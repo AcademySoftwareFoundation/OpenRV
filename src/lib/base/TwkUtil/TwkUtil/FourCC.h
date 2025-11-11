@@ -23,8 +23,7 @@ namespace TwkUtil
 
     template <int d, int c, int b, int a> struct FourCC
     {
-        static const PackedFourCC value =
-            (((((d << 8) | c) << 8) | b) << 8) | a;
+        static const PackedFourCC value = (((((d << 8) | c) << 8) | b) << 8) | a;
     };
 
     TWKUTIL_EXPORT std::string packedFourCCAsString(PackedFourCC x);

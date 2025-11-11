@@ -18,21 +18,16 @@ namespace Rv
     {
     }
 
-    QWidget*
-    PermDelegate::createEditor(QWidget* parent,
-                               const QStyleOptionViewItem& /* option */,
-                               const QModelIndex& /* index */) const
+    QWidget* PermDelegate::createEditor(QWidget* parent, const QStyleOptionViewItem& /* option */, const QModelIndex& /* index */) const
     {
         return new QComboBox(parent);
     }
 
-    void PermDelegate::setEditorData(QWidget* editor,
-                                     const QModelIndex& index) const
+    void PermDelegate::setEditorData(QWidget* editor, const QModelIndex& index) const
     {
         int value = index.model()->data(index, Qt::EditRole).toInt();
 
-        const QStandardItemModel* m =
-            static_cast<const QStandardItemModel*>(index.model());
+        const QStandardItemModel* m = static_cast<const QStandardItemModel*>(index.model());
 
         QComboBox* box = static_cast<QComboBox*>(editor);
         box->addItem("Ask");
@@ -49,8 +44,7 @@ namespace Rv
             box->setCurrentIndex(2);
     }
 
-    void PermDelegate::setModelData(QWidget* editor, QAbstractItemModel* model,
-                                    const QModelIndex& index) const
+    void PermDelegate::setModelData(QWidget* editor, QAbstractItemModel* model, const QModelIndex& index) const
     {
         QComboBox* cbox = static_cast<QComboBox*>(editor);
         QStandardItemModel* m = static_cast<QStandardItemModel*>(model);
@@ -61,10 +55,7 @@ namespace Rv
         m->setData(index, i->text(), Qt::EditRole);
     }
 
-    void
-    PermDelegate::updateEditorGeometry(QWidget* editor,
-                                       const QStyleOptionViewItem& option,
-                                       const QModelIndex& /* index */) const
+    void PermDelegate::updateEditorGeometry(QWidget* editor, const QStyleOptionViewItem& option, const QModelIndex& /* index */) const
     {
         editor->setGeometry(option.rect);
     }

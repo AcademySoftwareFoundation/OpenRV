@@ -58,16 +58,12 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(__allocate, Pointer)
     {
-        QRectType::Instance* i =
-            new QRectType::Instance((Class*)NODE_THIS.type());
+        QRectType::Instance* i = new QRectType::Instance((Class*)NODE_THIS.type());
         QRectType::registerFinalizer(i);
         NODE_RETURN(i);
     }
 
-    void QRectType::registerFinalizer(void* o)
-    {
-        GC_register_finalizer(o, QRectType::finalizer, 0, 0, 0);
-    }
+    void QRectType::registerFinalizer(void* o) { GC_register_finalizer(o, QRectType::finalizer, 0, 0, 0); }
 
     void QRectType::finalizer(void* obj, void* data)
     {
@@ -78,17 +74,14 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    Pointer qt_QRect_QRect_QRect_QRect(Mu::Thread& NODE_THREAD,
-                                       Pointer param_this)
+    Pointer qt_QRect_QRect_QRect_QRect(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         setqtype<QRectType>(param_this, QRect());
         return param_this;
     }
 
-    Pointer qt_QRect_QRect_QRect_QRect_QPoint_QPoint(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_this,
-                                                     Pointer param_topLeft,
+    Pointer qt_QRect_QRect_QRect_QRect_QPoint_QPoint(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_topLeft,
                                                      Pointer param_bottomRight)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
@@ -98,10 +91,7 @@ namespace Mu
         return param_this;
     }
 
-    Pointer qt_QRect_QRect_QRect_QRect_QPoint_QSize(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this,
-                                                    Pointer param_topLeft,
-                                                    Pointer param_size)
+    Pointer qt_QRect_QRect_QRect_QRect_QPoint_QSize(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_topLeft, Pointer param_size)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QPoint arg1 = getqtype<QPointType>(param_topLeft);
@@ -110,11 +100,8 @@ namespace Mu
         return param_this;
     }
 
-    Pointer qt_QRect_QRect_QRect_QRect_int_int_int_int(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this,
-                                                       int param_x, int param_y,
-                                                       int param_width,
-                                                       int param_height)
+    Pointer qt_QRect_QRect_QRect_QRect_int_int_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_x, int param_y,
+                                                       int param_width, int param_height)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         int arg1 = (int)(param_x);
@@ -125,9 +112,8 @@ namespace Mu
         return param_this;
     }
 
-    void qt_QRect_adjust_void_QRect_int_int_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_dx1,
-        int param_dy1, int param_dx2, int param_dy2)
+    void qt_QRect_adjust_void_QRect_int_int_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_dx1, int param_dy1,
+                                                    int param_dx2, int param_dy2)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRect arg0 = getqtype<QRectType>(param_this);
@@ -139,9 +125,8 @@ namespace Mu
         setqtype<QRectType>(param_this, arg0);
     }
 
-    Pointer qt_QRect_adjusted_QRect_QRect_int_int_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_dx1,
-        int param_dy1, int param_dx2, int param_dy2)
+    Pointer qt_QRect_adjusted_QRect_QRect_int_int_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_dx1, int param_dy1,
+                                                          int param_dx2, int param_dy2)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRect arg0 = getqtype<QRectType>(param_this);
@@ -149,8 +134,7 @@ namespace Mu
         int arg2 = (int)(param_dy1);
         int arg3 = (int)(param_dx2);
         int arg4 = (int)(param_dy2);
-        return makeqtype<QRectType>(c, arg0.adjusted(arg1, arg2, arg3, arg4),
-                                    "qt.QRect");
+        return makeqtype<QRectType>(c, arg0.adjusted(arg1, arg2, arg3, arg4), "qt.QRect");
     }
 
     int qt_QRect_bottom_int_QRect(Mu::Thread& NODE_THREAD, Pointer param_this)
@@ -160,34 +144,28 @@ namespace Mu
         return arg0.bottom();
     }
 
-    Pointer qt_QRect_bottomLeft_QPoint_QRect(Mu::Thread& NODE_THREAD,
-                                             Pointer param_this)
+    Pointer qt_QRect_bottomLeft_QPoint_QRect(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRect arg0 = getqtype<QRectType>(param_this);
         return makeqtype<QPointType>(c, arg0.bottomLeft(), "qt.QPoint");
     }
 
-    Pointer qt_QRect_bottomRight_QPoint_QRect(Mu::Thread& NODE_THREAD,
-                                              Pointer param_this)
+    Pointer qt_QRect_bottomRight_QPoint_QRect(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRect arg0 = getqtype<QRectType>(param_this);
         return makeqtype<QPointType>(c, arg0.bottomRight(), "qt.QPoint");
     }
 
-    Pointer qt_QRect_center_QPoint_QRect(Mu::Thread& NODE_THREAD,
-                                         Pointer param_this)
+    Pointer qt_QRect_center_QPoint_QRect(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRect arg0 = getqtype<QRectType>(param_this);
         return makeqtype<QPointType>(c, arg0.center(), "qt.QPoint");
     }
 
-    bool qt_QRect_contains_bool_QRect_QPoint_bool(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this,
-                                                  Pointer param_point,
-                                                  bool param_proper)
+    bool qt_QRect_contains_bool_QRect_QPoint_bool(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_point, bool param_proper)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRect arg0 = getqtype<QRectType>(param_this);
@@ -196,10 +174,7 @@ namespace Mu
         return arg0.contains(arg1, arg2);
     }
 
-    bool qt_QRect_contains_bool_QRect_QRect_bool(Mu::Thread& NODE_THREAD,
-                                                 Pointer param_this,
-                                                 Pointer param_rectangle,
-                                                 bool param_proper)
+    bool qt_QRect_contains_bool_QRect_QRect_bool(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_rectangle, bool param_proper)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRect arg0 = getqtype<QRectType>(param_this);
@@ -208,9 +183,7 @@ namespace Mu
         return arg0.contains(arg1, arg2);
     }
 
-    bool qt_QRect_contains_bool_QRect_int_int(Mu::Thread& NODE_THREAD,
-                                              Pointer param_this, int param_x,
-                                              int param_y)
+    bool qt_QRect_contains_bool_QRect_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_x, int param_y)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRect arg0 = getqtype<QRectType>(param_this);
@@ -219,10 +192,7 @@ namespace Mu
         return arg0.contains(arg1, arg2);
     }
 
-    bool qt_QRect_contains_bool_QRect_int_int_bool(Mu::Thread& NODE_THREAD,
-                                                   Pointer param_this,
-                                                   int param_x, int param_y,
-                                                   bool param_proper)
+    bool qt_QRect_contains_bool_QRect_int_int_bool(Mu::Thread& NODE_THREAD, Pointer param_this, int param_x, int param_y, bool param_proper)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRect arg0 = getqtype<QRectType>(param_this);
@@ -239,9 +209,7 @@ namespace Mu
         return arg0.height();
     }
 
-    Pointer qt_QRect_intersected_QRect_QRect_QRect(Mu::Thread& NODE_THREAD,
-                                                   Pointer param_this,
-                                                   Pointer param_rectangle)
+    Pointer qt_QRect_intersected_QRect_QRect_QRect(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_rectangle)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRect arg0 = getqtype<QRectType>(param_this);
@@ -249,9 +217,7 @@ namespace Mu
         return makeqtype<QRectType>(c, arg0.intersected(arg1), "qt.QRect");
     }
 
-    bool qt_QRect_intersects_bool_QRect_QRect(Mu::Thread& NODE_THREAD,
-                                              Pointer param_this,
-                                              Pointer param_rectangle)
+    bool qt_QRect_intersects_bool_QRect_QRect(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_rectangle)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRect arg0 = getqtype<QRectType>(param_this);
@@ -259,8 +225,7 @@ namespace Mu
         return arg0.intersects(arg1);
     }
 
-    bool qt_QRect_isEmpty_bool_QRect(Mu::Thread& NODE_THREAD,
-                                     Pointer param_this)
+    bool qt_QRect_isEmpty_bool_QRect(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRect arg0 = getqtype<QRectType>(param_this);
@@ -274,8 +239,7 @@ namespace Mu
         return arg0.isNull();
     }
 
-    bool qt_QRect_isValid_bool_QRect(Mu::Thread& NODE_THREAD,
-                                     Pointer param_this)
+    bool qt_QRect_isValid_bool_QRect(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRect arg0 = getqtype<QRectType>(param_this);
@@ -289,9 +253,7 @@ namespace Mu
         return arg0.left();
     }
 
-    Pointer qt_QRect_marginsAdded_QRect_QRect_QMargins(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this,
-                                                       Pointer param_margins)
+    Pointer qt_QRect_marginsAdded_QRect_QRect_QMargins(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_margins)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRect arg0 = getqtype<QRectType>(param_this);
@@ -299,8 +261,7 @@ namespace Mu
         return makeqtype<QRectType>(c, arg0.marginsAdded(arg1), "qt.QRect");
     }
 
-    Pointer qt_QRect_marginsRemoved_QRect_QRect_QMargins(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_margins)
+    Pointer qt_QRect_marginsRemoved_QRect_QRect_QMargins(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_margins)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRect arg0 = getqtype<QRectType>(param_this);
@@ -308,8 +269,7 @@ namespace Mu
         return makeqtype<QRectType>(c, arg0.marginsRemoved(arg1), "qt.QRect");
     }
 
-    void qt_QRect_moveBottom_void_QRect_int(Mu::Thread& NODE_THREAD,
-                                            Pointer param_this, int param_y)
+    void qt_QRect_moveBottom_void_QRect_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_y)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRect arg0 = getqtype<QRectType>(param_this);
@@ -318,9 +278,7 @@ namespace Mu
         setqtype<QRectType>(param_this, arg0);
     }
 
-    void qt_QRect_moveBottomLeft_void_QRect_QPoint(Mu::Thread& NODE_THREAD,
-                                                   Pointer param_this,
-                                                   Pointer param_position)
+    void qt_QRect_moveBottomLeft_void_QRect_QPoint(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_position)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRect arg0 = getqtype<QRectType>(param_this);
@@ -329,9 +287,7 @@ namespace Mu
         setqtype<QRectType>(param_this, arg0);
     }
 
-    void qt_QRect_moveBottomRight_void_QRect_QPoint(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this,
-                                                    Pointer param_position)
+    void qt_QRect_moveBottomRight_void_QRect_QPoint(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_position)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRect arg0 = getqtype<QRectType>(param_this);
@@ -340,9 +296,7 @@ namespace Mu
         setqtype<QRectType>(param_this, arg0);
     }
 
-    void qt_QRect_moveCenter_void_QRect_QPoint(Mu::Thread& NODE_THREAD,
-                                               Pointer param_this,
-                                               Pointer param_position)
+    void qt_QRect_moveCenter_void_QRect_QPoint(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_position)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRect arg0 = getqtype<QRectType>(param_this);
@@ -351,8 +305,7 @@ namespace Mu
         setqtype<QRectType>(param_this, arg0);
     }
 
-    void qt_QRect_moveLeft_void_QRect_int(Mu::Thread& NODE_THREAD,
-                                          Pointer param_this, int param_x)
+    void qt_QRect_moveLeft_void_QRect_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_x)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRect arg0 = getqtype<QRectType>(param_this);
@@ -361,8 +314,7 @@ namespace Mu
         setqtype<QRectType>(param_this, arg0);
     }
 
-    void qt_QRect_moveRight_void_QRect_int(Mu::Thread& NODE_THREAD,
-                                           Pointer param_this, int param_x)
+    void qt_QRect_moveRight_void_QRect_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_x)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRect arg0 = getqtype<QRectType>(param_this);
@@ -371,9 +323,7 @@ namespace Mu
         setqtype<QRectType>(param_this, arg0);
     }
 
-    void qt_QRect_moveTo_void_QRect_int_int(Mu::Thread& NODE_THREAD,
-                                            Pointer param_this, int param_x,
-                                            int param_y)
+    void qt_QRect_moveTo_void_QRect_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_x, int param_y)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRect arg0 = getqtype<QRectType>(param_this);
@@ -383,9 +333,7 @@ namespace Mu
         setqtype<QRectType>(param_this, arg0);
     }
 
-    void qt_QRect_moveTo_void_QRect_QPoint(Mu::Thread& NODE_THREAD,
-                                           Pointer param_this,
-                                           Pointer param_position)
+    void qt_QRect_moveTo_void_QRect_QPoint(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_position)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRect arg0 = getqtype<QRectType>(param_this);
@@ -394,8 +342,7 @@ namespace Mu
         setqtype<QRectType>(param_this, arg0);
     }
 
-    void qt_QRect_moveTop_void_QRect_int(Mu::Thread& NODE_THREAD,
-                                         Pointer param_this, int param_y)
+    void qt_QRect_moveTop_void_QRect_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_y)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRect arg0 = getqtype<QRectType>(param_this);
@@ -404,9 +351,7 @@ namespace Mu
         setqtype<QRectType>(param_this, arg0);
     }
 
-    void qt_QRect_moveTopLeft_void_QRect_QPoint(Mu::Thread& NODE_THREAD,
-                                                Pointer param_this,
-                                                Pointer param_position)
+    void qt_QRect_moveTopLeft_void_QRect_QPoint(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_position)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRect arg0 = getqtype<QRectType>(param_this);
@@ -415,9 +360,7 @@ namespace Mu
         setqtype<QRectType>(param_this, arg0);
     }
 
-    void qt_QRect_moveTopRight_void_QRect_QPoint(Mu::Thread& NODE_THREAD,
-                                                 Pointer param_this,
-                                                 Pointer param_position)
+    void qt_QRect_moveTopRight_void_QRect_QPoint(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_position)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRect arg0 = getqtype<QRectType>(param_this);
@@ -426,8 +369,7 @@ namespace Mu
         setqtype<QRectType>(param_this, arg0);
     }
 
-    Pointer qt_QRect_normalized_QRect_QRect(Mu::Thread& NODE_THREAD,
-                                            Pointer param_this)
+    Pointer qt_QRect_normalized_QRect_QRect(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRect arg0 = getqtype<QRectType>(param_this);
@@ -441,8 +383,7 @@ namespace Mu
         return arg0.right();
     }
 
-    void qt_QRect_setBottom_void_QRect_int(Mu::Thread& NODE_THREAD,
-                                           Pointer param_this, int param_y)
+    void qt_QRect_setBottom_void_QRect_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_y)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRect arg0 = getqtype<QRectType>(param_this);
@@ -451,9 +392,7 @@ namespace Mu
         setqtype<QRectType>(param_this, arg0);
     }
 
-    void qt_QRect_setBottomLeft_void_QRect_QPoint(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this,
-                                                  Pointer param_position)
+    void qt_QRect_setBottomLeft_void_QRect_QPoint(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_position)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRect arg0 = getqtype<QRectType>(param_this);
@@ -462,9 +401,7 @@ namespace Mu
         setqtype<QRectType>(param_this, arg0);
     }
 
-    void qt_QRect_setBottomRight_void_QRect_QPoint(Mu::Thread& NODE_THREAD,
-                                                   Pointer param_this,
-                                                   Pointer param_position)
+    void qt_QRect_setBottomRight_void_QRect_QPoint(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_position)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRect arg0 = getqtype<QRectType>(param_this);
@@ -473,9 +410,8 @@ namespace Mu
         setqtype<QRectType>(param_this, arg0);
     }
 
-    void qt_QRect_setCoords_void_QRect_int_int_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_x1, int param_y1,
-        int param_x2, int param_y2)
+    void qt_QRect_setCoords_void_QRect_int_int_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_x1, int param_y1,
+                                                       int param_x2, int param_y2)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRect arg0 = getqtype<QRectType>(param_this);
@@ -487,8 +423,7 @@ namespace Mu
         setqtype<QRectType>(param_this, arg0);
     }
 
-    void qt_QRect_setHeight_void_QRect_int(Mu::Thread& NODE_THREAD,
-                                           Pointer param_this, int param_height)
+    void qt_QRect_setHeight_void_QRect_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_height)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRect arg0 = getqtype<QRectType>(param_this);
@@ -497,8 +432,7 @@ namespace Mu
         setqtype<QRectType>(param_this, arg0);
     }
 
-    void qt_QRect_setLeft_void_QRect_int(Mu::Thread& NODE_THREAD,
-                                         Pointer param_this, int param_x)
+    void qt_QRect_setLeft_void_QRect_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_x)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRect arg0 = getqtype<QRectType>(param_this);
@@ -507,10 +441,7 @@ namespace Mu
         setqtype<QRectType>(param_this, arg0);
     }
 
-    void qt_QRect_setRect_void_QRect_int_int_int_int(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_this,
-                                                     int param_x, int param_y,
-                                                     int param_width,
+    void qt_QRect_setRect_void_QRect_int_int_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_x, int param_y, int param_width,
                                                      int param_height)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
@@ -523,8 +454,7 @@ namespace Mu
         setqtype<QRectType>(param_this, arg0);
     }
 
-    void qt_QRect_setRight_void_QRect_int(Mu::Thread& NODE_THREAD,
-                                          Pointer param_this, int param_x)
+    void qt_QRect_setRight_void_QRect_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_x)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRect arg0 = getqtype<QRectType>(param_this);
@@ -533,9 +463,7 @@ namespace Mu
         setqtype<QRectType>(param_this, arg0);
     }
 
-    void qt_QRect_setSize_void_QRect_QSize(Mu::Thread& NODE_THREAD,
-                                           Pointer param_this,
-                                           Pointer param_size)
+    void qt_QRect_setSize_void_QRect_QSize(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_size)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRect arg0 = getqtype<QRectType>(param_this);
@@ -544,8 +472,7 @@ namespace Mu
         setqtype<QRectType>(param_this, arg0);
     }
 
-    void qt_QRect_setTop_void_QRect_int(Mu::Thread& NODE_THREAD,
-                                        Pointer param_this, int param_y)
+    void qt_QRect_setTop_void_QRect_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_y)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRect arg0 = getqtype<QRectType>(param_this);
@@ -554,9 +481,7 @@ namespace Mu
         setqtype<QRectType>(param_this, arg0);
     }
 
-    void qt_QRect_setTopLeft_void_QRect_QPoint(Mu::Thread& NODE_THREAD,
-                                               Pointer param_this,
-                                               Pointer param_position)
+    void qt_QRect_setTopLeft_void_QRect_QPoint(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_position)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRect arg0 = getqtype<QRectType>(param_this);
@@ -565,9 +490,7 @@ namespace Mu
         setqtype<QRectType>(param_this, arg0);
     }
 
-    void qt_QRect_setTopRight_void_QRect_QPoint(Mu::Thread& NODE_THREAD,
-                                                Pointer param_this,
-                                                Pointer param_position)
+    void qt_QRect_setTopRight_void_QRect_QPoint(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_position)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRect arg0 = getqtype<QRectType>(param_this);
@@ -576,8 +499,7 @@ namespace Mu
         setqtype<QRectType>(param_this, arg0);
     }
 
-    void qt_QRect_setWidth_void_QRect_int(Mu::Thread& NODE_THREAD,
-                                          Pointer param_this, int param_width)
+    void qt_QRect_setWidth_void_QRect_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_width)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRect arg0 = getqtype<QRectType>(param_this);
@@ -586,8 +508,7 @@ namespace Mu
         setqtype<QRectType>(param_this, arg0);
     }
 
-    void qt_QRect_setX_void_QRect_int(Mu::Thread& NODE_THREAD,
-                                      Pointer param_this, int param_x)
+    void qt_QRect_setX_void_QRect_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_x)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRect arg0 = getqtype<QRectType>(param_this);
@@ -596,8 +517,7 @@ namespace Mu
         setqtype<QRectType>(param_this, arg0);
     }
 
-    void qt_QRect_setY_void_QRect_int(Mu::Thread& NODE_THREAD,
-                                      Pointer param_this, int param_y)
+    void qt_QRect_setY_void_QRect_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_y)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRect arg0 = getqtype<QRectType>(param_this);
@@ -606,16 +526,14 @@ namespace Mu
         setqtype<QRectType>(param_this, arg0);
     }
 
-    Pointer qt_QRect_size_QSize_QRect(Mu::Thread& NODE_THREAD,
-                                      Pointer param_this)
+    Pointer qt_QRect_size_QSize_QRect(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRect arg0 = getqtype<QRectType>(param_this);
         return makeqtype<QSizeType>(c, arg0.size(), "qt.QSize");
     }
 
-    Pointer qt_QRect_toRectF_QRectF_QRect(Mu::Thread& NODE_THREAD,
-                                          Pointer param_this)
+    Pointer qt_QRect_toRectF_QRectF_QRect(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRect arg0 = getqtype<QRectType>(param_this);
@@ -629,25 +547,21 @@ namespace Mu
         return arg0.top();
     }
 
-    Pointer qt_QRect_topLeft_QPoint_QRect(Mu::Thread& NODE_THREAD,
-                                          Pointer param_this)
+    Pointer qt_QRect_topLeft_QPoint_QRect(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRect arg0 = getqtype<QRectType>(param_this);
         return makeqtype<QPointType>(c, arg0.topLeft(), "qt.QPoint");
     }
 
-    Pointer qt_QRect_topRight_QPoint_QRect(Mu::Thread& NODE_THREAD,
-                                           Pointer param_this)
+    Pointer qt_QRect_topRight_QPoint_QRect(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRect arg0 = getqtype<QRectType>(param_this);
         return makeqtype<QPointType>(c, arg0.topRight(), "qt.QPoint");
     }
 
-    void qt_QRect_translate_void_QRect_int_int(Mu::Thread& NODE_THREAD,
-                                               Pointer param_this, int param_dx,
-                                               int param_dy)
+    void qt_QRect_translate_void_QRect_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_dx, int param_dy)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRect arg0 = getqtype<QRectType>(param_this);
@@ -657,9 +571,7 @@ namespace Mu
         setqtype<QRectType>(param_this, arg0);
     }
 
-    void qt_QRect_translate_void_QRect_QPoint(Mu::Thread& NODE_THREAD,
-                                              Pointer param_this,
-                                              Pointer param_offset)
+    void qt_QRect_translate_void_QRect_QPoint(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_offset)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRect arg0 = getqtype<QRectType>(param_this);
@@ -668,9 +580,7 @@ namespace Mu
         setqtype<QRectType>(param_this, arg0);
     }
 
-    Pointer qt_QRect_translated_QRect_QRect_int_int(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this,
-                                                    int param_dx, int param_dy)
+    Pointer qt_QRect_translated_QRect_QRect_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_dx, int param_dy)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRect arg0 = getqtype<QRectType>(param_this);
@@ -679,9 +589,7 @@ namespace Mu
         return makeqtype<QRectType>(c, arg0.translated(arg1, arg2), "qt.QRect");
     }
 
-    Pointer qt_QRect_translated_QRect_QRect_QPoint(Mu::Thread& NODE_THREAD,
-                                                   Pointer param_this,
-                                                   Pointer param_offset)
+    Pointer qt_QRect_translated_QRect_QRect_QPoint(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_offset)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRect arg0 = getqtype<QRectType>(param_this);
@@ -689,17 +597,14 @@ namespace Mu
         return makeqtype<QRectType>(c, arg0.translated(arg1), "qt.QRect");
     }
 
-    Pointer qt_QRect_transposed_QRect_QRect(Mu::Thread& NODE_THREAD,
-                                            Pointer param_this)
+    Pointer qt_QRect_transposed_QRect_QRect(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRect arg0 = getqtype<QRectType>(param_this);
         return makeqtype<QRectType>(c, arg0.transposed(), "qt.QRect");
     }
 
-    Pointer qt_QRect_united_QRect_QRect_QRect(Mu::Thread& NODE_THREAD,
-                                              Pointer param_this,
-                                              Pointer param_rectangle)
+    Pointer qt_QRect_united_QRect_QRect_QRect(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_rectangle)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRect arg0 = getqtype<QRectType>(param_this);
@@ -728,9 +633,7 @@ namespace Mu
         return arg0.y();
     }
 
-    Pointer qt_QRect_operatorAmp__QRect_QRect_QRect(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this,
-                                                    Pointer param_rectangle)
+    Pointer qt_QRect_operatorAmp__QRect_QRect_QRect(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_rectangle)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRect arg0 = getqtype<QRectType>(param_this);
@@ -738,8 +641,7 @@ namespace Mu
         return makeqtype<QRectType>(c, arg0.operator&(arg1), "qt.QRect");
     }
 
-    Pointer qt_QRect_operatorPlus_EQ__QRect_QRect_QMargins(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_margins)
+    Pointer qt_QRect_operatorPlus_EQ__QRect_QRect_QMargins(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_margins)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRect arg0 = getqtype<QRectType>(param_this);
@@ -747,8 +649,7 @@ namespace Mu
         return makeqtype<QRectType>(c, arg0.operator+=(arg1), "qt.QRect");
     }
 
-    Pointer qt_QRect_operatorMinus_EQ__QRect_QRect_QMargins(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_margins)
+    Pointer qt_QRect_operatorMinus_EQ__QRect_QRect_QMargins(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_margins)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRect arg0 = getqtype<QRectType>(param_this);
@@ -756,9 +657,7 @@ namespace Mu
         return makeqtype<QRectType>(c, arg0.operator-=(arg1), "qt.QRect");
     }
 
-    Pointer qt_QRect_operatorPipe__QRect_QRect_QRect(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_this,
-                                                     Pointer param_rectangle)
+    Pointer qt_QRect_operatorPipe__QRect_QRect_QRect(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_rectangle)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRect arg0 = getqtype<QRectType>(param_this);
@@ -766,9 +665,7 @@ namespace Mu
         return makeqtype<QRectType>(c, arg0.operator|(arg1), "qt.QRect");
     }
 
-    Pointer qt_QRect_operatorPipe_EQ__QRect_QRect_QRect(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this,
-                                                        Pointer param_rectangle)
+    Pointer qt_QRect_operatorPipe_EQ__QRect_QRect_QRect(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_rectangle)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRect arg0 = getqtype<QRectType>(param_this);
@@ -776,9 +673,7 @@ namespace Mu
         return makeqtype<QRectType>(c, arg0.operator|=(arg1), "qt.QRect");
     }
 
-    Pointer qt_QRect_span_QRect_QPoint_QPoint(Mu::Thread& NODE_THREAD,
-                                              Pointer param_p1,
-                                              Pointer param_p2)
+    Pointer qt_QRect_span_QRect_QPoint_QPoint(Mu::Thread& NODE_THREAD, Pointer param_p1, Pointer param_p2)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QPoint arg0 = getqtype<QPointType>(param_p1);
@@ -786,444 +681,321 @@ namespace Mu
         return makeqtype<QRectType>(c, QRect::span(arg0, arg1), "qt.QRect");
     }
 
-    static NODE_IMPLEMENTATION(_n_QRect0, Pointer)
-    {
-        NODE_RETURN(qt_QRect_QRect_QRect_QRect(NODE_THREAD,
-                                               NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_QRect0, Pointer) { NODE_RETURN(qt_QRect_QRect_QRect_QRect(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
     static NODE_IMPLEMENTATION(_n_QRect1, Pointer)
     {
-        NODE_RETURN(qt_QRect_QRect_QRect_QRect_QPoint_QPoint(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer)));
+        NODE_RETURN(
+            qt_QRect_QRect_QRect_QRect_QPoint_QPoint(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_QRect2, Pointer)
     {
-        NODE_RETURN(qt_QRect_QRect_QRect_QRect_QPoint_QSize(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer)));
+        NODE_RETURN(
+            qt_QRect_QRect_QRect_QRect_QPoint_QSize(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_QRect3, Pointer)
     {
-        NODE_RETURN(qt_QRect_QRect_QRect_QRect_int_int_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int), NODE_ARG(3, int), NODE_ARG(4, int)));
+        NODE_RETURN(qt_QRect_QRect_QRect_QRect_int_int_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int),
+                                                               NODE_ARG(3, int), NODE_ARG(4, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_adjust0, void)
     {
-        qt_QRect_adjust_void_QRect_int_int_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int), NODE_ARG(3, int), NODE_ARG(4, int));
+        qt_QRect_adjust_void_QRect_int_int_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int),
+                                                   NODE_ARG(3, int), NODE_ARG(4, int));
     }
 
     static NODE_IMPLEMENTATION(_n_adjusted0, Pointer)
     {
-        NODE_RETURN(qt_QRect_adjusted_QRect_QRect_int_int_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int), NODE_ARG(3, int), NODE_ARG(4, int)));
+        NODE_RETURN(qt_QRect_adjusted_QRect_QRect_int_int_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                  NODE_ARG(2, int), NODE_ARG(3, int), NODE_ARG(4, int)));
     }
 
-    static NODE_IMPLEMENTATION(_n_bottom0, int)
-    {
-        NODE_RETURN(qt_QRect_bottom_int_QRect(NODE_THREAD,
-                                              NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_bottom0, int) { NODE_RETURN(qt_QRect_bottom_int_QRect(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
     static NODE_IMPLEMENTATION(_n_bottomLeft0, Pointer)
     {
-        NODE_RETURN(qt_QRect_bottomLeft_QPoint_QRect(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QRect_bottomLeft_QPoint_QRect(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_bottomRight0, Pointer)
     {
-        NODE_RETURN(qt_QRect_bottomRight_QPoint_QRect(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QRect_bottomRight_QPoint_QRect(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
-    static NODE_IMPLEMENTATION(_n_center0, Pointer)
-    {
-        NODE_RETURN(qt_QRect_center_QPoint_QRect(NODE_THREAD,
-                                                 NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_center0, Pointer) { NODE_RETURN(qt_QRect_center_QPoint_QRect(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
     static NODE_IMPLEMENTATION(_n_contains0, bool)
     {
-        NODE_RETURN(qt_QRect_contains_bool_QRect_QPoint_bool(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, bool)));
+        NODE_RETURN(
+            qt_QRect_contains_bool_QRect_QPoint_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, bool)));
     }
 
     static NODE_IMPLEMENTATION(_n_contains1, bool)
     {
-        NODE_RETURN(qt_QRect_contains_bool_QRect_QRect_bool(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, bool)));
+        NODE_RETURN(
+            qt_QRect_contains_bool_QRect_QRect_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, bool)));
     }
 
     static NODE_IMPLEMENTATION(_n_contains2, bool)
     {
-        NODE_RETURN(qt_QRect_contains_bool_QRect_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int)));
+        NODE_RETURN(qt_QRect_contains_bool_QRect_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_contains3, bool)
     {
-        NODE_RETURN(qt_QRect_contains_bool_QRect_int_int_bool(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int), NODE_ARG(3, bool)));
+        NODE_RETURN(qt_QRect_contains_bool_QRect_int_int_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int),
+                                                              NODE_ARG(3, bool)));
     }
 
-    static NODE_IMPLEMENTATION(_n_height0, int)
-    {
-        NODE_RETURN(qt_QRect_height_int_QRect(NODE_THREAD,
-                                              NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_height0, int) { NODE_RETURN(qt_QRect_height_int_QRect(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
     static NODE_IMPLEMENTATION(_n_intersected0, Pointer)
     {
-        NODE_RETURN(qt_QRect_intersected_QRect_QRect_QRect(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QRect_intersected_QRect_QRect_QRect(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_intersects0, bool)
     {
-        NODE_RETURN(qt_QRect_intersects_bool_QRect_QRect(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QRect_intersects_bool_QRect_QRect(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
-    static NODE_IMPLEMENTATION(_n_isEmpty0, bool)
-    {
-        NODE_RETURN(qt_QRect_isEmpty_bool_QRect(NODE_THREAD,
-                                                NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_isEmpty0, bool) { NODE_RETURN(qt_QRect_isEmpty_bool_QRect(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
-    static NODE_IMPLEMENTATION(_n_isNull0, bool)
-    {
-        NODE_RETURN(qt_QRect_isNull_bool_QRect(NODE_THREAD,
-                                               NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_isNull0, bool) { NODE_RETURN(qt_QRect_isNull_bool_QRect(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
-    static NODE_IMPLEMENTATION(_n_isValid0, bool)
-    {
-        NODE_RETURN(qt_QRect_isValid_bool_QRect(NODE_THREAD,
-                                                NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_isValid0, bool) { NODE_RETURN(qt_QRect_isValid_bool_QRect(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
-    static NODE_IMPLEMENTATION(_n_left0, int)
-    {
-        NODE_RETURN(
-            qt_QRect_left_int_QRect(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_left0, int) { NODE_RETURN(qt_QRect_left_int_QRect(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
     static NODE_IMPLEMENTATION(_n_marginsAdded0, Pointer)
     {
-        NODE_RETURN(qt_QRect_marginsAdded_QRect_QRect_QMargins(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QRect_marginsAdded_QRect_QRect_QMargins(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_marginsRemoved0, Pointer)
     {
-        NODE_RETURN(qt_QRect_marginsRemoved_QRect_QRect_QMargins(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QRect_marginsRemoved_QRect_QRect_QMargins(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_moveBottom0, void)
     {
-        qt_QRect_moveBottom_void_QRect_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QRect_moveBottom_void_QRect_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_moveBottomLeft0, void)
     {
-        qt_QRect_moveBottomLeft_void_QRect_QPoint(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QRect_moveBottomLeft_void_QRect_QPoint(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_moveBottomRight0, void)
     {
-        qt_QRect_moveBottomRight_void_QRect_QPoint(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QRect_moveBottomRight_void_QRect_QPoint(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_moveCenter0, void)
     {
-        qt_QRect_moveCenter_void_QRect_QPoint(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QRect_moveCenter_void_QRect_QPoint(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_moveLeft0, void)
     {
-        qt_QRect_moveLeft_void_QRect_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QRect_moveLeft_void_QRect_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_moveRight0, void)
     {
-        qt_QRect_moveRight_void_QRect_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QRect_moveRight_void_QRect_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_moveTo0, void)
     {
-        qt_QRect_moveTo_void_QRect_int_int(NODE_THREAD,
-                                           NONNIL_NODE_ARG(0, Pointer),
-                                           NODE_ARG(1, int), NODE_ARG(2, int));
+        qt_QRect_moveTo_void_QRect_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_moveTo1, void)
     {
-        qt_QRect_moveTo_void_QRect_QPoint(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QRect_moveTo_void_QRect_QPoint(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_moveTop0, void)
     {
-        qt_QRect_moveTop_void_QRect_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QRect_moveTop_void_QRect_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_moveTopLeft0, void)
     {
-        qt_QRect_moveTopLeft_void_QRect_QPoint(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QRect_moveTopLeft_void_QRect_QPoint(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_moveTopRight0, void)
     {
-        qt_QRect_moveTopRight_void_QRect_QPoint(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QRect_moveTopRight_void_QRect_QPoint(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_normalized0, Pointer)
     {
-        NODE_RETURN(qt_QRect_normalized_QRect_QRect(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QRect_normalized_QRect_QRect(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
-    static NODE_IMPLEMENTATION(_n_right0, int)
-    {
-        NODE_RETURN(
-            qt_QRect_right_int_QRect(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_right0, int) { NODE_RETURN(qt_QRect_right_int_QRect(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
     static NODE_IMPLEMENTATION(_n_setBottom0, void)
     {
-        qt_QRect_setBottom_void_QRect_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QRect_setBottom_void_QRect_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setBottomLeft0, void)
     {
-        qt_QRect_setBottomLeft_void_QRect_QPoint(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QRect_setBottomLeft_void_QRect_QPoint(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setBottomRight0, void)
     {
-        qt_QRect_setBottomRight_void_QRect_QPoint(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QRect_setBottomRight_void_QRect_QPoint(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setCoords0, void)
     {
-        qt_QRect_setCoords_void_QRect_int_int_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int), NODE_ARG(3, int), NODE_ARG(4, int));
+        qt_QRect_setCoords_void_QRect_int_int_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int),
+                                                      NODE_ARG(3, int), NODE_ARG(4, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setHeight0, void)
     {
-        qt_QRect_setHeight_void_QRect_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QRect_setHeight_void_QRect_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setLeft0, void)
     {
-        qt_QRect_setLeft_void_QRect_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QRect_setLeft_void_QRect_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setRect0, void)
     {
-        qt_QRect_setRect_void_QRect_int_int_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int), NODE_ARG(3, int), NODE_ARG(4, int));
+        qt_QRect_setRect_void_QRect_int_int_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int),
+                                                    NODE_ARG(3, int), NODE_ARG(4, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setRight0, void)
     {
-        qt_QRect_setRight_void_QRect_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QRect_setRight_void_QRect_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setSize0, void)
     {
-        qt_QRect_setSize_void_QRect_QSize(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QRect_setSize_void_QRect_QSize(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setTop0, void)
     {
-        qt_QRect_setTop_void_QRect_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                                       NODE_ARG(1, int));
+        qt_QRect_setTop_void_QRect_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setTopLeft0, void)
     {
-        qt_QRect_setTopLeft_void_QRect_QPoint(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QRect_setTopLeft_void_QRect_QPoint(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setTopRight0, void)
     {
-        qt_QRect_setTopRight_void_QRect_QPoint(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QRect_setTopRight_void_QRect_QPoint(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setWidth0, void)
     {
-        qt_QRect_setWidth_void_QRect_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QRect_setWidth_void_QRect_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
-    static NODE_IMPLEMENTATION(_n_setX0, void)
-    {
-        qt_QRect_setX_void_QRect_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                                     NODE_ARG(1, int));
-    }
+    static NODE_IMPLEMENTATION(_n_setX0, void) { qt_QRect_setX_void_QRect_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)); }
 
-    static NODE_IMPLEMENTATION(_n_setY0, void)
-    {
-        qt_QRect_setY_void_QRect_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                                     NODE_ARG(1, int));
-    }
+    static NODE_IMPLEMENTATION(_n_setY0, void) { qt_QRect_setY_void_QRect_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)); }
 
-    static NODE_IMPLEMENTATION(_n_size0, Pointer)
-    {
-        NODE_RETURN(qt_QRect_size_QSize_QRect(NODE_THREAD,
-                                              NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_size0, Pointer) { NODE_RETURN(qt_QRect_size_QSize_QRect(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
     static NODE_IMPLEMENTATION(_n_toRectF0, Pointer)
     {
-        NODE_RETURN(qt_QRect_toRectF_QRectF_QRect(NODE_THREAD,
-                                                  NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QRect_toRectF_QRectF_QRect(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
-    static NODE_IMPLEMENTATION(_n_top0, int)
-    {
-        NODE_RETURN(
-            qt_QRect_top_int_QRect(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_top0, int) { NODE_RETURN(qt_QRect_top_int_QRect(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
     static NODE_IMPLEMENTATION(_n_topLeft0, Pointer)
     {
-        NODE_RETURN(qt_QRect_topLeft_QPoint_QRect(NODE_THREAD,
-                                                  NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QRect_topLeft_QPoint_QRect(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_topRight0, Pointer)
     {
-        NODE_RETURN(qt_QRect_topRight_QPoint_QRect(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QRect_topRight_QPoint_QRect(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_translate0, void)
     {
-        qt_QRect_translate_void_QRect_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int));
+        qt_QRect_translate_void_QRect_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_translate1, void)
     {
-        qt_QRect_translate_void_QRect_QPoint(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QRect_translate_void_QRect_QPoint(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_translated0, Pointer)
     {
-        NODE_RETURN(qt_QRect_translated_QRect_QRect_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int)));
+        NODE_RETURN(qt_QRect_translated_QRect_QRect_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_translated1, Pointer)
     {
-        NODE_RETURN(qt_QRect_translated_QRect_QRect_QPoint(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QRect_translated_QRect_QRect_QPoint(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_transposed0, Pointer)
     {
-        NODE_RETURN(qt_QRect_transposed_QRect_QRect(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QRect_transposed_QRect_QRect(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_united0, Pointer)
     {
-        NODE_RETURN(qt_QRect_united_QRect_QRect_QRect(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QRect_united_QRect_QRect_QRect(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
-    static NODE_IMPLEMENTATION(_n_width0, int)
-    {
-        NODE_RETURN(
-            qt_QRect_width_int_QRect(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_width0, int) { NODE_RETURN(qt_QRect_width_int_QRect(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
-    static NODE_IMPLEMENTATION(_n_x0, int)
-    {
-        NODE_RETURN(
-            qt_QRect_x_int_QRect(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_x0, int) { NODE_RETURN(qt_QRect_x_int_QRect(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
-    static NODE_IMPLEMENTATION(_n_y0, int)
-    {
-        NODE_RETURN(
-            qt_QRect_y_int_QRect(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_y0, int) { NODE_RETURN(qt_QRect_y_int_QRect(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
     static NODE_IMPLEMENTATION(_n_operatorAmp_0, Pointer)
     {
-        NODE_RETURN(qt_QRect_operatorAmp__QRect_QRect_QRect(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QRect_operatorAmp__QRect_QRect_QRect(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorPlus_EQ_0, Pointer)
     {
-        NODE_RETURN(qt_QRect_operatorPlus_EQ__QRect_QRect_QMargins(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QRect_operatorPlus_EQ__QRect_QRect_QMargins(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorMinus_EQ_0, Pointer)
     {
-        NODE_RETURN(qt_QRect_operatorMinus_EQ__QRect_QRect_QMargins(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QRect_operatorMinus_EQ__QRect_QRect_QMargins(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorPipe_0, Pointer)
     {
-        NODE_RETURN(qt_QRect_operatorPipe__QRect_QRect_QRect(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QRect_operatorPipe__QRect_QRect_QRect(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorPipe_EQ_0, Pointer)
     {
-        NODE_RETURN(qt_QRect_operatorPipe_EQ__QRect_QRect_QRect(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QRect_operatorPipe_EQ__QRect_QRect_QRect(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_span0, Pointer)
     {
-        NODE_RETURN(qt_QRect_span_QRect_QPoint_QPoint(
-            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QRect_span_QRect_QPoint_QPoint(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     void QRectType::load()
@@ -1243,326 +1015,176 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(
-            new Function(c, "__allocate", __allocate, None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", __allocate, None, Return, ftn, End),
 
-            EndArguments);
+                   EndArguments);
 
         addSymbols(EndArguments);
 
         addSymbols(
             // enums
             // member functions
-            new Function(c, "QRect", _n_QRect0, None, Compiled,
-                         qt_QRect_QRect_QRect_QRect, Return, "qt.QRect",
-                         Parameters, new Param(c, "this", "qt.QRect"), End),
-            new Function(c, "QRect", _n_QRect1, None, Compiled,
-                         qt_QRect_QRect_QRect_QRect_QPoint_QPoint, Return,
-                         "qt.QRect", Parameters,
-                         new Param(c, "this", "qt.QRect"),
-                         new Param(c, "topLeft", "qt.QPoint"),
-                         new Param(c, "bottomRight", "qt.QPoint"), End),
-            new Function(c, "QRect", _n_QRect2, None, Compiled,
-                         qt_QRect_QRect_QRect_QRect_QPoint_QSize, Return,
-                         "qt.QRect", Parameters,
-                         new Param(c, "this", "qt.QRect"),
-                         new Param(c, "topLeft", "qt.QPoint"),
-                         new Param(c, "size", "qt.QSize"), End),
-            new Function(c, "QRect", _n_QRect3, None, Compiled,
-                         qt_QRect_QRect_QRect_QRect_int_int_int_int, Return,
-                         "qt.QRect", Parameters,
-                         new Param(c, "this", "qt.QRect"),
-                         new Param(c, "x", "int"), new Param(c, "y", "int"),
-                         new Param(c, "width", "int"),
-                         new Param(c, "height", "int"), End),
-            new Function(c, "adjust", _n_adjust0, None, Compiled,
-                         qt_QRect_adjust_void_QRect_int_int_int_int, Return,
-                         "void", Parameters, new Param(c, "this", "qt.QRect"),
-                         new Param(c, "dx1", "int"), new Param(c, "dy1", "int"),
-                         new Param(c, "dx2", "int"), new Param(c, "dy2", "int"),
-                         End),
-            new Function(
-                c, "adjusted", _n_adjusted0, None, Compiled,
-                qt_QRect_adjusted_QRect_QRect_int_int_int_int, Return,
-                "qt.QRect", Parameters, new Param(c, "this", "qt.QRect"),
-                new Param(c, "dx1", "int"), new Param(c, "dy1", "int"),
-                new Param(c, "dx2", "int"), new Param(c, "dy2", "int"), End),
-            new Function(c, "bottom", _n_bottom0, None, Compiled,
-                         qt_QRect_bottom_int_QRect, Return, "int", Parameters,
+            new Function(c, "QRect", _n_QRect0, None, Compiled, qt_QRect_QRect_QRect_QRect, Return, "qt.QRect", Parameters,
                          new Param(c, "this", "qt.QRect"), End),
-            new Function(c, "bottomLeft", _n_bottomLeft0, None, Compiled,
-                         qt_QRect_bottomLeft_QPoint_QRect, Return, "qt.QPoint",
-                         Parameters, new Param(c, "this", "qt.QRect"), End),
-            new Function(c, "bottomRight", _n_bottomRight0, None, Compiled,
-                         qt_QRect_bottomRight_QPoint_QRect, Return, "qt.QPoint",
-                         Parameters, new Param(c, "this", "qt.QRect"), End),
-            new Function(c, "center", _n_center0, None, Compiled,
-                         qt_QRect_center_QPoint_QRect, Return, "qt.QPoint",
-                         Parameters, new Param(c, "this", "qt.QRect"), End),
-            new Function(c, "contains", _n_contains0, None, Compiled,
-                         qt_QRect_contains_bool_QRect_QPoint_bool, Return,
-                         "bool", Parameters, new Param(c, "this", "qt.QRect"),
-                         new Param(c, "point", "qt.QPoint"),
-                         new Param(c, "proper", "bool"), End),
-            new Function(c, "contains", _n_contains1, None, Compiled,
-                         qt_QRect_contains_bool_QRect_QRect_bool, Return,
-                         "bool", Parameters, new Param(c, "this", "qt.QRect"),
-                         new Param(c, "rectangle", "qt.QRect"),
-                         new Param(c, "proper", "bool"), End),
-            new Function(c, "contains", _n_contains2, None, Compiled,
-                         qt_QRect_contains_bool_QRect_int_int, Return, "bool",
-                         Parameters, new Param(c, "this", "qt.QRect"),
-                         new Param(c, "x", "int"), new Param(c, "y", "int"),
+            new Function(c, "QRect", _n_QRect1, None, Compiled, qt_QRect_QRect_QRect_QRect_QPoint_QPoint, Return, "qt.QRect", Parameters,
+                         new Param(c, "this", "qt.QRect"), new Param(c, "topLeft", "qt.QPoint"), new Param(c, "bottomRight", "qt.QPoint"),
                          End),
-            new Function(c, "contains", _n_contains3, None, Compiled,
-                         qt_QRect_contains_bool_QRect_int_int_bool, Return,
-                         "bool", Parameters, new Param(c, "this", "qt.QRect"),
-                         new Param(c, "x", "int"), new Param(c, "y", "int"),
+            new Function(c, "QRect", _n_QRect2, None, Compiled, qt_QRect_QRect_QRect_QRect_QPoint_QSize, Return, "qt.QRect", Parameters,
+                         new Param(c, "this", "qt.QRect"), new Param(c, "topLeft", "qt.QPoint"), new Param(c, "size", "qt.QSize"), End),
+            new Function(c, "QRect", _n_QRect3, None, Compiled, qt_QRect_QRect_QRect_QRect_int_int_int_int, Return, "qt.QRect", Parameters,
+                         new Param(c, "this", "qt.QRect"), new Param(c, "x", "int"), new Param(c, "y", "int"), new Param(c, "width", "int"),
+                         new Param(c, "height", "int"), End),
+            new Function(c, "adjust", _n_adjust0, None, Compiled, qt_QRect_adjust_void_QRect_int_int_int_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QRect"), new Param(c, "dx1", "int"), new Param(c, "dy1", "int"),
+                         new Param(c, "dx2", "int"), new Param(c, "dy2", "int"), End),
+            new Function(c, "adjusted", _n_adjusted0, None, Compiled, qt_QRect_adjusted_QRect_QRect_int_int_int_int, Return, "qt.QRect",
+                         Parameters, new Param(c, "this", "qt.QRect"), new Param(c, "dx1", "int"), new Param(c, "dy1", "int"),
+                         new Param(c, "dx2", "int"), new Param(c, "dy2", "int"), End),
+            new Function(c, "bottom", _n_bottom0, None, Compiled, qt_QRect_bottom_int_QRect, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QRect"), End),
+            new Function(c, "bottomLeft", _n_bottomLeft0, None, Compiled, qt_QRect_bottomLeft_QPoint_QRect, Return, "qt.QPoint", Parameters,
+                         new Param(c, "this", "qt.QRect"), End),
+            new Function(c, "bottomRight", _n_bottomRight0, None, Compiled, qt_QRect_bottomRight_QPoint_QRect, Return, "qt.QPoint",
+                         Parameters, new Param(c, "this", "qt.QRect"), End),
+            new Function(c, "center", _n_center0, None, Compiled, qt_QRect_center_QPoint_QRect, Return, "qt.QPoint", Parameters,
+                         new Param(c, "this", "qt.QRect"), End),
+            new Function(c, "contains", _n_contains0, None, Compiled, qt_QRect_contains_bool_QRect_QPoint_bool, Return, "bool", Parameters,
+                         new Param(c, "this", "qt.QRect"), new Param(c, "point", "qt.QPoint"), new Param(c, "proper", "bool"), End),
+            new Function(c, "contains", _n_contains1, None, Compiled, qt_QRect_contains_bool_QRect_QRect_bool, Return, "bool", Parameters,
+                         new Param(c, "this", "qt.QRect"), new Param(c, "rectangle", "qt.QRect"), new Param(c, "proper", "bool"), End),
+            new Function(c, "contains", _n_contains2, None, Compiled, qt_QRect_contains_bool_QRect_int_int, Return, "bool", Parameters,
+                         new Param(c, "this", "qt.QRect"), new Param(c, "x", "int"), new Param(c, "y", "int"), End),
+            new Function(c, "contains", _n_contains3, None, Compiled, qt_QRect_contains_bool_QRect_int_int_bool, Return, "bool", Parameters,
+                         new Param(c, "this", "qt.QRect"), new Param(c, "x", "int"), new Param(c, "y", "int"),
                          new Param(c, "proper", "bool"), End),
             // MISSING: getCoords (void; QRect this, "int *" x1, "int *" y1,
             // "int *" x2, "int *" y2) MISSING: getRect (void; QRect this, "int
             // *" x, "int *" y, "int *" width, "int *" height)
-            new Function(c, "height", _n_height0, None, Compiled,
-                         qt_QRect_height_int_QRect, Return, "int", Parameters,
+            new Function(c, "height", _n_height0, None, Compiled, qt_QRect_height_int_QRect, Return, "int", Parameters,
                          new Param(c, "this", "qt.QRect"), End),
-            new Function(c, "intersected", _n_intersected0, None, Compiled,
-                         qt_QRect_intersected_QRect_QRect_QRect, Return,
-                         "qt.QRect", Parameters,
-                         new Param(c, "this", "qt.QRect"),
-                         new Param(c, "rectangle", "qt.QRect"), End),
-            new Function(c, "intersects", _n_intersects0, None, Compiled,
-                         qt_QRect_intersects_bool_QRect_QRect, Return, "bool",
-                         Parameters, new Param(c, "this", "qt.QRect"),
-                         new Param(c, "rectangle", "qt.QRect"), End),
-            new Function(c, "isEmpty", _n_isEmpty0, None, Compiled,
-                         qt_QRect_isEmpty_bool_QRect, Return, "bool",
-                         Parameters, new Param(c, "this", "qt.QRect"), End),
-            new Function(c, "isNull", _n_isNull0, None, Compiled,
-                         qt_QRect_isNull_bool_QRect, Return, "bool", Parameters,
+            new Function(c, "intersected", _n_intersected0, None, Compiled, qt_QRect_intersected_QRect_QRect_QRect, Return, "qt.QRect",
+                         Parameters, new Param(c, "this", "qt.QRect"), new Param(c, "rectangle", "qt.QRect"), End),
+            new Function(c, "intersects", _n_intersects0, None, Compiled, qt_QRect_intersects_bool_QRect_QRect, Return, "bool", Parameters,
+                         new Param(c, "this", "qt.QRect"), new Param(c, "rectangle", "qt.QRect"), End),
+            new Function(c, "isEmpty", _n_isEmpty0, None, Compiled, qt_QRect_isEmpty_bool_QRect, Return, "bool", Parameters,
                          new Param(c, "this", "qt.QRect"), End),
-            new Function(c, "isValid", _n_isValid0, None, Compiled,
-                         qt_QRect_isValid_bool_QRect, Return, "bool",
-                         Parameters, new Param(c, "this", "qt.QRect"), End),
-            new Function(c, "left", _n_left0, None, Compiled,
-                         qt_QRect_left_int_QRect, Return, "int", Parameters,
+            new Function(c, "isNull", _n_isNull0, None, Compiled, qt_QRect_isNull_bool_QRect, Return, "bool", Parameters,
                          new Param(c, "this", "qt.QRect"), End),
-            new Function(c, "marginsAdded", _n_marginsAdded0, None, Compiled,
-                         qt_QRect_marginsAdded_QRect_QRect_QMargins, Return,
-                         "qt.QRect", Parameters,
-                         new Param(c, "this", "qt.QRect"),
-                         new Param(c, "margins", "qt.QMargins"), End),
-            new Function(c, "marginsRemoved", _n_marginsRemoved0, None,
-                         Compiled, qt_QRect_marginsRemoved_QRect_QRect_QMargins,
-                         Return, "qt.QRect", Parameters,
-                         new Param(c, "this", "qt.QRect"),
-                         new Param(c, "margins", "qt.QMargins"), End),
-            new Function(c, "moveBottom", _n_moveBottom0, None, Compiled,
-                         qt_QRect_moveBottom_void_QRect_int, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QRect"),
-                         new Param(c, "y", "int"), End),
-            new Function(c, "moveBottomLeft", _n_moveBottomLeft0, None,
-                         Compiled, qt_QRect_moveBottomLeft_void_QRect_QPoint,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QRect"),
-                         new Param(c, "position", "qt.QPoint"), End),
-            new Function(c, "moveBottomRight", _n_moveBottomRight0, None,
-                         Compiled, qt_QRect_moveBottomRight_void_QRect_QPoint,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QRect"),
-                         new Param(c, "position", "qt.QPoint"), End),
-            new Function(c, "moveCenter", _n_moveCenter0, None, Compiled,
-                         qt_QRect_moveCenter_void_QRect_QPoint, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QRect"),
-                         new Param(c, "position", "qt.QPoint"), End),
-            new Function(c, "moveLeft", _n_moveLeft0, None, Compiled,
-                         qt_QRect_moveLeft_void_QRect_int, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QRect"),
-                         new Param(c, "x", "int"), End),
-            new Function(c, "moveRight", _n_moveRight0, None, Compiled,
-                         qt_QRect_moveRight_void_QRect_int, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QRect"),
-                         new Param(c, "x", "int"), End),
-            new Function(c, "moveTo", _n_moveTo0, None, Compiled,
-                         qt_QRect_moveTo_void_QRect_int_int, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QRect"),
-                         new Param(c, "x", "int"), new Param(c, "y", "int"),
-                         End),
-            new Function(c, "moveTo", _n_moveTo1, None, Compiled,
-                         qt_QRect_moveTo_void_QRect_QPoint, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QRect"),
-                         new Param(c, "position", "qt.QPoint"), End),
-            new Function(c, "moveTop", _n_moveTop0, None, Compiled,
-                         qt_QRect_moveTop_void_QRect_int, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QRect"),
-                         new Param(c, "y", "int"), End),
-            new Function(c, "moveTopLeft", _n_moveTopLeft0, None, Compiled,
-                         qt_QRect_moveTopLeft_void_QRect_QPoint, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QRect"),
-                         new Param(c, "position", "qt.QPoint"), End),
-            new Function(c, "moveTopRight", _n_moveTopRight0, None, Compiled,
-                         qt_QRect_moveTopRight_void_QRect_QPoint, Return,
-                         "void", Parameters, new Param(c, "this", "qt.QRect"),
-                         new Param(c, "position", "qt.QPoint"), End),
-            new Function(c, "normalized", _n_normalized0, None, Compiled,
-                         qt_QRect_normalized_QRect_QRect, Return, "qt.QRect",
-                         Parameters, new Param(c, "this", "qt.QRect"), End),
-            new Function(c, "right", _n_right0, None, Compiled,
-                         qt_QRect_right_int_QRect, Return, "int", Parameters,
+            new Function(c, "isValid", _n_isValid0, None, Compiled, qt_QRect_isValid_bool_QRect, Return, "bool", Parameters,
                          new Param(c, "this", "qt.QRect"), End),
-            new Function(c, "setBottom", _n_setBottom0, None, Compiled,
-                         qt_QRect_setBottom_void_QRect_int, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QRect"),
-                         new Param(c, "y", "int"), End),
-            new Function(c, "setBottomLeft", _n_setBottomLeft0, None, Compiled,
-                         qt_QRect_setBottomLeft_void_QRect_QPoint, Return,
-                         "void", Parameters, new Param(c, "this", "qt.QRect"),
-                         new Param(c, "position", "qt.QPoint"), End),
-            new Function(c, "setBottomRight", _n_setBottomRight0, None,
-                         Compiled, qt_QRect_setBottomRight_void_QRect_QPoint,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QRect"),
-                         new Param(c, "position", "qt.QPoint"), End),
-            new Function(c, "setCoords", _n_setCoords0, None, Compiled,
-                         qt_QRect_setCoords_void_QRect_int_int_int_int, Return,
-                         "void", Parameters, new Param(c, "this", "qt.QRect"),
-                         new Param(c, "x1", "int"), new Param(c, "y1", "int"),
-                         new Param(c, "x2", "int"), new Param(c, "y2", "int"),
-                         End),
-            new Function(c, "setHeight", _n_setHeight0, None, Compiled,
-                         qt_QRect_setHeight_void_QRect_int, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QRect"),
+            new Function(c, "left", _n_left0, None, Compiled, qt_QRect_left_int_QRect, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QRect"), End),
+            new Function(c, "marginsAdded", _n_marginsAdded0, None, Compiled, qt_QRect_marginsAdded_QRect_QRect_QMargins, Return,
+                         "qt.QRect", Parameters, new Param(c, "this", "qt.QRect"), new Param(c, "margins", "qt.QMargins"), End),
+            new Function(c, "marginsRemoved", _n_marginsRemoved0, None, Compiled, qt_QRect_marginsRemoved_QRect_QRect_QMargins, Return,
+                         "qt.QRect", Parameters, new Param(c, "this", "qt.QRect"), new Param(c, "margins", "qt.QMargins"), End),
+            new Function(c, "moveBottom", _n_moveBottom0, None, Compiled, qt_QRect_moveBottom_void_QRect_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QRect"), new Param(c, "y", "int"), End),
+            new Function(c, "moveBottomLeft", _n_moveBottomLeft0, None, Compiled, qt_QRect_moveBottomLeft_void_QRect_QPoint, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QRect"), new Param(c, "position", "qt.QPoint"), End),
+            new Function(c, "moveBottomRight", _n_moveBottomRight0, None, Compiled, qt_QRect_moveBottomRight_void_QRect_QPoint, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QRect"), new Param(c, "position", "qt.QPoint"), End),
+            new Function(c, "moveCenter", _n_moveCenter0, None, Compiled, qt_QRect_moveCenter_void_QRect_QPoint, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QRect"), new Param(c, "position", "qt.QPoint"), End),
+            new Function(c, "moveLeft", _n_moveLeft0, None, Compiled, qt_QRect_moveLeft_void_QRect_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QRect"), new Param(c, "x", "int"), End),
+            new Function(c, "moveRight", _n_moveRight0, None, Compiled, qt_QRect_moveRight_void_QRect_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QRect"), new Param(c, "x", "int"), End),
+            new Function(c, "moveTo", _n_moveTo0, None, Compiled, qt_QRect_moveTo_void_QRect_int_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QRect"), new Param(c, "x", "int"), new Param(c, "y", "int"), End),
+            new Function(c, "moveTo", _n_moveTo1, None, Compiled, qt_QRect_moveTo_void_QRect_QPoint, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QRect"), new Param(c, "position", "qt.QPoint"), End),
+            new Function(c, "moveTop", _n_moveTop0, None, Compiled, qt_QRect_moveTop_void_QRect_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QRect"), new Param(c, "y", "int"), End),
+            new Function(c, "moveTopLeft", _n_moveTopLeft0, None, Compiled, qt_QRect_moveTopLeft_void_QRect_QPoint, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QRect"), new Param(c, "position", "qt.QPoint"), End),
+            new Function(c, "moveTopRight", _n_moveTopRight0, None, Compiled, qt_QRect_moveTopRight_void_QRect_QPoint, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QRect"), new Param(c, "position", "qt.QPoint"), End),
+            new Function(c, "normalized", _n_normalized0, None, Compiled, qt_QRect_normalized_QRect_QRect, Return, "qt.QRect", Parameters,
+                         new Param(c, "this", "qt.QRect"), End),
+            new Function(c, "right", _n_right0, None, Compiled, qt_QRect_right_int_QRect, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QRect"), End),
+            new Function(c, "setBottom", _n_setBottom0, None, Compiled, qt_QRect_setBottom_void_QRect_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QRect"), new Param(c, "y", "int"), End),
+            new Function(c, "setBottomLeft", _n_setBottomLeft0, None, Compiled, qt_QRect_setBottomLeft_void_QRect_QPoint, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QRect"), new Param(c, "position", "qt.QPoint"), End),
+            new Function(c, "setBottomRight", _n_setBottomRight0, None, Compiled, qt_QRect_setBottomRight_void_QRect_QPoint, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QRect"), new Param(c, "position", "qt.QPoint"), End),
+            new Function(c, "setCoords", _n_setCoords0, None, Compiled, qt_QRect_setCoords_void_QRect_int_int_int_int, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QRect"), new Param(c, "x1", "int"), new Param(c, "y1", "int"),
+                         new Param(c, "x2", "int"), new Param(c, "y2", "int"), End),
+            new Function(c, "setHeight", _n_setHeight0, None, Compiled, qt_QRect_setHeight_void_QRect_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QRect"), new Param(c, "height", "int"), End),
+            new Function(c, "setLeft", _n_setLeft0, None, Compiled, qt_QRect_setLeft_void_QRect_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QRect"), new Param(c, "x", "int"), End),
+            new Function(c, "setRect", _n_setRect0, None, Compiled, qt_QRect_setRect_void_QRect_int_int_int_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QRect"), new Param(c, "x", "int"), new Param(c, "y", "int"), new Param(c, "width", "int"),
                          new Param(c, "height", "int"), End),
-            new Function(c, "setLeft", _n_setLeft0, None, Compiled,
-                         qt_QRect_setLeft_void_QRect_int, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QRect"),
-                         new Param(c, "x", "int"), End),
-            new Function(c, "setRect", _n_setRect0, None, Compiled,
-                         qt_QRect_setRect_void_QRect_int_int_int_int, Return,
-                         "void", Parameters, new Param(c, "this", "qt.QRect"),
-                         new Param(c, "x", "int"), new Param(c, "y", "int"),
-                         new Param(c, "width", "int"),
-                         new Param(c, "height", "int"), End),
-            new Function(c, "setRight", _n_setRight0, None, Compiled,
-                         qt_QRect_setRight_void_QRect_int, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QRect"),
-                         new Param(c, "x", "int"), End),
-            new Function(c, "setSize", _n_setSize0, None, Compiled,
-                         qt_QRect_setSize_void_QRect_QSize, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QRect"),
-                         new Param(c, "size", "qt.QSize"), End),
-            new Function(c, "setTop", _n_setTop0, None, Compiled,
-                         qt_QRect_setTop_void_QRect_int, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QRect"),
-                         new Param(c, "y", "int"), End),
-            new Function(c, "setTopLeft", _n_setTopLeft0, None, Compiled,
-                         qt_QRect_setTopLeft_void_QRect_QPoint, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QRect"),
-                         new Param(c, "position", "qt.QPoint"), End),
-            new Function(c, "setTopRight", _n_setTopRight0, None, Compiled,
-                         qt_QRect_setTopRight_void_QRect_QPoint, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QRect"),
-                         new Param(c, "position", "qt.QPoint"), End),
-            new Function(c, "setWidth", _n_setWidth0, None, Compiled,
-                         qt_QRect_setWidth_void_QRect_int, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QRect"),
-                         new Param(c, "width", "int"), End),
-            new Function(c, "setX", _n_setX0, None, Compiled,
-                         qt_QRect_setX_void_QRect_int, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QRect"),
-                         new Param(c, "x", "int"), End),
-            new Function(c, "setY", _n_setY0, None, Compiled,
-                         qt_QRect_setY_void_QRect_int, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QRect"),
-                         new Param(c, "y", "int"), End),
-            new Function(c, "size", _n_size0, None, Compiled,
-                         qt_QRect_size_QSize_QRect, Return, "qt.QSize",
-                         Parameters, new Param(c, "this", "qt.QRect"), End),
+            new Function(c, "setRight", _n_setRight0, None, Compiled, qt_QRect_setRight_void_QRect_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QRect"), new Param(c, "x", "int"), End),
+            new Function(c, "setSize", _n_setSize0, None, Compiled, qt_QRect_setSize_void_QRect_QSize, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QRect"), new Param(c, "size", "qt.QSize"), End),
+            new Function(c, "setTop", _n_setTop0, None, Compiled, qt_QRect_setTop_void_QRect_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QRect"), new Param(c, "y", "int"), End),
+            new Function(c, "setTopLeft", _n_setTopLeft0, None, Compiled, qt_QRect_setTopLeft_void_QRect_QPoint, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QRect"), new Param(c, "position", "qt.QPoint"), End),
+            new Function(c, "setTopRight", _n_setTopRight0, None, Compiled, qt_QRect_setTopRight_void_QRect_QPoint, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QRect"), new Param(c, "position", "qt.QPoint"), End),
+            new Function(c, "setWidth", _n_setWidth0, None, Compiled, qt_QRect_setWidth_void_QRect_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QRect"), new Param(c, "width", "int"), End),
+            new Function(c, "setX", _n_setX0, None, Compiled, qt_QRect_setX_void_QRect_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QRect"), new Param(c, "x", "int"), End),
+            new Function(c, "setY", _n_setY0, None, Compiled, qt_QRect_setY_void_QRect_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QRect"), new Param(c, "y", "int"), End),
+            new Function(c, "size", _n_size0, None, Compiled, qt_QRect_size_QSize_QRect, Return, "qt.QSize", Parameters,
+                         new Param(c, "this", "qt.QRect"), End),
             // MISSING: toCGRect ("CGRect"; QRect this)
-            new Function(c, "toRectF", _n_toRectF0, None, Compiled,
-                         qt_QRect_toRectF_QRectF_QRect, Return, "qt.QRectF",
-                         Parameters, new Param(c, "this", "qt.QRect"), End),
-            new Function(c, "top", _n_top0, None, Compiled,
-                         qt_QRect_top_int_QRect, Return, "int", Parameters,
+            new Function(c, "toRectF", _n_toRectF0, None, Compiled, qt_QRect_toRectF_QRectF_QRect, Return, "qt.QRectF", Parameters,
                          new Param(c, "this", "qt.QRect"), End),
-            new Function(c, "topLeft", _n_topLeft0, None, Compiled,
-                         qt_QRect_topLeft_QPoint_QRect, Return, "qt.QPoint",
-                         Parameters, new Param(c, "this", "qt.QRect"), End),
-            new Function(c, "topRight", _n_topRight0, None, Compiled,
-                         qt_QRect_topRight_QPoint_QRect, Return, "qt.QPoint",
-                         Parameters, new Param(c, "this", "qt.QRect"), End),
-            new Function(c, "translate", _n_translate0, None, Compiled,
-                         qt_QRect_translate_void_QRect_int_int, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QRect"),
-                         new Param(c, "dx", "int"), new Param(c, "dy", "int"),
+            new Function(c, "top", _n_top0, None, Compiled, qt_QRect_top_int_QRect, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QRect"), End),
+            new Function(c, "topLeft", _n_topLeft0, None, Compiled, qt_QRect_topLeft_QPoint_QRect, Return, "qt.QPoint", Parameters,
+                         new Param(c, "this", "qt.QRect"), End),
+            new Function(c, "topRight", _n_topRight0, None, Compiled, qt_QRect_topRight_QPoint_QRect, Return, "qt.QPoint", Parameters,
+                         new Param(c, "this", "qt.QRect"), End),
+            new Function(c, "translate", _n_translate0, None, Compiled, qt_QRect_translate_void_QRect_int_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QRect"), new Param(c, "dx", "int"), new Param(c, "dy", "int"), End),
+            new Function(c, "translate", _n_translate1, None, Compiled, qt_QRect_translate_void_QRect_QPoint, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QRect"), new Param(c, "offset", "qt.QPoint"), End),
+            new Function(c, "translated", _n_translated0, None, Compiled, qt_QRect_translated_QRect_QRect_int_int, Return, "qt.QRect",
+                         Parameters, new Param(c, "this", "qt.QRect"), new Param(c, "dx", "int"), new Param(c, "dy", "int"), End),
+            new Function(c, "translated", _n_translated1, None, Compiled, qt_QRect_translated_QRect_QRect_QPoint, Return, "qt.QRect",
+                         Parameters, new Param(c, "this", "qt.QRect"), new Param(c, "offset", "qt.QPoint"), End),
+            new Function(c, "transposed", _n_transposed0, None, Compiled, qt_QRect_transposed_QRect_QRect, Return, "qt.QRect", Parameters,
+                         new Param(c, "this", "qt.QRect"), End),
+            new Function(c, "united", _n_united0, None, Compiled, qt_QRect_united_QRect_QRect_QRect, Return, "qt.QRect", Parameters,
+                         new Param(c, "this", "qt.QRect"), new Param(c, "rectangle", "qt.QRect"), End),
+            new Function(c, "width", _n_width0, None, Compiled, qt_QRect_width_int_QRect, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QRect"), End),
+            new Function(c, "x", _n_x0, None, Compiled, qt_QRect_x_int_QRect, Return, "int", Parameters, new Param(c, "this", "qt.QRect"),
                          End),
-            new Function(c, "translate", _n_translate1, None, Compiled,
-                         qt_QRect_translate_void_QRect_QPoint, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QRect"),
-                         new Param(c, "offset", "qt.QPoint"), End),
-            new Function(
-                c, "translated", _n_translated0, None, Compiled,
-                qt_QRect_translated_QRect_QRect_int_int, Return, "qt.QRect",
-                Parameters, new Param(c, "this", "qt.QRect"),
-                new Param(c, "dx", "int"), new Param(c, "dy", "int"), End),
-            new Function(c, "translated", _n_translated1, None, Compiled,
-                         qt_QRect_translated_QRect_QRect_QPoint, Return,
-                         "qt.QRect", Parameters,
-                         new Param(c, "this", "qt.QRect"),
-                         new Param(c, "offset", "qt.QPoint"), End),
-            new Function(c, "transposed", _n_transposed0, None, Compiled,
-                         qt_QRect_transposed_QRect_QRect, Return, "qt.QRect",
-                         Parameters, new Param(c, "this", "qt.QRect"), End),
-            new Function(c, "united", _n_united0, None, Compiled,
-                         qt_QRect_united_QRect_QRect_QRect, Return, "qt.QRect",
-                         Parameters, new Param(c, "this", "qt.QRect"),
-                         new Param(c, "rectangle", "qt.QRect"), End),
-            new Function(c, "width", _n_width0, None, Compiled,
-                         qt_QRect_width_int_QRect, Return, "int", Parameters,
-                         new Param(c, "this", "qt.QRect"), End),
-            new Function(c, "x", _n_x0, None, Compiled, qt_QRect_x_int_QRect,
-                         Return, "int", Parameters,
-                         new Param(c, "this", "qt.QRect"), End),
-            new Function(c, "y", _n_y0, None, Compiled, qt_QRect_y_int_QRect,
-                         Return, "int", Parameters,
-                         new Param(c, "this", "qt.QRect"), End),
+            new Function(c, "y", _n_y0, None, Compiled, qt_QRect_y_int_QRect, Return, "int", Parameters, new Param(c, "this", "qt.QRect"),
+                         End),
             // MISSING: = ("QRect & operator&"; QRect this, QRect rectangle)
             // static functions
-            new Function(c, "span", _n_span0, None, Compiled,
-                         qt_QRect_span_QRect_QPoint_QPoint, Return, "qt.QRect",
-                         Parameters, new Param(c, "p1", "qt.QPoint"),
-                         new Param(c, "p2", "qt.QPoint"), End),
+            new Function(c, "span", _n_span0, None, Compiled, qt_QRect_span_QRect_QPoint_QPoint, Return, "qt.QRect", Parameters,
+                         new Param(c, "p1", "qt.QPoint"), new Param(c, "p2", "qt.QPoint"), End),
             EndArguments);
         globalScope()->addSymbols(
-            new Function(c, "&", _n_operatorAmp_0, Op, Compiled,
-                         qt_QRect_operatorAmp__QRect_QRect_QRect, Return,
-                         "qt.QRect", Parameters,
-                         new Param(c, "this", "qt.QRect"),
-                         new Param(c, "rectangle", "qt.QRect"), End),
-            new Function(c, "+=", _n_operatorPlus_EQ_0, Op, Compiled,
-                         qt_QRect_operatorPlus_EQ__QRect_QRect_QMargins, Return,
-                         "qt.QRect", Parameters,
-                         new Param(c, "this", "qt.QRect"),
-                         new Param(c, "margins", "qt.QMargins"), End),
-            new Function(c, "-=", _n_operatorMinus_EQ_0, Op, Compiled,
-                         qt_QRect_operatorMinus_EQ__QRect_QRect_QMargins,
-                         Return, "qt.QRect", Parameters,
-                         new Param(c, "this", "qt.QRect"),
-                         new Param(c, "margins", "qt.QMargins"), End),
-            new Function(c, "|", _n_operatorPipe_0, Op, Compiled,
-                         qt_QRect_operatorPipe__QRect_QRect_QRect, Return,
-                         "qt.QRect", Parameters,
-                         new Param(c, "this", "qt.QRect"),
-                         new Param(c, "rectangle", "qt.QRect"), End),
-            new Function(c, "|=", _n_operatorPipe_EQ_0, Op, Compiled,
-                         qt_QRect_operatorPipe_EQ__QRect_QRect_QRect, Return,
-                         "qt.QRect", Parameters,
-                         new Param(c, "this", "qt.QRect"),
-                         new Param(c, "rectangle", "qt.QRect"), End),
+            new Function(c, "&", _n_operatorAmp_0, Op, Compiled, qt_QRect_operatorAmp__QRect_QRect_QRect, Return, "qt.QRect", Parameters,
+                         new Param(c, "this", "qt.QRect"), new Param(c, "rectangle", "qt.QRect"), End),
+            new Function(c, "+=", _n_operatorPlus_EQ_0, Op, Compiled, qt_QRect_operatorPlus_EQ__QRect_QRect_QMargins, Return, "qt.QRect",
+                         Parameters, new Param(c, "this", "qt.QRect"), new Param(c, "margins", "qt.QMargins"), End),
+            new Function(c, "-=", _n_operatorMinus_EQ_0, Op, Compiled, qt_QRect_operatorMinus_EQ__QRect_QRect_QMargins, Return, "qt.QRect",
+                         Parameters, new Param(c, "this", "qt.QRect"), new Param(c, "margins", "qt.QMargins"), End),
+            new Function(c, "|", _n_operatorPipe_0, Op, Compiled, qt_QRect_operatorPipe__QRect_QRect_QRect, Return, "qt.QRect", Parameters,
+                         new Param(c, "this", "qt.QRect"), new Param(c, "rectangle", "qt.QRect"), End),
+            new Function(c, "|=", _n_operatorPipe_EQ_0, Op, Compiled, qt_QRect_operatorPipe_EQ__QRect_QRect_QRect, Return, "qt.QRect",
+                         Parameters, new Param(c, "this", "qt.QRect"), new Param(c, "rectangle", "qt.QRect"), End),
             EndArguments);
         scope()->addSymbols(EndArguments);
     }

@@ -11,8 +11,7 @@ namespace Mu
 {
     using namespace std;
 
-    ParameterVariable::ParameterVariable(Context* context, const char* name,
-                                         const Type* storageClass, Attributes a)
+    ParameterVariable::ParameterVariable(Context* context, const char* name, const Type* storageClass, Attributes a)
         : StackVariable(context, name, storageClass, 0)
         , _hasDefaultValue(false)
         , _value()
@@ -20,8 +19,7 @@ namespace Mu
         init(a);
     }
 
-    ParameterVariable::ParameterVariable(Context* context, const char* name,
-                                         const char* storageClass, Attributes a)
+    ParameterVariable::ParameterVariable(Context* context, const char* name, const char* storageClass, Attributes a)
         : StackVariable(context, name, storageClass, 0)
         , _hasDefaultValue(false)
         , _value()
@@ -29,9 +27,7 @@ namespace Mu
         init(a);
     }
 
-    ParameterVariable::ParameterVariable(Context* context, const char* name,
-                                         const Type* storageClass,
-                                         const Value& defaultValue,
+    ParameterVariable::ParameterVariable(Context* context, const char* name, const Type* storageClass, const Value& defaultValue,
                                          Attributes a)
         : StackVariable(context, name, storageClass, 0)
         , _hasDefaultValue(true)
@@ -40,9 +36,7 @@ namespace Mu
         init(a);
     }
 
-    ParameterVariable::ParameterVariable(Context* context, const char* name,
-                                         const char* storageClass,
-                                         const Value& defaultValue,
+    ParameterVariable::ParameterVariable(Context* context, const char* name, const char* storageClass, const Value& defaultValue,
                                          Attributes a)
         : StackVariable(context, name, storageClass, 0)
         , _hasDefaultValue(true)

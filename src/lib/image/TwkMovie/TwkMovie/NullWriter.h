@@ -38,8 +38,7 @@ namespace TwkMovie
         /// function when the movie as finished writing.
         ///
 
-        virtual bool write(Movie* inMovie, const std::string& filename,
-                           WriteRequest&);
+        virtual bool write(Movie* inMovie, const std::string& filename, WriteRequest&);
     };
 
 } // namespace TwkMovie

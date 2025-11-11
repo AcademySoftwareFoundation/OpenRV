@@ -52,16 +52,12 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(__allocate, Pointer)
     {
-        QUrlType::Instance* i =
-            new QUrlType::Instance((Class*)NODE_THIS.type());
+        QUrlType::Instance* i = new QUrlType::Instance((Class*)NODE_THIS.type());
         QUrlType::registerFinalizer(i);
         NODE_RETURN(i);
     }
 
-    void QUrlType::registerFinalizer(void* o)
-    {
-        GC_register_finalizer(o, QUrlType::finalizer, 0, 0, 0);
-    }
+    void QUrlType::registerFinalizer(void* o) { GC_register_finalizer(o, QUrlType::finalizer, 0, 0, 0); }
 
     void QUrlType::finalizer(void* obj, void* data)
     {
@@ -79,10 +75,7 @@ namespace Mu
         return param_this;
     }
 
-    Pointer qt_QUrl_QUrl_QUrl_QUrl_string_int(Mu::Thread& NODE_THREAD,
-                                              Pointer param_this,
-                                              Pointer param_url,
-                                              int param_parsingMode)
+    Pointer qt_QUrl_QUrl_QUrl_QUrl_string_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_url, int param_parsingMode)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QString arg1 = qstring(param_url);
@@ -91,9 +84,7 @@ namespace Mu
         return param_this;
     }
 
-    Pointer qt_QUrl_adjusted_QUrl_QUrl_int(Mu::Thread& NODE_THREAD,
-                                           Pointer param_this,
-                                           int param_options)
+    Pointer qt_QUrl_adjusted_QUrl_QUrl_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_options)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QUrl& arg0 = getqtype<QUrlType>(param_this);
@@ -101,14 +92,11 @@ namespace Mu
         return makeqtype<QUrlType>(c, arg0.adjusted(arg1), "qt.QUrl");
     }
 
-    Pointer qt_QUrl_authority_string_QUrl_int(Mu::Thread& NODE_THREAD,
-                                              Pointer param_this,
-                                              int param_options)
+    Pointer qt_QUrl_authority_string_QUrl_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_options)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QUrl& arg0 = getqtype<QUrlType>(param_this);
-        QUrl::ComponentFormattingOptions arg1 =
-            (QUrl::ComponentFormattingOptions)(param_options);
+        QUrl::ComponentFormattingOptions arg1 = (QUrl::ComponentFormattingOptions)(param_options);
         return makestring(c, arg0.authority(arg1));
     }
 
@@ -120,38 +108,30 @@ namespace Mu
         setqtype<QUrlType>(param_this, arg0);
     }
 
-    Pointer qt_QUrl_errorString_string_QUrl(Mu::Thread& NODE_THREAD,
-                                            Pointer param_this)
+    Pointer qt_QUrl_errorString_string_QUrl(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QUrl& arg0 = getqtype<QUrlType>(param_this);
         return makestring(c, arg0.errorString());
     }
 
-    Pointer qt_QUrl_fileName_string_QUrl_int(Mu::Thread& NODE_THREAD,
-                                             Pointer param_this,
-                                             int param_options)
+    Pointer qt_QUrl_fileName_string_QUrl_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_options)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QUrl& arg0 = getqtype<QUrlType>(param_this);
-        QUrl::ComponentFormattingOptions arg1 =
-            (QUrl::ComponentFormattingOptions)(param_options);
+        QUrl::ComponentFormattingOptions arg1 = (QUrl::ComponentFormattingOptions)(param_options);
         return makestring(c, arg0.fileName(arg1));
     }
 
-    Pointer qt_QUrl_fragment_string_QUrl_int(Mu::Thread& NODE_THREAD,
-                                             Pointer param_this,
-                                             int param_options)
+    Pointer qt_QUrl_fragment_string_QUrl_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_options)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QUrl& arg0 = getqtype<QUrlType>(param_this);
-        QUrl::ComponentFormattingOptions arg1 =
-            (QUrl::ComponentFormattingOptions)(param_options);
+        QUrl::ComponentFormattingOptions arg1 = (QUrl::ComponentFormattingOptions)(param_options);
         return makestring(c, arg0.fragment(arg1));
     }
 
-    bool qt_QUrl_hasFragment_bool_QUrl(Mu::Thread& NODE_THREAD,
-                                       Pointer param_this)
+    bool qt_QUrl_hasFragment_bool_QUrl(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QUrl& arg0 = getqtype<QUrlType>(param_this);
@@ -165,13 +145,11 @@ namespace Mu
         return arg0.hasQuery();
     }
 
-    Pointer qt_QUrl_host_string_QUrl_int(Mu::Thread& NODE_THREAD,
-                                         Pointer param_this, int param_options)
+    Pointer qt_QUrl_host_string_QUrl_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_options)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QUrl& arg0 = getqtype<QUrlType>(param_this);
-        QUrl::ComponentFormattingOptions arg1 =
-            (QUrl::ComponentFormattingOptions)(param_options);
+        QUrl::ComponentFormattingOptions arg1 = (QUrl::ComponentFormattingOptions)(param_options);
         return makestring(c, arg0.host(arg1));
     }
 
@@ -182,17 +160,14 @@ namespace Mu
         return arg0.isEmpty();
     }
 
-    bool qt_QUrl_isLocalFile_bool_QUrl(Mu::Thread& NODE_THREAD,
-                                       Pointer param_this)
+    bool qt_QUrl_isLocalFile_bool_QUrl(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QUrl& arg0 = getqtype<QUrlType>(param_this);
         return arg0.isLocalFile();
     }
 
-    bool qt_QUrl_isParentOf_bool_QUrl_QUrl(Mu::Thread& NODE_THREAD,
-                                           Pointer param_this,
-                                           Pointer param_childUrl)
+    bool qt_QUrl_isParentOf_bool_QUrl_QUrl(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_childUrl)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QUrl& arg0 = getqtype<QUrlType>(param_this);
@@ -200,8 +175,7 @@ namespace Mu
         return arg0.isParentOf(arg1);
     }
 
-    bool qt_QUrl_isRelative_bool_QUrl(Mu::Thread& NODE_THREAD,
-                                      Pointer param_this)
+    bool qt_QUrl_isRelative_bool_QUrl(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QUrl& arg0 = getqtype<QUrlType>(param_this);
@@ -215,10 +189,7 @@ namespace Mu
         return arg0.isValid();
     }
 
-    bool qt_QUrl_matches_bool_QUrl_QUrl_int(Mu::Thread& NODE_THREAD,
-                                            Pointer param_this,
-                                            Pointer param_url,
-                                            int param_options)
+    bool qt_QUrl_matches_bool_QUrl_QUrl_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_url, int param_options)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QUrl& arg0 = getqtype<QUrlType>(param_this);
@@ -227,29 +198,23 @@ namespace Mu
         return arg0.matches(arg1, arg2);
     }
 
-    Pointer qt_QUrl_password_string_QUrl_int(Mu::Thread& NODE_THREAD,
-                                             Pointer param_this,
-                                             int param_options)
+    Pointer qt_QUrl_password_string_QUrl_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_options)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QUrl& arg0 = getqtype<QUrlType>(param_this);
-        QUrl::ComponentFormattingOptions arg1 =
-            (QUrl::ComponentFormattingOptions)(param_options);
+        QUrl::ComponentFormattingOptions arg1 = (QUrl::ComponentFormattingOptions)(param_options);
         return makestring(c, arg0.password(arg1));
     }
 
-    Pointer qt_QUrl_path_string_QUrl_int(Mu::Thread& NODE_THREAD,
-                                         Pointer param_this, int param_options)
+    Pointer qt_QUrl_path_string_QUrl_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_options)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QUrl& arg0 = getqtype<QUrlType>(param_this);
-        QUrl::ComponentFormattingOptions arg1 =
-            (QUrl::ComponentFormattingOptions)(param_options);
+        QUrl::ComponentFormattingOptions arg1 = (QUrl::ComponentFormattingOptions)(param_options);
         return makestring(c, arg0.path(arg1));
     }
 
-    int qt_QUrl_port_int_QUrl_int(Mu::Thread& NODE_THREAD, Pointer param_this,
-                                  int param_defaultPort)
+    int qt_QUrl_port_int_QUrl_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_defaultPort)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QUrl& arg0 = getqtype<QUrlType>(param_this);
@@ -257,19 +222,15 @@ namespace Mu
         return arg0.port(arg1);
     }
 
-    Pointer qt_QUrl_query_string_QUrl_int(Mu::Thread& NODE_THREAD,
-                                          Pointer param_this, int param_options)
+    Pointer qt_QUrl_query_string_QUrl_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_options)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QUrl& arg0 = getqtype<QUrlType>(param_this);
-        QUrl::ComponentFormattingOptions arg1 =
-            (QUrl::ComponentFormattingOptions)(param_options);
+        QUrl::ComponentFormattingOptions arg1 = (QUrl::ComponentFormattingOptions)(param_options);
         return makestring(c, arg0.query(arg1));
     }
 
-    Pointer qt_QUrl_resolved_QUrl_QUrl_QUrl(Mu::Thread& NODE_THREAD,
-                                            Pointer param_this,
-                                            Pointer param_relative)
+    Pointer qt_QUrl_resolved_QUrl_QUrl_QUrl(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_relative)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QUrl& arg0 = getqtype<QUrlType>(param_this);
@@ -277,18 +238,14 @@ namespace Mu
         return makeqtype<QUrlType>(c, arg0.resolved(arg1), "qt.QUrl");
     }
 
-    Pointer qt_QUrl_scheme_string_QUrl(Mu::Thread& NODE_THREAD,
-                                       Pointer param_this)
+    Pointer qt_QUrl_scheme_string_QUrl(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QUrl& arg0 = getqtype<QUrlType>(param_this);
         return makestring(c, arg0.scheme());
     }
 
-    void qt_QUrl_setAuthority_void_QUrl_string_int(Mu::Thread& NODE_THREAD,
-                                                   Pointer param_this,
-                                                   Pointer param_authority,
-                                                   int param_mode)
+    void qt_QUrl_setAuthority_void_QUrl_string_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_authority, int param_mode)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QUrl& arg0 = getqtype<QUrlType>(param_this);
@@ -298,10 +255,7 @@ namespace Mu
         setqtype<QUrlType>(param_this, arg0);
     }
 
-    void qt_QUrl_setFragment_void_QUrl_string_int(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this,
-                                                  Pointer param_fragment,
-                                                  int param_mode)
+    void qt_QUrl_setFragment_void_QUrl_string_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_fragment, int param_mode)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QUrl& arg0 = getqtype<QUrlType>(param_this);
@@ -311,10 +265,7 @@ namespace Mu
         setqtype<QUrlType>(param_this, arg0);
     }
 
-    void qt_QUrl_setHost_void_QUrl_string_int(Mu::Thread& NODE_THREAD,
-                                              Pointer param_this,
-                                              Pointer param_host,
-                                              int param_mode)
+    void qt_QUrl_setHost_void_QUrl_string_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_host, int param_mode)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QUrl& arg0 = getqtype<QUrlType>(param_this);
@@ -324,10 +275,7 @@ namespace Mu
         setqtype<QUrlType>(param_this, arg0);
     }
 
-    void qt_QUrl_setPassword_void_QUrl_string_int(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this,
-                                                  Pointer param_password,
-                                                  int param_mode)
+    void qt_QUrl_setPassword_void_QUrl_string_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_password, int param_mode)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QUrl& arg0 = getqtype<QUrlType>(param_this);
@@ -337,10 +285,7 @@ namespace Mu
         setqtype<QUrlType>(param_this, arg0);
     }
 
-    void qt_QUrl_setPath_void_QUrl_string_int(Mu::Thread& NODE_THREAD,
-                                              Pointer param_this,
-                                              Pointer param_path,
-                                              int param_mode)
+    void qt_QUrl_setPath_void_QUrl_string_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_path, int param_mode)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QUrl& arg0 = getqtype<QUrlType>(param_this);
@@ -350,8 +295,7 @@ namespace Mu
         setqtype<QUrlType>(param_this, arg0);
     }
 
-    void qt_QUrl_setPort_void_QUrl_int(Mu::Thread& NODE_THREAD,
-                                       Pointer param_this, int param_port)
+    void qt_QUrl_setPort_void_QUrl_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_port)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QUrl& arg0 = getqtype<QUrlType>(param_this);
@@ -360,10 +304,7 @@ namespace Mu
         setqtype<QUrlType>(param_this, arg0);
     }
 
-    void qt_QUrl_setQuery_void_QUrl_string_int(Mu::Thread& NODE_THREAD,
-                                               Pointer param_this,
-                                               Pointer param_query,
-                                               int param_mode)
+    void qt_QUrl_setQuery_void_QUrl_string_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_query, int param_mode)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QUrl& arg0 = getqtype<QUrlType>(param_this);
@@ -373,9 +314,7 @@ namespace Mu
         setqtype<QUrlType>(param_this, arg0);
     }
 
-    void qt_QUrl_setQuery_void_QUrl_QUrlQuery(Mu::Thread& NODE_THREAD,
-                                              Pointer param_this,
-                                              Pointer param_query)
+    void qt_QUrl_setQuery_void_QUrl_QUrlQuery(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_query)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QUrl& arg0 = getqtype<QUrlType>(param_this);
@@ -384,9 +323,7 @@ namespace Mu
         setqtype<QUrlType>(param_this, arg0);
     }
 
-    void qt_QUrl_setScheme_void_QUrl_string(Mu::Thread& NODE_THREAD,
-                                            Pointer param_this,
-                                            Pointer param_scheme)
+    void qt_QUrl_setScheme_void_QUrl_string(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_scheme)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QUrl& arg0 = getqtype<QUrlType>(param_this);
@@ -395,10 +332,7 @@ namespace Mu
         setqtype<QUrlType>(param_this, arg0);
     }
 
-    void qt_QUrl_setUrl_void_QUrl_string_int(Mu::Thread& NODE_THREAD,
-                                             Pointer param_this,
-                                             Pointer param_url,
-                                             int param_parsingMode)
+    void qt_QUrl_setUrl_void_QUrl_string_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_url, int param_parsingMode)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QUrl& arg0 = getqtype<QUrlType>(param_this);
@@ -408,10 +342,7 @@ namespace Mu
         setqtype<QUrlType>(param_this, arg0);
     }
 
-    void qt_QUrl_setUserInfo_void_QUrl_string_int(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this,
-                                                  Pointer param_userInfo,
-                                                  int param_mode)
+    void qt_QUrl_setUserInfo_void_QUrl_string_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_userInfo, int param_mode)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QUrl& arg0 = getqtype<QUrlType>(param_this);
@@ -421,10 +352,7 @@ namespace Mu
         setqtype<QUrlType>(param_this, arg0);
     }
 
-    void qt_QUrl_setUserName_void_QUrl_string_int(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this,
-                                                  Pointer param_userName,
-                                                  int param_mode)
+    void qt_QUrl_setUserName_void_QUrl_string_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_userName, int param_mode)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QUrl& arg0 = getqtype<QUrlType>(param_this);
@@ -434,8 +362,7 @@ namespace Mu
         setqtype<QUrlType>(param_this, arg0);
     }
 
-    void qt_QUrl_swap_void_QUrl_QUrl(Mu::Thread& NODE_THREAD,
-                                     Pointer param_this, Pointer param_other)
+    void qt_QUrl_swap_void_QUrl_QUrl(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_other)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QUrl& arg0 = getqtype<QUrlType>(param_this);
@@ -444,9 +371,7 @@ namespace Mu
         setqtype<QUrlType>(param_this, arg0);
     }
 
-    Pointer qt_QUrl_toDisplayString_string_QUrl_int(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this,
-                                                    int param_options)
+    Pointer qt_QUrl_toDisplayString_string_QUrl_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_options)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QUrl& arg0 = getqtype<QUrlType>(param_this);
@@ -454,28 +379,22 @@ namespace Mu
         return makestring(c, arg0.toDisplayString(arg1));
     }
 
-    Pointer qt_QUrl_toEncoded_QByteArray_QUrl_int(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this,
-                                                  int param_options)
+    Pointer qt_QUrl_toEncoded_QByteArray_QUrl_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_options)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QUrl& arg0 = getqtype<QUrlType>(param_this);
         QUrl::FormattingOptions arg1 = (QUrl::FormattingOptions)(param_options);
-        return makeqtype<QByteArrayType>(c, arg0.toEncoded(arg1),
-                                         "qt.QByteArray");
+        return makeqtype<QByteArrayType>(c, arg0.toEncoded(arg1), "qt.QByteArray");
     }
 
-    Pointer qt_QUrl_toLocalFile_string_QUrl(Mu::Thread& NODE_THREAD,
-                                            Pointer param_this)
+    Pointer qt_QUrl_toLocalFile_string_QUrl(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QUrl& arg0 = getqtype<QUrlType>(param_this);
         return makestring(c, arg0.toLocalFile());
     }
 
-    Pointer qt_QUrl_toString_string_QUrl_int(Mu::Thread& NODE_THREAD,
-                                             Pointer param_this,
-                                             int param_options)
+    Pointer qt_QUrl_toString_string_QUrl_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_options)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QUrl& arg0 = getqtype<QUrlType>(param_this);
@@ -483,19 +402,15 @@ namespace Mu
         return makestring(c, arg0.toString(arg1));
     }
 
-    Pointer qt_QUrl_topLevelDomain_string_QUrl_int(Mu::Thread& NODE_THREAD,
-                                                   Pointer param_this,
-                                                   int param_options)
+    Pointer qt_QUrl_topLevelDomain_string_QUrl_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_options)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QUrl& arg0 = getqtype<QUrlType>(param_this);
-        QUrl::ComponentFormattingOptions arg1 =
-            (QUrl::ComponentFormattingOptions)(param_options);
+        QUrl::ComponentFormattingOptions arg1 = (QUrl::ComponentFormattingOptions)(param_options);
         return makestring(c, arg0.topLevelDomain(arg1));
     }
 
-    Pointer qt_QUrl_url_string_QUrl_int(Mu::Thread& NODE_THREAD,
-                                        Pointer param_this, int param_options)
+    Pointer qt_QUrl_url_string_QUrl_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_options)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QUrl& arg0 = getqtype<QUrlType>(param_this);
@@ -503,31 +418,23 @@ namespace Mu
         return makestring(c, arg0.url(arg1));
     }
 
-    Pointer qt_QUrl_userInfo_string_QUrl_int(Mu::Thread& NODE_THREAD,
-                                             Pointer param_this,
-                                             int param_options)
+    Pointer qt_QUrl_userInfo_string_QUrl_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_options)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QUrl& arg0 = getqtype<QUrlType>(param_this);
-        QUrl::ComponentFormattingOptions arg1 =
-            (QUrl::ComponentFormattingOptions)(param_options);
+        QUrl::ComponentFormattingOptions arg1 = (QUrl::ComponentFormattingOptions)(param_options);
         return makestring(c, arg0.userInfo(arg1));
     }
 
-    Pointer qt_QUrl_userName_string_QUrl_int(Mu::Thread& NODE_THREAD,
-                                             Pointer param_this,
-                                             int param_options)
+    Pointer qt_QUrl_userName_string_QUrl_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_options)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QUrl& arg0 = getqtype<QUrlType>(param_this);
-        QUrl::ComponentFormattingOptions arg1 =
-            (QUrl::ComponentFormattingOptions)(param_options);
+        QUrl::ComponentFormattingOptions arg1 = (QUrl::ComponentFormattingOptions)(param_options);
         return makestring(c, arg0.userName(arg1));
     }
 
-    bool qt_QUrl_operatorBang_EQ__bool_QUrl_QUrl(Mu::Thread& NODE_THREAD,
-                                                 Pointer param_this,
-                                                 Pointer param_url)
+    bool qt_QUrl_operatorBang_EQ__bool_QUrl_QUrl(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_url)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QUrl& arg0 = getqtype<QUrlType>(param_this);
@@ -535,9 +442,7 @@ namespace Mu
         return arg0.operator!=(arg1);
     }
 
-    bool qt_QUrl_operatorEQ_EQ__bool_QUrl_QUrl(Mu::Thread& NODE_THREAD,
-                                               Pointer param_this,
-                                               Pointer param_url)
+    bool qt_QUrl_operatorEQ_EQ__bool_QUrl_QUrl(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_url)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QUrl& arg0 = getqtype<QUrlType>(param_this);
@@ -545,17 +450,14 @@ namespace Mu
         return arg0.operator==(arg1);
     }
 
-    Pointer qt_QUrl_fromAce_string_QByteArray(Mu::Thread& NODE_THREAD,
-                                              Pointer param_domain)
+    Pointer qt_QUrl_fromAce_string_QByteArray(Mu::Thread& NODE_THREAD, Pointer param_domain)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QByteArray arg0 = getqtype<QByteArrayType>(param_domain);
         return makestring(c, QUrl::fromAce(arg0));
     }
 
-    Pointer qt_QUrl_fromEncoded_QUrl_QByteArray_int(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_input,
-                                                    int param_parsingMode)
+    Pointer qt_QUrl_fromEncoded_QUrl_QByteArray_int(Mu::Thread& NODE_THREAD, Pointer param_input, int param_parsingMode)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QByteArray arg0 = getqtype<QByteArrayType>(param_input);
@@ -563,52 +465,43 @@ namespace Mu
         return makeqtype<QUrlType>(c, QUrl::fromEncoded(arg0, arg1), "qt.QUrl");
     }
 
-    Pointer qt_QUrl_fromLocalFile_QUrl_string(Mu::Thread& NODE_THREAD,
-                                              Pointer param_localFile)
+    Pointer qt_QUrl_fromLocalFile_QUrl_string(Mu::Thread& NODE_THREAD, Pointer param_localFile)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QString arg0 = qstring(param_localFile);
         return makeqtype<QUrlType>(c, QUrl::fromLocalFile(arg0), "qt.QUrl");
     }
 
-    Pointer
-    qt_QUrl_fromPercentEncoding_string_QByteArray(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_input)
+    Pointer qt_QUrl_fromPercentEncoding_string_QByteArray(Mu::Thread& NODE_THREAD, Pointer param_input)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QByteArray arg0 = getqtype<QByteArrayType>(param_input);
         return makestring(c, QUrl::fromPercentEncoding(arg0));
     }
 
-    Pointer qt_QUrl_fromStringList_qt__QUrlBSB_ESB__stringBSB_ESB__int(
-        Mu::Thread& NODE_THREAD, Pointer param_urls, int param_mode)
+    Pointer qt_QUrl_fromStringList_qt__QUrlBSB_ESB__stringBSB_ESB__int(Mu::Thread& NODE_THREAD, Pointer param_urls, int param_mode)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QStringList arg0 = qstringlist(param_urls);
         QUrl::ParsingMode arg1 = (QUrl::ParsingMode)(param_mode);
-        return makeqtypelist<QUrl, QUrlType>(
-            c, QUrl::fromStringList(arg0, arg1), "qt.QUrl");
+        return makeqtypelist<QUrl, QUrlType>(c, QUrl::fromStringList(arg0, arg1), "qt.QUrl");
     }
 
-    Pointer qt_QUrl_fromUserInput_QUrl_string(Mu::Thread& NODE_THREAD,
-                                              Pointer param_userInput)
+    Pointer qt_QUrl_fromUserInput_QUrl_string(Mu::Thread& NODE_THREAD, Pointer param_userInput)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QString arg0 = qstring(param_userInput);
         return makeqtype<QUrlType>(c, QUrl::fromUserInput(arg0), "qt.QUrl");
     }
 
-    Pointer qt_QUrl_fromUserInput_QUrl_string_string_int(
-        Mu::Thread& NODE_THREAD, Pointer param_userInput,
-        Pointer param_workingDirectory, int param_options)
+    Pointer qt_QUrl_fromUserInput_QUrl_string_string_int(Mu::Thread& NODE_THREAD, Pointer param_userInput, Pointer param_workingDirectory,
+                                                         int param_options)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QString arg0 = qstring(param_userInput);
         const QString arg1 = qstring(param_workingDirectory);
-        QUrl::UserInputResolutionOption arg2 =
-            (QUrl::UserInputResolutionOption)(param_options);
-        return makeqtype<QUrlType>(c, QUrl::fromUserInput(arg0, arg1, arg2),
-                                   "qt.QUrl");
+        QUrl::UserInputResolutionOption arg2 = (QUrl::UserInputResolutionOption)(param_options);
+        return makeqtype<QUrlType>(c, QUrl::fromUserInput(arg0, arg1, arg2), "qt.QUrl");
     }
 
     Pointer qt_QUrl_idnWhitelist_stringBSB_ESB_(Mu::Thread& NODE_THREAD)
@@ -617,402 +510,301 @@ namespace Mu
         return makestringlist(c, QUrl::idnWhitelist());
     }
 
-    void qt_QUrl_setIdnWhitelist_void_stringBSB_ESB_(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_list)
+    void qt_QUrl_setIdnWhitelist_void_stringBSB_ESB_(Mu::Thread& NODE_THREAD, Pointer param_list)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QStringList arg0 = qstringlist(param_list);
         QUrl::setIdnWhitelist(arg0);
     }
 
-    Pointer qt_QUrl_toAce_QByteArray_string(Mu::Thread& NODE_THREAD,
-                                            Pointer param_domain)
+    Pointer qt_QUrl_toAce_QByteArray_string(Mu::Thread& NODE_THREAD, Pointer param_domain)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QString arg0 = qstring(param_domain);
         return makeqtype<QByteArrayType>(c, QUrl::toAce(arg0), "qt.QByteArray");
     }
 
-    Pointer qt_QUrl_toPercentEncoding_QByteArray_string_QByteArray_QByteArray(
-        Mu::Thread& NODE_THREAD, Pointer param_input, Pointer param_exclude,
-        Pointer param_include)
+    Pointer qt_QUrl_toPercentEncoding_QByteArray_string_QByteArray_QByteArray(Mu::Thread& NODE_THREAD, Pointer param_input,
+                                                                              Pointer param_exclude, Pointer param_include)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QString arg0 = qstring(param_input);
         const QByteArray arg1 = getqtype<QByteArrayType>(param_exclude);
         const QByteArray arg2 = getqtype<QByteArrayType>(param_include);
-        return makeqtype<QByteArrayType>(
-            c, QUrl::toPercentEncoding(arg0, arg1, arg2), "qt.QByteArray");
+        return makeqtype<QByteArrayType>(c, QUrl::toPercentEncoding(arg0, arg1, arg2), "qt.QByteArray");
     }
 
-    Pointer qt_QUrl_toStringList_stringBSB_ESB__qt__QUrlBSB_ESB__int(
-        Mu::Thread& NODE_THREAD, Pointer param_urls, int param_options)
+    Pointer qt_QUrl_toStringList_stringBSB_ESB__qt__QUrlBSB_ESB__int(Mu::Thread& NODE_THREAD, Pointer param_urls, int param_options)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QList<QUrl> arg0 = qtypelist<QUrl, QUrlType>(param_urls);
-        QUrl::UrlFormattingOption arg1 =
-            (QUrl::UrlFormattingOption)(param_options);
+        QUrl::UrlFormattingOption arg1 = (QUrl::UrlFormattingOption)(param_options);
         return makestringlist(c, QUrl::toStringList(arg0, arg1));
     }
 
-    static NODE_IMPLEMENTATION(_n_QUrl0, Pointer)
-    {
-        NODE_RETURN(
-            qt_QUrl_QUrl_QUrl_QUrl(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_QUrl0, Pointer) { NODE_RETURN(qt_QUrl_QUrl_QUrl_QUrl(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
     static NODE_IMPLEMENTATION(_n_QUrl2, Pointer)
     {
-        NODE_RETURN(qt_QUrl_QUrl_QUrl_QUrl_string_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int)));
+        NODE_RETURN(qt_QUrl_QUrl_QUrl_QUrl_string_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_adjusted0, Pointer)
     {
-        NODE_RETURN(qt_QUrl_adjusted_QUrl_QUrl_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QUrl_adjusted_QUrl_QUrl_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_authority0, Pointer)
     {
-        NODE_RETURN(qt_QUrl_authority_string_QUrl_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QUrl_authority_string_QUrl_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
-    static NODE_IMPLEMENTATION(_n_clear0, void)
-    {
-        qt_QUrl_clear_void_QUrl(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
-    }
+    static NODE_IMPLEMENTATION(_n_clear0, void) { qt_QUrl_clear_void_QUrl(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)); }
 
     static NODE_IMPLEMENTATION(_n_errorString0, Pointer)
     {
-        NODE_RETURN(qt_QUrl_errorString_string_QUrl(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QUrl_errorString_string_QUrl(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_fileName0, Pointer)
     {
-        NODE_RETURN(qt_QUrl_fileName_string_QUrl_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QUrl_fileName_string_QUrl_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_fragment0, Pointer)
     {
-        NODE_RETURN(qt_QUrl_fragment_string_QUrl_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QUrl_fragment_string_QUrl_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_hasFragment0, bool)
     {
-        NODE_RETURN(qt_QUrl_hasFragment_bool_QUrl(NODE_THREAD,
-                                                  NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QUrl_hasFragment_bool_QUrl(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
-    static NODE_IMPLEMENTATION(_n_hasQuery0, bool)
-    {
-        NODE_RETURN(qt_QUrl_hasQuery_bool_QUrl(NODE_THREAD,
-                                               NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_hasQuery0, bool) { NODE_RETURN(qt_QUrl_hasQuery_bool_QUrl(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
     static NODE_IMPLEMENTATION(_n_host0, Pointer)
     {
-        NODE_RETURN(qt_QUrl_host_string_QUrl_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QUrl_host_string_QUrl_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
-    static NODE_IMPLEMENTATION(_n_isEmpty0, bool)
-    {
-        NODE_RETURN(qt_QUrl_isEmpty_bool_QUrl(NODE_THREAD,
-                                              NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_isEmpty0, bool) { NODE_RETURN(qt_QUrl_isEmpty_bool_QUrl(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
     static NODE_IMPLEMENTATION(_n_isLocalFile0, bool)
     {
-        NODE_RETURN(qt_QUrl_isLocalFile_bool_QUrl(NODE_THREAD,
-                                                  NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QUrl_isLocalFile_bool_QUrl(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isParentOf0, bool)
     {
-        NODE_RETURN(qt_QUrl_isParentOf_bool_QUrl_QUrl(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QUrl_isParentOf_bool_QUrl_QUrl(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isRelative0, bool)
     {
-        NODE_RETURN(qt_QUrl_isRelative_bool_QUrl(NODE_THREAD,
-                                                 NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QUrl_isRelative_bool_QUrl(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
-    static NODE_IMPLEMENTATION(_n_isValid0, bool)
-    {
-        NODE_RETURN(qt_QUrl_isValid_bool_QUrl(NODE_THREAD,
-                                              NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_isValid0, bool) { NODE_RETURN(qt_QUrl_isValid_bool_QUrl(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
     static NODE_IMPLEMENTATION(_n_matches0, bool)
     {
-        NODE_RETURN(qt_QUrl_matches_bool_QUrl_QUrl_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int)));
+        NODE_RETURN(qt_QUrl_matches_bool_QUrl_QUrl_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_password0, Pointer)
     {
-        NODE_RETURN(qt_QUrl_password_string_QUrl_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QUrl_password_string_QUrl_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_path0, Pointer)
     {
-        NODE_RETURN(qt_QUrl_path_string_QUrl_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QUrl_path_string_QUrl_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_port0, int)
     {
-        NODE_RETURN(qt_QUrl_port_int_QUrl_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QUrl_port_int_QUrl_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_query0, Pointer)
     {
-        NODE_RETURN(qt_QUrl_query_string_QUrl_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QUrl_query_string_QUrl_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_resolved0, Pointer)
     {
-        NODE_RETURN(qt_QUrl_resolved_QUrl_QUrl_QUrl(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QUrl_resolved_QUrl_QUrl_QUrl(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
-    static NODE_IMPLEMENTATION(_n_scheme0, Pointer)
-    {
-        NODE_RETURN(qt_QUrl_scheme_string_QUrl(NODE_THREAD,
-                                               NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_scheme0, Pointer) { NODE_RETURN(qt_QUrl_scheme_string_QUrl(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
     static NODE_IMPLEMENTATION(_n_setAuthority0, void)
     {
-        qt_QUrl_setAuthority_void_QUrl_string_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int));
+        qt_QUrl_setAuthority_void_QUrl_string_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setFragment0, void)
     {
-        qt_QUrl_setFragment_void_QUrl_string_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int));
+        qt_QUrl_setFragment_void_QUrl_string_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setHost0, void)
     {
-        qt_QUrl_setHost_void_QUrl_string_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int));
+        qt_QUrl_setHost_void_QUrl_string_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setPassword0, void)
     {
-        qt_QUrl_setPassword_void_QUrl_string_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int));
+        qt_QUrl_setPassword_void_QUrl_string_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setPath0, void)
     {
-        qt_QUrl_setPath_void_QUrl_string_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int));
+        qt_QUrl_setPath_void_QUrl_string_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setPort0, void)
     {
-        qt_QUrl_setPort_void_QUrl_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                                      NODE_ARG(1, int));
+        qt_QUrl_setPort_void_QUrl_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setQuery0, void)
     {
-        qt_QUrl_setQuery_void_QUrl_string_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int));
+        qt_QUrl_setQuery_void_QUrl_string_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setQuery1, void)
     {
-        qt_QUrl_setQuery_void_QUrl_QUrlQuery(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QUrl_setQuery_void_QUrl_QUrlQuery(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setScheme0, void)
     {
-        qt_QUrl_setScheme_void_QUrl_string(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QUrl_setScheme_void_QUrl_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setUrl0, void)
     {
-        qt_QUrl_setUrl_void_QUrl_string_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int));
+        qt_QUrl_setUrl_void_QUrl_string_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setUserInfo0, void)
     {
-        qt_QUrl_setUserInfo_void_QUrl_string_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int));
+        qt_QUrl_setUserInfo_void_QUrl_string_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setUserName0, void)
     {
-        qt_QUrl_setUserName_void_QUrl_string_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int));
+        qt_QUrl_setUserName_void_QUrl_string_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_swap0, void)
     {
-        qt_QUrl_swap_void_QUrl_QUrl(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                                    NODE_ARG(1, Pointer));
+        qt_QUrl_swap_void_QUrl_QUrl(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_toDisplayString0, Pointer)
     {
-        NODE_RETURN(qt_QUrl_toDisplayString_string_QUrl_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QUrl_toDisplayString_string_QUrl_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_toEncoded0, Pointer)
     {
-        NODE_RETURN(qt_QUrl_toEncoded_QByteArray_QUrl_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QUrl_toEncoded_QByteArray_QUrl_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_toLocalFile0, Pointer)
     {
-        NODE_RETURN(qt_QUrl_toLocalFile_string_QUrl(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QUrl_toLocalFile_string_QUrl(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_toString0, Pointer)
     {
-        NODE_RETURN(qt_QUrl_toString_string_QUrl_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QUrl_toString_string_QUrl_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_topLevelDomain0, Pointer)
     {
-        NODE_RETURN(qt_QUrl_topLevelDomain_string_QUrl_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QUrl_topLevelDomain_string_QUrl_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_url0, Pointer)
     {
-        NODE_RETURN(qt_QUrl_url_string_QUrl_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QUrl_url_string_QUrl_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_userInfo0, Pointer)
     {
-        NODE_RETURN(qt_QUrl_userInfo_string_QUrl_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QUrl_userInfo_string_QUrl_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_userName0, Pointer)
     {
-        NODE_RETURN(qt_QUrl_userName_string_QUrl_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QUrl_userName_string_QUrl_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorBang_EQ_0, bool)
     {
-        NODE_RETURN(qt_QUrl_operatorBang_EQ__bool_QUrl_QUrl(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QUrl_operatorBang_EQ__bool_QUrl_QUrl(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorEQ_EQ_0, bool)
     {
-        NODE_RETURN(qt_QUrl_operatorEQ_EQ__bool_QUrl_QUrl(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QUrl_operatorEQ_EQ__bool_QUrl_QUrl(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
-    static NODE_IMPLEMENTATION(_n_fromAce0, Pointer)
-    {
-        NODE_RETURN(qt_QUrl_fromAce_string_QByteArray(NODE_THREAD,
-                                                      NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_fromAce0, Pointer) { NODE_RETURN(qt_QUrl_fromAce_string_QByteArray(NODE_THREAD, NODE_ARG(0, Pointer))); }
 
     static NODE_IMPLEMENTATION(_n_fromEncoded0, Pointer)
     {
-        NODE_RETURN(qt_QUrl_fromEncoded_QUrl_QByteArray_int(
-            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QUrl_fromEncoded_QUrl_QByteArray_int(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_fromLocalFile0, Pointer)
     {
-        NODE_RETURN(qt_QUrl_fromLocalFile_QUrl_string(NODE_THREAD,
-                                                      NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QUrl_fromLocalFile_QUrl_string(NODE_THREAD, NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_fromPercentEncoding0, Pointer)
     {
-        NODE_RETURN(qt_QUrl_fromPercentEncoding_string_QByteArray(
-            NODE_THREAD, NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QUrl_fromPercentEncoding_string_QByteArray(NODE_THREAD, NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_fromStringList0, Pointer)
     {
-        NODE_RETURN(qt_QUrl_fromStringList_qt__QUrlBSB_ESB__stringBSB_ESB__int(
-            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QUrl_fromStringList_qt__QUrlBSB_ESB__stringBSB_ESB__int(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_fromUserInput0, Pointer)
     {
-        NODE_RETURN(qt_QUrl_fromUserInput_QUrl_string(NODE_THREAD,
-                                                      NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QUrl_fromUserInput_QUrl_string(NODE_THREAD, NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_fromUserInput1, Pointer)
     {
-        NODE_RETURN(qt_QUrl_fromUserInput_QUrl_string_string_int(
-            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int)));
+        NODE_RETURN(
+            qt_QUrl_fromUserInput_QUrl_string_string_int(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, int)));
     }
 
-    static NODE_IMPLEMENTATION(_n_idnWhitelist0, Pointer)
-    {
-        NODE_RETURN(qt_QUrl_idnWhitelist_stringBSB_ESB_(NODE_THREAD));
-    }
+    static NODE_IMPLEMENTATION(_n_idnWhitelist0, Pointer) { NODE_RETURN(qt_QUrl_idnWhitelist_stringBSB_ESB_(NODE_THREAD)); }
 
     static NODE_IMPLEMENTATION(_n_setIdnWhitelist0, void)
     {
-        qt_QUrl_setIdnWhitelist_void_stringBSB_ESB_(NODE_THREAD,
-                                                    NODE_ARG(0, Pointer));
+        qt_QUrl_setIdnWhitelist_void_stringBSB_ESB_(NODE_THREAD, NODE_ARG(0, Pointer));
     }
 
-    static NODE_IMPLEMENTATION(_n_toAce0, Pointer)
-    {
-        NODE_RETURN(
-            qt_QUrl_toAce_QByteArray_string(NODE_THREAD, NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_toAce0, Pointer) { NODE_RETURN(qt_QUrl_toAce_QByteArray_string(NODE_THREAD, NODE_ARG(0, Pointer))); }
 
     static NODE_IMPLEMENTATION(_n_toPercentEncoding0, Pointer)
     {
-        NODE_RETURN(
-            qt_QUrl_toPercentEncoding_QByteArray_string_QByteArray_QByteArray(
-                NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QUrl_toPercentEncoding_QByteArray_string_QByteArray_QByteArray(NODE_THREAD, NODE_ARG(0, Pointer),
+                                                                                      NODE_ARG(1, Pointer), NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_toStringList0, Pointer)
     {
-        NODE_RETURN(qt_QUrl_toStringList_stringBSB_ESB__qt__QUrlBSB_ESB__int(
-            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QUrl_toStringList_stringBSB_ESB__qt__QUrlBSB_ESB__int(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     void QUrlType::load()
@@ -1032,393 +824,192 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(
-            new Function(c, "__allocate", __allocate, None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", __allocate, None, Return, ftn, End),
 
-            EndArguments);
+                   EndArguments);
 
-        addSymbols(
-            new Alias(c, "ComponentFormattingOption", "int"),
-            new Alias(c, "ComponentFormattingOptions", "int"),
-            new SymbolicConstant(c, "PrettyDecoded", "int",
-                                 Value(int(QUrl::PrettyDecoded))),
-            new SymbolicConstant(c, "EncodeSpaces", "int",
-                                 Value(int(QUrl::EncodeSpaces))),
-            new SymbolicConstant(c, "EncodeUnicode", "int",
-                                 Value(int(QUrl::EncodeUnicode))),
-            new SymbolicConstant(c, "EncodeDelimiters", "int",
-                                 Value(int(QUrl::EncodeDelimiters))),
-            new SymbolicConstant(c, "EncodeReserved", "int",
-                                 Value(int(QUrl::EncodeReserved))),
-            new SymbolicConstant(c, "DecodeReserved", "int",
-                                 Value(int(QUrl::DecodeReserved))),
-            new SymbolicConstant(c, "FullyEncoded", "int",
-                                 Value(int(QUrl::FullyEncoded))),
-            new SymbolicConstant(c, "FullyDecoded", "int",
-                                 Value(int(QUrl::FullyDecoded))),
-            new Alias(c, "ParsingMode", "int"),
-            new SymbolicConstant(c, "TolerantMode", "int",
-                                 Value(int(QUrl::TolerantMode))),
-            new SymbolicConstant(c, "StrictMode", "int",
-                                 Value(int(QUrl::StrictMode))),
-            new SymbolicConstant(c, "DecodedMode", "int",
-                                 Value(int(QUrl::DecodedMode))),
-            new Alias(c, "UrlFormattingOption", "int"),
-            new Alias(c, "FormattingOptions", "int"),
-            new SymbolicConstant(c, "None", "int", Value(int(QUrl::None))),
-            new SymbolicConstant(c, "RemoveScheme", "int",
-                                 Value(int(QUrl::RemoveScheme))),
-            new SymbolicConstant(c, "RemovePassword", "int",
-                                 Value(int(QUrl::RemovePassword))),
-            new SymbolicConstant(c, "RemoveUserInfo", "int",
-                                 Value(int(QUrl::RemoveUserInfo))),
-            new SymbolicConstant(c, "RemovePort", "int",
-                                 Value(int(QUrl::RemovePort))),
-            new SymbolicConstant(c, "RemoveAuthority", "int",
-                                 Value(int(QUrl::RemoveAuthority))),
-            new SymbolicConstant(c, "RemovePath", "int",
-                                 Value(int(QUrl::RemovePath))),
-            new SymbolicConstant(c, "RemoveQuery", "int",
-                                 Value(int(QUrl::RemoveQuery))),
-            new SymbolicConstant(c, "RemoveFragment", "int",
-                                 Value(int(QUrl::RemoveFragment))),
-            new SymbolicConstant(c, "RemoveFilename", "int",
-                                 Value(int(QUrl::RemoveFilename))),
-            new SymbolicConstant(c, "PreferLocalFile", "int",
-                                 Value(int(QUrl::PreferLocalFile))),
-            new SymbolicConstant(c, "StripTrailingSlash", "int",
-                                 Value(int(QUrl::StripTrailingSlash))),
-            new SymbolicConstant(c, "NormalizePathSegments", "int",
-                                 Value(int(QUrl::NormalizePathSegments))),
-            new Alias(c, "UserInputResolutionOption", "int"),
-            new Alias(c, "UserInputResolutionOptions", "int"),
-            new SymbolicConstant(c, "DefaultResolution", "int",
-                                 Value(int(QUrl::DefaultResolution))),
-            new SymbolicConstant(c, "AssumeLocalFile", "int",
-                                 Value(int(QUrl::AssumeLocalFile))),
-            EndArguments);
+        addSymbols(new Alias(c, "ComponentFormattingOption", "int"), new Alias(c, "ComponentFormattingOptions", "int"),
+                   new SymbolicConstant(c, "PrettyDecoded", "int", Value(int(QUrl::PrettyDecoded))),
+                   new SymbolicConstant(c, "EncodeSpaces", "int", Value(int(QUrl::EncodeSpaces))),
+                   new SymbolicConstant(c, "EncodeUnicode", "int", Value(int(QUrl::EncodeUnicode))),
+                   new SymbolicConstant(c, "EncodeDelimiters", "int", Value(int(QUrl::EncodeDelimiters))),
+                   new SymbolicConstant(c, "EncodeReserved", "int", Value(int(QUrl::EncodeReserved))),
+                   new SymbolicConstant(c, "DecodeReserved", "int", Value(int(QUrl::DecodeReserved))),
+                   new SymbolicConstant(c, "FullyEncoded", "int", Value(int(QUrl::FullyEncoded))),
+                   new SymbolicConstant(c, "FullyDecoded", "int", Value(int(QUrl::FullyDecoded))), new Alias(c, "ParsingMode", "int"),
+                   new SymbolicConstant(c, "TolerantMode", "int", Value(int(QUrl::TolerantMode))),
+                   new SymbolicConstant(c, "StrictMode", "int", Value(int(QUrl::StrictMode))),
+                   new SymbolicConstant(c, "DecodedMode", "int", Value(int(QUrl::DecodedMode))), new Alias(c, "UrlFormattingOption", "int"),
+                   new Alias(c, "FormattingOptions", "int"), new SymbolicConstant(c, "None", "int", Value(int(QUrl::None))),
+                   new SymbolicConstant(c, "RemoveScheme", "int", Value(int(QUrl::RemoveScheme))),
+                   new SymbolicConstant(c, "RemovePassword", "int", Value(int(QUrl::RemovePassword))),
+                   new SymbolicConstant(c, "RemoveUserInfo", "int", Value(int(QUrl::RemoveUserInfo))),
+                   new SymbolicConstant(c, "RemovePort", "int", Value(int(QUrl::RemovePort))),
+                   new SymbolicConstant(c, "RemoveAuthority", "int", Value(int(QUrl::RemoveAuthority))),
+                   new SymbolicConstant(c, "RemovePath", "int", Value(int(QUrl::RemovePath))),
+                   new SymbolicConstant(c, "RemoveQuery", "int", Value(int(QUrl::RemoveQuery))),
+                   new SymbolicConstant(c, "RemoveFragment", "int", Value(int(QUrl::RemoveFragment))),
+                   new SymbolicConstant(c, "RemoveFilename", "int", Value(int(QUrl::RemoveFilename))),
+                   new SymbolicConstant(c, "PreferLocalFile", "int", Value(int(QUrl::PreferLocalFile))),
+                   new SymbolicConstant(c, "StripTrailingSlash", "int", Value(int(QUrl::StripTrailingSlash))),
+                   new SymbolicConstant(c, "NormalizePathSegments", "int", Value(int(QUrl::NormalizePathSegments))),
+                   new Alias(c, "UserInputResolutionOption", "int"), new Alias(c, "UserInputResolutionOptions", "int"),
+                   new SymbolicConstant(c, "DefaultResolution", "int", Value(int(QUrl::DefaultResolution))),
+                   new SymbolicConstant(c, "AssumeLocalFile", "int", Value(int(QUrl::AssumeLocalFile))), EndArguments);
 
         addSymbols(
             // enums
             // member functions
-            new Function(c, "QUrl", _n_QUrl0, None, Compiled,
-                         qt_QUrl_QUrl_QUrl_QUrl, Return, "qt.QUrl", Parameters,
+            new Function(c, "QUrl", _n_QUrl0, None, Compiled, qt_QUrl_QUrl_QUrl_QUrl, Return, "qt.QUrl", Parameters,
                          new Param(c, "this", "qt.QUrl"), End),
             // MISSING: QUrl (QUrl; QUrl this, QUrl other)
-            new Function(c, "QUrl", _n_QUrl2, None, Compiled,
-                         qt_QUrl_QUrl_QUrl_QUrl_string_int, Return, "qt.QUrl",
-                         Parameters, new Param(c, "this", "qt.QUrl"),
-                         new Param(c, "url", "string"),
-                         new Param(c, "parsingMode", "int",
-                                   Value((int)QUrl::TolerantMode)),
-                         End),
+            new Function(c, "QUrl", _n_QUrl2, None, Compiled, qt_QUrl_QUrl_QUrl_QUrl_string_int, Return, "qt.QUrl", Parameters,
+                         new Param(c, "this", "qt.QUrl"), new Param(c, "url", "string"),
+                         new Param(c, "parsingMode", "int", Value((int)QUrl::TolerantMode)), End),
             // MISSING: QUrl (QUrl; QUrl this, QUrl other)
-            new Function(c, "adjusted", _n_adjusted0, None, Compiled,
-                         qt_QUrl_adjusted_QUrl_QUrl_int, Return, "qt.QUrl",
-                         Parameters, new Param(c, "this", "qt.QUrl"),
-                         new Param(c, "options", "int"), End),
-            new Function(
-                c, "authority", _n_authority0, None, Compiled,
-                qt_QUrl_authority_string_QUrl_int, Return, "string", Parameters,
-                new Param(c, "this", "qt.QUrl"),
-                new Param(c, "options", "int", Value((int)QUrl::PrettyDecoded)),
-                End),
-            new Function(c, "clear", _n_clear0, None, Compiled,
-                         qt_QUrl_clear_void_QUrl, Return, "void", Parameters,
+            new Function(c, "adjusted", _n_adjusted0, None, Compiled, qt_QUrl_adjusted_QUrl_QUrl_int, Return, "qt.QUrl", Parameters,
+                         new Param(c, "this", "qt.QUrl"), new Param(c, "options", "int"), End),
+            new Function(c, "authority", _n_authority0, None, Compiled, qt_QUrl_authority_string_QUrl_int, Return, "string", Parameters,
+                         new Param(c, "this", "qt.QUrl"), new Param(c, "options", "int", Value((int)QUrl::PrettyDecoded)), End),
+            new Function(c, "clear", _n_clear0, None, Compiled, qt_QUrl_clear_void_QUrl, Return, "void", Parameters,
                          new Param(c, "this", "qt.QUrl"), End),
-            new Function(c, "errorString", _n_errorString0, None, Compiled,
-                         qt_QUrl_errorString_string_QUrl, Return, "string",
-                         Parameters, new Param(c, "this", "qt.QUrl"), End),
-            new Function(
-                c, "fileName", _n_fileName0, None, Compiled,
-                qt_QUrl_fileName_string_QUrl_int, Return, "string", Parameters,
-                new Param(c, "this", "qt.QUrl"),
-                new Param(c, "options", "int", Value((int)QUrl::FullyDecoded)),
-                End),
-            new Function(
-                c, "fragment", _n_fragment0, None, Compiled,
-                qt_QUrl_fragment_string_QUrl_int, Return, "string", Parameters,
-                new Param(c, "this", "qt.QUrl"),
-                new Param(c, "options", "int", Value((int)QUrl::PrettyDecoded)),
-                End),
-            new Function(c, "hasFragment", _n_hasFragment0, None, Compiled,
-                         qt_QUrl_hasFragment_bool_QUrl, Return, "bool",
-                         Parameters, new Param(c, "this", "qt.QUrl"), End),
-            new Function(c, "hasQuery", _n_hasQuery0, None, Compiled,
-                         qt_QUrl_hasQuery_bool_QUrl, Return, "bool", Parameters,
+            new Function(c, "errorString", _n_errorString0, None, Compiled, qt_QUrl_errorString_string_QUrl, Return, "string", Parameters,
                          new Param(c, "this", "qt.QUrl"), End),
-            new Function(
-                c, "host", _n_host0, None, Compiled,
-                qt_QUrl_host_string_QUrl_int, Return, "string", Parameters,
-                new Param(c, "this", "qt.QUrl"),
-                new Param(c, "options", "int", Value((int)QUrl::FullyDecoded)),
-                End),
-            new Function(c, "isEmpty", _n_isEmpty0, None, Compiled,
-                         qt_QUrl_isEmpty_bool_QUrl, Return, "bool", Parameters,
+            new Function(c, "fileName", _n_fileName0, None, Compiled, qt_QUrl_fileName_string_QUrl_int, Return, "string", Parameters,
+                         new Param(c, "this", "qt.QUrl"), new Param(c, "options", "int", Value((int)QUrl::FullyDecoded)), End),
+            new Function(c, "fragment", _n_fragment0, None, Compiled, qt_QUrl_fragment_string_QUrl_int, Return, "string", Parameters,
+                         new Param(c, "this", "qt.QUrl"), new Param(c, "options", "int", Value((int)QUrl::PrettyDecoded)), End),
+            new Function(c, "hasFragment", _n_hasFragment0, None, Compiled, qt_QUrl_hasFragment_bool_QUrl, Return, "bool", Parameters,
                          new Param(c, "this", "qt.QUrl"), End),
-            new Function(c, "isLocalFile", _n_isLocalFile0, None, Compiled,
-                         qt_QUrl_isLocalFile_bool_QUrl, Return, "bool",
-                         Parameters, new Param(c, "this", "qt.QUrl"), End),
-            new Function(c, "isParentOf", _n_isParentOf0, None, Compiled,
-                         qt_QUrl_isParentOf_bool_QUrl_QUrl, Return, "bool",
-                         Parameters, new Param(c, "this", "qt.QUrl"),
-                         new Param(c, "childUrl", "qt.QUrl"), End),
-            new Function(c, "isRelative", _n_isRelative0, None, Compiled,
-                         qt_QUrl_isRelative_bool_QUrl, Return, "bool",
-                         Parameters, new Param(c, "this", "qt.QUrl"), End),
-            new Function(c, "isValid", _n_isValid0, None, Compiled,
-                         qt_QUrl_isValid_bool_QUrl, Return, "bool", Parameters,
+            new Function(c, "hasQuery", _n_hasQuery0, None, Compiled, qt_QUrl_hasQuery_bool_QUrl, Return, "bool", Parameters,
                          new Param(c, "this", "qt.QUrl"), End),
-            new Function(c, "matches", _n_matches0, None, Compiled,
-                         qt_QUrl_matches_bool_QUrl_QUrl_int, Return, "bool",
-                         Parameters, new Param(c, "this", "qt.QUrl"),
-                         new Param(c, "url", "qt.QUrl"),
-                         new Param(c, "options", "int"), End),
-            new Function(
-                c, "password", _n_password0, None, Compiled,
-                qt_QUrl_password_string_QUrl_int, Return, "string", Parameters,
-                new Param(c, "this", "qt.QUrl"),
-                new Param(c, "options", "int", Value((int)QUrl::FullyDecoded)),
-                End),
-            new Function(
-                c, "path", _n_path0, None, Compiled,
-                qt_QUrl_path_string_QUrl_int, Return, "string", Parameters,
-                new Param(c, "this", "qt.QUrl"),
-                new Param(c, "options", "int", Value((int)QUrl::FullyDecoded)),
-                End),
-            new Function(
-                c, "port", _n_port0, None, Compiled, qt_QUrl_port_int_QUrl_int,
-                Return, "int", Parameters, new Param(c, "this", "qt.QUrl"),
-                new Param(c, "defaultPort", "int", Value((int)-1)), End),
-            new Function(
-                c, "query", _n_query0, None, Compiled,
-                qt_QUrl_query_string_QUrl_int, Return, "string", Parameters,
-                new Param(c, "this", "qt.QUrl"),
-                new Param(c, "options", "int", Value((int)QUrl::PrettyDecoded)),
-                End),
-            new Function(c, "resolved", _n_resolved0, None, Compiled,
-                         qt_QUrl_resolved_QUrl_QUrl_QUrl, Return, "qt.QUrl",
-                         Parameters, new Param(c, "this", "qt.QUrl"),
-                         new Param(c, "relative", "qt.QUrl"), End),
-            new Function(c, "scheme", _n_scheme0, None, Compiled,
-                         qt_QUrl_scheme_string_QUrl, Return, "string",
-                         Parameters, new Param(c, "this", "qt.QUrl"), End),
-            new Function(
-                c, "setAuthority", _n_setAuthority0, None, Compiled,
-                qt_QUrl_setAuthority_void_QUrl_string_int, Return, "void",
-                Parameters, new Param(c, "this", "qt.QUrl"),
-                new Param(c, "authority", "string"),
-                new Param(c, "mode", "int", Value((int)QUrl::TolerantMode)),
-                End),
-            new Function(
-                c, "setFragment", _n_setFragment0, None, Compiled,
-                qt_QUrl_setFragment_void_QUrl_string_int, Return, "void",
-                Parameters, new Param(c, "this", "qt.QUrl"),
-                new Param(c, "fragment", "string"),
-                new Param(c, "mode", "int", Value((int)QUrl::TolerantMode)),
-                End),
-            new Function(
-                c, "setHost", _n_setHost0, None, Compiled,
-                qt_QUrl_setHost_void_QUrl_string_int, Return, "void",
-                Parameters, new Param(c, "this", "qt.QUrl"),
-                new Param(c, "host", "string"),
-                new Param(c, "mode", "int", Value((int)QUrl::DecodedMode)),
-                End),
-            new Function(
-                c, "setPassword", _n_setPassword0, None, Compiled,
-                qt_QUrl_setPassword_void_QUrl_string_int, Return, "void",
-                Parameters, new Param(c, "this", "qt.QUrl"),
-                new Param(c, "password", "string"),
-                new Param(c, "mode", "int", Value((int)QUrl::DecodedMode)),
-                End),
-            new Function(
-                c, "setPath", _n_setPath0, None, Compiled,
-                qt_QUrl_setPath_void_QUrl_string_int, Return, "void",
-                Parameters, new Param(c, "this", "qt.QUrl"),
-                new Param(c, "path", "string"),
-                new Param(c, "mode", "int", Value((int)QUrl::DecodedMode)),
-                End),
-            new Function(c, "setPort", _n_setPort0, None, Compiled,
-                         qt_QUrl_setPort_void_QUrl_int, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QUrl"),
-                         new Param(c, "port", "int"), End),
-            new Function(
-                c, "setQuery", _n_setQuery0, None, Compiled,
-                qt_QUrl_setQuery_void_QUrl_string_int, Return, "void",
-                Parameters, new Param(c, "this", "qt.QUrl"),
-                new Param(c, "query", "string"),
-                new Param(c, "mode", "int", Value((int)QUrl::TolerantMode)),
-                End),
-            new Function(c, "setQuery", _n_setQuery1, None, Compiled,
-                         qt_QUrl_setQuery_void_QUrl_QUrlQuery, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QUrl"),
-                         new Param(c, "query", "qt.QUrlQuery"), End),
-            new Function(c, "setScheme", _n_setScheme0, None, Compiled,
-                         qt_QUrl_setScheme_void_QUrl_string, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QUrl"),
-                         new Param(c, "scheme", "string"), End),
-            new Function(c, "setUrl", _n_setUrl0, None, Compiled,
-                         qt_QUrl_setUrl_void_QUrl_string_int, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QUrl"),
-                         new Param(c, "url", "string"),
-                         new Param(c, "parsingMode", "int",
-                                   Value((int)QUrl::TolerantMode)),
-                         End),
-            new Function(
-                c, "setUserInfo", _n_setUserInfo0, None, Compiled,
-                qt_QUrl_setUserInfo_void_QUrl_string_int, Return, "void",
-                Parameters, new Param(c, "this", "qt.QUrl"),
-                new Param(c, "userInfo", "string"),
-                new Param(c, "mode", "int", Value((int)QUrl::TolerantMode)),
-                End),
-            new Function(
-                c, "setUserName", _n_setUserName0, None, Compiled,
-                qt_QUrl_setUserName_void_QUrl_string_int, Return, "void",
-                Parameters, new Param(c, "this", "qt.QUrl"),
-                new Param(c, "userName", "string"),
-                new Param(c, "mode", "int", Value((int)QUrl::DecodedMode)),
-                End),
-            new Function(c, "swap", _n_swap0, None, Compiled,
-                         qt_QUrl_swap_void_QUrl_QUrl, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QUrl"),
-                         new Param(c, "other", "qt.QUrl"), End),
+            new Function(c, "host", _n_host0, None, Compiled, qt_QUrl_host_string_QUrl_int, Return, "string", Parameters,
+                         new Param(c, "this", "qt.QUrl"), new Param(c, "options", "int", Value((int)QUrl::FullyDecoded)), End),
+            new Function(c, "isEmpty", _n_isEmpty0, None, Compiled, qt_QUrl_isEmpty_bool_QUrl, Return, "bool", Parameters,
+                         new Param(c, "this", "qt.QUrl"), End),
+            new Function(c, "isLocalFile", _n_isLocalFile0, None, Compiled, qt_QUrl_isLocalFile_bool_QUrl, Return, "bool", Parameters,
+                         new Param(c, "this", "qt.QUrl"), End),
+            new Function(c, "isParentOf", _n_isParentOf0, None, Compiled, qt_QUrl_isParentOf_bool_QUrl_QUrl, Return, "bool", Parameters,
+                         new Param(c, "this", "qt.QUrl"), new Param(c, "childUrl", "qt.QUrl"), End),
+            new Function(c, "isRelative", _n_isRelative0, None, Compiled, qt_QUrl_isRelative_bool_QUrl, Return, "bool", Parameters,
+                         new Param(c, "this", "qt.QUrl"), End),
+            new Function(c, "isValid", _n_isValid0, None, Compiled, qt_QUrl_isValid_bool_QUrl, Return, "bool", Parameters,
+                         new Param(c, "this", "qt.QUrl"), End),
+            new Function(c, "matches", _n_matches0, None, Compiled, qt_QUrl_matches_bool_QUrl_QUrl_int, Return, "bool", Parameters,
+                         new Param(c, "this", "qt.QUrl"), new Param(c, "url", "qt.QUrl"), new Param(c, "options", "int"), End),
+            new Function(c, "password", _n_password0, None, Compiled, qt_QUrl_password_string_QUrl_int, Return, "string", Parameters,
+                         new Param(c, "this", "qt.QUrl"), new Param(c, "options", "int", Value((int)QUrl::FullyDecoded)), End),
+            new Function(c, "path", _n_path0, None, Compiled, qt_QUrl_path_string_QUrl_int, Return, "string", Parameters,
+                         new Param(c, "this", "qt.QUrl"), new Param(c, "options", "int", Value((int)QUrl::FullyDecoded)), End),
+            new Function(c, "port", _n_port0, None, Compiled, qt_QUrl_port_int_QUrl_int, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QUrl"), new Param(c, "defaultPort", "int", Value((int)-1)), End),
+            new Function(c, "query", _n_query0, None, Compiled, qt_QUrl_query_string_QUrl_int, Return, "string", Parameters,
+                         new Param(c, "this", "qt.QUrl"), new Param(c, "options", "int", Value((int)QUrl::PrettyDecoded)), End),
+            new Function(c, "resolved", _n_resolved0, None, Compiled, qt_QUrl_resolved_QUrl_QUrl_QUrl, Return, "qt.QUrl", Parameters,
+                         new Param(c, "this", "qt.QUrl"), new Param(c, "relative", "qt.QUrl"), End),
+            new Function(c, "scheme", _n_scheme0, None, Compiled, qt_QUrl_scheme_string_QUrl, Return, "string", Parameters,
+                         new Param(c, "this", "qt.QUrl"), End),
+            new Function(c, "setAuthority", _n_setAuthority0, None, Compiled, qt_QUrl_setAuthority_void_QUrl_string_int, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QUrl"), new Param(c, "authority", "string"),
+                         new Param(c, "mode", "int", Value((int)QUrl::TolerantMode)), End),
+            new Function(c, "setFragment", _n_setFragment0, None, Compiled, qt_QUrl_setFragment_void_QUrl_string_int, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QUrl"), new Param(c, "fragment", "string"),
+                         new Param(c, "mode", "int", Value((int)QUrl::TolerantMode)), End),
+            new Function(c, "setHost", _n_setHost0, None, Compiled, qt_QUrl_setHost_void_QUrl_string_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QUrl"), new Param(c, "host", "string"),
+                         new Param(c, "mode", "int", Value((int)QUrl::DecodedMode)), End),
+            new Function(c, "setPassword", _n_setPassword0, None, Compiled, qt_QUrl_setPassword_void_QUrl_string_int, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QUrl"), new Param(c, "password", "string"),
+                         new Param(c, "mode", "int", Value((int)QUrl::DecodedMode)), End),
+            new Function(c, "setPath", _n_setPath0, None, Compiled, qt_QUrl_setPath_void_QUrl_string_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QUrl"), new Param(c, "path", "string"),
+                         new Param(c, "mode", "int", Value((int)QUrl::DecodedMode)), End),
+            new Function(c, "setPort", _n_setPort0, None, Compiled, qt_QUrl_setPort_void_QUrl_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QUrl"), new Param(c, "port", "int"), End),
+            new Function(c, "setQuery", _n_setQuery0, None, Compiled, qt_QUrl_setQuery_void_QUrl_string_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QUrl"), new Param(c, "query", "string"),
+                         new Param(c, "mode", "int", Value((int)QUrl::TolerantMode)), End),
+            new Function(c, "setQuery", _n_setQuery1, None, Compiled, qt_QUrl_setQuery_void_QUrl_QUrlQuery, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QUrl"), new Param(c, "query", "qt.QUrlQuery"), End),
+            new Function(c, "setScheme", _n_setScheme0, None, Compiled, qt_QUrl_setScheme_void_QUrl_string, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QUrl"), new Param(c, "scheme", "string"), End),
+            new Function(c, "setUrl", _n_setUrl0, None, Compiled, qt_QUrl_setUrl_void_QUrl_string_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QUrl"), new Param(c, "url", "string"),
+                         new Param(c, "parsingMode", "int", Value((int)QUrl::TolerantMode)), End),
+            new Function(c, "setUserInfo", _n_setUserInfo0, None, Compiled, qt_QUrl_setUserInfo_void_QUrl_string_int, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QUrl"), new Param(c, "userInfo", "string"),
+                         new Param(c, "mode", "int", Value((int)QUrl::TolerantMode)), End),
+            new Function(c, "setUserName", _n_setUserName0, None, Compiled, qt_QUrl_setUserName_void_QUrl_string_int, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QUrl"), new Param(c, "userName", "string"),
+                         new Param(c, "mode", "int", Value((int)QUrl::DecodedMode)), End),
+            new Function(c, "swap", _n_swap0, None, Compiled, qt_QUrl_swap_void_QUrl_QUrl, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QUrl"), new Param(c, "other", "qt.QUrl"), End),
             // MISSING: toCFURL ("CFURLRef"; QUrl this)
-            new Function(
-                c, "toDisplayString", _n_toDisplayString0, None, Compiled,
-                qt_QUrl_toDisplayString_string_QUrl_int, Return, "string",
-                Parameters, new Param(c, "this", "qt.QUrl"),
-                new Param(
-                    c, "options", "int",
-                    Value((int)QUrl::FormattingOptions(QUrl::PrettyDecoded))),
-                End),
-            new Function(
-                c, "toEncoded", _n_toEncoded0, None, Compiled,
-                qt_QUrl_toEncoded_QByteArray_QUrl_int, Return, "qt.QByteArray",
-                Parameters, new Param(c, "this", "qt.QUrl"),
-                new Param(c, "options", "int", Value((int)QUrl::FullyEncoded)),
-                End),
-            new Function(c, "toLocalFile", _n_toLocalFile0, None, Compiled,
-                         qt_QUrl_toLocalFile_string_QUrl, Return, "string",
-                         Parameters, new Param(c, "this", "qt.QUrl"), End),
+            new Function(c, "toDisplayString", _n_toDisplayString0, None, Compiled, qt_QUrl_toDisplayString_string_QUrl_int, Return,
+                         "string", Parameters, new Param(c, "this", "qt.QUrl"),
+                         new Param(c, "options", "int", Value((int)QUrl::FormattingOptions(QUrl::PrettyDecoded))), End),
+            new Function(c, "toEncoded", _n_toEncoded0, None, Compiled, qt_QUrl_toEncoded_QByteArray_QUrl_int, Return, "qt.QByteArray",
+                         Parameters, new Param(c, "this", "qt.QUrl"), new Param(c, "options", "int", Value((int)QUrl::FullyEncoded)), End),
+            new Function(c, "toLocalFile", _n_toLocalFile0, None, Compiled, qt_QUrl_toLocalFile_string_QUrl, Return, "string", Parameters,
+                         new Param(c, "this", "qt.QUrl"), End),
             // MISSING: toNSURL ("NSURL *"; QUrl this)
-            new Function(c, "toString", _n_toString0, None, Compiled,
-                         qt_QUrl_toString_string_QUrl_int, Return, "string",
-                         Parameters, new Param(c, "this", "qt.QUrl"),
-                         new Param(c, "options", "int",
-                                   Value((int)QUrl::FormattingOptions(
-                                       QUrl::PrettyDecoded))),
-                         End),
-            new Function(
-                c, "topLevelDomain", _n_topLevelDomain0, None, Compiled,
-                qt_QUrl_topLevelDomain_string_QUrl_int, Return, "string",
-                Parameters, new Param(c, "this", "qt.QUrl"),
-                new Param(c, "options", "int", Value((int)QUrl::FullyDecoded)),
-                End),
-            new Function(
-                c, "url", _n_url0, None, Compiled, qt_QUrl_url_string_QUrl_int,
-                Return, "string", Parameters, new Param(c, "this", "qt.QUrl"),
-                new Param(
-                    c, "options", "int",
-                    Value((int)QUrl::FormattingOptions(QUrl::PrettyDecoded))),
-                End),
-            new Function(
-                c, "userInfo", _n_userInfo0, None, Compiled,
-                qt_QUrl_userInfo_string_QUrl_int, Return, "string", Parameters,
-                new Param(c, "this", "qt.QUrl"),
-                new Param(c, "options", "int", Value((int)QUrl::PrettyDecoded)),
-                End),
-            new Function(
-                c, "userName", _n_userName0, None, Compiled,
-                qt_QUrl_userName_string_QUrl_int, Return, "string", Parameters,
-                new Param(c, "this", "qt.QUrl"),
-                new Param(c, "options", "int", Value((int)QUrl::FullyDecoded)),
-                End),
+            new Function(c, "toString", _n_toString0, None, Compiled, qt_QUrl_toString_string_QUrl_int, Return, "string", Parameters,
+                         new Param(c, "this", "qt.QUrl"),
+                         new Param(c, "options", "int", Value((int)QUrl::FormattingOptions(QUrl::PrettyDecoded))), End),
+            new Function(c, "topLevelDomain", _n_topLevelDomain0, None, Compiled, qt_QUrl_topLevelDomain_string_QUrl_int, Return, "string",
+                         Parameters, new Param(c, "this", "qt.QUrl"), new Param(c, "options", "int", Value((int)QUrl::FullyDecoded)), End),
+            new Function(c, "url", _n_url0, None, Compiled, qt_QUrl_url_string_QUrl_int, Return, "string", Parameters,
+                         new Param(c, "this", "qt.QUrl"),
+                         new Param(c, "options", "int", Value((int)QUrl::FormattingOptions(QUrl::PrettyDecoded))), End),
+            new Function(c, "userInfo", _n_userInfo0, None, Compiled, qt_QUrl_userInfo_string_QUrl_int, Return, "string", Parameters,
+                         new Param(c, "this", "qt.QUrl"), new Param(c, "options", "int", Value((int)QUrl::PrettyDecoded)), End),
+            new Function(c, "userName", _n_userName0, None, Compiled, qt_QUrl_userName_string_QUrl_int, Return, "string", Parameters,
+                         new Param(c, "this", "qt.QUrl"), new Param(c, "options", "int", Value((int)QUrl::FullyDecoded)), End),
             // static functions
-            new Function(c, "fromAce", _n_fromAce0, None, Compiled,
-                         qt_QUrl_fromAce_string_QByteArray, Return, "string",
-                         Parameters, new Param(c, "domain", "qt.QByteArray"),
-                         End),
+            new Function(c, "fromAce", _n_fromAce0, None, Compiled, qt_QUrl_fromAce_string_QByteArray, Return, "string", Parameters,
+                         new Param(c, "domain", "qt.QByteArray"), End),
             // MISSING: fromCFURL (QUrl; "CFURLRef" url)
-            new Function(c, "fromEncoded", _n_fromEncoded0, None, Compiled,
-                         qt_QUrl_fromEncoded_QUrl_QByteArray_int, Return,
-                         "qt.QUrl", Parameters,
-                         new Param(c, "input", "qt.QByteArray"),
-                         new Param(c, "parsingMode", "int",
-                                   Value((int)QUrl::TolerantMode)),
-                         End),
-            new Function(c, "fromLocalFile", _n_fromLocalFile0, None, Compiled,
-                         qt_QUrl_fromLocalFile_QUrl_string, Return, "qt.QUrl",
+            new Function(c, "fromEncoded", _n_fromEncoded0, None, Compiled, qt_QUrl_fromEncoded_QUrl_QByteArray_int, Return, "qt.QUrl",
+                         Parameters, new Param(c, "input", "qt.QByteArray"),
+                         new Param(c, "parsingMode", "int", Value((int)QUrl::TolerantMode)), End),
+            new Function(c, "fromLocalFile", _n_fromLocalFile0, None, Compiled, qt_QUrl_fromLocalFile_QUrl_string, Return, "qt.QUrl",
                          Parameters, new Param(c, "localFile", "string"), End),
             // MISSING: fromNSURL (QUrl; "const NSURL *" url)
-            new Function(c, "fromPercentEncoding", _n_fromPercentEncoding0,
-                         None, Compiled,
-                         qt_QUrl_fromPercentEncoding_string_QByteArray, Return,
-                         "string", Parameters,
-                         new Param(c, "input", "qt.QByteArray"), End),
-            new Function(
-                c, "fromStringList", _n_fromStringList0, None, Compiled,
-                qt_QUrl_fromStringList_qt__QUrlBSB_ESB__stringBSB_ESB__int,
-                Return, "qt.QUrl[]", Parameters,
-                new Param(c, "urls", "string[]"),
-                new Param(c, "mode", "int", Value((int)QUrl::TolerantMode)),
-                End),
-            new Function(c, "fromUserInput", _n_fromUserInput0, None, Compiled,
-                         qt_QUrl_fromUserInput_QUrl_string, Return, "qt.QUrl",
+            new Function(c, "fromPercentEncoding", _n_fromPercentEncoding0, None, Compiled, qt_QUrl_fromPercentEncoding_string_QByteArray,
+                         Return, "string", Parameters, new Param(c, "input", "qt.QByteArray"), End),
+            new Function(c, "fromStringList", _n_fromStringList0, None, Compiled,
+                         qt_QUrl_fromStringList_qt__QUrlBSB_ESB__stringBSB_ESB__int, Return, "qt.QUrl[]", Parameters,
+                         new Param(c, "urls", "string[]"), new Param(c, "mode", "int", Value((int)QUrl::TolerantMode)), End),
+            new Function(c, "fromUserInput", _n_fromUserInput0, None, Compiled, qt_QUrl_fromUserInput_QUrl_string, Return, "qt.QUrl",
                          Parameters, new Param(c, "userInput", "string"), End),
-            new Function(c, "fromUserInput", _n_fromUserInput1, None, Compiled,
-                         qt_QUrl_fromUserInput_QUrl_string_string_int, Return,
-                         "qt.QUrl", Parameters,
-                         new Param(c, "userInput", "string"),
-                         new Param(c, "workingDirectory", "string"),
-                         new Param(c, "options", "int",
-                                   Value((int)QUrl::DefaultResolution)),
-                         End),
-            new Function(c, "idnWhitelist", _n_idnWhitelist0, None, Compiled,
-                         qt_QUrl_idnWhitelist_stringBSB_ESB_, Return,
-                         "string[]", End),
-            new Function(c, "setIdnWhitelist", _n_setIdnWhitelist0, None,
-                         Compiled, qt_QUrl_setIdnWhitelist_void_stringBSB_ESB_,
-                         Return, "void", Parameters,
-                         new Param(c, "list", "string[]"), End),
-            new Function(c, "toAce", _n_toAce0, None, Compiled,
-                         qt_QUrl_toAce_QByteArray_string, Return,
-                         "qt.QByteArray", Parameters,
+            new Function(c, "fromUserInput", _n_fromUserInput1, None, Compiled, qt_QUrl_fromUserInput_QUrl_string_string_int, Return,
+                         "qt.QUrl", Parameters, new Param(c, "userInput", "string"), new Param(c, "workingDirectory", "string"),
+                         new Param(c, "options", "int", Value((int)QUrl::DefaultResolution)), End),
+            new Function(c, "idnWhitelist", _n_idnWhitelist0, None, Compiled, qt_QUrl_idnWhitelist_stringBSB_ESB_, Return, "string[]", End),
+            new Function(c, "setIdnWhitelist", _n_setIdnWhitelist0, None, Compiled, qt_QUrl_setIdnWhitelist_void_stringBSB_ESB_, Return,
+                         "void", Parameters, new Param(c, "list", "string[]"), End),
+            new Function(c, "toAce", _n_toAce0, None, Compiled, qt_QUrl_toAce_QByteArray_string, Return, "qt.QByteArray", Parameters,
                          new Param(c, "domain", "string"), End),
-            new Function(
-                c, "toPercentEncoding", _n_toPercentEncoding0, None, Compiled,
-                qt_QUrl_toPercentEncoding_QByteArray_string_QByteArray_QByteArray,
-                Return, "qt.QByteArray", Parameters,
-                new Param(c, "input", "string"),
-                new Param(c, "exclude", "qt.QByteArray"),
-                new Param(c, "include", "qt.QByteArray"), End),
-            new Function(
-                c, "toStringList", _n_toStringList0, None, Compiled,
-                qt_QUrl_toStringList_stringBSB_ESB__qt__QUrlBSB_ESB__int,
-                Return, "string[]", Parameters,
-                new Param(c, "urls", "qt.QUrl[]"),
-                new Param(
-                    c, "options", "int",
-                    Value((int)QUrl::FormattingOptions(QUrl::PrettyDecoded))),
-                End),
+            new Function(c, "toPercentEncoding", _n_toPercentEncoding0, None, Compiled,
+                         qt_QUrl_toPercentEncoding_QByteArray_string_QByteArray_QByteArray, Return, "qt.QByteArray", Parameters,
+                         new Param(c, "input", "string"), new Param(c, "exclude", "qt.QByteArray"),
+                         new Param(c, "include", "qt.QByteArray"), End),
+            new Function(c, "toStringList", _n_toStringList0, None, Compiled, qt_QUrl_toStringList_stringBSB_ESB__qt__QUrlBSB_ESB__int,
+                         Return, "string[]", Parameters, new Param(c, "urls", "qt.QUrl[]"),
+                         new Param(c, "options", "int", Value((int)QUrl::FormattingOptions(QUrl::PrettyDecoded))), End),
             EndArguments);
-        globalScope()->addSymbols(
-            new Function(c, "!=", _n_operatorBang_EQ_0, Op, Compiled,
-                         qt_QUrl_operatorBang_EQ__bool_QUrl_QUrl, Return,
-                         "bool", Parameters, new Param(c, "this", "qt.QUrl"),
-                         new Param(c, "url", "qt.QUrl"), End),
-            // MISSING: = (QUrl; QUrl this, QUrl url)
-            // MISSING: = (QUrl; QUrl this, string url)
-            // MISSING: = (QUrl; QUrl this, QUrl other)
-            new Function(c, "==", _n_operatorEQ_EQ_0, Op, Compiled,
-                         qt_QUrl_operatorEQ_EQ__bool_QUrl_QUrl, Return, "bool",
-                         Parameters, new Param(c, "this", "qt.QUrl"),
-                         new Param(c, "url", "qt.QUrl"), End),
-            EndArguments);
+        globalScope()->addSymbols(new Function(c, "!=", _n_operatorBang_EQ_0, Op, Compiled, qt_QUrl_operatorBang_EQ__bool_QUrl_QUrl, Return,
+                                               "bool", Parameters, new Param(c, "this", "qt.QUrl"), new Param(c, "url", "qt.QUrl"), End),
+                                  // MISSING: = (QUrl; QUrl this, QUrl url)
+                                  // MISSING: = (QUrl; QUrl this, string url)
+                                  // MISSING: = (QUrl; QUrl this, QUrl other)
+                                  new Function(c, "==", _n_operatorEQ_EQ_0, Op, Compiled, qt_QUrl_operatorEQ_EQ__bool_QUrl_QUrl, Return,
+                                               "bool", Parameters, new Param(c, "this", "qt.QUrl"), new Param(c, "url", "qt.QUrl"), End),
+                                  EndArguments);
         scope()->addSymbols(EndArguments);
 
         c->arrayType(this, 1, 0);

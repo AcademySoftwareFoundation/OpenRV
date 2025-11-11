@@ -35,9 +35,7 @@ namespace TwkMovie
 #undef max
 #endif
 
-#define IPGRAPH_CONSTRUCTOR_DECLARATION(NAME)                           \
-    static IPNode* NAME(const std::string& name, const NodeDefinition*, \
-                        IPGraph*, GroupIPNode*)
+#define IPGRAPH_CONSTRUCTOR_DECLARATION(NAME) static IPNode* NAME(const std::string& name, const NodeDefinition*, IPGraph*, GroupIPNode*)
 
 namespace IPCore
 {
@@ -103,12 +101,9 @@ namespace IPCore
 
         typedef boost::signals2::signal<void()> VoidSignal;
         typedef boost::signals2::signal<void(const Property*)> PropertySignal;
-        typedef boost::signals2::signal<void(const Property*, size_t, size_t)>
-            PropertyInsertSignal;
-        typedef boost::signals2::signal<void(const std::string&)>
-            PropertyNameSignal;
-        typedef boost::signals2::signal<void(const std::string&, unsigned int)>
-            ReadCompletedSignal;
+        typedef boost::signals2::signal<void(const Property*, size_t, size_t)> PropertyInsertSignal;
+        typedef boost::signals2::signal<void(const std::string&)> PropertyNameSignal;
+        typedef boost::signals2::signal<void(const std::string&, unsigned int)> ReadCompletedSignal;
 
         //
         //  For some applications (EG session writing), we want to maintain a
@@ -144,9 +139,8 @@ namespace IPCore
             CacheThreadMarker = (1 << 8),
             CacheEvalThread = (1 << 9),
 
-            DisplayThread = DisplayNoEvalThread | DisplayEvalThread
-                            | DisplayPassThroughThread | DisplayMaybeEvalThread
-                            | DisplayCacheEvalThread
+            DisplayThread =
+                DisplayNoEvalThread | DisplayEvalThread | DisplayPassThroughThread | DisplayMaybeEvalThread | DisplayCacheEvalThread
         };
 
         //
@@ -166,25 +160,20 @@ namespace IPCore
 
         enum PropagateTarget : int
         {
-            GroupPropagateTarget = 0x0001,  // propagates event in group
-            GraphPropagateTarget = 0x0002,  // propagates event in graph
-            OutputPropagateTarget = 0x0004, // propagates event throw ouputs
-            MemberPropagateTarget =
-                0x0008, // propages event in members of group
-            GroupAndGraphInOutputPropagateTarget =
-                0x1000, // allow graph and graph event propagation in outpus
+            GroupPropagateTarget = 0x0001,                 // propagates event in group
+            GraphPropagateTarget = 0x0002,                 // propagates event in graph
+            OutputPropagateTarget = 0x0004,                // propagates event throw ouputs
+            MemberPropagateTarget = 0x0008,                // propages event in members of group
+            GroupAndGraphInOutputPropagateTarget = 0x1000, // allow graph and graph event propagation in outpus
 
             // same event propagation behaviour then RV 7.6
-            LegacyPropagateTarget = GroupPropagateTarget | GraphPropagateTarget
-                                    | OutputPropagateTarget
-                                    | MemberPropagateTarget
+            LegacyPropagateTarget = GroupPropagateTarget | GraphPropagateTarget | OutputPropagateTarget | MemberPropagateTarget
                                     | GroupAndGraphInOutputPropagateTarget,
 
             // new fast event propagation behaviour
             // we avoid to propagate in graph and group after an output is
             // crossed
-            FastPropagateTarget = GroupPropagateTarget | GraphPropagateTarget
-                                  | OutputPropagateTarget
+            FastPropagateTarget = GroupPropagateTarget | GraphPropagateTarget | OutputPropagateTarget
         };
 
         struct ImageComponent
@@ -201,8 +190,7 @@ namespace IPCore
                 name[0] = a;
             }
 
-            ImageComponent(ComponentType t, const std::string& a,
-                           const std::string& b)
+            ImageComponent(ComponentType t, const std::string& a, const std::string& b)
                 : type(t)
                 , name(2)
             {
@@ -210,8 +198,7 @@ namespace IPCore
                 name[1] = b;
             }
 
-            ImageComponent(ComponentType t, const std::string& a,
-                           const std::string& b, const std::string& c)
+            ImageComponent(ComponentType t, const std::string& a, const std::string& b, const std::string& c)
                 : type(t)
                 , name(3)
             {
@@ -222,8 +209,7 @@ namespace IPCore
 
             bool isValid() const
             {
-                return (type == ViewComponent && name.size() == 1)
-                       || (type == LayerComponent && name.size() == 2)
+                return (type == ViewComponent && name.size() == 1) || (type == LayerComponent && name.size() == 2)
                        || (type == ChannelComponent && name.size() == 3);
             }
 
@@ -252,16 +238,15 @@ namespace IPCore
             {
             }
 
-            bool active;  //  StereoContext is ignored unless active is true
-            bool swap;    //  Swap will happen somewhere closer to the root
-            bool flip;    //  Right-eye flip will happen somewhere closer to the
-                          //  root
-            bool flop;    //  Right-eye flop will happen somewhere closer to the
-                          //  root
-            float offset; //  Additional stereo offset
-            float roffset; //  Additional stereo right-eye-only offset
-            float
-                rrotate; //  Additional right-eye rotation **CURRENTLY UNUSED**
+            bool active;     //  StereoContext is ignored unless active is true
+            bool swap;       //  Swap will happen somewhere closer to the root
+            bool flip;       //  Right-eye flip will happen somewhere closer to the
+                             //  root
+            bool flop;       //  Right-eye flop will happen somewhere closer to the
+                             //  root
+            float offset;    //  Additional stereo offset
+            float roffset;   //  Additional stereo right-eye-only offset
+            float rrotate;   //  Additional right-eye rotation **CURRENTLY UNUSED**
             Vec2 rtranslate; //  Additional right-eye translation **CURRENTLY
                              //  UNUSED**
         };
@@ -270,8 +255,7 @@ namespace IPCore
 
         struct Context
         {
-            Context(int evalFrame_, int baseFrame_, float fps_, int w, int h,
-                    ThreadType thread_, size_t threadNum_, FBCache& cache_,
+            Context(int evalFrame_, int baseFrame_, float fps_, int w, int h, ThreadType thread_, size_t threadNum_, FBCache& cache_,
                     bool stereo_ = false)
                 : frame(evalFrame_)
                 , baseFrame(baseFrame_)
@@ -305,15 +289,14 @@ namespace IPCore
             ThreadType thread;
             size_t threadNum;
             FBCache& cache;
-            const IPNode* cacheNode;     /// For per-node caching
-            bool allowInteractiveResize; /// if false don't do it
-            bool stereo;                 /// render is in stereo mode
-            bool missing;                /// find a proxy for this frame
-            mutable StereoContext
-                stereoContext; /// set at display level to inform source-level
-                               /// stereo eval.
-            size_t eye; /// request a specific eye (0=left, 1=right, 2=whatever)
-            ImageComponent component; /// defaults to NoComponent
+            const IPNode* cacheNode;             /// For per-node caching
+            bool allowInteractiveResize;         /// if false don't do it
+            bool stereo;                         /// render is in stereo mode
+            bool missing;                        /// find a proxy for this frame
+            mutable StereoContext stereoContext; /// set at display level to inform source-level
+                                                 /// stereo eval.
+            size_t eye;                          /// request a specific eye (0=left, 1=right, 2=whatever)
+            ImageComponent component;            /// defaults to NoComponent
         };
 
         typedef Context FlushContext;
@@ -339,10 +322,7 @@ namespace IPCore
             {
             }
 
-            bool operator()(const IPNode* n)
-            {
-                return n->protocol() == protocol;
-            }
+            bool operator()(const IPNode* n) { return n->protocol() == protocol; }
 
             const char* protocol;
         };
@@ -390,8 +370,7 @@ namespace IPCore
         //  Constructors
         //
 
-        IPNode(const std::string& name, const NodeDefinition* definition,
-               IPGraph*, GroupIPNode* group = 0);
+        IPNode(const std::string& name, const NodeDefinition* definition, IPGraph*, GroupIPNode* group = 0);
 
         virtual ~IPNode();
 
@@ -408,51 +387,27 @@ namespace IPCore
 
         VoidSignal& outputsChangedSignal() { return m_outputsChangedSignal; }
 
-        VoidSignal& graphStateChangedSignal()
-        {
-            return m_graphStateChangedSignal;
-        }
+        VoidSignal& graphStateChangedSignal() { return m_graphStateChangedSignal; }
 
-        VoidSignal& imageStructureChangedSignal()
-        {
-            return m_imageStructureChangedSignal;
-        }
+        VoidSignal& imageStructureChangedSignal() { return m_imageStructureChangedSignal; }
 
         VoidSignal& mediaChangedSignal() { return m_mediaChangedSignal; }
 
         VoidSignal& rangeChangedSignal() { return m_rangeChangedSignal; }
 
-        PropertySignal& propertyWillBeDeletedSignal()
-        {
-            return m_propertyWillBeDeletedSignal;
-        }
+        PropertySignal& propertyWillBeDeletedSignal() { return m_propertyWillBeDeletedSignal; }
 
-        PropertyNameSignal& propertyDeletedSignal()
-        {
-            return m_propertyDeletedSignal;
-        }
+        PropertyNameSignal& propertyDeletedSignal() { return m_propertyDeletedSignal; }
 
         PropertySignal& newPropertySignal() { return m_newPropertySignal; }
 
-        PropertySignal& propertyChangedSignal()
-        {
-            return m_propertyChangedSignal;
-        }
+        PropertySignal& propertyChangedSignal() { return m_propertyChangedSignal; }
 
-        PropertySignal& propertyWillChangeSignal()
-        {
-            return m_propertyWillChangeSignal;
-        }
+        PropertySignal& propertyWillChangeSignal() { return m_propertyWillChangeSignal; }
 
-        PropertyInsertSignal& propertyWillInsertSignal()
-        {
-            return m_propertyWillInsertSignal;
-        }
+        PropertyInsertSignal& propertyWillInsertSignal() { return m_propertyWillInsertSignal; }
 
-        PropertyInsertSignal& propertyDidInsertSignal()
-        {
-            return m_propertyDidInsertSignal;
-        }
+        PropertyInsertSignal& propertyDidInsertSignal() { return m_propertyDidInsertSignal; }
 
         //
         //  Node Name and type
@@ -578,8 +533,7 @@ namespace IPCore
         void setInputs1(IPNode* node0);
         void setInputs2(IPNode* node0, IPNode* node1);
         void setInputs3(IPNode* node0, IPNode* node1, IPNode* node2);
-        void setInputs4(IPNode* node0, IPNode* node1, IPNode* node2,
-                        IPNode* node3);
+        void setInputs4(IPNode* node0, IPNode* node1, IPNode* node2, IPNode* node3);
 
         //
         //  Returns either 0 or the numbered input (first, second, etc)
@@ -625,14 +579,12 @@ namespace IPCore
         //  reorder() will change the input ording according to indices
         //
 
-        void inputReordering(const IPNodes& newOrder,
-                             IndexArray& indices) const;
+        void inputReordering(const IPNodes& newOrder, IndexArray& indices) const;
         void reorder(const IndexArray& indices);
 
-        void inputPartialReordering(
-            const IPNodes& newInputs,
-            IndexArray& removeIndices,         // inputs to be removed
-            IndexArray& reorderIndices) const; // size same as newInputs
+        void inputPartialReordering(const IPNodes& newInputs,
+                                    IndexArray& removeIndices,         // inputs to be removed
+                                    IndexArray& reorderIndices) const; // size same as newInputs
 
         void findInputs(const IndexArray& indices, IPNodes& nodes) const;
 
@@ -651,8 +603,7 @@ namespace IPCore
 
         struct ImageStructureInfo
         {
-            ImageStructureInfo(int w = 0, int h = 0, float pa = 1.0,
-                               const Matrix& O = Matrix())
+            ImageStructureInfo(int w = 0, int h = 0, float pa = 1.0, const Matrix& O = Matrix())
                 : width(w)
                 , height(h)
                 , pixelAspect(pa)
@@ -668,8 +619,7 @@ namespace IPCore
 
         struct ImageRangeInfo
         {
-            ImageRangeInfo(int s = 0, int e = 0, int i = 0, float f = 0,
-                           int ci = 0, int co = 0, int b = false)
+            ImageRangeInfo(int s = 0, int e = 0, int i = 0, float f = 0, int ci = 0, int co = 0, int b = false)
                 : start(s)
                 , end(e)
                 , inc(i)
@@ -691,16 +641,14 @@ namespace IPCore
 
         struct MediaInfo
         {
-            MediaInfo(const std::string& n = "",
-                      const TwkMovie::MovieInfo* i = 0, IPNode* nd = NULL)
+            MediaInfo(const std::string& n = "", const TwkMovie::MovieInfo* i = 0, IPNode* nd = NULL)
                 : name(n)
                 , info(i)
                 , node(nd)
             {
             }
 
-            MediaInfo(const std::string& n, const TwkMovie::MovieInfo& i,
-                      IPNode* nd)
+            MediaInfo(const std::string& n, const TwkMovie::MovieInfo& i, IPNode* nd)
                 : name(n)
                 , info(&i)
                 , node(nd)
@@ -785,18 +733,14 @@ namespace IPCore
         //  The default is to append inframes to outframes
         //
 
-        virtual void mapInputToEvalFrames(size_t inputIndex,
-                                          const FrameVector& inframes,
-                                          FrameVector& outframes) const;
+        virtual void mapInputToEvalFrames(size_t inputIndex, const FrameVector& inframes, FrameVector& outframes) const;
 
         //
         //  Find nodes by predicate function in evaluation
         //  nodes
         //
 
-        template <typename Predicate>
-        void findInEvaluationPath(int frame, Predicate, IPNodes&,
-                                  bool ascendingOrder = true);
+        template <typename Predicate> void findInEvaluationPath(int frame, Predicate, IPNodes&, bool ascendingOrder = true);
 
         //
         //  Meta evaluation returns the nodes which would be evaluated at
@@ -814,11 +758,7 @@ namespace IPCore
 
             virtual void leave(const Context&, IPNode*) {}
 
-            virtual bool traverseChild(const Context&, size_t index, IPNode*,
-                                       IPNode*)
-            {
-                return true;
-            }
+            virtual bool traverseChild(const Context&, size_t index, IPNode*, IPNode*) { return true; }
         };
 
         struct MetaEvalInfo
@@ -835,11 +775,7 @@ namespace IPCore
             {
             }
 
-            bool operator<(const MetaEvalInfo& i) const
-            {
-                return (node < i.node
-                        || (node == i.node && sourceFrame < i.sourceFrame));
-            }
+            bool operator<(const MetaEvalInfo& i) const { return (node < i.node || (node == i.node && sourceFrame < i.sourceFrame)); }
 
             int sourceFrame;
             IPNode* node;
@@ -855,16 +791,12 @@ namespace IPCore
             {
             }
 
-            virtual void enter(const Context& c, IPNode* node)
-            {
-                info.push_back(MetaEvalInfo(c.frame, node));
-            }
+            virtual void enter(const Context& c, IPNode* node) { info.push_back(MetaEvalInfo(c.frame, node)); }
 
             MetaEvalInfoVector& info;
         };
 
-        template <class T>
-        class MetaEvalInfoCollectorByType : public MetaEvalVisitor
+        template <class T> class MetaEvalInfoCollectorByType : public MetaEvalVisitor
         {
         public:
             MetaEvalInfoCollectorByType(MetaEvalInfoVector& i)
@@ -893,8 +825,7 @@ namespace IPCore
 
             virtual void enter(const Context&, IPNode* n);
             virtual void leave(const Context&, IPNode* n);
-            virtual bool traverseChild(const Context&, size_t index,
-                                       IPNode* parent, IPNode* child);
+            virtual bool traverseChild(const Context&, size_t index, IPNode* parent, IPNode* child);
 
             MetaEvalInfoVector& info;
             IPNode* leaf;
@@ -904,16 +835,14 @@ namespace IPCore
         class MetaEvalClosestByTypeName : public MetaEvalVisitor
         {
         public:
-            MetaEvalClosestByTypeName(MetaEvalInfoVector& i,
-                                      const std::string& type)
+            MetaEvalClosestByTypeName(MetaEvalInfoVector& i, const std::string& type)
                 : info(i)
                 , typeName(type)
             {
             }
 
             virtual void enter(const Context&, IPNode* n);
-            virtual bool traverseChild(const Context&, size_t index,
-                                       IPNode* parent, IPNode* child);
+            virtual bool traverseChild(const Context&, size_t index, IPNode* parent, IPNode* child);
 
             MetaEvalInfoVector& info;
             std::string typeName;
@@ -922,16 +851,14 @@ namespace IPCore
         class MetaEvalFirstClosestByTypeName : public MetaEvalVisitor
         {
         public:
-            MetaEvalFirstClosestByTypeName(MetaEvalInfoVector& i,
-                                           const std::string& type)
+            MetaEvalFirstClosestByTypeName(MetaEvalInfoVector& i, const std::string& type)
                 : info(i)
                 , typeName(type)
             {
             }
 
             virtual void enter(const Context&, IPNode* n);
-            virtual bool traverseChild(const Context&, size_t index,
-                                       IPNode* parent, IPNode* child);
+            virtual bool traverseChild(const Context&, size_t index, IPNode* parent, IPNode* child);
 
             MetaEvalInfoVector& info;
             std::string typeName;
@@ -956,10 +883,7 @@ namespace IPCore
 
             virtual void leave(IPNode*) {}
 
-            virtual bool traverseChild(size_t index, IPNode*, IPNode*)
-            {
-                return true;
-            }
+            virtual bool traverseChild(size_t index, IPNode*, IPNode*) { return true; }
         };
 
         typedef std::map<const IPNode*, FrameVector> NodeFramesMap;
@@ -967,8 +891,7 @@ namespace IPCore
         class PropertyAsFramesVisitor : public NodeVisitor
         {
         public:
-            PropertyAsFramesVisitor(const std::string& propfullname,
-                                    size_t depth_)
+            PropertyAsFramesVisitor(const std::string& propfullname, size_t depth_)
                 : propName(propfullname)
                 , depth(depth_)
                 , currentDepth(0)
@@ -981,8 +904,7 @@ namespace IPCore
 
             const FrameVector& result(const IPNode* n) { return nodeMap[n]; }
 
-            virtual bool traverseChild(size_t index, IPNode* parent,
-                                       IPNode* child);
+            virtual bool traverseChild(size_t index, IPNode* parent, IPNode* child);
             virtual void leave(IPNode* n);
             virtual void enter(IPNode* n);
 
@@ -998,8 +920,7 @@ namespace IPCore
         class ClosestByTypeNameVisitor : public NodeVisitor
         {
         public:
-            ClosestByTypeNameVisitor(const std::string& typeName,
-                                     size_t depth = 1)
+            ClosestByTypeNameVisitor(const std::string& typeName, size_t depth = 1)
                 : name(typeName)
                 , currentDepth(0)
                 , maxDepth(depth)
@@ -1010,8 +931,7 @@ namespace IPCore
             std::set<IPNode*> nodes;
             size_t maxDepth;
 
-            virtual bool traverseChild(size_t index, IPNode* parent,
-                                       IPNode* child);
+            virtual bool traverseChild(size_t index, IPNode* parent, IPNode* child);
             virtual void leave(IPNode* n);
             virtual void enter(IPNode* n);
 
@@ -1058,24 +978,21 @@ namespace IPCore
         //  has changed.
         //
 
-        virtual void
-        propagateRangeChange(PropagateTarget target = LegacyPropagateTarget);
+        virtual void propagateRangeChange(PropagateTarget target = LegacyPropagateTarget);
 
         //
         //  Same idea as above, but indicates that this nodes image struct
         //  has changed.
         //
 
-        virtual void propagateImageStructureChange(
-            PropagateTarget target = LegacyPropagateTarget);
+        virtual void propagateImageStructureChange(PropagateTarget target = LegacyPropagateTarget);
 
         //
         //  Same idea as above, but indicates that this nodes upstream
         //  media has changed.
         //
 
-        virtual void
-        propagateMediaChange(PropagateTarget target = LegacyPropagateTarget);
+        virtual void propagateMediaChange(PropagateTarget target = LegacyPropagateTarget);
 
         //
         //  The audio analog to evaluate
@@ -1098,19 +1015,14 @@ namespace IPCore
             {
             }
 
-            AudioConfiguration(double deviceRate, TwkAudio::Layout layout,
-                               size_t numSamples)
+            AudioConfiguration(double deviceRate, TwkAudio::Layout layout, size_t numSamples)
                 : rate(deviceRate)
                 , layout(layout)
                 , samples(numSamples)
             {
             }
 
-            bool operator==(const AudioConfiguration& b) const
-            {
-                return layout == b.layout && rate == b.rate
-                       && samples == b.samples;
-            }
+            bool operator==(const AudioConfiguration& b) const { return layout == b.layout && rate == b.rate && samples == b.samples; }
 
             TwkAudio::Layout layout;
             double rate;
@@ -1192,8 +1104,7 @@ namespace IPCore
         //  is avoided (propertyChanged()) for similar reasons.
         //
 
-        virtual void readCompleted(const std::string& type,
-                                   unsigned int version);
+        virtual void readCompleted(const std::string& type, unsigned int version);
 
         //
         //  Notification of property changes
@@ -1204,19 +1115,14 @@ namespace IPCore
         virtual void newPropertyCreated(const Property*);
         virtual void propertyChanged(const Property*);
         virtual void propertyWillChange(const Property*);
-        virtual void propertyWillInsert(const Property*, size_t index,
-                                        size_t size);
-        virtual void propertyDidInsert(const Property*, size_t index,
-                                       size_t size);
+        virtual void propertyWillInsert(const Property*, size_t index, size_t size);
+        virtual void propertyDidInsert(const Property*, size_t index, size_t size);
 
         virtual void propagateInputChangeInternal();
         virtual void propagateStateChangeInternal();
-        virtual void propagateRangeChangeInternal(
-            PropagateTarget target = LegacyPropagateTarget);
-        virtual void propagateImageStructureChangeInternal(
-            PropagateTarget target = LegacyPropagateTarget);
-        virtual void propagateMediaChangeInternal(
-            PropagateTarget target = LegacyPropagateTarget);
+        virtual void propagateRangeChangeInternal(PropagateTarget target = LegacyPropagateTarget);
+        virtual void propagateImageStructureChangeInternal(PropagateTarget target = LegacyPropagateTarget);
+        virtual void propagateMediaChangeInternal(PropagateTarget target = LegacyPropagateTarget);
 
         virtual void collectMemberNodes(IPNodeSet&, size_t depth = 0);
 
@@ -1299,15 +1205,13 @@ namespace IPCore
         //  ImageStructureInfo has changed.
         //
 
-        virtual void inputImageStructureChanged(int inputIndex,
-                                                PropagateTarget target);
+        virtual void inputImageStructureChanged(int inputIndex, PropagateTarget target);
 
         //
         //  Called when an upstream node changes its media
         //
 
-        virtual void inputMediaChanged(IPNode* srcNode, int srcOutputIndex,
-                                       PropagateTarget target);
+        virtual void inputMediaChanged(IPNode* srcNode, int srcOutputIndex, PropagateTarget target);
 
         //
         //  Called when output disconnection is about to occur
@@ -1330,29 +1234,19 @@ namespace IPCore
 
         static bool willConvertToIntermediate(IPImage*);
         static bool convertBlendRenderTypeToIntermediate(IPImage*);
-        static bool
-        convertBlendRenderTypeToIntermediate(const IPImageVector& inImages,
-                                             IPImageSet& modifiedImages);
+        static bool convertBlendRenderTypeToIntermediate(const IPImageVector& inImages, IPImageSet& modifiedImages);
 
         static std::string getUnqualifiedName(const std::string& name);
 
-        void assembleMergeExpressions(IPImage* root, IPImageVector& inImages,
-                                      const IPImageSet& imagesNotToBeModified,
-                                      bool isFilter,
+        void assembleMergeExpressions(IPImage* root, IPImageVector& inImages, const IPImageSet& imagesNotToBeModified, bool isFilter,
                                       Shader::ExpressionVector& exprs);
 
-        void balanceResourceUsage(UsageFunction accumFunc,
-                                  IPImageVector& inImages,
-                                  IPImageSet& modifiedImages, size_t maxBuffers,
-                                  size_t maxCoords, size_t maxFetches,
-                                  size_t incomingSamplers = 0) const;
+        void balanceResourceUsage(UsageFunction accumFunc, IPImageVector& inImages, IPImageSet& modifiedImages, size_t maxBuffers,
+                                  size_t maxCoords, size_t maxFetches, size_t incomingSamplers = 0) const;
 
-        IPImage*
-        insertIntermediateRendersForPaint(IPImage* root,
-                                          const Context& context) const;
+        IPImage* insertIntermediateRendersForPaint(IPImage* root, const Context& context) const;
 
-        static void filterLimits(const IPImageVector& inImages,
-                                 IPImageSet& modifiedImages);
+        static void filterLimits(const IPImageVector& inImages, IPImageSet& modifiedImages);
 
         /** maps a source node to an input
          * @param srcNode the source node
@@ -1400,9 +1294,7 @@ namespace IPCore
         bool m_hasAudio : 1;
     };
 
-    template <typename Predicate>
-    void IPNode::findInEvaluationPath(int frame, Predicate P, IPNodes& nodes,
-                                      bool ascendingOrder)
+    template <typename Predicate> void IPNode::findInEvaluationPath(int frame, Predicate P, IPNodes& nodes, bool ascendingOrder)
     {
         MetaEvalInfoVector infos;
         MetaEvalInfoCollector collector(infos);
@@ -1419,9 +1311,7 @@ namespace IPCore
     //  A generic constructor function
     //
 
-    template <class T>
-    IPNode* newIPNode(const std::string& name, const NodeDefinition* def,
-                      IPGraph* graph, GroupIPNode* group)
+    template <class T> IPNode* newIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group)
     {
         return new T(name, def, graph, group);
     }

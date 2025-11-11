@@ -94,8 +94,7 @@ namespace IPCore
         typedef std::map<Component*, LocalRectangle> RectangleMap;
         typedef std::map<Component*, LocalWindow> WindowMap;
 
-        OverlayIPNode(const std::string& name, const NodeDefinition* def,
-                      IPGraph* graph, GroupIPNode* group);
+        OverlayIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group);
         virtual ~OverlayIPNode();
 
         virtual IPImage* evaluate(const Context&);

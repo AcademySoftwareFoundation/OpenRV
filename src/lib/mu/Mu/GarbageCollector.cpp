@@ -74,20 +74,11 @@ namespace Mu
 
     Pointer GCHeapAPI::allocateAtomic(size_t s) { return GC_malloc_atomic(s); }
 
-    Pointer GCHeapAPI::allocateAtomicOffPage(size_t s)
-    {
-        return GC_malloc_atomic_ignore_off_page(s);
-    }
+    Pointer GCHeapAPI::allocateAtomicOffPage(size_t s) { return GC_malloc_atomic_ignore_off_page(s); }
 
-    Pointer GCHeapAPI::allocateOffPage(size_t s)
-    {
-        return GC_malloc_ignore_off_page(s);
-    }
+    Pointer GCHeapAPI::allocateOffPage(size_t s) { return GC_malloc_ignore_off_page(s); }
 
-    Pointer GCHeapAPI::allocateStubborn(size_t s)
-    {
-        return GC_malloc_stubborn(s);
-    }
+    Pointer GCHeapAPI::allocateStubborn(size_t s) { return GC_malloc_stubborn(s); }
 
     void GCHeapAPI::beginChangeStubborn(Pointer p) { GC_change_stubborn(p); }
 
@@ -121,10 +112,7 @@ namespace Mu
 
     Pointer GCHeapNoOptAPI::allocateAtomic(size_t s) { return GC_malloc(s); }
 
-    Pointer GCHeapNoOptAPI::allocateAtomicOffPage(size_t s)
-    {
-        return GC_malloc(s);
-    }
+    Pointer GCHeapNoOptAPI::allocateAtomicOffPage(size_t s) { return GC_malloc(s); }
 
     Pointer GCHeapNoOptAPI::allocateOffPage(size_t s) { return GC_malloc(s); }
 
@@ -171,9 +159,7 @@ namespace Mu
                 {
                     if (GC_size(t) >= sizeof(Type))
                     {
-                        cout << reinterpret_cast<const Type*>(t)
-                                    ->fullyQualifiedName()
-                             << endl;
+                        cout << reinterpret_cast<const Type*>(t)->fullyQualifiedName() << endl;
                     }
                 }
             }
@@ -260,10 +246,7 @@ namespace Mu
 
     Pointer GCMallocPoolAPI::allocateAtomic(size_t s) { return allocate(s); }
 
-    Pointer GCMallocPoolAPI::allocateAtomicOffPage(size_t s)
-    {
-        return allocate(s);
-    }
+    Pointer GCMallocPoolAPI::allocateAtomicOffPage(size_t s) { return allocate(s); }
 
     Pointer GCMallocPoolAPI::allocateOffPage(size_t s) { return allocate(s); }
 
@@ -307,10 +290,7 @@ namespace Mu
 
     Pointer GCStaticPoolAPI::allocateAtomic(size_t s) { return allocate(s); }
 
-    Pointer GCStaticPoolAPI::allocateAtomicOffPage(size_t s)
-    {
-        return allocate(s);
-    }
+    Pointer GCStaticPoolAPI::allocateAtomicOffPage(size_t s) { return allocate(s); }
 
     Pointer GCStaticPoolAPI::allocateOffPage(size_t s) { return allocate(s); }
 
@@ -391,15 +371,9 @@ namespace Mu
         return next()->allocateStubborn(s);
     }
 
-    void GCStatAPI::beginChangeStubborn(Pointer p)
-    {
-        next()->beginChangeStubborn(p);
-    }
+    void GCStatAPI::beginChangeStubborn(Pointer p) { next()->beginChangeStubborn(p); }
 
-    void GCStatAPI::endChangeStubborn(Pointer p)
-    {
-        next()->endChangeStubborn(p);
-    }
+    void GCStatAPI::endChangeStubborn(Pointer p) { next()->endChangeStubborn(p); }
 
     void GCStatAPI::free(Pointer p) { next()->free(p); }
 
@@ -492,18 +466,12 @@ namespace Mu
 
     void GarbageCollector::clearRoots() { GC_clear_roots(); }
 
-    void GarbageCollector::addRoot(char* p, size_t s)
-    {
-        GC_add_roots(p, p + s);
-    }
+    void GarbageCollector::addRoot(char* p, size_t s) { GC_add_roots(p, p + s); }
 #if defined(_WIN32)
     // Note: removeRoot() is not available from the windows gc
     void GarbageCollector::removeRoot(char* p, size_t s) {}
 #else
-    void GarbageCollector::removeRoot(char* p, size_t s)
-    {
-        GC_remove_roots(p, p + s);
-    }
+    void GarbageCollector::removeRoot(char* p, size_t s) { GC_remove_roots(p, p + s); }
 #endif
 #endif
 
@@ -519,22 +487,13 @@ namespace Mu
 
     void GarbageCollector::pushMainHeapAPI() { _api = new GCHeapAPI(_api); }
 
-    void GarbageCollector::pushMainHeapNoOptAPI()
-    {
-        _api = new GCHeapNoOptAPI(_api);
-    }
+    void GarbageCollector::pushMainHeapNoOptAPI() { _api = new GCHeapNoOptAPI(_api); }
 
     void GarbageCollector::pushAutoreleaseAPI() { _api = new GCPoolAPI(_api); }
 
-    void GarbageCollector::pushMallocAutoreleaseAPI()
-    {
-        _api = new GCMallocPoolAPI(_api);
-    }
+    void GarbageCollector::pushMallocAutoreleaseAPI() { _api = new GCMallocPoolAPI(_api); }
 
-    void GarbageCollector::pushStaticAutoreleaseAPI()
-    {
-        _api = new GCStaticPoolAPI(_api);
-    }
+    void GarbageCollector::pushStaticAutoreleaseAPI() { _api = new GCStaticPoolAPI(_api); }
 
     void GarbageCollector::pushStatAPI() { _api = new GCStatAPI(_api); }
 

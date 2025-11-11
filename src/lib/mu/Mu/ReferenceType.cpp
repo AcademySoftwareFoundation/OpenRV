@@ -16,8 +16,7 @@ namespace Mu
 
     using namespace std;
 
-    ReferenceType::ReferenceType(Context* context, const char* typeName,
-                                 Type* type)
+    ReferenceType::ReferenceType(Context* context, const char* typeName, Type* type)
         : Type(context, typeName, PointerRep::rep())
     {
         assert(type->_referenceType == 0);
@@ -34,10 +33,7 @@ namespace Mu
         // nothing
     }
 
-    Value ReferenceType::nodeEval(const Node* n, Thread& thread) const
-    {
-        return Value((*n->func()._PointerFunc)(*n, thread));
-    }
+    Value ReferenceType::nodeEval(const Node* n, Thread& thread) const { return Value((*n->func()._PointerFunc)(*n, thread)); }
 
     void ReferenceType::nodeEval(void* p, const Node* n, Thread& thread) const
     {
@@ -45,23 +41,18 @@ namespace Mu
         *pp = (*n->func()._PointerFunc)(*n, thread);
     }
 
-    void ReferenceType::outputValue(ostream& o, const Value& value,
-                                    bool full) const
+    void ReferenceType::outputValue(ostream& o, const Value& value, bool full) const
     {
         ValueOutputState state(o, full);
         outputValueRecursive(o, ValuePointer(&value._Pointer), state);
     }
 
-    void ReferenceType::outputValueRecursive(ostream& o, const ValuePointer p,
-                                             ValueOutputState& state) const
+    void ReferenceType::outputValueRecursive(ostream& o, const ValuePointer p, ValueOutputState& state) const
     {
         const ValuePointer dp = *reinterpret_cast<ValuePointer*>(p);
         dereferenceType()->outputValueRecursive(o, dp, state);
     }
 
-    Type::MatchResult ReferenceType::match(const Type* t, Bindings&) const
-    {
-        return this == t ? Match : NoMatch;
-    }
+    Type::MatchResult ReferenceType::match(const Type* t, Bindings&) const { return this == t ? Match : NoMatch; }
 
 } // namespace Mu

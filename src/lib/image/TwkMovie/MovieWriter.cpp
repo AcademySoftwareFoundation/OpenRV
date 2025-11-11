@@ -25,18 +25,13 @@ namespace TwkMovie
 
     void MovieWriter::setReallyVerbose(bool b) { really = b; }
 
-    MovieInfo MovieWriter::open(const MovieInfo& info,
-                                const std::string& filename,
-                                const WriteRequest& request)
+    MovieInfo MovieWriter::open(const MovieInfo& info, const std::string& filename, const WriteRequest& request)
     {
         m_request = request;
         m_filename = filename;
         return info;
     }
 
-    bool MovieWriter::write(Movie* inMovie)
-    {
-        return write(inMovie, m_filename, m_request);
-    }
+    bool MovieWriter::write(Movie* inMovie) { return write(inMovie, m_filename, m_request); }
 
 } // namespace TwkMovie

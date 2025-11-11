@@ -114,9 +114,7 @@ namespace TwkMath
     // A = sum( ( xi - xmean )^2 )
     // B = sum( ( xi - xmean ) * ( yi - ymean ) )
     // C = sum( ( yi - ymean )^2 )
-    template <typename T>
-    void eigenAnalysisOf2x2CovarianceMatrix(T A, T B, T C, Vec2<T> vecs[],
-                                            T vals[])
+    template <typename T> void eigenAnalysisOf2x2CovarianceMatrix(T A, T B, T C, Vec2<T> vecs[], T vals[])
     {
         // See if it's already diagonal.
         if (IS_ZERO(B))
@@ -150,10 +148,8 @@ namespace TwkMath
             // Weird. This should not happen
             // Pretend diagonal and quit
 #if DEBUG
-            std::cerr << "WARNING: zero roots of characteristic eqn of 2x2"
-                      << std::endl
-                      << "covariance matrix. That's not supposed to happen"
-                      << std::endl;
+            std::cerr << "WARNING: zero roots of characteristic eqn of 2x2" << std::endl
+                      << "covariance matrix. That's not supposed to happen" << std::endl;
 #endif
             if (A > C)
             {
@@ -209,8 +205,7 @@ namespace TwkMath
     //******************************************************************************
     // Find the principal components of a 3d point distribution.
     template <class ITER, class VEC, typename TA, typename TB>
-    void principalComponentAnalysis2(ITER begin, ITER end, VEC& mean,
-                                     VEC components[], TA vals[], TB dummy)
+    void principalComponentAnalysis2(ITER begin, ITER end, VEC& mean, VEC components[], TA vals[], TB dummy)
     {
         size_t numVerts = (size_t)(end - begin);
 

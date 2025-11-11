@@ -51,9 +51,8 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    Pointer qt_QFocusEvent_QFocusEvent_QFocusEvent_QFocusEvent_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_type,
-        int param_reason)
+    Pointer qt_QFocusEvent_QFocusEvent_QFocusEvent_QFocusEvent_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_type,
+                                                                       int param_reason)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QEvent::Type arg1 = (QEvent::Type)(param_type);
@@ -62,24 +61,21 @@ namespace Mu
         return param_this;
     }
 
-    bool qt_QFocusEvent_gotFocus_bool_QFocusEvent(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this)
+    bool qt_QFocusEvent_gotFocus_bool_QFocusEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFocusEvent* arg0 = getqpointer<QFocusEventType>(param_this);
         return arg0->gotFocus();
     }
 
-    bool qt_QFocusEvent_lostFocus_bool_QFocusEvent(Mu::Thread& NODE_THREAD,
-                                                   Pointer param_this)
+    bool qt_QFocusEvent_lostFocus_bool_QFocusEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFocusEvent* arg0 = getqpointer<QFocusEventType>(param_this);
         return arg0->lostFocus();
     }
 
-    int qt_QFocusEvent_reason_int_QFocusEvent(Mu::Thread& NODE_THREAD,
-                                              Pointer param_this)
+    int qt_QFocusEvent_reason_int_QFocusEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFocusEvent* arg0 = getqpointer<QFocusEventType>(param_this);
@@ -88,27 +84,23 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(_n_QFocusEvent0, Pointer)
     {
-        NODE_RETURN(qt_QFocusEvent_QFocusEvent_QFocusEvent_QFocusEvent_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int)));
+        NODE_RETURN(qt_QFocusEvent_QFocusEvent_QFocusEvent_QFocusEvent_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                               NODE_ARG(2, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_gotFocus0, bool)
     {
-        NODE_RETURN(qt_QFocusEvent_gotFocus_bool_QFocusEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QFocusEvent_gotFocus_bool_QFocusEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_lostFocus0, bool)
     {
-        NODE_RETURN(qt_QFocusEvent_lostFocus_bool_QFocusEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QFocusEvent_lostFocus_bool_QFocusEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_reason0, int)
     {
-        NODE_RETURN(qt_QFocusEvent_reason_int_QFocusEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QFocusEvent_reason_int_QFocusEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     void QFocusEventType::load()
@@ -128,13 +120,11 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
                    new MemberVariable(c, "native", "qt.NativeObject"),
 
@@ -145,26 +135,15 @@ namespace Mu
         addSymbols(
             // enums
             // member functions
-            new Function(
-                c, "QFocusEvent", _n_QFocusEvent0, None, Compiled,
-                qt_QFocusEvent_QFocusEvent_QFocusEvent_QFocusEvent_int_int,
-                Return, "qt.QFocusEvent", Parameters,
-                new Param(c, "this", "qt.QFocusEvent"),
-                new Param(c, "type", "int"),
-                new Param(c, "reason", "int", Value((int)Qt::OtherFocusReason)),
-                End),
-            new Function(c, "gotFocus", _n_gotFocus0, None, Compiled,
-                         qt_QFocusEvent_gotFocus_bool_QFocusEvent, Return,
-                         "bool", Parameters,
+            new Function(c, "QFocusEvent", _n_QFocusEvent0, None, Compiled, qt_QFocusEvent_QFocusEvent_QFocusEvent_QFocusEvent_int_int,
+                         Return, "qt.QFocusEvent", Parameters, new Param(c, "this", "qt.QFocusEvent"), new Param(c, "type", "int"),
+                         new Param(c, "reason", "int", Value((int)Qt::OtherFocusReason)), End),
+            new Function(c, "gotFocus", _n_gotFocus0, None, Compiled, qt_QFocusEvent_gotFocus_bool_QFocusEvent, Return, "bool", Parameters,
                          new Param(c, "this", "qt.QFocusEvent"), End),
-            new Function(c, "lostFocus", _n_lostFocus0, None, Compiled,
-                         qt_QFocusEvent_lostFocus_bool_QFocusEvent, Return,
-                         "bool", Parameters,
+            new Function(c, "lostFocus", _n_lostFocus0, None, Compiled, qt_QFocusEvent_lostFocus_bool_QFocusEvent, Return, "bool",
+                         Parameters, new Param(c, "this", "qt.QFocusEvent"), End),
+            new Function(c, "reason", _n_reason0, None, Compiled, qt_QFocusEvent_reason_int_QFocusEvent, Return, "int", Parameters,
                          new Param(c, "this", "qt.QFocusEvent"), End),
-            new Function(c, "reason", _n_reason0, None, Compiled,
-                         qt_QFocusEvent_reason_int_QFocusEvent, Return, "int",
-                         Parameters, new Param(c, "this", "qt.QFocusEvent"),
-                         End),
             // static functions
             EndArguments);
         globalScope()->addSymbols(EndArguments);

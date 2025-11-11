@@ -15,19 +15,15 @@ namespace ZFile
     //-*****************************************************************************
     struct ZFileWriter
     {
-        static bool write(std::ostream& out, const Header& header,
+        static bool write(std::ostream& out, const Header& header, const float* data);
+
+        static bool write(std::ostream& out, int width, int height, const TwkMath::Mat44f& w2s, const TwkMath::Mat44f& w2c,
                           const float* data);
 
-        static bool write(std::ostream& out, int width, int height,
-                          const TwkMath::Mat44f& w2s,
-                          const TwkMath::Mat44f& w2c, const float* data);
+        static bool write(const char* outFileName, const Header& header, const float* data);
 
-        static bool write(const char* outFileName, const Header& header,
+        static bool write(const char* outFileName, int width, int height, const TwkMath::Mat44f& w2s, const TwkMath::Mat44f& w2c,
                           const float* data);
-
-        static bool write(const char* outFileName, int width, int height,
-                          const TwkMath::Mat44f& w2s,
-                          const TwkMath::Mat44f& w2c, const float* data);
     };
 
 } // End namespace ZFile

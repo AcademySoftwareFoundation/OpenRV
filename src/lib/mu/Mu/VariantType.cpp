@@ -33,9 +33,7 @@ namespace Mu
 
     Type::MatchResult VariantType::match(const Type* type, Bindings& b) const
     {
-        if (this == type
-            || (dynamic_cast<const VariantTagType*>(type)
-                && type->scope() == this))
+        if (this == type || (dynamic_cast<const VariantTagType*>(type) && type->scope() == this))
         {
             return Match;
         }
@@ -54,14 +52,10 @@ namespace Mu
 
     void VariantType::copyInstance(Pointer src, Pointer dst) const
     {
-        reinterpret_cast<VariantInstance*>(src)->tagType()->copyInstance(src,
-                                                                         dst);
+        reinterpret_cast<VariantInstance*>(src)->tagType()->copyInstance(src, dst);
     }
 
-    Value VariantType::nodeEval(const Node* n, Thread& thread) const
-    {
-        return Value((*n->func()._PointerFunc)(*n, thread));
-    }
+    Value VariantType::nodeEval(const Node* n, Thread& thread) const { return Value((*n->func()._PointerFunc)(*n, thread)); }
 
     void VariantType::nodeEval(void* p, const Node* n, Thread& thread) const
     {
@@ -69,20 +63,17 @@ namespace Mu
         *pp = (*n->func()._PointerFunc)(*n, thread);
     }
 
-    void VariantType::outputValue(ostream& o, const Value& value,
-                                  bool full) const
+    void VariantType::outputValue(ostream& o, const Value& value, bool full) const
     {
         ValueOutputState state(o, full);
         outputValueRecursive(o, ValuePointer(&value._Pointer), state);
     }
 
-    void VariantType::outputValueRecursive(ostream& o, const ValuePointer p,
-                                           ValueOutputState& state) const
+    void VariantType::outputValueRecursive(ostream& o, const ValuePointer p, ValueOutputState& state) const
     {
         if (p)
         {
-            const VariantInstance* i =
-                *reinterpret_cast<const VariantInstance**>(p);
+            const VariantInstance* i = *reinterpret_cast<const VariantInstance**>(p);
             if (i)
                 i->tagType()->outputValueRecursive(o, p, state);
             else

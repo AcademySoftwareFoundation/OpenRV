@@ -29,8 +29,7 @@ namespace TwkMediaLibrary
         return "";
     }
 
-    PyNode::PyNode(Library* lib, PyNode* parent, std::string name,
-                   PyNodeType type)
+    PyNode::PyNode(Library* lib, PyNode* parent, std::string name, PyNodeType type)
         : Node(lib)
         , m_type(type)
         , m_name(std::move(name))
@@ -50,10 +49,7 @@ namespace TwkMediaLibrary
 
     size_t PyNode::numChildren() const { return m_children.size(); }
 
-    const Node* PyNode::child(size_t index) const
-    {
-        return index < m_children.size() ? m_children[index] : nullptr;
-    }
+    const Node* PyNode::child(size_t index) const { return index < m_children.size() ? m_children[index] : nullptr; }
 
     void PyNode::setName(const std::string& n) { m_name = n; }
 

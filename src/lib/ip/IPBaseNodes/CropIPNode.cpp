@@ -17,8 +17,7 @@ namespace IPCore
     using namespace std;
     using namespace TwkMath;
 
-    CropIPNode::CropIPNode(const std::string& name, const NodeDefinition* def,
-                           IPGraph* graph, GroupIPNode* group)
+    CropIPNode::CropIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group)
         : IPNode(name, def, graph, group)
     {
         PropertyInfo* noSave = new PropertyInfo(PropertyInfo::NotPersistent);
@@ -40,8 +39,7 @@ namespace IPCore
         if (inputs().empty())
             return IPImage::newNoImage(this, "No Input");
 
-        const ImageStructureInfo info =
-            inputs()[0]->imageStructureInfo(context);
+        const ImageStructureInfo info = inputs()[0]->imageStructureInfo(context);
 
         Context c = context;
         c.allowInteractiveResize = false;
@@ -62,14 +60,9 @@ namespace IPCore
         const int bottom = manip ? 0 : propertyValue<IntProperty>(m_bottom, 0);
         const int top = manip ? 0 : propertyValue<IntProperty>(m_top, 0);
 
-        CropSize cropSize =
-            CropSize(image->width - left - right, image->height - top - bottom,
-                     left, bottom);
+        CropSize cropSize = CropSize(image->width - left - right, image->height - top - bottom, left, bottom);
 
-        if (((cropSize.width < 0 || cropSize.height < 0
-              || (cropSize.width == image->width
-                  && cropSize.height == image->height)))
-            && !manip)
+        if (((cropSize.width < 0 || cropSize.height < 0 || (cropSize.width == image->width && cropSize.height == image->height))) && !manip)
         {
             return image;
         }
@@ -77,9 +70,7 @@ namespace IPCore
         size_t newWidth = image->width;
         size_t newHeight = image->height;
 
-        IPImage* image2 =
-            new IPImage(this, IPImage::BlendRenderType, newWidth, newHeight,
-                        1.0, IPImage::IntermediateBuffer);
+        IPImage* image2 = new IPImage(this, IPImage::BlendRenderType, newWidth, newHeight, 1.0, IPImage::IntermediateBuffer);
         image2->children = image;
         image2->shaderExpr = Shader::newSourceRGBA(image2);
         image2->isCropped = true;
@@ -91,17 +82,14 @@ namespace IPCore
         size_t newWidth2 = cropSize.width;
         size_t newHeight2 = cropSize.height;
 
-        IPImage* root =
-            new IPImage(this, IPImage::BlendRenderType, newWidth2, newHeight2,
-                        1.0, IPImage::IntermediateBuffer);
+        IPImage* root = new IPImage(this, IPImage::BlendRenderType, newWidth2, newHeight2, 1.0, IPImage::IntermediateBuffer);
 
         root->shaderExpr = Shader::newSourceRGBA(root);
         root->appendChild(image2);
         return root;
     }
 
-    IPNode::ImageStructureInfo
-    CropIPNode::imageStructureInfo(const Context& context) const
+    IPNode::ImageStructureInfo CropIPNode::imageStructureInfo(const Context& context) const
     {
         Context c = context;
         c.allowInteractiveResize = false;
@@ -121,14 +109,10 @@ namespace IPCore
             else
             {
                 const bool manip = propertyValue<IntProperty>(m_manip, 1) == 1;
-                const int left =
-                    manip ? 0 : propertyValue<IntProperty>(m_left, 0);
-                const int right =
-                    manip ? 0 : propertyValue<IntProperty>(m_right, 0);
-                const int bottom =
-                    manip ? 0 : propertyValue<IntProperty>(m_bottom, 0);
-                const int top =
-                    manip ? 0 : propertyValue<IntProperty>(m_top, 0);
+                const int left = manip ? 0 : propertyValue<IntProperty>(m_left, 0);
+                const int right = manip ? 0 : propertyValue<IntProperty>(m_right, 0);
+                const int bottom = manip ? 0 : propertyValue<IntProperty>(m_bottom, 0);
+                const int top = manip ? 0 : propertyValue<IntProperty>(m_top, 0);
 
                 info.width = info.width - left - right;
                 info.height = info.height - top - bottom;
@@ -141,8 +125,7 @@ namespace IPCore
     {
         IPNode::propertyChanged(p);
 
-        if (p == m_manip || p == m_left || p == m_right || p == m_top
-            || p == m_bottom || p == m_active)
+        if (p == m_manip || p == m_left || p == m_right || p == m_top || p == m_bottom || p == m_active)
         {
             propagateImageStructureChange();
         }

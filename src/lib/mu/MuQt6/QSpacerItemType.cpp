@@ -61,9 +61,7 @@ namespace Mu
         _baseType = 0;
     }
 
-    MuQt_QSpacerItem::MuQt_QSpacerItem(Pointer muobj, const CallEnvironment* ce,
-                                       int w, int h,
-                                       QSizePolicy::Policy hPolicy,
+    MuQt_QSpacerItem::MuQt_QSpacerItem(Pointer muobj, const CallEnvironment* ce, int w, int h, QSizePolicy::Policy hPolicy,
                                        QSizePolicy::Policy vPolicy)
         : QSpacerItem(w, h, hPolicy, vPolicy)
     {
@@ -71,8 +69,7 @@ namespace Mu
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QSpacerItemType>(
-            c->internName("qt.QSpacerItem"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QSpacerItemType>(c->internName("qt.QSpacerItem"));
     }
 
     Qt::Orientations MuQt_QSpacerItem::expandingDirections() const
@@ -375,8 +372,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    static Pointer QSpacerItem_QSpacerItem_QLayoutItem(Thread& NODE_THREAD,
-                                                       Pointer obj)
+    static Pointer QSpacerItem_QSpacerItem_QLayoutItem(Thread& NODE_THREAD, Pointer obj)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         ClassInstance* item = reinterpret_cast<ClassInstance*>(obj);
@@ -387,9 +383,7 @@ namespace Mu
         }
         else if (QSpacerItem* i = layoutitem<QSpacerItem>(item))
         {
-            QSpacerItemType* type =
-                c->findSymbolOfTypeByQualifiedName<QSpacerItemType>(
-                    c->internName("qt.QSpacerItem"), false);
+            QSpacerItemType* type = c->findSymbolOfTypeByQualifiedName<QSpacerItemType>(c->internName("qt.QSpacerItem"), false);
             ClassInstance* o = ClassInstance::allocate(type);
             setlayoutitem(o, i);
             return o;
@@ -402,29 +396,23 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(castFromLayoutItem, Pointer)
     {
-        NODE_RETURN(QSpacerItem_QSpacerItem_QLayoutItem(NODE_THREAD,
-                                                        NODE_ARG(0, Pointer)));
+        NODE_RETURN(QSpacerItem_QSpacerItem_QLayoutItem(NODE_THREAD, NODE_ARG(0, Pointer)));
     }
 
-    Pointer qt_QSpacerItem_QSpacerItem_QSpacerItem_QSpacerItem_int_int_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_w, int param_h,
-        int param_hPolicy, int param_vPolicy)
+    Pointer qt_QSpacerItem_QSpacerItem_QSpacerItem_QSpacerItem_int_int_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_w,
+                                                                               int param_h, int param_hPolicy, int param_vPolicy)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         int arg1 = (int)(param_w);
         int arg2 = (int)(param_h);
         QSizePolicy::Policy arg3 = (QSizePolicy::Policy)(param_hPolicy);
         QSizePolicy::Policy arg4 = (QSizePolicy::Policy)(param_vPolicy);
-        setlayoutitem(param_this,
-                      new MuQt_QSpacerItem(param_this,
-                                           NODE_THREAD.process()->callEnv(),
-                                           arg1, arg2, arg3, arg4));
+        setlayoutitem(param_this, new MuQt_QSpacerItem(param_this, NODE_THREAD.process()->callEnv(), arg1, arg2, arg3, arg4));
         return param_this;
     }
 
-    void qt_QSpacerItem_changeSize_void_QSpacerItem_int_int_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_w, int param_h,
-        int param_hPolicy, int param_vPolicy)
+    void qt_QSpacerItem_changeSize_void_QSpacerItem_int_int_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_w, int param_h,
+                                                                    int param_hPolicy, int param_vPolicy)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSpacerItem* arg0 = layoutitem<QSpacerItem>(param_this);
@@ -435,63 +423,45 @@ namespace Mu
         arg0->changeSize(arg1, arg2, arg3, arg4);
     }
 
-    int
-    qt_QSpacerItem_expandingDirections_int_QSpacerItem(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this)
+    int qt_QSpacerItem_expandingDirections_int_QSpacerItem(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSpacerItem* arg0 = layoutitem<QSpacerItem>(param_this);
-        return isMuQtLayoutItem(arg0)
-                   ? int(arg0->QSpacerItem::expandingDirections())
-                   : int(arg0->expandingDirections());
+        return isMuQtLayoutItem(arg0) ? int(arg0->QSpacerItem::expandingDirections()) : int(arg0->expandingDirections());
     }
 
-    Pointer qt_QSpacerItem_geometry_QRect_QSpacerItem(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    Pointer qt_QSpacerItem_geometry_QRect_QSpacerItem(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSpacerItem* arg0 = layoutitem<QSpacerItem>(param_this);
-        return isMuQtLayoutItem(arg0)
-                   ? makeqtype<QRectType>(c, arg0->QSpacerItem::geometry(),
-                                          "qt.QRect")
-                   : makeqtype<QRectType>(c, arg0->geometry(), "qt.QRect");
+        return isMuQtLayoutItem(arg0) ? makeqtype<QRectType>(c, arg0->QSpacerItem::geometry(), "qt.QRect")
+                                      : makeqtype<QRectType>(c, arg0->geometry(), "qt.QRect");
     }
 
-    bool qt_QSpacerItem_isEmpty_bool_QSpacerItem(Mu::Thread& NODE_THREAD,
-                                                 Pointer param_this)
+    bool qt_QSpacerItem_isEmpty_bool_QSpacerItem(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSpacerItem* arg0 = layoutitem<QSpacerItem>(param_this);
-        return isMuQtLayoutItem(arg0) ? arg0->QSpacerItem::isEmpty()
-                                      : arg0->isEmpty();
+        return isMuQtLayoutItem(arg0) ? arg0->QSpacerItem::isEmpty() : arg0->isEmpty();
     }
 
-    Pointer
-    qt_QSpacerItem_maximumSize_QSize_QSpacerItem(Mu::Thread& NODE_THREAD,
-                                                 Pointer param_this)
+    Pointer qt_QSpacerItem_maximumSize_QSize_QSpacerItem(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSpacerItem* arg0 = layoutitem<QSpacerItem>(param_this);
-        return isMuQtLayoutItem(arg0)
-                   ? makeqtype<QSizeType>(c, arg0->QSpacerItem::maximumSize(),
-                                          "qt.QSize")
-                   : makeqtype<QSizeType>(c, arg0->maximumSize(), "qt.QSize");
+        return isMuQtLayoutItem(arg0) ? makeqtype<QSizeType>(c, arg0->QSpacerItem::maximumSize(), "qt.QSize")
+                                      : makeqtype<QSizeType>(c, arg0->maximumSize(), "qt.QSize");
     }
 
-    Pointer
-    qt_QSpacerItem_minimumSize_QSize_QSpacerItem(Mu::Thread& NODE_THREAD,
-                                                 Pointer param_this)
+    Pointer qt_QSpacerItem_minimumSize_QSize_QSpacerItem(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSpacerItem* arg0 = layoutitem<QSpacerItem>(param_this);
-        return isMuQtLayoutItem(arg0)
-                   ? makeqtype<QSizeType>(c, arg0->QSpacerItem::minimumSize(),
-                                          "qt.QSize")
-                   : makeqtype<QSizeType>(c, arg0->minimumSize(), "qt.QSize");
+        return isMuQtLayoutItem(arg0) ? makeqtype<QSizeType>(c, arg0->QSpacerItem::minimumSize(), "qt.QSize")
+                                      : makeqtype<QSizeType>(c, arg0->minimumSize(), "qt.QSize");
     }
 
-    void qt_QSpacerItem_setGeometry_void_QSpacerItem_QRect(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_r)
+    void qt_QSpacerItem_setGeometry_void_QSpacerItem_QRect(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_r)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSpacerItem* arg0 = layoutitem<QSpacerItem>(param_this);
@@ -502,48 +472,37 @@ namespace Mu
             arg0->setGeometry(arg1);
     }
 
-    Pointer qt_QSpacerItem_sizeHint_QSize_QSpacerItem(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    Pointer qt_QSpacerItem_sizeHint_QSize_QSpacerItem(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSpacerItem* arg0 = layoutitem<QSpacerItem>(param_this);
-        return isMuQtLayoutItem(arg0)
-                   ? makeqtype<QSizeType>(c, arg0->QSpacerItem::sizeHint(),
-                                          "qt.QSize")
-                   : makeqtype<QSizeType>(c, arg0->sizeHint(), "qt.QSize");
+        return isMuQtLayoutItem(arg0) ? makeqtype<QSizeType>(c, arg0->QSpacerItem::sizeHint(), "qt.QSize")
+                                      : makeqtype<QSizeType>(c, arg0->sizeHint(), "qt.QSize");
     }
 
-    int qt_QSpacerItem_controlTypes_int_QSpacerItem(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this)
+    int qt_QSpacerItem_controlTypes_int_QSpacerItem(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSpacerItem* arg0 = layoutitem<QSpacerItem>(param_this);
-        return isMuQtLayoutItem(arg0) ? int(arg0->QSpacerItem::controlTypes())
-                                      : int(arg0->controlTypes());
+        return isMuQtLayoutItem(arg0) ? int(arg0->QSpacerItem::controlTypes()) : int(arg0->controlTypes());
     }
 
-    bool
-    qt_QSpacerItem_hasHeightForWidth_bool_QSpacerItem(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    bool qt_QSpacerItem_hasHeightForWidth_bool_QSpacerItem(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSpacerItem* arg0 = layoutitem<QSpacerItem>(param_this);
-        return isMuQtLayoutItem(arg0) ? arg0->QSpacerItem::hasHeightForWidth()
-                                      : arg0->hasHeightForWidth();
+        return isMuQtLayoutItem(arg0) ? arg0->QSpacerItem::hasHeightForWidth() : arg0->hasHeightForWidth();
     }
 
-    int qt_QSpacerItem_heightForWidth_int_QSpacerItem_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param__p3)
+    int qt_QSpacerItem_heightForWidth_int_QSpacerItem_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param__p3)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSpacerItem* arg0 = layoutitem<QSpacerItem>(param_this);
         int arg1 = (int)(param__p3);
-        return isMuQtLayoutItem(arg0) ? arg0->QSpacerItem::heightForWidth(arg1)
-                                      : arg0->heightForWidth(arg1);
+        return isMuQtLayoutItem(arg0) ? arg0->QSpacerItem::heightForWidth(arg1) : arg0->heightForWidth(arg1);
     }
 
-    void qt_QSpacerItem_invalidate_void_QSpacerItem(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this)
+    void qt_QSpacerItem_invalidate_void_QSpacerItem(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSpacerItem* arg0 = layoutitem<QSpacerItem>(param_this);
@@ -553,136 +512,110 @@ namespace Mu
             arg0->invalidate();
     }
 
-    Pointer qt_QSpacerItem_layout_QLayout_QSpacerItem(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    Pointer qt_QSpacerItem_layout_QLayout_QSpacerItem(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSpacerItem* arg0 = layoutitem<QSpacerItem>(param_this);
-        return isMuQtLayoutItem(arg0)
-                   ? makeinstance<QLayoutType>(c, arg0->QSpacerItem::layout(),
-                                               "qt.QLayout")
-                   : makeinstance<QLayoutType>(c, arg0->layout(), "qt.QLayout");
+        return isMuQtLayoutItem(arg0) ? makeinstance<QLayoutType>(c, arg0->QSpacerItem::layout(), "qt.QLayout")
+                                      : makeinstance<QLayoutType>(c, arg0->layout(), "qt.QLayout");
     }
 
-    int qt_QSpacerItem_minimumHeightForWidth_int_QSpacerItem_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_w)
+    int qt_QSpacerItem_minimumHeightForWidth_int_QSpacerItem_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_w)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSpacerItem* arg0 = layoutitem<QSpacerItem>(param_this);
         int arg1 = (int)(param_w);
-        return isMuQtLayoutItem(arg0)
-                   ? arg0->QSpacerItem::minimumHeightForWidth(arg1)
-                   : arg0->minimumHeightForWidth(arg1);
+        return isMuQtLayoutItem(arg0) ? arg0->QSpacerItem::minimumHeightForWidth(arg1) : arg0->minimumHeightForWidth(arg1);
     }
 
-    Pointer qt_QSpacerItem_widget_QWidget_QSpacerItem(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    Pointer qt_QSpacerItem_widget_QWidget_QSpacerItem(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSpacerItem* arg0 = layoutitem<QSpacerItem>(param_this);
-        return isMuQtLayoutItem(arg0)
-                   ? makeinstance<QWidgetType>(c, arg0->QSpacerItem::widget(),
-                                               "qt.QWidget")
-                   : makeinstance<QWidgetType>(c, arg0->widget(), "qt.QWidget");
+        return isMuQtLayoutItem(arg0) ? makeinstance<QWidgetType>(c, arg0->QSpacerItem::widget(), "qt.QWidget")
+                                      : makeinstance<QWidgetType>(c, arg0->widget(), "qt.QWidget");
     }
 
     static NODE_IMPLEMENTATION(_n_QSpacerItem0, Pointer)
     {
-        NODE_RETURN(
-            qt_QSpacerItem_QSpacerItem_QSpacerItem_QSpacerItem_int_int_int_int(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-                NODE_ARG(2, int), NODE_ARG(3, int), NODE_ARG(4, int)));
+        NODE_RETURN(qt_QSpacerItem_QSpacerItem_QSpacerItem_QSpacerItem_int_int_int_int(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int), NODE_ARG(3, int), NODE_ARG(4, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_changeSize0, void)
     {
-        qt_QSpacerItem_changeSize_void_QSpacerItem_int_int_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int), NODE_ARG(3, int), NODE_ARG(4, int));
+        qt_QSpacerItem_changeSize_void_QSpacerItem_int_int_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                   NODE_ARG(2, int), NODE_ARG(3, int), NODE_ARG(4, int));
     }
 
     static NODE_IMPLEMENTATION(_n_expandingDirections0, int)
     {
-        NODE_RETURN(qt_QSpacerItem_expandingDirections_int_QSpacerItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QSpacerItem_expandingDirections_int_QSpacerItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_geometry0, Pointer)
     {
-        NODE_RETURN(qt_QSpacerItem_geometry_QRect_QSpacerItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QSpacerItem_geometry_QRect_QSpacerItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isEmpty0, bool)
     {
-        NODE_RETURN(qt_QSpacerItem_isEmpty_bool_QSpacerItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QSpacerItem_isEmpty_bool_QSpacerItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_maximumSize0, Pointer)
     {
-        NODE_RETURN(qt_QSpacerItem_maximumSize_QSize_QSpacerItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QSpacerItem_maximumSize_QSize_QSpacerItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_minimumSize0, Pointer)
     {
-        NODE_RETURN(qt_QSpacerItem_minimumSize_QSize_QSpacerItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QSpacerItem_minimumSize_QSize_QSpacerItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_setGeometry0, void)
     {
-        qt_QSpacerItem_setGeometry_void_QSpacerItem_QRect(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QSpacerItem_setGeometry_void_QSpacerItem_QRect(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_sizeHint0, Pointer)
     {
-        NODE_RETURN(qt_QSpacerItem_sizeHint_QSize_QSpacerItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QSpacerItem_sizeHint_QSize_QSpacerItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_controlTypes0, int)
     {
-        NODE_RETURN(qt_QSpacerItem_controlTypes_int_QSpacerItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QSpacerItem_controlTypes_int_QSpacerItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_hasHeightForWidth0, bool)
     {
-        NODE_RETURN(qt_QSpacerItem_hasHeightForWidth_bool_QSpacerItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QSpacerItem_hasHeightForWidth_bool_QSpacerItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_heightForWidth0, int)
     {
-        NODE_RETURN(qt_QSpacerItem_heightForWidth_int_QSpacerItem_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QSpacerItem_heightForWidth_int_QSpacerItem_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_invalidate0, void)
     {
-        qt_QSpacerItem_invalidate_void_QSpacerItem(NODE_THREAD,
-                                                   NONNIL_NODE_ARG(0, Pointer));
+        qt_QSpacerItem_invalidate_void_QSpacerItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_layout0, Pointer)
     {
-        NODE_RETURN(qt_QSpacerItem_layout_QLayout_QSpacerItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QSpacerItem_layout_QLayout_QSpacerItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_minimumHeightForWidth0, int)
     {
-        NODE_RETURN(qt_QSpacerItem_minimumHeightForWidth_int_QSpacerItem_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QSpacerItem_minimumHeightForWidth_int_QSpacerItem_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_widget0, Pointer)
     {
-        NODE_RETURN(qt_QSpacerItem_widget_QWidget_QSpacerItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QSpacerItem_widget_QWidget_QSpacerItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     void QSpacerItemType::load()
@@ -702,114 +635,64 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
-                   new Function(c, tn, castFromLayoutItem, Cast, Compiled,
-                                QSpacerItem_QSpacerItem_QLayoutItem, Return,
-                                ftn, Parameters,
-                                new Param(c, "layoutItem", "qt.QLayoutItem"),
-                                End),
+                   new Function(c, tn, castFromLayoutItem, Cast, Compiled, QSpacerItem_QSpacerItem_QLayoutItem, Return, ftn, Parameters,
+                                new Param(c, "layoutItem", "qt.QLayoutItem"), End),
 
                    EndArguments);
 
         addSymbols(
             // enums
             // member functions
-            new Function(
-                c, "QSpacerItem", _n_QSpacerItem0, None, Compiled,
-                qt_QSpacerItem_QSpacerItem_QSpacerItem_QSpacerItem_int_int_int_int,
-                Return, "qt.QSpacerItem", Parameters,
-                new Param(c, "this", "qt.QSpacerItem"),
-                new Param(c, "w", "int"), new Param(c, "h", "int"),
-                new Param(c, "hPolicy", "int",
-                          Value((int)QSizePolicy::Minimum)),
-                new Param(c, "vPolicy", "int",
-                          Value((int)QSizePolicy::Minimum)),
-                End),
-            new Function(
-                c, "changeSize", _n_changeSize0, None, Compiled,
-                qt_QSpacerItem_changeSize_void_QSpacerItem_int_int_int_int,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QSpacerItem"),
-                new Param(c, "w", "int"), new Param(c, "h", "int"),
-                new Param(c, "hPolicy", "int",
-                          Value((int)QSizePolicy::Minimum)),
-                new Param(c, "vPolicy", "int",
-                          Value((int)QSizePolicy::Minimum)),
-                End),
+            new Function(c, "QSpacerItem", _n_QSpacerItem0, None, Compiled,
+                         qt_QSpacerItem_QSpacerItem_QSpacerItem_QSpacerItem_int_int_int_int, Return, "qt.QSpacerItem", Parameters,
+                         new Param(c, "this", "qt.QSpacerItem"), new Param(c, "w", "int"), new Param(c, "h", "int"),
+                         new Param(c, "hPolicy", "int", Value((int)QSizePolicy::Minimum)),
+                         new Param(c, "vPolicy", "int", Value((int)QSizePolicy::Minimum)), End),
+            new Function(c, "changeSize", _n_changeSize0, None, Compiled, qt_QSpacerItem_changeSize_void_QSpacerItem_int_int_int_int,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QSpacerItem"), new Param(c, "w", "int"),
+                         new Param(c, "h", "int"), new Param(c, "hPolicy", "int", Value((int)QSizePolicy::Minimum)),
+                         new Param(c, "vPolicy", "int", Value((int)QSizePolicy::Minimum)), End),
             // MISSING: sizePolicy ("QSizePolicy"; QSpacerItem this)
-            _func[0] = new MemberFunction(
-                c, "expandingDirections", _n_expandingDirections0, None,
-                Compiled, qt_QSpacerItem_expandingDirections_int_QSpacerItem,
-                Return, "int", Parameters,
-                new Param(c, "this", "qt.QSpacerItem"), End),
-            _func[1] = new MemberFunction(
-                c, "geometry", _n_geometry0, None, Compiled,
-                qt_QSpacerItem_geometry_QRect_QSpacerItem, Return, "qt.QRect",
-                Parameters, new Param(c, "this", "qt.QSpacerItem"), End),
-            _func[2] = new MemberFunction(
-                c, "isEmpty", _n_isEmpty0, None, Compiled,
-                qt_QSpacerItem_isEmpty_bool_QSpacerItem, Return, "bool",
-                Parameters, new Param(c, "this", "qt.QSpacerItem"), End),
-            _func[3] = new MemberFunction(
-                c, "maximumSize", _n_maximumSize0, None, Compiled,
-                qt_QSpacerItem_maximumSize_QSize_QSpacerItem, Return,
-                "qt.QSize", Parameters, new Param(c, "this", "qt.QSpacerItem"),
-                End),
-            _func[4] = new MemberFunction(
-                c, "minimumSize", _n_minimumSize0, None, Compiled,
-                qt_QSpacerItem_minimumSize_QSize_QSpacerItem, Return,
-                "qt.QSize", Parameters, new Param(c, "this", "qt.QSpacerItem"),
-                End),
-            _func[5] = new MemberFunction(
-                c, "setGeometry", _n_setGeometry0, None, Compiled,
-                qt_QSpacerItem_setGeometry_void_QSpacerItem_QRect, Return,
-                "void", Parameters, new Param(c, "this", "qt.QSpacerItem"),
-                new Param(c, "r", "qt.QRect"), End),
-            _func[6] = new MemberFunction(
-                c, "sizeHint", _n_sizeHint0, None, Compiled,
-                qt_QSpacerItem_sizeHint_QSize_QSpacerItem, Return, "qt.QSize",
-                Parameters, new Param(c, "this", "qt.QSpacerItem"), End),
+            _func[0] = new MemberFunction(c, "expandingDirections", _n_expandingDirections0, None, Compiled,
+                                          qt_QSpacerItem_expandingDirections_int_QSpacerItem, Return, "int", Parameters,
+                                          new Param(c, "this", "qt.QSpacerItem"), End),
+            _func[1] = new MemberFunction(c, "geometry", _n_geometry0, None, Compiled, qt_QSpacerItem_geometry_QRect_QSpacerItem, Return,
+                                          "qt.QRect", Parameters, new Param(c, "this", "qt.QSpacerItem"), End),
+            _func[2] = new MemberFunction(c, "isEmpty", _n_isEmpty0, None, Compiled, qt_QSpacerItem_isEmpty_bool_QSpacerItem, Return,
+                                          "bool", Parameters, new Param(c, "this", "qt.QSpacerItem"), End),
+            _func[3] = new MemberFunction(c, "maximumSize", _n_maximumSize0, None, Compiled, qt_QSpacerItem_maximumSize_QSize_QSpacerItem,
+                                          Return, "qt.QSize", Parameters, new Param(c, "this", "qt.QSpacerItem"), End),
+            _func[4] = new MemberFunction(c, "minimumSize", _n_minimumSize0, None, Compiled, qt_QSpacerItem_minimumSize_QSize_QSpacerItem,
+                                          Return, "qt.QSize", Parameters, new Param(c, "this", "qt.QSpacerItem"), End),
+            _func[5] =
+                new MemberFunction(c, "setGeometry", _n_setGeometry0, None, Compiled, qt_QSpacerItem_setGeometry_void_QSpacerItem_QRect,
+                                   Return, "void", Parameters, new Param(c, "this", "qt.QSpacerItem"), new Param(c, "r", "qt.QRect"), End),
+            _func[6] = new MemberFunction(c, "sizeHint", _n_sizeHint0, None, Compiled, qt_QSpacerItem_sizeHint_QSize_QSpacerItem, Return,
+                                          "qt.QSize", Parameters, new Param(c, "this", "qt.QSpacerItem"), End),
             // MISSING: spacerItem ("QSpacerItem *"; QSpacerItem this)
-            _func[7] = new MemberFunction(
-                c, "controlTypes", _n_controlTypes0, None, Compiled,
-                qt_QSpacerItem_controlTypes_int_QSpacerItem, Return, "int",
-                Parameters, new Param(c, "this", "qt.QSpacerItem"), End),
-            _func[8] = new MemberFunction(
-                c, "hasHeightForWidth", _n_hasHeightForWidth0, None, Compiled,
-                qt_QSpacerItem_hasHeightForWidth_bool_QSpacerItem, Return,
-                "bool", Parameters, new Param(c, "this", "qt.QSpacerItem"),
-                End),
-            _func[9] = new MemberFunction(
-                c, "heightForWidth", _n_heightForWidth0, None, Compiled,
-                qt_QSpacerItem_heightForWidth_int_QSpacerItem_int, Return,
-                "int", Parameters, new Param(c, "this", "qt.QSpacerItem"),
-                new Param(c, "_p3", "int"), End),
-            _func[10] = new MemberFunction(
-                c, "invalidate", _n_invalidate0, None, Compiled,
-                qt_QSpacerItem_invalidate_void_QSpacerItem, Return, "void",
-                Parameters, new Param(c, "this", "qt.QSpacerItem"), End),
-            _func[11] = new MemberFunction(
-                c, "layout", _n_layout0, None, Compiled,
-                qt_QSpacerItem_layout_QLayout_QSpacerItem, Return, "qt.QLayout",
-                Parameters, new Param(c, "this", "qt.QSpacerItem"), End),
-            _func[12] = new MemberFunction(
-                c, "minimumHeightForWidth", _n_minimumHeightForWidth0, None,
-                Compiled,
-                qt_QSpacerItem_minimumHeightForWidth_int_QSpacerItem_int,
-                Return, "int", Parameters,
-                new Param(c, "this", "qt.QSpacerItem"),
-                new Param(c, "w", "int"), End),
-            _func[13] = new MemberFunction(
-                c, "widget", _n_widget0, None, Compiled,
-                qt_QSpacerItem_widget_QWidget_QSpacerItem, Return, "qt.QWidget",
-                Parameters, new Param(c, "this", "qt.QSpacerItem"), End),
+            _func[7] = new MemberFunction(c, "controlTypes", _n_controlTypes0, None, Compiled, qt_QSpacerItem_controlTypes_int_QSpacerItem,
+                                          Return, "int", Parameters, new Param(c, "this", "qt.QSpacerItem"), End),
+            _func[8] = new MemberFunction(c, "hasHeightForWidth", _n_hasHeightForWidth0, None, Compiled,
+                                          qt_QSpacerItem_hasHeightForWidth_bool_QSpacerItem, Return, "bool", Parameters,
+                                          new Param(c, "this", "qt.QSpacerItem"), End),
+            _func[9] = new MemberFunction(c, "heightForWidth", _n_heightForWidth0, None, Compiled,
+                                          qt_QSpacerItem_heightForWidth_int_QSpacerItem_int, Return, "int", Parameters,
+                                          new Param(c, "this", "qt.QSpacerItem"), new Param(c, "_p3", "int"), End),
+            _func[10] = new MemberFunction(c, "invalidate", _n_invalidate0, None, Compiled, qt_QSpacerItem_invalidate_void_QSpacerItem,
+                                           Return, "void", Parameters, new Param(c, "this", "qt.QSpacerItem"), End),
+            _func[11] = new MemberFunction(c, "layout", _n_layout0, None, Compiled, qt_QSpacerItem_layout_QLayout_QSpacerItem, Return,
+                                           "qt.QLayout", Parameters, new Param(c, "this", "qt.QSpacerItem"), End),
+            _func[12] = new MemberFunction(c, "minimumHeightForWidth", _n_minimumHeightForWidth0, None, Compiled,
+                                           qt_QSpacerItem_minimumHeightForWidth_int_QSpacerItem_int, Return, "int", Parameters,
+                                           new Param(c, "this", "qt.QSpacerItem"), new Param(c, "w", "int"), End),
+            _func[13] = new MemberFunction(c, "widget", _n_widget0, None, Compiled, qt_QSpacerItem_widget_QWidget_QSpacerItem, Return,
+                                           "qt.QWidget", Parameters, new Param(c, "this", "qt.QSpacerItem"), End),
             // static functions
             EndArguments);
         globalScope()->addSymbols(EndArguments);

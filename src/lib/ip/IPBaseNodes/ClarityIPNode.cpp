@@ -25,9 +25,7 @@ namespace IPCore
     using namespace TwkMath;
     using namespace TwkFB;
 
-    ClarityIPNode::ClarityIPNode(const std::string& name,
-                                 const NodeDefinition* def, IPGraph* graph,
-                                 GroupIPNode* group)
+    ClarityIPNode::ClarityIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group)
         : IPNode(name, def, graph, group)
     {
         m_active = declareProperty<IntProperty>("node.active", 1);
@@ -65,21 +63,16 @@ namespace IPCore
 
         IPImage* image2 = IPNode::evaluate(context);
 
-        IPImage* downSized =
-            new IPImage(this, IPImage::BlendRenderType, width / 2, height / 2,
-                        1.0, IPImage::IntermediateBuffer);
+        IPImage* downSized = new IPImage(this, IPImage::BlendRenderType, width / 2, height / 2, 1.0, IPImage::IntermediateBuffer);
         downSized->shaderExpr = Shader::newSourceRGBA(downSized);
-        downSized->shaderExpr =
-            newDownSample(downSized, downSized->shaderExpr, 2.0);
+        downSized->shaderExpr = newDownSample(downSized, downSized->shaderExpr, 2.0);
         downSized->appendChild(image);
 
         // both are reference copies of the m_gaussFB
-        IPImage* gauss =
-            Shader::applyFastGaussianFilter(this, downSized, (size_t)r);
+        IPImage* gauss = Shader::applyFastGaussianFilter(this, downSized, (size_t)r);
 
         // use gaussian result and the original to create result
-        IPImage* result = new IPImage(this, IPImage::MergeRenderType, width,
-                                      height, 1.0, IPImage::IntermediateBuffer);
+        IPImage* result = new IPImage(this, IPImage::MergeRenderType, width, height, 1.0, IPImage::IntermediateBuffer);
 
         IPImageVector images;
         IPImageSet modifiedImages;
@@ -88,13 +81,10 @@ namespace IPCore
 
         convertBlendRenderTypeToIntermediate(images, modifiedImages);
         Shader::ExpressionVector inExpressions;
-        balanceResourceUsage(IPNode::accumulate, images, modifiedImages, 8, 8,
-                             81);
-        assembleMergeExpressions(result, images, modifiedImages, false,
-                                 inExpressions);
+        balanceResourceUsage(IPNode::accumulate, images, modifiedImages, 8, 8, 81);
+        assembleMergeExpressions(result, images, modifiedImages, false, inExpressions);
 
-        result->mergeExpr =
-            Shader::newFilterClarity(result, inExpressions, amount);
+        result->mergeExpr = Shader::newFilterClarity(result, inExpressions, amount);
         result->shaderExpr = Shader::newSourceRGBA(result);
         result->appendChildren(images);
 

@@ -159,10 +159,7 @@ void setEnvVar(const string& var, const string& val)
 #endif
 }
 
-void setEnvVar(const string& var, const QFileInfo& val)
-{
-    setEnvVar(var, val.absoluteFilePath().toUtf8().data());
-}
+void setEnvVar(const string& var, const QFileInfo& val) { setEnvVar(var, val.absoluteFilePath().toUtf8().data()); }
 
 void addToEnvVar(const string& var, const string& val)
 {
@@ -189,8 +186,7 @@ string scarfFile(const string& fileName)
 #define EXECUTABLE_SHORT_NAME "rv"
 #define EXECUTABLE_SHORT_NAME_CAPS "RV"
 
-TwkApp::QTBundle bundle(EXECUTABLE_SHORT_NAME, MAJOR_VERSION, MINOR_VERSION,
-                        REVISION_NUMBER);
+TwkApp::QTBundle bundle(EXECUTABLE_SHORT_NAME, MAJOR_VERSION, MINOR_VERSION, REVISION_NUMBER);
 
 #ifdef PLATFORM_LINUX
 extern "C" int XInitThreads();
@@ -295,8 +291,7 @@ int utf8Main(int argc, char* argv[])
     getrlimit(RLIMIT_NOFILE, &rlim);
     if (rlim.rlim_cur < rlim.rlim_max)
     {
-        cerr << "WARNING: unable to increase open file limit above "
-             << rlim.rlim_cur << endl;
+        cerr << "WARNING: unable to increase open file limit above " << rlim.rlim_cur << endl;
     }
 #else
     _setmaxstdio(2048);
@@ -311,8 +306,7 @@ int utf8Main(int argc, char* argv[])
     //
     HANDLE hand = GetStdHandle(STD_OUTPUT_HANDLE);
 
-    if ((hand == INVALID_HANDLE_VALUE || GetFileType(hand) == FILE_TYPE_UNKNOWN)
-        && AttachConsole(ATTACH_PARENT_PROCESS))
+    if ((hand == INVALID_HANDLE_VALUE || GetFileType(hand) == FILE_TYPE_UNKNOWN) && AttachConsole(ATTACH_PARENT_PROCESS))
     {
         freopen("CON", "w", stdout);
         freopen("CON", "w", stderr);
@@ -335,9 +329,7 @@ int utf8Main(int argc, char* argv[])
         else
 #endif
         {
-            cerr
-                << "ERROR: $HOME is not set in the environment and is required."
-                << endl;
+            cerr << "ERROR: $HOME is not set in the environment and is required." << endl;
             exit(-1);
         }
     }
@@ -449,9 +441,7 @@ int utf8Main(int argc, char* argv[])
     //  Call the deploy functions
     //
 
-    TWK_DEPLOY_APP_OBJECT dobj(MAJOR_VERSION, MINOR_VERSION, REVISION_NUMBER,
-                               argc, argv, RELEASE_DESCRIPTION,
-                               "HEAD=" GIT_HEAD);
+    TWK_DEPLOY_APP_OBJECT dobj(MAJOR_VERSION, MINOR_VERSION, REVISION_NUMBER, argc, argv, RELEASE_DESCRIPTION, "HEAD=" GIT_HEAD);
 
     Imf::staticInitialize();
 
@@ -482,26 +472,17 @@ int utf8Main(int argc, char* argv[])
     char* prefsPath = 0;
     int sleepTime = 0;
 
-    if (arg_parse(
-            argc, argv, "", "", RV_ARG_EXAMPLES, "", "", RV_ARG_SEQUENCE_HELP,
-            "", "", RV_ARG_SOURCE_OPTIONS(opts), "", "", "",
-            ARG_SUBR(Rv::RvApplication::parseInFiles),
-            "Input sequence patterns, images, movies, or directories ",
-            RV_ARG_PARSE_OPTIONS(opts), "-strictlicense",
-            ARG_FLAG(&strictlicense),
-            "Exit rather than consume an RV license if no rvsolo licenses are "
-            "available",
-            "-prefsPath %S", &prefsPath,
-            "Alternate path to preferences directory",
+    if (arg_parse(argc, argv, "", "", RV_ARG_EXAMPLES, "", "", RV_ARG_SEQUENCE_HELP, "", "", RV_ARG_SOURCE_OPTIONS(opts), "", "", "",
+                  ARG_SUBR(Rv::RvApplication::parseInFiles), "Input sequence patterns, images, movies, or directories ",
+                  RV_ARG_PARSE_OPTIONS(opts), "-strictlicense", ARG_FLAG(&strictlicense),
+                  "Exit rather than consume an RV license if no rvsolo licenses are "
+                  "available",
+                  "-prefsPath %S", &prefsPath, "Alternate path to preferences directory",
 #if defined(PLATFORM_LINUX)
-            "-scheduler %S", &opts.schedulePolicy,
-            "Thread scheduling policy (may require root)", "-priorities %d %d",
-            &opts.displayPriority, &opts.audioPriority,
-            "Set display and audio thread priorities (may require root)",
+                  "-scheduler %S", &opts.schedulePolicy, "Thread scheduling policy (may require root)", "-priorities %d %d",
+                  &opts.displayPriority, &opts.audioPriority, "Set display and audio thread priorities (may require root)",
 #endif
-            "-sleep %d", &sleepTime,
-            "Sleep (in seconds) before starting to allow attaching debugger",
-            NULL)
+                  "-sleep %d", &sleepTime, "Sleep (in seconds) before starting to allow attaching debugger", NULL)
         < 0)
     {
         exit(-1);
@@ -525,8 +506,7 @@ int utf8Main(int argc, char* argv[])
 
     if (opts.showVersion)
     {
-        cout << MAJOR_VERSION << "." << MINOR_VERSION << "." << REVISION_NUMBER
-             << endl;
+        cout << MAJOR_VERSION << "." << MINOR_VERSION << "." << REVISION_NUMBER << endl;
         exit(0);
     }
 
@@ -594,9 +574,7 @@ int utf8Main(int argc, char* argv[])
     }
     else
     {
-        Imf::setGlobalThreadCount(TwkUtil::SystemInfo::numCPUs() > 1
-                                      ? (TwkUtil::SystemInfo::numCPUs() - 1)
-                                      : 1);
+        Imf::setGlobalThreadCount(TwkUtil::SystemInfo::numCPUs() > 1 ? (TwkUtil::SystemInfo::numCPUs() - 1) : 1);
     }
 
     //
@@ -618,8 +596,7 @@ int utf8Main(int argc, char* argv[])
 
     QTranslator* translator = new QTranslator();
     QLocale locale = QLocale(getenv("ORIGINALLOCAL"));
-    if (translator->load(locale, QLatin1String("i18n"), "_",
-                         QLatin1String(":/translations")))
+    if (translator->load(locale, QLatin1String("i18n"), "_", QLatin1String(":/translations")))
     {
         app->installTranslator(translator);
     }
@@ -669,22 +646,15 @@ int utf8Main(int argc, char* argv[])
     bundle.setEnvVar("RV_APP_RV_SHORT_NAME", EXECUTABLE_SHORT_NAME);
     bundle.setEnvVar("RV_APP_RV", bundle.executableFile(EXECUTABLE_SHORT_NAME));
     bundle.setEnvVar("RV_APP_MANUAL", bundle.resource("rv_manual", "pdf"));
-    bundle.setEnvVar("RV_APP_MANUAL_HTML",
-                     bundle.resource("rv_manual", "html"));
-    bundle.setEnvVar("RV_APP_SDI_MANUAL",
-                     bundle.resource("rvsdi_manual", "pdf"));
-    bundle.setEnvVar("RV_APP_SDI_MANUAL_HTML",
-                     bundle.resource("rvsdi_manual", "html"));
-    bundle.setEnvVar("RV_APP_REFERENCE_MANUAL",
-                     bundle.resource("rv_reference", "pdf"));
-    bundle.setEnvVar("RV_APP_REFERENCE_MANUAL_HTML",
-                     bundle.resource("rv_reference", "html"));
+    bundle.setEnvVar("RV_APP_MANUAL_HTML", bundle.resource("rv_manual", "html"));
+    bundle.setEnvVar("RV_APP_SDI_MANUAL", bundle.resource("rvsdi_manual", "pdf"));
+    bundle.setEnvVar("RV_APP_SDI_MANUAL_HTML", bundle.resource("rvsdi_manual", "html"));
+    bundle.setEnvVar("RV_APP_REFERENCE_MANUAL", bundle.resource("rv_reference", "pdf"));
+    bundle.setEnvVar("RV_APP_REFERENCE_MANUAL_HTML", bundle.resource("rv_reference", "html"));
     bundle.setEnvVar("RV_APP_MU_MANUAL", bundle.resource("mu", "pdf"));
     bundle.setEnvVar("RV_APP_GTO_REFERENCE", bundle.resource("gto", "pdf"));
-    bundle.setEnvVar("RV_APP_RELEASE_NOTES",
-                     bundle.resource("rv_release_notes", "html"));
-    bundle.setEnvVar("RV_APP_LICENSES_NOTES",
-                     bundle.resource("rv_client_licenses", "html"));
+    bundle.setEnvVar("RV_APP_RELEASE_NOTES", bundle.resource("rv_release_notes", "html"));
+    bundle.setEnvVar("RV_APP_LICENSES_NOTES", bundle.resource("rv_client_licenses", "html"));
     bundle.addPathToEnvVar("OIIO_LIBRARY_PATH", bundle.appPluginPath("OIIO"));
 
     //
@@ -731,14 +701,12 @@ int utf8Main(int argc, char* argv[])
     DWORD proClass1 = GetPriorityClass(GetCurrentProcess());
     if (0 == SetPriorityClass(GetCurrentProcess(), targetClass))
     {
-        cerr << "ERROR: SetPriorityClass failed, error " << GetLastError()
-             << endl;
+        cerr << "ERROR: SetPriorityClass failed, error " << GetLastError() << endl;
     }
     DWORD proClass2 = GetPriorityClass(GetCurrentProcess());
     if (proClass2 != targetClass)
     {
-        cerr << "WARNING: failed to set Priority Class, class " << hex
-             << showbase << int(proClass1) << " -> " << int(proClass2)
+        cerr << "WARNING: failed to set Priority Class, class " << hex << showbase << int(proClass1) << " -> " << int(proClass2)
              << noshowbase << dec << endl;
     }
 #endif
@@ -766,16 +734,11 @@ int utf8Main(int argc, char* argv[])
         QString qcss = QString(s.c_str());
         // Always apply font size parameters - Qt handles missing placeholders
         // safely
-        csstext = qcss.arg(opts.fontSize1)
-                      .arg(opts.fontSize2)
-                      .arg(opts.fontSize2 - 1);
+        csstext = qcss.arg(opts.fontSize1).arg(opts.fontSize2).arg(opts.fontSize2 - 1);
     }
     else
     {
-        csstext = QString(rv_linux_dark)
-                      .arg(opts.fontSize1)
-                      .arg(opts.fontSize2)
-                      .arg(opts.fontSize2 - 1);
+        csstext = QString(rv_linux_dark).arg(opts.fontSize1).arg(opts.fontSize2).arg(opts.fontSize2 - 1);
     }
 
     if (!opts.qtstyle || !strcmp(opts.qtstyle, "RV"))
@@ -803,11 +766,9 @@ int utf8Main(int argc, char* argv[])
             exit(-1);
         }
 
-        TwkApp::initWithFile(TwkApp::muContext(), TwkApp::muProcess(),
-                             TwkApp::muModuleList(), muInitFile.c_str());
+        TwkApp::initWithFile(TwkApp::muContext(), TwkApp::muProcess(), TwkApp::muModuleList(), muInitFile.c_str());
 
-        TwkApp::pyInitWithFile(pyInitFile.c_str(), Rv::pyRvAppCommands(),
-                               Rv::pyUICommands());
+        TwkApp::pyInitWithFile(pyInitFile.c_str(), Rv::pyRvAppCommands(), Rv::pyUICommands());
     }
     catch (const exception& e)
     {
@@ -823,11 +784,9 @@ int utf8Main(int argc, char* argv[])
     //
 
 #ifdef PLATFORM_WINDOWS
-    TwkGLF::FBOVideoDevice* dummyDev =
-        new TwkGLF::FBOVideoDevice(0, 10, 10, false);
+    TwkGLF::FBOVideoDevice* dummyDev = new TwkGLF::FBOVideoDevice(0, 10, 10, false);
     IPCore::ImageRenderer::queryGL();
-    const char* glVersion =
-        (const char*)glGetString(GL_SHADING_LANGUAGE_VERSION);
+    const char* glVersion = (const char*)glGetString(GL_SHADING_LANGUAGE_VERSION);
     IPCore::Shader::Function::useShadingLanguageVersion(glVersion);
 #endif
 
@@ -871,8 +830,7 @@ int utf8Main(int argc, char* argv[])
         }
         catch (const exception& e)
         {
-            cerr << "ERROR: Unhandled exception during execution: " << e.what()
-                 << endl;
+            cerr << "ERROR: Unhandled exception during execution: " << e.what() << endl;
 
             exit(-1);
         }

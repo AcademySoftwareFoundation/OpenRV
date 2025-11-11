@@ -174,22 +174,18 @@ public:
     //!
     //! \return shared pointer to the parent object
     //!
-    template <typename RefCountedParent>
-    SharedPtr<RefCountedParent> upCast() const
+    template <typename RefCountedParent> SharedPtr<RefCountedParent> upCast() const
     {
-        return SharedPtr<RefCountedParent>(
-            static_cast<RefCountedParent*>(get()));
+        return SharedPtr<RefCountedParent>(static_cast<RefCountedParent*>(get()));
     }
 
     //! \brief Cast the shared pointer to child shared pointer
     //!
     //! \return shared pointer to the child object
     //!
-    template <typename RefCountedChild>
-    SharedPtr<RefCountedChild> downCast() const
+    template <typename RefCountedChild> SharedPtr<RefCountedChild> downCast() const
     {
-        return SharedPtr<RefCountedChild>(
-            dynamic_cast<RefCountedChild*>(get()));
+        return SharedPtr<RefCountedChild>(dynamic_cast<RefCountedChild*>(get()));
     }
 };
 
@@ -289,10 +285,7 @@ public:
 
     //! \see SharedPtr:;operator=
     //!
-    ConstSharedPtr& operator=(const ConstSharedPtr& r)
-    {
-        return *this = r.get();
-    }
+    ConstSharedPtr& operator=(const ConstSharedPtr& r) { return *this = r.get(); }
 
     //! \see SharedPtr::operator=
     //!
@@ -349,31 +342,19 @@ public:
 
     //! \see SharedPtr::operator==( const SharedPtr &)
     //!
-    bool operator==(const SharedPtr<RefCounted>& r) const
-    {
-        return get() == r.get();
-    }
+    bool operator==(const SharedPtr<RefCounted>& r) const { return get() == r.get(); }
 
     //! \see SharedPtr::operator!=( const SharedPtr &)
     //!
-    bool operator!=(const SharedPtr<RefCounted>& r) const
-    {
-        return get() != r.get();
-    }
+    bool operator!=(const SharedPtr<RefCounted>& r) const { return get() != r.get(); }
 
     //! \see SharedPtr::operator<( const SharedPtr &)
     //!
-    bool operator<(const SharedPtr<RefCounted>& r) const
-    {
-        return get() < r.get();
-    }
+    bool operator<(const SharedPtr<RefCounted>& r) const { return get() < r.get(); }
 
     //! \see SharedPtr::operator>( const SharedPtr &)
     //!
-    bool operator>(const SharedPtr<RefCounted>& r) const
-    {
-        return get() > r.get();
-    }
+    bool operator>(const SharedPtr<RefCounted>& r) const { return get() > r.get(); }
 
     //! \see SharedPtr::get
     //!
@@ -381,20 +362,16 @@ public:
 
     //! \see SharedPtr::upCast
     //!
-    template <typename RefCountedParent>
-    ConstSharedPtr<RefCountedParent> upCast() const
+    template <typename RefCountedParent> ConstSharedPtr<RefCountedParent> upCast() const
     {
-        return ConstSharedPtr<RefCountedParent>(
-            static_cast<const RefCountedParent*>(get()));
+        return ConstSharedPtr<RefCountedParent>(static_cast<const RefCountedParent*>(get()));
     }
 
     //! \see SharedPtr::downCast
     //!
-    template <typename RefCountedChild>
-    ConstSharedPtr<RefCountedChild> downCast() const
+    template <typename RefCountedChild> ConstSharedPtr<RefCountedChild> downCast() const
     {
-        return ConstSharedPtr<RefCountedChild>(
-            dynamic_cast<const RefCountedChild*>(get()));
+        return ConstSharedPtr<RefCountedChild>(dynamic_cast<const RefCountedChild*>(get()));
     }
 };
 

@@ -34,8 +34,7 @@ namespace Mu
         //  Constructors
         //
 
-        QWindowStateChangeEventType(Context* context, const char* name,
-                                    Class* superClass = 0);
+        QWindowStateChangeEventType(Context* context, const char* name, Class* superClass = 0);
         virtual ~QWindowStateChangeEventType();
 
         //

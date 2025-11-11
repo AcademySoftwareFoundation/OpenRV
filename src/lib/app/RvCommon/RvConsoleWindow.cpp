@@ -20,8 +20,7 @@ namespace
     //
     bool stringPotentiallyContainsHtml(const std::string& s)
     {
-        return !s.empty() && s.find('<') != std::string::npos
-               && s.find('>') != std::string::npos;
+        return !s.empty() && s.find('<') != std::string::npos && s.find('>') != std::string::npos;
     }
 } // namespace
 
@@ -85,14 +84,11 @@ namespace Rv
         m_processTimer = new QTimer(this);
         m_processTimer->setSingleShot(true);
         m_processTimer->setInterval(500);
-        connect(m_processTimer, SIGNAL(timeout()), this,
-                SLOT(processTextBuffer()));
+        connect(m_processTimer, SIGNAL(timeout()), this, SLOT(processTextBuffer()));
 
         m_ui.setupUi(this);
-        m_ui.biggerButton->setIcon(
-            colorAdjustedIcon(":images/zoomi_32x32.png"));
-        m_ui.smallerButton->setIcon(
-            colorAdjustedIcon(":images/zoomo_32x32.png"));
+        m_ui.biggerButton->setIcon(colorAdjustedIcon(":images/zoomi_32x32.png"));
+        m_ui.smallerButton->setIcon(colorAdjustedIcon(":images/zoomo_32x32.png"));
         m_ui.clearButton->setIcon(colorAdjustedIcon(":images/del_32x32.png"));
         m_ui.textEdit->setReadOnly(true);
         //
@@ -103,8 +99,7 @@ namespace Rv
         m_ui.showComboBox->setFocus();
 
         setWindowTitle(UI_APPLICATION_NAME " Console");
-        setWindowIcon(
-            QIcon(qApp->applicationDirPath() + QString(RV_ICON_PATH_SUFFIX)));
+        setWindowIcon(QIcon(qApp->applicationDirPath() + QString(RV_ICON_PATH_SUFFIX)));
         setSizeGripEnabled(true);
         bool doRedirect = (getenv("RV_NO_CONSOLE_REDIRECT") == 0);
         // setAttribute(Qt::WA_MacBrushedMetal);
@@ -271,10 +266,8 @@ namespace Rv
 
     bool RvConsoleWindow::processLine(string& line, QString& html)
     {
-        bool qtimerwarning =
-            line.find("Application asked to unregister timer") != string::npos;
-        bool qfilesystemwatcher =
-            line.find("QFileSystemWatcher:") != string::npos;
+        bool qtimerwarning = line.find("Application asked to unregister timer") != string::npos;
+        bool qfilesystemwatcher = line.find("QFileSystemWatcher:") != string::npos;
 
         // filter this
         if (qtimerwarning || qfilesystemwatcher)
@@ -349,19 +342,14 @@ namespace Rv
         //
         return (showIndex != 4
                 && ((lineLogLevel == spdlog::level::err && showIndex <= 3)
-                    || (lineLogLevel == spdlog::level::warn && showIndex <= 3
-                        && showIndex >= 1)
-                    || (lineLogLevel == spdlog::level::info && showIndex <= 3
-                        && showIndex >= 2)
-                    || showIndex == 3));
+                    || (lineLogLevel == spdlog::level::warn && showIndex <= 3 && showIndex >= 1)
+                    || (lineLogLevel == spdlog::level::info && showIndex <= 3 && showIndex >= 2) || showIndex == 3));
     }
 
     bool RvConsoleWindow::processAndDisplayLine(string& line)
     {
-        bool qtimerwarning =
-            line.find("Application asked to unregister timer") != string::npos;
-        bool qfilesystemwatcher =
-            line.find("QFileSystemWatcher:") != string::npos;
+        bool qtimerwarning = line.find("Application asked to unregister timer") != string::npos;
+        bool qfilesystemwatcher = line.find("QFileSystemWatcher:") != string::npos;
 
         // filter this
         if (qtimerwarning || qfilesystemwatcher)
@@ -426,11 +414,8 @@ namespace Rv
         //
         return (showIndex != 4
                 && ((lineLogLevel == spdlog::level::err && showIndex <= 3)
-                    || (lineLogLevel == spdlog::level::warn && showIndex <= 3
-                        && showIndex >= 1)
-                    || (lineLogLevel == spdlog::level::info && showIndex <= 3
-                        && showIndex >= 2)
-                    || showIndex == 3));
+                    || (lineLogLevel == spdlog::level::warn && showIndex <= 3 && showIndex >= 1)
+                    || (lineLogLevel == spdlog::level::info && showIndex <= 3 && showIndex >= 2) || showIndex == 3));
     }
 
 } // namespace Rv

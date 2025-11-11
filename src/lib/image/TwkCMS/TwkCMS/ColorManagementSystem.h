@@ -136,8 +136,7 @@ namespace TwkCMS
             //  Constructors
             //
 
-            Transform(const std::string& name, Type t,
-                      ColorManagementSystem* cms)
+            Transform(const std::string& name, Type t, ColorManagementSystem* cms)
                 : m_type(t)
                 , m_name(name)
                 , m_cms(cms)
@@ -219,8 +218,7 @@ namespace TwkCMS
         //  individual paths in a vector.
         //
 
-        static void splitPath(std::vector<std::string>& tokens,
-                              const std::string& path);
+        static void splitPath(std::vector<std::string>& tokens, const std::string& path);
 
     protected:
         //

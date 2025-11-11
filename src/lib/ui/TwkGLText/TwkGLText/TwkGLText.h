@@ -61,15 +61,11 @@ namespace TwkGLText
         static void writeAt(const TwkMath::Vec2f& pos, std::string text);
 
         // Pay attention to newlines, returns # of lines written
-        static int writeAtNL(float x, float y, const char* text,
-                             float mult = 1.0f);
-        static int writeAtNL(const TwkMath::Vec2f& pos, const char* text,
-                             float mult = 1.0f);
+        static int writeAtNL(float x, float y, const char* text, float mult = 1.0f);
+        static int writeAtNL(const TwkMath::Vec2f& pos, const char* text, float mult = 1.0f);
 
-        static int writeAtNL(float x, float y, std::string text,
-                             float mult = 1.0f);
-        static int writeAtNL(const TwkMath::Vec2f& pos, std::string text,
-                             float mult = 1.0f);
+        static int writeAtNL(float x, float y, std::string text, float mult = 1.0f);
+        static int writeAtNL(const TwkMath::Vec2f& pos, std::string text, float mult = 1.0f);
 
         static void size(int s);
         static int size();

@@ -54,25 +54,20 @@ namespace Mu
         for (int i = 0; i < m.methodCount(); i++)
         {
             QMetaMethod mm = m.method(i);
-            if ((parent
-                 && parent->indexOfMethod(
-                        parent->normalizedSignature(mm.methodSignature()))
-                        != -1)
+            if ((parent && parent->indexOfMethod(parent->normalizedSignature(mm.methodSignature())) != -1)
                 || mm.methodSignature()[0] == '_')
             {
                 continue;
             }
 
-            cout << "method " << i << ": " << mm.methodSignature().constData()
-                 << ", " << mm.methodType() << endl;
+            cout << "method " << i << ": " << mm.methodSignature().constData() << ", " << mm.methodType() << endl;
 
             QList<QByteArray> pnames = mm.parameterNames();
             QList<QByteArray> ptypes = mm.parameterTypes();
 
             for (int q = 0; q < pnames.size(); q++)
             {
-                cout << "  " << pnames[q].constData() << " : "
-                     << ptypes[q].constData() << endl;
+                cout << "  " << pnames[q].constData() << " : " << ptypes[q].constData() << endl;
             }
         }
 
@@ -82,8 +77,7 @@ namespace Mu
             if (parent && parent->indexOfProperty(mp.name()) != -1)
                 continue;
 
-            cout << "property " << i << ": " << mp.name() << ", "
-                 << mp.typeName() << endl;
+            cout << "property " << i << ": " << mp.name() << ", " << mp.typeName() << endl;
         }
 
         for (int i = 0; i < m.enumeratorCount(); i++)
@@ -92,13 +86,11 @@ namespace Mu
             if (parent && parent->indexOfEnumerator(e.name()) != -1)
                 continue;
 
-            cout << "enum " << i << ": " << e.scope() << "." << e.name()
-                 << endl;
+            cout << "enum " << i << ": " << e.scope() << "." << e.name() << endl;
 
             for (int q = 0; q < e.keyCount(); q++)
             {
-                cout << "  " << e.key(q) << " = " << e.keyToValue(e.key(q))
-                     << endl;
+                cout << "  " << e.key(q) << " = " << e.keyToValue(e.key(q)) << endl;
             }
         }
     }
@@ -150,8 +142,7 @@ namespace Mu
         return 0;
     }
 
-    static QMetaProperty getprop(const Node& NODE_THIS, Thread& NODE_THREAD,
-                                 QObject* o)
+    static QMetaProperty getprop(const Node& NODE_THIS, Thread& NODE_THREAD, QObject* o)
     {
         const Symbol* s = NODE_THIS.symbol();
         string n = s->name();
@@ -168,8 +159,7 @@ namespace Mu
         return metaObject->property(propIndex);
     }
 
-    static QMetaMethod getmethod(const Node& NODE_THIS, Thread& NODE_THREAD,
-                                 QObject* o)
+    static QMetaMethod getmethod(const Node& NODE_THIS, Thread& NODE_THREAD, QObject* o)
     {
         const Function* F = static_cast<const Function*>(NODE_THIS.symbol());
 
@@ -276,8 +266,7 @@ namespace Mu
             }
             else
             {
-                cout << "ERROR: MuQt Bridge unsupported method arg type "
-                     << aname << endl;
+                cout << "ERROR: MuQt Bridge unsupported method arg type " << aname << endl;
             }
         }
 
@@ -326,15 +315,12 @@ namespace Mu
 
         if (methodIndex == -1)
         {
-            cout << "ERROR: MuQt Bridge getmethod failed for " << str.str()
-                 << endl;
+            cout << "ERROR: MuQt Bridge getmethod failed for " << str.str() << endl;
             cout << "       methods are:" << endl;
 
             for (size_t i = 0; i < metaObject->methodCount(); i++)
             {
-                cout << "       "
-                     << metaObject->method(i).methodSignature().constData()
-                     << endl;
+                cout << "       " << metaObject->method(i).methodSignature().constData() << endl;
             }
         }
 
@@ -370,23 +356,18 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(getpropString, Pointer)
     {
-        const MuLangContext* c =
-            static_cast<MuLangContext*>(NODE_THREAD.context());
+        const MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QObject* o = object<QObject>(NODE_ARG_OBJECT(0, ClassInstance));
         QMetaProperty prop = getprop(NODE_THIS, NODE_THREAD, o);
         QVariant v = prop.read(o);
-        StringType::String* str =
-            c->stringType()->allocate(v.toString().toUtf8().constData());
+        StringType::String* str = c->stringType()->allocate(v.toString().toUtf8().constData());
         NODE_RETURN(str);
     }
 
     static NODE_IMPLEMENTATION(getpropIcon, Pointer)
     {
-        const MuLangContext* c =
-            static_cast<MuLangContext*>(NODE_THREAD.context());
-        const QIconType* iconType =
-            c->findSymbolOfTypeByQualifiedName<QIconType>(
-                c->internName("qt.QIcon"), false);
+        const MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
+        const QIconType* iconType = c->findSymbolOfTypeByQualifiedName<QIconType>(c->internName("qt.QIcon"), false);
         QObject* o = object<QObject>(NODE_ARG_OBJECT(0, ClassInstance));
         QMetaProperty prop = getprop(NODE_THIS, NODE_THREAD, o);
         QVariant v = prop.read(o);
@@ -402,11 +383,8 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(getpropSize, Pointer)
     {
-        const MuLangContext* c =
-            static_cast<MuLangContext*>(NODE_THREAD.context());
-        const QSizeType* sizeType =
-            c->findSymbolOfTypeByQualifiedName<QSizeType>(
-                c->internName("qt.QSize"), false);
+        const MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
+        const QSizeType* sizeType = c->findSymbolOfTypeByQualifiedName<QSizeType>(c->internName("qt.QSize"), false);
         QObject* o = object<QObject>(NODE_ARG_OBJECT(0, ClassInstance));
         QMetaProperty prop = getprop(NODE_THIS, NODE_THREAD, o);
         QVariant v = prop.read(o);
@@ -422,11 +400,8 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(getpropRect, Pointer)
     {
-        const MuLangContext* c =
-            static_cast<MuLangContext*>(NODE_THREAD.context());
-        const QRectType* rectType =
-            c->findSymbolOfTypeByQualifiedName<QRectType>(
-                c->internName("qt.QRect"), false);
+        const MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
+        const QRectType* rectType = c->findSymbolOfTypeByQualifiedName<QRectType>(c->internName("qt.QRect"), false);
         QObject* o = object<QObject>(NODE_ARG_OBJECT(0, ClassInstance));
         QMetaProperty prop = getprop(NODE_THIS, NODE_THREAD, o);
         QVariant v = prop.read(o);
@@ -442,11 +417,8 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(getpropPoint, Pointer)
     {
-        const MuLangContext* c =
-            static_cast<MuLangContext*>(NODE_THREAD.context());
-        const QPointType* pointType =
-            c->findSymbolOfTypeByQualifiedName<QPointType>(
-                c->internName("qt.QPoint"), false);
+        const MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
+        const QPointType* pointType = c->findSymbolOfTypeByQualifiedName<QPointType>(c->internName("qt.QPoint"), false);
         QObject* o = object<QObject>(NODE_ARG_OBJECT(0, ClassInstance));
         QMetaProperty prop = getprop(NODE_THIS, NODE_THREAD, o);
         QVariant v = prop.read(o);
@@ -462,10 +434,8 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(getpropFont, Pointer)
     {
-        const MuLangContext* c =
-            static_cast<MuLangContext*>(NODE_THREAD.context());
-        const QFontType* type = c->findSymbolOfTypeByQualifiedName<QFontType>(
-            c->internName("qt.QFont"), false);
+        const MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
+        const QFontType* type = c->findSymbolOfTypeByQualifiedName<QFontType>(c->internName("qt.QFont"), false);
         QObject* o = object<QObject>(NODE_ARG_OBJECT(0, ClassInstance));
         QMetaProperty prop = getprop(NODE_THIS, NODE_THREAD, o);
         QVariant v = prop.read(o);
@@ -481,10 +451,8 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(getpropUrl, Pointer)
     {
-        const MuLangContext* c =
-            static_cast<MuLangContext*>(NODE_THREAD.context());
-        const QUrlType* type = c->findSymbolOfTypeByQualifiedName<QUrlType>(
-            c->internName("qt.QUrl"), false);
+        const MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
+        const QUrlType* type = c->findSymbolOfTypeByQualifiedName<QUrlType>(c->internName("qt.QUrl"), false);
         QObject* o = object<QObject>(NODE_ARG_OBJECT(0, ClassInstance));
         QMetaProperty prop = getprop(NODE_THIS, NODE_THREAD, o);
         QVariant v = prop.read(o);
@@ -500,11 +468,8 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(getpropKeySeq, Pointer)
     {
-        const MuLangContext* c =
-            static_cast<MuLangContext*>(NODE_THREAD.context());
-        const QKeySequenceType* type =
-            c->findSymbolOfTypeByQualifiedName<QKeySequenceType>(
-                c->internName("qt.QKeySequence"), false);
+        const MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
+        const QKeySequenceType* type = c->findSymbolOfTypeByQualifiedName<QKeySequenceType>(c->internName("qt.QKeySequence"), false);
         QObject* o = object<QObject>(NODE_ARG_OBJECT(0, ClassInstance));
         QMetaProperty prop = getprop(NODE_THIS, NODE_THREAD, o);
         QVariant v = prop.read(o);
@@ -520,10 +485,8 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(getpropColor, Pointer)
     {
-        const MuLangContext* c =
-            static_cast<MuLangContext*>(NODE_THREAD.context());
-        const QColorType* type = c->findSymbolOfTypeByQualifiedName<QColorType>(
-            c->internName("qt.QColor"), false);
+        const MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
+        const QColorType* type = c->findSymbolOfTypeByQualifiedName<QColorType>(c->internName("qt.QColor"), false);
         QObject* o = object<QObject>(NODE_ARG_OBJECT(0, ClassInstance));
         QMetaProperty prop = getprop(NODE_THIS, NODE_THREAD, o);
         QVariant v = prop.read(o);
@@ -731,8 +694,7 @@ namespace Mu
         QObject* a;
     };
 
-    QGenericArgument argument(STLVector<Pointer>::Type& gcCache, const Type* T,
-                              Value& v, QString& s, QVariant& qv)
+    QGenericArgument argument(STLVector<Pointer>::Type& gcCache, const Type* T, Value& v, QString& s, QVariant& qv)
     {
         //
         //  NOTE: this function is tricky. It has to return a ValueType**
@@ -758,16 +720,14 @@ namespace Mu
         }
         else if (T->name() == "string")
         {
-            StringType::String* str =
-                reinterpret_cast<StringType::String*>(v._Pointer);
+            StringType::String* str = reinterpret_cast<StringType::String*>(v._Pointer);
             s = str->c_str();
             return Q_ARG(QString, s);
         }
 
         else if (T->name() == "QVariant")
         {
-            QVariantType::Instance* tvar =
-                reinterpret_cast<QVariantType::Instance*>(v._Pointer);
+            QVariantType::Instance* tvar = reinterpret_cast<QVariantType::Instance*>(v._Pointer);
             qv = tvar->value;
             return Q_ARG(QVariant, qv);
         }
@@ -789,71 +749,51 @@ namespace Mu
 
         else if (T->name() == "QColor")
         {
-            return Q_ARG(
-                QColor,
-                reinterpret_cast<QColorType::Instance*>(v._Pointer)->value);
+            return Q_ARG(QColor, reinterpret_cast<QColorType::Instance*>(v._Pointer)->value);
         }
         else if (T->name() == "QPoint")
         {
-            return Q_ARG(
-                QPoint,
-                reinterpret_cast<QPointType::Instance*>(v._Pointer)->value);
+            return Q_ARG(QPoint, reinterpret_cast<QPointType::Instance*>(v._Pointer)->value);
         }
         else if (T->name() == "QUrl")
         {
-            return Q_ARG(
-                QUrl, reinterpret_cast<QUrlType::Instance*>(v._Pointer)->value);
+            return Q_ARG(QUrl, reinterpret_cast<QUrlType::Instance*>(v._Pointer)->value);
         }
         else if (T->name() == "QModelIndex")
         {
-            return Q_ARG(
-                QModelIndex,
-                reinterpret_cast<QModelIndexType::Instance*>(v._Pointer)
-                    ->value);
+            return Q_ARG(QModelIndex, reinterpret_cast<QModelIndexType::Instance*>(v._Pointer)->value);
         }
         else if (T->name() == "QKeySequence")
         {
-            return Q_ARG(
-                QKeySequence,
-                reinterpret_cast<QKeySequenceType::Instance*>(v._Pointer)
-                    ->value);
+            return Q_ARG(QKeySequence, reinterpret_cast<QKeySequenceType::Instance*>(v._Pointer)->value);
         }
         else if (T->name() == "QPixmap")
         {
-            return Q_ARG(
-                QPixmap,
-                reinterpret_cast<QPixmapType::Instance*>(v._Pointer)->value);
+            return Q_ARG(QPixmap, reinterpret_cast<QPixmapType::Instance*>(v._Pointer)->value);
         }
         else if (T->name() == "QItemSelection")
         {
-            return Q_ARG(
-                QItemSelection,
-                reinterpret_cast<QItemSelectionType::Instance*>(v._Pointer)
-                    ->value);
+            return Q_ARG(QItemSelection, reinterpret_cast<QItemSelectionType::Instance*>(v._Pointer)->value);
         }
         else if (T->name() == "QTreeWidgetItem")
         {
             ClassInstance* i = reinterpret_cast<ClassInstance*>(v._Pointer);
-            return Q_ARG(QTreeWidgetItem*,
-                         i->data<QTreeWidgetItemType::Struct>()->object);
+            return Q_ARG(QTreeWidgetItem*, i->data<QTreeWidgetItemType::Struct>()->object);
         }
         else if (T->name() == "QListWidgetItem")
         {
             ClassInstance* i = reinterpret_cast<ClassInstance*>(v._Pointer);
-            return Q_ARG(QListWidgetItem*,
-                         i->data<QListWidgetItemType::Struct>()->object);
+            return Q_ARG(QListWidgetItem*, i->data<QListWidgetItemType::Struct>()->object);
         }
         else if (T->name() == "QTableWidgetItem")
         {
             ClassInstance* i = reinterpret_cast<ClassInstance*>(v._Pointer);
-            return Q_ARG(QTableWidgetItem*,
-                         i->data<QTableWidgetItemType::Struct>()->object);
+            return Q_ARG(QTableWidgetItem*, i->data<QTableWidgetItemType::Struct>()->object);
         }
         else if (T->name() == "QStandardItem")
         {
             ClassInstance* i = reinterpret_cast<ClassInstance*>(v._Pointer);
-            return Q_ARG(QStandardItem*,
-                         i->data<QStandardItemType::Struct>()->object);
+            return Q_ARG(QStandardItem*, i->data<QStandardItemType::Struct>()->object);
         }
         else
         {
@@ -872,8 +812,7 @@ namespace Mu
 
             if (!result)
             {
-                cout << "ERROR: MuQt Bridge invokeMethod0 failed for "
-                     << method.methodSignature().constData() << endl;
+                cout << "ERROR: MuQt Bridge invokeMethod0 failed for " << method.methodSignature().constData() << endl;
             }
         }
         else
@@ -888,13 +827,11 @@ namespace Mu
         {
             bool rval;
             QMetaMethod method = getmethod(NODE_THIS, NODE_THREAD, o);
-            bool result = method.invoke(o, Qt::DirectConnection,
-                                        Q_RETURN_ARG(bool, rval));
+            bool result = method.invoke(o, Qt::DirectConnection, Q_RETURN_ARG(bool, rval));
 
             if (!result)
             {
-                cout << "ERROR: MuQt Bridge invokeMethod0 failed for "
-                     << method.methodSignature().constData() << endl;
+                cout << "ERROR: MuQt Bridge invokeMethod0 failed for " << method.methodSignature().constData() << endl;
             }
 
             NODE_RETURN(rval);
@@ -911,13 +848,11 @@ namespace Mu
         {
             int rval;
             QMetaMethod method = getmethod(NODE_THIS, NODE_THREAD, o);
-            bool result =
-                method.invoke(o, Qt::DirectConnection, Q_RETURN_ARG(int, rval));
+            bool result = method.invoke(o, Qt::DirectConnection, Q_RETURN_ARG(int, rval));
 
             if (!result)
             {
-                cout << "ERROR: MuQt Bridge invokeMethod0 failed for "
-                     << method.methodSignature().constData() << endl;
+                cout << "ERROR: MuQt Bridge invokeMethod0 failed for " << method.methodSignature().constData() << endl;
             }
 
             NODE_RETURN(rval);
@@ -941,14 +876,11 @@ namespace Mu
             QString s;
             QVariant v;
 
-            bool result =
-                method.invoke(o, Qt::DirectConnection,
-                              argument(gcCache, F->argType(1), p0, s, v));
+            bool result = method.invoke(o, Qt::DirectConnection, argument(gcCache, F->argType(1), p0, s, v));
 
             if (!result)
             {
-                cout << "ERROR: MuQt Bridge invokeMethod1 failed for "
-                     << method.methodSignature().constData() << endl;
+                cout << "ERROR: MuQt Bridge invokeMethod1 failed for " << method.methodSignature().constData() << endl;
             }
         }
         else
@@ -970,15 +902,12 @@ namespace Mu
             QString s1, s2;
             QVariant v1, v2;
 
-            bool result =
-                method.invoke(o, Qt::DirectConnection,
-                              argument(gcCache, F->argType(1), p0, s1, v1),
-                              argument(gcCache, F->argType(2), p1, s2, v2));
+            bool result = method.invoke(o, Qt::DirectConnection, argument(gcCache, F->argType(1), p0, s1, v1),
+                                        argument(gcCache, F->argType(2), p1, s2, v2));
 
             if (!result)
             {
-                cout << "ERROR: MuQt Bridge invokeMethod2 failed for "
-                     << method.methodSignature().constData() << endl;
+                cout << "ERROR: MuQt Bridge invokeMethod2 failed for " << method.methodSignature().constData() << endl;
             }
         }
         else
@@ -1001,16 +930,12 @@ namespace Mu
             QString s1, s2, s3;
             QVariant v1, v2, v3;
 
-            bool result =
-                method.invoke(o, Qt::DirectConnection,
-                              argument(gcCache, F->argType(1), p0, s1, v1),
-                              argument(gcCache, F->argType(2), p1, s2, v2),
-                              argument(gcCache, F->argType(3), p2, s3, v3));
+            bool result = method.invoke(o, Qt::DirectConnection, argument(gcCache, F->argType(1), p0, s1, v1),
+                                        argument(gcCache, F->argType(2), p1, s2, v2), argument(gcCache, F->argType(3), p2, s3, v3));
 
             if (!result)
             {
-                cout << "ERROR: MuQt Bridge invokeMethod3 failed for "
-                     << method.methodSignature().constData() << endl;
+                cout << "ERROR: MuQt Bridge invokeMethod3 failed for " << method.methodSignature().constData() << endl;
             }
         }
         else
@@ -1034,17 +959,13 @@ namespace Mu
             QString s1, s2, s3, s4;
             QVariant v1, v2, v3, v4;
 
-            bool result =
-                method.invoke(o, Qt::DirectConnection,
-                              argument(gcCache, F->argType(1), p0, s1, v1),
-                              argument(gcCache, F->argType(2), p1, s2, v2),
-                              argument(gcCache, F->argType(3), p2, s3, v3),
-                              argument(gcCache, F->argType(4), p3, s4, v4));
+            bool result = method.invoke(o, Qt::DirectConnection, argument(gcCache, F->argType(1), p0, s1, v1),
+                                        argument(gcCache, F->argType(2), p1, s2, v2), argument(gcCache, F->argType(3), p2, s3, v3),
+                                        argument(gcCache, F->argType(4), p3, s4, v4));
 
             if (!result)
             {
-                cout << "ERROR: MuQt Bridge invokeMethod4 failed for "
-                     << method.methodSignature().constData() << endl;
+                cout << "ERROR: MuQt Bridge invokeMethod4 failed for " << method.methodSignature().constData() << endl;
             }
         }
         else
@@ -1069,18 +990,13 @@ namespace Mu
             QString s1, s2, s3, s4, s5;
             QVariant v1, v2, v3, v4, v5;
 
-            bool result =
-                method.invoke(o, Qt::DirectConnection,
-                              argument(gcCache, F->argType(1), p0, s1, v1),
-                              argument(gcCache, F->argType(2), p1, s2, v2),
-                              argument(gcCache, F->argType(3), p2, s3, v3),
-                              argument(gcCache, F->argType(4), p3, s4, v4),
-                              argument(gcCache, F->argType(5), p4, s5, v5));
+            bool result = method.invoke(o, Qt::DirectConnection, argument(gcCache, F->argType(1), p0, s1, v1),
+                                        argument(gcCache, F->argType(2), p1, s2, v2), argument(gcCache, F->argType(3), p2, s3, v3),
+                                        argument(gcCache, F->argType(4), p3, s4, v4), argument(gcCache, F->argType(5), p4, s5, v5));
 
             if (!result)
             {
-                cout << "ERROR: MuQt Bridge invokeMethod5 failed for "
-                     << method.methodSignature().constData() << endl;
+                cout << "ERROR: MuQt Bridge invokeMethod5 failed for " << method.methodSignature().constData() << endl;
             }
         }
         else
@@ -1091,9 +1007,7 @@ namespace Mu
 
     //----------------------------------------------------------------------
 
-    bool isKnownDeprecatedSignal(const char* className,
-                                 const std::string& signalName,
-                                 const char* fullSignature)
+    bool isKnownDeprecatedSignal(const char* className, const std::string& signalName, const char* fullSignature)
     {
         const std::string classStr = className;
         const std::string sigStr = fullSignature;
@@ -1106,8 +1020,7 @@ namespace Mu
                 // The deprecated version: finished(int exitCode)
                 // The current version: finished(int exitCode,
                 // QProcess::ExitStatus exitStatus)
-                if (sigStr == "finished(int)"
-                    || sigStr.find("finished(int)") == 0)
+                if (sigStr == "finished(int)" || sigStr.find("finished(int)") == 0)
                 {
                     return true;
                 }
@@ -1131,35 +1044,21 @@ namespace Mu
         MuLangContext* context = static_cast<MuLangContext*>(c->context());
 
         const QMetaObject* parent = m.superClass();
-        QIconType* iconType =
-            context->findSymbolOfTypeByQualifiedName<QIconType>(
-                context->internName("qt.QIcon"), false);
-        QSizeType* sizeType =
-            context->findSymbolOfTypeByQualifiedName<QSizeType>(
-                context->internName("qt.QSize"), false);
+        QIconType* iconType = context->findSymbolOfTypeByQualifiedName<QIconType>(context->internName("qt.QIcon"), false);
+        QSizeType* sizeType = context->findSymbolOfTypeByQualifiedName<QSizeType>(context->internName("qt.QSize"), false);
 
-        QPointType* pointType =
-            context->findSymbolOfTypeByQualifiedName<QPointType>(
-                context->internName("qt.QPoint"), false);
+        QPointType* pointType = context->findSymbolOfTypeByQualifiedName<QPointType>(context->internName("qt.QPoint"), false);
 
-        QRectType* rectType =
-            context->findSymbolOfTypeByQualifiedName<QRectType>(
-                context->internName("qt.QRect"), false);
+        QRectType* rectType = context->findSymbolOfTypeByQualifiedName<QRectType>(context->internName("qt.QRect"), false);
 
-        QFontType* fontType =
-            context->findSymbolOfTypeByQualifiedName<QFontType>(
-                context->internName("qt.QFont"), false);
+        QFontType* fontType = context->findSymbolOfTypeByQualifiedName<QFontType>(context->internName("qt.QFont"), false);
 
-        QUrlType* urlType = context->findSymbolOfTypeByQualifiedName<QUrlType>(
-            context->internName("qt.QUrl"), false);
+        QUrlType* urlType = context->findSymbolOfTypeByQualifiedName<QUrlType>(context->internName("qt.QUrl"), false);
 
-        QColorType* colorType =
-            context->findSymbolOfTypeByQualifiedName<QColorType>(
-                context->internName("qt.QColor"), false);
+        QColorType* colorType = context->findSymbolOfTypeByQualifiedName<QColorType>(context->internName("qt.QColor"), false);
 
         QKeySequenceType* keysequenceType =
-            context->findSymbolOfTypeByQualifiedName<QKeySequenceType>(
-                context->internName("qt.QKeySequence"), false);
+            context->findSymbolOfTypeByQualifiedName<QKeySequenceType>(context->internName("qt.QKeySequence"), false);
 
         // Class* actionType =
         //     context->findSymbolOfTypeByQualifiedName<Class>(context->internName("qt.QAction"),
@@ -1189,8 +1088,7 @@ namespace Mu
 
             for (int q = 0; q < e.keyCount(); q++)
             {
-                SymbolicConstant* sc = new SymbolicConstant(
-                    context, e.key(q), "int", Value(e.keyToValue(e.key(q))));
+                SymbolicConstant* sc = new SymbolicConstant(context, e.key(q), "int", Value(e.keyToValue(e.key(q))));
 
                 c->addSymbol(sc);
 
@@ -1327,9 +1225,7 @@ namespace Mu
             {
                 if (mp.isReadable() && !getexclude)
                 {
-                    Function* F =
-                        new Function(context, getname.c_str(), rtype, 1,
-                                     &params.front(), getfunc, Function::None);
+                    Function* F = new Function(context, getname.c_str(), rtype, 1, &params.front(), getfunc, Function::None);
                     c->addSymbol(F);
 
                     if (verbose)
@@ -1346,9 +1242,7 @@ namespace Mu
                     params[0] = new ParameterVariable(context, "this", c);
                     params[1] = new ParameterVariable(context, "value", rtype);
 
-                    Function* F = new Function(
-                        context, setname.c_str(), context->voidType(), 2,
-                        &params.front(), putfunc, Function::None);
+                    Function* F = new Function(context, setname.c_str(), context->voidType(), 2, &params.front(), putfunc, Function::None);
                     c->addSymbol(F);
 
                     if (verbose)
@@ -1363,8 +1257,7 @@ namespace Mu
             {
                 if (verbose)
                 {
-                    cout << "SKIPPING: property " << getname << " (+ "
-                         << setname << ") : " << mp.typeName() << " in class "
+                    cout << "SKIPPING: property " << getname << " (+ " << setname << ") : " << mp.typeName() << " in class "
                          << m.className() << endl;
                 }
             }
@@ -1376,10 +1269,7 @@ namespace Mu
             bool isBoolType = !strcmp(mm.typeName(), "bool");
             bool isIntType = !strcmp(mm.typeName(), "int");
 
-            if ((parent
-                 && parent->indexOfMethod(
-                        parent->normalizedSignature(mm.methodSignature()))
-                        != -1)
+            if ((parent && parent->indexOfMethod(parent->normalizedSignature(mm.methodSignature())) != -1)
                 || mm.methodSignature()[0] == '_')
             {
                 continue;
@@ -1387,29 +1277,22 @@ namespace Mu
 
             if (verbose)
             {
-                std::cout << "Method: " << mm.methodSignature().constData()
-                          << std::endl;
+                std::cout << "Method: " << mm.methodSignature().constData() << std::endl;
             }
 
             // Skip known deprecated signals to avoid errors at runtime.
             if (mm.methodType() == QMetaMethod::Signal)
             {
-                std::string currentSignalName =
-                    mm.methodSignature().constData();
+                std::string currentSignalName = mm.methodSignature().constData();
                 std::string::size_type parenPos = currentSignalName.find('(');
-                currentSignalName.erase(parenPos,
-                                        currentSignalName.size() - parenPos);
+                currentSignalName.erase(parenPos, currentSignalName.size() - parenPos);
 
-                bool deprecated =
-                    isKnownDeprecatedSignal(m.className(), currentSignalName,
-                                            mm.methodSignature().constData());
+                bool deprecated = isKnownDeprecatedSignal(m.className(), currentSignalName, mm.methodSignature().constData());
                 if (deprecated)
                 {
                     if (verbose)
                     {
-                        std::cout << "Skipping known deprecated signal: "
-                                  << mm.methodSignature().constData()
-                                  << std::endl;
+                        std::cout << "Skipping known deprecated signal: " << mm.methodSignature().constData() << std::endl;
                     }
                     continue;
                 }
@@ -1433,58 +1316,47 @@ namespace Mu
 
                 if (t == "int" || t.find("::") != string::npos)
                 {
-                    params.push_back(new ParameterVariable(context, n.c_str(),
-                                                           context->intType()));
+                    params.push_back(new ParameterVariable(context, n.c_str(), context->intType()));
                 }
                 else if (t == "QString")
                 {
-                    params.push_back(new ParameterVariable(
-                        context, n.c_str(), context->stringType()));
+                    params.push_back(new ParameterVariable(context, n.c_str(), context->stringType()));
                 }
                 else if (t == "QIcon")
                 {
-                    params.push_back(
-                        new ParameterVariable(context, n.c_str(), iconType));
+                    params.push_back(new ParameterVariable(context, n.c_str(), iconType));
                 }
                 else if (t == "QSize")
                 {
-                    params.push_back(
-                        new ParameterVariable(context, n.c_str(), sizeType));
+                    params.push_back(new ParameterVariable(context, n.c_str(), sizeType));
                 }
                 else if (t == "QRect")
                 {
-                    params.push_back(
-                        new ParameterVariable(context, n.c_str(), rectType));
+                    params.push_back(new ParameterVariable(context, n.c_str(), rectType));
                 }
                 else if (t == "QPoint")
                 {
-                    params.push_back(
-                        new ParameterVariable(context, n.c_str(), pointType));
+                    params.push_back(new ParameterVariable(context, n.c_str(), pointType));
                 }
                 else if (t == "QFont")
                 {
-                    params.push_back(
-                        new ParameterVariable(context, n.c_str(), fontType));
+                    params.push_back(new ParameterVariable(context, n.c_str(), fontType));
                 }
                 else if (t == "QUrl")
                 {
-                    params.push_back(
-                        new ParameterVariable(context, n.c_str(), urlType));
+                    params.push_back(new ParameterVariable(context, n.c_str(), urlType));
                 }
                 else if (t == "QColor")
                 {
-                    params.push_back(
-                        new ParameterVariable(context, n.c_str(), colorType));
+                    params.push_back(new ParameterVariable(context, n.c_str(), colorType));
                 }
                 else if (t == "qreal")
                 {
-                    params.push_back(new ParameterVariable(
-                        context, n.c_str(), context->doubleType()));
+                    params.push_back(new ParameterVariable(context, n.c_str(), context->doubleType()));
                 }
                 else if (t == "bool")
                 {
-                    params.push_back(new ParameterVariable(
-                        context, n.c_str(), context->boolType()));
+                    params.push_back(new ParameterVariable(context, n.c_str(), context->boolType()));
                 }
                 else if (t.find("QAction*") != string::npos)
                 {
@@ -1495,8 +1367,7 @@ namespace Mu
                         n = str.str();
                     }
 
-                    params.push_back(new ParameterVariable(context, n.c_str(),
-                                                           "qt.QAction"));
+                    params.push_back(new ParameterVariable(context, n.c_str(), "qt.QAction"));
                 }
                 else if (t.find("QTreeWidgetItem*") != string::npos)
                 {
@@ -1507,8 +1378,7 @@ namespace Mu
                         n = str.str();
                     }
 
-                    params.push_back(new ParameterVariable(
-                        context, n.c_str(), "qt.QTreeWidgetItem"));
+                    params.push_back(new ParameterVariable(context, n.c_str(), "qt.QTreeWidgetItem"));
                 }
                 else if (t.find("QListWidgetItem*") != string::npos)
                 {
@@ -1519,8 +1389,7 @@ namespace Mu
                         n = str.str();
                     }
 
-                    params.push_back(new ParameterVariable(
-                        context, n.c_str(), "qt.QListWidgetItem"));
+                    params.push_back(new ParameterVariable(context, n.c_str(), "qt.QListWidgetItem"));
                 }
                 else if (t.find("QTableWidgetItem*") != string::npos)
                 {
@@ -1531,8 +1400,7 @@ namespace Mu
                         n = str.str();
                     }
 
-                    params.push_back(new ParameterVariable(
-                        context, n.c_str(), "qt.QTableWidgetItem"));
+                    params.push_back(new ParameterVariable(context, n.c_str(), "qt.QTableWidgetItem"));
                 }
                 else if (t.find("QStandardItem*") != string::npos)
                 {
@@ -1543,8 +1411,7 @@ namespace Mu
                         n = str.str();
                     }
 
-                    params.push_back(new ParameterVariable(context, n.c_str(),
-                                                           "qt.QStandardItem"));
+                    params.push_back(new ParameterVariable(context, n.c_str(), "qt.QStandardItem"));
                 }
                 else if (t == "QModelIndex")
                 {
@@ -1555,8 +1422,7 @@ namespace Mu
                         n = str.str();
                     }
 
-                    params.push_back(new ParameterVariable(context, n.c_str(),
-                                                           "qt.QModelIndex"));
+                    params.push_back(new ParameterVariable(context, n.c_str(), "qt.QModelIndex"));
                 }
                 else if (t == "QKeySequence")
                 {
@@ -1567,8 +1433,7 @@ namespace Mu
                         n = str.str();
                     }
 
-                    params.push_back(new ParameterVariable(context, n.c_str(),
-                                                           "qt.QKeySequence"));
+                    params.push_back(new ParameterVariable(context, n.c_str(), "qt.QKeySequence"));
                 }
                 else if (t == "QPixmap")
                 {
@@ -1579,8 +1444,7 @@ namespace Mu
                         n = str.str();
                     }
 
-                    params.push_back(new ParameterVariable(context, n.c_str(),
-                                                           "qt.QPixmap"));
+                    params.push_back(new ParameterVariable(context, n.c_str(), "qt.QPixmap"));
                 }
                 else if (t == "QItemSelection")
                 {
@@ -1591,8 +1455,7 @@ namespace Mu
                         n = str.str();
                     }
 
-                    params.push_back(new ParameterVariable(
-                        context, n.c_str(), "qt.QItemSelection"));
+                    params.push_back(new ParameterVariable(context, n.c_str(), "qt.QItemSelection"));
                 }
                 else
                 {
@@ -1643,9 +1506,7 @@ namespace Mu
                 else if (isIntType)
                     rtype = context->intType();
 
-                Function* F =
-                    new Function(context, fname.c_str(), rtype, params.size(),
-                                 &params.front(), func, Function::None);
+                Function* F = new Function(context, fname.c_str(), rtype, params.size(), &params.front(), func, Function::None);
 
                 c->addSymbol(F);
 

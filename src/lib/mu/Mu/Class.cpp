@@ -114,8 +114,7 @@ namespace Mu
         }
     }
 
-    void Class::findSymbols(QualifiedName name,
-                            ConstSymbolVector& symbols) const
+    void Class::findSymbols(QualifiedName name, ConstSymbolVector& symbols) const
     {
         Symbol::findSymbols(name, symbols);
 
@@ -164,10 +163,7 @@ namespace Mu
         return true;
     }
 
-    Value Class::nodeEval(const Node* n, Thread& thread) const
-    {
-        return Value((*n->func()._PointerFunc)(*n, thread));
-    }
+    Value Class::nodeEval(const Node* n, Thread& thread) const { return Value((*n->func()._PointerFunc)(*n, thread)); }
 
     void Class::nodeEval(void* p, const Node* n, Thread& thread) const
     {
@@ -175,8 +171,7 @@ namespace Mu
         *pp = (*n->func()._PointerFunc)(*n, thread);
     }
 
-    void Class::outputValueRecursive(ostream& o, const ValuePointer valuePtr,
-                                     ValueOutputState& state) const
+    void Class::outputValueRecursive(ostream& o, const ValuePointer valuePtr, ValueOutputState& state) const
     {
         if (!valuePtr)
             return;
@@ -186,8 +181,7 @@ namespace Mu
         {
             o << fullyQualifiedName() << " {";
 
-            if (state.traversedObjects.find(obj)
-                != state.traversedObjects.end())
+            if (state.traversedObjects.find(obj) != state.traversedObjects.end())
             {
                 o << "...ad infinitum...";
             }
@@ -273,8 +267,7 @@ namespace Mu
                 {
                     for (s = s->firstOverload(); s; s = s->nextOverload())
                     {
-                        if (const Function* f =
-                                dynamic_cast<const Function*>(s))
+                        if (const Function* f = dynamic_cast<const Function*>(s))
                         {
                             if (memberMatch(sig, f->signature()))
                             {
@@ -334,8 +327,7 @@ namespace Mu
         }
     }
 
-    ClassInstance* Class::dynamicCast(ClassInstance* obj, const Class* c,
-                                      bool upcastOK) const
+    ClassInstance* Class::dynamicCast(ClassInstance* obj, const Class* c, bool upcastOK) const
     {
         if (_nebulousAncestry)
         {
@@ -349,10 +341,7 @@ namespace Mu
             for (size_t i = 0, s = _superClasses.size(); i < s; i++)
             {
                 const Class* super = _superClasses[i];
-                ClassInstance* sobj =
-                    i ? (reinterpret_cast<ClassInstance*>(obj->structure()
-                                                          + _superOffsets[i]))
-                      : obj;
+                ClassInstance* sobj = i ? (reinterpret_cast<ClassInstance*>(obj->structure() + _superOffsets[i])) : obj;
 
                 if (sobj = super->dynamicCast(sobj, c, false))
                 {
@@ -436,25 +425,18 @@ namespace Mu
                         {
                             if (i == 1)
                             {
-                                return supers.front()->dynamicCast(bobj, c,
-                                                                   false);
+                                return supers.front()->dynamicCast(bobj, c, false);
                             }
                             else
                             {
-                                ClassInstance* sobj =
-                                    reinterpret_cast<ClassInstance*>(
-                                        bobj->structure() + offsets[i - 1]);
+                                ClassInstance* sobj = reinterpret_cast<ClassInstance*>(bobj->structure() + offsets[i - 1]);
 
-                                return supers[i - 1]->dynamicCast(sobj, c,
-                                                                  false);
+                                return supers[i - 1]->dynamicCast(sobj, c, false);
                             }
                         }
-                        else if (i == offsets.size() - 1
-                                 && i < btype->instanceSize())
+                        else if (i == offsets.size() - 1 && i < btype->instanceSize())
                         {
-                            ClassInstance* sobj =
-                                reinterpret_cast<ClassInstance*>(
-                                    bobj->structure() + offsets[i]);
+                            ClassInstance* sobj = reinterpret_cast<ClassInstance*>(bobj->structure() + offsets[i]);
 
                             return supers[i]->dynamicCast(sobj, c, false);
                         }
@@ -468,8 +450,7 @@ namespace Mu
 
     bool Class::nebulousIsA(const Class*) const
     {
-        cerr << "IMPLEMENTATION ERROR: Class " << name()
-             << " did not implement Class::nebulousIsA()" << endl;
+        cerr << "IMPLEMENTATION ERROR: Class " << name() << " did not implement Class::nebulousIsA()" << endl;
         abort();
 
         /* AJG - added to appease "return required" */
@@ -500,8 +481,7 @@ namespace Mu
         {
             for (const Symbol* s = sym; s; s = s->nextOverload())
             {
-                if (const MemberFunction* f =
-                        dynamic_cast<const MemberFunction*>(s))
+                if (const MemberFunction* f = dynamic_cast<const MemberFunction*>(s))
                 {
                     if (memberMatch(f->signature(), F->signature()))
                         return f;
@@ -568,8 +548,7 @@ namespace Mu
         //
 
         size_t start = 0;
-        _isGCAtomic =
-            !_superClasses.empty() ? _superClasses.front()->isGCAtomic() : true;
+        _isGCAtomic = !_superClasses.empty() ? _superClasses.front()->isGCAtomic() : true;
         Context* c = context();
         MemberVariableVector mvars;
         _superOffsets.resize(_superClasses.size());
@@ -597,8 +576,7 @@ namespace Mu
                 n += s->name().c_str();
 
                 _superOffsets[i] = _memberVariables.size();
-                InternalTypeMemberVariable* im =
-                    new InternalTypeMemberVariable(c, n.c_str(), s);
+                InternalTypeMemberVariable* im = new InternalTypeMemberVariable(c, n.c_str(), s);
 
                 _typeMembers.push_back(im);
                 _memberVariables.push_back(im);
@@ -610,8 +588,7 @@ namespace Mu
                 MemberVariable* m0 = s->_memberVariables[q];
                 MemberVariable* m = 0;
 
-                if (InternalTypeMemberVariable* tm =
-                        dynamic_cast<InternalTypeMemberVariable*>(m0))
+                if (InternalTypeMemberVariable* tm = dynamic_cast<InternalTypeMemberVariable*>(m0))
                 {
                     //
                     //  This is coming from one of the base classes. Its
@@ -620,16 +597,13 @@ namespace Mu
                     //  this in ClassInstance.
                     //
 
-                    InternalTypeMemberVariable* im =
-                        new InternalTypeMemberVariable(c, m0->name().c_str(),
-                                                       tm->value());
+                    InternalTypeMemberVariable* im = new InternalTypeMemberVariable(c, m0->name().c_str(), tm->value());
                     m = im;
                     _typeMembers.push_back(im);
                 }
                 else
                 {
-                    m = new MemberVariable(c, m0->name().c_str(),
-                                           m0->storageClassName().c_str());
+                    m = new MemberVariable(c, m0->name().c_str(), m0->storageClassName().c_str());
                 }
 
                 Symbol::addSymbol(m);
@@ -637,8 +611,7 @@ namespace Mu
             }
 
             size_t pos = i ? _memberVariables.size() : 0;
-            _memberVariables.insert(_memberVariables.begin() + pos,
-                                    mvars.begin(), mvars.end());
+            _memberVariables.insert(_memberVariables.begin() + pos, mvars.begin(), mvars.end());
         }
 
         //
@@ -667,8 +640,7 @@ namespace Mu
         {
             for (size_t i = 0; i < _superClasses.size(); i++)
             {
-                _superOffsets[i] =
-                    _memberVariables[_superOffsets[i]]->instanceOffset();
+                _superOffsets[i] = _memberVariables[_superOffsets[i]]->instanceOffset();
             }
         }
     }
@@ -717,8 +689,7 @@ namespace Mu
         }
     }
 
-    void Class::findOverridingFunctions(const MemberFunction* mf,
-                                        MemberFunctionVector& funcs) const
+    void Class::findOverridingFunctions(const MemberFunction* mf, MemberFunctionVector& funcs) const
     {
         const Class::ClassVector& derived = derivedClasses();
         // cout << "Looking in ";
@@ -731,11 +702,9 @@ namespace Mu
 
             if (const Symbol* fo = d->findSymbolOfType<Symbol>(mf->name()))
             {
-                for (const Symbol* s = fo->firstOverload(); s;
-                     s = s->nextOverload())
+                for (const Symbol* s = fo->firstOverload(); s; s = s->nextOverload())
                 {
-                    if (const MemberFunction* sf =
-                            dynamic_cast<const MemberFunction*>(s))
+                    if (const MemberFunction* sf = dynamic_cast<const MemberFunction*>(s))
                     {
                         // cout << "  comparing ";
                         // sf->output(cout);
@@ -753,15 +722,9 @@ namespace Mu
         }
     }
 
-    void Class::constructInstance(Pointer p) const
-    {
-        new (p) ClassInstance(this);
-    }
+    void Class::constructInstance(Pointer p) const { new (p) ClassInstance(this); }
 
-    void Class::copyInstance(Pointer a, Pointer b) const
-    {
-        memcpy(b, a, objectSize());
-    }
+    void Class::copyInstance(Pointer a, Pointer b) const { memcpy(b, a, objectSize()); }
 
     bool Class::isInBaseClass(const MemberVariable* v) const
     {
@@ -781,8 +744,7 @@ namespace Mu
     {
         // if (_superClasses.empty())
         // {
-        copy(_memberVariables.begin(), _memberVariables.end(),
-             back_inserter(vars));
+        copy(_memberVariables.begin(), _memberVariables.end(), back_inserter(vars));
         // }
         // else
         // {

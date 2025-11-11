@@ -32,8 +32,7 @@ namespace TwkFB
         FileStream* stream;
     };
 
-    IOjpeg::IOjpeg(StorageFormat format, IOType type, size_t chunkSize,
-                   int maxAsync)
+    IOjpeg::IOjpeg(StorageFormat format, IOType type, size_t chunkSize, int maxAsync)
         : StreamingFrameBufferIO("IOjpeg", "m2", type, chunkSize, maxAsync)
         , m_error(false)
         , m_format(format)
@@ -75,9 +74,7 @@ namespace TwkFB
         if (m_error)
         {
             m_error = false;
-            TWK_THROW_STREAM(TwkFB::IOException,
-                             "JPEG: failed to open jpeg file \""
-                                 << state.filename << "\"");
+            TWK_THROW_STREAM(TwkFB::IOException, "JPEG: failed to open jpeg file \"" << state.filename << "\"");
         }
     }
 
@@ -152,18 +149,15 @@ namespace TwkFB
         }
 
         jpeg_save_markers(&cinfo, JPEG_COM,
-                          0xFFFF); // comment marker (0xffff == all)
+                          0xFFFF);                      // comment marker (0xffff == all)
         jpeg_save_markers(&cinfo, EXIF_MARKER, 0xFFFF); // EXIF marker
         jpeg_save_markers(&cinfo, ICC_MARKER, 0xFFFF);  // ICC marker
 
-        unsigned int magic = (unsigned int)getc(state.file) << 16
-                             | (unsigned int)getc(state.file) << 8
-                             | (unsigned int)getc(state.file);
+        unsigned int magic = (unsigned int)getc(state.file) << 16 | (unsigned int)getc(state.file) << 8 | (unsigned int)getc(state.file);
 
         if (magic != 0xFFD8FF)
         {
-            TWK_THROW_STREAM(IOException,
-                             "JPEG: not a jpeg file: " << filename);
+            TWK_THROW_STREAM(IOException, "JPEG: not a jpeg file: " << filename);
         }
         else
         {
@@ -174,8 +168,7 @@ namespace TwkFB
 
         if (jpeg_read_header(&cinfo, TRUE) != JPEG_HEADER_OK)
         {
-            TWK_THROW_STREAM(TwkFB::IOException,
-                             "JPEG: not a jpeg file \"" << filename);
+            TWK_THROW_STREAM(TwkFB::IOException, "JPEG: not a jpeg file \"" << filename);
         }
 
         throwError(state);
@@ -212,8 +205,7 @@ namespace TwkFB
     //  Main entry point for reading
     //
 
-    void IOjpeg::readImage(FrameBuffer& fb, const std::string& filename,
-                           const ReadRequest& request) const
+    void IOjpeg::readImage(FrameBuffer& fb, const std::string& filename, const ReadRequest& request) const
     {
         struct jpeg_decompress_struct cinfo;
         struct jpeg_error_mgr jerr;
@@ -224,7 +216,7 @@ namespace TwkFB
         cinfo.client_data = (void*)this;
 
         jpeg_save_markers(&cinfo, JPEG_COM,
-                          0xFFFF); // comment marker (0xffff == all)
+                          0xFFFF);                      // comment marker (0xffff == all)
         jpeg_save_markers(&cinfo, EXIF_MARKER, 0xFFFF); // EXIF marker
         jpeg_save_markers(&cinfo, ICC_MARKER, 0xFFFF);  // ICC marker
 
@@ -235,17 +227,14 @@ namespace TwkFB
         {
             if (!(state.file = TwkUtil::fopen(state.filename.c_str(), "rb")))
             {
-                TWK_THROW_STREAM(IOException, "Cannot open " << state.filename
-                                                             << " for reading");
+                TWK_THROW_STREAM(IOException, "Cannot open " << state.filename << " for reading");
             }
 
             jpeg_stdio_src(&cinfo, state.file);
         }
         else
         {
-            state.stream = new FileStream(
-                state.filename, (FileStream::Type)((unsigned int)m_iotype - 1),
-                m_iosize, m_iomaxAsync);
+            state.stream = new FileStream(state.filename, (FileStream::Type)((unsigned int)m_iotype - 1), m_iosize, m_iomaxAsync);
 
             incore_src.stream = state.stream;
             incore_src.init_source = init_source;
@@ -272,8 +261,7 @@ namespace TwkFB
 
         if (cinfo.Y_density != cinfo.X_density)
         {
-            fb.setPixelAspectRatio(
-                float(double(cinfo.X_density) / double(cinfo.Y_density)));
+            fb.setPixelAspectRatio(float(double(cinfo.X_density) / double(cinfo.Y_density)));
         }
 
         StorageFormat outformat = RGB;
@@ -290,9 +278,7 @@ namespace TwkFB
             }
         }
 
-        if (informat == YUV && cinfo.num_components == 3
-            && cinfo.progressive_mode == FALSE
-            && cinfo.jpeg_color_space == JCS_YCbCr)
+        if (informat == YUV && cinfo.num_components == 3 && cinfo.progressive_mode == FALSE && cinfo.jpeg_color_space == JCS_YCbCr)
         {
             //
             //  Use YUV reader if request and for three channel
@@ -301,8 +287,7 @@ namespace TwkFB
 
             outformat = informat;
         }
-        else if (informat == RGBA && cinfo.num_components == 3
-                 && cinfo.progressive_mode == FALSE)
+        else if (informat == RGBA && cinfo.num_components == 3 && cinfo.progressive_mode == FALSE)
         {
             outformat = informat;
         }
@@ -353,11 +338,9 @@ namespace TwkFB
             jpeg_component_info* c = cinfo.cur_comp_info[i];
             int rows = c->height_in_blocks * DCTSIZE;
 
-            chw[i] = int(double(c->h_samp_factor)
-                         / double(cinfo.max_h_samp_factor) * double(w));
+            chw[i] = int(double(c->h_samp_factor) / double(cinfo.max_h_samp_factor) * double(w));
 
-            chh[i] = int(double(c->v_samp_factor)
-                         / double(cinfo.max_v_samp_factor) * double(h));
+            chh[i] = int(double(c->v_samp_factor) / double(cinfo.max_v_samp_factor) * double(h));
 
             chx[i] = rows - chh[i];
         }
@@ -369,10 +352,8 @@ namespace TwkFB
             U = fb.nextPlane();
             V = U->nextPlane();
 
-            U->restructure(chw[1], chh[1], 0, 1, type, 0, 0, orient, true,
-                           chx[1]);
-            V->restructure(chw[2], chh[2], 0, 1, type, 0, 0, orient, true,
-                           chx[2]);
+            U->restructure(chw[1], chh[1], 0, 1, type, 0, 0, orient, true, chx[1]);
+            V->restructure(chw[2], chh[2], 0, 1, type, 0, 0, orient, true, chx[2]);
         }
         else
         {
@@ -383,10 +364,8 @@ namespace TwkFB
                 delete old;
             }
 
-            U = new FrameBuffer(FrameBuffer::PixelCoordinates, chw[1], chh[1],
-                                0, 1, type, 0, 0, orient, true, chx[1]);
-            V = new FrameBuffer(FrameBuffer::PixelCoordinates, chw[2], chh[2],
-                                0, 1, type, 0, 0, orient, true, chx[2]);
+            U = new FrameBuffer(FrameBuffer::PixelCoordinates, chw[1], chh[1], 0, 1, type, 0, 0, orient, true, chx[1]);
+            V = new FrameBuffer(FrameBuffer::PixelCoordinates, chw[2], chh[2], 0, 1, type, 0, 0, orient, true, chx[2]);
 
             fb.appendPlane(U);
             fb.appendPlane(V);
@@ -413,72 +392,44 @@ namespace TwkFB
 
     static bool marker_is_icc(jpeg_saved_marker_ptr marker)
     {
-        return marker->marker == ICC_MARKER
-               && marker->data_length >= ICC_OVERHEAD_LEN &&
+        return marker->marker == ICC_MARKER && marker->data_length >= ICC_OVERHEAD_LEN &&
                /* verify the identifying string */
-               GETJOCTET(marker->data[0]) == 0x49
-               && GETJOCTET(marker->data[1]) == 0x43
-               && GETJOCTET(marker->data[2]) == 0x43
-               && GETJOCTET(marker->data[3]) == 0x5F
-               && GETJOCTET(marker->data[4]) == 0x50
-               && GETJOCTET(marker->data[5]) == 0x52
-               && GETJOCTET(marker->data[6]) == 0x4F
-               && GETJOCTET(marker->data[7]) == 0x46
-               && GETJOCTET(marker->data[8]) == 0x49
-               && GETJOCTET(marker->data[9]) == 0x4C
-               && GETJOCTET(marker->data[10]) == 0x45
-               && GETJOCTET(marker->data[11]) == 0x0;
+               GETJOCTET(marker->data[0]) == 0x49 && GETJOCTET(marker->data[1]) == 0x43 && GETJOCTET(marker->data[2]) == 0x43
+               && GETJOCTET(marker->data[3]) == 0x5F && GETJOCTET(marker->data[4]) == 0x50 && GETJOCTET(marker->data[5]) == 0x52
+               && GETJOCTET(marker->data[6]) == 0x4F && GETJOCTET(marker->data[7]) == 0x46 && GETJOCTET(marker->data[8]) == 0x49
+               && GETJOCTET(marker->data[9]) == 0x4C && GETJOCTET(marker->data[10]) == 0x45 && GETJOCTET(marker->data[11]) == 0x0;
     }
 
     static bool marker_is_exif(jpeg_saved_marker_ptr marker)
     {
-        return marker->marker == EXIF_MARKER
-               && marker->data_length >= EXIF_OVERHEAD_LEN &&
+        return marker->marker == EXIF_MARKER && marker->data_length >= EXIF_OVERHEAD_LEN &&
                /* verify the identifying string */
-               GETJOCTET(marker->data[0]) == 'E'
-               && GETJOCTET(marker->data[1]) == 'x'
-               && GETJOCTET(marker->data[2]) == 'i'
-               && GETJOCTET(marker->data[3]) == 'f'
-               && GETJOCTET(marker->data[4]) == 0x0
-               && GETJOCTET(marker->data[5]) == 0x0;
+               GETJOCTET(marker->data[0]) == 'E' && GETJOCTET(marker->data[1]) == 'x' && GETJOCTET(marker->data[2]) == 'i'
+               && GETJOCTET(marker->data[3]) == 'f' && GETJOCTET(marker->data[4]) == 0x0 && GETJOCTET(marker->data[5]) == 0x0;
     }
 
     static bool marker_is_photoshop(jpeg_saved_marker_ptr marker)
     {
-        return marker->marker == PHOTOSHOP_MARKER
-               && marker->data_length >= ICC_OVERHEAD_LEN &&
+        return marker->marker == PHOTOSHOP_MARKER && marker->data_length >= ICC_OVERHEAD_LEN &&
                /* verify the identifying string */
-               GETJOCTET(marker->data[0]) == 0x50
-               && GETJOCTET(marker->data[1]) == 0x68
-               && GETJOCTET(marker->data[2]) == 0x6F
-               && GETJOCTET(marker->data[3]) == 0x74
-               && GETJOCTET(marker->data[4]) == 0x6F
-               && GETJOCTET(marker->data[5]) == 0x73
-               && GETJOCTET(marker->data[6]) == 0x68
-               && GETJOCTET(marker->data[7]) == 0x6F
-               && GETJOCTET(marker->data[8]) == 0x70
-               && GETJOCTET(marker->data[9]) == 0x20
-               && GETJOCTET(marker->data[10]) == 0x33
-               && GETJOCTET(marker->data[11]) == 0x2E
-               && GETJOCTET(marker->data[12]) == 0x30
-               && GETJOCTET(marker->data[13]) == 0x0;
+               GETJOCTET(marker->data[0]) == 0x50 && GETJOCTET(marker->data[1]) == 0x68 && GETJOCTET(marker->data[2]) == 0x6F
+               && GETJOCTET(marker->data[3]) == 0x74 && GETJOCTET(marker->data[4]) == 0x6F && GETJOCTET(marker->data[5]) == 0x73
+               && GETJOCTET(marker->data[6]) == 0x68 && GETJOCTET(marker->data[7]) == 0x6F && GETJOCTET(marker->data[8]) == 0x70
+               && GETJOCTET(marker->data[9]) == 0x20 && GETJOCTET(marker->data[10]) == 0x33 && GETJOCTET(marker->data[11]) == 0x2E
+               && GETJOCTET(marker->data[12]) == 0x30 && GETJOCTET(marker->data[13]) == 0x0;
     }
 
-    static bool read_jpeg_marker(UINT8 requestmarker, j_decompress_ptr cinfo,
-                                 JOCTET** icc_data_ptr,
-                                 unsigned int* icc_data_len)
+    static bool read_jpeg_marker(UINT8 requestmarker, j_decompress_ptr cinfo, JOCTET** icc_data_ptr, unsigned int* icc_data_len)
     {
         jpeg_saved_marker_ptr marker;
         int num_markers = 0;
         int seq_no;
         JOCTET* icc_data;
         unsigned int total_length;
-#define MAX_SEQ_NO 255 /* sufficient since marker numbers are bytes */
-        char marker_present[MAX_SEQ_NO + 1]; /* 1 if marker found */
-        unsigned int
-            data_length[MAX_SEQ_NO + 1]; /* size of profile data in marker */
-        unsigned int
-            data_offset[MAX_SEQ_NO + 1]; /* offset for data in marker */
+#define MAX_SEQ_NO 255                            /* sufficient since marker numbers are bytes */
+        char marker_present[MAX_SEQ_NO + 1];      /* 1 if marker found */
+        unsigned int data_length[MAX_SEQ_NO + 1]; /* size of profile data in marker */
+        unsigned int data_offset[MAX_SEQ_NO + 1]; /* offset for data in marker */
 
         *icc_data_ptr = NULL; /* avoid confusion if false return */
         *icc_data_len = 0;
@@ -506,8 +457,7 @@ namespace TwkFB
                 marker_present[seq_no] = 1;
                 data_length[seq_no] = marker->data_length - ICC_OVERHEAD_LEN;
             }
-            else if (requestmarker == PHOTOSHOP_MARKER
-                     && marker_is_photoshop(marker))
+            else if (requestmarker == PHOTOSHOP_MARKER && marker_is_photoshop(marker))
             {
                 num_markers = ++seq_no;
                 marker_present[seq_no] = 1;
@@ -548,11 +498,8 @@ namespace TwkFB
         /* and fill it in */
         for (marker = cinfo->marker_list; marker != NULL; marker = marker->next)
         {
-            if ((requestmarker == ICC_MARKER && marker_is_icc(marker))
-                || (requestmarker == PHOTOSHOP_MARKER
-                    && marker_is_photoshop(marker))
-                || (requestmarker == EXIF_MARKER && marker_is_exif(marker))
-                || (requestmarker == 0xE1))
+            if ((requestmarker == ICC_MARKER && marker_is_icc(marker)) || (requestmarker == PHOTOSHOP_MARKER && marker_is_photoshop(marker))
+                || (requestmarker == EXIF_MARKER && marker_is_exif(marker)) || (requestmarker == 0xE1))
             {
                 JOCTET FAR* src_ptr;
                 JOCTET* dst_ptr;
@@ -589,8 +536,7 @@ namespace TwkFB
         return true;
     }
 
-    void IOjpeg::readAttributes(FrameBuffer& fb,
-                                struct jpeg_decompress_struct& cinfo) const
+    void IOjpeg::readAttributes(FrameBuffer& fb, struct jpeg_decompress_struct& cinfo) const
     {
         //
         //  COM/EXIF/ICC data
@@ -602,8 +548,7 @@ namespace TwkFB
         bool flagged_AdobeRGB = false;
         bool flagged_ICC = false;
 
-        for (jpeg_marker_struct* marker = cinfo.marker_list; marker;
-             marker = marker->next)
+        for (jpeg_marker_struct* marker = cinfo.marker_list; marker; marker = marker->next)
         {
             if (marker->marker == JPEG_COM)
             {
@@ -615,8 +560,7 @@ namespace TwkFB
                 JOCTET* exif_buf = NULL;
                 unsigned int exif_len = 0;
 
-                ExifData* exif =
-                    exif_data_new_from_data(marker->data, marker->data_length);
+                ExifData* exif = exif_data_new_from_data(marker->data, marker->data_length);
 
                 if (exif)
                 {
@@ -630,29 +574,24 @@ namespace TwkFB
                         {
                             ExifEntry* e = con->entries[j];
 
-                            if (e->tag
-                                == EXIF_TAG_COLOR_SPACE) // Color Space is a
-                                                         // special case
+                            if (e->tag == EXIF_TAG_COLOR_SPACE) // Color Space is a
+                                                                // special case
                             {
                                 ExifShort v_short = exif_get_short(e->data, o);
 
                                 if (v_short == 1)
                                 {
                                     flagged_sRGB = true;
-                                    fb.newAttribute("EXIF/ColorSpace",
-                                                    string("1 (sRGB)"));
+                                    fb.newAttribute("EXIF/ColorSpace", string("1 (sRGB)"));
                                 }
                                 else if (v_short == 2)
                                 {
                                     flagged_AdobeRGB = true;
-                                    fb.newAttribute("EXIF/ColorSpace",
-                                                    string("2 (Adobe RGB)"));
+                                    fb.newAttribute("EXIF/ColorSpace", string("2 (Adobe RGB)"));
                                 }
                                 else if (v_short == 0xffff)
                                 {
-                                    fb.newAttribute(
-                                        "EXIF/ColorSpace",
-                                        string("0xffff (Uncalibrated)"));
+                                    fb.newAttribute("EXIF/ColorSpace", string("0xffff (Uncalibrated)"));
                                 }
                             }
                             else
@@ -669,8 +608,7 @@ namespace TwkFB
                                 char value[1024];
                                 exif_entry_get_value(e, value, sizeof(value));
 
-                                fb.newAttribute(string("EXIF/") + name,
-                                                string(value));
+                                fb.newAttribute(string("EXIF/") + name, string(value));
                             }
                         }
                     }
@@ -697,10 +635,8 @@ namespace TwkFB
 
         if (flagged_ICC)
         {
-            fb.setPrimaryColorSpace(
-                ColorSpace::ICCProfile()); // profile name already set
-            fb.setTransferFunction(
-                ColorSpace::ICCProfile()); // profile name already set
+            fb.setPrimaryColorSpace(ColorSpace::ICCProfile()); // profile name already set
+            fb.setTransferFunction(ColorSpace::ICCProfile());  // profile name already set
         }
         else if (flagged_sRGB)
         {
@@ -710,8 +646,7 @@ namespace TwkFB
         else if (flagged_AdobeRGB)
         {
             fb.setPrimaryColorSpace(ColorSpace::ICCProfile());
-            fb.attribute<string>(ColorSpace::ICCProfileDescription()) =
-                string("Adobe RGB");
+            fb.attribute<string>(ColorSpace::ICCProfileDescription()) = string("Adobe RGB");
         }
 
         //
@@ -761,18 +696,14 @@ namespace TwkFB
 
         fb.newAttribute("JPEG/Sampling", str.str());
 
-        fb.newAttribute("JPEG/ColorSpace",
-                        string(colorSpaceName(cinfo.jpeg_color_space)));
+        fb.newAttribute("JPEG/ColorSpace", string(colorSpaceName(cinfo.jpeg_color_space)));
 
         if (cinfo.saw_Adobe_marker)
         {
-            fb.newAttribute("JPEG/AdobeTransformCode",
-                            int(cinfo.Adobe_transform));
+            fb.newAttribute("JPEG/AdobeTransformCode", int(cinfo.Adobe_transform));
         }
 
-        fb.newAttribute(
-            "JPEG/Encoding",
-            string(cinfo.arith_code == TRUE ? "Arithmetic" : "Huffman"));
+        fb.newAttribute("JPEG/Encoding", string(cinfo.arith_code == TRUE ? "Arithmetic" : "Huffman"));
 
         ostringstream den;
         if (cinfo.X_density != cinfo.Y_density)
@@ -798,8 +729,7 @@ namespace TwkFB
 
         if (cinfo.X_density != cinfo.Y_density)
         {
-            fb.newAttribute("JPEG/PixelAspect",
-                            float(cinfo.X_density) / float(cinfo.Y_density));
+            fb.newAttribute("JPEG/PixelAspect", float(cinfo.X_density) / float(cinfo.Y_density));
         }
 
         if (cinfo.progressive_mode)
@@ -813,13 +743,11 @@ namespace TwkFB
         }
 
         ostringstream ver;
-        ver << int(cinfo.JFIF_major_version) << "."
-            << int(cinfo.JFIF_minor_version);
+        ver << int(cinfo.JFIF_major_version) << "." << int(cinfo.JFIF_minor_version);
         fb.newAttribute("JPEG/Version", ver.str());
     }
 
-    void IOjpeg::readImageRGB(FrameBuffer& fb, const FileState& state,
-                              Decompressor& cinfo) const
+    void IOjpeg::readImageRGB(FrameBuffer& fb, const FileState& state, Decompressor& cinfo) const
     {
         //
         //  This is the basic JPEG -> RGB interleaved reader.
@@ -844,8 +772,7 @@ namespace TwkFB
         }
     }
 
-    void IOjpeg::readImageRGBA(FrameBuffer& fb, const FileState& state,
-                               Decompressor& cinfo) const
+    void IOjpeg::readImageRGBA(FrameBuffer& fb, const FileState& state, Decompressor& cinfo) const
     {
         //
         //  This is the basic JPEG -> RGB interleaved reader.
@@ -870,8 +797,7 @@ namespace TwkFB
             unsigned char* scanline = fb.scanline<unsigned char>(h - l - 1);
             jpeg_read_scanlines(&cinfo, &inscanline, 1);
 
-            for (unsigned char *inp = inscanline, *outp = scanline;
-                 inp <= endp;)
+            for (unsigned char *inp = inscanline, *outp = scanline; inp <= endp;)
             {
                 *outp = *inp;
                 outp++;
@@ -898,8 +824,7 @@ namespace TwkFB
         {
             jpeg_component_info* info = cinfo.cur_comp_info[i];
             int rowsize = info->width_in_blocks * DCTSIZE;
-            int cw = int(double(info->h_samp_factor)
-                         / double(cinfo.max_h_samp_factor) * double(w));
+            int cw = int(double(info->h_samp_factor) / double(cinfo.max_h_samp_factor) * double(w));
 
             if (cw != rowsize)
                 return false;
@@ -908,8 +833,7 @@ namespace TwkFB
         return true;
     }
 
-    void IOjpeg::readImageYUV(FrameBuffer& fb, const FileState& state,
-                              Decompressor& cinfo) const
+    void IOjpeg::readImageYUV(FrameBuffer& fb, const FileState& state, Decompressor& cinfo) const
     {
         //
         //  Raw mode, read the Y Cb Cr planes directly
@@ -958,8 +882,7 @@ namespace TwkFB
         // if (yrowsize != Y->width() || urowsize != U->width() || vrowsize !=
         // V->width() || yrows != Y->height() || urows != U->height() || vrows
         // != V->height())
-        if (yrowsize != Y->width() || urowsize != U->width()
-            || vrowsize != V->width())
+        if (yrowsize != Y->width() || urowsize != U->width() || vrowsize != V->width())
         {
             //
             //  We can't do a direct read. Instead, we need to read into
@@ -968,8 +891,7 @@ namespace TwkFB
 
 #if 1
             cout << "INFO: IOjpeg: non-direct read"
-                 << ", yrowsize = " << yrowsize << ", urowsize = " << urowsize
-                 << ", vrowsize = " << vrowsize << ", yrows = " << yrows
+                 << ", yrowsize = " << yrowsize << ", urowsize = " << urowsize << ", vrowsize = " << vrowsize << ", yrows = " << yrows
                  << ", urows = " << urows << ", vrows = " << vrows << endl;
 #endif
 
@@ -984,31 +906,24 @@ namespace TwkFB
             for (int i = 0; i < vrows; i++)
                 vscanlines[i] = &vbuffer[i * vrowsize];
 
-            for (int yr = 0, ur = 0, vr = 0; yr < Y->height();
-                 yr += yinc, ur += uinc, vr += vinc)
+            for (int yr = 0, ur = 0, vr = 0; yr < Y->height(); yr += yinc, ur += uinc, vr += vinc)
             {
                 jpeg_read_raw_data(&cinfo, image, yinc);
                 throwError(state);
 
                 for (int i = 0; i < yrows && (i + yr) < yh; i++)
                 {
-                    memcpy(Y->scanline<JSAMPLE>(yh - (i + yr) - 1),
-                           &ybuffer[i * yrowsize],
-                           Y->width() * sizeof(JSAMPLE));
+                    memcpy(Y->scanline<JSAMPLE>(yh - (i + yr) - 1), &ybuffer[i * yrowsize], Y->width() * sizeof(JSAMPLE));
                 }
 
                 for (int i = 0; i < urows && (i + ur) < uh; i++)
                 {
-                    memcpy(U->scanline<JSAMPLE>(uh - (i + ur) - 1),
-                           &ubuffer[i * urowsize],
-                           U->width() * sizeof(JSAMPLE));
+                    memcpy(U->scanline<JSAMPLE>(uh - (i + ur) - 1), &ubuffer[i * urowsize], U->width() * sizeof(JSAMPLE));
                 }
 
                 for (int i = 0; i < vrows && (i + vr) < vh; i++)
                 {
-                    memcpy(V->scanline<JSAMPLE>(vh - (i + vr) - 1),
-                           &vbuffer[i * vrowsize],
-                           V->width() * sizeof(JSAMPLE));
+                    memcpy(V->scanline<JSAMPLE>(vh - (i + vr) - 1), &vbuffer[i * vrowsize], V->width() * sizeof(JSAMPLE));
                 }
             }
         }
@@ -1045,8 +960,7 @@ namespace TwkFB
         }
     }
 
-    void IOjpeg::writeImage(const FrameBuffer& img, const std::string& filename,
-                            const WriteRequest& request) const
+    void IOjpeg::writeImage(const FrameBuffer& img, const std::string& filename, const WriteRequest& request) const
     {
         struct jpeg_compress_struct cinfo;
         struct jpeg_error_mgr jerr;
@@ -1098,8 +1012,7 @@ namespace TwkFB
         //  Convert everything to REC709
         //
 
-        if (outfb->hasPrimaries() || outfb->isYUV() || outfb->isYRYBY()
-            || outfb->dataType() >= FrameBuffer::PACKED_R10_G10_B10_X2)
+        if (outfb->hasPrimaries() || outfb->isYUV() || outfb->isYRYBY() || outfb->dataType() >= FrameBuffer::PACKED_R10_G10_B10_X2)
         {
             const FrameBuffer* fb = outfb;
             outfb = convertToLinearRGB709(outfb);
@@ -1111,8 +1024,7 @@ namespace TwkFB
         //  Convert to 3 channel, RGB
         //
 
-        if (img.numChannels() != 3 || img.channelName(0) != "R"
-            || img.channelName(1) != "G" || img.channelName(2) != "B")
+        if (img.numChannels() != 3 || img.channelName(0) != "R" || img.channelName(1) != "G" || img.channelName(2) != "B")
         {
             const FrameBuffer* fb = outfb;
             vector<string> mapping;
@@ -1176,8 +1088,7 @@ namespace TwkFB
 
         if (!(state.file = TwkUtil::fopen(state.filename.c_str(), "wb")))
         {
-            TWK_THROW_STREAM(IOException,
-                             "cannot open \"" << filename << "\" for writing");
+            TWK_THROW_STREAM(IOException, "cannot open \"" << filename << "\" for writing");
         }
 
         jpeg_stdio_dest(&cinfo, state.file);
@@ -1203,8 +1114,7 @@ namespace TwkFB
         {
             int l = cinfo.next_scanline;
             int lindex = needflip ? l : h - l - 1;
-            const unsigned char* scanline =
-                outfb->scanline<unsigned char>(lindex);
+            const unsigned char* scanline = outfb->scanline<unsigned char>(lindex);
             jpeg_write_scanlines(&cinfo, (JSAMPLE**)&scanline, 1);
             throwError(state);
         }

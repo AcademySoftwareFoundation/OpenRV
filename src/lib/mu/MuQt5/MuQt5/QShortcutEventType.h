@@ -34,8 +34,7 @@ namespace Mu
         //  Constructors
         //
 
-        QShortcutEventType(Context* context, const char* name,
-                           Class* superClass = 0);
+        QShortcutEventType(Context* context, const char* name, Class* superClass = 0);
         virtual ~QShortcutEventType();
 
         //

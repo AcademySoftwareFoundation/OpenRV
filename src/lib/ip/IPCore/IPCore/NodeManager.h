@@ -36,8 +36,7 @@ namespace IPCore
 
         typedef TwkContainer::PropertyContainer PropertyContainer;
         typedef std::map<std::string, NodeDefinition*> NodeDefinitionMap;
-        typedef std::map<std::string, GroupNodeDefinition*>
-            GroupNodeDefinitionMap;
+        typedef std::map<std::string, GroupNodeDefinition*> GroupNodeDefinitionMap;
         typedef std::vector<const NodeDefinition*> NodeDefinitionVector;
 
         NodeManager();
@@ -48,10 +47,8 @@ namespace IPCore
         //
 
         void loadDefinitions(const std::string& filename);
-        void writeAllDefinitions(const std::string& filename,
-                                 bool selfContained) const;
-        void writeDefinitions(const std::string&, const NodeDefinitionVector&,
-                              bool selfContained) const;
+        void writeAllDefinitions(const std::string& filename, bool selfContained) const;
+        void writeDefinitions(const std::string&, const NodeDefinitionVector&, bool selfContained) const;
 
         void loadDefinitionsAlongPathVar(const std::string& envValue);
 
@@ -71,24 +68,17 @@ namespace IPCore
         //  Create a node from a type name
         //
 
-        IPNode* newNode(const std::string& typeName,
-                        const std::string& nodeName, IPGraph* graph,
-                        GroupIPNode* group) const;
+        IPNode* newNode(const std::string& typeName, const std::string& nodeName, IPGraph* graph, GroupIPNode* group) const;
 
         template <typename T>
-        T* newNodeOfType(const std::string& typeName,
-                         const std::string& nodeName, IPGraph* graph,
-                         GroupIPNode* group) const
+        T* newNodeOfType(const std::string& typeName, const std::string& nodeName, IPGraph* graph, GroupIPNode* group) const
         {
             return dynamic_cast<T*>(newNode(typeName, nodeName, graph, group));
         }
 
         static void setDebug(bool b) { m_debug = b; }
 
-        const NodeDefinitionMap& definitionMap() const
-        {
-            return m_definitionMap;
-        }
+        const NodeDefinitionMap& definitionMap() const { return m_definitionMap; }
 
         bool updateDefinition(const std::string& typeName);
 

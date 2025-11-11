@@ -58,17 +58,14 @@ namespace TwkMovie
         typedef stl_ext::thread_group::thread_api ThreadAPI;
         typedef void (*InitializeFunc)();
 
-        ThreadedMovie(const Movies&, const Frames& frames,
-                      size_t stackMultiplier = 8, ThreadAPI* api = 0,
-                      InitializeFunc = NULL);
+        ThreadedMovie(const Movies&, const Frames& frames, size_t stackMultiplier = 8, ThreadAPI* api = 0, InitializeFunc = NULL);
 
         virtual ~ThreadedMovie();
 
         virtual void imagesAtFrame(const ReadRequest&, FrameBufferVector& fbs);
         virtual void identifiersAtFrame(const ReadRequest&, IdentifierVector&);
         virtual size_t audioFillBuffer(const AudioReadRequest&, AudioBuffer&);
-        virtual void audioConfigure(unsigned int channels, TwkAudio::Time rate,
-                                    size_t bufferSize);
+        virtual void audioConfigure(unsigned int channels, TwkAudio::Time rate, size_t bufferSize);
         virtual void flush();
         virtual Movie* clone() const;
 

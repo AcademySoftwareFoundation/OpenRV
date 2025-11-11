@@ -17,8 +17,7 @@
 
 namespace TwkMediaLibrary
 {
-    PyMediaNode::PyMediaNode(Library* lib, URL url, PyNode* parent,
-                             Plugin plugin, std::string pluginName)
+    PyMediaNode::PyMediaNode(Library* lib, URL url, PyNode* parent, Plugin plugin, std::string pluginName)
         : PyNode(lib, parent, std::move(pluginName), PyNodeType::PyMediaType)
         , MediaAPI()
         , m_url(std::move(url))
@@ -37,8 +36,7 @@ namespace TwkMediaLibrary
     {
         PyLockObject lock;
 
-        PyObject* ret =
-            PyObject_CallMethod(m_plugin, "is_streaming", "s", m_url.c_str());
+        PyObject* ret = PyObject_CallMethod(m_plugin, "is_streaming", "s", m_url.c_str());
 
         if (ret == nullptr)
         {
@@ -53,8 +51,7 @@ namespace TwkMediaLibrary
     {
         PyLockObject lock;
 
-        PyObject* ret =
-            PyObject_CallMethod(m_plugin, "is_redirecting", "s", m_url.c_str());
+        PyObject* ret = PyObject_CallMethod(m_plugin, "is_redirecting", "s", m_url.c_str());
 
         if (ret == nullptr)
         {
@@ -73,8 +70,7 @@ namespace TwkMediaLibrary
 
         HTTPCookieVector cookies;
 
-        PyObject* ret = PyObject_CallMethod(m_plugin, "get_http_cookies", "s",
-                                            m_url.c_str());
+        PyObject* ret = PyObject_CallMethod(m_plugin, "get_http_cookies", "s", m_url.c_str());
         if (ret == nullptr)
         {
             PyErr_Print();
@@ -89,23 +85,15 @@ namespace TwkMediaLibrary
                 {
                     // PyDict_GetItemString returns a borrowed reference, no
                     // need
-                    PyObject* nameObj =
-                        PyDict_GetItemString(cookieDict, "name");
-                    PyObject* valueObj =
-                        PyDict_GetItemString(cookieDict, "value");
-                    PyObject* domainObj =
-                        PyDict_GetItemString(cookieDict, "domain");
-                    PyObject* pathObj =
-                        PyDict_GetItemString(cookieDict, "path");
+                    PyObject* nameObj = PyDict_GetItemString(cookieDict, "name");
+                    PyObject* valueObj = PyDict_GetItemString(cookieDict, "value");
+                    PyObject* domainObj = PyDict_GetItemString(cookieDict, "domain");
+                    PyObject* pathObj = PyDict_GetItemString(cookieDict, "path");
 
-                    std::string name =
-                        nameObj != nullptr ? PyUnicode_AsUTF8(nameObj) : "";
-                    std::string value =
-                        valueObj != nullptr ? PyUnicode_AsUTF8(valueObj) : "";
-                    std::string domain =
-                        domainObj != nullptr ? PyUnicode_AsUTF8(domainObj) : "";
-                    std::string path =
-                        pathObj != nullptr ? PyUnicode_AsUTF8(pathObj) : "";
+                    std::string name = nameObj != nullptr ? PyUnicode_AsUTF8(nameObj) : "";
+                    std::string value = valueObj != nullptr ? PyUnicode_AsUTF8(valueObj) : "";
+                    std::string domain = domainObj != nullptr ? PyUnicode_AsUTF8(domainObj) : "";
+                    std::string path = pathObj != nullptr ? PyUnicode_AsUTF8(pathObj) : "";
 
                     cookies.emplace_back(domain, path, name, value);
 
@@ -138,8 +126,7 @@ namespace TwkMediaLibrary
 
         HTTPHeaderVector headers;
 
-        PyObject* ret = PyObject_CallMethod(m_plugin, "get_http_headers", "s",
-                                            m_url.c_str());
+        PyObject* ret = PyObject_CallMethod(m_plugin, "get_http_headers", "s", m_url.c_str());
         if (ret == nullptr)
         {
             PyErr_Print();
@@ -154,15 +141,11 @@ namespace TwkMediaLibrary
                 {
                     // PyDict_GetItemString returns a borrowed reference, no
                     // need
-                    PyObject* nameObj =
-                        PyDict_GetItemString(cookieDict, "name");
-                    PyObject* valueObj =
-                        PyDict_GetItemString(cookieDict, "value");
+                    PyObject* nameObj = PyDict_GetItemString(cookieDict, "name");
+                    PyObject* valueObj = PyDict_GetItemString(cookieDict, "value");
 
-                    std::string name =
-                        nameObj != nullptr ? PyUnicode_AsUTF8(nameObj) : "";
-                    std::string value =
-                        valueObj != nullptr ? PyUnicode_AsUTF8(valueObj) : "";
+                    std::string name = nameObj != nullptr ? PyUnicode_AsUTF8(nameObj) : "";
+                    std::string value = valueObj != nullptr ? PyUnicode_AsUTF8(valueObj) : "";
 
                     headers.emplace_back(name, value);
 
@@ -184,8 +167,7 @@ namespace TwkMediaLibrary
     {
         PyLockObject lock;
 
-        PyObject* ret = PyObject_CallMethod(m_plugin, "get_http_redirection",
-                                            "s", m_url.c_str());
+        PyObject* ret = PyObject_CallMethod(m_plugin, "get_http_redirection", "s", m_url.c_str());
 
         if (ret == nullptr)
         {

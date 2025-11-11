@@ -55,8 +55,7 @@
 
 #if defined(_USE_REP_MOVSB_MEMCPY)
 
-void* FastMemcpy_REPMOVSB(void* PXLRESTRICT outBuf,
-                          const void* PXLRESTRICT inBuf, size_t n)
+void* FastMemcpy_REPMOVSB(void* PXLRESTRICT outBuf, const void* PXLRESTRICT inBuf, size_t n)
 {
     void* origOutBuf = outBuf;
 
@@ -85,8 +84,7 @@ static inline bool is_aligned(const void* PXLRESTRICT ptr, size_t byte_count)
     return (reinterpret_cast<ptrdiff_t>(ptr) % byte_count) == 0;
 }
 
-void* FastMemcpy_SIMD(void* PXLRESTRICT outBuf, const void* PXLRESTRICT inBuf,
-                      size_t n)
+void* FastMemcpy_SIMD(void* PXLRESTRICT outBuf, const void* PXLRESTRICT inBuf, size_t n)
 {
     // Fall back to the standard version of memcpy if the size does not meet the
     // mininum length criteria
@@ -95,16 +93,13 @@ void* FastMemcpy_SIMD(void* PXLRESTRICT outBuf, const void* PXLRESTRICT inBuf,
         return small_memcpy(outBuf, inBuf, n);
     }
 
-    const unsigned char* PXLRESTRICT src =
-        static_cast<const unsigned char * PXLRESTRICT>(inBuf);
-    unsigned char* PXLRESTRICT dst =
-        static_cast<unsigned char * PXLRESTRICT>(outBuf);
+    const unsigned char* PXLRESTRICT src = static_cast<const unsigned char * PXLRESTRICT>(inBuf);
+    unsigned char* PXLRESTRICT dst = static_cast<unsigned char * PXLRESTRICT>(outBuf);
 
     // memcpy until dst is aligned with simd
     if (!is_aligned(dst, SSE_REGISTER_SIZE))
     {
-        size_t delta = SSE_REGISTER_SIZE
-                       - (reinterpret_cast<ptrdiff_t>(dst) % SSE_REGISTER_SIZE);
+        size_t delta = SSE_REGISTER_SIZE - (reinterpret_cast<ptrdiff_t>(dst) % SSE_REGISTER_SIZE);
         small_memcpy(dst, src, delta);
         src += delta;
         dst += delta;
@@ -119,8 +114,7 @@ void* FastMemcpy_SIMD(void* PXLRESTRICT outBuf, const void* PXLRESTRICT inBuf,
     {
         for (; n >= step; n -= step)
         {
-            _mm_prefetch(reinterpret_cast<const char * PXLRESTRICT>(src) + 1024,
-                         _MM_HINT_T0);
+            _mm_prefetch(reinterpret_cast<const char * PXLRESTRICT>(src) + 1024, _MM_HINT_T0);
             __m128 xmm0 = _mm_load_ps((float*)(src + 0 * SSE_REGISTER_SIZE));
             __m128 xmm1 = _mm_load_ps((float*)(src + 1 * SSE_REGISTER_SIZE));
             __m128 xmm2 = _mm_load_ps((float*)(src + 2 * SSE_REGISTER_SIZE));
@@ -169,8 +163,7 @@ void* FastMemcpy_SIMD(void* PXLRESTRICT outBuf, const void* PXLRESTRICT inBuf,
 // MEMCPY IMPLEMENTATION SELECTOR
 //==============================================================================
 
-void* FastMemcpy(void* FASTMEMCPYRESTRICT outBuf,
-                 const void* FASTMEMCPYRESTRICT inBuf, size_t n)
+void* FastMemcpy(void* FASTMEMCPYRESTRICT outBuf, const void* FASTMEMCPYRESTRICT inBuf, size_t n)
 {
     // On the latest processors, starting with the Haswell architecture, the
     // standard memcpy implementation is faster than both our REPMOVSB and SIMD
@@ -179,8 +172,7 @@ void* FastMemcpy(void* FASTMEMCPYRESTRICT outBuf,
     // Haswell was the first micro-architecture with avx2 support so we'll use
     // this feature to detect a newer processor.
 #if defined(_SSEUTIL_IS_AVAILABLE)
-    static const bool avx2Supported =
-        SSEUtil::isSupported(SSEUtil::CPU_FEATURE_AVX2);
+    static const bool avx2Supported = SSEUtil::isSupported(SSEUtil::CPU_FEATURE_AVX2);
     if (avx2Supported)
     {
         return memcpy(outBuf, inBuf, n);
@@ -189,8 +181,7 @@ void* FastMemcpy(void* FASTMEMCPYRESTRICT outBuf,
 
     // See note below for an explanation of the !defined(LINUX) condition
 #if defined(_USE_REP_MOVSB_MEMCPY) && !defined(LINUX)
-    static const bool enhancedRepMovSBSupported =
-        SSEUtil::isSupported(SSEUtil::CPU_FEATURE_ERMSB);
+    static const bool enhancedRepMovSBSupported = SSEUtil::isSupported(SSEUtil::CPU_FEATURE_ERMSB);
     if (enhancedRepMovSBSupported)
     {
         return PxlMemcpy_REPMOVSB(outBuf, inBuf, n);
@@ -215,8 +206,7 @@ void* FastMemcpy(void* FASTMEMCPYRESTRICT outBuf,
 // (PxlMemcpy). This routine was created to get the best of both worlds.
 // Note that this anomaly was NOT found on Mac systems.
 //
-void* FastMemcpyForMP(void* FASTMEMCPYRESTRICT outBuf,
-                      const void* FASTMEMCPYRESTRICT inBuf, size_t n)
+void* FastMemcpyForMP(void* FASTMEMCPYRESTRICT outBuf, const void* FASTMEMCPYRESTRICT inBuf, size_t n)
 {
     // On the latest processors, starting with the Haswell architecture, the
     // standard memcpy implementation is faster than both our REPMOVSB and SIMD
@@ -225,8 +215,7 @@ void* FastMemcpyForMP(void* FASTMEMCPYRESTRICT outBuf,
     // Haswell was the first micro-architecture with avx2 support so we'll use
     // this feature to detect a newer processor.
 #if defined(_SSEUTIL_IS_AVAILABLE)
-    static const bool avx2Supported =
-        SSEUtil::isSupported(SSEUtil::CPU_FEATURE_AVX2);
+    static const bool avx2Supported = SSEUtil::isSupported(SSEUtil::CPU_FEATURE_AVX2);
     if (avx2Supported)
     {
         return memcpy(outBuf, inBuf, n);
@@ -234,8 +223,7 @@ void* FastMemcpyForMP(void* FASTMEMCPYRESTRICT outBuf,
 #endif
 
 #if defined(_USE_REP_MOVSB_MEMCPY)
-    static const bool enhancedRepMovSBSupported =
-        SSEUtil::isSupported(SSEUtil::CPU_FEATURE_ERMSB);
+    static const bool enhancedRepMovSBSupported = SSEUtil::isSupported(SSEUtil::CPU_FEATURE_ERMSB);
     if (enhancedRepMovSBSupported)
     {
         return PxlMemcpy_REPMOVSB(outBuf, inBuf, n);
@@ -254,8 +242,7 @@ using namespace ILMTHREAD_NAMESPACE;
 class MemcpyTask : public Task
 {
 public:
-    MemcpyTask(TaskGroup* group, void* FASTMEMCPYRESTRICT outBuf,
-               const void* FASTMEMCPYRESTRICT inBuf, size_t n)
+    MemcpyTask(TaskGroup* group, void* FASTMEMCPYRESTRICT outBuf, const void* FASTMEMCPYRESTRICT inBuf, size_t n)
         : Task(group)
         , _outBuf(outBuf)
         , _inBuf(inBuf)
@@ -272,8 +259,7 @@ public:
     size_t _n;
 };
 
-void* FastMemcpy_MP(void* FASTMEMCPYRESTRICT outBuf,
-                    const void* FASTMEMCPYRESTRICT inBuf, size_t n)
+void* FastMemcpy_MP(void* FASTMEMCPYRESTRICT outBuf, const void* FASTMEMCPYRESTRICT inBuf, size_t n)
 {
     static bool use_standard_memcpy = getenv("RV_USE_STD_MEMCPY");
     if (use_standard_memcpy)
@@ -295,16 +281,14 @@ void* FastMemcpy_MP(void* FASTMEMCPYRESTRICT outBuf,
     {
         if (n > kMaxChunkSize)
         {
-            TwkFB::ThreadPool::addTask(new MemcpyTask(
-                &taskGroup, currOutBuf, currInBuf, kMaxChunkSize));
+            TwkFB::ThreadPool::addTask(new MemcpyTask(&taskGroup, currOutBuf, currInBuf, kMaxChunkSize));
             n -= kMaxChunkSize;
             currInBuf += kMaxChunkSize;
             currOutBuf += kMaxChunkSize;
         }
         else
         {
-            TwkFB::ThreadPool::addTask(
-                new MemcpyTask(&taskGroup, currOutBuf, currInBuf, n));
+            TwkFB::ThreadPool::addTask(new MemcpyTask(&taskGroup, currOutBuf, currInBuf, n));
             n = 0;
         }
     }
@@ -322,9 +306,7 @@ void* FastMemcpy_MP(void* FASTMEMCPYRESTRICT outBuf,
 //  interpolating. Not the best way to do this.
 //
 
-void subsample422_8bit_UYVY(size_t width, size_t height,
-                            const uint8_t* FASTMEMCPYRESTRICT inBuf,
-                            uint8_t* FASTMEMCPYRESTRICT outBuf)
+void subsample422_8bit_UYVY(size_t width, size_t height, const uint8_t* FASTMEMCPYRESTRICT inBuf, uint8_t* FASTMEMCPYRESTRICT outBuf)
 {
     uint8_t* FASTMEMCPYRESTRICT p1 = outBuf;
 
@@ -332,10 +314,8 @@ void subsample422_8bit_UYVY(size_t width, size_t height,
     {
         for (size_t row = 0; row < height; row++)
         {
-            for (const uint8_t *FASTMEMCPYRESTRICT
-                     p0 = inBuf + row * 3 * width,
-                     *FASTMEMCPYRESTRICT e = p0 + 3 * width;
-                 p0 < e; p0 += 6, p1 += 4)
+            for (const uint8_t *FASTMEMCPYRESTRICT p0 = inBuf + row * 3 * width, *FASTMEMCPYRESTRICT e = p0 + 3 * width; p0 < e;
+                 p0 += 6, p1 += 4)
             {
                 //
                 //  The comment out parts do the interpolation, but this
@@ -358,10 +338,8 @@ void subsample422_8bit_UYVY(size_t width, size_t height,
         {
             size_t count = 0;
 
-            for (const uint8_t *FASTMEMCPYRESTRICT
-                     p0 = inBuf + row * 3 * width,
-                     *FASTMEMCPYRESTRICT e = p0 + 3 * width;
-                 p0 < e; p0 += 3, count++)
+            for (const uint8_t *FASTMEMCPYRESTRICT p0 = inBuf + row * 3 * width, *FASTMEMCPYRESTRICT e = p0 + 3 * width; p0 < e;
+                 p0 += 3, count++)
             {
                 *p1 = p0[count % 2 + 1];
                 p1++;
@@ -377,8 +355,7 @@ void subsample422_8bit_UYVY(size_t width, size_t height,
 class Subsample422_8bit_UYVY_Task : public Task
 {
 public:
-    Subsample422_8bit_UYVY_Task(TaskGroup* group, size_t width, size_t height,
-                                const uint8_t* FASTMEMCPYRESTRICT inBuf,
+    Subsample422_8bit_UYVY_Task(TaskGroup* group, size_t width, size_t height, const uint8_t* FASTMEMCPYRESTRICT inBuf,
                                 uint8_t* FASTMEMCPYRESTRICT outBuf)
         : Task(group)
         , _width(width)
@@ -390,10 +367,7 @@ public:
 
     virtual ~Subsample422_8bit_UYVY_Task() {}
 
-    virtual void execute()
-    {
-        subsample422_8bit_UYVY(_width, _height, _inBuf, _outBuf);
-    }
+    virtual void execute() { subsample422_8bit_UYVY(_width, _height, _inBuf, _outBuf); }
 
     const size_t _width;
     const size_t _height;
@@ -403,9 +377,7 @@ public:
 
 //------------------------------------------------------------------------------
 //
-void subsample422_8bit_UYVY_MP(size_t width, size_t height,
-                               const uint8_t* FASTMEMCPYRESTRICT inBuf,
-                               uint8_t* FASTMEMCPYRESTRICT outBuf)
+void subsample422_8bit_UYVY_MP(size_t width, size_t height, const uint8_t* FASTMEMCPYRESTRICT inBuf, uint8_t* FASTMEMCPYRESTRICT outBuf)
 {
     static bool use_standard_memcpy = getenv("RV_USE_STD_MEMCPY");
     if (use_standard_memcpy)
@@ -430,8 +402,7 @@ void subsample422_8bit_UYVY_MP(size_t width, size_t height,
         const uint8_t* FASTMEMCPYRESTRICT curInBuf = inBuf + curY * inBufStride;
         uint8_t* FASTMEMCPYRESTRICT curOutBuf = outBuf + curY * outBufStride;
         const size_t curHeight = std::min(taskHeight, height - curY);
-        TwkFB::ThreadPool::addTask(new Subsample422_8bit_UYVY_Task(
-            &taskGroup, width, curHeight, curInBuf, curOutBuf));
+        TwkFB::ThreadPool::addTask(new Subsample422_8bit_UYVY_Task(&taskGroup, width, curHeight, curInBuf, curOutBuf));
         curY += curHeight;
     }
 }
@@ -449,15 +420,12 @@ void subsample422_8bit_UYVY_MP(size_t width, size_t height,
 #define G10MASK 0xFFC00
 #define B10MASK 0x3FF
 
-#define REVERSE(x) \
-    (((x << 20) & R10MASK) | (x & G10MASK) | ((x >> 20) & B10MASK));
+#define REVERSE(x) (((x << 20) & R10MASK) | (x & G10MASK) | ((x >> 20) & B10MASK));
 
 //------------------------------------------------------------------------------
 //
-void subsample422_10bit(size_t width, size_t height,
-                        const uint32_t* FASTMEMCPYRESTRICT inBuf,
-                        uint32_t* FASTMEMCPYRESTRICT outBuf, size_t inBufStride,
-                        size_t outBufStride)
+void subsample422_10bit(size_t width, size_t height, const uint32_t* FASTMEMCPYRESTRICT inBuf, uint32_t* FASTMEMCPYRESTRICT outBuf,
+                        size_t inBufStride, size_t outBufStride)
 {
     //
     //  NOTE: 2_10_10_10_INT_REV is *backwards* eventhough its GL_RGB
@@ -466,13 +434,10 @@ void subsample422_10bit(size_t width, size_t height,
 
     for (size_t row = 0; row < height; row++)
     {
-        uint32_t* FASTMEMCPYRESTRICT p1 =
-            outBuf + row * outBufStride / sizeof(uint32_t);
+        uint32_t* FASTMEMCPYRESTRICT p1 = outBuf + row * outBufStride / sizeof(uint32_t);
 
-        for (const uint32_t *FASTMEMCPYRESTRICT
-                 p0 = inBuf + row * inBufStride / sizeof(uint32_t),
-                 *FASTMEMCPYRESTRICT e =
-                     p0 + inBufStride / sizeof(uint32_t) - (width % 6);
+        for (const uint32_t *FASTMEMCPYRESTRICT p0 = inBuf + row * inBufStride / sizeof(uint32_t),
+                                                *FASTMEMCPYRESTRICT e = p0 + inBufStride / sizeof(uint32_t) - (width % 6);
              p0 < e; p0 += 6)
         {
             uint32_t A = *p0;
@@ -486,8 +451,7 @@ void subsample422_10bit(size_t width, size_t height,
             p1++;
             *p1 = ((C << 20) & R10MASK) | (B & G10MASK) | (B & B10MASK);
             p1++;
-            *p1 = ((C << 10) & R10MASK) | ((D << 10) & G10MASK)
-                  | ((B >> 20) & B10MASK);
+            *p1 = ((C << 10) & R10MASK) | ((D << 10) & G10MASK) | ((B >> 20) & B10MASK);
             p1++;
             *p1 = ((F << 20) & R10MASK) | ((D >> 10) & G10MASK) | (E & B10MASK);
             p1++;
@@ -500,10 +464,8 @@ void subsample422_10bit(size_t width, size_t height,
 class Subsample422_10bit_Task : public Task
 {
 public:
-    Subsample422_10bit_Task(TaskGroup* group, size_t width, size_t height,
-                            const uint32_t* FASTMEMCPYRESTRICT inBuf,
-                            uint32_t* FASTMEMCPYRESTRICT outBuf,
-                            size_t inBufStride, size_t outBufStride)
+    Subsample422_10bit_Task(TaskGroup* group, size_t width, size_t height, const uint32_t* FASTMEMCPYRESTRICT inBuf,
+                            uint32_t* FASTMEMCPYRESTRICT outBuf, size_t inBufStride, size_t outBufStride)
         : Task(group)
         , _width(width)
         , _height(height)
@@ -516,11 +478,7 @@ public:
 
     virtual ~Subsample422_10bit_Task() {}
 
-    virtual void execute()
-    {
-        subsample422_10bit(_width, _height, _inBuf, _outBuf, _inBufStride,
-                           _outBufStride);
-    }
+    virtual void execute() { subsample422_10bit(_width, _height, _inBuf, _outBuf, _inBufStride, _outBufStride); }
 
     const size_t _width;
     const size_t _height;
@@ -532,17 +490,14 @@ public:
 
 //------------------------------------------------------------------------------
 //
-void subsample422_10bit_MP(size_t width, size_t height,
-                           const uint32_t* FASTMEMCPYRESTRICT inBuf,
-                           uint32_t* FASTMEMCPYRESTRICT outBuf,
+void subsample422_10bit_MP(size_t width, size_t height, const uint32_t* FASTMEMCPYRESTRICT inBuf, uint32_t* FASTMEMCPYRESTRICT outBuf,
                            size_t inBufStride, size_t outBufStride)
 {
     static bool use_standard_memcpy = getenv("RV_USE_STD_MEMCPY");
     if (use_standard_memcpy)
     {
         HOP_PROF("subsample422_10bit()");
-        subsample422_10bit(width, height, inBuf, outBuf, inBufStride,
-                           outBufStride);
+        subsample422_10bit(width, height, inBuf, outBuf, inBufStride, outBufStride);
         return;
     }
 
@@ -555,36 +510,27 @@ void subsample422_10bit_MP(size_t width, size_t height,
 
     while (curY < height)
     {
-        const uint32_t* FASTMEMCPYRESTRICT curInBuf =
-            inBuf + curY * inBufStride / sizeof(uint32_t);
-        uint32_t* FASTMEMCPYRESTRICT curOutBuf =
-            outBuf + curY * outBufStride / sizeof(uint32_t);
+        const uint32_t* FASTMEMCPYRESTRICT curInBuf = inBuf + curY * inBufStride / sizeof(uint32_t);
+        uint32_t* FASTMEMCPYRESTRICT curOutBuf = outBuf + curY * outBufStride / sizeof(uint32_t);
         const size_t curHeight = std::min(taskHeight, height - curY);
         TwkFB::ThreadPool::addTask(
-            new Subsample422_10bit_Task(&taskGroup, width, curHeight, curInBuf,
-                                        curOutBuf, inBufStride, outBufStride));
+            new Subsample422_10bit_Task(&taskGroup, width, curHeight, curInBuf, curOutBuf, inBufStride, outBufStride));
         curY += curHeight;
     }
 }
 
 //------------------------------------------------------------------------------
 //
-void swap_bytes_32bit(size_t width, size_t height,
-                      const uint32_t* FASTMEMCPYRESTRICT inBuf,
-                      uint32_t* FASTMEMCPYRESTRICT outBuf)
+void swap_bytes_32bit(size_t width, size_t height, const uint32_t* FASTMEMCPYRESTRICT inBuf, uint32_t* FASTMEMCPYRESTRICT outBuf)
 {
     uint32_t* FASTMEMCPYRESTRICT p1 = outBuf;
 
     for (size_t row = 0; row < height; row++)
     {
-        for (const uint32_t *FASTMEMCPYRESTRICT
-                 p0 = inBuf + row * width,
-                 *FASTMEMCPYRESTRICT e = p0 + width;
-             p0 < e; p0++)
+        for (const uint32_t *FASTMEMCPYRESTRICT p0 = inBuf + row * width, *FASTMEMCPYRESTRICT e = p0 + width; p0 < e; p0++)
         {
             const uint32_t a = *p0;
-            *p1 = ((a & 0x000000FF) << 24) | ((a & 0x0000FF00) << 8)
-                  | ((a & 0x00FF0000) >> 8) | ((a & 0xFF000000) >> 24);
+            *p1 = ((a & 0x000000FF) << 24) | ((a & 0x0000FF00) << 8) | ((a & 0x00FF0000) >> 8) | ((a & 0xFF000000) >> 24);
             p1++;
         }
     }
@@ -595,8 +541,7 @@ void swap_bytes_32bit(size_t width, size_t height,
 class Swap_bytes_32bit_Task : public Task
 {
 public:
-    Swap_bytes_32bit_Task(TaskGroup* group, size_t width, size_t height,
-                          const uint32_t* FASTMEMCPYRESTRICT inBuf,
+    Swap_bytes_32bit_Task(TaskGroup* group, size_t width, size_t height, const uint32_t* FASTMEMCPYRESTRICT inBuf,
                           uint32_t* FASTMEMCPYRESTRICT outBuf)
         : Task(group)
         , _width(width)
@@ -608,10 +553,7 @@ public:
 
     virtual ~Swap_bytes_32bit_Task() {}
 
-    virtual void execute()
-    {
-        swap_bytes_32bit(_width, _height, _inBuf, _outBuf);
-    }
+    virtual void execute() { swap_bytes_32bit(_width, _height, _inBuf, _outBuf); }
 
     const size_t _width;
     const size_t _height;
@@ -621,9 +563,7 @@ public:
 
 //------------------------------------------------------------------------------
 //
-void swap_bytes_32bit_MP(size_t width, size_t height,
-                         const uint32_t* FASTMEMCPYRESTRICT inBuf,
-                         uint32_t* FASTMEMCPYRESTRICT outBuf)
+void swap_bytes_32bit_MP(size_t width, size_t height, const uint32_t* FASTMEMCPYRESTRICT inBuf, uint32_t* FASTMEMCPYRESTRICT outBuf)
 {
     static bool use_standard_memcpy = getenv("RV_USE_STD_MEMCPY");
     if (use_standard_memcpy)
@@ -647,8 +587,7 @@ void swap_bytes_32bit_MP(size_t width, size_t height,
         const uint32_t* FASTMEMCPYRESTRICT curInBuf = inBuf + curY * bufStride;
         uint32_t* FASTMEMCPYRESTRICT curOutBuf = outBuf + curY * bufStride;
         const size_t curHeight = std::min(taskHeight, height - curY);
-        TwkFB::ThreadPool::addTask(new Swap_bytes_32bit_Task(
-            &taskGroup, width, curHeight, curInBuf, curOutBuf));
+        TwkFB::ThreadPool::addTask(new Swap_bytes_32bit_Task(&taskGroup, width, curHeight, curInBuf, curOutBuf));
         curY += curHeight;
     }
 }

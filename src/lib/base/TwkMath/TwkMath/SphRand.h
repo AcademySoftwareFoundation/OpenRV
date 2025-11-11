@@ -51,8 +51,7 @@ namespace TwkMath
     //  The first one is not normalized the other is.
     //
 
-    template <class RANDGEN, class VEC>
-    class SphRandGenerator : public SphRand<RANDGEN, VEC>
+    template <class RANDGEN, class VEC> class SphRandGenerator : public SphRand<RANDGEN, VEC>
     {
     public:
         SphRandGenerator(RANDGEN& rng)
@@ -68,8 +67,7 @@ namespace TwkMath
         VEC operator()() { return SphRand<RANDGEN, VEC>::next(); }
     };
 
-    template <class RANDGEN, class VEC>
-    class NormalizedSphRandGenerator : public SphRand<RANDGEN, VEC>
+    template <class RANDGEN, class VEC> class NormalizedSphRandGenerator : public SphRand<RANDGEN, VEC>
     {
     public:
         NormalizedSphRandGenerator(RANDGEN& rng)
@@ -108,8 +106,7 @@ namespace TwkMath
         return v;
     }
 
-    template <class RANDGEN, class VEC>
-    VEC SphRand<RANDGEN, VEC>::nextNormalized()
+    template <class RANDGEN, class VEC> VEC SphRand<RANDGEN, VEC>::nextNormalized()
     {
         VEC v;
         const Scalar one = Scalar(1.0);

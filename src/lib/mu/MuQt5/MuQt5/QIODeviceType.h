@@ -39,8 +39,7 @@ namespace Mu
         //  Constructors
         //
 
-        QIODeviceType(Context* context, const char* name, Class* superClass = 0,
-                      Class* superClass2 = 0);
+        QIODeviceType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QIODeviceType();
 
@@ -57,11 +56,7 @@ namespace Mu
         MemberFunction* _func[17];
     };
 
-    inline ClassInstance*
-    QIODeviceType::cachedInstance(const QIODeviceType::MuQtType* obj)
-    {
-        return 0;
-    }
+    inline ClassInstance* QIODeviceType::cachedInstance(const QIODeviceType::MuQtType* obj) { return 0; }
 
 } // namespace Mu
 

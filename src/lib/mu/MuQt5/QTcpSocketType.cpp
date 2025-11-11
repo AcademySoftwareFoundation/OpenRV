@@ -54,16 +54,14 @@ namespace Mu
         _baseType = 0;
     }
 
-    MuQt_QTcpSocket::MuQt_QTcpSocket(Pointer muobj, const CallEnvironment* ce,
-                                     QObject* parent)
+    MuQt_QTcpSocket::MuQt_QTcpSocket(Pointer muobj, const CallEnvironment* ce, QObject* parent)
         : QTcpSocket(parent)
     {
         _env = ce;
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QTcpSocketType>(
-            c->internName("qt.QTcpSocket"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QTcpSocketType>(c->internName("qt.QTcpSocket"));
     }
 
     void MuQt_QTcpSocket::disconnectFromHost()
@@ -133,8 +131,7 @@ namespace Mu
         }
     }
 
-    void MuQt_QTcpSocket::setSocketOption(QAbstractSocket::SocketOption option,
-                                          const QVariant& value)
+    void MuQt_QTcpSocket::setSocketOption(QAbstractSocket::SocketOption option, const QVariant& value)
     {
         if (!_env)
         {
@@ -388,8 +385,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  Mu Type CONSTRUCTORS
 
-    QTcpSocketType::QTcpSocketType(Context* c, const char* name, Class* super,
-                                   Class* super2)
+    QTcpSocketType::QTcpSocketType(Context* c, const char* name, Class* super, Class* super2)
         : Class(c, name, vectorOf2(super, super2))
     {
     }
@@ -399,8 +395,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    static Pointer QTcpSocket_QTcpSocket_QObject(Thread& NODE_THREAD,
-                                                 Pointer obj)
+    static Pointer QTcpSocket_QTcpSocket_QObject(Thread& NODE_THREAD, Pointer obj)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         ClassInstance* widget = reinterpret_cast<ClassInstance*>(obj);
@@ -411,9 +406,7 @@ namespace Mu
         }
         else if (QTcpSocket* w = object<QTcpSocket>(widget))
         {
-            QTcpSocketType* type =
-                c->findSymbolOfTypeByQualifiedName<QTcpSocketType>(
-                    c->internName("qt.QTcpSocket"), false);
+            QTcpSocketType* type = c->findSymbolOfTypeByQualifiedName<QTcpSocketType>(c->internName("qt.QTcpSocket"), false);
             ClassInstance* o = ClassInstance::allocate(type);
             setobject(o, w);
             return o;
@@ -424,26 +417,17 @@ namespace Mu
         }
     }
 
-    static NODE_IMPLEMENTATION(castFromObject, Pointer)
-    {
-        NODE_RETURN(
-            QTcpSocket_QTcpSocket_QObject(NODE_THREAD, NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(castFromObject, Pointer) { NODE_RETURN(QTcpSocket_QTcpSocket_QObject(NODE_THREAD, NODE_ARG(0, Pointer))); }
 
-    Pointer qt_QTcpSocket_QTcpSocket_QTcpSocket_QTcpSocket_QObject(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
+    Pointer qt_QTcpSocket_QTcpSocket_QTcpSocket_QTcpSocket_QObject(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QObject* arg1 = object<QObject>(param_parent);
-        setobject(param_this,
-                  new MuQt_QTcpSocket(param_this,
-                                      NODE_THREAD.process()->callEnv(), arg1));
+        setobject(param_this, new MuQt_QTcpSocket(param_this, NODE_THREAD.process()->callEnv(), arg1));
         return param_this;
     }
 
-    void
-    qt_QTcpSocket_disconnectFromHost_void_QTcpSocket(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_this)
+    void qt_QTcpSocket_disconnectFromHost_void_QTcpSocket(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTcpSocket* arg0 = object<QTcpSocket>(param_this);
@@ -453,8 +437,7 @@ namespace Mu
             arg0->disconnectFromHost();
     }
 
-    void qt_QTcpSocket_resume_void_QTcpSocket(Mu::Thread& NODE_THREAD,
-                                              Pointer param_this)
+    void qt_QTcpSocket_resume_void_QTcpSocket(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTcpSocket* arg0 = object<QTcpSocket>(param_this);
@@ -464,8 +447,7 @@ namespace Mu
             arg0->resume();
     }
 
-    void qt_QTcpSocket_setReadBufferSize_void_QTcpSocket_int64(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int64 param_size)
+    void qt_QTcpSocket_setReadBufferSize_void_QTcpSocket_int64(Mu::Thread& NODE_THREAD, Pointer param_this, int64 param_size)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTcpSocket* arg0 = object<QTcpSocket>(param_this);
@@ -476,14 +458,12 @@ namespace Mu
             arg0->setReadBufferSize(arg1);
     }
 
-    void qt_QTcpSocket_setSocketOption_void_QTcpSocket_int_QVariant(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_option,
-        Pointer param_value)
+    void qt_QTcpSocket_setSocketOption_void_QTcpSocket_int_QVariant(Mu::Thread& NODE_THREAD, Pointer param_this, int param_option,
+                                                                    Pointer param_value)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTcpSocket* arg0 = object<QTcpSocket>(param_this);
-        QAbstractSocket::SocketOption arg1 =
-            (QAbstractSocket::SocketOption)(param_option);
+        QAbstractSocket::SocketOption arg1 = (QAbstractSocket::SocketOption)(param_option);
         const QVariant arg2 = getqtype<QVariantType>(param_value);
         if (isMuQtObject(arg0))
             arg0->QTcpSocket::setSocketOption(arg1, arg2);
@@ -491,77 +471,60 @@ namespace Mu
             arg0->setSocketOption(arg1, arg2);
     }
 
-    Pointer qt_QTcpSocket_socketOption_QVariant_QTcpSocket_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_option)
+    Pointer qt_QTcpSocket_socketOption_QVariant_QTcpSocket_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_option)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTcpSocket* arg0 = object<QTcpSocket>(param_this);
-        QAbstractSocket::SocketOption arg1 =
-            (QAbstractSocket::SocketOption)(param_option);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QVariantType>(
-                         c, arg0->QTcpSocket::socketOption(arg1), "qt.QVariant")
-                   : makeqtype<QVariantType>(c, arg0->socketOption(arg1),
-                                             "qt.QVariant");
+        QAbstractSocket::SocketOption arg1 = (QAbstractSocket::SocketOption)(param_option);
+        return isMuQtObject(arg0) ? makeqtype<QVariantType>(c, arg0->QTcpSocket::socketOption(arg1), "qt.QVariant")
+                                  : makeqtype<QVariantType>(c, arg0->socketOption(arg1), "qt.QVariant");
     }
 
-    bool qt_QTcpSocket_waitForConnected_bool_QTcpSocket_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_msecs)
+    bool qt_QTcpSocket_waitForConnected_bool_QTcpSocket_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_msecs)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTcpSocket* arg0 = object<QTcpSocket>(param_this);
         int arg1 = (int)(param_msecs);
-        return isMuQtObject(arg0) ? arg0->QTcpSocket::waitForConnected(arg1)
-                                  : arg0->waitForConnected(arg1);
+        return isMuQtObject(arg0) ? arg0->QTcpSocket::waitForConnected(arg1) : arg0->waitForConnected(arg1);
     }
 
-    bool qt_QTcpSocket_waitForDisconnected_bool_QTcpSocket_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_msecs)
+    bool qt_QTcpSocket_waitForDisconnected_bool_QTcpSocket_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_msecs)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTcpSocket* arg0 = object<QTcpSocket>(param_this);
         int arg1 = (int)(param_msecs);
-        return isMuQtObject(arg0) ? arg0->QTcpSocket::waitForDisconnected(arg1)
-                                  : arg0->waitForDisconnected(arg1);
+        return isMuQtObject(arg0) ? arg0->QTcpSocket::waitForDisconnected(arg1) : arg0->waitForDisconnected(arg1);
     }
 
-    bool qt_QTcpSocket_atEnd_bool_QTcpSocket(Mu::Thread& NODE_THREAD,
-                                             Pointer param_this)
+    bool qt_QTcpSocket_atEnd_bool_QTcpSocket(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTcpSocket* arg0 = object<QTcpSocket>(param_this);
         return isMuQtObject(arg0) ? arg0->QTcpSocket::atEnd() : arg0->atEnd();
     }
 
-    int64 qt_QTcpSocket_bytesAvailable_int64_QTcpSocket(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this)
+    int64 qt_QTcpSocket_bytesAvailable_int64_QTcpSocket(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTcpSocket* arg0 = object<QTcpSocket>(param_this);
-        return isMuQtObject(arg0) ? arg0->QTcpSocket::bytesAvailable()
-                                  : arg0->bytesAvailable();
+        return isMuQtObject(arg0) ? arg0->QTcpSocket::bytesAvailable() : arg0->bytesAvailable();
     }
 
-    int64 qt_QTcpSocket_bytesToWrite_int64_QTcpSocket(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    int64 qt_QTcpSocket_bytesToWrite_int64_QTcpSocket(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTcpSocket* arg0 = object<QTcpSocket>(param_this);
-        return isMuQtObject(arg0) ? arg0->QTcpSocket::bytesToWrite()
-                                  : arg0->bytesToWrite();
+        return isMuQtObject(arg0) ? arg0->QTcpSocket::bytesToWrite() : arg0->bytesToWrite();
     }
 
-    bool qt_QTcpSocket_canReadLine_bool_QTcpSocket(Mu::Thread& NODE_THREAD,
-                                                   Pointer param_this)
+    bool qt_QTcpSocket_canReadLine_bool_QTcpSocket(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTcpSocket* arg0 = object<QTcpSocket>(param_this);
-        return isMuQtObject(arg0) ? arg0->QTcpSocket::canReadLine()
-                                  : arg0->canReadLine();
+        return isMuQtObject(arg0) ? arg0->QTcpSocket::canReadLine() : arg0->canReadLine();
     }
 
-    void qt_QTcpSocket_close_void_QTcpSocket(Mu::Thread& NODE_THREAD,
-                                             Pointer param_this)
+    void qt_QTcpSocket_close_void_QTcpSocket(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTcpSocket* arg0 = object<QTcpSocket>(param_this);
@@ -571,130 +534,102 @@ namespace Mu
             arg0->close();
     }
 
-    bool qt_QTcpSocket_isSequential_bool_QTcpSocket(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this)
+    bool qt_QTcpSocket_isSequential_bool_QTcpSocket(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTcpSocket* arg0 = object<QTcpSocket>(param_this);
-        return isMuQtObject(arg0) ? arg0->QTcpSocket::isSequential()
-                                  : arg0->isSequential();
+        return isMuQtObject(arg0) ? arg0->QTcpSocket::isSequential() : arg0->isSequential();
     }
 
-    bool qt_QTcpSocket_waitForBytesWritten_bool_QTcpSocket_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_msecs)
+    bool qt_QTcpSocket_waitForBytesWritten_bool_QTcpSocket_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_msecs)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTcpSocket* arg0 = object<QTcpSocket>(param_this);
         int arg1 = (int)(param_msecs);
-        return isMuQtObject(arg0) ? arg0->QTcpSocket::waitForBytesWritten(arg1)
-                                  : arg0->waitForBytesWritten(arg1);
+        return isMuQtObject(arg0) ? arg0->QTcpSocket::waitForBytesWritten(arg1) : arg0->waitForBytesWritten(arg1);
     }
 
-    bool qt_QTcpSocket_waitForReadyRead_bool_QTcpSocket_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_msecs)
+    bool qt_QTcpSocket_waitForReadyRead_bool_QTcpSocket_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_msecs)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTcpSocket* arg0 = object<QTcpSocket>(param_this);
         int arg1 = (int)(param_msecs);
-        return isMuQtObject(arg0) ? arg0->QTcpSocket::waitForReadyRead(arg1)
-                                  : arg0->waitForReadyRead(arg1);
+        return isMuQtObject(arg0) ? arg0->QTcpSocket::waitForReadyRead(arg1) : arg0->waitForReadyRead(arg1);
     }
 
     static NODE_IMPLEMENTATION(_n_QTcpSocket0, Pointer)
     {
-        NODE_RETURN(qt_QTcpSocket_QTcpSocket_QTcpSocket_QTcpSocket_QObject(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QTcpSocket_QTcpSocket_QTcpSocket_QTcpSocket_QObject(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_disconnectFromHost0, void)
     {
-        qt_QTcpSocket_disconnectFromHost_void_QTcpSocket(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
+        qt_QTcpSocket_disconnectFromHost_void_QTcpSocket(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
     }
 
-    static NODE_IMPLEMENTATION(_n_resume0, void)
-    {
-        qt_QTcpSocket_resume_void_QTcpSocket(NODE_THREAD,
-                                             NONNIL_NODE_ARG(0, Pointer));
-    }
+    static NODE_IMPLEMENTATION(_n_resume0, void) { qt_QTcpSocket_resume_void_QTcpSocket(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)); }
 
     static NODE_IMPLEMENTATION(_n_setReadBufferSize0, void)
     {
-        qt_QTcpSocket_setReadBufferSize_void_QTcpSocket_int64(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int64));
+        qt_QTcpSocket_setReadBufferSize_void_QTcpSocket_int64(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int64));
     }
 
     static NODE_IMPLEMENTATION(_n_setSocketOption0, void)
     {
-        qt_QTcpSocket_setSocketOption_void_QTcpSocket_int_QVariant(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, Pointer));
+        qt_QTcpSocket_setSocketOption_void_QTcpSocket_int_QVariant(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                   NODE_ARG(2, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_socketOption0, Pointer)
     {
-        NODE_RETURN(qt_QTcpSocket_socketOption_QVariant_QTcpSocket_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QTcpSocket_socketOption_QVariant_QTcpSocket_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_waitForConnected0, bool)
     {
-        NODE_RETURN(qt_QTcpSocket_waitForConnected_bool_QTcpSocket_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QTcpSocket_waitForConnected_bool_QTcpSocket_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_waitForDisconnected0, bool)
     {
-        NODE_RETURN(qt_QTcpSocket_waitForDisconnected_bool_QTcpSocket_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QTcpSocket_waitForDisconnected_bool_QTcpSocket_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_atEnd0, bool)
     {
-        NODE_RETURN(qt_QTcpSocket_atEnd_bool_QTcpSocket(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTcpSocket_atEnd_bool_QTcpSocket(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_bytesAvailable0, int64)
     {
-        NODE_RETURN(qt_QTcpSocket_bytesAvailable_int64_QTcpSocket(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTcpSocket_bytesAvailable_int64_QTcpSocket(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_bytesToWrite0, int64)
     {
-        NODE_RETURN(qt_QTcpSocket_bytesToWrite_int64_QTcpSocket(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTcpSocket_bytesToWrite_int64_QTcpSocket(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_canReadLine0, bool)
     {
-        NODE_RETURN(qt_QTcpSocket_canReadLine_bool_QTcpSocket(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTcpSocket_canReadLine_bool_QTcpSocket(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
-    static NODE_IMPLEMENTATION(_n_close0, void)
-    {
-        qt_QTcpSocket_close_void_QTcpSocket(NODE_THREAD,
-                                            NONNIL_NODE_ARG(0, Pointer));
-    }
+    static NODE_IMPLEMENTATION(_n_close0, void) { qt_QTcpSocket_close_void_QTcpSocket(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)); }
 
     static NODE_IMPLEMENTATION(_n_isSequential0, bool)
     {
-        NODE_RETURN(qt_QTcpSocket_isSequential_bool_QTcpSocket(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTcpSocket_isSequential_bool_QTcpSocket(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_waitForBytesWritten0, bool)
     {
-        NODE_RETURN(qt_QTcpSocket_waitForBytesWritten_bool_QTcpSocket_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QTcpSocket_waitForBytesWritten_bool_QTcpSocket_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_waitForReadyRead0, bool)
     {
-        NODE_RETURN(qt_QTcpSocket_waitForReadyRead_bool_QTcpSocket_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QTcpSocket_waitForReadyRead_bool_QTcpSocket_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     void QTcpSocketType::load()
@@ -714,17 +649,13 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
-                   new Function(c, tn, castFromObject, Cast, Compiled,
-                                QTcpSocket_QTcpSocket_QObject, Return, ftn,
-                                Parameters,
+                   new Function(c, tn, castFromObject, Cast, Compiled, QTcpSocket_QTcpSocket_QObject, Return, ftn, Parameters,
                                 new Param(c, "object", "qt.QObject"), End),
 
                    EndArguments);
@@ -732,90 +663,55 @@ namespace Mu
         addSymbols(
             // enums
             // member functions
-            new Function(c, "QTcpSocket", _n_QTcpSocket0, None, Compiled,
-                         qt_QTcpSocket_QTcpSocket_QTcpSocket_QTcpSocket_QObject,
-                         Return, "qt.QTcpSocket", Parameters,
-                         new Param(c, "this", "qt.QTcpSocket"),
-                         new Param(c, "parent", "qt.QObject"), End),
+            new Function(c, "QTcpSocket", _n_QTcpSocket0, None, Compiled, qt_QTcpSocket_QTcpSocket_QTcpSocket_QTcpSocket_QObject, Return,
+                         "qt.QTcpSocket", Parameters, new Param(c, "this", "qt.QTcpSocket"), new Param(c, "parent", "qt.QObject"), End),
             // MISSING: connectToHost (void; QTcpSocket this, string hostName,
             // "quint16" port, "OpenMode" openMode, flags
             // QAbstractSocket::NetworkLayerProtocol protocol)
-            _func[0] = new MemberFunction(
-                c, "disconnectFromHost", _n_disconnectFromHost0, None, Compiled,
-                qt_QTcpSocket_disconnectFromHost_void_QTcpSocket, Return,
-                "void", Parameters, new Param(c, "this", "qt.QTcpSocket"), End),
-            _func[1] = new MemberFunction(
-                c, "resume", _n_resume0, None, Compiled,
-                qt_QTcpSocket_resume_void_QTcpSocket, Return, "void",
-                Parameters, new Param(c, "this", "qt.QTcpSocket"), End),
-            _func[2] = new MemberFunction(
-                c, "setReadBufferSize", _n_setReadBufferSize0, None, Compiled,
-                qt_QTcpSocket_setReadBufferSize_void_QTcpSocket_int64, Return,
-                "void", Parameters, new Param(c, "this", "qt.QTcpSocket"),
-                new Param(c, "size", "int64"), End),
+            _func[0] = new MemberFunction(c, "disconnectFromHost", _n_disconnectFromHost0, None, Compiled,
+                                          qt_QTcpSocket_disconnectFromHost_void_QTcpSocket, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QTcpSocket"), End),
+            _func[1] = new MemberFunction(c, "resume", _n_resume0, None, Compiled, qt_QTcpSocket_resume_void_QTcpSocket, Return, "void",
+                                          Parameters, new Param(c, "this", "qt.QTcpSocket"), End),
+            _func[2] = new MemberFunction(c, "setReadBufferSize", _n_setReadBufferSize0, None, Compiled,
+                                          qt_QTcpSocket_setReadBufferSize_void_QTcpSocket_int64, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QTcpSocket"), new Param(c, "size", "int64"), End),
             // MISSING: setSocketDescriptor (bool; QTcpSocket this, "qintptr"
             // socketDescriptor, flags QAbstractSocket::SocketState socketState,
             // "OpenMode" openMode)
-            _func[3] = new MemberFunction(
-                c, "setSocketOption", _n_setSocketOption0, None, Compiled,
-                qt_QTcpSocket_setSocketOption_void_QTcpSocket_int_QVariant,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTcpSocket"),
-                new Param(c, "option", "int"),
-                new Param(c, "value", "qt.QVariant"), End),
+            _func[3] = new MemberFunction(c, "setSocketOption", _n_setSocketOption0, None, Compiled,
+                                          qt_QTcpSocket_setSocketOption_void_QTcpSocket_int_QVariant, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QTcpSocket"), new Param(c, "option", "int"),
+                                          new Param(c, "value", "qt.QVariant"), End),
             // MISSING: socketDescriptor ("qintptr"; QTcpSocket this)
-            _func[4] = new MemberFunction(
-                c, "socketOption", _n_socketOption0, None, Compiled,
-                qt_QTcpSocket_socketOption_QVariant_QTcpSocket_int, Return,
-                "qt.QVariant", Parameters,
-                new Param(c, "this", "qt.QTcpSocket"),
-                new Param(c, "option", "int"), End),
-            _func[5] = new MemberFunction(
-                c, "waitForConnected", _n_waitForConnected0, None, Compiled,
-                qt_QTcpSocket_waitForConnected_bool_QTcpSocket_int, Return,
-                "bool", Parameters, new Param(c, "this", "qt.QTcpSocket"),
-                new Param(c, "msecs", "int", Value((int)30000)), End),
-            _func[6] = new MemberFunction(
-                c, "waitForDisconnected", _n_waitForDisconnected0, None,
-                Compiled, qt_QTcpSocket_waitForDisconnected_bool_QTcpSocket_int,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QTcpSocket"),
-                new Param(c, "msecs", "int", Value((int)30000)), End),
-            _func[7] = new MemberFunction(
-                c, "atEnd", _n_atEnd0, None, Compiled,
-                qt_QTcpSocket_atEnd_bool_QTcpSocket, Return, "bool", Parameters,
-                new Param(c, "this", "qt.QTcpSocket"), End),
-            _func[8] = new MemberFunction(
-                c, "bytesAvailable", _n_bytesAvailable0, None, Compiled,
-                qt_QTcpSocket_bytesAvailable_int64_QTcpSocket, Return, "int64",
-                Parameters, new Param(c, "this", "qt.QTcpSocket"), End),
-            _func[9] = new MemberFunction(
-                c, "bytesToWrite", _n_bytesToWrite0, None, Compiled,
-                qt_QTcpSocket_bytesToWrite_int64_QTcpSocket, Return, "int64",
-                Parameters, new Param(c, "this", "qt.QTcpSocket"), End),
-            _func[10] = new MemberFunction(
-                c, "canReadLine", _n_canReadLine0, None, Compiled,
-                qt_QTcpSocket_canReadLine_bool_QTcpSocket, Return, "bool",
-                Parameters, new Param(c, "this", "qt.QTcpSocket"), End),
-            _func[11] = new MemberFunction(
-                c, "close", _n_close0, None, Compiled,
-                qt_QTcpSocket_close_void_QTcpSocket, Return, "void", Parameters,
-                new Param(c, "this", "qt.QTcpSocket"), End),
-            _func[12] = new MemberFunction(
-                c, "isSequential", _n_isSequential0, None, Compiled,
-                qt_QTcpSocket_isSequential_bool_QTcpSocket, Return, "bool",
-                Parameters, new Param(c, "this", "qt.QTcpSocket"), End),
-            _func[13] = new MemberFunction(
-                c, "waitForBytesWritten", _n_waitForBytesWritten0, None,
-                Compiled, qt_QTcpSocket_waitForBytesWritten_bool_QTcpSocket_int,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QTcpSocket"),
-                new Param(c, "msecs", "int", Value((int)30000)), End),
-            _func[14] = new MemberFunction(
-                c, "waitForReadyRead", _n_waitForReadyRead0, None, Compiled,
-                qt_QTcpSocket_waitForReadyRead_bool_QTcpSocket_int, Return,
-                "bool", Parameters, new Param(c, "this", "qt.QTcpSocket"),
-                new Param(c, "msecs", "int", Value((int)30000)), End),
+            _func[4] = new MemberFunction(c, "socketOption", _n_socketOption0, None, Compiled,
+                                          qt_QTcpSocket_socketOption_QVariant_QTcpSocket_int, Return, "qt.QVariant", Parameters,
+                                          new Param(c, "this", "qt.QTcpSocket"), new Param(c, "option", "int"), End),
+            _func[5] = new MemberFunction(c, "waitForConnected", _n_waitForConnected0, None, Compiled,
+                                          qt_QTcpSocket_waitForConnected_bool_QTcpSocket_int, Return, "bool", Parameters,
+                                          new Param(c, "this", "qt.QTcpSocket"), new Param(c, "msecs", "int", Value((int)30000)), End),
+            _func[6] = new MemberFunction(c, "waitForDisconnected", _n_waitForDisconnected0, None, Compiled,
+                                          qt_QTcpSocket_waitForDisconnected_bool_QTcpSocket_int, Return, "bool", Parameters,
+                                          new Param(c, "this", "qt.QTcpSocket"), new Param(c, "msecs", "int", Value((int)30000)), End),
+            _func[7] = new MemberFunction(c, "atEnd", _n_atEnd0, None, Compiled, qt_QTcpSocket_atEnd_bool_QTcpSocket, Return, "bool",
+                                          Parameters, new Param(c, "this", "qt.QTcpSocket"), End),
+            _func[8] =
+                new MemberFunction(c, "bytesAvailable", _n_bytesAvailable0, None, Compiled, qt_QTcpSocket_bytesAvailable_int64_QTcpSocket,
+                                   Return, "int64", Parameters, new Param(c, "this", "qt.QTcpSocket"), End),
+            _func[9] = new MemberFunction(c, "bytesToWrite", _n_bytesToWrite0, None, Compiled, qt_QTcpSocket_bytesToWrite_int64_QTcpSocket,
+                                          Return, "int64", Parameters, new Param(c, "this", "qt.QTcpSocket"), End),
+            _func[10] = new MemberFunction(c, "canReadLine", _n_canReadLine0, None, Compiled, qt_QTcpSocket_canReadLine_bool_QTcpSocket,
+                                           Return, "bool", Parameters, new Param(c, "this", "qt.QTcpSocket"), End),
+            _func[11] = new MemberFunction(c, "close", _n_close0, None, Compiled, qt_QTcpSocket_close_void_QTcpSocket, Return, "void",
+                                           Parameters, new Param(c, "this", "qt.QTcpSocket"), End),
+            _func[12] = new MemberFunction(c, "isSequential", _n_isSequential0, None, Compiled, qt_QTcpSocket_isSequential_bool_QTcpSocket,
+                                           Return, "bool", Parameters, new Param(c, "this", "qt.QTcpSocket"), End),
+            _func[13] = new MemberFunction(c, "waitForBytesWritten", _n_waitForBytesWritten0, None, Compiled,
+                                           qt_QTcpSocket_waitForBytesWritten_bool_QTcpSocket_int, Return, "bool", Parameters,
+                                           new Param(c, "this", "qt.QTcpSocket"), new Param(c, "msecs", "int", Value((int)30000)), End),
+            _func[14] = new MemberFunction(c, "waitForReadyRead", _n_waitForReadyRead0, None, Compiled,
+                                           qt_QTcpSocket_waitForReadyRead_bool_QTcpSocket_int, Return, "bool", Parameters,
+                                           new Param(c, "this", "qt.QTcpSocket"), new Param(c, "msecs", "int", Value((int)30000)), End),
             // MISSING: readData (int64; QTcpSocket this, "char *" data, int64
             // maxSize) // protected MISSING: readLineData (int64; QTcpSocket
             // this, "char *" data, int64 maxlen) // protected MISSING:

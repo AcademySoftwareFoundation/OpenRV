@@ -25,20 +25,11 @@ namespace Mu
 
     NameType::~NameType() {}
 
-    PrimitiveObject* NameType::newObject() const
-    {
-        return new PrimitiveObject(this);
-    }
+    PrimitiveObject* NameType::newObject() const { return new PrimitiveObject(this); }
 
-    Value NameType::nodeEval(const Node* n, Thread& thread) const
-    {
-        return Value((*n->func()._PointerFunc)(*n, thread));
-    }
+    Value NameType::nodeEval(const Node* n, Thread& thread) const { return Value((*n->func()._PointerFunc)(*n, thread)); }
 
-    void NameType::nodeEval(void*, const Node* n, Thread& thread) const
-    {
-        (*n->func()._PointerFunc)(*n, thread);
-    }
+    void NameType::nodeEval(void*, const Node* n, Thread& thread) const { (*n->func()._PointerFunc)(*n, thread); }
 
     void NameType::outputValue(ostream& o, const Value& value, bool full) const
     {
@@ -46,8 +37,7 @@ namespace Mu
         StringType::outputQuotedString(o, s);
     }
 
-    void NameType::outputValueRecursive(std::ostream& o, const ValuePointer p,
-                                        ValueOutputState&) const
+    void NameType::outputValueRecursive(std::ostream& o, const ValuePointer p, ValueOutputState&) const
     {
         Name::Ref* ref = reinterpret_cast<Name::Ref*>(p);
         String s = Name(*ref).c_str();
@@ -83,18 +73,15 @@ namespace Mu
 
         s->addSymbols(new ReferenceType(c, "name&", this),
 
-                      new Function(c, "name", NameType::dereference, Cast,
-                                   Return, tn, Args, rn, End),
+                      new Function(c, "name", NameType::dereference, Cast, Return, tn, Args, rn, End),
 
                       EndArguments);
 
         globalScope()->addSymbols(
 
-            new Function(c, "=", NameType::assign, AsOp, Return, rn, Args, rn,
-                         tn, End),
+            new Function(c, "=", NameType::assign, AsOp, Return, rn, Args, rn, tn, End),
 
-            new Function(c, "string", NameType::to_string, Cast, Return,
-                         "string", Args, tn, End),
+            new Function(c, "string", NameType::to_string, Cast, Return, "string", Args, tn, End),
 
             EndArguments);
     }

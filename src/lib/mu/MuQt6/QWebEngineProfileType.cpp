@@ -51,31 +51,24 @@ namespace Mu
     //----------------------------------------------------------------------
     //  INHERITABLE TYPE IMPLEMENTATION
 
-    MuQt_QWebEngineProfile::MuQt_QWebEngineProfile(Pointer muobj,
-                                                   const CallEnvironment* ce,
-                                                   QObject* parent)
+    MuQt_QWebEngineProfile::MuQt_QWebEngineProfile(Pointer muobj, const CallEnvironment* ce, QObject* parent)
         : QWebEngineProfile(parent)
     {
         _env = ce;
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QWebEngineProfileType>(
-            c->internName("qt.QWebEngineProfile"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QWebEngineProfileType>(c->internName("qt.QWebEngineProfile"));
     }
 
-    MuQt_QWebEngineProfile::MuQt_QWebEngineProfile(Pointer muobj,
-                                                   const CallEnvironment* ce,
-                                                   const QString& storageName,
-                                                   QObject* parent)
+    MuQt_QWebEngineProfile::MuQt_QWebEngineProfile(Pointer muobj, const CallEnvironment* ce, const QString& storageName, QObject* parent)
         : QWebEngineProfile(storageName, parent)
     {
         _env = ce;
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QWebEngineProfileType>(
-            c->internName("qt.QWebEngineProfile"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QWebEngineProfileType>(c->internName("qt.QWebEngineProfile"));
     }
 
     bool MuQt_QWebEngineProfile::event(QEvent* e)
@@ -110,8 +103,7 @@ namespace Mu
         {
             Function::ArgumentVector args(3);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeinstance<QObjectType>(c, watched, "qt.QObject"));
+            args[1] = Value(makeinstance<QObjectType>(c, watched, "qt.QObject"));
             args[2] = Value(makeqpointer<QEventType>(c, event, "qt.QEvent"));
             Value rval = _env->call(F, args);
             return (bool)(rval._bool);
@@ -159,8 +151,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QTimerEventType>(c, event, "qt.QTimerEvent"));
+            args[1] = Value(makeqpointer<QTimerEventType>(c, event, "qt.QTimerEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -172,8 +163,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  Mu Type CONSTRUCTORS
 
-    QWebEngineProfileType::QWebEngineProfileType(Context* c, const char* name,
-                                                 Class* super, Class* super2)
+    QWebEngineProfileType::QWebEngineProfileType(Context* c, const char* name, Class* super, Class* super2)
         : Class(c, name, vectorOf2(super, super2))
     {
     }
@@ -183,9 +173,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    static Pointer
-    QWebEngineProfile_QWebEngineProfile_QObject(Thread& NODE_THREAD,
-                                                Pointer obj)
+    static Pointer QWebEngineProfile_QWebEngineProfile_QObject(Thread& NODE_THREAD, Pointer obj)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         ClassInstance* widget = reinterpret_cast<ClassInstance*>(obj);
@@ -197,8 +185,7 @@ namespace Mu
         else if (QWebEngineProfile* w = object<QWebEngineProfile>(widget))
         {
             QWebEngineProfileType* type =
-                c->findSymbolOfTypeByQualifiedName<QWebEngineProfileType>(
-                    c->internName("qt.QWebEngineProfile"), false);
+                c->findSymbolOfTypeByQualifiedName<QWebEngineProfileType>(c->internName("qt.QWebEngineProfile"), false);
             ClassInstance* o = ClassInstance::allocate(type);
             setobject(o, w);
             return o;
@@ -211,63 +198,53 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(castFromObject, Pointer)
     {
-        NODE_RETURN(QWebEngineProfile_QWebEngineProfile_QObject(
-            NODE_THREAD, NODE_ARG(0, Pointer)));
+        NODE_RETURN(QWebEngineProfile_QWebEngineProfile_QObject(NODE_THREAD, NODE_ARG(0, Pointer)));
     }
 
-    Pointer
-    qt_QWebEngineProfile_QWebEngineProfile_QWebEngineProfile_QWebEngineProfile_QObject(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
+    Pointer qt_QWebEngineProfile_QWebEngineProfile_QWebEngineProfile_QWebEngineProfile_QObject(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                               Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QObject* arg1 = object<QObject>(param_parent);
-        setobject(param_this,
-                  new MuQt_QWebEngineProfile(
-                      param_this, NODE_THREAD.process()->callEnv(), arg1));
+        setobject(param_this, new MuQt_QWebEngineProfile(param_this, NODE_THREAD.process()->callEnv(), arg1));
         return param_this;
     }
 
-    Pointer
-    qt_QWebEngineProfile_QWebEngineProfile_QWebEngineProfile_QWebEngineProfile_string_QObject(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_storageName,
-        Pointer param_parent)
+    Pointer qt_QWebEngineProfile_QWebEngineProfile_QWebEngineProfile_QWebEngineProfile_string_QObject(Mu::Thread& NODE_THREAD,
+                                                                                                      Pointer param_this,
+                                                                                                      Pointer param_storageName,
+                                                                                                      Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QString arg1 = qstring(param_storageName);
         QObject* arg2 = object<QObject>(param_parent);
-        setobject(param_this, new MuQt_QWebEngineProfile(
-                                  param_this, NODE_THREAD.process()->callEnv(),
-                                  arg1, arg2));
+        setobject(param_this, new MuQt_QWebEngineProfile(param_this, NODE_THREAD.process()->callEnv(), arg1, arg2));
         return param_this;
     }
 
-    Pointer qt_QWebEngineProfile_cachePath_string_QWebEngineProfile(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QWebEngineProfile_cachePath_string_QWebEngineProfile(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineProfile* arg0 = object<QWebEngineProfile>(param_this);
         return makestring(c, arg0->cachePath());
     }
 
-    void qt_QWebEngineProfile_clearAllVisitedLinks_void_QWebEngineProfile(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    void qt_QWebEngineProfile_clearAllVisitedLinks_void_QWebEngineProfile(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineProfile* arg0 = object<QWebEngineProfile>(param_this);
         arg0->clearAllVisitedLinks();
     }
 
-    void qt_QWebEngineProfile_clearHttpCache_void_QWebEngineProfile(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    void qt_QWebEngineProfile_clearHttpCache_void_QWebEngineProfile(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineProfile* arg0 = object<QWebEngineProfile>(param_this);
         arg0->clearHttpCache();
     }
 
-    void
-    qt_QWebEngineProfile_clearVisitedLinks_void_QWebEngineProfile_qt__QUrlBSB_ESB_(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_urls)
+    void qt_QWebEngineProfile_clearVisitedLinks_void_QWebEngineProfile_qt__QUrlBSB_ESB_(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                        Pointer param_urls)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineProfile* arg0 = object<QWebEngineProfile>(param_this);
@@ -275,106 +252,92 @@ namespace Mu
         arg0->clearVisitedLinks(arg1);
     }
 
-    Pointer
-    qt_QWebEngineProfile_cookieStore_QWebEngineCookieStore_QWebEngineProfile(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QWebEngineProfile_cookieStore_QWebEngineCookieStore_QWebEngineProfile(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineProfile* arg0 = object<QWebEngineProfile>(param_this);
-        return makeinstance<QWebEngineCookieStoreType>(
-            c, arg0->cookieStore(), "qt.QWebEngineCookieStore");
+        return makeinstance<QWebEngineCookieStoreType>(c, arg0->cookieStore(), "qt.QWebEngineCookieStore");
     }
 
-    Pointer qt_QWebEngineProfile_downloadPath_string_QWebEngineProfile(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QWebEngineProfile_downloadPath_string_QWebEngineProfile(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineProfile* arg0 = object<QWebEngineProfile>(param_this);
         return makestring(c, arg0->downloadPath());
     }
 
-    Pointer qt_QWebEngineProfile_httpAcceptLanguage_string_QWebEngineProfile(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QWebEngineProfile_httpAcceptLanguage_string_QWebEngineProfile(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineProfile* arg0 = object<QWebEngineProfile>(param_this);
         return makestring(c, arg0->httpAcceptLanguage());
     }
 
-    int qt_QWebEngineProfile_httpCacheMaximumSize_int_QWebEngineProfile(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    int qt_QWebEngineProfile_httpCacheMaximumSize_int_QWebEngineProfile(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineProfile* arg0 = object<QWebEngineProfile>(param_this);
         return arg0->httpCacheMaximumSize();
     }
 
-    int qt_QWebEngineProfile_httpCacheType_int_QWebEngineProfile(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    int qt_QWebEngineProfile_httpCacheType_int_QWebEngineProfile(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineProfile* arg0 = object<QWebEngineProfile>(param_this);
         return int(arg0->httpCacheType());
     }
 
-    Pointer qt_QWebEngineProfile_httpUserAgent_string_QWebEngineProfile(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QWebEngineProfile_httpUserAgent_string_QWebEngineProfile(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineProfile* arg0 = object<QWebEngineProfile>(param_this);
         return makestring(c, arg0->httpUserAgent());
     }
 
-    bool qt_QWebEngineProfile_isOffTheRecord_bool_QWebEngineProfile(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    bool qt_QWebEngineProfile_isOffTheRecord_bool_QWebEngineProfile(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineProfile* arg0 = object<QWebEngineProfile>(param_this);
         return arg0->isOffTheRecord();
     }
 
-    bool qt_QWebEngineProfile_isPushServiceEnabled_bool_QWebEngineProfile(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    bool qt_QWebEngineProfile_isPushServiceEnabled_bool_QWebEngineProfile(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineProfile* arg0 = object<QWebEngineProfile>(param_this);
         return arg0->isPushServiceEnabled();
     }
 
-    bool qt_QWebEngineProfile_isSpellCheckEnabled_bool_QWebEngineProfile(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    bool qt_QWebEngineProfile_isSpellCheckEnabled_bool_QWebEngineProfile(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineProfile* arg0 = object<QWebEngineProfile>(param_this);
         return arg0->isSpellCheckEnabled();
     }
 
-    int qt_QWebEngineProfile_persistentCookiesPolicy_int_QWebEngineProfile(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    int qt_QWebEngineProfile_persistentCookiesPolicy_int_QWebEngineProfile(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineProfile* arg0 = object<QWebEngineProfile>(param_this);
         return int(arg0->persistentCookiesPolicy());
     }
 
-    Pointer qt_QWebEngineProfile_persistentStoragePath_string_QWebEngineProfile(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QWebEngineProfile_persistentStoragePath_string_QWebEngineProfile(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineProfile* arg0 = object<QWebEngineProfile>(param_this);
         return makestring(c, arg0->persistentStoragePath());
     }
 
-    void qt_QWebEngineProfile_removeAllUrlSchemeHandlers_void_QWebEngineProfile(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    void qt_QWebEngineProfile_removeAllUrlSchemeHandlers_void_QWebEngineProfile(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineProfile* arg0 = object<QWebEngineProfile>(param_this);
         arg0->removeAllUrlSchemeHandlers();
     }
 
-    void qt_QWebEngineProfile_removeUrlScheme_void_QWebEngineProfile_QByteArray(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_scheme)
+    void qt_QWebEngineProfile_removeUrlScheme_void_QWebEngineProfile_QByteArray(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                Pointer param_scheme)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineProfile* arg0 = object<QWebEngineProfile>(param_this);
@@ -382,8 +345,7 @@ namespace Mu
         arg0->removeUrlScheme(arg1);
     }
 
-    void qt_QWebEngineProfile_setCachePath_void_QWebEngineProfile_string(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_path)
+    void qt_QWebEngineProfile_setCachePath_void_QWebEngineProfile_string(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_path)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineProfile* arg0 = object<QWebEngineProfile>(param_this);
@@ -391,8 +353,7 @@ namespace Mu
         arg0->setCachePath(arg1);
     }
 
-    void qt_QWebEngineProfile_setDownloadPath_void_QWebEngineProfile_string(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_path)
+    void qt_QWebEngineProfile_setDownloadPath_void_QWebEngineProfile_string(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_path)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineProfile* arg0 = object<QWebEngineProfile>(param_this);
@@ -400,10 +361,8 @@ namespace Mu
         arg0->setDownloadPath(arg1);
     }
 
-    void
-    qt_QWebEngineProfile_setHttpAcceptLanguage_void_QWebEngineProfile_string(
-        Mu::Thread& NODE_THREAD, Pointer param_this,
-        Pointer param_httpAcceptLanguage)
+    void qt_QWebEngineProfile_setHttpAcceptLanguage_void_QWebEngineProfile_string(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                  Pointer param_httpAcceptLanguage)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineProfile* arg0 = object<QWebEngineProfile>(param_this);
@@ -411,9 +370,8 @@ namespace Mu
         arg0->setHttpAcceptLanguage(arg1);
     }
 
-    void
-    qt_QWebEngineProfile_setHttpCacheMaximumSize_void_QWebEngineProfile_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_maxSize)
+    void qt_QWebEngineProfile_setHttpCacheMaximumSize_void_QWebEngineProfile_int(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                 int param_maxSize)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineProfile* arg0 = object<QWebEngineProfile>(param_this);
@@ -421,18 +379,17 @@ namespace Mu
         arg0->setHttpCacheMaximumSize(arg1);
     }
 
-    void qt_QWebEngineProfile_setHttpCacheType_void_QWebEngineProfile_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_httpCacheType)
+    void qt_QWebEngineProfile_setHttpCacheType_void_QWebEngineProfile_int(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                          int param_httpCacheType)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineProfile* arg0 = object<QWebEngineProfile>(param_this);
-        QWebEngineProfile::HttpCacheType arg1 =
-            (QWebEngineProfile::HttpCacheType)(param_httpCacheType);
+        QWebEngineProfile::HttpCacheType arg1 = (QWebEngineProfile::HttpCacheType)(param_httpCacheType);
         arg0->setHttpCacheType(arg1);
     }
 
-    void qt_QWebEngineProfile_setHttpUserAgent_void_QWebEngineProfile_string(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_userAgent)
+    void qt_QWebEngineProfile_setHttpUserAgent_void_QWebEngineProfile_string(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                             Pointer param_userAgent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineProfile* arg0 = object<QWebEngineProfile>(param_this);
@@ -440,22 +397,17 @@ namespace Mu
         arg0->setHttpUserAgent(arg1);
     }
 
-    void
-    qt_QWebEngineProfile_setPersistentCookiesPolicy_void_QWebEngineProfile_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this,
-        int param_newPersistentCookiesPolicy)
+    void qt_QWebEngineProfile_setPersistentCookiesPolicy_void_QWebEngineProfile_int(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                    int param_newPersistentCookiesPolicy)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineProfile* arg0 = object<QWebEngineProfile>(param_this);
-        QWebEngineProfile::PersistentCookiesPolicy arg1 =
-            (QWebEngineProfile::PersistentCookiesPolicy)(
-                param_newPersistentCookiesPolicy);
+        QWebEngineProfile::PersistentCookiesPolicy arg1 = (QWebEngineProfile::PersistentCookiesPolicy)(param_newPersistentCookiesPolicy);
         arg0->setPersistentCookiesPolicy(arg1);
     }
 
-    void
-    qt_QWebEngineProfile_setPersistentStoragePath_void_QWebEngineProfile_string(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_path)
+    void qt_QWebEngineProfile_setPersistentStoragePath_void_QWebEngineProfile_string(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                     Pointer param_path)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineProfile* arg0 = object<QWebEngineProfile>(param_this);
@@ -463,8 +415,8 @@ namespace Mu
         arg0->setPersistentStoragePath(arg1);
     }
 
-    void qt_QWebEngineProfile_setPushServiceEnabled_void_QWebEngineProfile_bool(
-        Mu::Thread& NODE_THREAD, Pointer param_this, bool param_enable)
+    void qt_QWebEngineProfile_setPushServiceEnabled_void_QWebEngineProfile_bool(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                bool param_enable)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineProfile* arg0 = object<QWebEngineProfile>(param_this);
@@ -472,8 +424,8 @@ namespace Mu
         arg0->setPushServiceEnabled(arg1);
     }
 
-    void qt_QWebEngineProfile_setSpellCheckEnabled_void_QWebEngineProfile_bool(
-        Mu::Thread& NODE_THREAD, Pointer param_this, bool param_enable)
+    void qt_QWebEngineProfile_setSpellCheckEnabled_void_QWebEngineProfile_bool(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                               bool param_enable)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineProfile* arg0 = object<QWebEngineProfile>(param_this);
@@ -481,9 +433,8 @@ namespace Mu
         arg0->setSpellCheckEnabled(arg1);
     }
 
-    void
-    qt_QWebEngineProfile_setSpellCheckLanguages_void_QWebEngineProfile_stringBSB_ESB_(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_languages)
+    void qt_QWebEngineProfile_setSpellCheckLanguages_void_QWebEngineProfile_stringBSB_ESB_(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                           Pointer param_languages)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineProfile* arg0 = object<QWebEngineProfile>(param_this);
@@ -491,35 +442,29 @@ namespace Mu
         arg0->setSpellCheckLanguages(arg1);
     }
 
-    Pointer qt_QWebEngineProfile_settings_QWebEngineSettings_QWebEngineProfile(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QWebEngineProfile_settings_QWebEngineSettings_QWebEngineProfile(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineProfile* arg0 = object<QWebEngineProfile>(param_this);
-        return makeqpointer<QWebEngineSettingsType>(c, arg0->settings(),
-                                                    "qt.QWebEngineSettings");
+        return makeqpointer<QWebEngineSettingsType>(c, arg0->settings(), "qt.QWebEngineSettings");
     }
 
-    Pointer
-    qt_QWebEngineProfile_spellCheckLanguages_stringBSB_ESB__QWebEngineProfile(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QWebEngineProfile_spellCheckLanguages_stringBSB_ESB__QWebEngineProfile(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineProfile* arg0 = object<QWebEngineProfile>(param_this);
         return makestringlist(c, arg0->spellCheckLanguages());
     }
 
-    Pointer qt_QWebEngineProfile_storageName_string_QWebEngineProfile(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QWebEngineProfile_storageName_string_QWebEngineProfile(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineProfile* arg0 = object<QWebEngineProfile>(param_this);
         return makestring(c, arg0->storageName());
     }
 
-    bool
-    qt_QWebEngineProfile_visitedLinksContainsUrl_bool_QWebEngineProfile_QUrl(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_url)
+    bool qt_QWebEngineProfile_visitedLinksContainsUrl_bool_QWebEngineProfile_QUrl(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                  Pointer param_url)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineProfile* arg0 = object<QWebEngineProfile>(param_this);
@@ -527,31 +472,25 @@ namespace Mu
         return arg0->visitedLinksContainsUrl(arg1);
     }
 
-    bool qt_QWebEngineProfile_event_bool_QWebEngineProfile_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    bool qt_QWebEngineProfile_event_bool_QWebEngineProfile_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineProfile* arg0 = object<QWebEngineProfile>(param_this);
         QEvent* arg1 = getqpointer<QEventType>(param_e);
-        return isMuQtObject(arg0) ? arg0->QWebEngineProfile::event(arg1)
-                                  : arg0->event(arg1);
+        return isMuQtObject(arg0) ? arg0->QWebEngineProfile::event(arg1) : arg0->event(arg1);
     }
 
-    bool qt_QWebEngineProfile_eventFilter_bool_QWebEngineProfile_QObject_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_watched,
-        Pointer param_event)
+    bool qt_QWebEngineProfile_eventFilter_bool_QWebEngineProfile_QObject_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                Pointer param_watched, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineProfile* arg0 = object<QWebEngineProfile>(param_this);
         QObject* arg1 = object<QObject>(param_watched);
         QEvent* arg2 = getqpointer<QEventType>(param_event);
-        return isMuQtObject(arg0)
-                   ? arg0->QWebEngineProfile::eventFilter(arg1, arg2)
-                   : arg0->eventFilter(arg1, arg2);
+        return isMuQtObject(arg0) ? arg0->QWebEngineProfile::eventFilter(arg1, arg2) : arg0->eventFilter(arg1, arg2);
     }
 
-    void qt_QWebEngineProfile_customEvent_void_QWebEngineProfile_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QWebEngineProfile_customEvent_void_QWebEngineProfile_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineProfile* arg0 = object<QWebEngineProfile>(param_this);
@@ -562,8 +501,8 @@ namespace Mu
             ((MuQt_QWebEngineProfile*)arg0)->customEvent_pub(arg1);
     }
 
-    void qt_QWebEngineProfile_timerEvent_void_QWebEngineProfile_QTimerEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QWebEngineProfile_timerEvent_void_QWebEngineProfile_QTimerEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                            Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineProfile* arg0 = object<QWebEngineProfile>(param_this);
@@ -574,263 +513,216 @@ namespace Mu
             ((MuQt_QWebEngineProfile*)arg0)->timerEvent_pub(arg1);
     }
 
-    Pointer qt_QWebEngineProfile_defaultProfile_QWebEngineProfile(
-        Mu::Thread& NODE_THREAD)
+    Pointer qt_QWebEngineProfile_defaultProfile_QWebEngineProfile(Mu::Thread& NODE_THREAD)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-        return makeinstance<QWebEngineProfileType>(
-            c, QWebEngineProfile::defaultProfile(), "qt.QWebEngineProfile");
+        return makeinstance<QWebEngineProfileType>(c, QWebEngineProfile::defaultProfile(), "qt.QWebEngineProfile");
     }
 
     static NODE_IMPLEMENTATION(_n_QWebEngineProfile0, Pointer)
     {
-        NODE_RETURN(
-            qt_QWebEngineProfile_QWebEngineProfile_QWebEngineProfile_QWebEngineProfile_QObject(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QWebEngineProfile_QWebEngineProfile_QWebEngineProfile_QWebEngineProfile_QObject(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_QWebEngineProfile1, Pointer)
     {
-        NODE_RETURN(
-            qt_QWebEngineProfile_QWebEngineProfile_QWebEngineProfile_QWebEngineProfile_string_QObject(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QWebEngineProfile_QWebEngineProfile_QWebEngineProfile_QWebEngineProfile_string_QObject(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_cachePath0, Pointer)
     {
-        NODE_RETURN(qt_QWebEngineProfile_cachePath_string_QWebEngineProfile(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QWebEngineProfile_cachePath_string_QWebEngineProfile(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_clearAllVisitedLinks0, void)
     {
-        qt_QWebEngineProfile_clearAllVisitedLinks_void_QWebEngineProfile(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
+        qt_QWebEngineProfile_clearAllVisitedLinks_void_QWebEngineProfile(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_clearHttpCache0, void)
     {
-        qt_QWebEngineProfile_clearHttpCache_void_QWebEngineProfile(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
+        qt_QWebEngineProfile_clearHttpCache_void_QWebEngineProfile(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_clearVisitedLinks0, void)
     {
-        qt_QWebEngineProfile_clearVisitedLinks_void_QWebEngineProfile_qt__QUrlBSB_ESB_(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QWebEngineProfile_clearVisitedLinks_void_QWebEngineProfile_qt__QUrlBSB_ESB_(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                       NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_cookieStore0, Pointer)
     {
-        NODE_RETURN(
-            qt_QWebEngineProfile_cookieStore_QWebEngineCookieStore_QWebEngineProfile(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QWebEngineProfile_cookieStore_QWebEngineCookieStore_QWebEngineProfile(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_downloadPath0, Pointer)
     {
-        NODE_RETURN(qt_QWebEngineProfile_downloadPath_string_QWebEngineProfile(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QWebEngineProfile_downloadPath_string_QWebEngineProfile(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_httpAcceptLanguage0, Pointer)
     {
-        NODE_RETURN(
-            qt_QWebEngineProfile_httpAcceptLanguage_string_QWebEngineProfile(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QWebEngineProfile_httpAcceptLanguage_string_QWebEngineProfile(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_httpCacheMaximumSize0, int)
     {
-        NODE_RETURN(
-            qt_QWebEngineProfile_httpCacheMaximumSize_int_QWebEngineProfile(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QWebEngineProfile_httpCacheMaximumSize_int_QWebEngineProfile(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_httpCacheType0, int)
     {
-        NODE_RETURN(qt_QWebEngineProfile_httpCacheType_int_QWebEngineProfile(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QWebEngineProfile_httpCacheType_int_QWebEngineProfile(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_httpUserAgent0, Pointer)
     {
-        NODE_RETURN(qt_QWebEngineProfile_httpUserAgent_string_QWebEngineProfile(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QWebEngineProfile_httpUserAgent_string_QWebEngineProfile(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isOffTheRecord0, bool)
     {
-        NODE_RETURN(qt_QWebEngineProfile_isOffTheRecord_bool_QWebEngineProfile(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QWebEngineProfile_isOffTheRecord_bool_QWebEngineProfile(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isPushServiceEnabled0, bool)
     {
-        NODE_RETURN(
-            qt_QWebEngineProfile_isPushServiceEnabled_bool_QWebEngineProfile(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QWebEngineProfile_isPushServiceEnabled_bool_QWebEngineProfile(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isSpellCheckEnabled0, bool)
     {
-        NODE_RETURN(
-            qt_QWebEngineProfile_isSpellCheckEnabled_bool_QWebEngineProfile(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QWebEngineProfile_isSpellCheckEnabled_bool_QWebEngineProfile(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_persistentCookiesPolicy0, int)
     {
-        NODE_RETURN(
-            qt_QWebEngineProfile_persistentCookiesPolicy_int_QWebEngineProfile(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QWebEngineProfile_persistentCookiesPolicy_int_QWebEngineProfile(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_persistentStoragePath0, Pointer)
     {
-        NODE_RETURN(
-            qt_QWebEngineProfile_persistentStoragePath_string_QWebEngineProfile(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QWebEngineProfile_persistentStoragePath_string_QWebEngineProfile(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_removeAllUrlSchemeHandlers0, void)
     {
-        qt_QWebEngineProfile_removeAllUrlSchemeHandlers_void_QWebEngineProfile(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
+        qt_QWebEngineProfile_removeAllUrlSchemeHandlers_void_QWebEngineProfile(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_removeUrlScheme0, void)
     {
-        qt_QWebEngineProfile_removeUrlScheme_void_QWebEngineProfile_QByteArray(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QWebEngineProfile_removeUrlScheme_void_QWebEngineProfile_QByteArray(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                               NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setCachePath0, void)
     {
-        qt_QWebEngineProfile_setCachePath_void_QWebEngineProfile_string(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QWebEngineProfile_setCachePath_void_QWebEngineProfile_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setDownloadPath0, void)
     {
-        qt_QWebEngineProfile_setDownloadPath_void_QWebEngineProfile_string(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QWebEngineProfile_setDownloadPath_void_QWebEngineProfile_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setHttpAcceptLanguage0, void)
     {
-        qt_QWebEngineProfile_setHttpAcceptLanguage_void_QWebEngineProfile_string(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QWebEngineProfile_setHttpAcceptLanguage_void_QWebEngineProfile_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                 NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setHttpCacheMaximumSize0, void)
     {
-        qt_QWebEngineProfile_setHttpCacheMaximumSize_void_QWebEngineProfile_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QWebEngineProfile_setHttpCacheMaximumSize_void_QWebEngineProfile_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setHttpCacheType0, void)
     {
-        qt_QWebEngineProfile_setHttpCacheType_void_QWebEngineProfile_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QWebEngineProfile_setHttpCacheType_void_QWebEngineProfile_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setHttpUserAgent0, void)
     {
-        qt_QWebEngineProfile_setHttpUserAgent_void_QWebEngineProfile_string(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QWebEngineProfile_setHttpUserAgent_void_QWebEngineProfile_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setPersistentCookiesPolicy0, void)
     {
-        qt_QWebEngineProfile_setPersistentCookiesPolicy_void_QWebEngineProfile_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QWebEngineProfile_setPersistentCookiesPolicy_void_QWebEngineProfile_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                   NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setPersistentStoragePath0, void)
     {
-        qt_QWebEngineProfile_setPersistentStoragePath_void_QWebEngineProfile_string(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QWebEngineProfile_setPersistentStoragePath_void_QWebEngineProfile_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                    NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setPushServiceEnabled0, void)
     {
-        qt_QWebEngineProfile_setPushServiceEnabled_void_QWebEngineProfile_bool(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool));
+        qt_QWebEngineProfile_setPushServiceEnabled_void_QWebEngineProfile_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool));
     }
 
     static NODE_IMPLEMENTATION(_n_setSpellCheckEnabled0, void)
     {
-        qt_QWebEngineProfile_setSpellCheckEnabled_void_QWebEngineProfile_bool(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool));
+        qt_QWebEngineProfile_setSpellCheckEnabled_void_QWebEngineProfile_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool));
     }
 
     static NODE_IMPLEMENTATION(_n_setSpellCheckLanguages0, void)
     {
-        qt_QWebEngineProfile_setSpellCheckLanguages_void_QWebEngineProfile_stringBSB_ESB_(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QWebEngineProfile_setSpellCheckLanguages_void_QWebEngineProfile_stringBSB_ESB_(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                          NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_settings0, Pointer)
     {
-        NODE_RETURN(
-            qt_QWebEngineProfile_settings_QWebEngineSettings_QWebEngineProfile(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QWebEngineProfile_settings_QWebEngineSettings_QWebEngineProfile(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_spellCheckLanguages0, Pointer)
     {
-        NODE_RETURN(
-            qt_QWebEngineProfile_spellCheckLanguages_stringBSB_ESB__QWebEngineProfile(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QWebEngineProfile_spellCheckLanguages_stringBSB_ESB__QWebEngineProfile(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_storageName0, Pointer)
     {
-        NODE_RETURN(qt_QWebEngineProfile_storageName_string_QWebEngineProfile(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QWebEngineProfile_storageName_string_QWebEngineProfile(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_visitedLinksContainsUrl0, bool)
     {
-        NODE_RETURN(
-            qt_QWebEngineProfile_visitedLinksContainsUrl_bool_QWebEngineProfile_QUrl(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QWebEngineProfile_visitedLinksContainsUrl_bool_QWebEngineProfile_QUrl(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                             NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_event0, bool)
     {
-        NODE_RETURN(qt_QWebEngineProfile_event_bool_QWebEngineProfile_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(
+            qt_QWebEngineProfile_event_bool_QWebEngineProfile_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_eventFilter0, bool)
     {
-        NODE_RETURN(
-            qt_QWebEngineProfile_eventFilter_bool_QWebEngineProfile_QObject_QEvent(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QWebEngineProfile_eventFilter_bool_QWebEngineProfile_QObject_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                           NODE_ARG(1, Pointer), NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_customEvent0, void)
     {
-        qt_QWebEngineProfile_customEvent_void_QWebEngineProfile_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QWebEngineProfile_customEvent_void_QWebEngineProfile_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_timerEvent0, void)
     {
-        qt_QWebEngineProfile_timerEvent_void_QWebEngineProfile_QTimerEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QWebEngineProfile_timerEvent_void_QWebEngineProfile_QTimerEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_defaultProfile0, Pointer)
     {
-        NODE_RETURN(
-            qt_QWebEngineProfile_defaultProfile_QWebEngineProfile(NODE_THREAD));
+        NODE_RETURN(qt_QWebEngineProfile_defaultProfile_QWebEngineProfile(NODE_THREAD));
     }
 
     void QWebEngineProfileType::load()
@@ -850,17 +742,13 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
-                   new Function(c, tn, castFromObject, Cast, Compiled,
-                                QWebEngineProfile_QWebEngineProfile_QObject,
-                                Return, ftn, Parameters,
+                   new Function(c, tn, castFromObject, Cast, Compiled, QWebEngineProfile_QWebEngineProfile_QObject, Return, ftn, Parameters,
                                 new Param(c, "object", "qt.QObject"), End),
 
                    EndArguments);
@@ -868,256 +756,136 @@ namespace Mu
         addSymbols(
             // enums
             // member functions
-            new Function(
-                c, "QWebEngineProfile", _n_QWebEngineProfile0, None, Compiled,
-                qt_QWebEngineProfile_QWebEngineProfile_QWebEngineProfile_QWebEngineProfile_QObject,
-                Return, "qt.QWebEngineProfile", Parameters,
-                new Param(c, "this", "qt.QWebEngineProfile"),
-                new Param(c, "parent", "qt.QObject"), End),
-            new Function(
-                c, "QWebEngineProfile", _n_QWebEngineProfile1, None, Compiled,
-                qt_QWebEngineProfile_QWebEngineProfile_QWebEngineProfile_QWebEngineProfile_string_QObject,
-                Return, "qt.QWebEngineProfile", Parameters,
-                new Param(c, "this", "qt.QWebEngineProfile"),
-                new Param(c, "storageName", "string"),
-                new Param(c, "parent", "qt.QObject"), End),
-            new Function(
-                c, "cachePath", _n_cachePath0, None, Compiled,
-                qt_QWebEngineProfile_cachePath_string_QWebEngineProfile, Return,
-                "string", Parameters,
-                new Param(c, "this", "qt.QWebEngineProfile"), End),
-            new Function(
-                c, "clearAllVisitedLinks", _n_clearAllVisitedLinks0, None,
-                Compiled,
-                qt_QWebEngineProfile_clearAllVisitedLinks_void_QWebEngineProfile,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QWebEngineProfile"), End),
-            new Function(
-                c, "clearHttpCache", _n_clearHttpCache0, None, Compiled,
-                qt_QWebEngineProfile_clearHttpCache_void_QWebEngineProfile,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QWebEngineProfile"), End),
-            new Function(
-                c, "clearVisitedLinks", _n_clearVisitedLinks0, None, Compiled,
-                qt_QWebEngineProfile_clearVisitedLinks_void_QWebEngineProfile_qt__QUrlBSB_ESB_,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QWebEngineProfile"),
-                new Param(c, "urls", "qt.QUrl[]"), End),
+            new Function(c, "QWebEngineProfile", _n_QWebEngineProfile0, None, Compiled,
+                         qt_QWebEngineProfile_QWebEngineProfile_QWebEngineProfile_QWebEngineProfile_QObject, Return, "qt.QWebEngineProfile",
+                         Parameters, new Param(c, "this", "qt.QWebEngineProfile"), new Param(c, "parent", "qt.QObject"), End),
+            new Function(c, "QWebEngineProfile", _n_QWebEngineProfile1, None, Compiled,
+                         qt_QWebEngineProfile_QWebEngineProfile_QWebEngineProfile_QWebEngineProfile_string_QObject, Return,
+                         "qt.QWebEngineProfile", Parameters, new Param(c, "this", "qt.QWebEngineProfile"),
+                         new Param(c, "storageName", "string"), new Param(c, "parent", "qt.QObject"), End),
+            new Function(c, "cachePath", _n_cachePath0, None, Compiled, qt_QWebEngineProfile_cachePath_string_QWebEngineProfile, Return,
+                         "string", Parameters, new Param(c, "this", "qt.QWebEngineProfile"), End),
+            new Function(c, "clearAllVisitedLinks", _n_clearAllVisitedLinks0, None, Compiled,
+                         qt_QWebEngineProfile_clearAllVisitedLinks_void_QWebEngineProfile, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QWebEngineProfile"), End),
+            new Function(c, "clearHttpCache", _n_clearHttpCache0, None, Compiled,
+                         qt_QWebEngineProfile_clearHttpCache_void_QWebEngineProfile, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QWebEngineProfile"), End),
+            new Function(c, "clearVisitedLinks", _n_clearVisitedLinks0, None, Compiled,
+                         qt_QWebEngineProfile_clearVisitedLinks_void_QWebEngineProfile_qt__QUrlBSB_ESB_, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QWebEngineProfile"), new Param(c, "urls", "qt.QUrl[]"), End),
             // MISSING: clientCertificateStore
             // ("QWebEngineClientCertificateStore *"; QWebEngineProfile this)
-            new Function(
-                c, "cookieStore", _n_cookieStore0, None, Compiled,
-                qt_QWebEngineProfile_cookieStore_QWebEngineCookieStore_QWebEngineProfile,
-                Return, "qt.QWebEngineCookieStore", Parameters,
-                new Param(c, "this", "qt.QWebEngineProfile"), End),
-            new Function(
-                c, "downloadPath", _n_downloadPath0, None, Compiled,
-                qt_QWebEngineProfile_downloadPath_string_QWebEngineProfile,
-                Return, "string", Parameters,
-                new Param(c, "this", "qt.QWebEngineProfile"), End),
-            new Function(
-                c, "httpAcceptLanguage", _n_httpAcceptLanguage0, None, Compiled,
-                qt_QWebEngineProfile_httpAcceptLanguage_string_QWebEngineProfile,
-                Return, "string", Parameters,
-                new Param(c, "this", "qt.QWebEngineProfile"), End),
-            new Function(
-                c, "httpCacheMaximumSize", _n_httpCacheMaximumSize0, None,
-                Compiled,
-                qt_QWebEngineProfile_httpCacheMaximumSize_int_QWebEngineProfile,
-                Return, "int", Parameters,
-                new Param(c, "this", "qt.QWebEngineProfile"), End),
-            new Function(
-                c, "httpCacheType", _n_httpCacheType0, None, Compiled,
-                qt_QWebEngineProfile_httpCacheType_int_QWebEngineProfile,
-                Return, "int", Parameters,
-                new Param(c, "this", "qt.QWebEngineProfile"), End),
-            new Function(
-                c, "httpUserAgent", _n_httpUserAgent0, None, Compiled,
-                qt_QWebEngineProfile_httpUserAgent_string_QWebEngineProfile,
-                Return, "string", Parameters,
-                new Param(c, "this", "qt.QWebEngineProfile"), End),
+            new Function(c, "cookieStore", _n_cookieStore0, None, Compiled,
+                         qt_QWebEngineProfile_cookieStore_QWebEngineCookieStore_QWebEngineProfile, Return, "qt.QWebEngineCookieStore",
+                         Parameters, new Param(c, "this", "qt.QWebEngineProfile"), End),
+            new Function(c, "downloadPath", _n_downloadPath0, None, Compiled, qt_QWebEngineProfile_downloadPath_string_QWebEngineProfile,
+                         Return, "string", Parameters, new Param(c, "this", "qt.QWebEngineProfile"), End),
+            new Function(c, "httpAcceptLanguage", _n_httpAcceptLanguage0, None, Compiled,
+                         qt_QWebEngineProfile_httpAcceptLanguage_string_QWebEngineProfile, Return, "string", Parameters,
+                         new Param(c, "this", "qt.QWebEngineProfile"), End),
+            new Function(c, "httpCacheMaximumSize", _n_httpCacheMaximumSize0, None, Compiled,
+                         qt_QWebEngineProfile_httpCacheMaximumSize_int_QWebEngineProfile, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QWebEngineProfile"), End),
+            new Function(c, "httpCacheType", _n_httpCacheType0, None, Compiled, qt_QWebEngineProfile_httpCacheType_int_QWebEngineProfile,
+                         Return, "int", Parameters, new Param(c, "this", "qt.QWebEngineProfile"), End),
+            new Function(c, "httpUserAgent", _n_httpUserAgent0, None, Compiled, qt_QWebEngineProfile_httpUserAgent_string_QWebEngineProfile,
+                         Return, "string", Parameters, new Param(c, "this", "qt.QWebEngineProfile"), End),
             // MISSING: installUrlSchemeHandler (void; QWebEngineProfile this,
             // QByteArray scheme, "QWebEngineUrlSchemeHandler *" handler)
-            new Function(
-                c, "isOffTheRecord", _n_isOffTheRecord0, None, Compiled,
-                qt_QWebEngineProfile_isOffTheRecord_bool_QWebEngineProfile,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QWebEngineProfile"), End),
-            new Function(
-                c, "isPushServiceEnabled", _n_isPushServiceEnabled0, None,
-                Compiled,
-                qt_QWebEngineProfile_isPushServiceEnabled_bool_QWebEngineProfile,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QWebEngineProfile"), End),
-            new Function(
-                c, "isSpellCheckEnabled", _n_isSpellCheckEnabled0, None,
-                Compiled,
-                qt_QWebEngineProfile_isSpellCheckEnabled_bool_QWebEngineProfile,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QWebEngineProfile"), End),
-            new Function(
-                c, "persistentCookiesPolicy", _n_persistentCookiesPolicy0, None,
-                Compiled,
-                qt_QWebEngineProfile_persistentCookiesPolicy_int_QWebEngineProfile,
-                Return, "int", Parameters,
-                new Param(c, "this", "qt.QWebEngineProfile"), End),
-            new Function(
-                c, "persistentStoragePath", _n_persistentStoragePath0, None,
-                Compiled,
-                qt_QWebEngineProfile_persistentStoragePath_string_QWebEngineProfile,
-                Return, "string", Parameters,
-                new Param(c, "this", "qt.QWebEngineProfile"), End),
-            new Function(
-                c, "removeAllUrlSchemeHandlers", _n_removeAllUrlSchemeHandlers0,
-                None, Compiled,
-                qt_QWebEngineProfile_removeAllUrlSchemeHandlers_void_QWebEngineProfile,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QWebEngineProfile"), End),
-            new Function(
-                c, "removeUrlScheme", _n_removeUrlScheme0, None, Compiled,
-                qt_QWebEngineProfile_removeUrlScheme_void_QWebEngineProfile_QByteArray,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QWebEngineProfile"),
-                new Param(c, "scheme", "qt.QByteArray"), End),
+            new Function(c, "isOffTheRecord", _n_isOffTheRecord0, None, Compiled,
+                         qt_QWebEngineProfile_isOffTheRecord_bool_QWebEngineProfile, Return, "bool", Parameters,
+                         new Param(c, "this", "qt.QWebEngineProfile"), End),
+            new Function(c, "isPushServiceEnabled", _n_isPushServiceEnabled0, None, Compiled,
+                         qt_QWebEngineProfile_isPushServiceEnabled_bool_QWebEngineProfile, Return, "bool", Parameters,
+                         new Param(c, "this", "qt.QWebEngineProfile"), End),
+            new Function(c, "isSpellCheckEnabled", _n_isSpellCheckEnabled0, None, Compiled,
+                         qt_QWebEngineProfile_isSpellCheckEnabled_bool_QWebEngineProfile, Return, "bool", Parameters,
+                         new Param(c, "this", "qt.QWebEngineProfile"), End),
+            new Function(c, "persistentCookiesPolicy", _n_persistentCookiesPolicy0, None, Compiled,
+                         qt_QWebEngineProfile_persistentCookiesPolicy_int_QWebEngineProfile, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QWebEngineProfile"), End),
+            new Function(c, "persistentStoragePath", _n_persistentStoragePath0, None, Compiled,
+                         qt_QWebEngineProfile_persistentStoragePath_string_QWebEngineProfile, Return, "string", Parameters,
+                         new Param(c, "this", "qt.QWebEngineProfile"), End),
+            new Function(c, "removeAllUrlSchemeHandlers", _n_removeAllUrlSchemeHandlers0, None, Compiled,
+                         qt_QWebEngineProfile_removeAllUrlSchemeHandlers_void_QWebEngineProfile, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QWebEngineProfile"), End),
+            new Function(c, "removeUrlScheme", _n_removeUrlScheme0, None, Compiled,
+                         qt_QWebEngineProfile_removeUrlScheme_void_QWebEngineProfile_QByteArray, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QWebEngineProfile"), new Param(c, "scheme", "qt.QByteArray"), End),
             // MISSING: removeUrlSchemeHandler (void; QWebEngineProfile this,
             // "QWebEngineUrlSchemeHandler *" handler) MISSING: scripts
             // ("QWebEngineScriptCollection *"; QWebEngineProfile this)
-            new Function(
-                c, "setCachePath", _n_setCachePath0, None, Compiled,
-                qt_QWebEngineProfile_setCachePath_void_QWebEngineProfile_string,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QWebEngineProfile"),
-                new Param(c, "path", "string"), End),
-            new Function(
-                c, "setDownloadPath", _n_setDownloadPath0, None, Compiled,
-                qt_QWebEngineProfile_setDownloadPath_void_QWebEngineProfile_string,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QWebEngineProfile"),
-                new Param(c, "path", "string"), End),
-            new Function(
-                c, "setHttpAcceptLanguage", _n_setHttpAcceptLanguage0, None,
-                Compiled,
-                qt_QWebEngineProfile_setHttpAcceptLanguage_void_QWebEngineProfile_string,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QWebEngineProfile"),
-                new Param(c, "httpAcceptLanguage", "string"), End),
-            new Function(
-                c, "setHttpCacheMaximumSize", _n_setHttpCacheMaximumSize0, None,
-                Compiled,
-                qt_QWebEngineProfile_setHttpCacheMaximumSize_void_QWebEngineProfile_int,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QWebEngineProfile"),
-                new Param(c, "maxSize", "int"), End),
-            new Function(
-                c, "setHttpCacheType", _n_setHttpCacheType0, None, Compiled,
-                qt_QWebEngineProfile_setHttpCacheType_void_QWebEngineProfile_int,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QWebEngineProfile"),
-                new Param(c, "httpCacheType", "int"), End),
-            new Function(
-                c, "setHttpUserAgent", _n_setHttpUserAgent0, None, Compiled,
-                qt_QWebEngineProfile_setHttpUserAgent_void_QWebEngineProfile_string,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QWebEngineProfile"),
-                new Param(c, "userAgent", "string"), End),
-            new Function(
-                c, "setPersistentCookiesPolicy", _n_setPersistentCookiesPolicy0,
-                None, Compiled,
-                qt_QWebEngineProfile_setPersistentCookiesPolicy_void_QWebEngineProfile_int,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QWebEngineProfile"),
-                new Param(c, "newPersistentCookiesPolicy", "int"), End),
-            new Function(
-                c, "setPersistentStoragePath", _n_setPersistentStoragePath0,
-                None, Compiled,
-                qt_QWebEngineProfile_setPersistentStoragePath_void_QWebEngineProfile_string,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QWebEngineProfile"),
-                new Param(c, "path", "string"), End),
-            new Function(
-                c, "setPushServiceEnabled", _n_setPushServiceEnabled0, None,
-                Compiled,
-                qt_QWebEngineProfile_setPushServiceEnabled_void_QWebEngineProfile_bool,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QWebEngineProfile"),
-                new Param(c, "enable", "bool"), End),
-            new Function(
-                c, "setSpellCheckEnabled", _n_setSpellCheckEnabled0, None,
-                Compiled,
-                qt_QWebEngineProfile_setSpellCheckEnabled_void_QWebEngineProfile_bool,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QWebEngineProfile"),
-                new Param(c, "enable", "bool"), End),
-            new Function(
-                c, "setSpellCheckLanguages", _n_setSpellCheckLanguages0, None,
-                Compiled,
-                qt_QWebEngineProfile_setSpellCheckLanguages_void_QWebEngineProfile_stringBSB_ESB_,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QWebEngineProfile"),
-                new Param(c, "languages", "string[]"), End),
+            new Function(c, "setCachePath", _n_setCachePath0, None, Compiled,
+                         qt_QWebEngineProfile_setCachePath_void_QWebEngineProfile_string, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QWebEngineProfile"), new Param(c, "path", "string"), End),
+            new Function(c, "setDownloadPath", _n_setDownloadPath0, None, Compiled,
+                         qt_QWebEngineProfile_setDownloadPath_void_QWebEngineProfile_string, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QWebEngineProfile"), new Param(c, "path", "string"), End),
+            new Function(c, "setHttpAcceptLanguage", _n_setHttpAcceptLanguage0, None, Compiled,
+                         qt_QWebEngineProfile_setHttpAcceptLanguage_void_QWebEngineProfile_string, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QWebEngineProfile"), new Param(c, "httpAcceptLanguage", "string"), End),
+            new Function(c, "setHttpCacheMaximumSize", _n_setHttpCacheMaximumSize0, None, Compiled,
+                         qt_QWebEngineProfile_setHttpCacheMaximumSize_void_QWebEngineProfile_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QWebEngineProfile"), new Param(c, "maxSize", "int"), End),
+            new Function(c, "setHttpCacheType", _n_setHttpCacheType0, None, Compiled,
+                         qt_QWebEngineProfile_setHttpCacheType_void_QWebEngineProfile_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QWebEngineProfile"), new Param(c, "httpCacheType", "int"), End),
+            new Function(c, "setHttpUserAgent", _n_setHttpUserAgent0, None, Compiled,
+                         qt_QWebEngineProfile_setHttpUserAgent_void_QWebEngineProfile_string, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QWebEngineProfile"), new Param(c, "userAgent", "string"), End),
+            new Function(c, "setPersistentCookiesPolicy", _n_setPersistentCookiesPolicy0, None, Compiled,
+                         qt_QWebEngineProfile_setPersistentCookiesPolicy_void_QWebEngineProfile_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QWebEngineProfile"), new Param(c, "newPersistentCookiesPolicy", "int"), End),
+            new Function(c, "setPersistentStoragePath", _n_setPersistentStoragePath0, None, Compiled,
+                         qt_QWebEngineProfile_setPersistentStoragePath_void_QWebEngineProfile_string, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QWebEngineProfile"), new Param(c, "path", "string"), End),
+            new Function(c, "setPushServiceEnabled", _n_setPushServiceEnabled0, None, Compiled,
+                         qt_QWebEngineProfile_setPushServiceEnabled_void_QWebEngineProfile_bool, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QWebEngineProfile"), new Param(c, "enable", "bool"), End),
+            new Function(c, "setSpellCheckEnabled", _n_setSpellCheckEnabled0, None, Compiled,
+                         qt_QWebEngineProfile_setSpellCheckEnabled_void_QWebEngineProfile_bool, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QWebEngineProfile"), new Param(c, "enable", "bool"), End),
+            new Function(c, "setSpellCheckLanguages", _n_setSpellCheckLanguages0, None, Compiled,
+                         qt_QWebEngineProfile_setSpellCheckLanguages_void_QWebEngineProfile_stringBSB_ESB_, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QWebEngineProfile"), new Param(c, "languages", "string[]"), End),
             // MISSING: setUrlRequestInterceptor (void; QWebEngineProfile this,
             // "QWebEngineUrlRequestInterceptor *" interceptor)
-            new Function(
-                c, "settings", _n_settings0, None, Compiled,
-                qt_QWebEngineProfile_settings_QWebEngineSettings_QWebEngineProfile,
-                Return, "qt.QWebEngineSettings", Parameters,
-                new Param(c, "this", "qt.QWebEngineProfile"), End),
-            new Function(
-                c, "spellCheckLanguages", _n_spellCheckLanguages0, None,
-                Compiled,
-                qt_QWebEngineProfile_spellCheckLanguages_stringBSB_ESB__QWebEngineProfile,
-                Return, "string[]", Parameters,
-                new Param(c, "this", "qt.QWebEngineProfile"), End),
-            new Function(
-                c, "storageName", _n_storageName0, None, Compiled,
-                qt_QWebEngineProfile_storageName_string_QWebEngineProfile,
-                Return, "string", Parameters,
-                new Param(c, "this", "qt.QWebEngineProfile"), End),
+            new Function(c, "settings", _n_settings0, None, Compiled, qt_QWebEngineProfile_settings_QWebEngineSettings_QWebEngineProfile,
+                         Return, "qt.QWebEngineSettings", Parameters, new Param(c, "this", "qt.QWebEngineProfile"), End),
+            new Function(c, "spellCheckLanguages", _n_spellCheckLanguages0, None, Compiled,
+                         qt_QWebEngineProfile_spellCheckLanguages_stringBSB_ESB__QWebEngineProfile, Return, "string[]", Parameters,
+                         new Param(c, "this", "qt.QWebEngineProfile"), End),
+            new Function(c, "storageName", _n_storageName0, None, Compiled, qt_QWebEngineProfile_storageName_string_QWebEngineProfile,
+                         Return, "string", Parameters, new Param(c, "this", "qt.QWebEngineProfile"), End),
             // MISSING: urlSchemeHandler ("const QWebEngineUrlSchemeHandler *";
             // QWebEngineProfile this, QByteArray scheme)
-            new Function(
-                c, "visitedLinksContainsUrl", _n_visitedLinksContainsUrl0, None,
-                Compiled,
-                qt_QWebEngineProfile_visitedLinksContainsUrl_bool_QWebEngineProfile_QUrl,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QWebEngineProfile"),
-                new Param(c, "url", "qt.QUrl"), End),
-            _func[0] = new MemberFunction(
-                c, "event", _n_event0, None, Compiled,
-                qt_QWebEngineProfile_event_bool_QWebEngineProfile_QEvent,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QWebEngineProfile"),
-                new Param(c, "e", "qt.QEvent"), End),
-            _func[1] = new MemberFunction(
-                c, "eventFilter", _n_eventFilter0, None, Compiled,
-                qt_QWebEngineProfile_eventFilter_bool_QWebEngineProfile_QObject_QEvent,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QWebEngineProfile"),
-                new Param(c, "watched", "qt.QObject"),
-                new Param(c, "event", "qt.QEvent"), End),
+            new Function(c, "visitedLinksContainsUrl", _n_visitedLinksContainsUrl0, None, Compiled,
+                         qt_QWebEngineProfile_visitedLinksContainsUrl_bool_QWebEngineProfile_QUrl, Return, "bool", Parameters,
+                         new Param(c, "this", "qt.QWebEngineProfile"), new Param(c, "url", "qt.QUrl"), End),
+            _func[0] =
+                new MemberFunction(c, "event", _n_event0, None, Compiled, qt_QWebEngineProfile_event_bool_QWebEngineProfile_QEvent, Return,
+                                   "bool", Parameters, new Param(c, "this", "qt.QWebEngineProfile"), new Param(c, "e", "qt.QEvent"), End),
+            _func[1] = new MemberFunction(c, "eventFilter", _n_eventFilter0, None, Compiled,
+                                          qt_QWebEngineProfile_eventFilter_bool_QWebEngineProfile_QObject_QEvent, Return, "bool",
+                                          Parameters, new Param(c, "this", "qt.QWebEngineProfile"), new Param(c, "watched", "qt.QObject"),
+                                          new Param(c, "event", "qt.QEvent"), End),
             // MISSING: metaObject ("const QMetaObject *"; QWebEngineProfile
             // this) MISSING: childEvent (void; QWebEngineProfile this,
             // "QChildEvent *" event) // protected MISSING: connectNotify (void;
             // QWebEngineProfile this, "const QMetaMethod &" signal) //
             // protected
-            _func[2] = new MemberFunction(
-                c, "customEvent", _n_customEvent0, None, Compiled,
-                qt_QWebEngineProfile_customEvent_void_QWebEngineProfile_QEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QWebEngineProfile"),
-                new Param(c, "event", "qt.QEvent"), End),
+            _func[2] = new MemberFunction(c, "customEvent", _n_customEvent0, None, Compiled,
+                                          qt_QWebEngineProfile_customEvent_void_QWebEngineProfile_QEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QWebEngineProfile"), new Param(c, "event", "qt.QEvent"), End),
             // MISSING: disconnectNotify (void; QWebEngineProfile this, "const
             // QMetaMethod &" signal) // protected
-            _func[3] = new MemberFunction(
-                c, "timerEvent", _n_timerEvent0, None, Compiled,
-                qt_QWebEngineProfile_timerEvent_void_QWebEngineProfile_QTimerEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QWebEngineProfile"),
-                new Param(c, "event", "qt.QTimerEvent"), End),
+            _func[3] = new MemberFunction(c, "timerEvent", _n_timerEvent0, None, Compiled,
+                                          qt_QWebEngineProfile_timerEvent_void_QWebEngineProfile_QTimerEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QWebEngineProfile"), new Param(c, "event", "qt.QTimerEvent"), End),
             // static functions
-            new Function(c, "defaultProfile", _n_defaultProfile0, None,
-                         Compiled,
-                         qt_QWebEngineProfile_defaultProfile_QWebEngineProfile,
+            new Function(c, "defaultProfile", _n_defaultProfile0, None, Compiled, qt_QWebEngineProfile_defaultProfile_QWebEngineProfile,
                          Return, "qt.QWebEngineProfile", End),
             EndArguments);
         globalScope()->addSymbols(EndArguments);

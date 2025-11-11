@@ -34,8 +34,7 @@ namespace Mu
         //  Constructors
         //
 
-        QWebEngineSettingsType(Context* context, const char* name,
-                               Class* superClass = 0);
+        QWebEngineSettingsType(Context* context, const char* name, Class* superClass = 0);
         virtual ~QWebEngineSettingsType();
 
         //

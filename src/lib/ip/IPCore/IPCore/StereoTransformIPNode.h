@@ -25,9 +25,7 @@ namespace IPCore
     class StereoTransformIPNode : public IPNode
     {
     public:
-        StereoTransformIPNode(const std::string& name,
-                              const NodeDefinition* def, IPGraph* graph,
-                              GroupIPNode* group = 0);
+        StereoTransformIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group = 0);
 
         virtual ~StereoTransformIPNode();
 

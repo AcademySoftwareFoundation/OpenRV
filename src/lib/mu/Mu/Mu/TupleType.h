@@ -24,8 +24,7 @@ namespace Mu
         TupleType(Context* context, const char* name, const Types& fieldTypes);
         ~TupleType();
 
-        virtual void outputValueRecursive(std::ostream&, const ValuePointer,
-                                          ValueOutputState&) const;
+        virtual void outputValueRecursive(std::ostream&, const ValuePointer, ValueOutputState&) const;
         virtual void load();
 
         const Types& tupleFieldTypes() const { return _types; }

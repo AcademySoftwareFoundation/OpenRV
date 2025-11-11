@@ -44,13 +44,9 @@ namespace IPCore
             GLtext::size(s);
         }
 
-        void Font::setColor(float r, float g, float b, float a) const
-        {
-            GLtext::color(r, g, b, a);
-        }
+        void Font::setColor(float r, float g, float b, float a) const { GLtext::color(r, g, b, a); }
 
-        pair<float, float> Font::computeText(const string& text, string& t,
-                                             float space, string origin) const
+        pair<float, float> Font::computeText(const string& text, string& t, float space, string origin) const
         {
             assert(m_initialized);
 
@@ -127,15 +123,9 @@ namespace IPCore
             return make_pair(xoffset, yoffset);
         }
 
-        float Font::globalAscenderHeight() const
-        {
-            return GLtext::globalAscenderHeight();
-        }
+        float Font::globalAscenderHeight() const { return GLtext::globalAscenderHeight(); }
 
-        float Font::globalDescenderHeight() const
-        {
-            return GLtext::globalDescenderHeight();
-        }
+        float Font::globalDescenderHeight() const { return GLtext::globalDescenderHeight(); }
 
         size_t PolyLine::getType() const { return Command::PolyLine; }
 
@@ -160,8 +150,7 @@ namespace IPCore
             TWK_GLDEBUG;
 
             // Draw a quad with the existing renders as the background
-            GLPipeline* glPipeline =
-                glState->useGLProgram(textureRectGLProgram());
+            GLPipeline* glPipeline = glState->useGLProgram(textureRectGLProgram());
 
             // transforms
             Mat44f identity(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
@@ -183,23 +172,15 @@ namespace IPCore
             //  NOTE: rectangle coords are [0,w] x [0,h]
             //  *not* [0,w-1] x [0,h-1]
             //
-            float data[] = {0, 0, 0,     0,     w, 0, w - 1, 0,
-                            w, h, w - 1, h - 1, 0, h, 0,     h - 1};
-            PrimitiveData buffer(data, NULL, GL_QUADS, 4, 1,
-                                 16 * sizeof(float));
+            float data[] = {0, 0, 0, 0, w, 0, w - 1, 0, w, h, w - 1, h - 1, 0, h, 0, h - 1};
+            PrimitiveData buffer(data, NULL, GL_QUADS, 4, 1, 16 * sizeof(float));
             std::vector<VertexAttribute> attributeInfo;
 
-            attributeInfo.push_back(
-                VertexAttribute(std::string("in_Position"), GL_FLOAT, 2,
-                                2 * sizeof(float), 4 * sizeof(float)));
+            attributeInfo.push_back(VertexAttribute(std::string("in_Position"), GL_FLOAT, 2, 2 * sizeof(float), 4 * sizeof(float)));
 
-            attributeInfo.push_back(VertexAttribute(std::string("in_TexCoord0"),
-                                                    GL_FLOAT, 2, 0,
-                                                    4 * sizeof(float)));
+            attributeInfo.push_back(VertexAttribute(std::string("in_TexCoord0"), GL_FLOAT, 2, 0, 4 * sizeof(float)));
 
-            RenderPrimitives renderprimitives(glState->activeGLProgram(),
-                                              buffer, attributeInfo,
-                                              glState->vboList());
+            RenderPrimitives renderprimitives(glState->activeGLProgram(), buffer, attributeInfo, glState->vboList());
 
             renderprimitives.setupAndRender();
 
@@ -208,8 +189,7 @@ namespace IPCore
             //  do paint
             if (brush == "gauss")
             {
-                glPipeline =
-                    glState->useGLProgram(softPaintOldReplaceGLProgram());
+                glPipeline = glState->useGLProgram(softPaintOldReplaceGLProgram());
             }
             else
             {
@@ -225,12 +205,9 @@ namespace IPCore
 
             // draw
             glEnable(GL_BLEND);
-            glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE,
-                                GL_ONE_MINUS_SRC_ALPHA);
+            glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
-            RenderPrimitives renderprimitives2(glState->activeGLProgram(),
-                                               primitives, primitiveAttributes,
-                                               glState->vboList());
+            RenderPrimitives renderprimitives2(glState->activeGLProgram(), primitives, primitiveAttributes, glState->vboList());
             renderprimitives2.setupAndRender();
 
             // cleanup
@@ -271,8 +248,7 @@ namespace IPCore
             GLState* glState = context.glState;
             currentFBO->bind();
 
-            GLPipeline* glPipeline =
-                glState->useGLProgram(textureRectGLProgram());
+            GLPipeline* glPipeline = glState->useGLProgram(textureRectGLProgram());
             Mat44f identity(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
             Frustumf f;
             f.window(0, w - 1, 0, h - 1, -1, 1, true);
@@ -294,21 +270,13 @@ namespace IPCore
             TWK_GLDEBUG;
             //  NOTE: rectangle coords are [0,w] x [0,h]
             //  *not* [0,w-1] x [0,h-1]
-            float data[] = {0, 0, 0,     0,     w, 0, w - 1, 0,
-                            w, h, w - 1, h - 1, 0, h, 0,     h - 1};
-            PrimitiveData buffer(data, NULL, GL_QUADS, 4, 1,
-                                 16 * sizeof(float));
+            float data[] = {0, 0, 0, 0, w, 0, w - 1, 0, w, h, w - 1, h - 1, 0, h, 0, h - 1};
+            PrimitiveData buffer(data, NULL, GL_QUADS, 4, 1, 16 * sizeof(float));
             std::vector<VertexAttribute> attributeInfo2;
-            attributeInfo2.push_back(
-                VertexAttribute(std::string("in_Position"), GL_FLOAT, 2,
-                                2 * sizeof(float), 4 * sizeof(float)));
+            attributeInfo2.push_back(VertexAttribute(std::string("in_Position"), GL_FLOAT, 2, 2 * sizeof(float), 4 * sizeof(float)));
 
-            attributeInfo2.push_back(
-                VertexAttribute(std::string("in_TexCoord0"), GL_FLOAT, 2, 0,
-                                4 * sizeof(float)));
-            RenderPrimitives renderprimitives2(glState->activeGLProgram(),
-                                               buffer, attributeInfo2,
-                                               glState->vboList());
+            attributeInfo2.push_back(VertexAttribute(std::string("in_TexCoord0"), GL_FLOAT, 2, 0, 4 * sizeof(float)));
+            RenderPrimitives renderprimitives2(glState->activeGLProgram(), buffer, attributeInfo2, glState->vboList());
             renderprimitives2.setupAndRender();
 
             textureFBO->unbindColorTexture();
@@ -325,23 +293,20 @@ namespace IPCore
                 if (brush != "gauss")
                     glPipeline = glState->useGLProgram(paintEraseGLProgram());
                 else
-                    glPipeline =
-                        glState->useGLProgram(softPaintEraseGLProgram());
+                    glPipeline = glState->useGLProgram(softPaintEraseGLProgram());
                 break;
             case ScaleMode:
             case GradientScaleMode:
                 if (brush != "gauss")
                     glPipeline = glState->useGLProgram(paintScaleGLProgram());
                 else
-                    glPipeline =
-                        glState->useGLProgram(softPaintScaleGLProgram());
+                    glPipeline = glState->useGLProgram(softPaintScaleGLProgram());
                 break;
             case CloneMode:
                 if (brush != "gauss")
                     glPipeline = glState->useGLProgram(paintCloneGLProgram());
                 else
-                    glPipeline =
-                        glState->useGLProgram(softPaintCloneGLProgram());
+                    glPipeline = glState->useGLProgram(softPaintCloneGLProgram());
                 break;
             case TessellateMode:
                 glPipeline = glState->useGLProgram(paintTessellateGLProgram());
@@ -351,8 +316,7 @@ namespace IPCore
                 if (brush != "gauss")
                     glPipeline = glState->useGLProgram(paintReplaceGLProgram());
                 else
-                    glPipeline =
-                        glState->useGLProgram(softPaintReplaceGLProgram());
+                    glPipeline = glState->useGLProgram(softPaintReplaceGLProgram());
                 break;
             }
 
@@ -379,10 +343,8 @@ namespace IPCore
 
             // set uniforms
             Color pcolor;
-            const auto* localCommand =
-                dynamic_cast<const PaintIPNode::LocalCommand*>(this);
-            bool isGhostOn =
-                (localCommand != nullptr) ? localCommand->ghostOn : false;
+            const auto* localCommand = dynamic_cast<const PaintIPNode::LocalCommand*>(this);
+            bool isGhostOn = (localCommand != nullptr) ? localCommand->ghostOn : false;
             pcolor = isGhostOn ? localCommand->ghostColor : color;
 
             glPipeline->setUniformFloat("uniformColor", 4, &(pcolor[0]));
@@ -399,16 +361,12 @@ namespace IPCore
             if (context.hasStencil)
             {
                 glEnable(GL_SCISSOR_TEST);
-                glScissor(context.stencilBox[0], context.stencilBox[1],
-                          context.stencilBox[2] - context.stencilBox[0],
+                glScissor(context.stencilBox[0], context.stencilBox[1], context.stencilBox[2] - context.stencilBox[0],
                           context.stencilBox[3] - context.stencilBox[1]);
             }
             glEnable(GL_BLEND);
-            glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE,
-                                GL_ONE_MINUS_SRC_ALPHA);
-            RenderPrimitives renderprimitives3(glState->activeGLProgram(),
-                                               primitives, primitiveAttributes,
-                                               glState->vboList());
+            glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+            RenderPrimitives renderprimitives3(glState->activeGLProgram(), primitives, primitiveAttributes, glState->vboList());
             renderprimitives3.setupAndRender();
             if (context.hasStencil)
                 glDisable(GL_SCISSOR_TEST);
@@ -495,9 +453,7 @@ namespace IPCore
                 path.setContantWidth(width);
             }
 
-            path.computeGeometry(join, cap, Path::RadiallySymmetric,
-                                 Path::QualityAlgorithm, true, smoothingWidth,
-                                 splat);
+            path.computeGeometry(join, cap, Path::RadiallySymmetric, Path::QualityAlgorithm, true, smoothingWidth, splat);
 
             // setup data to be prepared for late rendering
             const PointArray& opoints = path.outputPoints();
@@ -543,10 +499,8 @@ namespace IPCore
                 }
                 for (size_t i = 0; i < vertexno; i++)
                 {
-                    primitiveData[2 * vertexno + 2 * i + 0] =
-                        (float)opoints[i].x;
-                    primitiveData[2 * vertexno + 2 * i + 1] =
-                        (float)opoints[i].y;
+                    primitiveData[2 * vertexno + 2 * i + 0] = (float)opoints[i].x;
+                    primitiveData[2 * vertexno + 2 * i + 1] = (float)opoints[i].y;
                 }
                 if (mode == GradientScaleMode)
                 {
@@ -570,34 +524,22 @@ namespace IPCore
                 // fill in vertices
                 for (size_t i = 0; i < trino; i++)
                 {
-                    primitiveData[6 * i + 0] =
-                        (float)tpoints[triangles[i][0]].x;
-                    primitiveData[6 * i + 1] =
-                        (float)tpoints[triangles[i][0]].y;
-                    primitiveData[6 * i + 2] =
-                        (float)tpoints[triangles[i][1]].x;
-                    primitiveData[6 * i + 3] =
-                        (float)tpoints[triangles[i][1]].y;
-                    primitiveData[6 * i + 4] =
-                        (float)tpoints[triangles[i][2]].x;
-                    primitiveData[6 * i + 5] =
-                        (float)tpoints[triangles[i][2]].y;
+                    primitiveData[6 * i + 0] = (float)tpoints[triangles[i][0]].x;
+                    primitiveData[6 * i + 1] = (float)tpoints[triangles[i][0]].y;
+                    primitiveData[6 * i + 2] = (float)tpoints[triangles[i][1]].x;
+                    primitiveData[6 * i + 3] = (float)tpoints[triangles[i][1]].y;
+                    primitiveData[6 * i + 4] = (float)tpoints[triangles[i][2]].x;
+                    primitiveData[6 * i + 5] = (float)tpoints[triangles[i][2]].y;
                 }
                 size_t offset = 6 * trino;
                 for (size_t i = 0; i < trino; i++)
                 {
-                    primitiveData[offset + 6 * i + 0] =
-                        (float)opoints[triangles[i][0]].x;
-                    primitiveData[offset + 6 * i + 1] =
-                        (float)opoints[triangles[i][0]].y;
-                    primitiveData[offset + 6 * i + 2] =
-                        (float)opoints[triangles[i][1]].x;
-                    primitiveData[offset + 6 * i + 3] =
-                        (float)opoints[triangles[i][1]].y;
-                    primitiveData[offset + 6 * i + 4] =
-                        (float)opoints[triangles[i][2]].x;
-                    primitiveData[offset + 6 * i + 5] =
-                        (float)opoints[triangles[i][2]].y;
+                    primitiveData[offset + 6 * i + 0] = (float)opoints[triangles[i][0]].x;
+                    primitiveData[offset + 6 * i + 1] = (float)opoints[triangles[i][0]].y;
+                    primitiveData[offset + 6 * i + 2] = (float)opoints[triangles[i][1]].x;
+                    primitiveData[offset + 6 * i + 3] = (float)opoints[triangles[i][1]].y;
+                    primitiveData[offset + 6 * i + 4] = (float)opoints[triangles[i][2]].x;
+                    primitiveData[offset + 6 * i + 5] = (float)opoints[triangles[i][2]].y;
                 }
 
                 // fill in color per triangle
@@ -626,31 +568,25 @@ namespace IPCore
             }
 
             primitives.m_dataBuffer = &(primitiveData[0]);
-            primitives.m_indexBuffer =
-                mode == TessellateMode ? 0 : &(primitiveIndices[0]);
+            primitives.m_indexBuffer = mode == TessellateMode ? 0 : &(primitiveIndices[0]);
             primitives.m_primitiveType = GL_TRIANGLES;
             primitives.m_vertexNo = vertexno;
             primitives.m_primitiveNo = trino;
             primitives.m_size = sizeof(float) * vbodatasize;
 
             primitiveAttributes.clear();
-            primitiveAttributes.push_back(VertexAttribute(
-                std::string("in_TexCoord0"), GL_FLOAT, 2, 0, 0)); // texture
+            primitiveAttributes.push_back(VertexAttribute(std::string("in_TexCoord0"), GL_FLOAT, 2, 0, 0)); // texture
             primitiveAttributes.push_back(
-                VertexAttribute(std::string("in_Position"), GL_FLOAT, 2,
-                                2 * vertexno * sizeof(float), 0)); // vertex
+                VertexAttribute(std::string("in_Position"), GL_FLOAT, 2, 2 * vertexno * sizeof(float), 0)); // vertex
             if (mode == GradientScaleMode)
             {
-                primitiveAttributes.push_back(VertexAttribute(
-                    std::string("in_DirectionCoord"), GL_FLOAT, 1,
-                    4 * vertexno * sizeof(float), 0)); // direction coord
+                primitiveAttributes.push_back(
+                    VertexAttribute(std::string("in_DirectionCoord"), GL_FLOAT, 1, 4 * vertexno * sizeof(float), 0)); // direction coord
             }
             else if (mode == TessellateMode)
             {
-                primitiveAttributes.push_back(
-                    VertexAttribute(std::string("in_UniformColor"), GL_FLOAT, 4,
-                                    4 * vertexno * sizeof(float),
-                                    0)); // color for each triangle
+                primitiveAttributes.push_back(VertexAttribute(std::string("in_UniformColor"), GL_FLOAT, 4, 4 * vertexno * sizeof(float),
+                                                              0)); // color for each triangle
             }
 
             built = true;
@@ -662,10 +598,7 @@ namespace IPCore
 
         void PushFrameBuffer::hash(ostream& o) const { o << "pu"; }
 
-        size_t PushFrameBuffer::getType() const
-        {
-            return Command::PushFrameBuffer;
-        }
+        size_t PushFrameBuffer::getType() const { return Command::PushFrameBuffer; }
 
         PopFrameBuffer::PopFrameBuffer() {}
 
@@ -673,10 +606,7 @@ namespace IPCore
 
         void PopFrameBuffer::hash(ostream& o) const { o << "po"; }
 
-        size_t PopFrameBuffer::getType() const
-        {
-            return Command::PopFrameBuffer;
-        }
+        size_t PopFrameBuffer::getType() const { return Command::PopFrameBuffer; }
 
         void Text::setup(CommandContext& context)
         {
@@ -686,8 +616,7 @@ namespace IPCore
 
             glEnable(GL_TEXTURE_2D);
             glEnable(GL_BLEND);
-            glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE,
-                                GL_ONE_MINUS_SRC_ALPHA);
+            glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
             glActiveTexture(GL_TEXTURE0);
         }
@@ -713,10 +642,8 @@ namespace IPCore
             f->setSize(ptsize);
 
             Color textColor;
-            const auto* localCommand =
-                dynamic_cast<const PaintIPNode::LocalCommand*>(this);
-            bool isGhostOn =
-                (localCommand != nullptr) ? localCommand->ghostOn : false;
+            const auto* localCommand = dynamic_cast<const PaintIPNode::LocalCommand*>(this);
+            bool isGhostOn = (localCommand != nullptr) ? localCommand->ghostOn : false;
             textColor = isGhostOn ? localCommand->ghostColor : color;
             f->setColor(textColor.x, textColor.y, textColor.z, textColor.w);
 
@@ -743,14 +670,12 @@ namespace IPCore
             FFP.setViewport(0, 0, w, h);
 
             string outtext;
-            pair<float, float> loc =
-                f->computeText(text, outtext, spacing, origin);
+            pair<float, float> loc = f->computeText(text, outtext, spacing, origin);
 
             if (context.hasStencil)
             {
                 glEnable(GL_SCISSOR_TEST);
-                glScissor(context.stencilBox[0], context.stencilBox[1],
-                          context.stencilBox[2] - context.stencilBox[0],
+                glScissor(context.stencilBox[0], context.stencilBox[1], context.stencilBox[2] - context.stencilBox[0],
                           context.stencilBox[3] - context.stencilBox[1]);
             }
             GLtext::writeAtNL(loc.first, loc.second, outtext.c_str(), spacing);
@@ -759,28 +684,21 @@ namespace IPCore
             delete f;
         }
 
-        void Text::hash(ostream& o) const
-        {
-            o << pos << color << text << font << origin << ptsize << scale
-              << rotation << spacing;
-        }
+        void Text::hash(ostream& o) const { o << pos << color << text << font << origin << ptsize << scale << rotation << spacing; }
 
         size_t Text::getType() const { return Command::Text; }
 
         namespace
         {
 
-            void executeQuad(CommandContext& context, float* points,
-                             Color color, GLint mode)
+            void executeQuad(CommandContext& context, float* points, Color color, GLint mode)
             {
                 glEnable(GL_BLEND);
-                glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA,
-                                    GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+                glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
                 Color pcolor = color;
                 GLState* glState = context.glState;
-                GLPipeline* glPipeline =
-                    glState->useGLProgram(defaultGLProgram());
+                GLPipeline* glPipeline = glState->useGLProgram(defaultGLProgram());
                 const GLFBO* fbo = context.currentRender;
                 int programId = glPipeline->programId();
                 const float w = fbo->width();
@@ -794,19 +712,14 @@ namespace IPCore
                 context.currentTexture->copyTo(fbo);
                 fbo->bind();
 
-                PrimitiveData databuffer((void*)points, NULL, mode, 4, 1,
-                                         sizeof(float) * 8);
+                PrimitiveData databuffer((void*)points, NULL, mode, 4, 1, sizeof(float) * 8);
                 std::vector<VertexAttribute> attributeInfo;
-                attributeInfo.push_back(VertexAttribute(
-                    std::string("in_Position"), GL_FLOAT, 2, 0, 0));
-                RenderPrimitives renderprimitives(glState->activeGLProgram(),
-                                                  databuffer, attributeInfo,
-                                                  glState->vboList());
+                attributeInfo.push_back(VertexAttribute(std::string("in_Position"), GL_FLOAT, 2, 0, 0));
+                RenderPrimitives renderprimitives(glState->activeGLProgram(), databuffer, attributeInfo, glState->vboList());
                 if (context.hasStencil)
                 {
                     glEnable(GL_SCISSOR_TEST);
-                    glScissor(context.stencilBox[0], context.stencilBox[1],
-                              context.stencilBox[2] - context.stencilBox[0],
+                    glScissor(context.stencilBox[0], context.stencilBox[1], context.stencilBox[2] - context.stencilBox[0],
                               context.stencilBox[3] - context.stencilBox[1]);
                 }
                 renderprimitives.setupAndRender();
@@ -821,17 +734,12 @@ namespace IPCore
 
         void Rectangle::execute(CommandContext& context) const
         {
-            float data[] = {pos.x, pos.y,         pos.x + width,
-                            pos.y, pos.x + width, pos.y + height,
-                            pos.x, pos.y + height};
+            float data[] = {pos.x, pos.y, pos.x + width, pos.y, pos.x + width, pos.y + height, pos.x, pos.y + height};
 
             executeQuad(context, data, color, GL_QUADS);
         }
 
-        void Rectangle::hash(ostream& o) const
-        {
-            o << pos << height << width << color;
-        }
+        void Rectangle::hash(ostream& o) const { o << pos << height << width << color; }
 
         size_t Rectangle::getType() const { return Command::Rectangle; }
 
@@ -842,11 +750,7 @@ namespace IPCore
             executeQuad(context, (float*)points, color, dm);
         }
 
-        void Quad::hash(ostream& o) const
-        {
-            o << points[0] << points[1] << points[2] << points[3] << drawMode
-              << color;
-        }
+        void Quad::hash(ostream& o) const { o << points[0] << points[1] << points[2] << points[3] << drawMode << color; }
 
         size_t Quad::getType() const { return Command::Quad; }
 
@@ -854,10 +758,7 @@ namespace IPCore
 
         void ExecuteAllBefore::hash(ostream& o) const {}
 
-        size_t ExecuteAllBefore::getType() const
-        {
-            return Command::ExecuteAllBefore;
-        }
+        size_t ExecuteAllBefore::getType() const { return Command::ExecuteAllBefore; }
 
         void renderPaintCommands(PaintContext& context)
         {
@@ -895,8 +796,7 @@ namespace IPCore
                 // command, we don't update the cache.
                 //
 
-                if (context.updateCache && context.cachedfbo
-                    && (context.commands.size() > 1)
+                if (context.updateCache && context.cachedfbo && (context.commands.size() > 1)
                     && (context.commands[i] == context.lastCommand))
                 {
                     if (i > 0)
@@ -942,9 +842,8 @@ namespace IPCore
                 const Mat44f model = root->imageMatrix;
                 const Mat44f proj = root->projectionMatrix;
 
-                CommandContext commandContext(
-                    proj, model, fbo, textureFBO, currentFBO, context.glState,
-                    context.hasStencil, context.stencilBox);
+                CommandContext commandContext(proj, model, fbo, textureFBO, currentFBO, context.glState, context.hasStencil,
+                                              context.stencilBox);
 
                 //
                 // to speed up the rendering, we execute all consecutive text
@@ -955,15 +854,12 @@ namespace IPCore
                 {
                     size_t notText = 0;
                     // find all consecutive text commands
-                    for (notText = i + 1; notText < context.commands.size();
-                         ++notText)
+                    for (notText = i + 1; notText < context.commands.size(); ++notText)
                     {
-                        if (context.commands[notText]->getType()
-                            != Paint::Command::Text)
+                        if (context.commands[notText]->getType() != Paint::Command::Text)
                             break;
                     }
-                    const Paint::Text* tcmd =
-                        static_cast<const Paint::Text*>(cmd);
+                    const Paint::Text* tcmd = static_cast<const Paint::Text*>(cmd);
                     tcmd->setup(commandContext);
                     if (i < curCmdNum - 1)
                         notText = min(notText, curCmdNum - 1);

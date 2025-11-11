@@ -13,8 +13,7 @@ namespace IPCore
 {
     using namespace std;
 
-    RootIPNode::RootIPNode(const string& name, const NodeDefinition* def,
-                           IPGraph* graph, GroupIPNode* group)
+    RootIPNode::RootIPNode(const string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group)
         : IPNode(name, def, graph, 0)
     {
         setWritable(false);
@@ -28,8 +27,7 @@ namespace IPCore
         const IPNodes& nodes = inputs();
         if (nodes.empty())
             return IPImage::newNoImage(this, "No Input");
-        IPImage* root =
-            new IPImage(this, IPImage::GroupType, 0, 0, 1.0, IPImage::NoBuffer);
+        IPImage* root = new IPImage(this, IPImage::GroupType, 0, 0, 1.0, IPImage::NoBuffer);
 
         try
         {

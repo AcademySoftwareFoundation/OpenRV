@@ -89,8 +89,7 @@ namespace Mu
         {
             if (!_current)
                 throw BadInternalListCallException();
-            return reinterpret_cast<ValuePointer>(_current->structure()
-                                                  + _voff);
+            return reinterpret_cast<ValuePointer>(_current->structure() + _voff);
         }
 
         //
@@ -101,8 +100,7 @@ namespace Mu
         {
             if (!_current)
                 throw BadInternalListCallException();
-            return *reinterpret_cast<ClassInstance**>(_current->structure()
-                                                      + _noff);
+            return *reinterpret_cast<ClassInstance**>(_current->structure() + _noff);
         }
 
         //

@@ -47,8 +47,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  Mu Type CONSTRUCTORS
 
-    QClipboardType::QClipboardType(Context* c, const char* name, Class* super,
-                                   Class* super2)
+    QClipboardType::QClipboardType(Context* c, const char* name, Class* super, Class* super2)
         : Class(c, name, vectorOf2(super, super2))
     {
     }
@@ -58,8 +57,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    static Pointer QClipboard_QClipboard_QObject(Thread& NODE_THREAD,
-                                                 Pointer obj)
+    static Pointer QClipboard_QClipboard_QObject(Thread& NODE_THREAD, Pointer obj)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         ClassInstance* widget = reinterpret_cast<ClassInstance*>(obj);
@@ -70,9 +68,7 @@ namespace Mu
         }
         else if (QClipboard* w = object<QClipboard>(widget))
         {
-            QClipboardType* type =
-                c->findSymbolOfTypeByQualifiedName<QClipboardType>(
-                    c->internName("qt.QClipboard"), false);
+            QClipboardType* type = c->findSymbolOfTypeByQualifiedName<QClipboardType>(c->internName("qt.QClipboard"), false);
             ClassInstance* o = ClassInstance::allocate(type);
             setobject(o, w);
             return o;
@@ -83,15 +79,9 @@ namespace Mu
         }
     }
 
-    static NODE_IMPLEMENTATION(castFromObject, Pointer)
-    {
-        NODE_RETURN(
-            QClipboard_QClipboard_QObject(NODE_THREAD, NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(castFromObject, Pointer) { NODE_RETURN(QClipboard_QClipboard_QObject(NODE_THREAD, NODE_ARG(0, Pointer))); }
 
-    void qt_QClipboard_clear_void_QClipboard_int(Mu::Thread& NODE_THREAD,
-                                                 Pointer param_this,
-                                                 int param_mode)
+    void qt_QClipboard_clear_void_QClipboard_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_mode)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QClipboard* arg0 = object<QClipboard>(param_this);
@@ -99,9 +89,7 @@ namespace Mu
         arg0->clear(arg1);
     }
 
-    Pointer qt_QClipboard_image_QImage_QClipboard_int(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this,
-                                                      int param_mode)
+    Pointer qt_QClipboard_image_QImage_QClipboard_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_mode)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QClipboard* arg0 = object<QClipboard>(param_this);
@@ -109,43 +97,36 @@ namespace Mu
         return makeqtype<QImageType>(c, arg0->image(arg1), "qt.QImage");
     }
 
-    Pointer qt_QClipboard_mimeData_QMimeData_QClipboard_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_mode)
+    Pointer qt_QClipboard_mimeData_QMimeData_QClipboard_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_mode)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QClipboard* arg0 = object<QClipboard>(param_this);
         QClipboard::Mode arg1 = (QClipboard::Mode)(param_mode);
-        return makeinstance<QMimeDataType>(c, arg0->mimeData(arg1),
-                                           "qt.QMimeData");
+        return makeinstance<QMimeDataType>(c, arg0->mimeData(arg1), "qt.QMimeData");
     }
 
-    bool qt_QClipboard_ownsClipboard_bool_QClipboard(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_this)
+    bool qt_QClipboard_ownsClipboard_bool_QClipboard(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QClipboard* arg0 = object<QClipboard>(param_this);
         return arg0->ownsClipboard();
     }
 
-    bool qt_QClipboard_ownsFindBuffer_bool_QClipboard(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    bool qt_QClipboard_ownsFindBuffer_bool_QClipboard(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QClipboard* arg0 = object<QClipboard>(param_this);
         return arg0->ownsFindBuffer();
     }
 
-    bool qt_QClipboard_ownsSelection_bool_QClipboard(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_this)
+    bool qt_QClipboard_ownsSelection_bool_QClipboard(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QClipboard* arg0 = object<QClipboard>(param_this);
         return arg0->ownsSelection();
     }
 
-    Pointer qt_QClipboard_pixmap_QPixmap_QClipboard_int(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this,
-                                                        int param_mode)
+    Pointer qt_QClipboard_pixmap_QPixmap_QClipboard_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_mode)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QClipboard* arg0 = object<QClipboard>(param_this);
@@ -153,9 +134,7 @@ namespace Mu
         return makeqtype<QPixmapType>(c, arg0->pixmap(arg1), "qt.QPixmap");
     }
 
-    void qt_QClipboard_setImage_void_QClipboard_QImage_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_image,
-        int param_mode)
+    void qt_QClipboard_setImage_void_QClipboard_QImage_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_image, int param_mode)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QClipboard* arg0 = object<QClipboard>(param_this);
@@ -164,9 +143,8 @@ namespace Mu
         arg0->setImage(arg1, arg2);
     }
 
-    void qt_QClipboard_setMimeData_void_QClipboard_QMimeData_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_src,
-        int param_mode)
+    void qt_QClipboard_setMimeData_void_QClipboard_QMimeData_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_src,
+                                                                 int param_mode)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QClipboard* arg0 = object<QClipboard>(param_this);
@@ -175,9 +153,8 @@ namespace Mu
         arg0->setMimeData(arg1, arg2);
     }
 
-    void qt_QClipboard_setPixmap_void_QClipboard_QPixmap_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_pixmap,
-        int param_mode)
+    void qt_QClipboard_setPixmap_void_QClipboard_QPixmap_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_pixmap,
+                                                             int param_mode)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QClipboard* arg0 = object<QClipboard>(param_this);
@@ -186,9 +163,7 @@ namespace Mu
         arg0->setPixmap(arg1, arg2);
     }
 
-    void qt_QClipboard_setText_void_QClipboard_string_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_text,
-        int param_mode)
+    void qt_QClipboard_setText_void_QClipboard_string_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_text, int param_mode)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QClipboard* arg0 = object<QClipboard>(param_this);
@@ -197,27 +172,21 @@ namespace Mu
         arg0->setText(arg1, arg2);
     }
 
-    bool
-    qt_QClipboard_supportsFindBuffer_bool_QClipboard(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_this)
+    bool qt_QClipboard_supportsFindBuffer_bool_QClipboard(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QClipboard* arg0 = object<QClipboard>(param_this);
         return arg0->supportsFindBuffer();
     }
 
-    bool
-    qt_QClipboard_supportsSelection_bool_QClipboard(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this)
+    bool qt_QClipboard_supportsSelection_bool_QClipboard(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QClipboard* arg0 = object<QClipboard>(param_this);
         return arg0->supportsSelection();
     }
 
-    Pointer qt_QClipboard_text_string_QClipboard_int(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_this,
-                                                     int param_mode)
+    Pointer qt_QClipboard_text_string_QClipboard_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_mode)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QClipboard* arg0 = object<QClipboard>(param_this);
@@ -225,9 +194,8 @@ namespace Mu
         return makestring(c, arg0->text(arg1));
     }
 
-    Pointer qt_QClipboard_text_string_QClipboard_string_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_subtype,
-        int param_mode)
+    Pointer qt_QClipboard_text_string_QClipboard_string_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_subtype,
+                                                            int param_mode)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QClipboard* arg0 = object<QClipboard>(param_this);
@@ -236,9 +204,7 @@ namespace Mu
         return makestring(c, arg0->text(arg1, arg2));
     }
 
-    bool qt_QClipboard_event_bool_QClipboard_QEvent(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this,
-                                                    Pointer param_e)
+    bool qt_QClipboard_event_bool_QClipboard_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QClipboard* arg0 = object<QClipboard>(param_this);
@@ -246,9 +212,8 @@ namespace Mu
         return arg0->event(arg1);
     }
 
-    bool qt_QClipboard_eventFilter_bool_QClipboard_QObject_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_watched,
-        Pointer param_event)
+    bool qt_QClipboard_eventFilter_bool_QClipboard_QObject_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_watched,
+                                                                  Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QClipboard* arg0 = object<QClipboard>(param_this);
@@ -259,110 +224,91 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(_n_clear0, void)
     {
-        qt_QClipboard_clear_void_QClipboard_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QClipboard_clear_void_QClipboard_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_image0, Pointer)
     {
-        NODE_RETURN(qt_QClipboard_image_QImage_QClipboard_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QClipboard_image_QImage_QClipboard_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_mimeData0, Pointer)
     {
-        NODE_RETURN(qt_QClipboard_mimeData_QMimeData_QClipboard_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QClipboard_mimeData_QMimeData_QClipboard_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_ownsClipboard0, bool)
     {
-        NODE_RETURN(qt_QClipboard_ownsClipboard_bool_QClipboard(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QClipboard_ownsClipboard_bool_QClipboard(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_ownsFindBuffer0, bool)
     {
-        NODE_RETURN(qt_QClipboard_ownsFindBuffer_bool_QClipboard(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QClipboard_ownsFindBuffer_bool_QClipboard(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_ownsSelection0, bool)
     {
-        NODE_RETURN(qt_QClipboard_ownsSelection_bool_QClipboard(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QClipboard_ownsSelection_bool_QClipboard(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_pixmap0, Pointer)
     {
-        NODE_RETURN(qt_QClipboard_pixmap_QPixmap_QClipboard_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QClipboard_pixmap_QPixmap_QClipboard_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_setImage0, void)
     {
-        qt_QClipboard_setImage_void_QClipboard_QImage_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int));
+        qt_QClipboard_setImage_void_QClipboard_QImage_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setMimeData0, void)
     {
-        qt_QClipboard_setMimeData_void_QClipboard_QMimeData_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int));
+        qt_QClipboard_setMimeData_void_QClipboard_QMimeData_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setPixmap0, void)
     {
-        qt_QClipboard_setPixmap_void_QClipboard_QPixmap_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int));
+        qt_QClipboard_setPixmap_void_QClipboard_QPixmap_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                            NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setText0, void)
     {
-        qt_QClipboard_setText_void_QClipboard_string_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int));
+        qt_QClipboard_setText_void_QClipboard_string_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_supportsFindBuffer0, bool)
     {
-        NODE_RETURN(qt_QClipboard_supportsFindBuffer_bool_QClipboard(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QClipboard_supportsFindBuffer_bool_QClipboard(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_supportsSelection0, bool)
     {
-        NODE_RETURN(qt_QClipboard_supportsSelection_bool_QClipboard(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QClipboard_supportsSelection_bool_QClipboard(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_text0, Pointer)
     {
-        NODE_RETURN(qt_QClipboard_text_string_QClipboard_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QClipboard_text_string_QClipboard_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_text1, Pointer)
     {
-        NODE_RETURN(qt_QClipboard_text_string_QClipboard_string_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int)));
+        NODE_RETURN(qt_QClipboard_text_string_QClipboard_string_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                    NODE_ARG(2, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_event0, bool)
     {
-        NODE_RETURN(qt_QClipboard_event_bool_QClipboard_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QClipboard_event_bool_QClipboard_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_eventFilter0, bool)
     {
-        NODE_RETURN(qt_QClipboard_eventFilter_bool_QClipboard_QObject_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QClipboard_eventFilter_bool_QClipboard_QObject_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                             NODE_ARG(2, Pointer)));
     }
 
     void QClipboardType::load()
@@ -382,17 +328,13 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
-                   new Function(c, tn, castFromObject, Cast, Compiled,
-                                QClipboard_QClipboard_QObject, Return, ftn,
-                                Parameters,
+                   new Function(c, tn, castFromObject, Cast, Compiled, QClipboard_QClipboard_QObject, Return, ftn, Parameters,
                                 new Param(c, "object", "qt.QObject"), End),
 
                    EndArguments);
@@ -400,104 +342,48 @@ namespace Mu
         addSymbols(
             // enums
             // member functions
-            new Function(
-                c, "clear", _n_clear0, None, Compiled,
-                qt_QClipboard_clear_void_QClipboard_int, Return, "void",
-                Parameters, new Param(c, "this", "qt.QClipboard"),
-                new Param(c, "mode", "int", Value((int)QClipboard::Clipboard)),
-                End),
-            new Function(
-                c, "image", _n_image0, None, Compiled,
-                qt_QClipboard_image_QImage_QClipboard_int, Return, "qt.QImage",
-                Parameters, new Param(c, "this", "qt.QClipboard"),
-                new Param(c, "mode", "int", Value((int)QClipboard::Clipboard)),
-                End),
-            new Function(
-                c, "mimeData", _n_mimeData0, None, Compiled,
-                qt_QClipboard_mimeData_QMimeData_QClipboard_int, Return,
-                "qt.QMimeData", Parameters,
-                new Param(c, "this", "qt.QClipboard"),
-                new Param(c, "mode", "int", Value((int)QClipboard::Clipboard)),
-                End),
-            new Function(c, "ownsClipboard", _n_ownsClipboard0, None, Compiled,
-                         qt_QClipboard_ownsClipboard_bool_QClipboard, Return,
-                         "bool", Parameters,
-                         new Param(c, "this", "qt.QClipboard"), End),
-            new Function(c, "ownsFindBuffer", _n_ownsFindBuffer0, None,
-                         Compiled, qt_QClipboard_ownsFindBuffer_bool_QClipboard,
-                         Return, "bool", Parameters,
-                         new Param(c, "this", "qt.QClipboard"), End),
-            new Function(c, "ownsSelection", _n_ownsSelection0, None, Compiled,
-                         qt_QClipboard_ownsSelection_bool_QClipboard, Return,
-                         "bool", Parameters,
-                         new Param(c, "this", "qt.QClipboard"), End),
-            new Function(
-                c, "pixmap", _n_pixmap0, None, Compiled,
-                qt_QClipboard_pixmap_QPixmap_QClipboard_int, Return,
-                "qt.QPixmap", Parameters, new Param(c, "this", "qt.QClipboard"),
-                new Param(c, "mode", "int", Value((int)QClipboard::Clipboard)),
-                End),
-            new Function(
-                c, "setImage", _n_setImage0, None, Compiled,
-                qt_QClipboard_setImage_void_QClipboard_QImage_int, Return,
-                "void", Parameters, new Param(c, "this", "qt.QClipboard"),
-                new Param(c, "image", "qt.QImage"),
-                new Param(c, "mode", "int", Value((int)QClipboard::Clipboard)),
-                End),
-            new Function(
-                c, "setMimeData", _n_setMimeData0, None, Compiled,
-                qt_QClipboard_setMimeData_void_QClipboard_QMimeData_int, Return,
-                "void", Parameters, new Param(c, "this", "qt.QClipboard"),
-                new Param(c, "src", "qt.QMimeData"),
-                new Param(c, "mode", "int", Value((int)QClipboard::Clipboard)),
-                End),
-            new Function(
-                c, "setPixmap", _n_setPixmap0, None, Compiled,
-                qt_QClipboard_setPixmap_void_QClipboard_QPixmap_int, Return,
-                "void", Parameters, new Param(c, "this", "qt.QClipboard"),
-                new Param(c, "pixmap", "qt.QPixmap"),
-                new Param(c, "mode", "int", Value((int)QClipboard::Clipboard)),
-                End),
-            new Function(
-                c, "setText", _n_setText0, None, Compiled,
-                qt_QClipboard_setText_void_QClipboard_string_int, Return,
-                "void", Parameters, new Param(c, "this", "qt.QClipboard"),
-                new Param(c, "text", "string"),
-                new Param(c, "mode", "int", Value((int)QClipboard::Clipboard)),
-                End),
-            new Function(
-                c, "supportsFindBuffer", _n_supportsFindBuffer0, None, Compiled,
-                qt_QClipboard_supportsFindBuffer_bool_QClipboard, Return,
-                "bool", Parameters, new Param(c, "this", "qt.QClipboard"), End),
-            new Function(
-                c, "supportsSelection", _n_supportsSelection0, None, Compiled,
-                qt_QClipboard_supportsSelection_bool_QClipboard, Return, "bool",
-                Parameters, new Param(c, "this", "qt.QClipboard"), End),
-            new Function(
-                c, "text", _n_text0, None, Compiled,
-                qt_QClipboard_text_string_QClipboard_int, Return, "string",
-                Parameters, new Param(c, "this", "qt.QClipboard"),
-                new Param(c, "mode", "int", Value((int)QClipboard::Clipboard)),
-                End),
-            new Function(
-                c, "text", _n_text1, None, Compiled,
-                qt_QClipboard_text_string_QClipboard_string_int, Return,
-                "string", Parameters, new Param(c, "this", "qt.QClipboard"),
-                new Param(c, "subtype", "string"),
-                new Param(c, "mode", "int", Value((int)QClipboard::Clipboard)),
-                End),
-            new MemberFunction(c, "event", _n_event0, None, Compiled,
-                               qt_QClipboard_event_bool_QClipboard_QEvent,
-                               Return, "bool", Parameters,
-                               new Param(c, "this", "qt.QClipboard"),
-                               new Param(c, "e", "qt.QEvent"), End),
-            new MemberFunction(
-                c, "eventFilter", _n_eventFilter0, None, Compiled,
-                qt_QClipboard_eventFilter_bool_QClipboard_QObject_QEvent,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QClipboard"),
-                new Param(c, "watched", "qt.QObject"),
-                new Param(c, "event", "qt.QEvent"), End),
+            new Function(c, "clear", _n_clear0, None, Compiled, qt_QClipboard_clear_void_QClipboard_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QClipboard"), new Param(c, "mode", "int", Value((int)QClipboard::Clipboard)), End),
+            new Function(c, "image", _n_image0, None, Compiled, qt_QClipboard_image_QImage_QClipboard_int, Return, "qt.QImage", Parameters,
+                         new Param(c, "this", "qt.QClipboard"), new Param(c, "mode", "int", Value((int)QClipboard::Clipboard)), End),
+            new Function(c, "mimeData", _n_mimeData0, None, Compiled, qt_QClipboard_mimeData_QMimeData_QClipboard_int, Return,
+                         "qt.QMimeData", Parameters, new Param(c, "this", "qt.QClipboard"),
+                         new Param(c, "mode", "int", Value((int)QClipboard::Clipboard)), End),
+            new Function(c, "ownsClipboard", _n_ownsClipboard0, None, Compiled, qt_QClipboard_ownsClipboard_bool_QClipboard, Return, "bool",
+                         Parameters, new Param(c, "this", "qt.QClipboard"), End),
+            new Function(c, "ownsFindBuffer", _n_ownsFindBuffer0, None, Compiled, qt_QClipboard_ownsFindBuffer_bool_QClipboard, Return,
+                         "bool", Parameters, new Param(c, "this", "qt.QClipboard"), End),
+            new Function(c, "ownsSelection", _n_ownsSelection0, None, Compiled, qt_QClipboard_ownsSelection_bool_QClipboard, Return, "bool",
+                         Parameters, new Param(c, "this", "qt.QClipboard"), End),
+            new Function(c, "pixmap", _n_pixmap0, None, Compiled, qt_QClipboard_pixmap_QPixmap_QClipboard_int, Return, "qt.QPixmap",
+                         Parameters, new Param(c, "this", "qt.QClipboard"), new Param(c, "mode", "int", Value((int)QClipboard::Clipboard)),
+                         End),
+            new Function(c, "setImage", _n_setImage0, None, Compiled, qt_QClipboard_setImage_void_QClipboard_QImage_int, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QClipboard"), new Param(c, "image", "qt.QImage"),
+                         new Param(c, "mode", "int", Value((int)QClipboard::Clipboard)), End),
+            new Function(c, "setMimeData", _n_setMimeData0, None, Compiled, qt_QClipboard_setMimeData_void_QClipboard_QMimeData_int, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QClipboard"), new Param(c, "src", "qt.QMimeData"),
+                         new Param(c, "mode", "int", Value((int)QClipboard::Clipboard)), End),
+            new Function(c, "setPixmap", _n_setPixmap0, None, Compiled, qt_QClipboard_setPixmap_void_QClipboard_QPixmap_int, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QClipboard"), new Param(c, "pixmap", "qt.QPixmap"),
+                         new Param(c, "mode", "int", Value((int)QClipboard::Clipboard)), End),
+            new Function(c, "setText", _n_setText0, None, Compiled, qt_QClipboard_setText_void_QClipboard_string_int, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QClipboard"), new Param(c, "text", "string"),
+                         new Param(c, "mode", "int", Value((int)QClipboard::Clipboard)), End),
+            new Function(c, "supportsFindBuffer", _n_supportsFindBuffer0, None, Compiled, qt_QClipboard_supportsFindBuffer_bool_QClipboard,
+                         Return, "bool", Parameters, new Param(c, "this", "qt.QClipboard"), End),
+            new Function(c, "supportsSelection", _n_supportsSelection0, None, Compiled, qt_QClipboard_supportsSelection_bool_QClipboard,
+                         Return, "bool", Parameters, new Param(c, "this", "qt.QClipboard"), End),
+            new Function(c, "text", _n_text0, None, Compiled, qt_QClipboard_text_string_QClipboard_int, Return, "string", Parameters,
+                         new Param(c, "this", "qt.QClipboard"), new Param(c, "mode", "int", Value((int)QClipboard::Clipboard)), End),
+            new Function(c, "text", _n_text1, None, Compiled, qt_QClipboard_text_string_QClipboard_string_int, Return, "string", Parameters,
+                         new Param(c, "this", "qt.QClipboard"), new Param(c, "subtype", "string"),
+                         new Param(c, "mode", "int", Value((int)QClipboard::Clipboard)), End),
+            new MemberFunction(c, "event", _n_event0, None, Compiled, qt_QClipboard_event_bool_QClipboard_QEvent, Return, "bool",
+                               Parameters, new Param(c, "this", "qt.QClipboard"), new Param(c, "e", "qt.QEvent"), End),
+            new MemberFunction(c, "eventFilter", _n_eventFilter0, None, Compiled, qt_QClipboard_eventFilter_bool_QClipboard_QObject_QEvent,
+                               Return, "bool", Parameters, new Param(c, "this", "qt.QClipboard"), new Param(c, "watched", "qt.QObject"),
+                               new Param(c, "event", "qt.QEvent"), End),
             // MISSING: metaObject ("const QMetaObject *"; QClipboard this)
             // MISSING: childEvent (void; QClipboard this, "QChildEvent *"
             // event) // protected MISSING: connectNotify (void; QClipboard

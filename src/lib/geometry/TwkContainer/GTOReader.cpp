@@ -53,8 +53,7 @@ namespace TwkContainer
         }
     }
 
-    GTOReader::Containers GTOReader::read(std::istream& in, const char* name,
-                                          unsigned int ormode)
+    GTOReader::Containers GTOReader::read(std::istream& in, const char* name, unsigned int ormode)
     {
         if (open(in, name, ormode))
         {
@@ -70,22 +69,11 @@ namespace TwkContainer
         }
     }
 
-    PropertyContainer* GTOReader::newContainer(const string& protocol)
-    {
-        return new PropertyContainer;
-    }
+    PropertyContainer* GTOReader::newContainer(const string& protocol) { return new PropertyContainer; }
 
-    Property* GTOReader::newProperty(const std::string& name,
-                                     const std::string& interp,
-                                     const PropertyInfo&)
-    {
-        return 0;
-    }
+    Property* GTOReader::newProperty(const std::string& name, const std::string& interp, const PropertyInfo&) { return 0; }
 
-    GTOReader::Request GTOReader::object(const string& name,
-                                         const string& protocol,
-                                         unsigned int protocolVersion,
-                                         const ObjectInfo& info)
+    GTOReader::Request GTOReader::object(const string& name, const string& protocol, unsigned int protocolVersion, const ObjectInfo& info)
     {
         PropertyContainer* g = 0;
         bool found = false;
@@ -119,26 +107,19 @@ namespace TwkContainer
         return Request(true, g);
     }
 
-    GTOReader::Request GTOReader::component(const string& name,
-                                            const string& interp,
-                                            const ComponentInfo& info)
+    GTOReader::Request GTOReader::component(const string& name, const string& interp, const ComponentInfo& info)
     {
-        PropertyContainer* g =
-            reinterpret_cast<PropertyContainer*>(info.object->objectData);
+        PropertyContainer* g = reinterpret_cast<PropertyContainer*>(info.object->objectData);
 
         Component* c = g->createComponent(info.fullName);
         return Request(true, c);
     }
 
-    GTOReader::Request GTOReader::property(const string& name,
-                                           const string& ininterp,
-                                           const PropertyInfo& info)
+    GTOReader::Request GTOReader::property(const string& name, const string& ininterp, const PropertyInfo& info)
     {
         string interp;
-        PropertyContainer* pc = reinterpret_cast<PropertyContainer*>(
-            info.component->object->objectData);
-        Component* c =
-            reinterpret_cast<Component*>(info.component->componentData);
+        PropertyContainer* pc = reinterpret_cast<PropertyContainer*>(info.component->object->objectData);
+        Component* c = reinterpret_cast<Component*>(info.component->componentData);
         Property* p = c->find(name.c_str());
         Property* np = 0;
 
@@ -198,8 +179,7 @@ namespace TwkContainer
             }
 
             ImageProperty* ip = new ImageProperty(name.c_str(), layout);
-            ip->restructure(info.dims.x, info.dims.y, info.dims.z, info.dims.w,
-                            info.size);
+            ip->restructure(info.dims.x, info.dims.y, info.dims.z, info.dims.w, info.size);
             c->add(ip);
             return Request(true, ip);
         }
@@ -588,8 +568,7 @@ namespace TwkContainer
                     break;
 
                 default:
-                    cerr << "WARNING: ignoring property \"" << name << "\""
-                         << endl;
+                    cerr << "WARNING: ignoring property \"" << name << "\"" << endl;
                     return 0;
                 }
             }

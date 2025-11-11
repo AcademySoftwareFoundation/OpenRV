@@ -27,10 +27,7 @@ namespace TwkUtil
 
 #if !defined(PLATFORM_WINDOWS)
 
-    int Timer::gettimeofdayWrapper(struct timeval* tp) const
-    {
-        return gettimeofday(tp, 0);
-    }
+    int Timer::gettimeofdayWrapper(struct timeval* tp) const { return gettimeofday(tp, 0); }
 
 #else
 
@@ -75,8 +72,7 @@ DWORD GetCurrentProcessorNumberXP()
                 debugTimers = true;
             firstTimerConstructed = false;
             if (debugTimers)
-                fprintf(stderr, "WIN PERFORMANCE TIMER FREQUENCY %I64u\n",
-                        tickFrequency);
+                fprintf(stderr, "WIN PERFORMANCE TIMER FREQUENCY %I64u\n", tickFrequency);
         }
 
         if (m_winFirst)
@@ -109,8 +105,7 @@ DWORD GetCurrentProcessorNumberXP()
             if (debugTimers)
             {
                 fprintf(stderr, "*************** tick counter decreased !\n");
-                fprintf(stderr, "                baseTicks %I64u ticks %I64u\n",
-                        m_winBaseTicks, ticks);
+                fprintf(stderr, "                baseTicks %I64u ticks %I64u\n", m_winBaseTicks, ticks);
             }
             m_winBaseTicks = ticks;
         }
@@ -131,8 +126,7 @@ DWORD GetCurrentProcessorNumberXP()
 
         m_winSec += ticks / tickFrequency;
 
-        long newUsec =
-            (long)(((ticks % tickFrequency) * 1000000i64) / tickFrequency);
+        long newUsec = (long)(((ticks % tickFrequency) * 1000000i64) / tickFrequency);
         if (m_winUsec + newUsec > 1000000i64)
             ++m_winSec;
 
@@ -281,9 +275,8 @@ gettimeofday (struct timeval *tp, void *not_used)
         gettimeofdayWrapper(&m_tp1);
         m_running = false;
 
-        m_usecElapsed =
-            (size_t(m_tp1.tv_sec) * size_t(1000000) + size_t(m_tp1.tv_usec)
-             - size_t(m_tp0.tv_sec) * size_t(1000000) - size_t(m_tp0.tv_usec));
+        m_usecElapsed = (size_t(m_tp1.tv_sec) * size_t(1000000) + size_t(m_tp1.tv_usec) - size_t(m_tp0.tv_sec) * size_t(1000000)
+                         - size_t(m_tp0.tv_usec));
 
         return m_stopped = m_usecElapsed * 1e-6;
     }
@@ -301,8 +294,7 @@ gettimeofday (struct timeval *tp, void *not_used)
         gettimeofdayWrapper(&tp);
 
         size_t usecElapsed =
-            (size_t(tp.tv_sec) * size_t(1000000) + size_t(tp.tv_usec)
-             - size_t(m_tp0.tv_sec) * size_t(1000000) - size_t(m_tp0.tv_usec));
+            (size_t(tp.tv_sec) * size_t(1000000) + size_t(tp.tv_usec) - size_t(m_tp0.tv_sec) * size_t(1000000) - size_t(m_tp0.tv_usec));
 
         return usecElapsed * 1e-6;
     }
@@ -320,8 +312,7 @@ gettimeofday (struct timeval *tp, void *not_used)
         gettimeofdayWrapper(&tp);
 
         size_t usecElapsed =
-            (size_t(tp.tv_sec) * size_t(1000000) + size_t(tp.tv_usec)
-             - size_t(m_tp0.tv_sec) * size_t(1000000) - size_t(m_tp0.tv_usec));
+            (size_t(tp.tv_sec) * size_t(1000000) + size_t(tp.tv_usec) - size_t(m_tp0.tv_sec) * size_t(1000000) - size_t(m_tp0.tv_usec));
 
         return usecElapsed;
     }
@@ -359,13 +350,11 @@ gettimeofday (struct timeval *tp, void *not_used)
             hms(estimate(n, ofn), hours, minutes, secondsLeft);
             sprintf(temp2, "%02d:%02d:%02d", hours, minutes, int(secondsLeft));
 
-            sprintf(temp3, "%d%% done, %s elapsed... %s remaining... ",
-                    int(double(n) / double(ofn - 1) * 100.0), temp, temp2);
+            sprintf(temp3, "%d%% done, %s elapsed... %s remaining... ", int(double(n) / double(ofn - 1) * 100.0), temp, temp2);
         }
         else
         {
-            sprintf(temp3, "%d%% done, %s elapsed... ",
-                    int(double(n) / double(ofn - 1) * 100.0), temp);
+            sprintf(temp3, "%d%% done, %s elapsed... ", int(double(n) / double(ofn - 1) * 100.0), temp);
         }
 
         return std::string(temp3);

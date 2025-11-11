@@ -148,8 +148,7 @@ namespace IPCore
                 FragmentPositionType,
             };
 
-            Symbol(Qualifier c, const std::string& name, Type t,
-                   size_t width = 0)
+            Symbol(Qualifier c, const std::string& name, Type t, size_t width = 0)
                 : m_qualifier(c)
                 , m_name(name)
                 , m_type(t)
@@ -161,10 +160,7 @@ namespace IPCore
 
             const std::string& name() const { return m_name; }
 
-            Qualifier qualifier() const
-            {
-                return (Qualifier)(m_qualifier & ~Special);
-            }
+            Qualifier qualifier() const { return (Qualifier)(m_qualifier & ~Special); }
 
             Type type() const { return m_type; }
 
@@ -179,9 +175,7 @@ namespace IPCore
 
             bool isSampler() const
             {
-                return m_type == Sampler1DType || m_type == Sampler2DType
-                       || m_type == Sampler3DType
-                       || m_type == Sampler2DRectType;
+                return m_type == Sampler1DType || m_type == Sampler2DType || m_type == Sampler3DType || m_type == Sampler2DRectType;
             }
 
             bool isCoordinate() const { return m_type == Coord2DRectType; }
@@ -190,15 +184,11 @@ namespace IPCore
 
             bool isInputImage() const { return m_type == InputImageType; }
 
-            [[nodiscard]] bool isFragmentPositon() const
-            {
-                return m_type == FragmentPositionType;
-            }
+            [[nodiscard]] bool isFragmentPositon() const { return m_type == FragmentPositionType; }
 
             bool operator==(const Symbol& s) const
             {
-                return s.m_name == m_name && s.m_qualifier == m_qualifier
-                       && s.m_type == m_type && s.m_width == m_width;
+                return s.m_name == m_name && s.m_qualifier == m_qualifier && s.m_type == m_type && s.m_width == m_width;
             }
 
         private:
@@ -270,15 +260,9 @@ namespace IPCore
 
             virtual void* valuePointer() { return 0; }
 
-            virtual void output(std::ostream& o) const
-            {
-                o << "[proxy " << symbol()->glslTypeName() << "]";
-            }
+            virtual void output(std::ostream& o) const { o << "[proxy " << symbol()->glslTypeName() << "]"; }
 
-            virtual void outputHash(std::ostream& o) const
-            {
-                o << "[proxy!" << symbol()->glslTypeName() << "]";
-            }
+            virtual void outputHash(std::ostream& o) const { o << "[proxy!" << symbol()->glslTypeName() << "]"; }
         };
 
         //
@@ -303,10 +287,7 @@ namespace IPCore
 
             virtual ~TypedBoundSymbol() {}
 
-            virtual BoundSymbol* copy() const
-            {
-                return new ThisType(symbol(), m_value);
-            }
+            virtual BoundSymbol* copy() const { return new ThisType(symbol(), m_value); }
 
             const T& value() const { return m_value; }
 
@@ -314,10 +295,7 @@ namespace IPCore
 
             virtual void output(std::ostream& o) const { o << m_value; }
 
-            virtual void outputHash(std::ostream& o) const
-            {
-                ::outputHashValue(o, m_value);
-            }
+            virtual void outputHash(std::ostream& o) const { ::outputHashValue(o, m_value); }
 
         private:
             T m_value;
@@ -346,8 +324,7 @@ namespace IPCore
             {
             }
 
-            explicit ImageOrFB(const IPImage* img, const TwkFB::FrameBuffer* f,
-                               size_t p = 0)
+            explicit ImageOrFB(const IPImage* img, const TwkFB::FrameBuffer* f, size_t p = 0)
                 : image(img)
                 , fb(f)
                 , plane(p)

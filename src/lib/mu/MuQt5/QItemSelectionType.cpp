@@ -42,8 +42,7 @@ namespace Mu
     {
     }
 
-    QItemSelectionType::QItemSelectionType(Context* c, const char* name,
-                                           Class* super)
+    QItemSelectionType::QItemSelectionType(Context* c, const char* name, Class* super)
         : Class(c, name, super)
     {
     }
@@ -52,39 +51,33 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(__allocate, Pointer)
     {
-        QItemSelectionType::Instance* i =
-            new QItemSelectionType::Instance((Class*)NODE_THIS.type());
+        QItemSelectionType::Instance* i = new QItemSelectionType::Instance((Class*)NODE_THIS.type());
         QItemSelectionType::registerFinalizer(i);
         NODE_RETURN(i);
     }
 
-    void QItemSelectionType::registerFinalizer(void* o)
-    {
-        GC_register_finalizer(o, QItemSelectionType::finalizer, 0, 0, 0);
-    }
+    void QItemSelectionType::registerFinalizer(void* o) { GC_register_finalizer(o, QItemSelectionType::finalizer, 0, 0, 0); }
 
     void QItemSelectionType::finalizer(void* obj, void* data)
     {
-        QItemSelectionType::Instance* i =
-            reinterpret_cast<QItemSelectionType::Instance*>(obj);
+        QItemSelectionType::Instance* i = reinterpret_cast<QItemSelectionType::Instance*>(obj);
         delete i;
     }
 
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    Pointer qt_QItemSelection_QItemSelection_QItemSelection_QItemSelection(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QItemSelection_QItemSelection_QItemSelection_QItemSelection(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         setqtype<QItemSelectionType>(param_this, QItemSelection());
         return param_this;
     }
 
-    Pointer
-    qt_QItemSelection_QItemSelection_QItemSelection_QItemSelection_QModelIndex_QModelIndex(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_topLeft,
-        Pointer param_bottomRight)
+    Pointer qt_QItemSelection_QItemSelection_QItemSelection_QItemSelection_QModelIndex_QModelIndex(Mu::Thread& NODE_THREAD,
+                                                                                                   Pointer param_this,
+                                                                                                   Pointer param_topLeft,
+                                                                                                   Pointer param_bottomRight)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QModelIndex arg1 = getqtype<QModelIndexType>(param_topLeft);
@@ -93,8 +86,7 @@ namespace Mu
         return param_this;
     }
 
-    bool qt_QItemSelection_contains_bool_QItemSelection_QModelIndex(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index)
+    bool qt_QItemSelection_contains_bool_QItemSelection_QModelIndex(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QItemSelection arg0 = getqtype<QItemSelectionType>(param_this);
@@ -102,30 +94,26 @@ namespace Mu
         return arg0.contains(arg1);
     }
 
-    Pointer qt_QItemSelection_indexes_qt__QModelIndexBSB_ESB__QItemSelection(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QItemSelection_indexes_qt__QModelIndexBSB_ESB__QItemSelection(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QItemSelection arg0 = getqtype<QItemSelectionType>(param_this);
         return makeqmodelindexlist(c, arg0.indexes());
     }
 
-    void qt_QItemSelection_merge_void_QItemSelection_QItemSelection_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_other,
-        int param_command)
+    void qt_QItemSelection_merge_void_QItemSelection_QItemSelection_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_other,
+                                                                        int param_command)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QItemSelection arg0 = getqtype<QItemSelectionType>(param_this);
         const QItemSelection arg1 = getqtype<QItemSelectionType>(param_other);
-        QItemSelectionModel::SelectionFlags arg2 =
-            (QItemSelectionModel::SelectionFlags)(param_command);
+        QItemSelectionModel::SelectionFlags arg2 = (QItemSelectionModel::SelectionFlags)(param_command);
         arg0.merge(arg1, arg2);
         setqtype<QItemSelectionType>(param_this, arg0);
     }
 
-    void qt_QItemSelection_select_void_QItemSelection_QModelIndex_QModelIndex(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_topLeft,
-        Pointer param_bottomRight)
+    void qt_QItemSelection_select_void_QItemSelection_QModelIndex_QModelIndex(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                              Pointer param_topLeft, Pointer param_bottomRight)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QItemSelection arg0 = getqtype<QItemSelectionType>(param_this);
@@ -137,44 +125,36 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(_n_QItemSelection0, Pointer)
     {
-        NODE_RETURN(
-            qt_QItemSelection_QItemSelection_QItemSelection_QItemSelection(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QItemSelection_QItemSelection_QItemSelection_QItemSelection(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_QItemSelection1, Pointer)
     {
-        NODE_RETURN(
-            qt_QItemSelection_QItemSelection_QItemSelection_QItemSelection_QModelIndex_QModelIndex(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QItemSelection_QItemSelection_QItemSelection_QItemSelection_QModelIndex_QModelIndex(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_contains0, bool)
     {
-        NODE_RETURN(qt_QItemSelection_contains_bool_QItemSelection_QModelIndex(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(
+            qt_QItemSelection_contains_bool_QItemSelection_QModelIndex(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_indexes0, Pointer)
     {
-        NODE_RETURN(
-            qt_QItemSelection_indexes_qt__QModelIndexBSB_ESB__QItemSelection(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QItemSelection_indexes_qt__QModelIndexBSB_ESB__QItemSelection(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_merge0, void)
     {
-        qt_QItemSelection_merge_void_QItemSelection_QItemSelection_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int));
+        qt_QItemSelection_merge_void_QItemSelection_QItemSelection_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                       NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_select0, void)
     {
-        qt_QItemSelection_select_void_QItemSelection_QModelIndex_QModelIndex(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer));
+        qt_QItemSelection_select_void_QItemSelection_QModelIndex_QModelIndex(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                             NODE_ARG(2, Pointer));
     }
 
     void QItemSelectionType::load()
@@ -194,58 +174,36 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(
-            new Function(c, "__allocate", __allocate, None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", __allocate, None, Return, ftn, End),
 
-            EndArguments);
+                   EndArguments);
 
         addSymbols(EndArguments);
 
         addSymbols(
             // enums
             // member functions
-            new Function(
-                c, "QItemSelection", _n_QItemSelection0, None, Compiled,
-                qt_QItemSelection_QItemSelection_QItemSelection_QItemSelection,
-                Return, "qt.QItemSelection", Parameters,
-                new Param(c, "this", "qt.QItemSelection"), End),
-            new Function(
-                c, "QItemSelection", _n_QItemSelection1, None, Compiled,
-                qt_QItemSelection_QItemSelection_QItemSelection_QItemSelection_QModelIndex_QModelIndex,
-                Return, "qt.QItemSelection", Parameters,
-                new Param(c, "this", "qt.QItemSelection"),
-                new Param(c, "topLeft", "qt.QModelIndex"),
-                new Param(c, "bottomRight", "qt.QModelIndex"), End),
-            new Function(
-                c, "contains", _n_contains0, None, Compiled,
-                qt_QItemSelection_contains_bool_QItemSelection_QModelIndex,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QItemSelection"),
-                new Param(c, "index", "qt.QModelIndex"), End),
-            new Function(
-                c, "indexes", _n_indexes0, None, Compiled,
-                qt_QItemSelection_indexes_qt__QModelIndexBSB_ESB__QItemSelection,
-                Return, "qt.QModelIndex[]", Parameters,
-                new Param(c, "this", "qt.QItemSelection"), End),
-            new Function(
-                c, "merge", _n_merge0, None, Compiled,
-                qt_QItemSelection_merge_void_QItemSelection_QItemSelection_int,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QItemSelection"),
-                new Param(c, "other", "qt.QItemSelection"),
-                new Param(c, "command", "int"), End),
-            new Function(
-                c, "select", _n_select0, None, Compiled,
-                qt_QItemSelection_select_void_QItemSelection_QModelIndex_QModelIndex,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QItemSelection"),
-                new Param(c, "topLeft", "qt.QModelIndex"),
-                new Param(c, "bottomRight", "qt.QModelIndex"), End),
+            new Function(c, "QItemSelection", _n_QItemSelection0, None, Compiled,
+                         qt_QItemSelection_QItemSelection_QItemSelection_QItemSelection, Return, "qt.QItemSelection", Parameters,
+                         new Param(c, "this", "qt.QItemSelection"), End),
+            new Function(c, "QItemSelection", _n_QItemSelection1, None, Compiled,
+                         qt_QItemSelection_QItemSelection_QItemSelection_QItemSelection_QModelIndex_QModelIndex, Return,
+                         "qt.QItemSelection", Parameters, new Param(c, "this", "qt.QItemSelection"),
+                         new Param(c, "topLeft", "qt.QModelIndex"), new Param(c, "bottomRight", "qt.QModelIndex"), End),
+            new Function(c, "contains", _n_contains0, None, Compiled, qt_QItemSelection_contains_bool_QItemSelection_QModelIndex, Return,
+                         "bool", Parameters, new Param(c, "this", "qt.QItemSelection"), new Param(c, "index", "qt.QModelIndex"), End),
+            new Function(c, "indexes", _n_indexes0, None, Compiled, qt_QItemSelection_indexes_qt__QModelIndexBSB_ESB__QItemSelection,
+                         Return, "qt.QModelIndex[]", Parameters, new Param(c, "this", "qt.QItemSelection"), End),
+            new Function(c, "merge", _n_merge0, None, Compiled, qt_QItemSelection_merge_void_QItemSelection_QItemSelection_int, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QItemSelection"), new Param(c, "other", "qt.QItemSelection"),
+                         new Param(c, "command", "int"), End),
+            new Function(c, "select", _n_select0, None, Compiled, qt_QItemSelection_select_void_QItemSelection_QModelIndex_QModelIndex,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QItemSelection"), new Param(c, "topLeft", "qt.QModelIndex"),
+                         new Param(c, "bottomRight", "qt.QModelIndex"), End),
             // static functions
             EndArguments);
         globalScope()->addSymbols(EndArguments);

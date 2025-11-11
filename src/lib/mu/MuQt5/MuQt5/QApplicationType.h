@@ -39,8 +39,7 @@ namespace Mu
         //  Constructors
         //
 
-        QApplicationType(Context* context, const char* name,
-                         Class* superClass = 0, Class* superClass2 = 0);
+        QApplicationType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QApplicationType();
 
@@ -75,11 +74,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance*
-    QApplicationType::cachedInstance(const QApplicationType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QApplicationType::cachedInstance(const QApplicationType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

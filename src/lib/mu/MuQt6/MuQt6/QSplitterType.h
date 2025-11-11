@@ -42,8 +42,7 @@ namespace Mu
         //  Constructors
         //
 
-        QSplitterType(Context* context, const char* name, Class* superClass = 0,
-                      Class* superClass2 = 0);
+        QSplitterType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QSplitterType();
 
@@ -67,8 +66,7 @@ namespace Mu
     public:
         virtual ~MuQt_QSplitter();
         MuQt_QSplitter(Pointer muobj, const CallEnvironment*, QWidget* parent);
-        MuQt_QSplitter(Pointer muobj, const CallEnvironment*,
-                       Qt::Orientation orientation, QWidget* parent);
+        MuQt_QSplitter(Pointer muobj, const CallEnvironment*, Qt::Orientation orientation, QWidget* parent);
         virtual QSize minimumSizeHint() const;
         virtual QSize sizeHint() const;
 
@@ -79,29 +77,17 @@ namespace Mu
         virtual void paintEvent(QPaintEvent* _p14);
 
     public:
-        int closestLegalPosition_pub(int pos, int index)
-        {
-            return closestLegalPosition(pos, index);
-        }
+        int closestLegalPosition_pub(int pos, int index) { return closestLegalPosition(pos, index); }
 
-        int closestLegalPosition_pub_parent(int pos, int index)
-        {
-            return QSplitter::closestLegalPosition(pos, index);
-        }
+        int closestLegalPosition_pub_parent(int pos, int index) { return QSplitter::closestLegalPosition(pos, index); }
 
         void moveSplitter_pub(int pos, int index) { moveSplitter(pos, index); }
 
-        void moveSplitter_pub_parent(int pos, int index)
-        {
-            QSplitter::moveSplitter(pos, index);
-        }
+        void moveSplitter_pub_parent(int pos, int index) { QSplitter::moveSplitter(pos, index); }
 
         void setRubberBand_pub(int pos) { setRubberBand(pos); }
 
-        void setRubberBand_pub_parent(int pos)
-        {
-            QSplitter::setRubberBand(pos);
-        }
+        void setRubberBand_pub_parent(int pos) { QSplitter::setRubberBand(pos); }
 
         void changeEvent_pub(QEvent* ev) { changeEvent(ev); }
 
@@ -113,17 +99,11 @@ namespace Mu
 
         void resizeEvent_pub(QResizeEvent* _p15) { resizeEvent(_p15); }
 
-        void resizeEvent_pub_parent(QResizeEvent* _p15)
-        {
-            QSplitter::resizeEvent(_p15);
-        }
+        void resizeEvent_pub_parent(QResizeEvent* _p15) { QSplitter::resizeEvent(_p15); }
 
         void paintEvent_pub(QPaintEvent* _p14) { paintEvent(_p14); }
 
-        void paintEvent_pub_parent(QPaintEvent* _p14)
-        {
-            QSplitter::paintEvent(_p14);
-        }
+        void paintEvent_pub_parent(QPaintEvent* _p14) { QSplitter::paintEvent(_p14); }
 
     public:
         const QSplitterType* _baseType;
@@ -131,11 +111,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance*
-    QSplitterType::cachedInstance(const QSplitterType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QSplitterType::cachedInstance(const QSplitterType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

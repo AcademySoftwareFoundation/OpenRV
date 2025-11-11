@@ -34,8 +34,7 @@ namespace Mu
         //  Constructors
         //
 
-        QMoveEventType(Context* context, const char* name,
-                       Class* superClass = 0);
+        QMoveEventType(Context* context, const char* name, Class* superClass = 0);
         virtual ~QMoveEventType();
 
         //

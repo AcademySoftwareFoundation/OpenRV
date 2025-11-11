@@ -14,10 +14,7 @@ namespace TwkQtCoreUtil
     namespace UTF8
     {
 
-        QString qconvert(const string& s)
-        {
-            return QString::fromUtf8(s.c_str(), s.size());
-        }
+        QString qconvert(const string& s) { return QString::fromUtf8(s.c_str(), s.size()); }
 
         QString qconvert(const char* s)
         {

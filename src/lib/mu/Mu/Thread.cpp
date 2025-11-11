@@ -109,12 +109,9 @@ namespace Mu
             pthread_attr_getstacksize(&_threadAttrs, &stacksize);
             pthread_attr_setstacksize(&_threadAttrs, stacksize * 4);
 
-            if (int err = pthread_create(&_id, &_threadAttrs,
-                                         &Thread::trampoline, this))
+            if (int err = pthread_create(&_id, &_threadAttrs, &Thread::trampoline, this))
             {
-                cerr << "Error: trying to create thread: " << strerror(err)
-                     << endl
-                     << flush;
+                cerr << "Error: trying to create thread: " << strerror(err) << endl << flush;
                 abort();
             }
         }
@@ -313,23 +310,19 @@ namespace Mu
         }
     }
 
-    const Value Thread::callMethodByName(const char* funcName,
-                                         Function::ArgumentVector& args,
-                                         bool returnArguments)
+    const Value Thread::callMethodByName(const char* funcName, Function::ArgumentVector& args, bool returnArguments)
     {
         const Context* c = context();
 
         if (Name n = c->lookupName(funcName))
         {
-            ClassInstance* obj =
-                reinterpret_cast<ClassInstance*>(args[0].as<Pointer>());
+            ClassInstance* obj = reinterpret_cast<ClassInstance*>(args[0].as<Pointer>());
             if (!obj || args.empty())
                 throw NilMethodInvocationException();
 
             const Class* t = obj->classType();
 
-            if (const MemberFunction* F =
-                    t->findSymbolOfType<MemberFunction>(n))
+            if (const MemberFunction* F = t->findSymbolOfType<MemberFunction>(n))
             {
                 return call(F, args, returnArguments);
             }
@@ -339,8 +332,7 @@ namespace Mu
         return Value();
     }
 
-    const Value Thread::call(const Function* f, Function::ArgumentVector& args,
-                             bool returnArguments)
+    const Value Thread::call(const Function* f, Function::ArgumentVector& args, bool returnArguments)
     {
         Value v;
 
@@ -422,8 +414,7 @@ namespace Mu
             for (int i = 0; i < n; i++)
             {
                 const Type* t = f->argType(i);
-                DataNode* dn =
-                    new DataNode(0, t->machineRep()->constantFunc(), t);
+                DataNode* dn = new DataNode(0, t->machineRep()->constantFunc(), t);
                 dn->_data = args[i];
                 body->argv()[i] = dn;
             }
@@ -502,21 +493,17 @@ namespace Mu
 #ifdef PLATFORM_DARWIN
         if (_alive)
         {
-            mach_msg_type_number_t thread_state_count =
-                DARWIN_THREAD_STATE_COUNT;
+            mach_msg_type_number_t thread_state_count = DARWIN_THREAD_STATE_COUNT;
             kern_return_t krc;
-            if ((krc = thread_get_state(
-                     pthread_mach_thread_np(_id), // <-- can't use self here
-                     DARWIN_THREAD_STATE, (natural_t*)_threadState,
-                     &thread_state_count))
+            if ((krc = thread_get_state(pthread_mach_thread_np(_id), // <-- can't use self here
+                                        DARWIN_THREAD_STATE, (natural_t*)_threadState, &thread_state_count))
                 != KERN_SUCCESS)
             {
                 return _threadState;
             }
             else
             {
-                cerr << "Thread::threadState(): error obtaining thread state"
-                     << endl;
+                cerr << "Thread::threadState(): error obtaining thread state" << endl;
             }
         }
 #endif
@@ -635,9 +622,7 @@ namespace Mu
                     return maybeSymbol == context()->globalScope();
                 }
 
-                if (maybeSymbol->context() == context()
-                    && isSymbol(maybeSymbol->scope())
-                    && isSymbol(maybeSymbol->nextOverload()))
+                if (maybeSymbol->context() == context() && isSymbol(maybeSymbol->scope()) && isSymbol(maybeSymbol->nextOverload()))
                 {
                     MU_GC_PTR stbase = GC_base(maybeSymbol->symbolTable());
 
@@ -679,8 +664,7 @@ namespace Mu
                         const size_t maxArgs = GC_size(argvBase);
                         size_t count = 0;
 
-                        for (Node** np = maybeNode->_argv; *np && depth;
-                             np++, count++)
+                        for (Node** np = maybeNode->_argv; *np && depth; np++, count++)
                         {
                             if (count >= maxArgs || !isNode(*np, depth - 1))
                                 return false;
@@ -730,8 +714,7 @@ namespace Mu
                 //  determine if the pointer really is a Node or not.
                 //
 
-                if ((GC_size(ptr) == sizeOfNode || GC_size(ptr) == sizeOfAnnNode
-                     || GC_size(ptr) == sizeOfDataNode)
+                if ((GC_size(ptr) == sizeOfNode || GC_size(ptr) == sizeOfAnnNode || GC_size(ptr) == sizeOfDataNode)
                     && isNode((void*)data, 1))
                 {
                     const Node* n = (const Node*)data;
@@ -754,8 +737,7 @@ namespace Mu
                 if (data == size_t(this))
                     continue;
 
-                bool nextIsThread = (size_t(this) == *spointers[i + 1])
-                                    && (t = spointers[i + 1] - 1);
+                bool nextIsThread = (size_t(this) == *spointers[i + 1]) && (t = spointers[i + 1] - 1);
 
                 if (data && nextIsThread)
                 {
@@ -817,13 +799,11 @@ namespace Mu
                         changed = true;
                         break;
                     }
-                    else if (const Function* f =
-                                 dynamic_cast<const Function*>(n->symbol()))
+                    else if (const Function* f = dynamic_cast<const Function*>(n->symbol()))
                     {
                         if (!f->native())
                         {
-                            if (const MemberFunction* mf =
-                                    dynamic_cast<const MemberFunction*>(f))
+                            if (const MemberFunction* mf = dynamic_cast<const MemberFunction*>(f))
                             {
                                 MemberFunction::MemberFunctionVector funcs;
                                 mf->findOverridingFunctions(funcs);
@@ -858,9 +838,7 @@ namespace Mu
                 trace[i] = BackTraceFrame();
         }
 
-        trace.erase(
-            remove_if(trace.begin(), trace.end(), stl_ext::IsNull_p<Node>()),
-            trace.end());
+        trace.erase(remove_if(trace.begin(), trace.end(), stl_ext::IsNull_p<Node>()), trace.end());
 #endif
 
         const bool debugging = this->context()->debugging();
@@ -878,8 +856,7 @@ namespace Mu
                     //  Its a constant value node
                     //
                 }
-                else if (const Function* F =
-                             dynamic_cast<const Function*>(symbol))
+                else if (const Function* F = dynamic_cast<const Function*>(symbol))
                 {
                     if (F->hasHiddenArgument())
                     {
@@ -887,8 +864,7 @@ namespace Mu
                     }
                     else
                     {
-                        const AnnotatedNode* anode =
-                            static_cast<const AnnotatedNode*>(node);
+                        const AnnotatedNode* anode = static_cast<const AnnotatedNode*>(node);
                         trace[i].linenum = anode->linenum();
                         trace[i].charnum = anode->charnum();
                         trace[i].filename = anode->sourceFileName().c_str();

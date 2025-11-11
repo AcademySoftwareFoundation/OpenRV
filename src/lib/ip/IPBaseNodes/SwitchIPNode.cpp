@@ -25,9 +25,7 @@ namespace IPCore
     using namespace TwkAudio;
     using namespace std;
 
-    SwitchIPNode::SwitchIPNode(const std::string& name,
-                               const NodeDefinition* def, IPGraph* g,
-                               GroupIPNode* group)
+    SwitchIPNode::SwitchIPNode(const std::string& name, const NodeDefinition* def, IPGraph* g, GroupIPNode* group)
         : IPNode(name, def, g, group)
         , m_offset(0)
         , m_fit(false)
@@ -44,8 +42,7 @@ namespace IPCore
 
         m_useCutInfo = declareProperty<IntProperty>("mode.useCutInfo", 1);
         m_autoEDL = declareProperty<IntProperty>("mode.autoEDL", 1);
-        m_alignStartFrames =
-            declareProperty<IntProperty>("mode.alignStartFrames", 0);
+        m_alignStartFrames = declareProperty<IntProperty>("mode.alignStartFrames", 0);
         m_autoSize = declareProperty<IntProperty>("output.autoSize", 1);
         m_activeInput = declareProperty<StringProperty>("output.input", "");
     }
@@ -64,8 +61,7 @@ namespace IPCore
             while (node->inputs().size())
                 node = node->inputs()[0];
 
-            if (const AdaptorIPNode* n =
-                    dynamic_cast<const AdaptorIPNode*>(node))
+            if (const AdaptorIPNode* n = dynamic_cast<const AdaptorIPNode*>(node))
             {
                 node = n->groupInputNode();
                 if (node->name() == m_activeInput->front())
@@ -100,8 +96,7 @@ namespace IPCore
     {
         if (!isDeleting())
         {
-            if (p == m_useCutInfo || p == m_alignStartFrames || p == m_outputFPS
-                || p == m_autoEDL)
+            if (p == m_useCutInfo || p == m_alignStartFrames || p == m_outputFPS || p == m_autoEDL)
             {
                 lock();
                 m_rangeInfoDirty = true;
@@ -153,16 +148,14 @@ namespace IPCore
         unlock();
     }
 
-    void SwitchIPNode::inputImageStructureChanged(int inputIndex,
-                                                  PropagateTarget target)
+    void SwitchIPNode::inputImageStructureChanged(int inputIndex, PropagateTarget target)
     {
         lock();
         m_structureInfoDirty = true;
         unlock();
     }
 
-    void SwitchIPNode::mediaInfo(const Context& context,
-                                 MediaInfoVector& infos) const
+    void SwitchIPNode::mediaInfo(const Context& context, MediaInfoVector& infos) const
     {
         const IPNodes& ins = inputs();
         Context c = context;
@@ -172,8 +165,7 @@ namespace IPCore
         ins[i]->mediaInfo(c, infos);
     }
 
-    IPNode::ImageStructureInfo
-    SwitchIPNode::imageStructureInfo(const Context& context) const
+    IPNode::ImageStructureInfo SwitchIPNode::imageStructureInfo(const Context& context) const
     {
         lazyUpdateRanges();
         return m_structureInfo;
@@ -213,8 +205,7 @@ namespace IPCore
         }
 
         size_t i = m_activeInputIndex;
-        ImageStructureInfo sinfo = inputs()[i]->imageStructureInfo(
-            graph()->contextForFrame(m_rangeInfos[i].start));
+        ImageStructureInfo sinfo = inputs()[i]->imageStructureInfo(graph()->contextForFrame(m_rangeInfos[i].start));
 
         m_info = m_rangeInfos[i];
         m_structureInfo.width = sinfo.width;
@@ -240,8 +231,7 @@ namespace IPCore
                 size = m_rangeInfos[i].end - m_rangeInfos[i].start;
             }
 
-            m_info.end =
-                max(m_info.end - m_info.start + 1, size) + m_info.start;
+            m_info.end = max(m_info.end - m_info.start + 1, size) + m_info.start;
         }
         else
         {
@@ -305,8 +295,7 @@ namespace IPCore
         m_structureInfoDirty = false;
     }
 
-    int SwitchIPNode::inputFrame(size_t index, int frame,
-                                 bool unconstrained) const
+    int SwitchIPNode::inputFrame(size_t index, int frame, bool unconstrained) const
     {
         if (m_rangeInfos.empty())
             return frame;
@@ -381,8 +370,7 @@ namespace IPCore
         if (nodes.empty())
             return IPImage::newNoImage(this, "No Inputs");
 
-        IPImage* root =
-            new IPImage(this, IPImage::BlendRenderType, width, height);
+        IPImage* root = new IPImage(this, IPImage::BlendRenderType, width, height);
 
         try
         {
@@ -399,9 +387,7 @@ namespace IPCore
             {
                 // continue;
                 IPNode* node = nodes[i];
-                TWK_THROW_STREAM(EvaluationFailedExc,
-                                 "SwitchIPNode evaluation failed on node "
-                                     << node->name());
+                TWK_THROW_STREAM(EvaluationFailedExc, "SwitchIPNode evaluation failed on node " << node->name());
             }
 
             //
@@ -486,10 +472,7 @@ namespace IPCore
             {
                 // continue;
                 IPNode* node = nodes[i];
-                TWK_THROW_STREAM(EvaluationFailedExc,
-                                 "NULL imgid in SwitchIPNode "
-                                     << name() << " failed on input "
-                                     << node->name());
+                TWK_THROW_STREAM(EvaluationFailedExc, "NULL imgid in SwitchIPNode " << name() << " failed on input " << node->name());
             }
 
             if (i)
@@ -514,8 +497,7 @@ namespace IPCore
         return root;
     }
 
-    void SwitchIPNode::testEvaluate(const Context& context,
-                                    TestEvaluationResult& result)
+    void SwitchIPNode::testEvaluate(const Context& context, TestEvaluationResult& result)
     {
         lazyUpdateRanges();
         IPNodes ins = inputs();
@@ -535,8 +517,7 @@ namespace IPCore
         ins[i]->testEvaluate(context, result);
     }
 
-    void SwitchIPNode::metaEvaluate(const Context& context,
-                                    MetaEvalVisitor& visitor)
+    void SwitchIPNode::metaEvaluate(const Context& context, MetaEvalVisitor& visitor)
     {
         lazyUpdateRanges();
         visitor.enter(context, this);
@@ -588,34 +569,27 @@ namespace IPCore
 
         size_t i = m_activeInputIndex;
 
-        const long foffset = inputFrame(i, m_info.start - m_offset, true)
-                             - m_rangeInfos[i].start;
+        const long foffset = inputFrame(i, m_info.start - m_offset, true) - m_rangeInfos[i].start;
         const Time soffset = double(foffset) / context.fps;
-        Time contextStart =
-            samplesToTime(context.buffer.startSample(), context.buffer.rate());
+        Time contextStart = samplesToTime(context.buffer.startSample(), context.buffer.rate());
 
         //
         // Construct a temporary buffer from which we will fill the given
         // context
         //
 
-        AudioBuffer audioBuffer(context.buffer.size(),
-                                context.buffer.channels(),
-                                context.buffer.rate(), soffset + contextStart);
+        AudioBuffer audioBuffer(context.buffer.size(), context.buffer.channels(), context.buffer.rate(), soffset + contextStart);
 
         AudioContext subContext(audioBuffer, context.fps);
 
         size_t rval = inputs()[i]->audioFillBuffer(subContext);
 
-        memcpy(context.buffer.pointer(), subContext.buffer.pointer(),
-               rval * context.buffer.numChannels() * sizeof(float));
+        memcpy(context.buffer.pointer(), subContext.buffer.pointer(), rval * context.buffer.numChannels() * sizeof(float));
 
         return rval;
     }
 
-    void SwitchIPNode::mapInputToEvalFrames(size_t inputIndex,
-                                            const FrameVector& inframes,
-                                            FrameVector& outframes) const
+    void SwitchIPNode::mapInputToEvalFrames(size_t inputIndex, const FrameVector& inframes, FrameVector& outframes) const
     {
         if (inputIndex != m_activeInputIndex)
             return;
@@ -623,10 +597,7 @@ namespace IPCore
         mapInputToEvalFramesInternal(inputIndex, inframes, outframes);
     }
 
-    void
-    SwitchIPNode::mapInputToEvalFramesInternal(size_t inputIndex,
-                                               const FrameVector& inframes,
-                                               FrameVector& outframes) const
+    void SwitchIPNode::mapInputToEvalFramesInternal(size_t inputIndex, const FrameVector& inframes, FrameVector& outframes) const
     {
         const ImageRangeInfo& info = m_rangeInfos[inputIndex];
         const bool useCutInfo = m_useCutInfo->front();
@@ -637,8 +608,7 @@ namespace IPCore
             for (size_t i = 0; i < inframes.size(); i++)
             {
                 int start = (useCutInfo) ? info.cutIn : info.start;
-                outframes.push_back((inframes[i] - start + m_info.start)
-                                    - m_offset);
+                outframes.push_back((inframes[i] - start + m_info.start) - m_offset);
             }
         }
         else
@@ -672,11 +642,6 @@ namespace IPCore
         }
     }
 
-    IPNode* SwitchIPNode::activeInput() const
-    {
-        return (m_activeInputIndex < inputs().size())
-                   ? inputs()[m_activeInputIndex]
-                   : nullptr;
-    }
+    IPNode* SwitchIPNode::activeInput() const { return (m_activeInputIndex < inputs().size()) ? inputs()[m_activeInputIndex] : nullptr; }
 
 } // namespace IPCore

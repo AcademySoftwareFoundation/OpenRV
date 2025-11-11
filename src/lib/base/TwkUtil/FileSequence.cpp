@@ -77,9 +77,7 @@ namespace TwkUtil
 
         if (!fileMatch)
         {
-            TWK_THROW_EXC_STREAM("Couldn't parse '"
-                                 << m_filePattern
-                                 << "' into anything meaningful.\n");
+            TWK_THROW_EXC_STREAM("Couldn't parse '" << m_filePattern << "' into anything meaningful.\n");
         }
         m_filePrefix = fileMatch.subStr(0);
         m_fileRange = fileMatch.subStr(1);
@@ -122,9 +120,7 @@ namespace TwkUtil
             Match range(regEx3, m_fileRange);
             if (!range)
             {
-                TWK_THROW_EXC_STREAM("Couldn't parse '"
-                                     << m_fileRange
-                                     << "' into a meaningful frame range");
+                TWK_THROW_EXC_STREAM("Couldn't parse '" << m_fileRange << "' into a meaningful frame range");
             }
             if (!range.subStr(0).empty())
             {
@@ -134,10 +130,8 @@ namespace TwkUtil
                 }
                 else
                 {
-                    cerr << "FileSequence::Warning: Specified min '"
-                         << range.subInt(0) << "' is outside "
-                         << "range of matching files.  Using exising min '"
-                         << m_first << "'." << endl;
+                    cerr << "FileSequence::Warning: Specified min '" << range.subInt(0) << "' is outside "
+                         << "range of matching files.  Using exising min '" << m_first << "'." << endl;
                 }
             }
             if (!range.subStr(1).empty())
@@ -148,10 +142,8 @@ namespace TwkUtil
                 }
                 else
                 {
-                    cerr << "FileSequence::Warning: Specified max '"
-                         << range.subInt(1) << "' is outside "
-                         << "range of matching files.  Using exising max '"
-                         << m_last << "'." << endl;
+                    cerr << "FileSequence::Warning: Specified max '" << range.subInt(1) << "' is outside "
+                         << "range of matching files.  Using exising max '" << m_last << "'." << endl;
                 }
             }
             if (!range.subStr(2).empty())
@@ -162,8 +154,7 @@ namespace TwkUtil
                 }
                 else
                 {
-                    cerr << "FileSequence::Warning: Specified frame increment '"
-                         << range.subInt(2) << "' is <= 0"
+                    cerr << "FileSequence::Warning: Specified frame increment '" << range.subInt(2) << "' is <= 0"
                          << ".  Using exising increment of 1" << endl;
                 }
             }

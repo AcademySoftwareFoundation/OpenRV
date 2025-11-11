@@ -46,8 +46,7 @@ extern "C"
                 int argc = newargs.size();
 
                 options_description desc("");
-                desc.add_options()("format",
-                                   value<string>()->default_value(format), "");
+                desc.add_options()("format", value<string>()->default_value(format), "");
 
                 variables_map vm;
                 store(parse_command_line(argc, argv, desc), vm);
@@ -62,8 +61,7 @@ extern "C"
             }
             catch (...)
             {
-                cout << "ERROR: bad MOVIEMISTIKA_ARGS = \"" << args << "\""
-                     << endl;
+                cout << "ERROR: bad MOVIEMISTIKA_ARGS = \"" << args << "\"" << endl;
             }
         }
 

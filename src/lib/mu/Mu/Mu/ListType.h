@@ -42,8 +42,7 @@ namespace Mu
 
         virtual void freeze();
 
-        virtual void outputValueRecursive(std::ostream&, const ValuePointer,
-                                          ValueOutputState&) const;
+        virtual void outputValueRecursive(std::ostream&, const ValuePointer, ValueOutputState&) const;
         virtual void load();
 
         static NODE_DECLARATION(construct_aggregate, Pointer);

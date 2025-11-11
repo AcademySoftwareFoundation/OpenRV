@@ -61,13 +61,10 @@ namespace TwkFB
         U8 type = header.imageType;
         const ColorMapSpec& cs = header.colorMapSpec;
 
-        if ((type != NoImageDataType && type != RawColorMapType
-             && type != RawTrueColorType && type != RawBlackAndWhiteType
-             && type != RLEColorMapType && type != RLETrueColorType
-             && type != RLEBlackAndWhiteType)
+        if ((type != NoImageDataType && type != RawColorMapType && type != RawTrueColorType && type != RawBlackAndWhiteType
+             && type != RLEColorMapType && type != RLETrueColorType && type != RLEBlackAndWhiteType)
             || (header.colorMapType != 0 && header.colorMapType != 1)
-            || (header.colorMapType == 0
-                && (cs.startIndex != 0 || cs.length != 0 || cs.entrySize != 0)))
+            || (header.colorMapType == 0 && (cs.startIndex != 0 || cs.length != 0 || cs.entrySize != 0)))
         {
             //
             //  NOT A SPEC TARGA FILE
@@ -104,16 +101,13 @@ namespace TwkFB
         return "Unknown";
     }
 
-    void IOtarga::readAttributes(FrameBuffer& fb,
-                                 const TGAFileHeader& header) const
+    void IOtarga::readAttributes(FrameBuffer& fb, const TGAFileHeader& header) const
     {
-        fb.attribute<string>("TARGA/ImageType") =
-            typeToString((ImageType)header.imageType);
+        fb.attribute<string>("TARGA/ImageType") = typeToString((ImageType)header.imageType);
         fb.attribute<int>("TARGA/PixelDepth") = header.imageSpec.pixelDepth;
     }
 
-    void IOtarga::readExtensionArea(FrameBuffer& fb,
-                                    const unsigned char* indata) const
+    void IOtarga::readExtensionArea(FrameBuffer& fb, const unsigned char* indata) const
     {
         const char* data = (const char*)indata;
         U16 extSize = *(U16*)data;
@@ -143,8 +137,7 @@ namespace TwkFB
         {
             ostringstream str;
             str << setfill('0');
-            str << setw(4) << year << "." << setw(2) << month << "." << setw(2)
-                << day << " " << setw(2) << hour << ":" << setw(2) << minute
+            str << setw(4) << year << "." << setw(2) << month << "." << setw(2) << day << " " << setw(2) << hour << ":" << setw(2) << minute
                 << ":" << setw(2) << sec;
             fb.attribute<string>("TARGA/DateTimeStamp") = str.str();
         }
@@ -162,8 +155,7 @@ namespace TwkFB
         if (hour != 0 || minute != 0 || sec != 0)
         {
             ostringstream str;
-            str << setfill('0') << setw(2) << hour << ":" << setw(2) << minute
-                << ":" << setw(2) << sec;
+            str << setfill('0') << setw(2) << hour << ":" << setw(2) << minute << ":" << setw(2) << sec;
             fb.attribute<string>("TARGA/JobTime") = str.str();
         }
 
@@ -246,8 +238,7 @@ namespace TwkFB
         }
     }
 
-    void IOtarga::readHeader(const unsigned char* data,
-                             TGAFileHeader& header) const
+    void IOtarga::readHeader(const unsigned char* data, TGAFileHeader& header) const
     {
         header.IDLength = *data;
         data++;
@@ -265,8 +256,7 @@ namespace TwkFB
         data += sizeof(ImageSpec);
     }
 
-    void IOtarga::readFooter(const unsigned char* data,
-                             TGAFileFooter& footer) const
+    void IOtarga::readFooter(const unsigned char* data, TGAFileFooter& footer) const
     {
         footer.extOffset = *(U32*)data;
         data += 4;
@@ -281,8 +271,7 @@ namespace TwkFB
 
         if (!infile)
         {
-            TWK_THROW_STREAM(IOException, "Unable to open TARGA file \""
-                                              << filename << "\" for reading");
+            TWK_THROW_STREAM(IOException, "Unable to open TARGA file \"" << filename << "\" for reading");
         }
 
         vector<unsigned char> data(3 + 5 + 10);
@@ -303,11 +292,9 @@ namespace TwkFB
             TWK_THROW_STREAM(IOException, "TARGA: cannot open " << filename);
         }
 
-        if (header.imageType != RawTrueColorType
-            && header.imageType != RLETrueColorType)
+        if (header.imageType != RawTrueColorType && header.imageType != RLETrueColorType)
         {
-            TWK_THROW_STREAM(IOException,
-                             "TARGA: unsupport TARGA image type " << filename);
+            TWK_THROW_STREAM(IOException, "TARGA: unsupport TARGA image type " << filename);
         }
 
         fbi.numChannels = (header.imageSpec.descriptor & 0xf) == 0xf ? 4 : 3;
@@ -340,17 +327,14 @@ namespace TwkFB
 
         if (!strncmp(footer.signature, "TRUEVISION-XFILE.", 18))
         {
-            fbi.proxy.attribute<string>("TARGA/Signature") =
-                "TRUEVISION-XFILE.";
+            fbi.proxy.attribute<string>("TARGA/Signature") = "TRUEVISION-XFILE.";
 
             if (footer.extOffset)
             {
-                vector<char> extArea(2 + 41 + 324 + 12 + 41 + 6 + 41 + 3 + 4 + 4
-                                     + 4 + 4 + 4 + 4 + 1);
+                vector<char> extArea(2 + 41 + 324 + 12 + 41 + 6 + 41 + 3 + 4 + 4 + 4 + 4 + 4 + 4 + 1);
                 infile.seekg(footer.extOffset, ios::beg);
                 infile.read(&extArea.front(), extArea.size());
-                readExtensionArea(fbi.proxy,
-                                  (const unsigned char*)&extArea.front());
+                readExtensionArea(fbi.proxy, (const unsigned char*)&extArea.front());
             }
         }
         else
@@ -359,12 +343,9 @@ namespace TwkFB
         }
     }
 
-    void IOtarga::readImage(FrameBuffer& fb, const std::string& filename,
-                            const ReadRequest& request) const
+    void IOtarga::readImage(FrameBuffer& fb, const std::string& filename, const ReadRequest& request) const
     {
-        FileStream::Type ftype = m_iotype == StandardIO
-                                     ? FileStream::Buffering
-                                     : (FileStream::Type)(m_iotype - 1);
+        FileStream::Type ftype = m_iotype == StandardIO ? FileStream::Buffering : (FileStream::Type)(m_iotype - 1);
 
         FileStream fmap(filename, ftype, m_iosize, m_iomaxAsync);
 
@@ -391,11 +372,9 @@ namespace TwkFB
             TWK_THROW_STREAM(IOException, "TARGA: cannot open " << filename);
         }
 
-        if (header.imageType != RawTrueColorType
-            && header.imageType != RLETrueColorType)
+        if (header.imageType != RawTrueColorType && header.imageType != RLETrueColorType)
         {
-            TWK_THROW_STREAM(IOException,
-                             "TARGA: unsupport TARGA image type " << filename);
+            TWK_THROW_STREAM(IOException, "TARGA: unsupport TARGA image type " << filename);
         }
 
         const int ch = (header.imageSpec.descriptor & 0xf) == 0xf ? 4 : 3;
@@ -453,9 +432,7 @@ namespace TwkFB
         case 16:
             if (header.imageType == RawTrueColorType)
             {
-                for (unsigned char *p = fb.pixels<unsigned char>(),
-                                   *e = p + fb.planeSize();
-                     p != e; p += 4, data += 2)
+                for (unsigned char *p = fb.pixels<unsigned char>(), *e = p + fb.planeSize(); p != e; p += 4, data += 2)
                 {
                     U16 pixel = *(U16*)data;
                     p[0] = (pixel & 0x7c00) >> 7;
@@ -466,9 +443,7 @@ namespace TwkFB
             }
             else if (header.imageType == RLETrueColorType)
             {
-                for (unsigned char *p = fb.pixels<unsigned char>(),
-                                   *e = p + fb.planeSize();
-                     p < e;)
+                for (unsigned char *p = fb.pixels<unsigned char>(), *e = p + fb.planeSize(); p < e;)
                 {
                     const size_t repCount = *data;
                     data++;
@@ -495,9 +470,7 @@ namespace TwkFB
         case 24:
             if (header.imageType == RawTrueColorType)
             {
-                for (unsigned char *p = fb.pixels<unsigned char>(),
-                                   *e = p + fb.planeSize();
-                     p != e; p += 4, data += 3)
+                for (unsigned char *p = fb.pixels<unsigned char>(), *e = p + fb.planeSize(); p != e; p += 4, data += 3)
                 {
                     p[0] = data[2];
                     p[1] = data[1];
@@ -507,9 +480,7 @@ namespace TwkFB
             }
             else if (header.imageType == RLETrueColorType)
             {
-                for (unsigned char *p = fb.pixels<unsigned char>(),
-                                   *e = p + fb.planeSize();
-                     p < e;)
+                for (unsigned char *p = fb.pixels<unsigned char>(), *e = p + fb.planeSize(); p < e;)
                 {
                     const size_t repCount = *data;
                     data++;
@@ -535,9 +506,7 @@ namespace TwkFB
         case 32:
             if (header.imageType == RawTrueColorType)
             {
-                for (unsigned char *p = fb.pixels<unsigned char>(),
-                                   *e = p + fb.planeSize();
-                     p != e; p += 4, data += 4)
+                for (unsigned char *p = fb.pixels<unsigned char>(), *e = p + fb.planeSize(); p != e; p += 4, data += 4)
                 {
                     p[0] = data[2];
                     p[1] = data[1];
@@ -547,9 +516,7 @@ namespace TwkFB
             }
             else if (header.imageType == RLETrueColorType)
             {
-                for (unsigned char *p = fb.pixels<unsigned char>(),
-                                   *e = p + fb.planeSize();
-                     p < e;)
+                for (unsigned char *p = fb.pixels<unsigned char>(), *e = p + fb.planeSize(); p < e;)
                 {
                     const U8 repCount = *data;
                     data++;
@@ -580,8 +547,7 @@ namespace TwkFB
 
             if (footer.extOffset)
             {
-                readExtensionArea(fb, (unsigned char*)fmap.data()
-                                          + footer.extOffset);
+                readExtensionArea(fb, (unsigned char*)fmap.data() + footer.extOffset);
             }
         }
         else
@@ -592,9 +558,7 @@ namespace TwkFB
         readAttributes(fb, header);
     }
 
-    void IOtarga::writeImage(const FrameBuffer& img,
-                             const std::string& filename,
-                             const WriteRequest& request) const
+    void IOtarga::writeImage(const FrameBuffer& img, const std::string& filename, const WriteRequest& request) const
     {
         const FrameBuffer* outfb = &img;
 
@@ -614,8 +578,7 @@ namespace TwkFB
         //  Convert everything to REC709
         //
 
-        if (outfb->hasPrimaries() || outfb->isYUV() || outfb->isYRYBY()
-            || outfb->dataType() >= FrameBuffer::PACKED_R10_G10_B10_X2)
+        if (outfb->hasPrimaries() || outfb->isYUV() || outfb->isYRYBY() || outfb->dataType() >= FrameBuffer::PACKED_R10_G10_B10_X2)
         {
             const FrameBuffer* fb = outfb;
             outfb = convertToLinearRGB709(outfb);
@@ -645,13 +608,11 @@ namespace TwkFB
 
         const bool rle = request.compression == "RLE";
 
-        ofstream outfile(UNICODE_C_STR(filename.c_str()),
-                         ios::binary | ios::out);
+        ofstream outfile(UNICODE_C_STR(filename.c_str()), ios::binary | ios::out);
 
         if (!outfile)
         {
-            TWK_THROW_STREAM(IOException,
-                             "TARGA: cannot write TARGA file " << filename);
+            TWK_THROW_STREAM(IOException, "TARGA: cannot write TARGA file " << filename);
         }
 
         char b = 0;
@@ -715,9 +676,7 @@ namespace TwkFB
             int loop = 0;
             int numChannels = (alpha) ? 4 : 3;
             vector<unsigned char> l(numChannels);
-            for (const unsigned char *p = outfb->pixels<unsigned char>(),
-                                     *e = p + outfb->planeSize();
-                 p < e; p += numChannels)
+            for (const unsigned char *p = outfb->pixels<unsigned char>(), *e = p + outfb->planeSize(); p < e; p += numChannels)
             {
                 if (record && (!pixelsMatch(p, &l[0], alpha) || newline))
                 {
@@ -772,8 +731,7 @@ namespace TwkFB
         }
     }
 
-    void IOtarga::writeRLE(ofstream* outfile, unsigned char* pixel,
-                           int numChannels, int count) const
+    void IOtarga::writeRLE(ofstream* outfile, unsigned char* pixel, int numChannels, int count) const
     {
         if ((count * numChannels) > (1 + numChannels))
         {
@@ -797,11 +755,9 @@ namespace TwkFB
         }
     }
 
-    bool IOtarga::pixelsMatch(const unsigned char* p1, const unsigned char* p2,
-                              bool alpha) const
+    bool IOtarga::pixelsMatch(const unsigned char* p1, const unsigned char* p2, bool alpha) const
     {
-        return (p1[0] == p2[2] && p1[1] == p2[1] && p1[2] == p2[0]
-                && (!alpha || (alpha && p1[3] == p2[3])));
+        return (p1[0] == p2[2] && p1[1] == p2[1] && p1[2] == p2[0] && (!alpha || (alpha && p1[3] == p2[3])));
     }
 
 } // namespace TwkFB

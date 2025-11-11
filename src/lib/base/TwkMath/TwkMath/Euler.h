@@ -107,8 +107,7 @@ namespace TwkMath
 
         static T angleMod(T angle);
         static void simpleXYZRotation(Vec& xyzRot, const Vec& targetXyzRot);
-        static void nearestRotation(Vec& xyzRot, const Vec& targetXyzRot,
-                                    Order order = XYZ);
+        static void nearestRotation(Vec& xyzRot, const Vec& targetXyzRot, Order order = XYZ);
 
         void makeNear(const Euler<T>& target);
 
@@ -136,13 +135,9 @@ namespace TwkMath
     {
     }
 
-    template <typename T> Euler<T>::Euler(const Mat44<T>& M, Order order)
-    {
-        decompose(M, order);
-    }
+    template <typename T> Euler<T>::Euler(const Mat44<T>& M, Order order) { decompose(M, order); }
 
-    template <typename T>
-    inline void Euler<T>::indexOrder(int& i, int& j, int& k) const
+    template <typename T> inline void Euler<T>::indexOrder(int& i, int& j, int& k) const
     {
         i = m_order >> 12;
         j = parity() == Even ? (i + 1) % 3 : (i > 0 ? i - 1 : 2);
@@ -172,20 +167,17 @@ namespace TwkMath
 
         if (repeating())
         {
-            return Mat4(cj, sj * si, sj * ci, T(0), sj * sh, -cj * ss + cc,
-                        -cj * cs - sc, T(0), -sj * ch, cj * sc * cs,
-                        cj * cc - ss, T(0), T(0), T(0), T(0), T(1));
+            return Mat4(cj, sj * si, sj * ci, T(0), sj * sh, -cj * ss + cc, -cj * cs - sc, T(0), -sj * ch, cj * sc * cs, cj * cc - ss, T(0),
+                        T(0), T(0), T(0), T(1));
         }
         else
         {
-            return Mat4(cj * ch, sj * sc - cs, sj * cc + ss, T(0), cj * sh,
-                        sj * ss + cc, sj * cs - sc, T(0), -sj, cj * si, cj * ci,
-                        T(0), T(0), T(0), T(0), T(1));
+            return Mat4(cj * ch, sj * sc - cs, sj * cc + ss, T(0), cj * sh, sj * ss + cc, sj * cs - sc, T(0), -sj, cj * si, cj * ci, T(0),
+                        T(0), T(0), T(0), T(1));
         }
     }
 
-    template <typename T>
-    void Euler<T>::decompose(const Mat44<T>& M, Euler<T>::Order order)
+    template <typename T> void Euler<T>::decompose(const Mat44<T>& M, Euler<T>::Order order)
     {
         m_order = order;
         int i, j, k;
@@ -266,8 +258,7 @@ namespace TwkMath
         return angle;
     }
 
-    template <class T>
-    void Euler<T>::simpleXYZRotation(Vec& xyzRot, const Vec& targetXyzRot)
+    template <class T> void Euler<T>::simpleXYZRotation(Vec& xyzRot, const Vec& targetXyzRot)
     {
         Vec d = xyzRot - targetXyzRot;
         xyzRot[0] = targetXyzRot[0] + angleMod(d[0]);
@@ -275,9 +266,7 @@ namespace TwkMath
         xyzRot[2] = targetXyzRot[2] + angleMod(d[2]);
     }
 
-    template <class T>
-    void Euler<T>::nearestRotation(Vec& xyzRot, const Vec& targetXyzRot,
-                                   Order order)
+    template <class T> void Euler<T>::nearestRotation(Vec& xyzRot, const Vec& targetXyzRot, Order order)
     {
         int i, j, k;
         Euler<T> e(Vec(0, 0, 0), order);

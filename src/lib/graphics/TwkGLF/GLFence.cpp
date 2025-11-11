@@ -157,8 +157,7 @@ namespace TwkGLF
 
             if (client)
             {
-                GLenum error = glClientWaitSync(
-                    m_imp->arbSync, GL_SYNC_FLUSH_COMMANDS_BIT, 10000000000);
+                GLenum error = glClientWaitSync(m_imp->arbSync, GL_SYNC_FLUSH_COMMANDS_BIT, 10000000000);
 #if 0
             if (error == GL_ALREADY_SIGNALED) fprintf(stderr, "fence already signaled\n");
             else if (error == GL_TIMEOUT_EXPIRED) fprintf(stderr, "fence time expired\n");

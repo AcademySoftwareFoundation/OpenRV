@@ -62,42 +62,34 @@ namespace Mu
         _baseType = 0;
     }
 
-    MuQt_QStackedLayout::MuQt_QStackedLayout(Pointer muobj,
-                                             const CallEnvironment* ce)
+    MuQt_QStackedLayout::MuQt_QStackedLayout(Pointer muobj, const CallEnvironment* ce)
         : QStackedLayout()
     {
         _env = ce;
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QStackedLayoutType>(
-            c->internName("qt.QStackedLayout"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QStackedLayoutType>(c->internName("qt.QStackedLayout"));
     }
 
-    MuQt_QStackedLayout::MuQt_QStackedLayout(Pointer muobj,
-                                             const CallEnvironment* ce,
-                                             QWidget* parent)
+    MuQt_QStackedLayout::MuQt_QStackedLayout(Pointer muobj, const CallEnvironment* ce, QWidget* parent)
         : QStackedLayout(parent)
     {
         _env = ce;
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QStackedLayoutType>(
-            c->internName("qt.QStackedLayout"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QStackedLayoutType>(c->internName("qt.QStackedLayout"));
     }
 
-    MuQt_QStackedLayout::MuQt_QStackedLayout(Pointer muobj,
-                                             const CallEnvironment* ce,
-                                             QLayout* parentLayout)
+    MuQt_QStackedLayout::MuQt_QStackedLayout(Pointer muobj, const CallEnvironment* ce, QLayout* parentLayout)
         : QStackedLayout(parentLayout)
     {
         _env = ce;
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QStackedLayoutType>(
-            c->internName("qt.QStackedLayout"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QStackedLayoutType>(c->internName("qt.QStackedLayout"));
     }
 
     void MuQt_QStackedLayout::addItem(QLayoutItem* item)
@@ -114,8 +106,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makelayoutitem<QLayoutItemType>(c, item, "qt.QLayoutItem"));
+            args[1] = Value(makelayoutitem<QLayoutItemType>(c, item, "qt.QLayoutItem"));
             Value rval = _env->call(F, args);
         }
         else
@@ -311,9 +302,7 @@ namespace Mu
         }
     }
 
-    QLayoutItem*
-    MuQt_QStackedLayout::replaceWidget(QWidget* from, QWidget* to,
-                                       Qt::FindChildOptions options)
+    QLayoutItem* MuQt_QStackedLayout::replaceWidget(QWidget* from, QWidget* to, Qt::FindChildOptions options)
     {
         if (!_env)
             return QStackedLayout::replaceWidget(from, to, options);
@@ -524,8 +513,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  Mu Type CONSTRUCTORS
 
-    QStackedLayoutType::QStackedLayoutType(Context* c, const char* name,
-                                           Class* super, Class* super2)
+    QStackedLayoutType::QStackedLayoutType(Context* c, const char* name, Class* super, Class* super2)
         : Class(c, name, vectorOf2(super, super2))
     {
     }
@@ -535,8 +523,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    static Pointer QStackedLayout_QStackedLayout_QObject(Thread& NODE_THREAD,
-                                                         Pointer obj)
+    static Pointer QStackedLayout_QStackedLayout_QObject(Thread& NODE_THREAD, Pointer obj)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         ClassInstance* widget = reinterpret_cast<ClassInstance*>(obj);
@@ -547,9 +534,7 @@ namespace Mu
         }
         else if (QStackedLayout* w = object<QStackedLayout>(widget))
         {
-            QStackedLayoutType* type =
-                c->findSymbolOfTypeByQualifiedName<QStackedLayoutType>(
-                    c->internName("qt.QStackedLayout"), false);
+            QStackedLayoutType* type = c->findSymbolOfTypeByQualifiedName<QStackedLayoutType>(c->internName("qt.QStackedLayout"), false);
             ClassInstance* o = ClassInstance::allocate(type);
             setobject(o, w);
             return o;
@@ -562,46 +547,35 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(castFromObject, Pointer)
     {
-        NODE_RETURN(QStackedLayout_QStackedLayout_QObject(
-            NODE_THREAD, NODE_ARG(0, Pointer)));
+        NODE_RETURN(QStackedLayout_QStackedLayout_QObject(NODE_THREAD, NODE_ARG(0, Pointer)));
     }
 
-    Pointer qt_QStackedLayout_QStackedLayout_QStackedLayout_QStackedLayout(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QStackedLayout_QStackedLayout_QStackedLayout_QStackedLayout(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-        setobject(param_this,
-                  new MuQt_QStackedLayout(param_this,
-                                          NODE_THREAD.process()->callEnv()));
+        setobject(param_this, new MuQt_QStackedLayout(param_this, NODE_THREAD.process()->callEnv()));
         return param_this;
     }
 
-    Pointer
-    qt_QStackedLayout_QStackedLayout_QStackedLayout_QStackedLayout_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
+    Pointer qt_QStackedLayout_QStackedLayout_QStackedLayout_QStackedLayout_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                   Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWidget* arg1 = object<QWidget>(param_parent);
-        setobject(param_this,
-                  new MuQt_QStackedLayout(
-                      param_this, NODE_THREAD.process()->callEnv(), arg1));
+        setobject(param_this, new MuQt_QStackedLayout(param_this, NODE_THREAD.process()->callEnv(), arg1));
         return param_this;
     }
 
-    Pointer
-    qt_QStackedLayout_QStackedLayout_QStackedLayout_QStackedLayout_QLayout(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parentLayout)
+    Pointer qt_QStackedLayout_QStackedLayout_QStackedLayout_QStackedLayout_QLayout(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                   Pointer param_parentLayout)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QLayout* arg1 = object<QLayout>(param_parentLayout);
-        setobject(param_this,
-                  new MuQt_QStackedLayout(
-                      param_this, NODE_THREAD.process()->callEnv(), arg1));
+        setobject(param_this, new MuQt_QStackedLayout(param_this, NODE_THREAD.process()->callEnv(), arg1));
         return param_this;
     }
 
-    int qt_QStackedLayout_addWidget_int_QStackedLayout_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_widget)
+    int qt_QStackedLayout_addWidget_int_QStackedLayout_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_widget)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QStackedLayout* arg0 = object<QStackedLayout>(param_this);
@@ -609,18 +583,15 @@ namespace Mu
         return arg0->addWidget(arg1);
     }
 
-    Pointer qt_QStackedLayout_currentWidget_QWidget_QStackedLayout(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QStackedLayout_currentWidget_QWidget_QStackedLayout(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QStackedLayout* arg0 = object<QStackedLayout>(param_this);
-        return makeinstance<QWidgetType>(c, arg0->currentWidget(),
-                                         "qt.QWidget");
+        return makeinstance<QWidgetType>(c, arg0->currentWidget(), "qt.QWidget");
     }
 
-    int qt_QStackedLayout_insertWidget_int_QStackedLayout_int_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_index,
-        Pointer param_widget)
+    int qt_QStackedLayout_insertWidget_int_QStackedLayout_int_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this, int param_index,
+                                                                      Pointer param_widget)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QStackedLayout* arg0 = object<QStackedLayout>(param_this);
@@ -629,8 +600,7 @@ namespace Mu
         return arg0->insertWidget(arg1, arg2);
     }
 
-    Pointer qt_QStackedLayout_widget_QWidget_QStackedLayout_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_index)
+    Pointer qt_QStackedLayout_widget_QWidget_QStackedLayout_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_index)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QStackedLayout* arg0 = object<QStackedLayout>(param_this);
@@ -638,8 +608,7 @@ namespace Mu
         return makeinstance<QWidgetType>(c, arg0->widget(arg1), "qt.QWidget");
     }
 
-    void qt_QStackedLayout_addItem_void_QStackedLayout_QLayoutItem(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_item)
+    void qt_QStackedLayout_addItem_void_QStackedLayout_QLayoutItem(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_item)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QStackedLayout* arg0 = object<QStackedLayout>(param_this);
@@ -650,62 +619,46 @@ namespace Mu
             arg0->addItem(arg1);
     }
 
-    int qt_QStackedLayout_count_int_QStackedLayout(Mu::Thread& NODE_THREAD,
-                                                   Pointer param_this)
+    int qt_QStackedLayout_count_int_QStackedLayout(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QStackedLayout* arg0 = object<QStackedLayout>(param_this);
-        return isMuQtObject(arg0) ? arg0->QStackedLayout::count()
-                                  : arg0->count();
+        return isMuQtObject(arg0) ? arg0->QStackedLayout::count() : arg0->count();
     }
 
-    bool qt_QStackedLayout_hasHeightForWidth_bool_QStackedLayout(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    bool qt_QStackedLayout_hasHeightForWidth_bool_QStackedLayout(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QStackedLayout* arg0 = object<QStackedLayout>(param_this);
-        return isMuQtObject(arg0) ? arg0->QStackedLayout::hasHeightForWidth()
-                                  : arg0->hasHeightForWidth();
+        return isMuQtObject(arg0) ? arg0->QStackedLayout::hasHeightForWidth() : arg0->hasHeightForWidth();
     }
 
-    int qt_QStackedLayout_heightForWidth_int_QStackedLayout_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_width)
+    int qt_QStackedLayout_heightForWidth_int_QStackedLayout_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_width)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QStackedLayout* arg0 = object<QStackedLayout>(param_this);
         int arg1 = (int)(param_width);
-        return isMuQtObject(arg0) ? arg0->QStackedLayout::heightForWidth(arg1)
-                                  : arg0->heightForWidth(arg1);
+        return isMuQtObject(arg0) ? arg0->QStackedLayout::heightForWidth(arg1) : arg0->heightForWidth(arg1);
     }
 
-    Pointer qt_QStackedLayout_itemAt_QLayoutItem_QStackedLayout_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_index)
+    Pointer qt_QStackedLayout_itemAt_QLayoutItem_QStackedLayout_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_index)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QStackedLayout* arg0 = object<QStackedLayout>(param_this);
         int arg1 = (int)(param_index);
-        return isMuQtObject(arg0)
-                   ? makelayoutitem<QLayoutItemType>(
-                         c, arg0->QStackedLayout::itemAt(arg1),
-                         "qt.QLayoutItem")
-                   : makelayoutitem<QLayoutItemType>(c, arg0->itemAt(arg1),
-                                                     "qt.QLayoutItem");
+        return isMuQtObject(arg0) ? makelayoutitem<QLayoutItemType>(c, arg0->QStackedLayout::itemAt(arg1), "qt.QLayoutItem")
+                                  : makelayoutitem<QLayoutItemType>(c, arg0->itemAt(arg1), "qt.QLayoutItem");
     }
 
-    Pointer
-    qt_QStackedLayout_minimumSize_QSize_QStackedLayout(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this)
+    Pointer qt_QStackedLayout_minimumSize_QSize_QStackedLayout(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QStackedLayout* arg0 = object<QStackedLayout>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QSizeType>(
-                         c, arg0->QStackedLayout::minimumSize(), "qt.QSize")
-                   : makeqtype<QSizeType>(c, arg0->minimumSize(), "qt.QSize");
+        return isMuQtObject(arg0) ? makeqtype<QSizeType>(c, arg0->QStackedLayout::minimumSize(), "qt.QSize")
+                                  : makeqtype<QSizeType>(c, arg0->minimumSize(), "qt.QSize");
     }
 
-    void qt_QStackedLayout_setGeometry_void_QStackedLayout_QRect(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_rect)
+    void qt_QStackedLayout_setGeometry_void_QStackedLayout_QRect(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_rect)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QStackedLayout* arg0 = object<QStackedLayout>(param_this);
@@ -716,46 +669,34 @@ namespace Mu
             arg0->setGeometry(arg1);
     }
 
-    Pointer
-    qt_QStackedLayout_sizeHint_QSize_QStackedLayout(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this)
+    Pointer qt_QStackedLayout_sizeHint_QSize_QStackedLayout(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QStackedLayout* arg0 = object<QStackedLayout>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QSizeType>(c, arg0->QStackedLayout::sizeHint(),
-                                          "qt.QSize")
-                   : makeqtype<QSizeType>(c, arg0->sizeHint(), "qt.QSize");
+        return isMuQtObject(arg0) ? makeqtype<QSizeType>(c, arg0->QStackedLayout::sizeHint(), "qt.QSize")
+                                  : makeqtype<QSizeType>(c, arg0->sizeHint(), "qt.QSize");
     }
 
-    Pointer qt_QStackedLayout_takeAt_QLayoutItem_QStackedLayout_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_index)
+    Pointer qt_QStackedLayout_takeAt_QLayoutItem_QStackedLayout_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_index)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QStackedLayout* arg0 = object<QStackedLayout>(param_this);
         int arg1 = (int)(param_index);
-        return isMuQtObject(arg0)
-                   ? makelayoutitem<QLayoutItemType>(
-                         c, arg0->QStackedLayout::takeAt(arg1),
-                         "qt.QLayoutItem")
-                   : makelayoutitem<QLayoutItemType>(c, arg0->takeAt(arg1),
-                                                     "qt.QLayoutItem");
+        return isMuQtObject(arg0) ? makelayoutitem<QLayoutItemType>(c, arg0->QStackedLayout::takeAt(arg1), "qt.QLayoutItem")
+                                  : makelayoutitem<QLayoutItemType>(c, arg0->takeAt(arg1), "qt.QLayoutItem");
     }
 
-    int qt_QStackedLayout_indexOf_int_QStackedLayout_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_widget)
+    int qt_QStackedLayout_indexOf_int_QStackedLayout_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_widget)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QStackedLayout* arg0 = object<QStackedLayout>(param_this);
         const QWidget* arg1 = object<QWidget>(param_widget);
-        return isMuQtObject(arg0) ? arg0->QStackedLayout::indexOf(arg1)
-                                  : arg0->indexOf(arg1);
+        return isMuQtObject(arg0) ? arg0->QStackedLayout::indexOf(arg1) : arg0->indexOf(arg1);
     }
 
-    Pointer
-    qt_QStackedLayout_replaceWidget_QLayoutItem_QStackedLayout_QWidget_QWidget_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_from,
-        Pointer param_to, int param_options)
+    Pointer qt_QStackedLayout_replaceWidget_QLayoutItem_QStackedLayout_QWidget_QWidget_int(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                           Pointer param_from, Pointer param_to,
+                                                                                           int param_options)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QStackedLayout* arg0 = object<QStackedLayout>(param_this);
@@ -763,17 +704,11 @@ namespace Mu
         QWidget* arg2 = object<QWidget>(param_to);
         Qt::FindChildOptions arg3 = (Qt::FindChildOptions)(param_options);
         return isMuQtObject(arg0)
-                   ? makelayoutitem<QLayoutItemType>(
-                         c,
-                         arg0->QStackedLayout::replaceWidget(arg1, arg2, arg3),
-                         "qt.QLayoutItem")
-                   : makelayoutitem<QLayoutItemType>(
-                         c, arg0->replaceWidget(arg1, arg2, arg3),
-                         "qt.QLayoutItem");
+                   ? makelayoutitem<QLayoutItemType>(c, arg0->QStackedLayout::replaceWidget(arg1, arg2, arg3), "qt.QLayoutItem")
+                   : makelayoutitem<QLayoutItemType>(c, arg0->replaceWidget(arg1, arg2, arg3), "qt.QLayoutItem");
     }
 
-    void qt_QStackedLayout_setSpacing_void_QStackedLayout_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param__p3)
+    void qt_QStackedLayout_setSpacing_void_QStackedLayout_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param__p3)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QStackedLayout* arg0 = object<QStackedLayout>(param_this);
@@ -784,50 +719,36 @@ namespace Mu
             arg0->setSpacing(arg1);
     }
 
-    int qt_QStackedLayout_spacing_int_QStackedLayout(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_this)
+    int qt_QStackedLayout_spacing_int_QStackedLayout(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QStackedLayout* arg0 = object<QStackedLayout>(param_this);
-        return isMuQtObject(arg0) ? arg0->QStackedLayout::spacing()
-                                  : arg0->spacing();
+        return isMuQtObject(arg0) ? arg0->QStackedLayout::spacing() : arg0->spacing();
     }
 
-    int
-    qt_QStackedLayout_controlTypes_int_QStackedLayout(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    int qt_QStackedLayout_controlTypes_int_QStackedLayout(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QStackedLayout* arg0 = object<QStackedLayout>(param_this);
-        return isMuQtObject(arg0) ? int(arg0->QStackedLayout::controlTypes())
-                                  : int(arg0->controlTypes());
+        return isMuQtObject(arg0) ? int(arg0->QStackedLayout::controlTypes()) : int(arg0->controlTypes());
     }
 
-    int qt_QStackedLayout_expandingDirections_int_QStackedLayout(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    int qt_QStackedLayout_expandingDirections_int_QStackedLayout(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QStackedLayout* arg0 = object<QStackedLayout>(param_this);
-        return isMuQtObject(arg0)
-                   ? int(arg0->QStackedLayout::expandingDirections())
-                   : int(arg0->expandingDirections());
+        return isMuQtObject(arg0) ? int(arg0->QStackedLayout::expandingDirections()) : int(arg0->expandingDirections());
     }
 
-    Pointer
-    qt_QStackedLayout_geometry_QRect_QStackedLayout(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this)
+    Pointer qt_QStackedLayout_geometry_QRect_QStackedLayout(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QStackedLayout* arg0 = object<QStackedLayout>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QRectType>(c, arg0->QStackedLayout::geometry(),
-                                          "qt.QRect")
-                   : makeqtype<QRectType>(c, arg0->geometry(), "qt.QRect");
+        return isMuQtObject(arg0) ? makeqtype<QRectType>(c, arg0->QStackedLayout::geometry(), "qt.QRect")
+                                  : makeqtype<QRectType>(c, arg0->geometry(), "qt.QRect");
     }
 
-    void
-    qt_QStackedLayout_invalidate_void_QStackedLayout(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_this)
+    void qt_QStackedLayout_invalidate_void_QStackedLayout(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QStackedLayout* arg0 = object<QStackedLayout>(param_this);
@@ -837,208 +758,166 @@ namespace Mu
             arg0->invalidate();
     }
 
-    bool qt_QStackedLayout_isEmpty_bool_QStackedLayout(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this)
+    bool qt_QStackedLayout_isEmpty_bool_QStackedLayout(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QStackedLayout* arg0 = object<QStackedLayout>(param_this);
-        return isMuQtObject(arg0) ? arg0->QStackedLayout::isEmpty()
-                                  : arg0->isEmpty();
+        return isMuQtObject(arg0) ? arg0->QStackedLayout::isEmpty() : arg0->isEmpty();
     }
 
-    Pointer
-    qt_QStackedLayout_layout_QLayout_QStackedLayout(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this)
+    Pointer qt_QStackedLayout_layout_QLayout_QStackedLayout(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QStackedLayout* arg0 = object<QStackedLayout>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeinstance<QLayoutType>(
-                         c, arg0->QStackedLayout::layout(), "qt.QLayout")
-                   : makeinstance<QLayoutType>(c, arg0->layout(), "qt.QLayout");
+        return isMuQtObject(arg0) ? makeinstance<QLayoutType>(c, arg0->QStackedLayout::layout(), "qt.QLayout")
+                                  : makeinstance<QLayoutType>(c, arg0->layout(), "qt.QLayout");
     }
 
-    Pointer
-    qt_QStackedLayout_maximumSize_QSize_QStackedLayout(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this)
+    Pointer qt_QStackedLayout_maximumSize_QSize_QStackedLayout(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QStackedLayout* arg0 = object<QStackedLayout>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QSizeType>(
-                         c, arg0->QStackedLayout::maximumSize(), "qt.QSize")
-                   : makeqtype<QSizeType>(c, arg0->maximumSize(), "qt.QSize");
+        return isMuQtObject(arg0) ? makeqtype<QSizeType>(c, arg0->QStackedLayout::maximumSize(), "qt.QSize")
+                                  : makeqtype<QSizeType>(c, arg0->maximumSize(), "qt.QSize");
     }
 
     static NODE_IMPLEMENTATION(_n_QStackedLayout0, Pointer)
     {
-        NODE_RETURN(
-            qt_QStackedLayout_QStackedLayout_QStackedLayout_QStackedLayout(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QStackedLayout_QStackedLayout_QStackedLayout_QStackedLayout(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_QStackedLayout1, Pointer)
     {
-        NODE_RETURN(
-            qt_QStackedLayout_QStackedLayout_QStackedLayout_QStackedLayout_QWidget(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QStackedLayout_QStackedLayout_QStackedLayout_QStackedLayout_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                           NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_QStackedLayout2, Pointer)
     {
-        NODE_RETURN(
-            qt_QStackedLayout_QStackedLayout_QStackedLayout_QStackedLayout_QLayout(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QStackedLayout_QStackedLayout_QStackedLayout_QStackedLayout_QLayout(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                           NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_addWidget0, int)
     {
-        NODE_RETURN(qt_QStackedLayout_addWidget_int_QStackedLayout_QWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QStackedLayout_addWidget_int_QStackedLayout_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_currentWidget0, Pointer)
     {
-        NODE_RETURN(qt_QStackedLayout_currentWidget_QWidget_QStackedLayout(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QStackedLayout_currentWidget_QWidget_QStackedLayout(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_insertWidget0, int)
     {
-        NODE_RETURN(
-            qt_QStackedLayout_insertWidget_int_QStackedLayout_int_QWidget(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-                NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QStackedLayout_insertWidget_int_QStackedLayout_int_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                  NODE_ARG(1, int), NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_widget0, Pointer)
     {
-        NODE_RETURN(qt_QStackedLayout_widget_QWidget_QStackedLayout_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QStackedLayout_widget_QWidget_QStackedLayout_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_addItem0, void)
     {
-        qt_QStackedLayout_addItem_void_QStackedLayout_QLayoutItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QStackedLayout_addItem_void_QStackedLayout_QLayoutItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_count0, int)
     {
-        NODE_RETURN(qt_QStackedLayout_count_int_QStackedLayout(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QStackedLayout_count_int_QStackedLayout(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_hasHeightForWidth0, bool)
     {
-        NODE_RETURN(qt_QStackedLayout_hasHeightForWidth_bool_QStackedLayout(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QStackedLayout_hasHeightForWidth_bool_QStackedLayout(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_heightForWidth0, int)
     {
-        NODE_RETURN(qt_QStackedLayout_heightForWidth_int_QStackedLayout_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QStackedLayout_heightForWidth_int_QStackedLayout_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_itemAt0, Pointer)
     {
-        NODE_RETURN(qt_QStackedLayout_itemAt_QLayoutItem_QStackedLayout_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QStackedLayout_itemAt_QLayoutItem_QStackedLayout_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_minimumSize0, Pointer)
     {
-        NODE_RETURN(qt_QStackedLayout_minimumSize_QSize_QStackedLayout(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QStackedLayout_minimumSize_QSize_QStackedLayout(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_setGeometry0, void)
     {
-        qt_QStackedLayout_setGeometry_void_QStackedLayout_QRect(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QStackedLayout_setGeometry_void_QStackedLayout_QRect(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_sizeHint0, Pointer)
     {
-        NODE_RETURN(qt_QStackedLayout_sizeHint_QSize_QStackedLayout(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QStackedLayout_sizeHint_QSize_QStackedLayout(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_takeAt0, Pointer)
     {
-        NODE_RETURN(qt_QStackedLayout_takeAt_QLayoutItem_QStackedLayout_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QStackedLayout_takeAt_QLayoutItem_QStackedLayout_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_indexOf0, int)
     {
-        NODE_RETURN(qt_QStackedLayout_indexOf_int_QStackedLayout_QWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QStackedLayout_indexOf_int_QStackedLayout_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_replaceWidget0, Pointer)
     {
-        NODE_RETURN(
-            qt_QStackedLayout_replaceWidget_QLayoutItem_QStackedLayout_QWidget_QWidget_int(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, Pointer), NODE_ARG(3, int)));
+        NODE_RETURN(qt_QStackedLayout_replaceWidget_QLayoutItem_QStackedLayout_QWidget_QWidget_int(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, Pointer), NODE_ARG(3, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_setSpacing0, void)
     {
-        qt_QStackedLayout_setSpacing_void_QStackedLayout_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QStackedLayout_setSpacing_void_QStackedLayout_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_spacing0, int)
     {
-        NODE_RETURN(qt_QStackedLayout_spacing_int_QStackedLayout(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QStackedLayout_spacing_int_QStackedLayout(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_controlTypes0, int)
     {
-        NODE_RETURN(qt_QStackedLayout_controlTypes_int_QStackedLayout(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QStackedLayout_controlTypes_int_QStackedLayout(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_expandingDirections0, int)
     {
-        NODE_RETURN(qt_QStackedLayout_expandingDirections_int_QStackedLayout(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QStackedLayout_expandingDirections_int_QStackedLayout(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_geometry0, Pointer)
     {
-        NODE_RETURN(qt_QStackedLayout_geometry_QRect_QStackedLayout(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QStackedLayout_geometry_QRect_QStackedLayout(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_invalidate0, void)
     {
-        qt_QStackedLayout_invalidate_void_QStackedLayout(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
+        qt_QStackedLayout_invalidate_void_QStackedLayout(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_isEmpty0, bool)
     {
-        NODE_RETURN(qt_QStackedLayout_isEmpty_bool_QStackedLayout(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QStackedLayout_isEmpty_bool_QStackedLayout(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_layout0, Pointer)
     {
-        NODE_RETURN(qt_QStackedLayout_layout_QLayout_QStackedLayout(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QStackedLayout_layout_QLayout_QStackedLayout(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_maximumSize0, Pointer)
     {
-        NODE_RETURN(qt_QStackedLayout_maximumSize_QSize_QStackedLayout(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QStackedLayout_maximumSize_QSize_QStackedLayout(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     void QStackedLayoutType::load()
@@ -1058,17 +937,13 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
-                   new Function(c, tn, castFromObject, Cast, Compiled,
-                                QStackedLayout_QStackedLayout_QObject, Return,
-                                ftn, Parameters,
+                   new Function(c, tn, castFromObject, Cast, Compiled, QStackedLayout_QStackedLayout_QObject, Return, ftn, Parameters,
                                 new Param(c, "object", "qt.QObject"), End),
 
                    EndArguments);
@@ -1076,154 +951,84 @@ namespace Mu
         addSymbols(
             // enums
             // member functions
-            new Function(
-                c, "QStackedLayout", _n_QStackedLayout0, None, Compiled,
-                qt_QStackedLayout_QStackedLayout_QStackedLayout_QStackedLayout,
-                Return, "qt.QStackedLayout", Parameters,
-                new Param(c, "this", "qt.QStackedLayout"), End),
-            new Function(
-                c, "QStackedLayout", _n_QStackedLayout1, None, Compiled,
-                qt_QStackedLayout_QStackedLayout_QStackedLayout_QStackedLayout_QWidget,
-                Return, "qt.QStackedLayout", Parameters,
-                new Param(c, "this", "qt.QStackedLayout"),
-                new Param(c, "parent", "qt.QWidget"), End),
-            new Function(
-                c, "QStackedLayout", _n_QStackedLayout2, None, Compiled,
-                qt_QStackedLayout_QStackedLayout_QStackedLayout_QStackedLayout_QLayout,
-                Return, "qt.QStackedLayout", Parameters,
-                new Param(c, "this", "qt.QStackedLayout"),
-                new Param(c, "parentLayout", "qt.QLayout"), End),
-            new Function(c, "addWidget", _n_addWidget0, None, Compiled,
-                         qt_QStackedLayout_addWidget_int_QStackedLayout_QWidget,
-                         Return, "int", Parameters,
-                         new Param(c, "this", "qt.QStackedLayout"),
-                         new Param(c, "widget", "qt.QWidget"), End),
-            // PROP: currentIndex (int; QStackedLayout this)
-            new Function(c, "currentWidget", _n_currentWidget0, None, Compiled,
-                         qt_QStackedLayout_currentWidget_QWidget_QStackedLayout,
-                         Return, "qt.QWidget", Parameters,
+            new Function(c, "QStackedLayout", _n_QStackedLayout0, None, Compiled,
+                         qt_QStackedLayout_QStackedLayout_QStackedLayout_QStackedLayout, Return, "qt.QStackedLayout", Parameters,
                          new Param(c, "this", "qt.QStackedLayout"), End),
-            new Function(
-                c, "insertWidget", _n_insertWidget0, None, Compiled,
-                qt_QStackedLayout_insertWidget_int_QStackedLayout_int_QWidget,
-                Return, "int", Parameters,
-                new Param(c, "this", "qt.QStackedLayout"),
-                new Param(c, "index", "int"),
-                new Param(c, "widget", "qt.QWidget"), End),
+            new Function(c, "QStackedLayout", _n_QStackedLayout1, None, Compiled,
+                         qt_QStackedLayout_QStackedLayout_QStackedLayout_QStackedLayout_QWidget, Return, "qt.QStackedLayout", Parameters,
+                         new Param(c, "this", "qt.QStackedLayout"), new Param(c, "parent", "qt.QWidget"), End),
+            new Function(c, "QStackedLayout", _n_QStackedLayout2, None, Compiled,
+                         qt_QStackedLayout_QStackedLayout_QStackedLayout_QStackedLayout_QLayout, Return, "qt.QStackedLayout", Parameters,
+                         new Param(c, "this", "qt.QStackedLayout"), new Param(c, "parentLayout", "qt.QLayout"), End),
+            new Function(c, "addWidget", _n_addWidget0, None, Compiled, qt_QStackedLayout_addWidget_int_QStackedLayout_QWidget, Return,
+                         "int", Parameters, new Param(c, "this", "qt.QStackedLayout"), new Param(c, "widget", "qt.QWidget"), End),
+            // PROP: currentIndex (int; QStackedLayout this)
+            new Function(c, "currentWidget", _n_currentWidget0, None, Compiled, qt_QStackedLayout_currentWidget_QWidget_QStackedLayout,
+                         Return, "qt.QWidget", Parameters, new Param(c, "this", "qt.QStackedLayout"), End),
+            new Function(c, "insertWidget", _n_insertWidget0, None, Compiled, qt_QStackedLayout_insertWidget_int_QStackedLayout_int_QWidget,
+                         Return, "int", Parameters, new Param(c, "this", "qt.QStackedLayout"), new Param(c, "index", "int"),
+                         new Param(c, "widget", "qt.QWidget"), End),
             // PROP: setStackingMode (void; QStackedLayout this, flags
             // QStackedLayout::StackingMode stackingMode) PROP: stackingMode
             // (flags QStackedLayout::StackingMode; QStackedLayout this)
-            new Function(c, "widget", _n_widget0, None, Compiled,
-                         qt_QStackedLayout_widget_QWidget_QStackedLayout_int,
-                         Return, "qt.QWidget", Parameters,
-                         new Param(c, "this", "qt.QStackedLayout"),
-                         new Param(c, "index", "int"), End),
-            _func[0] = new MemberFunction(
-                c, "addItem", _n_addItem0, None, Compiled,
-                qt_QStackedLayout_addItem_void_QStackedLayout_QLayoutItem,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QStackedLayout"),
-                new Param(c, "item", "qt.QLayoutItem"), End),
-            _func[1] = new MemberFunction(
-                c, "count", _n_count0, None, Compiled,
-                qt_QStackedLayout_count_int_QStackedLayout, Return, "int",
-                Parameters, new Param(c, "this", "qt.QStackedLayout"), End),
-            _func[2] = new MemberFunction(
-                c, "hasHeightForWidth", _n_hasHeightForWidth0, None, Compiled,
-                qt_QStackedLayout_hasHeightForWidth_bool_QStackedLayout, Return,
-                "bool", Parameters, new Param(c, "this", "qt.QStackedLayout"),
-                End),
-            _func[3] = new MemberFunction(
-                c, "heightForWidth", _n_heightForWidth0, None, Compiled,
-                qt_QStackedLayout_heightForWidth_int_QStackedLayout_int, Return,
-                "int", Parameters, new Param(c, "this", "qt.QStackedLayout"),
-                new Param(c, "width", "int"), End),
-            _func[4] = new MemberFunction(
-                c, "itemAt", _n_itemAt0, None, Compiled,
-                qt_QStackedLayout_itemAt_QLayoutItem_QStackedLayout_int, Return,
-                "qt.QLayoutItem", Parameters,
-                new Param(c, "this", "qt.QStackedLayout"),
-                new Param(c, "index", "int"), End),
-            _func[5] = new MemberFunction(
-                c, "minimumSize", _n_minimumSize0, None, Compiled,
-                qt_QStackedLayout_minimumSize_QSize_QStackedLayout, Return,
-                "qt.QSize", Parameters,
-                new Param(c, "this", "qt.QStackedLayout"), End),
-            _func[6] = new MemberFunction(
-                c, "setGeometry", _n_setGeometry0, None, Compiled,
-                qt_QStackedLayout_setGeometry_void_QStackedLayout_QRect, Return,
-                "void", Parameters, new Param(c, "this", "qt.QStackedLayout"),
-                new Param(c, "rect", "qt.QRect"), End),
-            _func[7] = new MemberFunction(
-                c, "sizeHint", _n_sizeHint0, None, Compiled,
-                qt_QStackedLayout_sizeHint_QSize_QStackedLayout, Return,
-                "qt.QSize", Parameters,
-                new Param(c, "this", "qt.QStackedLayout"), End),
-            _func[8] = new MemberFunction(
-                c, "takeAt", _n_takeAt0, None, Compiled,
-                qt_QStackedLayout_takeAt_QLayoutItem_QStackedLayout_int, Return,
-                "qt.QLayoutItem", Parameters,
-                new Param(c, "this", "qt.QStackedLayout"),
-                new Param(c, "index", "int"), End),
-            _func[9] = new MemberFunction(
-                c, "indexOf", _n_indexOf0, None, Compiled,
-                qt_QStackedLayout_indexOf_int_QStackedLayout_QWidget, Return,
-                "int", Parameters, new Param(c, "this", "qt.QStackedLayout"),
-                new Param(c, "widget", "qt.QWidget"), End),
-            _func[10] = new MemberFunction(
-                c, "replaceWidget", _n_replaceWidget0, None, Compiled,
-                qt_QStackedLayout_replaceWidget_QLayoutItem_QStackedLayout_QWidget_QWidget_int,
-                Return, "qt.QLayoutItem", Parameters,
-                new Param(c, "this", "qt.QStackedLayout"),
-                new Param(c, "from", "qt.QWidget"),
-                new Param(c, "to", "qt.QWidget"),
-                new Param(c, "options", "int",
-                          Value((int)Qt::FindChildrenRecursively)),
-                End),
-            _func[11] = new MemberFunction(
-                c, "setSpacing", _n_setSpacing0, None, Compiled,
-                qt_QStackedLayout_setSpacing_void_QStackedLayout_int, Return,
-                "void", Parameters, new Param(c, "this", "qt.QStackedLayout"),
-                new Param(c, "_p3", "int"), End),
-            _func[12] = new MemberFunction(
-                c, "spacing", _n_spacing0, None, Compiled,
-                qt_QStackedLayout_spacing_int_QStackedLayout, Return, "int",
-                Parameters, new Param(c, "this", "qt.QStackedLayout"), End),
-            _func[13] = new MemberFunction(
-                c, "controlTypes", _n_controlTypes0, None, Compiled,
-                qt_QStackedLayout_controlTypes_int_QStackedLayout, Return,
-                "int", Parameters, new Param(c, "this", "qt.QStackedLayout"),
-                End),
-            _func[14] = new MemberFunction(
-                c, "expandingDirections", _n_expandingDirections0, None,
-                Compiled,
-                qt_QStackedLayout_expandingDirections_int_QStackedLayout,
-                Return, "int", Parameters,
-                new Param(c, "this", "qt.QStackedLayout"), End),
-            _func[15] = new MemberFunction(
-                c, "geometry", _n_geometry0, None, Compiled,
-                qt_QStackedLayout_geometry_QRect_QStackedLayout, Return,
-                "qt.QRect", Parameters,
-                new Param(c, "this", "qt.QStackedLayout"), End),
-            _func[16] = new MemberFunction(
-                c, "invalidate", _n_invalidate0, None, Compiled,
-                qt_QStackedLayout_invalidate_void_QStackedLayout, Return,
-                "void", Parameters, new Param(c, "this", "qt.QStackedLayout"),
-                End),
-            _func[17] = new MemberFunction(
-                c, "isEmpty", _n_isEmpty0, None, Compiled,
-                qt_QStackedLayout_isEmpty_bool_QStackedLayout, Return, "bool",
-                Parameters, new Param(c, "this", "qt.QStackedLayout"), End),
-            _func[18] = new MemberFunction(
-                c, "layout", _n_layout0, None, Compiled,
-                qt_QStackedLayout_layout_QLayout_QStackedLayout, Return,
-                "qt.QLayout", Parameters,
-                new Param(c, "this", "qt.QStackedLayout"), End),
-            _func[19] = new MemberFunction(
-                c, "maximumSize", _n_maximumSize0, None, Compiled,
-                qt_QStackedLayout_maximumSize_QSize_QStackedLayout, Return,
-                "qt.QSize", Parameters,
-                new Param(c, "this", "qt.QStackedLayout"), End),
+            new Function(c, "widget", _n_widget0, None, Compiled, qt_QStackedLayout_widget_QWidget_QStackedLayout_int, Return, "qt.QWidget",
+                         Parameters, new Param(c, "this", "qt.QStackedLayout"), new Param(c, "index", "int"), End),
+            _func[0] = new MemberFunction(c, "addItem", _n_addItem0, None, Compiled,
+                                          qt_QStackedLayout_addItem_void_QStackedLayout_QLayoutItem, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QStackedLayout"), new Param(c, "item", "qt.QLayoutItem"), End),
+            _func[1] = new MemberFunction(c, "count", _n_count0, None, Compiled, qt_QStackedLayout_count_int_QStackedLayout, Return, "int",
+                                          Parameters, new Param(c, "this", "qt.QStackedLayout"), End),
+            _func[2] = new MemberFunction(c, "hasHeightForWidth", _n_hasHeightForWidth0, None, Compiled,
+                                          qt_QStackedLayout_hasHeightForWidth_bool_QStackedLayout, Return, "bool", Parameters,
+                                          new Param(c, "this", "qt.QStackedLayout"), End),
+            _func[3] = new MemberFunction(c, "heightForWidth", _n_heightForWidth0, None, Compiled,
+                                          qt_QStackedLayout_heightForWidth_int_QStackedLayout_int, Return, "int", Parameters,
+                                          new Param(c, "this", "qt.QStackedLayout"), new Param(c, "width", "int"), End),
+            _func[4] = new MemberFunction(c, "itemAt", _n_itemAt0, None, Compiled, qt_QStackedLayout_itemAt_QLayoutItem_QStackedLayout_int,
+                                          Return, "qt.QLayoutItem", Parameters, new Param(c, "this", "qt.QStackedLayout"),
+                                          new Param(c, "index", "int"), End),
+            _func[5] =
+                new MemberFunction(c, "minimumSize", _n_minimumSize0, None, Compiled, qt_QStackedLayout_minimumSize_QSize_QStackedLayout,
+                                   Return, "qt.QSize", Parameters, new Param(c, "this", "qt.QStackedLayout"), End),
+            _func[6] = new MemberFunction(c, "setGeometry", _n_setGeometry0, None, Compiled,
+                                          qt_QStackedLayout_setGeometry_void_QStackedLayout_QRect, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QStackedLayout"), new Param(c, "rect", "qt.QRect"), End),
+            _func[7] = new MemberFunction(c, "sizeHint", _n_sizeHint0, None, Compiled, qt_QStackedLayout_sizeHint_QSize_QStackedLayout,
+                                          Return, "qt.QSize", Parameters, new Param(c, "this", "qt.QStackedLayout"), End),
+            _func[8] = new MemberFunction(c, "takeAt", _n_takeAt0, None, Compiled, qt_QStackedLayout_takeAt_QLayoutItem_QStackedLayout_int,
+                                          Return, "qt.QLayoutItem", Parameters, new Param(c, "this", "qt.QStackedLayout"),
+                                          new Param(c, "index", "int"), End),
+            _func[9] =
+                new MemberFunction(c, "indexOf", _n_indexOf0, None, Compiled, qt_QStackedLayout_indexOf_int_QStackedLayout_QWidget, Return,
+                                   "int", Parameters, new Param(c, "this", "qt.QStackedLayout"), new Param(c, "widget", "qt.QWidget"), End),
+            _func[10] = new MemberFunction(c, "replaceWidget", _n_replaceWidget0, None, Compiled,
+                                           qt_QStackedLayout_replaceWidget_QLayoutItem_QStackedLayout_QWidget_QWidget_int, Return,
+                                           "qt.QLayoutItem", Parameters, new Param(c, "this", "qt.QStackedLayout"),
+                                           new Param(c, "from", "qt.QWidget"), new Param(c, "to", "qt.QWidget"),
+                                           new Param(c, "options", "int", Value((int)Qt::FindChildrenRecursively)), End),
+            _func[11] =
+                new MemberFunction(c, "setSpacing", _n_setSpacing0, None, Compiled, qt_QStackedLayout_setSpacing_void_QStackedLayout_int,
+                                   Return, "void", Parameters, new Param(c, "this", "qt.QStackedLayout"), new Param(c, "_p3", "int"), End),
+            _func[12] = new MemberFunction(c, "spacing", _n_spacing0, None, Compiled, qt_QStackedLayout_spacing_int_QStackedLayout, Return,
+                                           "int", Parameters, new Param(c, "this", "qt.QStackedLayout"), End),
+            _func[13] =
+                new MemberFunction(c, "controlTypes", _n_controlTypes0, None, Compiled, qt_QStackedLayout_controlTypes_int_QStackedLayout,
+                                   Return, "int", Parameters, new Param(c, "this", "qt.QStackedLayout"), End),
+            _func[14] = new MemberFunction(c, "expandingDirections", _n_expandingDirections0, None, Compiled,
+                                           qt_QStackedLayout_expandingDirections_int_QStackedLayout, Return, "int", Parameters,
+                                           new Param(c, "this", "qt.QStackedLayout"), End),
+            _func[15] = new MemberFunction(c, "geometry", _n_geometry0, None, Compiled, qt_QStackedLayout_geometry_QRect_QStackedLayout,
+                                           Return, "qt.QRect", Parameters, new Param(c, "this", "qt.QStackedLayout"), End),
+            _func[16] =
+                new MemberFunction(c, "invalidate", _n_invalidate0, None, Compiled, qt_QStackedLayout_invalidate_void_QStackedLayout,
+                                   Return, "void", Parameters, new Param(c, "this", "qt.QStackedLayout"), End),
+            _func[17] = new MemberFunction(c, "isEmpty", _n_isEmpty0, None, Compiled, qt_QStackedLayout_isEmpty_bool_QStackedLayout, Return,
+                                           "bool", Parameters, new Param(c, "this", "qt.QStackedLayout"), End),
+            _func[18] = new MemberFunction(c, "layout", _n_layout0, None, Compiled, qt_QStackedLayout_layout_QLayout_QStackedLayout, Return,
+                                           "qt.QLayout", Parameters, new Param(c, "this", "qt.QStackedLayout"), End),
+            _func[19] =
+                new MemberFunction(c, "maximumSize", _n_maximumSize0, None, Compiled, qt_QStackedLayout_maximumSize_QSize_QStackedLayout,
+                                   Return, "qt.QSize", Parameters, new Param(c, "this", "qt.QStackedLayout"), End),
             // MISSING: childEvent (void; QStackedLayout this, "QChildEvent *"
             // e) // protected static functions
             EndArguments);

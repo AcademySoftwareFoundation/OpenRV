@@ -70,8 +70,7 @@ Pointer regex_regex_string_int(Mu::Thread& NODE_THREAD, Pointer str, int flags)
     return Pointer(o);
 }
 
-bool regex_match_bool_regex_string(Mu::Thread& NODE_THREAD, Pointer reg,
-                                   Pointer str)
+bool regex_match_bool_regex_string(Mu::Thread& NODE_THREAD, Pointer reg, Pointer str)
 {
     Process* p = NODE_THREAD.process();
     RegexType::Regex* r = reinterpret_cast<RegexType::Regex*>(reg);
@@ -81,8 +80,7 @@ bool regex_match_bool_regex_string(Mu::Thread& NODE_THREAD, Pointer reg,
     return r->matches(NODE_THREAD, s->c_str(), 0);
 }
 
-Pointer regex_smatch_stringBSB_ESB__regex_string(Mu::Thread& NODE_THREAD,
-                                                 Pointer reg, Pointer pstr)
+Pointer regex_smatch_stringBSB_ESB__regex_string(Mu::Thread& NODE_THREAD, Pointer reg, Pointer pstr)
 {
     Process* p = NODE_THREAD.process();
     MuLangContext* context = static_cast<MuLangContext*>(p->context());
@@ -93,15 +91,13 @@ Pointer regex_smatch_stringBSB_ESB__regex_string(Mu::Thread& NODE_THREAD,
         throw NilArgumentException(NODE_THREAD);
     vector<regmatch_t> matches(r->maxMatches() + 1);
 
-    if (!r->smatch(NODE_THREAD, str->c_str(), 0, &matches.front(),
-                   matches.size()))
+    if (!r->smatch(NODE_THREAD, str->c_str(), 0, &matches.front(), matches.size()))
     {
         return 0;
     }
 
     const StringType* stype = static_cast<const StringType*>(str->type());
-    const DynamicArrayType* atype =
-        static_cast<DynamicArrayType*>(context->arrayType(stype, 1, 0));
+    const DynamicArrayType* atype = static_cast<DynamicArrayType*>(context->arrayType(stype, 1, 0));
 
     DynamicArray* array = new DynamicArray(atype, 1);
     array->resize(matches.size());
@@ -137,17 +133,13 @@ void print_void_regex(Mu::Thread& NODE_THREAD, Pointer reg)
     }
 }
 
-Pointer regex_replace_string_regex_string_string(Mu::Thread& NODE_THREAD,
-                                                 Pointer reg, Pointer astr,
-                                                 Pointer bstr)
+Pointer regex_replace_string_regex_string_string(Mu::Thread& NODE_THREAD, Pointer reg, Pointer astr, Pointer bstr)
 {
     Process* p = NODE_THREAD.process();
     MuLangContext* context = static_cast<MuLangContext*>(p->context());
     RegexType::Regex* r = reinterpret_cast<RegexType::Regex*>(reg);
-    const StringType::String* instr =
-        reinterpret_cast<StringType::String*>(astr);
-    const StringType::String* inrepl =
-        reinterpret_cast<StringType::String*>(bstr);
+    const StringType::String* instr = reinterpret_cast<StringType::String*>(astr);
+    const StringType::String* inrepl = reinterpret_cast<StringType::String*>(bstr);
     const StringType* stype = context->stringType();
 
     if (!r || !instr || !inrepl)
@@ -233,8 +225,7 @@ Pointer regex_replace_string_regex_string_string(Mu::Thread& NODE_THREAD,
                 int bm = matches[rl].rm_so;
                 int em = matches[rl].rm_eo;
 
-                if (bm < 0 || bm >= text.size() || em < 0
-                    || em >= text.size() + 1)
+                if (bm < 0 || bm >= text.size() || em < 0 || em >= text.size() + 1)
                 {
                     OutOfRangeException exc(NODE_THREAD);
                     exc.message() = "bad replacement index: " + exc.message();
@@ -297,11 +288,9 @@ namespace Mu
         regerror(err, &_regex, &temp.front(), temp.size());
 
         Process* p = thread.process();
-        const MuLangContext* c =
-            static_cast<const MuLangContext*>(p->context());
+        const MuLangContext* c = static_cast<const MuLangContext*>(p->context());
 
-        ExceptionType::Exception* e =
-            new ExceptionType::Exception(c->exceptionType());
+        ExceptionType::Exception* e = new ExceptionType::Exception(c->exceptionType());
 
         e->string() += "Regular exression error: ";
         e->string() += &temp.front();
@@ -323,8 +312,7 @@ namespace Mu
         }
     }
 
-    bool RegexType::Regex::matches(Thread& thread, const Mu::String& s,
-                                   int flags)
+    bool RegexType::Regex::matches(Thread& thread, const Mu::String& s, int flags)
     {
         int result = regexec(&_regex, s.c_str(), 0, 0, flags);
 
@@ -339,8 +327,7 @@ namespace Mu
         }
     }
 
-    bool RegexType::Regex::smatch(Thread& thread, const Mu::String& s,
-                                  int flags, regmatch_t* matches, size_t num)
+    bool RegexType::Regex::smatch(Thread& thread, const Mu::String& s, int flags, regmatch_t* matches, size_t num)
     {
         int result = regexec(&_regex, s.c_str(), num, matches, flags);
 
@@ -366,10 +353,7 @@ namespace Mu
 
     Object* RegexType::newObject() const { return new Regex(this); }
 
-    void RegexType::deleteObject(Object* obj) const
-    {
-        delete static_cast<RegexType::Regex*>(obj);
-    }
+    void RegexType::deleteObject(Object* obj) const { delete static_cast<RegexType::Regex*>(obj); }
 
     void RegexType::outputValue(ostream& o, const Value& value, bool full) const
     {
@@ -386,8 +370,7 @@ namespace Mu
         }
     }
 
-    void RegexType::outputValueRecursive(ostream& o, const ValuePointer vp,
-                                         ValueOutputState& state) const
+    void RegexType::outputValueRecursive(ostream& o, const ValuePointer vp, ValueOutputState& state) const
     {
         const Regex* s = *reinterpret_cast<const Regex**>(vp);
 
@@ -411,27 +394,20 @@ namespace Mu
         Symbol* s = scope();
         Context* c = context();
 
-        s->addSymbols(
-            new ReferenceType(c, "regex&", this),
+        s->addSymbols(new ReferenceType(c, "regex&", this),
 
-            new Function(c, "regex", RegexType::from_string, Cast, Return,
-                         "regex", Args, "string", End),
+                      new Function(c, "regex", RegexType::from_string, Cast, Return, "regex", Args, "string", End),
 
-            new Function(c, "regex", RegexType::construct, Mapped, Return,
-                         "regex", Parameters,
-                         new ParameterVariable(c, "pattern", "string"),
-                         new ParameterVariable(c, "flags", "int"), End),
+                      new Function(c, "regex", RegexType::construct, Mapped, Return, "regex", Parameters,
+                                   new ParameterVariable(c, "pattern", "string"), new ParameterVariable(c, "flags", "int"), End),
 
-            new Function(c, "regex", BaseFunctions::dereference, Cast, Return,
-                         "regex", Args, "regex&", End),
+                      new Function(c, "regex", BaseFunctions::dereference, Cast, Return, "regex", Args, "regex&", End),
 
-            new Function(c, "=", BaseFunctions::assign, AsOp, Return, "regex&",
-                         Args, "regex&", "regex", End),
+                      new Function(c, "=", BaseFunctions::assign, AsOp, Return, "regex&", Args, "regex&", "regex", End),
 
-            new Function(c, "print", RegexType::print, None, Return, "void",
-                         Args, "regex", End),
+                      new Function(c, "print", RegexType::print, None, Return, "void", Args, "regex", End),
 
-            EndArguments);
+                      EndArguments);
 
         //
         //  Can't make the array type until the reference type above exists
@@ -440,30 +416,23 @@ namespace Mu
         MuLangContext* context = (MuLangContext*)globalModule()->context();
         context->arrayType(this, 1, 0);
 
-        addSymbols(
-            new SymbolicConstant(c, "Extended", "int",
-                                 Value(int(REG_EXTENDED))),
+        addSymbols(new SymbolicConstant(c, "Extended", "int", Value(int(REG_EXTENDED))),
 
-            new SymbolicConstant(c, "Basic", "int", Value(int(REG_BASIC))),
-            new SymbolicConstant(c, "NoSpec", "int", Value(int(REG_NOSPEC))),
-            new SymbolicConstant(c, "IgnoreCase", "int", Value(int(REG_ICASE))),
-            new SymbolicConstant(c, "NoSub", "int", Value(int(REG_NOSUB))),
-            new SymbolicConstant(c, "NotBOL", "int", Value(int(REG_NOTBOL))),
-            new SymbolicConstant(c, "NotEOL", "int", Value(int(REG_NOTEOL))),
+                   new SymbolicConstant(c, "Basic", "int", Value(int(REG_BASIC))),
+                   new SymbolicConstant(c, "NoSpec", "int", Value(int(REG_NOSPEC))),
+                   new SymbolicConstant(c, "IgnoreCase", "int", Value(int(REG_ICASE))),
+                   new SymbolicConstant(c, "NoSub", "int", Value(int(REG_NOSUB))),
+                   new SymbolicConstant(c, "NotBOL", "int", Value(int(REG_NOTBOL))),
+                   new SymbolicConstant(c, "NotEOL", "int", Value(int(REG_NOTEOL))),
 
-            new Function(c, "match", RegexType::match, Mapped, Return, "bool",
-                         Compiled, regex_match_bool_regex_string, Args, "regex",
-                         "string", End),
+                   new Function(c, "match", RegexType::match, Mapped, Return, "bool", Compiled, regex_match_bool_regex_string, Args,
+                                "regex", "string", End),
 
-            new Function(c, "smatch", RegexType::smatch, Mapped, Return,
-                         "string[]", Compiled,
-                         regex_smatch_stringBSB_ESB__regex_string, Args,
-                         "regex", "string", End),
+                   new Function(c, "smatch", RegexType::smatch, Mapped, Return, "string[]", Compiled,
+                                regex_smatch_stringBSB_ESB__regex_string, Args, "regex", "string", End),
 
-            new Function(c, "replace", RegexType::replace, Mapped, Return,
-                         "string", Compiled,
-                         regex_replace_string_regex_string_string, Args,
-                         "regex", "string", "string", End),
+                   new Function(c, "replace", RegexType::replace, Mapped, Return, "string", Compiled,
+                                regex_replace_string_regex_string_string, Args, "regex", "string", "string", End),
 
 #if 0
                 new Function(c, "split", RegexType::split, Mapped,
@@ -472,42 +441,32 @@ namespace Mu
                              End),
 #endif
 
-            EndArguments);
+                   EndArguments);
     }
 
-    NODE_IMPLEMENTATION(RegexType::from_string, Pointer)
-    {
-        NODE_RETURN(regex_regex_string(NODE_THREAD, NODE_ARG(0, Pointer)));
-    }
+    NODE_IMPLEMENTATION(RegexType::from_string, Pointer) { NODE_RETURN(regex_regex_string(NODE_THREAD, NODE_ARG(0, Pointer))); }
 
     NODE_IMPLEMENTATION(RegexType::construct, Pointer)
     {
-        NODE_RETURN(regex_regex_string_int(NODE_THREAD, NODE_ARG(0, Pointer),
-                                           NODE_ARG(1, int)));
+        NODE_RETURN(regex_regex_string_int(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     NODE_IMPLEMENTATION(RegexType::match, bool)
     {
-        NODE_RETURN(regex_match_bool_regex_string(
-            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(regex_match_bool_regex_string(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     NODE_IMPLEMENTATION(RegexType::smatch, Pointer)
     {
-        NODE_RETURN(regex_smatch_stringBSB_ESB__regex_string(
-            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(regex_smatch_stringBSB_ESB__regex_string(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
-    NODE_IMPLEMENTATION(RegexType::print, void)
-    {
-        print_void_regex(NODE_THREAD, NODE_ARG(0, Pointer));
-    }
+    NODE_IMPLEMENTATION(RegexType::print, void) { print_void_regex(NODE_THREAD, NODE_ARG(0, Pointer)); }
 
     NODE_IMPLEMENTATION(RegexType::replace, Pointer)
     {
-        NODE_RETURN(regex_replace_string_regex_string_string(
-            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer)));
+        NODE_RETURN(
+            regex_replace_string_regex_string_string(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, Pointer)));
     }
 
 } // namespace Mu

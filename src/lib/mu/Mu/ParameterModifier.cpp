@@ -18,10 +18,7 @@ namespace Mu
 
     ParameterModifier::~ParameterModifier() {}
 
-    void ParameterModifier::outputNode(std::ostream& o, const Node*) const
-    {
-        output(o);
-    }
+    void ParameterModifier::outputNode(std::ostream& o, const Node*) const { output(o); }
 
     void ParameterModifier::output(std::ostream& o) const { Symbol::output(o); }
 

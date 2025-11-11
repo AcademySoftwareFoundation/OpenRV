@@ -51,9 +51,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    void
-    qt_QDropEvent_acceptProposedAction_void_QDropEvent(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this)
+    void qt_QDropEvent_acceptProposedAction_void_QDropEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QDropEvent* arg0 = getqpointer<QDropEventType>(param_this);
@@ -61,72 +59,63 @@ namespace Mu
         setqpointer<QDropEventType>(param_this, arg0);
     }
 
-    int qt_QDropEvent_dropAction_int_QDropEvent(Mu::Thread& NODE_THREAD,
-                                                Pointer param_this)
+    int qt_QDropEvent_dropAction_int_QDropEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QDropEvent* arg0 = getqpointer<QDropEventType>(param_this);
         return int(arg0->dropAction());
     }
 
-    int qt_QDropEvent_keyboardModifiers_int_QDropEvent(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this)
+    int qt_QDropEvent_keyboardModifiers_int_QDropEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QDropEvent* arg0 = getqpointer<QDropEventType>(param_this);
         return int(arg0->keyboardModifiers());
     }
 
-    Pointer qt_QDropEvent_mimeData_QMimeData_QDropEvent(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this)
+    Pointer qt_QDropEvent_mimeData_QMimeData_QDropEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QDropEvent* arg0 = getqpointer<QDropEventType>(param_this);
         return makeinstance<QMimeDataType>(c, arg0->mimeData(), "qt.QMimeData");
     }
 
-    int qt_QDropEvent_mouseButtons_int_QDropEvent(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this)
+    int qt_QDropEvent_mouseButtons_int_QDropEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QDropEvent* arg0 = getqpointer<QDropEventType>(param_this);
         return int(arg0->mouseButtons());
     }
 
-    Pointer qt_QDropEvent_pos_QPoint_QDropEvent(Mu::Thread& NODE_THREAD,
-                                                Pointer param_this)
+    Pointer qt_QDropEvent_pos_QPoint_QDropEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QDropEvent* arg0 = getqpointer<QDropEventType>(param_this);
         return makeqtype<QPointType>(c, arg0->pos(), "qt.QPoint");
     }
 
-    Pointer qt_QDropEvent_posF_QPointF_QDropEvent(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this)
+    Pointer qt_QDropEvent_posF_QPointF_QDropEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QDropEvent* arg0 = getqpointer<QDropEventType>(param_this);
         return makeqtype<QPointFType>(c, arg0->posF(), "qt.QPointF");
     }
 
-    int qt_QDropEvent_possibleActions_int_QDropEvent(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_this)
+    int qt_QDropEvent_possibleActions_int_QDropEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QDropEvent* arg0 = getqpointer<QDropEventType>(param_this);
         return int(arg0->possibleActions());
     }
 
-    int qt_QDropEvent_proposedAction_int_QDropEvent(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this)
+    int qt_QDropEvent_proposedAction_int_QDropEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QDropEvent* arg0 = getqpointer<QDropEventType>(param_this);
         return int(arg0->proposedAction());
     }
 
-    void qt_QDropEvent_setDropAction_void_QDropEvent_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_action)
+    void qt_QDropEvent_setDropAction_void_QDropEvent_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_action)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QDropEvent* arg0 = getqpointer<QDropEventType>(param_this);
@@ -135,8 +124,7 @@ namespace Mu
         setqpointer<QDropEventType>(param_this, arg0);
     }
 
-    Pointer qt_QDropEvent_source_QObject_QDropEvent(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this)
+    Pointer qt_QDropEvent_source_QObject_QDropEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QDropEvent* arg0 = getqpointer<QDropEventType>(param_this);
@@ -145,68 +133,57 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(_n_acceptProposedAction0, void)
     {
-        qt_QDropEvent_acceptProposedAction_void_QDropEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
+        qt_QDropEvent_acceptProposedAction_void_QDropEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_dropAction0, int)
     {
-        NODE_RETURN(qt_QDropEvent_dropAction_int_QDropEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QDropEvent_dropAction_int_QDropEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_keyboardModifiers0, int)
     {
-        NODE_RETURN(qt_QDropEvent_keyboardModifiers_int_QDropEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QDropEvent_keyboardModifiers_int_QDropEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_mimeData0, Pointer)
     {
-        NODE_RETURN(qt_QDropEvent_mimeData_QMimeData_QDropEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QDropEvent_mimeData_QMimeData_QDropEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseButtons0, int)
     {
-        NODE_RETURN(qt_QDropEvent_mouseButtons_int_QDropEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QDropEvent_mouseButtons_int_QDropEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_pos0, Pointer)
     {
-        NODE_RETURN(qt_QDropEvent_pos_QPoint_QDropEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QDropEvent_pos_QPoint_QDropEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_posF0, Pointer)
     {
-        NODE_RETURN(qt_QDropEvent_posF_QPointF_QDropEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QDropEvent_posF_QPointF_QDropEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_possibleActions0, int)
     {
-        NODE_RETURN(qt_QDropEvent_possibleActions_int_QDropEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QDropEvent_possibleActions_int_QDropEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_proposedAction0, int)
     {
-        NODE_RETURN(qt_QDropEvent_proposedAction_int_QDropEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QDropEvent_proposedAction_int_QDropEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_setDropAction0, void)
     {
-        qt_QDropEvent_setDropAction_void_QDropEvent_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QDropEvent_setDropAction_void_QDropEvent_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_source0, Pointer)
     {
-        NODE_RETURN(qt_QDropEvent_source_QObject_QDropEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QDropEvent_source_QObject_QDropEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     void QDropEventType::load()
@@ -226,13 +203,11 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
                    new MemberVariable(c, "native", "qt.NativeObject"),
 
@@ -247,51 +222,28 @@ namespace Mu
             // flags Qt::DropActions actions, QMimeData data, flags
             // Qt::MouseButtons buttons, flags Qt::KeyboardModifiers modifiers,
             // "Type" type)
-            new Function(c, "acceptProposedAction", _n_acceptProposedAction0,
-                         None, Compiled,
-                         qt_QDropEvent_acceptProposedAction_void_QDropEvent,
-                         Return, "void", Parameters,
+            new Function(c, "acceptProposedAction", _n_acceptProposedAction0, None, Compiled,
+                         qt_QDropEvent_acceptProposedAction_void_QDropEvent, Return, "void", Parameters,
                          new Param(c, "this", "qt.QDropEvent"), End),
-            new Function(c, "dropAction", _n_dropAction0, None, Compiled,
-                         qt_QDropEvent_dropAction_int_QDropEvent, Return, "int",
-                         Parameters, new Param(c, "this", "qt.QDropEvent"),
-                         End),
-            new Function(
-                c, "keyboardModifiers", _n_keyboardModifiers0, None, Compiled,
-                qt_QDropEvent_keyboardModifiers_int_QDropEvent, Return, "int",
-                Parameters, new Param(c, "this", "qt.QDropEvent"), End),
-            new Function(c, "mimeData", _n_mimeData0, None, Compiled,
-                         qt_QDropEvent_mimeData_QMimeData_QDropEvent, Return,
-                         "qt.QMimeData", Parameters,
+            new Function(c, "dropAction", _n_dropAction0, None, Compiled, qt_QDropEvent_dropAction_int_QDropEvent, Return, "int",
+                         Parameters, new Param(c, "this", "qt.QDropEvent"), End),
+            new Function(c, "keyboardModifiers", _n_keyboardModifiers0, None, Compiled, qt_QDropEvent_keyboardModifiers_int_QDropEvent,
+                         Return, "int", Parameters, new Param(c, "this", "qt.QDropEvent"), End),
+            new Function(c, "mimeData", _n_mimeData0, None, Compiled, qt_QDropEvent_mimeData_QMimeData_QDropEvent, Return, "qt.QMimeData",
+                         Parameters, new Param(c, "this", "qt.QDropEvent"), End),
+            new Function(c, "mouseButtons", _n_mouseButtons0, None, Compiled, qt_QDropEvent_mouseButtons_int_QDropEvent, Return, "int",
+                         Parameters, new Param(c, "this", "qt.QDropEvent"), End),
+            new Function(c, "pos", _n_pos0, None, Compiled, qt_QDropEvent_pos_QPoint_QDropEvent, Return, "qt.QPoint", Parameters,
                          new Param(c, "this", "qt.QDropEvent"), End),
-            new Function(c, "mouseButtons", _n_mouseButtons0, None, Compiled,
-                         qt_QDropEvent_mouseButtons_int_QDropEvent, Return,
-                         "int", Parameters,
+            new Function(c, "posF", _n_posF0, None, Compiled, qt_QDropEvent_posF_QPointF_QDropEvent, Return, "qt.QPointF", Parameters,
                          new Param(c, "this", "qt.QDropEvent"), End),
-            new Function(c, "pos", _n_pos0, None, Compiled,
-                         qt_QDropEvent_pos_QPoint_QDropEvent, Return,
-                         "qt.QPoint", Parameters,
-                         new Param(c, "this", "qt.QDropEvent"), End),
-            new Function(c, "posF", _n_posF0, None, Compiled,
-                         qt_QDropEvent_posF_QPointF_QDropEvent, Return,
-                         "qt.QPointF", Parameters,
-                         new Param(c, "this", "qt.QDropEvent"), End),
-            new Function(c, "possibleActions", _n_possibleActions0, None,
-                         Compiled, qt_QDropEvent_possibleActions_int_QDropEvent,
-                         Return, "int", Parameters,
-                         new Param(c, "this", "qt.QDropEvent"), End),
-            new Function(c, "proposedAction", _n_proposedAction0, None,
-                         Compiled, qt_QDropEvent_proposedAction_int_QDropEvent,
-                         Return, "int", Parameters,
-                         new Param(c, "this", "qt.QDropEvent"), End),
-            new Function(c, "setDropAction", _n_setDropAction0, None, Compiled,
-                         qt_QDropEvent_setDropAction_void_QDropEvent_int,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QDropEvent"),
-                         new Param(c, "action", "int"), End),
-            new Function(c, "source", _n_source0, None, Compiled,
-                         qt_QDropEvent_source_QObject_QDropEvent, Return,
-                         "qt.QObject", Parameters,
+            new Function(c, "possibleActions", _n_possibleActions0, None, Compiled, qt_QDropEvent_possibleActions_int_QDropEvent, Return,
+                         "int", Parameters, new Param(c, "this", "qt.QDropEvent"), End),
+            new Function(c, "proposedAction", _n_proposedAction0, None, Compiled, qt_QDropEvent_proposedAction_int_QDropEvent, Return,
+                         "int", Parameters, new Param(c, "this", "qt.QDropEvent"), End),
+            new Function(c, "setDropAction", _n_setDropAction0, None, Compiled, qt_QDropEvent_setDropAction_void_QDropEvent_int, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QDropEvent"), new Param(c, "action", "int"), End),
+            new Function(c, "source", _n_source0, None, Compiled, qt_QDropEvent_source_QObject_QDropEvent, Return, "qt.QObject", Parameters,
                          new Param(c, "this", "qt.QDropEvent"), End),
             // static functions
             EndArguments);

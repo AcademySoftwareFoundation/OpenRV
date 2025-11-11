@@ -48,10 +48,7 @@ namespace Mu
 
     Object* OSStreamType::newObject() const { return new OSStream(this); }
 
-    void OSStreamType::deleteObject(Object* obj) const
-    {
-        delete static_cast<OSStreamType::OSStream*>(obj);
-    }
+    void OSStreamType::deleteObject(Object* obj) const { delete static_cast<OSStreamType::OSStream*>(obj); }
 
     void OSStreamType::load()
     {
@@ -69,24 +66,19 @@ namespace Mu
 
         s->addSymbols(new ReferenceType(c, "osstream&", this),
 
-                      new Function(c, "osstream", OSStreamType::construct, None,
-                                   Return, tn, End),
+                      new Function(c, "osstream", OSStreamType::construct, None, Return, tn, End),
 
-                      new Function(c, "osstream", BaseFunctions::dereference,
-                                   Cast, Return, tn, Args, rn, End),
+                      new Function(c, "osstream", BaseFunctions::dereference, Cast, Return, tn, Args, rn, End),
 
                       EndArguments);
 
         globalScope()->addSymbols(
 
-            new Function(c, "print", StreamType::print, None, Return, "void",
-                         Args, tn, End),
+            new Function(c, "print", StreamType::print, None, Return, "void", Args, tn, End),
 
-            new Function(c, "=", BaseFunctions::assign, AsOp, Return, rn, Args,
-                         rn, tn, End),
+            new Function(c, "=", BaseFunctions::assign, AsOp, Return, rn, Args, rn, tn, End),
 
-            new Function(c, "string", OSStreamType::tostring, None, Return,
-                         "string", Args, tn, End),
+            new Function(c, "string", OSStreamType::tostring, None, Return, "string", Args, tn, End),
 
             EndArguments);
     }

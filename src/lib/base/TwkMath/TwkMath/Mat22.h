@@ -224,9 +224,7 @@ namespace TwkMath
     //******************************************************************************
     // TEMPLATE AND INLINE FUNCTIONS
     //******************************************************************************
-    template <typename T>
-    inline const T*
-    Mat22<T>::operator[](typename Mat22<T>::size_type rowIndex) const
+    template <typename T> inline const T* Mat22<T>::operator[](typename Mat22<T>::size_type rowIndex) const
     {
         assert(rowIndex < 2);
 #ifdef COMPILER_GCC2
@@ -237,8 +235,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <typename T>
-    inline T* Mat22<T>::operator[](typename Mat22<T>::size_type rowIndex)
+    template <typename T> inline T* Mat22<T>::operator[](typename Mat22<T>::size_type rowIndex)
     {
         assert(rowIndex < 2);
 #ifdef COMPILER_GCC2
@@ -250,9 +247,7 @@ namespace TwkMath
 
     //******************************************************************************
     template <typename T>
-    inline const T&
-    Mat22<T>::operator()(typename Mat22<T>::size_type rowIndex,
-                         typename Mat22<T>::size_type colIndex) const
+    inline const T& Mat22<T>::operator()(typename Mat22<T>::size_type rowIndex, typename Mat22<T>::size_type colIndex) const
     {
         assert(rowIndex < 2);
         assert(colIndex < 2);
@@ -264,9 +259,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <typename T>
-    inline T& Mat22<T>::operator()(typename Mat22<T>::size_type rowIndex,
-                                   typename Mat22<T>::size_type colIndex)
+    template <typename T> inline T& Mat22<T>::operator()(typename Mat22<T>::size_type rowIndex, typename Mat22<T>::size_type colIndex)
     {
         assert(rowIndex < 2);
         assert(colIndex < 2);
@@ -286,22 +279,13 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <typename T> inline Mat22<T> Mat22<T>::transposed() const
-    {
-        return Mat22<T>(m00, m10, m01, m11);
-    }
+    template <typename T> inline Mat22<T> Mat22<T>::transposed() const { return Mat22<T>(m00, m10, m01, m11); }
 
     //******************************************************************************
-    template <typename T> inline T Mat22<T>::determinant() const
-    {
-        return determinant2x2(m00, m01, m10, m11);
-    }
+    template <typename T> inline T Mat22<T>::determinant() const { return determinant2x2(m00, m01, m10, m11); }
 
     //******************************************************************************
-    template <typename T> inline void Mat22<T>::invert()
-    {
-        invert2x2(m00, m01, m10, m11);
-    }
+    template <typename T> inline void Mat22<T>::invert() { invert2x2(m00, m01, m10, m11); }
 
     //******************************************************************************
     template <typename T> inline Mat22<T> Mat22<T>::inverted() const
@@ -312,8 +296,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <typename T>
-    inline Mat22<T>& Mat22<T>::operator+=(const Mat22<T>& v)
+    template <typename T> inline Mat22<T>& Mat22<T>::operator+=(const Mat22<T>& v)
     {
         m00 += v.m00;
         m01 += v.m01;
@@ -323,8 +306,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <typename T>
-    inline Mat22<T>& Mat22<T>::operator-=(const Mat22<T>& v)
+    template <typename T> inline Mat22<T>& Mat22<T>::operator-=(const Mat22<T>& v)
     {
         m00 -= v.m00;
         m01 -= v.m01;
@@ -373,48 +355,28 @@ namespace TwkMath
     // FUNCTIONS WHICH OPERATE ON MAT22
     //******************************************************************************
     //******************************************************************************
-    template <typename T>
-    inline typename Mat22<T>::size_type rowDimension(const Mat22<T>&)
-    {
-        return 2;
-    }
+    template <typename T> inline typename Mat22<T>::size_type rowDimension(const Mat22<T>&) { return 2; }
 
     //******************************************************************************
-    template <typename T>
-    inline typename Mat22<T>::size_type colDimension(const Mat22<T>&)
-    {
-        return 2;
-    }
+    template <typename T> inline typename Mat22<T>::size_type colDimension(const Mat22<T>&) { return 2; }
 
     //******************************************************************************
-    template <typename T> inline void makeIdentity(Mat22<T>& m)
-    {
-        m.makeIdentity();
-    }
+    template <typename T> inline void makeIdentity(Mat22<T>& m) { m.makeIdentity(); }
 
     //******************************************************************************
     template <typename T> inline void transpose(Mat22<T>& m) { m.transpose(); }
 
     //******************************************************************************
-    template <typename T> inline Mat22<T> transposed(const Mat22<T>& m)
-    {
-        return m.transposed();
-    }
+    template <typename T> inline Mat22<T> transposed(const Mat22<T>& m) { return m.transposed(); }
 
     //******************************************************************************
-    template <typename T> inline T determinant(const Mat22<T>& m)
-    {
-        return m.determinant();
-    }
+    template <typename T> inline T determinant(const Mat22<T>& m) { return m.determinant(); }
 
     //******************************************************************************
     template <typename T> inline void invert(Mat22<T>& m) { m.invert(); }
 
     //******************************************************************************
-    template <typename T> inline Mat22<T> inverted(const Mat22<T>& m)
-    {
-        return m.inverted();
-    }
+    template <typename T> inline Mat22<T> inverted(const Mat22<T>& m) { return m.inverted(); }
 
     //******************************************************************************
     //******************************************************************************
@@ -424,44 +386,35 @@ namespace TwkMath
     // ADDITION
     // Matrices can only be added to other matrices of the same size.
     // No scalars, no vectors.
-    template <typename T>
-    inline Mat22<T> operator+(const Mat22<T>& a, const Mat22<T>& b)
+    template <typename T> inline Mat22<T> operator+(const Mat22<T>& a, const Mat22<T>& b)
     {
-        return Mat22<T>(a.m00 + b.m00, a.m01 + b.m01, a.m10 + b.m10,
-                        a.m11 + b.m11);
+        return Mat22<T>(a.m00 + b.m00, a.m01 + b.m01, a.m10 + b.m10, a.m11 + b.m11);
     }
 
     //******************************************************************************
     // NEGATION
-    template <typename T> inline Mat22<T> operator-(const Mat22<T>& a)
-    {
-        return Mat22<T>(-a.m00, -a.m01, -a.m10, -a.m11);
-    }
+    template <typename T> inline Mat22<T> operator-(const Mat22<T>& a) { return Mat22<T>(-a.m00, -a.m01, -a.m10, -a.m11); }
 
     //******************************************************************************
     // SUBTRACTION
     // Matrices can only be subtracted from other matrices of the same size.
     // No scalars, no vectors.
-    template <typename T>
-    inline Mat22<T> operator-(const Mat22<T>& a, const Mat22<T>& b)
+    template <typename T> inline Mat22<T> operator-(const Mat22<T>& a, const Mat22<T>& b)
     {
-        return Mat22<T>(a.m00 - b.m00, a.m01 - b.m01, a.m10 - b.m10,
-                        a.m11 - b.m11);
+        return Mat22<T>(a.m00 - b.m00, a.m01 - b.m01, a.m10 - b.m10, a.m11 - b.m11);
     }
 
     //******************************************************************************
     // SCALAR MULTIPLICATION
     // Matrices can be left and right multiplied by scalars, both of which
     // produce the same effect of multiplying all elements of the matrix.
-    template <typename T>
-    inline Mat22<T> operator*(const Mat22<T>& a, const T& b)
+    template <typename T> inline Mat22<T> operator*(const Mat22<T>& a, const T& b)
     {
         return Mat22<T>(a.m00 * b, a.m01 * b, a.m10 * b, a.m11 * b);
     }
 
     //******************************************************************************
-    template <typename T>
-    inline Mat22<T> operator*(const T& a, const Mat22<T>& b)
+    template <typename T> inline Mat22<T> operator*(const T& a, const Mat22<T>& b)
     {
         return Mat22<T>(a * b.m00, a * b.m01, a * b.m10, a * b.m11);
     }
@@ -470,29 +423,22 @@ namespace TwkMath
     // VECTOR MULTIPLICATION
     // Matrices can be left multiplied by a vector, which results in a vector.
     // Matrices can be right multiplied by a vector, which results in a vector.
-    template <typename T>
-    inline Vec2<T> operator*(const Vec2<T>& v, const Mat22<T>& m)
+    template <typename T> inline Vec2<T> operator*(const Vec2<T>& v, const Mat22<T>& m)
     {
-        return Vec2<T>((v.x * m.m00) + (v.y * m.m10),
-                       (v.x * m.m01) + (v.y * m.m11));
+        return Vec2<T>((v.x * m.m00) + (v.y * m.m10), (v.x * m.m01) + (v.y * m.m11));
     }
 
     //******************************************************************************
-    template <typename T>
-    inline Vec2<T> operator*(const Mat22<T>& m, const Vec2<T>& v)
+    template <typename T> inline Vec2<T> operator*(const Mat22<T>& m, const Vec2<T>& v)
     {
-        return Vec2<T>((m.m00 * v.x) + (m.m01 * v.y),
-                       (m.m10 * v.x) + (m.m11 * v.y));
+        return Vec2<T>((m.m00 * v.x) + (m.m01 * v.y), (m.m10 * v.x) + (m.m11 * v.y));
     }
 
     //******************************************************************************
     // MATRIX MULTIPLICATION
-    template <typename T>
-    inline Mat22<T> operator*(const Mat22<T>& a, const Mat22<T>& b)
+    template <typename T> inline Mat22<T> operator*(const Mat22<T>& a, const Mat22<T>& b)
     {
-        return Mat22<T>((a.m00 * b.m00) + (a.m01 * b.m10),
-                        (a.m00 * b.m01) + (a.m01 * b.m11),
-                        (a.m10 * b.m00) + (a.m11 * b.m10),
+        return Mat22<T>((a.m00 * b.m00) + (a.m01 * b.m10), (a.m00 * b.m01) + (a.m01 * b.m11), (a.m10 * b.m00) + (a.m11 * b.m10),
                         (a.m10 * b.m01) + (a.m11 * b.m11));
     }
 
@@ -500,8 +446,7 @@ namespace TwkMath
     // DIVISION
     // Matrices can only be divided by scalar.
     // Scalars cannot be divided by matrices.
-    template <typename T>
-    inline Mat22<T> operator/(const Mat22<T>& a, const T& b)
+    template <typename T> inline Mat22<T> operator/(const Mat22<T>& a, const T& b)
     {
         assert(b != T0);
         return Mat22<T>(a.m00 / b, a.m01 / b, a.m10 / b, a.m11 / b);
@@ -512,19 +457,15 @@ namespace TwkMath
     // COMPARISON OPERATORS
     //******************************************************************************
     //******************************************************************************
-    template <typename T>
-    inline bool operator==(const Mat22<T>& a, const Mat22<T>& b)
+    template <typename T> inline bool operator==(const Mat22<T>& a, const Mat22<T>& b)
     {
-        return ((a.m00 == b.m00) && (a.m01 == b.m01) && (a.m10 == b.m10)
-                && (a.m11 == b.m11));
+        return ((a.m00 == b.m00) && (a.m01 == b.m01) && (a.m10 == b.m10) && (a.m11 == b.m11));
     }
 
     //******************************************************************************
-    template <typename T>
-    inline bool operator!=(const Mat22<T>& a, const Mat22<T>& b)
+    template <typename T> inline bool operator!=(const Mat22<T>& a, const Mat22<T>& b)
     {
-        return ((a.m00 != b.m00) || (a.m01 != b.m01) || (a.m10 != b.m10)
-                || (a.m11 != b.m11));
+        return ((a.m00 != b.m00) || (a.m01 != b.m01) || (a.m10 != b.m10) || (a.m11 != b.m11));
     }
 
 } // End namespace TwkMath

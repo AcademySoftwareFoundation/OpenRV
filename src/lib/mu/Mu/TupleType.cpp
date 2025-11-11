@@ -28,9 +28,7 @@ namespace Mu
 
     TupleType::~TupleType() {}
 
-    void TupleType::outputValueRecursive(ostream& o,
-                                         const ValuePointer valuePtr,
-                                         ValueOutputState& state) const
+    void TupleType::outputValueRecursive(ostream& o, const ValuePointer valuePtr, ValueOutputState& state) const
     {
         if (!valuePtr)
             return;
@@ -40,8 +38,7 @@ namespace Mu
         {
             o << "(";
 
-            if (state.traversedObjects.find(obj)
-                != state.traversedObjects.end())
+            if (state.traversedObjects.find(obj) != state.traversedObjects.end())
             {
                 o << "...ad infinitum...";
             }
@@ -93,22 +90,17 @@ namespace Mu
 
         g->addSymbol(new ReferenceType(c, rn, this));
 
-        g->addSymbol(new Function(c, n, BaseFunctions::dereference, Cast,
-                                  Return, n, Args, rn, End));
+        g->addSymbol(new Function(c, n, BaseFunctions::dereference, Cast, Return, n, Args, rn, End));
 
-        g->addSymbol(new Function(c, "=", BaseFunctions::assign, AsOp, Return,
-                                  rn, Args, rn, n, End));
+        g->addSymbol(new Function(c, "=", BaseFunctions::assign, AsOp, Return, rn, Args, rn, n, End));
 
-        g->addSymbol(
-            new Function(c, n, defaultConstructor, None, Return, fn, End));
+        g->addSymbol(new Function(c, n, defaultConstructor, None, Return, fn, End));
 
-        g->addSymbol(new Function(c, n, this, params.size(), &params.front(),
-                                  aggregateConstructor, Mapped));
+        g->addSymbol(new Function(c, n, this, params.size(), &params.front(), aggregateConstructor, Mapped));
 
         //                 EndArguments );
 
-        addSymbols(new Function(c, "__allocate", defaultConstructor, None,
-                                Return, fn, End),
+        addSymbols(new Function(c, "__allocate", defaultConstructor, None, Return, fn, End),
 
                    EndArguments);
     }

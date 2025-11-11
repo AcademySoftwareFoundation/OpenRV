@@ -20,8 +20,7 @@ namespace Mu
     using namespace std;
     using namespace stl_ext;
 
-    const Value BasicCallEnvironment::call(const Function* F,
-                                           Function::ArgumentVector& args) const
+    const Value BasicCallEnvironment::call(const Function* F, Function::ArgumentVector& args) const
     {
         Thread* athread = _thread ? _thread : _process->newApplicationThread();
 
@@ -40,9 +39,7 @@ namespace Mu
         }
     }
 
-    const Value
-    BasicCallEnvironment::callMethodByName(const char* F,
-                                           Function::ArgumentVector& args) const
+    const Value BasicCallEnvironment::callMethodByName(const char* F, Function::ArgumentVector& args) const
     {
         Thread* athread = _thread ? _thread : _process->newApplicationThread();
 
@@ -80,8 +77,7 @@ namespace Mu
         , _globals(process->globals())
     {
         GarbageCollector::init(); // ok to call many times.
-        setVaryingSize(process->varyingSize(0), process->varyingSize(1),
-                       process->varyingSize(2));
+        setVaryingSize(process->varyingSize(0), process->varyingSize(1), process->varyingSize(2));
 
         _processes.push_back(this);
         pthread_mutex_init(&_threadNewMutex, 0);
@@ -119,9 +115,7 @@ namespace Mu
         return _cbEnv;
     }
 
-    const Value Process::call(Thread* thread, const Function* f,
-                              Function::ArgumentVector& args,
-                              bool returnArguments)
+    const Value Process::call(Thread* thread, const Function* f, Function::ArgumentVector& args, bool returnArguments)
     {
         return thread->call(f, args, returnArguments);
     }
@@ -186,15 +180,13 @@ namespace Mu
 
         if (t->isApplicationThread())
         {
-            Threads::iterator i =
-                find(_applicationThreads.begin(), _applicationThreads.end(), t);
+            Threads::iterator i = find(_applicationThreads.begin(), _applicationThreads.end(), t);
             if (i != _applicationThreads.end())
                 _applicationThreads.erase(i);
         }
         else
         {
-            Threads::iterator i =
-                find(_processThreads.begin(), _processThreads.end(), t);
+            Threads::iterator i = find(_processThreads.begin(), _processThreads.end(), t);
             if (i != _processThreads.end())
                 _processThreads.erase(i);
         }

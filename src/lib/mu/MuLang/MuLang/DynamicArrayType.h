@@ -30,8 +30,7 @@ namespace Mu
     public:
         typedef STLVector<size_t>::Type SizeVector;
 
-        DynamicArrayType(Context* c, const char* name, Class* superClass,
-                         const Type* elementType, int dimensions);
+        DynamicArrayType(Context* c, const char* name, Class* superClass, const Type* elementType, int dimensions);
 
         ~DynamicArrayType();
 
@@ -39,10 +38,7 @@ namespace Mu
 
         const Type* elementType() const { return _elementType; }
 
-        const MachineRep* elementRep() const
-        {
-            return elementType()->machineRep();
-        }
+        const MachineRep* elementRep() const { return elementType()->machineRep(); }
 
         const size_t dimensions() const { return _dimensions; }
 
@@ -54,8 +50,7 @@ namespace Mu
         virtual size_t objectSize() const;
         virtual void deleteObject(Object*) const;
         virtual Value nodeEval(const Node*, Thread&) const;
-        virtual void outputValueRecursive(std::ostream&, const ValuePointer,
-                                          ValueOutputState&) const;
+        virtual void outputValueRecursive(std::ostream&, const ValuePointer, ValueOutputState&) const;
         virtual void load();
         virtual void constructInstance(Pointer) const;
         virtual void copyInstance(Pointer, Pointer) const;
@@ -73,10 +68,8 @@ namespace Mu
         //  Archiving
         //
 
-        virtual void serialize(std::ostream&, Archive::Writer&,
-                               const ValuePointer) const;
-        virtual void deserialize(std::istream&, Archive::Reader&,
-                                 ValuePointer) const;
+        virtual void serialize(std::ostream&, Archive::Writer&, const ValuePointer) const;
+        virtual void deserialize(std::istream&, Archive::Reader&, ValuePointer) const;
 
         //
         //	Dynamic array functions

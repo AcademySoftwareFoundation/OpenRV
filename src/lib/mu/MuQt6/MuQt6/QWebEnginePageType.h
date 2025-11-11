@@ -42,8 +42,7 @@ namespace Mu
         //  Constructors
         //
 
-        QWebEnginePageType(Context* context, const char* name,
-                           Class* superClass = 0, Class* superClass2 = 0);
+        QWebEnginePageType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QWebEnginePageType();
 
@@ -66,31 +65,20 @@ namespace Mu
     {
     public:
         virtual ~MuQt_QWebEnginePage();
-        MuQt_QWebEnginePage(Pointer muobj, const CallEnvironment*,
-                            QObject* parent);
-        MuQt_QWebEnginePage(Pointer muobj, const CallEnvironment*,
-                            QWebEngineProfile* profile, QObject* parent);
-        virtual void triggerAction(QWebEnginePage::WebAction action,
-                                   bool checked);
+        MuQt_QWebEnginePage(Pointer muobj, const CallEnvironment*, QObject* parent);
+        MuQt_QWebEnginePage(Pointer muobj, const CallEnvironment*, QWebEngineProfile* profile, QObject* parent);
+        virtual void triggerAction(QWebEnginePage::WebAction action, bool checked);
         virtual bool event(QEvent* e);
 
     protected:
-        virtual bool
-        acceptNavigationRequest(const QUrl& url,
-                                QWebEnginePage::NavigationType type,
-                                bool isMainFrame);
-        virtual QStringList chooseFiles(QWebEnginePage::FileSelectionMode mode,
-                                        const QStringList& oldFiles,
+        virtual bool acceptNavigationRequest(const QUrl& url, QWebEnginePage::NavigationType type, bool isMainFrame);
+        virtual QStringList chooseFiles(QWebEnginePage::FileSelectionMode mode, const QStringList& oldFiles,
                                         const QStringList& acceptedMimeTypes);
-        virtual QWebEnginePage*
-        createWindow(QWebEnginePage::WebWindowType type);
-        virtual void javaScriptAlert(const QUrl& securityOrigin,
-                                     const QString& msg);
-        virtual bool javaScriptConfirm(const QUrl& securityOrigin,
-                                       const QString& msg);
-        virtual void javaScriptConsoleMessage(
-            QWebEnginePage::JavaScriptConsoleMessageLevel level,
-            const QString& message, int lineNumber, const QString& sourceID);
+        virtual QWebEnginePage* createWindow(QWebEnginePage::WebWindowType type);
+        virtual void javaScriptAlert(const QUrl& securityOrigin, const QString& msg);
+        virtual bool javaScriptConfirm(const QUrl& securityOrigin, const QString& msg);
+        virtual void javaScriptConsoleMessage(QWebEnginePage::JavaScriptConsoleMessageLevel level, const QString& message, int lineNumber,
+                                              const QString& sourceID);
 
     public:
         virtual bool eventFilter(QObject* watched, QEvent* event);
@@ -100,100 +88,65 @@ namespace Mu
         virtual void timerEvent(QTimerEvent* event);
 
     public:
-        bool acceptNavigationRequest_pub(const QUrl& url,
-                                         QWebEnginePage::NavigationType type,
-                                         bool isMainFrame)
+        bool acceptNavigationRequest_pub(const QUrl& url, QWebEnginePage::NavigationType type, bool isMainFrame)
         {
             return acceptNavigationRequest(url, type, isMainFrame);
         }
 
-        bool
-        acceptNavigationRequest_pub_parent(const QUrl& url,
-                                           QWebEnginePage::NavigationType type,
-                                           bool isMainFrame)
+        bool acceptNavigationRequest_pub_parent(const QUrl& url, QWebEnginePage::NavigationType type, bool isMainFrame)
         {
-            return QWebEnginePage::acceptNavigationRequest(url, type,
-                                                           isMainFrame);
+            return QWebEnginePage::acceptNavigationRequest(url, type, isMainFrame);
         }
 
-        QStringList chooseFiles_pub(QWebEnginePage::FileSelectionMode mode,
-                                    const QStringList& oldFiles,
+        QStringList chooseFiles_pub(QWebEnginePage::FileSelectionMode mode, const QStringList& oldFiles,
                                     const QStringList& acceptedMimeTypes)
         {
             return chooseFiles(mode, oldFiles, acceptedMimeTypes);
         }
 
-        QStringList
-        chooseFiles_pub_parent(QWebEnginePage::FileSelectionMode mode,
-                               const QStringList& oldFiles,
-                               const QStringList& acceptedMimeTypes)
+        QStringList chooseFiles_pub_parent(QWebEnginePage::FileSelectionMode mode, const QStringList& oldFiles,
+                                           const QStringList& acceptedMimeTypes)
         {
-            return QWebEnginePage::chooseFiles(mode, oldFiles,
-                                               acceptedMimeTypes);
+            return QWebEnginePage::chooseFiles(mode, oldFiles, acceptedMimeTypes);
         }
 
-        QWebEnginePage* createWindow_pub(QWebEnginePage::WebWindowType type)
-        {
-            return createWindow(type);
-        }
+        QWebEnginePage* createWindow_pub(QWebEnginePage::WebWindowType type) { return createWindow(type); }
 
-        QWebEnginePage*
-        createWindow_pub_parent(QWebEnginePage::WebWindowType type)
-        {
-            return QWebEnginePage::createWindow(type);
-        }
+        QWebEnginePage* createWindow_pub_parent(QWebEnginePage::WebWindowType type) { return QWebEnginePage::createWindow(type); }
 
-        void javaScriptAlert_pub(const QUrl& securityOrigin, const QString& msg)
-        {
-            javaScriptAlert(securityOrigin, msg);
-        }
+        void javaScriptAlert_pub(const QUrl& securityOrigin, const QString& msg) { javaScriptAlert(securityOrigin, msg); }
 
-        void javaScriptAlert_pub_parent(const QUrl& securityOrigin,
-                                        const QString& msg)
+        void javaScriptAlert_pub_parent(const QUrl& securityOrigin, const QString& msg)
         {
             QWebEnginePage::javaScriptAlert(securityOrigin, msg);
         }
 
-        bool javaScriptConfirm_pub(const QUrl& securityOrigin,
-                                   const QString& msg)
-        {
-            return javaScriptConfirm(securityOrigin, msg);
-        }
+        bool javaScriptConfirm_pub(const QUrl& securityOrigin, const QString& msg) { return javaScriptConfirm(securityOrigin, msg); }
 
-        bool javaScriptConfirm_pub_parent(const QUrl& securityOrigin,
-                                          const QString& msg)
+        bool javaScriptConfirm_pub_parent(const QUrl& securityOrigin, const QString& msg)
         {
             return QWebEnginePage::javaScriptConfirm(securityOrigin, msg);
         }
 
-        void javaScriptConsoleMessage_pub(
-            QWebEnginePage::JavaScriptConsoleMessageLevel level,
-            const QString& message, int lineNumber, const QString& sourceID)
+        void javaScriptConsoleMessage_pub(QWebEnginePage::JavaScriptConsoleMessageLevel level, const QString& message, int lineNumber,
+                                          const QString& sourceID)
         {
             javaScriptConsoleMessage(level, message, lineNumber, sourceID);
         }
 
-        void javaScriptConsoleMessage_pub_parent(
-            QWebEnginePage::JavaScriptConsoleMessageLevel level,
-            const QString& message, int lineNumber, const QString& sourceID)
+        void javaScriptConsoleMessage_pub_parent(QWebEnginePage::JavaScriptConsoleMessageLevel level, const QString& message,
+                                                 int lineNumber, const QString& sourceID)
         {
-            QWebEnginePage::javaScriptConsoleMessage(level, message, lineNumber,
-                                                     sourceID);
+            QWebEnginePage::javaScriptConsoleMessage(level, message, lineNumber, sourceID);
         }
 
         void customEvent_pub(QEvent* event) { customEvent(event); }
 
-        void customEvent_pub_parent(QEvent* event)
-        {
-            QWebEnginePage::customEvent(event);
-        }
+        void customEvent_pub_parent(QEvent* event) { QWebEnginePage::customEvent(event); }
 
         void timerEvent_pub(QTimerEvent* event) { timerEvent(event); }
 
-        void timerEvent_pub_parent(QTimerEvent* event)
-        {
-            QWebEnginePage::timerEvent(event);
-        }
+        void timerEvent_pub_parent(QTimerEvent* event) { QWebEnginePage::timerEvent(event); }
 
     public:
         const QWebEnginePageType* _baseType;
@@ -201,11 +154,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance*
-    QWebEnginePageType::cachedInstance(const QWebEnginePageType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QWebEnginePageType::cachedInstance(const QWebEnginePageType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

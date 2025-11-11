@@ -49,32 +49,28 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    Pointer qt_QHoverEvent_oldPos_QPoint_QHoverEvent(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_this)
+    Pointer qt_QHoverEvent_oldPos_QPoint_QHoverEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHoverEvent* arg0 = getqpointer<QHoverEventType>(param_this);
         return makeqtype<QPointType>(c, arg0->oldPos(), "qt.QPoint");
     }
 
-    Pointer qt_QHoverEvent_oldPosF_QPointF_QHoverEvent(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this)
+    Pointer qt_QHoverEvent_oldPosF_QPointF_QHoverEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHoverEvent* arg0 = getqpointer<QHoverEventType>(param_this);
         return makeqtype<QPointFType>(c, arg0->oldPosF(), "qt.QPointF");
     }
 
-    Pointer qt_QHoverEvent_pos_QPoint_QHoverEvent(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this)
+    Pointer qt_QHoverEvent_pos_QPoint_QHoverEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHoverEvent* arg0 = getqpointer<QHoverEventType>(param_this);
         return makeqtype<QPointType>(c, arg0->pos(), "qt.QPoint");
     }
 
-    Pointer qt_QHoverEvent_posF_QPointF_QHoverEvent(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this)
+    Pointer qt_QHoverEvent_posF_QPointF_QHoverEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHoverEvent* arg0 = getqpointer<QHoverEventType>(param_this);
@@ -83,26 +79,22 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(_n_oldPos0, Pointer)
     {
-        NODE_RETURN(qt_QHoverEvent_oldPos_QPoint_QHoverEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QHoverEvent_oldPos_QPoint_QHoverEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_oldPosF0, Pointer)
     {
-        NODE_RETURN(qt_QHoverEvent_oldPosF_QPointF_QHoverEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QHoverEvent_oldPosF_QPointF_QHoverEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_pos0, Pointer)
     {
-        NODE_RETURN(qt_QHoverEvent_pos_QPoint_QHoverEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QHoverEvent_pos_QPoint_QHoverEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_posF0, Pointer)
     {
-        NODE_RETURN(qt_QHoverEvent_posF_QPointF_QHoverEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QHoverEvent_posF_QPointF_QHoverEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     void QHoverEventType::load()
@@ -122,13 +114,11 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
                    new MemberVariable(c, "native", "qt.NativeObject"),
 
@@ -142,21 +132,13 @@ namespace Mu
             // MISSING: QHoverEvent (QHoverEvent; QHoverEvent this, "Type" type,
             // QPointF pos, QPointF oldPos, flags Qt::KeyboardModifiers
             // modifiers)
-            new Function(c, "oldPos", _n_oldPos0, None, Compiled,
-                         qt_QHoverEvent_oldPos_QPoint_QHoverEvent, Return,
-                         "qt.QPoint", Parameters,
+            new Function(c, "oldPos", _n_oldPos0, None, Compiled, qt_QHoverEvent_oldPos_QPoint_QHoverEvent, Return, "qt.QPoint", Parameters,
                          new Param(c, "this", "qt.QHoverEvent"), End),
-            new Function(c, "oldPosF", _n_oldPosF0, None, Compiled,
-                         qt_QHoverEvent_oldPosF_QPointF_QHoverEvent, Return,
-                         "qt.QPointF", Parameters,
+            new Function(c, "oldPosF", _n_oldPosF0, None, Compiled, qt_QHoverEvent_oldPosF_QPointF_QHoverEvent, Return, "qt.QPointF",
+                         Parameters, new Param(c, "this", "qt.QHoverEvent"), End),
+            new Function(c, "pos", _n_pos0, None, Compiled, qt_QHoverEvent_pos_QPoint_QHoverEvent, Return, "qt.QPoint", Parameters,
                          new Param(c, "this", "qt.QHoverEvent"), End),
-            new Function(c, "pos", _n_pos0, None, Compiled,
-                         qt_QHoverEvent_pos_QPoint_QHoverEvent, Return,
-                         "qt.QPoint", Parameters,
-                         new Param(c, "this", "qt.QHoverEvent"), End),
-            new Function(c, "posF", _n_posF0, None, Compiled,
-                         qt_QHoverEvent_posF_QPointF_QHoverEvent, Return,
-                         "qt.QPointF", Parameters,
+            new Function(c, "posF", _n_posF0, None, Compiled, qt_QHoverEvent_posF_QPointF_QHoverEvent, Return, "qt.QPointF", Parameters,
                          new Param(c, "this", "qt.QHoverEvent"), End),
             // static functions
             EndArguments);

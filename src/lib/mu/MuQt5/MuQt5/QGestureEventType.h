@@ -34,8 +34,7 @@ namespace Mu
         //  Constructors
         //
 
-        QGestureEventType(Context* context, const char* name,
-                          Class* superClass = 0);
+        QGestureEventType(Context* context, const char* name, Class* superClass = 0);
         virtual ~QGestureEventType();
 
         //

@@ -31,10 +31,7 @@ static std::mutex plugin_mutex;
 
 static bool TwkMovie_GenericIO_debug = false;
 
-TWKMOVIE_EXPORT void TwkMovie_GenericIO_setDebug(bool b)
-{
-    TwkMovie_GenericIO_debug = b;
-}
+TWKMOVIE_EXPORT void TwkMovie_GenericIO_setDebug(bool b) { TwkMovie_GenericIO_debug = b; }
 
 namespace TwkMovie
 {
@@ -44,74 +41,43 @@ namespace TwkMovie
     typedef void destroy_t(MovieIO*);
     typedef bool* codecIsAllowed_t(std::string, bool);
 
-    static const char* capabilityNames[] = {"AttributeRead", "AttributeWrite",
-                                            "Read",          "Write",
-                                            "AudioRead",     "AudioWrite"};
+    static const char* capabilityNames[] = {"AttributeRead", "AttributeWrite", "Read", "Write", "AudioRead", "AudioWrite"};
 
     //
     // GenericIO::Preloader implementation
     //
-    GenericIO::Preloader::Reader::Reader(std::string_view filename,
-                                         const Movie::ReadRequest& request)
+    GenericIO::Preloader::Reader::Reader(std::string_view filename, const Movie::ReadRequest& request)
     {
         // other members initialized to default in the class definition
         m_filename = filename;
         m_request = request;
     }
 
-    void GenericIO::Preloader::Reader::clearFilename()
-    {
-        m_filename = "**** filename cleared ****";
-    }
+    void GenericIO::Preloader::Reader::clearFilename() { m_filename = "**** filename cleared ****"; }
 
-    const std::string& GenericIO::Preloader::Reader::filename() const
-    {
-        return m_filename;
-    }
+    const std::string& GenericIO::Preloader::Reader::filename() const { return m_filename; }
 
-    const Movie::ReadRequest& GenericIO::Preloader::Reader::request() const
-    {
-        return m_request;
-    }
+    const Movie::ReadRequest& GenericIO::Preloader::Reader::request() const { return m_request; }
 
-    void GenericIO::Preloader::Reader::setPriority(bool priority)
-    {
-        m_priority = priority;
-    }
+    void GenericIO::Preloader::Reader::setPriority(bool priority) { m_priority = priority; }
 
     bool GenericIO::Preloader::Reader::isPriority() const { return m_priority; }
 
-    void GenericIO::Preloader::Reader::setStatus(Status status)
-    {
-        m_status = status;
-    }
+    void GenericIO::Preloader::Reader::setStatus(Status status) { m_status = status; }
 
-    bool GenericIO::Preloader::Reader::isRemove() const
-    {
-        return (m_status == Status::REMOVE);
-    }
+    bool GenericIO::Preloader::Reader::isRemove() const { return (m_status == Status::REMOVE); }
 
-    bool GenericIO::Preloader::Reader::isPending() const
-    {
-        return (m_status == Status::PENDING);
-    }
+    bool GenericIO::Preloader::Reader::isPending() const { return (m_status == Status::PENDING); }
 
-    bool GenericIO::Preloader::Reader::isLoading() const
-    {
-        return (m_status == Status::LOADING);
-    }
+    bool GenericIO::Preloader::Reader::isLoading() const { return (m_status == Status::LOADING); }
 
-    bool GenericIO::Preloader::Reader::isFinishedLoading() const
-    {
-        return (m_status == Status::LOADED) || (m_status == Status::LOADERROR);
-    }
+    bool GenericIO::Preloader::Reader::isFinishedLoading() const { return (m_status == Status::LOADED) || (m_status == Status::LOADERROR); }
 
     void GenericIO::Preloader::Reader::load()
     {
         try
         {
-            m_movieReader =
-                GenericIO::preloadOpenMovieReader(filename(), request(), true);
+            m_movieReader = GenericIO::preloadOpenMovieReader(filename(), request(), true);
 
             if (m_movieReader != nullptr)
                 setStatus(Reader::Status::LOADED);
@@ -137,10 +103,7 @@ namespace TwkMovie
 
     GenericIO::Preloader::~Preloader() { shutdown(); }
 
-    void GenericIO::Preloader::init()
-    {
-        m_schedulerThread = std::thread(&Preloader::schedulerThreadFunc, this);
-    }
+    void GenericIO::Preloader::init() { m_schedulerThread = std::thread(&Preloader::schedulerThreadFunc, this); }
 
     void GenericIO::Preloader::shutdown()
     {
@@ -194,15 +157,14 @@ namespace TwkMovie
         // Finally, remove from the list any readers that have been fetched
         // from the getReader method and that have been marked for removal.
 
-        auto range =
-            std::remove_if(m_readers.begin(), m_readers.end(),
-                           [&update](const std::shared_ptr<Reader>& reader)
-                           {
-                               bool remove = reader->isRemove();
-                               if (remove)
-                                   update = true;
-                               return remove;
-                           });
+        auto range = std::remove_if(m_readers.begin(), m_readers.end(),
+                                    [&update](const std::shared_ptr<Reader>& reader)
+                                    {
+                                        bool remove = reader->isRemove();
+                                        if (remove)
+                                            update = true;
+                                        return remove;
+                                    });
 
         m_readers.erase(range, m_readers.end());
 
@@ -215,8 +177,7 @@ namespace TwkMovie
         */
     }
 
-    void GenericIO::Preloader::addReader(const std::string_view filename,
-                                         const Movie::ReadRequest& request)
+    void GenericIO::Preloader::addReader(const std::string_view filename, const Movie::ReadRequest& request)
     {
         std::unique_lock<std::mutex> lock(m_schedulerThread_mutex);
 
@@ -245,21 +206,17 @@ namespace TwkMovie
         return false;
     }
 
-    void
-    GenericIO::Preloader::waitForFinishedLoading(std::shared_ptr<Reader> reader)
+    void GenericIO::Preloader::waitForFinishedLoading(std::shared_ptr<Reader> reader)
     {
         // no need to create the lock and wait if it's already ready
         if (reader->isFinishedLoading())
             return;
 
         std::unique_lock<std::mutex> lock(m_mainThread_mutex);
-        m_mainThread_cv.wait(lock,
-                             [&reader] { return reader->isFinishedLoading(); });
+        m_mainThread_cv.wait(lock, [&reader] { return reader->isFinishedLoading(); });
     }
 
-    MovieReader* GenericIO::Preloader::getReader(std::string_view filename,
-                                                 const MovieInfo& info,
-                                                 Movie::ReadRequest& request)
+    MovieReader* GenericIO::Preloader::getReader(std::string_view filename, const MovieInfo& info, Movie::ReadRequest& request)
     {
         //        std::cerr << "PRELOADER GET " << filename << std::endl;
 
@@ -281,11 +238,7 @@ namespace TwkMovie
 
             std::list<std::shared_ptr<Reader>>::iterator it =
                 std::find_if(m_readers.begin(), m_readers.end(),
-                             [&filename](const auto& reader)
-                             {
-                                 return (reader->filename() == filename)
-                                        && (!reader->isRemove());
-                             });
+                             [&filename](const auto& reader) { return (reader->filename() == filename) && (!reader->isRemove()); });
 
             if (it != m_readers.end())
                 reader = *it;
@@ -338,8 +291,7 @@ namespace TwkMovie
             }
             else
             {
-                std::cerr << "PRELOADER READ ERROR: " << reader->filename()
-                          << std::endl;
+                std::cerr << "PRELOADER READ ERROR: " << reader->filename() << std::endl;
             }
 
             return movieReader;
@@ -365,8 +317,7 @@ namespace TwkMovie
 
                                           // resume execution if quitting or if
                                           // anything to schedule
-                                          return m_exitRequested
-                                                 || hasPendingReaders();
+                                          return m_exitRequested || hasPendingReaders();
                                       });
 
             // if asked to stop, exit the scheduler thread (done by
@@ -413,8 +364,7 @@ namespace TwkMovie
                         m_ceilingThreadCount = m_threadCount;
 
                     // Start the loader thread
-                    reader->m_thread =
-                        std::thread(&Preloader::loaderThreadFunc, this, reader);
+                    reader->m_thread = std::thread(&Preloader::loaderThreadFunc, this, reader);
                 }
             }
         }
@@ -472,34 +422,23 @@ namespace TwkMovie
 
     MovieWriter* MovieIO::movieWriter() const { return NULL; }
 
-    void MovieIO::addType(const std::string& e, unsigned int c)
-    {
-        m_exts.push_back(MovieTypeInfo(e, c));
-    }
+    void MovieIO::addType(const std::string& e, unsigned int c) { m_exts.push_back(MovieTypeInfo(e, c)); }
 
-    void MovieIO::addType(const std::string& e, const std::string& d,
-                          unsigned int c, const StringPairVector& comps,
+    void MovieIO::addType(const std::string& e, const std::string& d, unsigned int c, const StringPairVector& comps,
                           const StringPairVector& acomps)
     {
         m_exts.push_back(MovieTypeInfo(e, d, c, comps, acomps));
     }
 
-    void MovieIO::addType(const std::string& e, const std::string& d,
-                          unsigned int c, const StringPairVector& comps,
-                          const StringPairVector& acomps,
-                          const ParameterVector& eparams,
-                          const ParameterVector& dparams)
+    void MovieIO::addType(const std::string& e, const std::string& d, unsigned int c, const StringPairVector& comps,
+                          const StringPairVector& acomps, const ParameterVector& eparams, const ParameterVector& dparams)
     {
-        m_exts.push_back(
-            MovieTypeInfo(e, d, c, comps, acomps, eparams, dparams));
+        m_exts.push_back(MovieTypeInfo(e, d, c, comps, acomps, eparams, dparams));
     }
 
     string MovieIO::about() const { return "(no info available)"; }
 
-    const MovieIO::MovieTypeInfos& MovieIO::extensionsSupported() const
-    {
-        return m_exts;
-    }
+    const MovieIO::MovieTypeInfos& MovieIO::extensionsSupported() const { return m_exts; }
 
     bool MovieIO::canAttemptBruteForceRead() const
     {
@@ -512,15 +451,13 @@ namespace TwkMovie
         return false;
     }
 
-    bool MovieIO::supportsExtension(std::string extension,
-                                    unsigned int capabilities) const
+    bool MovieIO::supportsExtension(std::string extension, unsigned int capabilities) const
     {
         for (int i = 0; i < m_exts.size(); i++)
         {
             if (!strcasecmp(m_exts[i].extension.c_str(), extension.c_str()))
             {
-                if ((m_exts[i].capabilities & capabilities) == capabilities
-                    || capabilities == AnyCapability)
+                if ((m_exts[i].capabilities & capabilities) == capabilities || capabilities == AnyCapability)
                 {
                     return true;
                 }
@@ -535,70 +472,40 @@ namespace TwkMovie
         TWK_THROW_STREAM(IOException, "getMovieInfo not implemented");
     }
 
-    bool MovieIO::getBoolAttribute(const std::string& name) const
-    {
-        return m_boolMap[name];
-    }
+    bool MovieIO::getBoolAttribute(const std::string& name) const { return m_boolMap[name]; }
 
-    void MovieIO::setBoolAttribute(const std::string& name, bool value)
-    {
-        m_boolMap[name] = value;
-    }
+    void MovieIO::setBoolAttribute(const std::string& name, bool value) { m_boolMap[name] = value; }
 
-    int MovieIO::getIntAttribute(const std::string& name) const
-    {
-        return m_intMap[name];
-    }
+    int MovieIO::getIntAttribute(const std::string& name) const { return m_intMap[name]; }
 
-    void MovieIO::setIntAttribute(const std::string& name, int value)
-    {
-        m_intMap[name] = value;
-    }
+    void MovieIO::setIntAttribute(const std::string& name, int value) { m_intMap[name] = value; }
 
-    string MovieIO::getStringAttribute(const std::string& name) const
-    {
-        return m_stringMap[name];
-    }
+    string MovieIO::getStringAttribute(const std::string& name) const { return m_stringMap[name]; }
 
-    void MovieIO::setStringAttribute(const std::string& name,
-                                     const std::string& value)
-    {
-        m_stringMap[name] = value;
-    }
+    void MovieIO::setStringAttribute(const std::string& name, const std::string& value) { m_stringMap[name] = value; }
 
-    double MovieIO::getDoubleAttribute(const std::string& name) const
-    {
-        return m_doubleMap[name];
-    }
+    double MovieIO::getDoubleAttribute(const std::string& name) const { return m_doubleMap[name]; }
 
-    void MovieIO::setDoubleAttribute(const std::string& name,
-                                     double value) const
-    {
-        m_doubleMap[name] = value;
-    }
+    void MovieIO::setDoubleAttribute(const std::string& name, double value) const { m_doubleMap[name] = value; }
 
     void MovieIO::setMovieAttributesOn(Movie* mov) const
     {
-        for (BoolMap::const_iterator i = m_boolMap.begin();
-             i != m_boolMap.end(); ++i)
+        for (BoolMap::const_iterator i = m_boolMap.begin(); i != m_boolMap.end(); ++i)
         {
             mov->setBoolAttribute((*i).first, (*i).second);
         }
 
-        for (IntMap::const_iterator i = m_intMap.begin(); i != m_intMap.end();
-             ++i)
+        for (IntMap::const_iterator i = m_intMap.begin(); i != m_intMap.end(); ++i)
         {
             mov->setIntAttribute((*i).first, (*i).second);
         }
 
-        for (StringMap::const_iterator i = m_stringMap.begin();
-             i != m_stringMap.end(); ++i)
+        for (StringMap::const_iterator i = m_stringMap.begin(); i != m_stringMap.end(); ++i)
         {
             mov->setStringAttribute((*i).first, (*i).second);
         }
 
-        for (DoubleMap::const_iterator i = m_doubleMap.begin();
-             i != m_doubleMap.end(); ++i)
+        for (DoubleMap::const_iterator i = m_doubleMap.begin(); i != m_doubleMap.end(); ++i)
         {
             mov->setDoubleAttribute((*i).first, (*i).second);
         }
@@ -642,8 +549,7 @@ namespace TwkMovie
 
         if (m_plugins)
         {
-            for (Plugins::iterator i = plugins().begin(); i != plugins().end();
-                 ++i)
+            for (Plugins::iterator i = plugins().begin(); i != plugins().end(); ++i)
             {
                 delete *i;
             }
@@ -663,10 +569,7 @@ namespace TwkMovie
 
     bool GenericIO::dnxhdDecodingAllowed() { return m_dnxhdDecodingAllowed; }
 
-    void GenericIO::setDnxhdDecodingAllowed(bool b)
-    {
-        m_dnxhdDecodingAllowed = b;
-    }
+    void GenericIO::setDnxhdDecodingAllowed(bool b) { m_dnxhdDecodingAllowed = b; }
 
     GenericIO::Plugins& GenericIO::plugins()
     {
@@ -707,8 +610,7 @@ namespace TwkMovie
         {
             create_t* plugCreate = (create_t*)dlsym(handle, "create");
             destroy_t* plugDestroy = (destroy_t*)dlsym(handle, "destroy");
-            codecIsAllowed_t* plugCodecIsAllowed =
-                (codecIsAllowed_t*)dlsym(handle, "codecIsAllowed");
+            codecIsAllowed_t* plugCodecIsAllowed = (codecIsAllowed_t*)dlsym(handle, "codecIsAllowed");
 
             if (!plugCreate)
             {
@@ -723,9 +625,7 @@ namespace TwkMovie
             {
                 dlclose(handle);
 
-                cerr << "ERROR: ignoring movie plugin " << file
-                     << ": missing create() or destroy(): " << dlerror()
-                     << endl;
+                cerr << "ERROR: ignoring movie plugin " << file << ": missing create() or destroy(): " << dlerror() << endl;
             }
             else
             {
@@ -738,20 +638,17 @@ namespace TwkMovie
 
                         if (TwkMovie_GenericIO_debug)
                         {
-                            cerr << "INFO: plugin loaded: " << file << " ID "
-                                 << plugin->identifier() << ", description '"
+                            cerr << "INFO: plugin loaded: " << file << " ID " << plugin->identifier() << ", description '"
                                  << plugin->about() << "'" << endl;
 
                             //
                             //  Check for _ARGS-style args env var
                             //
                             string var = plugin->identifier();
-                            transform(var.begin(), var.end(), var.begin(),
-                                      (int (*)(int))toupper);
+                            transform(var.begin(), var.end(), var.begin(), (int (*)(int))toupper);
                             var = var + "_ARGS";
                             if (getenv(var.c_str()))
-                                cerr << "INFO: " << var << ": "
-                                     << getenv(var.c_str()) << endl;
+                                cerr << "INFO: " << var << ": " << getenv(var.c_str()) << endl;
                         }
 
                         return plugin;
@@ -759,8 +656,7 @@ namespace TwkMovie
                 }
                 catch (...)
                 {
-                    cerr << "WARNING: exception thrown while creating plugin "
-                         << file << ", ignoring" << endl;
+                    cerr << "WARNING: exception thrown while creating plugin " << file << ", ignoring" << endl;
 
                     dlclose(handle);
                 }
@@ -768,8 +664,7 @@ namespace TwkMovie
         }
         else
         {
-            cerr << "ERROR: cannot open movie plugin " << file << ": "
-                 << dlerror() << endl;
+            cerr << "ERROR: cannot open movie plugin " << file << ": " << dlerror() << endl;
         }
 
         return 0;
@@ -829,8 +724,7 @@ namespace TwkMovie
         }
         else
         {
-            cout << "WARNING: " << pio->pathToPlugin() << " failed to load"
-                 << endl;
+            cout << "WARNING: " << pio->pathToPlugin() << " failed to load" << endl;
 
             plugins().erase(i);
             delete pio;
@@ -886,8 +780,7 @@ namespace TwkMovie
         return QTnotInPath;
     }
 
-    const MovieIO* GenericIO::findByExtension(const string& extension,
-                                              unsigned int capabilities)
+    const MovieIO* GenericIO::findByExtension(const string& extension, unsigned int capabilities)
     {
         if (!plugins().empty())
         {
@@ -896,8 +789,7 @@ namespace TwkMovie
             {
                 restart = false;
 
-                for (Plugins::iterator i = plugins().begin();
-                     i != plugins().end(); ++i)
+                for (Plugins::iterator i = plugins().begin(); i != plugins().end(); ++i)
                 {
                     MovieIO* io = *i;
 
@@ -907,9 +799,7 @@ namespace TwkMovie
                         {
                             if (TwkMovie_GenericIO_debug)
                             {
-                                cout << "INFO: " << extension
-                                     << " supported by plugin "
-                                     << basename(pio->pathToPlugin()) << endl;
+                                cout << "INFO: " << extension << " supported by plugin " << basename(pio->pathToPlugin()) << endl;
                             }
 
                             if ((io = loadFromProxy(i)))
@@ -934,9 +824,7 @@ namespace TwkMovie
         return NULL;
     }
 
-    int GenericIO::findAllByExtension(const string& extension,
-                                      unsigned int capabilities,
-                                      MovieIOSet& ioSet)
+    int GenericIO::findAllByExtension(const string& extension, unsigned int capabilities, MovieIOSet& ioSet)
     {
         ioSet.clear();
 
@@ -947,8 +835,7 @@ namespace TwkMovie
             {
                 restart = false;
 
-                for (Plugins::iterator i = plugins().begin();
-                     i != plugins().end(); ++i)
+                for (Plugins::iterator i = plugins().begin(); i != plugins().end(); ++i)
                 {
                     MovieIO* io = *i;
 
@@ -958,9 +845,7 @@ namespace TwkMovie
                         {
                             if (TwkMovie_GenericIO_debug)
                             {
-                                cout << "INFO: " << extension
-                                     << " supported by plugin "
-                                     << basename(pio->pathToPlugin()) << endl;
+                                cout << "INFO: " << extension << " supported by plugin " << basename(pio->pathToPlugin()) << endl;
                             }
 
                             if ((io = loadFromProxy(i)))
@@ -982,25 +867,21 @@ namespace TwkMovie
         return ioSet.size();
     }
 
-    const MovieIO* GenericIO::findByBruteForce(const std::string& filename,
-                                               unsigned int capabilities)
+    const MovieIO* GenericIO::findByBruteForce(const std::string& filename, unsigned int capabilities)
     {
         if (!plugins().empty())
         {
-            cerr << "INFO: trying brute force to find an image reader for "
-                 << basename(filename) << endl;
+            cerr << "INFO: trying brute force to find an image reader for " << basename(filename) << endl;
 
             std::lock_guard<std::mutex> guard(plugin_mutex);
             for (bool restart = true; restart;)
             {
                 restart = false;
 
-                for (Plugins::iterator i = plugins().begin();
-                     i != plugins().end(); ++i)
+                for (Plugins::iterator i = plugins().begin(); i != plugins().end(); ++i)
                 {
 #if defined(PLATFORM_WINDOWS) && defined(ARCH_IA32)
-                    if ((*i)->identifier() == "Apple Quicktime"
-                        && QTmissing(false))
+                    if ((*i)->identifier() == "Apple Quicktime" && QTmissing(false))
                         continue;
 #endif
 
@@ -1019,9 +900,7 @@ namespace TwkMovie
 
                             (*i)->getMovieInfo(filename, info);
 
-                            cerr << "INFO: " << basename(filename)
-                                 << " is being read by: " << (*i)->about()
-                                 << endl;
+                            cerr << "INFO: " << basename(filename) << " is being read by: " << (*i)->about() << endl;
 
                             return (*i);
                         }
@@ -1036,8 +915,7 @@ namespace TwkMovie
         return NULL;
     }
 
-    MovieReader* GenericIO::movieReader(const std::string& filename,
-                                        bool tryBruteForce)
+    MovieReader* GenericIO::movieReader(const std::string& filename, bool tryBruteForce)
     {
         unsigned int image = MovieIO::MovieRead;
         unsigned int audio = MovieIO::MovieReadAudio;
@@ -1094,15 +972,13 @@ namespace TwkMovie
                 {
                     struct rlimit rlim;
                     getrlimit(RLIMIT_NOFILE, &rlim);
-                    TWK_THROW_EXC_STREAM(
-                        "ERROR: Failed to open for reading: "
-                        << filename << endl
-                        << "    The per-process limit on open files ("
-                        << rlim.rlim_cur << ") has" << endl
-                        << "    been reached.  To open a larger number of "
-                           "media files, speak to your"
-                        << endl
-                        << "    IT person about increasing that limit.");
+                    TWK_THROW_EXC_STREAM("ERROR: Failed to open for reading: " << filename << endl
+                                                                               << "    The per-process limit on open files ("
+                                                                               << rlim.rlim_cur << ") has" << endl
+                                                                               << "    been reached.  To open a larger number of "
+                                                                                  "media files, speak to your"
+                                                                               << endl
+                                                                               << "    IT person about increasing that limit.");
                 }
             }
             else
@@ -1114,9 +990,7 @@ namespace TwkMovie
             return true;
         }
 
-        MovieReader* preloadTryOpen(const MovieIO* io,
-                                    const std::string& filename,
-                                    const Movie::ReadRequest& request)
+        MovieReader* preloadTryOpen(const MovieIO* io, const std::string& filename, const Movie::ReadRequest& request)
         {
             //  cerr << "tryOpen '" << filename << "' with '" << io->about() <<
             //  "'" << endl;
@@ -1138,9 +1012,7 @@ namespace TwkMovie
                     m = 0;
                     if (TwkMovie_GenericIO_debug)
                     {
-                        cerr << "WARNING: " << io->identifier()
-                             << " failed to open " << filename << ": "
-                             << exc.what() << endl;
+                        cerr << "WARNING: " << io->identifier() << " failed to open " << filename << ": " << exc.what() << endl;
                     }
                 }
                 catch (...)
@@ -1151,8 +1023,7 @@ namespace TwkMovie
                     m = 0;
                     if (TwkMovie_GenericIO_debug)
                     {
-                        cerr << "WARNING: " << io->identifier()
-                             << " failed to open " << filename << endl;
+                        cerr << "WARNING: " << io->identifier() << " failed to open " << filename << endl;
                     }
                 }
             }
@@ -1163,8 +1034,7 @@ namespace TwkMovie
             return m;
         }
 
-        MovieReader* tryOpen(const MovieIO* io, const std::string& filename,
-                             const MovieInfo& mi, Movie::ReadRequest request)
+        MovieReader* tryOpen(const MovieIO* io, const std::string& filename, const MovieInfo& mi, Movie::ReadRequest request)
         {
             //  cerr << "tryOpen '" << filename << "' with '" << io->about() <<
             //  "'" << endl;
@@ -1186,9 +1056,7 @@ namespace TwkMovie
                     m = 0;
                     if (TwkMovie_GenericIO_debug)
                     {
-                        cerr << "WARNING: " << io->identifier()
-                             << " failed to open " << filename << ": "
-                             << exc.what() << endl;
+                        cerr << "WARNING: " << io->identifier() << " failed to open " << filename << ": " << exc.what() << endl;
                     }
                 }
                 catch (...)
@@ -1199,8 +1067,7 @@ namespace TwkMovie
                     m = 0;
                     if (TwkMovie_GenericIO_debug)
                     {
-                        cerr << "WARNING: " << io->identifier()
-                             << " failed to open " << filename << endl;
+                        cerr << "WARNING: " << io->identifier() << " failed to open " << filename << endl;
                     }
                 }
             }
@@ -1213,10 +1080,7 @@ namespace TwkMovie
 
     }; // namespace
 
-    MovieReader*
-    GenericIO::preloadOpenMovieReader(const std::string& filename,
-                                      const Movie::ReadRequest& request,
-                                      bool tryBruteForce)
+    MovieReader* GenericIO::preloadOpenMovieReader(const std::string& filename, const Movie::ReadRequest& request, bool tryBruteForce)
     {
         //
         // This method is really similar to openMoviePlayer, except that
@@ -1237,22 +1101,17 @@ namespace TwkMovie
 
         MovieReader* m = 0;
         MovieIOSet ioSet;
-        if (findAllByExtension(ext, image | audio, ioSet)
-            || findAllByExtension(ext, image, ioSet)
-            || findAllByExtension(ext, audio, ioSet))
+        if (findAllByExtension(ext, image | audio, ioSet) || findAllByExtension(ext, image, ioSet) || findAllByExtension(ext, audio, ioSet))
         {
-            for (MovieIOSet::iterator mio = ioSet.begin(); mio != ioSet.end();
-                 ++mio)
+            for (MovieIOSet::iterator mio = ioSet.begin(); mio != ioSet.end(); ++mio)
             {
                 if ((m = preloadTryOpen(*mio, filename, request)))
                     return m;
             }
         }
-        else if (TwkUtil::pathIsURL(filename)
-                 && findAllByExtension("mov", image | audio, ioSet))
+        else if (TwkUtil::pathIsURL(filename) && findAllByExtension("mov", image | audio, ioSet))
         {
-            for (MovieIOSet::iterator mio = ioSet.begin(); mio != ioSet.end();
-                 ++mio)
+            for (MovieIOSet::iterator mio = ioSet.begin(); mio != ioSet.end(); ++mio)
             {
                 if ((m = preloadTryOpen(*mio, filename, request)))
                     return m;
@@ -1261,8 +1120,7 @@ namespace TwkMovie
         else if (tryBruteForce)
         {
             const MovieIO* io;
-            if (((io = findByBruteForce(filename, image | audio)))
-                || ((io = findByBruteForce(filename, image)))
+            if (((io = findByBruteForce(filename, image | audio))) || ((io = findByBruteForce(filename, image)))
                 || ((io = findByBruteForce(filename, audio))))
             {
                 if ((m = preloadTryOpen(io, filename, request)))
@@ -1275,9 +1133,7 @@ namespace TwkMovie
 
     GenericIO::Preloader& GenericIO::getPreloader() { return m_preloader; }
 
-    MovieReader* GenericIO::openMovieReader(const std::string& filename,
-                                            const MovieInfo& mi,
-                                            Movie::ReadRequest& request,
+    MovieReader* GenericIO::openMovieReader(const std::string& filename, const MovieInfo& mi, Movie::ReadRequest& request,
                                             bool tryBruteForce)
     {
         MovieReader* m = 0;
@@ -1297,23 +1153,18 @@ namespace TwkMovie
             ext = basename(filename); // Try filename if there is no ext
 
         MovieIOSet ioSet;
-        if (findAllByExtension(ext, image | audio, ioSet)
-            || findAllByExtension(ext, image, ioSet)
-            || findAllByExtension(ext, audio, ioSet))
+        if (findAllByExtension(ext, image | audio, ioSet) || findAllByExtension(ext, image, ioSet) || findAllByExtension(ext, audio, ioSet))
         {
-            for (MovieIOSet::iterator mio = ioSet.begin(); mio != ioSet.end();
-                 ++mio)
+            for (MovieIOSet::iterator mio = ioSet.begin(); mio != ioSet.end(); ++mio)
             {
                 MovieInfo infoCopy = mi;
                 if ((m = tryOpen(*mio, filename, infoCopy, request)))
                     return m;
             }
         }
-        else if (TwkUtil::pathIsURL(filename)
-                 && findAllByExtension("mov", image | audio, ioSet))
+        else if (TwkUtil::pathIsURL(filename) && findAllByExtension("mov", image | audio, ioSet))
         {
-            for (MovieIOSet::iterator mio = ioSet.begin(); mio != ioSet.end();
-                 ++mio)
+            for (MovieIOSet::iterator mio = ioSet.begin(); mio != ioSet.end(); ++mio)
             {
                 MovieInfo infoCopy = mi;
                 if ((m = tryOpen(*mio, filename, infoCopy, request)))
@@ -1323,8 +1174,7 @@ namespace TwkMovie
         else if (tryBruteForce)
         {
             const MovieIO* io;
-            if ((io = findByBruteForce(filename, image | audio))
-                || (io = findByBruteForce(filename, image))
+            if ((io = findByBruteForce(filename, image | audio)) || (io = findByBruteForce(filename, image))
                 || (io = findByBruteForce(filename, audio)))
             {
                 if ((m = tryOpen(io, filename, mi, request)))
@@ -1354,14 +1204,12 @@ namespace TwkMovie
             return io->movieWriter();
         }
 
-        cerr << "ERROR: TwkMovie: No plugins support (write) format: " << ext
-             << endl;
+        cerr << "ERROR: TwkMovie: No plugins support (write) format: " << ext << endl;
 
         return 0;
     }
 
-    void GenericIO::outputParameters(const MovieIO::ParameterVector& params,
-                                     const string& codec, const string& header)
+    void GenericIO::outputParameters(const MovieIO::ParameterVector& params, const string& codec, const string& header)
     {
         int count = 0;
 
@@ -1374,8 +1222,7 @@ namespace TwkMovie
                     cout << "         " << header << endl;
                 }
 
-                cout << "            " << params[j].name << " "
-                     << params[j].description << endl;
+                cout << "            " << params[j].name << " " << params[j].description << endl;
 
                 count++;
             }
@@ -1395,13 +1242,10 @@ namespace TwkMovie
                 const MovieIO::MovieTypeInfo& info = exts[q];
 
                 cout << "format \"" << info.extension << "\""
-                     << " - " << info.description << " ("
-                     << info.capabilitiesAsString() << ")" << endl;
+                     << " - " << info.description << " (" << info.capabilitiesAsString() << ")" << endl;
 
-                outputParameters(info.encodeParameters, "",
-                                 "encode parameters");
-                outputParameters(info.decodeParameters, "",
-                                 "decode parameters");
+                outputParameters(info.encodeParameters, "", "encode parameters");
+                outputParameters(info.decodeParameters, "", "decode parameters");
 
                 if (info.codecs.size())
                 {
@@ -1418,13 +1262,9 @@ namespace TwkMovie
 
                         cout << endl;
 
-                        outputParameters(info.encodeParameters,
-                                         info.codecs[j].first,
-                                         "encode parameters");
+                        outputParameters(info.encodeParameters, info.codecs[j].first, "encode parameters");
 
-                        outputParameters(info.decodeParameters,
-                                         info.codecs[j].first,
-                                         "decode parameters");
+                        outputParameters(info.decodeParameters, info.codecs[j].first, "decode parameters");
                     }
 
                     cout << endl;
@@ -1445,13 +1285,9 @@ namespace TwkMovie
 
                         cout << endl;
 
-                        outputParameters(info.encodeParameters,
-                                         info.audioCodecs[j].first,
-                                         "encode parameters");
+                        outputParameters(info.encodeParameters, info.audioCodecs[j].first, "encode parameters");
 
-                        outputParameters(info.decodeParameters,
-                                         info.audioCodecs[j].first,
-                                         "decode parameters");
+                        outputParameters(info.decodeParameters, info.audioCodecs[j].first, "decode parameters");
                     }
 
                     cout << endl;

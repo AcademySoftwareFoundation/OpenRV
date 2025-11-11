@@ -42,8 +42,7 @@ namespace Mu
         //  Constructors
         //
 
-        QStackedWidgetType(Context* context, const char* name,
-                           Class* superClass = 0, Class* superClass2 = 0);
+        QStackedWidgetType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QStackedWidgetType();
 
@@ -66,8 +65,7 @@ namespace Mu
     {
     public:
         virtual ~MuQt_QStackedWidget();
-        MuQt_QStackedWidget(Pointer muobj, const CallEnvironment*,
-                            QWidget* parent);
+        MuQt_QStackedWidget(Pointer muobj, const CallEnvironment*, QWidget* parent);
 
     protected:
         virtual bool event(QEvent* e);
@@ -86,17 +84,11 @@ namespace Mu
 
         void changeEvent_pub(QEvent* ev) { changeEvent(ev); }
 
-        void changeEvent_pub_parent(QEvent* ev)
-        {
-            QStackedWidget::changeEvent(ev);
-        }
+        void changeEvent_pub_parent(QEvent* ev) { QStackedWidget::changeEvent(ev); }
 
         void paintEvent_pub(QPaintEvent* _p14) { paintEvent(_p14); }
 
-        void paintEvent_pub_parent(QPaintEvent* _p14)
-        {
-            QStackedWidget::paintEvent(_p14);
-        }
+        void paintEvent_pub_parent(QPaintEvent* _p14) { QStackedWidget::paintEvent(_p14); }
 
     public:
         const QStackedWidgetType* _baseType;
@@ -104,11 +96,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance*
-    QStackedWidgetType::cachedInstance(const QStackedWidgetType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QStackedWidgetType::cachedInstance(const QStackedWidgetType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

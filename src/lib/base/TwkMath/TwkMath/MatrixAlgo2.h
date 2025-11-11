@@ -24,9 +24,7 @@ namespace TwkMath
     //  B == vector< Vec3<T> > points that are A transfomed
     //
 
-    template <typename T>
-    Mat44<T> multiplyAsHomogeneous(const std::vector<Vec3<T>>& A,
-                                   const std::vector<Vec3<T>>& B)
+    template <typename T> Mat44<T> multiplyAsHomogeneous(const std::vector<Vec3<T>>& A, const std::vector<Vec3<T>>& B)
     {
         Mat44<T> M;
 
@@ -56,9 +54,7 @@ namespace TwkMath
     //  A = M * B
     //
 
-    template <typename T>
-    Mat44<T> LeastSquaredFitTransform(const std::vector<Vec3<T>>& A,
-                                      const std::vector<Vec3<T>>& B)
+    template <typename T> Mat44<T> LeastSquaredFitTransform(const std::vector<Vec3<T>>& A, const std::vector<Vec3<T>>& B)
     {
         //       T   -1
         // B A (A  A)   == M
@@ -84,9 +80,8 @@ namespace TwkMath
         const T e = P(2, 2);
         const T h = P(2, 3);
 
-        return Frustum<T>(-((g + T(1)) / a), -((g - T(1)) / a),
-                          -((d + T(1)) / c), -((d - T(1)) / c),
-                          -((-h - T(1)) / e), -((T(1) - h) / e), true);
+        return Frustum<T>(-((g + T(1)) / a), -((g - T(1)) / a), -((d + T(1)) / c), -((d - T(1)) / c), -((-h - T(1)) / e), -((T(1) - h) / e),
+                          true);
     }
 
 } // namespace TwkMath

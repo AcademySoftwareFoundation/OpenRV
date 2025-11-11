@@ -78,16 +78,14 @@ namespace Mu
         _baseType = 0;
     }
 
-    MuQt_QMainWindow::MuQt_QMainWindow(Pointer muobj, const CallEnvironment* ce,
-                                       QWidget* parent, Qt::WindowFlags flags)
+    MuQt_QMainWindow::MuQt_QMainWindow(Pointer muobj, const CallEnvironment* ce, QWidget* parent, Qt::WindowFlags flags)
         : QMainWindow(parent, flags)
     {
         _env = ce;
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QMainWindowType>(
-            c->internName("qt.QMainWindow"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QMainWindowType>(c->internName("qt.QMainWindow"));
     }
 
     QMenu* MuQt_QMainWindow::createPopupMenu()
@@ -124,8 +122,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqpointer<QContextMenuEventType>(
-                c, event, "qt.QContextMenuEvent"));
+            args[1] = Value(makeqpointer<QContextMenuEventType>(c, event, "qt.QContextMenuEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -196,8 +193,7 @@ namespace Mu
         }
     }
 
-    QVariant
-    MuQt_QMainWindow::inputMethodQuery(Qt::InputMethodQuery query) const
+    QVariant MuQt_QMainWindow::inputMethodQuery(Qt::InputMethodQuery query) const
     {
         if (!_env)
             return QMainWindow::inputMethodQuery(query);
@@ -295,8 +291,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QCloseEventType>(c, event, "qt.QCloseEvent"));
+            args[1] = Value(makeqpointer<QCloseEventType>(c, event, "qt.QCloseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -319,8 +314,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqpointer<QDragEnterEventType>(
-                c, event, "qt.QDragEnterEvent"));
+            args[1] = Value(makeqpointer<QDragEnterEventType>(c, event, "qt.QDragEnterEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -343,8 +337,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqpointer<QDragLeaveEventType>(
-                c, event, "qt.QDragLeaveEvent"));
+            args[1] = Value(makeqpointer<QDragLeaveEventType>(c, event, "qt.QDragLeaveEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -367,8 +360,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqpointer<QDragMoveEventType>(
-                c, event, "qt.QDragMoveEvent"));
+            args[1] = Value(makeqpointer<QDragMoveEventType>(c, event, "qt.QDragMoveEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -391,8 +383,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QDropEventType>(c, event, "qt.QDropEvent"));
+            args[1] = Value(makeqpointer<QDropEventType>(c, event, "qt.QDropEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -438,8 +429,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QFocusEventType>(c, event, "qt.QFocusEvent"));
+            args[1] = Value(makeqpointer<QFocusEventType>(c, event, "qt.QFocusEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -483,8 +473,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QFocusEventType>(c, event, "qt.QFocusEvent"));
+            args[1] = Value(makeqpointer<QFocusEventType>(c, event, "qt.QFocusEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -507,8 +496,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QHideEventType>(c, event, "qt.QHideEvent"));
+            args[1] = Value(makeqpointer<QHideEventType>(c, event, "qt.QHideEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -531,8 +519,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QKeyEventType>(c, event, "qt.QKeyEvent"));
+            args[1] = Value(makeqpointer<QKeyEventType>(c, event, "qt.QKeyEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -555,8 +542,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QKeyEventType>(c, event, "qt.QKeyEvent"));
+            args[1] = Value(makeqpointer<QKeyEventType>(c, event, "qt.QKeyEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -602,8 +588,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -626,8 +611,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -650,8 +634,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -674,8 +657,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -698,8 +680,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QMoveEventType>(c, event, "qt.QMoveEvent"));
+            args[1] = Value(makeqpointer<QMoveEventType>(c, event, "qt.QMoveEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -722,8 +703,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QPaintEventType>(c, event, "qt.QPaintEvent"));
+            args[1] = Value(makeqpointer<QPaintEventType>(c, event, "qt.QPaintEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -746,8 +726,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QResizeEventType>(c, event, "qt.QResizeEvent"));
+            args[1] = Value(makeqpointer<QResizeEventType>(c, event, "qt.QResizeEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -770,8 +749,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QShowEventType>(c, event, "qt.QShowEvent"));
+            args[1] = Value(makeqpointer<QShowEventType>(c, event, "qt.QShowEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -794,8 +772,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QTabletEventType>(c, event, "qt.QTabletEvent"));
+            args[1] = Value(makeqpointer<QTabletEventType>(c, event, "qt.QTabletEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -818,8 +795,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QWheelEventType>(c, event, "qt.QWheelEvent"));
+            args[1] = Value(makeqpointer<QWheelEventType>(c, event, "qt.QWheelEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -852,8 +828,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  Mu Type CONSTRUCTORS
 
-    QMainWindowType::QMainWindowType(Context* c, const char* name, Class* super,
-                                     Class* super2)
+    QMainWindowType::QMainWindowType(Context* c, const char* name, Class* super, Class* super2)
         : Class(c, name, vectorOf2(super, super2))
     {
     }
@@ -863,8 +838,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    static Pointer QMainWindow_QMainWindow_QObject(Thread& NODE_THREAD,
-                                                   Pointer obj)
+    static Pointer QMainWindow_QMainWindow_QObject(Thread& NODE_THREAD, Pointer obj)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         ClassInstance* widget = reinterpret_cast<ClassInstance*>(obj);
@@ -875,9 +849,7 @@ namespace Mu
         }
         else if (QMainWindow* w = object<QMainWindow>(widget))
         {
-            QMainWindowType* type =
-                c->findSymbolOfTypeByQualifiedName<QMainWindowType>(
-                    c->internName("qt.QMainWindow"), false);
+            QMainWindowType* type = c->findSymbolOfTypeByQualifiedName<QMainWindowType>(c->internName("qt.QMainWindow"), false);
             ClassInstance* o = ClassInstance::allocate(type);
             setobject(o, w);
             return o;
@@ -888,28 +860,20 @@ namespace Mu
         }
     }
 
-    static NODE_IMPLEMENTATION(castFromObject, Pointer)
-    {
-        NODE_RETURN(
-            QMainWindow_QMainWindow_QObject(NODE_THREAD, NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(castFromObject, Pointer) { NODE_RETURN(QMainWindow_QMainWindow_QObject(NODE_THREAD, NODE_ARG(0, Pointer))); }
 
-    Pointer qt_QMainWindow_QMainWindow_QMainWindow_QMainWindow_QWidget_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent,
-        int param_flags)
+    Pointer qt_QMainWindow_QMainWindow_QMainWindow_QMainWindow_QWidget_int(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                           Pointer param_parent, int param_flags)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWidget* arg1 = object<QWidget>(param_parent);
         Qt::WindowFlags arg2 = (Qt::WindowFlags)(param_flags);
-        setobject(param_this, new MuQt_QMainWindow(
-                                  param_this, NODE_THREAD.process()->callEnv(),
-                                  arg1, arg2));
+        setobject(param_this, new MuQt_QMainWindow(param_this, NODE_THREAD.process()->callEnv(), arg1, arg2));
         return param_this;
     }
 
-    void qt_QMainWindow_addDockWidget_void_QMainWindow_int_QDockWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_area,
-        Pointer param_dockwidget)
+    void qt_QMainWindow_addDockWidget_void_QMainWindow_int_QDockWidget(Mu::Thread& NODE_THREAD, Pointer param_this, int param_area,
+                                                                       Pointer param_dockwidget)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMainWindow* arg0 = object<QMainWindow>(param_this);
@@ -918,9 +882,8 @@ namespace Mu
         arg0->addDockWidget(arg1, arg2);
     }
 
-    void qt_QMainWindow_addDockWidget_void_QMainWindow_int_QDockWidget_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_area,
-        Pointer param_dockwidget, int param_orientation)
+    void qt_QMainWindow_addDockWidget_void_QMainWindow_int_QDockWidget_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_area,
+                                                                           Pointer param_dockwidget, int param_orientation)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMainWindow* arg0 = object<QMainWindow>(param_this);
@@ -930,9 +893,8 @@ namespace Mu
         arg0->addDockWidget(arg1, arg2, arg3);
     }
 
-    void qt_QMainWindow_addToolBar_void_QMainWindow_int_QToolBar(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_area,
-        Pointer param_toolbar)
+    void qt_QMainWindow_addToolBar_void_QMainWindow_int_QToolBar(Mu::Thread& NODE_THREAD, Pointer param_this, int param_area,
+                                                                 Pointer param_toolbar)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMainWindow* arg0 = object<QMainWindow>(param_this);
@@ -941,8 +903,7 @@ namespace Mu
         arg0->addToolBar(arg1, arg2);
     }
 
-    void qt_QMainWindow_addToolBar_void_QMainWindow_QToolBar(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_toolbar)
+    void qt_QMainWindow_addToolBar_void_QMainWindow_QToolBar(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_toolbar)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMainWindow* arg0 = object<QMainWindow>(param_this);
@@ -950,18 +911,15 @@ namespace Mu
         arg0->addToolBar(arg1);
     }
 
-    Pointer qt_QMainWindow_addToolBar_QToolBar_QMainWindow_string(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_title)
+    Pointer qt_QMainWindow_addToolBar_QToolBar_QMainWindow_string(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_title)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMainWindow* arg0 = object<QMainWindow>(param_this);
         const QString arg1 = qstring(param_title);
-        return makeinstance<QToolBarType>(c, arg0->addToolBar(arg1),
-                                          "qt.QToolBar");
+        return makeinstance<QToolBarType>(c, arg0->addToolBar(arg1), "qt.QToolBar");
     }
 
-    void qt_QMainWindow_addToolBarBreak_void_QMainWindow_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_area)
+    void qt_QMainWindow_addToolBarBreak_void_QMainWindow_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_area)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMainWindow* arg0 = object<QMainWindow>(param_this);
@@ -969,19 +927,14 @@ namespace Mu
         arg0->addToolBarBreak(arg1);
     }
 
-    Pointer
-    qt_QMainWindow_centralWidget_QWidget_QMainWindow(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_this)
+    Pointer qt_QMainWindow_centralWidget_QWidget_QMainWindow(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMainWindow* arg0 = object<QMainWindow>(param_this);
-        return makeinstance<QWidgetType>(c, arg0->centralWidget(),
-                                         "qt.QWidget");
+        return makeinstance<QWidgetType>(c, arg0->centralWidget(), "qt.QWidget");
     }
 
-    int qt_QMainWindow_corner_int_QMainWindow_int(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this,
-                                                  int param_corner_)
+    int qt_QMainWindow_corner_int_QMainWindow_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_corner_)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMainWindow* arg0 = object<QMainWindow>(param_this);
@@ -989,21 +942,15 @@ namespace Mu
         return int(arg0->corner(arg1));
     }
 
-    Pointer
-    qt_QMainWindow_createPopupMenu_QMenu_QMainWindow(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_this)
+    Pointer qt_QMainWindow_createPopupMenu_QMenu_QMainWindow(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMainWindow* arg0 = object<QMainWindow>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeinstance<QMenuType>(
-                         c, arg0->QMainWindow::createPopupMenu(), "qt.QMenu")
-                   : makeinstance<QMenuType>(c, arg0->createPopupMenu(),
-                                             "qt.QMenu");
+        return isMuQtObject(arg0) ? makeinstance<QMenuType>(c, arg0->QMainWindow::createPopupMenu(), "qt.QMenu")
+                                  : makeinstance<QMenuType>(c, arg0->createPopupMenu(), "qt.QMenu");
     }
 
-    int qt_QMainWindow_dockWidgetArea_int_QMainWindow_QDockWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_dockwidget)
+    int qt_QMainWindow_dockWidgetArea_int_QMainWindow_QDockWidget(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_dockwidget)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMainWindow* arg0 = object<QMainWindow>(param_this);
@@ -1011,9 +958,8 @@ namespace Mu
         return int(arg0->dockWidgetArea(arg1));
     }
 
-    void qt_QMainWindow_insertToolBar_void_QMainWindow_QToolBar_QToolBar(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_before,
-        Pointer param_toolbar)
+    void qt_QMainWindow_insertToolBar_void_QMainWindow_QToolBar_QToolBar(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_before,
+                                                                         Pointer param_toolbar)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMainWindow* arg0 = object<QMainWindow>(param_this);
@@ -1022,8 +968,7 @@ namespace Mu
         arg0->insertToolBar(arg1, arg2);
     }
 
-    void qt_QMainWindow_insertToolBarBreak_void_QMainWindow_QToolBar(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_before)
+    void qt_QMainWindow_insertToolBarBreak_void_QMainWindow_QToolBar(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_before)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMainWindow* arg0 = object<QMainWindow>(param_this);
@@ -1031,25 +976,21 @@ namespace Mu
         arg0->insertToolBarBreak(arg1);
     }
 
-    Pointer qt_QMainWindow_menuBar_QMenuBar_QMainWindow(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this)
+    Pointer qt_QMainWindow_menuBar_QMenuBar_QMainWindow(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMainWindow* arg0 = object<QMainWindow>(param_this);
         return makeinstance<QMenuBarType>(c, arg0->menuBar(), "qt.QMenuBar");
     }
 
-    Pointer
-    qt_QMainWindow_menuWidget_QWidget_QMainWindow(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this)
+    Pointer qt_QMainWindow_menuWidget_QWidget_QMainWindow(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMainWindow* arg0 = object<QMainWindow>(param_this);
         return makeinstance<QWidgetType>(c, arg0->menuWidget(), "qt.QWidget");
     }
 
-    void qt_QMainWindow_removeDockWidget_void_QMainWindow_QDockWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_dockwidget)
+    void qt_QMainWindow_removeDockWidget_void_QMainWindow_QDockWidget(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_dockwidget)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMainWindow* arg0 = object<QMainWindow>(param_this);
@@ -1057,8 +998,7 @@ namespace Mu
         arg0->removeDockWidget(arg1);
     }
 
-    void qt_QMainWindow_removeToolBar_void_QMainWindow_QToolBar(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_toolbar)
+    void qt_QMainWindow_removeToolBar_void_QMainWindow_QToolBar(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_toolbar)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMainWindow* arg0 = object<QMainWindow>(param_this);
@@ -1066,8 +1006,7 @@ namespace Mu
         arg0->removeToolBar(arg1);
     }
 
-    void qt_QMainWindow_removeToolBarBreak_void_QMainWindow_QToolBar(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_before)
+    void qt_QMainWindow_removeToolBarBreak_void_QMainWindow_QToolBar(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_before)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMainWindow* arg0 = object<QMainWindow>(param_this);
@@ -1075,9 +1014,8 @@ namespace Mu
         arg0->removeToolBarBreak(arg1);
     }
 
-    void qt_QMainWindow_resizeDock_void_QMainWindow_QDockWidget_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_dockwidget,
-        int param_size, int param_orientation)
+    void qt_QMainWindow_resizeDock_void_QMainWindow_QDockWidget_int_int(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                        Pointer param_dockwidget, int param_size, int param_orientation)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMainWindow* arg0 = object<QMainWindow>(param_this);
@@ -1093,8 +1031,8 @@ namespace Mu
         arg0->resizeDocks(dockWidgets, sizes, arg3);
     }
 
-    bool qt_QMainWindow_restoreDockWidget_bool_QMainWindow_QDockWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_dockwidget)
+    bool qt_QMainWindow_restoreDockWidget_bool_QMainWindow_QDockWidget(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                       Pointer param_dockwidget)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMainWindow* arg0 = object<QMainWindow>(param_this);
@@ -1102,9 +1040,8 @@ namespace Mu
         return arg0->restoreDockWidget(arg1);
     }
 
-    bool qt_QMainWindow_restoreState_bool_QMainWindow_QByteArray_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_state,
-        int param_version)
+    bool qt_QMainWindow_restoreState_bool_QMainWindow_QByteArray_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_state,
+                                                                     int param_version)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMainWindow* arg0 = object<QMainWindow>(param_this);
@@ -1113,18 +1050,15 @@ namespace Mu
         return arg0->restoreState(arg1, arg2);
     }
 
-    Pointer qt_QMainWindow_saveState_QByteArray_QMainWindow_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_version)
+    Pointer qt_QMainWindow_saveState_QByteArray_QMainWindow_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_version)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMainWindow* arg0 = object<QMainWindow>(param_this);
         int arg1 = (int)(param_version);
-        return makeqtype<QByteArrayType>(c, arg0->saveState(arg1),
-                                         "qt.QByteArray");
+        return makeqtype<QByteArrayType>(c, arg0->saveState(arg1), "qt.QByteArray");
     }
 
-    void qt_QMainWindow_setCentralWidget_void_QMainWindow_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_widget)
+    void qt_QMainWindow_setCentralWidget_void_QMainWindow_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_widget)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMainWindow* arg0 = object<QMainWindow>(param_this);
@@ -1132,9 +1066,7 @@ namespace Mu
         arg0->setCentralWidget(arg1);
     }
 
-    void qt_QMainWindow_setCorner_void_QMainWindow_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_corner,
-        int param_area)
+    void qt_QMainWindow_setCorner_void_QMainWindow_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_corner, int param_area)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMainWindow* arg0 = object<QMainWindow>(param_this);
@@ -1143,8 +1075,7 @@ namespace Mu
         arg0->setCorner(arg1, arg2);
     }
 
-    void qt_QMainWindow_setMenuBar_void_QMainWindow_QMenuBar(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_menuBar)
+    void qt_QMainWindow_setMenuBar_void_QMainWindow_QMenuBar(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_menuBar)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMainWindow* arg0 = object<QMainWindow>(param_this);
@@ -1152,8 +1083,7 @@ namespace Mu
         arg0->setMenuBar(arg1);
     }
 
-    void qt_QMainWindow_setMenuWidget_void_QMainWindow_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_menuBar)
+    void qt_QMainWindow_setMenuWidget_void_QMainWindow_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_menuBar)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMainWindow* arg0 = object<QMainWindow>(param_this);
@@ -1161,8 +1091,7 @@ namespace Mu
         arg0->setMenuWidget(arg1);
     }
 
-    void qt_QMainWindow_setStatusBar_void_QMainWindow_QStatusBar(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_statusbar)
+    void qt_QMainWindow_setStatusBar_void_QMainWindow_QStatusBar(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_statusbar)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMainWindow* arg0 = object<QMainWindow>(param_this);
@@ -1170,22 +1099,19 @@ namespace Mu
         arg0->setStatusBar(arg1);
     }
 
-    void qt_QMainWindow_setTabPosition_void_QMainWindow_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_areas,
-        int param_tabPosition)
+    void qt_QMainWindow_setTabPosition_void_QMainWindow_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_areas,
+                                                                int param_tabPosition)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMainWindow* arg0 = object<QMainWindow>(param_this);
         Qt::DockWidgetAreas arg1 = (Qt::DockWidgetAreas)(param_areas);
-        QTabWidget::TabPosition arg2 =
-            (QTabWidget::TabPosition)(param_tabPosition);
+        QTabWidget::TabPosition arg2 = (QTabWidget::TabPosition)(param_tabPosition);
         arg0->setTabPosition(arg1, arg2);
     }
 
-    void
-    qt_QMainWindow_splitDockWidget_void_QMainWindow_QDockWidget_QDockWidget_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_first,
-        Pointer param_second, int param_orientation)
+    void qt_QMainWindow_splitDockWidget_void_QMainWindow_QDockWidget_QDockWidget_int(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                     Pointer param_first, Pointer param_second,
+                                                                                     int param_orientation)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMainWindow* arg0 = object<QMainWindow>(param_this);
@@ -1195,19 +1121,14 @@ namespace Mu
         arg0->splitDockWidget(arg1, arg2, arg3);
     }
 
-    Pointer
-    qt_QMainWindow_statusBar_QStatusBar_QMainWindow(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this)
+    Pointer qt_QMainWindow_statusBar_QStatusBar_QMainWindow(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMainWindow* arg0 = object<QMainWindow>(param_this);
-        return makeinstance<QStatusBarType>(c, arg0->statusBar(),
-                                            "qt.QStatusBar");
+        return makeinstance<QStatusBarType>(c, arg0->statusBar(), "qt.QStatusBar");
     }
 
-    int qt_QMainWindow_tabPosition_int_QMainWindow_int(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this,
-                                                       int param_area)
+    int qt_QMainWindow_tabPosition_int_QMainWindow_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_area)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMainWindow* arg0 = object<QMainWindow>(param_this);
@@ -1215,10 +1136,8 @@ namespace Mu
         return int(arg0->tabPosition(arg1));
     }
 
-    void
-    qt_QMainWindow_tabifyDockWidget_void_QMainWindow_QDockWidget_QDockWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_first,
-        Pointer param_second)
+    void qt_QMainWindow_tabifyDockWidget_void_QMainWindow_QDockWidget_QDockWidget(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                  Pointer param_first, Pointer param_second)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMainWindow* arg0 = object<QMainWindow>(param_this);
@@ -1227,17 +1146,14 @@ namespace Mu
         arg0->tabifyDockWidget(arg1, arg2);
     }
 
-    Pointer qt_QMainWindow_takeCentralWidget_QWidget_QMainWindow(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QMainWindow_takeCentralWidget_QWidget_QMainWindow(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMainWindow* arg0 = object<QMainWindow>(param_this);
-        return makeinstance<QWidgetType>(c, arg0->takeCentralWidget(),
-                                         "qt.QWidget");
+        return makeinstance<QWidgetType>(c, arg0->takeCentralWidget(), "qt.QWidget");
     }
 
-    int qt_QMainWindow_toolBarArea_int_QMainWindow_QToolBar(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_toolbar)
+    int qt_QMainWindow_toolBarArea_int_QMainWindow_QToolBar(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_toolbar)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMainWindow* arg0 = object<QMainWindow>(param_this);
@@ -1245,8 +1161,7 @@ namespace Mu
         return int(arg0->toolBarArea(arg1));
     }
 
-    bool qt_QMainWindow_toolBarBreak_bool_QMainWindow_QToolBar(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_toolbar)
+    bool qt_QMainWindow_toolBarBreak_bool_QMainWindow_QToolBar(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_toolbar)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMainWindow* arg0 = object<QMainWindow>(param_this);
@@ -1254,91 +1169,67 @@ namespace Mu
         return arg0->toolBarBreak(arg1);
     }
 
-    void qt_QMainWindow_contextMenuEvent_void_QMainWindow_QContextMenuEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QMainWindow_contextMenuEvent_void_QMainWindow_QContextMenuEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                            Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMainWindow* arg0 = object<QMainWindow>(param_this);
-        QContextMenuEvent* arg1 =
-            getqpointer<QContextMenuEventType>(param_event);
+        QContextMenuEvent* arg1 = getqpointer<QContextMenuEventType>(param_event);
         if (isMuQtObject(arg0))
             ((MuQt_QMainWindow*)arg0)->contextMenuEvent_pub_parent(arg1);
         else
             ((MuQt_QMainWindow*)arg0)->contextMenuEvent_pub(arg1);
     }
 
-    bool qt_QMainWindow_event_bool_QMainWindow_QEvent(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this,
-                                                      Pointer param_event_)
+    bool qt_QMainWindow_event_bool_QMainWindow_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event_)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMainWindow* arg0 = object<QMainWindow>(param_this);
         QEvent* arg1 = getqpointer<QEventType>(param_event_);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QMainWindow*)arg0)->event_pub_parent(arg1)
-                   : ((MuQt_QMainWindow*)arg0)->event_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QMainWindow*)arg0)->event_pub_parent(arg1) : ((MuQt_QMainWindow*)arg0)->event_pub(arg1);
     }
 
-    bool
-    qt_QMainWindow_hasHeightForWidth_bool_QMainWindow(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    bool qt_QMainWindow_hasHeightForWidth_bool_QMainWindow(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMainWindow* arg0 = object<QMainWindow>(param_this);
-        return isMuQtObject(arg0) ? arg0->QMainWindow::hasHeightForWidth()
-                                  : arg0->hasHeightForWidth();
+        return isMuQtObject(arg0) ? arg0->QMainWindow::hasHeightForWidth() : arg0->hasHeightForWidth();
     }
 
-    int qt_QMainWindow_heightForWidth_int_QMainWindow_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_w)
+    int qt_QMainWindow_heightForWidth_int_QMainWindow_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_w)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMainWindow* arg0 = object<QMainWindow>(param_this);
         int arg1 = (int)(param_w);
-        return isMuQtObject(arg0) ? arg0->QMainWindow::heightForWidth(arg1)
-                                  : arg0->heightForWidth(arg1);
+        return isMuQtObject(arg0) ? arg0->QMainWindow::heightForWidth(arg1) : arg0->heightForWidth(arg1);
     }
 
-    Pointer qt_QMainWindow_inputMethodQuery_QVariant_QMainWindow_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_query)
+    Pointer qt_QMainWindow_inputMethodQuery_QVariant_QMainWindow_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_query)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMainWindow* arg0 = object<QMainWindow>(param_this);
         Qt::InputMethodQuery arg1 = (Qt::InputMethodQuery)(param_query);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QVariantType>(
-                         c, arg0->QMainWindow::inputMethodQuery(arg1),
-                         "qt.QVariant")
-                   : makeqtype<QVariantType>(c, arg0->inputMethodQuery(arg1),
-                                             "qt.QVariant");
+        return isMuQtObject(arg0) ? makeqtype<QVariantType>(c, arg0->QMainWindow::inputMethodQuery(arg1), "qt.QVariant")
+                                  : makeqtype<QVariantType>(c, arg0->inputMethodQuery(arg1), "qt.QVariant");
     }
 
-    Pointer
-    qt_QMainWindow_minimumSizeHint_QSize_QMainWindow(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_this)
+    Pointer qt_QMainWindow_minimumSizeHint_QSize_QMainWindow(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMainWindow* arg0 = object<QMainWindow>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QSizeType>(
-                         c, arg0->QMainWindow::minimumSizeHint(), "qt.QSize")
-                   : makeqtype<QSizeType>(c, arg0->minimumSizeHint(),
-                                          "qt.QSize");
+        return isMuQtObject(arg0) ? makeqtype<QSizeType>(c, arg0->QMainWindow::minimumSizeHint(), "qt.QSize")
+                                  : makeqtype<QSizeType>(c, arg0->minimumSizeHint(), "qt.QSize");
     }
 
-    Pointer qt_QMainWindow_sizeHint_QSize_QMainWindow(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    Pointer qt_QMainWindow_sizeHint_QSize_QMainWindow(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMainWindow* arg0 = object<QMainWindow>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QSizeType>(c, arg0->QMainWindow::sizeHint(),
-                                          "qt.QSize")
-                   : makeqtype<QSizeType>(c, arg0->sizeHint(), "qt.QSize");
+        return isMuQtObject(arg0) ? makeqtype<QSizeType>(c, arg0->QMainWindow::sizeHint(), "qt.QSize")
+                                  : makeqtype<QSizeType>(c, arg0->sizeHint(), "qt.QSize");
     }
 
-    void qt_QMainWindow_changeEvent_void_QMainWindow_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QMainWindow_changeEvent_void_QMainWindow_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMainWindow* arg0 = object<QMainWindow>(param_this);
@@ -1349,8 +1240,7 @@ namespace Mu
             ((MuQt_QMainWindow*)arg0)->changeEvent_pub(arg1);
     }
 
-    void qt_QMainWindow_closeEvent_void_QMainWindow_QCloseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QMainWindow_closeEvent_void_QMainWindow_QCloseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMainWindow* arg0 = object<QMainWindow>(param_this);
@@ -1361,8 +1251,7 @@ namespace Mu
             ((MuQt_QMainWindow*)arg0)->closeEvent_pub(arg1);
     }
 
-    void qt_QMainWindow_dragEnterEvent_void_QMainWindow_QDragEnterEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QMainWindow_dragEnterEvent_void_QMainWindow_QDragEnterEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMainWindow* arg0 = object<QMainWindow>(param_this);
@@ -1373,8 +1262,7 @@ namespace Mu
             ((MuQt_QMainWindow*)arg0)->dragEnterEvent_pub(arg1);
     }
 
-    void qt_QMainWindow_dragLeaveEvent_void_QMainWindow_QDragLeaveEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QMainWindow_dragLeaveEvent_void_QMainWindow_QDragLeaveEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMainWindow* arg0 = object<QMainWindow>(param_this);
@@ -1385,8 +1273,7 @@ namespace Mu
             ((MuQt_QMainWindow*)arg0)->dragLeaveEvent_pub(arg1);
     }
 
-    void qt_QMainWindow_dragMoveEvent_void_QMainWindow_QDragMoveEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QMainWindow_dragMoveEvent_void_QMainWindow_QDragMoveEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMainWindow* arg0 = object<QMainWindow>(param_this);
@@ -1397,8 +1284,7 @@ namespace Mu
             ((MuQt_QMainWindow*)arg0)->dragMoveEvent_pub(arg1);
     }
 
-    void qt_QMainWindow_dropEvent_void_QMainWindow_QDropEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QMainWindow_dropEvent_void_QMainWindow_QDropEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMainWindow* arg0 = object<QMainWindow>(param_this);
@@ -1409,8 +1295,7 @@ namespace Mu
             ((MuQt_QMainWindow*)arg0)->dropEvent_pub(arg1);
     }
 
-    void qt_QMainWindow_enterEvent_void_QMainWindow_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QMainWindow_enterEvent_void_QMainWindow_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMainWindow* arg0 = object<QMainWindow>(param_this);
@@ -1421,8 +1306,7 @@ namespace Mu
             ((MuQt_QMainWindow*)arg0)->enterEvent_pub(arg1);
     }
 
-    void qt_QMainWindow_focusInEvent_void_QMainWindow_QFocusEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QMainWindow_focusInEvent_void_QMainWindow_QFocusEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMainWindow* arg0 = object<QMainWindow>(param_this);
@@ -1433,20 +1317,16 @@ namespace Mu
             ((MuQt_QMainWindow*)arg0)->focusInEvent_pub(arg1);
     }
 
-    bool qt_QMainWindow_focusNextPrevChild_bool_QMainWindow_bool(
-        Mu::Thread& NODE_THREAD, Pointer param_this, bool param_next)
+    bool qt_QMainWindow_focusNextPrevChild_bool_QMainWindow_bool(Mu::Thread& NODE_THREAD, Pointer param_this, bool param_next)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMainWindow* arg0 = object<QMainWindow>(param_this);
         bool arg1 = (bool)(param_next);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QMainWindow*)arg0)
-                         ->focusNextPrevChild_pub_parent(arg1)
-                   : ((MuQt_QMainWindow*)arg0)->focusNextPrevChild_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QMainWindow*)arg0)->focusNextPrevChild_pub_parent(arg1)
+                                  : ((MuQt_QMainWindow*)arg0)->focusNextPrevChild_pub(arg1);
     }
 
-    void qt_QMainWindow_focusOutEvent_void_QMainWindow_QFocusEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QMainWindow_focusOutEvent_void_QMainWindow_QFocusEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMainWindow* arg0 = object<QMainWindow>(param_this);
@@ -1457,8 +1337,7 @@ namespace Mu
             ((MuQt_QMainWindow*)arg0)->focusOutEvent_pub(arg1);
     }
 
-    void qt_QMainWindow_hideEvent_void_QMainWindow_QHideEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QMainWindow_hideEvent_void_QMainWindow_QHideEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMainWindow* arg0 = object<QMainWindow>(param_this);
@@ -1469,8 +1348,7 @@ namespace Mu
             ((MuQt_QMainWindow*)arg0)->hideEvent_pub(arg1);
     }
 
-    void qt_QMainWindow_keyPressEvent_void_QMainWindow_QKeyEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QMainWindow_keyPressEvent_void_QMainWindow_QKeyEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMainWindow* arg0 = object<QMainWindow>(param_this);
@@ -1481,8 +1359,7 @@ namespace Mu
             ((MuQt_QMainWindow*)arg0)->keyPressEvent_pub(arg1);
     }
 
-    void qt_QMainWindow_keyReleaseEvent_void_QMainWindow_QKeyEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QMainWindow_keyReleaseEvent_void_QMainWindow_QKeyEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMainWindow* arg0 = object<QMainWindow>(param_this);
@@ -1493,8 +1370,7 @@ namespace Mu
             ((MuQt_QMainWindow*)arg0)->keyReleaseEvent_pub(arg1);
     }
 
-    void qt_QMainWindow_leaveEvent_void_QMainWindow_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QMainWindow_leaveEvent_void_QMainWindow_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMainWindow* arg0 = object<QMainWindow>(param_this);
@@ -1505,8 +1381,7 @@ namespace Mu
             ((MuQt_QMainWindow*)arg0)->leaveEvent_pub(arg1);
     }
 
-    void qt_QMainWindow_mouseDoubleClickEvent_void_QMainWindow_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QMainWindow_mouseDoubleClickEvent_void_QMainWindow_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMainWindow* arg0 = object<QMainWindow>(param_this);
@@ -1517,8 +1392,7 @@ namespace Mu
             ((MuQt_QMainWindow*)arg0)->mouseDoubleClickEvent_pub(arg1);
     }
 
-    void qt_QMainWindow_mouseMoveEvent_void_QMainWindow_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QMainWindow_mouseMoveEvent_void_QMainWindow_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMainWindow* arg0 = object<QMainWindow>(param_this);
@@ -1529,8 +1403,7 @@ namespace Mu
             ((MuQt_QMainWindow*)arg0)->mouseMoveEvent_pub(arg1);
     }
 
-    void qt_QMainWindow_mousePressEvent_void_QMainWindow_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QMainWindow_mousePressEvent_void_QMainWindow_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMainWindow* arg0 = object<QMainWindow>(param_this);
@@ -1541,8 +1414,7 @@ namespace Mu
             ((MuQt_QMainWindow*)arg0)->mousePressEvent_pub(arg1);
     }
 
-    void qt_QMainWindow_mouseReleaseEvent_void_QMainWindow_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QMainWindow_mouseReleaseEvent_void_QMainWindow_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMainWindow* arg0 = object<QMainWindow>(param_this);
@@ -1553,8 +1425,7 @@ namespace Mu
             ((MuQt_QMainWindow*)arg0)->mouseReleaseEvent_pub(arg1);
     }
 
-    void qt_QMainWindow_moveEvent_void_QMainWindow_QMoveEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QMainWindow_moveEvent_void_QMainWindow_QMoveEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMainWindow* arg0 = object<QMainWindow>(param_this);
@@ -1565,8 +1436,7 @@ namespace Mu
             ((MuQt_QMainWindow*)arg0)->moveEvent_pub(arg1);
     }
 
-    void qt_QMainWindow_paintEvent_void_QMainWindow_QPaintEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QMainWindow_paintEvent_void_QMainWindow_QPaintEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMainWindow* arg0 = object<QMainWindow>(param_this);
@@ -1577,8 +1447,7 @@ namespace Mu
             ((MuQt_QMainWindow*)arg0)->paintEvent_pub(arg1);
     }
 
-    void qt_QMainWindow_resizeEvent_void_QMainWindow_QResizeEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QMainWindow_resizeEvent_void_QMainWindow_QResizeEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMainWindow* arg0 = object<QMainWindow>(param_this);
@@ -1589,8 +1458,7 @@ namespace Mu
             ((MuQt_QMainWindow*)arg0)->resizeEvent_pub(arg1);
     }
 
-    void qt_QMainWindow_showEvent_void_QMainWindow_QShowEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QMainWindow_showEvent_void_QMainWindow_QShowEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMainWindow* arg0 = object<QMainWindow>(param_this);
@@ -1601,8 +1469,7 @@ namespace Mu
             ((MuQt_QMainWindow*)arg0)->showEvent_pub(arg1);
     }
 
-    void qt_QMainWindow_tabletEvent_void_QMainWindow_QTabletEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QMainWindow_tabletEvent_void_QMainWindow_QTabletEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMainWindow* arg0 = object<QMainWindow>(param_this);
@@ -1613,8 +1480,7 @@ namespace Mu
             ((MuQt_QMainWindow*)arg0)->tabletEvent_pub(arg1);
     }
 
-    void qt_QMainWindow_wheelEvent_void_QMainWindow_QWheelEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QMainWindow_wheelEvent_void_QMainWindow_QWheelEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMainWindow* arg0 = object<QMainWindow>(param_this);
@@ -1625,433 +1491,359 @@ namespace Mu
             ((MuQt_QMainWindow*)arg0)->wheelEvent_pub(arg1);
     }
 
-    int qt_QMainWindow_metric_int_QMainWindow_int(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this,
-                                                  int param_m)
+    int qt_QMainWindow_metric_int_QMainWindow_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_m)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMainWindow* arg0 = object<QMainWindow>(param_this);
-        QPaintDevice::PaintDeviceMetric arg1 =
-            (QPaintDevice::PaintDeviceMetric)(param_m);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QMainWindow*)arg0)->metric_pub_parent(arg1)
-                   : ((MuQt_QMainWindow*)arg0)->metric_pub(arg1);
+        QPaintDevice::PaintDeviceMetric arg1 = (QPaintDevice::PaintDeviceMetric)(param_m);
+        return isMuQtObject(arg0) ? ((MuQt_QMainWindow*)arg0)->metric_pub_parent(arg1) : ((MuQt_QMainWindow*)arg0)->metric_pub(arg1);
     }
 
     static NODE_IMPLEMENTATION(_n_QMainWindow0, Pointer)
     {
-        NODE_RETURN(
-            qt_QMainWindow_QMainWindow_QMainWindow_QMainWindow_QWidget_int(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, int)));
+        NODE_RETURN(qt_QMainWindow_QMainWindow_QMainWindow_QMainWindow_QWidget_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                   NODE_ARG(1, Pointer), NODE_ARG(2, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_addDockWidget0, void)
     {
-        qt_QMainWindow_addDockWidget_void_QMainWindow_int_QDockWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, Pointer));
+        qt_QMainWindow_addDockWidget_void_QMainWindow_int_QDockWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                      NODE_ARG(2, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_addDockWidget1, void)
     {
-        qt_QMainWindow_addDockWidget_void_QMainWindow_int_QDockWidget_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, Pointer), NODE_ARG(3, int));
+        qt_QMainWindow_addDockWidget_void_QMainWindow_int_QDockWidget_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                          NODE_ARG(2, Pointer), NODE_ARG(3, int));
     }
 
     static NODE_IMPLEMENTATION(_n_addToolBar0, void)
     {
-        qt_QMainWindow_addToolBar_void_QMainWindow_int_QToolBar(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, Pointer));
+        qt_QMainWindow_addToolBar_void_QMainWindow_int_QToolBar(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                NODE_ARG(2, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_addToolBar1, void)
     {
-        qt_QMainWindow_addToolBar_void_QMainWindow_QToolBar(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QMainWindow_addToolBar_void_QMainWindow_QToolBar(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_addToolBar2, Pointer)
     {
-        NODE_RETURN(qt_QMainWindow_addToolBar_QToolBar_QMainWindow_string(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QMainWindow_addToolBar_QToolBar_QMainWindow_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_addToolBarBreak0, void)
     {
-        qt_QMainWindow_addToolBarBreak_void_QMainWindow_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QMainWindow_addToolBarBreak_void_QMainWindow_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_centralWidget0, Pointer)
     {
-        NODE_RETURN(qt_QMainWindow_centralWidget_QWidget_QMainWindow(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QMainWindow_centralWidget_QWidget_QMainWindow(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_corner0, int)
     {
-        NODE_RETURN(qt_QMainWindow_corner_int_QMainWindow_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QMainWindow_corner_int_QMainWindow_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_createPopupMenu0, Pointer)
     {
-        NODE_RETURN(qt_QMainWindow_createPopupMenu_QMenu_QMainWindow(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QMainWindow_createPopupMenu_QMenu_QMainWindow(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_dockWidgetArea0, int)
     {
-        NODE_RETURN(qt_QMainWindow_dockWidgetArea_int_QMainWindow_QDockWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(
+            qt_QMainWindow_dockWidgetArea_int_QMainWindow_QDockWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_insertToolBar0, void)
     {
-        qt_QMainWindow_insertToolBar_void_QMainWindow_QToolBar_QToolBar(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer));
+        qt_QMainWindow_insertToolBar_void_QMainWindow_QToolBar_QToolBar(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                        NODE_ARG(2, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_insertToolBarBreak0, void)
     {
-        qt_QMainWindow_insertToolBarBreak_void_QMainWindow_QToolBar(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QMainWindow_insertToolBarBreak_void_QMainWindow_QToolBar(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_menuBar0, Pointer)
     {
-        NODE_RETURN(qt_QMainWindow_menuBar_QMenuBar_QMainWindow(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QMainWindow_menuBar_QMenuBar_QMainWindow(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_menuWidget0, Pointer)
     {
-        NODE_RETURN(qt_QMainWindow_menuWidget_QWidget_QMainWindow(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QMainWindow_menuWidget_QWidget_QMainWindow(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_removeDockWidget0, void)
     {
-        qt_QMainWindow_removeDockWidget_void_QMainWindow_QDockWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QMainWindow_removeDockWidget_void_QMainWindow_QDockWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_removeToolBar0, void)
     {
-        qt_QMainWindow_removeToolBar_void_QMainWindow_QToolBar(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QMainWindow_removeToolBar_void_QMainWindow_QToolBar(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_removeToolBarBreak0, void)
     {
-        qt_QMainWindow_removeToolBarBreak_void_QMainWindow_QToolBar(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QMainWindow_removeToolBarBreak_void_QMainWindow_QToolBar(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_resizeDock0, void)
     {
-        qt_QMainWindow_resizeDock_void_QMainWindow_QDockWidget_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int), NODE_ARG(3, int));
+        qt_QMainWindow_resizeDock_void_QMainWindow_QDockWidget_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                       NODE_ARG(2, int), NODE_ARG(3, int));
     }
 
     static NODE_IMPLEMENTATION(_n_restoreDockWidget0, bool)
     {
         NODE_RETURN(
-            qt_QMainWindow_restoreDockWidget_bool_QMainWindow_QDockWidget(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+            qt_QMainWindow_restoreDockWidget_bool_QMainWindow_QDockWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_restoreState0, bool)
     {
-        NODE_RETURN(qt_QMainWindow_restoreState_bool_QMainWindow_QByteArray_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int)));
+        NODE_RETURN(qt_QMainWindow_restoreState_bool_QMainWindow_QByteArray_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                NODE_ARG(1, Pointer), NODE_ARG(2, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_saveState0, Pointer)
     {
-        NODE_RETURN(qt_QMainWindow_saveState_QByteArray_QMainWindow_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QMainWindow_saveState_QByteArray_QMainWindow_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_setCentralWidget0, void)
     {
-        qt_QMainWindow_setCentralWidget_void_QMainWindow_QWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QMainWindow_setCentralWidget_void_QMainWindow_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setCorner0, void)
     {
-        qt_QMainWindow_setCorner_void_QMainWindow_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int));
+        qt_QMainWindow_setCorner_void_QMainWindow_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setMenuBar0, void)
     {
-        qt_QMainWindow_setMenuBar_void_QMainWindow_QMenuBar(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QMainWindow_setMenuBar_void_QMainWindow_QMenuBar(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setMenuWidget0, void)
     {
-        qt_QMainWindow_setMenuWidget_void_QMainWindow_QWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QMainWindow_setMenuWidget_void_QMainWindow_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setStatusBar0, void)
     {
-        qt_QMainWindow_setStatusBar_void_QMainWindow_QStatusBar(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QMainWindow_setStatusBar_void_QMainWindow_QStatusBar(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setTabPosition0, void)
     {
-        qt_QMainWindow_setTabPosition_void_QMainWindow_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int));
+        qt_QMainWindow_setTabPosition_void_QMainWindow_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                               NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_splitDockWidget0, void)
     {
         qt_QMainWindow_splitDockWidget_void_QMainWindow_QDockWidget_QDockWidget_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer), NODE_ARG(3, int));
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, Pointer), NODE_ARG(3, int));
     }
 
     static NODE_IMPLEMENTATION(_n_statusBar0, Pointer)
     {
-        NODE_RETURN(qt_QMainWindow_statusBar_QStatusBar_QMainWindow(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QMainWindow_statusBar_QStatusBar_QMainWindow(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_tabPosition0, int)
     {
-        NODE_RETURN(qt_QMainWindow_tabPosition_int_QMainWindow_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QMainWindow_tabPosition_int_QMainWindow_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_tabifyDockWidget0, void)
     {
-        qt_QMainWindow_tabifyDockWidget_void_QMainWindow_QDockWidget_QDockWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer));
+        qt_QMainWindow_tabifyDockWidget_void_QMainWindow_QDockWidget_QDockWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                 NODE_ARG(1, Pointer), NODE_ARG(2, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_takeCentralWidget0, Pointer)
     {
-        NODE_RETURN(qt_QMainWindow_takeCentralWidget_QWidget_QMainWindow(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QMainWindow_takeCentralWidget_QWidget_QMainWindow(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_toolBarArea0, int)
     {
-        NODE_RETURN(qt_QMainWindow_toolBarArea_int_QMainWindow_QToolBar(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QMainWindow_toolBarArea_int_QMainWindow_QToolBar(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_toolBarBreak0, bool)
     {
-        NODE_RETURN(qt_QMainWindow_toolBarBreak_bool_QMainWindow_QToolBar(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QMainWindow_toolBarBreak_bool_QMainWindow_QToolBar(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_contextMenuEvent0, void)
     {
-        qt_QMainWindow_contextMenuEvent_void_QMainWindow_QContextMenuEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QMainWindow_contextMenuEvent_void_QMainWindow_QContextMenuEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_event0, bool)
     {
-        NODE_RETURN(qt_QMainWindow_event_bool_QMainWindow_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QMainWindow_event_bool_QMainWindow_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_hasHeightForWidth0, bool)
     {
-        NODE_RETURN(qt_QMainWindow_hasHeightForWidth_bool_QMainWindow(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QMainWindow_hasHeightForWidth_bool_QMainWindow(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_heightForWidth0, int)
     {
-        NODE_RETURN(qt_QMainWindow_heightForWidth_int_QMainWindow_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QMainWindow_heightForWidth_int_QMainWindow_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_inputMethodQuery0, Pointer)
     {
-        NODE_RETURN(qt_QMainWindow_inputMethodQuery_QVariant_QMainWindow_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QMainWindow_inputMethodQuery_QVariant_QMainWindow_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_minimumSizeHint0, Pointer)
     {
-        NODE_RETURN(qt_QMainWindow_minimumSizeHint_QSize_QMainWindow(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QMainWindow_minimumSizeHint_QSize_QMainWindow(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_sizeHint0, Pointer)
     {
-        NODE_RETURN(qt_QMainWindow_sizeHint_QSize_QMainWindow(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QMainWindow_sizeHint_QSize_QMainWindow(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_changeEvent0, void)
     {
-        qt_QMainWindow_changeEvent_void_QMainWindow_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QMainWindow_changeEvent_void_QMainWindow_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_closeEvent0, void)
     {
-        qt_QMainWindow_closeEvent_void_QMainWindow_QCloseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QMainWindow_closeEvent_void_QMainWindow_QCloseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_dragEnterEvent0, void)
     {
-        qt_QMainWindow_dragEnterEvent_void_QMainWindow_QDragEnterEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QMainWindow_dragEnterEvent_void_QMainWindow_QDragEnterEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_dragLeaveEvent0, void)
     {
-        qt_QMainWindow_dragLeaveEvent_void_QMainWindow_QDragLeaveEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QMainWindow_dragLeaveEvent_void_QMainWindow_QDragLeaveEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_dragMoveEvent0, void)
     {
-        qt_QMainWindow_dragMoveEvent_void_QMainWindow_QDragMoveEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QMainWindow_dragMoveEvent_void_QMainWindow_QDragMoveEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_dropEvent0, void)
     {
-        qt_QMainWindow_dropEvent_void_QMainWindow_QDropEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QMainWindow_dropEvent_void_QMainWindow_QDropEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_enterEvent0, void)
     {
-        qt_QMainWindow_enterEvent_void_QMainWindow_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QMainWindow_enterEvent_void_QMainWindow_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_focusInEvent0, void)
     {
-        qt_QMainWindow_focusInEvent_void_QMainWindow_QFocusEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QMainWindow_focusInEvent_void_QMainWindow_QFocusEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_focusNextPrevChild0, bool)
     {
-        NODE_RETURN(qt_QMainWindow_focusNextPrevChild_bool_QMainWindow_bool(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool)));
+        NODE_RETURN(qt_QMainWindow_focusNextPrevChild_bool_QMainWindow_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool)));
     }
 
     static NODE_IMPLEMENTATION(_n_focusOutEvent0, void)
     {
-        qt_QMainWindow_focusOutEvent_void_QMainWindow_QFocusEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QMainWindow_focusOutEvent_void_QMainWindow_QFocusEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_hideEvent0, void)
     {
-        qt_QMainWindow_hideEvent_void_QMainWindow_QHideEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QMainWindow_hideEvent_void_QMainWindow_QHideEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_keyPressEvent0, void)
     {
-        qt_QMainWindow_keyPressEvent_void_QMainWindow_QKeyEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QMainWindow_keyPressEvent_void_QMainWindow_QKeyEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_keyReleaseEvent0, void)
     {
-        qt_QMainWindow_keyReleaseEvent_void_QMainWindow_QKeyEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QMainWindow_keyReleaseEvent_void_QMainWindow_QKeyEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_leaveEvent0, void)
     {
-        qt_QMainWindow_leaveEvent_void_QMainWindow_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QMainWindow_leaveEvent_void_QMainWindow_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseDoubleClickEvent0, void)
     {
-        qt_QMainWindow_mouseDoubleClickEvent_void_QMainWindow_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QMainWindow_mouseDoubleClickEvent_void_QMainWindow_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseMoveEvent0, void)
     {
-        qt_QMainWindow_mouseMoveEvent_void_QMainWindow_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QMainWindow_mouseMoveEvent_void_QMainWindow_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mousePressEvent0, void)
     {
-        qt_QMainWindow_mousePressEvent_void_QMainWindow_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QMainWindow_mousePressEvent_void_QMainWindow_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseReleaseEvent0, void)
     {
-        qt_QMainWindow_mouseReleaseEvent_void_QMainWindow_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QMainWindow_mouseReleaseEvent_void_QMainWindow_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_moveEvent0, void)
     {
-        qt_QMainWindow_moveEvent_void_QMainWindow_QMoveEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QMainWindow_moveEvent_void_QMainWindow_QMoveEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_paintEvent0, void)
     {
-        qt_QMainWindow_paintEvent_void_QMainWindow_QPaintEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QMainWindow_paintEvent_void_QMainWindow_QPaintEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_resizeEvent0, void)
     {
-        qt_QMainWindow_resizeEvent_void_QMainWindow_QResizeEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QMainWindow_resizeEvent_void_QMainWindow_QResizeEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_showEvent0, void)
     {
-        qt_QMainWindow_showEvent_void_QMainWindow_QShowEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QMainWindow_showEvent_void_QMainWindow_QShowEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_tabletEvent0, void)
     {
-        qt_QMainWindow_tabletEvent_void_QMainWindow_QTabletEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QMainWindow_tabletEvent_void_QMainWindow_QTabletEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_wheelEvent0, void)
     {
-        qt_QMainWindow_wheelEvent_void_QMainWindow_QWheelEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QMainWindow_wheelEvent_void_QMainWindow_QWheelEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_metric0, int)
     {
-        NODE_RETURN(qt_QMainWindow_metric_int_QMainWindow_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QMainWindow_metric_int_QMainWindow_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     void QMainWindowType::load()
@@ -2071,17 +1863,13 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
-                   new Function(c, tn, castFromObject, Cast, Compiled,
-                                QMainWindow_QMainWindow_QObject, Return, ftn,
-                                Parameters,
+                   new Function(c, tn, castFromObject, Cast, Compiled, QMainWindow_QMainWindow_QObject, Return, ftn, Parameters,
                                 new Param(c, "object", "qt.QObject"), End),
 
                    EndArguments);
@@ -2089,411 +1877,227 @@ namespace Mu
         addSymbols(
             // enums
             // member functions
-            new Function(
-                c, "QMainWindow", _n_QMainWindow0, None, Compiled,
-                qt_QMainWindow_QMainWindow_QMainWindow_QMainWindow_QWidget_int,
-                Return, "qt.QMainWindow", Parameters,
-                new Param(c, "this", "qt.QMainWindow"),
-                new Param(c, "parent", "qt.QWidget"),
-                new Param(c, "flags", "int", Value((int)Qt::WindowFlags())),
-                End),
-            new Function(
-                c, "addDockWidget", _n_addDockWidget0, None, Compiled,
-                qt_QMainWindow_addDockWidget_void_QMainWindow_int_QDockWidget,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QMainWindow"),
-                new Param(c, "area", "int"),
-                new Param(c, "dockwidget", "qt.QDockWidget"), End),
-            new Function(
-                c, "addDockWidget", _n_addDockWidget1, None, Compiled,
-                qt_QMainWindow_addDockWidget_void_QMainWindow_int_QDockWidget_int,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QMainWindow"),
-                new Param(c, "area", "int"),
-                new Param(c, "dockwidget", "qt.QDockWidget"),
-                new Param(c, "orientation", "int"), End),
-            new Function(
-                c, "addToolBar", _n_addToolBar0, None, Compiled,
-                qt_QMainWindow_addToolBar_void_QMainWindow_int_QToolBar, Return,
-                "void", Parameters, new Param(c, "this", "qt.QMainWindow"),
-                new Param(c, "area", "int"),
-                new Param(c, "toolbar", "qt.QToolBar"), End),
-            new Function(c, "addToolBar", _n_addToolBar1, None, Compiled,
-                         qt_QMainWindow_addToolBar_void_QMainWindow_QToolBar,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QMainWindow"),
+            new Function(c, "QMainWindow", _n_QMainWindow0, None, Compiled, qt_QMainWindow_QMainWindow_QMainWindow_QMainWindow_QWidget_int,
+                         Return, "qt.QMainWindow", Parameters, new Param(c, "this", "qt.QMainWindow"), new Param(c, "parent", "qt.QWidget"),
+                         new Param(c, "flags", "int", Value((int)Qt::WindowFlags())), End),
+            new Function(c, "addDockWidget", _n_addDockWidget0, None, Compiled,
+                         qt_QMainWindow_addDockWidget_void_QMainWindow_int_QDockWidget, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QMainWindow"), new Param(c, "area", "int"), new Param(c, "dockwidget", "qt.QDockWidget"),
+                         End),
+            new Function(c, "addDockWidget", _n_addDockWidget1, None, Compiled,
+                         qt_QMainWindow_addDockWidget_void_QMainWindow_int_QDockWidget_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QMainWindow"), new Param(c, "area", "int"), new Param(c, "dockwidget", "qt.QDockWidget"),
+                         new Param(c, "orientation", "int"), End),
+            new Function(c, "addToolBar", _n_addToolBar0, None, Compiled, qt_QMainWindow_addToolBar_void_QMainWindow_int_QToolBar, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QMainWindow"), new Param(c, "area", "int"),
                          new Param(c, "toolbar", "qt.QToolBar"), End),
-            new Function(c, "addToolBar", _n_addToolBar2, None, Compiled,
-                         qt_QMainWindow_addToolBar_QToolBar_QMainWindow_string,
-                         Return, "qt.QToolBar", Parameters,
-                         new Param(c, "this", "qt.QMainWindow"),
-                         new Param(c, "title", "string"), End),
-            new Function(
-                c, "addToolBarBreak", _n_addToolBarBreak0, None, Compiled,
-                qt_QMainWindow_addToolBarBreak_void_QMainWindow_int, Return,
-                "void", Parameters, new Param(c, "this", "qt.QMainWindow"),
-                new Param(c, "area", "int", Value((int)Qt::TopToolBarArea)),
-                End),
-            new Function(c, "centralWidget", _n_centralWidget0, None, Compiled,
-                         qt_QMainWindow_centralWidget_QWidget_QMainWindow,
-                         Return, "qt.QWidget", Parameters,
-                         new Param(c, "this", "qt.QMainWindow"), End),
-            new Function(c, "corner", _n_corner0, None, Compiled,
-                         qt_QMainWindow_corner_int_QMainWindow_int, Return,
-                         "int", Parameters,
-                         new Param(c, "this", "qt.QMainWindow"),
-                         new Param(c, "corner_", "int"), End),
-            _func[0] = new MemberFunction(
-                c, "createPopupMenu", _n_createPopupMenu0, None, Compiled,
-                qt_QMainWindow_createPopupMenu_QMenu_QMainWindow, Return,
-                "qt.QMenu", Parameters, new Param(c, "this", "qt.QMainWindow"),
-                End),
+            new Function(c, "addToolBar", _n_addToolBar1, None, Compiled, qt_QMainWindow_addToolBar_void_QMainWindow_QToolBar, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QMainWindow"), new Param(c, "toolbar", "qt.QToolBar"), End),
+            new Function(c, "addToolBar", _n_addToolBar2, None, Compiled, qt_QMainWindow_addToolBar_QToolBar_QMainWindow_string, Return,
+                         "qt.QToolBar", Parameters, new Param(c, "this", "qt.QMainWindow"), new Param(c, "title", "string"), End),
+            new Function(c, "addToolBarBreak", _n_addToolBarBreak0, None, Compiled, qt_QMainWindow_addToolBarBreak_void_QMainWindow_int,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QMainWindow"),
+                         new Param(c, "area", "int", Value((int)Qt::TopToolBarArea)), End),
+            new Function(c, "centralWidget", _n_centralWidget0, None, Compiled, qt_QMainWindow_centralWidget_QWidget_QMainWindow, Return,
+                         "qt.QWidget", Parameters, new Param(c, "this", "qt.QMainWindow"), End),
+            new Function(c, "corner", _n_corner0, None, Compiled, qt_QMainWindow_corner_int_QMainWindow_int, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QMainWindow"), new Param(c, "corner_", "int"), End),
+            _func[0] = new MemberFunction(c, "createPopupMenu", _n_createPopupMenu0, None, Compiled,
+                                          qt_QMainWindow_createPopupMenu_QMenu_QMainWindow, Return, "qt.QMenu", Parameters,
+                                          new Param(c, "this", "qt.QMainWindow"), End),
             // PROP: dockOptions (flags QMainWindow::DockOptions; QMainWindow
             // this)
-            new Function(
-                c, "dockWidgetArea", _n_dockWidgetArea0, None, Compiled,
-                qt_QMainWindow_dockWidgetArea_int_QMainWindow_QDockWidget,
-                Return, "int", Parameters,
-                new Param(c, "this", "qt.QMainWindow"),
-                new Param(c, "dockwidget", "qt.QDockWidget"), End),
+            new Function(c, "dockWidgetArea", _n_dockWidgetArea0, None, Compiled, qt_QMainWindow_dockWidgetArea_int_QMainWindow_QDockWidget,
+                         Return, "int", Parameters, new Param(c, "this", "qt.QMainWindow"), new Param(c, "dockwidget", "qt.QDockWidget"),
+                         End),
             // PROP: documentMode (bool; QMainWindow this)
             // PROP: iconSize (QSize; QMainWindow this)
-            new Function(
-                c, "insertToolBar", _n_insertToolBar0, None, Compiled,
-                qt_QMainWindow_insertToolBar_void_QMainWindow_QToolBar_QToolBar,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QMainWindow"),
-                new Param(c, "before", "qt.QToolBar"),
-                new Param(c, "toolbar", "qt.QToolBar"), End),
-            new Function(
-                c, "insertToolBarBreak", _n_insertToolBarBreak0, None, Compiled,
-                qt_QMainWindow_insertToolBarBreak_void_QMainWindow_QToolBar,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QMainWindow"),
-                new Param(c, "before", "qt.QToolBar"), End),
+            new Function(c, "insertToolBar", _n_insertToolBar0, None, Compiled,
+                         qt_QMainWindow_insertToolBar_void_QMainWindow_QToolBar_QToolBar, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QMainWindow"), new Param(c, "before", "qt.QToolBar"),
+                         new Param(c, "toolbar", "qt.QToolBar"), End),
+            new Function(c, "insertToolBarBreak", _n_insertToolBarBreak0, None, Compiled,
+                         qt_QMainWindow_insertToolBarBreak_void_QMainWindow_QToolBar, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QMainWindow"), new Param(c, "before", "qt.QToolBar"), End),
             // PROP: isAnimated (bool; QMainWindow this)
             // PROP: isDockNestingEnabled (bool; QMainWindow this)
-            new Function(c, "menuBar", _n_menuBar0, None, Compiled,
-                         qt_QMainWindow_menuBar_QMenuBar_QMainWindow, Return,
-                         "qt.QMenuBar", Parameters,
-                         new Param(c, "this", "qt.QMainWindow"), End),
-            new Function(c, "menuWidget", _n_menuWidget0, None, Compiled,
-                         qt_QMainWindow_menuWidget_QWidget_QMainWindow, Return,
-                         "qt.QWidget", Parameters,
-                         new Param(c, "this", "qt.QMainWindow"), End),
-            new Function(
-                c, "removeDockWidget", _n_removeDockWidget0, None, Compiled,
-                qt_QMainWindow_removeDockWidget_void_QMainWindow_QDockWidget,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QMainWindow"),
-                new Param(c, "dockwidget", "qt.QDockWidget"), End),
-            new Function(c, "removeToolBar", _n_removeToolBar0, None, Compiled,
-                         qt_QMainWindow_removeToolBar_void_QMainWindow_QToolBar,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QMainWindow"),
-                         new Param(c, "toolbar", "qt.QToolBar"), End),
-            new Function(
-                c, "removeToolBarBreak", _n_removeToolBarBreak0, None, Compiled,
-                qt_QMainWindow_removeToolBarBreak_void_QMainWindow_QToolBar,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QMainWindow"),
-                new Param(c, "before", "qt.QToolBar"), End),
-            new Function(
-                c, "resizeDock", _n_resizeDock0, None, Compiled,
-                qt_QMainWindow_resizeDock_void_QMainWindow_QDockWidget_int_int,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QMainWindow"),
-                new Param(c, "dockwidget", "qt.QDockWidget"),
-                new Param(c, "size", "int"), new Param(c, "orientation", "int"),
-                End),
+            new Function(c, "menuBar", _n_menuBar0, None, Compiled, qt_QMainWindow_menuBar_QMenuBar_QMainWindow, Return, "qt.QMenuBar",
+                         Parameters, new Param(c, "this", "qt.QMainWindow"), End),
+            new Function(c, "menuWidget", _n_menuWidget0, None, Compiled, qt_QMainWindow_menuWidget_QWidget_QMainWindow, Return,
+                         "qt.QWidget", Parameters, new Param(c, "this", "qt.QMainWindow"), End),
+            new Function(c, "removeDockWidget", _n_removeDockWidget0, None, Compiled,
+                         qt_QMainWindow_removeDockWidget_void_QMainWindow_QDockWidget, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QMainWindow"), new Param(c, "dockwidget", "qt.QDockWidget"), End),
+            new Function(c, "removeToolBar", _n_removeToolBar0, None, Compiled, qt_QMainWindow_removeToolBar_void_QMainWindow_QToolBar,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QMainWindow"), new Param(c, "toolbar", "qt.QToolBar"), End),
+            new Function(c, "removeToolBarBreak", _n_removeToolBarBreak0, None, Compiled,
+                         qt_QMainWindow_removeToolBarBreak_void_QMainWindow_QToolBar, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QMainWindow"), new Param(c, "before", "qt.QToolBar"), End),
+            new Function(c, "resizeDock", _n_resizeDock0, None, Compiled, qt_QMainWindow_resizeDock_void_QMainWindow_QDockWidget_int_int,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QMainWindow"), new Param(c, "dockwidget", "qt.QDockWidget"),
+                         new Param(c, "size", "int"), new Param(c, "orientation", "int"), End),
             // MISSING: resizeDocks (void; QMainWindow this, "const
             // QList<QDockWidget * > &" docks, "const QList<int> &" sizes, flags
             // Qt::Orientation orientation)
-            new Function(
-                c, "restoreDockWidget", _n_restoreDockWidget0, None, Compiled,
-                qt_QMainWindow_restoreDockWidget_bool_QMainWindow_QDockWidget,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QMainWindow"),
-                new Param(c, "dockwidget", "qt.QDockWidget"), End),
-            new Function(
-                c, "restoreState", _n_restoreState0, None, Compiled,
-                qt_QMainWindow_restoreState_bool_QMainWindow_QByteArray_int,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QMainWindow"),
-                new Param(c, "state", "qt.QByteArray"),
-                new Param(c, "version", "int", Value((int)0)), End),
-            new Function(c, "saveState", _n_saveState0, None, Compiled,
-                         qt_QMainWindow_saveState_QByteArray_QMainWindow_int,
-                         Return, "qt.QByteArray", Parameters,
-                         new Param(c, "this", "qt.QMainWindow"),
+            new Function(c, "restoreDockWidget", _n_restoreDockWidget0, None, Compiled,
+                         qt_QMainWindow_restoreDockWidget_bool_QMainWindow_QDockWidget, Return, "bool", Parameters,
+                         new Param(c, "this", "qt.QMainWindow"), new Param(c, "dockwidget", "qt.QDockWidget"), End),
+            new Function(c, "restoreState", _n_restoreState0, None, Compiled, qt_QMainWindow_restoreState_bool_QMainWindow_QByteArray_int,
+                         Return, "bool", Parameters, new Param(c, "this", "qt.QMainWindow"), new Param(c, "state", "qt.QByteArray"),
                          new Param(c, "version", "int", Value((int)0)), End),
-            new Function(
-                c, "setCentralWidget", _n_setCentralWidget0, None, Compiled,
-                qt_QMainWindow_setCentralWidget_void_QMainWindow_QWidget,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QMainWindow"),
-                new Param(c, "widget", "qt.QWidget"), End),
-            new Function(c, "setCorner", _n_setCorner0, None, Compiled,
-                         qt_QMainWindow_setCorner_void_QMainWindow_int_int,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QMainWindow"),
-                         new Param(c, "corner", "int"),
-                         new Param(c, "area", "int"), End),
+            new Function(c, "saveState", _n_saveState0, None, Compiled, qt_QMainWindow_saveState_QByteArray_QMainWindow_int, Return,
+                         "qt.QByteArray", Parameters, new Param(c, "this", "qt.QMainWindow"), new Param(c, "version", "int", Value((int)0)),
+                         End),
+            new Function(c, "setCentralWidget", _n_setCentralWidget0, None, Compiled,
+                         qt_QMainWindow_setCentralWidget_void_QMainWindow_QWidget, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QMainWindow"), new Param(c, "widget", "qt.QWidget"), End),
+            new Function(c, "setCorner", _n_setCorner0, None, Compiled, qt_QMainWindow_setCorner_void_QMainWindow_int_int, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QMainWindow"), new Param(c, "corner", "int"), new Param(c, "area", "int"),
+                         End),
             // PROP: setDockOptions (void; QMainWindow this, flags
             // QMainWindow::DockOptions options) PROP: setDocumentMode (void;
             // QMainWindow this, bool enabled) PROP: setIconSize (void;
             // QMainWindow this, QSize iconSize)
-            new Function(c, "setMenuBar", _n_setMenuBar0, None, Compiled,
-                         qt_QMainWindow_setMenuBar_void_QMainWindow_QMenuBar,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QMainWindow"),
-                         new Param(c, "menuBar", "qt.QMenuBar"), End),
-            new Function(c, "setMenuWidget", _n_setMenuWidget0, None, Compiled,
-                         qt_QMainWindow_setMenuWidget_void_QMainWindow_QWidget,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QMainWindow"),
-                         new Param(c, "menuBar", "qt.QWidget"), End),
-            new Function(
-                c, "setStatusBar", _n_setStatusBar0, None, Compiled,
-                qt_QMainWindow_setStatusBar_void_QMainWindow_QStatusBar, Return,
-                "void", Parameters, new Param(c, "this", "qt.QMainWindow"),
-                new Param(c, "statusbar", "qt.QStatusBar"), End),
-            new Function(
-                c, "setTabPosition", _n_setTabPosition0, None, Compiled,
-                qt_QMainWindow_setTabPosition_void_QMainWindow_int_int, Return,
-                "void", Parameters, new Param(c, "this", "qt.QMainWindow"),
-                new Param(c, "areas", "int"),
-                new Param(c, "tabPosition", "int"), End),
+            new Function(c, "setMenuBar", _n_setMenuBar0, None, Compiled, qt_QMainWindow_setMenuBar_void_QMainWindow_QMenuBar, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QMainWindow"), new Param(c, "menuBar", "qt.QMenuBar"), End),
+            new Function(c, "setMenuWidget", _n_setMenuWidget0, None, Compiled, qt_QMainWindow_setMenuWidget_void_QMainWindow_QWidget,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QMainWindow"), new Param(c, "menuBar", "qt.QWidget"), End),
+            new Function(c, "setStatusBar", _n_setStatusBar0, None, Compiled, qt_QMainWindow_setStatusBar_void_QMainWindow_QStatusBar,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QMainWindow"), new Param(c, "statusbar", "qt.QStatusBar"),
+                         End),
+            new Function(c, "setTabPosition", _n_setTabPosition0, None, Compiled, qt_QMainWindow_setTabPosition_void_QMainWindow_int_int,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QMainWindow"), new Param(c, "areas", "int"),
+                         new Param(c, "tabPosition", "int"), End),
             // PROP: setTabShape (void; QMainWindow this, flags
             // QTabWidget::TabShape tabShape) PROP: setToolButtonStyle (void;
             // QMainWindow this, flags Qt::ToolButtonStyle toolButtonStyle)
-            new Function(
-                c, "splitDockWidget", _n_splitDockWidget0, None, Compiled,
-                qt_QMainWindow_splitDockWidget_void_QMainWindow_QDockWidget_QDockWidget_int,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QMainWindow"),
-                new Param(c, "first", "qt.QDockWidget"),
-                new Param(c, "second", "qt.QDockWidget"),
-                new Param(c, "orientation", "int"), End),
-            new Function(c, "statusBar", _n_statusBar0, None, Compiled,
-                         qt_QMainWindow_statusBar_QStatusBar_QMainWindow,
-                         Return, "qt.QStatusBar", Parameters,
-                         new Param(c, "this", "qt.QMainWindow"), End),
-            new Function(c, "tabPosition", _n_tabPosition0, None, Compiled,
-                         qt_QMainWindow_tabPosition_int_QMainWindow_int, Return,
-                         "int", Parameters,
-                         new Param(c, "this", "qt.QMainWindow"),
-                         new Param(c, "area", "int"), End),
+            new Function(c, "splitDockWidget", _n_splitDockWidget0, None, Compiled,
+                         qt_QMainWindow_splitDockWidget_void_QMainWindow_QDockWidget_QDockWidget_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QMainWindow"), new Param(c, "first", "qt.QDockWidget"),
+                         new Param(c, "second", "qt.QDockWidget"), new Param(c, "orientation", "int"), End),
+            new Function(c, "statusBar", _n_statusBar0, None, Compiled, qt_QMainWindow_statusBar_QStatusBar_QMainWindow, Return,
+                         "qt.QStatusBar", Parameters, new Param(c, "this", "qt.QMainWindow"), End),
+            new Function(c, "tabPosition", _n_tabPosition0, None, Compiled, qt_QMainWindow_tabPosition_int_QMainWindow_int, Return, "int",
+                         Parameters, new Param(c, "this", "qt.QMainWindow"), new Param(c, "area", "int"), End),
             // PROP: tabShape (flags QTabWidget::TabShape; QMainWindow this)
             // MISSING: tabifiedDockWidgets ("QList<QDockWidget * >";
             // QMainWindow this, QDockWidget dockwidget)
-            new Function(
-                c, "tabifyDockWidget", _n_tabifyDockWidget0, None, Compiled,
-                qt_QMainWindow_tabifyDockWidget_void_QMainWindow_QDockWidget_QDockWidget,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QMainWindow"),
-                new Param(c, "first", "qt.QDockWidget"),
-                new Param(c, "second", "qt.QDockWidget"), End),
-            new Function(c, "takeCentralWidget", _n_takeCentralWidget0, None,
-                         Compiled,
-                         qt_QMainWindow_takeCentralWidget_QWidget_QMainWindow,
-                         Return, "qt.QWidget", Parameters,
+            new Function(c, "tabifyDockWidget", _n_tabifyDockWidget0, None, Compiled,
+                         qt_QMainWindow_tabifyDockWidget_void_QMainWindow_QDockWidget_QDockWidget, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QMainWindow"), new Param(c, "first", "qt.QDockWidget"),
+                         new Param(c, "second", "qt.QDockWidget"), End),
+            new Function(c, "takeCentralWidget", _n_takeCentralWidget0, None, Compiled,
+                         qt_QMainWindow_takeCentralWidget_QWidget_QMainWindow, Return, "qt.QWidget", Parameters,
                          new Param(c, "this", "qt.QMainWindow"), End),
-            new Function(c, "toolBarArea", _n_toolBarArea0, None, Compiled,
-                         qt_QMainWindow_toolBarArea_int_QMainWindow_QToolBar,
-                         Return, "int", Parameters,
-                         new Param(c, "this", "qt.QMainWindow"),
-                         new Param(c, "toolbar", "qt.QToolBar"), End),
-            new Function(c, "toolBarBreak", _n_toolBarBreak0, None, Compiled,
-                         qt_QMainWindow_toolBarBreak_bool_QMainWindow_QToolBar,
-                         Return, "bool", Parameters,
-                         new Param(c, "this", "qt.QMainWindow"),
-                         new Param(c, "toolbar", "qt.QToolBar"), End),
+            new Function(c, "toolBarArea", _n_toolBarArea0, None, Compiled, qt_QMainWindow_toolBarArea_int_QMainWindow_QToolBar, Return,
+                         "int", Parameters, new Param(c, "this", "qt.QMainWindow"), new Param(c, "toolbar", "qt.QToolBar"), End),
+            new Function(c, "toolBarBreak", _n_toolBarBreak0, None, Compiled, qt_QMainWindow_toolBarBreak_bool_QMainWindow_QToolBar, Return,
+                         "bool", Parameters, new Param(c, "this", "qt.QMainWindow"), new Param(c, "toolbar", "qt.QToolBar"), End),
             // PROP: toolButtonStyle (flags Qt::ToolButtonStyle; QMainWindow
             // this) PROP: unifiedTitleAndToolBarOnMac (bool; QMainWindow this)
-            _func[1] = new MemberFunction(
-                c, "contextMenuEvent", _n_contextMenuEvent0, None, Compiled,
-                qt_QMainWindow_contextMenuEvent_void_QMainWindow_QContextMenuEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QMainWindow"),
-                new Param(c, "event", "qt.QContextMenuEvent"), End),
-            _func[2] = new MemberFunction(
-                c, "event", _n_event0, None, Compiled,
-                qt_QMainWindow_event_bool_QMainWindow_QEvent, Return, "bool",
-                Parameters, new Param(c, "this", "qt.QMainWindow"),
-                new Param(c, "event_", "qt.QEvent"), End),
-            _func[3] = new MemberFunction(
-                c, "hasHeightForWidth", _n_hasHeightForWidth0, None, Compiled,
-                qt_QMainWindow_hasHeightForWidth_bool_QMainWindow, Return,
-                "bool", Parameters, new Param(c, "this", "qt.QMainWindow"),
-                End),
-            _func[4] = new MemberFunction(
-                c, "heightForWidth", _n_heightForWidth0, None, Compiled,
-                qt_QMainWindow_heightForWidth_int_QMainWindow_int, Return,
-                "int", Parameters, new Param(c, "this", "qt.QMainWindow"),
-                new Param(c, "w", "int"), End),
-            _func[5] = new MemberFunction(
-                c, "inputMethodQuery", _n_inputMethodQuery0, None, Compiled,
-                qt_QMainWindow_inputMethodQuery_QVariant_QMainWindow_int,
-                Return, "qt.QVariant", Parameters,
-                new Param(c, "this", "qt.QMainWindow"),
-                new Param(c, "query", "int"), End),
-            _func[6] = new MemberFunction(
-                c, "minimumSizeHint", _n_minimumSizeHint0, None, Compiled,
-                qt_QMainWindow_minimumSizeHint_QSize_QMainWindow, Return,
-                "qt.QSize", Parameters, new Param(c, "this", "qt.QMainWindow"),
-                End),
-            _func[7] = new MemberFunction(
-                c, "sizeHint", _n_sizeHint0, None, Compiled,
-                qt_QMainWindow_sizeHint_QSize_QMainWindow, Return, "qt.QSize",
-                Parameters, new Param(c, "this", "qt.QMainWindow"), End),
+            _func[1] = new MemberFunction(c, "contextMenuEvent", _n_contextMenuEvent0, None, Compiled,
+                                          qt_QMainWindow_contextMenuEvent_void_QMainWindow_QContextMenuEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QMainWindow"), new Param(c, "event", "qt.QContextMenuEvent"), End),
+            _func[2] =
+                new MemberFunction(c, "event", _n_event0, None, Compiled, qt_QMainWindow_event_bool_QMainWindow_QEvent, Return, "bool",
+                                   Parameters, new Param(c, "this", "qt.QMainWindow"), new Param(c, "event_", "qt.QEvent"), End),
+            _func[3] = new MemberFunction(c, "hasHeightForWidth", _n_hasHeightForWidth0, None, Compiled,
+                                          qt_QMainWindow_hasHeightForWidth_bool_QMainWindow, Return, "bool", Parameters,
+                                          new Param(c, "this", "qt.QMainWindow"), End),
+            _func[4] = new MemberFunction(c, "heightForWidth", _n_heightForWidth0, None, Compiled,
+                                          qt_QMainWindow_heightForWidth_int_QMainWindow_int, Return, "int", Parameters,
+                                          new Param(c, "this", "qt.QMainWindow"), new Param(c, "w", "int"), End),
+            _func[5] = new MemberFunction(c, "inputMethodQuery", _n_inputMethodQuery0, None, Compiled,
+                                          qt_QMainWindow_inputMethodQuery_QVariant_QMainWindow_int, Return, "qt.QVariant", Parameters,
+                                          new Param(c, "this", "qt.QMainWindow"), new Param(c, "query", "int"), End),
+            _func[6] = new MemberFunction(c, "minimumSizeHint", _n_minimumSizeHint0, None, Compiled,
+                                          qt_QMainWindow_minimumSizeHint_QSize_QMainWindow, Return, "qt.QSize", Parameters,
+                                          new Param(c, "this", "qt.QMainWindow"), End),
+            _func[7] = new MemberFunction(c, "sizeHint", _n_sizeHint0, None, Compiled, qt_QMainWindow_sizeHint_QSize_QMainWindow, Return,
+                                          "qt.QSize", Parameters, new Param(c, "this", "qt.QMainWindow"), End),
             // MISSING: paintEngine ("QPaintEngine *"; QMainWindow this)
             // MISSING: actionEvent (void; QMainWindow this, "QActionEvent *"
             // event) // protected
-            _func[8] = new MemberFunction(
-                c, "changeEvent", _n_changeEvent0, None, Compiled,
-                qt_QMainWindow_changeEvent_void_QMainWindow_QEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QMainWindow"),
-                new Param(c, "event", "qt.QEvent"), End),
-            _func[9] = new MemberFunction(
-                c, "closeEvent", _n_closeEvent0, None, Compiled,
-                qt_QMainWindow_closeEvent_void_QMainWindow_QCloseEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QMainWindow"),
-                new Param(c, "event", "qt.QCloseEvent"), End),
-            _func[10] = new MemberFunction(
-                c, "dragEnterEvent", _n_dragEnterEvent0, None, Compiled,
-                qt_QMainWindow_dragEnterEvent_void_QMainWindow_QDragEnterEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QMainWindow"),
-                new Param(c, "event", "qt.QDragEnterEvent"), End),
-            _func[11] = new MemberFunction(
-                c, "dragLeaveEvent", _n_dragLeaveEvent0, None, Compiled,
-                qt_QMainWindow_dragLeaveEvent_void_QMainWindow_QDragLeaveEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QMainWindow"),
-                new Param(c, "event", "qt.QDragLeaveEvent"), End),
-            _func[12] = new MemberFunction(
-                c, "dragMoveEvent", _n_dragMoveEvent0, None, Compiled,
-                qt_QMainWindow_dragMoveEvent_void_QMainWindow_QDragMoveEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QMainWindow"),
-                new Param(c, "event", "qt.QDragMoveEvent"), End),
-            _func[13] = new MemberFunction(
-                c, "dropEvent", _n_dropEvent0, None, Compiled,
-                qt_QMainWindow_dropEvent_void_QMainWindow_QDropEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QMainWindow"),
-                new Param(c, "event", "qt.QDropEvent"), End),
-            _func[14] = new MemberFunction(
-                c, "enterEvent", _n_enterEvent0, None, Compiled,
-                qt_QMainWindow_enterEvent_void_QMainWindow_QEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QMainWindow"),
-                new Param(c, "event", "qt.QEvent"), End),
-            _func[15] = new MemberFunction(
-                c, "focusInEvent", _n_focusInEvent0, None, Compiled,
-                qt_QMainWindow_focusInEvent_void_QMainWindow_QFocusEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QMainWindow"),
-                new Param(c, "event", "qt.QFocusEvent"), End),
-            _func[16] = new MemberFunction(
-                c, "focusNextPrevChild", _n_focusNextPrevChild0, None, Compiled,
-                qt_QMainWindow_focusNextPrevChild_bool_QMainWindow_bool, Return,
-                "bool", Parameters, new Param(c, "this", "qt.QMainWindow"),
-                new Param(c, "next", "bool"), End),
-            _func[17] = new MemberFunction(
-                c, "focusOutEvent", _n_focusOutEvent0, None, Compiled,
-                qt_QMainWindow_focusOutEvent_void_QMainWindow_QFocusEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QMainWindow"),
-                new Param(c, "event", "qt.QFocusEvent"), End),
-            _func[18] = new MemberFunction(
-                c, "hideEvent", _n_hideEvent0, None, Compiled,
-                qt_QMainWindow_hideEvent_void_QMainWindow_QHideEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QMainWindow"),
-                new Param(c, "event", "qt.QHideEvent"), End),
+            _func[8] = new MemberFunction(c, "changeEvent", _n_changeEvent0, None, Compiled,
+                                          qt_QMainWindow_changeEvent_void_QMainWindow_QEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QMainWindow"), new Param(c, "event", "qt.QEvent"), End),
+            _func[9] = new MemberFunction(c, "closeEvent", _n_closeEvent0, None, Compiled,
+                                          qt_QMainWindow_closeEvent_void_QMainWindow_QCloseEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QMainWindow"), new Param(c, "event", "qt.QCloseEvent"), End),
+            _func[10] = new MemberFunction(c, "dragEnterEvent", _n_dragEnterEvent0, None, Compiled,
+                                           qt_QMainWindow_dragEnterEvent_void_QMainWindow_QDragEnterEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QMainWindow"), new Param(c, "event", "qt.QDragEnterEvent"), End),
+            _func[11] = new MemberFunction(c, "dragLeaveEvent", _n_dragLeaveEvent0, None, Compiled,
+                                           qt_QMainWindow_dragLeaveEvent_void_QMainWindow_QDragLeaveEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QMainWindow"), new Param(c, "event", "qt.QDragLeaveEvent"), End),
+            _func[12] = new MemberFunction(c, "dragMoveEvent", _n_dragMoveEvent0, None, Compiled,
+                                           qt_QMainWindow_dragMoveEvent_void_QMainWindow_QDragMoveEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QMainWindow"), new Param(c, "event", "qt.QDragMoveEvent"), End),
+            _func[13] = new MemberFunction(c, "dropEvent", _n_dropEvent0, None, Compiled,
+                                           qt_QMainWindow_dropEvent_void_QMainWindow_QDropEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QMainWindow"), new Param(c, "event", "qt.QDropEvent"), End),
+            _func[14] = new MemberFunction(c, "enterEvent", _n_enterEvent0, None, Compiled,
+                                           qt_QMainWindow_enterEvent_void_QMainWindow_QEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QMainWindow"), new Param(c, "event", "qt.QEvent"), End),
+            _func[15] = new MemberFunction(c, "focusInEvent", _n_focusInEvent0, None, Compiled,
+                                           qt_QMainWindow_focusInEvent_void_QMainWindow_QFocusEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QMainWindow"), new Param(c, "event", "qt.QFocusEvent"), End),
+            _func[16] = new MemberFunction(c, "focusNextPrevChild", _n_focusNextPrevChild0, None, Compiled,
+                                           qt_QMainWindow_focusNextPrevChild_bool_QMainWindow_bool, Return, "bool", Parameters,
+                                           new Param(c, "this", "qt.QMainWindow"), new Param(c, "next", "bool"), End),
+            _func[17] = new MemberFunction(c, "focusOutEvent", _n_focusOutEvent0, None, Compiled,
+                                           qt_QMainWindow_focusOutEvent_void_QMainWindow_QFocusEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QMainWindow"), new Param(c, "event", "qt.QFocusEvent"), End),
+            _func[18] = new MemberFunction(c, "hideEvent", _n_hideEvent0, None, Compiled,
+                                           qt_QMainWindow_hideEvent_void_QMainWindow_QHideEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QMainWindow"), new Param(c, "event", "qt.QHideEvent"), End),
             // MISSING: inputMethodEvent (void; QMainWindow this,
             // "QInputMethodEvent *" event) // protected
-            _func[19] = new MemberFunction(
-                c, "keyPressEvent", _n_keyPressEvent0, None, Compiled,
-                qt_QMainWindow_keyPressEvent_void_QMainWindow_QKeyEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QMainWindow"),
-                new Param(c, "event", "qt.QKeyEvent"), End),
-            _func[20] = new MemberFunction(
-                c, "keyReleaseEvent", _n_keyReleaseEvent0, None, Compiled,
-                qt_QMainWindow_keyReleaseEvent_void_QMainWindow_QKeyEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QMainWindow"),
-                new Param(c, "event", "qt.QKeyEvent"), End),
-            _func[21] = new MemberFunction(
-                c, "leaveEvent", _n_leaveEvent0, None, Compiled,
-                qt_QMainWindow_leaveEvent_void_QMainWindow_QEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QMainWindow"),
-                new Param(c, "event", "qt.QEvent"), End),
-            _func[22] = new MemberFunction(
-                c, "mouseDoubleClickEvent", _n_mouseDoubleClickEvent0, None,
-                Compiled,
-                qt_QMainWindow_mouseDoubleClickEvent_void_QMainWindow_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QMainWindow"),
-                new Param(c, "event", "qt.QMouseEvent"), End),
-            _func[23] = new MemberFunction(
-                c, "mouseMoveEvent", _n_mouseMoveEvent0, None, Compiled,
-                qt_QMainWindow_mouseMoveEvent_void_QMainWindow_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QMainWindow"),
-                new Param(c, "event", "qt.QMouseEvent"), End),
-            _func[24] = new MemberFunction(
-                c, "mousePressEvent", _n_mousePressEvent0, None, Compiled,
-                qt_QMainWindow_mousePressEvent_void_QMainWindow_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QMainWindow"),
-                new Param(c, "event", "qt.QMouseEvent"), End),
-            _func[25] = new MemberFunction(
-                c, "mouseReleaseEvent", _n_mouseReleaseEvent0, None, Compiled,
-                qt_QMainWindow_mouseReleaseEvent_void_QMainWindow_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QMainWindow"),
-                new Param(c, "event", "qt.QMouseEvent"), End),
-            _func[26] = new MemberFunction(
-                c, "moveEvent", _n_moveEvent0, None, Compiled,
-                qt_QMainWindow_moveEvent_void_QMainWindow_QMoveEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QMainWindow"),
-                new Param(c, "event", "qt.QMoveEvent"), End),
+            _func[19] = new MemberFunction(c, "keyPressEvent", _n_keyPressEvent0, None, Compiled,
+                                           qt_QMainWindow_keyPressEvent_void_QMainWindow_QKeyEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QMainWindow"), new Param(c, "event", "qt.QKeyEvent"), End),
+            _func[20] = new MemberFunction(c, "keyReleaseEvent", _n_keyReleaseEvent0, None, Compiled,
+                                           qt_QMainWindow_keyReleaseEvent_void_QMainWindow_QKeyEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QMainWindow"), new Param(c, "event", "qt.QKeyEvent"), End),
+            _func[21] = new MemberFunction(c, "leaveEvent", _n_leaveEvent0, None, Compiled,
+                                           qt_QMainWindow_leaveEvent_void_QMainWindow_QEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QMainWindow"), new Param(c, "event", "qt.QEvent"), End),
+            _func[22] = new MemberFunction(c, "mouseDoubleClickEvent", _n_mouseDoubleClickEvent0, None, Compiled,
+                                           qt_QMainWindow_mouseDoubleClickEvent_void_QMainWindow_QMouseEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QMainWindow"), new Param(c, "event", "qt.QMouseEvent"), End),
+            _func[23] = new MemberFunction(c, "mouseMoveEvent", _n_mouseMoveEvent0, None, Compiled,
+                                           qt_QMainWindow_mouseMoveEvent_void_QMainWindow_QMouseEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QMainWindow"), new Param(c, "event", "qt.QMouseEvent"), End),
+            _func[24] = new MemberFunction(c, "mousePressEvent", _n_mousePressEvent0, None, Compiled,
+                                           qt_QMainWindow_mousePressEvent_void_QMainWindow_QMouseEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QMainWindow"), new Param(c, "event", "qt.QMouseEvent"), End),
+            _func[25] = new MemberFunction(c, "mouseReleaseEvent", _n_mouseReleaseEvent0, None, Compiled,
+                                           qt_QMainWindow_mouseReleaseEvent_void_QMainWindow_QMouseEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QMainWindow"), new Param(c, "event", "qt.QMouseEvent"), End),
+            _func[26] = new MemberFunction(c, "moveEvent", _n_moveEvent0, None, Compiled,
+                                           qt_QMainWindow_moveEvent_void_QMainWindow_QMoveEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QMainWindow"), new Param(c, "event", "qt.QMoveEvent"), End),
             // MISSING: nativeEvent (bool; QMainWindow this, QByteArray
             // eventType, "void *" message, "long *" result) // protected
-            _func[27] = new MemberFunction(
-                c, "paintEvent", _n_paintEvent0, None, Compiled,
-                qt_QMainWindow_paintEvent_void_QMainWindow_QPaintEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QMainWindow"),
-                new Param(c, "event", "qt.QPaintEvent"), End),
-            _func[28] = new MemberFunction(
-                c, "resizeEvent", _n_resizeEvent0, None, Compiled,
-                qt_QMainWindow_resizeEvent_void_QMainWindow_QResizeEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QMainWindow"),
-                new Param(c, "event", "qt.QResizeEvent"), End),
-            _func[29] = new MemberFunction(
-                c, "showEvent", _n_showEvent0, None, Compiled,
-                qt_QMainWindow_showEvent_void_QMainWindow_QShowEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QMainWindow"),
-                new Param(c, "event", "qt.QShowEvent"), End),
-            _func[30] = new MemberFunction(
-                c, "tabletEvent", _n_tabletEvent0, None, Compiled,
-                qt_QMainWindow_tabletEvent_void_QMainWindow_QTabletEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QMainWindow"),
-                new Param(c, "event", "qt.QTabletEvent"), End),
-            _func[31] = new MemberFunction(
-                c, "wheelEvent", _n_wheelEvent0, None, Compiled,
-                qt_QMainWindow_wheelEvent_void_QMainWindow_QWheelEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QMainWindow"),
-                new Param(c, "event", "qt.QWheelEvent"), End),
+            _func[27] = new MemberFunction(c, "paintEvent", _n_paintEvent0, None, Compiled,
+                                           qt_QMainWindow_paintEvent_void_QMainWindow_QPaintEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QMainWindow"), new Param(c, "event", "qt.QPaintEvent"), End),
+            _func[28] = new MemberFunction(c, "resizeEvent", _n_resizeEvent0, None, Compiled,
+                                           qt_QMainWindow_resizeEvent_void_QMainWindow_QResizeEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QMainWindow"), new Param(c, "event", "qt.QResizeEvent"), End),
+            _func[29] = new MemberFunction(c, "showEvent", _n_showEvent0, None, Compiled,
+                                           qt_QMainWindow_showEvent_void_QMainWindow_QShowEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QMainWindow"), new Param(c, "event", "qt.QShowEvent"), End),
+            _func[30] = new MemberFunction(c, "tabletEvent", _n_tabletEvent0, None, Compiled,
+                                           qt_QMainWindow_tabletEvent_void_QMainWindow_QTabletEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QMainWindow"), new Param(c, "event", "qt.QTabletEvent"), End),
+            _func[31] = new MemberFunction(c, "wheelEvent", _n_wheelEvent0, None, Compiled,
+                                           qt_QMainWindow_wheelEvent_void_QMainWindow_QWheelEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QMainWindow"), new Param(c, "event", "qt.QWheelEvent"), End),
             // MISSING: initPainter (void; QMainWindow this, "QPainter *"
             // painter) // protected
-            _func[32] = new MemberFunction(
-                c, "metric", _n_metric0, None, Compiled,
-                qt_QMainWindow_metric_int_QMainWindow_int, Return, "int",
-                Parameters, new Param(c, "this", "qt.QMainWindow"),
-                new Param(c, "m", "int"), End),
+            _func[32] = new MemberFunction(c, "metric", _n_metric0, None, Compiled, qt_QMainWindow_metric_int_QMainWindow_int, Return,
+                                           "int", Parameters, new Param(c, "this", "qt.QMainWindow"), new Param(c, "m", "int"), End),
             // static functions
             EndArguments);
         globalScope()->addSymbols(EndArguments);

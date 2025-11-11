@@ -39,8 +39,7 @@ namespace Mu
         //  Constructors
         //
 
-        QPaintDeviceType(Context* context, const char* name,
-                         Class* superClass = 0);
+        QPaintDeviceType(Context* context, const char* name, Class* superClass = 0);
         virtual ~QPaintDeviceType();
 
         static bool isInheritable() { return true; }
@@ -68,15 +67,9 @@ namespace Mu
         virtual int metric(QPaintDevice::PaintDeviceMetric metric_) const;
 
     public:
-        int metric_pub(QPaintDevice::PaintDeviceMetric metric_) const
-        {
-            return metric(metric_);
-        }
+        int metric_pub(QPaintDevice::PaintDeviceMetric metric_) const { return metric(metric_); }
 
-        int metric_pub_parent(QPaintDevice::PaintDeviceMetric metric_) const
-        {
-            return QPaintDevice::metric(metric_);
-        }
+        int metric_pub_parent(QPaintDevice::PaintDeviceMetric metric_) const { return QPaintDevice::metric(metric_); }
 
     public:
         const QPaintDeviceType* _baseType;
@@ -84,11 +77,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance*
-    QPaintDeviceType::cachedInstance(const QPaintDeviceType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QPaintDeviceType::cachedInstance(const QPaintDeviceType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

@@ -37,8 +37,7 @@ namespace Mu
         //  Constructors
         //
 
-        QWheelEventType(Context* context, const char* name,
-                        Class* superClass = 0);
+        QWheelEventType(Context* context, const char* name, Class* superClass = 0);
         virtual ~QWheelEventType();
 
         //

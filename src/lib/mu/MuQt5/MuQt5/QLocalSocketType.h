@@ -39,8 +39,7 @@ namespace Mu
         //  Constructors
         //
 
-        QLocalSocketType(Context* context, const char* name,
-                         Class* superClass = 0, Class* superClass2 = 0);
+        QLocalSocketType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QLocalSocketType();
 
@@ -63,8 +62,7 @@ namespace Mu
     {
     public:
         virtual ~MuQt_QLocalSocket();
-        MuQt_QLocalSocket(Pointer muobj, const CallEnvironment*,
-                          QObject* parent);
+        MuQt_QLocalSocket(Pointer muobj, const CallEnvironment*, QObject* parent);
         virtual qint64 bytesAvailable() const;
         virtual qint64 bytesToWrite() const;
         virtual bool canReadLine() const;
@@ -85,11 +83,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance*
-    QLocalSocketType::cachedInstance(const QLocalSocketType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QLocalSocketType::cachedInstance(const QLocalSocketType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

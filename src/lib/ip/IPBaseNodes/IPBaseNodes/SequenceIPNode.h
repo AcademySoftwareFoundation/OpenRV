@@ -48,8 +48,7 @@ namespace IPCore
         typedef std::recursive_mutex Mutex;
         typedef std::lock_guard<Mutex> LockGuard;
 
-        SequenceIPNode(const std::string& name, const NodeDefinition* def,
-                       IPGraph* graph, GroupIPNode* group = 0);
+        SequenceIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group = 0);
 
         virtual ~SequenceIPNode();
 
@@ -62,17 +61,14 @@ namespace IPCore
         virtual ImageRangeInfo imageRangeInfo() const;
         virtual ImageStructureInfo imageStructureInfo(const Context&) const;
         virtual void mediaInfo(const Context&, MediaInfoVector&) const;
-        virtual void mapInputToEvalFrames(size_t inputIndex,
-                                          const FrameVector& in,
-                                          FrameVector& out) const;
+        virtual void mapInputToEvalFrames(size_t inputIndex, const FrameVector& in, FrameVector& out) const;
 
         void init();
         void createDefaultEDL(int append = 0) const;
         virtual void propertyChanged(const Property*);
 
         int indexAtFrame(int) const;
-        int indexAtSample(TwkAudio::SampleTime seekSample, double sampleRate,
-                          double fps);
+        int indexAtSample(TwkAudio::SampleTime seekSample, double sampleRate, double fps);
         EvalPoint evaluationPoint(int frame, int forceIndex = -1) const;
 
         virtual size_t audioFillBuffer(const AudioContext&);
@@ -101,18 +97,14 @@ namespace IPCore
 
         /// return the source offset and the source range info of a specific
         /// source
-        bool getSourceRange(int sourceIndex, ImageRangeInfo& rangeInfo,
-                            int& sourceOffset);
+        bool getSourceRange(int sourceIndex, ImageRangeInfo& rangeInfo, int& sourceOffset);
 
         void invalidate();
 
     protected:
         virtual void inputChanged(int inputIndex);
-        virtual void
-        inputRangeChanged(int inputIndex,
-                          PropagateTarget target = LegacyPropagateTarget);
-        virtual void inputImageStructureChanged(int inputIndex,
-                                                PropagateTarget target);
+        virtual void inputRangeChanged(int inputIndex, PropagateTarget target = LegacyPropagateTarget);
+        virtual void inputImageStructureChanged(int inputIndex, PropagateTarget target);
         void lazyBuildState() const;
         bool interactiveSize(const Context&) const;
         void createDefaultEDLInternal(int append, const IPNodes& inputs) const;

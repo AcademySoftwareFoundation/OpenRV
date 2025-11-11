@@ -27,8 +27,7 @@ namespace Rv
     using namespace TwkGLF;
     using namespace TwkApp;
 
-    QTGLVideoDevice::QTGLVideoDevice(VideoModule* m, const string& name,
-                                     QOpenGLWidget* view)
+    QTGLVideoDevice::QTGLVideoDevice(VideoModule* m, const string& name, QOpenGLWidget* view)
         : GLVideoDevice(m, name, ImageOutput | ProvidesSync | SubWindow)
         , m_view(view)
         , m_translator(new QTTranslator(this, view))
@@ -73,8 +72,7 @@ namespace Rv
         // to share with setShareContext.
         QOpenGLWidget* openGLWidget = new QOpenGLWidget(m_view->parentWidget());
         openGLWidget->context()->setShareContext(m_view->context());
-        return new QTGLVideoDevice(name() + "-workerContextDevice",
-                                   openGLWidget);
+        return new QTGLVideoDevice(name() + "-workerContextDevice", openGLWidget);
     }
 
     void QTGLVideoDevice::makeCurrent() const
@@ -111,21 +109,18 @@ namespace Rv
         // may differ from the logical pixel ratio on a per screen basis.
         m_devicePixelRatio = 1.0f;
 
-        static bool noQtHighDPISupport =
-            getenv("RV_NO_QT_HDPI_SUPPORT") != nullptr;
+        static bool noQtHighDPISupport = getenv("RV_NO_QT_HDPI_SUPPORT") != nullptr;
         if (noQtHighDPISupport)
         {
             return;
         }
 
-        if (const DesktopVideoDevice* desktopVideoDevice =
-                dynamic_cast<const DesktopVideoDevice*>(d))
+        if (const DesktopVideoDevice* desktopVideoDevice = dynamic_cast<const DesktopVideoDevice*>(d))
         {
             const QList<QScreen*> screens = QGuiApplication::screens();
             if (desktopVideoDevice->qtScreen() < screens.size())
             {
-                m_devicePixelRatio =
-                    screens[desktopVideoDevice->qtScreen()]->devicePixelRatio();
+                m_devicePixelRatio = screens[desktopVideoDevice->qtScreen()]->devicePixelRatio();
             }
         }
     }
@@ -171,8 +166,7 @@ namespace Rv
 
     VideoDevice::Resolution QTGLVideoDevice::resolution() const
     {
-        return Resolution(m_view->width() * devicePixelRatio(),
-                          m_view->height() * devicePixelRatio(), 1.0f, 1.0f);
+        return Resolution(m_view->width() * devicePixelRatio(), m_view->height() * devicePixelRatio(), 1.0f, 1.0f);
     }
 
     VideoDevice::Resolution QTGLVideoDevice::internalResolution() const
@@ -180,22 +174,14 @@ namespace Rv
         return Resolution(m_view->width(), m_view->height(), 1.0f, 1.0f);
     }
 
-    VideoDevice::Offset QTGLVideoDevice::offset() const
-    {
-        return Offset(m_x, m_y);
-    }
+    VideoDevice::Offset QTGLVideoDevice::offset() const { return Offset(m_x, m_y); }
 
-    VideoDevice::Timing QTGLVideoDevice::timing() const
-    {
-        return Timing((m_refresh != -1.0) ? m_refresh : 0.0);
-    }
+    VideoDevice::Timing QTGLVideoDevice::timing() const { return Timing((m_refresh != -1.0) ? m_refresh : 0.0); }
 
     VideoDevice::VideoFormat QTGLVideoDevice::format() const
     {
-        return VideoFormat(m_view->width() * devicePixelRatio(),
-                           m_view->height() * devicePixelRatio(), 1.0, 1.0,
-                           (m_refresh != -1.0) ? m_refresh : 0.0,
-                           hardwareIdentification());
+        return VideoFormat(m_view->width() * devicePixelRatio(), m_view->height() * devicePixelRatio(), 1.0, 1.0,
+                           (m_refresh != -1.0) ? m_refresh : 0.0, hardwareIdentification());
     }
 
     void QTGLVideoDevice::open(const StringVector& args)
@@ -222,15 +208,9 @@ namespace Rv
         }
     }
 
-    size_t QTGLVideoDevice::width() const
-    {
-        return m_view->width() * devicePixelRatio();
-    }
+    size_t QTGLVideoDevice::width() const { return m_view->width() * devicePixelRatio(); }
 
-    size_t QTGLVideoDevice::height() const
-    {
-        return m_view->height() * devicePixelRatio();
-    }
+    size_t QTGLVideoDevice::height() const { return m_view->height() * devicePixelRatio(); }
 
     void QTGLVideoDevice::syncBuffers() const
     {
@@ -254,16 +234,14 @@ namespace Rv
             int tx = x + res.width / 2;
             int ty = y + res.height / 2;
 
-            if (const TwkApp::VideoModule* module =
-                    TwkApp::App()->primaryVideoModule())
+            if (const TwkApp::VideoModule* module = TwkApp::App()->primaryVideoModule())
             {
                 if (TwkApp::VideoDevice* d = module->deviceFromPosition(tx, ty))
                 {
                     setPhysicalDevice(d);
                     refresh = d->timing().hz;
 
-                    VideoDeviceContextChangeEvent event("video-device-changed",
-                                                        this, this, d);
+                    VideoDeviceContextChangeEvent event("video-device-changed", this, this, d);
                     sendEvent(event);
                 }
             }
@@ -285,8 +263,7 @@ namespace Rv
                 }
 
                 if (IPCore::debugPlayback)
-                    cout << "INFO: new desktop refresh rate " << m_refresh
-                         << endl;
+                    cout << "INFO: new desktop refresh rate " << m_refresh << endl;
             }
         }
         m_x = x;

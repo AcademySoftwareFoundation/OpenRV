@@ -62,10 +62,7 @@ namespace IPCore
             }
         }
 
-        const char* Symbol::glslQualifierName() const
-        {
-            return glslNameOfQualifierType(qualifier());
-        }
+        const char* Symbol::glslQualifierName() const { return glslNameOfQualifierType(qualifier()); }
 
         const char* glslNameOfSymbolType(Symbol::Type t)
         {
@@ -125,10 +122,7 @@ namespace IPCore
             }
         }
 
-        const char* Symbol::glslTypeName() const
-        {
-            return glslNameOfSymbolType(type());
-        }
+        const char* Symbol::glslTypeName() const { return glslNameOfSymbolType(type()); }
 
         //----------------------------------------------------------------------
 
@@ -138,21 +132,14 @@ namespace IPCore
         {
             m_isExpression = true;
             assert(F);
-            assert(p->type() == Symbol::Vec4fType
-                   || p->type() == Symbol::InputImageType);
+            assert(p->type() == Symbol::Vec4fType || p->type() == Symbol::InputImageType);
         }
 
         BoundExpression::~BoundExpression() { delete m_value; }
 
-        BoundSymbol* BoundExpression::copy() const
-        {
-            return new BoundExpression(symbol(), m_value->copy());
-        }
+        BoundSymbol* BoundExpression::copy() const { return new BoundExpression(symbol(), m_value->copy()); }
 
-        void BoundExpression::output(std::ostream& o) const
-        {
-            m_value->output(o);
-        }
+        void BoundExpression::output(std::ostream& o) const { m_value->output(o); }
 
         void BoundExpression::outputHash(std::ostream& o) const
         {
@@ -176,8 +163,7 @@ namespace IPCore
             }
             else if (r.fb)
             {
-                o << "ImageOrFB[fb](" << r.fb->identifier() << "," << r.plane
-                  << ")";
+                o << "ImageOrFB[fb](" << r.fb->identifier() << "," << r.plane << ")";
             }
 
             return o;
@@ -189,8 +175,7 @@ namespace IPCore
             return o;
         }
 
-        std::ostream& operator<<(std::ostream& o,
-                                 const Shader::ImageCoordName& r)
+        std::ostream& operator<<(std::ostream& o, const Shader::ImageCoordName& r)
         {
             o << "ImageCoordName(" << r.name << ")";
             return o;

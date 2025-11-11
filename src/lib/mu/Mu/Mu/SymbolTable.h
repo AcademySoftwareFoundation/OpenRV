@@ -24,15 +24,9 @@ namespace Mu
     {
         struct SymbolTraits
         {
-            static bool equals(const Symbol* a, const Symbol* b)
-            {
-                return a->name() == b->name();
-            }
+            static bool equals(const Symbol* a, const Symbol* b) { return a->name() == b->name(); }
 
-            static unsigned long hash(const Symbol* s)
-            {
-                return (s->name().hash());
-            }
+            static unsigned long hash(const Symbol* s) { return (s->name().hash()); }
         };
 
     public:
@@ -67,10 +61,7 @@ namespace Mu
 
             const Symbol* operator*() const { return *_itstack.back(); }
 
-            operator bool() const
-            {
-                return _itstack.empty() ? false : bool(_itstack.back());
-            }
+            operator bool() const { return _itstack.empty() ? false : bool(_itstack.back()); }
 
             void operator++();
 

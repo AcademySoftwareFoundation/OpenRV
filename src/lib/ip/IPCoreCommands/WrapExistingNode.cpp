@@ -23,10 +23,7 @@ namespace IPCore
 
         WrapExistingNodeInfo::~WrapExistingNodeInfo() {}
 
-        TwkApp::Command* WrapExistingNodeInfo::newCommand() const
-        {
-            return new WrapExistingNode(this);
-        }
+        TwkApp::Command* WrapExistingNodeInfo::newCommand() const { return new WrapExistingNode(this); }
 
         //----------------------------------------------------------------------
 

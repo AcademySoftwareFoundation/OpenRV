@@ -28,8 +28,7 @@
 
 using namespace std;
 
-RvPusher::RvPusher(QCoreApplication& app, string tag, string cmd,
-                   vector<string> argv, QObject* parent)
+RvPusher::RvPusher(QCoreApplication& app, string tag, string cmd, vector<string> argv, QObject* parent)
     : QObject(parent)
     , m_app(app)
     , m_client(0)
@@ -45,17 +44,13 @@ RvPusher::RvPusher(QCoreApplication& app, string tag, string cmd,
     //
     m_client = new TwkQtChat::Client("rvpush-1", "rvpush", 0, false);
 
-    connect(m_client, SIGNAL(newContact(const QString&)), this,
-            SLOT(newContact(const QString&)));
+    connect(m_client, SIGNAL(newContact(const QString&)), this, SLOT(newContact(const QString&)));
 
-    connect(m_client, SIGNAL(connectionFailed(QAbstractSocket::SocketError)),
-            this, SLOT(connectionFailed(QAbstractSocket::SocketError)));
+    connect(m_client, SIGNAL(connectionFailed(QAbstractSocket::SocketError)), this, SLOT(connectionFailed(QAbstractSocket::SocketError)));
 
-    connect(m_client, SIGNAL(contactLeft(const QString&)), this,
-            SLOT(contactLeft(const QString&)));
+    connect(m_client, SIGNAL(contactLeft(const QString&)), this, SLOT(contactLeft(const QString&)));
 
-    connect(m_client, SIGNAL(newMessage(const QString&, const QString&)), this,
-            SLOT(newMessage(const QString&, const QString&)));
+    connect(m_client, SIGNAL(newMessage(const QString&, const QString&)), this, SLOT(newMessage(const QString&, const QString&)));
 
     //
     //  Build list of possible tmp files holding rv port numbers.
@@ -92,8 +87,7 @@ void RvPusher::buildFileList()
         QStringList parts = rawList[i].fileName().split("_");
         QString name = parts.mid(1).join("_");
 
-        if ((parts.size() == 1 && tagString == "")
-            || (parts.size() >= 2 && name == tagString))
+        if ((parts.size() == 1 && tagString == "") || (parts.size() >= 2 && name == tagString))
         {
             m_fileList.push_back(rawList[i]);
         }
@@ -101,9 +95,7 @@ void RvPusher::buildFileList()
 
     for (int i = 0; i < m_fileList.size(); ++i)
     {
-        DB("    file " << i << " '"
-                       << m_fileList[i].absoluteFilePath().toStdString()
-                       << "'");
+        DB("    file " << i << " '" << m_fileList[i].absoluteFilePath().toStdString() << "'");
     }
 }
 
@@ -112,9 +104,7 @@ void RvPusher::attemptConnection()
     DB("attemptConnection currentFile " << m_currentFile << " fileList:");
     for (int i = 0; i < m_fileList.size(); ++i)
     {
-        DB("    file " << i << " '"
-                       << m_fileList[i].absoluteFilePath().toStdString()
-                       << "'");
+        DB("    file " << i << " '" << m_fileList[i].absoluteFilePath().toStdString() << "'");
     }
 
     //
@@ -149,8 +139,7 @@ void RvPusher::attemptConnection()
                 if (!ok)
                     port = 0;
 
-                DB("    '" << portFile.fileName().toStdString()
-                           << "' gives port " << port);
+                DB("    '" << portFile.fileName().toStdString() << "' gives port " << port);
             }
         }
 
@@ -200,8 +189,7 @@ void RvPusher::attemptConnection()
         }
         else
         {
-            cerr << "INFO: cannot connect to any running RV, starting new one"
-                 << endl;
+            cerr << "INFO: cannot connect to any running RV, starting new one" << endl;
 
             QStringList qargs;
 
@@ -240,8 +228,7 @@ void RvPusher::attemptConnection()
                 {
 #ifdef PLATFORM_WINDOWS
                     if (m_command == "set" || m_command == "merge")
-                        std::replace(m_argv[i].begin(), m_argv[i].end(), '\\',
-                                     '/');
+                        std::replace(m_argv[i].begin(), m_argv[i].end(), '\\', '/');
 #endif
                     qargs.append(m_argv[i].c_str());
                 }
@@ -282,11 +269,9 @@ void RvPusher::newContact(const QString& contact)
     m_contact = contact;
     DB("connected to " << contact.toStdString());
 
-    bool rsvp =
-        (m_command == "mu-eval-return" || m_command == "py-eval-return");
+    bool rsvp = (m_command == "mu-eval-return" || m_command == "py-eval-return");
 
-    if (m_command == "mu-eval" || m_command == "mu-eval-return"
-        || m_command == "py-eval" || m_command == "py-eval-return"
+    if (m_command == "mu-eval" || m_command == "mu-eval-return" || m_command == "py-eval" || m_command == "py-eval-return"
         || m_command == "py-exec")
     {
         QString src = "";
@@ -306,8 +291,7 @@ void RvPusher::newContact(const QString& contact)
         else
             com = "remote-pyexec";
 
-        bool rsvp =
-            (m_command == "mu-eval-return" || m_command == "py-eval-return");
+        bool rsvp = (m_command == "mu-eval-return" || m_command == "py-eval-return");
 
         m_client->sendEvent(m_contact, com, "*", src, rsvp);
     }
@@ -317,9 +301,7 @@ void RvPusher::newContact(const QString& contact)
         //  If "set" clear the session before we add media, otherwise merge it
         //  in.
         //
-        QString mu = (m_command == "set")
-                         ? "{ require rvui; rvui.clearEverything(); "
-                         : "{ ";
+        QString mu = (m_command == "set") ? "{ require rvui; rvui.clearEverything(); " : "{ ";
 
         //
         //  Run through args, use '+' instead of '-' for per-source args.
@@ -416,8 +398,7 @@ void RvPusher::contactLeft(const QString& contact)
     //
     //  Contact failed so remove this port file
     //
-    DB("    removing "
-       << m_fileList[m_currentFile].absoluteFilePath().toStdString());
+    DB("    removing " << m_fileList[m_currentFile].absoluteFilePath().toStdString());
     QFile::remove(m_fileList[m_currentFile].absoluteFilePath());
 
     //

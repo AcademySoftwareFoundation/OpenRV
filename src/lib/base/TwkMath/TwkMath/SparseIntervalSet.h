@@ -52,8 +52,7 @@ namespace TwkMath
     template <class T> bool SparseIntervalSet<T>::includes(const T& value) const
     {
         value_type iv(value, value);
-        const_iterator i =
-            lower_bound(m_container.begin(), m_container.end(), iv, Comp<T>());
+        const_iterator i = lower_bound(m_container.begin(), m_container.end(), iv, Comp<T>());
 
         if (i == m_container.begin())
         {
@@ -75,8 +74,7 @@ namespace TwkMath
         {
             value_type iv(value, value);
 
-            iterator i = lower_bound(m_container.begin(), m_container.end(), iv,
-                                     Comp<T>());
+            iterator i = lower_bound(m_container.begin(), m_container.end(), iv, Comp<T>());
 
             if (i == m_container.begin())
             {

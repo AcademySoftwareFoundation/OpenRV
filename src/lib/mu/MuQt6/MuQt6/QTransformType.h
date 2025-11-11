@@ -47,8 +47,7 @@ namespace Mu
         //  Constructors
         //
 
-        QTransformType(Context* context, const char* name,
-                       Class* superClass = 0);
+        QTransformType(Context* context, const char* name, Class* superClass = 0);
         virtual ~QTransformType();
 
         //

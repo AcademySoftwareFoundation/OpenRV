@@ -59,16 +59,14 @@ namespace Mu
         _baseType = 0;
     }
 
-    MuQt_QUdpSocket::MuQt_QUdpSocket(Pointer muobj, const CallEnvironment* ce,
-                                     QObject* parent)
+    MuQt_QUdpSocket::MuQt_QUdpSocket(Pointer muobj, const CallEnvironment* ce, QObject* parent)
         : QUdpSocket(parent)
     {
         _env = ce;
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QUdpSocketType>(
-            c->internName("qt.QUdpSocket"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QUdpSocketType>(c->internName("qt.QUdpSocket"));
     }
 
     void MuQt_QUdpSocket::disconnectFromHost()
@@ -138,8 +136,7 @@ namespace Mu
         }
     }
 
-    void MuQt_QUdpSocket::setSocketOption(QAbstractSocket::SocketOption option,
-                                          const QVariant& value)
+    void MuQt_QUdpSocket::setSocketOption(QAbstractSocket::SocketOption option, const QVariant& value)
     {
         if (!_env)
         {
@@ -374,8 +371,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  Mu Type CONSTRUCTORS
 
-    QUdpSocketType::QUdpSocketType(Context* c, const char* name, Class* super,
-                                   Class* super2)
+    QUdpSocketType::QUdpSocketType(Context* c, const char* name, Class* super, Class* super2)
         : Class(c, name, vectorOf2(super, super2))
     {
     }
@@ -385,8 +381,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    static Pointer QUdpSocket_QUdpSocket_QObject(Thread& NODE_THREAD,
-                                                 Pointer obj)
+    static Pointer QUdpSocket_QUdpSocket_QObject(Thread& NODE_THREAD, Pointer obj)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         ClassInstance* widget = reinterpret_cast<ClassInstance*>(obj);
@@ -397,9 +392,7 @@ namespace Mu
         }
         else if (QUdpSocket* w = object<QUdpSocket>(widget))
         {
-            QUdpSocketType* type =
-                c->findSymbolOfTypeByQualifiedName<QUdpSocketType>(
-                    c->internName("qt.QUdpSocket"), false);
+            QUdpSocketType* type = c->findSymbolOfTypeByQualifiedName<QUdpSocketType>(c->internName("qt.QUdpSocket"), false);
             ClassInstance* o = ClassInstance::allocate(type);
             setobject(o, w);
             return o;
@@ -410,64 +403,49 @@ namespace Mu
         }
     }
 
-    static NODE_IMPLEMENTATION(castFromObject, Pointer)
-    {
-        NODE_RETURN(
-            QUdpSocket_QUdpSocket_QObject(NODE_THREAD, NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(castFromObject, Pointer) { NODE_RETURN(QUdpSocket_QUdpSocket_QObject(NODE_THREAD, NODE_ARG(0, Pointer))); }
 
-    Pointer qt_QUdpSocket_QUdpSocket_QUdpSocket_QUdpSocket_QObject(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
+    Pointer qt_QUdpSocket_QUdpSocket_QUdpSocket_QUdpSocket_QObject(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QObject* arg1 = object<QObject>(param_parent);
-        setobject(param_this,
-                  new MuQt_QUdpSocket(param_this,
-                                      NODE_THREAD.process()->callEnv(), arg1));
+        setobject(param_this, new MuQt_QUdpSocket(param_this, NODE_THREAD.process()->callEnv(), arg1));
         return param_this;
     }
 
-    bool
-    qt_QUdpSocket_hasPendingDatagrams_bool_QUdpSocket(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    bool qt_QUdpSocket_hasPendingDatagrams_bool_QUdpSocket(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QUdpSocket* arg0 = object<QUdpSocket>(param_this);
         return arg0->hasPendingDatagrams();
     }
 
-    bool qt_QUdpSocket_joinMulticastGroup_bool_QUdpSocket_QHostAddress(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_groupAddress)
+    bool qt_QUdpSocket_joinMulticastGroup_bool_QUdpSocket_QHostAddress(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                       Pointer param_groupAddress)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QUdpSocket* arg0 = object<QUdpSocket>(param_this);
-        const QHostAddress arg1 =
-            getqtype<QHostAddressType>(param_groupAddress);
+        const QHostAddress arg1 = getqtype<QHostAddressType>(param_groupAddress);
         return arg0->joinMulticastGroup(arg1);
     }
 
-    bool qt_QUdpSocket_leaveMulticastGroup_bool_QUdpSocket_QHostAddress(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_groupAddress)
+    bool qt_QUdpSocket_leaveMulticastGroup_bool_QUdpSocket_QHostAddress(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                        Pointer param_groupAddress)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QUdpSocket* arg0 = object<QUdpSocket>(param_this);
-        const QHostAddress arg1 =
-            getqtype<QHostAddressType>(param_groupAddress);
+        const QHostAddress arg1 = getqtype<QHostAddressType>(param_groupAddress);
         return arg0->leaveMulticastGroup(arg1);
     }
 
-    int64
-    qt_QUdpSocket_pendingDatagramSize_int64_QUdpSocket(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this)
+    int64 qt_QUdpSocket_pendingDatagramSize_int64_QUdpSocket(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QUdpSocket* arg0 = object<QUdpSocket>(param_this);
         return arg0->pendingDatagramSize();
     }
 
-    void
-    qt_QUdpSocket_disconnectFromHost_void_QUdpSocket(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_this)
+    void qt_QUdpSocket_disconnectFromHost_void_QUdpSocket(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QUdpSocket* arg0 = object<QUdpSocket>(param_this);
@@ -477,8 +455,7 @@ namespace Mu
             arg0->disconnectFromHost();
     }
 
-    void qt_QUdpSocket_resume_void_QUdpSocket(Mu::Thread& NODE_THREAD,
-                                              Pointer param_this)
+    void qt_QUdpSocket_resume_void_QUdpSocket(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QUdpSocket* arg0 = object<QUdpSocket>(param_this);
@@ -488,8 +465,7 @@ namespace Mu
             arg0->resume();
     }
 
-    void qt_QUdpSocket_setReadBufferSize_void_QUdpSocket_int64(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int64 param_size)
+    void qt_QUdpSocket_setReadBufferSize_void_QUdpSocket_int64(Mu::Thread& NODE_THREAD, Pointer param_this, int64 param_size)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QUdpSocket* arg0 = object<QUdpSocket>(param_this);
@@ -500,14 +476,12 @@ namespace Mu
             arg0->setReadBufferSize(arg1);
     }
 
-    void qt_QUdpSocket_setSocketOption_void_QUdpSocket_int_QVariant(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_option,
-        Pointer param_value)
+    void qt_QUdpSocket_setSocketOption_void_QUdpSocket_int_QVariant(Mu::Thread& NODE_THREAD, Pointer param_this, int param_option,
+                                                                    Pointer param_value)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QUdpSocket* arg0 = object<QUdpSocket>(param_this);
-        QAbstractSocket::SocketOption arg1 =
-            (QAbstractSocket::SocketOption)(param_option);
+        QAbstractSocket::SocketOption arg1 = (QAbstractSocket::SocketOption)(param_option);
         const QVariant arg2 = getqtype<QVariantType>(param_value);
         if (isMuQtObject(arg0))
             arg0->QUdpSocket::setSocketOption(arg1, arg2);
@@ -515,60 +489,46 @@ namespace Mu
             arg0->setSocketOption(arg1, arg2);
     }
 
-    Pointer qt_QUdpSocket_socketOption_QVariant_QUdpSocket_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_option)
+    Pointer qt_QUdpSocket_socketOption_QVariant_QUdpSocket_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_option)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QUdpSocket* arg0 = object<QUdpSocket>(param_this);
-        QAbstractSocket::SocketOption arg1 =
-            (QAbstractSocket::SocketOption)(param_option);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QVariantType>(
-                         c, arg0->QUdpSocket::socketOption(arg1), "qt.QVariant")
-                   : makeqtype<QVariantType>(c, arg0->socketOption(arg1),
-                                             "qt.QVariant");
+        QAbstractSocket::SocketOption arg1 = (QAbstractSocket::SocketOption)(param_option);
+        return isMuQtObject(arg0) ? makeqtype<QVariantType>(c, arg0->QUdpSocket::socketOption(arg1), "qt.QVariant")
+                                  : makeqtype<QVariantType>(c, arg0->socketOption(arg1), "qt.QVariant");
     }
 
-    bool qt_QUdpSocket_waitForConnected_bool_QUdpSocket_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_msecs)
+    bool qt_QUdpSocket_waitForConnected_bool_QUdpSocket_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_msecs)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QUdpSocket* arg0 = object<QUdpSocket>(param_this);
         int arg1 = (int)(param_msecs);
-        return isMuQtObject(arg0) ? arg0->QUdpSocket::waitForConnected(arg1)
-                                  : arg0->waitForConnected(arg1);
+        return isMuQtObject(arg0) ? arg0->QUdpSocket::waitForConnected(arg1) : arg0->waitForConnected(arg1);
     }
 
-    bool qt_QUdpSocket_waitForDisconnected_bool_QUdpSocket_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_msecs)
+    bool qt_QUdpSocket_waitForDisconnected_bool_QUdpSocket_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_msecs)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QUdpSocket* arg0 = object<QUdpSocket>(param_this);
         int arg1 = (int)(param_msecs);
-        return isMuQtObject(arg0) ? arg0->QUdpSocket::waitForDisconnected(arg1)
-                                  : arg0->waitForDisconnected(arg1);
+        return isMuQtObject(arg0) ? arg0->QUdpSocket::waitForDisconnected(arg1) : arg0->waitForDisconnected(arg1);
     }
 
-    int64 qt_QUdpSocket_bytesAvailable_int64_QUdpSocket(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this)
+    int64 qt_QUdpSocket_bytesAvailable_int64_QUdpSocket(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QUdpSocket* arg0 = object<QUdpSocket>(param_this);
-        return isMuQtObject(arg0) ? arg0->QUdpSocket::bytesAvailable()
-                                  : arg0->bytesAvailable();
+        return isMuQtObject(arg0) ? arg0->QUdpSocket::bytesAvailable() : arg0->bytesAvailable();
     }
 
-    int64 qt_QUdpSocket_bytesToWrite_int64_QUdpSocket(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    int64 qt_QUdpSocket_bytesToWrite_int64_QUdpSocket(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QUdpSocket* arg0 = object<QUdpSocket>(param_this);
-        return isMuQtObject(arg0) ? arg0->QUdpSocket::bytesToWrite()
-                                  : arg0->bytesToWrite();
+        return isMuQtObject(arg0) ? arg0->QUdpSocket::bytesToWrite() : arg0->bytesToWrite();
     }
 
-    void qt_QUdpSocket_close_void_QUdpSocket(Mu::Thread& NODE_THREAD,
-                                             Pointer param_this)
+    void qt_QUdpSocket_close_void_QUdpSocket(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QUdpSocket* arg0 = object<QUdpSocket>(param_this);
@@ -578,164 +538,127 @@ namespace Mu
             arg0->close();
     }
 
-    bool qt_QUdpSocket_isSequential_bool_QUdpSocket(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this)
+    bool qt_QUdpSocket_isSequential_bool_QUdpSocket(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QUdpSocket* arg0 = object<QUdpSocket>(param_this);
-        return isMuQtObject(arg0) ? arg0->QUdpSocket::isSequential()
-                                  : arg0->isSequential();
+        return isMuQtObject(arg0) ? arg0->QUdpSocket::isSequential() : arg0->isSequential();
     }
 
-    bool qt_QUdpSocket_waitForBytesWritten_bool_QUdpSocket_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_msecs)
-    {
-        MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-        QUdpSocket* arg0 = object<QUdpSocket>(param_this);
-        int arg1 = (int)(param_msecs);
-        return isMuQtObject(arg0) ? arg0->QUdpSocket::waitForBytesWritten(arg1)
-                                  : arg0->waitForBytesWritten(arg1);
-    }
-
-    bool qt_QUdpSocket_waitForReadyRead_bool_QUdpSocket_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_msecs)
+    bool qt_QUdpSocket_waitForBytesWritten_bool_QUdpSocket_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_msecs)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QUdpSocket* arg0 = object<QUdpSocket>(param_this);
         int arg1 = (int)(param_msecs);
-        return isMuQtObject(arg0) ? arg0->QUdpSocket::waitForReadyRead(arg1)
-                                  : arg0->waitForReadyRead(arg1);
+        return isMuQtObject(arg0) ? arg0->QUdpSocket::waitForBytesWritten(arg1) : arg0->waitForBytesWritten(arg1);
     }
 
-    int64 qt_QUdpSocket_skipData_int64_QUdpSocket_int64(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this,
-                                                        int64 param_maxSize)
+    bool qt_QUdpSocket_waitForReadyRead_bool_QUdpSocket_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_msecs)
+    {
+        MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
+        QUdpSocket* arg0 = object<QUdpSocket>(param_this);
+        int arg1 = (int)(param_msecs);
+        return isMuQtObject(arg0) ? arg0->QUdpSocket::waitForReadyRead(arg1) : arg0->waitForReadyRead(arg1);
+    }
+
+    int64 qt_QUdpSocket_skipData_int64_QUdpSocket_int64(Mu::Thread& NODE_THREAD, Pointer param_this, int64 param_maxSize)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QUdpSocket* arg0 = object<QUdpSocket>(param_this);
         qint64 arg1 = (int64)(param_maxSize);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QUdpSocket*)arg0)->skipData_pub_parent(arg1)
-                   : ((MuQt_QUdpSocket*)arg0)->skipData_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QUdpSocket*)arg0)->skipData_pub_parent(arg1) : ((MuQt_QUdpSocket*)arg0)->skipData_pub(arg1);
     }
 
     static NODE_IMPLEMENTATION(_n_QUdpSocket0, Pointer)
     {
-        NODE_RETURN(qt_QUdpSocket_QUdpSocket_QUdpSocket_QUdpSocket_QObject(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QUdpSocket_QUdpSocket_QUdpSocket_QUdpSocket_QObject(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_hasPendingDatagrams0, bool)
     {
-        NODE_RETURN(qt_QUdpSocket_hasPendingDatagrams_bool_QUdpSocket(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QUdpSocket_hasPendingDatagrams_bool_QUdpSocket(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_joinMulticastGroup0, bool)
     {
         NODE_RETURN(
-            qt_QUdpSocket_joinMulticastGroup_bool_QUdpSocket_QHostAddress(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+            qt_QUdpSocket_joinMulticastGroup_bool_QUdpSocket_QHostAddress(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_leaveMulticastGroup0, bool)
     {
         NODE_RETURN(
-            qt_QUdpSocket_leaveMulticastGroup_bool_QUdpSocket_QHostAddress(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+            qt_QUdpSocket_leaveMulticastGroup_bool_QUdpSocket_QHostAddress(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_pendingDatagramSize0, int64)
     {
-        NODE_RETURN(qt_QUdpSocket_pendingDatagramSize_int64_QUdpSocket(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QUdpSocket_pendingDatagramSize_int64_QUdpSocket(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_disconnectFromHost0, void)
     {
-        qt_QUdpSocket_disconnectFromHost_void_QUdpSocket(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
+        qt_QUdpSocket_disconnectFromHost_void_QUdpSocket(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
     }
 
-    static NODE_IMPLEMENTATION(_n_resume0, void)
-    {
-        qt_QUdpSocket_resume_void_QUdpSocket(NODE_THREAD,
-                                             NONNIL_NODE_ARG(0, Pointer));
-    }
+    static NODE_IMPLEMENTATION(_n_resume0, void) { qt_QUdpSocket_resume_void_QUdpSocket(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)); }
 
     static NODE_IMPLEMENTATION(_n_setReadBufferSize0, void)
     {
-        qt_QUdpSocket_setReadBufferSize_void_QUdpSocket_int64(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int64));
+        qt_QUdpSocket_setReadBufferSize_void_QUdpSocket_int64(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int64));
     }
 
     static NODE_IMPLEMENTATION(_n_setSocketOption0, void)
     {
-        qt_QUdpSocket_setSocketOption_void_QUdpSocket_int_QVariant(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, Pointer));
+        qt_QUdpSocket_setSocketOption_void_QUdpSocket_int_QVariant(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                   NODE_ARG(2, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_socketOption0, Pointer)
     {
-        NODE_RETURN(qt_QUdpSocket_socketOption_QVariant_QUdpSocket_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QUdpSocket_socketOption_QVariant_QUdpSocket_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_waitForConnected0, bool)
     {
-        NODE_RETURN(qt_QUdpSocket_waitForConnected_bool_QUdpSocket_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QUdpSocket_waitForConnected_bool_QUdpSocket_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_waitForDisconnected0, bool)
     {
-        NODE_RETURN(qt_QUdpSocket_waitForDisconnected_bool_QUdpSocket_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QUdpSocket_waitForDisconnected_bool_QUdpSocket_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_bytesAvailable0, int64)
     {
-        NODE_RETURN(qt_QUdpSocket_bytesAvailable_int64_QUdpSocket(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QUdpSocket_bytesAvailable_int64_QUdpSocket(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_bytesToWrite0, int64)
     {
-        NODE_RETURN(qt_QUdpSocket_bytesToWrite_int64_QUdpSocket(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QUdpSocket_bytesToWrite_int64_QUdpSocket(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
-    static NODE_IMPLEMENTATION(_n_close0, void)
-    {
-        qt_QUdpSocket_close_void_QUdpSocket(NODE_THREAD,
-                                            NONNIL_NODE_ARG(0, Pointer));
-    }
+    static NODE_IMPLEMENTATION(_n_close0, void) { qt_QUdpSocket_close_void_QUdpSocket(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)); }
 
     static NODE_IMPLEMENTATION(_n_isSequential0, bool)
     {
-        NODE_RETURN(qt_QUdpSocket_isSequential_bool_QUdpSocket(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QUdpSocket_isSequential_bool_QUdpSocket(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_waitForBytesWritten0, bool)
     {
-        NODE_RETURN(qt_QUdpSocket_waitForBytesWritten_bool_QUdpSocket_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QUdpSocket_waitForBytesWritten_bool_QUdpSocket_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_waitForReadyRead0, bool)
     {
-        NODE_RETURN(qt_QUdpSocket_waitForReadyRead_bool_QUdpSocket_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QUdpSocket_waitForReadyRead_bool_QUdpSocket_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_skipData0, int64)
     {
-        NODE_RETURN(qt_QUdpSocket_skipData_int64_QUdpSocket_int64(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int64)));
+        NODE_RETURN(qt_QUdpSocket_skipData_int64_QUdpSocket_int64(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int64)));
     }
 
     void QUdpSocketType::load()
@@ -755,17 +678,13 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
-                   new Function(c, tn, castFromObject, Cast, Compiled,
-                                QUdpSocket_QUdpSocket_QObject, Return, ftn,
-                                Parameters,
+                   new Function(c, tn, castFromObject, Cast, Compiled, QUdpSocket_QUdpSocket_QObject, Return, ftn, Parameters,
                                 new Param(c, "object", "qt.QObject"), End),
 
                    EndArguments);
@@ -773,38 +692,24 @@ namespace Mu
         addSymbols(
             // enums
             // member functions
-            new Function(c, "QUdpSocket", _n_QUdpSocket0, None, Compiled,
-                         qt_QUdpSocket_QUdpSocket_QUdpSocket_QUdpSocket_QObject,
-                         Return, "qt.QUdpSocket", Parameters,
-                         new Param(c, "this", "qt.QUdpSocket"),
-                         new Param(c, "parent", "qt.QObject"), End),
-            new Function(c, "hasPendingDatagrams", _n_hasPendingDatagrams0,
-                         None, Compiled,
-                         qt_QUdpSocket_hasPendingDatagrams_bool_QUdpSocket,
-                         Return, "bool", Parameters,
+            new Function(c, "QUdpSocket", _n_QUdpSocket0, None, Compiled, qt_QUdpSocket_QUdpSocket_QUdpSocket_QUdpSocket_QObject, Return,
+                         "qt.QUdpSocket", Parameters, new Param(c, "this", "qt.QUdpSocket"), new Param(c, "parent", "qt.QObject"), End),
+            new Function(c, "hasPendingDatagrams", _n_hasPendingDatagrams0, None, Compiled,
+                         qt_QUdpSocket_hasPendingDatagrams_bool_QUdpSocket, Return, "bool", Parameters,
                          new Param(c, "this", "qt.QUdpSocket"), End),
-            new Function(
-                c, "joinMulticastGroup", _n_joinMulticastGroup0, None, Compiled,
-                qt_QUdpSocket_joinMulticastGroup_bool_QUdpSocket_QHostAddress,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QUdpSocket"),
-                new Param(c, "groupAddress", "qt.QHostAddress"), End),
+            new Function(c, "joinMulticastGroup", _n_joinMulticastGroup0, None, Compiled,
+                         qt_QUdpSocket_joinMulticastGroup_bool_QUdpSocket_QHostAddress, Return, "bool", Parameters,
+                         new Param(c, "this", "qt.QUdpSocket"), new Param(c, "groupAddress", "qt.QHostAddress"), End),
             // MISSING: joinMulticastGroup (bool; QUdpSocket this, QHostAddress
             // groupAddress, "const QNetworkInterface &" iface)
-            new Function(
-                c, "leaveMulticastGroup", _n_leaveMulticastGroup0, None,
-                Compiled,
-                qt_QUdpSocket_leaveMulticastGroup_bool_QUdpSocket_QHostAddress,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QUdpSocket"),
-                new Param(c, "groupAddress", "qt.QHostAddress"), End),
+            new Function(c, "leaveMulticastGroup", _n_leaveMulticastGroup0, None, Compiled,
+                         qt_QUdpSocket_leaveMulticastGroup_bool_QUdpSocket_QHostAddress, Return, "bool", Parameters,
+                         new Param(c, "this", "qt.QUdpSocket"), new Param(c, "groupAddress", "qt.QHostAddress"), End),
             // MISSING: leaveMulticastGroup (bool; QUdpSocket this, QHostAddress
             // groupAddress, "const QNetworkInterface &" iface) MISSING:
             // multicastInterface ("QNetworkInterface"; QUdpSocket this)
-            new Function(c, "pendingDatagramSize", _n_pendingDatagramSize0,
-                         None, Compiled,
-                         qt_QUdpSocket_pendingDatagramSize_int64_QUdpSocket,
-                         Return, "int64", Parameters,
+            new Function(c, "pendingDatagramSize", _n_pendingDatagramSize0, None, Compiled,
+                         qt_QUdpSocket_pendingDatagramSize_int64_QUdpSocket, Return, "int64", Parameters,
                          new Param(c, "this", "qt.QUdpSocket"), End),
             // MISSING: readDatagram (int64; QUdpSocket this, "char *" data,
             // int64 maxSize, QHostAddress address, "quint16 *" port) MISSING:
@@ -821,82 +726,52 @@ namespace Mu
             // QUdpSocket this, string hostName, "quint16" port, flags
             // QIODeviceBase::OpenMode openMode, flags
             // QAbstractSocket::NetworkLayerProtocol protocol)
-            _func[0] = new MemberFunction(
-                c, "disconnectFromHost", _n_disconnectFromHost0, None, Compiled,
-                qt_QUdpSocket_disconnectFromHost_void_QUdpSocket, Return,
-                "void", Parameters, new Param(c, "this", "qt.QUdpSocket"), End),
-            _func[1] = new MemberFunction(
-                c, "resume", _n_resume0, None, Compiled,
-                qt_QUdpSocket_resume_void_QUdpSocket, Return, "void",
-                Parameters, new Param(c, "this", "qt.QUdpSocket"), End),
-            _func[2] = new MemberFunction(
-                c, "setReadBufferSize", _n_setReadBufferSize0, None, Compiled,
-                qt_QUdpSocket_setReadBufferSize_void_QUdpSocket_int64, Return,
-                "void", Parameters, new Param(c, "this", "qt.QUdpSocket"),
-                new Param(c, "size", "int64"), End),
+            _func[0] = new MemberFunction(c, "disconnectFromHost", _n_disconnectFromHost0, None, Compiled,
+                                          qt_QUdpSocket_disconnectFromHost_void_QUdpSocket, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QUdpSocket"), End),
+            _func[1] = new MemberFunction(c, "resume", _n_resume0, None, Compiled, qt_QUdpSocket_resume_void_QUdpSocket, Return, "void",
+                                          Parameters, new Param(c, "this", "qt.QUdpSocket"), End),
+            _func[2] = new MemberFunction(c, "setReadBufferSize", _n_setReadBufferSize0, None, Compiled,
+                                          qt_QUdpSocket_setReadBufferSize_void_QUdpSocket_int64, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QUdpSocket"), new Param(c, "size", "int64"), End),
             // MISSING: setSocketDescriptor (bool; QUdpSocket this, "qintptr"
             // socketDescriptor, flags QAbstractSocket::SocketState socketState,
             // flags QIODeviceBase::OpenMode openMode)
-            _func[3] = new MemberFunction(
-                c, "setSocketOption", _n_setSocketOption0, None, Compiled,
-                qt_QUdpSocket_setSocketOption_void_QUdpSocket_int_QVariant,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QUdpSocket"),
-                new Param(c, "option", "int"),
-                new Param(c, "value", "qt.QVariant"), End),
+            _func[3] = new MemberFunction(c, "setSocketOption", _n_setSocketOption0, None, Compiled,
+                                          qt_QUdpSocket_setSocketOption_void_QUdpSocket_int_QVariant, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QUdpSocket"), new Param(c, "option", "int"),
+                                          new Param(c, "value", "qt.QVariant"), End),
             // MISSING: socketDescriptor ("qintptr"; QUdpSocket this)
-            _func[4] = new MemberFunction(
-                c, "socketOption", _n_socketOption0, None, Compiled,
-                qt_QUdpSocket_socketOption_QVariant_QUdpSocket_int, Return,
-                "qt.QVariant", Parameters,
-                new Param(c, "this", "qt.QUdpSocket"),
-                new Param(c, "option", "int"), End),
-            _func[5] = new MemberFunction(
-                c, "waitForConnected", _n_waitForConnected0, None, Compiled,
-                qt_QUdpSocket_waitForConnected_bool_QUdpSocket_int, Return,
-                "bool", Parameters, new Param(c, "this", "qt.QUdpSocket"),
-                new Param(c, "msecs", "int", Value((int)30000)), End),
-            _func[6] = new MemberFunction(
-                c, "waitForDisconnected", _n_waitForDisconnected0, None,
-                Compiled, qt_QUdpSocket_waitForDisconnected_bool_QUdpSocket_int,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QUdpSocket"),
-                new Param(c, "msecs", "int", Value((int)30000)), End),
-            _func[7] = new MemberFunction(
-                c, "bytesAvailable", _n_bytesAvailable0, None, Compiled,
-                qt_QUdpSocket_bytesAvailable_int64_QUdpSocket, Return, "int64",
-                Parameters, new Param(c, "this", "qt.QUdpSocket"), End),
-            _func[8] = new MemberFunction(
-                c, "bytesToWrite", _n_bytesToWrite0, None, Compiled,
-                qt_QUdpSocket_bytesToWrite_int64_QUdpSocket, Return, "int64",
-                Parameters, new Param(c, "this", "qt.QUdpSocket"), End),
-            _func[9] = new MemberFunction(
-                c, "close", _n_close0, None, Compiled,
-                qt_QUdpSocket_close_void_QUdpSocket, Return, "void", Parameters,
-                new Param(c, "this", "qt.QUdpSocket"), End),
-            _func[10] = new MemberFunction(
-                c, "isSequential", _n_isSequential0, None, Compiled,
-                qt_QUdpSocket_isSequential_bool_QUdpSocket, Return, "bool",
-                Parameters, new Param(c, "this", "qt.QUdpSocket"), End),
-            _func[11] = new MemberFunction(
-                c, "waitForBytesWritten", _n_waitForBytesWritten0, None,
-                Compiled, qt_QUdpSocket_waitForBytesWritten_bool_QUdpSocket_int,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QUdpSocket"),
-                new Param(c, "msecs", "int", Value((int)30000)), End),
-            _func[12] = new MemberFunction(
-                c, "waitForReadyRead", _n_waitForReadyRead0, None, Compiled,
-                qt_QUdpSocket_waitForReadyRead_bool_QUdpSocket_int, Return,
-                "bool", Parameters, new Param(c, "this", "qt.QUdpSocket"),
-                new Param(c, "msecs", "int", Value((int)30000)), End),
+            _func[4] = new MemberFunction(c, "socketOption", _n_socketOption0, None, Compiled,
+                                          qt_QUdpSocket_socketOption_QVariant_QUdpSocket_int, Return, "qt.QVariant", Parameters,
+                                          new Param(c, "this", "qt.QUdpSocket"), new Param(c, "option", "int"), End),
+            _func[5] = new MemberFunction(c, "waitForConnected", _n_waitForConnected0, None, Compiled,
+                                          qt_QUdpSocket_waitForConnected_bool_QUdpSocket_int, Return, "bool", Parameters,
+                                          new Param(c, "this", "qt.QUdpSocket"), new Param(c, "msecs", "int", Value((int)30000)), End),
+            _func[6] = new MemberFunction(c, "waitForDisconnected", _n_waitForDisconnected0, None, Compiled,
+                                          qt_QUdpSocket_waitForDisconnected_bool_QUdpSocket_int, Return, "bool", Parameters,
+                                          new Param(c, "this", "qt.QUdpSocket"), new Param(c, "msecs", "int", Value((int)30000)), End),
+            _func[7] =
+                new MemberFunction(c, "bytesAvailable", _n_bytesAvailable0, None, Compiled, qt_QUdpSocket_bytesAvailable_int64_QUdpSocket,
+                                   Return, "int64", Parameters, new Param(c, "this", "qt.QUdpSocket"), End),
+            _func[8] = new MemberFunction(c, "bytesToWrite", _n_bytesToWrite0, None, Compiled, qt_QUdpSocket_bytesToWrite_int64_QUdpSocket,
+                                          Return, "int64", Parameters, new Param(c, "this", "qt.QUdpSocket"), End),
+            _func[9] = new MemberFunction(c, "close", _n_close0, None, Compiled, qt_QUdpSocket_close_void_QUdpSocket, Return, "void",
+                                          Parameters, new Param(c, "this", "qt.QUdpSocket"), End),
+            _func[10] = new MemberFunction(c, "isSequential", _n_isSequential0, None, Compiled, qt_QUdpSocket_isSequential_bool_QUdpSocket,
+                                           Return, "bool", Parameters, new Param(c, "this", "qt.QUdpSocket"), End),
+            _func[11] = new MemberFunction(c, "waitForBytesWritten", _n_waitForBytesWritten0, None, Compiled,
+                                           qt_QUdpSocket_waitForBytesWritten_bool_QUdpSocket_int, Return, "bool", Parameters,
+                                           new Param(c, "this", "qt.QUdpSocket"), new Param(c, "msecs", "int", Value((int)30000)), End),
+            _func[12] = new MemberFunction(c, "waitForReadyRead", _n_waitForReadyRead0, None, Compiled,
+                                           qt_QUdpSocket_waitForReadyRead_bool_QUdpSocket_int, Return, "bool", Parameters,
+                                           new Param(c, "this", "qt.QUdpSocket"), new Param(c, "msecs", "int", Value((int)30000)), End),
             // MISSING: readData (int64; QUdpSocket this, "char *" data, int64
             // maxSize) // protected MISSING: readLineData (int64; QUdpSocket
             // this, "char *" data, int64 maxlen) // protected
-            _func[13] = new MemberFunction(
-                c, "skipData", _n_skipData0, None, Compiled,
-                qt_QUdpSocket_skipData_int64_QUdpSocket_int64, Return, "int64",
-                Parameters, new Param(c, "this", "qt.QUdpSocket"),
-                new Param(c, "maxSize", "int64"), End),
+            _func[13] =
+                new MemberFunction(c, "skipData", _n_skipData0, None, Compiled, qt_QUdpSocket_skipData_int64_QUdpSocket_int64, Return,
+                                   "int64", Parameters, new Param(c, "this", "qt.QUdpSocket"), new Param(c, "maxSize", "int64"), End),
             // MISSING: writeData (int64; QUdpSocket this, "const char *" data,
             // int64 size) // protected static functions
             EndArguments);

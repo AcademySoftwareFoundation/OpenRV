@@ -30,8 +30,7 @@ namespace TwkQtChat
 {
     using namespace std;
 
-    Client::Client(const QString& name, const QString& appName, int port,
-                   bool pingpong, ConnectionFactory fact)
+    Client::Client(const QString& name, const QString& appName, int port, bool pingpong, ConnectionFactory fact)
         : m_pingpong(pingpong)
         , m_contactName(name)
         , m_contactApp(appName)
@@ -49,8 +48,7 @@ namespace TwkQtChat
             if (!m_server->isListening())
                 return;
 
-            QObject::connect(m_server, SIGNAL(newConnection(Connection*)), this,
-                             SLOT(newConnection(Connection*)));
+            QObject::connect(m_server, SIGNAL(newConnection(Connection*)), this, SLOT(newConnection(Connection*)));
         }
         else
             m_server = 0;
@@ -88,8 +86,7 @@ namespace TwkQtChat
         }
     }
 
-    void Client::sendData(const QString& who, const QString& interp,
-                          const QByteArray& data)
+    void Client::sendData(const QString& who, const QString& interp, const QByteArray& data)
     {
         if (interp.isEmpty() || data.isEmpty())
             return;
@@ -105,17 +102,14 @@ namespace TwkQtChat
         }
     }
 
-    void Client::broadcastEvent(const QString& eventName, const QString& target,
-                                const QString& text, bool rsvp)
+    void Client::broadcastEvent(const QString& eventName, const QString& target, const QString& text, bool rsvp)
     {
         QString type = (rsvp) ? "RETURNEVENT " : "EVENT ";
         QString message = type + eventName + " " + target + " " + text;
         broadcastMessage(message);
     }
 
-    void Client::sendEvent(const QString& who, const QString& eventName,
-                           const QString& target, const QString& text,
-                           bool rsvp)
+    void Client::sendEvent(const QString& who, const QString& eventName, const QString& target, const QString& text, bool rsvp)
     {
         QString type = (rsvp) ? "RETURNEVENT " : "EVENT ";
         QString message = type + eventName + " " + target + " " + text;
@@ -160,8 +154,7 @@ namespace TwkQtChat
         return m_contactName + "@" + name;
     }
 
-    bool Client::hasConnection(const QHostAddress& senderIp,
-                               int senderPort) const
+    bool Client::hasConnection(const QHostAddress& senderIp, int senderPort) const
     {
         if (senderPort == -1)
             return m_connectionMap.contains(senderIp);
@@ -179,8 +172,7 @@ namespace TwkQtChat
         return false;
     }
 
-    void Client::connectTo(const QString& name, const QHostAddress& ip,
-                           int port)
+    void Client::connectTo(const QString& name, const QHostAddress& ip, int port)
     {
         if (!hasConnection(ip, port))
         {
@@ -226,12 +218,10 @@ namespace TwkQtChat
     {
         connection->setGreetingMessage(m_contactName, m_contactApp);
 
-        connect(connection, SIGNAL(errorOccurred(QAbstractSocket::SocketError)),
-                this, SLOT(connectionError(QAbstractSocket::SocketError)));
+        connect(connection, SIGNAL(errorOccurred(QAbstractSocket::SocketError)), this, SLOT(connectionError(QAbstractSocket::SocketError)));
         connect(connection, SIGNAL(disconnected()), this, SLOT(disconnected()));
         connect(connection, SIGNAL(readyForUse()), this, SLOT(readyForUse()));
-        connect(connection, SIGNAL(requestGreeting()), this,
-                SLOT(requestGreeting()));
+        connect(connection, SIGNAL(requestGreeting()), this, SLOT(requestGreeting()));
     }
 
     void Client::disconnectFrom(const QString& contact)
@@ -246,8 +236,7 @@ namespace TwkQtChat
 
     Connection* Client::connectionByName(const QString& contact) const
     {
-        for (ConnectionMap::const_iterator i = m_connectionMap.constBegin();
-             i != m_connectionMap.constEnd(); ++i)
+        for (ConnectionMap::const_iterator i = m_connectionMap.constBegin(); i != m_connectionMap.constEnd(); ++i)
         {
             Connection* c = *i;
             if (c->remoteContactName() == contact)
@@ -286,19 +275,14 @@ namespace TwkQtChat
     {
         DB("Client::readyForUse");
         Connection* connection = qobject_cast<Connection*>(sender());
-        if (!connection
-            || hasConnection(connection->peerAddress(), connection->peerPort())
+        if (!connection || hasConnection(connection->peerAddress(), connection->peerPort())
             || connectionByName(connection->remoteContactName()))
             return;
 
-        connect(connection, SIGNAL(newMessage(const QString&, const QString&)),
-                this, SIGNAL(newMessage(const QString&, const QString&)));
+        connect(connection, SIGNAL(newMessage(const QString&, const QString&)), this, SIGNAL(newMessage(const QString&, const QString&)));
 
-        connect(
-            connection,
-            SIGNAL(newData(const QString&, const QString&, const QByteArray&)),
-            this,
-            SIGNAL(newData(const QString&, const QString&, const QByteArray&)));
+        connect(connection, SIGNAL(newData(const QString&, const QString&, const QByteArray&)), this,
+                SIGNAL(newData(const QString&, const QString&, const QByteArray&)));
 
         m_connectionMap.insert(connection->peerAddress(), connection);
         QString contact = connection->remoteContactName();
@@ -318,13 +302,11 @@ namespace TwkQtChat
     {
         if (Connection* connection = qobject_cast<Connection*>(sender()))
         {
-            DB("connectionError state " << connection->state() << " incoming "
-                                        << connection->incoming());
+            DB("connectionError state " << connection->state() << " incoming " << connection->incoming());
             //
             //  Ignore errors on incoming connections before greeting
             //
-            if (connection->incoming()
-                && connection->state() == Connection::WaitingForGreeting)
+            if (connection->incoming() && connection->state() == Connection::WaitingForGreeting)
                 return;
 
             QString msg = connection->errorString();
@@ -333,10 +315,9 @@ namespace TwkQtChat
             if (cname == "unknown")
                 cname = connection->expectedContactName();
 
-            emit contactError(
-                cname,
-                // cname + "@" + connection->expectedAddress().toString(),
-                connection->expectedAddress().toString(), msg);
+            emit contactError(cname,
+                              // cname + "@" + connection->expectedAddress().toString(),
+                              connection->expectedAddress().toString(), msg);
 
             QString name = connection->remoteContactName();
             emit contactLeft(name);
@@ -353,8 +334,7 @@ namespace TwkQtChat
             DB("    removing connection from map");
             m_connectionMap.remove(connection->peerAddress(), connection);
 
-            if (!connection->duplicate()
-                && !connection->remoteContactName().isEmpty())
+            if (!connection->duplicate() && !connection->remoteContactName().isEmpty())
             {
                 emit contactLeft(connection->remoteContactName());
             }
@@ -369,9 +349,6 @@ namespace TwkQtChat
         waitForSend(contact);
     }
 
-    bool Client::online()
-    {
-        return (m_server) ? m_server->isListening() : false;
-    }
+    bool Client::online() { return (m_server) ? m_server->isListening() : false; }
 
 } // namespace TwkQtChat

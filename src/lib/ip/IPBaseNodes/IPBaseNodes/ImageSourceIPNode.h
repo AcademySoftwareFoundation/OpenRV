@@ -40,8 +40,7 @@ namespace IPCore
         typedef std::vector<StringVector> LayerTree;
         typedef std::set<std::string> NameSet;
 
-        ImageSourceIPNode(const std::string& name, const NodeDefinition* def,
-                          IPGraph*, GroupIPNode* group = 0,
+        ImageSourceIPNode(const std::string& name, const NodeDefinition* def, IPGraph*, GroupIPNode* group = 0,
                           const std::string mediaRepName = "");
 
         virtual ~ImageSourceIPNode();
@@ -53,8 +52,7 @@ namespace IPCore
         //  view and layer will be used if none is specified.
         //
 
-        Property* findCreatePixels(int frame, const std::string& view = "-",
-                                   const std::string& layer = "-");
+        Property* findCreatePixels(int frame, const std::string& view = "-", const std::string& layer = "-");
 
         //
         //  IPNode API
@@ -87,9 +85,8 @@ namespace IPCore
         //  not any uncrop region.
         //
 
-        void insertPixels(const std::string& view, const std::string& layer,
-                          int frame, int x, int y, int w, int h,
-                          const void* pixels, size_t size);
+        void insertPixels(const std::string& view, const std::string& layer, int frame, int x, int y, int w, int h, const void* pixels,
+                          size_t size);
 
         virtual void readCompleted(const std::string&, unsigned int);
         virtual void writeCompleted();
@@ -98,15 +95,10 @@ namespace IPCore
         std::string defaultView() const;
         std::string defaultLayer() const;
 
-        void pixelPropNamesViewLayer(const StringVector& suffixes1,
-                                     const StringVector& suffixes2,
-                                     const std::string& sep1,
-                                     const std::string& sep2, int frame,
-                                     LayerTree& propNames, bool existingOnly);
+        void pixelPropNamesViewLayer(const StringVector& suffixes1, const StringVector& suffixes2, const std::string& sep1,
+                                     const std::string& sep2, int frame, LayerTree& propNames, bool existingOnly);
 
-        void pixelPropNames(const StringVector& views,
-                            const StringVector& layers, int frame,
-                            LayerTree& propNames, bool existingOnly);
+        void pixelPropNames(const StringVector& views, const StringVector& layers, int frame, LayerTree& propNames, bool existingOnly);
 
         Property* makePixels(const std::string& comp, const std::string& prop);
 

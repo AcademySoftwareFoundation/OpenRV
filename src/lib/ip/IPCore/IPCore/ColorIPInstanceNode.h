@@ -16,8 +16,7 @@ namespace IPCore
     class ColorIPInstanceNode : public IPInstanceNode
     {
     public:
-        ColorIPInstanceNode(const std::string& name, const NodeDefinition* def,
-                            IPGraph* graph, GroupIPNode* group = 0);
+        ColorIPInstanceNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group = 0);
 
         virtual ~ColorIPInstanceNode();
 

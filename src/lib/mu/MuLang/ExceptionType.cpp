@@ -35,10 +35,7 @@ namespace Mu
     {
     }
 
-    String ExceptionType::Exception::backtraceAsString() const
-    {
-        return Mu::Exception::backtraceAsString(_backtrace);
-    }
+    String ExceptionType::Exception::backtraceAsString() const { return Mu::Exception::backtraceAsString(_backtrace); }
 
     //----------------------------------------------------------------------
 
@@ -51,13 +48,9 @@ namespace Mu
 
     Object* ExceptionType::newObject() const { return new Exception(this); }
 
-    void ExceptionType::deleteObject(Object* obj) const
-    {
-        delete reinterpret_cast<ExceptionType::Exception*>(obj);
-    }
+    void ExceptionType::deleteObject(Object* obj) const { delete reinterpret_cast<ExceptionType::Exception*>(obj); }
 
-    void ExceptionType::outputValueRecursive(ostream& o, const ValuePointer vp,
-                                             ValueOutputState& state) const
+    void ExceptionType::outputValueRecursive(ostream& o, const ValuePointer vp, ValueOutputState& state) const
     {
         const Exception* s = *reinterpret_cast<const Exception**>(vp);
 
@@ -88,56 +81,39 @@ namespace Mu
         MuLangContext* context = (MuLangContext*)globalModule()->context();
         context->arrayType(context->stringType(), 1, 0); // string[]
 
-        s->addSymbols(
-            new ReferenceType(c, "exception&", this),
+        s->addSymbols(new ReferenceType(c, "exception&", this),
 
-            new Function(c, "exception", ExceptionType::construct, None, Return,
-                         "exception", End),
+                      new Function(c, "exception", ExceptionType::construct, None, Return, "exception", End),
 
-            new Function(c, "exception", ExceptionType::dereference, Cast,
-                         Return, "exception", Args, "exception&", End),
+                      new Function(c, "exception", ExceptionType::dereference, Cast, Return, "exception", Args, "exception&", End),
 
-            new Function(c, "exception", ExceptionType::stringCast, Mapped,
-                         Return, "exception", Args, "string", End),
+                      new Function(c, "exception", ExceptionType::stringCast, Mapped, Return, "exception", Args, "string", End),
 
-            new Function(c, "=", ExceptionType::assign, AsOp, Return,
-                         "exception&", Args, "exception&", "exception", End),
+                      new Function(c, "=", ExceptionType::assign, AsOp, Return, "exception&", Args, "exception&", "exception", End),
 
-            new Function(c, "==", ExceptionType::equals, CommOp, Return, "bool",
-                         Args, "exception", "exception", End),
+                      new Function(c, "==", ExceptionType::equals, CommOp, Return, "bool", Args, "exception", "exception", End),
 
-            new Function(c, "print", ExceptionType::print, None, Return, "void",
-                         Args, "exception", End),
+                      new Function(c, "print", ExceptionType::print, None, Return, "void", Args, "exception", End),
 
-            new Function(c, "__try", ExceptionType::mu__try, None, Return,
-                         "void", Args, "?", "?", Optional, "?varargs", End),
+                      new Function(c, "__try", ExceptionType::mu__try, None, Return, "void", Args, "?", "?", Optional, "?varargs", End),
 
-            new Function(c, "__catch", ExceptionType::mu__catch, None, Return,
-                         "bool", Args, "?", "?", End),
+                      new Function(c, "__catch", ExceptionType::mu__catch, None, Return, "bool", Args, "?", "?", End),
 
-            new Function(c, "__catch_all", ExceptionType::mu__catch_all, None,
-                         Return, "bool", Args, "?", End),
+                      new Function(c, "__catch_all", ExceptionType::mu__catch_all, None, Return, "bool", Args, "?", End),
 
-            new Function(c, "__exception", ExceptionType::mu__exception, None,
-                         Return, "object", End),
+                      new Function(c, "__exception", ExceptionType::mu__exception, None, Return, "object", End),
 
-            new Function(c, "__throw", ExceptionType::mu__throw_exception, None,
-                         Return, "void", Args, "exception", End),
+                      new Function(c, "__throw", ExceptionType::mu__throw_exception, None, Return, "void", Args, "exception", End),
 
-            new Function(c, "__throw", ExceptionType::mu__throw, None, Return,
-                         "void", Args, "object", End),
+                      new Function(c, "__throw", ExceptionType::mu__throw, None, Return, "void", Args, "object", End),
 
-            new Function(c, "__rethrow", ExceptionType::mu__rethrow, None,
-                         Return, "void", End),
+                      new Function(c, "__rethrow", ExceptionType::mu__rethrow, None, Return, "void", End),
 
-            EndArguments);
+                      EndArguments);
 
-        addSymbols(new MemberFunction(c, "copy", ExceptionType::copy, Mapped,
-                                      Return, "object", Args, "exception", End),
+        addSymbols(new MemberFunction(c, "copy", ExceptionType::copy, Mapped, Return, "object", Args, "exception", End),
 
-                   new MemberFunction(c, "backtrace", ExceptionType::backtrace,
-                                      None, Return, "string[]", Args,
-                                      "exception", End),
+                   new MemberFunction(c, "backtrace", ExceptionType::backtrace, None, Return, "string[]", Args, "exception", End),
                    EndArguments);
     }
 
@@ -193,8 +169,7 @@ namespace Mu
         {
             Process* p = NODE_THREAD.process();
             MuLangContext* context = (MuLangContext*)p->context();
-            ExceptionType::Exception* e =
-                new ExceptionType::Exception(context->exceptionType());
+            ExceptionType::Exception* e = new ExceptionType::Exception(context->exceptionType());
             e->string() = exc.what();
             e->backtrace() = exc.backtrace();
             NODE_THREAD.setException(e);
@@ -214,8 +189,7 @@ namespace Mu
         {
             Process* p = NODE_THREAD.process();
             MuLangContext* context = (MuLangContext*)p->context();
-            ExceptionType::Exception* e =
-                new ExceptionType::Exception(context->exceptionType());
+            ExceptionType::Exception* e = new ExceptionType::Exception(context->exceptionType());
             e->string() = "unknown exception";
             NODE_THREAD.setException(e);
 
@@ -244,8 +218,7 @@ namespace Mu
         bool rval = false;
         const Node* n = NODE_THIS.argNode(0);
 
-        if (const ReferenceType* rt =
-                dynamic_cast<const ReferenceType*>(n->type()))
+        if (const ReferenceType* rt = dynamic_cast<const ReferenceType*>(n->type()))
         {
             if (const Type* t = rt->dereferenceType())
             {
@@ -312,10 +285,7 @@ namespace Mu
         NODE_RETURN(true);
     }
 
-    NODE_IMPLEMENTATION(ExceptionType::mu__exception, Pointer)
-    {
-        NODE_RETURN(NODE_THREAD.exception());
-    }
+    NODE_IMPLEMENTATION(ExceptionType::mu__exception, Pointer) { NODE_RETURN(NODE_THREAD.exception()); }
 
     NODE_IMPLEMENTATION(ExceptionType::mu__throw_exception, void)
     {
@@ -347,11 +317,9 @@ namespace Mu
         {
             Process* p = NODE_THREAD.process();
             MuLangContext* c = (MuLangContext*)p->context();
-            ExceptionType::Exception* e =
-                new ExceptionType::Exception(c->exceptionType());
+            ExceptionType::Exception* e = new ExceptionType::Exception(c->exceptionType());
             NODE_THREAD.backtrace(e->backtrace());
-            e->string() =
-                "Runtime Exception: rethrow with no current exception";
+            e->string() = "Runtime Exception: rethrow with no current exception";
             NODE_THREAD.setException(e);
             throw ProgramException(NODE_THREAD, e);
         }
@@ -367,8 +335,7 @@ namespace Mu
 
     NODE_IMPLEMENTATION(ExceptionType::stringCast, Pointer)
     {
-        const StringType::String* s =
-            reinterpret_cast<StringType::String*>(NODE_ARG(0, Pointer));
+        const StringType::String* s = reinterpret_cast<StringType::String*>(NODE_ARG(0, Pointer));
         Process* p = NODE_THREAD.process();
         const Class* c = static_cast<const ExceptionType*>(NODE_THIS.type());
         ExceptionType::Exception* o = new ExceptionType::Exception(c);
@@ -431,8 +398,7 @@ namespace Mu
         Process* p = NODE_THREAD.process();
         const Class* c = static_cast<const ExceptionType*>(NODE_THIS.type());
         DynamicArrayType* atype = (DynamicArrayType*)(NODE_THIS.type());
-        const Mu::StringType* stype =
-            static_cast<const Mu::StringType*>(atype->elementType());
+        const Mu::StringType* stype = static_cast<const Mu::StringType*>(atype->elementType());
         DynamicArray* array = new DynamicArray(atype, 1);
 
         array->resize(e->backtrace().size());
@@ -452,9 +418,7 @@ namespace Mu
 
                 if (anode->sourceFileName())
                 {
-                    cstr << anode->sourceFileName() << ", line "
-                         << anode->linenum() << ", char " << anode->charnum()
-                         << ": ";
+                    cstr << anode->sourceFileName() << ", line " << anode->linenum() << ", char " << anode->charnum() << ": ";
                 }
             }
 

@@ -132,8 +132,7 @@ namespace Mu
                 _writer->internAnnotation(n);
                 _writer->internFunction(f);
 
-                for (const Symbol* scope = f->scope(); scope;
-                     scope = scope->scope())
+                for (const Symbol* scope = f->scope(); scope; scope = scope->scope())
                 {
                     if (const Module* m = dynamic_cast<const Module*>(scope))
                     {
@@ -169,15 +168,11 @@ namespace Mu
             }
         }
 
-        void Writer::collectSymbolsFromFile(Name filename, SymbolVector& array,
-                                            bool userOnly) const
+        void Writer::collectSymbolsFromFile(Name filename, SymbolVector& array, bool userOnly) const
         {
-            const Context::SymbolDefinitionMap& symdefs =
-                _context->symbolDefinitions();
+            const Context::SymbolDefinitionMap& symdefs = _context->symbolDefinitions();
 
-            for (Context::SymbolDefinitionMap::const_iterator i =
-                     symdefs.begin();
-                 i != symdefs.end(); ++i)
+            for (Context::SymbolDefinitionMap::const_iterator i = symdefs.begin(); i != symdefs.end(); ++i)
             {
                 if ((*i).second.filename == filename)
                 {
@@ -187,8 +182,7 @@ namespace Mu
             }
         }
 
-        void Writer::collectPrimarySymbols(const Symbol* s,
-                                           SymbolVector& array) const
+        void Writer::collectPrimarySymbols(const Symbol* s, SymbolVector& array) const
         {
             if (s->isPrimary())
             {
@@ -215,13 +209,9 @@ namespace Mu
             }
         }
 
-        void Writer::collectAllPrimarySymbols(SymbolVector& array) const
-        {
-            collectPrimarySymbols(_context->globalScope(), array);
-        }
+        void Writer::collectAllPrimarySymbols(SymbolVector& array) const { collectPrimarySymbols(_context->globalScope(), array); }
 
-        static void addNameToVector(Names& names, const Symbol* s,
-                                    bool fully = false)
+        static void addNameToVector(Names& names, const Symbol* s, bool fully = false)
         {
             Name n = s->fullyQualifiedName();
             if (names.find(n) == names.end())
@@ -235,8 +225,7 @@ namespace Mu
             }
         }
 
-        void Writer::collectNames(const SymbolVector& symbols,
-                                  Names& names) const
+        void Writer::collectNames(const SymbolVector& symbols, Names& names) const
         {
             for (int i = 0; i < symbols.size(); i++)
             {
@@ -273,16 +262,14 @@ namespace Mu
 
             if (f->hasParameters())
             {
-                for (size_t i = 0; i < f->numArgs() + f->numFreeVariables();
-                     i++)
+                for (size_t i = 0; i < f->numArgs() + f->numFreeVariables(); i++)
                 {
                     internType(f->parameter(i)->storageClass());
                 }
             }
             else
             {
-                for (size_t i = 0; i < f->numArgs() + f->numFreeVariables();
-                     i++)
+                for (size_t i = 0; i < f->numArgs() + f->numFreeVariables(); i++)
                 {
                     internType(f->argType(i));
                 }
@@ -324,8 +311,7 @@ namespace Mu
             //  construct the root symbol set
             //
 
-            for (SymbolSet::const_iterator s = _primarySymbolSet.begin();
-                 s != _primarySymbolSet.end(); ++s)
+            for (SymbolSet::const_iterator s = _primarySymbolSet.begin(); s != _primarySymbolSet.end(); ++s)
             {
                 const Symbol* top = *s;
 
@@ -341,32 +327,28 @@ namespace Mu
 
             IDNumber count = 1;
 
-            for (ObjectMap::iterator i = _objects.begin(); i != _objects.end();
-                 ++i)
+            for (ObjectMap::iterator i = _objects.begin(); i != _objects.end(); ++i)
             {
                 i->second = count++;
             }
 
             count = 0;
 
-            for (ModuleMap::iterator i = _moduleMap.begin();
-                 i != _moduleMap.end(); ++i)
+            for (ModuleMap::iterator i = _moduleMap.begin(); i != _moduleMap.end(); ++i)
             {
                 i->second = count++;
             }
 
             count = 0;
 
-            for (TypeMap::iterator i = _typeMap.begin(); i != _typeMap.end();
-                 ++i)
+            for (TypeMap::iterator i = _typeMap.begin(); i != _typeMap.end(); ++i)
             {
                 i->second = count++;
             }
 
             count = 0;
 
-            for (NameMap::iterator i = _nameMap.begin(); i != _nameMap.end();
-                 ++i)
+            for (NameMap::iterator i = _nameMap.begin(); i != _nameMap.end(); ++i)
             {
                 i->second = count++;
             }
@@ -425,11 +407,9 @@ namespace Mu
             }
             else if (const Variable* v = dynamic_cast<const Variable*>(s))
             {
-                if (const ParameterVariable* p =
-                        dynamic_cast<const ParameterVariable*>(v))
+                if (const ParameterVariable* p = dynamic_cast<const ParameterVariable*>(v))
                 {
-                    if (p->hasDefaultValue()
-                        && !p->storageClass()->isPrimitiveType())
+                    if (p->hasDefaultValue() && !p->storageClass()->isPrimitiveType())
                     {
                         add((const Object*)(p->defaultValue()._Pointer));
                     }
@@ -458,8 +438,7 @@ namespace Mu
                 internNames(a);
                 internNames(a->alias());
             }
-            else if (const SymbolicConstant* c =
-                         dynamic_cast<const SymbolicConstant*>(s))
+            else if (const SymbolicConstant* c = dynamic_cast<const SymbolicConstant*>(s))
             {
                 internNames(c);
                 internType(c->type());
@@ -513,11 +492,9 @@ namespace Mu
             if (!o->type()->isSerializable())
                 throw UnarchivableObjectException();
 
-            if (const FunctionType* ftype =
-                    dynamic_cast<const FunctionType*>(o->type()))
+            if (const FunctionType* ftype = dynamic_cast<const FunctionType*>(o->type()))
             {
-                const FunctionObject* fo =
-                    static_cast<const FunctionObject*>(o);
+                const FunctionObject* fo = static_cast<const FunctionObject*>(o);
 
                 if (fo->function()->native())
                 {
@@ -612,20 +589,11 @@ namespace Mu
             o.write((char*)&oid, sizeof(IDNumber));
         }
 
-        void Writer::writeSize(ostream& o, SizeType s)
-        {
-            o.write((const char*)&s, sizeof(SizeType));
-        }
+        void Writer::writeSize(ostream& o, SizeType s) { o.write((const char*)&s, sizeof(SizeType)); }
 
-        void Writer::writeByte(ostream& o, Byte b)
-        {
-            o.write((const char*)&b, sizeof(Byte));
-        }
+        void Writer::writeByte(ostream& o, Byte b) { o.write((const char*)&b, sizeof(Byte)); }
 
-        void Writer::writeBool(ostream& o, Boolean b)
-        {
-            o.write((const char*)&b, sizeof(Boolean));
-        }
+        void Writer::writeBool(ostream& o, Boolean b) { o.write((const char*)&b, sizeof(Boolean)); }
 
         void Writer::writeOp(ostream& o, OpCode op)
         {
@@ -646,15 +614,9 @@ namespace Mu
             writeSize(o, s);
         }
 
-        void Writer::writeU32(ostream& o, U32 u)
-        {
-            o.write((const char*)&u, sizeof(U32));
-        }
+        void Writer::writeU32(ostream& o, U32 u) { o.write((const char*)&u, sizeof(U32)); }
 
-        void Writer::writeU16(ostream& o, U16 u)
-        {
-            o.write((const char*)&u, sizeof(U16));
-        }
+        void Writer::writeU16(ostream& o, U16 u) { o.write((const char*)&u, sizeof(U16)); }
 
         //
         //  MAIN ENTRY
@@ -670,8 +632,7 @@ namespace Mu
 
             SymbolVector symbols;
 
-            for (SymbolSet::const_iterator i = _rootSymbolSet.begin();
-                 i != _rootSymbolSet.end(); ++i)
+            for (SymbolSet::const_iterator i = _rootSymbolSet.begin(); i != _rootSymbolSet.end(); ++i)
             {
                 symbols.push_back(*i);
             }
@@ -721,8 +682,7 @@ namespace Mu
         {
             writeSize(o, _nameMap.size());
 
-            for (NameMap::const_iterator i = _nameMap.begin();
-                 i != _nameMap.end(); ++i)
+            for (NameMap::const_iterator i = _nameMap.begin(); i != _nameMap.end(); ++i)
             {
                 o << i->first;
                 o.put(0);
@@ -733,8 +693,7 @@ namespace Mu
         {
             size_t ignoreCount = 0;
 
-            for (ModuleSet::const_iterator i = _requiredModules.begin();
-                 i != _requiredModules.end(); ++i)
+            for (ModuleSet::const_iterator i = _requiredModules.begin(); i != _requiredModules.end(); ++i)
             {
                 const Module* m = *i;
                 if (_primarySymbolSet.count(m) > 0)
@@ -743,14 +702,12 @@ namespace Mu
 
             writeSize(o, _requiredModules.size() - ignoreCount);
 
-            for (ModuleSet::const_iterator i = _requiredModules.begin();
-                 i != _requiredModules.end(); ++i)
+            for (ModuleSet::const_iterator i = _requiredModules.begin(); i != _requiredModules.end(); ++i)
             {
                 const Module* m = *i;
                 if (_primarySymbolSet.count(m) > 0)
                     continue;
-                NameMap::const_iterator ci =
-                    _nameMap.find(m->fullyQualifiedName().c_str());
+                NameMap::const_iterator ci = _nameMap.find(m->fullyQualifiedName().c_str());
                 SizeType n = ci->second;
                 writeSize(o, n);
             }
@@ -760,13 +717,11 @@ namespace Mu
         {
             vector<const Type*> types;
 
-            for (TypeMap::iterator i = _typeMap.begin(); i != _typeMap.end();
-                 ++i)
+            for (TypeMap::iterator i = _typeMap.begin(); i != _typeMap.end(); ++i)
             {
                 const Type* t = (*i).first;
 
-                if (t->isCollection() || dynamic_cast<const TupleType*>(t)
-                    || dynamic_cast<const FunctionType*>(t))
+                if (t->isCollection() || dynamic_cast<const TupleType*>(t) || dynamic_cast<const FunctionType*>(t))
                 {
                     types.push_back(t);
                 }
@@ -778,13 +733,11 @@ namespace Mu
             {
                 writeNameId(o, types[i]->fullyQualifiedName());
                 if (_debugOutput)
-                    cout << "< derived " << types[i]->fullyQualifiedName()
-                         << endl;
+                    cout << "< derived " << types[i]->fullyQualifiedName() << endl;
             }
         }
 
-        void Writer::writePartialDeclarations(ostream& o, const Symbol* s,
-                                              bool root)
+        void Writer::writePartialDeclarations(ostream& o, const Symbol* s, bool root)
         {
             if (root)
             {
@@ -797,8 +750,7 @@ namespace Mu
                 if (_passNum == 1)
                     writeAnnotationInfo(o, s);
 
-                if ((F->isConstructor() && !F->hasParameters())
-                    || !F->hasParameters() || F->isGenerated() || !F->body())
+                if ((F->isConstructor() && !F->hasParameters()) || !F->hasParameters() || F->isGenerated() || !F->body())
                 {
                     writeOp(o, OpPass);
                 }
@@ -815,8 +767,7 @@ namespace Mu
                     writePartialFunctionDeclaration(o, F);
                 }
             }
-            else if (const FunctionType* T =
-                         dynamic_cast<const FunctionType*>(s))
+            else if (const FunctionType* T = dynamic_cast<const FunctionType*>(s))
             {
                 writeOp(o, OpPass);
             }
@@ -835,8 +786,7 @@ namespace Mu
                 writeNameId(o, s->name());
                 writePartialClassDeclaration(o, C);
             }
-            else if (const VariantTagType* T =
-                         dynamic_cast<const VariantTagType*>(s))
+            else if (const VariantTagType* T = dynamic_cast<const VariantTagType*>(s))
             {
                 writeOp(o, OpPass);
             }
@@ -864,14 +814,12 @@ namespace Mu
                 writeNameId(o, s->name());
                 writePartialModuleDeclaration(o, M);
             }
-            else if (const ParameterVariable* v =
-                         dynamic_cast<const ParameterVariable*>(s))
+            else if (const ParameterVariable* v = dynamic_cast<const ParameterVariable*>(s))
             {
                 // nothing
                 writeOp(o, OpPass);
             }
-            else if (const StackVariable* v =
-                         dynamic_cast<const StackVariable*>(s))
+            else if (const StackVariable* v = dynamic_cast<const StackVariable*>(s))
             {
                 if (_passNum == 1)
                     writeAnnotationInfo(o, s);
@@ -879,8 +827,7 @@ namespace Mu
                 writeNameId(o, s->name());
                 writePartialStackDeclaration(o, v);
             }
-            else if (const GlobalVariable* v =
-                         dynamic_cast<const GlobalVariable*>(s))
+            else if (const GlobalVariable* v = dynamic_cast<const GlobalVariable*>(s))
             {
                 if (_passNum == 1)
                     writeAnnotationInfo(o, s);
@@ -888,8 +835,7 @@ namespace Mu
                 writeNameId(o, s->name());
                 writePartialGlobalDeclaration(o, v);
             }
-            else if (const SymbolicConstant* c =
-                         dynamic_cast<const SymbolicConstant*>(s))
+            else if (const SymbolicConstant* c = dynamic_cast<const SymbolicConstant*>(s))
             {
                 if (_passNum == 1)
                     writeAnnotationInfo(o, s);
@@ -907,10 +853,8 @@ namespace Mu
         {
             if (_context->debugging() && _annotationOutput)
             {
-                const Context::SymbolDefinitionMap& symdefs =
-                    _context->symbolDefinitions();
-                Context::SymbolDefinitionMap::const_iterator i =
-                    symdefs.find(s);
+                const Context::SymbolDefinitionMap& symdefs = _context->symbolDefinitions();
+                Context::SymbolDefinitionMap::const_iterator i = symdefs.find(s);
                 if (i == symdefs.end())
                     return;
 
@@ -973,8 +917,7 @@ namespace Mu
             writeOp(o, OpDone);
         }
 
-        void Writer::writePartialStackDeclaration(ostream& o,
-                                                  const StackVariable* v)
+        void Writer::writePartialStackDeclaration(ostream& o, const StackVariable* v)
         {
             if (_passNum == 1)
             {
@@ -993,8 +936,7 @@ namespace Mu
             }
         }
 
-        void Writer::writePartialGlobalDeclaration(ostream& o,
-                                                   const GlobalVariable* v)
+        void Writer::writePartialGlobalDeclaration(ostream& o, const GlobalVariable* v)
         {
             if (_passNum == 1)
             {
@@ -1013,8 +955,7 @@ namespace Mu
             }
         }
 
-        void Writer::writePartialSymbolicConstantDeclaration(
-            ostream& o, const SymbolicConstant* s)
+        void Writer::writePartialSymbolicConstantDeclaration(ostream& o, const SymbolicConstant* s)
         {
             if (_passNum == 1)
             {
@@ -1042,9 +983,7 @@ namespace Mu
             }
         }
 
-        void
-        Writer::writePartialMemberVariableDeclaration(ostream& o,
-                                                      const MemberVariable* v)
+        void Writer::writePartialMemberVariableDeclaration(ostream& o, const MemberVariable* v)
         {
             if (_passNum == 1)
             {
@@ -1068,8 +1007,7 @@ namespace Mu
             if (_passNum == 1)
             {
                 if (_debugOutput)
-                    cout << "< declaration of alias " << a->fullyQualifiedName()
-                         << endl;
+                    cout << "< declaration of alias " << a->fullyQualifiedName() << endl;
             }
         }
 
@@ -1078,8 +1016,7 @@ namespace Mu
             if (_passNum == 0)
             {
                 if (_debugOutput)
-                    cout << "< declaration of class " << c->fullyQualifiedName()
-                         << endl;
+                    cout << "< declaration of class " << c->fullyQualifiedName() << endl;
                 // writeNameId(o, c->name());
             }
             else if (_passNum == 1)
@@ -1124,22 +1061,19 @@ namespace Mu
             writePartialChildDeclarations(o, c);
         }
 
-        void Writer::writePartialVariantDeclaration(ostream& o,
-                                                    const VariantType* V)
+        void Writer::writePartialVariantDeclaration(ostream& o, const VariantType* V)
         {
             if (_passNum == 0)
             {
                 if (_debugOutput)
-                    cout << "< declaration of variant type "
-                         << V->fullyQualifiedName() << endl;
+                    cout << "< declaration of variant type " << V->fullyQualifiedName() << endl;
                 // writeNameId(o, V->name());
             }
 
             writePartialChildDeclarations(o, V);
         }
 
-        void Writer::writePartialFunctionDeclaration(ostream& o,
-                                                     const Function* f)
+        void Writer::writePartialFunctionDeclaration(ostream& o, const Function* f)
         {
             if (_passNum == 0)
                 return;
@@ -1191,25 +1125,21 @@ namespace Mu
         {
             if (_passNum == 0)
                 if (_debugOutput)
-                    cout << "< declaration of module "
-                         << m->fullyQualifiedName() << endl;
+                    cout << "< declaration of module " << m->fullyQualifiedName() << endl;
             // writeNameId(o, m->name());
             writePartialChildDeclarations(o, m);
         }
 
-        void Writer::writePartialNamespaceDeclaration(ostream& o,
-                                                      const Namespace* n)
+        void Writer::writePartialNamespaceDeclaration(ostream& o, const Namespace* n)
         {
             if (_passNum == 0)
                 if (_debugOutput)
-                    cout << "< declaration of namespace "
-                         << n->fullyQualifiedName() << endl;
+                    cout << "< declaration of namespace " << n->fullyQualifiedName() << endl;
             // writeNameId(o, n->name());
             writePartialChildDeclarations(o, n);
         }
 
-        void Writer::writeFullDeclarations(ostream& o, const Symbol* s,
-                                           bool root)
+        void Writer::writeFullDeclarations(ostream& o, const Symbol* s, bool root)
         {
             if (root)
             {
@@ -1219,8 +1149,7 @@ namespace Mu
 
             if (const Function* F = dynamic_cast<const Function*>(s))
             {
-                if ((F->isConstructor() && !F->hasParameters())
-                    || !F->hasParameters() || F->isGenerated() || !F->body())
+                if ((F->isConstructor() && !F->hasParameters()) || !F->hasParameters() || F->isGenerated() || !F->body())
                 {
                     writeOp(o, OpPass);
                 }
@@ -1237,15 +1166,13 @@ namespace Mu
                     writeFunctionDeclaration(o, F);
                 }
             }
-            else if (const FunctionType* T =
-                         dynamic_cast<const FunctionType*>(s))
+            else if (const FunctionType* T = dynamic_cast<const FunctionType*>(s))
             {
                 writeOp(o, OpPass);
                 // writeOp(o, OpDeclareFunction);
                 // writePartialFunctionDeclaration(o, T);
             }
-            else if (const VariantTagType* t =
-                         dynamic_cast<const VariantTagType*>(s))
+            else if (const VariantTagType* t = dynamic_cast<const VariantTagType*>(s))
             {
                 writeOp(o, OpDeclareVariantTagType);
                 writeNameId(o, s->fullyQualifiedName());
@@ -1281,20 +1208,17 @@ namespace Mu
                 writeNameId(o, s->fullyQualifiedName());
                 writeModuleDeclaration(o, M);
             }
-            else if (const ParameterVariable* v =
-                         dynamic_cast<const ParameterVariable*>(s))
+            else if (const ParameterVariable* v = dynamic_cast<const ParameterVariable*>(s))
             {
                 writeOp(o, OpPass);
             }
-            else if (const StackVariable* v =
-                         dynamic_cast<const StackVariable*>(s))
+            else if (const StackVariable* v = dynamic_cast<const StackVariable*>(s))
             {
                 writeOp(o, OpDeclareStack);
                 writeNameId(o, s->fullyQualifiedName());
                 writeStackDeclaration(o, v);
             }
-            else if (const GlobalVariable* v =
-                         dynamic_cast<const GlobalVariable*>(s))
+            else if (const GlobalVariable* v = dynamic_cast<const GlobalVariable*>(s))
             {
                 writeOp(o, OpDeclareGlobal);
                 writeNameId(o, s->fullyQualifiedName());
@@ -1360,17 +1284,12 @@ namespace Mu
             writeChildDeclarations(o, f);
         }
 
-        void Writer::writeVariantDeclaration(ostream& o, const VariantType* V)
-        {
-            writeChildDeclarations(o, V);
-        }
+        void Writer::writeVariantDeclaration(ostream& o, const VariantType* V) { writeChildDeclarations(o, V); }
 
-        void Writer::writeVariantTagDeclaration(ostream& o,
-                                                const VariantTagType* V)
+        void Writer::writeVariantTagDeclaration(ostream& o, const VariantTagType* V)
         {
             if (_debugOutput)
-                cout << "< declaration of variant tag type "
-                     << V->fullyQualifiedName() << endl;
+                cout << "< declaration of variant tag type " << V->fullyQualifiedName() << endl;
             writeNameId(o, V->name());
             writeNameId(o, V->representationType()->fullyQualifiedName());
             // writeChildDeclarations(o, V);
@@ -1379,35 +1298,20 @@ namespace Mu
         void Writer::writeAliasDeclaration(ostream& o, const Alias* a)
         {
             if (_debugOutput)
-                cout << "< declaration of alias " << a->fullyQualifiedName()
-                     << endl;
+                cout << "< declaration of alias " << a->fullyQualifiedName() << endl;
             writeNameId(o, a->name());
             writeNameId(o, a->alias()->fullyQualifiedName());
         }
 
-        void Writer::writeClassDeclaration(ostream& o, const Class* c)
-        {
+        void Writer::writeClassDeclaration(ostream& o, const Class* c) { writeChildDeclarations(o, c); }
 
-            writeChildDeclarations(o, c);
-        }
+        void Writer::writeModuleDeclaration(ostream& o, const Module* m) { writeChildDeclarations(o, m); }
 
-        void Writer::writeModuleDeclaration(ostream& o, const Module* m)
-        {
-            writeChildDeclarations(o, m);
-        }
+        void Writer::writeNamespaceDeclaration(ostream& o, const Namespace* n) { writeChildDeclarations(o, n); }
 
-        void Writer::writeNamespaceDeclaration(ostream& o, const Namespace* n)
-        {
-            writeChildDeclarations(o, n);
-        }
+        void Writer::writeStackDeclaration(ostream& o, const StackVariable* v) {}
 
-        void Writer::writeStackDeclaration(ostream& o, const StackVariable* v)
-        {
-        }
-
-        void Writer::writeGlobalDeclaration(ostream& o, const GlobalVariable* v)
-        {
-        }
+        void Writer::writeGlobalDeclaration(ostream& o, const GlobalVariable* v) {}
 
         size_t Writer::writeObjects(ostream& o)
         {
@@ -1421,8 +1325,7 @@ namespace Mu
             //  Write their object ids
             //
 
-            for (ObjectSet::const_iterator i = _rootObjects.begin();
-                 i != _rootObjects.end(); ++i)
+            for (ObjectSet::const_iterator i = _rootObjects.begin(); i != _rootObjects.end(); ++i)
             {
                 writeObjectId(o, *i);
             }
@@ -1437,8 +1340,7 @@ namespace Mu
             //  Write the objects
             //
 
-            for (ObjectMap::const_iterator i = _objects.begin();
-                 i != _objects.end(); ++i)
+            for (ObjectMap::const_iterator i = _objects.begin(); i != _objects.end(); ++i)
             {
                 const Object* obj = i->first;
                 const Type* t = obj->type();
@@ -1481,8 +1383,7 @@ namespace Mu
 
                 if (_context->debugging() && _annotationOutput)
                 {
-                    const AnnotatedNode* an =
-                        static_cast<const AnnotatedNode*>(n);
+                    const AnnotatedNode* an = static_cast<const AnnotatedNode*>(n);
 
                     if (an->sourceFileName() != _annSource)
                     {
@@ -1510,8 +1411,7 @@ namespace Mu
                 {
                     writeOp(o, OpNoop);
                 }
-                else if (dynamic_cast<const Curry*>(f)
-                         || dynamic_cast<const DynamicPartialEvaluate*>(f)
+                else if (dynamic_cast<const Curry*>(f) || dynamic_cast<const DynamicPartialEvaluate*>(f)
                          || dynamic_cast<const DynamicPartialApplication*>(f))
 
                 {
@@ -1529,9 +1429,7 @@ namespace Mu
                     writeNameId(o, f->fullyQualifiedName());
                     writeSize(o, nargs);
                 }
-                else if (dynamic_cast<const MemberFunction*>(f)
-                         && n->func()
-                                == n->type()->machineRep()->callMethodFunc())
+                else if (dynamic_cast<const MemberFunction*>(f) && n->func() == n->type()->machineRep()->callMethodFunc())
                 {
                     writeOp(o, OpCallMethod);
                     writeNameId(o, f->fullyQualifiedName());
@@ -1560,8 +1458,7 @@ namespace Mu
                     // char* n = f->name().c_str();
                     // if (n[0] == '_' && n[1] == '_') exact = false;
 
-                    if (!exact || f->isVariadic() || f->isPolymorphic()
-                        || f->isMultiSigniture())
+                    if (!exact || f->isVariadic() || f->isPolymorphic() || f->isMultiSigniture())
                     {
                         writeOp(o, OpCallBest);
                     }
@@ -1675,8 +1572,7 @@ namespace Mu
             return count;
         }
 
-        void Writer::writeSymbolDocumentation(ostream& o, const Symbol* s,
-                                              Object* docs)
+        void Writer::writeSymbolDocumentation(ostream& o, const Symbol* s, Object* docs)
         {
             o << s->fullyQualifiedName() << " ";
             docs->type()->outputValue(o, &docs, true);
@@ -1799,8 +1695,7 @@ namespace Mu
 
             readHeader(in);
 
-            if (_header.magicNumber != magicNumber()
-                || _header.version > fileVersionNumber())
+            if (_header.magicNumber != magicNumber() || _header.version > fileVersionNumber())
             {
                 throw ArchiveUnknownFormatException();
             }
@@ -1861,9 +1756,7 @@ namespace Mu
                 const SymbolicConstant* c = _symbolicConstants[i];
                 if (!c->type()->isPrimitiveType())
                 {
-                    ((SymbolicConstant*)c)
-                        ->setValue(Value(
-                            Pointer(objectOfId((size_t)c->value()._Pointer))));
+                    ((SymbolicConstant*)c)->setValue(Value(Pointer(objectOfId((size_t)c->value()._Pointer))));
                 }
             }
 
@@ -1896,10 +1789,7 @@ namespace Mu
             return _inverseObjectMap;
         }
 
-        void Reader::readHeader(istream& in)
-        {
-            in.read((char*)&_header, sizeof(Header));
-        }
+        void Reader::readHeader(istream& in) { in.read((char*)&_header, sizeof(Header)); }
 
         void Reader::readRequiredModules(istream& in)
         {
@@ -1948,8 +1838,7 @@ namespace Mu
                 {
                     _as->popScopeToRoot();
                 }
-                else if (Symbol* scope =
-                             _context->findSymbolByQualifiedName(scopeName))
+                else if (Symbol* scope = _context->findSymbolByQualifiedName(scopeName))
                 {
                     _as->popScopeToRoot();
                     _as->pushScope(scope);
@@ -1957,8 +1846,7 @@ namespace Mu
                 else
                 {
                     // Fail archive read completely here
-                    cout << "ERROR: failed to find scope: " << scopeName
-                         << endl;
+                    cout << "ERROR: failed to find scope: " << scopeName << endl;
                 }
 
                 op = readOp(in);
@@ -2061,13 +1949,11 @@ namespace Mu
                 U32 attrs = readU32(in);
 
                 if (_debugOutput)
-                    cout << "> declare stack variable " << typeName << " "
-                         << name << endl;
+                    cout << "> declare stack variable " << typeName << " " << name << endl;
 
                 const Type* t = findType(typeName);
 
-                StackVariable* v = _as->declareStackVariable(
-                    t, name, (Variable::Attribute)attrs);
+                StackVariable* v = _as->declareStackVariable(t, name, (Variable::Attribute)attrs);
                 //_allSymbols.push_back(v);
                 _symbolMap[v->fullyQualifiedName()] = v;
                 readPartialChildDeclarations(in);
@@ -2084,8 +1970,7 @@ namespace Mu
                 U32 attrs = readU32(in);
 
                 if (_debugOutput)
-                    cout << "> declare global variable " << typeName << " "
-                         << name << endl;
+                    cout << "> declare global variable " << typeName << " " << name << endl;
 
                 const Type* t = findType(typeName);
 
@@ -2122,8 +2007,7 @@ namespace Mu
                 _as->scope()->addSymbol(c);
                 _symbolicConstants.push_back(c);
                 if (_debugOutput)
-                    cout << "> declare symbolic constant "
-                         << c->fullyQualifiedName() << endl;
+                    cout << "> declare symbolic constant " << c->fullyQualifiedName() << endl;
 
                 readPartialChildDeclarations(in);
             }
@@ -2138,8 +2022,7 @@ namespace Mu
             U32 attrs = readU32(in);
 
             if (_debugOutput)
-                cout << "> declare variable " << typeName << " " << name
-                     << endl;
+                cout << "> declare variable " << typeName << " " << name << endl;
 
             const Type* t = findType(typeName);
             MemberVariable* v = new MemberVariable(_context, name.c_str(), t);
@@ -2188,8 +2071,7 @@ namespace Mu
             {
                 Namespace* n = _as->declareNamespace(name);
                 if (_debugOutput)
-                    cout << "> declare namespace " << n->fullyQualifiedName()
-                         << endl;
+                    cout << "> declare namespace " << n->fullyQualifiedName() << endl;
                 //_allSymbols.push_back(n);
                 _symbolMap[n->fullyQualifiedName()] = n;
                 _as->pushScope(n);
@@ -2243,14 +2125,12 @@ namespace Mu
                     {
                         Value v;
                         t->deserialize(in, *this, (ValuePointer)&v);
-                        pv = new ParameterVariable(_context, pname.c_str(), t,
-                                                   v);
+                        pv = new ParameterVariable(_context, pname.c_str(), t, v);
                     }
                     else
                     {
                         Value v((Pointer)(size_t)readObjectId(in));
-                        pv = new ParameterVariable(_context, pname.c_str(), t,
-                                                   Value(Pointer(0)));
+                        pv = new ParameterVariable(_context, pname.c_str(), t, Value(Pointer(0)));
                         _defaultValueParams.push_back(DefaultValuePair(pv, v));
                     }
                 }
@@ -2264,9 +2144,7 @@ namespace Mu
 
             //_as->newStackFrame();
             Function* F =
-                member
-                    ? _as->declareMemberFunction(name.c_str(), rtype, l, attrs)
-                    : _as->declareFunction(name.c_str(), rtype, l, attrs);
+                member ? _as->declareMemberFunction(name.c_str(), rtype, l, attrs) : _as->declareFunction(name.c_str(), rtype, l, attrs);
 
             _functionMap[fid] = F;
 
@@ -2319,8 +2197,7 @@ namespace Mu
                 _current = c;
 
                 if (_debugOutput)
-                    cout << "> declared class " << c->fullyQualifiedName()
-                         << endl;
+                    cout << "> declared class " << c->fullyQualifiedName() << endl;
 
                 _as->removeSymbolList(l);
                 //_allSymbols.push_back(_current);
@@ -2335,9 +2212,7 @@ namespace Mu
                 {
                     Name superName = readNameId(in);
 
-                    if (Class* super =
-                            _context->findSymbolOfTypeByQualifiedName<Class>(
-                                superName, false))
+                    if (Class* super = _context->findSymbolOfTypeByQualifiedName<Class>(superName, false))
                     {
                         c->addSuperClass(super);
                     }
@@ -2355,8 +2230,7 @@ namespace Mu
                     Name tname = readNameId(in);
                     const Type* t = findType(tname);
 
-                    MemberVariable* m =
-                        new MemberVariable(_context, mname.c_str(), t);
+                    MemberVariable* m = new MemberVariable(_context, mname.c_str(), t);
                     c->addSymbol(m);
 
                     if (_debugOutput)
@@ -2386,16 +2260,14 @@ namespace Mu
                 _current = v;
 
                 if (_debugOutput)
-                    cout << "> declared variant " << v->fullyQualifiedName()
-                         << endl;
+                    cout << "> declared variant " << v->fullyQualifiedName() << endl;
 
                 //_allSymbols.push_back(_current);
                 _symbolMap[v->fullyQualifiedName()] = v;
             }
             else
             {
-                VariantType* t =
-                    _as->scope()->findSymbolOfType<VariantType>(name);
+                VariantType* t = _as->scope()->findSymbolOfType<VariantType>(name);
                 _as->pushScope(t);
                 _current = t;
             }
@@ -2427,8 +2299,7 @@ namespace Mu
                 {
                     _as->popScopeToRoot();
                 }
-                else if (Symbol* scope =
-                             _context->findSymbolByQualifiedName(scopeName))
+                else if (Symbol* scope = _context->findSymbolByQualifiedName(scopeName))
                 {
                     _as->popScopeToRoot();
                     _as->pushScope(scope);
@@ -2436,8 +2307,7 @@ namespace Mu
                 else
                 {
                     // Fail archive read completely here
-                    cout << "ERROR: failed to find scope: " << scopeName
-                         << endl;
+                    cout << "ERROR: failed to find scope: " << scopeName << endl;
                 }
 
                 op = readOp(in);
@@ -2670,8 +2540,7 @@ namespace Mu
             VariantTagType* tt = _as->declareVariantTagType(name.c_str(), t);
             _current = tt;
             if (_debugOutput)
-                cout << "> declared variant tag " << tt->fullyQualifiedName()
-                     << endl;
+                cout << "> declared variant tag " << tt->fullyQualifiedName() << endl;
 
             // readChildDeclarations(in);
         }
@@ -2746,8 +2615,7 @@ namespace Mu
             size_t nObjects = readSize(in);
 
             if (_debugOutput)
-                cout << "> " << nObjects << " objects serialized in file"
-                     << endl;
+                cout << "> " << nObjects << " objects serialized in file" << endl;
 
             //
             //  Read the objects
@@ -2816,24 +2684,17 @@ namespace Mu
             case OpCallMethod:
             {
                 QualifiedName n = readNameId(in);
-                Function* f =
-                    as.context()->findSymbolOfTypeByQualifiedName<Function>(
-                        n, false);
+                Function* f = as.context()->findSymbolOfTypeByQualifiedName<Function>(n, false);
 
                 if (!f)
                 {
                     cout << "ABORT: Failed to find function " << n << endl;
 
-                    cout << "scope is: " << as.scope()->fullyQualifiedName()
-                         << endl;
+                    cout << "scope is: " << as.scope()->fullyQualifiedName() << endl;
 
-                    cout << "source location is: " << as.sourceName()
-                         << ", line " << as.lineNum() << ", char "
-                         << as.charNum() << endl;
+                    cout << "source location is: " << as.sourceName() << ", line " << as.lineNum() << ", char " << as.charNum() << endl;
 
-                    Symbol* ec =
-                        as.context()->findSymbolOfTypeByQualifiedName<Module>(
-                            as.context()->internName("extra_commands"));
+                    Symbol* ec = as.context()->findSymbolOfTypeByQualifiedName<Module>(as.context()->internName("extra_commands"));
                     if (ec)
                         cout << "found " << ec->fullyQualifiedName() << endl;
                     else
@@ -2876,8 +2737,7 @@ namespace Mu
                 }
                 else if (op == OpCallMethod)
                 {
-                    rn = as.callMethod(dynamic_cast<const MemberFunction*>(f),
-                                       nl);
+                    rn = as.callMethod(dynamic_cast<const MemberFunction*>(f), nl);
                 }
 
                 //
@@ -2897,9 +2757,7 @@ namespace Mu
             case OpCallLiteral:
             {
                 QualifiedName n = readNameId(in);
-                Function* f =
-                    as.context()->findSymbolOfTypeByQualifiedName<Function>(
-                        n, false);
+                Function* f = as.context()->findSymbolOfTypeByQualifiedName<Function>(n, false);
                 int nargs = readSize(in);
                 Node* node = as.newNode(f, nargs);
 
@@ -2915,9 +2773,7 @@ namespace Mu
             {
                 QualifiedName n = readNameId(in);
                 // cout << "OpReference: " << n << endl;
-                Variable* v =
-                    _context->findSymbolOfTypeByQualifiedName<Variable>(n,
-                                                                        false);
+                Variable* v = _context->findSymbolOfTypeByQualifiedName<Variable>(n, false);
                 assert(v);
                 return as.referenceVariable(v);
             }
@@ -2926,9 +2782,7 @@ namespace Mu
             {
                 QualifiedName n = readNameId(in);
                 // cout << "OpDereference: " << n << endl;
-                Variable* v =
-                    _context->findSymbolOfTypeByQualifiedName<Variable>(n,
-                                                                        false);
+                Variable* v = _context->findSymbolOfTypeByQualifiedName<Variable>(n, false);
                 assert(v);
                 return as.dereferenceVariable(v);
             }
@@ -2937,9 +2791,7 @@ namespace Mu
             {
                 QualifiedName n = readNameId(in);
                 // cout << "OpReferenceStack: " << n << endl;
-                Variable* v =
-                    _context->findSymbolOfTypeByQualifiedName<Variable>(n,
-                                                                        false);
+                Variable* v = _context->findSymbolOfTypeByQualifiedName<Variable>(n, false);
                 assert(v);
                 return as.referenceVariable(v);
             }
@@ -2958,9 +2810,7 @@ namespace Mu
             {
                 QualifiedName n = readNameId(in);
                 // cout << "OpReferenceClassMember: " << n << endl;
-                MemberVariable* v =
-                    _context->findSymbolOfTypeByQualifiedName<MemberVariable>(
-                        n, false);
+                MemberVariable* v = _context->findSymbolOfTypeByQualifiedName<MemberVariable>(n, false);
                 assert(v);
                 Node* onode = readExpression(in, as);
                 Node* rnode = as.referenceMemberVariable(v, onode);
@@ -2996,8 +2846,7 @@ namespace Mu
 
             case OpNoop:
             {
-                return as.callBestOverloadedFunction(_context->noop(),
-                                                     as.emptyNodeList());
+                return as.callBestOverloadedFunction(_context->noop(), as.emptyNodeList());
             }
 
             default:
@@ -3006,24 +2855,21 @@ namespace Mu
             }
         }
 
-        Variable* Reader::findStackVariableInScope(QualifiedName n,
-                                                   NodeAssembler& as)
+        Variable* Reader::findStackVariableInScope(QualifiedName n, NodeAssembler& as)
         {
             String scopeName = as.scope()->fullyQualifiedName();
             String name = n;
 
             if (name.size() <= scopeName.size())
             {
-                return _context->findSymbolOfTypeByQualifiedName<Variable>(
-                    n, false);
+                return _context->findSymbolOfTypeByQualifiedName<Variable>(n, false);
             }
 
             if (name.find(scopeName) == 0)
             {
                 name = name.substr(scopeName.size() + 1);
                 Name nn = _context->internName(name.c_str());
-                return as.scope()->findSymbolOfTypeByQualifiedName<Variable>(
-                    nn, false);
+                return as.scope()->findSymbolOfTypeByQualifiedName<Variable>(nn, false);
             }
             else
             {
@@ -3035,8 +2881,7 @@ namespace Mu
 
         const Type* Reader::findType(Name name)
         {
-            const Type* t =
-                _context->findSymbolOfTypeByQualifiedName<Type>(name, false);
+            const Type* t = _context->findSymbolOfTypeByQualifiedName<Type>(name, false);
             if (!t)
                 t = _context->parseType(name.c_str(), _process);
             assert(t);

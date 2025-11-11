@@ -19,10 +19,7 @@ namespace TwkGLF
 
     struct CompareStr
     {
-        bool operator()(const char* A, const char* B) const
-        {
-            return strcmp(A, B) < 0;
-        }
+        bool operator()(const char* A, const char* B) const { return strcmp(A, B) < 0; }
     };
 
     //
@@ -35,13 +32,11 @@ namespace TwkGLF
         //------------------------typedefs and
         // structs------------------------------- the string is the vertex and
         // fragment shader string combined
-        typedef std::map<const char*, BasicGLProgram*, CompareStr>
-            ProgramCacheMap;
+        typedef std::map<const char*, BasicGLProgram*, CompareStr> ProgramCacheMap;
 
         //------------------------constructor and
         // destructor-------------------------
-        BasicGLProgram(const std::string& vertexcode,
-                       const std::string& fragmentcode);
+        BasicGLProgram(const std::string& vertexcode, const std::string& fragmentcode);
         ~BasicGLProgram();
 
         //------------------------public
@@ -56,8 +51,7 @@ namespace TwkGLF
 
         GLuint use() const;
 
-        static const BasicGLProgram* select(const std::string& vertexcode,
-                                            const std::string& fragmentcode);
+        static const BasicGLProgram* select(const std::string& vertexcode, const std::string& fragmentcode);
 
     private:
         GLuint m_vertexShader;

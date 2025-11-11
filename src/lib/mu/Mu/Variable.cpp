@@ -16,9 +16,7 @@ namespace Mu
 
     using namespace std;
 
-    Variable::Variable(Context* context, const char* name,
-                       const Type* storageClass, int address,
-                       Variable::Attributes attributes)
+    Variable::Variable(Context* context, const char* name, const Type* storageClass, int address, Variable::Attributes attributes)
         : Symbol(context, name)
     {
         _type = storageClass;
@@ -29,9 +27,7 @@ namespace Mu
         resolveSymbols();
     }
 
-    Variable::Variable(Context* context, const char* name,
-                       const char* storageClass, int address,
-                       Variable::Attributes attributes)
+    Variable::Variable(Context* context, const char* name, const char* storageClass, int address, Variable::Attributes attributes)
         : Symbol(context, name)
     {
         _type = SymbolRef(context->internName(storageClass));
@@ -54,10 +50,8 @@ namespace Mu
 
     Variable::Attributes Variable::attributes() const
     {
-        return (_readable ? Readable : NoVariableAttr)
-               & (_writable ? Writable : NoVariableAttr)
-               & (_singleAssign ? SingleAssign : NoVariableAttr)
-               & (_implicitType ? ImplicitType : NoVariableAttr)
+        return (_readable ? Readable : NoVariableAttr) & (_writable ? Writable : NoVariableAttr)
+               & (_singleAssign ? SingleAssign : NoVariableAttr) & (_implicitType ? ImplicitType : NoVariableAttr)
                & (_singleUse ? SingleUse : NoVariableAttr);
     }
 
@@ -98,8 +92,7 @@ namespace Mu
             return true;
         Name n = _type.name;
 
-        Symbol::ConstSymbolVector symbols =
-            globalScope()->findSymbolsOfType<Type>(n);
+        Symbol::ConstSymbolVector symbols = globalScope()->findSymbolsOfType<Type>(n);
 
         if (symbols.size() == 1)
         {

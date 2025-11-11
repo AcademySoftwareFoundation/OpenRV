@@ -47,8 +47,7 @@ namespace Mu
 {
     using namespace std;
 
-    QTreeWidgetItemType::QTreeWidgetItemType(Context* c, const char* name,
-                                             Class* super)
+    QTreeWidgetItemType::QTreeWidgetItemType(Context* c, const char* name, Class* super)
         : Class(c, name, super)
     {
     }
@@ -58,9 +57,8 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    Pointer
-    qt_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_type)
+    Pointer qt_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_int(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                   int param_type)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         int arg1 = (int)(param_type);
@@ -68,105 +66,83 @@ namespace Mu
         return param_this;
     }
 
-    Pointer
-    qt_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_stringBSB_ESB__int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_strings,
-        int param_type)
+    Pointer qt_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_stringBSB_ESB__int(Mu::Thread& NODE_THREAD,
+                                                                                                  Pointer param_this, Pointer param_strings,
+                                                                                                  int param_type)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QStringList arg1 = qstringlist(param_strings);
         int arg2 = (int)(param_type);
-        setqpointer<QTreeWidgetItemType>(param_this,
-                                         new QTreeWidgetItem(arg1, arg2));
+        setqpointer<QTreeWidgetItemType>(param_this, new QTreeWidgetItem(arg1, arg2));
         return param_this;
     }
 
-    Pointer
-    qt_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidget_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent,
-        int param_type)
+    Pointer qt_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidget_int(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                               Pointer param_parent, int param_type)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeWidget* arg1 = object<QTreeWidget>(param_parent);
         int arg2 = (int)(param_type);
-        setqpointer<QTreeWidgetItemType>(param_this,
-                                         new QTreeWidgetItem(arg1, arg2));
+        setqpointer<QTreeWidgetItemType>(param_this, new QTreeWidgetItem(arg1, arg2));
         return param_this;
     }
 
-    Pointer
-    qt_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidget_stringBSB_ESB__int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent,
-        Pointer param_strings, int param_type)
+    Pointer qt_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidget_stringBSB_ESB__int(
+        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent, Pointer param_strings, int param_type)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeWidget* arg1 = object<QTreeWidget>(param_parent);
         const QStringList arg2 = qstringlist(param_strings);
         int arg3 = (int)(param_type);
-        setqpointer<QTreeWidgetItemType>(param_this,
-                                         new QTreeWidgetItem(arg1, arg2, arg3));
+        setqpointer<QTreeWidgetItemType>(param_this, new QTreeWidgetItem(arg1, arg2, arg3));
         return param_this;
     }
 
-    Pointer
-    qt_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidget_QTreeWidgetItem_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent,
-        Pointer param_preceding, int param_type)
+    Pointer qt_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidget_QTreeWidgetItem_int(
+        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent, Pointer param_preceding, int param_type)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeWidget* arg1 = object<QTreeWidget>(param_parent);
-        QTreeWidgetItem* arg2 =
-            getqpointer<QTreeWidgetItemType>(param_preceding);
+        QTreeWidgetItem* arg2 = getqpointer<QTreeWidgetItemType>(param_preceding);
         int arg3 = (int)(param_type);
-        setqpointer<QTreeWidgetItemType>(param_this,
-                                         new QTreeWidgetItem(arg1, arg2, arg3));
+        setqpointer<QTreeWidgetItemType>(param_this, new QTreeWidgetItem(arg1, arg2, arg3));
         return param_this;
     }
 
-    Pointer
-    qt_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent,
-        int param_type)
+    Pointer qt_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_int(Mu::Thread& NODE_THREAD,
+                                                                                                   Pointer param_this, Pointer param_parent,
+                                                                                                   int param_type)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeWidgetItem* arg1 = getqpointer<QTreeWidgetItemType>(param_parent);
         int arg2 = (int)(param_type);
-        setqpointer<QTreeWidgetItemType>(param_this,
-                                         new QTreeWidgetItem(arg1, arg2));
+        setqpointer<QTreeWidgetItemType>(param_this, new QTreeWidgetItem(arg1, arg2));
         return param_this;
     }
 
-    Pointer
-    qt_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_stringBSB_ESB__int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent,
-        Pointer param_strings, int param_type)
+    Pointer qt_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_stringBSB_ESB__int(
+        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent, Pointer param_strings, int param_type)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeWidgetItem* arg1 = getqpointer<QTreeWidgetItemType>(param_parent);
         const QStringList arg2 = qstringlist(param_strings);
         int arg3 = (int)(param_type);
-        setqpointer<QTreeWidgetItemType>(param_this,
-                                         new QTreeWidgetItem(arg1, arg2, arg3));
+        setqpointer<QTreeWidgetItemType>(param_this, new QTreeWidgetItem(arg1, arg2, arg3));
         return param_this;
     }
 
-    Pointer
-    qt_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent,
-        Pointer param_preceding, int param_type)
+    Pointer qt_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_int(
+        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent, Pointer param_preceding, int param_type)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeWidgetItem* arg1 = getqpointer<QTreeWidgetItemType>(param_parent);
-        QTreeWidgetItem* arg2 =
-            getqpointer<QTreeWidgetItemType>(param_preceding);
+        QTreeWidgetItem* arg2 = getqpointer<QTreeWidgetItemType>(param_preceding);
         int arg3 = (int)(param_type);
-        setqpointer<QTreeWidgetItemType>(param_this,
-                                         new QTreeWidgetItem(arg1, arg2, arg3));
+        setqpointer<QTreeWidgetItemType>(param_this, new QTreeWidgetItem(arg1, arg2, arg3));
         return param_this;
     }
 
-    void qt_QTreeWidgetItem_addChild_void_QTreeWidgetItem_QTreeWidgetItem(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_child)
+    void qt_QTreeWidgetItem_addChild_void_QTreeWidgetItem_QTreeWidgetItem(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_child)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeWidgetItem* arg0 = getqpointer<QTreeWidgetItemType>(param_this);
@@ -175,20 +151,17 @@ namespace Mu
         setqpointer<QTreeWidgetItemType>(param_this, arg0);
     }
 
-    void
-    qt_QTreeWidgetItem_addChildren_void_QTreeWidgetItem_qt__QTreeWidgetItemBSB_ESB_(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_children)
+    void qt_QTreeWidgetItem_addChildren_void_QTreeWidgetItem_qt__QTreeWidgetItemBSB_ESB_(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                         Pointer param_children)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeWidgetItem* arg0 = getqpointer<QTreeWidgetItemType>(param_this);
-        const QList<QTreeWidgetItem*> arg1 =
-            qpointerlist<QTreeWidgetItemType>(param_children);
+        const QList<QTreeWidgetItem*> arg1 = qpointerlist<QTreeWidgetItemType>(param_children);
         arg0->addChildren(arg1);
         setqpointer<QTreeWidgetItemType>(param_this, arg0);
     }
 
-    Pointer qt_QTreeWidgetItem_background_QBrush_QTreeWidgetItem_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_column)
+    Pointer qt_QTreeWidgetItem_background_QBrush_QTreeWidgetItem_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_column)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeWidgetItem* arg0 = getqpointer<QTreeWidgetItemType>(param_this);
@@ -196,8 +169,7 @@ namespace Mu
         return makeqtype<QBrushType>(c, arg0->background(arg1), "qt.QBrush");
     }
 
-    int qt_QTreeWidgetItem_checkState_int_QTreeWidgetItem_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_column)
+    int qt_QTreeWidgetItem_checkState_int_QTreeWidgetItem_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_column)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeWidgetItem* arg0 = getqpointer<QTreeWidgetItemType>(param_this);
@@ -205,73 +177,60 @@ namespace Mu
         return int(arg0->checkState(arg1));
     }
 
-    Pointer qt_QTreeWidgetItem_child_QTreeWidgetItem_QTreeWidgetItem_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_index)
+    Pointer qt_QTreeWidgetItem_child_QTreeWidgetItem_QTreeWidgetItem_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_index)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeWidgetItem* arg0 = getqpointer<QTreeWidgetItemType>(param_this);
         int arg1 = (int)(param_index);
-        return makeqpointer<QTreeWidgetItemType>(c, arg0->child(arg1),
-                                                 "qt.QTreeWidgetItem");
+        return makeqpointer<QTreeWidgetItemType>(c, arg0->child(arg1), "qt.QTreeWidgetItem");
     }
 
-    int
-    qt_QTreeWidgetItem_childCount_int_QTreeWidgetItem(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    int qt_QTreeWidgetItem_childCount_int_QTreeWidgetItem(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeWidgetItem* arg0 = getqpointer<QTreeWidgetItemType>(param_this);
         return arg0->childCount();
     }
 
-    int qt_QTreeWidgetItem_childIndicatorPolicy_int_QTreeWidgetItem(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    int qt_QTreeWidgetItem_childIndicatorPolicy_int_QTreeWidgetItem(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeWidgetItem* arg0 = getqpointer<QTreeWidgetItemType>(param_this);
         return int(arg0->childIndicatorPolicy());
     }
 
-    Pointer qt_QTreeWidgetItem_clone_QTreeWidgetItem_QTreeWidgetItem(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QTreeWidgetItem_clone_QTreeWidgetItem_QTreeWidgetItem(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeWidgetItem* arg0 = getqpointer<QTreeWidgetItemType>(param_this);
-        return makeqpointer<QTreeWidgetItemType>(c, arg0->clone(),
-                                                 "qt.QTreeWidgetItem");
+        return makeqpointer<QTreeWidgetItemType>(c, arg0->clone(), "qt.QTreeWidgetItem");
     }
 
-    int
-    qt_QTreeWidgetItem_columnCount_int_QTreeWidgetItem(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this)
+    int qt_QTreeWidgetItem_columnCount_int_QTreeWidgetItem(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeWidgetItem* arg0 = getqpointer<QTreeWidgetItemType>(param_this);
         return arg0->columnCount();
     }
 
-    Pointer qt_QTreeWidgetItem_data_QVariant_QTreeWidgetItem_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_column,
-        int param_role)
+    Pointer qt_QTreeWidgetItem_data_QVariant_QTreeWidgetItem_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_column,
+                                                                     int param_role)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeWidgetItem* arg0 = getqpointer<QTreeWidgetItemType>(param_this);
         int arg1 = (int)(param_column);
         int arg2 = (int)(param_role);
-        return makeqtype<QVariantType>(c, arg0->data(arg1, arg2),
-                                       "qt.QVariant");
+        return makeqtype<QVariantType>(c, arg0->data(arg1, arg2), "qt.QVariant");
     }
 
-    int qt_QTreeWidgetItem_flags_int_QTreeWidgetItem(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_this)
+    int qt_QTreeWidgetItem_flags_int_QTreeWidgetItem(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeWidgetItem* arg0 = getqpointer<QTreeWidgetItemType>(param_this);
         return int(arg0->flags());
     }
 
-    Pointer qt_QTreeWidgetItem_font_QFont_QTreeWidgetItem_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_column)
+    Pointer qt_QTreeWidgetItem_font_QFont_QTreeWidgetItem_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_column)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeWidgetItem* arg0 = getqpointer<QTreeWidgetItemType>(param_this);
@@ -279,8 +238,7 @@ namespace Mu
         return makeqtype<QFontType>(c, arg0->font(arg1), "qt.QFont");
     }
 
-    Pointer qt_QTreeWidgetItem_foreground_QBrush_QTreeWidgetItem_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_column)
+    Pointer qt_QTreeWidgetItem_foreground_QBrush_QTreeWidgetItem_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_column)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeWidgetItem* arg0 = getqpointer<QTreeWidgetItemType>(param_this);
@@ -288,8 +246,7 @@ namespace Mu
         return makeqtype<QBrushType>(c, arg0->foreground(arg1), "qt.QBrush");
     }
 
-    Pointer qt_QTreeWidgetItem_icon_QIcon_QTreeWidgetItem_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_column)
+    Pointer qt_QTreeWidgetItem_icon_QIcon_QTreeWidgetItem_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_column)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeWidgetItem* arg0 = getqpointer<QTreeWidgetItemType>(param_this);
@@ -297,8 +254,8 @@ namespace Mu
         return makeqtype<QIconType>(c, arg0->icon(arg1), "qt.QIcon");
     }
 
-    int qt_QTreeWidgetItem_indexOfChild_int_QTreeWidgetItem_QTreeWidgetItem(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_child)
+    int qt_QTreeWidgetItem_indexOfChild_int_QTreeWidgetItem_QTreeWidgetItem(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                            Pointer param_child)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeWidgetItem* arg0 = getqpointer<QTreeWidgetItemType>(param_this);
@@ -306,10 +263,8 @@ namespace Mu
         return arg0->indexOfChild(arg1);
     }
 
-    void
-    qt_QTreeWidgetItem_insertChild_void_QTreeWidgetItem_int_QTreeWidgetItem(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_index,
-        Pointer param_child)
+    void qt_QTreeWidgetItem_insertChild_void_QTreeWidgetItem_int_QTreeWidgetItem(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                 int param_index, Pointer param_child)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeWidgetItem* arg0 = getqpointer<QTreeWidgetItemType>(param_this);
@@ -319,75 +274,61 @@ namespace Mu
         setqpointer<QTreeWidgetItemType>(param_this, arg0);
     }
 
-    void
-    qt_QTreeWidgetItem_insertChildren_void_QTreeWidgetItem_int_qt__QTreeWidgetItemBSB_ESB_(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_index,
-        Pointer param_children)
+    void qt_QTreeWidgetItem_insertChildren_void_QTreeWidgetItem_int_qt__QTreeWidgetItemBSB_ESB_(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                                int param_index, Pointer param_children)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeWidgetItem* arg0 = getqpointer<QTreeWidgetItemType>(param_this);
         int arg1 = (int)(param_index);
-        const QList<QTreeWidgetItem*> arg2 =
-            qpointerlist<QTreeWidgetItemType>(param_children);
+        const QList<QTreeWidgetItem*> arg2 = qpointerlist<QTreeWidgetItemType>(param_children);
         arg0->insertChildren(arg1, arg2);
         setqpointer<QTreeWidgetItemType>(param_this, arg0);
     }
 
-    bool
-    qt_QTreeWidgetItem_isDisabled_bool_QTreeWidgetItem(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this)
+    bool qt_QTreeWidgetItem_isDisabled_bool_QTreeWidgetItem(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeWidgetItem* arg0 = getqpointer<QTreeWidgetItemType>(param_this);
         return arg0->isDisabled();
     }
 
-    bool
-    qt_QTreeWidgetItem_isExpanded_bool_QTreeWidgetItem(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this)
+    bool qt_QTreeWidgetItem_isExpanded_bool_QTreeWidgetItem(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeWidgetItem* arg0 = getqpointer<QTreeWidgetItemType>(param_this);
         return arg0->isExpanded();
     }
 
-    bool qt_QTreeWidgetItem_isFirstColumnSpanned_bool_QTreeWidgetItem(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    bool qt_QTreeWidgetItem_isFirstColumnSpanned_bool_QTreeWidgetItem(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeWidgetItem* arg0 = getqpointer<QTreeWidgetItemType>(param_this);
         return arg0->isFirstColumnSpanned();
     }
 
-    bool
-    qt_QTreeWidgetItem_isHidden_bool_QTreeWidgetItem(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_this)
+    bool qt_QTreeWidgetItem_isHidden_bool_QTreeWidgetItem(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeWidgetItem* arg0 = getqpointer<QTreeWidgetItemType>(param_this);
         return arg0->isHidden();
     }
 
-    bool
-    qt_QTreeWidgetItem_isSelected_bool_QTreeWidgetItem(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this)
+    bool qt_QTreeWidgetItem_isSelected_bool_QTreeWidgetItem(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeWidgetItem* arg0 = getqpointer<QTreeWidgetItemType>(param_this);
         return arg0->isSelected();
     }
 
-    Pointer qt_QTreeWidgetItem_parent_QTreeWidgetItem_QTreeWidgetItem(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QTreeWidgetItem_parent_QTreeWidgetItem_QTreeWidgetItem(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeWidgetItem* arg0 = getqpointer<QTreeWidgetItemType>(param_this);
-        return makeqpointer<QTreeWidgetItemType>(c, arg0->parent(),
-                                                 "qt.QTreeWidgetItem");
+        return makeqpointer<QTreeWidgetItemType>(c, arg0->parent(), "qt.QTreeWidgetItem");
     }
 
-    void qt_QTreeWidgetItem_removeChild_void_QTreeWidgetItem_QTreeWidgetItem(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_child)
+    void qt_QTreeWidgetItem_removeChild_void_QTreeWidgetItem_QTreeWidgetItem(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                             Pointer param_child)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeWidgetItem* arg0 = getqpointer<QTreeWidgetItemType>(param_this);
@@ -396,9 +337,8 @@ namespace Mu
         setqpointer<QTreeWidgetItemType>(param_this, arg0);
     }
 
-    void qt_QTreeWidgetItem_setBackground_void_QTreeWidgetItem_int_QBrush(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_column,
-        Pointer param_brush)
+    void qt_QTreeWidgetItem_setBackground_void_QTreeWidgetItem_int_QBrush(Mu::Thread& NODE_THREAD, Pointer param_this, int param_column,
+                                                                          Pointer param_brush)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeWidgetItem* arg0 = getqpointer<QTreeWidgetItemType>(param_this);
@@ -408,9 +348,8 @@ namespace Mu
         setqpointer<QTreeWidgetItemType>(param_this, arg0);
     }
 
-    void qt_QTreeWidgetItem_setCheckState_void_QTreeWidgetItem_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_column,
-        int param_state)
+    void qt_QTreeWidgetItem_setCheckState_void_QTreeWidgetItem_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_column,
+                                                                       int param_state)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeWidgetItem* arg0 = getqpointer<QTreeWidgetItemType>(param_this);
@@ -420,20 +359,17 @@ namespace Mu
         setqpointer<QTreeWidgetItemType>(param_this, arg0);
     }
 
-    void qt_QTreeWidgetItem_setChildIndicatorPolicy_void_QTreeWidgetItem_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_policy)
+    void qt_QTreeWidgetItem_setChildIndicatorPolicy_void_QTreeWidgetItem_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_policy)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeWidgetItem* arg0 = getqpointer<QTreeWidgetItemType>(param_this);
-        QTreeWidgetItem::ChildIndicatorPolicy arg1 =
-            (QTreeWidgetItem::ChildIndicatorPolicy)(param_policy);
+        QTreeWidgetItem::ChildIndicatorPolicy arg1 = (QTreeWidgetItem::ChildIndicatorPolicy)(param_policy);
         arg0->setChildIndicatorPolicy(arg1);
         setqpointer<QTreeWidgetItemType>(param_this, arg0);
     }
 
-    void qt_QTreeWidgetItem_setData_void_QTreeWidgetItem_int_int_QVariant(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_column,
-        int param_role, Pointer param_value)
+    void qt_QTreeWidgetItem_setData_void_QTreeWidgetItem_int_int_QVariant(Mu::Thread& NODE_THREAD, Pointer param_this, int param_column,
+                                                                          int param_role, Pointer param_value)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeWidgetItem* arg0 = getqpointer<QTreeWidgetItemType>(param_this);
@@ -444,8 +380,7 @@ namespace Mu
         setqpointer<QTreeWidgetItemType>(param_this, arg0);
     }
 
-    void qt_QTreeWidgetItem_setDisabled_void_QTreeWidgetItem_bool(
-        Mu::Thread& NODE_THREAD, Pointer param_this, bool param_disabled)
+    void qt_QTreeWidgetItem_setDisabled_void_QTreeWidgetItem_bool(Mu::Thread& NODE_THREAD, Pointer param_this, bool param_disabled)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeWidgetItem* arg0 = getqpointer<QTreeWidgetItemType>(param_this);
@@ -454,8 +389,7 @@ namespace Mu
         setqpointer<QTreeWidgetItemType>(param_this, arg0);
     }
 
-    void qt_QTreeWidgetItem_setExpanded_void_QTreeWidgetItem_bool(
-        Mu::Thread& NODE_THREAD, Pointer param_this, bool param_expand)
+    void qt_QTreeWidgetItem_setExpanded_void_QTreeWidgetItem_bool(Mu::Thread& NODE_THREAD, Pointer param_this, bool param_expand)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeWidgetItem* arg0 = getqpointer<QTreeWidgetItemType>(param_this);
@@ -464,8 +398,7 @@ namespace Mu
         setqpointer<QTreeWidgetItemType>(param_this, arg0);
     }
 
-    void qt_QTreeWidgetItem_setFirstColumnSpanned_void_QTreeWidgetItem_bool(
-        Mu::Thread& NODE_THREAD, Pointer param_this, bool param_span)
+    void qt_QTreeWidgetItem_setFirstColumnSpanned_void_QTreeWidgetItem_bool(Mu::Thread& NODE_THREAD, Pointer param_this, bool param_span)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeWidgetItem* arg0 = getqpointer<QTreeWidgetItemType>(param_this);
@@ -474,8 +407,7 @@ namespace Mu
         setqpointer<QTreeWidgetItemType>(param_this, arg0);
     }
 
-    void qt_QTreeWidgetItem_setFlags_void_QTreeWidgetItem_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_flags)
+    void qt_QTreeWidgetItem_setFlags_void_QTreeWidgetItem_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_flags)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeWidgetItem* arg0 = getqpointer<QTreeWidgetItemType>(param_this);
@@ -484,9 +416,8 @@ namespace Mu
         setqpointer<QTreeWidgetItemType>(param_this, arg0);
     }
 
-    void qt_QTreeWidgetItem_setFont_void_QTreeWidgetItem_int_QFont(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_column,
-        Pointer param_font)
+    void qt_QTreeWidgetItem_setFont_void_QTreeWidgetItem_int_QFont(Mu::Thread& NODE_THREAD, Pointer param_this, int param_column,
+                                                                   Pointer param_font)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeWidgetItem* arg0 = getqpointer<QTreeWidgetItemType>(param_this);
@@ -496,9 +427,8 @@ namespace Mu
         setqpointer<QTreeWidgetItemType>(param_this, arg0);
     }
 
-    void qt_QTreeWidgetItem_setForeground_void_QTreeWidgetItem_int_QBrush(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_column,
-        Pointer param_brush)
+    void qt_QTreeWidgetItem_setForeground_void_QTreeWidgetItem_int_QBrush(Mu::Thread& NODE_THREAD, Pointer param_this, int param_column,
+                                                                          Pointer param_brush)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeWidgetItem* arg0 = getqpointer<QTreeWidgetItemType>(param_this);
@@ -508,8 +438,7 @@ namespace Mu
         setqpointer<QTreeWidgetItemType>(param_this, arg0);
     }
 
-    void qt_QTreeWidgetItem_setHidden_void_QTreeWidgetItem_bool(
-        Mu::Thread& NODE_THREAD, Pointer param_this, bool param_hide)
+    void qt_QTreeWidgetItem_setHidden_void_QTreeWidgetItem_bool(Mu::Thread& NODE_THREAD, Pointer param_this, bool param_hide)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeWidgetItem* arg0 = getqpointer<QTreeWidgetItemType>(param_this);
@@ -518,9 +447,8 @@ namespace Mu
         setqpointer<QTreeWidgetItemType>(param_this, arg0);
     }
 
-    void qt_QTreeWidgetItem_setIcon_void_QTreeWidgetItem_int_QIcon(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_column,
-        Pointer param_icon)
+    void qt_QTreeWidgetItem_setIcon_void_QTreeWidgetItem_int_QIcon(Mu::Thread& NODE_THREAD, Pointer param_this, int param_column,
+                                                                   Pointer param_icon)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeWidgetItem* arg0 = getqpointer<QTreeWidgetItemType>(param_this);
@@ -530,8 +458,7 @@ namespace Mu
         setqpointer<QTreeWidgetItemType>(param_this, arg0);
     }
 
-    void qt_QTreeWidgetItem_setSelected_void_QTreeWidgetItem_bool(
-        Mu::Thread& NODE_THREAD, Pointer param_this, bool param_select)
+    void qt_QTreeWidgetItem_setSelected_void_QTreeWidgetItem_bool(Mu::Thread& NODE_THREAD, Pointer param_this, bool param_select)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeWidgetItem* arg0 = getqpointer<QTreeWidgetItemType>(param_this);
@@ -540,9 +467,8 @@ namespace Mu
         setqpointer<QTreeWidgetItemType>(param_this, arg0);
     }
 
-    void qt_QTreeWidgetItem_setSizeHint_void_QTreeWidgetItem_int_QSize(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_column,
-        Pointer param_size)
+    void qt_QTreeWidgetItem_setSizeHint_void_QTreeWidgetItem_int_QSize(Mu::Thread& NODE_THREAD, Pointer param_this, int param_column,
+                                                                       Pointer param_size)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeWidgetItem* arg0 = getqpointer<QTreeWidgetItemType>(param_this);
@@ -552,9 +478,8 @@ namespace Mu
         setqpointer<QTreeWidgetItemType>(param_this, arg0);
     }
 
-    void qt_QTreeWidgetItem_setStatusTip_void_QTreeWidgetItem_int_string(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_column,
-        Pointer param_statusTip)
+    void qt_QTreeWidgetItem_setStatusTip_void_QTreeWidgetItem_int_string(Mu::Thread& NODE_THREAD, Pointer param_this, int param_column,
+                                                                         Pointer param_statusTip)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeWidgetItem* arg0 = getqpointer<QTreeWidgetItemType>(param_this);
@@ -564,9 +489,8 @@ namespace Mu
         setqpointer<QTreeWidgetItemType>(param_this, arg0);
     }
 
-    void qt_QTreeWidgetItem_setText_void_QTreeWidgetItem_int_string(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_column,
-        Pointer param_text)
+    void qt_QTreeWidgetItem_setText_void_QTreeWidgetItem_int_string(Mu::Thread& NODE_THREAD, Pointer param_this, int param_column,
+                                                                    Pointer param_text)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeWidgetItem* arg0 = getqpointer<QTreeWidgetItemType>(param_this);
@@ -576,9 +500,8 @@ namespace Mu
         setqpointer<QTreeWidgetItemType>(param_this, arg0);
     }
 
-    void qt_QTreeWidgetItem_setTextAlignment_void_QTreeWidgetItem_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_column,
-        int param_alignment)
+    void qt_QTreeWidgetItem_setTextAlignment_void_QTreeWidgetItem_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_column,
+                                                                          int param_alignment)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeWidgetItem* arg0 = getqpointer<QTreeWidgetItemType>(param_this);
@@ -588,9 +511,8 @@ namespace Mu
         setqpointer<QTreeWidgetItemType>(param_this, arg0);
     }
 
-    void qt_QTreeWidgetItem_setToolTip_void_QTreeWidgetItem_int_string(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_column,
-        Pointer param_toolTip)
+    void qt_QTreeWidgetItem_setToolTip_void_QTreeWidgetItem_int_string(Mu::Thread& NODE_THREAD, Pointer param_this, int param_column,
+                                                                       Pointer param_toolTip)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeWidgetItem* arg0 = getqpointer<QTreeWidgetItemType>(param_this);
@@ -600,9 +522,8 @@ namespace Mu
         setqpointer<QTreeWidgetItemType>(param_this, arg0);
     }
 
-    void qt_QTreeWidgetItem_setWhatsThis_void_QTreeWidgetItem_int_string(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_column,
-        Pointer param_whatsThis)
+    void qt_QTreeWidgetItem_setWhatsThis_void_QTreeWidgetItem_int_string(Mu::Thread& NODE_THREAD, Pointer param_this, int param_column,
+                                                                         Pointer param_whatsThis)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeWidgetItem* arg0 = getqpointer<QTreeWidgetItemType>(param_this);
@@ -612,8 +533,7 @@ namespace Mu
         setqpointer<QTreeWidgetItemType>(param_this, arg0);
     }
 
-    Pointer qt_QTreeWidgetItem_sizeHint_QSize_QTreeWidgetItem_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_column)
+    Pointer qt_QTreeWidgetItem_sizeHint_QSize_QTreeWidgetItem_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_column)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeWidgetItem* arg0 = getqpointer<QTreeWidgetItemType>(param_this);
@@ -621,9 +541,8 @@ namespace Mu
         return makeqtype<QSizeType>(c, arg0->sizeHint(arg1), "qt.QSize");
     }
 
-    void qt_QTreeWidgetItem_sortChildren_void_QTreeWidgetItem_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_column,
-        int param_order)
+    void qt_QTreeWidgetItem_sortChildren_void_QTreeWidgetItem_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_column,
+                                                                      int param_order)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeWidgetItem* arg0 = getqpointer<QTreeWidgetItemType>(param_this);
@@ -633,8 +552,7 @@ namespace Mu
         setqpointer<QTreeWidgetItemType>(param_this, arg0);
     }
 
-    Pointer qt_QTreeWidgetItem_statusTip_string_QTreeWidgetItem_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_column)
+    Pointer qt_QTreeWidgetItem_statusTip_string_QTreeWidgetItem_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_column)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeWidgetItem* arg0 = getqpointer<QTreeWidgetItemType>(param_this);
@@ -642,28 +560,22 @@ namespace Mu
         return makestring(c, arg0->statusTip(arg1));
     }
 
-    Pointer qt_QTreeWidgetItem_takeChild_QTreeWidgetItem_QTreeWidgetItem_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_index)
+    Pointer qt_QTreeWidgetItem_takeChild_QTreeWidgetItem_QTreeWidgetItem_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_index)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeWidgetItem* arg0 = getqpointer<QTreeWidgetItemType>(param_this);
         int arg1 = (int)(param_index);
-        return makeqpointer<QTreeWidgetItemType>(c, arg0->takeChild(arg1),
-                                                 "qt.QTreeWidgetItem");
+        return makeqpointer<QTreeWidgetItemType>(c, arg0->takeChild(arg1), "qt.QTreeWidgetItem");
     }
 
-    Pointer
-    qt_QTreeWidgetItem_takeChildren_qt__QTreeWidgetItemBSB_ESB__QTreeWidgetItem(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QTreeWidgetItem_takeChildren_qt__QTreeWidgetItemBSB_ESB__QTreeWidgetItem(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeWidgetItem* arg0 = getqpointer<QTreeWidgetItemType>(param_this);
-        return makeqpointerlist<QTreeWidgetItemType>(c, arg0->takeChildren(),
-                                                     "qt.QTreeWidgetItem");
+        return makeqpointerlist<QTreeWidgetItemType>(c, arg0->takeChildren(), "qt.QTreeWidgetItem");
     }
 
-    Pointer qt_QTreeWidgetItem_text_string_QTreeWidgetItem_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_column)
+    Pointer qt_QTreeWidgetItem_text_string_QTreeWidgetItem_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_column)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeWidgetItem* arg0 = getqpointer<QTreeWidgetItemType>(param_this);
@@ -671,8 +583,7 @@ namespace Mu
         return makestring(c, arg0->text(arg1));
     }
 
-    int qt_QTreeWidgetItem_textAlignment_int_QTreeWidgetItem_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_column)
+    int qt_QTreeWidgetItem_textAlignment_int_QTreeWidgetItem_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_column)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeWidgetItem* arg0 = getqpointer<QTreeWidgetItemType>(param_this);
@@ -680,8 +591,7 @@ namespace Mu
         return arg0->textAlignment(arg1);
     }
 
-    Pointer qt_QTreeWidgetItem_toolTip_string_QTreeWidgetItem_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_column)
+    Pointer qt_QTreeWidgetItem_toolTip_string_QTreeWidgetItem_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_column)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeWidgetItem* arg0 = getqpointer<QTreeWidgetItemType>(param_this);
@@ -689,25 +599,21 @@ namespace Mu
         return makestring(c, arg0->toolTip(arg1));
     }
 
-    Pointer qt_QTreeWidgetItem_treeWidget_QTreeWidget_QTreeWidgetItem(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QTreeWidgetItem_treeWidget_QTreeWidget_QTreeWidgetItem(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeWidgetItem* arg0 = getqpointer<QTreeWidgetItemType>(param_this);
-        return makeinstance<QTreeWidgetType>(c, arg0->treeWidget(),
-                                             "qt.QTreeWidget");
+        return makeinstance<QTreeWidgetType>(c, arg0->treeWidget(), "qt.QTreeWidget");
     }
 
-    int qt_QTreeWidgetItem_type_int_QTreeWidgetItem(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this)
+    int qt_QTreeWidgetItem_type_int_QTreeWidgetItem(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeWidgetItem* arg0 = getqpointer<QTreeWidgetItemType>(param_this);
         return arg0->type();
     }
 
-    Pointer qt_QTreeWidgetItem_whatsThis_string_QTreeWidgetItem_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_column)
+    Pointer qt_QTreeWidgetItem_whatsThis_string_QTreeWidgetItem_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_column)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeWidgetItem* arg0 = getqpointer<QTreeWidgetItemType>(param_this);
@@ -717,411 +623,340 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(_n_QTreeWidgetItem0, Pointer)
     {
-        NODE_RETURN(
-            qt_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_int(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                           NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_QTreeWidgetItem1, Pointer)
     {
-        NODE_RETURN(
-            qt_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_stringBSB_ESB__int(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, int)));
+        NODE_RETURN(qt_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_stringBSB_ESB__int(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_QTreeWidgetItem2, Pointer)
     {
-        NODE_RETURN(
-            qt_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidget_int(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, int)));
+        NODE_RETURN(qt_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidget_int(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_QTreeWidgetItem3, Pointer)
     {
-        NODE_RETURN(
-            qt_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidget_stringBSB_ESB__int(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, Pointer), NODE_ARG(3, int)));
+        NODE_RETURN(qt_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidget_stringBSB_ESB__int(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, Pointer), NODE_ARG(3, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_QTreeWidgetItem4, Pointer)
     {
-        NODE_RETURN(
-            qt_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidget_QTreeWidgetItem_int(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, Pointer), NODE_ARG(3, int)));
+        NODE_RETURN(qt_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidget_QTreeWidgetItem_int(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, Pointer), NODE_ARG(3, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_QTreeWidgetItem5, Pointer)
     {
-        NODE_RETURN(
-            qt_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_int(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, int)));
+        NODE_RETURN(qt_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_int(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_QTreeWidgetItem6, Pointer)
     {
-        NODE_RETURN(
-            qt_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_stringBSB_ESB__int(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, Pointer), NODE_ARG(3, int)));
+        NODE_RETURN(qt_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_stringBSB_ESB__int(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, Pointer), NODE_ARG(3, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_QTreeWidgetItem7, Pointer)
     {
-        NODE_RETURN(
-            qt_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_int(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, Pointer), NODE_ARG(3, int)));
+        NODE_RETURN(qt_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_int(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, Pointer), NODE_ARG(3, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_addChild0, void)
     {
-        qt_QTreeWidgetItem_addChild_void_QTreeWidgetItem_QTreeWidgetItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTreeWidgetItem_addChild_void_QTreeWidgetItem_QTreeWidgetItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_addChildren0, void)
     {
-        qt_QTreeWidgetItem_addChildren_void_QTreeWidgetItem_qt__QTreeWidgetItemBSB_ESB_(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTreeWidgetItem_addChildren_void_QTreeWidgetItem_qt__QTreeWidgetItemBSB_ESB_(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                        NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_background0, Pointer)
     {
-        NODE_RETURN(qt_QTreeWidgetItem_background_QBrush_QTreeWidgetItem_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QTreeWidgetItem_background_QBrush_QTreeWidgetItem_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_checkState0, int)
     {
-        NODE_RETURN(qt_QTreeWidgetItem_checkState_int_QTreeWidgetItem_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QTreeWidgetItem_checkState_int_QTreeWidgetItem_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_child0, Pointer)
     {
         NODE_RETURN(
-            qt_QTreeWidgetItem_child_QTreeWidgetItem_QTreeWidgetItem_int(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+            qt_QTreeWidgetItem_child_QTreeWidgetItem_QTreeWidgetItem_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_childCount0, int)
     {
-        NODE_RETURN(qt_QTreeWidgetItem_childCount_int_QTreeWidgetItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTreeWidgetItem_childCount_int_QTreeWidgetItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_childIndicatorPolicy0, int)
     {
-        NODE_RETURN(qt_QTreeWidgetItem_childIndicatorPolicy_int_QTreeWidgetItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTreeWidgetItem_childIndicatorPolicy_int_QTreeWidgetItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_clone0, Pointer)
     {
-        NODE_RETURN(qt_QTreeWidgetItem_clone_QTreeWidgetItem_QTreeWidgetItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTreeWidgetItem_clone_QTreeWidgetItem_QTreeWidgetItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_columnCount0, int)
     {
-        NODE_RETURN(qt_QTreeWidgetItem_columnCount_int_QTreeWidgetItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTreeWidgetItem_columnCount_int_QTreeWidgetItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_data0, Pointer)
     {
-        NODE_RETURN(qt_QTreeWidgetItem_data_QVariant_QTreeWidgetItem_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int)));
+        NODE_RETURN(qt_QTreeWidgetItem_data_QVariant_QTreeWidgetItem_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                             NODE_ARG(2, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_flags0, int)
     {
-        NODE_RETURN(qt_QTreeWidgetItem_flags_int_QTreeWidgetItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTreeWidgetItem_flags_int_QTreeWidgetItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_font0, Pointer)
     {
-        NODE_RETURN(qt_QTreeWidgetItem_font_QFont_QTreeWidgetItem_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QTreeWidgetItem_font_QFont_QTreeWidgetItem_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_foreground0, Pointer)
     {
-        NODE_RETURN(qt_QTreeWidgetItem_foreground_QBrush_QTreeWidgetItem_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QTreeWidgetItem_foreground_QBrush_QTreeWidgetItem_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_icon0, Pointer)
     {
-        NODE_RETURN(qt_QTreeWidgetItem_icon_QIcon_QTreeWidgetItem_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QTreeWidgetItem_icon_QIcon_QTreeWidgetItem_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_indexOfChild0, int)
     {
-        NODE_RETURN(
-            qt_QTreeWidgetItem_indexOfChild_int_QTreeWidgetItem_QTreeWidgetItem(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QTreeWidgetItem_indexOfChild_int_QTreeWidgetItem_QTreeWidgetItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                        NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_insertChild0, void)
     {
-        qt_QTreeWidgetItem_insertChild_void_QTreeWidgetItem_int_QTreeWidgetItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, Pointer));
+        qt_QTreeWidgetItem_insertChild_void_QTreeWidgetItem_int_QTreeWidgetItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                                NODE_ARG(2, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_insertChildren0, void)
     {
-        qt_QTreeWidgetItem_insertChildren_void_QTreeWidgetItem_int_qt__QTreeWidgetItemBSB_ESB_(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, Pointer));
+        qt_QTreeWidgetItem_insertChildren_void_QTreeWidgetItem_int_qt__QTreeWidgetItemBSB_ESB_(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                               NODE_ARG(1, int), NODE_ARG(2, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_isDisabled0, bool)
     {
-        NODE_RETURN(qt_QTreeWidgetItem_isDisabled_bool_QTreeWidgetItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTreeWidgetItem_isDisabled_bool_QTreeWidgetItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isExpanded0, bool)
     {
-        NODE_RETURN(qt_QTreeWidgetItem_isExpanded_bool_QTreeWidgetItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTreeWidgetItem_isExpanded_bool_QTreeWidgetItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isFirstColumnSpanned0, bool)
     {
-        NODE_RETURN(
-            qt_QTreeWidgetItem_isFirstColumnSpanned_bool_QTreeWidgetItem(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTreeWidgetItem_isFirstColumnSpanned_bool_QTreeWidgetItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isHidden0, bool)
     {
-        NODE_RETURN(qt_QTreeWidgetItem_isHidden_bool_QTreeWidgetItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTreeWidgetItem_isHidden_bool_QTreeWidgetItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isSelected0, bool)
     {
-        NODE_RETURN(qt_QTreeWidgetItem_isSelected_bool_QTreeWidgetItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTreeWidgetItem_isSelected_bool_QTreeWidgetItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_parent0, Pointer)
     {
-        NODE_RETURN(qt_QTreeWidgetItem_parent_QTreeWidgetItem_QTreeWidgetItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTreeWidgetItem_parent_QTreeWidgetItem_QTreeWidgetItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_removeChild0, void)
     {
-        qt_QTreeWidgetItem_removeChild_void_QTreeWidgetItem_QTreeWidgetItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTreeWidgetItem_removeChild_void_QTreeWidgetItem_QTreeWidgetItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setBackground0, void)
     {
-        qt_QTreeWidgetItem_setBackground_void_QTreeWidgetItem_int_QBrush(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, Pointer));
+        qt_QTreeWidgetItem_setBackground_void_QTreeWidgetItem_int_QBrush(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                         NODE_ARG(2, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setCheckState0, void)
     {
-        qt_QTreeWidgetItem_setCheckState_void_QTreeWidgetItem_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int));
+        qt_QTreeWidgetItem_setCheckState_void_QTreeWidgetItem_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                      NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setChildIndicatorPolicy0, void)
     {
-        qt_QTreeWidgetItem_setChildIndicatorPolicy_void_QTreeWidgetItem_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QTreeWidgetItem_setChildIndicatorPolicy_void_QTreeWidgetItem_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setData0, void)
     {
-        qt_QTreeWidgetItem_setData_void_QTreeWidgetItem_int_int_QVariant(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int), NODE_ARG(3, Pointer));
+        qt_QTreeWidgetItem_setData_void_QTreeWidgetItem_int_int_QVariant(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                         NODE_ARG(2, int), NODE_ARG(3, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setDisabled0, void)
     {
-        qt_QTreeWidgetItem_setDisabled_void_QTreeWidgetItem_bool(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool));
+        qt_QTreeWidgetItem_setDisabled_void_QTreeWidgetItem_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool));
     }
 
     static NODE_IMPLEMENTATION(_n_setExpanded0, void)
     {
-        qt_QTreeWidgetItem_setExpanded_void_QTreeWidgetItem_bool(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool));
+        qt_QTreeWidgetItem_setExpanded_void_QTreeWidgetItem_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool));
     }
 
     static NODE_IMPLEMENTATION(_n_setFirstColumnSpanned0, void)
     {
-        qt_QTreeWidgetItem_setFirstColumnSpanned_void_QTreeWidgetItem_bool(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool));
+        qt_QTreeWidgetItem_setFirstColumnSpanned_void_QTreeWidgetItem_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool));
     }
 
     static NODE_IMPLEMENTATION(_n_setFlags0, void)
     {
-        qt_QTreeWidgetItem_setFlags_void_QTreeWidgetItem_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QTreeWidgetItem_setFlags_void_QTreeWidgetItem_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setFont0, void)
     {
-        qt_QTreeWidgetItem_setFont_void_QTreeWidgetItem_int_QFont(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, Pointer));
+        qt_QTreeWidgetItem_setFont_void_QTreeWidgetItem_int_QFont(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                  NODE_ARG(2, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setForeground0, void)
     {
-        qt_QTreeWidgetItem_setForeground_void_QTreeWidgetItem_int_QBrush(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, Pointer));
+        qt_QTreeWidgetItem_setForeground_void_QTreeWidgetItem_int_QBrush(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                         NODE_ARG(2, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setHidden0, void)
     {
-        qt_QTreeWidgetItem_setHidden_void_QTreeWidgetItem_bool(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool));
+        qt_QTreeWidgetItem_setHidden_void_QTreeWidgetItem_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool));
     }
 
     static NODE_IMPLEMENTATION(_n_setIcon0, void)
     {
-        qt_QTreeWidgetItem_setIcon_void_QTreeWidgetItem_int_QIcon(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, Pointer));
+        qt_QTreeWidgetItem_setIcon_void_QTreeWidgetItem_int_QIcon(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                  NODE_ARG(2, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setSelected0, void)
     {
-        qt_QTreeWidgetItem_setSelected_void_QTreeWidgetItem_bool(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool));
+        qt_QTreeWidgetItem_setSelected_void_QTreeWidgetItem_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool));
     }
 
     static NODE_IMPLEMENTATION(_n_setSizeHint0, void)
     {
-        qt_QTreeWidgetItem_setSizeHint_void_QTreeWidgetItem_int_QSize(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, Pointer));
+        qt_QTreeWidgetItem_setSizeHint_void_QTreeWidgetItem_int_QSize(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                      NODE_ARG(2, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setStatusTip0, void)
     {
-        qt_QTreeWidgetItem_setStatusTip_void_QTreeWidgetItem_int_string(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, Pointer));
+        qt_QTreeWidgetItem_setStatusTip_void_QTreeWidgetItem_int_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                        NODE_ARG(2, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setText0, void)
     {
-        qt_QTreeWidgetItem_setText_void_QTreeWidgetItem_int_string(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, Pointer));
+        qt_QTreeWidgetItem_setText_void_QTreeWidgetItem_int_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                   NODE_ARG(2, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setTextAlignment0, void)
     {
-        qt_QTreeWidgetItem_setTextAlignment_void_QTreeWidgetItem_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int));
+        qt_QTreeWidgetItem_setTextAlignment_void_QTreeWidgetItem_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                         NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setToolTip0, void)
     {
-        qt_QTreeWidgetItem_setToolTip_void_QTreeWidgetItem_int_string(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, Pointer));
+        qt_QTreeWidgetItem_setToolTip_void_QTreeWidgetItem_int_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                      NODE_ARG(2, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setWhatsThis0, void)
     {
-        qt_QTreeWidgetItem_setWhatsThis_void_QTreeWidgetItem_int_string(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, Pointer));
+        qt_QTreeWidgetItem_setWhatsThis_void_QTreeWidgetItem_int_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                        NODE_ARG(2, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_sizeHint0, Pointer)
     {
-        NODE_RETURN(qt_QTreeWidgetItem_sizeHint_QSize_QTreeWidgetItem_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QTreeWidgetItem_sizeHint_QSize_QTreeWidgetItem_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_sortChildren0, void)
     {
-        qt_QTreeWidgetItem_sortChildren_void_QTreeWidgetItem_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int));
+        qt_QTreeWidgetItem_sortChildren_void_QTreeWidgetItem_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                     NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_statusTip0, Pointer)
     {
-        NODE_RETURN(qt_QTreeWidgetItem_statusTip_string_QTreeWidgetItem_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QTreeWidgetItem_statusTip_string_QTreeWidgetItem_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_takeChild0, Pointer)
     {
         NODE_RETURN(
-            qt_QTreeWidgetItem_takeChild_QTreeWidgetItem_QTreeWidgetItem_int(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+            qt_QTreeWidgetItem_takeChild_QTreeWidgetItem_QTreeWidgetItem_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_takeChildren0, Pointer)
     {
-        NODE_RETURN(
-            qt_QTreeWidgetItem_takeChildren_qt__QTreeWidgetItemBSB_ESB__QTreeWidgetItem(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTreeWidgetItem_takeChildren_qt__QTreeWidgetItemBSB_ESB__QTreeWidgetItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_text0, Pointer)
     {
-        NODE_RETURN(qt_QTreeWidgetItem_text_string_QTreeWidgetItem_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QTreeWidgetItem_text_string_QTreeWidgetItem_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_textAlignment0, int)
     {
-        NODE_RETURN(qt_QTreeWidgetItem_textAlignment_int_QTreeWidgetItem_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QTreeWidgetItem_textAlignment_int_QTreeWidgetItem_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_toolTip0, Pointer)
     {
-        NODE_RETURN(qt_QTreeWidgetItem_toolTip_string_QTreeWidgetItem_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QTreeWidgetItem_toolTip_string_QTreeWidgetItem_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_treeWidget0, Pointer)
     {
-        NODE_RETURN(qt_QTreeWidgetItem_treeWidget_QTreeWidget_QTreeWidgetItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTreeWidgetItem_treeWidget_QTreeWidget_QTreeWidgetItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_type0, int)
     {
-        NODE_RETURN(qt_QTreeWidgetItem_type_int_QTreeWidgetItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTreeWidgetItem_type_int_QTreeWidgetItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_whatsThis0, Pointer)
     {
-        NODE_RETURN(qt_QTreeWidgetItem_whatsThis_string_QTreeWidgetItem_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QTreeWidgetItem_whatsThis_string_QTreeWidgetItem_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     void QTreeWidgetItemType::load()
@@ -1141,13 +976,11 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
                    new MemberVariable(c, "native", "qt.NativeObject"),
 
@@ -1155,408 +988,193 @@ namespace Mu
 
         addSymbols(
             new Alias(c, "ChildIndicatorPolicy", "int"),
-            new SymbolicConstant(c, "ShowIndicator", "int",
-                                 Value(int(QTreeWidgetItem::ShowIndicator))),
-            new SymbolicConstant(
-                c, "DontShowIndicator", "int",
-                Value(int(QTreeWidgetItem::DontShowIndicator))),
-            new SymbolicConstant(
-                c, "DontShowIndicatorWhenChildless", "int",
-                Value(int(QTreeWidgetItem::DontShowIndicatorWhenChildless))),
-            new Alias(c, "ItemType", "int"),
-            new SymbolicConstant(c, "Type", "int",
-                                 Value(int(QTreeWidgetItem::Type))),
-            new SymbolicConstant(c, "UserType", "int",
-                                 Value(int(QTreeWidgetItem::UserType))),
-            EndArguments);
+            new SymbolicConstant(c, "ShowIndicator", "int", Value(int(QTreeWidgetItem::ShowIndicator))),
+            new SymbolicConstant(c, "DontShowIndicator", "int", Value(int(QTreeWidgetItem::DontShowIndicator))),
+            new SymbolicConstant(c, "DontShowIndicatorWhenChildless", "int", Value(int(QTreeWidgetItem::DontShowIndicatorWhenChildless))),
+            new Alias(c, "ItemType", "int"), new SymbolicConstant(c, "Type", "int", Value(int(QTreeWidgetItem::Type))),
+            new SymbolicConstant(c, "UserType", "int", Value(int(QTreeWidgetItem::UserType))), EndArguments);
 
         addSymbols(
             // enums
             // member functions
-            new Function(
-                c, "QTreeWidgetItem", _n_QTreeWidgetItem0, None, Compiled,
-                qt_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_int,
-                Return, "qt.QTreeWidgetItem", Parameters,
-                new Param(c, "this", "qt.QTreeWidgetItem"),
-                new Param(c, "type", "int", Value((int)QTreeWidgetItem::Type)),
-                End),
-            new Function(
-                c, "QTreeWidgetItem", _n_QTreeWidgetItem1, None, Compiled,
-                qt_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_stringBSB_ESB__int,
-                Return, "qt.QTreeWidgetItem", Parameters,
-                new Param(c, "this", "qt.QTreeWidgetItem"),
-                new Param(c, "strings", "string[]"),
-                new Param(c, "type", "int", Value((int)QTreeWidgetItem::Type)),
-                End),
-            new Function(
-                c, "QTreeWidgetItem", _n_QTreeWidgetItem2, None, Compiled,
-                qt_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidget_int,
-                Return, "qt.QTreeWidgetItem", Parameters,
-                new Param(c, "this", "qt.QTreeWidgetItem"),
-                new Param(c, "parent", "qt.QTreeWidget"),
-                new Param(c, "type", "int", Value((int)QTreeWidgetItem::Type)),
-                End),
-            new Function(
-                c, "QTreeWidgetItem", _n_QTreeWidgetItem3, None, Compiled,
-                qt_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidget_stringBSB_ESB__int,
-                Return, "qt.QTreeWidgetItem", Parameters,
-                new Param(c, "this", "qt.QTreeWidgetItem"),
-                new Param(c, "parent", "qt.QTreeWidget"),
-                new Param(c, "strings", "string[]"),
-                new Param(c, "type", "int", Value((int)QTreeWidgetItem::Type)),
-                End),
-            new Function(
-                c, "QTreeWidgetItem", _n_QTreeWidgetItem4, None, Compiled,
-                qt_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidget_QTreeWidgetItem_int,
-                Return, "qt.QTreeWidgetItem", Parameters,
-                new Param(c, "this", "qt.QTreeWidgetItem"),
-                new Param(c, "parent", "qt.QTreeWidget"),
-                new Param(c, "preceding", "qt.QTreeWidgetItem"),
-                new Param(c, "type", "int", Value((int)QTreeWidgetItem::Type)),
-                End),
-            new Function(
-                c, "QTreeWidgetItem", _n_QTreeWidgetItem5, None, Compiled,
-                qt_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_int,
-                Return, "qt.QTreeWidgetItem", Parameters,
-                new Param(c, "this", "qt.QTreeWidgetItem"),
-                new Param(c, "parent", "qt.QTreeWidgetItem"),
-                new Param(c, "type", "int", Value((int)QTreeWidgetItem::Type)),
-                End),
-            new Function(
-                c, "QTreeWidgetItem", _n_QTreeWidgetItem6, None, Compiled,
-                qt_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_stringBSB_ESB__int,
-                Return, "qt.QTreeWidgetItem", Parameters,
-                new Param(c, "this", "qt.QTreeWidgetItem"),
-                new Param(c, "parent", "qt.QTreeWidgetItem"),
-                new Param(c, "strings", "string[]"),
-                new Param(c, "type", "int", Value((int)QTreeWidgetItem::Type)),
-                End),
-            new Function(
-                c, "QTreeWidgetItem", _n_QTreeWidgetItem7, None, Compiled,
-                qt_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_int,
-                Return, "qt.QTreeWidgetItem", Parameters,
-                new Param(c, "this", "qt.QTreeWidgetItem"),
-                new Param(c, "parent", "qt.QTreeWidgetItem"),
-                new Param(c, "preceding", "qt.QTreeWidgetItem"),
-                new Param(c, "type", "int", Value((int)QTreeWidgetItem::Type)),
-                End),
+            new Function(c, "QTreeWidgetItem", _n_QTreeWidgetItem0, None, Compiled,
+                         qt_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_int, Return, "qt.QTreeWidgetItem", Parameters,
+                         new Param(c, "this", "qt.QTreeWidgetItem"), new Param(c, "type", "int", Value((int)QTreeWidgetItem::Type)), End),
+            new Function(c, "QTreeWidgetItem", _n_QTreeWidgetItem1, None, Compiled,
+                         qt_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_stringBSB_ESB__int, Return,
+                         "qt.QTreeWidgetItem", Parameters, new Param(c, "this", "qt.QTreeWidgetItem"), new Param(c, "strings", "string[]"),
+                         new Param(c, "type", "int", Value((int)QTreeWidgetItem::Type)), End),
+            new Function(c, "QTreeWidgetItem", _n_QTreeWidgetItem2, None, Compiled,
+                         qt_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidget_int, Return, "qt.QTreeWidgetItem",
+                         Parameters, new Param(c, "this", "qt.QTreeWidgetItem"), new Param(c, "parent", "qt.QTreeWidget"),
+                         new Param(c, "type", "int", Value((int)QTreeWidgetItem::Type)), End),
+            new Function(c, "QTreeWidgetItem", _n_QTreeWidgetItem3, None, Compiled,
+                         qt_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidget_stringBSB_ESB__int, Return,
+                         "qt.QTreeWidgetItem", Parameters, new Param(c, "this", "qt.QTreeWidgetItem"),
+                         new Param(c, "parent", "qt.QTreeWidget"), new Param(c, "strings", "string[]"),
+                         new Param(c, "type", "int", Value((int)QTreeWidgetItem::Type)), End),
+            new Function(c, "QTreeWidgetItem", _n_QTreeWidgetItem4, None, Compiled,
+                         qt_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidget_QTreeWidgetItem_int, Return,
+                         "qt.QTreeWidgetItem", Parameters, new Param(c, "this", "qt.QTreeWidgetItem"),
+                         new Param(c, "parent", "qt.QTreeWidget"), new Param(c, "preceding", "qt.QTreeWidgetItem"),
+                         new Param(c, "type", "int", Value((int)QTreeWidgetItem::Type)), End),
+            new Function(c, "QTreeWidgetItem", _n_QTreeWidgetItem5, None, Compiled,
+                         qt_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_int, Return,
+                         "qt.QTreeWidgetItem", Parameters, new Param(c, "this", "qt.QTreeWidgetItem"),
+                         new Param(c, "parent", "qt.QTreeWidgetItem"), new Param(c, "type", "int", Value((int)QTreeWidgetItem::Type)), End),
+            new Function(c, "QTreeWidgetItem", _n_QTreeWidgetItem6, None, Compiled,
+                         qt_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_stringBSB_ESB__int, Return,
+                         "qt.QTreeWidgetItem", Parameters, new Param(c, "this", "qt.QTreeWidgetItem"),
+                         new Param(c, "parent", "qt.QTreeWidgetItem"), new Param(c, "strings", "string[]"),
+                         new Param(c, "type", "int", Value((int)QTreeWidgetItem::Type)), End),
+            new Function(c, "QTreeWidgetItem", _n_QTreeWidgetItem7, None, Compiled,
+                         qt_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_QTreeWidgetItem_int, Return,
+                         "qt.QTreeWidgetItem", Parameters, new Param(c, "this", "qt.QTreeWidgetItem"),
+                         new Param(c, "parent", "qt.QTreeWidgetItem"), new Param(c, "preceding", "qt.QTreeWidgetItem"),
+                         new Param(c, "type", "int", Value((int)QTreeWidgetItem::Type)), End),
             // MISSING: QTreeWidgetItem (QTreeWidgetItem; QTreeWidgetItem this,
             // QTreeWidgetItem other)
-            new Function(
-                c, "addChild", _n_addChild0, None, Compiled,
-                qt_QTreeWidgetItem_addChild_void_QTreeWidgetItem_QTreeWidgetItem,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTreeWidgetItem"),
-                new Param(c, "child", "qt.QTreeWidgetItem"), End),
-            new Function(
-                c, "addChildren", _n_addChildren0, None, Compiled,
-                qt_QTreeWidgetItem_addChildren_void_QTreeWidgetItem_qt__QTreeWidgetItemBSB_ESB_,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTreeWidgetItem"),
-                new Param(c, "children", "qt.QTreeWidgetItem[]"), End),
-            new Function(
-                c, "background", _n_background0, None, Compiled,
-                qt_QTreeWidgetItem_background_QBrush_QTreeWidgetItem_int,
-                Return, "qt.QBrush", Parameters,
-                new Param(c, "this", "qt.QTreeWidgetItem"),
-                new Param(c, "column", "int"), End),
-            new Function(c, "checkState", _n_checkState0, None, Compiled,
-                         qt_QTreeWidgetItem_checkState_int_QTreeWidgetItem_int,
-                         Return, "int", Parameters,
-                         new Param(c, "this", "qt.QTreeWidgetItem"),
-                         new Param(c, "column", "int"), End),
-            new Function(
-                c, "child", _n_child0, None, Compiled,
-                qt_QTreeWidgetItem_child_QTreeWidgetItem_QTreeWidgetItem_int,
-                Return, "qt.QTreeWidgetItem", Parameters,
-                new Param(c, "this", "qt.QTreeWidgetItem"),
-                new Param(c, "index", "int"), End),
-            new Function(c, "childCount", _n_childCount0, None, Compiled,
-                         qt_QTreeWidgetItem_childCount_int_QTreeWidgetItem,
-                         Return, "int", Parameters,
+            new Function(c, "addChild", _n_addChild0, None, Compiled, qt_QTreeWidgetItem_addChild_void_QTreeWidgetItem_QTreeWidgetItem,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QTreeWidgetItem"),
+                         new Param(c, "child", "qt.QTreeWidgetItem"), End),
+            new Function(c, "addChildren", _n_addChildren0, None, Compiled,
+                         qt_QTreeWidgetItem_addChildren_void_QTreeWidgetItem_qt__QTreeWidgetItemBSB_ESB_, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QTreeWidgetItem"), new Param(c, "children", "qt.QTreeWidgetItem[]"), End),
+            new Function(c, "background", _n_background0, None, Compiled, qt_QTreeWidgetItem_background_QBrush_QTreeWidgetItem_int, Return,
+                         "qt.QBrush", Parameters, new Param(c, "this", "qt.QTreeWidgetItem"), new Param(c, "column", "int"), End),
+            new Function(c, "checkState", _n_checkState0, None, Compiled, qt_QTreeWidgetItem_checkState_int_QTreeWidgetItem_int, Return,
+                         "int", Parameters, new Param(c, "this", "qt.QTreeWidgetItem"), new Param(c, "column", "int"), End),
+            new Function(c, "child", _n_child0, None, Compiled, qt_QTreeWidgetItem_child_QTreeWidgetItem_QTreeWidgetItem_int, Return,
+                         "qt.QTreeWidgetItem", Parameters, new Param(c, "this", "qt.QTreeWidgetItem"), new Param(c, "index", "int"), End),
+            new Function(c, "childCount", _n_childCount0, None, Compiled, qt_QTreeWidgetItem_childCount_int_QTreeWidgetItem, Return, "int",
+                         Parameters, new Param(c, "this", "qt.QTreeWidgetItem"), End),
+            new Function(c, "childIndicatorPolicy", _n_childIndicatorPolicy0, None, Compiled,
+                         qt_QTreeWidgetItem_childIndicatorPolicy_int_QTreeWidgetItem, Return, "int", Parameters,
                          new Param(c, "this", "qt.QTreeWidgetItem"), End),
-            new Function(
-                c, "childIndicatorPolicy", _n_childIndicatorPolicy0, None,
-                Compiled,
-                qt_QTreeWidgetItem_childIndicatorPolicy_int_QTreeWidgetItem,
-                Return, "int", Parameters,
-                new Param(c, "this", "qt.QTreeWidgetItem"), End),
-            new MemberFunction(
-                c, "clone", _n_clone0, None, Compiled,
-                qt_QTreeWidgetItem_clone_QTreeWidgetItem_QTreeWidgetItem,
-                Return, "qt.QTreeWidgetItem", Parameters,
-                new Param(c, "this", "qt.QTreeWidgetItem"), End),
-            new Function(c, "columnCount", _n_columnCount0, None, Compiled,
-                         qt_QTreeWidgetItem_columnCount_int_QTreeWidgetItem,
-                         Return, "int", Parameters,
+            new MemberFunction(c, "clone", _n_clone0, None, Compiled, qt_QTreeWidgetItem_clone_QTreeWidgetItem_QTreeWidgetItem, Return,
+                               "qt.QTreeWidgetItem", Parameters, new Param(c, "this", "qt.QTreeWidgetItem"), End),
+            new Function(c, "columnCount", _n_columnCount0, None, Compiled, qt_QTreeWidgetItem_columnCount_int_QTreeWidgetItem, Return,
+                         "int", Parameters, new Param(c, "this", "qt.QTreeWidgetItem"), End),
+            new MemberFunction(c, "data", _n_data0, None, Compiled, qt_QTreeWidgetItem_data_QVariant_QTreeWidgetItem_int_int, Return,
+                               "qt.QVariant", Parameters, new Param(c, "this", "qt.QTreeWidgetItem"), new Param(c, "column", "int"),
+                               new Param(c, "role", "int"), End),
+            new Function(c, "flags", _n_flags0, None, Compiled, qt_QTreeWidgetItem_flags_int_QTreeWidgetItem, Return, "int", Parameters,
                          new Param(c, "this", "qt.QTreeWidgetItem"), End),
-            new MemberFunction(
-                c, "data", _n_data0, None, Compiled,
-                qt_QTreeWidgetItem_data_QVariant_QTreeWidgetItem_int_int,
-                Return, "qt.QVariant", Parameters,
-                new Param(c, "this", "qt.QTreeWidgetItem"),
-                new Param(c, "column", "int"), new Param(c, "role", "int"),
-                End),
-            new Function(c, "flags", _n_flags0, None, Compiled,
-                         qt_QTreeWidgetItem_flags_int_QTreeWidgetItem, Return,
-                         "int", Parameters,
+            new Function(c, "font", _n_font0, None, Compiled, qt_QTreeWidgetItem_font_QFont_QTreeWidgetItem_int, Return, "qt.QFont",
+                         Parameters, new Param(c, "this", "qt.QTreeWidgetItem"), new Param(c, "column", "int"), End),
+            new Function(c, "foreground", _n_foreground0, None, Compiled, qt_QTreeWidgetItem_foreground_QBrush_QTreeWidgetItem_int, Return,
+                         "qt.QBrush", Parameters, new Param(c, "this", "qt.QTreeWidgetItem"), new Param(c, "column", "int"), End),
+            new Function(c, "icon", _n_icon0, None, Compiled, qt_QTreeWidgetItem_icon_QIcon_QTreeWidgetItem_int, Return, "qt.QIcon",
+                         Parameters, new Param(c, "this", "qt.QTreeWidgetItem"), new Param(c, "column", "int"), End),
+            new Function(c, "indexOfChild", _n_indexOfChild0, None, Compiled,
+                         qt_QTreeWidgetItem_indexOfChild_int_QTreeWidgetItem_QTreeWidgetItem, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QTreeWidgetItem"), new Param(c, "child", "qt.QTreeWidgetItem"), End),
+            new Function(c, "insertChild", _n_insertChild0, None, Compiled,
+                         qt_QTreeWidgetItem_insertChild_void_QTreeWidgetItem_int_QTreeWidgetItem, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QTreeWidgetItem"), new Param(c, "index", "int"),
+                         new Param(c, "child", "qt.QTreeWidgetItem"), End),
+            new Function(c, "insertChildren", _n_insertChildren0, None, Compiled,
+                         qt_QTreeWidgetItem_insertChildren_void_QTreeWidgetItem_int_qt__QTreeWidgetItemBSB_ESB_, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QTreeWidgetItem"), new Param(c, "index", "int"),
+                         new Param(c, "children", "qt.QTreeWidgetItem[]"), End),
+            new Function(c, "isDisabled", _n_isDisabled0, None, Compiled, qt_QTreeWidgetItem_isDisabled_bool_QTreeWidgetItem, Return,
+                         "bool", Parameters, new Param(c, "this", "qt.QTreeWidgetItem"), End),
+            new Function(c, "isExpanded", _n_isExpanded0, None, Compiled, qt_QTreeWidgetItem_isExpanded_bool_QTreeWidgetItem, Return,
+                         "bool", Parameters, new Param(c, "this", "qt.QTreeWidgetItem"), End),
+            new Function(c, "isFirstColumnSpanned", _n_isFirstColumnSpanned0, None, Compiled,
+                         qt_QTreeWidgetItem_isFirstColumnSpanned_bool_QTreeWidgetItem, Return, "bool", Parameters,
                          new Param(c, "this", "qt.QTreeWidgetItem"), End),
-            new Function(c, "font", _n_font0, None, Compiled,
-                         qt_QTreeWidgetItem_font_QFont_QTreeWidgetItem_int,
-                         Return, "qt.QFont", Parameters,
-                         new Param(c, "this", "qt.QTreeWidgetItem"),
-                         new Param(c, "column", "int"), End),
-            new Function(
-                c, "foreground", _n_foreground0, None, Compiled,
-                qt_QTreeWidgetItem_foreground_QBrush_QTreeWidgetItem_int,
-                Return, "qt.QBrush", Parameters,
-                new Param(c, "this", "qt.QTreeWidgetItem"),
-                new Param(c, "column", "int"), End),
-            new Function(c, "icon", _n_icon0, None, Compiled,
-                         qt_QTreeWidgetItem_icon_QIcon_QTreeWidgetItem_int,
-                         Return, "qt.QIcon", Parameters,
-                         new Param(c, "this", "qt.QTreeWidgetItem"),
-                         new Param(c, "column", "int"), End),
-            new Function(
-                c, "indexOfChild", _n_indexOfChild0, None, Compiled,
-                qt_QTreeWidgetItem_indexOfChild_int_QTreeWidgetItem_QTreeWidgetItem,
-                Return, "int", Parameters,
-                new Param(c, "this", "qt.QTreeWidgetItem"),
-                new Param(c, "child", "qt.QTreeWidgetItem"), End),
-            new Function(
-                c, "insertChild", _n_insertChild0, None, Compiled,
-                qt_QTreeWidgetItem_insertChild_void_QTreeWidgetItem_int_QTreeWidgetItem,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTreeWidgetItem"),
-                new Param(c, "index", "int"),
-                new Param(c, "child", "qt.QTreeWidgetItem"), End),
-            new Function(
-                c, "insertChildren", _n_insertChildren0, None, Compiled,
-                qt_QTreeWidgetItem_insertChildren_void_QTreeWidgetItem_int_qt__QTreeWidgetItemBSB_ESB_,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTreeWidgetItem"),
-                new Param(c, "index", "int"),
-                new Param(c, "children", "qt.QTreeWidgetItem[]"), End),
-            new Function(c, "isDisabled", _n_isDisabled0, None, Compiled,
-                         qt_QTreeWidgetItem_isDisabled_bool_QTreeWidgetItem,
-                         Return, "bool", Parameters,
-                         new Param(c, "this", "qt.QTreeWidgetItem"), End),
-            new Function(c, "isExpanded", _n_isExpanded0, None, Compiled,
-                         qt_QTreeWidgetItem_isExpanded_bool_QTreeWidgetItem,
-                         Return, "bool", Parameters,
-                         new Param(c, "this", "qt.QTreeWidgetItem"), End),
-            new Function(
-                c, "isFirstColumnSpanned", _n_isFirstColumnSpanned0, None,
-                Compiled,
-                qt_QTreeWidgetItem_isFirstColumnSpanned_bool_QTreeWidgetItem,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QTreeWidgetItem"), End),
-            new Function(c, "isHidden", _n_isHidden0, None, Compiled,
-                         qt_QTreeWidgetItem_isHidden_bool_QTreeWidgetItem,
-                         Return, "bool", Parameters,
-                         new Param(c, "this", "qt.QTreeWidgetItem"), End),
-            new Function(c, "isSelected", _n_isSelected0, None, Compiled,
-                         qt_QTreeWidgetItem_isSelected_bool_QTreeWidgetItem,
-                         Return, "bool", Parameters,
-                         new Param(c, "this", "qt.QTreeWidgetItem"), End),
-            new Function(
-                c, "parent", _n_parent0, None, Compiled,
-                qt_QTreeWidgetItem_parent_QTreeWidgetItem_QTreeWidgetItem,
-                Return, "qt.QTreeWidgetItem", Parameters,
-                new Param(c, "this", "qt.QTreeWidgetItem"), End),
+            new Function(c, "isHidden", _n_isHidden0, None, Compiled, qt_QTreeWidgetItem_isHidden_bool_QTreeWidgetItem, Return, "bool",
+                         Parameters, new Param(c, "this", "qt.QTreeWidgetItem"), End),
+            new Function(c, "isSelected", _n_isSelected0, None, Compiled, qt_QTreeWidgetItem_isSelected_bool_QTreeWidgetItem, Return,
+                         "bool", Parameters, new Param(c, "this", "qt.QTreeWidgetItem"), End),
+            new Function(c, "parent", _n_parent0, None, Compiled, qt_QTreeWidgetItem_parent_QTreeWidgetItem_QTreeWidgetItem, Return,
+                         "qt.QTreeWidgetItem", Parameters, new Param(c, "this", "qt.QTreeWidgetItem"), End),
             // MISSING: read (void; QTreeWidgetItem this, "QDataStream &" in)
-            new Function(
-                c, "removeChild", _n_removeChild0, None, Compiled,
-                qt_QTreeWidgetItem_removeChild_void_QTreeWidgetItem_QTreeWidgetItem,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTreeWidgetItem"),
-                new Param(c, "child", "qt.QTreeWidgetItem"), End),
-            new Function(
-                c, "setBackground", _n_setBackground0, None, Compiled,
-                qt_QTreeWidgetItem_setBackground_void_QTreeWidgetItem_int_QBrush,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTreeWidgetItem"),
-                new Param(c, "column", "int"),
-                new Param(c, "brush", "qt.QBrush"), End),
-            new Function(
-                c, "setCheckState", _n_setCheckState0, None, Compiled,
-                qt_QTreeWidgetItem_setCheckState_void_QTreeWidgetItem_int_int,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTreeWidgetItem"),
-                new Param(c, "column", "int"), new Param(c, "state", "int"),
-                End),
-            new Function(
-                c, "setChildIndicatorPolicy", _n_setChildIndicatorPolicy0, None,
-                Compiled,
-                qt_QTreeWidgetItem_setChildIndicatorPolicy_void_QTreeWidgetItem_int,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTreeWidgetItem"),
-                new Param(c, "policy", "int"), End),
-            new MemberFunction(
-                c, "setData", _n_setData0, None, Compiled,
-                qt_QTreeWidgetItem_setData_void_QTreeWidgetItem_int_int_QVariant,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTreeWidgetItem"),
-                new Param(c, "column", "int"), new Param(c, "role", "int"),
-                new Param(c, "value", "qt.QVariant"), End),
-            new Function(
-                c, "setDisabled", _n_setDisabled0, None, Compiled,
-                qt_QTreeWidgetItem_setDisabled_void_QTreeWidgetItem_bool,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTreeWidgetItem"),
-                new Param(c, "disabled", "bool"), End),
-            new Function(
-                c, "setExpanded", _n_setExpanded0, None, Compiled,
-                qt_QTreeWidgetItem_setExpanded_void_QTreeWidgetItem_bool,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTreeWidgetItem"),
-                new Param(c, "expand", "bool"), End),
-            new Function(
-                c, "setFirstColumnSpanned", _n_setFirstColumnSpanned0, None,
-                Compiled,
-                qt_QTreeWidgetItem_setFirstColumnSpanned_void_QTreeWidgetItem_bool,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTreeWidgetItem"),
-                new Param(c, "span", "bool"), End),
-            new Function(c, "setFlags", _n_setFlags0, None, Compiled,
-                         qt_QTreeWidgetItem_setFlags_void_QTreeWidgetItem_int,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QTreeWidgetItem"),
-                         new Param(c, "flags", "int"), End),
-            new Function(
-                c, "setFont", _n_setFont0, None, Compiled,
-                qt_QTreeWidgetItem_setFont_void_QTreeWidgetItem_int_QFont,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTreeWidgetItem"),
-                new Param(c, "column", "int"), new Param(c, "font", "qt.QFont"),
-                End),
-            new Function(
-                c, "setForeground", _n_setForeground0, None, Compiled,
-                qt_QTreeWidgetItem_setForeground_void_QTreeWidgetItem_int_QBrush,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTreeWidgetItem"),
-                new Param(c, "column", "int"),
-                new Param(c, "brush", "qt.QBrush"), End),
-            new Function(c, "setHidden", _n_setHidden0, None, Compiled,
-                         qt_QTreeWidgetItem_setHidden_void_QTreeWidgetItem_bool,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QTreeWidgetItem"),
-                         new Param(c, "hide", "bool"), End),
-            new Function(
-                c, "setIcon", _n_setIcon0, None, Compiled,
-                qt_QTreeWidgetItem_setIcon_void_QTreeWidgetItem_int_QIcon,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTreeWidgetItem"),
-                new Param(c, "column", "int"), new Param(c, "icon", "qt.QIcon"),
-                End),
-            new Function(
-                c, "setSelected", _n_setSelected0, None, Compiled,
-                qt_QTreeWidgetItem_setSelected_void_QTreeWidgetItem_bool,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTreeWidgetItem"),
-                new Param(c, "select", "bool"), End),
-            new Function(
-                c, "setSizeHint", _n_setSizeHint0, None, Compiled,
-                qt_QTreeWidgetItem_setSizeHint_void_QTreeWidgetItem_int_QSize,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTreeWidgetItem"),
-                new Param(c, "column", "int"), new Param(c, "size", "qt.QSize"),
-                End),
-            new Function(
-                c, "setStatusTip", _n_setStatusTip0, None, Compiled,
-                qt_QTreeWidgetItem_setStatusTip_void_QTreeWidgetItem_int_string,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTreeWidgetItem"),
-                new Param(c, "column", "int"),
-                new Param(c, "statusTip", "string"), End),
-            new Function(
-                c, "setText", _n_setText0, None, Compiled,
-                qt_QTreeWidgetItem_setText_void_QTreeWidgetItem_int_string,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTreeWidgetItem"),
-                new Param(c, "column", "int"), new Param(c, "text", "string"),
-                End),
-            new Function(
-                c, "setTextAlignment", _n_setTextAlignment0, None, Compiled,
-                qt_QTreeWidgetItem_setTextAlignment_void_QTreeWidgetItem_int_int,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTreeWidgetItem"),
-                new Param(c, "column", "int"), new Param(c, "alignment", "int"),
-                End),
-            new Function(
-                c, "setToolTip", _n_setToolTip0, None, Compiled,
-                qt_QTreeWidgetItem_setToolTip_void_QTreeWidgetItem_int_string,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTreeWidgetItem"),
-                new Param(c, "column", "int"),
-                new Param(c, "toolTip", "string"), End),
-            new Function(
-                c, "setWhatsThis", _n_setWhatsThis0, None, Compiled,
-                qt_QTreeWidgetItem_setWhatsThis_void_QTreeWidgetItem_int_string,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTreeWidgetItem"),
-                new Param(c, "column", "int"),
-                new Param(c, "whatsThis", "string"), End),
-            new Function(c, "sizeHint", _n_sizeHint0, None, Compiled,
-                         qt_QTreeWidgetItem_sizeHint_QSize_QTreeWidgetItem_int,
-                         Return, "qt.QSize", Parameters,
-                         new Param(c, "this", "qt.QTreeWidgetItem"),
-                         new Param(c, "column", "int"), End),
-            new Function(
-                c, "sortChildren", _n_sortChildren0, None, Compiled,
-                qt_QTreeWidgetItem_sortChildren_void_QTreeWidgetItem_int_int,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTreeWidgetItem"),
-                new Param(c, "column", "int"), new Param(c, "order", "int"),
-                End),
-            new Function(
-                c, "statusTip", _n_statusTip0, None, Compiled,
-                qt_QTreeWidgetItem_statusTip_string_QTreeWidgetItem_int, Return,
-                "string", Parameters,
-                new Param(c, "this", "qt.QTreeWidgetItem"),
-                new Param(c, "column", "int"), End),
-            new Function(
-                c, "takeChild", _n_takeChild0, None, Compiled,
-                qt_QTreeWidgetItem_takeChild_QTreeWidgetItem_QTreeWidgetItem_int,
-                Return, "qt.QTreeWidgetItem", Parameters,
-                new Param(c, "this", "qt.QTreeWidgetItem"),
-                new Param(c, "index", "int"), End),
-            new Function(
-                c, "takeChildren", _n_takeChildren0, None, Compiled,
-                qt_QTreeWidgetItem_takeChildren_qt__QTreeWidgetItemBSB_ESB__QTreeWidgetItem,
-                Return, "qt.QTreeWidgetItem[]", Parameters,
-                new Param(c, "this", "qt.QTreeWidgetItem"), End),
-            new Function(c, "text", _n_text0, None, Compiled,
-                         qt_QTreeWidgetItem_text_string_QTreeWidgetItem_int,
-                         Return, "string", Parameters,
-                         new Param(c, "this", "qt.QTreeWidgetItem"),
-                         new Param(c, "column", "int"), End),
-            new Function(
-                c, "textAlignment", _n_textAlignment0, None, Compiled,
-                qt_QTreeWidgetItem_textAlignment_int_QTreeWidgetItem_int,
-                Return, "int", Parameters,
-                new Param(c, "this", "qt.QTreeWidgetItem"),
-                new Param(c, "column", "int"), End),
-            new Function(c, "toolTip", _n_toolTip0, None, Compiled,
-                         qt_QTreeWidgetItem_toolTip_string_QTreeWidgetItem_int,
-                         Return, "string", Parameters,
-                         new Param(c, "this", "qt.QTreeWidgetItem"),
-                         new Param(c, "column", "int"), End),
-            new Function(
-                c, "treeWidget", _n_treeWidget0, None, Compiled,
-                qt_QTreeWidgetItem_treeWidget_QTreeWidget_QTreeWidgetItem,
-                Return, "qt.QTreeWidget", Parameters,
-                new Param(c, "this", "qt.QTreeWidgetItem"), End),
-            new Function(c, "type", _n_type0, None, Compiled,
-                         qt_QTreeWidgetItem_type_int_QTreeWidgetItem, Return,
-                         "int", Parameters,
+            new Function(c, "removeChild", _n_removeChild0, None, Compiled,
+                         qt_QTreeWidgetItem_removeChild_void_QTreeWidgetItem_QTreeWidgetItem, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QTreeWidgetItem"), new Param(c, "child", "qt.QTreeWidgetItem"), End),
+            new Function(c, "setBackground", _n_setBackground0, None, Compiled,
+                         qt_QTreeWidgetItem_setBackground_void_QTreeWidgetItem_int_QBrush, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QTreeWidgetItem"), new Param(c, "column", "int"), new Param(c, "brush", "qt.QBrush"),
+                         End),
+            new Function(c, "setCheckState", _n_setCheckState0, None, Compiled,
+                         qt_QTreeWidgetItem_setCheckState_void_QTreeWidgetItem_int_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QTreeWidgetItem"), new Param(c, "column", "int"), new Param(c, "state", "int"), End),
+            new Function(c, "setChildIndicatorPolicy", _n_setChildIndicatorPolicy0, None, Compiled,
+                         qt_QTreeWidgetItem_setChildIndicatorPolicy_void_QTreeWidgetItem_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QTreeWidgetItem"), new Param(c, "policy", "int"), End),
+            new MemberFunction(c, "setData", _n_setData0, None, Compiled, qt_QTreeWidgetItem_setData_void_QTreeWidgetItem_int_int_QVariant,
+                               Return, "void", Parameters, new Param(c, "this", "qt.QTreeWidgetItem"), new Param(c, "column", "int"),
+                               new Param(c, "role", "int"), new Param(c, "value", "qt.QVariant"), End),
+            new Function(c, "setDisabled", _n_setDisabled0, None, Compiled, qt_QTreeWidgetItem_setDisabled_void_QTreeWidgetItem_bool,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QTreeWidgetItem"), new Param(c, "disabled", "bool"), End),
+            new Function(c, "setExpanded", _n_setExpanded0, None, Compiled, qt_QTreeWidgetItem_setExpanded_void_QTreeWidgetItem_bool,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QTreeWidgetItem"), new Param(c, "expand", "bool"), End),
+            new Function(c, "setFirstColumnSpanned", _n_setFirstColumnSpanned0, None, Compiled,
+                         qt_QTreeWidgetItem_setFirstColumnSpanned_void_QTreeWidgetItem_bool, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QTreeWidgetItem"), new Param(c, "span", "bool"), End),
+            new Function(c, "setFlags", _n_setFlags0, None, Compiled, qt_QTreeWidgetItem_setFlags_void_QTreeWidgetItem_int, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QTreeWidgetItem"), new Param(c, "flags", "int"), End),
+            new Function(c, "setFont", _n_setFont0, None, Compiled, qt_QTreeWidgetItem_setFont_void_QTreeWidgetItem_int_QFont, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QTreeWidgetItem"), new Param(c, "column", "int"),
+                         new Param(c, "font", "qt.QFont"), End),
+            new Function(c, "setForeground", _n_setForeground0, None, Compiled,
+                         qt_QTreeWidgetItem_setForeground_void_QTreeWidgetItem_int_QBrush, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QTreeWidgetItem"), new Param(c, "column", "int"), new Param(c, "brush", "qt.QBrush"),
+                         End),
+            new Function(c, "setHidden", _n_setHidden0, None, Compiled, qt_QTreeWidgetItem_setHidden_void_QTreeWidgetItem_bool, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QTreeWidgetItem"), new Param(c, "hide", "bool"), End),
+            new Function(c, "setIcon", _n_setIcon0, None, Compiled, qt_QTreeWidgetItem_setIcon_void_QTreeWidgetItem_int_QIcon, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QTreeWidgetItem"), new Param(c, "column", "int"),
+                         new Param(c, "icon", "qt.QIcon"), End),
+            new Function(c, "setSelected", _n_setSelected0, None, Compiled, qt_QTreeWidgetItem_setSelected_void_QTreeWidgetItem_bool,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QTreeWidgetItem"), new Param(c, "select", "bool"), End),
+            new Function(c, "setSizeHint", _n_setSizeHint0, None, Compiled, qt_QTreeWidgetItem_setSizeHint_void_QTreeWidgetItem_int_QSize,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QTreeWidgetItem"), new Param(c, "column", "int"),
+                         new Param(c, "size", "qt.QSize"), End),
+            new Function(c, "setStatusTip", _n_setStatusTip0, None, Compiled,
+                         qt_QTreeWidgetItem_setStatusTip_void_QTreeWidgetItem_int_string, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QTreeWidgetItem"), new Param(c, "column", "int"), new Param(c, "statusTip", "string"),
+                         End),
+            new Function(c, "setText", _n_setText0, None, Compiled, qt_QTreeWidgetItem_setText_void_QTreeWidgetItem_int_string, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QTreeWidgetItem"), new Param(c, "column", "int"),
+                         new Param(c, "text", "string"), End),
+            new Function(c, "setTextAlignment", _n_setTextAlignment0, None, Compiled,
+                         qt_QTreeWidgetItem_setTextAlignment_void_QTreeWidgetItem_int_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QTreeWidgetItem"), new Param(c, "column", "int"), new Param(c, "alignment", "int"), End),
+            new Function(c, "setToolTip", _n_setToolTip0, None, Compiled, qt_QTreeWidgetItem_setToolTip_void_QTreeWidgetItem_int_string,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QTreeWidgetItem"), new Param(c, "column", "int"),
+                         new Param(c, "toolTip", "string"), End),
+            new Function(c, "setWhatsThis", _n_setWhatsThis0, None, Compiled,
+                         qt_QTreeWidgetItem_setWhatsThis_void_QTreeWidgetItem_int_string, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QTreeWidgetItem"), new Param(c, "column", "int"), new Param(c, "whatsThis", "string"),
+                         End),
+            new Function(c, "sizeHint", _n_sizeHint0, None, Compiled, qt_QTreeWidgetItem_sizeHint_QSize_QTreeWidgetItem_int, Return,
+                         "qt.QSize", Parameters, new Param(c, "this", "qt.QTreeWidgetItem"), new Param(c, "column", "int"), End),
+            new Function(c, "sortChildren", _n_sortChildren0, None, Compiled, qt_QTreeWidgetItem_sortChildren_void_QTreeWidgetItem_int_int,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QTreeWidgetItem"), new Param(c, "column", "int"),
+                         new Param(c, "order", "int"), End),
+            new Function(c, "statusTip", _n_statusTip0, None, Compiled, qt_QTreeWidgetItem_statusTip_string_QTreeWidgetItem_int, Return,
+                         "string", Parameters, new Param(c, "this", "qt.QTreeWidgetItem"), new Param(c, "column", "int"), End),
+            new Function(c, "takeChild", _n_takeChild0, None, Compiled, qt_QTreeWidgetItem_takeChild_QTreeWidgetItem_QTreeWidgetItem_int,
+                         Return, "qt.QTreeWidgetItem", Parameters, new Param(c, "this", "qt.QTreeWidgetItem"), new Param(c, "index", "int"),
+                         End),
+            new Function(c, "takeChildren", _n_takeChildren0, None, Compiled,
+                         qt_QTreeWidgetItem_takeChildren_qt__QTreeWidgetItemBSB_ESB__QTreeWidgetItem, Return, "qt.QTreeWidgetItem[]",
+                         Parameters, new Param(c, "this", "qt.QTreeWidgetItem"), End),
+            new Function(c, "text", _n_text0, None, Compiled, qt_QTreeWidgetItem_text_string_QTreeWidgetItem_int, Return, "string",
+                         Parameters, new Param(c, "this", "qt.QTreeWidgetItem"), new Param(c, "column", "int"), End),
+            new Function(c, "textAlignment", _n_textAlignment0, None, Compiled, qt_QTreeWidgetItem_textAlignment_int_QTreeWidgetItem_int,
+                         Return, "int", Parameters, new Param(c, "this", "qt.QTreeWidgetItem"), new Param(c, "column", "int"), End),
+            new Function(c, "toolTip", _n_toolTip0, None, Compiled, qt_QTreeWidgetItem_toolTip_string_QTreeWidgetItem_int, Return, "string",
+                         Parameters, new Param(c, "this", "qt.QTreeWidgetItem"), new Param(c, "column", "int"), End),
+            new Function(c, "treeWidget", _n_treeWidget0, None, Compiled, qt_QTreeWidgetItem_treeWidget_QTreeWidget_QTreeWidgetItem, Return,
+                         "qt.QTreeWidget", Parameters, new Param(c, "this", "qt.QTreeWidgetItem"), End),
+            new Function(c, "type", _n_type0, None, Compiled, qt_QTreeWidgetItem_type_int_QTreeWidgetItem, Return, "int", Parameters,
                          new Param(c, "this", "qt.QTreeWidgetItem"), End),
-            new Function(
-                c, "whatsThis", _n_whatsThis0, None, Compiled,
-                qt_QTreeWidgetItem_whatsThis_string_QTreeWidgetItem_int, Return,
-                "string", Parameters,
-                new Param(c, "this", "qt.QTreeWidgetItem"),
-                new Param(c, "column", "int"), End),
+            new Function(c, "whatsThis", _n_whatsThis0, None, Compiled, qt_QTreeWidgetItem_whatsThis_string_QTreeWidgetItem_int, Return,
+                         "string", Parameters, new Param(c, "this", "qt.QTreeWidgetItem"), new Param(c, "column", "int"), End),
             // MISSING: write (void; QTreeWidgetItem this, "QDataStream &" out)
             // NOT INHERITABLE PROTECTED: emitDataChanged (void; QTreeWidgetItem
             // this) // protected static functions

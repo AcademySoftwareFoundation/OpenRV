@@ -65,28 +65,24 @@ namespace Mu
         _baseType = 0;
     }
 
-    MuQt_QCheckBox::MuQt_QCheckBox(Pointer muobj, const CallEnvironment* ce,
-                                   QWidget* parent)
+    MuQt_QCheckBox::MuQt_QCheckBox(Pointer muobj, const CallEnvironment* ce, QWidget* parent)
         : QCheckBox(parent)
     {
         _env = ce;
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QCheckBoxType>(
-            c->internName("qt.QCheckBox"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QCheckBoxType>(c->internName("qt.QCheckBox"));
     }
 
-    MuQt_QCheckBox::MuQt_QCheckBox(Pointer muobj, const CallEnvironment* ce,
-                                   const QString& text, QWidget* parent)
+    MuQt_QCheckBox::MuQt_QCheckBox(Pointer muobj, const CallEnvironment* ce, const QString& text, QWidget* parent)
         : QCheckBox(text, parent)
     {
         _env = ce;
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QCheckBoxType>(
-            c->internName("qt.QCheckBox"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QCheckBoxType>(c->internName("qt.QCheckBox"));
     }
 
     QSize MuQt_QCheckBox::minimumSizeHint() const
@@ -207,8 +203,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -253,8 +248,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QPaintEventType>(c, _p14, "qt.QPaintEvent"));
+            args[1] = Value(makeqpointer<QPaintEventType>(c, _p14, "qt.QPaintEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -300,8 +294,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QFocusEventType>(c, e, "qt.QFocusEvent"));
+            args[1] = Value(makeqpointer<QFocusEventType>(c, e, "qt.QFocusEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -324,8 +317,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QFocusEventType>(c, e, "qt.QFocusEvent"));
+            args[1] = Value(makeqpointer<QFocusEventType>(c, e, "qt.QFocusEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -394,8 +386,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -418,8 +409,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -442,8 +432,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QTimerEventType>(c, e, "qt.QTimerEvent"));
+            args[1] = Value(makeqpointer<QTimerEventType>(c, e, "qt.QTimerEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -455,8 +444,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  Mu Type CONSTRUCTORS
 
-    QCheckBoxType::QCheckBoxType(Context* c, const char* name, Class* super,
-                                 Class* super2)
+    QCheckBoxType::QCheckBoxType(Context* c, const char* name, Class* super, Class* super2)
         : Class(c, name, vectorOf2(super, super2))
     {
     }
@@ -477,9 +465,7 @@ namespace Mu
         }
         else if (QCheckBox* w = object<QCheckBox>(widget))
         {
-            QCheckBoxType* type =
-                c->findSymbolOfTypeByQualifiedName<QCheckBoxType>(
-                    c->internName("qt.QCheckBox"), false);
+            QCheckBoxType* type = c->findSymbolOfTypeByQualifiedName<QCheckBoxType>(c->internName("qt.QCheckBox"), false);
             ClassInstance* o = ClassInstance::allocate(type);
             setobject(o, w);
             return o;
@@ -490,47 +476,34 @@ namespace Mu
         }
     }
 
-    static NODE_IMPLEMENTATION(castFromObject, Pointer)
-    {
-        NODE_RETURN(
-            QCheckBox_QCheckBox_QObject(NODE_THREAD, NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(castFromObject, Pointer) { NODE_RETURN(QCheckBox_QCheckBox_QObject(NODE_THREAD, NODE_ARG(0, Pointer))); }
 
-    Pointer qt_QCheckBox_QCheckBox_QCheckBox_QCheckBox_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
+    Pointer qt_QCheckBox_QCheckBox_QCheckBox_QCheckBox_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWidget* arg1 = object<QWidget>(param_parent);
-        setobject(param_this,
-                  new MuQt_QCheckBox(param_this,
-                                     NODE_THREAD.process()->callEnv(), arg1));
+        setobject(param_this, new MuQt_QCheckBox(param_this, NODE_THREAD.process()->callEnv(), arg1));
         return param_this;
     }
 
-    Pointer qt_QCheckBox_QCheckBox_QCheckBox_QCheckBox_string_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_text,
-        Pointer param_parent)
+    Pointer qt_QCheckBox_QCheckBox_QCheckBox_QCheckBox_string_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_text,
+                                                                      Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QString arg1 = qstring(param_text);
         QWidget* arg2 = object<QWidget>(param_parent);
-        setobject(param_this, new MuQt_QCheckBox(
-                                  param_this, NODE_THREAD.process()->callEnv(),
-                                  arg1, arg2));
+        setobject(param_this, new MuQt_QCheckBox(param_this, NODE_THREAD.process()->callEnv(), arg1, arg2));
         return param_this;
     }
 
-    int qt_QCheckBox_checkState_int_QCheckBox(Mu::Thread& NODE_THREAD,
-                                              Pointer param_this)
+    int qt_QCheckBox_checkState_int_QCheckBox(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QCheckBox* arg0 = object<QCheckBox>(param_this);
         return int(arg0->checkState());
     }
 
-    void qt_QCheckBox_setCheckState_void_QCheckBox_int(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this,
-                                                       int param_state)
+    void qt_QCheckBox_setCheckState_void_QCheckBox_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_state)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QCheckBox* arg0 = object<QCheckBox>(param_this);
@@ -538,32 +511,23 @@ namespace Mu
         arg0->setCheckState(arg1);
     }
 
-    Pointer
-    qt_QCheckBox_minimumSizeHint_QSize_QCheckBox(Mu::Thread& NODE_THREAD,
-                                                 Pointer param_this)
+    Pointer qt_QCheckBox_minimumSizeHint_QSize_QCheckBox(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QCheckBox* arg0 = object<QCheckBox>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QSizeType>(c, arg0->QCheckBox::minimumSizeHint(),
-                                          "qt.QSize")
-                   : makeqtype<QSizeType>(c, arg0->minimumSizeHint(),
-                                          "qt.QSize");
+        return isMuQtObject(arg0) ? makeqtype<QSizeType>(c, arg0->QCheckBox::minimumSizeHint(), "qt.QSize")
+                                  : makeqtype<QSizeType>(c, arg0->minimumSizeHint(), "qt.QSize");
     }
 
-    Pointer qt_QCheckBox_sizeHint_QSize_QCheckBox(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this)
+    Pointer qt_QCheckBox_sizeHint_QSize_QCheckBox(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QCheckBox* arg0 = object<QCheckBox>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QSizeType>(c, arg0->QCheckBox::sizeHint(),
-                                          "qt.QSize")
-                   : makeqtype<QSizeType>(c, arg0->sizeHint(), "qt.QSize");
+        return isMuQtObject(arg0) ? makeqtype<QSizeType>(c, arg0->QCheckBox::sizeHint(), "qt.QSize")
+                                  : makeqtype<QSizeType>(c, arg0->sizeHint(), "qt.QSize");
     }
 
-    void qt_QCheckBox_checkStateSet_void_QCheckBox(Mu::Thread& NODE_THREAD,
-                                                   Pointer param_this)
+    void qt_QCheckBox_checkStateSet_void_QCheckBox(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QCheckBox* arg0 = object<QCheckBox>(param_this);
@@ -573,32 +537,23 @@ namespace Mu
             ((MuQt_QCheckBox*)arg0)->checkStateSet_pub();
     }
 
-    bool qt_QCheckBox_event_bool_QCheckBox_QEvent(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this,
-                                                  Pointer param_e)
+    bool qt_QCheckBox_event_bool_QCheckBox_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QCheckBox* arg0 = object<QCheckBox>(param_this);
         QEvent* arg1 = getqpointer<QEventType>(param_e);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QCheckBox*)arg0)->event_pub_parent(arg1)
-                   : ((MuQt_QCheckBox*)arg0)->event_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QCheckBox*)arg0)->event_pub_parent(arg1) : ((MuQt_QCheckBox*)arg0)->event_pub(arg1);
     }
 
-    bool qt_QCheckBox_hitButton_bool_QCheckBox_QPoint(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this,
-                                                      Pointer param_pos)
+    bool qt_QCheckBox_hitButton_bool_QCheckBox_QPoint(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_pos)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QCheckBox* arg0 = object<QCheckBox>(param_this);
         const QPoint arg1 = getqtype<QPointType>(param_pos);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QCheckBox*)arg0)->hitButton_pub_parent(arg1)
-                   : ((MuQt_QCheckBox*)arg0)->hitButton_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QCheckBox*)arg0)->hitButton_pub_parent(arg1) : ((MuQt_QCheckBox*)arg0)->hitButton_pub(arg1);
     }
 
-    void qt_QCheckBox_mouseMoveEvent_void_QCheckBox_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QCheckBox_mouseMoveEvent_void_QCheckBox_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QCheckBox* arg0 = object<QCheckBox>(param_this);
@@ -609,8 +564,7 @@ namespace Mu
             ((MuQt_QCheckBox*)arg0)->mouseMoveEvent_pub(arg1);
     }
 
-    void qt_QCheckBox_nextCheckState_void_QCheckBox(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this)
+    void qt_QCheckBox_nextCheckState_void_QCheckBox(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QCheckBox* arg0 = object<QCheckBox>(param_this);
@@ -620,8 +574,7 @@ namespace Mu
             ((MuQt_QCheckBox*)arg0)->nextCheckState_pub();
     }
 
-    void qt_QCheckBox_paintEvent_void_QCheckBox_QPaintEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param__p14)
+    void qt_QCheckBox_paintEvent_void_QCheckBox_QPaintEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param__p14)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QCheckBox* arg0 = object<QCheckBox>(param_this);
@@ -632,9 +585,7 @@ namespace Mu
             ((MuQt_QCheckBox*)arg0)->paintEvent_pub(arg1);
     }
 
-    void qt_QCheckBox_changeEvent_void_QCheckBox_QEvent(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this,
-                                                        Pointer param_e)
+    void qt_QCheckBox_changeEvent_void_QCheckBox_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QCheckBox* arg0 = object<QCheckBox>(param_this);
@@ -645,8 +596,7 @@ namespace Mu
             ((MuQt_QCheckBox*)arg0)->changeEvent_pub(arg1);
     }
 
-    void qt_QCheckBox_focusInEvent_void_QCheckBox_QFocusEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QCheckBox_focusInEvent_void_QCheckBox_QFocusEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QCheckBox* arg0 = object<QCheckBox>(param_this);
@@ -657,8 +607,7 @@ namespace Mu
             ((MuQt_QCheckBox*)arg0)->focusInEvent_pub(arg1);
     }
 
-    void qt_QCheckBox_focusOutEvent_void_QCheckBox_QFocusEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QCheckBox_focusOutEvent_void_QCheckBox_QFocusEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QCheckBox* arg0 = object<QCheckBox>(param_this);
@@ -669,8 +618,7 @@ namespace Mu
             ((MuQt_QCheckBox*)arg0)->focusOutEvent_pub(arg1);
     }
 
-    void qt_QCheckBox_keyPressEvent_void_QCheckBox_QKeyEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QCheckBox_keyPressEvent_void_QCheckBox_QKeyEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QCheckBox* arg0 = object<QCheckBox>(param_this);
@@ -681,8 +629,7 @@ namespace Mu
             ((MuQt_QCheckBox*)arg0)->keyPressEvent_pub(arg1);
     }
 
-    void qt_QCheckBox_keyReleaseEvent_void_QCheckBox_QKeyEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QCheckBox_keyReleaseEvent_void_QCheckBox_QKeyEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QCheckBox* arg0 = object<QCheckBox>(param_this);
@@ -693,8 +640,7 @@ namespace Mu
             ((MuQt_QCheckBox*)arg0)->keyReleaseEvent_pub(arg1);
     }
 
-    void qt_QCheckBox_mousePressEvent_void_QCheckBox_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QCheckBox_mousePressEvent_void_QCheckBox_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QCheckBox* arg0 = object<QCheckBox>(param_this);
@@ -705,8 +651,7 @@ namespace Mu
             ((MuQt_QCheckBox*)arg0)->mousePressEvent_pub(arg1);
     }
 
-    void qt_QCheckBox_mouseReleaseEvent_void_QCheckBox_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QCheckBox_mouseReleaseEvent_void_QCheckBox_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QCheckBox* arg0 = object<QCheckBox>(param_this);
@@ -717,8 +662,7 @@ namespace Mu
             ((MuQt_QCheckBox*)arg0)->mouseReleaseEvent_pub(arg1);
     }
 
-    void qt_QCheckBox_timerEvent_void_QCheckBox_QTimerEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QCheckBox_timerEvent_void_QCheckBox_QTimerEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QCheckBox* arg0 = object<QCheckBox>(param_this);
@@ -731,123 +675,103 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(_n_QCheckBox0, Pointer)
     {
-        NODE_RETURN(qt_QCheckBox_QCheckBox_QCheckBox_QCheckBox_QWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QCheckBox_QCheckBox_QCheckBox_QCheckBox_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_QCheckBox1, Pointer)
     {
-        NODE_RETURN(qt_QCheckBox_QCheckBox_QCheckBox_QCheckBox_string_QWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QCheckBox_QCheckBox_QCheckBox_QCheckBox_string_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                              NODE_ARG(1, Pointer), NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_checkState0, int)
     {
-        NODE_RETURN(qt_QCheckBox_checkState_int_QCheckBox(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QCheckBox_checkState_int_QCheckBox(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_setCheckState0, void)
     {
-        qt_QCheckBox_setCheckState_void_QCheckBox_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QCheckBox_setCheckState_void_QCheckBox_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_minimumSizeHint0, Pointer)
     {
-        NODE_RETURN(qt_QCheckBox_minimumSizeHint_QSize_QCheckBox(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QCheckBox_minimumSizeHint_QSize_QCheckBox(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_sizeHint0, Pointer)
     {
-        NODE_RETURN(qt_QCheckBox_sizeHint_QSize_QCheckBox(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QCheckBox_sizeHint_QSize_QCheckBox(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_checkStateSet0, void)
     {
-        qt_QCheckBox_checkStateSet_void_QCheckBox(NODE_THREAD,
-                                                  NONNIL_NODE_ARG(0, Pointer));
+        qt_QCheckBox_checkStateSet_void_QCheckBox(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_event0, bool)
     {
-        NODE_RETURN(qt_QCheckBox_event_bool_QCheckBox_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QCheckBox_event_bool_QCheckBox_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_hitButton0, bool)
     {
-        NODE_RETURN(qt_QCheckBox_hitButton_bool_QCheckBox_QPoint(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QCheckBox_hitButton_bool_QCheckBox_QPoint(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseMoveEvent0, void)
     {
-        qt_QCheckBox_mouseMoveEvent_void_QCheckBox_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QCheckBox_mouseMoveEvent_void_QCheckBox_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_nextCheckState0, void)
     {
-        qt_QCheckBox_nextCheckState_void_QCheckBox(NODE_THREAD,
-                                                   NONNIL_NODE_ARG(0, Pointer));
+        qt_QCheckBox_nextCheckState_void_QCheckBox(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_paintEvent0, void)
     {
-        qt_QCheckBox_paintEvent_void_QCheckBox_QPaintEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QCheckBox_paintEvent_void_QCheckBox_QPaintEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_changeEvent0, void)
     {
-        qt_QCheckBox_changeEvent_void_QCheckBox_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QCheckBox_changeEvent_void_QCheckBox_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_focusInEvent0, void)
     {
-        qt_QCheckBox_focusInEvent_void_QCheckBox_QFocusEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QCheckBox_focusInEvent_void_QCheckBox_QFocusEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_focusOutEvent0, void)
     {
-        qt_QCheckBox_focusOutEvent_void_QCheckBox_QFocusEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QCheckBox_focusOutEvent_void_QCheckBox_QFocusEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_keyPressEvent0, void)
     {
-        qt_QCheckBox_keyPressEvent_void_QCheckBox_QKeyEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QCheckBox_keyPressEvent_void_QCheckBox_QKeyEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_keyReleaseEvent0, void)
     {
-        qt_QCheckBox_keyReleaseEvent_void_QCheckBox_QKeyEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QCheckBox_keyReleaseEvent_void_QCheckBox_QKeyEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mousePressEvent0, void)
     {
-        qt_QCheckBox_mousePressEvent_void_QCheckBox_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QCheckBox_mousePressEvent_void_QCheckBox_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseReleaseEvent0, void)
     {
-        qt_QCheckBox_mouseReleaseEvent_void_QCheckBox_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QCheckBox_mouseReleaseEvent_void_QCheckBox_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_timerEvent0, void)
     {
-        qt_QCheckBox_timerEvent_void_QCheckBox_QTimerEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QCheckBox_timerEvent_void_QCheckBox_QTimerEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     void QCheckBoxType::load()
@@ -867,17 +791,13 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
-                   new Function(c, tn, castFromObject, Cast, Compiled,
-                                QCheckBox_QCheckBox_QObject, Return, ftn,
-                                Parameters,
+                   new Function(c, tn, castFromObject, Cast, Compiled, QCheckBox_QCheckBox_QObject, Return, ftn, Parameters,
                                 new Param(c, "object", "qt.QObject"), End),
 
                    EndArguments);
@@ -885,108 +805,64 @@ namespace Mu
         addSymbols(
             // enums
             // member functions
-            new Function(c, "QCheckBox", _n_QCheckBox0, None, Compiled,
-                         qt_QCheckBox_QCheckBox_QCheckBox_QCheckBox_QWidget,
-                         Return, "qt.QCheckBox", Parameters,
-                         new Param(c, "this", "qt.QCheckBox"),
+            new Function(c, "QCheckBox", _n_QCheckBox0, None, Compiled, qt_QCheckBox_QCheckBox_QCheckBox_QCheckBox_QWidget, Return,
+                         "qt.QCheckBox", Parameters, new Param(c, "this", "qt.QCheckBox"), new Param(c, "parent", "qt.QWidget"), End),
+            new Function(c, "QCheckBox", _n_QCheckBox1, None, Compiled, qt_QCheckBox_QCheckBox_QCheckBox_QCheckBox_string_QWidget, Return,
+                         "qt.QCheckBox", Parameters, new Param(c, "this", "qt.QCheckBox"), new Param(c, "text", "string"),
                          new Param(c, "parent", "qt.QWidget"), End),
-            new Function(
-                c, "QCheckBox", _n_QCheckBox1, None, Compiled,
-                qt_QCheckBox_QCheckBox_QCheckBox_QCheckBox_string_QWidget,
-                Return, "qt.QCheckBox", Parameters,
-                new Param(c, "this", "qt.QCheckBox"),
-                new Param(c, "text", "string"),
-                new Param(c, "parent", "qt.QWidget"), End),
-            new Function(c, "checkState", _n_checkState0, None, Compiled,
-                         qt_QCheckBox_checkState_int_QCheckBox, Return, "int",
-                         Parameters, new Param(c, "this", "qt.QCheckBox"), End),
+            new Function(c, "checkState", _n_checkState0, None, Compiled, qt_QCheckBox_checkState_int_QCheckBox, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QCheckBox"), End),
             // PROP: isTristate (bool; QCheckBox this)
-            new Function(c, "setCheckState", _n_setCheckState0, None, Compiled,
-                         qt_QCheckBox_setCheckState_void_QCheckBox_int, Return,
-                         "void", Parameters,
-                         new Param(c, "this", "qt.QCheckBox"),
-                         new Param(c, "state", "int"), End),
+            new Function(c, "setCheckState", _n_setCheckState0, None, Compiled, qt_QCheckBox_setCheckState_void_QCheckBox_int, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QCheckBox"), new Param(c, "state", "int"), End),
             // PROP: setTristate (void; QCheckBox this, bool y)
-            _func[0] = new MemberFunction(
-                c, "minimumSizeHint", _n_minimumSizeHint0, None, Compiled,
-                qt_QCheckBox_minimumSizeHint_QSize_QCheckBox, Return,
-                "qt.QSize", Parameters, new Param(c, "this", "qt.QCheckBox"),
-                End),
-            _func[1] = new MemberFunction(
-                c, "sizeHint", _n_sizeHint0, None, Compiled,
-                qt_QCheckBox_sizeHint_QSize_QCheckBox, Return, "qt.QSize",
-                Parameters, new Param(c, "this", "qt.QCheckBox"), End),
+            _func[0] =
+                new MemberFunction(c, "minimumSizeHint", _n_minimumSizeHint0, None, Compiled, qt_QCheckBox_minimumSizeHint_QSize_QCheckBox,
+                                   Return, "qt.QSize", Parameters, new Param(c, "this", "qt.QCheckBox"), End),
+            _func[1] = new MemberFunction(c, "sizeHint", _n_sizeHint0, None, Compiled, qt_QCheckBox_sizeHint_QSize_QCheckBox, Return,
+                                          "qt.QSize", Parameters, new Param(c, "this", "qt.QCheckBox"), End),
             // MISSING: initStyleOption (void; QCheckBox this,
             // "QStyleOptionButton *" option) // protected
-            _func[2] = new MemberFunction(
-                c, "checkStateSet", _n_checkStateSet0, None, Compiled,
-                qt_QCheckBox_checkStateSet_void_QCheckBox, Return, "void",
-                Parameters, new Param(c, "this", "qt.QCheckBox"), End),
-            _func[3] = new MemberFunction(
-                c, "event", _n_event0, None, Compiled,
-                qt_QCheckBox_event_bool_QCheckBox_QEvent, Return, "bool",
-                Parameters, new Param(c, "this", "qt.QCheckBox"),
-                new Param(c, "e", "qt.QEvent"), End),
-            _func[4] = new MemberFunction(
-                c, "hitButton", _n_hitButton0, None, Compiled,
-                qt_QCheckBox_hitButton_bool_QCheckBox_QPoint, Return, "bool",
-                Parameters, new Param(c, "this", "qt.QCheckBox"),
-                new Param(c, "pos", "qt.QPoint"), End),
-            _func[5] = new MemberFunction(
-                c, "mouseMoveEvent", _n_mouseMoveEvent0, None, Compiled,
-                qt_QCheckBox_mouseMoveEvent_void_QCheckBox_QMouseEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QCheckBox"),
-                new Param(c, "e", "qt.QMouseEvent"), End),
-            _func[6] = new MemberFunction(
-                c, "nextCheckState", _n_nextCheckState0, None, Compiled,
-                qt_QCheckBox_nextCheckState_void_QCheckBox, Return, "void",
-                Parameters, new Param(c, "this", "qt.QCheckBox"), End),
-            _func[7] = new MemberFunction(
-                c, "paintEvent", _n_paintEvent0, None, Compiled,
-                qt_QCheckBox_paintEvent_void_QCheckBox_QPaintEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QCheckBox"),
-                new Param(c, "_p14", "qt.QPaintEvent"), End),
-            _func[8] = new MemberFunction(
-                c, "changeEvent", _n_changeEvent0, None, Compiled,
-                qt_QCheckBox_changeEvent_void_QCheckBox_QEvent, Return, "void",
-                Parameters, new Param(c, "this", "qt.QCheckBox"),
-                new Param(c, "e", "qt.QEvent"), End),
-            _func[9] = new MemberFunction(
-                c, "focusInEvent", _n_focusInEvent0, None, Compiled,
-                qt_QCheckBox_focusInEvent_void_QCheckBox_QFocusEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QCheckBox"),
-                new Param(c, "e", "qt.QFocusEvent"), End),
-            _func[10] = new MemberFunction(
-                c, "focusOutEvent", _n_focusOutEvent0, None, Compiled,
-                qt_QCheckBox_focusOutEvent_void_QCheckBox_QFocusEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QCheckBox"),
-                new Param(c, "e", "qt.QFocusEvent"), End),
-            _func[11] = new MemberFunction(
-                c, "keyPressEvent", _n_keyPressEvent0, None, Compiled,
-                qt_QCheckBox_keyPressEvent_void_QCheckBox_QKeyEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QCheckBox"),
-                new Param(c, "e", "qt.QKeyEvent"), End),
-            _func[12] = new MemberFunction(
-                c, "keyReleaseEvent", _n_keyReleaseEvent0, None, Compiled,
-                qt_QCheckBox_keyReleaseEvent_void_QCheckBox_QKeyEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QCheckBox"),
-                new Param(c, "e", "qt.QKeyEvent"), End),
-            _func[13] = new MemberFunction(
-                c, "mousePressEvent", _n_mousePressEvent0, None, Compiled,
-                qt_QCheckBox_mousePressEvent_void_QCheckBox_QMouseEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QCheckBox"),
-                new Param(c, "e", "qt.QMouseEvent"), End),
-            _func[14] = new MemberFunction(
-                c, "mouseReleaseEvent", _n_mouseReleaseEvent0, None, Compiled,
-                qt_QCheckBox_mouseReleaseEvent_void_QCheckBox_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QCheckBox"),
-                new Param(c, "e", "qt.QMouseEvent"), End),
-            _func[15] = new MemberFunction(
-                c, "timerEvent", _n_timerEvent0, None, Compiled,
-                qt_QCheckBox_timerEvent_void_QCheckBox_QTimerEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QCheckBox"),
-                new Param(c, "e", "qt.QTimerEvent"), End),
+            _func[2] = new MemberFunction(c, "checkStateSet", _n_checkStateSet0, None, Compiled, qt_QCheckBox_checkStateSet_void_QCheckBox,
+                                          Return, "void", Parameters, new Param(c, "this", "qt.QCheckBox"), End),
+            _func[3] = new MemberFunction(c, "event", _n_event0, None, Compiled, qt_QCheckBox_event_bool_QCheckBox_QEvent, Return, "bool",
+                                          Parameters, new Param(c, "this", "qt.QCheckBox"), new Param(c, "e", "qt.QEvent"), End),
+            _func[4] =
+                new MemberFunction(c, "hitButton", _n_hitButton0, None, Compiled, qt_QCheckBox_hitButton_bool_QCheckBox_QPoint, Return,
+                                   "bool", Parameters, new Param(c, "this", "qt.QCheckBox"), new Param(c, "pos", "qt.QPoint"), End),
+            _func[5] = new MemberFunction(c, "mouseMoveEvent", _n_mouseMoveEvent0, None, Compiled,
+                                          qt_QCheckBox_mouseMoveEvent_void_QCheckBox_QMouseEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QCheckBox"), new Param(c, "e", "qt.QMouseEvent"), End),
+            _func[6] =
+                new MemberFunction(c, "nextCheckState", _n_nextCheckState0, None, Compiled, qt_QCheckBox_nextCheckState_void_QCheckBox,
+                                   Return, "void", Parameters, new Param(c, "this", "qt.QCheckBox"), End),
+            _func[7] = new MemberFunction(c, "paintEvent", _n_paintEvent0, None, Compiled,
+                                          qt_QCheckBox_paintEvent_void_QCheckBox_QPaintEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QCheckBox"), new Param(c, "_p14", "qt.QPaintEvent"), End),
+            _func[8] =
+                new MemberFunction(c, "changeEvent", _n_changeEvent0, None, Compiled, qt_QCheckBox_changeEvent_void_QCheckBox_QEvent,
+                                   Return, "void", Parameters, new Param(c, "this", "qt.QCheckBox"), new Param(c, "e", "qt.QEvent"), End),
+            _func[9] = new MemberFunction(c, "focusInEvent", _n_focusInEvent0, None, Compiled,
+                                          qt_QCheckBox_focusInEvent_void_QCheckBox_QFocusEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QCheckBox"), new Param(c, "e", "qt.QFocusEvent"), End),
+            _func[10] = new MemberFunction(c, "focusOutEvent", _n_focusOutEvent0, None, Compiled,
+                                           qt_QCheckBox_focusOutEvent_void_QCheckBox_QFocusEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QCheckBox"), new Param(c, "e", "qt.QFocusEvent"), End),
+            _func[11] = new MemberFunction(c, "keyPressEvent", _n_keyPressEvent0, None, Compiled,
+                                           qt_QCheckBox_keyPressEvent_void_QCheckBox_QKeyEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QCheckBox"), new Param(c, "e", "qt.QKeyEvent"), End),
+            _func[12] = new MemberFunction(c, "keyReleaseEvent", _n_keyReleaseEvent0, None, Compiled,
+                                           qt_QCheckBox_keyReleaseEvent_void_QCheckBox_QKeyEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QCheckBox"), new Param(c, "e", "qt.QKeyEvent"), End),
+            _func[13] = new MemberFunction(c, "mousePressEvent", _n_mousePressEvent0, None, Compiled,
+                                           qt_QCheckBox_mousePressEvent_void_QCheckBox_QMouseEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QCheckBox"), new Param(c, "e", "qt.QMouseEvent"), End),
+            _func[14] = new MemberFunction(c, "mouseReleaseEvent", _n_mouseReleaseEvent0, None, Compiled,
+                                           qt_QCheckBox_mouseReleaseEvent_void_QCheckBox_QMouseEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QCheckBox"), new Param(c, "e", "qt.QMouseEvent"), End),
+            _func[15] = new MemberFunction(c, "timerEvent", _n_timerEvent0, None, Compiled,
+                                           qt_QCheckBox_timerEvent_void_QCheckBox_QTimerEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QCheckBox"), new Param(c, "e", "qt.QTimerEvent"), End),
             // static functions
             EndArguments);
         globalScope()->addSymbols(EndArguments);

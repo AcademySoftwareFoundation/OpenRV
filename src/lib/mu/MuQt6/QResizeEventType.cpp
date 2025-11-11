@@ -42,8 +42,7 @@ namespace Mu
 {
     using namespace std;
 
-    QResizeEventType::QResizeEventType(Context* c, const char* name,
-                                       Class* super)
+    QResizeEventType::QResizeEventType(Context* c, const char* name, Class* super)
         : Class(c, name, super)
     {
     }
@@ -53,9 +52,8 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    Pointer qt_QResizeEvent_QResizeEvent_QResizeEvent_QResizeEvent_QSize_QSize(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_size,
-        Pointer param_oldSize)
+    Pointer qt_QResizeEvent_QResizeEvent_QResizeEvent_QResizeEvent_QSize_QSize(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                               Pointer param_size, Pointer param_oldSize)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QSize arg1 = getqtype<QSizeType>(param_size);
@@ -64,16 +62,14 @@ namespace Mu
         return param_this;
     }
 
-    Pointer qt_QResizeEvent_oldSize_QSize_QResizeEvent(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this)
+    Pointer qt_QResizeEvent_oldSize_QSize_QResizeEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QResizeEvent* arg0 = getqpointer<QResizeEventType>(param_this);
         return makeqtype<QSizeType>(c, arg0->oldSize(), "qt.QSize");
     }
 
-    Pointer qt_QResizeEvent_size_QSize_QResizeEvent(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this)
+    Pointer qt_QResizeEvent_size_QSize_QResizeEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QResizeEvent* arg0 = getqpointer<QResizeEventType>(param_this);
@@ -82,22 +78,18 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(_n_QResizeEvent0, Pointer)
     {
-        NODE_RETURN(
-            qt_QResizeEvent_QResizeEvent_QResizeEvent_QResizeEvent_QSize_QSize(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QResizeEvent_QResizeEvent_QResizeEvent_QResizeEvent_QSize_QSize(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                       NODE_ARG(1, Pointer), NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_oldSize0, Pointer)
     {
-        NODE_RETURN(qt_QResizeEvent_oldSize_QSize_QResizeEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QResizeEvent_oldSize_QSize_QResizeEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_size0, Pointer)
     {
-        NODE_RETURN(qt_QResizeEvent_size_QSize_QResizeEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QResizeEvent_size_QSize_QResizeEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     void QResizeEventType::load()
@@ -117,13 +109,11 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
                    new MemberVariable(c, "native", "qt.NativeObject"),
 
@@ -134,20 +124,13 @@ namespace Mu
         addSymbols(
             // enums
             // member functions
-            new Function(
-                c, "QResizeEvent", _n_QResizeEvent0, None, Compiled,
-                qt_QResizeEvent_QResizeEvent_QResizeEvent_QResizeEvent_QSize_QSize,
-                Return, "qt.QResizeEvent", Parameters,
-                new Param(c, "this", "qt.QResizeEvent"),
-                new Param(c, "size", "qt.QSize"),
-                new Param(c, "oldSize", "qt.QSize"), End),
-            new Function(c, "oldSize", _n_oldSize0, None, Compiled,
-                         qt_QResizeEvent_oldSize_QSize_QResizeEvent, Return,
-                         "qt.QSize", Parameters,
-                         new Param(c, "this", "qt.QResizeEvent"), End),
-            new Function(c, "size", _n_size0, None, Compiled,
-                         qt_QResizeEvent_size_QSize_QResizeEvent, Return,
-                         "qt.QSize", Parameters,
+            new Function(c, "QResizeEvent", _n_QResizeEvent0, None, Compiled,
+                         qt_QResizeEvent_QResizeEvent_QResizeEvent_QResizeEvent_QSize_QSize, Return, "qt.QResizeEvent", Parameters,
+                         new Param(c, "this", "qt.QResizeEvent"), new Param(c, "size", "qt.QSize"), new Param(c, "oldSize", "qt.QSize"),
+                         End),
+            new Function(c, "oldSize", _n_oldSize0, None, Compiled, qt_QResizeEvent_oldSize_QSize_QResizeEvent, Return, "qt.QSize",
+                         Parameters, new Param(c, "this", "qt.QResizeEvent"), End),
+            new Function(c, "size", _n_size0, None, Compiled, qt_QResizeEvent_size_QSize_QResizeEvent, Return, "qt.QSize", Parameters,
                          new Param(c, "this", "qt.QResizeEvent"), End),
             // static functions
             EndArguments);

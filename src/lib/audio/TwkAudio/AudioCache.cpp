@@ -85,8 +85,7 @@ namespace TwkAudio
             m_cachedRangesStat.clear();
         }
 
-        m_totalSecondsCached =
-            Time(m_count) * Time(m_packetSize) / m_packetRate;
+        m_totalSecondsCached = Time(m_count) * Time(m_packetSize) / m_packetRate;
     }
 
     void AudioCache::clearAfter(Time t)
@@ -116,8 +115,7 @@ namespace TwkAudio
             m_cachedRangesStat.clear();
         }
 
-        m_totalSecondsCached =
-            Time(m_count) * Time(m_packetSize) / m_packetRate;
+        m_totalSecondsCached = Time(m_count) * Time(m_packetSize) / m_packetRate;
     }
 
     void AudioCache::clear(Time time0, Time time1)
@@ -156,15 +154,12 @@ namespace TwkAudio
             m_cachedRangesStat.clear();
         }
 
-        m_totalSecondsCached =
-            Time(m_count) * Time(m_packetSize) / m_packetRate;
+        m_totalSecondsCached = Time(m_count) * Time(m_packetSize) / m_packetRate;
     }
 
-    void AudioCache::configurePacket(size_t samples, TwkAudio::Layout layout,
-                                     Time rate)
+    void AudioCache::configurePacket(size_t samples, TwkAudio::Layout layout, Time rate)
     {
-        if (m_packetSize != samples || m_packetLayout != layout
-            || m_packetRate != rate)
+        if (m_packetSize != samples || m_packetLayout != layout || m_packetRate != rate)
         {
             clear();
             m_packetSize = samples;
@@ -201,17 +196,11 @@ namespace TwkAudio
         // correct sampling rate.
         //
 
-        if (packetOffset(s) != 0 || buffer.size() != m_packetSize
-            || buffer.channels() != channels() || buffer.rate() != m_packetRate)
+        if (packetOffset(s) != 0 || buffer.size() != m_packetSize || buffer.channels() != channels() || buffer.rate() != m_packetRate)
         {
-            cout << "WARNING: s = " << s
-                 << ", packetOffset = " << packetOffset(s)
-                 << ", m_packetSize = " << m_packetSize
-                 << ", size = " << buffer.size() << ", m_packetLayout = "
-                 << TwkAudio::layoutString(m_packetLayout)
-                 << ", channels = " << buffer.numChannels()
-                 << ", m_packetRate = " << m_packetRate
-                 << ", rate: " << buffer.rate() << endl;
+            cout << "WARNING: s = " << s << ", packetOffset = " << packetOffset(s) << ", m_packetSize = " << m_packetSize
+                 << ", size = " << buffer.size() << ", m_packetLayout = " << TwkAudio::layoutString(m_packetLayout)
+                 << ", channels = " << buffer.numChannels() << ", m_packetRate = " << m_packetRate << ", rate: " << buffer.rate() << endl;
         }
         assert(packetOffset(s) == 0);
         assert(buffer.size() == m_packetSize);
@@ -226,8 +215,7 @@ namespace TwkAudio
             if (m_freePackets.empty())
             {
                 int numChannels = TwkAudio::channelsCount(m_packetLayout);
-                p = (float*)TwkUtil::MemPool::alloc(sizeof(float) * m_packetSize
-                                                    * numChannels);
+                p = (float*)TwkUtil::MemPool::alloc(sizeof(float) * m_packetSize * numChannels);
             }
             else
             {
@@ -240,8 +228,7 @@ namespace TwkAudio
 
             m_map[s] = p;
             m_count++;
-            m_totalSecondsCached =
-                Time(m_count) * Time(m_packetSize) / m_packetRate;
+            m_totalSecondsCached = Time(m_count) * Time(m_packetSize) / m_packetRate;
             m_cachedRangesStat.clear();
         }
         else
@@ -271,8 +258,7 @@ namespace TwkAudio
                 //  completely contained inside one packet.
                 //
 
-                memcpy(buffer.pointer(), p0 + packetOffset(s0) * numChannels,
-                       buffer.sizeInBytes());
+                memcpy(buffer.pointer(), p0 + packetOffset(s0) * numChannels, buffer.sizeInBytes());
 
                 return true;
             }
@@ -282,15 +268,12 @@ namespace TwkAudio
                 //  Straddles two packets
                 //
 
-                const SampleTime n0 =
-                    SampleTime(m_packetSize) - packetOffset(s0);
+                const SampleTime n0 = SampleTime(m_packetSize) - packetOffset(s0);
                 const SampleTime n1 = packetOffset(e0) + 1;
 
-                memcpy(buffer.pointer(), p0 + packetOffset(s0) * numChannels,
-                       n0 * sizeof(float) * numChannels);
+                memcpy(buffer.pointer(), p0 + packetOffset(s0) * numChannels, n0 * sizeof(float) * numChannels);
 
-                memcpy(buffer.pointer() + n0 * numChannels, p1,
-                       n1 * sizeof(float) * numChannels);
+                memcpy(buffer.pointer() + n0 * numChannels, p1, n1 * sizeof(float) * numChannels);
 
                 return true;
             }
@@ -305,12 +288,8 @@ namespace TwkAudio
             {
                 size_t offset = i * m_packetSize;
 
-                AudioBuffer newBuffer(
-                    buffer.pointer() + offset * buffer.numChannels(),
-                    buffer.channels(), m_packetSize,
-                    buffer.startTime()
-                        + double(i * m_packetSize) / m_packetRate,
-                    m_packetRate);
+                AudioBuffer newBuffer(buffer.pointer() + offset * buffer.numChannels(), buffer.channels(), m_packetSize,
+                                      buffer.startTime() + double(i * m_packetSize) / m_packetRate, m_packetRate);
 
                 if (!fillBuffer(newBuffer))
                     return false;
@@ -320,12 +299,8 @@ namespace TwkAudio
             {
                 SampleTime offset = n * SampleTime(m_packetSize);
 
-                AudioBuffer newBuffer(
-                    buffer.pointer() + offset * buffer.numChannels(),
-                    buffer.channels(), r,
-                    buffer.startTime()
-                        + double(n * m_packetSize) / m_packetRate,
-                    m_packetRate);
+                AudioBuffer newBuffer(buffer.pointer() + offset * buffer.numChannels(), buffer.channels(), r,
+                                      buffer.startTime() + double(n * m_packetSize) / m_packetRate, m_packetRate);
 
                 if (!fillBuffer(newBuffer))
                     return false;
@@ -339,8 +314,7 @@ namespace TwkAudio
 
     //------------------------------------------------------------------------------
     //
-    void AudioCache::computeCachedRangesStat(double frameRate,
-                                             FrameRangeVector& array)
+    void AudioCache::computeCachedRangesStat(double frameRate, FrameRangeVector& array)
     {
         lock();
 

@@ -34,8 +34,7 @@ namespace Mu
         //  Constructors
         //
 
-        QTextCodecType(Context* context, const char* name,
-                       Class* superClass = 0);
+        QTextCodecType(Context* context, const char* name, Class* superClass = 0);
         virtual ~QTextCodecType();
 
         //
