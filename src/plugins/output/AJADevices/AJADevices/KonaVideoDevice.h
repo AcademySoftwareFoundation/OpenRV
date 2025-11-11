@@ -78,8 +78,7 @@ namespace AJADevices
     {
         std::string desc;
         NTV2FrameBufferFormat value{NTV2_FBF_INVALID};
-        TwkApp::VideoDevice::InternalDataFormat iformat{
-            TwkApp::VideoDevice::InternalDataFormat::RGB8};
+        TwkApp::VideoDevice::InternalDataFormat iformat{TwkApp::VideoDevice::InternalDataFormat::RGB8};
         unsigned int flags{0};
     };
 
@@ -253,8 +252,7 @@ namespace AJADevices
 
         struct VideoChannel
         {
-            VideoChannel(NTV2FrameBufferFormat format, NTV2Channel ch,
-                         size_t bsize, size_t n);
+            VideoChannel(NTV2FrameBufferFormat format, NTV2Channel ch, size_t bsize, size_t n);
             ~VideoChannel();
 
             size_t bufferSizeInBytes;
@@ -302,8 +300,7 @@ namespace AJADevices
         //  stereo, or quad 4K, can be used.
         //
 
-        KonaVideoDevice(AJAModule*, const std::string& name,
-                        unsigned int deviceIndex, unsigned int appID,
+        KonaVideoDevice(AJAModule*, const std::string& name, unsigned int deviceIndex, unsigned int appID,
                         OperationMode mode = OperationMode::ProMode);
 
         ~KonaVideoDevice() override;
@@ -328,11 +325,9 @@ namespace AJADevices
 
         bool willBlockOnTransfer() const override;
         void bind(const TwkGLF::GLVideoDevice*) const override;
-        void bind2(const TwkGLF::GLVideoDevice*,
-                   const TwkGLF::GLVideoDevice*) const override;
+        void bind2(const TwkGLF::GLVideoDevice*, const TwkGLF::GLVideoDevice*) const override;
         void transfer(const TwkGLF::GLFBO*) const override;
-        void transfer2(const TwkGLF::GLFBO*,
-                       const TwkGLF::GLFBO*) const override;
+        void transfer2(const TwkGLF::GLFBO*, const TwkGLF::GLFBO*) const override;
 
         void unbind() const override;
 
@@ -400,11 +395,9 @@ namespace AJADevices
         bool initialize();
         void transferChannel(size_t i, const TwkGLF::GLFBO*) const;
         void transferChannelPBO(VideoChannel*, const TwkGLF::GLFBO*) const;
-        void transferChannelReadPixels(VideoChannel*,
-                                       const TwkGLF::GLFBO*) const;
+        void transferChannelReadPixels(VideoChannel*, const TwkGLF::GLFBO*) const;
         unsigned int channelsFromFormat(NTV2FrameBufferFormat) const;
-        NTV2HDMIBitDepth
-        getHDMIOutBitDepth(const NTV2FrameBufferFormat f) const;
+        NTV2HDMIBitDepth getHDMIOutBitDepth(const NTV2FrameBufferFormat f) const;
 
         void showAutoCirculateState(NTV2AutoCirculateState, int);
 
@@ -412,8 +405,7 @@ namespace AJADevices
         void endGPUTransfer() const;
         void startAJATransfer() const;
         void endAJATransfer() const;
-        void packBufferCopy(unsigned char*, size_t, unsigned char*, size_t,
-                            size_t);
+        void packBufferCopy(unsigned char*, size_t, unsigned char*, size_t, size_t);
 
         void queryCard();
         unsigned int appID() const;
@@ -423,24 +415,17 @@ namespace AJADevices
         bool tsiEnabled() const;
         void parseHDMIHDRMetadata(std::string data);
         void setHDMIHDRMetadata();
-        void routeQuadRGB(NTV2Standard standard, const KonaVideoFormat& f,
-                          const KonaDataFormat& d);
-        void routeStereoRGB(NTV2Standard standard, const KonaVideoFormat& f,
-                            const KonaDataFormat& d);
-        void routeMonoRGB(NTV2Standard standard, const KonaVideoFormat& f,
-                          const KonaDataFormat& d);
-        void routeQuadYUV(NTV2Standard standard, const KonaVideoFormat& f,
-                          const KonaDataFormat& d);
-        void routeStereoYUV(NTV2Standard standard, const KonaVideoFormat& f,
-                            const KonaDataFormat& d);
-        void routeMonoYUV(NTV2Standard standard, const KonaVideoFormat& f,
-                          const KonaDataFormat& d);
+        void routeQuadRGB(NTV2Standard standard, const KonaVideoFormat& f, const KonaDataFormat& d);
+        void routeStereoRGB(NTV2Standard standard, const KonaVideoFormat& f, const KonaDataFormat& d);
+        void routeMonoRGB(NTV2Standard standard, const KonaVideoFormat& f, const KonaDataFormat& d);
+        void routeQuadYUV(NTV2Standard standard, const KonaVideoFormat& f, const KonaDataFormat& d);
+        void routeStereoYUV(NTV2Standard standard, const KonaVideoFormat& f, const KonaDataFormat& d);
+        void routeMonoYUV(NTV2Standard standard, const KonaVideoFormat& f, const KonaDataFormat& d);
         void routeMux(bool tsiEnabled);
         void routeCSC(bool tsiEnabled, bool outputIsRGB);
         void route4KDownConverter(bool tsiEnabled, bool outputIsRGB);
         void routeMonitorOut(bool tsiEnabled, bool outputIsRGB);
-        void routeHDMI(NTV2Standard standard, const KonaDataFormat& d,
-                       bool tsiEnabled, bool outputIsRGB);
+        void routeHDMI(NTV2Standard standard, const KonaDataFormat& d, bool tsiEnabled, bool outputIsRGB);
 
         unsigned int m_appID{0};
         unsigned int m_deviceIndex{0};
@@ -457,8 +442,7 @@ namespace AJADevices
         KonaDataFormat m_actualDataFormat;
         bool m_stereo{false};
         bool m_quad{false};
-        bool m_quadQuad{
-            false}; // quad-quad-frame (8K) squares mode on the device.
+        bool m_quadQuad{false}; // quad-quad-frame (8K) squares mode on the device.
         VideoChannelVector m_videoChannels;
         bool m_bidirectional{false};
         size_t m_deviceNumVideoOutputs{0};

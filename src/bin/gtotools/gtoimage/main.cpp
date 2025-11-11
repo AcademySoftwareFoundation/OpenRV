@@ -69,20 +69,11 @@ struct Image
     size_t size;
     size_t pixelSize;
 
-    float* floatPixel(int x, int y)
-    {
-        return floatData + y * w * channels + x * channels;
-    }
+    float* floatPixel(int x, int y) { return floatData + y * w * channels + x * channels; }
 
-    short* shortPixel(int x, int y)
-    {
-        return shortData + y * w * channels + x * channels;
-    }
+    short* shortPixel(int x, int y) { return shortData + y * w * channels + x * channels; }
 
-    char* charPixel(int x, int y)
-    {
-        return charData + y * w * channels + x * channels;
-    }
+    char* charPixel(int x, int y) { return charData + y * w * channels + x * channels; }
 
     union
     {
@@ -117,8 +108,7 @@ Image* readTIFF(const std::string& imgFileName)
     TIFFGetField(tif, TIFFTAG_IMAGELENGTH, &image->h);
     TIFFGetField(tif, TIFFTAG_BITSPERSAMPLE, &image->bbs);
 
-    TIFFGetFieldDefaulted(tif, TIFFTAG_EXTRASAMPLES, &extrasamples,
-                          &sampleinfo);
+    TIFFGetFieldDefaulted(tif, TIFFTAG_EXTRASAMPLES, &extrasamples, &sampleinfo);
 
     image->channels = extrasamples ? 4 : 3;
 
@@ -189,8 +179,7 @@ Object* makeImageObject(Image* image, const char* inFile)
     p->int32Data[1] = image->h;
     c[0]->properties.push_back(p);
 
-    p = new Property(GTO_PROPERTY_PIXELS, itype, (Gto::DataType)image->type,
-                     image->w * image->h, image->channels, false);
+    p = new Property(GTO_PROPERTY_PIXELS, itype, (Gto::DataType)image->type, image->w * image->h, image->channels, false);
     p->voidData = image->voidData;
     c[0]->properties.push_back(p);
 

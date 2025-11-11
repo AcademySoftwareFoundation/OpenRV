@@ -8,8 +8,7 @@
 extern "C"
 {
 
-    IPCore::AudioRenderer*
-    CreateAudioModule(const IPCore::AudioRenderer::RendererParameters& p)
+    IPCore::AudioRenderer* CreateAudioModule(const IPCore::AudioRenderer::RendererParameters& p)
     {
         return new IPCore::ALSAAudioRenderer(p);
     }

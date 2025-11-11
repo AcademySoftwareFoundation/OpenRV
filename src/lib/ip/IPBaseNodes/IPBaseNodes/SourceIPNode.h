@@ -24,10 +24,8 @@ namespace IPCore
         //  Constructors
         //
 
-        SourceIPNode(const std::string& name, const NodeDefinition* def,
-                     IPGraph* graph, GroupIPNode* group = 0,
-                     const std::string mediaRepName = "",
-                     const bool mediaActive = true);
+        SourceIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group = 0,
+                     const std::string mediaRepName = "", const bool mediaActive = true);
 
         virtual ~SourceIPNode();
 
@@ -80,8 +78,7 @@ namespace IPCore
         virtual void onNewMediaComplete() {}
 
     protected:
-        void updateStereoViews(const std::vector<std::string>& views,
-                               StringProperty* viewsP) const;
+        void updateStereoViews(const std::vector<std::string>& views, StringProperty* viewsP) const;
 
         StringProperty* m_imageComponent;
         StringProperty* m_eyeViews;

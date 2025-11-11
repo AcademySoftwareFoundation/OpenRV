@@ -139,8 +139,7 @@ namespace stl_ext
         friend class fixed_block_arena;
     };
 
-    inline fixed_block_allocator::object_reference
-    fixed_block_allocator::iterator::operator*()
+    inline fixed_block_allocator::object_reference fixed_block_allocator::iterator::operator*()
     {
         // #if STL_EXT_DEBUG
         //    assert(_p);

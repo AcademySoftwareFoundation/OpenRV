@@ -29,8 +29,7 @@ namespace TwkGLF
         glGetProgramiv(pid, GL_ACTIVE_UNIFORMS, &activeUniforms);
         for (size_t i = 0; i < activeUniforms; ++i)
         {
-            glGetActiveUniform(pid, i, sizeof(uniformName) - 1, &nameLength,
-                               &uniformSize, &uniformType, uniformName);
+            glGetActiveUniform(pid, i, sizeof(uniformName) - 1, &nameLength, &uniformSize, &uniformType, uniformName);
             uniformName[nameLength] = 0;
             GLuint loc = glGetUniformLocation(pid, uniformName);
             m_uniformLocationMap[string(uniformName)] = loc;
@@ -61,8 +60,7 @@ namespace TwkGLF
 
         for (size_t i = 0; i < numActiveAttribs; ++i)
         {
-            glGetActiveAttrib(pid, i, nameBuffer.size(), &nameLength,
-                              &attribSize, &attribType, &nameBuffer.front());
+            glGetActiveAttrib(pid, i, nameBuffer.size(), &nameLength, &attribSize, &attribType, &nameBuffer.front());
 
             nameBuffer[nameLength] = 0;
 

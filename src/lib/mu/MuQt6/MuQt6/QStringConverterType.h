@@ -37,8 +37,7 @@ namespace Mu
         //  Constructors
         //
 
-        QStringConverterType(Context* context, const char* name,
-                             Class* superClass = 0);
+        QStringConverterType(Context* context, const char* name, Class* superClass = 0);
         virtual ~QStringConverterType();
 
         //

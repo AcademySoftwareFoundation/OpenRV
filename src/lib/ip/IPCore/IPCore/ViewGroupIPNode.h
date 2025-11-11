@@ -33,8 +33,7 @@ namespace IPCore
     class ViewGroupIPNode : public GroupIPNode
     {
     public:
-        ViewGroupIPNode(const std::string& name, const NodeDefinition* def,
-                        IPGraph* graph, GroupIPNode* group = 0);
+        ViewGroupIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group = 0);
 
         virtual ~ViewGroupIPNode();
 
@@ -48,10 +47,7 @@ namespace IPCore
 
         AudioTextureIPNode* waveformNode() const { return m_waveformNode; }
 
-        PipelineGroupIPNode* viewPipelineNode() const
-        {
-            return m_viewPipelineNode;
-        }
+        PipelineGroupIPNode* viewPipelineNode() const { return m_viewPipelineNode; }
 
     private:
         AdaptorIPNode* m_adaptor;

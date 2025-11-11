@@ -26,17 +26,13 @@ namespace TwkApp
 
     NOTIFIER_MESSAGE_IMP(Document, modeChangedMessage, "document mode changed")
     NOTIFIER_MESSAGE_IMP(Document, menuChangedMessage, "document menu changed")
-    NOTIFIER_MESSAGE_IMP(Document, selectionChangedMessage,
-                         "document selection changed")
+    NOTIFIER_MESSAGE_IMP(Document, selectionChangedMessage, "document selection changed")
     NOTIFIER_MESSAGE_IMP(Document, activeMessage, "document active")
-    NOTIFIER_MESSAGE_IMP(Document, bindingsChangedMessage,
-                         "document bindings changed")
+    NOTIFIER_MESSAGE_IMP(Document, bindingsChangedMessage, "document bindings changed")
     NOTIFIER_MESSAGE_IMP(Document, modeAddedMessage, "document mode added")
-    NOTIFIER_MESSAGE_IMP(Document, historyChangedMessage,
-                         "document history changed")
+    NOTIFIER_MESSAGE_IMP(Document, historyChangedMessage, "document history changed")
     NOTIFIER_MESSAGE_IMP(Document, deleteMessage, "document deleted")
-    NOTIFIER_MESSAGE_IMP(Document, filenameChangedMessage,
-                         "document filename changed")
+    NOTIFIER_MESSAGE_IMP(Document, filenameChangedMessage, "document filename changed")
 
     Document::Document()
         : TwkUtil::Notifier()
@@ -89,8 +85,7 @@ namespace TwkApp
 
     void Document::makeActive()
     {
-        Documents::iterator i =
-            find(m_documents.begin(), m_documents.end(), this);
+        Documents::iterator i = find(m_documents.begin(), m_documents.end(), this);
 
         if (i != m_documents.end())
         {
@@ -152,8 +147,7 @@ namespace TwkApp
         }
         else
         {
-            cerr << "WARNING: tried to activate non-existant mode " << name
-                 << endl;
+            cerr << "WARNING: tried to activate non-existant mode " << name << endl;
         }
     }
 
@@ -200,8 +194,7 @@ namespace TwkApp
         else
         {
             MinorMode* minorMode = static_cast<MinorMode*>(mode);
-            MinorModes::iterator i =
-                find(m_minorModes.begin(), m_minorModes.end(), minorMode);
+            MinorModes::iterator i = find(m_minorModes.begin(), m_minorModes.end(), minorMode);
 
             if (i == m_minorModes.end())
             {
@@ -231,8 +224,7 @@ namespace TwkApp
         else
         {
             MinorMode* minorMode = static_cast<MinorMode*>(mode);
-            MinorModes::iterator i =
-                find(m_minorModes.begin(), m_minorModes.end(), minorMode);
+            MinorModes::iterator i = find(m_minorModes.begin(), m_minorModes.end(), minorMode);
 
             if (i != m_minorModes.end())
             {
@@ -260,8 +252,7 @@ namespace TwkApp
 
         if (MinorMode* minorMode = dynamic_cast<MinorMode*>(m))
         {
-            MinorModes::iterator i =
-                find(m_minorModes.begin(), m_minorModes.end(), minorMode);
+            MinorModes::iterator i = find(m_minorModes.begin(), m_minorModes.end(), minorMode);
             return i != m_minorModes.end();
         }
 
@@ -280,8 +271,7 @@ namespace TwkApp
     {
         if (findModeByName(mode->name()))
         {
-            TWK_THROW_STREAM(DocumentException,
-                             "Duplicate mode: " << mode->name());
+            TWK_THROW_STREAM(DocumentException, "Duplicate mode: " << mode->name());
         }
 
         m_modes.insert(Modes::value_type(mode->name(), mode));
@@ -313,8 +303,7 @@ namespace TwkApp
         {
             m_menu = new Menu(m_majorMode->menu());
 
-            for (MinorModes::iterator i = m_minorModes.begin();
-                 i != m_minorModes.end(); ++i)
+            for (MinorModes::iterator i = m_minorModes.begin(); i != m_minorModes.end(); ++i)
             {
                 m_menu->merge((*i)->menu());
             }
@@ -337,9 +326,7 @@ namespace TwkApp
         //  checked in the correct order.
         //
 
-        for (EventTableNameStack::const_iterator ni =
-                 m_eventTableNameStack.begin();
-             ni != m_eventTableNameStack.end(); ++ni)
+        for (EventTableNameStack::const_iterator ni = m_eventTableNameStack.begin(); ni != m_eventTableNameStack.end(); ++ni)
         {
             const string& tname = *ni;
 
@@ -347,8 +334,7 @@ namespace TwkApp
             //  do the major mode
             //
 
-            EventTables::const_iterator ti =
-                m_majorMode->eventTables().find(tname);
+            EventTables::const_iterator ti = m_majorMode->eventTables().find(tname);
 
             if (ti != m_majorMode->eventTables().end())
             {
@@ -359,8 +345,7 @@ namespace TwkApp
             //  do the minor modes
             //
 
-            for (MinorModes::reverse_iterator mi = m_minorModes.rbegin();
-                 mi != m_minorModes.rend(); ++mi)
+            for (MinorModes::reverse_iterator mi = m_minorModes.rbegin(); mi != m_minorModes.rend(); ++mi)
             {
                 const EventTables& tables = (*mi)->eventTables();
                 EventTables::const_iterator ti = tables.find(tname);
@@ -380,8 +365,7 @@ namespace TwkApp
 
     void Document::setFocusTable(const EventTable* t) { m_focusTable = t; }
 
-    Document::ActionTablePair Document::queryEvent(const Event& event,
-                                                   const Action* after)
+    Document::ActionTablePair Document::queryEvent(const Event& event, const Action* after)
     {
         const EventTable* t = 0;
 
@@ -403,8 +387,7 @@ namespace TwkApp
                 }
                 else
                 {
-                    return ActionTablePair((const Action*)0,
-                                           (const EventTable*)0);
+                    return ActionTablePair((const Action*)0, (const EventTable*)0);
                 }
             }
             else
@@ -422,8 +405,7 @@ namespace TwkApp
                 Vec2i start(pe->startX(), pe->startY());
                 Vec2i current(pe->x(), pe->y());
 
-                if (t->bbox().intersects(start)
-                    || t->bbox().intersects(current))
+                if (t->bbox().intersects(start) || t->bbox().intersects(current))
                 {
                     if (pe->buttonStates())
                     {
@@ -492,16 +474,12 @@ namespace TwkApp
             {
                 event.m_table = atp.second;
 
-                bool outputEvent =
-                    (showEvents && event.name() != "render"
-                     && event.name() != "pre-render"
-                     && event.name() != "post-render"
-                     && event.name() != "per-render-event-processing");
+                bool outputEvent = (showEvents && event.name() != "render" && event.name() != "pre-render" && event.name() != "post-render"
+                                    && event.name() != "per-render-event-processing");
 
                 if (outputEvent)
                 {
-                    cerr << "Action begin on Event: '" << event.name() << "'"
-                         << endl;
+                    cerr << "Action begin on Event: '" << event.name() << "'" << endl;
                     startTime = debugTimer->elapsed();
                 }
 
@@ -520,14 +498,11 @@ namespace TwkApp
                             " by action '" << a->docString() << "' from table ";
                     */
 
-                    cerr << "Action complete on Event: '" << event.name()
-                         << "' " << ((event.handled) ? "handled" : "processed")
+                    cerr << "Action complete on Event: '" << event.name() << "' " << ((event.handled) ? "handled" : "processed")
                          << " by table ";
                     if (atp.second->mode())
                         cerr << atp.second->mode()->name() << ":";
-                    cerr << atp.second->name() << " ("
-                         << 1000.0 * (debugTimer->elapsed() - startTime)
-                         << "ms)" << endl;
+                    cerr << atp.second->name() << " (" << 1000.0 * (debugTimer->elapsed() - startTime) << "ms)" << endl;
                 }
 
                 if (event.handled)
@@ -554,8 +529,7 @@ namespace TwkApp
 
     void Document::pushTable(const string& name)
     {
-        EventTableNameStack::iterator i = find(
-            m_eventTableNameStack.begin(), m_eventTableNameStack.end(), name);
+        EventTableNameStack::iterator i = find(m_eventTableNameStack.begin(), m_eventTableNameStack.end(), name);
 
         if (i != m_eventTableNameStack.end())
         {
@@ -590,8 +564,7 @@ namespace TwkApp
     {
         setFocusTable(0);
 
-        EventTableNameStack::iterator i = find(
-            m_eventTableNameStack.begin(), m_eventTableNameStack.end(), name);
+        EventTableNameStack::iterator i = find(m_eventTableNameStack.begin(), m_eventTableNameStack.end(), name);
 
         if (i != m_eventTableNameStack.end())
         {
@@ -599,8 +572,7 @@ namespace TwkApp
         }
         else
         {
-            TWK_THROW_STREAM(DocumentException,
-                             "bad event table name: \"" << name << "\"");
+            TWK_THROW_STREAM(DocumentException, "bad event table name: \"" << name << "\"");
         }
 
         m_eventTableDirty = true;
@@ -621,21 +593,17 @@ namespace TwkApp
         Document* d = m_eventDocument;
         m_eventDocument = this;
 
-        bool outputEvent =
-            (showEvents && event.name() != "render"
-             && event.name() != "pre-render" && event.name() != "post-render"
-             && event.name() != "per-render-event-processing");
+        bool outputEvent = (showEvents && event.name() != "render" && event.name() != "pre-render" && event.name() != "post-render"
+                            && event.name() != "per-render-event-processing");
 
         if (outputEvent)
         {
             cerr << event;
             if (const RenderEvent* e = dynamic_cast<const RenderEvent*>(&event))
                 cerr << " '" << e->stringContent() << "'";
-            else if (const DragDropEvent* e =
-                         dynamic_cast<const DragDropEvent*>(&event))
+            else if (const DragDropEvent* e = dynamic_cast<const DragDropEvent*>(&event))
                 cerr << " '" << e->stringContent() << "'";
-            else if (const GenericStringEvent* e =
-                         dynamic_cast<const GenericStringEvent*>(&event))
+            else if (const GenericStringEvent* e = dynamic_cast<const GenericStringEvent*>(&event))
                 cerr << " '" << e->stringContent() << "'";
             cerr << endl;
         }

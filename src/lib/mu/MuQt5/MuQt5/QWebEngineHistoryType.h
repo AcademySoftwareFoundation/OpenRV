@@ -34,8 +34,7 @@ namespace Mu
         //  Constructors
         //
 
-        QWebEngineHistoryType(Context* context, const char* name,
-                              Class* superClass = 0);
+        QWebEngineHistoryType(Context* context, const char* name, Class* superClass = 0);
         virtual ~QWebEngineHistoryType();
 
         //

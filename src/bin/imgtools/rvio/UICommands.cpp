@@ -26,211 +26,132 @@ namespace RVIO
         commands->addSymbols(
             new Function(c, "resizeFit", resizeFit, None, Return, "void", End),
 
-            new Function(c, "setViewSize", setViewSize, None, Return, "void",
-                         Parameters, new Param(c, "width", "int"),
+            new Function(c, "setViewSize", setViewSize, None, Return, "void", Parameters, new Param(c, "width", "int"),
                          new Param(c, "height", "int"), End),
 
-            new Function(c, "popupMenu", popupMenu, None, Return, "void",
-                         Parameters, new Param(c, "event", "Event"),
-                         new Param(c, "menu", "MenuItem[]", Value(Pointer(0))),
-                         End),
+            new Function(c, "popupMenu", popupMenu, None, Return, "void", Parameters, new Param(c, "event", "Event"),
+                         new Param(c, "menu", "MenuItem[]", Value(Pointer(0))), End),
 
-            new Function(
-                c, "popupMenuAtPoint", popupMenuAtPoint, None, Return, "void",
-                Parameters, new Param(c, "x", "int"), new Param(c, "y", "int"),
-                new Param(c, "menu", "MenuItem[]", Value(Pointer(0))), End),
+            new Function(c, "popupMenuAtPoint", popupMenuAtPoint, None, Return, "void", Parameters, new Param(c, "x", "int"),
+                         new Param(c, "y", "int"), new Param(c, "menu", "MenuItem[]", Value(Pointer(0))), End),
 
-            new Function(c, "setWindowTitle", setWindowTitle, None, Return,
-                         "void", Parameters, new Param(c, "title", "string"),
-                         End),
+            new Function(c, "setWindowTitle", setWindowTitle, None, Return, "void", Parameters, new Param(c, "title", "string"), End),
 
             new Function(c, "center", center, None, Return, "void", End),
 
             new Function(c, "close", close, None, Return, "void", End),
 
-            new Function(c, "toggleMenuBar", toggleMenuBar, None, Return,
-                         "void", End),
+            new Function(c, "toggleMenuBar", toggleMenuBar, None, Return, "void", End),
 
-            new Function(c, "isMenuBarVisible", isMenuBarVisible, None, Return,
-                         "bool", End),
+            new Function(c, "isMenuBarVisible", isMenuBarVisible, None, Return, "bool", End),
 
-            new SymbolicConstant(c, "OneExistingFile", "int", Value(0)),
-            new SymbolicConstant(c, "ManyExistingFiles", "int", Value(0)),
-            new SymbolicConstant(c, "ManyExistingFilesAndDirectories", "int",
-                                 Value(0)),
-            new SymbolicConstant(c, "OneFileName", "int", Value(0)),
-            new SymbolicConstant(c, "OneDirectory", "int", Value(0)),
+            new SymbolicConstant(c, "OneExistingFile", "int", Value(0)), new SymbolicConstant(c, "ManyExistingFiles", "int", Value(0)),
+            new SymbolicConstant(c, "ManyExistingFilesAndDirectories", "int", Value(0)),
+            new SymbolicConstant(c, "OneFileName", "int", Value(0)), new SymbolicConstant(c, "OneDirectory", "int", Value(0)),
 
-            new Function(c, "openMediaFileDialog", openMediaFileDialog, None,
-                         Return, "string[]", Parameters,
-                         new Param(c, "associated", "bool"),
-                         new Param(c, "selectType", "int"),
-                         new Param(c, "filter", "string", Value(0)),
-                         new Param(c, "defaultPath", "string", Value(0)),
-                         new Param(c, "label", "string", Value(0)), End),
+            new Function(c, "openMediaFileDialog", openMediaFileDialog, None, Return, "string[]", Parameters,
+                         new Param(c, "associated", "bool"), new Param(c, "selectType", "int"), new Param(c, "filter", "string", Value(0)),
+                         new Param(c, "defaultPath", "string", Value(0)), new Param(c, "label", "string", Value(0)), End),
 
-            new Function(c, "openFileDialog", openFileDialog, None, Return,
-                         "string[]", Parameters,
-                         new Param(c, "associated", "bool"),
-                         new Param(c, "multiple", "bool", Value(false)),
-                         new Param(c, "directory", "bool", Value(false)),
-                         new Param(c, "filter", "string", Value(0)),
-                         new Param(c, "defaultPath", "string", Value(0)), End),
+            new Function(c, "openFileDialog", openFileDialog, None, Return, "string[]", Parameters, new Param(c, "associated", "bool"),
+                         new Param(c, "multiple", "bool", Value(false)), new Param(c, "directory", "bool", Value(false)),
+                         new Param(c, "filter", "string", Value(0)), new Param(c, "defaultPath", "string", Value(0)), End),
 
-            new Function(c, "saveFileDialog", saveFileDialog, None, Return,
-                         "string", Parameters,
-                         new Param(c, "associated", "bool"),
-                         new Param(c, "filter", "string", Value(0)),
-                         new Param(c, "defaultPath", "string", Value(0)), End),
+            new Function(c, "saveFileDialog", saveFileDialog, None, Return, "string", Parameters, new Param(c, "associated", "bool"),
+                         new Param(c, "filter", "string", Value(0)), new Param(c, "defaultPath", "string", Value(0)), End),
 
-            new SymbolicConstant(c, "CursorNone", "int", Value(0)),
-            new SymbolicConstant(c, "CursorArrow", "int", Value(2)),
+            new SymbolicConstant(c, "CursorNone", "int", Value(0)), new SymbolicConstant(c, "CursorArrow", "int", Value(2)),
             new SymbolicConstant(c, "CursorDefault", "int", Value(1)),
 
-            new Function(c, "setCursor", setCursor, None, Return, "void",
-                         Parameters, new Param(c, "cursorType", "int"), End),
+            new Function(c, "setCursor", setCursor, None, Return, "void", Parameters, new Param(c, "cursorType", "int"), End),
 
-            new SymbolicConstant(c, "InfoAlert", "int", Value(0)),
-            new SymbolicConstant(c, "WarningAlert", "int", Value(1)),
+            new SymbolicConstant(c, "InfoAlert", "int", Value(0)), new SymbolicConstant(c, "WarningAlert", "int", Value(1)),
             new SymbolicConstant(c, "ErrorAlert", "int", Value(2)),
 
-            new Function(c, "stereoSupported", stereoSupported, None, Return,
-                         "bool", End),
+            new Function(c, "stereoSupported", stereoSupported, None, Return, "bool", End),
 
-            new Function(c, "alertPanel", alertPanel, None, Return, "int",
-                         Parameters, new Param(c, "associated", "bool"),
-                         new Param(c, "type", "int"),
-                         new Param(c, "title", "string"),
-                         new Param(c, "message", "string"),
-                         new Param(c, "button0", "string"),
-                         new Param(c, "button1", "string"),
-                         new Param(c, "button2", "string"), End),
+            new Function(c, "alertPanel", alertPanel, None, Return, "int", Parameters, new Param(c, "associated", "bool"),
+                         new Param(c, "type", "int"), new Param(c, "title", "string"), new Param(c, "message", "string"),
+                         new Param(c, "button0", "string"), new Param(c, "button1", "string"), new Param(c, "button2", "string"), End),
 
-            new Function(c, "watchFile", watchFile, None, Return, "void",
-                         Parameters, new Param(c, "filename", "string"),
+            new Function(c, "watchFile", watchFile, None, Return, "void", Parameters, new Param(c, "filename", "string"),
                          new Param(c, "watch", "bool"), End),
 
-            new Function(c, "showConsole", showConsole, None, Return, "void",
-                         End),
+            new Function(c, "showConsole", showConsole, None, Return, "void", End),
 
-            new Function(c, "isConsoleVisible", isConsoleVisible, None, Return,
-                         "bool", End),
+            new Function(c, "isConsoleVisible", isConsoleVisible, None, Return, "bool", End),
             // network
 
-            new Function(c, "remoteSendMessage", remoteSendMessage, None,
-                         Return, "void", Parameters,
-                         new Param(c, "message", "string"),
+            new Function(c, "remoteSendMessage", remoteSendMessage, None, Return, "void", Parameters, new Param(c, "message", "string"),
                          new Param(c, "recipients", "string[]", Value(0)), End),
 
-            new Function(c, "remoteSendEvent", remoteSendEvent, None, Return,
-                         "void", Parameters, new Param(c, "event", "string"),
-                         new Param(c, "target", "string"),
-                         new Param(c, "contents", "string"),
+            new Function(c, "remoteSendEvent", remoteSendEvent, None, Return, "void", Parameters, new Param(c, "event", "string"),
+                         new Param(c, "target", "string"), new Param(c, "contents", "string"),
                          new Param(c, "recipients", "string[]", Value(0)), End),
 
-            new Function(c, "remoteConnections", remoteConnections, None,
-                         Return, "string[]", End),
+            new Function(c, "remoteConnections", remoteConnections, None, Return, "string[]", End),
 
-            new Function(c, "remoteApplications", remoteApplications, None,
-                         Return, "string[]", End),
+            new Function(c, "remoteApplications", remoteApplications, None, Return, "string[]", End),
 
-            new Function(c, "remoteContacts", remoteContacts, None, Return,
-                         "string[]", End),
+            new Function(c, "remoteContacts", remoteContacts, None, Return, "string[]", End),
 
-            new Function(c, "remoteLocalContactName", remoteLocalContactName,
-                         None, Return, "string", End),
+            new Function(c, "remoteLocalContactName", remoteLocalContactName, None, Return, "string", End),
 
-            new Function(c, "remoteConnect", remoteConnect, None, Return,
-                         "void", Parameters, new Param(c, "name", "string"),
-                         new Param(c, "host", "string"),
-                         new Param(c, "port", "int", Value(0)), End),
+            new Function(c, "remoteConnect", remoteConnect, None, Return, "void", Parameters, new Param(c, "name", "string"),
+                         new Param(c, "host", "string"), new Param(c, "port", "int", Value(0)), End),
 
-            new Function(c, "remoteDisconnect", remoteDisconnect, None, Return,
-                         "void", Parameters,
-                         new Param(c, "remoteContact", "string"), End),
+            new Function(c, "remoteDisconnect", remoteDisconnect, None, Return, "void", Parameters, new Param(c, "remoteContact", "string"),
+                         End),
 
-            new Function(c, "remoteNetwork", remoteNetwork, None, Return,
-                         "void", Parameters, new Param(c, "on", "bool"), End),
+            new Function(c, "remoteNetwork", remoteNetwork, None, Return, "void", Parameters, new Param(c, "on", "bool"), End),
 
-            new SymbolicConstant(c, "NetworkStatusOn", "int", Value(1)),
-            new SymbolicConstant(c, "NetworkStatusOff", "int", Value(0)),
+            new SymbolicConstant(c, "NetworkStatusOn", "int", Value(1)), new SymbolicConstant(c, "NetworkStatusOff", "int", Value(0)),
 
-            new Function(c, "remoteNetworkStatus", remoteNetworkStatus, None,
-                         Return, "int", End),
+            new Function(c, "remoteNetworkStatus", remoteNetworkStatus, None, Return, "int", End),
 
-            new Function(c, "writeSetting", writeSetting, None, Return, "void",
-                         Parameters, new Param(c, "group", "string"),
-                         new Param(c, "name", "string"),
-                         new Param(c, "value", "SettingsValue"), End),
+            new Function(c, "writeSetting", writeSetting, None, Return, "void", Parameters, new Param(c, "group", "string"),
+                         new Param(c, "name", "string"), new Param(c, "value", "SettingsValue"), End),
 
-            new Function(c, "readSetting", readSetting, None, Return,
-                         "SettingsValue", Parameters,
-                         new Param(c, "group", "string"),
-                         new Param(c, "name", "string"),
-                         new Param(c, "defaultValue", "SettingsValue"), End),
+            new Function(c, "readSetting", readSetting, None, Return, "SettingsValue", Parameters, new Param(c, "group", "string"),
+                         new Param(c, "name", "string"), new Param(c, "defaultValue", "SettingsValue"), End),
 
-            new Function(
-                c, "httpGet", httpGet, None, Return, "void", Parameters,
-                new Param(c, "url", "string"),
-                new Param(c, "headers", "[(string,string)]"),
-                new Param(c, "replyEvent", "string"),
-                new Param(c, "authenticationEvent", "string",
-                          Value(Pointer(0))),
-                new Param(c, "progressEvent", "string", Value(Pointer(0))),
-                new Param(c, "ignoreSslErrors", "bool", Value(false)), End),
+            new Function(c, "httpGet", httpGet, None, Return, "void", Parameters, new Param(c, "url", "string"),
+                         new Param(c, "headers", "[(string,string)]"), new Param(c, "replyEvent", "string"),
+                         new Param(c, "authenticationEvent", "string", Value(Pointer(0))),
+                         new Param(c, "progressEvent", "string", Value(Pointer(0))), new Param(c, "ignoreSslErrors", "bool", Value(false)),
+                         End),
 
-            new Function(
-                c, "httpPost", httpPost, None, Return, "void", Parameters,
-                new Param(c, "url", "string"),
-                new Param(c, "headers", "[(string,string)]"),
-                new Param(c, "postString", "string"),
-                new Param(c, "replyEvent", "string"),
-                new Param(c, "authenticationEvent", "string",
-                          Value(Pointer(0))),
-                new Param(c, "progressEvent", "string", Value(Pointer(0))),
-                new Param(c, "ignoreSslErrors", "bool", Value(false)), End),
+            new Function(c, "httpPost", httpPost, None, Return, "void", Parameters, new Param(c, "url", "string"),
+                         new Param(c, "headers", "[(string,string)]"), new Param(c, "postString", "string"),
+                         new Param(c, "replyEvent", "string"), new Param(c, "authenticationEvent", "string", Value(Pointer(0))),
+                         new Param(c, "progressEvent", "string", Value(Pointer(0))), new Param(c, "ignoreSslErrors", "bool", Value(false)),
+                         End),
 
-            new Function(c, "mainWindowWidget", mainWindowWidget, None, Return,
-                         "qt.QMainWindow", End),
+            new Function(c, "mainWindowWidget", mainWindowWidget, None, Return, "qt.QMainWindow", End),
 
-            new Function(c, "networkAccessManager", networkAccessManager, None,
-                         Return, "qt.QNetworkAccessManager", End),
+            new Function(c, "networkAccessManager", networkAccessManager, None, Return, "qt.QNetworkAccessManager", End),
 
-            new Function(c, "javascriptMuExport", javascriptMuExport, None,
-                         Return, "void", Parameters,
+            new Function(c, "javascriptMuExport", javascriptMuExport, None, Return, "void", Parameters,
                          new Param(c, "frame", "qt.QWebFrame"), End),
 
-            new Function(c, "sessionFromUrl", sessionFromUrl, None, Return,
-                         "void", Parameters, new Param(c, "url", "string"),
-                         End),
+            new Function(c, "sessionFromUrl", sessionFromUrl, None, Return, "void", Parameters, new Param(c, "url", "string"), End),
 
-            new Function(c, "putUrlOnClipboard", putUrlOnClipboard, None,
-                         Return, "void", Parameters,
-                         new Param(c, "url", "string"),
-                         new Param(c, "title", "string"),
-                         new Param(c, "doEncode", "bool", Value(true)), End),
+            new Function(c, "putUrlOnClipboard", putUrlOnClipboard, None, Return, "void", Parameters, new Param(c, "url", "string"),
+                         new Param(c, "title", "string"), new Param(c, "doEncode", "bool", Value(true)), End),
 
-            new Function(c, "myNetworkPort", myNetworkPort, None, Return, "int",
-                         End),
+            new Function(c, "myNetworkPort", myNetworkPort, None, Return, "int", End),
 
-            new Function(c, "myNetworkHost", myNetworkHost, None, Return,
-                         "string", End),
+            new Function(c, "myNetworkHost", myNetworkHost, None, Return, "string", End),
 
-            new Function(c, "encodePassword", encodePassword, None, Return,
-                         "string", Parameters,
-                         new Param(c, "password", "string"), End),
+            new Function(c, "encodePassword", encodePassword, None, Return, "string", Parameters, new Param(c, "password", "string"), End),
 
-            new Function(c, "decodePassword", decodePassword, None, Return,
-                         "string", Parameters,
-                         new Param(c, "password", "string"), End),
+            new Function(c, "decodePassword", decodePassword, None, Return, "string", Parameters, new Param(c, "password", "string"), End),
 
             new Function(c, "cacheDir", cacheDir, None, Return, "string", End),
 
-            new Function(c, "openUrl", openUrl, None, Return, "void",
-                         Parameters, new Param(c, "url", "string"), End),
+            new Function(c, "openUrl", openUrl, None, Return, "void", Parameters, new Param(c, "url", "string"), End),
 
-            new Function(c, "devicePixelRatio", devicePixelRatio, None, Return,
-                         "float", End),
+            new Function(c, "devicePixelRatio", devicePixelRatio, None, Return, "float", End),
 
             EndArguments);
     }
@@ -253,10 +174,7 @@ namespace RVIO
 
     NODE_IMPLEMENTATION(isMenuBarVisible, bool) { NODE_RETURN(false); }
 
-    NODE_IMPLEMENTATION(openMediaFileDialog, Pointer)
-    {
-        NODE_RETURN((Pointer)0);
-    }
+    NODE_IMPLEMENTATION(openMediaFileDialog, Pointer) { NODE_RETURN((Pointer)0); }
 
     NODE_IMPLEMENTATION(openFileDialog, Pointer) { NODE_RETURN((Pointer)0); }
 

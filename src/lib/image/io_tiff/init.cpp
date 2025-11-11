@@ -51,19 +51,11 @@ extern "C"
                 int argc = newargs.size();
 
                 options_description desc("");
-                desc.add_options()(
-                    "addAlpha", value<int>(&addAlpha)->default_value(addAlpha),
-                    "")(
-                    "planar3channel",
-                    value<int>(&planar3channel)->default_value(planar3channel),
-                    "")("ioMethod",
-                        value<int>(&ioMethod)->default_value(ioMethod),
-                        "I/O Method")(
-                    "ioSize", value<int>(&ioSize)->default_value(ioSize),
-                    "I/O Max async read size")(
-                    "ioMaxAsync",
-                    value<int>(&ioMaxAsync)->default_value(ioMaxAsync),
-                    "I/O Max ASync Requests");
+                desc.add_options()("addAlpha", value<int>(&addAlpha)->default_value(addAlpha),
+                                   "")("planar3channel", value<int>(&planar3channel)->default_value(planar3channel),
+                                       "")("ioMethod", value<int>(&ioMethod)->default_value(ioMethod),
+                                           "I/O Method")("ioSize", value<int>(&ioSize)->default_value(ioSize), "I/O Max async read size")(
+                    "ioMaxAsync", value<int>(&ioMaxAsync)->default_value(ioMaxAsync), "I/O Max ASync Requests");
 
                 variables_map vm;
                 store(parse_command_line(argc, argv, desc), vm);
@@ -80,9 +72,7 @@ extern "C"
             }
         }
 
-        return new IOtiff(addAlpha, planar3channel,
-                          (StreamingFrameBufferIO::IOType)ioMethod, ioSize,
-                          ioMaxAsync);
+        return new IOtiff(addAlpha, planar3channel, (StreamingFrameBufferIO::IOType)ioMethod, ioSize, ioMaxAsync);
     }
 
     void destroy(IOtiff* plug) { delete plug; }

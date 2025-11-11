@@ -26,8 +26,7 @@ namespace IPCore
     using namespace stl_ext;
     using namespace TwkMath;
 
-    IPNode::IPNode(const string& name, const NodeDefinition* definition,
-                   IPGraph* graph, GroupIPNode* group)
+    IPNode::IPNode(const string& name, const NodeDefinition* definition, IPGraph* graph, GroupIPNode* group)
         : PropertyContainer()
         , m_definition(definition)
         , m_graph(graph)
@@ -75,10 +74,7 @@ namespace IPCore
         }
     }
 
-    void IPNode::copy(const PropertyContainer* p)
-    {
-        PropertyContainer::copy(p);
-    }
+    void IPNode::copy(const PropertyContainer* p) { PropertyContainer::copy(p); }
 
     bool IPNode::isWritable() const
     {
@@ -133,8 +129,7 @@ namespace IPCore
 
     bool IPNode::isInput(IPNode* n) const
     {
-        IPNodes::const_iterator it =
-            std::find(m_inputs.begin(), m_inputs.end(), n);
+        IPNodes::const_iterator it = std::find(m_inputs.begin(), m_inputs.end(), n);
 
         return it != m_inputs.end();
     }
@@ -143,8 +138,7 @@ namespace IPCore
     {
         if (!isInput(n))
         {
-            cout << "ERROR: asked to remove non-existant input " << n->name()
-                 << " from " << name() << endl;
+            cout << "ERROR: asked to remove non-existant input " << n->name() << " from " << name() << endl;
 
             return;
         }
@@ -238,8 +232,7 @@ namespace IPCore
         {
             if (!nodes[i])
             {
-                cout << "ERROR: NULL node passed to setInputs in node "
-                     << name() << endl;
+                cout << "ERROR: NULL node passed to setInputs in node " << name() << endl;
             }
         }
 
@@ -249,10 +242,7 @@ namespace IPCore
         //
 
         {
-            HOP_PROF_DYN_NAME(
-                std::string(std::to_string(m_inputs.size())
-                            + std::string(" nodes - outputDisconnect"))
-                    .c_str());
+            HOP_PROF_DYN_NAME(std::string(std::to_string(m_inputs.size()) + std::string(" nodes - outputDisconnect")).c_str());
 
             for (size_t i = 0; i < m_inputs.size(); i++)
             {
@@ -278,12 +268,10 @@ namespace IPCore
                     //  case.
                     //
 
-                    cout << "WARNING: the input and output groups do not match:"
-                         << endl;
+                    cout << "WARNING: the input and output groups do not match:" << endl;
                     cout << "         lhs node " << m_inputs[i]->name();
                     if (m_inputs[i]->group())
-                        cout << " is member of "
-                             << m_inputs[i]->group()->name();
+                        cout << " is member of " << m_inputs[i]->group()->name();
                     else
                         cout << " is top level node";
                     cout << endl;
@@ -318,8 +306,7 @@ namespace IPCore
 
     void IPNode::outputDisconnect(IPNode* node)
     {
-        IPNodes::iterator i =
-            std::find(m_outputs.begin(), m_outputs.end(), node);
+        IPNodes::iterator i = std::find(m_outputs.begin(), m_outputs.end(), node);
         if (i != m_outputs.end())
             m_outputs.erase(i);
         m_outputsChangedSignal();
@@ -333,10 +320,7 @@ namespace IPCore
         m_outputsChangedSignal();
     }
 
-    IPNode::Context IPNode::contextForFrame(int frame)
-    {
-        return graph()->contextForFrame(frame);
-    }
+    IPNode::Context IPNode::contextForFrame(int frame) { return graph()->contextForFrame(frame); }
 
     IPImage* IPNode::evaluate(const Context& context)
     {
@@ -401,10 +385,7 @@ namespace IPCore
         }
     }
 
-    IPNode::Matrix IPNode::localMatrix(const Context&) const
-    {
-        return Matrix();
-    }
+    IPNode::Matrix IPNode::localMatrix(const Context&) const { return Matrix(); }
 
     // IPNode::Matrix
     // IPNode::localMatrixForInput(const Context&) const
@@ -446,8 +427,7 @@ namespace IPCore
         visitor.leave(this);
     }
 
-    void IPNode::testEvaluate(const Context& context,
-                              TestEvaluationResult& result)
+    void IPNode::testEvaluate(const Context& context, TestEvaluationResult& result)
     {
         if (inputs().empty())
             return;
@@ -468,8 +448,7 @@ namespace IPCore
         return ImageRangeInfo();
     }
 
-    IPNode::ImageStructureInfo
-    IPNode::imageStructureInfo(const Context& context) const
+    IPNode::ImageStructureInfo IPNode::imageStructureInfo(const Context& context) const
     {
         if (m_inputs.size())
         {
@@ -675,9 +654,7 @@ namespace IPCore
             {
                 auto outputTarget = target;
                 if ((target & GroupAndGraphInOutputPropagateTarget) == 0)
-                    outputTarget = PropagateTarget(
-                        target
-                        & ~(GraphPropagateTarget | GroupPropagateTarget));
+                    outputTarget = PropagateTarget(target & ~(GraphPropagateTarget | GroupPropagateTarget));
 
                 int outputNum = 0;
                 for (auto& currOutput : m_outputs)
@@ -716,17 +693,13 @@ namespace IPCore
             {
                 auto outputTarget = target;
                 if ((target & GroupAndGraphInOutputPropagateTarget) == 0)
-                    outputTarget = PropagateTarget(
-                        target
-                        & ~(GraphPropagateTarget | GroupPropagateTarget));
+                    outputTarget = PropagateTarget(target & ~(GraphPropagateTarget | GroupPropagateTarget));
 
                 int outputNum = 0;
                 for (auto& currOutput : m_outputs)
                 {
-                    currOutput->inputImageStructureChanged(outputNum++,
-                                                           outputTarget);
-                    currOutput->propagateImageStructureChangeInternal(
-                        outputTarget);
+                    currOutput->inputImageStructureChanged(outputNum++, outputTarget);
+                    currOutput->propagateImageStructureChangeInternal(outputTarget);
                 }
             }
         }
@@ -756,15 +729,12 @@ namespace IPCore
             {
                 auto outputTarget = target;
                 if ((target & GroupAndGraphInOutputPropagateTarget) == 0)
-                    outputTarget = PropagateTarget(
-                        target
-                        & ~(GraphPropagateTarget | GroupPropagateTarget));
+                    outputTarget = PropagateTarget(target & ~(GraphPropagateTarget | GroupPropagateTarget));
                 int outputPin = 0;
 
                 for (auto& currOutput : m_outputs)
                 {
-                    currOutput->inputMediaChanged(this, outputPin++,
-                                                  outputTarget);
+                    currOutput->inputMediaChanged(this, outputPin++, outputTarget);
                     currOutput->propagateMediaChangeInternal(outputTarget);
                 }
             }
@@ -799,10 +769,7 @@ namespace IPCore
 
     void IPNode::inputImageStructureChanged(int, PropagateTarget target) {}
 
-    void IPNode::inputMediaChanged(IPNode* srcNode, int srcNodeInputNdx,
-                                   PropagateTarget target)
-    {
-    }
+    void IPNode::inputMediaChanged(IPNode* srcNode, int srcNodeInputNdx, PropagateTarget target) {}
 
     void IPNode::flushAllCaches(const FlushContext&) {}
 
@@ -840,13 +807,9 @@ namespace IPCore
         m_graph->propertyDeleted(name);
     }
 
-    void IPNode::propertyWillChange(const Property* p)
-    {
-        m_propertyWillChangeSignal(p);
-    }
+    void IPNode::propertyWillChange(const Property* p) { m_propertyWillChangeSignal(p); }
 
-    void IPNode::propertyWillInsert(const Property* p, size_t index,
-                                    size_t size)
+    void IPNode::propertyWillInsert(const Property* p, size_t index, size_t size)
     {
         m_propertyWillInsertSignal(p, index, size);
         m_graph->propertyWillInsert(p, index, size);
@@ -876,8 +839,7 @@ namespace IPCore
 
             if (maxNum > 0)
             {
-                msg << " accepts no more than " << maxNum << " input"
-                    << (maxNum > 1 ? "s" : "") << endl;
+                msg << " accepts no more than " << maxNum << " input" << (maxNum > 1 ? "s" : "") << endl;
             }
             else
             {
@@ -924,8 +886,7 @@ namespace IPCore
         return true;
     }
 
-    IPNode::InputComparisonResult
-    IPNode::compareToInputs(const IPNodes& nodes) const
+    IPNode::InputComparisonResult IPNode::compareToInputs(const IPNodes& nodes) const
     {
         if (m_inputs.size() <= nodes.size())
         {
@@ -991,8 +952,7 @@ namespace IPCore
         return DiffersResult;
     }
 
-    void IPNode::inputReordering(const IPNodes& newOrder,
-                                 IndexArray& indices) const
+    void IPNode::inputReordering(const IPNodes& newOrder, IndexArray& indices) const
     {
         size_t s = inputs().size();
         indices.resize(s);
@@ -1027,9 +987,7 @@ namespace IPCore
             graph()->inputsChanged(this);
     }
 
-    void IPNode::inputPartialReordering(const IPNodes& newOrder,
-                                        IndexArray& removeIndices,
-                                        IndexArray& reorderIndices) const
+    void IPNode::inputPartialReordering(const IPNodes& newOrder, IndexArray& removeIndices, IndexArray& reorderIndices) const
     {
         //
         //  NOTE: this function has to handle duplicate inputs. Hence the
@@ -1078,9 +1036,7 @@ namespace IPCore
         }
     }
 
-    void IPNode::mapInputToEvalFrames(size_t inputIndex,
-                                      const vector<int>& inframe,
-                                      vector<int>& outframes) const
+    void IPNode::mapInputToEvalFrames(size_t inputIndex, const vector<int>& inframe, vector<int>& outframes) const
     {
         std::copy(inframe.begin(), inframe.end(), back_inserter(outframes));
     }
@@ -1100,14 +1056,12 @@ namespace IPCore
             info.pop_back();
     }
 
-    bool IPNode::MetaEvalPath::traverseChild(const Context& c, size_t index,
-                                             IPNode* parent, IPNode* child)
+    bool IPNode::MetaEvalPath::traverseChild(const Context& c, size_t index, IPNode* parent, IPNode* child)
     {
         return child->isMetaSearchable() && !found;
     }
 
-    void IPNode::MetaEvalClosestByTypeName::enter(const Context& c,
-                                                  IPNode* node)
+    void IPNode::MetaEvalClosestByTypeName::enter(const Context& c, IPNode* node)
     {
         if (node->protocol() == typeName)
         {
@@ -1115,17 +1069,12 @@ namespace IPCore
         }
     }
 
-    bool IPNode::MetaEvalClosestByTypeName::traverseChild(const Context& c,
-                                                          size_t index,
-                                                          IPNode* parent,
-                                                          IPNode* child)
+    bool IPNode::MetaEvalClosestByTypeName::traverseChild(const Context& c, size_t index, IPNode* parent, IPNode* child)
     {
-        return child->isMetaSearchable()
-               && (info.empty() || info.back().node != parent);
+        return child->isMetaSearchable() && (info.empty() || info.back().node != parent);
     }
 
-    void IPNode::MetaEvalFirstClosestByTypeName::enter(const Context& c,
-                                                       IPNode* node)
+    void IPNode::MetaEvalFirstClosestByTypeName::enter(const Context& c, IPNode* node)
     {
         if (node->protocol() == typeName)
         {
@@ -1133,25 +1082,19 @@ namespace IPCore
         }
     }
 
-    bool IPNode::MetaEvalFirstClosestByTypeName::traverseChild(const Context& c,
-                                                               size_t index,
-                                                               IPNode* parent,
-                                                               IPNode* child)
+    bool IPNode::MetaEvalFirstClosestByTypeName::traverseChild(const Context& c, size_t index, IPNode* parent, IPNode* child)
     {
         return child->isMetaSearchable() && info.empty();
     }
 
-    bool IPNode::PropertyAsFramesVisitor::traverseChild(size_t index,
-                                                        IPNode* parent,
-                                                        IPNode* child)
+    bool IPNode::PropertyAsFramesVisitor::traverseChild(size_t index, IPNode* parent, IPNode* child)
     {
         //
         //  NOTE: if the nodeMap already has a value for child then we've
         //  already visited it and its result is already cached.
         //
 
-        return child->isMetaSearchable() && currentDepth <= depth
-               && !nodeMap.count(child);
+        return child->isMetaSearchable() && currentDepth <= depth && !nodeMap.count(child);
     }
 
     void IPNode::PropertyAsFramesVisitor::enter(IPNode* n)
@@ -1169,8 +1112,7 @@ namespace IPCore
         {
             if (nodeMap.count(a->groupInputNode()))
             {
-                n->mapInputToEvalFrames(0, nodeMap[a->groupInputNode()],
-                                        nodeMap[n]);
+                n->mapInputToEvalFrames(0, nodeMap[a->groupInputNode()], nodeMap[n]);
             }
         }
         else if (GroupIPNode* g = dynamic_cast<GroupIPNode*>(n))
@@ -1201,9 +1143,7 @@ namespace IPCore
         }
     }
 
-    bool IPNode::ClosestByTypeNameVisitor::traverseChild(size_t index,
-                                                         IPNode* parent,
-                                                         IPNode* child)
+    bool IPNode::ClosestByTypeNameVisitor::traverseChild(size_t index, IPNode* parent, IPNode* child)
     {
         return child->isMetaSearchable() && currentDepth <= maxDepth;
     }
@@ -1297,8 +1237,7 @@ namespace IPCore
         setInputs(inputs);
     }
 
-    void IPNode::setInputs4(IPNode* node0, IPNode* node1, IPNode* node2,
-                            IPNode* node3)
+    void IPNode::setInputs4(IPNode* node0, IPNode* node1, IPNode* node2, IPNode* node3)
     {
         IPNodes inputs(2);
         inputs[0] = node0;
@@ -1337,20 +1276,11 @@ namespace IPCore
 
         typedef size_t (*FieldFunc)(const IPImage::ResourceUsage&);
 
-        size_t returnBuffersFunc(const IPImage::ResourceUsage& u)
-        {
-            return u.buffers;
-        }
+        size_t returnBuffersFunc(const IPImage::ResourceUsage& u) { return u.buffers; }
 
-        size_t returnCoordsFunc(const IPImage::ResourceUsage& u)
-        {
-            return u.coords;
-        }
+        size_t returnCoordsFunc(const IPImage::ResourceUsage& u) { return u.coords; }
 
-        size_t returnFetchesFunc(const IPImage::ResourceUsage& u)
-        {
-            return u.fetches;
-        }
+        size_t returnFetchesFunc(const IPImage::ResourceUsage& u) { return u.fetches; }
 
         struct CompareCount
         {
@@ -1361,16 +1291,11 @@ namespace IPCore
 
             FieldFunc field;
 
-            bool operator()(const IPImage* a, const IPImage* b)
-            {
-                return field(a->resourceUsage) >= field(b->resourceUsage);
-            }
+            bool operator()(const IPImage* a, const IPImage* b) { return field(a->resourceUsage) >= field(b->resourceUsage); }
         };
 
-        bool assignByResourceCount(const IPNode* node, FieldFunc field,
-                                   const IPImage::ResourceUsage& usage,
-                                   IPImageVector& images, IPImageSet& modified,
-                                   size_t maxValue)
+        bool assignByResourceCount(const IPNode* node, FieldFunc field, const IPImage::ResourceUsage& usage, IPImageVector& images,
+                                   IPImageSet& modified, size_t maxValue)
         {
             bool modifiedSomething = false;
             size_t ncurrent = field(usage);
@@ -1381,8 +1306,7 @@ namespace IPCore
 
             sort(sortedImages.begin(), sortedImages.end(), CompareCount(field));
 
-            for (size_t i = 0; i < sortedImages.size() && ncurrent > maxValue;
-                 i++)
+            for (size_t i = 0; i < sortedImages.size() && ncurrent > maxValue; i++)
             {
                 IPImage* img = sortedImages[i];
 
@@ -1428,8 +1352,7 @@ namespace IPCore
 
         if (root->destination != IPImage::IntermediateBuffer && root->children)
         {
-            bool needToInsert =
-                needToInsertIntermediateRecursive(root->children);
+            bool needToInsert = needToInsertIntermediateRecursive(root->children);
             if (needToInsert)
                 return true;
         }
@@ -1440,9 +1363,7 @@ namespace IPCore
         return false;
     }
 
-    IPImage*
-    IPNode::insertIntermediateRendersForPaint(IPImage* root,
-                                              const Context& context) const
+    IPImage* IPNode::insertIntermediateRendersForPaint(IPImage* root, const Context& context) const
     {
         if (root->destination == IPImage::IntermediateBuffer)
         {
@@ -1455,24 +1376,18 @@ namespace IPCore
         if (!needToInsert)
             return root;
 
-        IPImage* nroot =
-            new IPImage(this, IPImage::BlendRenderType, context.viewWidth,
-                        context.viewHeight, 1.0, IPImage::IntermediateBuffer,
-                        IPImage::FloatDataType);
+        IPImage* nroot = new IPImage(this, IPImage::BlendRenderType, context.viewWidth, context.viewHeight, 1.0,
+                                     IPImage::IntermediateBuffer, IPImage::FloatDataType);
 
         root->fitToAspect(nroot->displayAspect());
         nroot->appendChild(root);
         nroot->shaderExpr = Shader::newSourceRGBA(nroot);
-        nroot->resourceUsage =
-            nroot->shaderExpr->computeResourceUsageRecursive();
+        nroot->resourceUsage = nroot->shaderExpr->computeResourceUsageRecursive();
         return nroot;
     }
 
-    void IPNode::balanceResourceUsage(UsageFunction accumFunc,
-                                      IPImageVector& images,
-                                      IPImageSet& modified, size_t maxBuffers,
-                                      size_t maxCoords, size_t maxFetches,
-                                      size_t incomingSamplers) const
+    void IPNode::balanceResourceUsage(UsageFunction accumFunc, IPImageVector& images, IPImageSet& modified, size_t maxBuffers,
+                                      size_t maxCoords, size_t maxFetches, size_t incomingSamplers) const
     {
         IPImage::ResourceUsage usage = accumFunc(images);
 
@@ -1480,8 +1395,7 @@ namespace IPCore
         //  First check limit of texture buffers (images)
         //
 
-        if (assignByResourceCount(this, returnBuffersFunc, usage, images,
-                                  modified, maxBuffers + incomingSamplers))
+        if (assignByResourceCount(this, returnBuffersFunc, usage, images, modified, maxBuffers + incomingSamplers))
         {
             accumFunc(images);
         }
@@ -1490,8 +1404,7 @@ namespace IPCore
         //  Next limit of coordinates
         //
 
-        if (assignByResourceCount(this, returnCoordsFunc, usage, images,
-                                  modified, maxCoords))
+        if (assignByResourceCount(this, returnCoordsFunc, usage, images, modified, maxCoords))
         {
             accumFunc(images);
         }
@@ -1501,14 +1414,13 @@ namespace IPCore
         //  dynamically determined depending on the hardware).
         //
 
-        assignByResourceCount(this, returnFetchesFunc, usage, images, modified,
-                              maxFetches);
+        assignByResourceCount(this, returnFetchesFunc, usage, images, modified, maxFetches);
     }
 
     bool IPNode::willConvertToIntermediate(IPImage* img)
     {
-        return (img->renderType == IPImage::BlendRenderType && !img->shaderExpr
-                && !img->mergeExpr && img->children && !img->noIntermediate);
+        return (img->renderType == IPImage::BlendRenderType && !img->shaderExpr && !img->mergeExpr && img->children
+                && !img->noIntermediate);
     }
 
     bool IPNode::convertBlendRenderTypeToIntermediate(IPImage* img)
@@ -1517,8 +1429,7 @@ namespace IPCore
         {
             img->destination = IPImage::IntermediateBuffer;
             img->shaderExpr = Shader::newSourceRGBA(img);
-            img->resourceUsage =
-                img->shaderExpr->computeResourceUsageRecursive();
+            img->resourceUsage = img->shaderExpr->computeResourceUsageRecursive();
 
             return true;
         }
@@ -1526,9 +1437,7 @@ namespace IPCore
         return false;
     }
 
-    bool
-    IPNode::convertBlendRenderTypeToIntermediate(const IPImageVector& images,
-                                                 IPImageSet& modifiedImages)
+    bool IPNode::convertBlendRenderTypeToIntermediate(const IPImageVector& images, IPImageSet& modifiedImages)
     {
         for (size_t i = 0; i < images.size(); i++)
         {
@@ -1541,11 +1450,8 @@ namespace IPCore
         return !modifiedImages.empty();
     }
 
-    void
-    IPNode::assembleMergeExpressions(IPImage* root, IPImageVector& inImages,
-                                     const IPImageSet& modifiedImages,
-                                     bool isFilter,
-                                     Shader::ExpressionVector& inExpressions)
+    void IPNode::assembleMergeExpressions(IPImage* root, IPImageVector& inImages, const IPImageSet& modifiedImages, bool isFilter,
+                                          Shader::ExpressionVector& inExpressions)
     {
         for (size_t i = 0; i < inImages.size(); i++)
         {
@@ -1559,17 +1465,13 @@ namespace IPCore
             //  thing.
             //
 
-            if (!inImages[i]->commands.empty()
-                || (inImages[i]->fb && inImages[i]->fb->needsUncrop()))
+            if (!inImages[i]->commands.empty() || (inImages[i]->fb && inImages[i]->fb->needsUncrop()))
             {
-                IPImage* newImage = new IPImage(
-                    this, IPImage::BlendRenderType, inImages[i]->width,
-                    inImages[i]->height, 1.0, IPImage::IntermediateBuffer,
-                    IPImage::FloatDataType);
+                IPImage* newImage = new IPImage(this, IPImage::BlendRenderType, inImages[i]->width, inImages[i]->height, 1.0,
+                                                IPImage::IntermediateBuffer, IPImage::FloatDataType);
                 newImage->children = inImages[i];
                 newImage->shaderExpr = Shader::newSourceRGBA(newImage);
-                newImage->resourceUsage =
-                    newImage->shaderExpr->computeResourceUsageRecursive();
+                newImage->resourceUsage = newImage->shaderExpr->computeResourceUsageRecursive();
                 inImages[i] = newImage;
             }
 
@@ -1588,12 +1490,10 @@ namespace IPCore
             }
             else if (image->mergeExpr)
             {
-                if (isFilter
-                    && Shader::sourceFunctionCount(image->mergeExpr, 2) == 1
+                if (isFilter && Shader::sourceFunctionCount(image->mergeExpr, 2) == 1
                     && Shader::filterFunctionCount(image->mergeExpr, 1) == 0)
                 {
-                    inExpressions.push_back(replaceSourceWithExpression(
-                        image->shaderExpr, image->mergeExpr));
+                    inExpressions.push_back(replaceSourceWithExpression(image->shaderExpr, image->mergeExpr));
                     image->mergeExpr = 0;
                     image->shaderExpr = 0;
                     image->destination = IPImage::CurrentFrameBuffer;
@@ -1606,8 +1506,7 @@ namespace IPCore
                     image->blendMode = IPImage::Replace;
                 }
             }
-            else if (image->destination == IPImage::IntermediateBuffer
-                     || image->destination == IPImage::DataBuffer)
+            else if (image->destination == IPImage::IntermediateBuffer || image->destination == IPImage::DataBuffer)
             {
                 inExpressions.push_back(image->shaderExpr);
                 image->shaderExpr = 0;
@@ -1625,8 +1524,7 @@ namespace IPCore
         }
     }
 
-    void IPNode::filterLimits(const IPImageVector& inImages,
-                              IPImageSet& modifiedImages)
+    void IPNode::filterLimits(const IPImageVector& inImages, IPImageSet& modifiedImages)
     {
         //
         //  This prevents filters of filters in cases where the performance
@@ -1694,8 +1592,7 @@ namespace IPCore
 
         if (!component("__graph"))
         {
-            StringProperty* sp =
-                createProperty<StringProperty>("__graph.inputs");
+            StringProperty* sp = createProperty<StringProperty>("__graph.inputs");
             sp->resize(m_inputs.size());
             for (size_t i = 0; i < m_inputs.size(); i++)
                 (*sp)[i] = m_inputs[i]->name();
@@ -1705,8 +1602,7 @@ namespace IPCore
             //
 
             sp = createProperty<StringProperty>("__graph.outputs");
-            IntProperty* ip =
-                createProperty<IntProperty>("__graph.outputIndex");
+            IntProperty* ip = createProperty<IntProperty>("__graph.outputIndex");
             sp->resize(m_outputs.size());
             ip->resize(m_outputs.size());
 
@@ -1761,8 +1657,7 @@ namespace IPCore
             }
             else
             {
-                cout << "ERROR: " << __FUNCTION__ << " can't find input node \""
-                     << name << "\"" << endl;
+                cout << "ERROR: " << __FUNCTION__ << " can't find input node \"" << name << "\"" << endl;
             }
         }
 
@@ -1796,8 +1691,7 @@ namespace IPCore
             }
             else
             {
-                cout << "ERROR: " << __FUNCTION__
-                     << " can't find output node \"" << name << "\"" << endl;
+                cout << "ERROR: " << __FUNCTION__ << " can't find output node \"" << name << "\"" << endl;
             }
         }
 
@@ -1805,10 +1699,7 @@ namespace IPCore
         // delete comp;
     }
 
-    bool IPNode::isIsolated() const
-    {
-        return graph() && graph()->m_isolatedNodes.count(name()) > 0;
-    }
+    bool IPNode::isIsolated() const { return graph() && graph()->m_isolatedNodes.count(name()) > 0; }
 
     void IPNode::setGraph(IPGraph* graph) { m_graph = graph; }
 

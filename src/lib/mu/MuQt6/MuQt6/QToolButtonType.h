@@ -42,8 +42,7 @@ namespace Mu
         //  Constructors
         //
 
-        QToolButtonType(Context* context, const char* name,
-                        Class* superClass = 0, Class* superClass2 = 0);
+        QToolButtonType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QToolButtonType();
 
@@ -66,8 +65,7 @@ namespace Mu
     {
     public:
         virtual ~MuQt_QToolButton();
-        MuQt_QToolButton(Pointer muobj, const CallEnvironment*,
-                         QWidget* parent);
+        MuQt_QToolButton(Pointer muobj, const CallEnvironment*, QWidget* parent);
         virtual QSize minimumSizeHint() const;
         virtual QSize sizeHint() const;
 
@@ -99,17 +97,11 @@ namespace Mu
 
         bool event_pub(QEvent* event_) { return event(event_); }
 
-        bool event_pub_parent(QEvent* event_)
-        {
-            return QToolButton::event(event_);
-        }
+        bool event_pub_parent(QEvent* event_) { return QToolButton::event(event_); }
 
         bool hitButton_pub(const QPoint& pos) const { return hitButton(pos); }
 
-        bool hitButton_pub_parent(const QPoint& pos) const
-        {
-            return QToolButton::hitButton(pos);
-        }
+        bool hitButton_pub_parent(const QPoint& pos) const { return QToolButton::hitButton(pos); }
 
         void leaveEvent_pub(QEvent* e) { leaveEvent(e); }
 
@@ -117,17 +109,11 @@ namespace Mu
 
         void mousePressEvent_pub(QMouseEvent* e) { mousePressEvent(e); }
 
-        void mousePressEvent_pub_parent(QMouseEvent* e)
-        {
-            QToolButton::mousePressEvent(e);
-        }
+        void mousePressEvent_pub_parent(QMouseEvent* e) { QToolButton::mousePressEvent(e); }
 
         void mouseReleaseEvent_pub(QMouseEvent* e) { mouseReleaseEvent(e); }
 
-        void mouseReleaseEvent_pub_parent(QMouseEvent* e)
-        {
-            QToolButton::mouseReleaseEvent(e);
-        }
+        void mouseReleaseEvent_pub_parent(QMouseEvent* e) { QToolButton::mouseReleaseEvent(e); }
 
         void nextCheckState_pub() { nextCheckState(); }
 
@@ -135,52 +121,31 @@ namespace Mu
 
         void paintEvent_pub(QPaintEvent* event) { paintEvent(event); }
 
-        void paintEvent_pub_parent(QPaintEvent* event)
-        {
-            QToolButton::paintEvent(event);
-        }
+        void paintEvent_pub_parent(QPaintEvent* event) { QToolButton::paintEvent(event); }
 
         void timerEvent_pub(QTimerEvent* e) { timerEvent(e); }
 
-        void timerEvent_pub_parent(QTimerEvent* e)
-        {
-            QToolButton::timerEvent(e);
-        }
+        void timerEvent_pub_parent(QTimerEvent* e) { QToolButton::timerEvent(e); }
 
         void focusInEvent_pub(QFocusEvent* e) { focusInEvent(e); }
 
-        void focusInEvent_pub_parent(QFocusEvent* e)
-        {
-            QToolButton::focusInEvent(e);
-        }
+        void focusInEvent_pub_parent(QFocusEvent* e) { QToolButton::focusInEvent(e); }
 
         void focusOutEvent_pub(QFocusEvent* e) { focusOutEvent(e); }
 
-        void focusOutEvent_pub_parent(QFocusEvent* e)
-        {
-            QToolButton::focusOutEvent(e);
-        }
+        void focusOutEvent_pub_parent(QFocusEvent* e) { QToolButton::focusOutEvent(e); }
 
         void keyPressEvent_pub(QKeyEvent* e) { keyPressEvent(e); }
 
-        void keyPressEvent_pub_parent(QKeyEvent* e)
-        {
-            QToolButton::keyPressEvent(e);
-        }
+        void keyPressEvent_pub_parent(QKeyEvent* e) { QToolButton::keyPressEvent(e); }
 
         void keyReleaseEvent_pub(QKeyEvent* e) { keyReleaseEvent(e); }
 
-        void keyReleaseEvent_pub_parent(QKeyEvent* e)
-        {
-            QToolButton::keyReleaseEvent(e);
-        }
+        void keyReleaseEvent_pub_parent(QKeyEvent* e) { QToolButton::keyReleaseEvent(e); }
 
         void mouseMoveEvent_pub(QMouseEvent* e) { mouseMoveEvent(e); }
 
-        void mouseMoveEvent_pub_parent(QMouseEvent* e)
-        {
-            QToolButton::mouseMoveEvent(e);
-        }
+        void mouseMoveEvent_pub_parent(QMouseEvent* e) { QToolButton::mouseMoveEvent(e); }
 
     public:
         const QToolButtonType* _baseType;
@@ -188,11 +153,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance*
-    QToolButtonType::cachedInstance(const QToolButtonType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QToolButtonType::cachedInstance(const QToolButtonType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

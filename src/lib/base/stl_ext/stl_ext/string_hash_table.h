@@ -20,15 +20,9 @@ namespace stl_ext
 
     struct string_traits
     {
-        static bool equals(const std::string& a, const std::string& b)
-        {
-            return a == b;
-        }
+        static bool equals(const std::string& a, const std::string& b) { return a == b; }
 
-        static unsigned long hash(const std::string& s)
-        {
-            return stl_ext::hash(s);
-        }
+        static unsigned long hash(const std::string& s) { return stl_ext::hash(s); }
     };
 
     typedef stl_ext::hash_table<std::string, string_traits> string_hash_table;

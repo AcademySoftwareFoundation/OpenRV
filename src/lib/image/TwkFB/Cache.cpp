@@ -82,9 +82,7 @@ namespace TwkFB
     {
         if (!contains(fb))
         {
-            DBL(DB_TC, "TrashCan: add    fb "
-                           << fb->identifier() << " to   trashCan with "
-                           << trashMap.size() << " elements");
+            DBL(DB_TC, "TrashCan: add    fb " << fb->identifier() << " to   trashCan with " << trashMap.size() << " elements");
             trashList.push_back(fb);
             trashMap[fb] = --trashList.end();
         }
@@ -95,9 +93,7 @@ namespace TwkFB
         TrashMap::iterator tmi = trashMap.find(fb);
         if (trashMap.end() != tmi)
         {
-            DBL(DB_TC, "TrashCan: remove fb "
-                           << fb->identifier() << " from trashCan with "
-                           << trashMap.size() << " elements");
+            DBL(DB_TC, "TrashCan: remove fb " << fb->identifier() << " from trashCan with " << trashMap.size() << " elements");
             trashList.erase(tmi->second);
             trashMap.erase(tmi);
         }
@@ -116,9 +112,7 @@ namespace TwkFB
         if (trashList.size())
         {
             fb = trashList.front();
-            DBL(DB_TC, "TrashCan: pop    fb "
-                           << fb->identifier() << " from trashCan with "
-                           << trashMap.size() << " elements");
+            DBL(DB_TC, "TrashCan: pop    fb " << fb->identifier() << " from trashCan with " << trashMap.size() << " elements");
             trashList.pop_front();
             trashMap.erase(fb);
         }
@@ -190,8 +184,7 @@ namespace TwkFB
             else
             {
                 if (Cache::debug())
-                    cout << "DELETING: " << i->second << " : "
-                         << i->second->identifier() << endl;
+                    cout << "DELETING: " << i->second << " : " << i->second->identifier() << endl;
                 m_trashCan->remove(i->second);
                 delete i->second;
             }
@@ -207,8 +200,7 @@ namespace TwkFB
             m_map[fb->identifier()] = fb;
             bytes += fb->totalImageSize();
         }
-        DB("    after clearing, Cache holds " << m_map.size() << " fbs ("
-                                              << bytes << " bytes)");
+        DB("    after clearing, Cache holds " << m_map.size() << " fbs (" << bytes << " bytes)");
 
         m_currentBytes = bytes;
         m_full = (m_currentBytes >= m_maxBytes);
@@ -230,11 +222,8 @@ namespace TwkFB
             if (refcount <= 1)
             {
                 if (Cache::debug())
-                    cout << "DELETING: " << fb << " : " << fb->identifier()
-                         << endl;
-                DBL(DB_FLUSH, "flush() deleting id " << idstring << " (fb "
-                                                     << fb << " count "
-                                                     << refcount << ")");
+                    cout << "DELETING: " << fb << " : " << fb->identifier() << endl;
+                DBL(DB_FLUSH, "flush() deleting id " << idstring << " (fb " << fb << " count " << refcount << ")");
                 m_trashCan->remove(fb);
                 if (refcount)
                     fb->m_cacheRef--;
@@ -254,12 +243,10 @@ namespace TwkFB
                 //
                 // fb->m_cacheRef--;
 
-                DBL(DB_FLUSH, "flush() skipping " << idstring << " refCount "
-                                                  << fbReferenceCount(fb));
+                DBL(DB_FLUSH, "flush() skipping " << idstring << " refCount " << fbReferenceCount(fb));
 
                 if (Cache::debug())
-                    cout << "NO FLUSH: " << fb->identifier()
-                         << ", count = " << fbReferenceCount(fb) << endl;
+                    cout << "NO FLUSH: " << fb->identifier() << ", count = " << fbReferenceCount(fb) << endl;
 
                 return false;
             }
@@ -297,8 +284,7 @@ namespace TwkFB
 
     void Cache::checkOut(FrameBuffer* fb)
     {
-        DB("checkOut fb " << fb << " " << fb->identifier() << " refcnt "
-                          << fb->m_cacheRef);
+        DB("checkOut fb " << fb << " " << fb->identifier() << " refcnt " << fb->m_cacheRef);
         if (!fb)
         {
             TWK_THROW_STREAM(CacheMismatchException, "null fb ");
@@ -306,16 +292,12 @@ namespace TwkFB
 
         if (!fb->inCache())
         {
-            TWK_THROW_STREAM(CacheMismatchException,
-                             "fb " << fb << " : " << fb->identifier()
-                                   << " is not in cache " << this
-                                   << ", lock = " << fb->m_cacheLock
-                                   << ", refs = " << fb->m_cacheRef);
+            TWK_THROW_STREAM(CacheMismatchException, "fb " << fb << " : " << fb->identifier() << " is not in cache " << this
+                                                           << ", lock = " << fb->m_cacheLock << ", refs = " << fb->m_cacheRef);
         }
 
         if (Cache::debug())
-            cout << "CACHE: checking out " << fb << " : " << fb->identifier()
-                 << endl;
+            cout << "CACHE: checking out " << fb << " : " << fb->identifier() << endl;
 
         fb->m_retrievalTime = m_retrieveTime;
         m_retrieveTime++;
@@ -325,8 +307,7 @@ namespace TwkFB
 
     void Cache::checkIn(FrameBuffer* fb)
     {
-        DB("checkIn fb " << fb << " " << fb->identifier() << " refcnt "
-                         << fb->m_cacheRef);
+        DB("checkIn fb " << fb << " " << fb->identifier() << " refcnt " << fb->m_cacheRef);
         if (!fb)
         {
             TWK_THROW_STREAM(CacheMismatchException, "null fb");
@@ -334,15 +315,11 @@ namespace TwkFB
 
         if (!fb->inCache())
         {
-            TWK_THROW_STREAM(CacheMismatchException,
-                             "fb " << fb << " : "
-                                   << (fb ? fb->identifier() : "")
-                                   << " is not in cache " << this);
+            TWK_THROW_STREAM(CacheMismatchException, "fb " << fb << " : " << (fb ? fb->identifier() : "") << " is not in cache " << this);
         }
 
         if (Cache::debug())
-            cout << "CACHE checking in " << fb << " : " << fb->identifier()
-                 << endl;
+            cout << "CACHE checking in " << fb << " : " << fb->identifier() << endl;
         unlock(fb);
         dereferenceFB(fb);
     }
@@ -361,9 +338,7 @@ namespace TwkFB
 
         while (freedBytes < bytes && (fb = m_trashCan->popOldest()))
         {
-            DBL(DB_TCFREE, "freeTrash() freeing bytes "
-                               << fb->totalImageSize() << " ("
-                               << fb->identifier() << ")");
+            DBL(DB_TCFREE, "freeTrash() freeing bytes " << fb->totalImageSize() << " (" << fb->identifier() << ")");
             m_map.erase(fb->identifier());
             const size_t totalImagesize = deleteFB(fb);
 
@@ -401,17 +376,14 @@ namespace TwkFB
 
         for (int i = 0; i < fbs.size() && (m_currentBytes > targetBytes); i++)
         {
-            partial_sort(fbs.begin() + i, fbs.end(), fbs.begin() + (i + 1),
-                         Cache::retrievalCompare);
+            partial_sort(fbs.begin() + i, fbs.end(), fbs.begin() + (i + 1), Cache::retrievalCompare);
 
             FrameBuffer* fb = fbs.front();
 
             if (hasOneReference(fb))
             {
                 if (Cache::debug())
-                    cout << "CACHE: freeing " << fb->allocSize()
-                         << " of needed " << bytes
-                         << ", fb = " << fb->identifier() << endl;
+                    cout << "CACHE: freeing " << fb->allocSize() << " of needed " << bytes << ", fb = " << fb->identifier() << endl;
 
                 m_map.erase(fb->identifier());
                 fbs.front() = 0;
@@ -462,8 +434,7 @@ namespace TwkFB
             }
 
             if (Cache::debug())
-                cout << "INFO: CACHE: removing old " << fb->identifier()
-                     << endl;
+                cout << "INFO: CACHE: removing old " << fb->identifier() << endl;
             deleteFB(i->second);
         }
 
@@ -475,22 +446,17 @@ namespace TwkFB
         return ok;
     }
 
-    FrameBuffer* Cache::recycledFB(size_t allocSize[4])
-    {
-        return new FrameBuffer();
-    }
+    FrameBuffer* Cache::recycledFB(size_t allocSize[4]) { return new FrameBuffer(); }
 
     void Cache::referenceFB(FrameBuffer* fb)
     {
         fb->m_cacheRef++;
-        DBL(DB_REF, "referenceFB: " << fb << " " << fb->identifier()
-                                    << ", ref count now " << fb->m_cacheRef);
+        DBL(DB_REF, "referenceFB: " << fb << " " << fb->identifier() << ", ref count now " << fb->m_cacheRef);
         if (fb->m_cacheRef > 1)
             m_trashCan->remove(fb);
         if (DB_LEVEL && fb->m_cacheRef > 150)
         {
-            DB("          VERY HIGH REF COUNT " << fb->m_cacheRef << " "
-                                                << fb->identifier());
+            DB("          VERY HIGH REF COUNT " << fb->m_cacheRef << " " << fb->identifier());
         }
     }
 
@@ -498,8 +464,7 @@ namespace TwkFB
     {
         if (fb->m_cacheRef > 0)
             fb->m_cacheRef--;
-        DBL(DB_REF, "dereferenceFB: " << fb << " " << fb->identifier()
-                                      << ", ref count now " << fb->m_cacheRef);
+        DBL(DB_REF, "dereferenceFB: " << fb << " " << fb->identifier() << ", ref count now " << fb->m_cacheRef);
         //
         //  The below is dangerous.  flush may be FBCache::flush(), which
         //  calls Cache::dereferenceFB().  If all goes well, the second
@@ -519,10 +484,7 @@ namespace TwkFB
             m_trashCan->add(fb);
     }
 
-    bool Cache::trashContains(FrameBuffer* fb)
-    {
-        return m_trashCan->contains(fb);
-    }
+    bool Cache::trashContains(FrameBuffer* fb) { return m_trashCan->contains(fb); }
 
     // This function handles the presence of "proxy buffers" (FrameBuffer) in
     // the cache. Those buffers have a data pointer that refers to another
@@ -551,21 +513,15 @@ namespace TwkFB
 
             // Check to see if this buffer has proxy-buffer that must also be
             // deleted.
-            if (const TwkFB::TypedFBVectorAttribute<FrameBuffer*>*
-                    proxyBuffersAtt = dynamic_cast<
-                        const TwkFB::TypedFBVectorAttribute<FrameBuffer*>*>(
-                        fb->findAttribute("ProxyBuffers")))
+            if (const TwkFB::TypedFBVectorAttribute<FrameBuffer*>* proxyBuffersAtt =
+                    dynamic_cast<const TwkFB::TypedFBVectorAttribute<FrameBuffer*>*>(fb->findAttribute("ProxyBuffers")))
             {
-                for (int proxyBufferIndex = 0;
-                     proxyBufferIndex < proxyBuffersAtt->value().size();
-                     proxyBufferIndex++)
+                for (int proxyBufferIndex = 0; proxyBufferIndex < proxyBuffersAtt->value().size(); proxyBufferIndex++)
                 {
-                    FrameBuffer* proxyBuffer =
-                        proxyBuffersAtt->value()[proxyBufferIndex];
+                    FrameBuffer* proxyBuffer = proxyBuffersAtt->value()[proxyBufferIndex];
                     if (proxyBuffer)
                     {
-                        FBMap::iterator i =
-                            m_map.find(proxyBuffer->identifier());
+                        FBMap::iterator i = m_map.find(proxyBuffer->identifier());
                         // If the proxy buffer is not in the cache map, it has
                         // been deleted prior the master buffer.
                         if (i != m_map.end())
@@ -585,28 +541,19 @@ namespace TwkFB
 
             // Check to see if the buffer is a proxy buffer owned by a master
             // buffer. If so, unregister from the master's list of proxies.
-            if (const TwkFB::TypedFBAttribute<
-                    FrameBuffer*>* proxyBufferOwnerAtt =
-                    dynamic_cast<const TwkFB::TypedFBAttribute<FrameBuffer*>*>(
-                        fb->findAttribute("ProxyBufferOwnerPtr")))
+            if (const TwkFB::TypedFBAttribute<FrameBuffer*>* proxyBufferOwnerAtt =
+                    dynamic_cast<const TwkFB::TypedFBAttribute<FrameBuffer*>*>(fb->findAttribute("ProxyBufferOwnerPtr")))
             {
                 if (proxyBufferOwnerAtt && proxyBufferOwnerAtt->value())
                 {
-                    if (TwkFB::TypedFBVectorAttribute<
-                            FrameBuffer*>* proxyBuffersAtt =
-                            dynamic_cast<
-                                TwkFB::TypedFBVectorAttribute<FrameBuffer*>*>(
-                                proxyBufferOwnerAtt->value()->findAttribute(
-                                    "ProxyBuffers")))
+                    if (TwkFB::TypedFBVectorAttribute<FrameBuffer*>* proxyBuffersAtt =
+                            dynamic_cast<TwkFB::TypedFBVectorAttribute<FrameBuffer*>*>(
+                                proxyBufferOwnerAtt->value()->findAttribute("ProxyBuffers")))
                     {
                         if (proxyBuffersAtt)
                         {
-                            std::vector<FrameBuffer*>& proxyBuffers =
-                                proxyBuffersAtt->value();
-                            proxyBuffers.erase(std::remove(proxyBuffers.begin(),
-                                                           proxyBuffers.end(),
-                                                           fb),
-                                               proxyBuffers.end());
+                            std::vector<FrameBuffer*>& proxyBuffers = proxyBuffersAtt->value();
+                            proxyBuffers.erase(std::remove(proxyBuffers.begin(), proxyBuffers.end(), fb), proxyBuffers.end());
                         }
                     }
                 }

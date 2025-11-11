@@ -23,8 +23,7 @@ namespace IPCore
     class OutputGroupIPNode : public DisplayGroupIPNode
     {
     public:
-        OutputGroupIPNode(const std::string& name, const NodeDefinition* def,
-                          IPGraph* graph, GroupIPNode* group = 0);
+        OutputGroupIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group = 0);
 
         virtual ~OutputGroupIPNode();
 

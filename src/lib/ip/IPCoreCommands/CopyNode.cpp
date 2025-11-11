@@ -23,10 +23,7 @@ namespace IPCore
 
         CopyNodeInfo::~CopyNodeInfo() {}
 
-        TwkApp::Command* CopyNodeInfo::newCommand() const
-        {
-            return new CopyNode(this);
-        }
+        TwkApp::Command* CopyNodeInfo::newCommand() const { return new CopyNode(this); }
 
         //----------------------------------------------------------------------
 
@@ -47,8 +44,7 @@ namespace IPCore
             }
             catch (std::exception& exc)
             {
-                TWK_THROW_EXC_STREAM("CopyNode: failed to create copy of node "
-                                     << node->name());
+                TWK_THROW_EXC_STREAM("CopyNode: failed to create copy of node " << node->name());
             }
         }
 
@@ -62,8 +58,7 @@ namespace IPCore
             }
             catch (std::exception& exc)
             {
-                TWK_THROW_EXC_STREAM("CopyNode: failed to create copy of node "
-                                     << m_copyNode->name());
+                TWK_THROW_EXC_STREAM("CopyNode: failed to create copy of node " << m_copyNode->name());
             }
 
             if (firstTime)

@@ -83,8 +83,7 @@ namespace Rv
     static ENVVAR_BOOL(evUseFastAddSource, "RV_USE_FAST_ADD_SOURCE", true);
 
     // Defines the default value of the autoEDL mode for the RVSwitchGroup node
-    static ENVVAR_INT(evMediaRepSwitchAutoEDL, "RV_MEDIA_REP_SWITCH_AUTO_EDL",
-                      0);
+    static ENVVAR_INT(evMediaRepSwitchAutoEDL, "RV_MEDIA_REP_SWITCH_AUTO_EDL", 0);
 
     //----------------------------------------------------------------------
 
@@ -109,8 +108,7 @@ namespace Rv
         if (n == m_layoutNode)
             m_layoutNode = 0;
 
-        Sources::iterator s =
-            find(m_imageSources.begin(), m_imageSources.end(), n);
+        Sources::iterator s = find(m_imageSources.begin(), m_imageSources.end(), n);
         if (s != m_imageSources.end())
             m_imageSources.erase(s);
     }
@@ -134,8 +132,7 @@ namespace Rv
         //  deletion -- at least at the top level.
         //
 
-        for (NodeMap::iterator i = m_viewNodeMap.begin();
-             i != m_viewNodeMap.end(); ++i)
+        for (NodeMap::iterator i = m_viewNodeMap.begin(); i != m_viewNodeMap.end(); ++i)
         {
             IPNode* n = i->second;
             n->willDelete();
@@ -174,40 +171,24 @@ namespace Rv
 
         m_rootNode = newNode("Root", "root");
         m_sessionNode = newNodeOfType<SessionIPNode>("RVSession", "rv");
-        m_sequenceNode = newNodeOfType<SequenceGroupIPNode>("RVSequenceGroup",
-                                                            "defaultSequence");
-        m_stackNode =
-            newNodeOfType<StackGroupIPNode>("RVStackGroup", "defaultStack");
-        m_layoutNode =
-            newNodeOfType<LayoutGroupIPNode>("RVLayoutGroup", "defaultLayout");
-        m_viewGroupNode =
-            newNodeOfType<ViewGroupIPNode>("RVViewGroup", "viewGroup");
+        m_sequenceNode = newNodeOfType<SequenceGroupIPNode>("RVSequenceGroup", "defaultSequence");
+        m_stackNode = newNodeOfType<StackGroupIPNode>("RVStackGroup", "defaultStack");
+        m_layoutNode = newNodeOfType<LayoutGroupIPNode>("RVLayoutGroup", "defaultLayout");
+        m_viewGroupNode = newNodeOfType<ViewGroupIPNode>("RVViewGroup", "viewGroup");
         m_defaultOutputGroup = newOutputGroup("defaultOutputGroup");
 
         m_viewNode = m_sequenceNode;
 
-        m_sequenceNode->declareProperty<StringProperty>(
-            "ui.name", QObject::tr("Default Sequence").toStdString().c_str());
-        m_stackNode->declareProperty<StringProperty>("ui.name",
-                                                     "Default Stack");
-        m_layoutNode->declareProperty<StringProperty>("ui.name",
-                                                      "Default Layout");
+        m_sequenceNode->declareProperty<StringProperty>("ui.name", QObject::tr("Default Sequence").toStdString().c_str());
+        m_stackNode->declareProperty<StringProperty>("ui.name", "Default Stack");
+        m_layoutNode->declareProperty<StringProperty>("ui.name", "Default Layout");
 
-        m_volume = m_viewGroupNode->soundtrackNode()->property<FloatProperty>(
-            "audio.volume");
-        m_balance = m_viewGroupNode->soundtrackNode()->property<FloatProperty>(
-            "audio.balance");
-        m_mute = m_viewGroupNode->soundtrackNode()->property<IntProperty>(
-            "audio.mute");
-        m_audioSoftClamp =
-            m_viewGroupNode->soundtrackNode()->property<IntProperty>(
-                "audio.softClamp");
-        m_audioOffset =
-            m_viewGroupNode->soundtrackNode()->property<FloatProperty>(
-                "audio.offset");
-        m_audioOffset2 =
-            m_viewGroupNode->soundtrackNode()->property<FloatProperty>(
-                "audio.internalOffset");
+        m_volume = m_viewGroupNode->soundtrackNode()->property<FloatProperty>("audio.volume");
+        m_balance = m_viewGroupNode->soundtrackNode()->property<FloatProperty>("audio.balance");
+        m_mute = m_viewGroupNode->soundtrackNode()->property<IntProperty>("audio.mute");
+        m_audioSoftClamp = m_viewGroupNode->soundtrackNode()->property<IntProperty>("audio.softClamp");
+        m_audioOffset = m_viewGroupNode->soundtrackNode()->property<FloatProperty>("audio.offset");
+        m_audioOffset2 = m_viewGroupNode->soundtrackNode()->property<FloatProperty>("audio.internalOffset");
 
         m_defaultViewsMap[m_sequenceNode->name()] = m_sequenceNode;
         m_defaultViewsMap[m_stackNode->name()] = m_stackNode;
@@ -225,40 +206,31 @@ namespace Rv
         m_rootNode->appendInput(m_viewGroupNode->waveformNode());
     }
 
-    DisplayGroupIPNode*
-    RvGraph::newDisplayGroup(const std::string& nodeName,
-                             const TwkApp::VideoDevice* device)
+    DisplayGroupIPNode* RvGraph::newDisplayGroup(const std::string& nodeName, const TwkApp::VideoDevice* device)
     {
         const Options& opts = Options::sharedOptions();
 
-        DisplayGroupIPNode* group =
-            newNodeOfType<DisplayGroupIPNode>("RVDisplayGroup", nodeName);
+        DisplayGroupIPNode* group = newNodeOfType<DisplayGroupIPNode>("RVDisplayGroup", nodeName);
 
         if (group)
         {
             group->setPhysicalVideoDevice(device);
 
-            if (IPNode* dispNode =
-                    group->displayPipelineNode()->findNodeInPipelineByTypeName(
-                        "RVDisplayColor"))
+            if (IPNode* dispNode = group->displayPipelineNode()->findNodeInPipelineByTypeName("RVDisplayColor"))
             {
                 dispNode->setProperty<FloatProperty>("color.gamma", opts.gamma);
                 dispNode->setProperty<IntProperty>("color.sRGB", opts.sRGB);
                 dispNode->setProperty<IntProperty>("color.Rec709", opts.rec709);
-                dispNode->setProperty<FloatProperty>("color.brightness",
-                                                     opts.brightness);
+                dispNode->setProperty<FloatProperty>("color.brightness", opts.brightness);
             }
         }
 
         return group;
     }
 
-    OutputGroupIPNode*
-    RvGraph::newOutputGroup(const std::string& nodeName,
-                            const TwkApp::VideoDevice* device)
+    OutputGroupIPNode* RvGraph::newOutputGroup(const std::string& nodeName, const TwkApp::VideoDevice* device)
     {
-        OutputGroupIPNode* group =
-            newNodeOfType<OutputGroupIPNode>("RVOutputGroup", nodeName);
+        OutputGroupIPNode* group = newNodeOfType<OutputGroupIPNode>("RVOutputGroup", nodeName);
         if (group)
             group->setPhysicalVideoDevice(device);
         return group;
@@ -290,25 +262,17 @@ namespace Rv
         m_fastAddSourceChangedSignal(false, newFastAddSourceEnabled);
     }
 
-    bool RvGraph::isFastAddSourceEnabled() const
-    {
-        return m_fastAddSourceEnabled > 0;
-    }
+    bool RvGraph::isFastAddSourceEnabled() const { return m_fastAddSourceEnabled > 0; }
 
-    SourceIPNode*
-    RvGraph::addSource(const std::string& nodeType, const std::string& nodeName,
-                       const std::string& mediaRepName,
-                       IPCore::SourceIPNode* mediaRepSisterSrcNode)
+    SourceIPNode* RvGraph::addSource(const std::string& nodeType, const std::string& nodeName, const std::string& mediaRepName,
+                                     IPCore::SourceIPNode* mediaRepSisterSrcNode)
     {
         // Alternating between 2 colors makes it easier to see each individual
         // added source.
         static bool zoneFlip = false;
         zoneFlip = !zoneFlip;
         HOP_ZONE(zoneFlip ? HOP_ZONE_COLOR_10 : HOP_ZONE_COLOR_11);
-        HOP_PROF_DYN_NAME(
-            std::string(std::string("RvGraph::addSource(nodeType=") + nodeType
-                        + std::string(") ") + nodeName)
-                .c_str());
+        HOP_PROF_DYN_NAME(std::string(std::string("RvGraph::addSource(nodeType=") + nodeType + std::string(") ") + nodeName).c_str());
 
         //
         //  Build the IP tree for this source. Make sure that the
@@ -353,23 +317,17 @@ namespace Rv
             return;
         }
 
-        for (NodeMap::iterator i = m_defaultViewsMap.begin();
-             i != m_defaultViewsMap.end(); ++i)
+        for (NodeMap::iterator i = m_defaultViewsMap.begin(); i != m_defaultViewsMap.end(); ++i)
         {
-            HOP_PROF_DYN_NAME(
-                std::string(
-                    std::string("RvGraph::updateDefaultViewsWithNewSources() - "
-                                "setInputs - ")
-                    + i->first)
-                    .c_str());
+            HOP_PROF_DYN_NAME(std::string(std::string("RvGraph::updateDefaultViewsWithNewSources() - "
+                                                      "setInputs - ")
+                                          + i->first)
+                                  .c_str());
 
             IPNode* layer = i->second;
-            IPNode::IPNodes inputs(layer->inputs().size()
-                                   + m_newSources.size());
-            copy(layer->inputs().begin(), layer->inputs().end(),
-                 inputs.begin());
-            copy(m_newSources.begin(), m_newSources.end(),
-                 inputs.begin() + layer->inputs().size());
+            IPNode::IPNodes inputs(layer->inputs().size() + m_newSources.size());
+            copy(layer->inputs().begin(), layer->inputs().end(), inputs.begin());
+            copy(m_newSources.begin(), m_newSources.end(), inputs.begin() + layer->inputs().size());
             HOP_ZONE(HOP_ZONE_COLOR_12);
             layer->setInputs(inputs);
         }
@@ -377,8 +335,7 @@ namespace Rv
         m_newSources.clear();
     }
 
-    void RvGraph::setupSource(SourceIPNode* source,
-                              IPCore::SourceIPNode* mediaRepSisterSrcNode)
+    void RvGraph::setupSource(SourceIPNode* source, IPCore::SourceIPNode* mediaRepSisterSrcNode)
     {
         HOP_PROF_FUNC();
 
@@ -404,31 +361,24 @@ namespace Rv
 
                 // Is there an already existing switch group already connected
                 // to the sister source node ?
-                switchGroup =
-                    dynamic_cast<SwitchGroupIPNode*>(findNodeAssociatedWith(
-                        mediaRepSisterSrcNode->group(), "RVSwitchGroup"));
+                switchGroup = dynamic_cast<SwitchGroupIPNode*>(findNodeAssociatedWith(mediaRepSisterSrcNode->group(), "RVSwitchGroup"));
             }
 
             // If there is no existing switch group already then allocate one
             if (!switchGroup)
             {
-                const NodeDefinition* def =
-                    m_nodeManager->definition("RVSwitchGroup");
+                const NodeDefinition* def = m_nodeManager->definition("RVSwitchGroup");
                 if (!def)
                 {
-                    TWK_THROW_EXC_STREAM(
-                        "Could not find RVSwitchGroup node definition");
+                    TWK_THROW_EXC_STREAM("Could not find RVSwitchGroup node definition");
                 }
 
-                switchGroup =
-                    new SwitchGroupIPNode(name + "_switchGroup", def, this);
-                switchGroup->switchNode()->setProperty<IntProperty>(
-                    "mode.autoEDL", evMediaRepSwitchAutoEDL.getValue());
+                switchGroup = new SwitchGroupIPNode(name + "_switchGroup", def, this);
+                switchGroup->switchNode()->setProperty<IntProperty>("mode.autoEDL", evMediaRepSwitchAutoEDL.getValue());
 
                 if (mediaRepSisterSrcNode)
                 {
-                    switchGroup->setInputs2(mediaRepSisterSrcNode->group(),
-                                            sourceGroup);
+                    switchGroup->setInputs2(mediaRepSisterSrcNode->group(), sourceGroup);
                 }
                 else
                 {
@@ -445,15 +395,12 @@ namespace Rv
                     // been added to prevent O(n^2)
                     if (mediaRepSisterSrcNode)
                     {
-                        std::replace(m_newSources.begin(), m_newSources.end(),
-                                     static_cast<IPNode*>(
-                                         mediaRepSisterSrcNode->group()),
+                        std::replace(m_newSources.begin(), m_newSources.end(), static_cast<IPNode*>(mediaRepSisterSrcNode->group()),
                                      static_cast<IPNode*>(switchGroup));
                     }
                     else
                     {
-                        m_newSources.push_back(
-                            static_cast<IPNode*>(switchGroup));
+                        m_newSources.push_back(static_cast<IPNode*>(switchGroup));
                     }
                 }
                 else
@@ -463,15 +410,9 @@ namespace Rv
                     //
 
                     IPNode::IPNodes inputs(1);
-                    for (NodeMap::iterator i = m_defaultViewsMap.begin();
-                         i != m_defaultViewsMap.end(); ++i)
+                    for (NodeMap::iterator i = m_defaultViewsMap.begin(); i != m_defaultViewsMap.end(); ++i)
                     {
-                        HOP_PROF_DYN_NAME(
-                            std::string(
-                                std::string(
-                                    "RvGraph::setupSource - setInputs - ")
-                                + i->first)
-                                .c_str());
+                        HOP_PROF_DYN_NAME(std::string(std::string("RvGraph::setupSource - setInputs - ") + i->first).c_str());
 
                         IPNode* layer = i->second;
                         if (mediaRepSisterSrcNode)
@@ -479,17 +420,13 @@ namespace Rv
                             inputs.resize(layer->inputs().size());
                             for (size_t i = 0; i < inputs.size(); i++)
                             {
-                                inputs[i] = (layer->inputs()[i]
-                                             == mediaRepSisterSrcNode->group())
-                                                ? switchGroup
-                                                : layer->inputs()[i];
+                                inputs[i] = (layer->inputs()[i] == mediaRepSisterSrcNode->group()) ? switchGroup : layer->inputs()[i];
                             }
                         }
                         else
                         {
                             inputs.resize(layer->inputs().size() + 1);
-                            copy(layer->inputs().begin(), layer->inputs().end(),
-                                 inputs.begin());
+                            copy(layer->inputs().begin(), layer->inputs().end(), inputs.begin());
                             inputs.back() = switchGroup;
                         }
                         HOP_ZONE(HOP_ZONE_COLOR_12);
@@ -521,19 +458,13 @@ namespace Rv
             //
 
             IPNode::IPNodes inputs(1);
-            for (NodeMap::iterator i = m_defaultViewsMap.begin();
-                 i != m_defaultViewsMap.end(); ++i)
+            for (NodeMap::iterator i = m_defaultViewsMap.begin(); i != m_defaultViewsMap.end(); ++i)
             {
-                HOP_PROF_DYN_NAME(
-                    std::string(
-                        std::string("RvGraph::setupSource - setInputs - ")
-                        + i->first)
-                        .c_str());
+                HOP_PROF_DYN_NAME(std::string(std::string("RvGraph::setupSource - setInputs - ") + i->first).c_str());
 
                 IPNode* layer = i->second;
                 inputs.resize(layer->inputs().size() + 1);
-                copy(layer->inputs().begin(), layer->inputs().end(),
-                     inputs.begin());
+                copy(layer->inputs().begin(), layer->inputs().end(), inputs.begin());
                 inputs.back() = sourceGroup;
                 HOP_ZONE(HOP_ZONE_COLOR_12);
                 layer->setInputs(inputs);
@@ -544,23 +475,19 @@ namespace Rv
         m_topologyChanged = true;
     }
 
-    SourceIPNode* RvGraph::newSource(const std::string& nodeName,
-                                     const std::string& nodeType,
-                                     const std::string& mediaRepName)
+    SourceIPNode* RvGraph::newSource(const std::string& nodeName, const std::string& nodeType, const std::string& mediaRepName)
     {
         SourceIPNode* source = 0;
         if (const NodeDefinition* def = m_nodeManager->definition(nodeType))
         {
             if (nodeType == "RVImageSource")
             {
-                ImageSourceIPNode* sipn = new ImageSourceIPNode(
-                    nodeName, def, this, NULL, mediaRepName);
+                ImageSourceIPNode* sipn = new ImageSourceIPNode(nodeName, def, this, NULL, mediaRepName);
                 source = dynamic_cast<SourceIPNode*>(sipn);
             }
             else if (nodeType == "RVFileSource")
             {
-                FileSourceIPNode* sipn = new FileSourceIPNode(
-                    nodeName, def, this, NULL, mediaRepName);
+                FileSourceIPNode* sipn = new FileSourceIPNode(nodeName, def, this, NULL, mediaRepName);
                 source = dynamic_cast<SourceIPNode*>(sipn);
             }
         }
@@ -568,11 +495,9 @@ namespace Rv
         return source;
     }
 
-    SourceGroupIPNode* RvGraph::newSourceGroup(const std::string& nodeName,
-                                               SourceIPNode* snode)
+    SourceGroupIPNode* RvGraph::newSourceGroup(const std::string& nodeName, SourceIPNode* snode)
     {
-        if (const NodeDefinition* def =
-                m_nodeManager->definition("RVSourceGroup"))
+        if (const NodeDefinition* def = m_nodeManager->definition("RVSourceGroup"))
         {
             return new SourceGroupIPNode(nodeName, def, snode, this);
         }

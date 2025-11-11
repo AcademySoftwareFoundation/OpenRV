@@ -39,19 +39,16 @@ namespace Rv
             int minVersion = TWK_DEPLOY_MINOR_VERSION();
             int relVersion = 2 * (minVersion / 2);
 
-            str << "RV/3." << relVersion
-                << " (rv:" << TWK_DEPLOY_MAJOR_VERSION() << "."
-                << TWK_DEPLOY_MINOR_VERSION() << "." << TWK_DEPLOY_PATCH_LEVEL()
-                << ") Autodesk: www.autodesk.com";
+            str << "RV/3." << relVersion << " (rv:" << TWK_DEPLOY_MAJOR_VERSION() << "." << TWK_DEPLOY_MINOR_VERSION() << "."
+                << TWK_DEPLOY_PATCH_LEVEL() << ") Autodesk: www.autodesk.com";
             userAgentString = QByteArray(str.str().c_str());
         }
 
         return userAgentString;
     }
 
-    QNetworkReply* LocalNetworkAccessManager::createRequest(
-        QNetworkAccessManager::Operation operation,
-        const QNetworkRequest& request, QIODevice* device)
+    QNetworkReply* LocalNetworkAccessManager::createRequest(QNetworkAccessManager::Operation operation, const QNetworkRequest& request,
+                                                            QIODevice* device)
     {
         //  cerr << "createRequest url '" <<
         //  request.url().toString().toStdString() << "'" << endl;
@@ -65,8 +62,7 @@ namespace Rv
 
     static bool reportErrors = false;
 
-    NetworkReplyTimeout::NetworkReplyTimeout(QNetworkReply* reply,
-                                             const int timeout)
+    NetworkReplyTimeout::NetworkReplyTimeout(QNetworkReply* reply, const int timeout)
         : QObject(reply)
     {
         if (reply)
@@ -100,8 +96,7 @@ namespace Rv
 
         m_netManager = new LocalNetworkAccessManager(this);
 
-        QStringList cacheLocations =
-            QStandardPaths::standardLocations(QStandardPaths::CacheLocation);
+        QStringList cacheLocations = QStandardPaths::standardLocations(QStandardPaths::CacheLocation);
         QString cacheLocation = cacheLocations.front();
 
         //
@@ -125,22 +120,16 @@ namespace Rv
 
         // QWebSettings::setMaximumPagesInCache(10);
 
-        connect(m_netManager,
-                SIGNAL(authenticationRequired(QNetworkReply*, QAuthenticator*)),
-                this,
+        connect(m_netManager, SIGNAL(authenticationRequired(QNetworkReply*, QAuthenticator*)), this,
                 SLOT(replyAuthentication(QNetworkReply*, QAuthenticator*)));
-        connect(m_netManager,
-                SIGNAL(sslErrors(QNetworkReply*, QList<QSslError>)), this,
+        connect(m_netManager, SIGNAL(sslErrors(QNetworkReply*, QList<QSslError>)), this,
                 SLOT(managerSSLErrors(QNetworkReply*, QList<QSslError>)));
     }
 
     RvWebManager::~RvWebManager() {}
 
-    void RvWebManager::httpGet(const QString& url, const HeaderList& headers,
-                               Session* session, const QString& replyEvent,
-                               const QString& authenticationEvent,
-                               const QString& progressEvent,
-                               bool ignoreSslErrors, bool urlIsEncoded)
+    void RvWebManager::httpGet(const QString& url, const HeaderList& headers, Session* session, const QString& replyEvent,
+                               const QString& authenticationEvent, const QString& progressEvent, bool ignoreSslErrors, bool urlIsEncoded)
     {
         QUrl u = urlIsEncoded ? QUrl::fromEncoded(url.toUtf8()) : QUrl(url);
         QNetworkRequest request(u);
@@ -160,13 +149,10 @@ namespace Rv
         reply->setReadBufferSize(0); // unlimited
 
         connect(reply, SIGNAL(readyRead()), this, SLOT(replyRead()));
-        connect(reply, SIGNAL(errorOccurred(QNetworkReply::NetworkError)), this,
-                SLOT(replyError(QNetworkReply::NetworkError)));
-        connect(reply, SIGNAL(sslErrors(QList<QSslError>)), this,
-                SLOT(replySSLErrors(QList<QSslError>)));
+        connect(reply, SIGNAL(errorOccurred(QNetworkReply::NetworkError)), this, SLOT(replyError(QNetworkReply::NetworkError)));
+        connect(reply, SIGNAL(sslErrors(QList<QSslError>)), this, SLOT(replySSLErrors(QList<QSslError>)));
 
-        connect(m_netManager, SIGNAL(finished(QNetworkReply*)), this,
-                SLOT(replyDone(QNetworkReply*)));
+        connect(m_netManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(replyDone(QNetworkReply*)));
 
         ReplyData rdata;
         rdata.url = u;
@@ -179,13 +165,9 @@ namespace Rv
         m_replyMap.insert(reply, rdata);
     }
 
-    void RvWebManager::httpPost(const QString& url, const HeaderList& headers,
-                                const QByteArray& postData, Session* session,
-                                const QString& replyEvent,
-                                const QString& authenticationEvent,
-                                const QString& progressEvent,
-                                bool ignoreSslErrors, bool urlIsEncoded,
-                                void (*callback)(), QString tag)
+    void RvWebManager::httpPost(const QString& url, const HeaderList& headers, const QByteArray& postData, Session* session,
+                                const QString& replyEvent, const QString& authenticationEvent, const QString& progressEvent,
+                                bool ignoreSslErrors, bool urlIsEncoded, void (*callback)(), QString tag)
     {
         QUrl u = urlIsEncoded ? QUrl::fromEncoded(url.toUtf8()) : QUrl(url);
         QNetworkRequest request(u);
@@ -201,8 +183,7 @@ namespace Rv
 
         bool authDebug = (getenv("RV_SHOTGUN_AUTH_DEBUG") != 0);
         if (authDebug)
-            cerr << "INFO: RvWebManager POST to " << UTF8::qconvert(url)
-                 << endl;
+            cerr << "INFO: RvWebManager POST to " << UTF8::qconvert(url) << endl;
         /*
         //
         //  Uncommenting this will reveal passwords, so not for release!
@@ -230,13 +211,10 @@ namespace Rv
         reply->setReadBufferSize(0); // unlimited
 
         connect(reply, SIGNAL(readyRead()), this, SLOT(replyRead()));
-        connect(reply, SIGNAL(errorOccurred(QNetworkReply::NetworkError)), this,
-                SLOT(replyError(QNetworkReply::NetworkError)));
-        connect(reply, SIGNAL(sslErrors(QList<QSslError>)), this,
-                SLOT(replySSLErrors(QList<QSslError>)));
+        connect(reply, SIGNAL(errorOccurred(QNetworkReply::NetworkError)), this, SLOT(replyError(QNetworkReply::NetworkError)));
+        connect(reply, SIGNAL(sslErrors(QList<QSslError>)), this, SLOT(replySSLErrors(QList<QSslError>)));
 
-        connect(m_netManager, SIGNAL(finished(QNetworkReply*)), this,
-                SLOT(replyDone(QNetworkReply*)));
+        connect(m_netManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(replyDone(QNetworkReply*)));
 
         ReplyData rdata;
         rdata.url = u;
@@ -251,13 +229,9 @@ namespace Rv
         m_replyMap.insert(reply, rdata);
     }
 
-    void RvWebManager::httpPut(const QString& url, const HeaderList& headers,
-                               const QByteArray& putData, Session* session,
-                               const QString& replyEvent,
-                               const QString& authenticationEvent,
-                               const QString& progressEvent,
-                               bool ignoreSslErrors, bool urlIsEncoded,
-                               void (*callback)(), QString tag)
+    void RvWebManager::httpPut(const QString& url, const HeaderList& headers, const QByteArray& putData, Session* session,
+                               const QString& replyEvent, const QString& authenticationEvent, const QString& progressEvent,
+                               bool ignoreSslErrors, bool urlIsEncoded, void (*callback)(), QString tag)
     {
         QUrl u = urlIsEncoded ? QUrl::fromEncoded(url.toUtf8()) : QUrl(url);
         QNetworkRequest request(u);
@@ -304,13 +278,10 @@ namespace Rv
         reply->setReadBufferSize(0); // unlimited
 
         connect(reply, SIGNAL(readyRead()), this, SLOT(replyRead()));
-        connect(reply, SIGNAL(errorOccurred(QNetworkReply::NetworkError)), this,
-                SLOT(replyError(QNetworkReply::NetworkError)));
-        connect(reply, SIGNAL(sslErrors(QList<QSslError>)), this,
-                SLOT(replySSLErrors(QList<QSslError>)));
+        connect(reply, SIGNAL(errorOccurred(QNetworkReply::NetworkError)), this, SLOT(replyError(QNetworkReply::NetworkError)));
+        connect(reply, SIGNAL(sslErrors(QList<QSslError>)), this, SLOT(replySSLErrors(QList<QSslError>)));
 
-        connect(m_netManager, SIGNAL(finished(QNetworkReply*)), this,
-                SLOT(replyDone(QNetworkReply*)));
+        connect(m_netManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(replyDone(QNetworkReply*)));
 
         ReplyData rdata;
         rdata.url = u;
@@ -340,8 +311,7 @@ namespace Rv
             if (reportErrors)
             {
                 replyErrorString = reply->errorString();
-                cerr << "ERROR: RvWebManager http reply: "
-                     << UTF8::qconvert(replyErrorString) << endl;
+                cerr << "ERROR: RvWebManager http reply: " << UTF8::qconvert(replyErrorString) << endl;
             }
         }
         /*
@@ -353,17 +323,14 @@ namespace Rv
         */
 
         QByteArray array = reply->readAll();
-        QString ctype =
-            reply->header(QNetworkRequest::ContentTypeHeader).toString();
+        QString ctype = reply->header(QNetworkRequest::ContentTypeHeader).toString();
 
         if (authDebug)
-            cerr << "INFO: reply " << reply << ", replyDone (" << array.size()
-                 << " byes): '" << array.constData() << "'" << endl;
+            cerr << "INFO: reply " << reply << ", replyDone (" << array.size() << " byes): '" << array.constData() << "'" << endl;
 
         if (d.session)
         {
-            if (ctype.contains("text/", Qt::CaseInsensitive)
-                || ctype.contains("application/json", Qt::CaseInsensitive)
+            if (ctype.contains("text/", Qt::CaseInsensitive) || ctype.contains("application/json", Qt::CaseInsensitive)
                 || !replyErrorString.isEmpty())
             {
                 //
@@ -384,10 +351,8 @@ namespace Rv
                 if (!replyErrorString.isEmpty())
                     utf8 = replyErrorString.toUtf8();
 
-                (void)d.session->userRawDataEvent(
-                    d.replyEvent.toUtf8().constData(),
-                    ctype.toUtf8().constData(), array.constData(), array.size(),
-                    utf8.constData());
+                (void)d.session->userRawDataEvent(d.replyEvent.toUtf8().constData(), ctype.toUtf8().constData(), array.constData(),
+                                                  array.size(), utf8.constData());
             }
             else
             {
@@ -395,10 +360,8 @@ namespace Rv
                 //  Binary data, no text rep
                 //
 
-                (void)d.session->userRawDataEvent(
-                    d.replyEvent.toUtf8().constData(),
-                    ctype.toUtf8().constData(), array.constData(), array.size(),
-                    0);
+                (void)d.session->userRawDataEvent(d.replyEvent.toUtf8().constData(), ctype.toUtf8().constData(), array.constData(),
+                                                  array.size(), 0);
             }
         }
 
@@ -423,14 +386,12 @@ namespace Rv
         {
             foreach (QSslError err, errList)
             {
-                cerr << "WARNING: reply SSL error: "
-                     << UTF8::qconvert(err.errorString()) << endl;
+                cerr << "WARNING: reply SSL error: " << UTF8::qconvert(err.errorString()) << endl;
             }
         }
     }
 
-    void RvWebManager::managerSSLErrors(QNetworkReply* reply,
-                                        QList<QSslError> errList)
+    void RvWebManager::managerSSLErrors(QNetworkReply* reply, QList<QSslError> errList)
     {
         bool ignore = true;
 
@@ -452,8 +413,7 @@ namespace Rv
         {
             foreach (QSslError err, errList)
             {
-                cerr << "WARNING: " << ((ignore) ? "ignoring" : "not ignoring")
-                     << " SSL error: " << UTF8::qconvert(err.errorString())
+                cerr << "WARNING: " << ((ignore) ? "ignoring" : "not ignoring") << " SSL error: " << UTF8::qconvert(err.errorString())
                      << endl;
             }
         }

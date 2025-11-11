@@ -52,8 +52,7 @@ namespace Mu
             void throwError(Thread& m, int);
             void compile(Thread&, int flags);
             bool matches(Thread&, const Mu::String&, int flags);
-            bool smatch(Thread&, const Mu::String&, int flags,
-                        regmatch_t* matches, size_t num);
+            bool smatch(Thread&, const Mu::String&, int flags, regmatch_t* matches, size_t num);
 
         private:
             Mu::String _std_string;
@@ -75,10 +74,8 @@ namespace Mu
         // can call the static function if you already have a std::string.
         //
 
-        virtual void outputValue(std::ostream&, const Value&,
-                                 bool full = false) const;
-        virtual void outputValueRecursive(std::ostream&, const ValuePointer,
-                                          ValueOutputState&) const;
+        virtual void outputValue(std::ostream&, const Value&, bool full = false) const;
+        virtual void outputValueRecursive(std::ostream&, const ValuePointer, ValueOutputState&) const;
         static void outputQuotedRegex(std::ostream&, const std::string&);
 
         //

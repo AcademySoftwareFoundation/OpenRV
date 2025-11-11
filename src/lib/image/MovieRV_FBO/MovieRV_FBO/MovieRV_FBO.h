@@ -66,16 +66,12 @@ namespace TwkFB
         //
         //  MovieReader API
         //
-        virtual void preloadOpen(const std::string& filename,
-                                 const ReadRequest& request);
+        virtual void preloadOpen(const std::string& filename, const ReadRequest& request);
 
-        virtual void postPreloadOpen(const TwkMovie::MovieInfo& info,
-                                     const Movie::ReadRequest& request);
+        virtual void postPreloadOpen(const TwkMovie::MovieInfo& info, const Movie::ReadRequest& request);
 
-        void open(Rv::RvSession*, const TwkMovie::MovieInfo& as,
-                  TwkAudio::ChannelsVector audioChannels,
-                  double audioRate = TWEAK_AUDIO_DEFAULT_SAMPLE_RATE,
-                  size_t audioPacketSize = 512);
+        void open(Rv::RvSession*, const TwkMovie::MovieInfo& as, TwkAudio::ChannelsVector audioChannels,
+                  double audioRate = TWEAK_AUDIO_DEFAULT_SAMPLE_RATE, size_t audioPacketSize = 512);
 
         //
         //  Movie API
@@ -120,8 +116,7 @@ namespace TwkFB
         virtual std::string about() const;
         virtual TwkMovie::MovieReader* movieReader() const;
         virtual TwkMovie::MovieWriter* movieWriter() const;
-        virtual TwkMovie::MovieInfo
-        getMovieInfo(const std::string& filename) const;
+        virtual TwkMovie::MovieInfo getMovieInfo(const std::string& filename) const;
     };
 
 } // namespace TwkFB

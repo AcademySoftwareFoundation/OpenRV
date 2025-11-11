@@ -14,17 +14,14 @@ namespace Mu
 {
     using namespace std;
 
-    Type::MatchResult MatchDynamicArray::match(const Type* other,
-                                               Bindings&) const
+    Type::MatchResult MatchDynamicArray::match(const Type* other, Bindings&) const
     {
-        return dynamic_cast<const DynamicArrayType*>(other) != 0 ? Match
-                                                                 : NoMatch;
+        return dynamic_cast<const DynamicArrayType*>(other) != 0 ? Match : NoMatch;
     }
 
     Type::MatchResult MatchFixedArray::match(const Type* other, Bindings&) const
     {
-        return dynamic_cast<const FixedArrayType*>(other) != 0 ? Match
-                                                               : NoMatch;
+        return dynamic_cast<const FixedArrayType*>(other) != 0 ? Match : NoMatch;
     }
 
 } // namespace Mu

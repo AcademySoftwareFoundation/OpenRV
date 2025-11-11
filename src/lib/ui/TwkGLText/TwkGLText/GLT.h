@@ -65,11 +65,9 @@ void gltMultipleLineRender(float x, float y, const std::string& text);
 //  Measuring strings and the current face
 //
 
-void gltBounds(const std::string& text, float& xmin, float& xmax, float& ymin,
-               float& ymax);
+void gltBounds(const std::string& text, float& xmin, float& xmax, float& ymin, float& ymax);
 
-void gltMultipleLineBounds(const std::string& text, float& xmin, float& xmax,
-                           float& ymin, float& ymax);
+void gltMultipleLineBounds(const std::string& text, float& xmin, float& xmax, float& ymin, float& ymax);
 
 float gltAscenderHeight();
 float gltDescenderHeight();

@@ -48,20 +48,15 @@ namespace Mu
 
     Object* ProcessType::newObject() const { return new PipeStream(this); }
 
-    void ProcessType::deleteObject(Object* obj) const
-    {
-        delete static_cast<ProcessType::PipeStream*>(obj);
-    }
+    void ProcessType::deleteObject(Object* obj) const { delete static_cast<ProcessType::PipeStream*>(obj); }
 
-    void ProcessType::outputValue(ostream& o, const Value& value,
-                                  bool full) const
+    void ProcessType::outputValue(ostream& o, const Value& value, bool full) const
     {
         PipeStream* s = reinterpret_cast<PipeStream*>(value._Pointer);
 
         if (s)
         {
-            o << "<#" << s->type()->fullyQualifiedName() << " 0x" << hex
-              << s->exec_stream << dec << ">";
+            o << "<#" << s->type()->fullyQualifiedName() << " 0x" << hex << s->exec_stream << dec << ">";
         }
         else
         {
@@ -69,8 +64,7 @@ namespace Mu
         }
     }
 
-    void ProcessType::outputValueRecursive(ostream& o, const ValuePointer vp,
-                                           ValueOutputState& state) const
+    void ProcessType::outputValueRecursive(ostream& o, const ValuePointer vp, ValueOutputState& state) const
     {
         if (vp)
         {
@@ -106,44 +100,31 @@ namespace Mu
 
         s->addSymbols(new ReferenceType(c, r, this),
 
-                      new Function(c, n, BaseFunctions::dereference, Cast,
-                                   Return, tn, Args, rn, End),
+                      new Function(c, n, BaseFunctions::dereference, Cast, Return, tn, Args, rn, End),
 
-                      new Function(c, n, ProcessType::construct, None, Return,
-                                   tn, Args, "string", "[string]", "int64",
-                                   End),
+                      new Function(c, n, ProcessType::construct, None, Return, tn, Args, "string", "[string]", "int64", End),
 
                       EndArguments);
 
-        globalScope()->addSymbols(
-            new Function(c, "=", BaseFunctions::assign, AsOp, Return, rn, Args,
-                         rn, tn, End),
+        globalScope()->addSymbols(new Function(c, "=", BaseFunctions::assign, AsOp, Return, rn, Args, rn, tn, End),
 
-            new Function(c, "bool", ProcessType::toBool, None, Return, "bool",
-                         Args, tn, End),
+                                  new Function(c, "bool", ProcessType::toBool, None, Return, "bool", Args, tn, End),
 
-            EndArguments);
+                                  EndArguments);
 
-        addSymbols(new Function(c, "in", ProcessType::inStream, None, Return,
-                                "io.ostream", Args, tn, End),
+        addSymbols(new Function(c, "in", ProcessType::inStream, None, Return, "io.ostream", Args, tn, End),
 
-                   new Function(c, "out", ProcessType::outStream, None, Return,
-                                "io.istream", Args, tn, End),
+                   new Function(c, "out", ProcessType::outStream, None, Return, "io.istream", Args, tn, End),
 
-                   new Function(c, "err", ProcessType::errStream, None, Return,
-                                "io.istream", Args, tn, End),
+                   new Function(c, "err", ProcessType::errStream, None, Return, "io.istream", Args, tn, End),
 
-                   new Function(c, "close", ProcessType::close, None, Return,
-                                "bool", Args, tn, End),
+                   new Function(c, "close", ProcessType::close, None, Return, "bool", Args, tn, End),
 
-                   new Function(c, "close_in", ProcessType::close_in, None,
-                                Return, "bool", Args, tn, End),
+                   new Function(c, "close_in", ProcessType::close_in, None, Return, "bool", Args, tn, End),
 
-                   new Function(c, "kill", ProcessType::kill, None, Return,
-                                "void", Args, tn, End),
+                   new Function(c, "kill", ProcessType::kill, None, Return, "void", Args, tn, End),
 
-                   new Function(c, "exit_code", ProcessType::exit_code, None,
-                                Return, "int", Args, tn, End),
+                   new Function(c, "exit_code", ProcessType::exit_code, None, Return, "int", Args, tn, End),
 
                    EndArguments);
     }
@@ -155,18 +136,15 @@ namespace Mu
         PipeStream* o = new PipeStream(c);
 
         vector<string> args;
-        const StringType::String* program =
-            NODE_ARG_OBJECT(0, StringType::String);
+        const StringType::String* program = NODE_ARG_OBJECT(0, StringType::String);
 
-        for (List list(p, NODE_ARG_OBJECT(1, ClassInstance)); list.isNotNil();
-             list++)
+        for (List list(p, NODE_ARG_OBJECT(1, ClassInstance)); list.isNotNil(); list++)
         {
             args.push_back(list.value<const StringType::String*>()->c_str());
         }
 
         o->exec_stream = new exec_stream_t();
-        o->exec_stream->set_wait_timeout(exec_stream_t::s_all,
-                                         NODE_ARG(2, int64));
+        o->exec_stream->set_wait_timeout(exec_stream_t::s_all, NODE_ARG(2, int64));
         o->exec_stream->start(program->c_str(), args.begin(), args.end());
 
         OStreamType::OStream* oin = new OStreamType::OStream(c);

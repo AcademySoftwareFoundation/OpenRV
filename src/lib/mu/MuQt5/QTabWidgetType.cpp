@@ -75,16 +75,14 @@ namespace Mu
         _baseType = 0;
     }
 
-    MuQt_QTabWidget::MuQt_QTabWidget(Pointer muobj, const CallEnvironment* ce,
-                                     QWidget* parent)
+    MuQt_QTabWidget::MuQt_QTabWidget(Pointer muobj, const CallEnvironment* ce, QWidget* parent)
         : QTabWidget(parent)
     {
         _env = ce;
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QTabWidgetType>(
-            c->internName("qt.QTabWidget"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QTabWidgetType>(c->internName("qt.QTabWidget"));
     }
 
     bool MuQt_QTabWidget::hasHeightForWidth() const
@@ -295,8 +293,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QPaintEventType>(c, event, "qt.QPaintEvent"));
+            args[1] = Value(makeqpointer<QPaintEventType>(c, event, "qt.QPaintEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -319,8 +316,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QResizeEventType>(c, e, "qt.QResizeEvent"));
+            args[1] = Value(makeqpointer<QResizeEventType>(c, e, "qt.QResizeEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -343,8 +339,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QShowEventType>(c, _p13, "qt.QShowEvent"));
+            args[1] = Value(makeqpointer<QShowEventType>(c, _p13, "qt.QShowEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -388,8 +383,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QCloseEventType>(c, event, "qt.QCloseEvent"));
+            args[1] = Value(makeqpointer<QCloseEventType>(c, event, "qt.QCloseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -412,8 +406,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqpointer<QContextMenuEventType>(
-                c, event, "qt.QContextMenuEvent"));
+            args[1] = Value(makeqpointer<QContextMenuEventType>(c, event, "qt.QContextMenuEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -436,8 +429,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqpointer<QDragEnterEventType>(
-                c, event, "qt.QDragEnterEvent"));
+            args[1] = Value(makeqpointer<QDragEnterEventType>(c, event, "qt.QDragEnterEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -460,8 +452,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqpointer<QDragLeaveEventType>(
-                c, event, "qt.QDragLeaveEvent"));
+            args[1] = Value(makeqpointer<QDragLeaveEventType>(c, event, "qt.QDragLeaveEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -484,8 +475,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqpointer<QDragMoveEventType>(
-                c, event, "qt.QDragMoveEvent"));
+            args[1] = Value(makeqpointer<QDragMoveEventType>(c, event, "qt.QDragMoveEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -508,8 +498,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QDropEventType>(c, event, "qt.QDropEvent"));
+            args[1] = Value(makeqpointer<QDropEventType>(c, event, "qt.QDropEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -555,8 +544,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QFocusEventType>(c, event, "qt.QFocusEvent"));
+            args[1] = Value(makeqpointer<QFocusEventType>(c, event, "qt.QFocusEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -600,8 +588,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QFocusEventType>(c, event, "qt.QFocusEvent"));
+            args[1] = Value(makeqpointer<QFocusEventType>(c, event, "qt.QFocusEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -624,8 +611,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QHideEventType>(c, event, "qt.QHideEvent"));
+            args[1] = Value(makeqpointer<QHideEventType>(c, event, "qt.QHideEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -648,8 +634,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QKeyEventType>(c, event, "qt.QKeyEvent"));
+            args[1] = Value(makeqpointer<QKeyEventType>(c, event, "qt.QKeyEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -695,8 +680,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -719,8 +703,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -743,8 +726,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -767,8 +749,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -791,8 +772,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QMoveEventType>(c, event, "qt.QMoveEvent"));
+            args[1] = Value(makeqpointer<QMoveEventType>(c, event, "qt.QMoveEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -815,8 +795,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QTabletEventType>(c, event, "qt.QTabletEvent"));
+            args[1] = Value(makeqpointer<QTabletEventType>(c, event, "qt.QTabletEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -839,8 +818,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QWheelEventType>(c, event, "qt.QWheelEvent"));
+            args[1] = Value(makeqpointer<QWheelEventType>(c, event, "qt.QWheelEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -873,8 +851,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  Mu Type CONSTRUCTORS
 
-    QTabWidgetType::QTabWidgetType(Context* c, const char* name, Class* super,
-                                   Class* super2)
+    QTabWidgetType::QTabWidgetType(Context* c, const char* name, Class* super, Class* super2)
         : Class(c, name, vectorOf2(super, super2))
     {
     }
@@ -884,8 +861,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    static Pointer QTabWidget_QTabWidget_QObject(Thread& NODE_THREAD,
-                                                 Pointer obj)
+    static Pointer QTabWidget_QTabWidget_QObject(Thread& NODE_THREAD, Pointer obj)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         ClassInstance* widget = reinterpret_cast<ClassInstance*>(obj);
@@ -896,9 +872,7 @@ namespace Mu
         }
         else if (QTabWidget* w = object<QTabWidget>(widget))
         {
-            QTabWidgetType* type =
-                c->findSymbolOfTypeByQualifiedName<QTabWidgetType>(
-                    c->internName("qt.QTabWidget"), false);
+            QTabWidgetType* type = c->findSymbolOfTypeByQualifiedName<QTabWidgetType>(c->internName("qt.QTabWidget"), false);
             ClassInstance* o = ClassInstance::allocate(type);
             setobject(o, w);
             return o;
@@ -909,26 +883,18 @@ namespace Mu
         }
     }
 
-    static NODE_IMPLEMENTATION(castFromObject, Pointer)
-    {
-        NODE_RETURN(
-            QTabWidget_QTabWidget_QObject(NODE_THREAD, NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(castFromObject, Pointer) { NODE_RETURN(QTabWidget_QTabWidget_QObject(NODE_THREAD, NODE_ARG(0, Pointer))); }
 
-    Pointer qt_QTabWidget_QTabWidget_QTabWidget_QTabWidget_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
+    Pointer qt_QTabWidget_QTabWidget_QTabWidget_QTabWidget_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWidget* arg1 = object<QWidget>(param_parent);
-        setobject(param_this,
-                  new MuQt_QTabWidget(param_this,
-                                      NODE_THREAD.process()->callEnv(), arg1));
+        setobject(param_this, new MuQt_QTabWidget(param_this, NODE_THREAD.process()->callEnv(), arg1));
         return param_this;
     }
 
-    int qt_QTabWidget_addTab_int_QTabWidget_QWidget_string(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_page,
-        Pointer param_label)
+    int qt_QTabWidget_addTab_int_QTabWidget_QWidget_string(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_page,
+                                                           Pointer param_label)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTabWidget* arg0 = object<QTabWidget>(param_this);
@@ -937,9 +903,8 @@ namespace Mu
         return arg0->addTab(arg1, arg2);
     }
 
-    int qt_QTabWidget_addTab_int_QTabWidget_QWidget_QIcon_string(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_page,
-        Pointer param_icon, Pointer param_label)
+    int qt_QTabWidget_addTab_int_QTabWidget_QWidget_QIcon_string(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_page,
+                                                                 Pointer param_icon, Pointer param_label)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTabWidget* arg0 = object<QTabWidget>(param_this);
@@ -949,37 +914,29 @@ namespace Mu
         return arg0->addTab(arg1, arg2, arg3);
     }
 
-    void qt_QTabWidget_clear_void_QTabWidget(Mu::Thread& NODE_THREAD,
-                                             Pointer param_this)
+    void qt_QTabWidget_clear_void_QTabWidget(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTabWidget* arg0 = object<QTabWidget>(param_this);
         arg0->clear();
     }
 
-    Pointer qt_QTabWidget_cornerWidget_QWidget_QTabWidget_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_corner)
+    Pointer qt_QTabWidget_cornerWidget_QWidget_QTabWidget_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_corner)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTabWidget* arg0 = object<QTabWidget>(param_this);
         Qt::Corner arg1 = (Qt::Corner)(param_corner);
-        return makeinstance<QWidgetType>(c, arg0->cornerWidget(arg1),
-                                         "qt.QWidget");
+        return makeinstance<QWidgetType>(c, arg0->cornerWidget(arg1), "qt.QWidget");
     }
 
-    Pointer
-    qt_QTabWidget_currentWidget_QWidget_QTabWidget(Mu::Thread& NODE_THREAD,
-                                                   Pointer param_this)
+    Pointer qt_QTabWidget_currentWidget_QWidget_QTabWidget(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTabWidget* arg0 = object<QTabWidget>(param_this);
-        return makeinstance<QWidgetType>(c, arg0->currentWidget(),
-                                         "qt.QWidget");
+        return makeinstance<QWidgetType>(c, arg0->currentWidget(), "qt.QWidget");
     }
 
-    int qt_QTabWidget_indexOf_int_QTabWidget_QWidget(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_this,
-                                                     Pointer param_w)
+    int qt_QTabWidget_indexOf_int_QTabWidget_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_w)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTabWidget* arg0 = object<QTabWidget>(param_this);
@@ -987,9 +944,8 @@ namespace Mu
         return arg0->indexOf(arg1);
     }
 
-    int qt_QTabWidget_insertTab_int_QTabWidget_int_QWidget_string(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_index,
-        Pointer param_page, Pointer param_label)
+    int qt_QTabWidget_insertTab_int_QTabWidget_int_QWidget_string(Mu::Thread& NODE_THREAD, Pointer param_this, int param_index,
+                                                                  Pointer param_page, Pointer param_label)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTabWidget* arg0 = object<QTabWidget>(param_this);
@@ -999,9 +955,8 @@ namespace Mu
         return arg0->insertTab(arg1, arg2, arg3);
     }
 
-    int qt_QTabWidget_insertTab_int_QTabWidget_int_QWidget_QIcon_string(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_index,
-        Pointer param_page, Pointer param_icon, Pointer param_label)
+    int qt_QTabWidget_insertTab_int_QTabWidget_int_QWidget_QIcon_string(Mu::Thread& NODE_THREAD, Pointer param_this, int param_index,
+                                                                        Pointer param_page, Pointer param_icon, Pointer param_label)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTabWidget* arg0 = object<QTabWidget>(param_this);
@@ -1012,9 +967,7 @@ namespace Mu
         return arg0->insertTab(arg1, arg2, arg3, arg4);
     }
 
-    bool qt_QTabWidget_isTabEnabled_bool_QTabWidget_int(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this,
-                                                        int param_index)
+    bool qt_QTabWidget_isTabEnabled_bool_QTabWidget_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_index)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTabWidget* arg0 = object<QTabWidget>(param_this);
@@ -1022,9 +975,7 @@ namespace Mu
         return arg0->isTabEnabled(arg1);
     }
 
-    void qt_QTabWidget_removeTab_void_QTabWidget_int(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_this,
-                                                     int param_index)
+    void qt_QTabWidget_removeTab_void_QTabWidget_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_index)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTabWidget* arg0 = object<QTabWidget>(param_this);
@@ -1032,9 +983,8 @@ namespace Mu
         arg0->removeTab(arg1);
     }
 
-    void qt_QTabWidget_setCornerWidget_void_QTabWidget_QWidget_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_widget,
-        int param_corner)
+    void qt_QTabWidget_setCornerWidget_void_QTabWidget_QWidget_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_widget,
+                                                                   int param_corner)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTabWidget* arg0 = object<QTabWidget>(param_this);
@@ -1043,9 +993,8 @@ namespace Mu
         arg0->setCornerWidget(arg1, arg2);
     }
 
-    void qt_QTabWidget_setTabEnabled_void_QTabWidget_int_bool(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_index,
-        bool param_enable)
+    void qt_QTabWidget_setTabEnabled_void_QTabWidget_int_bool(Mu::Thread& NODE_THREAD, Pointer param_this, int param_index,
+                                                              bool param_enable)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTabWidget* arg0 = object<QTabWidget>(param_this);
@@ -1054,9 +1003,8 @@ namespace Mu
         arg0->setTabEnabled(arg1, arg2);
     }
 
-    void qt_QTabWidget_setTabIcon_void_QTabWidget_int_QIcon(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_index,
-        Pointer param_icon)
+    void qt_QTabWidget_setTabIcon_void_QTabWidget_int_QIcon(Mu::Thread& NODE_THREAD, Pointer param_this, int param_index,
+                                                            Pointer param_icon)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTabWidget* arg0 = object<QTabWidget>(param_this);
@@ -1065,9 +1013,8 @@ namespace Mu
         arg0->setTabIcon(arg1, arg2);
     }
 
-    void qt_QTabWidget_setTabText_void_QTabWidget_int_string(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_index,
-        Pointer param_label)
+    void qt_QTabWidget_setTabText_void_QTabWidget_int_string(Mu::Thread& NODE_THREAD, Pointer param_this, int param_index,
+                                                             Pointer param_label)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTabWidget* arg0 = object<QTabWidget>(param_this);
@@ -1076,9 +1023,8 @@ namespace Mu
         arg0->setTabText(arg1, arg2);
     }
 
-    void qt_QTabWidget_setTabToolTip_void_QTabWidget_int_string(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_index,
-        Pointer param_tip)
+    void qt_QTabWidget_setTabToolTip_void_QTabWidget_int_string(Mu::Thread& NODE_THREAD, Pointer param_this, int param_index,
+                                                                Pointer param_tip)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTabWidget* arg0 = object<QTabWidget>(param_this);
@@ -1087,9 +1033,8 @@ namespace Mu
         arg0->setTabToolTip(arg1, arg2);
     }
 
-    void qt_QTabWidget_setTabWhatsThis_void_QTabWidget_int_string(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_index,
-        Pointer param_text)
+    void qt_QTabWidget_setTabWhatsThis_void_QTabWidget_int_string(Mu::Thread& NODE_THREAD, Pointer param_this, int param_index,
+                                                                  Pointer param_text)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTabWidget* arg0 = object<QTabWidget>(param_this);
@@ -1098,17 +1043,14 @@ namespace Mu
         arg0->setTabWhatsThis(arg1, arg2);
     }
 
-    Pointer qt_QTabWidget_tabBar_QTabBar_QTabWidget(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this)
+    Pointer qt_QTabWidget_tabBar_QTabBar_QTabWidget(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTabWidget* arg0 = object<QTabWidget>(param_this);
         return makeinstance<QTabBarType>(c, arg0->tabBar(), "qt.QTabBar");
     }
 
-    Pointer qt_QTabWidget_tabIcon_QIcon_QTabWidget_int(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this,
-                                                       int param_index)
+    Pointer qt_QTabWidget_tabIcon_QIcon_QTabWidget_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_index)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTabWidget* arg0 = object<QTabWidget>(param_this);
@@ -1116,9 +1058,7 @@ namespace Mu
         return makeqtype<QIconType>(c, arg0->tabIcon(arg1), "qt.QIcon");
     }
 
-    Pointer qt_QTabWidget_tabText_string_QTabWidget_int(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this,
-                                                        int param_index)
+    Pointer qt_QTabWidget_tabText_string_QTabWidget_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_index)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTabWidget* arg0 = object<QTabWidget>(param_this);
@@ -1126,8 +1066,7 @@ namespace Mu
         return makestring(c, arg0->tabText(arg1));
     }
 
-    Pointer qt_QTabWidget_tabToolTip_string_QTabWidget_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_index)
+    Pointer qt_QTabWidget_tabToolTip_string_QTabWidget_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_index)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTabWidget* arg0 = object<QTabWidget>(param_this);
@@ -1135,8 +1074,7 @@ namespace Mu
         return makestring(c, arg0->tabToolTip(arg1));
     }
 
-    Pointer qt_QTabWidget_tabWhatsThis_string_QTabWidget_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_index)
+    Pointer qt_QTabWidget_tabWhatsThis_string_QTabWidget_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_index)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTabWidget* arg0 = object<QTabWidget>(param_this);
@@ -1144,9 +1082,7 @@ namespace Mu
         return makestring(c, arg0->tabWhatsThis(arg1));
     }
 
-    Pointer qt_QTabWidget_widget_QWidget_QTabWidget_int(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this,
-                                                        int param_index)
+    Pointer qt_QTabWidget_widget_QWidget_QTabWidget_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_index)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTabWidget* arg0 = object<QTabWidget>(param_this);
@@ -1154,53 +1090,38 @@ namespace Mu
         return makeinstance<QWidgetType>(c, arg0->widget(arg1), "qt.QWidget");
     }
 
-    bool
-    qt_QTabWidget_hasHeightForWidth_bool_QTabWidget(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this)
+    bool qt_QTabWidget_hasHeightForWidth_bool_QTabWidget(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTabWidget* arg0 = object<QTabWidget>(param_this);
-        return isMuQtObject(arg0) ? arg0->QTabWidget::hasHeightForWidth()
-                                  : arg0->hasHeightForWidth();
+        return isMuQtObject(arg0) ? arg0->QTabWidget::hasHeightForWidth() : arg0->hasHeightForWidth();
     }
 
-    int qt_QTabWidget_heightForWidth_int_QTabWidget_int(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this,
-                                                        int param_width)
+    int qt_QTabWidget_heightForWidth_int_QTabWidget_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_width)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTabWidget* arg0 = object<QTabWidget>(param_this);
         int arg1 = (int)(param_width);
-        return isMuQtObject(arg0) ? arg0->QTabWidget::heightForWidth(arg1)
-                                  : arg0->heightForWidth(arg1);
+        return isMuQtObject(arg0) ? arg0->QTabWidget::heightForWidth(arg1) : arg0->heightForWidth(arg1);
     }
 
-    Pointer
-    qt_QTabWidget_minimumSizeHint_QSize_QTabWidget(Mu::Thread& NODE_THREAD,
-                                                   Pointer param_this)
+    Pointer qt_QTabWidget_minimumSizeHint_QSize_QTabWidget(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTabWidget* arg0 = object<QTabWidget>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QSizeType>(
-                         c, arg0->QTabWidget::minimumSizeHint(), "qt.QSize")
-                   : makeqtype<QSizeType>(c, arg0->minimumSizeHint(),
-                                          "qt.QSize");
+        return isMuQtObject(arg0) ? makeqtype<QSizeType>(c, arg0->QTabWidget::minimumSizeHint(), "qt.QSize")
+                                  : makeqtype<QSizeType>(c, arg0->minimumSizeHint(), "qt.QSize");
     }
 
-    Pointer qt_QTabWidget_sizeHint_QSize_QTabWidget(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this)
+    Pointer qt_QTabWidget_sizeHint_QSize_QTabWidget(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTabWidget* arg0 = object<QTabWidget>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QSizeType>(c, arg0->QTabWidget::sizeHint(),
-                                          "qt.QSize")
-                   : makeqtype<QSizeType>(c, arg0->sizeHint(), "qt.QSize");
+        return isMuQtObject(arg0) ? makeqtype<QSizeType>(c, arg0->QTabWidget::sizeHint(), "qt.QSize")
+                                  : makeqtype<QSizeType>(c, arg0->sizeHint(), "qt.QSize");
     }
 
-    void qt_QTabWidget_setTabBar_void_QTabWidget_QTabBar(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_tb)
+    void qt_QTabWidget_setTabBar_void_QTabWidget_QTabBar(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_tb)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTabWidget* arg0 = object<QTabWidget>(param_this);
@@ -1208,9 +1129,7 @@ namespace Mu
         ((MuQt_QTabWidget*)arg0)->setTabBar_pub(arg1);
     }
 
-    void qt_QTabWidget_tabInserted_void_QTabWidget_int(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this,
-                                                       int param_index)
+    void qt_QTabWidget_tabInserted_void_QTabWidget_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_index)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTabWidget* arg0 = object<QTabWidget>(param_this);
@@ -1221,9 +1140,7 @@ namespace Mu
             ((MuQt_QTabWidget*)arg0)->tabInserted_pub(arg1);
     }
 
-    void qt_QTabWidget_tabRemoved_void_QTabWidget_int(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this,
-                                                      int param_index)
+    void qt_QTabWidget_tabRemoved_void_QTabWidget_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_index)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTabWidget* arg0 = object<QTabWidget>(param_this);
@@ -1234,8 +1151,7 @@ namespace Mu
             ((MuQt_QTabWidget*)arg0)->tabRemoved_pub(arg1);
     }
 
-    void qt_QTabWidget_changeEvent_void_QTabWidget_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_ev)
+    void qt_QTabWidget_changeEvent_void_QTabWidget_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_ev)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTabWidget* arg0 = object<QTabWidget>(param_this);
@@ -1246,20 +1162,15 @@ namespace Mu
             ((MuQt_QTabWidget*)arg0)->changeEvent_pub(arg1);
     }
 
-    bool qt_QTabWidget_event_bool_QTabWidget_QEvent(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this,
-                                                    Pointer param_ev)
+    bool qt_QTabWidget_event_bool_QTabWidget_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_ev)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTabWidget* arg0 = object<QTabWidget>(param_this);
         QEvent* arg1 = getqpointer<QEventType>(param_ev);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QTabWidget*)arg0)->event_pub_parent(arg1)
-                   : ((MuQt_QTabWidget*)arg0)->event_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QTabWidget*)arg0)->event_pub_parent(arg1) : ((MuQt_QTabWidget*)arg0)->event_pub(arg1);
     }
 
-    void qt_QTabWidget_keyPressEvent_void_QTabWidget_QKeyEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QTabWidget_keyPressEvent_void_QTabWidget_QKeyEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTabWidget* arg0 = object<QTabWidget>(param_this);
@@ -1270,8 +1181,7 @@ namespace Mu
             ((MuQt_QTabWidget*)arg0)->keyPressEvent_pub(arg1);
     }
 
-    void qt_QTabWidget_paintEvent_void_QTabWidget_QPaintEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QTabWidget_paintEvent_void_QTabWidget_QPaintEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTabWidget* arg0 = object<QTabWidget>(param_this);
@@ -1282,8 +1192,7 @@ namespace Mu
             ((MuQt_QTabWidget*)arg0)->paintEvent_pub(arg1);
     }
 
-    void qt_QTabWidget_resizeEvent_void_QTabWidget_QResizeEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QTabWidget_resizeEvent_void_QTabWidget_QResizeEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTabWidget* arg0 = object<QTabWidget>(param_this);
@@ -1294,8 +1203,7 @@ namespace Mu
             ((MuQt_QTabWidget*)arg0)->resizeEvent_pub(arg1);
     }
 
-    void qt_QTabWidget_showEvent_void_QTabWidget_QShowEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param__p13)
+    void qt_QTabWidget_showEvent_void_QTabWidget_QShowEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param__p13)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTabWidget* arg0 = object<QTabWidget>(param_this);
@@ -1306,22 +1214,16 @@ namespace Mu
             ((MuQt_QTabWidget*)arg0)->showEvent_pub(arg1);
     }
 
-    Pointer qt_QTabWidget_inputMethodQuery_QVariant_QTabWidget_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_query)
+    Pointer qt_QTabWidget_inputMethodQuery_QVariant_QTabWidget_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_query)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTabWidget* arg0 = object<QTabWidget>(param_this);
         Qt::InputMethodQuery arg1 = (Qt::InputMethodQuery)(param_query);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QVariantType>(
-                         c, arg0->QTabWidget::inputMethodQuery(arg1),
-                         "qt.QVariant")
-                   : makeqtype<QVariantType>(c, arg0->inputMethodQuery(arg1),
-                                             "qt.QVariant");
+        return isMuQtObject(arg0) ? makeqtype<QVariantType>(c, arg0->QTabWidget::inputMethodQuery(arg1), "qt.QVariant")
+                                  : makeqtype<QVariantType>(c, arg0->inputMethodQuery(arg1), "qt.QVariant");
     }
 
-    void qt_QTabWidget_closeEvent_void_QTabWidget_QCloseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QTabWidget_closeEvent_void_QTabWidget_QCloseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTabWidget* arg0 = object<QTabWidget>(param_this);
@@ -1332,21 +1234,18 @@ namespace Mu
             ((MuQt_QTabWidget*)arg0)->closeEvent_pub(arg1);
     }
 
-    void qt_QTabWidget_contextMenuEvent_void_QTabWidget_QContextMenuEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QTabWidget_contextMenuEvent_void_QTabWidget_QContextMenuEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTabWidget* arg0 = object<QTabWidget>(param_this);
-        QContextMenuEvent* arg1 =
-            getqpointer<QContextMenuEventType>(param_event);
+        QContextMenuEvent* arg1 = getqpointer<QContextMenuEventType>(param_event);
         if (isMuQtObject(arg0))
             ((MuQt_QTabWidget*)arg0)->contextMenuEvent_pub_parent(arg1);
         else
             ((MuQt_QTabWidget*)arg0)->contextMenuEvent_pub(arg1);
     }
 
-    void qt_QTabWidget_dragEnterEvent_void_QTabWidget_QDragEnterEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QTabWidget_dragEnterEvent_void_QTabWidget_QDragEnterEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTabWidget* arg0 = object<QTabWidget>(param_this);
@@ -1357,8 +1256,7 @@ namespace Mu
             ((MuQt_QTabWidget*)arg0)->dragEnterEvent_pub(arg1);
     }
 
-    void qt_QTabWidget_dragLeaveEvent_void_QTabWidget_QDragLeaveEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QTabWidget_dragLeaveEvent_void_QTabWidget_QDragLeaveEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTabWidget* arg0 = object<QTabWidget>(param_this);
@@ -1369,8 +1267,7 @@ namespace Mu
             ((MuQt_QTabWidget*)arg0)->dragLeaveEvent_pub(arg1);
     }
 
-    void qt_QTabWidget_dragMoveEvent_void_QTabWidget_QDragMoveEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QTabWidget_dragMoveEvent_void_QTabWidget_QDragMoveEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTabWidget* arg0 = object<QTabWidget>(param_this);
@@ -1381,8 +1278,7 @@ namespace Mu
             ((MuQt_QTabWidget*)arg0)->dragMoveEvent_pub(arg1);
     }
 
-    void qt_QTabWidget_dropEvent_void_QTabWidget_QDropEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QTabWidget_dropEvent_void_QTabWidget_QDropEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTabWidget* arg0 = object<QTabWidget>(param_this);
@@ -1393,8 +1289,7 @@ namespace Mu
             ((MuQt_QTabWidget*)arg0)->dropEvent_pub(arg1);
     }
 
-    void qt_QTabWidget_enterEvent_void_QTabWidget_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QTabWidget_enterEvent_void_QTabWidget_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTabWidget* arg0 = object<QTabWidget>(param_this);
@@ -1405,8 +1300,7 @@ namespace Mu
             ((MuQt_QTabWidget*)arg0)->enterEvent_pub(arg1);
     }
 
-    void qt_QTabWidget_focusInEvent_void_QTabWidget_QFocusEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QTabWidget_focusInEvent_void_QTabWidget_QFocusEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTabWidget* arg0 = object<QTabWidget>(param_this);
@@ -1417,20 +1311,16 @@ namespace Mu
             ((MuQt_QTabWidget*)arg0)->focusInEvent_pub(arg1);
     }
 
-    bool qt_QTabWidget_focusNextPrevChild_bool_QTabWidget_bool(
-        Mu::Thread& NODE_THREAD, Pointer param_this, bool param_next)
+    bool qt_QTabWidget_focusNextPrevChild_bool_QTabWidget_bool(Mu::Thread& NODE_THREAD, Pointer param_this, bool param_next)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTabWidget* arg0 = object<QTabWidget>(param_this);
         bool arg1 = (bool)(param_next);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QTabWidget*)arg0)
-                         ->focusNextPrevChild_pub_parent(arg1)
-                   : ((MuQt_QTabWidget*)arg0)->focusNextPrevChild_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QTabWidget*)arg0)->focusNextPrevChild_pub_parent(arg1)
+                                  : ((MuQt_QTabWidget*)arg0)->focusNextPrevChild_pub(arg1);
     }
 
-    void qt_QTabWidget_focusOutEvent_void_QTabWidget_QFocusEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QTabWidget_focusOutEvent_void_QTabWidget_QFocusEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTabWidget* arg0 = object<QTabWidget>(param_this);
@@ -1441,8 +1331,7 @@ namespace Mu
             ((MuQt_QTabWidget*)arg0)->focusOutEvent_pub(arg1);
     }
 
-    void qt_QTabWidget_hideEvent_void_QTabWidget_QHideEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QTabWidget_hideEvent_void_QTabWidget_QHideEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTabWidget* arg0 = object<QTabWidget>(param_this);
@@ -1453,8 +1342,7 @@ namespace Mu
             ((MuQt_QTabWidget*)arg0)->hideEvent_pub(arg1);
     }
 
-    void qt_QTabWidget_keyReleaseEvent_void_QTabWidget_QKeyEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QTabWidget_keyReleaseEvent_void_QTabWidget_QKeyEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTabWidget* arg0 = object<QTabWidget>(param_this);
@@ -1465,8 +1353,7 @@ namespace Mu
             ((MuQt_QTabWidget*)arg0)->keyReleaseEvent_pub(arg1);
     }
 
-    void qt_QTabWidget_leaveEvent_void_QTabWidget_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QTabWidget_leaveEvent_void_QTabWidget_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTabWidget* arg0 = object<QTabWidget>(param_this);
@@ -1477,8 +1364,7 @@ namespace Mu
             ((MuQt_QTabWidget*)arg0)->leaveEvent_pub(arg1);
     }
 
-    void qt_QTabWidget_mouseDoubleClickEvent_void_QTabWidget_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QTabWidget_mouseDoubleClickEvent_void_QTabWidget_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTabWidget* arg0 = object<QTabWidget>(param_this);
@@ -1489,8 +1375,7 @@ namespace Mu
             ((MuQt_QTabWidget*)arg0)->mouseDoubleClickEvent_pub(arg1);
     }
 
-    void qt_QTabWidget_mouseMoveEvent_void_QTabWidget_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QTabWidget_mouseMoveEvent_void_QTabWidget_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTabWidget* arg0 = object<QTabWidget>(param_this);
@@ -1501,8 +1386,7 @@ namespace Mu
             ((MuQt_QTabWidget*)arg0)->mouseMoveEvent_pub(arg1);
     }
 
-    void qt_QTabWidget_mousePressEvent_void_QTabWidget_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QTabWidget_mousePressEvent_void_QTabWidget_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTabWidget* arg0 = object<QTabWidget>(param_this);
@@ -1513,8 +1397,7 @@ namespace Mu
             ((MuQt_QTabWidget*)arg0)->mousePressEvent_pub(arg1);
     }
 
-    void qt_QTabWidget_mouseReleaseEvent_void_QTabWidget_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QTabWidget_mouseReleaseEvent_void_QTabWidget_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTabWidget* arg0 = object<QTabWidget>(param_this);
@@ -1525,8 +1408,7 @@ namespace Mu
             ((MuQt_QTabWidget*)arg0)->mouseReleaseEvent_pub(arg1);
     }
 
-    void qt_QTabWidget_moveEvent_void_QTabWidget_QMoveEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QTabWidget_moveEvent_void_QTabWidget_QMoveEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTabWidget* arg0 = object<QTabWidget>(param_this);
@@ -1537,8 +1419,7 @@ namespace Mu
             ((MuQt_QTabWidget*)arg0)->moveEvent_pub(arg1);
     }
 
-    void qt_QTabWidget_tabletEvent_void_QTabWidget_QTabletEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QTabWidget_tabletEvent_void_QTabWidget_QTabletEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTabWidget* arg0 = object<QTabWidget>(param_this);
@@ -1549,8 +1430,7 @@ namespace Mu
             ((MuQt_QTabWidget*)arg0)->tabletEvent_pub(arg1);
     }
 
-    void qt_QTabWidget_wheelEvent_void_QTabWidget_QWheelEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QTabWidget_wheelEvent_void_QTabWidget_QWheelEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTabWidget* arg0 = object<QTabWidget>(param_this);
@@ -1561,376 +1441,308 @@ namespace Mu
             ((MuQt_QTabWidget*)arg0)->wheelEvent_pub(arg1);
     }
 
-    int qt_QTabWidget_metric_int_QTabWidget_int(Mu::Thread& NODE_THREAD,
-                                                Pointer param_this, int param_m)
+    int qt_QTabWidget_metric_int_QTabWidget_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_m)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTabWidget* arg0 = object<QTabWidget>(param_this);
-        QPaintDevice::PaintDeviceMetric arg1 =
-            (QPaintDevice::PaintDeviceMetric)(param_m);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QTabWidget*)arg0)->metric_pub_parent(arg1)
-                   : ((MuQt_QTabWidget*)arg0)->metric_pub(arg1);
+        QPaintDevice::PaintDeviceMetric arg1 = (QPaintDevice::PaintDeviceMetric)(param_m);
+        return isMuQtObject(arg0) ? ((MuQt_QTabWidget*)arg0)->metric_pub_parent(arg1) : ((MuQt_QTabWidget*)arg0)->metric_pub(arg1);
     }
 
     static NODE_IMPLEMENTATION(_n_QTabWidget0, Pointer)
     {
-        NODE_RETURN(qt_QTabWidget_QTabWidget_QTabWidget_QTabWidget_QWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QTabWidget_QTabWidget_QTabWidget_QTabWidget_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_addTab0, int)
     {
-        NODE_RETURN(qt_QTabWidget_addTab_int_QTabWidget_QWidget_string(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QTabWidget_addTab_int_QTabWidget_QWidget_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                       NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_addTab1, int)
     {
-        NODE_RETURN(qt_QTabWidget_addTab_int_QTabWidget_QWidget_QIcon_string(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer), NODE_ARG(3, Pointer)));
+        NODE_RETURN(qt_QTabWidget_addTab_int_QTabWidget_QWidget_QIcon_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                             NODE_ARG(2, Pointer), NODE_ARG(3, Pointer)));
     }
 
-    static NODE_IMPLEMENTATION(_n_clear0, void)
-    {
-        qt_QTabWidget_clear_void_QTabWidget(NODE_THREAD,
-                                            NONNIL_NODE_ARG(0, Pointer));
-    }
+    static NODE_IMPLEMENTATION(_n_clear0, void) { qt_QTabWidget_clear_void_QTabWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)); }
 
     static NODE_IMPLEMENTATION(_n_cornerWidget0, Pointer)
     {
-        NODE_RETURN(qt_QTabWidget_cornerWidget_QWidget_QTabWidget_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QTabWidget_cornerWidget_QWidget_QTabWidget_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_currentWidget0, Pointer)
     {
-        NODE_RETURN(qt_QTabWidget_currentWidget_QWidget_QTabWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTabWidget_currentWidget_QWidget_QTabWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_indexOf0, int)
     {
-        NODE_RETURN(qt_QTabWidget_indexOf_int_QTabWidget_QWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QTabWidget_indexOf_int_QTabWidget_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_insertTab0, int)
     {
-        NODE_RETURN(qt_QTabWidget_insertTab_int_QTabWidget_int_QWidget_string(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, Pointer), NODE_ARG(3, Pointer)));
+        NODE_RETURN(qt_QTabWidget_insertTab_int_QTabWidget_int_QWidget_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                              NODE_ARG(2, Pointer), NODE_ARG(3, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_insertTab1, int)
     {
-        NODE_RETURN(
-            qt_QTabWidget_insertTab_int_QTabWidget_int_QWidget_QIcon_string(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-                NODE_ARG(2, Pointer), NODE_ARG(3, Pointer),
-                NODE_ARG(4, Pointer)));
+        NODE_RETURN(qt_QTabWidget_insertTab_int_QTabWidget_int_QWidget_QIcon_string(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, Pointer), NODE_ARG(3, Pointer), NODE_ARG(4, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isTabEnabled0, bool)
     {
-        NODE_RETURN(qt_QTabWidget_isTabEnabled_bool_QTabWidget_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QTabWidget_isTabEnabled_bool_QTabWidget_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_removeTab0, void)
     {
-        qt_QTabWidget_removeTab_void_QTabWidget_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QTabWidget_removeTab_void_QTabWidget_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setCornerWidget0, void)
     {
-        qt_QTabWidget_setCornerWidget_void_QTabWidget_QWidget_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int));
+        qt_QTabWidget_setCornerWidget_void_QTabWidget_QWidget_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                  NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setTabEnabled0, void)
     {
-        qt_QTabWidget_setTabEnabled_void_QTabWidget_int_bool(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, bool));
+        qt_QTabWidget_setTabEnabled_void_QTabWidget_int_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, bool));
     }
 
     static NODE_IMPLEMENTATION(_n_setTabIcon0, void)
     {
-        qt_QTabWidget_setTabIcon_void_QTabWidget_int_QIcon(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, Pointer));
+        qt_QTabWidget_setTabIcon_void_QTabWidget_int_QIcon(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                           NODE_ARG(2, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setTabText0, void)
     {
-        qt_QTabWidget_setTabText_void_QTabWidget_int_string(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, Pointer));
+        qt_QTabWidget_setTabText_void_QTabWidget_int_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                            NODE_ARG(2, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setTabToolTip0, void)
     {
-        qt_QTabWidget_setTabToolTip_void_QTabWidget_int_string(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, Pointer));
+        qt_QTabWidget_setTabToolTip_void_QTabWidget_int_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                               NODE_ARG(2, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setTabWhatsThis0, void)
     {
-        qt_QTabWidget_setTabWhatsThis_void_QTabWidget_int_string(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, Pointer));
+        qt_QTabWidget_setTabWhatsThis_void_QTabWidget_int_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                 NODE_ARG(2, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_tabBar0, Pointer)
     {
-        NODE_RETURN(qt_QTabWidget_tabBar_QTabBar_QTabWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTabWidget_tabBar_QTabBar_QTabWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_tabIcon0, Pointer)
     {
-        NODE_RETURN(qt_QTabWidget_tabIcon_QIcon_QTabWidget_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QTabWidget_tabIcon_QIcon_QTabWidget_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_tabText0, Pointer)
     {
-        NODE_RETURN(qt_QTabWidget_tabText_string_QTabWidget_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QTabWidget_tabText_string_QTabWidget_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_tabToolTip0, Pointer)
     {
-        NODE_RETURN(qt_QTabWidget_tabToolTip_string_QTabWidget_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QTabWidget_tabToolTip_string_QTabWidget_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_tabWhatsThis0, Pointer)
     {
-        NODE_RETURN(qt_QTabWidget_tabWhatsThis_string_QTabWidget_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QTabWidget_tabWhatsThis_string_QTabWidget_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_widget0, Pointer)
     {
-        NODE_RETURN(qt_QTabWidget_widget_QWidget_QTabWidget_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QTabWidget_widget_QWidget_QTabWidget_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_hasHeightForWidth0, bool)
     {
-        NODE_RETURN(qt_QTabWidget_hasHeightForWidth_bool_QTabWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTabWidget_hasHeightForWidth_bool_QTabWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_heightForWidth0, int)
     {
-        NODE_RETURN(qt_QTabWidget_heightForWidth_int_QTabWidget_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QTabWidget_heightForWidth_int_QTabWidget_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_minimumSizeHint0, Pointer)
     {
-        NODE_RETURN(qt_QTabWidget_minimumSizeHint_QSize_QTabWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTabWidget_minimumSizeHint_QSize_QTabWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_sizeHint0, Pointer)
     {
-        NODE_RETURN(qt_QTabWidget_sizeHint_QSize_QTabWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTabWidget_sizeHint_QSize_QTabWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_setTabBar0, void)
     {
-        qt_QTabWidget_setTabBar_void_QTabWidget_QTabBar(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTabWidget_setTabBar_void_QTabWidget_QTabBar(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_tabInserted0, void)
     {
-        qt_QTabWidget_tabInserted_void_QTabWidget_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QTabWidget_tabInserted_void_QTabWidget_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_tabRemoved0, void)
     {
-        qt_QTabWidget_tabRemoved_void_QTabWidget_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QTabWidget_tabRemoved_void_QTabWidget_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_changeEvent0, void)
     {
-        qt_QTabWidget_changeEvent_void_QTabWidget_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTabWidget_changeEvent_void_QTabWidget_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_event0, bool)
     {
-        NODE_RETURN(qt_QTabWidget_event_bool_QTabWidget_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QTabWidget_event_bool_QTabWidget_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_keyPressEvent0, void)
     {
-        qt_QTabWidget_keyPressEvent_void_QTabWidget_QKeyEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTabWidget_keyPressEvent_void_QTabWidget_QKeyEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_paintEvent0, void)
     {
-        qt_QTabWidget_paintEvent_void_QTabWidget_QPaintEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTabWidget_paintEvent_void_QTabWidget_QPaintEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_resizeEvent0, void)
     {
-        qt_QTabWidget_resizeEvent_void_QTabWidget_QResizeEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTabWidget_resizeEvent_void_QTabWidget_QResizeEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_showEvent0, void)
     {
-        qt_QTabWidget_showEvent_void_QTabWidget_QShowEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTabWidget_showEvent_void_QTabWidget_QShowEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_inputMethodQuery0, Pointer)
     {
-        NODE_RETURN(qt_QTabWidget_inputMethodQuery_QVariant_QTabWidget_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QTabWidget_inputMethodQuery_QVariant_QTabWidget_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_closeEvent0, void)
     {
-        qt_QTabWidget_closeEvent_void_QTabWidget_QCloseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTabWidget_closeEvent_void_QTabWidget_QCloseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_contextMenuEvent0, void)
     {
-        qt_QTabWidget_contextMenuEvent_void_QTabWidget_QContextMenuEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTabWidget_contextMenuEvent_void_QTabWidget_QContextMenuEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_dragEnterEvent0, void)
     {
-        qt_QTabWidget_dragEnterEvent_void_QTabWidget_QDragEnterEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTabWidget_dragEnterEvent_void_QTabWidget_QDragEnterEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_dragLeaveEvent0, void)
     {
-        qt_QTabWidget_dragLeaveEvent_void_QTabWidget_QDragLeaveEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTabWidget_dragLeaveEvent_void_QTabWidget_QDragLeaveEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_dragMoveEvent0, void)
     {
-        qt_QTabWidget_dragMoveEvent_void_QTabWidget_QDragMoveEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTabWidget_dragMoveEvent_void_QTabWidget_QDragMoveEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_dropEvent0, void)
     {
-        qt_QTabWidget_dropEvent_void_QTabWidget_QDropEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTabWidget_dropEvent_void_QTabWidget_QDropEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_enterEvent0, void)
     {
-        qt_QTabWidget_enterEvent_void_QTabWidget_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTabWidget_enterEvent_void_QTabWidget_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_focusInEvent0, void)
     {
-        qt_QTabWidget_focusInEvent_void_QTabWidget_QFocusEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTabWidget_focusInEvent_void_QTabWidget_QFocusEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_focusNextPrevChild0, bool)
     {
-        NODE_RETURN(qt_QTabWidget_focusNextPrevChild_bool_QTabWidget_bool(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool)));
+        NODE_RETURN(qt_QTabWidget_focusNextPrevChild_bool_QTabWidget_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool)));
     }
 
     static NODE_IMPLEMENTATION(_n_focusOutEvent0, void)
     {
-        qt_QTabWidget_focusOutEvent_void_QTabWidget_QFocusEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTabWidget_focusOutEvent_void_QTabWidget_QFocusEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_hideEvent0, void)
     {
-        qt_QTabWidget_hideEvent_void_QTabWidget_QHideEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTabWidget_hideEvent_void_QTabWidget_QHideEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_keyReleaseEvent0, void)
     {
-        qt_QTabWidget_keyReleaseEvent_void_QTabWidget_QKeyEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTabWidget_keyReleaseEvent_void_QTabWidget_QKeyEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_leaveEvent0, void)
     {
-        qt_QTabWidget_leaveEvent_void_QTabWidget_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTabWidget_leaveEvent_void_QTabWidget_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseDoubleClickEvent0, void)
     {
-        qt_QTabWidget_mouseDoubleClickEvent_void_QTabWidget_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTabWidget_mouseDoubleClickEvent_void_QTabWidget_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseMoveEvent0, void)
     {
-        qt_QTabWidget_mouseMoveEvent_void_QTabWidget_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTabWidget_mouseMoveEvent_void_QTabWidget_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mousePressEvent0, void)
     {
-        qt_QTabWidget_mousePressEvent_void_QTabWidget_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTabWidget_mousePressEvent_void_QTabWidget_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseReleaseEvent0, void)
     {
-        qt_QTabWidget_mouseReleaseEvent_void_QTabWidget_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTabWidget_mouseReleaseEvent_void_QTabWidget_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_moveEvent0, void)
     {
-        qt_QTabWidget_moveEvent_void_QTabWidget_QMoveEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTabWidget_moveEvent_void_QTabWidget_QMoveEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_tabletEvent0, void)
     {
-        qt_QTabWidget_tabletEvent_void_QTabWidget_QTabletEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTabWidget_tabletEvent_void_QTabWidget_QTabletEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_wheelEvent0, void)
     {
-        qt_QTabWidget_wheelEvent_void_QTabWidget_QWheelEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTabWidget_wheelEvent_void_QTabWidget_QWheelEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_metric0, int)
     {
-        NODE_RETURN(qt_QTabWidget_metric_int_QTabWidget_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QTabWidget_metric_int_QTabWidget_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     void QTabWidgetType::load()
@@ -1950,17 +1762,13 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
-                   new Function(c, tn, castFromObject, Cast, Compiled,
-                                QTabWidget_QTabWidget_QObject, Return, ftn,
-                                Parameters,
+                   new Function(c, tn, castFromObject, Cast, Compiled, QTabWidget_QTabWidget_QObject, Return, ftn, Parameters,
                                 new Param(c, "object", "qt.QObject"), End),
 
                    EndArguments);
@@ -1968,357 +1776,200 @@ namespace Mu
         addSymbols(
             // enums
             // member functions
-            new Function(c, "QTabWidget", _n_QTabWidget0, None, Compiled,
-                         qt_QTabWidget_QTabWidget_QTabWidget_QTabWidget_QWidget,
-                         Return, "qt.QTabWidget", Parameters,
-                         new Param(c, "this", "qt.QTabWidget"),
-                         new Param(c, "parent", "qt.QWidget"), End),
-            new Function(c, "addTab", _n_addTab0, None, Compiled,
-                         qt_QTabWidget_addTab_int_QTabWidget_QWidget_string,
-                         Return, "int", Parameters,
-                         new Param(c, "this", "qt.QTabWidget"),
-                         new Param(c, "page", "qt.QWidget"),
+            new Function(c, "QTabWidget", _n_QTabWidget0, None, Compiled, qt_QTabWidget_QTabWidget_QTabWidget_QTabWidget_QWidget, Return,
+                         "qt.QTabWidget", Parameters, new Param(c, "this", "qt.QTabWidget"), new Param(c, "parent", "qt.QWidget"), End),
+            new Function(c, "addTab", _n_addTab0, None, Compiled, qt_QTabWidget_addTab_int_QTabWidget_QWidget_string, Return, "int",
+                         Parameters, new Param(c, "this", "qt.QTabWidget"), new Param(c, "page", "qt.QWidget"),
                          new Param(c, "label", "string"), End),
-            new Function(
-                c, "addTab", _n_addTab1, None, Compiled,
-                qt_QTabWidget_addTab_int_QTabWidget_QWidget_QIcon_string,
-                Return, "int", Parameters,
-                new Param(c, "this", "qt.QTabWidget"),
-                new Param(c, "page", "qt.QWidget"),
-                new Param(c, "icon", "qt.QIcon"),
-                new Param(c, "label", "string"), End),
-            new Function(c, "clear", _n_clear0, None, Compiled,
-                         qt_QTabWidget_clear_void_QTabWidget, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QTabWidget"),
-                         End),
-            new Function(
-                c, "cornerWidget", _n_cornerWidget0, None, Compiled,
-                qt_QTabWidget_cornerWidget_QWidget_QTabWidget_int, Return,
-                "qt.QWidget", Parameters, new Param(c, "this", "qt.QTabWidget"),
-                new Param(c, "corner", "int", Value((int)Qt::TopRightCorner)),
-                End),
+            new Function(c, "addTab", _n_addTab1, None, Compiled, qt_QTabWidget_addTab_int_QTabWidget_QWidget_QIcon_string, Return, "int",
+                         Parameters, new Param(c, "this", "qt.QTabWidget"), new Param(c, "page", "qt.QWidget"),
+                         new Param(c, "icon", "qt.QIcon"), new Param(c, "label", "string"), End),
+            new Function(c, "clear", _n_clear0, None, Compiled, qt_QTabWidget_clear_void_QTabWidget, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QTabWidget"), End),
+            new Function(c, "cornerWidget", _n_cornerWidget0, None, Compiled, qt_QTabWidget_cornerWidget_QWidget_QTabWidget_int, Return,
+                         "qt.QWidget", Parameters, new Param(c, "this", "qt.QTabWidget"),
+                         new Param(c, "corner", "int", Value((int)Qt::TopRightCorner)), End),
             // PROP: count (int; QTabWidget this)
             // PROP: currentIndex (int; QTabWidget this)
-            new Function(c, "currentWidget", _n_currentWidget0, None, Compiled,
-                         qt_QTabWidget_currentWidget_QWidget_QTabWidget, Return,
-                         "qt.QWidget", Parameters,
-                         new Param(c, "this", "qt.QTabWidget"), End),
+            new Function(c, "currentWidget", _n_currentWidget0, None, Compiled, qt_QTabWidget_currentWidget_QWidget_QTabWidget, Return,
+                         "qt.QWidget", Parameters, new Param(c, "this", "qt.QTabWidget"), End),
             // PROP: documentMode (bool; QTabWidget this)
             // PROP: elideMode (flags Qt::TextElideMode; QTabWidget this)
             // PROP: iconSize (QSize; QTabWidget this)
-            new Function(c, "indexOf", _n_indexOf0, None, Compiled,
-                         qt_QTabWidget_indexOf_int_QTabWidget_QWidget, Return,
-                         "int", Parameters,
-                         new Param(c, "this", "qt.QTabWidget"),
-                         new Param(c, "w", "qt.QWidget"), End),
-            new Function(
-                c, "insertTab", _n_insertTab0, None, Compiled,
-                qt_QTabWidget_insertTab_int_QTabWidget_int_QWidget_string,
-                Return, "int", Parameters,
-                new Param(c, "this", "qt.QTabWidget"),
-                new Param(c, "index", "int"),
-                new Param(c, "page", "qt.QWidget"),
-                new Param(c, "label", "string"), End),
-            new Function(
-                c, "insertTab", _n_insertTab1, None, Compiled,
-                qt_QTabWidget_insertTab_int_QTabWidget_int_QWidget_QIcon_string,
-                Return, "int", Parameters,
-                new Param(c, "this", "qt.QTabWidget"),
-                new Param(c, "index", "int"),
-                new Param(c, "page", "qt.QWidget"),
-                new Param(c, "icon", "qt.QIcon"),
-                new Param(c, "label", "string"), End),
+            new Function(c, "indexOf", _n_indexOf0, None, Compiled, qt_QTabWidget_indexOf_int_QTabWidget_QWidget, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QTabWidget"), new Param(c, "w", "qt.QWidget"), End),
+            new Function(c, "insertTab", _n_insertTab0, None, Compiled, qt_QTabWidget_insertTab_int_QTabWidget_int_QWidget_string, Return,
+                         "int", Parameters, new Param(c, "this", "qt.QTabWidget"), new Param(c, "index", "int"),
+                         new Param(c, "page", "qt.QWidget"), new Param(c, "label", "string"), End),
+            new Function(c, "insertTab", _n_insertTab1, None, Compiled, qt_QTabWidget_insertTab_int_QTabWidget_int_QWidget_QIcon_string,
+                         Return, "int", Parameters, new Param(c, "this", "qt.QTabWidget"), new Param(c, "index", "int"),
+                         new Param(c, "page", "qt.QWidget"), new Param(c, "icon", "qt.QIcon"), new Param(c, "label", "string"), End),
             // PROP: isMovable (bool; QTabWidget this)
-            new Function(c, "isTabEnabled", _n_isTabEnabled0, None, Compiled,
-                         qt_QTabWidget_isTabEnabled_bool_QTabWidget_int, Return,
-                         "bool", Parameters,
-                         new Param(c, "this", "qt.QTabWidget"),
-                         new Param(c, "index", "int"), End),
-            new Function(c, "removeTab", _n_removeTab0, None, Compiled,
-                         qt_QTabWidget_removeTab_void_QTabWidget_int, Return,
-                         "void", Parameters,
-                         new Param(c, "this", "qt.QTabWidget"),
-                         new Param(c, "index", "int"), End),
-            new Function(
-                c, "setCornerWidget", _n_setCornerWidget0, None, Compiled,
-                qt_QTabWidget_setCornerWidget_void_QTabWidget_QWidget_int,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTabWidget"),
-                new Param(c, "widget", "qt.QWidget"),
-                new Param(c, "corner", "int", Value((int)Qt::TopRightCorner)),
-                End),
+            new Function(c, "isTabEnabled", _n_isTabEnabled0, None, Compiled, qt_QTabWidget_isTabEnabled_bool_QTabWidget_int, Return,
+                         "bool", Parameters, new Param(c, "this", "qt.QTabWidget"), new Param(c, "index", "int"), End),
+            new Function(c, "removeTab", _n_removeTab0, None, Compiled, qt_QTabWidget_removeTab_void_QTabWidget_int, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QTabWidget"), new Param(c, "index", "int"), End),
+            new Function(c, "setCornerWidget", _n_setCornerWidget0, None, Compiled,
+                         qt_QTabWidget_setCornerWidget_void_QTabWidget_QWidget_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QTabWidget"), new Param(c, "widget", "qt.QWidget"),
+                         new Param(c, "corner", "int", Value((int)Qt::TopRightCorner)), End),
             // PROP: setDocumentMode (void; QTabWidget this, bool set)
             // PROP: setElideMode (void; QTabWidget this, flags
             // Qt::TextElideMode _p18) PROP: setIconSize (void; QTabWidget this,
             // QSize size) PROP: setMovable (void; QTabWidget this, bool
             // movable) PROP: setTabBarAutoHide (void; QTabWidget this, bool
             // enabled)
-            new Function(c, "setTabEnabled", _n_setTabEnabled0, None, Compiled,
-                         qt_QTabWidget_setTabEnabled_void_QTabWidget_int_bool,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QTabWidget"),
-                         new Param(c, "index", "int"),
+            new Function(c, "setTabEnabled", _n_setTabEnabled0, None, Compiled, qt_QTabWidget_setTabEnabled_void_QTabWidget_int_bool,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QTabWidget"), new Param(c, "index", "int"),
                          new Param(c, "enable", "bool"), End),
-            new Function(c, "setTabIcon", _n_setTabIcon0, None, Compiled,
-                         qt_QTabWidget_setTabIcon_void_QTabWidget_int_QIcon,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QTabWidget"),
-                         new Param(c, "index", "int"),
+            new Function(c, "setTabIcon", _n_setTabIcon0, None, Compiled, qt_QTabWidget_setTabIcon_void_QTabWidget_int_QIcon, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QTabWidget"), new Param(c, "index", "int"),
                          new Param(c, "icon", "qt.QIcon"), End),
             // PROP: setTabPosition (void; QTabWidget this, flags
             // QTabWidget::TabPosition _p12) PROP: setTabShape (void; QTabWidget
             // this, flags QTabWidget::TabShape s)
-            new Function(c, "setTabText", _n_setTabText0, None, Compiled,
-                         qt_QTabWidget_setTabText_void_QTabWidget_int_string,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QTabWidget"),
-                         new Param(c, "index", "int"),
+            new Function(c, "setTabText", _n_setTabText0, None, Compiled, qt_QTabWidget_setTabText_void_QTabWidget_int_string, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QTabWidget"), new Param(c, "index", "int"),
                          new Param(c, "label", "string"), End),
-            new Function(c, "setTabToolTip", _n_setTabToolTip0, None, Compiled,
-                         qt_QTabWidget_setTabToolTip_void_QTabWidget_int_string,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QTabWidget"),
-                         new Param(c, "index", "int"),
+            new Function(c, "setTabToolTip", _n_setTabToolTip0, None, Compiled, qt_QTabWidget_setTabToolTip_void_QTabWidget_int_string,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QTabWidget"), new Param(c, "index", "int"),
                          new Param(c, "tip", "string"), End),
-            new Function(
-                c, "setTabWhatsThis", _n_setTabWhatsThis0, None, Compiled,
-                qt_QTabWidget_setTabWhatsThis_void_QTabWidget_int_string,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTabWidget"),
-                new Param(c, "index", "int"), new Param(c, "text", "string"),
-                End),
+            new Function(c, "setTabWhatsThis", _n_setTabWhatsThis0, None, Compiled,
+                         qt_QTabWidget_setTabWhatsThis_void_QTabWidget_int_string, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QTabWidget"), new Param(c, "index", "int"), new Param(c, "text", "string"), End),
             // PROP: setTabsClosable (void; QTabWidget this, bool closeable)
             // PROP: setUsesScrollButtons (void; QTabWidget this, bool
             // useButtons)
-            new Function(c, "tabBar", _n_tabBar0, None, Compiled,
-                         qt_QTabWidget_tabBar_QTabBar_QTabWidget, Return,
-                         "qt.QTabBar", Parameters,
+            new Function(c, "tabBar", _n_tabBar0, None, Compiled, qt_QTabWidget_tabBar_QTabBar_QTabWidget, Return, "qt.QTabBar", Parameters,
                          new Param(c, "this", "qt.QTabWidget"), End),
             // PROP: tabBarAutoHide (bool; QTabWidget this)
-            new Function(c, "tabIcon", _n_tabIcon0, None, Compiled,
-                         qt_QTabWidget_tabIcon_QIcon_QTabWidget_int, Return,
-                         "qt.QIcon", Parameters,
-                         new Param(c, "this", "qt.QTabWidget"),
-                         new Param(c, "index", "int"), End),
+            new Function(c, "tabIcon", _n_tabIcon0, None, Compiled, qt_QTabWidget_tabIcon_QIcon_QTabWidget_int, Return, "qt.QIcon",
+                         Parameters, new Param(c, "this", "qt.QTabWidget"), new Param(c, "index", "int"), End),
             // PROP: tabPosition (flags QTabWidget::TabPosition; QTabWidget
             // this) PROP: tabShape (flags QTabWidget::TabShape; QTabWidget
             // this)
-            new Function(c, "tabText", _n_tabText0, None, Compiled,
-                         qt_QTabWidget_tabText_string_QTabWidget_int, Return,
-                         "string", Parameters,
-                         new Param(c, "this", "qt.QTabWidget"),
-                         new Param(c, "index", "int"), End),
-            new Function(c, "tabToolTip", _n_tabToolTip0, None, Compiled,
-                         qt_QTabWidget_tabToolTip_string_QTabWidget_int, Return,
-                         "string", Parameters,
-                         new Param(c, "this", "qt.QTabWidget"),
-                         new Param(c, "index", "int"), End),
-            new Function(c, "tabWhatsThis", _n_tabWhatsThis0, None, Compiled,
-                         qt_QTabWidget_tabWhatsThis_string_QTabWidget_int,
-                         Return, "string", Parameters,
-                         new Param(c, "this", "qt.QTabWidget"),
-                         new Param(c, "index", "int"), End),
+            new Function(c, "tabText", _n_tabText0, None, Compiled, qt_QTabWidget_tabText_string_QTabWidget_int, Return, "string",
+                         Parameters, new Param(c, "this", "qt.QTabWidget"), new Param(c, "index", "int"), End),
+            new Function(c, "tabToolTip", _n_tabToolTip0, None, Compiled, qt_QTabWidget_tabToolTip_string_QTabWidget_int, Return, "string",
+                         Parameters, new Param(c, "this", "qt.QTabWidget"), new Param(c, "index", "int"), End),
+            new Function(c, "tabWhatsThis", _n_tabWhatsThis0, None, Compiled, qt_QTabWidget_tabWhatsThis_string_QTabWidget_int, Return,
+                         "string", Parameters, new Param(c, "this", "qt.QTabWidget"), new Param(c, "index", "int"), End),
             // PROP: tabsClosable (bool; QTabWidget this)
             // PROP: usesScrollButtons (bool; QTabWidget this)
-            new Function(c, "widget", _n_widget0, None, Compiled,
-                         qt_QTabWidget_widget_QWidget_QTabWidget_int, Return,
-                         "qt.QWidget", Parameters,
-                         new Param(c, "this", "qt.QTabWidget"),
-                         new Param(c, "index", "int"), End),
-            _func[0] = new MemberFunction(
-                c, "hasHeightForWidth", _n_hasHeightForWidth0, None, Compiled,
-                qt_QTabWidget_hasHeightForWidth_bool_QTabWidget, Return, "bool",
-                Parameters, new Param(c, "this", "qt.QTabWidget"), End),
-            _func[1] = new MemberFunction(
-                c, "heightForWidth", _n_heightForWidth0, None, Compiled,
-                qt_QTabWidget_heightForWidth_int_QTabWidget_int, Return, "int",
-                Parameters, new Param(c, "this", "qt.QTabWidget"),
-                new Param(c, "width", "int"), End),
-            _func[2] = new MemberFunction(
-                c, "minimumSizeHint", _n_minimumSizeHint0, None, Compiled,
-                qt_QTabWidget_minimumSizeHint_QSize_QTabWidget, Return,
-                "qt.QSize", Parameters, new Param(c, "this", "qt.QTabWidget"),
-                End),
-            _func[3] = new MemberFunction(
-                c, "sizeHint", _n_sizeHint0, None, Compiled,
-                qt_QTabWidget_sizeHint_QSize_QTabWidget, Return, "qt.QSize",
-                Parameters, new Param(c, "this", "qt.QTabWidget"), End),
+            new Function(c, "widget", _n_widget0, None, Compiled, qt_QTabWidget_widget_QWidget_QTabWidget_int, Return, "qt.QWidget",
+                         Parameters, new Param(c, "this", "qt.QTabWidget"), new Param(c, "index", "int"), End),
+            _func[0] = new MemberFunction(c, "hasHeightForWidth", _n_hasHeightForWidth0, None, Compiled,
+                                          qt_QTabWidget_hasHeightForWidth_bool_QTabWidget, Return, "bool", Parameters,
+                                          new Param(c, "this", "qt.QTabWidget"), End),
+            _func[1] =
+                new MemberFunction(c, "heightForWidth", _n_heightForWidth0, None, Compiled, qt_QTabWidget_heightForWidth_int_QTabWidget_int,
+                                   Return, "int", Parameters, new Param(c, "this", "qt.QTabWidget"), new Param(c, "width", "int"), End),
+            _func[2] = new MemberFunction(c, "minimumSizeHint", _n_minimumSizeHint0, None, Compiled,
+                                          qt_QTabWidget_minimumSizeHint_QSize_QTabWidget, Return, "qt.QSize", Parameters,
+                                          new Param(c, "this", "qt.QTabWidget"), End),
+            _func[3] = new MemberFunction(c, "sizeHint", _n_sizeHint0, None, Compiled, qt_QTabWidget_sizeHint_QSize_QTabWidget, Return,
+                                          "qt.QSize", Parameters, new Param(c, "this", "qt.QTabWidget"), End),
             // MISSING: initStyleOption (void; QTabWidget this,
             // "QStyleOptionTabWidgetFrame *" option) // protected
-            new Function(c, "setTabBar", _n_setTabBar0, None, Compiled,
-                         qt_QTabWidget_setTabBar_void_QTabWidget_QTabBar,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QTabWidget"),
-                         new Param(c, "tb", "qt.QTabBar"), End),
-            _func[4] = new MemberFunction(
-                c, "tabInserted", _n_tabInserted0, None, Compiled,
-                qt_QTabWidget_tabInserted_void_QTabWidget_int, Return, "void",
-                Parameters, new Param(c, "this", "qt.QTabWidget"),
-                new Param(c, "index", "int"), End),
-            _func[5] = new MemberFunction(
-                c, "tabRemoved", _n_tabRemoved0, None, Compiled,
-                qt_QTabWidget_tabRemoved_void_QTabWidget_int, Return, "void",
-                Parameters, new Param(c, "this", "qt.QTabWidget"),
-                new Param(c, "index", "int"), End),
-            _func[6] = new MemberFunction(
-                c, "changeEvent", _n_changeEvent0, None, Compiled,
-                qt_QTabWidget_changeEvent_void_QTabWidget_QEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QTabWidget"),
-                new Param(c, "ev", "qt.QEvent"), End),
-            _func[7] = new MemberFunction(
-                c, "event", _n_event0, None, Compiled,
-                qt_QTabWidget_event_bool_QTabWidget_QEvent, Return, "bool",
-                Parameters, new Param(c, "this", "qt.QTabWidget"),
-                new Param(c, "ev", "qt.QEvent"), End),
-            _func[8] = new MemberFunction(
-                c, "keyPressEvent", _n_keyPressEvent0, None, Compiled,
-                qt_QTabWidget_keyPressEvent_void_QTabWidget_QKeyEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QTabWidget"),
-                new Param(c, "e", "qt.QKeyEvent"), End),
-            _func[9] = new MemberFunction(
-                c, "paintEvent", _n_paintEvent0, None, Compiled,
-                qt_QTabWidget_paintEvent_void_QTabWidget_QPaintEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QTabWidget"),
-                new Param(c, "event", "qt.QPaintEvent"), End),
-            _func[10] = new MemberFunction(
-                c, "resizeEvent", _n_resizeEvent0, None, Compiled,
-                qt_QTabWidget_resizeEvent_void_QTabWidget_QResizeEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QTabWidget"),
-                new Param(c, "e", "qt.QResizeEvent"), End),
-            _func[11] = new MemberFunction(
-                c, "showEvent", _n_showEvent0, None, Compiled,
-                qt_QTabWidget_showEvent_void_QTabWidget_QShowEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QTabWidget"),
-                new Param(c, "_p13", "qt.QShowEvent"), End),
-            _func[12] = new MemberFunction(
-                c, "inputMethodQuery", _n_inputMethodQuery0, None, Compiled,
-                qt_QTabWidget_inputMethodQuery_QVariant_QTabWidget_int, Return,
-                "qt.QVariant", Parameters,
-                new Param(c, "this", "qt.QTabWidget"),
-                new Param(c, "query", "int"), End),
+            new Function(c, "setTabBar", _n_setTabBar0, None, Compiled, qt_QTabWidget_setTabBar_void_QTabWidget_QTabBar, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QTabWidget"), new Param(c, "tb", "qt.QTabBar"), End),
+            _func[4] =
+                new MemberFunction(c, "tabInserted", _n_tabInserted0, None, Compiled, qt_QTabWidget_tabInserted_void_QTabWidget_int, Return,
+                                   "void", Parameters, new Param(c, "this", "qt.QTabWidget"), new Param(c, "index", "int"), End),
+            _func[5] =
+                new MemberFunction(c, "tabRemoved", _n_tabRemoved0, None, Compiled, qt_QTabWidget_tabRemoved_void_QTabWidget_int, Return,
+                                   "void", Parameters, new Param(c, "this", "qt.QTabWidget"), new Param(c, "index", "int"), End),
+            _func[6] =
+                new MemberFunction(c, "changeEvent", _n_changeEvent0, None, Compiled, qt_QTabWidget_changeEvent_void_QTabWidget_QEvent,
+                                   Return, "void", Parameters, new Param(c, "this", "qt.QTabWidget"), new Param(c, "ev", "qt.QEvent"), End),
+            _func[7] = new MemberFunction(c, "event", _n_event0, None, Compiled, qt_QTabWidget_event_bool_QTabWidget_QEvent, Return, "bool",
+                                          Parameters, new Param(c, "this", "qt.QTabWidget"), new Param(c, "ev", "qt.QEvent"), End),
+            _func[8] = new MemberFunction(c, "keyPressEvent", _n_keyPressEvent0, None, Compiled,
+                                          qt_QTabWidget_keyPressEvent_void_QTabWidget_QKeyEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QTabWidget"), new Param(c, "e", "qt.QKeyEvent"), End),
+            _func[9] = new MemberFunction(c, "paintEvent", _n_paintEvent0, None, Compiled,
+                                          qt_QTabWidget_paintEvent_void_QTabWidget_QPaintEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QTabWidget"), new Param(c, "event", "qt.QPaintEvent"), End),
+            _func[10] = new MemberFunction(c, "resizeEvent", _n_resizeEvent0, None, Compiled,
+                                           qt_QTabWidget_resizeEvent_void_QTabWidget_QResizeEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QTabWidget"), new Param(c, "e", "qt.QResizeEvent"), End),
+            _func[11] = new MemberFunction(c, "showEvent", _n_showEvent0, None, Compiled,
+                                           qt_QTabWidget_showEvent_void_QTabWidget_QShowEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QTabWidget"), new Param(c, "_p13", "qt.QShowEvent"), End),
+            _func[12] = new MemberFunction(c, "inputMethodQuery", _n_inputMethodQuery0, None, Compiled,
+                                           qt_QTabWidget_inputMethodQuery_QVariant_QTabWidget_int, Return, "qt.QVariant", Parameters,
+                                           new Param(c, "this", "qt.QTabWidget"), new Param(c, "query", "int"), End),
             // MISSING: paintEngine ("QPaintEngine *"; QTabWidget this)
             // MISSING: actionEvent (void; QTabWidget this, "QActionEvent *"
             // event) // protected
-            _func[13] = new MemberFunction(
-                c, "closeEvent", _n_closeEvent0, None, Compiled,
-                qt_QTabWidget_closeEvent_void_QTabWidget_QCloseEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QTabWidget"),
-                new Param(c, "event", "qt.QCloseEvent"), End),
-            _func[14] = new MemberFunction(
-                c, "contextMenuEvent", _n_contextMenuEvent0, None, Compiled,
-                qt_QTabWidget_contextMenuEvent_void_QTabWidget_QContextMenuEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTabWidget"),
-                new Param(c, "event", "qt.QContextMenuEvent"), End),
-            _func[15] = new MemberFunction(
-                c, "dragEnterEvent", _n_dragEnterEvent0, None, Compiled,
-                qt_QTabWidget_dragEnterEvent_void_QTabWidget_QDragEnterEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTabWidget"),
-                new Param(c, "event", "qt.QDragEnterEvent"), End),
-            _func[16] = new MemberFunction(
-                c, "dragLeaveEvent", _n_dragLeaveEvent0, None, Compiled,
-                qt_QTabWidget_dragLeaveEvent_void_QTabWidget_QDragLeaveEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTabWidget"),
-                new Param(c, "event", "qt.QDragLeaveEvent"), End),
-            _func[17] = new MemberFunction(
-                c, "dragMoveEvent", _n_dragMoveEvent0, None, Compiled,
-                qt_QTabWidget_dragMoveEvent_void_QTabWidget_QDragMoveEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTabWidget"),
-                new Param(c, "event", "qt.QDragMoveEvent"), End),
-            _func[18] = new MemberFunction(
-                c, "dropEvent", _n_dropEvent0, None, Compiled,
-                qt_QTabWidget_dropEvent_void_QTabWidget_QDropEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QTabWidget"),
-                new Param(c, "event", "qt.QDropEvent"), End),
-            _func[19] = new MemberFunction(
-                c, "enterEvent", _n_enterEvent0, None, Compiled,
-                qt_QTabWidget_enterEvent_void_QTabWidget_QEvent, Return, "void",
-                Parameters, new Param(c, "this", "qt.QTabWidget"),
-                new Param(c, "event", "qt.QEvent"), End),
-            _func[20] = new MemberFunction(
-                c, "focusInEvent", _n_focusInEvent0, None, Compiled,
-                qt_QTabWidget_focusInEvent_void_QTabWidget_QFocusEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QTabWidget"),
-                new Param(c, "event", "qt.QFocusEvent"), End),
-            _func[21] = new MemberFunction(
-                c, "focusNextPrevChild", _n_focusNextPrevChild0, None, Compiled,
-                qt_QTabWidget_focusNextPrevChild_bool_QTabWidget_bool, Return,
-                "bool", Parameters, new Param(c, "this", "qt.QTabWidget"),
-                new Param(c, "next", "bool"), End),
-            _func[22] = new MemberFunction(
-                c, "focusOutEvent", _n_focusOutEvent0, None, Compiled,
-                qt_QTabWidget_focusOutEvent_void_QTabWidget_QFocusEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QTabWidget"),
-                new Param(c, "event", "qt.QFocusEvent"), End),
-            _func[23] = new MemberFunction(
-                c, "hideEvent", _n_hideEvent0, None, Compiled,
-                qt_QTabWidget_hideEvent_void_QTabWidget_QHideEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QTabWidget"),
-                new Param(c, "event", "qt.QHideEvent"), End),
+            _func[13] = new MemberFunction(c, "closeEvent", _n_closeEvent0, None, Compiled,
+                                           qt_QTabWidget_closeEvent_void_QTabWidget_QCloseEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QTabWidget"), new Param(c, "event", "qt.QCloseEvent"), End),
+            _func[14] = new MemberFunction(c, "contextMenuEvent", _n_contextMenuEvent0, None, Compiled,
+                                           qt_QTabWidget_contextMenuEvent_void_QTabWidget_QContextMenuEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QTabWidget"), new Param(c, "event", "qt.QContextMenuEvent"), End),
+            _func[15] = new MemberFunction(c, "dragEnterEvent", _n_dragEnterEvent0, None, Compiled,
+                                           qt_QTabWidget_dragEnterEvent_void_QTabWidget_QDragEnterEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QTabWidget"), new Param(c, "event", "qt.QDragEnterEvent"), End),
+            _func[16] = new MemberFunction(c, "dragLeaveEvent", _n_dragLeaveEvent0, None, Compiled,
+                                           qt_QTabWidget_dragLeaveEvent_void_QTabWidget_QDragLeaveEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QTabWidget"), new Param(c, "event", "qt.QDragLeaveEvent"), End),
+            _func[17] = new MemberFunction(c, "dragMoveEvent", _n_dragMoveEvent0, None, Compiled,
+                                           qt_QTabWidget_dragMoveEvent_void_QTabWidget_QDragMoveEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QTabWidget"), new Param(c, "event", "qt.QDragMoveEvent"), End),
+            _func[18] = new MemberFunction(c, "dropEvent", _n_dropEvent0, None, Compiled,
+                                           qt_QTabWidget_dropEvent_void_QTabWidget_QDropEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QTabWidget"), new Param(c, "event", "qt.QDropEvent"), End),
+            _func[19] =
+                new MemberFunction(c, "enterEvent", _n_enterEvent0, None, Compiled, qt_QTabWidget_enterEvent_void_QTabWidget_QEvent, Return,
+                                   "void", Parameters, new Param(c, "this", "qt.QTabWidget"), new Param(c, "event", "qt.QEvent"), End),
+            _func[20] = new MemberFunction(c, "focusInEvent", _n_focusInEvent0, None, Compiled,
+                                           qt_QTabWidget_focusInEvent_void_QTabWidget_QFocusEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QTabWidget"), new Param(c, "event", "qt.QFocusEvent"), End),
+            _func[21] = new MemberFunction(c, "focusNextPrevChild", _n_focusNextPrevChild0, None, Compiled,
+                                           qt_QTabWidget_focusNextPrevChild_bool_QTabWidget_bool, Return, "bool", Parameters,
+                                           new Param(c, "this", "qt.QTabWidget"), new Param(c, "next", "bool"), End),
+            _func[22] = new MemberFunction(c, "focusOutEvent", _n_focusOutEvent0, None, Compiled,
+                                           qt_QTabWidget_focusOutEvent_void_QTabWidget_QFocusEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QTabWidget"), new Param(c, "event", "qt.QFocusEvent"), End),
+            _func[23] = new MemberFunction(c, "hideEvent", _n_hideEvent0, None, Compiled,
+                                           qt_QTabWidget_hideEvent_void_QTabWidget_QHideEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QTabWidget"), new Param(c, "event", "qt.QHideEvent"), End),
             // MISSING: inputMethodEvent (void; QTabWidget this,
             // "QInputMethodEvent *" event) // protected
-            _func[24] = new MemberFunction(
-                c, "keyReleaseEvent", _n_keyReleaseEvent0, None, Compiled,
-                qt_QTabWidget_keyReleaseEvent_void_QTabWidget_QKeyEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QTabWidget"),
-                new Param(c, "event", "qt.QKeyEvent"), End),
-            _func[25] = new MemberFunction(
-                c, "leaveEvent", _n_leaveEvent0, None, Compiled,
-                qt_QTabWidget_leaveEvent_void_QTabWidget_QEvent, Return, "void",
-                Parameters, new Param(c, "this", "qt.QTabWidget"),
-                new Param(c, "event", "qt.QEvent"), End),
-            _func[26] = new MemberFunction(
-                c, "mouseDoubleClickEvent", _n_mouseDoubleClickEvent0, None,
-                Compiled,
-                qt_QTabWidget_mouseDoubleClickEvent_void_QTabWidget_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTabWidget"),
-                new Param(c, "event", "qt.QMouseEvent"), End),
-            _func[27] = new MemberFunction(
-                c, "mouseMoveEvent", _n_mouseMoveEvent0, None, Compiled,
-                qt_QTabWidget_mouseMoveEvent_void_QTabWidget_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTabWidget"),
-                new Param(c, "event", "qt.QMouseEvent"), End),
-            _func[28] = new MemberFunction(
-                c, "mousePressEvent", _n_mousePressEvent0, None, Compiled,
-                qt_QTabWidget_mousePressEvent_void_QTabWidget_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTabWidget"),
-                new Param(c, "event", "qt.QMouseEvent"), End),
-            _func[29] = new MemberFunction(
-                c, "mouseReleaseEvent", _n_mouseReleaseEvent0, None, Compiled,
-                qt_QTabWidget_mouseReleaseEvent_void_QTabWidget_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTabWidget"),
-                new Param(c, "event", "qt.QMouseEvent"), End),
-            _func[30] = new MemberFunction(
-                c, "moveEvent", _n_moveEvent0, None, Compiled,
-                qt_QTabWidget_moveEvent_void_QTabWidget_QMoveEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QTabWidget"),
-                new Param(c, "event", "qt.QMoveEvent"), End),
+            _func[24] = new MemberFunction(c, "keyReleaseEvent", _n_keyReleaseEvent0, None, Compiled,
+                                           qt_QTabWidget_keyReleaseEvent_void_QTabWidget_QKeyEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QTabWidget"), new Param(c, "event", "qt.QKeyEvent"), End),
+            _func[25] =
+                new MemberFunction(c, "leaveEvent", _n_leaveEvent0, None, Compiled, qt_QTabWidget_leaveEvent_void_QTabWidget_QEvent, Return,
+                                   "void", Parameters, new Param(c, "this", "qt.QTabWidget"), new Param(c, "event", "qt.QEvent"), End),
+            _func[26] = new MemberFunction(c, "mouseDoubleClickEvent", _n_mouseDoubleClickEvent0, None, Compiled,
+                                           qt_QTabWidget_mouseDoubleClickEvent_void_QTabWidget_QMouseEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QTabWidget"), new Param(c, "event", "qt.QMouseEvent"), End),
+            _func[27] = new MemberFunction(c, "mouseMoveEvent", _n_mouseMoveEvent0, None, Compiled,
+                                           qt_QTabWidget_mouseMoveEvent_void_QTabWidget_QMouseEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QTabWidget"), new Param(c, "event", "qt.QMouseEvent"), End),
+            _func[28] = new MemberFunction(c, "mousePressEvent", _n_mousePressEvent0, None, Compiled,
+                                           qt_QTabWidget_mousePressEvent_void_QTabWidget_QMouseEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QTabWidget"), new Param(c, "event", "qt.QMouseEvent"), End),
+            _func[29] = new MemberFunction(c, "mouseReleaseEvent", _n_mouseReleaseEvent0, None, Compiled,
+                                           qt_QTabWidget_mouseReleaseEvent_void_QTabWidget_QMouseEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QTabWidget"), new Param(c, "event", "qt.QMouseEvent"), End),
+            _func[30] = new MemberFunction(c, "moveEvent", _n_moveEvent0, None, Compiled,
+                                           qt_QTabWidget_moveEvent_void_QTabWidget_QMoveEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QTabWidget"), new Param(c, "event", "qt.QMoveEvent"), End),
             // MISSING: nativeEvent (bool; QTabWidget this, QByteArray
             // eventType, "void *" message, "long *" result) // protected
-            _func[31] = new MemberFunction(
-                c, "tabletEvent", _n_tabletEvent0, None, Compiled,
-                qt_QTabWidget_tabletEvent_void_QTabWidget_QTabletEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QTabWidget"),
-                new Param(c, "event", "qt.QTabletEvent"), End),
-            _func[32] = new MemberFunction(
-                c, "wheelEvent", _n_wheelEvent0, None, Compiled,
-                qt_QTabWidget_wheelEvent_void_QTabWidget_QWheelEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QTabWidget"),
-                new Param(c, "event", "qt.QWheelEvent"), End),
+            _func[31] = new MemberFunction(c, "tabletEvent", _n_tabletEvent0, None, Compiled,
+                                           qt_QTabWidget_tabletEvent_void_QTabWidget_QTabletEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QTabWidget"), new Param(c, "event", "qt.QTabletEvent"), End),
+            _func[32] = new MemberFunction(c, "wheelEvent", _n_wheelEvent0, None, Compiled,
+                                           qt_QTabWidget_wheelEvent_void_QTabWidget_QWheelEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QTabWidget"), new Param(c, "event", "qt.QWheelEvent"), End),
             // MISSING: initPainter (void; QTabWidget this, "QPainter *"
             // painter) // protected
-            _func[33] = new MemberFunction(
-                c, "metric", _n_metric0, None, Compiled,
-                qt_QTabWidget_metric_int_QTabWidget_int, Return, "int",
-                Parameters, new Param(c, "this", "qt.QTabWidget"),
-                new Param(c, "m", "int"), End),
+            _func[33] = new MemberFunction(c, "metric", _n_metric0, None, Compiled, qt_QTabWidget_metric_int_QTabWidget_int, Return, "int",
+                                           Parameters, new Param(c, "this", "qt.QTabWidget"), new Param(c, "m", "int"), End),
             // static functions
             EndArguments);
         globalScope()->addSymbols(EndArguments);

@@ -60,10 +60,7 @@ namespace TwkUtil
             const int hrs = std::floor(dsec / 60.0 / 60.0);
         }
 
-        void tcMonotonic(int frame, Time fps, Timecode& tc)
-        {
-            return tcResidual(frame, std::ceil(fps), tc);
-        }
+        void tcMonotonic(int frame, Time fps, Timecode& tc) { return tcResidual(frame, std::ceil(fps), tc); }
 
     } // namespace
 
@@ -104,8 +101,7 @@ namespace TwkUtil
         }
     } // namespace
 
-    std::string timecodeToString(const Timecode& tc, int maxFrame, char tsep,
-                                 char fsep, bool elideHours)
+    std::string timecodeToString(const Timecode& tc, int maxFrame, char tsep, char fsep, bool elideHours)
     {
         ostringstream out;
         out.fill('0');
@@ -119,38 +115,30 @@ namespace TwkUtil
         if (tc.rawFrame < 0)
             out << "-";
 
-        int h = maxFrame ? std::floor(TCTime(maxFrame) / tc.rawFPS
-                                      / TCTime(60.0) / TCTime(60.0))
-                         : tc.hours;
+        int h = maxFrame ? std::floor(TCTime(maxFrame) / tc.rawFPS / TCTime(60.0) / TCTime(60.0)) : tc.hours;
 
         if (!elideHours && h != 0)
-            out << setw(std::max((unsigned int)2, digits(h))) << tc.hours
-                << tsep;
+            out << setw(std::max((unsigned int)2, digits(h))) << tc.hours << tsep;
 
-        out << setw(2) << tc.minutes << tsep << setw(2) << tc.seconds << fsep
-            << setw(digits(std::floor(tc.rawFPS + 1.0))) << tc.frames;
+        out << setw(2) << tc.minutes << tsep << setw(2) << tc.seconds << fsep << setw(digits(std::floor(tc.rawFPS + 1.0))) << tc.frames;
 
         return out.str();
     }
 
-    TCSeparatedString timecodeToSeparatedString(const Timecode& tc,
-                                                int maxFrame, bool elideHours)
+    TCSeparatedString timecodeToSeparatedString(const Timecode& tc, int maxFrame, bool elideHours)
     {
         TCSeparatedString s;
         ostringstream out;
 
         if (tc.rawFPS != TCTime(0.0))
         {
-            int h = maxFrame ? std::floor(TCTime(maxFrame) / tc.rawFPS
-                                          / TCTime(60.0) / TCTime(60.0))
-                             : tc.hours;
+            int h = maxFrame ? std::floor(TCTime(maxFrame) / tc.rawFPS / TCTime(60.0) / TCTime(60.0)) : tc.hours;
 
             if (!elideHours && h != 0)
             {
                 if (tc.rawFrame < 0)
                     out << "-";
-                out << setfill('0')
-                    << setw(std::max((unsigned int)2, digits(h))) << tc.hours;
+                out << setfill('0') << setw(std::max((unsigned int)2, digits(h))) << tc.hours;
                 s.hours = out.str();
                 out.str("");
                 out.clear();
@@ -171,8 +159,7 @@ namespace TwkUtil
             out.str("");
             out.clear();
 
-            out << setfill('0') << setw(digits(std::floor(tc.rawFPS + 1.0)))
-                << tc.frames;
+            out << setfill('0') << setw(digits(std::floor(tc.rawFPS + 1.0))) << tc.frames;
             s.frames = out.str();
         }
 

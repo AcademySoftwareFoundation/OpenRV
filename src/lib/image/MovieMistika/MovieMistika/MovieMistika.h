@@ -49,21 +49,17 @@ namespace TwkMovie
 
         virtual MovieReader* clone() const;
 
-        virtual void preloadOpen(const std::string& filename,
-                                 const ReadRequest& request);
+        virtual void preloadOpen(const std::string& filename, const ReadRequest& request);
 
-        virtual void postPreloadOpen(const MovieInfo& as,
-                                     const ReadRequest& request);
+        virtual void postPreloadOpen(const MovieInfo& as, const ReadRequest& request);
 
         //
         //  Movie API
 
         void setErrorMessage(const std::string& s) { m_errorMessage = s; }
 
-        virtual void imagesAtFrame(const ReadRequest& request,
-                                   FrameBufferVector&);
-        virtual void identifiersAtFrame(const ReadRequest& request,
-                                        IdentifierVector&);
+        virtual void imagesAtFrame(const ReadRequest& request, FrameBufferVector&);
+        virtual void identifiersAtFrame(const ReadRequest& request, IdentifierVector&);
 
         static Format pixelFormat;
 
@@ -89,8 +85,7 @@ namespace TwkMovie
         virtual std::string about() const;
         virtual MovieReader* movieReader() const;
         virtual MovieWriter* movieWriter() const;
-        virtual void getMovieInfo(const std::string& filename,
-                                  MovieInfo&) const;
+        virtual void getMovieInfo(const std::string& filename, MovieInfo&) const;
     };
 
 } // namespace TwkMovie

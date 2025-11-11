@@ -38,8 +38,7 @@ namespace IPCore
     public:
         typedef TwkApp::VideoDevice VideoDevice;
 
-        DisplayGroupIPNode(const std::string& name, const NodeDefinition* def,
-                           IPGraph* graph, GroupIPNode* group = 0);
+        DisplayGroupIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group = 0);
 
         virtual ~DisplayGroupIPNode();
 
@@ -66,10 +65,7 @@ namespace IPCore
 
         DisplayStereoIPNode* stereoNode() const { return m_stereoNode; }
 
-        PipelineGroupIPNode* displayPipelineNode() const
-        {
-            return m_displayPipelineNode;
-        }
+        PipelineGroupIPNode* displayPipelineNode() const { return m_displayPipelineNode; }
 
         void incrementRenderHashCount();
 

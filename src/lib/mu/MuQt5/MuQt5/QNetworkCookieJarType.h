@@ -39,8 +39,7 @@ namespace Mu
         //  Constructors
         //
 
-        QNetworkCookieJarType(Context* context, const char* name,
-                              Class* superClass = 0, Class* superClass2 = 0);
+        QNetworkCookieJarType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QNetworkCookieJarType();
 
@@ -63,18 +62,15 @@ namespace Mu
     {
     public:
         virtual ~MuQt_QNetworkCookieJar();
-        MuQt_QNetworkCookieJar(Pointer muobj, const CallEnvironment*,
-                               QObject* parent);
+        MuQt_QNetworkCookieJar(Pointer muobj, const CallEnvironment*, QObject* parent);
         virtual QList<QNetworkCookie> cookiesForUrl(const QUrl& url) const;
         virtual bool deleteCookie(const QNetworkCookie& cookie);
         virtual bool insertCookie(const QNetworkCookie& cookie);
-        virtual bool setCookiesFromUrl(const QList<QNetworkCookie>& cookieList,
-                                       const QUrl& url);
+        virtual bool setCookiesFromUrl(const QList<QNetworkCookie>& cookieList, const QUrl& url);
         virtual bool updateCookie(const QNetworkCookie& cookie);
 
     protected:
-        virtual bool validateCookie(const QNetworkCookie& cookie,
-                                    const QUrl& url) const;
+        virtual bool validateCookie(const QNetworkCookie& cookie, const QUrl& url) const;
 
     public:
         virtual bool event(QEvent* e);
@@ -87,46 +83,26 @@ namespace Mu
     public:
         QList<QNetworkCookie> allCookies_pub() const { return allCookies(); }
 
-        QList<QNetworkCookie> allCookies_pub_parent() const
-        {
-            return QNetworkCookieJar::allCookies();
-        }
+        QList<QNetworkCookie> allCookies_pub_parent() const { return QNetworkCookieJar::allCookies(); }
 
-        void setAllCookies_pub(const QList<QNetworkCookie>& cookieList)
-        {
-            setAllCookies(cookieList);
-        }
+        void setAllCookies_pub(const QList<QNetworkCookie>& cookieList) { setAllCookies(cookieList); }
 
-        void setAllCookies_pub_parent(const QList<QNetworkCookie>& cookieList)
-        {
-            QNetworkCookieJar::setAllCookies(cookieList);
-        }
+        void setAllCookies_pub_parent(const QList<QNetworkCookie>& cookieList) { QNetworkCookieJar::setAllCookies(cookieList); }
 
-        bool validateCookie_pub(const QNetworkCookie& cookie,
-                                const QUrl& url) const
-        {
-            return validateCookie(cookie, url);
-        }
+        bool validateCookie_pub(const QNetworkCookie& cookie, const QUrl& url) const { return validateCookie(cookie, url); }
 
-        bool validateCookie_pub_parent(const QNetworkCookie& cookie,
-                                       const QUrl& url) const
+        bool validateCookie_pub_parent(const QNetworkCookie& cookie, const QUrl& url) const
         {
             return QNetworkCookieJar::validateCookie(cookie, url);
         }
 
         void customEvent_pub(QEvent* event) { customEvent(event); }
 
-        void customEvent_pub_parent(QEvent* event)
-        {
-            QNetworkCookieJar::customEvent(event);
-        }
+        void customEvent_pub_parent(QEvent* event) { QNetworkCookieJar::customEvent(event); }
 
         void timerEvent_pub(QTimerEvent* event) { timerEvent(event); }
 
-        void timerEvent_pub_parent(QTimerEvent* event)
-        {
-            QNetworkCookieJar::timerEvent(event);
-        }
+        void timerEvent_pub_parent(QTimerEvent* event) { QNetworkCookieJar::timerEvent(event); }
 
     public:
         const QNetworkCookieJarType* _baseType;
@@ -134,11 +110,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance* QNetworkCookieJarType::cachedInstance(
-        const QNetworkCookieJarType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QNetworkCookieJarType::cachedInstance(const QNetworkCookieJarType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

@@ -47,33 +47,28 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    int qt_QTouchEvent_deviceType_int_QTouchEvent(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this)
+    int qt_QTouchEvent_deviceType_int_QTouchEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTouchEvent* arg0 = getqpointer<QTouchEventType>(param_this);
         return arg0->deviceType();
     }
 
-    int qt_QTouchEvent_touchPointStates_int_QTouchEvent(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this)
+    int qt_QTouchEvent_touchPointStates_int_QTouchEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTouchEvent* arg0 = getqpointer<QTouchEventType>(param_this);
         return arg0->touchPointStates();
     }
 
-    int qt_QTouchEvent_touchPoints_int_QTouchEvent(Mu::Thread& NODE_THREAD,
-                                                   Pointer param_this)
+    int qt_QTouchEvent_touchPoints_int_QTouchEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTouchEvent* arg0 = getqpointer<QTouchEventType>(param_this);
-        return makeqpointerlist<QTouchEvent::TouchPoiType>(
-            c, arg0->touchPoints(), "qt.QTouchEvent::TouchPoi");
+        return makeqpointerlist<QTouchEvent::TouchPoiType>(c, arg0->touchPoints(), "qt.QTouchEvent::TouchPoi");
     }
 
-    Pointer qt_QTouchEvent_widget_QWidget_QTouchEvent(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    Pointer qt_QTouchEvent_widget_QWidget_QTouchEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTouchEvent* arg0 = getqpointer<QTouchEventType>(param_this);
@@ -82,26 +77,22 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(_n_deviceType0, int)
     {
-        NODE_RETURN(qt_QTouchEvent_deviceType_int_QTouchEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTouchEvent_deviceType_int_QTouchEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_touchPointStates0, int)
     {
-        NODE_RETURN(qt_QTouchEvent_touchPointStates_int_QTouchEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTouchEvent_touchPointStates_int_QTouchEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_touchPoints0, int)
     {
-        NODE_RETURN(qt_QTouchEvent_touchPoints_int_QTouchEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTouchEvent_touchPoints_int_QTouchEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_widget0, Pointer)
     {
-        NODE_RETURN(qt_QTouchEvent_widget_QWidget_QTouchEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTouchEvent_widget_QWidget_QTouchEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     void QTouchEventType::load()
@@ -121,24 +112,18 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
                    new MemberVariable(c, "native", "qt.NativeObject"),
 
                    EndArguments);
 
-        addSymbols(new Alias(c, "DeviceType", "int"),
-                   new SymbolicConstant(c, "TouchScreen", "int",
-                                        Value(int(QTouchEvent::TouchScreen))),
-                   new SymbolicConstant(c, "TouchPad", "int",
-                                        Value(int(QTouchEvent::TouchPad))),
-                   EndArguments);
+        addSymbols(new Alias(c, "DeviceType", "int"), new SymbolicConstant(c, "TouchScreen", "int", Value(int(QTouchEvent::TouchScreen))),
+                   new SymbolicConstant(c, "TouchPad", "int", Value(int(QTouchEvent::TouchPad))), EndArguments);
         addSymbols(
             // enums
             // member functions
@@ -149,22 +134,14 @@ namespace Mu
             // "deviceType", "int"), new Param(c, "modifiers", "int"), new
             // Param(c, "touchPointStates", "int"), new Param(c, "touchPoints",
             // "int"), End),
-            new Function(c, "deviceType", _n_deviceType0, None, Compiled,
-                         qt_QTouchEvent_deviceType_int_QTouchEvent, Return,
-                         "int", Parameters,
-                         new Param(c, "this", "qt.QTouchEvent"), End),
-            new Function(
-                c, "touchPointStates", _n_touchPointStates0, None, Compiled,
-                qt_QTouchEvent_touchPointStates_int_QTouchEvent, Return, "int",
-                Parameters, new Param(c, "this", "qt.QTouchEvent"), End),
-            new Function(c, "touchPoints", _n_touchPoints0, None, Compiled,
-                         qt_QTouchEvent_touchPoints_int_QTouchEvent, Return,
-                         "int", Parameters,
-                         new Param(c, "this", "qt.QTouchEvent"), End),
-            new Function(c, "widget", _n_widget0, None, Compiled,
-                         qt_QTouchEvent_widget_QWidget_QTouchEvent, Return,
-                         "qt.QWidget", Parameters,
-                         new Param(c, "this", "qt.QTouchEvent"), End),
+            new Function(c, "deviceType", _n_deviceType0, None, Compiled, qt_QTouchEvent_deviceType_int_QTouchEvent, Return, "int",
+                         Parameters, new Param(c, "this", "qt.QTouchEvent"), End),
+            new Function(c, "touchPointStates", _n_touchPointStates0, None, Compiled, qt_QTouchEvent_touchPointStates_int_QTouchEvent,
+                         Return, "int", Parameters, new Param(c, "this", "qt.QTouchEvent"), End),
+            new Function(c, "touchPoints", _n_touchPoints0, None, Compiled, qt_QTouchEvent_touchPoints_int_QTouchEvent, Return, "int",
+                         Parameters, new Param(c, "this", "qt.QTouchEvent"), End),
+            new Function(c, "widget", _n_widget0, None, Compiled, qt_QTouchEvent_widget_QWidget_QTouchEvent, Return, "qt.QWidget",
+                         Parameters, new Param(c, "this", "qt.QTouchEvent"), End),
             // static functions
             EndArguments);
         globalScope()->addSymbols(EndArguments);

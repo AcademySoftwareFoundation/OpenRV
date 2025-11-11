@@ -13,8 +13,7 @@ namespace TwkFB
 {
     using namespace std;
 
-    ImageReader::ImageReader(FrameBufferVector& fbs, istream& instream,
-                             const string& filename, bool nopixels)
+    ImageReader::ImageReader(FrameBufferVector& fbs, istream& instream, const string& filename, bool nopixels)
         : Gto::Reader(Gto::Reader::None)
         , m_fbs(fbs)
         , m_inAttributes(false)
@@ -25,8 +24,7 @@ namespace TwkFB
         copyAttrs();
     }
 
-    ImageReader::ImageReader(FrameBufferVector& fbs, void* data, size_t size,
-                             const string& filename, bool nopixels)
+    ImageReader::ImageReader(FrameBufferVector& fbs, void* data, size_t size, const string& filename, bool nopixels)
         : Gto::Reader(Gto::Reader::None)
         , m_fbs(fbs)
         , m_inAttributes(false)
@@ -57,9 +55,7 @@ namespace TwkFB
         }
     }
 
-    ImageReader::Request ImageReader::object(const std::string& name,
-                                             const std::string& protocol,
-                                             unsigned int version,
+    ImageReader::Request ImageReader::object(const std::string& name, const std::string& protocol, unsigned int version,
                                              const ObjectInfo& info)
     {
         m_inAttributes = false;
@@ -85,9 +81,7 @@ namespace TwkFB
         }
     }
 
-    ImageReader::Request ImageReader::component(const std::string& n,
-                                                const std::string& i,
-                                                const ComponentInfo& info)
+    ImageReader::Request ImageReader::component(const std::string& n, const std::string& i, const ComponentInfo& info)
     {
         Image& image = m_images[size_t(info.object->objectData)];
         FrameBuffer* fb = image.fb;
@@ -121,13 +115,10 @@ namespace TwkFB
             return Request(true, (void*)(image.planes.size() - 1));
         }
 
-        return Request(compInterp == "attributes" || compInterp == "geometry",
-                       fb);
+        return Request(compInterp == "attributes" || compInterp == "geometry", fb);
     }
 
-    ImageReader::Request ImageReader::property(const std::string& inname,
-                                               const std::string& interp,
-                                               const PropertyInfo& info)
+    ImageReader::Request ImageReader::property(const std::string& inname, const std::string& interp, const PropertyInfo& info)
     {
         const char* name = inname.c_str();
         string compInterp = stringFromId(info.component->interpretation);
@@ -198,8 +189,7 @@ namespace TwkFB
                     switch (info.type)
                     {
                     case Gto::Float:
-                        attr = new TypedFBAttribute<TwkMath::Vec2f>(
-                            name, TwkMath::Vec2f(0.0f));
+                        attr = new TypedFBAttribute<TwkMath::Vec2f>(name, TwkMath::Vec2f(0.0f));
                         break;
                     default:
                         return Request(false);
@@ -210,8 +200,7 @@ namespace TwkFB
                     switch (info.type)
                     {
                     case Gto::Float:
-                        attr = new TypedFBAttribute<TwkMath::Mat44f>(
-                            name, TwkMath::Mat44f());
+                        attr = new TypedFBAttribute<TwkMath::Mat44f>(name, TwkMath::Mat44f());
                         break;
                     default:
                         return Request(false);
@@ -228,20 +217,17 @@ namespace TwkFB
 
     bool ImageReader::isSingleValueInt(const PropertyInfo& info)
     {
-        return info.size == 1 && info.dims.x == 1 && info.dims.y == 0
-               && info.type == Gto::Int;
+        return info.size == 1 && info.dims.x == 1 && info.dims.y == 0 && info.type == Gto::Int;
     }
 
     bool ImageReader::isSingleValueFloat(const PropertyInfo& info)
     {
-        return info.size == 1 && info.dims.x == 1 && info.dims.y == 0
-               && info.type == Gto::Float;
+        return info.size == 1 && info.dims.x == 1 && info.dims.y == 0 && info.type == Gto::Float;
     }
 
     bool ImageReader::isSingleValueString(const PropertyInfo& info)
     {
-        return info.size == 1 && info.dims.x == 1 && info.dims.y == 0
-               && info.type == Gto::String;
+        return info.size == 1 && info.dims.x == 1 && info.dims.y == 0 && info.type == Gto::String;
     }
 
     void* ImageReader::prepIntVector(IntVector& v, const PropertyInfo& info)
@@ -291,8 +277,7 @@ namespace TwkFB
                     return prepIntVector(image.dataSize, info);
                 return 0;
             }
-            else if (m_propName == "pixelAspectRatio"
-                     && isSingleValueFloat(info))
+            else if (m_propName == "pixelAspectRatio" && isSingleValueFloat(info))
             {
                 return &image.pixelAspect;
             }
@@ -317,15 +302,10 @@ namespace TwkFB
                 size_t w = plane.planeSizes[0];
                 size_t h = plane.planeSizes[1];
 
-                fb->restructure(w, h, 0, plane.channels.size(),
-                                (FrameBuffer::DataType)plane.dataType, NULL,
-                                &plane.channels,
-                                (FrameBuffer::Orientation)plane.orientation,
-                                true, plane.extraScanlines,
-                                plane.scanlinePadded);
+                fb->restructure(w, h, 0, plane.channels.size(), (FrameBuffer::DataType)plane.dataType, NULL, &plane.channels,
+                                (FrameBuffer::Orientation)plane.orientation, true, plane.extraScanlines, plane.scanlinePadded);
 
-                assert(info.size * info.dims.x * Gto::dataSizeInBytes(info.type)
-                       <= fb->allocSize());
+                assert(info.size * info.dims.x * Gto::dataSizeInBytes(info.type) <= fb->allocSize());
 
                 return fb->pixels<void>();
             }
@@ -399,21 +379,15 @@ namespace TwkFB
                 if (m_propName == "size")
                 {
                 }
-                if (m_propName == "dataWindowOrigin" && info.type == Gto::Int
-                    && info.size == 2 && info.dims.x == 1 && info.dims.y == 0)
+                if (m_propName == "dataWindowOrigin" && info.type == Gto::Int && info.size == 2 && info.dims.x == 1 && info.dims.y == 0)
                 {
-                    fb->setUncrop(fb->uncropWidth(), fb->uncropHeight(),
-                                  image.dataOrigin[0], image.dataOrigin[1]);
+                    fb->setUncrop(fb->uncropWidth(), fb->uncropHeight(), image.dataOrigin[0], image.dataOrigin[1]);
                 }
-                else if (m_propName == "dataWindowSize" && info.type == Gto::Int
-                         && info.size == 2 && info.dims.x == 1
-                         && info.dims.y == 0)
+                else if (m_propName == "dataWindowSize" && info.type == Gto::Int && info.size == 2 && info.dims.x == 1 && info.dims.y == 0)
                 {
-                    fb->setUncrop(image.dataSize[0], image.dataSize[1],
-                                  fb->uncropX(), fb->uncropY());
+                    fb->setUncrop(image.dataSize[0], image.dataSize[1], fb->uncropX(), fb->uncropY());
                 }
-                else if (m_propName == "pixelAspectRatio"
-                         && isSingleValueFloat(info))
+                else if (m_propName == "pixelAspectRatio" && isSingleValueFloat(info))
                 {
                     fb->setPixelAspectRatio(image.pixelAspect);
                 }
@@ -433,8 +407,7 @@ namespace TwkFB
             Plane& plane = image.planes[size_t(info.component->componentData)];
             FrameBuffer* fb = plane.fb;
 
-            if (m_propName == "channels" && info.type == Gto::String
-                && info.dims.x == 1 && info.dims.y == 0)
+            if (m_propName == "channels" && info.type == Gto::String && info.dims.x == 1 && info.dims.y == 0)
             {
                 plane.channels.resize(m_stringBuffer.size());
 

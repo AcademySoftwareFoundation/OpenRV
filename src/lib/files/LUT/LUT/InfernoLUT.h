@@ -16,8 +16,7 @@ namespace LUT
     //  NOTE: this lut format (3dl) is actually lustre not inferno
     //
 
-    void readInfernoLUT(const std::string& filename, const std::string& type,
-                        LUTData& lut);
+    void readInfernoLUT(const std::string& filename, const std::string& type, LUTData& lut);
 
 } // namespace LUT
 

@@ -25,10 +25,7 @@ namespace TwkApp
 
     CommandInfo::~CommandInfo() {}
 
-    const CommandInfo* CommandInfo::findByName(const std::string& name)
-    {
-        return m_commands[name];
-    }
+    const CommandInfo* CommandInfo::findByName(const std::string& name) { return m_commands[name]; }
 
     //----------------------------------------------------------------------
 
@@ -151,8 +148,7 @@ namespace TwkApp
             {
                 if (commandStack[i]->isMarker())
                 {
-                    MarkerCommand* cm =
-                        static_cast<MarkerCommand*>(commandStack[i]);
+                    MarkerCommand* cm = static_cast<MarkerCommand*>(commandStack[i]);
 
                     if (cm->name() == m->name())
                     {
@@ -164,15 +160,13 @@ namespace TwkApp
             }
         }
 
-        bool hasMarkerInCommandStack(const string& name,
-                                     const CommandStack& commandStack)
+        bool hasMarkerInCommandStack(const string& name, const CommandStack& commandStack)
         {
             for (int i = 0; i < commandStack.size(); i++)
             {
                 if (commandStack[i]->isMarker())
                 {
-                    MarkerCommand* cm =
-                        static_cast<MarkerCommand*>(commandStack[i]);
+                    MarkerCommand* cm = static_cast<MarkerCommand*>(commandStack[i]);
                     if (cm->name() == name)
                         return true;
                 }
@@ -202,8 +196,7 @@ namespace TwkApp
 
     bool CommandHistory::hasMarkerCommand(const string& name) const
     {
-        return hasMarkerInCommandStack(name, m_undoStack)
-               || hasMarkerInCommandStack(name, m_redoStack);
+        return hasMarkerInCommandStack(name, m_undoStack) || hasMarkerInCommandStack(name, m_redoStack);
     }
 
     bool CommandHistory::isMarkerCommandRecent(const string& name) const
@@ -404,10 +397,7 @@ namespace TwkApp
 
     CompoundCommandInfo::~CompoundCommandInfo() {}
 
-    Command* CompoundCommandInfo::newCommand() const
-    {
-        return new CompoundCommand(this);
-    }
+    Command* CompoundCommandInfo::newCommand() const { return new CompoundCommand(this); }
 
     //------------------------------------------------------------------------------
 
@@ -436,10 +426,7 @@ namespace TwkApp
 
     MarkerCommandInfo::~MarkerCommandInfo() {}
 
-    Command* MarkerCommandInfo::newCommand() const
-    {
-        return new MarkerCommand(this);
-    }
+    Command* MarkerCommandInfo::newCommand() const { return new MarkerCommand(this); }
 
     //------------------------------------------------------------------------------
 
@@ -486,8 +473,7 @@ namespace TwkApp
 
     void HistoryCommand::redo() { abort(); } // should never get here
 
-    void HistoryCommand::setArgs(CommandHistory* h, CommandType t,
-                                 const string& name)
+    void HistoryCommand::setArgs(CommandHistory* h, CommandType t, const string& name)
     {
         m_history = h;
         m_commandType = t;
@@ -503,10 +489,7 @@ namespace TwkApp
 
     HistoryCommandInfo::~HistoryCommandInfo() {}
 
-    Command* HistoryCommandInfo::newCommand() const
-    {
-        return new HistoryCommand(this);
-    }
+    Command* HistoryCommandInfo::newCommand() const { return new HistoryCommand(this); }
 
     //------------------------------------------------------------------------------
 

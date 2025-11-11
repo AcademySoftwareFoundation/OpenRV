@@ -26,9 +26,7 @@
 
 namespace
 {
-    void addEventExts(const char* event, IPCore::Session* session,
-                      QStringList& exts, QStringList& formats,
-                      QSet<QString> extSet)
+    void addEventExts(const char* event, IPCore::Session* session, QStringList& exts, QStringList& formats, QSet<QString> extSet)
     {
         static constexpr auto EVENT_SEP = ':';
         static constexpr auto EXT_SEP = ';';
@@ -42,8 +40,7 @@ namespace
             if (pos != std::string::npos)
             {
                 const auto subLen = pos + 1, nextLen = next.length();
-                if (subLen < nextLen && next[subLen] != EXT_SEP
-                    && next[subLen] != EVENT_SEP)
+                if (subLen < nextLen && next[subLen] != EXT_SEP && next[subLen] != EVENT_SEP)
                 {
                     auto ext = next.substr(0, subLen - 1);
                     auto format = next.substr(subLen, nextLen - subLen);
@@ -66,8 +63,7 @@ namespace Rv
     using namespace TwkFB;
     using namespace std;
 
-    MediaFileTypes::MediaFileTypes(bool readable, bool writeable,
-                                   const QString& defaultExt)
+    MediaFileTypes::MediaFileTypes(bool readable, bool writeable, const QString& defaultExt)
         : FileTypeTraits()
         , m_readable(readable)
         , m_writeable(writeable)
@@ -85,15 +81,12 @@ namespace Rv
 
         if (auto session = IPCore::Session::currentSession())
         {
-            addEventExts("open-file-dialog-filters", session, m_exts, m_formats,
-                         m_extSet);
+            addEventExts("open-file-dialog-filters", session, m_exts, m_formats, m_extSet);
         }
 
-        const TwkMovie::GenericIO::Plugins& plugins =
-            TwkMovie::GenericIO::allPlugins();
+        const TwkMovie::GenericIO::Plugins& plugins = TwkMovie::GenericIO::allPlugins();
 
-        for (TwkMovie::GenericIO::Plugins::const_iterator i = plugins.begin();
-             i != plugins.end(); ++i)
+        for (TwkMovie::GenericIO::Plugins::const_iterator i = plugins.begin(); i != plugins.end(); ++i)
         {
             const TwkMovie::MovieIO* plugin = *i;
             const MovieIO::MovieTypeInfos& exts = plugin->extensionsSupported();
@@ -107,8 +100,7 @@ namespace Rv
                 bool writesaudio = info.capabilities & MovieIO::MovieWriteAudio;
                 bool writesimages = info.capabilities & MovieIO::MovieWrite;
 
-                if ((readable && !(readsaudio || readsimages))
-                    || (writeable && !(writesaudio || writesimages)))
+                if ((readable && !(readsaudio || readsimages)) || (writeable && !(writesaudio || writesimages)))
                 {
                     continue;
                 }
@@ -119,8 +111,7 @@ namespace Rv
                     {
                         m_extSet.insert(info.extension.c_str());
                         ostringstream str;
-                        str << info.description << " (" << info.extension
-                            << ")";
+                        str << info.description << " (" << info.extension << ")";
                         m_formats.push_back(str.str().c_str());
                         m_exts.push_back(info.extension.c_str());
                     }
@@ -128,8 +119,7 @@ namespace Rv
             }
         }
 
-        for (TwkMovie::GenericIO::Plugins::const_iterator i = plugins.begin();
-             i != plugins.end(); ++i)
+        for (TwkMovie::GenericIO::Plugins::const_iterator i = plugins.begin(); i != plugins.end(); ++i)
         {
             const TwkMovie::MovieIO* plugin = *i;
             const MovieIO::MovieTypeInfos& exts = plugin->extensionsSupported();
@@ -138,9 +128,7 @@ namespace Rv
             {
                 const MovieIO::MovieTypeInfo& info = exts[q];
 
-                if ((readable && !(info.capabilities & MovieIO::MovieRead))
-                    || (writeable
-                        && !(info.capabilities & MovieIO::MovieWrite)))
+                if ((readable && !(info.capabilities & MovieIO::MovieRead)) || (writeable && !(info.capabilities & MovieIO::MovieWrite)))
                 {
                     continue;
                 }
@@ -151,8 +139,7 @@ namespace Rv
                     {
                         m_extSet.insert(info.extension.c_str());
                         ostringstream str;
-                        str << "Image Format Extension" << " ("
-                            << info.extension << ")";
+                        str << "Image Format Extension" << " (" << info.extension << ")";
                         m_formats.push_back(str.str().c_str());
                         m_exts.push_back(info.extension.c_str());
                     }
@@ -161,9 +148,7 @@ namespace Rv
         }
     }
 
-    MediaFileTypes::MediaFileTypes(bool readable, bool writeable,
-                                   const QList<QPair<QString, QString>>& files,
-                                   const QString& defaultExt)
+    MediaFileTypes::MediaFileTypes(bool readable, bool writeable, const QList<QPair<QString, QString>>& files, const QString& defaultExt)
         : FileTypeTraits()
         , m_readable(readable)
         , m_writeable(writeable)
@@ -177,8 +162,7 @@ namespace Rv
 
         if (auto session = IPCore::Session::currentSession())
         {
-            addEventExts("save-file-dialog-filters", session, m_exts, m_formats,
-                         m_extSet);
+            addEventExts("save-file-dialog-filters", session, m_exts, m_formats, m_extSet);
         }
 
         for (size_t i = 0; i < files.size(); i++)
@@ -214,10 +198,7 @@ namespace Rv
         return 0;
     }
 
-    FileTypeTraits* MediaFileTypes::copyTraits() const
-    {
-        return new MediaFileTypes(this);
-    }
+    FileTypeTraits* MediaFileTypes::copyTraits() const { return new MediaFileTypes(this); }
 
     QStringList MediaFileTypes::typeDescriptions() { return m_formats; }
 
@@ -235,8 +216,7 @@ namespace Rv
         QString ext = file.split('.').last();
         if (m_exts[index] == "&")
         {
-            return m_extSet.contains(ext) || m_extSet.contains(ext.toLower())
-                   || m_extSet.contains("*");
+            return m_extSet.contains(ext) || m_extSet.contains(ext.toLower()) || m_extSet.contains("*");
         }
         else
         {
@@ -251,8 +231,7 @@ namespace Rv
 
         try
         {
-            if (MovieReader* reader =
-                    TwkMovie::GenericIO::movieReader(filename, false))
+            if (MovieReader* reader = TwkMovie::GenericIO::movieReader(filename, false))
             {
                 reader->open(filename);
                 const MovieInfo& i = reader->info();
@@ -294,12 +273,7 @@ namespace Rv
                         dtype = "-";
                     }
 
-                    list << "Geometry"
-                         << QString("%1 x %2, %3 ch %4")
-                                .arg(i.width)
-                                .arg(i.height)
-                                .arg(i.numChannels)
-                                .arg(dtype);
+                    list << "Geometry" << QString("%1 x %2, %3 ch %4").arg(i.width).arg(i.height).arg(i.numChannels).arg(dtype);
 
                     if (i.views.size() > 1)
                     {
@@ -333,24 +307,20 @@ namespace Rv
 
                     if (i.start != i.end)
                     {
-                        list << "Frames"
-                             << QString("%1 - %2").arg(i.start).arg(i.end);
+                        list << "Frames" << QString("%1 - %2").arg(i.start).arg(i.end);
                         list << "FPS" << QString("%1").arg(i.fps);
                     }
                 }
 
                 if (i.audio)
                 {
-                    list << "Audio Sample Rate"
-                         << QString("%1").arg(i.audioSampleRate);
-                    list << "Audio Channels"
-                         << QString("%1").arg(i.audioChannels.size());
+                    list << "Audio Sample Rate" << QString("%1").arg(i.audioSampleRate);
+                    list << "Audio Channels" << QString("%1").arg(i.audioChannels.size());
                 }
 
                 if (!i.proxy.attributes().empty())
                 {
-                    const FrameBuffer::AttributeVector& attrs =
-                        i.proxy.attributes();
+                    const FrameBuffer::AttributeVector& attrs = i.proxy.attributes();
 
                     for (int q = 0; q < attrs.size(); q++)
                     {
@@ -402,11 +372,8 @@ namespace Rv
     bool MediaFileTypes::sameAs(const FileTypeTraits* traits) const
     {
         const MediaFileTypes* t = dynamic_cast<const MediaFileTypes*>(traits);
-        return ((t != nullptr) && (iconMode() == t->iconMode())
-                && (m_readable == t->m_readable)
-                && (m_writeable == t->m_writeable) && (m_extSet == t->m_extSet)
-                && (m_exts == t->m_exts) && (m_formats == t->m_formats)
-                && (m_defaultExt == t->m_defaultExt));
+        return ((t != nullptr) && (iconMode() == t->iconMode()) && (m_readable == t->m_readable) && (m_writeable == t->m_writeable)
+                && (m_extSet == t->m_extSet) && (m_exts == t->m_exts) && (m_formats == t->m_formats) && (m_defaultExt == t->m_defaultExt));
     }
 
 } // namespace Rv

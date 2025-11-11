@@ -18,21 +18,16 @@ namespace TwkMath
     namespace
     {
 
-        template <typename T>
-        inline bool compare(const Vec3<T>* a, const Vec3<T>* b)
+        template <typename T> inline bool compare(const Vec3<T>* a, const Vec3<T>* b)
         {
-            return (a->z < b->z
-                    || (a->z == b->z
-                        && (a->y < b->y || (a->y == b->y && a->x < b->x))));
+            return (a->z < b->z || (a->z == b->z && (a->y < b->y || (a->y == b->y && a->x < b->x))));
         }
 
     } // End unnamed namespace
 
     //******************************************************************************
     // Elevation of a point above a plane defined by three points.
-    template <typename T>
-    T elevation(const Vec3<T>& v0, const Vec3<T>& v1, const Vec3<T>& v2,
-                const Vec3<T>& p)
+    template <typename T> T elevation(const Vec3<T>& v0, const Vec3<T>& v1, const Vec3<T>& v2, const Vec3<T>& p)
     {
         bool flip = false;
         const Vec3<T>* vp[3] = {&v0, &v1, &v2};
@@ -68,41 +63,31 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <typename T>
-    inline bool abovePlane(const Vec3<T>& v0, const Vec3<T>& v1,
-                           const Vec3<T>& v2, const Vec3<T>& p)
+    template <typename T> inline bool abovePlane(const Vec3<T>& v0, const Vec3<T>& v1, const Vec3<T>& v2, const Vec3<T>& p)
     {
         return (elevation(v0, v1, v2, p) > ((T)0));
     }
 
     //******************************************************************************
-    template <typename T>
-    inline bool aboveOrOnPlane(const Vec3<T>& v0, const Vec3<T>& v1,
-                               const Vec3<T>& v2, const Vec3<T>& p)
+    template <typename T> inline bool aboveOrOnPlane(const Vec3<T>& v0, const Vec3<T>& v1, const Vec3<T>& v2, const Vec3<T>& p)
     {
         return (elevation(v0, v1, v2, p) >= ((T)0));
     }
 
     //******************************************************************************
-    template <typename T>
-    inline bool belowPlane(const Vec3<T>& v0, const Vec3<T>& v1,
-                           const Vec3<T>& v2, const Vec3<T>& p)
+    template <typename T> inline bool belowPlane(const Vec3<T>& v0, const Vec3<T>& v1, const Vec3<T>& v2, const Vec3<T>& p)
     {
         return (elevation(v0, v1, v2, p) < ((T)0));
     }
 
     //******************************************************************************
-    template <typename T>
-    inline bool belowOrOnPlane(const Vec3<T>& v0, const Vec3<T>& v1,
-                               const Vec3<T>& v2, const Vec3<T>& p)
+    template <typename T> inline bool belowOrOnPlane(const Vec3<T>& v0, const Vec3<T>& v1, const Vec3<T>& v2, const Vec3<T>& p)
     {
         return (elevation(v0, v1, v2, p) <= ((T)0));
     }
 
     //******************************************************************************
-    template <typename T>
-    inline bool onPlane(const Vec3<T>& v0, const Vec3<T>& v1, const Vec3<T>& v2,
-                        const Vec3<T>& p)
+    template <typename T> inline bool onPlane(const Vec3<T>& v0, const Vec3<T>& v1, const Vec3<T>& v2, const Vec3<T>& p)
     {
         return (elevation(v0, v1, v2, p) == ((T)0));
     }

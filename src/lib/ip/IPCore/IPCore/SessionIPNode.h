@@ -19,8 +19,7 @@ namespace IPCore
     class SessionIPNode : public IPNode
     {
     public:
-        SessionIPNode(const std::string& name, const NodeDefinition* def,
-                      IPGraph* graph, GroupIPNode* group = 0);
+        SessionIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group = 0);
 
         virtual ~SessionIPNode();
     };

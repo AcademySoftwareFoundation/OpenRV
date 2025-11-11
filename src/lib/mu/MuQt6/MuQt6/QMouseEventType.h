@@ -37,8 +37,7 @@ namespace Mu
         //  Constructors
         //
 
-        QMouseEventType(Context* context, const char* name,
-                        Class* superClass = 0);
+        QMouseEventType(Context* context, const char* name, Class* superClass = 0);
         virtual ~QMouseEventType();
 
         //

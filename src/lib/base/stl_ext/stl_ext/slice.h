@@ -42,8 +42,7 @@ namespace stl_ext
         typedef typename Container::iterator iterator;
         typedef typename Container::const_iterator const_iterator;
         typedef typename Container::reverse_iterator reverse_iterator;
-        typedef
-            typename Container::const_reverse_iterator const_reverse_iterator;
+        typedef typename Container::const_reverse_iterator const_reverse_iterator;
 
         slice(Container& c, iterator i, int stride = 1)
             : _c(&c)
@@ -81,15 +80,9 @@ namespace stl_ext
 
         const Container& container() const { return *_c; }
 
-        const_reference operator[](size_type i) const
-        {
-            return const_reference(container()[i * _stride + _start]);
-        }
+        const_reference operator[](size_type i) const { return const_reference(container()[i * _stride + _start]); }
 
-        reference operator[](size_type i)
-        {
-            return reference(container()[i * _stride + _start]);
-        }
+        reference operator[](size_type i) { return reference(container()[i * _stride + _start]); }
 
         iterator begin() { return _c->begin(); }
 
@@ -113,10 +106,7 @@ namespace stl_ext
 
         bool empty() const { return _c ? container().empty() : true; }
 
-        size_t size() const
-        {
-            return empty() ? 0 : (container().size() - _start) / _stride;
-        }
+        size_t size() const { return empty() ? 0 : (container().size() - _start) / _stride; }
 
         const_reference back() const { return (*this)[size() - 1]; }
 
@@ -146,8 +136,7 @@ namespace stl_ext
         typedef typename Container::iterator iterator;
         typedef typename Container::const_iterator const_iterator;
         typedef typename Container::reverse_iterator reverse_iterator;
-        typedef
-            typename Container::const_reverse_iterator const_reverse_iterator;
+        typedef typename Container::const_reverse_iterator const_reverse_iterator;
 
         Container* _c;
         size_t _start;
@@ -161,15 +150,9 @@ namespace stl_ext
 
         const Container& container() const { return *_c; }
 
-        const_reference operator[](size_type i) const
-        {
-            return const_reference(container()[i * _stride + _start]);
-        }
+        const_reference operator[](size_type i) const { return const_reference(container()[i * _stride + _start]); }
 
-        reference operator[](size_type i)
-        {
-            return reference(container()[i * _stride + _start]);
-        }
+        reference operator[](size_type i) { return reference(container()[i * _stride + _start]); }
 
         void push_back(const value_type& t)
         {
@@ -193,10 +176,7 @@ namespace stl_ext
 
         bool empty() const { return _c ? container().empty() : true; }
 
-        size_t size() const
-        {
-            return empty() ? 0 : (container().size() - _start) / _stride;
-        }
+        size_t size() const { return empty() ? 0 : (container().size() - _start) / _stride; }
 
         const_reference back() const { return (*this)[size() - 1]; }
 

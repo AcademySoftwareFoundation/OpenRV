@@ -58,16 +58,14 @@ namespace Mu
         _baseType = 0;
     }
 
-    MuQt_QGridLayout::MuQt_QGridLayout(Pointer muobj, const CallEnvironment* ce,
-                                       QWidget* parent)
+    MuQt_QGridLayout::MuQt_QGridLayout(Pointer muobj, const CallEnvironment* ce, QWidget* parent)
         : QGridLayout(parent)
     {
         _env = ce;
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QGridLayoutType>(
-            c->internName("qt.QGridLayout"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QGridLayoutType>(c->internName("qt.QGridLayout"));
     }
 
     MuQt_QGridLayout::MuQt_QGridLayout(Pointer muobj, const CallEnvironment* ce)
@@ -77,8 +75,7 @@ namespace Mu
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QGridLayoutType>(
-            c->internName("qt.QGridLayout"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QGridLayoutType>(c->internName("qt.QGridLayout"));
     }
 
     int MuQt_QGridLayout::count() const
@@ -344,8 +341,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makelayoutitem<QLayoutItemType>(c, item, "qt.QLayoutItem"));
+            args[1] = Value(makelayoutitem<QLayoutItemType>(c, item, "qt.QLayoutItem"));
             Value rval = _env->call(F, args);
         }
         else
@@ -458,8 +454,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  Mu Type CONSTRUCTORS
 
-    QGridLayoutType::QGridLayoutType(Context* c, const char* name, Class* super,
-                                     Class* super2)
+    QGridLayoutType::QGridLayoutType(Context* c, const char* name, Class* super, Class* super2)
         : Class(c, name, vectorOf2(super, super2))
     {
     }
@@ -469,8 +464,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    static Pointer QGridLayout_QGridLayout_QObject(Thread& NODE_THREAD,
-                                                   Pointer obj)
+    static Pointer QGridLayout_QGridLayout_QObject(Thread& NODE_THREAD, Pointer obj)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         ClassInstance* widget = reinterpret_cast<ClassInstance*>(obj);
@@ -481,9 +475,7 @@ namespace Mu
         }
         else if (QGridLayout* w = object<QGridLayout>(widget))
         {
-            QGridLayoutType* type =
-                c->findSymbolOfTypeByQualifiedName<QGridLayoutType>(
-                    c->internName("qt.QGridLayout"), false);
+            QGridLayoutType* type = c->findSymbolOfTypeByQualifiedName<QGridLayoutType>(c->internName("qt.QGridLayout"), false);
             ClassInstance* o = ClassInstance::allocate(type);
             setobject(o, w);
             return o;
@@ -494,39 +486,27 @@ namespace Mu
         }
     }
 
-    static NODE_IMPLEMENTATION(castFromObject, Pointer)
-    {
-        NODE_RETURN(
-            QGridLayout_QGridLayout_QObject(NODE_THREAD, NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(castFromObject, Pointer) { NODE_RETURN(QGridLayout_QGridLayout_QObject(NODE_THREAD, NODE_ARG(0, Pointer))); }
 
-    Pointer qt_QGridLayout_QGridLayout_QGridLayout_QGridLayout_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
+    Pointer qt_QGridLayout_QGridLayout_QGridLayout_QGridLayout_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWidget* arg1 = object<QWidget>(param_parent);
-        setobject(param_this,
-                  new MuQt_QGridLayout(param_this,
-                                       NODE_THREAD.process()->callEnv(), arg1));
+        setobject(param_this, new MuQt_QGridLayout(param_this, NODE_THREAD.process()->callEnv(), arg1));
         return param_this;
     }
 
-    Pointer
-    qt_QGridLayout_QGridLayout_QGridLayout_QGridLayout(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this)
+    Pointer qt_QGridLayout_QGridLayout_QGridLayout_QGridLayout(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-        setobject(
-            param_this,
-            new MuQt_QGridLayout(param_this, NODE_THREAD.process()->callEnv()));
+        setobject(param_this, new MuQt_QGridLayout(param_this, NODE_THREAD.process()->callEnv()));
         return param_this;
     }
 
-    void
-    qt_QGridLayout_addItem_void_QGridLayout_QLayoutItem_int_int_int_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_item,
-        int param_row, int param_column, int param_rowSpan,
-        int param_columnSpan, int param_alignment)
+    void qt_QGridLayout_addItem_void_QGridLayout_QLayoutItem_int_int_int_int_int(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                 Pointer param_item, int param_row, int param_column,
+                                                                                 int param_rowSpan, int param_columnSpan,
+                                                                                 int param_alignment)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGridLayout* arg0 = object<QGridLayout>(param_this);
@@ -539,9 +519,8 @@ namespace Mu
         arg0->addItem(arg1, arg2, arg3, arg4, arg5, arg6);
     }
 
-    void qt_QGridLayout_addLayout_void_QGridLayout_QLayout_int_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_layout,
-        int param_row, int param_column, int param_alignment)
+    void qt_QGridLayout_addLayout_void_QGridLayout_QLayout_int_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_layout,
+                                                                       int param_row, int param_column, int param_alignment)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGridLayout* arg0 = object<QGridLayout>(param_this);
@@ -552,10 +531,9 @@ namespace Mu
         arg0->addLayout(arg1, arg2, arg3, arg4);
     }
 
-    void qt_QGridLayout_addLayout_void_QGridLayout_QLayout_int_int_int_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_layout,
-        int param_row, int param_column, int param_rowSpan,
-        int param_columnSpan, int param_alignment)
+    void qt_QGridLayout_addLayout_void_QGridLayout_QLayout_int_int_int_int_int(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                               Pointer param_layout, int param_row, int param_column,
+                                                                               int param_rowSpan, int param_columnSpan, int param_alignment)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGridLayout* arg0 = object<QGridLayout>(param_this);
@@ -568,9 +546,8 @@ namespace Mu
         arg0->addLayout(arg1, arg2, arg3, arg4, arg5, arg6);
     }
 
-    void qt_QGridLayout_addWidget_void_QGridLayout_QWidget_int_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_widget,
-        int param_row, int param_column, int param_alignment)
+    void qt_QGridLayout_addWidget_void_QGridLayout_QWidget_int_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_widget,
+                                                                       int param_row, int param_column, int param_alignment)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGridLayout* arg0 = object<QGridLayout>(param_this);
@@ -581,10 +558,10 @@ namespace Mu
         arg0->addWidget(arg1, arg2, arg3, arg4);
     }
 
-    void qt_QGridLayout_addWidget_void_QGridLayout_QWidget_int_int_int_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_widget,
-        int param_fromRow, int param_fromColumn, int param_rowSpan,
-        int param_columnSpan, int param_alignment)
+    void qt_QGridLayout_addWidget_void_QGridLayout_QWidget_int_int_int_int_int(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                               Pointer param_widget, int param_fromRow,
+                                                                               int param_fromColumn, int param_rowSpan,
+                                                                               int param_columnSpan, int param_alignment)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGridLayout* arg0 = object<QGridLayout>(param_this);
@@ -597,9 +574,7 @@ namespace Mu
         arg0->addWidget(arg1, arg2, arg3, arg4, arg5, arg6);
     }
 
-    Pointer qt_QGridLayout_cellRect_QRect_QGridLayout_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
-        int param_column)
+    Pointer qt_QGridLayout_cellRect_QRect_QGridLayout_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_row, int param_column)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGridLayout* arg0 = object<QGridLayout>(param_this);
@@ -608,16 +583,14 @@ namespace Mu
         return makeqtype<QRectType>(c, arg0->cellRect(arg1, arg2), "qt.QRect");
     }
 
-    int qt_QGridLayout_columnCount_int_QGridLayout(Mu::Thread& NODE_THREAD,
-                                                   Pointer param_this)
+    int qt_QGridLayout_columnCount_int_QGridLayout(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGridLayout* arg0 = object<QGridLayout>(param_this);
         return arg0->columnCount();
     }
 
-    int qt_QGridLayout_columnMinimumWidth_int_QGridLayout_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_column)
+    int qt_QGridLayout_columnMinimumWidth_int_QGridLayout_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_column)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGridLayout* arg0 = object<QGridLayout>(param_this);
@@ -625,8 +598,7 @@ namespace Mu
         return arg0->columnMinimumWidth(arg1);
     }
 
-    int qt_QGridLayout_columnStretch_int_QGridLayout_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_column)
+    int qt_QGridLayout_columnStretch_int_QGridLayout_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_column)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGridLayout* arg0 = object<QGridLayout>(param_this);
@@ -634,36 +606,31 @@ namespace Mu
         return arg0->columnStretch(arg1);
     }
 
-    Pointer qt_QGridLayout_itemAtPosition_QLayoutItem_QGridLayout_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
-        int param_column)
+    Pointer qt_QGridLayout_itemAtPosition_QLayoutItem_QGridLayout_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
+                                                                          int param_column)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGridLayout* arg0 = object<QGridLayout>(param_this);
         int arg1 = (int)(param_row);
         int arg2 = (int)(param_column);
-        return makelayoutitem<QLayoutItemType>(
-            c, arg0->itemAtPosition(arg1, arg2), "qt.QLayoutItem");
+        return makelayoutitem<QLayoutItemType>(c, arg0->itemAtPosition(arg1, arg2), "qt.QLayoutItem");
     }
 
-    int qt_QGridLayout_originCorner_int_QGridLayout(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this)
+    int qt_QGridLayout_originCorner_int_QGridLayout(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGridLayout* arg0 = object<QGridLayout>(param_this);
         return int(arg0->originCorner());
     }
 
-    int qt_QGridLayout_rowCount_int_QGridLayout(Mu::Thread& NODE_THREAD,
-                                                Pointer param_this)
+    int qt_QGridLayout_rowCount_int_QGridLayout(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGridLayout* arg0 = object<QGridLayout>(param_this);
         return arg0->rowCount();
     }
 
-    int qt_QGridLayout_rowMinimumHeight_int_QGridLayout_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_row)
+    int qt_QGridLayout_rowMinimumHeight_int_QGridLayout_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_row)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGridLayout* arg0 = object<QGridLayout>(param_this);
@@ -671,9 +638,7 @@ namespace Mu
         return arg0->rowMinimumHeight(arg1);
     }
 
-    int qt_QGridLayout_rowStretch_int_QGridLayout_int(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this,
-                                                      int param_row)
+    int qt_QGridLayout_rowStretch_int_QGridLayout_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_row)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGridLayout* arg0 = object<QGridLayout>(param_this);
@@ -681,9 +646,8 @@ namespace Mu
         return arg0->rowStretch(arg1);
     }
 
-    void qt_QGridLayout_setColumnMinimumWidth_void_QGridLayout_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_column,
-        int param_minSize)
+    void qt_QGridLayout_setColumnMinimumWidth_void_QGridLayout_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_column,
+                                                                       int param_minSize)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGridLayout* arg0 = object<QGridLayout>(param_this);
@@ -692,9 +656,8 @@ namespace Mu
         arg0->setColumnMinimumWidth(arg1, arg2);
     }
 
-    void qt_QGridLayout_setColumnStretch_void_QGridLayout_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_column,
-        int param_stretch)
+    void qt_QGridLayout_setColumnStretch_void_QGridLayout_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_column,
+                                                                  int param_stretch)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGridLayout* arg0 = object<QGridLayout>(param_this);
@@ -703,8 +666,7 @@ namespace Mu
         arg0->setColumnStretch(arg1, arg2);
     }
 
-    void qt_QGridLayout_setOriginCorner_void_QGridLayout_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_corner)
+    void qt_QGridLayout_setOriginCorner_void_QGridLayout_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_corner)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGridLayout* arg0 = object<QGridLayout>(param_this);
@@ -712,9 +674,8 @@ namespace Mu
         arg0->setOriginCorner(arg1);
     }
 
-    void qt_QGridLayout_setRowMinimumHeight_void_QGridLayout_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
-        int param_minSize)
+    void qt_QGridLayout_setRowMinimumHeight_void_QGridLayout_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
+                                                                     int param_minSize)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGridLayout* arg0 = object<QGridLayout>(param_this);
@@ -723,9 +684,8 @@ namespace Mu
         arg0->setRowMinimumHeight(arg1, arg2);
     }
 
-    void qt_QGridLayout_setRowStretch_void_QGridLayout_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
-        int param_stretch)
+    void qt_QGridLayout_setRowStretch_void_QGridLayout_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
+                                                               int param_stretch)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGridLayout* arg0 = object<QGridLayout>(param_this);
@@ -734,9 +694,7 @@ namespace Mu
         arg0->setRowStretch(arg1, arg2);
     }
 
-    void qt_QGridLayout_setSpacing_void_QGridLayout_int(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this,
-                                                        int param_spacing)
+    void qt_QGridLayout_setSpacing_void_QGridLayout_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_spacing)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGridLayout* arg0 = object<QGridLayout>(param_this);
@@ -744,55 +702,43 @@ namespace Mu
         arg0->setSpacing(arg1);
     }
 
-    int qt_QGridLayout_spacing_int_QGridLayout(Mu::Thread& NODE_THREAD,
-                                               Pointer param_this)
+    int qt_QGridLayout_spacing_int_QGridLayout(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGridLayout* arg0 = object<QGridLayout>(param_this);
         return arg0->spacing();
     }
 
-    int qt_QGridLayout_count_int_QGridLayout(Mu::Thread& NODE_THREAD,
-                                             Pointer param_this)
+    int qt_QGridLayout_count_int_QGridLayout(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGridLayout* arg0 = object<QGridLayout>(param_this);
         return isMuQtObject(arg0) ? arg0->QGridLayout::count() : arg0->count();
     }
 
-    int
-    qt_QGridLayout_expandingDirections_int_QGridLayout(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this)
+    int qt_QGridLayout_expandingDirections_int_QGridLayout(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGridLayout* arg0 = object<QGridLayout>(param_this);
-        return isMuQtObject(arg0)
-                   ? int(arg0->QGridLayout::expandingDirections())
-                   : int(arg0->expandingDirections());
+        return isMuQtObject(arg0) ? int(arg0->QGridLayout::expandingDirections()) : int(arg0->expandingDirections());
     }
 
-    bool
-    qt_QGridLayout_hasHeightForWidth_bool_QGridLayout(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    bool qt_QGridLayout_hasHeightForWidth_bool_QGridLayout(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGridLayout* arg0 = object<QGridLayout>(param_this);
-        return isMuQtObject(arg0) ? arg0->QGridLayout::hasHeightForWidth()
-                                  : arg0->hasHeightForWidth();
+        return isMuQtObject(arg0) ? arg0->QGridLayout::hasHeightForWidth() : arg0->hasHeightForWidth();
     }
 
-    int qt_QGridLayout_heightForWidth_int_QGridLayout_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_w)
+    int qt_QGridLayout_heightForWidth_int_QGridLayout_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_w)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGridLayout* arg0 = object<QGridLayout>(param_this);
         int arg1 = (int)(param_w);
-        return isMuQtObject(arg0) ? arg0->QGridLayout::heightForWidth(arg1)
-                                  : arg0->heightForWidth(arg1);
+        return isMuQtObject(arg0) ? arg0->QGridLayout::heightForWidth(arg1) : arg0->heightForWidth(arg1);
     }
 
-    void qt_QGridLayout_invalidate_void_QGridLayout(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this)
+    void qt_QGridLayout_invalidate_void_QGridLayout(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGridLayout* arg0 = object<QGridLayout>(param_this);
@@ -802,56 +748,40 @@ namespace Mu
             arg0->invalidate();
     }
 
-    Pointer qt_QGridLayout_itemAt_QLayoutItem_QGridLayout_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_index)
+    Pointer qt_QGridLayout_itemAt_QLayoutItem_QGridLayout_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_index)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGridLayout* arg0 = object<QGridLayout>(param_this);
         int arg1 = (int)(param_index);
-        return isMuQtObject(arg0)
-                   ? makelayoutitem<QLayoutItemType>(
-                         c, arg0->QGridLayout::itemAt(arg1), "qt.QLayoutItem")
-                   : makelayoutitem<QLayoutItemType>(c, arg0->itemAt(arg1),
-                                                     "qt.QLayoutItem");
+        return isMuQtObject(arg0) ? makelayoutitem<QLayoutItemType>(c, arg0->QGridLayout::itemAt(arg1), "qt.QLayoutItem")
+                                  : makelayoutitem<QLayoutItemType>(c, arg0->itemAt(arg1), "qt.QLayoutItem");
     }
 
-    Pointer
-    qt_QGridLayout_maximumSize_QSize_QGridLayout(Mu::Thread& NODE_THREAD,
-                                                 Pointer param_this)
+    Pointer qt_QGridLayout_maximumSize_QSize_QGridLayout(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGridLayout* arg0 = object<QGridLayout>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QSizeType>(c, arg0->QGridLayout::maximumSize(),
-                                          "qt.QSize")
-                   : makeqtype<QSizeType>(c, arg0->maximumSize(), "qt.QSize");
+        return isMuQtObject(arg0) ? makeqtype<QSizeType>(c, arg0->QGridLayout::maximumSize(), "qt.QSize")
+                                  : makeqtype<QSizeType>(c, arg0->maximumSize(), "qt.QSize");
     }
 
-    int qt_QGridLayout_minimumHeightForWidth_int_QGridLayout_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_w)
+    int qt_QGridLayout_minimumHeightForWidth_int_QGridLayout_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_w)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGridLayout* arg0 = object<QGridLayout>(param_this);
         int arg1 = (int)(param_w);
-        return isMuQtObject(arg0)
-                   ? arg0->QGridLayout::minimumHeightForWidth(arg1)
-                   : arg0->minimumHeightForWidth(arg1);
+        return isMuQtObject(arg0) ? arg0->QGridLayout::minimumHeightForWidth(arg1) : arg0->minimumHeightForWidth(arg1);
     }
 
-    Pointer
-    qt_QGridLayout_minimumSize_QSize_QGridLayout(Mu::Thread& NODE_THREAD,
-                                                 Pointer param_this)
+    Pointer qt_QGridLayout_minimumSize_QSize_QGridLayout(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGridLayout* arg0 = object<QGridLayout>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QSizeType>(c, arg0->QGridLayout::minimumSize(),
-                                          "qt.QSize")
-                   : makeqtype<QSizeType>(c, arg0->minimumSize(), "qt.QSize");
+        return isMuQtObject(arg0) ? makeqtype<QSizeType>(c, arg0->QGridLayout::minimumSize(), "qt.QSize")
+                                  : makeqtype<QSizeType>(c, arg0->minimumSize(), "qt.QSize");
     }
 
-    void qt_QGridLayout_setGeometry_void_QGridLayout_QRect(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_rect)
+    void qt_QGridLayout_setGeometry_void_QGridLayout_QRect(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_rect)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGridLayout* arg0 = object<QGridLayout>(param_this);
@@ -862,32 +792,24 @@ namespace Mu
             arg0->setGeometry(arg1);
     }
 
-    Pointer qt_QGridLayout_sizeHint_QSize_QGridLayout(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    Pointer qt_QGridLayout_sizeHint_QSize_QGridLayout(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGridLayout* arg0 = object<QGridLayout>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QSizeType>(c, arg0->QGridLayout::sizeHint(),
-                                          "qt.QSize")
-                   : makeqtype<QSizeType>(c, arg0->sizeHint(), "qt.QSize");
+        return isMuQtObject(arg0) ? makeqtype<QSizeType>(c, arg0->QGridLayout::sizeHint(), "qt.QSize")
+                                  : makeqtype<QSizeType>(c, arg0->sizeHint(), "qt.QSize");
     }
 
-    Pointer qt_QGridLayout_takeAt_QLayoutItem_QGridLayout_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_index)
+    Pointer qt_QGridLayout_takeAt_QLayoutItem_QGridLayout_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_index)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGridLayout* arg0 = object<QGridLayout>(param_this);
         int arg1 = (int)(param_index);
-        return isMuQtObject(arg0)
-                   ? makelayoutitem<QLayoutItemType>(
-                         c, arg0->QGridLayout::takeAt(arg1), "qt.QLayoutItem")
-                   : makelayoutitem<QLayoutItemType>(c, arg0->takeAt(arg1),
-                                                     "qt.QLayoutItem");
+        return isMuQtObject(arg0) ? makelayoutitem<QLayoutItemType>(c, arg0->QGridLayout::takeAt(arg1), "qt.QLayoutItem")
+                                  : makelayoutitem<QLayoutItemType>(c, arg0->takeAt(arg1), "qt.QLayoutItem");
     }
 
-    void qt_QGridLayout_addItem_void_QGridLayout_QLayoutItem(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_item)
+    void qt_QGridLayout_addItem_void_QGridLayout_QLayoutItem(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_item)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGridLayout* arg0 = object<QGridLayout>(param_this);
@@ -898,316 +820,261 @@ namespace Mu
             ((MuQt_QGridLayout*)arg0)->addItem_pub(arg1);
     }
 
-    int qt_QGridLayout_indexOf_int_QGridLayout_QWidget(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this,
-                                                       Pointer param_widget)
+    int qt_QGridLayout_indexOf_int_QGridLayout_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_widget)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGridLayout* arg0 = object<QGridLayout>(param_this);
         QWidget* arg1 = object<QWidget>(param_widget);
-        return isMuQtObject(arg0) ? arg0->QGridLayout::indexOf(arg1)
-                                  : arg0->indexOf(arg1);
+        return isMuQtObject(arg0) ? arg0->QGridLayout::indexOf(arg1) : arg0->indexOf(arg1);
     }
 
-    int qt_QGridLayout_controlTypes_int_QGridLayout(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this)
+    int qt_QGridLayout_controlTypes_int_QGridLayout(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGridLayout* arg0 = object<QGridLayout>(param_this);
-        return isMuQtObject(arg0) ? int(arg0->QGridLayout::controlTypes())
-                                  : int(arg0->controlTypes());
+        return isMuQtObject(arg0) ? int(arg0->QGridLayout::controlTypes()) : int(arg0->controlTypes());
     }
 
-    Pointer qt_QGridLayout_geometry_QRect_QGridLayout(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    Pointer qt_QGridLayout_geometry_QRect_QGridLayout(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGridLayout* arg0 = object<QGridLayout>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QRectType>(c, arg0->QGridLayout::geometry(),
-                                          "qt.QRect")
-                   : makeqtype<QRectType>(c, arg0->geometry(), "qt.QRect");
+        return isMuQtObject(arg0) ? makeqtype<QRectType>(c, arg0->QGridLayout::geometry(), "qt.QRect")
+                                  : makeqtype<QRectType>(c, arg0->geometry(), "qt.QRect");
     }
 
-    bool qt_QGridLayout_isEmpty_bool_QGridLayout(Mu::Thread& NODE_THREAD,
-                                                 Pointer param_this)
+    bool qt_QGridLayout_isEmpty_bool_QGridLayout(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGridLayout* arg0 = object<QGridLayout>(param_this);
-        return isMuQtObject(arg0) ? arg0->QGridLayout::isEmpty()
-                                  : arg0->isEmpty();
+        return isMuQtObject(arg0) ? arg0->QGridLayout::isEmpty() : arg0->isEmpty();
     }
 
-    Pointer qt_QGridLayout_layout_QLayout_QGridLayout(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    Pointer qt_QGridLayout_layout_QLayout_QGridLayout(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QGridLayout* arg0 = object<QGridLayout>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeinstance<QLayoutType>(c, arg0->QGridLayout::layout(),
-                                               "qt.QLayout")
-                   : makeinstance<QLayoutType>(c, arg0->layout(), "qt.QLayout");
+        return isMuQtObject(arg0) ? makeinstance<QLayoutType>(c, arg0->QGridLayout::layout(), "qt.QLayout")
+                                  : makeinstance<QLayoutType>(c, arg0->layout(), "qt.QLayout");
     }
 
     static NODE_IMPLEMENTATION(_n_QGridLayout0, Pointer)
     {
-        NODE_RETURN(qt_QGridLayout_QGridLayout_QGridLayout_QGridLayout_QWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(
+            qt_QGridLayout_QGridLayout_QGridLayout_QGridLayout_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_QGridLayout1, Pointer)
     {
-        NODE_RETURN(qt_QGridLayout_QGridLayout_QGridLayout_QGridLayout(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QGridLayout_QGridLayout_QGridLayout_QGridLayout(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_addItem0, void)
     {
-        qt_QGridLayout_addItem_void_QGridLayout_QLayoutItem_int_int_int_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int), NODE_ARG(3, int), NODE_ARG(4, int),
-            NODE_ARG(5, int), NODE_ARG(6, int));
+        qt_QGridLayout_addItem_void_QGridLayout_QLayoutItem_int_int_int_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                NODE_ARG(1, Pointer), NODE_ARG(2, int), NODE_ARG(3, int),
+                                                                                NODE_ARG(4, int), NODE_ARG(5, int), NODE_ARG(6, int));
     }
 
     static NODE_IMPLEMENTATION(_n_addLayout0, void)
     {
-        qt_QGridLayout_addLayout_void_QGridLayout_QLayout_int_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int), NODE_ARG(3, int), NODE_ARG(4, int));
+        qt_QGridLayout_addLayout_void_QGridLayout_QLayout_int_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                      NODE_ARG(2, int), NODE_ARG(3, int), NODE_ARG(4, int));
     }
 
     static NODE_IMPLEMENTATION(_n_addLayout1, void)
     {
-        qt_QGridLayout_addLayout_void_QGridLayout_QLayout_int_int_int_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int), NODE_ARG(3, int), NODE_ARG(4, int),
-            NODE_ARG(5, int), NODE_ARG(6, int));
+        qt_QGridLayout_addLayout_void_QGridLayout_QLayout_int_int_int_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                              NODE_ARG(1, Pointer), NODE_ARG(2, int), NODE_ARG(3, int),
+                                                                              NODE_ARG(4, int), NODE_ARG(5, int), NODE_ARG(6, int));
     }
 
     static NODE_IMPLEMENTATION(_n_addWidget0, void)
     {
-        qt_QGridLayout_addWidget_void_QGridLayout_QWidget_int_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int), NODE_ARG(3, int), NODE_ARG(4, int));
+        qt_QGridLayout_addWidget_void_QGridLayout_QWidget_int_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                      NODE_ARG(2, int), NODE_ARG(3, int), NODE_ARG(4, int));
     }
 
     static NODE_IMPLEMENTATION(_n_addWidget1, void)
     {
-        qt_QGridLayout_addWidget_void_QGridLayout_QWidget_int_int_int_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int), NODE_ARG(3, int), NODE_ARG(4, int),
-            NODE_ARG(5, int), NODE_ARG(6, int));
+        qt_QGridLayout_addWidget_void_QGridLayout_QWidget_int_int_int_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                              NODE_ARG(1, Pointer), NODE_ARG(2, int), NODE_ARG(3, int),
+                                                                              NODE_ARG(4, int), NODE_ARG(5, int), NODE_ARG(6, int));
     }
 
     static NODE_IMPLEMENTATION(_n_cellRect0, Pointer)
     {
-        NODE_RETURN(qt_QGridLayout_cellRect_QRect_QGridLayout_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int)));
+        NODE_RETURN(qt_QGridLayout_cellRect_QRect_QGridLayout_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                      NODE_ARG(2, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_columnCount0, int)
     {
-        NODE_RETURN(qt_QGridLayout_columnCount_int_QGridLayout(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QGridLayout_columnCount_int_QGridLayout(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_columnMinimumWidth0, int)
     {
-        NODE_RETURN(qt_QGridLayout_columnMinimumWidth_int_QGridLayout_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QGridLayout_columnMinimumWidth_int_QGridLayout_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_columnStretch0, int)
     {
-        NODE_RETURN(qt_QGridLayout_columnStretch_int_QGridLayout_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QGridLayout_columnStretch_int_QGridLayout_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_itemAtPosition0, Pointer)
     {
-        NODE_RETURN(
-            qt_QGridLayout_itemAtPosition_QLayoutItem_QGridLayout_int_int(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-                NODE_ARG(2, int)));
+        NODE_RETURN(qt_QGridLayout_itemAtPosition_QLayoutItem_QGridLayout_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                  NODE_ARG(1, int), NODE_ARG(2, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_originCorner0, int)
     {
-        NODE_RETURN(qt_QGridLayout_originCorner_int_QGridLayout(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QGridLayout_originCorner_int_QGridLayout(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_rowCount0, int)
     {
-        NODE_RETURN(qt_QGridLayout_rowCount_int_QGridLayout(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QGridLayout_rowCount_int_QGridLayout(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_rowMinimumHeight0, int)
     {
-        NODE_RETURN(qt_QGridLayout_rowMinimumHeight_int_QGridLayout_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QGridLayout_rowMinimumHeight_int_QGridLayout_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_rowStretch0, int)
     {
-        NODE_RETURN(qt_QGridLayout_rowStretch_int_QGridLayout_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QGridLayout_rowStretch_int_QGridLayout_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_setColumnMinimumWidth0, void)
     {
-        qt_QGridLayout_setColumnMinimumWidth_void_QGridLayout_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int));
+        qt_QGridLayout_setColumnMinimumWidth_void_QGridLayout_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                      NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setColumnStretch0, void)
     {
-        qt_QGridLayout_setColumnStretch_void_QGridLayout_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int));
+        qt_QGridLayout_setColumnStretch_void_QGridLayout_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                 NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setOriginCorner0, void)
     {
-        qt_QGridLayout_setOriginCorner_void_QGridLayout_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QGridLayout_setOriginCorner_void_QGridLayout_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setRowMinimumHeight0, void)
     {
-        qt_QGridLayout_setRowMinimumHeight_void_QGridLayout_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int));
+        qt_QGridLayout_setRowMinimumHeight_void_QGridLayout_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                    NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setRowStretch0, void)
     {
-        qt_QGridLayout_setRowStretch_void_QGridLayout_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int));
+        qt_QGridLayout_setRowStretch_void_QGridLayout_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setSpacing0, void)
     {
-        qt_QGridLayout_setSpacing_void_QGridLayout_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QGridLayout_setSpacing_void_QGridLayout_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_spacing0, int)
     {
-        NODE_RETURN(qt_QGridLayout_spacing_int_QGridLayout(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QGridLayout_spacing_int_QGridLayout(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_count0, int)
     {
-        NODE_RETURN(qt_QGridLayout_count_int_QGridLayout(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QGridLayout_count_int_QGridLayout(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_expandingDirections0, int)
     {
-        NODE_RETURN(qt_QGridLayout_expandingDirections_int_QGridLayout(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QGridLayout_expandingDirections_int_QGridLayout(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_hasHeightForWidth0, bool)
     {
-        NODE_RETURN(qt_QGridLayout_hasHeightForWidth_bool_QGridLayout(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QGridLayout_hasHeightForWidth_bool_QGridLayout(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_heightForWidth0, int)
     {
-        NODE_RETURN(qt_QGridLayout_heightForWidth_int_QGridLayout_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QGridLayout_heightForWidth_int_QGridLayout_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_invalidate0, void)
     {
-        qt_QGridLayout_invalidate_void_QGridLayout(NODE_THREAD,
-                                                   NONNIL_NODE_ARG(0, Pointer));
+        qt_QGridLayout_invalidate_void_QGridLayout(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_itemAt0, Pointer)
     {
-        NODE_RETURN(qt_QGridLayout_itemAt_QLayoutItem_QGridLayout_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QGridLayout_itemAt_QLayoutItem_QGridLayout_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_maximumSize0, Pointer)
     {
-        NODE_RETURN(qt_QGridLayout_maximumSize_QSize_QGridLayout(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QGridLayout_maximumSize_QSize_QGridLayout(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_minimumHeightForWidth0, int)
     {
-        NODE_RETURN(qt_QGridLayout_minimumHeightForWidth_int_QGridLayout_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QGridLayout_minimumHeightForWidth_int_QGridLayout_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_minimumSize0, Pointer)
     {
-        NODE_RETURN(qt_QGridLayout_minimumSize_QSize_QGridLayout(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QGridLayout_minimumSize_QSize_QGridLayout(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_setGeometry0, void)
     {
-        qt_QGridLayout_setGeometry_void_QGridLayout_QRect(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QGridLayout_setGeometry_void_QGridLayout_QRect(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_sizeHint0, Pointer)
     {
-        NODE_RETURN(qt_QGridLayout_sizeHint_QSize_QGridLayout(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QGridLayout_sizeHint_QSize_QGridLayout(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_takeAt0, Pointer)
     {
-        NODE_RETURN(qt_QGridLayout_takeAt_QLayoutItem_QGridLayout_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QGridLayout_takeAt_QLayoutItem_QGridLayout_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_addItem1, void)
     {
-        qt_QGridLayout_addItem_void_QGridLayout_QLayoutItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QGridLayout_addItem_void_QGridLayout_QLayoutItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_indexOf0, int)
     {
-        NODE_RETURN(qt_QGridLayout_indexOf_int_QGridLayout_QWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QGridLayout_indexOf_int_QGridLayout_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_controlTypes0, int)
     {
-        NODE_RETURN(qt_QGridLayout_controlTypes_int_QGridLayout(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QGridLayout_controlTypes_int_QGridLayout(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_geometry0, Pointer)
     {
-        NODE_RETURN(qt_QGridLayout_geometry_QRect_QGridLayout(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QGridLayout_geometry_QRect_QGridLayout(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isEmpty0, bool)
     {
-        NODE_RETURN(qt_QGridLayout_isEmpty_bool_QGridLayout(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QGridLayout_isEmpty_bool_QGridLayout(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_layout0, Pointer)
     {
-        NODE_RETURN(qt_QGridLayout_layout_QLayout_QGridLayout(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QGridLayout_layout_QLayout_QGridLayout(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     void QGridLayoutType::load()
@@ -1227,17 +1094,13 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
-                   new Function(c, tn, castFromObject, Cast, Compiled,
-                                QGridLayout_QGridLayout_QObject, Return, ftn,
-                                Parameters,
+                   new Function(c, tn, castFromObject, Cast, Compiled, QGridLayout_QGridLayout_QObject, Return, ftn, Parameters,
                                 new Param(c, "object", "qt.QObject"), End),
 
                    EndArguments);
@@ -1245,247 +1108,124 @@ namespace Mu
         addSymbols(
             // enums
             // member functions
-            new Function(
-                c, "QGridLayout", _n_QGridLayout0, None, Compiled,
-                qt_QGridLayout_QGridLayout_QGridLayout_QGridLayout_QWidget,
-                Return, "qt.QGridLayout", Parameters,
-                new Param(c, "this", "qt.QGridLayout"),
-                new Param(c, "parent", "qt.QWidget"), End),
-            new Function(c, "QGridLayout", _n_QGridLayout1, None, Compiled,
-                         qt_QGridLayout_QGridLayout_QGridLayout_QGridLayout,
-                         Return, "qt.QGridLayout", Parameters,
-                         new Param(c, "this", "qt.QGridLayout"), End),
-            new Function(
-                c, "addItem", _n_addItem0, None, Compiled,
-                qt_QGridLayout_addItem_void_QGridLayout_QLayoutItem_int_int_int_int_int,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QGridLayout"),
-                new Param(c, "item", "qt.QLayoutItem"),
-                new Param(c, "row", "int"), new Param(c, "column", "int"),
-                new Param(c, "rowSpan", "int", Value((int)1)),
-                new Param(c, "columnSpan", "int", Value((int)1)),
-                new Param(c, "alignment", "int", Value((int)Qt::Alignment())),
-                End),
-            new Function(
-                c, "addLayout", _n_addLayout0, None, Compiled,
-                qt_QGridLayout_addLayout_void_QGridLayout_QLayout_int_int_int,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QGridLayout"),
-                new Param(c, "layout", "qt.QLayout"),
-                new Param(c, "row", "int"), new Param(c, "column", "int"),
-                new Param(c, "alignment", "int", Value((int)Qt::Alignment())),
-                End),
-            new Function(
-                c, "addLayout", _n_addLayout1, None, Compiled,
-                qt_QGridLayout_addLayout_void_QGridLayout_QLayout_int_int_int_int_int,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QGridLayout"),
-                new Param(c, "layout", "qt.QLayout"),
-                new Param(c, "row", "int"), new Param(c, "column", "int"),
-                new Param(c, "rowSpan", "int"),
-                new Param(c, "columnSpan", "int"),
-                new Param(c, "alignment", "int", Value((int)Qt::Alignment())),
-                End),
-            new Function(
-                c, "addWidget", _n_addWidget0, None, Compiled,
-                qt_QGridLayout_addWidget_void_QGridLayout_QWidget_int_int_int,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QGridLayout"),
-                new Param(c, "widget", "qt.QWidget"),
-                new Param(c, "row", "int"), new Param(c, "column", "int"),
-                new Param(c, "alignment", "int", Value((int)Qt::Alignment())),
-                End),
-            new Function(
-                c, "addWidget", _n_addWidget1, None, Compiled,
-                qt_QGridLayout_addWidget_void_QGridLayout_QWidget_int_int_int_int_int,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QGridLayout"),
-                new Param(c, "widget", "qt.QWidget"),
-                new Param(c, "fromRow", "int"),
-                new Param(c, "fromColumn", "int"),
-                new Param(c, "rowSpan", "int"),
-                new Param(c, "columnSpan", "int"),
-                new Param(c, "alignment", "int", Value((int)Qt::Alignment())),
-                End),
-            new Function(
-                c, "cellRect", _n_cellRect0, None, Compiled,
-                qt_QGridLayout_cellRect_QRect_QGridLayout_int_int, Return,
-                "qt.QRect", Parameters, new Param(c, "this", "qt.QGridLayout"),
-                new Param(c, "row", "int"), new Param(c, "column", "int"), End),
-            new Function(c, "columnCount", _n_columnCount0, None, Compiled,
-                         qt_QGridLayout_columnCount_int_QGridLayout, Return,
-                         "int", Parameters,
-                         new Param(c, "this", "qt.QGridLayout"), End),
-            new Function(
-                c, "columnMinimumWidth", _n_columnMinimumWidth0, None, Compiled,
-                qt_QGridLayout_columnMinimumWidth_int_QGridLayout_int, Return,
-                "int", Parameters, new Param(c, "this", "qt.QGridLayout"),
-                new Param(c, "column", "int"), End),
-            new Function(c, "columnStretch", _n_columnStretch0, None, Compiled,
-                         qt_QGridLayout_columnStretch_int_QGridLayout_int,
-                         Return, "int", Parameters,
-                         new Param(c, "this", "qt.QGridLayout"),
-                         new Param(c, "column", "int"), End),
+            new Function(c, "QGridLayout", _n_QGridLayout0, None, Compiled, qt_QGridLayout_QGridLayout_QGridLayout_QGridLayout_QWidget,
+                         Return, "qt.QGridLayout", Parameters, new Param(c, "this", "qt.QGridLayout"), new Param(c, "parent", "qt.QWidget"),
+                         End),
+            new Function(c, "QGridLayout", _n_QGridLayout1, None, Compiled, qt_QGridLayout_QGridLayout_QGridLayout_QGridLayout, Return,
+                         "qt.QGridLayout", Parameters, new Param(c, "this", "qt.QGridLayout"), End),
+            new Function(c, "addItem", _n_addItem0, None, Compiled, qt_QGridLayout_addItem_void_QGridLayout_QLayoutItem_int_int_int_int_int,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QGridLayout"), new Param(c, "item", "qt.QLayoutItem"),
+                         new Param(c, "row", "int"), new Param(c, "column", "int"), new Param(c, "rowSpan", "int", Value((int)1)),
+                         new Param(c, "columnSpan", "int", Value((int)1)), new Param(c, "alignment", "int", Value((int)Qt::Alignment())),
+                         End),
+            new Function(c, "addLayout", _n_addLayout0, None, Compiled, qt_QGridLayout_addLayout_void_QGridLayout_QLayout_int_int_int,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QGridLayout"), new Param(c, "layout", "qt.QLayout"),
+                         new Param(c, "row", "int"), new Param(c, "column", "int"),
+                         new Param(c, "alignment", "int", Value((int)Qt::Alignment())), End),
+            new Function(c, "addLayout", _n_addLayout1, None, Compiled,
+                         qt_QGridLayout_addLayout_void_QGridLayout_QLayout_int_int_int_int_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QGridLayout"), new Param(c, "layout", "qt.QLayout"), new Param(c, "row", "int"),
+                         new Param(c, "column", "int"), new Param(c, "rowSpan", "int"), new Param(c, "columnSpan", "int"),
+                         new Param(c, "alignment", "int", Value((int)Qt::Alignment())), End),
+            new Function(c, "addWidget", _n_addWidget0, None, Compiled, qt_QGridLayout_addWidget_void_QGridLayout_QWidget_int_int_int,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QGridLayout"), new Param(c, "widget", "qt.QWidget"),
+                         new Param(c, "row", "int"), new Param(c, "column", "int"),
+                         new Param(c, "alignment", "int", Value((int)Qt::Alignment())), End),
+            new Function(c, "addWidget", _n_addWidget1, None, Compiled,
+                         qt_QGridLayout_addWidget_void_QGridLayout_QWidget_int_int_int_int_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QGridLayout"), new Param(c, "widget", "qt.QWidget"), new Param(c, "fromRow", "int"),
+                         new Param(c, "fromColumn", "int"), new Param(c, "rowSpan", "int"), new Param(c, "columnSpan", "int"),
+                         new Param(c, "alignment", "int", Value((int)Qt::Alignment())), End),
+            new Function(c, "cellRect", _n_cellRect0, None, Compiled, qt_QGridLayout_cellRect_QRect_QGridLayout_int_int, Return, "qt.QRect",
+                         Parameters, new Param(c, "this", "qt.QGridLayout"), new Param(c, "row", "int"), new Param(c, "column", "int"),
+                         End),
+            new Function(c, "columnCount", _n_columnCount0, None, Compiled, qt_QGridLayout_columnCount_int_QGridLayout, Return, "int",
+                         Parameters, new Param(c, "this", "qt.QGridLayout"), End),
+            new Function(c, "columnMinimumWidth", _n_columnMinimumWidth0, None, Compiled,
+                         qt_QGridLayout_columnMinimumWidth_int_QGridLayout_int, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QGridLayout"), new Param(c, "column", "int"), End),
+            new Function(c, "columnStretch", _n_columnStretch0, None, Compiled, qt_QGridLayout_columnStretch_int_QGridLayout_int, Return,
+                         "int", Parameters, new Param(c, "this", "qt.QGridLayout"), new Param(c, "column", "int"), End),
             // MISSING: getItemPosition (void; QGridLayout this, int index, "int
             // *" row, "int *" column, "int *" rowSpan, "int *" columnSpan)
             // PROP: horizontalSpacing (int; QGridLayout this)
-            new Function(
-                c, "itemAtPosition", _n_itemAtPosition0, None, Compiled,
-                qt_QGridLayout_itemAtPosition_QLayoutItem_QGridLayout_int_int,
-                Return, "qt.QLayoutItem", Parameters,
-                new Param(c, "this", "qt.QGridLayout"),
-                new Param(c, "row", "int"), new Param(c, "column", "int"), End),
-            new Function(c, "originCorner", _n_originCorner0, None, Compiled,
-                         qt_QGridLayout_originCorner_int_QGridLayout, Return,
-                         "int", Parameters,
+            new Function(c, "itemAtPosition", _n_itemAtPosition0, None, Compiled,
+                         qt_QGridLayout_itemAtPosition_QLayoutItem_QGridLayout_int_int, Return, "qt.QLayoutItem", Parameters,
+                         new Param(c, "this", "qt.QGridLayout"), new Param(c, "row", "int"), new Param(c, "column", "int"), End),
+            new Function(c, "originCorner", _n_originCorner0, None, Compiled, qt_QGridLayout_originCorner_int_QGridLayout, Return, "int",
+                         Parameters, new Param(c, "this", "qt.QGridLayout"), End),
+            new Function(c, "rowCount", _n_rowCount0, None, Compiled, qt_QGridLayout_rowCount_int_QGridLayout, Return, "int", Parameters,
                          new Param(c, "this", "qt.QGridLayout"), End),
-            new Function(c, "rowCount", _n_rowCount0, None, Compiled,
-                         qt_QGridLayout_rowCount_int_QGridLayout, Return, "int",
-                         Parameters, new Param(c, "this", "qt.QGridLayout"),
-                         End),
-            new Function(
-                c, "rowMinimumHeight", _n_rowMinimumHeight0, None, Compiled,
-                qt_QGridLayout_rowMinimumHeight_int_QGridLayout_int, Return,
-                "int", Parameters, new Param(c, "this", "qt.QGridLayout"),
-                new Param(c, "row", "int"), End),
-            new Function(c, "rowStretch", _n_rowStretch0, None, Compiled,
-                         qt_QGridLayout_rowStretch_int_QGridLayout_int, Return,
-                         "int", Parameters,
-                         new Param(c, "this", "qt.QGridLayout"),
-                         new Param(c, "row", "int"), End),
-            new Function(
-                c, "setColumnMinimumWidth", _n_setColumnMinimumWidth0, None,
-                Compiled,
-                qt_QGridLayout_setColumnMinimumWidth_void_QGridLayout_int_int,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QGridLayout"),
-                new Param(c, "column", "int"), new Param(c, "minSize", "int"),
-                End),
-            new Function(
-                c, "setColumnStretch", _n_setColumnStretch0, None, Compiled,
-                qt_QGridLayout_setColumnStretch_void_QGridLayout_int_int,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QGridLayout"),
-                new Param(c, "column", "int"), new Param(c, "stretch", "int"),
-                End),
+            new Function(c, "rowMinimumHeight", _n_rowMinimumHeight0, None, Compiled, qt_QGridLayout_rowMinimumHeight_int_QGridLayout_int,
+                         Return, "int", Parameters, new Param(c, "this", "qt.QGridLayout"), new Param(c, "row", "int"), End),
+            new Function(c, "rowStretch", _n_rowStretch0, None, Compiled, qt_QGridLayout_rowStretch_int_QGridLayout_int, Return, "int",
+                         Parameters, new Param(c, "this", "qt.QGridLayout"), new Param(c, "row", "int"), End),
+            new Function(c, "setColumnMinimumWidth", _n_setColumnMinimumWidth0, None, Compiled,
+                         qt_QGridLayout_setColumnMinimumWidth_void_QGridLayout_int_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QGridLayout"), new Param(c, "column", "int"), new Param(c, "minSize", "int"), End),
+            new Function(c, "setColumnStretch", _n_setColumnStretch0, None, Compiled,
+                         qt_QGridLayout_setColumnStretch_void_QGridLayout_int_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QGridLayout"), new Param(c, "column", "int"), new Param(c, "stretch", "int"), End),
             // PROP: setHorizontalSpacing (void; QGridLayout this, int spacing)
-            new Function(
-                c, "setOriginCorner", _n_setOriginCorner0, None, Compiled,
-                qt_QGridLayout_setOriginCorner_void_QGridLayout_int, Return,
-                "void", Parameters, new Param(c, "this", "qt.QGridLayout"),
-                new Param(c, "corner", "int"), End),
-            new Function(
-                c, "setRowMinimumHeight", _n_setRowMinimumHeight0, None,
-                Compiled,
-                qt_QGridLayout_setRowMinimumHeight_void_QGridLayout_int_int,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QGridLayout"),
-                new Param(c, "row", "int"), new Param(c, "minSize", "int"),
-                End),
-            new Function(c, "setRowStretch", _n_setRowStretch0, None, Compiled,
-                         qt_QGridLayout_setRowStretch_void_QGridLayout_int_int,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QGridLayout"),
-                         new Param(c, "row", "int"),
+            new Function(c, "setOriginCorner", _n_setOriginCorner0, None, Compiled, qt_QGridLayout_setOriginCorner_void_QGridLayout_int,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QGridLayout"), new Param(c, "corner", "int"), End),
+            new Function(c, "setRowMinimumHeight", _n_setRowMinimumHeight0, None, Compiled,
+                         qt_QGridLayout_setRowMinimumHeight_void_QGridLayout_int_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QGridLayout"), new Param(c, "row", "int"), new Param(c, "minSize", "int"), End),
+            new Function(c, "setRowStretch", _n_setRowStretch0, None, Compiled, qt_QGridLayout_setRowStretch_void_QGridLayout_int_int,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QGridLayout"), new Param(c, "row", "int"),
                          new Param(c, "stretch", "int"), End),
-            new Function(c, "setSpacing", _n_setSpacing0, None, Compiled,
-                         qt_QGridLayout_setSpacing_void_QGridLayout_int, Return,
-                         "void", Parameters,
-                         new Param(c, "this", "qt.QGridLayout"),
-                         new Param(c, "spacing", "int"), End),
+            new Function(c, "setSpacing", _n_setSpacing0, None, Compiled, qt_QGridLayout_setSpacing_void_QGridLayout_int, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QGridLayout"), new Param(c, "spacing", "int"), End),
             // PROP: setVerticalSpacing (void; QGridLayout this, int spacing)
-            new Function(c, "spacing", _n_spacing0, None, Compiled,
-                         qt_QGridLayout_spacing_int_QGridLayout, Return, "int",
-                         Parameters, new Param(c, "this", "qt.QGridLayout"),
-                         End),
+            new Function(c, "spacing", _n_spacing0, None, Compiled, qt_QGridLayout_spacing_int_QGridLayout, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QGridLayout"), End),
             // PROP: verticalSpacing (int; QGridLayout this)
-            _func[0] = new MemberFunction(
-                c, "count", _n_count0, None, Compiled,
-                qt_QGridLayout_count_int_QGridLayout, Return, "int", Parameters,
-                new Param(c, "this", "qt.QGridLayout"), End),
-            _func[1] = new MemberFunction(
-                c, "expandingDirections", _n_expandingDirections0, None,
-                Compiled, qt_QGridLayout_expandingDirections_int_QGridLayout,
-                Return, "int", Parameters,
-                new Param(c, "this", "qt.QGridLayout"), End),
-            _func[2] = new MemberFunction(
-                c, "hasHeightForWidth", _n_hasHeightForWidth0, None, Compiled,
-                qt_QGridLayout_hasHeightForWidth_bool_QGridLayout, Return,
-                "bool", Parameters, new Param(c, "this", "qt.QGridLayout"),
-                End),
-            _func[3] = new MemberFunction(
-                c, "heightForWidth", _n_heightForWidth0, None, Compiled,
-                qt_QGridLayout_heightForWidth_int_QGridLayout_int, Return,
-                "int", Parameters, new Param(c, "this", "qt.QGridLayout"),
-                new Param(c, "w", "int"), End),
-            _func[4] = new MemberFunction(
-                c, "invalidate", _n_invalidate0, None, Compiled,
-                qt_QGridLayout_invalidate_void_QGridLayout, Return, "void",
-                Parameters, new Param(c, "this", "qt.QGridLayout"), End),
-            _func[5] = new MemberFunction(
-                c, "itemAt", _n_itemAt0, None, Compiled,
-                qt_QGridLayout_itemAt_QLayoutItem_QGridLayout_int, Return,
-                "qt.QLayoutItem", Parameters,
-                new Param(c, "this", "qt.QGridLayout"),
-                new Param(c, "index", "int"), End),
-            _func[6] = new MemberFunction(
-                c, "maximumSize", _n_maximumSize0, None, Compiled,
-                qt_QGridLayout_maximumSize_QSize_QGridLayout, Return,
-                "qt.QSize", Parameters, new Param(c, "this", "qt.QGridLayout"),
-                End),
-            _func[7] = new MemberFunction(
-                c, "minimumHeightForWidth", _n_minimumHeightForWidth0, None,
-                Compiled,
-                qt_QGridLayout_minimumHeightForWidth_int_QGridLayout_int,
-                Return, "int", Parameters,
-                new Param(c, "this", "qt.QGridLayout"),
-                new Param(c, "w", "int"), End),
-            _func[8] = new MemberFunction(
-                c, "minimumSize", _n_minimumSize0, None, Compiled,
-                qt_QGridLayout_minimumSize_QSize_QGridLayout, Return,
-                "qt.QSize", Parameters, new Param(c, "this", "qt.QGridLayout"),
-                End),
-            _func[9] = new MemberFunction(
-                c, "setGeometry", _n_setGeometry0, None, Compiled,
-                qt_QGridLayout_setGeometry_void_QGridLayout_QRect, Return,
-                "void", Parameters, new Param(c, "this", "qt.QGridLayout"),
-                new Param(c, "rect", "qt.QRect"), End),
-            _func[10] = new MemberFunction(
-                c, "sizeHint", _n_sizeHint0, None, Compiled,
-                qt_QGridLayout_sizeHint_QSize_QGridLayout, Return, "qt.QSize",
-                Parameters, new Param(c, "this", "qt.QGridLayout"), End),
-            _func[11] = new MemberFunction(
-                c, "takeAt", _n_takeAt0, None, Compiled,
-                qt_QGridLayout_takeAt_QLayoutItem_QGridLayout_int, Return,
-                "qt.QLayoutItem", Parameters,
-                new Param(c, "this", "qt.QGridLayout"),
-                new Param(c, "index", "int"), End),
-            _func[12] = new MemberFunction(
-                c, "addItem", _n_addItem1, None, Compiled,
-                qt_QGridLayout_addItem_void_QGridLayout_QLayoutItem, Return,
-                "void", Parameters, new Param(c, "this", "qt.QGridLayout"),
-                new Param(c, "item", "qt.QLayoutItem"), End),
-            _func[13] = new MemberFunction(
-                c, "indexOf", _n_indexOf0, None, Compiled,
-                qt_QGridLayout_indexOf_int_QGridLayout_QWidget, Return, "int",
-                Parameters, new Param(c, "this", "qt.QGridLayout"),
-                new Param(c, "widget", "qt.QWidget"), End),
-            _func[14] = new MemberFunction(
-                c, "controlTypes", _n_controlTypes0, None, Compiled,
-                qt_QGridLayout_controlTypes_int_QGridLayout, Return, "int",
-                Parameters, new Param(c, "this", "qt.QGridLayout"), End),
-            _func[15] = new MemberFunction(
-                c, "geometry", _n_geometry0, None, Compiled,
-                qt_QGridLayout_geometry_QRect_QGridLayout, Return, "qt.QRect",
-                Parameters, new Param(c, "this", "qt.QGridLayout"), End),
-            _func[16] = new MemberFunction(
-                c, "isEmpty", _n_isEmpty0, None, Compiled,
-                qt_QGridLayout_isEmpty_bool_QGridLayout, Return, "bool",
-                Parameters, new Param(c, "this", "qt.QGridLayout"), End),
-            _func[17] = new MemberFunction(
-                c, "layout", _n_layout0, None, Compiled,
-                qt_QGridLayout_layout_QLayout_QGridLayout, Return, "qt.QLayout",
-                Parameters, new Param(c, "this", "qt.QGridLayout"), End),
+            _func[0] = new MemberFunction(c, "count", _n_count0, None, Compiled, qt_QGridLayout_count_int_QGridLayout, Return, "int",
+                                          Parameters, new Param(c, "this", "qt.QGridLayout"), End),
+            _func[1] = new MemberFunction(c, "expandingDirections", _n_expandingDirections0, None, Compiled,
+                                          qt_QGridLayout_expandingDirections_int_QGridLayout, Return, "int", Parameters,
+                                          new Param(c, "this", "qt.QGridLayout"), End),
+            _func[2] = new MemberFunction(c, "hasHeightForWidth", _n_hasHeightForWidth0, None, Compiled,
+                                          qt_QGridLayout_hasHeightForWidth_bool_QGridLayout, Return, "bool", Parameters,
+                                          new Param(c, "this", "qt.QGridLayout"), End),
+            _func[3] = new MemberFunction(c, "heightForWidth", _n_heightForWidth0, None, Compiled,
+                                          qt_QGridLayout_heightForWidth_int_QGridLayout_int, Return, "int", Parameters,
+                                          new Param(c, "this", "qt.QGridLayout"), new Param(c, "w", "int"), End),
+            _func[4] = new MemberFunction(c, "invalidate", _n_invalidate0, None, Compiled, qt_QGridLayout_invalidate_void_QGridLayout,
+                                          Return, "void", Parameters, new Param(c, "this", "qt.QGridLayout"), End),
+            _func[5] =
+                new MemberFunction(c, "itemAt", _n_itemAt0, None, Compiled, qt_QGridLayout_itemAt_QLayoutItem_QGridLayout_int, Return,
+                                   "qt.QLayoutItem", Parameters, new Param(c, "this", "qt.QGridLayout"), new Param(c, "index", "int"), End),
+            _func[6] = new MemberFunction(c, "maximumSize", _n_maximumSize0, None, Compiled, qt_QGridLayout_maximumSize_QSize_QGridLayout,
+                                          Return, "qt.QSize", Parameters, new Param(c, "this", "qt.QGridLayout"), End),
+            _func[7] = new MemberFunction(c, "minimumHeightForWidth", _n_minimumHeightForWidth0, None, Compiled,
+                                          qt_QGridLayout_minimumHeightForWidth_int_QGridLayout_int, Return, "int", Parameters,
+                                          new Param(c, "this", "qt.QGridLayout"), new Param(c, "w", "int"), End),
+            _func[8] = new MemberFunction(c, "minimumSize", _n_minimumSize0, None, Compiled, qt_QGridLayout_minimumSize_QSize_QGridLayout,
+                                          Return, "qt.QSize", Parameters, new Param(c, "this", "qt.QGridLayout"), End),
+            _func[9] = new MemberFunction(c, "setGeometry", _n_setGeometry0, None, Compiled,
+                                          qt_QGridLayout_setGeometry_void_QGridLayout_QRect, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QGridLayout"), new Param(c, "rect", "qt.QRect"), End),
+            _func[10] = new MemberFunction(c, "sizeHint", _n_sizeHint0, None, Compiled, qt_QGridLayout_sizeHint_QSize_QGridLayout, Return,
+                                           "qt.QSize", Parameters, new Param(c, "this", "qt.QGridLayout"), End),
+            _func[11] =
+                new MemberFunction(c, "takeAt", _n_takeAt0, None, Compiled, qt_QGridLayout_takeAt_QLayoutItem_QGridLayout_int, Return,
+                                   "qt.QLayoutItem", Parameters, new Param(c, "this", "qt.QGridLayout"), new Param(c, "index", "int"), End),
+            _func[12] =
+                new MemberFunction(c, "addItem", _n_addItem1, None, Compiled, qt_QGridLayout_addItem_void_QGridLayout_QLayoutItem, Return,
+                                   "void", Parameters, new Param(c, "this", "qt.QGridLayout"), new Param(c, "item", "qt.QLayoutItem"), End),
+            _func[13] =
+                new MemberFunction(c, "indexOf", _n_indexOf0, None, Compiled, qt_QGridLayout_indexOf_int_QGridLayout_QWidget, Return, "int",
+                                   Parameters, new Param(c, "this", "qt.QGridLayout"), new Param(c, "widget", "qt.QWidget"), End),
+            _func[14] = new MemberFunction(c, "controlTypes", _n_controlTypes0, None, Compiled, qt_QGridLayout_controlTypes_int_QGridLayout,
+                                           Return, "int", Parameters, new Param(c, "this", "qt.QGridLayout"), End),
+            _func[15] = new MemberFunction(c, "geometry", _n_geometry0, None, Compiled, qt_QGridLayout_geometry_QRect_QGridLayout, Return,
+                                           "qt.QRect", Parameters, new Param(c, "this", "qt.QGridLayout"), End),
+            _func[16] = new MemberFunction(c, "isEmpty", _n_isEmpty0, None, Compiled, qt_QGridLayout_isEmpty_bool_QGridLayout, Return,
+                                           "bool", Parameters, new Param(c, "this", "qt.QGridLayout"), End),
+            _func[17] = new MemberFunction(c, "layout", _n_layout0, None, Compiled, qt_QGridLayout_layout_QLayout_QGridLayout, Return,
+                                           "qt.QLayout", Parameters, new Param(c, "this", "qt.QGridLayout"), End),
             // MISSING: childEvent (void; QGridLayout this, "QChildEvent *" e)
             // // protected static functions
             EndArguments);

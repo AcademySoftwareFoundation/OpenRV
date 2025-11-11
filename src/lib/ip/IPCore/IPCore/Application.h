@@ -55,8 +55,7 @@ namespace IPCore
 
         typedef boost::signals2::signal<void()> VoidSignal;
         typedef boost::signals2::signal<void(const std::string&)> StringSignal;
-        typedef boost::signals2::signal<void(const StringVector&)>
-            StringVectorSignal;
+        typedef boost::signals2::signal<void(const StringVector&)> StringVectorSignal;
 
         //
         //  Signals
@@ -66,10 +65,7 @@ namespace IPCore
 
         VoidSignal& stopTimerSignal() { return m_stopTimerSignal; }
 
-        StringVectorSignal& createNewSessionFromFilesSignal()
-        {
-            return m_createNewSessionFromFilesSignal;
-        }
+        StringVectorSignal& createNewSessionFromFilesSignal() { return m_createNewSessionFromFilesSignal; }
 
         StringSignal& optionSetSignal() { return m_optionSetSignal; }
 
@@ -88,10 +84,7 @@ namespace IPCore
         Application();
         virtual ~Application();
 
-        static Application* instance()
-        {
-            return static_cast<Application*>(TwkApp::App());
-        }
+        static Application* instance() { return static_cast<Application*>(TwkApp::App()); }
 
         //
         //  NodeManager
@@ -142,8 +135,7 @@ namespace IPCore
         // dispatched
         //
 
-        virtual void undispatchToMainThread(DispatchID dispatchID,
-                                            double maxDuration);
+        virtual void undispatchToMainThread(DispatchID dispatchID, double maxDuration);
 
         //
         //  External Interface. virtual funcs are intended for app objects
@@ -194,9 +186,7 @@ namespace IPCore
 
         FileKind fileKind(const std::string& file);
 
-        std::string userGenericEventOnAll(const std::string& eventName,
-                                          const std::string& contents,
-                                          const std::string& sender = "");
+        std::string userGenericEventOnAll(const std::string& eventName, const std::string& contents, const std::string& sender = "");
 
         static void cacheEnvVars();
 
@@ -205,31 +195,20 @@ namespace IPCore
 
         static int parseInFiles(int argc, char* argv[]);
 
-        static std::string mapToFrom(const std::string& in, PropEnvMap& em,
-                                     bool wantLowerCase, bool wantPathSanitize);
+        static std::string mapToFrom(const std::string& in, PropEnvMap& em, bool wantLowerCase, bool wantPathSanitize);
 
         static OptionMap& optionMap() { return m_optionMap; }
 
-        static bool hasOption(const OptionMap::key_type& key)
-        {
-            return m_optionMap.count(key) > 0;
-        }
+        static bool hasOption(const OptionMap::key_type& key) { return m_optionMap.count(key) > 0; }
 
-        template <class T>
-        static void setOptionValue(const OptionMap::key_type& key,
-                                   const T& value);
+        template <class T> static void setOptionValue(const OptionMap::key_type& key, const T& value);
 
-        static void
-        setOptionValueFromEnvironment(const OptionMap::key_type& key,
-                                      const std::string& envVar);
+        static void setOptionValueFromEnvironment(const OptionMap::key_type& key, const std::string& envVar);
 
-        template <class T>
-        static T optionValue(const OptionMap::key_type& key,
-                             const T& defaultValue);
+        template <class T> static T optionValue(const OptionMap::key_type& key, const T& defaultValue);
 
     protected:
-        virtual bool receive(Notifier*, Notifier*, Notifier::MessageId,
-                             Notifier::MessageData*);
+        virtual bool receive(Notifier*, Notifier*, Notifier::MessageId, Notifier::MessageData*);
 
         void lock() { pthread_mutex_lock(&m_memoryLock); }
 
@@ -273,19 +252,14 @@ namespace IPCore
 
     inline Application* App() { return Application::instance(); }
 
-    template <class T>
-    void
-    Application::setOptionValue(const Application::OptionMap::key_type& key,
-                                const T& value)
+    template <class T> void Application::setOptionValue(const Application::OptionMap::key_type& key, const T& value)
     {
         m_optionMap[key] = value;
         if (App())
             App()->m_optionSetSignal(key);
     }
 
-    template <class T>
-    T Application::optionValue(const Application::OptionMap::key_type& key,
-                               const T& defaultValue)
+    template <class T> T Application::optionValue(const Application::OptionMap::key_type& key, const T& defaultValue)
     {
         if (m_optionMap.find(key) == m_optionMap.end())
         {

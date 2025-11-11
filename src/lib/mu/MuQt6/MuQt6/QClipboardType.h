@@ -42,8 +42,7 @@ namespace Mu
         //  Constructors
         //
 
-        QClipboardType(Context* context, const char* name,
-                       Class* superClass = 0, Class* superClass2 = 0);
+        QClipboardType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QClipboardType();
 
@@ -60,11 +59,7 @@ namespace Mu
         MemberFunction* _func[4];
     };
 
-    inline ClassInstance*
-    QClipboardType::cachedInstance(const QClipboardType::MuQtType* obj)
-    {
-        return 0;
-    }
+    inline ClassInstance* QClipboardType::cachedInstance(const QClipboardType::MuQtType* obj) { return 0; }
 
 } // namespace Mu
 

@@ -47,8 +47,7 @@ namespace Mu
         //  Constructors
         //
 
-        QRadialGradientType(Context* context, const char* name,
-                            Class* superClass = 0);
+        QRadialGradientType(Context* context, const char* name, Class* superClass = 0);
         virtual ~QRadialGradientType();
 
         //

@@ -91,8 +91,7 @@ namespace AJADevices
     {
     }
 
-    KonaVideoDevice::FrameData&
-    KonaVideoDevice::FrameData::operator=(const KonaVideoDevice::FrameData& f)
+    KonaVideoDevice::FrameData& KonaVideoDevice::FrameData::operator=(const KonaVideoDevice::FrameData& f)
     {
         fbo = f.fbo;
         globject = f.globject;
@@ -143,9 +142,7 @@ namespace AJADevices
 
     void KonaVideoDevice::FrameData::unlockState() { stateMutex.unlock(); }
 
-    KonaVideoDevice::VideoChannel::VideoChannel(NTV2FrameBufferFormat format,
-                                                NTV2Channel ch, size_t bsize,
-                                                size_t n)
+    KonaVideoDevice::VideoChannel::VideoChannel(NTV2FrameBufferFormat format, NTV2Channel ch, size_t bsize, size_t n)
         : bufferSizeInBytes(bsize)
         , channel(ch)
         , data(n)
@@ -171,62 +168,34 @@ namespace AJADevices
         //
 
         KonaAudioFormat audioFormats[] = {
-            {48000.0, TwkAudio::Int32Format, 2, TwkAudio::Stereo_2,
-             "24 bit 48kHz Stereo"},
-            {48000.0, TwkAudio::Int32Format, 6, TwkAudio::Surround_5_1,
-             "24 bit 48kHz 5.1 Surround"},
-            {48000.0, TwkAudio::Int32Format, 8, TwkAudio::Surround_7_1,
-             "24 bit 48kHz 7.1 Surround"},
-            {48000.0, TwkAudio::Int32Format, 8, TwkAudio::SDDS_7_1,
-             "24 bit 48kHz 7.1 Surround SDDS"},
-            {48000.0, TwkAudio::Int32Format, 9, TwkAudio::Generic_9,
-             "24 bit 48kHz 9 channel"},
-            {48000.0, TwkAudio::Int32Format, 10, TwkAudio::Surround_9_1,
-             "24 bit 48kHz 9.1 Surround"},
-            {48000.0, TwkAudio::Int32Format, 11, TwkAudio::Generic_11,
-             "24 bit 48kHz 11 channel"},
-            {48000.0, TwkAudio::Int32Format, 12, TwkAudio::Generic_12,
-             "24 bit 48kHz 12 channel"},
-            {48000.0, TwkAudio::Int32Format, 13, TwkAudio::Generic_13,
-             "24 bit 48kHz 13 channel"},
-            {48000.0, TwkAudio::Int32Format, 14, TwkAudio::Generic_14,
-             "24 bit 48kHz 14 channel"},
-            {48000.0, TwkAudio::Int32Format, 15, TwkAudio::Generic_15,
-             "24 bit 48kHz 15 channel"},
-            {48000.0, TwkAudio::Int32Format, 16, TwkAudio::Generic_16,
-             "24 bit 48kHz 16 channel"},
-            {48000.0, TwkAudio::Int32Format, 17, TwkAudio::Generic_17,
-             "24 bit 48kHz 17 channel"},
-            {48000.0, TwkAudio::Int32Format, 18, TwkAudio::Generic_18,
-             "24 bit 48kHz 18 channel"},
-            {48000.0, TwkAudio::Int32Format, 19, TwkAudio::Generic_19,
-             "24 bit 48kHz 19 channel"},
-            {48000.0, TwkAudio::Int32Format, 20, TwkAudio::Generic_20,
-             "24 bit 48kHz 20 channel"},
-            {48000.0, TwkAudio::Int32Format, 21, TwkAudio::Generic_21,
-             "24 bit 48kHz 21 channel"},
-            {48000.0, TwkAudio::Int32Format, 22, TwkAudio::Generic_22,
-             "24 bit 48kHz 22 channel"},
-            {48000.0, TwkAudio::Int32Format, 23, TwkAudio::Generic_23,
-             "24 bit 48kHz 23 channel"},
-            {48000.0, TwkAudio::Int32Format, 24, TwkAudio::Generic_24,
-             "24 bit 48kHz 24 channel"},
-            {48000.0, TwkAudio::Int32Format, 25, TwkAudio::Generic_25,
-             "24 bit 48kHz 25 channel"},
-            {48000.0, TwkAudio::Int32Format, 26, TwkAudio::Generic_26,
-             "24 bit 48kHz 26 channel"},
-            {48000.0, TwkAudio::Int32Format, 27, TwkAudio::Generic_27,
-             "24 bit 48kHz 27 channel"},
-            {48000.0, TwkAudio::Int32Format, 28, TwkAudio::Generic_28,
-             "24 bit 48kHz 28 channel"},
-            {48000.0, TwkAudio::Int32Format, 29, TwkAudio::Generic_29,
-             "24 bit 48kHz 29 channel"},
-            {48000.0, TwkAudio::Int32Format, 30, TwkAudio::Generic_30,
-             "24 bit 48kHz 30 channel"},
-            {48000.0, TwkAudio::Int32Format, 31, TwkAudio::Generic_31,
-             "24 bit 48kHz 31 channel"},
-            {48000.0, TwkAudio::Int32Format, 32, TwkAudio::Generic_32,
-             "24 bit 48kHz 32 channel"}
+            {48000.0, TwkAudio::Int32Format, 2, TwkAudio::Stereo_2, "24 bit 48kHz Stereo"},
+            {48000.0, TwkAudio::Int32Format, 6, TwkAudio::Surround_5_1, "24 bit 48kHz 5.1 Surround"},
+            {48000.0, TwkAudio::Int32Format, 8, TwkAudio::Surround_7_1, "24 bit 48kHz 7.1 Surround"},
+            {48000.0, TwkAudio::Int32Format, 8, TwkAudio::SDDS_7_1, "24 bit 48kHz 7.1 Surround SDDS"},
+            {48000.0, TwkAudio::Int32Format, 9, TwkAudio::Generic_9, "24 bit 48kHz 9 channel"},
+            {48000.0, TwkAudio::Int32Format, 10, TwkAudio::Surround_9_1, "24 bit 48kHz 9.1 Surround"},
+            {48000.0, TwkAudio::Int32Format, 11, TwkAudio::Generic_11, "24 bit 48kHz 11 channel"},
+            {48000.0, TwkAudio::Int32Format, 12, TwkAudio::Generic_12, "24 bit 48kHz 12 channel"},
+            {48000.0, TwkAudio::Int32Format, 13, TwkAudio::Generic_13, "24 bit 48kHz 13 channel"},
+            {48000.0, TwkAudio::Int32Format, 14, TwkAudio::Generic_14, "24 bit 48kHz 14 channel"},
+            {48000.0, TwkAudio::Int32Format, 15, TwkAudio::Generic_15, "24 bit 48kHz 15 channel"},
+            {48000.0, TwkAudio::Int32Format, 16, TwkAudio::Generic_16, "24 bit 48kHz 16 channel"},
+            {48000.0, TwkAudio::Int32Format, 17, TwkAudio::Generic_17, "24 bit 48kHz 17 channel"},
+            {48000.0, TwkAudio::Int32Format, 18, TwkAudio::Generic_18, "24 bit 48kHz 18 channel"},
+            {48000.0, TwkAudio::Int32Format, 19, TwkAudio::Generic_19, "24 bit 48kHz 19 channel"},
+            {48000.0, TwkAudio::Int32Format, 20, TwkAudio::Generic_20, "24 bit 48kHz 20 channel"},
+            {48000.0, TwkAudio::Int32Format, 21, TwkAudio::Generic_21, "24 bit 48kHz 21 channel"},
+            {48000.0, TwkAudio::Int32Format, 22, TwkAudio::Generic_22, "24 bit 48kHz 22 channel"},
+            {48000.0, TwkAudio::Int32Format, 23, TwkAudio::Generic_23, "24 bit 48kHz 23 channel"},
+            {48000.0, TwkAudio::Int32Format, 24, TwkAudio::Generic_24, "24 bit 48kHz 24 channel"},
+            {48000.0, TwkAudio::Int32Format, 25, TwkAudio::Generic_25, "24 bit 48kHz 25 channel"},
+            {48000.0, TwkAudio::Int32Format, 26, TwkAudio::Generic_26, "24 bit 48kHz 26 channel"},
+            {48000.0, TwkAudio::Int32Format, 27, TwkAudio::Generic_27, "24 bit 48kHz 27 channel"},
+            {48000.0, TwkAudio::Int32Format, 28, TwkAudio::Generic_28, "24 bit 48kHz 28 channel"},
+            {48000.0, TwkAudio::Int32Format, 29, TwkAudio::Generic_29, "24 bit 48kHz 29 channel"},
+            {48000.0, TwkAudio::Int32Format, 30, TwkAudio::Generic_30, "24 bit 48kHz 30 channel"},
+            {48000.0, TwkAudio::Int32Format, 31, TwkAudio::Generic_31, "24 bit 48kHz 31 channel"},
+            {48000.0, TwkAudio::Int32Format, 32, TwkAudio::Generic_32, "24 bit 48kHz 32 channel"}
             // {96000.0, TwkAudio::Int32Format, 2, TwkAudio::Stereo_2, "24 bit
             // 96kHz Stereo"}
         };
@@ -239,9 +208,8 @@ namespace AJADevices
 
         KonaSyncSource syncSources[] = {{"Composite", 0}, {"SDI", 1}};
 
-        KonaVideo4KTransport video4KTransports[] = {
-            {"Quadrants 4-wire", VIDEO_4K_TRANSPORT_QUADRANTS},
-            {"SMPTE 2SI", VIDEO_4K_TRANSPORT_TSI}};
+        KonaVideo4KTransport video4KTransports[] = {{"Quadrants 4-wire", VIDEO_4K_TRANSPORT_QUADRANTS},
+                                                    {"SMPTE 2SI", VIDEO_4K_TRANSPORT_TSI}};
 
         KonaDataFormat dataFormatsCP[] = {
             //
@@ -249,11 +217,9 @@ namespace AJADevices
             //  control panel.
             //
 
-            {"AJA Control Panel", (NTV2FrameBufferFormat)999, VideoDevice::RGB8,
-             DataFormatFlags::NoFlags},
+            {"AJA Control Panel", (NTV2FrameBufferFormat)999, VideoDevice::RGB8, DataFormatFlags::NoFlags},
             // End of list
-            {"", (NTV2FrameBufferFormat)999, VideoDevice::RGB8,
-             DataFormatFlags::NoFlags}};
+            {"", (NTV2FrameBufferFormat)999, VideoDevice::RGB8, DataFormatFlags::NoFlags}};
 
         KonaDataFormat dataFormatsYUV[] = {
             //
@@ -266,10 +232,8 @@ namespace AJADevices
             //  to make it not worthwhile.
             //
 
-            {"8 Bit YCrCb 4:2:2 (YUV-8)", NTV2_FBF_8BIT_YCBCR,
-             VideoDevice::Y0CbY1Cr_8_422, P2P},
-            {"10 Bit YCrCb 4:2:2 (YUV-10)", NTV2_FBF_10BIT_YCBCR,
-             VideoDevice::YCrCb_AJA_10_422, P2P},
+            {"8 Bit YCrCb 4:2:2 (YUV-8)", NTV2_FBF_8BIT_YCBCR, VideoDevice::Y0CbY1Cr_8_422, P2P},
+            {"10 Bit YCrCb 4:2:2 (YUV-10)", NTV2_FBF_10BIT_YCBCR, VideoDevice::YCrCb_AJA_10_422, P2P},
             // End of list
             {"", NTV2_FBF_10BIT_YCBCR, VideoDevice::YCrCb_AJA_10_422, P2P}};
 
@@ -293,10 +257,8 @@ namespace AJADevices
             // YUV formats
             //{"10 Bit YCrCb 4:2:2 (8 bit internal)", NTV2_FBF_24BIT_RGB,
             // VideoDevice::RGB8, P2P},
-            {"10 Bit YCrCb 4:2:2", NTV2_FBF_10BIT_RGB, VideoDevice::RGB10X2,
-             P2P},
-            {"10 Bit YCrCb 4:2:2 (Legal SDI Range)", NTV2_FBF_10BIT_RGB,
-             VideoDevice::RGB10X2, P2P | LegalRangeY},
+            {"10 Bit YCrCb 4:2:2", NTV2_FBF_10BIT_RGB, VideoDevice::RGB10X2, P2P},
+            {"10 Bit YCrCb 4:2:2 (Legal SDI Range)", NTV2_FBF_10BIT_RGB, VideoDevice::RGB10X2, P2P | LegalRangeY},
 
             // 3G RGB formats
             {"8 Bit 3G RGB", NTV2_FBF_24BIT_RGB, VideoDevice::RGB8, RGB_3G},
@@ -305,29 +267,22 @@ namespace AJADevices
             {"12 Bit 3G RGB", NTV2_FBF_48BIT_RGB, VideoDevice::RGB16, RGB_3G},
 
             // Dual link RGB formats
-            {"10 Bit Dual Link RGB", NTV2_FBF_10BIT_RGB, VideoDevice::RGB10X2,
-             RGB_DualLink},
-            {"12 Bit Dual Link RGB", NTV2_FBF_48BIT_RGB, VideoDevice::RGB16,
-             RGB_DualLink},
+            {"10 Bit Dual Link RGB", NTV2_FBF_10BIT_RGB, VideoDevice::RGB10X2, RGB_DualLink},
+            {"12 Bit Dual Link RGB", NTV2_FBF_48BIT_RGB, VideoDevice::RGB16, RGB_DualLink},
 
             // Stereo
             // {"Stereo Dual 10 Bit YCrCb 4:2:2 (8 bit internal)",
             // NTV2_FBF_24BIT_RGB, VideoDevice::RGB8, P2P},
-            {"Stereo Dual 10 Bit YCrCb 4:2:2", NTV2_FBF_10BIT_RGB,
-             VideoDevice::RGB10X2, P2P},
-            {"Stereo Dual 10 Bit YCrCb 4:2:2 (Legal SDI Range)",
-             NTV2_FBF_10BIT_RGB, VideoDevice::RGB10X2, P2P | LegalRangeY},
-            {"Stereo Dual 10 Bit 3G RGB", NTV2_FBF_10BIT_RGB,
-             VideoDevice::RGB10X2, RGB_3G},
-            {"Stereo Dual 12 Bit 3G RGB", NTV2_FBF_48BIT_RGB,
-             VideoDevice::RGB16, RGB_3G},
+            {"Stereo Dual 10 Bit YCrCb 4:2:2", NTV2_FBF_10BIT_RGB, VideoDevice::RGB10X2, P2P},
+            {"Stereo Dual 10 Bit YCrCb 4:2:2 (Legal SDI Range)", NTV2_FBF_10BIT_RGB, VideoDevice::RGB10X2, P2P | LegalRangeY},
+            {"Stereo Dual 10 Bit 3G RGB", NTV2_FBF_10BIT_RGB, VideoDevice::RGB10X2, RGB_3G},
+            {"Stereo Dual 12 Bit 3G RGB", NTV2_FBF_48BIT_RGB, VideoDevice::RGB16, RGB_3G},
             // End of list
             {"", NTV2_FBF_48BIT_RGB, VideoDevice::RGB16, RGB_3G}};
 
-        KonaVideoFormat videoFormatsCP[] = {
-            {0, 0, 0.0, 0.00, "AJA Control Panel", NTV2_FORMAT_UNKNOWN},
-            // End of list
-            {0, 0, 0.0, 0.00, "", NTV2_FORMAT_UNKNOWN}};
+        KonaVideoFormat videoFormatsCP[] = {{0, 0, 0.0, 0.00, "AJA Control Panel", NTV2_FORMAT_UNKNOWN},
+                                            // End of list
+                                            {0, 0, 0.0, 0.00, "", NTV2_FORMAT_UNKNOWN}};
 
         KonaVideoFormat videoFormats[] = {
             {1280, 720, 1.0, 50.00, "720p 50Hz", NTV2_FORMAT_720p_5000},
@@ -340,71 +295,43 @@ namespace AJADevices
             {1920, 1080, 1.0, 29.97, "1080p 29.97Hz", NTV2_FORMAT_1080p_2997},
             {1920, 1080, 1.0, 30.00, "1080p 30Hz", NTV2_FORMAT_1080p_3000},
 
-            {1920, 1080, 1.0, 50.00, "1080p 50Hz Level B",
-             NTV2_FORMAT_1080p_5000_B},
-            {1920, 1080, 1.0, 59.94, "1080p 59.94Hz Level B",
-             NTV2_FORMAT_1080p_5994_B},
-            {1920, 1080, 1.0, 60.00, "1080p 60Hz Level B",
-             NTV2_FORMAT_1080p_6000_B},
+            {1920, 1080, 1.0, 50.00, "1080p 50Hz Level B", NTV2_FORMAT_1080p_5000_B},
+            {1920, 1080, 1.0, 59.94, "1080p 59.94Hz Level B", NTV2_FORMAT_1080p_5994_B},
+            {1920, 1080, 1.0, 60.00, "1080p 60Hz Level B", NTV2_FORMAT_1080p_6000_B},
 
-            {1920, 1080, 1.0, 50.00, "1080p 50Hz Level A",
-             NTV2_FORMAT_1080p_5000_A},
-            {1920, 1080, 1.0, 59.94, "1080p 59.94Hz Level A",
-             NTV2_FORMAT_1080p_5994_A},
-            {1920, 1080, 1.0, 60.00, "1080p 60Hz Level A",
-             NTV2_FORMAT_1080p_6000_A},
+            {1920, 1080, 1.0, 50.00, "1080p 50Hz Level A", NTV2_FORMAT_1080p_5000_A},
+            {1920, 1080, 1.0, 59.94, "1080p 59.94Hz Level A", NTV2_FORMAT_1080p_5994_A},
+            {1920, 1080, 1.0, 60.00, "1080p 60Hz Level A", NTV2_FORMAT_1080p_6000_A},
 
-            {1920, 1080, 1.0, 50.00 / 2.0, "1080i 50Hz",
-             NTV2_FORMAT_1080i_5000},
-            {1920, 1080, 1.0, 59.94 / 2.0, "1080i 59.94Hz",
-             NTV2_FORMAT_1080i_5994},
-            {1920, 1080, 1.0, 60.00 / 2.0, "1080i 60Hz",
-             NTV2_FORMAT_1080i_6000},
+            {1920, 1080, 1.0, 50.00 / 2.0, "1080i 50Hz", NTV2_FORMAT_1080i_5000},
+            {1920, 1080, 1.0, 59.94 / 2.0, "1080i 59.94Hz", NTV2_FORMAT_1080i_5994},
+            {1920, 1080, 1.0, 60.00 / 2.0, "1080i 60Hz", NTV2_FORMAT_1080i_6000},
 
-            {1920, 1080, 1.0, 23.98, "1080psf 23.98Hz",
-             NTV2_FORMAT_1080psf_2398},
+            {1920, 1080, 1.0, 23.98, "1080psf 23.98Hz", NTV2_FORMAT_1080psf_2398},
             {1920, 1080, 1.0, 24.00, "1080psf 24Hz", NTV2_FORMAT_1080psf_2400},
-            {1920, 1080, 1.0, 25.00, "1080psf 25Hz",
-             NTV2_FORMAT_1080psf_2500_2},
-            {1920, 1080, 1.0, 30.00, "1080psf 30Hz",
-             NTV2_FORMAT_1080psf_3000_2},
+            {1920, 1080, 1.0, 25.00, "1080psf 25Hz", NTV2_FORMAT_1080psf_2500_2},
+            {1920, 1080, 1.0, 30.00, "1080psf 30Hz", NTV2_FORMAT_1080psf_3000_2},
 
-            {2048, 1080, 1.0, 23.98, "1080p (2048x1080) 2K DCI 23.98Hz",
-             NTV2_FORMAT_1080p_2K_2398}, // this needs to be looked at, might be
-                                         // hd link
-            {2048, 1080, 1.0, 24.00, "1080p (2048x1080) 2K DCI 24Hz",
-             NTV2_FORMAT_1080p_2K_2400},
-            {2048, 1080, 1.0, 25.00, "1080p (2048x1080) 2K DCI 25Hz",
-             NTV2_FORMAT_1080p_2K_2500},
-            {2048, 1080, 1.0, 29.97, "1080p (2048x1080) 2K DCI 29.97Hz",
-             NTV2_FORMAT_1080p_2K_2997},
-            {2048, 1080, 1.0, 30.00, "1080p (2048x1080) 2K DCI 30Hz",
-             NTV2_FORMAT_1080p_2K_3000},
+            {2048, 1080, 1.0, 23.98, "1080p (2048x1080) 2K DCI 23.98Hz", NTV2_FORMAT_1080p_2K_2398}, // this needs to be looked at, might be
+                                                                                                     // hd link
+            {2048, 1080, 1.0, 24.00, "1080p (2048x1080) 2K DCI 24Hz", NTV2_FORMAT_1080p_2K_2400},
+            {2048, 1080, 1.0, 25.00, "1080p (2048x1080) 2K DCI 25Hz", NTV2_FORMAT_1080p_2K_2500},
+            {2048, 1080, 1.0, 29.97, "1080p (2048x1080) 2K DCI 29.97Hz", NTV2_FORMAT_1080p_2K_2997},
+            {2048, 1080, 1.0, 30.00, "1080p (2048x1080) 2K DCI 30Hz", NTV2_FORMAT_1080p_2K_3000},
 
-            {2048, 1080, 1.0, 47.95, "1080p (2048x1080) 2K DCI 47.95Hz Level A",
-             NTV2_FORMAT_1080p_2K_4795_A},
-            {2048, 1080, 1.0, 48.00, "1080p (2048x1080) 2K DCI 48Hz Level A",
-             NTV2_FORMAT_1080p_2K_4800_A},
-            {2048, 1080, 1.0, 59.94, "1080p (2048x1080) 2K DCI 59.94Hz Level A",
-             NTV2_FORMAT_1080p_2K_5994_A},
-            {2048, 1080, 1.0, 60.00, "1080p (2048x1080) 2K DCI 60Hz Level A",
-             NTV2_FORMAT_1080p_2K_6000_A},
+            {2048, 1080, 1.0, 47.95, "1080p (2048x1080) 2K DCI 47.95Hz Level A", NTV2_FORMAT_1080p_2K_4795_A},
+            {2048, 1080, 1.0, 48.00, "1080p (2048x1080) 2K DCI 48Hz Level A", NTV2_FORMAT_1080p_2K_4800_A},
+            {2048, 1080, 1.0, 59.94, "1080p (2048x1080) 2K DCI 59.94Hz Level A", NTV2_FORMAT_1080p_2K_5994_A},
+            {2048, 1080, 1.0, 60.00, "1080p (2048x1080) 2K DCI 60Hz Level A", NTV2_FORMAT_1080p_2K_6000_A},
 
-            {2048, 1080, 1.0, 47.95, "1080p (2048x1080) 2K DCI 47.95Hz Level B",
-             NTV2_FORMAT_1080p_2K_4795_B},
-            {2048, 1080, 1.0, 48.00, "1080p (2048x1080) 2K DCI 48Hz Level B",
-             NTV2_FORMAT_1080p_2K_4800_B},
-            {2048, 1080, 1.0, 59.94, "1080p (2048x1080) 2K DCI 59.94Hz Level B",
-             NTV2_FORMAT_1080p_2K_5994_B},
-            {2048, 1080, 1.0, 60.00, "1080p (2048x1080) 2K DCI 60Hz Level B",
-             NTV2_FORMAT_1080p_2K_6000_B},
+            {2048, 1080, 1.0, 47.95, "1080p (2048x1080) 2K DCI 47.95Hz Level B", NTV2_FORMAT_1080p_2K_4795_B},
+            {2048, 1080, 1.0, 48.00, "1080p (2048x1080) 2K DCI 48Hz Level B", NTV2_FORMAT_1080p_2K_4800_B},
+            {2048, 1080, 1.0, 59.94, "1080p (2048x1080) 2K DCI 59.94Hz Level B", NTV2_FORMAT_1080p_2K_5994_B},
+            {2048, 1080, 1.0, 60.00, "1080p (2048x1080) 2K DCI 60Hz Level B", NTV2_FORMAT_1080p_2K_6000_B},
 
-            {2048, 1080, 1.0, 23.98, "1080psf (2048x1080) 2K DCI 23.98Hz",
-             NTV2_FORMAT_1080psf_2K_2398},
-            {2048, 1080, 1.0, 24.00, "1080psf (2048x1080) 2K DCI 24Hz",
-             NTV2_FORMAT_1080psf_2K_2400},
-            {2048, 1080, 1.0, 25.00, "1080psf (2048x1080) 2K DCI 25Hz",
-             NTV2_FORMAT_1080psf_2K_2500},
+            {2048, 1080, 1.0, 23.98, "1080psf (2048x1080) 2K DCI 23.98Hz", NTV2_FORMAT_1080psf_2K_2398},
+            {2048, 1080, 1.0, 24.00, "1080psf (2048x1080) 2K DCI 24Hz", NTV2_FORMAT_1080psf_2K_2400},
+            {2048, 1080, 1.0, 25.00, "1080psf (2048x1080) 2K DCI 25Hz", NTV2_FORMAT_1080psf_2K_2500},
 
             // {2048, 1556, 1.0, 23.93, "1556psf (2048x1556) 2K 23.98Hz",
             // NTV2_FORMAT_2K_2398}, {2048, 1556, 1.0, 24.00, "1556psf
@@ -412,249 +339,115 @@ namespace AJADevices
             // 1556, 1.0, 25.00, "1556psf (2048x1556) 2K 25Hz",
             // NTV2_FORMAT_2K_2500, false},
 
-            {3840, 2160, 1.0, 23.98, "2160p (3840x2160) Quad 4K UHD 23.98Hz",
-             NTV2_FORMAT_4x1920x1080p_2398},
-            {3840, 2160, 1.0, 24.00, "2160p (3840x2160) Quad 4K UHD 24Hz",
-             NTV2_FORMAT_4x1920x1080p_2400},
-            {3840, 2160, 1.0, 25.00, "2160p (3840x2160) Quad 4K UHD 25Hz",
-             NTV2_FORMAT_4x1920x1080p_2500},
-            {3840, 2160, 1.0, 29.97, "2160p (3840x2160) Quad 4K UHD 29.97Hz",
-             NTV2_FORMAT_4x1920x1080p_2997},
-            {3840, 2160, 1.0, 30.00, "2160p (3840x2160) Quad 4K UHD 30Hz",
-             NTV2_FORMAT_4x1920x1080p_3000},
-            {3840, 2160, 1.0, 50.00,
-             "2160p (3840x2160) Quad 4K UHD 50Hz Level A",
-             NTV2_FORMAT_4x1920x1080p_5000},
-            {3840, 2160, 1.0, 59.94,
-             "2160p (3840x2160) Quad 4K UHD 59.94Hz Level A",
-             NTV2_FORMAT_4x1920x1080p_5994},
-            {3840, 2160, 1.0, 60.00,
-             "2160p (3840x2160) Quad 4K UHD 60Hz Level A",
-             NTV2_FORMAT_4x1920x1080p_6000},
-            {3840, 2160, 1.0, 50.00,
-             "2160p (3840x2160) Quad 4K UHD 50Hz Level B",
-             NTV2_FORMAT_4x1920x1080p_5000_B},
-            {3840, 2160, 1.0, 59.94,
-             "2160p (3840x2160) Quad 4K UHD 59.94Hz Level B",
-             NTV2_FORMAT_4x1920x1080p_5994_B},
-            {3840, 2160, 1.0, 60.00,
-             "2160p (3840x2160) Quad 4K UHD 60Hz Level B",
-             NTV2_FORMAT_4x1920x1080p_6000_B},
+            {3840, 2160, 1.0, 23.98, "2160p (3840x2160) Quad 4K UHD 23.98Hz", NTV2_FORMAT_4x1920x1080p_2398},
+            {3840, 2160, 1.0, 24.00, "2160p (3840x2160) Quad 4K UHD 24Hz", NTV2_FORMAT_4x1920x1080p_2400},
+            {3840, 2160, 1.0, 25.00, "2160p (3840x2160) Quad 4K UHD 25Hz", NTV2_FORMAT_4x1920x1080p_2500},
+            {3840, 2160, 1.0, 29.97, "2160p (3840x2160) Quad 4K UHD 29.97Hz", NTV2_FORMAT_4x1920x1080p_2997},
+            {3840, 2160, 1.0, 30.00, "2160p (3840x2160) Quad 4K UHD 30Hz", NTV2_FORMAT_4x1920x1080p_3000},
+            {3840, 2160, 1.0, 50.00, "2160p (3840x2160) Quad 4K UHD 50Hz Level A", NTV2_FORMAT_4x1920x1080p_5000},
+            {3840, 2160, 1.0, 59.94, "2160p (3840x2160) Quad 4K UHD 59.94Hz Level A", NTV2_FORMAT_4x1920x1080p_5994},
+            {3840, 2160, 1.0, 60.00, "2160p (3840x2160) Quad 4K UHD 60Hz Level A", NTV2_FORMAT_4x1920x1080p_6000},
+            {3840, 2160, 1.0, 50.00, "2160p (3840x2160) Quad 4K UHD 50Hz Level B", NTV2_FORMAT_4x1920x1080p_5000_B},
+            {3840, 2160, 1.0, 59.94, "2160p (3840x2160) Quad 4K UHD 59.94Hz Level B", NTV2_FORMAT_4x1920x1080p_5994_B},
+            {3840, 2160, 1.0, 60.00, "2160p (3840x2160) Quad 4K UHD 60Hz Level B", NTV2_FORMAT_4x1920x1080p_6000_B},
 
-            {3840, 2160, 1.0, 23.98, "2160psf (3840x2160) Quad 4K UHD 23.98Hz",
-             NTV2_FORMAT_4x1920x1080psf_2398},
-            {3840, 2160, 1.0, 24.00, "2160psf (3840x2160) Quad 4K UHD 24Hz",
-             NTV2_FORMAT_4x1920x1080psf_2400},
-            {3840, 2160, 1.0, 25.00, "2160psf (3840x2160) Quad 4K UHD 25Hz",
-             NTV2_FORMAT_4x1920x1080psf_2500},
-            {3840, 2160, 1.0, 29.97, "2160psf (3840x2160) Quad 4K UHD 29.97Hz",
-             NTV2_FORMAT_4x1920x1080psf_2997},
-            {3840, 2160, 1.0, 30.00, "2160psf (3840x2160) Quad 4K UHD 30Hz",
-             NTV2_FORMAT_4x1920x1080psf_3000},
+            {3840, 2160, 1.0, 23.98, "2160psf (3840x2160) Quad 4K UHD 23.98Hz", NTV2_FORMAT_4x1920x1080psf_2398},
+            {3840, 2160, 1.0, 24.00, "2160psf (3840x2160) Quad 4K UHD 24Hz", NTV2_FORMAT_4x1920x1080psf_2400},
+            {3840, 2160, 1.0, 25.00, "2160psf (3840x2160) Quad 4K UHD 25Hz", NTV2_FORMAT_4x1920x1080psf_2500},
+            {3840, 2160, 1.0, 29.97, "2160psf (3840x2160) Quad 4K UHD 29.97Hz", NTV2_FORMAT_4x1920x1080psf_2997},
+            {3840, 2160, 1.0, 30.00, "2160psf (3840x2160) Quad 4K UHD 30Hz", NTV2_FORMAT_4x1920x1080psf_3000},
 
-            {4096, 2160, 1.0, 23.98, "2160p (4096x2160) Quad 4K DCI 23.98Hz",
-             NTV2_FORMAT_4x2048x1080p_2398},
-            {4096, 2160, 1.0, 24.00, "2160p (4096x2160) Quad 4K DCI 24Hz",
-             NTV2_FORMAT_4x2048x1080p_2400},
-            {4096, 2160, 1.0, 25.00, "2160p (4096x2160) Quad 4K DCI 25Hz",
-             NTV2_FORMAT_4x2048x1080p_2500},
-            {4096, 2160, 1.0, 29.97, "2160p (4096x2160) Quad 4K DCI 29.97Hz",
-             NTV2_FORMAT_4x2048x1080p_2997},
-            {4096, 2160, 1.0, 30.00, "2160p (4096x2160) Quad 4K DCI 30Hz",
-             NTV2_FORMAT_4x2048x1080p_3000},
-            {4096, 2160, 1.0, 47.95,
-             "2160p (4096x2160) Quad 4K DCI 47.95Hz Level A",
-             NTV2_FORMAT_4x2048x1080p_4795},
-            {4096, 2160, 1.0, 48.00,
-             "2160p (4096x2160) Quad 4K DCI 48Hz Level A",
-             NTV2_FORMAT_4x2048x1080p_4800},
-            {4096, 2160, 1.0, 50.00,
-             "2160p (4096x2160) Quad 4K DCI 50Hz Level A",
-             NTV2_FORMAT_4x2048x1080p_5000},
-            {4096, 2160, 1.0, 59.94,
-             "2160p (4096x2160) Quad 4K DCI 59.94Hz Level A",
-             NTV2_FORMAT_4x2048x1080p_5994},
-            {4096, 2160, 1.0, 60.00,
-             "2160p (4096x2160) Quad 4K DCI 60Hz Level A",
-             NTV2_FORMAT_4x2048x1080p_6000},
-            {4096, 2160, 1.0, 47.95,
-             "2160p (4096x2160) Quad 4K DCI 47.95Hz Level B",
-             NTV2_FORMAT_4x2048x1080p_4795_B},
-            {4096, 2160, 1.0, 48.00,
-             "2160p (4096x2160) Quad 4K DCI 48Hz Level B",
-             NTV2_FORMAT_4x2048x1080p_4800_B},
-            {4096, 2160, 1.0, 50.00,
-             "2160p (4096x2160) Quad 4K DCI 50Hz Level B",
-             NTV2_FORMAT_4x2048x1080p_5000_B},
-            {4096, 2160, 1.0, 59.94,
-             "2160p (4096x2160) Quad 4K DCI 59.94Hz Level B",
-             NTV2_FORMAT_4x2048x1080p_5994_B},
-            {4096, 2160, 1.0, 60.00,
-             "2160p (4096x2160) Quad 4K DCI 60Hz Level B",
-             NTV2_FORMAT_4x2048x1080p_6000_B},
-            {4096, 2160, 1.0, 119.88, "2160p (4096x2160) Quad 4K DCI 119.88Hz",
-             NTV2_FORMAT_4x2048x1080p_11988},
-            {4096, 2160, 1.0, 120.00, "2160p (4096x2160) Quad 4K DCI 120Hz",
-             NTV2_FORMAT_4x2048x1080p_12000},
+            {4096, 2160, 1.0, 23.98, "2160p (4096x2160) Quad 4K DCI 23.98Hz", NTV2_FORMAT_4x2048x1080p_2398},
+            {4096, 2160, 1.0, 24.00, "2160p (4096x2160) Quad 4K DCI 24Hz", NTV2_FORMAT_4x2048x1080p_2400},
+            {4096, 2160, 1.0, 25.00, "2160p (4096x2160) Quad 4K DCI 25Hz", NTV2_FORMAT_4x2048x1080p_2500},
+            {4096, 2160, 1.0, 29.97, "2160p (4096x2160) Quad 4K DCI 29.97Hz", NTV2_FORMAT_4x2048x1080p_2997},
+            {4096, 2160, 1.0, 30.00, "2160p (4096x2160) Quad 4K DCI 30Hz", NTV2_FORMAT_4x2048x1080p_3000},
+            {4096, 2160, 1.0, 47.95, "2160p (4096x2160) Quad 4K DCI 47.95Hz Level A", NTV2_FORMAT_4x2048x1080p_4795},
+            {4096, 2160, 1.0, 48.00, "2160p (4096x2160) Quad 4K DCI 48Hz Level A", NTV2_FORMAT_4x2048x1080p_4800},
+            {4096, 2160, 1.0, 50.00, "2160p (4096x2160) Quad 4K DCI 50Hz Level A", NTV2_FORMAT_4x2048x1080p_5000},
+            {4096, 2160, 1.0, 59.94, "2160p (4096x2160) Quad 4K DCI 59.94Hz Level A", NTV2_FORMAT_4x2048x1080p_5994},
+            {4096, 2160, 1.0, 60.00, "2160p (4096x2160) Quad 4K DCI 60Hz Level A", NTV2_FORMAT_4x2048x1080p_6000},
+            {4096, 2160, 1.0, 47.95, "2160p (4096x2160) Quad 4K DCI 47.95Hz Level B", NTV2_FORMAT_4x2048x1080p_4795_B},
+            {4096, 2160, 1.0, 48.00, "2160p (4096x2160) Quad 4K DCI 48Hz Level B", NTV2_FORMAT_4x2048x1080p_4800_B},
+            {4096, 2160, 1.0, 50.00, "2160p (4096x2160) Quad 4K DCI 50Hz Level B", NTV2_FORMAT_4x2048x1080p_5000_B},
+            {4096, 2160, 1.0, 59.94, "2160p (4096x2160) Quad 4K DCI 59.94Hz Level B", NTV2_FORMAT_4x2048x1080p_5994_B},
+            {4096, 2160, 1.0, 60.00, "2160p (4096x2160) Quad 4K DCI 60Hz Level B", NTV2_FORMAT_4x2048x1080p_6000_B},
+            {4096, 2160, 1.0, 119.88, "2160p (4096x2160) Quad 4K DCI 119.88Hz", NTV2_FORMAT_4x2048x1080p_11988},
+            {4096, 2160, 1.0, 120.00, "2160p (4096x2160) Quad 4K DCI 120Hz", NTV2_FORMAT_4x2048x1080p_12000},
 
-            {4096, 2160, 1.0, 23.98, "2160psf (4096x2160) Quad 4K DCI 23.98Hz",
-             NTV2_FORMAT_4x2048x1080psf_2398},
-            {4096, 2160, 1.0, 24.00, "2160psf (4096x2160) Quad 4K DCI 24Hz",
-             NTV2_FORMAT_4x2048x1080psf_2400},
-            {4096, 2160, 1.0, 25.00, "2160psf (4096x2160) Quad 4K DCI 25Hz",
-             NTV2_FORMAT_4x2048x1080psf_2500},
-            {4096, 2160, 1.0, 29.97, "2160psf (4096x2160) Quad 4K DCI 29.97Hz",
-             NTV2_FORMAT_4x2048x1080psf_2997},
-            {4096, 2160, 1.0, 30.00, "2160psf (4096x2160) Quad 4K DCI 30Hz",
-             NTV2_FORMAT_4x2048x1080psf_3000},
+            {4096, 2160, 1.0, 23.98, "2160psf (4096x2160) Quad 4K DCI 23.98Hz", NTV2_FORMAT_4x2048x1080psf_2398},
+            {4096, 2160, 1.0, 24.00, "2160psf (4096x2160) Quad 4K DCI 24Hz", NTV2_FORMAT_4x2048x1080psf_2400},
+            {4096, 2160, 1.0, 25.00, "2160psf (4096x2160) Quad 4K DCI 25Hz", NTV2_FORMAT_4x2048x1080psf_2500},
+            {4096, 2160, 1.0, 29.97, "2160psf (4096x2160) Quad 4K DCI 29.97Hz", NTV2_FORMAT_4x2048x1080psf_2997},
+            {4096, 2160, 1.0, 30.00, "2160psf (4096x2160) Quad 4K DCI 30Hz", NTV2_FORMAT_4x2048x1080psf_3000},
 
-            {3840, 2160, 1.0, 23.98, "2160p (3840x2160) 4K UHD 23.98Hz",
-             NTV2_FORMAT_3840x2160p_2398},
-            {3840, 2160, 1.0, 24.00, "2160p (3840x2160) 4K UHD 24Hz",
-             NTV2_FORMAT_3840x2160p_2400},
-            {3840, 2160, 1.0, 25.00, "2160p (3840x2160) 4K UHD 25Hz",
-             NTV2_FORMAT_3840x2160p_2500},
-            {3840, 2160, 1.0, 29.97, "2160p (3840x2160) 4K UHD 29.97Hz",
-             NTV2_FORMAT_3840x2160p_2997},
-            {3840, 2160, 1.0, 30.00, "2160p (3840x2160) 4K UHD 30Hz",
-             NTV2_FORMAT_3840x2160p_3000},
-            {3840, 2160, 1.0, 50.00, "2160p (3840x2160) 4K UHD 50Hz Level A",
-             NTV2_FORMAT_3840x2160p_5000},
-            {3840, 2160, 1.0, 59.94, "2160p (3840x2160) 4K UHD 59.94Hz Level A",
-             NTV2_FORMAT_3840x2160p_5994},
-            {3840, 2160, 1.0, 60.00, "2160p (3840x2160) 4K UHD 60Hz Level A",
-             NTV2_FORMAT_3840x2160p_6000},
-            {3840, 2160, 1.0, 50.00, "2160p (3840x2160) 4K UHD 50Hz Level B",
-             NTV2_FORMAT_3840x2160p_5000_B},
-            {3840, 2160, 1.0, 59.94, "2160p (3840x2160) 4K UHD 59.94Hz Level B",
-             NTV2_FORMAT_3840x2160p_5994_B},
-            {3840, 2160, 1.0, 60.00, "2160p (3840x2160) 4K UHD 60Hz Level B",
-             NTV2_FORMAT_3840x2160p_6000_B},
-            {3840, 2160, 1.0, 23.98, "2160psf (3840x2160) 4K UHD 23.98Hz",
-             NTV2_FORMAT_3840x2160psf_2398},
-            {3840, 2160, 1.0, 24.00, "2160psf (3840x2160) 4K UHD 24Hz",
-             NTV2_FORMAT_3840x2160psf_2400},
-            {3840, 2160, 1.0, 25.00, "2160psf (3840x2160) 4K UHD 25Hz",
-             NTV2_FORMAT_3840x2160psf_2500},
-            {3840, 2160, 1.0, 29.97, "2160psf (3840x2160) 4K UHD 29.97Hz",
-             NTV2_FORMAT_3840x2160psf_2997},
-            {3840, 2160, 1.0, 30.00, "2160psf (3840x2160) 4K UHD 30Hz",
-             NTV2_FORMAT_3840x2160psf_3000},
+            {3840, 2160, 1.0, 23.98, "2160p (3840x2160) 4K UHD 23.98Hz", NTV2_FORMAT_3840x2160p_2398},
+            {3840, 2160, 1.0, 24.00, "2160p (3840x2160) 4K UHD 24Hz", NTV2_FORMAT_3840x2160p_2400},
+            {3840, 2160, 1.0, 25.00, "2160p (3840x2160) 4K UHD 25Hz", NTV2_FORMAT_3840x2160p_2500},
+            {3840, 2160, 1.0, 29.97, "2160p (3840x2160) 4K UHD 29.97Hz", NTV2_FORMAT_3840x2160p_2997},
+            {3840, 2160, 1.0, 30.00, "2160p (3840x2160) 4K UHD 30Hz", NTV2_FORMAT_3840x2160p_3000},
+            {3840, 2160, 1.0, 50.00, "2160p (3840x2160) 4K UHD 50Hz Level A", NTV2_FORMAT_3840x2160p_5000},
+            {3840, 2160, 1.0, 59.94, "2160p (3840x2160) 4K UHD 59.94Hz Level A", NTV2_FORMAT_3840x2160p_5994},
+            {3840, 2160, 1.0, 60.00, "2160p (3840x2160) 4K UHD 60Hz Level A", NTV2_FORMAT_3840x2160p_6000},
+            {3840, 2160, 1.0, 50.00, "2160p (3840x2160) 4K UHD 50Hz Level B", NTV2_FORMAT_3840x2160p_5000_B},
+            {3840, 2160, 1.0, 59.94, "2160p (3840x2160) 4K UHD 59.94Hz Level B", NTV2_FORMAT_3840x2160p_5994_B},
+            {3840, 2160, 1.0, 60.00, "2160p (3840x2160) 4K UHD 60Hz Level B", NTV2_FORMAT_3840x2160p_6000_B},
+            {3840, 2160, 1.0, 23.98, "2160psf (3840x2160) 4K UHD 23.98Hz", NTV2_FORMAT_3840x2160psf_2398},
+            {3840, 2160, 1.0, 24.00, "2160psf (3840x2160) 4K UHD 24Hz", NTV2_FORMAT_3840x2160psf_2400},
+            {3840, 2160, 1.0, 25.00, "2160psf (3840x2160) 4K UHD 25Hz", NTV2_FORMAT_3840x2160psf_2500},
+            {3840, 2160, 1.0, 29.97, "2160psf (3840x2160) 4K UHD 29.97Hz", NTV2_FORMAT_3840x2160psf_2997},
+            {3840, 2160, 1.0, 30.00, "2160psf (3840x2160) 4K UHD 30Hz", NTV2_FORMAT_3840x2160psf_3000},
 
-            {4096, 2160, 1.0, 23.98, "2160p (4096x2160) 4K DCI 23.98Hz",
-             NTV2_FORMAT_4096x2160p_2398},
-            {4096, 2160, 1.0, 24.00, "2160p (4096x2160) 4K DCI 24Hz",
-             NTV2_FORMAT_4096x2160p_2400},
-            {4096, 2160, 1.0, 25.00, "2160p (4096x2160) 4K DCI 25Hz",
-             NTV2_FORMAT_4096x2160p_2500},
-            {4096, 2160, 1.0, 29.97, "2160p (4096x2160) 4K DCI 29.97Hz",
-             NTV2_FORMAT_4096x2160p_2997},
-            {4096, 2160, 1.0, 30.00, "2160p (4096x2160) 4K DCI 30.00Hz",
-             NTV2_FORMAT_4096x2160p_3000},
-            {4096, 2160, 1.0, 47.95, "2160p (4096x2160) 4K DCI 47.95Hz Level A",
-             NTV2_FORMAT_4096x2160p_4795},
-            {4096, 2160, 1.0, 48.00, "2160p (4096x2160) 4K DCI 48.00Hz Level A",
-             NTV2_FORMAT_4096x2160p_4800},
-            {4096, 2160, 1.0, 50.00, "2160p (4096x2160) 4K DCI 50.00Hz Level A",
-             NTV2_FORMAT_4096x2160p_5000},
-            {4096, 2160, 1.0, 59.94, "2160p (4096x2160) 4K DCI 59.94Hz Level A",
-             NTV2_FORMAT_4096x2160p_5994},
-            {4096, 2160, 1.0, 60.00, "2160p (4096x2160) 4K DCI 60.00Hz Level A",
-             NTV2_FORMAT_4096x2160p_6000},
-            {4096, 2160, 1.0, 119.88, "2160p (4096x2160) 4K DCI 119.88Hz",
-             NTV2_FORMAT_4096x2160p_11988},
-            {4096, 2160, 1.0, 120.00, "2160p (4096x2160) 4K DCI 120Hz",
-             NTV2_FORMAT_4096x2160p_12000},
-            {4096, 2160, 1.0, 47.95, "2160p (4096x2160) 4K DCI 47.95Hz Level B",
-             NTV2_FORMAT_4096x2160p_4795_B},
-            {4096, 2160, 1.0, 48.00, "2160p (4096x2160) 4K DCI 48.00Hz Level B",
-             NTV2_FORMAT_4096x2160p_4800_B},
-            {4096, 2160, 1.0, 50.00, "2160p (4096x2160) 4K DCI 50.00Hz Level B",
-             NTV2_FORMAT_4096x2160p_5000_B},
-            {4096, 2160, 1.0, 59.94, "2160p (4096x2160) 4K DCI 59.94Hz Level B",
-             NTV2_FORMAT_4096x2160p_5994_B},
-            {4096, 2160, 1.0, 60.00, "2160p (4096x2160) 4K DCI 60.00Hz Level B",
-             NTV2_FORMAT_4096x2160p_6000_B},
-            {4096, 2160, 1.0, 23.98, "2160psf (4096x2160) 4K DCI 23.98Hz",
-             NTV2_FORMAT_4096x2160psf_2398},
-            {4096, 2160, 1.0, 24.00, "2160psf (4096x2160) 4K DCI 24Hz",
-             NTV2_FORMAT_4096x2160psf_2400},
-            {4096, 2160, 1.0, 25.00, "2160psf (4096x2160) 4K DCI 25Hz",
-             NTV2_FORMAT_4096x2160psf_2500},
-            {4096, 2160, 1.0, 29.97, "2160psf (4096x2160) 4K DCI 29.97Hz",
-             NTV2_FORMAT_4096x2160psf_2997},
-            {4096, 2160, 1.0, 30.00, "2160psf (4096x2160) 4K DCI 30.00Hz",
-             NTV2_FORMAT_4096x2160psf_3000},
+            {4096, 2160, 1.0, 23.98, "2160p (4096x2160) 4K DCI 23.98Hz", NTV2_FORMAT_4096x2160p_2398},
+            {4096, 2160, 1.0, 24.00, "2160p (4096x2160) 4K DCI 24Hz", NTV2_FORMAT_4096x2160p_2400},
+            {4096, 2160, 1.0, 25.00, "2160p (4096x2160) 4K DCI 25Hz", NTV2_FORMAT_4096x2160p_2500},
+            {4096, 2160, 1.0, 29.97, "2160p (4096x2160) 4K DCI 29.97Hz", NTV2_FORMAT_4096x2160p_2997},
+            {4096, 2160, 1.0, 30.00, "2160p (4096x2160) 4K DCI 30.00Hz", NTV2_FORMAT_4096x2160p_3000},
+            {4096, 2160, 1.0, 47.95, "2160p (4096x2160) 4K DCI 47.95Hz Level A", NTV2_FORMAT_4096x2160p_4795},
+            {4096, 2160, 1.0, 48.00, "2160p (4096x2160) 4K DCI 48.00Hz Level A", NTV2_FORMAT_4096x2160p_4800},
+            {4096, 2160, 1.0, 50.00, "2160p (4096x2160) 4K DCI 50.00Hz Level A", NTV2_FORMAT_4096x2160p_5000},
+            {4096, 2160, 1.0, 59.94, "2160p (4096x2160) 4K DCI 59.94Hz Level A", NTV2_FORMAT_4096x2160p_5994},
+            {4096, 2160, 1.0, 60.00, "2160p (4096x2160) 4K DCI 60.00Hz Level A", NTV2_FORMAT_4096x2160p_6000},
+            {4096, 2160, 1.0, 119.88, "2160p (4096x2160) 4K DCI 119.88Hz", NTV2_FORMAT_4096x2160p_11988},
+            {4096, 2160, 1.0, 120.00, "2160p (4096x2160) 4K DCI 120Hz", NTV2_FORMAT_4096x2160p_12000},
+            {4096, 2160, 1.0, 47.95, "2160p (4096x2160) 4K DCI 47.95Hz Level B", NTV2_FORMAT_4096x2160p_4795_B},
+            {4096, 2160, 1.0, 48.00, "2160p (4096x2160) 4K DCI 48.00Hz Level B", NTV2_FORMAT_4096x2160p_4800_B},
+            {4096, 2160, 1.0, 50.00, "2160p (4096x2160) 4K DCI 50.00Hz Level B", NTV2_FORMAT_4096x2160p_5000_B},
+            {4096, 2160, 1.0, 59.94, "2160p (4096x2160) 4K DCI 59.94Hz Level B", NTV2_FORMAT_4096x2160p_5994_B},
+            {4096, 2160, 1.0, 60.00, "2160p (4096x2160) 4K DCI 60.00Hz Level B", NTV2_FORMAT_4096x2160p_6000_B},
+            {4096, 2160, 1.0, 23.98, "2160psf (4096x2160) 4K DCI 23.98Hz", NTV2_FORMAT_4096x2160psf_2398},
+            {4096, 2160, 1.0, 24.00, "2160psf (4096x2160) 4K DCI 24Hz", NTV2_FORMAT_4096x2160psf_2400},
+            {4096, 2160, 1.0, 25.00, "2160psf (4096x2160) 4K DCI 25Hz", NTV2_FORMAT_4096x2160psf_2500},
+            {4096, 2160, 1.0, 29.97, "2160psf (4096x2160) 4K DCI 29.97Hz", NTV2_FORMAT_4096x2160psf_2997},
+            {4096, 2160, 1.0, 30.00, "2160psf (4096x2160) 4K DCI 30.00Hz", NTV2_FORMAT_4096x2160psf_3000},
 
-            {7680, 4320, 1.0, 23.98, "4320p (7680x4320) Quad 8K UHD 23.98Hz",
-             NTV2_FORMAT_4x3840x2160p_2398},
-            {7680, 4320, 1.0, 24.00, "4320p (7680x4320) Quad 8K UHD 24Hz",
-             NTV2_FORMAT_4x3840x2160p_2400},
-            {7680, 4320, 1.0, 25.00, "4320p (7680x4320) Quad 8K UHD 25Hz",
-             NTV2_FORMAT_4x3840x2160p_2500},
-            {7680, 4320, 1.0, 29.97, "4320p (7680x4320) Quad 8K UHD 29.97Hz",
-             NTV2_FORMAT_4x3840x2160p_2997},
-            {7680, 4320, 1.0, 30.00, "4320p (7680x4320) Quad 8K UHD 30Hz",
-             NTV2_FORMAT_4x3840x2160p_3000},
-            {7680, 4320, 1.0, 50.00,
-             "4320p (7680x4320) Quad 8K UHD 50Hz Level A",
-             NTV2_FORMAT_4x3840x2160p_5000},
-            {7680, 4320, 1.0, 59.94,
-             "4320p (7680x4320) Quad 8K UHD 59.94Hz Level A",
-             NTV2_FORMAT_4x3840x2160p_5994},
-            {7680, 4320, 1.0, 60.00,
-             "4320p (7680x4320) Quad 8K UHD 60Hz Level A",
-             NTV2_FORMAT_4x3840x2160p_6000},
-            {7680, 4320, 1.0, 50.00,
-             "4320p (7680x4320) Quad 8K UHD 50Hz Level B",
-             NTV2_FORMAT_4x3840x2160p_5000_B},
-            {7680, 4320, 1.0, 59.94,
-             "4320p (7680x4320) Quad 8K UHD 59.94Hz Level B",
-             NTV2_FORMAT_4x3840x2160p_5994_B},
-            {7680, 4320, 1.0, 60.00,
-             "4320p (7680x4320) Quad 8K UHD 60Hz Level B",
-             NTV2_FORMAT_4x3840x2160p_6000_B},
+            {7680, 4320, 1.0, 23.98, "4320p (7680x4320) Quad 8K UHD 23.98Hz", NTV2_FORMAT_4x3840x2160p_2398},
+            {7680, 4320, 1.0, 24.00, "4320p (7680x4320) Quad 8K UHD 24Hz", NTV2_FORMAT_4x3840x2160p_2400},
+            {7680, 4320, 1.0, 25.00, "4320p (7680x4320) Quad 8K UHD 25Hz", NTV2_FORMAT_4x3840x2160p_2500},
+            {7680, 4320, 1.0, 29.97, "4320p (7680x4320) Quad 8K UHD 29.97Hz", NTV2_FORMAT_4x3840x2160p_2997},
+            {7680, 4320, 1.0, 30.00, "4320p (7680x4320) Quad 8K UHD 30Hz", NTV2_FORMAT_4x3840x2160p_3000},
+            {7680, 4320, 1.0, 50.00, "4320p (7680x4320) Quad 8K UHD 50Hz Level A", NTV2_FORMAT_4x3840x2160p_5000},
+            {7680, 4320, 1.0, 59.94, "4320p (7680x4320) Quad 8K UHD 59.94Hz Level A", NTV2_FORMAT_4x3840x2160p_5994},
+            {7680, 4320, 1.0, 60.00, "4320p (7680x4320) Quad 8K UHD 60Hz Level A", NTV2_FORMAT_4x3840x2160p_6000},
+            {7680, 4320, 1.0, 50.00, "4320p (7680x4320) Quad 8K UHD 50Hz Level B", NTV2_FORMAT_4x3840x2160p_5000_B},
+            {7680, 4320, 1.0, 59.94, "4320p (7680x4320) Quad 8K UHD 59.94Hz Level B", NTV2_FORMAT_4x3840x2160p_5994_B},
+            {7680, 4320, 1.0, 60.00, "4320p (7680x4320) Quad 8K UHD 60Hz Level B", NTV2_FORMAT_4x3840x2160p_6000_B},
 
-            {8192, 4320, 1.0, 23.98, "4320p (8192x4320) Quad 8K DCI 23.98Hz",
-             NTV2_FORMAT_4x4096x2160p_2398},
-            {8192, 4320, 1.0, 24.00, "4320p (8192x4320) Quad 8K DCI 24Hz",
-             NTV2_FORMAT_4x4096x2160p_2400},
-            {8192, 4320, 1.0, 25.00, "4320p (8192x4320) Quad 8K DCI 25Hz",
-             NTV2_FORMAT_4x4096x2160p_2500},
-            {8192, 4320, 1.0, 29.97, "4320p (8192x4320) Quad 8K DCI 29.97Hz",
-             NTV2_FORMAT_4x4096x2160p_2997},
-            {8192, 4320, 1.0, 30.00, "4320p (8192x4320) Quad 8K DCI 30Hz",
-             NTV2_FORMAT_4x4096x2160p_3000},
-            {8192, 4320, 1.0, 47.95,
-             "4320p (8192x4320) Quad 8K DCI 47.95Hz Level A",
-             NTV2_FORMAT_4x4096x2160p_4795},
-            {8192, 4320, 1.0, 48.00,
-             "4320p (8192x4320) Quad 8K DCI 48Hz Level A",
-             NTV2_FORMAT_4x4096x2160p_4800},
-            {8192, 4320, 1.0, 50.00,
-             "4320p (8192x4320) Quad 8K DCI 50Hz Level A",
-             NTV2_FORMAT_4x4096x2160p_5000},
-            {8192, 4320, 1.0, 59.94,
-             "4320p (8192x4320) Quad 8K DCI 59.94Hz Level A",
-             NTV2_FORMAT_4x4096x2160p_5994},
-            {8192, 4320, 1.0, 60.00,
-             "4320p (8192x4320) Quad 8K DCI 60Hz Level A",
-             NTV2_FORMAT_4x4096x2160p_6000},
-            {8192, 4320, 1.0, 47.95,
-             "4320p (8192x4320) Quad 8K DCI 47.95Hz Level B",
-             NTV2_FORMAT_4x4096x2160p_4795_B},
-            {8192, 4320, 1.0, 48.00,
-             "4320p (8192x4320) Quad 8K DCI 48Hz Level B",
-             NTV2_FORMAT_4x4096x2160p_4800_B},
-            {8192, 4320, 1.0, 50.00,
-             "4320p (8192x4320) Quad 8K DCI 50Hz Level B",
-             NTV2_FORMAT_4x4096x2160p_5000_B},
-            {8192, 4320, 1.0, 59.94,
-             "4320p (8192x4320) Quad 8K DCI 59.94Hz Level B",
-             NTV2_FORMAT_4x4096x2160p_5994_B},
-            {8192, 4320, 1.0, 60.00,
-             "4320p (8192x4320) Quad 8K DCI 60Hz Level B",
-             NTV2_FORMAT_4x4096x2160p_6000_B},
+            {8192, 4320, 1.0, 23.98, "4320p (8192x4320) Quad 8K DCI 23.98Hz", NTV2_FORMAT_4x4096x2160p_2398},
+            {8192, 4320, 1.0, 24.00, "4320p (8192x4320) Quad 8K DCI 24Hz", NTV2_FORMAT_4x4096x2160p_2400},
+            {8192, 4320, 1.0, 25.00, "4320p (8192x4320) Quad 8K DCI 25Hz", NTV2_FORMAT_4x4096x2160p_2500},
+            {8192, 4320, 1.0, 29.97, "4320p (8192x4320) Quad 8K DCI 29.97Hz", NTV2_FORMAT_4x4096x2160p_2997},
+            {8192, 4320, 1.0, 30.00, "4320p (8192x4320) Quad 8K DCI 30Hz", NTV2_FORMAT_4x4096x2160p_3000},
+            {8192, 4320, 1.0, 47.95, "4320p (8192x4320) Quad 8K DCI 47.95Hz Level A", NTV2_FORMAT_4x4096x2160p_4795},
+            {8192, 4320, 1.0, 48.00, "4320p (8192x4320) Quad 8K DCI 48Hz Level A", NTV2_FORMAT_4x4096x2160p_4800},
+            {8192, 4320, 1.0, 50.00, "4320p (8192x4320) Quad 8K DCI 50Hz Level A", NTV2_FORMAT_4x4096x2160p_5000},
+            {8192, 4320, 1.0, 59.94, "4320p (8192x4320) Quad 8K DCI 59.94Hz Level A", NTV2_FORMAT_4x4096x2160p_5994},
+            {8192, 4320, 1.0, 60.00, "4320p (8192x4320) Quad 8K DCI 60Hz Level A", NTV2_FORMAT_4x4096x2160p_6000},
+            {8192, 4320, 1.0, 47.95, "4320p (8192x4320) Quad 8K DCI 47.95Hz Level B", NTV2_FORMAT_4x4096x2160p_4795_B},
+            {8192, 4320, 1.0, 48.00, "4320p (8192x4320) Quad 8K DCI 48Hz Level B", NTV2_FORMAT_4x4096x2160p_4800_B},
+            {8192, 4320, 1.0, 50.00, "4320p (8192x4320) Quad 8K DCI 50Hz Level B", NTV2_FORMAT_4x4096x2160p_5000_B},
+            {8192, 4320, 1.0, 59.94, "4320p (8192x4320) Quad 8K DCI 59.94Hz Level B", NTV2_FORMAT_4x4096x2160p_5994_B},
+            {8192, 4320, 1.0, 60.00, "4320p (8192x4320) Quad 8K DCI 60Hz Level B", NTV2_FORMAT_4x4096x2160p_6000_B},
 
             // End of list
             {0, 0, 0.0, 0.00, "", NTV2_FORMAT_UNKNOWN}};
@@ -667,14 +460,10 @@ namespace AJADevices
 
     bool KonaVideoDevice::m_infoFeedback = false;
 
-    KonaVideoDevice::KonaVideoDevice(AJAModule* m, const string& name,
-                                     unsigned int deviceIndex,
-                                     unsigned int appID, OperationMode mode)
+    KonaVideoDevice::KonaVideoDevice(AJAModule* m, const string& name, unsigned int deviceIndex, unsigned int appID, OperationMode mode)
         : GLBindableVideoDevice(m, name,
-                                BlockingTransfer | ASyncReadBack | ImageOutput
-                                    | ProvidesSync | FixedResolution
-                                    | NormalizedCoordinates | FlippedImage
-                                    | Clock | AudioOutput)
+                                BlockingTransfer | ASyncReadBack | ImageOutput | ProvidesSync | FixedResolution | NormalizedCoordinates
+                                    | FlippedImage | Clock | AudioOutput)
         , m_appID(appID)
         , m_deviceIndex(deviceIndex)
         , m_card(0)
@@ -789,26 +578,22 @@ namespace AJADevices
             m_deviceID = m_card->GetDeviceID();
             m_bidirectional = NTV2DeviceHasBiDirectionalSDI(m_deviceID);
             m_deviceNumVideoOutputs = NTV2DeviceGetNumVideoOutputs(m_deviceID);
-            m_deviceNumVideoChannels =
-                NTV2DeviceGetNumVideoChannels(m_deviceID);
+            m_deviceNumVideoChannels = NTV2DeviceGetNumVideoChannels(m_deviceID);
             m_deviceHasDualLink = NTV2DeviceCanDoDualLink(m_deviceID);
             m_deviceHas3G = NTV2DeviceCanDo3GOut(m_deviceID, 0);
             m_deviceHDMIVersion = NTV2DeviceGetHDMIVersion(m_deviceID);
             m_deviceHasHDMIStereo = NTV2DeviceCanDoHDMIOutStereo(m_deviceID);
             m_deviceHasCSC = NTV2DeviceCanDoWidget(m_deviceID, NTV2_WgtCSC1);
             m_numHDMIOutputs = NTV2DeviceGetNumHDMIVideoOutputs(m_deviceID);
-            m_deviceMaxAudioChannels =
-                NTV2DeviceGetMaxAudioChannels(m_deviceID);
+            m_deviceMaxAudioChannels = NTV2DeviceGetMaxAudioChannels(m_deviceID);
             m_deviceHas96kAudio = NTV2DeviceCanDoAudio96K(m_deviceID);
 
-            bool stereo =
-                m_deviceNumVideoChannels >= 2 && m_deviceNumVideoOutputs >= 2;
+            bool stereo = m_deviceNumVideoChannels >= 2 && m_deviceNumVideoOutputs >= 2;
             bool allformats = getenv("TWK_AJA_ALL_FORMATS") != NULL;
 
             if (m_operationMode == OperationMode::ProMode)
             {
-                for (const KonaVideoFormat* p = videoFormats; !p->desc.empty();
-                     p++)
+                for (const KonaVideoFormat* p = videoFormats; !p->desc.empty(); p++)
                 {
                     if (NTV2DeviceCanDoVideoFormat(m_deviceID, p->value))
                     {
@@ -816,13 +601,11 @@ namespace AJADevices
                     }
                 }
 
-                for (const KonaDataFormat* p = dataFormats; !p->desc.empty();
-                     p++)
+                for (const KonaDataFormat* p = dataFormats; !p->desc.empty(); p++)
                 {
                     if (NTV2DeviceCanDoFrameBufferFormat(m_deviceID, p->value))
                     {
-                        bool stereoFormat =
-                            p->desc.find("Stereo") != string::npos;
+                        bool stereoFormat = p->desc.find("Stereo") != string::npos;
                         bool dualLink = p->flags & DualLink;
                         bool rgb = p->flags & RGB444;
 
@@ -847,14 +630,11 @@ namespace AJADevices
                     //  user.
                     //
 
-                    for (const KonaDataFormat* p = dataFormatsYUV;
-                         !p->desc.empty(); p++)
+                    for (const KonaDataFormat* p = dataFormatsYUV; !p->desc.empty(); p++)
                     {
-                        if (NTV2DeviceCanDoFrameBufferFormat(m_deviceID,
-                                                             p->value))
+                        if (NTV2DeviceCanDoFrameBufferFormat(m_deviceID, p->value))
                         {
-                            bool stereoFormat =
-                                p->desc.find("Stereo") != string::npos;
+                            bool stereoFormat = p->desc.find("Stereo") != string::npos;
                             bool dualLink = p->flags & DualLink;
 
                             if (stereoFormat && !stereo)
@@ -869,14 +649,12 @@ namespace AJADevices
             }
             else
             {
-                for (const KonaVideoFormat* p = videoFormatsCP;
-                     !p->desc.empty(); p++)
+                for (const KonaVideoFormat* p = videoFormatsCP; !p->desc.empty(); p++)
                 {
                     m_konaVideoFormats.push_back(*p);
                 }
 
-                for (const KonaDataFormat* p = dataFormatsCP; !p->desc.empty();
-                     p++)
+                for (const KonaDataFormat* p = dataFormatsCP; !p->desc.empty(); p++)
                 {
                     m_konaDataFormats.push_back(*p);
                 }
@@ -893,10 +671,7 @@ namespace AJADevices
             close();
     }
 
-    bool KonaVideoDevice::tsiEnabled() const
-    {
-        return m_video4KTransport == VIDEO_4K_TRANSPORT_TSI;
-    }
+    bool KonaVideoDevice::tsiEnabled() const { return m_video4KTransport == VIDEO_4K_TRANSPORT_TSI; }
 
     KonaVideoDevice::Resolution KonaVideoDevice::resolution() const
     {
@@ -906,10 +681,7 @@ namespace AJADevices
         return Resolution(f.width, f.height, f.pa, 1.0);
     }
 
-    KonaVideoDevice::Offset KonaVideoDevice::offset() const
-    {
-        return KonaVideoDevice::Offset(0, 0);
-    }
+    KonaVideoDevice::Offset KonaVideoDevice::offset() const { return KonaVideoDevice::Offset(0, 0); }
 
     KonaVideoDevice::Timing KonaVideoDevice::timing() const
     {
@@ -922,8 +694,7 @@ namespace AJADevices
     KonaVideoDevice::VideoFormat KonaVideoDevice::format() const
     {
         const KonaVideoFormat& f = m_actualVideoFormat;
-        return KonaVideoDevice::VideoFormat(f.width, f.height, f.pa, 1.0f, f.hz,
-                                            f.desc);
+        return KonaVideoDevice::VideoFormat(f.width, f.height, f.pa, 1.0f, f.hz, f.desc);
     }
 
     size_t KonaVideoDevice::width() const
@@ -1000,8 +771,7 @@ namespace AJADevices
 
         m_channelVector.clear();
 
-        for (unsigned int i = NTV2_CHANNEL1;
-             i < (NTV2_CHANNEL1 + m_deviceNumVideoChannels); i++)
+        for (unsigned int i = NTV2_CHANNEL1; i < (NTV2_CHANNEL1 + m_deviceNumVideoChannels); i++)
         {
             bool enabled = false;
 
@@ -1011,31 +781,25 @@ namespace AJADevices
             {
                 ULWord vpidA;
                 ULWord vpidB;
-                m_card->GetFrameBufferFormat((NTV2Channel)i,
-                                             m_actualDataFormat.value);
-                m_card->GetVideoFormat(m_actualVideoFormat.value,
-                                       (NTV2Channel)i);
+                m_card->GetFrameBufferFormat((NTV2Channel)i, m_actualDataFormat.value);
+                m_card->GetVideoFormat(m_actualVideoFormat.value, (NTV2Channel)i);
                 m_card->GetSDIOutVPID(vpidA, vpidB, (NTV2Channel)i);
                 m_channelVector.push_back((NTV2Channel)i);
                 m_channelVPIDVector.push_back(make_pair(vpidA, vpidB));
             }
         }
 
-        NTV2FrameRate frameRate =
-            GetNTV2FrameRateFromVideoFormat(m_actualVideoFormat.value);
+        NTV2FrameRate frameRate = GetNTV2FrameRateFromVideoFormat(m_actualVideoFormat.value);
         m_actualVideoFormat.width = GetDisplayWidth(m_actualVideoFormat.value);
-        m_actualVideoFormat.height =
-            GetDisplayHeight(m_actualVideoFormat.value);
+        m_actualVideoFormat.height = GetDisplayHeight(m_actualVideoFormat.value);
         m_actualVideoFormat.hz = GetFramesPerSecond(frameRate);
         m_width = m_actualVideoFormat.width;
         m_height = m_actualVideoFormat.height;
         m_outRate = m_actualVideoFormat.hz;
         m_channels = 1;
-        m_actualVideoFormat.desc =
-            NTV2VideoFormatToString(m_actualVideoFormat.value);
+        m_actualVideoFormat.desc = NTV2VideoFormatToString(m_actualVideoFormat.value);
 
-        if (!IsProgressivePicture(m_actualVideoFormat.value)
-            && !IsPSF(m_actualVideoFormat.value))
+        if (!IsProgressivePicture(m_actualVideoFormat.value) && !IsPSF(m_actualVideoFormat.value))
         {
             m_actualVideoFormat.hz /= 2.0f;
         }
@@ -1079,10 +843,8 @@ namespace AJADevices
             break;
         }
 
-        m_actualDataFormat.desc =
-            NTV2FrameBufferFormatToString(m_actualDataFormat.value);
-        m_yuvInternalFormat =
-            m_actualDataFormat.iformat >= VideoDevice::CbY0CrY1_8_422;
+        m_actualDataFormat.desc = NTV2FrameBufferFormatToString(m_actualDataFormat.value);
+        m_yuvInternalFormat = m_actualDataFormat.iformat >= VideoDevice::CbY0CrY1_8_422;
 
         NTV2Standard standard;
         m_card->GetStandard(standard);
@@ -1110,39 +872,26 @@ namespace AJADevices
 
         options_description desc("AJA NTV2 Device Options");
 
-        desc.add_options()("help,h", "Usage Message")("verbose,v", "Verbose")(
-            "rec601", "Use Rec.601 Color Matrix (default is Rec.709)")(
-            "limiting-broadcast-range",
-            "Force limiting to broadcast video range")(
-            "limiting-legal-range", "Force limiting to legal SDI range")(
-            "limiting-full-range",
-            "Force limiting to full SDI range (no limiting)")(
-            "profile,p", "Output Debugging Profile (twk_aja_profile_<ID>.dat)")(
-            "method,m", value<string>(),
-            "Method (ipbo, ppbo, basic)")("flip", "Flip Image Orientation")(
-            "hdmi-stereo-mode", value<string>(),
-            "HDMI stereo mode (side-by-side, top-and-bottom, or frame-packed)")(
+        desc.add_options()("help,h", "Usage Message")("verbose,v", "Verbose")("rec601", "Use Rec.601 Color Matrix (default is Rec.709)")(
+            "limiting-broadcast-range", "Force limiting to broadcast video range")(
+            "limiting-legal-range", "Force limiting to legal SDI range")("limiting-full-range",
+                                                                         "Force limiting to full SDI range (no limiting)")(
+            "profile,p", "Output Debugging Profile (twk_aja_profile_<ID>.dat)")("method,m", value<string>(), "Method (ipbo, ppbo, basic)")(
+            "flip", "Flip Image Orientation")("hdmi-stereo-mode", value<string>(),
+                                              "HDMI stereo mode (side-by-side, top-and-bottom, or frame-packed)")(
             HDMI_HDR_METADATA_ARG, value<string>(),
             "HDMI HDR Metadata - comma-separated values: "
-            "rx,ry,gx,gy,bx,by,wx,wy,minML,maxML,mCLL,mFALL,eotf,smdID")(
-            "no-set-desired-frame",
-            "Don't set desiredFrame field in transfer struct")(
-            "enable-hardware-pause", "Enable hardware pause states")(
-            "allow-segmented-transfer", "Enable segmented DMA transfers")(
+            "rx,ry,gx,gy,bx,by,wx,wy,minML,maxML,mCLL,mFALL,eotf,smdID")("no-set-desired-frame",
+                                                                         "Don't set desiredFrame field in transfer struct")(
+            "enable-hardware-pause", "Enable hardware pause states")("allow-segmented-transfer", "Enable segmented DMA transfers")(
             "simple-routing", "Omit all but minimal routing requirements")(
-            "ring-buffer-size,s",
-            value<int>()->default_value(DEFAULT_RINGBUFFER_SIZE),
-            "Ring Buffer Size")(
-            "acquire",
-            "Acquire device from AJA control panel (which is the default)")(
-            "no-acquire,n",
-            "Do not attempt to acquire device from AJA control panel")(
-            "no-aquire", "Deprecated. Please use no-acquire instead")(
-            "level-a,a", "Enable Level A timing where possible.")(
-            "disable-tasks", "Set card control to 'Disable tasks' mode.")(
-            "hdmi-output-bit-depth-override", value<int>()->default_value(0),
-            "HDMI Output Bit Depth override - (0=Same as Video Output data "
-            "format)");
+            "ring-buffer-size,s", value<int>()->default_value(DEFAULT_RINGBUFFER_SIZE),
+            "Ring Buffer Size")("acquire", "Acquire device from AJA control panel (which is the default)")(
+            "no-acquire,n", "Do not attempt to acquire device from AJA control panel")(
+            "no-aquire", "Deprecated. Please use no-acquire instead")("level-a,a", "Enable Level A timing where possible.")(
+            "disable-tasks", "Set card control to 'Disable tasks' mode.")("hdmi-output-bit-depth-override", value<int>()->default_value(0),
+                                                                          "HDMI Output Bit Depth override - (0=Same as Video Output data "
+                                                                          "format)");
 
         variables_map vm;
 
@@ -1203,13 +952,11 @@ namespace AJADevices
 
         if (vm.count("hdmi-output-bit-depth-override"))
         {
-            m_hdmiOutputBitDepthOverride =
-                vm["hdmi-output-bit-depth-override"].as<int>();
+            m_hdmiOutputBitDepthOverride = vm["hdmi-output-bit-depth-override"].as<int>();
             if (m_infoFeedback)
             {
                 if (m_hdmiOutputBitDepthOverride != 0)
-                    cout << "INFO: HDMI Output bit depth = "
-                         << m_hdmiOutputBitDepthOverride << endl;
+                    cout << "INFO: HDMI Output bit depth = " << m_hdmiOutputBitDepthOverride << endl;
                 else
                     cout << "INFO: HDMI Output bit depth will match the Video "
                             "Output "
@@ -1250,32 +997,27 @@ namespace AJADevices
                     cout << "INFO: unidirectional SDI" << endl;
             }
 
-            const KonaVideoFormat& f =
-                m_konaVideoFormats[m_internalVideoFormat];
+            const KonaVideoFormat& f = m_konaVideoFormats[m_internalVideoFormat];
             const KonaDataFormat& d = m_konaDataFormats[m_internalDataFormat];
             const string& dname = d.desc;
             const bool rgb = d.flags & RGB444;
 
             if (m_infoFeedback)
-                cout << "INFO: KONA video format (" << (int)f.value
-                     << ") = " << f.desc << endl;
+                cout << "INFO: KONA video format (" << (int)f.value << ") = " << f.desc << endl;
             if (m_infoFeedback)
-                cout << "INFO: KONA data format (" << (int)d.value
-                     << ") = " << d.desc << endl;
+                cout << "INFO: KONA data format (" << (int)d.value << ") = " << d.desc << endl;
 
             if (m_acquire)
             {
                 if (m_infoFeedback)
                     cout << "INFO: Kona AcquireStreamForApplication" << endl;
 
-                if (!m_card->AcquireStreamForApplication(
-                        appID(), (uint32_t)TwkUtil::processID()))
+                if (!m_card->AcquireStreamForApplication(appID(), (uint32_t)TwkUtil::processID()))
                 {
                     m_open = false;
                     delete m_card;
                     m_card = 0;
-                    TWK_THROW_EXC_STREAM(
-                        "AJA: Failed to acquire application stream " << name());
+                    TWK_THROW_EXC_STREAM("AJA: Failed to acquire application stream " << name());
                 }
 
                 m_card->GetEveryFrameServices(m_taskMode);
@@ -1291,18 +1033,13 @@ namespace AJADevices
             else
             {
                 if (m_infoFeedback)
-                    cout
-                        << "INFO: skipping Kona AcquireStreamForApplication ..."
-                        << endl;
+                    cout << "INFO: skipping Kona AcquireStreamForApplication ..." << endl;
             }
 
             m_stereo = dname.find("Stereo") != string::npos;
-            m_3GA = IsVideoFormatA(f.value)
-                    || (!IsVideoFormatB(f.value) && useLevelA);
+            m_3GA = IsVideoFormatA(f.value) || (!IsVideoFormatB(f.value) && useLevelA);
             m_3G = (d.flags & ThreeG) || NTV2_IS_3G_FORMAT(f.value);
-            m_3GB = (m_3GA ? false
-                           : ((d.flags & ThreeG) || IsVideoFormatB(f.value))
-                                 && !IsVideoFormatA(f.value));
+            m_3GB = (m_3GA ? false : ((d.flags & ThreeG) || IsVideoFormatB(f.value)) && !IsVideoFormatA(f.value));
             m_dualLink = d.flags & DualLink;
             m_channels = channelsFromFormat(d.value);
             m_quad = NTV2_IS_QUAD_FRAME_FORMAT(f.value);
@@ -1321,9 +1058,7 @@ namespace AJADevices
                 cout << "INFO: KONA enable 3GB = " << (int)m_3GB << endl;
             }
 
-            NTV2VideoLimiting limiting =
-                rgb ? NTV2_VIDEOLIMITING_LEGALSDI
-                    : NTV2_VIDEOLIMITING_LEGALBROADCAST;
+            NTV2VideoLimiting limiting = rgb ? NTV2_VIDEOLIMITING_LEGALSDI : NTV2_VIDEOLIMITING_LEGALBROADCAST;
 
             if ((d.flags & LegalRangeY) || vm.count("limiting-legal-range") > 0)
             {
@@ -1479,10 +1214,8 @@ namespace AJADevices
 
                 if (m_quad || m_quadQuad)
                 {
-                    AJA_CHECK(
-                        m_card->SetFrameBufferFormat(NTV2_CHANNEL3, d.value));
-                    AJA_CHECK(
-                        m_card->SetFrameBufferFormat(NTV2_CHANNEL4, d.value));
+                    AJA_CHECK(m_card->SetFrameBufferFormat(NTV2_CHANNEL3, d.value));
+                    AJA_CHECK(m_card->SetFrameBufferFormat(NTV2_CHANNEL4, d.value));
                 }
 
                 if (m_quad || m_quadQuad)
@@ -1502,9 +1235,7 @@ namespace AJADevices
                 NTV2VANCMode vancMode;
                 AJA_CHECK(m_card->GetVANCMode(vancMode));
 
-                bool progressive =
-                    NTV2_VIDEO_FORMAT_HAS_PROGRESSIVE_PICTURE(f.value)
-                    && !NTV2_IS_PSF_VIDEO_FORMAT(f.value);
+                bool progressive = NTV2_VIDEO_FORMAT_HAS_PROGRESSIVE_PICTURE(f.value) && !NTV2_IS_PSF_VIDEO_FORMAT(f.value);
 
                 //
                 // standard needs to overriden to 1080p or 1080.
@@ -1512,10 +1243,8 @@ namespace AJADevices
                 NTV2Standard standard = GetNTV2StandardFromVideoFormat(f.value);
 
                 if (m_infoFeedback)
-                    cout << "INFO: Card STANDARD request: " << (int)standard
-                         << endl;
-                if (standard != NTV2_STANDARD_720
-                    && !NTV2_IS_SD_STANDARD(standard))
+                    cout << "INFO: Card STANDARD request: " << (int)standard << endl;
+                if (standard != NTV2_STANDARD_720 && !NTV2_IS_SD_STANDARD(standard))
                 {
                     if (progressive)
                     {
@@ -1538,22 +1267,16 @@ namespace AJADevices
 
                 const bool needRGBLevelAConversion = (rgb & m_3GA);
 
-                m_card->SetSDIOutRGBLevelAConversion(NTV2_CHANNEL1,
-                                                     needRGBLevelAConversion);
-                m_card->SetSDIOutRGBLevelAConversion(NTV2_CHANNEL2,
-                                                     needRGBLevelAConversion);
-                m_card->SetSDIOutRGBLevelAConversion(NTV2_CHANNEL3,
-                                                     needRGBLevelAConversion);
-                m_card->SetSDIOutRGBLevelAConversion(NTV2_CHANNEL4,
-                                                     needRGBLevelAConversion);
-                m_card->SetSDIOutRGBLevelAConversion(NTV2_CHANNEL5,
-                                                     needRGBLevelAConversion);
+                m_card->SetSDIOutRGBLevelAConversion(NTV2_CHANNEL1, needRGBLevelAConversion);
+                m_card->SetSDIOutRGBLevelAConversion(NTV2_CHANNEL2, needRGBLevelAConversion);
+                m_card->SetSDIOutRGBLevelAConversion(NTV2_CHANNEL3, needRGBLevelAConversion);
+                m_card->SetSDIOutRGBLevelAConversion(NTV2_CHANNEL4, needRGBLevelAConversion);
+                m_card->SetSDIOutRGBLevelAConversion(NTV2_CHANNEL5, needRGBLevelAConversion);
 
                 if (m_infoFeedback)
                 {
                     bool isLevelA = false;
-                    m_card->GetSDIOutRGBLevelAConversion(NTV2_CHANNEL1,
-                                                         isLevelA);
+                    m_card->GetSDIOutRGBLevelAConversion(NTV2_CHANNEL1, isLevelA);
                     cout << "INFO: Level A status = " << (int)isLevelA << endl;
                 }
 
@@ -1581,14 +1304,10 @@ namespace AJADevices
                 //  get 4K modes to work.
                 //
 
-                m_card->SetFrameBufferOrientation(
-                    NTV2_CHANNEL1, NTV2_FRAMEBUFFER_ORIENTATION_TOPDOWN);
-                m_card->SetFrameBufferOrientation(
-                    NTV2_CHANNEL2, NTV2_FRAMEBUFFER_ORIENTATION_TOPDOWN);
-                m_card->SetFrameBufferOrientation(
-                    NTV2_CHANNEL3, NTV2_FRAMEBUFFER_ORIENTATION_TOPDOWN);
-                m_card->SetFrameBufferOrientation(
-                    NTV2_CHANNEL4, NTV2_FRAMEBUFFER_ORIENTATION_TOPDOWN);
+                m_card->SetFrameBufferOrientation(NTV2_CHANNEL1, NTV2_FRAMEBUFFER_ORIENTATION_TOPDOWN);
+                m_card->SetFrameBufferOrientation(NTV2_CHANNEL2, NTV2_FRAMEBUFFER_ORIENTATION_TOPDOWN);
+                m_card->SetFrameBufferOrientation(NTV2_CHANNEL3, NTV2_FRAMEBUFFER_ORIENTATION_TOPDOWN);
+                m_card->SetFrameBufferOrientation(NTV2_CHANNEL4, NTV2_FRAMEBUFFER_ORIENTATION_TOPDOWN);
 
                 m_card->SetTsiFrameEnable(false, NTV2_CHANNEL1);
                 m_card->SetTsiFrameEnable(false, NTV2_CHANNEL2);
@@ -1637,20 +1356,15 @@ namespace AJADevices
                     //  stereo)
                     //
 
-                    NTV2ColorSpaceMatrixType m =
-                        rec601 ? NTV2_Rec601Matrix : NTV2_Rec709Matrix;
+                    NTV2ColorSpaceMatrixType m = rec601 ? NTV2_Rec601Matrix : NTV2_Rec709Matrix;
 
-                    AJA_CHECK(
-                        m_card->SetColorSpaceMatrixSelect(m, NTV2_CHANNEL1));
-                    AJA_CHECK(
-                        m_card->SetColorSpaceMatrixSelect(m, NTV2_CHANNEL2));
+                    AJA_CHECK(m_card->SetColorSpaceMatrixSelect(m, NTV2_CHANNEL1));
+                    AJA_CHECK(m_card->SetColorSpaceMatrixSelect(m, NTV2_CHANNEL2));
 
                     if (m_quad || m_quadQuad)
                     {
-                        AJA_CHECK(m_card->SetColorSpaceMatrixSelect(
-                            m, NTV2_CHANNEL3));
-                        AJA_CHECK(m_card->SetColorSpaceMatrixSelect(
-                            m, NTV2_CHANNEL4));
+                        AJA_CHECK(m_card->SetColorSpaceMatrixSelect(m, NTV2_CHANNEL3));
+                        AJA_CHECK(m_card->SetColorSpaceMatrixSelect(m, NTV2_CHANNEL4));
                     }
 
                     //
@@ -1663,17 +1377,13 @@ namespace AJADevices
 
                     NTV2RGBBlackRange range = NTV2_RGBBLACKRANGE_0_0x3FF;
 
-                    AJA_CHECK(m_card->SetColorSpaceRGBBlackRange(
-                        range, NTV2_CHANNEL1));
-                    AJA_CHECK(m_card->SetColorSpaceRGBBlackRange(
-                        range, NTV2_CHANNEL2));
+                    AJA_CHECK(m_card->SetColorSpaceRGBBlackRange(range, NTV2_CHANNEL1));
+                    AJA_CHECK(m_card->SetColorSpaceRGBBlackRange(range, NTV2_CHANNEL2));
 
                     if (m_quad || m_quadQuad)
                     {
-                        AJA_CHECK(m_card->SetColorSpaceRGBBlackRange(
-                            range, NTV2_CHANNEL3));
-                        AJA_CHECK(m_card->SetColorSpaceRGBBlackRange(
-                            range, NTV2_CHANNEL4));
+                        AJA_CHECK(m_card->SetColorSpaceRGBBlackRange(range, NTV2_CHANNEL3));
+                        AJA_CHECK(m_card->SetColorSpaceRGBBlackRange(range, NTV2_CHANNEL4));
                     }
                 }
 
@@ -1695,16 +1405,12 @@ namespace AJADevices
 
                 m_stereo = m_channelVector.size() == 2;
                 m_quad = NTV2_IS_QUAD_FRAME_FORMAT(m_actualVideoFormat.value);
-                m_quadQuad =
-                    NTV2_IS_QUAD_QUAD_FORMAT(m_actualVideoFormat.value);
+                m_quadQuad = NTV2_IS_QUAD_QUAD_FORMAT(m_actualVideoFormat.value);
 
                 for (size_t i = 0; i < m_channelVector.size(); i++)
                 {
-                    m_card->SetFrameBufferFormat(m_channelVector[i],
-                                                 m_actualDataFormat.value);
-                    m_card->SetSDIOutVPID(m_channelVPIDVector[i].first,
-                                          m_channelVPIDVector[i].second,
-                                          (NTV2Channel)m_channelVector[i]);
+                    m_card->SetFrameBufferFormat(m_channelVector[i], m_actualDataFormat.value);
+                    m_card->SetSDIOutVPID(m_channelVPIDVector[i].first, m_channelVPIDVector[i].second, (NTV2Channel)m_channelVector[i]);
 
                     //
                     //  NOTE: we were told at one point not to set the
@@ -1712,31 +1418,21 @@ namespace AJADevices
                     //  get 4K modes to work.
                     //
 
-                    m_card->SetFrameBufferOrientation(
-                        m_channelVector[i],
-                        NTV2_FRAMEBUFFER_ORIENTATION_TOPDOWN);
+                    m_card->SetFrameBufferOrientation(m_channelVector[i], NTV2_FRAMEBUFFER_ORIENTATION_TOPDOWN);
                 }
             }
 
             m_bufferSize = m_width * m_height * m_channels;
-            m_bufferSizeInBytes =
-                m_width * m_height
-                * pixelSizeInBytes(m_actualDataFormat.iformat);
-            m_bufferStride =
-                m_width * pixelSizeInBytes(m_actualDataFormat.iformat);
+            m_bufferSizeInBytes = m_width * m_height * pixelSizeInBytes(m_actualDataFormat.iformat);
+            m_bufferStride = m_width * pixelSizeInBytes(m_actualDataFormat.iformat);
 
             if (m_infoFeedback)
-                cout << "INFO: " << m_width << "x" << m_height << "@"
-                     << m_outRate << ", "
-                     << NTV2VideoFormatToString(m_actualVideoFormat.value)
-                     << ", "
-                     << NTV2FrameBufferFormatToString(m_actualDataFormat.value)
-                     << endl;
+                cout << "INFO: " << m_width << "x" << m_height << "@" << m_outRate << ", "
+                     << NTV2VideoFormatToString(m_actualVideoFormat.value) << ", "
+                     << NTV2FrameBufferFormatToString(m_actualDataFormat.value) << endl;
 
-            m_fboInternalFormat = TwkGLF::internalFormatFromDataFormat(
-                m_actualDataFormat.iformat);
-            GLenumPair epair =
-                TwkGLF::textureFormatFromDataFormat(m_actualDataFormat.iformat);
+            m_fboInternalFormat = TwkGLF::internalFormatFromDataFormat(m_actualDataFormat.iformat);
+            GLenumPair epair = TwkGLF::textureFormatFromDataFormat(m_actualDataFormat.iformat);
             m_textureFormat = epair.first;
             m_textureType = epair.second;
             m_texturePadding = 0;
@@ -1746,14 +1442,12 @@ namespace AJADevices
             m_videoChannels.clear();
 
             m_videoChannels.push_back(
-                new VideoChannel(m_actualDataFormat.value, m_channelVector[0],
-                                 m_bufferSizeInBytes, m_ringBufferSize));
+                new VideoChannel(m_actualDataFormat.value, m_channelVector[0], m_bufferSizeInBytes, m_ringBufferSize));
 
             if (m_stereo)
             {
-                m_videoChannels.push_back(new VideoChannel(
-                    m_actualDataFormat.value, m_channelVector[1],
-                    m_bufferSizeInBytes, m_ringBufferSize));
+                m_videoChannels.push_back(
+                    new VideoChannel(m_actualDataFormat.value, m_channelVector[1], m_bufferSizeInBytes, m_ringBufferSize));
             }
 
             ULWord u372;
@@ -1765,28 +1459,21 @@ namespace AJADevices
                 VideoChannel* vc = m_videoChannels[i];
                 ULWord nch = (ULWord)audioFormatChannelCountForCard();
 
-                m_card->SetNumberAudioChannels(nch,
-                                               NTV2AudioSystem(vc->channel));
+                m_card->SetNumberAudioChannels(nch, NTV2AudioSystem(vc->channel));
 
-                if (m_deviceHas96kAudio
-                    && audioFormats[m_internalAudioFormat].hz == 96000)
+                if (m_deviceHas96kAudio && audioFormats[m_internalAudioFormat].hz == 96000)
                 {
-                    m_card->SetAudioRate(NTV2_AUDIO_96K,
-                                         NTV2AudioSystem(vc->channel));
+                    m_card->SetAudioRate(NTV2_AUDIO_96K, NTV2AudioSystem(vc->channel));
                 }
                 else
                 {
-                    m_card->SetAudioRate(NTV2_AUDIO_48K,
-                                         NTV2AudioSystem(vc->channel));
+                    m_card->SetAudioRate(NTV2_AUDIO_48K, NTV2AudioSystem(vc->channel));
                 }
 
-                m_card->SetAudioBufferSize(NTV2_AUDIO_BUFFER_BIG,
-                                           NTV2AudioSystem(vc->channel));
+                m_card->SetAudioBufferSize(NTV2_AUDIO_BUFFER_BIG, NTV2AudioSystem(vc->channel));
 
-                m_card->SetSDIOutputAudioSystem(vc->channel,
-                                                NTV2AudioSystem(vc->channel));
-                m_card->SetSDIOutputDS2AudioSystem(
-                    vc->channel, NTV2AudioSystem(vc->channel));
+                m_card->SetSDIOutputAudioSystem(vc->channel, NTV2AudioSystem(vc->channel));
+                m_card->SetSDIOutputDS2AudioSystem(vc->channel, NTV2AudioSystem(vc->channel));
 
                 //  Following comments below taken from AJA demo player app.
                 //	If the last app using the device left it in end-to-end
@@ -1794,8 +1481,7 @@ namespace AJADevices
                 // passthru), 	then loopback must be disabled, or else the
                 // output will contain whatever audio 	is present in whatever
                 // signal is feeding the device's SDI input...
-                m_card->SetAudioLoopBack(NTV2_AUDIO_LOOPBACK_OFF,
-                                         NTV2AudioSystem(vc->channel));
+                m_card->SetAudioLoopBack(NTV2_AUDIO_LOOPBACK_OFF, NTV2AudioSystem(vc->channel));
 
                 // AUTOCIRCULATE_TRANSFER_STRUCT& s = vc->transfer;
                 // s.bDisableExtraAudioInfo         = true;
@@ -1804,8 +1490,7 @@ namespace AJADevices
 
                 // cout << dec << "**** SETTING BUFFERFORMAT to: " <<
                 // m_actualDataFormat.value  << " at line " << __LINE__ << endl;
-                vc->auto_transfer.SetFrameBufferFormat(
-                    m_actualDataFormat.value);
+                vc->auto_transfer.SetFrameBufferFormat(m_actualDataFormat.value);
             }
 
             if (m_autocirculateRunning)
@@ -1848,23 +1533,20 @@ namespace AJADevices
                 //                                custom ANC data false);   //
                 //                                LTC
 
-                ok = m_card->AutoCirculateInitForOutput(
-                    vc->channel, m_ringBufferSize,
-                    audioOutputEnabled()
-                        ? (NTV2AudioSystem)(NTV2_AUDIOSYSTEM_1 + i)
-                        : NTV2_AUDIOSYSTEM_INVALID, // ?? as opposed to 2-4
-                    0,                              // option flags (e.g.,
-                       // AUTOCIRCULATE_WITH_RP188,AUTOCIRCULATE_WITH_LTC,
-                       // AUTOCIRCULATE_WITH_ANC, etc.)
-                    1,                             // in num channels
-                    i * m_ringBufferSize,          // start frame
-                    (i + 1) * m_ringBufferSize - 1 // end frame
+                ok = m_card->AutoCirculateInitForOutput(vc->channel, m_ringBufferSize,
+                                                        audioOutputEnabled() ? (NTV2AudioSystem)(NTV2_AUDIOSYSTEM_1 + i)
+                                                                             : NTV2_AUDIOSYSTEM_INVALID, // ?? as opposed to 2-4
+                                                        0,                                               // option flags (e.g.,
+                                                           // AUTOCIRCULATE_WITH_RP188,AUTOCIRCULATE_WITH_LTC,
+                                                           // AUTOCIRCULATE_WITH_ANC, etc.)
+                                                        1,                             // in num channels
+                                                        i * m_ringBufferSize,          // start frame
+                                                        (i + 1) * m_ringBufferSize - 1 // end frame
                 );
 
                 if (!ok && m_infoFeedback)
                 {
-                    cout << "ERROR: AutoCirculateInitForOutput #" << i
-                         << " failed " << vc->channel << endl;
+                    cout << "ERROR: AutoCirculateInitForOutput #" << i << " failed " << vc->channel << endl;
                 }
             }
             if (ok)
@@ -1906,9 +1588,7 @@ namespace AJADevices
         }
     }
 
-    void KonaVideoDevice::routeQuadRGB(NTV2Standard standard,
-                                       const KonaVideoFormat& f,
-                                       const KonaDataFormat& d)
+    void KonaVideoDevice::routeQuadRGB(NTV2Standard standard, const KonaVideoFormat& f, const KonaDataFormat& d)
     {
         if (m_infoFeedback)
             cout << "INFO: KONA quad 4K RGB format" << endl;
@@ -1918,14 +1598,10 @@ namespace AJADevices
         ULWord vpidC;
         ULWord vpidD;
 
-        CNTV2VPID::SetVPIDData(vpidA, f.value, d.value, false, false,
-                               VPIDChannel_1);
-        CNTV2VPID::SetVPIDData(vpidB, f.value, d.value, false, false,
-                               VPIDChannel_2);
-        CNTV2VPID::SetVPIDData(vpidC, f.value, d.value, false, false,
-                               VPIDChannel_3);
-        CNTV2VPID::SetVPIDData(vpidD, f.value, d.value, false, false,
-                               VPIDChannel_4);
+        CNTV2VPID::SetVPIDData(vpidA, f.value, d.value, false, false, VPIDChannel_1);
+        CNTV2VPID::SetVPIDData(vpidB, f.value, d.value, false, false, VPIDChannel_2);
+        CNTV2VPID::SetVPIDData(vpidC, f.value, d.value, false, false, VPIDChannel_3);
+        CNTV2VPID::SetVPIDData(vpidD, f.value, d.value, false, false, VPIDChannel_4);
 
         m_card->SetSDIOutputStandard(NTV2_CHANNEL1, standard);
         m_card->SetSDIOutputStandard(NTV2_CHANNEL2, standard);
@@ -2032,9 +1708,7 @@ namespace AJADevices
         routeHDMI(standard, d, tsiEnabled(), true);
     }
 
-    void KonaVideoDevice::routeStereoRGB(NTV2Standard standard,
-                                         const KonaVideoFormat& f,
-                                         const KonaDataFormat& d)
+    void KonaVideoDevice::routeStereoRGB(NTV2Standard standard, const KonaVideoFormat& f, const KonaDataFormat& d)
     {
         if (m_infoFeedback)
             cout << "INFO: KONA stereo RGB format" << endl;
@@ -2042,10 +1716,8 @@ namespace AJADevices
         ULWord vpidA;
         ULWord vpidB;
 
-        CNTV2VPID::SetVPIDData(vpidA, f.value, d.value, false, false,
-                               VPIDChannel_1);
-        CNTV2VPID::SetVPIDData(vpidB, f.value, d.value, false, false,
-                               VPIDChannel_2);
+        CNTV2VPID::SetVPIDData(vpidA, f.value, d.value, false, false, VPIDChannel_1);
+        CNTV2VPID::SetVPIDData(vpidB, f.value, d.value, false, false, VPIDChannel_2);
 
         m_card->SetSDIOutVPID(vpidA, 0, NTV2_CHANNEL1);
         m_card->SetSDIOutVPID(vpidB, 0, NTV2_CHANNEL2);
@@ -2096,9 +1768,7 @@ namespace AJADevices
         }
     }
 
-    void KonaVideoDevice::routeMonoRGB(NTV2Standard standard,
-                                       const KonaVideoFormat& f,
-                                       const KonaDataFormat& d)
+    void KonaVideoDevice::routeMonoRGB(NTV2Standard standard, const KonaVideoFormat& f, const KonaDataFormat& d)
     {
         if (m_infoFeedback)
             cout << "INFO: KONA mono RGB format" << endl;
@@ -2106,10 +1776,8 @@ namespace AJADevices
         ULWord vpidA;
         ULWord vpidB;
 
-        CNTV2VPID::SetVPIDData(vpidA, f.value, d.value, false, false,
-                               VPIDChannel_1);
-        CNTV2VPID::SetVPIDData(vpidB, f.value, d.value, false, false,
-                               VPIDChannel_2);
+        CNTV2VPID::SetVPIDData(vpidA, f.value, d.value, false, false, VPIDChannel_1);
+        CNTV2VPID::SetVPIDData(vpidB, f.value, d.value, false, false, VPIDChannel_2);
         m_card->SetSDIOutVPID(vpidA, vpidB, NTV2_CHANNEL1);
 
         m_card->SetSDITransmitEnable(NTV2_CHANNEL3, false);
@@ -2133,8 +1801,7 @@ namespace AJADevices
             m_card->SetMode(NTV2_CHANNEL2, NTV2_MODE_DISPLAY);
             m_card->SubscribeOutputVerticalEvent(NTV2_CHANNEL2);
             m_card->SetSDIOutputAudioSystem(NTV2_CHANNEL2, NTV2_AUDIOSYSTEM_2);
-            m_card->SetSDIOutputDS2AudioSystem(NTV2_CHANNEL2,
-                                               NTV2_AUDIOSYSTEM_2);
+            m_card->SetSDIOutputDS2AudioSystem(NTV2_CHANNEL2, NTV2_AUDIOSYSTEM_2);
             m_card->SetSDITransmitEnable(NTV2_CHANNEL2, true);
 
             if (m_deviceNumVideoOutputs > 2)
@@ -2149,10 +1816,8 @@ namespace AJADevices
                 m_card->SetSDIOutputStandard(NTV2_CHANNEL5, standard);
                 m_card->SetMode(NTV2_CHANNEL5, NTV2_MODE_DISPLAY);
                 m_card->SubscribeOutputVerticalEvent(NTV2_CHANNEL5);
-                m_card->SetSDIOutputAudioSystem(NTV2_CHANNEL5,
-                                                NTV2_AUDIOSYSTEM_5);
-                m_card->SetSDIOutputDS2AudioSystem(NTV2_CHANNEL5,
-                                                   NTV2_AUDIOSYSTEM_5);
+                m_card->SetSDIOutputAudioSystem(NTV2_CHANNEL5, NTV2_AUDIOSYSTEM_5);
+                m_card->SetSDIOutputDS2AudioSystem(NTV2_CHANNEL5, NTV2_AUDIOSYSTEM_5);
                 m_card->SetSDITransmitEnable(NTV2_CHANNEL5, true);
             }
         }
@@ -2198,8 +1863,7 @@ namespace AJADevices
                 //  Additional SDI2 output of the same 3G signal
                 //
                 m_card->Connect(NTV2_XptSDIOut2Input, NTV2_XptDuallinkOut2);
-                m_card->Connect(NTV2_XptSDIOut2InputDS2,
-                                NTV2_XptDuallinkOut2DS2);
+                m_card->Connect(NTV2_XptSDIOut2InputDS2, NTV2_XptDuallinkOut2DS2);
             }
         }
 
@@ -2216,9 +1880,7 @@ namespace AJADevices
         }
     }
 
-    void KonaVideoDevice::routeQuadYUV(NTV2Standard standard,
-                                       const KonaVideoFormat& f,
-                                       const KonaDataFormat& d)
+    void KonaVideoDevice::routeQuadYUV(NTV2Standard standard, const KonaVideoFormat& f, const KonaDataFormat& d)
     {
         if (m_infoFeedback)
             cout << "INFO: KONA quad 4K non-RGB format" << endl;
@@ -2228,14 +1890,10 @@ namespace AJADevices
         ULWord vpidC;
         ULWord vpidD;
 
-        CNTV2VPID::SetVPIDData(vpidA, f.value, d.value, false, false,
-                               VPIDChannel_1);
-        CNTV2VPID::SetVPIDData(vpidB, f.value, d.value, false, false,
-                               VPIDChannel_2);
-        CNTV2VPID::SetVPIDData(vpidC, f.value, d.value, false, false,
-                               VPIDChannel_3);
-        CNTV2VPID::SetVPIDData(vpidD, f.value, d.value, false, false,
-                               VPIDChannel_4);
+        CNTV2VPID::SetVPIDData(vpidA, f.value, d.value, false, false, VPIDChannel_1);
+        CNTV2VPID::SetVPIDData(vpidB, f.value, d.value, false, false, VPIDChannel_2);
+        CNTV2VPID::SetVPIDData(vpidC, f.value, d.value, false, false, VPIDChannel_3);
+        CNTV2VPID::SetVPIDData(vpidD, f.value, d.value, false, false, VPIDChannel_4);
 
         m_card->SetSDIOutputStandard(NTV2_CHANNEL1, standard);
         m_card->SetSDIOutputStandard(NTV2_CHANNEL2, standard);
@@ -2351,24 +2009,19 @@ namespace AJADevices
             if (outputIsRGB)
             {
                 // FB(RGB) -> CSC(YUV) -> 4KDC(YUV) -> DL5 -> SDI5
-                m_card->Connect(NTV2_XptDualLinkOut5Input,
-                                NTV2_Xpt4KDownConverterOut);
+                m_card->Connect(NTV2_XptDualLinkOut5Input, NTV2_Xpt4KDownConverterOut);
                 m_card->Connect(NTV2_XptSDIOut5Input, NTV2_XptDuallinkOut5);
-                m_card->Connect(NTV2_XptSDIOut5InputDS2,
-                                NTV2_XptDuallinkOut5DS2);
+                m_card->Connect(NTV2_XptSDIOut5InputDS2, NTV2_XptDuallinkOut5DS2);
             }
             else
             {
                 // FB(RGB) -> CSC(YUV) -> 4DK(YUV) -> SDI5
-                m_card->Connect(NTV2_XptSDIOut5Input,
-                                NTV2_Xpt4KDownConverterOut);
+                m_card->Connect(NTV2_XptSDIOut5Input, NTV2_Xpt4KDownConverterOut);
             }
         }
     }
 
-    void KonaVideoDevice::routeStereoYUV(NTV2Standard standard,
-                                         const KonaVideoFormat& f,
-                                         const KonaDataFormat& d)
+    void KonaVideoDevice::routeStereoYUV(NTV2Standard standard, const KonaVideoFormat& f, const KonaDataFormat& d)
     {
         if (m_infoFeedback)
             cout << "INFO: KONA stereo non-RGB format" << endl;
@@ -2376,10 +2029,8 @@ namespace AJADevices
         ULWord vpidA;
         ULWord vpidB;
 
-        CNTV2VPID::SetVPIDData(vpidA, f.value, d.value, false, false,
-                               VPIDChannel_1);
-        CNTV2VPID::SetVPIDData(vpidB, f.value, d.value, false, false,
-                               VPIDChannel_2);
+        CNTV2VPID::SetVPIDData(vpidA, f.value, d.value, false, false, VPIDChannel_1);
+        CNTV2VPID::SetVPIDData(vpidB, f.value, d.value, false, false, VPIDChannel_2);
 
         m_card->SetSDIOutVPID(vpidA, 0, NTV2_CHANNEL1);
         m_card->SetSDIOutVPID(vpidB, 0, NTV2_CHANNEL2);
@@ -2451,8 +2102,7 @@ namespace AJADevices
                 {
                     m_card->SetHDMIV2Mode(NTV2_HDMI_V2_HDSD_BIDIRECTIONAL);
                     m_card->SetHDMIOutVideoStandard(standard);
-                    m_card->Connect(NTV2_XptHDMIOutInput,
-                                    NTV2_XptStereoCompressorOut);
+                    m_card->Connect(NTV2_XptHDMIOutInput, NTV2_XptStereoCompressorOut);
                     m_card->Connect(NTV2_XptHDMIOutQ1Input, NTV2_XptCSC1VidYUV);
                     m_card->Connect(NTV2_XptHDMIOutQ2Input, NTV2_XptCSC1VidYUV);
                     m_card->SetHDMIOut3DPresent(true);
@@ -2481,9 +2131,7 @@ namespace AJADevices
         }
     }
 
-    void KonaVideoDevice::routeMonoYUV(NTV2Standard standard,
-                                       const KonaVideoFormat& f,
-                                       const KonaDataFormat& d)
+    void KonaVideoDevice::routeMonoYUV(NTV2Standard standard, const KonaVideoFormat& f, const KonaDataFormat& d)
     {
         if (m_infoFeedback)
             cout << "INFO: KONA mono non-RGB format" << endl;
@@ -2491,8 +2139,7 @@ namespace AJADevices
         ULWord vpidA;
         ULWord vpidB;
 
-        CNTV2VPID::SetVPIDData(vpidA, f.value, d.value, false, false,
-                               VPIDChannel_1);
+        CNTV2VPID::SetVPIDData(vpidA, f.value, d.value, false, false, VPIDChannel_1);
         m_card->SetSDIOutVPID(vpidA, 0, NTV2_CHANNEL1);
         m_card->SetSDIOutputAudioSystem(NTV2_CHANNEL1, NTV2_AUDIOSYSTEM_1);
         m_card->SetSDIOutputStandard(NTV2_CHANNEL1, standard);
@@ -2502,8 +2149,7 @@ namespace AJADevices
 
         if (m_deviceNumVideoOutputs > 1)
         {
-            CNTV2VPID::SetVPIDData(vpidB, f.value, d.value, false, false,
-                                   VPIDChannel_2);
+            CNTV2VPID::SetVPIDData(vpidB, f.value, d.value, false, false, VPIDChannel_2);
             m_card->SetSDIOutVPID(vpidB, 0, NTV2_CHANNEL2);
             m_card->SetSDITransmitEnable(NTV2_CHANNEL2, false);
             m_card->SetSDIOutputStandard(NTV2_CHANNEL2, standard);
@@ -2609,8 +2255,7 @@ namespace AJADevices
         }
     }
 
-    void KonaVideoDevice::route4KDownConverter(bool tsiEnabled,
-                                               bool outputIsRGB)
+    void KonaVideoDevice::route4KDownConverter(bool tsiEnabled, bool outputIsRGB)
     {
         if (!::NTV2DeviceCanDoWidget(m_deviceID, NTV2_Wgt4KDownConverter))
             return;
@@ -2650,9 +2295,7 @@ namespace AJADevices
         m_card->Connect(NTV2_Xpt4KDCQ4Input, source4Xpt);
     }
 
-    void KonaVideoDevice::routeHDMI(NTV2Standard standard,
-                                    const KonaDataFormat& d, bool tsiEnabled,
-                                    bool outputIsRGB)
+    void KonaVideoDevice::routeHDMI(NTV2Standard standard, const KonaDataFormat& d, bool tsiEnabled, bool outputIsRGB)
     {
         if (::NTV2DeviceGetNumHDMIVideoOutputs(m_deviceID) < 1)
             return;
@@ -2663,8 +2306,7 @@ namespace AJADevices
         m_card->SetHDMIOutTsiIO(tsiEnabled);
         m_card->SetHDMIV2Mode(NTV2_HDMI_V2_4K_PLAYBACK);
 
-        m_card->SetHDMIOutColorSpace(outputIsRGB ? NTV2_HDMIColorSpaceRGB
-                                                 : NTV2_HDMIColorSpaceYCbCr);
+        m_card->SetHDMIOutColorSpace(outputIsRGB ? NTV2_HDMIColorSpaceRGB : NTV2_HDMIColorSpaceYCbCr);
 
         NTV2OutputCrosspointID source1Xpt = NTV2_XptBlack;
         NTV2OutputCrosspointID source2Xpt = NTV2_XptBlack;
@@ -2763,8 +2405,7 @@ namespace AJADevices
             if (m_acquire)
             {
                 m_card->SetEveryFrameServices(m_taskMode);
-                m_card->ReleaseStreamForApplication(
-                    appID(), (uint32_t)TwkUtil::processID());
+                m_card->ReleaseStreamForApplication(appID(), (uint32_t)TwkUtil::processID());
             }
 
             for (size_t i = 0; i < m_videoChannels.size(); i++)
@@ -2799,8 +2440,7 @@ namespace AJADevices
             m_deviceMutex.lock();
             Time t = timer.elapsed();
             if (t > 0.001 && m_infoFeedback)
-                cout << "INFO: " << threadName << ": lockDevice for " << t
-                     << endl;
+                cout << "INFO: " << threadName << ": lockDevice for " << t << endl;
         }
         else
         {
@@ -2820,8 +2460,7 @@ namespace AJADevices
         //  interpolating. Not the best way to do this.
         //
 
-        void subsample422_8bit_UYVY(int width, int height,
-                                    unsigned char* buffer)
+        void subsample422_8bit_UYVY(int width, int height, unsigned char* buffer)
         {
             Timer timer;
             timer.start();
@@ -2832,11 +2471,7 @@ namespace AJADevices
             {
                 for (size_t row = 0; row < height; row++)
                 {
-                    for (
-                        unsigned char* __restrict p0 = buffer + row * 3 * width, * __restrict e =
-                                                                                     p0
-                                                                                     + 3 * width;
-                        p0 < e; p0 += 6, p1 += 4)
+                    for (unsigned char* __restrict p0 = buffer + row * 3 * width, * __restrict e = p0 + 3 * width; p0 < e; p0 += 6, p1 += 4)
                     {
                         //
                         //  The commented out parts do the interpolation, but
@@ -2859,11 +2494,7 @@ namespace AJADevices
                 {
                     size_t count = 0;
 
-                    for (
-                        unsigned char* __restrict p0 = buffer + row * 3 * width, * __restrict e =
-                                                                                     p0
-                                                                                     + 3 * width;
-                        p0 < e; p0 += 3, count++)
+                    for (unsigned char* __restrict p0 = buffer + row * 3 * width, * __restrict e = p0 + 3 * width; p0 < e; p0 += 3, count++)
                     {
                         *p1 = p0[count % 2 + 1];
                         p1++;
@@ -2896,13 +2527,7 @@ namespace AJADevices
 
             for (size_t row = 0; row < height; row++)
             {
-                for (
-                    uint32_t* __restrict p0 = buffer + row * width, * __restrict e =
-                                                                        p0
-                                                                        + width
-                                                                        - (width
-                                                                           % 6);
-                    p0 < e; p0 += 6)
+                for (uint32_t* __restrict p0 = buffer + row * width, * __restrict e = p0 + width - (width % 6); p0 < e; p0 += 6)
                 {
                     const uint32_t A = *p0;
                     const uint32_t B = p0[1];
@@ -2911,16 +2536,13 @@ namespace AJADevices
                     const uint32_t E = p0[4];
                     const uint32_t F = p0[5];
 
-                    *p1 = (A & R10MASK) | ((A << 10) & G10MASK)
-                          | ((A >> 10) & B10MASK);
+                    *p1 = (A & R10MASK) | ((A << 10) & G10MASK) | ((A >> 10) & B10MASK);
                     p1++;
                     *p1 = ((C << 20) & R10MASK) | (B & G10MASK) | (B & B10MASK);
                     p1++;
-                    *p1 = ((C << 10) & R10MASK) | ((D << 10) & G10MASK)
-                          | ((B >> 20) & B10MASK);
+                    *p1 = ((C << 10) & R10MASK) | ((D << 10) & G10MASK) | ((B >> 20) & B10MASK);
                     p1++;
-                    *p1 = ((F << 20) & R10MASK) | ((D >> 10) & G10MASK)
-                          | (E & B10MASK);
+                    *p1 = ((F << 20) & R10MASK) | ((D >> 10) & G10MASK) | (E & B10MASK);
                     p1++;
                 }
 
@@ -2953,8 +2575,7 @@ namespace AJADevices
         for (size_t vi = 0; !threadStop; vi = (vi + 1) % nchannels)
         {
             VideoChannel* vc = m_videoChannels[vi];
-            AJA_CHECK(
-                m_card->AutoCirculateGetStatus(vc->channel, vc->auto_status));
+            AJA_CHECK(m_card->AutoCirculateGetStatus(vc->channel, vc->auto_status));
             const int d = vc->auto_status.acFramesDropped;
 
             sleeping = false;
@@ -2987,8 +2608,7 @@ namespace AJADevices
 
                         if (doingStereo)
                         {
-                            AJA_CHECK(
-                                m_card->AutoCirculateStart(NTV2_CHANNEL2));
+                            AJA_CHECK(m_card->AutoCirculateStart(NTV2_CHANNEL2));
                         }
                         m_autocirculateRunning = true;
                         m_starting = true;
@@ -3009,8 +2629,7 @@ namespace AJADevices
                         lockDevice(false);
                     }
                 }
-                else if (running && bufferLevel == 0 && m_ringBufferSize > 2
-                         && !wasPaused)
+                else if (running && bufferLevel == 0 && m_ringBufferSize > 2 && !wasPaused)
                 {
                     if (m_usePausing)
                     {
@@ -3042,8 +2661,7 @@ namespace AJADevices
 #ifdef PLATFORM_WINDOWS
                         m_card->WaitForOutputVerticalInterrupt(NTV2_CHANNEL1);
 #else
-                        AJA_CHECK(m_card->WaitForOutputVerticalInterrupt(
-                            NTV2_CHANNEL1));
+                        AJA_CHECK(m_card->WaitForOutputVerticalInterrupt(NTV2_CHANNEL1));
 #endif
                     }
                 }
@@ -3072,15 +2690,13 @@ namespace AJADevices
 
                     threadStop = m_threadStop;
                     lockDevice(false);
-                    AJA_CHECK(
-                        m_card->WaitForOutputVerticalInterrupt()); // XXX best
-                                                                   // guess
+                    AJA_CHECK(m_card->WaitForOutputVerticalInterrupt()); // XXX best
+                                                                         // guess
                 }
                 else if (bufferLevel >= m_ringBufferSize - 1)
                 {
-                    AJA_CHECK(
-                        m_card->WaitForOutputVerticalInterrupt()); // XXX best
-                                                                   // guess
+                    AJA_CHECK(m_card->WaitForOutputVerticalInterrupt()); // XXX best
+                                                                         // guess
                     wasPaused = false;
                     vi = nchannels - 1;
                     continue;
@@ -3133,14 +2749,11 @@ namespace AJADevices
                     // << endl;
                     //  this function is returning false all the time but its
                     //  working?
-                    t.SetVideoBuffer(f.mappedPointer ? (ULWord*)f.mappedPointer
-                                                     : (ULWord*)f.imageData,
-                                     m_bufferStride * m_height);
+                    t.SetVideoBuffer(f.mappedPointer ? (ULWord*)f.mappedPointer : (ULWord*)f.imageData, m_bufferStride * m_height);
 
                     if (!t.acVideoBuffer)
                     {
-                        cout << "ERROR: t.acVideoBuffer is " << t.acVideoBuffer
-                             << endl;
+                        cout << "ERROR: t.acVideoBuffer is " << t.acVideoBuffer << endl;
                         m_threadStop = true; // ???
                     }
 
@@ -3149,21 +2762,16 @@ namespace AJADevices
                         // may have to restart audio after a drop??
                         if (dropped)
                         {
-                            AJA_CHECK(m_card->WriteRegister(kRegAud1Control,
-                                                            0x80E00100));
+                            AJA_CHECK(m_card->WriteRegister(kRegAud1Control, 0x80E00100));
                             if (m_stereo)
-                                m_card->WriteRegister(kRegAud1Control,
-                                                      0x80C00100);
-                            AJA_CHECK(m_card->SetNumberAudioChannels(
-                                audioFormatChannelCountForCard(),
-                                NTV2AudioSystem(vc->channel)));
+                                m_card->WriteRegister(kRegAud1Control, 0x80C00100);
+                            AJA_CHECK(m_card->SetNumberAudioChannels(audioFormatChannelCountForCard(), NTV2AudioSystem(vc->channel)));
                         }
 
                         f.lockAudio("TRANSFER");
                         // t.acAudioBuffer     =
                         // (NTV2_POINTER)&(f.audioBuffer.front());
-                        t.SetAudioBuffer((ULWord*)&(f.audioBuffer.front()),
-                                         f.audioBuffer.size() * sizeof(int));
+                        t.SetAudioBuffer((ULWord*)&(f.audioBuffer.front()), f.audioBuffer.size() * sizeof(int));
                         // t.acAudioBufferSize = f.audioBuffer.size() *
                         // sizeof(int); t.acAudioStartSample = 0;
                         f.unlockAudio();
@@ -3179,16 +2787,11 @@ namespace AJADevices
                         {
                         case Y0CbY1Cr_8_422:
                             // cout << "SUB 8" << endl;
-                            subsample422_8bit_UYVY(
-                                m_width, m_height,
-                                (unsigned char*)
-                                    t.acVideoBuffer.GetHostPointer());
+                            subsample422_8bit_UYVY(m_width, m_height, (unsigned char*)t.acVideoBuffer.GetHostPointer());
                             break;
                         case YCrCb_AJA_10_422:
                             // cout << "SUB 10" << endl;
-                            subsample422_10bit(
-                                m_width, m_height,
-                                (uint32_t*)t.acVideoBuffer.GetHostPointer());
+                            subsample422_10bit(m_width, m_height, (uint32_t*)t.acVideoBuffer.GetHostPointer());
                             break;
                         default:
                             break;
@@ -3230,8 +2833,7 @@ namespace AJADevices
 
             if (!wrote)
             {
-                AJA_CHECK(m_card->WaitForOutputVerticalInterrupt(
-                    NTV2_CHANNEL1)); // XXX best guess
+                AJA_CHECK(m_card->WaitForOutputVerticalInterrupt(NTV2_CHANNEL1)); // XXX best guess
                 vi--;
             }
         }
@@ -3283,16 +2885,14 @@ namespace AJADevices
                     TWK_GLDEBUG;
                     glBindBuffer(GL_PIXEL_PACK_BUFFER_ARB, f.globject);
                     TWK_GLDEBUG;
-                    glBufferData(GL_PIXEL_PACK_BUFFER_ARB, m_bufferSizeInBytes,
-                                 NULL, GL_DYNAMIC_READ);
+                    glBufferData(GL_PIXEL_PACK_BUFFER_ARB, m_bufferSizeInBytes, NULL, GL_DYNAMIC_READ);
                     TWK_GLDEBUG;
                     glBindBuffer(GL_PIXEL_PACK_BUFFER_ARB, 0);
                     TWK_GLDEBUG;
 
                     if (m_immediateCopy)
                     {
-                        f.imageData = TWK_ALLOCATE_ARRAY_PAGE_ALIGNED(
-                            unsigned char, m_bufferSizeInBytes);
+                        f.imageData = TWK_ALLOCATE_ARRAY_PAGE_ALIGNED(unsigned char, m_bufferSizeInBytes);
                     }
 
                     f.state = FrameData::State::Ready;
@@ -3308,8 +2908,7 @@ namespace AJADevices
                 for (size_t i = 0; i < m_ringBufferSize; i++)
                 {
                     FrameData& f = vc->data[i];
-                    f.imageData = TWK_ALLOCATE_ARRAY_PAGE_ALIGNED(
-                        unsigned char, m_bufferSizeInBytes);
+                    f.imageData = TWK_ALLOCATE_ARRAY_PAGE_ALIGNED(unsigned char, m_bufferSizeInBytes);
                     f.state = FrameData::State::Ready;
                 }
             }
@@ -3325,11 +2924,7 @@ namespace AJADevices
         m_bound = true;
     }
 
-    void KonaVideoDevice::bind2(const GLVideoDevice* d,
-                                const GLVideoDevice* d2) const
-    {
-        bind(d);
-    }
+    void KonaVideoDevice::bind2(const GLVideoDevice* d, const GLVideoDevice* d2) const { bind(d); }
 
     bool KonaVideoDevice::isStereo() const { return m_stereo; }
 
@@ -3350,9 +2945,7 @@ namespace AJADevices
         fd.unlockState();
 
         return !starting && !paused
-               && (s == FrameData::State::Transfering
-                   || s == FrameData::State::Mapped
-                   || s == FrameData::State::Reading);
+               && (s == FrameData::State::Transfering || s == FrameData::State::Mapped || s == FrameData::State::Reading);
     }
 
     void KonaVideoDevice::unbind() const
@@ -3419,8 +3012,7 @@ namespace AJADevices
             {
                 FrameData& f = vc->data[i];
 
-                if (m_pbos && !m_immediateCopy
-                    && f.state == FrameData::State::Mapped)
+                if (m_pbos && !m_immediateCopy && f.state == FrameData::State::Mapped)
                 {
                     glBindBuffer(GL_PIXEL_PACK_BUFFER_ARB, f.globject);
                     TWK_GLDEBUG;
@@ -3463,8 +3055,7 @@ namespace AJADevices
                     maxTime = std::max(maxTime, t);
                 }
 
-                cout << "INFO: GPU: " << (accumTime / m_gpuTimes.size())
-                     << ", min=" << minTime << ", max=" << maxTime
+                cout << "INFO: GPU: " << (accumTime / m_gpuTimes.size()) << ", min=" << minTime << ", max=" << maxTime
                      << ", count=" << m_gpuTimes.size() << endl;
             }
 
@@ -3482,26 +3073,21 @@ namespace AJADevices
                     maxTime = std::max(maxTime, t);
                 }
 
-                cout << "INFO: KONA: " << (accumTime / m_konaTimes.size())
-                     << ", min=" << minTime << ", max=" << maxTime
+                cout << "INFO: KONA: " << (accumTime / m_konaTimes.size()) << ", min=" << minTime << ", max=" << maxTime
                      << ", count=" << m_konaTimes.size() << endl;
             }
 
             if (!m_gpuTimes.empty() && !m_konaTimes.empty())
             {
                 ostringstream filename;
-                filename << "twk_aja_profile_" << TwkUtil::processID()
-                         << ".csv";
+                filename << "twk_aja_profile_" << TwkUtil::processID() << ".csv";
                 ofstream file(filename.str().c_str());
 
                 file << "GPUStart,GPUDuration,NTV2Begin,NTV2Duration" << endl;
 
-                for (size_t i = 0,
-                            s = std::min(m_gpuTimes.size(), m_konaTimes.size());
-                     i < s; i++)
+                for (size_t i = 0, s = std::min(m_gpuTimes.size(), m_konaTimes.size()); i < s; i++)
                 {
-                    file << m_gpuBeginTime[i] << "," << m_gpuTimes[i] << ","
-                         << m_konaBeginTime[i] << "," << m_konaTimes[i] << endl;
+                    file << m_gpuBeginTime[i] << "," << m_gpuTimes[i] << "," << m_konaBeginTime[i] << "," << m_konaTimes[i] << endl;
                 }
             }
         }
@@ -3509,8 +3095,7 @@ namespace AJADevices
 
     void KonaVideoDevice::resetClock() const { VideoDevice::resetClock(); }
 
-    void KonaVideoDevice::transferChannelPBO(VideoChannel* vc,
-                                             const GLFBO* fbo) const
+    void KonaVideoDevice::transferChannelPBO(VideoChannel* vc, const GLFBO* fbo) const
     {
         HOP_CALL(glFinish();)
         HOP_PROF_FUNC();
@@ -3522,8 +3107,7 @@ namespace AJADevices
         //  m_readBufferIndex because only this thread is allowed to change
         //  it.
 
-        const size_t previousReadIndex =
-            (m_readBufferIndex + m_ringBufferSize - 1) % m_ringBufferSize;
+        const size_t previousReadIndex = (m_readBufferIndex + m_ringBufferSize - 1) % m_ringBufferSize;
 
         lockDevice(true, "PBO READER");
         lockDevice(false);
@@ -3539,8 +3123,7 @@ namespace AJADevices
 
             glBindBuffer(GL_PIXEL_PACK_BUFFER_ARB, fdprev.globject);
             TWK_GLDEBUG;
-            GLubyte* p = (GLubyte*)glMapBuffer(GL_PIXEL_PACK_BUFFER_ARB,
-                                               GL_READ_ONLY_ARB);
+            GLubyte* p = (GLubyte*)glMapBuffer(GL_PIXEL_PACK_BUFFER_ARB, GL_READ_ONLY_ARB);
             TWK_GLDEBUG;
 
             if (p)
@@ -3552,22 +3135,15 @@ namespace AJADevices
                         switch (m_actualDataFormat.iformat)
                         {
                         case Y0CbY1Cr_8_422:
-                            subsample422_8bit_UYVY_MP(
-                                m_width, m_height,
-                                reinterpret_cast<uint8_t*>(p),
-                                reinterpret_cast<uint8_t*>(fdprev.imageData));
+                            subsample422_8bit_UYVY_MP(m_width, m_height, reinterpret_cast<uint8_t*>(p),
+                                                      reinterpret_cast<uint8_t*>(fdprev.imageData));
                             break;
                         case YCrCb_AJA_10_422:
                         {
-                            const size_t srcStrideInBytes =
-                                m_width * sizeof(uint32_t);
-                            const size_t dstStrideInBytes =
-                                ROUNDUP(m_width, 24) * 4 * sizeof(uint32_t) / 6;
-                            subsample422_10bit_MP(
-                                m_width, m_height,
-                                reinterpret_cast<uint32_t*>(p),
-                                reinterpret_cast<uint32_t*>(fdprev.imageData),
-                                srcStrideInBytes, dstStrideInBytes);
+                            const size_t srcStrideInBytes = m_width * sizeof(uint32_t);
+                            const size_t dstStrideInBytes = ROUNDUP(m_width, 24) * 4 * sizeof(uint32_t) / 6;
+                            subsample422_10bit_MP(m_width, m_height, reinterpret_cast<uint32_t*>(p),
+                                                  reinterpret_cast<uint32_t*>(fdprev.imageData), srcStrideInBytes, dstStrideInBytes);
                         }
                         break;
                         default:
@@ -3660,8 +3236,7 @@ namespace AJADevices
                 fdread.unlockImage();
                 fdread.lockState("PBO READER WAIT");
                 transfer = fdread.state == FrameData::State::Transfering;
-                unmapit =
-                    fdread.state == FrameData::State::NeedsUnmap || transfer;
+                unmapit = fdread.state == FrameData::State::NeedsUnmap || transfer;
                 mapped = fdread.state == FrameData::State::Mapped;
                 fdread.unlockState();
 #ifndef PLATFORM_WINDOWS
@@ -3691,8 +3266,7 @@ namespace AJADevices
 
         startGPUTransfer();
 
-        glReadPixels(0, 0, m_width, m_height, m_textureFormat, m_textureType,
-                     0);
+        glReadPixels(0, 0, m_width, m_height, m_textureFormat, m_textureType, 0);
         TWK_GLDEBUG;
 
         glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
@@ -3700,8 +3274,7 @@ namespace AJADevices
         HOP_CALL(glFinish();)
     }
 
-    void KonaVideoDevice::transferChannelReadPixels(VideoChannel* vc,
-                                                    const GLFBO* fbo) const
+    void KonaVideoDevice::transferChannelReadPixels(VideoChannel* vc, const GLFBO* fbo) const
     {
         HOP_PROF_FUNC();
 
@@ -3719,8 +3292,7 @@ namespace AJADevices
 
         startGPUTransfer();
 
-        glReadPixels(0, 0, m_width, m_height, m_textureFormat, m_textureType,
-                     fdread.imageData);
+        glReadPixels(0, 0, m_width, m_height, m_textureFormat, m_textureType, fdread.imageData);
         TWK_GLDEBUG;
 
         endGPUTransfer();
@@ -3794,15 +3366,9 @@ namespace AJADevices
         return t;
     }
 
-    VideoDevice::Time KonaVideoDevice::deviceLatency() const
-    {
-        return double(m_bufferLevel) / Time(m_actualVideoFormat.hz);
-    }
+    VideoDevice::Time KonaVideoDevice::deviceLatency() const { return double(m_bufferLevel) / Time(m_actualVideoFormat.hz); }
 
-    size_t KonaVideoDevice::asyncMaxMappedBuffers() const
-    {
-        return m_ringBufferSize;
-    }
+    size_t KonaVideoDevice::asyncMaxMappedBuffers() const { return m_ringBufferSize; }
 
     VideoDevice::Time KonaVideoDevice::inputTime() const { return 0; }
 
@@ -3825,8 +3391,7 @@ namespace AJADevices
 
 #define TOTAL_AUDIO_FRAME_SIZE 5
 
-    void
-    KonaVideoDevice::audioFrameSizeSequence(AudioFrameSizeVector& fsizes) const
+    void KonaVideoDevice::audioFrameSizeSequence(AudioFrameSizeVector& fsizes) const
     {
         //
         //  The Kona SDK (and prob any SDK) will only produce 5 frame
@@ -3845,16 +3410,13 @@ namespace AJADevices
 
         for (size_t i = 0; i < TOTAL_AUDIO_FRAME_SIZE; i++)
         {
-            if (m_deviceHas96kAudio
-                && audioFormats[m_internalAudioFormat].hz == 96000)
+            if (m_deviceHas96kAudio && audioFormats[m_internalAudioFormat].hz == 96000)
             {
-                fsizes[i] =
-                    GetAudioSamplesPerFrame(frate, NTV2_AUDIO_96K, i, u372);
+                fsizes[i] = GetAudioSamplesPerFrame(frate, NTV2_AUDIO_96K, i, u372);
             }
             else
             {
-                fsizes[i] =
-                    GetAudioSamplesPerFrame(frate, NTV2_AUDIO_48K, i, u372);
+                fsizes[i] = GetAudioSamplesPerFrame(frate, NTV2_AUDIO_48K, i, u372);
             }
             m_audioFrameSizes[i] = fsizes[i];
         }
@@ -3902,17 +3464,13 @@ namespace AJADevices
         return 5;
     }
 
-    KonaVideoDevice::AudioFormat
-    KonaVideoDevice::audioFormatAtIndex(size_t index) const
+    KonaVideoDevice::AudioFormat KonaVideoDevice::audioFormatAtIndex(size_t index) const
     {
         const KonaAudioFormat& f = audioFormats[index];
         return AudioFormat(f.hz, f.prec, f.numChannels, f.layout, f.desc);
     }
 
-    size_t KonaVideoDevice::currentAudioFormat() const
-    {
-        return m_internalAudioFormat;
-    }
+    size_t KonaVideoDevice::currentAudioFormat() const { return m_internalAudioFormat; }
 
     void KonaVideoDevice::setAudioFormat(size_t i)
     {
@@ -3923,13 +3481,9 @@ namespace AJADevices
         m_audioFrameSizes.clear();
     }
 
-    size_t KonaVideoDevice::numVideoFormats() const
-    {
-        return m_konaVideoFormats.size();
-    }
+    size_t KonaVideoDevice::numVideoFormats() const { return m_konaVideoFormats.size(); }
 
-    KonaVideoDevice::VideoFormat
-    KonaVideoDevice::videoFormatAtIndex(size_t index) const
+    KonaVideoDevice::VideoFormat KonaVideoDevice::videoFormatAtIndex(size_t index) const
     {
         // cout << "videoFormatAtIndex: " << index << endl;
 
@@ -3950,10 +3504,7 @@ namespace AJADevices
         return VideoFormat(f.width, f.height, f.pa, 1.0f, f.hz, f.desc);
     }
 
-    size_t KonaVideoDevice::currentVideoFormat() const
-    {
-        return m_internalVideoFormat;
-    }
+    size_t KonaVideoDevice::currentVideoFormat() const { return m_internalVideoFormat; }
 
     void KonaVideoDevice::setVideoFormat(size_t i)
     {
@@ -3966,20 +3517,15 @@ namespace AJADevices
         m_audioFrameSizes.clear();
     }
 
-    size_t KonaVideoDevice::numDataFormats() const
-    {
-        return m_konaDataFormats.size();
-    }
+    size_t KonaVideoDevice::numDataFormats() const { return m_konaDataFormats.size(); }
 
-    KonaVideoDevice::DataFormat
-    KonaVideoDevice::dataFormatAtIndex(size_t i) const
+    KonaVideoDevice::DataFormat KonaVideoDevice::dataFormatAtIndex(size_t i) const
     {
         if (m_operationMode == OperationMode::SimpleMode)
         {
             if (!m_open)
                 const_cast<KonaVideoDevice*>(this)->queryCard();
-            return DataFormat(m_actualDataFormat.iformat,
-                              m_actualDataFormat.desc);
+            return DataFormat(m_actualDataFormat.iformat, m_actualDataFormat.desc);
         }
 
         if (i >= m_konaDataFormats.size())
@@ -3987,8 +3533,7 @@ namespace AJADevices
             return DataFormat();
         }
 
-        return DataFormat(m_konaDataFormats[i].iformat,
-                          m_konaDataFormats[i].desc);
+        return DataFormat(m_konaDataFormats[i].iformat, m_konaDataFormats[i].desc);
     }
 
     void KonaVideoDevice::setDataFormat(size_t i)
@@ -3998,10 +3543,7 @@ namespace AJADevices
         m_dataFormat = f.value;
     }
 
-    size_t KonaVideoDevice::currentDataFormat() const
-    {
-        return m_internalDataFormat;
-    }
+    size_t KonaVideoDevice::currentDataFormat() const { return m_internalDataFormat; }
 
     size_t KonaVideoDevice::numSyncModes() const { return 1; }
 
@@ -4018,18 +3560,11 @@ namespace AJADevices
         m_syncMode = m.value;
     }
 
-    size_t KonaVideoDevice::currentSyncMode() const
-    {
-        return m_internalSyncMode;
-    }
+    size_t KonaVideoDevice::currentSyncMode() const { return m_internalSyncMode; }
 
-    size_t KonaVideoDevice::numSyncSources() const
-    {
-        return m_syncMode > 0 ? 2 : 0;
-    }
+    size_t KonaVideoDevice::numSyncSources() const { return m_syncMode > 0 ? 2 : 0; }
 
-    KonaVideoDevice::SyncSource
-    KonaVideoDevice::syncSourceAtIndex(size_t i) const
+    KonaVideoDevice::SyncSource KonaVideoDevice::syncSourceAtIndex(size_t i) const
     {
         const KonaSyncSource& m = syncSources[i];
         return SyncSource(m.desc);
@@ -4042,23 +3577,18 @@ namespace AJADevices
         m_syncSource = m.value;
     }
 
-    size_t KonaVideoDevice::currentSyncSource() const
-    {
-        return m_internalSyncSource;
-    }
+    size_t KonaVideoDevice::currentSyncSource() const { return m_internalSyncSource; }
 
     size_t KonaVideoDevice::numVideo4KTransports() const
     {
         // Don't offer 4K transport choice if device doesn't support TSI
-        if (!::NTV2DeviceCanDo425Mux(m_deviceID)
-            && !::NTV2DeviceCanDo8KVideo(m_deviceID))
+        if (!::NTV2DeviceCanDo425Mux(m_deviceID) && !::NTV2DeviceCanDo8KVideo(m_deviceID))
             return 0;
 
         return sizeof(video4KTransports) / sizeof(video4KTransports[0]);
     }
 
-    KonaVideoDevice::Video4KTransport
-    KonaVideoDevice::video4KTransportAtIndex(size_t i) const
+    KonaVideoDevice::Video4KTransport KonaVideoDevice::video4KTransportAtIndex(size_t i) const
     {
         const KonaVideo4KTransport& m = video4KTransports[i];
         return Video4KTransport(m.desc);
@@ -4071,10 +3601,7 @@ namespace AJADevices
         m_video4KTransport = m.value;
     }
 
-    size_t KonaVideoDevice::currentVideo4KTransport() const
-    {
-        return m_internalVideo4KTransport;
-    }
+    size_t KonaVideoDevice::currentVideo4KTransport() const { return m_internalVideo4KTransport; }
 
     void KonaVideoDevice::transferAudio(void* data, size_t n) const
     {
@@ -4113,9 +3640,7 @@ namespace AJADevices
                 else
                 {
                     audioFrameSizeSequence(m_audioFrameSizes);
-                    buffer.resize(m_audioFrameSizes[m_frameCount
-                                                    % m_audioFrameSizes.size()]
-                                  * och);
+                    buffer.resize(m_audioFrameSizes[m_frameCount % m_audioFrameSizes.size()] * och);
                     memset(&buffer.front(), 0, buffer.size() * sizeof(int));
                 }
 
@@ -4136,16 +3661,14 @@ namespace AJADevices
                 buffer.resize(f0.audioBuffer.size());
                 if ((size_t)&buffer.front() & 0xf)
                     cout << "NOT ALIGNED" << endl;
-                copy(f0.audioBuffer.begin(), f0.audioBuffer.end(),
-                     buffer.begin());
+                copy(f0.audioBuffer.begin(), f0.audioBuffer.end(), buffer.begin());
             }
 
             f.unlockAudio();
         }
     }
 
-    unsigned int
-    KonaVideoDevice::channelsFromFormat(NTV2FrameBufferFormat f) const
+    unsigned int KonaVideoDevice::channelsFromFormat(NTV2FrameBufferFormat f) const
     {
         switch (f)
         {
@@ -4189,8 +3712,7 @@ namespace AJADevices
     // user via the TWK_AJA_HDMI_OUTPUT_BIT_DEPTH_OVERRIDE environment variable
     // or the hdmi-output-bit-depth-override video output option.
     //
-    NTV2HDMIBitDepth
-    KonaVideoDevice::getHDMIOutBitDepth(const NTV2FrameBufferFormat f) const
+    NTV2HDMIBitDepth KonaVideoDevice::getHDMIOutBitDepth(const NTV2FrameBufferFormat f) const
     {
         if (m_hdmiOutputBitDepthOverride != 0)
         {
@@ -4223,8 +3745,7 @@ namespace AJADevices
         return NTV2_HDMI8Bit;
     }
 
-    void KonaVideoDevice::showAutoCirculateState(NTV2AutoCirculateState state,
-                                                 int bufferLevel)
+    void KonaVideoDevice::showAutoCirculateState(NTV2AutoCirculateState state, int bufferLevel)
     {
         if (state != m_lastState && m_infoFeedback)
         {
@@ -4273,8 +3794,7 @@ namespace AJADevices
     void KonaVideoDevice::endGPUTransfer() const
     {
         if (m_profile)
-            m_gpuTimes.push_back(m_globalTimer.elapsed()
-                                 - m_gpuBeginTime.back());
+            m_gpuTimes.push_back(m_globalTimer.elapsed() - m_gpuBeginTime.back());
     }
 
     void KonaVideoDevice::startAJATransfer() const
@@ -4286,13 +3806,10 @@ namespace AJADevices
     void KonaVideoDevice::endAJATransfer() const
     {
         if (m_profile)
-            m_konaTimes.push_back(m_globalTimer.elapsed()
-                                  - m_konaBeginTime.back());
+            m_konaTimes.push_back(m_globalTimer.elapsed() - m_konaBeginTime.back());
     }
 
-    void KonaVideoDevice::packBufferCopy(unsigned char* src, size_t srcRowSize,
-                                         unsigned char* dst, size_t dstRowSize,
-                                         size_t rows)
+    void KonaVideoDevice::packBufferCopy(unsigned char* src, size_t srcRowSize, unsigned char* dst, size_t dstRowSize, size_t rows)
     {
         for (size_t row = 0; row < rows; row++)
         {
@@ -4395,20 +3912,17 @@ namespace AJADevices
 
         // maxFrameAverageLightLevel
         pos = data.find(",");
-        m_hdrMetadata.maxFrameAverageLightLevel =
-            atoi(data.substr(0, pos).c_str());
+        m_hdrMetadata.maxFrameAverageLightLevel = atoi(data.substr(0, pos).c_str());
         data.erase(0, pos + 1);
 
         // electroOpticalTransferFunction
         pos = data.find(",");
-        m_hdrMetadata.electroOpticalTransferFunction =
-            atoi(data.substr(0, pos).c_str());
+        m_hdrMetadata.electroOpticalTransferFunction = atoi(data.substr(0, pos).c_str());
         data.erase(0, pos + 1);
 
         // staticMetadataDescriptorID
         pos = data.find(",");
-        m_hdrMetadata.staticMetadataDescriptorID =
-            atoi(data.substr(0, pos).c_str());
+        m_hdrMetadata.staticMetadataDescriptorID = atoi(data.substr(0, pos).c_str());
     }
 
 } // namespace AJADevices

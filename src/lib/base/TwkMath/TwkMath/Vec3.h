@@ -185,46 +185,27 @@ namespace TwkMath
     typedef Vec3<half> Vec3h;
     typedef Vec3<double> Vec3d;
 
-    template <typename T>
-    inline const T& Vec3<T>::operator[](typename Vec3<T>::size_type index) const
+    template <typename T> inline const T& Vec3<T>::operator[](typename Vec3<T>::size_type index) const
     {
         assert(index >= 0 && index < 3);
         return ((const T*)this)[index];
     }
 
-    template <typename T>
-    inline T& Vec3<T>::operator[](typename Vec3<T>::size_type index)
+    template <typename T> inline T& Vec3<T>::operator[](typename Vec3<T>::size_type index)
     {
         assert(index >= 0 && index < 3);
         return ((T*)this)[index];
     }
 
-    template <typename T>
-    inline typename Vec3<T>::const_iterator Vec3<T>::begin() const
-    {
-        return static_cast<const_iterator>(&x);
-    }
+    template <typename T> inline typename Vec3<T>::const_iterator Vec3<T>::begin() const { return static_cast<const_iterator>(&x); }
 
-    template <typename T> inline typename Vec3<T>::iterator Vec3<T>::begin()
-    {
-        return static_cast<iterator>(&x);
-    }
+    template <typename T> inline typename Vec3<T>::iterator Vec3<T>::begin() { return static_cast<iterator>(&x); }
 
-    template <typename T>
-    inline typename Vec3<T>::const_iterator Vec3<T>::end() const
-    {
-        return static_cast<const_iterator>(&x + 3);
-    }
+    template <typename T> inline typename Vec3<T>::const_iterator Vec3<T>::end() const { return static_cast<const_iterator>(&x + 3); }
 
-    template <typename T> inline T Vec3<T>::magnitude() const
-    {
-        return Math<T>::sqrt((x * x) + (y * y) + (z * z));
-    }
+    template <typename T> inline T Vec3<T>::magnitude() const { return Math<T>::sqrt((x * x) + (y * y) + (z * z)); }
 
-    template <typename T> inline T Vec3<T>::magnitudeSquared() const
-    {
-        return (x * x) + (y * y) + (z * z);
-    }
+    template <typename T> inline T Vec3<T>::magnitudeSquared() const { return (x * x) + (y * y) + (z * z); }
 
     template <typename T> inline void Vec3<T>::normalize()
     {
@@ -254,9 +235,7 @@ namespace TwkMath
         }
     }
 
-    template <typename T>
-    template <typename S>
-    inline Vec3<T>& Vec3<T>::operator+=(const S& rhs)
+    template <typename T> template <typename S> inline Vec3<T>& Vec3<T>::operator+=(const S& rhs)
     {
         x += rhs;
         y += rhs;
@@ -264,9 +243,7 @@ namespace TwkMath
         return *this;
     }
 
-    template <typename T>
-    template <typename S>
-    inline Vec3<T>& Vec3<T>::operator+=(const Vec3<S>& rhs)
+    template <typename T> template <typename S> inline Vec3<T>& Vec3<T>::operator+=(const Vec3<S>& rhs)
     {
         x += rhs.x;
         y += rhs.y;
@@ -274,9 +251,7 @@ namespace TwkMath
         return *this;
     }
 
-    template <typename T>
-    template <typename S>
-    inline Vec3<T>& Vec3<T>::operator-=(const S& rhs)
+    template <typename T> template <typename S> inline Vec3<T>& Vec3<T>::operator-=(const S& rhs)
     {
         x -= rhs;
         y -= rhs;
@@ -284,9 +259,7 @@ namespace TwkMath
         return *this;
     }
 
-    template <typename T>
-    template <typename S>
-    inline Vec3<T>& Vec3<T>::operator-=(const Vec3<S>& rhs)
+    template <typename T> template <typename S> inline Vec3<T>& Vec3<T>::operator-=(const Vec3<S>& rhs)
     {
         x -= rhs.x;
         y -= rhs.y;
@@ -294,9 +267,7 @@ namespace TwkMath
         return *this;
     }
 
-    template <typename T>
-    template <typename S>
-    inline Vec3<T>& Vec3<T>::operator*=(const S& rhs)
+    template <typename T> template <typename S> inline Vec3<T>& Vec3<T>::operator*=(const S& rhs)
     {
         x *= rhs;
         y *= rhs;
@@ -304,9 +275,7 @@ namespace TwkMath
         return *this;
     }
 
-    template <typename T>
-    template <typename S>
-    inline Vec3<T>& Vec3<T>::operator*=(const Vec3<S>& rhs)
+    template <typename T> template <typename S> inline Vec3<T>& Vec3<T>::operator*=(const Vec3<S>& rhs)
     {
         x *= rhs.x;
         y *= rhs.y;
@@ -314,9 +283,7 @@ namespace TwkMath
         return *this;
     }
 
-    template <typename T>
-    template <typename S>
-    inline Vec3<T>& Vec3<T>::operator/=(const S& rhs)
+    template <typename T> template <typename S> inline Vec3<T>& Vec3<T>::operator/=(const S& rhs)
     {
         assert(rhs != (T)0);
         x /= rhs;
@@ -325,9 +292,7 @@ namespace TwkMath
         return *this;
     }
 
-    template <typename T>
-    template <typename S>
-    inline Vec3<T>& Vec3<T>::operator/=(const Vec3<S>& rhs)
+    template <typename T> template <typename S> inline Vec3<T>& Vec3<T>::operator/=(const Vec3<S>& rhs)
     {
         assert(rhs.x != (T)0);
         x /= rhs.x;
@@ -344,8 +309,7 @@ namespace TwkMath
 
     template <typename T> inline size_t majorComponent(const Vec3<T>& q)
     {
-        Vec3<T> v =
-            Vec3<T>(Math<T>::abs(q.x), Math<T>::abs(q.y), Math<T>::abs(q.z));
+        Vec3<T> v = Vec3<T>(Math<T>::abs(q.x), Math<T>::abs(q.y), Math<T>::abs(q.z));
         if (v.x > v.y)
         {
             return (v.x > v.z) ? 0 : 2;
@@ -358,8 +322,7 @@ namespace TwkMath
 
     template <typename T> inline size_t minorComponent(const Vec3<T>& q)
     {
-        Vec3<T> v =
-            Vec3<T>(Math<T>::abs(q.x), Math<T>::abs(q.y), Math<T>::abs(q.z));
+        Vec3<T> v = Vec3<T>(Math<T>::abs(q.x), Math<T>::abs(q.y), Math<T>::abs(q.z));
         if (v.x < v.y)
         {
             return (v.x < v.z) ? 0 : 2;
@@ -370,43 +333,24 @@ namespace TwkMath
         }
     }
 
-    template <typename T> inline T magnitude(const Vec3<T>& v)
-    {
-        return v.magnitude();
-    }
+    template <typename T> inline T magnitude(const Vec3<T>& v) { return v.magnitude(); }
 
-    template <typename T> inline T mag(const Vec3<T>& v)
-    {
-        return v.magnitude();
-    }
+    template <typename T> inline T mag(const Vec3<T>& v) { return v.magnitude(); }
 
-    template <typename T> inline T magnitudeSquared(const Vec3<T>& v)
-    {
-        return v.magnitudeSquared();
-    }
+    template <typename T> inline T magnitudeSquared(const Vec3<T>& v) { return v.magnitudeSquared(); }
 
-    template <typename T, typename S>
-    inline T dot(const Vec3<T>& a, const Vec3<S>& b)
-    {
-        return (a.x * b.x) + (a.y * b.y) + (a.z * b.z);
-    }
+    template <typename T, typename S> inline T dot(const Vec3<T>& a, const Vec3<S>& b) { return (a.x * b.x) + (a.y * b.y) + (a.z * b.z); }
 
-    template <typename T> inline Vec3<T> normalize(const Vec3<T>& v)
-    {
-        return v.normalized();
-    }
+    template <typename T> inline Vec3<T> normalize(const Vec3<T>& v) { return v.normalized(); }
 
-    template <typename T, typename S>
-    inline Vec3<T> cross(const Vec3<T>& a, const Vec3<S>& b)
+    template <typename T, typename S> inline Vec3<T> cross(const Vec3<T>& a, const Vec3<S>& b)
     {
-        return Vec3<T>((a.y * b.z) - (a.z * b.y), (a.z * b.x) - (a.x * b.z),
-                       (a.x * b.y) - (a.y * b.x));
+        return Vec3<T>((a.y * b.z) - (a.z * b.y), (a.z * b.x) - (a.x * b.z), (a.x * b.y) - (a.y * b.x));
     }
 
     // Absolute value of the angle between two vectors. Never more than PI,
     // never less than zero.
-    template <typename T, typename S>
-    inline T angleBetween(const Vec3<T>& a, const Vec3<S>& b)
+    template <typename T, typename S> inline T angleBetween(const Vec3<T>& a, const Vec3<S>& b)
     {
         const Vec3<T> an = normalize(a);
         const Vec3<S> bn = normalize(b);
@@ -426,78 +370,46 @@ namespace TwkMath
     // GLOBAL ARITHMETIC OPERATORS
 
     // ADDITION
-    template <typename T, typename S>
-    inline Vec3<T> operator+(const Vec3<T>& a, const S& b)
-    {
-        return Vec3<T>(a.x + b, a.y + b, a.z + b);
-    }
+    template <typename T, typename S> inline Vec3<T> operator+(const Vec3<T>& a, const S& b) { return Vec3<T>(a.x + b, a.y + b, a.z + b); }
 
-    template <typename T, typename S>
-    inline Vec3<T> operator+(const S& a, const Vec3<T>& b)
-    {
-        return Vec3<T>(a + b.x, a + b.y, a + b.z);
-    }
+    template <typename T, typename S> inline Vec3<T> operator+(const S& a, const Vec3<T>& b) { return Vec3<T>(a + b.x, a + b.y, a + b.z); }
 
-    template <typename T, typename S>
-    inline Vec3<T> operator+(const Vec3<T>& a, const Vec3<S>& b)
+    template <typename T, typename S> inline Vec3<T> operator+(const Vec3<T>& a, const Vec3<S>& b)
     {
         return Vec3<T>(a.x + b.x, a.y + b.y, a.z + b.z);
     }
 
     // NEGATION
-    template <typename T> inline Vec3<T> operator-(const Vec3<T>& a)
-    {
-        return Vec3<T>(-a.x, -a.y, -a.z);
-    }
+    template <typename T> inline Vec3<T> operator-(const Vec3<T>& a) { return Vec3<T>(-a.x, -a.y, -a.z); }
 
     // SUBTRACTION
-    template <typename T, typename S>
-    inline Vec3<T> operator-(const Vec3<T>& a, const S& b)
-    {
-        return Vec3<T>(a.x - b, a.y - b, a.z - b);
-    }
+    template <typename T, typename S> inline Vec3<T> operator-(const Vec3<T>& a, const S& b) { return Vec3<T>(a.x - b, a.y - b, a.z - b); }
 
-    template <typename T, typename S>
-    inline Vec3<T> operator-(const S& a, const Vec3<T>& b)
-    {
-        return Vec3<T>(a - b.x, a - b.y, a - b.z);
-    }
+    template <typename T, typename S> inline Vec3<T> operator-(const S& a, const Vec3<T>& b) { return Vec3<T>(a - b.x, a - b.y, a - b.z); }
 
-    template <typename T, typename S>
-    inline Vec3<T> operator-(const Vec3<T>& a, const Vec3<S>& b)
+    template <typename T, typename S> inline Vec3<T> operator-(const Vec3<T>& a, const Vec3<S>& b)
     {
         return Vec3<T>(a.x - b.x, a.y - b.y, a.z - b.z);
     }
 
     // MULTIPLICATION
-    template <typename T, typename S>
-    inline Vec3<T> operator*(const Vec3<T>& a, const S& b)
-    {
-        return Vec3<T>(a.x * b, a.y * b, a.z * b);
-    }
+    template <typename T, typename S> inline Vec3<T> operator*(const Vec3<T>& a, const S& b) { return Vec3<T>(a.x * b, a.y * b, a.z * b); }
 
-    template <typename T, typename S>
-    inline Vec3<T> operator*(const S& a, const Vec3<T>& b)
-    {
-        return Vec3<T>(a * b.x, a * b.y, a * b.z);
-    }
+    template <typename T, typename S> inline Vec3<T> operator*(const S& a, const Vec3<T>& b) { return Vec3<T>(a * b.x, a * b.y, a * b.z); }
 
-    template <typename T, typename S>
-    inline Vec3<T> operator*(const Vec3<T>& a, const Vec3<S>& b)
+    template <typename T, typename S> inline Vec3<T> operator*(const Vec3<T>& a, const Vec3<S>& b)
     {
         return Vec3<T>(a.x * b.x, a.y * b.y, a.z * b.z);
     }
 
     // DIVISION
-    template <typename T, typename S>
-    inline Vec3<T> operator/(const Vec3<T>& a, const S& b)
+    template <typename T, typename S> inline Vec3<T> operator/(const Vec3<T>& a, const S& b)
     {
         assert(b != (T)0);
         return Vec3<T>(a.x / b, a.y / b, a.z / b);
     }
 
-    template <typename T, typename S>
-    inline Vec3<T> operator/(const S& a, const Vec3<T>& b)
+    template <typename T, typename S> inline Vec3<T> operator/(const S& a, const Vec3<T>& b)
     {
         assert(b.x != (T)0);
         assert(b.y != (T)0);
@@ -505,8 +417,7 @@ namespace TwkMath
         return Vec3<T>(a / b.x, a / b.y, a / b.z);
     }
 
-    template <typename T, typename S>
-    inline Vec3<T> operator/(const Vec3<T>& a, const Vec3<S>& b)
+    template <typename T, typename S> inline Vec3<T> operator/(const Vec3<T>& a, const Vec3<S>& b)
     {
         assert(b.x != (T)0);
         assert(b.y != (T)0);
@@ -516,28 +427,20 @@ namespace TwkMath
 
     // COMPARISON OPERATORS
 
-    template <typename T, typename T2>
-    inline bool operator==(const Vec3<T>& a, const Vec3<T2>& b)
+    template <typename T, typename T2> inline bool operator==(const Vec3<T>& a, const Vec3<T2>& b)
     {
         return (a.x == b.x) && (a.y == b.y) && (a.z == b.z);
     }
 
-    template <typename T, typename T2>
-    inline bool operator!=(const Vec3<T>& a, const Vec3<T2>& b)
+    template <typename T, typename T2> inline bool operator!=(const Vec3<T>& a, const Vec3<T2>& b)
     {
         return (a.x != b.x) || (a.y != b.y) || (a.z != b.z);
     }
 
 #ifdef COMPILER_GCC2_96
-    inline bool operator==(const Vec3<float>& a, const Vec3<float>& b)
-    {
-        return (a.x == b.x) && (a.y == b.y) && (a.z == b.z);
-    }
+    inline bool operator==(const Vec3<float>& a, const Vec3<float>& b) { return (a.x == b.x) && (a.y == b.y) && (a.z == b.z); }
 
-    inline bool operator!=(const Vec3<float>& a, const Vec3<float>& b)
-    {
-        return (a.x != b.x) || (a.y != b.y) || (a.z != b.z);
-    }
+    inline bool operator!=(const Vec3<float>& a, const Vec3<float>& b) { return (a.x != b.x) || (a.y != b.y) || (a.z != b.z); }
 #endif
 
 } // End namespace TwkMath

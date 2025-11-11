@@ -51,19 +51,11 @@ extern "C"
                 int argc = newargs.size();
 
                 options_description desc("");
-                desc.add_options()("useChromaticities",
-                                   value<int>(&useChromaticities)
-                                       ->default_value(useChromaticities),
-                                   "Respect file chromaticities")(
-                    "format", value<string>(&format)->default_value(format),
-                    "")("ioMethod",
-                        value<int>(&ioMethod)->default_value(ioMethod),
-                        "I/O Method")(
-                    "ioSize", value<int>(&ioSize)->default_value(ioSize),
-                    "I/O Max async read size")(
-                    "ioMaxAsync",
-                    value<int>(&ioMaxAsync)->default_value(ioMaxAsync),
-                    "I/O Max ASync Requests");
+                desc.add_options()("useChromaticities", value<int>(&useChromaticities)->default_value(useChromaticities),
+                                   "Respect file chromaticities")("format", value<string>(&format)->default_value(format), "")(
+                    "ioMethod", value<int>(&ioMethod)->default_value(ioMethod),
+                    "I/O Method")("ioSize", value<int>(&ioSize)->default_value(ioSize), "I/O Max async read size")(
+                    "ioMaxAsync", value<int>(&ioMaxAsync)->default_value(ioMaxAsync), "I/O Max ASync Requests");
 
                 variables_map vm;
                 store(parse_command_line(argc, argv, desc), vm);
@@ -80,9 +72,7 @@ extern "C"
             }
         }
 
-        return new IOdpx(format, useChromaticities,
-                         (StreamingFrameBufferIO::IOType)ioMethod, ioSize,
-                         ioMaxAsync);
+        return new IOdpx(format, useChromaticities, (StreamingFrameBufferIO::IOType)ioMethod, ioSize, ioMaxAsync);
     }
 
     void destroy(IOdpx* plug) { delete plug; }

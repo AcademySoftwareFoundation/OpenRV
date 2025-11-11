@@ -15,9 +15,7 @@ namespace IPCore
     class ColorLinearToSRGBIPNode : public IPNode
     {
     public:
-        ColorLinearToSRGBIPNode(const std::string& name,
-                                const NodeDefinition* def, IPGraph* graph,
-                                GroupIPNode* group = 0);
+        ColorLinearToSRGBIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group = 0);
 
         virtual ~ColorLinearToSRGBIPNode();
 

@@ -29,8 +29,7 @@ namespace Rv
     public:
         typedef std::map<int32_t, size_t> IOModeMap;
 
-        CGDesktopVideoDevice(TwkApp::VideoModule*, const std::string& name,
-                             CGDirectDisplayID cgScreen, int qtScreen,
+        CGDesktopVideoDevice(TwkApp::VideoModule*, const std::string& name, CGDirectDisplayID cgScreen, int qtScreen,
                              const QTGLVideoDevice* share);
 
         virtual ~CGDesktopVideoDevice();
@@ -66,9 +65,7 @@ namespace Rv
         void createFormats();
 
     public:
-        static std::vector<VideoDevice*>
-        createDesktopVideoDevices(TwkApp::VideoModule* module,
-                                  const QTGLVideoDevice* shareDevice);
+        static std::vector<VideoDevice*> createDesktopVideoDevices(TwkApp::VideoModule* module, const QTGLVideoDevice* shareDevice);
 
     private:
         CGDirectDisplayID m_cgScreen;

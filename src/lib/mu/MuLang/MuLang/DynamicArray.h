@@ -37,10 +37,7 @@ namespace Mu
         //	The array type object which "owns" this dynamic array
         //
 
-        const DynamicArrayType* arrayType() const
-        {
-            return static_cast<const DynamicArrayType*>(type());
-        }
+        const DynamicArrayType* arrayType() const { return static_cast<const DynamicArrayType*>(type()); }
 
         const Type* elementType() const { return arrayType()->elementType(); }
 
@@ -54,10 +51,7 @@ namespace Mu
         //	These return the number of elements, not the size in bytes
         //
 
-        size_t size() const
-        {
-            return _dataSize / elementType()->machineRep()->size();
-        }
+        size_t size() const { return _dataSize / elementType()->machineRep()->size(); }
 
         size_t size(size_t dimension) const { return _sizes[dimension]; }
 
@@ -93,10 +87,7 @@ namespace Mu
 
         template <typename T> T* data() { return (T*)(_data); }
 
-        template <typename T> const T* data() const
-        {
-            return (const T*)(_data);
-        }
+        template <typename T> const T* data() const { return (const T*)(_data); }
 
         //
         //  STL-like access (using C pointers as iterators)
@@ -108,10 +99,7 @@ namespace Mu
 
         template <typename T> const T* begin() const { return data<T>(); }
 
-        template <typename T> const T* end() const
-        {
-            return begin<T>() + size();
-        }
+        template <typename T> const T* end() const { return begin<T>() + size(); }
 
         //
         //	Access to individual elements. You should access them in
@@ -120,28 +108,15 @@ namespace Mu
 
         template <typename T> T& element(size_t i) { return data<T>()[i]; }
 
-        template <typename T> T& element(size_t i, size_t j)
-        {
-            return data<T>()[i * size(0) + j];
-        }
+        template <typename T> T& element(size_t i, size_t j) { return data<T>()[i * size(0) + j]; }
 
-        template <typename T> T& element(size_t i, size_t j, size_t k)
-        {
-            return data<T>()[i * size(0) * size(1) + j * size(1) + k];
-        }
+        template <typename T> T& element(size_t i, size_t j, size_t k) { return data<T>()[i * size(0) * size(1) + j * size(1) + k]; }
 
-        template <typename T> const T& element(size_t i) const
-        {
-            return data<T>()[i];
-        }
+        template <typename T> const T& element(size_t i) const { return data<T>()[i]; }
 
-        template <typename T> const T& element(size_t i, size_t j) const
-        {
-            return data<T>()[i * size(0) + j];
-        }
+        template <typename T> const T& element(size_t i, size_t j) const { return data<T>()[i * size(0) + j]; }
 
-        template <typename T>
-        const T& element(size_t i, size_t j, size_t k) const
+        template <typename T> const T& element(size_t i, size_t j, size_t k) const
         {
             return data<T>()[i * size(0) * size(1) + j * size(1) + k];
         }
@@ -150,10 +125,7 @@ namespace Mu
         //	For references to elements, you can use these
         //
 
-        byte* elementPointer(int i)
-        {
-            return &_data[i * arrayType()->elementRep()->size()];
-        }
+        byte* elementPointer(int i) { return &_data[i * arrayType()->elementRep()->size()]; }
 
         byte* elementPointer(int i, int j)
         {
@@ -167,10 +139,7 @@ namespace Mu
             return &_data[s * (i * size(0) * size(1) + j * size(1) + k)];
         }
 
-        const byte* elementPointer(int i) const
-        {
-            return &_data[i * arrayType()->elementRep()->size()];
-        }
+        const byte* elementPointer(int i) const { return &_data[i * arrayType()->elementRep()->size()]; }
 
         const byte* elementPointer(int i, int j) const
         {

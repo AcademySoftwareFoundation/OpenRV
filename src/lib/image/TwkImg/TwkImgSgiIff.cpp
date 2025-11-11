@@ -182,8 +182,7 @@ namespace TwkImg
     }
 
     //******************************************************************************
-    void SgiIffBase::readPixelsRLE(Img4uc& img, SgiIffBase::Header& header,
-                                   std::istream& stream)
+    void SgiIffBase::readPixelsRLE(Img4uc& img, SgiIffBase::Header& header, std::istream& stream)
     {
         // Scanlines in RGB images are separated by channels,
         // so that each channel is completely stored before the
@@ -265,8 +264,7 @@ namespace TwkImg
                     {
                         // Copy "count" bytes from scanline
                         // into our buffer
-                        for (unsigned char xc = 0; xc < count;
-                             xc++, dstPtr += sizeof(Col4uc), srcPtr++)
+                        for (unsigned char xc = 0; xc < count; xc++, dstPtr += sizeof(Col4uc), srcPtr++)
                         {
                             *dstPtr = *srcPtr;
                         }
@@ -275,8 +273,7 @@ namespace TwkImg
                     {
                         unsigned char chanVal = *srcPtr;
                         srcPtr++;
-                        for (unsigned char xc = 0; xc < count;
-                             xc++, dstPtr += sizeof(Col4uc))
+                        for (unsigned char xc = 0; xc < count; xc++, dstPtr += sizeof(Col4uc))
                         {
                             *dstPtr = chanVal;
                         }
@@ -312,8 +309,7 @@ namespace TwkImg
     }
 
     //******************************************************************************
-    void SgiIffBase::readPixels(Img4uc& img, SgiIffBase::Header& header,
-                                std::istream& stream)
+    void SgiIffBase::readPixels(Img4uc& img, SgiIffBase::Header& header, std::istream& stream)
     {
         // Allocate a scanline
         unsigned char* scanline = new unsigned char[header.width];
@@ -331,8 +327,7 @@ namespace TwkImg
                 unsigned char* srcPtr = scanline;
                 Col4uc* dstPtrPixel = img.begin() + (row * header.width);
                 unsigned char* dstPtr = c + (unsigned char*)dstPtrPixel;
-                for (int col = 0; col < header.width;
-                     col++, srcPtr++, dstPtr += sizeof(Col4uc))
+                for (int col = 0; col < header.width; col++, srcPtr++, dstPtr += sizeof(Col4uc))
                 {
                     *dstPtr = *srcPtr;
                 }
@@ -362,8 +357,7 @@ namespace TwkImg
     }
 
     //******************************************************************************
-    void SgiIffBase::writePixels(const Img4uc& img, SgiIffBase::Header& header,
-                                 std::ostream& stream)
+    void SgiIffBase::writePixels(const Img4uc& img, SgiIffBase::Header& header, std::ostream& stream)
     {
         // Allocate a scanline
         unsigned char* scanline = new unsigned char[header.width];
@@ -378,8 +372,7 @@ namespace TwkImg
                 unsigned char* dstPtr = scanline;
                 const Col4uc* srcPtrPixel = img.begin() + (row * header.width);
                 unsigned char* srcPtr = c + (unsigned char*)srcPtrPixel;
-                for (int col = 0; col < header.width;
-                     col++, dstPtr++, srcPtr += sizeof(Col4uc))
+                for (int col = 0; col < header.width; col++, dstPtr++, srcPtr += sizeof(Col4uc))
                 {
                     *dstPtr = *srcPtr;
                 }
@@ -403,8 +396,7 @@ namespace TwkImg
     //******************************************************************************
     Img4uc* SgiIff4uc::read(const char* imgFileName)
     {
-        std::ifstream imgInputStream(UNICODE_C_STR(imgFileName),
-                                     BINARY_INPUT_FLAGS);
+        std::ifstream imgInputStream(UNICODE_C_STR(imgFileName), BINARY_INPUT_FLAGS);
 
         if (!imgInputStream)
         {
@@ -462,8 +454,7 @@ namespace TwkImg
     //******************************************************************************
     Img4f* SgiIff4f::read(const char* imgFileName)
     {
-        std::ifstream imgInputStream(UNICODE_C_STR(imgFileName),
-                                     BINARY_INPUT_FLAGS);
+        std::ifstream imgInputStream(UNICODE_C_STR(imgFileName), BINARY_INPUT_FLAGS);
 
         if (!imgInputStream)
         {
@@ -550,8 +541,7 @@ namespace TwkImg
     {
         assert(img != NULL);
 
-        std::ofstream imgOutputStream(UNICODE_C_STR(imgFileName),
-                                      BINARY_OUTPUT_FLAGS);
+        std::ofstream imgOutputStream(UNICODE_C_STR(imgFileName), BINARY_OUTPUT_FLAGS);
 
         if (!imgOutputStream)
         {
@@ -583,14 +573,10 @@ namespace TwkImg
         Col4uc* const dstEnd = dstPixel + img4uc.numPixels();
         for (; dstPixel < dstEnd; ++srcPixel, ++dstPixel)
         {
-            (*dstPixel).x =
-                (unsigned char)(std::clamp((*srcPixel).x, 0.0f, 1.0f) * 255.0f);
-            (*dstPixel).y =
-                (unsigned char)(std::clamp((*srcPixel).y, 0.0f, 1.0f) * 255.0f);
-            (*dstPixel).z =
-                (unsigned char)(std::clamp((*srcPixel).z, 0.0f, 1.0f) * 255.0f);
-            (*dstPixel).w =
-                (unsigned char)(std::clamp((*srcPixel).w, 0.0f, 1.0f) * 255.0f);
+            (*dstPixel).x = (unsigned char)(std::clamp((*srcPixel).x, 0.0f, 1.0f) * 255.0f);
+            (*dstPixel).y = (unsigned char)(std::clamp((*srcPixel).y, 0.0f, 1.0f) * 255.0f);
+            (*dstPixel).z = (unsigned char)(std::clamp((*srcPixel).z, 0.0f, 1.0f) * 255.0f);
+            (*dstPixel).w = (unsigned char)(std::clamp((*srcPixel).w, 0.0f, 1.0f) * 255.0f);
         }
 
         // Now write pixels
@@ -602,8 +588,7 @@ namespace TwkImg
     {
         assert(img != NULL);
 
-        std::ofstream imgOutputStream(UNICODE_C_STR(imgFileName),
-                                      BINARY_OUTPUT_FLAGS);
+        std::ofstream imgOutputStream(UNICODE_C_STR(imgFileName), BINARY_OUTPUT_FLAGS);
 
         if (!imgOutputStream)
         {

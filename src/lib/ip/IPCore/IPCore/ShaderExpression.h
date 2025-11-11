@@ -28,19 +28,15 @@ namespace IPCore
         //  BoundSymbol objects.
         //
 
-        typedef std::vector<BoundSymbol*,
-                            stl_ext::replacement_allocator<BoundSymbol*>>
-            ArgumentVector;
+        typedef std::vector<BoundSymbol*, stl_ext::replacement_allocator<BoundSymbol*>> ArgumentVector;
 
         class Expression
         {
         public:
             static void* operator new(size_t s);
             static void operator delete(void* p, size_t s);
-            Expression(const Function* F, const ArgumentVector& args,
-                       const IPImage* image = 0);
-            Expression(const Function* F, const ArgumentVector& args,
-                       const std::string& graphID);
+            Expression(const Function* F, const ArgumentVector& args, const IPImage* image = 0);
+            Expression(const Function* F, const ArgumentVector& args, const std::string& graphID);
             ~Expression();
 
             Expression* copy() const;
@@ -69,8 +65,7 @@ namespace IPCore
 
         typedef std::vector<Expression*> ExpressionVector;
 
-        typedef stl_ext::replacement_allocator<const TwkFB::FrameBuffer*>
-            FBAlloc;
+        typedef stl_ext::replacement_allocator<const TwkFB::FrameBuffer*> FBAlloc;
         typedef std::vector<const TwkFB::FrameBuffer*, FBAlloc> FBVector;
 
     } // namespace Shader

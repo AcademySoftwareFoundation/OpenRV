@@ -56,9 +56,7 @@ namespace LUT
         // read data
         //
 
-        if (!Read3DLUTData(file, lut.dimensions[0], lut.dimensions[1],
-                           lut.dimensions[2], FLOAT_DEPTH, false, NO_PADDING,
-                           lut.data))
+        if (!Read3DLUTData(file, lut.dimensions[0], lut.dimensions[1], lut.dimensions[2], FLOAT_DEPTH, false, NO_PADDING, lut.data))
         {
             TWK_THROW_EXC_STREAM("data parsing error " << filename);
         }

@@ -36,16 +36,13 @@ namespace TwkAudio
         return true;
     }
 
-    bool ChannelsVector::identical(const ChannelsVector& a,
-                                   const ChannelsVector& b) const
+    bool ChannelsVector::identical(const ChannelsVector& a, const ChannelsVector& b) const
     {
         const size_t asize = a.size();
         const size_t bsize = b.size();
         if (asize != bsize)
             return false;
-        return (memcmp(&a.front(), &b.front(), asize * sizeof(Channels))
-                    ? false
-                    : true);
+        return (memcmp(&a.front(), &b.front(), asize * sizeof(Channels)) ? false : true);
     }
 
     std::string formatString(Format f)
@@ -702,8 +699,7 @@ namespace TwkAudio
             break;
         case UnknownLayout:
         default:
-            std::cout << "AUDIO: channels format unsupported: Layout="
-                      << (int)layout << std::endl;
+            std::cout << "AUDIO: channels format unsupported: Layout=" << (int)layout << std::endl;
             count = 0;
             break;
         }
@@ -1409,8 +1405,7 @@ namespace TwkAudio
         return chv;
     }
 
-    void initChannelsMap(const ChannelsVector& a, const ChannelsVector& b,
-                         ChannelsMap& chmap)
+    void initChannelsMap(const ChannelsVector& a, const ChannelsVector& b, ChannelsMap& chmap)
     {
         chmap.clear();
 
@@ -1589,8 +1584,7 @@ namespace TwkAudio
                 float normalizeFactor = 0.0f;
                 for (int ach = 0; ach < a.size(); ach++)
                 {
-                    normalizeFactor += LEFT_CHANNEL_WEIGHT(a[ach])
-                                       + RIGHT_CHANNEL_WEIGHT(a[ach]);
+                    normalizeFactor += LEFT_CHANNEL_WEIGHT(a[ach]) + RIGHT_CHANNEL_WEIGHT(a[ach]);
                 }
 
                 for (int ach = 0; ach < a.size(); ach++)
@@ -1629,16 +1623,14 @@ namespace TwkAudio
 
                     for (int ach = 0; ach < a.size(); ach++)
                     {
-                        if ((a[ach] == FrontLeft)
-                            && mixFrontCenter.lefts.empty())
+                        if ((a[ach] == FrontLeft) && mixFrontCenter.lefts.empty())
                         {
                             ChannelState state;
                             state.index = ach;
                             state.weight = 1.0f;
                             mixFrontCenter.lefts.push_back(state);
                         }
-                        else if ((a[ach] == FrontRight)
-                                 && mixFrontCenter.rights.empty())
+                        else if ((a[ach] == FrontRight) && mixFrontCenter.rights.empty())
                         {
                             ChannelState state;
                             state.index = ach;
@@ -1692,9 +1684,7 @@ namespace TwkAudio
 
                     if (!foundMatch)
                     {
-                        if ((b[bch] == FrontCenter)
-                            && (mixFrontCenter.lefts.size() == 1)
-                            && (mixFrontCenter.rights.size() == 1))
+                        if ((b[bch] == FrontCenter) && (mixFrontCenter.lefts.size() == 1) && (mixFrontCenter.rights.size() == 1))
                         {
                             //
                             // We define an unmatched output FrontCenter channel

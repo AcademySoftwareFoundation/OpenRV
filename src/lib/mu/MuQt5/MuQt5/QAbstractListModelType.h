@@ -39,8 +39,7 @@ namespace Mu
         //  Constructors
         //
 
-        QAbstractListModelType(Context* context, const char* name,
-                               Class* superClass = 0, Class* superClass2 = 0);
+        QAbstractListModelType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QAbstractListModelType();
 
@@ -63,48 +62,31 @@ namespace Mu
     {
     public:
         virtual ~MuQt_QAbstractListModel();
-        MuQt_QAbstractListModel(Pointer muobj, const CallEnvironment*,
-                                QObject* parent);
-        virtual bool dropMimeData(const QMimeData* data, Qt::DropAction action,
-                                  int row, int column,
-                                  const QModelIndex& parent);
+        MuQt_QAbstractListModel(Pointer muobj, const CallEnvironment*, QObject* parent);
+        virtual bool dropMimeData(const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& parent);
         virtual Qt::ItemFlags flags(const QModelIndex& index) const;
-        virtual QModelIndex index(int row, int column,
-                                  const QModelIndex& parent) const;
-        virtual QModelIndex sibling(int row, int column,
-                                    const QModelIndex& idx) const;
+        virtual QModelIndex index(int row, int column, const QModelIndex& parent) const;
+        virtual QModelIndex sibling(int row, int column, const QModelIndex& idx) const;
         virtual QModelIndex buddy(const QModelIndex& index) const;
-        virtual bool canDropMimeData(const QMimeData* data,
-                                     Qt::DropAction action, int row, int column,
-                                     const QModelIndex& parent) const;
+        virtual bool canDropMimeData(const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& parent) const;
         virtual bool canFetchMore(const QModelIndex& parent) const;
         virtual QVariant data(const QModelIndex& index, int role) const;
         virtual void fetchMore(const QModelIndex& parent);
-        virtual QVariant headerData(int section, Qt::Orientation orientation,
-                                    int role) const;
-        virtual bool insertColumns(int column, int count,
-                                   const QModelIndex& parent);
+        virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const;
+        virtual bool insertColumns(int column, int count, const QModelIndex& parent);
         virtual bool insertRows(int row, int count, const QModelIndex& parent);
-        virtual QModelIndexList match(const QModelIndex& start, int role,
-                                      const QVariant& value, int hits,
-                                      Qt::MatchFlags flags) const;
+        virtual QModelIndexList match(const QModelIndex& start, int role, const QVariant& value, int hits, Qt::MatchFlags flags) const;
         virtual QMimeData* mimeData(const QModelIndexList& indexes) const;
         virtual QStringList mimeTypes() const;
-        virtual bool moveColumns(const QModelIndex& sourceParent,
-                                 int sourceColumn, int count,
-                                 const QModelIndex& destinationParent,
+        virtual bool moveColumns(const QModelIndex& sourceParent, int sourceColumn, int count, const QModelIndex& destinationParent,
                                  int destinationChild);
-        virtual bool moveRows(const QModelIndex& sourceParent, int sourceRow,
-                              int count, const QModelIndex& destinationParent,
+        virtual bool moveRows(const QModelIndex& sourceParent, int sourceRow, int count, const QModelIndex& destinationParent,
                               int destinationChild);
-        virtual bool removeColumns(int column, int count,
-                                   const QModelIndex& parent);
+        virtual bool removeColumns(int column, int count, const QModelIndex& parent);
         virtual bool removeRows(int row, int count, const QModelIndex& parent);
         virtual int rowCount(const QModelIndex& parent) const;
-        virtual bool setData(const QModelIndex& index, const QVariant& value,
-                             int role);
-        virtual bool setHeaderData(int section, Qt::Orientation orientation,
-                                   const QVariant& value, int role);
+        virtual bool setData(const QModelIndex& index, const QVariant& value, int role);
+        virtual bool setHeaderData(int section, Qt::Orientation orientation, const QVariant& value, int role);
         virtual void sort(int column, Qt::SortOrder order);
         virtual QSize span(const QModelIndex& index) const;
         virtual Qt::DropActions supportedDragActions() const;
@@ -116,11 +98,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance* QAbstractListModelType::cachedInstance(
-        const QAbstractListModelType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QAbstractListModelType::cachedInstance(const QAbstractListModelType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

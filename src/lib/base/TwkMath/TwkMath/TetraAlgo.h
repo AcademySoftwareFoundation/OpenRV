@@ -18,21 +18,14 @@
 namespace TwkMath
 {
 
-    template <typename T>
-    inline T volumeOfTetra(const Vec3<T>& va, const Vec3<T>& vb,
-                           const Vec3<T>& vc, const Vec3<T>& vd)
+    template <typename T> inline T volumeOfTetra(const Vec3<T>& va, const Vec3<T>& vb, const Vec3<T>& vc, const Vec3<T>& vd)
     {
-        return Math<T>::abs(areaOfTriangle(va, vb, vc)
-                            * elevation(va, vb, vc, vd) / T(3));
+        return Math<T>::abs(areaOfTriangle(va, vb, vc) * elevation(va, vb, vc, vd) / T(3));
     }
 
-    template <typename T>
-    inline bool insideTetra(const Vec3<T>& a, const Vec3<T>& b,
-                            const Vec3<T>& c, const Vec3<T>& d,
-                            const Vec3<T>& p)
+    template <typename T> inline bool insideTetra(const Vec3<T>& a, const Vec3<T>& b, const Vec3<T>& c, const Vec3<T>& d, const Vec3<T>& p)
     {
-        return (elevation(d, c, b, p) <= T(0) && elevation(c, d, a, p) <= T(0)
-                && elevation(b, a, d, p) <= T(0)
+        return (elevation(d, c, b, p) <= T(0) && elevation(c, d, a, p) <= T(0) && elevation(b, a, d, p) <= T(0)
                 && elevation(a, b, c, p) <= T(0));
     }
 
@@ -46,9 +39,7 @@ namespace TwkMath
     //
 
     template <typename T, class RANDGEN>
-    Vec3<T> randomPointInTetra(const Vec3<T>& v0, const Vec3<T>& v1,
-                               const Vec3<T>& v2, const Vec3<T>& v3,
-                               RANDGEN& randGen)
+    Vec3<T> randomPointInTetra(const Vec3<T>& v0, const Vec3<T>& v1, const Vec3<T>& v2, const Vec3<T>& v3, RANDGEN& randGen)
     {
         T s = (T)(randGen.nextFloat());
         T t = (T)(randGen.nextFloat());
@@ -79,8 +70,7 @@ namespace TwkMath
 
         // Return
         // Vec3<T> ret = v0*a + v1*s + v2*t + v3*u;
-        Vec3<T> ret =
-            v0 + ((T)0.999) * (s * (v1 - v0) + t * (v2 - v0) + u * (v3 - v0));
+        Vec3<T> ret = v0 + ((T)0.999) * (s * (v1 - v0) + t * (v2 - v0) + u * (v3 - v0));
 
         // CJH: too restrictive. Roundoff error tends
         // to make this fail, even for valid points.

@@ -12,8 +12,7 @@
 namespace LUT
 {
 
-    void readShakeLUT(const std::string& filename, const std::string& type,
-                      LUTData& data);
+    void readShakeLUT(const std::string& filename, const std::string& type, LUTData& data);
 
 } // namespace LUT
 

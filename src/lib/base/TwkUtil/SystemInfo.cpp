@@ -60,18 +60,13 @@ namespace TwkUtil
             vm_statistics_data_t vminfo;
             int n = HOST_VM_INFO_COUNT;
 
-            if (host_statistics(mach_host_self(), HOST_VM_INFO,
-                                (host_info_t)&vminfo,
-                                (mach_msg_type_number_t*)&n)
-                != KERN_SUCCESS)
+            if (host_statistics(mach_host_self(), HOST_VM_INFO, (host_info_t)&vminfo, (mach_msg_type_number_t*)&n) != KERN_SUCCESS)
             {
                 throw SystemCallFailedException();
             }
             else
             {
-                m_useableMemory = (vminfo.free_count + vminfo.active_count
-                                   + vminfo.inactive_count)
-                                  * static_cast<size_t>(PAGE_SIZE);
+                m_useableMemory = (vminfo.free_count + vminfo.active_count + vminfo.inactive_count) * static_cast<size_t>(PAGE_SIZE);
             }
         }
 
@@ -83,8 +78,7 @@ namespace TwkUtil
         host_basic_info_data_t info;
         mach_msg_type_number_t count = HOST_BASIC_INFO_COUNT;
 
-        kern_return_t kr = host_info(mach_host_self(), HOST_BASIC_INFO,
-                                     (host_info_t)&info, &count);
+        kern_return_t kr = host_info(mach_host_self(), HOST_BASIC_INFO, (host_info_t)&info, &count);
 
         if (kr != KERN_SUCCESS)
         {
@@ -102,13 +96,10 @@ namespace TwkUtil
     // Note: The following code was imported from Flame
     // (creative-finishing/common/src/base/osal/src/CoSystem_MACOSX.cpp)
     //
-    bool SystemInfo::getSystemMemoryInfo(size_t* physTotal, size_t* physFree,
-                                         size_t* physUsed, size_t* physInactive,
-                                         size_t* physCached, size_t* swapTotal,
-                                         size_t* swapFree, size_t* swapUsed)
+    bool SystemInfo::getSystemMemoryInfo(size_t* physTotal, size_t* physFree, size_t* physUsed, size_t* physInactive, size_t* physCached,
+                                         size_t* swapTotal, size_t* swapFree, size_t* swapUsed)
     {
-        bool ok = (physTotal || physFree || physUsed || physInactive
-                   || physCached || swapTotal || swapFree || swapUsed);
+        bool ok = (physTotal || physFree || physUsed || physInactive || physCached || swapTotal || swapFree || swapUsed);
 
         size_t tmpPhysTotal = 0;
         size_t tmpPhysFree = 0;
@@ -193,14 +184,11 @@ namespace TwkUtil
 
                 vm_statistics64_data_t vm_stat;
                 mach_msg_type_number_t count = HOST_VM_INFO64_COUNT;
-                kern_return_t kr = host_statistics64(
-                    port, HOST_VM_INFO64,
-                    reinterpret_cast<host_info64_t>(&vm_stat), &count);
+                kern_return_t kr = host_statistics64(port, HOST_VM_INFO64, reinterpret_cast<host_info64_t>(&vm_stat), &count);
 
                 if (kr == KERN_SUCCESS)
                 {
-                    tmpPhysFree = (vm_stat.free_count + vm_stat.inactive_count)
-                                  * pageSize;
+                    tmpPhysFree = (vm_stat.free_count + vm_stat.inactive_count) * pageSize;
                     // Correspond approximately to active_count + wire_count +
                     // compressor_page_count.
                     tmpPhysUsed = tmpPhysTotal - tmpPhysFree;
@@ -293,8 +281,7 @@ namespace TwkUtil
                 cerr << "WARNING: could not open /proc/meminfo, assuming 2Gb "
                         "of memory"
                      << endl;
-                m_useableMemory =
-                    size_t(2) * size_t(1024) * size_t(1024) * size_t(1024);
+                m_useableMemory = size_t(2) * size_t(1024) * size_t(1024) * size_t(1024);
                 return m_useableMemory;
             }
 
@@ -328,8 +315,7 @@ namespace TwkUtil
 
         if (!cpuinfo)
         {
-            cerr << "WARNING: could not open /proc/cpuinfo, assuming 1 CPU"
-                 << endl;
+            cerr << "WARNING: could not open /proc/cpuinfo, assuming 1 CPU" << endl;
             return 1;
         }
 
@@ -357,13 +343,10 @@ namespace TwkUtil
     // Note: The following code was imported from Flame
     // (creative-finishing/common/src/base/osal/src/CoSystem_linux.cpp)
     //
-    bool SystemInfo::getSystemMemoryInfo(size_t* physTotal, size_t* physFree,
-                                         size_t* physUsed, size_t* physInactive,
-                                         size_t* physCached, size_t* swapTotal,
-                                         size_t* swapFree, size_t* swapUsed)
+    bool SystemInfo::getSystemMemoryInfo(size_t* physTotal, size_t* physFree, size_t* physUsed, size_t* physInactive, size_t* physCached,
+                                         size_t* swapTotal, size_t* swapFree, size_t* swapUsed)
     {
-        bool ok = (physTotal || physFree || physUsed || physInactive
-                   || physCached || swapTotal || swapFree || swapUsed);
+        bool ok = (physTotal || physFree || physUsed || physInactive || physCached || swapTotal || swapFree || swapUsed);
 
         size_t tmpPhysTotal = 0;
         size_t tmpPhysFree = 0;
@@ -413,8 +396,7 @@ namespace TwkUtil
             if (physTotal || physUsed)
             {
                 size_t pageSize = static_cast<size_t>(sysconf(_SC_PAGE_SIZE));
-                tmpPhysTotal =
-                    static_cast<size_t>(sysconf(_SC_PHYS_PAGES) * pageSize);
+                tmpPhysTotal = static_cast<size_t>(sysconf(_SC_PHYS_PAGES) * pageSize);
             }
 
             // Get other memory amounts from /proc/meminfo.
@@ -427,8 +409,7 @@ namespace TwkUtil
                 const size_t bufsize = 4096;
                 char buf[bufsize + 1];
                 ssize_t len = 0;
-                while (((len = read(fd, buf, bufsize)) < 0)
-                       && (errno == EAGAIN || errno == EINTR))
+                while (((len = read(fd, buf, bufsize)) < 0) && (errno == EAGAIN || errno == EINTR))
                 {
                 }
                 close(fd);
@@ -462,10 +443,7 @@ namespace TwkUtil
                                 // it's not present on RH5.5 don't report an
                                 // error if not present.
                                 p = strstr(buf, "Inactive(anon):");
-                                if (p
-                                    && sscanf(p, "Inactive(anon): %zu kB\n",
-                                              &tmp)
-                                           == 1)
+                                if (p && sscanf(p, "Inactive(anon): %zu kB\n", &tmp) == 1)
                                 {
                                     tmpPhysInactive = tmp * 1024;
                                 }
@@ -593,18 +571,14 @@ namespace TwkUtil
 
     //------------------------------------------------------------------------------
     //
-    bool SystemInfo::getSystemMemoryInfo(size_t* physTotal, size_t* physFree,
-                                         size_t* physUsed, size_t* physInactive,
-                                         size_t* physCached, size_t* swapTotal,
-                                         size_t* swapFree, size_t* swapUsed)
+    bool SystemInfo::getSystemMemoryInfo(size_t* physTotal, size_t* physFree, size_t* physUsed, size_t* physInactive, size_t* physCached,
+                                         size_t* swapTotal, size_t* swapFree, size_t* swapUsed)
     {
-        bool ok = (physTotal || physFree || physUsed || physInactive
-                   || physCached || swapTotal || swapFree || swapUsed);
+        bool ok = (physTotal || physFree || physUsed || physInactive || physCached || swapTotal || swapFree || swapUsed);
 
         // Not all features are implemented on windows - add implementation as
         // needed
-        assert(
-            !(physInactive || physCached || swapTotal || swapFree || swapUsed));
+        assert(!(physInactive || physCached || swapTotal || swapFree || swapUsed));
 
         size_t tmpPhysTotal = 0;
         size_t tmpPhysFree = 0;

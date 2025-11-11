@@ -39,8 +39,7 @@ namespace Mu
         //  Constructors
         //
 
-        QColorDialogType(Context* context, const char* name,
-                         Class* superClass = 0, Class* superClass2 = 0);
+        QColorDialogType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QColorDialogType();
 
@@ -63,10 +62,8 @@ namespace Mu
     {
     public:
         virtual ~MuQt_QColorDialog();
-        MuQt_QColorDialog(Pointer muobj, const CallEnvironment*,
-                          QWidget* parent);
-        MuQt_QColorDialog(Pointer muobj, const CallEnvironment*,
-                          const QColor& initial, QWidget* parent);
+        MuQt_QColorDialog(Pointer muobj, const CallEnvironment*, QWidget* parent);
+        MuQt_QColorDialog(Pointer muobj, const CallEnvironment*, const QColor& initial, QWidget* parent);
         virtual void setVisible(bool visible);
 
     protected:
@@ -97,52 +94,31 @@ namespace Mu
 
         void closeEvent_pub(QCloseEvent* e) { closeEvent(e); }
 
-        void closeEvent_pub_parent(QCloseEvent* e)
-        {
-            QColorDialog::closeEvent(e);
-        }
+        void closeEvent_pub_parent(QCloseEvent* e) { QColorDialog::closeEvent(e); }
 
         void contextMenuEvent_pub(QContextMenuEvent* e) { contextMenuEvent(e); }
 
-        void contextMenuEvent_pub_parent(QContextMenuEvent* e)
-        {
-            QColorDialog::contextMenuEvent(e);
-        }
+        void contextMenuEvent_pub_parent(QContextMenuEvent* e) { QColorDialog::contextMenuEvent(e); }
 
         bool event_pub(QEvent* e) { return event(e); }
 
         bool event_pub_parent(QEvent* e) { return QColorDialog::event(e); }
 
-        bool eventFilter_pub(QObject* o, QEvent* e)
-        {
-            return eventFilter(o, e);
-        }
+        bool eventFilter_pub(QObject* o, QEvent* e) { return eventFilter(o, e); }
 
-        bool eventFilter_pub_parent(QObject* o, QEvent* e)
-        {
-            return QColorDialog::eventFilter(o, e);
-        }
+        bool eventFilter_pub_parent(QObject* o, QEvent* e) { return QColorDialog::eventFilter(o, e); }
 
         void keyPressEvent_pub(QKeyEvent* e) { keyPressEvent(e); }
 
-        void keyPressEvent_pub_parent(QKeyEvent* e)
-        {
-            QColorDialog::keyPressEvent(e);
-        }
+        void keyPressEvent_pub_parent(QKeyEvent* e) { QColorDialog::keyPressEvent(e); }
 
         void resizeEvent_pub(QResizeEvent* _p15) { resizeEvent(_p15); }
 
-        void resizeEvent_pub_parent(QResizeEvent* _p15)
-        {
-            QColorDialog::resizeEvent(_p15);
-        }
+        void resizeEvent_pub_parent(QResizeEvent* _p15) { QColorDialog::resizeEvent(_p15); }
 
         void showEvent_pub(QShowEvent* event) { showEvent(event); }
 
-        void showEvent_pub_parent(QShowEvent* event)
-        {
-            QColorDialog::showEvent(event);
-        }
+        void showEvent_pub_parent(QShowEvent* event) { QColorDialog::showEvent(event); }
 
     public:
         const QColorDialogType* _baseType;
@@ -150,11 +126,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance*
-    QColorDialogType::cachedInstance(const QColorDialogType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QColorDialogType::cachedInstance(const QColorDialogType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

@@ -46,20 +46,16 @@ namespace IPCore
 
         void renderedImages(RenderedImagesVector&) const;
 
-        void imageCornersByHash(const IPImage::HashValue, std::vector<Vec3f>&,
-                                bool stencil = true) const;
+        void imageCornersByHash(const IPImage::HashValue, std::vector<Vec3f>&, bool stencil = true) const;
 
-        void imageCornersForImage(const RenderedImage& image,
-                                  std::vector<Vec3f>& points,
-                                  bool stencil = true) const;
+        void imageCornersForImage(const RenderedImage& image, std::vector<Vec3f>& points, bool stencil = true) const;
 
         //
         //  Find source near last rendered image x and y are in screen
         //  space coordinates [-1,1]. This will not return intern
         //
 
-        void imagesByTag(RenderedImagesVector&,
-                         const std::string& tag = "") const;
+        void imagesByTag(RenderedImagesVector&, const std::string& tag = "") const;
 
         //
         //  Find transforms by name. The name can be anything leading up
@@ -69,10 +65,8 @@ namespace IPCore
         //  full name.
         //
 
-        void imageTransforms(const std::string& name, Matrix& modelMatrix,
-                             Matrix& projectionMatrix, Matrix& textureMatrix,
-                             Matrix& imageOrientation,
-                             Matrix& imagePlacement) const;
+        void imageTransforms(const std::string& name, Matrix& modelMatrix, Matrix& projectionMatrix, Matrix& textureMatrix,
+                             Matrix& imageOrientation, Matrix& imagePlacement) const;
 
         // Find frame-ratio by name. Name must match the exact source name.
 
@@ -84,20 +78,14 @@ namespace IPCore
         //  comment regarding the full source name.
         //
 
-        void imageCorners(const std::string& source, std::vector<Vec3f>& points,
-                          bool stencil = true) const;
+        void imageCorners(const std::string& source, std::vector<Vec3f>& points, bool stencil = true) const;
 
-        void imageCorners(int index, std::vector<Vec3f>& points,
-                          bool stencil = true) const;
+        void imageCorners(int index, std::vector<Vec3f>& points, bool stencil = true) const;
 
-        void imageCornersByTag(const std::string& name,
-                               const std::string& value,
-                               std::vector<Vec3f>& points,
-                               bool stencil = true) const;
+        void imageCornersByTag(const std::string& name, const std::string& value, std::vector<Vec3f>& points, bool stencil = true) const;
 
         // Deprecated
-        void imageCornersByHash(const std::string& source,
-                                std::vector<Vec3f>&) const;
+        void imageCornersByHash(const std::string& source, std::vector<Vec3f>&) const;
 
     private:
         const ImageRenderer* m_renderer;

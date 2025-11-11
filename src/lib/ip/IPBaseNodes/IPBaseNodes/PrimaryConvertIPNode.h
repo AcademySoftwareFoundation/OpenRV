@@ -23,8 +23,7 @@ namespace IPCore
     class PrimaryConvertIPNode : public IPNode
     {
     public:
-        PrimaryConvertIPNode(const std::string& name, const NodeDefinition* def,
-                             IPGraph* graph, GroupIPNode* group = 0);
+        PrimaryConvertIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group = 0);
 
         virtual ~PrimaryConvertIPNode();
         virtual IPImage* evaluate(const Context&);

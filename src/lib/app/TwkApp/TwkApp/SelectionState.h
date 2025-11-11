@@ -37,10 +37,8 @@ namespace TwkApp
         //  does not yet exist.
         //
 
-        Selection* selection(const std::string& name,
-                             bool createIfNotThere = true);
-        Selection* selection(const SelectionType*,
-                             bool createIfNotThere = true);
+        Selection* selection(const std::string& name, bool createIfNotThere = true);
+        Selection* selection(const SelectionType*, bool createIfNotThere = true);
         const Selection* selection(const std::string& name) const;
 
         //
@@ -55,8 +53,7 @@ namespace TwkApp
         //
 
         template <class T> T* selectionOfType(const std::string& name);
-        template <class T>
-        const T* selectionOfType(const std::string& name) const;
+        template <class T> const T* selectionOfType(const std::string& name) const;
 
         //
         //  All of the selection objects
@@ -72,14 +69,9 @@ namespace TwkApp
     //  Convenient member template
     //
 
-    template <class T>
-    T* SelectionState::selectionOfType(const std::string& name)
-    {
-        return dynamic_cast<T*>(selection(name));
-    }
+    template <class T> T* SelectionState::selectionOfType(const std::string& name) { return dynamic_cast<T*>(selection(name)); }
 
-    template <class T>
-    const T* SelectionState::selectionOfType(const std::string& name) const
+    template <class T> const T* SelectionState::selectionOfType(const std::string& name) const
     {
         return dynamic_cast<const T*>(selection(name));
     }

@@ -53,8 +53,8 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    Pointer qt_QPaintEvent_QPaintEvent_QPaintEvent_QPaintEvent_QRegion(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_paintRegion)
+    Pointer qt_QPaintEvent_QPaintEvent_QPaintEvent_QPaintEvent_QRegion(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                       Pointer param_paintRegion)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QRegion arg1 = getqtype<QRegionType>(param_paintRegion);
@@ -62,8 +62,7 @@ namespace Mu
         return param_this;
     }
 
-    Pointer qt_QPaintEvent_QPaintEvent_QPaintEvent_QPaintEvent_QRect(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_paintRect)
+    Pointer qt_QPaintEvent_QPaintEvent_QPaintEvent_QPaintEvent_QRect(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_paintRect)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QRect arg1 = getqtype<QRectType>(param_paintRect);
@@ -71,16 +70,14 @@ namespace Mu
         return param_this;
     }
 
-    Pointer qt_QPaintEvent_rect_QRect_QPaintEvent(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this)
+    Pointer qt_QPaintEvent_rect_QRect_QPaintEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QPaintEvent* arg0 = getqpointer<QPaintEventType>(param_this);
         return makeqtype<QRectType>(c, arg0->rect(), "qt.QRect");
     }
 
-    Pointer qt_QPaintEvent_region_QRegion_QPaintEvent(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    Pointer qt_QPaintEvent_region_QRegion_QPaintEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QPaintEvent* arg0 = getqpointer<QPaintEventType>(param_this);
@@ -89,26 +86,24 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(_n_QPaintEvent0, Pointer)
     {
-        NODE_RETURN(qt_QPaintEvent_QPaintEvent_QPaintEvent_QPaintEvent_QRegion(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(
+            qt_QPaintEvent_QPaintEvent_QPaintEvent_QPaintEvent_QRegion(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_QPaintEvent1, Pointer)
     {
-        NODE_RETURN(qt_QPaintEvent_QPaintEvent_QPaintEvent_QPaintEvent_QRect(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(
+            qt_QPaintEvent_QPaintEvent_QPaintEvent_QPaintEvent_QRect(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_rect0, Pointer)
     {
-        NODE_RETURN(qt_QPaintEvent_rect_QRect_QPaintEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QPaintEvent_rect_QRect_QPaintEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_region0, Pointer)
     {
-        NODE_RETURN(qt_QPaintEvent_region_QRegion_QPaintEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QPaintEvent_region_QRegion_QPaintEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     void QPaintEventType::load()
@@ -128,13 +123,11 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
                    new MemberVariable(c, "native", "qt.NativeObject"),
 
@@ -145,26 +138,16 @@ namespace Mu
         addSymbols(
             // enums
             // member functions
-            new Function(
-                c, "QPaintEvent", _n_QPaintEvent0, None, Compiled,
-                qt_QPaintEvent_QPaintEvent_QPaintEvent_QPaintEvent_QRegion,
-                Return, "qt.QPaintEvent", Parameters,
-                new Param(c, "this", "qt.QPaintEvent"),
-                new Param(c, "paintRegion", "qt.QRegion"), End),
-            new Function(
-                c, "QPaintEvent", _n_QPaintEvent1, None, Compiled,
-                qt_QPaintEvent_QPaintEvent_QPaintEvent_QPaintEvent_QRect,
-                Return, "qt.QPaintEvent", Parameters,
-                new Param(c, "this", "qt.QPaintEvent"),
-                new Param(c, "paintRect", "qt.QRect"), End),
-            new Function(c, "rect", _n_rect0, None, Compiled,
-                         qt_QPaintEvent_rect_QRect_QPaintEvent, Return,
-                         "qt.QRect", Parameters,
+            new Function(c, "QPaintEvent", _n_QPaintEvent0, None, Compiled, qt_QPaintEvent_QPaintEvent_QPaintEvent_QPaintEvent_QRegion,
+                         Return, "qt.QPaintEvent", Parameters, new Param(c, "this", "qt.QPaintEvent"),
+                         new Param(c, "paintRegion", "qt.QRegion"), End),
+            new Function(c, "QPaintEvent", _n_QPaintEvent1, None, Compiled, qt_QPaintEvent_QPaintEvent_QPaintEvent_QPaintEvent_QRect,
+                         Return, "qt.QPaintEvent", Parameters, new Param(c, "this", "qt.QPaintEvent"),
+                         new Param(c, "paintRect", "qt.QRect"), End),
+            new Function(c, "rect", _n_rect0, None, Compiled, qt_QPaintEvent_rect_QRect_QPaintEvent, Return, "qt.QRect", Parameters,
                          new Param(c, "this", "qt.QPaintEvent"), End),
-            new Function(c, "region", _n_region0, None, Compiled,
-                         qt_QPaintEvent_region_QRegion_QPaintEvent, Return,
-                         "qt.QRegion", Parameters,
-                         new Param(c, "this", "qt.QPaintEvent"), End),
+            new Function(c, "region", _n_region0, None, Compiled, qt_QPaintEvent_region_QRegion_QPaintEvent, Return, "qt.QRegion",
+                         Parameters, new Param(c, "this", "qt.QPaintEvent"), End),
             // static functions
             EndArguments);
         globalScope()->addSymbols(EndArguments);

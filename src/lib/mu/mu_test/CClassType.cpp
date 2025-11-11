@@ -46,17 +46,12 @@ namespace Mu
         Function::ArgKeyword End = Function::End;
 
         Function::Attributes None = Function::None;
-        Function::Attributes CommOp = Function::Mapped | Function::Commutative
-                                      | Function::Operator
-                                      | Function::NoSideEffects;
-        Function::Attributes Op =
-            Function::Mapped | Function::Operator | Function::NoSideEffects;
-        Function::Attributes Mapped =
-            Function::Mapped | Function::NoSideEffects;
+        Function::Attributes CommOp = Function::Mapped | Function::Commutative | Function::Operator | Function::NoSideEffects;
+        Function::Attributes Op = Function::Mapped | Function::Operator | Function::NoSideEffects;
+        Function::Attributes Mapped = Function::Mapped | Function::NoSideEffects;
         Function::Attributes Cast = Mapped | Function::Cast;
         Function::Attributes Lossy = Cast | Function::Lossy;
-        Function::Attributes AsOp =
-            Function::MemberOperator | Function::Operator;
+        Function::Attributes AsOp = Function::MemberOperator | Function::Operator;
         Function::ArgKeyword Parameters = Function::Parameters;
 
         Symbol* s = scope();
@@ -76,21 +71,17 @@ namespace Mu
 
         s->addSymbols(new ReferenceType(c, "c_class&", this),
 
-                      new Function(c, "c_class", CClassType::construct, None,
-                                   Return, tn, Args, "string", End),
+                      new Function(c, "c_class", CClassType::construct, None, Return, tn, Args, "string", End),
 
-                      new Function(c, "c_class", BaseFunctions::dereference,
-                                   Cast, Return, tn, Args, rn, End),
+                      new Function(c, "c_class", BaseFunctions::dereference, Cast, Return, tn, Args, rn, End),
 
                       EndArguments);
 
         globalScope()->addSymbols(
 
-            new Function(c, "print", CClassType::print, None, Return, "void",
-                         Args, tn, End),
+            new Function(c, "print", CClassType::print, None, Return, "void", Args, tn, End),
 
-            new Function(c, "=", BaseFunctions::assign, AsOp, Return, rn, Args,
-                         rn, tn, End),
+            new Function(c, "=", BaseFunctions::assign, AsOp, Return, rn, Args, rn, tn, End),
 
             EndArguments);
 
@@ -98,14 +89,11 @@ namespace Mu
 
         context->arrayType(this, 1, 0);
 
-        addSymbols(new MemberVariable(c, "parent", tn),
-                   new MemberVariable(c, "children", an),
+        addSymbols(new MemberVariable(c, "parent", tn), new MemberVariable(c, "children", an),
 
-                   new MemberFunction(c, "bar", CClassType::bar, None, Return,
-                                      "string", Args, tn, End),
+                   new MemberFunction(c, "bar", CClassType::bar, None, Return, "string", Args, tn, End),
 
-                   new MemberFunction(c, "baz", CClassType::baz, None, Return,
-                                      "string", Args, tn, End),
+                   new MemberFunction(c, "baz", CClassType::baz, None, Return, "string", Args, tn, End),
 
                    EndArguments);
     }
@@ -123,8 +111,7 @@ namespace Mu
 
         Layout* x = reinterpret_cast<Layout*>(o->structure());
         x->name = name;
-        x->children =
-            new DynamicArray((DynamicArrayType*)c->arrayType(type, 1, 0), 1);
+        x->children = new DynamicArray((DynamicArrayType*)c->arrayType(type, 1, 0), 1);
 
         NODE_RETURN(Pointer(o));
     }

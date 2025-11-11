@@ -34,12 +34,10 @@ namespace Mu
         typedef STLVector<const Class*>::Type ClassVector;
         typedef STLVector<InterfaceImp*>::Type InterfaceImps;
         typedef STLVector<size_t>::Type ClassOffsets;
-        typedef STLVector<InternalTypeMemberVariable*>::Type
-            TypeMemberVariableVector;
+        typedef STLVector<InternalTypeMemberVariable*>::Type TypeMemberVariableVector;
 
         Class(Context* context, const char* name, Class* superClass = 0);
-        Class(Context* context, const char* name,
-              const ClassVector& superClasses);
+        Class(Context* context, const char* name, const ClassVector& superClasses);
         virtual ~Class();
 
         //
@@ -59,10 +57,8 @@ namespace Mu
         virtual size_t objectSize() const;
         virtual void deleteObject(Object*) const;
 
-        virtual void outputValue(std::ostream&, const Value&,
-                                 bool full = false) const;
-        virtual void outputValueRecursive(std::ostream&, const ValuePointer,
-                                          ValueOutputState&) const;
+        virtual void outputValue(std::ostream&, const Value&, bool full = false) const;
+        virtual void outputValueRecursive(std::ostream&, const ValuePointer, ValueOutputState&) const;
         virtual void symbolDependancies(ConstSymbolVector&) const;
 
         virtual const Type* fieldType(size_t) const;
@@ -107,10 +103,7 @@ namespace Mu
 
         const ClassOffsets& superOffsets() const { return _superOffsets; }
 
-        const TypeMemberVariableVector& typeMembers() const
-        {
-            return _typeMembers;
-        }
+        const TypeMemberVariableVector& typeMembers() const { return _typeMembers; }
 
         //
         //	Determine if this class is derived class (ancestor) of another
@@ -132,8 +125,7 @@ namespace Mu
         //  May return a ClassInstance pointer inside the passed in object
         //
 
-        ClassInstance* dynamicCast(ClassInstance*, const Class*,
-                                   bool upcastOK) const;
+        ClassInstance* dynamicCast(ClassInstance*, const Class*, bool upcastOK) const;
 
         //
         //	Returns true if the types match.
@@ -155,10 +147,7 @@ namespace Mu
         //	Virtual function table for this class
         //
 
-        const MemberVariableVector& memberVariables() const
-        {
-            return _memberVariables;
-        }
+        const MemberVariableVector& memberVariables() const { return _memberVariables; }
 
         void allMemberVariables(MemberVariableVector&) const;
 
@@ -193,8 +182,7 @@ namespace Mu
         //  Find all functions that override the given member function.
         //
 
-        void findOverridingFunctions(const MemberFunction*,
-                                     MemberFunctionVector&) const;
+        void findOverridingFunctions(const MemberFunction*, MemberFunctionVector&) const;
 
     protected:
         //

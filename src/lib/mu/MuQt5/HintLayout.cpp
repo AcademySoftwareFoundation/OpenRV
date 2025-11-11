@@ -28,10 +28,7 @@ namespace Mu
 
     int HintLayout::count() const { return m_itemList.size(); }
 
-    QLayoutItem* HintLayout::itemAt(int index) const
-    {
-        return m_itemList.value(index);
-    }
+    QLayoutItem* HintLayout::itemAt(int index) const { return m_itemList.value(index); }
 
     QLayoutItem* HintLayout::takeAt(int index)
     {

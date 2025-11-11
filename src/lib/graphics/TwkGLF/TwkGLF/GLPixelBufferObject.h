@@ -25,8 +25,7 @@ namespace TwkGLF
         };
 
     public:
-        GLPixelBufferObject(PackDir dir, unsigned int num_bytes,
-                            unsigned int alignment = 1);
+        GLPixelBufferObject(PackDir dir, unsigned int num_bytes, unsigned int alignment = 1);
         virtual ~GLPixelBufferObject();
 
         void bind();

@@ -67,15 +67,9 @@ namespace Mu
 
         String functionTypeName() const;
 
-        const Type* argType(size_t i) const
-        {
-            return _types[i + 1].symbolOfType<Type>();
-        }
+        const Type* argType(size_t i) const { return _types[i + 1].symbolOfType<Type>(); }
 
-        const Type* returnType() const
-        {
-            return _types[0].symbolOfType<Type>();
-        }
+        const Type* returnType() const { return _types[0].symbolOfType<Type>(); }
 
     private:
         mutable Types _types;
@@ -85,10 +79,7 @@ namespace Mu
 
     struct SignatureTraits
     {
-        static bool equals(const Signature* a, const Signature* b)
-        {
-            return *a == *b;
-        }
+        static bool equals(const Signature* a, const Signature* b) { return *a == *b; }
 
         static unsigned long hash(const Signature*);
     };

@@ -58,10 +58,7 @@ namespace TwkApp
 
     Object* EventType::newObject() const { return new EventInstance(this); }
 
-    void EventType::deleteObject(Object* obj) const
-    {
-        delete static_cast<EventType::EventInstance*>(obj);
-    }
+    void EventType::deleteObject(Object* obj) const { delete static_cast<EventType::EventInstance*>(obj); }
 
     void EventType::outputValue(ostream& o, const Value& value, bool full) const
     {
@@ -69,8 +66,7 @@ namespace TwkApp
         outputValueRecursive(o, ValuePointer(&value._Pointer), state);
     }
 
-    void EventType::outputValueRecursive(ostream& o, const ValuePointer vp,
-                                         ValueOutputState& state) const
+    void EventType::outputValueRecursive(ostream& o, const ValuePointer vp, ValueOutputState& state) const
     {
         EventInstance* i = *reinterpret_cast<EventInstance**>(vp);
 
@@ -107,131 +103,92 @@ namespace TwkApp
 
         s->addSymbols(new ReferenceType(c, "Event&", this),
 
-                      new Function(c, "Event", BaseFunctions::dereference, Cast,
-                                   Return, tn, Args, rn, End),
+                      new Function(c, "Event", BaseFunctions::dereference, Cast, Return, tn, Args, rn, End),
 
                       EndArguments);
 
         globalScope()->addSymbols(
 
-            new Function(c, "print", EventType::print, None, Return, "void",
-                         Args, tn, End),
+            new Function(c, "print", EventType::print, None, Return, "void", Args, tn, End),
 
-            new Function(c, "=", BaseFunctions::assign, AsOp, Return, rn, Args,
-                         rn, tn, End),
+            new Function(c, "=", BaseFunctions::assign, AsOp, Return, rn, Args, rn, tn, End),
 
             EndArguments);
 
-        addSymbols(
-            new Function(c, "pointer", EventType::pointer, None, Return,
-                         "vector float[2]", Args, tn, End),
+        addSymbols(new Function(c, "pointer", EventType::pointer, None, Return, "vector float[2]", Args, tn, End),
 
-            new Function(c, "relativePointer", EventType::relativePointer, None,
-                         Return, "vector float[2]", Args, tn, End),
+                   new Function(c, "relativePointer", EventType::relativePointer, None, Return, "vector float[2]", Args, tn, End),
 
-            new Function(c, "reference", EventType::reference, None, Return,
-                         "vector float[2]", Args, tn, End),
+                   new Function(c, "reference", EventType::reference, None, Return, "vector float[2]", Args, tn, End),
 
-            new Function(c, "domain", EventType::domain, None, Return,
-                         "vector float[2]", Args, tn, End),
+                   new Function(c, "domain", EventType::domain, None, Return, "vector float[2]", Args, tn, End),
 
-            new Function(c, "subDomain", EventType::subDomain, None, Return,
-                         "vector float[2]", Args, tn, End),
+                   new Function(c, "subDomain", EventType::subDomain, None, Return, "vector float[2]", Args, tn, End),
 
-            new Function(c, "domainVerticalFlip", EventType::domainVerticalFlip,
-                         None, Return, "bool", Args, tn, End),
+                   new Function(c, "domainVerticalFlip", EventType::domainVerticalFlip, None, Return, "bool", Args, tn, End),
 
-            new Function(c, "buttons", EventType::buttons, None, Return, "int",
-                         Args, tn, End),
+                   new Function(c, "buttons", EventType::buttons, None, Return, "int", Args, tn, End),
 
-            new Function(c, "modifiers", EventType::modifiers, None, Return,
-                         "int", Args, tn, End),
+                   new Function(c, "modifiers", EventType::modifiers, None, Return, "int", Args, tn, End),
 
-            new Function(c, "key", EventType::key, None, Return, "int", Args,
-                         tn, End),
+                   new Function(c, "key", EventType::key, None, Return, "int", Args, tn, End),
 
-            new Function(c, "name", EventType::name, None, Return, "string",
-                         Args, tn, End),
+                   new Function(c, "name", EventType::name, None, Return, "string", Args, tn, End),
 
-            new Function(c, "contents", EventType::contents, None, Return,
-                         "string", Args, tn, End),
+                   new Function(c, "contents", EventType::contents, None, Return, "string", Args, tn, End),
 
-            new Function(c, "contentsArray", EventType::contentsArray, None,
-                         Return, "string[]", Args, tn, End),
+                   new Function(c, "contentsArray", EventType::contentsArray, None, Return, "string[]", Args, tn, End),
 
-            new Function(c, "returnContents", EventType::returnContents, None,
-                         Return, "string", Args, tn, End),
+                   new Function(c, "returnContents", EventType::returnContents, None, Return, "string", Args, tn, End),
 
-            new Function(c, "dataContents", EventType::dataContents, None,
-                         Return, "byte[]", Args, tn, End),
+                   new Function(c, "dataContents", EventType::dataContents, None, Return, "byte[]", Args, tn, End),
 
-            new Function(c, "sender", EventType::sender, None, Return, "string",
-                         Args, tn, End),
+                   new Function(c, "sender", EventType::sender, None, Return, "string", Args, tn, End),
 
-            new Function(c, "contentType", EventType::contentType, None, Return,
-                         "int", Args, tn, End),
+                   new Function(c, "contentType", EventType::contentType, None, Return, "int", Args, tn, End),
 
-            new Function(c, "contentMimeType", EventType::contentMimeType, None,
-                         Return, "string", Args, tn, End),
+                   new Function(c, "contentMimeType", EventType::contentMimeType, None, Return, "string", Args, tn, End),
 
-            new Function(c, "timeStamp", EventType::timeStamp, None, Return,
-                         "float", Args, tn, End),
+                   new Function(c, "timeStamp", EventType::timeStamp, None, Return, "float", Args, tn, End),
 
-            new Function(c, "reject", EventType::reject, None, Return, "void",
-                         Args, tn, End),
+                   new Function(c, "reject", EventType::reject, None, Return, "void", Args, tn, End),
 
-            new Function(c, "setReturnContent", EventType::setReturnContent,
-                         None, Return, "void", Args, tn, "string", End),
+                   new Function(c, "setReturnContent", EventType::setReturnContent, None, Return, "void", Args, tn, "string", End),
 
-            new Function(c, "pressure", EventType::pressure, None, Return,
-                         "float", Args, tn, End),
+                   new Function(c, "pressure", EventType::pressure, None, Return, "float", Args, tn, End),
 
-            new Function(c, "tangentialPressure", EventType::tangentialPressure,
-                         None, Return, "float", Args, tn, End),
+                   new Function(c, "tangentialPressure", EventType::tangentialPressure, None, Return, "float", Args, tn, End),
 
-            new Function(c, "rotation", EventType::rotation, None, Return,
-                         "float", Args, tn, End),
+                   new Function(c, "rotation", EventType::rotation, None, Return, "float", Args, tn, End),
 
-            new Function(c, "xTilt", EventType::xTilt, None, Return, "int",
-                         Args, tn, End),
+                   new Function(c, "xTilt", EventType::xTilt, None, Return, "int", Args, tn, End),
 
-            new Function(c, "yTilt", EventType::yTilt, None, Return, "int",
-                         Args, tn, End),
+                   new Function(c, "yTilt", EventType::yTilt, None, Return, "int", Args, tn, End),
 
-            new Function(c, "activationTime", EventType::activationTime, None,
-                         Return, "float", Args, tn, End),
+                   new Function(c, "activationTime", EventType::activationTime, None, Return, "float", Args, tn, End),
 
-            new SymbolicConstant(c, "None", "int", Value(int(0))),
-            new SymbolicConstant(c, "Shift", "int", Value(int(1 << 0))),
-            new SymbolicConstant(c, "Control", "int", Value(int(1 << 1))),
-            new SymbolicConstant(c, "Alt", "int", Value(int(1 << 2))),
-            new SymbolicConstant(c, "Meta", "int", Value(int(1 << 3))),
-            new SymbolicConstant(c, "Super", "int", Value(int(1 << 4))),
-            new SymbolicConstant(c, "CapLock", "int", Value(int(1 << 5))),
-            new SymbolicConstant(c, "NumLock", "int", Value(int(1 << 6))),
-            new SymbolicConstant(c, "ScrollLock", "int", Value(int(1 << 7))),
+                   new SymbolicConstant(c, "None", "int", Value(int(0))), new SymbolicConstant(c, "Shift", "int", Value(int(1 << 0))),
+                   new SymbolicConstant(c, "Control", "int", Value(int(1 << 1))), new SymbolicConstant(c, "Alt", "int", Value(int(1 << 2))),
+                   new SymbolicConstant(c, "Meta", "int", Value(int(1 << 3))), new SymbolicConstant(c, "Super", "int", Value(int(1 << 4))),
+                   new SymbolicConstant(c, "CapLock", "int", Value(int(1 << 5))),
+                   new SymbolicConstant(c, "NumLock", "int", Value(int(1 << 6))),
+                   new SymbolicConstant(c, "ScrollLock", "int", Value(int(1 << 7))),
 
-            new SymbolicConstant(c, "Button1", "int", Value(1 << 0)),
-            new SymbolicConstant(c, "Button2", "int", Value(1 << 1)),
-            new SymbolicConstant(c, "Button3", "int", Value(1 << 2)),
+                   new SymbolicConstant(c, "Button1", "int", Value(1 << 0)), new SymbolicConstant(c, "Button2", "int", Value(1 << 1)),
+                   new SymbolicConstant(c, "Button3", "int", Value(1 << 2)),
 
-            new SymbolicConstant(c, "UnknownObject", "int", Value(-1)),
-            new SymbolicConstant(c, "BadObject", "int", Value(0)),
-            new SymbolicConstant(c, "FileObject", "int", Value(1)),
-            new SymbolicConstant(c, "URLObject", "int", Value(2)),
-            new SymbolicConstant(c, "TextObject", "int", Value(3)),
+                   new SymbolicConstant(c, "UnknownObject", "int", Value(-1)), new SymbolicConstant(c, "BadObject", "int", Value(0)),
+                   new SymbolicConstant(c, "FileObject", "int", Value(1)), new SymbolicConstant(c, "URLObject", "int", Value(2)),
+                   new SymbolicConstant(c, "TextObject", "int", Value(3)),
 
-            EndArguments);
+                   EndArguments);
     }
 
-    static void throwBadArgumentException(const Mu::Node& node,
-                                          Mu::Thread& thread, std::string msg)
+    static void throwBadArgumentException(const Mu::Node& node, Mu::Thread& thread, std::string msg)
     {
         ostringstream str;
-        const Mu::MuLangContext* context =
-            static_cast<const Mu::MuLangContext*>(thread.context());
-        ExceptionType::Exception* e =
-            new ExceptionType::Exception(context->exceptionType());
+        const Mu::MuLangContext* context = static_cast<const Mu::MuLangContext*>(thread.context());
+        ExceptionType::Exception* e = new ExceptionType::Exception(context->exceptionType());
         str << "in " << node.symbol()->fullyQualifiedName() << ": " << msg;
         e->string() += str.str().c_str();
         thread.setException(e);
@@ -256,8 +213,7 @@ namespace TwkApp
     {
         Process* p = NODE_THREAD.process();
         EventInstance* i = NODE_ARG_OBJECT(0, EventInstance);
-        const StringType* stype =
-            static_cast<const Mu::StringType*>(NODE_THIS.type());
+        const StringType* stype = static_cast<const Mu::StringType*>(NODE_THIS.type());
 
         if (i)
         {
@@ -282,8 +238,7 @@ namespace TwkApp
 
         int rval = 0;
 
-        if (const DragDropEvent* de =
-                dynamic_cast<const DragDropEvent*>(i->event))
+        if (const DragDropEvent* de = dynamic_cast<const DragDropEvent*>(i->event))
         {
             switch (de->contentType())
             {
@@ -312,8 +267,7 @@ namespace TwkApp
     NODE_IMPLEMENTATION(EventType::contentMimeType, Pointer)
     {
         EventInstance* i = NODE_ARG_OBJECT(0, EventInstance);
-        const StringType* stype =
-            static_cast<const Mu::StringType*>(NODE_THIS.type());
+        const StringType* stype = static_cast<const Mu::StringType*>(NODE_THIS.type());
         String* s = 0;
 
         if (!i)
@@ -325,15 +279,13 @@ namespace TwkApp
         {
             s = stype->allocate(e->contentType());
         }
-        else if (const GenericStringEvent* e =
-                     dynamic_cast<const GenericStringEvent*>(i->event))
+        else if (const GenericStringEvent* e = dynamic_cast<const GenericStringEvent*>(i->event))
         {
             s = stype->allocate("text/plain");
         }
         else
         {
-            throwBadArgumentException(NODE_THIS, NODE_THREAD,
-                                      "mime type not applicable");
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "mime type not applicable");
         }
 
         NODE_RETURN(s);
@@ -349,23 +301,19 @@ namespace TwkApp
             throwBadArgumentException(NODE_THIS, NODE_THREAD, "nil argument");
         }
 
-        const StringType* stype =
-            static_cast<const Mu::StringType*>(NODE_THIS.type());
+        const StringType* stype = static_cast<const Mu::StringType*>(NODE_THIS.type());
 
         String* s = 0;
 
-        if (const DragDropEvent* de =
-                dynamic_cast<const DragDropEvent*>(i->event))
+        if (const DragDropEvent* de = dynamic_cast<const DragDropEvent*>(i->event))
         {
             s = stype->allocate(de->stringContent());
         }
-        else if (const GenericStringEvent* e =
-                     dynamic_cast<const GenericStringEvent*>(i->event))
+        else if (const GenericStringEvent* e = dynamic_cast<const GenericStringEvent*>(i->event))
         {
             s = stype->allocate(e->stringContent());
         }
-        else if (const RawDataEvent* e =
-                     dynamic_cast<const RawDataEvent*>(i->event))
+        else if (const RawDataEvent* e = dynamic_cast<const RawDataEvent*>(i->event))
         {
             if (e->utf8())
             {
@@ -373,12 +321,10 @@ namespace TwkApp
             }
             else
             {
-                throwBadArgumentException(NODE_THIS, NODE_THREAD,
-                                          "event not text");
+                throwBadArgumentException(NODE_THIS, NODE_THREAD, "event not text");
             }
         }
-        else if (const RenderEvent* re =
-                     dynamic_cast<const RenderEvent*>(i->event))
+        else if (const RenderEvent* re = dynamic_cast<const RenderEvent*>(i->event))
         {
             s = stype->allocate(re->stringContent());
         }
@@ -401,12 +347,10 @@ namespace TwkApp
             throwBadArgumentException(NODE_THIS, NODE_THREAD, "nil argument");
         }
 
-        const DynamicArrayType* atype =
-            static_cast<const Mu::DynamicArrayType*>(NODE_THIS.type());
+        const DynamicArrayType* atype = static_cast<const Mu::DynamicArrayType*>(NODE_THIS.type());
         DynamicArray* array = new DynamicArray(atype, 1);
 
-        if (const GenericStringEvent* e =
-                dynamic_cast<const GenericStringEvent*>(i->event))
+        if (const GenericStringEvent* e = dynamic_cast<const GenericStringEvent*>(i->event))
         {
             const Event::StringVector& v = e->stringContentVector();
             const size_t n = v.size();
@@ -414,8 +358,7 @@ namespace TwkApp
             if (n == 0)
             {
                 array->resize(1);
-                array->element<StringType::String*>(0) =
-                    c->stringType()->allocate(e->stringContent());
+                array->element<StringType::String*>(0) = c->stringType()->allocate(e->stringContent());
             }
             else
             {
@@ -423,8 +366,7 @@ namespace TwkApp
 
                 for (size_t q = 0; q < n; q++)
                 {
-                    array->element<StringType::String*>(q) =
-                        c->stringType()->allocate(v[q]);
+                    array->element<StringType::String*>(q) = c->stringType()->allocate(v[q]);
                 }
             }
         }
@@ -446,13 +388,11 @@ namespace TwkApp
             throwBadArgumentException(NODE_THIS, NODE_THREAD, "nil argument");
         }
 
-        const StringType* stype =
-            static_cast<const Mu::StringType*>(NODE_THIS.type());
+        const StringType* stype = static_cast<const Mu::StringType*>(NODE_THIS.type());
 
         String* s = 0;
 
-        if (const GenericStringEvent* e =
-                dynamic_cast<const GenericStringEvent*>(i->event))
+        if (const GenericStringEvent* e = dynamic_cast<const GenericStringEvent*>(i->event))
         {
             s = stype->allocate(e->returnContent());
         }
@@ -471,8 +411,7 @@ namespace TwkApp
             throwBadArgumentException(NODE_THIS, NODE_THREAD, "nil argument");
         }
 
-        if (const RawDataEvent* e =
-                dynamic_cast<const RawDataEvent*>(inst->event))
+        if (const RawDataEvent* e = dynamic_cast<const RawDataEvent*>(inst->event))
         {
             int sz = e->rawDataSize();
             array->resize(sz);
@@ -490,8 +429,7 @@ namespace TwkApp
     NODE_IMPLEMENTATION(EventType::interp, Pointer)
     {
         EventInstance* inst = NODE_ARG_OBJECT(0, EventInstance);
-        const StringType* stype =
-            static_cast<const Mu::StringType*>(NODE_THIS.type());
+        const StringType* stype = static_cast<const Mu::StringType*>(NODE_THIS.type());
         String* s = 0;
 
         if (!inst)
@@ -499,15 +437,13 @@ namespace TwkApp
             throwBadArgumentException(NODE_THIS, NODE_THREAD, "nil argument");
         }
 
-        if (const RawDataEvent* e =
-                dynamic_cast<const RawDataEvent*>(inst->event))
+        if (const RawDataEvent* e = dynamic_cast<const RawDataEvent*>(inst->event))
         {
             s = stype->allocate(e->contentType());
         }
         else
         {
-            throwBadArgumentException(NODE_THIS, NODE_THREAD,
-                                      "interp not applicable");
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "interp not applicable");
         }
 
         NODE_RETURN(s);
@@ -517,8 +453,7 @@ namespace TwkApp
     {
         Process* p = NODE_THREAD.process();
         EventInstance* i = NODE_ARG_OBJECT(0, EventInstance);
-        const StringType* stype =
-            static_cast<const Mu::StringType*>(NODE_THIS.type());
+        const StringType* stype = static_cast<const Mu::StringType*>(NODE_THIS.type());
 
         if (!i)
         {
@@ -527,13 +462,11 @@ namespace TwkApp
 
         String* s = 0;
 
-        if (const GenericStringEvent* e =
-                dynamic_cast<const GenericStringEvent*>(i->event))
+        if (const GenericStringEvent* e = dynamic_cast<const GenericStringEvent*>(i->event))
         {
             s = stype->allocate(e->senderName());
         }
-        else if (const RawDataEvent* e =
-                     dynamic_cast<const RawDataEvent*>(i->event))
+        else if (const RawDataEvent* e = dynamic_cast<const RawDataEvent*>(i->event))
         {
             s = stype->allocate(e->senderName());
         }
@@ -582,8 +515,7 @@ namespace TwkApp
             v[0] = te->gx();
             v[1] = te->gy();
         }
-        else if (const PointerEvent* pe =
-                     dynamic_cast<const PointerEvent*>(e->event))
+        else if (const PointerEvent* pe = dynamic_cast<const PointerEvent*>(e->event))
         {
             v[0] = pe->x();
             v[1] = pe->y();
@@ -616,8 +548,7 @@ namespace TwkApp
                 v[1] -= te->eventTable()->bbox().min.y;
             }
         }
-        else if (const PointerEvent* pe =
-                     dynamic_cast<const PointerEvent*>(e->event))
+        else if (const PointerEvent* pe = dynamic_cast<const PointerEvent*>(e->event))
         {
             v[0] = pe->x();
             v[1] = pe->y();
@@ -646,8 +577,7 @@ namespace TwkApp
             throwBadArgumentException(NODE_THIS, NODE_THREAD, "nil argument");
         }
 
-        if (const PointerEvent* pe =
-                dynamic_cast<const PointerEvent*>(e->event))
+        if (const PointerEvent* pe = dynamic_cast<const PointerEvent*>(e->event))
         {
             v[0] = pe->startX();
             v[1] = pe->startY();
@@ -670,14 +600,12 @@ namespace TwkApp
             throwBadArgumentException(NODE_THIS, NODE_THREAD, "nil argument");
         }
 
-        if (const PointerEvent* pe =
-                dynamic_cast<const PointerEvent*>(e->event))
+        if (const PointerEvent* pe = dynamic_cast<const PointerEvent*>(e->event))
         {
             v[0] = pe->w();
             v[1] = pe->h();
         }
-        else if (const RenderEvent* re =
-                     dynamic_cast<const RenderEvent*>(e->event))
+        else if (const RenderEvent* re = dynamic_cast<const RenderEvent*>(e->event))
         {
             v[0] = re->w();
             v[1] = re->h();
@@ -700,14 +628,12 @@ namespace TwkApp
             throwBadArgumentException(NODE_THIS, NODE_THREAD, "nil argument");
         }
 
-        if (const PointerEvent* pe =
-                dynamic_cast<const PointerEvent*>(e->event))
+        if (const PointerEvent* pe = dynamic_cast<const PointerEvent*>(e->event))
         {
             v[0] = pe->w();
             v[1] = pe->h();
         }
-        else if (const RenderEvent* re =
-                     dynamic_cast<const RenderEvent*>(e->event))
+        else if (const RenderEvent* re = dynamic_cast<const RenderEvent*>(e->event))
         {
             v[0] = re->w();
             v[1] = re->h();
@@ -733,24 +659,20 @@ namespace TwkApp
 
         if (e)
         {
-            if (const RenderEvent* re =
-                    dynamic_cast<const RenderEvent*>(e->event))
+            if (const RenderEvent* re = dynamic_cast<const RenderEvent*>(e->event))
             {
                 if (re->device())
                 {
-                    NODE_RETURN(re->device()->capabilities()
-                                & VideoDevice::FlippedImage);
+                    NODE_RETURN(re->device()->capabilities() & VideoDevice::FlippedImage);
                 }
                 else
                 {
-                    throwBadArgumentException(NODE_THIS, NODE_THREAD,
-                                              "RenderEvent has unset device");
+                    throwBadArgumentException(NODE_THIS, NODE_THREAD, "RenderEvent has unset device");
                 }
             }
             else
             {
-                throwBadArgumentException(NODE_THIS, NODE_THREAD,
-                                          "event is not a RenderEvent");
+                throwBadArgumentException(NODE_THIS, NODE_THREAD, "event is not a RenderEvent");
             }
         }
 
@@ -767,8 +689,7 @@ namespace TwkApp
             throwBadArgumentException(NODE_THIS, NODE_THREAD, "nil argument");
         }
 
-        if (const PointerEvent* pe =
-                dynamic_cast<const PointerEvent*>(e->event))
+        if (const PointerEvent* pe = dynamic_cast<const PointerEvent*>(e->event))
         {
             b = pe->buttonStates();
         }
@@ -790,8 +711,7 @@ namespace TwkApp
             throwBadArgumentException(NODE_THIS, NODE_THREAD, "nil argument");
         }
 
-        if (const ModifierEvent* pe =
-                dynamic_cast<const ModifierEvent*>(e->event))
+        if (const ModifierEvent* pe = dynamic_cast<const ModifierEvent*>(e->event))
         {
             b = pe->modifiers();
         }
@@ -832,13 +752,11 @@ namespace TwkApp
             throwBadArgumentException(NODE_THIS, NODE_THREAD, "nil argument");
         }
 
-        if (const GenericStringEvent* se =
-                dynamic_cast<const GenericStringEvent*>(e->event))
+        if (const GenericStringEvent* se = dynamic_cast<const GenericStringEvent*>(e->event))
         {
             se->setReturnContent(s->c_str());
         }
-        else if (const RawDataEvent* rde =
-                     dynamic_cast<const RawDataEvent*>(e->event))
+        else if (const RawDataEvent* rde = dynamic_cast<const RawDataEvent*>(e->event))
         {
             rde->setReturnContent(s->c_str());
         }
@@ -946,8 +864,7 @@ namespace TwkApp
             throwBadArgumentException(NODE_THIS, NODE_THREAD, "nil argument");
         }
 
-        if (const PointerButtonPressEvent* pe =
-                dynamic_cast<const PointerButtonPressEvent*>(e->event))
+        if (const PointerButtonPressEvent* pe = dynamic_cast<const PointerButtonPressEvent*>(e->event))
         {
             NODE_RETURN(float(pe->activationTime()));
         }

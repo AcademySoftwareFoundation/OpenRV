@@ -42,8 +42,7 @@ namespace Mu
         //  Constructors
         //
 
-        QWidgetActionType(Context* context, const char* name,
-                          Class* superClass = 0, Class* superClass2 = 0);
+        QWidgetActionType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QWidgetActionType();
 
@@ -66,8 +65,7 @@ namespace Mu
     {
     public:
         virtual ~MuQt_QWidgetAction();
-        MuQt_QWidgetAction(Pointer muobj, const CallEnvironment*,
-                           QObject* parent);
+        MuQt_QWidgetAction(Pointer muobj, const CallEnvironment*, QObject* parent);
 
     protected:
         virtual QWidget* createWidget(QWidget* parent);
@@ -76,39 +74,21 @@ namespace Mu
         virtual bool eventFilter(QObject* obj, QEvent* event);
 
     public:
-        QWidget* createWidget_pub(QWidget* parent)
-        {
-            return createWidget(parent);
-        }
+        QWidget* createWidget_pub(QWidget* parent) { return createWidget(parent); }
 
-        QWidget* createWidget_pub_parent(QWidget* parent)
-        {
-            return QWidgetAction::createWidget(parent);
-        }
+        QWidget* createWidget_pub_parent(QWidget* parent) { return QWidgetAction::createWidget(parent); }
 
         void deleteWidget_pub(QWidget* widget) { deleteWidget(widget); }
 
-        void deleteWidget_pub_parent(QWidget* widget)
-        {
-            QWidgetAction::deleteWidget(widget);
-        }
+        void deleteWidget_pub_parent(QWidget* widget) { QWidgetAction::deleteWidget(widget); }
 
         bool event_pub(QEvent* event_) { return event(event_); }
 
-        bool event_pub_parent(QEvent* event_)
-        {
-            return QWidgetAction::event(event_);
-        }
+        bool event_pub_parent(QEvent* event_) { return QWidgetAction::event(event_); }
 
-        bool eventFilter_pub(QObject* obj, QEvent* event)
-        {
-            return eventFilter(obj, event);
-        }
+        bool eventFilter_pub(QObject* obj, QEvent* event) { return eventFilter(obj, event); }
 
-        bool eventFilter_pub_parent(QObject* obj, QEvent* event)
-        {
-            return QWidgetAction::eventFilter(obj, event);
-        }
+        bool eventFilter_pub_parent(QObject* obj, QEvent* event) { return QWidgetAction::eventFilter(obj, event); }
 
     public:
         const QWidgetActionType* _baseType;
@@ -116,11 +96,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance*
-    QWidgetActionType::cachedInstance(const QWidgetActionType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QWidgetActionType::cachedInstance(const QWidgetActionType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

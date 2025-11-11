@@ -38,8 +38,7 @@ namespace IPCore
     //  RGB 3D LUT:             type == "RGBA", dimensions == 3
     //
 
-    LUTIPNode::LUTIPNode(const std::string& name, const NodeDefinition* def,
-                         IPGraph* g, GroupIPNode* group)
+    LUTIPNode::LUTIPNode(const std::string& name, const NodeDefinition* def, IPGraph* g, GroupIPNode* group)
         : IPNode(name, def, g, group)
         , m_lutfb(0)
         , m_lowlut3(0)
@@ -82,8 +81,7 @@ namespace IPCore
         m_lutPreLUT = declareProperty<FloatProperty>("lut.prelut");
         m_lutScale = declareProperty<FloatProperty>("lut.scale", 1.0);
         m_lutOffset = declareProperty<FloatProperty>("lut.offset", 0.0);
-        m_lutGamma =
-            declareProperty<FloatProperty>("lut.conditioningGamma", 1.0);
+        m_lutGamma = declareProperty<FloatProperty>("lut.conditioningGamma", 1.0);
         m_lutType = declareProperty<StringProperty>("lut.type", "Luminance");
         m_lutName = declareProperty<StringProperty>("lut.name", "");
         m_lutFile = declareProperty<StringProperty>("lut.file", "");
@@ -94,23 +92,18 @@ namespace IPCore
         (*m_lutSize)[2] = 0;
 
         m_lutActive = declareProperty<IntProperty>("lut.active", 0);
-        m_lutOutputSize =
-            declareProperty<IntProperty>("lut:output.size", 256, info);
-        m_lutOutputType = declareProperty<StringProperty>("lut:output.type",
-                                                          "Luminance", info);
+        m_lutOutputSize = declareProperty<IntProperty>("lut:output.size", 256, info);
+        m_lutOutputType = declareProperty<StringProperty>("lut:output.type", "Luminance", info);
 
         m_lutOutputLUT = declareProperty<FloatProperty>("lut:output.lut", info);
-        m_lutOutputPreLUT =
-            declareProperty<FloatProperty>("lut:output.prelut", info);
+        m_lutOutputPreLUT = declareProperty<FloatProperty>("lut:output.prelut", info);
 
-        m_matrixOutputRGBA =
-            createProperty<Mat44fProperty>("matrix:output.RGBA");
+        m_matrixOutputRGBA = createProperty<Mat44fProperty>("matrix:output.RGBA");
         m_matrixOutputRGBA->resize(1);
         m_matrixOutputRGBA->setInfo(info);
 
         int preLUTSize = def->intValue("defaults.preLUTSize", 2048);
-        m_lutPreLUTSize =
-            declareProperty<IntProperty>("lut.preLUTSize", preLUTSize, info);
+        m_lutPreLUTSize = declareProperty<IntProperty>("lut.preLUTSize", preLUTSize, info);
     }
 
     LUTIPNode::~LUTIPNode()
@@ -137,8 +130,7 @@ namespace IPCore
             updateProperties();
         }
 
-        if (property == m_lutLUT || property == m_lutPreLUT
-            || property == m_lutSize || property == m_lutInMatrix
+        if (property == m_lutLUT || property == m_lutPreLUT || property == m_lutSize || property == m_lutInMatrix
             || property == m_lutOutMatrix)
         {
             generateLUT();
@@ -181,8 +173,7 @@ namespace IPCore
             }
             if (!fileExists(filename.c_str()))
             {
-                TWK_THROW_STREAM(ReadFailedExc,
-                                 "Unable to read lut: '" << file << "'");
+                TWK_THROW_STREAM(ReadFailedExc, "Unable to read lut: '" << file << "'");
             }
 
             setProperty<StringProperty>(m_lutFile, filename);
@@ -193,16 +184,13 @@ namespace IPCore
             setProperty<FloatProperty>(m_lutGamma, lutdata->conditioningGamma);
 
             m_lutLUT->resize(lutdata->data.size());
-            std::copy(lutdata->data.begin(), lutdata->data.end(),
-                      m_lutLUT->begin());
+            std::copy(lutdata->data.begin(), lutdata->data.end(), m_lutLUT->begin());
 
             m_lutPreLUT->resize(lutdata->prelutData.size());
-            std::copy(lutdata->prelutData.begin(), lutdata->prelutData.end(),
-                      m_lutPreLUT->begin());
+            std::copy(lutdata->prelutData.begin(), lutdata->prelutData.end(), m_lutPreLUT->begin());
 
             m_lutSize->resize(lutdata->dimensions.size());
-            std::copy(lutdata->dimensions.begin(), lutdata->dimensions.end(),
-                      m_lutSize->begin());
+            std::copy(lutdata->dimensions.begin(), lutdata->dimensions.end(), m_lutSize->begin());
 
             if (m_lutSize->size() == 1)
             {
@@ -248,10 +236,9 @@ namespace IPCore
                 if (lutdata->dimensions.size() == 1 && !linear)
                 {
                     lutLib.erase(filename);
-                    TWK_THROW_EXC_STREAM(
-                        "can't handle non-linear prelut with a channel lut. "
-                        "Try baking the non-linear portion of the prelut "
-                        "into the channel lut");
+                    TWK_THROW_EXC_STREAM("can't handle non-linear prelut with a channel lut. "
+                                         "Try baking the non-linear portion of the prelut "
+                                         "into the channel lut");
                 }
             }
             else
@@ -259,8 +246,7 @@ namespace IPCore
                 static string lastMsg;
                 ostringstream msg;
 
-                msg << "INFO: re-using LUT data from '" << filename << "'"
-                    << endl;
+                msg << "INFO: re-using LUT data from '" << filename << "'" << endl;
                 if (msg.str() != lastMsg)
                 {
                     lastMsg = msg.str();
@@ -280,18 +266,14 @@ namespace IPCore
         }
         catch (...)
         {
-            cerr << "ERROR: uncaught exception in parseLUT(), LUT '" << filename
-                 << "'" << endl;
+            cerr << "ERROR: uncaught exception in parseLUT(), LUT '" << filename << "'" << endl;
             throw;
         }
 
         return lutdata;
     }
 
-    bool LUTIPNode::lutActive() const
-    {
-        return (propertyValue<IntProperty>(m_lutActive, 0) == 1);
-    }
+    bool LUTIPNode::lutActive() const { return (propertyValue<IntProperty>(m_lutActive, 0) == 1); }
 
     inline float lerp1DLUT(FloatProperty* lut, float range, size_t c, float v)
     {
@@ -381,8 +363,7 @@ namespace IPCore
 
         float rangev = maxv - minv;
 
-        FrameBuffer::DataType dataType =
-            out32 ? FrameBuffer::FLOAT : FrameBuffer::HALF;
+        FrameBuffer::DataType dataType = out32 ? FrameBuffer::FLOAT : FrameBuffer::HALF;
 
         if (!ImageRenderer::hasFloatFormats() && !m_floatOutLUT)
         {
@@ -398,17 +379,11 @@ namespace IPCore
             {
                 if (out32)
                 {
-                    m_lowlut3[i] =
-                        (unsigned short)(((*out32)[i] - minv) / rangev
-                                         * double(numeric_limits<
-                                                  unsigned short>::max()));
+                    m_lowlut3[i] = (unsigned short)(((*out32)[i] - minv) / rangev * double(numeric_limits<unsigned short>::max()));
                 }
                 else
                 {
-                    m_lowlut3[i] =
-                        (unsigned short)(((*out16)[i] - minv) / rangev
-                                         * double(numeric_limits<
-                                                  unsigned short>::max()));
+                    m_lowlut3[i] = (unsigned short)(((*out16)[i] - minv) / rangev * double(numeric_limits<unsigned short>::max()));
                 }
 
                 h += i * m_lowlut3[i];
@@ -424,11 +399,8 @@ namespace IPCore
         }
 
         m_lutfb =
-            new FrameBuffer(FrameBuffer::NormalizedCoordinates, (*sizes)[0],
-                            (*sizes)[1], (*sizes)[2], 3, dataType,
-                            m_lowlut3 ? (unsigned char*)m_lowlut3
-                                      : (unsigned char*)outProp->rawData(),
-                            0, FrameBuffer::BOTTOMLEFT, false);
+            new FrameBuffer(FrameBuffer::NormalizedCoordinates, (*sizes)[0], (*sizes)[1], (*sizes)[2], 3, dataType,
+                            m_lowlut3 ? (unsigned char*)m_lowlut3 : (unsigned char*)outProp->rawData(), 0, FrameBuffer::BOTTOMLEFT, false);
 
         m_lutfb->attribute<float>("scale") = scale->front();
         m_lutfb->attribute<float>("offset") = offset->front();
@@ -535,8 +507,7 @@ namespace IPCore
 
         float rangev = maxv - minv;
 
-        FrameBuffer::DataType dataType =
-            out32 ? FrameBuffer::FLOAT : FrameBuffer::HALF;
+        FrameBuffer::DataType dataType = out32 ? FrameBuffer::FLOAT : FrameBuffer::HALF;
         typedef unsigned short IType;
 
         if (!ImageRenderer::hasFloatFormats() && !m_floatOutLUT)
@@ -580,11 +551,8 @@ namespace IPCore
             offset->front() = 0.0;
         }
 
-        FrameBuffer* fb =
-            new FrameBuffer(n, 1, 3, dataType,
-                            m_lowlut1 ? (unsigned char*)m_lowlut1
-                                      : (unsigned char*)outProp->rawData(),
-                            0, FrameBuffer::NATURAL, false);
+        FrameBuffer* fb = new FrameBuffer(n, 1, 3, dataType, m_lowlut1 ? (unsigned char*)m_lowlut1 : (unsigned char*)outProp->rawData(), 0,
+                                          FrameBuffer::NATURAL, false);
 
         fb->attribute<float>("scale") = scale->front();
         fb->attribute<float>("offset") = offset->front();
@@ -639,8 +607,7 @@ namespace IPCore
 
                 std::copy(lut->begin(), lut->end(), m_lutdata.data.begin());
 
-                std::copy(prelut->begin(), prelut->end(),
-                          m_lutdata.prelutData.begin());
+                std::copy(prelut->begin(), prelut->end(), m_lutdata.prelutData.begin());
 
                 lut->resize(0);
                 prelut->resize(0);
@@ -662,11 +629,9 @@ namespace IPCore
             lut->resize(m_lutdata.data.size());
             prelut->resize(m_lutdata.prelutData.size());
 
-            std::copy(m_lutdata.data.begin(), m_lutdata.data.end(),
-                      lut->begin());
+            std::copy(m_lutdata.data.begin(), m_lutdata.data.end(), lut->begin());
 
-            std::copy(m_lutdata.prelutData.begin(), m_lutdata.prelutData.end(),
-                      prelut->begin());
+            std::copy(m_lutdata.prelutData.begin(), m_lutdata.prelutData.end(), prelut->begin());
 
             m_lutdata.data.resize(0);
             m_lutdata.prelutData.resize(0);
@@ -683,8 +648,7 @@ namespace IPCore
         {
             if (img->node)
             {
-                cerr << "ERROR: cannot add LUT pipeline, image has no shader: "
-                     << img->node->name() << endl;
+                cerr << "ERROR: cannot add LUT pipeline, image has no shader: " << img->node->name() << endl;
             }
             return;
         }
@@ -695,8 +659,7 @@ namespace IPCore
             if (m_lutGamma->front() != 1.0)
             {
                 Vec3f gammaVec(m_lutGamma->front());
-                img->shaderExpr =
-                    Shader::newColorGamma(img->shaderExpr, gammaVec);
+                img->shaderExpr = Shader::newColorGamma(img->shaderExpr, gammaVec);
             }
 
             LUT->removePlane(preLUT);
@@ -705,8 +668,7 @@ namespace IPCore
 
         if (LUT->hasAttribute("inMatrix"))
         {
-            img->shaderExpr = Shader::newColorMatrix(
-                img->shaderExpr, LUT->attribute<Mat44f>("inMatrix"));
+            img->shaderExpr = Shader::newColorMatrix(img->shaderExpr, LUT->attribute<Mat44f>("inMatrix"));
         }
 
         if (LUT->depth() > 1)
@@ -720,12 +682,10 @@ namespace IPCore
                 if (preLUT->hasAttribute("offset"))
                     outOffset = Vec3f(preLUT->attribute<float>("offset"));
 
-                img->shaderExpr = Shader::newColorChannelLUT(
-                    img->shaderExpr, preLUT, outScale, outOffset);
+                img->shaderExpr = Shader::newColorChannelLUT(img->shaderExpr, preLUT, outScale, outOffset);
             }
 
-            Vec3f grid = Vec3f(1.0 / LUT->width(), 1.0 / LUT->height(),
-                               1.0 / LUT->depth());
+            Vec3f grid = Vec3f(1.0 / LUT->width(), 1.0 / LUT->height(), 1.0 / LUT->depth());
 
             Vec3f scale = Vec3f(Vec3f(1.0, 1.0, 1.0) - grid);
 
@@ -739,14 +699,11 @@ namespace IPCore
 
             if (newGLSLlutInterp)
             {
-                img->shaderExpr = Shader::newColor3DLUT(img->shaderExpr, LUT,
-                                                        outScale, outOffset);
+                img->shaderExpr = Shader::newColor3DLUT(img->shaderExpr, LUT, outScale, outOffset);
             }
             else
             {
-                img->shaderExpr = Shader::newColor3DLUTGLSampling(
-                    img->shaderExpr, LUT, scale, grid / 2.0f, outScale,
-                    outOffset);
+                img->shaderExpr = Shader::newColor3DLUTGLSampling(img->shaderExpr, LUT, scale, grid / 2.0f, outScale, outOffset);
             }
         }
         else
@@ -758,14 +715,12 @@ namespace IPCore
             if (LUT->hasAttribute("offset"))
                 outOffset = Vec3f(LUT->attribute<float>("offset"));
 
-            img->shaderExpr = Shader::newColorChannelLUT(img->shaderExpr, LUT,
-                                                         outScale, outOffset);
+            img->shaderExpr = Shader::newColorChannelLUT(img->shaderExpr, LUT, outScale, outOffset);
         }
 
         if (LUT->hasAttribute("outMatrix"))
         {
-            img->shaderExpr = Shader::newColorMatrix(
-                img->shaderExpr, LUT->attribute<Mat44f>("outMatrix"));
+            img->shaderExpr = Shader::newColorMatrix(img->shaderExpr, LUT->attribute<Mat44f>("outMatrix"));
         }
     }
 

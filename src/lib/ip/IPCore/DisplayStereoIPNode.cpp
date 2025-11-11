@@ -18,48 +18,35 @@ namespace IPCore
     string DisplayStereoIPNode::m_defaultType;
     int DisplayStereoIPNode::m_swapScanlines = false;
 
-    DisplayStereoIPNode::DisplayStereoIPNode(const std::string& name,
-                                             const NodeDefinition* def,
-                                             IPGraph* g, GroupIPNode* group)
+    DisplayStereoIPNode::DisplayStereoIPNode(const std::string& name, const NodeDefinition* def, IPGraph* g, GroupIPNode* group)
         : StereoTransformIPNode(name, def, g, group)
     {
         setHasLinearTransform(true); // fits to aspect
-        m_stereoType = declareProperty<StringProperty>(
-            "stereo.type", m_defaultType == "" ? "off" : m_defaultType);
+        m_stereoType = declareProperty<StringProperty>("stereo.type", m_defaultType == "" ? "off" : m_defaultType);
     }
 
     DisplayStereoIPNode::~DisplayStereoIPNode() {}
 
-    void DisplayStereoIPNode::setStereoType(const string& type)
-    {
-        setProperty(m_stereoType, type);
-    }
+    void DisplayStereoIPNode::setStereoType(const string& type) { setProperty(m_stereoType, type); }
 
-    string DisplayStereoIPNode::stereoType() const
-    {
-        return propertyValue(m_stereoType, "off");
-    }
+    string DisplayStereoIPNode::stereoType() const { return propertyValue(m_stereoType, "off"); }
 
     namespace
     {
 
-        void prepareForStereo(IPImage* img, bool isLeftEye, bool mirror,
-                              bool vertical, Vec3f offset, Vec3f roffset,
-                              Vec3f scale)
+        void prepareForStereo(IPImage* img, bool isLeftEye, bool mirror, bool vertical, Vec3f offset, Vec3f roffset, Vec3f scale)
         {
             if (img->destination == IPImage::OutputTexture)
                 return;
 
-            if (offset != Vec3f(0.0f) || roffset != Vec3f(0.0f)
-                || scale != Vec3f(1.0f))
+            if (offset != Vec3f(0.0f) || roffset != Vec3f(0.0f) || scale != Vec3f(1.0f))
             {
                 float aspect = img->displayAspect();
                 Mat44f T, S;
 
                 if (isLeftEye)
                 {
-                    T.makeTranslation(offset
-                                      * Vec3f(-aspect, vertical ? -1 : 1, 1));
+                    T.makeTranslation(offset * Vec3f(-aspect, vertical ? -1 : 1, 1));
                     S.makeScale(scale);
                 }
                 else
@@ -68,8 +55,7 @@ namespace IPCore
                     if (mirror)
                         off *= Vec3f(-1, 1, 1);
                     T.makeTranslation(off);
-                    S.makeScale(
-                        Vec3f(mirror ? -scale.x : scale.x, scale.y, scale.z));
+                    S.makeScale(Vec3f(mirror ? -scale.x : scale.x, scale.y, scale.z));
                 }
 
                 img->transformMatrix = img->transformMatrix * S * T;
@@ -146,8 +132,7 @@ namespace IPCore
             const float viewAspect = float(w) / float(h);
             const float parityX = context.viewXOrigin % 2 == 0 ? 0.0 : 1.0;
             float parityY = context.viewYOrigin % 2 == 0 ? 0.0 : 1.0;
-            bool isMerge = type == "lumanaglyph" || type == "anaglyph"
-                           || type == "scanline" || type == "checker";
+            bool isMerge = type == "lumanaglyph" || type == "anaglyph" || type == "scanline" || type == "checker";
 
             try
             {
@@ -159,15 +144,13 @@ namespace IPCore
                 Context leftContext = scontext;
                 leftContext.eye = 0;
                 images.push_back(StereoTransformIPNode::evaluate(leftContext));
-                prepareForStereo(images.back(), true, mirror, vertical, offset,
-                                 roffset, scale);
+                prepareForStereo(images.back(), true, mirror, vertical, offset, roffset, scale);
 
                 //  Evaluate right Eye
                 Context rightContext = scontext;
                 rightContext.eye = 1;
                 images.push_back(StereoTransformIPNode::evaluate(rightContext));
-                prepareForStereo(images.back(), false, mirror, vertical, offset,
-                                 roffset, scale);
+                prepareForStereo(images.back(), false, mirror, vertical, offset, roffset, scale);
             }
             catch (std::exception&)
             {
@@ -187,13 +170,8 @@ namespace IPCore
             //  an image the size of the display image.
             //
 
-            root = new IPImage(this,
-                               isMerge ? IPImage::MergeRenderType
-                                       : IPImage::BlendRenderType,
-                               w, h, 1.0,
-                               isMerge ? IPImage::IntermediateBuffer
-                                       : IPImage::CurrentFrameBuffer,
-                               IPImage::FloatDataType);
+            root = new IPImage(this, isMerge ? IPImage::MergeRenderType : IPImage::BlendRenderType, w, h, 1.0,
+                               isMerge ? IPImage::IntermediateBuffer : IPImage::CurrentFrameBuffer, IPImage::FloatDataType);
 
             const float aspect = root->displayAspect();
 
@@ -204,28 +182,22 @@ namespace IPCore
 
                 convertBlendRenderTypeToIntermediate(images, modifiedImages);
 
-                balanceResourceUsage(IPNode::accumulate, images, modifiedImages,
-                                     8, 8, 81);
+                balanceResourceUsage(IPNode::accumulate, images, modifiedImages, 8, 8, 81);
 
                 Shader::ExpressionVector inExpressions;
-                assembleMergeExpressions(root, images, modifiedImages, false,
-                                         inExpressions);
+                assembleMergeExpressions(root, images, modifiedImages, false, inExpressions);
 
                 if (type == "anaglyph")
-                    root->mergeExpr =
-                        Shader::newStereoAnaglyph(root, inExpressions);
+                    root->mergeExpr = Shader::newStereoAnaglyph(root, inExpressions);
                 else if (type == "lumanaglyph")
-                    root->mergeExpr =
-                        Shader::newStereoLumAnaglyph(root, inExpressions);
+                    root->mergeExpr = Shader::newStereoLumAnaglyph(root, inExpressions);
                 else if (type == "checker")
-                    root->mergeExpr = Shader::newStereoChecker(
-                        root, parityX, parityY, inExpressions);
+                    root->mergeExpr = Shader::newStereoChecker(root, parityX, parityY, inExpressions);
                 else if (type == "scanline")
                 {
                     if (DisplayStereoIPNode::m_swapScanlines)
                         parityY = 1 - parityY;
-                    root->mergeExpr =
-                        Shader::newStereoScanline(root, parityY, inExpressions);
+                    root->mergeExpr = Shader::newStereoScanline(root, parityY, inExpressions);
                 }
 
                 root->shaderExpr = Shader::newSourceRGBA(root);
@@ -244,9 +216,8 @@ namespace IPCore
                     //  with the left and right eyes.
                     //
 
-                    IPImage* temp = new IPImage(
-                        this, IPImage::BlendRenderType, images[0]->width,
-                        images[0]->height, 1.0, IPImage::CurrentFrameBuffer);
+                    IPImage* temp =
+                        new IPImage(this, IPImage::BlendRenderType, images[0]->width, images[0]->height, 1.0, IPImage::CurrentFrameBuffer);
 
                     temp->appendChildren(images);
                     root->appendChild(temp);
@@ -268,8 +239,7 @@ namespace IPCore
             scontext.eye = isLeft ? 0 : 1;
             scontext.stereoContext.active = true;
             root = StereoTransformIPNode::evaluate(scontext);
-            prepareForStereo(root, isLeft, mirror, vertical, offset, roffset,
-                             scale);
+            prepareForStereo(root, isLeft, mirror, vertical, offset, roffset, scale);
 
             return root;
         }
@@ -319,14 +289,12 @@ namespace IPCore
             //  Evaluate left Eye
             Context leftContext = scontext;
             leftContext.eye = 0;
-            images.push_back(
-                StereoTransformIPNode::evaluateIdentifier(leftContext));
+            images.push_back(StereoTransformIPNode::evaluateIdentifier(leftContext));
 
             //  Evaluate right Eye
             Context rightContext = scontext;
             rightContext.eye = 1;
-            images.push_back(
-                StereoTransformIPNode::evaluateIdentifier(rightContext));
+            images.push_back(StereoTransformIPNode::evaluateIdentifier(rightContext));
 
             IPImageID* root = new IPImageID();
 
@@ -349,8 +317,7 @@ namespace IPCore
         return StereoTransformIPNode::evaluateIdentifier(scontext);
     }
 
-    void DisplayStereoIPNode::metaEvaluate(const Context& context,
-                                           MetaEvalVisitor& visitor)
+    void DisplayStereoIPNode::metaEvaluate(const Context& context, MetaEvalVisitor& visitor)
     {
         visitor.enter(context, this);
 
@@ -429,8 +396,7 @@ namespace IPCore
         visitor.leave(context, this);
     }
 
-    void
-    DisplayStereoIPNode::propagateFlushToInputs(const FlushContext& context)
+    void DisplayStereoIPNode::propagateFlushToInputs(const FlushContext& context)
     {
         bool passthrough = context.stereo;
         bool oneEye = false;

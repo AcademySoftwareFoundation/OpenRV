@@ -37,8 +37,7 @@ namespace Mu
         //  Constructors
         //
 
-        QPointerEventType(Context* context, const char* name,
-                          Class* superClass = 0);
+        QPointerEventType(Context* context, const char* name, Class* superClass = 0);
         virtual ~QPointerEventType();
 
         //

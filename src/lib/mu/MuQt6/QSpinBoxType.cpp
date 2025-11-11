@@ -71,16 +71,14 @@ namespace Mu
         _baseType = 0;
     }
 
-    MuQt_QSpinBox::MuQt_QSpinBox(Pointer muobj, const CallEnvironment* ce,
-                                 QWidget* parent)
+    MuQt_QSpinBox::MuQt_QSpinBox(Pointer muobj, const CallEnvironment* ce, QWidget* parent)
         : QSpinBox(parent)
     {
         _env = ce;
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QSpinBoxType>(
-            c->internName("qt.QSpinBox"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QSpinBoxType>(c->internName("qt.QSpinBox"));
     }
 
     QString MuQt_QSpinBox::textFromValue(int value) const
@@ -287,8 +285,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QCloseEventType>(c, event, "qt.QCloseEvent"));
+            args[1] = Value(makeqpointer<QCloseEventType>(c, event, "qt.QCloseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -311,8 +308,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqpointer<QContextMenuEventType>(
-                c, event, "qt.QContextMenuEvent"));
+            args[1] = Value(makeqpointer<QContextMenuEventType>(c, event, "qt.QContextMenuEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -335,8 +331,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QFocusEventType>(c, event, "qt.QFocusEvent"));
+            args[1] = Value(makeqpointer<QFocusEventType>(c, event, "qt.QFocusEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -359,8 +354,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QFocusEventType>(c, event, "qt.QFocusEvent"));
+            args[1] = Value(makeqpointer<QFocusEventType>(c, event, "qt.QFocusEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -383,8 +377,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QHideEventType>(c, event, "qt.QHideEvent"));
+            args[1] = Value(makeqpointer<QHideEventType>(c, event, "qt.QHideEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -407,8 +400,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QKeyEventType>(c, event, "qt.QKeyEvent"));
+            args[1] = Value(makeqpointer<QKeyEventType>(c, event, "qt.QKeyEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -431,8 +423,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QKeyEventType>(c, event, "qt.QKeyEvent"));
+            args[1] = Value(makeqpointer<QKeyEventType>(c, event, "qt.QKeyEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -455,8 +446,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -479,8 +469,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -503,8 +492,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -527,8 +515,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QPaintEventType>(c, event, "qt.QPaintEvent"));
+            args[1] = Value(makeqpointer<QPaintEventType>(c, event, "qt.QPaintEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -551,8 +538,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QResizeEventType>(c, event, "qt.QResizeEvent"));
+            args[1] = Value(makeqpointer<QResizeEventType>(c, event, "qt.QResizeEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -575,8 +561,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QShowEventType>(c, event, "qt.QShowEvent"));
+            args[1] = Value(makeqpointer<QShowEventType>(c, event, "qt.QShowEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -599,8 +584,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QTimerEventType>(c, event, "qt.QTimerEvent"));
+            args[1] = Value(makeqpointer<QTimerEventType>(c, event, "qt.QTimerEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -623,8 +607,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QWheelEventType>(c, event, "qt.QWheelEvent"));
+            args[1] = Value(makeqpointer<QWheelEventType>(c, event, "qt.QWheelEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -636,8 +619,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  Mu Type CONSTRUCTORS
 
-    QSpinBoxType::QSpinBoxType(Context* c, const char* name, Class* super,
-                               Class* super2)
+    QSpinBoxType::QSpinBoxType(Context* c, const char* name, Class* super, Class* super2)
         : Class(c, name, vectorOf2(super, super2))
     {
     }
@@ -658,9 +640,7 @@ namespace Mu
         }
         else if (QSpinBox* w = object<QSpinBox>(widget))
         {
-            QSpinBoxType* type =
-                c->findSymbolOfTypeByQualifiedName<QSpinBoxType>(
-                    c->internName("qt.QSpinBox"), false);
+            QSpinBoxType* type = c->findSymbolOfTypeByQualifiedName<QSpinBoxType>(c->internName("qt.QSpinBox"), false);
             ClassInstance* o = ClassInstance::allocate(type);
             setobject(o, w);
             return o;
@@ -671,27 +651,17 @@ namespace Mu
         }
     }
 
-    static NODE_IMPLEMENTATION(castFromObject, Pointer)
-    {
-        NODE_RETURN(
-            QSpinBox_QSpinBox_QObject(NODE_THREAD, NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(castFromObject, Pointer) { NODE_RETURN(QSpinBox_QSpinBox_QObject(NODE_THREAD, NODE_ARG(0, Pointer))); }
 
-    Pointer qt_QSpinBox_QSpinBox_QSpinBox_QSpinBox_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
+    Pointer qt_QSpinBox_QSpinBox_QSpinBox_QSpinBox_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWidget* arg1 = object<QWidget>(param_parent);
-        setobject(param_this,
-                  new MuQt_QSpinBox(param_this,
-                                    NODE_THREAD.process()->callEnv(), arg1));
+        setobject(param_this, new MuQt_QSpinBox(param_this, NODE_THREAD.process()->callEnv(), arg1));
         return param_this;
     }
 
-    void qt_QSpinBox_setRange_void_QSpinBox_int_int(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this,
-                                                    int param_minimum,
-                                                    int param_maximum)
+    void qt_QSpinBox_setRange_void_QSpinBox_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_minimum, int param_maximum)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSpinBox* arg0 = object<QSpinBox>(param_this);
@@ -700,58 +670,41 @@ namespace Mu
         arg0->setRange(arg1, arg2);
     }
 
-    void qt_QSpinBox_setStepType_void_QSpinBox_int(Mu::Thread& NODE_THREAD,
-                                                   Pointer param_this,
-                                                   int param_stepType)
+    void qt_QSpinBox_setStepType_void_QSpinBox_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_stepType)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSpinBox* arg0 = object<QSpinBox>(param_this);
-        QAbstractSpinBox::StepType arg1 =
-            (QAbstractSpinBox::StepType)(param_stepType);
+        QAbstractSpinBox::StepType arg1 = (QAbstractSpinBox::StepType)(param_stepType);
         arg0->setStepType(arg1);
     }
 
-    Pointer qt_QSpinBox_textFromValue_string_QSpinBox_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_value)
+    Pointer qt_QSpinBox_textFromValue_string_QSpinBox_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_value)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSpinBox* arg0 = object<QSpinBox>(param_this);
         int arg1 = (int)(param_value);
-        return isMuQtObject(arg0)
-                   ? makestring(
-                         c,
-                         ((MuQt_QSpinBox*)arg0)->textFromValue_pub_parent(arg1))
-                   : makestring(
-                         c, ((MuQt_QSpinBox*)arg0)->textFromValue_pub(arg1));
+        return isMuQtObject(arg0) ? makestring(c, ((MuQt_QSpinBox*)arg0)->textFromValue_pub_parent(arg1))
+                                  : makestring(c, ((MuQt_QSpinBox*)arg0)->textFromValue_pub(arg1));
     }
 
-    int qt_QSpinBox_valueFromText_int_QSpinBox_string(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this,
-                                                      Pointer param_text)
+    int qt_QSpinBox_valueFromText_int_QSpinBox_string(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_text)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSpinBox* arg0 = object<QSpinBox>(param_this);
         const QString arg1 = qstring(param_text);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QSpinBox*)arg0)->valueFromText_pub_parent(arg1)
-                   : ((MuQt_QSpinBox*)arg0)->valueFromText_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QSpinBox*)arg0)->valueFromText_pub_parent(arg1)
+                                  : ((MuQt_QSpinBox*)arg0)->valueFromText_pub(arg1);
     }
 
-    bool qt_QSpinBox_event_bool_QSpinBox_QEvent(Mu::Thread& NODE_THREAD,
-                                                Pointer param_this,
-                                                Pointer param_event_)
+    bool qt_QSpinBox_event_bool_QSpinBox_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event_)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSpinBox* arg0 = object<QSpinBox>(param_this);
         QEvent* arg1 = getqpointer<QEventType>(param_event_);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QSpinBox*)arg0)->event_pub_parent(arg1)
-                   : ((MuQt_QSpinBox*)arg0)->event_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QSpinBox*)arg0)->event_pub_parent(arg1) : ((MuQt_QSpinBox*)arg0)->event_pub(arg1);
     }
 
-    void qt_QSpinBox_stepBy_void_QSpinBox_int(Mu::Thread& NODE_THREAD,
-                                              Pointer param_this,
-                                              int param_steps)
+    void qt_QSpinBox_stepBy_void_QSpinBox_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_steps)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSpinBox* arg0 = object<QSpinBox>(param_this);
@@ -762,56 +715,39 @@ namespace Mu
             arg0->stepBy(arg1);
     }
 
-    Pointer qt_QSpinBox_inputMethodQuery_QVariant_QSpinBox_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_query)
+    Pointer qt_QSpinBox_inputMethodQuery_QVariant_QSpinBox_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_query)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSpinBox* arg0 = object<QSpinBox>(param_this);
         Qt::InputMethodQuery arg1 = (Qt::InputMethodQuery)(param_query);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QVariantType>(
-                         c, arg0->QSpinBox::inputMethodQuery(arg1),
-                         "qt.QVariant")
-                   : makeqtype<QVariantType>(c, arg0->inputMethodQuery(arg1),
-                                             "qt.QVariant");
+        return isMuQtObject(arg0) ? makeqtype<QVariantType>(c, arg0->QSpinBox::inputMethodQuery(arg1), "qt.QVariant")
+                                  : makeqtype<QVariantType>(c, arg0->inputMethodQuery(arg1), "qt.QVariant");
     }
 
-    Pointer qt_QSpinBox_minimumSizeHint_QSize_QSpinBox(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this)
+    Pointer qt_QSpinBox_minimumSizeHint_QSize_QSpinBox(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSpinBox* arg0 = object<QSpinBox>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QSizeType>(c, arg0->QSpinBox::minimumSizeHint(),
-                                          "qt.QSize")
-                   : makeqtype<QSizeType>(c, arg0->minimumSizeHint(),
-                                          "qt.QSize");
+        return isMuQtObject(arg0) ? makeqtype<QSizeType>(c, arg0->QSpinBox::minimumSizeHint(), "qt.QSize")
+                                  : makeqtype<QSizeType>(c, arg0->minimumSizeHint(), "qt.QSize");
     }
 
-    Pointer qt_QSpinBox_sizeHint_QSize_QSpinBox(Mu::Thread& NODE_THREAD,
-                                                Pointer param_this)
+    Pointer qt_QSpinBox_sizeHint_QSize_QSpinBox(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSpinBox* arg0 = object<QSpinBox>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QSizeType>(c, arg0->QSpinBox::sizeHint(),
-                                          "qt.QSize")
-                   : makeqtype<QSizeType>(c, arg0->sizeHint(), "qt.QSize");
+        return isMuQtObject(arg0) ? makeqtype<QSizeType>(c, arg0->QSpinBox::sizeHint(), "qt.QSize")
+                                  : makeqtype<QSizeType>(c, arg0->sizeHint(), "qt.QSize");
     }
 
-    int qt_QSpinBox_stepEnabled_int_QSpinBox(Mu::Thread& NODE_THREAD,
-                                             Pointer param_this)
+    int qt_QSpinBox_stepEnabled_int_QSpinBox(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSpinBox* arg0 = object<QSpinBox>(param_this);
-        return isMuQtObject(arg0)
-                   ? int(((MuQt_QSpinBox*)arg0)->stepEnabled_pub_parent())
-                   : int(((MuQt_QSpinBox*)arg0)->stepEnabled_pub());
+        return isMuQtObject(arg0) ? int(((MuQt_QSpinBox*)arg0)->stepEnabled_pub_parent()) : int(((MuQt_QSpinBox*)arg0)->stepEnabled_pub());
     }
 
-    void qt_QSpinBox_changeEvent_void_QSpinBox_QEvent(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this,
-                                                      Pointer param_event)
+    void qt_QSpinBox_changeEvent_void_QSpinBox_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSpinBox* arg0 = object<QSpinBox>(param_this);
@@ -822,8 +758,7 @@ namespace Mu
             ((MuQt_QSpinBox*)arg0)->changeEvent_pub(arg1);
     }
 
-    void qt_QSpinBox_closeEvent_void_QSpinBox_QCloseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QSpinBox_closeEvent_void_QSpinBox_QCloseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSpinBox* arg0 = object<QSpinBox>(param_this);
@@ -834,21 +769,18 @@ namespace Mu
             ((MuQt_QSpinBox*)arg0)->closeEvent_pub(arg1);
     }
 
-    void qt_QSpinBox_contextMenuEvent_void_QSpinBox_QContextMenuEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QSpinBox_contextMenuEvent_void_QSpinBox_QContextMenuEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSpinBox* arg0 = object<QSpinBox>(param_this);
-        QContextMenuEvent* arg1 =
-            getqpointer<QContextMenuEventType>(param_event);
+        QContextMenuEvent* arg1 = getqpointer<QContextMenuEventType>(param_event);
         if (isMuQtObject(arg0))
             ((MuQt_QSpinBox*)arg0)->contextMenuEvent_pub_parent(arg1);
         else
             ((MuQt_QSpinBox*)arg0)->contextMenuEvent_pub(arg1);
     }
 
-    void qt_QSpinBox_focusInEvent_void_QSpinBox_QFocusEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QSpinBox_focusInEvent_void_QSpinBox_QFocusEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSpinBox* arg0 = object<QSpinBox>(param_this);
@@ -859,8 +791,7 @@ namespace Mu
             ((MuQt_QSpinBox*)arg0)->focusInEvent_pub(arg1);
     }
 
-    void qt_QSpinBox_focusOutEvent_void_QSpinBox_QFocusEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QSpinBox_focusOutEvent_void_QSpinBox_QFocusEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSpinBox* arg0 = object<QSpinBox>(param_this);
@@ -871,9 +802,7 @@ namespace Mu
             ((MuQt_QSpinBox*)arg0)->focusOutEvent_pub(arg1);
     }
 
-    void qt_QSpinBox_hideEvent_void_QSpinBox_QHideEvent(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this,
-                                                        Pointer param_event)
+    void qt_QSpinBox_hideEvent_void_QSpinBox_QHideEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSpinBox* arg0 = object<QSpinBox>(param_this);
@@ -884,8 +813,7 @@ namespace Mu
             ((MuQt_QSpinBox*)arg0)->hideEvent_pub(arg1);
     }
 
-    void qt_QSpinBox_keyPressEvent_void_QSpinBox_QKeyEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QSpinBox_keyPressEvent_void_QSpinBox_QKeyEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSpinBox* arg0 = object<QSpinBox>(param_this);
@@ -896,8 +824,7 @@ namespace Mu
             ((MuQt_QSpinBox*)arg0)->keyPressEvent_pub(arg1);
     }
 
-    void qt_QSpinBox_keyReleaseEvent_void_QSpinBox_QKeyEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QSpinBox_keyReleaseEvent_void_QSpinBox_QKeyEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSpinBox* arg0 = object<QSpinBox>(param_this);
@@ -908,8 +835,7 @@ namespace Mu
             ((MuQt_QSpinBox*)arg0)->keyReleaseEvent_pub(arg1);
     }
 
-    void qt_QSpinBox_mouseMoveEvent_void_QSpinBox_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QSpinBox_mouseMoveEvent_void_QSpinBox_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSpinBox* arg0 = object<QSpinBox>(param_this);
@@ -920,8 +846,7 @@ namespace Mu
             ((MuQt_QSpinBox*)arg0)->mouseMoveEvent_pub(arg1);
     }
 
-    void qt_QSpinBox_mousePressEvent_void_QSpinBox_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QSpinBox_mousePressEvent_void_QSpinBox_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSpinBox* arg0 = object<QSpinBox>(param_this);
@@ -932,8 +857,7 @@ namespace Mu
             ((MuQt_QSpinBox*)arg0)->mousePressEvent_pub(arg1);
     }
 
-    void qt_QSpinBox_mouseReleaseEvent_void_QSpinBox_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QSpinBox_mouseReleaseEvent_void_QSpinBox_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSpinBox* arg0 = object<QSpinBox>(param_this);
@@ -944,8 +868,7 @@ namespace Mu
             ((MuQt_QSpinBox*)arg0)->mouseReleaseEvent_pub(arg1);
     }
 
-    void qt_QSpinBox_paintEvent_void_QSpinBox_QPaintEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QSpinBox_paintEvent_void_QSpinBox_QPaintEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSpinBox* arg0 = object<QSpinBox>(param_this);
@@ -956,8 +879,7 @@ namespace Mu
             ((MuQt_QSpinBox*)arg0)->paintEvent_pub(arg1);
     }
 
-    void qt_QSpinBox_resizeEvent_void_QSpinBox_QResizeEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QSpinBox_resizeEvent_void_QSpinBox_QResizeEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSpinBox* arg0 = object<QSpinBox>(param_this);
@@ -968,9 +890,7 @@ namespace Mu
             ((MuQt_QSpinBox*)arg0)->resizeEvent_pub(arg1);
     }
 
-    void qt_QSpinBox_showEvent_void_QSpinBox_QShowEvent(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this,
-                                                        Pointer param_event)
+    void qt_QSpinBox_showEvent_void_QSpinBox_QShowEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSpinBox* arg0 = object<QSpinBox>(param_this);
@@ -981,8 +901,7 @@ namespace Mu
             ((MuQt_QSpinBox*)arg0)->showEvent_pub(arg1);
     }
 
-    void qt_QSpinBox_timerEvent_void_QSpinBox_QTimerEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QSpinBox_timerEvent_void_QSpinBox_QTimerEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSpinBox* arg0 = object<QSpinBox>(param_this);
@@ -993,8 +912,7 @@ namespace Mu
             ((MuQt_QSpinBox*)arg0)->timerEvent_pub(arg1);
     }
 
-    void qt_QSpinBox_wheelEvent_void_QSpinBox_QWheelEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QSpinBox_wheelEvent_void_QSpinBox_QWheelEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSpinBox* arg0 = object<QSpinBox>(param_this);
@@ -1007,165 +925,137 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(_n_QSpinBox0, Pointer)
     {
-        NODE_RETURN(qt_QSpinBox_QSpinBox_QSpinBox_QSpinBox_QWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QSpinBox_QSpinBox_QSpinBox_QSpinBox_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_setRange0, void)
     {
-        qt_QSpinBox_setRange_void_QSpinBox_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int));
+        qt_QSpinBox_setRange_void_QSpinBox_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setStepType0, void)
     {
-        qt_QSpinBox_setStepType_void_QSpinBox_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QSpinBox_setStepType_void_QSpinBox_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_textFromValue0, Pointer)
     {
-        NODE_RETURN(qt_QSpinBox_textFromValue_string_QSpinBox_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QSpinBox_textFromValue_string_QSpinBox_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_valueFromText0, int)
     {
-        NODE_RETURN(qt_QSpinBox_valueFromText_int_QSpinBox_string(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QSpinBox_valueFromText_int_QSpinBox_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_event0, bool)
     {
-        NODE_RETURN(qt_QSpinBox_event_bool_QSpinBox_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QSpinBox_event_bool_QSpinBox_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_stepBy0, void)
     {
-        qt_QSpinBox_stepBy_void_QSpinBox_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QSpinBox_stepBy_void_QSpinBox_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_inputMethodQuery0, Pointer)
     {
-        NODE_RETURN(qt_QSpinBox_inputMethodQuery_QVariant_QSpinBox_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QSpinBox_inputMethodQuery_QVariant_QSpinBox_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_minimumSizeHint0, Pointer)
     {
-        NODE_RETURN(qt_QSpinBox_minimumSizeHint_QSize_QSpinBox(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QSpinBox_minimumSizeHint_QSize_QSpinBox(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_sizeHint0, Pointer)
     {
-        NODE_RETURN(qt_QSpinBox_sizeHint_QSize_QSpinBox(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QSpinBox_sizeHint_QSize_QSpinBox(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_stepEnabled0, int)
     {
-        NODE_RETURN(qt_QSpinBox_stepEnabled_int_QSpinBox(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QSpinBox_stepEnabled_int_QSpinBox(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_changeEvent0, void)
     {
-        qt_QSpinBox_changeEvent_void_QSpinBox_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QSpinBox_changeEvent_void_QSpinBox_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_closeEvent0, void)
     {
-        qt_QSpinBox_closeEvent_void_QSpinBox_QCloseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QSpinBox_closeEvent_void_QSpinBox_QCloseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_contextMenuEvent0, void)
     {
-        qt_QSpinBox_contextMenuEvent_void_QSpinBox_QContextMenuEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QSpinBox_contextMenuEvent_void_QSpinBox_QContextMenuEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_focusInEvent0, void)
     {
-        qt_QSpinBox_focusInEvent_void_QSpinBox_QFocusEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QSpinBox_focusInEvent_void_QSpinBox_QFocusEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_focusOutEvent0, void)
     {
-        qt_QSpinBox_focusOutEvent_void_QSpinBox_QFocusEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QSpinBox_focusOutEvent_void_QSpinBox_QFocusEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_hideEvent0, void)
     {
-        qt_QSpinBox_hideEvent_void_QSpinBox_QHideEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QSpinBox_hideEvent_void_QSpinBox_QHideEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_keyPressEvent0, void)
     {
-        qt_QSpinBox_keyPressEvent_void_QSpinBox_QKeyEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QSpinBox_keyPressEvent_void_QSpinBox_QKeyEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_keyReleaseEvent0, void)
     {
-        qt_QSpinBox_keyReleaseEvent_void_QSpinBox_QKeyEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QSpinBox_keyReleaseEvent_void_QSpinBox_QKeyEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseMoveEvent0, void)
     {
-        qt_QSpinBox_mouseMoveEvent_void_QSpinBox_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QSpinBox_mouseMoveEvent_void_QSpinBox_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mousePressEvent0, void)
     {
-        qt_QSpinBox_mousePressEvent_void_QSpinBox_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QSpinBox_mousePressEvent_void_QSpinBox_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseReleaseEvent0, void)
     {
-        qt_QSpinBox_mouseReleaseEvent_void_QSpinBox_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QSpinBox_mouseReleaseEvent_void_QSpinBox_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_paintEvent0, void)
     {
-        qt_QSpinBox_paintEvent_void_QSpinBox_QPaintEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QSpinBox_paintEvent_void_QSpinBox_QPaintEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_resizeEvent0, void)
     {
-        qt_QSpinBox_resizeEvent_void_QSpinBox_QResizeEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QSpinBox_resizeEvent_void_QSpinBox_QResizeEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_showEvent0, void)
     {
-        qt_QSpinBox_showEvent_void_QSpinBox_QShowEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QSpinBox_showEvent_void_QSpinBox_QShowEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_timerEvent0, void)
     {
-        qt_QSpinBox_timerEvent_void_QSpinBox_QTimerEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QSpinBox_timerEvent_void_QSpinBox_QTimerEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_wheelEvent0, void)
     {
-        qt_QSpinBox_wheelEvent_void_QSpinBox_QWheelEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QSpinBox_wheelEvent_void_QSpinBox_QWheelEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     void QSpinBoxType::load()
@@ -1185,17 +1075,13 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
-                   new Function(c, tn, castFromObject, Cast, Compiled,
-                                QSpinBox_QSpinBox_QObject, Return, ftn,
-                                Parameters,
+                   new Function(c, tn, castFromObject, Cast, Compiled, QSpinBox_QSpinBox_QObject, Return, ftn, Parameters,
                                 new Param(c, "object", "qt.QObject"), End),
 
                    EndArguments);
@@ -1203,11 +1089,8 @@ namespace Mu
         addSymbols(
             // enums
             // member functions
-            new Function(c, "QSpinBox", _n_QSpinBox0, None, Compiled,
-                         qt_QSpinBox_QSpinBox_QSpinBox_QSpinBox_QWidget, Return,
-                         "qt.QSpinBox", Parameters,
-                         new Param(c, "this", "qt.QSpinBox"),
-                         new Param(c, "parent", "qt.QWidget"), End),
+            new Function(c, "QSpinBox", _n_QSpinBox0, None, Compiled, qt_QSpinBox_QSpinBox_QSpinBox_QSpinBox_QWidget, Return, "qt.QSpinBox",
+                         Parameters, new Param(c, "this", "qt.QSpinBox"), new Param(c, "parent", "qt.QWidget"), End),
             // PROP: cleanText (string; QSpinBox this)
             // PROP: displayIntegerBase (int; QSpinBox this)
             // PROP: maximum (int; QSpinBox this)
@@ -1217,144 +1100,89 @@ namespace Mu
             // PROP: setMaximum (void; QSpinBox this, int max)
             // PROP: setMinimum (void; QSpinBox this, int min)
             // PROP: setPrefix (void; QSpinBox this, string prefix)
-            new Function(c, "setRange", _n_setRange0, None, Compiled,
-                         qt_QSpinBox_setRange_void_QSpinBox_int_int, Return,
-                         "void", Parameters,
-                         new Param(c, "this", "qt.QSpinBox"),
-                         new Param(c, "minimum", "int"),
-                         new Param(c, "maximum", "int"), End),
+            new Function(c, "setRange", _n_setRange0, None, Compiled, qt_QSpinBox_setRange_void_QSpinBox_int_int, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QSpinBox"), new Param(c, "minimum", "int"), new Param(c, "maximum", "int"),
+                         End),
             // PROP: setSingleStep (void; QSpinBox this, int val)
-            new Function(c, "setStepType", _n_setStepType0, None, Compiled,
-                         qt_QSpinBox_setStepType_void_QSpinBox_int, Return,
-                         "void", Parameters,
-                         new Param(c, "this", "qt.QSpinBox"),
-                         new Param(c, "stepType", "int"), End),
+            new Function(c, "setStepType", _n_setStepType0, None, Compiled, qt_QSpinBox_setStepType_void_QSpinBox_int, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QSpinBox"), new Param(c, "stepType", "int"), End),
             // PROP: setSuffix (void; QSpinBox this, string suffix)
             // PROP: singleStep (int; QSpinBox this)
             // PROP: stepType (flags QAbstractSpinBox::StepType; QSpinBox this)
             // PROP: suffix (string; QSpinBox this)
             // PROP: value (int; QSpinBox this)
-            _func[0] = new MemberFunction(
-                c, "textFromValue", _n_textFromValue0, None, Compiled,
-                qt_QSpinBox_textFromValue_string_QSpinBox_int, Return, "string",
-                Parameters, new Param(c, "this", "qt.QSpinBox"),
-                new Param(c, "value", "int"), End),
-            _func[1] = new MemberFunction(
-                c, "valueFromText", _n_valueFromText0, None, Compiled,
-                qt_QSpinBox_valueFromText_int_QSpinBox_string, Return, "int",
-                Parameters, new Param(c, "this", "qt.QSpinBox"),
-                new Param(c, "text", "string"), End),
-            _func[2] = new MemberFunction(
-                c, "event", _n_event0, None, Compiled,
-                qt_QSpinBox_event_bool_QSpinBox_QEvent, Return, "bool",
-                Parameters, new Param(c, "this", "qt.QSpinBox"),
-                new Param(c, "event_", "qt.QEvent"), End),
+            _func[0] =
+                new MemberFunction(c, "textFromValue", _n_textFromValue0, None, Compiled, qt_QSpinBox_textFromValue_string_QSpinBox_int,
+                                   Return, "string", Parameters, new Param(c, "this", "qt.QSpinBox"), new Param(c, "value", "int"), End),
+            _func[1] =
+                new MemberFunction(c, "valueFromText", _n_valueFromText0, None, Compiled, qt_QSpinBox_valueFromText_int_QSpinBox_string,
+                                   Return, "int", Parameters, new Param(c, "this", "qt.QSpinBox"), new Param(c, "text", "string"), End),
+            _func[2] = new MemberFunction(c, "event", _n_event0, None, Compiled, qt_QSpinBox_event_bool_QSpinBox_QEvent, Return, "bool",
+                                          Parameters, new Param(c, "this", "qt.QSpinBox"), new Param(c, "event_", "qt.QEvent"), End),
             // MISSING: validate (flags QValidator::State; QSpinBox this, string
             // text, "int &" pos) // protected
-            _func[3] = new MemberFunction(
-                c, "stepBy", _n_stepBy0, None, Compiled,
-                qt_QSpinBox_stepBy_void_QSpinBox_int, Return, "void",
-                Parameters, new Param(c, "this", "qt.QSpinBox"),
-                new Param(c, "steps", "int"), End),
-            _func[4] = new MemberFunction(
-                c, "inputMethodQuery", _n_inputMethodQuery0, None, Compiled,
-                qt_QSpinBox_inputMethodQuery_QVariant_QSpinBox_int, Return,
-                "qt.QVariant", Parameters, new Param(c, "this", "qt.QSpinBox"),
-                new Param(c, "query", "int"), End),
-            _func[5] = new MemberFunction(
-                c, "minimumSizeHint", _n_minimumSizeHint0, None, Compiled,
-                qt_QSpinBox_minimumSizeHint_QSize_QSpinBox, Return, "qt.QSize",
-                Parameters, new Param(c, "this", "qt.QSpinBox"), End),
-            _func[6] = new MemberFunction(
-                c, "sizeHint", _n_sizeHint0, None, Compiled,
-                qt_QSpinBox_sizeHint_QSize_QSpinBox, Return, "qt.QSize",
-                Parameters, new Param(c, "this", "qt.QSpinBox"), End),
+            _func[3] = new MemberFunction(c, "stepBy", _n_stepBy0, None, Compiled, qt_QSpinBox_stepBy_void_QSpinBox_int, Return, "void",
+                                          Parameters, new Param(c, "this", "qt.QSpinBox"), new Param(c, "steps", "int"), End),
+            _func[4] = new MemberFunction(c, "inputMethodQuery", _n_inputMethodQuery0, None, Compiled,
+                                          qt_QSpinBox_inputMethodQuery_QVariant_QSpinBox_int, Return, "qt.QVariant", Parameters,
+                                          new Param(c, "this", "qt.QSpinBox"), new Param(c, "query", "int"), End),
+            _func[5] =
+                new MemberFunction(c, "minimumSizeHint", _n_minimumSizeHint0, None, Compiled, qt_QSpinBox_minimumSizeHint_QSize_QSpinBox,
+                                   Return, "qt.QSize", Parameters, new Param(c, "this", "qt.QSpinBox"), End),
+            _func[6] = new MemberFunction(c, "sizeHint", _n_sizeHint0, None, Compiled, qt_QSpinBox_sizeHint_QSize_QSpinBox, Return,
+                                          "qt.QSize", Parameters, new Param(c, "this", "qt.QSpinBox"), End),
             // MISSING: initStyleOption (void; QSpinBox this,
             // "QStyleOptionSpinBox *" option) // protected
-            _func[7] = new MemberFunction(
-                c, "stepEnabled", _n_stepEnabled0, None, Compiled,
-                qt_QSpinBox_stepEnabled_int_QSpinBox, Return, "int", Parameters,
-                new Param(c, "this", "qt.QSpinBox"), End),
-            _func[8] = new MemberFunction(
-                c, "changeEvent", _n_changeEvent0, None, Compiled,
-                qt_QSpinBox_changeEvent_void_QSpinBox_QEvent, Return, "void",
-                Parameters, new Param(c, "this", "qt.QSpinBox"),
-                new Param(c, "event", "qt.QEvent"), End),
-            _func[9] = new MemberFunction(
-                c, "closeEvent", _n_closeEvent0, None, Compiled,
-                qt_QSpinBox_closeEvent_void_QSpinBox_QCloseEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QSpinBox"),
-                new Param(c, "event", "qt.QCloseEvent"), End),
-            _func[10] = new MemberFunction(
-                c, "contextMenuEvent", _n_contextMenuEvent0, None, Compiled,
-                qt_QSpinBox_contextMenuEvent_void_QSpinBox_QContextMenuEvent,
-                Return, "void", Parameters, new Param(c, "this", "qt.QSpinBox"),
-                new Param(c, "event", "qt.QContextMenuEvent"), End),
-            _func[11] = new MemberFunction(
-                c, "focusInEvent", _n_focusInEvent0, None, Compiled,
-                qt_QSpinBox_focusInEvent_void_QSpinBox_QFocusEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QSpinBox"),
-                new Param(c, "event", "qt.QFocusEvent"), End),
-            _func[12] = new MemberFunction(
-                c, "focusOutEvent", _n_focusOutEvent0, None, Compiled,
-                qt_QSpinBox_focusOutEvent_void_QSpinBox_QFocusEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QSpinBox"),
-                new Param(c, "event", "qt.QFocusEvent"), End),
-            _func[13] = new MemberFunction(
-                c, "hideEvent", _n_hideEvent0, None, Compiled,
-                qt_QSpinBox_hideEvent_void_QSpinBox_QHideEvent, Return, "void",
-                Parameters, new Param(c, "this", "qt.QSpinBox"),
-                new Param(c, "event", "qt.QHideEvent"), End),
-            _func[14] = new MemberFunction(
-                c, "keyPressEvent", _n_keyPressEvent0, None, Compiled,
-                qt_QSpinBox_keyPressEvent_void_QSpinBox_QKeyEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QSpinBox"),
-                new Param(c, "event", "qt.QKeyEvent"), End),
-            _func[15] = new MemberFunction(
-                c, "keyReleaseEvent", _n_keyReleaseEvent0, None, Compiled,
-                qt_QSpinBox_keyReleaseEvent_void_QSpinBox_QKeyEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QSpinBox"),
-                new Param(c, "event", "qt.QKeyEvent"), End),
-            _func[16] = new MemberFunction(
-                c, "mouseMoveEvent", _n_mouseMoveEvent0, None, Compiled,
-                qt_QSpinBox_mouseMoveEvent_void_QSpinBox_QMouseEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QSpinBox"),
-                new Param(c, "event", "qt.QMouseEvent"), End),
-            _func[17] = new MemberFunction(
-                c, "mousePressEvent", _n_mousePressEvent0, None, Compiled,
-                qt_QSpinBox_mousePressEvent_void_QSpinBox_QMouseEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QSpinBox"),
-                new Param(c, "event", "qt.QMouseEvent"), End),
-            _func[18] = new MemberFunction(
-                c, "mouseReleaseEvent", _n_mouseReleaseEvent0, None, Compiled,
-                qt_QSpinBox_mouseReleaseEvent_void_QSpinBox_QMouseEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QSpinBox"),
-                new Param(c, "event", "qt.QMouseEvent"), End),
-            _func[19] = new MemberFunction(
-                c, "paintEvent", _n_paintEvent0, None, Compiled,
-                qt_QSpinBox_paintEvent_void_QSpinBox_QPaintEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QSpinBox"),
-                new Param(c, "event", "qt.QPaintEvent"), End),
-            _func[20] = new MemberFunction(
-                c, "resizeEvent", _n_resizeEvent0, None, Compiled,
-                qt_QSpinBox_resizeEvent_void_QSpinBox_QResizeEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QSpinBox"),
-                new Param(c, "event", "qt.QResizeEvent"), End),
-            _func[21] = new MemberFunction(
-                c, "showEvent", _n_showEvent0, None, Compiled,
-                qt_QSpinBox_showEvent_void_QSpinBox_QShowEvent, Return, "void",
-                Parameters, new Param(c, "this", "qt.QSpinBox"),
-                new Param(c, "event", "qt.QShowEvent"), End),
-            _func[22] = new MemberFunction(
-                c, "timerEvent", _n_timerEvent0, None, Compiled,
-                qt_QSpinBox_timerEvent_void_QSpinBox_QTimerEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QSpinBox"),
-                new Param(c, "event", "qt.QTimerEvent"), End),
-            _func[23] = new MemberFunction(
-                c, "wheelEvent", _n_wheelEvent0, None, Compiled,
-                qt_QSpinBox_wheelEvent_void_QSpinBox_QWheelEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QSpinBox"),
-                new Param(c, "event", "qt.QWheelEvent"), End),
+            _func[7] = new MemberFunction(c, "stepEnabled", _n_stepEnabled0, None, Compiled, qt_QSpinBox_stepEnabled_int_QSpinBox, Return,
+                                          "int", Parameters, new Param(c, "this", "qt.QSpinBox"), End),
+            _func[8] =
+                new MemberFunction(c, "changeEvent", _n_changeEvent0, None, Compiled, qt_QSpinBox_changeEvent_void_QSpinBox_QEvent, Return,
+                                   "void", Parameters, new Param(c, "this", "qt.QSpinBox"), new Param(c, "event", "qt.QEvent"), End),
+            _func[9] = new MemberFunction(c, "closeEvent", _n_closeEvent0, None, Compiled, qt_QSpinBox_closeEvent_void_QSpinBox_QCloseEvent,
+                                          Return, "void", Parameters, new Param(c, "this", "qt.QSpinBox"),
+                                          new Param(c, "event", "qt.QCloseEvent"), End),
+            _func[10] = new MemberFunction(c, "contextMenuEvent", _n_contextMenuEvent0, None, Compiled,
+                                           qt_QSpinBox_contextMenuEvent_void_QSpinBox_QContextMenuEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QSpinBox"), new Param(c, "event", "qt.QContextMenuEvent"), End),
+            _func[11] = new MemberFunction(c, "focusInEvent", _n_focusInEvent0, None, Compiled,
+                                           qt_QSpinBox_focusInEvent_void_QSpinBox_QFocusEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QSpinBox"), new Param(c, "event", "qt.QFocusEvent"), End),
+            _func[12] = new MemberFunction(c, "focusOutEvent", _n_focusOutEvent0, None, Compiled,
+                                           qt_QSpinBox_focusOutEvent_void_QSpinBox_QFocusEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QSpinBox"), new Param(c, "event", "qt.QFocusEvent"), End),
+            _func[13] =
+                new MemberFunction(c, "hideEvent", _n_hideEvent0, None, Compiled, qt_QSpinBox_hideEvent_void_QSpinBox_QHideEvent, Return,
+                                   "void", Parameters, new Param(c, "this", "qt.QSpinBox"), new Param(c, "event", "qt.QHideEvent"), End),
+            _func[14] = new MemberFunction(c, "keyPressEvent", _n_keyPressEvent0, None, Compiled,
+                                           qt_QSpinBox_keyPressEvent_void_QSpinBox_QKeyEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QSpinBox"), new Param(c, "event", "qt.QKeyEvent"), End),
+            _func[15] = new MemberFunction(c, "keyReleaseEvent", _n_keyReleaseEvent0, None, Compiled,
+                                           qt_QSpinBox_keyReleaseEvent_void_QSpinBox_QKeyEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QSpinBox"), new Param(c, "event", "qt.QKeyEvent"), End),
+            _func[16] = new MemberFunction(c, "mouseMoveEvent", _n_mouseMoveEvent0, None, Compiled,
+                                           qt_QSpinBox_mouseMoveEvent_void_QSpinBox_QMouseEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QSpinBox"), new Param(c, "event", "qt.QMouseEvent"), End),
+            _func[17] = new MemberFunction(c, "mousePressEvent", _n_mousePressEvent0, None, Compiled,
+                                           qt_QSpinBox_mousePressEvent_void_QSpinBox_QMouseEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QSpinBox"), new Param(c, "event", "qt.QMouseEvent"), End),
+            _func[18] = new MemberFunction(c, "mouseReleaseEvent", _n_mouseReleaseEvent0, None, Compiled,
+                                           qt_QSpinBox_mouseReleaseEvent_void_QSpinBox_QMouseEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QSpinBox"), new Param(c, "event", "qt.QMouseEvent"), End),
+            _func[19] = new MemberFunction(c, "paintEvent", _n_paintEvent0, None, Compiled,
+                                           qt_QSpinBox_paintEvent_void_QSpinBox_QPaintEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QSpinBox"), new Param(c, "event", "qt.QPaintEvent"), End),
+            _func[20] = new MemberFunction(c, "resizeEvent", _n_resizeEvent0, None, Compiled,
+                                           qt_QSpinBox_resizeEvent_void_QSpinBox_QResizeEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QSpinBox"), new Param(c, "event", "qt.QResizeEvent"), End),
+            _func[21] =
+                new MemberFunction(c, "showEvent", _n_showEvent0, None, Compiled, qt_QSpinBox_showEvent_void_QSpinBox_QShowEvent, Return,
+                                   "void", Parameters, new Param(c, "this", "qt.QSpinBox"), new Param(c, "event", "qt.QShowEvent"), End),
+            _func[22] = new MemberFunction(c, "timerEvent", _n_timerEvent0, None, Compiled,
+                                           qt_QSpinBox_timerEvent_void_QSpinBox_QTimerEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QSpinBox"), new Param(c, "event", "qt.QTimerEvent"), End),
+            _func[23] = new MemberFunction(c, "wheelEvent", _n_wheelEvent0, None, Compiled,
+                                           qt_QSpinBox_wheelEvent_void_QSpinBox_QWheelEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QSpinBox"), new Param(c, "event", "qt.QWheelEvent"), End),
             // static functions
             EndArguments);
         globalScope()->addSymbols(EndArguments);

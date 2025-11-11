@@ -39,8 +39,7 @@ namespace Mu
         //  Constructors
         //
 
-        QTextBrowserType(Context* context, const char* name,
-                         Class* superClass = 0, Class* superClass2 = 0);
+        QTextBrowserType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QTextBrowserType();
 
@@ -62,8 +61,7 @@ namespace Mu
     class MuQt_QTextBrowser : public QTextBrowser
     {
     public:
-        MuQt_QTextBrowser(Pointer muobj, const CallEnvironment*,
-                          QWidget* parent);
+        MuQt_QTextBrowser(Pointer muobj, const CallEnvironment*, QWidget* parent);
         virtual QVariant loadResource(int type, const QUrl& name);
 
     protected:
@@ -102,122 +100,65 @@ namespace Mu
 
         bool event_pub_parent(QEvent* e) { return QTextBrowser::event(e); }
 
-        bool focusNextPrevChild_pub(bool next)
-        {
-            return focusNextPrevChild(next);
-        }
+        bool focusNextPrevChild_pub(bool next) { return focusNextPrevChild(next); }
 
-        bool focusNextPrevChild_pub_parent(bool next)
-        {
-            return QTextBrowser::focusNextPrevChild(next);
-        }
+        bool focusNextPrevChild_pub_parent(bool next) { return QTextBrowser::focusNextPrevChild(next); }
 
         void focusOutEvent_pub(QFocusEvent* ev) { focusOutEvent(ev); }
 
-        void focusOutEvent_pub_parent(QFocusEvent* ev)
-        {
-            QTextBrowser::focusOutEvent(ev);
-        }
+        void focusOutEvent_pub_parent(QFocusEvent* ev) { QTextBrowser::focusOutEvent(ev); }
 
         void keyPressEvent_pub(QKeyEvent* ev) { keyPressEvent(ev); }
 
-        void keyPressEvent_pub_parent(QKeyEvent* ev)
-        {
-            QTextBrowser::keyPressEvent(ev);
-        }
+        void keyPressEvent_pub_parent(QKeyEvent* ev) { QTextBrowser::keyPressEvent(ev); }
 
         void mouseMoveEvent_pub(QMouseEvent* e) { mouseMoveEvent(e); }
 
-        void mouseMoveEvent_pub_parent(QMouseEvent* e)
-        {
-            QTextBrowser::mouseMoveEvent(e);
-        }
+        void mouseMoveEvent_pub_parent(QMouseEvent* e) { QTextBrowser::mouseMoveEvent(e); }
 
         void mousePressEvent_pub(QMouseEvent* e) { mousePressEvent(e); }
 
-        void mousePressEvent_pub_parent(QMouseEvent* e)
-        {
-            QTextBrowser::mousePressEvent(e);
-        }
+        void mousePressEvent_pub_parent(QMouseEvent* e) { QTextBrowser::mousePressEvent(e); }
 
         void mouseReleaseEvent_pub(QMouseEvent* e) { mouseReleaseEvent(e); }
 
-        void mouseReleaseEvent_pub_parent(QMouseEvent* e)
-        {
-            QTextBrowser::mouseReleaseEvent(e);
-        }
+        void mouseReleaseEvent_pub_parent(QMouseEvent* e) { QTextBrowser::mouseReleaseEvent(e); }
 
         void paintEvent_pub(QPaintEvent* e) { paintEvent(e); }
 
-        void paintEvent_pub_parent(QPaintEvent* e)
-        {
-            QTextBrowser::paintEvent(e);
-        }
+        void paintEvent_pub_parent(QPaintEvent* e) { QTextBrowser::paintEvent(e); }
 
-        bool canInsertFromMimeData_pub(const QMimeData* source) const
-        {
-            return canInsertFromMimeData(source);
-        }
+        bool canInsertFromMimeData_pub(const QMimeData* source) const { return canInsertFromMimeData(source); }
 
-        bool canInsertFromMimeData_pub_parent(const QMimeData* source) const
-        {
-            return QTextBrowser::canInsertFromMimeData(source);
-        }
+        bool canInsertFromMimeData_pub_parent(const QMimeData* source) const { return QTextBrowser::canInsertFromMimeData(source); }
 
-        QMimeData* createMimeDataFromSelection_pub() const
-        {
-            return createMimeDataFromSelection();
-        }
+        QMimeData* createMimeDataFromSelection_pub() const { return createMimeDataFromSelection(); }
 
-        QMimeData* createMimeDataFromSelection_pub_parent() const
-        {
-            return QTextBrowser::createMimeDataFromSelection();
-        }
+        QMimeData* createMimeDataFromSelection_pub_parent() const { return QTextBrowser::createMimeDataFromSelection(); }
 
-        void insertFromMimeData_pub(const QMimeData* source)
-        {
-            insertFromMimeData(source);
-        }
+        void insertFromMimeData_pub(const QMimeData* source) { insertFromMimeData(source); }
 
-        void insertFromMimeData_pub_parent(const QMimeData* source)
-        {
-            QTextBrowser::insertFromMimeData(source);
-        }
+        void insertFromMimeData_pub_parent(const QMimeData* source) { QTextBrowser::insertFromMimeData(source); }
 
         void changeEvent_pub(QEvent* e) { changeEvent(e); }
 
         void changeEvent_pub_parent(QEvent* e) { QTextBrowser::changeEvent(e); }
 
-        void contextMenuEvent_pub(QContextMenuEvent* event)
-        {
-            contextMenuEvent(event);
-        }
+        void contextMenuEvent_pub(QContextMenuEvent* event) { contextMenuEvent(event); }
 
-        void contextMenuEvent_pub_parent(QContextMenuEvent* event)
-        {
-            QTextBrowser::contextMenuEvent(event);
-        }
+        void contextMenuEvent_pub_parent(QContextMenuEvent* event) { QTextBrowser::contextMenuEvent(event); }
 
         void dragEnterEvent_pub(QDragEnterEvent* e) { dragEnterEvent(e); }
 
-        void dragEnterEvent_pub_parent(QDragEnterEvent* e)
-        {
-            QTextBrowser::dragEnterEvent(e);
-        }
+        void dragEnterEvent_pub_parent(QDragEnterEvent* e) { QTextBrowser::dragEnterEvent(e); }
 
         void dragLeaveEvent_pub(QDragLeaveEvent* e) { dragLeaveEvent(e); }
 
-        void dragLeaveEvent_pub_parent(QDragLeaveEvent* e)
-        {
-            QTextBrowser::dragLeaveEvent(e);
-        }
+        void dragLeaveEvent_pub_parent(QDragLeaveEvent* e) { QTextBrowser::dragLeaveEvent(e); }
 
         void dragMoveEvent_pub(QDragMoveEvent* e) { dragMoveEvent(e); }
 
-        void dragMoveEvent_pub_parent(QDragMoveEvent* e)
-        {
-            QTextBrowser::dragMoveEvent(e);
-        }
+        void dragMoveEvent_pub_parent(QDragMoveEvent* e) { QTextBrowser::dragMoveEvent(e); }
 
         void dropEvent_pub(QDropEvent* e) { dropEvent(e); }
 
@@ -225,55 +166,31 @@ namespace Mu
 
         void focusInEvent_pub(QFocusEvent* e) { focusInEvent(e); }
 
-        void focusInEvent_pub_parent(QFocusEvent* e)
-        {
-            QTextBrowser::focusInEvent(e);
-        }
+        void focusInEvent_pub_parent(QFocusEvent* e) { QTextBrowser::focusInEvent(e); }
 
         void keyReleaseEvent_pub(QKeyEvent* e) { keyReleaseEvent(e); }
 
-        void keyReleaseEvent_pub_parent(QKeyEvent* e)
-        {
-            QTextBrowser::keyReleaseEvent(e);
-        }
+        void keyReleaseEvent_pub_parent(QKeyEvent* e) { QTextBrowser::keyReleaseEvent(e); }
 
-        void mouseDoubleClickEvent_pub(QMouseEvent* e)
-        {
-            mouseDoubleClickEvent(e);
-        }
+        void mouseDoubleClickEvent_pub(QMouseEvent* e) { mouseDoubleClickEvent(e); }
 
-        void mouseDoubleClickEvent_pub_parent(QMouseEvent* e)
-        {
-            QTextBrowser::mouseDoubleClickEvent(e);
-        }
+        void mouseDoubleClickEvent_pub_parent(QMouseEvent* e) { QTextBrowser::mouseDoubleClickEvent(e); }
 
         void resizeEvent_pub(QResizeEvent* e) { resizeEvent(e); }
 
-        void resizeEvent_pub_parent(QResizeEvent* e)
-        {
-            QTextBrowser::resizeEvent(e);
-        }
+        void resizeEvent_pub_parent(QResizeEvent* e) { QTextBrowser::resizeEvent(e); }
 
         void scrollContentsBy_pub(int dx, int dy) { scrollContentsBy(dx, dy); }
 
-        void scrollContentsBy_pub_parent(int dx, int dy)
-        {
-            QTextBrowser::scrollContentsBy(dx, dy);
-        }
+        void scrollContentsBy_pub_parent(int dx, int dy) { QTextBrowser::scrollContentsBy(dx, dy); }
 
         void showEvent_pub(QShowEvent* _p13) { showEvent(_p13); }
 
-        void showEvent_pub_parent(QShowEvent* _p13)
-        {
-            QTextBrowser::showEvent(_p13);
-        }
+        void showEvent_pub_parent(QShowEvent* _p13) { QTextBrowser::showEvent(_p13); }
 
         void wheelEvent_pub(QWheelEvent* e) { wheelEvent(e); }
 
-        void wheelEvent_pub_parent(QWheelEvent* e)
-        {
-            QTextBrowser::wheelEvent(e);
-        }
+        void wheelEvent_pub_parent(QWheelEvent* e) { QTextBrowser::wheelEvent(e); }
 
     public:
         const QTextBrowserType* _baseType;
@@ -281,11 +198,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance*
-    QTextBrowserType::cachedInstance(const QTextBrowserType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QTextBrowserType::cachedInstance(const QTextBrowserType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

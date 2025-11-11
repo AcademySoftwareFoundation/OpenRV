@@ -87,48 +87,31 @@ namespace TwkFB
             void setB(unsigned int B) { blue = (B & 1023U); }
         };
 
-        static void planarConfig(TwkFB::FrameBuffer&, int, int,
-                                 TwkFB::FrameBuffer::DataType);
+        static void planarConfig(TwkFB::FrameBuffer&, int, int, TwkFB::FrameBuffer::DataType);
 
-        static void readRGB8(const std::string&, const unsigned char*,
-                             TwkFB::FrameBuffer&, int, int, size_t maxbytes,
-                             bool swap);
+        static void readRGB8(const std::string&, const unsigned char*, TwkFB::FrameBuffer&, int, int, size_t maxbytes, bool swap);
 
-        static void readRGBA8(const std::string&, const unsigned char*,
-                              TwkFB::FrameBuffer&, int, int, size_t maxbytes,
-                              bool alpha, bool swap);
-
-        static void readRGB16(const std::string&, const unsigned char*,
-                              TwkFB::FrameBuffer&, int, int, size_t maxbytes,
+        static void readRGBA8(const std::string&, const unsigned char*, TwkFB::FrameBuffer&, int, int, size_t maxbytes, bool alpha,
                               bool swap);
 
-        static void readRGBA16(const std::string&, const unsigned char*,
-                               TwkFB::FrameBuffer&, int, int, size_t maxbytes,
-                               bool alpha, bool swap);
+        static void readRGB16(const std::string&, const unsigned char*, TwkFB::FrameBuffer&, int, int, size_t maxbytes, bool swap);
 
-        static void readRGB10_A2(const std::string&, const unsigned char*,
-                                 TwkFB::FrameBuffer&, int, int, size_t maxbytes,
-                                 bool swap, bool useRaw = false,
-                                 unsigned char* deletePointer = 0);
+        static void readRGBA16(const std::string&, const unsigned char*, TwkFB::FrameBuffer&, int, int, size_t maxbytes, bool alpha,
+                               bool swap);
 
-        static void readA2_BGR10(const std::string&, const unsigned char*,
-                                 TwkFB::FrameBuffer&, int, int, size_t maxbytes,
-                                 bool swap);
+        static void readRGB10_A2(const std::string&, const unsigned char*, TwkFB::FrameBuffer&, int, int, size_t maxbytes, bool swap,
+                                 bool useRaw = false, unsigned char* deletePointer = 0);
 
-        static void readRGB8_PLANAR(const std::string&, const unsigned char*,
-                                    TwkFB::FrameBuffer&, int, int,
-                                    size_t maxbytes, bool swap);
+        static void readA2_BGR10(const std::string&, const unsigned char*, TwkFB::FrameBuffer&, int, int, size_t maxbytes, bool swap);
 
-        static void readRGB16_PLANAR(const std::string&, const unsigned char*,
-                                     TwkFB::FrameBuffer&, int, int,
-                                     size_t maxbytes, bool swap);
+        static void readRGB8_PLANAR(const std::string&, const unsigned char*, TwkFB::FrameBuffer&, int, int, size_t maxbytes, bool swap);
+
+        static void readRGB16_PLANAR(const std::string&, const unsigned char*, TwkFB::FrameBuffer&, int, int, size_t maxbytes, bool swap);
 
         //
 
-        static void readYCrYCb8_422_PLANAR(const std::string&,
-                                           const unsigned char*,
-                                           TwkFB::FrameBuffer&, int, int,
-                                           size_t maxbytes, bool swap);
+        static void readYCrYCb8_422_PLANAR(const std::string&, const unsigned char*, TwkFB::FrameBuffer&, int, int, size_t maxbytes,
+                                           bool swap);
     };
 
 } // namespace TwkFB

@@ -39,10 +39,7 @@ namespace TwkUtil
 
         ~PoolElem() { memPool.m_elemMap.erase(ptr); }
 
-        float slop(size_t targetSize)
-        {
-            return (float(size - targetSize) / float(size));
-        }
+        float slop(size_t targetSize) { return (float(size - targetSize) / float(size)); }
 
         void* ptr;
         size_t size;
@@ -92,8 +89,7 @@ namespace TwkUtil
         if (getenv("TWK_MEM_POOL_SIZE"))
             poolSize = atoi(getenv("TWK_MEM_POOL_SIZE")) * 1024 * 1024;
         if (getenv("TWK_MEM_POOL_MIN_ELEM_SIZE"))
-            minElemSize = size_t(atof(getenv("TWK_MEM_POOL_MIN_ELEM_SIZE"))
-                                 * 1024.0 * 1024.0);
+            minElemSize = size_t(atof(getenv("TWK_MEM_POOL_MIN_ELEM_SIZE")) * 1024.0 * 1024.0);
         if (getenv("TWK_MEM_POOL_ALLOC_SLOP"))
             allocSlop = atof(getenv("TWK_MEM_POOL_ALLOC_SLOP"));
 
@@ -106,10 +102,8 @@ namespace TwkUtil
 
         if (globalMemPool->m_debugOutput)
         {
-            cerr << "MP: size " << poolSize / (1024 * 1024)
-                 << "MB, minElemSize " << float(minElemSize) / (1024.0 * 1024.0)
-                 << ", slop " << allocSlop << ", shortCircuit "
-                 << globalMemPool->m_shortCircuit << endl;
+            cerr << "MP: size " << poolSize / (1024 * 1024) << "MB, minElemSize " << float(minElemSize) / (1024.0 * 1024.0) << ", slop "
+                 << allocSlop << ", shortCircuit " << globalMemPool->m_shortCircuit << endl;
         }
     }
 
@@ -151,9 +145,7 @@ namespace TwkUtil
         }
         if (mp.m_debugOutput && size >= mp.m_minElemSize)
         {
-            cerr << "MP: alloc " << size / (1024 * 1024) << "MB "
-                 << ((hit) ? "hit, " : "miss, ") << 1000.0 * tmr.stop() << "ms"
-                 << endl;
+            cerr << "MP: alloc " << size / (1024 * 1024) << "MB " << ((hit) ? "hit, " : "miss, ") << 1000.0 * tmr.stop() << "ms" << endl;
         }
 
         return ptr;
@@ -234,8 +226,7 @@ namespace TwkUtil
 
         if (globalMemPool->m_debugOutput)
         {
-            cerr << "MP: freelist total " << totalCount << " elems, "
-                 << totalSize / (1024 * 1024) << "MB out of "
+            cerr << "MP: freelist total " << totalCount << " elems, " << totalSize / (1024 * 1024) << "MB out of "
                  << poolSize / (1024 * 1024) << "MB" << endl;
         }
     }
@@ -262,8 +253,7 @@ namespace TwkUtil
                 //  use it.  If we already have something, use this candidate if
                 //  it has less slop.
                 //
-                if ((!candidate && i->slop(size) < allocSlop)
-                    || (candidate && i->slop(size) < candidate->slop(size)))
+                if ((!candidate && i->slop(size) < allocSlop) || (candidate && i->slop(size) < candidate->slop(size)))
                 {
                     candidate = i;
                 }

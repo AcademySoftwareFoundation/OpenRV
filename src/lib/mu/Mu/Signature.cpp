@@ -109,8 +109,7 @@ namespace Mu
             if (Name(_types[i].name) == "")
                 return;
 
-            Symbol::ConstSymbolVector symbols =
-                global->findSymbolsOfType<Type>(_types[i].name);
+            Symbol::ConstSymbolVector symbols = global->findSymbolsOfType<Type>(_types[i].name);
 
             if (symbols.size() == 1)
             {

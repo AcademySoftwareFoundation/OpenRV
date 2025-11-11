@@ -27,8 +27,7 @@ inline TwkMath::Mat44f getMatrix(GLenum matrix)
     // Unfortunately, open GL stores matrices in COLUMN-major
     // format, whereas we store them in the much more sane ROW-major
     // format.
-    return TwkMath::Mat44f(m[0], m[4], m[8], m[12], m[1], m[5], m[9], m[13],
-                           m[2], m[6], m[10], m[14], m[3], m[7], m[11], m[15]);
+    return TwkMath::Mat44f(m[0], m[4], m[8], m[12], m[1], m[5], m[9], m[13], m[2], m[6], m[10], m[14], m[3], m[7], m[11], m[15]);
 }
 
 inline void glLoadMatrix(const TwkMath::Mat44f& m)
@@ -106,24 +105,16 @@ VisMainWindow::VisMainWindow(QWidget* parent)
 
     connect(m_ui.actionOpen, SIGNAL(triggered()), this, SLOT(openFile()));
     connect(m_ui.actionQuit, SIGNAL(triggered()), this, SLOT(quit()));
-    connect(m_ui.actionShow_Raw_Profile_Data, SIGNAL(triggered()), this,
-            SLOT(showFile()));
-    connect(m_dockUI.startEdit, SIGNAL(editingFinished()), this,
-            SLOT(rangeChanged()));
-    connect(m_dockUI.endEdit, SIGNAL(editingFinished()), this,
-            SLOT(rangeChanged()));
+    connect(m_ui.actionShow_Raw_Profile_Data, SIGNAL(triggered()), this, SLOT(showFile()));
+    connect(m_dockUI.startEdit, SIGNAL(editingFinished()), this, SLOT(rangeChanged()));
+    connect(m_dockUI.endEdit, SIGNAL(editingFinished()), this, SLOT(rangeChanged()));
 
-    connect(m_dockUI.startTimeEdit, SIGNAL(editingFinished()), this,
-            SLOT(rangeChanged()));
-    connect(m_dockUI.endTimeEdit, SIGNAL(editingFinished()), this,
-            SLOT(rangeChanged()));
+    connect(m_dockUI.startTimeEdit, SIGNAL(editingFinished()), this, SLOT(rangeChanged()));
+    connect(m_dockUI.endTimeEdit, SIGNAL(editingFinished()), this, SLOT(rangeChanged()));
 
-    connect(m_dockUI.showIdealFramesButton, SIGNAL(stateChanged(int)), this,
-            SLOT(showIdealFrames(int)));
-    connect(m_dockUI.showEvalTimingButton, SIGNAL(stateChanged(int)), this,
-            SLOT(showEvalTiming(int)));
-    connect(m_dockUI.actualFPSEdit, SIGNAL(editingFinished()), this,
-            SLOT(fpsChanged()));
+    connect(m_dockUI.showIdealFramesButton, SIGNAL(stateChanged(int)), this, SLOT(showIdealFrames(int)));
+    connect(m_dockUI.showEvalTimingButton, SIGNAL(stateChanged(int)), this, SLOT(showEvalTiming(int)));
+    connect(m_dockUI.actualFPSEdit, SIGNAL(editingFinished()), this, SLOT(fpsChanged()));
 
     m_glWidget = new GLView(this, m_dockUI.readoutEdit, this);
     setCentralWidget(m_glWidget);
@@ -153,9 +144,7 @@ bool VisMainWindow::eventFilter(QObject* obj, QEvent* event)
 
 void VisMainWindow::openFile()
 {
-    QString filename = QFileDialog::getOpenFileName(
-        this, "Select File", ".",
-        UI_APPLICATION_NAME " Profile Data (*.rvprof *.timedata)");
+    QString filename = QFileDialog::getOpenFileName(this, "Select File", ".", UI_APPLICATION_NAME " Profile Data (*.rvprof *.timedata)");
 
     readFile(filename);
 }
@@ -168,8 +157,7 @@ void VisMainWindow::readFile(const QString& filename)
 
     if (!infile.exists())
     {
-        cerr << "ERROR: file doesn't exist: " << filename.toUtf8().constData()
-             << endl;
+        cerr << "ERROR: file doesn't exist: " << filename.toUtf8().constData() << endl;
         return;
     }
 
@@ -180,8 +168,7 @@ void VisMainWindow::readFile(const QString& filename)
     }
 
     QFileInfo info(filename);
-    setWindowTitle(QString(UI_APPLICATION_NAME " Profile Viewer -- %1")
-                       .arg(info.baseName()));
+    setWindowTitle(QString(UI_APPLICATION_NAME " Profile Viewer -- %1").arg(info.baseName()));
 
     DataVector data;
 
@@ -203,11 +190,11 @@ void VisMainWindow::readFile(const QString& filename)
             //
 
             DataElement e;
-#define OFFSET_PAIR(NAME, FIELD)                     \
-    {#NAME "0", ((char*)&e.FIELD##0) - ((char*)&e)}, \
-        {#NAME "1", ((char*)&e.FIELD##1) - ((char*)&e)}
+            // clang-format off
+#define OFFSET_PAIR(NAME, FIELD) {#NAME "0", ((char*)&e.FIELD##0) - ((char*)&e)}, {#NAME "1", ((char*)&e.FIELD##1) - ((char*)&e)}
 
 #define OFFSET_SINGLE(NAME, FIELD) {#NAME, ((char*)&e.FIELD) - ((char*)&e)}
+            // clang-format on
 
             NameOffsetPair offsets[] = {OFFSET_PAIR(R, render),
                                         OFFSET_PAIR(S, swap),
@@ -239,10 +226,8 @@ void VisMainWindow::readFile(const QString& filename)
 
                 if (nameValue.size() != 2)
                 {
-                    cout << "ERROR: reading file "
-                         << filename.toUtf8().constData() << endl;
-                    cout << "ERROR: reading this field: \""
-                         << parts[i].toUtf8().constData() << "\"" << endl;
+                    cout << "ERROR: reading file " << filename.toUtf8().constData() << endl;
+                    cout << "ERROR: reading this field: \"" << parts[i].toUtf8().constData() << "\"" << endl;
                     continue;
                 }
 
@@ -250,8 +235,7 @@ void VisMainWindow::readFile(const QString& filename)
                 {
                     if (nameValue[0] == p->name)
                     {
-                        *(double*)((char*)&e + p->offset) =
-                            nameValue[1].toDouble();
+                        *(double*)((char*)&e + p->offset) = nameValue[1].toDouble();
                         break;
                     }
                 }
@@ -363,37 +347,21 @@ void VisMainWindow::showFile()
 
 void VisMainWindow::quit() { qApp->quit(); }
 
-void VisMainWindow::showIdealFrames(int b)
-{
-    m_glWidget->setShowIdealFrames(b == Qt::Checked);
-}
+void VisMainWindow::showIdealFrames(int b) { m_glWidget->setShowIdealFrames(b == Qt::Checked); }
 
-void VisMainWindow::showEvalTiming(int b)
-{
-    m_glWidget->setShowEvalTiming(b == Qt::Checked);
-}
+void VisMainWindow::showEvalTiming(int b) { m_glWidget->setShowEvalTiming(b == Qt::Checked); }
 
-void VisMainWindow::fpsChanged()
-{
-    m_glWidget->setActualFPS(m_dockUI.actualFPSEdit->text().toFloat());
-}
+void VisMainWindow::fpsChanged() { m_glWidget->setActualFPS(m_dockUI.actualFPSEdit->text().toFloat()); }
 
 void VisMainWindow::updateTimeRangeFromGLView()
 {
-    m_dockUI.startTimeEdit->setText(
-        QString("%1").arg(m_glWidget->rangeStart()));
+    m_dockUI.startTimeEdit->setText(QString("%1").arg(m_glWidget->rangeStart()));
     m_dockUI.endTimeEdit->setText(QString("%1").arg(m_glWidget->rangeEnd()));
 }
 
-void VisMainWindow::updateActualFPSFromGLView()
-{
-    m_dockUI.actualFPSEdit->setText(QString("%1").arg(m_glWidget->actualFPS()));
-}
+void VisMainWindow::updateActualFPSFromGLView() { m_dockUI.actualFPSEdit->setText(QString("%1").arg(m_glWidget->actualFPS())); }
 
-void VisMainWindow::setShowIdealFrames()
-{
-    m_dockUI.showIdealFramesButton->setCheckState(Qt::Checked);
-}
+void VisMainWindow::setShowIdealFrames() { m_dockUI.showIdealFramesButton->setCheckState(Qt::Checked); }
 
 void VisMainWindow::rangeChanged()
 {
@@ -438,8 +406,7 @@ void VisMainWindow::rangeChanged()
         m_glWidget->setComputedFPS(fps);
         m_dockUI.fpsLabel->setText(QString("%1").arg(fps));
 
-        m_dockUI.totalTimeLabel->setText(
-            QString("%1 sec").arg(endTime - startTime));
+        m_dockUI.totalTimeLabel->setText(QString("%1 sec").arg(endTime - startTime));
 
         for (size_t i = i0; i <= i1; i++)
         {
@@ -466,11 +433,9 @@ void VisMainWindow::rangeChanged()
 
         // yes, this is right, its inverted so min is max
         if (minRR > 0)
-            m_dockUI.maxVariationLabel->setText(
-                QString("%1 Hz").arg(1.0 / minRR));
+            m_dockUI.maxVariationLabel->setText(QString("%1 Hz").arg(1.0 / minRR));
         if (maxRR > 0)
-            m_dockUI.minVariationLabel->setText(
-                QString("%1 Hz").arg(1.0 / maxRR));
+            m_dockUI.minVariationLabel->setText(QString("%1 Hz").arg(1.0 / maxRR));
     }
 }
 
@@ -595,8 +560,7 @@ void GLView::setData(const DataVector& data)
     */
     float d = 1.0;
     float y = 4.0 * (m_endTime - m_startTime) / height();
-    m_matrix = scaleMatrix<float>(Vec(d, d, 1))
-               * translationMatrix<float>(Vec(-m_startTime, y, 0));
+    m_matrix = scaleMatrix<float>(Vec(d, d, 1)) * translationMatrix<float>(Vec(-m_startTime, y, 0));
 
     update();
 }
@@ -643,8 +607,7 @@ int GLView::timeToSample(float t)
     {
         const DataElement& e = m_data[i];
 
-        if ((e.prefetch1 != 0.0 && e.prefetch1 >= t)
-            || (e.prefetch1 == 0.0 && e.swap1 >= t))
+        if ((e.prefetch1 != 0.0 && e.prefetch1 >= t) || (e.prefetch1 == 0.0 && e.swap1 >= t))
         {
             return i;
         }
@@ -655,8 +618,7 @@ int GLView::timeToSample(float t)
 #define APP0(str) m_readoutHtml.append(QString(str))
 #define APP1(str, a1) m_readoutHtml.append(QString(str).arg(a1))
 #define APP2(str, a1, a2) m_readoutHtml.append(QString(str).arg(a1).arg(a2))
-#define APP3(str, a1, a2, a3) \
-    m_readoutHtml.append(QString(str).arg(a1).arg(a2).arg(a3))
+#define APP3(str, a1, a2, a3) m_readoutHtml.append(QString(str).arg(a1).arg(a2).arg(a3))
 #define APPBR() m_readoutHtml.append(QString("\n<br>\n"))
 #define APPCOLSTART(r, g, b)                                       \
     m_readoutHtml.append(QString("%1<font color=\"#%2%3%4\">")     \
@@ -665,22 +627,18 @@ int GLView::timeToSample(float t)
                              .arg(int(g * 255), 2, 16, QChar('0')) \
                              .arg(int(b * 255), 2, 16, QChar('0')))
 #define APPCOLEND() m_readoutHtml.append(QString("</font>"))
-#define APPCOLTXT(r, g, b, s)                                             \
-    m_readoutHtml.append(                                                 \
-        QString("%1<font color=\"#%2%3%4\">&diams;&diams;&diams;&diams; " \
-                "</font><b>%5</b>")                                       \
-            .arg(indent)                                                  \
-            .arg(int(r * 255), 2, 16, QChar('0'))                         \
-            .arg(int(g * 255), 2, 16, QChar('0'))                         \
-            .arg(int(b * 255), 2, 16, QChar('0'))                         \
-            .arg(s))
+#define APPCOLTXT(r, g, b, s)                                                              \
+    m_readoutHtml.append(QString("%1<font color=\"#%2%3%4\">&diams;&diams;&diams;&diams; " \
+                                 "</font><b>%5</b>")                                       \
+                             .arg(indent)                                                  \
+                             .arg(int(r * 255), 2, 16, QChar('0'))                         \
+                             .arg(int(g * 255), 2, 16, QChar('0'))                         \
+                             .arg(int(b * 255), 2, 16, QChar('0'))                         \
+                             .arg(s))
 
-#define APPITEM(str, a1)                                                      \
-    APP3(QString(str) + QString(", start %1, end %2, total %3<br>\n"), a1##0, \
-         a1##1, a1##1 - a1##0)
+#define APPITEM(str, a1) APP3(QString(str) + QString(", start %1, end %2, total %3<br>\n"), a1##0, a1##1, a1##1 - a1##0)
 
-#define APPDELTAITEM(str, a1) \
-    APP1(QString(str) + QString(", total %1<br>\n"), a1)
+#define APPDELTAITEM(str, a1) APP1(QString(str) + QString(", total %1<br>\n"), a1)
 
 #define APPITEMTEST(bold, str, a1, r, g, b) \
     if (a1##1 - a1##0 > 0.0000)             \
@@ -713,8 +671,7 @@ void GLView::generateHtml()
         return;
 
     const DataElement& e = m_data[m_readoutSample];
-    const DataElement& elast =
-        m_data[(m_readoutSample == 0) ? 0 : m_readoutSample - 1];
+    const DataElement& elast = m_data[(m_readoutSample == 0) ? 0 : m_readoutSample - 1];
 
     APP0("<body bgcolor=\"#909090\">");
     APP1("Start with frame %1, ", elast.frame);
@@ -727,30 +684,21 @@ void GLView::generateHtml()
 
     indent = spaces;
     APPCOLTXT(.3, 1, .3, "evaluate (render) start: ");
-    APPITEM("Evaluation during Session::render (Session::evaluateForDisplay)",
-            e.eval);
+    APPITEM("Evaluation during Session::render (Session::evaluateForDisplay)", e.eval);
 
     if (e.cacheTest0 < e.eval1)
     {
         QString saveIndent = indent;
         indent = saveIndent + spaces;
-        APPITEMTEST(
-            "cacheTest",
-            "test to see if image is in cache, IPGraph::evaluateAtFrame()",
-            e.cacheTest, 1, 1, 0);
+        APPITEMTEST("cacheTest", "test to see if image is in cache, IPGraph::evaluateAtFrame()", e.cacheTest, 1, 1, 0);
 
         indent = saveIndent + spaces + spaces;
-        APPITEMTESTBOLD("cacheTestLock", "acquire lock on frame cache",
-                        e.cacheTestLock);
-        APPITEMTESTBOLD("setDisplayFrame", "set display frame on frame cache",
-                        e.setDisplayFrame);
-        APPITEMTESTBOLD("frameCachedTest",
-                        "check that all FBs for this frame are in cache",
-                        e.frameCachedTest);
+        APPITEMTESTBOLD("cacheTestLock", "acquire lock on frame cache", e.cacheTestLock);
+        APPITEMTESTBOLD("setDisplayFrame", "set display frame on frame cache", e.setDisplayFrame);
+        APPITEMTESTBOLD("frameCachedTest", "check that all FBs for this frame are in cache", e.frameCachedTest);
 
         indent = saveIndent + spaces;
-        APPITEMTESTBOLD("evalGraph", "get the FBs for this frame from cache.",
-                        e.evalGraph);
+        APPITEMTESTBOLD("evalGraph", "get the FBs for this frame from cache.", e.evalGraph);
     }
 
     indent = spaces;
@@ -758,8 +706,7 @@ void GLView::generateHtml()
     APPBR();
 
     APPCOLTXT(1, .6, .6, "internalRender: ");
-    APPITEM("Internal render time, total time in CompositeRenderer::render",
-            e.internalRender);
+    APPITEM("Internal render time, total time in CompositeRenderer::render", e.internalRender);
 
     indent = spaces + spaces;
     APPITEMTEST("userRender",
@@ -771,10 +718,8 @@ void GLView::generateHtml()
                 "\"frame-changed\" user event.",
                 e.frameChange, 1, 1, .6);
 
-    APPDELTAITEMTEST(
-        "renderFenceWait",
-        "total fence wait time.  should only be non-zero in presentation mode.",
-        e.renderFenceWait, .6, .2, .2);
+    APPDELTAITEMTEST("renderFenceWait", "total fence wait time.  should only be non-zero in presentation mode.", e.renderFenceWait, .6, .2,
+                     .2);
     APPDELTAITEMTEST("renderUploadPlane",
                      "total time in uploadPlane().  should only be non-zero if "
                      "upload did not complete in prefetch.",
@@ -792,8 +737,7 @@ void GLView::generateHtml()
     float swapRate = (swapDiff == 0.0) ? 0.0 : 1.0 / swapDiff;
 
     QString swapText;
-    if (swapRate != 0.0 && m_computedRefresh != 0.0
-        && swapRate < 1.0 / m_computedRefresh)
+    if (swapRate != 0.0 && m_computedRefresh != 0.0 && swapRate < 1.0 / m_computedRefresh)
     {
         swapText = QString("rendering complete, waiting for buffer swap, "
                            "<b>equiv rate = %1</b>")
@@ -801,15 +745,11 @@ void GLView::generateHtml()
     }
     else
     {
-        swapText =
-            QString(
-                "rendering complete, waiting for buffer swap, equiv rate = %1")
-                .arg(swapRate);
+        swapText = QString("rendering complete, waiting for buffer swap, equiv rate = %1").arg(swapRate);
     }
     APPITEMTEST("buffer swap / vsync", swapText, e.swap, .3, .3, .75);
 
-    APPITEMTEST("awaken", "awaken caching threads post-render", e.awaken, .2,
-                .6, .6);
+    APPITEMTEST("awaken", "awaken caching threads post-render", e.awaken, .2, .6, .6);
 
     APPCOLTXT(.7, 1, 1, "prefetch: ");
     APPITEM("time spent in Session::postRender, including eval time if "
@@ -820,36 +760,25 @@ void GLView::generateHtml()
     {
         QString saveIndent = indent;
         indent = saveIndent + spaces;
-        APPITEMTEST(
-            "cacheTest",
-            "test to see if image is in cache, IPGraph::evaluateAtFrame()",
-            e.cacheTest, 1, 1, 0);
+        APPITEMTEST("cacheTest", "test to see if image is in cache, IPGraph::evaluateAtFrame()", e.cacheTest, 1, 1, 0);
 
         indent = saveIndent + spaces + spaces;
 
-        APPITEMTESTBOLD("cacheTestLock", "acquire lock on frame cache",
-                        e.cacheTestLock);
-        APPITEMTESTBOLD("setDisplayFrame", "set display frame on frame cache",
-                        e.setDisplayFrame);
-        APPITEMTESTBOLD("frameCachedTest",
-                        "check that all FBs for this frame are in cache",
-                        e.frameCachedTest);
+        APPITEMTESTBOLD("cacheTestLock", "acquire lock on frame cache", e.cacheTestLock);
+        APPITEMTESTBOLD("setDisplayFrame", "set display frame on frame cache", e.setDisplayFrame);
+        APPITEMTESTBOLD("frameCachedTest", "check that all FBs for this frame are in cache", e.frameCachedTest);
 
         indent = saveIndent + spaces;
-        APPITEMTESTBOLD("evalGraph", "get the FBs for this frame from cache.",
-                        e.evalGraph);
+        APPITEMTESTBOLD("evalGraph", "get the FBs for this frame from cache.", e.evalGraph);
     }
 
     indent = spaces;
     APPCOLTXT(.6, .2, .2, "prefetchRender: ");
-    APPITEM("total prefetch rendertime, CompositeRenderer::prefetch.",
-            e.prefetchRender);
+    APPITEM("total prefetch rendertime, CompositeRenderer::prefetch.", e.prefetchRender);
 
     indent = spaces + spaces;
-    APPDELTAITEMTEST(
-        "prefetchUploadPlanes",
-        "time spent in uploadPlanes, may be zero of upload is async",
-        e.prefetchUploadPlane, .6, .2, .6);
+    APPDELTAITEMTEST("prefetchUploadPlanes", "time spent in uploadPlanes, may be zero of upload is async", e.prefetchUploadPlane, .6, .2,
+                     .6);
 
     indent = spaces;
     APPCOLTXT(.6, .2, .2, "prefetchRender end ");
@@ -865,18 +794,10 @@ void GLView::generateHtml()
          "playback.<br>");
 
     indent = spaces;
-    APPITEMTEST(
-        "evalID",
-        "evaluate identifiers preparatory to looking them up in the cache",
-        e.evalID, .75, 1, .75);
-    APPITEMTEST(
-        "cacheQuery",
-        "evaluate identifiers preparatory to looking them up in the cache.",
-        e.cacheQuery, 0, .75, 1);
-    APPITEMTEST("cacheEval", "actually evaluate the FBs for this frame.",
-                e.cacheEval, 1, .6, 1);
-    APPITEMTESTBOLD("IO", "FileSource calling imagesAtFrame on it's movies.",
-                    e.io);
+    APPITEMTEST("evalID", "evaluate identifiers preparatory to looking them up in the cache", e.evalID, .75, 1, .75);
+    APPITEMTEST("cacheQuery", "evaluate identifiers preparatory to looking them up in the cache.", e.cacheQuery, 0, .75, 1);
+    APPITEMTEST("cacheEval", "actually evaluate the FBs for this frame.", e.cacheEval, 1, .6, 1);
+    APPITEMTESTBOLD("IO", "FileSource calling imagesAtFrame on it's movies.", e.io);
 
     indent = "";
 
@@ -885,14 +806,11 @@ void GLView::generateHtml()
     APPBR();
     APP3("Expected time of next vsync: %1, which is in the %2 (%3 sec from end "
          "of render).",
-         e.expectedSyncTime,
-         ((e.expectedSyncTime < e.render1) ? "past" : "future"),
-         (e.expectedSyncTime - e.render1));
+         e.expectedSyncTime, ((e.expectedSyncTime < e.render1) ? "past" : "future"), (e.expectedSyncTime - e.render1));
     if (e.deviceClockOffset != 0.0)
     {
         APPBR();
-        APP1("Elapsed play time - Device clock = %1 seconds.",
-             e.deviceClockOffset);
+        APP1("Elapsed play time - Device clock = %1 seconds.", e.deviceClockOffset);
     }
 
     APP0("</body>");
@@ -902,9 +820,7 @@ void GLView::generateHtml()
 int GLView::sampleFromMousePosition(float x, float y)
 {
     float tx = m_startTime + (x / width()) * (m_endTime - m_startTime);
-    float ty =
-        m_startTime
-        + (-y / height()) * (m_endTime - m_startTime) * (height() / width());
+    float ty = m_startTime + (-y / height()) * (m_endTime - m_startTime) * (height() / width());
 
     Matrix m = m_matrix;
     m.invert();
@@ -921,8 +837,7 @@ void GLView::mouseMoveEvent(QMouseEvent* event)
 
     if (event->buttons() == Qt::NoButton)
     {
-        int sample =
-            sampleFromMousePosition(event->pos().x(), event->pos().y());
+        int sample = sampleFromMousePosition(event->pos().x(), event->pos().y());
 
         if (sample != m_readoutSample)
         {
@@ -935,20 +850,16 @@ void GLView::mouseMoveEvent(QMouseEvent* event)
 
     if (event->buttons() & Qt::RightButton)
     {
-        Vec t(.5 * (m_endTime - m_startTime),
-              .5 * (m_endTime - m_startTime) * (h / w), 0);
+        Vec t(.5 * (m_endTime - m_startTime), .5 * (m_endTime - m_startTime) * (h / w), 0);
 
         float a = dp.x() * .8;
         a *= 0.001;
         a += 1.0;
-        m_matrix = translationMatrix<float>(t)
-                   * scaleMatrix<float>(Vec(a, a, 1))
-                   * translationMatrix<float>(-t) * m_matrix;
+        m_matrix = translationMatrix<float>(t) * scaleMatrix<float>(Vec(a, a, 1)) * translationMatrix<float>(-t) * m_matrix;
     }
     else if (event->buttons() & Qt::LeftButton)
     {
-        Vec t = Vec(dp.x() / w * (m_endTime - m_startTime),
-                    -dp.y() / h * (m_endTime - m_startTime) * (h / w), 0);
+        Vec t = Vec(dp.x() / w * (m_endTime - m_startTime), -dp.y() / h * (m_endTime - m_startTime) * (h / w), 0);
         m_matrix = translationMatrix<float>(t) * m_matrix;
     }
     m_mouseDown = event->pos();
@@ -976,8 +887,7 @@ void GLView::mousePressEvent(QMouseEvent* event)
     {
         if (event->modifiers() & Qt::ShiftModifier)
         {
-            int sample =
-                sampleFromMousePosition(event->pos().x(), event->pos().y());
+            int sample = sampleFromMousePosition(event->pos().x(), event->pos().y());
 
             m_rangeStartIndex = sample;
             while (m_rangeStartIndex > 1)
@@ -1019,16 +929,14 @@ void GLView::mousePressEvent(QMouseEvent* event)
         }
         else if (event->modifiers() & Qt::ControlModifier)
         {
-            int sample =
-                sampleFromMousePosition(event->pos().x(), event->pos().y());
+            int sample = sampleFromMousePosition(event->pos().x(), event->pos().y());
             m_rangeStart = m_data[sample].render0;
             m_rangeStartIndex = sample;
             autoRangeProcessing();
         }
         else if (event->modifiers() & Qt::AltModifier)
         {
-            int sample =
-                sampleFromMousePosition(event->pos().x(), event->pos().y());
+            int sample = sampleFromMousePosition(event->pos().x(), event->pos().y());
             m_rangeEnd = m_data[sample].swap1;
             m_rangeEndIndex = sample;
             autoRangeProcessing();
@@ -1044,8 +952,7 @@ void GLView::wheelEvent(QWheelEvent* event)
     float w = width();
     float h = height();
 
-    Vec t(.5 * (m_endTime - m_startTime),
-          .5 * (m_endTime - m_startTime) * (h / w), 0);
+    Vec t(.5 * (m_endTime - m_startTime), .5 * (m_endTime - m_startTime) * (h / w), 0);
 
 #if defined(RV_VFX_CY2023)
     float a = event->delta() * .8;
@@ -1055,8 +962,7 @@ void GLView::wheelEvent(QWheelEvent* event)
 
     a *= 0.001;
     a += 1.0;
-    m_matrix = translationMatrix<float>(t) * scaleMatrix<float>(Vec(a, a, 1))
-               * translationMatrix<float>(-t) * m_matrix;
+    m_matrix = translationMatrix<float>(t) * scaleMatrix<float>(Vec(a, a, 1)) * translationMatrix<float>(-t) * m_matrix;
 
     update();
 }
@@ -1076,8 +982,7 @@ void GLView::resizeGL(int, int)
     update();
 }
 
-static void drawBox(float r, float g, float b, float a, float llx, float lly,
-                    float urx, float ury)
+static void drawBox(float r, float g, float b, float a, float llx, float lly, float urx, float ury)
 {
     glColor4f(r, g, b, a);
     glBegin(GL_POLYGON);
@@ -1088,8 +993,7 @@ static void drawBox(float r, float g, float b, float a, float llx, float lly,
     glEnd();
 }
 
-static void drawBox(float r, float g, float b, float a, float x0, float y0,
-                    float x1, float y1, float x2, float y2, float x3, float y3)
+static void drawBox(float r, float g, float b, float a, float x0, float y0, float x1, float y1, float x2, float y2, float x3, float y3)
 {
     glColor4f(r, g, b, a);
     glBegin(GL_POLYGON);
@@ -1153,8 +1057,7 @@ void GLView::paintGL()
         y0 = h0;
         y1 = h / 3.0;
 
-        drawBox(e.repeatframe ? 0.6 : 1, .3, .3, 1, e.render0, y0, e.render1,
-                y1);
+        drawBox(e.repeatframe ? 0.6 : 1, .3, .3, 1, e.render0, y0, e.render1, y1);
 
         //
         //  Green box, drawn above render box.  corresponds to Session's
@@ -1378,9 +1281,7 @@ void GLView::paintGL()
 
             GLtext::size(20.0);
             GLtext::color(.7, .2, .2, 1);
-            float s = 1.0
-                      / (GLtext::globalAscenderHeight()
-                         - GLtext::globalDescenderHeight());
+            float s = 1.0 / (GLtext::globalAscenderHeight() - GLtext::globalDescenderHeight());
             ostringstream str;
             str << e.frame;
             glPushMatrix();
@@ -1397,9 +1298,7 @@ void GLView::paintGL()
         {
             GLtext::size(20.0);
             GLtext::color(0, 0, 0, .7);
-            float s = 1.0
-                      / (GLtext::globalAscenderHeight()
-                         - GLtext::globalDescenderHeight());
+            float s = 1.0 / (GLtext::globalAscenderHeight() - GLtext::globalDescenderHeight());
             ostringstream str;
             str << e.frame;
 
@@ -1438,9 +1337,7 @@ void GLView::paintGL()
 
             GLtext::size(50.0);
             GLtext::color(1, 1, 1, 1);
-            float s = 1.0
-                      / (GLtext::globalAscenderHeight()
-                         - GLtext::globalDescenderHeight());
+            float s = 1.0 / (GLtext::globalAscenderHeight() - GLtext::globalDescenderHeight());
             ostringstream str;
             str << "*1 ";
 
@@ -1475,9 +1372,7 @@ void GLView::paintGL()
 
             GLtext::size(20.0);
             GLtext::color(0, 0, 0, .85);
-            float s = 1.0
-                      / (GLtext::globalAscenderHeight()
-                         - GLtext::globalDescenderHeight());
+            float s = 1.0 / (GLtext::globalAscenderHeight() - GLtext::globalDescenderHeight());
             ostringstream str;
             str << "GC# " << e.gccount << " ";
 
@@ -1501,8 +1396,7 @@ void GLView::paintGL()
             glPopMatrix();
         }
 
-        if (false && m_showIdealFrames && i >= m_rangeStartIndex
-            && i <= m_rangeEndIndex)
+        if (false && m_showIdealFrames && i >= m_rangeStartIndex && i <= m_rangeEndIndex)
         {
             if (idealStartIndex == -1)
             {
@@ -1515,10 +1409,7 @@ void GLView::paintGL()
             else
             {
                 int startFrame = m_data[idealStartIndex].frame;
-                int frame = startFrame
-                            + int(0.5
-                                  + ((e.swap1 - m_data[idealStartIndex].swap1)
-                                     * m_actualFPS));
+                int frame = startFrame + int(0.5 + ((e.swap1 - m_data[idealStartIndex].swap1) * m_actualFPS));
 
                 /*
                 int nsyncs = i - m_rangeStartIndex;
@@ -1536,9 +1427,7 @@ void GLView::paintGL()
                     lastIdealFrame = frame;
                     GLtext::size(20.0);
                     GLtext::color(0, 0, 0, .7);
-                    float s = 1.0
-                              / (GLtext::globalAscenderHeight()
-                                 - GLtext::globalDescenderHeight());
+                    float s = 1.0 / (GLtext::globalAscenderHeight() - GLtext::globalDescenderHeight());
                     ostringstream str;
                     str << frame;
 
@@ -1585,9 +1474,7 @@ void GLView::paintGL()
 
             GLtext::size(20.0);
             GLtext::color(0, 0, 0, .7);
-            float s = 1.0
-                      / (GLtext::globalAscenderHeight()
-                         - GLtext::globalDescenderHeight());
+            float s = 1.0 / (GLtext::globalAscenderHeight() - GLtext::globalDescenderHeight());
             ostringstream str;
             str << frame;
 
@@ -1627,9 +1514,7 @@ void GLView::paintGL()
 
     GLtext::size(100.0);
     GLtext::color(0, 0, 0, .5);
-    float s =
-        1.0
-        / (GLtext::globalAscenderHeight() - GLtext::globalDescenderHeight());
+    float s = 1.0 / (GLtext::globalAscenderHeight() - GLtext::globalDescenderHeight());
 
     for (int i = int(m_startTime); i < int(m_endTime - m_startTime + 1.0); i++)
     {

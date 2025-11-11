@@ -45,15 +45,13 @@ namespace TwkFB
 
         if (!infile)
         {
-            TWK_THROW_STREAM(TwkFB::IOException,
-                             "RGBE I/O: can't get info about " << filename);
+            TWK_THROW_STREAM(TwkFB::IOException, "RGBE I/O: can't get info about " << filename);
         }
 
         int width;
         int height;
 
-        if (RGBE_ReadHeader(infile, &width, &height, 0, true)
-            == RGBE_RETURN_SUCCESS)
+        if (RGBE_ReadHeader(infile, &width, &height, 0, true) == RGBE_RETURN_SUCCESS)
         {
             fbi.numChannels = 3;
             fbi.dataType = FrameBuffer::FLOAT;
@@ -63,20 +61,17 @@ namespace TwkFB
         }
         else
         {
-            TWK_THROW_STREAM(IOException,
-                             "RGBE I/O: can't get info about " << filename);
+            TWK_THROW_STREAM(IOException, "RGBE I/O: can't get info about " << filename);
         }
     }
 
-    void IOrgbe::readImage(FrameBuffer& fb, const std::string& filename,
-                           const ReadRequest& request) const
+    void IOrgbe::readImage(FrameBuffer& fb, const std::string& filename, const ReadRequest& request) const
     {
         FILE* infile = TwkUtil::fopen(filename.c_str(), "rb");
 
         if (!infile)
         {
-            TWK_THROW_STREAM(TwkFB::IOException,
-                             "RGBE I/O: can't get info about " << filename);
+            TWK_THROW_STREAM(TwkFB::IOException, "RGBE I/O: can't get info about " << filename);
         }
 
         int w;
@@ -86,32 +81,26 @@ namespace TwkFB
         {
             fb.restructure(w, h, 0, 3, FrameBuffer::FLOAT);
 
-            if (RGBE_ReadPixels_RLE(infile, fb.pixels<float>(), w, h)
-                != RGBE_RETURN_SUCCESS)
+            if (RGBE_ReadPixels_RLE(infile, fb.pixels<float>(), w, h) != RGBE_RETURN_SUCCESS)
             {
                 fclose(infile);
-                TWK_THROW_STREAM(IOException,
-                                 "RGBE I/O: can't get pixel data for "
-                                     << filename);
+                TWK_THROW_STREAM(IOException, "RGBE I/O: can't get pixel data for " << filename);
             }
 
-            fb.setPrimaryColorSpace(
-                ColorSpace::Rec709()); // assume rec709 primaries
+            fb.setPrimaryColorSpace(ColorSpace::Rec709()); // assume rec709 primaries
             fb.setTransferFunction(ColorSpace::Linear());
             fb.setOrientation(FrameBuffer::TOPLEFT);
         }
         else
         {
             fclose(infile);
-            TWK_THROW_STREAM(IOException,
-                             "RGBE I/O: can't get info about " << filename);
+            TWK_THROW_STREAM(IOException, "RGBE I/O: can't get info about " << filename);
         }
 
         fclose(infile);
     }
 
-    void IOrgbe::writeImage(const FrameBuffer& img, const std::string& filename,
-                            const WriteRequest& request) const
+    void IOrgbe::writeImage(const FrameBuffer& img, const std::string& filename, const WriteRequest& request) const
     {
         FrameBuffer* outfb = const_cast<FrameBuffer*>(&img);
 
@@ -189,14 +178,12 @@ namespace TwkFB
 
         if (!outfile)
         {
-            TWK_THROW_STREAM(TwkFB::IOException,
-                             "RGBE I/O: can't write " << filename);
+            TWK_THROW_STREAM(TwkFB::IOException, "RGBE I/O: can't write " << filename);
         }
 
         RGBE_WriteHeader(outfile, outfb->width(), outfb->height(), 0);
 
-        RGBE_WritePixels_RLE(outfile, outfb->pixels<float>(), outfb->width(),
-                             outfb->height());
+        RGBE_WritePixels_RLE(outfile, outfb->pixels<float>(), outfb->width(), outfb->height());
         fclose(outfile);
 
         if (outfb != &img)

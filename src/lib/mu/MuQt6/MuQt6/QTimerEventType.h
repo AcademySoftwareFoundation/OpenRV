@@ -37,8 +37,7 @@ namespace Mu
         //  Constructors
         //
 
-        QTimerEventType(Context* context, const char* name,
-                        Class* superClass = 0);
+        QTimerEventType(Context* context, const char* name, Class* superClass = 0);
         virtual ~QTimerEventType();
 
         //

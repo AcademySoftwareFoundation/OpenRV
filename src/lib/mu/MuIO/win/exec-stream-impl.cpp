@@ -90,8 +90,7 @@ void exec_stream_t::set_buffer_limit(int stream_kind, std::size_t size)
     }
 }
 
-void exec_stream_t::set_wait_timeout(int stream_kind,
-                                     exec_stream_t::timeout_t milliseconds)
+void exec_stream_t::set_wait_timeout(int stream_kind, exec_stream_t::timeout_t milliseconds)
 {
     if (stream_kind & s_in)
     {
@@ -148,8 +147,7 @@ void exec_stream_t::set_text_mode(int stream_kind)
 
 using namespace std;
 
-void exec_stream_t::start(std::string const& program,
-                          std::string const& arguments)
+void exec_stream_t::start(std::string const& program, std::string const& arguments)
 {
     if (!close())
     {
@@ -164,8 +162,7 @@ void exec_stream_t::start(std::string const& program,
 
     wchar_t conout[8] = {'C', 'O', 'N', 'O', 'U', 'T', '$', 0};
 
-    HANDLE con = CreateFile(conout, GENERIC_WRITE, FILE_SHARE_WRITE, 0,
-                            OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+    HANDLE con = CreateFile(conout, GENERIC_WRITE, FILE_SHARE_WRITE, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
 
     bool has_console = con != INVALID_HANDLE_VALUE;
     if (has_console)
@@ -179,28 +176,23 @@ void exec_stream_t::start(std::string const& program,
     // set_stdhandle_t set_err( STD_ERROR_HANDLE, err.w() );
     HANDLE cp = GetCurrentProcess();
 
-    if (!DuplicateHandle(cp, in.w(), cp, &m_impl->m_in_pipe, 0, FALSE,
-                         DUPLICATE_SAME_ACCESS))
+    if (!DuplicateHandle(cp, in.w(), cp, &m_impl->m_in_pipe, 0, FALSE, DUPLICATE_SAME_ACCESS))
     {
         throw os_error_t("exec_stream_t::start: unable to duplicate in handle");
     }
 
     in.close_w();
 
-    if (!DuplicateHandle(cp, out.r(), cp, &m_impl->m_out_pipe, 0, FALSE,
-                         DUPLICATE_SAME_ACCESS))
+    if (!DuplicateHandle(cp, out.r(), cp, &m_impl->m_out_pipe, 0, FALSE, DUPLICATE_SAME_ACCESS))
     {
-        throw os_error_t(
-            "exec_stream_t::start: unable to duplicate out handle");
+        throw os_error_t("exec_stream_t::start: unable to duplicate out handle");
     }
 
     out.close_r();
 
-    if (!DuplicateHandle(cp, err.r(), cp, &m_impl->m_err_pipe, 0, FALSE,
-                         DUPLICATE_SAME_ACCESS))
+    if (!DuplicateHandle(cp, err.r(), cp, &m_impl->m_err_pipe, 0, FALSE, DUPLICATE_SAME_ACCESS))
     {
-        throw os_error_t(
-            "exec_stream_t::start: unable to duplicate err handle");
+        throw os_error_t("exec_stream_t::start: unable to duplicate err handle");
     }
 
     err.close_r();
@@ -247,11 +239,9 @@ void exec_stream_t::start(std::string const& program,
                        0,                                  // environment
                        0,                                  // current directory
                        &si,                                // startup info
-                       &pi)) // process information
+                       &pi))                               // process information
     {
-        throw os_error_t(
-            "exec_stream_t::start: CreateProcess failed.\n command line was: "
-            + command);
+        throw os_error_t("exec_stream_t::start: CreateProcess failed.\n command line was: " + command);
     }
 
     m_impl->m_child_process = pi.hProcess;
@@ -273,8 +263,7 @@ void exec_stream_t::start(std::string const& program,
     m_impl->m_in_thread.start_writer_thread(m_impl->m_in_pipe);
 }
 
-void exec_stream_t::start(std::string const& program,
-                          exec_stream_t::next_arg_t& next_arg)
+void exec_stream_t::start(std::string const& program, exec_stream_t::next_arg_t& next_arg)
 {
     std::string arguments;
     while (std::string const* arg = next_arg.next())
@@ -371,8 +360,7 @@ bool exec_stream_t::close()
     {
         if (!CloseHandle(m_impl->m_out_pipe))
         {
-            throw os_error_t(
-                "exec_stream_t::close: unable to close out_pipe handle");
+            throw os_error_t("exec_stream_t::close: unable to close out_pipe handle");
         }
         m_impl->m_out_pipe = 0;
     }
@@ -380,29 +368,23 @@ bool exec_stream_t::close()
     {
         if (!CloseHandle(m_impl->m_err_pipe))
         {
-            throw os_error_t(
-                "exec_stream_t::close: unable to close err_pipe handle");
+            throw os_error_t("exec_stream_t::close: unable to close err_pipe handle");
         }
         m_impl->m_err_pipe = 0;
     }
     if (m_impl->m_child_process != 0)
     {
-        wait_result_t wait_result =
-            wait(m_impl->m_child_process, m_impl->m_child_timeout);
+        wait_result_t wait_result = wait(m_impl->m_child_process, m_impl->m_child_timeout);
         if (!wait_result.ok() & !wait_result.timed_out())
         {
-            throw os_error_t(
-                std::string(
-                    "exec_stream_t::close: wait for child process failed. ")
-                + wait_result.error_message());
+            throw os_error_t(std::string("exec_stream_t::close: wait for child process failed. ") + wait_result.error_message());
         }
         if (wait_result.ok())
         {
             DWORD exit_code;
             if (!GetExitCodeProcess(m_impl->m_child_process, &exit_code))
             {
-                throw os_error_t(
-                    "exec_stream_t::close: unable to get process exit code");
+                throw os_error_t("exec_stream_t::close: unable to get process exit code");
             }
             m_impl->m_exit_code = exit_code;
             if (!CloseHandle(m_impl->m_child_process))
@@ -422,14 +404,12 @@ void exec_stream_t::kill()
     {
         if (!TerminateProcess(m_impl->m_child_process, 0))
         {
-            throw os_error_t(
-                "exec_stream_t::kill: unable to terminate child process");
+            throw os_error_t("exec_stream_t::kill: unable to terminate child process");
         }
         m_impl->m_exit_code = 0;
         if (!CloseHandle(m_impl->m_child_process))
         {
-            throw os_error_t(
-                "exec_stream_t::close: unable to close child process handle");
+            throw os_error_t("exec_stream_t::close: unable to close child process handle");
         }
         m_impl->m_child_process = 0;
     }
@@ -439,8 +419,7 @@ int exec_stream_t::exit_code()
 {
     if (m_impl->m_child_process != 0)
     {
-        throw exec_stream_t::error_t(
-            "exec_stream_t:exit_code: child process still running");
+        throw exec_stream_t::error_t("exec_stream_t:exit_code: child process still running");
     }
     return m_impl->m_exit_code;
 }

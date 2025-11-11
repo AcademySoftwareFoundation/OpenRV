@@ -33,30 +33,15 @@ namespace Mu
 
         Structure structure() { return (unsigned char*)this + sizeof(this); }
 
-        const Structure structure() const
-        {
-            return (unsigned char*)this + sizeof(this);
-        }
+        const Structure structure() const { return (unsigned char*)this + sizeof(this); }
 
-        const VariantTagType* tagType() const
-        {
-            return static_cast<const VariantTagType*>(type());
-        }
+        const VariantTagType* tagType() const { return static_cast<const VariantTagType*>(type()); }
 
-        const VariantType* variantType() const
-        {
-            return tagType()->variantType();
-        }
+        const VariantType* variantType() const { return tagType()->variantType(); }
 
-        template <class T> T* data()
-        {
-            return reinterpret_cast<T*>(structure());
-        }
+        template <class T> T* data() { return reinterpret_cast<T*>(structure()); }
 
-        template <class T> const T* data() const
-        {
-            return reinterpret_cast<const T*>(structure());
-        }
+        template <class T> const T* data() const { return reinterpret_cast<const T*>(structure()); }
 
         //
         // This function uses the contents of the Structure plus the type

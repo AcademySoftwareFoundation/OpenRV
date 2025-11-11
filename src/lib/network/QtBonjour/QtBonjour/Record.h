@@ -37,8 +37,7 @@ class BonjourRecord
 public:
     BonjourRecord() {}
 
-    BonjourRecord(const QString& name, const QString& regType,
-                  const QString& domain)
+    BonjourRecord(const QString& name, const QString& regType, const QString& domain)
         : serviceName(name)
         , registeredType(regType)
         , replyDomain(domain)
@@ -58,9 +57,7 @@ public:
 
     bool operator==(const BonjourRecord& other) const
     {
-        return serviceName == other.serviceName
-               && registeredType == other.registeredType
-               && replyDomain == other.replyDomain;
+        return serviceName == other.serviceName && registeredType == other.registeredType && replyDomain == other.replyDomain;
     }
 };
 

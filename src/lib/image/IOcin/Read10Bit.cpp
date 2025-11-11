@@ -40,8 +40,7 @@ namespace TwkFB
 #define restrict __restrict
 #endif
 
-    void Read10Bit::planarConfig(FrameBuffer& fb, int w, int h,
-                                 FrameBuffer::DataType type)
+    void Read10Bit::planarConfig(FrameBuffer& fb, int w, int h, FrameBuffer::DataType type)
     {
         //
         //  NOTE: we're defaulting to TOPLEFT as that's the most common DPX
@@ -55,12 +54,10 @@ namespace TwkFB
         fb.restructurePlanar(w, h, planeNames, type, FrameBuffer::TOPLEFT);
     }
 
-    void Read10Bit::readRGBA8(const string& filename, const unsigned char* data,
-                              FrameBuffer& fb, int w, int h, size_t maxBytes,
-                              bool alpha, bool swap)
+    void Read10Bit::readRGBA8(const string& filename, const unsigned char* data, FrameBuffer& fb, int w, int h, size_t maxBytes, bool alpha,
+                              bool swap)
     {
-        fb.restructure(w, h, 0, 4, FrameBuffer::UCHAR, 0, 0,
-                       FrameBuffer::TOPLEFT, true);
+        fb.restructure(w, h, 0, 4, FrameBuffer::UCHAR, 0, 0, FrameBuffer::TOPLEFT, true);
 
         if (alpha)
         {
@@ -70,8 +67,7 @@ namespace TwkFB
             const size_t nwords = (w * 4) / 3;
             const size_t rem = (w * 4) % 3;
             const size_t totalWords = (nwords + (rem ? 1 : 0)) * h;
-            const bool truncatedScanline =
-                (maxBytes / 4 == nwords * h) && rem != 0;
+            const bool truncatedScanline = (maxBytes / 4 == nwords * h) && rem != 0;
             const size_t brem = (w * h * 4) % 3;
             const size_t bwords = (w * h * 4) / 3 * 4 + (brem ? 4 : 0);
             const bool runonScanline = bwords == maxBytes && rem != 0;
@@ -79,22 +75,19 @@ namespace TwkFB
 
             if (truncatedScanline && runonScanline)
             {
-                cout << "WARNING: " << filename
-                     << " is both truncated and run-on" << endl;
+                cout << "WARNING: " << filename << " is both truncated and run-on" << endl;
             }
 
             if (truncatedScanline)
             {
                 cout << "INFO: Reading as a truncated scanline file" << endl;
-                cout << "INFO: " << filename << " is not following the DPX spec"
-                     << endl;
+                cout << "INFO: " << filename << " is not following the DPX spec" << endl;
                 ss -= rem;
             }
             else if (runonScanline)
             {
                 cout << "INFO: Read as a run-on scanline file" << endl;
-                cout << "INFO: " << filename << " is not following the DPX spec"
-                     << endl;
+                cout << "INFO: " << filename << " is not following the DPX spec" << endl;
             }
 
             for (int y = 0; y < h; y++)
@@ -111,10 +104,8 @@ namespace TwkFB
                     {
                         const U32 v = in->pixelWord;
 
-                        p.pixelWord = ((v & 0xff000000) >> 24)
-                                      | ((v & 0x00ff0000) >> 8)
-                                      | ((v & 0x0000ff00) << 8)
-                                      | ((v & 0x000000ff) << 24);
+                        p.pixelWord =
+                            ((v & 0xff000000) >> 24) | ((v & 0x00ff0000) >> 8) | ((v & 0x0000ff00) << 8) | ((v & 0x000000ff) << 24);
                     }
                     else
                     {
@@ -124,16 +115,13 @@ namespace TwkFB
                     switch (inindex)
                     {
                     case 0:
-                        *out = U8(p.red == 0x3ff ? p.red_most
-                                                 : ((p.red + 1) >> 2));
+                        *out = U8(p.red == 0x3ff ? p.red_most : ((p.red + 1) >> 2));
                         break;
                     case 1:
-                        *out = U8(p.green == 0x3ff ? p.green_most
-                                                   : ((p.green + 1) >> 2));
+                        *out = U8(p.green == 0x3ff ? p.green_most : ((p.green + 1) >> 2));
                         break;
                     case 2:
-                        *out = U8(p.blue == 0x3ff ? p.blue_most
-                                                  : ((p.blue + 1) >> 2));
+                        *out = U8(p.blue == 0x3ff ? p.blue_most : ((p.blue + 1) >> 2));
                         break;
                     }
 
@@ -204,20 +192,15 @@ namespace TwkFB
                         Pixel p;
                         const U32 v = in->pixelWord;
 
-                        p.pixelWord = ((v & 0xff000000) >> 24)
-                                      | ((v & 0x00ff0000) >> 8)
-                                      | ((v & 0x0000ff00) << 8)
-                                      | ((v & 0x000000ff) << 24);
+                        p.pixelWord =
+                            ((v & 0xff000000) >> 24) | ((v & 0x00ff0000) >> 8) | ((v & 0x0000ff00) << 8) | ((v & 0x000000ff) << 24);
 
                         // const U8 rv = p.red_most;
                         // const U8 gv = p.green_most;
                         // const U8 bv = p.blue_most;
-                        const U8 rv =
-                            p.red == 0x3ff ? p.red_most : ((p.red + 1) >> 2);
-                        const U8 gv = p.green == 0x3ff ? p.green_most
-                                                       : ((p.green + 1) >> 2);
-                        const U8 bv =
-                            p.blue == 0x3ff ? p.blue_most : ((p.blue + 1) >> 2);
+                        const U8 rv = p.red == 0x3ff ? p.red_most : ((p.red + 1) >> 2);
+                        const U8 gv = p.green == 0x3ff ? p.green_most : ((p.green + 1) >> 2);
+                        const U8 bv = p.blue == 0x3ff ? p.blue_most : ((p.blue + 1) >> 2);
 
                         *out = rv;
                         out++;
@@ -247,12 +230,9 @@ namespace TwkFB
                         // const U8 rv = p.red_most;
                         // const U8 gv = p.green_most;
                         // const U8 bv = p.blue_most;
-                        const U8 rv =
-                            p.red == 0x3ff ? p.red_most : ((p.red + 1) >> 2);
-                        const U8 gv = p.green == 0x3ff ? p.green_most
-                                                       : ((p.green + 1) >> 2);
-                        const U8 bv =
-                            p.blue == 0x3ff ? p.blue_most : ((p.blue + 1) >> 2);
+                        const U8 rv = p.red == 0x3ff ? p.red_most : ((p.red + 1) >> 2);
+                        const U8 gv = p.green == 0x3ff ? p.green_most : ((p.green + 1) >> 2);
+                        const U8 bv = p.blue == 0x3ff ? p.blue_most : ((p.blue + 1) >> 2);
 
                         *out = rv;
                         out++;
@@ -268,9 +248,8 @@ namespace TwkFB
         }
     }
 
-    void Read10Bit::readRGB8_PLANAR(const string& filename,
-                                    const unsigned char* data, FrameBuffer& fb,
-                                    int w, int h, size_t maxBytes, bool swap)
+    void Read10Bit::readRGB8_PLANAR(const string& filename, const unsigned char* data, FrameBuffer& fb, int w, int h, size_t maxBytes,
+                                    bool swap)
     {
         planarConfig(fb, w, h, FrameBuffer::UCHAR);
 
@@ -299,21 +278,16 @@ namespace TwkFB
                     Pixel p;
                     const U32 v = in->pixelWord;
 
-                    p.pixelWord =
-                        ((v & 0xff000000) >> 24) | ((v & 0x00ff0000) >> 8)
-                        | ((v & 0x0000ff00) << 8) | ((v & 0x000000ff) << 24);
+                    p.pixelWord = ((v & 0xff000000) >> 24) | ((v & 0x00ff0000) >> 8) | ((v & 0x0000ff00) << 8) | ((v & 0x000000ff) << 24);
 
                     // const U8 rv = U8((float(p.red) / 1023.0f + slop) *
                     // 255.0f); const U8 gv = U8((float(p.green) / 1023.0f +
                     // slop) * 255.0f); const U8 bv = U8((float(p.blue) /
                     // 1023.0f + slop) * 255.0f);
 
-                    const U8 rv =
-                        p.red == 0x3ff ? p.red_most : ((p.red + 1) >> 2);
-                    const U8 gv =
-                        p.green == 0x3ff ? p.green_most : ((p.green + 1) >> 2);
-                    const U8 bv =
-                        p.blue == 0x3ff ? p.blue_most : ((p.blue + 1) >> 2);
+                    const U8 rv = p.red == 0x3ff ? p.red_most : ((p.red + 1) >> 2);
+                    const U8 gv = p.green == 0x3ff ? p.green_most : ((p.green + 1) >> 2);
+                    const U8 bv = p.blue == 0x3ff ? p.blue_most : ((p.blue + 1) >> 2);
 
                     // const U8 rv = p.red_most;
                     // const U8 gv = p.green_most;
@@ -350,12 +324,9 @@ namespace TwkFB
                     // 1023.0f + slop) * 255.0f); const U8 rv = p.red_most;
                     // const U8 gv = p.green_most;
                     // const U8 bv = p.blue_most;
-                    const U8 rv =
-                        p.red == 0x3ff ? p.red_most : ((p.red + 1) >> 2);
-                    const U8 gv =
-                        p.green == 0x3ff ? p.green_most : ((p.green + 1) >> 2);
-                    const U8 bv =
-                        p.blue == 0x3ff ? p.blue_most : ((p.blue + 1) >> 2);
+                    const U8 rv = p.red == 0x3ff ? p.red_most : ((p.red + 1) >> 2);
+                    const U8 gv = p.green == 0x3ff ? p.green_most : ((p.green + 1) >> 2);
+                    const U8 bv = p.blue == 0x3ff ? p.blue_most : ((p.blue + 1) >> 2);
 
                     *r = rv;
                     *g = gv;
@@ -365,12 +336,9 @@ namespace TwkFB
         }
     }
 
-    void Read10Bit::readRGB8(const string& filename, const unsigned char* data,
-                             FrameBuffer& fb, int w, int h, size_t maxBytes,
-                             bool swap)
+    void Read10Bit::readRGB8(const string& filename, const unsigned char* data, FrameBuffer& fb, int w, int h, size_t maxBytes, bool swap)
     {
-        fb.restructure(w, h, 0, 3, FrameBuffer::UCHAR, 0, 0,
-                       FrameBuffer::TOPLEFT, true);
+        fb.restructure(w, h, 0, 3, FrameBuffer::UCHAR, 0, 0, FrameBuffer::TOPLEFT, true);
 
         for (int y = 0; y < h; y++)
         {
@@ -387,16 +355,11 @@ namespace TwkFB
                     Pixel p;
                     const U32 v = in->pixelWord;
 
-                    p.pixelWord =
-                        ((v & 0xff000000) >> 24) | ((v & 0x00ff0000) >> 8)
-                        | ((v & 0x0000ff00) << 8) | ((v & 0x000000ff) << 24);
+                    p.pixelWord = ((v & 0xff000000) >> 24) | ((v & 0x00ff0000) >> 8) | ((v & 0x0000ff00) << 8) | ((v & 0x000000ff) << 24);
 
-                    const U8 rv =
-                        p.red == 0x3ff ? p.red_most : ((p.red + 1) >> 2);
-                    const U8 gv =
-                        p.green == 0x3ff ? p.green_most : ((p.green + 1) >> 2);
-                    const U8 bv =
-                        p.blue == 0x3ff ? p.blue_most : ((p.blue + 1) >> 2);
+                    const U8 rv = p.red == 0x3ff ? p.red_most : ((p.red + 1) >> 2);
+                    const U8 gv = p.green == 0x3ff ? p.green_most : ((p.green + 1) >> 2);
+                    const U8 bv = p.blue == 0x3ff ? p.blue_most : ((p.blue + 1) >> 2);
 
                     *out = rv;
                     out++;
@@ -412,12 +375,9 @@ namespace TwkFB
                 {
                     Pixel p = *in;
 
-                    const U8 rv =
-                        p.red == 0x3ff ? p.red_most : ((p.red + 1) >> 2);
-                    const U8 gv =
-                        p.green == 0x3ff ? p.green_most : ((p.green + 1) >> 2);
-                    const U8 bv =
-                        p.blue == 0x3ff ? p.blue_most : ((p.blue + 1) >> 2);
+                    const U8 rv = p.red == 0x3ff ? p.red_most : ((p.red + 1) >> 2);
+                    const U8 gv = p.green == 0x3ff ? p.green_most : ((p.green + 1) >> 2);
+                    const U8 bv = p.blue == 0x3ff ? p.blue_most : ((p.blue + 1) >> 2);
 
                     *out = rv;
                     out++;
@@ -430,12 +390,9 @@ namespace TwkFB
         }
     }
 
-    void Read10Bit::readRGB16(const string& filename, const unsigned char* data,
-                              FrameBuffer& fb, int w, int h, size_t maxBytes,
-                              bool swap)
+    void Read10Bit::readRGB16(const string& filename, const unsigned char* data, FrameBuffer& fb, int w, int h, size_t maxBytes, bool swap)
     {
-        fb.restructure(w, h, 0, 3, FrameBuffer::USHORT, 0, 0,
-                       FrameBuffer::TOPLEFT, true);
+        fb.restructure(w, h, 0, 3, FrameBuffer::USHORT, 0, 0, FrameBuffer::TOPLEFT, true);
 
         for (int y = 0; y < h; y++)
         {
@@ -452,9 +409,7 @@ namespace TwkFB
                     Pixel p;
                     const U32 v = in->pixelWord;
 
-                    p.pixelWord =
-                        ((v & 0xff000000) >> 24) | ((v & 0x00ff0000) >> 8)
-                        | ((v & 0x0000ff00) << 8) | ((v & 0x000000ff) << 24);
+                    p.pixelWord = ((v & 0xff000000) >> 24) | ((v & 0x00ff0000) >> 8) | ((v & 0x0000ff00) << 8) | ((v & 0x000000ff) << 24);
 
                     //
                     //  We used to make 16bit values from 10bit values by just
@@ -520,13 +475,10 @@ namespace TwkFB
         }
     }
 
-    void Read10Bit::readRGBA16(const string& filename,
-                               const unsigned char* data, FrameBuffer& fb,
-                               int w, int h, size_t maxBytes, bool alpha,
-                               bool swap)
+    void Read10Bit::readRGBA16(const string& filename, const unsigned char* data, FrameBuffer& fb, int w, int h, size_t maxBytes,
+                               bool alpha, bool swap)
     {
-        fb.restructure(w, h, 0, 4, FrameBuffer::USHORT, 0, 0,
-                       FrameBuffer::TOPLEFT, true);
+        fb.restructure(w, h, 0, 4, FrameBuffer::USHORT, 0, 0, FrameBuffer::TOPLEFT, true);
 
         if (alpha)
         {
@@ -536,8 +488,7 @@ namespace TwkFB
             const size_t nwords = (w * 4) / 3;
             const size_t rem = (w * 4) % 3;
             const size_t totalWords = (nwords + (rem ? 1 : 0)) * h;
-            const bool truncatedScanline =
-                (maxBytes / 4 == nwords * h) && rem != 0;
+            const bool truncatedScanline = (maxBytes / 4 == nwords * h) && rem != 0;
             const size_t brem = (w * h * 4) % 3;
             const size_t bwords = (w * h * 4) / 3 * 4 + (brem ? 4 : 0);
             const bool runonScanline = bwords == maxBytes && rem != 0;
@@ -545,22 +496,19 @@ namespace TwkFB
 
             if (truncatedScanline && runonScanline)
             {
-                cout << "WARNING: " << filename
-                     << " is both truncated and run-on" << endl;
+                cout << "WARNING: " << filename << " is both truncated and run-on" << endl;
             }
 
             if (truncatedScanline)
             {
                 cout << "INFO: Reading as a truncated scanline file" << endl;
-                cout << "INFO: " << filename << " is not following the DPX spec"
-                     << endl;
+                cout << "INFO: " << filename << " is not following the DPX spec" << endl;
                 ss -= rem;
             }
             else if (runonScanline)
             {
                 cout << "INFO: Read as a run-on scanline file" << endl;
-                cout << "INFO: " << filename << " is not following the DPX spec"
-                     << endl;
+                cout << "INFO: " << filename << " is not following the DPX spec" << endl;
             }
 
             for (int y = 0; y < h; y++)
@@ -577,10 +525,8 @@ namespace TwkFB
                     {
                         const U32 v = in->pixelWord;
 
-                        p.pixelWord = ((v & 0xff000000) >> 24)
-                                      | ((v & 0x00ff0000) >> 8)
-                                      | ((v & 0x0000ff00) << 8)
-                                      | ((v & 0x000000ff) << 24);
+                        p.pixelWord =
+                            ((v & 0xff000000) >> 24) | ((v & 0x00ff0000) >> 8) | ((v & 0x0000ff00) << 8) | ((v & 0x000000ff) << 24);
                     }
                     else
                     {
@@ -671,18 +617,15 @@ namespace TwkFB
                         Pixel p;
                         const U32 v = in->pixelWord;
 
-                        p.pixelWord = ((v & 0xff000000) >> 24)
-                                      | ((v & 0x00ff0000) >> 8)
-                                      | ((v & 0x0000ff00) << 8)
-                                      | ((v & 0x000000ff) << 24);
+                        p.pixelWord =
+                            ((v & 0xff000000) >> 24) | ((v & 0x00ff0000) >> 8) | ((v & 0x0000ff00) << 8) | ((v & 0x000000ff) << 24);
 
                         //
                         //  See big comment in readRGB16() above.
                         //
 
                         const U16 rv = U16((double(65535l * p.red) / 1023.0l));
-                        const U16 gv =
-                            U16((double(65535l * p.green) / 1023.0l));
+                        const U16 gv = U16((double(65535l * p.green) / 1023.0l));
                         const U16 bv = U16((double(65535l * p.blue) / 1023.0l));
 
                         *out = rv;
@@ -706,8 +649,7 @@ namespace TwkFB
                         //
 
                         const U16 rv = U16((double(65535l * p.red) / 1023.0l));
-                        const U16 gv =
-                            U16((double(65535l * p.green) / 1023.0l));
+                        const U16 gv = U16((double(65535l * p.green) / 1023.0l));
                         const U16 bv = U16((double(65535l * p.blue) / 1023.0l));
 
                         *out = rv;
@@ -724,9 +666,8 @@ namespace TwkFB
         }
     }
 
-    void Read10Bit::readRGB16_PLANAR(const string& filename,
-                                     const unsigned char* data, FrameBuffer& fb,
-                                     int w, int h, size_t maxBytes, bool swap)
+    void Read10Bit::readRGB16_PLANAR(const string& filename, const unsigned char* data, FrameBuffer& fb, int w, int h, size_t maxBytes,
+                                     bool swap)
     {
         planarConfig(fb, w, h, FrameBuffer::USHORT);
 
@@ -752,9 +693,7 @@ namespace TwkFB
                     Pixel p;
                     const U32 v = in->pixelWord;
 
-                    p.pixelWord =
-                        ((v & 0xff000000) >> 24) | ((v & 0x00ff0000) >> 8)
-                        | ((v & 0x0000ff00) << 8) | ((v & 0x000000ff) << 24);
+                    p.pixelWord = ((v & 0xff000000) >> 24) | ((v & 0x00ff0000) >> 8) | ((v & 0x0000ff00) << 8) | ((v & 0x000000ff) << 24);
 
                     //
                     //  See big comment in readRGB16() above.
@@ -791,15 +730,11 @@ namespace TwkFB
         }
     }
 
-    void Read10Bit::readRGB10_A2(const string& filename,
-                                 const unsigned char* data, FrameBuffer& fb,
-                                 int w, int h, size_t maxBytes, bool swap,
-                                 bool useRaw, unsigned char* deletePointer)
+    void Read10Bit::readRGB10_A2(const string& filename, const unsigned char* data, FrameBuffer& fb, int w, int h, size_t maxBytes,
+                                 bool swap, bool useRaw, unsigned char* deletePointer)
     {
-        fb.restructure(w, h, 0, 1, FrameBuffer::PACKED_R10_G10_B10_X2,
-                       useRaw ? (unsigned char*)data : 0, 0,
-                       FrameBuffer::TOPLEFT, true, 0, 0,
-                       useRaw ? deletePointer : 0);
+        fb.restructure(w, h, 0, 1, FrameBuffer::PACKED_R10_G10_B10_X2, useRaw ? (unsigned char*)data : 0, 0, FrameBuffer::TOPLEFT, true, 0,
+                       0, useRaw ? deletePointer : 0);
         //
         //  Scarf it all at once.
         //
@@ -829,12 +764,10 @@ namespace TwkFB
         }
     }
 
-    void Read10Bit::readA2_BGR10(const string& filename,
-                                 const unsigned char* data, FrameBuffer& fb,
-                                 int w, int h, size_t maxBytes, bool swap)
+    void Read10Bit::readA2_BGR10(const string& filename, const unsigned char* data, FrameBuffer& fb, int w, int h, size_t maxBytes,
+                                 bool swap)
     {
-        fb.restructure(w, h, 0, 1, FrameBuffer::PACKED_X2_B10_G10_R10, 0, 0,
-                       FrameBuffer::TOPLEFT, true, 0, 0);
+        fb.restructure(w, h, 0, 1, FrameBuffer::PACKED_X2_B10_G10_R10, 0, 0, FrameBuffer::TOPLEFT, true, 0, 0);
 
         for (int y = 0; y < h; y++)
         {
@@ -851,9 +784,7 @@ namespace TwkFB
                     Pixel p;
                     const U32 v = in->pixelWord;
 
-                    p.pixelWord =
-                        ((v & 0xff000000) >> 24) | ((v & 0x00ff0000) >> 8)
-                        | ((v & 0x0000ff00) << 8) | ((v & 0x000000ff) << 24);
+                    p.pixelWord = ((v & 0xff000000) >> 24) | ((v & 0x00ff0000) >> 8) | ((v & 0x0000ff00) << 8) | ((v & 0x000000ff) << 24);
 
                     out->red = p.red;
                     out->green = p.green;
@@ -874,9 +805,7 @@ namespace TwkFB
         }
     }
 
-    void Read10Bit::readYCrYCb8_422_PLANAR(const std::string& filename,
-                                           const unsigned char* data,
-                                           TwkFB::FrameBuffer& fb, int w, int h,
+    void Read10Bit::readYCrYCb8_422_PLANAR(const std::string& filename, const unsigned char* data, TwkFB::FrameBuffer& fb, int w, int h,
                                            size_t maxBytes, bool swap)
     {
         vector<string> planeNames(3);
@@ -894,8 +823,7 @@ namespace TwkFB
         ysamplings[1] = 1;
         ysamplings[2] = 1;
 
-        fb.restructurePlanar(w, h, xsamplings, ysamplings, planeNames,
-                             FrameBuffer::UCHAR, FrameBuffer::TOPLEFT, 1);
+        fb.restructurePlanar(w, h, xsamplings, ysamplings, planeNames, FrameBuffer::UCHAR, FrameBuffer::TOPLEFT, 1);
 
         FrameBuffer* Y = &fb;
         FrameBuffer* U = Y->nextPlane();
@@ -936,9 +864,7 @@ namespace TwkFB
                 {
                     const U32 v = in->pixelWord;
 
-                    p.pixelWord =
-                        ((v & 0xff000000) >> 24) | ((v & 0x00ff0000) >> 8)
-                        | ((v & 0x0000ff00) << 8) | ((v & 0x000000ff) << 24);
+                    p.pixelWord = ((v & 0xff000000) >> 24) | ((v & 0x00ff0000) >> 8) | ((v & 0x0000ff00) << 8) | ((v & 0x000000ff) << 24);
                 }
                 else
                 {

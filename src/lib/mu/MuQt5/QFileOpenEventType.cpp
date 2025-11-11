@@ -38,8 +38,7 @@ namespace Mu
 {
     using namespace std;
 
-    QFileOpenEventType::QFileOpenEventType(Context* c, const char* name,
-                                           Class* super)
+    QFileOpenEventType::QFileOpenEventType(Context* c, const char* name, Class* super)
         : Class(c, name, super)
     {
     }
@@ -49,17 +48,14 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    Pointer
-    qt_QFileOpenEvent_file_string_QFileOpenEvent(Mu::Thread& NODE_THREAD,
-                                                 Pointer param_this)
+    Pointer qt_QFileOpenEvent_file_string_QFileOpenEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFileOpenEvent* arg0 = getqpointer<QFileOpenEventType>(param_this);
         return makestring(c, arg0->file());
     }
 
-    Pointer qt_QFileOpenEvent_url_QUrl_QFileOpenEvent(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    Pointer qt_QFileOpenEvent_url_QUrl_QFileOpenEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFileOpenEvent* arg0 = getqpointer<QFileOpenEventType>(param_this);
@@ -68,14 +64,12 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(_n_file0, Pointer)
     {
-        NODE_RETURN(qt_QFileOpenEvent_file_string_QFileOpenEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QFileOpenEvent_file_string_QFileOpenEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_url0, Pointer)
     {
-        NODE_RETURN(qt_QFileOpenEvent_url_QUrl_QFileOpenEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QFileOpenEvent_url_QUrl_QFileOpenEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     void QFileOpenEventType::load()
@@ -95,13 +89,11 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
                    new MemberVariable(c, "native", "qt.NativeObject"),
 
@@ -112,13 +104,9 @@ namespace Mu
         addSymbols(
             // enums
             // member functions
-            new Function(c, "file", _n_file0, None, Compiled,
-                         qt_QFileOpenEvent_file_string_QFileOpenEvent, Return,
-                         "string", Parameters,
+            new Function(c, "file", _n_file0, None, Compiled, qt_QFileOpenEvent_file_string_QFileOpenEvent, Return, "string", Parameters,
                          new Param(c, "this", "qt.QFileOpenEvent"), End),
-            new Function(c, "url", _n_url0, None, Compiled,
-                         qt_QFileOpenEvent_url_QUrl_QFileOpenEvent, Return,
-                         "qt.QUrl", Parameters,
+            new Function(c, "url", _n_url0, None, Compiled, qt_QFileOpenEvent_url_QUrl_QFileOpenEvent, Return, "qt.QUrl", Parameters,
                          new Param(c, "this", "qt.QFileOpenEvent"), End),
             // static functions
             EndArguments);

@@ -34,9 +34,7 @@ namespace TwkMath
     // m(0) = c1 = m0;
     // m(1) = 3 c3 + 2 c2 + c1 = m1;
     // Solve these equations for c0, c1, c2 & c3 to get below
-    template <class VAL, class INTERP>
-    inline VAL hermite(const VAL& vn1, const VAL& v0, const VAL& v1,
-                       const VAL& v2, const INTERP& t)
+    template <class VAL, class INTERP> inline VAL hermite(const VAL& vn1, const VAL& v0, const VAL& v1, const VAL& v2, const INTERP& t)
     {
         static const INTERP i2 = (INTERP)2;
         static const INTERP i3 = (INTERP)3;
@@ -55,9 +53,7 @@ namespace TwkMath
 
     //******************************************************************************
     // A version of hermite for only three points at t values 0, 1, 2
-    template <class VAL, class INTERP>
-    inline VAL hermiteBegin(const VAL& v0, const VAL& v1, const VAL& v2,
-                            const INTERP& t)
+    template <class VAL, class INTERP> inline VAL hermiteBegin(const VAL& v0, const VAL& v1, const VAL& v2, const INTERP& t)
     {
         static const INTERP i2 = (INTERP)2;
         static const INTERP i3 = (INTERP)3;
@@ -76,9 +72,7 @@ namespace TwkMath
 
     //******************************************************************************
     // A version of hermite for only three points at t values -1, 0, 1
-    template <class VAL, class INTERP>
-    inline VAL hermiteEnd(const VAL& vn1, const VAL& v0, const VAL& v1,
-                          const INTERP& t)
+    template <class VAL, class INTERP> inline VAL hermiteEnd(const VAL& vn1, const VAL& v0, const VAL& v1, const INTERP& t)
     {
         static const INTERP i2 = (INTERP)2;
         static const INTERP i3 = (INTERP)3;
@@ -97,8 +91,7 @@ namespace TwkMath
 
     //******************************************************************************
     // Treat a list of points as a piecewise hermite curve
-    template <class VAL, class INTERP>
-    VAL hermite(const VAL* vals, int numVals, const INTERP& t)
+    template <class VAL, class INTERP> VAL hermite(const VAL* vals, int numVals, const INTERP& t)
     {
         if (numVals == 1)
         {
@@ -114,20 +107,16 @@ namespace TwkMath
         }
         else if (t >= ((INTERP)(numVals - 2)))
         {
-            return hermiteEnd(vals[numVals - 3], vals[numVals - 2],
-                              vals[numVals - 1], t - (numVals - 2));
+            return hermiteEnd(vals[numVals - 3], vals[numVals - 2], vals[numVals - 1], t - (numVals - 2));
         }
         else
         {
             int i = Math<INTERP>::floor(t);
-            return hermite(vals[i - 1], vals[i], vals[i + 1], vals[i + 2],
-                           t - (INTERP)i);
+            return hermite(vals[i - 1], vals[i], vals[i + 1], vals[i + 2], t - (INTERP)i);
         }
     }
 
-    template <class T>
-    Vec2<T> bezierCurve2D(const Vec2<T>& p0, const Vec2<T>& p1,
-                          const Vec2<T>& p2, const Vec2<T>& p3, const T t)
+    template <class T> Vec2<T> bezierCurve2D(const Vec2<T>& p0, const Vec2<T>& p1, const Vec2<T>& p2, const Vec2<T>& p3, const T t)
     {
         const T oneMinusT = T(1) - t;
         const T oneMinusT2 = oneMinusT * oneMinusT;
@@ -135,13 +124,10 @@ namespace TwkMath
         const T t2 = t * t;
         const T t3 = t2 * t;
 
-        return p0 * oneMinusT3 + (T(3) * oneMinusT2 * t) * p1
-               + (T(3) * oneMinusT * t2) * p2 + t3 * p3;
+        return p0 * oneMinusT3 + (T(3) * oneMinusT2 * t) * p1 + (T(3) * oneMinusT * t2) * p2 + t3 * p3;
     }
 
-    template <class T>
-    Vec2<T> bezierSamplingTangent2D(const Vec2<T>& p0, const Vec2<T>& p1,
-                                    const Vec2<T>& p2)
+    template <class T> Vec2<T> bezierSamplingTangent2D(const Vec2<T>& p0, const Vec2<T>& p1, const Vec2<T>& p2)
     {
         const Vec2<T> s0 = p1 - p0;
         const Vec2<T> s1 = p1 - p2;
@@ -165,8 +151,7 @@ namespace TwkMath
             const Vec3<T> s03 = Vec3<T>(s0.x, s0.y, 0);
             const Vec3<T> s13 = Vec3<T>(s1.x, s1.y, 0);
             const T z = cross(s03, s13).z > T(0) ? T(1) : T(-1);
-            const Vec3<T> c =
-                cross(Vec3<T>(0, 0, z), Vec3<T>(norm.x, norm.y, 0));
+            const Vec3<T> c = cross(Vec3<T>(0, 0, z), Vec3<T>(norm.x, norm.y, 0));
 
             return -Vec2<T>(c.x, c.y) * l;
         }

@@ -31,8 +31,7 @@ namespace IPCore
         // new and delete implementation
         TWK_CLASS_NEW_DELETE(Expression)
 
-        Expression::Expression(const Function* F, const ArgumentVector& args,
-                               const IPImage* image)
+        Expression::Expression(const Function* F, const ArgumentVector& args, const IPImage* image)
             : m_function(F)
             , m_arguments(args)
             , m_image(image)
@@ -40,8 +39,7 @@ namespace IPCore
         {
         }
 
-        Expression::Expression(const Function* F, const ArgumentVector& args,
-                               const std::string& gid)
+        Expression::Expression(const Function* F, const ArgumentVector& args, const std::string& gid)
             : m_function(F)
             , m_arguments(args)
             , m_image(0)
@@ -198,8 +196,7 @@ namespace IPCore
                 if (BoundExpression* e = dynamic_cast<BoundExpression*>(s))
                 {
                     assert(e->value());
-                    args[i] = new BoundExpression(e->symbol(),
-                                                  e->value()->copyUnbound());
+                    args[i] = new BoundExpression(e->symbol(), e->value()->copyUnbound());
                 }
                 else if (BoundImageCoord* b = dynamic_cast<BoundImageCoord*>(s))
                 {
@@ -222,9 +219,7 @@ namespace IPCore
                     //  of graphIDs can occur during evaluation (in the nodes)
                     //
 
-                    args[i] = new BoundImageCoordName(
-                        s->symbol(),
-                        ImageCoordName(b->value().image->graphID()));
+                    args[i] = new BoundImageCoordName(s->symbol(), ImageCoordName(b->value().image->graphID()));
                 }
                 else
                 {
@@ -241,20 +236,17 @@ namespace IPCore
             return new Expression(m_function, args, m_image->graphID());
         }
 
-        Function::ResourceUsage
-        Expression::computeResourceUsageRecursive() const
+        Function::ResourceUsage Expression::computeResourceUsageRecursive() const
         {
             Function::ResourceUsage usage = m_function->resourceUsage();
             size_t nargs = m_arguments.size();
 
             for (size_t i = 0; i < nargs; i++)
             {
-                if (const BoundExpression* e =
-                        dynamic_cast<const BoundExpression*>(m_arguments[i]))
+                if (const BoundExpression* e = dynamic_cast<const BoundExpression*>(m_arguments[i]))
                 {
                     const Expression* fexpr = e->value();
-                    Function::ResourceUsage u =
-                        e->value()->computeResourceUsageRecursive();
+                    Function::ResourceUsage u = e->value()->computeResourceUsageRecursive();
                     usage.coords += u.coords;
                     usage.buffers += u.buffers;
 

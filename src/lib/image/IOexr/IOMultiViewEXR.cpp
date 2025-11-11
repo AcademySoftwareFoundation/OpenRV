@@ -50,13 +50,10 @@ namespace TwkFB
     using namespace std;
     using namespace TwkUtil;
 
-    void IOexr::readMultiViewChannelList(
-        const std::string& filename, const std::string& layer,
-        const std::string& view, FrameBuffer& fb, Imf::MultiPartInputFile& file,
-        int partNum, Imf::ChannelList& cl, bool useRGBAReader,
-        bool convertYRYBY, bool planar3channel, bool allChannels,
-        bool inheritChannels, bool noOneChannelPlanes, bool stripAlpha,
-        bool readWindowIsDisplayWindow, IOexr::ReadWindow window)
+    void IOexr::readMultiViewChannelList(const std::string& filename, const std::string& layer, const std::string& view, FrameBuffer& fb,
+                                         Imf::MultiPartInputFile& file, int partNum, Imf::ChannelList& cl, bool useRGBAReader,
+                                         bool convertYRYBY, bool planar3channel, bool allChannels, bool inheritChannels,
+                                         bool noOneChannelPlanes, bool stripAlpha, bool readWindowIsDisplayWindow, IOexr::ReadWindow window)
     {
         FrameBuffer* outfb = &fb;
         Imath::Box2i dspWin = file.header(partNum).displayWindow();
@@ -82,16 +79,14 @@ namespace TwkFB
             clipped.min = Imath::clip(dspWin.min, datWin);
             clipped.max = Imath::clip(dspWin.max, datWin);
 
-            if (!dspWin.intersects(clipped.min)
-                && !dspWin.intersects(clipped.max))
+            if (!dspWin.intersects(clipped.min) && !dspWin.intersects(clipped.max))
             {
                 // datwin outside dspWin
                 dataWinOutsideDspWin = true;
             }
             else
             {
-                if (!dspWin.intersects(datWin.min)
-                    || !dspWin.intersects(datWin.max))
+                if (!dspWin.intersects(datWin.min) || !dspWin.intersects(datWin.max))
                 {
                     outfb = new FrameBuffer();
                 }
@@ -126,8 +121,7 @@ namespace TwkFB
         string originalChannels;
         ostringstream originalSampling;
 
-        for (Imf::ChannelList::ConstIterator i = cl.begin(); i != cl.end();
-             ++i, totalChannels++)
+        for (Imf::ChannelList::ConstIterator i = cl.begin(); i != cl.end(); ++i, totalChannels++)
         {
             if (originalChannels.size())
             {
@@ -144,8 +138,7 @@ namespace TwkFB
             }
             else
             {
-                originalSampling << i.channel().xSampling << "x"
-                                 << i.channel().ySampling;
+                originalSampling << i.channel().xSampling << "x" << i.channel().ySampling;
             }
 
             exrPixelType = i.channel().type;
@@ -187,9 +180,7 @@ namespace TwkFB
         {
             vector<string> channelNames0 = channelNames;
 
-            vector<string>::iterator i =
-                remove_if(channelNames.begin(), channelNames.end(),
-                          LayerOrNamedViewChannel);
+            vector<string>::iterator i = remove_if(channelNames.begin(), channelNames.end(), LayerOrNamedViewChannel);
 
             //
             //  Only alpha -- find some R G B for us
@@ -210,8 +201,7 @@ namespace TwkFB
             {
                 int a = alphaIndex(channelNames);
 
-                if (channelNames0.size() > 1 && channelNames.size() == 1
-                    && a != -1)
+                if (channelNames0.size() > 1 && channelNames.size() == 1 && a != -1)
                 {
                     int r = redIndex(channelNames0);
                     int g = greenIndex(channelNames0);
@@ -232,8 +222,7 @@ namespace TwkFB
 #ifdef DEBUG_IOEXR
             for (int c = 0; c < channelNames.size(); ++c)
             {
-                LOG.log("Reading updated full channel name: %s",
-                        channelNames[c].c_str());
+                LOG.log("Reading updated full channel name: %s", channelNames[c].c_str());
             }
 #endif
         }
@@ -265,8 +254,7 @@ namespace TwkFB
 
         if (inheritChannels && channelNames.size() == 3)
         {
-            if (redIndex(channelNames) != -1 && greenIndex(channelNames) != -1
-                && blueIndex(channelNames) != -1 && !stripAlpha)
+            if (redIndex(channelNames) != -1 && greenIndex(channelNames) != -1 && blueIndex(channelNames) != -1 && !stripAlpha)
             {
                 //
                 //  See if there's a default alpha channel
@@ -286,8 +274,7 @@ namespace TwkFB
         if (!allChannels && channelNames.size() >= 4)
         {
             numChannels = 4;
-            if (stripAlpha
-                && (channelNames[3] == "A" || channelNames[3] == "a"))
+            if (stripAlpha && (channelNames[3] == "A" || channelNames[3] == "a"))
                 numChannels = 3;
         }
         else
@@ -321,12 +308,9 @@ namespace TwkFB
 
         if (!useRGBAReader && (planarYRYBY || planar3))
         {
-            Imf::ChannelList::Iterator ci0 =
-                findChannelWithBasename(planarYRYBY ? "Y" : "R", cl);
-            Imf::ChannelList::Iterator ci1 =
-                findChannelWithBasename(planarYRYBY ? "RY" : "G", cl);
-            Imf::ChannelList::Iterator ci2 =
-                findChannelWithBasename(planarYRYBY ? "BY" : "B", cl);
+            Imf::ChannelList::Iterator ci0 = findChannelWithBasename(planarYRYBY ? "Y" : "R", cl);
+            Imf::ChannelList::Iterator ci1 = findChannelWithBasename(planarYRYBY ? "RY" : "G", cl);
+            Imf::ChannelList::Iterator ci2 = findChannelWithBasename(planarYRYBY ? "BY" : "B", cl);
             Imf::ChannelList::Iterator ci3 = findChannelWithBasename("A", cl);
 
             size_t clSize = channelListSize(cl);
@@ -433,9 +417,7 @@ namespace TwkFB
                 }
             }
 
-            outfb->restructurePlanar(width, height, xsamps, ysamps, planeNames,
-                                     dataType, FrameBuffer::BOTTOMLEFT,
-                                     nchannels);
+            outfb->restructurePlanar(width, height, xsamps, ysamps, planeNames, dataType, FrameBuffer::BOTTOMLEFT, nchannels);
         }
         else
         {
@@ -504,10 +486,8 @@ namespace TwkFB
         }
 
         outfb->newAttribute("ChannelsInFile", totalChannels);
-        outfb->newAttribute("ChannelNamesInFile",
-                            stl_ext::wrap(originalChannels));
-        outfb->newAttribute("ChannelSamplingInFile",
-                            stl_ext::wrap(originalSampling.str()));
+        outfb->newAttribute("ChannelNamesInFile", stl_ext::wrap(originalChannels));
+        outfb->newAttribute("ChannelSamplingInFile", stl_ext::wrap(originalSampling.str()));
         outfb->newAttribute("ChannelsRead", stl_ext::wrap(cch));
         outfb->newAttribute("IOexr/ReadWindow", string(rw));
 
@@ -580,17 +560,13 @@ namespace TwkFB
 
             try
             {
-                rgbafile.setFrameBuffer(outfb->pixels<Imf::Rgba>()
-                                            - bufWin.min.x
-                                            - bufWin.min.y * outfb->width(),
-                                        1, outfb->width());
+                rgbafile.setFrameBuffer(outfb->pixels<Imf::Rgba>() - bufWin.min.x - bufWin.min.y * outfb->width(), 1, outfb->width());
                 rgbafile.readPixels(datWin.min.y, datWin.max.y);
                 outfb->newAttribute("IOexr/Comment", string("Read as RGBA"));
             }
             catch (const std::exception& exc)
             {
-                cerr << "WARNING: EXR: incomplete image \"" << filename << "\""
-                     << endl;
+                cerr << "WARNING: EXR: incomplete image \"" << filename << "\"" << endl;
 
                 if (!outfb->hasAttribute("PartialImage"))
                 {
@@ -618,8 +594,7 @@ namespace TwkFB
 
                     for (FrameBuffer* p = outfb; p; p = p->nextPlane())
                     {
-                        Imf::ChannelList::Iterator ci =
-                            planeChannels[chindex++];
+                        Imf::ChannelList::Iterator ci = planeChannels[chindex++];
 
                         int xs = ci.channel().xSampling;
                         int ys = ci.channel().ySampling;
@@ -629,12 +604,8 @@ namespace TwkFB
 #endif
                         exrFrameBuffer.insert(
                             ci.name(),
-                            Imf::Slice(exrPixelType,
-                                       p->pixels<char>()
-                                           - p->scanlineSize() * bufWin.min.y
-                                           - p->pixelSize() * bufWin.min.x,
-                                       p->pixelSize(), p->scanlineSize(), xs,
-                                       ys));
+                            Imf::Slice(exrPixelType, p->pixels<char>() - p->scanlineSize() * bufWin.min.y - p->pixelSize() * bufWin.min.x,
+                                       p->pixelSize(), p->scanlineSize(), xs, ys));
 
                         ci = planeChannels[chindex++];
 
@@ -646,15 +617,10 @@ namespace TwkFB
 #ifdef DEBUG_IOEXR
                             LOG.log("Reading channel name: %s", ci.name());
 #endif
-                            exrFrameBuffer.insert(
-                                ci.name(),
-                                Imf::Slice(
-                                    exrPixelType,
-                                    p->pixels<char>()
-                                        - p->scanlineSize() * bufWin.min.y
-                                        - p->pixelSize() * bufWin.min.x
-                                        + p->bytesPerChannel(),
-                                    p->pixelSize(), p->scanlineSize(), xs, ys));
+                            exrFrameBuffer.insert(ci.name(), Imf::Slice(exrPixelType,
+                                                                        p->pixels<char>() - p->scanlineSize() * bufWin.min.y
+                                                                            - p->pixelSize() * bufWin.min.x + p->bytesPerChannel(),
+                                                                        p->pixelSize(), p->scanlineSize(), xs, ys));
                         }
                         else
                         {
@@ -668,8 +634,7 @@ namespace TwkFB
 
                     for (FrameBuffer* p = outfb; p; p = p->nextPlane())
                     {
-                        const Imf::ChannelList::Iterator ci =
-                            planeChannels[chindex++];
+                        const Imf::ChannelList::Iterator ci = planeChannels[chindex++];
 
                         const int xs = ci.channel().xSampling;
                         const int ys = ci.channel().ySampling;
@@ -679,12 +644,8 @@ namespace TwkFB
 #endif
                         exrFrameBuffer.insert(
                             ci.name(),
-                            Imf::Slice(exrPixelType,
-                                       p->pixels<char>()
-                                           - p->scanlineSize() * bufWin.min.y
-                                           - p->pixelSize() * bufWin.min.x,
-                                       p->pixelSize(), p->scanlineSize(), xs,
-                                       ys));
+                            Imf::Slice(exrPixelType, p->pixels<char>() - p->scanlineSize() * bufWin.min.y - p->pixelSize() * bufWin.min.x,
+                                       p->pixelSize(), p->scanlineSize(), xs, ys));
                     }
                 }
             }
@@ -697,15 +658,12 @@ namespace TwkFB
 #ifdef DEBUG_IOEXR
                     LOG.log("Reading channel name: %s", name.c_str());
 #endif
-                    exrFrameBuffer.insert(
-                        name.c_str(),            // name
-                        Imf::Slice(exrPixelType, // type
-                                   outfb->pixels<char>()
-                                       - outfb->scanlineSize() * bufWin.min.y
-                                       - outfb->pixelSize() * bufWin.min.x
-                                       + outfb->bytesPerChannel() * c,
-                                   outfb->pixelSize(),      // xStride
-                                   outfb->scanlineSize())); // yStride
+                    exrFrameBuffer.insert(name.c_str(),            // name
+                                          Imf::Slice(exrPixelType, // type
+                                                     outfb->pixels<char>() - outfb->scanlineSize() * bufWin.min.y
+                                                         - outfb->pixelSize() * bufWin.min.x + outfb->bytesPerChannel() * c,
+                                                     outfb->pixelSize(),      // xStride
+                                                     outfb->scanlineSize())); // yStride
                 }
             }
 
@@ -718,8 +676,7 @@ namespace TwkFB
             }
             catch (...)
             {
-                cerr << "WARNING: EXR: incomplete image \"" << filename << "\""
-                     << endl;
+                cerr << "WARNING: EXR: incomplete image \"" << filename << "\"" << endl;
 
                 if (!outfb->hasAttribute("PartialImage"))
                 {
@@ -756,9 +713,7 @@ namespace TwkFB
 
                 cropInto(outfb, &fb, x0, y0, x1, y1);
                 outfb->copyAttributesTo(&fb);
-                fb.setUncrop(dspWin.size().x + 1, dspWin.size().y + 1,
-                             clipped.min.x - dspWin.min.x,
-                             clipped.min.y - dspWin.min.y);
+                fb.setUncrop(dspWin.size().x + 1, dspWin.size().y + 1, clipped.min.x - dspWin.min.x, clipped.min.y - dspWin.min.y);
             }
             else
             {
@@ -775,12 +730,10 @@ namespace TwkFB
         }
     }
 
-    void IOexr::readImagesFromMultiViewFile(
-        Imf::MultiPartInputFile& file, FrameBufferVector& fbs,
-        const string& filename, const string& requestedView,
-        const string& requestedLayer, const string& requestedChannel,
-        const bool requestedAllChannels, const int partNum,
-        const ViewNames& views, bool requestedViewIsDefaultView) const
+    void IOexr::readImagesFromMultiViewFile(Imf::MultiPartInputFile& file, FrameBufferVector& fbs, const string& filename,
+                                            const string& requestedView, const string& requestedLayer, const string& requestedChannel,
+                                            const bool requestedAllChannels, const int partNum, const ViewNames& views,
+                                            bool requestedViewIsDefaultView) const
     {
 #ifdef DEBUG_IOEXR
         LOG.log("Reading multiview exr with views:");
@@ -807,8 +760,7 @@ namespace TwkFB
             if (requestedViewIsDefaultView)
             {
                 Imf::ChannelList dcl = Imf::channelsInView("", fcl, views);
-                for (Imf::ChannelList::Iterator i = dcl.begin(); i != dcl.end();
-                     ++i)
+                for (Imf::ChannelList::Iterator i = dcl.begin(); i != dcl.end(); ++i)
                 {
                     cl.insert(i.name(), i.channel());
                 }
@@ -835,14 +787,12 @@ namespace TwkFB
             string requestedFullChannel = requestedChannel;
             if (!requestedView.empty() && !requestedViewIsDefaultView)
             {
-                requestedFullChannel =
-                    requestedView + "." + requestedFullChannel;
+                requestedFullChannel = requestedView + "." + requestedFullChannel;
             }
 
             if (!requestedLayer.empty())
             {
-                requestedFullChannel =
-                    requestedLayer + "." + requestedFullChannel;
+                requestedFullChannel = requestedLayer + "." + requestedFullChannel;
             }
 
             Imf::ChannelList ncl;
@@ -867,11 +817,9 @@ namespace TwkFB
         fbs.push_back(new FrameBuffer());
         if (requestedLayer.empty())
         {
-            readMultiViewChannelList(
-                filename, requestedLayer, requestedView, *fbs.back(), file,
-                partNum, cl, m_rgbaOnly, m_convertYRYBY, m_planar3channel,
-                requestedAllChannels, m_inheritChannels, m_noOneChannelPlanes,
-                stripAlpha, m_readWindowIsDisplayWindow, m_readWindow);
+            readMultiViewChannelList(filename, requestedLayer, requestedView, *fbs.back(), file, partNum, cl, m_rgbaOnly, m_convertYRYBY,
+                                     m_planar3channel, requestedAllChannels, m_inheritChannels, m_noOneChannelPlanes, stripAlpha,
+                                     m_readWindowIsDisplayWindow, m_readWindow);
         }
         else
         {
@@ -889,11 +837,9 @@ namespace TwkFB
                 ncl.insert(ci.name(), ci.channel());
             }
 
-            readMultiViewChannelList(
-                filename, requestedLayer, requestedView, *fbs.back(), file,
-                partNum, ncl, m_rgbaOnly, m_convertYRYBY, m_planar3channel,
-                requestedAllChannels, m_inheritChannels, m_noOneChannelPlanes,
-                stripAlpha, m_readWindowIsDisplayWindow, m_readWindow);
+            readMultiViewChannelList(filename, requestedLayer, requestedView, *fbs.back(), file, partNum, ncl, m_rgbaOnly, m_convertYRYBY,
+                                     m_planar3channel, requestedAllChannels, m_inheritChannels, m_noOneChannelPlanes, stripAlpha,
+                                     m_readWindowIsDisplayWindow, m_readWindow);
         }
 
         if (!requestedChannel.empty())
@@ -909,8 +855,7 @@ namespace TwkFB
         fbs.back()->attribute<string>("View") = requestedView;
     }
 
-    void IOexr::getMultiViewImageInfo(const Imf::MultiPartInputFile& file,
-                                      const ViewNames& views, FBInfo& fbi) const
+    void IOexr::getMultiViewImageInfo(const Imf::MultiPartInputFile& file, const ViewNames& views, FBInfo& fbi) const
     {
         const int partNum = 0;
         Imath::Box2i dataWin = file.header(partNum).dataWindow();
@@ -950,8 +895,7 @@ namespace TwkFB
 
         set<string> channelSet;
 
-        for (Imf::ChannelList::ConstIterator i = cl.begin(); i != cl.end();
-             ++i, index++)
+        for (Imf::ChannelList::ConstIterator i = cl.begin(); i != cl.end(); ++i, index++)
         {
             exrPixelType = i.channel().type;
             FBInfo::ChannelInfo& cinfo = fbi.channelInfos[index];
@@ -974,8 +918,7 @@ namespace TwkFB
             size_t numNoViewChannels = channelListSize(noviewChannels);
             bool hasNoViewChannels = numNoViewChannels > 0;
 
-            fbi.viewInfos.resize(fbi.views.size()
-                                 + (hasNoViewChannels ? 1 : 0));
+            fbi.viewInfos.resize(fbi.views.size() + (hasNoViewChannels ? 1 : 0));
             int defaultViewIndex = -1;
 
             for (size_t i = 0; i < fbi.viewInfos.size(); i++)
@@ -994,17 +937,14 @@ namespace TwkFB
                     vinfo = &(fbi.viewInfos[defaultViewIndex]);
                 }
 
-                Imf::ChannelList vcl =
-                    noview ? noviewChannels
-                           : channelsInView(vinfo->name, cl, views);
+                Imf::ChannelList vcl = noview ? noviewChannels : channelsInView(vinfo->name, cl, views);
                 set<string> vlayers;
                 vcl.layers(vlayers);
 
                 vinfo->layers.resize(vinfo->layers.size() + vlayers.size());
 
                 size_t lindex = 0;
-                for (set<string>::const_iterator si = vlayers.begin();
-                     si != vlayers.end(); ++si, lindex++)
+                for (set<string>::const_iterator si = vlayers.begin(); si != vlayers.end(); ++si, lindex++)
                 {
                     string layerName = *si;
 
@@ -1013,8 +953,7 @@ namespace TwkFB
                     //
                     string vstr = string(".") + vinfo->name;
                     size_t pos = layerName.find(vstr);
-                    if (pos != string::npos
-                        && pos == layerName.size() - vstr.size())
+                    if (pos != string::npos && pos == layerName.size() - vstr.size())
                     {
                         layerName.erase(pos);
                     }
@@ -1034,8 +973,7 @@ namespace TwkFB
                     for (size_t q = 0; q < n; q++, cb++)
                     {
                         // setChannelInfo(cb, linfo.channels[q]);
-                        setChannelInfo(baseChannelName(cb.name()),
-                                       cb.channel().type, linfo.channels[q]);
+                        setChannelInfo(baseChannelName(cb.name()), cb.channel().type, linfo.channels[q]);
                         channelSet.erase(cb.name());
                     }
                 }
@@ -1058,13 +996,11 @@ namespace TwkFB
             vinfo.otherChannels.resize(channelSet.size());
             size_t count = 0;
 
-            for (set<string>::const_iterator i = channelSet.begin();
-                 i != channelSet.end(); ++i, count++)
+            for (set<string>::const_iterator i = channelSet.begin(); i != channelSet.end(); ++i, count++)
             {
                 Imf::ChannelList::ConstIterator ci = cl.find(*i);
                 // setChannelInfo(ci, vinfo.otherChannels[count]);
-                setChannelInfo(baseChannelName(ci.name()), ci.channel().type,
-                               vinfo.otherChannels[count]);
+                setChannelInfo(baseChannelName(ci.name()), ci.channel().type, vinfo.otherChannels[count]);
             }
         }
         else
@@ -1080,8 +1016,7 @@ namespace TwkFB
             fbi.defaultView = "";
 
             size_t lindex = 0;
-            for (set<string>::const_iterator si = layers.begin();
-                 si != layers.end(); ++si, lindex++)
+            for (set<string>::const_iterator si = layers.begin(); si != layers.end(); ++si, lindex++)
             {
                 const string& layerName = *si;
                 FBInfo::LayerInfo& linfo = vinfo.layers[lindex];
@@ -1096,8 +1031,7 @@ namespace TwkFB
                 for (size_t q = 0; q < n; q++, cb++)
                 {
                     // setChannelInfo(cb, linfo.channels[q]);
-                    setChannelInfo(baseChannelName(cb.name()),
-                                   cb.channel().type, linfo.channels[q]);
+                    setChannelInfo(baseChannelName(cb.name()), cb.channel().type, linfo.channels[q]);
 
                     //
                     //  Remove channels that live in a layer from the
@@ -1116,8 +1050,7 @@ namespace TwkFB
             vinfo.otherChannels.resize(channelSet.size());
             size_t count = 0;
 
-            for (set<string>::const_iterator i = channelSet.begin();
-                 i != channelSet.end(); ++i, count++)
+            for (set<string>::const_iterator i = channelSet.begin(); i != channelSet.end(); ++i, count++)
             {
                 Imf::ChannelList::ConstIterator ci = cl.find(*i);
                 setChannelInfo(ci, vinfo.otherChannels[count]);
@@ -1131,8 +1064,7 @@ namespace TwkFB
         //  this multiview business?
         //
 
-        set_difference(layers.begin(), layers.end(), fbi.views.begin(),
-                       fbi.views.end(), back_inserter(fbi.layers));
+        set_difference(layers.begin(), layers.end(), fbi.views.begin(), fbi.views.end(), back_inserter(fbi.layers));
 
         //
         //  Just float and half for EXR
@@ -1150,8 +1082,7 @@ namespace TwkFB
             fbi.dataType = FrameBuffer::UINT;
             break;
         default:
-            TWK_THROW_STREAM(Exception,
-                             "EXR: Unsupported data type: " << exrPixelType);
+            TWK_THROW_STREAM(Exception, "EXR: Unsupported data type: " << exrPixelType);
         }
 
         //
@@ -1160,8 +1091,7 @@ namespace TwkFB
         readAllAttributes(file, fbi.proxy);
     }
 
-    void IOexr::writeImagesToMultiViewFile(const ConstFrameBufferVector& fbs,
-                                           const std::string& filename,
+    void IOexr::writeImagesToMultiViewFile(const ConstFrameBufferVector& fbs, const std::string& filename,
                                            const WriteRequest& request) const
     {
 #if 0 //  ALAN_UNCROP
@@ -1185,8 +1115,7 @@ namespace TwkFB
         vector<string> userNames;
         vector<Imf::Attribute*> userAttrs;
 
-        bool acesFile = filename.size() > 5
-                        && filename.find(".aces") == filename.size() - 5;
+        bool acesFile = filename.size() > 5 && filename.find(".aces") == filename.size() - 5;
 
         bool usePrimaries = false;
         Imf::Chromaticities ch;
@@ -1215,8 +1144,7 @@ namespace TwkFB
             {
                 double pa = atof(value.c_str());
                 userNames.push_back("pixelAspectRatio");
-                userAttrs.push_back(
-                    new Imf::FloatAttribute(atof(value.c_str())));
+                userAttrs.push_back(new Imf::FloatAttribute(atof(value.c_str())));
             }
             else if (name == "output/ACES")
             {
@@ -1239,11 +1167,9 @@ namespace TwkFB
             else if (name == "output/gamma")
             {
                 userNames.push_back("transferFunction");
-                userAttrs.push_back(
-                    new Imf::StringAttribute(ColorSpace::Gamma()));
+                userAttrs.push_back(new Imf::StringAttribute(ColorSpace::Gamma()));
                 userNames.push_back("gamma");
-                userAttrs.push_back(
-                    new Imf::FloatAttribute(atof(value.c_str())));
+                userAttrs.push_back(new Imf::FloatAttribute(atof(value.c_str())));
             }
             else if (name == "output/chromaticities")
             {
@@ -1297,14 +1223,12 @@ namespace TwkFB
                 else if (t == "f")
                 {
                     userNames.push_back(m.subStr(0));
-                    userAttrs.push_back(
-                        new Imf::FloatAttribute(atof(value.c_str())));
+                    userAttrs.push_back(new Imf::FloatAttribute(atof(value.c_str())));
                 }
                 else if (t == "i")
                 {
                     userNames.push_back(m.subStr(0));
-                    userAttrs.push_back(
-                        new Imf::IntAttribute(atoi(value.c_str())));
+                    userAttrs.push_back(new Imf::IntAttribute(atoi(value.c_str())));
                 }
                 else if (t == "v2i")
                 {
@@ -1566,8 +1490,7 @@ namespace TwkFB
             //  the "common" format, then make the image packed.
             //
 
-            if (outfb->isPlanar()
-                && (!request.keepPlanar || request.preferCommonFormat))
+            if (outfb->isPlanar() && (!request.keepPlanar || request.preferCommonFormat))
             {
                 const FrameBuffer* fb = outfb;
                 outfb = mergePlanes(outfb);
@@ -1580,15 +1503,11 @@ namespace TwkFB
             //  "common" format is requested.
             //
 
-            if (request.preferCommonFormat && !acesFile
-                && (outfb->hasPrimaries() || outfb->isYUV()
-                    || outfb->isYRYBY()))
+            if (request.preferCommonFormat && !acesFile && (outfb->hasPrimaries() || outfb->isYUV() || outfb->isYRYBY()))
             {
                 const FrameBuffer* fb = outfb;
 
-                cout << "INFO: IOexr: converting to REC 709 RGB because "
-                     << (outfb->hasPrimaries() ? " image has chromaticities "
-                                               : "")
+                cout << "INFO: IOexr: converting to REC 709 RGB because " << (outfb->hasPrimaries() ? " image has chromaticities " : "")
                      << (outfb->isYRYBY() ? " image is Y RY BY" : "") << endl;
 
                 outfb = convertToLinearRGB709(outfb);
@@ -1664,15 +1583,12 @@ namespace TwkFB
             compression = Imf::PIZ_COMPRESSION;
         else if (request.compression != "")
         {
-            cerr << "WARNING: IOexr: unknown compression type "
-                 << request.compression << ", using PIZ instead" << endl;
+            cerr << "WARNING: IOexr: unknown compression type " << request.compression << ", using PIZ instead" << endl;
         }
 
         if (acesFile)
         {
-            if (compression != Imf::PIZ_COMPRESSION
-                && compression != Imf::B44A_COMPRESSION
-                && compression != Imf::NO_COMPRESSION)
+            if (compression != Imf::PIZ_COMPRESSION && compression != Imf::B44A_COMPRESSION && compression != Imf::NO_COMPRESSION)
             {
                 if (compression == Imf::B44_COMPRESSION)
                 {
@@ -1683,8 +1599,7 @@ namespace TwkFB
                 }
                 else
                 {
-                    cerr << "WARNING: IOexr: using PIZ compression instead of "
-                         << request.compression << " for ACES output" << endl;
+                    cerr << "WARNING: IOexr: using PIZ compression instead of " << request.compression << " for ACES output" << endl;
                     compression = Imf::PIZ_COMPRESSION;
                 }
             }
@@ -1693,24 +1608,18 @@ namespace TwkFB
             {
                 Imf::ChromaticitiesAttribute* a = 0;
 
-                if (userNames[i] == "chromaticities"
-                    && (a = dynamic_cast<Imf::ChromaticitiesAttribute*>(
-                            userAttrs[i])))
+                if (userNames[i] == "chromaticities" && (a = dynamic_cast<Imf::ChromaticitiesAttribute*>(userAttrs[i])))
                 {
                     if (!isAces(a->value()))
                     {
-                        TWK_THROW_STREAM(
-                            Exception,
-                            "ERROR: EXR: chromaticities are not ACES");
+                        TWK_THROW_STREAM(Exception, "ERROR: EXR: chromaticities are not ACES");
                     }
                 }
             }
         }
 
         Imf::FrameBuffer frameBuffer;
-        Imath::Box2i window(Imath::V2i(0, 0),
-                            Imath::V2i(outfbs.front()->width() - 1,
-                                       outfbs.front()->height() - 1));
+        Imath::Box2i window(Imath::V2i(0, 0), Imath::V2i(outfbs.front()->width() - 1, outfbs.front()->height() - 1));
 
         Imath::Box2i displayWindow, dataWindow;
         displayWindow = window;
@@ -1776,16 +1685,14 @@ namespace TwkFB
 
                 string name = a->name().substr(p + 3, string::npos);
 
-                if (name.find("IOexr/") == 0 || name.find("ColorSpace/") == 0
-                    || name == "")
+                if (name.find("IOexr/") == 0 || name.find("ColorSpace/") == 0 || name == "")
                 {
                     continue;
                 }
 
                 if (attrRE.matches(name))
                 {
-                    if (name == "View" || name == "Sequence" || name == "Eye"
-                        || name == "File" || name == "SourceFrame"
+                    if (name == "View" || name == "Sequence" || name == "Eye" || name == "File" || name == "SourceFrame"
                         || name == "AlphaType" || name == "RVSource")
                     {
                         continue;
@@ -1795,15 +1702,9 @@ namespace TwkFB
                     {
                         name = name.substr(4, string::npos);
 
-                        if (name == "compression" || name == "dataWindow"
-                            || name == "displayWindow" || name == "lineOrder"
-                            || name == "screenWindowCenter"
-                            || name == "screenWindowWidth"
-                            || name == "pixelAspectRatio"
-                            || name == "ChannelsRead"
-                            || name == "ChannelsInFile"
-                            || name == "ChannelSamplingInFile"
-                            || name == "AlphaType")
+                        if (name == "compression" || name == "dataWindow" || name == "displayWindow" || name == "lineOrder"
+                            || name == "screenWindowCenter" || name == "screenWindowWidth" || name == "pixelAspectRatio"
+                            || name == "ChannelsRead" || name == "ChannelsInFile" || name == "ChannelSamplingInFile" || name == "AlphaType")
                         {
                             continue;
                         }
@@ -1828,12 +1729,10 @@ namespace TwkFB
             }
         }
 
-        if ((compression == Imf::DWAA_COMPRESSION)
-            || (compression == Imf::DWAB_COMPRESSION))
+        if ((compression == Imf::DWAA_COMPRESSION) || (compression == Imf::DWAB_COMPRESSION))
         {
-            float dwaCompressionLevel =
-                45.0f;                   // Default value in ImfDwaCompressor().
-            if (request.quality != 0.9f) // the rvio default
+            float dwaCompressionLevel = 45.0f; // Default value in ImfDwaCompressor().
+            if (request.quality != 0.9f)       // the rvio default
             {
                 dwaCompressionLevel = request.quality;
             }
@@ -1876,20 +1775,15 @@ namespace TwkFB
                     int ysamp = outfb->height() / fb->height();
                     string chname = prefix + fb->channelName(0);
 
-                    header.channels().insert(
-                        chname.c_str(),
-                        Imf::Channel(pixelType, xsamp, ysamp,
-                                     chname == "RY" || chname == "BY"));
+                    header.channels().insert(chname.c_str(), Imf::Channel(pixelType, xsamp, ysamp, chname == "RY" || chname == "BY"));
 
-                    frameBuffer.insert(
-                        chname.c_str(), // name
-                        Imf::Slice(
-                            pixelType,                                // type
-                            &fb->pixel<char>(0, fb->height() - 1, 0), // base
-                            fb->pixelSize(),                          // xStride
-                            -fb->scanlineSize(),                      // yStride
-                            xsamp,   // xSamples
-                            ysamp)); // ySamples
+                    frameBuffer.insert(chname.c_str(),                                      // name
+                                       Imf::Slice(pixelType,                                // type
+                                                  &fb->pixel<char>(0, fb->height() - 1, 0), // base
+                                                  fb->pixelSize(),                          // xStride
+                                                  -fb->scanlineSize(),                      // yStride
+                                                  xsamp,                                    // xSamples
+                                                  ysamp));                                  // ySamples
                 }
             }
             else
@@ -1900,13 +1794,12 @@ namespace TwkFB
 
                     header.channels().insert(chname.c_str(), pixelType);
 
-                    frameBuffer.insert(
-                        chname.c_str(),       // name
-                        Imf::Slice(pixelType, // type
-                                   &outfb->pixel<char>(0, outfb->height() - 1,
-                                                       c),   // base
-                                   outfb->pixelSize(),       // xStride
-                                   -outfb->scanlineSize())); // yStride
+                    frameBuffer.insert(chname.c_str(),       // name
+                                       Imf::Slice(pixelType, // type
+                                                  &outfb->pixel<char>(0, outfb->height() - 1,
+                                                                      c),   // base
+                                                  outfb->pixelSize(),       // xStride
+                                                  -outfb->scanlineSize())); // yStride
                 }
             }
         }

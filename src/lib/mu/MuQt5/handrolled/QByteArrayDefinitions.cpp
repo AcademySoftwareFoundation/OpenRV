@@ -4,8 +4,7 @@
 // SPDX-License-Identifier: Apache-2.0
 //
 
-Pointer QByteArray_constData_QByteArray_byteECB_BSB__(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+Pointer QByteArray_constData_QByteArray_byteECB_BSB__(Mu::Thread& NODE_THREAD, Pointer param_this)
 {
     MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
     QByteArray arg0 = getqtype<QByteArrayType>(param_this);
@@ -18,6 +17,5 @@ Pointer QByteArray_constData_QByteArray_byteECB_BSB__(Mu::Thread& NODE_THREAD,
 
 static NODE_IMPLEMENTATION(constData, Pointer)
 {
-    NODE_RETURN(QByteArray_constData_QByteArray_byteECB_BSB__(
-        NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+    NODE_RETURN(QByteArray_constData_QByteArray_byteECB_BSB__(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
 }

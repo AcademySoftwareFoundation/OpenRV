@@ -32,10 +32,8 @@ namespace TwkGLF
     //  Utilitiy functions which map the VideoDevice formats to GL formats
     //
 
-    unsigned int
-        internalFormatFromDataFormat(TwkApp::VideoDevice::InternalDataFormat);
-    GLenumPair
-        textureFormatFromDataFormat(TwkApp::VideoDevice::InternalDataFormat);
+    unsigned int internalFormatFromDataFormat(TwkApp::VideoDevice::InternalDataFormat);
+    GLenumPair textureFormatFromDataFormat(TwkApp::VideoDevice::InternalDataFormat);
     size_t pixelSizeFromTextureFormat(GLenum format, GLenum type);
 
     //
@@ -52,8 +50,7 @@ namespace TwkGLF
     class GLVideoDevice : public TwkApp::VideoDevice
     {
     public:
-        GLVideoDevice(TwkApp::VideoModule*, const std::string& name,
-                      unsigned int capabilities);
+        GLVideoDevice(TwkApp::VideoModule*, const std::string& name, unsigned int capabilities);
 
         ~GLVideoDevice();
 
@@ -84,10 +81,7 @@ namespace TwkGLF
         virtual GLFBO* defaultFBO(); // GLVideoDevice owns it
         virtual const GLFBO* defaultFBO() const;
 
-        virtual GLuint fboID() const
-        {
-            return 0;
-        } // this is meant to be overridden in derived classes.
+        virtual GLuint fboID() const { return 0; } // this is meant to be overridden in derived classes.
 
         virtual void setDefaultFBOIndex(int i) {}
 
@@ -131,9 +125,7 @@ namespace TwkGLF
     class GLBindableVideoDevice : public TwkApp::VideoDevice
     {
     public:
-        GLBindableVideoDevice(TwkApp::VideoModule* module,
-                              const std::string& name,
-                              unsigned int capabilities);
+        GLBindableVideoDevice(TwkApp::VideoModule* module, const std::string& name, unsigned int capabilities);
 
         ~GLBindableVideoDevice();
 

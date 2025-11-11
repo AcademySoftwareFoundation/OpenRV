@@ -21,11 +21,9 @@ using namespace std;
 using namespace TwkApp;
 
 #ifdef PLATFORM_DARWIN
-DarwinBundle bundle("python", BUNDLE_MAJOR_VERSION, BUNDLE_MINOR_VERSION,
-                    BUNDLE_REVISION_NUMBER);
+DarwinBundle bundle("python", BUNDLE_MAJOR_VERSION, BUNDLE_MINOR_VERSION, BUNDLE_REVISION_NUMBER);
 #else
-QTBundle bundle("python", BUNDLE_MAJOR_VERSION, BUNDLE_MINOR_VERSION,
-                BUNDLE_REVISION_NUMBER);
+QTBundle bundle("python", BUNDLE_MAJOR_VERSION, BUNDLE_MINOR_VERSION, BUNDLE_REVISION_NUMBER);
 #endif
 
 int main(int argc, char** argv)

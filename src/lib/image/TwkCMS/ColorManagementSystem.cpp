@@ -37,17 +37,9 @@ namespace TwkCMS
 
     ColorManagementSystem::CMSPlugins ColorManagementSystem::m_plugins;
 
-    ColorManagementSystem::Transform::ColorSpace
-    ColorManagementSystem::Transform::inputSpace() const
-    {
-        return RGB709;
-    }
+    ColorManagementSystem::Transform::ColorSpace ColorManagementSystem::Transform::inputSpace() const { return RGB709; }
 
-    ColorManagementSystem::Transform::ColorSpace
-    ColorManagementSystem::Transform::outputSpace() const
-    {
-        return RGB709;
-    }
+    ColorManagementSystem::Transform::ColorSpace ColorManagementSystem::Transform::outputSpace() const { return RGB709; }
 
     ColorManagementSystem::ColorManagementSystem(const char* name)
         : m_name(name)
@@ -56,13 +48,9 @@ namespace TwkCMS
 
     ColorManagementSystem::~ColorManagementSystem() {}
 
-    void ColorManagementSystem::addTransform(Transform* t)
-    {
-        m_transforms.push_back(t);
-    }
+    void ColorManagementSystem::addTransform(Transform* t) { m_transforms.push_back(t); }
 
-    ColorManagementSystem::Transform*
-    ColorManagementSystem::findTransform(const string& name) const
+    ColorManagementSystem::Transform* ColorManagementSystem::findTransform(const string& name) const
     {
         for (int i = 0; i < m_transforms.size(); i++)
         {
@@ -75,11 +63,7 @@ namespace TwkCMS
         return 0;
     }
 
-    void ColorManagementSystem::splitPath(vector<string>& tokens,
-                                          const string& str)
-    {
-        tokenize(tokens, str, ":");
-    }
+    void ColorManagementSystem::splitPath(vector<string>& tokens, const string& str) { tokenize(tokens, str, ":"); }
 
     //
     //  Plugin management
@@ -106,13 +90,9 @@ namespace TwkCMS
         return findInPath("TwkCMS.+so", pluginPath);
     }
 
-    void ColorManagementSystem::addPlugin(ColorManagementSystem* cms)
-    {
-        m_plugins.push_back(cms);
-    }
+    void ColorManagementSystem::addPlugin(ColorManagementSystem* cms) { m_plugins.push_back(cms); }
 
-    ColorManagementSystem*
-    ColorManagementSystem::findPlugin(const std::string& name)
+    ColorManagementSystem* ColorManagementSystem::findPlugin(const std::string& name)
     {
         for (int i = 0; i < m_plugins.size(); i++)
         {
@@ -134,8 +114,7 @@ namespace TwkCMS
 
         for (int i = 0; i < pluginFiles.size(); i++)
         {
-            if (void* handle =
-                    dlopen(pluginFiles[i].c_str(), RTLD_NOW | RTLD_GLOBAL))
+            if (void* handle = dlopen(pluginFiles[i].c_str(), RTLD_NOW | RTLD_GLOBAL))
             {
                 create_t* plugCreate = (create_t*)dlsym(handle, "create");
                 destroy_t* plugDestroy = (destroy_t*)dlsym(handle, "destroy");
@@ -144,17 +123,14 @@ namespace TwkCMS
                 {
                     dlclose(handle);
 
-                    cerr << "ERROR: ignoring CMS plugin " << pluginFiles[i]
-                         << ": missing create() or destroy(): " << dlerror()
-                         << endl;
+                    cerr << "ERROR: ignoring CMS plugin " << pluginFiles[i] << ": missing create() or destroy(): " << dlerror() << endl;
 
                     continue;
                 }
 
                 try
                 {
-                    if (ColorManagementSystem* plugin =
-                            plugCreate(CMS_PLUGIN_VERSION))
+                    if (ColorManagementSystem* plugin = plugCreate(CMS_PLUGIN_VERSION))
                     {
                         m_plugins.push_back(plugin);
                         cout << "INFO: loaded CMS " << pluginFiles[i] << endl;
@@ -171,8 +147,7 @@ namespace TwkCMS
             }
             else
             {
-                cerr << "ERROR: cannot open CMS plugin " << pluginFiles[i]
-                     << ": " << dlerror() << endl;
+                cerr << "ERROR: cannot open CMS plugin " << pluginFiles[i] << ": " << dlerror() << endl;
             }
         }
 #endif

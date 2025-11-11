@@ -25,10 +25,7 @@ namespace TwkFB
         void initialize()
         {
             const char* memcpyThreadCount = getenv("RV_MEMCPY_THREAD_COUNT");
-            numThreads =
-                memcpyThreadCount
-                    ? (size_t)atoi(memcpyThreadCount)
-                    : std::min(TwkUtil::SystemInfo::numCPUs() / 4, (size_t)8);
+            numThreads = memcpyThreadCount ? (size_t)atoi(memcpyThreadCount) : std::min(TwkUtil::SystemInfo::numCPUs() / 4, (size_t)8);
             memcpyThreadPool.setNumThreads(numThreads);
         }
 
@@ -36,10 +33,7 @@ namespace TwkFB
 
         size_t getNumThreads() { return numThreads; }
 
-        void addTask(ILMTHREAD_NAMESPACE::Task* task)
-        {
-            memcpyThreadPool.addTask(task);
-        }
+        void addTask(ILMTHREAD_NAMESPACE::Task* task) { memcpyThreadPool.addTask(task); }
 
     } // namespace ThreadPool
 } // namespace TwkFB

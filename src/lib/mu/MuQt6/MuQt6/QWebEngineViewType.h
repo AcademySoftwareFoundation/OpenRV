@@ -42,8 +42,7 @@ namespace Mu
         //  Constructors
         //
 
-        QWebEngineViewType(Context* context, const char* name,
-                           Class* superClass = 0, Class* superClass2 = 0);
+        QWebEngineViewType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QWebEngineViewType();
 
@@ -66,17 +65,13 @@ namespace Mu
     {
     public:
         virtual ~MuQt_QWebEngineView();
-        MuQt_QWebEngineView(Pointer muobj, const CallEnvironment*,
-                            QWidget* parent);
-        MuQt_QWebEngineView(Pointer muobj, const CallEnvironment*,
-                            QWebEngineProfile* profile, QWidget* parent);
-        MuQt_QWebEngineView(Pointer muobj, const CallEnvironment*,
-                            QWebEnginePage* page, QWidget* parent);
+        MuQt_QWebEngineView(Pointer muobj, const CallEnvironment*, QWidget* parent);
+        MuQt_QWebEngineView(Pointer muobj, const CallEnvironment*, QWebEngineProfile* profile, QWidget* parent);
+        MuQt_QWebEngineView(Pointer muobj, const CallEnvironment*, QWebEnginePage* page, QWidget* parent);
         virtual QSize sizeHint() const;
 
     protected:
-        virtual QWebEngineView*
-        createWindow(QWebEnginePage::WebWindowType type);
+        virtual QWebEngineView* createWindow(QWebEnginePage::WebWindowType type);
         virtual void closeEvent(QCloseEvent* event);
         virtual void contextMenuEvent(QContextMenuEvent* event);
         virtual void dragEnterEvent(QDragEnterEvent* e);
@@ -113,61 +108,33 @@ namespace Mu
         virtual int metric(QPaintDevice::PaintDeviceMetric m) const;
 
     public:
-        QWebEngineView* createWindow_pub(QWebEnginePage::WebWindowType type)
-        {
-            return createWindow(type);
-        }
+        QWebEngineView* createWindow_pub(QWebEnginePage::WebWindowType type) { return createWindow(type); }
 
-        QWebEngineView*
-        createWindow_pub_parent(QWebEnginePage::WebWindowType type)
-        {
-            return QWebEngineView::createWindow(type);
-        }
+        QWebEngineView* createWindow_pub_parent(QWebEnginePage::WebWindowType type) { return QWebEngineView::createWindow(type); }
 
         void closeEvent_pub(QCloseEvent* event) { closeEvent(event); }
 
-        void closeEvent_pub_parent(QCloseEvent* event)
-        {
-            QWebEngineView::closeEvent(event);
-        }
+        void closeEvent_pub_parent(QCloseEvent* event) { QWebEngineView::closeEvent(event); }
 
-        void contextMenuEvent_pub(QContextMenuEvent* event)
-        {
-            contextMenuEvent(event);
-        }
+        void contextMenuEvent_pub(QContextMenuEvent* event) { contextMenuEvent(event); }
 
-        void contextMenuEvent_pub_parent(QContextMenuEvent* event)
-        {
-            QWebEngineView::contextMenuEvent(event);
-        }
+        void contextMenuEvent_pub_parent(QContextMenuEvent* event) { QWebEngineView::contextMenuEvent(event); }
 
         void dragEnterEvent_pub(QDragEnterEvent* e) { dragEnterEvent(e); }
 
-        void dragEnterEvent_pub_parent(QDragEnterEvent* e)
-        {
-            QWebEngineView::dragEnterEvent(e);
-        }
+        void dragEnterEvent_pub_parent(QDragEnterEvent* e) { QWebEngineView::dragEnterEvent(e); }
 
         void dragLeaveEvent_pub(QDragLeaveEvent* e) { dragLeaveEvent(e); }
 
-        void dragLeaveEvent_pub_parent(QDragLeaveEvent* e)
-        {
-            QWebEngineView::dragLeaveEvent(e);
-        }
+        void dragLeaveEvent_pub_parent(QDragLeaveEvent* e) { QWebEngineView::dragLeaveEvent(e); }
 
         void dragMoveEvent_pub(QDragMoveEvent* e) { dragMoveEvent(e); }
 
-        void dragMoveEvent_pub_parent(QDragMoveEvent* e)
-        {
-            QWebEngineView::dragMoveEvent(e);
-        }
+        void dragMoveEvent_pub_parent(QDragMoveEvent* e) { QWebEngineView::dragMoveEvent(e); }
 
         void dropEvent_pub(QDropEvent* e) { dropEvent(e); }
 
-        void dropEvent_pub_parent(QDropEvent* e)
-        {
-            QWebEngineView::dropEvent(e);
-        }
+        void dropEvent_pub_parent(QDropEvent* e) { QWebEngineView::dropEvent(e); }
 
         bool event_pub(QEvent* ev) { return event(ev); }
 
@@ -175,148 +142,79 @@ namespace Mu
 
         void hideEvent_pub(QHideEvent* event) { hideEvent(event); }
 
-        void hideEvent_pub_parent(QHideEvent* event)
-        {
-            QWebEngineView::hideEvent(event);
-        }
+        void hideEvent_pub_parent(QHideEvent* event) { QWebEngineView::hideEvent(event); }
 
         void showEvent_pub(QShowEvent* event) { showEvent(event); }
 
-        void showEvent_pub_parent(QShowEvent* event)
-        {
-            QWebEngineView::showEvent(event);
-        }
+        void showEvent_pub_parent(QShowEvent* event) { QWebEngineView::showEvent(event); }
 
         void changeEvent_pub(QEvent* event) { changeEvent(event); }
 
-        void changeEvent_pub_parent(QEvent* event)
-        {
-            QWebEngineView::changeEvent(event);
-        }
+        void changeEvent_pub_parent(QEvent* event) { QWebEngineView::changeEvent(event); }
 
         void focusInEvent_pub(QFocusEvent* event) { focusInEvent(event); }
 
-        void focusInEvent_pub_parent(QFocusEvent* event)
-        {
-            QWebEngineView::focusInEvent(event);
-        }
+        void focusInEvent_pub_parent(QFocusEvent* event) { QWebEngineView::focusInEvent(event); }
 
-        bool focusNextPrevChild_pub(bool next)
-        {
-            return focusNextPrevChild(next);
-        }
+        bool focusNextPrevChild_pub(bool next) { return focusNextPrevChild(next); }
 
-        bool focusNextPrevChild_pub_parent(bool next)
-        {
-            return QWebEngineView::focusNextPrevChild(next);
-        }
+        bool focusNextPrevChild_pub_parent(bool next) { return QWebEngineView::focusNextPrevChild(next); }
 
         void focusOutEvent_pub(QFocusEvent* event) { focusOutEvent(event); }
 
-        void focusOutEvent_pub_parent(QFocusEvent* event)
-        {
-            QWebEngineView::focusOutEvent(event);
-        }
+        void focusOutEvent_pub_parent(QFocusEvent* event) { QWebEngineView::focusOutEvent(event); }
 
         void keyPressEvent_pub(QKeyEvent* event) { keyPressEvent(event); }
 
-        void keyPressEvent_pub_parent(QKeyEvent* event)
-        {
-            QWebEngineView::keyPressEvent(event);
-        }
+        void keyPressEvent_pub_parent(QKeyEvent* event) { QWebEngineView::keyPressEvent(event); }
 
         void keyReleaseEvent_pub(QKeyEvent* event) { keyReleaseEvent(event); }
 
-        void keyReleaseEvent_pub_parent(QKeyEvent* event)
-        {
-            QWebEngineView::keyReleaseEvent(event);
-        }
+        void keyReleaseEvent_pub_parent(QKeyEvent* event) { QWebEngineView::keyReleaseEvent(event); }
 
         void leaveEvent_pub(QEvent* event) { leaveEvent(event); }
 
-        void leaveEvent_pub_parent(QEvent* event)
-        {
-            QWebEngineView::leaveEvent(event);
-        }
+        void leaveEvent_pub_parent(QEvent* event) { QWebEngineView::leaveEvent(event); }
 
-        void mouseDoubleClickEvent_pub(QMouseEvent* event)
-        {
-            mouseDoubleClickEvent(event);
-        }
+        void mouseDoubleClickEvent_pub(QMouseEvent* event) { mouseDoubleClickEvent(event); }
 
-        void mouseDoubleClickEvent_pub_parent(QMouseEvent* event)
-        {
-            QWebEngineView::mouseDoubleClickEvent(event);
-        }
+        void mouseDoubleClickEvent_pub_parent(QMouseEvent* event) { QWebEngineView::mouseDoubleClickEvent(event); }
 
         void mouseMoveEvent_pub(QMouseEvent* event) { mouseMoveEvent(event); }
 
-        void mouseMoveEvent_pub_parent(QMouseEvent* event)
-        {
-            QWebEngineView::mouseMoveEvent(event);
-        }
+        void mouseMoveEvent_pub_parent(QMouseEvent* event) { QWebEngineView::mouseMoveEvent(event); }
 
         void mousePressEvent_pub(QMouseEvent* event) { mousePressEvent(event); }
 
-        void mousePressEvent_pub_parent(QMouseEvent* event)
-        {
-            QWebEngineView::mousePressEvent(event);
-        }
+        void mousePressEvent_pub_parent(QMouseEvent* event) { QWebEngineView::mousePressEvent(event); }
 
-        void mouseReleaseEvent_pub(QMouseEvent* event)
-        {
-            mouseReleaseEvent(event);
-        }
+        void mouseReleaseEvent_pub(QMouseEvent* event) { mouseReleaseEvent(event); }
 
-        void mouseReleaseEvent_pub_parent(QMouseEvent* event)
-        {
-            QWebEngineView::mouseReleaseEvent(event);
-        }
+        void mouseReleaseEvent_pub_parent(QMouseEvent* event) { QWebEngineView::mouseReleaseEvent(event); }
 
         void moveEvent_pub(QMoveEvent* event) { moveEvent(event); }
 
-        void moveEvent_pub_parent(QMoveEvent* event)
-        {
-            QWebEngineView::moveEvent(event);
-        }
+        void moveEvent_pub_parent(QMoveEvent* event) { QWebEngineView::moveEvent(event); }
 
         void paintEvent_pub(QPaintEvent* event) { paintEvent(event); }
 
-        void paintEvent_pub_parent(QPaintEvent* event)
-        {
-            QWebEngineView::paintEvent(event);
-        }
+        void paintEvent_pub_parent(QPaintEvent* event) { QWebEngineView::paintEvent(event); }
 
         void resizeEvent_pub(QResizeEvent* event) { resizeEvent(event); }
 
-        void resizeEvent_pub_parent(QResizeEvent* event)
-        {
-            QWebEngineView::resizeEvent(event);
-        }
+        void resizeEvent_pub_parent(QResizeEvent* event) { QWebEngineView::resizeEvent(event); }
 
         void tabletEvent_pub(QTabletEvent* event) { tabletEvent(event); }
 
-        void tabletEvent_pub_parent(QTabletEvent* event)
-        {
-            QWebEngineView::tabletEvent(event);
-        }
+        void tabletEvent_pub_parent(QTabletEvent* event) { QWebEngineView::tabletEvent(event); }
 
         void wheelEvent_pub(QWheelEvent* event) { wheelEvent(event); }
 
-        void wheelEvent_pub_parent(QWheelEvent* event)
-        {
-            QWebEngineView::wheelEvent(event);
-        }
+        void wheelEvent_pub_parent(QWheelEvent* event) { QWebEngineView::wheelEvent(event); }
 
-        int metric_pub(QPaintDevice::PaintDeviceMetric m) const
-        {
-            return metric(m);
-        }
+        int metric_pub(QPaintDevice::PaintDeviceMetric m) const { return metric(m); }
 
-        int metric_pub_parent(QPaintDevice::PaintDeviceMetric m) const
-        {
-            return QWebEngineView::metric(m);
-        }
+        int metric_pub_parent(QPaintDevice::PaintDeviceMetric m) const { return QWebEngineView::metric(m); }
 
     public:
         const QWebEngineViewType* _baseType;
@@ -324,11 +222,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance*
-    QWebEngineViewType::cachedInstance(const QWebEngineViewType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QWebEngineViewType::cachedInstance(const QWebEngineViewType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 
