@@ -10,14 +10,6 @@ PROCESSORCOUNT(_cpu_count)
 
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_OPENEXR" "${RV_DEPS_OPENEXR_VERSION}" "" "")
 
-SET(_download_url
-    "https://github.com/AcademySoftwareFoundation/openexr/archive/refs/tags/v${_version}.zip"
-)
-
-SET(_download_hash 
-  "${RV_DEPS_OPENEXR_DOWNLOAD_HASH}"
-)
-
 SET(_install_dir
     ${RV_DEPS_BASE_DIR}/${_target}/install
 )
@@ -173,8 +165,8 @@ LIST(APPEND _configure_options "-DOPENEXR_BUILD_TOOLS=OFF")
 
 EXTERNALPROJECT_ADD(
   ${_target}
-  URL ${_download_url}
-  URL_MD5 ${_download_hash}
+  URL "https://github.com/AcademySoftwareFoundation/openexr/archive/refs/tags/v${_version}.zip"
+  URL_MD5 ${RV_DEPS_OPENEXR_DOWNLOAD_HASH}
   DOWNLOAD_NAME ${_target}_${_version}.zip
   DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
   DOWNLOAD_EXTRACT_TIMESTAMP TRUE
