@@ -12,37 +12,39 @@ SET(_opentimelineio_target
     "RV_DEPS_OPENTIMELINEIO"
 )
 
-RV_VFX_SET_VARIABLE(_pyside_target CY2023 "RV_DEPS_PYSIDE2" CY2024 "RV_DEPS_PYSIDE6")
-
-SET(PYTHON_VERSION_MAJOR
-    3
+SET(_pyside_target
+  "${RV_DEPS_PYSIDE_TARGET}"
 )
-
-RV_VFX_SET_VARIABLE(PYTHON_VERSION_MINOR CY2023 "10" CY2024 "11")
-
-RV_VFX_SET_VARIABLE(PYTHON_VERSION_PATCH CY2023 "13" CY2024 "9")
 
 SET(_python3_version
-    "${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}.${PYTHON_VERSION_PATCH}"
+    "${RV_DEPS_PYTHON_VERSION}"
 )
+string(REPLACE "." ";" _python_version_list "${_python3_version}")
 
-SET(RV_DEPS_PYTHON_VERSION_MAJOR
-    ${PYTHON_VERSION_MAJOR}
-)
+list(GET _python_version_list 0 PYTHON_VERSION_MAJOR)
+list(GET _python_version_list 1 PYTHON_VERSION_MINOR)
+list(GET _python_version_list 2 PYTHON_VERSION_PATCH)
+
+
 SET(RV_DEPS_PYTHON_VERSION_SHORT
     "${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}"
 )
 
 SET(_opentimelineio_version
-    "0.16.0"
+    "${RV_DEPS_OTIO_VERSION}"
 )
 
-RV_VFX_SET_VARIABLE(_pyside_version CY2023 "5.15.10" CY2024 "6.5.3")
+SET(_pyside_version 
+    "${RV_DEPS_PYSIDE_VERSION}"
+)
 
 SET(_python3_download_url
     "https://github.com/python/cpython/archive/refs/tags/v${_python3_version}.zip"
 )
-RV_VFX_SET_VARIABLE(_python3_download_hash CY2023 "21b32503f31386b37f0c42172dfe5637" CY2024 "392eccd4386936ffcc46ed08057db3e7")
+
+SET(_python3_download_hash 
+    "${RV_DEPS_PYTHON_DOWNLOAD_HASH}"
+)
 
 SET(_opentimelineio_download_url
     "https://github.com/AcademySoftwareFoundation/OpenTimelineIO"
@@ -51,15 +53,14 @@ SET(_opentimelineio_git_tag
     "v${_opentimelineio_version}"
 )
 
-RV_VFX_SET_VARIABLE(
+SET(
   _pyside_archive_url
-  CY2023
-  "https://mirrors.ocf.berkeley.edu/qt/official_releases/QtForPython/pyside2/PySide2-${_pyside_version}-src/pyside-setup-opensource-src-${_pyside_version}.zip"
-  CY2024
-  "https://mirrors.ocf.berkeley.edu/qt/official_releases/QtForPython/pyside6/PySide6-${_pyside_version}-src/pyside-setup-everywhere-src-${_pyside_version}.zip"
+  "${RV_DEPS_PYSIDE_ARCHIVE_URL}"
 )
 
-RV_VFX_SET_VARIABLE(_pyside_download_hash CY2023 "87841aaced763b6b52e9b549e31a493f" CY2024 "515d3249c6e743219ff0d7dd25b8c8d8")
+SET(_pyside_download_hash 
+  "${RV_DEPS_PYSIDE_DOWNLOAD_HASH}"
+)
 
 SET(_install_dir
     ${RV_DEPS_BASE_DIR}/${_python3_target}/install
@@ -109,8 +110,8 @@ LIST(APPEND _python3_make_command "--temp-dir")
 LIST(APPEND _python3_make_command ${_build_dir})
 
 LIST(APPEND _python3_make_command "--vfx_platform")
-RV_VFX_SET_VARIABLE(_vfx_platform_ CY2023 "2023" CY2024 "2024")
-LIST(APPEND _python3_make_command ${_vfx_platform_})
+LIST(APPEND _python3_make_command ${RV_VFX_CY_YEAR})
+
 
 IF(DEFINED RV_DEPS_OPENSSL_INSTALL_DIR)
   LIST(APPEND _python3_make_command "--openssl-dir")
@@ -123,7 +124,6 @@ IF(RV_TARGET_WINDOWS)
   LIST(APPEND _python3_make_command "${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR}")
 ENDIF()
 
-# TODO_QT: Maybe we could use something like NOT CY2023 since after 2023, it is Qt6 TODO_QT: Below code could be simplified, but for now it is faster to test.
 IF(RV_VFX_PLATFORM STREQUAL CY2023)
   SET(_pyside_make_command_script
       "${PROJECT_SOURCE_DIR}/src/build/make_pyside.py"
@@ -152,7 +152,7 @@ IF(RV_VFX_PLATFORM STREQUAL CY2023)
   LIST(APPEND _pyside_make_command ${RV_DEPS_QT5_LOCATION})
   LIST(APPEND _pyside_make_command "--python-version")
   LIST(APPEND _pyside_make_command "${RV_DEPS_PYTHON_VERSION_SHORT}")
-ELSEIF(RV_VFX_PLATFORM STREQUAL CY2024)
+ELSEIF(RV_VFX_PLATFORM STRGREATER_EQUAL CY2024)
   SET(_pyside_make_command_script
       "${PROJECT_SOURCE_DIR}/src/build/make_pyside6.py"
   )
@@ -285,13 +285,14 @@ ELSE()
 ENDIF()
 
 IF(RV_TARGET_WINDOWS)
-  SET(_patch_python3_11_command
-      "patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/patch/python.3.11.openssl.props.patch &&\
-       patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/patch/python.3.11.python.props.patch &&\
-       patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/patch/python.3.11.get_externals.bat.patch"
+  SET(_patch_python_command
+      "patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/patch/python-${RV_DEPS_PYTHON_VERSION}/python.${RV_DEPS_PYTHON_VERSION}.openssl.props.patch &&\
+       patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/patch/python-${RV_DEPS_PYTHON_VERSION}/python.${RV_DEPS_PYTHON_VERSION}.python.props.patch &&\
+       patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/patch/python-${RV_DEPS_PYTHON_VERSION}/python.${RV_DEPS_PYTHON_VERSION}.get_externals.bat.patch"
   )
 
-  RV_VFX_SET_VARIABLE(_patch_command CY2023 "" CY2024 "${_patch_python3_11_command}")
+  #TODO: Above patches are for Python 3.11.9, need to add other versions.
+  RV_VFX_SET_VARIABLE(_patch_command CY2023 "" CY2024 "${_patch_python_command}" CY2025 "" CY2026 "")
   # Split the command into a semi-colon separated list.
   SEPARATE_ARGUMENTS(_patch_command)
   STRING(
@@ -331,6 +332,10 @@ IF(APPLE
       patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/patch/pyopengl-accelerate.patch
   )
 
+  # TODO: pyopengl is now at 3.1.10.  
+  # Need to check if this is an improvement
+  # Still need the patch https://github.com/mcfletch/pyopengl/blob/master/accelerate/src/vbo.pyx
+  # https://github.com/mcfletch/pyopengl/compare/release-3.1.8...3.1.10
   EXTERNALPROJECT_ADD(
     pyopengl_accelerate
     URL "https://github.com/mcfletch/pyopengl/archive/refs/tags/release-3.1.8.tar.gz"
@@ -383,7 +388,6 @@ SET(${_pyside_target}-build-flag
     ${_install_dir}/${_pyside_target}-build-flag
 )
 
-# TODO_QT: Maybe we could use something like NOT CY2023 since after 2023, it is Qt6 TODO_QT: Below code could be simplified, but for now it is faster to test.
 IF(RV_VFX_PLATFORM STREQUAL CY2023)
   ADD_CUSTOM_COMMAND(
     COMMENT "Building PySide2 using ${_pyside_make_command_script}"
@@ -400,7 +404,7 @@ IF(RV_VFX_PLATFORM STREQUAL CY2023)
   SET(_build_flag_depends
       ${${_pyside_target}-build-flag}
   )
-ELSEIF(RV_VFX_PLATFORM STREQUAL CY2024)
+ELSEIF(RV_VFX_PLATFORM STRGREATER_EQUAL CY2024)
   ADD_CUSTOM_COMMAND(
     COMMENT "Building PySide6 using ${_pyside_make_command_script}"
     OUTPUT ${${_pyside_target}-build-flag}
