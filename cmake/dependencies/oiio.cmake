@@ -7,7 +7,7 @@
 #
 # [OIIO -- Sources](https://github.com/OpenImageIO/oiio)
 #
-# [OIIO -- Documentation](https://openimageio.readthedocs.io/en/v2.4.7.1/)
+# [OIIO -- Documentation](https://openimageio.readthedocs.io/en/v${VERSION)NUMBER}/)
 #
 # [OIIO -- Build instructions](https://github.com/OpenImageIO/oiio/blob/master/INSTALL.md)
 #
@@ -15,17 +15,17 @@
 INCLUDE(ProcessorCount) # require CMake 3.15+
 PROCESSORCOUNT(_cpu_count)
 
-RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_OIIO" "2.4.6.0" "make" "")
+RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_OIIO" "${RV_DEPS_OIIO_VERSION}" "make" "")
 RV_SHOW_STANDARD_DEPS_VARIABLES()
 
 SET(_download_url
     "https://github.com/AcademySoftwareFoundation/OpenImageIO/archive/refs/tags/v${_version}.tar.gz"
 )
 SET(_download_hash
-    "628c588112ce8e08f31ec3417eb6828d"
+    "${RV_DEPS_OIIO_DOWNLOAD_HASH}"
 )
 
-RV_MAKE_STANDARD_LIB_NAME("OpenImageIO_Util" "2.4.6" "SHARED" "${RV_DEBUG_POSTFIX}")
+RV_MAKE_STANDARD_LIB_NAME("OpenImageIO_Util" "${_oiio_ver_major_minor}" "SHARED" "${RV_DEBUG_POSTFIX}")
 SET(_byprojects_copy
     ${_byproducts}
 )
@@ -38,7 +38,13 @@ SET(_oiio_utils_libpath
 SET(_oiio_utils_implibpath
     ${_implibpath}
 )
-RV_MAKE_STANDARD_LIB_NAME("OpenImageIO" "2.4.6" "SHARED" "${RV_DEBUG_POSTFIX}")
+
+# Strips that last group from the version number 
+# and stores it in _oiio_ver_major_minor
+# eg. 1.2.3.4 -> 1.2.3
+string(REGEX REPLACE "^([0-9]+\\.[0-9]+\\.[0-9]+)\\..*" "\\1" _oiio_ver_major_minor ${RV_DEPS_OIIO_VERSION})
+
+RV_MAKE_STANDARD_LIB_NAME("OpenImageIO" "${_oiio_ver_major_minor}" "SHARED" "${RV_DEBUG_POSTFIX}")
 LIST(APPEND _byproducts ${_byprojects_copy})
 
 # The '_configure_options' list gets reset and initialized in 'RV_CREATE_STANDARD_DEPS_VARIABLES'

@@ -7,14 +7,14 @@
 INCLUDE(ProcessorCount) # require CMake 3.15+
 PROCESSORCOUNT(_cpu_count)
 
-RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_IMATH" "3.1.6" "" "")
+RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_IMATH" "${RV_DEPS_IMATH_VERSION}" "" "")
 
 SET(_download_url
     "https://github.com/AcademySoftwareFoundation/Imath/archive/refs/tags/v${_version}.zip"
 )
 
 SET(_download_hash
-    "3900f9e7cf8a0ae3edf2552ea92ef7d8"
+    "${RV_DEPS_IMATH_DOWNLOAD_HASH}"
 )
 
 SET(_install_dir
