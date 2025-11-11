@@ -40,7 +40,6 @@
 #include <sched.h>
 #include <sstream>
 #include <stdlib.h>
-#include <stl_ext/thread_group.h>
 #include <string.h>
 #include <vector>
 #include <set>
@@ -71,7 +70,7 @@
 // #error ********* NO VERSION INFORMATION ***********
 #else
 #ifndef _MSC_VER
-#warning********* NO VERSION INFORMATION ***********
+#warning ********* NO VERSION INFORMATION ***********
 #endif
 #endif
 #endif
