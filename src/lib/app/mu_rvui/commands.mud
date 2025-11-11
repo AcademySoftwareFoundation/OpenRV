@@ -1336,6 +1336,13 @@ close "Close the session window and exit the session."
 toggleMenuBar "Toggle menu bar visibility. Has no effect on the Mac."
 isMenuBarVisible "Return true if the menu bar is visible."
 
+setUIBlocked """
+Temporarily block user interaction with the UI by displaying a semi-transparent 
+overlay. When blocked, mouse and keyboard input is intercepted, preventing 
+interaction with the viewport, toolbars, and panels. The event loop continues 
+to run normally, allowing timers, network operations, and rendering to proceed. 
+"""
+
 openMediaFileDialog """
 Launch the media file dialog to choose files. 
 

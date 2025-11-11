@@ -306,6 +306,7 @@ all_mu_commands = [
     "enableEventCategory",
     "disableEventCategory",
     "isEventCategoryEnabled",
+    "setUIBlocked",
     "crash",
     "addSourceMediaRep",
     "setActiveSourceMediaRep",
