@@ -16,6 +16,7 @@
 #include <IPCore/IPNode.h>
 #include <IPCore/ShaderProgram.h>
 #include <IPCore/Application.h>
+#include <IPCore/PaintCommand.h>
 #include <TwkExc/TwkExcException.h>
 #include <TwkGLF/GL.h>
 #include <TwkGLF/GLState.h>
@@ -46,6 +47,7 @@
 #include <stl_ext/string_algo.h>
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/regex.hpp>
+#include <boost/functional/hash.hpp>
 #include <boost/thread.hpp>
 #include <boost/thread/mutex.hpp>
 #include <IPCore/ImageRenderer.h>
@@ -4849,9 +4851,6 @@ namespace IPCore
             return;
 
         const string prenderID = imageToFBOIdentifier(root);
-        // these two are for pingpong
-        const GLFBO* tempfbo1 = m_imageFBOManager.newImageFBO(fbo, m_fullRenderSerialNumber, prenderID)->fbo();
-        const GLFBO* tempfbo2 = m_imageFBOManager.newImageFBO(fbo, m_fullRenderSerialNumber, prenderID)->fbo();
 
         assert(fbo);
 
@@ -4889,9 +4888,23 @@ namespace IPCore
             // a recompute of the renderID which is a unique identifier
             // associated with the render.
 
+            // Compute hash of commands that should be in the cache
+            // This detects if any previously cached commands have been modified (e.g., in live review)
+            // Process each command's hash individually and combine them
+            boost::hash<string> string_hash;
+            size_t hashValue = 0;
+            for (size_t i = 0; i < curCmdNum - 1; ++i)
+            {
+                ostringstream hash;
+                root->commands[i]->hash(hash);
+                size_t cmdHash = string_hash(hash.str());
+                hashValue ^= cmdHash + 0x9e3779b9 + (hashValue << 6) + (hashValue >> 2);
+            }
+
             ostringstream newRenderID;
-            newRenderID << root->renderIDWithPartialPaint(true /*force_recompute*/) << " " << m_filter << " " << m_bgpattern << " "
-                        << fbo->width() << "x" << fbo->height() << " paintCmdNo" << curCmdNum - 1;
+            string imageRenderID = root->renderIDWithPartialPaint(true /*force_recompute*/);
+            newRenderID << imageRenderID << " " << m_filter << " " << m_bgpattern << " " << fbo->width() << "x" << fbo->height()
+                        << " paintCmdNo" << curCmdNum - 1 << " hash" << hashValue;
 
             cachedFBO =
                 m_imageFBOManager.findExistingPaintFBO(fbo, newRenderID.str(), foundCachedFBO, lastCmdNum, m_fullRenderSerialNumber);
@@ -4900,11 +4913,26 @@ namespace IPCore
             if (foundCachedFBO)
             {
                 startCmd = lastCmdNum;
-                cachedFBO->fbo()->copyTo(tempfbo1);
             }
             else
             {
                 cachedFBO = m_imageFBOManager.newImageFBO(fbo, m_fullRenderSerialNumber, newRenderID.str());
+            }
+        }
+
+        // Allocate temp FBOs AFTER cache lookup so the cached FBO is protected from being reused
+        const GLFBO* tempfbo1 = m_imageFBOManager.newImageFBO(fbo, m_fullRenderSerialNumber, prenderID)->fbo();
+        const GLFBO* tempfbo2 = m_imageFBOManager.newImageFBO(fbo, m_fullRenderSerialNumber, prenderID)->fbo();
+
+        // Copy initial render to temp buffer
+        if (root->commands.size() > 1)
+        {
+            if (foundCachedFBO)
+            {
+                cachedFBO->fbo()->copyTo(tempfbo1);
+            }
+            else
+            {
                 fbo->copyTo(tempfbo1);
             }
         }
@@ -4961,6 +4989,7 @@ namespace IPCore
         paintContext.hasStencil = hasStencil;
         paintContext.stencilBox = stencil;
         paintContext.lastCommand = root->commands.back();
+        paintContext.totalCommandsInCache = startCmd;
 
         fbo->unbind();
 
@@ -5044,7 +5073,9 @@ namespace IPCore
             Paint::renderPaintCommands(paintContext);
         }
 
-        if (!paintContext.cacheUpdated && cachedFBO)
+        // Only clear the cache identifier if we didn't use an existing cache
+        // If we had a cache hit (foundCachedFBO), keep the identifier even if we didn't update it
+        if (!paintContext.cacheUpdated && cachedFBO && !foundCachedFBO)
             cachedFBO->identifier = "";
 
         /////////////////// clean up /////////////////////////////////////

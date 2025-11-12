@@ -784,32 +784,6 @@ namespace IPCore
             size_t count = 0;
             for (size_t i = 0; i < context.commands.size(); count++)
             {
-                //
-                // update the cache, only up to the second to the last cmd we
-                // don't cache the render with the very last cmd because doing
-                // so will cause the last cmd to be rendered twice, and in
-                // case of alpha not 0, or 1, it will not be correct
-                //
-                // Note: There is no cache to update when there is only 1
-                // command to render as the context.cachedfbo is already up to
-                // date. In other words when the last command is also the first
-                // command, we don't update the cache.
-                //
-
-                if (context.updateCache && context.cachedfbo && (context.commands.size() > 1)
-                    && (context.commands[i] == context.lastCommand))
-                {
-                    if (i > 0)
-                    {
-                        currentFBO->copyTo(context.cachedfbo);
-                    }
-                    else
-                    {
-                        tempfbo1->copyTo(context.cachedfbo);
-                    }
-                    context.cacheUpdated = true;
-                }
-
                 const Paint::Command* cmd = context.commands[i];
                 if (cmd->getType() == Paint::Command::ExecuteAllBefore)
                 {
@@ -874,6 +848,23 @@ namespace IPCore
                 {
                     cmd->execute(commandContext);
                     ++i;
+                }
+                // Update the cache AFTER command execution
+                // We cache up to the second-to-last command in the batch (not the very last, which might still be dragging)
+                // count is the number of commands rendered so far (1-indexed after increment)
+                // Cache after rendering the second-to-last command: count == curCmdNum - 1
+                bool shouldCache = context.updateCache && context.cachedfbo && (curCmdNum > 1) && (count == curCmdNum - 1);
+
+                if (shouldCache)
+                {
+                    // Always save to cache from tempfbo1 to maintain consistent ping-pong state
+                    // If currentFBO is tempfbo2, copy it to tempfbo1 first
+                    if (currentFBO != tempfbo1)
+                    {
+                        currentFBO->copyTo(tempfbo1);
+                    }
+                    tempfbo1->copyTo(context.cachedfbo);
+                    context.cacheUpdated = true;
                 }
             }
 
