@@ -71,16 +71,14 @@ namespace Mu
         _baseType = 0;
     }
 
-    MuQt_QListWidget::MuQt_QListWidget(Pointer muobj, const CallEnvironment* ce,
-                                       QWidget* parent)
+    MuQt_QListWidget::MuQt_QListWidget(Pointer muobj, const CallEnvironment* ce, QWidget* parent)
         : QListWidget(parent)
     {
         _env = ce;
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QListWidgetType>(
-            c->internName("qt.QListWidget"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QListWidgetType>(c->internName("qt.QListWidget"));
     }
 
     void MuQt_QListWidget::dropEvent(QDropEvent* event)
@@ -97,8 +95,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QDropEventType>(c, event, "qt.QDropEvent"));
+            args[1] = Value(makeqpointer<QDropEventType>(c, event, "qt.QDropEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -107,8 +104,7 @@ namespace Mu
         }
     }
 
-    bool MuQt_QListWidget::dropMimeData(int index, const QMimeData* data,
-                                        Qt::DropAction action)
+    bool MuQt_QListWidget::dropMimeData(int index, const QMimeData* data, Qt::DropAction action)
     {
         if (!_env)
             return QListWidget::dropMimeData(index, data, action);
@@ -120,8 +116,7 @@ namespace Mu
             Function::ArgumentVector args(4);
             args[0] = Value(Pointer(_obj));
             args[1] = Value(index);
-            args[2] =
-                Value(makeinstance<QMimeDataType>(c, data, "qt.QMimeData"));
+            args[2] = Value(makeinstance<QMimeDataType>(c, data, "qt.QMimeData"));
             args[3] = Value(int(action));
             Value rval = _env->call(F, args);
             return (bool)(rval._bool);
@@ -132,8 +127,7 @@ namespace Mu
         }
     }
 
-    QMimeData*
-    MuQt_QListWidget::mimeData(const QList<QListWidgetItem*>& items) const
+    QMimeData* MuQt_QListWidget::mimeData(const QList<QListWidgetItem*>& items) const
     {
         if (!_env)
             return QListWidget::mimeData(items);
@@ -144,8 +138,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqpointerlist<QListWidgetItemType>(
-                c, items, "qt.QListWidgetItem"));
+            args[1] = Value(makeqpointerlist<QListWidgetItemType>(c, items, "qt.QListWidgetItem"));
             Value rval = _env->call(F, args);
             return object<QMimeData>(rval._Pointer);
         }
@@ -248,8 +241,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
+            args[1] = Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
             Value rval = _env->call(F, args);
             return getqtype<QRectType>(rval._Pointer);
         }
@@ -259,8 +251,7 @@ namespace Mu
         }
     }
 
-    void MuQt_QListWidget::currentChanged(const QModelIndex& current,
-                                          const QModelIndex& previous)
+    void MuQt_QListWidget::currentChanged(const QModelIndex& current, const QModelIndex& previous)
     {
         if (!_env)
         {
@@ -274,10 +265,8 @@ namespace Mu
         {
             Function::ArgumentVector args(3);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqtype<QModelIndexType>(c, current, "qt.QModelIndex"));
-            args[2] = Value(
-                makeqtype<QModelIndexType>(c, previous, "qt.QModelIndex"));
+            args[1] = Value(makeqtype<QModelIndexType>(c, current, "qt.QModelIndex"));
+            args[2] = Value(makeqtype<QModelIndexType>(c, previous, "qt.QModelIndex"));
             Value rval = _env->call(F, args);
         }
         else
@@ -300,8 +289,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QDragLeaveEventType>(c, e, "qt.QDragLeaveEvent"));
+            args[1] = Value(makeqpointer<QDragLeaveEventType>(c, e, "qt.QDragLeaveEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -324,8 +312,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QDragMoveEventType>(c, e, "qt.QDragMoveEvent"));
+            args[1] = Value(makeqpointer<QDragMoveEventType>(c, e, "qt.QDragMoveEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -365,8 +352,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
+            args[1] = Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
             Value rval = _env->call(F, args);
             return (bool)(rval._bool);
         }
@@ -390,8 +376,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -414,8 +399,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -438,8 +422,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QPaintEventType>(c, e, "qt.QPaintEvent"));
+            args[1] = Value(makeqpointer<QPaintEventType>(c, e, "qt.QPaintEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -462,8 +445,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QResizeEventType>(c, e, "qt.QResizeEvent"));
+            args[1] = Value(makeqpointer<QResizeEventType>(c, e, "qt.QResizeEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -472,8 +454,7 @@ namespace Mu
         }
     }
 
-    void MuQt_QListWidget::rowsAboutToBeRemoved(const QModelIndex& parent,
-                                                int start, int end)
+    void MuQt_QListWidget::rowsAboutToBeRemoved(const QModelIndex& parent, int start, int end)
     {
         if (!_env)
         {
@@ -487,8 +468,7 @@ namespace Mu
         {
             Function::ArgumentVector args(4);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqtype<QModelIndexType>(c, parent, "qt.QModelIndex"));
+            args[1] = Value(makeqtype<QModelIndexType>(c, parent, "qt.QModelIndex"));
             args[2] = Value(start);
             args[3] = Value(end);
             Value rval = _env->call(F, args);
@@ -499,8 +479,7 @@ namespace Mu
         }
     }
 
-    void MuQt_QListWidget::rowsInserted(const QModelIndex& parent, int start,
-                                        int end)
+    void MuQt_QListWidget::rowsInserted(const QModelIndex& parent, int start, int end)
     {
         if (!_env)
         {
@@ -514,8 +493,7 @@ namespace Mu
         {
             Function::ArgumentVector args(4);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqtype<QModelIndexType>(c, parent, "qt.QModelIndex"));
+            args[1] = Value(makeqtype<QModelIndexType>(c, parent, "qt.QModelIndex"));
             args[2] = Value(start);
             args[3] = Value(end);
             Value rval = _env->call(F, args);
@@ -546,8 +524,7 @@ namespace Mu
         }
     }
 
-    void MuQt_QListWidget::selectionChanged(const QItemSelection& selected,
-                                            const QItemSelection& deselected)
+    void MuQt_QListWidget::selectionChanged(const QItemSelection& selected, const QItemSelection& deselected)
     {
         if (!_env)
         {
@@ -561,10 +538,8 @@ namespace Mu
         {
             Function::ArgumentVector args(3);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqtype<QItemSelectionType>(c, selected,
-                                                          "qt.QItemSelection"));
-            args[2] = Value(makeqtype<QItemSelectionType>(c, deselected,
-                                                          "qt.QItemSelection"));
+            args[1] = Value(makeqtype<QItemSelectionType>(c, selected, "qt.QItemSelection"));
+            args[2] = Value(makeqtype<QItemSelectionType>(c, deselected, "qt.QItemSelection"));
             Value rval = _env->call(F, args);
         }
         else
@@ -573,9 +548,7 @@ namespace Mu
         }
     }
 
-    void
-    MuQt_QListWidget::setSelection(const QRect& rect,
-                                   QItemSelectionModel::SelectionFlags command)
+    void MuQt_QListWidget::setSelection(const QRect& rect, QItemSelectionModel::SelectionFlags command)
     {
         if (!_env)
         {
@@ -636,8 +609,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QTimerEventType>(c, e, "qt.QTimerEvent"));
+            args[1] = Value(makeqpointer<QTimerEventType>(c, e, "qt.QTimerEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -708,8 +680,7 @@ namespace Mu
         }
     }
 
-    QRegion MuQt_QListWidget::visualRegionForSelection(
-        const QItemSelection& selection) const
+    QRegion MuQt_QListWidget::visualRegionForSelection(const QItemSelection& selection) const
     {
         if (!_env)
             return QListWidget::visualRegionForSelection(selection);
@@ -720,8 +691,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqtype<QItemSelectionType>(c, selection,
-                                                          "qt.QItemSelection"));
+            args[1] = Value(makeqtype<QItemSelectionType>(c, selection, "qt.QItemSelection"));
             Value rval = _env->call(F, args);
             return getqtype<QRegionType>(rval._Pointer);
         }
@@ -745,8 +715,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QWheelEventType>(c, e, "qt.QWheelEvent"));
+            args[1] = Value(makeqpointer<QWheelEventType>(c, e, "qt.QWheelEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -758,8 +727,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  Mu Type CONSTRUCTORS
 
-    QListWidgetType::QListWidgetType(Context* c, const char* name, Class* super,
-                                     Class* super2)
+    QListWidgetType::QListWidgetType(Context* c, const char* name, Class* super, Class* super2)
         : Class(c, name, vectorOf2(super, super2))
     {
     }
@@ -769,8 +737,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    static Pointer QListWidget_QListWidget_QObject(Thread& NODE_THREAD,
-                                                   Pointer obj)
+    static Pointer QListWidget_QListWidget_QObject(Thread& NODE_THREAD, Pointer obj)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         ClassInstance* widget = reinterpret_cast<ClassInstance*>(obj);
@@ -781,9 +748,7 @@ namespace Mu
         }
         else if (QListWidget* w = object<QListWidget>(widget))
         {
-            QListWidgetType* type =
-                c->findSymbolOfTypeByQualifiedName<QListWidgetType>(
-                    c->internName("qt.QListWidget"), false);
+            QListWidgetType* type = c->findSymbolOfTypeByQualifiedName<QListWidgetType>(c->internName("qt.QListWidget"), false);
             ClassInstance* o = ClassInstance::allocate(type);
             setobject(o, w);
             return o;
@@ -794,26 +759,17 @@ namespace Mu
         }
     }
 
-    static NODE_IMPLEMENTATION(castFromObject, Pointer)
-    {
-        NODE_RETURN(
-            QListWidget_QListWidget_QObject(NODE_THREAD, NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(castFromObject, Pointer) { NODE_RETURN(QListWidget_QListWidget_QObject(NODE_THREAD, NODE_ARG(0, Pointer))); }
 
-    Pointer qt_QListWidget_QListWidget_QListWidget_QListWidget_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
+    Pointer qt_QListWidget_QListWidget_QListWidget_QListWidget_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWidget* arg1 = object<QWidget>(param_parent);
-        setobject(param_this,
-                  new MuQt_QListWidget(param_this,
-                                       NODE_THREAD.process()->callEnv(), arg1));
+        setobject(param_this, new MuQt_QListWidget(param_this, NODE_THREAD.process()->callEnv(), arg1));
         return param_this;
     }
 
-    void qt_QListWidget_addItem_void_QListWidget_string(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this,
-                                                        Pointer param_label)
+    void qt_QListWidget_addItem_void_QListWidget_string(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_label)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListWidget* arg0 = object<QListWidget>(param_this);
@@ -821,8 +777,7 @@ namespace Mu
         arg0->addItem(arg1);
     }
 
-    void qt_QListWidget_addItem_void_QListWidget_QListWidgetItem(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_item)
+    void qt_QListWidget_addItem_void_QListWidget_QListWidgetItem(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_item)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListWidget* arg0 = object<QListWidget>(param_this);
@@ -830,8 +785,7 @@ namespace Mu
         arg0->addItem(arg1);
     }
 
-    void qt_QListWidget_addItems_void_QListWidget_stringBSB_ESB_(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_labels)
+    void qt_QListWidget_addItems_void_QListWidget_stringBSB_ESB_(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_labels)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListWidget* arg0 = object<QListWidget>(param_this);
@@ -839,8 +793,8 @@ namespace Mu
         arg0->addItems(arg1);
     }
 
-    void qt_QListWidget_closePersistentEditor_void_QListWidget_QListWidgetItem(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_item)
+    void qt_QListWidget_closePersistentEditor_void_QListWidget_QListWidgetItem(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                               Pointer param_item)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListWidget* arg0 = object<QListWidget>(param_this);
@@ -848,17 +802,14 @@ namespace Mu
         arg0->closePersistentEditor(arg1);
     }
 
-    Pointer qt_QListWidget_currentItem_QListWidgetItem_QListWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QListWidget_currentItem_QListWidgetItem_QListWidget(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListWidget* arg0 = object<QListWidget>(param_this);
-        return makeqpointer<QListWidgetItemType>(c, arg0->currentItem(),
-                                                 "qt.QListWidgetItem");
+        return makeqpointer<QListWidgetItemType>(c, arg0->currentItem(), "qt.QListWidgetItem");
     }
 
-    void qt_QListWidget_editItem_void_QListWidget_QListWidgetItem(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_item)
+    void qt_QListWidget_editItem_void_QListWidget_QListWidgetItem(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_item)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListWidget* arg0 = object<QListWidget>(param_this);
@@ -866,22 +817,18 @@ namespace Mu
         arg0->editItem(arg1);
     }
 
-    Pointer
-    qt_QListWidget_findItems_qt__QListWidgetItemBSB_ESB__QListWidget_string_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_text,
-        int param_flags)
+    Pointer qt_QListWidget_findItems_qt__QListWidgetItemBSB_ESB__QListWidget_string_int(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                        Pointer param_text, int param_flags)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListWidget* arg0 = object<QListWidget>(param_this);
         const QString arg1 = qstring(param_text);
         Qt::MatchFlags arg2 = (Qt::MatchFlags)(param_flags);
-        return makeqpointerlist<QListWidgetItemType>(
-            c, arg0->findItems(arg1, arg2), "qt.QListWidgetItem");
+        return makeqpointerlist<QListWidgetItemType>(c, arg0->findItems(arg1, arg2), "qt.QListWidgetItem");
     }
 
-    void qt_QListWidget_insertItem_void_QListWidget_int_QListWidgetItem(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
-        Pointer param_item)
+    void qt_QListWidget_insertItem_void_QListWidget_int_QListWidgetItem(Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
+                                                                        Pointer param_item)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListWidget* arg0 = object<QListWidget>(param_this);
@@ -890,9 +837,8 @@ namespace Mu
         arg0->insertItem(arg1, arg2);
     }
 
-    void qt_QListWidget_insertItem_void_QListWidget_int_string(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
-        Pointer param_label)
+    void qt_QListWidget_insertItem_void_QListWidget_int_string(Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
+                                                               Pointer param_label)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListWidget* arg0 = object<QListWidget>(param_this);
@@ -901,9 +847,8 @@ namespace Mu
         arg0->insertItem(arg1, arg2);
     }
 
-    void qt_QListWidget_insertItems_void_QListWidget_int_stringBSB_ESB_(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
-        Pointer param_labels)
+    void qt_QListWidget_insertItems_void_QListWidget_int_stringBSB_ESB_(Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
+                                                                        Pointer param_labels)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListWidget* arg0 = object<QListWidget>(param_this);
@@ -912,49 +857,41 @@ namespace Mu
         arg0->insertItems(arg1, arg2);
     }
 
-    Pointer qt_QListWidget_item_QListWidgetItem_QListWidget_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_row)
+    Pointer qt_QListWidget_item_QListWidgetItem_QListWidget_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_row)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListWidget* arg0 = object<QListWidget>(param_this);
         int arg1 = (int)(param_row);
-        return makeqpointer<QListWidgetItemType>(c, arg0->item(arg1),
-                                                 "qt.QListWidgetItem");
+        return makeqpointer<QListWidgetItemType>(c, arg0->item(arg1), "qt.QListWidgetItem");
     }
 
-    Pointer qt_QListWidget_itemAt_QListWidgetItem_QListWidget_QPoint(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_p)
+    Pointer qt_QListWidget_itemAt_QListWidgetItem_QListWidget_QPoint(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_p)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListWidget* arg0 = object<QListWidget>(param_this);
         const QPoint arg1 = getqtype<QPointType>(param_p);
-        return makeqpointer<QListWidgetItemType>(c, arg0->itemAt(arg1),
-                                                 "qt.QListWidgetItem");
+        return makeqpointer<QListWidgetItemType>(c, arg0->itemAt(arg1), "qt.QListWidgetItem");
     }
 
-    Pointer qt_QListWidget_itemAt_QListWidgetItem_QListWidget_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_x, int param_y)
+    Pointer qt_QListWidget_itemAt_QListWidgetItem_QListWidget_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_x, int param_y)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListWidget* arg0 = object<QListWidget>(param_this);
         int arg1 = (int)(param_x);
         int arg2 = (int)(param_y);
-        return makeqpointer<QListWidgetItemType>(c, arg0->itemAt(arg1, arg2),
-                                                 "qt.QListWidgetItem");
+        return makeqpointer<QListWidgetItemType>(c, arg0->itemAt(arg1, arg2), "qt.QListWidgetItem");
     }
 
-    Pointer qt_QListWidget_itemWidget_QWidget_QListWidget_QListWidgetItem(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_item)
+    Pointer qt_QListWidget_itemWidget_QWidget_QListWidget_QListWidgetItem(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_item)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListWidget* arg0 = object<QListWidget>(param_this);
         QListWidgetItem* arg1 = getqpointer<QListWidgetItemType>(param_item);
-        return makeinstance<QWidgetType>(c, arg0->itemWidget(arg1),
-                                         "qt.QWidget");
+        return makeinstance<QWidgetType>(c, arg0->itemWidget(arg1), "qt.QWidget");
     }
 
-    void qt_QListWidget_openPersistentEditor_void_QListWidget_QListWidgetItem(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_item)
+    void qt_QListWidget_openPersistentEditor_void_QListWidget_QListWidgetItem(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                              Pointer param_item)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListWidget* arg0 = object<QListWidget>(param_this);
@@ -962,8 +899,7 @@ namespace Mu
         arg0->openPersistentEditor(arg1);
     }
 
-    void qt_QListWidget_removeItemWidget_void_QListWidget_QListWidgetItem(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_item)
+    void qt_QListWidget_removeItemWidget_void_QListWidget_QListWidgetItem(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_item)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListWidget* arg0 = object<QListWidget>(param_this);
@@ -971,28 +907,22 @@ namespace Mu
         arg0->removeItemWidget(arg1);
     }
 
-    int qt_QListWidget_row_int_QListWidget_QListWidgetItem(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_item)
+    int qt_QListWidget_row_int_QListWidget_QListWidgetItem(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_item)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListWidget* arg0 = object<QListWidget>(param_this);
-        const QListWidgetItem* arg1 =
-            getqpointer<QListWidgetItemType>(param_item);
+        const QListWidgetItem* arg1 = getqpointer<QListWidgetItemType>(param_item);
         return arg0->row(arg1);
     }
 
-    Pointer
-    qt_QListWidget_selectedItems_qt__QListWidgetItemBSB_ESB__QListWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QListWidget_selectedItems_qt__QListWidgetItemBSB_ESB__QListWidget(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListWidget* arg0 = object<QListWidget>(param_this);
-        return makeqpointerlist<QListWidgetItemType>(c, arg0->selectedItems(),
-                                                     "qt.QListWidgetItem");
+        return makeqpointerlist<QListWidgetItemType>(c, arg0->selectedItems(), "qt.QListWidgetItem");
     }
 
-    void qt_QListWidget_setCurrentItem_void_QListWidget_QListWidgetItem(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_item)
+    void qt_QListWidget_setCurrentItem_void_QListWidget_QListWidgetItem(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_item)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListWidget* arg0 = object<QListWidget>(param_this);
@@ -1000,33 +930,28 @@ namespace Mu
         arg0->setCurrentItem(arg1);
     }
 
-    void qt_QListWidget_setCurrentItem_void_QListWidget_QListWidgetItem_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_item,
-        int param_command)
+    void qt_QListWidget_setCurrentItem_void_QListWidget_QListWidgetItem_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_item,
+                                                                            int param_command)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListWidget* arg0 = object<QListWidget>(param_this);
         QListWidgetItem* arg1 = getqpointer<QListWidgetItemType>(param_item);
-        QItemSelectionModel::SelectionFlags arg2 =
-            (QItemSelectionModel::SelectionFlags)(param_command);
+        QItemSelectionModel::SelectionFlags arg2 = (QItemSelectionModel::SelectionFlags)(param_command);
         arg0->setCurrentItem(arg1, arg2);
     }
 
-    void qt_QListWidget_setCurrentRow_void_QListWidget_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
-        int param_command)
+    void qt_QListWidget_setCurrentRow_void_QListWidget_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
+                                                               int param_command)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListWidget* arg0 = object<QListWidget>(param_this);
         int arg1 = (int)(param_row);
-        QItemSelectionModel::SelectionFlags arg2 =
-            (QItemSelectionModel::SelectionFlags)(param_command);
+        QItemSelectionModel::SelectionFlags arg2 = (QItemSelectionModel::SelectionFlags)(param_command);
         arg0->setCurrentRow(arg1, arg2);
     }
 
-    void qt_QListWidget_setItemWidget_void_QListWidget_QListWidgetItem_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_item,
-        Pointer param_widget)
+    void qt_QListWidget_setItemWidget_void_QListWidget_QListWidgetItem_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                               Pointer param_item, Pointer param_widget)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListWidget* arg0 = object<QListWidget>(param_this);
@@ -1035,9 +960,7 @@ namespace Mu
         arg0->setItemWidget(arg1, arg2);
     }
 
-    void qt_QListWidget_sortItems_void_QListWidget_int(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this,
-                                                       int param_order)
+    void qt_QListWidget_sortItems_void_QListWidget_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_order)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListWidget* arg0 = object<QListWidget>(param_this);
@@ -1045,28 +968,23 @@ namespace Mu
         arg0->sortItems(arg1);
     }
 
-    Pointer qt_QListWidget_takeItem_QListWidgetItem_QListWidget_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_row)
+    Pointer qt_QListWidget_takeItem_QListWidgetItem_QListWidget_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_row)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListWidget* arg0 = object<QListWidget>(param_this);
         int arg1 = (int)(param_row);
-        return makeqpointer<QListWidgetItemType>(c, arg0->takeItem(arg1),
-                                                 "qt.QListWidgetItem");
+        return makeqpointer<QListWidgetItemType>(c, arg0->takeItem(arg1), "qt.QListWidgetItem");
     }
 
-    Pointer qt_QListWidget_visualItemRect_QRect_QListWidget_QListWidgetItem(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_item)
+    Pointer qt_QListWidget_visualItemRect_QRect_QListWidget_QListWidgetItem(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_item)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListWidget* arg0 = object<QListWidget>(param_this);
-        const QListWidgetItem* arg1 =
-            getqpointer<QListWidgetItemType>(param_item);
+        const QListWidgetItem* arg1 = getqpointer<QListWidgetItemType>(param_item);
         return makeqtype<QRectType>(c, arg0->visualItemRect(arg1), "qt.QRect");
     }
 
-    void qt_QListWidget_dropEvent_void_QListWidget_QDropEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QListWidget_dropEvent_void_QListWidget_QDropEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListWidget* arg0 = object<QListWidget>(param_this);
@@ -1077,142 +995,99 @@ namespace Mu
             arg0->dropEvent(arg1);
     }
 
-    bool qt_QListWidget_dropMimeData_bool_QListWidget_int_QMimeData_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_index,
-        Pointer param_data, int param_action)
+    bool qt_QListWidget_dropMimeData_bool_QListWidget_int_QMimeData_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_index,
+                                                                        Pointer param_data, int param_action)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListWidget* arg0 = object<QListWidget>(param_this);
         int arg1 = (int)(param_index);
         const QMimeData* arg2 = object<QMimeData>(param_data);
         Qt::DropAction arg3 = (Qt::DropAction)(param_action);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QListWidget*)arg0)
-                         ->dropMimeData_pub_parent(arg1, arg2, arg3)
-                   : ((MuQt_QListWidget*)arg0)
-                         ->dropMimeData_pub(arg1, arg2, arg3);
+        return isMuQtObject(arg0) ? ((MuQt_QListWidget*)arg0)->dropMimeData_pub_parent(arg1, arg2, arg3)
+                                  : ((MuQt_QListWidget*)arg0)->dropMimeData_pub(arg1, arg2, arg3);
     }
 
-    Pointer
-    qt_QListWidget_indexFromItem_QModelIndex_QListWidget_QListWidgetItem(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_item)
+    Pointer qt_QListWidget_indexFromItem_QModelIndex_QListWidget_QListWidgetItem(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                 Pointer param_item)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListWidget* arg0 = object<QListWidget>(param_this);
         QListWidgetItem* arg1 = getqpointer<QListWidgetItemType>(param_item);
-        return makeqtype<QModelIndexType>(
-            c, ((MuQt_QListWidget*)arg0)->indexFromItem_pub(arg1),
-            "qt.QModelIndex");
+        return makeqtype<QModelIndexType>(c, ((MuQt_QListWidget*)arg0)->indexFromItem_pub(arg1), "qt.QModelIndex");
     }
 
-    Pointer
-    qt_QListWidget_itemFromIndex_QListWidgetItem_QListWidget_QModelIndex(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index)
+    Pointer qt_QListWidget_itemFromIndex_QListWidgetItem_QListWidget_QModelIndex(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                 Pointer param_index)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListWidget* arg0 = object<QListWidget>(param_this);
         const QModelIndex arg1 = getqtype<QModelIndexType>(param_index);
-        return makeqpointer<QListWidgetItemType>(
-            c, ((MuQt_QListWidget*)arg0)->itemFromIndex_pub(arg1),
-            "qt.QListWidgetItem");
+        return makeqpointer<QListWidgetItemType>(c, ((MuQt_QListWidget*)arg0)->itemFromIndex_pub(arg1), "qt.QListWidgetItem");
     }
 
-    Pointer
-    qt_QListWidget_items_qt__QListWidgetItemBSB_ESB__QListWidget_QMimeData(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_data)
+    Pointer qt_QListWidget_items_qt__QListWidgetItemBSB_ESB__QListWidget_QMimeData(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                   Pointer param_data)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListWidget* arg0 = object<QListWidget>(param_this);
         const QMimeData* arg1 = object<QMimeData>(param_data);
-        return makeqpointerlist<QListWidgetItemType>(
-            c, ((MuQt_QListWidget*)arg0)->items_pub(arg1),
-            "qt.QListWidgetItem");
+        return makeqpointerlist<QListWidgetItemType>(c, ((MuQt_QListWidget*)arg0)->items_pub(arg1), "qt.QListWidgetItem");
     }
 
-    Pointer
-    qt_QListWidget_mimeData_QMimeData_QListWidget_qt__QListWidgetItemBSB_ESB_(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_items)
+    Pointer qt_QListWidget_mimeData_QMimeData_QListWidget_qt__QListWidgetItemBSB_ESB_(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                      Pointer param_items)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListWidget* arg0 = object<QListWidget>(param_this);
-        const QList<QListWidgetItem*> arg1 =
-            qpointerlist<QListWidgetItemType>(param_items);
-        return isMuQtObject(arg0)
-                   ? makeinstance<QMimeDataType>(
-                         c,
-                         ((MuQt_QListWidget*)arg0)->mimeData_pub_parent(arg1),
-                         "qt.QMimeData")
-                   : makeinstance<QMimeDataType>(
-                         c, ((MuQt_QListWidget*)arg0)->mimeData_pub(arg1),
-                         "qt.QMimeData");
+        const QList<QListWidgetItem*> arg1 = qpointerlist<QListWidgetItemType>(param_items);
+        return isMuQtObject(arg0) ? makeinstance<QMimeDataType>(c, ((MuQt_QListWidget*)arg0)->mimeData_pub_parent(arg1), "qt.QMimeData")
+                                  : makeinstance<QMimeDataType>(c, ((MuQt_QListWidget*)arg0)->mimeData_pub(arg1), "qt.QMimeData");
     }
 
-    Pointer
-    qt_QListWidget_mimeTypes_stringBSB_ESB__QListWidget(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this)
+    Pointer qt_QListWidget_mimeTypes_stringBSB_ESB__QListWidget(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListWidget* arg0 = object<QListWidget>(param_this);
-        return isMuQtObject(arg0)
-                   ? makestringlist(
-                         c, ((MuQt_QListWidget*)arg0)->mimeTypes_pub_parent())
-                   : makestringlist(c,
-                                    ((MuQt_QListWidget*)arg0)->mimeTypes_pub());
+        return isMuQtObject(arg0) ? makestringlist(c, ((MuQt_QListWidget*)arg0)->mimeTypes_pub_parent())
+                                  : makestringlist(c, ((MuQt_QListWidget*)arg0)->mimeTypes_pub());
     }
 
-    int
-    qt_QListWidget_supportedDropActions_int_QListWidget(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this)
+    int qt_QListWidget_supportedDropActions_int_QListWidget(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListWidget* arg0 = object<QListWidget>(param_this);
-        return isMuQtObject(arg0)
-                   ? int(((MuQt_QListWidget*)arg0)
-                             ->supportedDropActions_pub_parent())
-                   : int(((MuQt_QListWidget*)arg0)->supportedDropActions_pub());
+        return isMuQtObject(arg0) ? int(((MuQt_QListWidget*)arg0)->supportedDropActions_pub_parent())
+                                  : int(((MuQt_QListWidget*)arg0)->supportedDropActions_pub());
     }
 
-    bool qt_QListWidget_event_bool_QListWidget_QEvent(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this,
-                                                      Pointer param_e)
+    bool qt_QListWidget_event_bool_QListWidget_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListWidget* arg0 = object<QListWidget>(param_this);
         QEvent* arg1 = getqpointer<QEventType>(param_e);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QListWidget*)arg0)->event_pub_parent(arg1)
-                   : ((MuQt_QListWidget*)arg0)->event_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QListWidget*)arg0)->event_pub_parent(arg1) : ((MuQt_QListWidget*)arg0)->event_pub(arg1);
     }
 
-    Pointer qt_QListWidget_indexAt_QModelIndex_QListWidget_QPoint(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_p)
+    Pointer qt_QListWidget_indexAt_QModelIndex_QListWidget_QPoint(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_p)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListWidget* arg0 = object<QListWidget>(param_this);
         const QPoint arg1 = getqtype<QPointType>(param_p);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QModelIndexType>(
-                         c, arg0->QListWidget::indexAt(arg1), "qt.QModelIndex")
-                   : makeqtype<QModelIndexType>(c, arg0->indexAt(arg1),
-                                                "qt.QModelIndex");
+        return isMuQtObject(arg0) ? makeqtype<QModelIndexType>(c, arg0->QListWidget::indexAt(arg1), "qt.QModelIndex")
+                                  : makeqtype<QModelIndexType>(c, arg0->indexAt(arg1), "qt.QModelIndex");
     }
 
-    Pointer qt_QListWidget_visualRect_QRect_QListWidget_QModelIndex(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index)
+    Pointer qt_QListWidget_visualRect_QRect_QListWidget_QModelIndex(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListWidget* arg0 = object<QListWidget>(param_this);
         const QModelIndex arg1 = getqtype<QModelIndexType>(param_index);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QRectType>(
-                         c, arg0->QListWidget::visualRect(arg1), "qt.QRect")
-                   : makeqtype<QRectType>(c, arg0->visualRect(arg1),
-                                          "qt.QRect");
+        return isMuQtObject(arg0) ? makeqtype<QRectType>(c, arg0->QListWidget::visualRect(arg1), "qt.QRect")
+                                  : makeqtype<QRectType>(c, arg0->visualRect(arg1), "qt.QRect");
     }
 
-    void qt_QListWidget_currentChanged_void_QListWidget_QModelIndex_QModelIndex(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_current,
-        Pointer param_previous)
+    void qt_QListWidget_currentChanged_void_QListWidget_QModelIndex_QModelIndex(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                Pointer param_current, Pointer param_previous)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListWidget* arg0 = object<QListWidget>(param_this);
@@ -1224,8 +1099,7 @@ namespace Mu
             ((MuQt_QListWidget*)arg0)->currentChanged_pub(arg1, arg2);
     }
 
-    void qt_QListWidget_dragLeaveEvent_void_QListWidget_QDragLeaveEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QListWidget_dragLeaveEvent_void_QListWidget_QDragLeaveEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListWidget* arg0 = object<QListWidget>(param_this);
@@ -1236,8 +1110,7 @@ namespace Mu
             ((MuQt_QListWidget*)arg0)->dragLeaveEvent_pub(arg1);
     }
 
-    void qt_QListWidget_dragMoveEvent_void_QListWidget_QDragMoveEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QListWidget_dragMoveEvent_void_QListWidget_QDragMoveEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListWidget* arg0 = object<QListWidget>(param_this);
@@ -1248,29 +1121,24 @@ namespace Mu
             ((MuQt_QListWidget*)arg0)->dragMoveEvent_pub(arg1);
     }
 
-    int qt_QListWidget_horizontalOffset_int_QListWidget(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this)
+    int qt_QListWidget_horizontalOffset_int_QListWidget(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListWidget* arg0 = object<QListWidget>(param_this);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QListWidget*)arg0)->horizontalOffset_pub_parent()
-                   : ((MuQt_QListWidget*)arg0)->horizontalOffset_pub();
+        return isMuQtObject(arg0) ? ((MuQt_QListWidget*)arg0)->horizontalOffset_pub_parent()
+                                  : ((MuQt_QListWidget*)arg0)->horizontalOffset_pub();
     }
 
-    bool qt_QListWidget_isIndexHidden_bool_QListWidget_QModelIndex(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index)
+    bool qt_QListWidget_isIndexHidden_bool_QListWidget_QModelIndex(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListWidget* arg0 = object<QListWidget>(param_this);
         const QModelIndex arg1 = getqtype<QModelIndexType>(param_index);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QListWidget*)arg0)->isIndexHidden_pub_parent(arg1)
-                   : ((MuQt_QListWidget*)arg0)->isIndexHidden_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QListWidget*)arg0)->isIndexHidden_pub_parent(arg1)
+                                  : ((MuQt_QListWidget*)arg0)->isIndexHidden_pub(arg1);
     }
 
-    void qt_QListWidget_mouseMoveEvent_void_QListWidget_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QListWidget_mouseMoveEvent_void_QListWidget_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListWidget* arg0 = object<QListWidget>(param_this);
@@ -1281,8 +1149,7 @@ namespace Mu
             ((MuQt_QListWidget*)arg0)->mouseMoveEvent_pub(arg1);
     }
 
-    void qt_QListWidget_mouseReleaseEvent_void_QListWidget_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QListWidget_mouseReleaseEvent_void_QListWidget_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListWidget* arg0 = object<QListWidget>(param_this);
@@ -1293,8 +1160,7 @@ namespace Mu
             ((MuQt_QListWidget*)arg0)->mouseReleaseEvent_pub(arg1);
     }
 
-    void qt_QListWidget_paintEvent_void_QListWidget_QPaintEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QListWidget_paintEvent_void_QListWidget_QPaintEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListWidget* arg0 = object<QListWidget>(param_this);
@@ -1305,8 +1171,7 @@ namespace Mu
             ((MuQt_QListWidget*)arg0)->paintEvent_pub(arg1);
     }
 
-    void qt_QListWidget_resizeEvent_void_QListWidget_QResizeEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QListWidget_resizeEvent_void_QListWidget_QResizeEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListWidget* arg0 = object<QListWidget>(param_this);
@@ -1317,10 +1182,8 @@ namespace Mu
             ((MuQt_QListWidget*)arg0)->resizeEvent_pub(arg1);
     }
 
-    void
-    qt_QListWidget_rowsAboutToBeRemoved_void_QListWidget_QModelIndex_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent,
-        int param_start, int param_end)
+    void qt_QListWidget_rowsAboutToBeRemoved_void_QListWidget_QModelIndex_int_int(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                  Pointer param_parent, int param_start, int param_end)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListWidget* arg0 = object<QListWidget>(param_this);
@@ -1328,16 +1191,13 @@ namespace Mu
         int arg2 = (int)(param_start);
         int arg3 = (int)(param_end);
         if (isMuQtObject(arg0))
-            ((MuQt_QListWidget*)arg0)
-                ->rowsAboutToBeRemoved_pub_parent(arg1, arg2, arg3);
+            ((MuQt_QListWidget*)arg0)->rowsAboutToBeRemoved_pub_parent(arg1, arg2, arg3);
         else
-            ((MuQt_QListWidget*)arg0)
-                ->rowsAboutToBeRemoved_pub(arg1, arg2, arg3);
+            ((MuQt_QListWidget*)arg0)->rowsAboutToBeRemoved_pub(arg1, arg2, arg3);
     }
 
-    void qt_QListWidget_rowsInserted_void_QListWidget_QModelIndex_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent,
-        int param_start, int param_end)
+    void qt_QListWidget_rowsInserted_void_QListWidget_QModelIndex_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent,
+                                                                          int param_start, int param_end)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListWidget* arg0 = object<QListWidget>(param_this);
@@ -1345,58 +1205,46 @@ namespace Mu
         int arg2 = (int)(param_start);
         int arg3 = (int)(param_end);
         if (isMuQtObject(arg0))
-            ((MuQt_QListWidget*)arg0)
-                ->rowsInserted_pub_parent(arg1, arg2, arg3);
+            ((MuQt_QListWidget*)arg0)->rowsInserted_pub_parent(arg1, arg2, arg3);
         else
             ((MuQt_QListWidget*)arg0)->rowsInserted_pub(arg1, arg2, arg3);
     }
 
-    Pointer qt_QListWidget_selectedIndexes_qt__QModelIndexBSB_ESB__QListWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QListWidget_selectedIndexes_qt__QModelIndexBSB_ESB__QListWidget(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListWidget* arg0 = object<QListWidget>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqmodelindexlist(c, ((MuQt_QListWidget*)arg0)
-                                                ->selectedIndexes_pub_parent())
-                   : makeqmodelindexlist(
-                         c, ((MuQt_QListWidget*)arg0)->selectedIndexes_pub());
+        return isMuQtObject(arg0) ? makeqmodelindexlist(c, ((MuQt_QListWidget*)arg0)->selectedIndexes_pub_parent())
+                                  : makeqmodelindexlist(c, ((MuQt_QListWidget*)arg0)->selectedIndexes_pub());
     }
 
-    void
-    qt_QListWidget_selectionChanged_void_QListWidget_QItemSelection_QItemSelection(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_selected,
-        Pointer param_deselected)
+    void qt_QListWidget_selectionChanged_void_QListWidget_QItemSelection_QItemSelection(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                        Pointer param_selected, Pointer param_deselected)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListWidget* arg0 = object<QListWidget>(param_this);
-        const QItemSelection arg1 =
-            getqtype<QItemSelectionType>(param_selected);
-        const QItemSelection arg2 =
-            getqtype<QItemSelectionType>(param_deselected);
+        const QItemSelection arg1 = getqtype<QItemSelectionType>(param_selected);
+        const QItemSelection arg2 = getqtype<QItemSelectionType>(param_deselected);
         if (isMuQtObject(arg0))
             ((MuQt_QListWidget*)arg0)->selectionChanged_pub_parent(arg1, arg2);
         else
             ((MuQt_QListWidget*)arg0)->selectionChanged_pub(arg1, arg2);
     }
 
-    void qt_QListWidget_setSelection_void_QListWidget_QRect_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_rect,
-        int param_command)
+    void qt_QListWidget_setSelection_void_QListWidget_QRect_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_rect,
+                                                                int param_command)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListWidget* arg0 = object<QListWidget>(param_this);
         const QRect arg1 = getqtype<QRectType>(param_rect);
-        QItemSelectionModel::SelectionFlags arg2 =
-            (QItemSelectionModel::SelectionFlags)(param_command);
+        QItemSelectionModel::SelectionFlags arg2 = (QItemSelectionModel::SelectionFlags)(param_command);
         if (isMuQtObject(arg0))
             ((MuQt_QListWidget*)arg0)->setSelection_pub_parent(arg1, arg2);
         else
             ((MuQt_QListWidget*)arg0)->setSelection_pub(arg1, arg2);
     }
 
-    void qt_QListWidget_startDrag_void_QListWidget_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_supportedActions)
+    void qt_QListWidget_startDrag_void_QListWidget_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_supportedActions)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListWidget* arg0 = object<QListWidget>(param_this);
@@ -1407,8 +1255,7 @@ namespace Mu
             ((MuQt_QListWidget*)arg0)->startDrag_pub(arg1);
     }
 
-    void qt_QListWidget_timerEvent_void_QListWidget_QTimerEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QListWidget_timerEvent_void_QListWidget_QTimerEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListWidget* arg0 = object<QListWidget>(param_this);
@@ -1419,9 +1266,7 @@ namespace Mu
             ((MuQt_QListWidget*)arg0)->timerEvent_pub(arg1);
     }
 
-    void
-    qt_QListWidget_updateGeometries_void_QListWidget(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_this)
+    void qt_QListWidget_updateGeometries_void_QListWidget(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListWidget* arg0 = object<QListWidget>(param_this);
@@ -1431,55 +1276,34 @@ namespace Mu
             ((MuQt_QListWidget*)arg0)->updateGeometries_pub();
     }
 
-    int qt_QListWidget_verticalOffset_int_QListWidget(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    int qt_QListWidget_verticalOffset_int_QListWidget(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListWidget* arg0 = object<QListWidget>(param_this);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QListWidget*)arg0)->verticalOffset_pub_parent()
-                   : ((MuQt_QListWidget*)arg0)->verticalOffset_pub();
+        return isMuQtObject(arg0) ? ((MuQt_QListWidget*)arg0)->verticalOffset_pub_parent()
+                                  : ((MuQt_QListWidget*)arg0)->verticalOffset_pub();
     }
 
-    Pointer
-    qt_QListWidget_viewportSizeHint_QSize_QListWidget(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    Pointer qt_QListWidget_viewportSizeHint_QSize_QListWidget(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListWidget* arg0 = object<QListWidget>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QSizeType>(c,
-                                          ((MuQt_QListWidget*)arg0)
-                                              ->viewportSizeHint_pub_parent(),
-                                          "qt.QSize")
-                   : makeqtype<QSizeType>(
-                         c, ((MuQt_QListWidget*)arg0)->viewportSizeHint_pub(),
-                         "qt.QSize");
+        return isMuQtObject(arg0) ? makeqtype<QSizeType>(c, ((MuQt_QListWidget*)arg0)->viewportSizeHint_pub_parent(), "qt.QSize")
+                                  : makeqtype<QSizeType>(c, ((MuQt_QListWidget*)arg0)->viewportSizeHint_pub(), "qt.QSize");
     }
 
-    Pointer
-    qt_QListWidget_visualRegionForSelection_QRegion_QListWidget_QItemSelection(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_selection)
+    Pointer qt_QListWidget_visualRegionForSelection_QRegion_QListWidget_QItemSelection(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                       Pointer param_selection)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListWidget* arg0 = object<QListWidget>(param_this);
-        const QItemSelection arg1 =
-            getqtype<QItemSelectionType>(param_selection);
+        const QItemSelection arg1 = getqtype<QItemSelectionType>(param_selection);
         return isMuQtObject(arg0)
-                   ? makeqtype<QRegionType>(
-                         c,
-                         ((MuQt_QListWidget*)arg0)
-                             ->visualRegionForSelection_pub_parent(arg1),
-                         "qt.QRegion")
-                   : makeqtype<QRegionType>(
-                         c,
-                         ((MuQt_QListWidget*)arg0)
-                             ->visualRegionForSelection_pub(arg1),
-                         "qt.QRegion");
+                   ? makeqtype<QRegionType>(c, ((MuQt_QListWidget*)arg0)->visualRegionForSelection_pub_parent(arg1), "qt.QRegion")
+                   : makeqtype<QRegionType>(c, ((MuQt_QListWidget*)arg0)->visualRegionForSelection_pub(arg1), "qt.QRegion");
     }
 
-    void qt_QListWidget_wheelEvent_void_QListWidget_QWheelEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QListWidget_wheelEvent_void_QListWidget_QWheelEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QListWidget* arg0 = object<QListWidget>(param_this);
@@ -1492,382 +1316,318 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(_n_QListWidget0, Pointer)
     {
-        NODE_RETURN(qt_QListWidget_QListWidget_QListWidget_QListWidget_QWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(
+            qt_QListWidget_QListWidget_QListWidget_QListWidget_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_addItem0, void)
     {
-        qt_QListWidget_addItem_void_QListWidget_string(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QListWidget_addItem_void_QListWidget_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_addItem1, void)
     {
-        qt_QListWidget_addItem_void_QListWidget_QListWidgetItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QListWidget_addItem_void_QListWidget_QListWidgetItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_addItems0, void)
     {
-        qt_QListWidget_addItems_void_QListWidget_stringBSB_ESB_(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QListWidget_addItems_void_QListWidget_stringBSB_ESB_(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_closePersistentEditor0, void)
     {
-        qt_QListWidget_closePersistentEditor_void_QListWidget_QListWidgetItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QListWidget_closePersistentEditor_void_QListWidget_QListWidgetItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                              NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_currentItem0, Pointer)
     {
-        NODE_RETURN(qt_QListWidget_currentItem_QListWidgetItem_QListWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QListWidget_currentItem_QListWidgetItem_QListWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_editItem0, void)
     {
-        qt_QListWidget_editItem_void_QListWidget_QListWidgetItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QListWidget_editItem_void_QListWidget_QListWidgetItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_findItems0, Pointer)
     {
-        NODE_RETURN(
-            qt_QListWidget_findItems_qt__QListWidgetItemBSB_ESB__QListWidget_string_int(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, int)));
+        NODE_RETURN(qt_QListWidget_findItems_qt__QListWidgetItemBSB_ESB__QListWidget_string_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                                NODE_ARG(1, Pointer), NODE_ARG(2, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_insertItem0, void)
     {
-        qt_QListWidget_insertItem_void_QListWidget_int_QListWidgetItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, Pointer));
+        qt_QListWidget_insertItem_void_QListWidget_int_QListWidgetItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                       NODE_ARG(2, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_insertItem1, void)
     {
-        qt_QListWidget_insertItem_void_QListWidget_int_string(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, Pointer));
+        qt_QListWidget_insertItem_void_QListWidget_int_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                              NODE_ARG(2, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_insertItems0, void)
     {
-        qt_QListWidget_insertItems_void_QListWidget_int_stringBSB_ESB_(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, Pointer));
+        qt_QListWidget_insertItems_void_QListWidget_int_stringBSB_ESB_(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                       NODE_ARG(2, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_item0, Pointer)
     {
-        NODE_RETURN(qt_QListWidget_item_QListWidgetItem_QListWidget_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QListWidget_item_QListWidgetItem_QListWidget_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_itemAt0, Pointer)
     {
-        NODE_RETURN(qt_QListWidget_itemAt_QListWidgetItem_QListWidget_QPoint(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(
+            qt_QListWidget_itemAt_QListWidgetItem_QListWidget_QPoint(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_itemAt1, Pointer)
     {
-        NODE_RETURN(qt_QListWidget_itemAt_QListWidgetItem_QListWidget_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int)));
+        NODE_RETURN(qt_QListWidget_itemAt_QListWidgetItem_QListWidget_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                              NODE_ARG(2, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_itemWidget0, Pointer)
     {
         NODE_RETURN(
-            qt_QListWidget_itemWidget_QWidget_QListWidget_QListWidgetItem(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+            qt_QListWidget_itemWidget_QWidget_QListWidget_QListWidgetItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_openPersistentEditor0, void)
     {
-        qt_QListWidget_openPersistentEditor_void_QListWidget_QListWidgetItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QListWidget_openPersistentEditor_void_QListWidget_QListWidgetItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                             NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_removeItemWidget0, void)
     {
-        qt_QListWidget_removeItemWidget_void_QListWidget_QListWidgetItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QListWidget_removeItemWidget_void_QListWidget_QListWidgetItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_row0, int)
     {
-        NODE_RETURN(qt_QListWidget_row_int_QListWidget_QListWidgetItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QListWidget_row_int_QListWidget_QListWidgetItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_selectedItems0, Pointer)
     {
-        NODE_RETURN(
-            qt_QListWidget_selectedItems_qt__QListWidgetItemBSB_ESB__QListWidget(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QListWidget_selectedItems_qt__QListWidgetItemBSB_ESB__QListWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_setCurrentItem0, void)
     {
-        qt_QListWidget_setCurrentItem_void_QListWidget_QListWidgetItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QListWidget_setCurrentItem_void_QListWidget_QListWidgetItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setCurrentItem1, void)
     {
-        qt_QListWidget_setCurrentItem_void_QListWidget_QListWidgetItem_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int));
+        qt_QListWidget_setCurrentItem_void_QListWidget_QListWidgetItem_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                           NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setCurrentRow1, void)
     {
-        qt_QListWidget_setCurrentRow_void_QListWidget_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int));
+        qt_QListWidget_setCurrentRow_void_QListWidget_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setItemWidget0, void)
     {
-        qt_QListWidget_setItemWidget_void_QListWidget_QListWidgetItem_QWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer));
+        qt_QListWidget_setItemWidget_void_QListWidget_QListWidgetItem_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                              NODE_ARG(1, Pointer), NODE_ARG(2, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_sortItems0, void)
     {
-        qt_QListWidget_sortItems_void_QListWidget_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QListWidget_sortItems_void_QListWidget_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_takeItem0, Pointer)
     {
-        NODE_RETURN(qt_QListWidget_takeItem_QListWidgetItem_QListWidget_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QListWidget_takeItem_QListWidgetItem_QListWidget_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_visualItemRect0, Pointer)
     {
-        NODE_RETURN(
-            qt_QListWidget_visualItemRect_QRect_QListWidget_QListWidgetItem(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QListWidget_visualItemRect_QRect_QListWidget_QListWidgetItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                    NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_dropEvent0, void)
     {
-        qt_QListWidget_dropEvent_void_QListWidget_QDropEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QListWidget_dropEvent_void_QListWidget_QDropEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_dropMimeData0, bool)
     {
-        NODE_RETURN(
-            qt_QListWidget_dropMimeData_bool_QListWidget_int_QMimeData_int(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-                NODE_ARG(2, Pointer), NODE_ARG(3, int)));
+        NODE_RETURN(qt_QListWidget_dropMimeData_bool_QListWidget_int_QMimeData_int(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, Pointer), NODE_ARG(3, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_indexFromItem0, Pointer)
     {
-        NODE_RETURN(
-            qt_QListWidget_indexFromItem_QModelIndex_QListWidget_QListWidgetItem(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QListWidget_indexFromItem_QModelIndex_QListWidget_QListWidgetItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                         NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_itemFromIndex0, Pointer)
     {
-        NODE_RETURN(
-            qt_QListWidget_itemFromIndex_QListWidgetItem_QListWidget_QModelIndex(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QListWidget_itemFromIndex_QListWidgetItem_QListWidget_QModelIndex(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                         NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_items0, Pointer)
     {
-        NODE_RETURN(
-            qt_QListWidget_items_qt__QListWidgetItemBSB_ESB__QListWidget_QMimeData(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QListWidget_items_qt__QListWidgetItemBSB_ESB__QListWidget_QMimeData(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                           NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_mimeData0, Pointer)
     {
-        NODE_RETURN(
-            qt_QListWidget_mimeData_QMimeData_QListWidget_qt__QListWidgetItemBSB_ESB_(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QListWidget_mimeData_QMimeData_QListWidget_qt__QListWidgetItemBSB_ESB_(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                              NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_mimeTypes0, Pointer)
     {
-        NODE_RETURN(qt_QListWidget_mimeTypes_stringBSB_ESB__QListWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QListWidget_mimeTypes_stringBSB_ESB__QListWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_supportedDropActions0, int)
     {
-        NODE_RETURN(qt_QListWidget_supportedDropActions_int_QListWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QListWidget_supportedDropActions_int_QListWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_event0, bool)
     {
-        NODE_RETURN(qt_QListWidget_event_bool_QListWidget_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QListWidget_event_bool_QListWidget_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_indexAt0, Pointer)
     {
-        NODE_RETURN(qt_QListWidget_indexAt_QModelIndex_QListWidget_QPoint(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QListWidget_indexAt_QModelIndex_QListWidget_QPoint(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_visualRect0, Pointer)
     {
-        NODE_RETURN(qt_QListWidget_visualRect_QRect_QListWidget_QModelIndex(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(
+            qt_QListWidget_visualRect_QRect_QListWidget_QModelIndex(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_currentChanged0, void)
     {
-        qt_QListWidget_currentChanged_void_QListWidget_QModelIndex_QModelIndex(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer));
+        qt_QListWidget_currentChanged_void_QListWidget_QModelIndex_QModelIndex(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                               NODE_ARG(1, Pointer), NODE_ARG(2, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_dragLeaveEvent0, void)
     {
-        qt_QListWidget_dragLeaveEvent_void_QListWidget_QDragLeaveEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QListWidget_dragLeaveEvent_void_QListWidget_QDragLeaveEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_dragMoveEvent0, void)
     {
-        qt_QListWidget_dragMoveEvent_void_QListWidget_QDragMoveEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QListWidget_dragMoveEvent_void_QListWidget_QDragMoveEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_horizontalOffset0, int)
     {
-        NODE_RETURN(qt_QListWidget_horizontalOffset_int_QListWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QListWidget_horizontalOffset_int_QListWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isIndexHidden0, bool)
     {
-        NODE_RETURN(qt_QListWidget_isIndexHidden_bool_QListWidget_QModelIndex(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(
+            qt_QListWidget_isIndexHidden_bool_QListWidget_QModelIndex(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseMoveEvent0, void)
     {
-        qt_QListWidget_mouseMoveEvent_void_QListWidget_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QListWidget_mouseMoveEvent_void_QListWidget_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseReleaseEvent0, void)
     {
-        qt_QListWidget_mouseReleaseEvent_void_QListWidget_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QListWidget_mouseReleaseEvent_void_QListWidget_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_paintEvent0, void)
     {
-        qt_QListWidget_paintEvent_void_QListWidget_QPaintEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QListWidget_paintEvent_void_QListWidget_QPaintEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_resizeEvent0, void)
     {
-        qt_QListWidget_resizeEvent_void_QListWidget_QResizeEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QListWidget_resizeEvent_void_QListWidget_QResizeEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_rowsAboutToBeRemoved0, void)
     {
-        qt_QListWidget_rowsAboutToBeRemoved_void_QListWidget_QModelIndex_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int), NODE_ARG(3, int));
+        qt_QListWidget_rowsAboutToBeRemoved_void_QListWidget_QModelIndex_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                 NODE_ARG(1, Pointer), NODE_ARG(2, int), NODE_ARG(3, int));
     }
 
     static NODE_IMPLEMENTATION(_n_rowsInserted0, void)
     {
-        qt_QListWidget_rowsInserted_void_QListWidget_QModelIndex_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int), NODE_ARG(3, int));
+        qt_QListWidget_rowsInserted_void_QListWidget_QModelIndex_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                         NODE_ARG(2, int), NODE_ARG(3, int));
     }
 
     static NODE_IMPLEMENTATION(_n_selectedIndexes0, Pointer)
     {
-        NODE_RETURN(
-            qt_QListWidget_selectedIndexes_qt__QModelIndexBSB_ESB__QListWidget(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QListWidget_selectedIndexes_qt__QModelIndexBSB_ESB__QListWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_selectionChanged0, void)
     {
-        qt_QListWidget_selectionChanged_void_QListWidget_QItemSelection_QItemSelection(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer));
+        qt_QListWidget_selectionChanged_void_QListWidget_QItemSelection_QItemSelection(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                       NODE_ARG(1, Pointer), NODE_ARG(2, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setSelection0, void)
     {
-        qt_QListWidget_setSelection_void_QListWidget_QRect_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int));
+        qt_QListWidget_setSelection_void_QListWidget_QRect_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                               NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_startDrag0, void)
     {
-        qt_QListWidget_startDrag_void_QListWidget_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QListWidget_startDrag_void_QListWidget_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_timerEvent0, void)
     {
-        qt_QListWidget_timerEvent_void_QListWidget_QTimerEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QListWidget_timerEvent_void_QListWidget_QTimerEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_updateGeometries0, void)
     {
-        qt_QListWidget_updateGeometries_void_QListWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
+        qt_QListWidget_updateGeometries_void_QListWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_verticalOffset0, int)
     {
-        NODE_RETURN(qt_QListWidget_verticalOffset_int_QListWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QListWidget_verticalOffset_int_QListWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_viewportSizeHint0, Pointer)
     {
-        NODE_RETURN(qt_QListWidget_viewportSizeHint_QSize_QListWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QListWidget_viewportSizeHint_QSize_QListWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_visualRegionForSelection0, Pointer)
     {
-        NODE_RETURN(
-            qt_QListWidget_visualRegionForSelection_QRegion_QListWidget_QItemSelection(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QListWidget_visualRegionForSelection_QRegion_QListWidget_QItemSelection(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                               NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_wheelEvent0, void)
     {
-        qt_QListWidget_wheelEvent_void_QListWidget_QWheelEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QListWidget_wheelEvent_void_QListWidget_QWheelEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     void QListWidgetType::load()
@@ -1887,17 +1647,13 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
-                   new Function(c, tn, castFromObject, Cast, Compiled,
-                                QListWidget_QListWidget_QObject, Return, ftn,
-                                Parameters,
+                   new Function(c, tn, castFromObject, Cast, Compiled, QListWidget_QListWidget_QObject, Return, ftn, Parameters,
                                 new Param(c, "object", "qt.QObject"), End),
 
                    EndArguments);
@@ -1905,360 +1661,196 @@ namespace Mu
         addSymbols(
             // enums
             // member functions
-            new Function(
-                c, "QListWidget", _n_QListWidget0, None, Compiled,
-                qt_QListWidget_QListWidget_QListWidget_QListWidget_QWidget,
-                Return, "qt.QListWidget", Parameters,
-                new Param(c, "this", "qt.QListWidget"),
-                new Param(c, "parent", "qt.QWidget"), End),
-            new Function(c, "addItem", _n_addItem0, None, Compiled,
-                         qt_QListWidget_addItem_void_QListWidget_string, Return,
-                         "void", Parameters,
-                         new Param(c, "this", "qt.QListWidget"),
-                         new Param(c, "label", "string"), End),
-            new Function(
-                c, "addItem", _n_addItem1, None, Compiled,
-                qt_QListWidget_addItem_void_QListWidget_QListWidgetItem, Return,
-                "void", Parameters, new Param(c, "this", "qt.QListWidget"),
-                new Param(c, "item", "qt.QListWidgetItem"), End),
-            new Function(
-                c, "addItems", _n_addItems0, None, Compiled,
-                qt_QListWidget_addItems_void_QListWidget_stringBSB_ESB_, Return,
-                "void", Parameters, new Param(c, "this", "qt.QListWidget"),
-                new Param(c, "labels", "string[]"), End),
-            new Function(
-                c, "closePersistentEditor", _n_closePersistentEditor0, None,
-                Compiled,
-                qt_QListWidget_closePersistentEditor_void_QListWidget_QListWidgetItem,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QListWidget"),
-                new Param(c, "item", "qt.QListWidgetItem"), End),
+            new Function(c, "QListWidget", _n_QListWidget0, None, Compiled, qt_QListWidget_QListWidget_QListWidget_QListWidget_QWidget,
+                         Return, "qt.QListWidget", Parameters, new Param(c, "this", "qt.QListWidget"), new Param(c, "parent", "qt.QWidget"),
+                         End),
+            new Function(c, "addItem", _n_addItem0, None, Compiled, qt_QListWidget_addItem_void_QListWidget_string, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QListWidget"), new Param(c, "label", "string"), End),
+            new Function(c, "addItem", _n_addItem1, None, Compiled, qt_QListWidget_addItem_void_QListWidget_QListWidgetItem, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QListWidget"), new Param(c, "item", "qt.QListWidgetItem"), End),
+            new Function(c, "addItems", _n_addItems0, None, Compiled, qt_QListWidget_addItems_void_QListWidget_stringBSB_ESB_, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QListWidget"), new Param(c, "labels", "string[]"), End),
+            new Function(c, "closePersistentEditor", _n_closePersistentEditor0, None, Compiled,
+                         qt_QListWidget_closePersistentEditor_void_QListWidget_QListWidgetItem, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QListWidget"), new Param(c, "item", "qt.QListWidgetItem"), End),
             // PROP: count (int; QListWidget this)
-            new Function(c, "currentItem", _n_currentItem0, None, Compiled,
-                         qt_QListWidget_currentItem_QListWidgetItem_QListWidget,
-                         Return, "qt.QListWidgetItem", Parameters,
-                         new Param(c, "this", "qt.QListWidget"), End),
+            new Function(c, "currentItem", _n_currentItem0, None, Compiled, qt_QListWidget_currentItem_QListWidgetItem_QListWidget, Return,
+                         "qt.QListWidgetItem", Parameters, new Param(c, "this", "qt.QListWidget"), End),
             // PROP: currentRow (int; QListWidget this)
-            new Function(
-                c, "editItem", _n_editItem0, None, Compiled,
-                qt_QListWidget_editItem_void_QListWidget_QListWidgetItem,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QListWidget"),
-                new Param(c, "item", "qt.QListWidgetItem"), End),
-            new Function(
-                c, "findItems", _n_findItems0, None, Compiled,
-                qt_QListWidget_findItems_qt__QListWidgetItemBSB_ESB__QListWidget_string_int,
-                Return, "qt.QListWidgetItem[]", Parameters,
-                new Param(c, "this", "qt.QListWidget"),
-                new Param(c, "text", "string"), new Param(c, "flags", "int"),
-                End),
-            new Function(
-                c, "insertItem", _n_insertItem0, None, Compiled,
-                qt_QListWidget_insertItem_void_QListWidget_int_QListWidgetItem,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QListWidget"),
-                new Param(c, "row", "int"),
-                new Param(c, "item", "qt.QListWidgetItem"), End),
-            new Function(c, "insertItem", _n_insertItem1, None, Compiled,
-                         qt_QListWidget_insertItem_void_QListWidget_int_string,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QListWidget"),
-                         new Param(c, "row", "int"),
-                         new Param(c, "label", "string"), End),
-            new Function(
-                c, "insertItems", _n_insertItems0, None, Compiled,
-                qt_QListWidget_insertItems_void_QListWidget_int_stringBSB_ESB_,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QListWidget"),
-                new Param(c, "row", "int"), new Param(c, "labels", "string[]"),
-                End),
-            // PROP: isSortingEnabled (bool; QListWidget this)
-            new Function(c, "item", _n_item0, None, Compiled,
-                         qt_QListWidget_item_QListWidgetItem_QListWidget_int,
-                         Return, "qt.QListWidgetItem", Parameters,
-                         new Param(c, "this", "qt.QListWidget"),
-                         new Param(c, "row", "int"), End),
-            new Function(
-                c, "itemAt", _n_itemAt0, None, Compiled,
-                qt_QListWidget_itemAt_QListWidgetItem_QListWidget_QPoint,
-                Return, "qt.QListWidgetItem", Parameters,
-                new Param(c, "this", "qt.QListWidget"),
-                new Param(c, "p", "qt.QPoint"), End),
-            new Function(
-                c, "itemAt", _n_itemAt1, None, Compiled,
-                qt_QListWidget_itemAt_QListWidgetItem_QListWidget_int_int,
-                Return, "qt.QListWidgetItem", Parameters,
-                new Param(c, "this", "qt.QListWidget"),
-                new Param(c, "x", "int"), new Param(c, "y", "int"), End),
-            new Function(
-                c, "itemWidget", _n_itemWidget0, None, Compiled,
-                qt_QListWidget_itemWidget_QWidget_QListWidget_QListWidgetItem,
-                Return, "qt.QWidget", Parameters,
-                new Param(c, "this", "qt.QListWidget"),
-                new Param(c, "item", "qt.QListWidgetItem"), End),
-            new Function(
-                c, "openPersistentEditor", _n_openPersistentEditor0, None,
-                Compiled,
-                qt_QListWidget_openPersistentEditor_void_QListWidget_QListWidgetItem,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QListWidget"),
-                new Param(c, "item", "qt.QListWidgetItem"), End),
-            new Function(
-                c, "removeItemWidget", _n_removeItemWidget0, None, Compiled,
-                qt_QListWidget_removeItemWidget_void_QListWidget_QListWidgetItem,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QListWidget"),
-                new Param(c, "item", "qt.QListWidgetItem"), End),
-            new Function(c, "row", _n_row0, None, Compiled,
-                         qt_QListWidget_row_int_QListWidget_QListWidgetItem,
-                         Return, "int", Parameters,
-                         new Param(c, "this", "qt.QListWidget"),
+            new Function(c, "editItem", _n_editItem0, None, Compiled, qt_QListWidget_editItem_void_QListWidget_QListWidgetItem, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QListWidget"), new Param(c, "item", "qt.QListWidgetItem"), End),
+            new Function(c, "findItems", _n_findItems0, None, Compiled,
+                         qt_QListWidget_findItems_qt__QListWidgetItemBSB_ESB__QListWidget_string_int, Return, "qt.QListWidgetItem[]",
+                         Parameters, new Param(c, "this", "qt.QListWidget"), new Param(c, "text", "string"), new Param(c, "flags", "int"),
+                         End),
+            new Function(c, "insertItem", _n_insertItem0, None, Compiled, qt_QListWidget_insertItem_void_QListWidget_int_QListWidgetItem,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QListWidget"), new Param(c, "row", "int"),
                          new Param(c, "item", "qt.QListWidgetItem"), End),
-            new Function(
-                c, "selectedItems", _n_selectedItems0, None, Compiled,
-                qt_QListWidget_selectedItems_qt__QListWidgetItemBSB_ESB__QListWidget,
-                Return, "qt.QListWidgetItem[]", Parameters,
-                new Param(c, "this", "qt.QListWidget"), End),
-            new Function(
-                c, "setCurrentItem", _n_setCurrentItem0, None, Compiled,
-                qt_QListWidget_setCurrentItem_void_QListWidget_QListWidgetItem,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QListWidget"),
-                new Param(c, "item", "qt.QListWidgetItem"), End),
-            new Function(
-                c, "setCurrentItem", _n_setCurrentItem1, None, Compiled,
-                qt_QListWidget_setCurrentItem_void_QListWidget_QListWidgetItem_int,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QListWidget"),
-                new Param(c, "item", "qt.QListWidgetItem"),
-                new Param(c, "command", "int"), End),
+            new Function(c, "insertItem", _n_insertItem1, None, Compiled, qt_QListWidget_insertItem_void_QListWidget_int_string, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QListWidget"), new Param(c, "row", "int"),
+                         new Param(c, "label", "string"), End),
+            new Function(c, "insertItems", _n_insertItems0, None, Compiled, qt_QListWidget_insertItems_void_QListWidget_int_stringBSB_ESB_,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QListWidget"), new Param(c, "row", "int"),
+                         new Param(c, "labels", "string[]"), End),
+            // PROP: isSortingEnabled (bool; QListWidget this)
+            new Function(c, "item", _n_item0, None, Compiled, qt_QListWidget_item_QListWidgetItem_QListWidget_int, Return,
+                         "qt.QListWidgetItem", Parameters, new Param(c, "this", "qt.QListWidget"), new Param(c, "row", "int"), End),
+            new Function(c, "itemAt", _n_itemAt0, None, Compiled, qt_QListWidget_itemAt_QListWidgetItem_QListWidget_QPoint, Return,
+                         "qt.QListWidgetItem", Parameters, new Param(c, "this", "qt.QListWidget"), new Param(c, "p", "qt.QPoint"), End),
+            new Function(c, "itemAt", _n_itemAt1, None, Compiled, qt_QListWidget_itemAt_QListWidgetItem_QListWidget_int_int, Return,
+                         "qt.QListWidgetItem", Parameters, new Param(c, "this", "qt.QListWidget"), new Param(c, "x", "int"),
+                         new Param(c, "y", "int"), End),
+            new Function(c, "itemWidget", _n_itemWidget0, None, Compiled, qt_QListWidget_itemWidget_QWidget_QListWidget_QListWidgetItem,
+                         Return, "qt.QWidget", Parameters, new Param(c, "this", "qt.QListWidget"),
+                         new Param(c, "item", "qt.QListWidgetItem"), End),
+            new Function(c, "openPersistentEditor", _n_openPersistentEditor0, None, Compiled,
+                         qt_QListWidget_openPersistentEditor_void_QListWidget_QListWidgetItem, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QListWidget"), new Param(c, "item", "qt.QListWidgetItem"), End),
+            new Function(c, "removeItemWidget", _n_removeItemWidget0, None, Compiled,
+                         qt_QListWidget_removeItemWidget_void_QListWidget_QListWidgetItem, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QListWidget"), new Param(c, "item", "qt.QListWidgetItem"), End),
+            new Function(c, "row", _n_row0, None, Compiled, qt_QListWidget_row_int_QListWidget_QListWidgetItem, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QListWidget"), new Param(c, "item", "qt.QListWidgetItem"), End),
+            new Function(c, "selectedItems", _n_selectedItems0, None, Compiled,
+                         qt_QListWidget_selectedItems_qt__QListWidgetItemBSB_ESB__QListWidget, Return, "qt.QListWidgetItem[]", Parameters,
+                         new Param(c, "this", "qt.QListWidget"), End),
+            new Function(c, "setCurrentItem", _n_setCurrentItem0, None, Compiled,
+                         qt_QListWidget_setCurrentItem_void_QListWidget_QListWidgetItem, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QListWidget"), new Param(c, "item", "qt.QListWidgetItem"), End),
+            new Function(c, "setCurrentItem", _n_setCurrentItem1, None, Compiled,
+                         qt_QListWidget_setCurrentItem_void_QListWidget_QListWidgetItem_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QListWidget"), new Param(c, "item", "qt.QListWidgetItem"), new Param(c, "command", "int"),
+                         End),
             // PROP: setCurrentRow (void; QListWidget this, int row)
-            new Function(c, "setCurrentRow", _n_setCurrentRow1, None, Compiled,
-                         qt_QListWidget_setCurrentRow_void_QListWidget_int_int,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QListWidget"),
-                         new Param(c, "row", "int"),
+            new Function(c, "setCurrentRow", _n_setCurrentRow1, None, Compiled, qt_QListWidget_setCurrentRow_void_QListWidget_int_int,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QListWidget"), new Param(c, "row", "int"),
                          new Param(c, "command", "int"), End),
-            new Function(
-                c, "setItemWidget", _n_setItemWidget0, None, Compiled,
-                qt_QListWidget_setItemWidget_void_QListWidget_QListWidgetItem_QWidget,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QListWidget"),
-                new Param(c, "item", "qt.QListWidgetItem"),
-                new Param(c, "widget", "qt.QWidget"), End),
+            new Function(c, "setItemWidget", _n_setItemWidget0, None, Compiled,
+                         qt_QListWidget_setItemWidget_void_QListWidget_QListWidgetItem_QWidget, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QListWidget"), new Param(c, "item", "qt.QListWidgetItem"),
+                         new Param(c, "widget", "qt.QWidget"), End),
             // PROP: setSortingEnabled (void; QListWidget this, bool enable)
-            new Function(
-                c, "sortItems", _n_sortItems0, None, Compiled,
-                qt_QListWidget_sortItems_void_QListWidget_int, Return, "void",
-                Parameters, new Param(c, "this", "qt.QListWidget"),
-                new Param(c, "order", "int", Value((int)Qt::AscendingOrder)),
-                End),
-            new Function(
-                c, "takeItem", _n_takeItem0, None, Compiled,
-                qt_QListWidget_takeItem_QListWidgetItem_QListWidget_int, Return,
-                "qt.QListWidgetItem", Parameters,
-                new Param(c, "this", "qt.QListWidget"),
-                new Param(c, "row", "int"), End),
-            new Function(
-                c, "visualItemRect", _n_visualItemRect0, None, Compiled,
-                qt_QListWidget_visualItemRect_QRect_QListWidget_QListWidgetItem,
-                Return, "qt.QRect", Parameters,
-                new Param(c, "this", "qt.QListWidget"),
-                new Param(c, "item", "qt.QListWidgetItem"), End),
-            _func[0] = new MemberFunction(
-                c, "dropEvent", _n_dropEvent0, None, Compiled,
-                qt_QListWidget_dropEvent_void_QListWidget_QDropEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QListWidget"),
-                new Param(c, "event", "qt.QDropEvent"), End),
-            _func[1] = new MemberFunction(
-                c, "dropMimeData", _n_dropMimeData0, None, Compiled,
-                qt_QListWidget_dropMimeData_bool_QListWidget_int_QMimeData_int,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QListWidget"),
-                new Param(c, "index", "int"),
-                new Param(c, "data", "qt.QMimeData"),
-                new Param(c, "action", "int"), End),
-            new Function(
-                c, "indexFromItem", _n_indexFromItem0, None, Compiled,
-                qt_QListWidget_indexFromItem_QModelIndex_QListWidget_QListWidgetItem,
-                Return, "qt.QModelIndex", Parameters,
-                new Param(c, "this", "qt.QListWidget"),
-                new Param(c, "item", "qt.QListWidgetItem"), End),
-            new Function(
-                c, "itemFromIndex", _n_itemFromIndex0, None, Compiled,
-                qt_QListWidget_itemFromIndex_QListWidgetItem_QListWidget_QModelIndex,
-                Return, "qt.QListWidgetItem", Parameters,
-                new Param(c, "this", "qt.QListWidget"),
-                new Param(c, "index", "qt.QModelIndex"), End),
-            new Function(
-                c, "items", _n_items0, None, Compiled,
-                qt_QListWidget_items_qt__QListWidgetItemBSB_ESB__QListWidget_QMimeData,
-                Return, "qt.QListWidgetItem[]", Parameters,
-                new Param(c, "this", "qt.QListWidget"),
-                new Param(c, "data", "qt.QMimeData"), End),
-            _func[2] = new MemberFunction(
-                c, "mimeData", _n_mimeData0, None, Compiled,
-                qt_QListWidget_mimeData_QMimeData_QListWidget_qt__QListWidgetItemBSB_ESB_,
-                Return, "qt.QMimeData", Parameters,
-                new Param(c, "this", "qt.QListWidget"),
-                new Param(c, "items", "qt.QListWidgetItem[]"), End),
-            _func[3] = new MemberFunction(
-                c, "mimeTypes", _n_mimeTypes0, None, Compiled,
-                qt_QListWidget_mimeTypes_stringBSB_ESB__QListWidget, Return,
-                "string[]", Parameters, new Param(c, "this", "qt.QListWidget"),
-                End),
-            _func[4] = new MemberFunction(
-                c, "supportedDropActions", _n_supportedDropActions0, None,
-                Compiled, qt_QListWidget_supportedDropActions_int_QListWidget,
-                Return, "int", Parameters,
-                new Param(c, "this", "qt.QListWidget"), End),
-            _func[5] = new MemberFunction(
-                c, "event", _n_event0, None, Compiled,
-                qt_QListWidget_event_bool_QListWidget_QEvent, Return, "bool",
-                Parameters, new Param(c, "this", "qt.QListWidget"),
-                new Param(c, "e", "qt.QEvent"), End),
-            _func[6] = new MemberFunction(
-                c, "indexAt", _n_indexAt0, None, Compiled,
-                qt_QListWidget_indexAt_QModelIndex_QListWidget_QPoint, Return,
-                "qt.QModelIndex", Parameters,
-                new Param(c, "this", "qt.QListWidget"),
-                new Param(c, "p", "qt.QPoint"), End),
+            new Function(c, "sortItems", _n_sortItems0, None, Compiled, qt_QListWidget_sortItems_void_QListWidget_int, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QListWidget"), new Param(c, "order", "int", Value((int)Qt::AscendingOrder)),
+                         End),
+            new Function(c, "takeItem", _n_takeItem0, None, Compiled, qt_QListWidget_takeItem_QListWidgetItem_QListWidget_int, Return,
+                         "qt.QListWidgetItem", Parameters, new Param(c, "this", "qt.QListWidget"), new Param(c, "row", "int"), End),
+            new Function(c, "visualItemRect", _n_visualItemRect0, None, Compiled,
+                         qt_QListWidget_visualItemRect_QRect_QListWidget_QListWidgetItem, Return, "qt.QRect", Parameters,
+                         new Param(c, "this", "qt.QListWidget"), new Param(c, "item", "qt.QListWidgetItem"), End),
+            _func[0] = new MemberFunction(c, "dropEvent", _n_dropEvent0, None, Compiled,
+                                          qt_QListWidget_dropEvent_void_QListWidget_QDropEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QListWidget"), new Param(c, "event", "qt.QDropEvent"), End),
+            _func[1] = new MemberFunction(c, "dropMimeData", _n_dropMimeData0, None, Compiled,
+                                          qt_QListWidget_dropMimeData_bool_QListWidget_int_QMimeData_int, Return, "bool", Parameters,
+                                          new Param(c, "this", "qt.QListWidget"), new Param(c, "index", "int"),
+                                          new Param(c, "data", "qt.QMimeData"), new Param(c, "action", "int"), End),
+            new Function(c, "indexFromItem", _n_indexFromItem0, None, Compiled,
+                         qt_QListWidget_indexFromItem_QModelIndex_QListWidget_QListWidgetItem, Return, "qt.QModelIndex", Parameters,
+                         new Param(c, "this", "qt.QListWidget"), new Param(c, "item", "qt.QListWidgetItem"), End),
+            new Function(c, "itemFromIndex", _n_itemFromIndex0, None, Compiled,
+                         qt_QListWidget_itemFromIndex_QListWidgetItem_QListWidget_QModelIndex, Return, "qt.QListWidgetItem", Parameters,
+                         new Param(c, "this", "qt.QListWidget"), new Param(c, "index", "qt.QModelIndex"), End),
+            new Function(c, "items", _n_items0, None, Compiled, qt_QListWidget_items_qt__QListWidgetItemBSB_ESB__QListWidget_QMimeData,
+                         Return, "qt.QListWidgetItem[]", Parameters, new Param(c, "this", "qt.QListWidget"),
+                         new Param(c, "data", "qt.QMimeData"), End),
+            _func[2] =
+                new MemberFunction(c, "mimeData", _n_mimeData0, None, Compiled,
+                                   qt_QListWidget_mimeData_QMimeData_QListWidget_qt__QListWidgetItemBSB_ESB_, Return, "qt.QMimeData",
+                                   Parameters, new Param(c, "this", "qt.QListWidget"), new Param(c, "items", "qt.QListWidgetItem[]"), End),
+            _func[3] =
+                new MemberFunction(c, "mimeTypes", _n_mimeTypes0, None, Compiled, qt_QListWidget_mimeTypes_stringBSB_ESB__QListWidget,
+                                   Return, "string[]", Parameters, new Param(c, "this", "qt.QListWidget"), End),
+            _func[4] = new MemberFunction(c, "supportedDropActions", _n_supportedDropActions0, None, Compiled,
+                                          qt_QListWidget_supportedDropActions_int_QListWidget, Return, "int", Parameters,
+                                          new Param(c, "this", "qt.QListWidget"), End),
+            _func[5] = new MemberFunction(c, "event", _n_event0, None, Compiled, qt_QListWidget_event_bool_QListWidget_QEvent, Return,
+                                          "bool", Parameters, new Param(c, "this", "qt.QListWidget"), new Param(c, "e", "qt.QEvent"), End),
+            _func[6] = new MemberFunction(c, "indexAt", _n_indexAt0, None, Compiled, qt_QListWidget_indexAt_QModelIndex_QListWidget_QPoint,
+                                          Return, "qt.QModelIndex", Parameters, new Param(c, "this", "qt.QListWidget"),
+                                          new Param(c, "p", "qt.QPoint"), End),
             // MISSING: scrollTo (void; QListWidget this, QModelIndex index,
             // "ScrollHint" hint)
-            _func[7] = new MemberFunction(
-                c, "visualRect", _n_visualRect0, None, Compiled,
-                qt_QListWidget_visualRect_QRect_QListWidget_QModelIndex, Return,
-                "qt.QRect", Parameters, new Param(c, "this", "qt.QListWidget"),
-                new Param(c, "index", "qt.QModelIndex"), End),
-            _func[8] = new MemberFunction(
-                c, "currentChanged", _n_currentChanged0, None, Compiled,
-                qt_QListWidget_currentChanged_void_QListWidget_QModelIndex_QModelIndex,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QListWidget"),
-                new Param(c, "current", "qt.QModelIndex"),
-                new Param(c, "previous", "qt.QModelIndex"), End),
+            _func[7] = new MemberFunction(c, "visualRect", _n_visualRect0, None, Compiled,
+                                          qt_QListWidget_visualRect_QRect_QListWidget_QModelIndex, Return, "qt.QRect", Parameters,
+                                          new Param(c, "this", "qt.QListWidget"), new Param(c, "index", "qt.QModelIndex"), End),
+            _func[8] = new MemberFunction(c, "currentChanged", _n_currentChanged0, None, Compiled,
+                                          qt_QListWidget_currentChanged_void_QListWidget_QModelIndex_QModelIndex, Return, "void",
+                                          Parameters, new Param(c, "this", "qt.QListWidget"), new Param(c, "current", "qt.QModelIndex"),
+                                          new Param(c, "previous", "qt.QModelIndex"), End),
             // MISSING: dataChanged (void; QListWidget this, QModelIndex
             // topLeft, QModelIndex bottomRight, "const QVector<int> &" roles)
             // // protected
-            _func[9] = new MemberFunction(
-                c, "dragLeaveEvent", _n_dragLeaveEvent0, None, Compiled,
-                qt_QListWidget_dragLeaveEvent_void_QListWidget_QDragLeaveEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QListWidget"),
-                new Param(c, "e", "qt.QDragLeaveEvent"), End),
-            _func[10] = new MemberFunction(
-                c, "dragMoveEvent", _n_dragMoveEvent0, None, Compiled,
-                qt_QListWidget_dragMoveEvent_void_QListWidget_QDragMoveEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QListWidget"),
-                new Param(c, "e", "qt.QDragMoveEvent"), End),
-            _func[11] = new MemberFunction(
-                c, "horizontalOffset", _n_horizontalOffset0, None, Compiled,
-                qt_QListWidget_horizontalOffset_int_QListWidget, Return, "int",
-                Parameters, new Param(c, "this", "qt.QListWidget"), End),
-            _func[12] = new MemberFunction(
-                c, "isIndexHidden", _n_isIndexHidden0, None, Compiled,
-                qt_QListWidget_isIndexHidden_bool_QListWidget_QModelIndex,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QListWidget"),
-                new Param(c, "index", "qt.QModelIndex"), End),
-            _func[13] = new MemberFunction(
-                c, "mouseMoveEvent", _n_mouseMoveEvent0, None, Compiled,
-                qt_QListWidget_mouseMoveEvent_void_QListWidget_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QListWidget"),
-                new Param(c, "e", "qt.QMouseEvent"), End),
-            _func[14] = new MemberFunction(
-                c, "mouseReleaseEvent", _n_mouseReleaseEvent0, None, Compiled,
-                qt_QListWidget_mouseReleaseEvent_void_QListWidget_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QListWidget"),
-                new Param(c, "e", "qt.QMouseEvent"), End),
+            _func[9] = new MemberFunction(c, "dragLeaveEvent", _n_dragLeaveEvent0, None, Compiled,
+                                          qt_QListWidget_dragLeaveEvent_void_QListWidget_QDragLeaveEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QListWidget"), new Param(c, "e", "qt.QDragLeaveEvent"), End),
+            _func[10] = new MemberFunction(c, "dragMoveEvent", _n_dragMoveEvent0, None, Compiled,
+                                           qt_QListWidget_dragMoveEvent_void_QListWidget_QDragMoveEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QListWidget"), new Param(c, "e", "qt.QDragMoveEvent"), End),
+            _func[11] = new MemberFunction(c, "horizontalOffset", _n_horizontalOffset0, None, Compiled,
+                                           qt_QListWidget_horizontalOffset_int_QListWidget, Return, "int", Parameters,
+                                           new Param(c, "this", "qt.QListWidget"), End),
+            _func[12] = new MemberFunction(c, "isIndexHidden", _n_isIndexHidden0, None, Compiled,
+                                           qt_QListWidget_isIndexHidden_bool_QListWidget_QModelIndex, Return, "bool", Parameters,
+                                           new Param(c, "this", "qt.QListWidget"), new Param(c, "index", "qt.QModelIndex"), End),
+            _func[13] = new MemberFunction(c, "mouseMoveEvent", _n_mouseMoveEvent0, None, Compiled,
+                                           qt_QListWidget_mouseMoveEvent_void_QListWidget_QMouseEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QListWidget"), new Param(c, "e", "qt.QMouseEvent"), End),
+            _func[14] = new MemberFunction(c, "mouseReleaseEvent", _n_mouseReleaseEvent0, None, Compiled,
+                                           qt_QListWidget_mouseReleaseEvent_void_QListWidget_QMouseEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QListWidget"), new Param(c, "e", "qt.QMouseEvent"), End),
             // MISSING: moveCursor (QModelIndex; QListWidget this,
             // "CursorAction" cursorAction, flags Qt::KeyboardModifiers
             // modifiers) // protected
-            _func[15] = new MemberFunction(
-                c, "paintEvent", _n_paintEvent0, None, Compiled,
-                qt_QListWidget_paintEvent_void_QListWidget_QPaintEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QListWidget"),
-                new Param(c, "e", "qt.QPaintEvent"), End),
-            _func[16] = new MemberFunction(
-                c, "resizeEvent", _n_resizeEvent0, None, Compiled,
-                qt_QListWidget_resizeEvent_void_QListWidget_QResizeEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QListWidget"),
-                new Param(c, "e", "qt.QResizeEvent"), End),
-            _func[17] = new MemberFunction(
-                c, "rowsAboutToBeRemoved", _n_rowsAboutToBeRemoved0, None,
-                Compiled,
-                qt_QListWidget_rowsAboutToBeRemoved_void_QListWidget_QModelIndex_int_int,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QListWidget"),
-                new Param(c, "parent", "qt.QModelIndex"),
-                new Param(c, "start", "int"), new Param(c, "end", "int"), End),
-            _func[18] = new MemberFunction(
-                c, "rowsInserted", _n_rowsInserted0, None, Compiled,
-                qt_QListWidget_rowsInserted_void_QListWidget_QModelIndex_int_int,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QListWidget"),
-                new Param(c, "parent", "qt.QModelIndex"),
-                new Param(c, "start", "int"), new Param(c, "end", "int"), End),
-            _func[19] = new MemberFunction(
-                c, "selectedIndexes", _n_selectedIndexes0, None, Compiled,
-                qt_QListWidget_selectedIndexes_qt__QModelIndexBSB_ESB__QListWidget,
-                Return, "qt.QModelIndex[]", Parameters,
-                new Param(c, "this", "qt.QListWidget"), End),
-            _func[20] = new MemberFunction(
-                c, "selectionChanged", _n_selectionChanged0, None, Compiled,
-                qt_QListWidget_selectionChanged_void_QListWidget_QItemSelection_QItemSelection,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QListWidget"),
-                new Param(c, "selected", "qt.QItemSelection"),
-                new Param(c, "deselected", "qt.QItemSelection"), End),
+            _func[15] = new MemberFunction(c, "paintEvent", _n_paintEvent0, None, Compiled,
+                                           qt_QListWidget_paintEvent_void_QListWidget_QPaintEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QListWidget"), new Param(c, "e", "qt.QPaintEvent"), End),
+            _func[16] = new MemberFunction(c, "resizeEvent", _n_resizeEvent0, None, Compiled,
+                                           qt_QListWidget_resizeEvent_void_QListWidget_QResizeEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QListWidget"), new Param(c, "e", "qt.QResizeEvent"), End),
+            _func[17] = new MemberFunction(c, "rowsAboutToBeRemoved", _n_rowsAboutToBeRemoved0, None, Compiled,
+                                           qt_QListWidget_rowsAboutToBeRemoved_void_QListWidget_QModelIndex_int_int, Return, "void",
+                                           Parameters, new Param(c, "this", "qt.QListWidget"), new Param(c, "parent", "qt.QModelIndex"),
+                                           new Param(c, "start", "int"), new Param(c, "end", "int"), End),
+            _func[18] = new MemberFunction(c, "rowsInserted", _n_rowsInserted0, None, Compiled,
+                                           qt_QListWidget_rowsInserted_void_QListWidget_QModelIndex_int_int, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QListWidget"), new Param(c, "parent", "qt.QModelIndex"),
+                                           new Param(c, "start", "int"), new Param(c, "end", "int"), End),
+            _func[19] = new MemberFunction(c, "selectedIndexes", _n_selectedIndexes0, None, Compiled,
+                                           qt_QListWidget_selectedIndexes_qt__QModelIndexBSB_ESB__QListWidget, Return, "qt.QModelIndex[]",
+                                           Parameters, new Param(c, "this", "qt.QListWidget"), End),
+            _func[20] =
+                new MemberFunction(c, "selectionChanged", _n_selectionChanged0, None, Compiled,
+                                   qt_QListWidget_selectionChanged_void_QListWidget_QItemSelection_QItemSelection, Return, "void",
+                                   Parameters, new Param(c, "this", "qt.QListWidget"), new Param(c, "selected", "qt.QItemSelection"),
+                                   new Param(c, "deselected", "qt.QItemSelection"), End),
             _func[21] = new MemberFunction(
-                c, "setSelection", _n_setSelection0, None, Compiled,
-                qt_QListWidget_setSelection_void_QListWidget_QRect_int, Return,
-                "void", Parameters, new Param(c, "this", "qt.QListWidget"),
-                new Param(c, "rect", "qt.QRect"),
-                new Param(c, "command", "int"), End),
-            _func[22] = new MemberFunction(
-                c, "startDrag", _n_startDrag0, None, Compiled,
-                qt_QListWidget_startDrag_void_QListWidget_int, Return, "void",
-                Parameters, new Param(c, "this", "qt.QListWidget"),
-                new Param(c, "supportedActions", "int"), End),
-            _func[23] = new MemberFunction(
-                c, "timerEvent", _n_timerEvent0, None, Compiled,
-                qt_QListWidget_timerEvent_void_QListWidget_QTimerEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QListWidget"),
-                new Param(c, "e", "qt.QTimerEvent"), End),
-            _func[24] = new MemberFunction(
-                c, "updateGeometries", _n_updateGeometries0, None, Compiled,
-                qt_QListWidget_updateGeometries_void_QListWidget, Return,
-                "void", Parameters, new Param(c, "this", "qt.QListWidget"),
-                End),
-            _func[25] = new MemberFunction(
-                c, "verticalOffset", _n_verticalOffset0, None, Compiled,
-                qt_QListWidget_verticalOffset_int_QListWidget, Return, "int",
-                Parameters, new Param(c, "this", "qt.QListWidget"), End),
+                c, "setSelection", _n_setSelection0, None, Compiled, qt_QListWidget_setSelection_void_QListWidget_QRect_int, Return, "void",
+                Parameters, new Param(c, "this", "qt.QListWidget"), new Param(c, "rect", "qt.QRect"), new Param(c, "command", "int"), End),
+            _func[22] = new MemberFunction(c, "startDrag", _n_startDrag0, None, Compiled, qt_QListWidget_startDrag_void_QListWidget_int,
+                                           Return, "void", Parameters, new Param(c, "this", "qt.QListWidget"),
+                                           new Param(c, "supportedActions", "int"), End),
+            _func[23] = new MemberFunction(c, "timerEvent", _n_timerEvent0, None, Compiled,
+                                           qt_QListWidget_timerEvent_void_QListWidget_QTimerEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QListWidget"), new Param(c, "e", "qt.QTimerEvent"), End),
+            _func[24] = new MemberFunction(c, "updateGeometries", _n_updateGeometries0, None, Compiled,
+                                           qt_QListWidget_updateGeometries_void_QListWidget, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QListWidget"), End),
+            _func[25] =
+                new MemberFunction(c, "verticalOffset", _n_verticalOffset0, None, Compiled, qt_QListWidget_verticalOffset_int_QListWidget,
+                                   Return, "int", Parameters, new Param(c, "this", "qt.QListWidget"), End),
             // MISSING: viewOptions ("QStyleOptionViewItem"; QListWidget this)
             // // protected
-            _func[26] = new MemberFunction(
-                c, "viewportSizeHint", _n_viewportSizeHint0, None, Compiled,
-                qt_QListWidget_viewportSizeHint_QSize_QListWidget, Return,
-                "qt.QSize", Parameters, new Param(c, "this", "qt.QListWidget"),
-                End),
-            _func[27] = new MemberFunction(
-                c, "visualRegionForSelection", _n_visualRegionForSelection0,
-                None, Compiled,
-                qt_QListWidget_visualRegionForSelection_QRegion_QListWidget_QItemSelection,
-                Return, "qt.QRegion", Parameters,
-                new Param(c, "this", "qt.QListWidget"),
-                new Param(c, "selection", "qt.QItemSelection"), End),
-            _func[28] = new MemberFunction(
-                c, "wheelEvent", _n_wheelEvent0, None, Compiled,
-                qt_QListWidget_wheelEvent_void_QListWidget_QWheelEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QListWidget"),
-                new Param(c, "e", "qt.QWheelEvent"), End),
+            _func[26] = new MemberFunction(c, "viewportSizeHint", _n_viewportSizeHint0, None, Compiled,
+                                           qt_QListWidget_viewportSizeHint_QSize_QListWidget, Return, "qt.QSize", Parameters,
+                                           new Param(c, "this", "qt.QListWidget"), End),
+            _func[27] =
+                new MemberFunction(c, "visualRegionForSelection", _n_visualRegionForSelection0, None, Compiled,
+                                   qt_QListWidget_visualRegionForSelection_QRegion_QListWidget_QItemSelection, Return, "qt.QRegion",
+                                   Parameters, new Param(c, "this", "qt.QListWidget"), new Param(c, "selection", "qt.QItemSelection"), End),
+            _func[28] = new MemberFunction(c, "wheelEvent", _n_wheelEvent0, None, Compiled,
+                                           qt_QListWidget_wheelEvent_void_QListWidget_QWheelEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QListWidget"), new Param(c, "e", "qt.QWheelEvent"), End),
             // static functions
             EndArguments);
         globalScope()->addSymbols(EndArguments);

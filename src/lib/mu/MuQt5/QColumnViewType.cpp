@@ -74,16 +74,14 @@ namespace Mu
         _baseType = 0;
     }
 
-    MuQt_QColumnView::MuQt_QColumnView(Pointer muobj, const CallEnvironment* ce,
-                                       QWidget* parent)
+    MuQt_QColumnView::MuQt_QColumnView(Pointer muobj, const CallEnvironment* ce, QWidget* parent)
         : QColumnView(parent)
     {
         _env = ce;
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QColumnViewType>(
-            c->internName("qt.QColumnView"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QColumnViewType>(c->internName("qt.QColumnView"));
     }
 
     QModelIndex MuQt_QColumnView::indexAt(const QPoint& point) const
@@ -143,8 +141,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeinstance<QAbstractItemModelType>(
-                c, model, "qt.QAbstractItemModel"));
+            args[1] = Value(makeinstance<QAbstractItemModelType>(c, model, "qt.QAbstractItemModel"));
             Value rval = _env->call(F, args);
         }
         else
@@ -167,8 +164,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
+            args[1] = Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
             Value rval = _env->call(F, args);
         }
         else
@@ -177,8 +173,7 @@ namespace Mu
         }
     }
 
-    void
-    MuQt_QColumnView::setSelectionModel(QItemSelectionModel* newSelectionModel)
+    void MuQt_QColumnView::setSelectionModel(QItemSelectionModel* newSelectionModel)
     {
         if (!_env)
         {
@@ -192,8 +187,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeinstance<QItemSelectionModelType>(
-                c, newSelectionModel, "qt.QItemSelectionModel"));
+            args[1] = Value(makeinstance<QItemSelectionModelType>(c, newSelectionModel, "qt.QItemSelectionModel"));
             Value rval = _env->call(F, args);
         }
         else
@@ -233,8 +227,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
+            args[1] = Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
             Value rval = _env->call(F, args);
             return getqtype<QRectType>(rval._Pointer);
         }
@@ -255,8 +248,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
+            args[1] = Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
             Value rval = _env->call(F, args);
             return object<QAbstractItemView>(rval._Pointer);
         }
@@ -266,8 +258,7 @@ namespace Mu
         }
     }
 
-    void MuQt_QColumnView::currentChanged(const QModelIndex& current,
-                                          const QModelIndex& previous)
+    void MuQt_QColumnView::currentChanged(const QModelIndex& current, const QModelIndex& previous)
     {
         if (!_env)
         {
@@ -281,10 +272,8 @@ namespace Mu
         {
             Function::ArgumentVector args(3);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqtype<QModelIndexType>(c, current, "qt.QModelIndex"));
-            args[2] = Value(
-                makeqtype<QModelIndexType>(c, previous, "qt.QModelIndex"));
+            args[1] = Value(makeqtype<QModelIndexType>(c, current, "qt.QModelIndex"));
+            args[2] = Value(makeqtype<QModelIndexType>(c, previous, "qt.QModelIndex"));
             Value rval = _env->call(F, args);
         }
         else
@@ -324,8 +313,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
+            args[1] = Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
             Value rval = _env->call(F, args);
             return (bool)(rval._bool);
         }
@@ -349,8 +337,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QResizeEventType>(c, event, "qt.QResizeEvent"));
+            args[1] = Value(makeqpointer<QResizeEventType>(c, event, "qt.QResizeEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -359,8 +346,7 @@ namespace Mu
         }
     }
 
-    void MuQt_QColumnView::rowsInserted(const QModelIndex& parent, int start,
-                                        int end)
+    void MuQt_QColumnView::rowsInserted(const QModelIndex& parent, int start, int end)
     {
         if (!_env)
         {
@@ -374,8 +360,7 @@ namespace Mu
         {
             Function::ArgumentVector args(4);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqtype<QModelIndexType>(c, parent, "qt.QModelIndex"));
+            args[1] = Value(makeqtype<QModelIndexType>(c, parent, "qt.QModelIndex"));
             args[2] = Value(start);
             args[3] = Value(end);
             Value rval = _env->call(F, args);
@@ -410,9 +395,7 @@ namespace Mu
         }
     }
 
-    void
-    MuQt_QColumnView::setSelection(const QRect& rect,
-                                   QItemSelectionModel::SelectionFlags command)
+    void MuQt_QColumnView::setSelection(const QRect& rect, QItemSelectionModel::SelectionFlags command)
     {
         if (!_env)
         {
@@ -456,8 +439,7 @@ namespace Mu
         }
     }
 
-    QRegion MuQt_QColumnView::visualRegionForSelection(
-        const QItemSelection& selection) const
+    QRegion MuQt_QColumnView::visualRegionForSelection(const QItemSelection& selection) const
     {
         if (!_env)
             return QColumnView::visualRegionForSelection(selection);
@@ -468,8 +450,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqtype<QItemSelectionType>(c, selection,
-                                                          "qt.QItemSelection"));
+            args[1] = Value(makeqtype<QItemSelectionType>(c, selection, "qt.QItemSelection"));
             Value rval = _env->call(F, args);
             return getqtype<QRegionType>(rval._Pointer);
         }
@@ -544,8 +525,7 @@ namespace Mu
         }
     }
 
-    QVariant
-    MuQt_QColumnView::inputMethodQuery(Qt::InputMethodQuery query) const
+    QVariant MuQt_QColumnView::inputMethodQuery(Qt::InputMethodQuery query) const
     {
         if (!_env)
             return QColumnView::inputMethodQuery(query);
@@ -566,9 +546,7 @@ namespace Mu
         }
     }
 
-    bool MuQt_QColumnView::edit(const QModelIndex& index,
-                                QAbstractItemView::EditTrigger trigger,
-                                QEvent* event)
+    bool MuQt_QColumnView::edit(const QModelIndex& index, QAbstractItemView::EditTrigger trigger, QEvent* event)
     {
         if (!_env)
             return QColumnView::edit(index, trigger, event);
@@ -579,8 +557,7 @@ namespace Mu
         {
             Function::ArgumentVector args(4);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
+            args[1] = Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
             args[2] = Value(int(trigger));
             args[3] = Value(makeqpointer<QEventType>(c, event, "qt.QEvent"));
             Value rval = _env->call(F, args);
@@ -612,9 +589,7 @@ namespace Mu
         }
     }
 
-    QItemSelectionModel::SelectionFlags
-    MuQt_QColumnView::selectionCommand(const QModelIndex& index,
-                                       const QEvent* event) const
+    QItemSelectionModel::SelectionFlags MuQt_QColumnView::selectionCommand(const QModelIndex& index, const QEvent* event) const
     {
         if (!_env)
             return QColumnView::selectionCommand(index, event);
@@ -625,8 +600,7 @@ namespace Mu
         {
             Function::ArgumentVector args(3);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
+            args[1] = Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
             args[2] = Value(makeqpointer<QEventType>(c, event, "qt.QEvent"));
             Value rval = _env->call(F, args);
             return (QItemSelectionModel::SelectionFlags)(rval._int);
@@ -674,8 +648,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqpointer<QDragEnterEventType>(
-                c, event, "qt.QDragEnterEvent"));
+            args[1] = Value(makeqpointer<QDragEnterEventType>(c, event, "qt.QDragEnterEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -698,8 +671,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqpointer<QDragLeaveEventType>(
-                c, event, "qt.QDragLeaveEvent"));
+            args[1] = Value(makeqpointer<QDragLeaveEventType>(c, event, "qt.QDragLeaveEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -722,8 +694,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqpointer<QDragMoveEventType>(
-                c, event, "qt.QDragMoveEvent"));
+            args[1] = Value(makeqpointer<QDragMoveEventType>(c, event, "qt.QDragMoveEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -746,8 +717,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QDropEventType>(c, event, "qt.QDropEvent"));
+            args[1] = Value(makeqpointer<QDropEventType>(c, event, "qt.QDropEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -791,8 +761,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QFocusEventType>(c, event, "qt.QFocusEvent"));
+            args[1] = Value(makeqpointer<QFocusEventType>(c, event, "qt.QFocusEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -836,8 +805,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QFocusEventType>(c, event, "qt.QFocusEvent"));
+            args[1] = Value(makeqpointer<QFocusEventType>(c, event, "qt.QFocusEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -860,8 +828,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QKeyEventType>(c, event, "qt.QKeyEvent"));
+            args[1] = Value(makeqpointer<QKeyEventType>(c, event, "qt.QKeyEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -884,8 +851,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -908,8 +874,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -932,8 +897,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -956,8 +920,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -980,8 +943,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QTimerEventType>(c, event, "qt.QTimerEvent"));
+            args[1] = Value(makeqpointer<QTimerEventType>(c, event, "qt.QTimerEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -1034,8 +996,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  Mu Type CONSTRUCTORS
 
-    QColumnViewType::QColumnViewType(Context* c, const char* name, Class* super,
-                                     Class* super2)
+    QColumnViewType::QColumnViewType(Context* c, const char* name, Class* super, Class* super2)
         : Class(c, name, vectorOf2(super, super2))
     {
     }
@@ -1045,8 +1006,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    static Pointer QColumnView_QColumnView_QObject(Thread& NODE_THREAD,
-                                                   Pointer obj)
+    static Pointer QColumnView_QColumnView_QObject(Thread& NODE_THREAD, Pointer obj)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         ClassInstance* widget = reinterpret_cast<ClassInstance*>(obj);
@@ -1057,9 +1017,7 @@ namespace Mu
         }
         else if (QColumnView* w = object<QColumnView>(widget))
         {
-            QColumnViewType* type =
-                c->findSymbolOfTypeByQualifiedName<QColumnViewType>(
-                    c->internName("qt.QColumnView"), false);
+            QColumnViewType* type = c->findSymbolOfTypeByQualifiedName<QColumnViewType>(c->internName("qt.QColumnView"), false);
             ClassInstance* o = ClassInstance::allocate(type);
             setobject(o, w);
             return o;
@@ -1070,35 +1028,24 @@ namespace Mu
         }
     }
 
-    static NODE_IMPLEMENTATION(castFromObject, Pointer)
-    {
-        NODE_RETURN(
-            QColumnView_QColumnView_QObject(NODE_THREAD, NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(castFromObject, Pointer) { NODE_RETURN(QColumnView_QColumnView_QObject(NODE_THREAD, NODE_ARG(0, Pointer))); }
 
-    Pointer qt_QColumnView_QColumnView_QColumnView_QColumnView_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
+    Pointer qt_QColumnView_QColumnView_QColumnView_QColumnView_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWidget* arg1 = object<QWidget>(param_parent);
-        setobject(param_this,
-                  new MuQt_QColumnView(param_this,
-                                       NODE_THREAD.process()->callEnv(), arg1));
+        setobject(param_this, new MuQt_QColumnView(param_this, NODE_THREAD.process()->callEnv(), arg1));
         return param_this;
     }
 
-    Pointer
-    qt_QColumnView_previewWidget_QWidget_QColumnView(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_this)
+    Pointer qt_QColumnView_previewWidget_QWidget_QColumnView(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColumnView* arg0 = object<QColumnView>(param_this);
-        return makeinstance<QWidgetType>(c, arg0->previewWidget(),
-                                         "qt.QWidget");
+        return makeinstance<QWidgetType>(c, arg0->previewWidget(), "qt.QWidget");
     }
 
-    void qt_QColumnView_setPreviewWidget_void_QColumnView_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_widget)
+    void qt_QColumnView_setPreviewWidget_void_QColumnView_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_widget)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColumnView* arg0 = object<QColumnView>(param_this);
@@ -1106,21 +1053,16 @@ namespace Mu
         arg0->setPreviewWidget(arg1);
     }
 
-    Pointer qt_QColumnView_indexAt_QModelIndex_QColumnView_QPoint(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_point)
+    Pointer qt_QColumnView_indexAt_QModelIndex_QColumnView_QPoint(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_point)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColumnView* arg0 = object<QColumnView>(param_this);
         const QPoint arg1 = getqtype<QPointType>(param_point);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QModelIndexType>(
-                         c, arg0->QColumnView::indexAt(arg1), "qt.QModelIndex")
-                   : makeqtype<QModelIndexType>(c, arg0->indexAt(arg1),
-                                                "qt.QModelIndex");
+        return isMuQtObject(arg0) ? makeqtype<QModelIndexType>(c, arg0->QColumnView::indexAt(arg1), "qt.QModelIndex")
+                                  : makeqtype<QModelIndexType>(c, arg0->indexAt(arg1), "qt.QModelIndex");
     }
 
-    void qt_QColumnView_selectAll_void_QColumnView(Mu::Thread& NODE_THREAD,
-                                                   Pointer param_this)
+    void qt_QColumnView_selectAll_void_QColumnView(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColumnView* arg0 = object<QColumnView>(param_this);
@@ -1130,8 +1072,7 @@ namespace Mu
             arg0->selectAll();
     }
 
-    void qt_QColumnView_setModel_void_QColumnView_QAbstractItemModel(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_model)
+    void qt_QColumnView_setModel_void_QColumnView_QAbstractItemModel(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_model)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColumnView* arg0 = object<QColumnView>(param_this);
@@ -1142,8 +1083,7 @@ namespace Mu
             arg0->setModel(arg1);
     }
 
-    void qt_QColumnView_setRootIndex_void_QColumnView_QModelIndex(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index)
+    void qt_QColumnView_setRootIndex_void_QColumnView_QModelIndex(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColumnView* arg0 = object<QColumnView>(param_this);
@@ -1154,64 +1094,49 @@ namespace Mu
             arg0->setRootIndex(arg1);
     }
 
-    void qt_QColumnView_setSelectionModel_void_QColumnView_QItemSelectionModel(
-        Mu::Thread& NODE_THREAD, Pointer param_this,
-        Pointer param_newSelectionModel)
+    void qt_QColumnView_setSelectionModel_void_QColumnView_QItemSelectionModel(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                               Pointer param_newSelectionModel)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColumnView* arg0 = object<QColumnView>(param_this);
-        QItemSelectionModel* arg1 =
-            object<QItemSelectionModel>(param_newSelectionModel);
+        QItemSelectionModel* arg1 = object<QItemSelectionModel>(param_newSelectionModel);
         if (isMuQtObject(arg0))
             arg0->QColumnView::setSelectionModel(arg1);
         else
             arg0->setSelectionModel(arg1);
     }
 
-    Pointer qt_QColumnView_sizeHint_QSize_QColumnView(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    Pointer qt_QColumnView_sizeHint_QSize_QColumnView(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColumnView* arg0 = object<QColumnView>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QSizeType>(c, arg0->QColumnView::sizeHint(),
-                                          "qt.QSize")
-                   : makeqtype<QSizeType>(c, arg0->sizeHint(), "qt.QSize");
+        return isMuQtObject(arg0) ? makeqtype<QSizeType>(c, arg0->QColumnView::sizeHint(), "qt.QSize")
+                                  : makeqtype<QSizeType>(c, arg0->sizeHint(), "qt.QSize");
     }
 
-    Pointer qt_QColumnView_visualRect_QRect_QColumnView_QModelIndex(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index)
+    Pointer qt_QColumnView_visualRect_QRect_QColumnView_QModelIndex(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index)
+    {
+        MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
+        QColumnView* arg0 = object<QColumnView>(param_this);
+        const QModelIndex arg1 = getqtype<QModelIndexType>(param_index);
+        return isMuQtObject(arg0) ? makeqtype<QRectType>(c, arg0->QColumnView::visualRect(arg1), "qt.QRect")
+                                  : makeqtype<QRectType>(c, arg0->visualRect(arg1), "qt.QRect");
+    }
+
+    Pointer qt_QColumnView_createColumn_QAbstractItemView_QColumnView_QModelIndex(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                  Pointer param_index)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColumnView* arg0 = object<QColumnView>(param_this);
         const QModelIndex arg1 = getqtype<QModelIndexType>(param_index);
         return isMuQtObject(arg0)
-                   ? makeqtype<QRectType>(
-                         c, arg0->QColumnView::visualRect(arg1), "qt.QRect")
-                   : makeqtype<QRectType>(c, arg0->visualRect(arg1),
-                                          "qt.QRect");
+                   ? makeinstance<QAbstractItemViewType>(c, ((MuQt_QColumnView*)arg0)->createColumn_pub_parent(arg1),
+                                                         "qt.QAbstractItemView")
+                   : makeinstance<QAbstractItemViewType>(c, ((MuQt_QColumnView*)arg0)->createColumn_pub(arg1), "qt.QAbstractItemView");
     }
 
-    Pointer
-    qt_QColumnView_createColumn_QAbstractItemView_QColumnView_QModelIndex(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index)
-    {
-        MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-        QColumnView* arg0 = object<QColumnView>(param_this);
-        const QModelIndex arg1 = getqtype<QModelIndexType>(param_index);
-        return isMuQtObject(arg0)
-                   ? makeinstance<QAbstractItemViewType>(
-                         c,
-                         ((MuQt_QColumnView*)arg0)
-                             ->createColumn_pub_parent(arg1),
-                         "qt.QAbstractItemView")
-                   : makeinstance<QAbstractItemViewType>(
-                         c, ((MuQt_QColumnView*)arg0)->createColumn_pub(arg1),
-                         "qt.QAbstractItemView");
-    }
-
-    void qt_QColumnView_initializeColumn_void_QColumnView_QAbstractItemView(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_column)
+    void qt_QColumnView_initializeColumn_void_QColumnView_QAbstractItemView(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                            Pointer param_column)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColumnView* arg0 = object<QColumnView>(param_this);
@@ -1219,9 +1144,8 @@ namespace Mu
         ((MuQt_QColumnView*)arg0)->initializeColumn_pub(arg1);
     }
 
-    void qt_QColumnView_currentChanged_void_QColumnView_QModelIndex_QModelIndex(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_current,
-        Pointer param_previous)
+    void qt_QColumnView_currentChanged_void_QColumnView_QModelIndex_QModelIndex(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                Pointer param_current, Pointer param_previous)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColumnView* arg0 = object<QColumnView>(param_this);
@@ -1233,29 +1157,24 @@ namespace Mu
             ((MuQt_QColumnView*)arg0)->currentChanged_pub(arg1, arg2);
     }
 
-    int qt_QColumnView_horizontalOffset_int_QColumnView(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this)
+    int qt_QColumnView_horizontalOffset_int_QColumnView(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColumnView* arg0 = object<QColumnView>(param_this);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QColumnView*)arg0)->horizontalOffset_pub_parent()
-                   : ((MuQt_QColumnView*)arg0)->horizontalOffset_pub();
+        return isMuQtObject(arg0) ? ((MuQt_QColumnView*)arg0)->horizontalOffset_pub_parent()
+                                  : ((MuQt_QColumnView*)arg0)->horizontalOffset_pub();
     }
 
-    bool qt_QColumnView_isIndexHidden_bool_QColumnView_QModelIndex(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index)
+    bool qt_QColumnView_isIndexHidden_bool_QColumnView_QModelIndex(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColumnView* arg0 = object<QColumnView>(param_this);
         const QModelIndex arg1 = getqtype<QModelIndexType>(param_index);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QColumnView*)arg0)->isIndexHidden_pub_parent(arg1)
-                   : ((MuQt_QColumnView*)arg0)->isIndexHidden_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QColumnView*)arg0)->isIndexHidden_pub_parent(arg1)
+                                  : ((MuQt_QColumnView*)arg0)->isIndexHidden_pub(arg1);
     }
 
-    void qt_QColumnView_resizeEvent_void_QColumnView_QResizeEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QColumnView_resizeEvent_void_QColumnView_QResizeEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColumnView* arg0 = object<QColumnView>(param_this);
@@ -1266,9 +1185,8 @@ namespace Mu
             ((MuQt_QColumnView*)arg0)->resizeEvent_pub(arg1);
     }
 
-    void qt_QColumnView_rowsInserted_void_QColumnView_QModelIndex_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent,
-        int param_start, int param_end)
+    void qt_QColumnView_rowsInserted_void_QColumnView_QModelIndex_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent,
+                                                                          int param_start, int param_end)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColumnView* arg0 = object<QColumnView>(param_this);
@@ -1276,14 +1194,12 @@ namespace Mu
         int arg2 = (int)(param_start);
         int arg3 = (int)(param_end);
         if (isMuQtObject(arg0))
-            ((MuQt_QColumnView*)arg0)
-                ->rowsInserted_pub_parent(arg1, arg2, arg3);
+            ((MuQt_QColumnView*)arg0)->rowsInserted_pub_parent(arg1, arg2, arg3);
         else
             ((MuQt_QColumnView*)arg0)->rowsInserted_pub(arg1, arg2, arg3);
     }
 
-    void qt_QColumnView_scrollContentsBy_void_QColumnView_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_dx, int param_dy)
+    void qt_QColumnView_scrollContentsBy_void_QColumnView_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_dx, int param_dy)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColumnView* arg0 = object<QColumnView>(param_this);
@@ -1295,54 +1211,39 @@ namespace Mu
             ((MuQt_QColumnView*)arg0)->scrollContentsBy_pub(arg1, arg2);
     }
 
-    void qt_QColumnView_setSelection_void_QColumnView_QRect_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_rect,
-        int param_command)
+    void qt_QColumnView_setSelection_void_QColumnView_QRect_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_rect,
+                                                                int param_command)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColumnView* arg0 = object<QColumnView>(param_this);
         const QRect arg1 = getqtype<QRectType>(param_rect);
-        QItemSelectionModel::SelectionFlags arg2 =
-            (QItemSelectionModel::SelectionFlags)(param_command);
+        QItemSelectionModel::SelectionFlags arg2 = (QItemSelectionModel::SelectionFlags)(param_command);
         if (isMuQtObject(arg0))
             ((MuQt_QColumnView*)arg0)->setSelection_pub_parent(arg1, arg2);
         else
             ((MuQt_QColumnView*)arg0)->setSelection_pub(arg1, arg2);
     }
 
-    int qt_QColumnView_verticalOffset_int_QColumnView(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    int qt_QColumnView_verticalOffset_int_QColumnView(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColumnView* arg0 = object<QColumnView>(param_this);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QColumnView*)arg0)->verticalOffset_pub_parent()
-                   : ((MuQt_QColumnView*)arg0)->verticalOffset_pub();
+        return isMuQtObject(arg0) ? ((MuQt_QColumnView*)arg0)->verticalOffset_pub_parent()
+                                  : ((MuQt_QColumnView*)arg0)->verticalOffset_pub();
     }
 
-    Pointer
-    qt_QColumnView_visualRegionForSelection_QRegion_QColumnView_QItemSelection(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_selection)
+    Pointer qt_QColumnView_visualRegionForSelection_QRegion_QColumnView_QItemSelection(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                       Pointer param_selection)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColumnView* arg0 = object<QColumnView>(param_this);
-        const QItemSelection arg1 =
-            getqtype<QItemSelectionType>(param_selection);
+        const QItemSelection arg1 = getqtype<QItemSelectionType>(param_selection);
         return isMuQtObject(arg0)
-                   ? makeqtype<QRegionType>(
-                         c,
-                         ((MuQt_QColumnView*)arg0)
-                             ->visualRegionForSelection_pub_parent(arg1),
-                         "qt.QRegion")
-                   : makeqtype<QRegionType>(
-                         c,
-                         ((MuQt_QColumnView*)arg0)
-                             ->visualRegionForSelection_pub(arg1),
-                         "qt.QRegion");
+                   ? makeqtype<QRegionType>(c, ((MuQt_QColumnView*)arg0)->visualRegionForSelection_pub_parent(arg1), "qt.QRegion")
+                   : makeqtype<QRegionType>(c, ((MuQt_QColumnView*)arg0)->visualRegionForSelection_pub(arg1), "qt.QRegion");
     }
 
-    void qt_QColumnView_keyboardSearch_void_QColumnView_string(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_search)
+    void qt_QColumnView_keyboardSearch_void_QColumnView_string(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_search)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColumnView* arg0 = object<QColumnView>(param_this);
@@ -1353,85 +1254,63 @@ namespace Mu
             arg0->keyboardSearch(arg1);
     }
 
-    int qt_QColumnView_sizeHintForColumn_int_QColumnView_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_column)
+    int qt_QColumnView_sizeHintForColumn_int_QColumnView_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_column)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColumnView* arg0 = object<QColumnView>(param_this);
         int arg1 = (int)(param_column);
-        return isMuQtObject(arg0) ? arg0->QColumnView::sizeHintForColumn(arg1)
-                                  : arg0->sizeHintForColumn(arg1);
+        return isMuQtObject(arg0) ? arg0->QColumnView::sizeHintForColumn(arg1) : arg0->sizeHintForColumn(arg1);
     }
 
-    int qt_QColumnView_sizeHintForRow_int_QColumnView_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_row)
+    int qt_QColumnView_sizeHintForRow_int_QColumnView_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_row)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColumnView* arg0 = object<QColumnView>(param_this);
         int arg1 = (int)(param_row);
-        return isMuQtObject(arg0) ? arg0->QColumnView::sizeHintForRow(arg1)
-                                  : arg0->sizeHintForRow(arg1);
+        return isMuQtObject(arg0) ? arg0->QColumnView::sizeHintForRow(arg1) : arg0->sizeHintForRow(arg1);
     }
 
-    Pointer qt_QColumnView_inputMethodQuery_QVariant_QColumnView_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_query)
+    Pointer qt_QColumnView_inputMethodQuery_QVariant_QColumnView_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_query)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColumnView* arg0 = object<QColumnView>(param_this);
         Qt::InputMethodQuery arg1 = (Qt::InputMethodQuery)(param_query);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QVariantType>(
-                         c, arg0->QColumnView::inputMethodQuery(arg1),
-                         "qt.QVariant")
-                   : makeqtype<QVariantType>(c, arg0->inputMethodQuery(arg1),
-                                             "qt.QVariant");
+        return isMuQtObject(arg0) ? makeqtype<QVariantType>(c, arg0->QColumnView::inputMethodQuery(arg1), "qt.QVariant")
+                                  : makeqtype<QVariantType>(c, arg0->inputMethodQuery(arg1), "qt.QVariant");
     }
 
-    bool qt_QColumnView_edit_bool_QColumnView_QModelIndex_int_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index,
-        int param_trigger, Pointer param_event)
+    bool qt_QColumnView_edit_bool_QColumnView_QModelIndex_int_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index,
+                                                                     int param_trigger, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColumnView* arg0 = object<QColumnView>(param_this);
         const QModelIndex arg1 = getqtype<QModelIndexType>(param_index);
-        QAbstractItemView::EditTrigger arg2 =
-            (QAbstractItemView::EditTrigger)(param_trigger);
+        QAbstractItemView::EditTrigger arg2 = (QAbstractItemView::EditTrigger)(param_trigger);
         QEvent* arg3 = getqpointer<QEventType>(param_event);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QColumnView*)arg0)
-                         ->edit_pub_parent(arg1, arg2, arg3)
-                   : ((MuQt_QColumnView*)arg0)->edit_pub(arg1, arg2, arg3);
+        return isMuQtObject(arg0) ? ((MuQt_QColumnView*)arg0)->edit_pub_parent(arg1, arg2, arg3)
+                                  : ((MuQt_QColumnView*)arg0)->edit_pub(arg1, arg2, arg3);
     }
 
-    Pointer qt_QColumnView_selectedIndexes_qt__QModelIndexBSB_ESB__QColumnView(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QColumnView_selectedIndexes_qt__QModelIndexBSB_ESB__QColumnView(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColumnView* arg0 = object<QColumnView>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqmodelindexlist(c, ((MuQt_QColumnView*)arg0)
-                                                ->selectedIndexes_pub_parent())
-                   : makeqmodelindexlist(
-                         c, ((MuQt_QColumnView*)arg0)->selectedIndexes_pub());
+        return isMuQtObject(arg0) ? makeqmodelindexlist(c, ((MuQt_QColumnView*)arg0)->selectedIndexes_pub_parent())
+                                  : makeqmodelindexlist(c, ((MuQt_QColumnView*)arg0)->selectedIndexes_pub());
     }
 
-    int qt_QColumnView_selectionCommand_int_QColumnView_QModelIndex_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index,
-        Pointer param_event)
+    int qt_QColumnView_selectionCommand_int_QColumnView_QModelIndex_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index,
+                                                                           Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColumnView* arg0 = object<QColumnView>(param_this);
         const QModelIndex arg1 = getqtype<QModelIndexType>(param_index);
         const QEvent* arg2 = getqpointer<QEventType>(param_event);
-        return isMuQtObject(arg0)
-                   ? int(((MuQt_QColumnView*)arg0)
-                             ->selectionCommand_pub_parent(arg1, arg2))
-                   : int(((MuQt_QColumnView*)arg0)
-                             ->selectionCommand_pub(arg1, arg2));
+        return isMuQtObject(arg0) ? int(((MuQt_QColumnView*)arg0)->selectionCommand_pub_parent(arg1, arg2))
+                                  : int(((MuQt_QColumnView*)arg0)->selectionCommand_pub(arg1, arg2));
     }
 
-    void qt_QColumnView_startDrag_void_QColumnView_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_supportedActions)
+    void qt_QColumnView_startDrag_void_QColumnView_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_supportedActions)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColumnView* arg0 = object<QColumnView>(param_this);
@@ -1442,8 +1321,7 @@ namespace Mu
             ((MuQt_QColumnView*)arg0)->startDrag_pub(arg1);
     }
 
-    void qt_QColumnView_dragEnterEvent_void_QColumnView_QDragEnterEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QColumnView_dragEnterEvent_void_QColumnView_QDragEnterEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColumnView* arg0 = object<QColumnView>(param_this);
@@ -1454,8 +1332,7 @@ namespace Mu
             ((MuQt_QColumnView*)arg0)->dragEnterEvent_pub(arg1);
     }
 
-    void qt_QColumnView_dragLeaveEvent_void_QColumnView_QDragLeaveEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QColumnView_dragLeaveEvent_void_QColumnView_QDragLeaveEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColumnView* arg0 = object<QColumnView>(param_this);
@@ -1466,8 +1343,7 @@ namespace Mu
             ((MuQt_QColumnView*)arg0)->dragLeaveEvent_pub(arg1);
     }
 
-    void qt_QColumnView_dragMoveEvent_void_QColumnView_QDragMoveEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QColumnView_dragMoveEvent_void_QColumnView_QDragMoveEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColumnView* arg0 = object<QColumnView>(param_this);
@@ -1478,8 +1354,7 @@ namespace Mu
             ((MuQt_QColumnView*)arg0)->dragMoveEvent_pub(arg1);
     }
 
-    void qt_QColumnView_dropEvent_void_QColumnView_QDropEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QColumnView_dropEvent_void_QColumnView_QDropEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColumnView* arg0 = object<QColumnView>(param_this);
@@ -1490,20 +1365,15 @@ namespace Mu
             ((MuQt_QColumnView*)arg0)->dropEvent_pub(arg1);
     }
 
-    bool qt_QColumnView_event_bool_QColumnView_QEvent(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this,
-                                                      Pointer param_event_)
+    bool qt_QColumnView_event_bool_QColumnView_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event_)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColumnView* arg0 = object<QColumnView>(param_this);
         QEvent* arg1 = getqpointer<QEventType>(param_event_);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QColumnView*)arg0)->event_pub_parent(arg1)
-                   : ((MuQt_QColumnView*)arg0)->event_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QColumnView*)arg0)->event_pub_parent(arg1) : ((MuQt_QColumnView*)arg0)->event_pub(arg1);
     }
 
-    void qt_QColumnView_focusInEvent_void_QColumnView_QFocusEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QColumnView_focusInEvent_void_QColumnView_QFocusEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColumnView* arg0 = object<QColumnView>(param_this);
@@ -1514,20 +1384,16 @@ namespace Mu
             ((MuQt_QColumnView*)arg0)->focusInEvent_pub(arg1);
     }
 
-    bool qt_QColumnView_focusNextPrevChild_bool_QColumnView_bool(
-        Mu::Thread& NODE_THREAD, Pointer param_this, bool param_next)
+    bool qt_QColumnView_focusNextPrevChild_bool_QColumnView_bool(Mu::Thread& NODE_THREAD, Pointer param_this, bool param_next)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColumnView* arg0 = object<QColumnView>(param_this);
         bool arg1 = (bool)(param_next);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QColumnView*)arg0)
-                         ->focusNextPrevChild_pub_parent(arg1)
-                   : ((MuQt_QColumnView*)arg0)->focusNextPrevChild_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QColumnView*)arg0)->focusNextPrevChild_pub_parent(arg1)
+                                  : ((MuQt_QColumnView*)arg0)->focusNextPrevChild_pub(arg1);
     }
 
-    void qt_QColumnView_focusOutEvent_void_QColumnView_QFocusEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QColumnView_focusOutEvent_void_QColumnView_QFocusEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColumnView* arg0 = object<QColumnView>(param_this);
@@ -1538,8 +1404,7 @@ namespace Mu
             ((MuQt_QColumnView*)arg0)->focusOutEvent_pub(arg1);
     }
 
-    void qt_QColumnView_keyPressEvent_void_QColumnView_QKeyEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QColumnView_keyPressEvent_void_QColumnView_QKeyEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColumnView* arg0 = object<QColumnView>(param_this);
@@ -1550,8 +1415,7 @@ namespace Mu
             ((MuQt_QColumnView*)arg0)->keyPressEvent_pub(arg1);
     }
 
-    void qt_QColumnView_mouseDoubleClickEvent_void_QColumnView_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QColumnView_mouseDoubleClickEvent_void_QColumnView_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColumnView* arg0 = object<QColumnView>(param_this);
@@ -1562,8 +1426,7 @@ namespace Mu
             ((MuQt_QColumnView*)arg0)->mouseDoubleClickEvent_pub(arg1);
     }
 
-    void qt_QColumnView_mouseMoveEvent_void_QColumnView_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QColumnView_mouseMoveEvent_void_QColumnView_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColumnView* arg0 = object<QColumnView>(param_this);
@@ -1574,8 +1437,7 @@ namespace Mu
             ((MuQt_QColumnView*)arg0)->mouseMoveEvent_pub(arg1);
     }
 
-    void qt_QColumnView_mousePressEvent_void_QColumnView_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QColumnView_mousePressEvent_void_QColumnView_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColumnView* arg0 = object<QColumnView>(param_this);
@@ -1586,8 +1448,7 @@ namespace Mu
             ((MuQt_QColumnView*)arg0)->mousePressEvent_pub(arg1);
     }
 
-    void qt_QColumnView_mouseReleaseEvent_void_QColumnView_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QColumnView_mouseReleaseEvent_void_QColumnView_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColumnView* arg0 = object<QColumnView>(param_this);
@@ -1598,8 +1459,7 @@ namespace Mu
             ((MuQt_QColumnView*)arg0)->mouseReleaseEvent_pub(arg1);
     }
 
-    void qt_QColumnView_timerEvent_void_QColumnView_QTimerEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QColumnView_timerEvent_void_QColumnView_QTimerEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColumnView* arg0 = object<QColumnView>(param_this);
@@ -1610,313 +1470,255 @@ namespace Mu
             ((MuQt_QColumnView*)arg0)->timerEvent_pub(arg1);
     }
 
-    bool qt_QColumnView_viewportEvent_bool_QColumnView_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    bool qt_QColumnView_viewportEvent_bool_QColumnView_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColumnView* arg0 = object<QColumnView>(param_this);
         QEvent* arg1 = getqpointer<QEventType>(param_event);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QColumnView*)arg0)->viewportEvent_pub_parent(arg1)
-                   : ((MuQt_QColumnView*)arg0)->viewportEvent_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QColumnView*)arg0)->viewportEvent_pub_parent(arg1)
+                                  : ((MuQt_QColumnView*)arg0)->viewportEvent_pub(arg1);
     }
 
-    Pointer
-    qt_QColumnView_viewportSizeHint_QSize_QColumnView(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    Pointer qt_QColumnView_viewportSizeHint_QSize_QColumnView(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColumnView* arg0 = object<QColumnView>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QSizeType>(c,
-                                          ((MuQt_QColumnView*)arg0)
-                                              ->viewportSizeHint_pub_parent(),
-                                          "qt.QSize")
-                   : makeqtype<QSizeType>(
-                         c, ((MuQt_QColumnView*)arg0)->viewportSizeHint_pub(),
-                         "qt.QSize");
+        return isMuQtObject(arg0) ? makeqtype<QSizeType>(c, ((MuQt_QColumnView*)arg0)->viewportSizeHint_pub_parent(), "qt.QSize")
+                                  : makeqtype<QSizeType>(c, ((MuQt_QColumnView*)arg0)->viewportSizeHint_pub(), "qt.QSize");
     }
 
     static NODE_IMPLEMENTATION(_n_QColumnView0, Pointer)
     {
-        NODE_RETURN(qt_QColumnView_QColumnView_QColumnView_QColumnView_QWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(
+            qt_QColumnView_QColumnView_QColumnView_QColumnView_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_previewWidget0, Pointer)
     {
-        NODE_RETURN(qt_QColumnView_previewWidget_QWidget_QColumnView(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QColumnView_previewWidget_QWidget_QColumnView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_setPreviewWidget0, void)
     {
-        qt_QColumnView_setPreviewWidget_void_QColumnView_QWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QColumnView_setPreviewWidget_void_QColumnView_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_indexAt0, Pointer)
     {
-        NODE_RETURN(qt_QColumnView_indexAt_QModelIndex_QColumnView_QPoint(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QColumnView_indexAt_QModelIndex_QColumnView_QPoint(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
-    static NODE_IMPLEMENTATION(_n_selectAll0, void)
-    {
-        qt_QColumnView_selectAll_void_QColumnView(NODE_THREAD,
-                                                  NONNIL_NODE_ARG(0, Pointer));
-    }
+    static NODE_IMPLEMENTATION(_n_selectAll0, void) { qt_QColumnView_selectAll_void_QColumnView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)); }
 
     static NODE_IMPLEMENTATION(_n_setModel0, void)
     {
-        qt_QColumnView_setModel_void_QColumnView_QAbstractItemModel(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QColumnView_setModel_void_QColumnView_QAbstractItemModel(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setRootIndex0, void)
     {
-        qt_QColumnView_setRootIndex_void_QColumnView_QModelIndex(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QColumnView_setRootIndex_void_QColumnView_QModelIndex(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setSelectionModel0, void)
     {
-        qt_QColumnView_setSelectionModel_void_QColumnView_QItemSelectionModel(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QColumnView_setSelectionModel_void_QColumnView_QItemSelectionModel(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                              NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_sizeHint0, Pointer)
     {
-        NODE_RETURN(qt_QColumnView_sizeHint_QSize_QColumnView(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QColumnView_sizeHint_QSize_QColumnView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_visualRect0, Pointer)
     {
-        NODE_RETURN(qt_QColumnView_visualRect_QRect_QColumnView_QModelIndex(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(
+            qt_QColumnView_visualRect_QRect_QColumnView_QModelIndex(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_createColumn0, Pointer)
     {
-        NODE_RETURN(
-            qt_QColumnView_createColumn_QAbstractItemView_QColumnView_QModelIndex(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QColumnView_createColumn_QAbstractItemView_QColumnView_QModelIndex(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                          NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_initializeColumn0, void)
     {
-        qt_QColumnView_initializeColumn_void_QColumnView_QAbstractItemView(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QColumnView_initializeColumn_void_QColumnView_QAbstractItemView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_currentChanged0, void)
     {
-        qt_QColumnView_currentChanged_void_QColumnView_QModelIndex_QModelIndex(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer));
+        qt_QColumnView_currentChanged_void_QColumnView_QModelIndex_QModelIndex(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                               NODE_ARG(1, Pointer), NODE_ARG(2, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_horizontalOffset0, int)
     {
-        NODE_RETURN(qt_QColumnView_horizontalOffset_int_QColumnView(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QColumnView_horizontalOffset_int_QColumnView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isIndexHidden0, bool)
     {
-        NODE_RETURN(qt_QColumnView_isIndexHidden_bool_QColumnView_QModelIndex(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(
+            qt_QColumnView_isIndexHidden_bool_QColumnView_QModelIndex(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_resizeEvent0, void)
     {
-        qt_QColumnView_resizeEvent_void_QColumnView_QResizeEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QColumnView_resizeEvent_void_QColumnView_QResizeEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_rowsInserted0, void)
     {
-        qt_QColumnView_rowsInserted_void_QColumnView_QModelIndex_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int), NODE_ARG(3, int));
+        qt_QColumnView_rowsInserted_void_QColumnView_QModelIndex_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                         NODE_ARG(2, int), NODE_ARG(3, int));
     }
 
     static NODE_IMPLEMENTATION(_n_scrollContentsBy0, void)
     {
-        qt_QColumnView_scrollContentsBy_void_QColumnView_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int));
+        qt_QColumnView_scrollContentsBy_void_QColumnView_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                 NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setSelection0, void)
     {
-        qt_QColumnView_setSelection_void_QColumnView_QRect_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int));
+        qt_QColumnView_setSelection_void_QColumnView_QRect_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                               NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_verticalOffset0, int)
     {
-        NODE_RETURN(qt_QColumnView_verticalOffset_int_QColumnView(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QColumnView_verticalOffset_int_QColumnView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_visualRegionForSelection0, Pointer)
     {
-        NODE_RETURN(
-            qt_QColumnView_visualRegionForSelection_QRegion_QColumnView_QItemSelection(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QColumnView_visualRegionForSelection_QRegion_QColumnView_QItemSelection(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                               NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_keyboardSearch0, void)
     {
-        qt_QColumnView_keyboardSearch_void_QColumnView_string(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QColumnView_keyboardSearch_void_QColumnView_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_sizeHintForColumn0, int)
     {
-        NODE_RETURN(qt_QColumnView_sizeHintForColumn_int_QColumnView_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QColumnView_sizeHintForColumn_int_QColumnView_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_sizeHintForRow0, int)
     {
-        NODE_RETURN(qt_QColumnView_sizeHintForRow_int_QColumnView_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QColumnView_sizeHintForRow_int_QColumnView_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_inputMethodQuery0, Pointer)
     {
-        NODE_RETURN(qt_QColumnView_inputMethodQuery_QVariant_QColumnView_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QColumnView_inputMethodQuery_QVariant_QColumnView_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_edit0, bool)
     {
         NODE_RETURN(qt_QColumnView_edit_bool_QColumnView_QModelIndex_int_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int), NODE_ARG(3, Pointer)));
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, int), NODE_ARG(3, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_selectedIndexes0, Pointer)
     {
-        NODE_RETURN(
-            qt_QColumnView_selectedIndexes_qt__QModelIndexBSB_ESB__QColumnView(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QColumnView_selectedIndexes_qt__QModelIndexBSB_ESB__QColumnView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_selectionCommand0, int)
     {
-        NODE_RETURN(
-            qt_QColumnView_selectionCommand_int_QColumnView_QModelIndex_QEvent(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QColumnView_selectionCommand_int_QColumnView_QModelIndex_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                       NODE_ARG(1, Pointer), NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_startDrag0, void)
     {
-        qt_QColumnView_startDrag_void_QColumnView_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QColumnView_startDrag_void_QColumnView_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_dragEnterEvent0, void)
     {
-        qt_QColumnView_dragEnterEvent_void_QColumnView_QDragEnterEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QColumnView_dragEnterEvent_void_QColumnView_QDragEnterEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_dragLeaveEvent0, void)
     {
-        qt_QColumnView_dragLeaveEvent_void_QColumnView_QDragLeaveEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QColumnView_dragLeaveEvent_void_QColumnView_QDragLeaveEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_dragMoveEvent0, void)
     {
-        qt_QColumnView_dragMoveEvent_void_QColumnView_QDragMoveEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QColumnView_dragMoveEvent_void_QColumnView_QDragMoveEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_dropEvent0, void)
     {
-        qt_QColumnView_dropEvent_void_QColumnView_QDropEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QColumnView_dropEvent_void_QColumnView_QDropEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_event0, bool)
     {
-        NODE_RETURN(qt_QColumnView_event_bool_QColumnView_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QColumnView_event_bool_QColumnView_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_focusInEvent0, void)
     {
-        qt_QColumnView_focusInEvent_void_QColumnView_QFocusEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QColumnView_focusInEvent_void_QColumnView_QFocusEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_focusNextPrevChild0, bool)
     {
-        NODE_RETURN(qt_QColumnView_focusNextPrevChild_bool_QColumnView_bool(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool)));
+        NODE_RETURN(qt_QColumnView_focusNextPrevChild_bool_QColumnView_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool)));
     }
 
     static NODE_IMPLEMENTATION(_n_focusOutEvent0, void)
     {
-        qt_QColumnView_focusOutEvent_void_QColumnView_QFocusEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QColumnView_focusOutEvent_void_QColumnView_QFocusEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_keyPressEvent0, void)
     {
-        qt_QColumnView_keyPressEvent_void_QColumnView_QKeyEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QColumnView_keyPressEvent_void_QColumnView_QKeyEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseDoubleClickEvent0, void)
     {
-        qt_QColumnView_mouseDoubleClickEvent_void_QColumnView_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QColumnView_mouseDoubleClickEvent_void_QColumnView_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseMoveEvent0, void)
     {
-        qt_QColumnView_mouseMoveEvent_void_QColumnView_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QColumnView_mouseMoveEvent_void_QColumnView_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mousePressEvent0, void)
     {
-        qt_QColumnView_mousePressEvent_void_QColumnView_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QColumnView_mousePressEvent_void_QColumnView_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseReleaseEvent0, void)
     {
-        qt_QColumnView_mouseReleaseEvent_void_QColumnView_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QColumnView_mouseReleaseEvent_void_QColumnView_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_timerEvent0, void)
     {
-        qt_QColumnView_timerEvent_void_QColumnView_QTimerEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QColumnView_timerEvent_void_QColumnView_QTimerEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_viewportEvent0, bool)
     {
-        NODE_RETURN(qt_QColumnView_viewportEvent_bool_QColumnView_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QColumnView_viewportEvent_bool_QColumnView_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_viewportSizeHint0, Pointer)
     {
-        NODE_RETURN(qt_QColumnView_viewportSizeHint_QSize_QColumnView(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QColumnView_viewportSizeHint_QSize_QColumnView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     void QColumnViewType::load()
@@ -1936,17 +1738,13 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
-                   new Function(c, tn, castFromObject, Cast, Compiled,
-                                QColumnView_QColumnView_QObject, Return, ftn,
-                                Parameters,
+                   new Function(c, tn, castFromObject, Cast, Compiled, QColumnView_QColumnView_QObject, Return, ftn, Parameters,
                                 new Param(c, "object", "qt.QObject"), End),
 
                    EndArguments);
@@ -1954,276 +1752,161 @@ namespace Mu
         addSymbols(
             // enums
             // member functions
-            new Function(
-                c, "QColumnView", _n_QColumnView0, None, Compiled,
-                qt_QColumnView_QColumnView_QColumnView_QColumnView_QWidget,
-                Return, "qt.QColumnView", Parameters,
-                new Param(c, "this", "qt.QColumnView"),
-                new Param(c, "parent", "qt.QWidget"), End),
+            new Function(c, "QColumnView", _n_QColumnView0, None, Compiled, qt_QColumnView_QColumnView_QColumnView_QColumnView_QWidget,
+                         Return, "qt.QColumnView", Parameters, new Param(c, "this", "qt.QColumnView"), new Param(c, "parent", "qt.QWidget"),
+                         End),
             // MISSING: columnWidths ("QList<int>"; QColumnView this)
-            new Function(c, "previewWidget", _n_previewWidget0, None, Compiled,
-                         qt_QColumnView_previewWidget_QWidget_QColumnView,
-                         Return, "qt.QWidget", Parameters,
-                         new Param(c, "this", "qt.QColumnView"), End),
+            new Function(c, "previewWidget", _n_previewWidget0, None, Compiled, qt_QColumnView_previewWidget_QWidget_QColumnView, Return,
+                         "qt.QWidget", Parameters, new Param(c, "this", "qt.QColumnView"), End),
             // PROP: resizeGripsVisible (bool; QColumnView this)
             // MISSING: setColumnWidths (void; QColumnView this, "const
             // QList<int> &" list)
-            new Function(
-                c, "setPreviewWidget", _n_setPreviewWidget0, None, Compiled,
-                qt_QColumnView_setPreviewWidget_void_QColumnView_QWidget,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QColumnView"),
-                new Param(c, "widget", "qt.QWidget"), End),
+            new Function(c, "setPreviewWidget", _n_setPreviewWidget0, None, Compiled,
+                         qt_QColumnView_setPreviewWidget_void_QColumnView_QWidget, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QColumnView"), new Param(c, "widget", "qt.QWidget"), End),
             // PROP: setResizeGripsVisible (void; QColumnView this, bool
             // visible)
-            _func[0] = new MemberFunction(
-                c, "indexAt", _n_indexAt0, None, Compiled,
-                qt_QColumnView_indexAt_QModelIndex_QColumnView_QPoint, Return,
-                "qt.QModelIndex", Parameters,
-                new Param(c, "this", "qt.QColumnView"),
-                new Param(c, "point", "qt.QPoint"), End),
+            _func[0] = new MemberFunction(c, "indexAt", _n_indexAt0, None, Compiled, qt_QColumnView_indexAt_QModelIndex_QColumnView_QPoint,
+                                          Return, "qt.QModelIndex", Parameters, new Param(c, "this", "qt.QColumnView"),
+                                          new Param(c, "point", "qt.QPoint"), End),
             // MISSING: scrollTo (void; QColumnView this, QModelIndex index,
             // "ScrollHint" hint)
-            _func[1] = new MemberFunction(
-                c, "selectAll", _n_selectAll0, None, Compiled,
-                qt_QColumnView_selectAll_void_QColumnView, Return, "void",
-                Parameters, new Param(c, "this", "qt.QColumnView"), End),
-            _func[2] = new MemberFunction(
-                c, "setModel", _n_setModel0, None, Compiled,
-                qt_QColumnView_setModel_void_QColumnView_QAbstractItemModel,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QColumnView"),
-                new Param(c, "model", "qt.QAbstractItemModel"), End),
-            _func[3] = new MemberFunction(
-                c, "setRootIndex", _n_setRootIndex0, None, Compiled,
-                qt_QColumnView_setRootIndex_void_QColumnView_QModelIndex,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QColumnView"),
-                new Param(c, "index", "qt.QModelIndex"), End),
-            _func[4] = new MemberFunction(
-                c, "setSelectionModel", _n_setSelectionModel0, None, Compiled,
-                qt_QColumnView_setSelectionModel_void_QColumnView_QItemSelectionModel,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QColumnView"),
-                new Param(c, "newSelectionModel", "qt.QItemSelectionModel"),
-                End),
-            _func[5] = new MemberFunction(
-                c, "sizeHint", _n_sizeHint0, None, Compiled,
-                qt_QColumnView_sizeHint_QSize_QColumnView, Return, "qt.QSize",
-                Parameters, new Param(c, "this", "qt.QColumnView"), End),
-            _func[6] = new MemberFunction(
-                c, "visualRect", _n_visualRect0, None, Compiled,
-                qt_QColumnView_visualRect_QRect_QColumnView_QModelIndex, Return,
-                "qt.QRect", Parameters, new Param(c, "this", "qt.QColumnView"),
-                new Param(c, "index", "qt.QModelIndex"), End),
-            _func[7] = new MemberFunction(
-                c, "createColumn", _n_createColumn0, None, Compiled,
-                qt_QColumnView_createColumn_QAbstractItemView_QColumnView_QModelIndex,
-                Return, "qt.QAbstractItemView", Parameters,
-                new Param(c, "this", "qt.QColumnView"),
-                new Param(c, "index", "qt.QModelIndex"), End),
-            new Function(
-                c, "initializeColumn", _n_initializeColumn0, None, Compiled,
-                qt_QColumnView_initializeColumn_void_QColumnView_QAbstractItemView,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QColumnView"),
-                new Param(c, "column", "qt.QAbstractItemView"), End),
-            _func[8] = new MemberFunction(
-                c, "currentChanged", _n_currentChanged0, None, Compiled,
-                qt_QColumnView_currentChanged_void_QColumnView_QModelIndex_QModelIndex,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QColumnView"),
-                new Param(c, "current", "qt.QModelIndex"),
-                new Param(c, "previous", "qt.QModelIndex"), End),
-            _func[9] = new MemberFunction(
-                c, "horizontalOffset", _n_horizontalOffset0, None, Compiled,
-                qt_QColumnView_horizontalOffset_int_QColumnView, Return, "int",
-                Parameters, new Param(c, "this", "qt.QColumnView"), End),
-            _func[10] = new MemberFunction(
-                c, "isIndexHidden", _n_isIndexHidden0, None, Compiled,
-                qt_QColumnView_isIndexHidden_bool_QColumnView_QModelIndex,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QColumnView"),
-                new Param(c, "index", "qt.QModelIndex"), End),
+            _func[1] = new MemberFunction(c, "selectAll", _n_selectAll0, None, Compiled, qt_QColumnView_selectAll_void_QColumnView, Return,
+                                          "void", Parameters, new Param(c, "this", "qt.QColumnView"), End),
+            _func[2] = new MemberFunction(c, "setModel", _n_setModel0, None, Compiled,
+                                          qt_QColumnView_setModel_void_QColumnView_QAbstractItemModel, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QColumnView"), new Param(c, "model", "qt.QAbstractItemModel"), End),
+            _func[3] = new MemberFunction(c, "setRootIndex", _n_setRootIndex0, None, Compiled,
+                                          qt_QColumnView_setRootIndex_void_QColumnView_QModelIndex, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QColumnView"), new Param(c, "index", "qt.QModelIndex"), End),
+            _func[4] = new MemberFunction(c, "setSelectionModel", _n_setSelectionModel0, None, Compiled,
+                                          qt_QColumnView_setSelectionModel_void_QColumnView_QItemSelectionModel, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QColumnView"),
+                                          new Param(c, "newSelectionModel", "qt.QItemSelectionModel"), End),
+            _func[5] = new MemberFunction(c, "sizeHint", _n_sizeHint0, None, Compiled, qt_QColumnView_sizeHint_QSize_QColumnView, Return,
+                                          "qt.QSize", Parameters, new Param(c, "this", "qt.QColumnView"), End),
+            _func[6] = new MemberFunction(c, "visualRect", _n_visualRect0, None, Compiled,
+                                          qt_QColumnView_visualRect_QRect_QColumnView_QModelIndex, Return, "qt.QRect", Parameters,
+                                          new Param(c, "this", "qt.QColumnView"), new Param(c, "index", "qt.QModelIndex"), End),
+            _func[7] =
+                new MemberFunction(c, "createColumn", _n_createColumn0, None, Compiled,
+                                   qt_QColumnView_createColumn_QAbstractItemView_QColumnView_QModelIndex, Return, "qt.QAbstractItemView",
+                                   Parameters, new Param(c, "this", "qt.QColumnView"), new Param(c, "index", "qt.QModelIndex"), End),
+            new Function(c, "initializeColumn", _n_initializeColumn0, None, Compiled,
+                         qt_QColumnView_initializeColumn_void_QColumnView_QAbstractItemView, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QColumnView"), new Param(c, "column", "qt.QAbstractItemView"), End),
+            _func[8] = new MemberFunction(c, "currentChanged", _n_currentChanged0, None, Compiled,
+                                          qt_QColumnView_currentChanged_void_QColumnView_QModelIndex_QModelIndex, Return, "void",
+                                          Parameters, new Param(c, "this", "qt.QColumnView"), new Param(c, "current", "qt.QModelIndex"),
+                                          new Param(c, "previous", "qt.QModelIndex"), End),
+            _func[9] = new MemberFunction(c, "horizontalOffset", _n_horizontalOffset0, None, Compiled,
+                                          qt_QColumnView_horizontalOffset_int_QColumnView, Return, "int", Parameters,
+                                          new Param(c, "this", "qt.QColumnView"), End),
+            _func[10] = new MemberFunction(c, "isIndexHidden", _n_isIndexHidden0, None, Compiled,
+                                           qt_QColumnView_isIndexHidden_bool_QColumnView_QModelIndex, Return, "bool", Parameters,
+                                           new Param(c, "this", "qt.QColumnView"), new Param(c, "index", "qt.QModelIndex"), End),
             // MISSING: moveCursor (QModelIndex; QColumnView this,
             // "CursorAction" cursorAction, flags Qt::KeyboardModifiers
             // modifiers) // protected
-            _func[11] = new MemberFunction(
-                c, "resizeEvent", _n_resizeEvent0, None, Compiled,
-                qt_QColumnView_resizeEvent_void_QColumnView_QResizeEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QColumnView"),
-                new Param(c, "event", "qt.QResizeEvent"), End),
-            _func[12] = new MemberFunction(
-                c, "rowsInserted", _n_rowsInserted0, None, Compiled,
-                qt_QColumnView_rowsInserted_void_QColumnView_QModelIndex_int_int,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QColumnView"),
-                new Param(c, "parent", "qt.QModelIndex"),
-                new Param(c, "start", "int"), new Param(c, "end", "int"), End),
-            _func[13] = new MemberFunction(
-                c, "scrollContentsBy", _n_scrollContentsBy0, None, Compiled,
-                qt_QColumnView_scrollContentsBy_void_QColumnView_int_int,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QColumnView"),
-                new Param(c, "dx", "int"), new Param(c, "dy", "int"), End),
+            _func[11] = new MemberFunction(c, "resizeEvent", _n_resizeEvent0, None, Compiled,
+                                           qt_QColumnView_resizeEvent_void_QColumnView_QResizeEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QColumnView"), new Param(c, "event", "qt.QResizeEvent"), End),
+            _func[12] = new MemberFunction(c, "rowsInserted", _n_rowsInserted0, None, Compiled,
+                                           qt_QColumnView_rowsInserted_void_QColumnView_QModelIndex_int_int, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QColumnView"), new Param(c, "parent", "qt.QModelIndex"),
+                                           new Param(c, "start", "int"), new Param(c, "end", "int"), End),
+            _func[13] =
+                new MemberFunction(c, "scrollContentsBy", _n_scrollContentsBy0, None, Compiled,
+                                   qt_QColumnView_scrollContentsBy_void_QColumnView_int_int, Return, "void", Parameters,
+                                   new Param(c, "this", "qt.QColumnView"), new Param(c, "dx", "int"), new Param(c, "dy", "int"), End),
             _func[14] = new MemberFunction(
-                c, "setSelection", _n_setSelection0, None, Compiled,
-                qt_QColumnView_setSelection_void_QColumnView_QRect_int, Return,
-                "void", Parameters, new Param(c, "this", "qt.QColumnView"),
-                new Param(c, "rect", "qt.QRect"),
-                new Param(c, "command", "int"), End),
-            _func[15] = new MemberFunction(
-                c, "verticalOffset", _n_verticalOffset0, None, Compiled,
-                qt_QColumnView_verticalOffset_int_QColumnView, Return, "int",
-                Parameters, new Param(c, "this", "qt.QColumnView"), End),
-            _func[16] = new MemberFunction(
-                c, "visualRegionForSelection", _n_visualRegionForSelection0,
-                None, Compiled,
-                qt_QColumnView_visualRegionForSelection_QRegion_QColumnView_QItemSelection,
-                Return, "qt.QRegion", Parameters,
-                new Param(c, "this", "qt.QColumnView"),
-                new Param(c, "selection", "qt.QItemSelection"), End),
-            _func[17] = new MemberFunction(
-                c, "keyboardSearch", _n_keyboardSearch0, None, Compiled,
-                qt_QColumnView_keyboardSearch_void_QColumnView_string, Return,
-                "void", Parameters, new Param(c, "this", "qt.QColumnView"),
-                new Param(c, "search", "string"), End),
-            _func[18] = new MemberFunction(
-                c, "sizeHintForColumn", _n_sizeHintForColumn0, None, Compiled,
-                qt_QColumnView_sizeHintForColumn_int_QColumnView_int, Return,
-                "int", Parameters, new Param(c, "this", "qt.QColumnView"),
-                new Param(c, "column", "int"), End),
-            _func[19] = new MemberFunction(
-                c, "sizeHintForRow", _n_sizeHintForRow0, None, Compiled,
-                qt_QColumnView_sizeHintForRow_int_QColumnView_int, Return,
-                "int", Parameters, new Param(c, "this", "qt.QColumnView"),
-                new Param(c, "row", "int"), End),
-            _func[20] = new MemberFunction(
-                c, "inputMethodQuery", _n_inputMethodQuery0, None, Compiled,
-                qt_QColumnView_inputMethodQuery_QVariant_QColumnView_int,
-                Return, "qt.QVariant", Parameters,
-                new Param(c, "this", "qt.QColumnView"),
-                new Param(c, "query", "int"), End),
-            _func[21] = new MemberFunction(
-                c, "edit", _n_edit0, None, Compiled,
-                qt_QColumnView_edit_bool_QColumnView_QModelIndex_int_QEvent,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QColumnView"),
-                new Param(c, "index", "qt.QModelIndex"),
-                new Param(c, "trigger", "int"),
-                new Param(c, "event", "qt.QEvent"), End),
-            _func[22] = new MemberFunction(
-                c, "selectedIndexes", _n_selectedIndexes0, None, Compiled,
-                qt_QColumnView_selectedIndexes_qt__QModelIndexBSB_ESB__QColumnView,
-                Return, "qt.QModelIndex[]", Parameters,
-                new Param(c, "this", "qt.QColumnView"), End),
-            _func[23] = new MemberFunction(
-                c, "selectionCommand", _n_selectionCommand0, None, Compiled,
-                qt_QColumnView_selectionCommand_int_QColumnView_QModelIndex_QEvent,
-                Return, "int", Parameters,
-                new Param(c, "this", "qt.QColumnView"),
-                new Param(c, "index", "qt.QModelIndex"),
-                new Param(c, "event", "qt.QEvent"), End),
-            _func[24] = new MemberFunction(
-                c, "startDrag", _n_startDrag0, None, Compiled,
-                qt_QColumnView_startDrag_void_QColumnView_int, Return, "void",
-                Parameters, new Param(c, "this", "qt.QColumnView"),
-                new Param(c, "supportedActions", "int"), End),
+                c, "setSelection", _n_setSelection0, None, Compiled, qt_QColumnView_setSelection_void_QColumnView_QRect_int, Return, "void",
+                Parameters, new Param(c, "this", "qt.QColumnView"), new Param(c, "rect", "qt.QRect"), new Param(c, "command", "int"), End),
+            _func[15] =
+                new MemberFunction(c, "verticalOffset", _n_verticalOffset0, None, Compiled, qt_QColumnView_verticalOffset_int_QColumnView,
+                                   Return, "int", Parameters, new Param(c, "this", "qt.QColumnView"), End),
+            _func[16] =
+                new MemberFunction(c, "visualRegionForSelection", _n_visualRegionForSelection0, None, Compiled,
+                                   qt_QColumnView_visualRegionForSelection_QRegion_QColumnView_QItemSelection, Return, "qt.QRegion",
+                                   Parameters, new Param(c, "this", "qt.QColumnView"), new Param(c, "selection", "qt.QItemSelection"), End),
+            _func[17] = new MemberFunction(c, "keyboardSearch", _n_keyboardSearch0, None, Compiled,
+                                           qt_QColumnView_keyboardSearch_void_QColumnView_string, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QColumnView"), new Param(c, "search", "string"), End),
+            _func[18] = new MemberFunction(c, "sizeHintForColumn", _n_sizeHintForColumn0, None, Compiled,
+                                           qt_QColumnView_sizeHintForColumn_int_QColumnView_int, Return, "int", Parameters,
+                                           new Param(c, "this", "qt.QColumnView"), new Param(c, "column", "int"), End),
+            _func[19] = new MemberFunction(c, "sizeHintForRow", _n_sizeHintForRow0, None, Compiled,
+                                           qt_QColumnView_sizeHintForRow_int_QColumnView_int, Return, "int", Parameters,
+                                           new Param(c, "this", "qt.QColumnView"), new Param(c, "row", "int"), End),
+            _func[20] = new MemberFunction(c, "inputMethodQuery", _n_inputMethodQuery0, None, Compiled,
+                                           qt_QColumnView_inputMethodQuery_QVariant_QColumnView_int, Return, "qt.QVariant", Parameters,
+                                           new Param(c, "this", "qt.QColumnView"), new Param(c, "query", "int"), End),
+            _func[21] =
+                new MemberFunction(c, "edit", _n_edit0, None, Compiled, qt_QColumnView_edit_bool_QColumnView_QModelIndex_int_QEvent, Return,
+                                   "bool", Parameters, new Param(c, "this", "qt.QColumnView"), new Param(c, "index", "qt.QModelIndex"),
+                                   new Param(c, "trigger", "int"), new Param(c, "event", "qt.QEvent"), End),
+            _func[22] = new MemberFunction(c, "selectedIndexes", _n_selectedIndexes0, None, Compiled,
+                                           qt_QColumnView_selectedIndexes_qt__QModelIndexBSB_ESB__QColumnView, Return, "qt.QModelIndex[]",
+                                           Parameters, new Param(c, "this", "qt.QColumnView"), End),
+            _func[23] = new MemberFunction(c, "selectionCommand", _n_selectionCommand0, None, Compiled,
+                                           qt_QColumnView_selectionCommand_int_QColumnView_QModelIndex_QEvent, Return, "int", Parameters,
+                                           new Param(c, "this", "qt.QColumnView"), new Param(c, "index", "qt.QModelIndex"),
+                                           new Param(c, "event", "qt.QEvent"), End),
+            _func[24] = new MemberFunction(c, "startDrag", _n_startDrag0, None, Compiled, qt_QColumnView_startDrag_void_QColumnView_int,
+                                           Return, "void", Parameters, new Param(c, "this", "qt.QColumnView"),
+                                           new Param(c, "supportedActions", "int"), End),
             // MISSING: viewOptions ("QStyleOptionViewItem"; QColumnView this)
             // // protected
-            _func[25] = new MemberFunction(
-                c, "dragEnterEvent", _n_dragEnterEvent0, None, Compiled,
-                qt_QColumnView_dragEnterEvent_void_QColumnView_QDragEnterEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QColumnView"),
-                new Param(c, "event", "qt.QDragEnterEvent"), End),
-            _func[26] = new MemberFunction(
-                c, "dragLeaveEvent", _n_dragLeaveEvent0, None, Compiled,
-                qt_QColumnView_dragLeaveEvent_void_QColumnView_QDragLeaveEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QColumnView"),
-                new Param(c, "event", "qt.QDragLeaveEvent"), End),
-            _func[27] = new MemberFunction(
-                c, "dragMoveEvent", _n_dragMoveEvent0, None, Compiled,
-                qt_QColumnView_dragMoveEvent_void_QColumnView_QDragMoveEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QColumnView"),
-                new Param(c, "event", "qt.QDragMoveEvent"), End),
-            _func[28] = new MemberFunction(
-                c, "dropEvent", _n_dropEvent0, None, Compiled,
-                qt_QColumnView_dropEvent_void_QColumnView_QDropEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QColumnView"),
-                new Param(c, "event", "qt.QDropEvent"), End),
-            _func[29] = new MemberFunction(
-                c, "event", _n_event0, None, Compiled,
-                qt_QColumnView_event_bool_QColumnView_QEvent, Return, "bool",
-                Parameters, new Param(c, "this", "qt.QColumnView"),
-                new Param(c, "event_", "qt.QEvent"), End),
-            _func[30] = new MemberFunction(
-                c, "focusInEvent", _n_focusInEvent0, None, Compiled,
-                qt_QColumnView_focusInEvent_void_QColumnView_QFocusEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QColumnView"),
-                new Param(c, "event", "qt.QFocusEvent"), End),
-            _func[31] = new MemberFunction(
-                c, "focusNextPrevChild", _n_focusNextPrevChild0, None, Compiled,
-                qt_QColumnView_focusNextPrevChild_bool_QColumnView_bool, Return,
-                "bool", Parameters, new Param(c, "this", "qt.QColumnView"),
-                new Param(c, "next", "bool"), End),
-            _func[32] = new MemberFunction(
-                c, "focusOutEvent", _n_focusOutEvent0, None, Compiled,
-                qt_QColumnView_focusOutEvent_void_QColumnView_QFocusEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QColumnView"),
-                new Param(c, "event", "qt.QFocusEvent"), End),
+            _func[25] = new MemberFunction(c, "dragEnterEvent", _n_dragEnterEvent0, None, Compiled,
+                                           qt_QColumnView_dragEnterEvent_void_QColumnView_QDragEnterEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QColumnView"), new Param(c, "event", "qt.QDragEnterEvent"), End),
+            _func[26] = new MemberFunction(c, "dragLeaveEvent", _n_dragLeaveEvent0, None, Compiled,
+                                           qt_QColumnView_dragLeaveEvent_void_QColumnView_QDragLeaveEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QColumnView"), new Param(c, "event", "qt.QDragLeaveEvent"), End),
+            _func[27] = new MemberFunction(c, "dragMoveEvent", _n_dragMoveEvent0, None, Compiled,
+                                           qt_QColumnView_dragMoveEvent_void_QColumnView_QDragMoveEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QColumnView"), new Param(c, "event", "qt.QDragMoveEvent"), End),
+            _func[28] = new MemberFunction(c, "dropEvent", _n_dropEvent0, None, Compiled,
+                                           qt_QColumnView_dropEvent_void_QColumnView_QDropEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QColumnView"), new Param(c, "event", "qt.QDropEvent"), End),
+            _func[29] =
+                new MemberFunction(c, "event", _n_event0, None, Compiled, qt_QColumnView_event_bool_QColumnView_QEvent, Return, "bool",
+                                   Parameters, new Param(c, "this", "qt.QColumnView"), new Param(c, "event_", "qt.QEvent"), End),
+            _func[30] = new MemberFunction(c, "focusInEvent", _n_focusInEvent0, None, Compiled,
+                                           qt_QColumnView_focusInEvent_void_QColumnView_QFocusEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QColumnView"), new Param(c, "event", "qt.QFocusEvent"), End),
+            _func[31] = new MemberFunction(c, "focusNextPrevChild", _n_focusNextPrevChild0, None, Compiled,
+                                           qt_QColumnView_focusNextPrevChild_bool_QColumnView_bool, Return, "bool", Parameters,
+                                           new Param(c, "this", "qt.QColumnView"), new Param(c, "next", "bool"), End),
+            _func[32] = new MemberFunction(c, "focusOutEvent", _n_focusOutEvent0, None, Compiled,
+                                           qt_QColumnView_focusOutEvent_void_QColumnView_QFocusEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QColumnView"), new Param(c, "event", "qt.QFocusEvent"), End),
             // MISSING: inputMethodEvent (void; QColumnView this,
             // "QInputMethodEvent *" event) // protected
-            _func[33] = new MemberFunction(
-                c, "keyPressEvent", _n_keyPressEvent0, None, Compiled,
-                qt_QColumnView_keyPressEvent_void_QColumnView_QKeyEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QColumnView"),
-                new Param(c, "event", "qt.QKeyEvent"), End),
-            _func[34] = new MemberFunction(
-                c, "mouseDoubleClickEvent", _n_mouseDoubleClickEvent0, None,
-                Compiled,
-                qt_QColumnView_mouseDoubleClickEvent_void_QColumnView_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QColumnView"),
-                new Param(c, "event", "qt.QMouseEvent"), End),
-            _func[35] = new MemberFunction(
-                c, "mouseMoveEvent", _n_mouseMoveEvent0, None, Compiled,
-                qt_QColumnView_mouseMoveEvent_void_QColumnView_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QColumnView"),
-                new Param(c, "event", "qt.QMouseEvent"), End),
-            _func[36] = new MemberFunction(
-                c, "mousePressEvent", _n_mousePressEvent0, None, Compiled,
-                qt_QColumnView_mousePressEvent_void_QColumnView_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QColumnView"),
-                new Param(c, "event", "qt.QMouseEvent"), End),
-            _func[37] = new MemberFunction(
-                c, "mouseReleaseEvent", _n_mouseReleaseEvent0, None, Compiled,
-                qt_QColumnView_mouseReleaseEvent_void_QColumnView_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QColumnView"),
-                new Param(c, "event", "qt.QMouseEvent"), End),
-            _func[38] = new MemberFunction(
-                c, "timerEvent", _n_timerEvent0, None, Compiled,
-                qt_QColumnView_timerEvent_void_QColumnView_QTimerEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QColumnView"),
-                new Param(c, "event", "qt.QTimerEvent"), End),
-            _func[39] = new MemberFunction(
-                c, "viewportEvent", _n_viewportEvent0, None, Compiled,
-                qt_QColumnView_viewportEvent_bool_QColumnView_QEvent, Return,
-                "bool", Parameters, new Param(c, "this", "qt.QColumnView"),
-                new Param(c, "event", "qt.QEvent"), End),
-            _func[40] = new MemberFunction(
-                c, "viewportSizeHint", _n_viewportSizeHint0, None, Compiled,
-                qt_QColumnView_viewportSizeHint_QSize_QColumnView, Return,
-                "qt.QSize", Parameters, new Param(c, "this", "qt.QColumnView"),
-                End),
+            _func[33] = new MemberFunction(c, "keyPressEvent", _n_keyPressEvent0, None, Compiled,
+                                           qt_QColumnView_keyPressEvent_void_QColumnView_QKeyEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QColumnView"), new Param(c, "event", "qt.QKeyEvent"), End),
+            _func[34] = new MemberFunction(c, "mouseDoubleClickEvent", _n_mouseDoubleClickEvent0, None, Compiled,
+                                           qt_QColumnView_mouseDoubleClickEvent_void_QColumnView_QMouseEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QColumnView"), new Param(c, "event", "qt.QMouseEvent"), End),
+            _func[35] = new MemberFunction(c, "mouseMoveEvent", _n_mouseMoveEvent0, None, Compiled,
+                                           qt_QColumnView_mouseMoveEvent_void_QColumnView_QMouseEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QColumnView"), new Param(c, "event", "qt.QMouseEvent"), End),
+            _func[36] = new MemberFunction(c, "mousePressEvent", _n_mousePressEvent0, None, Compiled,
+                                           qt_QColumnView_mousePressEvent_void_QColumnView_QMouseEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QColumnView"), new Param(c, "event", "qt.QMouseEvent"), End),
+            _func[37] = new MemberFunction(c, "mouseReleaseEvent", _n_mouseReleaseEvent0, None, Compiled,
+                                           qt_QColumnView_mouseReleaseEvent_void_QColumnView_QMouseEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QColumnView"), new Param(c, "event", "qt.QMouseEvent"), End),
+            _func[38] = new MemberFunction(c, "timerEvent", _n_timerEvent0, None, Compiled,
+                                           qt_QColumnView_timerEvent_void_QColumnView_QTimerEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QColumnView"), new Param(c, "event", "qt.QTimerEvent"), End),
+            _func[39] = new MemberFunction(c, "viewportEvent", _n_viewportEvent0, None, Compiled,
+                                           qt_QColumnView_viewportEvent_bool_QColumnView_QEvent, Return, "bool", Parameters,
+                                           new Param(c, "this", "qt.QColumnView"), new Param(c, "event", "qt.QEvent"), End),
+            _func[40] = new MemberFunction(c, "viewportSizeHint", _n_viewportSizeHint0, None, Compiled,
+                                           qt_QColumnView_viewportSizeHint_QSize_QColumnView, Return, "qt.QSize", Parameters,
+                                           new Param(c, "this", "qt.QColumnView"), End),
             // static functions
             EndArguments);
         globalScope()->addSymbols(EndArguments);

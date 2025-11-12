@@ -109,9 +109,7 @@ namespace Rv
 
             void operator()()
             {
-                SyncBufferThreadData* closure =
-                    reinterpret_cast<SyncBufferThreadData*>(
-                        m_view->syncClosure());
+                SyncBufferThreadData* closure = reinterpret_cast<SyncBufferThreadData*>(m_view->syncClosure());
                 closure->run();
             }
 
@@ -121,9 +119,8 @@ namespace Rv
 
     } // namespace
 
-    GLView::GLView(QWidget* parent, QOpenGLContext* sharedContext,
-                   RvDocument* doc, bool stereo, bool vsync, bool doubleBuffer,
-                   int red, int green, int blue, int alpha, bool noResize)
+    GLView::GLView(QWidget* parent, QOpenGLContext* sharedContext, RvDocument* doc, bool stereo, bool vsync, bool doubleBuffer, int red,
+                   int green, int blue, int alpha, bool noResize)
         : QOpenGLWidget(parent)
         , m_sharedContext(sharedContext)
         , m_doc(doc)
@@ -142,15 +139,13 @@ namespace Rv
         , m_stopProcessingEvents(false)
         , m_syncThreadData(0)
     {
-        setFormat(
-            rvGLFormat(stereo, vsync, doubleBuffer, red, green, blue, alpha));
+        setFormat(rvGLFormat(stereo, vsync, doubleBuffer, red, green, blue, alpha));
 
         ostringstream str;
         str << UI_APPLICATION_NAME " Main Window" << "/" << m_doc;
         m_videoDevice = new QTGLVideoDevice(0, str.str(), this);
 
-        setObjectName((m_doc->session()) ? m_doc->session()->name().c_str()
-                                         : "no session");
+        setObjectName((m_doc->session()) ? m_doc->session()->name().c_str() : "no session");
 
         m_activityTimer.start();
         setMouseTracking(true);
@@ -158,8 +153,7 @@ namespace Rv
         setFocusPolicy(Qt::StrongFocus);
 
         m_eventProcessingTimer.setSingleShot(true);
-        connect(&m_eventProcessingTimer, SIGNAL(timeout()), this,
-                SLOT(eventProcessingTimeout()));
+        connect(&m_eventProcessingTimer, SIGNAL(timeout()), this, SLOT(eventProcessingTimeout()));
     }
 
     GLView::~GLView()
@@ -169,8 +163,7 @@ namespace Rv
 
         if (m_syncThreadData)
         {
-            SyncBufferThreadData* closure =
-                reinterpret_cast<SyncBufferThreadData*>(m_syncThreadData);
+            SyncBufferThreadData* closure = reinterpret_cast<SyncBufferThreadData*>(m_syncThreadData);
             closure->notify(true);
             m_swapThread.join();
 
@@ -196,9 +189,7 @@ namespace Rv
         y = gp.y();
     }
 
-    QSurfaceFormat GLView::rvGLFormat(bool stereo, bool vsync,
-                                      bool doubleBuffer, int red, int green,
-                                      int blue, int alpha)
+    QSurfaceFormat GLView::rvGLFormat(bool stereo, bool vsync, bool doubleBuffer, int red, int green, int blue, int alpha)
     {
         const Rv::Options& opts = Rv::Options::sharedOptions();
 
@@ -207,8 +198,7 @@ namespace Rv
         // setDepthBufferSize and setStencilBufferSize.
         QSurfaceFormat fmt;
         fmt.setDepthBufferSize(24);
-        fmt.setSwapBehavior(doubleBuffer ? QSurfaceFormat::DoubleBuffer
-                                         : QSurfaceFormat::SingleBuffer);
+        fmt.setSwapBehavior(doubleBuffer ? QSurfaceFormat::DoubleBuffer : QSurfaceFormat::SingleBuffer);
         fmt.setStencilBufferSize(8);
         fmt.setStereo(stereo);
 
@@ -286,12 +276,9 @@ namespace Rv
                 ostringstream str;
 
                 str << "WARNING: asked for"
-                    << " " << m_red << " " << m_green << " " << m_blue << " "
-                    << m_alpha << " RGBA color but got"
-                    << " " << f.redBufferSize() << " " << f.greenBufferSize()
-                    << " " << f.blueBufferSize() << " "
-                    << (f.alphaBufferSize() <= 0 ? 0 : f.alphaBufferSize())
-                    << " RGBA instead";
+                    << " " << m_red << " " << m_green << " " << m_blue << " " << m_alpha << " RGBA color but got"
+                    << " " << f.redBufferSize() << " " << f.greenBufferSize() << " " << f.blueBufferSize() << " "
+                    << (f.alphaBufferSize() <= 0 ? 0 : f.alphaBufferSize()) << " RGBA instead";
 
                 cout << str.str() << endl;
 
@@ -335,8 +322,7 @@ namespace Rv
         int t = y + h;
 
         // are the extents of the read region out of bounds?
-        if (x < 0 || y < 0 || r > width() * devicePixelRatio()
-            || t > height() * devicePixelRatio())
+        if (x < 0 || y < 0 || r > width() * devicePixelRatio() || t > height() * devicePixelRatio())
             return false;
 
         return true;
@@ -363,8 +349,7 @@ namespace Rv
     {
         // Create a QImage with the same size as the FBO
         QImage image(width(), height(), QImage::Format_RGBA8888);
-        glReadPixels(0, 0, width(), height(), GL_RGBA, GL_UNSIGNED_BYTE,
-                     image.bits());
+        glReadPixels(0, 0, width(), height(), GL_RGBA, GL_UNSIGNED_BYTE, image.bits());
 
         // image.save("/home/<username>>/<orv_folder>/fbo.png");
     }
@@ -376,8 +361,7 @@ namespace Rv
         IPCore::Session* session = m_doc->session();
         bool debug = IPCore::debugProfile && session;
 
-        if (!m_postFirstNonEmptyRender && session
-            && session->postFirstNonEmptyRender())
+        if (!m_postFirstNonEmptyRender && session && session->postFirstNonEmptyRender())
         {
             m_postFirstNonEmptyRender = true;
 
@@ -419,11 +403,9 @@ namespace Rv
 
             if (m_userActive && m_activityTimer.elapsed() > 1.0)
             {
-                if (m_doc->mainPopup() && !m_doc->mainPopup()->isVisible()
-                    && hasFocus())
+                if (m_doc->mainPopup() && !m_doc->mainPopup()->isVisible() && hasFocus())
                 {
-                    TwkApp::ActivityChangeEvent aevent("user-inactive",
-                                                       m_videoDevice);
+                    TwkApp::ActivityChangeEvent aevent("user-inactive", m_videoDevice);
                     m_videoDevice->sendEvent(aevent);
                     TWK_GLDEBUG;
                     m_userActive = false;
@@ -456,9 +438,7 @@ namespace Rv
             // Even on Qt6/QOpenGLWidget, we need to call
             // glBindFramebuffer(); it otherwise complains and fails
             // on glClear() on macOS
-            glBindFramebufferEXT(
-                GL_FRAMEBUFFER_EXT,
-                QOpenGLContext::currentContext()->defaultFramebufferObject());
+            glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, QOpenGLContext::currentContext()->defaultFramebufferObject());
             TWK_GLDEBUG;
 
             glPushAttrib(GL_COLOR_BUFFER_BIT);
@@ -543,8 +523,7 @@ namespace Rv
 
         if (debug)
         {
-            Session::ProfilingRecord& trecord =
-                session->currentProfilingSample();
+            Session::ProfilingRecord& trecord = session->currentProfilingSample();
             trecord.renderEnd = session->profilingElapsedTime();
             trecord.swapStart = trecord.renderEnd;
 
@@ -554,8 +533,7 @@ namespace Rv
             }
             else
             {
-                m_videoDevice->widget()->context()->swapBuffers(
-                    m_videoDevice->widget()->context()->surface());
+                m_videoDevice->widget()->context()->swapBuffers(m_videoDevice->widget()->context()->surface());
             }
 
             trecord.swapEnd = session->profilingElapsedTime();
@@ -578,10 +556,7 @@ namespace Rv
         TWK_GLDEBUG;
     }
 
-    void GLView::eventProcessingTimeout()
-    {
-        m_doc->session()->userGenericEvent("per-render-event-processing", "");
-    }
+    void GLView::eventProcessingTimeout() { m_doc->session()->userGenericEvent("per-render-event-processing", ""); }
 
     bool GLView::event(QEvent* event)
     {
@@ -656,8 +631,7 @@ namespace Rv
 
             if (!m_userActive)
             {
-                TwkApp::ActivityChangeEvent aevent("user-active",
-                                                   m_videoDevice);
+                TwkApp::ActivityChangeEvent aevent("user-active", m_videoDevice);
 
                 //
                 //  m_userActive set first will prevent recursive nightmare. In
@@ -681,9 +655,7 @@ namespace Rv
             //
 
             if (m_lastKey == kevent->key()
-                && (m_lastKeyType == QEvent::ShortcutOverride
-                        && (kevent->type() == QEvent::KeyPress)
-                    || (m_lastKeyType == kevent->type())))
+                && (m_lastKeyType == QEvent::ShortcutOverride && (kevent->type() == QEvent::KeyPress) || (m_lastKeyType == kevent->type())))
             {
                 //
                 //  Qt 4.3.3 (4.5 too) will give both override and press events
@@ -725,9 +697,7 @@ namespace Rv
             if (e->oldSize().width() != -1 && e->oldSize().height() != -1)
             {
                 ostringstream contents;
-                contents << e->oldSize().width() << " " << e->oldSize().height()
-                         << "|" << e->size().width() << " "
-                         << e->size().height();
+                contents << e->oldSize().width() << " " << e->oldSize().height() << "|" << e->size().width() << " " << e->size().height();
 
                 if (m_doc && session)
                 {
@@ -738,8 +708,7 @@ namespace Rv
         }
 
         if (session && session->outputVideoDevice()
-            && session->outputVideoDevice()->displayMode()
-                   == TwkApp::VideoDevice::MirrorDisplayMode)
+            && session->outputVideoDevice()->displayMode() == TwkApp::VideoDevice::MirrorDisplayMode)
         {
             if (const TwkApp::VideoDevice* cdv = session->controlVideoDevice())
             {
@@ -763,8 +732,7 @@ namespace Rv
                         const float yoffset = 0.0;
                         const float xscale = yscale;
                         const float xoffset = -(w * yscale - ow) / 2.0;
-                        m_videoDevice->translator().setScaleAndOffset(
-                            xoffset, yoffset, xscale, yscale);
+                        m_videoDevice->translator().setScaleAndOffset(xoffset, yoffset, xscale, yscale);
                     }
                     else
                     {
@@ -772,23 +740,19 @@ namespace Rv
                         const float xoffset = 0.0;
                         const float yscale = xscale;
                         const float yoffset = -(xscale * h - oh) / 2.0;
-                        m_videoDevice->translator().setScaleAndOffset(
-                            xoffset, yoffset, xscale, yscale);
+                        m_videoDevice->translator().setScaleAndOffset(xoffset, yoffset, xscale, yscale);
                     }
                 }
                 else
                 {
-                    m_videoDevice->translator().setScaleAndOffset(0, 0, 1.0,
-                                                                  1.0);
-                    m_videoDevice->translator().setRelativeDomain(width(),
-                                                                  height());
+                    m_videoDevice->translator().setScaleAndOffset(0, 0, 1.0, 1.0);
+                    m_videoDevice->translator().setRelativeDomain(width(), height());
                 }
             }
             else
             {
                 m_videoDevice->translator().setScaleAndOffset(0, 0, 1.0, 1.0);
-                m_videoDevice->translator().setRelativeDomain(width(),
-                                                              height());
+                m_videoDevice->translator().setRelativeDomain(width(), height());
             }
         }
         else
@@ -815,9 +779,7 @@ namespace Rv
 
     bool GLView::eventFilter(QObject* object, QEvent* event)
     {
-        if (event->type() == QEvent::KeyPress
-            || event->type() == QEvent::KeyRelease
-            || event->type() == QEvent::Shortcut
+        if (event->type() == QEvent::KeyPress || event->type() == QEvent::KeyRelease || event->type() == QEvent::Shortcut
             || event->type() == QEvent::ShortcutOverride)
         {
 
@@ -836,8 +798,7 @@ namespace Rv
             if (QKeyEvent* kevent = dynamic_cast<QKeyEvent*>(event))
             {
                 if (m_lastKey == kevent->key()
-                    && (m_lastKeyType == QEvent::ShortcutOverride
-                            && (kevent->type() == QEvent::KeyPress)
+                    && (m_lastKeyType == QEvent::ShortcutOverride && (kevent->type() == QEvent::KeyPress)
                         || (m_lastKeyType == kevent->type())))
                 {
                     m_lastKey = kevent->key();
@@ -868,9 +829,6 @@ namespace Rv
         return false;
     }
 
-    float GLView::devicePixelRatio() const
-    {
-        return videoDevice() ? videoDevice()->devicePixelRatio() : 1.0f;
-    }
+    float GLView::devicePixelRatio() const { return videoDevice() ? videoDevice()->devicePixelRatio() : 1.0f; }
 
 } // namespace Rv

@@ -265,10 +265,7 @@ namespace Mu
 
         Class* classScope() { return dynamic_cast<Class*>(scope()); }
 
-        Interface* interfaceScope()
-        {
-            return dynamic_cast<Interface*>(scope());
-        }
+        Interface* interfaceScope() { return dynamic_cast<Interface*>(scope()); }
 
         void pushScope(Symbol* s, bool declarative = true);
         void setScope(const ScopeState*);
@@ -283,15 +280,11 @@ namespace Mu
 
         template <class T> T* findTypeInScope(Name) const;
 
-        template <class T>
-        bool findTypesInScope(Name, typename STLVector<const T*>::Type&) const;
+        template <class T> bool findTypesInScope(Name, typename STLVector<const T*>::Type&) const;
 
         template <class T> T* findScopeOfType() const;
 
-        Function* currentFunction() const
-        {
-            return findScopeOfType<Function>();
-        }
+        Function* currentFunction() const { return findScopeOfType<Function>(); }
 
         Name uniqueNameInScope(const char*) const;
 
@@ -310,21 +303,16 @@ namespace Mu
         //  These functions push the result as the scope.
         //
 
-        Function* declareFunction(const char* name, const Type* returnType,
-                                  SymbolList parameters, unsigned int attrs,
+        Function* declareFunction(const char* name, const Type* returnType, SymbolList parameters, unsigned int attrs,
                                   bool addToContext = true);
 
-        MemberFunction* declareMemberFunction(const char* name,
-                                              const Type* returnType,
-                                              SymbolList parameters,
-                                              unsigned int attrs);
+        MemberFunction* declareMemberFunction(const char* name, const Type* returnType, SymbolList parameters, unsigned int attrs);
 
         Function* declareFunctionBody(Function*, Node*);
 
         void markCurrentFunctionUnresolved();
 
-        bool checkRedeclaration(const char* name, const Type* returnType,
-                                SymbolList paramters);
+        bool checkRedeclaration(const char* name, const Type* returnType, SymbolList paramters);
 
         //
         //	type stack
@@ -526,9 +514,7 @@ namespace Mu
         //  (instead of completing a partial evaluation).
         //
 
-        Node* dynamicPartialEvalOrApply(Node* self, NodeList arguments,
-                                        bool reduce = false,
-                                        bool dynamicDispatch = true);
+        Node* dynamicPartialEvalOrApply(Node* self, NodeList arguments, bool reduce = false, bool dynamicDispatch = true);
 
         //
         //	Replace node
@@ -616,15 +602,9 @@ namespace Mu
 
         bool declareMemberVariables(const Type*);
 
-        Node* declareStackVariables(const Type* t, const char* asop)
-        {
-            return declareVariables(t, asop, Stack);
-        }
+        Node* declareStackVariables(const Type* t, const char* asop) { return declareVariables(t, asop, Stack); }
 
-        Node* declareGlobalVariables(const Type* t, const char* asop)
-        {
-            return declareVariables(t, asop, Global);
-        }
+        Node* declareGlobalVariables(const Type* t, const char* asop) { return declareVariables(t, asop, Global); }
 
         void declareParameters(SymbolList);
 
@@ -660,8 +640,7 @@ namespace Mu
         //
 
         Namespace* declareNamespace(Name n);
-        StackVariable* declareStackVariable(const Type* t, Name n,
-                                            unsigned int attrs);
+        StackVariable* declareStackVariable(const Type* t, Name n, unsigned int attrs);
         GlobalVariable* declareGlobalVariable(const Type* t, Name n);
 
         //
@@ -877,9 +856,7 @@ namespace Mu
         return 0;
     }
 
-    template <class T>
-    bool NodeAssembler::findTypesInScope(
-        Name name, typename STLVector<const T*>::Type& array) const
+    template <class T> bool NodeAssembler::findTypesInScope(Name name, typename STLVector<const T*>::Type& array) const
     {
         array.clear();
 

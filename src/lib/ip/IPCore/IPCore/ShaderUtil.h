@@ -25,16 +25,12 @@ namespace IPCore
         class ExpressionVisitor
         {
         public:
-            ExpressionVisitor(Expression* root, bool onEnter, bool onLeave,
-                              bool eachSymbol);
+            ExpressionVisitor(Expression* root, bool onEnter, bool onLeave, bool eachSymbol);
             ~ExpressionVisitor();
 
             virtual void visit(Expression*, bool enter) {}
 
-            virtual void child(Expression* parent, BoundSymbol* child,
-                               size_t childNum)
-            {
-            }
+            virtual void child(Expression* parent, BoundSymbol* child, size_t childNum) {}
 
             void cancel() { m_stop = true; }
 
@@ -60,8 +56,7 @@ namespace IPCore
         class ExpressionQuery : public ExpressionVisitor
         {
         public:
-            ExpressionQuery(Expression* fexpr, unsigned int typeFlags,
-                            size_t maxCount = 1000000)
+            ExpressionQuery(Expression* fexpr, unsigned int typeFlags, size_t maxCount = 1000000)
                 : ExpressionVisitor(fexpr, true, false, false)
                 , m_max(maxCount)
                 , m_type(typeFlags)

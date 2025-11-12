@@ -11,8 +11,7 @@ namespace stl_ext
 {
     using namespace std;
 
-    void tokenize(vector<string>& tokens, const string& str,
-                  const string& delimiters)
+    void tokenize(vector<string>& tokens, const string& str, const string& delimiters)
     {
         string::size_type lastPos = str.find_first_not_of(delimiters, 0);
         string::size_type pos = str.find_first_of(delimiters, lastPos);
@@ -25,8 +24,7 @@ namespace stl_ext
         }
     }
 
-    string wrap(const string& s, char wrapchar, const string& breakString,
-                string::size_type col)
+    string wrap(const string& s, char wrapchar, const string& breakString, string::size_type col)
     {
         if (s.size() < col)
             return s;

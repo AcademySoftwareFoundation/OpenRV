@@ -37,8 +37,7 @@ namespace Mu
         //  Constructors
         //
 
-        QHoverEventType(Context* context, const char* name,
-                        Class* superClass = 0);
+        QHoverEventType(Context* context, const char* name, Class* superClass = 0);
         virtual ~QHoverEventType();
 
         //

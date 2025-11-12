@@ -72,28 +72,24 @@ namespace Mu
         _baseType = 0;
     }
 
-    MuQt_QSvgWidget::MuQt_QSvgWidget(Pointer muobj, const CallEnvironment* ce,
-                                     QWidget* parent)
+    MuQt_QSvgWidget::MuQt_QSvgWidget(Pointer muobj, const CallEnvironment* ce, QWidget* parent)
         : QSvgWidget(parent)
     {
         _env = ce;
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QSvgWidgetType>(
-            c->internName("qt.QSvgWidget"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QSvgWidgetType>(c->internName("qt.QSvgWidget"));
     }
 
-    MuQt_QSvgWidget::MuQt_QSvgWidget(Pointer muobj, const CallEnvironment* ce,
-                                     const QString& file, QWidget* parent)
+    MuQt_QSvgWidget::MuQt_QSvgWidget(Pointer muobj, const CallEnvironment* ce, const QString& file, QWidget* parent)
         : QSvgWidget(file, parent)
     {
         _env = ce;
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QSvgWidgetType>(
-            c->internName("qt.QSvgWidget"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QSvgWidgetType>(c->internName("qt.QSvgWidget"));
     }
 
     QSize MuQt_QSvgWidget::sizeHint() const
@@ -130,8 +126,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QPaintEventType>(c, event, "qt.QPaintEvent"));
+            args[1] = Value(makeqpointer<QPaintEventType>(c, event, "qt.QPaintEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -259,8 +254,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QCloseEventType>(c, event, "qt.QCloseEvent"));
+            args[1] = Value(makeqpointer<QCloseEventType>(c, event, "qt.QCloseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -283,8 +277,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqpointer<QContextMenuEventType>(
-                c, event, "qt.QContextMenuEvent"));
+            args[1] = Value(makeqpointer<QContextMenuEventType>(c, event, "qt.QContextMenuEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -307,8 +300,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqpointer<QDragEnterEventType>(
-                c, event, "qt.QDragEnterEvent"));
+            args[1] = Value(makeqpointer<QDragEnterEventType>(c, event, "qt.QDragEnterEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -331,8 +323,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqpointer<QDragLeaveEventType>(
-                c, event, "qt.QDragLeaveEvent"));
+            args[1] = Value(makeqpointer<QDragLeaveEventType>(c, event, "qt.QDragLeaveEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -355,8 +346,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqpointer<QDragMoveEventType>(
-                c, event, "qt.QDragMoveEvent"));
+            args[1] = Value(makeqpointer<QDragMoveEventType>(c, event, "qt.QDragMoveEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -379,8 +369,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QDropEventType>(c, event, "qt.QDropEvent"));
+            args[1] = Value(makeqpointer<QDropEventType>(c, event, "qt.QDropEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -426,8 +415,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QFocusEventType>(c, event, "qt.QFocusEvent"));
+            args[1] = Value(makeqpointer<QFocusEventType>(c, event, "qt.QFocusEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -471,8 +459,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QFocusEventType>(c, event, "qt.QFocusEvent"));
+            args[1] = Value(makeqpointer<QFocusEventType>(c, event, "qt.QFocusEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -495,8 +482,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QHideEventType>(c, event, "qt.QHideEvent"));
+            args[1] = Value(makeqpointer<QHideEventType>(c, event, "qt.QHideEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -519,8 +505,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QKeyEventType>(c, event, "qt.QKeyEvent"));
+            args[1] = Value(makeqpointer<QKeyEventType>(c, event, "qt.QKeyEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -543,8 +528,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QKeyEventType>(c, event, "qt.QKeyEvent"));
+            args[1] = Value(makeqpointer<QKeyEventType>(c, event, "qt.QKeyEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -590,8 +574,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -614,8 +597,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -638,8 +620,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -662,8 +643,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -686,8 +666,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QMoveEventType>(c, event, "qt.QMoveEvent"));
+            args[1] = Value(makeqpointer<QMoveEventType>(c, event, "qt.QMoveEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -710,8 +689,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QResizeEventType>(c, event, "qt.QResizeEvent"));
+            args[1] = Value(makeqpointer<QResizeEventType>(c, event, "qt.QResizeEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -734,8 +712,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QShowEventType>(c, event, "qt.QShowEvent"));
+            args[1] = Value(makeqpointer<QShowEventType>(c, event, "qt.QShowEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -758,8 +735,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QTabletEventType>(c, event, "qt.QTabletEvent"));
+            args[1] = Value(makeqpointer<QTabletEventType>(c, event, "qt.QTabletEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -782,8 +758,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QWheelEventType>(c, event, "qt.QWheelEvent"));
+            args[1] = Value(makeqpointer<QWheelEventType>(c, event, "qt.QWheelEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -816,8 +791,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  Mu Type CONSTRUCTORS
 
-    QSvgWidgetType::QSvgWidgetType(Context* c, const char* name, Class* super,
-                                   Class* super2)
+    QSvgWidgetType::QSvgWidgetType(Context* c, const char* name, Class* super, Class* super2)
         : Class(c, name, vectorOf2(super, super2))
     {
     }
@@ -827,8 +801,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    static Pointer QSvgWidget_QSvgWidget_QObject(Thread& NODE_THREAD,
-                                                 Pointer obj)
+    static Pointer QSvgWidget_QSvgWidget_QObject(Thread& NODE_THREAD, Pointer obj)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         ClassInstance* widget = reinterpret_cast<ClassInstance*>(obj);
@@ -839,9 +812,7 @@ namespace Mu
         }
         else if (QSvgWidget* w = object<QSvgWidget>(widget))
         {
-            QSvgWidgetType* type =
-                c->findSymbolOfTypeByQualifiedName<QSvgWidgetType>(
-                    c->internName("qt.QSvgWidget"), false);
+            QSvgWidgetType* type = c->findSymbolOfTypeByQualifiedName<QSvgWidgetType>(c->internName("qt.QSvgWidget"), false);
             ClassInstance* o = ClassInstance::allocate(type);
             setobject(o, w);
             return o;
@@ -852,49 +823,35 @@ namespace Mu
         }
     }
 
-    static NODE_IMPLEMENTATION(castFromObject, Pointer)
-    {
-        NODE_RETURN(
-            QSvgWidget_QSvgWidget_QObject(NODE_THREAD, NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(castFromObject, Pointer) { NODE_RETURN(QSvgWidget_QSvgWidget_QObject(NODE_THREAD, NODE_ARG(0, Pointer))); }
 
-    Pointer qt_QSvgWidget_QSvgWidget_QSvgWidget_QSvgWidget_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
+    Pointer qt_QSvgWidget_QSvgWidget_QSvgWidget_QSvgWidget_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWidget* arg1 = object<QWidget>(param_parent);
-        setobject(param_this,
-                  new MuQt_QSvgWidget(param_this,
-                                      NODE_THREAD.process()->callEnv(), arg1));
+        setobject(param_this, new MuQt_QSvgWidget(param_this, NODE_THREAD.process()->callEnv(), arg1));
         return param_this;
     }
 
-    Pointer qt_QSvgWidget_QSvgWidget_QSvgWidget_QSvgWidget_string_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_file,
-        Pointer param_parent)
+    Pointer qt_QSvgWidget_QSvgWidget_QSvgWidget_QSvgWidget_string_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_file,
+                                                                          Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QString arg1 = qstring(param_file);
         QWidget* arg2 = object<QWidget>(param_parent);
-        setobject(param_this, new MuQt_QSvgWidget(
-                                  param_this, NODE_THREAD.process()->callEnv(),
-                                  arg1, arg2));
+        setobject(param_this, new MuQt_QSvgWidget(param_this, NODE_THREAD.process()->callEnv(), arg1, arg2));
         return param_this;
     }
 
-    Pointer qt_QSvgWidget_sizeHint_QSize_QSvgWidget(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this)
+    Pointer qt_QSvgWidget_sizeHint_QSize_QSvgWidget(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSvgWidget* arg0 = object<QSvgWidget>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QSizeType>(c, arg0->QSvgWidget::sizeHint(),
-                                          "qt.QSize")
-                   : makeqtype<QSizeType>(c, arg0->sizeHint(), "qt.QSize");
+        return isMuQtObject(arg0) ? makeqtype<QSizeType>(c, arg0->QSvgWidget::sizeHint(), "qt.QSize")
+                                  : makeqtype<QSizeType>(c, arg0->sizeHint(), "qt.QSize");
     }
 
-    void qt_QSvgWidget_paintEvent_void_QSvgWidget_QPaintEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QSvgWidget_paintEvent_void_QSvgWidget_QPaintEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSvgWidget* arg0 = object<QSvgWidget>(param_this);
@@ -905,56 +862,39 @@ namespace Mu
             ((MuQt_QSvgWidget*)arg0)->paintEvent_pub(arg1);
     }
 
-    bool
-    qt_QSvgWidget_hasHeightForWidth_bool_QSvgWidget(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this)
+    bool qt_QSvgWidget_hasHeightForWidth_bool_QSvgWidget(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSvgWidget* arg0 = object<QSvgWidget>(param_this);
-        return isMuQtObject(arg0) ? arg0->QSvgWidget::hasHeightForWidth()
-                                  : arg0->hasHeightForWidth();
+        return isMuQtObject(arg0) ? arg0->QSvgWidget::hasHeightForWidth() : arg0->hasHeightForWidth();
     }
 
-    int qt_QSvgWidget_heightForWidth_int_QSvgWidget_int(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this,
-                                                        int param_w)
+    int qt_QSvgWidget_heightForWidth_int_QSvgWidget_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_w)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSvgWidget* arg0 = object<QSvgWidget>(param_this);
         int arg1 = (int)(param_w);
-        return isMuQtObject(arg0) ? arg0->QSvgWidget::heightForWidth(arg1)
-                                  : arg0->heightForWidth(arg1);
+        return isMuQtObject(arg0) ? arg0->QSvgWidget::heightForWidth(arg1) : arg0->heightForWidth(arg1);
     }
 
-    Pointer qt_QSvgWidget_inputMethodQuery_QVariant_QSvgWidget_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_query)
+    Pointer qt_QSvgWidget_inputMethodQuery_QVariant_QSvgWidget_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_query)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSvgWidget* arg0 = object<QSvgWidget>(param_this);
         Qt::InputMethodQuery arg1 = (Qt::InputMethodQuery)(param_query);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QVariantType>(
-                         c, arg0->QSvgWidget::inputMethodQuery(arg1),
-                         "qt.QVariant")
-                   : makeqtype<QVariantType>(c, arg0->inputMethodQuery(arg1),
-                                             "qt.QVariant");
+        return isMuQtObject(arg0) ? makeqtype<QVariantType>(c, arg0->QSvgWidget::inputMethodQuery(arg1), "qt.QVariant")
+                                  : makeqtype<QVariantType>(c, arg0->inputMethodQuery(arg1), "qt.QVariant");
     }
 
-    Pointer
-    qt_QSvgWidget_minimumSizeHint_QSize_QSvgWidget(Mu::Thread& NODE_THREAD,
-                                                   Pointer param_this)
+    Pointer qt_QSvgWidget_minimumSizeHint_QSize_QSvgWidget(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSvgWidget* arg0 = object<QSvgWidget>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QSizeType>(
-                         c, arg0->QSvgWidget::minimumSizeHint(), "qt.QSize")
-                   : makeqtype<QSizeType>(c, arg0->minimumSizeHint(),
-                                          "qt.QSize");
+        return isMuQtObject(arg0) ? makeqtype<QSizeType>(c, arg0->QSvgWidget::minimumSizeHint(), "qt.QSize")
+                                  : makeqtype<QSizeType>(c, arg0->minimumSizeHint(), "qt.QSize");
     }
 
-    void qt_QSvgWidget_changeEvent_void_QSvgWidget_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QSvgWidget_changeEvent_void_QSvgWidget_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSvgWidget* arg0 = object<QSvgWidget>(param_this);
@@ -965,8 +905,7 @@ namespace Mu
             ((MuQt_QSvgWidget*)arg0)->changeEvent_pub(arg1);
     }
 
-    void qt_QSvgWidget_closeEvent_void_QSvgWidget_QCloseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QSvgWidget_closeEvent_void_QSvgWidget_QCloseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSvgWidget* arg0 = object<QSvgWidget>(param_this);
@@ -977,21 +916,18 @@ namespace Mu
             ((MuQt_QSvgWidget*)arg0)->closeEvent_pub(arg1);
     }
 
-    void qt_QSvgWidget_contextMenuEvent_void_QSvgWidget_QContextMenuEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QSvgWidget_contextMenuEvent_void_QSvgWidget_QContextMenuEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSvgWidget* arg0 = object<QSvgWidget>(param_this);
-        QContextMenuEvent* arg1 =
-            getqpointer<QContextMenuEventType>(param_event);
+        QContextMenuEvent* arg1 = getqpointer<QContextMenuEventType>(param_event);
         if (isMuQtObject(arg0))
             ((MuQt_QSvgWidget*)arg0)->contextMenuEvent_pub_parent(arg1);
         else
             ((MuQt_QSvgWidget*)arg0)->contextMenuEvent_pub(arg1);
     }
 
-    void qt_QSvgWidget_dragEnterEvent_void_QSvgWidget_QDragEnterEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QSvgWidget_dragEnterEvent_void_QSvgWidget_QDragEnterEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSvgWidget* arg0 = object<QSvgWidget>(param_this);
@@ -1002,8 +938,7 @@ namespace Mu
             ((MuQt_QSvgWidget*)arg0)->dragEnterEvent_pub(arg1);
     }
 
-    void qt_QSvgWidget_dragLeaveEvent_void_QSvgWidget_QDragLeaveEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QSvgWidget_dragLeaveEvent_void_QSvgWidget_QDragLeaveEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSvgWidget* arg0 = object<QSvgWidget>(param_this);
@@ -1014,8 +949,7 @@ namespace Mu
             ((MuQt_QSvgWidget*)arg0)->dragLeaveEvent_pub(arg1);
     }
 
-    void qt_QSvgWidget_dragMoveEvent_void_QSvgWidget_QDragMoveEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QSvgWidget_dragMoveEvent_void_QSvgWidget_QDragMoveEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSvgWidget* arg0 = object<QSvgWidget>(param_this);
@@ -1026,8 +960,7 @@ namespace Mu
             ((MuQt_QSvgWidget*)arg0)->dragMoveEvent_pub(arg1);
     }
 
-    void qt_QSvgWidget_dropEvent_void_QSvgWidget_QDropEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QSvgWidget_dropEvent_void_QSvgWidget_QDropEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSvgWidget* arg0 = object<QSvgWidget>(param_this);
@@ -1038,8 +971,7 @@ namespace Mu
             ((MuQt_QSvgWidget*)arg0)->dropEvent_pub(arg1);
     }
 
-    void qt_QSvgWidget_enterEvent_void_QSvgWidget_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QSvgWidget_enterEvent_void_QSvgWidget_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSvgWidget* arg0 = object<QSvgWidget>(param_this);
@@ -1050,8 +982,7 @@ namespace Mu
             ((MuQt_QSvgWidget*)arg0)->enterEvent_pub(arg1);
     }
 
-    void qt_QSvgWidget_focusInEvent_void_QSvgWidget_QFocusEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QSvgWidget_focusInEvent_void_QSvgWidget_QFocusEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSvgWidget* arg0 = object<QSvgWidget>(param_this);
@@ -1062,20 +993,16 @@ namespace Mu
             ((MuQt_QSvgWidget*)arg0)->focusInEvent_pub(arg1);
     }
 
-    bool qt_QSvgWidget_focusNextPrevChild_bool_QSvgWidget_bool(
-        Mu::Thread& NODE_THREAD, Pointer param_this, bool param_next)
+    bool qt_QSvgWidget_focusNextPrevChild_bool_QSvgWidget_bool(Mu::Thread& NODE_THREAD, Pointer param_this, bool param_next)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSvgWidget* arg0 = object<QSvgWidget>(param_this);
         bool arg1 = (bool)(param_next);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QSvgWidget*)arg0)
-                         ->focusNextPrevChild_pub_parent(arg1)
-                   : ((MuQt_QSvgWidget*)arg0)->focusNextPrevChild_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QSvgWidget*)arg0)->focusNextPrevChild_pub_parent(arg1)
+                                  : ((MuQt_QSvgWidget*)arg0)->focusNextPrevChild_pub(arg1);
     }
 
-    void qt_QSvgWidget_focusOutEvent_void_QSvgWidget_QFocusEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QSvgWidget_focusOutEvent_void_QSvgWidget_QFocusEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSvgWidget* arg0 = object<QSvgWidget>(param_this);
@@ -1086,8 +1013,7 @@ namespace Mu
             ((MuQt_QSvgWidget*)arg0)->focusOutEvent_pub(arg1);
     }
 
-    void qt_QSvgWidget_hideEvent_void_QSvgWidget_QHideEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QSvgWidget_hideEvent_void_QSvgWidget_QHideEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSvgWidget* arg0 = object<QSvgWidget>(param_this);
@@ -1098,8 +1024,7 @@ namespace Mu
             ((MuQt_QSvgWidget*)arg0)->hideEvent_pub(arg1);
     }
 
-    void qt_QSvgWidget_keyPressEvent_void_QSvgWidget_QKeyEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QSvgWidget_keyPressEvent_void_QSvgWidget_QKeyEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSvgWidget* arg0 = object<QSvgWidget>(param_this);
@@ -1110,8 +1035,7 @@ namespace Mu
             ((MuQt_QSvgWidget*)arg0)->keyPressEvent_pub(arg1);
     }
 
-    void qt_QSvgWidget_keyReleaseEvent_void_QSvgWidget_QKeyEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QSvgWidget_keyReleaseEvent_void_QSvgWidget_QKeyEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSvgWidget* arg0 = object<QSvgWidget>(param_this);
@@ -1122,8 +1046,7 @@ namespace Mu
             ((MuQt_QSvgWidget*)arg0)->keyReleaseEvent_pub(arg1);
     }
 
-    void qt_QSvgWidget_leaveEvent_void_QSvgWidget_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QSvgWidget_leaveEvent_void_QSvgWidget_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSvgWidget* arg0 = object<QSvgWidget>(param_this);
@@ -1134,8 +1057,7 @@ namespace Mu
             ((MuQt_QSvgWidget*)arg0)->leaveEvent_pub(arg1);
     }
 
-    void qt_QSvgWidget_mouseDoubleClickEvent_void_QSvgWidget_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QSvgWidget_mouseDoubleClickEvent_void_QSvgWidget_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSvgWidget* arg0 = object<QSvgWidget>(param_this);
@@ -1146,8 +1068,7 @@ namespace Mu
             ((MuQt_QSvgWidget*)arg0)->mouseDoubleClickEvent_pub(arg1);
     }
 
-    void qt_QSvgWidget_mouseMoveEvent_void_QSvgWidget_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QSvgWidget_mouseMoveEvent_void_QSvgWidget_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSvgWidget* arg0 = object<QSvgWidget>(param_this);
@@ -1158,8 +1079,7 @@ namespace Mu
             ((MuQt_QSvgWidget*)arg0)->mouseMoveEvent_pub(arg1);
     }
 
-    void qt_QSvgWidget_mousePressEvent_void_QSvgWidget_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QSvgWidget_mousePressEvent_void_QSvgWidget_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSvgWidget* arg0 = object<QSvgWidget>(param_this);
@@ -1170,8 +1090,7 @@ namespace Mu
             ((MuQt_QSvgWidget*)arg0)->mousePressEvent_pub(arg1);
     }
 
-    void qt_QSvgWidget_mouseReleaseEvent_void_QSvgWidget_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QSvgWidget_mouseReleaseEvent_void_QSvgWidget_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSvgWidget* arg0 = object<QSvgWidget>(param_this);
@@ -1182,8 +1101,7 @@ namespace Mu
             ((MuQt_QSvgWidget*)arg0)->mouseReleaseEvent_pub(arg1);
     }
 
-    void qt_QSvgWidget_moveEvent_void_QSvgWidget_QMoveEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QSvgWidget_moveEvent_void_QSvgWidget_QMoveEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSvgWidget* arg0 = object<QSvgWidget>(param_this);
@@ -1194,8 +1112,7 @@ namespace Mu
             ((MuQt_QSvgWidget*)arg0)->moveEvent_pub(arg1);
     }
 
-    void qt_QSvgWidget_resizeEvent_void_QSvgWidget_QResizeEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QSvgWidget_resizeEvent_void_QSvgWidget_QResizeEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSvgWidget* arg0 = object<QSvgWidget>(param_this);
@@ -1206,8 +1123,7 @@ namespace Mu
             ((MuQt_QSvgWidget*)arg0)->resizeEvent_pub(arg1);
     }
 
-    void qt_QSvgWidget_showEvent_void_QSvgWidget_QShowEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QSvgWidget_showEvent_void_QSvgWidget_QShowEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSvgWidget* arg0 = object<QSvgWidget>(param_this);
@@ -1218,8 +1134,7 @@ namespace Mu
             ((MuQt_QSvgWidget*)arg0)->showEvent_pub(arg1);
     }
 
-    void qt_QSvgWidget_tabletEvent_void_QSvgWidget_QTabletEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QSvgWidget_tabletEvent_void_QSvgWidget_QTabletEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSvgWidget* arg0 = object<QSvgWidget>(param_this);
@@ -1230,8 +1145,7 @@ namespace Mu
             ((MuQt_QSvgWidget*)arg0)->tabletEvent_pub(arg1);
     }
 
-    void qt_QSvgWidget_wheelEvent_void_QSvgWidget_QWheelEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QSvgWidget_wheelEvent_void_QSvgWidget_QWheelEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSvgWidget* arg0 = object<QSvgWidget>(param_this);
@@ -1242,216 +1156,178 @@ namespace Mu
             ((MuQt_QSvgWidget*)arg0)->wheelEvent_pub(arg1);
     }
 
-    bool qt_QSvgWidget_event_bool_QSvgWidget_QEvent(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this,
-                                                    Pointer param_event_)
+    bool qt_QSvgWidget_event_bool_QSvgWidget_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event_)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSvgWidget* arg0 = object<QSvgWidget>(param_this);
         QEvent* arg1 = getqpointer<QEventType>(param_event_);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QSvgWidget*)arg0)->event_pub_parent(arg1)
-                   : ((MuQt_QSvgWidget*)arg0)->event_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QSvgWidget*)arg0)->event_pub_parent(arg1) : ((MuQt_QSvgWidget*)arg0)->event_pub(arg1);
     }
 
     static NODE_IMPLEMENTATION(_n_QSvgWidget0, Pointer)
     {
-        NODE_RETURN(qt_QSvgWidget_QSvgWidget_QSvgWidget_QSvgWidget_QWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QSvgWidget_QSvgWidget_QSvgWidget_QSvgWidget_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_QSvgWidget1, Pointer)
     {
-        NODE_RETURN(
-            qt_QSvgWidget_QSvgWidget_QSvgWidget_QSvgWidget_string_QWidget(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QSvgWidget_QSvgWidget_QSvgWidget_QSvgWidget_string_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                  NODE_ARG(1, Pointer), NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_sizeHint0, Pointer)
     {
-        NODE_RETURN(qt_QSvgWidget_sizeHint_QSize_QSvgWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QSvgWidget_sizeHint_QSize_QSvgWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_paintEvent0, void)
     {
-        qt_QSvgWidget_paintEvent_void_QSvgWidget_QPaintEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QSvgWidget_paintEvent_void_QSvgWidget_QPaintEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_hasHeightForWidth0, bool)
     {
-        NODE_RETURN(qt_QSvgWidget_hasHeightForWidth_bool_QSvgWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QSvgWidget_hasHeightForWidth_bool_QSvgWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_heightForWidth0, int)
     {
-        NODE_RETURN(qt_QSvgWidget_heightForWidth_int_QSvgWidget_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QSvgWidget_heightForWidth_int_QSvgWidget_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_inputMethodQuery0, Pointer)
     {
-        NODE_RETURN(qt_QSvgWidget_inputMethodQuery_QVariant_QSvgWidget_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QSvgWidget_inputMethodQuery_QVariant_QSvgWidget_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_minimumSizeHint0, Pointer)
     {
-        NODE_RETURN(qt_QSvgWidget_minimumSizeHint_QSize_QSvgWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QSvgWidget_minimumSizeHint_QSize_QSvgWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_changeEvent0, void)
     {
-        qt_QSvgWidget_changeEvent_void_QSvgWidget_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QSvgWidget_changeEvent_void_QSvgWidget_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_closeEvent0, void)
     {
-        qt_QSvgWidget_closeEvent_void_QSvgWidget_QCloseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QSvgWidget_closeEvent_void_QSvgWidget_QCloseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_contextMenuEvent0, void)
     {
-        qt_QSvgWidget_contextMenuEvent_void_QSvgWidget_QContextMenuEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QSvgWidget_contextMenuEvent_void_QSvgWidget_QContextMenuEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_dragEnterEvent0, void)
     {
-        qt_QSvgWidget_dragEnterEvent_void_QSvgWidget_QDragEnterEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QSvgWidget_dragEnterEvent_void_QSvgWidget_QDragEnterEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_dragLeaveEvent0, void)
     {
-        qt_QSvgWidget_dragLeaveEvent_void_QSvgWidget_QDragLeaveEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QSvgWidget_dragLeaveEvent_void_QSvgWidget_QDragLeaveEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_dragMoveEvent0, void)
     {
-        qt_QSvgWidget_dragMoveEvent_void_QSvgWidget_QDragMoveEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QSvgWidget_dragMoveEvent_void_QSvgWidget_QDragMoveEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_dropEvent0, void)
     {
-        qt_QSvgWidget_dropEvent_void_QSvgWidget_QDropEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QSvgWidget_dropEvent_void_QSvgWidget_QDropEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_enterEvent0, void)
     {
-        qt_QSvgWidget_enterEvent_void_QSvgWidget_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QSvgWidget_enterEvent_void_QSvgWidget_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_focusInEvent0, void)
     {
-        qt_QSvgWidget_focusInEvent_void_QSvgWidget_QFocusEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QSvgWidget_focusInEvent_void_QSvgWidget_QFocusEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_focusNextPrevChild0, bool)
     {
-        NODE_RETURN(qt_QSvgWidget_focusNextPrevChild_bool_QSvgWidget_bool(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool)));
+        NODE_RETURN(qt_QSvgWidget_focusNextPrevChild_bool_QSvgWidget_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool)));
     }
 
     static NODE_IMPLEMENTATION(_n_focusOutEvent0, void)
     {
-        qt_QSvgWidget_focusOutEvent_void_QSvgWidget_QFocusEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QSvgWidget_focusOutEvent_void_QSvgWidget_QFocusEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_hideEvent0, void)
     {
-        qt_QSvgWidget_hideEvent_void_QSvgWidget_QHideEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QSvgWidget_hideEvent_void_QSvgWidget_QHideEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_keyPressEvent0, void)
     {
-        qt_QSvgWidget_keyPressEvent_void_QSvgWidget_QKeyEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QSvgWidget_keyPressEvent_void_QSvgWidget_QKeyEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_keyReleaseEvent0, void)
     {
-        qt_QSvgWidget_keyReleaseEvent_void_QSvgWidget_QKeyEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QSvgWidget_keyReleaseEvent_void_QSvgWidget_QKeyEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_leaveEvent0, void)
     {
-        qt_QSvgWidget_leaveEvent_void_QSvgWidget_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QSvgWidget_leaveEvent_void_QSvgWidget_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseDoubleClickEvent0, void)
     {
-        qt_QSvgWidget_mouseDoubleClickEvent_void_QSvgWidget_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QSvgWidget_mouseDoubleClickEvent_void_QSvgWidget_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseMoveEvent0, void)
     {
-        qt_QSvgWidget_mouseMoveEvent_void_QSvgWidget_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QSvgWidget_mouseMoveEvent_void_QSvgWidget_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mousePressEvent0, void)
     {
-        qt_QSvgWidget_mousePressEvent_void_QSvgWidget_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QSvgWidget_mousePressEvent_void_QSvgWidget_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseReleaseEvent0, void)
     {
-        qt_QSvgWidget_mouseReleaseEvent_void_QSvgWidget_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QSvgWidget_mouseReleaseEvent_void_QSvgWidget_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_moveEvent0, void)
     {
-        qt_QSvgWidget_moveEvent_void_QSvgWidget_QMoveEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QSvgWidget_moveEvent_void_QSvgWidget_QMoveEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_resizeEvent0, void)
     {
-        qt_QSvgWidget_resizeEvent_void_QSvgWidget_QResizeEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QSvgWidget_resizeEvent_void_QSvgWidget_QResizeEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_showEvent0, void)
     {
-        qt_QSvgWidget_showEvent_void_QSvgWidget_QShowEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QSvgWidget_showEvent_void_QSvgWidget_QShowEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_tabletEvent0, void)
     {
-        qt_QSvgWidget_tabletEvent_void_QSvgWidget_QTabletEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QSvgWidget_tabletEvent_void_QSvgWidget_QTabletEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_wheelEvent0, void)
     {
-        qt_QSvgWidget_wheelEvent_void_QSvgWidget_QWheelEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QSvgWidget_wheelEvent_void_QSvgWidget_QWheelEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_event0, bool)
     {
-        NODE_RETURN(qt_QSvgWidget_event_bool_QSvgWidget_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QSvgWidget_event_bool_QSvgWidget_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     void QSvgWidgetType::load()
@@ -1471,17 +1347,13 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
-                   new Function(c, tn, castFromObject, Cast, Compiled,
-                                QSvgWidget_QSvgWidget_QObject, Return, ftn,
-                                Parameters,
+                   new Function(c, tn, castFromObject, Cast, Compiled, QSvgWidget_QSvgWidget_QObject, Return, ftn, Parameters,
                                 new Param(c, "object", "qt.QObject"), End),
 
                    EndArguments);
@@ -1489,189 +1361,111 @@ namespace Mu
         addSymbols(
             // enums
             // member functions
-            new Function(c, "QSvgWidget", _n_QSvgWidget0, None, Compiled,
-                         qt_QSvgWidget_QSvgWidget_QSvgWidget_QSvgWidget_QWidget,
-                         Return, "qt.QSvgWidget", Parameters,
-                         new Param(c, "this", "qt.QSvgWidget"),
+            new Function(c, "QSvgWidget", _n_QSvgWidget0, None, Compiled, qt_QSvgWidget_QSvgWidget_QSvgWidget_QSvgWidget_QWidget, Return,
+                         "qt.QSvgWidget", Parameters, new Param(c, "this", "qt.QSvgWidget"), new Param(c, "parent", "qt.QWidget"), End),
+            new Function(c, "QSvgWidget", _n_QSvgWidget1, None, Compiled, qt_QSvgWidget_QSvgWidget_QSvgWidget_QSvgWidget_string_QWidget,
+                         Return, "qt.QSvgWidget", Parameters, new Param(c, "this", "qt.QSvgWidget"), new Param(c, "file", "string"),
                          new Param(c, "parent", "qt.QWidget"), End),
-            new Function(
-                c, "QSvgWidget", _n_QSvgWidget1, None, Compiled,
-                qt_QSvgWidget_QSvgWidget_QSvgWidget_QSvgWidget_string_QWidget,
-                Return, "qt.QSvgWidget", Parameters,
-                new Param(c, "this", "qt.QSvgWidget"),
-                new Param(c, "file", "string"),
-                new Param(c, "parent", "qt.QWidget"), End),
             // MISSING: renderer ("QSvgRenderer *"; QSvgWidget this)
-            _func[0] = new MemberFunction(
-                c, "sizeHint", _n_sizeHint0, None, Compiled,
-                qt_QSvgWidget_sizeHint_QSize_QSvgWidget, Return, "qt.QSize",
-                Parameters, new Param(c, "this", "qt.QSvgWidget"), End),
-            _func[1] = new MemberFunction(
-                c, "paintEvent", _n_paintEvent0, None, Compiled,
-                qt_QSvgWidget_paintEvent_void_QSvgWidget_QPaintEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QSvgWidget"),
-                new Param(c, "event", "qt.QPaintEvent"), End),
-            _func[2] = new MemberFunction(
-                c, "hasHeightForWidth", _n_hasHeightForWidth0, None, Compiled,
-                qt_QSvgWidget_hasHeightForWidth_bool_QSvgWidget, Return, "bool",
-                Parameters, new Param(c, "this", "qt.QSvgWidget"), End),
-            _func[3] = new MemberFunction(
-                c, "heightForWidth", _n_heightForWidth0, None, Compiled,
-                qt_QSvgWidget_heightForWidth_int_QSvgWidget_int, Return, "int",
-                Parameters, new Param(c, "this", "qt.QSvgWidget"),
-                new Param(c, "w", "int"), End),
-            _func[4] = new MemberFunction(
-                c, "inputMethodQuery", _n_inputMethodQuery0, None, Compiled,
-                qt_QSvgWidget_inputMethodQuery_QVariant_QSvgWidget_int, Return,
-                "qt.QVariant", Parameters,
-                new Param(c, "this", "qt.QSvgWidget"),
-                new Param(c, "query", "int"), End),
-            _func[5] = new MemberFunction(
-                c, "minimumSizeHint", _n_minimumSizeHint0, None, Compiled,
-                qt_QSvgWidget_minimumSizeHint_QSize_QSvgWidget, Return,
-                "qt.QSize", Parameters, new Param(c, "this", "qt.QSvgWidget"),
-                End),
+            _func[0] = new MemberFunction(c, "sizeHint", _n_sizeHint0, None, Compiled, qt_QSvgWidget_sizeHint_QSize_QSvgWidget, Return,
+                                          "qt.QSize", Parameters, new Param(c, "this", "qt.QSvgWidget"), End),
+            _func[1] = new MemberFunction(c, "paintEvent", _n_paintEvent0, None, Compiled,
+                                          qt_QSvgWidget_paintEvent_void_QSvgWidget_QPaintEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QSvgWidget"), new Param(c, "event", "qt.QPaintEvent"), End),
+            _func[2] = new MemberFunction(c, "hasHeightForWidth", _n_hasHeightForWidth0, None, Compiled,
+                                          qt_QSvgWidget_hasHeightForWidth_bool_QSvgWidget, Return, "bool", Parameters,
+                                          new Param(c, "this", "qt.QSvgWidget"), End),
+            _func[3] =
+                new MemberFunction(c, "heightForWidth", _n_heightForWidth0, None, Compiled, qt_QSvgWidget_heightForWidth_int_QSvgWidget_int,
+                                   Return, "int", Parameters, new Param(c, "this", "qt.QSvgWidget"), new Param(c, "w", "int"), End),
+            _func[4] = new MemberFunction(c, "inputMethodQuery", _n_inputMethodQuery0, None, Compiled,
+                                          qt_QSvgWidget_inputMethodQuery_QVariant_QSvgWidget_int, Return, "qt.QVariant", Parameters,
+                                          new Param(c, "this", "qt.QSvgWidget"), new Param(c, "query", "int"), End),
+            _func[5] = new MemberFunction(c, "minimumSizeHint", _n_minimumSizeHint0, None, Compiled,
+                                          qt_QSvgWidget_minimumSizeHint_QSize_QSvgWidget, Return, "qt.QSize", Parameters,
+                                          new Param(c, "this", "qt.QSvgWidget"), End),
             // MISSING: paintEngine ("QPaintEngine *"; QSvgWidget this)
             // MISSING: actionEvent (void; QSvgWidget this, "QActionEvent *"
             // event) // protected
-            _func[6] = new MemberFunction(
-                c, "changeEvent", _n_changeEvent0, None, Compiled,
-                qt_QSvgWidget_changeEvent_void_QSvgWidget_QEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QSvgWidget"),
-                new Param(c, "event", "qt.QEvent"), End),
-            _func[7] = new MemberFunction(
-                c, "closeEvent", _n_closeEvent0, None, Compiled,
-                qt_QSvgWidget_closeEvent_void_QSvgWidget_QCloseEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QSvgWidget"),
-                new Param(c, "event", "qt.QCloseEvent"), End),
-            _func[8] = new MemberFunction(
-                c, "contextMenuEvent", _n_contextMenuEvent0, None, Compiled,
-                qt_QSvgWidget_contextMenuEvent_void_QSvgWidget_QContextMenuEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QSvgWidget"),
-                new Param(c, "event", "qt.QContextMenuEvent"), End),
-            _func[9] = new MemberFunction(
-                c, "dragEnterEvent", _n_dragEnterEvent0, None, Compiled,
-                qt_QSvgWidget_dragEnterEvent_void_QSvgWidget_QDragEnterEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QSvgWidget"),
-                new Param(c, "event", "qt.QDragEnterEvent"), End),
-            _func[10] = new MemberFunction(
-                c, "dragLeaveEvent", _n_dragLeaveEvent0, None, Compiled,
-                qt_QSvgWidget_dragLeaveEvent_void_QSvgWidget_QDragLeaveEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QSvgWidget"),
-                new Param(c, "event", "qt.QDragLeaveEvent"), End),
-            _func[11] = new MemberFunction(
-                c, "dragMoveEvent", _n_dragMoveEvent0, None, Compiled,
-                qt_QSvgWidget_dragMoveEvent_void_QSvgWidget_QDragMoveEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QSvgWidget"),
-                new Param(c, "event", "qt.QDragMoveEvent"), End),
-            _func[12] = new MemberFunction(
-                c, "dropEvent", _n_dropEvent0, None, Compiled,
-                qt_QSvgWidget_dropEvent_void_QSvgWidget_QDropEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QSvgWidget"),
-                new Param(c, "event", "qt.QDropEvent"), End),
-            _func[13] = new MemberFunction(
-                c, "enterEvent", _n_enterEvent0, None, Compiled,
-                qt_QSvgWidget_enterEvent_void_QSvgWidget_QEvent, Return, "void",
-                Parameters, new Param(c, "this", "qt.QSvgWidget"),
-                new Param(c, "event", "qt.QEvent"), End),
-            _func[14] = new MemberFunction(
-                c, "focusInEvent", _n_focusInEvent0, None, Compiled,
-                qt_QSvgWidget_focusInEvent_void_QSvgWidget_QFocusEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QSvgWidget"),
-                new Param(c, "event", "qt.QFocusEvent"), End),
-            _func[15] = new MemberFunction(
-                c, "focusNextPrevChild", _n_focusNextPrevChild0, None, Compiled,
-                qt_QSvgWidget_focusNextPrevChild_bool_QSvgWidget_bool, Return,
-                "bool", Parameters, new Param(c, "this", "qt.QSvgWidget"),
-                new Param(c, "next", "bool"), End),
-            _func[16] = new MemberFunction(
-                c, "focusOutEvent", _n_focusOutEvent0, None, Compiled,
-                qt_QSvgWidget_focusOutEvent_void_QSvgWidget_QFocusEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QSvgWidget"),
-                new Param(c, "event", "qt.QFocusEvent"), End),
-            _func[17] = new MemberFunction(
-                c, "hideEvent", _n_hideEvent0, None, Compiled,
-                qt_QSvgWidget_hideEvent_void_QSvgWidget_QHideEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QSvgWidget"),
-                new Param(c, "event", "qt.QHideEvent"), End),
+            _func[6] = new MemberFunction(c, "changeEvent", _n_changeEvent0, None, Compiled,
+                                          qt_QSvgWidget_changeEvent_void_QSvgWidget_QEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QSvgWidget"), new Param(c, "event", "qt.QEvent"), End),
+            _func[7] = new MemberFunction(c, "closeEvent", _n_closeEvent0, None, Compiled,
+                                          qt_QSvgWidget_closeEvent_void_QSvgWidget_QCloseEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QSvgWidget"), new Param(c, "event", "qt.QCloseEvent"), End),
+            _func[8] = new MemberFunction(c, "contextMenuEvent", _n_contextMenuEvent0, None, Compiled,
+                                          qt_QSvgWidget_contextMenuEvent_void_QSvgWidget_QContextMenuEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QSvgWidget"), new Param(c, "event", "qt.QContextMenuEvent"), End),
+            _func[9] = new MemberFunction(c, "dragEnterEvent", _n_dragEnterEvent0, None, Compiled,
+                                          qt_QSvgWidget_dragEnterEvent_void_QSvgWidget_QDragEnterEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QSvgWidget"), new Param(c, "event", "qt.QDragEnterEvent"), End),
+            _func[10] = new MemberFunction(c, "dragLeaveEvent", _n_dragLeaveEvent0, None, Compiled,
+                                           qt_QSvgWidget_dragLeaveEvent_void_QSvgWidget_QDragLeaveEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QSvgWidget"), new Param(c, "event", "qt.QDragLeaveEvent"), End),
+            _func[11] = new MemberFunction(c, "dragMoveEvent", _n_dragMoveEvent0, None, Compiled,
+                                           qt_QSvgWidget_dragMoveEvent_void_QSvgWidget_QDragMoveEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QSvgWidget"), new Param(c, "event", "qt.QDragMoveEvent"), End),
+            _func[12] = new MemberFunction(c, "dropEvent", _n_dropEvent0, None, Compiled,
+                                           qt_QSvgWidget_dropEvent_void_QSvgWidget_QDropEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QSvgWidget"), new Param(c, "event", "qt.QDropEvent"), End),
+            _func[13] =
+                new MemberFunction(c, "enterEvent", _n_enterEvent0, None, Compiled, qt_QSvgWidget_enterEvent_void_QSvgWidget_QEvent, Return,
+                                   "void", Parameters, new Param(c, "this", "qt.QSvgWidget"), new Param(c, "event", "qt.QEvent"), End),
+            _func[14] = new MemberFunction(c, "focusInEvent", _n_focusInEvent0, None, Compiled,
+                                           qt_QSvgWidget_focusInEvent_void_QSvgWidget_QFocusEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QSvgWidget"), new Param(c, "event", "qt.QFocusEvent"), End),
+            _func[15] = new MemberFunction(c, "focusNextPrevChild", _n_focusNextPrevChild0, None, Compiled,
+                                           qt_QSvgWidget_focusNextPrevChild_bool_QSvgWidget_bool, Return, "bool", Parameters,
+                                           new Param(c, "this", "qt.QSvgWidget"), new Param(c, "next", "bool"), End),
+            _func[16] = new MemberFunction(c, "focusOutEvent", _n_focusOutEvent0, None, Compiled,
+                                           qt_QSvgWidget_focusOutEvent_void_QSvgWidget_QFocusEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QSvgWidget"), new Param(c, "event", "qt.QFocusEvent"), End),
+            _func[17] = new MemberFunction(c, "hideEvent", _n_hideEvent0, None, Compiled,
+                                           qt_QSvgWidget_hideEvent_void_QSvgWidget_QHideEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QSvgWidget"), new Param(c, "event", "qt.QHideEvent"), End),
             // MISSING: inputMethodEvent (void; QSvgWidget this,
             // "QInputMethodEvent *" event) // protected
-            _func[18] = new MemberFunction(
-                c, "keyPressEvent", _n_keyPressEvent0, None, Compiled,
-                qt_QSvgWidget_keyPressEvent_void_QSvgWidget_QKeyEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QSvgWidget"),
-                new Param(c, "event", "qt.QKeyEvent"), End),
-            _func[19] = new MemberFunction(
-                c, "keyReleaseEvent", _n_keyReleaseEvent0, None, Compiled,
-                qt_QSvgWidget_keyReleaseEvent_void_QSvgWidget_QKeyEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QSvgWidget"),
-                new Param(c, "event", "qt.QKeyEvent"), End),
-            _func[20] = new MemberFunction(
-                c, "leaveEvent", _n_leaveEvent0, None, Compiled,
-                qt_QSvgWidget_leaveEvent_void_QSvgWidget_QEvent, Return, "void",
-                Parameters, new Param(c, "this", "qt.QSvgWidget"),
-                new Param(c, "event", "qt.QEvent"), End),
-            _func[21] = new MemberFunction(
-                c, "mouseDoubleClickEvent", _n_mouseDoubleClickEvent0, None,
-                Compiled,
-                qt_QSvgWidget_mouseDoubleClickEvent_void_QSvgWidget_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QSvgWidget"),
-                new Param(c, "event", "qt.QMouseEvent"), End),
-            _func[22] = new MemberFunction(
-                c, "mouseMoveEvent", _n_mouseMoveEvent0, None, Compiled,
-                qt_QSvgWidget_mouseMoveEvent_void_QSvgWidget_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QSvgWidget"),
-                new Param(c, "event", "qt.QMouseEvent"), End),
-            _func[23] = new MemberFunction(
-                c, "mousePressEvent", _n_mousePressEvent0, None, Compiled,
-                qt_QSvgWidget_mousePressEvent_void_QSvgWidget_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QSvgWidget"),
-                new Param(c, "event", "qt.QMouseEvent"), End),
-            _func[24] = new MemberFunction(
-                c, "mouseReleaseEvent", _n_mouseReleaseEvent0, None, Compiled,
-                qt_QSvgWidget_mouseReleaseEvent_void_QSvgWidget_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QSvgWidget"),
-                new Param(c, "event", "qt.QMouseEvent"), End),
-            _func[25] = new MemberFunction(
-                c, "moveEvent", _n_moveEvent0, None, Compiled,
-                qt_QSvgWidget_moveEvent_void_QSvgWidget_QMoveEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QSvgWidget"),
-                new Param(c, "event", "qt.QMoveEvent"), End),
+            _func[18] = new MemberFunction(c, "keyPressEvent", _n_keyPressEvent0, None, Compiled,
+                                           qt_QSvgWidget_keyPressEvent_void_QSvgWidget_QKeyEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QSvgWidget"), new Param(c, "event", "qt.QKeyEvent"), End),
+            _func[19] = new MemberFunction(c, "keyReleaseEvent", _n_keyReleaseEvent0, None, Compiled,
+                                           qt_QSvgWidget_keyReleaseEvent_void_QSvgWidget_QKeyEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QSvgWidget"), new Param(c, "event", "qt.QKeyEvent"), End),
+            _func[20] =
+                new MemberFunction(c, "leaveEvent", _n_leaveEvent0, None, Compiled, qt_QSvgWidget_leaveEvent_void_QSvgWidget_QEvent, Return,
+                                   "void", Parameters, new Param(c, "this", "qt.QSvgWidget"), new Param(c, "event", "qt.QEvent"), End),
+            _func[21] = new MemberFunction(c, "mouseDoubleClickEvent", _n_mouseDoubleClickEvent0, None, Compiled,
+                                           qt_QSvgWidget_mouseDoubleClickEvent_void_QSvgWidget_QMouseEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QSvgWidget"), new Param(c, "event", "qt.QMouseEvent"), End),
+            _func[22] = new MemberFunction(c, "mouseMoveEvent", _n_mouseMoveEvent0, None, Compiled,
+                                           qt_QSvgWidget_mouseMoveEvent_void_QSvgWidget_QMouseEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QSvgWidget"), new Param(c, "event", "qt.QMouseEvent"), End),
+            _func[23] = new MemberFunction(c, "mousePressEvent", _n_mousePressEvent0, None, Compiled,
+                                           qt_QSvgWidget_mousePressEvent_void_QSvgWidget_QMouseEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QSvgWidget"), new Param(c, "event", "qt.QMouseEvent"), End),
+            _func[24] = new MemberFunction(c, "mouseReleaseEvent", _n_mouseReleaseEvent0, None, Compiled,
+                                           qt_QSvgWidget_mouseReleaseEvent_void_QSvgWidget_QMouseEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QSvgWidget"), new Param(c, "event", "qt.QMouseEvent"), End),
+            _func[25] = new MemberFunction(c, "moveEvent", _n_moveEvent0, None, Compiled,
+                                           qt_QSvgWidget_moveEvent_void_QSvgWidget_QMoveEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QSvgWidget"), new Param(c, "event", "qt.QMoveEvent"), End),
             // MISSING: nativeEvent (bool; QSvgWidget this, QByteArray
             // eventType, "void *" message, "long *" result) // protected
-            _func[26] = new MemberFunction(
-                c, "resizeEvent", _n_resizeEvent0, None, Compiled,
-                qt_QSvgWidget_resizeEvent_void_QSvgWidget_QResizeEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QSvgWidget"),
-                new Param(c, "event", "qt.QResizeEvent"), End),
-            _func[27] = new MemberFunction(
-                c, "showEvent", _n_showEvent0, None, Compiled,
-                qt_QSvgWidget_showEvent_void_QSvgWidget_QShowEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QSvgWidget"),
-                new Param(c, "event", "qt.QShowEvent"), End),
-            _func[28] = new MemberFunction(
-                c, "tabletEvent", _n_tabletEvent0, None, Compiled,
-                qt_QSvgWidget_tabletEvent_void_QSvgWidget_QTabletEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QSvgWidget"),
-                new Param(c, "event", "qt.QTabletEvent"), End),
-            _func[29] = new MemberFunction(
-                c, "wheelEvent", _n_wheelEvent0, None, Compiled,
-                qt_QSvgWidget_wheelEvent_void_QSvgWidget_QWheelEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QSvgWidget"),
-                new Param(c, "event", "qt.QWheelEvent"), End),
-            _func[30] = new MemberFunction(
-                c, "event", _n_event0, None, Compiled,
-                qt_QSvgWidget_event_bool_QSvgWidget_QEvent, Return, "bool",
-                Parameters, new Param(c, "this", "qt.QSvgWidget"),
-                new Param(c, "event_", "qt.QEvent"), End),
+            _func[26] = new MemberFunction(c, "resizeEvent", _n_resizeEvent0, None, Compiled,
+                                           qt_QSvgWidget_resizeEvent_void_QSvgWidget_QResizeEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QSvgWidget"), new Param(c, "event", "qt.QResizeEvent"), End),
+            _func[27] = new MemberFunction(c, "showEvent", _n_showEvent0, None, Compiled,
+                                           qt_QSvgWidget_showEvent_void_QSvgWidget_QShowEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QSvgWidget"), new Param(c, "event", "qt.QShowEvent"), End),
+            _func[28] = new MemberFunction(c, "tabletEvent", _n_tabletEvent0, None, Compiled,
+                                           qt_QSvgWidget_tabletEvent_void_QSvgWidget_QTabletEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QSvgWidget"), new Param(c, "event", "qt.QTabletEvent"), End),
+            _func[29] = new MemberFunction(c, "wheelEvent", _n_wheelEvent0, None, Compiled,
+                                           qt_QSvgWidget_wheelEvent_void_QSvgWidget_QWheelEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QSvgWidget"), new Param(c, "event", "qt.QWheelEvent"), End),
+            _func[30] =
+                new MemberFunction(c, "event", _n_event0, None, Compiled, qt_QSvgWidget_event_bool_QSvgWidget_QEvent, Return, "bool",
+                                   Parameters, new Param(c, "this", "qt.QSvgWidget"), new Param(c, "event_", "qt.QEvent"), End),
             // MISSING: initPainter (void; QSvgWidget this, "QPainter *"
             // painter) // protected MISSING: metric (int; QSvgWidget this,
             // "PaintDeviceMetric" m) // protected static functions

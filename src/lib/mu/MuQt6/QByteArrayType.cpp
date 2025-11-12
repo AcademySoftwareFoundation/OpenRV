@@ -62,38 +62,30 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(__allocate, Pointer)
     {
-        QByteArrayType::Instance* i =
-            new QByteArrayType::Instance((Class*)NODE_THIS.type());
+        QByteArrayType::Instance* i = new QByteArrayType::Instance((Class*)NODE_THIS.type());
         QByteArrayType::registerFinalizer(i);
         NODE_RETURN(i);
     }
 
-    void QByteArrayType::registerFinalizer(void* o)
-    {
-        GC_register_finalizer(o, QByteArrayType::finalizer, 0, 0, 0);
-    }
+    void QByteArrayType::registerFinalizer(void* o) { GC_register_finalizer(o, QByteArrayType::finalizer, 0, 0, 0); }
 
     void QByteArrayType::finalizer(void* obj, void* data)
     {
-        QByteArrayType::Instance* i =
-            reinterpret_cast<QByteArrayType::Instance*>(obj);
+        QByteArrayType::Instance* i = reinterpret_cast<QByteArrayType::Instance*>(obj);
         delete i;
     }
 
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    Pointer
-    qt_QByteArray_QByteArray_QByteArray_QByteArray(Mu::Thread& NODE_THREAD,
-                                                   Pointer param_this)
+    Pointer qt_QByteArray_QByteArray_QByteArray_QByteArray(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         setqtype<QByteArrayType>(param_this, QByteArray());
         return param_this;
     }
 
-    Pointer qt_QByteArray_append_QByteArray_QByteArray_QByteArray(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_ba)
+    Pointer qt_QByteArray_append_QByteArray_QByteArray_QByteArray(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_ba)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QByteArray& arg0 = getqtype<QByteArrayType>(param_this);
@@ -101,8 +93,7 @@ namespace Mu
         return makeqtype<QByteArrayType>(c, arg0.append(arg1), "qt.QByteArray");
     }
 
-    void qt_QByteArray_clear_void_QByteArray(Mu::Thread& NODE_THREAD,
-                                             Pointer param_this)
+    void qt_QByteArray_clear_void_QByteArray(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QByteArray& arg0 = getqtype<QByteArrayType>(param_this);
@@ -110,58 +101,50 @@ namespace Mu
         setqtype<QByteArrayType>(param_this, arg0);
     }
 
-    bool qt_QByteArray_isEmpty_bool_QByteArray(Mu::Thread& NODE_THREAD,
-                                               Pointer param_this)
+    bool qt_QByteArray_isEmpty_bool_QByteArray(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QByteArray& arg0 = getqtype<QByteArrayType>(param_this);
         return arg0.isEmpty();
     }
 
-    bool qt_QByteArray_isLower_bool_QByteArray(Mu::Thread& NODE_THREAD,
-                                               Pointer param_this)
+    bool qt_QByteArray_isLower_bool_QByteArray(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QByteArray& arg0 = getqtype<QByteArrayType>(param_this);
         return arg0.isLower();
     }
 
-    bool qt_QByteArray_isNull_bool_QByteArray(Mu::Thread& NODE_THREAD,
-                                              Pointer param_this)
+    bool qt_QByteArray_isNull_bool_QByteArray(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QByteArray& arg0 = getqtype<QByteArrayType>(param_this);
         return arg0.isNull();
     }
 
-    bool qt_QByteArray_isUpper_bool_QByteArray(Mu::Thread& NODE_THREAD,
-                                               Pointer param_this)
+    bool qt_QByteArray_isUpper_bool_QByteArray(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QByteArray& arg0 = getqtype<QByteArrayType>(param_this);
         return arg0.isUpper();
     }
 
-    bool qt_QByteArray_isValidUtf8_bool_QByteArray(Mu::Thread& NODE_THREAD,
-                                                   Pointer param_this)
+    bool qt_QByteArray_isValidUtf8_bool_QByteArray(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QByteArray& arg0 = getqtype<QByteArrayType>(param_this);
         return arg0.isValidUtf8();
     }
 
-    Pointer qt_QByteArray_prepend_QByteArray_QByteArray_QByteArray(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_ba)
+    Pointer qt_QByteArray_prepend_QByteArray_QByteArray_QByteArray(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_ba)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QByteArray& arg0 = getqtype<QByteArrayType>(param_this);
         const QByteArray arg1 = getqtype<QByteArrayType>(param_ba);
-        return makeqtype<QByteArrayType>(c, arg0.prepend(arg1),
-                                         "qt.QByteArray");
+        return makeqtype<QByteArrayType>(c, arg0.prepend(arg1), "qt.QByteArray");
     }
 
-    void qt_QByteArray_push_back_void_QByteArray_QByteArray(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_other)
+    void qt_QByteArray_push_back_void_QByteArray_QByteArray(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_other)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QByteArray& arg0 = getqtype<QByteArrayType>(param_this);
@@ -170,8 +153,7 @@ namespace Mu
         setqtype<QByteArrayType>(param_this, arg0);
     }
 
-    void qt_QByteArray_push_front_void_QByteArray_QByteArray(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_other)
+    void qt_QByteArray_push_front_void_QByteArray_QByteArray(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_other)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QByteArray& arg0 = getqtype<QByteArrayType>(param_this);
@@ -180,39 +162,30 @@ namespace Mu
         setqtype<QByteArrayType>(param_this, arg0);
     }
 
-    Pointer
-    qt_QByteArray_removeFirst_QByteArray_QByteArray(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this)
+    Pointer qt_QByteArray_removeFirst_QByteArray_QByteArray(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QByteArray& arg0 = getqtype<QByteArrayType>(param_this);
-        return makeqtype<QByteArrayType>(c, arg0.removeFirst(),
-                                         "qt.QByteArray");
+        return makeqtype<QByteArrayType>(c, arg0.removeFirst(), "qt.QByteArray");
     }
 
-    Pointer
-    qt_QByteArray_removeLast_QByteArray_QByteArray(Mu::Thread& NODE_THREAD,
-                                                   Pointer param_this)
+    Pointer qt_QByteArray_removeLast_QByteArray_QByteArray(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QByteArray& arg0 = getqtype<QByteArrayType>(param_this);
         return makeqtype<QByteArrayType>(c, arg0.removeLast(), "qt.QByteArray");
     }
 
-    Pointer qt_QByteArray_setNum_QByteArray_QByteArray_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_n,
-        int param_base)
+    Pointer qt_QByteArray_setNum_QByteArray_QByteArray_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_n, int param_base)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QByteArray& arg0 = getqtype<QByteArrayType>(param_this);
         int arg1 = (int)(param_n);
         int arg2 = (int)(param_base);
-        return makeqtype<QByteArrayType>(c, arg0.setNum(arg1, arg2),
-                                         "qt.QByteArray");
+        return makeqtype<QByteArrayType>(c, arg0.setNum(arg1, arg2), "qt.QByteArray");
     }
 
-    void qt_QByteArray_shrink_to_fit_void_QByteArray(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_this)
+    void qt_QByteArray_shrink_to_fit_void_QByteArray(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QByteArray& arg0 = getqtype<QByteArrayType>(param_this);
@@ -220,17 +193,14 @@ namespace Mu
         setqtype<QByteArrayType>(param_this, arg0);
     }
 
-    Pointer
-    qt_QByteArray_simplified_QByteArray_QByteArray(Mu::Thread& NODE_THREAD,
-                                                   Pointer param_this)
+    Pointer qt_QByteArray_simplified_QByteArray_QByteArray(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QByteArray& arg0 = getqtype<QByteArrayType>(param_this);
         return makeqtype<QByteArrayType>(c, arg0.simplified(), "qt.QByteArray");
     }
 
-    void qt_QByteArray_squeeze_void_QByteArray(Mu::Thread& NODE_THREAD,
-                                               Pointer param_this)
+    void qt_QByteArray_squeeze_void_QByteArray(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QByteArray& arg0 = getqtype<QByteArrayType>(param_this);
@@ -238,9 +208,7 @@ namespace Mu
         setqtype<QByteArrayType>(param_this, arg0);
     }
 
-    void qt_QByteArray_swap_void_QByteArray_QByteArray(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this,
-                                                       Pointer param_other)
+    void qt_QByteArray_swap_void_QByteArray_QByteArray(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_other)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QByteArray& arg0 = getqtype<QByteArrayType>(param_this);
@@ -249,43 +217,36 @@ namespace Mu
         setqtype<QByteArrayType>(param_this, arg0);
     }
 
-    Pointer qt_QByteArray_toBase64_QByteArray_QByteArray_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_options)
+    Pointer qt_QByteArray_toBase64_QByteArray_QByteArray_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_options)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QByteArray& arg0 = getqtype<QByteArrayType>(param_this);
-        QByteArray::Base64Options arg1 =
-            (QByteArray::Base64Options)(param_options);
-        return makeqtype<QByteArrayType>(c, arg0.toBase64(arg1),
-                                         "qt.QByteArray");
+        QByteArray::Base64Options arg1 = (QByteArray::Base64Options)(param_options);
+        return makeqtype<QByteArrayType>(c, arg0.toBase64(arg1), "qt.QByteArray");
     }
 
-    Pointer qt_QByteArray_toLower_QByteArray_QByteArray(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this)
+    Pointer qt_QByteArray_toLower_QByteArray_QByteArray(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QByteArray& arg0 = getqtype<QByteArrayType>(param_this);
         return makeqtype<QByteArrayType>(c, arg0.toLower(), "qt.QByteArray");
     }
 
-    Pointer qt_QByteArray_toUpper_QByteArray_QByteArray(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this)
+    Pointer qt_QByteArray_toUpper_QByteArray_QByteArray(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QByteArray& arg0 = getqtype<QByteArrayType>(param_this);
         return makeqtype<QByteArrayType>(c, arg0.toUpper(), "qt.QByteArray");
     }
 
-    Pointer qt_QByteArray_trimmed_QByteArray_QByteArray(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this)
+    Pointer qt_QByteArray_trimmed_QByteArray_QByteArray(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QByteArray& arg0 = getqtype<QByteArrayType>(param_this);
         return makeqtype<QByteArrayType>(c, arg0.trimmed(), "qt.QByteArray");
     }
 
-    bool qt_QByteArray_operatorBang_EQ__bool_QByteArray_string(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_str)
+    bool qt_QByteArray_operatorBang_EQ__bool_QByteArray_string(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_str)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QByteArray& arg0 = getqtype<QByteArrayType>(param_this);
@@ -293,18 +254,15 @@ namespace Mu
         return arg0.operator!=(arg1);
     }
 
-    Pointer qt_QByteArray_operatorPlus_EQ__QByteArray_QByteArray_QByteArray(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_ba)
+    Pointer qt_QByteArray_operatorPlus_EQ__QByteArray_QByteArray_QByteArray(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_ba)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QByteArray& arg0 = getqtype<QByteArrayType>(param_this);
         const QByteArray arg1 = getqtype<QByteArrayType>(param_ba);
-        return makeqtype<QByteArrayType>(c, arg0.operator+=(arg1),
-                                         "qt.QByteArray");
+        return makeqtype<QByteArrayType>(c, arg0.operator+=(arg1), "qt.QByteArray");
     }
 
-    bool qt_QByteArray_operatorLT__bool_QByteArray_string(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_str)
+    bool qt_QByteArray_operatorLT__bool_QByteArray_string(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_str)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QByteArray& arg0 = getqtype<QByteArrayType>(param_this);
@@ -312,8 +270,7 @@ namespace Mu
         return arg0.operator<(arg1);
     }
 
-    bool qt_QByteArray_operatorLT_EQ__bool_QByteArray_string(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_str)
+    bool qt_QByteArray_operatorLT_EQ__bool_QByteArray_string(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_str)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QByteArray& arg0 = getqtype<QByteArrayType>(param_this);
@@ -321,8 +278,7 @@ namespace Mu
         return arg0.operator<=(arg1);
     }
 
-    bool qt_QByteArray_operatorEQ_EQ__bool_QByteArray_string(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_str)
+    bool qt_QByteArray_operatorEQ_EQ__bool_QByteArray_string(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_str)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QByteArray& arg0 = getqtype<QByteArrayType>(param_this);
@@ -330,8 +286,7 @@ namespace Mu
         return arg0.operator==(arg1);
     }
 
-    bool qt_QByteArray_operatorGT__bool_QByteArray_string(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_str)
+    bool qt_QByteArray_operatorGT__bool_QByteArray_string(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_str)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QByteArray& arg0 = getqtype<QByteArrayType>(param_this);
@@ -339,8 +294,7 @@ namespace Mu
         return arg0.operator>(arg1);
     }
 
-    bool qt_QByteArray_operatorGT_EQ__bool_QByteArray_string(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_str)
+    bool qt_QByteArray_operatorGT_EQ__bool_QByteArray_string(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_str)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QByteArray& arg0 = getqtype<QByteArrayType>(param_this);
@@ -348,230 +302,183 @@ namespace Mu
         return arg0.operator>=(arg1);
     }
 
-    Pointer qt_QByteArray_fromBase64_QByteArray_QByteArray_int(
-        Mu::Thread& NODE_THREAD, Pointer param_base64, int param_options)
+    Pointer qt_QByteArray_fromBase64_QByteArray_QByteArray_int(Mu::Thread& NODE_THREAD, Pointer param_base64, int param_options)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QByteArray arg0 = getqtype<QByteArrayType>(param_base64);
-        QByteArray::Base64Options arg1 =
-            (QByteArray::Base64Options)(param_options);
-        return makeqtype<QByteArrayType>(c, QByteArray::fromBase64(arg0, arg1),
-                                         "qt.QByteArray");
+        QByteArray::Base64Options arg1 = (QByteArray::Base64Options)(param_options);
+        return makeqtype<QByteArrayType>(c, QByteArray::fromBase64(arg0, arg1), "qt.QByteArray");
     }
 
-    Pointer
-    qt_QByteArray_fromHex_QByteArray_QByteArray(Mu::Thread& NODE_THREAD,
-                                                Pointer param_hexEncoded)
+    Pointer qt_QByteArray_fromHex_QByteArray_QByteArray(Mu::Thread& NODE_THREAD, Pointer param_hexEncoded)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QByteArray arg0 = getqtype<QByteArrayType>(param_hexEncoded);
-        return makeqtype<QByteArrayType>(c, QByteArray::fromHex(arg0),
-                                         "qt.QByteArray");
+        return makeqtype<QByteArrayType>(c, QByteArray::fromHex(arg0), "qt.QByteArray");
     }
 
-    Pointer qt_QByteArray_number_QByteArray_int_int(Mu::Thread& NODE_THREAD,
-                                                    int param_n, int param_base)
+    Pointer qt_QByteArray_number_QByteArray_int_int(Mu::Thread& NODE_THREAD, int param_n, int param_base)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         int arg0 = (int)(param_n);
         int arg1 = (int)(param_base);
-        return makeqtype<QByteArrayType>(c, QByteArray::number(arg0, arg1),
-                                         "qt.QByteArray");
+        return makeqtype<QByteArrayType>(c, QByteArray::number(arg0, arg1), "qt.QByteArray");
     }
 
     static NODE_IMPLEMENTATION(_n_QByteArray0, Pointer)
     {
-        NODE_RETURN(qt_QByteArray_QByteArray_QByteArray_QByteArray(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QByteArray_QByteArray_QByteArray_QByteArray(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_append0, Pointer)
     {
-        NODE_RETURN(qt_QByteArray_append_QByteArray_QByteArray_QByteArray(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QByteArray_append_QByteArray_QByteArray_QByteArray(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
-    static NODE_IMPLEMENTATION(_n_clear0, void)
-    {
-        qt_QByteArray_clear_void_QByteArray(NODE_THREAD,
-                                            NONNIL_NODE_ARG(0, Pointer));
-    }
+    static NODE_IMPLEMENTATION(_n_clear0, void) { qt_QByteArray_clear_void_QByteArray(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)); }
 
     static NODE_IMPLEMENTATION(_n_isEmpty0, bool)
     {
-        NODE_RETURN(qt_QByteArray_isEmpty_bool_QByteArray(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QByteArray_isEmpty_bool_QByteArray(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isLower0, bool)
     {
-        NODE_RETURN(qt_QByteArray_isLower_bool_QByteArray(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QByteArray_isLower_bool_QByteArray(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isNull0, bool)
     {
-        NODE_RETURN(qt_QByteArray_isNull_bool_QByteArray(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QByteArray_isNull_bool_QByteArray(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isUpper0, bool)
     {
-        NODE_RETURN(qt_QByteArray_isUpper_bool_QByteArray(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QByteArray_isUpper_bool_QByteArray(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isValidUtf80, bool)
     {
-        NODE_RETURN(qt_QByteArray_isValidUtf8_bool_QByteArray(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QByteArray_isValidUtf8_bool_QByteArray(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_prepend5, Pointer)
     {
-        NODE_RETURN(qt_QByteArray_prepend_QByteArray_QByteArray_QByteArray(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QByteArray_prepend_QByteArray_QByteArray_QByteArray(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_push_back0, void)
     {
-        qt_QByteArray_push_back_void_QByteArray_QByteArray(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QByteArray_push_back_void_QByteArray_QByteArray(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_push_front0, void)
     {
-        qt_QByteArray_push_front_void_QByteArray_QByteArray(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QByteArray_push_front_void_QByteArray_QByteArray(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_removeFirst0, Pointer)
     {
-        NODE_RETURN(qt_QByteArray_removeFirst_QByteArray_QByteArray(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QByteArray_removeFirst_QByteArray_QByteArray(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_removeLast0, Pointer)
     {
-        NODE_RETURN(qt_QByteArray_removeLast_QByteArray_QByteArray(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QByteArray_removeLast_QByteArray_QByteArray(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_setNum0, Pointer)
     {
-        NODE_RETURN(qt_QByteArray_setNum_QByteArray_QByteArray_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int)));
+        NODE_RETURN(qt_QByteArray_setNum_QByteArray_QByteArray_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                       NODE_ARG(2, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_shrink_to_fit0, void)
     {
-        qt_QByteArray_shrink_to_fit_void_QByteArray(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
+        qt_QByteArray_shrink_to_fit_void_QByteArray(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_simplified0, Pointer)
     {
-        NODE_RETURN(qt_QByteArray_simplified_QByteArray_QByteArray(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QByteArray_simplified_QByteArray_QByteArray(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
-    static NODE_IMPLEMENTATION(_n_squeeze0, void)
-    {
-        qt_QByteArray_squeeze_void_QByteArray(NODE_THREAD,
-                                              NONNIL_NODE_ARG(0, Pointer));
-    }
+    static NODE_IMPLEMENTATION(_n_squeeze0, void) { qt_QByteArray_squeeze_void_QByteArray(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)); }
 
     static NODE_IMPLEMENTATION(_n_swap0, void)
     {
-        qt_QByteArray_swap_void_QByteArray_QByteArray(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QByteArray_swap_void_QByteArray_QByteArray(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_toBase640, Pointer)
     {
-        NODE_RETURN(qt_QByteArray_toBase64_QByteArray_QByteArray_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QByteArray_toBase64_QByteArray_QByteArray_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_toLower0, Pointer)
     {
-        NODE_RETURN(qt_QByteArray_toLower_QByteArray_QByteArray(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QByteArray_toLower_QByteArray_QByteArray(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_toUpper0, Pointer)
     {
-        NODE_RETURN(qt_QByteArray_toUpper_QByteArray_QByteArray(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QByteArray_toUpper_QByteArray_QByteArray(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_trimmed0, Pointer)
     {
-        NODE_RETURN(qt_QByteArray_trimmed_QByteArray_QByteArray(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QByteArray_trimmed_QByteArray_QByteArray(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorBang_EQ_0, bool)
     {
-        NODE_RETURN(qt_QByteArray_operatorBang_EQ__bool_QByteArray_string(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QByteArray_operatorBang_EQ__bool_QByteArray_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorPlus_EQ_0, Pointer)
     {
-        NODE_RETURN(
-            qt_QByteArray_operatorPlus_EQ__QByteArray_QByteArray_QByteArray(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QByteArray_operatorPlus_EQ__QByteArray_QByteArray_QByteArray(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                    NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorLT_0, bool)
     {
-        NODE_RETURN(qt_QByteArray_operatorLT__bool_QByteArray_string(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QByteArray_operatorLT__bool_QByteArray_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorLT_EQ_0, bool)
     {
-        NODE_RETURN(qt_QByteArray_operatorLT_EQ__bool_QByteArray_string(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QByteArray_operatorLT_EQ__bool_QByteArray_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorEQ_EQ_0, bool)
     {
-        NODE_RETURN(qt_QByteArray_operatorEQ_EQ__bool_QByteArray_string(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QByteArray_operatorEQ_EQ__bool_QByteArray_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorGT_0, bool)
     {
-        NODE_RETURN(qt_QByteArray_operatorGT__bool_QByteArray_string(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QByteArray_operatorGT__bool_QByteArray_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorGT_EQ_0, bool)
     {
-        NODE_RETURN(qt_QByteArray_operatorGT_EQ__bool_QByteArray_string(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QByteArray_operatorGT_EQ__bool_QByteArray_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_fromBase640, Pointer)
     {
-        NODE_RETURN(qt_QByteArray_fromBase64_QByteArray_QByteArray_int(
-            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QByteArray_fromBase64_QByteArray_QByteArray_int(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_fromHex0, Pointer)
     {
-        NODE_RETURN(qt_QByteArray_fromHex_QByteArray_QByteArray(
-            NODE_THREAD, NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QByteArray_fromHex_QByteArray_QByteArray(NODE_THREAD, NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_number0, Pointer)
     {
-        NODE_RETURN(qt_QByteArray_number_QByteArray_int_int(
-            NODE_THREAD, NODE_ARG(0, int), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QByteArray_number_QByteArray_int_int(NODE_THREAD, NODE_ARG(0, int), NODE_ARG(1, int)));
     }
 
     //
@@ -580,9 +487,7 @@ namespace Mu
     // SPDX-License-Identifier: Apache-2.0
     //
 
-    Pointer
-    QByteArray_constData_QByteArray_byteECB_BSB__(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this)
+    Pointer QByteArray_constData_QByteArray_byteECB_BSB__(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QByteArray arg0 = getqtype<QByteArrayType>(param_this);
@@ -595,24 +500,20 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(constData, Pointer)
     {
-        NODE_RETURN(QByteArray_constData_QByteArray_byteECB_BSB__(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(QByteArray_constData_QByteArray_byteECB_BSB__(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
-    Pointer qt_QByteArray_append_QByteArray_QByteArray_string(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_str)
+    Pointer qt_QByteArray_append_QByteArray_QByteArray_string(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_str)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QByteArray& arg0 = getqtype<QByteArrayType>(param_this);
         const QString arg1 = qstring(param_str);
-        return makeqtype<QByteArrayType>(
-            c, arg0.append(arg1.toStdString().c_str()), "qt.QByteArray");
+        return makeqtype<QByteArrayType>(c, arg0.append(arg1.toStdString().c_str()), "qt.QByteArray");
     }
 
     static NODE_IMPLEMENTATION(_n_append4, Pointer)
     {
-        NODE_RETURN(qt_QByteArray_append_QByteArray_QByteArray_string(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QByteArray_append_QByteArray_QByteArray_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     void QByteArrayType::load()
@@ -632,42 +533,28 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(
-            new Function(c, "__allocate", __allocate, None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", __allocate, None, Return, ftn, End),
 
-            EndArguments);
+                   EndArguments);
 
-        addSymbols(
-            new Alias(c, "Base64Option", "int"),
-            new Alias(c, "Base64Options", "int"),
-            new SymbolicConstant(c, "Base64Encoding", "int",
-                                 Value(int(QByteArray::Base64Encoding))),
-            new SymbolicConstant(c, "Base64UrlEncoding", "int",
-                                 Value(int(QByteArray::Base64UrlEncoding))),
-            new SymbolicConstant(c, "KeepTrailingEquals", "int",
-                                 Value(int(QByteArray::KeepTrailingEquals))),
-            new SymbolicConstant(c, "OmitTrailingEquals", "int",
-                                 Value(int(QByteArray::OmitTrailingEquals))),
-            new SymbolicConstant(
-                c, "IgnoreBase64DecodingErrors", "int",
-                Value(int(QByteArray::IgnoreBase64DecodingErrors))),
-            new SymbolicConstant(
-                c, "AbortOnBase64DecodingErrors", "int",
-                Value(int(QByteArray::AbortOnBase64DecodingErrors))),
-            EndArguments);
+        addSymbols(new Alias(c, "Base64Option", "int"), new Alias(c, "Base64Options", "int"),
+                   new SymbolicConstant(c, "Base64Encoding", "int", Value(int(QByteArray::Base64Encoding))),
+                   new SymbolicConstant(c, "Base64UrlEncoding", "int", Value(int(QByteArray::Base64UrlEncoding))),
+                   new SymbolicConstant(c, "KeepTrailingEquals", "int", Value(int(QByteArray::KeepTrailingEquals))),
+                   new SymbolicConstant(c, "OmitTrailingEquals", "int", Value(int(QByteArray::OmitTrailingEquals))),
+                   new SymbolicConstant(c, "IgnoreBase64DecodingErrors", "int", Value(int(QByteArray::IgnoreBase64DecodingErrors))),
+                   new SymbolicConstant(c, "AbortOnBase64DecodingErrors", "int", Value(int(QByteArray::AbortOnBase64DecodingErrors))),
+                   EndArguments);
 
         addSymbols(
             // enums
             // member functions
-            new Function(c, "QByteArray", _n_QByteArray0, None, Compiled,
-                         qt_QByteArray_QByteArray_QByteArray_QByteArray, Return,
-                         "qt.QByteArray", Parameters,
-                         new Param(c, "this", "qt.QByteArray"), End),
+            new Function(c, "QByteArray", _n_QByteArray0, None, Compiled, qt_QByteArray_QByteArray_QByteArray_QByteArray, Return,
+                         "qt.QByteArray", Parameters, new Param(c, "this", "qt.QByteArray"), End),
             // MISSING: QByteArray (QByteArray; QByteArray this, "const char *"
             // data, "qsizetype" size) MISSING: QByteArray (QByteArray;
             // QByteArray this, "qsizetype" size, "char" ch) MISSING: QByteArray
@@ -675,11 +562,8 @@ namespace Mu
             // Qt::Initialization _p34) MISSING: QByteArray (QByteArray;
             // QByteArray this, QByteArray other) MISSING: QByteArray
             // (QByteArray; QByteArray this, "QByteArray & &" other)
-            new Function(c, "append", _n_append0, None, Compiled,
-                         qt_QByteArray_append_QByteArray_QByteArray_QByteArray,
-                         Return, "qt.QByteArray", Parameters,
-                         new Param(c, "this", "qt.QByteArray"),
-                         new Param(c, "ba", "qt.QByteArray"), End),
+            new Function(c, "append", _n_append0, None, Compiled, qt_QByteArray_append_QByteArray_QByteArray_QByteArray, Return,
+                         "qt.QByteArray", Parameters, new Param(c, "this", "qt.QByteArray"), new Param(c, "ba", "qt.QByteArray"), End),
             // MISSING: append (QByteArray; QByteArray this, "char" ch)
             // MISSING: append (QByteArray; QByteArray this, "qsizetype" count,
             // "char" ch) MISSING: append (QByteArray; QByteArray this, "const
@@ -695,10 +579,8 @@ namespace Mu
             // ("QByteArray::const_iterator"; QByteArray this) MISSING: chop
             // (void; QByteArray this, "qsizetype" n) MISSING: chopped
             // (QByteArray; QByteArray this, "qsizetype" len)
-            new Function(c, "clear", _n_clear0, None, Compiled,
-                         qt_QByteArray_clear_void_QByteArray, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QByteArray"),
-                         End),
+            new Function(c, "clear", _n_clear0, None, Compiled, qt_QByteArray_clear_void_QByteArray, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QByteArray"), End),
             // MISSING: compare (int; QByteArray this, "QByteArrayView" bv,
             // flags Qt::CaseSensitivity cs) MISSING: constBegin
             // ("QByteArray::const_iterator"; QByteArray this) MISSING:
@@ -735,26 +617,16 @@ namespace Mu
             // QByteArray this, "qsizetype" i, "char" ch) MISSING: insert
             // (QByteArray; QByteArray this, "qsizetype" i, "const char *" data,
             // "qsizetype" len)
-            new Function(c, "isEmpty", _n_isEmpty0, None, Compiled,
-                         qt_QByteArray_isEmpty_bool_QByteArray, Return, "bool",
-                         Parameters, new Param(c, "this", "qt.QByteArray"),
-                         End),
-            new Function(c, "isLower", _n_isLower0, None, Compiled,
-                         qt_QByteArray_isLower_bool_QByteArray, Return, "bool",
-                         Parameters, new Param(c, "this", "qt.QByteArray"),
-                         End),
-            new Function(c, "isNull", _n_isNull0, None, Compiled,
-                         qt_QByteArray_isNull_bool_QByteArray, Return, "bool",
-                         Parameters, new Param(c, "this", "qt.QByteArray"),
-                         End),
-            new Function(c, "isUpper", _n_isUpper0, None, Compiled,
-                         qt_QByteArray_isUpper_bool_QByteArray, Return, "bool",
-                         Parameters, new Param(c, "this", "qt.QByteArray"),
-                         End),
-            new Function(c, "isValidUtf8", _n_isValidUtf80, None, Compiled,
-                         qt_QByteArray_isValidUtf8_bool_QByteArray, Return,
-                         "bool", Parameters,
+            new Function(c, "isEmpty", _n_isEmpty0, None, Compiled, qt_QByteArray_isEmpty_bool_QByteArray, Return, "bool", Parameters,
                          new Param(c, "this", "qt.QByteArray"), End),
+            new Function(c, "isLower", _n_isLower0, None, Compiled, qt_QByteArray_isLower_bool_QByteArray, Return, "bool", Parameters,
+                         new Param(c, "this", "qt.QByteArray"), End),
+            new Function(c, "isNull", _n_isNull0, None, Compiled, qt_QByteArray_isNull_bool_QByteArray, Return, "bool", Parameters,
+                         new Param(c, "this", "qt.QByteArray"), End),
+            new Function(c, "isUpper", _n_isUpper0, None, Compiled, qt_QByteArray_isUpper_bool_QByteArray, Return, "bool", Parameters,
+                         new Param(c, "this", "qt.QByteArray"), End),
+            new Function(c, "isValidUtf8", _n_isValidUtf80, None, Compiled, qt_QByteArray_isValidUtf8_bool_QByteArray, Return, "bool",
+                         Parameters, new Param(c, "this", "qt.QByteArray"), End),
             // MISSING: last (QByteArray; QByteArray this, "qsizetype" n)
             // MISSING: lastIndexOf ("qsizetype"; QByteArray this,
             // "QByteArrayView" bv, "qsizetype" from) MISSING: lastIndexOf
@@ -772,24 +644,15 @@ namespace Mu
             // "char" ch) MISSING: prepend (QByteArray; QByteArray this, "const
             // char *" str) MISSING: prepend (QByteArray; QByteArray this,
             // "const char *" str, "qsizetype" len)
-            new Function(c, "prepend", _n_prepend5, None, Compiled,
-                         qt_QByteArray_prepend_QByteArray_QByteArray_QByteArray,
-                         Return, "qt.QByteArray", Parameters,
-                         new Param(c, "this", "qt.QByteArray"),
-                         new Param(c, "ba", "qt.QByteArray"), End),
-            new Function(c, "push_back", _n_push_back0, None, Compiled,
-                         qt_QByteArray_push_back_void_QByteArray_QByteArray,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QByteArray"),
-                         new Param(c, "other", "qt.QByteArray"), End),
+            new Function(c, "prepend", _n_prepend5, None, Compiled, qt_QByteArray_prepend_QByteArray_QByteArray_QByteArray, Return,
+                         "qt.QByteArray", Parameters, new Param(c, "this", "qt.QByteArray"), new Param(c, "ba", "qt.QByteArray"), End),
+            new Function(c, "push_back", _n_push_back0, None, Compiled, qt_QByteArray_push_back_void_QByteArray_QByteArray, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QByteArray"), new Param(c, "other", "qt.QByteArray"), End),
             // MISSING: push_back (void; QByteArray this, "char" ch)
             // MISSING: push_back (void; QByteArray this, "const char *" str)
             // MISSING: push_back (void; QByteArray this, "QByteArrayView" str)
-            new Function(c, "push_front", _n_push_front0, None, Compiled,
-                         qt_QByteArray_push_front_void_QByteArray_QByteArray,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QByteArray"),
-                         new Param(c, "other", "qt.QByteArray"), End),
+            new Function(c, "push_front", _n_push_front0, None, Compiled, qt_QByteArray_push_front_void_QByteArray_QByteArray, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QByteArray"), new Param(c, "other", "qt.QByteArray"), End),
             // MISSING: push_front (void; QByteArray this, "char" ch)
             // MISSING: push_front (void; QByteArray this, "const char *" str)
             // MISSING: push_front (void; QByteArray this, "QByteArrayView" str)
@@ -798,15 +661,11 @@ namespace Mu
             // this) MISSING: remove (QByteArray; QByteArray this, "qsizetype"
             // pos, "qsizetype" len) MISSING: removeAt (QByteArray; QByteArray
             // this, "qsizetype" pos)
-            new Function(c, "removeFirst", _n_removeFirst0, None, Compiled,
-                         qt_QByteArray_removeFirst_QByteArray_QByteArray,
-                         Return, "qt.QByteArray", Parameters,
-                         new Param(c, "this", "qt.QByteArray"), End),
+            new Function(c, "removeFirst", _n_removeFirst0, None, Compiled, qt_QByteArray_removeFirst_QByteArray_QByteArray, Return,
+                         "qt.QByteArray", Parameters, new Param(c, "this", "qt.QByteArray"), End),
             // MISSING: removeIf (QByteArray; QByteArray this, "Predicate" pred)
-            new Function(c, "removeLast", _n_removeLast0, None, Compiled,
-                         qt_QByteArray_removeLast_QByteArray_QByteArray, Return,
-                         "qt.QByteArray", Parameters,
-                         new Param(c, "this", "qt.QByteArray"), End),
+            new Function(c, "removeLast", _n_removeLast0, None, Compiled, qt_QByteArray_removeLast_QByteArray_QByteArray, Return,
+                         "qt.QByteArray", Parameters, new Param(c, "this", "qt.QByteArray"), End),
             // MISSING: rend ("QByteArray::reverse_iterator"; QByteArray this)
             // MISSING: rend ("QByteArray::const_reverse_iterator"; QByteArray
             // this) MISSING: repeated (QByteArray; QByteArray this, "qsizetype"
@@ -826,11 +685,8 @@ namespace Mu
             // "char" c) MISSING: right (QByteArray; QByteArray this,
             // "qsizetype" len) MISSING: rightJustified (QByteArray; QByteArray
             // this, "qsizetype" width, "char" fill, bool truncate)
-            new Function(c, "setNum", _n_setNum0, None, Compiled,
-                         qt_QByteArray_setNum_QByteArray_QByteArray_int_int,
-                         Return, "qt.QByteArray", Parameters,
-                         new Param(c, "this", "qt.QByteArray"),
-                         new Param(c, "n", "int"),
+            new Function(c, "setNum", _n_setNum0, None, Compiled, qt_QByteArray_setNum_QByteArray_QByteArray_int_int, Return,
+                         "qt.QByteArray", Parameters, new Param(c, "this", "qt.QByteArray"), new Param(c, "n", "int"),
                          new Param(c, "base", "int", Value((int)10)), End),
             // MISSING: setNum (QByteArray; QByteArray this, "short" n, int
             // base) MISSING: setNum (QByteArray; QByteArray this, "ushort" n,
@@ -844,37 +700,24 @@ namespace Mu
             // setNum (QByteArray; QByteArray this, double n, "char" format, int
             // precision) MISSING: setRawData (QByteArray; QByteArray this,
             // "const char *" data, "qsizetype" size)
-            new Function(c, "shrink_to_fit", _n_shrink_to_fit0, None, Compiled,
-                         qt_QByteArray_shrink_to_fit_void_QByteArray, Return,
-                         "void", Parameters,
-                         new Param(c, "this", "qt.QByteArray"), End),
-            new Function(c, "simplified", _n_simplified0, None, Compiled,
-                         qt_QByteArray_simplified_QByteArray_QByteArray, Return,
-                         "qt.QByteArray", Parameters,
-                         new Param(c, "this", "qt.QByteArray"), End),
+            new Function(c, "shrink_to_fit", _n_shrink_to_fit0, None, Compiled, qt_QByteArray_shrink_to_fit_void_QByteArray, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QByteArray"), End),
+            new Function(c, "simplified", _n_simplified0, None, Compiled, qt_QByteArray_simplified_QByteArray_QByteArray, Return,
+                         "qt.QByteArray", Parameters, new Param(c, "this", "qt.QByteArray"), End),
             // MISSING: size ("qsizetype"; QByteArray this)
             // MISSING: sliced (QByteArray; QByteArray this, "qsizetype" pos,
             // "qsizetype" n) MISSING: sliced (QByteArray; QByteArray this,
             // "qsizetype" pos) MISSING: split ("QList<QByteArray>"; QByteArray
             // this, "char" sep)
-            new Function(c, "squeeze", _n_squeeze0, None, Compiled,
-                         qt_QByteArray_squeeze_void_QByteArray, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QByteArray"),
-                         End),
+            new Function(c, "squeeze", _n_squeeze0, None, Compiled, qt_QByteArray_squeeze_void_QByteArray, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QByteArray"), End),
             // MISSING: startsWith (bool; QByteArray this, "QByteArrayView" bv)
             // MISSING: startsWith (bool; QByteArray this, "char" ch)
-            new Function(c, "swap", _n_swap0, None, Compiled,
-                         qt_QByteArray_swap_void_QByteArray_QByteArray, Return,
-                         "void", Parameters,
-                         new Param(c, "this", "qt.QByteArray"),
-                         new Param(c, "other", "qt.QByteArray"), End),
-            new Function(c, "toBase64", _n_toBase640, None, Compiled,
-                         qt_QByteArray_toBase64_QByteArray_QByteArray_int,
-                         Return, "qt.QByteArray", Parameters,
-                         new Param(c, "this", "qt.QByteArray"),
-                         new Param(c, "options", "int",
-                                   Value((int)QByteArray::Base64Encoding)),
-                         End),
+            new Function(c, "swap", _n_swap0, None, Compiled, qt_QByteArray_swap_void_QByteArray_QByteArray, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QByteArray"), new Param(c, "other", "qt.QByteArray"), End),
+            new Function(c, "toBase64", _n_toBase640, None, Compiled, qt_QByteArray_toBase64_QByteArray_QByteArray_int, Return,
+                         "qt.QByteArray", Parameters, new Param(c, "this", "qt.QByteArray"),
+                         new Param(c, "options", "int", Value((int)QByteArray::Base64Encoding)), End),
             // MISSING: toCFData ("CFDataRef"; QByteArray this)
             // MISSING: toDouble (double; QByteArray this, "bool *" ok)
             // MISSING: toFloat (float; QByteArray this, "bool *" ok)
@@ -883,10 +726,8 @@ namespace Mu
             // MISSING: toLong ("long"; QByteArray this, "bool *" ok, int base)
             // MISSING: toLongLong ("qlonglong"; QByteArray this, "bool *" ok,
             // int base)
-            new Function(c, "toLower", _n_toLower0, None, Compiled,
-                         qt_QByteArray_toLower_QByteArray_QByteArray, Return,
-                         "qt.QByteArray", Parameters,
-                         new Param(c, "this", "qt.QByteArray"), End),
+            new Function(c, "toLower", _n_toLower0, None, Compiled, qt_QByteArray_toLower_QByteArray_QByteArray, Return, "qt.QByteArray",
+                         Parameters, new Param(c, "this", "qt.QByteArray"), End),
             // MISSING: toNSData ("NSData *"; QByteArray this)
             // MISSING: toPercentEncoding (QByteArray; QByteArray this,
             // QByteArray exclude, QByteArray include, "char" percent) MISSING:
@@ -898,40 +739,28 @@ namespace Mu
             // toULongLong ("qulonglong"; QByteArray this, "bool *" ok, int
             // base) MISSING: toUShort ("ushort"; QByteArray this, "bool *" ok,
             // int base)
-            new Function(c, "toUpper", _n_toUpper0, None, Compiled,
-                         qt_QByteArray_toUpper_QByteArray_QByteArray, Return,
-                         "qt.QByteArray", Parameters,
-                         new Param(c, "this", "qt.QByteArray"), End),
-            new Function(c, "trimmed", _n_trimmed0, None, Compiled,
-                         qt_QByteArray_trimmed_QByteArray_QByteArray, Return,
-                         "qt.QByteArray", Parameters,
-                         new Param(c, "this", "qt.QByteArray"), End),
+            new Function(c, "toUpper", _n_toUpper0, None, Compiled, qt_QByteArray_toUpper_QByteArray_QByteArray, Return, "qt.QByteArray",
+                         Parameters, new Param(c, "this", "qt.QByteArray"), End),
+            new Function(c, "trimmed", _n_trimmed0, None, Compiled, qt_QByteArray_trimmed_QByteArray_QByteArray, Return, "qt.QByteArray",
+                         Parameters, new Param(c, "this", "qt.QByteArray"), End),
             // MISSING: truncate (void; QByteArray this, "qsizetype" pos)
             // MISSING: * ("const char * operator const char"; QByteArray this)
             // MISSING: * ("const void * operator const void"; QByteArray this)
             // static functions
-            new Function(c, "fromBase64", _n_fromBase640, None, Compiled,
-                         qt_QByteArray_fromBase64_QByteArray_QByteArray_int,
-                         Return, "qt.QByteArray", Parameters,
-                         new Param(c, "base64", "qt.QByteArray"),
-                         new Param(c, "options", "int",
-                                   Value((int)QByteArray::Base64Encoding)),
-                         End),
+            new Function(c, "fromBase64", _n_fromBase640, None, Compiled, qt_QByteArray_fromBase64_QByteArray_QByteArray_int, Return,
+                         "qt.QByteArray", Parameters, new Param(c, "base64", "qt.QByteArray"),
+                         new Param(c, "options", "int", Value((int)QByteArray::Base64Encoding)), End),
             // MISSING: fromCFData (QByteArray; "CFDataRef" data)
-            new Function(c, "fromHex", _n_fromHex0, None, Compiled,
-                         qt_QByteArray_fromHex_QByteArray_QByteArray, Return,
-                         "qt.QByteArray", Parameters,
-                         new Param(c, "hexEncoded", "qt.QByteArray"), End),
+            new Function(c, "fromHex", _n_fromHex0, None, Compiled, qt_QByteArray_fromHex_QByteArray_QByteArray, Return, "qt.QByteArray",
+                         Parameters, new Param(c, "hexEncoded", "qt.QByteArray"), End),
             // MISSING: fromNSData (QByteArray; "const NSData *" data)
             // MISSING: fromPercentEncoding (QByteArray; QByteArray input,
             // "char" percent) MISSING: fromRawCFData (QByteArray; "CFDataRef"
             // data) MISSING: fromRawData (QByteArray; "const char *" data,
             // "qsizetype" size) MISSING: fromRawNSData (QByteArray; "const
             // NSData *" data)
-            new Function(c, "number", _n_number0, None, Compiled,
-                         qt_QByteArray_number_QByteArray_int_int, Return,
-                         "qt.QByteArray", Parameters, new Param(c, "n", "int"),
-                         new Param(c, "base", "int", Value((int)10)), End),
+            new Function(c, "number", _n_number0, None, Compiled, qt_QByteArray_number_QByteArray_int_int, Return, "qt.QByteArray",
+                         Parameters, new Param(c, "n", "int"), new Param(c, "base", "int", Value((int)10)), End),
             // MISSING: number (QByteArray; "long" n, int base)
             // MISSING: number (QByteArray; "ulong" n, int base)
             // MISSING: number (QByteArray; "qlonglong" n, int base)
@@ -940,47 +769,26 @@ namespace Mu
             // precision)
             EndArguments);
         globalScope()->addSymbols(
-            new Function(c, "!=", _n_operatorBang_EQ_0, Op, Compiled,
-                         qt_QByteArray_operatorBang_EQ__bool_QByteArray_string,
-                         Return, "bool", Parameters,
-                         new Param(c, "this", "qt.QByteArray"),
-                         new Param(c, "str", "string"), End),
-            new Function(
-                c, "+=", _n_operatorPlus_EQ_0, Op, Compiled,
-                qt_QByteArray_operatorPlus_EQ__QByteArray_QByteArray_QByteArray,
-                Return, "qt.QByteArray", Parameters,
-                new Param(c, "this", "qt.QByteArray"),
-                new Param(c, "ba", "qt.QByteArray"), End),
+            new Function(c, "!=", _n_operatorBang_EQ_0, Op, Compiled, qt_QByteArray_operatorBang_EQ__bool_QByteArray_string, Return, "bool",
+                         Parameters, new Param(c, "this", "qt.QByteArray"), new Param(c, "str", "string"), End),
+            new Function(c, "+=", _n_operatorPlus_EQ_0, Op, Compiled, qt_QByteArray_operatorPlus_EQ__QByteArray_QByteArray_QByteArray,
+                         Return, "qt.QByteArray", Parameters, new Param(c, "this", "qt.QByteArray"), new Param(c, "ba", "qt.QByteArray"),
+                         End),
             // MISSING: += (QByteArray; QByteArray this, "char" ch)
             // MISSING: += (QByteArray; QByteArray this, "const char *" str)
-            new Function(c, "<", _n_operatorLT_0, Op, Compiled,
-                         qt_QByteArray_operatorLT__bool_QByteArray_string,
-                         Return, "bool", Parameters,
-                         new Param(c, "this", "qt.QByteArray"),
-                         new Param(c, "str", "string"), End),
-            new Function(c, "<=", _n_operatorLT_EQ_0, Op, Compiled,
-                         qt_QByteArray_operatorLT_EQ__bool_QByteArray_string,
-                         Return, "bool", Parameters,
-                         new Param(c, "this", "qt.QByteArray"),
-                         new Param(c, "str", "string"), End),
+            new Function(c, "<", _n_operatorLT_0, Op, Compiled, qt_QByteArray_operatorLT__bool_QByteArray_string, Return, "bool",
+                         Parameters, new Param(c, "this", "qt.QByteArray"), new Param(c, "str", "string"), End),
+            new Function(c, "<=", _n_operatorLT_EQ_0, Op, Compiled, qt_QByteArray_operatorLT_EQ__bool_QByteArray_string, Return, "bool",
+                         Parameters, new Param(c, "this", "qt.QByteArray"), new Param(c, "str", "string"), End),
             // MISSING: = (QByteArray; QByteArray this, QByteArray other)
             // MISSING: = (QByteArray; QByteArray this, "const char *" str)
             // MISSING: = (QByteArray; QByteArray this, "QByteArray & &" other)
-            new Function(c, "==", _n_operatorEQ_EQ_0, Op, Compiled,
-                         qt_QByteArray_operatorEQ_EQ__bool_QByteArray_string,
-                         Return, "bool", Parameters,
-                         new Param(c, "this", "qt.QByteArray"),
-                         new Param(c, "str", "string"), End),
-            new Function(c, ">", _n_operatorGT_0, Op, Compiled,
-                         qt_QByteArray_operatorGT__bool_QByteArray_string,
-                         Return, "bool", Parameters,
-                         new Param(c, "this", "qt.QByteArray"),
-                         new Param(c, "str", "string"), End),
-            new Function(c, ">=", _n_operatorGT_EQ_0, Op, Compiled,
-                         qt_QByteArray_operatorGT_EQ__bool_QByteArray_string,
-                         Return, "bool", Parameters,
-                         new Param(c, "this", "qt.QByteArray"),
-                         new Param(c, "str", "string"), End),
+            new Function(c, "==", _n_operatorEQ_EQ_0, Op, Compiled, qt_QByteArray_operatorEQ_EQ__bool_QByteArray_string, Return, "bool",
+                         Parameters, new Param(c, "this", "qt.QByteArray"), new Param(c, "str", "string"), End),
+            new Function(c, ">", _n_operatorGT_0, Op, Compiled, qt_QByteArray_operatorGT__bool_QByteArray_string, Return, "bool",
+                         Parameters, new Param(c, "this", "qt.QByteArray"), new Param(c, "str", "string"), End),
+            new Function(c, ">=", _n_operatorGT_EQ_0, Op, Compiled, qt_QByteArray_operatorGT_EQ__bool_QByteArray_string, Return, "bool",
+                         Parameters, new Param(c, "this", "qt.QByteArray"), new Param(c, "str", "string"), End),
             // MISSING: [] ("char &"; QByteArray this, "qsizetype" i)
             // MISSING: [] ("char"; QByteArray this, "qsizetype" i)
             EndArguments);
@@ -994,18 +802,12 @@ namespace Mu
 
         c->arrayType(c->byteType(), 1, 0);
 
-        addSymbols(
-            new Function(c, "constData", constData, None, Compiled,
-                         QByteArray_constData_QByteArray_byteECB_BSB__, Return,
-                         "byte[]", Parameters,
-                         new Param(c, "this", "qt.QByteArray"), End),
+        addSymbols(new Function(c, "constData", constData, None, Compiled, QByteArray_constData_QByteArray_byteECB_BSB__, Return, "byte[]",
+                                Parameters, new Param(c, "this", "qt.QByteArray"), End),
 
-            new Function(c, "append", _n_append4, None, Compiled,
-                         qt_QByteArray_append_QByteArray_QByteArray_string,
-                         Return, "qt.QByteArray", Parameters,
-                         new Param(c, "this", "qt.QByteArray"),
-                         new Param(c, "str", "string"), End),
-            EndArguments);
+                   new Function(c, "append", _n_append4, None, Compiled, qt_QByteArray_append_QByteArray_QByteArray_string, Return,
+                                "qt.QByteArray", Parameters, new Param(c, "this", "qt.QByteArray"), new Param(c, "str", "string"), End),
+                   EndArguments);
     }
 
 } // namespace Mu

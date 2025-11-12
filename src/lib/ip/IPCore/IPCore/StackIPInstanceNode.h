@@ -37,8 +37,7 @@ namespace IPCore
             HoldOutOfRange
         };
 
-        StackIPInstanceNode(const std::string& name, const NodeDefinition* def,
-                            IPGraph* graph, GroupIPNode* group = 0);
+        StackIPInstanceNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group = 0);
 
         virtual ~StackIPInstanceNode();
 
@@ -53,13 +52,11 @@ namespace IPCore
 
         virtual void setInputs(const IPNodes&);
         virtual ImageRangeInfo imageRangeInfo() const;
-        virtual void mapInputToEvalFrames(size_t inputIndex, const FrameVector&,
-                                          FrameVector&) const;
+        virtual void mapInputToEvalFrames(size_t inputIndex, const FrameVector&, FrameVector&) const;
 
         virtual void propertyChanged(const Property*);
         virtual void inputRangeChanged(int inputIndex, PropagateTarget target);
-        virtual void inputImageStructureChanged(int inputIndex,
-                                                PropagateTarget target);
+        virtual void inputImageStructureChanged(int inputIndex, PropagateTarget target);
         virtual void readCompleted(const std::string&, unsigned int);
 
         void setFitInputsToOutputAspect(bool b)
@@ -80,8 +77,7 @@ namespace IPCore
         void computeRanges();
         void updateOutOfRangePolicy();
         int inputFrame(size_t, int, bool unconstrained = false);
-        void mapInputToEvalFramesInternal(size_t inputIndex, const FrameVector&,
-                                          FrameVector&) const;
+        void mapInputToEvalFramesInternal(size_t inputIndex, const FrameVector&, FrameVector&) const;
 
         void lock() const { pthread_mutex_lock(&m_lock); }
 

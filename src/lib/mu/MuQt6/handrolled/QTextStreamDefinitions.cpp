@@ -15,8 +15,7 @@
 //     return param_this;
 // }
 
-Pointer qt_QTextStream_QTextStream_QTextStream_QTextStream_QIODevice(
-    Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_device)
+Pointer qt_QTextStream_QTextStream_QTextStream_QTextStream_QIODevice(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_device)
 {
     MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
     QIODevice* arg1 = object<QIODevice>(param_device);
@@ -24,18 +23,15 @@ Pointer qt_QTextStream_QTextStream_QTextStream_QTextStream_QIODevice(
     return param_this;
 }
 
-Pointer
-qt_QTextStream_QTextStream_QTextStream_QTextStream(Mu::Thread& NODE_THREAD,
-                                                   Pointer param_this)
+Pointer qt_QTextStream_QTextStream_QTextStream_QTextStream(Mu::Thread& NODE_THREAD, Pointer param_this)
 {
     MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
     setqpointer<QTextStreamType>(param_this, new QTextStream());
     return param_this;
 }
 
-Pointer qt_QTextStream_QTextStream_QTextStream_QTextStream_QByteArray_int(
-    Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_array,
-    int param_openMode)
+Pointer qt_QTextStream_QTextStream_QTextStream_QTextStream_QByteArray_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_array,
+                                                                          int param_openMode)
 {
     MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
     QByteArray* arg1 = &getqtype<QByteArrayType>(param_array);
@@ -44,8 +40,7 @@ Pointer qt_QTextStream_QTextStream_QTextStream_QTextStream_QByteArray_int(
     return param_this;
 }
 
-static void print_void_qt_QTextStream_string(Thread& NODE_THREAD, Pointer obj,
-                                             Pointer p)
+static void print_void_qt_QTextStream_string(Thread& NODE_THREAD, Pointer obj, Pointer p)
 {
     MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
     QTextStream* arg0 = getqpointer<QTextStreamType>(obj);
@@ -61,26 +56,22 @@ static void print_void_qt_QTextStream_string(Thread& NODE_THREAD, Pointer obj,
 
 static NODE_IMPLEMENTATION(_n_QTextStream0, Pointer)
 {
-    NODE_RETURN(qt_QTextStream_QTextStream_QTextStream_QTextStream(
-        NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+    NODE_RETURN(qt_QTextStream_QTextStream_QTextStream_QTextStream(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
 }
 
 static NODE_IMPLEMENTATION(_n_QTextStream1, Pointer)
 {
-    NODE_RETURN(qt_QTextStream_QTextStream_QTextStream_QTextStream_QIODevice(
-        NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+    NODE_RETURN(
+        qt_QTextStream_QTextStream_QTextStream_QTextStream_QIODevice(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
 }
 
 static NODE_IMPLEMENTATION(_n_QTextStream5, Pointer)
 {
-    NODE_RETURN(
-        qt_QTextStream_QTextStream_QTextStream_QTextStream_QByteArray_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int)));
+    NODE_RETURN(qt_QTextStream_QTextStream_QTextStream_QTextStream_QByteArray_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                  NODE_ARG(1, Pointer), NODE_ARG(2, int)));
 }
 
 static NODE_IMPLEMENTATION(printTextStream, void)
 {
-    print_void_qt_QTextStream_string(NODE_THREAD, NODE_ARG(0, Pointer),
-                                     NODE_ARG(1, Pointer));
+    print_void_qt_QTextStream_string(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
 }

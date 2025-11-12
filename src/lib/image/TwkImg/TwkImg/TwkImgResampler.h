@@ -34,12 +34,10 @@ namespace TwkImg
         // Sample a point in relative coordinates
         // Return the percent coverage of the point
         // based on the given kernel.
-        float sample(const Image<COLOR>& img, const TwkMath::Vec2f& loc,
-                     COLOR& samp) const;
+        float sample(const Image<COLOR>& img, const TwkMath::Vec2f& loc, COLOR& samp) const;
 
         // Sample a point in absolute coordinates
-        float sampleAbs(const Image<COLOR>& img, const TwkMath::Vec2f& abs,
-                        COLOR& samp) const;
+        float sampleAbs(const Image<COLOR>& img, const TwkMath::Vec2f& abs, COLOR& samp) const;
     };
 
     //******************************************************************************
@@ -55,12 +53,10 @@ namespace TwkImg
         float radius() const;
 
         // Sample a point in relative coordinates
-        float sample(const Image<COLOR>& img, const TwkMath::Vec2f& loc,
-                     COLOR& samp) const;
+        float sample(const Image<COLOR>& img, const TwkMath::Vec2f& loc, COLOR& samp) const;
 
         // Sample a point in absolute coordinates
-        float sampleAbs(const Image<COLOR>& img, const TwkMath::Vec2f& abs,
-                        COLOR& samp) const;
+        float sampleAbs(const Image<COLOR>& img, const TwkMath::Vec2f& abs, COLOR& samp) const;
     };
 
     //******************************************************************************
@@ -68,15 +64,13 @@ namespace TwkImg
     //******************************************************************************
 
     //******************************************************************************
-    template <class COLOR, bool CHECK>
-    inline NearNbRsmp<COLOR, CHECK>::NearNbRsmp()
+    template <class COLOR, bool CHECK> inline NearNbRsmp<COLOR, CHECK>::NearNbRsmp()
     {
         // Nothing
     }
 
     //******************************************************************************
-    template <class COLOR, bool CHECK>
-    inline float NearNbRsmp<COLOR, CHECK>::radius() const
+    template <class COLOR, bool CHECK> inline float NearNbRsmp<COLOR, CHECK>::radius() const
     {
         // Technically, the radius of a NearNbRsmp is
         // 0.5f pixels, because the furthest distance from
@@ -92,17 +86,14 @@ namespace TwkImg
 
     //******************************************************************************
     template <class COLOR, bool CHECK>
-    float NearNbRsmp<COLOR, CHECK>::sample(const Image<COLOR>& img,
-                                           const TwkMath::Vec2f& loc,
-                                           COLOR& samp) const
+    float NearNbRsmp<COLOR, CHECK>::sample(const Image<COLOR>& img, const TwkMath::Vec2f& loc, COLOR& samp) const
     {
         // Create a static black pixel
         // Part of the COLOR specification is that a default
         // constructor produces a "black" color.
         static COLOR blackPixel;
 
-        TwkMath::Vec2i rloc((int)(TwkMath::Math<float>::round(loc[0])),
-                            (int)(TwkMath::Math<float>::round(loc[1])));
+        TwkMath::Vec2i rloc((int)(TwkMath::Math<float>::round(loc[0])), (int)(TwkMath::Math<float>::round(loc[1])));
 
         if (CHECK)
         {
@@ -126,36 +117,23 @@ namespace TwkImg
 
     //******************************************************************************
     template <class COLOR, bool CHECK>
-    inline float NearNbRsmp<COLOR, CHECK>::sampleAbs(const Image<COLOR>& img,
-                                                     const TwkMath::Vec2f& loc,
-                                                     COLOR& samp) const
+    inline float NearNbRsmp<COLOR, CHECK>::sampleAbs(const Image<COLOR>& img, const TwkMath::Vec2f& loc, COLOR& samp) const
     {
-        return sample(img,
-                      loc
-                          - TwkMath::Vec2f((float)(img.origin()[0]),
-                                           (float)(img.origin()[1])),
-                      samp);
+        return sample(img, loc - TwkMath::Vec2f((float)(img.origin()[0]), (float)(img.origin()[1])), samp);
     }
 
     //******************************************************************************
-    template <class COLOR, bool CHECK>
-    inline BiLinearRsmp<COLOR, CHECK>::BiLinearRsmp()
+    template <class COLOR, bool CHECK> inline BiLinearRsmp<COLOR, CHECK>::BiLinearRsmp()
     {
         // Nothing
     }
 
     //******************************************************************************
-    template <class COLOR, bool CHECK>
-    inline float BiLinearRsmp<COLOR, CHECK>::radius() const
-    {
-        return 0.5f;
-    }
+    template <class COLOR, bool CHECK> inline float BiLinearRsmp<COLOR, CHECK>::radius() const { return 0.5f; }
 
     //******************************************************************************
     template <class COLOR, bool CHECK>
-    float BiLinearRsmp<COLOR, CHECK>::sample(const Image<COLOR>& img,
-                                             const TwkMath::Vec2f& loc,
-                                             COLOR& samp) const
+    float BiLinearRsmp<COLOR, CHECK>::sample(const Image<COLOR>& img, const TwkMath::Vec2f& loc, COLOR& samp) const
     {
         // Allow for samples outside the range of this Image, or tile.
         const int minX = int(floorf(loc[0]));
@@ -229,23 +207,16 @@ namespace TwkImg
             const COLOR* rightBottom = leftBottom + 1;
             const COLOR* rightTop = leftTop + 1;
 
-            samp = (*leftBottom) * (1.0f - tx - ty + txty)
-                   + (*leftTop) * (ty - txty) + (*rightBottom) * (tx - txty)
-                   + (*rightTop) * txty;
+            samp = (*leftBottom) * (1.0f - tx - ty + txty) + (*leftTop) * (ty - txty) + (*rightBottom) * (tx - txty) + (*rightTop) * txty;
             return 1.0f;
         }
     }
 
     //******************************************************************************
     template <class COLOR, bool CHECK>
-    inline float BiLinearRsmp<COLOR, CHECK>::sampleAbs(
-        const Image<COLOR>& img, const TwkMath::Vec2f& loc, COLOR& samp) const
+    inline float BiLinearRsmp<COLOR, CHECK>::sampleAbs(const Image<COLOR>& img, const TwkMath::Vec2f& loc, COLOR& samp) const
     {
-        return sample(img,
-                      loc
-                          - TwkMath::Vec2f((float)(img.origin()[0]),
-                                           (float)(img.origin()[1])),
-                      samp);
+        return sample(img, loc - TwkMath::Vec2f((float)(img.origin()[0]), (float)(img.origin()[1])), samp);
     }
 
 } // End namespace TwkImg

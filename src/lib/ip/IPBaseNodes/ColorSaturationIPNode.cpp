@@ -24,10 +24,7 @@ namespace IPCore
     using namespace TwkContainer;
     using namespace TwkMath;
 
-    ColorSaturationIPNode::ColorSaturationIPNode(const std::string& name,
-                                                 const NodeDefinition* def,
-                                                 IPGraph* graph,
-                                                 GroupIPNode* group)
+    ColorSaturationIPNode::ColorSaturationIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group)
         : IPNode(name, def, graph, group)
     {
         setMaxInputs(1);
@@ -36,8 +33,7 @@ namespace IPCore
         info->setPersistent(false);
 
         m_active = declareProperty<IntProperty>("color.active", 1);
-        m_colorSaturation =
-            declareProperty<FloatProperty>("color.saturation", 1.0f);
+        m_colorSaturation = declareProperty<FloatProperty>("color.saturation", 1.0f);
     }
 
     ColorSaturationIPNode::~ColorSaturationIPNode() {}

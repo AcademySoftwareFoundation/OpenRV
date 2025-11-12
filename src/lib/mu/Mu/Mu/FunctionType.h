@@ -26,11 +26,9 @@ namespace Mu
         //  Type API
         //
 
-        virtual void serialize(std::ostream&, Archive::Writer&,
-                               const ValuePointer) const;
+        virtual void serialize(std::ostream&, Archive::Writer&, const ValuePointer) const;
 
-        virtual void deserialize(std::istream&, Archive::Reader&,
-                                 ValuePointer) const;
+        virtual void deserialize(std::istream&, Archive::Reader&, ValuePointer) const;
 
         virtual void reconstitute(Archive::Reader&, Object*) const;
 
@@ -40,8 +38,7 @@ namespace Mu
         virtual void deleteObject(Object*) const;
 
         virtual void outputNode(std::ostream&, const Node*) const;
-        virtual void outputValueRecursive(std::ostream&, const ValuePointer,
-                                          ValueOutputState&) const;
+        virtual void outputValueRecursive(std::ostream&, const ValuePointer, ValueOutputState&) const;
 
         virtual void load();
 

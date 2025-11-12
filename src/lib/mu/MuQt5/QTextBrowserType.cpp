@@ -56,17 +56,14 @@ namespace Mu
     //----------------------------------------------------------------------
     //  INHERITABLE TYPE IMPLEMENTATION
 
-    MuQt_QTextBrowser::MuQt_QTextBrowser(Pointer muobj,
-                                         const CallEnvironment* ce,
-                                         QWidget* parent)
+    MuQt_QTextBrowser::MuQt_QTextBrowser(Pointer muobj, const CallEnvironment* ce, QWidget* parent)
         : QTextBrowser(parent)
     {
         _env = ce;
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QTextBrowserType>(
-            c->internName("qt.QTextBrowser"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QTextBrowserType>(c->internName("qt.QTextBrowser"));
     }
 
     QVariant MuQt_QTextBrowser::loadResource(int type, const QUrl& name)
@@ -147,8 +144,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QFocusEventType>(c, ev, "qt.QFocusEvent"));
+            args[1] = Value(makeqpointer<QFocusEventType>(c, ev, "qt.QFocusEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -194,8 +190,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -218,8 +213,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -242,8 +236,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -266,8 +259,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QPaintEventType>(c, e, "qt.QPaintEvent"));
+            args[1] = Value(makeqpointer<QPaintEventType>(c, e, "qt.QPaintEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -276,8 +268,7 @@ namespace Mu
         }
     }
 
-    QVariant
-    MuQt_QTextBrowser::inputMethodQuery(Qt::InputMethodQuery property) const
+    QVariant MuQt_QTextBrowser::inputMethodQuery(Qt::InputMethodQuery property) const
     {
         if (!_env)
             return QTextBrowser::inputMethodQuery(property);
@@ -309,8 +300,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeinstance<QMimeDataType>(c, source, "qt.QMimeData"));
+            args[1] = Value(makeinstance<QMimeDataType>(c, source, "qt.QMimeData"));
             Value rval = _env->call(F, args);
             return (bool)(rval._bool);
         }
@@ -354,8 +344,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeinstance<QMimeDataType>(c, source, "qt.QMimeData"));
+            args[1] = Value(makeinstance<QMimeDataType>(c, source, "qt.QMimeData"));
             Value rval = _env->call(F, args);
         }
         else
@@ -401,8 +390,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqpointer<QContextMenuEventType>(
-                c, event, "qt.QContextMenuEvent"));
+            args[1] = Value(makeqpointer<QContextMenuEventType>(c, event, "qt.QContextMenuEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -425,8 +413,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QDragEnterEventType>(c, e, "qt.QDragEnterEvent"));
+            args[1] = Value(makeqpointer<QDragEnterEventType>(c, e, "qt.QDragEnterEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -449,8 +436,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QDragLeaveEventType>(c, e, "qt.QDragLeaveEvent"));
+            args[1] = Value(makeqpointer<QDragLeaveEventType>(c, e, "qt.QDragLeaveEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -473,8 +459,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QDragMoveEventType>(c, e, "qt.QDragMoveEvent"));
+            args[1] = Value(makeqpointer<QDragMoveEventType>(c, e, "qt.QDragMoveEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -497,8 +482,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QDropEventType>(c, e, "qt.QDropEvent"));
+            args[1] = Value(makeqpointer<QDropEventType>(c, e, "qt.QDropEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -521,8 +505,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QFocusEventType>(c, e, "qt.QFocusEvent"));
+            args[1] = Value(makeqpointer<QFocusEventType>(c, e, "qt.QFocusEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -568,8 +551,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -592,8 +574,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QResizeEventType>(c, e, "qt.QResizeEvent"));
+            args[1] = Value(makeqpointer<QResizeEventType>(c, e, "qt.QResizeEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -640,8 +621,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QShowEventType>(c, _p13, "qt.QShowEvent"));
+            args[1] = Value(makeqpointer<QShowEventType>(c, _p13, "qt.QShowEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -664,8 +644,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QWheelEventType>(c, e, "qt.QWheelEvent"));
+            args[1] = Value(makeqpointer<QWheelEventType>(c, e, "qt.QWheelEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -677,8 +656,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  Mu Type CONSTRUCTORS
 
-    QTextBrowserType::QTextBrowserType(Context* c, const char* name,
-                                       Class* super, Class* super2)
+    QTextBrowserType::QTextBrowserType(Context* c, const char* name, Class* super, Class* super2)
         : Class(c, name, vectorOf2(super, super2))
     {
     }
@@ -688,8 +666,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    static Pointer QTextBrowser_QTextBrowser_QObject(Thread& NODE_THREAD,
-                                                     Pointer obj)
+    static Pointer QTextBrowser_QTextBrowser_QObject(Thread& NODE_THREAD, Pointer obj)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         ClassInstance* widget = reinterpret_cast<ClassInstance*>(obj);
@@ -700,9 +677,7 @@ namespace Mu
         }
         else if (QTextBrowser* w = object<QTextBrowser>(widget))
         {
-            QTextBrowserType* type =
-                c->findSymbolOfTypeByQualifiedName<QTextBrowserType>(
-                    c->internName("qt.QTextBrowser"), false);
+            QTextBrowserType* type = c->findSymbolOfTypeByQualifiedName<QTextBrowserType>(c->internName("qt.QTextBrowser"), false);
             ClassInstance* o = ClassInstance::allocate(type);
             setobject(o, w);
             return o;
@@ -715,47 +690,40 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(castFromObject, Pointer)
     {
-        NODE_RETURN(QTextBrowser_QTextBrowser_QObject(NODE_THREAD,
-                                                      NODE_ARG(0, Pointer)));
+        NODE_RETURN(QTextBrowser_QTextBrowser_QObject(NODE_THREAD, NODE_ARG(0, Pointer)));
     }
 
-    Pointer qt_QTextBrowser_QTextBrowser_QTextBrowser_QTextBrowser_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
+    Pointer qt_QTextBrowser_QTextBrowser_QTextBrowser_QTextBrowser_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                           Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWidget* arg1 = object<QWidget>(param_parent);
-        setobject(param_this,
-                  new MuQt_QTextBrowser(
-                      param_this, NODE_THREAD.process()->callEnv(), arg1));
+        setobject(param_this, new MuQt_QTextBrowser(param_this, NODE_THREAD.process()->callEnv(), arg1));
         return param_this;
     }
 
-    int qt_QTextBrowser_backwardHistoryCount_int_QTextBrowser(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    int qt_QTextBrowser_backwardHistoryCount_int_QTextBrowser(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextBrowser* arg0 = object<QTextBrowser>(param_this);
         return arg0->backwardHistoryCount();
     }
 
-    void qt_QTextBrowser_clearHistory_void_QTextBrowser(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this)
+    void qt_QTextBrowser_clearHistory_void_QTextBrowser(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextBrowser* arg0 = object<QTextBrowser>(param_this);
         arg0->clearHistory();
     }
 
-    int qt_QTextBrowser_forwardHistoryCount_int_QTextBrowser(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    int qt_QTextBrowser_forwardHistoryCount_int_QTextBrowser(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextBrowser* arg0 = object<QTextBrowser>(param_this);
         return arg0->forwardHistoryCount();
     }
 
-    Pointer qt_QTextBrowser_historyTitle_string_QTextBrowser_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_i)
+    Pointer qt_QTextBrowser_historyTitle_string_QTextBrowser_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_i)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextBrowser* arg0 = object<QTextBrowser>(param_this);
@@ -763,8 +731,7 @@ namespace Mu
         return makestring(c, arg0->historyTitle(arg1));
     }
 
-    Pointer qt_QTextBrowser_historyUrl_QUrl_QTextBrowser_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_i)
+    Pointer qt_QTextBrowser_historyUrl_QUrl_QTextBrowser_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_i)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextBrowser* arg0 = object<QTextBrowser>(param_this);
@@ -772,64 +739,49 @@ namespace Mu
         return makeqtype<QUrlType>(c, arg0->historyUrl(arg1), "qt.QUrl");
     }
 
-    bool qt_QTextBrowser_isBackwardAvailable_bool_QTextBrowser(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    bool qt_QTextBrowser_isBackwardAvailable_bool_QTextBrowser(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextBrowser* arg0 = object<QTextBrowser>(param_this);
         return arg0->isBackwardAvailable();
     }
 
-    bool qt_QTextBrowser_isForwardAvailable_bool_QTextBrowser(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    bool qt_QTextBrowser_isForwardAvailable_bool_QTextBrowser(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextBrowser* arg0 = object<QTextBrowser>(param_this);
         return arg0->isForwardAvailable();
     }
 
-    Pointer qt_QTextBrowser_loadResource_QVariant_QTextBrowser_int_QUrl(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_type,
-        Pointer param_name)
+    Pointer qt_QTextBrowser_loadResource_QVariant_QTextBrowser_int_QUrl(Mu::Thread& NODE_THREAD, Pointer param_this, int param_type,
+                                                                        Pointer param_name)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextBrowser* arg0 = object<QTextBrowser>(param_this);
         int arg1 = (int)(param_type);
         const QUrl arg2 = getqtype<QUrlType>(param_name);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QVariantType>(
-                         c, arg0->QTextBrowser::loadResource(arg1, arg2),
-                         "qt.QVariant")
-                   : makeqtype<QVariantType>(c, arg0->loadResource(arg1, arg2),
-                                             "qt.QVariant");
+        return isMuQtObject(arg0) ? makeqtype<QVariantType>(c, arg0->QTextBrowser::loadResource(arg1, arg2), "qt.QVariant")
+                                  : makeqtype<QVariantType>(c, arg0->loadResource(arg1, arg2), "qt.QVariant");
     }
 
-    bool qt_QTextBrowser_event_bool_QTextBrowser_QEvent(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this,
-                                                        Pointer param_e)
+    bool qt_QTextBrowser_event_bool_QTextBrowser_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextBrowser* arg0 = object<QTextBrowser>(param_this);
         QEvent* arg1 = getqpointer<QEventType>(param_e);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QTextBrowser*)arg0)->event_pub_parent(arg1)
-                   : ((MuQt_QTextBrowser*)arg0)->event_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QTextBrowser*)arg0)->event_pub_parent(arg1) : ((MuQt_QTextBrowser*)arg0)->event_pub(arg1);
     }
 
-    bool qt_QTextBrowser_focusNextPrevChild_bool_QTextBrowser_bool(
-        Mu::Thread& NODE_THREAD, Pointer param_this, bool param_next)
+    bool qt_QTextBrowser_focusNextPrevChild_bool_QTextBrowser_bool(Mu::Thread& NODE_THREAD, Pointer param_this, bool param_next)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextBrowser* arg0 = object<QTextBrowser>(param_this);
         bool arg1 = (bool)(param_next);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QTextBrowser*)arg0)
-                         ->focusNextPrevChild_pub_parent(arg1)
-                   : ((MuQt_QTextBrowser*)arg0)->focusNextPrevChild_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QTextBrowser*)arg0)->focusNextPrevChild_pub_parent(arg1)
+                                  : ((MuQt_QTextBrowser*)arg0)->focusNextPrevChild_pub(arg1);
     }
 
-    void qt_QTextBrowser_focusOutEvent_void_QTextBrowser_QFocusEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_ev)
+    void qt_QTextBrowser_focusOutEvent_void_QTextBrowser_QFocusEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_ev)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextBrowser* arg0 = object<QTextBrowser>(param_this);
@@ -840,8 +792,7 @@ namespace Mu
             ((MuQt_QTextBrowser*)arg0)->focusOutEvent_pub(arg1);
     }
 
-    void qt_QTextBrowser_keyPressEvent_void_QTextBrowser_QKeyEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_ev)
+    void qt_QTextBrowser_keyPressEvent_void_QTextBrowser_QKeyEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_ev)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextBrowser* arg0 = object<QTextBrowser>(param_this);
@@ -852,8 +803,7 @@ namespace Mu
             ((MuQt_QTextBrowser*)arg0)->keyPressEvent_pub(arg1);
     }
 
-    void qt_QTextBrowser_mouseMoveEvent_void_QTextBrowser_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QTextBrowser_mouseMoveEvent_void_QTextBrowser_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextBrowser* arg0 = object<QTextBrowser>(param_this);
@@ -864,8 +814,7 @@ namespace Mu
             ((MuQt_QTextBrowser*)arg0)->mouseMoveEvent_pub(arg1);
     }
 
-    void qt_QTextBrowser_mousePressEvent_void_QTextBrowser_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QTextBrowser_mousePressEvent_void_QTextBrowser_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextBrowser* arg0 = object<QTextBrowser>(param_this);
@@ -876,8 +825,7 @@ namespace Mu
             ((MuQt_QTextBrowser*)arg0)->mousePressEvent_pub(arg1);
     }
 
-    void qt_QTextBrowser_mouseReleaseEvent_void_QTextBrowser_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QTextBrowser_mouseReleaseEvent_void_QTextBrowser_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextBrowser* arg0 = object<QTextBrowser>(param_this);
@@ -888,8 +836,7 @@ namespace Mu
             ((MuQt_QTextBrowser*)arg0)->mouseReleaseEvent_pub(arg1);
     }
 
-    void qt_QTextBrowser_paintEvent_void_QTextBrowser_QPaintEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QTextBrowser_paintEvent_void_QTextBrowser_QPaintEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextBrowser* arg0 = object<QTextBrowser>(param_this);
@@ -900,52 +847,35 @@ namespace Mu
             ((MuQt_QTextBrowser*)arg0)->paintEvent_pub(arg1);
     }
 
-    Pointer qt_QTextBrowser_inputMethodQuery_QVariant_QTextBrowser_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_property)
+    Pointer qt_QTextBrowser_inputMethodQuery_QVariant_QTextBrowser_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_property)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextBrowser* arg0 = object<QTextBrowser>(param_this);
         Qt::InputMethodQuery arg1 = (Qt::InputMethodQuery)(param_property);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QVariantType>(
-                         c, arg0->QTextBrowser::inputMethodQuery(arg1),
-                         "qt.QVariant")
-                   : makeqtype<QVariantType>(c, arg0->inputMethodQuery(arg1),
-                                             "qt.QVariant");
+        return isMuQtObject(arg0) ? makeqtype<QVariantType>(c, arg0->QTextBrowser::inputMethodQuery(arg1), "qt.QVariant")
+                                  : makeqtype<QVariantType>(c, arg0->inputMethodQuery(arg1), "qt.QVariant");
     }
 
-    bool qt_QTextBrowser_canInsertFromMimeData_bool_QTextBrowser_QMimeData(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_source)
+    bool qt_QTextBrowser_canInsertFromMimeData_bool_QTextBrowser_QMimeData(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                           Pointer param_source)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextBrowser* arg0 = object<QTextBrowser>(param_this);
         const QMimeData* arg1 = object<QMimeData>(param_source);
-        return isMuQtObject(arg0) ? ((MuQt_QTextBrowser*)arg0)
-                                        ->canInsertFromMimeData_pub_parent(arg1)
-                                  : ((MuQt_QTextBrowser*)arg0)
-                                        ->canInsertFromMimeData_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QTextBrowser*)arg0)->canInsertFromMimeData_pub_parent(arg1)
+                                  : ((MuQt_QTextBrowser*)arg0)->canInsertFromMimeData_pub(arg1);
     }
 
-    Pointer qt_QTextBrowser_createMimeDataFromSelection_QMimeData_QTextBrowser(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QTextBrowser_createMimeDataFromSelection_QMimeData_QTextBrowser(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextBrowser* arg0 = object<QTextBrowser>(param_this);
         return isMuQtObject(arg0)
-                   ? makeinstance<QMimeDataType>(
-                         c,
-                         ((MuQt_QTextBrowser*)arg0)
-                             ->createMimeDataFromSelection_pub_parent(),
-                         "qt.QMimeData")
-                   : makeinstance<QMimeDataType>(
-                         c,
-                         ((MuQt_QTextBrowser*)arg0)
-                             ->createMimeDataFromSelection_pub(),
-                         "qt.QMimeData");
+                   ? makeinstance<QMimeDataType>(c, ((MuQt_QTextBrowser*)arg0)->createMimeDataFromSelection_pub_parent(), "qt.QMimeData")
+                   : makeinstance<QMimeDataType>(c, ((MuQt_QTextBrowser*)arg0)->createMimeDataFromSelection_pub(), "qt.QMimeData");
     }
 
-    void qt_QTextBrowser_insertFromMimeData_void_QTextBrowser_QMimeData(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_source)
+    void qt_QTextBrowser_insertFromMimeData_void_QTextBrowser_QMimeData(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_source)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextBrowser* arg0 = object<QTextBrowser>(param_this);
@@ -956,8 +886,7 @@ namespace Mu
             ((MuQt_QTextBrowser*)arg0)->insertFromMimeData_pub(arg1);
     }
 
-    void qt_QTextBrowser_changeEvent_void_QTextBrowser_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QTextBrowser_changeEvent_void_QTextBrowser_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextBrowser* arg0 = object<QTextBrowser>(param_this);
@@ -968,21 +897,19 @@ namespace Mu
             ((MuQt_QTextBrowser*)arg0)->changeEvent_pub(arg1);
     }
 
-    void qt_QTextBrowser_contextMenuEvent_void_QTextBrowser_QContextMenuEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QTextBrowser_contextMenuEvent_void_QTextBrowser_QContextMenuEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                              Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextBrowser* arg0 = object<QTextBrowser>(param_this);
-        QContextMenuEvent* arg1 =
-            getqpointer<QContextMenuEventType>(param_event);
+        QContextMenuEvent* arg1 = getqpointer<QContextMenuEventType>(param_event);
         if (isMuQtObject(arg0))
             ((MuQt_QTextBrowser*)arg0)->contextMenuEvent_pub_parent(arg1);
         else
             ((MuQt_QTextBrowser*)arg0)->contextMenuEvent_pub(arg1);
     }
 
-    void qt_QTextBrowser_dragEnterEvent_void_QTextBrowser_QDragEnterEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QTextBrowser_dragEnterEvent_void_QTextBrowser_QDragEnterEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextBrowser* arg0 = object<QTextBrowser>(param_this);
@@ -993,8 +920,7 @@ namespace Mu
             ((MuQt_QTextBrowser*)arg0)->dragEnterEvent_pub(arg1);
     }
 
-    void qt_QTextBrowser_dragLeaveEvent_void_QTextBrowser_QDragLeaveEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QTextBrowser_dragLeaveEvent_void_QTextBrowser_QDragLeaveEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextBrowser* arg0 = object<QTextBrowser>(param_this);
@@ -1005,8 +931,7 @@ namespace Mu
             ((MuQt_QTextBrowser*)arg0)->dragLeaveEvent_pub(arg1);
     }
 
-    void qt_QTextBrowser_dragMoveEvent_void_QTextBrowser_QDragMoveEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QTextBrowser_dragMoveEvent_void_QTextBrowser_QDragMoveEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextBrowser* arg0 = object<QTextBrowser>(param_this);
@@ -1017,8 +942,7 @@ namespace Mu
             ((MuQt_QTextBrowser*)arg0)->dragMoveEvent_pub(arg1);
     }
 
-    void qt_QTextBrowser_dropEvent_void_QTextBrowser_QDropEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QTextBrowser_dropEvent_void_QTextBrowser_QDropEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextBrowser* arg0 = object<QTextBrowser>(param_this);
@@ -1029,8 +953,7 @@ namespace Mu
             ((MuQt_QTextBrowser*)arg0)->dropEvent_pub(arg1);
     }
 
-    void qt_QTextBrowser_focusInEvent_void_QTextBrowser_QFocusEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QTextBrowser_focusInEvent_void_QTextBrowser_QFocusEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextBrowser* arg0 = object<QTextBrowser>(param_this);
@@ -1041,8 +964,7 @@ namespace Mu
             ((MuQt_QTextBrowser*)arg0)->focusInEvent_pub(arg1);
     }
 
-    void qt_QTextBrowser_keyReleaseEvent_void_QTextBrowser_QKeyEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QTextBrowser_keyReleaseEvent_void_QTextBrowser_QKeyEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextBrowser* arg0 = object<QTextBrowser>(param_this);
@@ -1053,8 +975,7 @@ namespace Mu
             ((MuQt_QTextBrowser*)arg0)->keyReleaseEvent_pub(arg1);
     }
 
-    void qt_QTextBrowser_mouseDoubleClickEvent_void_QTextBrowser_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QTextBrowser_mouseDoubleClickEvent_void_QTextBrowser_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextBrowser* arg0 = object<QTextBrowser>(param_this);
@@ -1065,8 +986,7 @@ namespace Mu
             ((MuQt_QTextBrowser*)arg0)->mouseDoubleClickEvent_pub(arg1);
     }
 
-    void qt_QTextBrowser_resizeEvent_void_QTextBrowser_QResizeEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QTextBrowser_resizeEvent_void_QTextBrowser_QResizeEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextBrowser* arg0 = object<QTextBrowser>(param_this);
@@ -1077,8 +997,7 @@ namespace Mu
             ((MuQt_QTextBrowser*)arg0)->resizeEvent_pub(arg1);
     }
 
-    void qt_QTextBrowser_scrollContentsBy_void_QTextBrowser_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_dx, int param_dy)
+    void qt_QTextBrowser_scrollContentsBy_void_QTextBrowser_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_dx, int param_dy)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextBrowser* arg0 = object<QTextBrowser>(param_this);
@@ -1090,8 +1009,7 @@ namespace Mu
             ((MuQt_QTextBrowser*)arg0)->scrollContentsBy_pub(arg1, arg2);
     }
 
-    void qt_QTextBrowser_showEvent_void_QTextBrowser_QShowEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param__p13)
+    void qt_QTextBrowser_showEvent_void_QTextBrowser_QShowEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param__p13)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextBrowser* arg0 = object<QTextBrowser>(param_this);
@@ -1102,8 +1020,7 @@ namespace Mu
             ((MuQt_QTextBrowser*)arg0)->showEvent_pub(arg1);
     }
 
-    void qt_QTextBrowser_wheelEvent_void_QTextBrowser_QWheelEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QTextBrowser_wheelEvent_void_QTextBrowser_QWheelEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextBrowser* arg0 = object<QTextBrowser>(param_this);
@@ -1117,212 +1034,176 @@ namespace Mu
     static NODE_IMPLEMENTATION(_n_QTextBrowser0, Pointer)
     {
         NODE_RETURN(
-            qt_QTextBrowser_QTextBrowser_QTextBrowser_QTextBrowser_QWidget(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+            qt_QTextBrowser_QTextBrowser_QTextBrowser_QTextBrowser_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_backwardHistoryCount0, int)
     {
-        NODE_RETURN(qt_QTextBrowser_backwardHistoryCount_int_QTextBrowser(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTextBrowser_backwardHistoryCount_int_QTextBrowser(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_clearHistory0, void)
     {
-        qt_QTextBrowser_clearHistory_void_QTextBrowser(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
+        qt_QTextBrowser_clearHistory_void_QTextBrowser(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_forwardHistoryCount0, int)
     {
-        NODE_RETURN(qt_QTextBrowser_forwardHistoryCount_int_QTextBrowser(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTextBrowser_forwardHistoryCount_int_QTextBrowser(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_historyTitle0, Pointer)
     {
-        NODE_RETURN(qt_QTextBrowser_historyTitle_string_QTextBrowser_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QTextBrowser_historyTitle_string_QTextBrowser_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_historyUrl0, Pointer)
     {
-        NODE_RETURN(qt_QTextBrowser_historyUrl_QUrl_QTextBrowser_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QTextBrowser_historyUrl_QUrl_QTextBrowser_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_isBackwardAvailable0, bool)
     {
-        NODE_RETURN(qt_QTextBrowser_isBackwardAvailable_bool_QTextBrowser(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTextBrowser_isBackwardAvailable_bool_QTextBrowser(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isForwardAvailable0, bool)
     {
-        NODE_RETURN(qt_QTextBrowser_isForwardAvailable_bool_QTextBrowser(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTextBrowser_isForwardAvailable_bool_QTextBrowser(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_loadResource0, Pointer)
     {
-        NODE_RETURN(qt_QTextBrowser_loadResource_QVariant_QTextBrowser_int_QUrl(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QTextBrowser_loadResource_QVariant_QTextBrowser_int_QUrl(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                                NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_event0, bool)
     {
-        NODE_RETURN(qt_QTextBrowser_event_bool_QTextBrowser_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QTextBrowser_event_bool_QTextBrowser_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_focusNextPrevChild0, bool)
     {
-        NODE_RETURN(qt_QTextBrowser_focusNextPrevChild_bool_QTextBrowser_bool(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool)));
+        NODE_RETURN(qt_QTextBrowser_focusNextPrevChild_bool_QTextBrowser_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool)));
     }
 
     static NODE_IMPLEMENTATION(_n_focusOutEvent0, void)
     {
-        qt_QTextBrowser_focusOutEvent_void_QTextBrowser_QFocusEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTextBrowser_focusOutEvent_void_QTextBrowser_QFocusEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_keyPressEvent0, void)
     {
-        qt_QTextBrowser_keyPressEvent_void_QTextBrowser_QKeyEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTextBrowser_keyPressEvent_void_QTextBrowser_QKeyEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseMoveEvent0, void)
     {
-        qt_QTextBrowser_mouseMoveEvent_void_QTextBrowser_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTextBrowser_mouseMoveEvent_void_QTextBrowser_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mousePressEvent0, void)
     {
-        qt_QTextBrowser_mousePressEvent_void_QTextBrowser_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTextBrowser_mousePressEvent_void_QTextBrowser_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseReleaseEvent0, void)
     {
-        qt_QTextBrowser_mouseReleaseEvent_void_QTextBrowser_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTextBrowser_mouseReleaseEvent_void_QTextBrowser_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_paintEvent0, void)
     {
-        qt_QTextBrowser_paintEvent_void_QTextBrowser_QPaintEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTextBrowser_paintEvent_void_QTextBrowser_QPaintEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_inputMethodQuery0, Pointer)
     {
-        NODE_RETURN(qt_QTextBrowser_inputMethodQuery_QVariant_QTextBrowser_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QTextBrowser_inputMethodQuery_QVariant_QTextBrowser_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_canInsertFromMimeData0, bool)
     {
-        NODE_RETURN(
-            qt_QTextBrowser_canInsertFromMimeData_bool_QTextBrowser_QMimeData(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QTextBrowser_canInsertFromMimeData_bool_QTextBrowser_QMimeData(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                      NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_createMimeDataFromSelection0, Pointer)
     {
-        NODE_RETURN(
-            qt_QTextBrowser_createMimeDataFromSelection_QMimeData_QTextBrowser(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTextBrowser_createMimeDataFromSelection_QMimeData_QTextBrowser(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_insertFromMimeData0, void)
     {
-        qt_QTextBrowser_insertFromMimeData_void_QTextBrowser_QMimeData(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTextBrowser_insertFromMimeData_void_QTextBrowser_QMimeData(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_changeEvent0, void)
     {
-        qt_QTextBrowser_changeEvent_void_QTextBrowser_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTextBrowser_changeEvent_void_QTextBrowser_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_contextMenuEvent0, void)
     {
-        qt_QTextBrowser_contextMenuEvent_void_QTextBrowser_QContextMenuEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTextBrowser_contextMenuEvent_void_QTextBrowser_QContextMenuEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                             NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_dragEnterEvent0, void)
     {
-        qt_QTextBrowser_dragEnterEvent_void_QTextBrowser_QDragEnterEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTextBrowser_dragEnterEvent_void_QTextBrowser_QDragEnterEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_dragLeaveEvent0, void)
     {
-        qt_QTextBrowser_dragLeaveEvent_void_QTextBrowser_QDragLeaveEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTextBrowser_dragLeaveEvent_void_QTextBrowser_QDragLeaveEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_dragMoveEvent0, void)
     {
-        qt_QTextBrowser_dragMoveEvent_void_QTextBrowser_QDragMoveEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTextBrowser_dragMoveEvent_void_QTextBrowser_QDragMoveEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_dropEvent0, void)
     {
-        qt_QTextBrowser_dropEvent_void_QTextBrowser_QDropEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTextBrowser_dropEvent_void_QTextBrowser_QDropEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_focusInEvent0, void)
     {
-        qt_QTextBrowser_focusInEvent_void_QTextBrowser_QFocusEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTextBrowser_focusInEvent_void_QTextBrowser_QFocusEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_keyReleaseEvent0, void)
     {
-        qt_QTextBrowser_keyReleaseEvent_void_QTextBrowser_QKeyEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTextBrowser_keyReleaseEvent_void_QTextBrowser_QKeyEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseDoubleClickEvent0, void)
     {
-        qt_QTextBrowser_mouseDoubleClickEvent_void_QTextBrowser_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTextBrowser_mouseDoubleClickEvent_void_QTextBrowser_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_resizeEvent0, void)
     {
-        qt_QTextBrowser_resizeEvent_void_QTextBrowser_QResizeEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTextBrowser_resizeEvent_void_QTextBrowser_QResizeEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_scrollContentsBy0, void)
     {
-        qt_QTextBrowser_scrollContentsBy_void_QTextBrowser_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int));
+        qt_QTextBrowser_scrollContentsBy_void_QTextBrowser_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                   NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_showEvent0, void)
     {
-        qt_QTextBrowser_showEvent_void_QTextBrowser_QShowEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTextBrowser_showEvent_void_QTextBrowser_QShowEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_wheelEvent0, void)
     {
-        qt_QTextBrowser_wheelEvent_void_QTextBrowser_QWheelEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTextBrowser_wheelEvent_void_QTextBrowser_QWheelEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     void QTextBrowserType::load()
@@ -1342,17 +1223,13 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
-                   new Function(c, tn, castFromObject, Cast, Compiled,
-                                QTextBrowser_QTextBrowser_QObject, Return, ftn,
-                                Parameters,
+                   new Function(c, tn, castFromObject, Cast, Compiled, QTextBrowser_QTextBrowser_QObject, Return, ftn, Parameters,
                                 new Param(c, "object", "qt.QObject"), End),
 
                    EndArguments);
@@ -1360,45 +1237,26 @@ namespace Mu
         addSymbols(
             // enums
             // member functions
-            new Function(
-                c, "QTextBrowser", _n_QTextBrowser0, None, Compiled,
-                qt_QTextBrowser_QTextBrowser_QTextBrowser_QTextBrowser_QWidget,
-                Return, "qt.QTextBrowser", Parameters,
-                new Param(c, "this", "qt.QTextBrowser"),
-                new Param(c, "parent", "qt.QWidget"), End),
-            new Function(c, "backwardHistoryCount", _n_backwardHistoryCount0,
-                         None, Compiled,
-                         qt_QTextBrowser_backwardHistoryCount_int_QTextBrowser,
-                         Return, "int", Parameters,
+            new Function(c, "QTextBrowser", _n_QTextBrowser0, None, Compiled,
+                         qt_QTextBrowser_QTextBrowser_QTextBrowser_QTextBrowser_QWidget, Return, "qt.QTextBrowser", Parameters,
+                         new Param(c, "this", "qt.QTextBrowser"), new Param(c, "parent", "qt.QWidget"), End),
+            new Function(c, "backwardHistoryCount", _n_backwardHistoryCount0, None, Compiled,
+                         qt_QTextBrowser_backwardHistoryCount_int_QTextBrowser, Return, "int", Parameters,
                          new Param(c, "this", "qt.QTextBrowser"), End),
-            new Function(c, "clearHistory", _n_clearHistory0, None, Compiled,
-                         qt_QTextBrowser_clearHistory_void_QTextBrowser, Return,
-                         "void", Parameters,
+            new Function(c, "clearHistory", _n_clearHistory0, None, Compiled, qt_QTextBrowser_clearHistory_void_QTextBrowser, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QTextBrowser"), End),
+            new Function(c, "forwardHistoryCount", _n_forwardHistoryCount0, None, Compiled,
+                         qt_QTextBrowser_forwardHistoryCount_int_QTextBrowser, Return, "int", Parameters,
                          new Param(c, "this", "qt.QTextBrowser"), End),
-            new Function(c, "forwardHistoryCount", _n_forwardHistoryCount0,
-                         None, Compiled,
-                         qt_QTextBrowser_forwardHistoryCount_int_QTextBrowser,
-                         Return, "int", Parameters,
+            new Function(c, "historyTitle", _n_historyTitle0, None, Compiled, qt_QTextBrowser_historyTitle_string_QTextBrowser_int, Return,
+                         "string", Parameters, new Param(c, "this", "qt.QTextBrowser"), new Param(c, "i", "int"), End),
+            new Function(c, "historyUrl", _n_historyUrl0, None, Compiled, qt_QTextBrowser_historyUrl_QUrl_QTextBrowser_int, Return,
+                         "qt.QUrl", Parameters, new Param(c, "this", "qt.QTextBrowser"), new Param(c, "i", "int"), End),
+            new Function(c, "isBackwardAvailable", _n_isBackwardAvailable0, None, Compiled,
+                         qt_QTextBrowser_isBackwardAvailable_bool_QTextBrowser, Return, "bool", Parameters,
                          new Param(c, "this", "qt.QTextBrowser"), End),
-            new Function(c, "historyTitle", _n_historyTitle0, None, Compiled,
-                         qt_QTextBrowser_historyTitle_string_QTextBrowser_int,
-                         Return, "string", Parameters,
-                         new Param(c, "this", "qt.QTextBrowser"),
-                         new Param(c, "i", "int"), End),
-            new Function(c, "historyUrl", _n_historyUrl0, None, Compiled,
-                         qt_QTextBrowser_historyUrl_QUrl_QTextBrowser_int,
-                         Return, "qt.QUrl", Parameters,
-                         new Param(c, "this", "qt.QTextBrowser"),
-                         new Param(c, "i", "int"), End),
-            new Function(c, "isBackwardAvailable", _n_isBackwardAvailable0,
-                         None, Compiled,
-                         qt_QTextBrowser_isBackwardAvailable_bool_QTextBrowser,
-                         Return, "bool", Parameters,
-                         new Param(c, "this", "qt.QTextBrowser"), End),
-            new Function(c, "isForwardAvailable", _n_isForwardAvailable0, None,
-                         Compiled,
-                         qt_QTextBrowser_isForwardAvailable_bool_QTextBrowser,
-                         Return, "bool", Parameters,
+            new Function(c, "isForwardAvailable", _n_isForwardAvailable0, None, Compiled,
+                         qt_QTextBrowser_isForwardAvailable_bool_QTextBrowser, Return, "bool", Parameters,
                          new Param(c, "this", "qt.QTextBrowser"), End),
             // PROP: openExternalLinks (bool; QTextBrowser this)
             // PROP: openLinks (bool; QTextBrowser this)
@@ -1407,163 +1265,87 @@ namespace Mu
             // PROP: setOpenLinks (void; QTextBrowser this, bool open)
             // PROP: setSearchPaths (void; QTextBrowser this, string[] paths)
             // PROP: source (QUrl; QTextBrowser this)
-            _func[0] = new MemberFunction(
-                c, "loadResource", _n_loadResource0, None, Compiled,
-                qt_QTextBrowser_loadResource_QVariant_QTextBrowser_int_QUrl,
-                Return, "qt.QVariant", Parameters,
-                new Param(c, "this", "qt.QTextBrowser"),
-                new Param(c, "type", "int"), new Param(c, "name", "qt.QUrl"),
-                End),
-            _func[1] = new MemberFunction(
-                c, "event", _n_event0, None, Compiled,
-                qt_QTextBrowser_event_bool_QTextBrowser_QEvent, Return, "bool",
-                Parameters, new Param(c, "this", "qt.QTextBrowser"),
-                new Param(c, "e", "qt.QEvent"), End),
-            _func[2] = new MemberFunction(
-                c, "focusNextPrevChild", _n_focusNextPrevChild0, None, Compiled,
-                qt_QTextBrowser_focusNextPrevChild_bool_QTextBrowser_bool,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QTextBrowser"),
-                new Param(c, "next", "bool"), End),
-            _func[3] = new MemberFunction(
-                c, "focusOutEvent", _n_focusOutEvent0, None, Compiled,
-                qt_QTextBrowser_focusOutEvent_void_QTextBrowser_QFocusEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTextBrowser"),
-                new Param(c, "ev", "qt.QFocusEvent"), End),
-            _func[4] = new MemberFunction(
-                c, "keyPressEvent", _n_keyPressEvent0, None, Compiled,
-                qt_QTextBrowser_keyPressEvent_void_QTextBrowser_QKeyEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTextBrowser"),
-                new Param(c, "ev", "qt.QKeyEvent"), End),
-            _func[5] = new MemberFunction(
-                c, "mouseMoveEvent", _n_mouseMoveEvent0, None, Compiled,
-                qt_QTextBrowser_mouseMoveEvent_void_QTextBrowser_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTextBrowser"),
-                new Param(c, "e", "qt.QMouseEvent"), End),
-            _func[6] = new MemberFunction(
-                c, "mousePressEvent", _n_mousePressEvent0, None, Compiled,
-                qt_QTextBrowser_mousePressEvent_void_QTextBrowser_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTextBrowser"),
-                new Param(c, "e", "qt.QMouseEvent"), End),
-            _func[7] = new MemberFunction(
-                c, "mouseReleaseEvent", _n_mouseReleaseEvent0, None, Compiled,
-                qt_QTextBrowser_mouseReleaseEvent_void_QTextBrowser_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTextBrowser"),
-                new Param(c, "e", "qt.QMouseEvent"), End),
-            _func[8] = new MemberFunction(
-                c, "paintEvent", _n_paintEvent0, None, Compiled,
-                qt_QTextBrowser_paintEvent_void_QTextBrowser_QPaintEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTextBrowser"),
-                new Param(c, "e", "qt.QPaintEvent"), End),
-            _func[9] = new MemberFunction(
-                c, "inputMethodQuery", _n_inputMethodQuery0, None, Compiled,
-                qt_QTextBrowser_inputMethodQuery_QVariant_QTextBrowser_int,
-                Return, "qt.QVariant", Parameters,
-                new Param(c, "this", "qt.QTextBrowser"),
-                new Param(c, "property", "int"), End),
-            _func[10] = new MemberFunction(
-                c, "canInsertFromMimeData", _n_canInsertFromMimeData0, None,
-                Compiled,
-                qt_QTextBrowser_canInsertFromMimeData_bool_QTextBrowser_QMimeData,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QTextBrowser"),
-                new Param(c, "source", "qt.QMimeData"), End),
-            _func[11] = new MemberFunction(
-                c, "createMimeDataFromSelection",
-                _n_createMimeDataFromSelection0, None, Compiled,
-                qt_QTextBrowser_createMimeDataFromSelection_QMimeData_QTextBrowser,
-                Return, "qt.QMimeData", Parameters,
-                new Param(c, "this", "qt.QTextBrowser"), End),
-            _func[12] = new MemberFunction(
-                c, "insertFromMimeData", _n_insertFromMimeData0, None, Compiled,
-                qt_QTextBrowser_insertFromMimeData_void_QTextBrowser_QMimeData,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTextBrowser"),
-                new Param(c, "source", "qt.QMimeData"), End),
-            _func[13] = new MemberFunction(
-                c, "changeEvent", _n_changeEvent0, None, Compiled,
-                qt_QTextBrowser_changeEvent_void_QTextBrowser_QEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QTextBrowser"),
-                new Param(c, "e", "qt.QEvent"), End),
-            _func[14] = new MemberFunction(
-                c, "contextMenuEvent", _n_contextMenuEvent0, None, Compiled,
-                qt_QTextBrowser_contextMenuEvent_void_QTextBrowser_QContextMenuEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTextBrowser"),
-                new Param(c, "event", "qt.QContextMenuEvent"), End),
-            _func[15] = new MemberFunction(
-                c, "dragEnterEvent", _n_dragEnterEvent0, None, Compiled,
-                qt_QTextBrowser_dragEnterEvent_void_QTextBrowser_QDragEnterEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTextBrowser"),
-                new Param(c, "e", "qt.QDragEnterEvent"), End),
-            _func[16] = new MemberFunction(
-                c, "dragLeaveEvent", _n_dragLeaveEvent0, None, Compiled,
-                qt_QTextBrowser_dragLeaveEvent_void_QTextBrowser_QDragLeaveEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTextBrowser"),
-                new Param(c, "e", "qt.QDragLeaveEvent"), End),
-            _func[17] = new MemberFunction(
-                c, "dragMoveEvent", _n_dragMoveEvent0, None, Compiled,
-                qt_QTextBrowser_dragMoveEvent_void_QTextBrowser_QDragMoveEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTextBrowser"),
-                new Param(c, "e", "qt.QDragMoveEvent"), End),
-            _func[18] = new MemberFunction(
-                c, "dropEvent", _n_dropEvent0, None, Compiled,
-                qt_QTextBrowser_dropEvent_void_QTextBrowser_QDropEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QTextBrowser"),
-                new Param(c, "e", "qt.QDropEvent"), End),
-            _func[19] = new MemberFunction(
-                c, "focusInEvent", _n_focusInEvent0, None, Compiled,
-                qt_QTextBrowser_focusInEvent_void_QTextBrowser_QFocusEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTextBrowser"),
-                new Param(c, "e", "qt.QFocusEvent"), End),
+            _func[0] = new MemberFunction(c, "loadResource", _n_loadResource0, None, Compiled,
+                                          qt_QTextBrowser_loadResource_QVariant_QTextBrowser_int_QUrl, Return, "qt.QVariant", Parameters,
+                                          new Param(c, "this", "qt.QTextBrowser"), new Param(c, "type", "int"),
+                                          new Param(c, "name", "qt.QUrl"), End),
+            _func[1] = new MemberFunction(c, "event", _n_event0, None, Compiled, qt_QTextBrowser_event_bool_QTextBrowser_QEvent, Return,
+                                          "bool", Parameters, new Param(c, "this", "qt.QTextBrowser"), new Param(c, "e", "qt.QEvent"), End),
+            _func[2] = new MemberFunction(c, "focusNextPrevChild", _n_focusNextPrevChild0, None, Compiled,
+                                          qt_QTextBrowser_focusNextPrevChild_bool_QTextBrowser_bool, Return, "bool", Parameters,
+                                          new Param(c, "this", "qt.QTextBrowser"), new Param(c, "next", "bool"), End),
+            _func[3] = new MemberFunction(c, "focusOutEvent", _n_focusOutEvent0, None, Compiled,
+                                          qt_QTextBrowser_focusOutEvent_void_QTextBrowser_QFocusEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QTextBrowser"), new Param(c, "ev", "qt.QFocusEvent"), End),
+            _func[4] = new MemberFunction(c, "keyPressEvent", _n_keyPressEvent0, None, Compiled,
+                                          qt_QTextBrowser_keyPressEvent_void_QTextBrowser_QKeyEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QTextBrowser"), new Param(c, "ev", "qt.QKeyEvent"), End),
+            _func[5] = new MemberFunction(c, "mouseMoveEvent", _n_mouseMoveEvent0, None, Compiled,
+                                          qt_QTextBrowser_mouseMoveEvent_void_QTextBrowser_QMouseEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QTextBrowser"), new Param(c, "e", "qt.QMouseEvent"), End),
+            _func[6] = new MemberFunction(c, "mousePressEvent", _n_mousePressEvent0, None, Compiled,
+                                          qt_QTextBrowser_mousePressEvent_void_QTextBrowser_QMouseEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QTextBrowser"), new Param(c, "e", "qt.QMouseEvent"), End),
+            _func[7] = new MemberFunction(c, "mouseReleaseEvent", _n_mouseReleaseEvent0, None, Compiled,
+                                          qt_QTextBrowser_mouseReleaseEvent_void_QTextBrowser_QMouseEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QTextBrowser"), new Param(c, "e", "qt.QMouseEvent"), End),
+            _func[8] = new MemberFunction(c, "paintEvent", _n_paintEvent0, None, Compiled,
+                                          qt_QTextBrowser_paintEvent_void_QTextBrowser_QPaintEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QTextBrowser"), new Param(c, "e", "qt.QPaintEvent"), End),
+            _func[9] = new MemberFunction(c, "inputMethodQuery", _n_inputMethodQuery0, None, Compiled,
+                                          qt_QTextBrowser_inputMethodQuery_QVariant_QTextBrowser_int, Return, "qt.QVariant", Parameters,
+                                          new Param(c, "this", "qt.QTextBrowser"), new Param(c, "property", "int"), End),
+            _func[10] = new MemberFunction(c, "canInsertFromMimeData", _n_canInsertFromMimeData0, None, Compiled,
+                                           qt_QTextBrowser_canInsertFromMimeData_bool_QTextBrowser_QMimeData, Return, "bool", Parameters,
+                                           new Param(c, "this", "qt.QTextBrowser"), new Param(c, "source", "qt.QMimeData"), End),
+            _func[11] = new MemberFunction(c, "createMimeDataFromSelection", _n_createMimeDataFromSelection0, None, Compiled,
+                                           qt_QTextBrowser_createMimeDataFromSelection_QMimeData_QTextBrowser, Return, "qt.QMimeData",
+                                           Parameters, new Param(c, "this", "qt.QTextBrowser"), End),
+            _func[12] = new MemberFunction(c, "insertFromMimeData", _n_insertFromMimeData0, None, Compiled,
+                                           qt_QTextBrowser_insertFromMimeData_void_QTextBrowser_QMimeData, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QTextBrowser"), new Param(c, "source", "qt.QMimeData"), End),
+            _func[13] = new MemberFunction(c, "changeEvent", _n_changeEvent0, None, Compiled,
+                                           qt_QTextBrowser_changeEvent_void_QTextBrowser_QEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QTextBrowser"), new Param(c, "e", "qt.QEvent"), End),
+            _func[14] = new MemberFunction(c, "contextMenuEvent", _n_contextMenuEvent0, None, Compiled,
+                                           qt_QTextBrowser_contextMenuEvent_void_QTextBrowser_QContextMenuEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QTextBrowser"), new Param(c, "event", "qt.QContextMenuEvent"), End),
+            _func[15] = new MemberFunction(c, "dragEnterEvent", _n_dragEnterEvent0, None, Compiled,
+                                           qt_QTextBrowser_dragEnterEvent_void_QTextBrowser_QDragEnterEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QTextBrowser"), new Param(c, "e", "qt.QDragEnterEvent"), End),
+            _func[16] = new MemberFunction(c, "dragLeaveEvent", _n_dragLeaveEvent0, None, Compiled,
+                                           qt_QTextBrowser_dragLeaveEvent_void_QTextBrowser_QDragLeaveEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QTextBrowser"), new Param(c, "e", "qt.QDragLeaveEvent"), End),
+            _func[17] = new MemberFunction(c, "dragMoveEvent", _n_dragMoveEvent0, None, Compiled,
+                                           qt_QTextBrowser_dragMoveEvent_void_QTextBrowser_QDragMoveEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QTextBrowser"), new Param(c, "e", "qt.QDragMoveEvent"), End),
+            _func[18] = new MemberFunction(c, "dropEvent", _n_dropEvent0, None, Compiled,
+                                           qt_QTextBrowser_dropEvent_void_QTextBrowser_QDropEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QTextBrowser"), new Param(c, "e", "qt.QDropEvent"), End),
+            _func[19] = new MemberFunction(c, "focusInEvent", _n_focusInEvent0, None, Compiled,
+                                           qt_QTextBrowser_focusInEvent_void_QTextBrowser_QFocusEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QTextBrowser"), new Param(c, "e", "qt.QFocusEvent"), End),
             // MISSING: inputMethodEvent (void; QTextBrowser this,
             // "QInputMethodEvent *" e) // protected
-            _func[20] = new MemberFunction(
-                c, "keyReleaseEvent", _n_keyReleaseEvent0, None, Compiled,
-                qt_QTextBrowser_keyReleaseEvent_void_QTextBrowser_QKeyEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTextBrowser"),
-                new Param(c, "e", "qt.QKeyEvent"), End),
-            _func[21] = new MemberFunction(
-                c, "mouseDoubleClickEvent", _n_mouseDoubleClickEvent0, None,
-                Compiled,
-                qt_QTextBrowser_mouseDoubleClickEvent_void_QTextBrowser_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTextBrowser"),
-                new Param(c, "e", "qt.QMouseEvent"), End),
-            _func[22] = new MemberFunction(
-                c, "resizeEvent", _n_resizeEvent0, None, Compiled,
-                qt_QTextBrowser_resizeEvent_void_QTextBrowser_QResizeEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTextBrowser"),
-                new Param(c, "e", "qt.QResizeEvent"), End),
-            _func[23] = new MemberFunction(
-                c, "scrollContentsBy", _n_scrollContentsBy0, None, Compiled,
-                qt_QTextBrowser_scrollContentsBy_void_QTextBrowser_int_int,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTextBrowser"),
-                new Param(c, "dx", "int"), new Param(c, "dy", "int"), End),
-            _func[24] = new MemberFunction(
-                c, "showEvent", _n_showEvent0, None, Compiled,
-                qt_QTextBrowser_showEvent_void_QTextBrowser_QShowEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QTextBrowser"),
-                new Param(c, "_p13", "qt.QShowEvent"), End),
-            _func[25] = new MemberFunction(
-                c, "wheelEvent", _n_wheelEvent0, None, Compiled,
-                qt_QTextBrowser_wheelEvent_void_QTextBrowser_QWheelEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTextBrowser"),
-                new Param(c, "e", "qt.QWheelEvent"), End),
+            _func[20] = new MemberFunction(c, "keyReleaseEvent", _n_keyReleaseEvent0, None, Compiled,
+                                           qt_QTextBrowser_keyReleaseEvent_void_QTextBrowser_QKeyEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QTextBrowser"), new Param(c, "e", "qt.QKeyEvent"), End),
+            _func[21] = new MemberFunction(c, "mouseDoubleClickEvent", _n_mouseDoubleClickEvent0, None, Compiled,
+                                           qt_QTextBrowser_mouseDoubleClickEvent_void_QTextBrowser_QMouseEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QTextBrowser"), new Param(c, "e", "qt.QMouseEvent"), End),
+            _func[22] = new MemberFunction(c, "resizeEvent", _n_resizeEvent0, None, Compiled,
+                                           qt_QTextBrowser_resizeEvent_void_QTextBrowser_QResizeEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QTextBrowser"), new Param(c, "e", "qt.QResizeEvent"), End),
+            _func[23] =
+                new MemberFunction(c, "scrollContentsBy", _n_scrollContentsBy0, None, Compiled,
+                                   qt_QTextBrowser_scrollContentsBy_void_QTextBrowser_int_int, Return, "void", Parameters,
+                                   new Param(c, "this", "qt.QTextBrowser"), new Param(c, "dx", "int"), new Param(c, "dy", "int"), End),
+            _func[24] = new MemberFunction(c, "showEvent", _n_showEvent0, None, Compiled,
+                                           qt_QTextBrowser_showEvent_void_QTextBrowser_QShowEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QTextBrowser"), new Param(c, "_p13", "qt.QShowEvent"), End),
+            _func[25] = new MemberFunction(c, "wheelEvent", _n_wheelEvent0, None, Compiled,
+                                           qt_QTextBrowser_wheelEvent_void_QTextBrowser_QWheelEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QTextBrowser"), new Param(c, "e", "qt.QWheelEvent"), End),
             // static functions
             EndArguments);
         globalScope()->addSymbols(EndArguments);

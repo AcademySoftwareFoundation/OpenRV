@@ -14,9 +14,7 @@ namespace IPCore
     using namespace TwkContainer;
     using namespace TwkMath;
 
-    SessionIPNode::SessionIPNode(const std::string& name,
-                                 const NodeDefinition* def, IPGraph* graph,
-                                 GroupIPNode* group)
+    SessionIPNode::SessionIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group)
         : IPNode(name, def, graph, group)
     {
         setWritable(false); // special case for this one in the writer

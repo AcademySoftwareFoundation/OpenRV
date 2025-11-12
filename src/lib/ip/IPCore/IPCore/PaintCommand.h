@@ -71,9 +71,7 @@ namespace IPCore
 
             void setSize(unsigned int s) const;
             void setColor(float, float, float, float) const;
-            std::pair<float, float> computeText(const std::string&,
-                                                std::string&, float space,
-                                                std::string origin) const;
+            std::pair<float, float> computeText(const std::string&, std::string&, float space, std::string origin) const;
             float globalAscenderHeight() const;
             float globalDescenderHeight() const;
 
@@ -86,10 +84,8 @@ namespace IPCore
         class CommandContext
         {
         public:
-            explicit CommandContext(TwkMath::Mat44f pid, TwkMath::Mat44f m,
-                                    const GLFBO* i, const GLFBO* t,
-                                    const GLFBO* c, GLState*& g, bool hasSten,
-                                    TwkMath::Vec4f sten = TwkMath::Vec4f(0.0))
+            explicit CommandContext(TwkMath::Mat44f pid, TwkMath::Mat44f m, const GLFBO* i, const GLFBO* t, const GLFBO* c, GLState*& g,
+                                    bool hasSten, TwkMath::Vec4f sten = TwkMath::Vec4f(0.0))
             {
                 hasStencil = hasSten;
                 stencilBox = sten;
@@ -171,9 +167,8 @@ namespace IPCore
                 TessellateMode // each triangle can have its own color
             };
 
-            explicit PolyLine(const Vec2* vector2d = nullptr,
-                              size_t npoints = 0, float width = 0,
-                              Color color = Color(0.0), bool ownPoints = false)
+            explicit PolyLine(const Vec2* vector2d = nullptr, size_t npoints = 0, float width = 0, Color color = Color(0.0),
+                              bool ownPoints = false)
                 : npoints(npoints)
                 , width(width)
                 , smoothingWidth(1.0)
@@ -213,8 +208,7 @@ namespace IPCore
                 if (polyLine.npoints > 0)
                 {
                     npoints = polyLine.npoints;
-                    points.assign(polyLine.points.begin(),
-                                  polyLine.points.end());
+                    points.assign(polyLine.points.begin(), polyLine.points.end());
                 }
                 else
                 {
@@ -224,8 +218,7 @@ namespace IPCore
 
                 if (polyLine.width != 0.0f)
                 {
-                    widths.assign(polyLine.widths.begin(),
-                                  polyLine.widths.end());
+                    widths.assign(polyLine.widths.begin(), polyLine.widths.end());
                 }
                 else
                 {
@@ -278,8 +271,7 @@ namespace IPCore
         class Text : public Command
         {
         public:
-            explicit Text(const std::string& /*str*/ = "",
-                          const std::string& /*fnt*/ = "", float ptsze = 1.0,
+            explicit Text(const std::string& /*str*/ = "", const std::string& /*fnt*/ = "", float ptsze = 1.0,
                           Color color = Color(1, 1, 1, 1))
                 : ptsize(ptsze)
                 , scale(1.0)
@@ -330,8 +322,7 @@ namespace IPCore
         class Rectangle : public Command
         {
         public:
-            explicit Rectangle(float height = 0, float width = 0,
-                               Color color = Color(0, 0, 0, 1.0))
+            explicit Rectangle(float height = 0, float width = 0, Color color = Color(0, 0, 0, 1.0))
                 : height(height)
                 , width(width)
                 , pos(0, 0)

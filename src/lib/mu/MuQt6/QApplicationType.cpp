@@ -74,8 +74,7 @@ namespace Mu
         {
             Function::ArgumentVector args(3);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeinstance<QObjectType>(c, receiver, "qt.QObject"));
+            args[1] = Value(makeinstance<QObjectType>(c, receiver, "qt.QObject"));
             args[2] = Value(makeqpointer<QEventType>(c, e, "qt.QEvent"));
             Value rval = _env->call(F, args);
             return (bool)(rval._bool);
@@ -110,8 +109,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  Mu Type CONSTRUCTORS
 
-    QApplicationType::QApplicationType(Context* c, const char* name,
-                                       Class* super, Class* super2)
+    QApplicationType::QApplicationType(Context* c, const char* name, Class* super, Class* super2)
         : Class(c, name, vectorOf2(super, super2))
     {
     }
@@ -121,8 +119,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    static Pointer QApplication_QApplication_QObject(Thread& NODE_THREAD,
-                                                     Pointer obj)
+    static Pointer QApplication_QApplication_QObject(Thread& NODE_THREAD, Pointer obj)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         ClassInstance* widget = reinterpret_cast<ClassInstance*>(obj);
@@ -133,9 +130,7 @@ namespace Mu
         }
         else if (QApplication* w = object<QApplication>(widget))
         {
-            QApplicationType* type =
-                c->findSymbolOfTypeByQualifiedName<QApplicationType>(
-                    c->internName("qt.QApplication"), false);
+            QApplicationType* type = c->findSymbolOfTypeByQualifiedName<QApplicationType>(c->internName("qt.QApplication"), false);
             ClassInstance* o = ClassInstance::allocate(type);
             setobject(o, w);
             return o;
@@ -148,58 +143,46 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(castFromObject, Pointer)
     {
-        NODE_RETURN(QApplication_QApplication_QObject(NODE_THREAD,
-                                                      NODE_ARG(0, Pointer)));
+        NODE_RETURN(QApplication_QApplication_QObject(NODE_THREAD, NODE_ARG(0, Pointer)));
     }
 
-    bool qt_QApplication_notify_bool_QApplication_QObject_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_receiver,
-        Pointer param_e)
+    bool qt_QApplication_notify_bool_QApplication_QObject_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_receiver,
+                                                                 Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QApplication* arg0 = object<QApplication>(param_this);
         QObject* arg1 = object<QObject>(param_receiver);
         QEvent* arg2 = getqpointer<QEventType>(param_e);
-        return isMuQtObject(arg0) ? arg0->QApplication::notify(arg1, arg2)
-                                  : arg0->notify(arg1, arg2);
+        return isMuQtObject(arg0) ? arg0->QApplication::notify(arg1, arg2) : arg0->notify(arg1, arg2);
     }
 
-    bool qt_QApplication_event_bool_QApplication_QEvent(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this,
-                                                        Pointer param_e)
+    bool qt_QApplication_event_bool_QApplication_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QApplication* arg0 = object<QApplication>(param_this);
         QEvent* arg1 = getqpointer<QEventType>(param_e);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QApplication*)arg0)->event_pub_parent(arg1)
-                   : ((MuQt_QApplication*)arg0)->event_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QApplication*)arg0)->event_pub_parent(arg1) : ((MuQt_QApplication*)arg0)->event_pub(arg1);
     }
 
     Pointer qt_QApplication_activeModalWidget_QWidget(Mu::Thread& NODE_THREAD)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-        return makeinstance<QWidgetType>(c, QApplication::activeModalWidget(),
-                                         "qt.QWidget");
+        return makeinstance<QWidgetType>(c, QApplication::activeModalWidget(), "qt.QWidget");
     }
 
     Pointer qt_QApplication_activePopupWidget_QWidget(Mu::Thread& NODE_THREAD)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-        return makeinstance<QWidgetType>(c, QApplication::activePopupWidget(),
-                                         "qt.QWidget");
+        return makeinstance<QWidgetType>(c, QApplication::activePopupWidget(), "qt.QWidget");
     }
 
     Pointer qt_QApplication_activeWindow_QWidget(Mu::Thread& NODE_THREAD)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-        return makeinstance<QWidgetType>(c, QApplication::activeWindow(),
-                                         "qt.QWidget");
+        return makeinstance<QWidgetType>(c, QApplication::activeWindow(), "qt.QWidget");
     }
 
-    void qt_QApplication_alert_void_QWidget_int(Mu::Thread& NODE_THREAD,
-                                                Pointer param_widget,
-                                                int param_msec)
+    void qt_QApplication_alert_void_QWidget_int(Mu::Thread& NODE_THREAD, Pointer param_widget, int param_msec)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWidget* arg0 = object<QWidget>(param_widget);
@@ -222,8 +205,7 @@ namespace Mu
     Pointer qt_QApplication_focusWidget_QWidget(Mu::Thread& NODE_THREAD)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-        return makeinstance<QWidgetType>(c, QApplication::focusWidget(),
-                                         "qt.QWidget");
+        return makeinstance<QWidgetType>(c, QApplication::focusWidget(), "qt.QWidget");
     }
 
     Pointer qt_QApplication_font_QFont(Mu::Thread& NODE_THREAD)
@@ -232,34 +214,28 @@ namespace Mu
         return makeqtype<QFontType>(c, QApplication::font(), "qt.QFont");
     }
 
-    Pointer qt_QApplication_font_QFont_QWidget(Mu::Thread& NODE_THREAD,
-                                               Pointer param_widget)
+    Pointer qt_QApplication_font_QFont_QWidget(Mu::Thread& NODE_THREAD, Pointer param_widget)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QWidget* arg0 = object<QWidget>(param_widget);
         return makeqtype<QFontType>(c, QApplication::font(arg0), "qt.QFont");
     }
 
-    bool qt_QApplication_isEffectEnabled_bool_int(Mu::Thread& NODE_THREAD,
-                                                  int param_effect)
+    bool qt_QApplication_isEffectEnabled_bool_int(Mu::Thread& NODE_THREAD, int param_effect)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         Qt::UIEffect arg0 = (Qt::UIEffect)(param_effect);
         return QApplication::isEffectEnabled(arg0);
     }
 
-    Pointer qt_QApplication_palette_QPalette_QWidget(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_widget)
+    Pointer qt_QApplication_palette_QPalette_QWidget(Mu::Thread& NODE_THREAD, Pointer param_widget)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QWidget* arg0 = object<QWidget>(param_widget);
-        return makeqtype<QPaletteType>(c, QApplication::palette(arg0),
-                                       "qt.QPalette");
+        return makeqtype<QPaletteType>(c, QApplication::palette(arg0), "qt.QPalette");
     }
 
-    void qt_QApplication_setEffectEnabled_void_int_bool(Mu::Thread& NODE_THREAD,
-                                                        int param_effect,
-                                                        bool param_enable)
+    void qt_QApplication_setEffectEnabled_void_int_bool(Mu::Thread& NODE_THREAD, int param_effect, bool param_enable)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         Qt::UIEffect arg0 = (Qt::UIEffect)(param_effect);
@@ -267,144 +243,101 @@ namespace Mu
         QApplication::setEffectEnabled(arg0, arg1);
     }
 
-    Pointer qt_QApplication_topLevelAt_QWidget_QPoint(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_point)
+    Pointer qt_QApplication_topLevelAt_QWidget_QPoint(Mu::Thread& NODE_THREAD, Pointer param_point)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QPoint arg0 = getqtype<QPointType>(param_point);
-        return makeinstance<QWidgetType>(c, QApplication::topLevelAt(arg0),
-                                         "qt.QWidget");
+        return makeinstance<QWidgetType>(c, QApplication::topLevelAt(arg0), "qt.QWidget");
     }
 
-    Pointer qt_QApplication_topLevelAt_QWidget_int_int(Mu::Thread& NODE_THREAD,
-                                                       int param_x, int param_y)
+    Pointer qt_QApplication_topLevelAt_QWidget_int_int(Mu::Thread& NODE_THREAD, int param_x, int param_y)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         int arg0 = (int)(param_x);
         int arg1 = (int)(param_y);
-        return makeinstance<QWidgetType>(
-            c, QApplication::topLevelAt(arg0, arg1), "qt.QWidget");
+        return makeinstance<QWidgetType>(c, QApplication::topLevelAt(arg0, arg1), "qt.QWidget");
     }
 
-    Pointer qt_QApplication_widgetAt_QWidget_QPoint(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_point)
+    Pointer qt_QApplication_widgetAt_QWidget_QPoint(Mu::Thread& NODE_THREAD, Pointer param_point)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QPoint arg0 = getqtype<QPointType>(param_point);
-        return makeinstance<QWidgetType>(c, QApplication::widgetAt(arg0),
-                                         "qt.QWidget");
+        return makeinstance<QWidgetType>(c, QApplication::widgetAt(arg0), "qt.QWidget");
     }
 
-    Pointer qt_QApplication_widgetAt_QWidget_int_int(Mu::Thread& NODE_THREAD,
-                                                     int param_x, int param_y)
+    Pointer qt_QApplication_widgetAt_QWidget_int_int(Mu::Thread& NODE_THREAD, int param_x, int param_y)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         int arg0 = (int)(param_x);
         int arg1 = (int)(param_y);
-        return makeinstance<QWidgetType>(c, QApplication::widgetAt(arg0, arg1),
-                                         "qt.QWidget");
+        return makeinstance<QWidgetType>(c, QApplication::widgetAt(arg0, arg1), "qt.QWidget");
     }
 
     static NODE_IMPLEMENTATION(_n_notify0, bool)
     {
-        NODE_RETURN(qt_QApplication_notify_bool_QApplication_QObject_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QApplication_notify_bool_QApplication_QObject_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                            NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_event0, bool)
     {
-        NODE_RETURN(qt_QApplication_event_bool_QApplication_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QApplication_event_bool_QApplication_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
-    static NODE_IMPLEMENTATION(_n_activeModalWidget0, Pointer)
-    {
-        NODE_RETURN(qt_QApplication_activeModalWidget_QWidget(NODE_THREAD));
-    }
+    static NODE_IMPLEMENTATION(_n_activeModalWidget0, Pointer) { NODE_RETURN(qt_QApplication_activeModalWidget_QWidget(NODE_THREAD)); }
 
-    static NODE_IMPLEMENTATION(_n_activePopupWidget0, Pointer)
-    {
-        NODE_RETURN(qt_QApplication_activePopupWidget_QWidget(NODE_THREAD));
-    }
+    static NODE_IMPLEMENTATION(_n_activePopupWidget0, Pointer) { NODE_RETURN(qt_QApplication_activePopupWidget_QWidget(NODE_THREAD)); }
 
-    static NODE_IMPLEMENTATION(_n_activeWindow0, Pointer)
-    {
-        NODE_RETURN(qt_QApplication_activeWindow_QWidget(NODE_THREAD));
-    }
+    static NODE_IMPLEMENTATION(_n_activeWindow0, Pointer) { NODE_RETURN(qt_QApplication_activeWindow_QWidget(NODE_THREAD)); }
 
     static NODE_IMPLEMENTATION(_n_alert0, void)
     {
-        qt_QApplication_alert_void_QWidget_int(
-            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QApplication_alert_void_QWidget_int(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
-    static NODE_IMPLEMENTATION(_n_beep0, void)
-    {
-        qt_QApplication_beep_void(NODE_THREAD);
-    }
+    static NODE_IMPLEMENTATION(_n_beep0, void) { qt_QApplication_beep_void(NODE_THREAD); }
 
-    static NODE_IMPLEMENTATION(_n_exec0, int)
-    {
-        NODE_RETURN(qt_QApplication_exec_int(NODE_THREAD));
-    }
+    static NODE_IMPLEMENTATION(_n_exec0, int) { NODE_RETURN(qt_QApplication_exec_int(NODE_THREAD)); }
 
-    static NODE_IMPLEMENTATION(_n_focusWidget0, Pointer)
-    {
-        NODE_RETURN(qt_QApplication_focusWidget_QWidget(NODE_THREAD));
-    }
+    static NODE_IMPLEMENTATION(_n_focusWidget0, Pointer) { NODE_RETURN(qt_QApplication_focusWidget_QWidget(NODE_THREAD)); }
 
-    static NODE_IMPLEMENTATION(_n_font0, Pointer)
-    {
-        NODE_RETURN(qt_QApplication_font_QFont(NODE_THREAD));
-    }
+    static NODE_IMPLEMENTATION(_n_font0, Pointer) { NODE_RETURN(qt_QApplication_font_QFont(NODE_THREAD)); }
 
-    static NODE_IMPLEMENTATION(_n_font1, Pointer)
-    {
-        NODE_RETURN(qt_QApplication_font_QFont_QWidget(NODE_THREAD,
-                                                       NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_font1, Pointer) { NODE_RETURN(qt_QApplication_font_QFont_QWidget(NODE_THREAD, NODE_ARG(0, Pointer))); }
 
     static NODE_IMPLEMENTATION(_n_isEffectEnabled0, bool)
     {
-        NODE_RETURN(qt_QApplication_isEffectEnabled_bool_int(NODE_THREAD,
-                                                             NODE_ARG(0, int)));
+        NODE_RETURN(qt_QApplication_isEffectEnabled_bool_int(NODE_THREAD, NODE_ARG(0, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_palette0, Pointer)
     {
-        NODE_RETURN(qt_QApplication_palette_QPalette_QWidget(
-            NODE_THREAD, NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QApplication_palette_QPalette_QWidget(NODE_THREAD, NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_setEffectEnabled0, void)
     {
-        qt_QApplication_setEffectEnabled_void_int_bool(
-            NODE_THREAD, NODE_ARG(0, int), NODE_ARG(1, bool));
+        qt_QApplication_setEffectEnabled_void_int_bool(NODE_THREAD, NODE_ARG(0, int), NODE_ARG(1, bool));
     }
 
     static NODE_IMPLEMENTATION(_n_topLevelAt0, Pointer)
     {
-        NODE_RETURN(qt_QApplication_topLevelAt_QWidget_QPoint(
-            NODE_THREAD, NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QApplication_topLevelAt_QWidget_QPoint(NODE_THREAD, NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_topLevelAt1, Pointer)
     {
-        NODE_RETURN(qt_QApplication_topLevelAt_QWidget_int_int(
-            NODE_THREAD, NODE_ARG(0, int), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QApplication_topLevelAt_QWidget_int_int(NODE_THREAD, NODE_ARG(0, int), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_widgetAt0, Pointer)
     {
-        NODE_RETURN(qt_QApplication_widgetAt_QWidget_QPoint(
-            NODE_THREAD, NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QApplication_widgetAt_QWidget_QPoint(NODE_THREAD, NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_widgetAt1, Pointer)
     {
-        NODE_RETURN(qt_QApplication_widgetAt_QWidget_int_int(
-            NODE_THREAD, NODE_ARG(0, int), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QApplication_widgetAt_QWidget_int_int(NODE_THREAD, NODE_ARG(0, int), NODE_ARG(1, int)));
     }
 
     //
@@ -452,17 +385,13 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
-                   new Function(c, tn, castFromObject, Cast, Compiled,
-                                QApplication_QApplication_QObject, Return, ftn,
-                                Parameters,
+                   new Function(c, tn, castFromObject, Cast, Compiled, QApplication_QApplication_QObject, Return, ftn, Parameters,
                                 new Param(c, "object", "qt.QObject"), End),
 
                    EndArguments);
@@ -473,80 +402,48 @@ namespace Mu
             // MISSING: QApplication (QApplication; QApplication this, "int &"
             // argc, "char * *" argv) PROP: autoSipEnabled (bool; QApplication
             // this) PROP: styleSheet (string; QApplication this)
-            _func[0] = new MemberFunction(
-                c, "notify", _n_notify0, None, Compiled,
-                qt_QApplication_notify_bool_QApplication_QObject_QEvent, Return,
-                "bool", Parameters, new Param(c, "this", "qt.QApplication"),
-                new Param(c, "receiver", "qt.QObject"),
-                new Param(c, "e", "qt.QEvent"), End),
-            _func[1] = new MemberFunction(
-                c, "event", _n_event0, None, Compiled,
-                qt_QApplication_event_bool_QApplication_QEvent, Return, "bool",
-                Parameters, new Param(c, "this", "qt.QApplication"),
-                new Param(c, "e", "qt.QEvent"), End),
+            _func[0] = new MemberFunction(c, "notify", _n_notify0, None, Compiled, qt_QApplication_notify_bool_QApplication_QObject_QEvent,
+                                          Return, "bool", Parameters, new Param(c, "this", "qt.QApplication"),
+                                          new Param(c, "receiver", "qt.QObject"), new Param(c, "e", "qt.QEvent"), End),
+            _func[1] = new MemberFunction(c, "event", _n_event0, None, Compiled, qt_QApplication_event_bool_QApplication_QEvent, Return,
+                                          "bool", Parameters, new Param(c, "this", "qt.QApplication"), new Param(c, "e", "qt.QEvent"), End),
             // static functions
-            new Function(c, "activeModalWidget", _n_activeModalWidget0, None,
-                         Compiled, qt_QApplication_activeModalWidget_QWidget,
-                         Return, "qt.QWidget", End),
-            new Function(c, "activePopupWidget", _n_activePopupWidget0, None,
-                         Compiled, qt_QApplication_activePopupWidget_QWidget,
-                         Return, "qt.QWidget", End),
-            new Function(c, "activeWindow", _n_activeWindow0, None, Compiled,
-                         qt_QApplication_activeWindow_QWidget, Return,
+            new Function(c, "activeModalWidget", _n_activeModalWidget0, None, Compiled, qt_QApplication_activeModalWidget_QWidget, Return,
                          "qt.QWidget", End),
-            new Function(c, "alert", _n_alert0, None, Compiled,
-                         qt_QApplication_alert_void_QWidget_int, Return, "void",
-                         Parameters, new Param(c, "widget", "qt.QWidget"),
-                         new Param(c, "msec", "int", Value((int)0)), End),
+            new Function(c, "activePopupWidget", _n_activePopupWidget0, None, Compiled, qt_QApplication_activePopupWidget_QWidget, Return,
+                         "qt.QWidget", End),
+            new Function(c, "activeWindow", _n_activeWindow0, None, Compiled, qt_QApplication_activeWindow_QWidget, Return, "qt.QWidget",
+                         End),
+            new Function(c, "alert", _n_alert0, None, Compiled, qt_QApplication_alert_void_QWidget_int, Return, "void", Parameters,
+                         new Param(c, "widget", "qt.QWidget"), new Param(c, "msec", "int", Value((int)0)), End),
             // MISSING: allWidgets ("QWidgetList"; )
-            new Function(c, "beep", _n_beep0, None, Compiled,
-                         qt_QApplication_beep_void, Return, "void", End),
-            new Function(c, "exec", _n_exec0, None, Compiled,
-                         qt_QApplication_exec_int, Return, "int", End),
-            new Function(c, "focusWidget", _n_focusWidget0, None, Compiled,
-                         qt_QApplication_focusWidget_QWidget, Return,
-                         "qt.QWidget", End),
-            new Function(c, "font", _n_font0, None, Compiled,
-                         qt_QApplication_font_QFont, Return, "qt.QFont", End),
-            new Function(c, "font", _n_font1, None, Compiled,
-                         qt_QApplication_font_QFont_QWidget, Return, "qt.QFont",
-                         Parameters, new Param(c, "widget", "qt.QWidget"), End),
-            // MISSING: font (QFont; "const char *" className)
-            new Function(c, "isEffectEnabled", _n_isEffectEnabled0, None,
-                         Compiled, qt_QApplication_isEffectEnabled_bool_int,
-                         Return, "bool", Parameters,
-                         new Param(c, "effect", "int"), End),
-            new Function(c, "palette", _n_palette0, None, Compiled,
-                         qt_QApplication_palette_QPalette_QWidget, Return,
-                         "qt.QPalette", Parameters,
+            new Function(c, "beep", _n_beep0, None, Compiled, qt_QApplication_beep_void, Return, "void", End),
+            new Function(c, "exec", _n_exec0, None, Compiled, qt_QApplication_exec_int, Return, "int", End),
+            new Function(c, "focusWidget", _n_focusWidget0, None, Compiled, qt_QApplication_focusWidget_QWidget, Return, "qt.QWidget", End),
+            new Function(c, "font", _n_font0, None, Compiled, qt_QApplication_font_QFont, Return, "qt.QFont", End),
+            new Function(c, "font", _n_font1, None, Compiled, qt_QApplication_font_QFont_QWidget, Return, "qt.QFont", Parameters,
                          new Param(c, "widget", "qt.QWidget"), End),
+            // MISSING: font (QFont; "const char *" className)
+            new Function(c, "isEffectEnabled", _n_isEffectEnabled0, None, Compiled, qt_QApplication_isEffectEnabled_bool_int, Return,
+                         "bool", Parameters, new Param(c, "effect", "int"), End),
+            new Function(c, "palette", _n_palette0, None, Compiled, qt_QApplication_palette_QPalette_QWidget, Return, "qt.QPalette",
+                         Parameters, new Param(c, "widget", "qt.QWidget"), End),
             // MISSING: palette (QPalette; "const char *" className)
-            new Function(c, "setEffectEnabled", _n_setEffectEnabled0, None,
-                         Compiled,
-                         qt_QApplication_setEffectEnabled_void_int_bool, Return,
-                         "void", Parameters, new Param(c, "effect", "int"),
-                         new Param(c, "enable", "bool"), End),
+            new Function(c, "setEffectEnabled", _n_setEffectEnabled0, None, Compiled, qt_QApplication_setEffectEnabled_void_int_bool,
+                         Return, "void", Parameters, new Param(c, "effect", "int"), new Param(c, "enable", "bool"), End),
             // MISSING: setFont (void; QFont font, "const char *" className)
             // MISSING: setPalette (void; QPalette palette, "const char *"
             // className) MISSING: setStyle (void; "QStyle *" style) MISSING:
             // setStyle ("QStyle *"; string style) MISSING: style ("QStyle *"; )
-            new Function(c, "topLevelAt", _n_topLevelAt0, None, Compiled,
-                         qt_QApplication_topLevelAt_QWidget_QPoint, Return,
-                         "qt.QWidget", Parameters,
-                         new Param(c, "point", "qt.QPoint"), End),
-            new Function(c, "topLevelAt", _n_topLevelAt1, None, Compiled,
-                         qt_QApplication_topLevelAt_QWidget_int_int, Return,
-                         "qt.QWidget", Parameters, new Param(c, "x", "int"),
-                         new Param(c, "y", "int"), End),
+            new Function(c, "topLevelAt", _n_topLevelAt0, None, Compiled, qt_QApplication_topLevelAt_QWidget_QPoint, Return, "qt.QWidget",
+                         Parameters, new Param(c, "point", "qt.QPoint"), End),
+            new Function(c, "topLevelAt", _n_topLevelAt1, None, Compiled, qt_QApplication_topLevelAt_QWidget_int_int, Return, "qt.QWidget",
+                         Parameters, new Param(c, "x", "int"), new Param(c, "y", "int"), End),
             // MISSING: topLevelWidgets ("QWidgetList"; )
-            new Function(c, "widgetAt", _n_widgetAt0, None, Compiled,
-                         qt_QApplication_widgetAt_QWidget_QPoint, Return,
-                         "qt.QWidget", Parameters,
-                         new Param(c, "point", "qt.QPoint"), End),
-            new Function(c, "widgetAt", _n_widgetAt1, None, Compiled,
-                         qt_QApplication_widgetAt_QWidget_int_int, Return,
-                         "qt.QWidget", Parameters, new Param(c, "x", "int"),
-                         new Param(c, "y", "int"), End),
+            new Function(c, "widgetAt", _n_widgetAt0, None, Compiled, qt_QApplication_widgetAt_QWidget_QPoint, Return, "qt.QWidget",
+                         Parameters, new Param(c, "point", "qt.QPoint"), End),
+            new Function(c, "widgetAt", _n_widgetAt1, None, Compiled, qt_QApplication_widgetAt_QWidget_int_int, Return, "qt.QWidget",
+                         Parameters, new Param(c, "x", "int"), new Param(c, "y", "int"), End),
             EndArguments);
         globalScope()->addSymbols(EndArguments);
         scope()->addSymbols(EndArguments);
@@ -561,10 +458,8 @@ namespace Mu
 
         addSymbols(
 
-            new Function(c, "QApplication", _n_QApplication0, None, Return,
-                         "qt.QApplication", Parameters,
-                         new Param(c, "this", "qt.QApplication"),
-                         new Param(c, "args", "string[]"), End),
+            new Function(c, "QApplication", _n_QApplication0, None, Return, "qt.QApplication", Parameters,
+                         new Param(c, "this", "qt.QApplication"), new Param(c, "args", "string[]"), End),
 
             EndArguments);
 

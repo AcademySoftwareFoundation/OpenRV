@@ -52,16 +52,9 @@ namespace Mu
 
         void destroy(pointer p) { ((T*)p)->~T(); }
 
-        pointer allocate(size_type n, const void* = 0)
-        {
-            return reinterpret_cast<T*>(
-                Object::arena().allocate(n * sizeof(T)));
-        }
+        pointer allocate(size_type n, const void* = 0) { return reinterpret_cast<T*>(Object::arena().allocate(n * sizeof(T))); }
 
-        void deallocate(pointer p, size_type n)
-        {
-            Object::arena().deallocate(p, n * sizeof(T));
-        }
+        void deallocate(pointer p, size_type n) { Object::arena().deallocate(p, n * sizeof(T)); }
 
         size_type max_size() const throw() { return size_t(-1) / sizeof(T); }
     };

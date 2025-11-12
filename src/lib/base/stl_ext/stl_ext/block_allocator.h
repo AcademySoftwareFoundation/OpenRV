@@ -28,10 +28,7 @@ namespace stl_ext
 
     struct arena_selector
     {
-        static block_alloc_arena& arena()
-        {
-            return block_alloc_arena::static_arena();
-        }
+        static block_alloc_arena& arena() { return block_alloc_arena::static_arena(); }
     };
 
     template <class T, class ArenaSelector> class block_allocator
@@ -54,10 +51,7 @@ namespace stl_ext
 
         block_allocator(const block_allocator&) throw() {}
 
-        template <class U>
-        block_allocator(const block_allocator<U, ArenaSelector>&) throw()
-        {
-        }
+        template <class U> block_allocator(const block_allocator<U, ArenaSelector>&) throw() {}
 
         ~block_allocator() throw() {}
 
@@ -90,16 +84,13 @@ namespace stl_ext
     };
 
     template <class T, class ArenaSelector>
-    inline typename block_allocator<T, ArenaSelector>::pointer
-    block_allocator<T, ArenaSelector>::allocate(size_type size, const void*)
+    inline typename block_allocator<T, ArenaSelector>::pointer block_allocator<T, ArenaSelector>::allocate(size_type size, const void*)
     {
-        return reinterpret_cast<T*>(
-            ArenaSelector::arena().allocate(size * sizeof(T)));
+        return reinterpret_cast<T*>(ArenaSelector::arena().allocate(size * sizeof(T)));
     };
 
     template <class T, class ArenaSelector>
-    inline void block_allocator<T, ArenaSelector>::deallocate(
-        typename block_allocator<T, ArenaSelector>::pointer p, size_type size)
+    inline void block_allocator<T, ArenaSelector>::deallocate(typename block_allocator<T, ArenaSelector>::pointer p, size_type size)
     {
         ArenaSelector::arena().deallocate(p, size * sizeof(T));
     };

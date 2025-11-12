@@ -43,10 +43,7 @@ namespace TwkContainer
 
         virtual void setProtocol(const std::string& t) { m_protocol = t; }
 
-        virtual void setProtocolVersion(unsigned int v)
-        {
-            m_protocolVersion = v;
-        }
+        virtual void setProtocolVersion(unsigned int v) { m_protocolVersion = v; }
 
         const std::string& name() const { return m_name; }
 
@@ -54,8 +51,7 @@ namespace TwkContainer
 
         const unsigned int protocolVersion() const { return m_protocolVersion; }
 
-        virtual void
-        copy(const PropertyContainer* other); // doesn't copy name+protocol
+        virtual void copy(const PropertyContainer* other); // doesn't copy name+protocol
         void copyNameAndProtocol(const PropertyContainer* other);
 
         //
@@ -63,8 +59,7 @@ namespace TwkContainer
         //  from *this iff its property values differ from ref's
         //
 
-        virtual PropertyContainer*
-        shallowDiffCopy(const PropertyContainer* ref);
+        virtual PropertyContainer* shallowDiffCopy(const PropertyContainer* ref);
 
         //
         //	Component Management
@@ -93,18 +88,15 @@ namespace TwkContainer
         bool hasComponent(Component*) const;
 
         ConstComponents propertyPath(const Property*) const;
-        std::string propertyFullName(const Property*,
-                                     bool withContainer = true) const;
+        std::string propertyFullName(const Property*, bool withContainer = true) const;
 
         //
         //	Will return an existing component.
         //
 
-        Component* createComponent(const std::string& name,
-                                   bool synchronized = false);
+        Component* createComponent(const std::string& name, bool synchronized = false);
 
-        Component* createComponent(NameIterator i, NameIterator end,
-                                   bool synchronized = false);
+        Component* createComponent(NameIterator i, NameIterator end, bool synchronized = false);
 
         //
         //  Search for properties
@@ -115,18 +107,14 @@ namespace TwkContainer
 
         Property* find(const std::string& comp, const std::string& name);
 
-        const Property* find(const std::string& comp,
-                             const std::string& name) const;
+        const Property* find(const std::string& comp, const std::string& name) const;
 
         Property* find(const std::string& fullname);
         const Property* find(const std::string& fullname) const;
 
-        template <class T>
-        T* property(const std::string& comp, const std::string& name);
+        template <class T> T* property(const std::string& comp, const std::string& name);
 
-        template <class T>
-        const T* property(const std::string& comp,
-                          const std::string& name) const;
+        template <class T> const T* property(const std::string& comp, const std::string& name) const;
 
         template <class T> T* property(const std::string& fullname);
 
@@ -142,8 +130,7 @@ namespace TwkContainer
         //  Create or return existing property
         //
 
-        template <class T>
-        T* createProperty(const std::string& comp, const std::string& name);
+        template <class T> T* createProperty(const std::string& comp, const std::string& name);
 
         template <class T> T* createProperty(const std::string& fullname);
 
@@ -157,19 +144,15 @@ namespace TwkContainer
         //  unless the property is empty.
         //
 
-        template <typename T>
-        T* declareProperty(const std::string& fullname,
-                           Property::Info* info = 0, bool forceValue = true);
+        template <typename T> T* declareProperty(const std::string& fullname, Property::Info* info = 0, bool forceValue = true);
 
         template <typename T>
-        T* declareProperty(const std::string& fullname,
-                           const typename T::value_type& value,
-                           Property::Info* info = 0, bool forceValue = true);
+        T* declareProperty(const std::string& fullname, const typename T::value_type& value, Property::Info* info = 0,
+                           bool forceValue = true);
 
         template <typename T>
-        T* declareProperty(const std::string& fullname,
-                           const typename T::container_type& value,
-                           Property::Info* info = 0, bool forceValue = true);
+        T* declareProperty(const std::string& fullname, const typename T::container_type& value, Property::Info* info = 0,
+                           bool forceValue = true);
 
         //
         //  This will get the property value if it exists, and isn't
@@ -177,57 +160,41 @@ namespace TwkContainer
         //
 
         template <typename T>
-        typename T::value_type
-        propertyValue(const std::string& fullname,
-                      const typename T::value_type& defaultValue) const;
+        typename T::value_type propertyValue(const std::string& fullname, const typename T::value_type& defaultValue) const;
 
-        template <typename T>
-        typename T::container_type&
-        propertyContainer(const std::string& fullname);
+        template <typename T> typename T::container_type& propertyContainer(const std::string& fullname);
 
-        template <typename T>
-        const typename T::container_type&
-        propertyContainer(const std::string& fullname) const;
+        template <typename T> const typename T::container_type& propertyContainer(const std::string& fullname) const;
 
-        template <typename T>
-        typename T::value_type
-        propertyValue(const T*,
-                      const typename T::value_type& defaultValue) const;
+        template <typename T> typename T::value_type propertyValue(const T*, const typename T::value_type& defaultValue) const;
 
         //
         //  Set sets a single value. This requires that the property
         //  *already* has size 1 or the container size.
         //
 
-        template <typename T>
-        void setProperty(const std::string& fullname,
-                         const typename T::value_type& value);
+        template <typename T> void setProperty(const std::string& fullname, const typename T::value_type& value);
 
-        template <typename T>
-        void setProperty(T*, const typename T::value_type& value);
+        template <typename T> void setProperty(T*, const typename T::value_type& value);
 
         //
         //  Sets the whole value container.
         //
 
-        template <typename T>
-        void setProperty(const std::string& fullname,
-                         const typename T::container_type& value);
+        template <typename T> void setProperty(const std::string& fullname, const typename T::container_type& value);
 
         //
         //  Returns the property -- if the property is shared with another
         //  container, a new copy will be created and returned.
         //
 
-        template <class T>
-        T* uniqueProperty(const std::string& comp, const std::string& name);
+        template <class T> T* uniqueProperty(const std::string& comp, const std::string& name);
 
         //
         //  Remove property
         //
 
-        template <class T>
-        void removeProperty(const std::string& comp, const std::string& name);
+        template <class T> void removeProperty(const std::string& comp, const std::string& name);
 
         template <class T> void removeProperty(const std::string& fullname);
 
@@ -268,8 +235,7 @@ namespace TwkContainer
         //  Parse a fullname
         //
 
-        static void parseFullName(const std::string& fullname,
-                                  StringVector& parts);
+        static void parseFullName(const std::string& fullname, StringVector& parts);
 
     protected:
         virtual PropertyContainer* emptyContainer() const;
@@ -292,21 +258,13 @@ namespace TwkContainer
 
     inline std::string name(const PropertyContainer* p) { return name(*p); }
 
-    inline std::string protocol(const PropertyContainer* p)
-    {
-        return protocol(*p);
-    }
+    inline std::string protocol(const PropertyContainer* p) { return protocol(*p); }
 
-    inline int protocolVersion(const PropertyContainer* p)
-    {
-        return protocolVersion(*p);
-    }
+    inline int protocolVersion(const PropertyContainer* p) { return protocolVersion(*p); }
 
     //----------------------------------------------------------------------
 
-    template <class T>
-    T* PropertyContainer::property(const std::string& comp,
-                                   const std::string& name)
+    template <class T> T* PropertyContainer::property(const std::string& comp, const std::string& name)
     {
         if (Component* c = component(comp))
         {
@@ -316,9 +274,7 @@ namespace TwkContainer
         return 0;
     }
 
-    template <class T>
-    const T* PropertyContainer::property(const std::string& comp,
-                                         const std::string& name) const
+    template <class T> const T* PropertyContainer::property(const std::string& comp, const std::string& name) const
     {
         if (const Component* c = component(comp))
         {
@@ -328,14 +284,12 @@ namespace TwkContainer
         return 0;
     }
 
-    template <class T>
-    T* PropertyContainer::property(const std::string& fullname)
+    template <class T> T* PropertyContainer::property(const std::string& fullname)
     {
         StringVector parts;
         parseFullName(fullname, parts);
 
-        if (Component* c =
-                component(parts.begin(), parts.begin() + (parts.size() - 1)))
+        if (Component* c = component(parts.begin(), parts.begin() + (parts.size() - 1)))
         {
             return c->property<T>(parts.back());
         }
@@ -343,14 +297,12 @@ namespace TwkContainer
         return 0;
     }
 
-    template <class T>
-    const T* PropertyContainer::property(const std::string& fullname) const
+    template <class T> const T* PropertyContainer::property(const std::string& fullname) const
     {
         StringVector parts;
         parseFullName(fullname, parts);
 
-        if (const Component* c =
-                component(parts.begin(), parts.begin() + (parts.size() - 1)))
+        if (const Component* c = component(parts.begin(), parts.begin() + (parts.size() - 1)))
         {
             return c->property<const T>(parts.back());
         }
@@ -358,9 +310,7 @@ namespace TwkContainer
         return 0;
     }
 
-    template <class T>
-    T* PropertyContainer::createProperty(const std::string& comp,
-                                         const std::string& name)
+    template <class T> T* PropertyContainer::createProperty(const std::string& comp, const std::string& name)
     {
         StringVector parts;
         parseFullName(comp, parts);
@@ -381,14 +331,12 @@ namespace TwkContainer
         throw UnexpectedExc(", PropertyContainer::createProperty() failed");
     }
 
-    template <class T>
-    T* PropertyContainer::createProperty(const std::string& fullname)
+    template <class T> T* PropertyContainer::createProperty(const std::string& fullname)
     {
         StringVector parts;
         parseFullName(fullname, parts);
 
-        if (Component* c = createComponent(
-                parts.begin(), parts.begin() + parts.size() - 1, false))
+        if (Component* c = createComponent(parts.begin(), parts.begin() + parts.size() - 1, false))
         {
             if (T* p = c->property<T>(parts.back()))
             {
@@ -405,9 +353,7 @@ namespace TwkContainer
         throw UnexpectedExc(", PropertyContainer::createProperty() failed");
     }
 
-    template <class T>
-    T* PropertyContainer::declareProperty(const std::string& fullname,
-                                          Property::Info* info, bool forceValue)
+    template <class T> T* PropertyContainer::declareProperty(const std::string& fullname, Property::Info* info, bool forceValue)
     {
         T* p = createProperty<T>(fullname);
         if (forceValue)
@@ -418,9 +364,8 @@ namespace TwkContainer
     }
 
     template <class T>
-    T* PropertyContainer::declareProperty(const std::string& fullname,
-                                          const typename T::value_type& value,
-                                          Property::Info* info, bool forceValue)
+    T* PropertyContainer::declareProperty(const std::string& fullname, const typename T::value_type& value, Property::Info* info,
+                                          bool forceValue)
     {
         T* p = createProperty<T>(fullname);
 
@@ -436,10 +381,8 @@ namespace TwkContainer
     }
 
     template <class T>
-    T*
-    PropertyContainer::declareProperty(const std::string& fullname,
-                                       const typename T::container_type& value,
-                                       Property::Info* info, bool forceValue)
+    T* PropertyContainer::declareProperty(const std::string& fullname, const typename T::container_type& value, Property::Info* info,
+                                          bool forceValue)
     {
         T* p = createProperty<T>(fullname);
 
@@ -453,9 +396,7 @@ namespace TwkContainer
         return p;
     }
 
-    template <typename T>
-    void PropertyContainer::setProperty(const std::string& fullname,
-                                        const typename T::value_type& value)
+    template <typename T> void PropertyContainer::setProperty(const std::string& fullname, const typename T::value_type& value)
     {
         if (T* p = property<T>(fullname))
         {
@@ -468,17 +409,13 @@ namespace TwkContainer
         }
     }
 
-    template <typename T>
-    void PropertyContainer::setProperty(T* p,
-                                        const typename T::value_type& value)
+    template <typename T> void PropertyContainer::setProperty(T* p, const typename T::value_type& value)
     {
         p->resize(1);
         p->front() = value;
     }
 
-    template <typename T>
-    void PropertyContainer::setProperty(const std::string& fullname,
-                                        const typename T::container_type& value)
+    template <typename T> void PropertyContainer::setProperty(const std::string& fullname, const typename T::container_type& value)
     {
         if (T* p = property<T>(fullname))
         {
@@ -490,9 +427,7 @@ namespace TwkContainer
         }
     }
 
-    template <class T>
-    T* PropertyContainer::uniqueProperty(const std::string& comp,
-                                         const std::string& name)
+    template <class T> T* PropertyContainer::uniqueProperty(const std::string& comp, const std::string& name)
     {
         if (Component* c = createComponent(comp))
         {
@@ -519,9 +454,7 @@ namespace TwkContainer
         throw UnexpectedExc(", PropertyContainer::createComponent() failed");
     }
 
-    template <class T>
-    void PropertyContainer::removeProperty(const std::string& comp,
-                                           const std::string& name)
+    template <class T> void PropertyContainer::removeProperty(const std::string& comp, const std::string& name)
     {
         if (Component* c = component(comp))
         {
@@ -533,8 +466,7 @@ namespace TwkContainer
         }
     }
 
-    template <class T>
-    void PropertyContainer::removeProperty(const std::string& fullname)
+    template <class T> void PropertyContainer::removeProperty(const std::string& fullname)
     {
         if (T* p = property<T>(fullname))
         {
@@ -544,9 +476,7 @@ namespace TwkContainer
     }
 
     template <typename T>
-    typename T::value_type PropertyContainer::propertyValue(
-        const std::string& fullname,
-        const typename T::value_type& defaultValue) const
+    typename T::value_type PropertyContainer::propertyValue(const std::string& fullname, const typename T::value_type& defaultValue) const
     {
         if (const T* p = property<T>(fullname))
         {
@@ -558,39 +488,32 @@ namespace TwkContainer
     }
 
     template <typename T>
-    typename T::value_type PropertyContainer::propertyValue(
-        const T* p, const typename T::value_type& defaultValue) const
+    typename T::value_type PropertyContainer::propertyValue(const T* p, const typename T::value_type& defaultValue) const
     {
         if (p && !p->empty() && p->size() == 1)
             return p->front();
         return defaultValue;
     }
 
-    template <typename T>
-    const typename T::container_type&
-    PropertyContainer::propertyContainer(const std::string& fullname) const
+    template <typename T> const typename T::container_type& PropertyContainer::propertyContainer(const std::string& fullname) const
     {
         if (const T* p = property<T>(fullname))
         {
             return p->valueContainer();
         }
 
-        std::string msg =
-            fullname + " does not exist, propertyContainer failed.";
+        std::string msg = fullname + " does not exist, propertyContainer failed.";
         throw NoPropertyExc(msg.c_str());
     }
 
-    template <typename T>
-    typename T::container_type&
-    PropertyContainer::propertyContainer(const std::string& fullname)
+    template <typename T> typename T::container_type& PropertyContainer::propertyContainer(const std::string& fullname)
     {
         if (T* p = property<T>(fullname))
         {
             return p->valueContainer();
         }
 
-        std::string msg =
-            fullname + " does not exist, propertyContainer failed.";
+        std::string msg = fullname + " does not exist, propertyContainer failed.";
         throw NoPropertyExc(msg.c_str());
     }
 

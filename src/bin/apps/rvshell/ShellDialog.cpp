@@ -40,12 +40,9 @@ ShellDialog::ShellDialog(QWidget* parent)
     connect(actionSend, SIGNAL(triggered()), this, SLOT(go()));
     connect(actionQuit, SIGNAL(triggered()), this, SLOT(quit()));
 
-    connect(m_client, SIGNAL(newMessage(const QString&, const QString&)), this,
-            SLOT(appendMessage(const QString&, const QString&)));
-    connect(m_client, SIGNAL(newContact(const QString&)), this,
-            SLOT(newContact(const QString&)));
-    connect(m_client, SIGNAL(contactLeft(const QString&)), this,
-            SLOT(contactLeft(const QString&)));
+    connect(m_client, SIGNAL(newMessage(const QString&, const QString&)), this, SLOT(appendMessage(const QString&, const QString&)));
+    connect(m_client, SIGNAL(newContact(const QString&)), this, SLOT(newContact(const QString&)));
+    connect(m_client, SIGNAL(contactLeft(const QString&)), this, SLOT(contactLeft(const QString&)));
 
     connect(sendImageButton, SIGNAL(clicked()), this, SLOT(sendImage()));
 
@@ -53,8 +50,7 @@ ShellDialog::ShellDialog(QWidget* parent)
     connect(stopButton, SIGNAL(clicked()), this, SLOT(stop()));
     connect(forwardButton, SIGNAL(clicked()), this, SLOT(forward()));
     connect(backButton, SIGNAL(clicked()), this, SLOT(back()));
-    connect(fullScreenButton, SIGNAL(clicked(bool)), this,
-            SLOT(fullScreen(bool)));
+    connect(fullScreenButton, SIGNAL(clicked(bool)), this, SLOT(fullScreen(bool)));
     connect(cacheButton, SIGNAL(clicked(bool)), this, SLOT(cacheOn(bool)));
     connect(loadImageButton, SIGNAL(clicked()), this, SLOT(loadImage()));
 
@@ -85,8 +81,7 @@ void ShellDialog::go()
     QString event = eventNameLineEdit->text();
     if (text.isEmpty())
         return;
-    m_client->sendEvent(m_contact, event, eventTargetLineEdit->text(), text,
-                        true);
+    m_client->sendEvent(m_contact, event, eventTargetLineEdit->text(), text, true);
     // plainTextEdit->clear();
 }
 
@@ -108,8 +103,7 @@ void ShellDialog::contactLeft(const QString& contact)
     if (contact.isEmpty())
         return;
 
-    QList<QListWidgetItem*> items =
-        listWidget->findItems(contact, Qt::MatchExactly);
+    QList<QListWidgetItem*> items = listWidget->findItems(contact, Qt::MatchExactly);
     if (items.isEmpty())
         return;
     delete items.at(0);
@@ -157,30 +151,25 @@ void ShellDialog::back()
 void ShellDialog::fullScreen(bool b)
 {
     QString msg = QString("fullScreenMode(%1)").arg(b ? "true" : "false");
-    m_client->sendEvent(m_contact, "remote-eval", eventTargetLineEdit->text(),
-                        msg);
+    m_client->sendEvent(m_contact, "remote-eval", eventTargetLineEdit->text(), msg);
 }
 
 void ShellDialog::cacheOn(bool b)
 {
-    QString msg =
-        QString("setCacheMode(%1)").arg(b ? "CacheBuffer" : "CacheOff");
-    m_client->sendEvent(m_contact, "remote-eval", eventTargetLineEdit->text(),
-                        msg);
+    QString msg = QString("setCacheMode(%1)").arg(b ? "CacheBuffer" : "CacheOff");
+    m_client->sendEvent(m_contact, "remote-eval", eventTargetLineEdit->text(), msg);
 }
 
 void ShellDialog::loadImage()
 {
-    QString file = QFileDialog::getOpenFileName(this, "Select Image", ".",
-                                                "Images (*.png *.xpm *.jpg)");
+    QString file = QFileDialog::getOpenFileName(this, "Select Image", ".", "Images (*.png *.xpm *.jpg)");
 
     if (file == "")
         return;
 
     if (!m_pixmap.load(file))
     {
-        QMessageBox::critical(this, "Image not Read",
-                              "The image could not be read");
+        QMessageBox::critical(this, "Image not Read", "The image could not be read");
         return;
     }
 
@@ -220,8 +209,7 @@ void ShellDialog::loadImage()
     //  up send pixel buckets to the same source over and over.
     //
 
-    m_mediaName = QTime::currentTime().toString(
-        QDate::currentDate().toString("yyyy-M-d-h:m:s:z"));
+    m_mediaName = QTime::currentTime().toString(QDate::currentDate().toString("yyyy-M-d-h:m:s:z"));
 }
 
 void ShellDialog::sendImage()
@@ -287,16 +275,15 @@ void ShellDialog::sendImage()
     if (first || !updateOnly)
     {
         first = false;
-        QString newImageSource =
-            QString("newImageSource( \"%1\", %2, %3, " // name, w, h
-                    "%2, %3, 0, 0, "     // uncrop w, h, x-off, y-off,
-                    "1.0, 4, 8, false, " // pixaspect, 4 ch, 8 bit, nofloat
-                    "1, 1, 24.0, "       // fs, fe, fps
-                    "nil, "              // layers (none in this case)
-                    "string[] {\"left\", \"right\"} )") // views
-                .arg(m_mediaName)
-                .arg(w)
-                .arg(h);
+        QString newImageSource = QString("newImageSource( \"%1\", %2, %3, "  // name, w, h
+                                         "%2, %3, 0, 0, "                    // uncrop w, h, x-off, y-off,
+                                         "1.0, 4, 8, false, "                // pixaspect, 4 ch, 8 bit, nofloat
+                                         "1, 1, 24.0, "                      // fs, fe, fps
+                                         "nil, "                             // layers (none in this case)
+                                         "string[] {\"left\", \"right\"} )") // views
+                                     .arg(m_mediaName)
+                                     .arg(w)
+                                     .arg(h);
 
         //
         //  The "s" argument below will be the result of newImageSource()
@@ -323,25 +310,19 @@ void ShellDialog::sendImage()
         //  The entire thing will be evaluated in one go on the RV end.
         //
 
-        QString msg = QString("{ let s = %1; %2; %3; }")
-                          .arg(newImageSource)
-                          .arg(leftPixels)
-                          .arg(rightPixels);
+        QString msg = QString("{ let s = %1; %2; %3; }").arg(newImageSource).arg(leftPixels).arg(rightPixels);
 
         //
         //  Send the command
         //
 
-        m_client->sendEvent(m_contact, "remote-eval", "*", msg.toUtf8().data(),
-                            true);
+        m_client->sendEvent(m_contact, "remote-eval", "*", msg.toUtf8().data(), true);
 
         m_client->waitForSend(m_contact);
 
         if (!m_client->waitForMessage(m_contact))
         {
-            QMessageBox::critical(
-                this, "Timeout",
-                QString("%1 failed to respond in time").arg(m_contact));
+            QMessageBox::critical(this, "Timeout", QString("%1 failed to respond in time").arg(m_contact));
             return;
         }
     }
@@ -386,9 +367,7 @@ void ShellDialog::sendImage()
             {
                 for (size_t i = 0; i < tw * 4; i++)
                 {
-                    tile.push_back(
-                        ro
-                        + *(d + iy * (iw * 4) + tr * (iw * 4) + (ix * 4) + i));
+                    tile.push_back(ro + *(d + iy * (iw * 4) + tr * (iw * 4) + (ix * 4) + i));
                 }
             }
 
@@ -418,23 +397,21 @@ void ShellDialog::sendImage()
             //      f (frame)        any int, default is 1
             //
 
-            QString interpLeft =
-                QString("PIXELTILE("
-                        "media=%1,view=left,w=%2,h=%3,x=%4,y=%5,f=1)")
-                    .arg(m_mediaName)
-                    .arg(tw)
-                    .arg(th)
-                    .arg(ix)
-                    .arg(iy);
+            QString interpLeft = QString("PIXELTILE("
+                                         "media=%1,view=left,w=%2,h=%3,x=%4,y=%5,f=1)")
+                                     .arg(m_mediaName)
+                                     .arg(tw)
+                                     .arg(th)
+                                     .arg(ix)
+                                     .arg(iy);
 
-            QString interpRight =
-                QString("PIXELTILE("
-                        "media=%1,view=right,w=%2,h=%3,x=%4,y=%5,f=1)")
-                    .arg(m_mediaName)
-                    .arg(tw)
-                    .arg(th)
-                    .arg(ix)
-                    .arg(iy);
+            QString interpRight = QString("PIXELTILE("
+                                          "media=%1,view=right,w=%2,h=%3,x=%4,y=%5,f=1)")
+                                      .arg(m_mediaName)
+                                      .arg(tw)
+                                      .arg(th)
+                                      .arg(ix)
+                                      .arg(iy);
 
             m_client->sendData(m_contact, interpLeft, tile);
             m_client->waitForSend(m_contact);

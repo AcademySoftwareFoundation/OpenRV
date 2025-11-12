@@ -133,8 +133,7 @@ namespace Rv
                 //  is that in many cases this code causes the control modifier
                 //  to be lost.
                 //
-                if (m_modifiers & Qt::ControlModifier
-                    || m_modifiers & Qt::MetaModifier)
+                if (m_modifiers & Qt::ControlModifier || m_modifiers & Qt::MetaModifier)
                 {
                     m_modifiers = inputEvent->modifiers() & 0xffff0000;
                 }
@@ -225,9 +224,7 @@ namespace Rv
         bool nokeypad = false;
         bool meta = false;
         bool alt = false;
-        bool keydown = event->type() == QEvent::KeyPress
-                       || event->type() == QEvent::ShortcutOverride
-                       || event->type() == QEvent::Shortcut;
+        bool keydown = event->type() == QEvent::KeyPress || event->type() == QEvent::ShortcutOverride || event->type() == QEvent::Shortcut;
 
         //  On the mac, there are no "releases" reported during auto-repeat,
         //  we do the below to make this consistant on other platforms.
@@ -545,8 +542,7 @@ namespace Rv
         //  work on all platforms.
         //
 
-        unsigned int key =
-            (alt || ucs4string.empty()) ? event->key() : ucs4string.front();
+        unsigned int key = (alt || ucs4string.empty()) ? event->key() : ucs4string.front();
 
         if (keydown)
         {
@@ -564,18 +560,13 @@ namespace Rv
         }
     }
 
-    string QTTranslator::pointerString(bool b1, bool b2, bool b3,
-                                       QEvent::Type eventType,
-                                       Qt::KeyboardModifiers mods,
-                                       Qt::MouseButtons buttons,
-                                       bool tabletPushed = false) const
+    string QTTranslator::pointerString(bool b1, bool b2, bool b3, QEvent::Type eventType, Qt::KeyboardModifiers mods,
+                                       Qt::MouseButtons buttons, bool tabletPushed = false) const
     {
         string n;
 
         if (!Options::sharedOptions().stylusAsMouse
-            && (eventType == QEvent::TabletPress
-                || eventType == QEvent::TabletRelease
-                || eventType == QEvent::TabletMove))
+            && (eventType == QEvent::TabletPress || eventType == QEvent::TabletRelease || eventType == QEvent::TabletMove))
         {
             n = "";
         }
@@ -665,8 +656,7 @@ namespace Rv
     {
         QWheelEvent* event = static_cast<QWheelEvent*>(qevent);
 
-        string n = pointerString(m_b1, m_b2, m_b3, event->type(), m_modifiers,
-                                 event->buttons());
+        string n = pointerString(m_b1, m_b2, m_b3, event->type(), m_modifiers, event->buttons());
 
         n += "wheel";
         // use pixelDelta() or angleDelta() instead of delta() (deprecated)
@@ -675,8 +665,7 @@ namespace Rv
         else
             n += "up";
 
-        PointerEvent e(n, m_node, modifiers(m_modifiers), m_x, m_y, m_width,
-                       m_height, m_pushx, m_pushy, buttons());
+        PointerEvent e(n, m_node, modifiers(m_modifiers), m_x, m_y, m_width, m_height, m_pushx, m_pushy, buttons());
 
         sendEvent(e);
         return e.handled;
@@ -696,18 +685,15 @@ namespace Rv
         QEvent::Type type = event->type();
         Qt::KeyboardModifiers mods = m_modifiers;
 
-        string n =
-            pointerString(m_b1, m_b2, m_b3, type, mods, qbuttons(buttons()));
+        string n = pointerString(m_b1, m_b2, m_b3, type, mods, qbuttons(buttons()));
 
-        PointerEvent e(n, m_node, modifiers(mods), m_x, m_y, m_width, m_height,
-                       m_x, m_y, buttons());
+        PointerEvent e(n, m_node, modifiers(mods), m_x, m_y, m_width, m_height, m_x, m_y, buttons());
 
         sendEvent(e);
         return e.handled;
     }
 
-    bool QTTranslator::sendMouseEvent(QEvent* qevent,
-                                      float activationTime) const
+    bool QTTranslator::sendMouseEvent(QEvent* qevent, float activationTime) const
     {
         QMouseEvent* event = static_cast<QMouseEvent*>(qevent);
         QEvent::Type type = event->type();
@@ -725,36 +711,30 @@ namespace Rv
         m_y = (m_yscale * (m_widget->height() - event->y())) + m_yoffset;
 #else
         m_x = (m_xscale * event->position().x()) + m_xoffset;
-        m_y = (m_yscale * (m_widget->height() - event->position().y()))
-              + m_yoffset;
+        m_y = (m_yscale * (m_widget->height() - event->position().y())) + m_yoffset;
 #endif
 
         if (type == QEvent::MouseMove && !buttons())
         {
             n = pointerString(false, false, false, type, mods, ebuttons);
 
-            PointerEvent event(n, m_node, modifiers(mods), m_x, m_y, m_width,
-                               m_height, m_lastx, m_lasty, buttons());
+            PointerEvent event(n, m_node, modifiers(mods), m_x, m_y, m_width, m_height, m_lastx, m_lasty, buttons());
 
             sendEvent(event);
             handled = event.handled;
         }
-        else if (type == QEvent::MouseButtonPress
-                 || type == QEvent::MouseButtonDblClick)
+        else if (type == QEvent::MouseButtonPress || type == QEvent::MouseButtonDblClick)
         {
             //
             //  Release old push
             //
 
-            if ((m_b1 || m_b2 || m_b3 || m_lastMods != m_modifiers)
-                && !m_firstTime)
+            if ((m_b1 || m_b2 || m_b3 || m_lastMods != m_modifiers) && !m_firstTime)
             {
-                n = pointerString(m_b1, m_b2, m_b3, QEvent::MouseButtonRelease,
-                                  m_lastMods, qbuttons(m_lastButtons));
+                n = pointerString(m_b1, m_b2, m_b3, QEvent::MouseButtonRelease, m_lastMods, qbuttons(m_lastButtons));
 
-                PointerButtonReleaseEvent event(
-                    n, m_node, modifiers(m_lastMods), m_x, m_y, m_width,
-                    m_height, m_pushx, m_pushy, m_lastButtons);
+                PointerButtonReleaseEvent event(n, m_node, modifiers(m_lastMods), m_x, m_y, m_width, m_height, m_pushx, m_pushy,
+                                                m_lastButtons);
                 sendEvent(event);
             }
 
@@ -764,9 +744,7 @@ namespace Rv
 
             n = pointerString(b1, b2, b3, type, mods, ebuttons);
 
-            PointerButtonPressEvent event(n, m_node, mods, m_x, m_y, m_width,
-                                          m_height, m_x, m_y, buttons(), 0,
-                                          activationTime);
+            PointerButtonPressEvent event(n, m_node, mods, m_x, m_y, m_width, m_height, m_x, m_y, buttons(), 0, activationTime);
             sendEvent(event);
             handled = event.handled;
             m_pushx = m_x;
@@ -778,23 +756,17 @@ namespace Rv
             //  Release relative to old event
             //
 
-            n = pointerString(m_b1, m_b2, m_b3, QEvent::MouseButtonRelease,
-                              mods, ebuttons);
+            n = pointerString(m_b1, m_b2, m_b3, QEvent::MouseButtonRelease, mods, ebuttons);
 
-            PointerButtonReleaseEvent event(n, m_node, modifiers(mods), m_x,
-                                            m_y, m_width, m_height, m_pushx,
-                                            m_pushy, buttons());
+            PointerButtonReleaseEvent event(n, m_node, modifiers(mods), m_x, m_y, m_width, m_height, m_pushx, m_pushy, buttons());
             sendEvent(event);
             handled = event.handled;
 
             if (b1 || b2 || b3)
             {
-                n = pointerString(b1, b2, b3, QEvent::MouseButtonPress, mods,
-                                  ebuttons);
+                n = pointerString(b1, b2, b3, QEvent::MouseButtonPress, mods, ebuttons);
 
-                PointerButtonPressEvent event(n, m_node, modifiers(mods), m_x,
-                                              m_y, m_width, m_height, m_x, m_y,
-                                              buttons());
+                PointerButtonPressEvent event(n, m_node, modifiers(mods), m_x, m_y, m_width, m_height, m_x, m_y, buttons());
                 sendEvent(event);
                 handled = event.handled;
                 m_pushx = m_x;
@@ -803,23 +775,16 @@ namespace Rv
         }
         else
         {
-            if ((b1 != m_b1 || b2 != m_b2 || b3 != m_b3
-                 || m_lastMods != m_modifiers)
-                && !m_firstTime)
+            if ((b1 != m_b1 || b2 != m_b2 || b3 != m_b3 || m_lastMods != m_modifiers) && !m_firstTime)
             {
-                n = pointerString(m_b1, m_b2, m_b3, QEvent::MouseButtonRelease,
-                                  m_lastMods, qbuttons(m_lastButtons));
+                n = pointerString(m_b1, m_b2, m_b3, QEvent::MouseButtonRelease, m_lastMods, qbuttons(m_lastButtons));
 
-                PointerButtonReleaseEvent eEnd(
-                    n, m_node, modifiers(m_modifiers), m_x, m_y, m_width,
-                    m_height, m_pushx, m_pushy, m_lastButtons);
+                PointerButtonReleaseEvent eEnd(n, m_node, modifiers(m_modifiers), m_x, m_y, m_width, m_height, m_pushx, m_pushy,
+                                               m_lastButtons);
 
-                n = pointerString(b1, b2, b3, QEvent::MouseButtonPress, mods,
-                                  ebuttons);
+                n = pointerString(b1, b2, b3, QEvent::MouseButtonPress, mods, ebuttons);
 
-                PointerButtonPressEvent eBegin(n, m_node, modifiers(mods), m_x,
-                                               m_y, m_width, m_height, m_x, m_y,
-                                               buttons());
+                PointerButtonPressEvent eBegin(n, m_node, modifiers(mods), m_x, m_y, m_width, m_height, m_x, m_y, buttons());
 
                 sendEvent(eEnd);
                 m_pushx = m_x;
@@ -829,8 +794,7 @@ namespace Rv
 
             n = pointerString(b1, b2, b3, type, mods, ebuttons);
 
-            PointerEvent event(n, m_node, modifiers(mods), m_x, m_y, m_width,
-                               m_height, m_pushx, m_pushy, buttons());
+            PointerEvent event(n, m_node, modifiers(mods), m_x, m_y, m_width, m_height, m_pushx, m_pushy, buttons());
 
             sendEvent(event);
             handled = event.handled;
@@ -849,13 +813,9 @@ namespace Rv
         return handled ? true : false;
     }
 
-    unsigned int QTTranslator::buttons() const
-    {
-        return int(m_b1) | (int(m_b2) << 1) | (int(m_b3) << 2);
-    }
+    unsigned int QTTranslator::buttons() const { return int(m_b1) | (int(m_b2) << 1) | (int(m_b3) << 2); }
 
-    string QTTranslator::modifierString(Qt::KeyboardModifiers mods,
-                                        bool showShift) const
+    string QTTranslator::modifierString(Qt::KeyboardModifiers mods, bool showShift) const
     {
         string s;
         unsigned int m = modifiers(mods);
@@ -893,8 +853,7 @@ namespace Rv
             //  MoveAction seems to stand in for CopyAction sometimes, so just
             //  treat everything as a copy.
             //
-            if (de->proposedAction() == Qt::MoveAction
-                || de->proposedAction() == Qt::TargetMoveAction)
+            if (de->proposedAction() == Qt::MoveAction || de->proposedAction() == Qt::TargetMoveAction)
             {
                 de->setDropAction(Qt::CopyAction);
             }
@@ -932,8 +891,7 @@ namespace Rv
 
         if (leave)
         {
-            DragDropEvent e(ename, m_node, DragDropEvent::Leave,
-                            DragDropEvent::File, "", 0, 0, 0, w, h);
+            DragDropEvent e(ename, m_node, DragDropEvent::Leave, DragDropEvent::File, "", 0, 0, 0, w, h);
 
             sendEvent(e);
             handled = e.handled;
@@ -958,8 +916,7 @@ namespace Rv
                 FileNameList files;
                 FileNameList nonfiles;
 
-                for (QList<QUrl>::iterator i = urls.begin(); i < urls.end();
-                     ++i)
+                for (QList<QUrl>::iterator i = urls.begin(); i < urls.end(); ++i)
                 {
                     if (i->scheme() == "" || i->path() == "")
                         continue;
@@ -977,8 +934,7 @@ namespace Rv
                         // #ifdef WIN32
                         // while (ppath[0] == '/') ppath.remove(0, 1);
                         // #endif
-                        files.push_back(
-                            pathConform(ppath.toUtf8().constData()));
+                        files.push_back(pathConform(ppath.toUtf8().constData()));
                     }
                     else
                     {
@@ -1000,14 +956,11 @@ namespace Rv
                 for (int i = 0; i < seqs.size(); i++)
                 {
 #if defined(RV_VFX_CY2023)
-                    DragDropEvent e(ename, m_node, type, DragDropEvent::File,
-                                    seqs[i], 0, devent->pos().x(),
-                                    h - devent->pos().y() - 1, w, h);
+                    DragDropEvent e(ename, m_node, type, DragDropEvent::File, seqs[i], 0, devent->pos().x(), h - devent->pos().y() - 1, w,
+                                    h);
 #else
-                    DragDropEvent e(
-                        ename, m_node, type, DragDropEvent::File, seqs[i], 0,
-                        devent->position().toPoint().x(),
-                        h - devent->position().toPoint().y() - 1, w, h);
+                    DragDropEvent e(ename, m_node, type, DragDropEvent::File, seqs[i], 0, devent->position().toPoint().x(),
+                                    h - devent->position().toPoint().y() - 1, w, h);
 #endif
 
                     sendEvent(e);
@@ -1018,14 +971,11 @@ namespace Rv
                 for (int i = 0; i < nonfiles.size(); i++)
                 {
 #if defined(RV_VFX_CY2023)
-                    DragDropEvent e(ename, m_node, type, DragDropEvent::URL,
-                                    nonfiles[i], 0, devent->pos().x(),
-                                    h - devent->pos().y() - 1, w, h);
+                    DragDropEvent e(ename, m_node, type, DragDropEvent::URL, nonfiles[i], 0, devent->pos().x(), h - devent->pos().y() - 1,
+                                    w, h);
 #else
-                    DragDropEvent e(
-                        ename, m_node, type, DragDropEvent::URL, nonfiles[i], 0,
-                        devent->position().toPoint().x(),
-                        h - devent->position().toPoint().y() - 1, w, h);
+                    DragDropEvent e(ename, m_node, type, DragDropEvent::URL, nonfiles[i], 0, devent->position().toPoint().x(),
+                                    h - devent->position().toPoint().y() - 1, w, h);
 #endif
 
                     sendEvent(e);
@@ -1036,15 +986,11 @@ namespace Rv
             else if (devent->mimeData()->hasText())
             {
 #if defined(RV_VFX_CY2023)
-                DragDropEvent e(ename, m_node, type, DragDropEvent::Text,
-                                devent->mimeData()->text().toUtf8().constData(),
-                                0, devent->pos().x(), h - devent->pos().y() - 1,
-                                w, h);
+                DragDropEvent e(ename, m_node, type, DragDropEvent::Text, devent->mimeData()->text().toUtf8().constData(), 0,
+                                devent->pos().x(), h - devent->pos().y() - 1, w, h);
 #else
-                DragDropEvent e(ename, m_node, type, DragDropEvent::Text,
-                                devent->mimeData()->text().toUtf8().constData(),
-                                0, devent->position().toPoint().x(),
-                                h - devent->position().toPoint().y() - 1, w, h);
+                DragDropEvent e(ename, m_node, type, DragDropEvent::Text, devent->mimeData()->text().toUtf8().constData(), 0,
+                                devent->position().toPoint().x(), h - devent->position().toPoint().y() - 1, w, h);
 #endif
 
                 sendEvent(e);
@@ -1070,12 +1016,10 @@ namespace Rv
 
 #if defined(RV_VFX_CY2023)
         const double gx = event->hiResGlobalX() - xoff;
-        const double gy =
-            double(m_widget->height()) - (event->hiResGlobalY() - yoff);
+        const double gy = double(m_widget->height()) - (event->hiResGlobalY() - yoff);
 #else
         const double gx = event->globalPosition().x() - xoff;
-        const double gy =
-            double(m_widget->height()) - (event->globalPosition().y() - yoff);
+        const double gy = double(m_widget->height()) - (event->globalPosition().y() - yoff);
 #endif
         const double pressure = event->pressure();
         const double tpressure = event->tangentialPressure();
@@ -1180,11 +1124,9 @@ namespace Rv
             break;
         }
 
-        bool isPointerTypeHandled =
-            (event->deviceType() == QInputDevice::DeviceType::Unknown
-             && (event->pointerType() == QPointingDevice::PointerType::Pen
-                 || event->pointerType()
-                        == QPointingDevice::PointerType::Eraser));
+        bool isPointerTypeHandled = (event->deviceType() == QInputDevice::DeviceType::Unknown
+                                     && (event->pointerType() == QPointingDevice::PointerType::Pen
+                                         || event->pointerType() == QPointingDevice::PointerType::Eraser));
 
         if (!isPointerTypeHandled)
         {
@@ -1246,8 +1188,7 @@ namespace Rv
             break;
         }
 
-        TabletEvent e(n, m_node, modifiers(mods), m_x, m_y, m_width, m_height,
-                      m_pushx, m_pushy, buttons(), gx, gy, pressure, tpressure,
+        TabletEvent e(n, m_node, modifiers(mods), m_x, m_y, m_width, m_height, m_pushx, m_pushy, buttons(), gx, gy, pressure, tpressure,
                       rot, xtilt, ytilt, z);
 
         sendEvent(e);
@@ -1266,8 +1207,7 @@ namespace Rv
         return true;
     }
 
-    void QTTranslator::setScaleAndOffset(float x, float y, float sx,
-                                         float sy) const
+    void QTTranslator::setScaleAndOffset(float x, float y, float sx, float sy) const
     {
         m_xoffset = x;
         m_yoffset = y;

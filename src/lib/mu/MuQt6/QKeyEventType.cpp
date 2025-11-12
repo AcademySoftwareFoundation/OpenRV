@@ -51,33 +51,28 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    int qt_QKeyEvent_count_int_QKeyEvent(Mu::Thread& NODE_THREAD,
-                                         Pointer param_this)
+    int qt_QKeyEvent_count_int_QKeyEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QKeyEvent* arg0 = getqpointer<QKeyEventType>(param_this);
         return arg0->count();
     }
 
-    bool qt_QKeyEvent_isAutoRepeat_bool_QKeyEvent(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this)
+    bool qt_QKeyEvent_isAutoRepeat_bool_QKeyEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QKeyEvent* arg0 = getqpointer<QKeyEventType>(param_this);
         return arg0->isAutoRepeat();
     }
 
-    int qt_QKeyEvent_key_int_QKeyEvent(Mu::Thread& NODE_THREAD,
-                                       Pointer param_this)
+    int qt_QKeyEvent_key_int_QKeyEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QKeyEvent* arg0 = getqpointer<QKeyEventType>(param_this);
         return arg0->key();
     }
 
-    bool qt_QKeyEvent_matches_bool_QKeyEvent_int(Mu::Thread& NODE_THREAD,
-                                                 Pointer param_this,
-                                                 int param_key)
+    bool qt_QKeyEvent_matches_bool_QKeyEvent_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_key)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QKeyEvent* arg0 = getqpointer<QKeyEventType>(param_this);
@@ -85,98 +80,78 @@ namespace Mu
         return arg0->matches(arg1);
     }
 
-    int qt_QKeyEvent_modifiers_int_QKeyEvent(Mu::Thread& NODE_THREAD,
-                                             Pointer param_this)
+    int qt_QKeyEvent_modifiers_int_QKeyEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QKeyEvent* arg0 = getqpointer<QKeyEventType>(param_this);
         return int(arg0->modifiers());
     }
 
-    int qt_QKeyEvent_nativeModifiers_int_QKeyEvent(Mu::Thread& NODE_THREAD,
-                                                   Pointer param_this)
+    int qt_QKeyEvent_nativeModifiers_int_QKeyEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QKeyEvent* arg0 = getqpointer<QKeyEventType>(param_this);
         return arg0->nativeModifiers();
     }
 
-    int qt_QKeyEvent_nativeScanCode_int_QKeyEvent(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this)
+    int qt_QKeyEvent_nativeScanCode_int_QKeyEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QKeyEvent* arg0 = getqpointer<QKeyEventType>(param_this);
         return arg0->nativeScanCode();
     }
 
-    int qt_QKeyEvent_nativeVirtualKey_int_QKeyEvent(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this)
+    int qt_QKeyEvent_nativeVirtualKey_int_QKeyEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QKeyEvent* arg0 = getqpointer<QKeyEventType>(param_this);
         return arg0->nativeVirtualKey();
     }
 
-    Pointer qt_QKeyEvent_text_string_QKeyEvent(Mu::Thread& NODE_THREAD,
-                                               Pointer param_this)
+    Pointer qt_QKeyEvent_text_string_QKeyEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QKeyEvent* arg0 = getqpointer<QKeyEventType>(param_this);
         return makestring(c, arg0->text());
     }
 
-    static NODE_IMPLEMENTATION(_n_count0, int)
-    {
-        NODE_RETURN(qt_QKeyEvent_count_int_QKeyEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_count0, int) { NODE_RETURN(qt_QKeyEvent_count_int_QKeyEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
     static NODE_IMPLEMENTATION(_n_isAutoRepeat0, bool)
     {
-        NODE_RETURN(qt_QKeyEvent_isAutoRepeat_bool_QKeyEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QKeyEvent_isAutoRepeat_bool_QKeyEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
-    static NODE_IMPLEMENTATION(_n_key0, int)
-    {
-        NODE_RETURN(qt_QKeyEvent_key_int_QKeyEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_key0, int) { NODE_RETURN(qt_QKeyEvent_key_int_QKeyEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
     static NODE_IMPLEMENTATION(_n_matches0, bool)
     {
-        NODE_RETURN(qt_QKeyEvent_matches_bool_QKeyEvent_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QKeyEvent_matches_bool_QKeyEvent_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_modifiers0, int)
     {
-        NODE_RETURN(qt_QKeyEvent_modifiers_int_QKeyEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QKeyEvent_modifiers_int_QKeyEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_nativeModifiers0, int)
     {
-        NODE_RETURN(qt_QKeyEvent_nativeModifiers_int_QKeyEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QKeyEvent_nativeModifiers_int_QKeyEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_nativeScanCode0, int)
     {
-        NODE_RETURN(qt_QKeyEvent_nativeScanCode_int_QKeyEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QKeyEvent_nativeScanCode_int_QKeyEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_nativeVirtualKey0, int)
     {
-        NODE_RETURN(qt_QKeyEvent_nativeVirtualKey_int_QKeyEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QKeyEvent_nativeVirtualKey_int_QKeyEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_text0, Pointer)
     {
-        NODE_RETURN(qt_QKeyEvent_text_string_QKeyEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QKeyEvent_text_string_QKeyEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     void QKeyEventType::load()
@@ -196,13 +171,11 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
                    new MemberVariable(c, "native", "qt.NativeObject"),
 
@@ -220,40 +193,25 @@ namespace Mu
             // flags Qt::KeyboardModifiers modifiers, int nativeScanCode, int
             // nativeVirtualKey, int nativeModifiers, string text, bool autorep,
             // "quint16" count, "const QInputDevice *" device)
-            new Function(c, "count", _n_count0, None, Compiled,
-                         qt_QKeyEvent_count_int_QKeyEvent, Return, "int",
-                         Parameters, new Param(c, "this", "qt.QKeyEvent"), End),
-            new Function(c, "isAutoRepeat", _n_isAutoRepeat0, None, Compiled,
-                         qt_QKeyEvent_isAutoRepeat_bool_QKeyEvent, Return,
-                         "bool", Parameters,
+            new Function(c, "count", _n_count0, None, Compiled, qt_QKeyEvent_count_int_QKeyEvent, Return, "int", Parameters,
                          new Param(c, "this", "qt.QKeyEvent"), End),
-            new Function(c, "key", _n_key0, None, Compiled,
-                         qt_QKeyEvent_key_int_QKeyEvent, Return, "int",
+            new Function(c, "isAutoRepeat", _n_isAutoRepeat0, None, Compiled, qt_QKeyEvent_isAutoRepeat_bool_QKeyEvent, Return, "bool",
                          Parameters, new Param(c, "this", "qt.QKeyEvent"), End),
+            new Function(c, "key", _n_key0, None, Compiled, qt_QKeyEvent_key_int_QKeyEvent, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QKeyEvent"), End),
             // MISSING: keyCombination ("QKeyCombination"; QKeyEvent this)
-            new Function(c, "matches", _n_matches0, None, Compiled,
-                         qt_QKeyEvent_matches_bool_QKeyEvent_int, Return,
-                         "bool", Parameters,
-                         new Param(c, "this", "qt.QKeyEvent"),
-                         new Param(c, "key", "int"), End),
-            new Function(c, "modifiers", _n_modifiers0, None, Compiled,
-                         qt_QKeyEvent_modifiers_int_QKeyEvent, Return, "int",
+            new Function(c, "matches", _n_matches0, None, Compiled, qt_QKeyEvent_matches_bool_QKeyEvent_int, Return, "bool", Parameters,
+                         new Param(c, "this", "qt.QKeyEvent"), new Param(c, "key", "int"), End),
+            new Function(c, "modifiers", _n_modifiers0, None, Compiled, qt_QKeyEvent_modifiers_int_QKeyEvent, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QKeyEvent"), End),
+            new Function(c, "nativeModifiers", _n_nativeModifiers0, None, Compiled, qt_QKeyEvent_nativeModifiers_int_QKeyEvent, Return,
+                         "int", Parameters, new Param(c, "this", "qt.QKeyEvent"), End),
+            new Function(c, "nativeScanCode", _n_nativeScanCode0, None, Compiled, qt_QKeyEvent_nativeScanCode_int_QKeyEvent, Return, "int",
                          Parameters, new Param(c, "this", "qt.QKeyEvent"), End),
-            new Function(c, "nativeModifiers", _n_nativeModifiers0, None,
-                         Compiled, qt_QKeyEvent_nativeModifiers_int_QKeyEvent,
-                         Return, "int", Parameters,
+            new Function(c, "nativeVirtualKey", _n_nativeVirtualKey0, None, Compiled, qt_QKeyEvent_nativeVirtualKey_int_QKeyEvent, Return,
+                         "int", Parameters, new Param(c, "this", "qt.QKeyEvent"), End),
+            new Function(c, "text", _n_text0, None, Compiled, qt_QKeyEvent_text_string_QKeyEvent, Return, "string", Parameters,
                          new Param(c, "this", "qt.QKeyEvent"), End),
-            new Function(c, "nativeScanCode", _n_nativeScanCode0, None,
-                         Compiled, qt_QKeyEvent_nativeScanCode_int_QKeyEvent,
-                         Return, "int", Parameters,
-                         new Param(c, "this", "qt.QKeyEvent"), End),
-            new Function(c, "nativeVirtualKey", _n_nativeVirtualKey0, None,
-                         Compiled, qt_QKeyEvent_nativeVirtualKey_int_QKeyEvent,
-                         Return, "int", Parameters,
-                         new Param(c, "this", "qt.QKeyEvent"), End),
-            new Function(c, "text", _n_text0, None, Compiled,
-                         qt_QKeyEvent_text_string_QKeyEvent, Return, "string",
-                         Parameters, new Param(c, "this", "qt.QKeyEvent"), End),
             // static functions
             EndArguments);
         globalScope()->addSymbols(EndArguments);

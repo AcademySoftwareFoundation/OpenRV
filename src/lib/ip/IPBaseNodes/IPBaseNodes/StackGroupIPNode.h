@@ -25,16 +25,13 @@ namespace IPCore
     class StackGroupIPNode : public GroupIPNode
     {
     public:
-        StackGroupIPNode(const std::string& name, const NodeDefinition* def,
-                         IPGraph* graph, GroupIPNode* group = 0);
+        StackGroupIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group = 0);
 
         virtual ~StackGroupIPNode();
 
         virtual void setInputs(const IPNodes&) override;
         virtual IPNode* newSubGraphForInput(size_t, const IPNodes&) override;
-        virtual IPNode* modifySubGraphForInput(size_t index,
-                                               const IPNodes& newInputs,
-                                               IPNode* subgraph) override;
+        virtual IPNode* modifySubGraphForInput(size_t index, const IPNodes& newInputs, IPNode* subgraph) override;
         virtual void propertyChanged(const Property*) override;
 
         StackIPNode* stackNode() const { return m_stackNode; }
@@ -42,8 +39,7 @@ namespace IPCore
         static void setDefaultAutoRetime(bool b) { m_defaultAutoRetime = b; }
 
     protected:
-        void inputMediaChanged(IPNode* srcNode, int srcOutIndex,
-                               PropagateTarget target) override;
+        void inputMediaChanged(IPNode* srcNode, int srcOutIndex, PropagateTarget target) override;
 
     private:
         std::string transformType();

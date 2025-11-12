@@ -38,8 +38,7 @@ namespace TwkMediaLibrary
         std::string typeName() const override;
 
     protected:
-        explicit PyNode(Library*, PyNode* parent = nullptr,
-                        std::string name = "", PyNodeType type = PyNoType);
+        explicit PyNode(Library*, PyNode* parent = nullptr, std::string name = "", PyNodeType type = PyNoType);
         virtual ~PyNode() = default;
 
         void addChild(PyNode*);

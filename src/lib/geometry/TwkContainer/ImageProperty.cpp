@@ -32,13 +32,9 @@ namespace TwkContainer
 
     ImageProperty::~ImageProperty() { clear(); }
 
-    size_t ImageProperty::sizeOfDimension(size_t dim) const
-    {
-        return m_sizes[dim];
-    }
+    size_t ImageProperty::sizeOfDimension(size_t dim) const { return m_sizes[dim]; }
 
-    void ImageProperty::restructure(size_t s0, size_t s1, size_t s2, size_t s3,
-                                    size_t num)
+    void ImageProperty::restructure(size_t s0, size_t s1, size_t s2, size_t s3, size_t num)
     {
         delete[] m_data;
         m_data = 0;
@@ -107,26 +103,19 @@ namespace TwkContainer
         return total * sizeofLayout(m_layout);
     }
 
-    void ImageProperty::insertDefaultValue(size_t index, size_t len)
-    {
-        abort();
-    }
+    void ImageProperty::insertDefaultValue(size_t index, size_t len) { abort(); }
 
     void ImageProperty::clearToDefaultValue() { abort(); }
 
     Property* ImageProperty::copy(const char* newName) const
     {
-        ImageProperty* p =
-            new ImageProperty(newName ? newName : name().c_str(), m_layout);
+        ImageProperty* p = new ImageProperty(newName ? newName : name().c_str(), m_layout);
         p->restructure(m_sizes[0], m_sizes[1], m_sizes[2], m_sizes[3], m_num);
         memcpy(p->data<unsigned char>(), m_data, sizeInBytes());
         return p;
     }
 
-    Property* ImageProperty::copyNoData() const
-    {
-        return new ImageProperty(name().c_str(), m_layout);
-    }
+    Property* ImageProperty::copyNoData() const { return new ImageProperty(name().c_str(), m_layout); }
 
     void ImageProperty::copy(const Property* prop)
     {
@@ -134,18 +123,13 @@ namespace TwkContainer
         {
             assert(p->layoutTrait() == m_layout);
 
-            restructure(p->sizeOfDimension(0), p->sizeOfDimension(1),
-                        p->sizeOfDimension(2), p->sizeOfDimension(3),
-                        p->size());
+            restructure(p->sizeOfDimension(0), p->sizeOfDimension(1), p->sizeOfDimension(2), p->sizeOfDimension(3), p->size());
 
             memcpy(m_data, p->data<unsigned char>(), sizeInBytes());
         }
     }
 
-    void ImageProperty::copyRange(const Property*, size_t begin, size_t end)
-    {
-        abort();
-    }
+    void ImageProperty::copyRange(const Property*, size_t begin, size_t end) { abort(); }
 
     void ImageProperty::concatenate(const Property*) { abort(); }
 
@@ -157,11 +141,8 @@ namespace TwkContainer
     {
         if (const ImageProperty* p = dynamic_cast<const ImageProperty*>(prop))
         {
-            if (p->layoutTrait() == m_layout
-                && p->sizeOfDimension(0) == m_sizes[0]
-                && p->sizeOfDimension(1) == m_sizes[1]
-                && p->sizeOfDimension(2) == m_sizes[2]
-                && p->sizeOfDimension(3) == m_sizes[3] && p->size() == m_num)
+            if (p->layoutTrait() == m_layout && p->sizeOfDimension(0) == m_sizes[0] && p->sizeOfDimension(1) == m_sizes[1]
+                && p->sizeOfDimension(2) == m_sizes[2] && p->sizeOfDimension(3) == m_sizes[3] && p->size() == m_num)
             {
                 return memcmp(p->data<byte>(), m_data, sizeInBytes()) == 0;
             }
@@ -174,11 +155,8 @@ namespace TwkContainer
     {
         if (const ImageProperty* p = dynamic_cast<const ImageProperty*>(prop))
         {
-            if (p->layoutTrait() == m_layout
-                && p->sizeOfDimension(0) == m_sizes[0]
-                && p->sizeOfDimension(1) == m_sizes[1]
-                && p->sizeOfDimension(2) == m_sizes[2]
-                && p->sizeOfDimension(3) == m_sizes[3] && p->size() == m_num)
+            if (p->layoutTrait() == m_layout && p->sizeOfDimension(0) == m_sizes[0] && p->sizeOfDimension(1) == m_sizes[1]
+                && p->sizeOfDimension(2) == m_sizes[2] && p->sizeOfDimension(3) == m_sizes[3] && p->size() == m_num)
             {
                 return true;
             }
@@ -190,8 +168,7 @@ namespace TwkContainer
     string ImageProperty::valueAsString() const
     {
         ostringstream str;
-        str << sizeOfDimension(0) << "x" << sizeOfDimension(1) << "x"
-            << sizeOfDimension(2) << "x" << sizeOfDimension(3) << " "
+        str << sizeOfDimension(0) << "x" << sizeOfDimension(1) << "x" << sizeOfDimension(2) << "x" << sizeOfDimension(3) << " "
             << layoutAsString(m_layout);
 
         return str.str();

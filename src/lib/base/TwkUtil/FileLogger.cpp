@@ -26,13 +26,9 @@ namespace TwkUtil
     {
 #if defined(PLATFORM_DARWIN)
         std::string logFilePath =
-            QDir::homePath().toStdString() + "/Library/Logs/"
-            + QCoreApplication::organizationName().toStdString() + "/";
+            QDir::homePath().toStdString() + "/Library/Logs/" + QCoreApplication::organizationName().toStdString() + "/";
 #else
-        std::string logFilePath =
-            QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)
-                .toStdString()
-            + "/";
+        std::string logFilePath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation).toStdString() + "/";
 #endif
         std::cout << "INFO: File logger path: " << logFilePath << '\n';
 
@@ -41,9 +37,7 @@ namespace TwkUtil
         if (evFileLogSynchronous.getValue())
         {
             m_logger =
-                spdlog::rotating_logger_mt(
-                    name, logFilePath.append(name + ".log"),
-                    evFileLogSize.getValue(), evFileLogNumFiles.getValue())
+                spdlog::rotating_logger_mt(name, logFilePath.append(name + ".log"), evFileLogSize.getValue(), evFileLogNumFiles.getValue())
                     .get();
 
             m_logger->flush_on(spdlog::level::trace); // All message levels will
@@ -51,11 +45,9 @@ namespace TwkUtil
         }
         else
         {
-            m_logger =
-                spdlog::rotating_logger_mt<spdlog::async_factory>(
-                    name, logFilePath.append(name + ".log"),
-                    evFileLogSize.getValue(), evFileLogNumFiles.getValue())
-                    .get();
+            m_logger = spdlog::rotating_logger_mt<spdlog::async_factory>(name, logFilePath.append(name + ".log"), evFileLogSize.getValue(),
+                                                                         evFileLogNumFiles.getValue())
+                           .get();
             m_logger->flush_on(spdlog::level::err);
         }
 
@@ -64,13 +56,9 @@ namespace TwkUtil
         m_logger->info("============ SESSION START ============\n");
     }
 
-    FileLogger::~FileLogger()
-    {
-        m_logger->info("============  SESSION END  ============\n");
-    }
+    FileLogger::~FileLogger() { m_logger->info("============  SESSION END  ============\n"); }
 
-    void FileLogger::logToFile(spdlog::level::level_enum lineLevel,
-                               const std::string& line)
+    void FileLogger::logToFile(spdlog::level::level_enum lineLevel, const std::string& line)
     {
         switch (lineLevel)
         {

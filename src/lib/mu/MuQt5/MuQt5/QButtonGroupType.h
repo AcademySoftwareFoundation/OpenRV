@@ -39,8 +39,7 @@ namespace Mu
         //  Constructors
         //
 
-        QButtonGroupType(Context* context, const char* name,
-                         Class* superClass = 0, Class* superClass2 = 0);
+        QButtonGroupType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QButtonGroupType();
 
@@ -63,8 +62,7 @@ namespace Mu
     {
     public:
         virtual ~MuQt_QButtonGroup();
-        MuQt_QButtonGroup(Pointer muobj, const CallEnvironment*,
-                          QObject* parent);
+        MuQt_QButtonGroup(Pointer muobj, const CallEnvironment*, QObject* parent);
         virtual bool event(QEvent* e);
         virtual bool eventFilter(QObject* watched, QEvent* event);
 
@@ -75,17 +73,11 @@ namespace Mu
     public:
         void customEvent_pub(QEvent* event) { customEvent(event); }
 
-        void customEvent_pub_parent(QEvent* event)
-        {
-            QButtonGroup::customEvent(event);
-        }
+        void customEvent_pub_parent(QEvent* event) { QButtonGroup::customEvent(event); }
 
         void timerEvent_pub(QTimerEvent* event) { timerEvent(event); }
 
-        void timerEvent_pub_parent(QTimerEvent* event)
-        {
-            QButtonGroup::timerEvent(event);
-        }
+        void timerEvent_pub_parent(QTimerEvent* event) { QButtonGroup::timerEvent(event); }
 
     public:
         const QButtonGroupType* _baseType;
@@ -93,11 +85,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance*
-    QButtonGroupType::cachedInstance(const QButtonGroupType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QButtonGroupType::cachedInstance(const QButtonGroupType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

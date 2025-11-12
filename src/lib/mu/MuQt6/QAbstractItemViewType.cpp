@@ -81,21 +81,17 @@ namespace Mu
         _baseType = 0;
     }
 
-    MuQt_QAbstractItemView::MuQt_QAbstractItemView(Pointer muobj,
-                                                   const CallEnvironment* ce,
-                                                   QWidget* parent)
+    MuQt_QAbstractItemView::MuQt_QAbstractItemView(Pointer muobj, const CallEnvironment* ce, QWidget* parent)
         : QAbstractItemView(parent)
     {
         _env = ce;
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QAbstractItemViewType>(
-            c->internName("qt.QAbstractItemView"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QAbstractItemViewType>(c->internName("qt.QAbstractItemView"));
     }
 
-    QModelIndex
-    MuQt_QAbstractItemView::indexAt(const QPoint& point) const // pure virtual
+    QModelIndex MuQt_QAbstractItemView::indexAt(const QPoint& point) const // pure virtual
     {
         if (!_env)
             return defaultValue<QModelIndex>();
@@ -139,9 +135,8 @@ namespace Mu
         }
     }
 
-    void MuQt_QAbstractItemView::scrollTo(
-        const QModelIndex& index,
-        QAbstractItemView::ScrollHint hint) // pure virtual
+    void MuQt_QAbstractItemView::scrollTo(const QModelIndex& index,
+                                          QAbstractItemView::ScrollHint hint) // pure virtual
     {
         if (!_env)
             return;
@@ -152,8 +147,7 @@ namespace Mu
         {
             Function::ArgumentVector args(3);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
+            args[1] = Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
             args[2] = Value(int(hint));
             Value rval = _env->call(F, args);
         }
@@ -177,8 +171,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeinstance<QAbstractItemModelType>(
-                c, model, "qt.QAbstractItemModel"));
+            args[1] = Value(makeinstance<QAbstractItemModelType>(c, model, "qt.QAbstractItemModel"));
             Value rval = _env->call(F, args);
         }
         else
@@ -187,8 +180,7 @@ namespace Mu
         }
     }
 
-    void MuQt_QAbstractItemView::setSelectionModel(
-        QItemSelectionModel* selectionModel)
+    void MuQt_QAbstractItemView::setSelectionModel(QItemSelectionModel* selectionModel)
     {
         if (!_env)
         {
@@ -202,8 +194,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeinstance<QItemSelectionModelType>(
-                c, selectionModel, "qt.QItemSelectionModel"));
+            args[1] = Value(makeinstance<QItemSelectionModelType>(c, selectionModel, "qt.QItemSelectionModel"));
             Value rval = _env->call(F, args);
         }
         else
@@ -254,8 +245,7 @@ namespace Mu
         }
     }
 
-    QRect MuQt_QAbstractItemView::visualRect(
-        const QModelIndex& index) const // pure virtual
+    QRect MuQt_QAbstractItemView::visualRect(const QModelIndex& index) const // pure virtual
     {
         if (!_env)
             return defaultValue<QRect>();
@@ -266,8 +256,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
+            args[1] = Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
             Value rval = _env->call(F, args);
             return getqtype<QRectType>(rval._Pointer);
         }
@@ -277,8 +266,7 @@ namespace Mu
         }
     }
 
-    QVariant
-    MuQt_QAbstractItemView::inputMethodQuery(Qt::InputMethodQuery query) const
+    QVariant MuQt_QAbstractItemView::inputMethodQuery(Qt::InputMethodQuery query) const
     {
         if (!_env)
             return QAbstractItemView::inputMethodQuery(query);
@@ -299,9 +287,7 @@ namespace Mu
         }
     }
 
-    bool MuQt_QAbstractItemView::edit(const QModelIndex& index,
-                                      QAbstractItemView::EditTrigger trigger,
-                                      QEvent* event)
+    bool MuQt_QAbstractItemView::edit(const QModelIndex& index, QAbstractItemView::EditTrigger trigger, QEvent* event)
     {
         if (!_env)
             return QAbstractItemView::edit(index, trigger, event);
@@ -312,8 +298,7 @@ namespace Mu
         {
             Function::ArgumentVector args(4);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
+            args[1] = Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
             args[2] = Value(int(trigger));
             args[3] = Value(makeqpointer<QEventType>(c, event, "qt.QEvent"));
             Value rval = _env->call(F, args);
@@ -345,8 +330,7 @@ namespace Mu
         }
     }
 
-    bool MuQt_QAbstractItemView::isIndexHidden(
-        const QModelIndex& index) const // pure virtual
+    bool MuQt_QAbstractItemView::isIndexHidden(const QModelIndex& index) const // pure virtual
     {
         if (!_env)
             return defaultValue<bool>();
@@ -357,8 +341,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
+            args[1] = Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
             Value rval = _env->call(F, args);
             return (bool)(rval._bool);
         }
@@ -368,9 +351,8 @@ namespace Mu
         }
     }
 
-    QModelIndex MuQt_QAbstractItemView::moveCursor(
-        QAbstractItemView::CursorAction cursorAction,
-        Qt::KeyboardModifiers modifiers) // pure virtual
+    QModelIndex MuQt_QAbstractItemView::moveCursor(QAbstractItemView::CursorAction cursorAction,
+                                                   Qt::KeyboardModifiers modifiers) // pure virtual
     {
         if (!_env)
             return defaultValue<QModelIndex>();
@@ -412,9 +394,7 @@ namespace Mu
         }
     }
 
-    QItemSelectionModel::SelectionFlags
-    MuQt_QAbstractItemView::selectionCommand(const QModelIndex& index,
-                                             const QEvent* event) const
+    QItemSelectionModel::SelectionFlags MuQt_QAbstractItemView::selectionCommand(const QModelIndex& index, const QEvent* event) const
     {
         if (!_env)
             return QAbstractItemView::selectionCommand(index, event);
@@ -425,8 +405,7 @@ namespace Mu
         {
             Function::ArgumentVector args(3);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
+            args[1] = Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
             args[2] = Value(makeqpointer<QEventType>(c, event, "qt.QEvent"));
             Value rval = _env->call(F, args);
             return (QItemSelectionModel::SelectionFlags)(rval._int);
@@ -437,9 +416,8 @@ namespace Mu
         }
     }
 
-    void MuQt_QAbstractItemView::setSelection(
-        const QRect& rect,
-        QItemSelectionModel::SelectionFlags flags) // pure virtual
+    void MuQt_QAbstractItemView::setSelection(const QRect& rect,
+                                              QItemSelectionModel::SelectionFlags flags) // pure virtual
     {
         if (!_env)
             return;
@@ -503,8 +481,7 @@ namespace Mu
         }
     }
 
-    QRegion MuQt_QAbstractItemView::visualRegionForSelection(
-        const QItemSelection& selection) const // pure virtual
+    QRegion MuQt_QAbstractItemView::visualRegionForSelection(const QItemSelection& selection) const // pure virtual
     {
         if (!_env)
             return defaultValue<QRegion>();
@@ -515,8 +492,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqtype<QItemSelectionType>(c, selection,
-                                                          "qt.QItemSelection"));
+            args[1] = Value(makeqtype<QItemSelectionType>(c, selection, "qt.QItemSelection"));
             Value rval = _env->call(F, args);
             return getqtype<QRegionType>(rval._Pointer);
         }
@@ -540,8 +516,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqpointer<QDragEnterEventType>(
-                c, event, "qt.QDragEnterEvent"));
+            args[1] = Value(makeqpointer<QDragEnterEventType>(c, event, "qt.QDragEnterEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -564,8 +539,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqpointer<QDragLeaveEventType>(
-                c, event, "qt.QDragLeaveEvent"));
+            args[1] = Value(makeqpointer<QDragLeaveEventType>(c, event, "qt.QDragLeaveEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -588,8 +562,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqpointer<QDragMoveEventType>(
-                c, event, "qt.QDragMoveEvent"));
+            args[1] = Value(makeqpointer<QDragMoveEventType>(c, event, "qt.QDragMoveEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -612,8 +585,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QDropEventType>(c, event, "qt.QDropEvent"));
+            args[1] = Value(makeqpointer<QDropEventType>(c, event, "qt.QDropEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -679,8 +651,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QFocusEventType>(c, event, "qt.QFocusEvent"));
+            args[1] = Value(makeqpointer<QFocusEventType>(c, event, "qt.QFocusEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -724,8 +695,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QFocusEventType>(c, event, "qt.QFocusEvent"));
+            args[1] = Value(makeqpointer<QFocusEventType>(c, event, "qt.QFocusEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -748,8 +718,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QKeyEventType>(c, event, "qt.QKeyEvent"));
+            args[1] = Value(makeqpointer<QKeyEventType>(c, event, "qt.QKeyEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -772,8 +741,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -796,8 +764,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -820,8 +787,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -844,8 +810,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -868,8 +833,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QResizeEventType>(c, event, "qt.QResizeEvent"));
+            args[1] = Value(makeqpointer<QResizeEventType>(c, event, "qt.QResizeEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -892,8 +856,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QTimerEventType>(c, event, "qt.QTimerEvent"));
+            args[1] = Value(makeqpointer<QTimerEventType>(c, event, "qt.QTimerEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -957,8 +920,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeinstance<QWidgetType>(c, viewport, "qt.QWidget"));
+            args[1] = Value(makeinstance<QWidgetType>(c, viewport, "qt.QWidget"));
             Value rval = _env->call(F, args);
         }
         else
@@ -1045,8 +1007,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqpointer<QContextMenuEventType>(
-                c, e, "qt.QContextMenuEvent"));
+            args[1] = Value(makeqpointer<QContextMenuEventType>(c, e, "qt.QContextMenuEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -1069,8 +1030,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QPaintEventType>(c, event, "qt.QPaintEvent"));
+            args[1] = Value(makeqpointer<QPaintEventType>(c, event, "qt.QPaintEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -1093,8 +1053,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QWheelEventType>(c, e, "qt.QWheelEvent"));
+            args[1] = Value(makeqpointer<QWheelEventType>(c, e, "qt.QWheelEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -1106,8 +1065,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  Mu Type CONSTRUCTORS
 
-    QAbstractItemViewType::QAbstractItemViewType(Context* c, const char* name,
-                                                 Class* super, Class* super2)
+    QAbstractItemViewType::QAbstractItemViewType(Context* c, const char* name, Class* super, Class* super2)
         : Class(c, name, vectorOf2(super, super2))
     {
     }
@@ -1117,9 +1075,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    static Pointer
-    QAbstractItemView_QAbstractItemView_QObject(Thread& NODE_THREAD,
-                                                Pointer obj)
+    static Pointer QAbstractItemView_QAbstractItemView_QObject(Thread& NODE_THREAD, Pointer obj)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         ClassInstance* widget = reinterpret_cast<ClassInstance*>(obj);
@@ -1131,8 +1087,7 @@ namespace Mu
         else if (QAbstractItemView* w = object<QAbstractItemView>(widget))
         {
             QAbstractItemViewType* type =
-                c->findSymbolOfTypeByQualifiedName<QAbstractItemViewType>(
-                    c->internName("qt.QAbstractItemView"), false);
+                c->findSymbolOfTypeByQualifiedName<QAbstractItemViewType>(c->internName("qt.QAbstractItemView"), false);
             ClassInstance* o = ClassInstance::allocate(type);
             setobject(o, w);
             return o;
@@ -1145,25 +1100,20 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(castFromObject, Pointer)
     {
-        NODE_RETURN(QAbstractItemView_QAbstractItemView_QObject(
-            NODE_THREAD, NODE_ARG(0, Pointer)));
+        NODE_RETURN(QAbstractItemView_QAbstractItemView_QObject(NODE_THREAD, NODE_ARG(0, Pointer)));
     }
 
-    Pointer
-    qt_QAbstractItemView_QAbstractItemView_QAbstractItemView_QAbstractItemView_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
+    Pointer qt_QAbstractItemView_QAbstractItemView_QAbstractItemView_QAbstractItemView_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                               Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWidget* arg1 = object<QWidget>(param_parent);
-        setobject(param_this,
-                  new MuQt_QAbstractItemView(
-                      param_this, NODE_THREAD.process()->callEnv(), arg1));
+        setobject(param_this, new MuQt_QAbstractItemView(param_this, NODE_THREAD.process()->callEnv(), arg1));
         return param_this;
     }
 
-    void
-    qt_QAbstractItemView_closePersistentEditor_void_QAbstractItemView_QModelIndex(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index)
+    void qt_QAbstractItemView_closePersistentEditor_void_QAbstractItemView_QModelIndex(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                       Pointer param_index)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemView* arg0 = object<QAbstractItemView>(param_this);
@@ -1171,39 +1121,33 @@ namespace Mu
         arg0->closePersistentEditor(arg1);
     }
 
-    Pointer qt_QAbstractItemView_currentIndex_QModelIndex_QAbstractItemView(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QAbstractItemView_currentIndex_QModelIndex_QAbstractItemView(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemView* arg0 = object<QAbstractItemView>(param_this);
-        return makeqtype<QModelIndexType>(c, arg0->currentIndex(),
-                                          "qt.QModelIndex");
+        return makeqtype<QModelIndexType>(c, arg0->currentIndex(), "qt.QModelIndex");
     }
 
-    Pointer qt_QAbstractItemView_indexAt_QModelIndex_QAbstractItemView_QPoint(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_point)
+    Pointer qt_QAbstractItemView_indexAt_QModelIndex_QAbstractItemView_QPoint(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                              Pointer param_point)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemView* arg0 = object<QAbstractItemView>(param_this);
         const QPoint arg1 = getqtype<QPointType>(param_point);
-        return makeqtype<QModelIndexType>(c, arg0->indexAt(arg1),
-                                          "qt.QModelIndex");
+        return makeqtype<QModelIndexType>(c, arg0->indexAt(arg1), "qt.QModelIndex");
     }
 
-    Pointer
-    qt_QAbstractItemView_indexWidget_QWidget_QAbstractItemView_QModelIndex(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index)
+    Pointer qt_QAbstractItemView_indexWidget_QWidget_QAbstractItemView_QModelIndex(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                   Pointer param_index)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemView* arg0 = object<QAbstractItemView>(param_this);
         const QModelIndex arg1 = getqtype<QModelIndexType>(param_index);
-        return makeinstance<QWidgetType>(c, arg0->indexWidget(arg1),
-                                         "qt.QWidget");
+        return makeinstance<QWidgetType>(c, arg0->indexWidget(arg1), "qt.QWidget");
     }
 
-    bool
-    qt_QAbstractItemView_isPersistentEditorOpen_bool_QAbstractItemView_QModelIndex(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index)
+    bool qt_QAbstractItemView_isPersistentEditorOpen_bool_QAbstractItemView_QModelIndex(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                        Pointer param_index)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemView* arg0 = object<QAbstractItemView>(param_this);
@@ -1211,8 +1155,8 @@ namespace Mu
         return arg0->isPersistentEditorOpen(arg1);
     }
 
-    void qt_QAbstractItemView_keyboardSearch_void_QAbstractItemView_string(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_search)
+    void qt_QAbstractItemView_keyboardSearch_void_QAbstractItemView_string(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                           Pointer param_search)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemView* arg0 = object<QAbstractItemView>(param_this);
@@ -1223,18 +1167,15 @@ namespace Mu
             arg0->keyboardSearch(arg1);
     }
 
-    Pointer qt_QAbstractItemView_model_QAbstractItemModel_QAbstractItemView(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QAbstractItemView_model_QAbstractItemModel_QAbstractItemView(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemView* arg0 = object<QAbstractItemView>(param_this);
-        return makeinstance<QAbstractItemModelType>(c, arg0->model(),
-                                                    "qt.QAbstractItemModel");
+        return makeinstance<QAbstractItemModelType>(c, arg0->model(), "qt.QAbstractItemModel");
     }
 
-    void
-    qt_QAbstractItemView_openPersistentEditor_void_QAbstractItemView_QModelIndex(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index)
+    void qt_QAbstractItemView_openPersistentEditor_void_QAbstractItemView_QModelIndex(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                      Pointer param_index)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemView* arg0 = object<QAbstractItemView>(param_this);
@@ -1242,41 +1183,32 @@ namespace Mu
         arg0->openPersistentEditor(arg1);
     }
 
-    Pointer qt_QAbstractItemView_rootIndex_QModelIndex_QAbstractItemView(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QAbstractItemView_rootIndex_QModelIndex_QAbstractItemView(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemView* arg0 = object<QAbstractItemView>(param_this);
-        return makeqtype<QModelIndexType>(c, arg0->rootIndex(),
-                                          "qt.QModelIndex");
+        return makeqtype<QModelIndexType>(c, arg0->rootIndex(), "qt.QModelIndex");
     }
 
-    void qt_QAbstractItemView_scrollTo_void_QAbstractItemView_QModelIndex_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index,
-        int param_hint)
+    void qt_QAbstractItemView_scrollTo_void_QAbstractItemView_QModelIndex_int(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                              Pointer param_index, int param_hint)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemView* arg0 = object<QAbstractItemView>(param_this);
         const QModelIndex arg1 = getqtype<QModelIndexType>(param_index);
-        QAbstractItemView::ScrollHint arg2 =
-            (QAbstractItemView::ScrollHint)(param_hint);
+        QAbstractItemView::ScrollHint arg2 = (QAbstractItemView::ScrollHint)(param_hint);
         arg0->scrollTo(arg1, arg2);
     }
 
-    Pointer
-    qt_QAbstractItemView_selectionModel_QItemSelectionModel_QAbstractItemView(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QAbstractItemView_selectionModel_QItemSelectionModel_QAbstractItemView(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemView* arg0 = object<QAbstractItemView>(param_this);
-        return makeinstance<QItemSelectionModelType>(c, arg0->selectionModel(),
-                                                     "qt.QItemSelectionModel");
+        return makeinstance<QItemSelectionModelType>(c, arg0->selectionModel(), "qt.QItemSelectionModel");
     }
 
-    void
-    qt_QAbstractItemView_setIndexWidget_void_QAbstractItemView_QModelIndex_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index,
-        Pointer param_widget)
+    void qt_QAbstractItemView_setIndexWidget_void_QAbstractItemView_QModelIndex_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                        Pointer param_index, Pointer param_widget)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemView* arg0 = object<QAbstractItemView>(param_this);
@@ -1285,9 +1217,8 @@ namespace Mu
         arg0->setIndexWidget(arg1, arg2);
     }
 
-    void
-    qt_QAbstractItemView_setModel_void_QAbstractItemView_QAbstractItemModel(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_model)
+    void qt_QAbstractItemView_setModel_void_QAbstractItemView_QAbstractItemModel(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                 Pointer param_model)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemView* arg0 = object<QAbstractItemView>(param_this);
@@ -1298,56 +1229,45 @@ namespace Mu
             arg0->setModel(arg1);
     }
 
-    void
-    qt_QAbstractItemView_setSelectionModel_void_QAbstractItemView_QItemSelectionModel(
-        Mu::Thread& NODE_THREAD, Pointer param_this,
-        Pointer param_selectionModel)
+    void qt_QAbstractItemView_setSelectionModel_void_QAbstractItemView_QItemSelectionModel(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                           Pointer param_selectionModel)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemView* arg0 = object<QAbstractItemView>(param_this);
-        QItemSelectionModel* arg1 =
-            object<QItemSelectionModel>(param_selectionModel);
+        QItemSelectionModel* arg1 = object<QItemSelectionModel>(param_selectionModel);
         if (isMuQtObject(arg0))
             arg0->QAbstractItemView::setSelectionModel(arg1);
         else
             arg0->setSelectionModel(arg1);
     }
 
-    int qt_QAbstractItemView_sizeHintForColumn_int_QAbstractItemView_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_column)
+    int qt_QAbstractItemView_sizeHintForColumn_int_QAbstractItemView_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_column)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemView* arg0 = object<QAbstractItemView>(param_this);
         int arg1 = (int)(param_column);
-        return isMuQtObject(arg0)
-                   ? arg0->QAbstractItemView::sizeHintForColumn(arg1)
-                   : arg0->sizeHintForColumn(arg1);
+        return isMuQtObject(arg0) ? arg0->QAbstractItemView::sizeHintForColumn(arg1) : arg0->sizeHintForColumn(arg1);
     }
 
-    Pointer
-    qt_QAbstractItemView_sizeHintForIndex_QSize_QAbstractItemView_QModelIndex(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index)
+    Pointer qt_QAbstractItemView_sizeHintForIndex_QSize_QAbstractItemView_QModelIndex(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                      Pointer param_index)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemView* arg0 = object<QAbstractItemView>(param_this);
         const QModelIndex arg1 = getqtype<QModelIndexType>(param_index);
-        return makeqtype<QSizeType>(c, arg0->sizeHintForIndex(arg1),
-                                    "qt.QSize");
+        return makeqtype<QSizeType>(c, arg0->sizeHintForIndex(arg1), "qt.QSize");
     }
 
-    int qt_QAbstractItemView_sizeHintForRow_int_QAbstractItemView_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_row)
+    int qt_QAbstractItemView_sizeHintForRow_int_QAbstractItemView_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_row)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemView* arg0 = object<QAbstractItemView>(param_this);
         int arg1 = (int)(param_row);
-        return isMuQtObject(arg0)
-                   ? arg0->QAbstractItemView::sizeHintForRow(arg1)
-                   : arg0->sizeHintForRow(arg1);
+        return isMuQtObject(arg0) ? arg0->QAbstractItemView::sizeHintForRow(arg1) : arg0->sizeHintForRow(arg1);
     }
 
-    Pointer qt_QAbstractItemView_visualRect_QRect_QAbstractItemView_QModelIndex(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index)
+    Pointer qt_QAbstractItemView_visualRect_QRect_QAbstractItemView_QModelIndex(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                Pointer param_index)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemView* arg0 = object<QAbstractItemView>(param_this);
@@ -1355,75 +1275,59 @@ namespace Mu
         return makeqtype<QRectType>(c, arg0->visualRect(arg1), "qt.QRect");
     }
 
-    Pointer
-    qt_QAbstractItemView_inputMethodQuery_QVariant_QAbstractItemView_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_query)
+    Pointer qt_QAbstractItemView_inputMethodQuery_QVariant_QAbstractItemView_int(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                 int param_query)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemView* arg0 = object<QAbstractItemView>(param_this);
         Qt::InputMethodQuery arg1 = (Qt::InputMethodQuery)(param_query);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QVariantType>(
-                         c, arg0->QAbstractItemView::inputMethodQuery(arg1),
-                         "qt.QVariant")
-                   : makeqtype<QVariantType>(c, arg0->inputMethodQuery(arg1),
-                                             "qt.QVariant");
+        return isMuQtObject(arg0) ? makeqtype<QVariantType>(c, arg0->QAbstractItemView::inputMethodQuery(arg1), "qt.QVariant")
+                                  : makeqtype<QVariantType>(c, arg0->inputMethodQuery(arg1), "qt.QVariant");
     }
 
-    Pointer qt_QAbstractItemView_dirtyRegionOffset_QPoint_QAbstractItemView(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QAbstractItemView_dirtyRegionOffset_QPoint_QAbstractItemView(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemView* arg0 = object<QAbstractItemView>(param_this);
-        return makeqtype<QPointType>(
-            c, ((MuQt_QAbstractItemView*)arg0)->dirtyRegionOffset_pub(),
-            "qt.QPoint");
+        return makeqtype<QPointType>(c, ((MuQt_QAbstractItemView*)arg0)->dirtyRegionOffset_pub(), "qt.QPoint");
     }
 
-    int qt_QAbstractItemView_dropIndicatorPosition_int_QAbstractItemView(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    int qt_QAbstractItemView_dropIndicatorPosition_int_QAbstractItemView(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemView* arg0 = object<QAbstractItemView>(param_this);
-        return int(
-            ((MuQt_QAbstractItemView*)arg0)->dropIndicatorPosition_pub());
+        return int(((MuQt_QAbstractItemView*)arg0)->dropIndicatorPosition_pub());
     }
 
-    bool
-    qt_QAbstractItemView_edit_bool_QAbstractItemView_QModelIndex_int_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index,
-        int param_trigger, Pointer param_event)
+    bool qt_QAbstractItemView_edit_bool_QAbstractItemView_QModelIndex_int_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                 Pointer param_index, int param_trigger,
+                                                                                 Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemView* arg0 = object<QAbstractItemView>(param_this);
         const QModelIndex arg1 = getqtype<QModelIndexType>(param_index);
-        QAbstractItemView::EditTrigger arg2 =
-            (QAbstractItemView::EditTrigger)(param_trigger);
+        QAbstractItemView::EditTrigger arg2 = (QAbstractItemView::EditTrigger)(param_trigger);
         QEvent* arg3 = getqpointer<QEventType>(param_event);
-        return isMuQtObject(arg0) ? ((MuQt_QAbstractItemView*)arg0)
-                                        ->edit_pub_parent(arg1, arg2, arg3)
-                                  : ((MuQt_QAbstractItemView*)arg0)
-                                        ->edit_pub(arg1, arg2, arg3);
+        return isMuQtObject(arg0) ? ((MuQt_QAbstractItemView*)arg0)->edit_pub_parent(arg1, arg2, arg3)
+                                  : ((MuQt_QAbstractItemView*)arg0)->edit_pub(arg1, arg2, arg3);
     }
 
-    void qt_QAbstractItemView_executeDelayedItemsLayout_void_QAbstractItemView(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    void qt_QAbstractItemView_executeDelayedItemsLayout_void_QAbstractItemView(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemView* arg0 = object<QAbstractItemView>(param_this);
         ((MuQt_QAbstractItemView*)arg0)->executeDelayedItemsLayout_pub();
     }
 
-    int qt_QAbstractItemView_horizontalOffset_int_QAbstractItemView(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    int qt_QAbstractItemView_horizontalOffset_int_QAbstractItemView(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemView* arg0 = object<QAbstractItemView>(param_this);
         return ((MuQt_QAbstractItemView*)arg0)->horizontalOffset_pub();
     }
 
-    bool qt_QAbstractItemView_isIndexHidden_bool_QAbstractItemView_QModelIndex(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index)
+    bool qt_QAbstractItemView_isIndexHidden_bool_QAbstractItemView_QModelIndex(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                               Pointer param_index)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemView* arg0 = object<QAbstractItemView>(param_this);
@@ -1431,30 +1335,25 @@ namespace Mu
         return ((MuQt_QAbstractItemView*)arg0)->isIndexHidden_pub(arg1);
     }
 
-    Pointer
-    qt_QAbstractItemView_moveCursor_QModelIndex_QAbstractItemView_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_cursorAction,
-        int param_modifiers)
+    Pointer qt_QAbstractItemView_moveCursor_QModelIndex_QAbstractItemView_int_int(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                  int param_cursorAction, int param_modifiers)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemView* arg0 = object<QAbstractItemView>(param_this);
         MuQtPublicEnum arg1 = (MuQtPublicEnum)(param_cursorAction);
         Qt::KeyboardModifiers arg2 = (Qt::KeyboardModifiers)(param_modifiers);
-        return makeqtype<QModelIndexType>(
-            c, ((MuQt_QAbstractItemView*)arg0)->moveCursor_pub(arg1, arg2),
-            "qt.QModelIndex");
+        return makeqtype<QModelIndexType>(c, ((MuQt_QAbstractItemView*)arg0)->moveCursor_pub(arg1, arg2), "qt.QModelIndex");
     }
 
-    void qt_QAbstractItemView_scheduleDelayedItemsLayout_void_QAbstractItemView(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    void qt_QAbstractItemView_scheduleDelayedItemsLayout_void_QAbstractItemView(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemView* arg0 = object<QAbstractItemView>(param_this);
         ((MuQt_QAbstractItemView*)arg0)->scheduleDelayedItemsLayout_pub();
     }
 
-    void qt_QAbstractItemView_scrollDirtyRegion_void_QAbstractItemView_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_dx, int param_dy)
+    void qt_QAbstractItemView_scrollDirtyRegion_void_QAbstractItemView_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_dx,
+                                                                               int param_dy)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemView* arg0 = object<QAbstractItemView>(param_this);
@@ -1463,37 +1362,27 @@ namespace Mu
         ((MuQt_QAbstractItemView*)arg0)->scrollDirtyRegion_pub(arg1, arg2);
     }
 
-    Pointer
-    qt_QAbstractItemView_selectedIndexes_qt__QModelIndexBSB_ESB__QAbstractItemView(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QAbstractItemView_selectedIndexes_qt__QModelIndexBSB_ESB__QAbstractItemView(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemView* arg0 = object<QAbstractItemView>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqmodelindexlist(c, ((MuQt_QAbstractItemView*)arg0)
-                                                ->selectedIndexes_pub_parent())
-                   : makeqmodelindexlist(c, ((MuQt_QAbstractItemView*)arg0)
-                                                ->selectedIndexes_pub());
+        return isMuQtObject(arg0) ? makeqmodelindexlist(c, ((MuQt_QAbstractItemView*)arg0)->selectedIndexes_pub_parent())
+                                  : makeqmodelindexlist(c, ((MuQt_QAbstractItemView*)arg0)->selectedIndexes_pub());
     }
 
-    int
-    qt_QAbstractItemView_selectionCommand_int_QAbstractItemView_QModelIndex_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index,
-        Pointer param_event)
+    int qt_QAbstractItemView_selectionCommand_int_QAbstractItemView_QModelIndex_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                       Pointer param_index, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemView* arg0 = object<QAbstractItemView>(param_this);
         const QModelIndex arg1 = getqtype<QModelIndexType>(param_index);
         const QEvent* arg2 = getqpointer<QEventType>(param_event);
-        return isMuQtObject(arg0)
-                   ? int(((MuQt_QAbstractItemView*)arg0)
-                             ->selectionCommand_pub_parent(arg1, arg2))
-                   : int(((MuQt_QAbstractItemView*)arg0)
-                             ->selectionCommand_pub(arg1, arg2));
+        return isMuQtObject(arg0) ? int(((MuQt_QAbstractItemView*)arg0)->selectionCommand_pub_parent(arg1, arg2))
+                                  : int(((MuQt_QAbstractItemView*)arg0)->selectionCommand_pub(arg1, arg2));
     }
 
-    void qt_QAbstractItemView_setDirtyRegion_void_QAbstractItemView_QRegion(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_region)
+    void qt_QAbstractItemView_setDirtyRegion_void_QAbstractItemView_QRegion(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                            Pointer param_region)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemView* arg0 = object<QAbstractItemView>(param_this);
@@ -1501,20 +1390,17 @@ namespace Mu
         ((MuQt_QAbstractItemView*)arg0)->setDirtyRegion_pub(arg1);
     }
 
-    void qt_QAbstractItemView_setSelection_void_QAbstractItemView_QRect_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_rect,
-        int param_flags)
+    void qt_QAbstractItemView_setSelection_void_QAbstractItemView_QRect_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_rect,
+                                                                            int param_flags)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemView* arg0 = object<QAbstractItemView>(param_this);
         const QRect arg1 = getqtype<QRectType>(param_rect);
-        QItemSelectionModel::SelectionFlags arg2 =
-            (QItemSelectionModel::SelectionFlags)(param_flags);
+        QItemSelectionModel::SelectionFlags arg2 = (QItemSelectionModel::SelectionFlags)(param_flags);
         ((MuQt_QAbstractItemView*)arg0)->setSelection_pub(arg1, arg2);
     }
 
-    void qt_QAbstractItemView_setState_void_QAbstractItemView_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_state)
+    void qt_QAbstractItemView_setState_void_QAbstractItemView_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_state)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemView* arg0 = object<QAbstractItemView>(param_this);
@@ -1522,8 +1408,7 @@ namespace Mu
         ((MuQt_QAbstractItemView*)arg0)->setState_pub(arg1);
     }
 
-    void qt_QAbstractItemView_startDrag_void_QAbstractItemView_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_supportedActions)
+    void qt_QAbstractItemView_startDrag_void_QAbstractItemView_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_supportedActions)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemView* arg0 = object<QAbstractItemView>(param_this);
@@ -1534,40 +1419,32 @@ namespace Mu
             ((MuQt_QAbstractItemView*)arg0)->startDrag_pub(arg1);
     }
 
-    int
-    qt_QAbstractItemView_state_int_QAbstractItemView(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_this)
+    int qt_QAbstractItemView_state_int_QAbstractItemView(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemView* arg0 = object<QAbstractItemView>(param_this);
         return int(((MuQt_QAbstractItemView*)arg0)->state_pub());
     }
 
-    int qt_QAbstractItemView_verticalOffset_int_QAbstractItemView(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    int qt_QAbstractItemView_verticalOffset_int_QAbstractItemView(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemView* arg0 = object<QAbstractItemView>(param_this);
         return ((MuQt_QAbstractItemView*)arg0)->verticalOffset_pub();
     }
 
-    Pointer
-    qt_QAbstractItemView_visualRegionForSelection_QRegion_QAbstractItemView_QItemSelection(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_selection)
+    Pointer qt_QAbstractItemView_visualRegionForSelection_QRegion_QAbstractItemView_QItemSelection(Mu::Thread& NODE_THREAD,
+                                                                                                   Pointer param_this,
+                                                                                                   Pointer param_selection)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemView* arg0 = object<QAbstractItemView>(param_this);
-        const QItemSelection arg1 =
-            getqtype<QItemSelectionType>(param_selection);
-        return makeqtype<QRegionType>(
-            c,
-            ((MuQt_QAbstractItemView*)arg0)->visualRegionForSelection_pub(arg1),
-            "qt.QRegion");
+        const QItemSelection arg1 = getqtype<QItemSelectionType>(param_selection);
+        return makeqtype<QRegionType>(c, ((MuQt_QAbstractItemView*)arg0)->visualRegionForSelection_pub(arg1), "qt.QRegion");
     }
 
-    void
-    qt_QAbstractItemView_dragEnterEvent_void_QAbstractItemView_QDragEnterEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractItemView_dragEnterEvent_void_QAbstractItemView_QDragEnterEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                    Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemView* arg0 = object<QAbstractItemView>(param_this);
@@ -1578,9 +1455,8 @@ namespace Mu
             ((MuQt_QAbstractItemView*)arg0)->dragEnterEvent_pub(arg1);
     }
 
-    void
-    qt_QAbstractItemView_dragLeaveEvent_void_QAbstractItemView_QDragLeaveEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractItemView_dragLeaveEvent_void_QAbstractItemView_QDragLeaveEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                    Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemView* arg0 = object<QAbstractItemView>(param_this);
@@ -1591,9 +1467,8 @@ namespace Mu
             ((MuQt_QAbstractItemView*)arg0)->dragLeaveEvent_pub(arg1);
     }
 
-    void
-    qt_QAbstractItemView_dragMoveEvent_void_QAbstractItemView_QDragMoveEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractItemView_dragMoveEvent_void_QAbstractItemView_QDragMoveEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                  Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemView* arg0 = object<QAbstractItemView>(param_this);
@@ -1604,8 +1479,7 @@ namespace Mu
             ((MuQt_QAbstractItemView*)arg0)->dragMoveEvent_pub(arg1);
     }
 
-    void qt_QAbstractItemView_dropEvent_void_QAbstractItemView_QDropEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractItemView_dropEvent_void_QAbstractItemView_QDropEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemView* arg0 = object<QAbstractItemView>(param_this);
@@ -1616,33 +1490,28 @@ namespace Mu
             ((MuQt_QAbstractItemView*)arg0)->dropEvent_pub(arg1);
     }
 
-    bool qt_QAbstractItemView_event_bool_QAbstractItemView_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event_)
+    bool qt_QAbstractItemView_event_bool_QAbstractItemView_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event_)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemView* arg0 = object<QAbstractItemView>(param_this);
         QEvent* arg1 = getqpointer<QEventType>(param_event_);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QAbstractItemView*)arg0)->event_pub_parent(arg1)
-                   : ((MuQt_QAbstractItemView*)arg0)->event_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QAbstractItemView*)arg0)->event_pub_parent(arg1)
+                                  : ((MuQt_QAbstractItemView*)arg0)->event_pub(arg1);
     }
 
-    bool qt_QAbstractItemView_eventFilter_bool_QAbstractItemView_QObject_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_object,
-        Pointer param_event)
+    bool qt_QAbstractItemView_eventFilter_bool_QAbstractItemView_QObject_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                Pointer param_object, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemView* arg0 = object<QAbstractItemView>(param_this);
         QObject* arg1 = object<QObject>(param_object);
         QEvent* arg2 = getqpointer<QEventType>(param_event);
-        return isMuQtObject(arg0) ? ((MuQt_QAbstractItemView*)arg0)
-                                        ->eventFilter_pub_parent(arg1, arg2)
-                                  : ((MuQt_QAbstractItemView*)arg0)
-                                        ->eventFilter_pub(arg1, arg2);
+        return isMuQtObject(arg0) ? ((MuQt_QAbstractItemView*)arg0)->eventFilter_pub_parent(arg1, arg2)
+                                  : ((MuQt_QAbstractItemView*)arg0)->eventFilter_pub(arg1, arg2);
     }
 
-    void qt_QAbstractItemView_focusInEvent_void_QAbstractItemView_QFocusEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractItemView_focusInEvent_void_QAbstractItemView_QFocusEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                              Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemView* arg0 = object<QAbstractItemView>(param_this);
@@ -1653,20 +1522,17 @@ namespace Mu
             ((MuQt_QAbstractItemView*)arg0)->focusInEvent_pub(arg1);
     }
 
-    bool qt_QAbstractItemView_focusNextPrevChild_bool_QAbstractItemView_bool(
-        Mu::Thread& NODE_THREAD, Pointer param_this, bool param_next)
+    bool qt_QAbstractItemView_focusNextPrevChild_bool_QAbstractItemView_bool(Mu::Thread& NODE_THREAD, Pointer param_this, bool param_next)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemView* arg0 = object<QAbstractItemView>(param_this);
         bool arg1 = (bool)(param_next);
-        return isMuQtObject(arg0) ? ((MuQt_QAbstractItemView*)arg0)
-                                        ->focusNextPrevChild_pub_parent(arg1)
-                                  : ((MuQt_QAbstractItemView*)arg0)
-                                        ->focusNextPrevChild_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QAbstractItemView*)arg0)->focusNextPrevChild_pub_parent(arg1)
+                                  : ((MuQt_QAbstractItemView*)arg0)->focusNextPrevChild_pub(arg1);
     }
 
-    void qt_QAbstractItemView_focusOutEvent_void_QAbstractItemView_QFocusEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractItemView_focusOutEvent_void_QAbstractItemView_QFocusEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                               Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemView* arg0 = object<QAbstractItemView>(param_this);
@@ -1677,8 +1543,8 @@ namespace Mu
             ((MuQt_QAbstractItemView*)arg0)->focusOutEvent_pub(arg1);
     }
 
-    void qt_QAbstractItemView_keyPressEvent_void_QAbstractItemView_QKeyEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractItemView_keyPressEvent_void_QAbstractItemView_QKeyEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                             Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemView* arg0 = object<QAbstractItemView>(param_this);
@@ -1689,22 +1555,20 @@ namespace Mu
             ((MuQt_QAbstractItemView*)arg0)->keyPressEvent_pub(arg1);
     }
 
-    void
-    qt_QAbstractItemView_mouseDoubleClickEvent_void_QAbstractItemView_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractItemView_mouseDoubleClickEvent_void_QAbstractItemView_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                       Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemView* arg0 = object<QAbstractItemView>(param_this);
         QMouseEvent* arg1 = getqpointer<QMouseEventType>(param_event);
         if (isMuQtObject(arg0))
-            ((MuQt_QAbstractItemView*)arg0)
-                ->mouseDoubleClickEvent_pub_parent(arg1);
+            ((MuQt_QAbstractItemView*)arg0)->mouseDoubleClickEvent_pub_parent(arg1);
         else
             ((MuQt_QAbstractItemView*)arg0)->mouseDoubleClickEvent_pub(arg1);
     }
 
-    void qt_QAbstractItemView_mouseMoveEvent_void_QAbstractItemView_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractItemView_mouseMoveEvent_void_QAbstractItemView_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemView* arg0 = object<QAbstractItemView>(param_this);
@@ -1715,9 +1579,8 @@ namespace Mu
             ((MuQt_QAbstractItemView*)arg0)->mouseMoveEvent_pub(arg1);
     }
 
-    void
-    qt_QAbstractItemView_mousePressEvent_void_QAbstractItemView_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractItemView_mousePressEvent_void_QAbstractItemView_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                 Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemView* arg0 = object<QAbstractItemView>(param_this);
@@ -1728,9 +1591,8 @@ namespace Mu
             ((MuQt_QAbstractItemView*)arg0)->mousePressEvent_pub(arg1);
     }
 
-    void
-    qt_QAbstractItemView_mouseReleaseEvent_void_QAbstractItemView_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractItemView_mouseReleaseEvent_void_QAbstractItemView_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                   Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemView* arg0 = object<QAbstractItemView>(param_this);
@@ -1741,8 +1603,8 @@ namespace Mu
             ((MuQt_QAbstractItemView*)arg0)->mouseReleaseEvent_pub(arg1);
     }
 
-    void qt_QAbstractItemView_resizeEvent_void_QAbstractItemView_QResizeEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractItemView_resizeEvent_void_QAbstractItemView_QResizeEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                              Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemView* arg0 = object<QAbstractItemView>(param_this);
@@ -1753,8 +1615,8 @@ namespace Mu
             ((MuQt_QAbstractItemView*)arg0)->resizeEvent_pub(arg1);
     }
 
-    void qt_QAbstractItemView_timerEvent_void_QAbstractItemView_QTimerEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractItemView_timerEvent_void_QAbstractItemView_QTimerEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                            Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemView* arg0 = object<QAbstractItemView>(param_this);
@@ -1765,36 +1627,25 @@ namespace Mu
             ((MuQt_QAbstractItemView*)arg0)->timerEvent_pub(arg1);
     }
 
-    bool qt_QAbstractItemView_viewportEvent_bool_QAbstractItemView_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    bool qt_QAbstractItemView_viewportEvent_bool_QAbstractItemView_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemView* arg0 = object<QAbstractItemView>(param_this);
         QEvent* arg1 = getqpointer<QEventType>(param_event);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QAbstractItemView*)arg0)
-                         ->viewportEvent_pub_parent(arg1)
-                   : ((MuQt_QAbstractItemView*)arg0)->viewportEvent_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QAbstractItemView*)arg0)->viewportEvent_pub_parent(arg1)
+                                  : ((MuQt_QAbstractItemView*)arg0)->viewportEvent_pub(arg1);
     }
 
-    Pointer qt_QAbstractItemView_viewportSizeHint_QSize_QAbstractItemView(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QAbstractItemView_viewportSizeHint_QSize_QAbstractItemView(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemView* arg0 = object<QAbstractItemView>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QSizeType>(c,
-                                          ((MuQt_QAbstractItemView*)arg0)
-                                              ->viewportSizeHint_pub_parent(),
-                                          "qt.QSize")
-                   : makeqtype<QSizeType>(c,
-                                          ((MuQt_QAbstractItemView*)arg0)
-                                              ->viewportSizeHint_pub(),
-                                          "qt.QSize");
+        return isMuQtObject(arg0) ? makeqtype<QSizeType>(c, ((MuQt_QAbstractItemView*)arg0)->viewportSizeHint_pub_parent(), "qt.QSize")
+                                  : makeqtype<QSizeType>(c, ((MuQt_QAbstractItemView*)arg0)->viewportSizeHint_pub(), "qt.QSize");
     }
 
-    void qt_QAbstractItemView_setupViewport_void_QAbstractItemView_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_viewport)
+    void qt_QAbstractItemView_setupViewport_void_QAbstractItemView_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                           Pointer param_viewport)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemView* arg0 = object<QAbstractItemView>(param_this);
@@ -1805,47 +1656,37 @@ namespace Mu
             arg0->setupViewport(arg1);
     }
 
-    Pointer qt_QAbstractItemView_minimumSizeHint_QSize_QAbstractItemView(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QAbstractItemView_minimumSizeHint_QSize_QAbstractItemView(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemView* arg0 = object<QAbstractItemView>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QSizeType>(
-                         c, arg0->QAbstractItemView::minimumSizeHint(),
-                         "qt.QSize")
-                   : makeqtype<QSizeType>(c, arg0->minimumSizeHint(),
-                                          "qt.QSize");
+        return isMuQtObject(arg0) ? makeqtype<QSizeType>(c, arg0->QAbstractItemView::minimumSizeHint(), "qt.QSize")
+                                  : makeqtype<QSizeType>(c, arg0->minimumSizeHint(), "qt.QSize");
     }
 
-    Pointer qt_QAbstractItemView_sizeHint_QSize_QAbstractItemView(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QAbstractItemView_sizeHint_QSize_QAbstractItemView(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemView* arg0 = object<QAbstractItemView>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QSizeType>(
-                         c, arg0->QAbstractItemView::sizeHint(), "qt.QSize")
-                   : makeqtype<QSizeType>(c, arg0->sizeHint(), "qt.QSize");
+        return isMuQtObject(arg0) ? makeqtype<QSizeType>(c, arg0->QAbstractItemView::sizeHint(), "qt.QSize")
+                                  : makeqtype<QSizeType>(c, arg0->sizeHint(), "qt.QSize");
     }
 
-    void qt_QAbstractItemView_scrollContentsBy_void_QAbstractItemView_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_dx, int param_dy)
+    void qt_QAbstractItemView_scrollContentsBy_void_QAbstractItemView_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_dx,
+                                                                              int param_dy)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemView* arg0 = object<QAbstractItemView>(param_this);
         int arg1 = (int)(param_dx);
         int arg2 = (int)(param_dy);
         if (isMuQtObject(arg0))
-            ((MuQt_QAbstractItemView*)arg0)
-                ->scrollContentsBy_pub_parent(arg1, arg2);
+            ((MuQt_QAbstractItemView*)arg0)->scrollContentsBy_pub_parent(arg1, arg2);
         else
             ((MuQt_QAbstractItemView*)arg0)->scrollContentsBy_pub(arg1, arg2);
     }
 
-    void
-    qt_QAbstractItemView_contextMenuEvent_void_QAbstractItemView_QContextMenuEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QAbstractItemView_contextMenuEvent_void_QAbstractItemView_QContextMenuEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                        Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemView* arg0 = object<QAbstractItemView>(param_this);
@@ -1856,8 +1697,8 @@ namespace Mu
             ((MuQt_QAbstractItemView*)arg0)->contextMenuEvent_pub(arg1);
     }
 
-    void qt_QAbstractItemView_paintEvent_void_QAbstractItemView_QPaintEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractItemView_paintEvent_void_QAbstractItemView_QPaintEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                            Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemView* arg0 = object<QAbstractItemView>(param_this);
@@ -1868,8 +1709,7 @@ namespace Mu
             ((MuQt_QAbstractItemView*)arg0)->paintEvent_pub(arg1);
     }
 
-    void qt_QAbstractItemView_wheelEvent_void_QAbstractItemView_QWheelEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QAbstractItemView_wheelEvent_void_QAbstractItemView_QWheelEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemView* arg0 = object<QAbstractItemView>(param_this);
@@ -1882,424 +1722,356 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(_n_QAbstractItemView0, Pointer)
     {
-        NODE_RETURN(
-            qt_QAbstractItemView_QAbstractItemView_QAbstractItemView_QAbstractItemView_QWidget(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QAbstractItemView_QAbstractItemView_QAbstractItemView_QAbstractItemView_QWidget(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_closePersistentEditor0, void)
     {
-        qt_QAbstractItemView_closePersistentEditor_void_QAbstractItemView_QModelIndex(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractItemView_closePersistentEditor_void_QAbstractItemView_QModelIndex(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                      NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_currentIndex0, Pointer)
     {
-        NODE_RETURN(
-            qt_QAbstractItemView_currentIndex_QModelIndex_QAbstractItemView(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QAbstractItemView_currentIndex_QModelIndex_QAbstractItemView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_indexAt0, Pointer)
     {
-        NODE_RETURN(
-            qt_QAbstractItemView_indexAt_QModelIndex_QAbstractItemView_QPoint(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QAbstractItemView_indexAt_QModelIndex_QAbstractItemView_QPoint(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                      NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_indexWidget0, Pointer)
     {
-        NODE_RETURN(
-            qt_QAbstractItemView_indexWidget_QWidget_QAbstractItemView_QModelIndex(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QAbstractItemView_indexWidget_QWidget_QAbstractItemView_QModelIndex(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                           NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isPersistentEditorOpen0, bool)
     {
-        NODE_RETURN(
-            qt_QAbstractItemView_isPersistentEditorOpen_bool_QAbstractItemView_QModelIndex(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QAbstractItemView_isPersistentEditorOpen_bool_QAbstractItemView_QModelIndex(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                                   NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_keyboardSearch0, void)
     {
-        qt_QAbstractItemView_keyboardSearch_void_QAbstractItemView_string(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractItemView_keyboardSearch_void_QAbstractItemView_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_model0, Pointer)
     {
-        NODE_RETURN(
-            qt_QAbstractItemView_model_QAbstractItemModel_QAbstractItemView(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QAbstractItemView_model_QAbstractItemModel_QAbstractItemView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_openPersistentEditor0, void)
     {
-        qt_QAbstractItemView_openPersistentEditor_void_QAbstractItemView_QModelIndex(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractItemView_openPersistentEditor_void_QAbstractItemView_QModelIndex(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                     NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_rootIndex0, Pointer)
     {
-        NODE_RETURN(
-            qt_QAbstractItemView_rootIndex_QModelIndex_QAbstractItemView(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QAbstractItemView_rootIndex_QModelIndex_QAbstractItemView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_scrollTo0, void)
     {
-        qt_QAbstractItemView_scrollTo_void_QAbstractItemView_QModelIndex_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int));
+        qt_QAbstractItemView_scrollTo_void_QAbstractItemView_QModelIndex_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                             NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_selectionModel0, Pointer)
     {
-        NODE_RETURN(
-            qt_QAbstractItemView_selectionModel_QItemSelectionModel_QAbstractItemView(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QAbstractItemView_selectionModel_QItemSelectionModel_QAbstractItemView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_setIndexWidget0, void)
     {
-        qt_QAbstractItemView_setIndexWidget_void_QAbstractItemView_QModelIndex_QWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer));
+        qt_QAbstractItemView_setIndexWidget_void_QAbstractItemView_QModelIndex_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                       NODE_ARG(1, Pointer), NODE_ARG(2, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setModel0, void)
     {
-        qt_QAbstractItemView_setModel_void_QAbstractItemView_QAbstractItemModel(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractItemView_setModel_void_QAbstractItemView_QAbstractItemModel(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setSelectionModel0, void)
     {
-        qt_QAbstractItemView_setSelectionModel_void_QAbstractItemView_QItemSelectionModel(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractItemView_setSelectionModel_void_QAbstractItemView_QItemSelectionModel(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                          NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_sizeHintForColumn0, int)
     {
         NODE_RETURN(
-            qt_QAbstractItemView_sizeHintForColumn_int_QAbstractItemView_int(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+            qt_QAbstractItemView_sizeHintForColumn_int_QAbstractItemView_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_sizeHintForIndex0, Pointer)
     {
-        NODE_RETURN(
-            qt_QAbstractItemView_sizeHintForIndex_QSize_QAbstractItemView_QModelIndex(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QAbstractItemView_sizeHintForIndex_QSize_QAbstractItemView_QModelIndex(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                              NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_sizeHintForRow0, int)
     {
         NODE_RETURN(
-            qt_QAbstractItemView_sizeHintForRow_int_QAbstractItemView_int(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+            qt_QAbstractItemView_sizeHintForRow_int_QAbstractItemView_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_visualRect0, Pointer)
     {
-        NODE_RETURN(
-            qt_QAbstractItemView_visualRect_QRect_QAbstractItemView_QModelIndex(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QAbstractItemView_visualRect_QRect_QAbstractItemView_QModelIndex(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                        NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_inputMethodQuery0, Pointer)
     {
-        NODE_RETURN(
-            qt_QAbstractItemView_inputMethodQuery_QVariant_QAbstractItemView_int(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QAbstractItemView_inputMethodQuery_QVariant_QAbstractItemView_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                         NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_dirtyRegionOffset0, Pointer)
     {
-        NODE_RETURN(
-            qt_QAbstractItemView_dirtyRegionOffset_QPoint_QAbstractItemView(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QAbstractItemView_dirtyRegionOffset_QPoint_QAbstractItemView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_dropIndicatorPosition0, int)
     {
-        NODE_RETURN(
-            qt_QAbstractItemView_dropIndicatorPosition_int_QAbstractItemView(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QAbstractItemView_dropIndicatorPosition_int_QAbstractItemView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_edit0, bool)
     {
-        NODE_RETURN(
-            qt_QAbstractItemView_edit_bool_QAbstractItemView_QModelIndex_int_QEvent(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, int), NODE_ARG(3, Pointer)));
+        NODE_RETURN(qt_QAbstractItemView_edit_bool_QAbstractItemView_QModelIndex_int_QEvent(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, int), NODE_ARG(3, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_executeDelayedItemsLayout0, void)
     {
-        qt_QAbstractItemView_executeDelayedItemsLayout_void_QAbstractItemView(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
+        qt_QAbstractItemView_executeDelayedItemsLayout_void_QAbstractItemView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_horizontalOffset0, int)
     {
-        NODE_RETURN(qt_QAbstractItemView_horizontalOffset_int_QAbstractItemView(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QAbstractItemView_horizontalOffset_int_QAbstractItemView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isIndexHidden0, bool)
     {
-        NODE_RETURN(
-            qt_QAbstractItemView_isIndexHidden_bool_QAbstractItemView_QModelIndex(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QAbstractItemView_isIndexHidden_bool_QAbstractItemView_QModelIndex(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                          NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_moveCursor0, Pointer)
     {
-        NODE_RETURN(
-            qt_QAbstractItemView_moveCursor_QModelIndex_QAbstractItemView_int_int(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-                NODE_ARG(2, int)));
+        NODE_RETURN(qt_QAbstractItemView_moveCursor_QModelIndex_QAbstractItemView_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                          NODE_ARG(1, int), NODE_ARG(2, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_scheduleDelayedItemsLayout0, void)
     {
-        qt_QAbstractItemView_scheduleDelayedItemsLayout_void_QAbstractItemView(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
+        qt_QAbstractItemView_scheduleDelayedItemsLayout_void_QAbstractItemView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_scrollDirtyRegion0, void)
     {
-        qt_QAbstractItemView_scrollDirtyRegion_void_QAbstractItemView_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int));
+        qt_QAbstractItemView_scrollDirtyRegion_void_QAbstractItemView_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                              NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_selectedIndexes0, Pointer)
     {
         NODE_RETURN(
-            qt_QAbstractItemView_selectedIndexes_qt__QModelIndexBSB_ESB__QAbstractItemView(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+            qt_QAbstractItemView_selectedIndexes_qt__QModelIndexBSB_ESB__QAbstractItemView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_selectionCommand0, int)
     {
-        NODE_RETURN(
-            qt_QAbstractItemView_selectionCommand_int_QAbstractItemView_QModelIndex_QEvent(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QAbstractItemView_selectionCommand_int_QAbstractItemView_QModelIndex_QEvent(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_setDirtyRegion0, void)
     {
-        qt_QAbstractItemView_setDirtyRegion_void_QAbstractItemView_QRegion(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractItemView_setDirtyRegion_void_QAbstractItemView_QRegion(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setSelection0, void)
     {
-        qt_QAbstractItemView_setSelection_void_QAbstractItemView_QRect_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int));
+        qt_QAbstractItemView_setSelection_void_QAbstractItemView_QRect_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                           NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setState0, void)
     {
-        qt_QAbstractItemView_setState_void_QAbstractItemView_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QAbstractItemView_setState_void_QAbstractItemView_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_startDrag0, void)
     {
-        qt_QAbstractItemView_startDrag_void_QAbstractItemView_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QAbstractItemView_startDrag_void_QAbstractItemView_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_state0, int)
     {
-        NODE_RETURN(qt_QAbstractItemView_state_int_QAbstractItemView(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QAbstractItemView_state_int_QAbstractItemView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_verticalOffset0, int)
     {
-        NODE_RETURN(qt_QAbstractItemView_verticalOffset_int_QAbstractItemView(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QAbstractItemView_verticalOffset_int_QAbstractItemView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_visualRegionForSelection0, Pointer)
     {
-        NODE_RETURN(
-            qt_QAbstractItemView_visualRegionForSelection_QRegion_QAbstractItemView_QItemSelection(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QAbstractItemView_visualRegionForSelection_QRegion_QAbstractItemView_QItemSelection(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_dragEnterEvent0, void)
     {
-        qt_QAbstractItemView_dragEnterEvent_void_QAbstractItemView_QDragEnterEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractItemView_dragEnterEvent_void_QAbstractItemView_QDragEnterEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                   NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_dragLeaveEvent0, void)
     {
-        qt_QAbstractItemView_dragLeaveEvent_void_QAbstractItemView_QDragLeaveEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractItemView_dragLeaveEvent_void_QAbstractItemView_QDragLeaveEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                   NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_dragMoveEvent0, void)
     {
-        qt_QAbstractItemView_dragMoveEvent_void_QAbstractItemView_QDragMoveEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractItemView_dragMoveEvent_void_QAbstractItemView_QDragMoveEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                 NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_dropEvent0, void)
     {
-        qt_QAbstractItemView_dropEvent_void_QAbstractItemView_QDropEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractItemView_dropEvent_void_QAbstractItemView_QDropEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_event0, bool)
     {
-        NODE_RETURN(qt_QAbstractItemView_event_bool_QAbstractItemView_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(
+            qt_QAbstractItemView_event_bool_QAbstractItemView_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_eventFilter0, bool)
     {
-        NODE_RETURN(
-            qt_QAbstractItemView_eventFilter_bool_QAbstractItemView_QObject_QEvent(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QAbstractItemView_eventFilter_bool_QAbstractItemView_QObject_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                           NODE_ARG(1, Pointer), NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_focusInEvent0, void)
     {
-        qt_QAbstractItemView_focusInEvent_void_QAbstractItemView_QFocusEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractItemView_focusInEvent_void_QAbstractItemView_QFocusEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                             NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_focusNextPrevChild0, bool)
     {
-        NODE_RETURN(
-            qt_QAbstractItemView_focusNextPrevChild_bool_QAbstractItemView_bool(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool)));
+        NODE_RETURN(qt_QAbstractItemView_focusNextPrevChild_bool_QAbstractItemView_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                        NODE_ARG(1, bool)));
     }
 
     static NODE_IMPLEMENTATION(_n_focusOutEvent0, void)
     {
-        qt_QAbstractItemView_focusOutEvent_void_QAbstractItemView_QFocusEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractItemView_focusOutEvent_void_QAbstractItemView_QFocusEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                              NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_keyPressEvent0, void)
     {
-        qt_QAbstractItemView_keyPressEvent_void_QAbstractItemView_QKeyEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractItemView_keyPressEvent_void_QAbstractItemView_QKeyEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseDoubleClickEvent0, void)
     {
-        qt_QAbstractItemView_mouseDoubleClickEvent_void_QAbstractItemView_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractItemView_mouseDoubleClickEvent_void_QAbstractItemView_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                      NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseMoveEvent0, void)
     {
-        qt_QAbstractItemView_mouseMoveEvent_void_QAbstractItemView_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractItemView_mouseMoveEvent_void_QAbstractItemView_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                               NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mousePressEvent0, void)
     {
-        qt_QAbstractItemView_mousePressEvent_void_QAbstractItemView_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractItemView_mousePressEvent_void_QAbstractItemView_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseReleaseEvent0, void)
     {
-        qt_QAbstractItemView_mouseReleaseEvent_void_QAbstractItemView_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractItemView_mouseReleaseEvent_void_QAbstractItemView_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                  NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_resizeEvent0, void)
     {
-        qt_QAbstractItemView_resizeEvent_void_QAbstractItemView_QResizeEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractItemView_resizeEvent_void_QAbstractItemView_QResizeEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                             NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_timerEvent0, void)
     {
-        qt_QAbstractItemView_timerEvent_void_QAbstractItemView_QTimerEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractItemView_timerEvent_void_QAbstractItemView_QTimerEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_viewportEvent0, bool)
     {
-        NODE_RETURN(
-            qt_QAbstractItemView_viewportEvent_bool_QAbstractItemView_QEvent(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QAbstractItemView_viewportEvent_bool_QAbstractItemView_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                     NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_viewportSizeHint0, Pointer)
     {
-        NODE_RETURN(
-            qt_QAbstractItemView_viewportSizeHint_QSize_QAbstractItemView(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QAbstractItemView_viewportSizeHint_QSize_QAbstractItemView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_setupViewport0, void)
     {
-        qt_QAbstractItemView_setupViewport_void_QAbstractItemView_QWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractItemView_setupViewport_void_QAbstractItemView_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_minimumSizeHint0, Pointer)
     {
-        NODE_RETURN(
-            qt_QAbstractItemView_minimumSizeHint_QSize_QAbstractItemView(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QAbstractItemView_minimumSizeHint_QSize_QAbstractItemView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_sizeHint0, Pointer)
     {
-        NODE_RETURN(qt_QAbstractItemView_sizeHint_QSize_QAbstractItemView(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QAbstractItemView_sizeHint_QSize_QAbstractItemView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_scrollContentsBy0, void)
     {
-        qt_QAbstractItemView_scrollContentsBy_void_QAbstractItemView_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int));
+        qt_QAbstractItemView_scrollContentsBy_void_QAbstractItemView_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                             NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_contextMenuEvent0, void)
     {
-        qt_QAbstractItemView_contextMenuEvent_void_QAbstractItemView_QContextMenuEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractItemView_contextMenuEvent_void_QAbstractItemView_QContextMenuEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                       NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_paintEvent0, void)
     {
-        qt_QAbstractItemView_paintEvent_void_QAbstractItemView_QPaintEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractItemView_paintEvent_void_QAbstractItemView_QPaintEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_wheelEvent0, void)
     {
-        qt_QAbstractItemView_wheelEvent_void_QAbstractItemView_QWheelEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractItemView_wheelEvent_void_QAbstractItemView_QWheelEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     void QAbstractItemViewType::load()
@@ -2319,68 +2091,45 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
-                   new Function(c, tn, castFromObject, Cast, Compiled,
-                                QAbstractItemView_QAbstractItemView_QObject,
-                                Return, ftn, Parameters,
+                   new Function(c, tn, castFromObject, Cast, Compiled, QAbstractItemView_QAbstractItemView_QObject, Return, ftn, Parameters,
                                 new Param(c, "object", "qt.QObject"), End),
 
                    EndArguments);
 
         addSymbols(
             // enums
-            new Alias(c, "CursorAction", "int") /* PROTECTED ENUM */,
-            new SymbolicConstant(c, "MoveUp", "int", Value(int(0))),
-            new SymbolicConstant(c, "MoveDown", "int", Value(int(1))),
-            new SymbolicConstant(c, "MoveLeft", "int", Value(int(2))),
-            new SymbolicConstant(c, "MoveRight", "int", Value(int(3))),
-            new SymbolicConstant(c, "MoveHome", "int", Value(int(4))),
-            new SymbolicConstant(c, "MoveEnd", "int", Value(int(5))),
-            new SymbolicConstant(c, "MovePageUp", "int", Value(int(6))),
-            new SymbolicConstant(c, "MovePageDown", "int", Value(int(7))),
-            new SymbolicConstant(c, "MoveNext", "int", Value(int(8))),
+            new Alias(c, "CursorAction", "int") /* PROTECTED ENUM */, new SymbolicConstant(c, "MoveUp", "int", Value(int(0))),
+            new SymbolicConstant(c, "MoveDown", "int", Value(int(1))), new SymbolicConstant(c, "MoveLeft", "int", Value(int(2))),
+            new SymbolicConstant(c, "MoveRight", "int", Value(int(3))), new SymbolicConstant(c, "MoveHome", "int", Value(int(4))),
+            new SymbolicConstant(c, "MoveEnd", "int", Value(int(5))), new SymbolicConstant(c, "MovePageUp", "int", Value(int(6))),
+            new SymbolicConstant(c, "MovePageDown", "int", Value(int(7))), new SymbolicConstant(c, "MoveNext", "int", Value(int(8))),
             new SymbolicConstant(c, "MovePrevious", "int", Value(int(9))),
-            new Alias(c, "DropIndicatorPosition", "int") /* PROTECTED ENUM */,
-            new SymbolicConstant(c, "OnItem", "int", Value(int(0))),
-            new SymbolicConstant(c, "AboveItem", "int", Value(int(1))),
-            new SymbolicConstant(c, "BelowItem", "int", Value(int(2))),
-            new SymbolicConstant(c, "OnViewport", "int", Value(int(3))),
-            new Alias(c, "State", "int") /* PROTECTED ENUM */,
-            new SymbolicConstant(c, "NoState", "int", Value(int(0))),
-            new SymbolicConstant(c, "DraggingState", "int", Value(int(1))),
+            new Alias(c, "DropIndicatorPosition", "int") /* PROTECTED ENUM */, new SymbolicConstant(c, "OnItem", "int", Value(int(0))),
+            new SymbolicConstant(c, "AboveItem", "int", Value(int(1))), new SymbolicConstant(c, "BelowItem", "int", Value(int(2))),
+            new SymbolicConstant(c, "OnViewport", "int", Value(int(3))), new Alias(c, "State", "int") /* PROTECTED ENUM */,
+            new SymbolicConstant(c, "NoState", "int", Value(int(0))), new SymbolicConstant(c, "DraggingState", "int", Value(int(1))),
             new SymbolicConstant(c, "DragSelectingState", "int", Value(int(2))),
-            new SymbolicConstant(c, "EditingState", "int", Value(int(3))),
-            new SymbolicConstant(c, "ExpandingState", "int", Value(int(4))),
+            new SymbolicConstant(c, "EditingState", "int", Value(int(3))), new SymbolicConstant(c, "ExpandingState", "int", Value(int(4))),
             new SymbolicConstant(c, "CollapsingState", "int", Value(int(5))),
             new SymbolicConstant(c, "AnimatingState", "int", Value(int(6))),
             // member functions
-            new Function(
-                c, "QAbstractItemView", _n_QAbstractItemView0, None, Compiled,
-                qt_QAbstractItemView_QAbstractItemView_QAbstractItemView_QAbstractItemView_QWidget,
-                Return, "qt.QAbstractItemView", Parameters,
-                new Param(c, "this", "qt.QAbstractItemView"),
-                new Param(c, "parent", "qt.QWidget"), End),
+            new Function(c, "QAbstractItemView", _n_QAbstractItemView0, None, Compiled,
+                         qt_QAbstractItemView_QAbstractItemView_QAbstractItemView_QAbstractItemView_QWidget, Return, "qt.QAbstractItemView",
+                         Parameters, new Param(c, "this", "qt.QAbstractItemView"), new Param(c, "parent", "qt.QWidget"), End),
             // PROP: alternatingRowColors (bool; QAbstractItemView this)
             // PROP: autoScrollMargin (int; QAbstractItemView this)
-            new Function(
-                c, "closePersistentEditor", _n_closePersistentEditor0, None,
-                Compiled,
-                qt_QAbstractItemView_closePersistentEditor_void_QAbstractItemView_QModelIndex,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractItemView"),
-                new Param(c, "index", "qt.QModelIndex"), End),
-            new Function(
-                c, "currentIndex", _n_currentIndex0, None, Compiled,
-                qt_QAbstractItemView_currentIndex_QModelIndex_QAbstractItemView,
-                Return, "qt.QModelIndex", Parameters,
-                new Param(c, "this", "qt.QAbstractItemView"), End),
+            new Function(c, "closePersistentEditor", _n_closePersistentEditor0, None, Compiled,
+                         qt_QAbstractItemView_closePersistentEditor_void_QAbstractItemView_QModelIndex, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QAbstractItemView"), new Param(c, "index", "qt.QModelIndex"), End),
+            new Function(c, "currentIndex", _n_currentIndex0, None, Compiled,
+                         qt_QAbstractItemView_currentIndex_QModelIndex_QAbstractItemView, Return, "qt.QModelIndex", Parameters,
+                         new Param(c, "this", "qt.QAbstractItemView"), End),
             // PROP: defaultDropAction (flags Qt::DropAction; QAbstractItemView
             // this) PROP: dragDropMode (flags QAbstractItemView::DragDropMode;
             // QAbstractItemView this) PROP: dragDropOverwriteMode (bool;
@@ -2392,24 +2141,14 @@ namespace Mu
             // QAbstractItemView this) PROP: iconSize (QSize; QAbstractItemView
             // this)
             _func[0] = new MemberFunction(
-                c, "indexAt", _n_indexAt0, None, Compiled,
-                qt_QAbstractItemView_indexAt_QModelIndex_QAbstractItemView_QPoint,
-                Return, "qt.QModelIndex", Parameters,
-                new Param(c, "this", "qt.QAbstractItemView"),
-                new Param(c, "point", "qt.QPoint"), End),
-            new Function(
-                c, "indexWidget", _n_indexWidget0, None, Compiled,
-                qt_QAbstractItemView_indexWidget_QWidget_QAbstractItemView_QModelIndex,
-                Return, "qt.QWidget", Parameters,
-                new Param(c, "this", "qt.QAbstractItemView"),
-                new Param(c, "index", "qt.QModelIndex"), End),
-            new Function(
-                c, "isPersistentEditorOpen", _n_isPersistentEditorOpen0, None,
-                Compiled,
-                qt_QAbstractItemView_isPersistentEditorOpen_bool_QAbstractItemView_QModelIndex,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QAbstractItemView"),
-                new Param(c, "index", "qt.QModelIndex"), End),
+                c, "indexAt", _n_indexAt0, None, Compiled, qt_QAbstractItemView_indexAt_QModelIndex_QAbstractItemView_QPoint, Return,
+                "qt.QModelIndex", Parameters, new Param(c, "this", "qt.QAbstractItemView"), new Param(c, "point", "qt.QPoint"), End),
+            new Function(c, "indexWidget", _n_indexWidget0, None, Compiled,
+                         qt_QAbstractItemView_indexWidget_QWidget_QAbstractItemView_QModelIndex, Return, "qt.QWidget", Parameters,
+                         new Param(c, "this", "qt.QAbstractItemView"), new Param(c, "index", "qt.QModelIndex"), End),
+            new Function(c, "isPersistentEditorOpen", _n_isPersistentEditorOpen0, None, Compiled,
+                         qt_QAbstractItemView_isPersistentEditorOpen_bool_QAbstractItemView_QModelIndex, Return, "bool", Parameters,
+                         new Param(c, "this", "qt.QAbstractItemView"), new Param(c, "index", "qt.QModelIndex"), End),
             // MISSING: itemDelegate ("QAbstractItemDelegate *";
             // QAbstractItemView this) MISSING: itemDelegateForColumn
             // ("QAbstractItemDelegate *"; QAbstractItemView this, int column)
@@ -2417,49 +2156,29 @@ namespace Mu
             // QAbstractItemView this, QModelIndex index) MISSING:
             // itemDelegateForRow ("QAbstractItemDelegate *"; QAbstractItemView
             // this, int row)
-            _func[1] = new MemberFunction(
-                c, "keyboardSearch", _n_keyboardSearch0, None, Compiled,
-                qt_QAbstractItemView_keyboardSearch_void_QAbstractItemView_string,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractItemView"),
-                new Param(c, "search", "string"), End),
-            new Function(
-                c, "model", _n_model0, None, Compiled,
-                qt_QAbstractItemView_model_QAbstractItemModel_QAbstractItemView,
-                Return, "qt.QAbstractItemModel", Parameters,
-                new Param(c, "this", "qt.QAbstractItemView"), End),
-            new Function(
-                c, "openPersistentEditor", _n_openPersistentEditor0, None,
-                Compiled,
-                qt_QAbstractItemView_openPersistentEditor_void_QAbstractItemView_QModelIndex,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractItemView"),
-                new Param(c, "index", "qt.QModelIndex"), End),
+            _func[1] = new MemberFunction(c, "keyboardSearch", _n_keyboardSearch0, None, Compiled,
+                                          qt_QAbstractItemView_keyboardSearch_void_QAbstractItemView_string, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QAbstractItemView"), new Param(c, "search", "string"), End),
+            new Function(c, "model", _n_model0, None, Compiled, qt_QAbstractItemView_model_QAbstractItemModel_QAbstractItemView, Return,
+                         "qt.QAbstractItemModel", Parameters, new Param(c, "this", "qt.QAbstractItemView"), End),
+            new Function(c, "openPersistentEditor", _n_openPersistentEditor0, None, Compiled,
+                         qt_QAbstractItemView_openPersistentEditor_void_QAbstractItemView_QModelIndex, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QAbstractItemView"), new Param(c, "index", "qt.QModelIndex"), End),
             // PROP: resetHorizontalScrollMode (void; QAbstractItemView this)
             // PROP: resetVerticalScrollMode (void; QAbstractItemView this)
-            new Function(
-                c, "rootIndex", _n_rootIndex0, None, Compiled,
-                qt_QAbstractItemView_rootIndex_QModelIndex_QAbstractItemView,
-                Return, "qt.QModelIndex", Parameters,
-                new Param(c, "this", "qt.QAbstractItemView"), End),
-            _func[2] = new MemberFunction(
-                c, "scrollTo", _n_scrollTo0, None, Compiled,
-                qt_QAbstractItemView_scrollTo_void_QAbstractItemView_QModelIndex_int,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractItemView"),
-                new Param(c, "index", "qt.QModelIndex"),
-                new Param(c, "hint", "int",
-                          Value((int)QAbstractItemView::EnsureVisible)),
-                End),
+            new Function(c, "rootIndex", _n_rootIndex0, None, Compiled, qt_QAbstractItemView_rootIndex_QModelIndex_QAbstractItemView,
+                         Return, "qt.QModelIndex", Parameters, new Param(c, "this", "qt.QAbstractItemView"), End),
+            _func[2] = new MemberFunction(c, "scrollTo", _n_scrollTo0, None, Compiled,
+                                          qt_QAbstractItemView_scrollTo_void_QAbstractItemView_QModelIndex_int, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QAbstractItemView"), new Param(c, "index", "qt.QModelIndex"),
+                                          new Param(c, "hint", "int", Value((int)QAbstractItemView::EnsureVisible)), End),
             // PROP: selectionBehavior (flags
             // QAbstractItemView::SelectionBehavior; QAbstractItemView this)
             // PROP: selectionMode (flags QAbstractItemView::SelectionMode;
             // QAbstractItemView this)
-            new Function(
-                c, "selectionModel", _n_selectionModel0, None, Compiled,
-                qt_QAbstractItemView_selectionModel_QItemSelectionModel_QAbstractItemView,
-                Return, "qt.QItemSelectionModel", Parameters,
-                new Param(c, "this", "qt.QAbstractItemView"), End),
+            new Function(c, "selectionModel", _n_selectionModel0, None, Compiled,
+                         qt_QAbstractItemView_selectionModel_QItemSelectionModel_QAbstractItemView, Return, "qt.QItemSelectionModel",
+                         Parameters, new Param(c, "this", "qt.QAbstractItemView"), End),
             // PROP: setAlternatingRowColors (void; QAbstractItemView this, bool
             // enable) PROP: setAutoScroll (void; QAbstractItemView this, bool
             // enable) PROP: setAutoScrollMargin (void; QAbstractItemView this,
@@ -2475,335 +2194,200 @@ namespace Mu
             // setHorizontalScrollMode (void; QAbstractItemView this, flags
             // QAbstractItemView::ScrollMode mode) PROP: setIconSize (void;
             // QAbstractItemView this, QSize size)
-            new Function(
-                c, "setIndexWidget", _n_setIndexWidget0, None, Compiled,
-                qt_QAbstractItemView_setIndexWidget_void_QAbstractItemView_QModelIndex_QWidget,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractItemView"),
-                new Param(c, "index", "qt.QModelIndex"),
-                new Param(c, "widget", "qt.QWidget"), End),
+            new Function(c, "setIndexWidget", _n_setIndexWidget0, None, Compiled,
+                         qt_QAbstractItemView_setIndexWidget_void_QAbstractItemView_QModelIndex_QWidget, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QAbstractItemView"), new Param(c, "index", "qt.QModelIndex"),
+                         new Param(c, "widget", "qt.QWidget"), End),
             // MISSING: setItemDelegate (void; QAbstractItemView this,
             // "QAbstractItemDelegate *" delegate) MISSING:
             // setItemDelegateForColumn (void; QAbstractItemView this, int
             // column, "QAbstractItemDelegate *" delegate) MISSING:
             // setItemDelegateForRow (void; QAbstractItemView this, int row,
             // "QAbstractItemDelegate *" delegate)
-            _func[3] = new MemberFunction(
-                c, "setModel", _n_setModel0, None, Compiled,
-                qt_QAbstractItemView_setModel_void_QAbstractItemView_QAbstractItemModel,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractItemView"),
-                new Param(c, "model", "qt.QAbstractItemModel"), End),
+            _func[3] =
+                new MemberFunction(c, "setModel", _n_setModel0, None, Compiled,
+                                   qt_QAbstractItemView_setModel_void_QAbstractItemView_QAbstractItemModel, Return, "void", Parameters,
+                                   new Param(c, "this", "qt.QAbstractItemView"), new Param(c, "model", "qt.QAbstractItemModel"), End),
             // PROP: setSelectionBehavior (void; QAbstractItemView this, flags
             // QAbstractItemView::SelectionBehavior behavior) PROP:
             // setSelectionMode (void; QAbstractItemView this, flags
             // QAbstractItemView::SelectionMode mode)
-            _func[4] = new MemberFunction(
-                c, "setSelectionModel", _n_setSelectionModel0, None, Compiled,
-                qt_QAbstractItemView_setSelectionModel_void_QAbstractItemView_QItemSelectionModel,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractItemView"),
-                new Param(c, "selectionModel", "qt.QItemSelectionModel"), End),
+            _func[4] = new MemberFunction(c, "setSelectionModel", _n_setSelectionModel0, None, Compiled,
+                                          qt_QAbstractItemView_setSelectionModel_void_QAbstractItemView_QItemSelectionModel, Return, "void",
+                                          Parameters, new Param(c, "this", "qt.QAbstractItemView"),
+                                          new Param(c, "selectionModel", "qt.QItemSelectionModel"), End),
             // PROP: setTabKeyNavigation (void; QAbstractItemView this, bool
             // enable) PROP: setTextElideMode (void; QAbstractItemView this,
             // flags Qt::TextElideMode mode) PROP: setVerticalScrollMode (void;
             // QAbstractItemView this, flags QAbstractItemView::ScrollMode mode)
             // PROP: showDropIndicator (bool; QAbstractItemView this)
-            _func[5] = new MemberFunction(
-                c, "sizeHintForColumn", _n_sizeHintForColumn0, None, Compiled,
-                qt_QAbstractItemView_sizeHintForColumn_int_QAbstractItemView_int,
-                Return, "int", Parameters,
-                new Param(c, "this", "qt.QAbstractItemView"),
-                new Param(c, "column", "int"), End),
-            new Function(
-                c, "sizeHintForIndex", _n_sizeHintForIndex0, None, Compiled,
-                qt_QAbstractItemView_sizeHintForIndex_QSize_QAbstractItemView_QModelIndex,
-                Return, "qt.QSize", Parameters,
-                new Param(c, "this", "qt.QAbstractItemView"),
-                new Param(c, "index", "qt.QModelIndex"), End),
-            _func[6] = new MemberFunction(
-                c, "sizeHintForRow", _n_sizeHintForRow0, None, Compiled,
-                qt_QAbstractItemView_sizeHintForRow_int_QAbstractItemView_int,
-                Return, "int", Parameters,
-                new Param(c, "this", "qt.QAbstractItemView"),
-                new Param(c, "row", "int"), End),
+            _func[5] = new MemberFunction(c, "sizeHintForColumn", _n_sizeHintForColumn0, None, Compiled,
+                                          qt_QAbstractItemView_sizeHintForColumn_int_QAbstractItemView_int, Return, "int", Parameters,
+                                          new Param(c, "this", "qt.QAbstractItemView"), new Param(c, "column", "int"), End),
+            new Function(c, "sizeHintForIndex", _n_sizeHintForIndex0, None, Compiled,
+                         qt_QAbstractItemView_sizeHintForIndex_QSize_QAbstractItemView_QModelIndex, Return, "qt.QSize", Parameters,
+                         new Param(c, "this", "qt.QAbstractItemView"), new Param(c, "index", "qt.QModelIndex"), End),
+            _func[6] = new MemberFunction(c, "sizeHintForRow", _n_sizeHintForRow0, None, Compiled,
+                                          qt_QAbstractItemView_sizeHintForRow_int_QAbstractItemView_int, Return, "int", Parameters,
+                                          new Param(c, "this", "qt.QAbstractItemView"), new Param(c, "row", "int"), End),
             // PROP: tabKeyNavigation (bool; QAbstractItemView this)
             // PROP: textElideMode (flags Qt::TextElideMode; QAbstractItemView
             // this) PROP: verticalScrollMode (flags
             // QAbstractItemView::ScrollMode; QAbstractItemView this)
             _func[7] = new MemberFunction(
-                c, "visualRect", _n_visualRect0, None, Compiled,
-                qt_QAbstractItemView_visualRect_QRect_QAbstractItemView_QModelIndex,
-                Return, "qt.QRect", Parameters,
-                new Param(c, "this", "qt.QAbstractItemView"),
-                new Param(c, "index", "qt.QModelIndex"), End),
-            _func[8] = new MemberFunction(
-                c, "inputMethodQuery", _n_inputMethodQuery0, None, Compiled,
-                qt_QAbstractItemView_inputMethodQuery_QVariant_QAbstractItemView_int,
-                Return, "qt.QVariant", Parameters,
-                new Param(c, "this", "qt.QAbstractItemView"),
-                new Param(c, "query", "int"), End),
-            new Function(
-                c, "dirtyRegionOffset", _n_dirtyRegionOffset0, None, Compiled,
-                qt_QAbstractItemView_dirtyRegionOffset_QPoint_QAbstractItemView,
-                Return, "qt.QPoint", Parameters,
-                new Param(c, "this", "qt.QAbstractItemView"), End),
-            new Function(
-                c, "dropIndicatorPosition", _n_dropIndicatorPosition0, None,
-                Compiled,
-                qt_QAbstractItemView_dropIndicatorPosition_int_QAbstractItemView,
-                Return, "int", Parameters,
-                new Param(c, "this", "qt.QAbstractItemView"), End),
-            _func[9] = new MemberFunction(
-                c, "edit", _n_edit0, None, Compiled,
-                qt_QAbstractItemView_edit_bool_QAbstractItemView_QModelIndex_int_QEvent,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QAbstractItemView"),
-                new Param(c, "index", "qt.QModelIndex"),
-                new Param(c, "trigger", "int"),
-                new Param(c, "event", "qt.QEvent"), End),
-            new Function(
-                c, "executeDelayedItemsLayout", _n_executeDelayedItemsLayout0,
-                None, Compiled,
-                qt_QAbstractItemView_executeDelayedItemsLayout_void_QAbstractItemView,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractItemView"), End),
-            _func[10] = new MemberFunction(
-                c, "horizontalOffset", _n_horizontalOffset0, None, Compiled,
-                qt_QAbstractItemView_horizontalOffset_int_QAbstractItemView,
-                Return, "int", Parameters,
-                new Param(c, "this", "qt.QAbstractItemView"), End),
+                c, "visualRect", _n_visualRect0, None, Compiled, qt_QAbstractItemView_visualRect_QRect_QAbstractItemView_QModelIndex,
+                Return, "qt.QRect", Parameters, new Param(c, "this", "qt.QAbstractItemView"), new Param(c, "index", "qt.QModelIndex"), End),
+            _func[8] = new MemberFunction(c, "inputMethodQuery", _n_inputMethodQuery0, None, Compiled,
+                                          qt_QAbstractItemView_inputMethodQuery_QVariant_QAbstractItemView_int, Return, "qt.QVariant",
+                                          Parameters, new Param(c, "this", "qt.QAbstractItemView"), new Param(c, "query", "int"), End),
+            new Function(c, "dirtyRegionOffset", _n_dirtyRegionOffset0, None, Compiled,
+                         qt_QAbstractItemView_dirtyRegionOffset_QPoint_QAbstractItemView, Return, "qt.QPoint", Parameters,
+                         new Param(c, "this", "qt.QAbstractItemView"), End),
+            new Function(c, "dropIndicatorPosition", _n_dropIndicatorPosition0, None, Compiled,
+                         qt_QAbstractItemView_dropIndicatorPosition_int_QAbstractItemView, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QAbstractItemView"), End),
+            _func[9] = new MemberFunction(c, "edit", _n_edit0, None, Compiled,
+                                          qt_QAbstractItemView_edit_bool_QAbstractItemView_QModelIndex_int_QEvent, Return, "bool",
+                                          Parameters, new Param(c, "this", "qt.QAbstractItemView"), new Param(c, "index", "qt.QModelIndex"),
+                                          new Param(c, "trigger", "int"), new Param(c, "event", "qt.QEvent"), End),
+            new Function(c, "executeDelayedItemsLayout", _n_executeDelayedItemsLayout0, None, Compiled,
+                         qt_QAbstractItemView_executeDelayedItemsLayout_void_QAbstractItemView, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QAbstractItemView"), End),
+            _func[10] = new MemberFunction(c, "horizontalOffset", _n_horizontalOffset0, None, Compiled,
+                                           qt_QAbstractItemView_horizontalOffset_int_QAbstractItemView, Return, "int", Parameters,
+                                           new Param(c, "this", "qt.QAbstractItemView"), End),
             // MISSING: initViewItemOption (void; QAbstractItemView this,
             // "QStyleOptionViewItem *" option) // protected
-            _func[11] = new MemberFunction(
-                c, "isIndexHidden", _n_isIndexHidden0, None, Compiled,
-                qt_QAbstractItemView_isIndexHidden_bool_QAbstractItemView_QModelIndex,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QAbstractItemView"),
-                new Param(c, "index", "qt.QModelIndex"), End),
-            _func[12] = new MemberFunction(
-                c, "moveCursor", _n_moveCursor0, None, Compiled,
-                qt_QAbstractItemView_moveCursor_QModelIndex_QAbstractItemView_int_int,
-                Return, "qt.QModelIndex", Parameters,
-                new Param(c, "this", "qt.QAbstractItemView"),
-                new Param(c, "cursorAction", "int"),
-                new Param(c, "modifiers", "int"), End),
-            new Function(
-                c, "scheduleDelayedItemsLayout", _n_scheduleDelayedItemsLayout0,
-                None, Compiled,
-                qt_QAbstractItemView_scheduleDelayedItemsLayout_void_QAbstractItemView,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractItemView"), End),
-            new Function(
-                c, "scrollDirtyRegion", _n_scrollDirtyRegion0, None, Compiled,
-                qt_QAbstractItemView_scrollDirtyRegion_void_QAbstractItemView_int_int,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractItemView"),
-                new Param(c, "dx", "int"), new Param(c, "dy", "int"), End),
-            _func[13] = new MemberFunction(
-                c, "selectedIndexes", _n_selectedIndexes0, None, Compiled,
-                qt_QAbstractItemView_selectedIndexes_qt__QModelIndexBSB_ESB__QAbstractItemView,
-                Return, "qt.QModelIndex[]", Parameters,
-                new Param(c, "this", "qt.QAbstractItemView"), End),
-            _func[14] = new MemberFunction(
-                c, "selectionCommand", _n_selectionCommand0, None, Compiled,
-                qt_QAbstractItemView_selectionCommand_int_QAbstractItemView_QModelIndex_QEvent,
-                Return, "int", Parameters,
-                new Param(c, "this", "qt.QAbstractItemView"),
-                new Param(c, "index", "qt.QModelIndex"),
-                new Param(c, "event", "qt.QEvent"), End),
-            new Function(
-                c, "setDirtyRegion", _n_setDirtyRegion0, None, Compiled,
-                qt_QAbstractItemView_setDirtyRegion_void_QAbstractItemView_QRegion,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractItemView"),
-                new Param(c, "region", "qt.QRegion"), End),
-            _func[15] = new MemberFunction(
-                c, "setSelection", _n_setSelection0, None, Compiled,
-                qt_QAbstractItemView_setSelection_void_QAbstractItemView_QRect_int,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractItemView"),
-                new Param(c, "rect", "qt.QRect"), new Param(c, "flags", "int"),
-                End),
-            new Function(
-                c, "setState", _n_setState0, None, Compiled,
-                qt_QAbstractItemView_setState_void_QAbstractItemView_int,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractItemView"),
-                new Param(c, "state", "int"), End),
-            _func[16] = new MemberFunction(
-                c, "startDrag", _n_startDrag0, None, Compiled,
-                qt_QAbstractItemView_startDrag_void_QAbstractItemView_int,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractItemView"),
-                new Param(c, "supportedActions", "int"), End),
-            new Function(c, "state", _n_state0, None, Compiled,
-                         qt_QAbstractItemView_state_int_QAbstractItemView,
-                         Return, "int", Parameters,
+            _func[11] =
+                new MemberFunction(c, "isIndexHidden", _n_isIndexHidden0, None, Compiled,
+                                   qt_QAbstractItemView_isIndexHidden_bool_QAbstractItemView_QModelIndex, Return, "bool", Parameters,
+                                   new Param(c, "this", "qt.QAbstractItemView"), new Param(c, "index", "qt.QModelIndex"), End),
+            _func[12] = new MemberFunction(c, "moveCursor", _n_moveCursor0, None, Compiled,
+                                           qt_QAbstractItemView_moveCursor_QModelIndex_QAbstractItemView_int_int, Return, "qt.QModelIndex",
+                                           Parameters, new Param(c, "this", "qt.QAbstractItemView"), new Param(c, "cursorAction", "int"),
+                                           new Param(c, "modifiers", "int"), End),
+            new Function(c, "scheduleDelayedItemsLayout", _n_scheduleDelayedItemsLayout0, None, Compiled,
+                         qt_QAbstractItemView_scheduleDelayedItemsLayout_void_QAbstractItemView, Return, "void", Parameters,
                          new Param(c, "this", "qt.QAbstractItemView"), End),
-            _func[17] = new MemberFunction(
-                c, "verticalOffset", _n_verticalOffset0, None, Compiled,
-                qt_QAbstractItemView_verticalOffset_int_QAbstractItemView,
-                Return, "int", Parameters,
-                new Param(c, "this", "qt.QAbstractItemView"), End),
-            _func[18] = new MemberFunction(
-                c, "visualRegionForSelection", _n_visualRegionForSelection0,
-                None, Compiled,
-                qt_QAbstractItemView_visualRegionForSelection_QRegion_QAbstractItemView_QItemSelection,
-                Return, "qt.QRegion", Parameters,
-                new Param(c, "this", "qt.QAbstractItemView"),
-                new Param(c, "selection", "qt.QItemSelection"), End),
-            _func[19] = new MemberFunction(
-                c, "dragEnterEvent", _n_dragEnterEvent0, None, Compiled,
-                qt_QAbstractItemView_dragEnterEvent_void_QAbstractItemView_QDragEnterEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractItemView"),
-                new Param(c, "event", "qt.QDragEnterEvent"), End),
-            _func[20] = new MemberFunction(
-                c, "dragLeaveEvent", _n_dragLeaveEvent0, None, Compiled,
-                qt_QAbstractItemView_dragLeaveEvent_void_QAbstractItemView_QDragLeaveEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractItemView"),
-                new Param(c, "event", "qt.QDragLeaveEvent"), End),
-            _func[21] = new MemberFunction(
-                c, "dragMoveEvent", _n_dragMoveEvent0, None, Compiled,
-                qt_QAbstractItemView_dragMoveEvent_void_QAbstractItemView_QDragMoveEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractItemView"),
-                new Param(c, "event", "qt.QDragMoveEvent"), End),
-            _func[22] = new MemberFunction(
-                c, "dropEvent", _n_dropEvent0, None, Compiled,
-                qt_QAbstractItemView_dropEvent_void_QAbstractItemView_QDropEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractItemView"),
-                new Param(c, "event", "qt.QDropEvent"), End),
-            _func[23] = new MemberFunction(
-                c, "event", _n_event0, None, Compiled,
-                qt_QAbstractItemView_event_bool_QAbstractItemView_QEvent,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QAbstractItemView"),
-                new Param(c, "event_", "qt.QEvent"), End),
-            _func[24] = new MemberFunction(
-                c, "eventFilter", _n_eventFilter0, None, Compiled,
-                qt_QAbstractItemView_eventFilter_bool_QAbstractItemView_QObject_QEvent,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QAbstractItemView"),
-                new Param(c, "object", "qt.QObject"),
-                new Param(c, "event", "qt.QEvent"), End),
-            _func[25] = new MemberFunction(
-                c, "focusInEvent", _n_focusInEvent0, None, Compiled,
-                qt_QAbstractItemView_focusInEvent_void_QAbstractItemView_QFocusEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractItemView"),
-                new Param(c, "event", "qt.QFocusEvent"), End),
-            _func[26] = new MemberFunction(
-                c, "focusNextPrevChild", _n_focusNextPrevChild0, None, Compiled,
-                qt_QAbstractItemView_focusNextPrevChild_bool_QAbstractItemView_bool,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QAbstractItemView"),
-                new Param(c, "next", "bool"), End),
-            _func[27] = new MemberFunction(
-                c, "focusOutEvent", _n_focusOutEvent0, None, Compiled,
-                qt_QAbstractItemView_focusOutEvent_void_QAbstractItemView_QFocusEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractItemView"),
-                new Param(c, "event", "qt.QFocusEvent"), End),
+            new Function(c, "scrollDirtyRegion", _n_scrollDirtyRegion0, None, Compiled,
+                         qt_QAbstractItemView_scrollDirtyRegion_void_QAbstractItemView_int_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QAbstractItemView"), new Param(c, "dx", "int"), new Param(c, "dy", "int"), End),
+            _func[13] = new MemberFunction(c, "selectedIndexes", _n_selectedIndexes0, None, Compiled,
+                                           qt_QAbstractItemView_selectedIndexes_qt__QModelIndexBSB_ESB__QAbstractItemView, Return,
+                                           "qt.QModelIndex[]", Parameters, new Param(c, "this", "qt.QAbstractItemView"), End),
+            _func[14] = new MemberFunction(c, "selectionCommand", _n_selectionCommand0, None, Compiled,
+                                           qt_QAbstractItemView_selectionCommand_int_QAbstractItemView_QModelIndex_QEvent, Return, "int",
+                                           Parameters, new Param(c, "this", "qt.QAbstractItemView"),
+                                           new Param(c, "index", "qt.QModelIndex"), new Param(c, "event", "qt.QEvent"), End),
+            new Function(c, "setDirtyRegion", _n_setDirtyRegion0, None, Compiled,
+                         qt_QAbstractItemView_setDirtyRegion_void_QAbstractItemView_QRegion, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QAbstractItemView"), new Param(c, "region", "qt.QRegion"), End),
+            _func[15] = new MemberFunction(c, "setSelection", _n_setSelection0, None, Compiled,
+                                           qt_QAbstractItemView_setSelection_void_QAbstractItemView_QRect_int, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QAbstractItemView"), new Param(c, "rect", "qt.QRect"),
+                                           new Param(c, "flags", "int"), End),
+            new Function(c, "setState", _n_setState0, None, Compiled, qt_QAbstractItemView_setState_void_QAbstractItemView_int, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QAbstractItemView"), new Param(c, "state", "int"), End),
+            _func[16] = new MemberFunction(c, "startDrag", _n_startDrag0, None, Compiled,
+                                           qt_QAbstractItemView_startDrag_void_QAbstractItemView_int, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QAbstractItemView"), new Param(c, "supportedActions", "int"), End),
+            new Function(c, "state", _n_state0, None, Compiled, qt_QAbstractItemView_state_int_QAbstractItemView, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QAbstractItemView"), End),
+            _func[17] = new MemberFunction(c, "verticalOffset", _n_verticalOffset0, None, Compiled,
+                                           qt_QAbstractItemView_verticalOffset_int_QAbstractItemView, Return, "int", Parameters,
+                                           new Param(c, "this", "qt.QAbstractItemView"), End),
+            _func[18] = new MemberFunction(c, "visualRegionForSelection", _n_visualRegionForSelection0, None, Compiled,
+                                           qt_QAbstractItemView_visualRegionForSelection_QRegion_QAbstractItemView_QItemSelection, Return,
+                                           "qt.QRegion", Parameters, new Param(c, "this", "qt.QAbstractItemView"),
+                                           new Param(c, "selection", "qt.QItemSelection"), End),
+            _func[19] =
+                new MemberFunction(c, "dragEnterEvent", _n_dragEnterEvent0, None, Compiled,
+                                   qt_QAbstractItemView_dragEnterEvent_void_QAbstractItemView_QDragEnterEvent, Return, "void", Parameters,
+                                   new Param(c, "this", "qt.QAbstractItemView"), new Param(c, "event", "qt.QDragEnterEvent"), End),
+            _func[20] =
+                new MemberFunction(c, "dragLeaveEvent", _n_dragLeaveEvent0, None, Compiled,
+                                   qt_QAbstractItemView_dragLeaveEvent_void_QAbstractItemView_QDragLeaveEvent, Return, "void", Parameters,
+                                   new Param(c, "this", "qt.QAbstractItemView"), new Param(c, "event", "qt.QDragLeaveEvent"), End),
+            _func[21] =
+                new MemberFunction(c, "dragMoveEvent", _n_dragMoveEvent0, None, Compiled,
+                                   qt_QAbstractItemView_dragMoveEvent_void_QAbstractItemView_QDragMoveEvent, Return, "void", Parameters,
+                                   new Param(c, "this", "qt.QAbstractItemView"), new Param(c, "event", "qt.QDragMoveEvent"), End),
+            _func[22] = new MemberFunction(c, "dropEvent", _n_dropEvent0, None, Compiled,
+                                           qt_QAbstractItemView_dropEvent_void_QAbstractItemView_QDropEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QAbstractItemView"), new Param(c, "event", "qt.QDropEvent"), End),
+            _func[23] = new MemberFunction(c, "event", _n_event0, None, Compiled, qt_QAbstractItemView_event_bool_QAbstractItemView_QEvent,
+                                           Return, "bool", Parameters, new Param(c, "this", "qt.QAbstractItemView"),
+                                           new Param(c, "event_", "qt.QEvent"), End),
+            _func[24] = new MemberFunction(c, "eventFilter", _n_eventFilter0, None, Compiled,
+                                           qt_QAbstractItemView_eventFilter_bool_QAbstractItemView_QObject_QEvent, Return, "bool",
+                                           Parameters, new Param(c, "this", "qt.QAbstractItemView"), new Param(c, "object", "qt.QObject"),
+                                           new Param(c, "event", "qt.QEvent"), End),
+            _func[25] = new MemberFunction(c, "focusInEvent", _n_focusInEvent0, None, Compiled,
+                                           qt_QAbstractItemView_focusInEvent_void_QAbstractItemView_QFocusEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QAbstractItemView"), new Param(c, "event", "qt.QFocusEvent"), End),
+            _func[26] = new MemberFunction(c, "focusNextPrevChild", _n_focusNextPrevChild0, None, Compiled,
+                                           qt_QAbstractItemView_focusNextPrevChild_bool_QAbstractItemView_bool, Return, "bool", Parameters,
+                                           new Param(c, "this", "qt.QAbstractItemView"), new Param(c, "next", "bool"), End),
+            _func[27] =
+                new MemberFunction(c, "focusOutEvent", _n_focusOutEvent0, None, Compiled,
+                                   qt_QAbstractItemView_focusOutEvent_void_QAbstractItemView_QFocusEvent, Return, "void", Parameters,
+                                   new Param(c, "this", "qt.QAbstractItemView"), new Param(c, "event", "qt.QFocusEvent"), End),
             // MISSING: inputMethodEvent (void; QAbstractItemView this,
             // "QInputMethodEvent *" event) // protected
-            _func[28] = new MemberFunction(
-                c, "keyPressEvent", _n_keyPressEvent0, None, Compiled,
-                qt_QAbstractItemView_keyPressEvent_void_QAbstractItemView_QKeyEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractItemView"),
-                new Param(c, "event", "qt.QKeyEvent"), End),
-            _func[29] = new MemberFunction(
-                c, "mouseDoubleClickEvent", _n_mouseDoubleClickEvent0, None,
-                Compiled,
-                qt_QAbstractItemView_mouseDoubleClickEvent_void_QAbstractItemView_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractItemView"),
-                new Param(c, "event", "qt.QMouseEvent"), End),
-            _func[30] = new MemberFunction(
-                c, "mouseMoveEvent", _n_mouseMoveEvent0, None, Compiled,
-                qt_QAbstractItemView_mouseMoveEvent_void_QAbstractItemView_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractItemView"),
-                new Param(c, "event", "qt.QMouseEvent"), End),
-            _func[31] = new MemberFunction(
-                c, "mousePressEvent", _n_mousePressEvent0, None, Compiled,
-                qt_QAbstractItemView_mousePressEvent_void_QAbstractItemView_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractItemView"),
-                new Param(c, "event", "qt.QMouseEvent"), End),
-            _func[32] = new MemberFunction(
-                c, "mouseReleaseEvent", _n_mouseReleaseEvent0, None, Compiled,
-                qt_QAbstractItemView_mouseReleaseEvent_void_QAbstractItemView_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractItemView"),
-                new Param(c, "event", "qt.QMouseEvent"), End),
-            _func[33] = new MemberFunction(
-                c, "resizeEvent", _n_resizeEvent0, None, Compiled,
-                qt_QAbstractItemView_resizeEvent_void_QAbstractItemView_QResizeEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractItemView"),
-                new Param(c, "event", "qt.QResizeEvent"), End),
-            _func[34] = new MemberFunction(
-                c, "timerEvent", _n_timerEvent0, None, Compiled,
-                qt_QAbstractItemView_timerEvent_void_QAbstractItemView_QTimerEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractItemView"),
-                new Param(c, "event", "qt.QTimerEvent"), End),
-            _func[35] = new MemberFunction(
-                c, "viewportEvent", _n_viewportEvent0, None, Compiled,
-                qt_QAbstractItemView_viewportEvent_bool_QAbstractItemView_QEvent,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QAbstractItemView"),
-                new Param(c, "event", "qt.QEvent"), End),
-            _func[36] = new MemberFunction(
-                c, "viewportSizeHint", _n_viewportSizeHint0, None, Compiled,
-                qt_QAbstractItemView_viewportSizeHint_QSize_QAbstractItemView,
-                Return, "qt.QSize", Parameters,
-                new Param(c, "this", "qt.QAbstractItemView"), End),
-            _func[37] = new MemberFunction(
-                c, "setupViewport", _n_setupViewport0, None, Compiled,
-                qt_QAbstractItemView_setupViewport_void_QAbstractItemView_QWidget,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractItemView"),
-                new Param(c, "viewport", "qt.QWidget"), End),
-            _func[38] = new MemberFunction(
-                c, "minimumSizeHint", _n_minimumSizeHint0, None, Compiled,
-                qt_QAbstractItemView_minimumSizeHint_QSize_QAbstractItemView,
-                Return, "qt.QSize", Parameters,
-                new Param(c, "this", "qt.QAbstractItemView"), End),
-            _func[39] = new MemberFunction(
-                c, "sizeHint", _n_sizeHint0, None, Compiled,
-                qt_QAbstractItemView_sizeHint_QSize_QAbstractItemView, Return,
-                "qt.QSize", Parameters,
-                new Param(c, "this", "qt.QAbstractItemView"), End),
-            _func[40] = new MemberFunction(
-                c, "scrollContentsBy", _n_scrollContentsBy0, None, Compiled,
-                qt_QAbstractItemView_scrollContentsBy_void_QAbstractItemView_int_int,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractItemView"),
-                new Param(c, "dx", "int"), new Param(c, "dy", "int"), End),
-            _func[41] = new MemberFunction(
-                c, "contextMenuEvent", _n_contextMenuEvent0, None, Compiled,
-                qt_QAbstractItemView_contextMenuEvent_void_QAbstractItemView_QContextMenuEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractItemView"),
-                new Param(c, "e", "qt.QContextMenuEvent"), End),
-            _func[42] = new MemberFunction(
-                c, "paintEvent", _n_paintEvent0, None, Compiled,
-                qt_QAbstractItemView_paintEvent_void_QAbstractItemView_QPaintEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractItemView"),
-                new Param(c, "event", "qt.QPaintEvent"), End),
-            _func[43] = new MemberFunction(
-                c, "wheelEvent", _n_wheelEvent0, None, Compiled,
-                qt_QAbstractItemView_wheelEvent_void_QAbstractItemView_QWheelEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractItemView"),
-                new Param(c, "e", "qt.QWheelEvent"), End),
+            _func[28] = new MemberFunction(c, "keyPressEvent", _n_keyPressEvent0, None, Compiled,
+                                           qt_QAbstractItemView_keyPressEvent_void_QAbstractItemView_QKeyEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QAbstractItemView"), new Param(c, "event", "qt.QKeyEvent"), End),
+            _func[29] =
+                new MemberFunction(c, "mouseDoubleClickEvent", _n_mouseDoubleClickEvent0, None, Compiled,
+                                   qt_QAbstractItemView_mouseDoubleClickEvent_void_QAbstractItemView_QMouseEvent, Return, "void",
+                                   Parameters, new Param(c, "this", "qt.QAbstractItemView"), new Param(c, "event", "qt.QMouseEvent"), End),
+            _func[30] =
+                new MemberFunction(c, "mouseMoveEvent", _n_mouseMoveEvent0, None, Compiled,
+                                   qt_QAbstractItemView_mouseMoveEvent_void_QAbstractItemView_QMouseEvent, Return, "void", Parameters,
+                                   new Param(c, "this", "qt.QAbstractItemView"), new Param(c, "event", "qt.QMouseEvent"), End),
+            _func[31] =
+                new MemberFunction(c, "mousePressEvent", _n_mousePressEvent0, None, Compiled,
+                                   qt_QAbstractItemView_mousePressEvent_void_QAbstractItemView_QMouseEvent, Return, "void", Parameters,
+                                   new Param(c, "this", "qt.QAbstractItemView"), new Param(c, "event", "qt.QMouseEvent"), End),
+            _func[32] =
+                new MemberFunction(c, "mouseReleaseEvent", _n_mouseReleaseEvent0, None, Compiled,
+                                   qt_QAbstractItemView_mouseReleaseEvent_void_QAbstractItemView_QMouseEvent, Return, "void", Parameters,
+                                   new Param(c, "this", "qt.QAbstractItemView"), new Param(c, "event", "qt.QMouseEvent"), End),
+            _func[33] = new MemberFunction(c, "resizeEvent", _n_resizeEvent0, None, Compiled,
+                                           qt_QAbstractItemView_resizeEvent_void_QAbstractItemView_QResizeEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QAbstractItemView"), new Param(c, "event", "qt.QResizeEvent"), End),
+            _func[34] = new MemberFunction(c, "timerEvent", _n_timerEvent0, None, Compiled,
+                                           qt_QAbstractItemView_timerEvent_void_QAbstractItemView_QTimerEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QAbstractItemView"), new Param(c, "event", "qt.QTimerEvent"), End),
+            _func[35] = new MemberFunction(c, "viewportEvent", _n_viewportEvent0, None, Compiled,
+                                           qt_QAbstractItemView_viewportEvent_bool_QAbstractItemView_QEvent, Return, "bool", Parameters,
+                                           new Param(c, "this", "qt.QAbstractItemView"), new Param(c, "event", "qt.QEvent"), End),
+            _func[36] = new MemberFunction(c, "viewportSizeHint", _n_viewportSizeHint0, None, Compiled,
+                                           qt_QAbstractItemView_viewportSizeHint_QSize_QAbstractItemView, Return, "qt.QSize", Parameters,
+                                           new Param(c, "this", "qt.QAbstractItemView"), End),
+            _func[37] = new MemberFunction(c, "setupViewport", _n_setupViewport0, None, Compiled,
+                                           qt_QAbstractItemView_setupViewport_void_QAbstractItemView_QWidget, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QAbstractItemView"), new Param(c, "viewport", "qt.QWidget"), End),
+            _func[38] = new MemberFunction(c, "minimumSizeHint", _n_minimumSizeHint0, None, Compiled,
+                                           qt_QAbstractItemView_minimumSizeHint_QSize_QAbstractItemView, Return, "qt.QSize", Parameters,
+                                           new Param(c, "this", "qt.QAbstractItemView"), End),
+            _func[39] =
+                new MemberFunction(c, "sizeHint", _n_sizeHint0, None, Compiled, qt_QAbstractItemView_sizeHint_QSize_QAbstractItemView,
+                                   Return, "qt.QSize", Parameters, new Param(c, "this", "qt.QAbstractItemView"), End),
+            _func[40] =
+                new MemberFunction(c, "scrollContentsBy", _n_scrollContentsBy0, None, Compiled,
+                                   qt_QAbstractItemView_scrollContentsBy_void_QAbstractItemView_int_int, Return, "void", Parameters,
+                                   new Param(c, "this", "qt.QAbstractItemView"), new Param(c, "dx", "int"), new Param(c, "dy", "int"), End),
+            _func[41] = new MemberFunction(c, "contextMenuEvent", _n_contextMenuEvent0, None, Compiled,
+                                           qt_QAbstractItemView_contextMenuEvent_void_QAbstractItemView_QContextMenuEvent, Return, "void",
+                                           Parameters, new Param(c, "this", "qt.QAbstractItemView"),
+                                           new Param(c, "e", "qt.QContextMenuEvent"), End),
+            _func[42] = new MemberFunction(c, "paintEvent", _n_paintEvent0, None, Compiled,
+                                           qt_QAbstractItemView_paintEvent_void_QAbstractItemView_QPaintEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QAbstractItemView"), new Param(c, "event", "qt.QPaintEvent"), End),
+            _func[43] = new MemberFunction(c, "wheelEvent", _n_wheelEvent0, None, Compiled,
+                                           qt_QAbstractItemView_wheelEvent_void_QAbstractItemView_QWheelEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QAbstractItemView"), new Param(c, "e", "qt.QWheelEvent"), End),
             // static functions
             EndArguments);
         globalScope()->addSymbols(EndArguments);

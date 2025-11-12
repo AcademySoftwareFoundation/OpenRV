@@ -34,8 +34,7 @@ namespace Mu
 #define NODE_DECLARATION(NAME, TYPE) TYPE NAME(const Mu::Node&, Mu::Thread&)
 #define NODE_THIS node_
 #define NODE_THREAD thread_
-#define NODE_IMPLEMENTATION(NAME, TYPE) \
-    TYPE NAME(const Mu::Node& NODE_THIS, Mu::Thread& NODE_THREAD)
+#define NODE_IMPLEMENTATION(NAME, TYPE) TYPE NAME(const Mu::Node& NODE_THIS, Mu::Thread& NODE_THREAD)
 #define NODE_EVAL() (NODE_THIS.eval(NODE_THREAD))
 #define NODE_DATA(X) (static_cast<const Mu::DataNode&>(NODE_THIS)._data.as<X>())
 // #define NODE_DATA(X) (static_cast<const Mu::DataNode&>(NODE_THIS)._data._ ##
@@ -43,12 +42,8 @@ namespace Mu
 #define NODE_EVAL_VALUE(N, T) ((N)->type()->nodeEval((N), (T)))
 #define NODE_NUM_ARGS() (NODE_THIS.numArgs())
 
-#define NODE_ARG(N, T)                                                        \
-    (Mu::evalNodeFunc<T>(NODE_THIS.argNode(N)->func(), *NODE_THIS.argNode(N), \
-                         NODE_THREAD))
-#define NODE_ARG_OBJECT(N, T)                                                  \
-    (Mu::evalNodeFunc<T*>(NODE_THIS.argNode(N)->func(), *NODE_THIS.argNode(N), \
-                          NODE_THREAD))
+#define NODE_ARG(N, T) (Mu::evalNodeFunc<T>(NODE_THIS.argNode(N)->func(), *NODE_THIS.argNode(N), NODE_THREAD))
+#define NODE_ARG_OBJECT(N, T) (Mu::evalNodeFunc<T*>(NODE_THIS.argNode(N)->func(), *NODE_THIS.argNode(N), NODE_THREAD))
 #define NODE_RETURN(X) return X
 #define NODE_ANY_TYPE_ARG(N) NODE_EVAL_VALUE(NODE_THIS.argNode(N), NODE_THREAD)
 
@@ -113,65 +108,29 @@ namespace Mu
         void releaseArgv() { _argv = 0; }
 
 #ifdef MU_FUNCTION_UNION
-        Value valueArg(int i, Thread& t) const
-        {
-            return (*_argv[i]->_func._valueFunc)(*_argv[i], t);
-        }
+        Value valueArg(int i, Thread& t) const { return (*_argv[i]->_func._valueFunc)(*_argv[i], t); }
 
-        float floatArg(int i, Thread& t) const
-        {
-            return (*_argv[i]->_func._floatFunc)(*_argv[i], t);
-        }
+        float floatArg(int i, Thread& t) const { return (*_argv[i]->_func._floatFunc)(*_argv[i], t); }
 
-        int intArg(int i, Thread& t) const
-        {
-            return (*_argv[i]->_func._intFunc)(*_argv[i], t);
-        }
+        int intArg(int i, Thread& t) const { return (*_argv[i]->_func._intFunc)(*_argv[i], t); }
 
-        short shortArg(int i, Thread& t) const
-        {
-            return (*_argv[i]->_func._shortFunc)(*_argv[i], t);
-        }
+        short shortArg(int i, Thread& t) const { return (*_argv[i]->_func._shortFunc)(*_argv[i], t); }
 
-        char charArg(int i, Thread& t) const
-        {
-            return (*_argv[i]->_func._charFunc)(*_argv[i], t);
-        }
+        char charArg(int i, Thread& t) const { return (*_argv[i]->_func._charFunc)(*_argv[i], t); }
 
-        bool boolArg(int i, Thread& t) const
-        {
-            return (*_argv[i]->_func._boolFunc)(*_argv[i], t);
-        }
+        bool boolArg(int i, Thread& t) const { return (*_argv[i]->_func._boolFunc)(*_argv[i], t); }
 
-        Vector4f Vector4fArg(int i, Thread& t) const
-        {
-            return (*_argv[i]->_func._Vector4fFunc)(*_argv[i], t);
-        }
+        Vector4f Vector4fArg(int i, Thread& t) const { return (*_argv[i]->_func._Vector4fFunc)(*_argv[i], t); }
 
-        Vector3f Vector3fArg(int i, Thread& t) const
-        {
-            return (*_argv[i]->_func._Vector3fFunc)(*_argv[i], t);
-        }
+        Vector3f Vector3fArg(int i, Thread& t) const { return (*_argv[i]->_func._Vector3fFunc)(*_argv[i], t); }
 
-        Vector2f Vector2fArg(int i, Thread& t) const
-        {
-            return (*_argv[i]->_func._Vector2fFunc)(*_argv[i], t);
-        }
+        Vector2f Vector2fArg(int i, Thread& t) const { return (*_argv[i]->_func._Vector2fFunc)(*_argv[i], t); }
 
-        Pointer PointerArg(int i, Thread& t) const
-        {
-            return (*_argv[i]->_func._PointerFunc)(*_argv[i], t);
-        }
+        Pointer PointerArg(int i, Thread& t) const { return (*_argv[i]->_func._PointerFunc)(*_argv[i], t); }
 
-        void voidArg(int i, Thread& t) const
-        {
-            (*_argv[i]->_func._voidFunc)(*_argv[i], t);
-        }
+        void voidArg(int i, Thread& t) const { (*_argv[i]->_func._voidFunc)(*_argv[i], t); }
 #else
-        const Value arg(int i, Thread& t) const
-        {
-            return (*_argv[i]->_func)(*_argv[i], t);
-        }
+        const Value arg(int i, Thread& t) const { return (*_argv[i]->_func)(*_argv[i], t); }
 #endif
 
         //
@@ -244,9 +203,7 @@ namespace Mu
     public:
         MU_GC_NEW_DELETE
         AnnotatedNode();
-        AnnotatedNode(int numArgs, NodeFunc F, const Symbol* s,
-                      unsigned short linenum, unsigned short charnum,
-                      Name file);
+        AnnotatedNode(int numArgs, NodeFunc F, const Symbol* s, unsigned short linenum, unsigned short charnum, Name file);
 
         virtual ~AnnotatedNode();
 

@@ -45,13 +45,10 @@ namespace TwkUtil
             ASyncNonBuffering
         };
 
-        FileStream(const std::string& filename, size_t startOffset,
-                   size_t readSize, Type type = Buffering,
-                   size_t chunkSize = 61440, int maxInFlight = 16,
-                   bool deleteOnDestruction = true);
+        FileStream(const std::string& filename, size_t startOffset, size_t readSize, Type type = Buffering, size_t chunkSize = 61440,
+                   int maxInFlight = 16, bool deleteOnDestruction = true);
 
-        FileStream(const std::string& filename, Type type = Buffering,
-                   size_t chunkSize = 61440, int maxInFlight = 16,
+        FileStream(const std::string& filename, Type type = Buffering, size_t chunkSize = 61440, int maxInFlight = 16,
                    bool deleteOnDestruction = true);
 
         ~FileStream();

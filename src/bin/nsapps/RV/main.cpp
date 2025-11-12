@@ -114,8 +114,7 @@ static int set_realtime(int period, int computation, int constraint)
     ttcpolicy.constraint = constraint;   // HZ/2200;
     ttcpolicy.preemptible = 1;
 
-    if (thread_policy_set(mach_thread_self(), THREAD_TIME_CONSTRAINT_POLICY,
-                          (thread_policy_t)&ttcpolicy,
+    if (thread_policy_set(mach_thread_self(), THREAD_TIME_CONSTRAINT_POLICY, (thread_policy_t)&ttcpolicy,
                           THREAD_TIME_CONSTRAINT_POLICY_COUNT)
         != KERN_SUCCESS)
     {
@@ -174,16 +173,14 @@ void thread_priority_init()
     ttcpolicy.constraint = bus_speed / rtConstraint;
     ttcpolicy.preemptible = rtPreemptable != 0;
 
-    if (thread_policy_set(mach_thread_self(), THREAD_TIME_CONSTRAINT_POLICY,
-                          (int*)&ttcpolicy, THREAD_TIME_CONSTRAINT_POLICY_COUNT)
+    if (thread_policy_set(mach_thread_self(), THREAD_TIME_CONSTRAINT_POLICY, (int*)&ttcpolicy, THREAD_TIME_CONSTRAINT_POLICY_COUNT)
         != KERN_SUCCESS)
     {
         cout << "INFO: running without real-time scheduling" << endl;
     }
     else
     {
-        cout << "INFO: real-time thread priorities set (bus="
-             << (bus_speed / 1000) << "kHz)" << endl;
+        cout << "INFO: real-time thread priorities set (bus=" << (bus_speed / 1000) << "kHz)" << endl;
     }
 }
 
@@ -229,11 +226,8 @@ static int gc_filter(const char* name, void* ptr, size_t size)
 {
     string s(name);
 
-    if (s.find("/Library/Frameworks/") != string::npos
-        || s.find("/System/Library/Frameworks/") != string::npos
-        || s.find("/usr/lib/") != string::npos
-        || s.find("imageformats/libq") != string::npos
-        || s.find(qtver) != string::npos)
+    if (s.find("/Library/Frameworks/") != string::npos || s.find("/System/Library/Frameworks/") != string::npos
+        || s.find("/usr/lib/") != string::npos || s.find("imageformats/libq") != string::npos || s.find(qtver) != string::npos)
     {
         // cout << "SKIPPING: " << name << endl;
         return 0;
@@ -244,8 +238,7 @@ static int gc_filter(const char* name, void* ptr, size_t size)
     }
 }
 
-void noOpenGLWarnOnStartup(QtMsgType t, const QMessageLogContext& context,
-                           const QString& qmsg)
+void noOpenGLWarnOnStartup(QtMsgType t, const QMessageLogContext& context, const QString& qmsg)
 {
     // This warning appears because RV requires OpenGL 2.1
     // in macOS because it needs legacy functions like glBegin/glEnd
@@ -256,12 +249,11 @@ void noOpenGLWarnOnStartup(QtMsgType t, const QMessageLogContext& context,
     // we don't do any rendering in the web view.
     // Also note the Qt typo "surfcace" (present in at least Qt 6.5.3)
 
-    const QString silenced =
-        "An OpenGL surfcace format was requested that is either not "
-        "version 3.2 or higher or a not Core Profile.\nChromium on "
-        "macOS will fall back to software rendering in this case.\n"
-        "Hardware acceleration and features such as WebGL will not be "
-        "available.";
+    const QString silenced = "An OpenGL surfcace format was requested that is either not "
+                             "version 3.2 or higher or a not Core Profile.\nChromium on "
+                             "macOS will fall back to software rendering in this case.\n"
+                             "Hardware acceleration and features such as WebGL will not be "
+                             "available.";
 
     if (silenced != qmsg)
         std::cout << qmsg.toUtf8().constData() << std::endl;
@@ -271,8 +263,7 @@ int main(int argc, char* argv[])
 {
     if (!getenv("HOME"))
     {
-        cerr << "ERROR: $HOME is not set in the environment and is required."
-             << endl;
+        cerr << "ERROR: $HOME is not set in the environment and is required." << endl;
         exit(-1);
     }
 
@@ -295,8 +286,7 @@ int main(int argc, char* argv[])
     // Qt 5.12.1 specific
     // Disable Qt Quick hardware rendering because QwebEngineView conflicts with
     // QGLWidget
-    setenv("QT_QUICK_BACKEND", "software",
-           0 /* changeFlag : Do not change the existing value */);
+    setenv("QT_QUICK_BACKEND", "software", 0 /* changeFlag : Do not change the existing value */);
 
     // Prevent usage of native sibling widgets on Mac. This attribute can be
     // removed if GLView is changed to inherit from QOpenGLWidget.
@@ -314,8 +304,7 @@ int main(int argc, char* argv[])
     {
         // Prevent Mac from automatically scaling app pixel coordinates in
         // OpenGL
-        setenv("QT_MAC_WANTS_BEST_RESOLUTION_OPENGL_SURFACE", "0",
-               0); /* changeFlag : Do not change the existing value */
+        setenv("QT_MAC_WANTS_BEST_RESOLUTION_OPENGL_SURFACE", "0", 0); /* changeFlag : Do not change the existing value */
 
         unsetenv("QT_SCALE_FACTOR");
         unsetenv("QT_SCREEN_SCALE_FACTORS");
@@ -344,8 +333,7 @@ int main(int argc, char* argv[])
     getrlimit(RLIMIT_NOFILE, &rlim);
     if (rlim.rlim_cur < target)
     {
-        cerr << "WARNING: unable to increase open file limit above "
-             << rlim.rlim_cur << endl;
+        cerr << "WARNING: unable to increase open file limit above " << rlim.rlim_cur << endl;
     }
 #endif
 
@@ -367,9 +355,7 @@ int main(int argc, char* argv[])
     }
     Rv::RvApplication::initializeQSettings(altPrefsPath);
 
-    TwkApp::DarwinBundle bundle("RV", MAJOR_VERSION, MINOR_VERSION,
-                                REVISION_NUMBER,
-                                true /*register rvlink protocol handler*/);
+    TwkApp::DarwinBundle bundle("RV", MAJOR_VERSION, MINOR_VERSION, REVISION_NUMBER, true /*register rvlink protocol handler*/);
 
     bundle.setEnvVar("RV_PYTHONPATH_EXTERNAL", (pythonPath) ? pythonPath : "");
 
@@ -416,8 +402,7 @@ int main(int argc, char* argv[])
         else if (!strcmp(argv[i], "-registerHandler"))
         {
             bundle.registerHandler();
-            cerr << "INFO: registering '" << argv[0]
-                 << "' as default rvlink protocol handler." << endl;
+            cerr << "INFO: registering '" << argv[0] << "' as default rvlink protocol handler." << endl;
             exit(0);
         }
     }
@@ -458,9 +443,7 @@ int main(int argc, char* argv[])
     //  Call the deploy functions
     //
 
-    TWK_DEPLOY_APP_OBJECT dobj(MAJOR_VERSION, MINOR_VERSION, REVISION_NUMBER,
-                               argc, argv, RELEASE_DESCRIPTION,
-                               "HEAD=" GIT_HEAD);
+    TWK_DEPLOY_APP_OBJECT dobj(MAJOR_VERSION, MINOR_VERSION, REVISION_NUMBER, argc, argv, RELEASE_DESCRIPTION, "HEAD=" GIT_HEAD);
 
     Imf::staticInitialize();
     TwkFB::GenericIO::init();    // Initialize TwkFB::GenericIO plugins statics
@@ -491,26 +474,17 @@ int main(int argc, char* argv[])
     char* prefsPath;
     int sleepTime = 0;
 
-    if (arg_parse(
-            nargv.size(), &nargv.front(), "", "", RV_ARG_EXAMPLES, "", "",
-            RV_ARG_SEQUENCE_HELP, "", "", RV_ARG_SOURCE_OPTIONS(opts), "", "",
-            "", ARG_SUBR(Rv::RvApplication::parseInFiles),
-            "Input sequence patterns, images, movies, or directories ",
-            RV_ARG_PARSE_OPTIONS(opts), "-strictlicense",
-            ARG_FLAG(&strictlicense),
-            "Exit rather than consume an RV license if no rvsolo licenses are "
-            "available",
-            "-prefsPath %S", &prefsPath,
-            "Alternate path to preferences directory", "-registerHandler",
-            ARG_FLAG(&registerHandler),
-            "Register this executable as the default rvlink protocol handler "
-            "(OS X only)",
-            "-rt %d %d %d %d", &rtPeriod, &rtComputation, &rtConstraint,
-            &rtPreemptable, "Real time parameters (default=%d %d %d %d)",
-            rtPeriod, rtComputation, rtConstraint, rtPreemptable, "-sleep %d",
-            &sleepTime,
-            "Sleep (in seconds) before starting to allow attaching debugger",
-            NULL)
+    if (arg_parse(nargv.size(), &nargv.front(), "", "", RV_ARG_EXAMPLES, "", "", RV_ARG_SEQUENCE_HELP, "", "", RV_ARG_SOURCE_OPTIONS(opts),
+                  "", "", "", ARG_SUBR(Rv::RvApplication::parseInFiles), "Input sequence patterns, images, movies, or directories ",
+                  RV_ARG_PARSE_OPTIONS(opts), "-strictlicense", ARG_FLAG(&strictlicense),
+                  "Exit rather than consume an RV license if no rvsolo licenses are "
+                  "available",
+                  "-prefsPath %S", &prefsPath, "Alternate path to preferences directory", "-registerHandler", ARG_FLAG(&registerHandler),
+                  "Register this executable as the default rvlink protocol handler "
+                  "(OS X only)",
+                  "-rt %d %d %d %d", &rtPeriod, &rtComputation, &rtConstraint, &rtPreemptable, "Real time parameters (default=%d %d %d %d)",
+                  rtPeriod, rtComputation, rtConstraint, rtPreemptable, "-sleep %d", &sleepTime,
+                  "Sleep (in seconds) before starting to allow attaching debugger", NULL)
         < 0)
     {
         exit(-1);
@@ -525,8 +499,7 @@ int main(int argc, char* argv[])
 
     if (opts.showVersion)
     {
-        cout << MAJOR_VERSION << "." << MINOR_VERSION << "." << REVISION_NUMBER
-             << endl;
+        cout << MAJOR_VERSION << "." << MINOR_VERSION << "." << REVISION_NUMBER << endl;
         exit(0);
     }
 
@@ -561,9 +534,7 @@ int main(int argc, char* argv[])
     }
     else
     {
-        Imf::setGlobalThreadCount(TwkUtil::SystemInfo::numCPUs() > 1
-                                      ? (TwkUtil::SystemInfo::numCPUs() - 1)
-                                      : 1);
+        Imf::setGlobalThreadCount(TwkUtil::SystemInfo::numCPUs() > 1 ? (TwkUtil::SystemInfo::numCPUs() - 1) : 1);
     }
 
     //
@@ -596,8 +567,7 @@ int main(int argc, char* argv[])
 
     QTranslator* translator = new QTranslator();
     QLocale locale = QLocale(getenv("ORIGINALLOCAL"));
-    if (translator->load(locale, QLatin1String("i18n"), "_",
-                         QLatin1String(":/translations")))
+    if (translator->load(locale, QLatin1String("i18n"), "_", QLatin1String(":/translations")))
     {
         app->installTranslator(translator);
     }
@@ -646,22 +616,15 @@ int main(int argc, char* argv[])
     bundle.setEnvVar("RV_APP_RV", bundle.executableFile("RV"));
     bundle.setEnvVar("RV_APP_RV_SHORT_NAME", "RV");
     bundle.setEnvVar("RV_APP_MANUAL", bundle.resource("rv_manual", "pdf"));
-    bundle.setEnvVar("RV_APP_MANUAL_HTML",
-                     bundle.resource("rv_manual", "html"));
-    bundle.setEnvVar("RV_APP_SDI_MANUAL",
-                     bundle.resource("rvsdi_manual", "pdf"));
-    bundle.setEnvVar("RV_APP_SDI_MANUAL_HTML",
-                     bundle.resource("rvsdi_manual", "html"));
-    bundle.setEnvVar("RV_APP_REFERENCE_MANUAL",
-                     bundle.resource("rv_reference", "pdf"));
-    bundle.setEnvVar("RV_APP_REFERENCE_MANUAL_HTML",
-                     bundle.resource("rv_reference", "html"));
+    bundle.setEnvVar("RV_APP_MANUAL_HTML", bundle.resource("rv_manual", "html"));
+    bundle.setEnvVar("RV_APP_SDI_MANUAL", bundle.resource("rvsdi_manual", "pdf"));
+    bundle.setEnvVar("RV_APP_SDI_MANUAL_HTML", bundle.resource("rvsdi_manual", "html"));
+    bundle.setEnvVar("RV_APP_REFERENCE_MANUAL", bundle.resource("rv_reference", "pdf"));
+    bundle.setEnvVar("RV_APP_REFERENCE_MANUAL_HTML", bundle.resource("rv_reference", "html"));
     bundle.setEnvVar("RV_APP_MU_MANUAL", bundle.resource("mu", "pdf"));
     bundle.setEnvVar("RV_APP_GTO_REFERENCE", bundle.resource("gto", "pdf"));
-    bundle.setEnvVar("RV_APP_RELEASE_NOTES",
-                     bundle.resource("rv_release_notes", "html"));
-    bundle.setEnvVar("RV_APP_LICENSES_NOTES",
-                     bundle.resource("rv_client_licenses", "html"));
+    bundle.setEnvVar("RV_APP_RELEASE_NOTES", bundle.resource("rv_release_notes", "html"));
+    bundle.setEnvVar("RV_APP_LICENSES_NOTES", bundle.resource("rv_client_licenses", "html"));
     bundle.addPathToEnvVar("OIIO_LIBRARY_PATH", bundle.appPluginPath("OIIO"));
 
     //
@@ -686,8 +649,7 @@ int main(int argc, char* argv[])
     }
     catch (...)
     {
-        cerr << "WARNING: a problem occured while loading image plugins."
-             << endl;
+        cerr << "WARNING: a problem occured while loading image plugins." << endl;
         cerr << "         some plugins may not have been loaded." << endl;
     }
 
@@ -742,11 +704,9 @@ int main(int argc, char* argv[])
             exit(-1);
         }
 
-        TwkApp::initWithFile(TwkApp::muContext(), TwkApp::muProcess(),
-                             TwkApp::muModuleList(), muInitFile.c_str());
+        TwkApp::initWithFile(TwkApp::muContext(), TwkApp::muProcess(), TwkApp::muModuleList(), muInitFile.c_str());
 
-        TwkApp::pyInitWithFile(pyInitFile.c_str(), Rv::pyRvAppCommands(),
-                               Rv::pyUICommands());
+        TwkApp::pyInitWithFile(pyInitFile.c_str(), Rv::pyRvAppCommands(), Rv::pyUICommands());
     }
     catch (const exception& e)
     {
@@ -799,8 +759,7 @@ int main(int argc, char* argv[])
         }
         catch (const exception& e)
         {
-            cerr << "ERROR: Unhandled exception during execution: " << e.what()
-                 << endl;
+            cerr << "ERROR: Unhandled exception during execution: " << e.what() << endl;
 
             exit(-1);
         }

@@ -63,75 +63,35 @@ namespace TwkFB
             return F(slop / 2.0);
         }
 
-        template <> double roundingSlop<double, unsigned char>()
-        {
-            return 1.0 / 255.0 / 2.0;
-        }
+        template <> double roundingSlop<double, unsigned char>() { return 1.0 / 255.0 / 2.0; }
 
-        template <> double roundingSlop<float, unsigned char>()
-        {
-            return 1.0 / 255.0 / 2.0;
-        }
+        template <> double roundingSlop<float, unsigned char>() { return 1.0 / 255.0 / 2.0; }
 
-        template <> double roundingSlop<half, unsigned char>()
-        {
-            return 1.0 / 255.0 / 2.0;
-        }
+        template <> double roundingSlop<half, unsigned char>() { return 1.0 / 255.0 / 2.0; }
 
-        template <> double roundingSlop<double, unsigned short>()
-        {
-            return 1.0 / 65535.0 / 2.0;
-        }
+        template <> double roundingSlop<double, unsigned short>() { return 1.0 / 65535.0 / 2.0; }
 
-        template <> double roundingSlop<float, unsigned short>()
-        {
-            return 1.0 / 65535.0 / 2.0;
-        }
+        template <> double roundingSlop<float, unsigned short>() { return 1.0 / 65535.0 / 2.0; }
 
-        template <> double roundingSlop<half, unsigned short>()
-        {
-            return 1.0 / 65535.0 / 2.0;
-        }
+        template <> double roundingSlop<half, unsigned short>() { return 1.0 / 65535.0 / 2.0; }
 
-        template <> double roundingSlop<double, unsigned int>()
-        {
-            return 1.0 / 65535.0 / 2.0;
-        }
+        template <> double roundingSlop<double, unsigned int>() { return 1.0 / 65535.0 / 2.0; }
 
-        template <> double roundingSlop<float, unsigned int>()
-        {
-            return 1.0 / 65535.0 / 2.0;
-        }
+        template <> double roundingSlop<float, unsigned int>() { return 1.0 / 65535.0 / 2.0; }
 
-        template <> double roundingSlop<half, unsigned int>()
-        {
-            return 1.0 / 65535.0 / 2.0;
-        }
+        template <> double roundingSlop<half, unsigned int>() { return 1.0 / 65535.0 / 2.0; }
 
         template <typename A, typename B> A roundingMask() { return 0; }
 
-        template <> unsigned short roundingMask<unsigned short, unsigned char>()
-        {
-            return 0xff;
-        }
+        template <> unsigned short roundingMask<unsigned short, unsigned char>() { return 0xff; }
 
-        template <> unsigned int roundingMask<unsigned int, unsigned char>()
-        {
-            return 0xffffff;
-        }
+        template <> unsigned int roundingMask<unsigned int, unsigned char>() { return 0xffffff; }
 
         template <typename A, typename B> A roundingCenter() { return 0; }
 
-        template <>
-        unsigned short roundingCenter<unsigned short, unsigned char>()
-        {
-            return 0xff / 2;
-        }
+        template <> unsigned short roundingCenter<unsigned short, unsigned char>() { return 0xff / 2; }
 
-        template <> unsigned int roundingCenter<unsigned int, unsigned char>()
-        {
-            return 0xffffff / 2;
-        }
+        template <> unsigned int roundingCenter<unsigned int, unsigned char>() { return 0xffffff / 2; }
 
         //
         //  Specialized copy functions. These are scanline based in case the
@@ -140,8 +100,7 @@ namespace TwkFB
         //  and sequence viewing so optimization here is a good thing.
         //
 
-        template <typename A, typename B>
-        void copyFloatingToFloating(const FrameBuffer* a, FrameBuffer* b)
+        template <typename A, typename B> void copyFloatingToFloating(const FrameBuffer* a, FrameBuffer* b)
         {
             const size_t w = a->width();
             const size_t h = a->height();
@@ -156,8 +115,7 @@ namespace TwkFB
             }
         }
 
-        template <typename A, typename B>
-        void copyIntegralToIntegral(const FrameBuffer* a, FrameBuffer* b)
+        template <typename A, typename B> void copyIntegralToIntegral(const FrameBuffer* a, FrameBuffer* b)
         {
             const size_t adigits = numeric_limits<A>::digits;
             const size_t bdigits = numeric_limits<B>::digits;
@@ -171,8 +129,7 @@ namespace TwkFB
             if (adigits > bdigits)
             {
                 // For the UINT 32bit case, just pass through the value.
-                const unsigned int bits =
-                    ((adigits == 32) ? 0 : adigits - bdigits);
+                const unsigned int bits = ((adigits == 32) ? 0 : adigits - bdigits);
 
                 for (; in < end; in++, out++)
                 {
@@ -195,8 +152,7 @@ namespace TwkFB
             }
         }
 
-        template <typename I, typename F>
-        void copyIntegralToFloating(const FrameBuffer* a, FrameBuffer* b)
+        template <typename I, typename F> void copyIntegralToFloating(const FrameBuffer* a, FrameBuffer* b)
         {
             const size_t w = a->width();
             const size_t h = a->height();
@@ -217,14 +173,12 @@ namespace TwkFB
             {
                 for (; in < end; in++, out++)
                 {
-                    *out =
-                        float(double(*in) / double(numeric_limits<I>::max()));
+                    *out = float(double(*in) / double(numeric_limits<I>::max()));
                 }
             }
         }
 
-        template <typename F, typename I>
-        void copyFloatingToIntegral(const FrameBuffer* a, FrameBuffer* b)
+        template <typename F, typename I> void copyFloatingToIntegral(const FrameBuffer* a, FrameBuffer* b)
         {
             const double slop = roundingSlop<F, I>();
             const size_t w = a->width();
@@ -246,14 +200,12 @@ namespace TwkFB
             {
                 for (; in < end; in++, out++)
                 {
-                    *out = I(clamp(double(*in) + slop, 0.0, 1.0)
-                             * numeric_limits<I>::max());
+                    *out = I(clamp(double(*in) + slop, 0.0, 1.0) * numeric_limits<I>::max());
                 }
             }
         }
 
-        template <typename F, typename P>
-        void copyIntegral10BitToFloating(const FrameBuffer* a, FrameBuffer* b)
+        template <typename F, typename P> void copyIntegral10BitToFloating(const FrameBuffer* a, FrameBuffer* b)
         {
             const size_t w = a->width();
             const size_t h = a->height();
@@ -278,8 +230,7 @@ namespace TwkFB
             }
         }
 
-        template <typename F, typename P>
-        void copyFloatingToIntegral10Bit(const FrameBuffer* a, FrameBuffer* b)
+        template <typename F, typename P> void copyFloatingToIntegral10Bit(const FrameBuffer* a, FrameBuffer* b)
         {
             const double slop = 1.0 / 1023.0 / 2.0;
             const size_t w = a->width();
@@ -300,8 +251,7 @@ namespace TwkFB
             }
         }
 
-        template <typename B, typename P>
-        void copyIntegral10BitToIntegral(const FrameBuffer* a, FrameBuffer* b)
+        template <typename B, typename P> void copyIntegral10BitToIntegral(const FrameBuffer* a, FrameBuffer* b)
         {
             const size_t adigits = 10;
             const size_t bdigits = numeric_limits<P>::digits;
@@ -312,8 +262,7 @@ namespace TwkFB
             const B* end = in + w * h * d;
             P* out = b->pixels<P>();
 
-            const int bits =
-                ((bdigits < adigits) ? 0 : ((int)bdigits - (int)adigits));
+            const int bits = ((bdigits < adigits) ? 0 : ((int)bdigits - (int)adigits));
 
             for (; in < end; in++)
             {
@@ -326,9 +275,7 @@ namespace TwkFB
             }
         }
 
-        template <>
-        void copyIntegral10BitToIntegral<unsigned char, Pixel10>(
-            const FrameBuffer* a, FrameBuffer* b)
+        template <> void copyIntegral10BitToIntegral<unsigned char, Pixel10>(const FrameBuffer* a, FrameBuffer* b)
         {
             const size_t w = a->width();
             const size_t h = a->height();
@@ -341,18 +288,14 @@ namespace TwkFB
             {
                 *out = in->red == 0x3ff ? (in->red >> 2) : ((in->red + 1) >> 2);
                 out++;
-                *out = in->green == 0x3ff ? (in->green >> 2)
-                                          : ((in->green + 1) >> 2);
+                *out = in->green == 0x3ff ? (in->green >> 2) : ((in->green + 1) >> 2);
                 out++;
-                *out =
-                    in->blue == 0x3ff ? (in->blue >> 2) : ((in->blue + 1) >> 2);
+                *out = in->blue == 0x3ff ? (in->blue >> 2) : ((in->blue + 1) >> 2);
                 out++;
             }
         }
 
-        template <>
-        void copyIntegral10BitToIntegral<unsigned char, Pixel10Rev>(
-            const FrameBuffer* a, FrameBuffer* b)
+        template <> void copyIntegral10BitToIntegral<unsigned char, Pixel10Rev>(const FrameBuffer* a, FrameBuffer* b)
         {
             const size_t w = a->width();
             const size_t h = a->height();
@@ -365,11 +308,9 @@ namespace TwkFB
             {
                 *out = in->red == 0x3ff ? (in->red >> 2) : ((in->red + 1) >> 2);
                 out++;
-                *out = in->green == 0x3ff ? (in->green >> 2)
-                                          : ((in->green + 1) >> 2);
+                *out = in->green == 0x3ff ? (in->green >> 2) : ((in->green + 1) >> 2);
                 out++;
-                *out =
-                    in->blue == 0x3ff ? (in->blue >> 2) : ((in->blue + 1) >> 2);
+                *out = in->blue == 0x3ff ? (in->blue >> 2) : ((in->blue + 1) >> 2);
                 out++;
             }
         }
@@ -384,17 +325,13 @@ namespace TwkFB
     {
         assert(a->width() == b->width() && a->height() == b->height());
 
-        int numColorsA = (a->dataType() == FrameBuffer::PACKED_R10_G10_B10_X2
-                          || a->dataType() == FrameBuffer::PACKED_X2_B10_G10_R10
-                          || a->dataType() == FrameBuffer::PACKED_Y8_Cb8_Y8_Cr8
-                          || a->dataType() == FrameBuffer::PACKED_Cb8_Y8_Cr8_Y8)
+        int numColorsA = (a->dataType() == FrameBuffer::PACKED_R10_G10_B10_X2 || a->dataType() == FrameBuffer::PACKED_X2_B10_G10_R10
+                          || a->dataType() == FrameBuffer::PACKED_Y8_Cb8_Y8_Cr8 || a->dataType() == FrameBuffer::PACKED_Cb8_Y8_Cr8_Y8)
                              ? 3
                              : a->numChannels();
 
-        int numColorsB = (b->dataType() == FrameBuffer::PACKED_R10_G10_B10_X2
-                          || a->dataType() == FrameBuffer::PACKED_X2_B10_G10_R10
-                          || b->dataType() == FrameBuffer::PACKED_Y8_Cb8_Y8_Cr8
-                          || b->dataType() == FrameBuffer::PACKED_Cb8_Y8_Cr8_Y8)
+        int numColorsB = (b->dataType() == FrameBuffer::PACKED_R10_G10_B10_X2 || a->dataType() == FrameBuffer::PACKED_X2_B10_G10_R10
+                          || b->dataType() == FrameBuffer::PACKED_Y8_Cb8_Y8_Cr8 || b->dataType() == FrameBuffer::PACKED_Cb8_Y8_Cr8_Y8)
                              ? 3
                              : a->numChannels();
 
@@ -404,8 +341,7 @@ namespace TwkFB
 
         if (a->dataType() == b->dataType())
         {
-            memcpy(b->pixels<unsigned char>(), a->pixels<unsigned char>(),
-                   a->dataSize());
+            memcpy(b->pixels<unsigned char>(), a->pixels<unsigned char>(), a->dataSize());
         }
         else if (b->dataType() == FrameBuffer::UCHAR)
         {
@@ -638,8 +574,7 @@ namespace TwkFB
         }
     }
 
-    FrameBuffer* copyConvertYRYBYtoYUV(const FrameBuffer* from,
-                                       FrameBuffer::DataType type)
+    FrameBuffer* copyConvertYRYBYtoYUV(const FrameBuffer* from, FrameBuffer::DataType type)
     {
         if (from->isPlanar())
         {
@@ -663,8 +598,7 @@ namespace TwkFB
 
             if (ux != 1.0 || uy != 1.0)
             {
-                FrameBuffer* fb =
-                    new FrameBuffer(inRY->width(), inRY->height(), 1, type);
+                FrameBuffer* fb = new FrameBuffer(inRY->width(), inRY->height(), 1, type);
                 fb->setChannelName(0, "U");
                 fb->setOrientation(inRY->orientation());
 
@@ -675,8 +609,7 @@ namespace TwkFB
 
             if (vx != 1.0 || vy != 1.0)
             {
-                FrameBuffer* fb =
-                    new FrameBuffer(inBY->width(), inBY->height(), 1, type);
+                FrameBuffer* fb = new FrameBuffer(inBY->width(), inBY->height(), 1, type);
                 fb->setChannelName(0, "V");
                 fb->setOrientation(inBY->orientation());
 
@@ -725,8 +658,7 @@ namespace TwkFB
     {
 
         template <typename A, typename B>
-        void applyFloatingToFloating(const FrameBuffer* a, FrameBuffer* b,
-                                     ColorTransformFunc F, void* data)
+        void applyFloatingToFloating(const FrameBuffer* a, FrameBuffer* b, ColorTransformFunc F, void* data)
         {
             unsigned int n = a->width() * a->numChannels();
             unsigned int nrow = a->height();
@@ -738,26 +670,21 @@ namespace TwkFB
                 const A* ap = a->FrameBuffer::scanline<A>(row);
                 B* bp = b->FrameBuffer::scanline<B>(row);
 
-                for (float *fp = &scanline.front(), *ep = fp + n; fp < ep;
-                     fp++, ap++)
+                for (float *fp = &scanline.front(), *ep = fp + n; fp < ep; fp++, ap++)
                 {
                     *fp = float(*ap);
                 }
 
-                F(&scanline.front(), &scanline.front(), a->numChannels(),
-                  a->width(), data);
+                F(&scanline.front(), &scanline.front(), a->numChannels(), a->width(), data);
 
-                for (float *fp = &scanline.front(), *ep = fp + n; fp < ep;
-                     fp++, bp++)
+                for (float *fp = &scanline.front(), *ep = fp + n; fp < ep; fp++, bp++)
                 {
                     *bp = B(*fp);
                 }
             }
         }
 
-        template <typename P>
-        void applyIntegral10ToIntegral10(const FrameBuffer* a, FrameBuffer* b,
-                                         ColorTransformFunc F, void* data)
+        template <typename P> void applyIntegral10ToIntegral10(const FrameBuffer* a, FrameBuffer* b, ColorTransformFunc F, void* data)
 
         {
             unsigned int n = a->width() * 3;
@@ -799,8 +726,7 @@ namespace TwkFB
         }
 
         template <typename A, typename B>
-        void applyIntegralToIntegral(const FrameBuffer* a, FrameBuffer* b,
-                                     ColorTransformFunc F, void* data)
+        void applyIntegralToIntegral(const FrameBuffer* a, FrameBuffer* b, ColorTransformFunc F, void* data)
 
         {
             unsigned int n = a->width() * a->numChannels();
@@ -817,17 +743,14 @@ namespace TwkFB
                 const A* ap = a->FrameBuffer::scanline<A>(row);
                 B* bp = b->FrameBuffer::scanline<B>(row);
 
-                for (float *fp = &scanline.front(), *ep = fp + n; fp < ep;
-                     fp++, ap++)
+                for (float *fp = &scanline.front(), *ep = fp + n; fp < ep; fp++, ap++)
                 {
                     *fp = float(*ap) / adiv;
                 }
 
-                F(&scanline.front(), &scanline.front(), a->numChannels(),
-                  a->width(), data);
+                F(&scanline.front(), &scanline.front(), a->numChannels(), a->width(), data);
 
-                for (float *fp = &scanline.front(), *ep = fp + n; fp < ep;
-                     fp++, bp++)
+                for (float *fp = &scanline.front(), *ep = fp + n; fp < ep; fp++, bp++)
                 {
                     *bp = B(clamp(*fp, 0.0f, 1.0f) * bmult);
                 }
@@ -835,8 +758,7 @@ namespace TwkFB
         }
 
         template <typename I, typename F>
-        void applyIntegralToFloating(const FrameBuffer* a, FrameBuffer* b,
-                                     ColorTransformFunc C, void* data)
+        void applyIntegralToFloating(const FrameBuffer* a, FrameBuffer* b, ColorTransformFunc C, void* data)
         {
             unsigned int n = a->width() * a->numChannels();
             unsigned int nrow = a->height();
@@ -849,24 +771,20 @@ namespace TwkFB
                 const I* ap = a->FrameBuffer::scanline<I>(row);
                 F* bp = b->FrameBuffer::scanline<F>(row);
 
-                for (float *fp = &scanline.front(), *ep = fp + n; fp < ep;
-                     fp++, ap++)
+                for (float *fp = &scanline.front(), *ep = fp + n; fp < ep; fp++, ap++)
                 {
                     *fp = float(*ap) / adiv;
                 }
 
                 if (numeric_limits<float>::digits == numeric_limits<F>::digits)
                 {
-                    C(&scanline.front(), &scanline.front(), a->numChannels(),
-                      a->width(), data);
+                    C(&scanline.front(), &scanline.front(), a->numChannels(), a->width(), data);
                 }
                 else
                 {
-                    C(&scanline.front(), &scanline.front(), a->numChannels(),
-                      a->width(), data);
+                    C(&scanline.front(), &scanline.front(), a->numChannels(), a->width(), data);
 
-                    for (float *fp = &scanline.front(), *ep = fp + n; fp < ep;
-                         fp++, bp++)
+                    for (float *fp = &scanline.front(), *ep = fp + n; fp < ep; fp++, bp++)
                     {
                         *bp = F(*fp);
                     }
@@ -875,8 +793,7 @@ namespace TwkFB
         }
 
         template <typename F, typename I>
-        void applyFloatingToIntegral(const FrameBuffer* a, FrameBuffer* b,
-                                     ColorTransformFunc C, void* data)
+        void applyFloatingToIntegral(const FrameBuffer* a, FrameBuffer* b, ColorTransformFunc C, void* data)
         {
             unsigned int n = a->width() * a->numChannels();
             unsigned int nrow = a->height();
@@ -911,8 +828,7 @@ namespace TwkFB
 
     } // namespace
 
-    void applyTransform(const FrameBuffer* a, FrameBuffer* b,
-                        ColorTransformFunc F, void* data)
+    void applyTransform(const FrameBuffer* a, FrameBuffer* b, ColorTransformFunc F, void* data)
     {
         assert(a->width() == b->width() && a->height() == b->height());
 
@@ -1133,9 +1049,8 @@ namespace TwkFB
         const double cinbwdiff = cinblack - cinwhite;
     } // namespace
 
-    void logLinearTransform(
-        const float* inPixels, float* outPixels, int channels, int nelements,
-        void* data) // << bool vector indicating which channels to do
+    void logLinearTransform(const float* inPixels, float* outPixels, int channels, int nelements,
+                            void* data) // << bool vector indicating which channels to do
     {
         const float* end = inPixels + (nelements * channels);
         bool* channelMask = reinterpret_cast<bool*>(data);
@@ -1145,15 +1060,13 @@ namespace TwkFB
         {
             if (channelMask[count % channels])
             {
-                *outPixels =
-                    (Math<double>::pow(10, *p * 3.41) - cinblack) / cinwbdiff;
+                *outPixels = (Math<double>::pow(10, *p * 3.41) - cinblack) / cinwbdiff;
             }
         }
     }
 
-    void linearLogTransform(
-        const float* inPixels, float* outPixels, int channels, int nelements,
-        void* data) // << bool array indicating which channels to do
+    void linearLogTransform(const float* inPixels, float* outPixels, int channels, int nelements,
+                            void* data) // << bool array indicating which channels to do
     {
         const float* end = inPixels + (nelements * channels);
         bool* channelMask = reinterpret_cast<bool*>(data);
@@ -1163,38 +1076,27 @@ namespace TwkFB
         {
             if (channelMask[count % channels])
             {
-                *outPixels =
-                    Math<double>::log10((cinblack / cinwbdiff + *p) * cinwbdiff)
-                    / 3.41;
+                *outPixels = Math<double>::log10((cinblack / cinwbdiff + *p) * cinwbdiff) / 3.41;
             }
         }
     }
 
-    void logCToLinearTransform(const float* inPixels, float* outPixels,
-                               int channels, int nelements,
+    void logCToLinearTransform(const float* inPixels, float* outPixels, int channels, int nelements,
                                void* data) // << float vector params
     {
         const float* end = inPixels + (nelements * channels);
-        LogCTransformParams* params =
-            reinterpret_cast<LogCTransformParams*>(data);
+        LogCTransformParams* params = reinterpret_cast<LogCTransformParams*>(data);
         bool* channelMask = params->chmap;
         int count = 0;
 
-        const float pbs =
-            params->LogCBlackSignal; // ColorSpace::LogCBlackSignal()
-        const float eo =
-            params->LogCEncodingOffset; // ColorSpace::LogCEncodingOffset()
-        const float eg =
-            params->LogCEncodingGain; // ColorSpace::LogCEncodingGain()
-        const float gs = params->LogCGraySignal; // ColorSpace::LogCGraySignal()
-        const float bo =
-            params->LogCBlackOffset; // ColorSpace::LogCBlackOffset()
-        const float ls =
-            params->LogCLinearSlope; // ColorSpace::LogCLinearSlope()
-        const float lo =
-            params->LogCLinearOffset; // ColorSpace::LogCLinearOffset()
-        const float cutoff =
-            params->LogCLinearCutPoint; // ColorSpace::LogCLinearCutPoint()
+        const float pbs = params->LogCBlackSignal;       // ColorSpace::LogCBlackSignal()
+        const float eo = params->LogCEncodingOffset;     // ColorSpace::LogCEncodingOffset()
+        const float eg = params->LogCEncodingGain;       // ColorSpace::LogCEncodingGain()
+        const float gs = params->LogCGraySignal;         // ColorSpace::LogCGraySignal()
+        const float bo = params->LogCBlackOffset;        // ColorSpace::LogCBlackOffset()
+        const float ls = params->LogCLinearSlope;        // ColorSpace::LogCLinearSlope()
+        const float lo = params->LogCLinearOffset;       // ColorSpace::LogCLinearOffset()
+        const float cutoff = params->LogCLinearCutPoint; // ColorSpace::LogCLinearCutPoint()
 
         const float A = 1.0f / eg;
         const float B = -eo / eg;
@@ -1221,26 +1123,20 @@ namespace TwkFB
         }
     }
 
-    void linearToLogCTransform(const float* inPixels, float* outPixels,
-                               int channels, int nelements,
+    void linearToLogCTransform(const float* inPixels, float* outPixels, int channels, int nelements,
                                void* data) // << float vector params
     {
         const float* end = inPixels + (nelements * channels);
-        LogCTransformParams* params =
-            reinterpret_cast<LogCTransformParams*>(data);
+        LogCTransformParams* params = reinterpret_cast<LogCTransformParams*>(data);
         bool* channelMask = params->chmap;
         int count = 0;
 
-        const float pbs =
-            params->LogCBlackSignal; // ColorSpace::LogCBlackSignal()
-        const float eo =
-            params->LogCEncodingOffset; // ColorSpace::LogCEncodingOffset()
-        const float eg =
-            params->LogCEncodingGain; // ColorSpace::LogCEncodingGain()
-        const float gs = params->LogCGraySignal; // ColorSpace::LogCGraySignal()
-        const float bo =
-            params->LogCBlackOffset; // ColorSpace::LogCBlackOffset()
-        const float cutoff = params->LogCCutPoint; // ColorSpace::LogCCutPoint()
+        const float pbs = params->LogCBlackSignal;   // ColorSpace::LogCBlackSignal()
+        const float eo = params->LogCEncodingOffset; // ColorSpace::LogCEncodingOffset()
+        const float eg = params->LogCEncodingGain;   // ColorSpace::LogCEncodingGain()
+        const float gs = params->LogCGraySignal;     // ColorSpace::LogCGraySignal()
+        const float bo = params->LogCBlackOffset;    // ColorSpace::LogCBlackOffset()
+        const float cutoff = params->LogCCutPoint;   // ColorSpace::LogCCutPoint()
 
         const float ls_eg = params->LogCLinearSlope * eg;
         const float lo_eg_eo = params->LogCLinearOffset * eg + eo;
@@ -1264,9 +1160,8 @@ namespace TwkFB
         }
     }
 
-    void redLogLinearTransform(
-        const float* inPixels, float* outPixels, int channels, int nelements,
-        void* data) // << bool vector indicating which channels to do
+    void redLogLinearTransform(const float* inPixels, float* outPixels, int channels, int nelements,
+                               void* data) // << bool vector indicating which channels to do
     {
         const float* end = inPixels + (nelements * channels);
         bool* channelMask = reinterpret_cast<bool*>(data);
@@ -1278,23 +1173,18 @@ namespace TwkFB
             {
                 if (*p < 0)
                 {
-                    *outPixels =
-                        (1.0
-                         - Math<double>::pow(10.0, 2.0 * Math<double>::abs(*p)))
-                        / 99.0;
+                    *outPixels = (1.0 - Math<double>::pow(10.0, 2.0 * Math<double>::abs(*p))) / 99.0;
                 }
                 else
                 {
-                    *outPixels =
-                        (Math<double>::pow(10.0, 2.0 * (*p)) - 1.0) / 99.0;
+                    *outPixels = (Math<double>::pow(10.0, 2.0 * (*p)) - 1.0) / 99.0;
                 }
             }
         }
     }
 
-    void linearRedLogTransform(
-        const float* inPixels, float* outPixels, int channels, int nelements,
-        void* data) // << bool array indicating which channels to do
+    void linearRedLogTransform(const float* inPixels, float* outPixels, int channels, int nelements,
+                               void* data) // << bool array indicating which channels to do
     {
         const float* end = inPixels + (nelements * channels);
         bool* channelMask = reinterpret_cast<bool*>(data);
@@ -1306,9 +1196,7 @@ namespace TwkFB
             {
                 if (*p < 0)
                 {
-                    *outPixels = -0.5
-                                 * Math<double>::log10(
-                                     99.0 * Math<double>::abs(*p) + 1.0);
+                    *outPixels = -0.5 * Math<double>::log10(99.0 * Math<double>::abs(*p) + 1.0);
                 }
                 else
                 {
@@ -1516,8 +1404,7 @@ namespace TwkFB
         }
     }
 
-    void premultTransform(const float* inPixels, float* outPixels, int channels,
-                          int nelements,
+    void premultTransform(const float* inPixels, float* outPixels, int channels, int nelements,
                           void* data) // nothing
     {
         assert(channels == 4 || channels == 2);
@@ -1549,8 +1436,7 @@ namespace TwkFB
         }
     }
 
-    void unpremultTransform(const float* inPixels, float* outPixels,
-                            int channels, int nelements,
+    void unpremultTransform(const float* inPixels, float* outPixels, int channels, int nelements,
                             void* data) // nothing
     {
         assert(channels == 4 || channels == 2);
@@ -1582,8 +1468,7 @@ namespace TwkFB
         }
     }
 
-    void floatChromaToIntegralTransform(const float* inPixels, float* outPixels,
-                                        int channels, int nelements,
+    void floatChromaToIntegralTransform(const float* inPixels, float* outPixels, int channels, int nelements,
                                         void* data) // nothing
     {
         assert(channels != 2);
@@ -1601,8 +1486,7 @@ namespace TwkFB
         }
         else
         {
-            for (const float* p = inPixels; p < end;
-                 p += channels, outPixels += channels)
+            for (const float* p = inPixels; p < end; p += channels, outPixels += channels)
             {
                 outPixels[1] = max(0.0, min(p[1] + 0.5, 1.0));
                 outPixels[2] = max(0.0, min(p[2] + 0.5, 1.0));
@@ -1610,16 +1494,14 @@ namespace TwkFB
         }
     }
 
-    void gammaTransform(const float* inPixels, float* outPixels, int channels,
-                        int nelements,
+    void gammaTransform(const float* inPixels, float* outPixels, int channels, int nelements,
                         void* data) // float* -> gamma values
     {
         const float* end = inPixels + (nelements * channels);
         bool channelMask[4] = {true, true, true, false};
         size_t count = 0;
         const float* ingammas = reinterpret_cast<float*>(data);
-        float gammas[4] = {1.0f / ingammas[0], 1.0f / ingammas[1],
-                           1.0f / ingammas[2], 1.0f};
+        float gammas[4] = {1.0f / ingammas[0], 1.0f / ingammas[1], 1.0f / ingammas[2], 1.0f};
 
         for (const float* p = inPixels; p < end; p++, outPixels++, count++)
         {
@@ -1630,14 +1512,12 @@ namespace TwkFB
 
             if (channelMask[count % channels])
             {
-                *outPixels =
-                    TwkMath::Math<double>::pow(*p, gammas[count % channels]);
+                *outPixels = TwkMath::Math<double>::pow(*p, gammas[count % channels]);
             }
         }
     }
 
-    void powerTransform(const float* inPixels, float* outPixels, int channels,
-                        int nelements,
+    void powerTransform(const float* inPixels, float* outPixels, int channels, int nelements,
                         void* data) // float* -> gamma values
     {
         const float* end = inPixels + (nelements * channels);
@@ -1654,14 +1534,12 @@ namespace TwkFB
 
             if (channelMask[count % channels])
             {
-                *outPixels =
-                    TwkMath::Math<double>::pow(*p, powers[count % channels]);
+                *outPixels = TwkMath::Math<double>::pow(*p, powers[count % channels]);
             }
         }
     }
 
-    void sRGBtoLinearTransform(const float* inPixels, float* outPixels,
-                               int channels, int nelements,
+    void sRGBtoLinearTransform(const float* inPixels, float* outPixels, int channels, int nelements,
                                void* data) // nothing
     {
         const float* end = inPixels + (nelements * channels);
@@ -1691,8 +1569,7 @@ namespace TwkFB
         }
     }
 
-    void linearToSRGBTransform(const float* inPixels, float* outPixels,
-                               int channels, int nelements,
+    void linearToSRGBTransform(const float* inPixels, float* outPixels, int channels, int nelements,
                                void* data) // nothing
     {
         const float* end = inPixels + (nelements * channels);
@@ -1722,8 +1599,7 @@ namespace TwkFB
         }
     }
 
-    void Rec709toLinearTransform(const float* inPixels, float* outPixels,
-                                 int channels, int nelements,
+    void Rec709toLinearTransform(const float* inPixels, float* outPixels, int channels, int nelements,
                                  void* data) // nothing
     {
         const float* end = inPixels + (nelements * channels);
@@ -1753,8 +1629,7 @@ namespace TwkFB
         }
     }
 
-    void linearToRec709Transform(const float* inPixels, float* outPixels,
-                                 int channels, int nelements,
+    void linearToRec709Transform(const float* inPixels, float* outPixels, int channels, int nelements,
                                  void* data) // nothing
     {
         const float* end = inPixels + (nelements * channels);
@@ -1784,8 +1659,7 @@ namespace TwkFB
         }
     }
 
-    void channelLUTTransform(const float* inPixels, float* outPixels,
-                             int channels, int nelements, void* data)
+    void channelLUTTransform(const float* inPixels, float* outPixels, int channels, int nelements, void* data)
     {
         //
         //  FB is expected to be width x 1 in size and 3 channels.
@@ -1798,8 +1672,7 @@ namespace TwkFB
         const size_t uchannels = !(channels % 2) ? channels - 1 : channels;
         float* o = outPixels;
 
-        for (const float *p = inPixels, *e = p + (nelements * channels); p < e;
-             o += channels, p += channels)
+        for (const float *p = inPixels, *e = p + (nelements * channels); p < e; o += channels, p += channels)
         {
             for (size_t q = 0; q < channels; q++)
             {
@@ -1825,8 +1698,7 @@ namespace TwkFB
         }
     }
 
-    void luminanceLUTTransform(const float* inPixels, float* outPixels,
-                               int channels, int nelements, void* data)
+    void luminanceLUTTransform(const float* inPixels, float* outPixels, int channels, int nelements, void* data)
     {
         //
         //  FB is expected to be width x 1 in size and 3 channels.
@@ -1844,13 +1716,11 @@ namespace TwkFB
         const float gw709 = M.m01;
         const float bw709 = M.m02;
 
-        Mat44f L = Mat44f(rw709, gw709, bw709, 0, rw709, gw709, bw709, 0, rw709,
-                          gw709, bw709, 0, 0, 0, 0, 1);
+        Mat44f L = Mat44f(rw709, gw709, bw709, 0, rw709, gw709, bw709, 0, rw709, gw709, bw709, 0, 0, 0, 0, 1);
 
         if (channels >= 3)
         {
-            for (const float *p = inPixels, *e = p + (nelements * channels);
-                 p < e; o += channels, p += channels)
+            for (const float *p = inPixels, *e = p + (nelements * channels); p < e; o += channels, p += channels)
             {
                 float l = (L * Vec3f(p[0], p[1], p[2])).x;
 
@@ -1876,8 +1746,7 @@ namespace TwkFB
         }
     }
 
-    void pixel3DLUTTransform(const float* inPixels, float* outPixels,
-                             int channels, int nelements, void* data)
+    void pixel3DLUTTransform(const float* inPixels, float* outPixels, int channels, int nelements, void* data)
     {
         //
         //  FB is expected to be 3 channels float
@@ -1885,9 +1754,7 @@ namespace TwkFB
         //
 
         FrameBuffer* infb = reinterpret_cast<FrameBuffer*>(data);
-        FrameBuffer* fb = infb->dataType() == FrameBuffer::FLOAT
-                              ? infb
-                              : copyConvert(infb, FrameBuffer::FLOAT);
+        FrameBuffer* fb = infb->dataType() == FrameBuffer::FLOAT ? infb : copyConvert(infb, FrameBuffer::FLOAT);
         const size_t xs = fb->width();
         const size_t ys = fb->height();
         const size_t zs = fb->depth();
@@ -1901,16 +1768,13 @@ namespace TwkFB
         {
             float* o = outPixels;
 
-            for (const float *p = inPixels, *e = p + nelements * channels;
-                 p < e; o += channels, p += channels)
+            for (const float *p = inPixels, *e = p + nelements * channels; p < e; o += channels, p += channels)
             {
                 //
                 //  find the corners
                 //
 
-                Vec3f ip =
-                    Vec3f(clamp(p[0], 0.0f, 1.0f), clamp(p[1], 0.0f, 1.0f),
-                          clamp(p[2], 0.0f, 1.0f));
+                Vec3f ip = Vec3f(clamp(p[0], 0.0f, 1.0f), clamp(p[1], 0.0f, 1.0f), clamp(p[2], 0.0f, 1.0f));
 
                 Vec3f vn = ip * Vec3f(xl, yl, zl);
 
@@ -1932,8 +1796,7 @@ namespace TwkFB
                 corners[1][1][0] = lut[xs * ys * z1 + xs * y1 + x0];
                 corners[1][1][1] = lut[xs * ys * z1 + xs * y1 + x1];
 
-                float t[3] = {vn.x - float(x0), vn.y - float(y0),
-                              vn.z - float(z0)};
+                float t[3] = {vn.x - float(x0), vn.y - float(y0), vn.z - float(z0)};
 
                 Vec3f op = trilinear(corners, t);
 
@@ -1955,9 +1818,7 @@ namespace TwkFB
     namespace
     {
 
-        template <class T>
-        void convertYUVS(const FrameBuffer* infb, FrameBuffer* outfb,
-                         double cmax, bool reverse)
+        template <class T> void convertYUVS(const FrameBuffer* infb, FrameBuffer* outfb, double cmax, bool reverse)
         {
             Mat44d C;
 
@@ -1993,10 +1854,7 @@ namespace TwkFB
 
                 if (reverse)
                 {
-                    for (const unsigned short* restrict p = row,
-                                                        *e =
-                                                            row + infb->width();
-                         p < e;)
+                    for (const unsigned short* restrict p = row, *e = row + infb->width(); p < e;)
                     {
                         const double y0 = double(*p >> 8);
                         const double u = double(*p & 0xff);
@@ -2024,10 +1882,7 @@ namespace TwkFB
                 }
                 else
                 {
-                    for (const unsigned short* restrict p = row,
-                                                        *e =
-                                                            row + infb->width();
-                         p < e;)
+                    for (const unsigned short* restrict p = row, *e = row + infb->width(); p < e;)
                     {
                         const double u = double(*p >> 8);
                         const double y0 = double(*p & 0xff);
@@ -2056,8 +1911,7 @@ namespace TwkFB
             }
         }
 
-        FrameBuffer* copyConvertPackedYUVS(const FrameBuffer* f,
-                                           FrameBuffer::DataType d)
+        FrameBuffer* copyConvertPackedYUVS(const FrameBuffer* f, FrameBuffer::DataType d)
         {
             FrameBuffer::StringVector names;
             names.push_back("R");
@@ -2066,16 +1920,14 @@ namespace TwkFB
 
             FrameBuffer::DataType nd = d;
 
-            if (d != FrameBuffer::UCHAR && d != FrameBuffer::HALF
-                && d != FrameBuffer::FLOAT && d != FrameBuffer::USHORT
+            if (d != FrameBuffer::UCHAR && d != FrameBuffer::HALF && d != FrameBuffer::FLOAT && d != FrameBuffer::USHORT
                 && d != FrameBuffer::UINT)
             {
                 nd = FrameBuffer::UCHAR;
             }
 
-            FrameBuffer* fnew = new FrameBuffer(
-                f->coordinateType(), f->width(), f->height(), f->depth(), 3, nd,
-                0, &names, f->orientation(), true);
+            FrameBuffer* fnew =
+                new FrameBuffer(f->coordinateType(), f->width(), f->height(), f->depth(), 3, nd, 0, &names, f->orientation(), true);
 
             typedef unsigned char byte;
             bool reverse = f->dataType() == FrameBuffer::PACKED_Y8_Cb8_Y8_Cr8;
@@ -2123,18 +1975,15 @@ namespace TwkFB
 
     //----------------------------------------------------------------------
 
-    template <typename P>
-    FrameBuffer* copyConvertPacked10Bit(const FrameBuffer* f,
-                                        FrameBuffer::DataType d)
+    template <typename P> FrameBuffer* copyConvertPacked10Bit(const FrameBuffer* f, FrameBuffer::DataType d)
     {
         FrameBuffer::StringVector names;
         names.push_back("R");
         names.push_back("G");
         names.push_back("B");
 
-        FrameBuffer* fnew = new FrameBuffer(f->coordinateType(), f->width(),
-                                            f->height(), f->depth(), 3, d, 0,
-                                            &names, f->orientation(), true);
+        FrameBuffer* fnew =
+            new FrameBuffer(f->coordinateType(), f->width(), f->height(), f->depth(), 3, d, 0, &names, f->orientation(), true);
 
         switch (d)
         {
@@ -2167,8 +2016,7 @@ namespace TwkFB
 
     FrameBuffer* copyConvertPlane(const FrameBuffer* f, FrameBuffer::DataType d)
     {
-        if (f->dataType() == FrameBuffer::PACKED_Cb8_Y8_Cr8_Y8
-            || f->dataType() == FrameBuffer::PACKED_Y8_Cb8_Y8_Cr8)
+        if (f->dataType() == FrameBuffer::PACKED_Cb8_Y8_Cr8_Y8 || f->dataType() == FrameBuffer::PACKED_Y8_Cb8_Y8_Cr8)
         {
             return copyConvertPackedYUVS(f, d);
         }
@@ -2183,9 +2031,8 @@ namespace TwkFB
         else
         {
             FrameBuffer::StringVector names = f->channelNames();
-            FrameBuffer* fnew = new FrameBuffer(
-                f->coordinateType(), f->width(), f->height(), f->depth(),
-                f->numChannels(), d, 0, &names, f->orientation(), true);
+            FrameBuffer* fnew = new FrameBuffer(f->coordinateType(), f->width(), f->height(), f->depth(), f->numChannels(), d, 0, &names,
+                                                f->orientation(), true);
 
             copyPlane(f, fnew);
             return fnew;
@@ -2219,8 +2066,7 @@ namespace TwkFB
 
             if (a->dataType() == b->dataType())
             {
-                memcpy(b->pixels<unsigned char>(), a->pixels<unsigned char>(),
-                       a->scanlineSize() * a->height());
+                memcpy(b->pixels<unsigned char>(), a->pixels<unsigned char>(), a->scanlineSize() * a->height());
             }
             else
             {
@@ -2240,19 +2086,11 @@ namespace TwkFB
     namespace
     {
 
-        unsigned char* getscanline(FrameBuffer* fb, int y)
-        {
-            return fb->scanline<unsigned char>(y);
-        }
+        unsigned char* getscanline(FrameBuffer* fb, int y) { return fb->scanline<unsigned char>(y); }
 
-        const unsigned char* getscanline(const FrameBuffer* fb, int y)
-        {
-            return fb->scanline<const unsigned char>(y);
-        }
+        const unsigned char* getscanline(const FrameBuffer* fb, int y) { return fb->scanline<const unsigned char>(y); }
 
-        template <typename T>
-        void normalizeRange(FrameBuffer* fb, bool discardmax, const T maxval,
-                            bool invert)
+        template <typename T> void normalizeRange(FrameBuffer* fb, bool discardmax, const T maxval, bool invert)
         {
             T mn = numeric_limits<T>::max();
             T mx = -mn;
@@ -2268,13 +2106,11 @@ namespace TwkFB
             for (int y = 0; y < fb->height(); y++)
             {
                 // unsigned char* b = fb->scanline<unsigned char>(y);
-                unsigned char* b =
-                    getscanline(fb, y); // 3.2 compiler bug requires this
+                unsigned char* b = getscanline(fb, y); // 3.2 compiler bug requires this
                 const unsigned char* e = b + fb->scanlineSize();
                 unsigned int count = 1; // 1 pulls computation out of mod below
 
-                for (const T* p = reinterpret_cast<const T*>(b);
-                     p < reinterpret_cast<const T*>(e); p++, count++)
+                for (const T* p = reinterpret_cast<const T*>(b); p < reinterpret_cast<const T*>(e); p++, count++)
                 {
                     if (skipLast && (count % nc) == 0)
                         continue;
@@ -2296,13 +2132,11 @@ namespace TwkFB
             for (int y = 0; y < fb->height(); y++)
             {
                 // unsigned char* b = fb->scanline<unsigned char>(y);
-                unsigned char* b =
-                    getscanline(fb, y); // 3.2 compiler bug requires this
+                unsigned char* b = getscanline(fb, y); // 3.2 compiler bug requires this
                 unsigned char* e = b + fb->scanlineSize();
                 unsigned int count = 1; // 1 pulls computation out of mod below
 
-                for (T* p = reinterpret_cast<T*>(b);
-                     p < reinterpret_cast<const T*>(e); p++, count++)
+                for (T* p = reinterpret_cast<T*>(b); p < reinterpret_cast<const T*>(e); p++, count++)
                 {
                     if (skipLast && (count % nc) == 0)
                         continue;
@@ -2313,9 +2147,7 @@ namespace TwkFB
                     }
                     else if (invert)
                     {
-                        *p = T(1.0)
-                             - T(double(*p) / double(r)
-                                 - double(mn) / double(r));
+                        *p = T(1.0) - T(double(*p) / double(r) - double(mn) / double(r));
                     }
                     else
                     {
@@ -2359,14 +2191,12 @@ namespace TwkFB
             for (int by = 0; by < b->height(); by++)
             {
                 const float ndcy = float(by) / float(b->height() - 1);
-                const float ay =
-                    (ndcy > 1.0f ? 1.0f : ndcy) * float(a->height() - 1);
+                const float ay = (ndcy > 1.0f ? 1.0f : ndcy) * float(a->height() - 1);
 
                 for (int bx = 0; bx < b->width(); bx++)
                 {
                     const float ndcx = float(bx) / float(b->width() - 1);
-                    const float ax =
-                        (ndcx > 1.0f ? 1.0f : ndcx) * float(a->width() - 1);
+                    const float ax = (ndcx > 1.0f ? 1.0f : ndcx) * float(a->width() - 1);
 
                     const int iax = int(ax);
                     const int iay = int(ay);
@@ -2404,8 +2234,7 @@ namespace TwkFB
         outpixel[3] = std::max(outpixel[3], inpixel[3]);
     }
 
-    void transfer(const FrameBuffer* a, FrameBuffer* b, TransferFunc F,
-                  void* data)
+    void transfer(const FrameBuffer* a, FrameBuffer* b, TransferFunc F, void* data)
     {
         assert(a->numChannels() == b->numChannels());
 
@@ -2418,15 +2247,13 @@ namespace TwkFB
             for (int ay = 0; ay < a->height(); ay++)
             {
                 const float ndcy = float(ay) / float(a->height() - 1);
-                const float by =
-                    (ndcy > 1.0f ? 1.0f : ndcy) * float(b->height() - 1);
+                const float by = (ndcy > 1.0f ? 1.0f : ndcy) * float(b->height() - 1);
                 const int iby = int(by);
 
                 for (int ax = 0; ax < a->width(); ax++)
                 {
                     const float ndcx = float(ax) / float(a->width() - 1);
-                    const float bx =
-                        (ndcx > 1.0f ? 1.0f : ndcx) * float(b->width() - 1);
+                    const float bx = (ndcx > 1.0f ? 1.0f : ndcx) * float(b->width() - 1);
                     const int ibx = int(bx);
 
                     float inpixel[4], outpixel[4];
@@ -2435,15 +2262,13 @@ namespace TwkFB
 
                     F(inpixel, outpixel, data);
 
-                    b->setPixel4f(outpixel[0], outpixel[1], outpixel[2],
-                                  outpixel[3], ibx, iby);
+                    b->setPixel4f(outpixel[0], outpixel[1], outpixel[2], outpixel[3], ibx, iby);
                 }
             }
         }
     }
 
-    FrameBuffer* channelMapToPlanar(const FrameBuffer* in,
-                                    vector<string> newMapping)
+    FrameBuffer* channelMapToPlanar(const FrameBuffer* in, vector<string> newMapping)
     {
         FrameBufferVector planes;
 
@@ -2468,8 +2293,7 @@ namespace TwkFB
         {
             for (int i = 0; i < newMapping.size(); i++)
             {
-                for (const FrameBuffer* f = in->firstPlane(); f;
-                     f = f->nextPlane())
+                for (const FrameBuffer* f = in->firstPlane(); f; f = f->nextPlane())
                 {
                     if (newMapping[i] == f->channelName(0))
                     {
@@ -2506,8 +2330,7 @@ namespace TwkFB
         return fb;
     }
 
-    FrameBuffer* channelMap(const FrameBuffer* in,
-                            const vector<string>& newMapping)
+    FrameBuffer* channelMap(const FrameBuffer* in, const vector<string>& newMapping)
     {
         size_t n = newMapping.size();
         vector<int> cindex(newMapping.size());
@@ -2518,9 +2341,7 @@ namespace TwkFB
             in = mergePlanes(in);
         }
 
-        FrameBuffer* out =
-            new FrameBuffer(in->width(), in->height(), n, in->dataType(), 0,
-                            &newMapping, in->orientation());
+        FrameBuffer* out = new FrameBuffer(in->width(), in->height(), n, in->dataType(), 0, &newMapping, in->orientation());
 
         for (int i = 0; i < n; i++)
         {
@@ -2554,8 +2375,7 @@ namespace TwkFB
             const unsigned char* inp = in->pixels<unsigned char>();
             unsigned char* outp = out->pixels<unsigned char>();
 
-            for (const unsigned char* endp = inp + in->planeSize(); inp < endp;
-                 inp += pixelSize, outp += chunkSize)
+            for (const unsigned char* endp = inp + in->planeSize(); inp < endp; inp += pixelSize, outp += chunkSize)
             {
                 memcpy(outp, inp, chunkSize);
             }
@@ -2609,15 +2429,9 @@ namespace TwkFB
     }
 
     // We'll discuss what 'applyGamma' means, but for now, this is silly :)
-    void linearizeFromGamma(const FrameBuffer* a, FrameBuffer* b,
-                            float fromGamma)
-    {
-        applyGamma(a, b, fromGamma);
-    }
+    void linearizeFromGamma(const FrameBuffer* a, FrameBuffer* b, float fromGamma) { applyGamma(a, b, fromGamma); }
 
-    template <class T>
-    void minMaxInteger(const FrameBuffer* fb, std::vector<float>& mins,
-                       std::vector<float>& maxs)
+    template <class T> void minMaxInteger(const FrameBuffer* fb, std::vector<float>& mins, std::vector<float>& maxs)
     {
         mins.resize(fb->numChannels());
         maxs.resize(fb->numChannels());
@@ -2657,9 +2471,7 @@ namespace TwkFB
         }
     }
 
-    template <class T>
-    void minMaxFloat(const FrameBuffer* fb, std::vector<float> mins,
-                     std::vector<float> maxs)
+    template <class T> void minMaxFloat(const FrameBuffer* fb, std::vector<float> mins, std::vector<float> maxs)
     {
         mins.resize(fb->numChannels());
         maxs.resize(fb->numChannels());
@@ -2699,8 +2511,7 @@ namespace TwkFB
         }
     }
 
-    void minMax(const FrameBuffer* fb, std::vector<float>& minValues,
-                std::vector<float>& maxValues)
+    void minMax(const FrameBuffer* fb, std::vector<float>& minValues, std::vector<float>& maxValues)
     {
         switch (fb->dataType())
         {
@@ -2736,15 +2547,11 @@ namespace TwkFB
 
             for (int y = 0; y < (ymax + 1) / 2; y++)
             {
-                memcpy(&temp.front(), fb->scanline<unsigned char>(y),
-                       fb->scanlineSize());
+                memcpy(&temp.front(), fb->scanline<unsigned char>(y), fb->scanlineSize());
 
-                memcpy(fb->scanline<unsigned char>(y),
-                       fb->scanline<unsigned char>(ymax - y),
-                       fb->scanlineSize());
+                memcpy(fb->scanline<unsigned char>(y), fb->scanline<unsigned char>(ymax - y), fb->scanlineSize());
 
-                memcpy(fb->scanline<unsigned char>(ymax - y), &temp.front(),
-                       fb->scanlineSize());
+                memcpy(fb->scanline<unsigned char>(ymax - y), &temp.front(), fb->scanlineSize());
             }
         }
     }
@@ -2762,10 +2569,8 @@ namespace TwkFB
                     fb->getPixel4f(x, y, pLeft);
                     fb->getPixel4f(fb->width() - 1 - x, y, pRight);
 
-                    fb->setPixel4f(pRight[0], pRight[1], pRight[2], pRight[3],
-                                   x, y);
-                    fb->setPixel4f(pLeft[0], pLeft[1], pLeft[2], pLeft[3],
-                                   fb->width() - 1 - x, y);
+                    fb->setPixel4f(pRight[0], pRight[1], pRight[2], pRight[3], x, y);
+                    fb->setPixel4f(pLeft[0], pLeft[1], pLeft[2], pLeft[3], fb->width() - 1 - x, y);
                 }
             }
         }
@@ -2777,22 +2582,17 @@ namespace TwkFB
 
         if (fb->isYA2C2Planar())
         {
-            const bool alpha = fb->hasAttribute("AlphaType")
-                               && fb->attribute<string>("AlphaType") != "None";
+            const bool alpha = fb->hasAttribute("AlphaType") && fb->attribute<string>("AlphaType") != "None";
 
-            FrameBuffer YA(fb->coordinateType(), fb->width(), fb->height(), 0,
-                           2, fb->dataType(),
-                           (unsigned char*)fb->pixels<unsigned char>(),
-                           &fb->channelNames(), fb->orientation(), false, 0);
+            FrameBuffer YA(fb->coordinateType(), fb->width(), fb->height(), 0, 2, fb->dataType(),
+                           (unsigned char*)fb->pixels<unsigned char>(), &fb->channelNames(), fb->orientation(), false, 0);
 
             FrameBufferVector fbs0 = split(&YA);
 
             const FrameBuffer* fbc = fb->nextPlane();
 
-            FrameBuffer C(fbc->coordinateType(), fbc->width(), fbc->height(), 0,
-                          2, fbc->dataType(),
-                          (unsigned char*)fbc->pixels<unsigned char>(),
-                          &fbc->channelNames(), fbc->orientation(), false, 0);
+            FrameBuffer C(fbc->coordinateType(), fbc->width(), fbc->height(), 0, 2, fbc->dataType(),
+                          (unsigned char*)fbc->pixels<unsigned char>(), &fbc->channelNames(), fbc->orientation(), false, 0);
 
             FrameBufferVector fbs1 = split(&C);
             fbs0.push_back(fbs1[0]);
@@ -2803,10 +2603,8 @@ namespace TwkFB
         {
             for (const FrameBuffer* f = fb->firstPlane(); f; f = f->nextPlane())
             {
-                FrameBuffer* p = new FrameBuffer(
-                    f->coordinateType(), f->width(), f->height(), f->depth(), 1,
-                    f->dataType(), 0, &f->channelNames(), f->orientation(),
-                    true);
+                FrameBuffer* p = new FrameBuffer(f->coordinateType(), f->width(), f->height(), f->depth(), 1, f->dataType(), 0,
+                                                 &f->channelNames(), f->orientation(), true);
 
                 copyPlane(f, p);
                 fbs.push_back(p);
@@ -2819,17 +2617,13 @@ namespace TwkFB
                 FrameBuffer::StringVector channels;
                 channels.push_back(fb->channelName(i));
 
-                FrameBuffer* cfb = new FrameBuffer(
-                    fb->coordinateType(), fb->width(), fb->height(),
-                    fb->depth(), 1, fb->dataType(), 0, &channels,
-                    fb->orientation(), true);
+                FrameBuffer* cfb = new FrameBuffer(fb->coordinateType(), fb->width(), fb->height(), fb->depth(), 1, fb->dataType(), 0,
+                                                   &channels, fb->orientation(), true);
                 fbs.push_back(cfb);
 
-                const unsigned char* src =
-                    fb->begin<unsigned char>() + fb->bytesPerChannel() * i;
+                const unsigned char* src = fb->begin<unsigned char>() + fb->bytesPerChannel() * i;
                 unsigned char* dst = cfb->begin<unsigned char>();
-                const unsigned char* end =
-                    fb->begin<unsigned char>() + fb->dataSize();
+                const unsigned char* end = fb->begin<unsigned char>() + fb->dataSize();
                 size_t srcSize = fb->pixelSize();
                 size_t dstSize = cfb->pixelSize();
 
@@ -2866,18 +2660,15 @@ namespace TwkFB
             channels.push_back(fbs[i]->channelName(0));
         }
 
-        FrameBuffer* fb = new FrameBuffer(
-            a->coordinateType(), a->width(), a->height(), a->depth(),
-            fbs.size(), a->dataType(), 0, &channels, a->orientation(), true);
+        FrameBuffer* fb = new FrameBuffer(a->coordinateType(), a->width(), a->height(), a->depth(), fbs.size(), a->dataType(), 0, &channels,
+                                          a->orientation(), true);
 
         for (int i = 0; i < fb->numChannels(); i++)
         {
             FrameBuffer* cfb = fbs[i];
-            unsigned char* dst =
-                fb->begin<unsigned char>() + fb->bytesPerChannel() * i;
+            unsigned char* dst = fb->begin<unsigned char>() + fb->bytesPerChannel() * i;
             const unsigned char* src = cfb->begin<unsigned char>();
-            const unsigned char* end =
-                fb->begin<unsigned char>() + fb->dataSize();
+            const unsigned char* end = fb->begin<unsigned char>() + fb->dataSize();
             size_t dstSize = fb->pixelSize();
             size_t srcSize = cfb->pixelSize();
 
@@ -2911,9 +2702,8 @@ namespace TwkFB
         // XXX The following FrameBuffer construction assumes the first plane
         // has the largest resolution of all of the planes
         //
-        FrameBuffer* nfb = new FrameBuffer(
-            fb->coordinateType(), fb->width(), fb->height(), fb->depth(),
-            nchannels, fb->dataType(), 0, &channels, fb->orientation(), true);
+        FrameBuffer* nfb = new FrameBuffer(fb->coordinateType(), fb->width(), fb->height(), fb->depth(), nchannels, fb->dataType(), 0,
+                                           &channels, fb->orientation(), true);
 
         nfb->setUncrop(fb);
 
@@ -2943,8 +2733,7 @@ namespace TwkFB
                 {
                 case FrameBuffer::UCHAR:
                 {
-                    const unsigned char* pscanline =
-                        f->scanline<unsigned char>(yf);
+                    const unsigned char* pscanline = f->scanline<unsigned char>(yf);
                     unsigned char* scanline = nfb->scanline<unsigned char>(y);
                     for (size_t x = 0; x < nfb->width(); x++)
                     {
@@ -2955,8 +2744,7 @@ namespace TwkFB
                 break;
                 case FrameBuffer::USHORT:
                 {
-                    const unsigned short* pscanline =
-                        f->scanline<unsigned short>(yf);
+                    const unsigned short* pscanline = f->scanline<unsigned short>(yf);
                     unsigned short* scanline = nfb->scanline<unsigned short>(y);
                     for (size_t x = 0; x < nfb->width(); x++)
                     {
@@ -2967,8 +2755,7 @@ namespace TwkFB
                 break;
                 case FrameBuffer::UINT:
                 {
-                    const unsigned int* pscanline =
-                        f->scanline<unsigned int>(yf);
+                    const unsigned int* pscanline = f->scanline<unsigned int>(yf);
                     unsigned int* scanline = nfb->scanline<unsigned int>(y);
                     for (size_t x = 0; x < nfb->width(); x++)
                     {
@@ -3028,9 +2815,7 @@ namespace TwkFB
     namespace
     {
 
-        Imath::M44f primaryConvert(const Imf::Chromaticities& c0,
-                                   const Imf::Chromaticities& c1,
-                                   const Imath::V2f c0Neutral,
+        Imath::M44f primaryConvert(const Imf::Chromaticities& c0, const Imf::Chromaticities& c1, const Imath::V2f c0Neutral,
                                    const Imath::V2f c1Neutral, bool adapt)
         {
             Imath::M44f A;
@@ -3039,15 +2824,11 @@ namespace TwkFB
 
             if (adapt)
             {
-                static const Imath::M44f B(
-                    0.895100, -0.750200, 0.038900, 0.000000, 0.266400, 1.713500,
-                    -0.068500, 0.000000, -0.161400, 0.036700, 1.029600,
-                    0.000000, 0.000000, 0.000000, 0.000000, 1.000000);
+                static const Imath::M44f B(0.895100, -0.750200, 0.038900, 0.000000, 0.266400, 1.713500, -0.068500, 0.000000, -0.161400,
+                                           0.036700, 1.029600, 0.000000, 0.000000, 0.000000, 0.000000, 1.000000);
 
-                static const Imath::M44f BI(
-                    0.986993, 0.432305, -0.008529, 0.000000, -0.147054,
-                    0.518360, 0.040043, 0.000000, 0.159963, 0.049291, 0.968487,
-                    0.000000, 0.000000, 0.000000, 0.000000, 1.000000);
+                static const Imath::M44f BI(0.986993, 0.432305, -0.008529, 0.000000, -0.147054, 0.518360, 0.040043, 0.000000, 0.159963,
+                                            0.049291, 0.968487, 0.000000, 0.000000, 0.000000, 0.000000, 1.000000);
 
                 float ix = c0Neutral.x;
                 float iy = c0Neutral.y;
@@ -3059,8 +2840,7 @@ namespace TwkFB
 
                 Imath::V3f ratio((outN * B) / (inN * B));
 
-                Imath::M44f R(ratio[0], 0, 0, 0, 0, ratio[1], 0, 0, 0, 0,
-                              ratio[2], 0, 0, 0, 0, 1);
+                Imath::M44f R(ratio[0], 0, 0, 0, 0, ratio[1], 0, 0, 0, 0, ratio[2], 0, 0, 0, 0, 1);
 
                 A = B * R * BI;
             }
@@ -3072,16 +2852,14 @@ namespace TwkFB
 
     } // namespace
 
-    void
-    colorSpaceConversionMatrix(const float* i,  // in chromaticies (8 floats)
-                               const float* o,  // out chromaticies
-                               const float* ni, // in neutral (2 floats)
-                               const float* no, // out neutral
-                               bool adapt,      // neutral adaptation
-                               float* M)        // return 4x4 matrix
+    void colorSpaceConversionMatrix(const float* i,  // in chromaticies (8 floats)
+                                    const float* o,  // out chromaticies
+                                    const float* ni, // in neutral (2 floats)
+                                    const float* no, // out neutral
+                                    bool adapt,      // neutral adaptation
+                                    float* M)        // return 4x4 matrix
     {
-        if (!memcmp(i, o, sizeof(float) * 8)
-            && (!adapt || !memcmp(ni, no, sizeof(float) * 2)))
+        if (!memcmp(i, o, sizeof(float) * 8) && (!adapt || !memcmp(ni, no, sizeof(float) * 2)))
         {
             // We hv identical in's and out's for chromaticities and neutral
             // so return identity matrix without precision loss.
@@ -3094,13 +2872,9 @@ namespace TwkFB
         }
         else
         {
-            Imf::Chromaticities c0(
-                Imath::V2f(i[0], i[1]), Imath::V2f(i[2], i[3]),
-                Imath::V2f(i[4], i[5]), Imath::V2f(i[6], i[7]));
+            Imf::Chromaticities c0(Imath::V2f(i[0], i[1]), Imath::V2f(i[2], i[3]), Imath::V2f(i[4], i[5]), Imath::V2f(i[6], i[7]));
 
-            Imf::Chromaticities c1(
-                Imath::V2f(o[0], o[1]), Imath::V2f(o[2], o[3]),
-                Imath::V2f(o[4], o[5]), Imath::V2f(o[6], o[7]));
+            Imf::Chromaticities c1(Imath::V2f(o[0], o[1]), Imath::V2f(o[2], o[3]), Imath::V2f(o[4], o[5]), Imath::V2f(o[6], o[7]));
 
             Imath::V2f n0(ni[0], ni[1]);
             Imath::V2f n1(no[0], no[1]);
@@ -3139,30 +2913,25 @@ namespace TwkFB
             neutral = fb->attribute<Vec2f>(ColorSpace::AdoptedNeutral());
         }
 
-        Imf::Chromaticities chr(convert(red), convert(green), convert(blue),
-                                convert(white));
+        Imf::Chromaticities chr(convert(red), convert(green), convert(blue), convert(white));
 
         Imf::Chromaticities chr709;
 
-        if (chr.red == chr709.red && chr.green == chr709.green
-            && chr.blue == chr709.blue && chr.white == chr709.white)
+        if (chr.red == chr709.red && chr.green == chr709.green && chr.blue == chr709.blue && chr.white == chr709.white)
         {
             Imath::M44f C;
             memcpy(M, &C, sizeof(float) * 16);
             return;
         }
 
-        Imath::M44f C =
-            primaryConvert(chr, Imf::Chromaticities(), convert(neutral),
-                           Imf::Chromaticities().white, adapt);
+        Imath::M44f C = primaryConvert(chr, Imf::Chromaticities(), convert(neutral), Imf::Chromaticities().white, adapt);
 
         if (fb->primaryColorSpace() == ColorSpace::Rec601())
         {
             //
             // * 1.16438356164 - 0.0730593607303
             //
-            C *= Imath::M44f(1.16438356164, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0,
-                             -0.0730593607303, 0, 0, 1);
+            C *= Imath::M44f(1.16438356164, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, -0.0730593607303, 0, 0, 1);
         }
 
         C.transpose();
@@ -3195,23 +2964,19 @@ namespace TwkFB
             neutral = fb->attribute<Vec2f>(ColorSpace::AdoptedNeutral());
         }
 
-        Imf::Chromaticities chr(convert(red), convert(green), convert(blue),
-                                convert(white));
+        Imf::Chromaticities chr(convert(red), convert(green), convert(blue), convert(white));
 
-        Imf::Chromaticities aces(
-            Imath::V2f(0.73470, 0.26530), Imath::V2f(0.00000, 1.00000),
-            Imath::V2f(0.00010, -0.07700), Imath::V2f(0.32168, 0.33767));
+        Imf::Chromaticities aces(Imath::V2f(0.73470, 0.26530), Imath::V2f(0.00000, 1.00000), Imath::V2f(0.00010, -0.07700),
+                                 Imath::V2f(0.32168, 0.33767));
 
-        Imath::M44f C =
-            primaryConvert(chr, aces, convert(neutral), aces.white, adapt);
+        Imath::M44f C = primaryConvert(chr, aces, convert(neutral), aces.white, adapt);
 
         if (fb->primaryColorSpace() == ColorSpace::Rec601())
         {
             //
             // * 1.16438356164 - 0.0730593607303
             //
-            C *= Imath::M44f(1.16438356164, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0,
-                             -0.0730593607303, 0, 0, 1);
+            C *= Imath::M44f(1.16438356164, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, -0.0730593607303, 0, 0, 1);
         }
 
         C.transpose();
@@ -3237,8 +3002,7 @@ namespace TwkFB
             blue = Vec2f(0.1500f, 0.0600f);
         }
 
-        Imf::Chromaticities chr(convert(red), convert(green), convert(blue),
-                                convert(white));
+        Imf::Chromaticities chr(convert(red), convert(green), convert(blue), convert(white));
 
         Imath::V3f w = Imf::RgbaYca::computeYw(chr);
 
@@ -3279,11 +3043,9 @@ namespace TwkFB
     //  use in the custom GLSL nodes (see additional_nodes)
     //  accordingly.
     //
-    void getYUVtoRGBMatrix(Mat44f& M, const string& fb_conversion,
-                           const string& fb_range, unsigned int bits)
+    void getYUVtoRGBMatrix(Mat44f& M, const string& fb_conversion, const string& fb_range, unsigned int bits)
     {
-        if (fb_conversion == ColorSpace::Rec709()
-            && (fb_range == "None" || fb_range == ColorSpace::VideoRange()))
+        if (fb_conversion == ColorSpace::Rec709() && (fb_range == "None" || fb_range == ColorSpace::VideoRange()))
         {
             switch (bits)
             {
@@ -3299,8 +3061,7 @@ namespace TwkFB
                 break;
             }
         }
-        else if (fb_conversion == ColorSpace::Rec2020()
-            && (fb_range == "None" || fb_range == ColorSpace::VideoRange()))
+        else if (fb_conversion == ColorSpace::Rec2020() && (fb_range == "None" || fb_range == ColorSpace::VideoRange()))
         {
             switch (bits)
             {
@@ -3316,9 +3077,7 @@ namespace TwkFB
                 break;
             }
         }
-        else if ((fb_conversion == ColorSpace::Rec601()
-                  && (fb_range == "None"
-                      || fb_range == ColorSpace::VideoRange()))
+        else if ((fb_conversion == ColorSpace::Rec601() && (fb_range == "None" || fb_range == ColorSpace::VideoRange()))
                  || fb_conversion == "None")
         {
             switch (bits)
@@ -3335,8 +3094,7 @@ namespace TwkFB
                 break;
             }
         }
-        else if (fb_conversion == ColorSpace::Rec601()
-                 && fb_range == ColorSpace::FullRange())
+        else if (fb_conversion == ColorSpace::Rec601() && fb_range == ColorSpace::FullRange())
         {
             switch (bits)
             {
@@ -3352,8 +3110,7 @@ namespace TwkFB
                 break;
             }
         }
-        else if (fb_conversion == ColorSpace::Rec709()
-                 && fb_range == ColorSpace::FullRange())
+        else if (fb_conversion == ColorSpace::Rec709() && fb_range == ColorSpace::FullRange())
         {
             switch (bits)
             {
@@ -3369,8 +3126,7 @@ namespace TwkFB
                 break;
             }
         }
-        else if (fb_conversion == ColorSpace::Rec2020()
-                 && fb_range == ColorSpace::FullRange())
+        else if (fb_conversion == ColorSpace::Rec2020() && fb_range == ColorSpace::FullRange())
         {
             switch (bits)
             {
@@ -3395,11 +3151,9 @@ namespace TwkFB
     //  use in the custom GLSL nodes (see additional_nodes)
     //  accordingly.
     //
-    void getRGBtoYUVMatrix(Mat44f& M, const string& fb_conversion,
-                           const string& fb_range, unsigned int bits)
+    void getRGBtoYUVMatrix(Mat44f& M, const string& fb_conversion, const string& fb_range, unsigned int bits)
     {
-        if ((fb_conversion == ColorSpace::Rec601()
-             && (fb_range == "None" || fb_range == ColorSpace::VideoRange()))
+        if ((fb_conversion == ColorSpace::Rec601() && (fb_range == "None" || fb_range == ColorSpace::VideoRange()))
             || fb_conversion == "None")
         {
             switch (bits)
@@ -3416,9 +3170,7 @@ namespace TwkFB
                 break;
             }
         }
-        else if (fb_conversion == ColorSpace::Rec709()
-                 && (fb_range == "None"
-                     || fb_range == ColorSpace::VideoRange()))
+        else if (fb_conversion == ColorSpace::Rec709() && (fb_range == "None" || fb_range == ColorSpace::VideoRange()))
         {
             switch (bits)
             {
@@ -3434,9 +3186,7 @@ namespace TwkFB
                 break;
             }
         }
-        else if (fb_conversion == ColorSpace::Rec2020()
-                 && (fb_range == "None"
-                     || fb_range == ColorSpace::VideoRange()))
+        else if (fb_conversion == ColorSpace::Rec2020() && (fb_range == "None" || fb_range == ColorSpace::VideoRange()))
         {
             switch (bits)
             {
@@ -3452,8 +3202,7 @@ namespace TwkFB
                 break;
             }
         }
-        else if (fb_conversion == ColorSpace::Rec601()
-                 && fb_range == ColorSpace::FullRange())
+        else if (fb_conversion == ColorSpace::Rec601() && fb_range == ColorSpace::FullRange())
         {
             switch (bits)
             {
@@ -3469,8 +3218,7 @@ namespace TwkFB
                 break;
             }
         }
-        else if (fb_conversion == ColorSpace::Rec709()
-                 && fb_range == ColorSpace::FullRange())
+        else if (fb_conversion == ColorSpace::Rec709() && fb_range == ColorSpace::FullRange())
         {
             switch (bits)
             {
@@ -3486,8 +3234,7 @@ namespace TwkFB
                 break;
             }
         }
-        else if (fb_conversion == ColorSpace::Rec2020()
-                 && fb_range == ColorSpace::FullRange())
+        else if (fb_conversion == ColorSpace::Rec2020() && fb_range == ColorSpace::FullRange())
         {
             switch (bits)
             {
@@ -3572,16 +3319,13 @@ namespace TwkFB
             getYUVtoRGBMatrix(M, a->conversion(), a->range(), 8);
         }
 
-        if (a->primaryColorSpace() == ColorSpace::Rec601()
-            || a->primaryColorSpace() == ColorSpace::Generic())
+        if (a->primaryColorSpace() == ColorSpace::Rec601() || a->primaryColorSpace() == ColorSpace::Generic())
         {
-            getYUVtoRGBMatrix(M, ColorSpace::Rec601(), ColorSpace::FullRange(),
-                              8);
+            getYUVtoRGBMatrix(M, ColorSpace::Rec601(), ColorSpace::FullRange(), 8);
         }
         else if (a->primaryColorSpace() == ColorSpace::Rec709())
         {
-            getYUVtoRGBMatrix(M, ColorSpace::Rec709(), ColorSpace::FullRange(),
-                              8);
+            getYUVtoRGBMatrix(M, ColorSpace::Rec709(), ColorSpace::FullRange(), 8);
         }
 
         applyTransform(a, b, linearColorTransform, &M);
@@ -3605,20 +3349,16 @@ namespace TwkFB
         unsigned int bits = 8;
         if (b->dataType() == FrameBuffer::USHORT)
             bits = 16;
-        if (b->dataType() == FrameBuffer::PACKED_X2_B10_G10_R10
-            || b->dataType() == FrameBuffer::PACKED_R10_G10_B10_X2)
+        if (b->dataType() == FrameBuffer::PACKED_X2_B10_G10_R10 || b->dataType() == FrameBuffer::PACKED_R10_G10_B10_X2)
             bits = 10;
 
-        if (b->primaryColorSpace() == ColorSpace::Rec601()
-            || b->primaryColorSpace() == ColorSpace::Generic())
+        if (b->primaryColorSpace() == ColorSpace::Rec601() || b->primaryColorSpace() == ColorSpace::Generic())
         {
-            getRGBtoYUVMatrix(M, ColorSpace::Rec601(), ColorSpace::FullRange(),
-                              bits);
+            getRGBtoYUVMatrix(M, ColorSpace::Rec601(), ColorSpace::FullRange(), bits);
         }
         else if (b->primaryColorSpace() == ColorSpace::Rec709())
         {
-            getRGBtoYUVMatrix(M, ColorSpace::Rec709(), ColorSpace::FullRange(),
-                              bits);
+            getRGBtoYUVMatrix(M, ColorSpace::Rec709(), ColorSpace::FullRange(), bits);
         }
 
         assert(a->numChannels() == 3 || a->numChannels() == 4);
@@ -3638,13 +3378,9 @@ namespace TwkFB
         assert(a->numChannels() == b->numChannels());
         yrybyYweights(a, Yw.x, Yw.y, Yw.z);
 
-        if (b->dataType() == FrameBuffer::UCHAR
-            || b->dataType() == FrameBuffer::USHORT
-            || b->dataType() == FrameBuffer::UINT)
+        if (b->dataType() == FrameBuffer::UCHAR || b->dataType() == FrameBuffer::USHORT || b->dataType() == FrameBuffer::UINT)
         {
-            TWK_THROW_EXC_STREAM(
-                "convertRGBtoYRYBY requires floating point output type, got "
-                << b->dataType() << " instead");
+            TWK_THROW_EXC_STREAM("convertRGBtoYRYBY requires floating point output type, got " << b->dataType() << " instead");
         }
 
         applyTransform(a, b, rgb2yrybyColorTransform, &Yw);
@@ -3783,8 +3519,7 @@ namespace TwkFB
         float& g = p[1];
         float& b = p[2];
 
-        if (fb->isYUV() || YUVp
-            || fb->dataType() == FrameBuffer::PACKED_Cb8_Y8_Cr8_Y8
+        if (fb->isYUV() || YUVp || fb->dataType() == FrameBuffer::PACKED_Cb8_Y8_Cr8_Y8
             || fb->dataType() == FrameBuffer::PACKED_Y8_Cb8_Y8_Cr8)
         {
             const float r0 = r;
@@ -3826,29 +3561,19 @@ namespace TwkFB
         }
     }
 
-    void getLogCCurveParams(LogCTransformParams& params, const FrameBuffer* fb,
-                            float ei)
+    void getLogCCurveParams(LogCTransformParams& params, const FrameBuffer* fb, float ei)
     {
         if (fb && fb->hasLogCParameters() && ei != 0.0f)
         {
-            params.LogCBlackSignal =
-                fb->attribute<float>(TwkFB::ColorSpace::LogCBlackSignal());
-            params.LogCEncodingOffset =
-                fb->attribute<float>(TwkFB::ColorSpace::LogCEncodingOffset());
-            params.LogCEncodingGain =
-                fb->attribute<float>(TwkFB::ColorSpace::LogCEncodingGain());
-            params.LogCGraySignal =
-                fb->attribute<float>(TwkFB::ColorSpace::LogCGraySignal());
-            params.LogCBlackOffset =
-                fb->attribute<float>(TwkFB::ColorSpace::LogCBlackOffset());
-            params.LogCLinearSlope =
-                fb->attribute<float>(TwkFB::ColorSpace::LogCLinearSlope());
-            params.LogCLinearOffset =
-                fb->attribute<float>(TwkFB::ColorSpace::LogCLinearOffset());
-            params.LogCLinearCutPoint =
-                fb->attribute<float>(TwkFB::ColorSpace::LogCLinearCutPoint());
-            params.LogCCutPoint =
-                fb->attribute<float>(TwkFB::ColorSpace::LogCCutPoint());
+            params.LogCBlackSignal = fb->attribute<float>(TwkFB::ColorSpace::LogCBlackSignal());
+            params.LogCEncodingOffset = fb->attribute<float>(TwkFB::ColorSpace::LogCEncodingOffset());
+            params.LogCEncodingGain = fb->attribute<float>(TwkFB::ColorSpace::LogCEncodingGain());
+            params.LogCGraySignal = fb->attribute<float>(TwkFB::ColorSpace::LogCGraySignal());
+            params.LogCBlackOffset = fb->attribute<float>(TwkFB::ColorSpace::LogCBlackOffset());
+            params.LogCLinearSlope = fb->attribute<float>(TwkFB::ColorSpace::LogCLinearSlope());
+            params.LogCLinearOffset = fb->attribute<float>(TwkFB::ColorSpace::LogCLinearOffset());
+            params.LogCLinearCutPoint = fb->attribute<float>(TwkFB::ColorSpace::LogCLinearCutPoint());
+            params.LogCCutPoint = fb->attribute<float>(TwkFB::ColorSpace::LogCCutPoint());
         }
         else
         {
@@ -3870,9 +3595,7 @@ namespace TwkFB
             params.LogCLinearSlope = logC.getLinearSlope();
             params.LogCLinearOffset = logC.getLinearOffset();
             params.LogCLinearCutPoint =
-                (RVMath::ALEXA_LOGC_PARAMS.cutPoint * params.LogCLinearSlope
-                 + params.LogCLinearOffset)
-                    * params.LogCEncodingGain
+                (RVMath::ALEXA_LOGC_PARAMS.cutPoint * params.LogCLinearSlope + params.LogCLinearOffset) * params.LogCEncodingGain
                 + params.LogCEncodingOffset;
 
             params.LogCCutPoint = RVMath::ALEXA_LOGC_PARAMS.cutPoint;
@@ -3889,8 +3612,7 @@ namespace TwkFB
             {
                 const string& name = a->channelName(i);
 
-                channelMask[i] =
-                    name == "R" || name == "G" || name == "B" || name == "Y";
+                channelMask[i] = name == "R" || name == "G" || name == "B" || name == "Y";
             }
 
             return channelMask;
@@ -3910,17 +3632,14 @@ namespace TwkFB
             return channelMask;
         }
 
-        void convertWithChannelMask(const FrameBuffer* a, FrameBuffer* b,
-                                    ColorTransformFunc F)
+        void convertWithChannelMask(const FrameBuffer* a, FrameBuffer* b, ColorTransformFunc F)
         {
             bool* channelMask = RGBYChannelMask(a);
             applyTransform(a, b, F, channelMask);
             delete[] channelMask;
         }
 
-        void convertWithLogCTransformParams(const FrameBuffer* a,
-                                            FrameBuffer* b, float ei,
-                                            ColorTransformFunc F)
+        void convertWithLogCTransformParams(const FrameBuffer* a, FrameBuffer* b, float ei, ColorTransformFunc F)
         {
             bool* channelMask = RGBYChannelMask(a);
 
@@ -3934,24 +3653,15 @@ namespace TwkFB
             // params on the target fb.
             if (ei != 0.0f)
             {
-                b->newAttribute<float>(ColorSpace::LogCCutPoint(),
-                                       params.LogCCutPoint);
-                b->newAttribute<float>(ColorSpace::LogCLinearCutPoint(),
-                                       params.LogCLinearCutPoint);
-                b->newAttribute<float>(ColorSpace::LogCLinearOffset(),
-                                       params.LogCLinearOffset);
-                b->newAttribute<float>(ColorSpace::LogCLinearSlope(),
-                                       params.LogCLinearSlope);
-                b->newAttribute<float>(ColorSpace::LogCBlackOffset(),
-                                       params.LogCBlackOffset);
-                b->newAttribute<float>(ColorSpace::LogCGraySignal(),
-                                       params.LogCGraySignal);
-                b->newAttribute<float>(ColorSpace::LogCEncodingGain(),
-                                       params.LogCEncodingGain);
-                b->newAttribute<float>(ColorSpace::LogCEncodingOffset(),
-                                       params.LogCEncodingOffset);
-                b->newAttribute<float>(ColorSpace::LogCBlackSignal(),
-                                       params.LogCBlackSignal);
+                b->newAttribute<float>(ColorSpace::LogCCutPoint(), params.LogCCutPoint);
+                b->newAttribute<float>(ColorSpace::LogCLinearCutPoint(), params.LogCLinearCutPoint);
+                b->newAttribute<float>(ColorSpace::LogCLinearOffset(), params.LogCLinearOffset);
+                b->newAttribute<float>(ColorSpace::LogCLinearSlope(), params.LogCLinearSlope);
+                b->newAttribute<float>(ColorSpace::LogCBlackOffset(), params.LogCBlackOffset);
+                b->newAttribute<float>(ColorSpace::LogCGraySignal(), params.LogCGraySignal);
+                b->newAttribute<float>(ColorSpace::LogCEncodingGain(), params.LogCEncodingGain);
+                b->newAttribute<float>(ColorSpace::LogCEncodingOffset(), params.LogCEncodingOffset);
+                b->newAttribute<float>(ColorSpace::LogCBlackSignal(), params.LogCBlackSignal);
             }
 
             delete[] channelMask;
@@ -3959,40 +3669,19 @@ namespace TwkFB
 
     } // namespace
 
-    void convertLogToLinear(const FrameBuffer* a, FrameBuffer* b)
-    {
-        convertWithChannelMask(a, b, logLinearTransform);
-    }
+    void convertLogToLinear(const FrameBuffer* a, FrameBuffer* b) { convertWithChannelMask(a, b, logLinearTransform); }
 
-    void convertLinearToLog(const FrameBuffer* a, FrameBuffer* b)
-    {
-        convertWithChannelMask(a, b, linearLogTransform);
-    }
+    void convertLinearToLog(const FrameBuffer* a, FrameBuffer* b) { convertWithChannelMask(a, b, linearLogTransform); }
 
-    void convertRedLogToLinear(const FrameBuffer* a, FrameBuffer* b)
-    {
-        convertWithChannelMask(a, b, redLogLinearTransform);
-    }
+    void convertRedLogToLinear(const FrameBuffer* a, FrameBuffer* b) { convertWithChannelMask(a, b, redLogLinearTransform); }
 
-    void convertLinearToRedLog(const FrameBuffer* a, FrameBuffer* b)
-    {
-        convertWithChannelMask(a, b, linearRedLogTransform);
-    }
+    void convertLinearToRedLog(const FrameBuffer* a, FrameBuffer* b) { convertWithChannelMask(a, b, linearRedLogTransform); }
 
-    void convertSRGBToLinear(const FrameBuffer* a, FrameBuffer* b)
-    {
-        convertWithChannelMask(a, b, sRGBtoLinearTransform);
-    }
+    void convertSRGBToLinear(const FrameBuffer* a, FrameBuffer* b) { convertWithChannelMask(a, b, sRGBtoLinearTransform); }
 
-    void convertLinearToSRGB(const FrameBuffer* a, FrameBuffer* b)
-    {
-        convertWithChannelMask(a, b, linearToSRGBTransform);
-    }
+    void convertLinearToSRGB(const FrameBuffer* a, FrameBuffer* b) { convertWithChannelMask(a, b, linearToSRGBTransform); }
 
-    void convertLinearToRec709(const FrameBuffer* a, FrameBuffer* b)
-    {
-        convertWithChannelMask(a, b, linearToRec709Transform);
-    }
+    void convertLinearToRec709(const FrameBuffer* a, FrameBuffer* b) { convertWithChannelMask(a, b, linearToRec709Transform); }
 
     void convertLogCToLinear(const FrameBuffer* a, FrameBuffer* b, float ei)
     {
@@ -4004,15 +3693,9 @@ namespace TwkFB
         convertWithLogCTransformParams(a, b, ei, linearToLogCTransform);
     }
 
-    void premult(const FrameBuffer* a, FrameBuffer* b)
-    {
-        convertWithChannelMask(a, b, premultTransform);
-    }
+    void premult(const FrameBuffer* a, FrameBuffer* b) { convertWithChannelMask(a, b, premultTransform); }
 
-    void unpremult(const FrameBuffer* a, FrameBuffer* b)
-    {
-        convertWithChannelMask(a, b, unpremultTransform);
-    }
+    void unpremult(const FrameBuffer* a, FrameBuffer* b) { convertWithChannelMask(a, b, unpremultTransform); }
 
     void orientationMatrix(const FrameBuffer* fb, bool normalized, float* m)
     {
@@ -4037,28 +3720,21 @@ namespace TwkFB
         }
     }
 
-    FrameBuffer* cropPlane(const FrameBuffer* fb, int x0, int y0, int x1,
-                           int y1)
+    FrameBuffer* cropPlane(const FrameBuffer* fb, int x0, int y0, int x1, int y1)
     {
-        if (x1 < x0 || y1 < y0 || x0 < 0 || x0 >= fb->width() || x1 < 0
-            || x1 >= fb->width() || y0 < 0 || y0 >= fb->height() || y1 < 0
+        if (x1 < x0 || y1 < y0 || x0 < 0 || x0 >= fb->width() || x1 < 0 || x1 >= fb->width() || y0 < 0 || y0 >= fb->height() || y1 < 0
             || y1 >= fb->height())
         {
-            TWK_THROW_EXC_STREAM("bad parameter(s) to crop "
-                                 << x0 << " " << y0 << " " << x1 << " " << y1
-                                 << ", fb " << fb->width() << " "
-                                 << fb->height());
+            TWK_THROW_EXC_STREAM("bad parameter(s) to crop " << x0 << " " << y0 << " " << x1 << " " << y1 << ", fb " << fb->width() << " "
+                                                             << fb->height());
         }
 
-        FrameBuffer* crop =
-            new FrameBuffer(fb->coordinateType(), x1 - x0 + 1, y1 - y0 + 1,
-                            fb->depth(), fb->numChannels(), fb->dataType(), 0,
-                            &fb->channelNames(), fb->orientation(), true);
+        FrameBuffer* crop = new FrameBuffer(fb->coordinateType(), x1 - x0 + 1, y1 - y0 + 1, fb->depth(), fb->numChannels(), fb->dataType(),
+                                            0, &fb->channelNames(), fb->orientation(), true);
 
         for (int row = y0; row <= y1; row++)
         {
-            const unsigned char* src =
-                fb->scanline<unsigned char>(row) + x0 * fb->pixelSize();
+            const unsigned char* src = fb->scanline<unsigned char>(row) + x0 * fb->pixelSize();
             unsigned char* dst = crop->scanline<unsigned char>(row - y0);
             memcpy(dst, src, crop->scanlineSize());
         }
@@ -4092,10 +3768,8 @@ namespace TwkFB
 
         if (!errStr.empty())
         {
-            TWK_THROW_EXC_STREAM("bad parameter(s) to crop "
-                                 << x0 << " " << y0 << " " << x1 << " " << y1
-                                 << ", fb size " << fb->width() << " "
-                                 << fb->height() << " (" << errStr << ")");
+            TWK_THROW_EXC_STREAM("bad parameter(s) to crop " << x0 << " " << y0 << " " << x1 << " " << y1 << ", fb size " << fb->width()
+                                                             << " " << fb->height() << " (" << errStr << ")");
         }
 
         //
@@ -4105,16 +3779,14 @@ namespace TwkFB
         //  framebuffer, so we convert from one to the other here.
         //
 
-        if (fb->orientation() == FrameBuffer::TOPRIGHT
-            || fb->orientation() == FrameBuffer::BOTTOMRIGHT)
+        if (fb->orientation() == FrameBuffer::TOPRIGHT || fb->orientation() == FrameBuffer::BOTTOMRIGHT)
         {
             int x0orig = x0;
             x0 = fb->width() - 1 - x1;
             x1 = fb->width() - 1 - x0orig;
         }
 
-        if (fb->orientation() == FrameBuffer::TOPLEFT
-            || fb->orientation() == FrameBuffer::TOPRIGHT)
+        if (fb->orientation() == FrameBuffer::TOPLEFT || fb->orientation() == FrameBuffer::TOPRIGHT)
         {
             int y0orig = y0;
             y0 = fb->height() - 1 - y1;
@@ -4175,16 +3847,14 @@ namespace TwkFB
         return cfb;
     }
 
-    FrameBuffer* cropWithUncrop(const FrameBuffer* fb, int x0, int y0, int x1,
-                                int y1)
+    FrameBuffer* cropWithUncrop(const FrameBuffer* fb, int x0, int y0, int x1, int y1)
     {
         FrameBuffer* cfb = crop(fb, x0, y0, x1, y1);
         cfb->setUncrop(fb->width(), fb->height(), x0, y0);
         return cfb;
     }
 
-    void cropInto(const FrameBuffer* infb, FrameBuffer* outfb, int x0, int y0,
-                  int x1, int y1)
+    void cropInto(const FrameBuffer* infb, FrameBuffer* outfb, int x0, int y0, int x1, int y1)
     {
         const double w = double(infb->width());
         const double h = double(infb->height());
@@ -4216,17 +3886,12 @@ namespace TwkFB
             const int nw = int(cropW * xsampling + 0.5);
             const int nh = int(cropH * ysampling + 0.5);
 
-            out->restructure(nw, nh, in->depth(), in->numChannels(),
-                             in->dataType(), NULL, &in->channelNames(),
-                             in->orientation());
+            out->restructure(nw, nh, in->depth(), in->numChannels(), in->dataType(), NULL, &in->channelNames(), in->orientation());
 
-            for (int row = int(fy0 * ysampling * h + 0.499), nrow = 0;
-                 row < int(fy1 * ysampling * h + 0.499) && nrow < out->height();
+            for (int row = int(fy0 * ysampling * h + 0.499), nrow = 0; row < int(fy1 * ysampling * h + 0.499) && nrow < out->height();
                  row++, nrow++)
             {
-                const unsigned char* src =
-                    in->scanline<unsigned char>(row)
-                    + size_t(fx0 * xsampling * in->width()) * in->pixelSize();
+                const unsigned char* src = in->scanline<unsigned char>(row) + size_t(fx0 * xsampling * in->width()) * in->pixelSize();
                 unsigned char* dst = out->scanline<unsigned char>(nrow);
                 memcpy(dst, src, out->scanlineSize());
             }

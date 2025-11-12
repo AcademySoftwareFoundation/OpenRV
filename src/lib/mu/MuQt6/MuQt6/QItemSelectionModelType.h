@@ -42,8 +42,7 @@ namespace Mu
         //  Constructors
         //
 
-        QItemSelectionModelType(Context* context, const char* name,
-                                Class* superClass = 0, Class* superClass2 = 0);
+        QItemSelectionModelType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QItemSelectionModelType();
 
@@ -66,10 +65,8 @@ namespace Mu
     {
     public:
         virtual ~MuQt_QItemSelectionModel();
-        MuQt_QItemSelectionModel(Pointer muobj, const CallEnvironment*,
-                                 QAbstractItemModel* model);
-        MuQt_QItemSelectionModel(Pointer muobj, const CallEnvironment*,
-                                 QAbstractItemModel* model, QObject* parent);
+        MuQt_QItemSelectionModel(Pointer muobj, const CallEnvironment*, QAbstractItemModel* model);
+        MuQt_QItemSelectionModel(Pointer muobj, const CallEnvironment*, QAbstractItemModel* model, QObject* parent);
         virtual bool event(QEvent* e);
         virtual bool eventFilter(QObject* watched, QEvent* event);
 
@@ -78,32 +75,23 @@ namespace Mu
         virtual void timerEvent(QTimerEvent* event);
 
     public:
-        void emitSelectionChanged_pub(const QItemSelection& newSelection,
-                                      const QItemSelection& oldSelection)
+        void emitSelectionChanged_pub(const QItemSelection& newSelection, const QItemSelection& oldSelection)
         {
             emitSelectionChanged(newSelection, oldSelection);
         }
 
-        void emitSelectionChanged_pub_parent(const QItemSelection& newSelection,
-                                             const QItemSelection& oldSelection)
+        void emitSelectionChanged_pub_parent(const QItemSelection& newSelection, const QItemSelection& oldSelection)
         {
-            QItemSelectionModel::emitSelectionChanged(newSelection,
-                                                      oldSelection);
+            QItemSelectionModel::emitSelectionChanged(newSelection, oldSelection);
         }
 
         void customEvent_pub(QEvent* event) { customEvent(event); }
 
-        void customEvent_pub_parent(QEvent* event)
-        {
-            QItemSelectionModel::customEvent(event);
-        }
+        void customEvent_pub_parent(QEvent* event) { QItemSelectionModel::customEvent(event); }
 
         void timerEvent_pub(QTimerEvent* event) { timerEvent(event); }
 
-        void timerEvent_pub_parent(QTimerEvent* event)
-        {
-            QItemSelectionModel::timerEvent(event);
-        }
+        void timerEvent_pub_parent(QTimerEvent* event) { QItemSelectionModel::timerEvent(event); }
 
     public:
         const QItemSelectionModelType* _baseType;
@@ -111,11 +99,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance* QItemSelectionModelType::cachedInstance(
-        const QItemSelectionModelType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QItemSelectionModelType::cachedInstance(const QItemSelectionModelType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

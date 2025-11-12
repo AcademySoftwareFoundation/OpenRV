@@ -124,10 +124,8 @@ namespace Rv
         ScrollEventEater* scrollEventEater = new ScrollEventEater(this);
 
         m_ui.setupUi(this);
-        connect(m_ui.exrAutoThreadsToggle, SIGNAL(stateChanged(int)), this,
-                SLOT(exrAutoThreads(int)));
-        connect(m_ui.exrNumThreadsEdit, SIGNAL(textChanged(const QString&)),
-                this, SLOT(exrThreadNumChanged(const QString&)));
+        connect(m_ui.exrAutoThreadsToggle, SIGNAL(stateChanged(int)), this, SLOT(exrAutoThreads(int)));
+        connect(m_ui.exrNumThreadsEdit, SIGNAL(textChanged(const QString&)), this, SLOT(exrThreadNumChanged(const QString&)));
         setWindowTitle(UI_APPLICATION_NAME " Preferences");
 
 #ifndef PLATFORM_DARWIN
@@ -139,238 +137,164 @@ namespace Rv
         m_ui.extTreeView->setAlternatingRowColors(true);
         QItemSelectionModel* s = m_ui.extTreeView->selectionModel();
 
-        connect(m_ui.stylusAsMouseToggle, SIGNAL(stateChanged(int)), this,
-                SLOT(stylusAsMouseChanged(int)));
+        connect(m_ui.stylusAsMouseToggle, SIGNAL(stateChanged(int)), this, SLOT(stylusAsMouseChanged(int)));
 
-        connect(m_ui.startupResizeToggle, SIGNAL(stateChanged(int)), this,
-                SLOT(startupResizeChanged(int)));
+        connect(m_ui.startupResizeToggle, SIGNAL(stateChanged(int)), this, SLOT(startupResizeChanged(int)));
 
-        connect(s,
-                SIGNAL(selectionChanged(const QItemSelection&,
-                                        const QItemSelection&)),
-                this,
-                SLOT(packageSelection(const QItemSelection&,
-                                      const QItemSelection&)));
+        connect(s, SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), this,
+                SLOT(packageSelection(const QItemSelection&, const QItemSelection&)));
 
-        connect(m_ui.extTreeView, SIGNAL(clicked(QModelIndex)), this,
-                SLOT(clickedPackage(QModelIndex)));
+        connect(m_ui.extTreeView, SIGNAL(clicked(QModelIndex)), this, SLOT(clickedPackage(QModelIndex)));
 
-        connect(m_ui.extAddButton, SIGNAL(clicked(bool)), this,
-                SLOT(addPackage(bool)));
-        connect(m_ui.extRemoveButton, SIGNAL(clicked(bool)), this,
-                SLOT(removePackage(bool)));
-        connect(m_ui.extShowHiddenToggle, SIGNAL(clicked(bool)), this,
-                SLOT(showHiddenPackages(bool)));
+        connect(m_ui.extAddButton, SIGNAL(clicked(bool)), this, SLOT(addPackage(bool)));
+        connect(m_ui.extRemoveButton, SIGNAL(clicked(bool)), this, SLOT(removePackage(bool)));
+        connect(m_ui.extShowHiddenToggle, SIGNAL(clicked(bool)), this, SLOT(showHiddenPackages(bool)));
 
-        connect(m_ui.audioModuleCombo, SIGNAL(activated(int)), this,
-                SLOT(audioModuleChanged(int)));
+        connect(m_ui.audioModuleCombo, SIGNAL(activated(int)), this, SLOT(audioModuleChanged(int)));
         m_ui.audioModuleCombo->installEventFilter(scrollEventEater);
 
-        connect(m_ui.audioDeviceCombo, SIGNAL(activated(int)), this,
-                SLOT(audioDeviceChanged(int)));
+        connect(m_ui.audioDeviceCombo, SIGNAL(activated(int)), this, SLOT(audioDeviceChanged(int)));
         m_ui.audioDeviceCombo->installEventFilter(scrollEventEater);
 
 #if defined(RV_VFX_CY2023)
-        connect(m_ui.audioDeviceRateWidget, SIGNAL(activated(int)), this,
-                SLOT(audioRateChanged(int)));
+        connect(m_ui.audioDeviceRateWidget, SIGNAL(activated(int)), this, SLOT(audioRateChanged(int)));
 #else
-        connect(m_ui.audioDeviceRateWidget, SIGNAL(editingFinished()), this,
-                SLOT(audioRateChanged()));
+        connect(m_ui.audioDeviceRateWidget, SIGNAL(editingFinished()), this, SLOT(audioRateChanged()));
 #endif
         m_ui.audioDeviceRateWidget->installEventFilter(scrollEventEater);
 
-        connect(m_ui.audioDeviceFormatCombo, SIGNAL(activated(int)), this,
-                SLOT(audioFormatChanged(int)));
+        connect(m_ui.audioDeviceFormatCombo, SIGNAL(activated(int)), this, SLOT(audioFormatChanged(int)));
         m_ui.audioDeviceFormatCombo->installEventFilter(scrollEventEater);
 
-        connect(m_ui.audioDeviceLayoutCombo, SIGNAL(activated(int)), this,
-                SLOT(audioChannelsChanged(int)));
+        connect(m_ui.audioDeviceLayoutCombo, SIGNAL(activated(int)), this, SLOT(audioChannelsChanged(int)));
         m_ui.audioDeviceLayoutCombo->installEventFilter(scrollEventEater);
 
-        connect(m_ui.audioHoldOpenToggle, SIGNAL(stateChanged(int)), this,
-                SLOT(audioHoldOpenChanged(int)));
+        connect(m_ui.audioHoldOpenToggle, SIGNAL(stateChanged(int)), this, SLOT(audioHoldOpenChanged(int)));
 
-        connect(m_ui.audioHardwareLockToggle, SIGNAL(stateChanged(int)), this,
-                SLOT(audioVideoSyncChanged(int)));
+        connect(m_ui.audioHardwareLockToggle, SIGNAL(stateChanged(int)), this, SLOT(audioVideoSyncChanged(int)));
 
-        connect(m_ui.audioPreRollToggle, SIGNAL(stateChanged(int)), this,
-                SLOT(audioPreRollChanged(int)));
+        connect(m_ui.audioPreRollToggle, SIGNAL(stateChanged(int)), this, SLOT(audioPreRollChanged(int)));
 
-        connect(m_ui.audioDevicePacketEdit, SIGNAL(editingFinished()), this,
-                SLOT(audioDevicePacketChanged()));
+        connect(m_ui.audioDevicePacketEdit, SIGNAL(editingFinished()), this, SLOT(audioDevicePacketChanged()));
 
-        connect(m_ui.audioCachePacketEdit, SIGNAL(editingFinished()), this,
-                SLOT(audioCachePacketChanged()));
+        connect(m_ui.audioCachePacketEdit, SIGNAL(editingFinished()), this, SLOT(audioCachePacketChanged()));
 
-        connect(m_ui.audioGlobalOffsetEdit, SIGNAL(editingFinished()), this,
-                SLOT(audioOffsetFinished()));
+        connect(m_ui.audioGlobalOffsetEdit, SIGNAL(editingFinished()), this, SLOT(audioOffsetFinished()));
 
-        connect(m_ui.audioDeviceLatencyEdit, SIGNAL(editingFinished()), this,
-                SLOT(audioDeviceLatencyFinished()));
+        connect(m_ui.audioDeviceLatencyEdit, SIGNAL(editingFinished()), this, SLOT(audioDeviceLatencyFinished()));
 
 // Only connect the update slot to the architecture appropriate signal
 #ifdef ARCH_IA32
-        connect(m_ui.lookAheadCacheSize32Edit, SIGNAL(editingFinished()), this,
-                SLOT(lookaheadCacheSizeFinisihed()));
+        connect(m_ui.lookAheadCacheSize32Edit, SIGNAL(editingFinished()), this, SLOT(lookaheadCacheSizeFinisihed()));
 
-        connect(m_ui.regionCacheSize32Edit, SIGNAL(editingFinished()), this,
-                SLOT(regionCacheSizeFinisihed()));
+        connect(m_ui.regionCacheSize32Edit, SIGNAL(editingFinished()), this, SLOT(regionCacheSizeFinisihed()));
 #else
-        connect(m_ui.lookAheadCacheSize64Edit, SIGNAL(editingFinished()), this,
-                SLOT(lookaheadCacheSizeFinisihed()));
+        connect(m_ui.lookAheadCacheSize64Edit, SIGNAL(editingFinished()), this, SLOT(lookaheadCacheSizeFinisihed()));
 
-        connect(m_ui.regionCacheSize64Edit, SIGNAL(editingFinished()), this,
-                SLOT(regionCacheSizeFinisihed()));
+        connect(m_ui.regionCacheSize64Edit, SIGNAL(editingFinished()), this, SLOT(regionCacheSizeFinisihed()));
 #endif
 
-        connect(m_ui.bufferWaitEdit, SIGNAL(editingFinished()), this,
-                SLOT(bufferWaitFinished()));
+        connect(m_ui.bufferWaitEdit, SIGNAL(editingFinished()), this, SLOT(bufferWaitFinished()));
 
-        connect(m_ui.lookBehindFracEdit, SIGNAL(editingFinished()), this,
-                SLOT(lookBehindFinished()));
+        connect(m_ui.lookBehindFracEdit, SIGNAL(editingFinished()), this, SLOT(lookBehindFinished()));
 
-        connect(m_ui.cacheOutsideRegionToggle, SIGNAL(stateChanged(int)), this,
-                SLOT(cacheOutsideRegionChanged(int)));
+        connect(m_ui.cacheOutsideRegionToggle, SIGNAL(stateChanged(int)), this, SLOT(cacheOutsideRegionChanged(int)));
 
-        connect(m_ui.rthreadEdit, SIGNAL(editingFinished()), this,
-                SLOT(rthreadFinished()));
+        connect(m_ui.rthreadEdit, SIGNAL(editingFinished()), this, SLOT(rthreadFinished()));
 
-        connect(m_ui.bitDepthCombo, SIGNAL(activated(int)), this,
-                SLOT(bitDepthChanged(int)));
+        connect(m_ui.bitDepthCombo, SIGNAL(activated(int)), this, SLOT(bitDepthChanged(int)));
         m_ui.bitDepthCombo->installEventFilter(scrollEventEater);
 
-        connect(m_ui.allowFloatToggle, SIGNAL(stateChanged(int)), this,
-                SLOT(allowFloatChanged(int)));
+        connect(m_ui.allowFloatToggle, SIGNAL(stateChanged(int)), this, SLOT(allowFloatChanged(int)));
 
-        connect(m_ui.newGLSLlutInterpToggle, SIGNAL(stateChanged(int)), this,
-                SLOT(newGLSLlutInterpChanged(int)));
+        connect(m_ui.newGLSLlutInterpToggle, SIGNAL(stateChanged(int)), this, SLOT(newGLSLlutInterpChanged(int)));
 
-        connect(m_ui.swapScanlinesToggle, SIGNAL(stateChanged(int)), this,
-                SLOT(swapScanlinesChanged(int)));
+        connect(m_ui.swapScanlinesToggle, SIGNAL(stateChanged(int)), this, SLOT(swapScanlinesChanged(int)));
 
-        connect(m_ui.prefetchToggle, SIGNAL(stateChanged(int)), this,
-                SLOT(prefetchChanged(int)));
+        connect(m_ui.prefetchToggle, SIGNAL(stateChanged(int)), this, SLOT(prefetchChanged(int)));
 
-        connect(m_ui.appleClientStorageToggle, SIGNAL(stateChanged(int)), this,
-                SLOT(appleClientStorageChanged(int)));
+        connect(m_ui.appleClientStorageToggle, SIGNAL(stateChanged(int)), this, SLOT(appleClientStorageChanged(int)));
 
-        connect(m_ui.useThreadedUploadToggle, SIGNAL(stateChanged(int)), this,
-                SLOT(useThreadedUploadChanged(int)));
+        connect(m_ui.useThreadedUploadToggle, SIGNAL(stateChanged(int)), this, SLOT(useThreadedUploadChanged(int)));
 
-        connect(m_ui.displayVideoSyncButton, SIGNAL(stateChanged(int)), this,
-                SLOT(videoSyncChanged(int)));
+        connect(m_ui.displayVideoSyncButton, SIGNAL(stateChanged(int)), this, SLOT(videoSyncChanged(int)));
 
-        connect(m_ui.configureVideoLatencyButton, SIGNAL(clicked()), this,
-                SLOT(configVideoLatency()));
+        connect(m_ui.configureVideoLatencyButton, SIGNAL(clicked()), this, SLOT(configVideoLatency()));
 
-        connect(m_ui.exrRGBAToggle, SIGNAL(stateChanged(int)), this,
-                SLOT(exrRGBAChanged(int)));
+        connect(m_ui.exrRGBAToggle, SIGNAL(stateChanged(int)), this, SLOT(exrRGBAChanged(int)));
 
-        connect(m_ui.exrInheritToggle, SIGNAL(stateChanged(int)), this,
-                SLOT(exrInheritChanged(int)));
+        connect(m_ui.exrInheritToggle, SIGNAL(stateChanged(int)), this, SLOT(exrInheritChanged(int)));
 
-        connect(m_ui.exrPlanar3ChannelToggle, SIGNAL(stateChanged(int)), this,
-                SLOT(exrPlanar3ChannelChanged(int)));
+        connect(m_ui.exrPlanar3ChannelToggle, SIGNAL(stateChanged(int)), this, SLOT(exrPlanar3ChannelChanged(int)));
 
-        connect(m_ui.exrNoOneChannelToggle, SIGNAL(stateChanged(int)), this,
-                SLOT(exrNoOneChannelChanged(int)));
+        connect(m_ui.exrNoOneChannelToggle, SIGNAL(stateChanged(int)), this, SLOT(exrNoOneChannelChanged(int)));
 
-        connect(m_ui.exrReadWindowIsDisplayWindowToggle,
-                SIGNAL(stateChanged(int)), this,
-                SLOT(exrReadWindowIsDisplayWindowChanged(int)));
+        connect(m_ui.exrReadWindowIsDisplayWindowToggle, SIGNAL(stateChanged(int)), this, SLOT(exrReadWindowIsDisplayWindowChanged(int)));
 
-        connect(m_ui.exrNumThreadsEdit, SIGNAL(editingFinished()), this,
-                SLOT(exrNumThreadsFinished()));
+        connect(m_ui.exrNumThreadsEdit, SIGNAL(editingFinished()), this, SLOT(exrNumThreadsFinished()));
 
-        connect(m_ui.exrChunkSizeEdit, SIGNAL(editingFinished()), this,
-                SLOT(exrChunkSizeFinished()));
+        connect(m_ui.exrChunkSizeEdit, SIGNAL(editingFinished()), this, SLOT(exrChunkSizeFinished()));
 
-        connect(m_ui.exrMaxInFlightEdit, SIGNAL(editingFinished()), this,
-                SLOT(exrMaxInFlightFinished()));
+        connect(m_ui.exrMaxInFlightEdit, SIGNAL(editingFinished()), this, SLOT(exrMaxInFlightFinished()));
 
-        connect(m_ui.exrIOMethodCombo, SIGNAL(activated(int)), this,
-                SLOT(exrIOMethodChanged(int)));
+        connect(m_ui.exrIOMethodCombo, SIGNAL(activated(int)), this, SLOT(exrIOMethodChanged(int)));
         m_ui.exrIOMethodCombo->installEventFilter(scrollEventEater);
 
-        connect(m_ui.exrReadWindowCombo, SIGNAL(activated(int)), this,
-                SLOT(exrReadWindowChanged(int)));
+        connect(m_ui.exrReadWindowCombo, SIGNAL(activated(int)), this, SLOT(exrReadWindowChanged(int)));
         m_ui.exrReadWindowCombo->installEventFilter(scrollEventEater);
 
-        connect(m_ui.cinChunkSizeEdit, SIGNAL(editingFinished()), this,
-                SLOT(cinChunkSizeFinished()));
+        connect(m_ui.cinChunkSizeEdit, SIGNAL(editingFinished()), this, SLOT(cinChunkSizeFinished()));
 
-        connect(m_ui.cinMaxInFlightEdit, SIGNAL(editingFinished()), this,
-                SLOT(cinMaxInFlightFinished()));
+        connect(m_ui.cinMaxInFlightEdit, SIGNAL(editingFinished()), this, SLOT(cinMaxInFlightFinished()));
 
-        connect(m_ui.cinIOMethodCombo, SIGNAL(activated(int)), this,
-                SLOT(cinIOMethodChanged(int)));
+        connect(m_ui.cinIOMethodCombo, SIGNAL(activated(int)), this, SLOT(cinIOMethodChanged(int)));
         m_ui.cinIOMethodCombo->installEventFilter(scrollEventEater);
 
-        connect(m_ui.cinDisplayPixelCombo, SIGNAL(activated(int)), this,
-                SLOT(cinPixelsChanged(int)));
+        connect(m_ui.cinDisplayPixelCombo, SIGNAL(activated(int)), this, SLOT(cinPixelsChanged(int)));
         m_ui.cinDisplayPixelCombo->installEventFilter(scrollEventEater);
 
-        connect(m_ui.cinChromaToggle, SIGNAL(stateChanged(int)), this,
-                SLOT(cinChromaChanged(int)));
+        connect(m_ui.cinChromaToggle, SIGNAL(stateChanged(int)), this, SLOT(cinChromaChanged(int)));
 
-        connect(m_ui.dpxChunkSizeEdit, SIGNAL(editingFinished()), this,
-                SLOT(dpxChunkSizeFinished()));
+        connect(m_ui.dpxChunkSizeEdit, SIGNAL(editingFinished()), this, SLOT(dpxChunkSizeFinished()));
 
-        connect(m_ui.dpxMaxInFlightEdit, SIGNAL(editingFinished()), this,
-                SLOT(dpxMaxInFlightFinished()));
+        connect(m_ui.dpxMaxInFlightEdit, SIGNAL(editingFinished()), this, SLOT(dpxMaxInFlightFinished()));
 
-        connect(m_ui.dpxIOMethodCombo, SIGNAL(activated(int)), this,
-                SLOT(dpxIOMethodChanged(int)));
+        connect(m_ui.dpxIOMethodCombo, SIGNAL(activated(int)), this, SLOT(dpxIOMethodChanged(int)));
         m_ui.dpxIOMethodCombo->installEventFilter(scrollEventEater);
 
-        connect(m_ui.dpxDisplayPixelCombo, SIGNAL(activated(int)), this,
-                SLOT(dpxPixelsChanged(int)));
+        connect(m_ui.dpxDisplayPixelCombo, SIGNAL(activated(int)), this, SLOT(dpxPixelsChanged(int)));
         m_ui.dpxDisplayPixelCombo->installEventFilter(scrollEventEater);
 
-        connect(m_ui.dpxChromaToggle, SIGNAL(stateChanged(int)), this,
-                SLOT(dpxChromaChanged(int)));
+        connect(m_ui.dpxChromaToggle, SIGNAL(stateChanged(int)), this, SLOT(dpxChromaChanged(int)));
 
-        connect(m_ui.tgaChunkSizeEdit, SIGNAL(editingFinished()), this,
-                SLOT(tgaChunkSizeFinished()));
+        connect(m_ui.tgaChunkSizeEdit, SIGNAL(editingFinished()), this, SLOT(tgaChunkSizeFinished()));
 
-        connect(m_ui.tgaMaxInFlightEdit, SIGNAL(editingFinished()), this,
-                SLOT(tgaMaxInFlightFinished()));
+        connect(m_ui.tgaMaxInFlightEdit, SIGNAL(editingFinished()), this, SLOT(tgaMaxInFlightFinished()));
 
-        connect(m_ui.tgaIOMethodCombo, SIGNAL(activated(int)), this,
-                SLOT(tgaIOMethodChanged(int)));
+        connect(m_ui.tgaIOMethodCombo, SIGNAL(activated(int)), this, SLOT(tgaIOMethodChanged(int)));
         m_ui.tgaIOMethodCombo->installEventFilter(scrollEventEater);
 
-        connect(m_ui.tifChunkSizeEdit, SIGNAL(editingFinished()), this,
-                SLOT(tiffChunkSizeFinished()));
+        connect(m_ui.tifChunkSizeEdit, SIGNAL(editingFinished()), this, SLOT(tiffChunkSizeFinished()));
 
-        connect(m_ui.tifMaxInFlightEdit, SIGNAL(editingFinished()), this,
-                SLOT(tiffMaxInFlightFinished()));
+        connect(m_ui.tifMaxInFlightEdit, SIGNAL(editingFinished()), this, SLOT(tiffMaxInFlightFinished()));
 
-        connect(m_ui.tifIOMethodCombo, SIGNAL(activated(int)), this,
-                SLOT(tiffIOMethodChanged(int)));
+        connect(m_ui.tifIOMethodCombo, SIGNAL(activated(int)), this, SLOT(tiffIOMethodChanged(int)));
         m_ui.tifIOMethodCombo->installEventFilter(scrollEventEater);
 
-        connect(m_ui.jpegChunkSizeEdit, SIGNAL(editingFinished()), this,
-                SLOT(jpegChunkSizeFinished()));
+        connect(m_ui.jpegChunkSizeEdit, SIGNAL(editingFinished()), this, SLOT(jpegChunkSizeFinished()));
 
-        connect(m_ui.jpegMaxInFlightEdit, SIGNAL(editingFinished()), this,
-                SLOT(jpegMaxInFlightFinished()));
+        connect(m_ui.jpegMaxInFlightEdit, SIGNAL(editingFinished()), this, SLOT(jpegMaxInFlightFinished()));
 
-        connect(m_ui.jpegIOMethodCombo, SIGNAL(activated(int)), this,
-                SLOT(jpegIOMethodChanged(int)));
+        connect(m_ui.jpegIOMethodCombo, SIGNAL(activated(int)), this, SLOT(jpegIOMethodChanged(int)));
         m_ui.jpegIOMethodCombo->installEventFilter(scrollEventEater);
 
-        connect(m_ui.jpegRGBAToggle, SIGNAL(stateChanged(int)), this,
-                SLOT(jpegRGBAChanged(int)));
+        connect(m_ui.jpegRGBAToggle, SIGNAL(stateChanged(int)), this, SLOT(jpegRGBAChanged(int)));
 
-        connect(m_ui.displayOutputCombo, SIGNAL(activated(int)), this,
-                SLOT(displayOutputChanged(int)));
+        connect(m_ui.displayOutputCombo, SIGNAL(activated(int)), this, SLOT(displayOutputChanged(int)));
 
-        connect(m_ui.fontSizeSpinBox, SIGNAL(editingFinished()), this,
-                SLOT(fontChanged()));
+        connect(m_ui.fontSizeSpinBox, SIGNAL(editingFinished()), this, SLOT(fontChanged()));
 
-        connect(m_ui.fontSize2SpinBox, SIGNAL(editingFinished()), this,
-                SLOT(fontChanged()));
+        connect(m_ui.fontSize2SpinBox, SIGNAL(editingFinished()), this, SLOT(fontChanged()));
 
         m_ui.displayOutputCombo->installEventFilter(scrollEventEater);
 
@@ -393,39 +317,23 @@ namespace Rv
         m_ui.extRemoveButton->setEnabled(false);
         m_ui.extTextBrowser->zoomOut();
 
-        connect(m_ui.videoModuleCombo, SIGNAL(activated(int)), this,
-                SLOT(videoModuleChanged(int)));
-        connect(m_ui.videoDeviceCombo, SIGNAL(activated(int)), this,
-                SLOT(videoDeviceChanged(int)));
-        connect(m_ui.videoFormatCombo, SIGNAL(activated(int)), this,
-                SLOT(videoFormatChanged(int)));
-        connect(m_ui.video4KTransportCombo, SIGNAL(activated(int)), this,
-                SLOT(video4KTransportChanged(int)));
-        connect(m_ui.videoAudioFormatCombo, SIGNAL(activated(int)), this,
-                SLOT(videoAudioFormatChanged(int)));
-        connect(m_ui.dataFormatCombo, SIGNAL(activated(int)), this,
-                SLOT(videoDataFormatChanged(int)));
-        connect(m_ui.syncMethodCombo, SIGNAL(activated(int)), this,
-                SLOT(syncMethodChanged(int)));
-        connect(m_ui.syncSourceCombo, SIGNAL(activated(int)), this,
-                SLOT(syncSourceChanged(int)));
-        connect(m_ui.videoAudioDeviceCheckBox, SIGNAL(stateChanged(int)), this,
-                SLOT(videoAudioCheckBoxChanged(int)));
-        connect(m_ui.videoSwapStereoEyesCheckBox, SIGNAL(stateChanged(int)),
-                this, SLOT(videoSwapStereoEyesChanged(int)));
-        connect(m_ui.useVideoLatencyCheckBox, SIGNAL(stateChanged(int)), this,
-                SLOT(videoUseLatencyCheckBoxChanged(int)));
-        connect(m_ui.presentationCheckBox, SIGNAL(stateChanged(int)), this,
-                SLOT(presentationCheckBoxChanged(int)));
-        connect(m_ui.additionalOptionsEdit, SIGNAL(textChanged()), this,
-                SLOT(videoAdditionalOptionsChanged()));
+        connect(m_ui.videoModuleCombo, SIGNAL(activated(int)), this, SLOT(videoModuleChanged(int)));
+        connect(m_ui.videoDeviceCombo, SIGNAL(activated(int)), this, SLOT(videoDeviceChanged(int)));
+        connect(m_ui.videoFormatCombo, SIGNAL(activated(int)), this, SLOT(videoFormatChanged(int)));
+        connect(m_ui.video4KTransportCombo, SIGNAL(activated(int)), this, SLOT(video4KTransportChanged(int)));
+        connect(m_ui.videoAudioFormatCombo, SIGNAL(activated(int)), this, SLOT(videoAudioFormatChanged(int)));
+        connect(m_ui.dataFormatCombo, SIGNAL(activated(int)), this, SLOT(videoDataFormatChanged(int)));
+        connect(m_ui.syncMethodCombo, SIGNAL(activated(int)), this, SLOT(syncMethodChanged(int)));
+        connect(m_ui.syncSourceCombo, SIGNAL(activated(int)), this, SLOT(syncSourceChanged(int)));
+        connect(m_ui.videoAudioDeviceCheckBox, SIGNAL(stateChanged(int)), this, SLOT(videoAudioCheckBoxChanged(int)));
+        connect(m_ui.videoSwapStereoEyesCheckBox, SIGNAL(stateChanged(int)), this, SLOT(videoSwapStereoEyesChanged(int)));
+        connect(m_ui.useVideoLatencyCheckBox, SIGNAL(stateChanged(int)), this, SLOT(videoUseLatencyCheckBoxChanged(int)));
+        connect(m_ui.presentationCheckBox, SIGNAL(stateChanged(int)), this, SLOT(presentationCheckBoxChanged(int)));
+        connect(m_ui.additionalOptionsEdit, SIGNAL(textChanged()), this, SLOT(videoAdditionalOptionsChanged()));
 
-        connect(m_ui.moduleProfileCombo, SIGNAL(activated(int)), this,
-                SLOT(modProfileChanged(int)));
-        connect(m_ui.deviceProfileCombo, SIGNAL(activated(int)), this,
-                SLOT(devProfileChanged(int)));
-        connect(m_ui.formatProfileCombo, SIGNAL(activated(int)), this,
-                SLOT(formatProfileChanged(int)));
+        connect(m_ui.moduleProfileCombo, SIGNAL(activated(int)), this, SLOT(modProfileChanged(int)));
+        connect(m_ui.deviceProfileCombo, SIGNAL(activated(int)), this, SLOT(devProfileChanged(int)));
+        connect(m_ui.formatProfileCombo, SIGNAL(activated(int)), this, SLOT(formatProfileChanged(int)));
 
         m_ui.videoModuleCombo->installEventFilter(scrollEventEater);
         m_ui.videoDeviceCombo->installEventFilter(scrollEventEater);
@@ -467,10 +375,8 @@ namespace Rv
         //----------------------------------------------------------------------
         settings.beginGroup("Controls");
 
-        m_ui.clickToPlayEnableToggle->setCheckState(
-            opts.clickToPlayEnable ? Qt::Checked : Qt::Unchecked);
-        m_ui.scrubEnableToggle->setCheckState(opts.scrubEnable ? Qt::Checked
-                                                               : Qt::Unchecked);
+        m_ui.clickToPlayEnableToggle->setCheckState(opts.clickToPlayEnable ? Qt::Checked : Qt::Unchecked);
+        m_ui.scrubEnableToggle->setCheckState(opts.scrubEnable ? Qt::Checked : Qt::Unchecked);
 
         settings.endGroup();
 
@@ -481,29 +387,20 @@ namespace Rv
         m_ui.fontSize2SpinBox->setValue(opts.fontSize2);
 
         m_ui.playbackModeCombo->setCurrentIndex(opts.playMode);
-        m_ui.playOnStartupToggle->setCheckState(opts.play ? Qt::Checked
-                                                          : Qt::Unchecked);
-        m_ui.reuseSessionToggle->setCheckState(
-            opts.urlsReuseSession ? Qt::Checked : Qt::Unchecked);
-        m_ui.networkToggle->setCheckState(
-            opts.networkOnStartup ? Qt::Checked : Qt::Unchecked);
-        m_ui.stylusAsMouseToggle->setCheckState(
-            opts.stylusAsMouse ? Qt::Checked : Qt::Unchecked);
-        m_ui.startupResizeToggle->setCheckState(
-            opts.startupResize ? Qt::Checked : Qt::Unchecked);
-        m_ui.desktopAwareToggle->setCheckState(opts.qtdesktop ? Qt::Checked
-                                                              : Qt::Unchecked);
-        m_ui.noMenuBarToggle->setCheckState(opts.nomb ? Qt::Checked
-                                                      : Qt::Unchecked);
-        m_ui.fullscreenOnStartupToggle->setCheckState(
-            opts.fullscreen ? Qt::Checked : Qt::Unchecked);
+        m_ui.playOnStartupToggle->setCheckState(opts.play ? Qt::Checked : Qt::Unchecked);
+        m_ui.reuseSessionToggle->setCheckState(opts.urlsReuseSession ? Qt::Checked : Qt::Unchecked);
+        m_ui.networkToggle->setCheckState(opts.networkOnStartup ? Qt::Checked : Qt::Unchecked);
+        m_ui.stylusAsMouseToggle->setCheckState(opts.stylusAsMouse ? Qt::Checked : Qt::Unchecked);
+        m_ui.startupResizeToggle->setCheckState(opts.startupResize ? Qt::Checked : Qt::Unchecked);
+        m_ui.desktopAwareToggle->setCheckState(opts.qtdesktop ? Qt::Checked : Qt::Unchecked);
+        m_ui.noMenuBarToggle->setCheckState(opts.nomb ? Qt::Checked : Qt::Unchecked);
+        m_ui.fullscreenOnStartupToggle->setCheckState(opts.fullscreen ? Qt::Checked : Qt::Unchecked);
         s.setNum(opts.defaultfps, 'g', 4);
         m_ui.fpsEdit->setText(s);
         s.setNum(opts.readerThreads);
         m_ui.rthreadEdit->setText(s);
         m_ui.networkHostEdit->setText(opts.networkHost ? opts.networkHost : "");
-        m_ui.autoRetimeToggle->setCheckState(opts.autoRetime ? Qt::Checked
-                                                             : Qt::Unchecked);
+        m_ui.autoRetimeToggle->setCheckState(opts.autoRetime ? Qt::Checked : Qt::Unchecked);
         m_ui.useCrashReporterToggle->setCheckState(Qt::Unchecked);
         m_ui.useCrashReporterToggle->setDisabled(true);
 
@@ -513,13 +410,9 @@ namespace Rv
         const QList<QScreen*> screens = QGuiApplication::screens();
         for (int i = 0; i < screens.size(); i++)
         {
-            m_ui.startupScreenCombo->addItem(
-                QString("Screen %1").arg((unsigned int)(i)));
+            m_ui.startupScreenCombo->addItem(QString("Screen %1").arg((unsigned int)(i)));
         }
-        m_ui.startupScreenCombo->setCurrentIndex(
-            (opts.screen < m_ui.startupScreenCombo->count() - 1)
-                ? opts.screen + 1
-                : 0);
+        m_ui.startupScreenCombo->setCurrentIndex((opts.screen < m_ui.startupScreenCombo->count() - 1) ? opts.screen + 1 : 0);
 
         n = 0;
         if (opts.stereoMode)
@@ -558,18 +451,13 @@ namespace Rv
         if (opts.useLCache)
             n = 2;
 
-        m_ui.cacheModeCombo->setCurrentIndex(
-            settings.value("cacheMode", n).toInt());
+        m_ui.cacheModeCombo->setCurrentIndex(settings.value("cacheMode", n).toInt());
 
         // Pull the achitecture specific settings...
-        double max32lram =
-            settings.value("lookAheadCacheSize32New", opts.maxlram).toDouble();
-        double max64lram =
-            settings.value("lookAheadCacheSize64New", opts.maxlram).toDouble();
-        double max32cram =
-            settings.value("regionCacheSize32New", opts.maxcram).toDouble();
-        double max64cram =
-            settings.value("regionCacheSize64New", opts.maxcram).toDouble();
+        double max32lram = settings.value("lookAheadCacheSize32New", opts.maxlram).toDouble();
+        double max64lram = settings.value("lookAheadCacheSize64New", opts.maxlram).toDouble();
+        double max32cram = settings.value("regionCacheSize32New", opts.maxcram).toDouble();
+        double max64cram = settings.value("regionCacheSize64New", opts.maxcram).toDouble();
 
         // ...and populate the preference fields
         // s.setNum(max32lram, 'g', 3);
@@ -585,8 +473,7 @@ namespace Rv
         s.setNum(opts.lookback, 'g', 3);
         m_ui.lookBehindFracEdit->setText(s);
 
-        m_ui.cacheOutsideRegionToggle->setCheckState(
-            opts.cacheOutsideRegion ? Qt::Checked : Qt::Unchecked);
+        m_ui.cacheOutsideRegionToggle->setCheckState(opts.cacheOutsideRegion ? Qt::Checked : Qt::Unchecked);
 
         settings.endGroup();
 
@@ -600,19 +487,14 @@ namespace Rv
             n = 2;
 
         m_ui.bitDepthCombo->setCurrentIndex(n);
-        m_ui.allowFloatToggle->setCheckState(opts.nofloat ? Qt::Unchecked
-                                                          : Qt::Checked);
-        m_ui.swapScanlinesToggle->setCheckState(
-            opts.swapScanlines ? Qt::Checked : Qt::Unchecked);
-        m_ui.prefetchToggle->setCheckState(opts.prefetch ? Qt::Checked
-                                                         : Qt::Unchecked);
-        m_ui.newGLSLlutInterpToggle->setCheckState(
-            opts.newGLSLlutInterp ? Qt::Checked : Qt::Unchecked);
+        m_ui.allowFloatToggle->setCheckState(opts.nofloat ? Qt::Unchecked : Qt::Checked);
+        m_ui.swapScanlinesToggle->setCheckState(opts.swapScanlines ? Qt::Checked : Qt::Unchecked);
+        m_ui.prefetchToggle->setCheckState(opts.prefetch ? Qt::Checked : Qt::Unchecked);
+        m_ui.newGLSLlutInterpToggle->setCheckState(opts.newGLSLlutInterp ? Qt::Checked : Qt::Unchecked);
 
         if (ImageRenderer::queryClientStorage())
         {
-            m_ui.appleClientStorageToggle->setCheckState(
-                opts.useAppleClientStorage ? Qt::Checked : Qt::Unchecked);
+            m_ui.appleClientStorageToggle->setCheckState(opts.useAppleClientStorage ? Qt::Checked : Qt::Unchecked);
         }
         else
         {
@@ -621,8 +503,7 @@ namespace Rv
 
         if (ImageRenderer::queryThreadedUpload())
         {
-            m_ui.useThreadedUploadToggle->setCheckState(
-                opts.useThreadedUpload ? Qt::Checked : Qt::Unchecked);
+            m_ui.useThreadedUploadToggle->setCheckState(opts.useThreadedUpload ? Qt::Checked : Qt::Unchecked);
         }
         else
         {
@@ -677,8 +558,7 @@ namespace Rv
             m_ui.audioDeviceFormatCombo->clear();
             m_ui.audioDeviceRateWidget->clear();
             m_ui.audioModuleCombo->addItem("Audio Disabled");
-            m_ui.audioModuleCombo->setItemIcon(
-                0, colorAdjustedIcon(":images/mute_32x32.png"));
+            m_ui.audioModuleCombo->setItemIcon(0, colorAdjustedIcon(":images/mute_32x32.png"));
             m_ui.audioDeviceCombo->setEnabled(false);
             m_ui.audioDeviceLayoutCombo->setEnabled(false);
             m_ui.audioDeviceFormatCombo->setEnabled(false);
@@ -686,8 +566,7 @@ namespace Rv
         }
         else if (!m_ui.audioModuleCombo->count())
         {
-            const AudioRenderer::ModuleVector& modules =
-                AudioRenderer::modules();
+            const AudioRenderer::ModuleVector& modules = AudioRenderer::modules();
             size_t current = 0;
 
             for (size_t i = 0; i < modules.size(); i++)
@@ -696,8 +575,7 @@ namespace Rv
                     break;
                 if (opts.audioModule && modules[i].name == opts.audioModule)
                     current = i;
-                m_ui.audioModuleCombo->addItem(
-                    QString::fromUtf8(modules[i].name.c_str()));
+                m_ui.audioModuleCombo->addItem(QString::fromUtf8(modules[i].name.c_str()));
             }
 
             m_ui.audioModuleCombo->setCurrentIndex(current);
@@ -710,14 +588,10 @@ namespace Rv
         }
 
         m_ui.volumeSlider->setSliderPosition(int(opts.volume * 100.0));
-        m_ui.audioHoldOpenToggle->setCheckState(opts.audioNice ? Qt::Unchecked
-                                                               : Qt::Checked);
-        m_ui.audioHardwareLockToggle->setCheckState(
-            opts.audioNoLock ? Qt::Unchecked : Qt::Checked);
-        m_ui.audioScrubAtLaunchToggle->setCheckState(
-            opts.audioScrub ? Qt::Checked : Qt::Unchecked);
-        m_ui.audioPreRollToggle->setCheckState(
-            opts.audioPreRoll ? Qt::Checked : Qt::Unchecked);
+        m_ui.audioHoldOpenToggle->setCheckState(opts.audioNice ? Qt::Unchecked : Qt::Checked);
+        m_ui.audioHardwareLockToggle->setCheckState(opts.audioNoLock ? Qt::Unchecked : Qt::Checked);
+        m_ui.audioScrubAtLaunchToggle->setCheckState(opts.audioScrub ? Qt::Checked : Qt::Unchecked);
+        m_ui.audioPreRollToggle->setCheckState(opts.audioPreRoll ? Qt::Checked : Qt::Unchecked);
 
         s.setNum(opts.aframesize);
         m_ui.audioDevicePacketEdit->setText(s);
@@ -756,8 +630,7 @@ namespace Rv
             break;
         }
 
-        for (int index = 0; index < m_ui.audioDeviceFormatCombo->count();
-             ++index)
+        for (int index = 0; index < m_ui.audioDeviceFormatCombo->count(); ++index)
         {
             if (m_ui.audioDeviceFormatCombo->itemData(index) == currentFormat)
             {
@@ -766,11 +639,9 @@ namespace Rv
             }
         }
 
-        for (int index = 0; index < m_ui.audioDeviceLayoutCombo->count();
-             ++index)
+        for (int index = 0; index < m_ui.audioDeviceLayoutCombo->count(); ++index)
         {
-            if (m_ui.audioDeviceLayoutCombo->itemData(index)
-                == opts.audioLayout)
+            if (m_ui.audioDeviceLayoutCombo->itemData(index) == opts.audioLayout)
             {
                 m_ui.audioDeviceLayoutCombo->setCurrentIndex(index);
                 break;
@@ -782,18 +653,15 @@ namespace Rv
         //----------------------------------------------------------------------
         settings.beginGroup("Display");
 
-        m_ui.displayVideoSyncButton->setCheckState(opts.vsync ? Qt::Checked
-                                                              : Qt::Unchecked);
+        m_ui.displayVideoSyncButton->setCheckState(opts.vsync ? Qt::Checked : Qt::Unchecked);
 
         int dindex = 0;
 
-        if (opts.dispRedBits == 8 && opts.dispGreenBits == 8
-            && opts.dispBlueBits == 8 && opts.dispAlphaBits == 8)
+        if (opts.dispRedBits == 8 && opts.dispGreenBits == 8 && opts.dispBlueBits == 8 && opts.dispAlphaBits == 8)
         {
             dindex = 1;
         }
-        else if (opts.dispRedBits == 10 && opts.dispGreenBits == 10
-                 && opts.dispBlueBits == 10 && opts.dispAlphaBits == 2)
+        else if (opts.dispRedBits == 10 && opts.dispGreenBits == 10 && opts.dispBlueBits == 10 && opts.dispAlphaBits == 2)
         {
             dindex = 2;
         }
@@ -808,18 +676,12 @@ namespace Rv
 
         //----------------------------------------------------------------------
         settings.beginGroup("OpenEXR");
-        m_ui.exrRGBAToggle->setCheckState(opts.exrRGBA ? Qt::Checked
-                                                       : Qt::Unchecked);
-        m_ui.exrInheritToggle->setCheckState(opts.exrInherit ? Qt::Checked
-                                                             : Qt::Unchecked);
-        m_ui.exrPlanar3ChannelToggle->setCheckState(
-            opts.exrPlanar3Chan ? Qt::Checked : Qt::Unchecked);
-        m_ui.exrNoOneChannelToggle->setCheckState(
-            opts.exrNoOneChannel ? Qt::Checked : Qt::Unchecked);
-        m_ui.exrReadWindowIsDisplayWindowToggle->setCheckState(
-            opts.exrReadWindowIsDisplayWindow ? Qt::Checked : Qt::Unchecked);
-        m_ui.exrAutoThreadsToggle->setCheckState(
-            opts.exrcpus == 0 ? Qt::Checked : Qt::Unchecked);
+        m_ui.exrRGBAToggle->setCheckState(opts.exrRGBA ? Qt::Checked : Qt::Unchecked);
+        m_ui.exrInheritToggle->setCheckState(opts.exrInherit ? Qt::Checked : Qt::Unchecked);
+        m_ui.exrPlanar3ChannelToggle->setCheckState(opts.exrPlanar3Chan ? Qt::Checked : Qt::Unchecked);
+        m_ui.exrNoOneChannelToggle->setCheckState(opts.exrNoOneChannel ? Qt::Checked : Qt::Unchecked);
+        m_ui.exrReadWindowIsDisplayWindowToggle->setCheckState(opts.exrReadWindowIsDisplayWindow ? Qt::Checked : Qt::Unchecked);
+        m_ui.exrAutoThreadsToggle->setCheckState(opts.exrcpus == 0 ? Qt::Checked : Qt::Unchecked);
         s.setNum(opts.exrcpus);
         m_ui.exrNumThreadsEdit->setText(s);
         m_ui.exrIOMethodCombo->setCurrentIndex(opts.exrIOMethod);
@@ -834,8 +696,7 @@ namespace Rv
 
         //----------------------------------------------------------------------
         settings.beginGroup("JPEG");
-        m_ui.jpegRGBAToggle->setCheckState(opts.jpegRGBA ? Qt::Checked
-                                                         : Qt::Unchecked);
+        m_ui.jpegRGBAToggle->setCheckState(opts.jpegRGBA ? Qt::Checked : Qt::Unchecked);
         m_ui.jpegIOMethodCombo->setCurrentIndex(opts.jpegIOMethod);
         s.setNum(opts.jpegIOSize);
         m_ui.jpegChunkSizeEdit->setText(s);
@@ -850,8 +711,7 @@ namespace Rv
         m_ui.cinChunkSizeEdit->setText(s);
         s.setNum(opts.cinMaxAsync);
         m_ui.cinMaxInFlightEdit->setText(s);
-        m_ui.cinChromaToggle->setCheckState(opts.cinchroma ? Qt::Checked
-                                                           : Qt::Unchecked);
+        m_ui.cinChromaToggle->setCheckState(opts.cinchroma ? Qt::Checked : Qt::Unchecked);
 
         n = 2;
         s = opts.cinPixel;
@@ -882,8 +742,7 @@ namespace Rv
         m_ui.dpxChunkSizeEdit->setText(s);
         s.setNum(opts.dpxMaxAsync);
         m_ui.dpxMaxInFlightEdit->setText(s);
-        m_ui.dpxChromaToggle->setCheckState(opts.dpxchroma ? Qt::Checked
-                                                           : Qt::Unchecked);
+        m_ui.dpxChromaToggle->setCheckState(opts.dpxchroma ? Qt::Checked : Qt::Unchecked);
 
         n = 2;
         s = opts.dpxPixel;
@@ -954,21 +813,13 @@ namespace Rv
         loadSettingsIntoOptions(settings, opts);
     }
 
-    void RvPreferences::loadSettingsIntoOptions(RvSettings& settings,
-                                                Options& opts)
+    void RvPreferences::loadSettingsIntoOptions(RvSettings& settings, Options& opts)
     {
         QString s;
         settings.beginGroup("Controls");
 
-        opts.clickToPlayEnable =
-            int(!settings
-                     .value("disableClickToPlay",
-                            opts.clickToPlayEnable ? false : true)
-                     .toBool());
-        opts.scrubEnable = int(
-            !settings
-                 .value("disableScrubInView", opts.scrubEnable ? false : true)
-                 .toBool());
+        opts.clickToPlayEnable = int(!settings.value("disableClickToPlay", opts.clickToPlayEnable ? false : true).toBool());
+        opts.scrubEnable = int(!settings.value("disableScrubInView", opts.scrubEnable ? false : true).toBool());
 
         settings.endGroup();
 
@@ -978,53 +829,21 @@ namespace Rv
         opts.fontSize2 = settings.value("fontSize2", opts.fontSize2).toInt();
 
         opts.playMode = settings.value("playMode", opts.playMode).toInt();
-        opts.play = int(
-            settings.value("playOnStartup", opts.play ? true : false).toBool());
-        opts.networkOnStartup = int(
-            settings
-                .value("networkOnStartup", opts.networkOnStartup ? true : false)
-                .toBool());
-        opts.stylusAsMouse = int(
-            settings.value("stylusAsMouse", opts.stylusAsMouse ? true : false)
-                .toBool());
-        opts.startupResize = int(
-            settings.value("startupResize", opts.startupResize ? true : false)
-                .toBool());
-        opts.qtdesktop =
-            int(settings.value("desktopAware", opts.qtdesktop ? true : false)
-                    .toBool());
-        opts.urlsReuseSession = int(
-            settings
-                .value("urlsReuseSession", opts.urlsReuseSession ? true : false)
-                .toBool());
-        opts.fullscreen = int(
-            settings
-                .value("fullscreenOnStartup", opts.fullscreen ? true : false)
-                .toBool());
-        opts.screen =
-            settings.value("startupScreenPolicy", opts.screen).toInt();
-        opts.nomb =
-            int(settings.value("noMenuBar", opts.nomb ? true : false).toBool());
+        opts.play = int(settings.value("playOnStartup", opts.play ? true : false).toBool());
+        opts.networkOnStartup = int(settings.value("networkOnStartup", opts.networkOnStartup ? true : false).toBool());
+        opts.stylusAsMouse = int(settings.value("stylusAsMouse", opts.stylusAsMouse ? true : false).toBool());
+        opts.startupResize = int(settings.value("startupResize", opts.startupResize ? true : false).toBool());
+        opts.qtdesktop = int(settings.value("desktopAware", opts.qtdesktop ? true : false).toBool());
+        opts.urlsReuseSession = int(settings.value("urlsReuseSession", opts.urlsReuseSession ? true : false).toBool());
+        opts.fullscreen = int(settings.value("fullscreenOnStartup", opts.fullscreen ? true : false).toBool());
+        opts.screen = settings.value("startupScreenPolicy", opts.screen).toInt();
+        opts.nomb = int(settings.value("noMenuBar", opts.nomb ? true : false).toBool());
         opts.defaultfps = settings.value("fps", opts.defaultfps).toDouble();
-        opts.networkHostBuf =
-            settings
-                .value("networkHost",
-                       (opts.networkHost) ? opts.networkHost : "")
-                .toString()
-                .toUtf8()
-                .data();
-        opts.networkHost = (char*)((opts.networkHostBuf.empty())
-                                       ? 0
-                                       : opts.networkHostBuf.c_str());
-        opts.readerThreads =
-            settings.value("readerThreads", opts.readerThreads).toInt();
-        opts.autoRetime =
-            int(settings.value("autoRetime", opts.autoRetime ? true : false)
-                    .toBool());
-        opts.useCrashReporter = int(
-            settings
-                .value("useCrashReporter", opts.useCrashReporter ? true : false)
-                .toBool());
+        opts.networkHostBuf = settings.value("networkHost", (opts.networkHost) ? opts.networkHost : "").toString().toUtf8().data();
+        opts.networkHost = (char*)((opts.networkHostBuf.empty()) ? 0 : opts.networkHostBuf.c_str());
+        opts.readerThreads = settings.value("readerThreads", opts.readerThreads).toInt();
+        opts.autoRetime = int(settings.value("autoRetime", opts.autoRetime ? true : false).toBool());
+        opts.useCrashReporter = int(settings.value("useCrashReporter", opts.useCrashReporter ? true : false).toBool());
 
         opts.stereoMode = 0;
         s = settings.value("stereoMode", QString(opts.stereoMode)).toString();
@@ -1051,8 +870,7 @@ namespace Rv
 
         //----------------------------------------------------------------------
         settings.beginGroup("Caching");
-        int cacheMode =
-            settings.value("cacheMode", 2 /*Look-Ahead Cache*/).toInt();
+        int cacheMode = settings.value("cacheMode", 2 /*Look-Ahead Cache*/).toInt();
 
         opts.useCache = false;
         opts.useLCache = false;
@@ -1084,36 +902,27 @@ namespace Rv
 #endif
 
         if (tmplram == -1)
-            opts.maxlram = settings.value("lookAheadCacheSizeNew", opts.maxlram)
-                               .toDouble();
+            opts.maxlram = settings.value("lookAheadCacheSizeNew", opts.maxlram).toDouble();
         else
             opts.maxlram = tmplram;
         if (tmpcram == -1)
-            opts.maxcram =
-                settings.value("regionCacheSizeNew", opts.maxcram).toDouble();
+            opts.maxcram = settings.value("regionCacheSizeNew", opts.maxcram).toDouble();
         else
             opts.maxcram = tmpcram;
 
         opts.maxbwait = settings.value("bufferWait", opts.maxbwait).toDouble();
-        opts.lookback =
-            settings.value("lookBehindFraction", opts.lookback).toDouble();
-        opts.cacheOutsideRegion =
-            settings.value("cacheOutsideRegion", opts.cacheOutsideRegion)
-                .toBool();
+        opts.lookback = settings.value("lookBehindFraction", opts.lookback).toDouble();
+        opts.cacheOutsideRegion = settings.value("cacheOutsideRegion", opts.cacheOutsideRegion).toBool();
 
         settings.endGroup();
 
         //----------------------------------------------------------------------
         settings.beginGroup("Rendering");
         opts.nofloat = settings.value("nofloat", opts.nofloat).toBool();
-        opts.swapScanlines =
-            settings.value("swapScanlines", opts.swapScanlines).toBool();
+        opts.swapScanlines = settings.value("swapScanlines", opts.swapScanlines).toBool();
         opts.prefetch = settings.value("prefetch2", opts.prefetch).toBool();
-        opts.useAppleClientStorage =
-            settings.value("appleClientStorage", opts.useAppleClientStorage)
-                .toBool();
-        opts.newGLSLlutInterp =
-            settings.value("newGLSLlutInterp", opts.newGLSLlutInterp).toBool();
+        opts.useAppleClientStorage = settings.value("appleClientStorage", opts.useAppleClientStorage).toBool();
+        opts.newGLSLlutInterp = settings.value("newGLSLlutInterp", opts.newGLSLlutInterp).toBool();
 
         //  Can't check ImageRenderer::queryThreadedUpload() here because this
         //  function is called very early (before video modules are created). If
@@ -1122,15 +931,12 @@ namespace Rv
         //  in settings file.
         //
 
-        opts.useThreadedUpload =
-            settings.value("useThreadedUpload3", opts.useThreadedUpload)
-                .toBool();
+        opts.useThreadedUpload = settings.value("useThreadedUpload3", opts.useThreadedUpload).toBool();
 
         opts.maxvram = settings.value("vram", opts.maxvram).toDouble();
         opts.maxbits = settings.value("maxBitDepth", opts.maxbits).toInt();
 
-        s = settings.value("resampleMethod", QString(opts.resampleMethod))
-                .toString();
+        s = settings.value("resampleMethod", QString(opts.resampleMethod)).toString();
 
         if (s == Area)
             opts.resampleMethod = (char*)Area;
@@ -1148,10 +954,7 @@ namespace Rv
         else if (s == Nearest)
             opts.imageFilter = GL_NEAREST;
 
-        s = settings
-                .value("backgroundPattern",
-                       (opts.bgpattern ? opts.bgpattern : "black"))
-                .toString();
+        s = settings.value("backgroundPattern", (opts.bgpattern ? opts.bgpattern : "black")).toString();
 
         if (s == "black")
             opts.bgpattern = (char*)Solid0;
@@ -1173,111 +976,69 @@ namespace Rv
         opts.volume = settings.value("volume", opts.volume).toDouble();
 
         string audioDevice = (opts.audioDevice) ? opts.audioDevice : "";
-        audioDevice = UTF8::qconvert(
-            settings
-                .value("outputDevice",
-                       QVariant(UTF8::qconvert(audioDevice.c_str())))
-                .toString());
+        audioDevice = UTF8::qconvert(settings.value("outputDevice", QVariant(UTF8::qconvert(audioDevice.c_str()))).toString());
         opts.audioDevice = strdup(audioDevice.c_str());
 
         string audioModule = (opts.audioModule) ? opts.audioModule : "";
-        audioModule = UTF8::qconvert(
-            settings
-                .value("outputModule",
-                       QVariant(UTF8::qconvert(audioModule.c_str())))
-                .toString());
+        audioModule = UTF8::qconvert(settings.value("outputModule", QVariant(UTF8::qconvert(audioModule.c_str()))).toString());
         opts.audioModule = strdup(audioModule.c_str());
 
-        opts.audioNice =
-            int(!settings.value("holdDeviceOpen", !opts.audioNice).toBool());
-        opts.aframesize =
-            settings.value("devicePacketSize", opts.aframesize).toInt();
-        opts.acachesize =
-            settings.value("cachePacketSizeNew", opts.acachesize).toInt();
-        opts.audioMinCache =
-            settings.value("audioMinCache", opts.audioMinCache).toDouble();
-        opts.audioMaxCache =
-            settings.value("audioMaxCache", opts.audioMaxCache).toDouble();
-        opts.audioNoLock =
-            int(!settings.value("hardwareLock", !opts.audioNoLock).toBool());
-        opts.audioPrecision =
-            settings.value("outputPrecision", opts.audioPrecision).toInt();
-        opts.audioLayout =
-            settings.value("outputLayout", opts.audioLayout).toInt();
+        opts.audioNice = int(!settings.value("holdDeviceOpen", !opts.audioNice).toBool());
+        opts.aframesize = settings.value("devicePacketSize", opts.aframesize).toInt();
+        opts.acachesize = settings.value("cachePacketSizeNew", opts.acachesize).toInt();
+        opts.audioMinCache = settings.value("audioMinCache", opts.audioMinCache).toDouble();
+        opts.audioMaxCache = settings.value("audioMaxCache", opts.audioMaxCache).toDouble();
+        opts.audioNoLock = int(!settings.value("hardwareLock", !opts.audioNoLock).toBool());
+        opts.audioPrecision = settings.value("outputPrecision", opts.audioPrecision).toInt();
+        opts.audioLayout = settings.value("outputLayout", opts.audioLayout).toInt();
         opts.audioRate = settings.value("outputRate", opts.audioRate).toInt();
-        opts.audioGlobalOffset =
-            settings.value("globalOffset", opts.audioGlobalOffset).toDouble();
-        opts.audioDeviceLatency =
-            settings.value("audioDeviceLatency", opts.audioDeviceLatency)
-                .toDouble();
-        opts.audioScrub =
-            int(settings.value("audioScrub", opts.audioScrub).toBool());
-        opts.audioPreRoll =
-            int(settings.value("audioPreRoll", opts.audioPreRoll).toBool());
+        opts.audioGlobalOffset = settings.value("globalOffset", opts.audioGlobalOffset).toDouble();
+        opts.audioDeviceLatency = settings.value("audioDeviceLatency", opts.audioDeviceLatency).toDouble();
+        opts.audioScrub = int(settings.value("audioScrub", opts.audioScrub).toBool());
+        opts.audioPreRoll = int(settings.value("audioPreRoll", opts.audioPreRoll).toBool());
         settings.endGroup();
 
         //----------------------------------------------------------------------
         settings.beginGroup("Display");
         opts.gamma = settings.value("gamma", opts.gamma).toDouble();
-        opts.brightness =
-            settings.value("brightness", opts.brightness).toDouble();
+        opts.brightness = settings.value("brightness", opts.brightness).toDouble();
         opts.vsync = settings.value("vsync", opts.vsync).toInt();
-        opts.dispRedBits =
-            settings.value("dispRedBits", opts.dispRedBits).toInt();
-        opts.dispGreenBits =
-            settings.value("dispBlueBits", opts.dispGreenBits).toInt();
-        opts.dispBlueBits =
-            settings.value("dispGreenBits", opts.dispBlueBits).toInt();
-        opts.dispAlphaBits =
-            settings.value("dispAlphaBits", opts.dispAlphaBits).toInt();
+        opts.dispRedBits = settings.value("dispRedBits", opts.dispRedBits).toInt();
+        opts.dispGreenBits = settings.value("dispBlueBits", opts.dispGreenBits).toInt();
+        opts.dispBlueBits = settings.value("dispGreenBits", opts.dispBlueBits).toInt();
+        opts.dispAlphaBits = settings.value("dispAlphaBits", opts.dispAlphaBits).toInt();
         settings.endGroup();
 
         //----------------------------------------------------------------------
         settings.beginGroup("OpenEXR");
         opts.exrRGBA = settings.value("useRGBA", bool(opts.exrRGBA)).toBool();
-        opts.exrInherit =
-            settings.value("inheritChannels", bool(opts.exrInherit)).toBool();
-        opts.exrPlanar3Chan =
-            settings.value("planar3Channel", bool(opts.exrPlanar3Chan))
-                .toBool();
-        opts.exrNoOneChannel =
-            settings.value("noOneChannel", bool(opts.exrNoOneChannel)).toBool();
+        opts.exrInherit = settings.value("inheritChannels", bool(opts.exrInherit)).toBool();
+        opts.exrPlanar3Chan = settings.value("planar3Channel", bool(opts.exrPlanar3Chan)).toBool();
+        opts.exrNoOneChannel = settings.value("noOneChannel", bool(opts.exrNoOneChannel)).toBool();
         opts.exrcpus = settings.value("cpus", opts.exrcpus).toInt();
         opts.exrIOMethod = settings.value("IOmethod", opts.exrIOMethod).toInt();
         opts.exrIOSize = settings.value("IOsize", opts.exrIOSize).toInt();
-        opts.exrMaxAsync =
-            settings.value("MaxInFlight", opts.exrMaxAsync).toInt();
-        opts.exrReadWindowIsDisplayWindow =
-            settings
-                .value("readWindowIsDisplayWindow",
-                       bool(opts.exrReadWindowIsDisplayWindow))
-                .toBool();
-        opts.exrReadWindow =
-            settings.value("readWindow", opts.exrReadWindow).toInt();
+        opts.exrMaxAsync = settings.value("MaxInFlight", opts.exrMaxAsync).toInt();
+        opts.exrReadWindowIsDisplayWindow = settings.value("readWindowIsDisplayWindow", bool(opts.exrReadWindowIsDisplayWindow)).toBool();
+        opts.exrReadWindow = settings.value("readWindow", opts.exrReadWindow).toInt();
         settings.endGroup();
 
         //----------------------------------------------------------------------
         settings.beginGroup("JPEG");
-        opts.jpegRGBA =
-            int(settings.value("RGBA", bool(opts.jpegRGBA)).toBool());
-        opts.jpegIOMethod =
-            settings.value("IOmethod", opts.jpegIOMethod).toInt();
+        opts.jpegRGBA = int(settings.value("RGBA", bool(opts.jpegRGBA)).toBool());
+        opts.jpegIOMethod = settings.value("IOmethod", opts.jpegIOMethod).toInt();
         opts.jpegIOSize = settings.value("IOsize", opts.jpegIOSize).toInt();
-        opts.jpegMaxAsync =
-            settings.value("MaxInFlight", opts.jpegMaxAsync).toInt();
+        opts.jpegMaxAsync = settings.value("MaxInFlight", opts.jpegMaxAsync).toInt();
         settings.endGroup();
 
         //----------------------------------------------------------------------
         settings.beginGroup("Cineon");
         opts.cinIOMethod = settings.value("IOmethod", opts.cinIOMethod).toInt();
         opts.cinIOSize = settings.value("IOsize", opts.cinIOSize).toInt();
-        opts.cinMaxAsync =
-            settings.value("MaxInFlight", opts.cinMaxAsync).toInt();
-        opts.cinchroma =
-            int(settings.value("usePrimaries", bool(opts.cinchroma)).toBool());
+        opts.cinMaxAsync = settings.value("MaxInFlight", opts.cinMaxAsync).toInt();
+        opts.cinchroma = int(settings.value("usePrimaries", bool(opts.cinchroma)).toBool());
 
-        QString cinpf =
-            settings.value("pixelFormatNew", QString(opts.cinPixel)).toString();
+        QString cinpf = settings.value("pixelFormatNew", QString(opts.cinPixel)).toString();
 
         if (cinpf == RGB8)
             opts.cinPixel = (char*)RGB8;
@@ -1302,13 +1063,10 @@ namespace Rv
         settings.beginGroup("DPX");
         opts.dpxIOMethod = settings.value("IOmethod", opts.dpxIOMethod).toInt();
         opts.dpxIOSize = settings.value("IOsize", opts.dpxIOSize).toInt();
-        opts.dpxMaxAsync =
-            settings.value("MaxInFlight", opts.dpxMaxAsync).toInt();
-        opts.dpxchroma =
-            int(settings.value("usePrimaries", bool(opts.dpxchroma)).toBool());
+        opts.dpxMaxAsync = settings.value("MaxInFlight", opts.dpxMaxAsync).toInt();
+        opts.dpxchroma = int(settings.value("usePrimaries", bool(opts.dpxchroma)).toBool());
 
-        QString dpxpf =
-            settings.value("pixelFormatNew", QString(opts.dpxPixel)).toString();
+        QString dpxpf = settings.value("pixelFormatNew", QString(opts.dpxPixel)).toString();
 
         if (dpxpf == RGB8)
             opts.dpxPixel = (char*)RGB8;
@@ -1333,27 +1091,21 @@ namespace Rv
         settings.beginGroup("TGA");
         opts.tgaIOMethod = settings.value("IOmethod", opts.tgaIOMethod).toInt();
         opts.tgaIOSize = settings.value("IOsize", opts.tgaIOSize).toInt();
-        opts.tgaMaxAsync =
-            settings.value("MaxInFlight", opts.tgaMaxAsync).toInt();
+        opts.tgaMaxAsync = settings.value("MaxInFlight", opts.tgaMaxAsync).toInt();
         settings.endGroup();
 
         //----------------------------------------------------------------------
         settings.beginGroup("TIFF");
-        opts.tiffIOMethod =
-            settings.value("IOmethod", opts.tiffIOMethod).toInt();
+        opts.tiffIOMethod = settings.value("IOmethod", opts.tiffIOMethod).toInt();
         opts.tiffIOSize = settings.value("IOsize", opts.tiffIOSize).toInt();
-        opts.tiffMaxAsync =
-            settings.value("MaxInFlight", opts.tiffMaxAsync).toInt();
+        opts.tiffMaxAsync = settings.value("MaxInFlight", opts.tiffMaxAsync).toInt();
         settings.endGroup();
 
         opts.exportIOEnvVars();
 
         //----------------------------------------------------------------------
         settings.beginGroup("Video");
-        QString pdev =
-            settings
-                .value("presentationDevice", UTF8::qconvert(opts.presentDevice))
-                .toString();
+        QString pdev = settings.value("presentationDevice", UTF8::qconvert(opts.presentDevice)).toString();
         settings.endGroup();
 
         QStringList parts = pdev.split("/");
@@ -1393,45 +1145,26 @@ namespace Rv
         RV_QSETTINGS;
 
         settings.beginGroup("Controls");
-        settings.setValue("disableClickToPlay",
-                          m_ui.clickToPlayEnableToggle->checkState()
-                              != Qt::Checked);
-        settings.setValue("disableScrubInView",
-                          m_ui.scrubEnableToggle->checkState() != Qt::Checked);
+        settings.setValue("disableClickToPlay", m_ui.clickToPlayEnableToggle->checkState() != Qt::Checked);
+        settings.setValue("disableScrubInView", m_ui.scrubEnableToggle->checkState() != Qt::Checked);
         settings.endGroup();
 
         settings.beginGroup("General");
-        settings.setValue("playOnStartup",
-                          m_ui.playOnStartupToggle->checkState()
-                              == Qt::Checked);
-        settings.setValue("networkOnStartup",
-                          m_ui.networkToggle->checkState() == Qt::Checked);
-        settings.setValue("stylusAsMouse",
-                          m_ui.stylusAsMouseToggle->checkState()
-                              == Qt::Checked);
-        settings.setValue("startupResize",
-                          m_ui.startupResizeToggle->checkState()
-                              == Qt::Checked);
-        settings.setValue("desktopAware",
-                          m_ui.desktopAwareToggle->checkState() == Qt::Checked);
-        settings.setValue("urlsReuseSession",
-                          m_ui.reuseSessionToggle->checkState() == Qt::Checked);
+        settings.setValue("playOnStartup", m_ui.playOnStartupToggle->checkState() == Qt::Checked);
+        settings.setValue("networkOnStartup", m_ui.networkToggle->checkState() == Qt::Checked);
+        settings.setValue("stylusAsMouse", m_ui.stylusAsMouseToggle->checkState() == Qt::Checked);
+        settings.setValue("startupResize", m_ui.startupResizeToggle->checkState() == Qt::Checked);
+        settings.setValue("desktopAware", m_ui.desktopAwareToggle->checkState() == Qt::Checked);
+        settings.setValue("urlsReuseSession", m_ui.reuseSessionToggle->checkState() == Qt::Checked);
         settings.setValue("playMode", m_ui.playbackModeCombo->currentIndex());
-        settings.setValue("noMenuBar",
-                          m_ui.noMenuBarToggle->checkState() == Qt::Checked);
-        settings.setValue("fullscreenOnStartup",
-                          m_ui.fullscreenOnStartupToggle->checkState()
-                              == Qt::Checked);
-        settings.setValue("startupScreenPolicy",
-                          m_ui.startupScreenCombo->currentIndex() - 1);
+        settings.setValue("noMenuBar", m_ui.noMenuBarToggle->checkState() == Qt::Checked);
+        settings.setValue("fullscreenOnStartup", m_ui.fullscreenOnStartupToggle->checkState() == Qt::Checked);
+        settings.setValue("startupScreenPolicy", m_ui.startupScreenCombo->currentIndex() - 1);
         settings.setValue("fps", m_ui.fpsEdit->text().toDouble());
         settings.setValue("networkHost", m_ui.networkHostEdit->text());
         settings.setValue("readerThreads", m_ui.rthreadEdit->text().toInt());
-        settings.setValue("autoRetime",
-                          m_ui.autoRetimeToggle->checkState() == Qt::Checked);
-        settings.setValue("useCrashReporter",
-                          m_ui.useCrashReporterToggle->checkState()
-                              == Qt::Checked);
+        settings.setValue("autoRetime", m_ui.autoRetimeToggle->checkState() == Qt::Checked);
+        settings.setValue("useCrashReporter", m_ui.useCrashReporterToggle->checkState() == Qt::Checked);
         settings.setValue("fontSize1", m_ui.fontSizeSpinBox->value());
         settings.setValue("fontSize2", m_ui.fontSize2SpinBox->value());
 
@@ -1481,61 +1214,42 @@ namespace Rv
 // Use the setting from the running architecture as the shared setting for
 // backwards compatibility.
 #ifdef ARCH_IA32
-        settings.setValue("lookAheadCacheSizeNew",
-                          m_ui.lookAheadCacheSize32Edit->text().toDouble());
-        settings.setValue("regionCacheSizeNew",
-                          m_ui.regionCacheSize32Edit->text().toDouble());
+        settings.setValue("lookAheadCacheSizeNew", m_ui.lookAheadCacheSize32Edit->text().toDouble());
+        settings.setValue("regionCacheSizeNew", m_ui.regionCacheSize32Edit->text().toDouble());
 #else
-        settings.setValue("lookAheadCacheSizeNew",
-                          m_ui.lookAheadCacheSize64Edit->text().toDouble());
-        settings.setValue("regionCacheSizeNew",
-                          m_ui.regionCacheSize64Edit->text().toDouble());
+        settings.setValue("lookAheadCacheSizeNew", m_ui.lookAheadCacheSize64Edit->text().toDouble());
+        settings.setValue("regionCacheSizeNew", m_ui.regionCacheSize64Edit->text().toDouble());
 #endif
 
         // Set the architecture specific settings
         // settings.setValue("lookAheadCacheSize32New",
         // m_ui.lookAheadCacheSize32Edit->text().toDouble());
-        settings.setValue("lookAheadCacheSize64New",
-                          m_ui.lookAheadCacheSize64Edit->text().toDouble());
+        settings.setValue("lookAheadCacheSize64New", m_ui.lookAheadCacheSize64Edit->text().toDouble());
         // settings.setValue("regionCacheSize32New",
         // m_ui.regionCacheSize32Edit->text().toDouble());
-        settings.setValue("regionCacheSize64New",
-                          m_ui.regionCacheSize64Edit->text().toDouble());
+        settings.setValue("regionCacheSize64New", m_ui.regionCacheSize64Edit->text().toDouble());
 
         settings.setValue("bufferWait", m_ui.bufferWaitEdit->text().toDouble());
-        settings.setValue("lookBehindFraction",
-                          m_ui.lookBehindFracEdit->text().toDouble());
-        settings.setValue("cacheOutsideRegion",
-                          m_ui.cacheOutsideRegionToggle->checkState()
-                              == Qt::Checked);
+        settings.setValue("lookBehindFraction", m_ui.lookBehindFracEdit->text().toDouble());
+        settings.setValue("cacheOutsideRegion", m_ui.cacheOutsideRegionToggle->checkState() == Qt::Checked);
         settings.endGroup();
 
         //----------------------------------------------------------------------
 
         settings.beginGroup("Rendering");
 
-        settings.setValue("nofloat",
-                          m_ui.allowFloatToggle->checkState() != Qt::Checked);
-        settings.setValue("swapScanlines",
-                          m_ui.swapScanlinesToggle->checkState()
-                              == Qt::Checked);
-        settings.setValue("prefetch2",
-                          m_ui.prefetchToggle->checkState() == Qt::Checked);
-        settings.setValue("appleClientStorage",
-                          m_ui.appleClientStorageToggle->checkState()
-                              == Qt::Checked);
-        settings.setValue("newGLSLlutInterp",
-                          m_ui.newGLSLlutInterpToggle->checkState()
-                              == Qt::Checked);
+        settings.setValue("nofloat", m_ui.allowFloatToggle->checkState() != Qt::Checked);
+        settings.setValue("swapScanlines", m_ui.swapScanlinesToggle->checkState() == Qt::Checked);
+        settings.setValue("prefetch2", m_ui.prefetchToggle->checkState() == Qt::Checked);
+        settings.setValue("appleClientStorage", m_ui.appleClientStorageToggle->checkState() == Qt::Checked);
+        settings.setValue("newGLSLlutInterp", m_ui.newGLSLlutInterpToggle->checkState() == Qt::Checked);
 
         //  Don't write the value of the toggle as a setting unless the user was
         //  actually allowed to change it.
         //
         if (ImageRenderer::queryThreadedUpload())
         {
-            settings.setValue("useThreadedUpload3",
-                              m_ui.useThreadedUploadToggle->checkState()
-                                  == Qt::Checked);
+            settings.setValue("useThreadedUpload3", m_ui.useThreadedUploadToggle->checkState() == Qt::Checked);
         }
 
         int n = 32;
@@ -1619,49 +1333,28 @@ namespace Rv
         //----------------------------------------------------------------------
 
         settings.beginGroup("Audio");
-        settings.setValue("volume",
-                          m_ui.volumeSlider->sliderPosition() / 100.0);
-        settings.setValue("holdDeviceOpen",
-                          m_ui.audioHoldOpenToggle->checkState()
-                              == Qt::Checked);
-        settings.setValue("hardwareLock",
-                          m_ui.audioHardwareLockToggle->checkState()
-                              == Qt::Checked);
-        settings.setValue("audioScrub",
-                          m_ui.audioScrubAtLaunchToggle->checkState()
-                              == Qt::Checked);
-        settings.setValue("audioPreRoll",
-                          m_ui.audioPreRollToggle->checkState() == Qt::Checked);
-        settings.setValue("devicePacketSize",
-                          m_ui.audioDevicePacketEdit->text().toInt());
-        settings.setValue("cachePacketSizeNew",
-                          m_ui.audioCachePacketEdit->text().toInt());
-        settings.setValue("audioMinCache",
-                          m_ui.audioCacheMinEdit->text().toDouble());
-        settings.setValue("audioMaxCache",
-                          m_ui.audioCacheMaxEdit->text().toDouble());
-        settings.setValue("globalOffset",
-                          m_ui.audioGlobalOffsetEdit->text().toDouble());
-        settings.setValue("audioDeviceLatency",
-                          m_ui.audioDeviceLatencyEdit->text().toDouble());
+        settings.setValue("volume", m_ui.volumeSlider->sliderPosition() / 100.0);
+        settings.setValue("holdDeviceOpen", m_ui.audioHoldOpenToggle->checkState() == Qt::Checked);
+        settings.setValue("hardwareLock", m_ui.audioHardwareLockToggle->checkState() == Qt::Checked);
+        settings.setValue("audioScrub", m_ui.audioScrubAtLaunchToggle->checkState() == Qt::Checked);
+        settings.setValue("audioPreRoll", m_ui.audioPreRollToggle->checkState() == Qt::Checked);
+        settings.setValue("devicePacketSize", m_ui.audioDevicePacketEdit->text().toInt());
+        settings.setValue("cachePacketSizeNew", m_ui.audioCachePacketEdit->text().toInt());
+        settings.setValue("audioMinCache", m_ui.audioCacheMinEdit->text().toDouble());
+        settings.setValue("audioMaxCache", m_ui.audioCacheMaxEdit->text().toDouble());
+        settings.setValue("globalOffset", m_ui.audioGlobalOffsetEdit->text().toDouble());
+        settings.setValue("audioDeviceLatency", m_ui.audioDeviceLatencyEdit->text().toDouble());
 
-        if (!AudioRenderer::audioDisabledAlways()
-            && m_ui.audioDeviceLayoutCombo->currentText() != "Unavailable"
+        if (!AudioRenderer::audioDisabledAlways() && m_ui.audioDeviceLayoutCombo->currentText() != "Unavailable"
             && m_ui.audioDeviceLayoutCombo->currentText() != "")
         {
 #if defined(RV_VFX_CY2023)
-            settings.setValue(
-                "outputRate",
-                m_ui.audioDeviceRateWidget->currentText().toDouble());
+            settings.setValue("outputRate", m_ui.audioDeviceRateWidget->currentText().toDouble());
 #else
-            settings.setValue("outputRate",
-                              (double)1.0
-                                  * m_ui.audioDeviceRateWidget->value());
+            settings.setValue("outputRate", (double)1.0 * m_ui.audioDeviceRateWidget->value());
 #endif
-            settings.setValue("outputModule",
-                              m_ui.audioModuleCombo->currentText());
-            settings.setValue("outputDevice",
-                              m_ui.audioDeviceCombo->currentText());
+            settings.setValue("outputModule", m_ui.audioModuleCombo->currentText());
+            settings.setValue("outputDevice", m_ui.audioDeviceCombo->currentText());
 
             // Handle outputPrecision settings
             int currentIndex = m_ui.audioDeviceFormatCombo->currentIndex();
@@ -1669,9 +1362,7 @@ namespace Rv
 
             if (currentIndex < m_ui.audioDeviceFormatCombo->count())
             {
-                currentFormat = (TwkAudio::Format)m_ui.audioDeviceFormatCombo
-                                    ->itemData(currentIndex)
-                                    .toInt();
+                currentFormat = (TwkAudio::Format)m_ui.audioDeviceFormatCombo->itemData(currentIndex).toInt();
             }
 
             int prec;
@@ -1703,10 +1394,7 @@ namespace Rv
 
             if (currentIndex < m_ui.audioDeviceLayoutCombo->count())
             {
-                currentChannelLayout =
-                    (TwkAudio::Layout)m_ui.audioDeviceLayoutCombo
-                        ->itemData(currentIndex)
-                        .toInt();
+                currentChannelLayout = (TwkAudio::Layout)m_ui.audioDeviceLayoutCombo->itemData(currentIndex).toInt();
             }
             settings.setValue("outputLayout", int(currentChannelLayout));
         }
@@ -1716,9 +1404,7 @@ namespace Rv
         //----------------------------------------------------------------------
 
         settings.beginGroup("Display");
-        settings.setValue(
-            "vsync",
-            m_ui.displayVideoSyncButton->checkState() == Qt::Checked ? 1 : 0);
+        settings.setValue("vsync", m_ui.displayVideoSyncButton->checkState() == Qt::Checked ? 1 : 0);
 
         int rbits = 0, gbits = 0, bbits = 0, abits = 0;
 
@@ -1747,37 +1433,25 @@ namespace Rv
         //----------------------------------------------------------------------
 
         settings.beginGroup("OpenEXR");
-        settings.setValue("useRGBA",
-                          m_ui.exrRGBAToggle->checkState() == Qt::Checked);
-        settings.setValue("inheritChannels",
-                          m_ui.exrInheritToggle->checkState() == Qt::Checked);
-        settings.setValue("planar3Channel",
-                          m_ui.exrPlanar3ChannelToggle->checkState()
-                              == Qt::Checked);
-        settings.setValue("noOneChannel",
-                          m_ui.exrNoOneChannelToggle->checkState()
-                              == Qt::Checked);
-        settings.setValue("readWindowIsDisplayWindow",
-                          m_ui.exrReadWindowIsDisplayWindowToggle->checkState()
-                              == Qt::Checked);
+        settings.setValue("useRGBA", m_ui.exrRGBAToggle->checkState() == Qt::Checked);
+        settings.setValue("inheritChannels", m_ui.exrInheritToggle->checkState() == Qt::Checked);
+        settings.setValue("planar3Channel", m_ui.exrPlanar3ChannelToggle->checkState() == Qt::Checked);
+        settings.setValue("noOneChannel", m_ui.exrNoOneChannelToggle->checkState() == Qt::Checked);
+        settings.setValue("readWindowIsDisplayWindow", m_ui.exrReadWindowIsDisplayWindowToggle->checkState() == Qt::Checked);
         settings.setValue("cpus", m_ui.exrNumThreadsEdit->text().toInt());
         settings.setValue("IOmethod", m_ui.exrIOMethodCombo->currentIndex());
-        settings.setValue("readWindow",
-                          m_ui.exrReadWindowCombo->currentIndex());
+        settings.setValue("readWindow", m_ui.exrReadWindowCombo->currentIndex());
         settings.setValue("IOsize", m_ui.exrChunkSizeEdit->text().toInt());
-        settings.setValue("MaxInFlight",
-                          m_ui.exrMaxInFlightEdit->text().toInt());
+        settings.setValue("MaxInFlight", m_ui.exrMaxInFlightEdit->text().toInt());
         settings.endGroup();
 
         //----------------------------------------------------------------------
 
         settings.beginGroup("JPEG");
-        settings.setValue("RGBA",
-                          m_ui.jpegRGBAToggle->checkState() == Qt::Checked);
+        settings.setValue("RGBA", m_ui.jpegRGBAToggle->checkState() == Qt::Checked);
         settings.setValue("IOmethod", m_ui.jpegIOMethodCombo->currentIndex());
         settings.setValue("IOsize", m_ui.jpegChunkSizeEdit->text().toInt());
-        settings.setValue("MaxInFlight",
-                          m_ui.jpegMaxInFlightEdit->text().toInt());
+        settings.setValue("MaxInFlight", m_ui.jpegMaxInFlightEdit->text().toInt());
         settings.endGroup();
 
         //----------------------------------------------------------------------
@@ -1785,10 +1459,8 @@ namespace Rv
         settings.beginGroup("Cineon");
         settings.setValue("IOmethod", m_ui.cinIOMethodCombo->currentIndex());
         settings.setValue("IOsize", m_ui.cinChunkSizeEdit->text().toInt());
-        settings.setValue("MaxInFlight",
-                          m_ui.cinMaxInFlightEdit->text().toInt());
-        settings.setValue("usePrimaries",
-                          m_ui.cinChromaToggle->checkState() == Qt::Checked);
+        settings.setValue("MaxInFlight", m_ui.cinMaxInFlightEdit->text().toInt());
+        settings.setValue("usePrimaries", m_ui.cinChromaToggle->checkState() == Qt::Checked);
 
         const char* cinfmt = opts.cinPixel;
 
@@ -1828,10 +1500,8 @@ namespace Rv
         settings.beginGroup("DPX");
         settings.setValue("IOmethod", m_ui.dpxIOMethodCombo->currentIndex());
         settings.setValue("IOsize", m_ui.dpxChunkSizeEdit->text().toInt());
-        settings.setValue("MaxInFlight",
-                          m_ui.dpxMaxInFlightEdit->text().toInt());
-        settings.setValue("usePrimaries",
-                          m_ui.dpxChromaToggle->checkState() == Qt::Checked);
+        settings.setValue("MaxInFlight", m_ui.dpxMaxInFlightEdit->text().toInt());
+        settings.setValue("usePrimaries", m_ui.dpxChromaToggle->checkState() == Qt::Checked);
 
         const char* dpxfmt = opts.dpxPixel;
 
@@ -1870,15 +1540,13 @@ namespace Rv
         settings.beginGroup("TGA");
         settings.setValue("IOmethod", m_ui.tgaIOMethodCombo->currentIndex());
         settings.setValue("IOsize", m_ui.tgaChunkSizeEdit->text().toInt());
-        settings.setValue("MaxInFlight",
-                          m_ui.tgaMaxInFlightEdit->text().toInt());
+        settings.setValue("MaxInFlight", m_ui.tgaMaxInFlightEdit->text().toInt());
         settings.endGroup();
 
         settings.beginGroup("TIFF");
         settings.setValue("IOmethod", m_ui.tifIOMethodCombo->currentIndex());
         settings.setValue("IOsize", m_ui.tifChunkSizeEdit->text().toInt());
-        settings.setValue("MaxInFlight",
-                          m_ui.tifMaxInFlightEdit->text().toInt());
+        settings.setValue("MaxInFlight", m_ui.tifMaxInFlightEdit->text().toInt());
         settings.endGroup();
 
         //
@@ -1907,14 +1575,9 @@ namespace Rv
         if (!opts.qtcss)
         {
 #ifdef PLATFORM_DARWIN
-            QString csstext = UTF8::qconvert(rv_mac_dark)
-                                  .arg(opts.fontSize1)
-                                  .arg(opts.fontSize2);
+            QString csstext = UTF8::qconvert(rv_mac_dark).arg(opts.fontSize1).arg(opts.fontSize2);
 #else
-            QString csstext = UTF8::qconvert(rv_linux_dark)
-                                  .arg(opts.fontSize1)
-                                  .arg(opts.fontSize2)
-                                  .arg(opts.fontSize2 - 1);
+            QString csstext = UTF8::qconvert(rv_linux_dark).arg(opts.fontSize1).arg(opts.fontSize2).arg(opts.fontSize2 - 1);
 #endif
             qApp->setStyleSheet(csstext);
         }
@@ -1933,9 +1596,7 @@ namespace Rv
 #ifdef PLATFORM_DARWIN
                 csstext = csstext.arg(opts.fontSize1).arg(opts.fontSize2);
 #else
-                csstext = csstext.arg(opts.fontSize1)
-                              .arg(opts.fontSize2)
-                              .arg(opts.fontSize2 - 1);
+                csstext = csstext.arg(opts.fontSize1).arg(opts.fontSize2).arg(opts.fontSize2 - 1);
 #endif
 
                 qApp->setStyleSheet(csstext);
@@ -1943,15 +1604,9 @@ namespace Rv
         }
     }
 
-    void RvPreferences::stylusAsMouseChanged(int state)
-    {
-        Options::sharedOptions().stylusAsMouse = (state == 0) ? 0 : 1;
-    }
+    void RvPreferences::stylusAsMouseChanged(int state) { Options::sharedOptions().stylusAsMouse = (state == 0) ? 0 : 1; }
 
-    void RvPreferences::startupResizeChanged(int state)
-    {
-        Options::sharedOptions().startupResize = (state == 0) ? 0 : 1;
-    }
+    void RvPreferences::startupResizeChanged(int state) { Options::sharedOptions().startupResize = (state == 0) ? 0 : 1; }
 
     //----------------------------------------------------------------------
     //
@@ -1995,15 +1650,13 @@ namespace Rv
 
     void RvPreferences::lookaheadCacheSizeFinisihed()
     {
-        float gigs =
-            (dynamic_cast<QLineEdit*>(QObject::sender()))->text().toFloat();
+        float gigs = (dynamic_cast<QLineEdit*>(QObject::sender()))->text().toFloat();
         newCacheSize(gigs, IPGraph::BufferCache);
     }
 
     void RvPreferences::regionCacheSizeFinisihed()
     {
-        float gigs =
-            (dynamic_cast<QLineEdit*>(QObject::sender()))->text().toFloat();
+        float gigs = (dynamic_cast<QLineEdit*>(QObject::sender()))->text().toFloat();
         newCacheSize(gigs, IPGraph::GreedyCache);
     }
 
@@ -2064,20 +1717,11 @@ namespace Rv
         }
     }
 
-    void RvPreferences::allowFloatChanged(int state)
-    {
-        FormatIPNode::defaultAllowFP = state != 0;
-    }
+    void RvPreferences::allowFloatChanged(int state) { FormatIPNode::defaultAllowFP = state != 0; }
 
-    void RvPreferences::newGLSLlutInterpChanged(int state)
-    {
-        LUTIPNode::newGLSLlutInterp = (state != 0);
-    }
+    void RvPreferences::newGLSLlutInterpChanged(int state) { LUTIPNode::newGLSLlutInterp = (state != 0); }
 
-    void RvPreferences::swapScanlinesChanged(int state)
-    {
-        DisplayStereoIPNode::setSwapScanlines((state == Qt::Checked));
-    }
+    void RvPreferences::swapScanlinesChanged(int state) { DisplayStereoIPNode::setSwapScanlines((state == Qt::Checked)); }
 
     void RvPreferences::prefetchChanged(int state)
     {
@@ -2120,8 +1764,7 @@ namespace Rv
         for (size_t i = 0; i < docs.size(); i++)
         {
             Session* s = static_cast<Session*>(docs[i]);
-            if (RvDocument* rvdoc =
-                    reinterpret_cast<RvDocument*>(s->opaquePointer()))
+            if (RvDocument* rvdoc = reinterpret_cast<RvDocument*>(s->opaquePointer()))
             {
                 rvdoc->setVSync(state != 0);
             }
@@ -2135,8 +1778,7 @@ namespace Rv
         for (size_t i = 0; i < docs.size(); i++)
         {
             Session* s = static_cast<Session*>(docs[i]);
-            if (RvDocument* rvdoc =
-                    reinterpret_cast<RvDocument*>(s->opaquePointer()))
+            if (RvDocument* rvdoc = reinterpret_cast<RvDocument*>(s->opaquePointer()))
             {
                 RvDocument::DisplayOutputType t;
 
@@ -2179,8 +1821,7 @@ namespace Rv
 
         for (FBPlugins::const_iterator i = plugs.begin(); i != plugs.end(); ++i)
         {
-            if (StreamingFrameBufferIO* sio =
-                    dynamic_cast<StreamingFrameBufferIO*>(*i))
+            if (StreamingFrameBufferIO* sio = dynamic_cast<StreamingFrameBufferIO*>(*i))
             {
                 if (sio->identifier() == name)
                     return sio;
@@ -2229,9 +1870,7 @@ namespace Rv
     {
         if (m_ui.exrNumThreadsEdit->text() == "0")
         {
-            Imf::setGlobalThreadCount(TwkUtil::SystemInfo::numCPUs() > 1
-                                          ? (TwkUtil::SystemInfo::numCPUs() - 1)
-                                          : 1);
+            Imf::setGlobalThreadCount(TwkUtil::SystemInfo::numCPUs() > 1 ? (TwkUtil::SystemInfo::numCPUs() - 1) : 1);
         }
         else
         {
@@ -2246,9 +1885,7 @@ namespace Rv
             m_ui.exrNumThreadsEdit->setText("0");
             m_ui.exrNumThreadsEdit->setEnabled(false);
             m_ui.exrThreadsLabel->setEnabled(false);
-            Imf::setGlobalThreadCount(TwkUtil::SystemInfo::numCPUs() > 1
-                                          ? (TwkUtil::SystemInfo::numCPUs() - 1)
-                                          : 1);
+            Imf::setGlobalThreadCount(TwkUtil::SystemInfo::numCPUs() > 1 ? (TwkUtil::SystemInfo::numCPUs() - 1) : 1);
         }
         else
         {
@@ -2275,31 +1912,25 @@ namespace Rv
     void RvPreferences::exrChunkSizeFinished()
     {
         if (StreamingFrameBufferIO* exr = findPlugin("IOexr"))
-            exr->setIntAttribute("iosize",
-                                 m_ui.exrChunkSizeEdit->text().toInt());
+            exr->setIntAttribute("iosize", m_ui.exrChunkSizeEdit->text().toInt());
     }
 
     void RvPreferences::exrMaxInFlightFinished()
     {
         if (StreamingFrameBufferIO* exr = findPlugin("IOexr"))
-            exr->setIntAttribute("iomaxAsync",
-                                 m_ui.exrMaxInFlightEdit->text().toInt());
+            exr->setIntAttribute("iomaxAsync", m_ui.exrMaxInFlightEdit->text().toInt());
     }
 
     void RvPreferences::exrIOMethodChanged(int state)
     {
         if (StreamingFrameBufferIO* exr = findPlugin("IOexr"))
-            exr->setIntAttribute("iotype",
-                                 (TwkFB::StreamingFrameBufferIO::IOType)
-                                     m_ui.exrIOMethodCombo->currentIndex());
+            exr->setIntAttribute("iotype", (TwkFB::StreamingFrameBufferIO::IOType)m_ui.exrIOMethodCombo->currentIndex());
     }
 
     void RvPreferences::exrReadWindowChanged(int state)
     {
         if (StreamingFrameBufferIO* exr = findPlugin("IOexr"))
-            exr->setIntAttribute("readWindow",
-                                 (TwkFB::IOexr::ReadWindow)
-                                     m_ui.exrReadWindowCombo->currentIndex());
+            exr->setIntAttribute("readWindow", (TwkFB::IOexr::ReadWindow)m_ui.exrReadWindowCombo->currentIndex());
     }
 
     //----------------------------------------------------------------------
@@ -2310,23 +1941,19 @@ namespace Rv
     void RvPreferences::cinChunkSizeFinished()
     {
         if (StreamingFrameBufferIO* exr = findPlugin("IOexr"))
-            exr->setIntAttribute("iosize",
-                                 m_ui.exrChunkSizeEdit->text().toInt());
+            exr->setIntAttribute("iosize", m_ui.exrChunkSizeEdit->text().toInt());
     }
 
     void RvPreferences::cinMaxInFlightFinished()
     {
         if (StreamingFrameBufferIO* cin = findPlugin("IOcin"))
-            cin->setIntAttribute("iomaxAsync",
-                                 m_ui.cinMaxInFlightEdit->text().toInt());
+            cin->setIntAttribute("iomaxAsync", m_ui.cinMaxInFlightEdit->text().toInt());
     }
 
     void RvPreferences::cinIOMethodChanged(int state)
     {
         if (StreamingFrameBufferIO* cin = findPlugin("IOcin"))
-            cin->setIntAttribute("iotype",
-                                 (TwkFB::StreamingFrameBufferIO::IOType)
-                                     m_ui.cinIOMethodCombo->currentIndex());
+            cin->setIntAttribute("iotype", (TwkFB::StreamingFrameBufferIO::IOType)m_ui.cinIOMethodCombo->currentIndex());
     }
 
     void RvPreferences::cinChromaChanged(int state)
@@ -2377,23 +2004,19 @@ namespace Rv
     void RvPreferences::dpxChunkSizeFinished()
     {
         if (StreamingFrameBufferIO* dpx = findPlugin("IOdpx"))
-            dpx->setIntAttribute("iosize",
-                                 m_ui.dpxChunkSizeEdit->text().toInt());
+            dpx->setIntAttribute("iosize", m_ui.dpxChunkSizeEdit->text().toInt());
     }
 
     void RvPreferences::dpxMaxInFlightFinished()
     {
         if (StreamingFrameBufferIO* dpx = findPlugin("IOdpx"))
-            dpx->setIntAttribute("iomaxAsync",
-                                 m_ui.dpxMaxInFlightEdit->text().toInt());
+            dpx->setIntAttribute("iomaxAsync", m_ui.dpxMaxInFlightEdit->text().toInt());
     }
 
     void RvPreferences::dpxIOMethodChanged(int state)
     {
         if (StreamingFrameBufferIO* dpx = findPlugin("IOdpx"))
-            dpx->setIntAttribute("iotype",
-                                 (TwkFB::StreamingFrameBufferIO::IOType)
-                                     m_ui.dpxIOMethodCombo->currentIndex());
+            dpx->setIntAttribute("iotype", (TwkFB::StreamingFrameBufferIO::IOType)m_ui.dpxIOMethodCombo->currentIndex());
     }
 
     void RvPreferences::dpxChromaChanged(int state)
@@ -2444,23 +2067,19 @@ namespace Rv
     void RvPreferences::tgaChunkSizeFinished()
     {
         if (StreamingFrameBufferIO* tga = findPlugin("IOtga"))
-            tga->setIntAttribute("iosize",
-                                 m_ui.tgaChunkSizeEdit->text().toInt());
+            tga->setIntAttribute("iosize", m_ui.tgaChunkSizeEdit->text().toInt());
     }
 
     void RvPreferences::tgaMaxInFlightFinished()
     {
         if (StreamingFrameBufferIO* tga = findPlugin("IOtga"))
-            tga->setIntAttribute("iomaxAsync",
-                                 m_ui.tgaMaxInFlightEdit->text().toInt());
+            tga->setIntAttribute("iomaxAsync", m_ui.tgaMaxInFlightEdit->text().toInt());
     }
 
     void RvPreferences::tgaIOMethodChanged(int state)
     {
         if (StreamingFrameBufferIO* tga = findPlugin("IOtga"))
-            tga->setIntAttribute("iotype",
-                                 (TwkFB::StreamingFrameBufferIO::IOType)
-                                     m_ui.tgaIOMethodCombo->currentIndex());
+            tga->setIntAttribute("iotype", (TwkFB::StreamingFrameBufferIO::IOType)m_ui.tgaIOMethodCombo->currentIndex());
     }
 
     //----------------------------------------------------------------------
@@ -2471,23 +2090,19 @@ namespace Rv
     void RvPreferences::tiffChunkSizeFinished()
     {
         if (StreamingFrameBufferIO* tif = findPlugin("IOtif"))
-            tif->setIntAttribute("iosize",
-                                 m_ui.tifChunkSizeEdit->text().toInt());
+            tif->setIntAttribute("iosize", m_ui.tifChunkSizeEdit->text().toInt());
     }
 
     void RvPreferences::tiffMaxInFlightFinished()
     {
         if (StreamingFrameBufferIO* tif = findPlugin("IOtif"))
-            tif->setIntAttribute("iomaxAsync",
-                                 m_ui.tifMaxInFlightEdit->text().toInt());
+            tif->setIntAttribute("iomaxAsync", m_ui.tifMaxInFlightEdit->text().toInt());
     }
 
     void RvPreferences::tiffIOMethodChanged(int state)
     {
         if (StreamingFrameBufferIO* tif = findPlugin("IOtif"))
-            tif->setIntAttribute("iotype",
-                                 (TwkFB::StreamingFrameBufferIO::IOType)
-                                     m_ui.tifIOMethodCombo->currentIndex());
+            tif->setIntAttribute("iotype", (TwkFB::StreamingFrameBufferIO::IOType)m_ui.tifIOMethodCombo->currentIndex());
     }
 
     //----------------------------------------------------------------------
@@ -2498,23 +2113,19 @@ namespace Rv
     void RvPreferences::jpegChunkSizeFinished()
     {
         if (StreamingFrameBufferIO* jpeg = findPlugin("IOjpeg"))
-            jpeg->setIntAttribute("iosize",
-                                  m_ui.jpegChunkSizeEdit->text().toInt());
+            jpeg->setIntAttribute("iosize", m_ui.jpegChunkSizeEdit->text().toInt());
     }
 
     void RvPreferences::jpegMaxInFlightFinished()
     {
         if (StreamingFrameBufferIO* jpeg = findPlugin("IOjpeg"))
-            jpeg->setIntAttribute("iomaxAsync",
-                                  m_ui.jpegMaxInFlightEdit->text().toInt());
+            jpeg->setIntAttribute("iomaxAsync", m_ui.jpegMaxInFlightEdit->text().toInt());
     }
 
     void RvPreferences::jpegIOMethodChanged(int state)
     {
         if (StreamingFrameBufferIO* jpeg = findPlugin("IOjpeg"))
-            jpeg->setIntAttribute("iotype",
-                                  (TwkFB::StreamingFrameBufferIO::IOType)
-                                      m_ui.jpegIOMethodCombo->currentIndex());
+            jpeg->setIntAttribute("iotype", (TwkFB::StreamingFrameBufferIO::IOType)m_ui.jpegIOMethodCombo->currentIndex());
     }
 
     void RvPreferences::jpegRGBAChanged(int state)
@@ -2536,18 +2147,15 @@ namespace Rv
     //  Audio slots
     //
 
-    bool RvPreferences::initAudioDeviceMenu(
-        AudioRenderer::RendererParameters& params,
-        const AudioRenderer::DeviceVector& devices,
-        const string& currentDeviceName)
+    bool RvPreferences::initAudioDeviceMenu(AudioRenderer::RendererParameters& params, const AudioRenderer::DeviceVector& devices,
+                                            const string& currentDeviceName)
     {
         m_ui.audioDeviceCombo->clear();
 
         if (devices.empty())
         {
             m_ui.audioDeviceCombo->addItem("Unavailable");
-            m_ui.audioDeviceCombo->setItemIcon(
-                0, colorAdjustedIcon(":images/mute_32x32.png"));
+            m_ui.audioDeviceCombo->setItemIcon(0, colorAdjustedIcon(":images/mute_32x32.png"));
             m_ui.audioDeviceCombo->setCurrentIndex(0);
             m_ui.audioDeviceCombo->setEnabled(false);
             return false;
@@ -2557,8 +2165,7 @@ namespace Rv
             int current = 0;
             for (size_t i = 0; i < devices.size(); i++)
             {
-                m_ui.audioDeviceCombo->addItem(
-                    QString::fromUtf8(devices[i].name.c_str()));
+                m_ui.audioDeviceCombo->addItem(QString::fromUtf8(devices[i].name.c_str()));
                 if (devices[i].name == currentDeviceName)
                     current = i;
             }
@@ -2572,18 +2179,15 @@ namespace Rv
         return true;
     }
 
-    bool RvPreferences::initAudioLayoutMenu(
-        AudioRenderer::RendererParameters& params,
-        const AudioRenderer::LayoutsVector& layouts,
-        const AudioRenderer::Layout& currentLayout)
+    bool RvPreferences::initAudioLayoutMenu(AudioRenderer::RendererParameters& params, const AudioRenderer::LayoutsVector& layouts,
+                                            const AudioRenderer::Layout& currentLayout)
     {
         m_ui.audioDeviceLayoutCombo->clear();
 
         if (layouts.empty())
         {
             m_ui.audioDeviceLayoutCombo->addItem("Unavailable");
-            m_ui.audioDeviceLayoutCombo->setItemIcon(
-                0, colorAdjustedIcon(":images/mute_32x32.png"));
+            m_ui.audioDeviceLayoutCombo->setItemIcon(0, colorAdjustedIcon(":images/mute_32x32.png"));
             m_ui.audioDeviceLayoutCombo->setCurrentIndex(0);
             m_ui.audioDeviceLayoutCombo->setEnabled(false);
             return false;
@@ -2593,10 +2197,7 @@ namespace Rv
             int current = 0;
             for (size_t i = 0; i < layouts.size(); i++)
             {
-                m_ui.audioDeviceLayoutCombo->addItem(
-                    QString::fromUtf8(
-                        TwkAudio::layoutString(layouts[i]).c_str()),
-                    layouts[i]);
+                m_ui.audioDeviceLayoutCombo->addItem(QString::fromUtf8(TwkAudio::layoutString(layouts[i]).c_str()), layouts[i]);
                 if (layouts[i] == currentLayout)
                     current = i;
             }
@@ -2609,18 +2210,15 @@ namespace Rv
         return true;
     }
 
-    bool RvPreferences::initAudioFormatMenu(
-        AudioRenderer::RendererParameters& params,
-        const AudioRenderer::FormatVector& formats,
-        const AudioRenderer::Format& currentFormat)
+    bool RvPreferences::initAudioFormatMenu(AudioRenderer::RendererParameters& params, const AudioRenderer::FormatVector& formats,
+                                            const AudioRenderer::Format& currentFormat)
     {
         m_ui.audioDeviceFormatCombo->clear();
 
         if (formats.empty())
         {
             m_ui.audioDeviceFormatCombo->addItem("Unavailable");
-            m_ui.audioDeviceFormatCombo->setItemIcon(
-                0, colorAdjustedIcon(":images/mute_32x32.png"));
+            m_ui.audioDeviceFormatCombo->setItemIcon(0, colorAdjustedIcon(":images/mute_32x32.png"));
             m_ui.audioDeviceFormatCombo->setCurrentIndex(0);
             m_ui.audioDeviceFormatCombo->setEnabled(false);
             return false;
@@ -2630,10 +2228,7 @@ namespace Rv
             int current = 0;
             for (size_t i = 0; i < formats.size(); i++)
             {
-                m_ui.audioDeviceFormatCombo->addItem(
-                    QString::fromUtf8(
-                        TwkAudio::formatString(formats[i]).c_str()),
-                    formats[i]);
+                m_ui.audioDeviceFormatCombo->addItem(QString::fromUtf8(TwkAudio::formatString(formats[i]).c_str()), formats[i]);
                 if (formats[i] == currentFormat)
                     current = i;
             }
@@ -2646,10 +2241,8 @@ namespace Rv
         return true;
     }
 
-    bool
-    RvPreferences::initAudioRatesMenu(AudioRenderer::RendererParameters& params,
-                                      const AudioRenderer::RateVector& rates,
-                                      const size_t& currentRate)
+    bool RvPreferences::initAudioRatesMenu(AudioRenderer::RendererParameters& params, const AudioRenderer::RateVector& rates,
+                                           const size_t& currentRate)
     {
         m_ui.audioDeviceRateWidget->clear();
 
@@ -2658,8 +2251,7 @@ namespace Rv
             m_ui.audioDeviceRateWidget->clear();
 #if defined(RV_VFX_CY2023)
             m_ui.audioDeviceRateWidget->addItem("Unavailable");
-            m_ui.audioDeviceRateWidget->setItemIcon(
-                0, colorAdjustedIcon(":images/mute_32x32.png"));
+            m_ui.audioDeviceRateWidget->setItemIcon(0, colorAdjustedIcon(":images/mute_32x32.png"));
             m_ui.audioDeviceRateWidget->setCurrentIndex(0);
 #else
             m_ui.audioDeviceRateWidget->setValue((int)currentRate);
@@ -2702,23 +2294,19 @@ namespace Rv
         {
             try
             {
-                string moduleChoice =
-                    m_ui.audioModuleCombo->currentText().toUtf8().constData();
-                if (moduleChoice != AudioRenderer::currentModule()
-                    || m_ui.audioDeviceCombo->count() == 0)
+                string moduleChoice = m_ui.audioModuleCombo->currentText().toUtf8().constData();
+                if (moduleChoice != AudioRenderer::currentModule() || m_ui.audioDeviceCombo->count() == 0)
                 {
                     // If we really have switched module then we must
                     // force the device choice to "Default" since this is
                     // the only choice that is common across all the audio
                     // module choices.
-                    AudioRenderer::RendererParameters params =
-                        AudioRenderer::defaultParameters();
+                    AudioRenderer::RendererParameters params = AudioRenderer::defaultParameters();
                     params.device = "Default";
                     AudioRenderer::setDefaultParameters(params);
                     AudioRenderer::setModule(moduleChoice);
-                    AudioRenderer::setDefaultParameters(
-                        params); // Re-set cause the setModule() can change
-                                 // params values. when switching modules.
+                    AudioRenderer::setDefaultParameters(params); // Re-set cause the setModule() can change
+                                                                 // params values. when switching modules.
                 }
             }
             catch (...)
@@ -2743,8 +2331,7 @@ namespace Rv
         if (!renderer)
             return;
 
-        AudioRenderer::RendererParameters params =
-            AudioRenderer::defaultParameters();
+        AudioRenderer::RendererParameters params = AudioRenderer::defaultParameters();
 
         //  If we've initialized a device, try to reuse it.
         //
@@ -2774,10 +2361,8 @@ namespace Rv
         const AudioRenderer::DeviceVector& devices = renderer->outputDevices();
         bool initMenusOK = initAudioDeviceMenu(params, devices, d.name);
 
-        AudioRenderer::Format currentFormat =
-            AudioRenderer::defaultParameters().format;
-        AudioRenderer::Layout currentLayout =
-            AudioRenderer::defaultParameters().layout;
+        AudioRenderer::Format currentFormat = AudioRenderer::defaultParameters().format;
+        AudioRenderer::Layout currentLayout = AudioRenderer::defaultParameters().layout;
         size_t currentRate = size_t(AudioRenderer::defaultParameters().rate);
 
         AudioRenderer::LayoutsVector layouts;
@@ -2801,8 +2386,7 @@ namespace Rv
                 // Implies currentLayout isnt a valid choice
                 // for this device so use Stereo_2 if its an option
                 // otherwise pick the first choice in the list.
-                currentLayout =
-                    (hasStereoLayout ? TwkAudio::Stereo_2 : layouts.front());
+                currentLayout = (hasStereoLayout ? TwkAudio::Stereo_2 : layouts.front());
             }
         }
         d.layout = currentLayout;
@@ -2833,16 +2417,13 @@ namespace Rv
         IPCore::App()->resumeAll();
 
         // Create the channel layout choice list
-        initMenusOK =
-            initMenusOK && initAudioLayoutMenu(params, layouts, currentLayout);
+        initMenusOK = initMenusOK && initAudioLayoutMenu(params, layouts, currentLayout);
 
         // Create format choice list
-        initMenusOK =
-            initMenusOK && initAudioFormatMenu(params, formats, currentFormat);
+        initMenusOK = initMenusOK && initAudioFormatMenu(params, formats, currentFormat);
 
         // Create rates choice list
-        initMenusOK =
-            initMenusOK && initAudioRatesMenu(params, rates, currentRate);
+        initMenusOK = initMenusOK && initAudioRatesMenu(params, rates, currentRate);
 
         if (initMenusOK)
         {
@@ -2860,10 +2441,8 @@ namespace Rv
 
         if (index != -1)
         {
-            AudioRenderer::RendererParameters params =
-                AudioRenderer::defaultParameters();
-            string deviceChoice =
-                m_ui.audioDeviceCombo->currentText().toUtf8().constData();
+            AudioRenderer::RendererParameters params = AudioRenderer::defaultParameters();
+            string deviceChoice = m_ui.audioDeviceCombo->currentText().toUtf8().constData();
 
             if (deviceChoice != params.device)
             {
@@ -2891,8 +2470,7 @@ namespace Rv
         if (!renderer || !hasChanged)
             return;
 
-        AudioRenderer::RendererParameters params =
-            AudioRenderer::defaultParameters();
+        AudioRenderer::RendererParameters params = AudioRenderer::defaultParameters();
 
         string deviceName = params.device;
         int deviceIndex = renderer->findDeviceByName(deviceName);
@@ -2902,10 +2480,8 @@ namespace Rv
             deviceIndex = renderer->findDefaultDevice();
         }
         AudioRenderer::Device d = renderer->outputDevices()[deviceIndex];
-        AudioRenderer::Format currentFormat =
-            AudioRenderer::defaultParameters().format;
-        AudioRenderer::Layout currentLayout =
-            AudioRenderer::defaultParameters().layout;
+        AudioRenderer::Format currentFormat = AudioRenderer::defaultParameters().format;
+        AudioRenderer::Layout currentLayout = AudioRenderer::defaultParameters().layout;
         size_t currentRate = size_t(AudioRenderer::defaultParameters().rate);
 
         AudioRenderer::LayoutsVector layouts;
@@ -2929,8 +2505,7 @@ namespace Rv
                 // Implies currentLayout isnt a valid choice
                 // for this device so use Stereo_2 if its an option
                 // otherwise pick the first choice in the list.
-                currentLayout =
-                    (hasStereoLayout ? TwkAudio::Stereo_2 : layouts.front());
+                currentLayout = (hasStereoLayout ? TwkAudio::Stereo_2 : layouts.front());
             }
         }
         d.layout = currentLayout;
@@ -2963,12 +2538,10 @@ namespace Rv
         bool initMenusOK = initAudioLayoutMenu(params, layouts, currentLayout);
 
         // Create format choice list
-        initMenusOK =
-            initMenusOK && initAudioFormatMenu(params, formats, currentFormat);
+        initMenusOK = initMenusOK && initAudioFormatMenu(params, formats, currentFormat);
 
         // Create rates choice list
-        initMenusOK =
-            initMenusOK && initAudioRatesMenu(params, rates, currentRate);
+        initMenusOK = initMenusOK && initAudioRatesMenu(params, rates, currentRate);
 
         if (initMenusOK)
         {
@@ -2986,12 +2559,9 @@ namespace Rv
 
         if ((index != -1) && (index < m_ui.audioDeviceLayoutCombo->count()))
         {
-            AudioRenderer::RendererParameters params =
-                AudioRenderer::defaultParameters();
+            AudioRenderer::RendererParameters params = AudioRenderer::defaultParameters();
 
-            TwkAudio::Layout layoutChoice =
-                (TwkAudio::Layout)m_ui.audioDeviceLayoutCombo->itemData(index)
-                    .toInt();
+            TwkAudio::Layout layoutChoice = (TwkAudio::Layout)m_ui.audioDeviceLayoutCombo->itemData(index).toInt();
 
             if (layoutChoice != params.layout)
             {
@@ -3016,8 +2586,7 @@ namespace Rv
         if (!renderer || !hasChanged)
             return;
 
-        AudioRenderer::RendererParameters params =
-            AudioRenderer::defaultParameters();
+        AudioRenderer::RendererParameters params = AudioRenderer::defaultParameters();
 
         string deviceName = params.device;
         int deviceIndex = renderer->findDeviceByName(deviceName);
@@ -3025,8 +2594,7 @@ namespace Rv
             deviceIndex = renderer->findDefaultDevice();
         const AudioRenderer::Device& d = renderer->outputDevices()[deviceIndex];
 
-        AudioRenderer::Format currentFormat =
-            AudioRenderer::defaultParameters().format;
+        AudioRenderer::Format currentFormat = AudioRenderer::defaultParameters().format;
         size_t currentRate = size_t(AudioRenderer::defaultParameters().rate);
 
         AudioRenderer::FormatVector formats;
@@ -3062,8 +2630,7 @@ namespace Rv
         bool initMenusOK = initAudioFormatMenu(params, formats, currentFormat);
 
         // Create rates choice list
-        initMenusOK =
-            initMenusOK && initAudioRatesMenu(params, rates, currentRate);
+        initMenusOK = initMenusOK && initAudioRatesMenu(params, rates, currentRate);
 
         if (initMenusOK)
         {
@@ -3081,12 +2648,9 @@ namespace Rv
 
         if ((index != -1) && (index < m_ui.audioDeviceFormatCombo->count()))
         {
-            AudioRenderer::RendererParameters params =
-                AudioRenderer::defaultParameters();
+            AudioRenderer::RendererParameters params = AudioRenderer::defaultParameters();
 
-            TwkAudio::Format formatChoice =
-                (TwkAudio::Format)m_ui.audioDeviceFormatCombo->itemData(index)
-                    .toInt();
+            TwkAudio::Format formatChoice = (TwkAudio::Format)m_ui.audioDeviceFormatCombo->itemData(index).toInt();
 
             if (formatChoice != params.format)
             {
@@ -3111,8 +2675,7 @@ namespace Rv
         if (!renderer || !hasChanged)
             return;
 
-        AudioRenderer::RendererParameters params =
-            AudioRenderer::defaultParameters();
+        AudioRenderer::RendererParameters params = AudioRenderer::defaultParameters();
 
         string deviceName = params.device;
         int deviceIndex = renderer->findDeviceByName(deviceName);
@@ -3120,8 +2683,7 @@ namespace Rv
             deviceIndex = renderer->findDefaultDevice();
         const AudioRenderer::Device& d = renderer->outputDevices()[deviceIndex];
 
-        AudioRenderer::Format currentFormat =
-            AudioRenderer::defaultParameters().format;
+        AudioRenderer::Format currentFormat = AudioRenderer::defaultParameters().format;
         size_t currentRate = size_t(AudioRenderer::defaultParameters().rate);
 
         AudioRenderer::RateVector rates;
@@ -3159,8 +2721,7 @@ namespace Rv
 #else
         size_t rate = m_ui.audioDeviceRateWidget->value();
 #endif
-        AudioRenderer::RendererParameters params =
-            AudioRenderer::defaultParameters();
+        AudioRenderer::RendererParameters params = AudioRenderer::defaultParameters();
         params.rate = rate;
         AudioRenderer::setDefaultParameters(params);
         AudioRenderer::reset();
@@ -3168,8 +2729,7 @@ namespace Rv
 
     void RvPreferences::audioHoldOpenChanged(int state)
     {
-        AudioRenderer::RendererParameters params =
-            AudioRenderer::defaultParameters();
+        AudioRenderer::RendererParameters params = AudioRenderer::defaultParameters();
         params.holdOpen = state == Qt::Checked;
         AudioRenderer::setDefaultParameters(params);
         AudioRenderer::reset();
@@ -3177,8 +2737,7 @@ namespace Rv
 
     void RvPreferences::audioVideoSyncChanged(int state)
     {
-        AudioRenderer::RendererParameters params =
-            AudioRenderer::defaultParameters();
+        AudioRenderer::RendererParameters params = AudioRenderer::defaultParameters();
         params.hardwareLock = state == Qt::Checked;
         AudioRenderer::setDefaultParameters(params);
         AudioRenderer::reset();
@@ -3186,8 +2745,7 @@ namespace Rv
 
     void RvPreferences::audioPreRollChanged(int state)
     {
-        AudioRenderer::RendererParameters params =
-            AudioRenderer::defaultParameters();
+        AudioRenderer::RendererParameters params = AudioRenderer::defaultParameters();
         params.preRoll = state == Qt::Checked;
         AudioRenderer::setDefaultParameters(params);
         AudioRenderer::reset();
@@ -3195,8 +2753,7 @@ namespace Rv
 
     void RvPreferences::audioDevicePacketChanged()
     {
-        AudioRenderer::RendererParameters params =
-            AudioRenderer::defaultParameters();
+        AudioRenderer::RendererParameters params = AudioRenderer::defaultParameters();
         params.framesPerBuffer = m_ui.audioDevicePacketEdit->text().toInt();
         AudioRenderer::setDefaultParameters(params);
         AudioRenderer::reset();
@@ -3240,18 +2797,13 @@ namespace Rv
 
                         if (p.compatible)
                         {
-                            iitem->setCheckState(p.installed ? Qt::Checked
-                                                             : Qt::Unchecked);
-                            litem->setCheckState(p.installed && p.loadable
-                                                     ? Qt::Checked
-                                                     : Qt::Unchecked);
+                            iitem->setCheckState(p.installed ? Qt::Checked : Qt::Unchecked);
+                            litem->setCheckState(p.installed && p.loadable ? Qt::Checked : Qt::Unchecked);
                         }
                     }
                 }
 
-                m_ui.extRemoveButton->setEnabled(
-                    !package.installed
-                    && (package.fileWritable && package.dirWritable));
+                m_ui.extRemoveButton->setEnabled(!package.installed && (package.fileWritable && package.dirWritable));
             }
         }
         else if (index.column() == 1)
@@ -3272,8 +2824,7 @@ namespace Rv
 
                     if (package.installed && package.compatible)
                     {
-                        item->setCheckState(package.loadable ? Qt::Checked
-                                                             : Qt::Unchecked);
+                        item->setCheckState(package.loadable ? Qt::Checked : Qt::Unchecked);
                     }
                 }
             }
@@ -3294,8 +2845,7 @@ namespace Rv
 
         if (p.compatible)
         {
-            loaded->setCheckState(p.loadable && p.installed ? Qt::Checked
-                                                            : Qt::Unchecked);
+            loaded->setCheckState(p.loadable && p.installed ? Qt::Checked : Qt::Unchecked);
             installed->setCheckState(p.installed ? Qt::Checked : Qt::Unchecked);
         }
         else
@@ -3328,8 +2878,7 @@ namespace Rv
         // if (p.system) loaded->setEnabled(false);
 
         QList<QStandardItem*> row;
-        row << installed << loaded << name << file << version << author
-            << organization;
+        row << installed << loaded << name << file << version << author << organization;
 
         m_packageModel->appendRow(row);
     }
@@ -3361,8 +2910,7 @@ namespace Rv
         }
     }
 
-    void RvPreferences::packageSelection(const QItemSelection& selected,
-                                         const QItemSelection& deselected)
+    void RvPreferences::packageSelection(const QItemSelection& selected, const QItemSelection& deselected)
     {
         QItemSelectionModel* s = m_ui.extTreeView->selectionModel();
         QModelIndexList indices = s->selection().indexes();
@@ -3405,27 +2953,22 @@ namespace Rv
             << "<table border=0>";
 
         if (p.author != "")
-            str << "<tr><td align=right> <b>Author</b> </td><td> "
-                << p.author.toUtf8().data() << " </td></tr>";
+            str << "<tr><td align=right> <b>Author</b> </td><td> " << p.author.toUtf8().data() << " </td></tr>";
 
         if (p.organization != "")
-            str << "<tr><td align=right> <b>Organization</b> </td><td> "
-                << p.organization.toUtf8().data() << " </td></tr>";
+            str << "<tr><td align=right> <b>Organization</b> </td><td> " << p.organization.toUtf8().data() << " </td></tr>";
 
         if (p.contact != "")
             str << "<tr><td align=right> <b>Contact</b> </td><td> <a "
                    "href=\"mailto:"
-                << p.contact.toUtf8().constData() << "\">"
-                << p.contact.toUtf8().constData() << "</a></td></tr>";
+                << p.contact.toUtf8().constData() << "\">" << p.contact.toUtf8().constData() << "</a></td></tr>";
 
         if (p.url != "")
-            str << "<tr><td align=right> <b>URL</b> </td><td><a href=\""
-                << p.url.toUtf8().constData() << "\">"
+            str << "<tr><td align=right> <b>URL</b> </td><td><a href=\"" << p.url.toUtf8().constData() << "\">"
                 << p.url.toUtf8().constData() << "</a></td></tr>";
 
         if (p.version != "")
-            str << "<tr><td align=right> <b>Version</b> </td><td> "
-                << p.version.toUtf8().data() << " </td></tr>";
+            str << "<tr><td align=right> <b>Version</b> </td><td> " << p.version.toUtf8().data() << " </td></tr>";
 
         if (p.requires != "")
         str << "<tr><td align=right> <b>Requires</b> </td><td> "
@@ -3436,15 +2979,12 @@ namespace Rv
             << " </td></tr>";
 
         if (p.rvversion != "")
-            str << "<tr><td align=right> <b>RV Version</b> </td><td> "
-                << p.rvversion.toUtf8().data() << " </td></tr>";
+            str << "<tr><td align=right> <b>RV Version</b> </td><td> " << p.rvversion.toUtf8().data() << " </td></tr>";
 
         if (p.openrvversion != "")
-            str << "<tr><td align=right> <b>OpenRV Version</b> </td><td> "
-                << p.openrvversion.toUtf8().data() << " </td></tr>";
+            str << "<tr><td align=right> <b>OpenRV Version</b> </td><td> " << p.openrvversion.toUtf8().data() << " </td></tr>";
 
-        str << "<tr><td align=right> <b>File</b> </td><td> "
-            << p.file.toUtf8().data() << " </td></tr>";
+        str << "<tr><td align=right> <b>File</b> </td><td> " << p.file.toUtf8().data() << " </td></tr>";
 
         if (p.optional)
             str << "<tr><td align=right> <b>Optional Package</b> </td><td> "
@@ -3494,8 +3034,7 @@ namespace Rv
 
         b->insertHtml(QString::fromUtf8(str.str().c_str()));
 
-        m_ui.extRemoveButton->setEnabled(!p.installed
-                                         && (p.fileWritable && p.dirWritable));
+        m_ui.extRemoveButton->setEnabled(!p.installed && (p.fileWritable && p.dirWritable));
     }
 
     void RvPreferences::showHiddenPackages(bool b)
@@ -3510,8 +3049,7 @@ namespace Rv
         //  Figure out what dir to copy them to
         //
 
-        TwkApp::Bundle::PathVector supportDirs =
-            TwkApp::Bundle::mainBundle()->supportPath();
+        TwkApp::Bundle::PathVector supportDirs = TwkApp::Bundle::mainBundle()->supportPath();
 
         QStringList possiblePlaces;
 
@@ -3530,8 +3068,7 @@ namespace Rv
 
                 pdir.cd("Packages");
 
-                if (TwkUtil::isWritable(
-                        UTF8::qconvert(pdir.absolutePath()).c_str()))
+                if (TwkUtil::isWritable(UTF8::qconvert(pdir.absolutePath()).c_str()))
                 {
                     possiblePlaces.push_back(pdir.absolutePath());
                 }
@@ -3561,8 +3098,7 @@ namespace Rv
 
 #if defined(PLATFORM_WINDOWS)
         QFileDialog* fileDialog =
-            new QFileDialog(this, "Select rvpkg RV package files", dirname,
-                            "rvpkg Package Files (*.zip *.rvpkg *.rvpkgs)");
+            new QFileDialog(this, "Select rvpkg RV package files", dirname, "rvpkg Package Files (*.zip *.rvpkg *.rvpkgs)");
 
         QStringList files;
         if (fileDialog->exec())
@@ -3585,10 +3121,9 @@ namespace Rv
 #if defined(PLATFORM_LINUX)
         options |= QFileDialog::DontUseNativeDialog;
 #endif
-        QStringList files = QFileDialog::getOpenFileNames(
-            this, "Select rvpkg RV package files", dirname,
-            "rvpkg Package Files (*.zip *.rvpkg *.rvpkgs, *.rvpkgs)",
-            &selectedFilter, options);
+        QStringList files =
+            QFileDialog::getOpenFileNames(this, "Select rvpkg RV package files", dirname,
+                                          "rvpkg Package Files (*.zip *.rvpkg *.rvpkgs, *.rvpkgs)", &selectedFilter, options);
 #endif
 
         if (files.size())
@@ -3656,8 +3191,7 @@ namespace Rv
         QMessageBox box(this);
         box.setWindowTitle(tr("Confirm Removal"));
 
-        QString t = tr(
-            "Remove Packages ?\n\nThe following packages will be removed:\n");
+        QString t = tr("Remove Packages ?\n\nThe following packages will be removed:\n");
         size_t count = 0;
 
         for (size_t i = 0; i < indices.size(); i++)
@@ -3692,8 +3226,7 @@ namespace Rv
         {
             if (indices[i].column() == 0)
             {
-                int row =
-                    m_packageModel->itemFromIndex(indices[i])->data().toInt();
+                int row = m_packageModel->itemFromIndex(indices[i])->data().toInt();
 
                 if (m_packages[row].zipFile)
                 {
@@ -3714,15 +3247,13 @@ namespace Rv
     {
         QMessageBox box(this);
         box.setWindowTitle(tr("Unloadable Package Dependencies"));
-        box.setText(
-            tr("Can't make package loadable because some of its dependencies "
-               "are not loadable. Try and fix them first?\n\nDetails:\n")
-            + msg);
+        box.setText(tr("Can't make package loadable because some of its dependencies "
+                       "are not loadable. Try and fix them first?\n\nDetails:\n")
+                    + msg);
 
         box.setWindowModality(Qt::WindowModal);
         QPushButton* b1 = box.addButton(tr("Abort"), QMessageBox::RejectRole);
-        QPushButton* b2 =
-            box.addButton(tr("Continue"), QMessageBox::AcceptRole);
+        QPushButton* b2 = box.addButton(tr("Continue"), QMessageBox::AcceptRole);
         box.setIcon(QMessageBox::Critical);
         box.exec();
 
@@ -3739,8 +3270,7 @@ namespace Rv
 
         box.setWindowModality(Qt::WindowModal);
         QPushButton* b1 = box.addButton(tr("Abort"), QMessageBox::RejectRole);
-        QPushButton* b2 =
-            box.addButton(tr("Continue"), QMessageBox::AcceptRole);
+        QPushButton* b2 = box.addButton(tr("Continue"), QMessageBox::AcceptRole);
         box.setIcon(QMessageBox::Critical);
         box.exec();
 
@@ -3751,15 +3281,13 @@ namespace Rv
     {
         QMessageBox box(this);
         box.setWindowTitle(tr("Some Packages Depend on This One"));
-        box.setText(
-            tr("Can't install package because some other packages dependend on "
-               "this one. Try and install them first?\n\nDetails:\n")
-            + msg);
+        box.setText(tr("Can't install package because some other packages dependend on "
+                       "this one. Try and install them first?\n\nDetails:\n")
+                    + msg);
 
         box.setWindowModality(Qt::WindowModal);
         QPushButton* b1 = box.addButton(tr("Abort"), QMessageBox::RejectRole);
-        QPushButton* b2 =
-            box.addButton(tr("Continue"), QMessageBox::AcceptRole);
+        QPushButton* b2 = box.addButton(tr("Continue"), QMessageBox::AcceptRole);
         box.setIcon(QMessageBox::Critical);
         box.exec();
 
@@ -3776,8 +3304,7 @@ namespace Rv
 
         box.setWindowModality(Qt::WindowModal);
         QPushButton* b1 = box.addButton(tr("Abort"), QMessageBox::RejectRole);
-        QPushButton* b2 =
-            box.addButton(tr("Overwrite"), QMessageBox::AcceptRole);
+        QPushButton* b2 = box.addButton(tr("Overwrite"), QMessageBox::AcceptRole);
         box.setIcon(QMessageBox::Critical);
         box.exec();
 
@@ -3793,8 +3320,7 @@ namespace Rv
                     + msg);
 
         box.setWindowModality(Qt::WindowModal);
-        QPushButton* b1 =
-            box.addButton(tr("Abort Install"), QMessageBox::AcceptRole);
+        QPushButton* b1 = box.addButton(tr("Abort Install"), QMessageBox::AcceptRole);
         box.setIcon(QMessageBox::Critical);
         box.exec();
     }
@@ -3803,15 +3329,13 @@ namespace Rv
     {
         QMessageBox box(this);
         box.setWindowTitle(tr("Some Packages Depend on This One"));
-        box.setText(
-            tr("Can't uninstall package because some other packages dependend "
-               "on this one. Try and uninstall them first?\n\nDetails:\n")
-            + msg);
+        box.setText(tr("Can't uninstall package because some other packages dependend "
+                       "on this one. Try and uninstall them first?\n\nDetails:\n")
+                    + msg);
 
         box.setWindowModality(Qt::WindowModal);
         QPushButton* b1 = box.addButton(tr("Abort"), QMessageBox::RejectRole);
-        QPushButton* b2 =
-            box.addButton(tr("Continue"), QMessageBox::AcceptRole);
+        QPushButton* b2 = box.addButton(tr("Continue"), QMessageBox::AcceptRole);
         box.setIcon(QMessageBox::Critical);
         box.exec();
 
@@ -3822,9 +3346,7 @@ namespace Rv
     {
         QMessageBox box(this);
         box.setWindowTitle(tr("Some Files Cannot Be Removed"));
-        box.setText(
-            tr("Could not remove some of the package files.\n\nDetails:\n")
-            + msg);
+        box.setText(tr("Could not remove some of the package files.\n\nDetails:\n") + msg);
 
         box.setWindowModality(Qt::WindowModal);
         QPushButton* b2 = box.addButton(tr("Ok"), QMessageBox::AcceptRole);
@@ -3865,8 +3387,7 @@ namespace Rv
 
         box.setWindowModality(Qt::WindowModal);
         QPushButton* b1 = box.addButton(tr("Abort"), QMessageBox::RejectRole);
-        QPushButton* b2 =
-            box.addButton(tr("Continue"), QMessageBox::AcceptRole);
+        QPushButton* b2 = box.addButton(tr("Continue"), QMessageBox::AcceptRole);
         box.setIcon(QMessageBox::Critical);
         box.exec();
 
@@ -3875,8 +3396,7 @@ namespace Rv
 
     void RvPreferences::updateVideo()
     {
-        const IPCore::Application::VideoModules& vmods =
-            RvApp()->videoModules();
+        const IPCore::Application::VideoModules& vmods = RvApp()->videoModules();
 
         Options& opts = Options::sharedOptions();
         m_ui.videoModuleCombo->clear();
@@ -3888,8 +3408,7 @@ namespace Rv
 
             if (parts.size() == 2)
             {
-                m_currentVideoModule = RvApp()->findVideoModuleIndexByName(
-                    parts[0].toUtf8().constData());
+                m_currentVideoModule = RvApp()->findVideoModuleIndexByName(parts[0].toUtf8().constData());
                 ;
 
                 if (m_currentVideoDevice < 0 && m_currentVideoModule >= 0)
@@ -3919,14 +3438,12 @@ namespace Rv
         if (m_currentVideoDevice < 0)
             m_currentVideoDevice = 0;
 
-        RvDocument* doc = reinterpret_cast<RvDocument*>(
-            TwkApp::Document::documents().front()->opaquePointer());
+        RvDocument* doc = reinterpret_cast<RvDocument*>(TwkApp::Document::documents().front()->opaquePointer());
 
         for (size_t i = 0; i < vmods.size(); i++)
         {
             auto mod = vmods[i];
-            m_ui.videoModuleCombo->addItem(
-                QString::fromUtf8(mod->name().c_str()));
+            m_ui.videoModuleCombo->addItem(QString::fromUtf8(mod->name().c_str()));
 
             if (i == m_currentVideoModule)
             {
@@ -3955,8 +3472,7 @@ namespace Rv
                     if (n != hd)
                         str << " (" << n << ")";
 
-                    m_ui.videoDeviceCombo->addItem(
-                        QString::fromUtf8(str.str().c_str()));
+                    m_ui.videoDeviceCombo->addItem(QString::fromUtf8(str.str().c_str()));
 
                     ostringstream mname;
                     mname << mod->name() << "/" << d->name();
@@ -3964,14 +3480,11 @@ namespace Rv
                     if (j == m_currentVideoDevice)
                     {
                         m_lockPresentCheck = true;
-                        m_ui.presentationCheckBox->setCheckState(
-                            mname.str() == opts.presentDevice ? Qt::Checked
-                                                              : Qt::Unchecked);
+                        m_ui.presentationCheckBox->setCheckState(mname.str() == opts.presentDevice ? Qt::Checked : Qt::Unchecked);
                         m_lockPresentCheck = false;
 
                         m_ui.videoDeviceCombo->setCurrentIndex(j);
-                        string options =
-                            RvApp()->setVideoDeviceStateFromSettings(d);
+                        string options = RvApp()->setVideoDeviceStateFromSettings(d);
                         m_ui.additionalOptionsEdit->setText(options.c_str());
                         updateVideoFormat(d);
                         updateVideo4KTransport(d);
@@ -3980,8 +3493,7 @@ namespace Rv
                         updateVideoSyncSource(d);
                         updateVideoAudioFormat(d);
                         updateVideoProfiles(d);
-                        m_ui.videoSwapStereoEyesCheckBox->setCheckState(
-                            d->swapStereoEyes() ? Qt::Checked : Qt::Unchecked);
+                        m_ui.videoSwapStereoEyesCheckBox->setCheckState(d->swapStereoEyes() ? Qt::Checked : Qt::Unchecked);
                     }
                 }
 
@@ -4022,8 +3534,7 @@ namespace Rv
         QString devProfile = settings.value("DisplayProfile", "").toString();
         settings.endGroup();
 
-        string formatName =
-            device->humanReadableID(VideoDevice::VideoAndDataFormatID);
+        string formatName = device->humanReadableID(VideoDevice::VideoAndDataFormatID);
         settings.beginGroup(QString::fromUtf8(formatName.c_str()));
         QString formatProfile = settings.value("DisplayProfile", "").toString();
         settings.endGroup();
@@ -4079,12 +3590,9 @@ namespace Rv
         //  Set current values
         //
 
-        combos[0]->setCurrentIndex(modIndex == -1 ? combos[0]->count() - 1
-                                                  : modIndex);
-        combos[1]->setCurrentIndex(devIndex == -1 ? combos[1]->count() - 1
-                                                  : devIndex);
-        combos[2]->setCurrentIndex(formatIndex == -1 ? combos[2]->count() - 1
-                                                     : formatIndex);
+        combos[0]->setCurrentIndex(modIndex == -1 ? combos[0]->count() - 1 : modIndex);
+        combos[1]->setCurrentIndex(devIndex == -1 ? combos[1]->count() - 1 : devIndex);
+        combos[2]->setCurrentIndex(formatIndex == -1 ? combos[2]->count() - 1 : formatIndex);
     }
 
     void RvPreferences::updateVideoFormat(TwkApp::VideoDevice* d)
@@ -4102,8 +3610,7 @@ namespace Rv
 
             for (size_t i = 0; i < d->numVideoFormats(); i++)
             {
-                m_ui.videoFormatCombo->addItem(QString::fromUtf8(
-                    d->videoFormatAtIndex(i).description.c_str()));
+                m_ui.videoFormatCombo->addItem(QString::fromUtf8(d->videoFormatAtIndex(i).description.c_str()));
                 if (i == d->currentVideoFormat())
                     m_ui.videoFormatCombo->setCurrentIndex(i);
             }
@@ -4125,8 +3632,7 @@ namespace Rv
 
             for (size_t i = 0; i < d->numVideo4KTransports(); i++)
             {
-                m_ui.video4KTransportCombo->addItem(QString::fromUtf8(
-                    d->video4KTransportAtIndex(i).description.c_str()));
+                m_ui.video4KTransportCombo->addItem(QString::fromUtf8(d->video4KTransportAtIndex(i).description.c_str()));
                 if (i == d->currentVideo4KTransport())
                     m_ui.video4KTransportCombo->setCurrentIndex(i);
             }
@@ -4137,14 +3643,10 @@ namespace Rv
     {
         m_ui.videoAudioFormatCombo->clear();
         m_ui.videoAudioDeviceCheckBox->setEnabled(d->hasAudioOutput());
-        m_ui.videoAudioDeviceCheckBox->setCheckState(
-            d->audioOutputEnabled() ? Qt::Checked : Qt::Unchecked);
-        m_ui.useVideoLatencyCheckBox->setEnabled(!d->hasAudioOutput()
-                                                 || !d->audioOutputEnabled());
-        m_ui.configureVideoLatencyButton->setEnabled(
-            !d->hasAudioOutput() || !d->audioOutputEnabled());
-        m_ui.useVideoLatencyCheckBox->setCheckState(
-            d->useLatencyForAudio() ? Qt::Checked : Qt::Unchecked);
+        m_ui.videoAudioDeviceCheckBox->setCheckState(d->audioOutputEnabled() ? Qt::Checked : Qt::Unchecked);
+        m_ui.useVideoLatencyCheckBox->setEnabled(!d->hasAudioOutput() || !d->audioOutputEnabled());
+        m_ui.configureVideoLatencyButton->setEnabled(!d->hasAudioOutput() || !d->audioOutputEnabled());
+        m_ui.useVideoLatencyCheckBox->setCheckState(d->useLatencyForAudio() ? Qt::Checked : Qt::Unchecked);
 
         if (d->numAudioFormats() == 0)
         {
@@ -4157,8 +3659,7 @@ namespace Rv
 
             for (size_t i = 0; i < d->numAudioFormats(); i++)
             {
-                m_ui.videoAudioFormatCombo->addItem(QString::fromUtf8(
-                    d->audioFormatAtIndex(i).description.c_str()));
+                m_ui.videoAudioFormatCombo->addItem(QString::fromUtf8(d->audioFormatAtIndex(i).description.c_str()));
                 if (i == d->currentAudioFormat())
                     m_ui.videoAudioFormatCombo->setCurrentIndex(i);
             }
@@ -4180,8 +3681,7 @@ namespace Rv
 
             for (size_t i = 0; i < d->numDataFormats(); i++)
             {
-                m_ui.dataFormatCombo->addItem(QString::fromUtf8(
-                    d->dataFormatAtIndex(i).description.c_str()));
+                m_ui.dataFormatCombo->addItem(QString::fromUtf8(d->dataFormatAtIndex(i).description.c_str()));
                 if (i == d->currentDataFormat())
                     m_ui.dataFormatCombo->setCurrentIndex(i);
             }
@@ -4203,8 +3703,7 @@ namespace Rv
 
             for (size_t i = 0; i < d->numSyncModes(); i++)
             {
-                m_ui.syncMethodCombo->addItem(QString::fromUtf8(
-                    d->syncModeAtIndex(i).description.c_str()));
+                m_ui.syncMethodCombo->addItem(QString::fromUtf8(d->syncModeAtIndex(i).description.c_str()));
                 if (i == d->currentSyncMode())
                     m_ui.syncMethodCombo->setCurrentIndex(i);
             }
@@ -4226,8 +3725,7 @@ namespace Rv
 
             for (size_t i = 0; i < d->numSyncSources(); i++)
             {
-                m_ui.syncSourceCombo->addItem(QString::fromUtf8(
-                    d->syncSourceAtIndex(i).description.c_str()));
+                m_ui.syncSourceCombo->addItem(QString::fromUtf8(d->syncSourceAtIndex(i).description.c_str()));
                 if (i == d->currentSyncSource())
                     m_ui.syncSourceCombo->setCurrentIndex(i);
             }
@@ -4462,8 +3960,7 @@ namespace Rv
 
             if (state == Qt::Checked)
             {
-                settings.setValue("presentationDevice",
-                                  QString::fromUtf8(str.str().c_str()));
+                settings.setValue("presentationDevice", QString::fromUtf8(str.str().c_str()));
                 opts.presentDevice = strdup(str.str().c_str());
             }
             else
@@ -4480,8 +3977,7 @@ namespace Rv
         if (m_currentVideoDevice == -1 || m_currentVideoModule == -1)
             return 0;
 
-        const IPCore::Application::VideoModules& vmods =
-            RvApp()->videoModules();
+        const IPCore::Application::VideoModules& vmods = RvApp()->videoModules();
         const auto mod = vmods[m_currentVideoModule];
         const VideoModule::VideoDevices& devs = mod->devices();
         return devs[m_currentVideoDevice];
@@ -4503,12 +3999,10 @@ namespace Rv
 
     void RvPreferences::audioDeviceLatencyFinished()
     {
-        AudioRenderer::RendererParameters params =
-            AudioRenderer::defaultParameters();
+        AudioRenderer::RendererParameters params = AudioRenderer::defaultParameters();
         Options& opts = Options::sharedOptions();
 
-        opts.audioDeviceLatency =
-            m_ui.audioDeviceLatencyEdit->text().toDouble();
+        opts.audioDeviceLatency = m_ui.audioDeviceLatencyEdit->text().toDouble();
 
         // Convert from msecs to secs and reverse the sign.
         params.latency = -opts.audioDeviceLatency / 1000.0;
@@ -4529,19 +4023,12 @@ namespace Rv
             d->setFrameLatency(v);
 
         double tl = d->totalLatencyInSeconds();
-        m_videoLatencyUI.totalLatencyLabel->setText(
-            QString("%1 ms").arg(tl * 1000.0));
+        m_videoLatencyUI.totalLatencyLabel->setText(QString("%1 ms").arg(tl * 1000.0));
     }
 
-    void RvPreferences::frameLatencyChanged(const QString& s)
-    {
-        latencyChanged(s, false);
-    }
+    void RvPreferences::frameLatencyChanged(const QString& s) { latencyChanged(s, false); }
 
-    void RvPreferences::fixedLatencyChanged(const QString& s)
-    {
-        latencyChanged(s, true);
-    }
+    void RvPreferences::fixedLatencyChanged(const QString& s) { latencyChanged(s, true); }
 
     void RvPreferences::configVideoLatency()
     {
@@ -4550,13 +4037,9 @@ namespace Rv
             m_videoLatencyDialog = new QDialog(this, Qt::Sheet);
             m_videoLatencyUI.setupUi(m_videoLatencyDialog);
 
-            connect(m_videoLatencyUI.fixedLatencyEdit,
-                    SIGNAL(textEdited(const QString&)), this,
-                    SLOT(fixedLatencyChanged(const QString&)));
+            connect(m_videoLatencyUI.fixedLatencyEdit, SIGNAL(textEdited(const QString&)), this, SLOT(fixedLatencyChanged(const QString&)));
 
-            connect(m_videoLatencyUI.frameLatencyEdit,
-                    SIGNAL(textEdited(const QString&)), this,
-                    SLOT(frameLatencyChanged(const QString&)));
+            connect(m_videoLatencyUI.frameLatencyEdit, SIGNAL(textEdited(const QString&)), this, SLOT(frameLatencyChanged(const QString&)));
         }
 
         TwkApp::VideoDevice* d = currentVideoDevice();
@@ -4566,10 +4049,8 @@ namespace Rv
         double xl = d->fixedLatency();
         double fl = d->frameLatencyInFrames();
 
-        m_videoLatencyUI.computedLatencyLabel->setText(
-            QString("%1 ms").arg(dl * 1000.0));
-        m_videoLatencyUI.totalLatencyLabel->setText(
-            QString("%1 ms").arg(tl * 1000.0));
+        m_videoLatencyUI.computedLatencyLabel->setText(QString("%1 ms").arg(dl * 1000.0));
+        m_videoLatencyUI.totalLatencyLabel->setText(QString("%1 ms").arg(tl * 1000.0));
         m_videoLatencyUI.fixedLatencyEdit->setText(QString("%1").arg(xl));
         m_videoLatencyUI.frameLatencyEdit->setText(QString("%1").arg(fl));
 
@@ -4634,8 +4115,7 @@ namespace Rv
 
         if (index < n - 2)
         {
-            settings.setValue("DisplayProfile",
-                              QVariant(m_ui.moduleProfileCombo->currentText()));
+            settings.setValue("DisplayProfile", QVariant(m_ui.moduleProfileCombo->currentText()));
         }
         else if (index == n - 1)
         {
@@ -4659,8 +4139,7 @@ namespace Rv
 
         if (index < n - 2)
         {
-            settings.setValue("DisplayProfile",
-                              QVariant(m_ui.deviceProfileCombo->currentText()));
+            settings.setValue("DisplayProfile", QVariant(m_ui.deviceProfileCombo->currentText()));
         }
         else if (index == n - 1)
         {
@@ -4679,14 +4158,12 @@ namespace Rv
 
         RV_QSETTINGS;
 
-        string formatName =
-            d->humanReadableID(VideoDevice::VideoAndDataFormatID);
+        string formatName = d->humanReadableID(VideoDevice::VideoAndDataFormatID);
         settings.beginGroup(QString::fromUtf8(formatName.c_str()));
 
         if (index < n - 2)
         {
-            settings.setValue("DisplayProfile",
-                              QVariant(m_ui.formatProfileCombo->currentText()));
+            settings.setValue("DisplayProfile", QVariant(m_ui.formatProfileCombo->currentText()));
         }
         else if (index == n - 1)
         {

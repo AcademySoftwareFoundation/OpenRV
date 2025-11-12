@@ -37,24 +37,17 @@ namespace IPCore
 
     static inline Imath::V2f convert(Vec2f v) { return Imath::V2f(v.x, v.y); }
 
-    static inline Imath::V3f convert(Vec3f v)
-    {
-        return Imath::V3f(v.x, v.y, v.z);
-    }
+    static inline Imath::V3f convert(Vec3f v) { return Imath::V3f(v.x, v.y, v.z); }
 
     static inline Vec2f convert(Imath::V2f v) { return Vec2f(v.x, v.y); }
 
     static inline Vec3f convert(Imath::V3f v) { return Vec3f(v.x, v.y, v.z); }
 
-    static inline Mat44f convert(const Imath::M44f& m)
-    {
-        return reinterpret_cast<const Mat44f*>(&m)->transposed();
-    }
+    static inline Mat44f convert(const Imath::M44f& m) { return reinterpret_cast<const Mat44f*>(&m)->transposed(); }
 
 #define NO_FLOAT_3D_TEXTURES
 
-    ColorIPNode::ColorIPNode(const std::string& name, const NodeDefinition* def,
-                             IPGraph* graph, GroupIPNode* group)
+    ColorIPNode::ColorIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group)
         : LUTIPNode(name, def, graph, group)
     {
         setMaxInputs(1);
@@ -65,47 +58,33 @@ namespace IPCore
         info->setPersistent(false);
 
         m_colorInvert = declareProperty<IntProperty>("color.invert", 0);
-        m_colorGamma = declareProperty<Vec3fProperty>("color.gamma",
-                                                      Vec3f(1.0f, 1.0f, 1.0f));
+        m_colorGamma = declareProperty<Vec3fProperty>("color.gamma", Vec3f(1.0f, 1.0f, 1.0f));
         m_colorLUT = declareProperty<StringProperty>("color.lut", "default");
-        m_colorOffset =
-            declareProperty<Vec3fProperty>("color.offset", Vec3f(0.0f));
-        m_colorScale = declareProperty<Vec3fProperty>("color.scale",
-                                                      Vec3f(1.0f, 1.0f, 1.0f));
-        m_colorExposure =
-            declareProperty<Vec3fProperty>("color.exposure", Vec3f(0.0f));
-        m_colorContrast =
-            declareProperty<Vec3fProperty>("color.contrast", Vec3f(0.0f));
-        m_colorSaturation =
-            declareProperty<FloatProperty>("color.saturation", 1.0f);
+        m_colorOffset = declareProperty<Vec3fProperty>("color.offset", Vec3f(0.0f));
+        m_colorScale = declareProperty<Vec3fProperty>("color.scale", Vec3f(1.0f, 1.0f, 1.0f));
+        m_colorExposure = declareProperty<Vec3fProperty>("color.exposure", Vec3f(0.0f));
+        m_colorContrast = declareProperty<Vec3fProperty>("color.contrast", Vec3f(0.0f));
+        m_colorSaturation = declareProperty<FloatProperty>("color.saturation", 1.0f);
         m_colorNormalize = declareProperty<IntProperty>("color.normalize", 0);
         m_colorHue = declareProperty<FloatProperty>("color.hue", 0.0f);
         m_colorActive = declareProperty<IntProperty>("color.active", 1);
         m_colorUnpremult = declareProperty<IntProperty>("color.unpremult", 0);
         m_CDLactive = declareProperty<IntProperty>("CDL.active", 0);
-        m_CDLcolorspace =
-            declareProperty<StringProperty>("CDL.colorspace", "rec709");
-        m_CDLslope = declareProperty<Vec3fProperty>("CDL.slope",
-                                                    Vec3f(1.0f, 1.0f, 1.0f));
+        m_CDLcolorspace = declareProperty<StringProperty>("CDL.colorspace", "rec709");
+        m_CDLslope = declareProperty<Vec3fProperty>("CDL.slope", Vec3f(1.0f, 1.0f, 1.0f));
         m_CDLoffset = declareProperty<Vec3fProperty>("CDL.offset", Vec3f(0.0f));
-        m_CDLpower = declareProperty<Vec3fProperty>("CDL.power",
-                                                    Vec3f(1.0f, 1.0f, 1.0f));
-        m_CDLsaturation =
-            declareProperty<FloatProperty>("CDL.saturation", 1.0f);
+        m_CDLpower = declareProperty<Vec3fProperty>("CDL.power", Vec3f(1.0f, 1.0f, 1.0f));
+        m_CDLsaturation = declareProperty<FloatProperty>("CDL.saturation", 1.0f);
         m_CDLnoclamp = declareProperty<IntProperty>("CDL.noClamp", 0);
         m_lumlutLUT = declareProperty<FloatProperty>("luminanceLUT.lut");
         m_lumlutMax = declareProperty<FloatProperty>("luminanceLUT.max", 1.0f);
         m_lumlutSize = declareProperty<IntProperty>("luminanceLUT.size", 0);
         m_lumlutName = declareProperty<StringProperty>("luminanceLUT.name", "");
         m_lumlutActive = declareProperty<IntProperty>("luminanceLUT.active", 0);
-        m_lumlutOutputSize =
-            declareProperty<IntProperty>("luminanceLUT:output.size", 256);
-        m_lumlutOutputType = declareProperty<StringProperty>(
-            "luminanceLUT:output.type", "Luminance", info);
-        m_lumlutOutputLUT =
-            declareProperty<HalfProperty>("luminanceLUT:output.lut", info);
-        m_matrixOutputRGBA = declareProperty<Mat44fProperty>(
-            "matrix:output.RGBA", Mat44f(), info);
+        m_lumlutOutputSize = declareProperty<IntProperty>("luminanceLUT:output.size", 256);
+        m_lumlutOutputType = declareProperty<StringProperty>("luminanceLUT:output.type", "Luminance", info);
+        m_lumlutOutputLUT = declareProperty<HalfProperty>("luminanceLUT:output.lut", info);
+        m_matrixOutputRGBA = declareProperty<Mat44fProperty>("matrix:output.RGBA", Mat44f(), info);
     }
 
     ColorIPNode::~ColorIPNode() { delete m_lumLUTfb; }
@@ -135,8 +114,7 @@ namespace IPCore
         return lerp(v0, v1, d);
     }
 
-    void ColorIPNode::readCompleted(const std::string& type,
-                                    unsigned int version)
+    void ColorIPNode::readCompleted(const std::string& type, unsigned int version)
     {
         IPNode::readCompleted(type, version);
 
@@ -204,9 +182,7 @@ namespace IPCore
             h = h << 8 | h >> 24;
         }
 
-        m_lumLUTfb = new FrameBuffer(n, 1, 3, FrameBuffer::HALF,
-                                     (unsigned char*)&out->front(), 0,
-                                     FrameBuffer::NATURAL, false);
+        m_lumLUTfb = new FrameBuffer(n, 1, 3, FrameBuffer::HALF, (unsigned char*)&out->front(), 0, FrameBuffer::NATURAL, false);
 
         m_lumLUTfb->idstream() << h << ":" << size_t(m_lumLUTfb);
     }
@@ -225,8 +201,7 @@ namespace IPCore
             // children and apply the linearization logic to each of them. This
             // usually happens in the context of a tiled-source.
             size_t i = 0;
-            for (IPImage* child = head->children; child;
-                 child = child->next, i++)
+            for (IPImage* child = head->children; child; child = child->next, i++)
             {
                 evaluateOne(child, context);
             }
@@ -257,8 +232,7 @@ namespace IPCore
 
         const bool active = propertyValue<IntProperty>(m_colorActive, 1) != 0;
         const bool CDLactive = propertyValue<IntProperty>(m_CDLactive, 1) != 0;
-        const bool unpremultProp =
-            propertyValue<IntProperty>(m_colorUnpremult, 0) != 0;
+        const bool unpremultProp = propertyValue<IntProperty>(m_colorUnpremult, 0) != 0;
 
         Mat44f C;
         typedef TwkFB::TypedFBAttribute<Vec2f> V2fAttr;
@@ -267,8 +241,7 @@ namespace IPCore
         {
             if (n->front() == 1 && img->fb)
             {
-                if (TwkFB::FBAttribute* a =
-                        img->fb->findAttribute("ColorBounds"))
+                if (TwkFB::FBAttribute* a = img->fb->findAttribute("ColorBounds"))
                 {
                     if (V2fAttr* va = dynamic_cast<V2fAttr*>(a))
                     {
@@ -370,8 +343,7 @@ namespace IPCore
             const Vec3f s = (Vec3f(1.0) + c);
             const Vec3f d = -c * 0.5;
 
-            Mat44f M(s.x, 0, 0, d.x, 0, s.y, 0, d.y, 0, 0, s.z, d.z, 0, 0, 0,
-                     1);
+            Mat44f M(s.x, 0, 0, d.x, 0, s.y, 0, d.y, 0, 0, s.z, d.z, 0, 0, 0, 1);
 
             C = M * C;
         }
@@ -389,8 +361,7 @@ namespace IPCore
             {
                 Mat44f R, Rz;
 
-                const Vec3f d =
-                    normalize(cross(Vec3f(1, 1, 1), Vec3f(0, 0, 1)));
+                const Vec3f d = normalize(cross(Vec3f(1, 1, 1), Vec3f(0, 0, 1)));
                 const float a = angleBetween(Vec3f(1, 1, 1), Vec3f(0, 0, 1));
 
                 R.makeRotation(d, a);
@@ -467,13 +438,9 @@ namespace IPCore
         }
 
         bool useCDL =
-            CDLactive
-            && (CDL_offset != Vec3f(0.0f) || CDL_slope != Vec3f(1.0f)
-                || CDL_power != Vec3f(1.0f) || CDL_saturation != 1.0f);
+            CDLactive && (CDL_offset != Vec3f(0.0f) || CDL_slope != Vec3f(1.0f) || CDL_power != Vec3f(1.0f) || CDL_saturation != 1.0f);
 
-        bool unpremult =
-            unpremultProp
-            && ((C != Mat44f() && active) || useCDL || (hasGamma && active));
+        bool unpremult = unpremultProp && ((C != Mat44f() && active) || useCDL || (hasGamma && active));
         bool willPremult = unpremult;
 
         if (unpremult)
@@ -492,15 +459,13 @@ namespace IPCore
             if (ip->front() && m_lumLUTfb)
             {
                 FrameBuffer* lumaLUT = m_lumLUTfb->referenceCopy();
-                img->shaderExpr =
-                    Shader::newColorLuminanceLUT(img->shaderExpr, lumaLUT);
+                img->shaderExpr = Shader::newColorLuminanceLUT(img->shaderExpr, lumaLUT);
             }
         }
 
         if (gammaValue != Vec3f(1.0f) && active)
         {
-            img->shaderExpr =
-                Shader::newColorGamma(img->shaderExpr, gammaValue);
+            img->shaderExpr = Shader::newColorGamma(img->shaderExpr, gammaValue);
         }
 
         if (C != Mat44f() && active)
@@ -508,30 +473,24 @@ namespace IPCore
             img->shaderExpr = Shader::newColorMatrix(img->shaderExpr, C);
         }
 
-        if (CDLactive
-            && (CDL_offset != Vec3f(0.0f) || CDL_slope != Vec3f(1.0f)
-                || CDL_power != Vec3f(1.0f) || CDL_saturation != 1.0f))
+        if (CDLactive && (CDL_offset != Vec3f(0.0f) || CDL_slope != Vec3f(1.0f) || CDL_power != Vec3f(1.0f) || CDL_saturation != 1.0f))
         {
             bool noClamp = false;
             if (IntProperty* ip = m_CDLnoclamp)
                 noClamp = ip->front();
 
-            const string CDL_colorspace =
-                m_CDLcolorspace ? m_CDLcolorspace->front() : "rec709";
+            const string CDL_colorspace = m_CDLcolorspace ? m_CDLcolorspace->front() : "rec709";
 
             const bool isACESLog = (CDL_colorspace == "aceslog");
 
             if (isACESLog || (CDL_colorspace == "aces"))
             {
-                img->shaderExpr = Shader::newColorCDLForACES(
-                    img->shaderExpr, CDL_slope, CDL_offset, CDL_power,
-                    CDL_saturation, noClamp, isACESLog);
+                img->shaderExpr =
+                    Shader::newColorCDLForACES(img->shaderExpr, CDL_slope, CDL_offset, CDL_power, CDL_saturation, noClamp, isACESLog);
             }
             else
             {
-                img->shaderExpr =
-                    Shader::newColorCDL(img->shaderExpr, CDL_slope, CDL_offset,
-                                        CDL_power, CDL_saturation, noClamp);
+                img->shaderExpr = Shader::newColorCDL(img->shaderExpr, CDL_slope, CDL_offset, CDL_power, CDL_saturation, noClamp);
             }
         }
 

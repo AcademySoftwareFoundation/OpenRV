@@ -49,15 +49,9 @@ namespace TwkGLF
         unsigned int uniformLocation(const std::string& name) const;
         unsigned int attribLocation(const std::string& name) const;
 
-        const UniformLocationMap& uniformLocationMap() const
-        {
-            return m_uniformLocationMap;
-        }
+        const UniformLocationMap& uniformLocationMap() const { return m_uniformLocationMap; }
 
-        const AttribLocationMap& attribLocationMap() const
-        {
-            return m_attribLocationMap;
-        }
+        const AttribLocationMap& attribLocationMap() const { return m_attribLocationMap; }
 
         const size_t programId() const { return m_programId; }
 

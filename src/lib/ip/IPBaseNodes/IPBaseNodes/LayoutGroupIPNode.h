@@ -27,32 +27,24 @@ namespace IPCore
     class LayoutGroupIPNode : public GroupIPNode
     {
     public:
-        LayoutGroupIPNode(const std::string& name, const NodeDefinition* def,
-                          IPGraph* graph, GroupIPNode* group = 0);
+        LayoutGroupIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group = 0);
 
         virtual ~LayoutGroupIPNode();
 
         virtual void setInputs(const IPNodes&) override;
         virtual IPNode* newSubGraphForInput(size_t, const IPNodes&) override;
-        virtual IPNode* modifySubGraphForInput(size_t, const IPNodes&,
-                                               IPNode*) override;
+        virtual IPNode* modifySubGraphForInput(size_t, const IPNodes&, IPNode*) override;
         virtual void propertyChanged(const Property*) override;
-        virtual void
-        inputImageStructureChanged(int inputIndex,
-                                   PropagateTarget target) override;
+        virtual void inputImageStructureChanged(int inputIndex, PropagateTarget target) override;
 
         StackIPNode* stackNode() const { return m_stackNode; }
 
-        static void setDefaultMode(const std::string& mode)
-        {
-            m_defaultMode = mode;
-        }
+        static void setDefaultMode(const std::string& mode) { m_defaultMode = mode; }
 
         void readCompleted(const std::string&, unsigned int) override;
         IPImage* evaluate(const Context& context) override;
 
-        void inputMediaChanged(IPNode* srcNode, int srcOutIndex,
-                               PropagateTarget target) override;
+        void inputMediaChanged(IPNode* srcNode, int srcOutIndex, PropagateTarget target) override;
 
         static void setDefaultAutoRetime(bool b) { m_defaultAutoRetime = b; }
 

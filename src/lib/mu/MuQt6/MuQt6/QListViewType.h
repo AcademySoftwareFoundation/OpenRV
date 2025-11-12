@@ -42,8 +42,7 @@ namespace Mu
         //  Constructors
         //
 
-        QListViewType(Context* context, const char* name, Class* superClass = 0,
-                      Class* superClass2 = 0);
+        QListViewType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QListViewType();
 
@@ -68,14 +67,12 @@ namespace Mu
         virtual ~MuQt_QListView();
         MuQt_QListView(Pointer muobj, const CallEnvironment*, QWidget* parent);
         virtual QModelIndex indexAt(const QPoint& p) const;
-        virtual void scrollTo(const QModelIndex& index,
-                              QAbstractItemView::ScrollHint hint);
+        virtual void scrollTo(const QModelIndex& index, QAbstractItemView::ScrollHint hint);
         virtual void setRootIndex(const QModelIndex& index);
         virtual QRect visualRect(const QModelIndex& index) const;
 
     protected:
-        virtual void currentChanged(const QModelIndex& current,
-                                    const QModelIndex& previous);
+        virtual void currentChanged(const QModelIndex& current, const QModelIndex& previous);
         virtual void dragLeaveEvent(QDragLeaveEvent* e);
         virtual void dragMoveEvent(QDragMoveEvent* e);
         virtual void dropEvent(QDropEvent* event);
@@ -86,23 +83,18 @@ namespace Mu
         virtual void mouseReleaseEvent(QMouseEvent* e);
         virtual void paintEvent(QPaintEvent* e);
         virtual void resizeEvent(QResizeEvent* e);
-        virtual void rowsAboutToBeRemoved(const QModelIndex& parent, int start,
-                                          int end);
-        virtual void rowsInserted(const QModelIndex& parent, int start,
-                                  int end);
+        virtual void rowsAboutToBeRemoved(const QModelIndex& parent, int start, int end);
+        virtual void rowsInserted(const QModelIndex& parent, int start, int end);
         virtual void scrollContentsBy(int dx, int dy);
         virtual QModelIndexList selectedIndexes() const;
-        virtual void selectionChanged(const QItemSelection& selected,
-                                      const QItemSelection& deselected);
-        virtual void setSelection(const QRect& rect,
-                                  QItemSelectionModel::SelectionFlags command);
+        virtual void selectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
+        virtual void setSelection(const QRect& rect, QItemSelectionModel::SelectionFlags command);
         virtual void startDrag(Qt::DropActions supportedActions);
         virtual void timerEvent(QTimerEvent* e);
         virtual void updateGeometries();
         virtual int verticalOffset() const;
         virtual QSize viewportSizeHint() const;
-        virtual QRegion
-        visualRegionForSelection(const QItemSelection& selection) const;
+        virtual QRegion visualRegionForSelection(const QItemSelection& selection) const;
         virtual void wheelEvent(QWheelEvent* e);
 
     public:
@@ -114,11 +106,8 @@ namespace Mu
         virtual QVariant inputMethodQuery(Qt::InputMethodQuery query) const;
 
     protected:
-        virtual bool edit(const QModelIndex& index,
-                          QAbstractItemView::EditTrigger trigger,
-                          QEvent* event);
-        virtual QItemSelectionModel::SelectionFlags
-        selectionCommand(const QModelIndex& index, const QEvent* event) const;
+        virtual bool edit(const QModelIndex& index, QAbstractItemView::EditTrigger trigger, QEvent* event);
+        virtual QItemSelectionModel::SelectionFlags selectionCommand(const QModelIndex& index, const QEvent* event) const;
         virtual void dragEnterEvent(QDragEnterEvent* event);
         virtual bool eventFilter(QObject* object, QEvent* event);
         virtual void focusInEvent(QFocusEvent* event);
@@ -130,60 +119,35 @@ namespace Mu
         virtual bool viewportEvent(QEvent* event);
 
     public:
-        QRect rectForIndex_pub(const QModelIndex& index) const
-        {
-            return rectForIndex(index);
-        }
+        QRect rectForIndex_pub(const QModelIndex& index) const { return rectForIndex(index); }
 
-        QRect rectForIndex_pub_parent(const QModelIndex& index) const
-        {
-            return QListView::rectForIndex(index);
-        }
+        QRect rectForIndex_pub_parent(const QModelIndex& index) const { return QListView::rectForIndex(index); }
 
-        void setPositionForIndex_pub(const QPoint& position,
-                                     const QModelIndex& index)
-        {
-            setPositionForIndex(position, index);
-        }
+        void setPositionForIndex_pub(const QPoint& position, const QModelIndex& index) { setPositionForIndex(position, index); }
 
-        void setPositionForIndex_pub_parent(const QPoint& position,
-                                            const QModelIndex& index)
+        void setPositionForIndex_pub_parent(const QPoint& position, const QModelIndex& index)
         {
             QListView::setPositionForIndex(position, index);
         }
 
-        void currentChanged_pub(const QModelIndex& current,
-                                const QModelIndex& previous)
-        {
-            currentChanged(current, previous);
-        }
+        void currentChanged_pub(const QModelIndex& current, const QModelIndex& previous) { currentChanged(current, previous); }
 
-        void currentChanged_pub_parent(const QModelIndex& current,
-                                       const QModelIndex& previous)
+        void currentChanged_pub_parent(const QModelIndex& current, const QModelIndex& previous)
         {
             QListView::currentChanged(current, previous);
         }
 
         void dragLeaveEvent_pub(QDragLeaveEvent* e) { dragLeaveEvent(e); }
 
-        void dragLeaveEvent_pub_parent(QDragLeaveEvent* e)
-        {
-            QListView::dragLeaveEvent(e);
-        }
+        void dragLeaveEvent_pub_parent(QDragLeaveEvent* e) { QListView::dragLeaveEvent(e); }
 
         void dragMoveEvent_pub(QDragMoveEvent* e) { dragMoveEvent(e); }
 
-        void dragMoveEvent_pub_parent(QDragMoveEvent* e)
-        {
-            QListView::dragMoveEvent(e);
-        }
+        void dragMoveEvent_pub_parent(QDragMoveEvent* e) { QListView::dragMoveEvent(e); }
 
         void dropEvent_pub(QDropEvent* event) { dropEvent(event); }
 
-        void dropEvent_pub_parent(QDropEvent* event)
-        {
-            QListView::dropEvent(event);
-        }
+        void dropEvent_pub_parent(QDropEvent* event) { QListView::dropEvent(event); }
 
         bool event_pub(QEvent* e) { return event(e); }
 
@@ -191,34 +155,19 @@ namespace Mu
 
         int horizontalOffset_pub() const { return horizontalOffset(); }
 
-        int horizontalOffset_pub_parent() const
-        {
-            return QListView::horizontalOffset();
-        }
+        int horizontalOffset_pub_parent() const { return QListView::horizontalOffset(); }
 
-        bool isIndexHidden_pub(const QModelIndex& index) const
-        {
-            return isIndexHidden(index);
-        }
+        bool isIndexHidden_pub(const QModelIndex& index) const { return isIndexHidden(index); }
 
-        bool isIndexHidden_pub_parent(const QModelIndex& index) const
-        {
-            return QListView::isIndexHidden(index);
-        }
+        bool isIndexHidden_pub_parent(const QModelIndex& index) const { return QListView::isIndexHidden(index); }
 
         void mouseMoveEvent_pub(QMouseEvent* e) { mouseMoveEvent(e); }
 
-        void mouseMoveEvent_pub_parent(QMouseEvent* e)
-        {
-            QListView::mouseMoveEvent(e);
-        }
+        void mouseMoveEvent_pub_parent(QMouseEvent* e) { QListView::mouseMoveEvent(e); }
 
         void mouseReleaseEvent_pub(QMouseEvent* e) { mouseReleaseEvent(e); }
 
-        void mouseReleaseEvent_pub_parent(QMouseEvent* e)
-        {
-            QListView::mouseReleaseEvent(e);
-        }
+        void mouseReleaseEvent_pub_parent(QMouseEvent* e) { QListView::mouseReleaseEvent(e); }
 
         void paintEvent_pub(QPaintEvent* e) { paintEvent(e); }
 
@@ -226,85 +175,47 @@ namespace Mu
 
         void resizeEvent_pub(QResizeEvent* e) { resizeEvent(e); }
 
-        void resizeEvent_pub_parent(QResizeEvent* e)
-        {
-            QListView::resizeEvent(e);
-        }
+        void resizeEvent_pub_parent(QResizeEvent* e) { QListView::resizeEvent(e); }
 
-        void rowsAboutToBeRemoved_pub(const QModelIndex& parent, int start,
-                                      int end)
-        {
-            rowsAboutToBeRemoved(parent, start, end);
-        }
+        void rowsAboutToBeRemoved_pub(const QModelIndex& parent, int start, int end) { rowsAboutToBeRemoved(parent, start, end); }
 
-        void rowsAboutToBeRemoved_pub_parent(const QModelIndex& parent,
-                                             int start, int end)
+        void rowsAboutToBeRemoved_pub_parent(const QModelIndex& parent, int start, int end)
         {
             QListView::rowsAboutToBeRemoved(parent, start, end);
         }
 
-        void rowsInserted_pub(const QModelIndex& parent, int start, int end)
-        {
-            rowsInserted(parent, start, end);
-        }
+        void rowsInserted_pub(const QModelIndex& parent, int start, int end) { rowsInserted(parent, start, end); }
 
-        void rowsInserted_pub_parent(const QModelIndex& parent, int start,
-                                     int end)
-        {
-            QListView::rowsInserted(parent, start, end);
-        }
+        void rowsInserted_pub_parent(const QModelIndex& parent, int start, int end) { QListView::rowsInserted(parent, start, end); }
 
         void scrollContentsBy_pub(int dx, int dy) { scrollContentsBy(dx, dy); }
 
-        void scrollContentsBy_pub_parent(int dx, int dy)
-        {
-            QListView::scrollContentsBy(dx, dy);
-        }
+        void scrollContentsBy_pub_parent(int dx, int dy) { QListView::scrollContentsBy(dx, dy); }
 
-        QModelIndexList selectedIndexes_pub() const
-        {
-            return selectedIndexes();
-        }
+        QModelIndexList selectedIndexes_pub() const { return selectedIndexes(); }
 
-        QModelIndexList selectedIndexes_pub_parent() const
-        {
-            return QListView::selectedIndexes();
-        }
+        QModelIndexList selectedIndexes_pub_parent() const { return QListView::selectedIndexes(); }
 
-        void selectionChanged_pub(const QItemSelection& selected,
-                                  const QItemSelection& deselected)
+        void selectionChanged_pub(const QItemSelection& selected, const QItemSelection& deselected)
         {
             selectionChanged(selected, deselected);
         }
 
-        void selectionChanged_pub_parent(const QItemSelection& selected,
-                                         const QItemSelection& deselected)
+        void selectionChanged_pub_parent(const QItemSelection& selected, const QItemSelection& deselected)
         {
             QListView::selectionChanged(selected, deselected);
         }
 
-        void setSelection_pub(const QRect& rect,
-                              QItemSelectionModel::SelectionFlags command)
-        {
-            setSelection(rect, command);
-        }
+        void setSelection_pub(const QRect& rect, QItemSelectionModel::SelectionFlags command) { setSelection(rect, command); }
 
-        void
-        setSelection_pub_parent(const QRect& rect,
-                                QItemSelectionModel::SelectionFlags command)
+        void setSelection_pub_parent(const QRect& rect, QItemSelectionModel::SelectionFlags command)
         {
             QListView::setSelection(rect, command);
         }
 
-        void startDrag_pub(Qt::DropActions supportedActions)
-        {
-            startDrag(supportedActions);
-        }
+        void startDrag_pub(Qt::DropActions supportedActions) { startDrag(supportedActions); }
 
-        void startDrag_pub_parent(Qt::DropActions supportedActions)
-        {
-            QListView::startDrag(supportedActions);
-        }
+        void startDrag_pub_parent(Qt::DropActions supportedActions) { QListView::startDrag(supportedActions); }
 
         void timerEvent_pub(QTimerEvent* e) { timerEvent(e); }
 
@@ -316,26 +227,15 @@ namespace Mu
 
         int verticalOffset_pub() const { return verticalOffset(); }
 
-        int verticalOffset_pub_parent() const
-        {
-            return QListView::verticalOffset();
-        }
+        int verticalOffset_pub_parent() const { return QListView::verticalOffset(); }
 
         QSize viewportSizeHint_pub() const { return viewportSizeHint(); }
 
-        QSize viewportSizeHint_pub_parent() const
-        {
-            return QListView::viewportSizeHint();
-        }
+        QSize viewportSizeHint_pub_parent() const { return QListView::viewportSizeHint(); }
 
-        QRegion
-        visualRegionForSelection_pub(const QItemSelection& selection) const
-        {
-            return visualRegionForSelection(selection);
-        }
+        QRegion visualRegionForSelection_pub(const QItemSelection& selection) const { return visualRegionForSelection(selection); }
 
-        QRegion visualRegionForSelection_pub_parent(
-            const QItemSelection& selection) const
+        QRegion visualRegionForSelection_pub_parent(const QItemSelection& selection) const
         {
             return QListView::visualRegionForSelection(selection);
         }
@@ -344,107 +244,61 @@ namespace Mu
 
         void wheelEvent_pub_parent(QWheelEvent* e) { QListView::wheelEvent(e); }
 
-        bool edit_pub(const QModelIndex& index,
-                      QAbstractItemView::EditTrigger trigger, QEvent* event)
+        bool edit_pub(const QModelIndex& index, QAbstractItemView::EditTrigger trigger, QEvent* event)
         {
             return edit(index, trigger, event);
         }
 
-        bool edit_pub_parent(const QModelIndex& index,
-                             QAbstractItemView::EditTrigger trigger,
-                             QEvent* event)
+        bool edit_pub_parent(const QModelIndex& index, QAbstractItemView::EditTrigger trigger, QEvent* event)
         {
             return QListView::edit(index, trigger, event);
         }
 
-        QItemSelectionModel::SelectionFlags
-        selectionCommand_pub(const QModelIndex& index,
-                             const QEvent* event) const
+        QItemSelectionModel::SelectionFlags selectionCommand_pub(const QModelIndex& index, const QEvent* event) const
         {
             return selectionCommand(index, event);
         }
 
-        QItemSelectionModel::SelectionFlags
-        selectionCommand_pub_parent(const QModelIndex& index,
-                                    const QEvent* event) const
+        QItemSelectionModel::SelectionFlags selectionCommand_pub_parent(const QModelIndex& index, const QEvent* event) const
         {
             return QListView::selectionCommand(index, event);
         }
 
-        void dragEnterEvent_pub(QDragEnterEvent* event)
-        {
-            dragEnterEvent(event);
-        }
+        void dragEnterEvent_pub(QDragEnterEvent* event) { dragEnterEvent(event); }
 
-        void dragEnterEvent_pub_parent(QDragEnterEvent* event)
-        {
-            QListView::dragEnterEvent(event);
-        }
+        void dragEnterEvent_pub_parent(QDragEnterEvent* event) { QListView::dragEnterEvent(event); }
 
-        bool eventFilter_pub(QObject* object, QEvent* event)
-        {
-            return eventFilter(object, event);
-        }
+        bool eventFilter_pub(QObject* object, QEvent* event) { return eventFilter(object, event); }
 
-        bool eventFilter_pub_parent(QObject* object, QEvent* event)
-        {
-            return QListView::eventFilter(object, event);
-        }
+        bool eventFilter_pub_parent(QObject* object, QEvent* event) { return QListView::eventFilter(object, event); }
 
         void focusInEvent_pub(QFocusEvent* event) { focusInEvent(event); }
 
-        void focusInEvent_pub_parent(QFocusEvent* event)
-        {
-            QListView::focusInEvent(event);
-        }
+        void focusInEvent_pub_parent(QFocusEvent* event) { QListView::focusInEvent(event); }
 
-        bool focusNextPrevChild_pub(bool next)
-        {
-            return focusNextPrevChild(next);
-        }
+        bool focusNextPrevChild_pub(bool next) { return focusNextPrevChild(next); }
 
-        bool focusNextPrevChild_pub_parent(bool next)
-        {
-            return QListView::focusNextPrevChild(next);
-        }
+        bool focusNextPrevChild_pub_parent(bool next) { return QListView::focusNextPrevChild(next); }
 
         void focusOutEvent_pub(QFocusEvent* event) { focusOutEvent(event); }
 
-        void focusOutEvent_pub_parent(QFocusEvent* event)
-        {
-            QListView::focusOutEvent(event);
-        }
+        void focusOutEvent_pub_parent(QFocusEvent* event) { QListView::focusOutEvent(event); }
 
         void keyPressEvent_pub(QKeyEvent* event) { keyPressEvent(event); }
 
-        void keyPressEvent_pub_parent(QKeyEvent* event)
-        {
-            QListView::keyPressEvent(event);
-        }
+        void keyPressEvent_pub_parent(QKeyEvent* event) { QListView::keyPressEvent(event); }
 
-        void mouseDoubleClickEvent_pub(QMouseEvent* event)
-        {
-            mouseDoubleClickEvent(event);
-        }
+        void mouseDoubleClickEvent_pub(QMouseEvent* event) { mouseDoubleClickEvent(event); }
 
-        void mouseDoubleClickEvent_pub_parent(QMouseEvent* event)
-        {
-            QListView::mouseDoubleClickEvent(event);
-        }
+        void mouseDoubleClickEvent_pub_parent(QMouseEvent* event) { QListView::mouseDoubleClickEvent(event); }
 
         void mousePressEvent_pub(QMouseEvent* event) { mousePressEvent(event); }
 
-        void mousePressEvent_pub_parent(QMouseEvent* event)
-        {
-            QListView::mousePressEvent(event);
-        }
+        void mousePressEvent_pub_parent(QMouseEvent* event) { QListView::mousePressEvent(event); }
 
         bool viewportEvent_pub(QEvent* event) { return viewportEvent(event); }
 
-        bool viewportEvent_pub_parent(QEvent* event)
-        {
-            return QListView::viewportEvent(event);
-        }
+        bool viewportEvent_pub_parent(QEvent* event) { return QListView::viewportEvent(event); }
 
     public:
         const QListViewType* _baseType;
@@ -452,11 +306,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance*
-    QListViewType::cachedInstance(const QListViewType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QListViewType::cachedInstance(const QListViewType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

@@ -42,8 +42,7 @@ namespace Mu
         //  Constructors
         //
 
-        QWebEngineHistoryType(Context* context, const char* name,
-                              Class* superClass = 0, Class* superClass2 = 0);
+        QWebEngineHistoryType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QWebEngineHistoryType();
 
@@ -76,17 +75,11 @@ namespace Mu
     public:
         void customEvent_pub(QEvent* event) { customEvent(event); }
 
-        void customEvent_pub_parent(QEvent* event)
-        {
-            QWebEngineHistory::customEvent(event);
-        }
+        void customEvent_pub_parent(QEvent* event) { QWebEngineHistory::customEvent(event); }
 
         void timerEvent_pub(QTimerEvent* event) { timerEvent(event); }
 
-        void timerEvent_pub_parent(QTimerEvent* event)
-        {
-            QWebEngineHistory::timerEvent(event);
-        }
+        void timerEvent_pub_parent(QTimerEvent* event) { QWebEngineHistory::timerEvent(event); }
 
     public:
         const QWebEngineHistoryType* _baseType;
@@ -94,11 +87,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance* QWebEngineHistoryType::cachedInstance(
-        const QWebEngineHistoryType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QWebEngineHistoryType::cachedInstance(const QWebEngineHistoryType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

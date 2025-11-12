@@ -39,8 +39,7 @@ namespace LUT
         float val;
     };
 
-    void readInfernoLUT(const string& filename, const string& type,
-                        LUTData& lut)
+    void readInfernoLUT(const string& filename, const string& type, LUTData& lut)
     {
         ifstream file(UNICODE_C_STR(filename.c_str()), ios::binary);
         lut.data.resize(0);
@@ -107,14 +106,12 @@ namespace LUT
         }
 
         // read data
-        if (!Read3DLUTData(file, lut.dimensions[0], lut.dimensions[1],
-                           lut.dimensions[2], 1, true, 0, lut.data))
+        if (!Read3DLUTData(file, lut.dimensions[0], lut.dimensions[1], lut.dimensions[2], 1, true, 0, lut.data))
         {
             TWK_THROW_EXC_STREAM("data parsing error " << filename);
         }
 
-        LUTData::Data::iterator i =
-            max_element(lut.data.begin(), lut.data.end());
+        LUTData::Data::iterator i = max_element(lut.data.begin(), lut.data.end());
         float m = *i;
 
         float p = pow(double(2), int(log2(m)));

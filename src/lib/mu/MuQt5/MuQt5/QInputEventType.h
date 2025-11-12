@@ -34,8 +34,7 @@ namespace Mu
         //  Constructors
         //
 
-        QInputEventType(Context* context, const char* name,
-                        Class* superClass = 0);
+        QInputEventType(Context* context, const char* name, Class* superClass = 0);
         virtual ~QInputEventType();
 
         //

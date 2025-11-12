@@ -46,17 +46,12 @@ namespace Mu
         Function::ArgKeyword End = Function::End;
 
         Function::Attributes None = Function::None;
-        Function::Attributes CommOp = Function::Mapped | Function::Commutative
-                                      | Function::Operator
-                                      | Function::NoSideEffects;
-        Function::Attributes Op =
-            Function::Mapped | Function::Operator | Function::NoSideEffects;
-        Function::Attributes Mapped =
-            Function::Mapped | Function::NoSideEffects;
+        Function::Attributes CommOp = Function::Mapped | Function::Commutative | Function::Operator | Function::NoSideEffects;
+        Function::Attributes Op = Function::Mapped | Function::Operator | Function::NoSideEffects;
+        Function::Attributes Mapped = Function::Mapped | Function::NoSideEffects;
         Function::Attributes Cast = Mapped | Function::Cast;
         Function::Attributes Lossy = Cast | Function::Lossy;
-        Function::Attributes AsOp =
-            Function::MemberOperator | Function::Operator;
+        Function::Attributes AsOp = Function::MemberOperator | Function::Operator;
         Function::ArgKeyword Parameters = Function::Parameters;
 
         Symbol* s = scope();
@@ -74,34 +69,27 @@ namespace Mu
 
         s->addSymbols(new ReferenceType(c, "b_class&", this),
 
-                      new Function(c, "b_class", BClassType::construct, None,
-                                   Return, tn, Args, "string", End),
+                      new Function(c, "b_class", BClassType::construct, None, Return, tn, Args, "string", End),
 
-                      new Function(c, "b_class", BaseFunctions::dereference,
-                                   Cast, Return, tn, Args, rn, End),
+                      new Function(c, "b_class", BaseFunctions::dereference, Cast, Return, tn, Args, rn, End),
 
                       EndArguments);
 
         globalScope()->addSymbols(
 
-            new Function(c, "print", BClassType::print, None, Return, "void",
-                         Args, tn, End),
+            new Function(c, "print", BClassType::print, None, Return, "void", Args, tn, End),
 
-            new Function(c, "=", BaseFunctions::assign, AsOp, Return, rn, Args,
-                         rn, tn, End),
+            new Function(c, "=", BaseFunctions::assign, AsOp, Return, rn, Args, rn, tn, End),
 
             EndArguments);
 
         typedef ParameterVariable Param;
 
-        addSymbols(new MemberVariable(c, "value", "float"),
-                   new MemberVariable(c, "ch", "char"),
+        addSymbols(new MemberVariable(c, "value", "float"), new MemberVariable(c, "ch", "char"),
 
-                   new MemberFunction(c, "foo", BClassType::foo, None, Return,
-                                      "string", Args, tn, End),
+                   new MemberFunction(c, "foo", BClassType::foo, None, Return, "string", Args, tn, End),
 
-                   new MemberFunction(c, "bar", BClassType::bar, None, Return,
-                                      "string", Args, tn, End),
+                   new MemberFunction(c, "bar", BClassType::bar, None, Return, "string", Args, tn, End),
 
                    EndArguments);
     }

@@ -29,9 +29,7 @@ namespace Rv
         LocalNetworkAccessManager(QObject* parent)
             : QNetworkAccessManager(parent) {};
 
-        virtual QNetworkReply*
-        createRequest(QNetworkAccessManager::Operation operation,
-                      const QNetworkRequest& request, QIODevice* device);
+        virtual QNetworkReply* createRequest(QNetworkAccessManager::Operation operation, const QNetworkRequest& request, QIODevice* device);
     };
 
     class RvWebManager : public QObject
@@ -65,27 +63,17 @@ namespace Rv
         RvWebManager(QObject* parent = 0);
         virtual ~RvWebManager();
 
-        void httpGet(const QString& url, const HeaderList& headers,
-                     IPCore::Session* session, const QString& replyEvent,
-                     const QString& authenticationEvent,
-                     const QString& progressEvent, bool ignoreSslErrors = false,
+        void httpGet(const QString& url, const HeaderList& headers, IPCore::Session* session, const QString& replyEvent,
+                     const QString& authenticationEvent, const QString& progressEvent, bool ignoreSslErrors = false,
                      bool urlIsEncoded = false);
 
-        void httpPost(const QString& url, const HeaderList& headers,
-                      const QByteArray& postData, IPCore::Session* session,
-                      const QString& replyEvent,
-                      const QString& authenticationEvent,
-                      const QString& progressEvent,
-                      bool ignoreSslErrors = false, bool urlIsEncoded = false,
-                      void (*callback)() = 0, QString tag = "");
+        void httpPost(const QString& url, const HeaderList& headers, const QByteArray& postData, IPCore::Session* session,
+                      const QString& replyEvent, const QString& authenticationEvent, const QString& progressEvent,
+                      bool ignoreSslErrors = false, bool urlIsEncoded = false, void (*callback)() = 0, QString tag = "");
 
-        void httpPut(const QString& url, const HeaderList& headers,
-                     const QByteArray& putData, IPCore::Session* session,
-                     const QString& replyEvent,
-                     const QString& authenticationEvent,
-                     const QString& progressEvent, bool ignoreSslErrors = false,
-                     bool urlIsEncoded = false, void (*callback)() = 0,
-                     QString tag = "");
+        void httpPut(const QString& url, const HeaderList& headers, const QByteArray& putData, IPCore::Session* session,
+                     const QString& replyEvent, const QString& authenticationEvent, const QString& progressEvent,
+                     bool ignoreSslErrors = false, bool urlIsEncoded = false, void (*callback)() = 0, QString tag = "");
 
         QNetworkAccessManager* netManager() const { return m_netManager; }
 

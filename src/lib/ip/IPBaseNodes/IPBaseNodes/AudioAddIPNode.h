@@ -24,8 +24,7 @@ namespace IPCore
     class AudioAddIPNode : public IPNode
     {
     public:
-        AudioAddIPNode(const std::string& name, const NodeDefinition* def,
-                       IPGraph* graph, GroupIPNode* group = 0);
+        AudioAddIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group = 0);
 
         virtual ~AudioAddIPNode();
 

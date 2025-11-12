@@ -84,8 +84,7 @@ namespace IPCore
         //  Constructors
         //
 
-        FileSourceIPNode(const std::string& name, const NodeDefinition* def,
-                         IPGraph*, GroupIPNode* group,
+        FileSourceIPNode(const std::string& name, const NodeDefinition* def, IPGraph*, GroupIPNode* group,
                          const std::string mediaRepName = "");
 
         virtual ~FileSourceIPNode();
@@ -163,15 +162,12 @@ namespace IPCore
         //  Media I/O
         //
 
-        void openMovieTask(const std::string& filename,
-                           const SharedMediaPointer& proxySharedMedia);
+        void openMovieTask(const std::string& filename, const SharedMediaPointer& proxySharedMedia);
         Movie* openMovie(const std::string& filename);
 
-        bool findCachedMediaMetaData(const std::string& filename,
-                                     PropertyContainer* pc);
+        bool findCachedMediaMetaData(const std::string& filename, PropertyContainer* pc);
 
-        static std::string cacheHash(const std::string& filename,
-                                     const std::string& prefix);
+        static std::string cacheHash(const std::string& filename, const std::string& prefix);
 
         // Lookup filename in the media library, save associated HTTP header and
         // cookies if any, and return the actual filename to be used for opening
@@ -194,33 +190,21 @@ namespace IPCore
         //  Progressive source loading
         //
 
-        bool hasProgressiveSourceLoading() const
-        {
-            return m_progressiveSourceLoading;
-        }
+        bool hasProgressiveSourceLoading() const { return m_progressiveSourceLoading; }
 
-        void setProgressiveSourceLoading(bool b)
-        {
-            m_progressiveSourceLoading = b;
-        }
+        void setProgressiveSourceLoading(bool b) { m_progressiveSourceLoading = b; }
 
     protected:
         virtual void audioConfigure(const AudioConfiguration&);
         size_t audioFillBufferInternal(const AudioContext&);
-        void addMedia(
-            const SharedMediaPointer& sharedMedia,
-            const SharedMediaPointer& proxySharedMedia = SharedMediaPointer());
-        void changeMedia(
-            const SharedMediaPointer& sharedMedia,
-            const SharedMediaPointer& proxySharedMedia = SharedMediaPointer());
+        void addMedia(const SharedMediaPointer& sharedMedia, const SharedMediaPointer& proxySharedMedia = SharedMediaPointer());
+        void changeMedia(const SharedMediaPointer& sharedMedia, const SharedMediaPointer& proxySharedMedia = SharedMediaPointer());
 
-        MediaPointer getMediaFromContext(ImageComponent& selection,
-                                         const Context& context);
+        MediaPointer getMediaFromContext(ImageComponent& selection, const Context& context);
         MediaPointer mediaForComponent(ImageComponent&, const Context& context);
         MediaPointer defaultMedia(int);
         Movie* movieForThread(const Media*, const Context&);
-        void setupRequest(const Movie*, const ImageComponent&, const Context&,
-                          Movie::ReadRequest& request);
+        void setupRequest(const Movie*, const ImageComponent&, const Context&, Movie::ReadRequest& request);
 
         void reloadMediaFromFiles();
 
@@ -230,9 +214,7 @@ namespace IPCore
         Time offsetStartTime(const AudioContext context);
 
         void configureAlphaAttrs(FrameBuffer* fb, IPImage* img);
-        Movie* openProxyMovie(const std::string& errorString,
-                              double minBeforeTime, const std::string filename,
-                              double defaultFPS);
+        Movie* openProxyMovie(const std::string& errorString, double minBeforeTime, const std::string filename, double defaultFPS);
 
         void cancelJobs();
 

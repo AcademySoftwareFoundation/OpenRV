@@ -44,8 +44,7 @@ namespace Mu
         //  Constructors
         //
 
-        QTextBlockType(Context* context, const char* name,
-                       Class* superClass = 0);
+        QTextBlockType(Context* context, const char* name, Class* superClass = 0);
         virtual ~QTextBlockType();
 
         //

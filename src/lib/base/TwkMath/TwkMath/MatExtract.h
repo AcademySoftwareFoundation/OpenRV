@@ -22,13 +22,11 @@ namespace TwkMath
         T cosr = Math<T>::cos(xRot);
         T sinr = Math<T>::sin(xRot);
 
-        return Mat44<T>(T(1), T(0), T(0), T(0), T(0), cosr, -sinr, T(0), T(0),
-                        sinr, cosr, T(0), T(0), T(0), T(0), T(1));
+        return Mat44<T>(T(1), T(0), T(0), T(0), T(0), cosr, -sinr, T(0), T(0), sinr, cosr, T(0), T(0), T(0), T(0), T(1));
     }
 
     //******************************************************************************
-    template <typename T>
-    void extractEulerXYZ(const Mat44<T>& mat, Vec3<T>& rot)
+    template <typename T> void extractEulerXYZ(const Mat44<T>& mat, Vec3<T>& rot)
     {
         // Normalize the local x, y and z axes to remove scaling.
         Vec3<T> i(mat[0][0], mat[1][0], mat[2][0]);
@@ -39,8 +37,7 @@ namespace TwkMath
         j.normalize();
         k.normalize();
 
-        Mat44<T> M(i[0], j[0], k[0], T(0), i[1], j[1], k[1], T(0), i[2], j[2],
-                   k[2], T(0), T(0), T(0), T(0), T(1));
+        Mat44<T> M(i[0], j[0], k[0], T(0), i[1], j[1], k[1], T(0), i[2], j[2], k[2], T(0), T(0), T(0), T(0), T(1));
 
         // Extract the first angle, rot.x.
         rot.x = Math<T>::atan2(M[2][1], M[2][2]);
@@ -59,20 +56,15 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <typename T>
-    bool checkForZeroScaleInCol(const T& scl, const Vec3<T>& col,
-                                bool throwOnError)
+    template <typename T> bool checkForZeroScaleInCol(const T& scl, const Vec3<T>& col, bool throwOnError)
     {
         for (int i = 0; i < 3; ++i)
         {
-            if ((Math<T>::abs(scl) < T(1)
-                 && Math<T>::abs(col[i]) >= Math<T>::max() * scl))
+            if ((Math<T>::abs(scl) < T(1) && Math<T>::abs(col[i]) >= Math<T>::max() * scl))
             {
                 if (throwOnError)
                 {
-                    TWK_EXC_THROW_WHAT(
-                        ZeroScaleExc,
-                        "Cannot remove zero scaling from matrix.");
+                    TWK_EXC_THROW_WHAT(ZeroScaleExc, "Cannot remove zero scaling from matrix.");
                 }
                 else
                 {
@@ -85,9 +77,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <typename T>
-    bool extractAndRemoveScalingAndShear(Mat44<T>& mat, Vec3<T>& scl,
-                                         Vec3<T>& shr, bool throwOnError)
+    template <typename T> bool extractAndRemoveScalingAndShear(Mat44<T>& mat, Vec3<T>& scl, Vec3<T>& shr, bool throwOnError)
     {
         Vec3<T> col[3];
 
@@ -204,9 +194,7 @@ namespace TwkMath
 
     //******************************************************************************
     template <typename T>
-    bool extractSHRT(const Mat44<T>& mat, Vec3<T>& Scale, Vec3<T>& sHear,
-                     Vec3<T>& Rotation, Vec3<T>& Translation,
-                     bool THROW_ON_ERROR)
+    bool extractSHRT(const Mat44<T>& mat, Vec3<T>& Scale, Vec3<T>& sHear, Vec3<T>& Rotation, Vec3<T>& Translation, bool THROW_ON_ERROR)
     {
         Mat44<T> rot = mat;
         if (!extractAndRemoveScalingAndShear(rot, Scale, sHear, THROW_ON_ERROR))
@@ -224,8 +212,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <typename T>
-    Mat44<T> alignZAxisWithTargetDir(Vec3<T> targetDir, Vec3<T> upDir)
+    template <typename T> Mat44<T> alignZAxisWithTargetDir(Vec3<T> targetDir, Vec3<T> upDir)
     {
         // Ensure that the target direction is non-zero.
         if (targetDir.magnitude() == T(0))
@@ -263,15 +250,12 @@ namespace TwkMath
         col[1] = targetUpDir.normalized();
         col[2] = targetDir.normalized();
 
-        return Mat44<T>(col[0][0], col[1][0], col[2][0], T(0), col[0][1],
-                        col[1][1], col[2][1], T(0), col[0][2], col[1][2],
-                        col[2][2], T(0), T(0), T(0), T(0), T(1));
+        return Mat44<T>(col[0][0], col[1][0], col[2][0], T(0), col[0][1], col[1][1], col[2][1], T(0), col[0][2], col[1][2], col[2][2], T(0),
+                        T(0), T(0), T(0), T(1));
     }
 
     //******************************************************************************
-    template <typename T>
-    Mat44<T> rotationMatrixWithUpDir(const Vec3<T>& fromDir,
-                                     const Vec3<T>& toDir, const Vec3<T>& upDir)
+    template <typename T> Mat44<T> rotationMatrixWithUpDir(const Vec3<T>& fromDir, const Vec3<T>& toDir, const Vec3<T>& upDir)
     {
         // The goal is to obtain a rotation matrix that takes
         // "fromDir" to "toDir".  We do this in two steps and
@@ -289,8 +273,7 @@ namespace TwkMath
         }
         else
         {
-            Mat44<T> zAxis2FromDir =
-                alignZAxisWithTargetDir(fromDir, Vec3<T>(T(0), T(1), T(0)));
+            Mat44<T> zAxis2FromDir = alignZAxisWithTargetDir(fromDir, Vec3<T>(T(0), T(1), T(0)));
 
             Mat44<T> fromDir2zAxis = zAxis2FromDir.transposed();
 

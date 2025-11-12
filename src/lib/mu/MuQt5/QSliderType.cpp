@@ -60,28 +60,24 @@ namespace Mu
         _baseType = 0;
     }
 
-    MuQt_QSlider::MuQt_QSlider(Pointer muobj, const CallEnvironment* ce,
-                               QWidget* parent)
+    MuQt_QSlider::MuQt_QSlider(Pointer muobj, const CallEnvironment* ce, QWidget* parent)
         : QSlider(parent)
     {
         _env = ce;
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QSliderType>(
-            c->internName("qt.QSlider"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QSliderType>(c->internName("qt.QSlider"));
     }
 
-    MuQt_QSlider::MuQt_QSlider(Pointer muobj, const CallEnvironment* ce,
-                               Qt::Orientation orientation, QWidget* parent)
+    MuQt_QSlider::MuQt_QSlider(Pointer muobj, const CallEnvironment* ce, Qt::Orientation orientation, QWidget* parent)
         : QSlider(orientation, parent)
     {
         _env = ce;
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QSliderType>(
-            c->internName("qt.QSlider"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QSliderType>(c->internName("qt.QSlider"));
     }
 
     bool MuQt_QSlider::event(QEvent* event_)
@@ -159,8 +155,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QMouseEventType>(c, ev, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, ev, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -183,8 +178,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QMouseEventType>(c, ev, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, ev, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -207,8 +201,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QMouseEventType>(c, ev, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, ev, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -231,8 +224,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QPaintEventType>(c, ev, "qt.QPaintEvent"));
+            args[1] = Value(makeqpointer<QPaintEventType>(c, ev, "qt.QPaintEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -301,8 +293,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QTimerEventType>(c, e, "qt.QTimerEvent"));
+            args[1] = Value(makeqpointer<QTimerEventType>(c, e, "qt.QTimerEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -325,8 +316,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QWheelEventType>(c, e, "qt.QWheelEvent"));
+            args[1] = Value(makeqpointer<QWheelEventType>(c, e, "qt.QWheelEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -338,8 +328,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  Mu Type CONSTRUCTORS
 
-    QSliderType::QSliderType(Context* c, const char* name, Class* super,
-                             Class* super2)
+    QSliderType::QSliderType(Context* c, const char* name, Class* super, Class* super2)
         : Class(c, name, vectorOf2(super, super2))
     {
     }
@@ -360,8 +349,7 @@ namespace Mu
         }
         else if (QSlider* w = object<QSlider>(widget))
         {
-            QSliderType* type = c->findSymbolOfTypeByQualifiedName<QSliderType>(
-                c->internName("qt.QSlider"), false);
+            QSliderType* type = c->findSymbolOfTypeByQualifiedName<QSliderType>(c->internName("qt.QSlider"), false);
             ClassInstance* o = ClassInstance::allocate(type);
             setobject(o, w);
             return o;
@@ -372,72 +360,51 @@ namespace Mu
         }
     }
 
-    static NODE_IMPLEMENTATION(castFromObject, Pointer)
-    {
-        NODE_RETURN(QSlider_QSlider_QObject(NODE_THREAD, NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(castFromObject, Pointer) { NODE_RETURN(QSlider_QSlider_QObject(NODE_THREAD, NODE_ARG(0, Pointer))); }
 
-    Pointer qt_QSlider_QSlider_QSlider_QSlider_QWidget(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this,
-                                                       Pointer param_parent)
+    Pointer qt_QSlider_QSlider_QSlider_QSlider_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWidget* arg1 = object<QWidget>(param_parent);
-        setobject(param_this,
-                  new MuQt_QSlider(param_this, NODE_THREAD.process()->callEnv(),
-                                   arg1));
+        setobject(param_this, new MuQt_QSlider(param_this, NODE_THREAD.process()->callEnv(), arg1));
         return param_this;
     }
 
-    Pointer qt_QSlider_QSlider_QSlider_QSlider_int_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_orientation,
-        Pointer param_parent)
+    Pointer qt_QSlider_QSlider_QSlider_QSlider_int_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this, int param_orientation,
+                                                           Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         Qt::Orientation arg1 = (Qt::Orientation)(param_orientation);
         QWidget* arg2 = object<QWidget>(param_parent);
-        setobject(param_this,
-                  new MuQt_QSlider(param_this, NODE_THREAD.process()->callEnv(),
-                                   arg1, arg2));
+        setobject(param_this, new MuQt_QSlider(param_this, NODE_THREAD.process()->callEnv(), arg1, arg2));
         return param_this;
     }
 
-    bool qt_QSlider_event_bool_QSlider_QEvent(Mu::Thread& NODE_THREAD,
-                                              Pointer param_this,
-                                              Pointer param_event_)
+    bool qt_QSlider_event_bool_QSlider_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event_)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSlider* arg0 = object<QSlider>(param_this);
         QEvent* arg1 = getqpointer<QEventType>(param_event_);
-        return isMuQtObject(arg0) ? arg0->QSlider::event(arg1)
-                                  : arg0->event(arg1);
+        return isMuQtObject(arg0) ? arg0->QSlider::event(arg1) : arg0->event(arg1);
     }
 
-    Pointer qt_QSlider_minimumSizeHint_QSize_QSlider(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_this)
+    Pointer qt_QSlider_minimumSizeHint_QSize_QSlider(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSlider* arg0 = object<QSlider>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QSizeType>(c, arg0->QSlider::minimumSizeHint(),
-                                          "qt.QSize")
-                   : makeqtype<QSizeType>(c, arg0->minimumSizeHint(),
-                                          "qt.QSize");
+        return isMuQtObject(arg0) ? makeqtype<QSizeType>(c, arg0->QSlider::minimumSizeHint(), "qt.QSize")
+                                  : makeqtype<QSizeType>(c, arg0->minimumSizeHint(), "qt.QSize");
     }
 
-    Pointer qt_QSlider_sizeHint_QSize_QSlider(Mu::Thread& NODE_THREAD,
-                                              Pointer param_this)
+    Pointer qt_QSlider_sizeHint_QSize_QSlider(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSlider* arg0 = object<QSlider>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QSizeType>(c, arg0->QSlider::sizeHint(),
-                                          "qt.QSize")
-                   : makeqtype<QSizeType>(c, arg0->sizeHint(), "qt.QSize");
+        return isMuQtObject(arg0) ? makeqtype<QSizeType>(c, arg0->QSlider::sizeHint(), "qt.QSize")
+                                  : makeqtype<QSizeType>(c, arg0->sizeHint(), "qt.QSize");
     }
 
-    void qt_QSlider_mouseMoveEvent_void_QSlider_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_ev)
+    void qt_QSlider_mouseMoveEvent_void_QSlider_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_ev)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSlider* arg0 = object<QSlider>(param_this);
@@ -448,8 +415,7 @@ namespace Mu
             ((MuQt_QSlider*)arg0)->mouseMoveEvent_pub(arg1);
     }
 
-    void qt_QSlider_mousePressEvent_void_QSlider_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_ev)
+    void qt_QSlider_mousePressEvent_void_QSlider_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_ev)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSlider* arg0 = object<QSlider>(param_this);
@@ -460,8 +426,7 @@ namespace Mu
             ((MuQt_QSlider*)arg0)->mousePressEvent_pub(arg1);
     }
 
-    void qt_QSlider_mouseReleaseEvent_void_QSlider_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_ev)
+    void qt_QSlider_mouseReleaseEvent_void_QSlider_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_ev)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSlider* arg0 = object<QSlider>(param_this);
@@ -472,9 +437,7 @@ namespace Mu
             ((MuQt_QSlider*)arg0)->mouseReleaseEvent_pub(arg1);
     }
 
-    void qt_QSlider_paintEvent_void_QSlider_QPaintEvent(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this,
-                                                        Pointer param_ev)
+    void qt_QSlider_paintEvent_void_QSlider_QPaintEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_ev)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSlider* arg0 = object<QSlider>(param_this);
@@ -485,9 +448,7 @@ namespace Mu
             ((MuQt_QSlider*)arg0)->paintEvent_pub(arg1);
     }
 
-    void qt_QSlider_changeEvent_void_QSlider_QEvent(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this,
-                                                    Pointer param_ev)
+    void qt_QSlider_changeEvent_void_QSlider_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_ev)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSlider* arg0 = object<QSlider>(param_this);
@@ -498,8 +459,7 @@ namespace Mu
             ((MuQt_QSlider*)arg0)->changeEvent_pub(arg1);
     }
 
-    void qt_QSlider_keyPressEvent_void_QSlider_QKeyEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_ev)
+    void qt_QSlider_keyPressEvent_void_QSlider_QKeyEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_ev)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSlider* arg0 = object<QSlider>(param_this);
@@ -510,9 +470,7 @@ namespace Mu
             ((MuQt_QSlider*)arg0)->keyPressEvent_pub(arg1);
     }
 
-    void qt_QSlider_timerEvent_void_QSlider_QTimerEvent(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this,
-                                                        Pointer param_e)
+    void qt_QSlider_timerEvent_void_QSlider_QTimerEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSlider* arg0 = object<QSlider>(param_this);
@@ -523,9 +481,7 @@ namespace Mu
             ((MuQt_QSlider*)arg0)->timerEvent_pub(arg1);
     }
 
-    void qt_QSlider_wheelEvent_void_QSlider_QWheelEvent(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this,
-                                                        Pointer param_e)
+    void qt_QSlider_wheelEvent_void_QSlider_QWheelEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSlider* arg0 = object<QSlider>(param_this);
@@ -538,81 +494,68 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(_n_QSlider0, Pointer)
     {
-        NODE_RETURN(qt_QSlider_QSlider_QSlider_QSlider_QWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QSlider_QSlider_QSlider_QSlider_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_QSlider1, Pointer)
     {
-        NODE_RETURN(qt_QSlider_QSlider_QSlider_QSlider_int_QWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QSlider_QSlider_QSlider_QSlider_int_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                   NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_event0, bool)
     {
-        NODE_RETURN(qt_QSlider_event_bool_QSlider_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QSlider_event_bool_QSlider_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_minimumSizeHint0, Pointer)
     {
-        NODE_RETURN(qt_QSlider_minimumSizeHint_QSize_QSlider(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QSlider_minimumSizeHint_QSize_QSlider(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_sizeHint0, Pointer)
     {
-        NODE_RETURN(qt_QSlider_sizeHint_QSize_QSlider(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QSlider_sizeHint_QSize_QSlider(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseMoveEvent0, void)
     {
-        qt_QSlider_mouseMoveEvent_void_QSlider_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QSlider_mouseMoveEvent_void_QSlider_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mousePressEvent0, void)
     {
-        qt_QSlider_mousePressEvent_void_QSlider_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QSlider_mousePressEvent_void_QSlider_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseReleaseEvent0, void)
     {
-        qt_QSlider_mouseReleaseEvent_void_QSlider_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QSlider_mouseReleaseEvent_void_QSlider_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_paintEvent0, void)
     {
-        qt_QSlider_paintEvent_void_QSlider_QPaintEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QSlider_paintEvent_void_QSlider_QPaintEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_changeEvent0, void)
     {
-        qt_QSlider_changeEvent_void_QSlider_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QSlider_changeEvent_void_QSlider_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_keyPressEvent0, void)
     {
-        qt_QSlider_keyPressEvent_void_QSlider_QKeyEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QSlider_keyPressEvent_void_QSlider_QKeyEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_timerEvent0, void)
     {
-        qt_QSlider_timerEvent_void_QSlider_QTimerEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QSlider_timerEvent_void_QSlider_QTimerEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_wheelEvent0, void)
     {
-        qt_QSlider_wheelEvent_void_QSlider_QWheelEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QSlider_wheelEvent_void_QSlider_QWheelEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     void QSliderType::load()
@@ -632,17 +575,13 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
-                   new Function(c, tn, castFromObject, Cast, Compiled,
-                                QSlider_QSlider_QObject, Return, ftn,
-                                Parameters,
+                   new Function(c, tn, castFromObject, Cast, Compiled, QSlider_QSlider_QObject, Return, ftn, Parameters,
                                 new Param(c, "object", "qt.QObject"), End),
 
                    EndArguments);
@@ -650,77 +589,49 @@ namespace Mu
         addSymbols(
             // enums
             // member functions
-            new Function(c, "QSlider", _n_QSlider0, None, Compiled,
-                         qt_QSlider_QSlider_QSlider_QSlider_QWidget, Return,
-                         "qt.QSlider", Parameters,
-                         new Param(c, "this", "qt.QSlider"),
-                         new Param(c, "parent", "qt.QWidget"), End),
-            new Function(c, "QSlider", _n_QSlider1, None, Compiled,
-                         qt_QSlider_QSlider_QSlider_QSlider_int_QWidget, Return,
-                         "qt.QSlider", Parameters,
-                         new Param(c, "this", "qt.QSlider"),
-                         new Param(c, "orientation", "int"),
+            new Function(c, "QSlider", _n_QSlider0, None, Compiled, qt_QSlider_QSlider_QSlider_QSlider_QWidget, Return, "qt.QSlider",
+                         Parameters, new Param(c, "this", "qt.QSlider"), new Param(c, "parent", "qt.QWidget"), End),
+            new Function(c, "QSlider", _n_QSlider1, None, Compiled, qt_QSlider_QSlider_QSlider_QSlider_int_QWidget, Return, "qt.QSlider",
+                         Parameters, new Param(c, "this", "qt.QSlider"), new Param(c, "orientation", "int"),
                          new Param(c, "parent", "qt.QWidget"), End),
             // PROP: setTickInterval (void; QSlider this, int ti)
             // PROP: setTickPosition (void; QSlider this, flags
             // QSlider::TickPosition position) PROP: tickInterval (int; QSlider
             // this) PROP: tickPosition (flags QSlider::TickPosition; QSlider
             // this)
-            _func[0] = new MemberFunction(
-                c, "event", _n_event0, None, Compiled,
-                qt_QSlider_event_bool_QSlider_QEvent, Return, "bool",
-                Parameters, new Param(c, "this", "qt.QSlider"),
-                new Param(c, "event_", "qt.QEvent"), End),
-            _func[1] = new MemberFunction(
-                c, "minimumSizeHint", _n_minimumSizeHint0, None, Compiled,
-                qt_QSlider_minimumSizeHint_QSize_QSlider, Return, "qt.QSize",
-                Parameters, new Param(c, "this", "qt.QSlider"), End),
-            _func[2] = new MemberFunction(
-                c, "sizeHint", _n_sizeHint0, None, Compiled,
-                qt_QSlider_sizeHint_QSize_QSlider, Return, "qt.QSize",
-                Parameters, new Param(c, "this", "qt.QSlider"), End),
+            _func[0] = new MemberFunction(c, "event", _n_event0, None, Compiled, qt_QSlider_event_bool_QSlider_QEvent, Return, "bool",
+                                          Parameters, new Param(c, "this", "qt.QSlider"), new Param(c, "event_", "qt.QEvent"), End),
+            _func[1] =
+                new MemberFunction(c, "minimumSizeHint", _n_minimumSizeHint0, None, Compiled, qt_QSlider_minimumSizeHint_QSize_QSlider,
+                                   Return, "qt.QSize", Parameters, new Param(c, "this", "qt.QSlider"), End),
+            _func[2] = new MemberFunction(c, "sizeHint", _n_sizeHint0, None, Compiled, qt_QSlider_sizeHint_QSize_QSlider, Return,
+                                          "qt.QSize", Parameters, new Param(c, "this", "qt.QSlider"), End),
             // MISSING: initStyleOption (void; QSlider this, "QStyleOptionSlider
             // *" option) // protected
-            _func[3] = new MemberFunction(
-                c, "mouseMoveEvent", _n_mouseMoveEvent0, None, Compiled,
-                qt_QSlider_mouseMoveEvent_void_QSlider_QMouseEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QSlider"),
-                new Param(c, "ev", "qt.QMouseEvent"), End),
-            _func[4] = new MemberFunction(
-                c, "mousePressEvent", _n_mousePressEvent0, None, Compiled,
-                qt_QSlider_mousePressEvent_void_QSlider_QMouseEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QSlider"),
-                new Param(c, "ev", "qt.QMouseEvent"), End),
-            _func[5] = new MemberFunction(
-                c, "mouseReleaseEvent", _n_mouseReleaseEvent0, None, Compiled,
-                qt_QSlider_mouseReleaseEvent_void_QSlider_QMouseEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QSlider"),
-                new Param(c, "ev", "qt.QMouseEvent"), End),
-            _func[6] = new MemberFunction(
-                c, "paintEvent", _n_paintEvent0, None, Compiled,
-                qt_QSlider_paintEvent_void_QSlider_QPaintEvent, Return, "void",
-                Parameters, new Param(c, "this", "qt.QSlider"),
-                new Param(c, "ev", "qt.QPaintEvent"), End),
-            _func[7] = new MemberFunction(
-                c, "changeEvent", _n_changeEvent0, None, Compiled,
-                qt_QSlider_changeEvent_void_QSlider_QEvent, Return, "void",
-                Parameters, new Param(c, "this", "qt.QSlider"),
-                new Param(c, "ev", "qt.QEvent"), End),
-            _func[8] = new MemberFunction(
-                c, "keyPressEvent", _n_keyPressEvent0, None, Compiled,
-                qt_QSlider_keyPressEvent_void_QSlider_QKeyEvent, Return, "void",
-                Parameters, new Param(c, "this", "qt.QSlider"),
-                new Param(c, "ev", "qt.QKeyEvent"), End),
-            _func[9] = new MemberFunction(
-                c, "timerEvent", _n_timerEvent0, None, Compiled,
-                qt_QSlider_timerEvent_void_QSlider_QTimerEvent, Return, "void",
-                Parameters, new Param(c, "this", "qt.QSlider"),
-                new Param(c, "e", "qt.QTimerEvent"), End),
-            _func[10] = new MemberFunction(
-                c, "wheelEvent", _n_wheelEvent0, None, Compiled,
-                qt_QSlider_wheelEvent_void_QSlider_QWheelEvent, Return, "void",
-                Parameters, new Param(c, "this", "qt.QSlider"),
-                new Param(c, "e", "qt.QWheelEvent"), End),
+            _func[3] = new MemberFunction(c, "mouseMoveEvent", _n_mouseMoveEvent0, None, Compiled,
+                                          qt_QSlider_mouseMoveEvent_void_QSlider_QMouseEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QSlider"), new Param(c, "ev", "qt.QMouseEvent"), End),
+            _func[4] = new MemberFunction(c, "mousePressEvent", _n_mousePressEvent0, None, Compiled,
+                                          qt_QSlider_mousePressEvent_void_QSlider_QMouseEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QSlider"), new Param(c, "ev", "qt.QMouseEvent"), End),
+            _func[5] = new MemberFunction(c, "mouseReleaseEvent", _n_mouseReleaseEvent0, None, Compiled,
+                                          qt_QSlider_mouseReleaseEvent_void_QSlider_QMouseEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QSlider"), new Param(c, "ev", "qt.QMouseEvent"), End),
+            _func[6] =
+                new MemberFunction(c, "paintEvent", _n_paintEvent0, None, Compiled, qt_QSlider_paintEvent_void_QSlider_QPaintEvent, Return,
+                                   "void", Parameters, new Param(c, "this", "qt.QSlider"), new Param(c, "ev", "qt.QPaintEvent"), End),
+            _func[7] =
+                new MemberFunction(c, "changeEvent", _n_changeEvent0, None, Compiled, qt_QSlider_changeEvent_void_QSlider_QEvent, Return,
+                                   "void", Parameters, new Param(c, "this", "qt.QSlider"), new Param(c, "ev", "qt.QEvent"), End),
+            _func[8] =
+                new MemberFunction(c, "keyPressEvent", _n_keyPressEvent0, None, Compiled, qt_QSlider_keyPressEvent_void_QSlider_QKeyEvent,
+                                   Return, "void", Parameters, new Param(c, "this", "qt.QSlider"), new Param(c, "ev", "qt.QKeyEvent"), End),
+            _func[9] =
+                new MemberFunction(c, "timerEvent", _n_timerEvent0, None, Compiled, qt_QSlider_timerEvent_void_QSlider_QTimerEvent, Return,
+                                   "void", Parameters, new Param(c, "this", "qt.QSlider"), new Param(c, "e", "qt.QTimerEvent"), End),
+            _func[10] =
+                new MemberFunction(c, "wheelEvent", _n_wheelEvent0, None, Compiled, qt_QSlider_wheelEvent_void_QSlider_QWheelEvent, Return,
+                                   "void", Parameters, new Param(c, "this", "qt.QSlider"), new Param(c, "e", "qt.QWheelEvent"), End),
             // static functions
             EndArguments);
         globalScope()->addSymbols(EndArguments);

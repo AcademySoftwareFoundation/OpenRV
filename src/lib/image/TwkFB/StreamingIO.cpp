@@ -24,8 +24,7 @@ namespace TwkFB
         return 0;
     }
 
-    void StreamingFrameBufferIO::setIntAttribute(const std::string& name,
-                                                 int value)
+    void StreamingFrameBufferIO::setIntAttribute(const std::string& name, int value)
     {
         if (name == "iosize")
             m_iosize = value;

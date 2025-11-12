@@ -24,8 +24,7 @@ namespace Tex
 {
 
     //******************************************************************************
-    void GetMatrices(const char* fileName, Mat44f& camera, Mat44f& screen,
-                     bool doTranspose)
+    void GetMatrices(const char* fileName, Mat44f& camera, Mat44f& screen, bool doTranspose)
     {
         TIFF* tif = TIFFOpen(fileName, "r");
         if (tif == NULL)
@@ -41,8 +40,7 @@ namespace Tex
         }
         else
         {
-            memcpy((void*)(&(camera[0][0])), (const void*)ptr,
-                   16 * sizeof(float));
+            memcpy((void*)(&(camera[0][0])), (const void*)ptr, 16 * sizeof(float));
         }
 
         rslt = TIFFGetField(tif, TIFFTAG_SCREEN_MATRIX, &ptr);
@@ -52,8 +50,7 @@ namespace Tex
         }
         else
         {
-            memcpy((void*)(&(screen[0][0])), (const void*)ptr,
-                   16 * sizeof(float));
+            memcpy((void*)(&(screen[0][0])), (const void*)ptr, 16 * sizeof(float));
         }
 
         TIFFClose(tif);
@@ -65,8 +62,7 @@ namespace Tex
         }
     }
 
-    void GetMatrices(const char* fileName, const char* texPath, Mat44f& camera,
-                     Mat44f& screen, bool doTranspose)
+    void GetMatrices(const char* fileName, const char* texPath, Mat44f& camera, Mat44f& screen, bool doTranspose)
     {
         assert(fileName);
         assert(texPath);

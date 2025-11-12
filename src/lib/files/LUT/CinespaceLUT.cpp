@@ -78,8 +78,7 @@ namespace LUT
             //  whitespace (weird stuff).
             //
 
-            if (s.find_first_not_of(WHITESPACE) == string::npos
-                || (s.size() && (s[0] == ' ' || s[0] == '\t')))
+            if (s.find_first_not_of(WHITESPACE) == string::npos || (s.size() && (s[0] == ' ' || s[0] == '\t')))
             {
                 continue;
             }
@@ -120,8 +119,7 @@ namespace LUT
         return s;
     }
 
-    void readCinespaceLUT(const string& filename, const string& type,
-                          LUTData& lut)
+    void readCinespaceLUT(const string& filename, const string& type, LUTData& lut)
     {
         ifstream file(UNICODE_C_STR(filename.c_str()), ios::binary);
         lut.data.resize(0);
@@ -170,9 +168,8 @@ namespace LUT
 
             if (buffer.size() != s)
             {
-                TWK_THROW_EXC_STREAM("prelut size mismatch, expected "
-                                     << s << " items, found " << buffer.size()
-                                     << " while reading " << filename);
+                TWK_THROW_EXC_STREAM("prelut size mismatch, expected " << s << " items, found " << buffer.size() << " while reading "
+                                                                       << filename);
             }
 
             //
@@ -181,8 +178,7 @@ namespace LUT
 
             for (size_t q = 0; q < s; q++)
             {
-                lut.prelut[i][q].first =
-                    powf(atof(buffer[q].c_str()), lut.conditioningGamma);
+                lut.prelut[i][q].first = powf(atof(buffer[q].c_str()), lut.conditioningGamma);
             }
 
             //
@@ -195,9 +191,8 @@ namespace LUT
 
             if (buffer.size() != s)
             {
-                TWK_THROW_EXC_STREAM("prelut size mismatch, expected "
-                                     << s << " items, found " << buffer.size()
-                                     << " while reading " << filename);
+                TWK_THROW_EXC_STREAM("prelut size mismatch, expected " << s << " items, found " << buffer.size() << " while reading "
+                                                                       << filename);
             }
 
             //
@@ -233,23 +228,19 @@ namespace LUT
         }
         else
         {
-            TWK_THROW_EXC_STREAM("CSP: unexpected number of lut dimensions in "
-                                 << filename);
+            TWK_THROW_EXC_STREAM("CSP: unexpected number of lut dimensions in " << filename);
         }
 
         if (is3d)
         {
-            if (!Read3DLUTData(file, lut.dimensions[0], lut.dimensions[1],
-                               lut.dimensions[2], FLOAT_DEPTH, false, 0,
-                               lut.data))
+            if (!Read3DLUTData(file, lut.dimensions[0], lut.dimensions[1], lut.dimensions[2], FLOAT_DEPTH, false, 0, lut.data))
             {
                 TWK_THROW_EXC_STREAM("data parsing error " << filename);
             }
         }
         else
         {
-            if (!ReadChannelLUTData(file, lut.dimensions[0], FLOAT_DEPTH, false,
-                                    0, lut.data))
+            if (!ReadChannelLUTData(file, lut.dimensions[0], FLOAT_DEPTH, false, 0, lut.data))
             {
                 TWK_THROW_EXC_STREAM("data parsing error " << filename);
             }

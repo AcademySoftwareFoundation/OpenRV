@@ -21,8 +21,7 @@ namespace TwkFB
         IOrla();
         virtual ~IOrla();
 
-        virtual void readImage(FrameBuffer& fb, const std::string& filename,
-                               const ReadRequest& request) const;
+        virtual void readImage(FrameBuffer& fb, const std::string& filename, const ReadRequest& request) const;
         //     virtual void writeImage(const FrameBuffer& img,
         //                             const std::string& filename,
         //                             const WriteRequest& request) const;

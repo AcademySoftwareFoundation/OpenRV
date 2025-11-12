@@ -32,8 +32,7 @@ namespace Mu
         };
 
         NodePrinter(Node*, std::ostream&, Style = Tree);
-        NodePrinter(Node*, std::ostream&, Type::ValueOutputState&,
-                    Style = Tree);
+        NodePrinter(Node*, std::ostream&, Type::ValueOutputState&, Style = Tree);
         ~NodePrinter();
 
     protected:

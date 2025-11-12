@@ -24,15 +24,9 @@ namespace TwkGLF
         glUseProgram(GLuint(0));
     }
 
-    void GLState::FixedFunctionPipeline::setViewport(int x, int y, int w, int h)
-    {
-        glViewport(x, y, w, h);
-    }
+    void GLState::FixedFunctionPipeline::setViewport(int x, int y, int w, int h) { glViewport(x, y, w, h); }
 
-    GLState::FixedFunctionPipeline::~FixedFunctionPipeline()
-    {
-        state->useGLProgram(program);
-    }
+    GLState::FixedFunctionPipeline::~FixedFunctionPipeline() { state->useGLProgram(program); }
 
     GLuint GLState::createGLTexture(size_t s)
     {
@@ -84,8 +78,7 @@ namespace TwkGLF
         {
             // create one
             std::pair<PipelineMap::iterator, bool> result;
-            result = m_state.insert(
-                std::pair<unsigned int, GLPipeline>(pid, GLPipeline(p)));
+            result = m_state.insert(std::pair<unsigned int, GLPipeline>(pid, GLPipeline(p)));
             it = result.first;
         }
         // use
@@ -100,10 +93,7 @@ namespace TwkGLF
         return &(m_state[m_activeProgram->programId()]);
     }
 
-    const GLProgram* GLState::activeGLProgram() const
-    {
-        return m_activeProgram;
-    }
+    const GLProgram* GLState::activeGLProgram() const { return m_activeProgram; }
 
     // note that the [] operator will insert an element with key p if none
     // exists

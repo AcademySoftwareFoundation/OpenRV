@@ -39,9 +39,8 @@ namespace TwkFB
 
     typedef std::pair<float, float> MinMaxPair;
 
-    TWKFB_EXPORT MinMaxPair
-    computeChannelHistogram(const FrameBuffer* fb, FBHistorgram& output,
-                            size_t bins = 100, bool fullRangeOverOne = false);
+    TWKFB_EXPORT MinMaxPair computeChannelHistogram(const FrameBuffer* fb, FBHistorgram& output, size_t bins = 100,
+                                                    bool fullRangeOverOne = false);
 
 } // namespace TwkFB
 

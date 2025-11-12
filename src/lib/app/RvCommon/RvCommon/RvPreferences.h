@@ -198,25 +198,17 @@ namespace Rv
         static void write(QSettings&);
         void latencyChanged(const QString&, bool);
 
-        bool
-        initAudioDeviceMenu(IPCore::AudioRenderer::RendererParameters& params,
-                            const IPCore::AudioRenderer::DeviceVector& devices,
-                            const std::string& currentDeviceName);
+        bool initAudioDeviceMenu(IPCore::AudioRenderer::RendererParameters& params, const IPCore::AudioRenderer::DeviceVector& devices,
+                                 const std::string& currentDeviceName);
 
-        bool
-        initAudioLayoutMenu(IPCore::AudioRenderer::RendererParameters& params,
-                            const IPCore::AudioRenderer::LayoutsVector& layouts,
-                            const IPCore::AudioRenderer::Layout& currentLayout);
+        bool initAudioLayoutMenu(IPCore::AudioRenderer::RendererParameters& params, const IPCore::AudioRenderer::LayoutsVector& layouts,
+                                 const IPCore::AudioRenderer::Layout& currentLayout);
 
-        bool
-        initAudioFormatMenu(IPCore::AudioRenderer::RendererParameters& params,
-                            const IPCore::AudioRenderer::FormatVector& formats,
-                            const IPCore::AudioRenderer::Format& currentFormat);
+        bool initAudioFormatMenu(IPCore::AudioRenderer::RendererParameters& params, const IPCore::AudioRenderer::FormatVector& formats,
+                                 const IPCore::AudioRenderer::Format& currentFormat);
 
-        bool
-        initAudioRatesMenu(IPCore::AudioRenderer::RendererParameters& params,
-                           const IPCore::AudioRenderer::RateVector& rates,
-                           const size_t& currentRate);
+        bool initAudioRatesMenu(IPCore::AudioRenderer::RendererParameters& params, const IPCore::AudioRenderer::RateVector& rates,
+                                const size_t& currentRate);
 
     private:
         Ui::RvPreferences m_ui;

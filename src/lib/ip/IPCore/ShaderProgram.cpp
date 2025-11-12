@@ -39,8 +39,7 @@ namespace IPCore::Shader
         collectSymbolNames(expr, 0);
     }
 
-    void Program::collectSymbolNames(const Expression* expr,
-                                     size_t localFunctionIndex)
+    void Program::collectSymbolNames(const Expression* expr, size_t localFunctionIndex)
     {
         //
         //  Assign (human readable) unique names to all parameters. A
@@ -79,8 +78,7 @@ namespace IPCore::Shader
 
         for (size_t i = 0; i < exprArgs.size(); i++)
         {
-            if (BoundExpression* B =
-                    dynamic_cast<BoundExpression*>(exprArgs[i]))
+            if (BoundExpression* B = dynamic_cast<BoundExpression*>(exprArgs[i]))
             {
                 //
                 //  Currently only Symbol::InputImageTypes are expressions
@@ -98,8 +96,7 @@ namespace IPCore::Shader
                     //  track Size and TexCoord
                     //
 
-                    if (const Function::ImageParameterInfo* pinfo =
-                            F->imageParameterInfo(i))
+                    if (const Function::ImageParameterInfo* pinfo = F->imageParameterInfo(i))
                     {
                         if (pinfo->usesST)
                             m_outputSTSet.insert(fexpr->graphID());
@@ -110,9 +107,7 @@ namespace IPCore::Shader
                         name << "_samplerExpr" << m_localFunctions.size();
 
                         size_t newIndex = m_localFunctions.size();
-                        m_localFunctions.push_back(
-                            LocalFunction(name.str(), fexpr->graphID(), fexpr,
-                                          pinfo->usesSampling));
+                        m_localFunctions.push_back(LocalFunction(name.str(), fexpr->graphID(), fexpr, pinfo->usesSampling));
                         m_localIndexMap[fexpr] = newIndex;
                         collectSymbolNames(fexpr, newIndex);
                     }
@@ -165,8 +160,7 @@ namespace IPCore::Shader
 
             if (S->isSpecial())
             {
-                if ((source && S->name() == "offset")
-                    || (inlined && S->name() == "_offset"))
+                if ((source && S->name() == "offset") || (inlined && S->name() == "_offset"))
                 {
                     //
                     // skip this one. we'll have to generate its value
@@ -184,8 +178,7 @@ namespace IPCore::Shader
             }
             else
             {
-                const BoundExpression* Bexpr =
-                    dynamic_cast<const BoundExpression*>(B);
+                const BoundExpression* Bexpr = dynamic_cast<const BoundExpression*>(B);
 
                 if (source && S->type() == Symbol::Coord2DRectType)
                 {
@@ -199,8 +192,7 @@ namespace IPCore::Shader
                     // DO WE NEED THIS CODE? I THINK THIS CAN BE DONE
                     // USING THE STORED GRAPHID INSTEAD OF THESE MAPS
 
-                    m_outputSTSet.insert(
-                        expr->graphID()); // Not needed at all AFAIK
+                    m_outputSTSet.insert(expr->graphID()); // Not needed at all AFAIK
                     m_coordBindingMap[B] = m_totalST;
                     m_invSourceBindingMap[m_totalST] = expr;
                     m_totalST++;
@@ -213,8 +205,7 @@ namespace IPCore::Shader
                 m_nameCountMap[S->name()]++;
                 n << S->name() << "_" << m_nameCountMap[S->name()];
 
-                m_bindingMap[B] =
-                    NameBinding(B, n.str(), (Bexpr ? false : true));
+                m_bindingMap[B] = NameBinding(B, n.str(), (Bexpr ? false : true));
             }
         }
     }
@@ -226,8 +217,7 @@ namespace IPCore::Shader
         releaseCompiledState();
     }
 
-    string Program::recursiveOutputExpr(const Expression* expr,
-                                        bool outputOffset)
+    string Program::recursiveOutputExpr(const Expression* expr, bool outputOffset)
     {
         //
         //  NOTE: this function has a bit of an "unnatural" structure to
@@ -243,8 +233,7 @@ namespace IPCore::Shader
 
         for (size_t i = 0; i < exprArgs.size(); i++)
         {
-            if (const BoundExpression* B =
-                    dynamic_cast<const BoundExpression*>(exprArgs[i]))
+            if (const BoundExpression* B = dynamic_cast<const BoundExpression*>(exprArgs[i]))
             {
                 if (B->symbol()->type() != Symbol::InputImageType)
                 {
@@ -278,14 +267,12 @@ namespace IPCore::Shader
                 continue;
             }
 
-            if (be->symbol()->type() == Symbol::OutputImageType
-                || be->symbol()->type() == Symbol::FragmentPositionType)
+            if (be->symbol()->type() == Symbol::OutputImageType || be->symbol()->type() == Symbol::FragmentPositionType)
             {
                 continue;
             }
 
-            if (be->symbol()->type() == Symbol::Sampler2DRectType
-                && F->type() == Function::Source)
+            if (be->symbol()->type() == Symbol::Sampler2DRectType && F->type() == Function::Source)
             {
                 const NameBinding& binding = m_bindingMap[be];
                 if (samplerName.empty())
@@ -304,16 +291,14 @@ namespace IPCore::Shader
             {
                 if (be->symbol()->isCoordinate())
                 {
-                    const Expression* expr =
-                        m_invSourceBindingMap[m_coordBindingMap[be]];
+                    const Expression* expr = m_invSourceBindingMap[m_coordBindingMap[be]];
                     code << "TexCoord" << expr->graphID() << ".xy";
                 }
                 else
                 {
                     const NameBinding& binding = m_bindingMap[be];
 
-                    if (((F->isFilter() && be->symbol()->name() == "_offset")
-                         || (F->isSource() && be->symbol()->name() == "offset"))
+                    if (((F->isFilter() && be->symbol()->name() == "_offset") || (F->isSource() && be->symbol()->name() == "offset"))
                         && be->symbol()->isSpecial() && outputOffset)
                     {
                         code << "_offset";
@@ -336,8 +321,7 @@ namespace IPCore::Shader
     // check if it has already been output before (find in uniforms)
     // if not, output to code
     //
-    void outputUniformVariable(ostream& code, const string& type,
-                               const string& name)
+    void outputUniformVariable(ostream& code, const string& type, const string& name)
     {
         code << "uniform " << type << " " << name << ";" << endl;
     }
@@ -360,8 +344,7 @@ namespace IPCore::Shader
         const char* glVersion = (const char*)glGetString(GL_VERSION);
         string fragColor = glVersion[0] <= '2' ? "gl_FragColor" : "FragColor";
 
-        code << "    " << (ismain ? (fragColor + " = ") : "return ")
-             << recursiveOutputExpr(l.root, !ismain) << ";" << endl;
+        code << "    " << (ismain ? (fragColor + " = ") : "return ") << recursiveOutputExpr(l.root, !ismain) << ";" << endl;
 
         code << "}" << endl;
     }
@@ -377,9 +360,7 @@ namespace IPCore::Shader
 
         if (Shader::debuggingType() != Shader::NoDebugInfo)
         {
-            cout << "INFO:" << endl
-                 << "INFO: new shader program " << this << endl
-                 << "INFO: " << endl;
+            cout << "INFO:" << endl << "INFO: new shader program " << this << endl << "INFO: " << endl;
         }
 
         //
@@ -401,14 +382,12 @@ namespace IPCore::Shader
 
         std::vector<int> TexCoordIndices;
 
-        for (BindingMap::const_iterator i = m_bindingMap.begin();
-             i != m_bindingMap.end(); ++i)
+        for (BindingMap::const_iterator i = m_bindingMap.begin(); i != m_bindingMap.end(); ++i)
         {
             const NameBinding& b = (*i).second;
             const Symbol* S = b.bsymbol->symbol();
 
-            if (b.uniform && !S->isSpecial() && !S->isCoordinate()
-                && !S->isOutputImage() && !S->isFragmentPositon())
+            if (b.uniform && !S->isSpecial() && !S->isCoordinate() && !S->isOutputImage() && !S->isFragmentPositon())
             {
                 outputUniformVariable(code, S->glslTypeName(), b.name);
             }
@@ -427,14 +406,12 @@ namespace IPCore::Shader
             code << varying << " vec3 _fragPosition;\n";
         }
 
-        for (GraphIDSet::const_iterator i = m_outputSTSet.begin();
-             i != m_outputSTSet.end(); ++i)
+        for (GraphIDSet::const_iterator i = m_outputSTSet.begin(); i != m_outputSTSet.end(); ++i)
         {
             code << varying << " vec2 TexCoord" << *i << ";" << endl;
         }
 
-        for (GraphIDSet::const_iterator i = m_outputSizeSet.begin();
-             i != m_outputSizeSet.end(); ++i)
+        for (GraphIDSet::const_iterator i = m_outputSizeSet.begin(); i != m_outputSizeSet.end(); ++i)
         {
             code << "uniform vec2 Size" << *i << ";" << endl;
         }
@@ -461,8 +438,7 @@ namespace IPCore::Shader
         vertexCode << attribute << " vec2 in_Position;" << endl;
         vertexCode << "uniform mat4 projMatrix, modelviewMatrix;" << endl;
 
-        for (GraphIDSet::const_iterator i = m_outputSTSet.begin();
-             i != m_outputSTSet.end(); ++i)
+        for (GraphIDSet::const_iterator i = m_outputSTSet.begin(); i != m_outputSTSet.end(); ++i)
         {
             vertexCode << attribute << " vec2 in_TexCoord" << *i << ";" << endl;
             vertexCode << varying_out << " vec2 TexCoord" << *i << ";" << endl;
@@ -489,11 +465,9 @@ namespace IPCore::Shader
 
         vertexCode << "void main()" << endl << "{" << endl;
 
-        for (GraphIDSet::const_iterator i = m_outputSTSet.begin();
-             i != m_outputSTSet.end(); ++i)
+        for (GraphIDSet::const_iterator i = m_outputSTSet.begin(); i != m_outputSTSet.end(); ++i)
         {
-            vertexCode << "    TexCoord" << *i << " = in_TexCoord" << *i << ";"
-                       << endl;
+            vertexCode << "    TexCoord" << *i << " = in_TexCoord" << *i << ";" << endl;
         }
 
         vertexCode << "    gl_Position = projMatrix * modelviewMatrix * "
@@ -547,8 +521,7 @@ namespace IPCore::Shader
             {
                 char* infoLog = new char[infologLength + 1];
                 int charsWritten = 0;
-                glGetShaderInfoLog(vshader, infologLength, &charsWritten,
-                                   infoLog);
+                glGetShaderInfoLog(vshader, infologLength, &charsWritten, infoLog);
                 cout << infoLog << endl;
                 delete[] infoLog;
             }
@@ -562,8 +535,7 @@ namespace IPCore::Shader
         //  Output extern declarations
         //
 
-        for (FunctionSet::const_iterator i = m_functions.begin();
-             i != m_functions.end(); ++i)
+        for (FunctionSet::const_iterator i = m_functions.begin(); i != m_functions.end(); ++i)
         {
             const Function* F = *i;
             if (F->isInline())
@@ -577,8 +549,7 @@ namespace IPCore::Shader
         //  Output inline function prototypes
         //
 
-        for (ExprSuffixMap::const_iterator i = m_inlineMap.begin();
-             i != m_inlineMap.end(); ++i)
+        for (ExprSuffixMap::const_iterator i = m_inlineMap.begin(); i != m_inlineMap.end(); ++i)
         {
             const Expression* Fexpr = (*i).first;
             const Function* F = Fexpr->function();
@@ -605,8 +576,7 @@ namespace IPCore::Shader
         //  Rewrite and shouldEmit inlined functions
         //
 
-        for (ExprSuffixMap::const_iterator i = m_inlineMap.begin();
-             i != m_inlineMap.end(); ++i)
+        for (ExprSuffixMap::const_iterator i = m_inlineMap.begin(); i != m_inlineMap.end(); ++i)
         {
             const Expression* Fexpr = (*i).first;
             const Function* F = Fexpr->function();
@@ -617,11 +587,9 @@ namespace IPCore::Shader
 
             for (size_t q = 0; q < args.size(); q++)
             {
-                if (const BoundExpression* be =
-                        dynamic_cast<const BoundExpression*>(args[q]))
+                if (const BoundExpression* be = dynamic_cast<const BoundExpression*>(args[q]))
                 {
-                    const LocalFunction& L =
-                        m_localFunctions[m_localIndexMap[be->value()]];
+                    const LocalFunction& L = m_localFunctions[m_localIndexMap[be->value()]];
                     argNames.push_back(L.name);
                     graphIDs.push_back(L.graphID);
                 }
@@ -639,8 +607,7 @@ namespace IPCore::Shader
 
         set<const Function*> attachedFuncs;
 
-        for (FunctionSet::const_iterator i = m_functions.begin();
-             i != m_functions.end(); ++i)
+        for (FunctionSet::const_iterator i = m_functions.begin(); i != m_functions.end(); ++i)
         {
             const Function* F = *i;
 
@@ -651,8 +618,7 @@ namespace IPCore::Shader
             {
                 if (!F->compile())
                 {
-                    cout << "ERROR: function " << F->name()
-                         << " failed to compile" << endl;
+                    cout << "ERROR: function " << F->name() << " failed to compile" << endl;
                     continue;
                 }
             }
@@ -678,13 +644,11 @@ namespace IPCore::Shader
         //  Write the execution pipeline
         //
 
-        m_main = new Function("main", code.str(), Function::Main,
-                              SymbolVector(), SymbolVector());
+        m_main = new Function("main", code.str(), Function::Main, SymbolVector(), SymbolVector());
 
         if (!m_main->compile())
         {
-            cout << "ERROR: main failed to compile. Cannot build program"
-                 << endl;
+            cout << "ERROR: main failed to compile. Cannot build program" << endl;
             return false;
         }
 
@@ -701,8 +665,7 @@ namespace IPCore::Shader
 
             outputAnnotatedCode(cout, m_vertexCode);
 
-            for (FunctionSet::const_iterator i = m_functions.begin();
-                 i != m_functions.end(); ++i)
+            for (FunctionSet::const_iterator i = m_functions.begin(); i != m_functions.end(); ++i)
             {
                 const Function* F = *i;
 
@@ -721,11 +684,9 @@ namespace IPCore::Shader
 
             outputAnnotatedCode(cout, code.str());
 
-            cout << "ERROR: compiling program: " << endl
-                 << "       with functions: ";
+            cout << "ERROR: compiling program: " << endl << "       with functions: ";
 
-            for (FunctionSet::const_iterator i = m_functions.begin();
-                 i != m_functions.end(); ++i)
+            for (FunctionSet::const_iterator i = m_functions.begin(); i != m_functions.end(); ++i)
             {
                 cout << " " << (*i)->name();
             }
@@ -737,8 +698,7 @@ namespace IPCore::Shader
             {
                 GLsizei rlen;
                 vector<char> buffer(logsize);
-                glGetProgramInfoLog(m_programId, logsize, &rlen,
-                                    &buffer.front());
+                glGetProgramInfoLog(m_programId, logsize, &rlen, &buffer.front());
 
                 cout << &buffer.front() << endl;
             }
@@ -777,8 +737,7 @@ namespace IPCore::Shader
 
         if (status != GL_TRUE)
         {
-            for (FunctionSet::const_iterator i = m_functions.begin();
-                 i != m_functions.end(); ++i)
+            for (FunctionSet::const_iterator i = m_functions.begin(); i != m_functions.end(); ++i)
             {
                 cout << "//" << endl;
                 cout << "// FUNCTION: " << (*i)->name();
@@ -789,11 +748,9 @@ namespace IPCore::Shader
                 cout << endl;
             }
 
-            cout << "ERROR: validating program: " << endl
-                 << "       with functions: ";
+            cout << "ERROR: validating program: " << endl << "       with functions: ";
 
-            for (FunctionSet::const_iterator i = m_functions.begin();
-                 i != m_functions.end(); ++i)
+            for (FunctionSet::const_iterator i = m_functions.begin(); i != m_functions.end(); ++i)
             {
                 cout << " " << (*i)->name();
             }
@@ -806,8 +763,7 @@ namespace IPCore::Shader
             {
                 GLsizei rlen;
                 vector<char> buffer(logsize);
-                glGetProgramInfoLog(m_programId, logsize, &rlen,
-                                    &buffer.front());
+                glGetProgramInfoLog(m_programId, logsize, &rlen, &buffer.front());
 
                 cout << &buffer.front() << endl;
             }
@@ -824,27 +780,20 @@ namespace IPCore::Shader
     namespace
     {
 
-        const Program::ImageAndCoordinateUnit* findTextureAssignment(
-            const Symbol* S, const string& idhash, int plane,
-            const Program::TextureUnitAssignments& channelAssignments)
+        const Program::ImageAndCoordinateUnit* findTextureAssignment(const Symbol* S, const string& idhash, int plane,
+                                                                     const Program::TextureUnitAssignments& channelAssignments)
         {
             for (size_t i = 0; i < channelAssignments.size(); i++)
             {
-                const Program::ImageAndCoordinateUnit& ca =
-                    channelAssignments[i];
+                const Program::ImageAndCoordinateUnit& ca = channelAssignments[i];
 
-                if ((ca.idhash == idhash || ca.graphID == idhash)
-                    && ca.plane == plane)
+                if ((ca.idhash == idhash || ca.graphID == idhash) && ca.plane == plane)
                 {
-                    assert((ca.textureTarget == GL_TEXTURE_1D
-                            && S->type() == Symbol::Sampler1DType)
-                           || (ca.textureTarget == GL_TEXTURE_2D
-                               && S->type() == Symbol::Sampler2DType)
-                           || (ca.textureTarget == GL_TEXTURE_3D
-                               && S->type() == Symbol::Sampler3DType)
+                    assert((ca.textureTarget == GL_TEXTURE_1D && S->type() == Symbol::Sampler1DType)
+                           || (ca.textureTarget == GL_TEXTURE_2D && S->type() == Symbol::Sampler2DType)
+                           || (ca.textureTarget == GL_TEXTURE_3D && S->type() == Symbol::Sampler3DType)
                            || (ca.textureTarget == GL_TEXTURE_RECTANGLE
-                               && (S->type() == Symbol::Sampler2DRectType
-                                   || S->type() == Symbol::Coord2DRectType)));
+                               && (S->type() == Symbol::Sampler2DRectType || S->type() == Symbol::Coord2DRectType)));
 
                     return &channelAssignments[i];
                 }
@@ -857,11 +806,9 @@ namespace IPCore::Shader
 
             for (size_t i = 0; i < channelAssignments.size(); i++)
             {
-                const Program::ImageAndCoordinateUnit& ca =
-                    channelAssignments[i];
+                const Program::ImageAndCoordinateUnit& ca = channelAssignments[i];
 
-                cout << "ERROR: [" << i << "] -> " << ca.idhash << "("
-                     << ca.graphID << ")"
+                cout << "ERROR: [" << i << "] -> " << ca.idhash << "(" << ca.graphID << ")"
                      << ", " << ca.plane << endl;
             }
 
@@ -870,9 +817,7 @@ namespace IPCore::Shader
 
     } // namespace
 
-    void Program::bind(const Expression* boundExpr,
-                       const TextureUnitAssignments& assignments,
-                       const TwkMath::Vec2f& windowSize) const
+    void Program::bind(const Expression* boundExpr, const TextureUnitAssignments& assignments, const TwkMath::Vec2f& windowSize) const
     {
         if (Shader::debuggingType() == Shader::AllDebugInfo)
         {
@@ -883,10 +828,8 @@ namespace IPCore::Shader
                  << "ASSIGNMENTS:" << endl;
 
             for (size_t i = 0; i < assignments.size(); i++)
-                cout << assignments[i].textureUnit << " / "
-                     << assignments[i].coordinateSet << " -> "
-                     << assignments[i].idhash << " (" << assignments[i].graphID
-                     << ")" << endl;
+                cout << assignments[i].textureUnit << " / " << assignments[i].coordinateSet << " -> " << assignments[i].idhash << " ("
+                     << assignments[i].graphID << ")" << endl;
 
             cout << "---- bind ----" << endl;
         }
@@ -906,8 +849,7 @@ namespace IPCore::Shader
 
             if (Shader::debuggingType() == Shader::AllDebugInfo)
             {
-                cout << "INFO: binding variable vec2 _windowSize at "
-                     << location << " :: value = " << windowSize[0] << ", "
+                cout << "INFO: binding variable vec2 _windowSize at " << location << " :: value = " << windowSize[0] << ", "
                      << windowSize[1] << endl;
             }
         }
@@ -927,9 +869,8 @@ namespace IPCore::Shader
 
                     if (Shader::debuggingType() == Shader::AllDebugInfo)
                     {
-                        cout << "INFO: binding variable vec2 " << name << " at "
-                             << location << " :: value = " << icu.uncropWidth
-                             << ", " << icu.uncropHeight << endl;
+                        cout << "INFO: binding variable vec2 " << name << " at " << location << " :: value = " << icu.uncropWidth << ", "
+                             << icu.uncropHeight << endl;
                     }
                 }
                 else
@@ -940,10 +881,8 @@ namespace IPCore::Shader
         }
     }
 
-    void Program::bind2(size_t& nameCount, const Expression* boundExpr,
-                        const Expression* unboundExpr,
-                        const TextureUnitAssignments& assignments,
-                        const TwkMath::Vec2f& windowSize) const
+    void Program::bind2(size_t& nameCount, const Expression* boundExpr, const Expression* unboundExpr,
+                        const TextureUnitAssignments& assignments, const TwkMath::Vec2f& windowSize) const
     {
         const ArgumentVector& boundArgs = boundExpr->arguments();
         const ArgumentVector& unboundArgs = unboundExpr->arguments();
@@ -952,13 +891,10 @@ namespace IPCore::Shader
 
         for (size_t i = 0; i < nargs; i++)
         {
-            if (BoundExpression* be =
-                    dynamic_cast<BoundExpression*>(boundArgs[i]))
+            if (BoundExpression* be = dynamic_cast<BoundExpression*>(boundArgs[i]))
             {
-                BoundExpression* rbe =
-                    dynamic_cast<BoundExpression*>(unboundArgs[i]);
-                bind2(nameCount, be->value(), rbe->value(), assignments,
-                      windowSize);
+                BoundExpression* rbe = dynamic_cast<BoundExpression*>(unboundArgs[i]);
+                bind2(nameCount, be->value(), rbe->value(), assignments, windowSize);
             }
         }
 
@@ -990,8 +926,7 @@ namespace IPCore::Shader
 
             if (Shader::debuggingType() == Shader::AllDebugInfo)
             {
-                cout << "INFO: binding variable " << S->glslTypeName() << " "
-                     << name << " at " << location << " :: value = ";
+                cout << "INFO: binding variable " << S->glslTypeName() << " " << name << " at " << location << " :: value = ";
 
                 b->output(cout);
                 cout << endl;
@@ -1067,13 +1002,11 @@ namespace IPCore::Shader
 
             case Symbol::Coord2DRectType:
 
-                if (BoundImageCoordName* bcoord =
-                        dynamic_cast<BoundImageCoordName*>(b))
+                if (BoundImageCoordName* bcoord = dynamic_cast<BoundImageCoordName*>(b))
                 {
                     const string& idhash = bcoord->value().name;
 
-                    if (const ImageAndCoordinateUnit* icu =
-                            findTextureAssignment(S, idhash, 0, assignments))
+                    if (const ImageAndCoordinateUnit* icu = findTextureAssignment(S, idhash, 0, assignments))
                     {
                         // bcoord->value().index = icu->coordinateSet;
                     }
@@ -1085,17 +1018,13 @@ namespace IPCore::Shader
             case Symbol::Sampler2DRectType:
             case Symbol::Sampler3DType:
 
-                if (const BoundSampler* bsampler =
-                        dynamic_cast<const BoundSampler*>(b))
+                if (const BoundSampler* bsampler = dynamic_cast<const BoundSampler*>(b))
                 {
                     ImageOrFB ifb = bsampler->value();
-                    const string idhash =
-                        ifb.fb ? ifb.fb->identifier() : ifb.image->graphID();
+                    const string idhash = ifb.fb ? ifb.fb->identifier() : ifb.image->graphID();
                     const size_t plane = bsampler->value().plane;
 
-                    if (const ImageAndCoordinateUnit* icu =
-                            findTextureAssignment(S, idhash, plane,
-                                                  assignments))
+                    if (const ImageAndCoordinateUnit* icu = findTextureAssignment(S, idhash, plane, assignments))
                     {
                         glUniform1i(location, icu->textureUnit);
                         TWK_GLDEBUG;
@@ -1111,10 +1040,8 @@ namespace IPCore::Shader
                         cout << endl << "ERROR: assignments = " << endl;
 
                         for (size_t i = 0; i < assignments.size(); i++)
-                            cout << assignments[i].textureUnit << " / "
-                                 << assignments[i].coordinateSet << " -> "
-                                 << assignments[i].idhash << " ("
-                                 << assignments[i].graphID << ")" << endl;
+                            cout << assignments[i].textureUnit << " / " << assignments[i].coordinateSet << " -> " << assignments[i].idhash
+                                 << " (" << assignments[i].graphID << ")" << endl;
                     }
                 }
                 break;
@@ -1138,8 +1065,7 @@ namespace IPCore::Shader
 
     void ProgramCache::flush()
     {
-        for (ProgramCacheMap::iterator i = m_programCache.begin();
-             i != m_programCache.end(); ++i)
+        for (ProgramCacheMap::iterator i = m_programCache.begin(); i != m_programCache.end(); ++i)
         {
             //
             //  (*i).first will be deleted when (*i).second is deleted.

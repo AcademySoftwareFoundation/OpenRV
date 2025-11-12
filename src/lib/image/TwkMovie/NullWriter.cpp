@@ -28,8 +28,7 @@ namespace TwkMovie
 
     NullWriter::~NullWriter() {}
 
-    bool NullWriter::write(Movie* inMovie, const string& filename,
-                           WriteRequest& request)
+    bool NullWriter::write(Movie* inMovie, const string& filename, WriteRequest& request)
     {
         Frames frames;
         vector<float> audioBuffer;
@@ -109,10 +108,7 @@ namespace TwkMovie
                 cout << "INFO: stats:"
                      << " " << double(i) / t << " fps, "
                      << "[" << (1.0 / minf) << ", " << (1.0 / maxf) << "] "
-                     << " ("
-                     << int(float(i) / float(frames.size() - 1) * 10000.0)
-                            / float(100.0)
-                     << "% done)" << endl;
+                     << " (" << int(float(i) / float(frames.size() - 1) * 10000.0) / float(100.0) << "% done)" << endl;
 
                 last = t;
             }

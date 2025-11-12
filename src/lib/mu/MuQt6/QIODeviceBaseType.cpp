@@ -47,8 +47,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  Mu Type CONSTRUCTORS
 
-    QIODeviceBaseType::QIODeviceBaseType(Context* c, const char* name,
-                                         Class* super)
+    QIODeviceBaseType::QIODeviceBaseType(Context* c, const char* name, Class* super)
         : Class(c, name, super)
     {
     }
@@ -108,40 +107,27 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
                    EndArguments);
 
         addSymbols(
             // enums
-            new Alias(c, "OpenModeFlag", "int"),
-            new Alias(c, "OpenMode", "int"),
-            new SymbolicConstant(c, "NotOpen", "int",
-                                 Value(int(QIODeviceBase::NotOpen))),
-            new SymbolicConstant(c, "ReadOnly", "int",
-                                 Value(int(QIODeviceBase::ReadOnly))),
-            new SymbolicConstant(c, "WriteOnly", "int",
-                                 Value(int(QIODeviceBase::WriteOnly))),
-            new SymbolicConstant(c, "ReadWrite", "int",
-                                 Value(int(QIODeviceBase::ReadWrite))),
-            new SymbolicConstant(c, "Append", "int",
-                                 Value(int(QIODeviceBase::Append))),
-            new SymbolicConstant(c, "Truncate", "int",
-                                 Value(int(QIODeviceBase::Truncate))),
-            new SymbolicConstant(c, "Text", "int",
-                                 Value(int(QIODeviceBase::Text))),
-            new SymbolicConstant(c, "Unbuffered", "int",
-                                 Value(int(QIODeviceBase::Unbuffered))),
-            new SymbolicConstant(c, "NewOnly", "int",
-                                 Value(int(QIODeviceBase::NewOnly))),
-            new SymbolicConstant(c, "ExistingOnly", "int",
-                                 Value(int(QIODeviceBase::ExistingOnly))),
+            new Alias(c, "OpenModeFlag", "int"), new Alias(c, "OpenMode", "int"),
+            new SymbolicConstant(c, "NotOpen", "int", Value(int(QIODeviceBase::NotOpen))),
+            new SymbolicConstant(c, "ReadOnly", "int", Value(int(QIODeviceBase::ReadOnly))),
+            new SymbolicConstant(c, "WriteOnly", "int", Value(int(QIODeviceBase::WriteOnly))),
+            new SymbolicConstant(c, "ReadWrite", "int", Value(int(QIODeviceBase::ReadWrite))),
+            new SymbolicConstant(c, "Append", "int", Value(int(QIODeviceBase::Append))),
+            new SymbolicConstant(c, "Truncate", "int", Value(int(QIODeviceBase::Truncate))),
+            new SymbolicConstant(c, "Text", "int", Value(int(QIODeviceBase::Text))),
+            new SymbolicConstant(c, "Unbuffered", "int", Value(int(QIODeviceBase::Unbuffered))),
+            new SymbolicConstant(c, "NewOnly", "int", Value(int(QIODeviceBase::NewOnly))),
+            new SymbolicConstant(c, "ExistingOnly", "int", Value(int(QIODeviceBase::ExistingOnly))),
             // member functions
             // static functions
             EndArguments);

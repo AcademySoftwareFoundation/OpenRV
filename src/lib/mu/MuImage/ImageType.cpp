@@ -57,8 +57,7 @@ namespace Mu
         return ry0 * pa + ry * pb;
     }
 
-    static void readTIFF(ImageType::ImageStruct* im,
-                         const Mu::String& imgFileName, Thread& thread)
+    static void readTIFF(ImageType::ImageStruct* im, const Mu::String& imgFileName, Thread& thread)
     {
         Process* process = thread.process();
         MuLangContext* context = (MuLangContext*)process->context();
@@ -74,10 +73,8 @@ namespace Mu
 
         if (!tif)
         {
-            const Mu::MuLangContext* context =
-                static_cast<const Mu::MuLangContext*>(thread.context());
-            ExceptionType::Exception* e =
-                new ExceptionType::Exception(context->exceptionType());
+            const Mu::MuLangContext* context = static_cast<const Mu::MuLangContext*>(thread.context());
+            ExceptionType::Exception* e = new ExceptionType::Exception(context->exceptionType());
             e->string() = "failed to open image \"";
             e->string() += imgFileName;
             e->string() += "\"";
@@ -98,21 +95,17 @@ namespace Mu
         im->width = width;
         im->height = height;
 
-        TIFFGetFieldDefaulted(tif, TIFFTAG_EXTRASAMPLES, &extrasamples,
-                              &sampleinfo);
+        TIFFGetFieldDefaulted(tif, TIFFTAG_EXTRASAMPLES, &extrasamples, &sampleinfo);
 
         unsigned short orient = ORIENTATION_TOPLEFT;
         TIFFGetField(tif, TIFFTAG_ORIENTATION, &orient);
-        bool flip =
-            orient == ORIENTATION_BOTLEFT || orient == ORIENTATION_BOTRIGHT;
-        bool flop =
-            orient == ORIENTATION_BOTRIGHT || orient == ORIENTATION_TOPRIGHT;
+        bool flip = orient == ORIENTATION_BOTLEFT || orient == ORIENTATION_BOTRIGHT;
+        bool flop = orient == ORIENTATION_BOTRIGHT || orient == ORIENTATION_TOPRIGHT;
         flop = false;
 
         bool hasAlpha = extrasamples == 1 ? true : false;
 
-        DynamicArrayType* dataType = static_cast<DynamicArrayType*>(
-            context->arrayType(context->vec4fType(), 1, 0));
+        DynamicArrayType* dataType = static_cast<DynamicArrayType*>(context->arrayType(context->vec4fType(), 1, 0));
         im->data = new DynamicArray(dataType, 1);
         im->data->resize(width * height);
 
@@ -233,10 +226,8 @@ namespace Mu
             TIFFClose(tif);
             {
                 width = 0;
-                const Mu::MuLangContext* context =
-                    static_cast<const Mu::MuLangContext*>(thread.context());
-                ExceptionType::Exception* e =
-                    new ExceptionType::Exception(context->exceptionType());
+                const Mu::MuLangContext* context = static_cast<const Mu::MuLangContext*>(thread.context());
+                ExceptionType::Exception* e = new ExceptionType::Exception(context->exceptionType());
                 e->string() = "Unsupported bit depth in image file \"";
                 e->string() += imgFileName;
                 e->string() += "\"";
@@ -277,18 +268,15 @@ namespace Mu
 
         s->addSymbols(new ReferenceType(c, "image&", this),
 
-                      new Function(c, "image", ImageType::construct, None,
-                                   Return, tn, Args, "string", End),
+                      new Function(c, "image", ImageType::construct, None, Return, tn, Args, "string", End),
 
-                      new Function(c, "image", BaseFunctions::dereference, Cast,
-                                   Return, tn, Args, rn, End),
+                      new Function(c, "image", BaseFunctions::dereference, Cast, Return, tn, Args, rn, End),
 
                       EndArguments);
 
         globalScope()->addSymbols(
 
-            new Function(c, "=", BaseFunctions::assign, AsOp, Return, rn, Args,
-                         rn, tn, End),
+            new Function(c, "=", BaseFunctions::assign, AsOp, Return, rn, Args, rn, tn, End),
 
             EndArguments);
 
@@ -300,14 +288,10 @@ namespace Mu
         context->arrayType(context->byteType(), 1, 0);
         context->arrayType(context->floatType(), 1, 0);
 
-        addSymbols(new MemberVariable(c, "name", "string"),
-                   new MemberVariable(c, "data", "(vector float[4])[]"),
-                   new MemberVariable(c, "width", "int"),
-                   new MemberVariable(c, "height", "int"),
+        addSymbols(new MemberVariable(c, "name", "string"), new MemberVariable(c, "data", "(vector float[4])[]"),
+                   new MemberVariable(c, "width", "int"), new MemberVariable(c, "height", "int"),
 
-                   new Function(c, "()", ImageType::sample, Mapped, Return,
-                                "vector float[4]", Args, tn, "float", "float",
-                                End),
+                   new Function(c, "()", ImageType::sample, Mapped, Return, "vector float[4]", Args, tn, "float", "float", End),
 
                    EndArguments);
     }

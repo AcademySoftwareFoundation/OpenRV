@@ -86,20 +86,13 @@ namespace TwkMath
         explicit Quaternion(const Mat44<T>& m) { setValue(m); }
 
         // Axis-angle constructor
-        Quaternion(const Vec3<T>& axis, const T& radians)
-        {
-            setValue(axis, radians);
-        }
+        Quaternion(const Vec3<T>& axis, const T& radians) { setValue(axis, radians); }
 
         // Euler angle constructor
-        Quaternion(const Vec3<T>& rotateFrom, const Vec3<T>& rotateTo)
-        {
-            setValue(rotateFrom, rotateTo);
-        }
+        Quaternion(const Vec3<T>& rotateFrom, const Vec3<T>& rotateTo) { setValue(rotateFrom, rotateTo); }
 
         // Highly constrained rotation
-        Quaternion(const Vec3<T>& fromLook, const Vec3<T>& fromUp,
-                   const Vec3<T>& toLook, const Vec3<T>& toUp)
+        Quaternion(const Vec3<T>& fromLook, const Vec3<T>& fromUp, const Vec3<T>& toLook, const Vec3<T>& toUp)
         {
             setValue(fromLook, fromUp, toLook, toUp);
         }
@@ -187,8 +180,7 @@ namespace TwkMath
         void setValue(const Mat44<T>& m);
         void setValue(const Vec3<T>& axis, const T& theta);
         void setValue(const Vec3<T>& rotateFrom, const Vec3<T>& rotateTo);
-        void setValue(const Vec3<T>& fromLook, const Vec3<T>& fromUp,
-                      const Vec3<T>& toLook, const Vec3<T>& toUp);
+        void setValue(const Vec3<T>& fromLook, const Vec3<T>& fromUp, const Vec3<T>& toLook, const Vec3<T>& toUp);
 
         //**************************************************************************
         // GEOMETRIC OPERATIONS
@@ -231,8 +223,7 @@ namespace TwkMath
     // TEMPLATE AND INLINE FUNCTIONS
     //*****************************************************************************
     //*****************************************************************************
-    template <typename T>
-    inline T& Quaternion<T>::operator[](Quaternion<T>::size_type i)
+    template <typename T> inline T& Quaternion<T>::operator[](Quaternion<T>::size_type i)
     {
         assert(i < 4);
 #ifdef COMPILER_GCC2
@@ -243,8 +234,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <typename T>
-    inline const T& Quaternion<T>::operator[](Quaternion<T>::size_type i) const
+    template <typename T> inline const T& Quaternion<T>::operator[](Quaternion<T>::size_type i) const
     {
         assert(i < 4);
 #ifdef COMPILER_GCC2
@@ -255,8 +245,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <typename T>
-    void Quaternion<T>::value(Vec3<T>& axis, T& radians) const
+    template <typename T> void Quaternion<T>::value(Vec3<T>& axis, T& radians) const
     {
         radians = Math<T>::acos(w) * (T)2;
         if (radians == T0)
@@ -361,14 +350,10 @@ namespace TwkMath
     }
 
     //*************************************************************************
-    template <typename T> inline void Quaternion<T>::makeIdentity()
-    {
-        setValue(Vec3<T>(T0, T0, T1), T0);
-    }
+    template <typename T> inline void Quaternion<T>::makeIdentity() { setValue(Vec3<T>(T0, T0, T1), T0); }
 
     //******************************************************************************
-    template <typename T>
-    void Quaternion<T>::setValue(const Vec3<T>& axis, const T& theta)
+    template <typename T> void Quaternion<T>::setValue(const Vec3<T>& axis, const T& theta)
     {
         const T alen2 = axis.magnitudeSquared();
 
@@ -397,9 +382,7 @@ namespace TwkMath
     }
 
     //*****************************************************************************
-    template <typename T>
-    void Quaternion<T>::setValue(const Vec3<T>& rotateFrom,
-                                 const Vec3<T>& rotateTo)
+    template <typename T> void Quaternion<T>::setValue(const Vec3<T>& rotateFrom, const Vec3<T>& rotateTo)
     {
         Vec3<T> p1(rotateFrom.normalized());
 
@@ -498,8 +481,7 @@ namespace TwkMath
     }
 
     //*****************************************************************************
-    template <typename T>
-    inline void Quaternion<T>::scaleAngle(const T& scaleFactor)
+    template <typename T> inline void Quaternion<T>::scaleAngle(const T& scaleFactor)
     {
         Vec3<T> axis;
         T radians;
@@ -523,8 +505,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <typename T>
-    Quaternion<T>& Quaternion<T>::operator*=(const Quaternion<T>& qr)
+    template <typename T> Quaternion<T>& Quaternion<T>::operator*=(const Quaternion<T>& qr)
     {
         Quaternion<T> ql(*this);
 
@@ -544,57 +525,33 @@ namespace TwkMath
     // FUNCTIONS WHICH OPERATE ON QUATERNIONS
     //******************************************************************************
     //******************************************************************************
-    template <typename T>
-    inline bool areEquivalent(const Quaternion<T>& q1, const Quaternion<T>& q2,
-                              const T& tolerance)
+    template <typename T> inline bool areEquivalent(const Quaternion<T>& q1, const Quaternion<T>& q2, const T& tolerance)
     {
-        const T t = Math<T>::sqr(q1.x - q2.x) + Math<T>::sqr(q1.y - q2.y)
-                    + Math<T>::sqr(q1.z - q2.z) + Math<T>::sqr(q1.w - q2.w);
+        const T t = Math<T>::sqr(q1.x - q2.x) + Math<T>::sqr(q1.y - q2.y) + Math<T>::sqr(q1.z - q2.z) + Math<T>::sqr(q1.w - q2.w);
 
         return (t <= tolerance);
     }
 
     //******************************************************************************
-    template <typename T> inline void normalize(Quaternion<T>& q)
-    {
-        q.normalize();
-    }
+    template <typename T> inline void normalize(Quaternion<T>& q) { q.normalize(); }
 
     //******************************************************************************
-    template <typename T>
-    inline Quaternion<T> normalized(const Quaternion<T>& q)
-    {
-        return q.normalized();
-    }
+    template <typename T> inline Quaternion<T> normalized(const Quaternion<T>& q) { return q.normalized(); }
 
     //******************************************************************************
-    template <typename T> inline void conjugate(Quaternion<T>& q)
-    {
-        q.conjugate();
-    }
+    template <typename T> inline void conjugate(Quaternion<T>& q) { q.conjugate(); }
 
     //******************************************************************************
-    template <typename T>
-    inline Quaternion<T> conjugated(const Quaternion<T>& q)
-    {
-        return q.conjugated();
-    }
+    template <typename T> inline Quaternion<T> conjugated(const Quaternion<T>& q) { return q.conjugated(); }
 
     //******************************************************************************
     template <typename T> inline void invert(Quaternion<T>& q) { q.invert(); }
 
     //******************************************************************************
-    template <typename T> inline Quaternion<T> inverted(const Quaternion<T>& q)
-    {
-        return q.inverted();
-    }
+    template <typename T> inline Quaternion<T> inverted(const Quaternion<T>& q) { return q.inverted(); }
 
     //******************************************************************************
-    template <typename T>
-    inline void scaleAngle(Quaternion<T>& q, const T& angScale)
-    {
-        q.scaleAngle(q);
-    }
+    template <typename T> inline void scaleAngle(Quaternion<T>& q, const T& angScale) { q.scaleAngle(q); }
 
     //*****************************************************************************
     //*****************************************************************************
@@ -604,9 +561,7 @@ namespace TwkMath
     // "animation friendly" way.
     //*****************************************************************************
     //*****************************************************************************
-    template <typename T>
-    Quaternion<T> slerp(const Quaternion<T>& p, const Quaternion<T>& q,
-                        const T& alph)
+    template <typename T> Quaternion<T> slerp(const Quaternion<T>& p, const Quaternion<T>& q, const T& alph)
     {
         T cosOmega = (p.x * q.x) + (p.y * q.y) + (p.z * q.z) + (p.w * q.w);
 
@@ -637,9 +592,8 @@ namespace TwkMath
             alpha = -alpha;
         }
 
-        return Quaternion<T>(
-            (beta * p.x) + (alpha * q.x), (beta * p.y) + (alpha * q.y),
-            (beta * p.z) + (alpha * q.z), (beta * p.w) + (alpha * q.w));
+        return Quaternion<T>((beta * p.x) + (alpha * q.x), (beta * p.y) + (alpha * q.y), (beta * p.z) + (alpha * q.z),
+                             (beta * p.w) + (alpha * q.w));
     }
 
     //******************************************************************************
@@ -650,26 +604,20 @@ namespace TwkMath
     // VECTOR MULTIPLICATION
     // Quaternion multiplication with cartesion vector
     // v' = q*v*q(star)
-    template <typename T>
-    Vec3<T> operator*(const Quaternion<T>& q, const Vec3<T>& v)
+    template <typename T> Vec3<T> operator*(const Quaternion<T>& q, const Vec3<T>& v)
     {
         const T vCoef = (q.w * q.w) - (q.x * q.x) - (q.y * q.y) - (q.z * q.z);
         const T uCoef = T2 * ((v[0] * q.x) + (v[1] * q.y) + (v[2] * q.z));
         const T cCoef = T2 * q.w;
 
-        return Vec3<T>((vCoef * v[0]) + (uCoef * q.x)
-                           + (cCoef * ((q.y * v[2]) - (q.z * v[1]))),
-                       (vCoef * v[1]) + (uCoef * q.y)
-                           + (cCoef * ((q.z * v[0]) - (q.x * v[2]))),
-                       (vCoef * v[2]) + (uCoef * q.z)
-                           + (cCoef * ((q.x * v[1]) - (q.y * v[0]))));
+        return Vec3<T>((vCoef * v[0]) + (uCoef * q.x) + (cCoef * ((q.y * v[2]) - (q.z * v[1]))),
+                       (vCoef * v[1]) + (uCoef * q.y) + (cCoef * ((q.z * v[0]) - (q.x * v[2]))),
+                       (vCoef * v[2]) + (uCoef * q.z) + (cCoef * ((q.x * v[1]) - (q.y * v[0]))));
     }
 
     //******************************************************************************
     // QUATERNION MULTIPLICATION
-    template <typename T>
-    inline Quaternion<T> operator*(const Quaternion<T>& q1,
-                                   const Quaternion<T>& q2)
+    template <typename T> inline Quaternion<T> operator*(const Quaternion<T>& q1, const Quaternion<T>& q2)
     {
         Quaternion<T> r(q1);
         r *= q2;
@@ -678,8 +626,7 @@ namespace TwkMath
 
     //*****************************************************************************
     template <typename T>
-    void Quaternion<T>::setValue(const Vec3<T>& fromLook, const Vec3<T>& fromUp,
-                                 const Vec3<T>& toLook, const Vec3<T>& toUp)
+    void Quaternion<T>::setValue(const Vec3<T>& fromLook, const Vec3<T>& fromUp, const Vec3<T>& toLook, const Vec3<T>& toUp)
     {
         Quaternion<T> rLook(fromLook, toLook);
 
@@ -697,19 +644,15 @@ namespace TwkMath
     // COMPARISON OPERATORS
     //******************************************************************************
     //******************************************************************************
-    template <typename T>
-    inline bool operator==(const Quaternion<T>& q1, const Quaternion<T>& q2)
+    template <typename T> inline bool operator==(const Quaternion<T>& q1, const Quaternion<T>& q2)
     {
-        return ((q1.x == q2.x) && (q1.y == q2.y) && (q1.z == q2.z)
-                && (q1.w == q2.w));
+        return ((q1.x == q2.x) && (q1.y == q2.y) && (q1.z == q2.z) && (q1.w == q2.w));
     }
 
     //******************************************************************************
-    template <typename T>
-    inline bool operator!=(const Quaternion<T>& q1, const Quaternion<T>& q2)
+    template <typename T> inline bool operator!=(const Quaternion<T>& q1, const Quaternion<T>& q2)
     {
-        return ((q1.x != q2.x) || (q1.y != q2.y) || (q1.z != q2.z)
-                || (q1.w != q2.w));
+        return ((q1.x != q2.x) || (q1.y != q2.y) || (q1.z != q2.z) || (q1.w != q2.w));
     }
 
 } // End namespace TwkMath

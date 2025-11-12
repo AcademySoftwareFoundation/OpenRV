@@ -20,8 +20,7 @@ namespace TwkQtChat
         Q_OBJECT
 
     public:
-        Server(QObject* parent = 0, int port = 45124,
-               ConnectionFactory fact = 0);
+        Server(QObject* parent = 0, int port = 45124, ConnectionFactory fact = 0);
 
     signals:
         void newConnection(Connection* connection);

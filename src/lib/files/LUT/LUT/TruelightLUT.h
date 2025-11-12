@@ -12,8 +12,7 @@
 namespace LUT
 {
 
-    void readTruelightLUT(const std::string& filename, const std::string& type,
-                          LUTData& data);
+    void readTruelightLUT(const std::string& filename, const std::string& type, LUTData& data);
 
 } // namespace LUT
 

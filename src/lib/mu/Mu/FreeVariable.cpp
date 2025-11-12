@@ -11,28 +11,22 @@ namespace Mu
 {
     using namespace std;
 
-    FreeVariable::FreeVariable(Context* context, const char* name,
-                               const Type* storageClass)
+    FreeVariable::FreeVariable(Context* context, const char* name, const Type* storageClass)
         : ParameterVariable(context, name, storageClass)
     {
     }
 
-    FreeVariable::FreeVariable(Context* context, const char* name,
-                               const char* storageClass)
+    FreeVariable::FreeVariable(Context* context, const char* name, const char* storageClass)
         : ParameterVariable(context, name, storageClass)
     {
     }
 
-    FreeVariable::FreeVariable(Context* context, const char* name,
-                               const Type* storageClass,
-                               const Value& defaultValue)
+    FreeVariable::FreeVariable(Context* context, const char* name, const Type* storageClass, const Value& defaultValue)
         : ParameterVariable(context, name, storageClass, defaultValue)
     {
     }
 
-    FreeVariable::FreeVariable(Context* context, const char* name,
-                               const char* storageClass,
-                               const Value& defaultValue)
+    FreeVariable::FreeVariable(Context* context, const char* name, const char* storageClass, const Value& defaultValue)
         : ParameterVariable(context, name, storageClass, defaultValue)
     {
     }

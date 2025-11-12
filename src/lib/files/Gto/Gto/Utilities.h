@@ -23,10 +23,7 @@ namespace Gto
         uint32 w;
     };
 
-    inline Dimensions makeDimensions(const DimStruct& ds)
-    {
-        return Dimensions(ds.x, ds.y, ds.y, ds.w);
-    }
+    inline Dimensions makeDimensions(const DimStruct& ds) { return Dimensions(ds.x, ds.y, ds.y, ds.w); }
 
     inline DimStruct makeDimStruct(const Dimensions& d)
     {

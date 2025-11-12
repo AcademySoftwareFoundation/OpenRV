@@ -30,6 +30,10 @@ SET(RV_DEPS_PYTHON_VERSION_SHORT
     "${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}"
 )
 
+# This version is used for:
+# 1. Building OpenTimelineIO from source for Windows debug builds
+# 2. Generating src/build/requirements.txt from requirements.txt.in template
+#    (used by all other platforms/builds to install from PyPI)
 SET(_opentimelineio_version
     "${RV_DEPS_OTIO_VERSION}"
 )
@@ -249,8 +253,18 @@ ELSE() # Not WINDOWS
   )
 ENDIF()
 
-SET(_requirements_file
-    "${PROJECT_SOURCE_DIR}/src/build/requirements.txt"
+# Generate requirements.txt from template with the OpenTimelineIO version substituted
+SET(_requirements_input_file
+    "${PROJECT_SOURCE_DIR}/src/build/requirements.txt.in"
+)
+SET(_requirements_output_file
+    "${CMAKE_BINARY_DIR}/requirements.txt"
+)
+
+CONFIGURE_FILE(
+    ${_requirements_input_file}
+    ${_requirements_output_file}
+    @ONLY
 )
 
 IF(RV_TARGET_WINDOWS)
@@ -269,18 +283,18 @@ IF(RV_TARGET_WINDOWS)
         ${CMAKE_COMMAND} -E env
         "OTIO_CXX_DEBUG_BUILD=1"
         "CMAKE_ARGS=-DPYTHON_LIBRARY=${_python3_implib} -DPYTHON_INCLUDE_DIR=${_include_dir} -DPYTHON_EXECUTABLE=${_python3_executable}"
-        "${_python3_executable}" -m pip install --upgrade -r "${_requirements_file}"
+        "${_python3_executable}" -m pip install --upgrade -r "${_requirements_output_file}"
     )
   ELSE()
     SET(_requirements_install_command
         ${CMAKE_COMMAND} -E env
         "CMAKE_ARGS=-DPYTHON_LIBRARY=${_python3_implib} -DPYTHON_INCLUDE_DIR=${_include_dir} -DPYTHON_EXECUTABLE=${_python3_executable}"
-        "${_python3_executable}" -m pip install --upgrade -r "${_requirements_file}"
+        "${_python3_executable}" -m pip install --upgrade -r "${_requirements_output_file}"
     )
   ENDIF()
 ELSE()
   SET(_requirements_install_command
-      "${_python3_executable}" -m pip install --upgrade -r "${_requirements_file}"
+      "${_python3_executable}" -m pip install --upgrade -r "${_requirements_output_file}"
   )
 ENDIF()
 
@@ -364,11 +378,11 @@ SET(${_python3_target}-requirements-flag
 )
 
 ADD_CUSTOM_COMMAND(
-  COMMENT "Installing requirements from ${_requirements_file}"
+  COMMENT "Installing requirements from ${_requirements_output_file}"
   OUTPUT ${${_python3_target}-requirements-flag}
   COMMAND ${_requirements_install_command}
   COMMAND cmake -E touch ${${_python3_target}-requirements-flag}
-  DEPENDS ${_python3_target} ${_requirements_file}
+  DEPENDS ${_python3_target} ${_requirements_output_file} ${_requirements_input_file}
 )
 
 IF(RV_TARGET_WINDOWS
@@ -380,7 +394,7 @@ IF(RV_TARGET_WINDOWS
     POST_BUILD
     COMMENT "Copying Debug Python lib as a unversionned file for Debug"
     COMMAND cmake -E copy_if_different ${_python3_implib} ${_python_release_libpath}
-    COMMAND cmake -E copy_if_different ${_python3_implib} ${_python_release_in_bin_libpath} DEPENDS ${_python3_target} ${_requirements_file}
+    COMMAND cmake -E copy_if_different ${_python3_implib} ${_python_release_in_bin_libpath} DEPENDS ${_python3_target} ${_requirements_output_file} ${_requirements_input_file}
   )
 ENDIF()
 

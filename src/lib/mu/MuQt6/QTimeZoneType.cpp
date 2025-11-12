@@ -56,47 +56,38 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(__allocate, Pointer)
     {
-        QTimeZoneType::Instance* i =
-            new QTimeZoneType::Instance((Class*)NODE_THIS.type());
+        QTimeZoneType::Instance* i = new QTimeZoneType::Instance((Class*)NODE_THIS.type());
         QTimeZoneType::registerFinalizer(i);
         NODE_RETURN(i);
     }
 
-    void QTimeZoneType::registerFinalizer(void* o)
-    {
-        GC_register_finalizer(o, QTimeZoneType::finalizer, 0, 0, 0);
-    }
+    void QTimeZoneType::registerFinalizer(void* o) { GC_register_finalizer(o, QTimeZoneType::finalizer, 0, 0, 0); }
 
     void QTimeZoneType::finalizer(void* obj, void* data)
     {
-        QTimeZoneType::Instance* i =
-            reinterpret_cast<QTimeZoneType::Instance*>(obj);
+        QTimeZoneType::Instance* i = reinterpret_cast<QTimeZoneType::Instance*>(obj);
         delete i;
     }
 
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    Pointer qt_QTimeZone_QTimeZone_QTimeZone_QTimeZone(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this)
+    Pointer qt_QTimeZone_QTimeZone_QTimeZone_QTimeZone(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         setqtype<QTimeZoneType>(param_this, QTimeZone());
         return param_this;
     }
 
-    Pointer qt_QTimeZone_QTimeZone_QTimeZone_QTimeZone_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_spec)
+    Pointer qt_QTimeZone_QTimeZone_QTimeZone_QTimeZone_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_spec)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-        QTimeZone::Initialization arg1 =
-            (QTimeZone::Initialization)(param_spec);
+        QTimeZone::Initialization arg1 = (QTimeZone::Initialization)(param_spec);
         setqtype<QTimeZoneType>(param_this, QTimeZone(arg1));
         return param_this;
     }
 
-    Pointer qt_QTimeZone_QTimeZone_QTimeZone_QTimeZone_QByteArray(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_ianaId)
+    Pointer qt_QTimeZone_QTimeZone_QTimeZone_QTimeZone_QByteArray(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_ianaId)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QByteArray arg1 = getqtype<QByteArrayType>(param_ianaId);
@@ -104,11 +95,11 @@ namespace Mu
         return param_this;
     }
 
-    Pointer
-    qt_QTimeZone_QTimeZone_QTimeZone_QTimeZone_QByteArray_int_string_string_int_string(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_ianaId,
-        int param_offsetSeconds, Pointer param_name, Pointer param_abbreviation,
-        int param_territory, Pointer param_comment)
+    Pointer qt_QTimeZone_QTimeZone_QTimeZone_QTimeZone_QByteArray_int_string_string_int_string(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                               Pointer param_ianaId,
+                                                                                               int param_offsetSeconds, Pointer param_name,
+                                                                                               Pointer param_abbreviation,
+                                                                                               int param_territory, Pointer param_comment)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QByteArray arg1 = getqtype<QByteArrayType>(param_ianaId);
@@ -117,13 +108,11 @@ namespace Mu
         const QString arg4 = qstring(param_abbreviation);
         QLocale::Territory arg5 = (QLocale::Territory)(param_territory);
         const QString arg6 = qstring(param_comment);
-        setqtype<QTimeZoneType>(param_this,
-                                QTimeZone(arg1, arg2, arg3, arg4, arg5, arg6));
+        setqtype<QTimeZoneType>(param_this, QTimeZone(arg1, arg2, arg3, arg4, arg5, arg6));
         return param_this;
     }
 
-    Pointer qt_QTimeZone_abbreviation_string_QTimeZone_QDateTime(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_atDateTime)
+    Pointer qt_QTimeZone_abbreviation_string_QTimeZone_QDateTime(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_atDateTime)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTimeZone arg0 = getqtype<QTimeZoneType>(param_this);
@@ -131,26 +120,21 @@ namespace Mu
         return makestring(c, arg0.abbreviation(arg1));
     }
 
-    Pointer
-    qt_QTimeZone_asBackendZone_QTimeZone_QTimeZone(Mu::Thread& NODE_THREAD,
-                                                   Pointer param_this)
+    Pointer qt_QTimeZone_asBackendZone_QTimeZone_QTimeZone(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTimeZone arg0 = getqtype<QTimeZoneType>(param_this);
-        return makeqtype<QTimeZoneType>(c, arg0.asBackendZone(),
-                                        "qt.QTimeZone");
+        return makeqtype<QTimeZoneType>(c, arg0.asBackendZone(), "qt.QTimeZone");
     }
 
-    Pointer qt_QTimeZone_comment_string_QTimeZone(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this)
+    Pointer qt_QTimeZone_comment_string_QTimeZone(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTimeZone arg0 = getqtype<QTimeZoneType>(param_this);
         return makestring(c, arg0.comment());
     }
 
-    int qt_QTimeZone_daylightTimeOffset_int_QTimeZone_QDateTime(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_atDateTime)
+    int qt_QTimeZone_daylightTimeOffset_int_QTimeZone_QDateTime(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_atDateTime)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTimeZone arg0 = getqtype<QTimeZoneType>(param_this);
@@ -158,41 +142,35 @@ namespace Mu
         return arg0.daylightTimeOffset(arg1);
     }
 
-    int
-    qt_QTimeZone_fixedSecondsAheadOfUtc_int_QTimeZone(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    int qt_QTimeZone_fixedSecondsAheadOfUtc_int_QTimeZone(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTimeZone arg0 = getqtype<QTimeZoneType>(param_this);
         return arg0.fixedSecondsAheadOfUtc();
     }
 
-    bool qt_QTimeZone_hasDaylightTime_bool_QTimeZone(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_this)
+    bool qt_QTimeZone_hasDaylightTime_bool_QTimeZone(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTimeZone arg0 = getqtype<QTimeZoneType>(param_this);
         return arg0.hasDaylightTime();
     }
 
-    bool qt_QTimeZone_hasTransitions_bool_QTimeZone(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this)
+    bool qt_QTimeZone_hasTransitions_bool_QTimeZone(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTimeZone arg0 = getqtype<QTimeZoneType>(param_this);
         return arg0.hasTransitions();
     }
 
-    Pointer qt_QTimeZone_id_QByteArray_QTimeZone(Mu::Thread& NODE_THREAD,
-                                                 Pointer param_this)
+    Pointer qt_QTimeZone_id_QByteArray_QTimeZone(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTimeZone arg0 = getqtype<QTimeZoneType>(param_this);
         return makeqtype<QByteArrayType>(c, arg0.id(), "qt.QByteArray");
     }
 
-    bool qt_QTimeZone_isDaylightTime_bool_QTimeZone_QDateTime(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_atDateTime)
+    bool qt_QTimeZone_isDaylightTime_bool_QTimeZone_QDateTime(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_atDateTime)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTimeZone arg0 = getqtype<QTimeZoneType>(param_this);
@@ -200,24 +178,21 @@ namespace Mu
         return arg0.isDaylightTime(arg1);
     }
 
-    bool qt_QTimeZone_isUtcOrFixedOffset_bool_QTimeZone(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this)
+    bool qt_QTimeZone_isUtcOrFixedOffset_bool_QTimeZone(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTimeZone arg0 = getqtype<QTimeZoneType>(param_this);
         return arg0.isUtcOrFixedOffset();
     }
 
-    bool qt_QTimeZone_isValid_bool_QTimeZone(Mu::Thread& NODE_THREAD,
-                                             Pointer param_this)
+    bool qt_QTimeZone_isValid_bool_QTimeZone(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTimeZone arg0 = getqtype<QTimeZoneType>(param_this);
         return arg0.isValid();
     }
 
-    int qt_QTimeZone_offsetFromUtc_int_QTimeZone_QDateTime(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_atDateTime)
+    int qt_QTimeZone_offsetFromUtc_int_QTimeZone_QDateTime(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_atDateTime)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTimeZone arg0 = getqtype<QTimeZoneType>(param_this);
@@ -225,8 +200,7 @@ namespace Mu
         return arg0.offsetFromUtc(arg1);
     }
 
-    int qt_QTimeZone_standardTimeOffset_int_QTimeZone_QDateTime(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_atDateTime)
+    int qt_QTimeZone_standardTimeOffset_int_QTimeZone_QDateTime(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_atDateTime)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTimeZone arg0 = getqtype<QTimeZoneType>(param_this);
@@ -234,9 +208,7 @@ namespace Mu
         return arg0.standardTimeOffset(arg1);
     }
 
-    void qt_QTimeZone_swap_void_QTimeZone_QTimeZone(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this,
-                                                    Pointer param_other)
+    void qt_QTimeZone_swap_void_QTimeZone_QTimeZone(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_other)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTimeZone arg0 = getqtype<QTimeZoneType>(param_this);
@@ -245,24 +217,21 @@ namespace Mu
         setqtype<QTimeZoneType>(param_this, arg0);
     }
 
-    int qt_QTimeZone_territory_int_QTimeZone(Mu::Thread& NODE_THREAD,
-                                             Pointer param_this)
+    int qt_QTimeZone_territory_int_QTimeZone(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTimeZone arg0 = getqtype<QTimeZoneType>(param_this);
         return int(arg0.territory());
     }
 
-    int qt_QTimeZone_timeSpec_int_QTimeZone(Mu::Thread& NODE_THREAD,
-                                            Pointer param_this)
+    int qt_QTimeZone_timeSpec_int_QTimeZone(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTimeZone arg0 = getqtype<QTimeZoneType>(param_this);
         return int(arg0.timeSpec());
     }
 
-    bool qt_QTimeZone_operatorBang_EQ__bool_QTimeZone_QTimeZone(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_other)
+    bool qt_QTimeZone_operatorBang_EQ__bool_QTimeZone_QTimeZone(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_other)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTimeZone arg0 = getqtype<QTimeZoneType>(param_this);
@@ -270,8 +239,7 @@ namespace Mu
         return arg0.operator!=(arg1);
     }
 
-    bool qt_QTimeZone_operatorEQ_EQ__bool_QTimeZone_QTimeZone(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_other)
+    bool qt_QTimeZone_operatorEQ_EQ__bool_QTimeZone_QTimeZone(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_other)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTimeZone arg0 = getqtype<QTimeZoneType>(param_this);
@@ -279,46 +247,35 @@ namespace Mu
         return arg0.operator==(arg1);
     }
 
-    Pointer
-    qt_QTimeZone_fromDurationAheadOfUtc_QTimeZone_int(Mu::Thread& NODE_THREAD,
-                                                      int param_offset)
+    Pointer qt_QTimeZone_fromDurationAheadOfUtc_QTimeZone_int(Mu::Thread& NODE_THREAD, int param_offset)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         std::chrono::seconds arg0 = (std::chrono::seconds)(param_offset);
-        return makeqtype<QTimeZoneType>(
-            c, QTimeZone::fromDurationAheadOfUtc(arg0), "qt.QTimeZone");
+        return makeqtype<QTimeZoneType>(c, QTimeZone::fromDurationAheadOfUtc(arg0), "qt.QTimeZone");
     }
 
-    Pointer
-    qt_QTimeZone_fromSecondsAheadOfUtc_QTimeZone_int(Mu::Thread& NODE_THREAD,
-                                                     int param_offset)
+    Pointer qt_QTimeZone_fromSecondsAheadOfUtc_QTimeZone_int(Mu::Thread& NODE_THREAD, int param_offset)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         int arg0 = (int)(param_offset);
-        return makeqtype<QTimeZoneType>(
-            c, QTimeZone::fromSecondsAheadOfUtc(arg0), "qt.QTimeZone");
+        return makeqtype<QTimeZoneType>(c, QTimeZone::fromSecondsAheadOfUtc(arg0), "qt.QTimeZone");
     }
 
-    Pointer qt_QTimeZone_ianaIdToWindowsId_QByteArray_QByteArray(
-        Mu::Thread& NODE_THREAD, Pointer param_ianaId)
+    Pointer qt_QTimeZone_ianaIdToWindowsId_QByteArray_QByteArray(Mu::Thread& NODE_THREAD, Pointer param_ianaId)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QByteArray arg0 = getqtype<QByteArrayType>(param_ianaId);
-        return makeqtype<QByteArrayType>(c, QTimeZone::ianaIdToWindowsId(arg0),
-                                         "qt.QByteArray");
+        return makeqtype<QByteArrayType>(c, QTimeZone::ianaIdToWindowsId(arg0), "qt.QByteArray");
     }
 
-    bool
-    qt_QTimeZone_isTimeZoneIdAvailable_bool_QByteArray(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_ianaId)
+    bool qt_QTimeZone_isTimeZoneIdAvailable_bool_QByteArray(Mu::Thread& NODE_THREAD, Pointer param_ianaId)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QByteArray arg0 = getqtype<QByteArrayType>(param_ianaId);
         return QTimeZone::isTimeZoneIdAvailable(arg0);
     }
 
-    bool qt_QTimeZone_isUtcOrFixedOffset_bool_int(Mu::Thread& NODE_THREAD,
-                                                  int param_spec)
+    bool qt_QTimeZone_isUtcOrFixedOffset_bool_int(Mu::Thread& NODE_THREAD, int param_spec)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         Qt::TimeSpec arg0 = (Qt::TimeSpec)(param_spec);
@@ -328,15 +285,13 @@ namespace Mu
     Pointer qt_QTimeZone_systemTimeZone_QTimeZone(Mu::Thread& NODE_THREAD)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-        return makeqtype<QTimeZoneType>(c, QTimeZone::systemTimeZone(),
-                                        "qt.QTimeZone");
+        return makeqtype<QTimeZoneType>(c, QTimeZone::systemTimeZone(), "qt.QTimeZone");
     }
 
     Pointer qt_QTimeZone_systemTimeZoneId_QByteArray(Mu::Thread& NODE_THREAD)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-        return makeqtype<QByteArrayType>(c, QTimeZone::systemTimeZoneId(),
-                                         "qt.QByteArray");
+        return makeqtype<QByteArrayType>(c, QTimeZone::systemTimeZoneId(), "qt.QByteArray");
     }
 
     Pointer qt_QTimeZone_utc_QTimeZone(Mu::Thread& NODE_THREAD)
@@ -345,217 +300,175 @@ namespace Mu
         return makeqtype<QTimeZoneType>(c, QTimeZone::utc(), "qt.QTimeZone");
     }
 
-    Pointer qt_QTimeZone_windowsIdToDefaultIanaId_QByteArray_QByteArray(
-        Mu::Thread& NODE_THREAD, Pointer param_windowsId)
+    Pointer qt_QTimeZone_windowsIdToDefaultIanaId_QByteArray_QByteArray(Mu::Thread& NODE_THREAD, Pointer param_windowsId)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QByteArray arg0 = getqtype<QByteArrayType>(param_windowsId);
-        return makeqtype<QByteArrayType>(
-            c, QTimeZone::windowsIdToDefaultIanaId(arg0), "qt.QByteArray");
+        return makeqtype<QByteArrayType>(c, QTimeZone::windowsIdToDefaultIanaId(arg0), "qt.QByteArray");
     }
 
-    Pointer qt_QTimeZone_windowsIdToDefaultIanaId_QByteArray_QByteArray_int(
-        Mu::Thread& NODE_THREAD, Pointer param_windowsId, int param_territory)
+    Pointer qt_QTimeZone_windowsIdToDefaultIanaId_QByteArray_QByteArray_int(Mu::Thread& NODE_THREAD, Pointer param_windowsId,
+                                                                            int param_territory)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QByteArray arg0 = getqtype<QByteArrayType>(param_windowsId);
         QLocale::Territory arg1 = (QLocale::Territory)(param_territory);
-        return makeqtype<QByteArrayType>(
-            c, QTimeZone::windowsIdToDefaultIanaId(arg0, arg1),
-            "qt.QByteArray");
+        return makeqtype<QByteArrayType>(c, QTimeZone::windowsIdToDefaultIanaId(arg0, arg1), "qt.QByteArray");
     }
 
     static NODE_IMPLEMENTATION(_n_QTimeZone0, Pointer)
     {
-        NODE_RETURN(qt_QTimeZone_QTimeZone_QTimeZone_QTimeZone(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTimeZone_QTimeZone_QTimeZone_QTimeZone(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_QTimeZone1, Pointer)
     {
-        NODE_RETURN(qt_QTimeZone_QTimeZone_QTimeZone_QTimeZone_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QTimeZone_QTimeZone_QTimeZone_QTimeZone_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_QTimeZone3, Pointer)
     {
-        NODE_RETURN(qt_QTimeZone_QTimeZone_QTimeZone_QTimeZone_QByteArray(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QTimeZone_QTimeZone_QTimeZone_QTimeZone_QByteArray(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_QTimeZone4, Pointer)
     {
-        NODE_RETURN(
-            qt_QTimeZone_QTimeZone_QTimeZone_QTimeZone_QByteArray_int_string_string_int_string(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, int), NODE_ARG(3, Pointer), NODE_ARG(4, Pointer),
-                NODE_ARG(5, int), NODE_ARG(6, Pointer)));
+        NODE_RETURN(qt_QTimeZone_QTimeZone_QTimeZone_QTimeZone_QByteArray_int_string_string_int_string(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, int), NODE_ARG(3, Pointer), NODE_ARG(4, Pointer),
+            NODE_ARG(5, int), NODE_ARG(6, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_abbreviation0, Pointer)
     {
-        NODE_RETURN(qt_QTimeZone_abbreviation_string_QTimeZone_QDateTime(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QTimeZone_abbreviation_string_QTimeZone_QDateTime(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_asBackendZone0, Pointer)
     {
-        NODE_RETURN(qt_QTimeZone_asBackendZone_QTimeZone_QTimeZone(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTimeZone_asBackendZone_QTimeZone_QTimeZone(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_comment0, Pointer)
     {
-        NODE_RETURN(qt_QTimeZone_comment_string_QTimeZone(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTimeZone_comment_string_QTimeZone(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_daylightTimeOffset0, int)
     {
-        NODE_RETURN(qt_QTimeZone_daylightTimeOffset_int_QTimeZone_QDateTime(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(
+            qt_QTimeZone_daylightTimeOffset_int_QTimeZone_QDateTime(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_fixedSecondsAheadOfUtc0, int)
     {
-        NODE_RETURN(qt_QTimeZone_fixedSecondsAheadOfUtc_int_QTimeZone(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTimeZone_fixedSecondsAheadOfUtc_int_QTimeZone(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_hasDaylightTime0, bool)
     {
-        NODE_RETURN(qt_QTimeZone_hasDaylightTime_bool_QTimeZone(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTimeZone_hasDaylightTime_bool_QTimeZone(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_hasTransitions0, bool)
     {
-        NODE_RETURN(qt_QTimeZone_hasTransitions_bool_QTimeZone(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTimeZone_hasTransitions_bool_QTimeZone(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_id0, Pointer)
     {
-        NODE_RETURN(qt_QTimeZone_id_QByteArray_QTimeZone(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTimeZone_id_QByteArray_QTimeZone(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isDaylightTime0, bool)
     {
-        NODE_RETURN(qt_QTimeZone_isDaylightTime_bool_QTimeZone_QDateTime(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QTimeZone_isDaylightTime_bool_QTimeZone_QDateTime(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isUtcOrFixedOffset0, bool)
     {
-        NODE_RETURN(qt_QTimeZone_isUtcOrFixedOffset_bool_QTimeZone(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTimeZone_isUtcOrFixedOffset_bool_QTimeZone(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isValid0, bool)
     {
-        NODE_RETURN(qt_QTimeZone_isValid_bool_QTimeZone(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTimeZone_isValid_bool_QTimeZone(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_offsetFromUtc0, int)
     {
-        NODE_RETURN(qt_QTimeZone_offsetFromUtc_int_QTimeZone_QDateTime(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QTimeZone_offsetFromUtc_int_QTimeZone_QDateTime(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_standardTimeOffset0, int)
     {
-        NODE_RETURN(qt_QTimeZone_standardTimeOffset_int_QTimeZone_QDateTime(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(
+            qt_QTimeZone_standardTimeOffset_int_QTimeZone_QDateTime(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_swap0, void)
     {
-        qt_QTimeZone_swap_void_QTimeZone_QTimeZone(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTimeZone_swap_void_QTimeZone_QTimeZone(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_territory0, int)
     {
-        NODE_RETURN(qt_QTimeZone_territory_int_QTimeZone(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTimeZone_territory_int_QTimeZone(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_timeSpec0, int)
     {
-        NODE_RETURN(qt_QTimeZone_timeSpec_int_QTimeZone(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTimeZone_timeSpec_int_QTimeZone(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorBang_EQ_0, bool)
     {
-        NODE_RETURN(qt_QTimeZone_operatorBang_EQ__bool_QTimeZone_QTimeZone(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QTimeZone_operatorBang_EQ__bool_QTimeZone_QTimeZone(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorEQ_EQ_0, bool)
     {
-        NODE_RETURN(qt_QTimeZone_operatorEQ_EQ__bool_QTimeZone_QTimeZone(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QTimeZone_operatorEQ_EQ__bool_QTimeZone_QTimeZone(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_fromDurationAheadOfUtc0, Pointer)
     {
-        NODE_RETURN(qt_QTimeZone_fromDurationAheadOfUtc_QTimeZone_int(
-            NODE_THREAD, NODE_ARG(0, int)));
+        NODE_RETURN(qt_QTimeZone_fromDurationAheadOfUtc_QTimeZone_int(NODE_THREAD, NODE_ARG(0, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_fromSecondsAheadOfUtc0, Pointer)
     {
-        NODE_RETURN(qt_QTimeZone_fromSecondsAheadOfUtc_QTimeZone_int(
-            NODE_THREAD, NODE_ARG(0, int)));
+        NODE_RETURN(qt_QTimeZone_fromSecondsAheadOfUtc_QTimeZone_int(NODE_THREAD, NODE_ARG(0, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_ianaIdToWindowsId0, Pointer)
     {
-        NODE_RETURN(qt_QTimeZone_ianaIdToWindowsId_QByteArray_QByteArray(
-            NODE_THREAD, NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTimeZone_ianaIdToWindowsId_QByteArray_QByteArray(NODE_THREAD, NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isTimeZoneIdAvailable0, bool)
     {
-        NODE_RETURN(qt_QTimeZone_isTimeZoneIdAvailable_bool_QByteArray(
-            NODE_THREAD, NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTimeZone_isTimeZoneIdAvailable_bool_QByteArray(NODE_THREAD, NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isUtcOrFixedOffset1, bool)
     {
-        NODE_RETURN(qt_QTimeZone_isUtcOrFixedOffset_bool_int(NODE_THREAD,
-                                                             NODE_ARG(0, int)));
+        NODE_RETURN(qt_QTimeZone_isUtcOrFixedOffset_bool_int(NODE_THREAD, NODE_ARG(0, int)));
     }
 
-    static NODE_IMPLEMENTATION(_n_systemTimeZone0, Pointer)
-    {
-        NODE_RETURN(qt_QTimeZone_systemTimeZone_QTimeZone(NODE_THREAD));
-    }
+    static NODE_IMPLEMENTATION(_n_systemTimeZone0, Pointer) { NODE_RETURN(qt_QTimeZone_systemTimeZone_QTimeZone(NODE_THREAD)); }
 
-    static NODE_IMPLEMENTATION(_n_systemTimeZoneId0, Pointer)
-    {
-        NODE_RETURN(qt_QTimeZone_systemTimeZoneId_QByteArray(NODE_THREAD));
-    }
+    static NODE_IMPLEMENTATION(_n_systemTimeZoneId0, Pointer) { NODE_RETURN(qt_QTimeZone_systemTimeZoneId_QByteArray(NODE_THREAD)); }
 
-    static NODE_IMPLEMENTATION(_n_utc0, Pointer)
-    {
-        NODE_RETURN(qt_QTimeZone_utc_QTimeZone(NODE_THREAD));
-    }
+    static NODE_IMPLEMENTATION(_n_utc0, Pointer) { NODE_RETURN(qt_QTimeZone_utc_QTimeZone(NODE_THREAD)); }
 
     static NODE_IMPLEMENTATION(_n_windowsIdToDefaultIanaId0, Pointer)
     {
-        NODE_RETURN(qt_QTimeZone_windowsIdToDefaultIanaId_QByteArray_QByteArray(
-            NODE_THREAD, NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTimeZone_windowsIdToDefaultIanaId_QByteArray_QByteArray(NODE_THREAD, NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_windowsIdToDefaultIanaId1, Pointer)
     {
-        NODE_RETURN(
-            qt_QTimeZone_windowsIdToDefaultIanaId_QByteArray_QByteArray_int(
-                NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QTimeZone_windowsIdToDefaultIanaId_QByteArray_QByteArray_int(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     void QTimeZoneType::load()
@@ -575,150 +488,84 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(
-            new Function(c, "__allocate", __allocate, None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", __allocate, None, Return, ftn, End),
 
-            EndArguments);
+                   EndArguments);
 
-        addSymbols(
-            new Alias(c, "Initialization", "int"),
-            new SymbolicConstant(c, "LocalTime", "int",
-                                 Value(int(QTimeZone::LocalTime))),
-            new SymbolicConstant(c, "UTC", "int", Value(int(QTimeZone::UTC))),
-            new Alias(c, "NameType", "int"),
-            new SymbolicConstant(c, "DefaultName", "int",
-                                 Value(int(QTimeZone::DefaultName))),
-            new SymbolicConstant(c, "LongName", "int",
-                                 Value(int(QTimeZone::LongName))),
-            new SymbolicConstant(c, "ShortName", "int",
-                                 Value(int(QTimeZone::ShortName))),
-            new SymbolicConstant(c, "OffsetName", "int",
-                                 Value(int(QTimeZone::OffsetName))),
-            new Alias(c, "TimeType", "int"),
-            new SymbolicConstant(c, "StandardTime", "int",
-                                 Value(int(QTimeZone::StandardTime))),
-            new SymbolicConstant(c, "DaylightTime", "int",
-                                 Value(int(QTimeZone::DaylightTime))),
-            new SymbolicConstant(c, "GenericTime", "int",
-                                 Value(int(QTimeZone::GenericTime))),
-            new Alias(c, "anonymous", "int"),
-            new SymbolicConstant(c, "MinUtcOffsetSecs", "int",
-                                 Value(int(QTimeZone::MinUtcOffsetSecs))),
-            new SymbolicConstant(c, "MaxUtcOffsetSecs", "int",
-                                 Value(int(QTimeZone::MaxUtcOffsetSecs))),
-            EndArguments);
+        addSymbols(new Alias(c, "Initialization", "int"), new SymbolicConstant(c, "LocalTime", "int", Value(int(QTimeZone::LocalTime))),
+                   new SymbolicConstant(c, "UTC", "int", Value(int(QTimeZone::UTC))), new Alias(c, "NameType", "int"),
+                   new SymbolicConstant(c, "DefaultName", "int", Value(int(QTimeZone::DefaultName))),
+                   new SymbolicConstant(c, "LongName", "int", Value(int(QTimeZone::LongName))),
+                   new SymbolicConstant(c, "ShortName", "int", Value(int(QTimeZone::ShortName))),
+                   new SymbolicConstant(c, "OffsetName", "int", Value(int(QTimeZone::OffsetName))), new Alias(c, "TimeType", "int"),
+                   new SymbolicConstant(c, "StandardTime", "int", Value(int(QTimeZone::StandardTime))),
+                   new SymbolicConstant(c, "DaylightTime", "int", Value(int(QTimeZone::DaylightTime))),
+                   new SymbolicConstant(c, "GenericTime", "int", Value(int(QTimeZone::GenericTime))), new Alias(c, "anonymous", "int"),
+                   new SymbolicConstant(c, "MinUtcOffsetSecs", "int", Value(int(QTimeZone::MinUtcOffsetSecs))),
+                   new SymbolicConstant(c, "MaxUtcOffsetSecs", "int", Value(int(QTimeZone::MaxUtcOffsetSecs))), EndArguments);
 
         addSymbols(
             // enums
             // member functions
-            new Function(c, "QTimeZone", _n_QTimeZone0, None, Compiled,
-                         qt_QTimeZone_QTimeZone_QTimeZone_QTimeZone, Return,
-                         "qt.QTimeZone", Parameters,
-                         new Param(c, "this", "qt.QTimeZone"), End),
-            new Function(c, "QTimeZone", _n_QTimeZone1, None, Compiled,
-                         qt_QTimeZone_QTimeZone_QTimeZone_QTimeZone_int, Return,
-                         "qt.QTimeZone", Parameters,
-                         new Param(c, "this", "qt.QTimeZone"),
-                         new Param(c, "spec", "int"), End),
+            new Function(c, "QTimeZone", _n_QTimeZone0, None, Compiled, qt_QTimeZone_QTimeZone_QTimeZone_QTimeZone, Return, "qt.QTimeZone",
+                         Parameters, new Param(c, "this", "qt.QTimeZone"), End),
+            new Function(c, "QTimeZone", _n_QTimeZone1, None, Compiled, qt_QTimeZone_QTimeZone_QTimeZone_QTimeZone_int, Return,
+                         "qt.QTimeZone", Parameters, new Param(c, "this", "qt.QTimeZone"), new Param(c, "spec", "int"), End),
             // MISSING: QTimeZone (QTimeZone; QTimeZone this, int offsetSeconds)
-            new Function(c, "QTimeZone", _n_QTimeZone3, None, Compiled,
-                         qt_QTimeZone_QTimeZone_QTimeZone_QTimeZone_QByteArray,
-                         Return, "qt.QTimeZone", Parameters,
-                         new Param(c, "this", "qt.QTimeZone"),
-                         new Param(c, "ianaId", "qt.QByteArray"), End),
-            new Function(
-                c, "QTimeZone", _n_QTimeZone4, None, Compiled,
-                qt_QTimeZone_QTimeZone_QTimeZone_QTimeZone_QByteArray_int_string_string_int_string,
-                Return, "qt.QTimeZone", Parameters,
-                new Param(c, "this", "qt.QTimeZone"),
-                new Param(c, "ianaId", "qt.QByteArray"),
-                new Param(c, "offsetSeconds", "int"),
-                new Param(c, "name", "string"),
-                new Param(c, "abbreviation", "string"),
-                new Param(c, "territory", "int",
-                          Value((int)QLocale::AnyTerritory)),
-                new Param(c, "comment", "string"), End),
+            new Function(c, "QTimeZone", _n_QTimeZone3, None, Compiled, qt_QTimeZone_QTimeZone_QTimeZone_QTimeZone_QByteArray, Return,
+                         "qt.QTimeZone", Parameters, new Param(c, "this", "qt.QTimeZone"), new Param(c, "ianaId", "qt.QByteArray"), End),
+            new Function(c, "QTimeZone", _n_QTimeZone4, None, Compiled,
+                         qt_QTimeZone_QTimeZone_QTimeZone_QTimeZone_QByteArray_int_string_string_int_string, Return, "qt.QTimeZone",
+                         Parameters, new Param(c, "this", "qt.QTimeZone"), new Param(c, "ianaId", "qt.QByteArray"),
+                         new Param(c, "offsetSeconds", "int"), new Param(c, "name", "string"), new Param(c, "abbreviation", "string"),
+                         new Param(c, "territory", "int", Value((int)QLocale::AnyTerritory)), new Param(c, "comment", "string"), End),
             // MISSING: QTimeZone (QTimeZone; QTimeZone this, QTimeZone other)
             // MISSING: QTimeZone (QTimeZone; QTimeZone this, "QTimeZone & &"
             // other)
-            new Function(c, "abbreviation", _n_abbreviation0, None, Compiled,
-                         qt_QTimeZone_abbreviation_string_QTimeZone_QDateTime,
-                         Return, "string", Parameters,
-                         new Param(c, "this", "qt.QTimeZone"),
-                         new Param(c, "atDateTime", "qt.QDateTime"), End),
-            new Function(c, "asBackendZone", _n_asBackendZone0, None, Compiled,
-                         qt_QTimeZone_asBackendZone_QTimeZone_QTimeZone, Return,
-                         "qt.QTimeZone", Parameters,
+            new Function(c, "abbreviation", _n_abbreviation0, None, Compiled, qt_QTimeZone_abbreviation_string_QTimeZone_QDateTime, Return,
+                         "string", Parameters, new Param(c, "this", "qt.QTimeZone"), new Param(c, "atDateTime", "qt.QDateTime"), End),
+            new Function(c, "asBackendZone", _n_asBackendZone0, None, Compiled, qt_QTimeZone_asBackendZone_QTimeZone_QTimeZone, Return,
+                         "qt.QTimeZone", Parameters, new Param(c, "this", "qt.QTimeZone"), End),
+            new Function(c, "comment", _n_comment0, None, Compiled, qt_QTimeZone_comment_string_QTimeZone, Return, "string", Parameters,
                          new Param(c, "this", "qt.QTimeZone"), End),
-            new Function(c, "comment", _n_comment0, None, Compiled,
-                         qt_QTimeZone_comment_string_QTimeZone, Return,
-                         "string", Parameters,
-                         new Param(c, "this", "qt.QTimeZone"), End),
-            new Function(
-                c, "daylightTimeOffset", _n_daylightTimeOffset0, None, Compiled,
-                qt_QTimeZone_daylightTimeOffset_int_QTimeZone_QDateTime, Return,
-                "int", Parameters, new Param(c, "this", "qt.QTimeZone"),
-                new Param(c, "atDateTime", "qt.QDateTime"), End),
+            new Function(c, "daylightTimeOffset", _n_daylightTimeOffset0, None, Compiled,
+                         qt_QTimeZone_daylightTimeOffset_int_QTimeZone_QDateTime, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QTimeZone"), new Param(c, "atDateTime", "qt.QDateTime"), End),
             // MISSING: displayName (string; QTimeZone this, QDateTime
             // atDateTime, flags QTimeZone::NameType nameType, "const QLocale &"
             // locale) MISSING: displayName (string; QTimeZone this, flags
             // QTimeZone::TimeType timeType, flags QTimeZone::NameType nameType,
             // "const QLocale &" locale)
-            new Function(c, "fixedSecondsAheadOfUtc",
-                         _n_fixedSecondsAheadOfUtc0, None, Compiled,
-                         qt_QTimeZone_fixedSecondsAheadOfUtc_int_QTimeZone,
-                         Return, "int", Parameters,
+            new Function(c, "fixedSecondsAheadOfUtc", _n_fixedSecondsAheadOfUtc0, None, Compiled,
+                         qt_QTimeZone_fixedSecondsAheadOfUtc_int_QTimeZone, Return, "int", Parameters, new Param(c, "this", "qt.QTimeZone"),
+                         End),
+            new Function(c, "hasDaylightTime", _n_hasDaylightTime0, None, Compiled, qt_QTimeZone_hasDaylightTime_bool_QTimeZone, Return,
+                         "bool", Parameters, new Param(c, "this", "qt.QTimeZone"), End),
+            new Function(c, "hasTransitions", _n_hasTransitions0, None, Compiled, qt_QTimeZone_hasTransitions_bool_QTimeZone, Return,
+                         "bool", Parameters, new Param(c, "this", "qt.QTimeZone"), End),
+            new Function(c, "id", _n_id0, None, Compiled, qt_QTimeZone_id_QByteArray_QTimeZone, Return, "qt.QByteArray", Parameters,
                          new Param(c, "this", "qt.QTimeZone"), End),
-            new Function(c, "hasDaylightTime", _n_hasDaylightTime0, None,
-                         Compiled, qt_QTimeZone_hasDaylightTime_bool_QTimeZone,
-                         Return, "bool", Parameters,
+            new Function(c, "isDaylightTime", _n_isDaylightTime0, None, Compiled, qt_QTimeZone_isDaylightTime_bool_QTimeZone_QDateTime,
+                         Return, "bool", Parameters, new Param(c, "this", "qt.QTimeZone"), new Param(c, "atDateTime", "qt.QDateTime"), End),
+            new Function(c, "isUtcOrFixedOffset", _n_isUtcOrFixedOffset0, None, Compiled, qt_QTimeZone_isUtcOrFixedOffset_bool_QTimeZone,
+                         Return, "bool", Parameters, new Param(c, "this", "qt.QTimeZone"), End),
+            new Function(c, "isValid", _n_isValid0, None, Compiled, qt_QTimeZone_isValid_bool_QTimeZone, Return, "bool", Parameters,
                          new Param(c, "this", "qt.QTimeZone"), End),
-            new Function(c, "hasTransitions", _n_hasTransitions0, None,
-                         Compiled, qt_QTimeZone_hasTransitions_bool_QTimeZone,
-                         Return, "bool", Parameters,
+            new Function(c, "offsetFromUtc", _n_offsetFromUtc0, None, Compiled, qt_QTimeZone_offsetFromUtc_int_QTimeZone_QDateTime, Return,
+                         "int", Parameters, new Param(c, "this", "qt.QTimeZone"), new Param(c, "atDateTime", "qt.QDateTime"), End),
+            new Function(c, "standardTimeOffset", _n_standardTimeOffset0, None, Compiled,
+                         qt_QTimeZone_standardTimeOffset_int_QTimeZone_QDateTime, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QTimeZone"), new Param(c, "atDateTime", "qt.QDateTime"), End),
+            new Function(c, "swap", _n_swap0, None, Compiled, qt_QTimeZone_swap_void_QTimeZone_QTimeZone, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QTimeZone"), new Param(c, "other", "qt.QTimeZone"), End),
+            new Function(c, "territory", _n_territory0, None, Compiled, qt_QTimeZone_territory_int_QTimeZone, Return, "int", Parameters,
                          new Param(c, "this", "qt.QTimeZone"), End),
-            new Function(c, "id", _n_id0, None, Compiled,
-                         qt_QTimeZone_id_QByteArray_QTimeZone, Return,
-                         "qt.QByteArray", Parameters,
+            new Function(c, "timeSpec", _n_timeSpec0, None, Compiled, qt_QTimeZone_timeSpec_int_QTimeZone, Return, "int", Parameters,
                          new Param(c, "this", "qt.QTimeZone"), End),
-            new Function(
-                c, "isDaylightTime", _n_isDaylightTime0, None, Compiled,
-                qt_QTimeZone_isDaylightTime_bool_QTimeZone_QDateTime, Return,
-                "bool", Parameters, new Param(c, "this", "qt.QTimeZone"),
-                new Param(c, "atDateTime", "qt.QDateTime"), End),
-            new Function(
-                c, "isUtcOrFixedOffset", _n_isUtcOrFixedOffset0, None, Compiled,
-                qt_QTimeZone_isUtcOrFixedOffset_bool_QTimeZone, Return, "bool",
-                Parameters, new Param(c, "this", "qt.QTimeZone"), End),
-            new Function(c, "isValid", _n_isValid0, None, Compiled,
-                         qt_QTimeZone_isValid_bool_QTimeZone, Return, "bool",
-                         Parameters, new Param(c, "this", "qt.QTimeZone"), End),
-            new Function(c, "offsetFromUtc", _n_offsetFromUtc0, None, Compiled,
-                         qt_QTimeZone_offsetFromUtc_int_QTimeZone_QDateTime,
-                         Return, "int", Parameters,
-                         new Param(c, "this", "qt.QTimeZone"),
-                         new Param(c, "atDateTime", "qt.QDateTime"), End),
-            new Function(
-                c, "standardTimeOffset", _n_standardTimeOffset0, None, Compiled,
-                qt_QTimeZone_standardTimeOffset_int_QTimeZone_QDateTime, Return,
-                "int", Parameters, new Param(c, "this", "qt.QTimeZone"),
-                new Param(c, "atDateTime", "qt.QDateTime"), End),
-            new Function(c, "swap", _n_swap0, None, Compiled,
-                         qt_QTimeZone_swap_void_QTimeZone_QTimeZone, Return,
-                         "void", Parameters,
-                         new Param(c, "this", "qt.QTimeZone"),
-                         new Param(c, "other", "qt.QTimeZone"), End),
-            new Function(c, "territory", _n_territory0, None, Compiled,
-                         qt_QTimeZone_territory_int_QTimeZone, Return, "int",
-                         Parameters, new Param(c, "this", "qt.QTimeZone"), End),
-            new Function(c, "timeSpec", _n_timeSpec0, None, Compiled,
-                         qt_QTimeZone_timeSpec_int_QTimeZone, Return, "int",
-                         Parameters, new Param(c, "this", "qt.QTimeZone"), End),
             // MISSING: toCFTimeZone ("CFTimeZoneRef"; QTimeZone this)
             // MISSING: toNSTimeZone ("NSTimeZone *"; QTimeZone this)
             // static functions
@@ -727,72 +574,45 @@ namespace Mu
             // QLocale::Territory territory) MISSING: availableTimeZoneIds
             // ("QList<QByteArray>"; int offsetSeconds) MISSING: fromCFTimeZone
             // (QTimeZone; "CFTimeZoneRef" timeZone)
-            new Function(c, "fromDurationAheadOfUtc",
-                         _n_fromDurationAheadOfUtc0, None, Compiled,
-                         qt_QTimeZone_fromDurationAheadOfUtc_QTimeZone_int,
-                         Return, "qt.QTimeZone", Parameters,
+            new Function(c, "fromDurationAheadOfUtc", _n_fromDurationAheadOfUtc0, None, Compiled,
+                         qt_QTimeZone_fromDurationAheadOfUtc_QTimeZone_int, Return, "qt.QTimeZone", Parameters,
                          new Param(c, "offset", "int"), End),
             // MISSING: fromNSTimeZone (QTimeZone; "const NSTimeZone *"
             // timeZone)
-            new Function(c, "fromSecondsAheadOfUtc", _n_fromSecondsAheadOfUtc0,
-                         None, Compiled,
-                         qt_QTimeZone_fromSecondsAheadOfUtc_QTimeZone_int,
-                         Return, "qt.QTimeZone", Parameters,
+            new Function(c, "fromSecondsAheadOfUtc", _n_fromSecondsAheadOfUtc0, None, Compiled,
+                         qt_QTimeZone_fromSecondsAheadOfUtc_QTimeZone_int, Return, "qt.QTimeZone", Parameters,
                          new Param(c, "offset", "int"), End),
             // MISSING: fromStdTimeZonePtr (QTimeZone; "const int *" timeZone)
-            new Function(c, "ianaIdToWindowsId", _n_ianaIdToWindowsId0, None,
-                         Compiled,
-                         qt_QTimeZone_ianaIdToWindowsId_QByteArray_QByteArray,
-                         Return, "qt.QByteArray", Parameters,
+            new Function(c, "ianaIdToWindowsId", _n_ianaIdToWindowsId0, None, Compiled,
+                         qt_QTimeZone_ianaIdToWindowsId_QByteArray_QByteArray, Return, "qt.QByteArray", Parameters,
                          new Param(c, "ianaId", "qt.QByteArray"), End),
-            new Function(c, "isTimeZoneIdAvailable", _n_isTimeZoneIdAvailable0,
-                         None, Compiled,
-                         qt_QTimeZone_isTimeZoneIdAvailable_bool_QByteArray,
-                         Return, "bool", Parameters,
+            new Function(c, "isTimeZoneIdAvailable", _n_isTimeZoneIdAvailable0, None, Compiled,
+                         qt_QTimeZone_isTimeZoneIdAvailable_bool_QByteArray, Return, "bool", Parameters,
                          new Param(c, "ianaId", "qt.QByteArray"), End),
-            new Function(c, "isUtcOrFixedOffset", _n_isUtcOrFixedOffset1, None,
-                         Compiled, qt_QTimeZone_isUtcOrFixedOffset_bool_int,
-                         Return, "bool", Parameters,
-                         new Param(c, "spec", "int"), End),
-            new Function(c, "systemTimeZone", _n_systemTimeZone0, None,
-                         Compiled, qt_QTimeZone_systemTimeZone_QTimeZone,
-                         Return, "qt.QTimeZone", End),
-            new Function(c, "systemTimeZoneId", _n_systemTimeZoneId0, None,
-                         Compiled, qt_QTimeZone_systemTimeZoneId_QByteArray,
-                         Return, "qt.QByteArray", End),
-            new Function(c, "utc", _n_utc0, None, Compiled,
-                         qt_QTimeZone_utc_QTimeZone, Return, "qt.QTimeZone",
-                         End),
-            new Function(
-                c, "windowsIdToDefaultIanaId", _n_windowsIdToDefaultIanaId0,
-                None, Compiled,
-                qt_QTimeZone_windowsIdToDefaultIanaId_QByteArray_QByteArray,
-                Return, "qt.QByteArray", Parameters,
-                new Param(c, "windowsId", "qt.QByteArray"), End),
-            new Function(
-                c, "windowsIdToDefaultIanaId", _n_windowsIdToDefaultIanaId1,
-                None, Compiled,
-                qt_QTimeZone_windowsIdToDefaultIanaId_QByteArray_QByteArray_int,
-                Return, "qt.QByteArray", Parameters,
-                new Param(c, "windowsId", "qt.QByteArray"),
-                new Param(c, "territory", "int"), End),
+            new Function(c, "isUtcOrFixedOffset", _n_isUtcOrFixedOffset1, None, Compiled, qt_QTimeZone_isUtcOrFixedOffset_bool_int, Return,
+                         "bool", Parameters, new Param(c, "spec", "int"), End),
+            new Function(c, "systemTimeZone", _n_systemTimeZone0, None, Compiled, qt_QTimeZone_systemTimeZone_QTimeZone, Return,
+                         "qt.QTimeZone", End),
+            new Function(c, "systemTimeZoneId", _n_systemTimeZoneId0, None, Compiled, qt_QTimeZone_systemTimeZoneId_QByteArray, Return,
+                         "qt.QByteArray", End),
+            new Function(c, "utc", _n_utc0, None, Compiled, qt_QTimeZone_utc_QTimeZone, Return, "qt.QTimeZone", End),
+            new Function(c, "windowsIdToDefaultIanaId", _n_windowsIdToDefaultIanaId0, None, Compiled,
+                         qt_QTimeZone_windowsIdToDefaultIanaId_QByteArray_QByteArray, Return, "qt.QByteArray", Parameters,
+                         new Param(c, "windowsId", "qt.QByteArray"), End),
+            new Function(c, "windowsIdToDefaultIanaId", _n_windowsIdToDefaultIanaId1, None, Compiled,
+                         qt_QTimeZone_windowsIdToDefaultIanaId_QByteArray_QByteArray_int, Return, "qt.QByteArray", Parameters,
+                         new Param(c, "windowsId", "qt.QByteArray"), new Param(c, "territory", "int"), End),
             // MISSING: windowsIdToIanaIds ("QList<QByteArray>"; QByteArray
             // windowsId) MISSING: windowsIdToIanaIds ("QList<QByteArray>";
             // QByteArray windowsId, flags QLocale::Territory territory)
             EndArguments);
         globalScope()->addSymbols(
-            new Function(c, "!=", _n_operatorBang_EQ_0, Op, Compiled,
-                         qt_QTimeZone_operatorBang_EQ__bool_QTimeZone_QTimeZone,
-                         Return, "bool", Parameters,
-                         new Param(c, "this", "qt.QTimeZone"),
-                         new Param(c, "other", "qt.QTimeZone"), End),
+            new Function(c, "!=", _n_operatorBang_EQ_0, Op, Compiled, qt_QTimeZone_operatorBang_EQ__bool_QTimeZone_QTimeZone, Return,
+                         "bool", Parameters, new Param(c, "this", "qt.QTimeZone"), new Param(c, "other", "qt.QTimeZone"), End),
             // MISSING: = (QTimeZone; QTimeZone this, QTimeZone other)
             // MISSING: = (QTimeZone; QTimeZone this, "QTimeZone & &" other)
-            new Function(c, "==", _n_operatorEQ_EQ_0, Op, Compiled,
-                         qt_QTimeZone_operatorEQ_EQ__bool_QTimeZone_QTimeZone,
-                         Return, "bool", Parameters,
-                         new Param(c, "this", "qt.QTimeZone"),
-                         new Param(c, "other", "qt.QTimeZone"), End),
+            new Function(c, "==", _n_operatorEQ_EQ_0, Op, Compiled, qt_QTimeZone_operatorEQ_EQ__bool_QTimeZone_QTimeZone, Return, "bool",
+                         Parameters, new Param(c, "this", "qt.QTimeZone"), new Param(c, "other", "qt.QTimeZone"), End),
             EndArguments);
         scope()->addSymbols(EndArguments);
     }

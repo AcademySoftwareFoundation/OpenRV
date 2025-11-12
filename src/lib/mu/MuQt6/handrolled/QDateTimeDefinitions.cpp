@@ -4,9 +4,7 @@
 // SPDX-License-Identifier: Apache-2.0
 //
 
-Pointer qt_QDateTime_fromString_QDateTime_string_string(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_string,
-                                                        Pointer param_format)
+Pointer qt_QDateTime_fromString_QDateTime_string_string(Mu::Thread& NODE_THREAD, Pointer param_string, Pointer param_format)
 {
     MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
     const QString arg0 = qstring(param_string);
@@ -22,6 +20,5 @@ Pointer qt_QDateTime_fromString_QDateTime_string_string(Mu::Thread& NODE_THREAD,
 
 static NODE_IMPLEMENTATION(_n_fromString1, Pointer)
 {
-    NODE_RETURN(qt_QDateTime_fromString_QDateTime_string_string(
-        NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+    NODE_RETURN(qt_QDateTime_fromString_QDateTime_string_string(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
 }

@@ -39,8 +39,7 @@ namespace Mu
         //  Constructors
         //
 
-        QSliderType(Context* context, const char* name, Class* superClass = 0,
-                    Class* superClass2 = 0);
+        QSliderType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QSliderType();
 
@@ -64,8 +63,7 @@ namespace Mu
     public:
         virtual ~MuQt_QSlider();
         MuQt_QSlider(Pointer muobj, const CallEnvironment*, QWidget* parent);
-        MuQt_QSlider(Pointer muobj, const CallEnvironment*,
-                     Qt::Orientation orientation, QWidget* parent);
+        MuQt_QSlider(Pointer muobj, const CallEnvironment*, Qt::Orientation orientation, QWidget* parent);
         virtual bool event(QEvent* event_);
         virtual QSize minimumSizeHint() const;
         virtual QSize sizeHint() const;
@@ -83,24 +81,15 @@ namespace Mu
     public:
         void mouseMoveEvent_pub(QMouseEvent* ev) { mouseMoveEvent(ev); }
 
-        void mouseMoveEvent_pub_parent(QMouseEvent* ev)
-        {
-            QSlider::mouseMoveEvent(ev);
-        }
+        void mouseMoveEvent_pub_parent(QMouseEvent* ev) { QSlider::mouseMoveEvent(ev); }
 
         void mousePressEvent_pub(QMouseEvent* ev) { mousePressEvent(ev); }
 
-        void mousePressEvent_pub_parent(QMouseEvent* ev)
-        {
-            QSlider::mousePressEvent(ev);
-        }
+        void mousePressEvent_pub_parent(QMouseEvent* ev) { QSlider::mousePressEvent(ev); }
 
         void mouseReleaseEvent_pub(QMouseEvent* ev) { mouseReleaseEvent(ev); }
 
-        void mouseReleaseEvent_pub_parent(QMouseEvent* ev)
-        {
-            QSlider::mouseReleaseEvent(ev);
-        }
+        void mouseReleaseEvent_pub_parent(QMouseEvent* ev) { QSlider::mouseReleaseEvent(ev); }
 
         void paintEvent_pub(QPaintEvent* ev) { paintEvent(ev); }
 
@@ -112,10 +101,7 @@ namespace Mu
 
         void keyPressEvent_pub(QKeyEvent* ev) { keyPressEvent(ev); }
 
-        void keyPressEvent_pub_parent(QKeyEvent* ev)
-        {
-            QSlider::keyPressEvent(ev);
-        }
+        void keyPressEvent_pub_parent(QKeyEvent* ev) { QSlider::keyPressEvent(ev); }
 
         void timerEvent_pub(QTimerEvent* e) { timerEvent(e); }
 
@@ -131,11 +117,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance*
-    QSliderType::cachedInstance(const QSliderType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QSliderType::cachedInstance(const QSliderType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

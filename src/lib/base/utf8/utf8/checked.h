@@ -43,10 +43,7 @@ namespace utf8
         {
         }
 
-        virtual const char* what() const throw()
-        {
-            return "Invalid code point";
-        }
+        virtual const char* what() const throw() { return "Invalid code point"; }
 
         uint32_t code_point() const { return cp; }
     };
@@ -90,8 +87,7 @@ namespace utf8
     /// The library API - functions intended to be called by the users
 
     template <typename octet_iterator, typename output_iterator>
-    output_iterator replace_invalid(octet_iterator start, octet_iterator end,
-                                    output_iterator out, uint32_t replacement)
+    output_iterator replace_invalid(octet_iterator start, octet_iterator end, output_iterator out, uint32_t replacement)
     {
         while (start != end)
         {
@@ -124,16 +120,13 @@ namespace utf8
     }
 
     template <typename octet_iterator, typename output_iterator>
-    inline output_iterator replace_invalid(octet_iterator start,
-                                           octet_iterator end,
-                                           output_iterator out)
+    inline output_iterator replace_invalid(octet_iterator start, octet_iterator end, output_iterator out)
     {
         static const uint32_t replacement_marker = internal::mask16(0xfffd);
         return replace_invalid(start, end, out, replacement_marker);
     }
 
-    template <typename octet_iterator>
-    octet_iterator append(uint32_t cp, octet_iterator result)
+    template <typename octet_iterator> octet_iterator append(uint32_t cp, octet_iterator result)
     {
         if (!internal::is_code_point_valid(cp))
             throw invalid_code_point(cp);
@@ -164,8 +157,7 @@ namespace utf8
         return result;
     }
 
-    template <typename octet_iterator>
-    uint32_t next(octet_iterator& it, octet_iterator end)
+    template <typename octet_iterator> uint32_t next(octet_iterator& it, octet_iterator end)
     {
         uint32_t cp = 0;
         internal::utf_error err_code = internal::validate_next(it, end, &cp);
@@ -185,14 +177,9 @@ namespace utf8
         return cp;
     }
 
-    template <typename octet_iterator>
-    uint32_t peek_next(octet_iterator it, octet_iterator end)
-    {
-        return next(it, end);
-    }
+    template <typename octet_iterator> uint32_t peek_next(octet_iterator it, octet_iterator end) { return next(it, end); }
 
-    template <typename octet_iterator>
-    uint32_t prior(octet_iterator& it, octet_iterator start)
+    template <typename octet_iterator> uint32_t prior(octet_iterator& it, octet_iterator start)
     {
         octet_iterator end = it;
         while (internal::is_trail(*(--it)))
@@ -203,8 +190,7 @@ namespace utf8
     }
 
     /// Deprecated in versions that include "prior"
-    template <typename octet_iterator>
-    uint32_t previous(octet_iterator& it, octet_iterator pass_start)
+    template <typename octet_iterator> uint32_t previous(octet_iterator& it, octet_iterator pass_start)
     {
         octet_iterator end = it;
         while (internal::is_trail(*(--it)))
@@ -214,16 +200,14 @@ namespace utf8
         return next(temp, end);
     }
 
-    template <typename octet_iterator, typename distance_type>
-    void advance(octet_iterator& it, distance_type n, octet_iterator end)
+    template <typename octet_iterator, typename distance_type> void advance(octet_iterator& it, distance_type n, octet_iterator end)
     {
         for (distance_type i = 0; i < n; ++i)
             next(it, end);
     }
 
     template <typename octet_iterator>
-    typename std::iterator_traits<octet_iterator>::difference_type
-    distance(octet_iterator first, octet_iterator last)
+    typename std::iterator_traits<octet_iterator>::difference_type distance(octet_iterator first, octet_iterator last)
     {
         typename std::iterator_traits<octet_iterator>::difference_type dist;
         for (dist = 0; first < last; ++dist)
@@ -232,8 +216,7 @@ namespace utf8
     }
 
     template <typename u16bit_iterator, typename octet_iterator>
-    octet_iterator utf16to8(u16bit_iterator start, u16bit_iterator end,
-                            octet_iterator result)
+    octet_iterator utf16to8(u16bit_iterator start, u16bit_iterator end, octet_iterator result)
     {
         while (start != end)
         {
@@ -244,13 +227,10 @@ namespace utf8
                 if (start != end)
                 {
                     uint32_t trail_surrogate = internal::mask16(*start++);
-                    if (trail_surrogate >= internal::TRAIL_SURROGATE_MIN
-                        && trail_surrogate <= internal::TRAIL_SURROGATE_MAX)
-                        cp = (cp << 10) + trail_surrogate
-                             + internal::SURROGATE_OFFSET;
+                    if (trail_surrogate >= internal::TRAIL_SURROGATE_MIN && trail_surrogate <= internal::TRAIL_SURROGATE_MAX)
+                        cp = (cp << 10) + trail_surrogate + internal::SURROGATE_OFFSET;
                     else
-                        throw invalid_utf16(
-                            static_cast<uint16_t>(trail_surrogate));
+                        throw invalid_utf16(static_cast<uint16_t>(trail_surrogate));
                 }
                 else
                     throw invalid_utf16(static_cast<uint16_t>(*start));
@@ -261,18 +241,15 @@ namespace utf8
     }
 
     template <typename u16bit_iterator, typename octet_iterator>
-    u16bit_iterator utf8to16(octet_iterator start, octet_iterator end,
-                             u16bit_iterator result)
+    u16bit_iterator utf8to16(octet_iterator start, octet_iterator end, u16bit_iterator result)
     {
         while (start != end)
         {
             uint32_t cp = next(start, end);
             if (cp > 0xffff)
             { // make a surrogate pair
-                *result++ =
-                    static_cast<uint16_t>((cp >> 10) + internal::LEAD_OFFSET);
-                *result++ = static_cast<uint16_t>(
-                    (cp & 0x3ff) + internal::TRAIL_SURROGATE_MIN);
+                *result++ = static_cast<uint16_t>((cp >> 10) + internal::LEAD_OFFSET);
+                *result++ = static_cast<uint16_t>((cp & 0x3ff) + internal::TRAIL_SURROGATE_MIN);
             }
             else
                 *result++ = static_cast<uint16_t>(cp);
@@ -281,8 +258,7 @@ namespace utf8
     }
 
     template <typename octet_iterator, typename u32bit_iterator>
-    octet_iterator utf32to8(u32bit_iterator start, u32bit_iterator end,
-                            octet_iterator result)
+    octet_iterator utf32to8(u32bit_iterator start, u32bit_iterator end, octet_iterator result)
     {
         while (start != end)
             result = append(*(start++), result);
@@ -291,8 +267,7 @@ namespace utf8
     }
 
     template <typename octet_iterator, typename u32bit_iterator>
-    u32bit_iterator utf8to32(octet_iterator start, octet_iterator end,
-                             u32bit_iterator result)
+    u32bit_iterator utf8to32(octet_iterator start, octet_iterator end, u32bit_iterator result)
     {
         while (start < end)
             (*result++) = next(start, end);
@@ -301,9 +276,7 @@ namespace utf8
     }
 
     // The iterator class
-    template <typename octet_iterator>
-    class iterator
-        : public std::iterator<std::bidirectional_iterator_tag, uint32_t>
+    template <typename octet_iterator> class iterator : public std::iterator<std::bidirectional_iterator_tag, uint32_t>
     {
         octet_iterator it;
         octet_iterator range_start;
@@ -312,9 +285,7 @@ namespace utf8
     public:
         iterator() {};
 
-        explicit iterator(const octet_iterator& octet_it,
-                          const octet_iterator& range_start,
-                          const octet_iterator& range_end)
+        explicit iterator(const octet_iterator& octet_it, const octet_iterator& range_start, const octet_iterator& range_end)
             : it(octet_it)
             , range_start(range_start)
             , range_end(range_end)
@@ -335,15 +306,11 @@ namespace utf8
         bool operator==(const iterator& rhs) const
         {
             if (range_start != rhs.range_start || range_end != rhs.range_end)
-                throw std::logic_error(
-                    "Comparing utf-8 iterators defined with different ranges");
+                throw std::logic_error("Comparing utf-8 iterators defined with different ranges");
             return (it == rhs.it);
         }
 
-        bool operator!=(const iterator& rhs) const
-        {
-            return !(operator==(rhs));
-        }
+        bool operator!=(const iterator& rhs) const { return !(operator==(rhs)); }
 
         iterator& operator++()
         {

@@ -59,29 +59,24 @@ namespace Mu
         _baseType = 0;
     }
 
-    MuQt_QQmlContext::MuQt_QQmlContext(Pointer muobj, const CallEnvironment* ce,
-                                       QQmlEngine* engine, QObject* parent)
+    MuQt_QQmlContext::MuQt_QQmlContext(Pointer muobj, const CallEnvironment* ce, QQmlEngine* engine, QObject* parent)
         : QQmlContext(engine, parent)
     {
         _env = ce;
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QQmlContextType>(
-            c->internName("qt.QQmlContext"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QQmlContextType>(c->internName("qt.QQmlContext"));
     }
 
-    MuQt_QQmlContext::MuQt_QQmlContext(Pointer muobj, const CallEnvironment* ce,
-                                       QQmlContext* parentContext,
-                                       QObject* parent)
+    MuQt_QQmlContext::MuQt_QQmlContext(Pointer muobj, const CallEnvironment* ce, QQmlContext* parentContext, QObject* parent)
         : QQmlContext(parentContext, parent)
     {
         _env = ce;
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QQmlContextType>(
-            c->internName("qt.QQmlContext"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QQmlContextType>(c->internName("qt.QQmlContext"));
     }
 
     bool MuQt_QQmlContext::event(QEvent* e)
@@ -116,8 +111,7 @@ namespace Mu
         {
             Function::ArgumentVector args(3);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeinstance<QObjectType>(c, watched, "qt.QObject"));
+            args[1] = Value(makeinstance<QObjectType>(c, watched, "qt.QObject"));
             args[2] = Value(makeqpointer<QEventType>(c, event, "qt.QEvent"));
             Value rval = _env->call(F, args);
             return (bool)(rval._bool);
@@ -165,8 +159,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QTimerEventType>(c, event, "qt.QTimerEvent"));
+            args[1] = Value(makeqpointer<QTimerEventType>(c, event, "qt.QTimerEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -178,8 +171,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  Mu Type CONSTRUCTORS
 
-    QQmlContextType::QQmlContextType(Context* c, const char* name, Class* super,
-                                     Class* super2)
+    QQmlContextType::QQmlContextType(Context* c, const char* name, Class* super, Class* super2)
         : Class(c, name, vectorOf2(super, super2))
     {
     }
@@ -189,8 +181,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    static Pointer QQmlContext_QQmlContext_QObject(Thread& NODE_THREAD,
-                                                   Pointer obj)
+    static Pointer QQmlContext_QQmlContext_QObject(Thread& NODE_THREAD, Pointer obj)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         ClassInstance* widget = reinterpret_cast<ClassInstance*>(obj);
@@ -201,9 +192,7 @@ namespace Mu
         }
         else if (QQmlContext* w = object<QQmlContext>(widget))
         {
-            QQmlContextType* type =
-                c->findSymbolOfTypeByQualifiedName<QQmlContextType>(
-                    c->internName("qt.QQmlContext"), false);
+            QQmlContextType* type = c->findSymbolOfTypeByQualifiedName<QQmlContextType>(c->internName("qt.QQmlContext"), false);
             ClassInstance* o = ClassInstance::allocate(type);
             setobject(o, w);
             return o;
@@ -214,87 +203,65 @@ namespace Mu
         }
     }
 
-    static NODE_IMPLEMENTATION(castFromObject, Pointer)
-    {
-        NODE_RETURN(
-            QQmlContext_QQmlContext_QObject(NODE_THREAD, NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(castFromObject, Pointer) { NODE_RETURN(QQmlContext_QQmlContext_QObject(NODE_THREAD, NODE_ARG(0, Pointer))); }
 
-    Pointer
-    qt_QQmlContext_QQmlContext_QQmlContext_QQmlContext_QQmlEngine_QObject(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_engine,
-        Pointer param_parent)
+    Pointer qt_QQmlContext_QQmlContext_QQmlContext_QQmlContext_QQmlEngine_QObject(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                  Pointer param_engine, Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQmlEngine* arg1 = object<QQmlEngine>(param_engine);
         QObject* arg2 = object<QObject>(param_parent);
-        setobject(param_this, new MuQt_QQmlContext(
-                                  param_this, NODE_THREAD.process()->callEnv(),
-                                  arg1, arg2));
+        setobject(param_this, new MuQt_QQmlContext(param_this, NODE_THREAD.process()->callEnv(), arg1, arg2));
         return param_this;
     }
 
-    Pointer
-    qt_QQmlContext_QQmlContext_QQmlContext_QQmlContext_QQmlContext_QObject(
-        Mu::Thread& NODE_THREAD, Pointer param_this,
-        Pointer param_parentContext, Pointer param_parent)
+    Pointer qt_QQmlContext_QQmlContext_QQmlContext_QQmlContext_QQmlContext_QObject(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                   Pointer param_parentContext, Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQmlContext* arg1 = object<QQmlContext>(param_parentContext);
         QObject* arg2 = object<QObject>(param_parent);
-        setobject(param_this, new MuQt_QQmlContext(
-                                  param_this, NODE_THREAD.process()->callEnv(),
-                                  arg1, arg2));
+        setobject(param_this, new MuQt_QQmlContext(param_this, NODE_THREAD.process()->callEnv(), arg1, arg2));
         return param_this;
     }
 
-    Pointer qt_QQmlContext_baseUrl_QUrl_QQmlContext(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this)
+    Pointer qt_QQmlContext_baseUrl_QUrl_QQmlContext(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQmlContext* arg0 = object<QQmlContext>(param_this);
         return makeqtype<QUrlType>(c, arg0->baseUrl(), "qt.QUrl");
     }
 
-    Pointer
-    qt_QQmlContext_contextObject_QObject_QQmlContext(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_this)
+    Pointer qt_QQmlContext_contextObject_QObject_QQmlContext(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQmlContext* arg0 = object<QQmlContext>(param_this);
-        return makeinstance<QObjectType>(c, arg0->contextObject(),
-                                         "qt.QObject");
+        return makeinstance<QObjectType>(c, arg0->contextObject(), "qt.QObject");
     }
 
-    Pointer qt_QQmlContext_contextProperty_QVariant_QQmlContext_string(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_name)
+    Pointer qt_QQmlContext_contextProperty_QVariant_QQmlContext_string(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_name)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQmlContext* arg0 = object<QQmlContext>(param_this);
         const QString arg1 = qstring(param_name);
-        return makeqtype<QVariantType>(c, arg0->contextProperty(arg1),
-                                       "qt.QVariant");
+        return makeqtype<QVariantType>(c, arg0->contextProperty(arg1), "qt.QVariant");
     }
 
-    Pointer
-    qt_QQmlContext_engine_QQmlEngine_QQmlContext(Mu::Thread& NODE_THREAD,
-                                                 Pointer param_this)
+    Pointer qt_QQmlContext_engine_QQmlEngine_QQmlContext(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQmlContext* arg0 = object<QQmlContext>(param_this);
         return makeinstance<QQmlEngineType>(c, arg0->engine(), "qt.QQmlEngine");
     }
 
-    bool qt_QQmlContext_isValid_bool_QQmlContext(Mu::Thread& NODE_THREAD,
-                                                 Pointer param_this)
+    bool qt_QQmlContext_isValid_bool_QQmlContext(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQmlContext* arg0 = object<QQmlContext>(param_this);
         return arg0->isValid();
     }
 
-    Pointer qt_QQmlContext_nameForObject_string_QQmlContext_QObject(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_object)
+    Pointer qt_QQmlContext_nameForObject_string_QQmlContext_QObject(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_object)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQmlContext* arg0 = object<QQmlContext>(param_this);
@@ -302,17 +269,14 @@ namespace Mu
         return makestring(c, arg0->nameForObject(arg1));
     }
 
-    Pointer qt_QQmlContext_parentContext_QQmlContext_QQmlContext(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QQmlContext_parentContext_QQmlContext_QQmlContext(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQmlContext* arg0 = object<QQmlContext>(param_this);
-        return makeinstance<QQmlContextType>(c, arg0->parentContext(),
-                                             "qt.QQmlContext");
+        return makeinstance<QQmlContextType>(c, arg0->parentContext(), "qt.QQmlContext");
     }
 
-    Pointer qt_QQmlContext_resolvedUrl_QUrl_QQmlContext_QUrl(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_src)
+    Pointer qt_QQmlContext_resolvedUrl_QUrl_QQmlContext_QUrl(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_src)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQmlContext* arg0 = object<QQmlContext>(param_this);
@@ -320,8 +284,7 @@ namespace Mu
         return makeqtype<QUrlType>(c, arg0->resolvedUrl(arg1), "qt.QUrl");
     }
 
-    void qt_QQmlContext_setBaseUrl_void_QQmlContext_QUrl(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_baseUrl)
+    void qt_QQmlContext_setBaseUrl_void_QQmlContext_QUrl(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_baseUrl)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQmlContext* arg0 = object<QQmlContext>(param_this);
@@ -329,8 +292,7 @@ namespace Mu
         arg0->setBaseUrl(arg1);
     }
 
-    void qt_QQmlContext_setContextObject_void_QQmlContext_QObject(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_object)
+    void qt_QQmlContext_setContextObject_void_QQmlContext_QObject(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_object)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQmlContext* arg0 = object<QQmlContext>(param_this);
@@ -338,9 +300,8 @@ namespace Mu
         arg0->setContextObject(arg1);
     }
 
-    void qt_QQmlContext_setContextProperty_void_QQmlContext_string_QObject(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_name,
-        Pointer param_value)
+    void qt_QQmlContext_setContextProperty_void_QQmlContext_string_QObject(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_name,
+                                                                           Pointer param_value)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQmlContext* arg0 = object<QQmlContext>(param_this);
@@ -349,9 +310,8 @@ namespace Mu
         arg0->setContextProperty(arg1, arg2);
     }
 
-    void qt_QQmlContext_setContextProperty_void_QQmlContext_string_QVariant(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_name,
-        Pointer param_value)
+    void qt_QQmlContext_setContextProperty_void_QQmlContext_string_QVariant(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_name,
+                                                                            Pointer param_value)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQmlContext* arg0 = object<QQmlContext>(param_this);
@@ -360,31 +320,25 @@ namespace Mu
         arg0->setContextProperty(arg1, arg2);
     }
 
-    bool qt_QQmlContext_event_bool_QQmlContext_QEvent(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this,
-                                                      Pointer param_e)
+    bool qt_QQmlContext_event_bool_QQmlContext_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQmlContext* arg0 = object<QQmlContext>(param_this);
         QEvent* arg1 = getqpointer<QEventType>(param_e);
-        return isMuQtObject(arg0) ? arg0->QQmlContext::event(arg1)
-                                  : arg0->event(arg1);
+        return isMuQtObject(arg0) ? arg0->QQmlContext::event(arg1) : arg0->event(arg1);
     }
 
-    bool qt_QQmlContext_eventFilter_bool_QQmlContext_QObject_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_watched,
-        Pointer param_event)
+    bool qt_QQmlContext_eventFilter_bool_QQmlContext_QObject_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_watched,
+                                                                    Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQmlContext* arg0 = object<QQmlContext>(param_this);
         QObject* arg1 = object<QObject>(param_watched);
         QEvent* arg2 = getqpointer<QEventType>(param_event);
-        return isMuQtObject(arg0) ? arg0->QQmlContext::eventFilter(arg1, arg2)
-                                  : arg0->eventFilter(arg1, arg2);
+        return isMuQtObject(arg0) ? arg0->QQmlContext::eventFilter(arg1, arg2) : arg0->eventFilter(arg1, arg2);
     }
 
-    void qt_QQmlContext_customEvent_void_QQmlContext_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QQmlContext_customEvent_void_QQmlContext_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQmlContext* arg0 = object<QQmlContext>(param_this);
@@ -395,8 +349,7 @@ namespace Mu
             ((MuQt_QQmlContext*)arg0)->customEvent_pub(arg1);
     }
 
-    void qt_QQmlContext_timerEvent_void_QQmlContext_QTimerEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QQmlContext_timerEvent_void_QQmlContext_QTimerEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QQmlContext* arg0 = object<QQmlContext>(param_this);
@@ -409,117 +362,99 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(_n_QQmlContext0, Pointer)
     {
-        NODE_RETURN(
-            qt_QQmlContext_QQmlContext_QQmlContext_QQmlContext_QQmlEngine_QObject(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QQmlContext_QQmlContext_QQmlContext_QQmlContext_QQmlEngine_QObject(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                          NODE_ARG(1, Pointer), NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_QQmlContext1, Pointer)
     {
-        NODE_RETURN(
-            qt_QQmlContext_QQmlContext_QQmlContext_QQmlContext_QQmlContext_QObject(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QQmlContext_QQmlContext_QQmlContext_QQmlContext_QQmlContext_QObject(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                           NODE_ARG(1, Pointer), NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_baseUrl0, Pointer)
     {
-        NODE_RETURN(qt_QQmlContext_baseUrl_QUrl_QQmlContext(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QQmlContext_baseUrl_QUrl_QQmlContext(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_contextObject0, Pointer)
     {
-        NODE_RETURN(qt_QQmlContext_contextObject_QObject_QQmlContext(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QQmlContext_contextObject_QObject_QQmlContext(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_contextProperty0, Pointer)
     {
-        NODE_RETURN(qt_QQmlContext_contextProperty_QVariant_QQmlContext_string(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(
+            qt_QQmlContext_contextProperty_QVariant_QQmlContext_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_engine0, Pointer)
     {
-        NODE_RETURN(qt_QQmlContext_engine_QQmlEngine_QQmlContext(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QQmlContext_engine_QQmlEngine_QQmlContext(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isValid0, bool)
     {
-        NODE_RETURN(qt_QQmlContext_isValid_bool_QQmlContext(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QQmlContext_isValid_bool_QQmlContext(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_nameForObject0, Pointer)
     {
-        NODE_RETURN(qt_QQmlContext_nameForObject_string_QQmlContext_QObject(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(
+            qt_QQmlContext_nameForObject_string_QQmlContext_QObject(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_parentContext0, Pointer)
     {
-        NODE_RETURN(qt_QQmlContext_parentContext_QQmlContext_QQmlContext(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QQmlContext_parentContext_QQmlContext_QQmlContext(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_resolvedUrl0, Pointer)
     {
-        NODE_RETURN(qt_QQmlContext_resolvedUrl_QUrl_QQmlContext_QUrl(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QQmlContext_resolvedUrl_QUrl_QQmlContext_QUrl(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_setBaseUrl0, void)
     {
-        qt_QQmlContext_setBaseUrl_void_QQmlContext_QUrl(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QQmlContext_setBaseUrl_void_QQmlContext_QUrl(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setContextObject0, void)
     {
-        qt_QQmlContext_setContextObject_void_QQmlContext_QObject(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QQmlContext_setContextObject_void_QQmlContext_QObject(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setContextProperty0, void)
     {
-        qt_QQmlContext_setContextProperty_void_QQmlContext_string_QObject(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer));
+        qt_QQmlContext_setContextProperty_void_QQmlContext_string_QObject(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                          NODE_ARG(2, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setContextProperty1, void)
     {
-        qt_QQmlContext_setContextProperty_void_QQmlContext_string_QVariant(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer));
+        qt_QQmlContext_setContextProperty_void_QQmlContext_string_QVariant(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                           NODE_ARG(2, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_event0, bool)
     {
-        NODE_RETURN(qt_QQmlContext_event_bool_QQmlContext_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QQmlContext_event_bool_QQmlContext_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_eventFilter0, bool)
     {
-        NODE_RETURN(qt_QQmlContext_eventFilter_bool_QQmlContext_QObject_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QQmlContext_eventFilter_bool_QQmlContext_QObject_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                               NODE_ARG(1, Pointer), NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_customEvent0, void)
     {
-        qt_QQmlContext_customEvent_void_QQmlContext_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QQmlContext_customEvent_void_QQmlContext_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_timerEvent0, void)
     {
-        qt_QQmlContext_timerEvent_void_QQmlContext_QTimerEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QQmlContext_timerEvent_void_QQmlContext_QTimerEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     void QQmlContextType::load()
@@ -539,17 +474,13 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
-                   new Function(c, tn, castFromObject, Cast, Compiled,
-                                QQmlContext_QQmlContext_QObject, Return, ftn,
-                                Parameters,
+                   new Function(c, tn, castFromObject, Cast, Compiled, QQmlContext_QQmlContext_QObject, Return, ftn, Parameters,
                                 new Param(c, "object", "qt.QObject"), End),
 
                    EndArguments);
@@ -557,109 +488,60 @@ namespace Mu
         addSymbols(
             // enums
             // member functions
-            new Function(
-                c, "QQmlContext", _n_QQmlContext0, None, Compiled,
-                qt_QQmlContext_QQmlContext_QQmlContext_QQmlContext_QQmlEngine_QObject,
-                Return, "qt.QQmlContext", Parameters,
-                new Param(c, "this", "qt.QQmlContext"),
-                new Param(c, "engine", "qt.QQmlEngine"),
-                new Param(c, "parent", "qt.QObject"), End),
-            new Function(
-                c, "QQmlContext", _n_QQmlContext1, None, Compiled,
-                qt_QQmlContext_QQmlContext_QQmlContext_QQmlContext_QQmlContext_QObject,
-                Return, "qt.QQmlContext", Parameters,
-                new Param(c, "this", "qt.QQmlContext"),
-                new Param(c, "parentContext", "qt.QQmlContext"),
-                new Param(c, "parent", "qt.QObject"), End),
-            new Function(c, "baseUrl", _n_baseUrl0, None, Compiled,
-                         qt_QQmlContext_baseUrl_QUrl_QQmlContext, Return,
-                         "qt.QUrl", Parameters,
+            new Function(c, "QQmlContext", _n_QQmlContext0, None, Compiled,
+                         qt_QQmlContext_QQmlContext_QQmlContext_QQmlContext_QQmlEngine_QObject, Return, "qt.QQmlContext", Parameters,
+                         new Param(c, "this", "qt.QQmlContext"), new Param(c, "engine", "qt.QQmlEngine"),
+                         new Param(c, "parent", "qt.QObject"), End),
+            new Function(c, "QQmlContext", _n_QQmlContext1, None, Compiled,
+                         qt_QQmlContext_QQmlContext_QQmlContext_QQmlContext_QQmlContext_QObject, Return, "qt.QQmlContext", Parameters,
+                         new Param(c, "this", "qt.QQmlContext"), new Param(c, "parentContext", "qt.QQmlContext"),
+                         new Param(c, "parent", "qt.QObject"), End),
+            new Function(c, "baseUrl", _n_baseUrl0, None, Compiled, qt_QQmlContext_baseUrl_QUrl_QQmlContext, Return, "qt.QUrl", Parameters,
                          new Param(c, "this", "qt.QQmlContext"), End),
-            new Function(c, "contextObject", _n_contextObject0, None, Compiled,
-                         qt_QQmlContext_contextObject_QObject_QQmlContext,
-                         Return, "qt.QObject", Parameters,
+            new Function(c, "contextObject", _n_contextObject0, None, Compiled, qt_QQmlContext_contextObject_QObject_QQmlContext, Return,
+                         "qt.QObject", Parameters, new Param(c, "this", "qt.QQmlContext"), End),
+            new Function(c, "contextProperty", _n_contextProperty0, None, Compiled,
+                         qt_QQmlContext_contextProperty_QVariant_QQmlContext_string, Return, "qt.QVariant", Parameters,
+                         new Param(c, "this", "qt.QQmlContext"), new Param(c, "name", "string"), End),
+            new Function(c, "engine", _n_engine0, None, Compiled, qt_QQmlContext_engine_QQmlEngine_QQmlContext, Return, "qt.QQmlEngine",
+                         Parameters, new Param(c, "this", "qt.QQmlContext"), End),
+            new Function(c, "isValid", _n_isValid0, None, Compiled, qt_QQmlContext_isValid_bool_QQmlContext, Return, "bool", Parameters,
                          new Param(c, "this", "qt.QQmlContext"), End),
-            new Function(
-                c, "contextProperty", _n_contextProperty0, None, Compiled,
-                qt_QQmlContext_contextProperty_QVariant_QQmlContext_string,
-                Return, "qt.QVariant", Parameters,
-                new Param(c, "this", "qt.QQmlContext"),
-                new Param(c, "name", "string"), End),
-            new Function(c, "engine", _n_engine0, None, Compiled,
-                         qt_QQmlContext_engine_QQmlEngine_QQmlContext, Return,
-                         "qt.QQmlEngine", Parameters,
-                         new Param(c, "this", "qt.QQmlContext"), End),
-            new Function(c, "isValid", _n_isValid0, None, Compiled,
-                         qt_QQmlContext_isValid_bool_QQmlContext, Return,
-                         "bool", Parameters,
-                         new Param(c, "this", "qt.QQmlContext"), End),
-            new Function(
-                c, "nameForObject", _n_nameForObject0, None, Compiled,
-                qt_QQmlContext_nameForObject_string_QQmlContext_QObject, Return,
-                "string", Parameters, new Param(c, "this", "qt.QQmlContext"),
-                new Param(c, "object", "qt.QObject"), End),
-            new Function(c, "parentContext", _n_parentContext0, None, Compiled,
-                         qt_QQmlContext_parentContext_QQmlContext_QQmlContext,
-                         Return, "qt.QQmlContext", Parameters,
-                         new Param(c, "this", "qt.QQmlContext"), End),
-            new Function(c, "resolvedUrl", _n_resolvedUrl0, None, Compiled,
-                         qt_QQmlContext_resolvedUrl_QUrl_QQmlContext_QUrl,
-                         Return, "qt.QUrl", Parameters,
-                         new Param(c, "this", "qt.QQmlContext"),
-                         new Param(c, "src", "qt.QUrl"), End),
-            new Function(c, "setBaseUrl", _n_setBaseUrl0, None, Compiled,
-                         qt_QQmlContext_setBaseUrl_void_QQmlContext_QUrl,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QQmlContext"),
-                         new Param(c, "baseUrl", "qt.QUrl"), End),
-            new Function(
-                c, "setContextObject", _n_setContextObject0, None, Compiled,
-                qt_QQmlContext_setContextObject_void_QQmlContext_QObject,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QQmlContext"),
-                new Param(c, "object", "qt.QObject"), End),
-            new Function(
-                c, "setContextProperty", _n_setContextProperty0, None, Compiled,
-                qt_QQmlContext_setContextProperty_void_QQmlContext_string_QObject,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QQmlContext"),
-                new Param(c, "name", "string"),
-                new Param(c, "value", "qt.QObject"), End),
-            new Function(
-                c, "setContextProperty", _n_setContextProperty1, None, Compiled,
-                qt_QQmlContext_setContextProperty_void_QQmlContext_string_QVariant,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QQmlContext"),
-                new Param(c, "name", "string"),
-                new Param(c, "value", "qt.QVariant"), End),
-            _func[0] = new MemberFunction(
-                c, "event", _n_event0, None, Compiled,
-                qt_QQmlContext_event_bool_QQmlContext_QEvent, Return, "bool",
-                Parameters, new Param(c, "this", "qt.QQmlContext"),
-                new Param(c, "e", "qt.QEvent"), End),
-            _func[1] = new MemberFunction(
-                c, "eventFilter", _n_eventFilter0, None, Compiled,
-                qt_QQmlContext_eventFilter_bool_QQmlContext_QObject_QEvent,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QQmlContext"),
-                new Param(c, "watched", "qt.QObject"),
-                new Param(c, "event", "qt.QEvent"), End),
+            new Function(c, "nameForObject", _n_nameForObject0, None, Compiled, qt_QQmlContext_nameForObject_string_QQmlContext_QObject,
+                         Return, "string", Parameters, new Param(c, "this", "qt.QQmlContext"), new Param(c, "object", "qt.QObject"), End),
+            new Function(c, "parentContext", _n_parentContext0, None, Compiled, qt_QQmlContext_parentContext_QQmlContext_QQmlContext,
+                         Return, "qt.QQmlContext", Parameters, new Param(c, "this", "qt.QQmlContext"), End),
+            new Function(c, "resolvedUrl", _n_resolvedUrl0, None, Compiled, qt_QQmlContext_resolvedUrl_QUrl_QQmlContext_QUrl, Return,
+                         "qt.QUrl", Parameters, new Param(c, "this", "qt.QQmlContext"), new Param(c, "src", "qt.QUrl"), End),
+            new Function(c, "setBaseUrl", _n_setBaseUrl0, None, Compiled, qt_QQmlContext_setBaseUrl_void_QQmlContext_QUrl, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QQmlContext"), new Param(c, "baseUrl", "qt.QUrl"), End),
+            new Function(c, "setContextObject", _n_setContextObject0, None, Compiled,
+                         qt_QQmlContext_setContextObject_void_QQmlContext_QObject, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QQmlContext"), new Param(c, "object", "qt.QObject"), End),
+            new Function(c, "setContextProperty", _n_setContextProperty0, None, Compiled,
+                         qt_QQmlContext_setContextProperty_void_QQmlContext_string_QObject, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QQmlContext"), new Param(c, "name", "string"), new Param(c, "value", "qt.QObject"), End),
+            new Function(c, "setContextProperty", _n_setContextProperty1, None, Compiled,
+                         qt_QQmlContext_setContextProperty_void_QQmlContext_string_QVariant, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QQmlContext"), new Param(c, "name", "string"), new Param(c, "value", "qt.QVariant"), End),
+            _func[0] = new MemberFunction(c, "event", _n_event0, None, Compiled, qt_QQmlContext_event_bool_QQmlContext_QEvent, Return,
+                                          "bool", Parameters, new Param(c, "this", "qt.QQmlContext"), new Param(c, "e", "qt.QEvent"), End),
+            _func[1] = new MemberFunction(c, "eventFilter", _n_eventFilter0, None, Compiled,
+                                          qt_QQmlContext_eventFilter_bool_QQmlContext_QObject_QEvent, Return, "bool", Parameters,
+                                          new Param(c, "this", "qt.QQmlContext"), new Param(c, "watched", "qt.QObject"),
+                                          new Param(c, "event", "qt.QEvent"), End),
             // MISSING: metaObject ("const QMetaObject *"; QQmlContext this)
             // MISSING: childEvent (void; QQmlContext this, "QChildEvent *"
             // event) // protected MISSING: connectNotify (void; QQmlContext
             // this, "const QMetaMethod &" signal) // protected
-            _func[2] = new MemberFunction(
-                c, "customEvent", _n_customEvent0, None, Compiled,
-                qt_QQmlContext_customEvent_void_QQmlContext_QEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QQmlContext"),
-                new Param(c, "event", "qt.QEvent"), End),
+            _func[2] = new MemberFunction(c, "customEvent", _n_customEvent0, None, Compiled,
+                                          qt_QQmlContext_customEvent_void_QQmlContext_QEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QQmlContext"), new Param(c, "event", "qt.QEvent"), End),
             // MISSING: disconnectNotify (void; QQmlContext this, "const
             // QMetaMethod &" signal) // protected
-            _func[3] = new MemberFunction(
-                c, "timerEvent", _n_timerEvent0, None, Compiled,
-                qt_QQmlContext_timerEvent_void_QQmlContext_QTimerEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QQmlContext"),
-                new Param(c, "event", "qt.QTimerEvent"), End),
+            _func[3] = new MemberFunction(c, "timerEvent", _n_timerEvent0, None, Compiled,
+                                          qt_QQmlContext_timerEvent_void_QQmlContext_QTimerEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QQmlContext"), new Param(c, "event", "qt.QTimerEvent"), End),
             // static functions
             EndArguments);
         globalScope()->addSymbols(EndArguments);

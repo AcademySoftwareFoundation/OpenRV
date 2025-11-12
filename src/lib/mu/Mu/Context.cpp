@@ -209,8 +209,7 @@ namespace Mu
 
             if (Name n = lookupName(name.c_str()))
             {
-                if (FunctionType* ftype =
-                        globalScope()->findSymbolOfType<FunctionType>(n))
+                if (FunctionType* ftype = globalScope()->findSymbolOfType<FunctionType>(n))
                 {
                     return ftype;
                 }
@@ -228,11 +227,7 @@ namespace Mu
 
     //----------------------------------------------------------------------
 
-    bool operator<(const Context::ScoredFunction& a,
-                   const Context::ScoredFunction& b)
-    {
-        return a.totalScore > b.totalScore;
-    }
+    bool operator<(const Context::ScoredFunction& a, const Context::ScoredFunction& b) { return a.totalScore > b.totalScore; }
 
     void Context::ScoredFunction::computeTotalScore()
     {
@@ -263,8 +258,7 @@ namespace Mu
                     return dynamicCast();
                 }
             }
-            else if (const Interface* toInter =
-                         dynamic_cast<const Interface*>(to))
+            else if (const Interface* toInter = dynamic_cast<const Interface*>(to))
             {
                 return dynamicCast();
             }
@@ -273,8 +267,7 @@ namespace Mu
         return 0;
     }
 
-    int Context::score(const Function* F, TypeBindings& bindings,
-                       const Type* ftype, const Type* type) const
+    int Context::score(const Function* F, TypeBindings& bindings, const Type* ftype, const Type* type) const
     {
         if (!type || !ftype || ftype == type)
             return 0;
@@ -302,8 +295,7 @@ namespace Mu
         return -1;
     }
 
-    bool Context::scoreArgs(Scores& scores, TypeBindings& bindings,
-                            const Function* F, const TypeVector& args) const
+    bool Context::scoreArgs(Scores& scores, TypeBindings& bindings, const Function* F, const TypeVector& args) const
     {
         scores.resize(F->numArgs());
 
@@ -328,8 +320,7 @@ namespace Mu
 
                 if (funcType->isTypePattern())
                 {
-                    const TypePattern* ptype =
-                        static_cast<const TypePattern*>(funcType);
+                    const TypePattern* ptype = static_cast<const TypePattern*>(funcType);
                     ptype->argumentAdjust(i, j);
                 }
             }
@@ -363,9 +354,7 @@ namespace Mu
         return true;
     }
 
-    const Function* Context::matchFunction(const FunctionVector& functions,
-                                           const TypeVector& argTypes,
-                                           TypeBindings& bindings,
+    const Function* Context::matchFunction(const FunctionVector& functions, const TypeVector& argTypes, TypeBindings& bindings,
                                            MatchType& matchType) const
     {
         ScoredFunctions possibles;
@@ -419,8 +408,7 @@ namespace Mu
                         p[0] = 1;
                         p[1] = 0;
 
-                        possibles.push_back(
-                            ScoredFunction(F, bindings, scores, p));
+                        possibles.push_back(ScoredFunction(F, bindings, scores, p));
                     }
                 }
             }
@@ -454,8 +442,7 @@ namespace Mu
 
         if (_verbose)
         {
-            cout << ">>> MU: Choices in order for "
-                 << possibles.back().func->fullyQualifiedName() << " (";
+            cout << ">>> MU: Choices in order for " << possibles.back().func->fullyQualifiedName() << " (";
 
             for (int i = 0; i < argTypes.size(); i++)
             {
@@ -474,16 +461,14 @@ namespace Mu
                 f.func->output(cout);
                 cout << endl << ">>> Mu:      " << f.totalScore << " = ( ";
 
-                copy(f.scores.begin(), f.scores.end(),
-                     ostream_iterator<int>(cout, " "));
+                copy(f.scores.begin(), f.scores.end(), ostream_iterator<int>(cout, " "));
 
                 cout << ")";
 
                 if (f.permutation.size())
                 {
                     cout << "   [ ";
-                    copy(f.permutation.begin(), f.permutation.end(),
-                         ostream_iterator<int>(cout, " "));
+                    copy(f.permutation.begin(), f.permutation.end(), ostream_iterator<int>(cout, " "));
 
                     cout << "]";
                 }
@@ -521,9 +506,8 @@ namespace Mu
         return choice.func;
     }
 
-    const Function* Context::matchSpecializedFunction(
-        Process* p, Thread* thread, const FunctionVector& fvec,
-        const TypeVector& args, MatchType& matchType)
+    const Function* Context::matchSpecializedFunction(Process* p, Thread* thread, const FunctionVector& fvec, const TypeVector& args,
+                                                      MatchType& matchType)
     {
         TypeBindings bindings;
         const Function* F = matchFunction(fvec, args, bindings, matchType);
@@ -545,9 +529,7 @@ namespace Mu
     //  specialize the function F for the given parameter types.
     //
 
-    const Function* Context::specializeFunction(Process* p, Thread* thread,
-                                                const TypeBindings& bindings,
-                                                const Function* F,
+    const Function* Context::specializeFunction(Process* p, Thread* thread, const TypeBindings& bindings, const Function* F,
                                                 const TypeVector& types)
     {
 #if 0
@@ -575,8 +557,7 @@ namespace Mu
     }
 
     //----------------------------------------------------------------------
-    TypedValue Context::evalFunction(Process* p, Function* F,
-                                     ArgumentVector& args)
+    TypedValue Context::evalFunction(Process* p, Function* F, ArgumentVector& args)
     {
         Thread* t = p->newApplicationThread();
         TypedValue v(t->call(F, args, true), F->returnType());
@@ -607,10 +588,7 @@ namespace Mu
         parseStream(process, cin, inputName);
     }
 
-    void Context::parseStream(Process*, istream&, const char* inputName)
-    {
-        abort();
-    }
+    void Context::parseStream(Process*, istream&, const char* inputName) { abort(); }
 
     //----------------------------------------------------------------------
 
@@ -643,8 +621,7 @@ namespace Mu
 
     //----------------------------------------------------------------------
 
-    StructType* Context::structType(Symbol* root, const char* n,
-                                    const NameValuePairs& fields)
+    StructType* Context::structType(Symbol* root, const char* n, const NameValuePairs& fields)
     {
         PrimaryBit fence(this, false);
         Name name = internName(n);
@@ -692,15 +669,9 @@ namespace Mu
 
     Name Context::internName(const String& n) { return namePool().intern(n); }
 
-    Name Context::internName(const char* n) const
-    {
-        return namePool().intern(n);
-    }
+    Name Context::internName(const char* n) const { return namePool().intern(n); }
 
-    Name Context::internName(const String& n) const
-    {
-        return namePool().intern(n);
-    }
+    Name Context::internName(const String& n) const { return namePool().intern(n); }
 
     void Context::separateName(Name name, NameVector& names) const
     {
@@ -861,8 +832,7 @@ namespace Mu
         return name;
     }
 
-    const Context::SourceRecord*
-    Context::sourceRecordOfNode(const Node* n) const
+    const Context::SourceRecord* Context::sourceRecordOfNode(const Node* n) const
     {
         NodeDefinitionMap::const_iterator i = _nodeDefinitionMap.find(n);
 
@@ -874,8 +844,7 @@ namespace Mu
         return 0;
     }
 
-    const Context::SourceRecord*
-    Context::sourceRecordOfSymbol(const Symbol* s) const
+    const Context::SourceRecord* Context::sourceRecordOfSymbol(const Symbol* s) const
     {
         SymbolDefinitionMap::const_iterator i = _symbolDefinitionMap.find(s);
 
@@ -912,9 +881,6 @@ namespace Mu
         }
     }
 
-    void Context::symbolDestroyed(const Symbol* s)
-    {
-        _symbolDefinitionMap.erase(s);
-    }
+    void Context::symbolDestroyed(const Symbol* s) { _symbolDefinitionMap.erase(s); }
 
 } // namespace Mu

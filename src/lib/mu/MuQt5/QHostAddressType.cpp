@@ -41,8 +41,7 @@ namespace Mu
     {
     }
 
-    QHostAddressType::QHostAddressType(Context* c, const char* name,
-                                       Class* super)
+    QHostAddressType::QHostAddressType(Context* c, const char* name, Class* super)
         : Class(c, name, super)
     {
     }
@@ -51,37 +50,30 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(__allocate, Pointer)
     {
-        QHostAddressType::Instance* i =
-            new QHostAddressType::Instance((Class*)NODE_THIS.type());
+        QHostAddressType::Instance* i = new QHostAddressType::Instance((Class*)NODE_THIS.type());
         QHostAddressType::registerFinalizer(i);
         NODE_RETURN(i);
     }
 
-    void QHostAddressType::registerFinalizer(void* o)
-    {
-        GC_register_finalizer(o, QHostAddressType::finalizer, 0, 0, 0);
-    }
+    void QHostAddressType::registerFinalizer(void* o) { GC_register_finalizer(o, QHostAddressType::finalizer, 0, 0, 0); }
 
     void QHostAddressType::finalizer(void* obj, void* data)
     {
-        QHostAddressType::Instance* i =
-            reinterpret_cast<QHostAddressType::Instance*>(obj);
+        QHostAddressType::Instance* i = reinterpret_cast<QHostAddressType::Instance*>(obj);
         delete i;
     }
 
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    Pointer qt_QHostAddress_QHostAddress_QHostAddress_QHostAddress(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QHostAddress_QHostAddress_QHostAddress_QHostAddress(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         setqtype<QHostAddressType>(param_this, QHostAddress());
         return param_this;
     }
 
-    Pointer qt_QHostAddress_QHostAddress_QHostAddress_QHostAddress_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_ip4Addr)
+    Pointer qt_QHostAddress_QHostAddress_QHostAddress_QHostAddress_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_ip4Addr)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         quint32 arg1 = (int)(param_ip4Addr);
@@ -89,8 +81,8 @@ namespace Mu
         return param_this;
     }
 
-    Pointer qt_QHostAddress_QHostAddress_QHostAddress_QHostAddress_string(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_address)
+    Pointer qt_QHostAddress_QHostAddress_QHostAddress_QHostAddress_string(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                          Pointer param_address)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QString arg1 = qstring(param_address);
@@ -98,8 +90,7 @@ namespace Mu
         return param_this;
     }
 
-    void qt_QHostAddress_clear_void_QHostAddress(Mu::Thread& NODE_THREAD,
-                                                 Pointer param_this)
+    void qt_QHostAddress_clear_void_QHostAddress(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHostAddress arg0 = getqtype<QHostAddressType>(param_this);
@@ -107,9 +98,8 @@ namespace Mu
         setqtype<QHostAddressType>(param_this, arg0);
     }
 
-    bool qt_QHostAddress_isInSubnet_bool_QHostAddress_QHostAddress_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_subnet,
-        int param_netmask)
+    bool qt_QHostAddress_isInSubnet_bool_QHostAddress_QHostAddress_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_subnet,
+                                                                       int param_netmask)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHostAddress arg0 = getqtype<QHostAddressType>(param_this);
@@ -118,48 +108,42 @@ namespace Mu
         return arg0.isInSubnet(arg1, arg2);
     }
 
-    bool qt_QHostAddress_isLoopback_bool_QHostAddress(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    bool qt_QHostAddress_isLoopback_bool_QHostAddress(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHostAddress arg0 = getqtype<QHostAddressType>(param_this);
         return arg0.isLoopback();
     }
 
-    bool qt_QHostAddress_isMulticast_bool_QHostAddress(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this)
+    bool qt_QHostAddress_isMulticast_bool_QHostAddress(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHostAddress arg0 = getqtype<QHostAddressType>(param_this);
         return arg0.isMulticast();
     }
 
-    bool qt_QHostAddress_isNull_bool_QHostAddress(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this)
+    bool qt_QHostAddress_isNull_bool_QHostAddress(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHostAddress arg0 = getqtype<QHostAddressType>(param_this);
         return arg0.isNull();
     }
 
-    int qt_QHostAddress_protocol_int_QHostAddress(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this)
+    int qt_QHostAddress_protocol_int_QHostAddress(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHostAddress arg0 = getqtype<QHostAddressType>(param_this);
         return int(arg0.protocol());
     }
 
-    Pointer qt_QHostAddress_scopeId_string_QHostAddress(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this)
+    Pointer qt_QHostAddress_scopeId_string_QHostAddress(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHostAddress arg0 = getqtype<QHostAddressType>(param_this);
         return makestring(c, arg0.scopeId());
     }
 
-    void qt_QHostAddress_setAddress_void_QHostAddress_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_ip4Addr)
+    void qt_QHostAddress_setAddress_void_QHostAddress_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_ip4Addr)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHostAddress arg0 = getqtype<QHostAddressType>(param_this);
@@ -168,8 +152,7 @@ namespace Mu
         setqtype<QHostAddressType>(param_this, arg0);
     }
 
-    bool qt_QHostAddress_setAddress_bool_QHostAddress_string(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_address)
+    bool qt_QHostAddress_setAddress_bool_QHostAddress_string(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_address)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHostAddress arg0 = getqtype<QHostAddressType>(param_this);
@@ -177,8 +160,7 @@ namespace Mu
         return arg0.setAddress(arg1);
     }
 
-    void qt_QHostAddress_setScopeId_void_QHostAddress_string(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_id)
+    void qt_QHostAddress_setScopeId_void_QHostAddress_string(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_id)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHostAddress arg0 = getqtype<QHostAddressType>(param_this);
@@ -187,8 +169,7 @@ namespace Mu
         setqtype<QHostAddressType>(param_this, arg0);
     }
 
-    void qt_QHostAddress_swap_void_QHostAddress_QHostAddress(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_other)
+    void qt_QHostAddress_swap_void_QHostAddress_QHostAddress(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_other)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHostAddress arg0 = getqtype<QHostAddressType>(param_this);
@@ -197,25 +178,21 @@ namespace Mu
         setqtype<QHostAddressType>(param_this, arg0);
     }
 
-    int qt_QHostAddress_toIPv4Address_int_QHostAddress(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this)
+    int qt_QHostAddress_toIPv4Address_int_QHostAddress(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHostAddress arg0 = getqtype<QHostAddressType>(param_this);
         return arg0.toIPv4Address();
     }
 
-    Pointer
-    qt_QHostAddress_toString_string_QHostAddress(Mu::Thread& NODE_THREAD,
-                                                 Pointer param_this)
+    Pointer qt_QHostAddress_toString_string_QHostAddress(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHostAddress arg0 = getqtype<QHostAddressType>(param_this);
         return makestring(c, arg0.toString());
     }
 
-    bool qt_QHostAddress_operatorBang_EQ__bool_QHostAddress_QHostAddress(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_other)
+    bool qt_QHostAddress_operatorBang_EQ__bool_QHostAddress_QHostAddress(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_other)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHostAddress arg0 = getqtype<QHostAddressType>(param_this);
@@ -223,18 +200,15 @@ namespace Mu
         return arg0.operator!=(arg1);
     }
 
-    bool qt_QHostAddress_operatorBang_EQ__bool_QHostAddress_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_other)
+    bool qt_QHostAddress_operatorBang_EQ__bool_QHostAddress_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_other)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHostAddress arg0 = getqtype<QHostAddressType>(param_this);
-        QHostAddress::SpecialAddress arg1 =
-            (QHostAddress::SpecialAddress)(param_other);
+        QHostAddress::SpecialAddress arg1 = (QHostAddress::SpecialAddress)(param_other);
         return arg0.operator!=(arg1);
     }
 
-    bool qt_QHostAddress_operatorEQ_EQ__bool_QHostAddress_QHostAddress(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_other)
+    bool qt_QHostAddress_operatorEQ_EQ__bool_QHostAddress_QHostAddress(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_other)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHostAddress arg0 = getqtype<QHostAddressType>(param_this);
@@ -242,142 +216,113 @@ namespace Mu
         return arg0.operator==(arg1);
     }
 
-    bool qt_QHostAddress_operatorEQ_EQ__bool_QHostAddress_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_other)
+    bool qt_QHostAddress_operatorEQ_EQ__bool_QHostAddress_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_other)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHostAddress arg0 = getqtype<QHostAddressType>(param_this);
-        QHostAddress::SpecialAddress arg1 =
-            (QHostAddress::SpecialAddress)(param_other);
+        QHostAddress::SpecialAddress arg1 = (QHostAddress::SpecialAddress)(param_other);
         return arg0.operator==(arg1);
     }
 
     static NODE_IMPLEMENTATION(_n_QHostAddress0, Pointer)
     {
-        NODE_RETURN(qt_QHostAddress_QHostAddress_QHostAddress_QHostAddress(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QHostAddress_QHostAddress_QHostAddress_QHostAddress(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_QHostAddress1, Pointer)
     {
-        NODE_RETURN(qt_QHostAddress_QHostAddress_QHostAddress_QHostAddress_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QHostAddress_QHostAddress_QHostAddress_QHostAddress_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_QHostAddress6, Pointer)
     {
         NODE_RETURN(
-            qt_QHostAddress_QHostAddress_QHostAddress_QHostAddress_string(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+            qt_QHostAddress_QHostAddress_QHostAddress_QHostAddress_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
-    static NODE_IMPLEMENTATION(_n_clear0, void)
-    {
-        qt_QHostAddress_clear_void_QHostAddress(NODE_THREAD,
-                                                NONNIL_NODE_ARG(0, Pointer));
-    }
+    static NODE_IMPLEMENTATION(_n_clear0, void) { qt_QHostAddress_clear_void_QHostAddress(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)); }
 
     static NODE_IMPLEMENTATION(_n_isInSubnet0, bool)
     {
-        NODE_RETURN(
-            qt_QHostAddress_isInSubnet_bool_QHostAddress_QHostAddress_int(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, int)));
+        NODE_RETURN(qt_QHostAddress_isInSubnet_bool_QHostAddress_QHostAddress_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                  NODE_ARG(1, Pointer), NODE_ARG(2, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_isLoopback0, bool)
     {
-        NODE_RETURN(qt_QHostAddress_isLoopback_bool_QHostAddress(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QHostAddress_isLoopback_bool_QHostAddress(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isMulticast0, bool)
     {
-        NODE_RETURN(qt_QHostAddress_isMulticast_bool_QHostAddress(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QHostAddress_isMulticast_bool_QHostAddress(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isNull0, bool)
     {
-        NODE_RETURN(qt_QHostAddress_isNull_bool_QHostAddress(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QHostAddress_isNull_bool_QHostAddress(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_protocol0, int)
     {
-        NODE_RETURN(qt_QHostAddress_protocol_int_QHostAddress(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QHostAddress_protocol_int_QHostAddress(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_scopeId0, Pointer)
     {
-        NODE_RETURN(qt_QHostAddress_scopeId_string_QHostAddress(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QHostAddress_scopeId_string_QHostAddress(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_setAddress0, void)
     {
-        qt_QHostAddress_setAddress_void_QHostAddress_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QHostAddress_setAddress_void_QHostAddress_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setAddress5, bool)
     {
-        NODE_RETURN(qt_QHostAddress_setAddress_bool_QHostAddress_string(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QHostAddress_setAddress_bool_QHostAddress_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_setScopeId0, void)
     {
-        qt_QHostAddress_setScopeId_void_QHostAddress_string(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QHostAddress_setScopeId_void_QHostAddress_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_swap0, void)
     {
-        qt_QHostAddress_swap_void_QHostAddress_QHostAddress(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QHostAddress_swap_void_QHostAddress_QHostAddress(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_toIPv4Address0, int)
     {
-        NODE_RETURN(qt_QHostAddress_toIPv4Address_int_QHostAddress(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QHostAddress_toIPv4Address_int_QHostAddress(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_toString0, Pointer)
     {
-        NODE_RETURN(qt_QHostAddress_toString_string_QHostAddress(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QHostAddress_toString_string_QHostAddress(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorBang_EQ_0, bool)
     {
-        NODE_RETURN(
-            qt_QHostAddress_operatorBang_EQ__bool_QHostAddress_QHostAddress(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QHostAddress_operatorBang_EQ__bool_QHostAddress_QHostAddress(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                    NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorBang_EQ_1, bool)
     {
-        NODE_RETURN(qt_QHostAddress_operatorBang_EQ__bool_QHostAddress_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QHostAddress_operatorBang_EQ__bool_QHostAddress_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorEQ_EQ_0, bool)
     {
         NODE_RETURN(
-            qt_QHostAddress_operatorEQ_EQ__bool_QHostAddress_QHostAddress(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+            qt_QHostAddress_operatorEQ_EQ__bool_QHostAddress_QHostAddress(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorEQ_EQ_1, bool)
     {
-        NODE_RETURN(qt_QHostAddress_operatorEQ_EQ__bool_QHostAddress_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QHostAddress_operatorEQ_EQ__bool_QHostAddress_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     void QHostAddressType::load()
@@ -397,160 +342,95 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(
-            new Function(c, "__allocate", __allocate, None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", __allocate, None, Return, ftn, End),
 
-            EndArguments);
+                   EndArguments);
 
-        addSymbols(
-            new Alias(c, "SpecialAddress", "int"),
-            new SymbolicConstant(c, "Null", "int",
-                                 Value(int(QHostAddress::Null))),
-            new SymbolicConstant(c, "LocalHost", "int",
-                                 Value(int(QHostAddress::LocalHost))),
-            new SymbolicConstant(c, "LocalHostIPv6", "int",
-                                 Value(int(QHostAddress::LocalHostIPv6))),
-            new SymbolicConstant(c, "Broadcast", "int",
-                                 Value(int(QHostAddress::Broadcast))),
-            new SymbolicConstant(c, "AnyIPv4", "int",
-                                 Value(int(QHostAddress::AnyIPv4))),
-            new SymbolicConstant(c, "AnyIPv6", "int",
-                                 Value(int(QHostAddress::AnyIPv6))),
-            new SymbolicConstant(c, "Any", "int",
-                                 Value(int(QHostAddress::Any))),
-            EndArguments);
+        addSymbols(new Alias(c, "SpecialAddress", "int"), new SymbolicConstant(c, "Null", "int", Value(int(QHostAddress::Null))),
+                   new SymbolicConstant(c, "LocalHost", "int", Value(int(QHostAddress::LocalHost))),
+                   new SymbolicConstant(c, "LocalHostIPv6", "int", Value(int(QHostAddress::LocalHostIPv6))),
+                   new SymbolicConstant(c, "Broadcast", "int", Value(int(QHostAddress::Broadcast))),
+                   new SymbolicConstant(c, "AnyIPv4", "int", Value(int(QHostAddress::AnyIPv4))),
+                   new SymbolicConstant(c, "AnyIPv6", "int", Value(int(QHostAddress::AnyIPv6))),
+                   new SymbolicConstant(c, "Any", "int", Value(int(QHostAddress::Any))), EndArguments);
 
         addSymbols(
             // enums
             // member functions
-            new Function(c, "QHostAddress", _n_QHostAddress0, None, Compiled,
-                         qt_QHostAddress_QHostAddress_QHostAddress_QHostAddress,
-                         Return, "qt.QHostAddress", Parameters,
-                         new Param(c, "this", "qt.QHostAddress"), End),
-            new Function(
-                c, "QHostAddress", _n_QHostAddress1, None, Compiled,
-                qt_QHostAddress_QHostAddress_QHostAddress_QHostAddress_int,
-                Return, "qt.QHostAddress", Parameters,
-                new Param(c, "this", "qt.QHostAddress"),
-                new Param(c, "ip4Addr", "int"), End),
+            new Function(c, "QHostAddress", _n_QHostAddress0, None, Compiled, qt_QHostAddress_QHostAddress_QHostAddress_QHostAddress,
+                         Return, "qt.QHostAddress", Parameters, new Param(c, "this", "qt.QHostAddress"), End),
+            new Function(c, "QHostAddress", _n_QHostAddress1, None, Compiled, qt_QHostAddress_QHostAddress_QHostAddress_QHostAddress_int,
+                         Return, "qt.QHostAddress", Parameters, new Param(c, "this", "qt.QHostAddress"), new Param(c, "ip4Addr", "int"),
+                         End),
             // MISSING: QHostAddress (QHostAddress; QHostAddress this, "quint8
             // *" ip6Addr) MISSING: QHostAddress (QHostAddress; QHostAddress
             // this, "const quint8 *" ip6Addr) MISSING: QHostAddress
             // (QHostAddress; QHostAddress this, "const Q_IPV6ADDR &" ip6Addr)
             // MISSING: QHostAddress (QHostAddress; QHostAddress this, "const
             // sockaddr *" sockaddr)
-            new Function(
-                c, "QHostAddress", _n_QHostAddress6, None, Compiled,
-                qt_QHostAddress_QHostAddress_QHostAddress_QHostAddress_string,
-                Return, "qt.QHostAddress", Parameters,
-                new Param(c, "this", "qt.QHostAddress"),
-                new Param(c, "address", "string"), End),
+            new Function(c, "QHostAddress", _n_QHostAddress6, None, Compiled, qt_QHostAddress_QHostAddress_QHostAddress_QHostAddress_string,
+                         Return, "qt.QHostAddress", Parameters, new Param(c, "this", "qt.QHostAddress"), new Param(c, "address", "string"),
+                         End),
             // MISSING: QHostAddress (QHostAddress; QHostAddress this,
             // QHostAddress address) MISSING: QHostAddress (QHostAddress;
             // QHostAddress this, flags QHostAddress::SpecialAddress address)
-            new Function(c, "clear", _n_clear0, None, Compiled,
-                         qt_QHostAddress_clear_void_QHostAddress, Return,
-                         "void", Parameters,
+            new Function(c, "clear", _n_clear0, None, Compiled, qt_QHostAddress_clear_void_QHostAddress, Return, "void", Parameters,
                          new Param(c, "this", "qt.QHostAddress"), End),
-            new Function(
-                c, "isInSubnet", _n_isInSubnet0, None, Compiled,
-                qt_QHostAddress_isInSubnet_bool_QHostAddress_QHostAddress_int,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QHostAddress"),
-                new Param(c, "subnet", "qt.QHostAddress"),
-                new Param(c, "netmask", "int"), End),
+            new Function(c, "isInSubnet", _n_isInSubnet0, None, Compiled, qt_QHostAddress_isInSubnet_bool_QHostAddress_QHostAddress_int,
+                         Return, "bool", Parameters, new Param(c, "this", "qt.QHostAddress"), new Param(c, "subnet", "qt.QHostAddress"),
+                         new Param(c, "netmask", "int"), End),
             // MISSING: isInSubnet (bool; QHostAddress this, "const
             // QPair<QHostAddress, int> &" subnet)
-            new Function(c, "isLoopback", _n_isLoopback0, None, Compiled,
-                         qt_QHostAddress_isLoopback_bool_QHostAddress, Return,
-                         "bool", Parameters,
+            new Function(c, "isLoopback", _n_isLoopback0, None, Compiled, qt_QHostAddress_isLoopback_bool_QHostAddress, Return, "bool",
+                         Parameters, new Param(c, "this", "qt.QHostAddress"), End),
+            new Function(c, "isMulticast", _n_isMulticast0, None, Compiled, qt_QHostAddress_isMulticast_bool_QHostAddress, Return, "bool",
+                         Parameters, new Param(c, "this", "qt.QHostAddress"), End),
+            new Function(c, "isNull", _n_isNull0, None, Compiled, qt_QHostAddress_isNull_bool_QHostAddress, Return, "bool", Parameters,
                          new Param(c, "this", "qt.QHostAddress"), End),
-            new Function(c, "isMulticast", _n_isMulticast0, None, Compiled,
-                         qt_QHostAddress_isMulticast_bool_QHostAddress, Return,
-                         "bool", Parameters,
+            new Function(c, "protocol", _n_protocol0, None, Compiled, qt_QHostAddress_protocol_int_QHostAddress, Return, "int", Parameters,
                          new Param(c, "this", "qt.QHostAddress"), End),
-            new Function(c, "isNull", _n_isNull0, None, Compiled,
-                         qt_QHostAddress_isNull_bool_QHostAddress, Return,
-                         "bool", Parameters,
-                         new Param(c, "this", "qt.QHostAddress"), End),
-            new Function(c, "protocol", _n_protocol0, None, Compiled,
-                         qt_QHostAddress_protocol_int_QHostAddress, Return,
-                         "int", Parameters,
-                         new Param(c, "this", "qt.QHostAddress"), End),
-            new Function(c, "scopeId", _n_scopeId0, None, Compiled,
-                         qt_QHostAddress_scopeId_string_QHostAddress, Return,
-                         "string", Parameters,
-                         new Param(c, "this", "qt.QHostAddress"), End),
-            new Function(c, "setAddress", _n_setAddress0, None, Compiled,
-                         qt_QHostAddress_setAddress_void_QHostAddress_int,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QHostAddress"),
-                         new Param(c, "ip4Addr", "int"), End),
+            new Function(c, "scopeId", _n_scopeId0, None, Compiled, qt_QHostAddress_scopeId_string_QHostAddress, Return, "string",
+                         Parameters, new Param(c, "this", "qt.QHostAddress"), End),
+            new Function(c, "setAddress", _n_setAddress0, None, Compiled, qt_QHostAddress_setAddress_void_QHostAddress_int, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QHostAddress"), new Param(c, "ip4Addr", "int"), End),
             // MISSING: setAddress (void; QHostAddress this, "quint8 *" ip6Addr)
             // MISSING: setAddress (void; QHostAddress this, "const quint8 *"
             // ip6Addr) MISSING: setAddress (void; QHostAddress this, "const
             // Q_IPV6ADDR &" ip6Addr) MISSING: setAddress (void; QHostAddress
             // this, "const sockaddr *" sockaddr)
-            new Function(c, "setAddress", _n_setAddress5, None, Compiled,
-                         qt_QHostAddress_setAddress_bool_QHostAddress_string,
-                         Return, "bool", Parameters,
-                         new Param(c, "this", "qt.QHostAddress"),
-                         new Param(c, "address", "string"), End),
-            new Function(c, "setScopeId", _n_setScopeId0, None, Compiled,
-                         qt_QHostAddress_setScopeId_void_QHostAddress_string,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QHostAddress"),
-                         new Param(c, "id", "string"), End),
-            new Function(c, "swap", _n_swap0, None, Compiled,
-                         qt_QHostAddress_swap_void_QHostAddress_QHostAddress,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QHostAddress"),
-                         new Param(c, "other", "qt.QHostAddress"), End),
-            new Function(c, "toIPv4Address", _n_toIPv4Address0, None, Compiled,
-                         qt_QHostAddress_toIPv4Address_int_QHostAddress, Return,
-                         "int", Parameters,
-                         new Param(c, "this", "qt.QHostAddress"), End),
+            new Function(c, "setAddress", _n_setAddress5, None, Compiled, qt_QHostAddress_setAddress_bool_QHostAddress_string, Return,
+                         "bool", Parameters, new Param(c, "this", "qt.QHostAddress"), new Param(c, "address", "string"), End),
+            new Function(c, "setScopeId", _n_setScopeId0, None, Compiled, qt_QHostAddress_setScopeId_void_QHostAddress_string, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QHostAddress"), new Param(c, "id", "string"), End),
+            new Function(c, "swap", _n_swap0, None, Compiled, qt_QHostAddress_swap_void_QHostAddress_QHostAddress, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QHostAddress"), new Param(c, "other", "qt.QHostAddress"), End),
+            new Function(c, "toIPv4Address", _n_toIPv4Address0, None, Compiled, qt_QHostAddress_toIPv4Address_int_QHostAddress, Return,
+                         "int", Parameters, new Param(c, "this", "qt.QHostAddress"), End),
             // MISSING: toIPv4Address (int; QHostAddress this, "bool *" ok)
             // MISSING: toIPv6Address ("Q_IPV6ADDR"; QHostAddress this)
-            new Function(c, "toString", _n_toString0, None, Compiled,
-                         qt_QHostAddress_toString_string_QHostAddress, Return,
-                         "string", Parameters,
-                         new Param(c, "this", "qt.QHostAddress"), End),
+            new Function(c, "toString", _n_toString0, None, Compiled, qt_QHostAddress_toString_string_QHostAddress, Return, "string",
+                         Parameters, new Param(c, "this", "qt.QHostAddress"), End),
             // static functions
             // MISSING: parseSubnet ("QPair<QHostAddress, int>"; string subnet)
             EndArguments);
         globalScope()->addSymbols(
-            new Function(
-                c, "!=", _n_operatorBang_EQ_0, Op, Compiled,
-                qt_QHostAddress_operatorBang_EQ__bool_QHostAddress_QHostAddress,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QHostAddress"),
-                new Param(c, "other", "qt.QHostAddress"), End),
-            new Function(c, "!=", _n_operatorBang_EQ_1, Op, Compiled,
-                         qt_QHostAddress_operatorBang_EQ__bool_QHostAddress_int,
-                         Return, "bool", Parameters,
-                         new Param(c, "this", "qt.QHostAddress"),
-                         new Param(c, "other", "int"), End),
+            new Function(c, "!=", _n_operatorBang_EQ_0, Op, Compiled, qt_QHostAddress_operatorBang_EQ__bool_QHostAddress_QHostAddress,
+                         Return, "bool", Parameters, new Param(c, "this", "qt.QHostAddress"), new Param(c, "other", "qt.QHostAddress"),
+                         End),
+            new Function(c, "!=", _n_operatorBang_EQ_1, Op, Compiled, qt_QHostAddress_operatorBang_EQ__bool_QHostAddress_int, Return,
+                         "bool", Parameters, new Param(c, "this", "qt.QHostAddress"), new Param(c, "other", "int"), End),
             // MISSING: = (QHostAddress; QHostAddress this, QHostAddress other)
             // MISSING: = (QHostAddress; QHostAddress this, QHostAddress
             // address) MISSING: = (QHostAddress; QHostAddress this, string
             // address)
-            new Function(
-                c, "==", _n_operatorEQ_EQ_0, Op, Compiled,
-                qt_QHostAddress_operatorEQ_EQ__bool_QHostAddress_QHostAddress,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QHostAddress"),
-                new Param(c, "other", "qt.QHostAddress"), End),
-            new Function(c, "==", _n_operatorEQ_EQ_1, Op, Compiled,
-                         qt_QHostAddress_operatorEQ_EQ__bool_QHostAddress_int,
-                         Return, "bool", Parameters,
-                         new Param(c, "this", "qt.QHostAddress"),
-                         new Param(c, "other", "int"), End),
+            new Function(c, "==", _n_operatorEQ_EQ_0, Op, Compiled, qt_QHostAddress_operatorEQ_EQ__bool_QHostAddress_QHostAddress, Return,
+                         "bool", Parameters, new Param(c, "this", "qt.QHostAddress"), new Param(c, "other", "qt.QHostAddress"), End),
+            new Function(c, "==", _n_operatorEQ_EQ_1, Op, Compiled, qt_QHostAddress_operatorEQ_EQ__bool_QHostAddress_int, Return, "bool",
+                         Parameters, new Param(c, "this", "qt.QHostAddress"), new Param(c, "other", "int"), End),
             EndArguments);
         scope()->addSymbols(EndArguments);
     }

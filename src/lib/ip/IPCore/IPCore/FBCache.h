@@ -49,10 +49,10 @@ namespace IPCore
         enum FreeMode
         {
             ConservativeFreeMode, /// never frees in in/out range
-            ActiveFreeMode, /// allows freeing in in/out range behind display
-                            /// frame
-            GreedyFreeMode  /// allows freeing in in/out range in FRONT of
-                            /// display frame
+            ActiveFreeMode,       /// allows freeing in in/out range behind display
+                                  /// frame
+            GreedyFreeMode        /// allows freeing in in/out range in FRONT of
+                                  /// display frame
         };
 
         enum TreeResults
@@ -64,12 +64,11 @@ namespace IPCore
 
         struct CacheStats
         {
-            size_t capacity;        /// as returned by capacity() function
-            size_t used;            /// as returned by used() function
-            float lookAheadSeconds; /// as returned by
-                                    /// computeLookAheadSecondsStat()
-            FrameRangeVector
-                cachedRanges; /// as returned by computeCachedRangesStat()
+            size_t capacity;               /// as returned by capacity() function
+            size_t used;                   /// as returned by used() function
+            float lookAheadSeconds;        /// as returned by
+                                           /// computeLookAheadSecondsStat()
+            FrameRangeVector cachedRanges; /// as returned by computeCachedRangesStat()
 
             CacheStats()
                 : capacity(0)
@@ -111,17 +110,13 @@ namespace IPCore
         //  cache. It does not tell you how many items were missing.
         //
 
-        bool add(FrameBuffer*, int frame, bool force = false,
-                 const IPNode* node = 0);
+        bool add(FrameBuffer*, int frame, bool force = false, const IPNode* node = 0);
         bool flush(const IDString&);
         bool flushIDSetSubstr(const IDSet& subStrings);
 
         bool frameItems(int frame, FBVector& items) const;
 
-        bool isFrameCached(int frame) const
-        {
-            return m_frames.find(frame) != m_frames.end();
-        }
+        bool isFrameCached(int frame) const { return m_frames.find(frame) != m_frames.end(); }
 
         bool hasPartialFrameCache(int frame) const;
 
@@ -189,8 +184,7 @@ namespace IPCore
         //  yourself before calling them
         //
 
-        void initiateCachingOfBestFrameGroup(FrameVector& frames,
-                                             int maxGroupSize);
+        void initiateCachingOfBestFrameGroup(FrameVector& frames, int maxGroupSize);
         void completeCachingOfFrame(int frame);
 
         //
@@ -292,18 +286,13 @@ namespace IPCore
 
         int cachedFrameOfLesserUtility(int frame);
 
-        bool frameIsBeingCached(int frame) const
-        {
-            return (m_framesBeingCached.find(frame)
-                    != m_framesBeingCached.end());
-        }
+        bool frameIsBeingCached(int frame) const { return (m_framesBeingCached.find(frame) != m_framesBeingCached.end()); }
 
         bool utilityStateChanged() const { return m_utilityStateChanged; };
 
         void resetUtilityState() { m_utilityStateChanged = false; };
 
-        void considerFrameForFreeing(int f, int& targetFrame,
-                                     float& targetUtility);
+        void considerFrameForFreeing(int f, int& targetFrame, float& targetUtility);
 
         float lookBehindFraction() { return m_lookBehindFraction; };
 
@@ -315,10 +304,7 @@ namespace IPCore
         // consider frames in the head of the display frame. However already
         // generated tail frames will be preserved with respect to the current
         // look behind fraction.
-        bool isActiveTailCachingEnabled() const
-        {
-            return m_activeTailCachingEnabled;
-        }
+        bool isActiveTailCachingEnabled() const { return m_activeTailCachingEnabled; }
 
         void enableActiveTailCaching(const bool enable);
 
@@ -329,12 +315,7 @@ namespace IPCore
         //
         bool promoteFrame(int frame, IPImageID* idTree);
 
-        int framesInItemMap(FrameBuffer* fb)
-        {
-            return ((m_itemMap.find(fb) != m_itemMap.end())
-                        ? m_itemMap[fb].size()
-                        : 0);
-        }
+        int framesInItemMap(FrameBuffer* fb) { return ((m_itemMap.find(fb) != m_itemMap.end()) ? m_itemMap[fb].size() : 0); }
 
         //
         //  Check metadata of both frame and fb caches and error if any

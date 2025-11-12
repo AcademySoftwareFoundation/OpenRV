@@ -116,8 +116,7 @@ namespace Rv
         std::array<ActionCategoryMapping, 11> m_actionCategoryMappings;
     };
 
-    template <class T>
-    void RvBottomViewToolBar::setVolumeLevel(T& inst, int level)
+    template <class T> void RvBottomViewToolBar::setVolumeLevel(T& inst, int level)
     {
         if (level > 67)
         {

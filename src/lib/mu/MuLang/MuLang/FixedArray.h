@@ -28,10 +28,7 @@ namespace Mu
     public:
         typedef unsigned char byte;
 
-        const FixedArrayType* arrayType() const
-        {
-            return static_cast<const FixedArrayType*>(type());
-        }
+        const FixedArrayType* arrayType() const { return static_cast<const FixedArrayType*>(type()); }
 
         size_t size() const;
 
@@ -41,36 +38,20 @@ namespace Mu
 
         template <typename T> T& element(size_t i) { return data<T>()[i]; }
 
-        template <typename T> T& element(size_t i, size_t j)
-        {
-            return data<T>()[i * size(0) + j];
-        }
+        template <typename T> T& element(size_t i, size_t j) { return data<T>()[i * size(0) + j]; }
 
-        template <typename T> T& element(size_t i, size_t j, size_t k)
+        template <typename T> T& element(size_t i, size_t j, size_t k) { return data<T>()[i * size(0) * size(1) + j * size(1) + k]; }
+
+        template <typename T> const T& element(size_t i) const { return data<T>()[i]; }
+
+        template <typename T> const T& element(size_t i, size_t j) const { return data<T>()[i * size(0) + j]; }
+
+        template <typename T> const T& element(size_t i, size_t j, size_t k) const
         {
             return data<T>()[i * size(0) * size(1) + j * size(1) + k];
         }
 
-        template <typename T> const T& element(size_t i) const
-        {
-            return data<T>()[i];
-        }
-
-        template <typename T> const T& element(size_t i, size_t j) const
-        {
-            return data<T>()[i * size(0) + j];
-        }
-
-        template <typename T>
-        const T& element(size_t i, size_t j, size_t k) const
-        {
-            return data<T>()[i * size(0) * size(1) + j * size(1) + k];
-        }
-
-        byte* elementPointer(int i)
-        {
-            return &data<byte>()[i * arrayType()->elementRep()->size()];
-        }
+        byte* elementPointer(int i) { return &data<byte>()[i * arrayType()->elementRep()->size()]; }
 
         byte* elementPointer(int i, int j)
         {
@@ -84,10 +65,7 @@ namespace Mu
             return &data<byte>()[s * (i * size(0) * size(1) + j * size(1) + k)];
         }
 
-        const byte* elementPointer(int i) const
-        {
-            return &data<const byte>()[i * arrayType()->elementRep()->size()];
-        }
+        const byte* elementPointer(int i) const { return &data<const byte>()[i * arrayType()->elementRep()->size()]; }
 
         const byte* elementPointer(int i, int j) const
         {
@@ -98,8 +76,7 @@ namespace Mu
         const byte* elementPointer(int i, int j, int k) const
         {
             size_t s = arrayType()->elementRep()->size();
-            return &data<
-                const byte>()[s * (i * size(0) * size(1) + j * size(1) + k)];
+            return &data<const byte>()[s * (i * size(0) * size(1) + j * size(1) + k)];
         }
 
     protected:

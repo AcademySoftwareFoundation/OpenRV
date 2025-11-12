@@ -23,8 +23,7 @@ namespace IPCore
     class ChannelMapIPNode : public IPNode
     {
     public:
-        ChannelMapIPNode(const std::string& name, const NodeDefinition* def,
-                         IPGraph* graph, GroupIPNode* group = 0);
+        ChannelMapIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group = 0);
         virtual ~ChannelMapIPNode();
 
         virtual IPImage* evaluate(const Context&);

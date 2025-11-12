@@ -33,8 +33,7 @@ namespace Mu
 {
     using namespace std;
 
-    QtColorTriangleType::QtColorTriangleType(Context* c, const char* name,
-                                             Class* super)
+    QtColorTriangleType::QtColorTriangleType(Context* c, const char* name, Class* super)
         : Class(c, name, super)
     {
     }
@@ -44,17 +43,14 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    static Pointer QtColorTriangle_QtColorTriangle_QObject(Thread& NODE_THREAD,
-                                                           Pointer obj)
+    static Pointer QtColorTriangle_QtColorTriangle_QObject(Thread& NODE_THREAD, Pointer obj)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         ClassInstance* widget = reinterpret_cast<ClassInstance*>(obj);
 
         if (QtColorTriangle* w = object<QtColorTriangle>(widget))
         {
-            QtColorTriangleType* type =
-                c->findSymbolOfTypeByQualifiedName<QtColorTriangleType>(
-                    c->internName("qt.QtColorTriangle"), false);
+            QtColorTriangleType* type = c->findSymbolOfTypeByQualifiedName<QtColorTriangleType>(c->internName("qt.QtColorTriangle"), false);
             ClassInstance* o = ClassInstance::allocate(type);
             setobject(o, w);
             return o;
@@ -67,12 +63,10 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(castFromObject, Pointer)
     {
-        NODE_RETURN(QtColorTriangle_QtColorTriangle_QObject(
-            NODE_THREAD, NODE_ARG(0, Pointer)));
+        NODE_RETURN(QtColorTriangle_QtColorTriangle_QObject(NODE_THREAD, NODE_ARG(0, Pointer)));
     }
 
-    Pointer QtColorTriangle_QtColorTriangle_QtColorTriangle_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
+    Pointer QtColorTriangle_QtColorTriangle_QtColorTriangle_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWidget* arg1 = object<QWidget>(param_parent);
@@ -82,8 +76,7 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(_n_QtColorTriangle0, Pointer)
     {
-        NODE_RETURN(QtColorTriangle_QtColorTriangle_QtColorTriangle_QWidget(
-            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(QtColorTriangle_QtColorTriangle_QtColorTriangle_QWidget(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     void QtColorTriangleType::load()
@@ -103,28 +96,20 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
-                   new Function(c, tn, castFromObject, Cast, Compiled,
-                                QtColorTriangle_QtColorTriangle_QObject, Return,
-                                ftn, Parameters,
+                   new Function(c, tn, castFromObject, Cast, Compiled, QtColorTriangle_QtColorTriangle_QObject, Return, ftn, Parameters,
                                 new Param(c, "object", "qt.QObject"), End),
 
                    EndArguments);
 
-        addSymbols(new Function(
-                       c, "QtColorTriangle", _n_QtColorTriangle0, None,
-                       Compiled,
-                       QtColorTriangle_QtColorTriangle_QtColorTriangle_QWidget,
-                       Return, "qt.QtColorTriangle", Parameters,
-                       new Param(c, "this", "qt.QtColorTriangle"),
-                       new Param(c, "parent", "qt.QWidget"), End),
+        addSymbols(new Function(c, "QtColorTriangle", _n_QtColorTriangle0, None, Compiled,
+                                QtColorTriangle_QtColorTriangle_QtColorTriangle_QWidget, Return, "qt.QtColorTriangle", Parameters,
+                                new Param(c, "this", "qt.QtColorTriangle"), new Param(c, "parent", "qt.QWidget"), End),
 
 #if 0
                new Function(c, "color", _n_color, None,

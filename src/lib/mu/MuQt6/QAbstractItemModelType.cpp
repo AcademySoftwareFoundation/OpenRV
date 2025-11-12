@@ -64,17 +64,14 @@ namespace Mu
         _baseType = 0;
     }
 
-    MuQt_QAbstractItemModel::MuQt_QAbstractItemModel(Pointer muobj,
-                                                     const CallEnvironment* ce,
-                                                     QObject* parent)
+    MuQt_QAbstractItemModel::MuQt_QAbstractItemModel(Pointer muobj, const CallEnvironment* ce, QObject* parent)
         : QAbstractItemModel(parent)
     {
         _env = ce;
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QAbstractItemModelType>(
-            c->internName("qt.QAbstractItemModel"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QAbstractItemModelType>(c->internName("qt.QAbstractItemModel"));
     }
 
     QModelIndex MuQt_QAbstractItemModel::buddy(const QModelIndex& index) const
@@ -88,8 +85,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
+            args[1] = Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
             Value rval = _env->call(F, args);
             return getqtype<QModelIndexType>(rval._Pointer);
         }
@@ -99,13 +95,11 @@ namespace Mu
         }
     }
 
-    bool MuQt_QAbstractItemModel::canDropMimeData(
-        const QMimeData* data, Qt::DropAction action, int row, int column,
-        const QModelIndex& parent) const
+    bool MuQt_QAbstractItemModel::canDropMimeData(const QMimeData* data, Qt::DropAction action, int row, int column,
+                                                  const QModelIndex& parent) const
     {
         if (!_env)
-            return QAbstractItemModel::canDropMimeData(data, action, row,
-                                                       column, parent);
+            return QAbstractItemModel::canDropMimeData(data, action, row, column, parent);
         MuLangContext* c = (MuLangContext*)_env->context();
         const MemberFunction* F0 = _baseType->_func[1];
         const MemberFunction* F = _obj->classType()->dynamicLookup(F0);
@@ -113,20 +107,17 @@ namespace Mu
         {
             Function::ArgumentVector args(6);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeinstance<QMimeDataType>(c, data, "qt.QMimeData"));
+            args[1] = Value(makeinstance<QMimeDataType>(c, data, "qt.QMimeData"));
             args[2] = Value(int(action));
             args[3] = Value(row);
             args[4] = Value(column);
-            args[5] =
-                Value(makeqtype<QModelIndexType>(c, parent, "qt.QModelIndex"));
+            args[5] = Value(makeqtype<QModelIndexType>(c, parent, "qt.QModelIndex"));
             Value rval = _env->call(F, args);
             return (bool)(rval._bool);
         }
         else
         {
-            return QAbstractItemModel::canDropMimeData(data, action, row,
-                                                       column, parent);
+            return QAbstractItemModel::canDropMimeData(data, action, row, column, parent);
         }
     }
 
@@ -141,8 +132,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqtype<QModelIndexType>(c, parent, "qt.QModelIndex"));
+            args[1] = Value(makeqtype<QModelIndexType>(c, parent, "qt.QModelIndex"));
             Value rval = _env->call(F, args);
             return (bool)(rval._bool);
         }
@@ -163,8 +153,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
+            args[1] = Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
             Value rval = _env->call(F, args);
             return (bool)(rval._bool);
         }
@@ -174,8 +163,7 @@ namespace Mu
         }
     }
 
-    int MuQt_QAbstractItemModel::columnCount(
-        const QModelIndex& parent) const // pure virtual
+    int MuQt_QAbstractItemModel::columnCount(const QModelIndex& parent) const // pure virtual
     {
         if (!_env)
             return defaultValue<int>();
@@ -186,8 +174,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqtype<QModelIndexType>(c, parent, "qt.QModelIndex"));
+            args[1] = Value(makeqtype<QModelIndexType>(c, parent, "qt.QModelIndex"));
             Value rval = _env->call(F, args);
             return (int)(rval._int);
         }
@@ -209,8 +196,7 @@ namespace Mu
         {
             Function::ArgumentVector args(3);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
+            args[1] = Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
             args[2] = Value(role);
             Value rval = _env->call(F, args);
             return getqtype<QVariantType>(rval._Pointer);
@@ -221,14 +207,10 @@ namespace Mu
         }
     }
 
-    bool MuQt_QAbstractItemModel::dropMimeData(const QMimeData* data,
-                                               Qt::DropAction action, int row,
-                                               int column,
-                                               const QModelIndex& parent)
+    bool MuQt_QAbstractItemModel::dropMimeData(const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& parent)
     {
         if (!_env)
-            return QAbstractItemModel::dropMimeData(data, action, row, column,
-                                                    parent);
+            return QAbstractItemModel::dropMimeData(data, action, row, column, parent);
         MuLangContext* c = (MuLangContext*)_env->context();
         const MemberFunction* F0 = _baseType->_func[6];
         const MemberFunction* F = _obj->classType()->dynamicLookup(F0);
@@ -236,20 +218,17 @@ namespace Mu
         {
             Function::ArgumentVector args(6);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeinstance<QMimeDataType>(c, data, "qt.QMimeData"));
+            args[1] = Value(makeinstance<QMimeDataType>(c, data, "qt.QMimeData"));
             args[2] = Value(int(action));
             args[3] = Value(row);
             args[4] = Value(column);
-            args[5] =
-                Value(makeqtype<QModelIndexType>(c, parent, "qt.QModelIndex"));
+            args[5] = Value(makeqtype<QModelIndexType>(c, parent, "qt.QModelIndex"));
             Value rval = _env->call(F, args);
             return (bool)(rval._bool);
         }
         else
         {
-            return QAbstractItemModel::dropMimeData(data, action, row, column,
-                                                    parent);
+            return QAbstractItemModel::dropMimeData(data, action, row, column, parent);
         }
     }
 
@@ -267,8 +246,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqtype<QModelIndexType>(c, parent, "qt.QModelIndex"));
+            args[1] = Value(makeqtype<QModelIndexType>(c, parent, "qt.QModelIndex"));
             Value rval = _env->call(F, args);
         }
         else
@@ -288,8 +266,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
+            args[1] = Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
             Value rval = _env->call(F, args);
             return (Qt::ItemFlags)(rval._int);
         }
@@ -310,8 +287,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqtype<QModelIndexType>(c, parent, "qt.QModelIndex"));
+            args[1] = Value(makeqtype<QModelIndexType>(c, parent, "qt.QModelIndex"));
             Value rval = _env->call(F, args);
             return (bool)(rval._bool);
         }
@@ -321,9 +297,7 @@ namespace Mu
         }
     }
 
-    QVariant MuQt_QAbstractItemModel::headerData(int section,
-                                                 Qt::Orientation orientation,
-                                                 int role) const
+    QVariant MuQt_QAbstractItemModel::headerData(int section, Qt::Orientation orientation, int role) const
     {
         if (!_env)
             return QAbstractItemModel::headerData(section, orientation, role);
@@ -346,8 +320,7 @@ namespace Mu
         }
     }
 
-    QModelIndex MuQt_QAbstractItemModel::index(
-        int row, int column, const QModelIndex& parent) const // pure virtual
+    QModelIndex MuQt_QAbstractItemModel::index(int row, int column, const QModelIndex& parent) const // pure virtual
     {
         if (!_env)
             return defaultValue<QModelIndex>();
@@ -360,8 +333,7 @@ namespace Mu
             args[0] = Value(Pointer(_obj));
             args[1] = Value(row);
             args[2] = Value(column);
-            args[3] =
-                Value(makeqtype<QModelIndexType>(c, parent, "qt.QModelIndex"));
+            args[3] = Value(makeqtype<QModelIndexType>(c, parent, "qt.QModelIndex"));
             Value rval = _env->call(F, args);
             return getqtype<QModelIndexType>(rval._Pointer);
         }
@@ -371,8 +343,7 @@ namespace Mu
         }
     }
 
-    bool MuQt_QAbstractItemModel::insertColumns(int column, int count,
-                                                const QModelIndex& parent)
+    bool MuQt_QAbstractItemModel::insertColumns(int column, int count, const QModelIndex& parent)
     {
         if (!_env)
             return QAbstractItemModel::insertColumns(column, count, parent);
@@ -385,8 +356,7 @@ namespace Mu
             args[0] = Value(Pointer(_obj));
             args[1] = Value(column);
             args[2] = Value(count);
-            args[3] =
-                Value(makeqtype<QModelIndexType>(c, parent, "qt.QModelIndex"));
+            args[3] = Value(makeqtype<QModelIndexType>(c, parent, "qt.QModelIndex"));
             Value rval = _env->call(F, args);
             return (bool)(rval._bool);
         }
@@ -396,8 +366,7 @@ namespace Mu
         }
     }
 
-    bool MuQt_QAbstractItemModel::insertRows(int row, int count,
-                                             const QModelIndex& parent)
+    bool MuQt_QAbstractItemModel::insertRows(int row, int count, const QModelIndex& parent)
     {
         if (!_env)
             return QAbstractItemModel::insertRows(row, count, parent);
@@ -410,8 +379,7 @@ namespace Mu
             args[0] = Value(Pointer(_obj));
             args[1] = Value(row);
             args[2] = Value(count);
-            args[3] =
-                Value(makeqtype<QModelIndexType>(c, parent, "qt.QModelIndex"));
+            args[3] = Value(makeqtype<QModelIndexType>(c, parent, "qt.QModelIndex"));
             Value rval = _env->call(F, args);
             return (bool)(rval._bool);
         }
@@ -421,10 +389,7 @@ namespace Mu
         }
     }
 
-    QModelIndexList MuQt_QAbstractItemModel::match(const QModelIndex& start,
-                                                   int role,
-                                                   const QVariant& value,
-                                                   int hits,
+    QModelIndexList MuQt_QAbstractItemModel::match(const QModelIndex& start, int role, const QVariant& value, int hits,
                                                    Qt::MatchFlags flags) const
     {
         if (!_env)
@@ -436,8 +401,7 @@ namespace Mu
         {
             Function::ArgumentVector args(6);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqtype<QModelIndexType>(c, start, "qt.QModelIndex"));
+            args[1] = Value(makeqtype<QModelIndexType>(c, start, "qt.QModelIndex"));
             args[2] = Value(role);
             args[3] = Value(makeqtype<QVariantType>(c, value, "qt.QVariant"));
             args[4] = Value(hits);
@@ -451,8 +415,7 @@ namespace Mu
         }
     }
 
-    QMimeData*
-    MuQt_QAbstractItemModel::mimeData(const QModelIndexList& indexes) const
+    QMimeData* MuQt_QAbstractItemModel::mimeData(const QModelIndexList& indexes) const
     {
         if (!_env)
             return QAbstractItemModel::mimeData(indexes);
@@ -493,14 +456,11 @@ namespace Mu
         }
     }
 
-    bool MuQt_QAbstractItemModel::moveColumns(
-        const QModelIndex& sourceParent, int sourceColumn, int count,
-        const QModelIndex& destinationParent, int destinationChild)
+    bool MuQt_QAbstractItemModel::moveColumns(const QModelIndex& sourceParent, int sourceColumn, int count,
+                                              const QModelIndex& destinationParent, int destinationChild)
     {
         if (!_env)
-            return QAbstractItemModel::moveColumns(sourceParent, sourceColumn,
-                                                   count, destinationParent,
-                                                   destinationChild);
+            return QAbstractItemModel::moveColumns(sourceParent, sourceColumn, count, destinationParent, destinationChild);
         MuLangContext* c = (MuLangContext*)_env->context();
         const MemberFunction* F0 = _baseType->_func[17];
         const MemberFunction* F = _obj->classType()->dynamicLookup(F0);
@@ -508,33 +468,25 @@ namespace Mu
         {
             Function::ArgumentVector args(6);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqtype<QModelIndexType>(c, sourceParent, "qt.QModelIndex"));
+            args[1] = Value(makeqtype<QModelIndexType>(c, sourceParent, "qt.QModelIndex"));
             args[2] = Value(sourceColumn);
             args[3] = Value(count);
-            args[4] = Value(makeqtype<QModelIndexType>(c, destinationParent,
-                                                       "qt.QModelIndex"));
+            args[4] = Value(makeqtype<QModelIndexType>(c, destinationParent, "qt.QModelIndex"));
             args[5] = Value(destinationChild);
             Value rval = _env->call(F, args);
             return (bool)(rval._bool);
         }
         else
         {
-            return QAbstractItemModel::moveColumns(sourceParent, sourceColumn,
-                                                   count, destinationParent,
-                                                   destinationChild);
+            return QAbstractItemModel::moveColumns(sourceParent, sourceColumn, count, destinationParent, destinationChild);
         }
     }
 
-    bool MuQt_QAbstractItemModel::moveRows(const QModelIndex& sourceParent,
-                                           int sourceRow, int count,
-                                           const QModelIndex& destinationParent,
+    bool MuQt_QAbstractItemModel::moveRows(const QModelIndex& sourceParent, int sourceRow, int count, const QModelIndex& destinationParent,
                                            int destinationChild)
     {
         if (!_env)
-            return QAbstractItemModel::moveRows(sourceParent, sourceRow, count,
-                                                destinationParent,
-                                                destinationChild);
+            return QAbstractItemModel::moveRows(sourceParent, sourceRow, count, destinationParent, destinationChild);
         MuLangContext* c = (MuLangContext*)_env->context();
         const MemberFunction* F0 = _baseType->_func[18];
         const MemberFunction* F = _obj->classType()->dynamicLookup(F0);
@@ -542,26 +494,21 @@ namespace Mu
         {
             Function::ArgumentVector args(6);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqtype<QModelIndexType>(c, sourceParent, "qt.QModelIndex"));
+            args[1] = Value(makeqtype<QModelIndexType>(c, sourceParent, "qt.QModelIndex"));
             args[2] = Value(sourceRow);
             args[3] = Value(count);
-            args[4] = Value(makeqtype<QModelIndexType>(c, destinationParent,
-                                                       "qt.QModelIndex"));
+            args[4] = Value(makeqtype<QModelIndexType>(c, destinationParent, "qt.QModelIndex"));
             args[5] = Value(destinationChild);
             Value rval = _env->call(F, args);
             return (bool)(rval._bool);
         }
         else
         {
-            return QAbstractItemModel::moveRows(sourceParent, sourceRow, count,
-                                                destinationParent,
-                                                destinationChild);
+            return QAbstractItemModel::moveRows(sourceParent, sourceRow, count, destinationParent, destinationChild);
         }
     }
 
-    QModelIndex MuQt_QAbstractItemModel::parent(
-        const QModelIndex& index) const // pure virtual
+    QModelIndex MuQt_QAbstractItemModel::parent(const QModelIndex& index) const // pure virtual
     {
         if (!_env)
             return defaultValue<QModelIndex>();
@@ -572,8 +519,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
+            args[1] = Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
             Value rval = _env->call(F, args);
             return getqtype<QModelIndexType>(rval._Pointer);
         }
@@ -583,8 +529,7 @@ namespace Mu
         }
     }
 
-    bool MuQt_QAbstractItemModel::removeColumns(int column, int count,
-                                                const QModelIndex& parent)
+    bool MuQt_QAbstractItemModel::removeColumns(int column, int count, const QModelIndex& parent)
     {
         if (!_env)
             return QAbstractItemModel::removeColumns(column, count, parent);
@@ -597,8 +542,7 @@ namespace Mu
             args[0] = Value(Pointer(_obj));
             args[1] = Value(column);
             args[2] = Value(count);
-            args[3] =
-                Value(makeqtype<QModelIndexType>(c, parent, "qt.QModelIndex"));
+            args[3] = Value(makeqtype<QModelIndexType>(c, parent, "qt.QModelIndex"));
             Value rval = _env->call(F, args);
             return (bool)(rval._bool);
         }
@@ -608,8 +552,7 @@ namespace Mu
         }
     }
 
-    bool MuQt_QAbstractItemModel::removeRows(int row, int count,
-                                             const QModelIndex& parent)
+    bool MuQt_QAbstractItemModel::removeRows(int row, int count, const QModelIndex& parent)
     {
         if (!_env)
             return QAbstractItemModel::removeRows(row, count, parent);
@@ -622,8 +565,7 @@ namespace Mu
             args[0] = Value(Pointer(_obj));
             args[1] = Value(row);
             args[2] = Value(count);
-            args[3] =
-                Value(makeqtype<QModelIndexType>(c, parent, "qt.QModelIndex"));
+            args[3] = Value(makeqtype<QModelIndexType>(c, parent, "qt.QModelIndex"));
             Value rval = _env->call(F, args);
             return (bool)(rval._bool);
         }
@@ -633,8 +575,7 @@ namespace Mu
         }
     }
 
-    int MuQt_QAbstractItemModel::rowCount(
-        const QModelIndex& parent) const // pure virtual
+    int MuQt_QAbstractItemModel::rowCount(const QModelIndex& parent) const // pure virtual
     {
         if (!_env)
             return defaultValue<int>();
@@ -645,8 +586,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqtype<QModelIndexType>(c, parent, "qt.QModelIndex"));
+            args[1] = Value(makeqtype<QModelIndexType>(c, parent, "qt.QModelIndex"));
             Value rval = _env->call(F, args);
             return (int)(rval._int);
         }
@@ -656,8 +596,7 @@ namespace Mu
         }
     }
 
-    bool MuQt_QAbstractItemModel::setData(const QModelIndex& index,
-                                          const QVariant& value, int role)
+    bool MuQt_QAbstractItemModel::setData(const QModelIndex& index, const QVariant& value, int role)
     {
         if (!_env)
             return QAbstractItemModel::setData(index, value, role);
@@ -668,8 +607,7 @@ namespace Mu
         {
             Function::ArgumentVector args(4);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
+            args[1] = Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
             args[2] = Value(makeqtype<QVariantType>(c, value, "qt.QVariant"));
             args[3] = Value(role);
             Value rval = _env->call(F, args);
@@ -681,13 +619,10 @@ namespace Mu
         }
     }
 
-    bool MuQt_QAbstractItemModel::setHeaderData(int section,
-                                                Qt::Orientation orientation,
-                                                const QVariant& value, int role)
+    bool MuQt_QAbstractItemModel::setHeaderData(int section, Qt::Orientation orientation, const QVariant& value, int role)
     {
         if (!_env)
-            return QAbstractItemModel::setHeaderData(section, orientation,
-                                                     value, role);
+            return QAbstractItemModel::setHeaderData(section, orientation, value, role);
         MuLangContext* c = (MuLangContext*)_env->context();
         const MemberFunction* F0 = _baseType->_func[24];
         const MemberFunction* F = _obj->classType()->dynamicLookup(F0);
@@ -704,13 +639,11 @@ namespace Mu
         }
         else
         {
-            return QAbstractItemModel::setHeaderData(section, orientation,
-                                                     value, role);
+            return QAbstractItemModel::setHeaderData(section, orientation, value, role);
         }
     }
 
-    QModelIndex MuQt_QAbstractItemModel::sibling(int row, int column,
-                                                 const QModelIndex& index) const
+    QModelIndex MuQt_QAbstractItemModel::sibling(int row, int column, const QModelIndex& index) const
     {
         if (!_env)
             return QAbstractItemModel::sibling(row, column, index);
@@ -723,8 +656,7 @@ namespace Mu
             args[0] = Value(Pointer(_obj));
             args[1] = Value(row);
             args[2] = Value(column);
-            args[3] =
-                Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
+            args[3] = Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
             Value rval = _env->call(F, args);
             return getqtype<QModelIndexType>(rval._Pointer);
         }
@@ -769,8 +701,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
+            args[1] = Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
             Value rval = _env->call(F, args);
             return getqtype<QSizeType>(rval._Pointer);
         }
@@ -852,8 +783,7 @@ namespace Mu
         {
             Function::ArgumentVector args(3);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeinstance<QObjectType>(c, watched, "qt.QObject"));
+            args[1] = Value(makeinstance<QObjectType>(c, watched, "qt.QObject"));
             args[2] = Value(makeqpointer<QEventType>(c, event, "qt.QEvent"));
             Value rval = _env->call(F, args);
             return (bool)(rval._bool);
@@ -901,8 +831,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QTimerEventType>(c, event, "qt.QTimerEvent"));
+            args[1] = Value(makeqpointer<QTimerEventType>(c, event, "qt.QTimerEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -914,8 +843,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  Mu Type CONSTRUCTORS
 
-    QAbstractItemModelType::QAbstractItemModelType(Context* c, const char* name,
-                                                   Class* super, Class* super2)
+    QAbstractItemModelType::QAbstractItemModelType(Context* c, const char* name, Class* super, Class* super2)
         : Class(c, name, vectorOf2(super, super2))
     {
     }
@@ -925,9 +853,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    static Pointer
-    QAbstractItemModel_QAbstractItemModel_QObject(Thread& NODE_THREAD,
-                                                  Pointer obj)
+    static Pointer QAbstractItemModel_QAbstractItemModel_QObject(Thread& NODE_THREAD, Pointer obj)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         ClassInstance* widget = reinterpret_cast<ClassInstance*>(obj);
@@ -939,8 +865,7 @@ namespace Mu
         else if (QAbstractItemModel* w = object<QAbstractItemModel>(widget))
         {
             QAbstractItemModelType* type =
-                c->findSymbolOfTypeByQualifiedName<QAbstractItemModelType>(
-                    c->internName("qt.QAbstractItemModel"), false);
+                c->findSymbolOfTypeByQualifiedName<QAbstractItemModelType>(c->internName("qt.QAbstractItemModel"), false);
             ClassInstance* o = ClassInstance::allocate(type);
             setobject(o, w);
             return o;
@@ -953,41 +878,31 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(castFromObject, Pointer)
     {
-        NODE_RETURN(QAbstractItemModel_QAbstractItemModel_QObject(
-            NODE_THREAD, NODE_ARG(0, Pointer)));
+        NODE_RETURN(QAbstractItemModel_QAbstractItemModel_QObject(NODE_THREAD, NODE_ARG(0, Pointer)));
     }
 
-    Pointer
-    qt_QAbstractItemModel_QAbstractItemModel_QAbstractItemModel_QAbstractItemModel_QObject(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
+    Pointer qt_QAbstractItemModel_QAbstractItemModel_QAbstractItemModel_QAbstractItemModel_QObject(Mu::Thread& NODE_THREAD,
+                                                                                                   Pointer param_this, Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QObject* arg1 = object<QObject>(param_parent);
-        setobject(param_this,
-                  new MuQt_QAbstractItemModel(
-                      param_this, NODE_THREAD.process()->callEnv(), arg1));
+        setobject(param_this, new MuQt_QAbstractItemModel(param_this, NODE_THREAD.process()->callEnv(), arg1));
         return param_this;
     }
 
-    Pointer
-    qt_QAbstractItemModel_buddy_QModelIndex_QAbstractItemModel_QModelIndex(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index)
+    Pointer qt_QAbstractItemModel_buddy_QModelIndex_QAbstractItemModel_QModelIndex(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                   Pointer param_index)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemModel* arg0 = object<QAbstractItemModel>(param_this);
         const QModelIndex arg1 = getqtype<QModelIndexType>(param_index);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QModelIndexType>(
-                         c, arg0->QAbstractItemModel::buddy(arg1),
-                         "qt.QModelIndex")
-                   : makeqtype<QModelIndexType>(c, arg0->buddy(arg1),
-                                                "qt.QModelIndex");
+        return isMuQtObject(arg0) ? makeqtype<QModelIndexType>(c, arg0->QAbstractItemModel::buddy(arg1), "qt.QModelIndex")
+                                  : makeqtype<QModelIndexType>(c, arg0->buddy(arg1), "qt.QModelIndex");
     }
 
-    bool
-    qt_QAbstractItemModel_canDropMimeData_bool_QAbstractItemModel_QMimeData_int_int_int_QModelIndex(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_data,
-        int param_action, int param_row, int param_column, Pointer param_parent)
+    bool qt_QAbstractItemModel_canDropMimeData_bool_QAbstractItemModel_QMimeData_int_int_int_QModelIndex(
+        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_data, int param_action, int param_row, int param_column,
+        Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemModel* arg0 = object<QAbstractItemModel>(param_this);
@@ -996,36 +911,30 @@ namespace Mu
         int arg3 = (int)(param_row);
         int arg4 = (int)(param_column);
         const QModelIndex arg5 = getqtype<QModelIndexType>(param_parent);
-        return isMuQtObject(arg0)
-                   ? arg0->QAbstractItemModel::canDropMimeData(arg1, arg2, arg3,
-                                                               arg4, arg5)
-                   : arg0->canDropMimeData(arg1, arg2, arg3, arg4, arg5);
+        return isMuQtObject(arg0) ? arg0->QAbstractItemModel::canDropMimeData(arg1, arg2, arg3, arg4, arg5)
+                                  : arg0->canDropMimeData(arg1, arg2, arg3, arg4, arg5);
     }
 
-    bool qt_QAbstractItemModel_canFetchMore_bool_QAbstractItemModel_QModelIndex(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
+    bool qt_QAbstractItemModel_canFetchMore_bool_QAbstractItemModel_QModelIndex(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemModel* arg0 = object<QAbstractItemModel>(param_this);
         const QModelIndex arg1 = getqtype<QModelIndexType>(param_parent);
-        return isMuQtObject(arg0) ? arg0->QAbstractItemModel::canFetchMore(arg1)
-                                  : arg0->canFetchMore(arg1);
+        return isMuQtObject(arg0) ? arg0->QAbstractItemModel::canFetchMore(arg1) : arg0->canFetchMore(arg1);
     }
 
-    bool
-    qt_QAbstractItemModel_clearItemData_bool_QAbstractItemModel_QModelIndex(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index)
+    bool qt_QAbstractItemModel_clearItemData_bool_QAbstractItemModel_QModelIndex(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                 Pointer param_index)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemModel* arg0 = object<QAbstractItemModel>(param_this);
         const QModelIndex arg1 = getqtype<QModelIndexType>(param_index);
-        return isMuQtObject(arg0)
-                   ? arg0->QAbstractItemModel::clearItemData(arg1)
-                   : arg0->clearItemData(arg1);
+        return isMuQtObject(arg0) ? arg0->QAbstractItemModel::clearItemData(arg1) : arg0->clearItemData(arg1);
     }
 
-    int qt_QAbstractItemModel_columnCount_int_QAbstractItemModel_QModelIndex(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
+    int qt_QAbstractItemModel_columnCount_int_QAbstractItemModel_QModelIndex(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                             Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemModel* arg0 = object<QAbstractItemModel>(param_this);
@@ -1033,23 +942,21 @@ namespace Mu
         return arg0->columnCount(arg1);
     }
 
-    Pointer
-    qt_QAbstractItemModel_data_QVariant_QAbstractItemModel_QModelIndex_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index,
-        int param_role)
+    Pointer qt_QAbstractItemModel_data_QVariant_QAbstractItemModel_QModelIndex_int(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                   Pointer param_index, int param_role)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemModel* arg0 = object<QAbstractItemModel>(param_this);
         const QModelIndex arg1 = getqtype<QModelIndexType>(param_index);
         int arg2 = (int)(param_role);
-        return makeqtype<QVariantType>(c, arg0->data(arg1, arg2),
-                                       "qt.QVariant");
+        return makeqtype<QVariantType>(c, arg0->data(arg1, arg2), "qt.QVariant");
     }
 
-    bool
-    qt_QAbstractItemModel_dropMimeData_bool_QAbstractItemModel_QMimeData_int_int_int_QModelIndex(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_data,
-        int param_action, int param_row, int param_column, Pointer param_parent)
+    bool qt_QAbstractItemModel_dropMimeData_bool_QAbstractItemModel_QMimeData_int_int_int_QModelIndex(Mu::Thread& NODE_THREAD,
+                                                                                                      Pointer param_this,
+                                                                                                      Pointer param_data, int param_action,
+                                                                                                      int param_row, int param_column,
+                                                                                                      Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemModel* arg0 = object<QAbstractItemModel>(param_this);
@@ -1058,14 +965,12 @@ namespace Mu
         int arg3 = (int)(param_row);
         int arg4 = (int)(param_column);
         const QModelIndex arg5 = getqtype<QModelIndexType>(param_parent);
-        return isMuQtObject(arg0)
-                   ? arg0->QAbstractItemModel::dropMimeData(arg1, arg2, arg3,
-                                                            arg4, arg5)
-                   : arg0->dropMimeData(arg1, arg2, arg3, arg4, arg5);
+        return isMuQtObject(arg0) ? arg0->QAbstractItemModel::dropMimeData(arg1, arg2, arg3, arg4, arg5)
+                                  : arg0->dropMimeData(arg1, arg2, arg3, arg4, arg5);
     }
 
-    void qt_QAbstractItemModel_fetchMore_void_QAbstractItemModel_QModelIndex(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
+    void qt_QAbstractItemModel_fetchMore_void_QAbstractItemModel_QModelIndex(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                             Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemModel* arg0 = object<QAbstractItemModel>(param_this);
@@ -1076,30 +981,25 @@ namespace Mu
             arg0->fetchMore(arg1);
     }
 
-    int qt_QAbstractItemModel_flags_int_QAbstractItemModel_QModelIndex(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index)
+    int qt_QAbstractItemModel_flags_int_QAbstractItemModel_QModelIndex(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemModel* arg0 = object<QAbstractItemModel>(param_this);
         const QModelIndex arg1 = getqtype<QModelIndexType>(param_index);
-        return isMuQtObject(arg0) ? int(arg0->QAbstractItemModel::flags(arg1))
-                                  : int(arg0->flags(arg1));
+        return isMuQtObject(arg0) ? int(arg0->QAbstractItemModel::flags(arg1)) : int(arg0->flags(arg1));
     }
 
-    bool qt_QAbstractItemModel_hasChildren_bool_QAbstractItemModel_QModelIndex(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
+    bool qt_QAbstractItemModel_hasChildren_bool_QAbstractItemModel_QModelIndex(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                               Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemModel* arg0 = object<QAbstractItemModel>(param_this);
         const QModelIndex arg1 = getqtype<QModelIndexType>(param_parent);
-        return isMuQtObject(arg0) ? arg0->QAbstractItemModel::hasChildren(arg1)
-                                  : arg0->hasChildren(arg1);
+        return isMuQtObject(arg0) ? arg0->QAbstractItemModel::hasChildren(arg1) : arg0->hasChildren(arg1);
     }
 
-    bool
-    qt_QAbstractItemModel_hasIndex_bool_QAbstractItemModel_int_int_QModelIndex(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
-        int param_column, Pointer param_parent)
+    bool qt_QAbstractItemModel_hasIndex_bool_QAbstractItemModel_int_int_QModelIndex(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                    int param_row, int param_column, Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemModel* arg0 = object<QAbstractItemModel>(param_this);
@@ -1109,43 +1009,33 @@ namespace Mu
         return arg0->hasIndex(arg1, arg2, arg3);
     }
 
-    Pointer
-    qt_QAbstractItemModel_headerData_QVariant_QAbstractItemModel_int_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_section,
-        int param_orientation, int param_role)
+    Pointer qt_QAbstractItemModel_headerData_QVariant_QAbstractItemModel_int_int_int(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                     int param_section, int param_orientation,
+                                                                                     int param_role)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemModel* arg0 = object<QAbstractItemModel>(param_this);
         int arg1 = (int)(param_section);
         Qt::Orientation arg2 = (Qt::Orientation)(param_orientation);
         int arg3 = (int)(param_role);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QVariantType>(
-                         c,
-                         arg0->QAbstractItemModel::headerData(arg1, arg2, arg3),
-                         "qt.QVariant")
-                   : makeqtype<QVariantType>(
-                         c, arg0->headerData(arg1, arg2, arg3), "qt.QVariant");
+        return isMuQtObject(arg0) ? makeqtype<QVariantType>(c, arg0->QAbstractItemModel::headerData(arg1, arg2, arg3), "qt.QVariant")
+                                  : makeqtype<QVariantType>(c, arg0->headerData(arg1, arg2, arg3), "qt.QVariant");
     }
 
-    Pointer
-    qt_QAbstractItemModel_index_QModelIndex_QAbstractItemModel_int_int_QModelIndex(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
-        int param_column, Pointer param_parent)
+    Pointer qt_QAbstractItemModel_index_QModelIndex_QAbstractItemModel_int_int_QModelIndex(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                           int param_row, int param_column,
+                                                                                           Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemModel* arg0 = object<QAbstractItemModel>(param_this);
         int arg1 = (int)(param_row);
         int arg2 = (int)(param_column);
         const QModelIndex arg3 = getqtype<QModelIndexType>(param_parent);
-        return makeqtype<QModelIndexType>(c, arg0->index(arg1, arg2, arg3),
-                                          "qt.QModelIndex");
+        return makeqtype<QModelIndexType>(c, arg0->index(arg1, arg2, arg3), "qt.QModelIndex");
     }
 
-    bool
-    qt_QAbstractItemModel_insertColumn_bool_QAbstractItemModel_int_QModelIndex(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_column,
-        Pointer param_parent)
+    bool qt_QAbstractItemModel_insertColumn_bool_QAbstractItemModel_int_QModelIndex(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                    int param_column, Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemModel* arg0 = object<QAbstractItemModel>(param_this);
@@ -1154,25 +1044,20 @@ namespace Mu
         return arg0->insertColumn(arg1, arg2);
     }
 
-    bool
-    qt_QAbstractItemModel_insertColumns_bool_QAbstractItemModel_int_int_QModelIndex(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_column,
-        int param_count, Pointer param_parent)
+    bool qt_QAbstractItemModel_insertColumns_bool_QAbstractItemModel_int_int_QModelIndex(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                         int param_column, int param_count,
+                                                                                         Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemModel* arg0 = object<QAbstractItemModel>(param_this);
         int arg1 = (int)(param_column);
         int arg2 = (int)(param_count);
         const QModelIndex arg3 = getqtype<QModelIndexType>(param_parent);
-        return isMuQtObject(arg0)
-                   ? arg0->QAbstractItemModel::insertColumns(arg1, arg2, arg3)
-                   : arg0->insertColumns(arg1, arg2, arg3);
+        return isMuQtObject(arg0) ? arg0->QAbstractItemModel::insertColumns(arg1, arg2, arg3) : arg0->insertColumns(arg1, arg2, arg3);
     }
 
-    bool
-    qt_QAbstractItemModel_insertRow_bool_QAbstractItemModel_int_QModelIndex(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
-        Pointer param_parent)
+    bool qt_QAbstractItemModel_insertRow_bool_QAbstractItemModel_int_QModelIndex(Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
+                                                                                 Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemModel* arg0 = object<QAbstractItemModel>(param_this);
@@ -1181,25 +1066,20 @@ namespace Mu
         return arg0->insertRow(arg1, arg2);
     }
 
-    bool
-    qt_QAbstractItemModel_insertRows_bool_QAbstractItemModel_int_int_QModelIndex(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
-        int param_count, Pointer param_parent)
+    bool qt_QAbstractItemModel_insertRows_bool_QAbstractItemModel_int_int_QModelIndex(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                      int param_row, int param_count, Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemModel* arg0 = object<QAbstractItemModel>(param_this);
         int arg1 = (int)(param_row);
         int arg2 = (int)(param_count);
         const QModelIndex arg3 = getqtype<QModelIndexType>(param_parent);
-        return isMuQtObject(arg0)
-                   ? arg0->QAbstractItemModel::insertRows(arg1, arg2, arg3)
-                   : arg0->insertRows(arg1, arg2, arg3);
+        return isMuQtObject(arg0) ? arg0->QAbstractItemModel::insertRows(arg1, arg2, arg3) : arg0->insertRows(arg1, arg2, arg3);
     }
 
-    Pointer
-    qt_QAbstractItemModel_match_qt__QModelIndexBSB_ESB__QAbstractItemModel_QModelIndex_int_QVariant_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_start,
-        int param_role, Pointer param_value, int param_hits, int param_flags)
+    Pointer qt_QAbstractItemModel_match_qt__QModelIndexBSB_ESB__QAbstractItemModel_QModelIndex_int_QVariant_int_int(
+        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_start, int param_role, Pointer param_value, int param_hits,
+        int param_flags)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemModel* arg0 = object<QAbstractItemModel>(param_this);
@@ -1208,58 +1088,42 @@ namespace Mu
         const QVariant arg3 = getqtype<QVariantType>(param_value);
         int arg4 = (int)(param_hits);
         Qt::MatchFlags arg5 = (Qt::MatchFlags)(param_flags);
-        return isMuQtObject(arg0)
-                   ? makeqmodelindexlist(c, arg0->QAbstractItemModel::match(
-                                                arg1, arg2, arg3, arg4, arg5))
-                   : makeqmodelindexlist(
-                         c, arg0->match(arg1, arg2, arg3, arg4, arg5));
+        return isMuQtObject(arg0) ? makeqmodelindexlist(c, arg0->QAbstractItemModel::match(arg1, arg2, arg3, arg4, arg5))
+                                  : makeqmodelindexlist(c, arg0->match(arg1, arg2, arg3, arg4, arg5));
     }
 
-    Pointer
-    qt_QAbstractItemModel_mimeData_QMimeData_QAbstractItemModel_qt__QModelIndexBSB_ESB_(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_indexes)
+    Pointer qt_QAbstractItemModel_mimeData_QMimeData_QAbstractItemModel_qt__QModelIndexBSB_ESB_(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                                Pointer param_indexes)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemModel* arg0 = object<QAbstractItemModel>(param_this);
         const QModelIndexList arg1 = qmodelindexlist(param_indexes);
-        return isMuQtObject(arg0)
-                   ? makeinstance<QMimeDataType>(
-                         c, arg0->QAbstractItemModel::mimeData(arg1),
-                         "qt.QMimeData")
-                   : makeinstance<QMimeDataType>(c, arg0->mimeData(arg1),
-                                                 "qt.QMimeData");
+        return isMuQtObject(arg0) ? makeinstance<QMimeDataType>(c, arg0->QAbstractItemModel::mimeData(arg1), "qt.QMimeData")
+                                  : makeinstance<QMimeDataType>(c, arg0->mimeData(arg1), "qt.QMimeData");
     }
 
-    Pointer qt_QAbstractItemModel_mimeTypes_stringBSB_ESB__QAbstractItemModel(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QAbstractItemModel_mimeTypes_stringBSB_ESB__QAbstractItemModel(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemModel* arg0 = object<QAbstractItemModel>(param_this);
-        return isMuQtObject(arg0)
-                   ? makestringlist(c, arg0->QAbstractItemModel::mimeTypes())
-                   : makestringlist(c, arg0->mimeTypes());
+        return isMuQtObject(arg0) ? makestringlist(c, arg0->QAbstractItemModel::mimeTypes()) : makestringlist(c, arg0->mimeTypes());
     }
 
-    bool
-    qt_QAbstractItemModel_moveColumn_bool_QAbstractItemModel_QModelIndex_int_QModelIndex_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_sourceParent,
-        int param_sourceColumn, Pointer param_destinationParent,
+    bool qt_QAbstractItemModel_moveColumn_bool_QAbstractItemModel_QModelIndex_int_QModelIndex_int(
+        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_sourceParent, int param_sourceColumn, Pointer param_destinationParent,
         int param_destinationChild)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemModel* arg0 = object<QAbstractItemModel>(param_this);
         const QModelIndex arg1 = getqtype<QModelIndexType>(param_sourceParent);
         int arg2 = (int)(param_sourceColumn);
-        const QModelIndex arg3 =
-            getqtype<QModelIndexType>(param_destinationParent);
+        const QModelIndex arg3 = getqtype<QModelIndexType>(param_destinationParent);
         int arg4 = (int)(param_destinationChild);
         return arg0->moveColumn(arg1, arg2, arg3, arg4);
     }
 
-    bool
-    qt_QAbstractItemModel_moveColumns_bool_QAbstractItemModel_QModelIndex_int_int_QModelIndex_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_sourceParent,
-        int param_sourceColumn, int param_count,
+    bool qt_QAbstractItemModel_moveColumns_bool_QAbstractItemModel_QModelIndex_int_int_QModelIndex_int(
+        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_sourceParent, int param_sourceColumn, int param_count,
         Pointer param_destinationParent, int param_destinationChild)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
@@ -1267,66 +1131,53 @@ namespace Mu
         const QModelIndex arg1 = getqtype<QModelIndexType>(param_sourceParent);
         int arg2 = (int)(param_sourceColumn);
         int arg3 = (int)(param_count);
-        const QModelIndex arg4 =
-            getqtype<QModelIndexType>(param_destinationParent);
+        const QModelIndex arg4 = getqtype<QModelIndexType>(param_destinationParent);
         int arg5 = (int)(param_destinationChild);
-        return isMuQtObject(arg0)
-                   ? arg0->QAbstractItemModel::moveColumns(arg1, arg2, arg3,
-                                                           arg4, arg5)
-                   : arg0->moveColumns(arg1, arg2, arg3, arg4, arg5);
+        return isMuQtObject(arg0) ? arg0->QAbstractItemModel::moveColumns(arg1, arg2, arg3, arg4, arg5)
+                                  : arg0->moveColumns(arg1, arg2, arg3, arg4, arg5);
     }
 
-    bool
-    qt_QAbstractItemModel_moveRow_bool_QAbstractItemModel_QModelIndex_int_QModelIndex_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_sourceParent,
-        int param_sourceRow, Pointer param_destinationParent,
-        int param_destinationChild)
+    bool qt_QAbstractItemModel_moveRow_bool_QAbstractItemModel_QModelIndex_int_QModelIndex_int(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                               Pointer param_sourceParent,
+                                                                                               int param_sourceRow,
+                                                                                               Pointer param_destinationParent,
+                                                                                               int param_destinationChild)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemModel* arg0 = object<QAbstractItemModel>(param_this);
         const QModelIndex arg1 = getqtype<QModelIndexType>(param_sourceParent);
         int arg2 = (int)(param_sourceRow);
-        const QModelIndex arg3 =
-            getqtype<QModelIndexType>(param_destinationParent);
+        const QModelIndex arg3 = getqtype<QModelIndexType>(param_destinationParent);
         int arg4 = (int)(param_destinationChild);
         return arg0->moveRow(arg1, arg2, arg3, arg4);
     }
 
-    bool
-    qt_QAbstractItemModel_moveRows_bool_QAbstractItemModel_QModelIndex_int_int_QModelIndex_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_sourceParent,
-        int param_sourceRow, int param_count, Pointer param_destinationParent,
-        int param_destinationChild)
+    bool qt_QAbstractItemModel_moveRows_bool_QAbstractItemModel_QModelIndex_int_int_QModelIndex_int(
+        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_sourceParent, int param_sourceRow, int param_count,
+        Pointer param_destinationParent, int param_destinationChild)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemModel* arg0 = object<QAbstractItemModel>(param_this);
         const QModelIndex arg1 = getqtype<QModelIndexType>(param_sourceParent);
         int arg2 = (int)(param_sourceRow);
         int arg3 = (int)(param_count);
-        const QModelIndex arg4 =
-            getqtype<QModelIndexType>(param_destinationParent);
+        const QModelIndex arg4 = getqtype<QModelIndexType>(param_destinationParent);
         int arg5 = (int)(param_destinationChild);
-        return isMuQtObject(arg0)
-                   ? arg0->QAbstractItemModel::moveRows(arg1, arg2, arg3, arg4,
-                                                        arg5)
-                   : arg0->moveRows(arg1, arg2, arg3, arg4, arg5);
+        return isMuQtObject(arg0) ? arg0->QAbstractItemModel::moveRows(arg1, arg2, arg3, arg4, arg5)
+                                  : arg0->moveRows(arg1, arg2, arg3, arg4, arg5);
     }
 
-    Pointer
-    qt_QAbstractItemModel_parent_QModelIndex_QAbstractItemModel_QModelIndex(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index)
+    Pointer qt_QAbstractItemModel_parent_QModelIndex_QAbstractItemModel_QModelIndex(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                    Pointer param_index)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemModel* arg0 = object<QAbstractItemModel>(param_this);
         const QModelIndex arg1 = getqtype<QModelIndexType>(param_index);
-        return makeqtype<QModelIndexType>(c, arg0->parent(arg1),
-                                          "qt.QModelIndex");
+        return makeqtype<QModelIndexType>(c, arg0->parent(arg1), "qt.QModelIndex");
     }
 
-    bool
-    qt_QAbstractItemModel_removeColumn_bool_QAbstractItemModel_int_QModelIndex(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_column,
-        Pointer param_parent)
+    bool qt_QAbstractItemModel_removeColumn_bool_QAbstractItemModel_int_QModelIndex(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                    int param_column, Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemModel* arg0 = object<QAbstractItemModel>(param_this);
@@ -1335,25 +1186,20 @@ namespace Mu
         return arg0->removeColumn(arg1, arg2);
     }
 
-    bool
-    qt_QAbstractItemModel_removeColumns_bool_QAbstractItemModel_int_int_QModelIndex(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_column,
-        int param_count, Pointer param_parent)
+    bool qt_QAbstractItemModel_removeColumns_bool_QAbstractItemModel_int_int_QModelIndex(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                         int param_column, int param_count,
+                                                                                         Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemModel* arg0 = object<QAbstractItemModel>(param_this);
         int arg1 = (int)(param_column);
         int arg2 = (int)(param_count);
         const QModelIndex arg3 = getqtype<QModelIndexType>(param_parent);
-        return isMuQtObject(arg0)
-                   ? arg0->QAbstractItemModel::removeColumns(arg1, arg2, arg3)
-                   : arg0->removeColumns(arg1, arg2, arg3);
+        return isMuQtObject(arg0) ? arg0->QAbstractItemModel::removeColumns(arg1, arg2, arg3) : arg0->removeColumns(arg1, arg2, arg3);
     }
 
-    bool
-    qt_QAbstractItemModel_removeRow_bool_QAbstractItemModel_int_QModelIndex(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
-        Pointer param_parent)
+    bool qt_QAbstractItemModel_removeRow_bool_QAbstractItemModel_int_QModelIndex(Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
+                                                                                 Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemModel* arg0 = object<QAbstractItemModel>(param_this);
@@ -1362,23 +1208,18 @@ namespace Mu
         return arg0->removeRow(arg1, arg2);
     }
 
-    bool
-    qt_QAbstractItemModel_removeRows_bool_QAbstractItemModel_int_int_QModelIndex(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
-        int param_count, Pointer param_parent)
+    bool qt_QAbstractItemModel_removeRows_bool_QAbstractItemModel_int_int_QModelIndex(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                      int param_row, int param_count, Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemModel* arg0 = object<QAbstractItemModel>(param_this);
         int arg1 = (int)(param_row);
         int arg2 = (int)(param_count);
         const QModelIndex arg3 = getqtype<QModelIndexType>(param_parent);
-        return isMuQtObject(arg0)
-                   ? arg0->QAbstractItemModel::removeRows(arg1, arg2, arg3)
-                   : arg0->removeRows(arg1, arg2, arg3);
+        return isMuQtObject(arg0) ? arg0->QAbstractItemModel::removeRows(arg1, arg2, arg3) : arg0->removeRows(arg1, arg2, arg3);
     }
 
-    int qt_QAbstractItemModel_rowCount_int_QAbstractItemModel_QModelIndex(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
+    int qt_QAbstractItemModel_rowCount_int_QAbstractItemModel_QModelIndex(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemModel* arg0 = object<QAbstractItemModel>(param_this);
@@ -1386,25 +1227,21 @@ namespace Mu
         return arg0->rowCount(arg1);
     }
 
-    bool
-    qt_QAbstractItemModel_setData_bool_QAbstractItemModel_QModelIndex_QVariant_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index,
-        Pointer param_value, int param_role)
+    bool qt_QAbstractItemModel_setData_bool_QAbstractItemModel_QModelIndex_QVariant_int(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                        Pointer param_index, Pointer param_value,
+                                                                                        int param_role)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemModel* arg0 = object<QAbstractItemModel>(param_this);
         const QModelIndex arg1 = getqtype<QModelIndexType>(param_index);
         const QVariant arg2 = getqtype<QVariantType>(param_value);
         int arg3 = (int)(param_role);
-        return isMuQtObject(arg0)
-                   ? arg0->QAbstractItemModel::setData(arg1, arg2, arg3)
-                   : arg0->setData(arg1, arg2, arg3);
+        return isMuQtObject(arg0) ? arg0->QAbstractItemModel::setData(arg1, arg2, arg3) : arg0->setData(arg1, arg2, arg3);
     }
 
-    bool
-    qt_QAbstractItemModel_setHeaderData_bool_QAbstractItemModel_int_int_QVariant_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_section,
-        int param_orientation, Pointer param_value, int param_role)
+    bool qt_QAbstractItemModel_setHeaderData_bool_QAbstractItemModel_int_int_QVariant_int(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                          int param_section, int param_orientation,
+                                                                                          Pointer param_value, int param_role)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemModel* arg0 = object<QAbstractItemModel>(param_this);
@@ -1412,32 +1249,25 @@ namespace Mu
         Qt::Orientation arg2 = (Qt::Orientation)(param_orientation);
         const QVariant arg3 = getqtype<QVariantType>(param_value);
         int arg4 = (int)(param_role);
-        return isMuQtObject(arg0) ? arg0->QAbstractItemModel::setHeaderData(
-                                        arg1, arg2, arg3, arg4)
+        return isMuQtObject(arg0) ? arg0->QAbstractItemModel::setHeaderData(arg1, arg2, arg3, arg4)
                                   : arg0->setHeaderData(arg1, arg2, arg3, arg4);
     }
 
-    Pointer
-    qt_QAbstractItemModel_sibling_QModelIndex_QAbstractItemModel_int_int_QModelIndex(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
-        int param_column, Pointer param_index)
+    Pointer qt_QAbstractItemModel_sibling_QModelIndex_QAbstractItemModel_int_int_QModelIndex(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                             int param_row, int param_column,
+                                                                                             Pointer param_index)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemModel* arg0 = object<QAbstractItemModel>(param_this);
         int arg1 = (int)(param_row);
         int arg2 = (int)(param_column);
         const QModelIndex arg3 = getqtype<QModelIndexType>(param_index);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QModelIndexType>(
-                         c, arg0->QAbstractItemModel::sibling(arg1, arg2, arg3),
-                         "qt.QModelIndex")
-                   : makeqtype<QModelIndexType>(
-                         c, arg0->sibling(arg1, arg2, arg3), "qt.QModelIndex");
+        return isMuQtObject(arg0) ? makeqtype<QModelIndexType>(c, arg0->QAbstractItemModel::sibling(arg1, arg2, arg3), "qt.QModelIndex")
+                                  : makeqtype<QModelIndexType>(c, arg0->sibling(arg1, arg2, arg3), "qt.QModelIndex");
     }
 
-    void qt_QAbstractItemModel_sort_void_QAbstractItemModel_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_column,
-        int param_order)
+    void qt_QAbstractItemModel_sort_void_QAbstractItemModel_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_column,
+                                                                    int param_order)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemModel* arg0 = object<QAbstractItemModel>(param_this);
@@ -1449,56 +1279,45 @@ namespace Mu
             arg0->sort(arg1, arg2);
     }
 
-    Pointer qt_QAbstractItemModel_span_QSize_QAbstractItemModel_QModelIndex(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index)
+    Pointer qt_QAbstractItemModel_span_QSize_QAbstractItemModel_QModelIndex(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                            Pointer param_index)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemModel* arg0 = object<QAbstractItemModel>(param_this);
         const QModelIndex arg1 = getqtype<QModelIndexType>(param_index);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QSizeType>(
-                         c, arg0->QAbstractItemModel::span(arg1), "qt.QSize")
-                   : makeqtype<QSizeType>(c, arg0->span(arg1), "qt.QSize");
+        return isMuQtObject(arg0) ? makeqtype<QSizeType>(c, arg0->QAbstractItemModel::span(arg1), "qt.QSize")
+                                  : makeqtype<QSizeType>(c, arg0->span(arg1), "qt.QSize");
     }
 
-    int qt_QAbstractItemModel_supportedDragActions_int_QAbstractItemModel(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    int qt_QAbstractItemModel_supportedDragActions_int_QAbstractItemModel(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemModel* arg0 = object<QAbstractItemModel>(param_this);
-        return isMuQtObject(arg0)
-                   ? int(arg0->QAbstractItemModel::supportedDragActions())
-                   : int(arg0->supportedDragActions());
+        return isMuQtObject(arg0) ? int(arg0->QAbstractItemModel::supportedDragActions()) : int(arg0->supportedDragActions());
     }
 
-    int qt_QAbstractItemModel_supportedDropActions_int_QAbstractItemModel(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    int qt_QAbstractItemModel_supportedDropActions_int_QAbstractItemModel(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemModel* arg0 = object<QAbstractItemModel>(param_this);
-        return isMuQtObject(arg0)
-                   ? int(arg0->QAbstractItemModel::supportedDropActions())
-                   : int(arg0->supportedDropActions());
+        return isMuQtObject(arg0) ? int(arg0->QAbstractItemModel::supportedDropActions()) : int(arg0->supportedDropActions());
     }
 
-    void
-    qt_QAbstractItemModel_beginInsertColumns_void_QAbstractItemModel_QModelIndex_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent,
-        int param_first, int param_last)
+    void qt_QAbstractItemModel_beginInsertColumns_void_QAbstractItemModel_QModelIndex_int_int(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                              Pointer param_parent, int param_first,
+                                                                                              int param_last)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemModel* arg0 = object<QAbstractItemModel>(param_this);
         const QModelIndex arg1 = getqtype<QModelIndexType>(param_parent);
         int arg2 = (int)(param_first);
         int arg3 = (int)(param_last);
-        ((MuQt_QAbstractItemModel*)arg0)
-            ->beginInsertColumns_pub(arg1, arg2, arg3);
+        ((MuQt_QAbstractItemModel*)arg0)->beginInsertColumns_pub(arg1, arg2, arg3);
     }
 
-    void
-    qt_QAbstractItemModel_beginInsertRows_void_QAbstractItemModel_QModelIndex_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent,
-        int param_first, int param_last)
+    void qt_QAbstractItemModel_beginInsertRows_void_QAbstractItemModel_QModelIndex_int_int(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                           Pointer param_parent, int param_first,
+                                                                                           int param_last)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemModel* arg0 = object<QAbstractItemModel>(param_this);
@@ -1508,10 +1327,8 @@ namespace Mu
         ((MuQt_QAbstractItemModel*)arg0)->beginInsertRows_pub(arg1, arg2, arg3);
     }
 
-    bool
-    qt_QAbstractItemModel_beginMoveColumns_bool_QAbstractItemModel_QModelIndex_int_int_QModelIndex_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_sourceParent,
-        int param_sourceFirst, int param_sourceLast,
+    bool qt_QAbstractItemModel_beginMoveColumns_bool_QAbstractItemModel_QModelIndex_int_int_QModelIndex_int(
+        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_sourceParent, int param_sourceFirst, int param_sourceLast,
         Pointer param_destinationParent, int param_destinationChild)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
@@ -1519,17 +1336,13 @@ namespace Mu
         const QModelIndex arg1 = getqtype<QModelIndexType>(param_sourceParent);
         int arg2 = (int)(param_sourceFirst);
         int arg3 = (int)(param_sourceLast);
-        const QModelIndex arg4 =
-            getqtype<QModelIndexType>(param_destinationParent);
+        const QModelIndex arg4 = getqtype<QModelIndexType>(param_destinationParent);
         int arg5 = (int)(param_destinationChild);
-        return ((MuQt_QAbstractItemModel*)arg0)
-            ->beginMoveColumns_pub(arg1, arg2, arg3, arg4, arg5);
+        return ((MuQt_QAbstractItemModel*)arg0)->beginMoveColumns_pub(arg1, arg2, arg3, arg4, arg5);
     }
 
-    bool
-    qt_QAbstractItemModel_beginMoveRows_bool_QAbstractItemModel_QModelIndex_int_int_QModelIndex_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_sourceParent,
-        int param_sourceFirst, int param_sourceLast,
+    bool qt_QAbstractItemModel_beginMoveRows_bool_QAbstractItemModel_QModelIndex_int_int_QModelIndex_int(
+        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_sourceParent, int param_sourceFirst, int param_sourceLast,
         Pointer param_destinationParent, int param_destinationChild)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
@@ -1537,31 +1350,26 @@ namespace Mu
         const QModelIndex arg1 = getqtype<QModelIndexType>(param_sourceParent);
         int arg2 = (int)(param_sourceFirst);
         int arg3 = (int)(param_sourceLast);
-        const QModelIndex arg4 =
-            getqtype<QModelIndexType>(param_destinationParent);
+        const QModelIndex arg4 = getqtype<QModelIndexType>(param_destinationParent);
         int arg5 = (int)(param_destinationChild);
-        return ((MuQt_QAbstractItemModel*)arg0)
-            ->beginMoveRows_pub(arg1, arg2, arg3, arg4, arg5);
+        return ((MuQt_QAbstractItemModel*)arg0)->beginMoveRows_pub(arg1, arg2, arg3, arg4, arg5);
     }
 
-    void
-    qt_QAbstractItemModel_beginRemoveColumns_void_QAbstractItemModel_QModelIndex_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent,
-        int param_first, int param_last)
+    void qt_QAbstractItemModel_beginRemoveColumns_void_QAbstractItemModel_QModelIndex_int_int(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                              Pointer param_parent, int param_first,
+                                                                                              int param_last)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemModel* arg0 = object<QAbstractItemModel>(param_this);
         const QModelIndex arg1 = getqtype<QModelIndexType>(param_parent);
         int arg2 = (int)(param_first);
         int arg3 = (int)(param_last);
-        ((MuQt_QAbstractItemModel*)arg0)
-            ->beginRemoveColumns_pub(arg1, arg2, arg3);
+        ((MuQt_QAbstractItemModel*)arg0)->beginRemoveColumns_pub(arg1, arg2, arg3);
     }
 
-    void
-    qt_QAbstractItemModel_beginRemoveRows_void_QAbstractItemModel_QModelIndex_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent,
-        int param_first, int param_last)
+    void qt_QAbstractItemModel_beginRemoveRows_void_QAbstractItemModel_QModelIndex_int_int(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                           Pointer param_parent, int param_first,
+                                                                                           int param_last)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemModel* arg0 = object<QAbstractItemModel>(param_this);
@@ -1571,18 +1379,16 @@ namespace Mu
         ((MuQt_QAbstractItemModel*)arg0)->beginRemoveRows_pub(arg1, arg2, arg3);
     }
 
-    void qt_QAbstractItemModel_beginResetModel_void_QAbstractItemModel(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    void qt_QAbstractItemModel_beginResetModel_void_QAbstractItemModel(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemModel* arg0 = object<QAbstractItemModel>(param_this);
         ((MuQt_QAbstractItemModel*)arg0)->beginResetModel_pub();
     }
 
-    void
-    qt_QAbstractItemModel_changePersistentIndex_void_QAbstractItemModel_QModelIndex_QModelIndex(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_from,
-        Pointer param_to)
+    void qt_QAbstractItemModel_changePersistentIndex_void_QAbstractItemModel_QModelIndex_QModelIndex(Mu::Thread& NODE_THREAD,
+                                                                                                     Pointer param_this, Pointer param_from,
+                                                                                                     Pointer param_to)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemModel* arg0 = object<QAbstractItemModel>(param_this);
@@ -1591,111 +1397,92 @@ namespace Mu
         ((MuQt_QAbstractItemModel*)arg0)->changePersistentIndex_pub(arg1, arg2);
     }
 
-    void
-    qt_QAbstractItemModel_changePersistentIndexList_void_QAbstractItemModel_qt__QModelIndexBSB_ESB__qt__QModelIndexBSB_ESB_(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_from,
-        Pointer param_to)
+    void qt_QAbstractItemModel_changePersistentIndexList_void_QAbstractItemModel_qt__QModelIndexBSB_ESB__qt__QModelIndexBSB_ESB_(
+        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_from, Pointer param_to)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemModel* arg0 = object<QAbstractItemModel>(param_this);
         const QModelIndexList arg1 = qmodelindexlist(param_from);
         const QModelIndexList arg2 = qmodelindexlist(param_to);
-        ((MuQt_QAbstractItemModel*)arg0)
-            ->changePersistentIndexList_pub(arg1, arg2);
+        ((MuQt_QAbstractItemModel*)arg0)->changePersistentIndexList_pub(arg1, arg2);
     }
 
-    void qt_QAbstractItemModel_endInsertColumns_void_QAbstractItemModel(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    void qt_QAbstractItemModel_endInsertColumns_void_QAbstractItemModel(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemModel* arg0 = object<QAbstractItemModel>(param_this);
         ((MuQt_QAbstractItemModel*)arg0)->endInsertColumns_pub();
     }
 
-    void qt_QAbstractItemModel_endInsertRows_void_QAbstractItemModel(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    void qt_QAbstractItemModel_endInsertRows_void_QAbstractItemModel(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemModel* arg0 = object<QAbstractItemModel>(param_this);
         ((MuQt_QAbstractItemModel*)arg0)->endInsertRows_pub();
     }
 
-    void qt_QAbstractItemModel_endMoveColumns_void_QAbstractItemModel(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    void qt_QAbstractItemModel_endMoveColumns_void_QAbstractItemModel(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemModel* arg0 = object<QAbstractItemModel>(param_this);
         ((MuQt_QAbstractItemModel*)arg0)->endMoveColumns_pub();
     }
 
-    void qt_QAbstractItemModel_endMoveRows_void_QAbstractItemModel(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    void qt_QAbstractItemModel_endMoveRows_void_QAbstractItemModel(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemModel* arg0 = object<QAbstractItemModel>(param_this);
         ((MuQt_QAbstractItemModel*)arg0)->endMoveRows_pub();
     }
 
-    void qt_QAbstractItemModel_endRemoveColumns_void_QAbstractItemModel(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    void qt_QAbstractItemModel_endRemoveColumns_void_QAbstractItemModel(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemModel* arg0 = object<QAbstractItemModel>(param_this);
         ((MuQt_QAbstractItemModel*)arg0)->endRemoveColumns_pub();
     }
 
-    void qt_QAbstractItemModel_endRemoveRows_void_QAbstractItemModel(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    void qt_QAbstractItemModel_endRemoveRows_void_QAbstractItemModel(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemModel* arg0 = object<QAbstractItemModel>(param_this);
         ((MuQt_QAbstractItemModel*)arg0)->endRemoveRows_pub();
     }
 
-    void qt_QAbstractItemModel_endResetModel_void_QAbstractItemModel(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    void qt_QAbstractItemModel_endResetModel_void_QAbstractItemModel(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemModel* arg0 = object<QAbstractItemModel>(param_this);
         ((MuQt_QAbstractItemModel*)arg0)->endResetModel_pub();
     }
 
-    Pointer
-    qt_QAbstractItemModel_persistentIndexList_qt__QModelIndexBSB_ESB__QAbstractItemModel(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QAbstractItemModel_persistentIndexList_qt__QModelIndexBSB_ESB__QAbstractItemModel(Mu::Thread& NODE_THREAD,
+                                                                                                 Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemModel* arg0 = object<QAbstractItemModel>(param_this);
-        return makeqmodelindexlist(
-            c, ((MuQt_QAbstractItemModel*)arg0)->persistentIndexList_pub());
+        return makeqmodelindexlist(c, ((MuQt_QAbstractItemModel*)arg0)->persistentIndexList_pub());
     }
 
-    bool qt_QAbstractItemModel_event_bool_QAbstractItemModel_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    bool qt_QAbstractItemModel_event_bool_QAbstractItemModel_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemModel* arg0 = object<QAbstractItemModel>(param_this);
         QEvent* arg1 = getqpointer<QEventType>(param_e);
-        return isMuQtObject(arg0) ? arg0->QAbstractItemModel::event(arg1)
-                                  : arg0->event(arg1);
+        return isMuQtObject(arg0) ? arg0->QAbstractItemModel::event(arg1) : arg0->event(arg1);
     }
 
-    bool
-    qt_QAbstractItemModel_eventFilter_bool_QAbstractItemModel_QObject_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_watched,
-        Pointer param_event)
+    bool qt_QAbstractItemModel_eventFilter_bool_QAbstractItemModel_QObject_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                  Pointer param_watched, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemModel* arg0 = object<QAbstractItemModel>(param_this);
         QObject* arg1 = object<QObject>(param_watched);
         QEvent* arg2 = getqpointer<QEventType>(param_event);
-        return isMuQtObject(arg0)
-                   ? arg0->QAbstractItemModel::eventFilter(arg1, arg2)
-                   : arg0->eventFilter(arg1, arg2);
+        return isMuQtObject(arg0) ? arg0->QAbstractItemModel::eventFilter(arg1, arg2) : arg0->eventFilter(arg1, arg2);
     }
 
-    void qt_QAbstractItemModel_customEvent_void_QAbstractItemModel_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractItemModel_customEvent_void_QAbstractItemModel_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemModel* arg0 = object<QAbstractItemModel>(param_this);
@@ -1706,8 +1493,8 @@ namespace Mu
             ((MuQt_QAbstractItemModel*)arg0)->customEvent_pub(arg1);
     }
 
-    void qt_QAbstractItemModel_timerEvent_void_QAbstractItemModel_QTimerEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractItemModel_timerEvent_void_QAbstractItemModel_QTimerEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                              Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemModel* arg0 = object<QAbstractItemModel>(param_this);
@@ -1720,446 +1507,350 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(_n_QAbstractItemModel0, Pointer)
     {
-        NODE_RETURN(
-            qt_QAbstractItemModel_QAbstractItemModel_QAbstractItemModel_QAbstractItemModel_QObject(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QAbstractItemModel_QAbstractItemModel_QAbstractItemModel_QAbstractItemModel_QObject(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_buddy0, Pointer)
     {
-        NODE_RETURN(
-            qt_QAbstractItemModel_buddy_QModelIndex_QAbstractItemModel_QModelIndex(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QAbstractItemModel_buddy_QModelIndex_QAbstractItemModel_QModelIndex(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                           NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_canDropMimeData0, bool)
     {
-        NODE_RETURN(
-            qt_QAbstractItemModel_canDropMimeData_bool_QAbstractItemModel_QMimeData_int_int_int_QModelIndex(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, int), NODE_ARG(3, int), NODE_ARG(4, int),
-                NODE_ARG(5, Pointer)));
+        NODE_RETURN(qt_QAbstractItemModel_canDropMimeData_bool_QAbstractItemModel_QMimeData_int_int_int_QModelIndex(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, int), NODE_ARG(3, int), NODE_ARG(4, int),
+            NODE_ARG(5, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_canFetchMore0, bool)
     {
-        NODE_RETURN(
-            qt_QAbstractItemModel_canFetchMore_bool_QAbstractItemModel_QModelIndex(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QAbstractItemModel_canFetchMore_bool_QAbstractItemModel_QModelIndex(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                           NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_clearItemData0, bool)
     {
-        NODE_RETURN(
-            qt_QAbstractItemModel_clearItemData_bool_QAbstractItemModel_QModelIndex(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QAbstractItemModel_clearItemData_bool_QAbstractItemModel_QModelIndex(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                            NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_columnCount0, int)
     {
-        NODE_RETURN(
-            qt_QAbstractItemModel_columnCount_int_QAbstractItemModel_QModelIndex(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QAbstractItemModel_columnCount_int_QAbstractItemModel_QModelIndex(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                         NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_data0, Pointer)
     {
-        NODE_RETURN(
-            qt_QAbstractItemModel_data_QVariant_QAbstractItemModel_QModelIndex_int(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, int)));
+        NODE_RETURN(qt_QAbstractItemModel_data_QVariant_QAbstractItemModel_QModelIndex_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                           NODE_ARG(1, Pointer), NODE_ARG(2, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_dropMimeData0, bool)
     {
-        NODE_RETURN(
-            qt_QAbstractItemModel_dropMimeData_bool_QAbstractItemModel_QMimeData_int_int_int_QModelIndex(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, int), NODE_ARG(3, int), NODE_ARG(4, int),
-                NODE_ARG(5, Pointer)));
+        NODE_RETURN(qt_QAbstractItemModel_dropMimeData_bool_QAbstractItemModel_QMimeData_int_int_int_QModelIndex(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, int), NODE_ARG(3, int), NODE_ARG(4, int),
+            NODE_ARG(5, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_fetchMore0, void)
     {
-        qt_QAbstractItemModel_fetchMore_void_QAbstractItemModel_QModelIndex(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractItemModel_fetchMore_void_QAbstractItemModel_QModelIndex(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_flags0, int)
     {
         NODE_RETURN(
-            qt_QAbstractItemModel_flags_int_QAbstractItemModel_QModelIndex(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+            qt_QAbstractItemModel_flags_int_QAbstractItemModel_QModelIndex(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_hasChildren0, bool)
     {
-        NODE_RETURN(
-            qt_QAbstractItemModel_hasChildren_bool_QAbstractItemModel_QModelIndex(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QAbstractItemModel_hasChildren_bool_QAbstractItemModel_QModelIndex(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                          NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_hasIndex0, bool)
     {
-        NODE_RETURN(
-            qt_QAbstractItemModel_hasIndex_bool_QAbstractItemModel_int_int_QModelIndex(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-                NODE_ARG(2, int), NODE_ARG(3, Pointer)));
+        NODE_RETURN(qt_QAbstractItemModel_hasIndex_bool_QAbstractItemModel_int_int_QModelIndex(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int), NODE_ARG(3, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_headerData0, Pointer)
     {
-        NODE_RETURN(
-            qt_QAbstractItemModel_headerData_QVariant_QAbstractItemModel_int_int_int(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-                NODE_ARG(2, int), NODE_ARG(3, int)));
+        NODE_RETURN(qt_QAbstractItemModel_headerData_QVariant_QAbstractItemModel_int_int_int(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int), NODE_ARG(3, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_index0, Pointer)
     {
-        NODE_RETURN(
-            qt_QAbstractItemModel_index_QModelIndex_QAbstractItemModel_int_int_QModelIndex(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-                NODE_ARG(2, int), NODE_ARG(3, Pointer)));
+        NODE_RETURN(qt_QAbstractItemModel_index_QModelIndex_QAbstractItemModel_int_int_QModelIndex(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int), NODE_ARG(3, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_insertColumn0, bool)
     {
-        NODE_RETURN(
-            qt_QAbstractItemModel_insertColumn_bool_QAbstractItemModel_int_QModelIndex(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-                NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QAbstractItemModel_insertColumn_bool_QAbstractItemModel_int_QModelIndex(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                               NODE_ARG(1, int), NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_insertColumns0, bool)
     {
-        NODE_RETURN(
-            qt_QAbstractItemModel_insertColumns_bool_QAbstractItemModel_int_int_QModelIndex(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-                NODE_ARG(2, int), NODE_ARG(3, Pointer)));
+        NODE_RETURN(qt_QAbstractItemModel_insertColumns_bool_QAbstractItemModel_int_int_QModelIndex(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int), NODE_ARG(3, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_insertRow0, bool)
     {
-        NODE_RETURN(
-            qt_QAbstractItemModel_insertRow_bool_QAbstractItemModel_int_QModelIndex(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-                NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QAbstractItemModel_insertRow_bool_QAbstractItemModel_int_QModelIndex(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                            NODE_ARG(1, int), NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_insertRows0, bool)
     {
-        NODE_RETURN(
-            qt_QAbstractItemModel_insertRows_bool_QAbstractItemModel_int_int_QModelIndex(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-                NODE_ARG(2, int), NODE_ARG(3, Pointer)));
+        NODE_RETURN(qt_QAbstractItemModel_insertRows_bool_QAbstractItemModel_int_int_QModelIndex(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int), NODE_ARG(3, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_match0, Pointer)
     {
-        NODE_RETURN(
-            qt_QAbstractItemModel_match_qt__QModelIndexBSB_ESB__QAbstractItemModel_QModelIndex_int_QVariant_int_int(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, int), NODE_ARG(3, Pointer), NODE_ARG(4, int),
-                NODE_ARG(5, int)));
+        NODE_RETURN(qt_QAbstractItemModel_match_qt__QModelIndexBSB_ESB__QAbstractItemModel_QModelIndex_int_QVariant_int_int(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, int), NODE_ARG(3, Pointer), NODE_ARG(4, int),
+            NODE_ARG(5, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_mimeData0, Pointer)
     {
-        NODE_RETURN(
-            qt_QAbstractItemModel_mimeData_QMimeData_QAbstractItemModel_qt__QModelIndexBSB_ESB_(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QAbstractItemModel_mimeData_QMimeData_QAbstractItemModel_qt__QModelIndexBSB_ESB_(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_mimeTypes0, Pointer)
     {
-        NODE_RETURN(
-            qt_QAbstractItemModel_mimeTypes_stringBSB_ESB__QAbstractItemModel(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QAbstractItemModel_mimeTypes_stringBSB_ESB__QAbstractItemModel(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_moveColumn0, bool)
     {
-        NODE_RETURN(
-            qt_QAbstractItemModel_moveColumn_bool_QAbstractItemModel_QModelIndex_int_QModelIndex_int(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, int), NODE_ARG(3, Pointer), NODE_ARG(4, int)));
+        NODE_RETURN(qt_QAbstractItemModel_moveColumn_bool_QAbstractItemModel_QModelIndex_int_QModelIndex_int(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, int), NODE_ARG(3, Pointer), NODE_ARG(4, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_moveColumns0, bool)
     {
-        NODE_RETURN(
-            qt_QAbstractItemModel_moveColumns_bool_QAbstractItemModel_QModelIndex_int_int_QModelIndex_int(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, int), NODE_ARG(3, int), NODE_ARG(4, Pointer),
-                NODE_ARG(5, int)));
+        NODE_RETURN(qt_QAbstractItemModel_moveColumns_bool_QAbstractItemModel_QModelIndex_int_int_QModelIndex_int(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, int), NODE_ARG(3, int), NODE_ARG(4, Pointer),
+            NODE_ARG(5, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_moveRow0, bool)
     {
-        NODE_RETURN(
-            qt_QAbstractItemModel_moveRow_bool_QAbstractItemModel_QModelIndex_int_QModelIndex_int(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, int), NODE_ARG(3, Pointer), NODE_ARG(4, int)));
+        NODE_RETURN(qt_QAbstractItemModel_moveRow_bool_QAbstractItemModel_QModelIndex_int_QModelIndex_int(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, int), NODE_ARG(3, Pointer), NODE_ARG(4, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_moveRows0, bool)
     {
-        NODE_RETURN(
-            qt_QAbstractItemModel_moveRows_bool_QAbstractItemModel_QModelIndex_int_int_QModelIndex_int(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, int), NODE_ARG(3, int), NODE_ARG(4, Pointer),
-                NODE_ARG(5, int)));
+        NODE_RETURN(qt_QAbstractItemModel_moveRows_bool_QAbstractItemModel_QModelIndex_int_int_QModelIndex_int(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, int), NODE_ARG(3, int), NODE_ARG(4, Pointer),
+            NODE_ARG(5, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_parent0, Pointer)
     {
-        NODE_RETURN(
-            qt_QAbstractItemModel_parent_QModelIndex_QAbstractItemModel_QModelIndex(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QAbstractItemModel_parent_QModelIndex_QAbstractItemModel_QModelIndex(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                            NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_removeColumn0, bool)
     {
-        NODE_RETURN(
-            qt_QAbstractItemModel_removeColumn_bool_QAbstractItemModel_int_QModelIndex(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-                NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QAbstractItemModel_removeColumn_bool_QAbstractItemModel_int_QModelIndex(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                               NODE_ARG(1, int), NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_removeColumns0, bool)
     {
-        NODE_RETURN(
-            qt_QAbstractItemModel_removeColumns_bool_QAbstractItemModel_int_int_QModelIndex(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-                NODE_ARG(2, int), NODE_ARG(3, Pointer)));
+        NODE_RETURN(qt_QAbstractItemModel_removeColumns_bool_QAbstractItemModel_int_int_QModelIndex(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int), NODE_ARG(3, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_removeRow0, bool)
     {
-        NODE_RETURN(
-            qt_QAbstractItemModel_removeRow_bool_QAbstractItemModel_int_QModelIndex(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-                NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QAbstractItemModel_removeRow_bool_QAbstractItemModel_int_QModelIndex(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                            NODE_ARG(1, int), NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_removeRows0, bool)
     {
-        NODE_RETURN(
-            qt_QAbstractItemModel_removeRows_bool_QAbstractItemModel_int_int_QModelIndex(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-                NODE_ARG(2, int), NODE_ARG(3, Pointer)));
+        NODE_RETURN(qt_QAbstractItemModel_removeRows_bool_QAbstractItemModel_int_int_QModelIndex(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int), NODE_ARG(3, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_rowCount0, int)
     {
-        NODE_RETURN(
-            qt_QAbstractItemModel_rowCount_int_QAbstractItemModel_QModelIndex(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QAbstractItemModel_rowCount_int_QAbstractItemModel_QModelIndex(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                      NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_setData0, bool)
     {
-        NODE_RETURN(
-            qt_QAbstractItemModel_setData_bool_QAbstractItemModel_QModelIndex_QVariant_int(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, Pointer), NODE_ARG(3, int)));
+        NODE_RETURN(qt_QAbstractItemModel_setData_bool_QAbstractItemModel_QModelIndex_QVariant_int(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, Pointer), NODE_ARG(3, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_setHeaderData0, bool)
     {
-        NODE_RETURN(
-            qt_QAbstractItemModel_setHeaderData_bool_QAbstractItemModel_int_int_QVariant_int(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-                NODE_ARG(2, int), NODE_ARG(3, Pointer), NODE_ARG(4, int)));
+        NODE_RETURN(qt_QAbstractItemModel_setHeaderData_bool_QAbstractItemModel_int_int_QVariant_int(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int), NODE_ARG(3, Pointer), NODE_ARG(4, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_sibling0, Pointer)
     {
-        NODE_RETURN(
-            qt_QAbstractItemModel_sibling_QModelIndex_QAbstractItemModel_int_int_QModelIndex(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-                NODE_ARG(2, int), NODE_ARG(3, Pointer)));
+        NODE_RETURN(qt_QAbstractItemModel_sibling_QModelIndex_QAbstractItemModel_int_int_QModelIndex(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int), NODE_ARG(3, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_sort0, void)
     {
-        qt_QAbstractItemModel_sort_void_QAbstractItemModel_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int));
+        qt_QAbstractItemModel_sort_void_QAbstractItemModel_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                   NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_span0, Pointer)
     {
-        NODE_RETURN(
-            qt_QAbstractItemModel_span_QSize_QAbstractItemModel_QModelIndex(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QAbstractItemModel_span_QSize_QAbstractItemModel_QModelIndex(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                    NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_supportedDragActions0, int)
     {
-        NODE_RETURN(
-            qt_QAbstractItemModel_supportedDragActions_int_QAbstractItemModel(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QAbstractItemModel_supportedDragActions_int_QAbstractItemModel(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_supportedDropActions0, int)
     {
-        NODE_RETURN(
-            qt_QAbstractItemModel_supportedDropActions_int_QAbstractItemModel(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QAbstractItemModel_supportedDropActions_int_QAbstractItemModel(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_beginInsertColumns0, void)
     {
         qt_QAbstractItemModel_beginInsertColumns_void_QAbstractItemModel_QModelIndex_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int), NODE_ARG(3, int));
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, int), NODE_ARG(3, int));
     }
 
     static NODE_IMPLEMENTATION(_n_beginInsertRows0, void)
     {
         qt_QAbstractItemModel_beginInsertRows_void_QAbstractItemModel_QModelIndex_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int), NODE_ARG(3, int));
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, int), NODE_ARG(3, int));
     }
 
     static NODE_IMPLEMENTATION(_n_beginMoveColumns0, bool)
     {
-        NODE_RETURN(
-            qt_QAbstractItemModel_beginMoveColumns_bool_QAbstractItemModel_QModelIndex_int_int_QModelIndex_int(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, int), NODE_ARG(3, int), NODE_ARG(4, Pointer),
-                NODE_ARG(5, int)));
+        NODE_RETURN(qt_QAbstractItemModel_beginMoveColumns_bool_QAbstractItemModel_QModelIndex_int_int_QModelIndex_int(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, int), NODE_ARG(3, int), NODE_ARG(4, Pointer),
+            NODE_ARG(5, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_beginMoveRows0, bool)
     {
-        NODE_RETURN(
-            qt_QAbstractItemModel_beginMoveRows_bool_QAbstractItemModel_QModelIndex_int_int_QModelIndex_int(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, int), NODE_ARG(3, int), NODE_ARG(4, Pointer),
-                NODE_ARG(5, int)));
+        NODE_RETURN(qt_QAbstractItemModel_beginMoveRows_bool_QAbstractItemModel_QModelIndex_int_int_QModelIndex_int(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, int), NODE_ARG(3, int), NODE_ARG(4, Pointer),
+            NODE_ARG(5, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_beginRemoveColumns0, void)
     {
         qt_QAbstractItemModel_beginRemoveColumns_void_QAbstractItemModel_QModelIndex_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int), NODE_ARG(3, int));
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, int), NODE_ARG(3, int));
     }
 
     static NODE_IMPLEMENTATION(_n_beginRemoveRows0, void)
     {
         qt_QAbstractItemModel_beginRemoveRows_void_QAbstractItemModel_QModelIndex_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int), NODE_ARG(3, int));
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, int), NODE_ARG(3, int));
     }
 
     static NODE_IMPLEMENTATION(_n_beginResetModel0, void)
     {
-        qt_QAbstractItemModel_beginResetModel_void_QAbstractItemModel(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
+        qt_QAbstractItemModel_beginResetModel_void_QAbstractItemModel(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_changePersistentIndex0, void)
     {
         qt_QAbstractItemModel_changePersistentIndex_void_QAbstractItemModel_QModelIndex_QModelIndex(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer));
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_changePersistentIndexList0, void)
     {
         qt_QAbstractItemModel_changePersistentIndexList_void_QAbstractItemModel_qt__QModelIndexBSB_ESB__qt__QModelIndexBSB_ESB_(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer));
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_endInsertColumns0, void)
     {
-        qt_QAbstractItemModel_endInsertColumns_void_QAbstractItemModel(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
+        qt_QAbstractItemModel_endInsertColumns_void_QAbstractItemModel(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_endInsertRows0, void)
     {
-        qt_QAbstractItemModel_endInsertRows_void_QAbstractItemModel(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
+        qt_QAbstractItemModel_endInsertRows_void_QAbstractItemModel(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_endMoveColumns0, void)
     {
-        qt_QAbstractItemModel_endMoveColumns_void_QAbstractItemModel(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
+        qt_QAbstractItemModel_endMoveColumns_void_QAbstractItemModel(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_endMoveRows0, void)
     {
-        qt_QAbstractItemModel_endMoveRows_void_QAbstractItemModel(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
+        qt_QAbstractItemModel_endMoveRows_void_QAbstractItemModel(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_endRemoveColumns0, void)
     {
-        qt_QAbstractItemModel_endRemoveColumns_void_QAbstractItemModel(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
+        qt_QAbstractItemModel_endRemoveColumns_void_QAbstractItemModel(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_endRemoveRows0, void)
     {
-        qt_QAbstractItemModel_endRemoveRows_void_QAbstractItemModel(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
+        qt_QAbstractItemModel_endRemoveRows_void_QAbstractItemModel(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_endResetModel0, void)
     {
-        qt_QAbstractItemModel_endResetModel_void_QAbstractItemModel(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
+        qt_QAbstractItemModel_endResetModel_void_QAbstractItemModel(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_persistentIndexList0, Pointer)
     {
         NODE_RETURN(
-            qt_QAbstractItemModel_persistentIndexList_qt__QModelIndexBSB_ESB__QAbstractItemModel(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+            qt_QAbstractItemModel_persistentIndexList_qt__QModelIndexBSB_ESB__QAbstractItemModel(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_event0, bool)
     {
-        NODE_RETURN(qt_QAbstractItemModel_event_bool_QAbstractItemModel_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(
+            qt_QAbstractItemModel_event_bool_QAbstractItemModel_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_eventFilter0, bool)
     {
-        NODE_RETURN(
-            qt_QAbstractItemModel_eventFilter_bool_QAbstractItemModel_QObject_QEvent(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QAbstractItemModel_eventFilter_bool_QAbstractItemModel_QObject_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                             NODE_ARG(1, Pointer), NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_customEvent0, void)
     {
-        qt_QAbstractItemModel_customEvent_void_QAbstractItemModel_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractItemModel_customEvent_void_QAbstractItemModel_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_timerEvent0, void)
     {
-        qt_QAbstractItemModel_timerEvent_void_QAbstractItemModel_QTimerEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractItemModel_timerEvent_void_QAbstractItemModel_QTimerEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                             NODE_ARG(1, Pointer));
     }
 
     //
@@ -2168,27 +1859,22 @@ namespace Mu
     // SPDX-License-Identifier: Apache-2.0
     //
 
-    Pointer
-    qt_QAbstractItemModel_createIndex_QModelIndex_QAbstractItemModel_int_int_object(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
-        int param_column, Pointer param_any)
+    Pointer qt_QAbstractItemModel_createIndex_QModelIndex_QAbstractItemModel_int_int_object(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                            int param_row, int param_column,
+                                                                                            Pointer param_any)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-        MuQt_QAbstractItemModel* arg0 =
-            object<MuQt_QAbstractItemModel>(param_this);
+        MuQt_QAbstractItemModel* arg0 = object<MuQt_QAbstractItemModel>(param_this);
         int arg1 = (int)(param_row);
         int arg2 = (int)(param_column);
         Pointer arg3 = (Pointer)(param_any);
-        return makeqtype<QModelIndexType>(
-            c, arg0->createIndex0_pub(arg1, arg2, arg3), "qt.QModelIndex");
+        return makeqtype<QModelIndexType>(c, arg0->createIndex0_pub(arg1, arg2, arg3), "qt.QModelIndex");
     }
 
     static NODE_IMPLEMENTATION(_n_createIndex0, Pointer)
     {
-        NODE_RETURN(
-            qt_QAbstractItemModel_createIndex_QModelIndex_QAbstractItemModel_int_int_object(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-                NODE_ARG(2, int), NODE_ARG(3, Pointer)));
+        NODE_RETURN(qt_QAbstractItemModel_createIndex_QModelIndex_QAbstractItemModel_int_int_object(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int), NODE_ARG(3, Pointer)));
     }
 
     void QAbstractItemModelType::load()
@@ -2208,456 +1894,263 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
-                   new Function(c, tn, castFromObject, Cast, Compiled,
-                                QAbstractItemModel_QAbstractItemModel_QObject,
-                                Return, ftn, Parameters,
-                                new Param(c, "object", "qt.QObject"), End),
+                   new Function(c, tn, castFromObject, Cast, Compiled, QAbstractItemModel_QAbstractItemModel_QObject, Return, ftn,
+                                Parameters, new Param(c, "object", "qt.QObject"), End),
 
                    EndArguments);
 
         addSymbols(
             // enums
             // member functions
-            new Function(
-                c, "QAbstractItemModel", _n_QAbstractItemModel0, None, Compiled,
-                qt_QAbstractItemModel_QAbstractItemModel_QAbstractItemModel_QAbstractItemModel_QObject,
-                Return, "qt.QAbstractItemModel", Parameters,
-                new Param(c, "this", "qt.QAbstractItemModel"),
-                new Param(c, "parent", "qt.QObject"), End),
+            new Function(c, "QAbstractItemModel", _n_QAbstractItemModel0, None, Compiled,
+                         qt_QAbstractItemModel_QAbstractItemModel_QAbstractItemModel_QAbstractItemModel_QObject, Return,
+                         "qt.QAbstractItemModel", Parameters, new Param(c, "this", "qt.QAbstractItemModel"),
+                         new Param(c, "parent", "qt.QObject"), End),
             _func[0] = new MemberFunction(
-                c, "buddy", _n_buddy0, None, Compiled,
-                qt_QAbstractItemModel_buddy_QModelIndex_QAbstractItemModel_QModelIndex,
-                Return, "qt.QModelIndex", Parameters,
-                new Param(c, "this", "qt.QAbstractItemModel"),
-                new Param(c, "index", "qt.QModelIndex"), End),
-            _func[1] = new MemberFunction(
-                c, "canDropMimeData", _n_canDropMimeData0, None, Compiled,
-                qt_QAbstractItemModel_canDropMimeData_bool_QAbstractItemModel_QMimeData_int_int_int_QModelIndex,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QAbstractItemModel"),
-                new Param(c, "data", "qt.QMimeData"),
-                new Param(c, "action", "int"), new Param(c, "row", "int"),
-                new Param(c, "column", "int"),
-                new Param(c, "parent", "qt.QModelIndex"), End),
+                c, "buddy", _n_buddy0, None, Compiled, qt_QAbstractItemModel_buddy_QModelIndex_QAbstractItemModel_QModelIndex, Return,
+                "qt.QModelIndex", Parameters, new Param(c, "this", "qt.QAbstractItemModel"), new Param(c, "index", "qt.QModelIndex"), End),
+            _func[1] = new MemberFunction(c, "canDropMimeData", _n_canDropMimeData0, None, Compiled,
+                                          qt_QAbstractItemModel_canDropMimeData_bool_QAbstractItemModel_QMimeData_int_int_int_QModelIndex,
+                                          Return, "bool", Parameters, new Param(c, "this", "qt.QAbstractItemModel"),
+                                          new Param(c, "data", "qt.QMimeData"), new Param(c, "action", "int"), new Param(c, "row", "int"),
+                                          new Param(c, "column", "int"), new Param(c, "parent", "qt.QModelIndex"), End),
             _func[2] = new MemberFunction(
-                c, "canFetchMore", _n_canFetchMore0, None, Compiled,
-                qt_QAbstractItemModel_canFetchMore_bool_QAbstractItemModel_QModelIndex,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QAbstractItemModel"),
-                new Param(c, "parent", "qt.QModelIndex"), End),
-            _func[3] = new MemberFunction(
-                c, "clearItemData", _n_clearItemData0, None, Compiled,
-                qt_QAbstractItemModel_clearItemData_bool_QAbstractItemModel_QModelIndex,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QAbstractItemModel"),
-                new Param(c, "index", "qt.QModelIndex"), End),
-            _func[4] = new MemberFunction(
-                c, "columnCount", _n_columnCount0, None, Compiled,
-                qt_QAbstractItemModel_columnCount_int_QAbstractItemModel_QModelIndex,
-                Return, "int", Parameters,
-                new Param(c, "this", "qt.QAbstractItemModel"),
-                new Param(c, "parent", "qt.QModelIndex"), End),
+                c, "canFetchMore", _n_canFetchMore0, None, Compiled, qt_QAbstractItemModel_canFetchMore_bool_QAbstractItemModel_QModelIndex,
+                Return, "bool", Parameters, new Param(c, "this", "qt.QAbstractItemModel"), new Param(c, "parent", "qt.QModelIndex"), End),
+            _func[3] =
+                new MemberFunction(c, "clearItemData", _n_clearItemData0, None, Compiled,
+                                   qt_QAbstractItemModel_clearItemData_bool_QAbstractItemModel_QModelIndex, Return, "bool", Parameters,
+                                   new Param(c, "this", "qt.QAbstractItemModel"), new Param(c, "index", "qt.QModelIndex"), End),
+            _func[4] = new MemberFunction(c, "columnCount", _n_columnCount0, None, Compiled,
+                                          qt_QAbstractItemModel_columnCount_int_QAbstractItemModel_QModelIndex, Return, "int", Parameters,
+                                          new Param(c, "this", "qt.QAbstractItemModel"), new Param(c, "parent", "qt.QModelIndex"), End),
             _func[5] = new MemberFunction(
-                c, "data", _n_data0, None, Compiled,
-                qt_QAbstractItemModel_data_QVariant_QAbstractItemModel_QModelIndex_int,
-                Return, "qt.QVariant", Parameters,
-                new Param(c, "this", "qt.QAbstractItemModel"),
-                new Param(c, "index", "qt.QModelIndex"),
+                c, "data", _n_data0, None, Compiled, qt_QAbstractItemModel_data_QVariant_QAbstractItemModel_QModelIndex_int, Return,
+                "qt.QVariant", Parameters, new Param(c, "this", "qt.QAbstractItemModel"), new Param(c, "index", "qt.QModelIndex"),
                 new Param(c, "role", "int", Value((int)Qt::DisplayRole)), End),
-            _func[6] = new MemberFunction(
-                c, "dropMimeData", _n_dropMimeData0, None, Compiled,
-                qt_QAbstractItemModel_dropMimeData_bool_QAbstractItemModel_QMimeData_int_int_int_QModelIndex,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QAbstractItemModel"),
-                new Param(c, "data", "qt.QMimeData"),
-                new Param(c, "action", "int"), new Param(c, "row", "int"),
-                new Param(c, "column", "int"),
-                new Param(c, "parent", "qt.QModelIndex"), End),
-            _func[7] = new MemberFunction(
-                c, "fetchMore", _n_fetchMore0, None, Compiled,
-                qt_QAbstractItemModel_fetchMore_void_QAbstractItemModel_QModelIndex,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractItemModel"),
-                new Param(c, "parent", "qt.QModelIndex"), End),
-            _func[8] = new MemberFunction(
-                c, "flags", _n_flags0, None, Compiled,
-                qt_QAbstractItemModel_flags_int_QAbstractItemModel_QModelIndex,
-                Return, "int", Parameters,
-                new Param(c, "this", "qt.QAbstractItemModel"),
-                new Param(c, "index", "qt.QModelIndex"), End),
-            _func[9] = new MemberFunction(
-                c, "hasChildren", _n_hasChildren0, None, Compiled,
-                qt_QAbstractItemModel_hasChildren_bool_QAbstractItemModel_QModelIndex,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QAbstractItemModel"),
-                new Param(c, "parent", "qt.QModelIndex"), End),
-            new Function(
-                c, "hasIndex", _n_hasIndex0, None, Compiled,
-                qt_QAbstractItemModel_hasIndex_bool_QAbstractItemModel_int_int_QModelIndex,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QAbstractItemModel"),
-                new Param(c, "row", "int"), new Param(c, "column", "int"),
-                new Param(c, "parent", "qt.QModelIndex"), End),
+            _func[6] = new MemberFunction(c, "dropMimeData", _n_dropMimeData0, None, Compiled,
+                                          qt_QAbstractItemModel_dropMimeData_bool_QAbstractItemModel_QMimeData_int_int_int_QModelIndex,
+                                          Return, "bool", Parameters, new Param(c, "this", "qt.QAbstractItemModel"),
+                                          new Param(c, "data", "qt.QMimeData"), new Param(c, "action", "int"), new Param(c, "row", "int"),
+                                          new Param(c, "column", "int"), new Param(c, "parent", "qt.QModelIndex"), End),
+            _func[7] = new MemberFunction(c, "fetchMore", _n_fetchMore0, None, Compiled,
+                                          qt_QAbstractItemModel_fetchMore_void_QAbstractItemModel_QModelIndex, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QAbstractItemModel"), new Param(c, "parent", "qt.QModelIndex"), End),
+            _func[8] = new MemberFunction(c, "flags", _n_flags0, None, Compiled,
+                                          qt_QAbstractItemModel_flags_int_QAbstractItemModel_QModelIndex, Return, "int", Parameters,
+                                          new Param(c, "this", "qt.QAbstractItemModel"), new Param(c, "index", "qt.QModelIndex"), End),
+            _func[9] = new MemberFunction(c, "hasChildren", _n_hasChildren0, None, Compiled,
+                                          qt_QAbstractItemModel_hasChildren_bool_QAbstractItemModel_QModelIndex, Return, "bool", Parameters,
+                                          new Param(c, "this", "qt.QAbstractItemModel"), new Param(c, "parent", "qt.QModelIndex"), End),
+            new Function(c, "hasIndex", _n_hasIndex0, None, Compiled,
+                         qt_QAbstractItemModel_hasIndex_bool_QAbstractItemModel_int_int_QModelIndex, Return, "bool", Parameters,
+                         new Param(c, "this", "qt.QAbstractItemModel"), new Param(c, "row", "int"), new Param(c, "column", "int"),
+                         new Param(c, "parent", "qt.QModelIndex"), End),
             _func[10] = new MemberFunction(
-                c, "headerData", _n_headerData0, None, Compiled,
-                qt_QAbstractItemModel_headerData_QVariant_QAbstractItemModel_int_int_int,
-                Return, "qt.QVariant", Parameters,
-                new Param(c, "this", "qt.QAbstractItemModel"),
-                new Param(c, "section", "int"),
-                new Param(c, "orientation", "int"),
-                new Param(c, "role", "int", Value((int)Qt::DisplayRole)), End),
+                c, "headerData", _n_headerData0, None, Compiled, qt_QAbstractItemModel_headerData_QVariant_QAbstractItemModel_int_int_int,
+                Return, "qt.QVariant", Parameters, new Param(c, "this", "qt.QAbstractItemModel"), new Param(c, "section", "int"),
+                new Param(c, "orientation", "int"), new Param(c, "role", "int", Value((int)Qt::DisplayRole)), End),
             _func[11] = new MemberFunction(
-                c, "index", _n_index0, None, Compiled,
-                qt_QAbstractItemModel_index_QModelIndex_QAbstractItemModel_int_int_QModelIndex,
-                Return, "qt.QModelIndex", Parameters,
-                new Param(c, "this", "qt.QAbstractItemModel"),
-                new Param(c, "row", "int"), new Param(c, "column", "int"),
-                new Param(c, "parent", "qt.QModelIndex"), End),
-            new Function(
-                c, "insertColumn", _n_insertColumn0, None, Compiled,
-                qt_QAbstractItemModel_insertColumn_bool_QAbstractItemModel_int_QModelIndex,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QAbstractItemModel"),
-                new Param(c, "column", "int"),
-                new Param(c, "parent", "qt.QModelIndex"), End),
-            _func[12] = new MemberFunction(
-                c, "insertColumns", _n_insertColumns0, None, Compiled,
-                qt_QAbstractItemModel_insertColumns_bool_QAbstractItemModel_int_int_QModelIndex,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QAbstractItemModel"),
-                new Param(c, "column", "int"), new Param(c, "count", "int"),
-                new Param(c, "parent", "qt.QModelIndex"), End),
-            new Function(
-                c, "insertRow", _n_insertRow0, None, Compiled,
-                qt_QAbstractItemModel_insertRow_bool_QAbstractItemModel_int_QModelIndex,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QAbstractItemModel"),
-                new Param(c, "row", "int"),
-                new Param(c, "parent", "qt.QModelIndex"), End),
-            _func[13] = new MemberFunction(
-                c, "insertRows", _n_insertRows0, None, Compiled,
-                qt_QAbstractItemModel_insertRows_bool_QAbstractItemModel_int_int_QModelIndex,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QAbstractItemModel"),
-                new Param(c, "row", "int"), new Param(c, "count", "int"),
-                new Param(c, "parent", "qt.QModelIndex"), End),
+                c, "index", _n_index0, None, Compiled, qt_QAbstractItemModel_index_QModelIndex_QAbstractItemModel_int_int_QModelIndex,
+                Return, "qt.QModelIndex", Parameters, new Param(c, "this", "qt.QAbstractItemModel"), new Param(c, "row", "int"),
+                new Param(c, "column", "int"), new Param(c, "parent", "qt.QModelIndex"), End),
+            new Function(c, "insertColumn", _n_insertColumn0, None, Compiled,
+                         qt_QAbstractItemModel_insertColumn_bool_QAbstractItemModel_int_QModelIndex, Return, "bool", Parameters,
+                         new Param(c, "this", "qt.QAbstractItemModel"), new Param(c, "column", "int"),
+                         new Param(c, "parent", "qt.QModelIndex"), End),
+            _func[12] = new MemberFunction(c, "insertColumns", _n_insertColumns0, None, Compiled,
+                                           qt_QAbstractItemModel_insertColumns_bool_QAbstractItemModel_int_int_QModelIndex, Return, "bool",
+                                           Parameters, new Param(c, "this", "qt.QAbstractItemModel"), new Param(c, "column", "int"),
+                                           new Param(c, "count", "int"), new Param(c, "parent", "qt.QModelIndex"), End),
+            new Function(c, "insertRow", _n_insertRow0, None, Compiled,
+                         qt_QAbstractItemModel_insertRow_bool_QAbstractItemModel_int_QModelIndex, Return, "bool", Parameters,
+                         new Param(c, "this", "qt.QAbstractItemModel"), new Param(c, "row", "int"),
+                         new Param(c, "parent", "qt.QModelIndex"), End),
+            _func[13] = new MemberFunction(c, "insertRows", _n_insertRows0, None, Compiled,
+                                           qt_QAbstractItemModel_insertRows_bool_QAbstractItemModel_int_int_QModelIndex, Return, "bool",
+                                           Parameters, new Param(c, "this", "qt.QAbstractItemModel"), new Param(c, "row", "int"),
+                                           new Param(c, "count", "int"), new Param(c, "parent", "qt.QModelIndex"), End),
             // MISSING: itemData ("QMap<int, QVariant>"; QAbstractItemModel
             // this, QModelIndex index)
             _func[14] = new MemberFunction(
                 c, "match", _n_match0, None, Compiled,
-                qt_QAbstractItemModel_match_qt__QModelIndexBSB_ESB__QAbstractItemModel_QModelIndex_int_QVariant_int_int,
-                Return, "qt.QModelIndex[]", Parameters,
-                new Param(c, "this", "qt.QAbstractItemModel"),
-                new Param(c, "start", "qt.QModelIndex"),
-                new Param(c, "role", "int"),
-                new Param(c, "value", "qt.QVariant"),
-                new Param(c, "hits", "int", Value((int)1)),
-                new Param(c, "flags", "int",
-                          Value((int)Qt::MatchFlags(Qt::MatchStartsWith
-                                                    | Qt::MatchWrap))),
-                End),
-            _func[15] = new MemberFunction(
-                c, "mimeData", _n_mimeData0, None, Compiled,
-                qt_QAbstractItemModel_mimeData_QMimeData_QAbstractItemModel_qt__QModelIndexBSB_ESB_,
-                Return, "qt.QMimeData", Parameters,
-                new Param(c, "this", "qt.QAbstractItemModel"),
-                new Param(c, "indexes", "qt.QModelIndex[]"), End),
-            _func[16] = new MemberFunction(
-                c, "mimeTypes", _n_mimeTypes0, None, Compiled,
-                qt_QAbstractItemModel_mimeTypes_stringBSB_ESB__QAbstractItemModel,
-                Return, "string[]", Parameters,
-                new Param(c, "this", "qt.QAbstractItemModel"), End),
-            new Function(
-                c, "moveColumn", _n_moveColumn0, None, Compiled,
-                qt_QAbstractItemModel_moveColumn_bool_QAbstractItemModel_QModelIndex_int_QModelIndex_int,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QAbstractItemModel"),
-                new Param(c, "sourceParent", "qt.QModelIndex"),
-                new Param(c, "sourceColumn", "int"),
-                new Param(c, "destinationParent", "qt.QModelIndex"),
-                new Param(c, "destinationChild", "int"), End),
-            _func[17] = new MemberFunction(
-                c, "moveColumns", _n_moveColumns0, None, Compiled,
-                qt_QAbstractItemModel_moveColumns_bool_QAbstractItemModel_QModelIndex_int_int_QModelIndex_int,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QAbstractItemModel"),
-                new Param(c, "sourceParent", "qt.QModelIndex"),
-                new Param(c, "sourceColumn", "int"),
-                new Param(c, "count", "int"),
-                new Param(c, "destinationParent", "qt.QModelIndex"),
-                new Param(c, "destinationChild", "int"), End),
-            new Function(
-                c, "moveRow", _n_moveRow0, None, Compiled,
-                qt_QAbstractItemModel_moveRow_bool_QAbstractItemModel_QModelIndex_int_QModelIndex_int,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QAbstractItemModel"),
-                new Param(c, "sourceParent", "qt.QModelIndex"),
-                new Param(c, "sourceRow", "int"),
-                new Param(c, "destinationParent", "qt.QModelIndex"),
-                new Param(c, "destinationChild", "int"), End),
-            _func[18] = new MemberFunction(
-                c, "moveRows", _n_moveRows0, None, Compiled,
-                qt_QAbstractItemModel_moveRows_bool_QAbstractItemModel_QModelIndex_int_int_QModelIndex_int,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QAbstractItemModel"),
-                new Param(c, "sourceParent", "qt.QModelIndex"),
-                new Param(c, "sourceRow", "int"), new Param(c, "count", "int"),
-                new Param(c, "destinationParent", "qt.QModelIndex"),
-                new Param(c, "destinationChild", "int"), End),
+                qt_QAbstractItemModel_match_qt__QModelIndexBSB_ESB__QAbstractItemModel_QModelIndex_int_QVariant_int_int, Return,
+                "qt.QModelIndex[]", Parameters, new Param(c, "this", "qt.QAbstractItemModel"), new Param(c, "start", "qt.QModelIndex"),
+                new Param(c, "role", "int"), new Param(c, "value", "qt.QVariant"), new Param(c, "hits", "int", Value((int)1)),
+                new Param(c, "flags", "int", Value((int)Qt::MatchFlags(Qt::MatchStartsWith | Qt::MatchWrap))), End),
+            _func[15] = new MemberFunction(c, "mimeData", _n_mimeData0, None, Compiled,
+                                           qt_QAbstractItemModel_mimeData_QMimeData_QAbstractItemModel_qt__QModelIndexBSB_ESB_, Return,
+                                           "qt.QMimeData", Parameters, new Param(c, "this", "qt.QAbstractItemModel"),
+                                           new Param(c, "indexes", "qt.QModelIndex[]"), End),
+            _func[16] = new MemberFunction(c, "mimeTypes", _n_mimeTypes0, None, Compiled,
+                                           qt_QAbstractItemModel_mimeTypes_stringBSB_ESB__QAbstractItemModel, Return, "string[]",
+                                           Parameters, new Param(c, "this", "qt.QAbstractItemModel"), End),
+            new Function(c, "moveColumn", _n_moveColumn0, None, Compiled,
+                         qt_QAbstractItemModel_moveColumn_bool_QAbstractItemModel_QModelIndex_int_QModelIndex_int, Return, "bool",
+                         Parameters, new Param(c, "this", "qt.QAbstractItemModel"), new Param(c, "sourceParent", "qt.QModelIndex"),
+                         new Param(c, "sourceColumn", "int"), new Param(c, "destinationParent", "qt.QModelIndex"),
+                         new Param(c, "destinationChild", "int"), End),
+            _func[17] = new MemberFunction(c, "moveColumns", _n_moveColumns0, None, Compiled,
+                                           qt_QAbstractItemModel_moveColumns_bool_QAbstractItemModel_QModelIndex_int_int_QModelIndex_int,
+                                           Return, "bool", Parameters, new Param(c, "this", "qt.QAbstractItemModel"),
+                                           new Param(c, "sourceParent", "qt.QModelIndex"), new Param(c, "sourceColumn", "int"),
+                                           new Param(c, "count", "int"), new Param(c, "destinationParent", "qt.QModelIndex"),
+                                           new Param(c, "destinationChild", "int"), End),
+            new Function(c, "moveRow", _n_moveRow0, None, Compiled,
+                         qt_QAbstractItemModel_moveRow_bool_QAbstractItemModel_QModelIndex_int_QModelIndex_int, Return, "bool", Parameters,
+                         new Param(c, "this", "qt.QAbstractItemModel"), new Param(c, "sourceParent", "qt.QModelIndex"),
+                         new Param(c, "sourceRow", "int"), new Param(c, "destinationParent", "qt.QModelIndex"),
+                         new Param(c, "destinationChild", "int"), End),
+            _func[18] = new MemberFunction(c, "moveRows", _n_moveRows0, None, Compiled,
+                                           qt_QAbstractItemModel_moveRows_bool_QAbstractItemModel_QModelIndex_int_int_QModelIndex_int,
+                                           Return, "bool", Parameters, new Param(c, "this", "qt.QAbstractItemModel"),
+                                           new Param(c, "sourceParent", "qt.QModelIndex"), new Param(c, "sourceRow", "int"),
+                                           new Param(c, "count", "int"), new Param(c, "destinationParent", "qt.QModelIndex"),
+                                           new Param(c, "destinationChild", "int"), End),
             // MISSING: multiData (void; QAbstractItemModel this, QModelIndex
             // index, "QModelRoleDataSpan" roleDataSpan)
             _func[19] = new MemberFunction(
-                c, "parent", _n_parent0, None, Compiled,
-                qt_QAbstractItemModel_parent_QModelIndex_QAbstractItemModel_QModelIndex,
-                Return, "qt.QModelIndex", Parameters,
-                new Param(c, "this", "qt.QAbstractItemModel"),
-                new Param(c, "index", "qt.QModelIndex"), End),
-            new Function(
-                c, "removeColumn", _n_removeColumn0, None, Compiled,
-                qt_QAbstractItemModel_removeColumn_bool_QAbstractItemModel_int_QModelIndex,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QAbstractItemModel"),
-                new Param(c, "column", "int"),
-                new Param(c, "parent", "qt.QModelIndex"), End),
-            _func[20] = new MemberFunction(
-                c, "removeColumns", _n_removeColumns0, None, Compiled,
-                qt_QAbstractItemModel_removeColumns_bool_QAbstractItemModel_int_int_QModelIndex,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QAbstractItemModel"),
-                new Param(c, "column", "int"), new Param(c, "count", "int"),
-                new Param(c, "parent", "qt.QModelIndex"), End),
-            new Function(
-                c, "removeRow", _n_removeRow0, None, Compiled,
-                qt_QAbstractItemModel_removeRow_bool_QAbstractItemModel_int_QModelIndex,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QAbstractItemModel"),
-                new Param(c, "row", "int"),
-                new Param(c, "parent", "qt.QModelIndex"), End),
-            _func[21] = new MemberFunction(
-                c, "removeRows", _n_removeRows0, None, Compiled,
-                qt_QAbstractItemModel_removeRows_bool_QAbstractItemModel_int_int_QModelIndex,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QAbstractItemModel"),
-                new Param(c, "row", "int"), new Param(c, "count", "int"),
-                new Param(c, "parent", "qt.QModelIndex"), End),
+                c, "parent", _n_parent0, None, Compiled, qt_QAbstractItemModel_parent_QModelIndex_QAbstractItemModel_QModelIndex, Return,
+                "qt.QModelIndex", Parameters, new Param(c, "this", "qt.QAbstractItemModel"), new Param(c, "index", "qt.QModelIndex"), End),
+            new Function(c, "removeColumn", _n_removeColumn0, None, Compiled,
+                         qt_QAbstractItemModel_removeColumn_bool_QAbstractItemModel_int_QModelIndex, Return, "bool", Parameters,
+                         new Param(c, "this", "qt.QAbstractItemModel"), new Param(c, "column", "int"),
+                         new Param(c, "parent", "qt.QModelIndex"), End),
+            _func[20] = new MemberFunction(c, "removeColumns", _n_removeColumns0, None, Compiled,
+                                           qt_QAbstractItemModel_removeColumns_bool_QAbstractItemModel_int_int_QModelIndex, Return, "bool",
+                                           Parameters, new Param(c, "this", "qt.QAbstractItemModel"), new Param(c, "column", "int"),
+                                           new Param(c, "count", "int"), new Param(c, "parent", "qt.QModelIndex"), End),
+            new Function(c, "removeRow", _n_removeRow0, None, Compiled,
+                         qt_QAbstractItemModel_removeRow_bool_QAbstractItemModel_int_QModelIndex, Return, "bool", Parameters,
+                         new Param(c, "this", "qt.QAbstractItemModel"), new Param(c, "row", "int"),
+                         new Param(c, "parent", "qt.QModelIndex"), End),
+            _func[21] = new MemberFunction(c, "removeRows", _n_removeRows0, None, Compiled,
+                                           qt_QAbstractItemModel_removeRows_bool_QAbstractItemModel_int_int_QModelIndex, Return, "bool",
+                                           Parameters, new Param(c, "this", "qt.QAbstractItemModel"), new Param(c, "row", "int"),
+                                           new Param(c, "count", "int"), new Param(c, "parent", "qt.QModelIndex"), End),
             // MISSING: roleNames ("QHash<int, QByteArray>"; QAbstractItemModel
             // this)
-            _func[22] = new MemberFunction(
-                c, "rowCount", _n_rowCount0, None, Compiled,
-                qt_QAbstractItemModel_rowCount_int_QAbstractItemModel_QModelIndex,
-                Return, "int", Parameters,
-                new Param(c, "this", "qt.QAbstractItemModel"),
-                new Param(c, "parent", "qt.QModelIndex"), End),
-            _func[23] = new MemberFunction(
-                c, "setData", _n_setData0,
-                None, Compiled,
-                qt_QAbstractItemModel_setData_bool_QAbstractItemModel_QModelIndex_QVariant_int,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QAbstractItemModel"),
-                new Param(c, "index", "qt.QModelIndex"),
-                new Param(c, "value", "qt.QVariant"),
-                new Param(c, "role", "int", Value((int)Qt::EditRole)), End),
-            _func[24] = new MemberFunction(
-                c, "setHeaderData", _n_setHeaderData0, None, Compiled,
-                qt_QAbstractItemModel_setHeaderData_bool_QAbstractItemModel_int_int_QVariant_int,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QAbstractItemModel"),
-                new Param(c, "section", "int"),
-                new Param(c, "orientation", "int"),
-                new Param(c, "value", "qt.QVariant"),
-                new Param(c, "role", "int", Value((int)Qt::EditRole)), End),
+            _func[22] = new MemberFunction(c, "rowCount", _n_rowCount0, None, Compiled,
+                                           qt_QAbstractItemModel_rowCount_int_QAbstractItemModel_QModelIndex, Return, "int", Parameters,
+                                           new Param(c, "this", "qt.QAbstractItemModel"), new Param(c, "parent", "qt.QModelIndex"), End),
+            _func[23] =
+                new MemberFunction(c, "setData", _n_setData0, None, Compiled,
+                                   qt_QAbstractItemModel_setData_bool_QAbstractItemModel_QModelIndex_QVariant_int, Return, "bool",
+                                   Parameters, new Param(c, "this", "qt.QAbstractItemModel"), new Param(c, "index", "qt.QModelIndex"),
+                                   new Param(c, "value", "qt.QVariant"), new Param(c, "role", "int", Value((int)Qt::EditRole)), End),
+            _func[24] = new MemberFunction(c, "setHeaderData", _n_setHeaderData0, None, Compiled,
+                                           qt_QAbstractItemModel_setHeaderData_bool_QAbstractItemModel_int_int_QVariant_int, Return, "bool",
+                                           Parameters, new Param(c, "this", "qt.QAbstractItemModel"), new Param(c, "section", "int"),
+                                           new Param(c, "orientation", "int"), new Param(c, "value", "qt.QVariant"),
+                                           new Param(c, "role", "int", Value((int)Qt::EditRole)), End),
             // MISSING: setItemData (bool; QAbstractItemModel this, QModelIndex
             // index, "const QMap<int, QVariant> &" roles)
-            _func[25] = new MemberFunction(
-                c, "sibling", _n_sibling0,
-                None, Compiled,
-                qt_QAbstractItemModel_sibling_QModelIndex_QAbstractItemModel_int_int_QModelIndex,
-                Return, "qt.QModelIndex", Parameters,
-                new Param(c, "this", "qt.QAbstractItemModel"),
-                new Param(c, "row", "int"), new Param(c, "column", "int"),
-                new Param(c, "index", "qt.QModelIndex"), End),
-            _func[26] = new MemberFunction(
-                c, "sort", _n_sort0, None,
-                Compiled,
-                qt_QAbstractItemModel_sort_void_QAbstractItemModel_int_int,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractItemModel"),
-                new Param(c, "column", "int"),
-                new Param(c, "order", "int", Value((int)Qt::AscendingOrder)),
-                End),
-            _func[27] = new MemberFunction(
-                c, "span", _n_span0, None,
-                Compiled,
-                qt_QAbstractItemModel_span_QSize_QAbstractItemModel_QModelIndex,
-                Return, "qt.QSize", Parameters,
-                new Param(c, "this", "qt.QAbstractItemModel"),
-                new Param(c, "index", "qt.QModelIndex"), End),
-            _func[28] = new MemberFunction(
-                c, "supportedDragActions",
-                _n_supportedDragActions0, None, Compiled,
-                qt_QAbstractItemModel_supportedDragActions_int_QAbstractItemModel,
-                Return, "int", Parameters,
-                new Param(c, "this", "qt.QAbstractItemModel"), End),
-            _func[29] = new MemberFunction(
-                c, "supportedDropActions",
-                _n_supportedDropActions0, None, Compiled,
-                qt_QAbstractItemModel_supportedDropActions_int_QAbstractItemModel,
-                Return, "int", Parameters,
-                new Param(c, "this", "qt.QAbstractItemModel"), End),
+            _func[25] =
+                new MemberFunction(c, "sibling", _n_sibling0, None, Compiled,
+                                   qt_QAbstractItemModel_sibling_QModelIndex_QAbstractItemModel_int_int_QModelIndex, Return,
+                                   "qt.QModelIndex", Parameters, new Param(c, "this", "qt.QAbstractItemModel"), new Param(c, "row", "int"),
+                                   new Param(c, "column", "int"), new Param(c, "index", "qt.QModelIndex"), End),
+            _func[26] =
+                new MemberFunction(c, "sort", _n_sort0, None, Compiled, qt_QAbstractItemModel_sort_void_QAbstractItemModel_int_int, Return,
+                                   "void", Parameters, new Param(c, "this", "qt.QAbstractItemModel"), new Param(c, "column", "int"),
+                                   new Param(c, "order", "int", Value((int)Qt::AscendingOrder)), End),
+            _func[27] = new MemberFunction(c, "span", _n_span0, None, Compiled,
+                                           qt_QAbstractItemModel_span_QSize_QAbstractItemModel_QModelIndex, Return, "qt.QSize", Parameters,
+                                           new Param(c, "this", "qt.QAbstractItemModel"), new Param(c, "index", "qt.QModelIndex"), End),
+            _func[28] = new MemberFunction(c, "supportedDragActions", _n_supportedDragActions0, None, Compiled,
+                                           qt_QAbstractItemModel_supportedDragActions_int_QAbstractItemModel, Return, "int", Parameters,
+                                           new Param(c, "this", "qt.QAbstractItemModel"), End),
+            _func[29] = new MemberFunction(c, "supportedDropActions", _n_supportedDropActions0, None, Compiled,
+                                           qt_QAbstractItemModel_supportedDropActions_int_QAbstractItemModel, Return, "int", Parameters,
+                                           new Param(c, "this", "qt.QAbstractItemModel"), End),
+            new Function(c, "beginInsertColumns", _n_beginInsertColumns0, None, Compiled,
+                         qt_QAbstractItemModel_beginInsertColumns_void_QAbstractItemModel_QModelIndex_int_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QAbstractItemModel"), new Param(c, "parent", "qt.QModelIndex"),
+                         new Param(c, "first", "int"), new Param(c, "last", "int"), End),
+            new Function(c, "beginInsertRows", _n_beginInsertRows0, None, Compiled,
+                         qt_QAbstractItemModel_beginInsertRows_void_QAbstractItemModel_QModelIndex_int_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QAbstractItemModel"), new Param(c, "parent", "qt.QModelIndex"),
+                         new Param(c, "first", "int"), new Param(c, "last", "int"), End),
+            new Function(c, "beginMoveColumns", _n_beginMoveColumns0, None, Compiled,
+                         qt_QAbstractItemModel_beginMoveColumns_bool_QAbstractItemModel_QModelIndex_int_int_QModelIndex_int, Return, "bool",
+                         Parameters, new Param(c, "this", "qt.QAbstractItemModel"), new Param(c, "sourceParent", "qt.QModelIndex"),
+                         new Param(c, "sourceFirst", "int"), new Param(c, "sourceLast", "int"),
+                         new Param(c, "destinationParent", "qt.QModelIndex"), new Param(c, "destinationChild", "int"), End),
+            new Function(c, "beginMoveRows", _n_beginMoveRows0, None, Compiled,
+                         qt_QAbstractItemModel_beginMoveRows_bool_QAbstractItemModel_QModelIndex_int_int_QModelIndex_int, Return, "bool",
+                         Parameters, new Param(c, "this", "qt.QAbstractItemModel"), new Param(c, "sourceParent", "qt.QModelIndex"),
+                         new Param(c, "sourceFirst", "int"), new Param(c, "sourceLast", "int"),
+                         new Param(c, "destinationParent", "qt.QModelIndex"), new Param(c, "destinationChild", "int"), End),
+            new Function(c, "beginRemoveColumns", _n_beginRemoveColumns0, None, Compiled,
+                         qt_QAbstractItemModel_beginRemoveColumns_void_QAbstractItemModel_QModelIndex_int_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QAbstractItemModel"), new Param(c, "parent", "qt.QModelIndex"),
+                         new Param(c, "first", "int"), new Param(c, "last", "int"), End),
+            new Function(c, "beginRemoveRows", _n_beginRemoveRows0, None, Compiled,
+                         qt_QAbstractItemModel_beginRemoveRows_void_QAbstractItemModel_QModelIndex_int_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QAbstractItemModel"), new Param(c, "parent", "qt.QModelIndex"),
+                         new Param(c, "first", "int"), new Param(c, "last", "int"), End),
+            new Function(c, "beginResetModel", _n_beginResetModel0, None, Compiled,
+                         qt_QAbstractItemModel_beginResetModel_void_QAbstractItemModel, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QAbstractItemModel"), End),
+            new Function(c, "changePersistentIndex", _n_changePersistentIndex0, None, Compiled,
+                         qt_QAbstractItemModel_changePersistentIndex_void_QAbstractItemModel_QModelIndex_QModelIndex, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QAbstractItemModel"), new Param(c, "from", "qt.QModelIndex"),
+                         new Param(c, "to", "qt.QModelIndex"), End),
             new Function(
-                c, "beginInsertColumns", _n_beginInsertColumns0, None, Compiled,
-                qt_QAbstractItemModel_beginInsertColumns_void_QAbstractItemModel_QModelIndex_int_int,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractItemModel"),
-                new Param(c, "parent", "qt.QModelIndex"),
-                new Param(c, "first", "int"), new Param(c, "last", "int"), End),
-            new Function(
-                c, "beginInsertRows", _n_beginInsertRows0, None, Compiled,
-                qt_QAbstractItemModel_beginInsertRows_void_QAbstractItemModel_QModelIndex_int_int,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractItemModel"),
-                new Param(c, "parent", "qt.QModelIndex"),
-                new Param(c, "first", "int"), new Param(c, "last", "int"), End),
-            new Function(
-                c, "beginMoveColumns", _n_beginMoveColumns0, None, Compiled,
-                qt_QAbstractItemModel_beginMoveColumns_bool_QAbstractItemModel_QModelIndex_int_int_QModelIndex_int,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QAbstractItemModel"),
-                new Param(c, "sourceParent", "qt.QModelIndex"),
-                new Param(c, "sourceFirst", "int"),
-                new Param(c, "sourceLast", "int"),
-                new Param(c, "destinationParent", "qt.QModelIndex"),
-                new Param(c, "destinationChild", "int"), End),
-            new Function(
-                c, "beginMoveRows", _n_beginMoveRows0, None, Compiled,
-                qt_QAbstractItemModel_beginMoveRows_bool_QAbstractItemModel_QModelIndex_int_int_QModelIndex_int,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QAbstractItemModel"),
-                new Param(c, "sourceParent", "qt.QModelIndex"),
-                new Param(c, "sourceFirst", "int"),
-                new Param(c, "sourceLast", "int"),
-                new Param(c, "destinationParent", "qt.QModelIndex"),
-                new Param(c, "destinationChild", "int"), End),
-            new Function(
-                c, "beginRemoveColumns", _n_beginRemoveColumns0, None, Compiled,
-                qt_QAbstractItemModel_beginRemoveColumns_void_QAbstractItemModel_QModelIndex_int_int,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractItemModel"),
-                new Param(c, "parent", "qt.QModelIndex"),
-                new Param(c, "first", "int"), new Param(c, "last", "int"), End),
-            new Function(
-                c, "beginRemoveRows", _n_beginRemoveRows0, None, Compiled,
-                qt_QAbstractItemModel_beginRemoveRows_void_QAbstractItemModel_QModelIndex_int_int,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractItemModel"),
-                new Param(c, "parent", "qt.QModelIndex"),
-                new Param(c, "first", "int"), new Param(c, "last", "int"), End),
-            new Function(
-                c, "beginResetModel", _n_beginResetModel0, None, Compiled,
-                qt_QAbstractItemModel_beginResetModel_void_QAbstractItemModel,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractItemModel"), End),
-            new Function(
-                c, "changePersistentIndex", _n_changePersistentIndex0, None,
-                Compiled,
-                qt_QAbstractItemModel_changePersistentIndex_void_QAbstractItemModel_QModelIndex_QModelIndex,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractItemModel"),
-                new Param(c, "from", "qt.QModelIndex"),
-                new Param(c, "to", "qt.QModelIndex"), End),
-            new Function(
-                c, "changePersistentIndexList", _n_changePersistentIndexList0,
-                None, Compiled,
+                c, "changePersistentIndexList", _n_changePersistentIndexList0, None, Compiled,
                 qt_QAbstractItemModel_changePersistentIndexList_void_QAbstractItemModel_qt__QModelIndexBSB_ESB__qt__QModelIndexBSB_ESB_,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractItemModel"),
-                new Param(c, "from", "qt.QModelIndex[]"),
+                Return, "void", Parameters, new Param(c, "this", "qt.QAbstractItemModel"), new Param(c, "from", "qt.QModelIndex[]"),
                 new Param(c, "to", "qt.QModelIndex[]"), End),
             // MISSING: createIndex (QModelIndex; QAbstractItemModel this, int
             // row, int column, "const void *" ptr) // protected MISSING:
             // createIndex (QModelIndex; QAbstractItemModel this, int row, int
             // column, "quintptr" id) // protected
-            new Function(
-                c, "endInsertColumns", _n_endInsertColumns0, None, Compiled,
-                qt_QAbstractItemModel_endInsertColumns_void_QAbstractItemModel,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractItemModel"), End),
-            new Function(
-                c, "endInsertRows", _n_endInsertRows0, None, Compiled,
-                qt_QAbstractItemModel_endInsertRows_void_QAbstractItemModel,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractItemModel"), End),
-            new Function(
-                c, "endMoveColumns", _n_endMoveColumns0, None, Compiled,
-                qt_QAbstractItemModel_endMoveColumns_void_QAbstractItemModel,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractItemModel"), End),
-            new Function(
-                c, "endMoveRows", _n_endMoveRows0, None, Compiled,
-                qt_QAbstractItemModel_endMoveRows_void_QAbstractItemModel,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractItemModel"), End),
-            new Function(
-                c, "endRemoveColumns", _n_endRemoveColumns0, None, Compiled,
-                qt_QAbstractItemModel_endRemoveColumns_void_QAbstractItemModel,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractItemModel"), End),
-            new Function(
-                c, "endRemoveRows", _n_endRemoveRows0, None, Compiled,
-                qt_QAbstractItemModel_endRemoveRows_void_QAbstractItemModel,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractItemModel"), End),
-            new Function(
-                c, "endResetModel", _n_endResetModel0, None, Compiled,
-                qt_QAbstractItemModel_endResetModel_void_QAbstractItemModel,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractItemModel"), End),
-            new Function(
-                c, "persistentIndexList", _n_persistentIndexList0, None,
-                Compiled,
-                qt_QAbstractItemModel_persistentIndexList_qt__QModelIndexBSB_ESB__QAbstractItemModel,
-                Return, "qt.QModelIndex[]", Parameters,
-                new Param(c, "this", "qt.QAbstractItemModel"), End),
-            _func[30] = new MemberFunction(
-                c, "event", _n_event0, None, Compiled,
-                qt_QAbstractItemModel_event_bool_QAbstractItemModel_QEvent,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QAbstractItemModel"),
-                new Param(c, "e", "qt.QEvent"), End),
-            _func[31] = new MemberFunction(
-                c, "eventFilter", _n_eventFilter0, None, Compiled,
-                qt_QAbstractItemModel_eventFilter_bool_QAbstractItemModel_QObject_QEvent,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QAbstractItemModel"),
-                new Param(c, "watched", "qt.QObject"),
-                new Param(c, "event", "qt.QEvent"), End),
+            new Function(c, "endInsertColumns", _n_endInsertColumns0, None, Compiled,
+                         qt_QAbstractItemModel_endInsertColumns_void_QAbstractItemModel, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QAbstractItemModel"), End),
+            new Function(c, "endInsertRows", _n_endInsertRows0, None, Compiled, qt_QAbstractItemModel_endInsertRows_void_QAbstractItemModel,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QAbstractItemModel"), End),
+            new Function(c, "endMoveColumns", _n_endMoveColumns0, None, Compiled,
+                         qt_QAbstractItemModel_endMoveColumns_void_QAbstractItemModel, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QAbstractItemModel"), End),
+            new Function(c, "endMoveRows", _n_endMoveRows0, None, Compiled, qt_QAbstractItemModel_endMoveRows_void_QAbstractItemModel,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QAbstractItemModel"), End),
+            new Function(c, "endRemoveColumns", _n_endRemoveColumns0, None, Compiled,
+                         qt_QAbstractItemModel_endRemoveColumns_void_QAbstractItemModel, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QAbstractItemModel"), End),
+            new Function(c, "endRemoveRows", _n_endRemoveRows0, None, Compiled, qt_QAbstractItemModel_endRemoveRows_void_QAbstractItemModel,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QAbstractItemModel"), End),
+            new Function(c, "endResetModel", _n_endResetModel0, None, Compiled, qt_QAbstractItemModel_endResetModel_void_QAbstractItemModel,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QAbstractItemModel"), End),
+            new Function(c, "persistentIndexList", _n_persistentIndexList0, None, Compiled,
+                         qt_QAbstractItemModel_persistentIndexList_qt__QModelIndexBSB_ESB__QAbstractItemModel, Return, "qt.QModelIndex[]",
+                         Parameters, new Param(c, "this", "qt.QAbstractItemModel"), End),
+            _func[30] = new MemberFunction(c, "event", _n_event0, None, Compiled,
+                                           qt_QAbstractItemModel_event_bool_QAbstractItemModel_QEvent, Return, "bool", Parameters,
+                                           new Param(c, "this", "qt.QAbstractItemModel"), new Param(c, "e", "qt.QEvent"), End),
+            _func[31] = new MemberFunction(c, "eventFilter", _n_eventFilter0, None, Compiled,
+                                           qt_QAbstractItemModel_eventFilter_bool_QAbstractItemModel_QObject_QEvent, Return, "bool",
+                                           Parameters, new Param(c, "this", "qt.QAbstractItemModel"), new Param(c, "watched", "qt.QObject"),
+                                           new Param(c, "event", "qt.QEvent"), End),
             // MISSING: metaObject ("const QMetaObject *"; QAbstractItemModel
             // this) MISSING: childEvent (void; QAbstractItemModel this,
             // "QChildEvent *" event) // protected MISSING: connectNotify (void;
             // QAbstractItemModel this, "const QMetaMethod &" signal) //
             // protected
-            _func[32] = new MemberFunction(
-                c, "customEvent", _n_customEvent0, None, Compiled,
-                qt_QAbstractItemModel_customEvent_void_QAbstractItemModel_QEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractItemModel"),
-                new Param(c, "event", "qt.QEvent"), End),
+            _func[32] = new MemberFunction(c, "customEvent", _n_customEvent0, None, Compiled,
+                                           qt_QAbstractItemModel_customEvent_void_QAbstractItemModel_QEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QAbstractItemModel"), new Param(c, "event", "qt.QEvent"), End),
             // MISSING: disconnectNotify (void; QAbstractItemModel this, "const
             // QMetaMethod &" signal) // protected
-            _func[33] = new MemberFunction(
-                c, "timerEvent", _n_timerEvent0, None, Compiled,
-                qt_QAbstractItemModel_timerEvent_void_QAbstractItemModel_QTimerEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractItemModel"),
-                new Param(c, "event", "qt.QTimerEvent"), End),
+            _func[33] = new MemberFunction(c, "timerEvent", _n_timerEvent0, None, Compiled,
+                                           qt_QAbstractItemModel_timerEvent_void_QAbstractItemModel_QTimerEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QAbstractItemModel"), new Param(c, "event", "qt.QTimerEvent"), End),
             // static functions
             EndArguments);
         globalScope()->addSymbols(EndArguments);
@@ -2671,13 +2164,10 @@ namespace Mu
 
         addSymbols(
 
-            new Function(
-                c, "createIndex", _n_createIndex0, None, Compiled,
-                qt_QAbstractItemModel_createIndex_QModelIndex_QAbstractItemModel_int_int_object,
-                Return, "qt.QModelIndex", Parameters,
-                new Param(c, "this", "qt.QAbstractItemModel"),
-                new Param(c, "row", "int"), new Param(c, "column", "int"),
-                new Param(c, "any", "object"), End),
+            new Function(c, "createIndex", _n_createIndex0, None, Compiled,
+                         qt_QAbstractItemModel_createIndex_QModelIndex_QAbstractItemModel_int_int_object, Return, "qt.QModelIndex",
+                         Parameters, new Param(c, "this", "qt.QAbstractItemModel"), new Param(c, "row", "int"),
+                         new Param(c, "column", "int"), new Param(c, "any", "object"), End),
 
             EndArguments);
 

@@ -16,17 +16,15 @@ namespace Mu
 {
     using namespace std;
 
-    MemberVariable::MemberVariable(Context* context, const char* name,
-                                   const Type* storageClass, int address,
-                                   bool hidden, Variable::Attribute a)
+    MemberVariable::MemberVariable(Context* context, const char* name, const Type* storageClass, int address, bool hidden,
+                                   Variable::Attribute a)
         : Variable(context, name, storageClass, address, a)
         , _hidden(hidden)
     {
     }
 
-    MemberVariable::MemberVariable(Context* context, const char* name,
-                                   const char* storageClass, int address,
-                                   bool hidden, Variable::Attribute a)
+    MemberVariable::MemberVariable(Context* context, const char* name, const char* storageClass, int address, bool hidden,
+                                   Variable::Attribute a)
         : Variable(context, name, storageClass, address, a)
         , _hidden(hidden)
     {
@@ -34,10 +32,8 @@ namespace Mu
 
     String MemberVariable::mangledName() const
     {
-        static const char* cppkeywords[] = {
-            "this",    "switch", "default",   "auto",     "case",
-            "return",  "throw",  "catch",     "template", "class",
-            "private", "public", "protected", NULL};
+        static const char* cppkeywords[] = {"this",  "switch",   "default", "auto",    "case",   "return",    "throw",
+                                            "catch", "template", "class",   "private", "public", "protected", NULL};
 
         for (const char** k = cppkeywords; *k; k++)
         {
@@ -58,8 +54,7 @@ namespace Mu
         {
             const MachineRep* rep = t->machineRep();
 
-            if (n->func() == rep->referenceMemberFunc()
-                || n->func() == rep->referenceClassMemberFunc())
+            if (n->func() == rep->referenceMemberFunc() || n->func() == rep->referenceClassMemberFunc())
             {
                 return storageClass()->referenceType();
             }
@@ -87,16 +82,11 @@ namespace Mu
         o << " (member)";
     }
 
-    void MemberVariable::outputNode(std::ostream& o, const Node* n) const
-    {
-        o << n->type()->name() << " member " << name();
-    }
+    void MemberVariable::outputNode(std::ostream& o, const Node* n) const { o << n->type()->name() << " member " << name(); }
 
     //----------------------------------------------------------------------
 
-    InternalTypeMemberVariable::InternalTypeMemberVariable(Context* context,
-                                                           const char* name,
-                                                           const Class* value)
+    InternalTypeMemberVariable::InternalTypeMemberVariable(Context* context, const char* name, const Class* value)
         : MemberVariable(context, name, "runtime.type_symbol", 0, true)
         , _value(value)
     {
@@ -104,34 +94,24 @@ namespace Mu
 
     //----------------------------------------------------------------------
 
-    FunctionMemberVariable::FunctionMemberVariable(
-        Context* context, const char* name, const char* storageClass,
-        const Function* refFunction, const Function* extractFunction,
-        int address, Attribute a)
+    FunctionMemberVariable::FunctionMemberVariable(Context* context, const char* name, const char* storageClass,
+                                                   const Function* refFunction, const Function* extractFunction, int address, Attribute a)
         : MemberVariable(context, name, storageClass, address, a)
         , _refFunc(refFunction)
         , _extractFunc(extractFunction)
     {
     }
 
-    FunctionMemberVariable::FunctionMemberVariable(
-        Context* context, const char* name, const Type* storageClass,
-        const Function* refFunction, const Function* extractFunction,
-        int address, Attribute a)
+    FunctionMemberVariable::FunctionMemberVariable(Context* context, const char* name, const Type* storageClass,
+                                                   const Function* refFunction, const Function* extractFunction, int address, Attribute a)
         : MemberVariable(context, name, storageClass, address, a)
         , _refFunc(refFunction)
         , _extractFunc(extractFunction)
     {
     }
 
-    const Function* FunctionMemberVariable::referenceFunction() const
-    {
-        return _refFunc;
-    }
+    const Function* FunctionMemberVariable::referenceFunction() const { return _refFunc; }
 
-    const Function* FunctionMemberVariable::extractFunction() const
-    {
-        return _extractFunc;
-    }
+    const Function* FunctionMemberVariable::extractFunction() const { return _extractFunc; }
 
 } // namespace Mu

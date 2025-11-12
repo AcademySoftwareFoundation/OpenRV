@@ -33,8 +33,7 @@ struct exec_stream_t::impl_t
     ~impl_t();
 
     void split_args(std::string const& program, std::string const& arguments);
-    void split_args(std::string const& program,
-                    exec_stream_t::next_arg_t& next_arg);
+    void split_args(std::string const& program, exec_stream_t::next_arg_t& next_arg);
     void start(std::string const& program);
 
     pid_t m_child_pid;
@@ -80,11 +79,9 @@ exec_stream_t::impl_t::impl_t()
 
 exec_stream_t::impl_t::~impl_t() { signal(SIGPIPE, m_old_sigpipe_handler); }
 
-void exec_stream_t::impl_t::split_args(std::string const& program,
-                                       std::string const& arguments)
+void exec_stream_t::impl_t::split_args(std::string const& program, std::string const& arguments)
 {
-    char* args_end =
-        m_child_args.new_data(program.size() + 1 + arguments.size() + 1);
+    char* args_end = m_child_args.new_data(program.size() + 1 + arguments.size() + 1);
     int argc = 1;
 
     std::string::traits_type::copy(args_end, program.data(), program.size());
@@ -105,8 +102,7 @@ void exec_stream_t::impl_t::split_args(std::string const& program,
             {
                 arg_stop = arguments.size();
             }
-            std::string::traits_type::copy(
-                args_end, arguments.data() + arg_start, arg_stop - arg_start);
+            std::string::traits_type::copy(args_end, arguments.data() + arg_start, arg_stop - arg_start);
             args_end += arg_stop - arg_start;
         }
         else
@@ -126,15 +122,13 @@ void exec_stream_t::impl_t::split_args(std::string const& program,
                     {
                         arg_stop = next + 1;
                     }
-                    std::string::traits_type::copy(
-                        args_end, arguments.data() + cur, next - cur);
+                    std::string::traits_type::copy(args_end, arguments.data() + cur, next - cur);
                     args_end += next - cur;
                     break;
                 }
                 else
                 {
-                    std::string::traits_type::copy(
-                        args_end, arguments.data() + cur, next - 1 - cur);
+                    std::string::traits_type::copy(args_end, arguments.data() + cur, next - 1 - cur);
                     args_end += next - 1 - cur;
                     *args_end++ = '"';
                     cur = next + 1;
@@ -156,15 +150,13 @@ void exec_stream_t::impl_t::split_args(std::string const& program,
     *argp_end = 0;
 }
 
-void exec_stream_t::impl_t::split_args(std::string const& program,
-                                       exec_stream_t::next_arg_t& next_arg)
+void exec_stream_t::impl_t::split_args(std::string const& program, exec_stream_t::next_arg_t& next_arg)
 {
     typedef std::vector<std::size_t> arg_sizes_t;
     arg_sizes_t arg_sizes;
 
     m_child_args.new_data(program.size() + 1);
-    std::string::traits_type::copy(m_child_args.data(), program.c_str(),
-                                   program.size() + 1);
+    std::string::traits_type::copy(m_child_args.data(), program.c_str(), program.size() + 1);
     arg_sizes.push_back(program.size() + 1);
 
     while (std::string const* s = next_arg.next())
@@ -184,10 +176,7 @@ void exec_stream_t::impl_t::split_args(std::string const& program,
     *argp_end = 0;
 }
 
-void exec_stream_t::set_buffer_limit(int stream_kind, std::size_t size)
-{
-    m_impl->m_thread.set_buffer_limit(stream_kind, size);
-}
+void exec_stream_t::set_buffer_limit(int stream_kind, std::size_t size) { m_impl->m_thread.set_buffer_limit(stream_kind, size); }
 
 void exec_stream_t::set_wait_timeout(int stream_kind, timeout_t milliseconds)
 {
@@ -198,8 +187,7 @@ void exec_stream_t::set_wait_timeout(int stream_kind, timeout_t milliseconds)
     }
 }
 
-void exec_stream_t::start(std::string const& program,
-                          std::string const& arguments)
+void exec_stream_t::start(std::string const& program, std::string const& arguments)
 {
     if (!close())
     {
@@ -211,8 +199,7 @@ void exec_stream_t::start(std::string const& program,
     m_impl->start(program);
 }
 
-void exec_stream_t::start(std::string const& program,
-                          exec_stream_t::next_arg_t& next_arg)
+void exec_stream_t::start(std::string const& program, exec_stream_t::next_arg_t& next_arg)
 {
     if (!close())
     {
@@ -245,9 +232,8 @@ void exec_stream_t::impl_t::start(std::string const& program)
             status_pipe.close_r();
             if (fcntl(status_pipe.w(), F_SETFD, FD_CLOEXEC) == -1)
             {
-                throw os_error_t(
-                    "exec_stream_t::start: unable to fcnth( status_pipe, "
-                    "F_SETFD, FD_CLOEXEC ) in child process");
+                throw os_error_t("exec_stream_t::start: unable to fcnth( status_pipe, "
+                                 "F_SETFD, FD_CLOEXEC ) in child process");
             }
             m_in_pipe.close_w();
             m_out_pipe.close_r();
@@ -287,12 +273,9 @@ void exec_stream_t::impl_t::start(std::string const& program)
             m_err_pipe.close_w();
             if (execvp(m_child_args.data(), m_child_argp.data()) == -1)
             {
-                throw os_error_t(
-                    "exec_stream_t::start: exec in child process failed. "
-                    + program);
+                throw os_error_t("exec_stream_t::start: exec in child process failed. " + program);
             }
-            throw exec_stream_t::error_t(
-                "exec_stream_t::start: exec in child process returned");
+            throw exec_stream_t::error_t("exec_stream_t::start: exec in child process returned");
         }
         catch (std::exception const& e)
         {
@@ -304,8 +287,7 @@ void exec_stream_t::impl_t::start(std::string const& program)
         }
         catch (...)
         {
-            const char* msg =
-                "exec_stream_t::start: unknown exception in child process";
+            const char* msg = "exec_stream_t::start: unknown exception in child process";
             std::size_t len = strlen(msg);
             write(status_pipe.w(), &len, sizeof(len));
             write(status_pipe.w(), msg, len);
@@ -324,8 +306,7 @@ void exec_stream_t::impl_t::start(std::string const& program)
         timeout.tv_usec = 0;
         if (select(status_pipe.r() + 1, &status_fds, 0, 0, &timeout) == -1)
         {
-            throw os_error_t(
-                "exec_stream_t::start: select on status_pipe failed");
+            throw os_error_t("exec_stream_t::start: select on status_pipe failed");
         }
         if (!FD_ISSET(status_pipe.r(), &status_fds))
         {
@@ -333,8 +314,7 @@ void exec_stream_t::impl_t::start(std::string const& program)
                              "child to report via status_pipe");
         }
         std::size_t status_len;
-        int status_nread =
-            read(status_pipe.r(), &status_len, sizeof(status_len));
+        int status_nread = read(status_pipe.r(), &status_len, sizeof(status_len));
         // when all ok, status_pipe is closed on child's exec, and nothing is
         // written to it
         if (status_nread != 0)
@@ -342,8 +322,7 @@ void exec_stream_t::impl_t::start(std::string const& program)
             // otherwize, check what went wrong.
             if (status_nread == -1)
             {
-                throw os_error_t(
-                    "exec_stream_t::start: read from status pipe failed");
+                throw os_error_t("exec_stream_t::start: read from status pipe failed");
             }
             else if (status_nread != sizeof(status_len))
             {
@@ -355,8 +334,7 @@ void exec_stream_t::impl_t::start(std::string const& program)
             {
                 buf_t<char> status_buf;
                 status_buf.new_data(status_len);
-                status_nread =
-                    read(status_pipe.r(), status_buf.data(), status_len);
+                status_nread = read(status_pipe.r(), status_buf.data(), status_len);
                 if (status_nread == -1)
                 {
                     throw os_error_t("exec_stream_t::start: readof status "
@@ -364,8 +342,7 @@ void exec_stream_t::impl_t::start(std::string const& program)
                 }
                 status_msg.assign(status_buf.data(), status_len);
             }
-            throw exec_stream_t::error_t(
-                "exec_stream_t::start: error in child process." + status_msg);
+            throw exec_stream_t::error_t("exec_stream_t::start: error in child process." + status_msg);
         }
         status_pipe.close_r();
 
@@ -412,8 +389,7 @@ bool exec_stream_t::close()
 
     if (m_impl->m_child_pid != -1)
     {
-        pid_t code =
-            waitpid(m_impl->m_child_pid, &m_impl->m_exit_code, WNOHANG);
+        pid_t code = waitpid(m_impl->m_child_pid, &m_impl->m_exit_code, WNOHANG);
         if (code == -1)
         {
             throw os_error_t("exec_stream_t::close: first waitpid failed");
@@ -477,8 +453,7 @@ int exec_stream_t::exit_code()
 {
     if (m_impl->m_child_pid != -1)
     {
-        throw exec_stream_t::error_t(
-            "exec_stream_t::exit_code: child process still running");
+        throw exec_stream_t::error_t("exec_stream_t::exit_code: child process still running");
     }
     return WEXITSTATUS(m_impl->m_exit_code);
 }

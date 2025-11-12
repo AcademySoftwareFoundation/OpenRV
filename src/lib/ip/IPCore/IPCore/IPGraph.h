@@ -141,13 +141,9 @@ namespace IPCore
         typedef boost::signals2::signal<void()> VoidSignal;
         typedef boost::signals2::signal<void(IPNode*)> NodeSignal;
         typedef boost::signals2::signal<void(const Property*)> PropertySignal;
-        typedef boost::signals2::signal<void(const std::string&,
-                                             const std::string&)>
-            NodeNameProtocolSignal;
+        typedef boost::signals2::signal<void(const std::string&, const std::string&)> NodeNameProtocolSignal;
         typedef boost::signals2::signal<void(const VideoDevice*)> DeviceSignal;
-        typedef boost::signals2::signal<void(const VideoDevice*,
-                                             const VideoDevice*)>
-            DeviceChangedSignal;
+        typedef boost::signals2::signal<void(const VideoDevice*, const VideoDevice*)> DeviceChangedSignal;
 
         IPGraph(const NodeManager*);
         ~IPGraph();
@@ -158,32 +154,17 @@ namespace IPCore
 
         NodeSignal& newNodeSignal() { return m_newNodeSignal; }
 
-        NodeSignal& nodeInputsChangedSignal()
-        {
-            return m_nodeInputsChangedSignal;
-        }
+        NodeSignal& nodeInputsChangedSignal() { return m_nodeInputsChangedSignal; }
 
-        NodeSignal& nodeImageStructureChangedSignal()
-        {
-            return m_nodeImageStructureChangedSignal;
-        }
+        NodeSignal& nodeImageStructureChangedSignal() { return m_nodeImageStructureChangedSignal; }
 
-        NodeSignal& nodeRangeChangedSignal()
-        {
-            return m_nodeRangeChangedSignal;
-        }
+        NodeSignal& nodeRangeChangedSignal() { return m_nodeRangeChangedSignal; }
 
-        NodeSignal& nodeMediaChangedSignal()
-        {
-            return m_nodeMediaChangedSignal;
-        }
+        NodeSignal& nodeMediaChangedSignal() { return m_nodeMediaChangedSignal; }
 
         NodeSignal& nodeWillDeleteSignal() { return m_nodeWillDeleteSignal; }
 
-        NodeNameProtocolSignal& nodeDidDeleteSignal()
-        {
-            return m_nodeDidDeleteSignal;
-        }
+        NodeNameProtocolSignal& nodeDidDeleteSignal() { return m_nodeDidDeleteSignal; }
 
         NodeSignal& viewNodeChangedSignal() { return m_viewNodeChangedSignal; }
 
@@ -191,20 +172,11 @@ namespace IPCore
 
         VoidSignal& textureCacheUpdated() { return m_textureCacheUpdated; }
 
-        DeviceChangedSignal& videoDeviceChangedSignal()
-        {
-            return m_deviceChangedSignal;
-        }
+        DeviceChangedSignal& videoDeviceChangedSignal() { return m_deviceChangedSignal; }
 
-        DeviceSignal& primaryVideoDeviceChangedSignal()
-        {
-            return m_primaryDeviceChangedSignal;
-        }
+        DeviceSignal& primaryVideoDeviceChangedSignal() { return m_primaryDeviceChangedSignal; }
 
-        PropertySignal& propertyChangedSignal()
-        {
-            return m_propertyChangedSignal;
-        }
+        PropertySignal& propertyChangedSignal() { return m_propertyChangedSignal; }
 
         // nodeWillRemoveSignal() is raised when a node will be remove from the
         // graph
@@ -272,8 +244,7 @@ namespace IPCore
         //  to true and provide the proper frame number.
         //
 
-        void checkInImage(IPImage*, bool updateDisplayframe = false,
-                          int frame = 0);
+        void checkInImage(IPImage*, bool updateDisplayframe = false, int frame = 0);
         //
         //  Similar to above, but for audio. The IPGraph evaluates audio
         //  asynchronously and caches the results. If block is true, the
@@ -299,8 +270,7 @@ namespace IPCore
             {
             }
 
-            AudioConfiguration(double deviceRate, TwkAudio::Layout layout,
-                               size_t numSamples, double fps_, bool backwards_,
+            AudioConfiguration(double deviceRate, TwkAudio::Layout layout, size_t numSamples, double fps_, bool backwards_,
                                size_t startSample_, size_t endSample_)
                 : IPNode::AudioConfiguration(deviceRate, layout, numSamples)
                 , fps(fps_)
@@ -319,17 +289,13 @@ namespace IPCore
             {
                 return c.fps == fps && c.backwards == backwards &&
                        // c.startSample == startSample &&
-                       c.endSample == endSample && c.layout == layout
-                       && c.rate == rate && c.samples == samples;
+                       c.endSample == endSample && c.layout == layout && c.rate == rate && c.samples == samples;
             }
         };
 
         void audioConfigure(const AudioConfiguration&);
 
-        const AudioConfiguration& lastAudioConfiguration() const
-        {
-            return m_lastAudioConfiguration;
-        }
+        const AudioConfiguration& lastAudioConfiguration() const { return m_lastAudioConfiguration; }
 
         void setAudioCachingMode(CachingMode);
 
@@ -403,10 +369,8 @@ namespace IPCore
         class GraphEdit
         {
         public:
-            GraphEdit(IPGraph& graph, bool lock = true,
-                      bool programFlush = false, bool audioFlush = false);
-            template <class T>
-            GraphEdit(IPGraph& graph, std::vector<T*>& props);
+            GraphEdit(IPGraph& graph, bool lock = true, bool programFlush = false, bool audioFlush = false);
+            template <class T> GraphEdit(IPGraph& graph, std::vector<T*>& props);
             ~GraphEdit();
 
         private:
@@ -424,15 +388,10 @@ namespace IPCore
         //  Caching Mode
         //
 
-        void setCachingMode(CachingMode mode, int inframe, int outframe,
-                            int minFrame, int maxFrame, int inc, int curframe,
-                            float fps);
+        void setCachingMode(CachingMode mode, int inframe, int outframe, int minFrame, int maxFrame, int inc, int curframe, float fps);
         void setNumEvalThreads(size_t n);
 
-        size_t numEvalThreads() const
-        {
-            return ((m_threadGroup) ? m_threadGroup->num_threads() : 0) + 1;
-        }
+        size_t numEvalThreads() const { return ((m_threadGroup) ? m_threadGroup->num_threads() : 0) + 1; }
 
         void setCacheModeSize(CachingMode mode, size_t size);
 
@@ -451,10 +410,7 @@ namespace IPCore
         //  given *global* frame number.
         //
 
-        IPNode::Context
-        contextForFrame(int frame,
-                        IPNode::ThreadType t = IPNode::DisplayEvalThread,
-                        bool stereo = false) const;
+        IPNode::Context contextForFrame(int frame, IPNode::ThreadType t = IPNode::DisplayEvalThread, bool stereo = false) const;
 
         //
         //  The root node, and the session information
@@ -473,29 +429,21 @@ namespace IPCore
         void setPrimaryDisplayGroup(DisplayGroupIPNode*);
         void setPrimaryDisplayGroup(const TwkApp::VideoDevice* device);
 
-        DisplayGroupIPNode* primaryDisplayGroup() const
-        {
-            return m_displayGroups.empty() ? 0 : m_displayGroups.front();
-        }
+        DisplayGroupIPNode* primaryDisplayGroup() const { return m_displayGroups.empty() ? 0 : m_displayGroups.front(); }
 
-        DisplayGroupIPNode*
-        findDisplayGroupByDevice(const TwkApp::VideoDevice*) const;
+        DisplayGroupIPNode* findDisplayGroupByDevice(const TwkApp::VideoDevice*) const;
 
         const DisplayGroups& displayGroups() const { return m_displayGroups; }
 
         void addDisplayGroup(DisplayGroupIPNode*);
-        void connectDisplayGroup(DisplayGroupIPNode*, bool atbeginning = true,
-                                 bool connectToView = true);
-        void connectDisplayGroup(const TwkApp::VideoDevice*,
-                                 bool atbeginning = true,
-                                 bool connectToView = true);
+        void connectDisplayGroup(DisplayGroupIPNode*, bool atbeginning = true, bool connectToView = true);
+        void connectDisplayGroup(const TwkApp::VideoDevice*, bool atbeginning = true, bool connectToView = true);
         void disconnectDisplayGroup(DisplayGroupIPNode*);
         void disconnectDisplayGroup(const TwkApp::VideoDevice*);
         void removeDisplayGroup(DisplayGroupIPNode*);
         void removeDisplayGroup(const TwkApp::VideoDevice*);
 
-        void deviceChanged(const TwkApp::VideoDevice* oldDevice,
-                           const TwkApp::VideoDevice* newDevice) const;
+        void deviceChanged(const TwkApp::VideoDevice* oldDevice, const TwkApp::VideoDevice* newDevice) const;
 
         //
         //  NOTE: setting root nodes will remove all other inputs
@@ -509,10 +457,7 @@ namespace IPCore
         //  "real" display
         //
 
-        OutputGroupIPNode* defaultOutputGroup() const
-        {
-            return m_defaultOutputGroup;
-        }
+        OutputGroupIPNode* defaultOutputGroup() const { return m_defaultOutputGroup; }
 
         //
         //  Turn caching on/off for the whole graph
@@ -521,8 +466,7 @@ namespace IPCore
         void setCacheNodesActive(bool);
         void dispatchCachingThread(int inframe, int outframe,
                                    int minFrame, // whole range
-                                   int maxFrame, int inc, int frame, float fps,
-                                   bool modeChanged);
+                                   int maxFrame, int inc, int frame, float fps, bool modeChanged);
         void finishCachingThread();
 
         //
@@ -550,8 +494,7 @@ namespace IPCore
 
         ViewGroupIPNode* viewGroup() const { return m_viewGroupNode; }
 
-        void setDevice(const TwkApp::VideoDevice* controlDevice,
-                       const TwkApp::VideoDevice* outputDevice);
+        void setDevice(const TwkApp::VideoDevice* controlDevice, const TwkApp::VideoDevice* outputDevice);
 
         //
         //  Generate a unqiue name from the given one (could be the same as
@@ -575,24 +518,16 @@ namespace IPCore
         IPNode* findNode(const std::string& name) const;
         IPNode* findNodeByUIName(const std::string& name) const;
         IPNode* findNodeAssociatedWith(IPNode*, const std::string& type) const;
-        void findProperty(int frame, PropertyVector& props,
-                          const std::string& name);
-        void findNodesByTypeName(int frame, NodeVector& nodes,
-                                 const std::string& typeName) const;
-        void findNodesByTypeName(NodeVector& nodes,
-                                 const std::string& typeName) const;
-        void findNodesByTypeNameWithProperty(NodeVector& nodes,
-                                             const std::string& typeName,
-                                             const std::string& propName);
+        void findProperty(int frame, PropertyVector& props, const std::string& name);
+        void findNodesByTypeName(int frame, NodeVector& nodes, const std::string& typeName) const;
+        void findNodesByTypeName(NodeVector& nodes, const std::string& typeName) const;
+        void findNodesByTypeNameWithProperty(NodeVector& nodes, const std::string& typeName, const std::string& propName);
 
-        void findNodesByPattern(int frame, NodeVector& nodes,
-                                const std::string& pattern);
+        void findNodesByPattern(int frame, NodeVector& nodes, const std::string& pattern);
 
         template <typename T> T* findNodeOfType(const std::string& name) const;
 
-        template <typename T>
-        void findPropertyOfType(int frame, std::vector<T*>& props,
-                                const std::string& name);
+        template <typename T> void findPropertyOfType(int frame, std::vector<T*>& props, const std::string& name);
 
         //
         //  Evaluation Thread Only
@@ -618,34 +553,24 @@ namespace IPCore
 
         void setLookBehindFraction(float f);
 
-        static void setMaxBufferedWaitTime(float f)
-        {
-            m_maxBufferedWaitTime = f;
-        };
+        static void setMaxBufferedWaitTime(float f) { m_maxBufferedWaitTime = f; };
 
         float maxBufferedWaitTime() { return m_maxBufferedWaitTime; };
 
         static void setMinCacheSize(size_t bytes) { m_minCacheSize = bytes; };
 
-        void nodeConnections(StringPairVector& pairs,
-                             bool toplevel = false) const;
+        void nodeConnections(StringPairVector& pairs, bool toplevel = false) const;
 
         bool hasConstructor(const std::string& typeName);
         const NodeDefinition* nodeDefinition(const std::string& typeName);
-        IPNode* newNode(const std::string& typeName,
-                        const std::string& nodeName, GroupIPNode* group = 0);
+        IPNode* newNode(const std::string& typeName, const std::string& nodeName, GroupIPNode* group = 0);
 
-        template <class T>
-        T* newNodeOfType(const std::string& typeName,
-                         const std::string& nodeName)
+        template <class T> T* newNodeOfType(const std::string& typeName, const std::string& nodeName)
         {
             return dynamic_cast<T*>(newNode(typeName, nodeName));
         }
 
-        bool isDefaultView(std::string name)
-        {
-            return (m_defaultViewsMap.find(name) != m_defaultViewsMap.end());
-        };
+        bool isDefaultView(std::string name) { return (m_defaultViewsMap.find(name) != m_defaultViewsMap.end()); };
 
         //
         //  Profiling mirrors what the session has. The session passes in
@@ -722,10 +647,7 @@ namespace IPCore
 
         void endProfilingSample() {}
 
-        const ProfilingVector& profilingSamples() const
-        {
-            return m_profilingSamples;
-        }
+        const ProfilingVector& profilingSamples() const { return m_profilingSamples; }
 
         // Asynchronous media loading detection - Progressive source loading
         // mode When loading sources in progressive source loading mode, the
@@ -754,10 +676,7 @@ namespace IPCore
         void mediaLoadingEnd(WorkItemID mediaWorkItemId);
 
         // this signal is raised when the last source loading is complete
-        VoidSignal& mediaLoadingSetEmptySignal()
-        {
-            return m_mediaLoadingSetEmptySignal;
-        }
+        VoidSignal& mediaLoadingSetEmptySignal() { return m_mediaLoadingSetEmptySignal; }
 
         //----------------------------------------------------------------------
 
@@ -775,12 +694,8 @@ namespace IPCore
         virtual void initializeIPTree(const VideoModules&);
         virtual void addNode(IPNode*);
         virtual void removeNode(IPNode*);
-        virtual DisplayGroupIPNode*
-        newDisplayGroup(const std::string& nodeName,
-                        const TwkApp::VideoDevice* d = 0);
-        virtual OutputGroupIPNode*
-        newOutputGroup(const std::string& nodeName,
-                       const TwkApp::VideoDevice* d = 0);
+        virtual DisplayGroupIPNode* newDisplayGroup(const std::string& nodeName, const TwkApp::VideoDevice* d = 0);
+        virtual OutputGroupIPNode* newOutputGroup(const std::string& nodeName, const TwkApp::VideoDevice* d = 0);
 
         // Undo/Redo support
         virtual void isolateNode(IPNode*);
@@ -820,8 +735,7 @@ namespace IPCore
         //
 
         IPImage* evaluate(int, IPNode::ThreadType thread, size_t n = 0);
-        TestEvalResult testEvaluate(int, IPNode::ThreadType thread,
-                                    size_t n = 0);
+        TestEvalResult testEvaluate(int, IPNode::ThreadType thread, size_t n = 0);
         size_t audioFillBufferInternal(const IPNode::AudioContext&);
 
         void finishCachingThreadASync();
@@ -846,8 +760,7 @@ namespace IPCore
 
         void awakenAllCachingThreads();
 
-        void promoteFBsInFrameRange(int beg, int mid, int end,
-                                    TwkUtil::Timer t);
+        void promoteFBsInFrameRange(int beg, int mid, int end, TwkUtil::Timer t);
 
         void setPhysicalDevicesInternal(const VideoModules&);
 
@@ -862,8 +775,7 @@ namespace IPCore
         //
         void _audioClearCacheOutsideHeadAndTail();
         void _audioMapLinearVolumeToPerceptual(AudioBuffer& inout_buffer);
-        bool _isCurrentAudioSampleBeyondHead(
-            const SampleTime audioHeadSamples) const;
+        bool _isCurrentAudioSampleBeyondHead(const SampleTime audioHeadSamples) const;
         //--------------------------------------------------------------------------
 
     protected:
@@ -962,9 +874,7 @@ namespace IPCore
         friend class IPNode;
     };
 
-    template <typename T>
-    void IPGraph::findPropertyOfType(int frame, std::vector<T*>& props,
-                                     const std::string& name)
+    template <typename T> void IPGraph::findPropertyOfType(int frame, std::vector<T*>& props, const std::string& name)
     {
         PropertyVector p;
         findProperty(frame, p, name);
@@ -981,8 +891,7 @@ namespace IPCore
         }
     }
 
-    template <typename T>
-    T* IPGraph::findNodeOfType(const std::string& name) const
+    template <typename T> T* IPGraph::findNodeOfType(const std::string& name) const
     {
         if (IPNode* n = findNode(name))
         {
@@ -1003,8 +912,7 @@ namespace IPCore
     {
         for (size_t i = 0, s = props.size(); i < s; i++)
         {
-            if (const PropertyInfo* pinfo =
-                    dynamic_cast<const PropertyInfo*>(props[i]->info()))
+            if (const PropertyInfo* pinfo = dynamic_cast<const PropertyInfo*>(props[i]->info()))
             {
                 if (pinfo->requiresGraphEdit())
                 {

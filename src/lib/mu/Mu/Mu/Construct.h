@@ -21,8 +21,7 @@ namespace Mu
     class Construct : public Function
     {
     public:
-        Construct(Context* context, const char* name, NodeFunc,
-                  Attributes attributes, ...);
+        Construct(Context* context, const char* name, NodeFunc, Attributes attributes, ...);
         virtual ~Construct();
 
         //

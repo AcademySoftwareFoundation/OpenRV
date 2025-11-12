@@ -23,9 +23,7 @@ namespace
     typ m_prev##var = def;         \
     typ m_curr##var = def;
 
-#define PRINT_VAR(var)                                                       \
-    std::cerr << "[" << #var << ": " << m_prev##var << " to " << m_curr##var \
-              << "] ";
+#define PRINT_VAR(var) std::cerr << "[" << #var << ": " << m_prev##var << " to " << m_curr##var << "] ";
 
 #define UPDATEVAR_VAL(var, val)     \
     m_prev##var = m_curr##var;      \
@@ -51,8 +49,7 @@ namespace
             m_ctx = QOpenGLContext::currentContext();
             m_name = "????";
 
-            std::cerr << "-------> [NEW CONTEXT: " << name() << "]"
-                      << std::endl;
+            std::cerr << "-------> [NEW CONTEXT: " << name() << "]" << std::endl;
         }
 
         void update(std::string_view file, std::string_view function, int line)
@@ -74,8 +71,7 @@ namespace
 
                 bool printDetails = true;
                 if (printDetails)
-                    std::cerr << " " << shorterPath(file).data() << " "
-                              << function.data() << "@" << line;
+                    std::cerr << " " << shorterPath(file).data() << " " << function.data() << "@" << line;
 
                 std::cerr << std::endl;
             }
@@ -108,8 +104,7 @@ namespace
 
         void setCurrentContextName(std::string_view name)
         {
-            GLContextStateTracker& tracker =
-                m_trackers[QOpenGLContext::currentContext()];
+            GLContextStateTracker& tracker = m_trackers[QOpenGLContext::currentContext()];
             tracker.setName(name);
         }
 
@@ -126,8 +121,7 @@ namespace
                 const GLContextStateTracker& t0 = m_trackers[m_prevContext];
                 const GLContextStateTracker& t1 = m_trackers[m_currContext];
 
-                std::cerr << "@@ [QT_CTX: " << t0.name() << " to " << t1.name()
-                          << "]" << std::endl;
+                std::cerr << "@@ [QT_CTX: " << t0.name() << " to " << t1.name() << "]" << std::endl;
             }
 
             if (m_currContext)
@@ -217,14 +211,12 @@ namespace TwkGLF
 
 } // namespace TwkGLF
 
-bool twkGlPrintError(std::string_view file, std::string_view function,
-                     const int line, const std::string_view msg)
+bool twkGlPrintError(std::string_view file, std::string_view function, const int line, const std::string_view msg)
 {
     if (GLuint err = glGetError())
     {
-        std::cerr << "GL_ERROR: " << shorterPath(file).data()
-                  << "::" << function.data() << ":" << line << " ["
-                  << TwkGLF::errorString(err) << "]" << std::endl;
+        std::cerr << "GL_ERROR: " << shorterPath(file).data() << "::" << function.data() << ":" << line << " [" << TwkGLF::errorString(err)
+                  << "]" << std::endl;
         return false;
     }
 
@@ -300,10 +292,8 @@ void glDrawBox(const Box3f& bbox)
 //  From SGI's OpenGL website
 //
 
-void glJitterFrustum(GLdouble left, GLdouble right, GLdouble bottom,
-                     GLdouble top, GLdouble nearPlane, GLdouble farPlane,
-                     GLdouble pixdx, GLdouble pixdy, GLdouble eyedx,
-                     GLdouble eyedy, GLdouble focus)
+void glJitterFrustum(GLdouble left, GLdouble right, GLdouble bottom, GLdouble top, GLdouble nearPlane, GLdouble farPlane, GLdouble pixdx,
+                     GLdouble pixdy, GLdouble eyedx, GLdouble eyedy, GLdouble focus)
 {
     GLdouble xwsize, ywsize;
     GLdouble dx, dy;
@@ -318,15 +308,13 @@ void glJitterFrustum(GLdouble left, GLdouble right, GLdouble bottom,
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glFrustum(left + dx, right + dx, bottom + dy, top + dy, nearPlane,
-              farPlane);
+    glFrustum(left + dx, right + dx, bottom + dy, top + dy, nearPlane, farPlane);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     glTranslatef(-eyedx, -eyedy, 0.0);
 }
 
-void glJitterPerspective(GLdouble fovy, GLdouble aspect, GLdouble nearPlane,
-                         GLdouble farPlane, GLdouble pixdx, GLdouble pixdy,
+void glJitterPerspective(GLdouble fovy, GLdouble aspect, GLdouble nearPlane, GLdouble farPlane, GLdouble pixdx, GLdouble pixdy,
                          GLdouble eyedx, GLdouble eyedy, GLdouble focus)
 {
     GLdouble fov2, left, right, bottom, top;
@@ -337,6 +325,5 @@ void glJitterPerspective(GLdouble fovy, GLdouble aspect, GLdouble nearPlane,
     right = top * aspect;
     left = -right;
 
-    glJitterFrustum(left, right, bottom, top, nearPlane, farPlane, pixdx, pixdy,
-                    eyedx, eyedy, focus);
+    glJitterFrustum(left, right, bottom, top, nearPlane, farPlane, pixdx, pixdy, eyedx, eyedy, focus);
 }

@@ -45,10 +45,7 @@ namespace IPCore
             virtual void undo();
             virtual void redo();
 
-            template <typename T> T* node() const
-            {
-                return dynamic_cast<T*>(m_node);
-            }
+            template <typename T> T* node() const { return dynamic_cast<T*>(m_node); }
 
         protected:
             WrapExistingNode(const TwkApp::CommandInfo*);

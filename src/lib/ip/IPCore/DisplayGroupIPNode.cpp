@@ -25,9 +25,7 @@ namespace IPCore
 {
     using namespace std;
 
-    DisplayGroupIPNode::DisplayGroupIPNode(const std::string& name,
-                                           const NodeDefinition* def,
-                                           IPGraph* graph, GroupIPNode* group)
+    DisplayGroupIPNode::DisplayGroupIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group)
         : GroupIPNode(name, def, graph, group)
         , m_physicalDevice(0)
         , m_outputDevice(0)
@@ -40,51 +38,38 @@ namespace IPCore
         //  written to files.
         //
 
-        string stereoNodeType =
-            def->stringValue("defaults.stereoType", "DisplayStereo");
-        string pipelineType =
-            def->stringValue("defaults.pipelineType", "PipelineGroup");
+        string stereoNodeType = def->stringValue("defaults.stereoType", "DisplayStereo");
+        string pipelineType = def->stringValue("defaults.pipelineType", "PipelineGroup");
         string resizeType = def->stringValue("defaults.resizeType", "");
         int autoResize = def->intValue("defaults.autoResize", 1);
         bool writable = def->intValue("defaults.persistent", 0);
 
         PropertyInfo* outputOnly = new PropertyInfo(PropertyInfo::OutputOnly);
-        PropertyInfo* notPersistent = new PropertyInfo(
-            PropertyInfo::NotPersistent | PropertyInfo::OutputOnly);
+        PropertyInfo* notPersistent = new PropertyInfo(PropertyInfo::NotPersistent | PropertyInfo::OutputOnly);
 
         setWritable(writable);
 
-        m_deviceName =
-            declareProperty<StringProperty>("device.name", "", outputOnly);
-        m_moduleName = declareProperty<StringProperty>("device.moduleName", "",
-                                                       outputOnly);
-        m_systemProfileURL = declareProperty<StringProperty>(
-            "device.systemProfileURL", outputOnly);
-        m_systemProfileType = declareProperty<StringProperty>(
-            "device.systemProfileType", outputOnly);
-        m_renderHashCount =
-            declareProperty<IntProperty>("render.hashCount", 0, notPersistent);
+        m_deviceName = declareProperty<StringProperty>("device.name", "", outputOnly);
+        m_moduleName = declareProperty<StringProperty>("device.moduleName", "", outputOnly);
+        m_systemProfileURL = declareProperty<StringProperty>("device.systemProfileURL", outputOnly);
+        m_systemProfileType = declareProperty<StringProperty>("device.systemProfileType", outputOnly);
+        m_renderHashCount = declareProperty<IntProperty>("render.hashCount", 0, notPersistent);
         m_adaptor = newMemberNodeOfType<AdaptorIPNode>("Adaptor", "adaptor");
-        m_displayPipelineNode = newMemberNodeOfType<PipelineGroupIPNode>(
-            pipelineType, "colorPipeline");
+        m_displayPipelineNode = newMemberNodeOfType<PipelineGroupIPNode>(pipelineType, "colorPipeline");
         m_resizeNode = 0;
         m_stereoNode = 0;
 
         if (resizeType != "")
         {
-            m_resizeNode =
-                newMemberNodeOfType<ResizeIPNode>(resizeType, "resize");
-            m_resizeNode->setProperty<IntProperty>("node.useContext",
-                                                   autoResize);
+            m_resizeNode = newMemberNodeOfType<ResizeIPNode>(resizeType, "resize");
+            m_resizeNode->setProperty<IntProperty>("node.useContext", autoResize);
             m_resizeNode->setInputs1(m_adaptor);
         }
 
         if (stereoNodeType != "")
         {
-            m_stereoNode = newMemberNodeOfType<DisplayStereoIPNode>(
-                stereoNodeType, "stereo");
-            m_stereoNode->setInputs1(m_resizeNode ? (IPNode*)m_resizeNode
-                                                  : (IPNode*)m_adaptor);
+            m_stereoNode = newMemberNodeOfType<DisplayStereoIPNode>(stereoNodeType, "stereo");
+            m_stereoNode->setInputs1(m_resizeNode ? (IPNode*)m_resizeNode : (IPNode*)m_adaptor);
         }
 
         if (m_stereoNode)
@@ -109,17 +94,13 @@ namespace IPCore
             graph()->removeDisplayGroup(this);
     }
 
-    void DisplayGroupIPNode::setOutputVideoDevice(const VideoDevice* d)
-    {
-        m_outputDevice = d;
-    }
+    void DisplayGroupIPNode::setOutputVideoDevice(const VideoDevice* d) { m_outputDevice = d; }
 
     void DisplayGroupIPNode::setPhysicalVideoDevice(const VideoDevice* d)
     {
         m_physicalDevice = d;
         setProperty<StringProperty>(m_deviceName, d ? d->name() : "");
-        setProperty<StringProperty>(
-            m_moduleName, d && d->module() ? d->module()->name() : "");
+        setProperty<StringProperty>(m_moduleName, d && d->module() ? d->module()->name() : "");
         setProperty<StringProperty>(m_systemProfileURL, "");
         setProperty<StringProperty>(m_systemProfileType, "");
 
@@ -145,10 +126,8 @@ namespace IPCore
         {
             string stype = m_stereoNode->stereoType();
 
-            return stype == "hardware" || stype == "dual"
-                   || (m_outputDevice && m_outputDevice->isDualStereo())
-                   || (!m_outputDevice && m_physicalDevice
-                       && m_physicalDevice->isDualStereo());
+            return stype == "hardware" || stype == "dual" || (m_outputDevice && m_outputDevice->isDualStereo())
+                   || (!m_outputDevice && m_physicalDevice && m_physicalDevice->isDualStereo());
         }
         else
         {
@@ -156,8 +135,7 @@ namespace IPCore
         }
     }
 
-    void DisplayGroupIPNode::initNewContext(const Context& context,
-                                            Context& newContext) const
+    void DisplayGroupIPNode::initNewContext(const Context& context, Context& newContext) const
     {
         const VideoDevice* d = imageDevice();
 
@@ -179,8 +157,7 @@ namespace IPCore
             newContext.viewYOrigin = d->internalHeight() - o.y - 1 - m.bottom;
         }
 
-        newContext.allowInteractiveResize =
-            newContext.viewWidth != 0 && newContext.viewHeight != 0;
+        newContext.allowInteractiveResize = newContext.viewWidth != 0 && newContext.viewHeight != 0;
         newContext.stereo = dualOutputMode();
     }
 
@@ -197,8 +174,7 @@ namespace IPCore
         if (d)
         {
             flip = d->capabilities() & VideoDevice::FlippedImage;
-            VideoDevice::InternalDataFormat f =
-                d->dataFormatAtIndex(d->currentDataFormat()).iformat;
+            VideoDevice::InternalDataFormat f = d->dataFormatAtIndex(d->currentDataFormat()).iformat;
             yuvConvert = f >= VideoDevice::CbY0CrY1_8_422;
         }
 
@@ -231,8 +207,7 @@ namespace IPCore
                 newContext2.eye = 1;
                 right = m_root->evaluate(newContext2);
                 if (!yuvConvert)
-                    right =
-                        insertIntermediateRendersForPaint(right, newContext);
+                    right = insertIntermediateRendersForPaint(right, newContext);
                 right->useBackground = true;
 
                 if (flip)
@@ -250,50 +225,38 @@ namespace IPCore
                 throw;
             }
 
-            IPImage* leftEimage = new IPImage(
-                this, imageDevice(), IPImage::ExternalRenderType,
-                IPImage::CurrentFrameBuffer, IPImage::Rect2DSampler, false);
+            IPImage* leftEimage =
+                new IPImage(this, imageDevice(), IPImage::ExternalRenderType, IPImage::CurrentFrameBuffer, IPImage::Rect2DSampler, false);
 
-            IPImage* rightEimage = new IPImage(
-                this, imageDevice(), IPImage::ExternalRenderType,
-                IPImage::CurrentFrameBuffer, IPImage::Rect2DSampler, false);
+            IPImage* rightEimage =
+                new IPImage(this, imageDevice(), IPImage::ExternalRenderType, IPImage::CurrentFrameBuffer, IPImage::Rect2DSampler, false);
 
             leftEimage->appendChild(left);
             rightEimage->appendChild(right);
 
-            IPImage* leftTarget =
-                new IPImage(this, imageDevice(), IPImage::BlendRenderType,
-                            IPImage::LeftBuffer);
+            IPImage* leftTarget = new IPImage(this, imageDevice(), IPImage::BlendRenderType, IPImage::LeftBuffer);
 
-            IPImage* rightTarget =
-                new IPImage(this, imageDevice(), IPImage::BlendRenderType,
-                            IPImage::RightBuffer);
+            IPImage* rightTarget = new IPImage(this, imageDevice(), IPImage::BlendRenderType, IPImage::RightBuffer);
 
             if (yuvConvert)
             {
-                IPImage* leftRgbImage = new IPImage(
-                    this, imageDevice(), IPImage::BlendRenderType,
-                    IPImage::IntermediateBuffer, IPImage::Rect2DSampler, false);
+                IPImage* leftRgbImage =
+                    new IPImage(this, imageDevice(), IPImage::BlendRenderType, IPImage::IntermediateBuffer, IPImage::Rect2DSampler, false);
 
-                IPImage* rightRgbImage = new IPImage(
-                    this, imageDevice(), IPImage::BlendRenderType,
-                    IPImage::IntermediateBuffer, IPImage::Rect2DSampler, false);
+                IPImage* rightRgbImage =
+                    new IPImage(this, imageDevice(), IPImage::BlendRenderType, IPImage::IntermediateBuffer, IPImage::Rect2DSampler, false);
 
                 leftRgbImage->appendChild(leftEimage);
                 rightRgbImage->appendChild(rightEimage);
 
                 const Matrix M = TwkMath::Rec709VideoRangeRGBToYUV10<float>();
-                leftRgbImage->shaderExpr =
-                    Shader::newColorClamp(Shader::newSourceRGBA(leftRgbImage));
-                leftRgbImage->shaderExpr =
-                    Shader::newColorMatrix(leftRgbImage->shaderExpr, M);
+                leftRgbImage->shaderExpr = Shader::newColorClamp(Shader::newSourceRGBA(leftRgbImage));
+                leftRgbImage->shaderExpr = Shader::newColorMatrix(leftRgbImage->shaderExpr, M);
                 leftRgbImage->useBackground = true;
                 leftRgbImage->hashCount = propertyValue(m_renderHashCount, 0);
 
-                rightRgbImage->shaderExpr =
-                    Shader::newColorClamp(Shader::newSourceRGBA(rightRgbImage));
-                rightRgbImage->shaderExpr =
-                    Shader::newColorMatrix(rightRgbImage->shaderExpr, M);
+                rightRgbImage->shaderExpr = Shader::newColorClamp(Shader::newSourceRGBA(rightRgbImage));
+                rightRgbImage->shaderExpr = Shader::newColorMatrix(rightRgbImage->shaderExpr, M);
                 rightRgbImage->useBackground = true;
                 rightRgbImage->hashCount = leftRgbImage->hashCount;
 
@@ -309,8 +272,7 @@ namespace IPCore
             rightTarget->appendChild(rightEimage);
             rightTarget->shaderExpr = Shader::newSourceRGBA(rightTarget);
 
-            root = new IPImage(this, imageDevice(), IPImage::GroupType,
-                               IPImage::NoBuffer);
+            root = new IPImage(this, imageDevice(), IPImage::GroupType, IPImage::NoBuffer);
 
             root->appendChild(leftTarget);
             root->appendChild(rightTarget);
@@ -322,34 +284,27 @@ namespace IPCore
             {
                 IPImage* image = m_root->evaluate(newContext);
                 if (!yuvConvert)
-                    image =
-                        insertIntermediateRendersForPaint(image, newContext);
+                    image = insertIntermediateRendersForPaint(image, newContext);
 
                 if (flip)
                     image->transformMatrix = M * image->transformMatrix;
                 image->useBackground = true;
 
-                IPImage* eimage = new IPImage(
-                    this, imageDevice(), IPImage::ExternalRenderType,
-                    IPImage::CurrentFrameBuffer, IPImage::Rect2DSampler, false);
+                IPImage* eimage = new IPImage(this, imageDevice(), IPImage::ExternalRenderType, IPImage::CurrentFrameBuffer,
+                                              IPImage::Rect2DSampler, false);
 
                 eimage->appendChild(image);
 
                 if (yuvConvert)
                 {
-                    IPImage* rgbImage = new IPImage(
-                        this, imageDevice(), IPImage::BlendRenderType,
-                        IPImage::IntermediateBuffer, IPImage::Rect2DSampler,
-                        false);
+                    IPImage* rgbImage = new IPImage(this, imageDevice(), IPImage::BlendRenderType, IPImage::IntermediateBuffer,
+                                                    IPImage::Rect2DSampler, false);
 
                     rgbImage->appendChild(eimage);
 
-                    const Matrix M =
-                        TwkMath::Rec709VideoRangeRGBToYUV10<float>();
-                    rgbImage->shaderExpr =
-                        Shader::newColorClamp(Shader::newSourceRGBA(rgbImage));
-                    rgbImage->shaderExpr =
-                        Shader::newColorMatrix(rgbImage->shaderExpr, M);
+                    const Matrix M = TwkMath::Rec709VideoRangeRGBToYUV10<float>();
+                    rgbImage->shaderExpr = Shader::newColorClamp(Shader::newSourceRGBA(rgbImage));
+                    rgbImage->shaderExpr = Shader::newColorMatrix(rgbImage->shaderExpr, M);
                     rgbImage->useBackground = true;
                     rgbImage->hashCount = propertyValue(m_renderHashCount, 0);
                     eimage = rgbImage;
@@ -357,9 +312,7 @@ namespace IPCore
                     rgbImage->tagMap["yuvconvert"] = "true";
                 }
 
-                root = new IPImage(this, imageDevice(), IPImage::GroupType,
-                                   IPImage::MainBuffer, IPImage::Rect2DSampler,
-                                   false);
+                root = new IPImage(this, imageDevice(), IPImage::GroupType, IPImage::MainBuffer, IPImage::Rect2DSampler, false);
 
                 root->appendChild(eimage);
             }
@@ -424,8 +377,7 @@ namespace IPCore
         return root;
     }
 
-    void DisplayGroupIPNode::metaEvaluate(const Context& context,
-                                          MetaEvalVisitor& visitor)
+    void DisplayGroupIPNode::metaEvaluate(const Context& context, MetaEvalVisitor& visitor)
     {
         if (!m_root)
             return;
@@ -476,16 +428,14 @@ namespace IPCore
         visitor.leave(context, this);
     }
 
-    IPNode::ImageStructureInfo
-    DisplayGroupIPNode::imageStructureInfo(const Context& context) const
+    IPNode::ImageStructureInfo DisplayGroupIPNode::imageStructureInfo(const Context& context) const
     {
         Context newContext = context;
         initNewContext(context, newContext);
 
         if (newContext.viewWidth != 0 && newContext.viewHeight != 0)
         {
-            return ImageStructureInfo(newContext.viewWidth,
-                                      newContext.viewHeight);
+            return ImageStructureInfo(newContext.viewWidth, newContext.viewHeight);
         }
         else
         {
@@ -493,8 +443,7 @@ namespace IPCore
         }
     }
 
-    void DisplayGroupIPNode::mediaInfo(const Context& context,
-                                       MediaInfoVector& infos) const
+    void DisplayGroupIPNode::mediaInfo(const Context& context, MediaInfoVector& infos) const
     {
         Context newContext = context;
         initNewContext(context, newContext);
@@ -532,14 +481,8 @@ namespace IPCore
         IPNode::setInputs(newInputs);
     }
 
-    const TwkApp::VideoDevice* DisplayGroupIPNode::imageDevice() const
-    {
-        return m_outputDevice ? m_outputDevice : m_physicalDevice;
-    }
+    const TwkApp::VideoDevice* DisplayGroupIPNode::imageDevice() const { return m_outputDevice ? m_outputDevice : m_physicalDevice; }
 
-    void DisplayGroupIPNode::incrementRenderHashCount()
-    {
-        setProperty(m_renderHashCount, propertyValue(m_renderHashCount, 0) + 1);
-    }
+    void DisplayGroupIPNode::incrementRenderHashCount() { setProperty(m_renderHashCount, propertyValue(m_renderHashCount, 0) + 1); }
 
 } // namespace IPCore

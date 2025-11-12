@@ -19,16 +19,14 @@ namespace IPCore
         typedef boost::mutex Mutex;
         typedef boost::lock_guard<Mutex> LockGuard;
 
-        ColorCDLIPNode(const std::string& name, const NodeDefinition* def,
-                       IPGraph* graph, GroupIPNode* group = 0);
+        ColorCDLIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group = 0);
 
         virtual ~ColorCDLIPNode();
 
         virtual IPImage* evaluate(const Context&);
         virtual void copyNode(const IPNode* node);
         virtual void propertyChanged(const Property* property);
-        virtual void readCompleted(const std::string& type,
-                                   unsigned int version);
+        virtual void readCompleted(const std::string& type, unsigned int version);
 
     private:
         void updateProperties();

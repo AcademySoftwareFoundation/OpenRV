@@ -34,14 +34,12 @@ void TestFastMemcpy()
     Timer timer(true);
     for (size_t i = 0; i < tryCount; i++)
         FastMemcpy(dstBuffer, srcBuffer, bufferSize);
-    printf("PxlMemcpy() for 8k frame:%f sec/frame\n",
-           timer.elapsed() / tryCount);
+    printf("PxlMemcpy() for 8k frame:%f sec/frame\n", timer.elapsed() / tryCount);
 
     Timer timer1(true);
     for (size_t i = 0; i < tryCount; i++)
         FastMemcpy_MP(dstBuffer, srcBuffer, bufferSize);
-    printf("PxlMemcpy_MP() for 8k frame:%f sec/frame\n",
-           timer1.elapsed() / tryCount);
+    printf("PxlMemcpy_MP() for 8k frame:%f sec/frame\n", timer1.elapsed() / tryCount);
 
     delete[] srcBuffer;
     delete[] interBuffer;

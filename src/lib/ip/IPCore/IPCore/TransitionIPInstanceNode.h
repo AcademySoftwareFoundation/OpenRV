@@ -30,9 +30,7 @@ namespace IPCore
         typedef std::vector<FrameRange> FrameRangeVector;
         typedef std::vector<ImageRangeInfo> ImageRangeInfoVector;
 
-        TransitionIPInstanceNode(const std::string& name,
-                                 const NodeDefinition* definition,
-                                 IPGraph* graph, GroupIPNode* group = 0);
+        TransitionIPInstanceNode(const std::string& name, const NodeDefinition* definition, IPGraph* graph, GroupIPNode* group = 0);
 
         virtual ~TransitionIPInstanceNode();
 
@@ -47,13 +45,11 @@ namespace IPCore
 
         virtual void setInputs(const IPNodes&);
         virtual ImageRangeInfo imageRangeInfo() const;
-        virtual void mapInputToEvalFrames(size_t inputIndex, const FrameVector&,
-                                          FrameVector&) const;
+        virtual void mapInputToEvalFrames(size_t inputIndex, const FrameVector&, FrameVector&) const;
 
         virtual void propertyChanged(const Property*);
         virtual void inputRangeChanged(int inputIndex, PropagateTarget target);
-        virtual void inputImageStructureChanged(int inputIndex,
-                                                PropagateTarget target);
+        virtual void inputImageStructureChanged(int inputIndex, PropagateTarget target);
 
         void setFitInputsToOutputAspect(bool b)
         {
@@ -73,8 +69,7 @@ namespace IPCore
     protected:
         void computeRanges();
         int inputFrame(size_t, int, bool unconstrained = false);
-        void mapInputToEvalFramesInternal(size_t inputIndex, const FrameVector&,
-                                          FrameVector&) const;
+        void mapInputToEvalFramesInternal(size_t inputIndex, const FrameVector&, FrameVector&) const;
 
         void lazyUpdateRanges() const;
         void updateChosenAudioInput();

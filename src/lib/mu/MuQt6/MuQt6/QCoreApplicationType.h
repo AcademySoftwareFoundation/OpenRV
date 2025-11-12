@@ -42,8 +42,7 @@ namespace Mu
         //  Constructors
         //
 
-        QCoreApplicationType(Context* context, const char* name,
-                             Class* superClass = 0, Class* superClass2 = 0);
+        QCoreApplicationType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QCoreApplicationType();
 
@@ -85,17 +84,11 @@ namespace Mu
 
         void customEvent_pub(QEvent* event) { customEvent(event); }
 
-        void customEvent_pub_parent(QEvent* event)
-        {
-            QCoreApplication::customEvent(event);
-        }
+        void customEvent_pub_parent(QEvent* event) { QCoreApplication::customEvent(event); }
 
         void timerEvent_pub(QTimerEvent* event) { timerEvent(event); }
 
-        void timerEvent_pub_parent(QTimerEvent* event)
-        {
-            QCoreApplication::timerEvent(event);
-        }
+        void timerEvent_pub_parent(QTimerEvent* event) { QCoreApplication::timerEvent(event); }
 
     public:
         const QCoreApplicationType* _baseType;
@@ -103,11 +96,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance* QCoreApplicationType::cachedInstance(
-        const QCoreApplicationType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QCoreApplicationType::cachedInstance(const QCoreApplicationType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

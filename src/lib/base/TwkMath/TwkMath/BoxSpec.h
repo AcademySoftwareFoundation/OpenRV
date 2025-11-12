@@ -24,18 +24,14 @@ namespace TwkMath
     // VEC2I
     //******************************************************************************
     //******************************************************************************
-    template <> inline bool Box<Vec2i>::isEmpty() const
-    {
-        return (min.x > max.x || min.y > max.y);
-    }
+    template <> inline bool Box<Vec2i>::isEmpty() const { return (min.x > max.x || min.y > max.y); }
 
     //******************************************************************************
     template <> inline bool Box<Vec2i>::isInfinite() const
     {
         static const int mini = Math<int>::min();
         static const int maxi = Math<int>::max();
-        return (min.x == mini && min.y == mini && max.x == maxi
-                && max.y == maxi);
+        return (min.x == mini && min.y == mini && max.x == maxi && max.y == maxi);
     }
 
     //******************************************************************************
@@ -68,15 +64,13 @@ namespace TwkMath
     template <> bool Box<Vec2i>::intersects(const Vec2i& p, int radius) const;
 
     //******************************************************************************
-    template <>
-    bool Box<Vec2i>::intersects(const Vec2i& origin, const Vec2i& dir) const;
+    template <> bool Box<Vec2i>::intersects(const Vec2i& origin, const Vec2i& dir) const;
 
     //******************************************************************************
     template <> bool Box<Vec2i>::intersects(const Box<Vec2i>& b) const;
 
     //******************************************************************************
-    template <>
-    bool Box<Vec2i>::closestInteriorPoint(const Vec2i& pt, Vec2i& ret) const;
+    template <> bool Box<Vec2i>::closestInteriorPoint(const Vec2i& pt, Vec2i& ret) const;
 
     //******************************************************************************
     template <> Box<Vec2i>& Box<Vec2i>::operator*=(const Vec2i& rhs);
@@ -114,18 +108,14 @@ namespace TwkMath
     // VEC2F
     //******************************************************************************
     //******************************************************************************
-    template <> inline bool Box<Vec2f>::isEmpty() const
-    {
-        return (min.x > max.x || min.y > max.y);
-    }
+    template <> inline bool Box<Vec2f>::isEmpty() const { return (min.x > max.x || min.y > max.y); }
 
     //******************************************************************************
     template <> inline bool Box<Vec2f>::isInfinite() const
     {
         static const float minf = Math<float>::min();
         static const float maxf = Math<float>::max();
-        return (min.x == minf && min.y == minf && max.x == maxf
-                && max.y == maxf);
+        return (min.x == minf && min.y == minf && max.x == maxf && max.y == maxf);
     }
 
     //******************************************************************************
@@ -158,15 +148,13 @@ namespace TwkMath
     template <> bool Box<Vec2f>::intersects(const Vec2f& p, float radius) const;
 
     //******************************************************************************
-    template <>
-    bool Box<Vec2f>::intersects(const Vec2f& origin, const Vec2f& dir) const;
+    template <> bool Box<Vec2f>::intersects(const Vec2f& origin, const Vec2f& dir) const;
 
     //******************************************************************************
     template <> bool Box<Vec2f>::intersects(const Box<Vec2f>& b) const;
 
     //******************************************************************************
-    template <>
-    bool Box<Vec2f>::closestInteriorPoint(const Vec2f& pt, Vec2f& ret) const;
+    template <> bool Box<Vec2f>::closestInteriorPoint(const Vec2f& pt, Vec2f& ret) const;
 
     //******************************************************************************
     template <> Box<Vec2f>& Box<Vec2f>::operator*=(const Vec2f& rhs);
@@ -204,18 +192,14 @@ namespace TwkMath
     // VEC2D
     //******************************************************************************
     //******************************************************************************
-    template <> inline bool Box<Vec2d>::isEmpty() const
-    {
-        return (min.x > max.x || min.y > max.y);
-    }
+    template <> inline bool Box<Vec2d>::isEmpty() const { return (min.x > max.x || min.y > max.y); }
 
     //******************************************************************************
     template <> inline bool Box<Vec2d>::isInfinite() const
     {
         static const double minf = Math<double>::min();
         static const double maxf = Math<double>::max();
-        return (min.x == minf && min.y == minf && max.x == maxf
-                && max.y == maxf);
+        return (min.x == minf && min.y == minf && max.x == maxf && max.y == maxf);
     }
 
     //******************************************************************************
@@ -245,19 +229,16 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <>
-    bool Box<Vec2d>::intersects(const Vec2d& p, double radius) const;
+    template <> bool Box<Vec2d>::intersects(const Vec2d& p, double radius) const;
 
     //******************************************************************************
-    template <>
-    bool Box<Vec2d>::intersects(const Vec2d& origin, const Vec2d& dir) const;
+    template <> bool Box<Vec2d>::intersects(const Vec2d& origin, const Vec2d& dir) const;
 
     //******************************************************************************
     template <> bool Box<Vec2d>::intersects(const Box<Vec2d>& b) const;
 
     //******************************************************************************
-    template <>
-    bool Box<Vec2d>::closestInteriorPoint(const Vec2d& pt, Vec2d& ret) const;
+    template <> bool Box<Vec2d>::closestInteriorPoint(const Vec2d& pt, Vec2d& ret) const;
 
     //******************************************************************************
     template <> Box<Vec2d>& Box<Vec2d>::operator*=(const Vec2d& rhs);
@@ -295,18 +276,14 @@ namespace TwkMath
     // VEC3I
     //******************************************************************************
     //******************************************************************************
-    template <> inline bool Box<Vec3i>::isEmpty() const
-    {
-        return (min.x > max.x || min.y > max.y || min.z > max.z);
-    }
+    template <> inline bool Box<Vec3i>::isEmpty() const { return (min.x > max.x || min.y > max.y || min.z > max.z); }
 
     //******************************************************************************
     template <> inline bool Box<Vec3i>::isInfinite() const
     {
         static const int mini = Math<int>::min();
         static const int maxi = Math<int>::max();
-        return (min.x == mini && min.y == mini && min.z == mini && max.x == maxi
-                && max.y == maxi && max.z == maxi);
+        return (min.x == mini && min.y == mini && min.z == mini && max.x == maxi && max.y == maxi && max.z == maxi);
     }
 
     //******************************************************************************
@@ -333,23 +310,20 @@ namespace TwkMath
     //******************************************************************************
     template <> inline bool Box<Vec3i>::intersects(const Vec3i& v) const
     {
-        return (v.x >= min.x && v.x <= max.x && v.y >= min.y && v.y <= max.y
-                && v.z >= min.z && v.z <= max.z);
+        return (v.x >= min.x && v.x <= max.x && v.y >= min.y && v.y <= max.y && v.z >= min.z && v.z <= max.z);
     }
 
     //******************************************************************************
     template <> bool Box<Vec3i>::intersects(const Vec3i& p, int radius) const;
 
     //******************************************************************************
-    template <>
-    bool Box<Vec3i>::intersects(const Vec3i& origin, const Vec3i& dir) const;
+    template <> bool Box<Vec3i>::intersects(const Vec3i& origin, const Vec3i& dir) const;
 
     //******************************************************************************
     template <> bool Box<Vec3i>::intersects(const Box<Vec3i>& b) const;
 
     //******************************************************************************
-    template <>
-    bool Box<Vec3i>::closestInteriorPoint(const Vec3i& pt, Vec3i& ret) const;
+    template <> bool Box<Vec3i>::closestInteriorPoint(const Vec3i& pt, Vec3i& ret) const;
 
     //******************************************************************************
     template <> Box<Vec3i>& Box<Vec3i>::operator*=(const Vec3i& rhs);
@@ -391,18 +365,14 @@ namespace TwkMath
     // VEC3F
     //******************************************************************************
     //******************************************************************************
-    template <> inline bool Box<Vec3f>::isEmpty() const
-    {
-        return (min.x > max.x || min.y > max.y || min.z > max.z);
-    }
+    template <> inline bool Box<Vec3f>::isEmpty() const { return (min.x > max.x || min.y > max.y || min.z > max.z); }
 
     //******************************************************************************
     template <> inline bool Box<Vec3f>::isInfinite() const
     {
         static const float minf = Math<float>::min();
         static const float maxf = Math<float>::max();
-        return (min.x == minf && min.y == minf && min.z == minf && max.x == maxf
-                && max.y == maxf && max.z == maxf);
+        return (min.x == minf && min.y == minf && min.z == minf && max.x == maxf && max.y == maxf && max.z == maxf);
     }
 
     //******************************************************************************
@@ -429,23 +399,20 @@ namespace TwkMath
     //******************************************************************************
     template <> inline bool Box<Vec3f>::intersects(const Vec3f& v) const
     {
-        return (v.x >= min.x && v.x <= max.x && v.y >= min.y && v.y <= max.y
-                && v.z >= min.z && v.z <= max.z);
+        return (v.x >= min.x && v.x <= max.x && v.y >= min.y && v.y <= max.y && v.z >= min.z && v.z <= max.z);
     }
 
     //******************************************************************************
     template <> bool Box<Vec3f>::intersects(const Vec3f& p, float radius) const;
 
     //******************************************************************************
-    template <>
-    bool Box<Vec3f>::intersects(const Vec3f& origin, const Vec3f& dir) const;
+    template <> bool Box<Vec3f>::intersects(const Vec3f& origin, const Vec3f& dir) const;
 
     //******************************************************************************
     template <> bool Box<Vec3f>::intersects(const Box<Vec3f>& b) const;
 
     //******************************************************************************
-    template <>
-    bool Box<Vec3f>::closestInteriorPoint(const Vec3f& pt, Vec3f& ret) const;
+    template <> bool Box<Vec3f>::closestInteriorPoint(const Vec3f& pt, Vec3f& ret) const;
 
     //******************************************************************************
     template <> Box<Vec3f>& Box<Vec3f>::operator*=(const Vec3f& rhs);
@@ -487,18 +454,14 @@ namespace TwkMath
     // VEC3D
     //******************************************************************************
     //******************************************************************************
-    template <> inline bool Box<Vec3d>::isEmpty() const
-    {
-        return (min.x > max.x || min.y > max.y || min.z > max.z);
-    }
+    template <> inline bool Box<Vec3d>::isEmpty() const { return (min.x > max.x || min.y > max.y || min.z > max.z); }
 
     //******************************************************************************
     template <> inline bool Box<Vec3d>::isInfinite() const
     {
         static const double minf = Math<double>::min();
         static const double maxf = Math<double>::max();
-        return (min.x == minf && min.y == minf && min.z == minf && max.x == maxf
-                && max.y == maxf && max.z == maxf);
+        return (min.x == minf && min.y == minf && min.z == minf && max.x == maxf && max.y == maxf && max.z == maxf);
     }
 
     //******************************************************************************
@@ -525,24 +488,20 @@ namespace TwkMath
     //******************************************************************************
     template <> inline bool Box<Vec3d>::intersects(const Vec3d& v) const
     {
-        return (v.x >= min.x && v.x <= max.x && v.y >= min.y && v.y <= max.y
-                && v.z >= min.z && v.z <= max.z);
+        return (v.x >= min.x && v.x <= max.x && v.y >= min.y && v.y <= max.y && v.z >= min.z && v.z <= max.z);
     }
 
     //******************************************************************************
-    template <>
-    bool Box<Vec3d>::intersects(const Vec3d& p, double radius) const;
+    template <> bool Box<Vec3d>::intersects(const Vec3d& p, double radius) const;
 
     //******************************************************************************
-    template <>
-    bool Box<Vec3d>::intersects(const Vec3d& origin, const Vec3d& dir) const;
+    template <> bool Box<Vec3d>::intersects(const Vec3d& origin, const Vec3d& dir) const;
 
     //******************************************************************************
     template <> bool Box<Vec3d>::intersects(const Box<Vec3d>& b) const;
 
     //******************************************************************************
-    template <>
-    bool Box<Vec3d>::closestInteriorPoint(const Vec3d& pt, Vec3d& ret) const;
+    template <> bool Box<Vec3d>::closestInteriorPoint(const Vec3d& pt, Vec3d& ret) const;
 
     //******************************************************************************
     template <> Box<Vec3d>& Box<Vec3d>::operator*=(const Vec3d& rhs);

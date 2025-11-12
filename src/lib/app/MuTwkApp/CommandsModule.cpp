@@ -91,107 +91,69 @@ namespace TwkApp
         globalScope()->addSymbols(new MenuItem(c, "MenuItem", 0), EndArguments);
 
         addSymbols(
-            new SymbolicConstant(c, "NeutralMenuState", "int", Value(0)),
-            new SymbolicConstant(c, "UncheckedMenuState", "int", Value(1)),
-            new SymbolicConstant(c, "CheckedMenuState", "int", Value(2)),
-            new SymbolicConstant(c, "MixedStateMenuState", "int", Value(3)),
+            new SymbolicConstant(c, "NeutralMenuState", "int", Value(0)), new SymbolicConstant(c, "UncheckedMenuState", "int", Value(1)),
+            new SymbolicConstant(c, "CheckedMenuState", "int", Value(2)), new SymbolicConstant(c, "MixedStateMenuState", "int", Value(3)),
             new SymbolicConstant(c, "DisabledMenuState", "int", Value(-1)),
 
-            new Function(c, "eval", CommandsModule::eval, None, Parameters,
-                         new Param(c, "text", "string"), Return, "string", End),
+            new Function(c, "eval", CommandsModule::eval, None, Parameters, new Param(c, "text", "string"), Return, "string", End),
 
-            new Function(c, "undo", CommandsModule::undo, None, Return, "void",
+            new Function(c, "undo", CommandsModule::undo, None, Return, "void", End),
+
+            new Function(c, "redo", CommandsModule::redo, None, Return, "void", End),
+
+            new Function(c, "clearHistory", CommandsModule::clearHistory, None, Return, "void", End),
+
+            new Function(c, "beginCompoundCommand", CommandsModule::beginCompoundCommand, None, Parameters,
+                         new ParameterVariable(c, "name", "string"), Return, "void", End),
+
+            new Function(c, "endCompoundCommand", CommandsModule::endCompoundCommand, None, Return, "void", End),
+
+            new Function(c, "undoHistory", CommandsModule::undoHistory, None, Return, "string[]", End),
+
+            new Function(c, "redoHistory", CommandsModule::redoHistory, None, Return, "string[]", End),
+
+            new Function(c, "activateMode", CommandsModule::activateMode, None, Return, "void", Parameters, new Param(c, "name", "string"),
                          End),
 
-            new Function(c, "redo", CommandsModule::redo, None, Return, "void",
+            new Function(c, "isModeActive", CommandsModule::isModeActive, None, Return, "bool", Parameters, new Param(c, "name", "string"),
                          End),
 
-            new Function(c, "clearHistory", CommandsModule::clearHistory, None,
-                         Return, "void", End),
+            new Function(c, "activeModes", CommandsModule::activeModes, None, Return, "[string]", End),
 
-            new Function(c, "beginCompoundCommand",
-                         CommandsModule::beginCompoundCommand, None, Parameters,
-                         new ParameterVariable(c, "name", "string"), Return,
-                         "void", End),
-
-            new Function(c, "endCompoundCommand",
-                         CommandsModule::endCompoundCommand, None, Return,
-                         "void", End),
-
-            new Function(c, "undoHistory", CommandsModule::undoHistory, None,
-                         Return, "string[]", End),
-
-            new Function(c, "redoHistory", CommandsModule::redoHistory, None,
-                         Return, "string[]", End),
-
-            new Function(c, "activateMode", CommandsModule::activateMode, None,
-                         Return, "void", Parameters,
+            new Function(c, "deactivateMode", CommandsModule::deactivateMode, None, Return, "void", Parameters,
                          new Param(c, "name", "string"), End),
 
-            new Function(c, "isModeActive", CommandsModule::isModeActive, None,
-                         Return, "bool", Parameters,
-                         new Param(c, "name", "string"), End),
-
-            new Function(c, "activeModes", CommandsModule::activeModes, None,
-                         Return, "[string]", End),
-
-            new Function(c, "deactivateMode", CommandsModule::deactivateMode,
-                         None, Return, "void", Parameters,
-                         new Param(c, "name", "string"), End),
-
-            new Function(c, "defineMinorMode", CommandsModule::defineMinorMode,
-                         None, Return, "void", Parameters,
-                         new Param(c, "name", "string"),
-                         new Param(c, "sortKey", "string", Value(Pointer(0))),
+            new Function(c, "defineMinorMode", CommandsModule::defineMinorMode, None, Return, "void", Parameters,
+                         new Param(c, "name", "string"), new Param(c, "sortKey", "string", Value(Pointer(0))),
                          new Param(c, "order", "int", Value(0)), End),
 
-            new Function(c, "bindingDocumentation", CommandsModule::bindDoc,
-                         None, Return, "string", Parameters,
-                         new Param(c, "eventName", "string"),
-                         new Param(c, "modeName", "string", Value()),
+            new Function(c, "bindingDocumentation", CommandsModule::bindDoc, None, Return, "string", Parameters,
+                         new Param(c, "eventName", "string"), new Param(c, "modeName", "string", Value()),
                          new Param(c, "tableName", "string", Value()), End),
 
-            new Function(c, "bindings", CommandsModule::bindings, None, Return,
-                         "(string,string)[]", End),
+            new Function(c, "bindings", CommandsModule::bindings, None, Return, "(string,string)[]", End),
 
-            new Function(c, "bind", CommandsModule::bind, None, Return, "void",
-                         Parameters, new Param(c, "modeName", "string"),
-                         new Param(c, "tableName", "string"),
-                         new Param(c, "eventName", "string"),
-                         new Param(c, "func", "(void;Event)"),
+            new Function(c, "bind", CommandsModule::bind, None, Return, "void", Parameters, new Param(c, "modeName", "string"),
+                         new Param(c, "tableName", "string"), new Param(c, "eventName", "string"), new Param(c, "func", "(void;Event)"),
                          new Param(c, "description", "string", Value()), End),
 
-            new Function(c, "bindRegex", CommandsModule::bindRegex, None,
-                         Return, "void", Parameters,
-                         new Param(c, "modeName", "string"),
-                         new Param(c, "tableName", "string"),
-                         new Param(c, "eventPattern", "string"),
-                         new Param(c, "func", "(void;Event)"),
+            new Function(c, "bindRegex", CommandsModule::bindRegex, None, Return, "void", Parameters, new Param(c, "modeName", "string"),
+                         new Param(c, "tableName", "string"), new Param(c, "eventPattern", "string"), new Param(c, "func", "(void;Event)"),
                          new Param(c, "description", "string", Value()), End),
 
-            new Function(c, "unbind", CommandsModule::unbind, None, Return,
-                         "void", Parameters, new Param(c, "modeName", "string"),
-                         new Param(c, "tableName", "string"),
-                         new Param(c, "eventName", "string"), End),
+            new Function(c, "unbind", CommandsModule::unbind, None, Return, "void", Parameters, new Param(c, "modeName", "string"),
+                         new Param(c, "tableName", "string"), new Param(c, "eventName", "string"), End),
 
-            new Function(c, "unbindRegex", CommandsModule::unbindRegex, None,
-                         Return, "void", Parameters,
-                         new Param(c, "modeName", "string"),
-                         new Param(c, "tableName", "string"),
-                         new Param(c, "eventName", "string"), End),
+            new Function(c, "unbindRegex", CommandsModule::unbindRegex, None, Return, "void", Parameters,
+                         new Param(c, "modeName", "string"), new Param(c, "tableName", "string"), new Param(c, "eventName", "string"), End),
 
-            new Function(c, "setEventTableBBox", CommandsModule::setTableBBox,
-                         None, Return, "void", Parameters,
-                         new Param(c, "modeName", "string"),
-                         new Param(c, "tableName", "string"),
-                         new Param(c, "min", "vector float[2]"),
+            new Function(c, "setEventTableBBox", CommandsModule::setTableBBox, None, Return, "void", Parameters,
+                         new Param(c, "modeName", "string"), new Param(c, "tableName", "string"), new Param(c, "min", "vector float[2]"),
                          new Param(c, "max", "vector float[2]"), End),
 
-            new Function(c, "defineModeMenu", CommandsModule::defineModeMenu,
-                         None, Return, "void", Parameters,
-                         new Param(c, "mode", "string"),
-                         new Param(c, "menu", "MenuItem[]"),
-                         new Param(c, "strict", "bool", Value(false)), End),
+            new Function(c, "defineModeMenu", CommandsModule::defineModeMenu, None, Return, "void", Parameters,
+                         new Param(c, "mode", "string"), new Param(c, "menu", "MenuItem[]"), new Param(c, "strict", "bool", Value(false)),
+                         End),
 
             // new Function(c, "isComputationInProgress",
             //              CommandsModule::isComputationInProgress, None,
@@ -213,27 +175,20 @@ namespace TwkApp
             //              Return, "float",
             //              End),
 
-            new Function(c, "pushEventTable", CommandsModule::pushEventTable,
-                         None, Return, "void", Parameters,
+            new Function(c, "pushEventTable", CommandsModule::pushEventTable, None, Return, "void", Parameters,
                          new Param(c, "table", "string"), End),
 
-            new Function(c, "popEventTable", CommandsModule::popEventTable,
-                         None, Return, "void", End),
+            new Function(c, "popEventTable", CommandsModule::popEventTable, None, Return, "void", End),
 
-            new Function(c, "popEventTable", CommandsModule::popNamedEventTable,
-                         None, Return, "void", Parameters,
+            new Function(c, "popEventTable", CommandsModule::popNamedEventTable, None, Return, "void", Parameters,
                          new Param(c, "table", "string"), End),
 
-            new Function(c, "activeEventTables",
-                         CommandsModule::activeEventTables, None, Return,
-                         "[string]", End),
+            new Function(c, "activeEventTables", CommandsModule::activeEventTables, None, Return, "[string]", End),
 
-            new Function(c, "contractSequences", CommandsModule::contractSeq,
-                         None, Return, "string[]", Parameters,
+            new Function(c, "contractSequences", CommandsModule::contractSeq, None, Return, "string[]", Parameters,
                          new Param(c, "files", "string[]"), End),
 
-            new Function(c, "sequenceOfFile", CommandsModule::sequenceOfFile,
-                         None, Return, "(string,int)", Parameters,
+            new Function(c, "sequenceOfFile", CommandsModule::sequenceOfFile, None, Return, "(string,int)", Parameters,
                          new Param(c, "file", "string"), End),
 
             EndArguments);
@@ -251,14 +206,11 @@ namespace TwkApp
         }
     }
 
-    static void throwBadArgumentException(const Mu::Node& node,
-                                          Mu::Thread& thread, std::string msg)
+    static void throwBadArgumentException(const Mu::Node& node, Mu::Thread& thread, std::string msg)
     {
         ostringstream str;
-        const Mu::MuLangContext* context =
-            static_cast<const Mu::MuLangContext*>(thread.context());
-        ExceptionType::Exception* e =
-            new ExceptionType::Exception(context->exceptionType());
+        const Mu::MuLangContext* context = static_cast<const Mu::MuLangContext*>(thread.context());
+        ExceptionType::Exception* e = new ExceptionType::Exception(context->exceptionType());
         str << "in " << node.symbol()->fullyQualifiedName() << ": " << msg;
         e->string() += str.str().c_str();
         thread.setException(e);
@@ -271,12 +223,10 @@ namespace TwkApp
     {
         Process* p = NODE_THREAD.process();
         const String* text = NODE_ARG_OBJECT(0, StringType::String);
-        const StringType* stype =
-            static_cast<const Mu::StringType*>(NODE_THIS.type());
+        const StringType* stype = static_cast<const Mu::StringType*>(NODE_THIS.type());
         MuLangContext* c = static_cast<MuLangContext*>(p->context());
         Context::ModuleList modules;
-        String* s = stype->allocate(
-            muEval(c, p, modules, text->c_str(), "commands.eval"));
+        String* s = stype->allocate(muEval(c, p, modules, text->c_str(), "commands.eval"));
         NODE_RETURN(s);
     }
 
@@ -340,12 +290,9 @@ namespace TwkApp
     namespace
     {
 
-        void compileHistoryDescriptions(const TwkApp::CommandHistory* history,
-                                        bool undo, vector<string>& array,
-                                        size_t indent = 0)
+        void compileHistoryDescriptions(const TwkApp::CommandHistory* history, bool undo, vector<string>& array, size_t indent = 0)
         {
-            const TwkApp::CommandStack& stack =
-                undo ? history->undoStack() : history->redoStack();
+            const TwkApp::CommandStack& stack = undo ? history->undoStack() : history->redoStack();
 
             for (int i = 0; i < stack.size(); i++)
             {
@@ -359,8 +306,7 @@ namespace TwkApp
 
                 array.push_back(str.str());
 
-                if (const TwkApp::CompoundCommand* cc =
-                        dynamic_cast<const TwkApp::CompoundCommand*>(stack[i]))
+                if (const TwkApp::CompoundCommand* cc = dynamic_cast<const TwkApp::CompoundCommand*>(stack[i]))
                 {
                     compileHistoryDescriptions(cc, undo, array, indent + 1);
                 }
@@ -374,10 +320,8 @@ namespace TwkApp
         Process* p = NODE_THREAD.process();
         Document* d = currentDocument();
 
-        const Mu::DynamicArrayType* atype =
-            static_cast<const Mu::DynamicArrayType*>(NODE_THIS.type());
-        const Mu::StringType* stype =
-            static_cast<const Mu::StringType*>(atype->elementType());
+        const Mu::DynamicArrayType* atype = static_cast<const Mu::DynamicArrayType*>(NODE_THIS.type());
+        const Mu::StringType* stype = static_cast<const Mu::StringType*>(atype->elementType());
 
         DynamicArray* array = new DynamicArray(atype, 1);
 
@@ -398,10 +342,8 @@ namespace TwkApp
         Process* p = NODE_THREAD.process();
         Document* d = currentDocument();
 
-        const Mu::DynamicArrayType* atype =
-            static_cast<const Mu::DynamicArrayType*>(NODE_THIS.type());
-        const Mu::StringType* stype =
-            static_cast<const Mu::StringType*>(atype->elementType());
+        const Mu::DynamicArrayType* atype = static_cast<const Mu::DynamicArrayType*>(NODE_THIS.type());
+        const Mu::StringType* stype = static_cast<const Mu::StringType*>(atype->elementType());
 
         DynamicArray* array = new DynamicArray(atype, 1);
         const TwkApp::CommandStack& redoStack = d->redoStack();
@@ -438,8 +380,7 @@ namespace TwkApp
         String* modeName = NODE_ARG_OBJECT(0, StringType::String);
 
         if (!modeName)
-            throwBadArgumentException(NODE_THIS, NODE_THREAD,
-                                      "Nil argument to function");
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "Nil argument to function");
 
         d->activateMode(modeName->c_str());
     }
@@ -456,8 +397,7 @@ namespace TwkApp
         }
         else
         {
-            throwBadArgumentException(NODE_THIS, NODE_THREAD,
-                                      "Nil argument to function");
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "Nil argument to function");
         }
 
         NODE_RETURN(b);
@@ -558,8 +498,7 @@ namespace TwkApp
 
         if (!modeName || !tableName || !eventName)
         {
-            throwBadArgumentException(NODE_THIS, NODE_THREAD,
-                                      "Nil argument to function");
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "Nil argument to function");
         }
 
         if (Mode* mode = d->findModeByName(modeName->c_str()))
@@ -597,8 +536,7 @@ namespace TwkApp
 
         if (!modeName || !tableName || !eventName)
         {
-            throwBadArgumentException(NODE_THIS, NODE_THREAD,
-                                      "Nil argument to function");
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "Nil argument to function");
         }
 
         if (Mode* mode = d->findModeByName(modeName->c_str()))
@@ -629,11 +567,9 @@ namespace TwkApp
     {
         Process* p = NODE_THREAD.process();
         Document* d = currentDocument();
-        const Mu::MuLangContext* c =
-            static_cast<const Mu::MuLangContext*>(NODE_THREAD.context());
+        const Mu::MuLangContext* c = static_cast<const Mu::MuLangContext*>(NODE_THREAD.context());
 
-        const DynamicArrayType* atype =
-            (const DynamicArrayType*)NODE_THIS.type();
+        const DynamicArrayType* atype = (const DynamicArrayType*)NODE_THIS.type();
         const Class* ttype = (const Class*)atype->elementType();
         DynamicArray* array = new DynamicArray(atype, 1);
 
@@ -658,8 +594,7 @@ namespace TwkApp
                 String* doc = c->stringType()->allocate(i->second->docString());
 
                 ClassInstance* tuple = ClassInstance::allocate(ttype);
-                StringTuple* st =
-                    reinterpret_cast<StringTuple*>(tuple->structure());
+                StringTuple* st = reinterpret_cast<StringTuple*>(tuple->structure());
 
                 st->a = name;
                 st->b = doc;
@@ -676,8 +611,7 @@ namespace TwkApp
     {
         Process* p = NODE_THREAD.process();
         Document* d = currentDocument();
-        const Mu::MuLangContext* c =
-            static_cast<const Mu::MuLangContext*>(NODE_THREAD.context());
+        const Mu::MuLangContext* c = static_cast<const Mu::MuLangContext*>(NODE_THREAD.context());
 
         String* eventName = NODE_ARG_OBJECT(0, StringType::String);
         String* modeName = NODE_ARG_OBJECT(1, StringType::String);
@@ -687,8 +621,7 @@ namespace TwkApp
         {
             if (Mode* mode = d->findModeByName(modeName->c_str()))
             {
-                const EventTable* table =
-                    mode->findTableByName(tableName->c_str());
+                const EventTable* table = mode->findTableByName(tableName->c_str());
 
                 if (!table)
                 {
@@ -698,8 +631,7 @@ namespace TwkApp
 
                 if (const Action* action = table->query(eventName->c_str()))
                 {
-                    String* doc =
-                        c->stringType()->allocate(action->docString());
+                    String* doc = c->stringType()->allocate(action->docString());
                     NODE_RETURN(doc);
                 }
                 else
@@ -724,8 +656,7 @@ namespace TwkApp
 
                 if (const Action* action = table->query(eventName->c_str()))
                 {
-                    String* doc =
-                        c->stringType()->allocate(action->docString());
+                    String* doc = c->stringType()->allocate(action->docString());
                     NODE_RETURN(doc);
                 }
             }
@@ -879,8 +810,7 @@ namespace TwkApp
 
         Process* p = NODE_THREAD.process();
         const ListType* ltype = static_cast<const ListType*>(NODE_THIS.type());
-        const Mu::StringType* stype =
-            static_cast<const Mu::StringType*>(ltype->elementType());
+        const Mu::StringType* stype = static_cast<const Mu::StringType*>(ltype->elementType());
         Mu::List list(p, ltype);
 
         for (int i = 0; i < tables.size(); i++)
@@ -895,15 +825,12 @@ namespace TwkApp
     NODE_IMPLEMENTATION(CommandsModule::contractSeq, Pointer)
     {
         Process* p = NODE_THREAD.process();
-        const DynamicArrayType* atype =
-            static_cast<const DynamicArrayType*>(NODE_THIS.type());
-        const StringType* stype =
-            static_cast<const StringType*>(atype->elementType());
+        const DynamicArrayType* atype = static_cast<const DynamicArrayType*>(NODE_THIS.type());
+        const StringType* stype = static_cast<const StringType*>(atype->elementType());
         DynamicArray* inArray = NODE_ARG_OBJECT(0, DynamicArray);
 
         if (!inArray)
-            throwBadArgumentException(NODE_THIS, NODE_THREAD,
-                                      "Nil argument to function");
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "Nil argument to function");
 
         if (!inArray->size())
             NODE_RETURN(inArray);
@@ -916,15 +843,13 @@ namespace TwkApp
             files[i] = inArray->element<StringType::String*>(i)->c_str();
         }
 
-        SequenceNameList seqlist =
-            sequencesInFileList(files, GlobalExtensionPredicate);
+        SequenceNameList seqlist = sequencesInFileList(files, GlobalExtensionPredicate);
 
         outArray->resize(seqlist.size());
 
         for (int i = 0; i < seqlist.size(); i++)
         {
-            outArray->element<StringType::String*>(i) =
-                stype->allocate(seqlist[i]);
+            outArray->element<StringType::String*>(i) = stype->allocate(seqlist[i]);
         }
 
         NODE_RETURN(outArray);
@@ -933,13 +858,10 @@ namespace TwkApp
     NODE_IMPLEMENTATION(CommandsModule::activeModes, Pointer)
     {
         Process* p = NODE_THREAD.process();
-        const Mu::MuLangContext* c =
-            static_cast<const Mu::MuLangContext*>(NODE_THREAD.context());
+        const Mu::MuLangContext* c = static_cast<const Mu::MuLangContext*>(NODE_THREAD.context());
 
-        const Mu::ListType* listType =
-            static_cast<const Mu::ListType*>(NODE_THIS.type());
-        const StringType* stype =
-            static_cast<const StringType*>(listType->elementType());
+        const Mu::ListType* listType = static_cast<const Mu::ListType*>(NODE_THIS.type());
+        const StringType* stype = static_cast<const StringType*>(listType->elementType());
         Document* d = currentDocument();
 
         List list(p, listType);
@@ -947,8 +869,7 @@ namespace TwkApp
 
         const Document::MinorModes& minorModes = d->minorModes();
 
-        for (Document::MinorModes::const_iterator i = minorModes.begin();
-             i != minorModes.end(); ++i)
+        for (Document::MinorModes::const_iterator i = minorModes.begin(); i != minorModes.end(); ++i)
         {
             const MinorMode* m = *i;
             list.append(stype->allocate(m->name()));
@@ -971,8 +892,7 @@ namespace TwkApp
         };
 
         string filename = file->c_str();
-        PatternFramePair pp =
-            TwkUtil::sequenceOfFile(filename, GlobalExtensionPredicate);
+        PatternFramePair pp = TwkUtil::sequenceOfFile(filename, GlobalExtensionPredicate);
 
         ClassInstance* tuple = ClassInstance::allocate(ttype);
         PatTuple* pt = reinterpret_cast<PatTuple*>(tuple->structure());

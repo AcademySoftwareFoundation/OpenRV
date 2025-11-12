@@ -31,8 +31,7 @@ namespace Mu
 
     TypeVariable::~TypeVariable() {}
 
-    Type::MatchResult TypeVariable::match(const Type* type,
-                                          Bindings& bindings) const
+    Type::MatchResult TypeVariable::match(const Type* type, Bindings& bindings) const
     {
         Bindings::iterator i = bindings.find(this);
 
@@ -49,10 +48,7 @@ namespace Mu
 
     Object* TypeVariable::newObject() const { return 0; }
 
-    void TypeVariable::outputValue(std::ostream& o, Value& value) const
-    {
-        o << "\"" << name() << "\" is a type variable";
-    }
+    void TypeVariable::outputValue(std::ostream& o, Value& value) const { o << "\"" << name() << "\" is a type variable"; }
 
     Value TypeVariable::nodeEval(const Node* n, Thread& t) const
     {

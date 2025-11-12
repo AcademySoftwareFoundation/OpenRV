@@ -17,8 +17,7 @@ namespace TwkMath
 {
 
     //******************************************************************************
-    template <typename T>
-    Box<Vec3<T>> transform(const Mat44<T>& M, const Box<Vec3<T>>& box)
+    template <typename T> Box<Vec3<T>> transform(const Mat44<T>& M, const Box<Vec3<T>>& box)
     {
         Box<Vec3<T>> newBox;
         typedef Vec3<T> Vec;
@@ -75,11 +74,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <typename T>
-    inline Box<Vec3<T>> operator*(const Mat44<T>& M, const Box<Vec3<T>>& box)
-    {
-        return transform(M, box);
-    }
+    template <typename T> inline Box<Vec3<T>> operator*(const Mat44<T>& M, const Box<Vec3<T>>& box) { return transform(M, box); }
 
     //******************************************************************************
     // Util stuff for functions below
@@ -100,8 +95,7 @@ namespace TwkMath
     // by Andrew Woo
     // from "Graphics Gems", Academic Press, 1990
     template <class VEC, class T>
-    bool boxRayIntersection(const TwkMath::Box<VEC>& box, const VEC& origin,
-                            const VEC& dir, T& resultT, VEC& result)
+    bool boxRayIntersection(const TwkMath::Box<VEC>& box, const VEC& origin, const VEC& dir, T& resultT, VEC& result)
     {
         static const size_t DIM = VEC::dimension();
 
@@ -197,9 +191,7 @@ namespace TwkMath
 
     //******************************************************************************
     // Intersection vs unterminated ray without result
-    template <class VEC>
-    inline bool boxRayIntersect(const Box<VEC>& box, const VEC& origin,
-                                const VEC& dir)
+    template <class VEC> inline bool boxRayIntersect(const Box<VEC>& box, const VEC& origin, const VEC& dir)
     {
         static VEC dummy;
         static typename VEC::value_type dummyT;
@@ -210,9 +202,8 @@ namespace TwkMath
     // Intersection of a box with a terminated ray
     // It's from Andrew Woo's Graphics Gem.
     template <class VEC, typename T>
-    inline bool boxSegmentIntersection(const Box<VEC>& box, const VEC& origin,
-                                       const VEC& dir, const T& tMin,
-                                       const T& tMax, T& resultT, VEC& result)
+    inline bool boxSegmentIntersection(const Box<VEC>& box, const VEC& origin, const VEC& dir, const T& tMin, const T& tMax, T& resultT,
+                                       VEC& result)
     {
         static VEC dummy;
         static T dummyT;
@@ -233,14 +224,11 @@ namespace TwkMath
     // Intersection of a box with a terminated ray
     // It's from Andrew Woo's Graphics Gem.
     template <class VEC, class T>
-    inline bool boxSegmentIntersect(const Box<VEC>& box, const VEC& origin,
-                                    const VEC& dir, const T& tMin,
-                                    const T& tMax)
+    inline bool boxSegmentIntersect(const Box<VEC>& box, const VEC& origin, const VEC& dir, const T& tMin, const T& tMax)
     {
         static VEC dummy;
         static T dummyT;
-        return boxSegmentIntersection(box, origin, dir, tMin, tMax, dummyT,
-                                      dummy);
+        return boxSegmentIntersection(box, origin, dir, tMin, tMax, dummyT, dummy);
     }
 
 } // End namespace TwkMath

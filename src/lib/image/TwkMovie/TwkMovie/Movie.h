@@ -132,16 +132,15 @@ namespace TwkMovie
             return *this;
         }
 
-        bool video;             /// true if movie produces images
-        int start;              /// frame start of images
-        int end;                /// frame end of images
-        int inc;                /// frames between images
-        float fps;              /// frames per second
-        float quality;          /// unused
-        bool audio;             /// true if movie produces audio
-        double audioSampleRate; /// sample rate of returned audio
-        bool
-            slowRandomAccess; /// if true random (non-sequential) access is slow
+        bool video;                   /// true if movie produces images
+        int start;                    /// frame start of images
+        int end;                      /// frame end of images
+        int inc;                      /// frames between images
+        float fps;                    /// frames per second
+        float quality;                /// unused
+        bool audio;                   /// true if movie produces audio
+        double audioSampleRate;       /// sample rate of returned audio
+        bool slowRandomAccess;        /// if true random (non-sequential) access is slow
         StringVector audioLanguages;  /// for choosing an audio track
         StringVector textLanguages;   /// for choosing a text track
         ChapterVector chapters;       /// chapter info if the movie has chapters
@@ -261,7 +260,7 @@ namespace TwkMovie
             std::string audioCodec; /// use codec when writing
             float audioQuality;     /// general quality knob (0->1)
             size_t audioChannels;   /// defaults to 2
-            double audioRate; /// defaults to TWEAK_AUDIO_DEFAULT_SAMPLE_RATE
+            double audioRate;       /// defaults to TWEAK_AUDIO_DEFAULT_SAMPLE_RATE
             bool timeRangeOverride; /// override input movie time range
             Frames frames;          /// if override is true, output these frames
             size_t threads;         /// could be 0 (not specified)
@@ -295,10 +294,9 @@ namespace TwkMovie
             {
             }
 
-            Time
-                startTime; /// The start time relative to the movie being called
-            Time duration; /// The amount of data requested
-            size_t margin; /// margin in samples
+            Time startTime; /// The start time relative to the movie being called
+            Time duration;  /// The amount of data requested
+            size_t margin;  /// margin in samples
             std::string audioLanguage;
         };
 
@@ -311,8 +309,7 @@ namespace TwkMovie
             {
             }
 
-            AudioConfiguration(TwkAudio::Time deviceRate,
-                               TwkAudio::Layout chanFormat, size_t numSamples)
+            AudioConfiguration(TwkAudio::Time deviceRate, TwkAudio::Layout chanFormat, size_t numSamples)
                 : rate(deviceRate)
                 , layout(chanFormat)
                 , bufferSize(numSamples)
@@ -321,8 +318,7 @@ namespace TwkMovie
 
             bool operator==(const AudioConfiguration& b) const
             {
-                return layout == b.layout && rate == b.rate
-                       && bufferSize == b.bufferSize;
+                return layout == b.layout && rate == b.rate && bufferSize == b.bufferSize;
             }
 
             TwkAudio::Layout layout;
@@ -365,8 +361,8 @@ namespace TwkMovie
         //  Movie API.
         //
 
-        virtual bool hasAudio() const; /// returns value from MovieInfo
-        virtual bool hasVideo() const; /// returns value from MovieInfo
+        virtual bool hasAudio() const;                /// returns value from MovieInfo
+        virtual bool hasVideo() const;                /// returns value from MovieInfo
         virtual bool canConvertAudioRate() const;     /// defaults to false
         virtual bool canConvertAudioChannels() const; /// defaults to false
 
@@ -394,8 +390,7 @@ namespace TwkMovie
         ///  create a sound track for example).
         ///
 
-        virtual void attributesAtFrame(const ReadRequest&,
-                                       FrameBufferVector& fbs);
+        virtual void attributesAtFrame(const ReadRequest&, FrameBufferVector& fbs);
 
         ///
         ///  Fill a buffer with audio data. This is the lowest level
@@ -471,11 +466,9 @@ namespace TwkMovie
         virtual int getIntAttribute(const std::string& name) const;
         virtual void setIntAttribute(const std::string& name, int value);
         virtual std::string getStringAttribute(const std::string& name) const;
-        virtual void setStringAttribute(const std::string& name,
-                                        const std::string& value);
+        virtual void setStringAttribute(const std::string& name, const std::string& value);
         virtual double getDoubleAttribute(const std::string& name) const;
-        virtual void setDoubleAttribute(const std::string& name,
-                                        double value) const;
+        virtual void setDoubleAttribute(const std::string& name, double value) const;
 
     private:
         Movie(const Movie& copy) {} /// Copy forbidden

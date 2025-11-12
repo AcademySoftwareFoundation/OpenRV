@@ -19,9 +19,7 @@ namespace IPCore
         typedef std::vector<IntProperty*> IntPropertyVector;
         typedef std::vector<StringProperty*> StringPropertyVector;
 
-        CombineIPInstanceNode(const std::string& name,
-                              const NodeDefinition* def, IPGraph* graph,
-                              GroupIPNode* group = 0);
+        CombineIPInstanceNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group = 0);
 
         virtual ~CombineIPInstanceNode();
 

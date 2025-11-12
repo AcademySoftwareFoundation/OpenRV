@@ -46,14 +46,11 @@ namespace Mu
 {
     using namespace std;
 
-    static void throwBadArgumentException(const Mu::Node& node,
-                                          Mu::Thread& thread, std::string msg)
+    static void throwBadArgumentException(const Mu::Node& node, Mu::Thread& thread, std::string msg)
     {
         ostringstream str;
-        const Mu::MuLangContext* context =
-            static_cast<const Mu::MuLangContext*>(thread.context());
-        ExceptionType::Exception* e =
-            new ExceptionType::Exception(context->exceptionType());
+        const Mu::MuLangContext* context = static_cast<const Mu::MuLangContext*>(thread.context());
+        ExceptionType::Exception* e = new ExceptionType::Exception(context->exceptionType());
         str << "in " << node.symbol()->fullyQualifiedName() << ": " << msg;
         e->string() += str.str().c_str();
         thread.setException(e);
@@ -72,9 +69,7 @@ namespace Mu
 
     static vector<Converter>* externalConverters = 0;
 
-    void PyModule::addConverterFunctions(MuToPyObjectConverter m2p,
-                                         PyObjectToMuConverter p2m,
-                                         MuOpaqueToPyObjectConverter mo2p,
+    void PyModule::addConverterFunctions(MuToPyObjectConverter m2p, PyObjectToMuConverter p2m, MuOpaqueToPyObjectConverter mo2p,
                                          PyObjectToMuOpaqueConverter p2mo)
     {
         if (!externalConverters)
@@ -113,137 +108,94 @@ namespace Mu
 
         addSymbols(pyobj, pytypeobj,
 
-                   new Function(c, "PyObject", classInstanceToPyObject, Cast,
-                                Return, "python.PyObject", Args, "?class", End),
+                   new Function(c, "PyObject", classInstanceToPyObject, Cast, Return, "python.PyObject", Args, "?class", End),
 
                    EndArguments);
 
         globalScope()->addSymbols(
 
-            new Function(c, "to_string", PyObjectToString, None, Return,
-                         "string", Args, "python.PyObject", End),
+            new Function(c, "to_string", PyObjectToString, None, Return, "string", Args, "python.PyObject", End),
 
-            new Function(c, "to_bool", PyObjectToBool, None, Return, "bool",
-                         Args, "python.PyObject", End),
+            new Function(c, "to_bool", PyObjectToBool, None, Return, "bool", Args, "python.PyObject", End),
 
-            new Function(c, "to_int", PyObjectToInt, None, Return, "int", Args,
-                         "python.PyObject", End),
+            new Function(c, "to_int", PyObjectToInt, None, Return, "int", Args, "python.PyObject", End),
 
-            new Function(c, "to_float", PyObjectToFloat, None, Return, "float",
-                         Args, "python.PyObject", End),
+            new Function(c, "to_float", PyObjectToFloat, None, Return, "float", Args, "python.PyObject", End),
 
             EndArguments);
 
         addSymbols(
-            new Function(
-                c, "Py_INCREF", nPy_INCREF, None, Return, "void", Parameters,
-                new ParameterVariable(c, "obj", "python.PyObject"), End),
-
-            new Function(
-                c, "Py_DECREF", nPy_DECREF, None, Return, "void", Parameters,
-                new ParameterVariable(c, "obj", "python.PyObject"), End),
-
-            new Function(c, "PyErr_Print", nPyErr_Print, None, Return, "void",
+            new Function(c, "Py_INCREF", nPy_INCREF, None, Return, "void", Parameters, new ParameterVariable(c, "obj", "python.PyObject"),
                          End),
 
-            new Function(c, "PyObject_GetAttr", nPyObject_GetAttr, None, Return,
-                         "python.PyObject", Parameters,
-                         new ParameterVariable(c, "obj", "python.PyObject"),
-                         new ParameterVariable(c, "name", "string"), End),
-
-            new Function(c, "PyObject_CallObject", nPyObject_CallObject, None,
-                         Return, "python.PyObject", Parameters,
-                         new ParameterVariable(c, "obj", "python.PyObject"),
-                         new ParameterVariable(c, "args", "python.PyObject"),
+            new Function(c, "Py_DECREF", nPy_DECREF, None, Return, "void", Parameters, new ParameterVariable(c, "obj", "python.PyObject"),
                          End),
 
-            new Function(c, "PyObject_CallObject", nPyObject_CallObject2, None,
-                         Return, "python.PyObject", Parameters,
-                         new ParameterVariable(c, "obj", "python.PyObject"),
-                         new ParameterVariable(c, "args", "?class"), End),
+            new Function(c, "PyErr_Print", nPyErr_Print, None, Return, "void", End),
 
-            new Function(c, "PyTuple_New", nPyTuple_New, None, Return,
-                         "python.PyObject", Parameters,
+            new Function(c, "PyObject_GetAttr", nPyObject_GetAttr, None, Return, "python.PyObject", Parameters,
+                         new ParameterVariable(c, "obj", "python.PyObject"), new ParameterVariable(c, "name", "string"), End),
+
+            new Function(c, "PyObject_CallObject", nPyObject_CallObject, None, Return, "python.PyObject", Parameters,
+                         new ParameterVariable(c, "obj", "python.PyObject"), new ParameterVariable(c, "args", "python.PyObject"), End),
+
+            new Function(c, "PyObject_CallObject", nPyObject_CallObject2, None, Return, "python.PyObject", Parameters,
+                         new ParameterVariable(c, "obj", "python.PyObject"), new ParameterVariable(c, "args", "?class"), End),
+
+            new Function(c, "PyTuple_New", nPyTuple_New, None, Return, "python.PyObject", Parameters,
                          new ParameterVariable(c, "size", "int"), End),
 
-            new Function(c, "PyTuple_Size", nPyTuple_Size, None, Return, "int",
-                         Parameters,
-                         new ParameterVariable(c, "obj", "python.PyObject"),
-                         End),
+            new Function(c, "PyTuple_Size", nPyTuple_Size, None, Return, "int", Parameters,
+                         new ParameterVariable(c, "obj", "python.PyObject"), End),
 
-            new Function(
-                c, "PyTuple_SetItem", nPyTuple_SetItem, None, Return, "int",
-                Parameters, new ParameterVariable(c, "obj", "python.PyObject"),
-                new ParameterVariable(c, "index", "int"),
-                new ParameterVariable(c, "element", "python.PyObject"), End),
+            new Function(c, "PyTuple_SetItem", nPyTuple_SetItem, None, Return, "int", Parameters,
+                         new ParameterVariable(c, "obj", "python.PyObject"), new ParameterVariable(c, "index", "int"),
+                         new ParameterVariable(c, "element", "python.PyObject"), End),
 
-            new Function(c, "PyTuple_GetItem", nPyTuple_GetItem, None, Return,
-                         "python.PyObject", Parameters,
-                         new ParameterVariable(c, "obj", "python.PyObject"),
-                         new ParameterVariable(c, "index", "int"), End),
+            new Function(c, "PyTuple_GetItem", nPyTuple_GetItem, None, Return, "python.PyObject", Parameters,
+                         new ParameterVariable(c, "obj", "python.PyObject"), new ParameterVariable(c, "index", "int"), End),
 
-            new Function(c, "PyImport_Import", nPyImport_Import, None, Return,
-                         "python.PyObject", Parameters,
+            new Function(c, "PyImport_Import", nPyImport_Import, None, Return, "python.PyObject", Parameters,
                          new ParameterVariable(c, "moduleName", "string"), End),
 
-            new Function(c, "PyString_Check", nPyString_Check, None, Return,
-                         "bool", Parameters,
-                         new ParameterVariable(c, "obj", "python.PyObject"),
-                         End),
+            new Function(c, "PyString_Check", nPyString_Check, None, Return, "bool", Parameters,
+                         new ParameterVariable(c, "obj", "python.PyObject"), End),
 
-            new Function(c, "PyBytes_Check", nPyString_Check, None, Return,
-                         "bool", Parameters,
-                         new ParameterVariable(c, "obj", "python.PyObject"),
-                         End),
+            new Function(c, "PyBytes_Check", nPyString_Check, None, Return, "bool", Parameters,
+                         new ParameterVariable(c, "obj", "python.PyObject"), End),
 
-            new Function(c, "PyFunction_Check", nPyFunction_Check, None, Return,
-                         "bool", Parameters,
-                         new ParameterVariable(c, "obj", "python.PyObject"),
-                         End),
+            new Function(c, "PyFunction_Check", nPyFunction_Check, None, Return, "bool", Parameters,
+                         new ParameterVariable(c, "obj", "python.PyObject"), End),
 
-            new Function(c, "Py_TYPE", nPy_TYPE, None, Return,
-                         "python.PyTypeObject", Parameters,
-                         new ParameterVariable(c, "obj", "python.PyObject"),
-                         End),
+            new Function(c, "Py_TYPE", nPy_TYPE, None, Return, "python.PyTypeObject", Parameters,
+                         new ParameterVariable(c, "obj", "python.PyObject"), End),
 
-            new Function(c, "PyModule_GetName", nPyModule_GetName, None, Return,
-                         "string", Parameters,
-                         new ParameterVariable(c, "obj", "python.PyObject"),
-                         End),
+            new Function(c, "PyModule_GetName", nPyModule_GetName, None, Return, "string", Parameters,
+                         new ParameterVariable(c, "obj", "python.PyObject"), End),
 
-            new Function(c, "PyModule_GetFilename", nPyModule_GetFilename, None,
-                         Return, "string", Parameters,
-                         new ParameterVariable(c, "obj", "python.PyObject"),
-                         End),
+            new Function(c, "PyModule_GetFilename", nPyModule_GetFilename, None, Return, "string", Parameters,
+                         new ParameterVariable(c, "obj", "python.PyObject"), End),
 
-            new Function(
-                c, "type_name", type_name, None, Return, "string", Parameters,
-                new ParameterVariable(c, "obj", "python.PyTypeObject"), End),
+            new Function(c, "type_name", type_name, None, Return, "string", Parameters,
+                         new ParameterVariable(c, "obj", "python.PyTypeObject"), End),
 
-            new Function(c, "is_nil", is_nil, None, Return, "bool", Parameters,
-                         new ParameterVariable(c, "obj", "python.PyObject"),
-                         End),
+            new Function(c, "is_nil", is_nil, None, Return, "bool", Parameters, new ParameterVariable(c, "obj", "python.PyObject"), End),
 
-            new Function(c, "is_nil", is_nil, None, Return, "bool", Parameters,
-                         new ParameterVariable(c, "obj", "python.PyTypeObject"),
+            new Function(c, "is_nil", is_nil, None, Return, "bool", Parameters, new ParameterVariable(c, "obj", "python.PyTypeObject"),
                          End),
 
             EndArguments);
     }
 
-    Mu::FunctionObject*
-    createFunctionObjectFromPyObject(const Mu::FunctionType* t, PyObject* pyobj)
+    Mu::FunctionObject* createFunctionObjectFromPyObject(const Mu::FunctionType* t, PyObject* pyobj)
     {
         Mu::MuLangContext* c = (Mu::MuLangContext*)t->context();
         Mu::NodeAssembler as(c);
         const Mu::Signature* sig = t->signature();
         size_t nargs = sig->size() - 1;
         const Mu::Type* rtype = sig->returnType();
-        const Mu::Type* ptype = c->findSymbolOfTypeByQualifiedName<Mu::Type>(
-            c->internName("python.PyObject"));
-        const Mu::Function* C =
-            c->findSymbolOfTypeByQualifiedName<Mu::Function>(
-                c->internName("python.PyObject_CallObject"));
+        const Mu::Type* ptype = c->findSymbolOfTypeByQualifiedName<Mu::Type>(c->internName("python.PyObject"));
+        const Mu::Function* C = c->findSymbolOfTypeByQualifiedName<Mu::Function>(c->internName("python.PyObject_CallObject"));
         assert(C);
         assert(ptype);
         PyLockObject locker;
@@ -255,22 +207,17 @@ namespace Mu
 
         string cname = "to_";
         cname += rtype->name().c_str();
-        const Mu::Function* Fcast =
-            c->findSymbolOfTypeByQualifiedName<Mu::Function>(
-                c->internName(cname.c_str()));
+        const Mu::Function* Fcast = c->findSymbolOfTypeByQualifiedName<Mu::Function>(c->internName(cname.c_str()));
 
         if (Fcast)
         {
             bool found = false;
 
-            for (const Mu::Symbol* s = Fcast->firstOverload(); s;
-                 s = s->nextOverload())
+            for (const Mu::Symbol* s = Fcast->firstOverload(); s; s = s->nextOverload())
             {
-                if (const Mu::Function* f =
-                        dynamic_cast<const Mu::Function*>(s))
+                if (const Mu::Function* f = dynamic_cast<const Mu::Function*>(s))
                 {
-                    if (f->returnType() == rtype && f->numArgs() == 1
-                        && f->argType(0) == ptype)
+                    if (f->returnType() == rtype && f->numArgs() == 1 && f->argType(0) == ptype)
                     {
                         found = true;
                         break;
@@ -285,8 +232,7 @@ namespace Mu
         if (!Fcast && rtype != c->voidType())
         {
             ostringstream str;
-            str << "can't create PyCallable thunk which returns "
-                << rtype->fullyQualifiedName();
+            str << "can't create PyCallable thunk which returns " << rtype->fullyQualifiedName();
             throw invalid_argument(str.str().c_str());
         }
 
@@ -302,8 +248,7 @@ namespace Mu
             ostringstream name;
             name << "_" << i;
             const Mu::Type* argType = sig->argType(i);
-            params.push_back(
-                new Mu::ParameterVariable(c, name.str().c_str(), argType));
+            params.push_back(new Mu::ParameterVariable(c, name.str().c_str(), argType));
         }
 
         as.newStackFrame();
@@ -312,16 +257,12 @@ namespace Mu
 
         if (nargs > 0)
         {
-            F = new Mu::Function(c, "__lambda", rtype, nargs,
-                                 (Mu::ParameterVariable**)&params.front(), 0,
-                                 Mu::Function::ContextDependent
-                                     | Mu::Function::LambdaExpression);
+            F = new Mu::Function(c, "__lambda", rtype, nargs, (Mu::ParameterVariable**)&params.front(), 0,
+                                 Mu::Function::ContextDependent | Mu::Function::LambdaExpression);
         }
         else
         {
-            F = new Mu::Function(c, "__lambda", rtype, 0, 0, 0,
-                                 Mu::Function::ContextDependent
-                                     | Mu::Function::LambdaExpression);
+            F = new Mu::Function(c, "__lambda", rtype, 0, 0, 0, Mu::Function::ContextDependent | Mu::Function::LambdaExpression);
         }
 
         as.scope()->addAnonymousSymbol(F);
@@ -391,8 +332,7 @@ namespace Mu
         }
         else
         {
-            throw invalid_argument(
-                "failed to build closue for PyObject because of bad cast");
+            throw invalid_argument("failed to build closue for PyObject because of bad cast");
         }
 
         fobj->setFunction(F);
@@ -402,8 +342,7 @@ namespace Mu
     //
     //  Convert a PyObject to a Value
     //
-    Value PyModule::py2mu(MuLangContext* c, Process* p, const Type* t,
-                          PyObject* pobj)
+    Value PyModule::py2mu(MuLangContext* c, Process* p, const Type* t, PyObject* pobj)
     {
         PyLockObject locker;
 
@@ -505,15 +444,13 @@ namespace Mu
             if (PyUnicode_Check(pobj))
             {
                 PyObject* utf8 = PyUnicode_AsUTF8String(pobj);
-                Value ret(
-                    Pointer(c->stringType()->allocate(PyBytes_AsString(utf8))));
+                Value ret(Pointer(c->stringType()->allocate(PyBytes_AsString(utf8))));
                 Py_XDECREF(utf8);
                 return ret;
             }
             else if (PyBytes_Check(pobj))
             {
-                return Value(
-                    Pointer(c->stringType()->allocate(PyBytes_AsString(pobj))));
+                return Value(Pointer(c->stringType()->allocate(PyBytes_AsString(pobj))));
             }
             else
             {
@@ -543,10 +480,8 @@ namespace Mu
             if (PyTuple_Check(pobj) && PyTuple_Size(pobj) == 2)
             {
                 Vector2f vec;
-                vec[0] = py2mu(c, p, c->floatType(), PyTuple_GetItem(pobj, 0))
-                             ._float;
-                vec[1] = py2mu(c, p, c->floatType(), PyTuple_GetItem(pobj, 1))
-                             ._float;
+                vec[0] = py2mu(c, p, c->floatType(), PyTuple_GetItem(pobj, 0))._float;
+                vec[1] = py2mu(c, p, c->floatType(), PyTuple_GetItem(pobj, 1))._float;
                 return Value(vec);
             }
             else
@@ -559,12 +494,9 @@ namespace Mu
             if (PyTuple_Check(pobj) && PyTuple_Size(pobj) == 3)
             {
                 Vector3f vec;
-                vec[0] = py2mu(c, p, c->floatType(), PyTuple_GetItem(pobj, 0))
-                             ._float;
-                vec[1] = py2mu(c, p, c->floatType(), PyTuple_GetItem(pobj, 1))
-                             ._float;
-                vec[2] = py2mu(c, p, c->floatType(), PyTuple_GetItem(pobj, 2))
-                             ._float;
+                vec[0] = py2mu(c, p, c->floatType(), PyTuple_GetItem(pobj, 0))._float;
+                vec[1] = py2mu(c, p, c->floatType(), PyTuple_GetItem(pobj, 1))._float;
+                vec[2] = py2mu(c, p, c->floatType(), PyTuple_GetItem(pobj, 2))._float;
                 return Value(vec);
             }
             else
@@ -577,20 +509,15 @@ namespace Mu
             if (PyTuple_Check(pobj) && PyTuple_Size(pobj) == 4)
             {
                 Vector4f vec;
-                vec[0] = py2mu(c, p, c->floatType(), PyTuple_GetItem(pobj, 0))
-                             ._float;
-                vec[1] = py2mu(c, p, c->floatType(), PyTuple_GetItem(pobj, 1))
-                             ._float;
-                vec[2] = py2mu(c, p, c->floatType(), PyTuple_GetItem(pobj, 2))
-                             ._float;
-                vec[3] = py2mu(c, p, c->floatType(), PyTuple_GetItem(pobj, 3))
-                             ._float;
+                vec[0] = py2mu(c, p, c->floatType(), PyTuple_GetItem(pobj, 0))._float;
+                vec[1] = py2mu(c, p, c->floatType(), PyTuple_GetItem(pobj, 1))._float;
+                vec[2] = py2mu(c, p, c->floatType(), PyTuple_GetItem(pobj, 2))._float;
+                vec[3] = py2mu(c, p, c->floatType(), PyTuple_GetItem(pobj, 3))._float;
                 return Value(vec);
             }
             else
             {
-                throw invalid_argument(
-                    "expecting (float, float, float, float) tuple");
+                throw invalid_argument("expecting (float, float, float, float) tuple");
             }
         }
         else if (const TupleType* ttype = dynamic_cast<const TupleType*>(t))
@@ -610,12 +537,9 @@ namespace Mu
 
                     for (size_t i = 0; i < n; i++)
                     {
-                        Value pyval =
-                            py2mu(c, p, types[i], PyTuple_GetItem(pobj, i));
-                        ValuePointer ptr =
-                            types[i]->machineRep()->valuePointer(pyval);
-                        memcpy(mutuple->field(i), ptr,
-                               types[i]->machineRep()->size());
+                        Value pyval = py2mu(c, p, types[i], PyTuple_GetItem(pobj, i));
+                        ValuePointer ptr = types[i]->machineRep()->valuePointer(pyval);
+                        memcpy(mutuple->field(i), ptr, types[i]->machineRep()->size());
                     }
 
                     return Value(mutuple);
@@ -647,8 +571,7 @@ namespace Mu
                     list.appendDefaultValue();
                     Value pyval = py2mu(c, p, etype, PyList_GetItem(pobj, i));
                     ValuePointer ptr = etype->machineRep()->valuePointer(pyval);
-                    memcpy(list.valuePointer(), ptr,
-                           etype->machineRep()->size());
+                    memcpy(list.valuePointer(), ptr, etype->machineRep()->size());
                 }
 
                 return Value(list.head());
@@ -658,8 +581,7 @@ namespace Mu
                 throw invalid_argument("expecting list");
             }
         }
-        else if (const DynamicArrayType* atype =
-                     dynamic_cast<const DynamicArrayType*>(t))
+        else if (const DynamicArrayType* atype = dynamic_cast<const DynamicArrayType*>(t))
         {
             if (pobj == Py_None)
             {
@@ -676,8 +598,7 @@ namespace Mu
                 {
                     Value pyval = py2mu(c, p, etype, PyList_GetItem(pobj, i));
                     ValuePointer ptr = etype->machineRep()->valuePointer(pyval);
-                    memcpy(array->elementPointer(i), ptr,
-                           etype->machineRep()->size());
+                    memcpy(array->elementPointer(i), ptr, etype->machineRep()->size());
                 }
 
                 return Value(array);
@@ -687,8 +608,7 @@ namespace Mu
                 throw invalid_argument("expecting dynamic array");
             }
         }
-        else if (const FixedArrayType* atype =
-                     dynamic_cast<const FixedArrayType*>(t))
+        else if (const FixedArrayType* atype = dynamic_cast<const FixedArrayType*>(t))
         {
             if (pobj == Py_None)
             {
@@ -701,17 +621,13 @@ namespace Mu
                 if (n == PyList_Size(pobj))
                 {
                     const Type* etype = atype->elementType();
-                    FixedArray* array = static_cast<FixedArray*>(
-                        ClassInstance::allocate(atype));
+                    FixedArray* array = static_cast<FixedArray*>(ClassInstance::allocate(atype));
 
                     for (size_t i = 0; i < n; i++)
                     {
-                        Value pyval =
-                            py2mu(c, p, etype, PyList_GetItem(pobj, i));
-                        ValuePointer ptr =
-                            etype->machineRep()->valuePointer(pyval);
-                        memcpy(array->elementPointer(i), ptr,
-                               etype->machineRep()->size());
+                        Value pyval = py2mu(c, p, etype, PyList_GetItem(pobj, i));
+                        ValuePointer ptr = etype->machineRep()->valuePointer(pyval);
+                        memcpy(array->elementPointer(i), ptr, etype->machineRep()->size());
                     }
 
                     return Value(array);
@@ -726,8 +642,7 @@ namespace Mu
                 throw invalid_argument("expecting fixed array");
             }
         }
-        else if (const FunctionType* ftype =
-                     dynamic_cast<const FunctionType*>(t))
+        else if (const FunctionType* ftype = dynamic_cast<const FunctionType*>(t))
         {
             if (pobj == Py_None)
             {
@@ -759,8 +674,7 @@ namespace Mu
                 {
                     const Type* ftype = muobj->fieldType(i);
                     const char* name = vars[i]->name().c_str();
-                    PyObject* key =
-                        PyUnicode_DecodeUTF8(name, strlen(name), "ignore");
+                    PyObject* key = PyUnicode_DecodeUTF8(name, strlen(name), "ignore");
                     PyObject* val = PyDict_GetItem(pobj, key); // borrowed ref
                     Value muval = py2mu(c, p, ftype, val);
                     ValuePointer ptr = ftype->machineRep()->valuePointer(muval);
@@ -826,8 +740,7 @@ namespace Mu
     //
     //  Convert a Value to a PyObject
     //
-    PyObject* PyModule::mu2py(MuLangContext* c, Process* p, const Type* t,
-                              const Value& v)
+    PyObject* PyModule::mu2py(MuLangContext* c, Process* p, const Type* t, const Value& v)
     {
         PyLockObject locker;
 
@@ -876,8 +789,7 @@ namespace Mu
         {
             if (!v._Pointer)
                 Py_RETURN_NONE;
-            StringType::String* s =
-                reinterpret_cast<StringType::String*>(v._Pointer);
+            StringType::String* s = reinterpret_cast<StringType::String*>(v._Pointer);
 
             const char* utf8 = s->c_str(); // its utf8 by definition
             PyObject* o = PyUnicode_DecodeUTF8(utf8, strlen(utf8), "ignore");
@@ -894,13 +806,11 @@ namespace Mu
         }
         else if (t == c->vec3fType())
         {
-            return Py_BuildValue("(fff)", v._Vector3f[0], v._Vector3f[1],
-                                 v._Vector3f[2]);
+            return Py_BuildValue("(fff)", v._Vector3f[0], v._Vector3f[1], v._Vector3f[2]);
         }
         else if (t == c->vec4fType())
         {
-            return Py_BuildValue("(ffff)", v._Vector4f[0], v._Vector4f[1],
-                                 v._Vector4f[2], v._Vector4f[3]);
+            return Py_BuildValue("(ffff)", v._Vector4f[0], v._Vector4f[1], v._Vector4f[2], v._Vector4f[3]);
         }
         else if (const TupleType* ttype = dynamic_cast<const TupleType*>(t))
         {
@@ -915,15 +825,13 @@ namespace Mu
             for (size_t i = 0; i < n; i++)
             {
                 ValuePointer vp = o->field(i);
-                PyObject* pyobj =
-                    mu2py(c, p, types[i], types[i]->machineRep()->value(vp));
+                PyObject* pyobj = mu2py(c, p, types[i], types[i]->machineRep()->value(vp));
                 PyTuple_SetItem(tuple, i, pyobj);
             }
 
             return tuple;
         }
-        else if (const DynamicArrayType* atype =
-                     dynamic_cast<const DynamicArrayType*>(t))
+        else if (const DynamicArrayType* atype = dynamic_cast<const DynamicArrayType*>(t))
         {
             if (!v._Pointer)
                 Py_RETURN_NONE;
@@ -936,15 +844,13 @@ namespace Mu
             for (size_t i = 0; i < n; i++)
             {
                 ValuePointer vp = (ValuePointer)array->elementPointer(i);
-                PyObject* pyobj =
-                    mu2py(c, p, etype, etype->machineRep()->value(vp));
+                PyObject* pyobj = mu2py(c, p, etype, etype->machineRep()->value(vp));
                 PyList_SetItem(list, i, pyobj);
             }
 
             return list;
         }
-        else if (const FixedArrayType* atype =
-                     dynamic_cast<const FixedArrayType*>(t))
+        else if (const FixedArrayType* atype = dynamic_cast<const FixedArrayType*>(t))
         {
             if (!v._Pointer)
                 Py_RETURN_NONE;
@@ -957,8 +863,7 @@ namespace Mu
             for (size_t i = 0; i < n; i++)
             {
                 ValuePointer vp = (ValuePointer)array->elementPointer(i);
-                PyObject* pyobj =
-                    mu2py(c, p, etype, etype->machineRep()->value(vp));
+                PyObject* pyobj = mu2py(c, p, etype, etype->machineRep()->value(vp));
                 PyList_SetItem(list, i, pyobj);
             }
 
@@ -979,9 +884,7 @@ namespace Mu
 
             for (List list(p, mlist); !list.isNil(); list++, i++)
             {
-                PyObject* pyobj =
-                    mu2py(c, p, etype,
-                          etype->machineRep()->value(list.valuePointer()));
+                PyObject* pyobj = mu2py(c, p, etype, etype->machineRep()->value(list.valuePointer()));
                 PyList_SetItem(pylist, i, pyobj);
             }
 
@@ -1018,11 +921,9 @@ namespace Mu
             {
                 const Type* ftype = obj->fieldType(i);
                 assert(ftype == vars[i]->storageClass());
-                PyObject* pyobj = mu2py(
-                    c, p, ftype, ftype->machineRep()->value(obj->field(i)));
+                PyObject* pyobj = mu2py(c, p, ftype, ftype->machineRep()->value(obj->field(i)));
                 const char* name = vars[i]->name().c_str();
-                PyObject* key =
-                    PyUnicode_DecodeUTF8(name, strlen(name), "ignore");
+                PyObject* key = PyUnicode_DecodeUTF8(name, strlen(name), "ignore");
                 PyDict_SetItem(dict, key, pyobj);
                 //
                 // We have to Py_XDECREF key and pyobj otherwise
@@ -1156,8 +1057,7 @@ namespace Mu
 
         if (!obj)
         {
-            throwBadArgumentException(NODE_THIS, NODE_THREAD,
-                                      "Nil PyObject given");
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "Nil PyObject given");
         }
 
         if (!PyTuple_Check(args))
@@ -1211,14 +1111,12 @@ namespace Mu
 
         if (!pyobj)
         {
-            throwBadArgumentException(NODE_THIS, NODE_THREAD,
-                                      "Nil PyObject given");
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "Nil PyObject given");
         }
 
         //  Assume mu2py returns "new reference"
         //
-        PyObject* args =
-            mu2py(c, NODE_THREAD.process(), obj->type(), Value(obj));
+        PyObject* args = mu2py(c, NODE_THREAD.process(), obj->type(), Value(obj));
 
         if (!PyTuple_Check(args))
         {

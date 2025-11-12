@@ -44,8 +44,7 @@ namespace Mu
         //  Constructors
         //
 
-        QUrlQueryType(Context* context, const char* name,
-                      Class* superClass = 0);
+        QUrlQueryType(Context* context, const char* name, Class* superClass = 0);
         virtual ~QUrlQueryType();
 
         //

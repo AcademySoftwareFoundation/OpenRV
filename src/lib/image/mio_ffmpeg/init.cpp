@@ -105,19 +105,11 @@ extern "C"
                 int argc = newargs.size();
 
                 options_description desc("");
-                desc.add_options()(
-                    "bruteForce",
-                    value<int>(&bruteForce)->default_value(bruteForce),
-                    "Attempt to load any file extension")(
-                    "codecThreads",
-                    value<int>(&codecThreads)->default_value(codecThreads),
-                    "Thread count to pass to ffmpeg on codec open")(
-                    "language",
-                    value<string>(&language)->default_value(language),
-                    "Language for audio and subtitles (default: eng)")(
-                    "defaultFPS",
-                    value<double>(&defaultFPS)->default_value(defaultFPS),
-                    "For cases where there is no way to determine FPS");
+                desc.add_options()("bruteForce", value<int>(&bruteForce)->default_value(bruteForce), "Attempt to load any file extension")(
+                    "codecThreads", value<int>(&codecThreads)->default_value(codecThreads), "Thread count to pass to ffmpeg on codec open")(
+                    "language", value<string>(&language)->default_value(language),
+                    "Language for audio and subtitles (default: eng)")("defaultFPS", value<double>(&defaultFPS)->default_value(defaultFPS),
+                                                                       "For cases where there is no way to determine FPS");
 
                 variables_map vm;
                 store(parse_command_line(argc, argv, desc), vm);
@@ -130,13 +122,11 @@ extern "C"
             }
             catch (...)
             {
-                cout << "ERROR: bad MOVIEFFMPEG_ARGS = \"" << args << "\""
-                     << endl;
+                cout << "ERROR: bad MOVIEFFMPEG_ARGS = \"" << args << "\"" << endl;
             }
         }
 
-        return new TwkMovie::MovieFFMpegIO(codecIsAllowed, bruteForce,
-                                           codecThreads, language, defaultFPS);
+        return new TwkMovie::MovieFFMpegIO(codecIsAllowed, bruteForce, codecThreads, language, defaultFPS);
     }
 
     void destroy(TwkMovie::MovieFFMpegIO* plug) { delete plug; }

@@ -20,9 +20,7 @@ public:
 
     RvNetworkAccessManager(QObject*);
 
-    virtual QNetworkReply*
-    createRequest(QNetworkAccessManager::Operation operation,
-                  const QNetworkRequest& request, QIODevice* device);
+    virtual QNetworkReply* createRequest(QNetworkAccessManager::Operation operation, const QNetworkRequest& request, QIODevice* device);
 
 public slots:
     void sslErrorsManagerSlot(QNetworkReply*, QList<QSslError>);

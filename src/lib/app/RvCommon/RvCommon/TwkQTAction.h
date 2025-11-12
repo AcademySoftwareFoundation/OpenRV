@@ -26,8 +26,7 @@ namespace Rv
         Q_OBJECT
 
     public:
-        TwkQTAction(const TwkApp::Menu::Item*, RvDocument* document,
-                    QObject* parent);
+        TwkQTAction(const TwkApp::Menu::Item*, RvDocument* document, QObject* parent);
 
         const TwkApp::Menu::Item* item() const { return m_item; }
 

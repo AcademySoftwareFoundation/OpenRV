@@ -27,20 +27,14 @@ namespace TwkMovie
     namespace Shared
     {
 
-        typedef boost::interprocess::managed_shared_memory::segment_manager
-            SegmentManager;
-        typedef boost::interprocess::allocator<char, SegmentManager>
-            CharAllocator;
+        typedef boost::interprocess::managed_shared_memory::segment_manager SegmentManager;
+        typedef boost::interprocess::allocator<char, SegmentManager> CharAllocator;
 
-        typedef boost::interprocess::basic_string<char, std::char_traits<char>,
-                                                  CharAllocator>
-            String;
+        typedef boost::interprocess::basic_string<char, std::char_traits<char>, CharAllocator> String;
 
-        typedef boost::interprocess::allocator<String, SegmentManager>
-            StringAllocator;
+        typedef boost::interprocess::allocator<String, SegmentManager> StringAllocator;
 
-        typedef boost::interprocess::vector<String, StringAllocator>
-            StringVector;
+        typedef boost::interprocess::vector<String, StringAllocator> StringVector;
 
     } // namespace Shared
 
@@ -82,8 +76,7 @@ namespace TwkMovie
         std::string encodeMovieReadRequest(const Movie::ReadRequest&);
         void decodeMovieReadRequest(const std::string&, Movie::ReadRequest&);
         std::string encodeStringVector(const TwkFB::FBInfo::StringVector&);
-        void decodeStringVector(const std::string& encoded,
-                                TwkFB::FBInfo::StringVector& decoded);
+        void decodeStringVector(const std::string& encoded, TwkFB::FBInfo::StringVector& decoded);
 
         //
         //  Message parsing
@@ -91,8 +84,7 @@ namespace TwkMovie
         //  Returns a StringPair of (CMD, ARG)
         //
 
-        StringPair parseMessage(const char* processName, std::ostream* log,
-                                const std::string&);
+        StringPair parseMessage(const char* processName, std::ostream* log, const std::string&);
 
         //
         //  Message creation
@@ -100,9 +92,7 @@ namespace TwkMovie
         //  Returns message. May truncate arg if it won't fit.
         //
 
-        size_t newMessage(const char* processName, std::ostream* log,
-                          const std::string& cmd, const std::string& arg,
-                          char* outbuffer);
+        size_t newMessage(const char* processName, std::ostream* log, const std::string& cmd, const std::string& arg, char* outbuffer);
 
     } // namespace Message
 

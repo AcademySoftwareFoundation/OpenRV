@@ -14,10 +14,8 @@ namespace IPCore
 
     bool ImageFBOManager::m_imageFBOLog = false;
 
-    ImageFBO* ImageFBOManager::newImageFBO(
-        size_t width, size_t height, GLenum target, GLenum internalFormat,
-        GLenum format, GLenum type, size_t fullSerialNum,
-        const string& identifier, size_t expectedNumUses, size_t samples)
+    ImageFBO* ImageFBOManager::newImageFBO(size_t width, size_t height, GLenum target, GLenum internalFormat, GLenum format, GLenum type,
+                                           size_t fullSerialNum, const string& identifier, size_t expectedNumUses, size_t samples)
     {
         if (samples == 0)
             samples = 1;
@@ -31,14 +29,12 @@ namespace IPCore
         {
             ImageFBO* imageFBO = m_imageFBOs[i];
 
-            if (imageFBO->available && imageFBO->type == type
-                && imageFBO->format == format && imageFBO->target == target)
+            if (imageFBO->available && imageFBO->type == type && imageFBO->format == format && imageFBO->target == target)
             {
                 const GLFBO* fbo = imageFBO->fbo();
 
-                if (fbo->primaryColorFormat() == internalFormat
-                    && fbo->multiSampleSize() == samples
-                    && fbo->width() == width && fbo->height() == height)
+                if (fbo->primaryColorFormat() == internalFormat && fbo->multiSampleSize() == samples && fbo->width() == width
+                    && fbo->height() == height)
                 {
                     imageFBO->available = false;
                     imageFBO->expectedUseCount = expectedNumUses;
@@ -48,8 +44,7 @@ namespace IPCore
                     if (m_imageFBOLog)
                     {
                         cout << "INFO: ("
-                             << ") reusing GLFBO for "
-                             << identifier.substr(0, 20) << endl;
+                             << ") reusing GLFBO for " << identifier.substr(0, 20) << endl;
 
                         for (size_t i = 0; i < m_imageFBOs.size(); i++)
                         {
@@ -58,11 +53,8 @@ namespace IPCore
                             if (s.size() > 50)
                                 s = s.substr(0, 50);
 
-                            cout << "INFO:     " << i << ": "
-                                 << f->fbo()->width() << "x"
-                                 << f->fbo()->height() << ", "
-                                 << (f->available ? "available" : "used") << "/"
-                                 << f->fullSerialNum << ", " << s << endl;
+                            cout << "INFO:     " << i << ": " << f->fbo()->width() << "x" << f->fbo()->height() << ", "
+                                 << (f->available ? "available" : "used") << "/" << f->fullSerialNum << ", " << s << endl;
                         }
                     }
 
@@ -89,8 +81,7 @@ namespace IPCore
 
         if (m_imageFBOLog)
         {
-            cout << "INFO: (" << fullSerialNum << ") new FBO created for "
-                 << m_imageFBOs.size() << endl;
+            cout << "INFO: (" << fullSerialNum << ") new FBO created for " << m_imageFBOs.size() << endl;
 
             for (size_t i = 0; i < m_imageFBOs.size(); i++)
             {
@@ -99,19 +90,15 @@ namespace IPCore
                 if (s.size() > 50)
                     s = s.substr(0, 50);
 
-                cout << "INFO:     " << i << ": " << f->fbo()->width() << "x"
-                     << f->fbo()->height() << ", "
-                     << (f->available ? "available" : "used") << "/"
-                     << f->fullSerialNum << ", " << s << endl;
+                cout << "INFO:     " << i << ": " << f->fbo()->width() << "x" << f->fbo()->height() << ", "
+                     << (f->available ? "available" : "used") << "/" << f->fullSerialNum << ", " << s << endl;
             }
         }
 
         return m_imageFBOs.back();
     }
 
-    ImageFBO* ImageFBOManager::newImageFBO(const IPImage* image,
-                                           size_t fullSerialNum,
-                                           const string& identifier)
+    ImageFBO* ImageFBOManager::newImageFBO(const IPImage* image, size_t fullSerialNum, const string& identifier)
     {
         GLenum type;
         GLenum iformat;
@@ -146,28 +133,18 @@ namespace IPCore
         }
 
         return newImageFBO(image->width, image->height,
-                           image->samplerType == IPImage::Rect2DSampler
-                               ? GL_TEXTURE_RECTANGLE_ARB
-                               : GL_TEXTURE_2D,
-                           iformat, GL_RGBA, type, fullSerialNum, identifier,
-                           image->node->outputs().size(), 0);
+                           image->samplerType == IPImage::Rect2DSampler ? GL_TEXTURE_RECTANGLE_ARB : GL_TEXTURE_2D, iformat, GL_RGBA, type,
+                           fullSerialNum, identifier, image->node->outputs().size(), 0);
     }
 
-    ImageFBO* ImageFBOManager::newImageFBO(const GLFBO* fbo,
-                                           size_t fullSerialNum,
-                                           const string& identifier)
+    ImageFBO* ImageFBOManager::newImageFBO(const GLFBO* fbo, size_t fullSerialNum, const string& identifier)
     {
-        return newImageFBO(fbo->width(), fbo->height(),
-                           fbo->primaryColorTarget(), fbo->primaryColorFormat(),
-                           GL_RGBA, fbo->primaryColorType(), fullSerialNum,
-                           identifier);
+        return newImageFBO(fbo->width(), fbo->height(), fbo->primaryColorTarget(), fbo->primaryColorFormat(), GL_RGBA,
+                           fbo->primaryColorType(), fullSerialNum, identifier);
     }
 
     // find existing fbo if available, and mark it unavailable.
-    ImageFBO* ImageFBOManager::findExistingPaintFBO(const GLFBO* fbo,
-                                                    const string& identifier,
-                                                    bool& found,
-                                                    size_t& lastCmdNum,
+    ImageFBO* ImageFBOManager::findExistingPaintFBO(const GLFBO* fbo, const string& identifier, bool& found, size_t& lastCmdNum,
                                                     size_t fullSerialNum)
     {
         for (size_t i = 0; i < m_imageFBOs.size(); i++)
@@ -177,9 +154,7 @@ namespace IPCore
             size_t loc = imageFBO->identifier.find("paintCmdNo");
             if (loc != string::npos)
             {
-                if (strncmp(imageFBO->identifier.c_str(), identifier.c_str(),
-                            loc)
-                    == 0)
+                if (strncmp(imageFBO->identifier.c_str(), identifier.c_str(), loc) == 0)
                 {
                     // this means we found a fbo containing the IPImage and a
                     // number of commands (could be zero) we need to find out
@@ -188,17 +163,13 @@ namespace IPCore
                     if (m_imageFBOLog)
                     {
                         ImageFBO* i = imageFBO;
-                        cout << "INFO: found paint imageFBO "
-                             << i->fbo()->width() << "x" << i->fbo()->height()
-                             << ", " << (i->available ? "available" : "used")
-                             << "/" << i->fullSerialNum << ", " << i->identifier
-                             << endl;
+                        cout << "INFO: found paint imageFBO " << i->fbo()->width() << "x" << i->fbo()->height() << ", "
+                             << (i->available ? "available" : "used") << "/" << i->fullSerialNum << ", " << i->identifier << endl;
                     }
 
                     // the identfifier finishes with "paintCmdNo" and the number
                     // of commands painted in this imageFBO
-                    string n =
-                        imageFBO->identifier.substr(loc + strlen("paintCmdNo"));
+                    string n = imageFBO->identifier.substr(loc + strlen("paintCmdNo"));
                     lastCmdNum = atoi(n.c_str());
 
                     imageFBO->available = false;
@@ -215,8 +186,7 @@ namespace IPCore
         return 0;
     }
 
-    ImageFBO* ImageFBOManager::findExistingImageFBO(const string& identifier,
-                                                    size_t fullSerialNum)
+    ImageFBO* ImageFBOManager::findExistingImageFBO(const string& identifier, size_t fullSerialNum)
     {
         for (size_t j = 0; j < m_imageFBOs.size(); j++)
         {
@@ -229,10 +199,8 @@ namespace IPCore
                     ImageFBO* i = imageFBO;
                     // string s = i->identifier;
                     // if (s.size() > 50) s = s.substr(0, 50);
-                    cout << "INFO: (" << fullSerialNum << ") found imageFBO "
-                         << i->fbo()->width() << "x" << i->fbo()->height()
-                         << ", " << (i->available ? "available" : "used") << "/"
-                         << i->fullSerialNum << ", " << i->identifier << endl;
+                    cout << "INFO: (" << fullSerialNum << ") found imageFBO " << i->fbo()->width() << "x" << i->fbo()->height() << ", "
+                         << (i->available ? "available" : "used") << "/" << i->fullSerialNum << ", " << i->identifier << endl;
                 }
 
                 imageFBO->available = false;
@@ -282,10 +250,8 @@ namespace IPCore
                     if (s.size() > 50)
                         s = s.substr(0, 50);
 
-                    cout << "INFO: gc (" << fullSerialNum << ") "
-                         << i->fbo()->width() << "x" << i->fbo()->height()
-                         << ", " << (i->available ? "available" : "used") << "/"
-                         << i->fullSerialNum << ", " << s << endl;
+                    cout << "INFO: gc (" << fullSerialNum << ") " << i->fbo()->width() << "x" << i->fbo()->height() << ", "
+                         << (i->available ? "available" : "used") << "/" << i->fullSerialNum << ", " << s << endl;
                 }
 
                 m_totalSizeInBytes -= i->fbo()->totalSizeInBytes();
@@ -423,8 +389,7 @@ namespace IPCore
         m_fboSet.clear();
 
         ScopedLock lock1(m_textureFenceMutex);
-        for (GLFenceTextureMap::iterator i = m_textureFenceMap.begin();
-             i != m_textureFenceMap.end(); ++i)
+        for (GLFenceTextureMap::iterator i = m_textureFenceMap.begin(); i != m_textureFenceMap.end(); ++i)
         {
             GLFence* f = i->second;
             if (f)
@@ -445,10 +410,8 @@ namespace IPCore
             string s = i->identifier;
             if (s.size() > 50)
                 s = s.substr(0, 50);
-            cout << "INFO: release " << i->fbo()->width() << "x"
-                 << i->fbo()->height() << ", "
-                 << (i->available ? "available" : "used") << "/"
-                 << i->fullSerialNum << ", " << s << endl;
+            cout << "INFO: release " << i->fbo()->width() << "x" << i->fbo()->height() << ", " << (i->available ? "available" : "used")
+                 << "/" << i->fullSerialNum << ", " << s << endl;
         }
 
         deleteFBOFence(fbo);
@@ -490,8 +453,7 @@ namespace IPCore
         m_imageFBOs.clear();
     }
 
-    ImageFBO* ImageFBOManager::newOutputOnlyImageFBO(GLenum format, size_t w,
-                                                     size_t h, size_t samples)
+    ImageFBO* ImageFBOManager::newOutputOnlyImageFBO(GLenum format, size_t w, size_t h, size_t samples)
     {
         if (samples == 0)
             samples = 1;
@@ -504,8 +466,7 @@ namespace IPCore
             {
                 const GLFBO* fbo = target->fbo();
 
-                if (fbo->primaryColorFormat() == format
-                    && fbo->multiSampleSize() == samples)
+                if (fbo->primaryColorFormat() == format && fbo->multiSampleSize() == samples)
                 {
                     target->available = false;
                     return target;

@@ -57,8 +57,7 @@ namespace Rv
         class ScreenView : public QOpenGLWidget
         {
         public:
-            ScreenView(const QSurfaceFormat& fmt, QWidget* parent,
-                       QOpenGLWidget* glViewShare, Qt::WindowFlags flags);
+            ScreenView(const QSurfaceFormat& fmt, QWidget* parent, QOpenGLWidget* glViewShare, Qt::WindowFlags flags);
 
             void initializeGL() override;
             void paintGL() override;
@@ -106,19 +105,14 @@ namespace Rv
 
         struct DesktopVideoFormat : public TwkApp::VideoDevice::VideoFormat
         {
-            DesktopVideoFormat(size_t w, size_t h, float pa, float ps,
-                               float hertz, const std::string& desc,
-                               void* xtradata = 0)
+            DesktopVideoFormat(size_t w, size_t h, float pa, float ps, float hertz, const std::string& desc, void* xtradata = 0)
                 : TwkApp::VideoDevice::VideoFormat(w, h, pa, ps, hertz, desc)
                 , data(xtradata)
             {
             }
 
-            DesktopVideoFormat(const TwkApp::VideoDevice::VideoFormat& v,
-                               void* xtradata = 0)
-                : TwkApp::VideoDevice::VideoFormat(v.width, v.height,
-                                                   v.pixelAspect, v.pixelScale,
-                                                   v.hz, v.description)
+            DesktopVideoFormat(const TwkApp::VideoDevice::VideoFormat& v, void* xtradata = 0)
+                : TwkApp::VideoDevice::VideoFormat(v.width, v.height, v.pixelAspect, v.pixelScale, v.hz, v.description)
                 ,
 
                 data(xtradata)
@@ -135,8 +129,7 @@ namespace Rv
         //
         //
 
-        DesktopVideoDevice(TwkApp::VideoModule*, const std::string& name,
-                           int qtscreen, const QTGLVideoDevice* glViewShared);
+        DesktopVideoDevice(TwkApp::VideoModule*, const std::string& name, int qtscreen, const QTGLVideoDevice* glViewShared);
 
         virtual ~DesktopVideoDevice();
 
@@ -173,8 +166,7 @@ namespace Rv
 
         // virtual bool willBlockOnTransfer() const;
         virtual void transfer(const TwkGLF::GLFBO*) const;
-        virtual void transfer2(const TwkGLF::GLFBO*,
-                               const TwkGLF::GLFBO*) const;
+        virtual void transfer2(const TwkGLF::GLFBO*, const TwkGLF::GLFBO*) const;
 
         virtual void unbind() const;
 
@@ -240,20 +232,15 @@ namespace Rv
         bool useFullScreen() const;
         QRect screenGeometry() const;
 
-        static std::vector<VideoDevice*>
-        createDesktopVideoDevices(TwkApp::VideoModule* module,
-                                  const QTGLVideoDevice* shareDevice);
+        static std::vector<VideoDevice*> createDesktopVideoDevices(TwkApp::VideoModule* module, const QTGLVideoDevice* shareDevice);
 
     protected:
         void addDefaultDataFormats(size_t bits = 8);
         void sortVideoFormatsByWidth();
 
-        void setupModelviewAndProjection(float w, float h,
-                                         TwkGLF::GLPipeline*) const;
-        void fillWithTexture(const TwkGLF::GLFBO*, size_t, float, float,
-                             TwkGLF::GLPipeline*) const;
-        void fillWithTexture2(const TwkGLF::GLFBO*, const TwkGLF::GLFBO*,
-                              size_t, float, float, TwkGLF::GLPipeline*) const;
+        void setupModelviewAndProjection(float w, float h, TwkGLF::GLPipeline*) const;
+        void fillWithTexture(const TwkGLF::GLFBO*, size_t, float, float, TwkGLF::GLPipeline*) const;
+        void fillWithTexture2(const TwkGLF::GLFBO*, const TwkGLF::GLFBO*, size_t, float, float, TwkGLF::GLPipeline*) const;
 
         bool maybeFramePacked(const TwkApp::VideoDevice::VideoFormat&) const;
 

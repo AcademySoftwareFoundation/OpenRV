@@ -30,8 +30,7 @@ namespace IPCore
     bool FormatIPNode::defaultAllowFP = true;
     string FormatIPNode::defaultResampleMethod = "area";
 
-    IPNode::ImageStructureInfo outResFromParams(float w, float h,
-                                                FormatIPNode::Params& s)
+    IPNode::ImageStructureInfo outResFromParams(float w, float h, FormatIPNode::Params& s)
     {
         float aspect;
         float fx = w;
@@ -105,13 +104,10 @@ namespace IPCore
             fy *= s.scale;
         }
 
-        return IPNode::ImageStructureInfo(int(fx + 0.49f), int(fy + 0.49f),
-                                          1.0);
+        return IPNode::ImageStructureInfo(int(fx + 0.49f), int(fy + 0.49f), 1.0);
     }
 
-    FormatIPNode::FormatIPNode(const std::string& name,
-                               const NodeDefinition* def, IPGraph* g,
-                               GroupIPNode* group)
+    FormatIPNode::FormatIPNode(const std::string& name, const NodeDefinition* def, IPGraph* g, GroupIPNode* group)
         : IPNode(name, def, g, group)
         , m_xmin(0)
         , m_xmax(0)
@@ -129,12 +125,9 @@ namespace IPCore
         m_xresize = declareProperty<IntProperty>("geometry.xresize", 0);
         m_yresize = declareProperty<IntProperty>("geometry.yresize", 0);
         m_scale = declareProperty<FloatProperty>("geometry.scale", 1.0f);
-        m_resampleMethod = declareProperty<StringProperty>(
-            "geometry.resampleMethod", defaultResampleMethod);
-        m_maxBitDepth =
-            declareProperty<IntProperty>("color.maxBitDepth", defaultBitDepth);
-        m_allowFloatingPoint = declareProperty<IntProperty>(
-            "color.allowFloatingPoint", defaultAllowFP ? 1 : 0);
+        m_resampleMethod = declareProperty<StringProperty>("geometry.resampleMethod", defaultResampleMethod);
+        m_maxBitDepth = declareProperty<IntProperty>("color.maxBitDepth", defaultBitDepth);
+        m_allowFloatingPoint = declareProperty<IntProperty>("color.allowFloatingPoint", defaultAllowFP ? 1 : 0);
         m_cropActive = declareProperty<IntProperty>("crop.active", 0);
         m_uncropActive = declareProperty<IntProperty>("uncrop.active", 0);
         m_uncropWidth = declareProperty<IntProperty>("uncrop.width", 0);
@@ -156,8 +149,7 @@ namespace IPCore
             m_topCrop = declareProperty<IntProperty>("crop.top", 0);
             m_bottomCrop = declareProperty<IntProperty>("crop.bottom", 0);
 
-            PropertyInfo* noSave =
-                new PropertyInfo(PropertyInfo::NotPersistent);
+            PropertyInfo* noSave = new PropertyInfo(PropertyInfo::NotPersistent);
             m_cropManip = declareProperty<IntProperty>("crop.manip", 0, noSave);
         }
     }
@@ -205,13 +197,9 @@ namespace IPCore
         setProperty(m_yresize, h);
     }
 
-    void FormatIPNode::outputDisconnect(IPNode* node)
-    {
-        IPNode::outputDisconnect(node);
-    }
+    void FormatIPNode::outputDisconnect(IPNode* node) { IPNode::outputDisconnect(node); }
 
-    static FrameBuffer* resizeImage(FrameBuffer* in, float sx, float sy,
-                                    FrameBuffer::DataType outType)
+    static FrameBuffer* resizeImage(FrameBuffer* in, float sx, float sy, FrameBuffer::DataType outType)
     {
         //
         //  sx here is really representing outWidth/inWidth (both integers), but
@@ -222,17 +210,14 @@ namespace IPCore
         int ow = int(0.49f + float(in->width()) * sx);
         int oh = int(0.49f + float(in->height()) * sy);
 
-        if (ow != in->width() || oh != in->height()
-            || outType != in->dataType())
+        if (ow != in->width() || oh != in->height() || outType != in->dataType())
         {
             /*
             cout << "resize from " << in->width() << ", " << in->height()
                  << " to " << ow << ", " << oh << endl;
             */
 
-            FrameBuffer* fb =
-                new FrameBuffer(ow, oh, in->numChannels(), outType, 0,
-                                &in->channelNames(), in->orientation());
+            FrameBuffer* fb = new FrameBuffer(ow, oh, in->numChannels(), outType, 0, &in->channelNames(), in->orientation());
             if (fb->isRootPlane())
                 fb->idstream() << in->identifier();
             if (in->nextPlane())
@@ -338,8 +323,7 @@ namespace IPCore
             s.yresize = yresize->front();
         }
 
-        s.crop =
-            propertyValue(m_cropActive, 0) && !propertyValue(m_cropManip, 0);
+        s.crop = propertyValue(m_cropActive, 0) && !propertyValue(m_cropManip, 0);
 
         if (const IntProperty* x0 = m_xmin)
         {
@@ -417,10 +401,8 @@ namespace IPCore
             int originalWidth = in->width();
             int originalHeight = in->height();
 
-            if (inType == FrameBuffer::PACKED_R10_G10_B10_X2
-                || inType == FrameBuffer::PACKED_X2_B10_G10_R10
-                || inType == FrameBuffer::PACKED_Y8_Cb8_Y8_Cr8
-                || inType == FrameBuffer::PACKED_Cb8_Y8_Cr8_Y8)
+            if (inType == FrameBuffer::PACKED_R10_G10_B10_X2 || inType == FrameBuffer::PACKED_X2_B10_G10_R10
+                || inType == FrameBuffer::PACKED_Y8_Cb8_Y8_Cr8 || inType == FrameBuffer::PACKED_Cb8_Y8_Cr8_Y8)
             {
                 outType = inType;
             }
@@ -432,8 +414,7 @@ namespace IPCore
                 }
                 else
                 {
-                    outType =
-                        (inType > s.bestIntegral) ? s.bestIntegral : inType;
+                    outType = (inType > s.bestIntegral) ? s.bestIntegral : inType;
                 }
 
                 if (ImageRenderer::fbAcceptableTypes().count(outType) == 0)
@@ -442,8 +423,7 @@ namespace IPCore
                 }
             }
 
-            if (s.scale == 1.0f && s.xfit == 0 && s.yfit == 0 && s.xresize == 0
-                && s.yresize == 0)
+            if (s.scale == 1.0f && s.xfit == 0 && s.yfit == 0 && s.xresize == 0 && s.yresize == 0)
             {
                 if (s.crop)
                 {
@@ -454,14 +434,11 @@ namespace IPCore
                         bool sameType = (in->dataType() == outType);
                         if (m_xmin)
                         {
-                            cfb = crop(in, s.cropX0, s.cropY0, s.cropX1,
-                                       s.cropY1);
+                            cfb = crop(in, s.cropX0, s.cropY0, s.cropX1, s.cropY1);
                         }
                         else
                         {
-                            cfb = crop(in, s.leftCrop, s.bottomCrop,
-                                       in->width() - s.rightCrop - 1,
-                                       in->height() - s.topCrop - 1);
+                            cfb = crop(in, s.leftCrop, s.bottomCrop, in->width() - s.rightCrop - 1, in->height() - s.topCrop - 1);
                         }
 
                         cfb->setIdentifier(in->identifier());
@@ -490,8 +467,7 @@ namespace IPCore
                     }
                 }
 
-                if (in->dataType() != outType
-                    && in->dataType() != FrameBuffer::PACKED_Cb8_Y8_Cr8_Y8
+                if (in->dataType() != outType && in->dataType() != FrameBuffer::PACKED_Cb8_Y8_Cr8_Y8
                     && in->dataType() != FrameBuffer::PACKED_Y8_Cb8_Y8_Cr8)
                 {
                     FrameBuffer* fb = 0;
@@ -533,14 +509,11 @@ namespace IPCore
                         bool sameType = (in->dataType() == outType);
                         if (m_xmin)
                         {
-                            cfb = crop(in, s.cropX0, s.cropY0, s.cropX1,
-                                       s.cropY1);
+                            cfb = crop(in, s.cropX0, s.cropY0, s.cropX1, s.cropY1);
                         }
                         else
                         {
-                            cfb = crop(in, s.leftCrop, s.bottomCrop,
-                                       in->width() - s.rightCrop - 1,
-                                       in->height() - s.topCrop - 1);
+                            cfb = crop(in, s.leftCrop, s.bottomCrop, in->width() - s.rightCrop - 1, in->height() - s.topCrop - 1);
                         }
                         cfb->setIdentifier(in->identifier());
                         in->copyAttributesTo(cfb);
@@ -600,12 +573,10 @@ namespace IPCore
                     scaley = float(ii.height) / float(in->height());
                 }
 
-                if (inType == FrameBuffer::PACKED_Cb8_Y8_Cr8_Y8
-                    || inType == FrameBuffer::PACKED_Y8_Cb8_Y8_Cr8)
+                if (inType == FrameBuffer::PACKED_Cb8_Y8_Cr8_Y8 || inType == FrameBuffer::PACKED_Y8_Cb8_Y8_Cr8)
                 {
                     FrameBuffer* fb0 = convertToLinearRGB709(in);
-                    FrameBuffer* fb1 =
-                        resizeImage(fb0, scalex, scaley, FrameBuffer::UCHAR);
+                    FrameBuffer* fb1 = resizeImage(fb0, scalex, scaley, FrameBuffer::UCHAR);
 
                     if (fb0 != fb1)
                     {
@@ -669,10 +640,8 @@ namespace IPCore
                     img->width = img->fb->width();
                     img->height = img->fb->height();
                 }
-                img->fb->setUncrop(int(scalex * in->uncropWidth() + 0.49f),
-                                   int(scaley * in->uncropHeight() + 0.49f),
-                                   int(scalex * in->uncropX() + 0.49f),
-                                   int(scaley * in->uncropY() + 0.49f));
+                img->fb->setUncrop(int(scalex * in->uncropWidth() + 0.49f), int(scaley * in->uncropHeight() + 0.49f),
+                                   int(scalex * in->uncropX() + 0.49f), int(scaley * in->uncropY() + 0.49f));
 
                 img->fb->setUncropActive(in->uncrop());
                 in->copyAttributesTo(img->fb);
@@ -684,15 +653,13 @@ namespace IPCore
 
             if (s.uncrop)
             {
-                img->fb->setUncrop(s.uncropWidth, s.uncropHeight, s.uncropX,
-                                   s.uncropY);
+                img->fb->setUncrop(s.uncropWidth, s.uncropHeight, s.uncropX, s.uncropY);
                 img->fb->setUncropActive(in->uncrop());
                 img->width = s.uncropWidth;
                 img->height = s.uncropHeight;
             }
 
-            if (s.scale != 1.0f || s.bestFloat != FrameBuffer::FLOAT
-                || s.bestIntegral != FrameBuffer::USHORT || s.xfit || s.yfit
+            if (s.scale != 1.0f || s.bestFloat != FrameBuffer::FLOAT || s.bestIntegral != FrameBuffer::USHORT || s.xfit || s.yfit
                 || s.xresize || s.yresize || s.crop || s.uncrop)
             {
                 //
@@ -702,25 +669,19 @@ namespace IPCore
                 //  relative to, so you have to include them in the hash
                 //
 
-                img->fb->idstream()
-                    << ":fmt/s" << s.scale << ":f" << s.bestFloat << ":i"
-                    << s.bestIntegral << ":r" << s.method << ":xf" << s.xfit
-                    << ":yf" << s.yfit << ":xr" << s.xresize << ":yr"
-                    << s.yresize;
+                img->fb->idstream() << ":fmt/s" << s.scale << ":f" << s.bestFloat << ":i" << s.bestIntegral << ":r" << s.method << ":xf"
+                                    << s.xfit << ":yf" << s.yfit << ":xr" << s.xresize << ":yr" << s.yresize;
 
                 if (s.crop)
                 {
                     img->fb->idstream() << ":c"
-                                        << "+" << s.cropX0 << "+" << s.cropY0
-                                        << "+" << s.cropX1 << "+" << s.cropY1;
+                                        << "+" << s.cropX0 << "+" << s.cropY0 << "+" << s.cropX1 << "+" << s.cropY1;
                 }
 
                 if (s.uncrop)
                 {
-                    img->fb->idstream()
-                        << ":u"
-                        << "+" << s.uncropWidth << "+" << s.uncropHeight << "+"
-                        << s.uncropX << "+" << s.uncropY;
+                    img->fb->idstream() << ":u"
+                                        << "+" << s.uncropWidth << "+" << s.uncropHeight << "+" << s.uncropX << "+" << s.uncropY;
                 }
             }
         }
@@ -739,9 +700,8 @@ namespace IPCore
         IPImageID* i = imgid;
         ostringstream str;
 
-        if (p.scale != 1.0f || p.bestFloat != FrameBuffer::FLOAT
-            || p.bestIntegral != FrameBuffer::USHORT || p.xfit || p.yfit
-            || p.xresize || p.yresize || p.crop || p.uncrop)
+        if (p.scale != 1.0f || p.bestFloat != FrameBuffer::FLOAT || p.bestIntegral != FrameBuffer::USHORT || p.xfit || p.yfit || p.xresize
+            || p.yresize || p.crop || p.uncrop)
         {
             //
             //  NOTE: you can just get rid of xfit and yfit here and
@@ -752,22 +712,19 @@ namespace IPCore
 
             str << i->id;
 
-            str << ":fmt/s" << p.scale << ":f" << p.bestFloat << ":i"
-                << p.bestIntegral << ":r" << p.method << ":xf" << p.xfit
-                << ":yf" << p.yfit << ":xr" << p.xresize << ":yr" << p.yresize;
+            str << ":fmt/s" << p.scale << ":f" << p.bestFloat << ":i" << p.bestIntegral << ":r" << p.method << ":xf" << p.xfit << ":yf"
+                << p.yfit << ":xr" << p.xresize << ":yr" << p.yresize;
 
             if (p.crop)
             {
                 str << ":c"
-                    << "+" << p.cropX0 << "+" << p.cropY0 << "+" << p.cropX1
-                    << "+" << p.cropY1;
+                    << "+" << p.cropX0 << "+" << p.cropY0 << "+" << p.cropX1 << "+" << p.cropY1;
             }
 
             if (p.uncrop)
             {
                 str << ":u"
-                    << "+" << p.uncropWidth << "+" << p.uncropHeight << "+"
-                    << p.uncropX << "+" << p.uncropY;
+                    << "+" << p.uncropWidth << "+" << p.uncropHeight << "+" << p.uncropX << "+" << p.uncropY;
             }
 
             i->id = str.str();
@@ -776,14 +733,12 @@ namespace IPCore
         return imgid;
     }
 
-    IPNode::ImageStructureInfo
-    FormatIPNode::imageStructureInfo(const Context& context) const
+    IPNode::ImageStructureInfo FormatIPNode::imageStructureInfo(const Context& context) const
     {
         if (!inputs().empty())
         {
             Params p = params();
-            ImageStructureInfo i =
-                inputs().front()->imageStructureInfo(context);
+            ImageStructureInfo i = inputs().front()->imageStructureInfo(context);
 
             if (p.crop)
             {

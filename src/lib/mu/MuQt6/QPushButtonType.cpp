@@ -67,41 +67,34 @@ namespace Mu
         _baseType = 0;
     }
 
-    MuQt_QPushButton::MuQt_QPushButton(Pointer muobj, const CallEnvironment* ce,
-                                       QWidget* parent)
+    MuQt_QPushButton::MuQt_QPushButton(Pointer muobj, const CallEnvironment* ce, QWidget* parent)
         : QPushButton(parent)
     {
         _env = ce;
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QPushButtonType>(
-            c->internName("qt.QPushButton"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QPushButtonType>(c->internName("qt.QPushButton"));
     }
 
-    MuQt_QPushButton::MuQt_QPushButton(Pointer muobj, const CallEnvironment* ce,
-                                       const QString& text, QWidget* parent)
+    MuQt_QPushButton::MuQt_QPushButton(Pointer muobj, const CallEnvironment* ce, const QString& text, QWidget* parent)
         : QPushButton(text, parent)
     {
         _env = ce;
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QPushButtonType>(
-            c->internName("qt.QPushButton"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QPushButtonType>(c->internName("qt.QPushButton"));
     }
 
-    MuQt_QPushButton::MuQt_QPushButton(Pointer muobj, const CallEnvironment* ce,
-                                       const QIcon& icon, const QString& text,
-                                       QWidget* parent)
+    MuQt_QPushButton::MuQt_QPushButton(Pointer muobj, const CallEnvironment* ce, const QIcon& icon, const QString& text, QWidget* parent)
         : QPushButton(icon, text, parent)
     {
         _env = ce;
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QPushButtonType>(
-            c->internName("qt.QPushButton"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QPushButtonType>(c->internName("qt.QPushButton"));
     }
 
     QSize MuQt_QPushButton::minimumSizeHint() const
@@ -179,8 +172,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QFocusEventType>(c, e, "qt.QFocusEvent"));
+            args[1] = Value(makeqpointer<QFocusEventType>(c, e, "qt.QFocusEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -203,8 +195,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QFocusEventType>(c, e, "qt.QFocusEvent"));
+            args[1] = Value(makeqpointer<QFocusEventType>(c, e, "qt.QFocusEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -271,8 +262,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -295,8 +285,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QPaintEventType>(c, _p14, "qt.QPaintEvent"));
+            args[1] = Value(makeqpointer<QPaintEventType>(c, _p14, "qt.QPaintEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -409,8 +398,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -433,8 +421,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -457,8 +444,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QTimerEventType>(c, e, "qt.QTimerEvent"));
+            args[1] = Value(makeqpointer<QTimerEventType>(c, e, "qt.QTimerEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -470,8 +456,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  Mu Type CONSTRUCTORS
 
-    QPushButtonType::QPushButtonType(Context* c, const char* name, Class* super,
-                                     Class* super2)
+    QPushButtonType::QPushButtonType(Context* c, const char* name, Class* super, Class* super2)
         : Class(c, name, vectorOf2(super, super2))
     {
     }
@@ -481,8 +466,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    static Pointer QPushButton_QPushButton_QObject(Thread& NODE_THREAD,
-                                                   Pointer obj)
+    static Pointer QPushButton_QPushButton_QObject(Thread& NODE_THREAD, Pointer obj)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         ClassInstance* widget = reinterpret_cast<ClassInstance*>(obj);
@@ -493,9 +477,7 @@ namespace Mu
         }
         else if (QPushButton* w = object<QPushButton>(widget))
         {
-            QPushButtonType* type =
-                c->findSymbolOfTypeByQualifiedName<QPushButtonType>(
-                    c->internName("qt.QPushButton"), false);
+            QPushButtonType* type = c->findSymbolOfTypeByQualifiedName<QPushButtonType>(c->internName("qt.QPushButton"), false);
             ClassInstance* o = ClassInstance::allocate(type);
             setobject(o, w);
             return o;
@@ -506,62 +488,46 @@ namespace Mu
         }
     }
 
-    static NODE_IMPLEMENTATION(castFromObject, Pointer)
-    {
-        NODE_RETURN(
-            QPushButton_QPushButton_QObject(NODE_THREAD, NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(castFromObject, Pointer) { NODE_RETURN(QPushButton_QPushButton_QObject(NODE_THREAD, NODE_ARG(0, Pointer))); }
 
-    Pointer qt_QPushButton_QPushButton_QPushButton_QPushButton_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
+    Pointer qt_QPushButton_QPushButton_QPushButton_QPushButton_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWidget* arg1 = object<QWidget>(param_parent);
-        setobject(param_this,
-                  new MuQt_QPushButton(param_this,
-                                       NODE_THREAD.process()->callEnv(), arg1));
+        setobject(param_this, new MuQt_QPushButton(param_this, NODE_THREAD.process()->callEnv(), arg1));
         return param_this;
     }
 
-    Pointer qt_QPushButton_QPushButton_QPushButton_QPushButton_string_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_text,
-        Pointer param_parent)
+    Pointer qt_QPushButton_QPushButton_QPushButton_QPushButton_string_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                              Pointer param_text, Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QString arg1 = qstring(param_text);
         QWidget* arg2 = object<QWidget>(param_parent);
-        setobject(param_this, new MuQt_QPushButton(
-                                  param_this, NODE_THREAD.process()->callEnv(),
-                                  arg1, arg2));
+        setobject(param_this, new MuQt_QPushButton(param_this, NODE_THREAD.process()->callEnv(), arg1, arg2));
         return param_this;
     }
 
-    Pointer
-    qt_QPushButton_QPushButton_QPushButton_QPushButton_QIcon_string_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_icon,
-        Pointer param_text, Pointer param_parent)
+    Pointer qt_QPushButton_QPushButton_QPushButton_QPushButton_QIcon_string_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                    Pointer param_icon, Pointer param_text,
+                                                                                    Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QIcon arg1 = getqtype<QIconType>(param_icon);
         const QString arg2 = qstring(param_text);
         QWidget* arg3 = object<QWidget>(param_parent);
-        setobject(param_this, new MuQt_QPushButton(
-                                  param_this, NODE_THREAD.process()->callEnv(),
-                                  arg1, arg2, arg3));
+        setobject(param_this, new MuQt_QPushButton(param_this, NODE_THREAD.process()->callEnv(), arg1, arg2, arg3));
         return param_this;
     }
 
-    Pointer qt_QPushButton_menu_QMenu_QPushButton(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this)
+    Pointer qt_QPushButton_menu_QMenu_QPushButton(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QPushButton* arg0 = object<QPushButton>(param_this);
         return makeinstance<QMenuType>(c, arg0->menu(), "qt.QMenu");
     }
 
-    void qt_QPushButton_setMenu_void_QPushButton_QMenu(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this,
-                                                       Pointer param_menu)
+    void qt_QPushButton_setMenu_void_QPushButton_QMenu(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_menu)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QPushButton* arg0 = object<QPushButton>(param_this);
@@ -569,44 +535,31 @@ namespace Mu
         arg0->setMenu(arg1);
     }
 
-    Pointer
-    qt_QPushButton_minimumSizeHint_QSize_QPushButton(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_this)
+    Pointer qt_QPushButton_minimumSizeHint_QSize_QPushButton(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QPushButton* arg0 = object<QPushButton>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QSizeType>(
-                         c, arg0->QPushButton::minimumSizeHint(), "qt.QSize")
-                   : makeqtype<QSizeType>(c, arg0->minimumSizeHint(),
-                                          "qt.QSize");
+        return isMuQtObject(arg0) ? makeqtype<QSizeType>(c, arg0->QPushButton::minimumSizeHint(), "qt.QSize")
+                                  : makeqtype<QSizeType>(c, arg0->minimumSizeHint(), "qt.QSize");
     }
 
-    Pointer qt_QPushButton_sizeHint_QSize_QPushButton(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    Pointer qt_QPushButton_sizeHint_QSize_QPushButton(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QPushButton* arg0 = object<QPushButton>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QSizeType>(c, arg0->QPushButton::sizeHint(),
-                                          "qt.QSize")
-                   : makeqtype<QSizeType>(c, arg0->sizeHint(), "qt.QSize");
+        return isMuQtObject(arg0) ? makeqtype<QSizeType>(c, arg0->QPushButton::sizeHint(), "qt.QSize")
+                                  : makeqtype<QSizeType>(c, arg0->sizeHint(), "qt.QSize");
     }
 
-    bool qt_QPushButton_event_bool_QPushButton_QEvent(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this,
-                                                      Pointer param_e)
+    bool qt_QPushButton_event_bool_QPushButton_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QPushButton* arg0 = object<QPushButton>(param_this);
         QEvent* arg1 = getqpointer<QEventType>(param_e);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QPushButton*)arg0)->event_pub_parent(arg1)
-                   : ((MuQt_QPushButton*)arg0)->event_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QPushButton*)arg0)->event_pub_parent(arg1) : ((MuQt_QPushButton*)arg0)->event_pub(arg1);
     }
 
-    void qt_QPushButton_focusInEvent_void_QPushButton_QFocusEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QPushButton_focusInEvent_void_QPushButton_QFocusEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QPushButton* arg0 = object<QPushButton>(param_this);
@@ -617,8 +570,7 @@ namespace Mu
             ((MuQt_QPushButton*)arg0)->focusInEvent_pub(arg1);
     }
 
-    void qt_QPushButton_focusOutEvent_void_QPushButton_QFocusEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QPushButton_focusOutEvent_void_QPushButton_QFocusEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QPushButton* arg0 = object<QPushButton>(param_this);
@@ -629,19 +581,15 @@ namespace Mu
             ((MuQt_QPushButton*)arg0)->focusOutEvent_pub(arg1);
     }
 
-    bool qt_QPushButton_hitButton_bool_QPushButton_QPoint(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_pos)
+    bool qt_QPushButton_hitButton_bool_QPushButton_QPoint(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_pos)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QPushButton* arg0 = object<QPushButton>(param_this);
         const QPoint arg1 = getqtype<QPointType>(param_pos);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QPushButton*)arg0)->hitButton_pub_parent(arg1)
-                   : ((MuQt_QPushButton*)arg0)->hitButton_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QPushButton*)arg0)->hitButton_pub_parent(arg1) : ((MuQt_QPushButton*)arg0)->hitButton_pub(arg1);
     }
 
-    void qt_QPushButton_keyPressEvent_void_QPushButton_QKeyEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QPushButton_keyPressEvent_void_QPushButton_QKeyEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QPushButton* arg0 = object<QPushButton>(param_this);
@@ -652,8 +600,7 @@ namespace Mu
             ((MuQt_QPushButton*)arg0)->keyPressEvent_pub(arg1);
     }
 
-    void qt_QPushButton_mouseMoveEvent_void_QPushButton_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QPushButton_mouseMoveEvent_void_QPushButton_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QPushButton* arg0 = object<QPushButton>(param_this);
@@ -664,8 +611,7 @@ namespace Mu
             ((MuQt_QPushButton*)arg0)->mouseMoveEvent_pub(arg1);
     }
 
-    void qt_QPushButton_paintEvent_void_QPushButton_QPaintEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param__p14)
+    void qt_QPushButton_paintEvent_void_QPushButton_QPaintEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param__p14)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QPushButton* arg0 = object<QPushButton>(param_this);
@@ -676,8 +622,7 @@ namespace Mu
             ((MuQt_QPushButton*)arg0)->paintEvent_pub(arg1);
     }
 
-    void qt_QPushButton_checkStateSet_void_QPushButton(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this)
+    void qt_QPushButton_checkStateSet_void_QPushButton(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QPushButton* arg0 = object<QPushButton>(param_this);
@@ -687,8 +632,7 @@ namespace Mu
             ((MuQt_QPushButton*)arg0)->checkStateSet_pub();
     }
 
-    void qt_QPushButton_nextCheckState_void_QPushButton(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this)
+    void qt_QPushButton_nextCheckState_void_QPushButton(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QPushButton* arg0 = object<QPushButton>(param_this);
@@ -698,8 +642,7 @@ namespace Mu
             ((MuQt_QPushButton*)arg0)->nextCheckState_pub();
     }
 
-    void qt_QPushButton_changeEvent_void_QPushButton_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QPushButton_changeEvent_void_QPushButton_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QPushButton* arg0 = object<QPushButton>(param_this);
@@ -710,8 +653,7 @@ namespace Mu
             ((MuQt_QPushButton*)arg0)->changeEvent_pub(arg1);
     }
 
-    void qt_QPushButton_keyReleaseEvent_void_QPushButton_QKeyEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QPushButton_keyReleaseEvent_void_QPushButton_QKeyEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QPushButton* arg0 = object<QPushButton>(param_this);
@@ -722,8 +664,7 @@ namespace Mu
             ((MuQt_QPushButton*)arg0)->keyReleaseEvent_pub(arg1);
     }
 
-    void qt_QPushButton_mousePressEvent_void_QPushButton_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QPushButton_mousePressEvent_void_QPushButton_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QPushButton* arg0 = object<QPushButton>(param_this);
@@ -734,8 +675,7 @@ namespace Mu
             ((MuQt_QPushButton*)arg0)->mousePressEvent_pub(arg1);
     }
 
-    void qt_QPushButton_mouseReleaseEvent_void_QPushButton_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QPushButton_mouseReleaseEvent_void_QPushButton_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QPushButton* arg0 = object<QPushButton>(param_this);
@@ -746,8 +686,7 @@ namespace Mu
             ((MuQt_QPushButton*)arg0)->mouseReleaseEvent_pub(arg1);
     }
 
-    void qt_QPushButton_timerEvent_void_QPushButton_QTimerEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QPushButton_timerEvent_void_QPushButton_QTimerEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QPushButton* arg0 = object<QPushButton>(param_this);
@@ -760,132 +699,110 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(_n_QPushButton0, Pointer)
     {
-        NODE_RETURN(qt_QPushButton_QPushButton_QPushButton_QPushButton_QWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(
+            qt_QPushButton_QPushButton_QPushButton_QPushButton_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_QPushButton1, Pointer)
     {
-        NODE_RETURN(
-            qt_QPushButton_QPushButton_QPushButton_QPushButton_string_QWidget(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QPushButton_QPushButton_QPushButton_QPushButton_string_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                      NODE_ARG(1, Pointer), NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_QPushButton2, Pointer)
     {
-        NODE_RETURN(
-            qt_QPushButton_QPushButton_QPushButton_QPushButton_QIcon_string_QWidget(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, Pointer), NODE_ARG(3, Pointer)));
+        NODE_RETURN(qt_QPushButton_QPushButton_QPushButton_QPushButton_QIcon_string_QWidget(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, Pointer), NODE_ARG(3, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_menu0, Pointer)
     {
-        NODE_RETURN(qt_QPushButton_menu_QMenu_QPushButton(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QPushButton_menu_QMenu_QPushButton(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_setMenu0, void)
     {
-        qt_QPushButton_setMenu_void_QPushButton_QMenu(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QPushButton_setMenu_void_QPushButton_QMenu(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_minimumSizeHint0, Pointer)
     {
-        NODE_RETURN(qt_QPushButton_minimumSizeHint_QSize_QPushButton(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QPushButton_minimumSizeHint_QSize_QPushButton(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_sizeHint0, Pointer)
     {
-        NODE_RETURN(qt_QPushButton_sizeHint_QSize_QPushButton(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QPushButton_sizeHint_QSize_QPushButton(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_event0, bool)
     {
-        NODE_RETURN(qt_QPushButton_event_bool_QPushButton_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QPushButton_event_bool_QPushButton_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_focusInEvent0, void)
     {
-        qt_QPushButton_focusInEvent_void_QPushButton_QFocusEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QPushButton_focusInEvent_void_QPushButton_QFocusEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_focusOutEvent0, void)
     {
-        qt_QPushButton_focusOutEvent_void_QPushButton_QFocusEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QPushButton_focusOutEvent_void_QPushButton_QFocusEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_hitButton0, bool)
     {
-        NODE_RETURN(qt_QPushButton_hitButton_bool_QPushButton_QPoint(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QPushButton_hitButton_bool_QPushButton_QPoint(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_keyPressEvent0, void)
     {
-        qt_QPushButton_keyPressEvent_void_QPushButton_QKeyEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QPushButton_keyPressEvent_void_QPushButton_QKeyEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseMoveEvent0, void)
     {
-        qt_QPushButton_mouseMoveEvent_void_QPushButton_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QPushButton_mouseMoveEvent_void_QPushButton_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_paintEvent0, void)
     {
-        qt_QPushButton_paintEvent_void_QPushButton_QPaintEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QPushButton_paintEvent_void_QPushButton_QPaintEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_checkStateSet0, void)
     {
-        qt_QPushButton_checkStateSet_void_QPushButton(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
+        qt_QPushButton_checkStateSet_void_QPushButton(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_nextCheckState0, void)
     {
-        qt_QPushButton_nextCheckState_void_QPushButton(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
+        qt_QPushButton_nextCheckState_void_QPushButton(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_changeEvent0, void)
     {
-        qt_QPushButton_changeEvent_void_QPushButton_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QPushButton_changeEvent_void_QPushButton_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_keyReleaseEvent0, void)
     {
-        qt_QPushButton_keyReleaseEvent_void_QPushButton_QKeyEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QPushButton_keyReleaseEvent_void_QPushButton_QKeyEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mousePressEvent0, void)
     {
-        qt_QPushButton_mousePressEvent_void_QPushButton_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QPushButton_mousePressEvent_void_QPushButton_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseReleaseEvent0, void)
     {
-        qt_QPushButton_mouseReleaseEvent_void_QPushButton_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QPushButton_mouseReleaseEvent_void_QPushButton_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_timerEvent0, void)
     {
-        qt_QPushButton_timerEvent_void_QPushButton_QTimerEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QPushButton_timerEvent_void_QPushButton_QTimerEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     void QPushButtonType::load()
@@ -905,17 +822,13 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
-                   new Function(c, tn, castFromObject, Cast, Compiled,
-                                QPushButton_QPushButton_QObject, Return, ftn,
-                                Parameters,
+                   new Function(c, tn, castFromObject, Cast, Compiled, QPushButton_QPushButton_QObject, Return, ftn, Parameters,
                                 new Param(c, "object", "qt.QObject"), End),
 
                    EndArguments);
@@ -923,127 +836,74 @@ namespace Mu
         addSymbols(
             // enums
             // member functions
-            new Function(
-                c, "QPushButton", _n_QPushButton0, None, Compiled,
-                qt_QPushButton_QPushButton_QPushButton_QPushButton_QWidget,
-                Return, "qt.QPushButton", Parameters,
-                new Param(c, "this", "qt.QPushButton"),
-                new Param(c, "parent", "qt.QWidget"), End),
-            new Function(
-                c, "QPushButton", _n_QPushButton1, None, Compiled,
-                qt_QPushButton_QPushButton_QPushButton_QPushButton_string_QWidget,
-                Return, "qt.QPushButton", Parameters,
-                new Param(c, "this", "qt.QPushButton"),
-                new Param(c, "text", "string"),
-                new Param(c, "parent", "qt.QWidget"), End),
-            new Function(
-                c, "QPushButton", _n_QPushButton2, None, Compiled,
-                qt_QPushButton_QPushButton_QPushButton_QPushButton_QIcon_string_QWidget,
-                Return, "qt.QPushButton", Parameters,
-                new Param(c, "this", "qt.QPushButton"),
-                new Param(c, "icon", "qt.QIcon"),
-                new Param(c, "text", "string"),
-                new Param(c, "parent", "qt.QWidget"), End),
+            new Function(c, "QPushButton", _n_QPushButton0, None, Compiled, qt_QPushButton_QPushButton_QPushButton_QPushButton_QWidget,
+                         Return, "qt.QPushButton", Parameters, new Param(c, "this", "qt.QPushButton"), new Param(c, "parent", "qt.QWidget"),
+                         End),
+            new Function(c, "QPushButton", _n_QPushButton1, None, Compiled,
+                         qt_QPushButton_QPushButton_QPushButton_QPushButton_string_QWidget, Return, "qt.QPushButton", Parameters,
+                         new Param(c, "this", "qt.QPushButton"), new Param(c, "text", "string"), new Param(c, "parent", "qt.QWidget"), End),
+            new Function(c, "QPushButton", _n_QPushButton2, None, Compiled,
+                         qt_QPushButton_QPushButton_QPushButton_QPushButton_QIcon_string_QWidget, Return, "qt.QPushButton", Parameters,
+                         new Param(c, "this", "qt.QPushButton"), new Param(c, "icon", "qt.QIcon"), new Param(c, "text", "string"),
+                         new Param(c, "parent", "qt.QWidget"), End),
             // PROP: autoDefault (bool; QPushButton this)
             // PROP: isDefault (bool; QPushButton this)
             // PROP: isFlat (bool; QPushButton this)
-            new Function(c, "menu", _n_menu0, None, Compiled,
-                         qt_QPushButton_menu_QMenu_QPushButton, Return,
-                         "qt.QMenu", Parameters,
+            new Function(c, "menu", _n_menu0, None, Compiled, qt_QPushButton_menu_QMenu_QPushButton, Return, "qt.QMenu", Parameters,
                          new Param(c, "this", "qt.QPushButton"), End),
             // PROP: setAutoDefault (void; QPushButton this, bool _p4)
             // PROP: setDefault (void; QPushButton this, bool _p4)
             // PROP: setFlat (void; QPushButton this, bool _p4)
-            new Function(c, "setMenu", _n_setMenu0, None, Compiled,
-                         qt_QPushButton_setMenu_void_QPushButton_QMenu, Return,
-                         "void", Parameters,
-                         new Param(c, "this", "qt.QPushButton"),
-                         new Param(c, "menu", "qt.QMenu"), End),
-            _func[0] = new MemberFunction(
-                c, "minimumSizeHint", _n_minimumSizeHint0, None, Compiled,
-                qt_QPushButton_minimumSizeHint_QSize_QPushButton, Return,
-                "qt.QSize", Parameters, new Param(c, "this", "qt.QPushButton"),
-                End),
-            _func[1] = new MemberFunction(
-                c, "sizeHint", _n_sizeHint0, None, Compiled,
-                qt_QPushButton_sizeHint_QSize_QPushButton, Return, "qt.QSize",
-                Parameters, new Param(c, "this", "qt.QPushButton"), End),
+            new Function(c, "setMenu", _n_setMenu0, None, Compiled, qt_QPushButton_setMenu_void_QPushButton_QMenu, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QPushButton"), new Param(c, "menu", "qt.QMenu"), End),
+            _func[0] = new MemberFunction(c, "minimumSizeHint", _n_minimumSizeHint0, None, Compiled,
+                                          qt_QPushButton_minimumSizeHint_QSize_QPushButton, Return, "qt.QSize", Parameters,
+                                          new Param(c, "this", "qt.QPushButton"), End),
+            _func[1] = new MemberFunction(c, "sizeHint", _n_sizeHint0, None, Compiled, qt_QPushButton_sizeHint_QSize_QPushButton, Return,
+                                          "qt.QSize", Parameters, new Param(c, "this", "qt.QPushButton"), End),
             // MISSING: initStyleOption (void; QPushButton this,
             // "QStyleOptionButton *" option) // protected
-            _func[2] = new MemberFunction(
-                c, "event", _n_event0, None, Compiled,
-                qt_QPushButton_event_bool_QPushButton_QEvent, Return, "bool",
-                Parameters, new Param(c, "this", "qt.QPushButton"),
-                new Param(c, "e", "qt.QEvent"), End),
-            _func[3] = new MemberFunction(
-                c, "focusInEvent", _n_focusInEvent0, None, Compiled,
-                qt_QPushButton_focusInEvent_void_QPushButton_QFocusEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QPushButton"),
-                new Param(c, "e", "qt.QFocusEvent"), End),
-            _func[4] = new MemberFunction(
-                c, "focusOutEvent", _n_focusOutEvent0, None, Compiled,
-                qt_QPushButton_focusOutEvent_void_QPushButton_QFocusEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QPushButton"),
-                new Param(c, "e", "qt.QFocusEvent"), End),
-            _func[5] = new MemberFunction(
-                c, "hitButton", _n_hitButton0, None, Compiled,
-                qt_QPushButton_hitButton_bool_QPushButton_QPoint, Return,
-                "bool", Parameters, new Param(c, "this", "qt.QPushButton"),
-                new Param(c, "pos", "qt.QPoint"), End),
-            _func[6] = new MemberFunction(
-                c, "keyPressEvent", _n_keyPressEvent0, None, Compiled,
-                qt_QPushButton_keyPressEvent_void_QPushButton_QKeyEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QPushButton"),
-                new Param(c, "e", "qt.QKeyEvent"), End),
-            _func[7] = new MemberFunction(
-                c, "mouseMoveEvent", _n_mouseMoveEvent0, None, Compiled,
-                qt_QPushButton_mouseMoveEvent_void_QPushButton_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QPushButton"),
-                new Param(c, "e", "qt.QMouseEvent"), End),
-            _func[8] = new MemberFunction(
-                c, "paintEvent", _n_paintEvent0, None, Compiled,
-                qt_QPushButton_paintEvent_void_QPushButton_QPaintEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QPushButton"),
-                new Param(c, "_p14", "qt.QPaintEvent"), End),
-            _func[9] = new MemberFunction(
-                c, "checkStateSet", _n_checkStateSet0, None, Compiled,
-                qt_QPushButton_checkStateSet_void_QPushButton, Return, "void",
-                Parameters, new Param(c, "this", "qt.QPushButton"), End),
-            _func[10] = new MemberFunction(
-                c, "nextCheckState", _n_nextCheckState0, None, Compiled,
-                qt_QPushButton_nextCheckState_void_QPushButton, Return, "void",
-                Parameters, new Param(c, "this", "qt.QPushButton"), End),
-            _func[11] = new MemberFunction(
-                c, "changeEvent", _n_changeEvent0, None, Compiled,
-                qt_QPushButton_changeEvent_void_QPushButton_QEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QPushButton"),
-                new Param(c, "e", "qt.QEvent"), End),
-            _func[12] = new MemberFunction(
-                c, "keyReleaseEvent", _n_keyReleaseEvent0, None, Compiled,
-                qt_QPushButton_keyReleaseEvent_void_QPushButton_QKeyEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QPushButton"),
-                new Param(c, "e", "qt.QKeyEvent"), End),
-            _func[13] = new MemberFunction(
-                c, "mousePressEvent", _n_mousePressEvent0, None, Compiled,
-                qt_QPushButton_mousePressEvent_void_QPushButton_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QPushButton"),
-                new Param(c, "e", "qt.QMouseEvent"), End),
-            _func[14] = new MemberFunction(
-                c, "mouseReleaseEvent", _n_mouseReleaseEvent0, None, Compiled,
-                qt_QPushButton_mouseReleaseEvent_void_QPushButton_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QPushButton"),
-                new Param(c, "e", "qt.QMouseEvent"), End),
-            _func[15] = new MemberFunction(
-                c, "timerEvent", _n_timerEvent0, None, Compiled,
-                qt_QPushButton_timerEvent_void_QPushButton_QTimerEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QPushButton"),
-                new Param(c, "e", "qt.QTimerEvent"), End),
+            _func[2] = new MemberFunction(c, "event", _n_event0, None, Compiled, qt_QPushButton_event_bool_QPushButton_QEvent, Return,
+                                          "bool", Parameters, new Param(c, "this", "qt.QPushButton"), new Param(c, "e", "qt.QEvent"), End),
+            _func[3] = new MemberFunction(c, "focusInEvent", _n_focusInEvent0, None, Compiled,
+                                          qt_QPushButton_focusInEvent_void_QPushButton_QFocusEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QPushButton"), new Param(c, "e", "qt.QFocusEvent"), End),
+            _func[4] = new MemberFunction(c, "focusOutEvent", _n_focusOutEvent0, None, Compiled,
+                                          qt_QPushButton_focusOutEvent_void_QPushButton_QFocusEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QPushButton"), new Param(c, "e", "qt.QFocusEvent"), End),
+            _func[5] =
+                new MemberFunction(c, "hitButton", _n_hitButton0, None, Compiled, qt_QPushButton_hitButton_bool_QPushButton_QPoint, Return,
+                                   "bool", Parameters, new Param(c, "this", "qt.QPushButton"), new Param(c, "pos", "qt.QPoint"), End),
+            _func[6] = new MemberFunction(c, "keyPressEvent", _n_keyPressEvent0, None, Compiled,
+                                          qt_QPushButton_keyPressEvent_void_QPushButton_QKeyEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QPushButton"), new Param(c, "e", "qt.QKeyEvent"), End),
+            _func[7] = new MemberFunction(c, "mouseMoveEvent", _n_mouseMoveEvent0, None, Compiled,
+                                          qt_QPushButton_mouseMoveEvent_void_QPushButton_QMouseEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QPushButton"), new Param(c, "e", "qt.QMouseEvent"), End),
+            _func[8] = new MemberFunction(c, "paintEvent", _n_paintEvent0, None, Compiled,
+                                          qt_QPushButton_paintEvent_void_QPushButton_QPaintEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QPushButton"), new Param(c, "_p14", "qt.QPaintEvent"), End),
+            _func[9] =
+                new MemberFunction(c, "checkStateSet", _n_checkStateSet0, None, Compiled, qt_QPushButton_checkStateSet_void_QPushButton,
+                                   Return, "void", Parameters, new Param(c, "this", "qt.QPushButton"), End),
+            _func[10] =
+                new MemberFunction(c, "nextCheckState", _n_nextCheckState0, None, Compiled, qt_QPushButton_nextCheckState_void_QPushButton,
+                                   Return, "void", Parameters, new Param(c, "this", "qt.QPushButton"), End),
+            _func[11] =
+                new MemberFunction(c, "changeEvent", _n_changeEvent0, None, Compiled, qt_QPushButton_changeEvent_void_QPushButton_QEvent,
+                                   Return, "void", Parameters, new Param(c, "this", "qt.QPushButton"), new Param(c, "e", "qt.QEvent"), End),
+            _func[12] = new MemberFunction(c, "keyReleaseEvent", _n_keyReleaseEvent0, None, Compiled,
+                                           qt_QPushButton_keyReleaseEvent_void_QPushButton_QKeyEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QPushButton"), new Param(c, "e", "qt.QKeyEvent"), End),
+            _func[13] = new MemberFunction(c, "mousePressEvent", _n_mousePressEvent0, None, Compiled,
+                                           qt_QPushButton_mousePressEvent_void_QPushButton_QMouseEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QPushButton"), new Param(c, "e", "qt.QMouseEvent"), End),
+            _func[14] = new MemberFunction(c, "mouseReleaseEvent", _n_mouseReleaseEvent0, None, Compiled,
+                                           qt_QPushButton_mouseReleaseEvent_void_QPushButton_QMouseEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QPushButton"), new Param(c, "e", "qt.QMouseEvent"), End),
+            _func[15] = new MemberFunction(c, "timerEvent", _n_timerEvent0, None, Compiled,
+                                           qt_QPushButton_timerEvent_void_QPushButton_QTimerEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QPushButton"), new Param(c, "e", "qt.QTimerEvent"), End),
             // static functions
             EndArguments);
         globalScope()->addSymbols(EndArguments);

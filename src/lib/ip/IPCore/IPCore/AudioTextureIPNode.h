@@ -21,8 +21,7 @@ namespace IPCore
     class AudioTextureIPNode : public IPNode
     {
     public:
-        AudioTextureIPNode(const std::string& name, const NodeDefinition* def,
-                           IPGraph* graph, GroupIPNode* group = 0);
+        AudioTextureIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group = 0);
 
         virtual ~AudioTextureIPNode();
 

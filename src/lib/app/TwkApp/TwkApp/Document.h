@@ -69,10 +69,7 @@ namespace TwkApp
             //  request.setOption("baz", float(123.321));
             //
 
-            void setOption(const std::string& name, const boost::any& value)
-            {
-                options[name] = value;
-            }
+            void setOption(const std::string& name, const boost::any& value) { options[name] = value; }
 
             //
             //  const bool b     = request.optionValue<bool>("flag", false);
@@ -82,9 +79,7 @@ namespace TwkApp
             //  request.optionValue<float>("baz", 0.0f);
             //
 
-            template <typename T>
-            T optionValue(const std::string& name,
-                          const T& defaultValue = T()) const
+            template <typename T> T optionValue(const std::string& name, const T& defaultValue = T()) const
             {
                 OptionMap::const_iterator i = options.find(name);
                 if (i != options.end())
@@ -102,10 +97,9 @@ namespace TwkApp
         {
             bool operator()(MinorMode* a, MinorMode* b) const
             {
-                return a->order() != b->order() ? a->order() < b->order()
-                       : a->sortKey() != b->sortKey()
-                           ? a->sortKey() < b->sortKey()
-                           : a < b;
+                return a->order() != b->order()       ? a->order() < b->order()
+                       : a->sortKey() != b->sortKey() ? a->sortKey() < b->sortKey()
+                                                      : a < b;
             }
         };
 
@@ -118,8 +112,7 @@ namespace TwkApp
         typedef std::vector<Document*> Documents;
         typedef std::pair<const Action*, const EventTable*> ActionTablePair;
 
-        typedef bool (*TablePredicate)(const Document&, const EventTable&,
-                                       const Event&);
+        typedef bool (*TablePredicate)(const Document&, const EventTable&, const Event&);
 
         //
         //  Signals
@@ -129,29 +122,17 @@ namespace TwkApp
 
         DocumentSignal& documentActiveSignal() { return m_activeSignal; }
 
-        DocumentSignal& fileNameChangedSignal()
-        {
-            return m_fileNameChangedSignal;
-        }
+        DocumentSignal& fileNameChangedSignal() { return m_fileNameChangedSignal; }
 
-        DocumentSignal& historyChangedSignal()
-        {
-            return m_historyChangedSignal;
-        }
+        DocumentSignal& historyChangedSignal() { return m_historyChangedSignal; }
 
         DocumentSignal& modeChangedSignal() { return m_modeChangedSignal; }
 
         DocumentSignal& menuChangedSignal() { return m_menuChangedSignal; }
 
-        DocumentSignal& selectionChangedSignal()
-        {
-            return m_selectionChangedSignal;
-        }
+        DocumentSignal& selectionChangedSignal() { return m_selectionChangedSignal; }
 
-        DocumentSignal& bindingsChangedSignal()
-        {
-            return m_bindingsChangedSignal;
-        }
+        DocumentSignal& bindingsChangedSignal() { return m_bindingsChangedSignal; }
 
         DocumentSignal& modeAddedSignal() { return m_modeAddedSignal; }
 
@@ -180,10 +161,7 @@ namespace TwkApp
         //  Active / All documents
         //
 
-        static Document* activeDocument()
-        {
-            return m_documents.empty() ? 0 : m_documents.front();
-        }
+        static Document* activeDocument() { return m_documents.empty() ? 0 : m_documents.front(); }
 
         static const Documents& documents() { return m_documents; }
 

@@ -12,8 +12,7 @@
 namespace LUT
 {
 
-    void readCubeLUT(const std::string& filename, const std::string& type,
-                     LUTData& data);
+    void readCubeLUT(const std::string& filename, const std::string& type, LUTData& data);
 
 } // namespace LUT
 

@@ -81,8 +81,7 @@ namespace Mu
         outputValue(o, dn->_data);
     }
 
-    void Type::outputValueRecursive(ostream& o, const ValuePointer,
-                                    ValueOutputState&) const
+    void Type::outputValueRecursive(ostream& o, const ValuePointer, ValueOutputState&) const
     {
         o << "(type does not implement Type::outputValueRecursive())";
     }
@@ -92,8 +91,7 @@ namespace Mu
         o << "(type does not implement Type::outputValue() for Value)";
     }
 
-    void Type::outputValue(std::ostream& o, const ValuePointer p,
-                           bool full) const
+    void Type::outputValue(std::ostream& o, const ValuePointer p, bool full) const
     {
         ValueOutputState state(o, full);
         outputValueRecursive(o, p, state);
@@ -125,10 +123,7 @@ namespace Mu
 
     const Type* Type::nodeReturnType(const Node*) const { return this; }
 
-    void Type::deleteObject(Object* obj) const
-    {
-        cerr << "Type::deleteObject -- " << hex << obj << " " << name() << endl;
-    }
+    void Type::deleteObject(Object* obj) const { cerr << "Type::deleteObject -- " << hex << obj << " " << name() << endl; }
 
     void Type::constructInstance(Pointer) const { abort(); }
 
@@ -138,13 +133,9 @@ namespace Mu
 
     ValuePointer Type::fieldPointer(Object*, size_t) const { return 0; }
 
-    const ValuePointer Type::fieldPointer(const Object*, size_t) const
-    {
-        return 0;
-    }
+    const ValuePointer Type::fieldPointer(const Object*, size_t) const { return 0; }
 
-    void Type::serialize(std::ostream& o, Archive::Writer& archive,
-                         const ValuePointer p) const
+    void Type::serialize(std::ostream& o, Archive::Writer& archive, const ValuePointer p) const
     {
         if (isPrimitiveType())
         {
@@ -157,8 +148,7 @@ namespace Mu
             ValuePointer fp = 0;
             size_t index = 0;
 
-            while ((ftype = fieldType(index))
-                   && (fp = fieldPointer(obj, index)))
+            while ((ftype = fieldType(index)) && (fp = fieldPointer(obj, index)))
             {
                 if (ftype->isPrimitiveType())
                 {
@@ -175,8 +165,7 @@ namespace Mu
         }
     }
 
-    void Type::deserialize(std::istream& i, Archive::Reader& archive,
-                           ValuePointer p) const
+    void Type::deserialize(std::istream& i, Archive::Reader& archive, ValuePointer p) const
     {
         if (isPrimitiveType())
         {
@@ -189,8 +178,7 @@ namespace Mu
             ValuePointer fp = 0;
             size_t index = 0;
 
-            while ((ftype = fieldType(index))
-                   && (fp = fieldPointer(obj, index)))
+            while ((ftype = fieldType(index)) && (fp = fieldPointer(obj, index)))
             {
                 if (ftype->isPrimitiveType())
                 {
@@ -228,9 +216,6 @@ namespace Mu
         }
     }
 
-    NODE_IMPLEMENTATION(Type::dataNodeReturnValue, Value)
-    {
-        return ((const DataNode&)NODE_THIS)._data;
-    }
+    NODE_IMPLEMENTATION(Type::dataNodeReturnValue, Value) { return ((const DataNode&)NODE_THIS)._data; }
 
 } // namespace Mu

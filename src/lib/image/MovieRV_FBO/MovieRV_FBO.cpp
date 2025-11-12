@@ -73,8 +73,7 @@ namespace TwkFB
                     prefix = i->fb->attribute<string>("RVSource");
                 }
 
-                const TwkFB::FrameBuffer::AttributeVector& attrs =
-                    i->fb->attributes();
+                const TwkFB::FrameBuffer::AttributeVector& attrs = i->fb->attributes();
 
                 if (prefix != "")
                     prefix = "/" + prefix + "/./";
@@ -113,20 +112,17 @@ namespace TwkFB
         TwkGLF::UninitPBOPools();
     }
 
-    void MovieRV::preloadOpen(const std::string& /*unused*/,
-                              const ReadRequest& /*unused*/)
+    void MovieRV::preloadOpen(const std::string& /*unused*/, const ReadRequest& /*unused*/)
     {
         // nothing works for this
     }
 
-    void MovieRV::postPreloadOpen(const TwkMovie::MovieInfo& /*unused*/,
-                                  const Movie::ReadRequest& /*unused*/)
+    void MovieRV::postPreloadOpen(const TwkMovie::MovieInfo& /*unused*/, const Movie::ReadRequest& /*unused*/)
     {
         // nothing works for this
     }
 
-    void MovieRV::open(Rv::RvSession* session, const TwkMovie::MovieInfo& info,
-                       TwkAudio::ChannelsVector audioChannels, double audioRate,
+    void MovieRV::open(Rv::RvSession* session, const TwkMovie::MovieInfo& info, TwkAudio::ChannelsVector audioChannels, double audioRate,
                        size_t audioPacketSize)
     {
         m_info = info;
@@ -174,17 +170,14 @@ namespace TwkFB
         m_thread = pthread_self();
     }
 
-    void MovieRV::imagesAtFrame(const ReadRequest& request,
-                                FrameBufferVector& fbs)
+    void MovieRV::imagesAtFrame(const ReadRequest& request, FrameBufferVector& fbs)
     {
         int frame = request.frame;
         bool stereo = request.stereo;
 
         if (!m_device)
         {
-            m_device =
-                new FBOVideoDevice(0, m_info.uncropWidth, m_info.uncropHeight,
-                                   m_info.numChannels == 4, (stereo) ? 2 : 1);
+            m_device = new FBOVideoDevice(0, m_info.uncropWidth, m_info.uncropHeight, m_info.numChannels == 4, (stereo) ? 2 : 1);
             TWK_GLDEBUG;
             m_device->makeCurrent();
             TWK_GLDEBUG;
@@ -212,8 +205,7 @@ namespace TwkFB
         m_session->graph().findNodesByTypeName(frame, nodes, "RVDisplayStereo");
         m_session->makeCurrentSession();
 
-        if (!nodes.empty()
-            && (stereoNode = dynamic_cast<DisplayStereoIPNode*>(nodes.front())))
+        if (!nodes.empty() && (stereoNode = dynamic_cast<DisplayStereoIPNode*>(nodes.front())))
         {
             if (stereoNode->stereoType() == "hardware")
             {
@@ -236,9 +228,7 @@ namespace TwkFB
 
             m_device->setDefaultFBOIndex(i);
 
-            fb->restructure(m_device->width(), m_device->height(), 1, 4,
-                            TwkFB::FrameBuffer::HALF, 0, 0,
-                            TwkFB::FrameBuffer::NATURAL, true);
+            fb->restructure(m_device->width(), m_device->height(), 1, 4, TwkFB::FrameBuffer::HALF, 0, 0, TwkFB::FrameBuffer::NATURAL, true);
 
             m_device->makeCurrent();
 
@@ -273,8 +263,7 @@ namespace TwkFB
                 break;
             }
 
-            glReadPixels(0, 0, fb->width(), fb->height(), ctype, dtype,
-                         fb->pixels<GLvoid>());
+            glReadPixels(0, 0, fb->width(), fb->height(), ctype, dtype, fb->pixels<GLvoid>());
             glFinish();
 
             if (const IPImage* ipimage = m_session->displayImage())
@@ -292,8 +281,7 @@ namespace TwkFB
 
             fb->setIdentifier("");
             fb->attribute<TwkGLF::GLVideoDevice*>("videoDevice") = m_device;
-            fb->attribute<TwkGLF::GLState*>("glState") =
-                m_session->renderer()->getGLState();
+            fb->attribute<TwkGLF::GLState*>("glState") = m_session->renderer()->getGLState();
             fb->attribute<string>("renderer") = "hw";
             identifier(frame, fb->idstream());
 
@@ -312,8 +300,7 @@ namespace TwkFB
         }
     }
 
-    void MovieRV::identifiersAtFrame(const ReadRequest& request,
-                                     IdentifierVector& ids)
+    void MovieRV::identifiersAtFrame(const ReadRequest& request, IdentifierVector& ids)
     {
         int frame = request.frame;
         ostringstream str;
@@ -322,17 +309,12 @@ namespace TwkFB
         ids.front() = str.str();
     }
 
-    void MovieRV::identifier(int frame, ostream& o)
-    {
-        o << m_idstring << ":" << frame;
-    }
+    void MovieRV::identifier(int frame, ostream& o) { o << m_idstring << ":" << frame; }
 
-    size_t MovieRV::audioFillBuffer(const AudioReadRequest& request,
-                                    AudioBuffer& buffer)
+    size_t MovieRV::audioFillBuffer(const AudioReadRequest& request, AudioBuffer& buffer)
     {
         size_t nsamps = timeToSamples(request.duration, m_audioRate);
-        buffer.reconfigure(nsamps, m_audioChannels, m_audioRate,
-                           request.startTime);
+        buffer.reconfigure(nsamps, m_audioChannels, m_audioRate, request.startTime);
         IPNode::AudioContext context(buffer, m_session->fps());
 
         if (m_audioInit)
@@ -343,13 +325,9 @@ namespace TwkFB
             //
 
             IPGraph::AudioConfiguration config(
-                m_audioRate,
-                TwkAudio::channelLayouts(m_audioChannels.size()).front(),
-                m_audioPacketSize, m_session->fps(), m_session->inc() < 0,
-                buffer.startSample(),
-                size_t((m_session->rangeEnd() - m_session->rangeStart())
-                           / m_session->fps() * m_audioRate
-                       + 0.49));
+                m_audioRate, TwkAudio::channelLayouts(m_audioChannels.size()).front(), m_audioPacketSize, m_session->fps(),
+                m_session->inc() < 0, buffer.startSample(),
+                size_t((m_session->rangeEnd() - m_session->rangeStart()) / m_session->fps() * m_audioRate + 0.49));
 
             m_session->graph().audioConfigure(config);
             m_audioInit = false;
@@ -367,8 +345,7 @@ namespace TwkFB
 
         for (int i = 0; i < sources.size(); i++)
         {
-            if (FileSourceIPNode* node =
-                    dynamic_cast<FileSourceIPNode*>(sources[i]))
+            if (FileSourceIPNode* node = dynamic_cast<FileSourceIPNode*>(sources[i]))
             {
                 // for (int q=0; q < node->numLayers(); q++)
                 //{
@@ -387,23 +364,18 @@ namespace TwkFB
     {
         StringPairVector codecs;
         StringPairVector acodecs;
-        addType("rv", "Tweak RV file", MovieRead | MovieReadAudio, codecs,
-                acodecs);
+        addType("rv", "Tweak RV file", MovieRead | MovieReadAudio, codecs, acodecs);
     }
 
     MovieRVIO::~MovieRVIO() {}
 
     std::string MovieRVIO::about() const { return "MovieRV_FBO"; }
 
-    TwkMovie::MovieReader* MovieRVIO::movieReader() const
-    {
-        return new MovieRV();
-    }
+    TwkMovie::MovieReader* MovieRVIO::movieReader() const { return new MovieRV(); }
 
     TwkMovie::MovieWriter* MovieRVIO::movieWriter() const { return 0; }
 
-    TwkMovie::MovieInfo
-    MovieRVIO::getMovieInfo(const std::string& filename) const
+    TwkMovie::MovieInfo MovieRVIO::getMovieInfo(const std::string& filename) const
     {
         TwkMovie::MovieInfo minfo;
         GTOReader reader;
@@ -422,22 +394,16 @@ namespace TwkFB
 
             if (p == "RVSession")
             {
-                StringProperty* sp =
-                    pc->property<StringProperty>("session", "sources");
-                Vec2iProperty* rp =
-                    pc->property<Vec2iProperty>("session", "range");
-                FloatProperty* fpsp =
-                    pc->property<FloatProperty>("session", "fps");
+                StringProperty* sp = pc->property<StringProperty>("session", "sources");
+                Vec2iProperty* rp = pc->property<Vec2iProperty>("session", "range");
+                FloatProperty* fpsp = pc->property<FloatProperty>("session", "fps");
                 IntProperty* incp = pc->property<IntProperty>("session", "inc");
 
-                if (sp->empty() || rp->empty() || fpsp->empty()
-                    || incp->empty())
+                if (sp->empty() || rp->empty() || fpsp->empty() || incp->empty())
                 {
                     for (int i = 0; i < containers.size(); i++)
                         delete containers[i];
-                    TWK_THROW_STREAM(
-                        TwkFB::IOException,
-                        "Unable to read session object: " << filename);
+                    TWK_THROW_STREAM(TwkFB::IOException, "Unable to read session object: " << filename);
                 }
 
                 minfo.start = rp->front().x;
@@ -448,8 +414,7 @@ namespace TwkFB
                 minfo.pixelAspect = 1.0;
                 minfo.audio = true;
                 minfo.audioSampleRate = TWEAK_AUDIO_DEFAULT_SAMPLE_RATE;
-                minfo.audioChannels =
-                    TwkAudio::layoutChannels(TwkAudio::Stereo_2);
+                minfo.audioChannels = TwkAudio::layoutChannels(TwkAudio::Stereo_2);
             }
 
             if (p == "RVSource")
@@ -459,8 +424,7 @@ namespace TwkFB
                 //  the result will be incorrect.
                 //
 
-                if (Vec2iProperty* rp =
-                        pc->property<Vec2iProperty>("proxy", "size"))
+                if (Vec2iProperty* rp = pc->property<Vec2iProperty>("proxy", "size"))
                 {
                     minfo.width = std::max(rp->front().x, minfo.width);
                     minfo.height = std::max(rp->front().y, minfo.height);
@@ -468,8 +432,7 @@ namespace TwkFB
             }
         }
 
-        TWK_THROW_STREAM(TwkFB::IOException,
-                         "Unable to read session object: " << filename);
+        TWK_THROW_STREAM(TwkFB::IOException, "Unable to read session object: " << filename);
 
         return minfo;
     }

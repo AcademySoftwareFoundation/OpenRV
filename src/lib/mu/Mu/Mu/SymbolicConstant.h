@@ -22,10 +22,8 @@ namespace Mu
     class SymbolicConstant : public Symbol
     {
     public:
-        SymbolicConstant(Context* context, const char* name, const Type*,
-                         const Value&);
-        SymbolicConstant(Context* context, const char* name, const char* type,
-                         const Value&);
+        SymbolicConstant(Context* context, const char* name, const Type*, const Value&);
+        SymbolicConstant(Context* context, const char* name, const char* type, const Value&);
         ~SymbolicConstant();
 
         //
