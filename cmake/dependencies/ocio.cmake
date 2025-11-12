@@ -30,8 +30,7 @@ ELSE()
   )
 ENDIF()
 
-RV_VFX_SET_VARIABLE(
-  _download_hash
+SET(_download_hash
   ${RV_DEPS_OCIO_DOWNLOAD_HASH}
 )
 
@@ -48,8 +47,7 @@ IF(RV_TARGET_WINDOWS)
   ) # Empty out the List as it has the wrong DLL name: it doesn't have the version suffix
 
   # OpenColorIO shared library has the same name on Release and Debug.
-  RV_VFX_SET_VARIABLE(
-    _ocio_win_sharedlibname
+  SET(_ocio_win_sharedlibname
     "OpenColorIO_${RV_DEPS_OCIO_VERSION_SHORT}.dll"
   )
 
