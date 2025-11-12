@@ -16,7 +16,7 @@ IF(RV_VFX_PLATFORM STREQUAL "CY2026")
     # Can find the build version in OpenRV/_build/RV_DEPS_IMATH/install/lib/
     SET(RV_DEPS_IMATH_VERSION "3.2.2")
     SET(RV_DEPS_IMATH_DOWNLOAD_HASH "d9c3aadc25a7d47a893b649787e59a44")
-    SET(RV_DEPS_IMATH_LIB_VER "30.11.0")
+    SET(RV_DEPS_IMATH_LIB_VER "30.${RV_DEPS_IMATH_VERSION}")
     SET(RV_DEPS_IMATH_LIB_MAJOR "3_2")
 
     # NumPy
@@ -53,14 +53,9 @@ IF(RV_VFX_PLATFORM STREQUAL "CY2026")
     # https://github.com/AcademySoftwareFoundation/OpenTimelineIO
     SET(RV_DEPS_OTIO_VERSION "0.18.1")
 
-    # PySide 
-    # Should be 6.8.3 for CY2026, but 
-    # using 6.5.3 for now pending updates to RV
-    #
-    # SET(RV_DEPS_PYSIDE_VERSION "6.8.3")
-    # SET(RV_DEPS_PYSIDE_DOWNLOAD_HASH "2a81028f5896edeb9c2a80adac3a8e68")
-    SET(RV_DEPS_PYSIDE_VERSION "6.5.3")
-    SET(RV_DEPS_PYSIDE_DOWNLOAD_HASH "515d3249c6e743219ff0d7dd25b8c8d8")
+    # PySide
+    SET(RV_DEPS_PYSIDE_VERSION "6.8.3")
+    SET(RV_DEPS_PYSIDE_DOWNLOAD_HASH "2a81028f5896edeb9c2a80adac3a8e68")
     SET(RV_DEPS_PYSIDE_TARGET "RV_DEPS_PYSIDE6")
     SET(RV_DEPS_PYSIDE_ARCHIVE_URL "https://mirrors.ocf.berkeley.edu/qt/official_releases/QtForPython/pyside6/PySide6-${RV_DEPS_PYSIDE_VERSION}-src/pyside-setup-everywhere-src-${RV_DEPS_PYSIDE_VERSION}.zip")
 
@@ -70,9 +65,6 @@ IF(RV_VFX_PLATFORM STREQUAL "CY2026")
     SET(RV_DEPS_PYTHON_DOWNLOAD_HASH "922596355aaa82f1f431fd88e114310d")
 
     # Qt
-    # Should be 6.8.3 for CY2026, but
-    # using 6.5.3 for now pending updates to RV
-    #SET(RV_DEPS_QT_VERSION "6.8.3")
-    SET(RV_DEPS_QT_VERSION "6.5.3")
+    SET(RV_DEPS_QT_VERSION "6.8.3")
     SET(RV_DEPS_QT_MAJOR "6")
 ENDIF()
