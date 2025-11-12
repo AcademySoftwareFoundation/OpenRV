@@ -292,7 +292,7 @@ IF(RV_TARGET_WINDOWS)
   )
 
   #TODO: Above patches are for Python 3.11.9, need to add other versions.
-  RV_VFX_SET_VARIABLE(_patch_command CY2023 "" CY2024 "${_patch_python_command}" CY2025 "" CY2026 "")
+  RV_VFX_SET_VARIABLE(_patch_command CY2023 "" CY2024 "${_patch_python_command}" CY2025 "${_patch_python_command}" CY2026 "")
   # Split the command into a semi-colon separated list.
   SEPARATE_ARGUMENTS(_patch_command)
   STRING(
@@ -425,7 +425,7 @@ IF(RV_TARGET_WINDOWS)
       ${RV_STAGE_INCLUDE_DIR} COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir}/bin ${RV_STAGE_BIN_DIR}
   )
 
-  IF(RV_VFX_CY2024)
+  IF(RV_VFX_PLATFORM STRGREATER_EQUAL CY2024)
     LIST(
       APPEND
       _copy_commands
