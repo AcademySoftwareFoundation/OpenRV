@@ -83,6 +83,8 @@ class: AnnotateMinorMode : MinorMode
         DrawMode     penMode;
         string       sliderName;
         ColorFunc    colorFunction;
+        string       category;
+        string       defaultTooltip;
     }
 
     MetaEvalInfo      _currentNodeInfo;
@@ -103,6 +105,7 @@ class: AnnotateMinorMode : MinorMode
     DrawMode          _smudgeDrawMode;
     string            _currentDrawObject;
     string            _drawModeTable;
+    string            _disabledTooltipMessage;
     int               _debug;
     Color             _color;
     Point             _pointer;
@@ -1340,6 +1343,15 @@ class: AnnotateMinorMode : MinorMode
         _textPlacementMode = false;
         _currentDrawMode = d;
         commands.setCursor(d.cursor);
+        
+        // Check if we need to hide panels due to category restriction
+        if (_active && !commands.isEventCategoryEnabled("annotate_category"))
+        {
+            if (_manageDock neq nil) _manageDock.hide();
+            if (_drawDock neq nil) _drawDock.hide();
+            _hideDrawPane = 0;
+        }
+        
         updateDrawModeUI();
         _toolSliderLabel.setText(if d.sliderName eq nil then "Opacity" else d.sliderName);
     }
@@ -1826,11 +1838,19 @@ class: AnnotateMinorMode : MinorMode
         if (_currentDrawMode eq _selectDrawMode)
         {
             _hideDrawPane = _hideDrawPane + 1;
-            if (_active) toggle();
+            // Don't toggle if annotate category is disabled
+            if (_active && commands.isEventCategoryEnabled("annotate_category"))
+            {
+                toggle();
+            }
         }
         else
         {
-            if (!_active) toggle();
+            // Don't activate if annotate category is disabled
+            if (!_active && commands.isEventCategoryEnabled("annotate_category"))
+            {
+                toggle();
+            }
             _hideDrawPane = 0;
         }
 
@@ -1961,13 +1981,66 @@ class: AnnotateMinorMode : MinorMode
     method: nextSlot (void; bool b) { nextAnnotatedFrame(); }
     method: prevSlot (void; bool b) { prevAnnotatedFrame(); }
 
-    method: onCategoryStateChanged(void; Event event)
+
+    method: setDisabledTooltipMessage(void; Event event)
     {
-        if (_active && !commands.isEventCategoryEnabled("annotate_category"))
+        let message = event.contents();
+        if (message != "")
         {
-            toggle();
+            _disabledTooltipMessage = message;
         }
         event.reject();
+    }
+
+    method: onCategoryStateChanged(void; Event event)
+    {
+        // Close panel if annotate_category is disabled
+        if (_active && !commands.isEventCategoryEnabled("annotate_category"))
+        {
+            _hideDrawPane = 0;
+            toggle();
+        }
+        
+        // Update individual tool availability
+        updateToolAvailability();
+        
+        event.reject();
+    }
+    
+    method: updateToolAvailability(void;)
+    {
+        // Check main annotate_category and hide panels if disabled
+        if (!commands.isEventCategoryEnabled("annotate_category"))
+        {
+            if (_manageDock neq nil) _manageDock.hide();
+            if (_drawDock neq nil) _drawDock.hide();
+            _hideDrawPane = 0;
+        }
+        
+        // Update tool states
+        for_each (tool; _drawModes)
+        {
+            if (tool.category neq nil && tool.category != "")
+            {
+                let enabled = commands.isEventCategoryEnabled(tool.category);
+                tool.button.setEnabled(enabled);
+                tool.action.setEnabled(enabled);
+                
+                if (enabled)
+                {
+                    tool.action.setToolTip(tool.defaultTooltip);
+                }
+                else
+                {
+                    tool.action.setToolTip(_disabledTooltipMessage);
+                    
+                    if (_currentDrawMode eq tool)
+                    {
+                        setDrawModeSlot(true, _selectDrawMode);
+                    }
+                }
+            }
+        }
     }
 
     method: setCurrentNodeEvent (void; Event event)
@@ -2009,6 +2082,7 @@ class: AnnotateMinorMode : MinorMode
         _autoSave          = true;
         _hideDrawPane      = 0;
         _userSelectedNode   = "";
+        _disabledTooltipMessage = "This tool is currently unavailable";
 
         let m = mainWindowWidget(),
             g = QActionGroup(m);
@@ -2087,7 +2161,13 @@ class: AnnotateMinorMode : MinorMode
                                      1,
                                      1,
                                      0.024, 0.001,
-                                     PressureMode.None };
+                                     PressureMode.None,
+                                     nil,
+                                     nil,
+                                     nil,
+                                     nil,
+                                     "annotate_select_category",
+                                     "Select" };
 
         _dropperDrawMode = DrawMode { "Sample Color",
                                       "sample",
@@ -2104,7 +2184,13 @@ class: AnnotateMinorMode : MinorMode
                                      0.024, 0.001,
                                      1,
                                      1,
-                                     PressureMode.None };
+                                     PressureMode.None,
+                                     nil,
+                                     nil,
+                                     nil,
+                                     nil,
+                                     "annotate_sample_category",
+                                     "Sample Color" };
 
         _textDrawMode  = DrawMode { "Text",
                                       "text",
@@ -2121,7 +2207,13 @@ class: AnnotateMinorMode : MinorMode
                                      0.01, 0.0015,
                                      1,
                                      1,
-                                     PressureMode.None };
+                                     PressureMode.None,
+                                     nil,
+                                     nil,
+                                     nil,
+                                     nil,
+                                     "annotate_text_category",
+                                     "Text" };
 
         _penDrawMode = DrawMode { "Pen",
                                   "pen",
@@ -2138,7 +2230,13 @@ class: AnnotateMinorMode : MinorMode
                                   0.024, 0.001,
                                   1,
                                   1,
-                                  defaultPMode };
+                                  defaultPMode,
+                                  nil,
+                                  nil,
+                                  nil,
+                                  nil,
+                                  "annotate_pen_category",
+                                  "Pen" };
 
 
         _airBrushDrawMode = DrawMode { "Air Brush",
@@ -2156,7 +2254,13 @@ class: AnnotateMinorMode : MinorMode
                                        0.044, 0.001,
                                        1,
                                        1,
-                                       defaultPMode };
+                                       defaultPMode,
+                                       nil,
+                                       nil,
+                                       nil,
+                                       nil,
+                                       "annotate_airbrush_category",
+                                       "Air Brush" };
 
 
         _hardEraseDrawMode = DrawMode { "Hard Erase",
@@ -2175,7 +2279,13 @@ class: AnnotateMinorMode : MinorMode
                                         0.024, 0.001,
                                         1,
                                         1,
-                                        PressureMode.None };
+                                        PressureMode.None,
+                                        nil,
+                                        nil,
+                                        nil,
+                                        nil,
+                                        "annotate_harderase_category",
+                                        "Hard Erase" };
 
         _softEraseDrawMode = DrawMode { "Air Brush Erase",
                                         "airerase",
@@ -2193,7 +2303,13 @@ class: AnnotateMinorMode : MinorMode
                                         0.044, 0.001,
                                         1,
                                         1,
-                                        PressureMode.None };
+                                        PressureMode.None,
+                                        nil,
+                                        nil,
+                                        nil,
+                                        nil,
+                                        "annotate_softerase_category",
+                                        "Air Brush Erase" };
 
         _dodgeDrawMode     = DrawMode { "Dodge",
                                         "dodge",
@@ -2214,7 +2330,9 @@ class: AnnotateMinorMode : MinorMode
                                         _hardEraseDrawMode,
                                         nil,
                                         "Intensity",
-                                        dodgeFunc };
+                                        dodgeFunc,
+                                        "annotate_dodge_category",
+                                        "Dodge" };
 
         _burnDrawMode     = DrawMode { "Burn",
                                         "burn",
@@ -2235,7 +2353,9 @@ class: AnnotateMinorMode : MinorMode
                                         _hardEraseDrawMode,
                                         nil,
                                         "Intensity",
-                                        burnFunc };
+                                        burnFunc,
+                                        "annotate_burn_category",
+                                        "Burn" };
 
         _cloneDrawMode    = DrawMode { "Clone",
                                         "clone",
@@ -2252,7 +2372,13 @@ class: AnnotateMinorMode : MinorMode
                                         0.044, 0.001,
                                         1,
                                         1,
-                                        PressureMode.None };
+                                        PressureMode.None,
+                                        nil,
+                                        nil,
+                                        nil,
+                                        nil,
+                                        "annotate_clone_category",
+                                        "Clone" };
 
         _smudgeDrawMode   = DrawMode { "Smudge",
                                         "smudge",
@@ -2269,7 +2395,13 @@ class: AnnotateMinorMode : MinorMode
                                         0.044, 0.001,
                                         1,
                                         1,
-                                        PressureMode.None };
+                                        PressureMode.None,
+                                        nil,
+                                        nil,
+                                        nil,
+                                        nil,
+                                        "annotate_smudge_category",
+                                        "Smudge" };
 
         _drawModes = DrawMode[] { _selectDrawMode, _penDrawMode, _airBrushDrawMode,
                                   _textDrawMode, _dropperDrawMode, _hardEraseDrawMode,
@@ -2429,6 +2561,7 @@ class: AnnotateMinorMode : MinorMode
               // bound by menuItem("   Next Annotated Frame") // ("key-down--alt-shift--right", nextEvent, "Next Annotated Frame"),
               // bound by menuItem("   Previous Annotated Frame") // ("key-down--alt-shift--left", prevEvent, "Previous Annotated Frame"),
               ("event-category-state-changed", onCategoryStateChanged, "Category state changed"),
+              ("annotate-set-disabled-tooltip", setDisabledTooltipMessage, "Set disabled tooltip message"),
               ("clear-annotations-current-frame", clearEvent, "Clear annotations on current frame"),
               ("clear-annotations-all-frames", clearAllEvent, "Clear annotations on all frames"),
               ("set-current-annotate-mode-node", setCurrentNodeEvent, "Set current paint node"),
@@ -2562,6 +2695,19 @@ class: AnnotateMinorMode : MinorMode
         {
             ; // ignore
         }
+        
+        //
+        //  Bind global event handler for category state changes
+        //  This must be global (not mode-local) so it works even when mode is semi-active
+        //
+        let self = this;  // Capture the instance for lambda closure
+        bind("default", "global", "event-category-state-changed", 
+             \: (void; Event event) 
+             {
+                 self.updateToolAvailability();
+                 event.reject();
+             }, 
+             "");
     }
 
     method: deactivate (void;)
@@ -2580,8 +2726,22 @@ class: AnnotateMinorMode : MinorMode
     method: activate (void;)
     {
         updateCurrentNode();
-        if (_manageDock neq nil) _manageDock.show();
-        if (_drawDock neq nil) _drawDock.show();
+        updateToolAvailability();
+        
+        // Handle panel visibility based on category state
+        if (commands.isEventCategoryEnabled("annotate_category"))
+        {
+            if (_manageDock neq nil) _manageDock.show();
+            if (_drawDock neq nil) _drawDock.show();
+        }
+        else
+        {
+            // Explicitly hide panels if category is disabled
+            if (_manageDock neq nil) _manageDock.hide();
+            if (_drawDock neq nil) _drawDock.hide();
+            _hideDrawPane = 0;
+        }
+        
         setCursor(_currentDrawMode.cursor);
         updateDrawModeUI();
         setTags();

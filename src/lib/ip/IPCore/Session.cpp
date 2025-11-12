@@ -754,7 +754,6 @@ namespace IPCore
         {
             m_disabledEventCategories.push_back(category);
         }
-        std::cout << "Disabled event category: " << category << std::endl;
     }
 
     bool Session::isEventCategoryDisabled(std::string_view category) const
