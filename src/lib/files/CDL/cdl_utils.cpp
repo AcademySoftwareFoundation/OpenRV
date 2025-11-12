@@ -40,7 +40,7 @@ namespace CDL
 
     bool isCDLFile(const std::string& filepath)
     {
-        const string ext = boost::filesystem::extension(filepath);
+        const string ext = boost::filesystem::path(filepath).extension().string();
 
         //
         //  Add the extensions that we support.
