@@ -32,7 +32,7 @@ IF(RV_VFX_PLATFORM STREQUAL "CY2024")
     # OIIO
     # https://github.com/AcademySoftwareFoundation/OpenImageIO
     SET(RV_DEPS_OIIO_VERSION "2.4.12.0")
-    SET(RV_DEPS_OIIO_DOWNLOAD_HASH "5af6de5a73c6d234eed8e2874a5aed62")
+    SET(RV_DEPS_OIIO_DOWNLOAD_HASH "7de64609a08cf0b1a8e3f3d74eebb8b5")
 
     # OpenEXR
     # https://github.com/AcademySoftwareFoundation/openexr/releases
