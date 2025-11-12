@@ -325,6 +325,8 @@ alias rvmk='rvcfg && rvbuild'
 alias rvbootstrap='rvsetup && rvmk'
 alias rvrun='rvappdir && ./rv'
 
+__rv_update_paths
+
 echo "Please ensure you have installed any required dependencies from doc/build_system/config_[os]"
 echo
 echo "CMake parameters:"
@@ -337,10 +339,10 @@ echo "CMAKE_GENERATOR is $CMAKE_GENERATOR"
 echo "QT_HOME is $QT_HOME"
 if [[ "$OSTYPE" == "msys"* || "$OSTYPE" == "cygwin"* ]]; then echo "WIN_PERL is $WIN_PERL"; fi
 
+echo 
 echo "To override any of them do unset [name]; export [name]=value; source $SCRIPT"
 echo
 echo "Use 'rvrelease' (default) or 'rvdebug' to switch between build configurations."
-echo
 echo "Call 'rvbootstrap' if its your first time building or after calling rvclean."
 echo "After 'rvbootstrap', use 'rvbuild' or 'rvmk' for incremental builds."
 echo
