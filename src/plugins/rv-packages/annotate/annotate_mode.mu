@@ -1344,7 +1344,6 @@ class: AnnotateMinorMode : MinorMode
         _currentDrawMode = d;
         commands.setCursor(d.cursor);
         
-        // Check if we need to hide panels due to category restriction
         if (_active && !commands.isEventCategoryEnabled("annotate_category"))
         {
             if (_manageDock neq nil) _manageDock.hide();
@@ -1838,7 +1837,6 @@ class: AnnotateMinorMode : MinorMode
         if (_currentDrawMode eq _selectDrawMode)
         {
             _hideDrawPane = _hideDrawPane + 1;
-            // Don't toggle if annotate category is disabled
             if (_active && commands.isEventCategoryEnabled("annotate_category"))
             {
                 toggle();
@@ -1846,7 +1844,6 @@ class: AnnotateMinorMode : MinorMode
         }
         else
         {
-            // Don't activate if annotate category is disabled
             if (!_active && commands.isEventCategoryEnabled("annotate_category"))
             {
                 toggle();
@@ -1994,7 +1991,6 @@ class: AnnotateMinorMode : MinorMode
 
     method: onCategoryStateChanged(void; Event event)
     {
-        // Close panel if annotate_category is disabled
         if (_active && !commands.isEventCategoryEnabled("annotate_category"))
         {
             _hideDrawPane = 0;
@@ -2009,7 +2005,6 @@ class: AnnotateMinorMode : MinorMode
     
     method: updateToolAvailability(void;)
     {
-        // Check main annotate_category and hide panels if disabled
         if (!commands.isEventCategoryEnabled("annotate_category"))
         {
             if (_manageDock neq nil) _manageDock.hide();
@@ -2728,7 +2723,6 @@ class: AnnotateMinorMode : MinorMode
         updateCurrentNode();
         updateToolAvailability();
         
-        // Handle panel visibility based on category state
         if (commands.isEventCategoryEnabled("annotate_category"))
         {
             if (_manageDock neq nil) _manageDock.show();
