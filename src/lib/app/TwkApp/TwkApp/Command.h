@@ -398,8 +398,7 @@ namespace TwkApp
         virtual void doit();
         virtual void undo();
         virtual void redo();
-        void setArgs(CommandHistory* h, CommandType t,
-                     const std::string& name = "");
+        void setArgs(CommandHistory* h, CommandType t, const std::string& name = "");
 
     private:
         CommandHistory* m_history;

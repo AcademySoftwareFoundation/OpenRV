@@ -21,9 +21,7 @@ namespace IPCore
     using namespace TwkContainer;
     using namespace TwkFB;
 
-    IPInstanceNode::IPInstanceNode(const std::string& name,
-                                   const NodeDefinition* def, IPGraph* graph,
-                                   GroupIPNode* group)
+    IPInstanceNode::IPInstanceNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group)
         : IPNode(name, def, graph, group)
         , m_intermediate(false)
     {
@@ -73,9 +71,7 @@ namespace IPCore
             string name = "parameters.";
             name += s->name();
 
-            if (s->name() == "frame"
-                || (s->name() == "_offset" && s->isSpecial())
-                || s->name() == "baseFrame" || s->name() == "stereoEye"
+            if (s->name() == "frame" || (s->name() == "_offset" && s->isSpecial()) || s->name() == "baseFrame" || s->name() == "stereoEye"
                 || F->isInputImageParameter(s->name()))
             {
                 //
@@ -184,13 +180,9 @@ namespace IPCore
 
     IPInstanceNode::~IPInstanceNode() { pthread_mutex_destroy(&m_lock); }
 
-    bool IPInstanceNode::isActive() const
-    {
-        return m_activeProperty->size() == 1 && m_activeProperty->front() == 1;
-    }
+    bool IPInstanceNode::isActive() const { return m_activeProperty->size() == 1 && m_activeProperty->front() == 1; }
 
-    bool IPInstanceNode::testInputs(const IPNodes& inputs,
-                                    std::ostringstream& msg) const
+    bool IPInstanceNode::testInputs(const IPNodes& inputs, std::ostringstream& msg) const
     {
         if (inputs.size() > m_numInputs)
         {
@@ -210,15 +202,13 @@ namespace IPCore
         }
     }
 
-    Shader::BoundSymbol* IPInstanceNode::boundSymbolFromSymbol(
-        IPImage* image, const Shader::Symbol* s, const Context& context) const
+    Shader::BoundSymbol* IPInstanceNode::boundSymbolFromSymbol(IPImage* image, const Shader::Symbol* s, const Context& context) const
     {
         //
         //  Test for some special cases that override user parameters first
         //
 
-        if ((s->name() == "_offset" || s->name() == "offset")
-            && s->type() == Shader::Symbol::Vec2fType && s->isSpecial())
+        if ((s->name() == "_offset" || s->name() == "offset") && s->type() == Shader::Symbol::Vec2fType && s->isSpecial())
         {
             //
             //  Special parameter (used by renderer) requires initialization to
@@ -244,14 +234,12 @@ namespace IPCore
             {
             case Shader::Symbol::FloatType:
 
-                if (const FloatProperty* fp =
-                        dynamic_cast<const FloatProperty*>(prop))
+                if (const FloatProperty* fp = dynamic_cast<const FloatProperty*>(prop))
                 {
                     return new Shader::BoundFloat(s, fp->front());
                 }
 
-                if (const IntProperty* ip =
-                        dynamic_cast<const IntProperty*>(prop))
+                if (const IntProperty* ip = dynamic_cast<const IntProperty*>(prop))
                 {
                     return new Shader::BoundFloat(s, float(ip->front()));
                 }
@@ -259,8 +247,7 @@ namespace IPCore
 
             case Shader::Symbol::Vec2fType:
 
-                if (const Vec2fProperty* vp =
-                        dynamic_cast<const Vec2fProperty*>(prop))
+                if (const Vec2fProperty* vp = dynamic_cast<const Vec2fProperty*>(prop))
                 {
                     return new Shader::BoundVec2f(s, vp->front());
                 }
@@ -268,8 +255,7 @@ namespace IPCore
 
             case Shader::Symbol::Vec3fType:
 
-                if (const Vec3fProperty* vp =
-                        dynamic_cast<const Vec3fProperty*>(prop))
+                if (const Vec3fProperty* vp = dynamic_cast<const Vec3fProperty*>(prop))
                 {
                     return new Shader::BoundVec3f(s, vp->front());
                 }
@@ -277,8 +263,7 @@ namespace IPCore
 
             case Shader::Symbol::Vec4fType:
 
-                if (const Vec4fProperty* vp =
-                        dynamic_cast<const Vec4fProperty*>(prop))
+                if (const Vec4fProperty* vp = dynamic_cast<const Vec4fProperty*>(prop))
                 {
                     return new Shader::BoundVec4f(s, vp->front());
                 }
@@ -286,14 +271,12 @@ namespace IPCore
 
             case Shader::Symbol::IntType:
 
-                if (const IntProperty* ip =
-                        dynamic_cast<const IntProperty*>(prop))
+                if (const IntProperty* ip = dynamic_cast<const IntProperty*>(prop))
                 {
                     return new Shader::BoundInt(s, ip->front());
                 }
 
-                if (const FloatProperty* fp =
-                        dynamic_cast<const FloatProperty*>(prop))
+                if (const FloatProperty* fp = dynamic_cast<const FloatProperty*>(prop))
                 {
                     return new Shader::BoundInt(s, int(fp->front()));
                 }
@@ -301,8 +284,7 @@ namespace IPCore
 
             case Shader::Symbol::BoolType:
 
-                if (const IntProperty* ip =
-                        dynamic_cast<const IntProperty*>(prop))
+                if (const IntProperty* ip = dynamic_cast<const IntProperty*>(prop))
                 {
                     return new Shader::BoundBool(s, ip->front());
                 }
@@ -310,13 +292,11 @@ namespace IPCore
 
             case Shader::Symbol::Matrix4fType:
 
-                if (const Mat44fProperty* m44p =
-                        dynamic_cast<const Mat44fProperty*>(prop))
+                if (const Mat44fProperty* m44p = dynamic_cast<const Mat44fProperty*>(prop))
                 {
                     return new Shader::BoundMat44f(s, *(Mat44f*)m44p->data());
                 }
-                else if (const FloatProperty* fp =
-                             dynamic_cast<const FloatProperty*>(prop))
+                else if (const FloatProperty* fp = dynamic_cast<const FloatProperty*>(prop))
                 {
                     if (fp->size() == 16)
                     {
@@ -327,13 +307,11 @@ namespace IPCore
 
             case Shader::Symbol::Matrix3fType:
 
-                if (const Mat33fProperty* m33p =
-                        dynamic_cast<const Mat33fProperty*>(prop))
+                if (const Mat33fProperty* m33p = dynamic_cast<const Mat33fProperty*>(prop))
                 {
                     return new Shader::BoundMat33f(s, *(Mat33f*)m33p->data());
                 }
-                else if (const FloatProperty* fp =
-                             dynamic_cast<const FloatProperty*>(prop))
+                else if (const FloatProperty* fp = dynamic_cast<const FloatProperty*>(prop))
                 {
                     if (fp->size() == 9)
                     {
@@ -344,8 +322,7 @@ namespace IPCore
 
             case Shader::Symbol::Matrix2fType:
 
-                if (const FloatProperty* fp =
-                        dynamic_cast<const FloatProperty*>(prop))
+                if (const FloatProperty* fp = dynamic_cast<const FloatProperty*>(prop))
                 {
                     if (fp->size() == 4)
                     {
@@ -356,8 +333,7 @@ namespace IPCore
 
             case Shader::Symbol::Sampler1DType:
 
-                if (const FloatProperty* fp =
-                        dynamic_cast<const FloatProperty*>(prop))
+                if (const FloatProperty* fp = dynamic_cast<const FloatProperty*>(prop))
                 {
                     // return an FB
                 }
@@ -374,8 +350,7 @@ namespace IPCore
                 const size_t zs = prop->zsizeTrait();
                 const size_t ws = prop->wsizeTrait();
 
-                if (const ImageProperty* ip =
-                        dynamic_cast<const ImageProperty*>(prop))
+                if (const ImageProperty* ip = dynamic_cast<const ImageProperty*>(prop))
                 {
                     if (zs != 0 && ws == 0)
                     {
@@ -417,17 +392,13 @@ namespace IPCore
                             break;
                         }
 
-                        FrameBuffer* fb = new FrameBuffer(
-                            FrameBuffer::PixelCoordinates, ys, zs, 0, xs, dtype,
-                            const_cast<unsigned char*>(
-                                ip->data<unsigned char>()),
-                            NULL, FrameBuffer::BOTTOMLEFT, false);
+                        FrameBuffer* fb =
+                            new FrameBuffer(FrameBuffer::PixelCoordinates, ys, zs, 0, xs, dtype,
+                                            const_cast<unsigned char*>(ip->data<unsigned char>()), NULL, FrameBuffer::BOTTOMLEFT, false);
 
-                        fb->idstream() << name() << "+"
-                                       << size_t(ip->data<unsigned char>());
+                        fb->idstream() << name() << "+" << size_t(ip->data<unsigned char>());
 
-                        return new Shader::BoundSampler(
-                            s, Shader::ImageOrFB(fb, 0));
+                        return new Shader::BoundSampler(s, Shader::ImageOrFB(fb, 0));
                     }
                 }
             }
@@ -505,18 +476,14 @@ namespace IPCore
         return 0;
     }
 
-    Shader::Expression* IPInstanceNode::bind(IPImage* image,
-                                             Shader::Expression* expr,
-                                             const Context& context) const
+    Shader::Expression* IPInstanceNode::bind(IPImage* image, Shader::Expression* expr, const Context& context) const
     {
         ExprVector exprs(1);
         exprs[0] = expr;
         return bind(image, exprs, context);
     }
 
-    Shader::Expression* IPInstanceNode::bind(IPImage* image,
-                                             const ExprVector& exprs,
-                                             const Context& context) const
+    Shader::Expression* IPInstanceNode::bind(IPImage* image, const ExprVector& exprs, const Context& context) const
     {
         const Shader::Function* F = definition()->function();
         size_t n = F->parameters().size();
@@ -527,15 +494,12 @@ namespace IPCore
         {
             const Shader::Symbol* p = F->parameters()[i];
 
-            if (p->type() == Shader::Symbol::InputImageType
-                || F->isInputImageParameter(p->name()))
+            if (p->type() == Shader::Symbol::InputImageType || F->isInputImageParameter(p->name()))
             {
-                args.push_back(
-                    new Shader::BoundExpression(p, exprs[proxyCount]));
+                args.push_back(new Shader::BoundExpression(p, exprs[proxyCount]));
                 proxyCount++;
             }
-            else if (Shader::BoundSymbol* bs =
-                         boundSymbolFromSymbol(image, p, context))
+            else if (Shader::BoundSymbol* bs = boundSymbolFromSymbol(image, p, context))
             {
                 args.push_back(bs);
             }
@@ -561,8 +525,7 @@ namespace IPCore
         {
             if (!images.empty())
             {
-                images.push_back(IPImage::newBlankImage(this, images[0]->width,
-                                                        images[1]->height));
+                images.push_back(IPImage::newBlankImage(this, images[0]->width, images[1]->height));
             }
             else
             {

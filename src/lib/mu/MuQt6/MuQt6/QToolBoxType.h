@@ -42,8 +42,7 @@ namespace Mu
         //  Constructors
         //
 
-        QToolBoxType(Context* context, const char* name, Class* superClass = 0,
-                     Class* superClass2 = 0);
+        QToolBoxType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QToolBoxType();
 
@@ -66,8 +65,7 @@ namespace Mu
     {
     public:
         virtual ~MuQt_QToolBox();
-        MuQt_QToolBox(Pointer muobj, const CallEnvironment*, QWidget* parent,
-                      Qt::WindowFlags f);
+        MuQt_QToolBox(Pointer muobj, const CallEnvironment*, QWidget* parent, Qt::WindowFlags f);
 
     protected:
         virtual void itemInserted(int index);
@@ -85,10 +83,7 @@ namespace Mu
     public:
         void itemInserted_pub(int index) { itemInserted(index); }
 
-        void itemInserted_pub_parent(int index)
-        {
-            QToolBox::itemInserted(index);
-        }
+        void itemInserted_pub_parent(int index) { QToolBox::itemInserted(index); }
 
         void itemRemoved_pub(int index) { itemRemoved(index); }
 
@@ -108,10 +103,7 @@ namespace Mu
 
         void paintEvent_pub(QPaintEvent* _p14) { paintEvent(_p14); }
 
-        void paintEvent_pub_parent(QPaintEvent* _p14)
-        {
-            QToolBox::paintEvent(_p14);
-        }
+        void paintEvent_pub_parent(QPaintEvent* _p14) { QToolBox::paintEvent(_p14); }
 
     public:
         const QToolBoxType* _baseType;
@@ -119,11 +111,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance*
-    QToolBoxType::cachedInstance(const QToolBoxType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QToolBoxType::cachedInstance(const QToolBoxType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

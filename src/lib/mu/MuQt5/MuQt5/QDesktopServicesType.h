@@ -23,8 +23,7 @@ namespace Mu
         //  Constructors
         //
 
-        QDesktopServicesType(Context* context, const char* name,
-                             Class* superClass = 0);
+        QDesktopServicesType(Context* context, const char* name, Class* superClass = 0);
         virtual ~QDesktopServicesType();
 
         //

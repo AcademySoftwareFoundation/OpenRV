@@ -149,40 +149,27 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <typename T>
-    inline const T& Vec1<T>::operator[](typename Vec1<T>::size_type index) const
+    template <typename T> inline const T& Vec1<T>::operator[](typename Vec1<T>::size_type index) const
     {
         assert(index == 0);
         return x;
     }
 
     //******************************************************************************
-    template <typename T>
-    inline T& Vec1<T>::operator[](typename Vec1<T>::size_type index)
+    template <typename T> inline T& Vec1<T>::operator[](typename Vec1<T>::size_type index)
     {
         assert(index == 0);
         return x;
     }
 
     //******************************************************************************
-    template <typename T>
-    inline typename Vec1<T>::const_iterator Vec1<T>::begin() const
-    {
-        return static_cast<const_iterator>(&x);
-    }
+    template <typename T> inline typename Vec1<T>::const_iterator Vec1<T>::begin() const { return static_cast<const_iterator>(&x); }
 
     //******************************************************************************
-    template <typename T> inline typename Vec1<T>::iterator Vec1<T>::begin()
-    {
-        return static_cast<iterator>(&x);
-    }
+    template <typename T> inline typename Vec1<T>::iterator Vec1<T>::begin() { return static_cast<iterator>(&x); }
 
     //******************************************************************************
-    template <typename T>
-    inline typename Vec1<T>::const_iterator Vec1<T>::end() const
-    {
-        return static_cast<const_iterator>(&x + 1);
-    }
+    template <typename T> inline typename Vec1<T>::const_iterator Vec1<T>::end() const { return static_cast<const_iterator>(&x + 1); }
 
     //******************************************************************************
     template <typename T> inline Vec1<T>& Vec1<T>::operator+=(const T& rhs)
@@ -192,8 +179,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <typename T>
-    inline Vec1<T>& Vec1<T>::operator+=(const Vec1<T>& rhs)
+    template <typename T> inline Vec1<T>& Vec1<T>::operator+=(const Vec1<T>& rhs)
     {
         x += rhs.x;
         return *this;
@@ -207,8 +193,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <typename T>
-    inline Vec1<T>& Vec1<T>::operator-=(const Vec1<T>& rhs)
+    template <typename T> inline Vec1<T>& Vec1<T>::operator-=(const Vec1<T>& rhs)
     {
         x -= rhs.x;
         return *this;
@@ -222,8 +207,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <typename T>
-    inline Vec1<T>& Vec1<T>::operator*=(const Vec1<T>& rhs)
+    template <typename T> inline Vec1<T>& Vec1<T>::operator*=(const Vec1<T>& rhs)
     {
         x *= rhs.x;
         return *this;
@@ -238,8 +222,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <typename T>
-    inline Vec1<T>& Vec1<T>::operator/=(const Vec1<T>& rhs)
+    template <typename T> inline Vec1<T>& Vec1<T>::operator/=(const Vec1<T>& rhs)
     {
         assert(rhs.x != (T)0);
         x /= rhs.x;
@@ -259,70 +242,37 @@ namespace TwkMath
     //******************************************************************************
     //******************************************************************************
     // ADDITION
-    template <typename T> inline Vec1<T> operator+(const Vec1<T>& a, const T& b)
-    {
-        return Vec1<T>(a.x + b);
-    }
+    template <typename T> inline Vec1<T> operator+(const Vec1<T>& a, const T& b) { return Vec1<T>(a.x + b); }
 
     //******************************************************************************
-    template <typename T> inline Vec1<T> operator+(const T& a, const Vec1<T>& b)
-    {
-        return Vec1<T>(a + b.x);
-    }
+    template <typename T> inline Vec1<T> operator+(const T& a, const Vec1<T>& b) { return Vec1<T>(a + b.x); }
 
     //******************************************************************************
-    template <typename T>
-    inline Vec1<T> operator+(const Vec1<T>& a, const Vec1<T>& b)
-    {
-        return Vec1<T>(a.x + b.x);
-    }
+    template <typename T> inline Vec1<T> operator+(const Vec1<T>& a, const Vec1<T>& b) { return Vec1<T>(a.x + b.x); }
 
     //******************************************************************************
     // NEGATION
-    template <typename T> inline Vec1<T> operator-(const Vec1<T>& a)
-    {
-        return Vec1<T>(-a.x);
-    }
+    template <typename T> inline Vec1<T> operator-(const Vec1<T>& a) { return Vec1<T>(-a.x); }
 
     //******************************************************************************
     // SUBTRACTION
-    template <typename T> inline Vec1<T> operator-(const Vec1<T>& a, const T& b)
-    {
-        return Vec1<T>(a.x - b);
-    }
+    template <typename T> inline Vec1<T> operator-(const Vec1<T>& a, const T& b) { return Vec1<T>(a.x - b); }
 
     //******************************************************************************
-    template <typename T> inline Vec1<T> operator-(const T& a, const Vec1<T>& b)
-    {
-        return Vec1<T>(a - b.x);
-    }
+    template <typename T> inline Vec1<T> operator-(const T& a, const Vec1<T>& b) { return Vec1<T>(a - b.x); }
 
     //******************************************************************************
-    template <typename T>
-    inline Vec1<T> operator-(const Vec1<T>& a, const Vec1<T>& b)
-    {
-        return Vec1<T>(a.x - b.x);
-    }
+    template <typename T> inline Vec1<T> operator-(const Vec1<T>& a, const Vec1<T>& b) { return Vec1<T>(a.x - b.x); }
 
     //******************************************************************************
     // MULTIPLICATION
-    template <typename T> inline Vec1<T> operator*(const Vec1<T>& a, const T& b)
-    {
-        return Vec1<T>(a.x * b);
-    }
+    template <typename T> inline Vec1<T> operator*(const Vec1<T>& a, const T& b) { return Vec1<T>(a.x * b); }
 
     //******************************************************************************
-    template <typename T> inline Vec1<T> operator*(const T& a, const Vec1<T>& b)
-    {
-        return Vec1<T>(a * b.x);
-    }
+    template <typename T> inline Vec1<T> operator*(const T& a, const Vec1<T>& b) { return Vec1<T>(a * b.x); }
 
     //******************************************************************************
-    template <typename T>
-    inline Vec1<T> operator*(const Vec1<T>& a, const Vec1<T>& b)
-    {
-        return Vec1<T>(a.x * b.x);
-    }
+    template <typename T> inline Vec1<T> operator*(const Vec1<T>& a, const Vec1<T>& b) { return Vec1<T>(a.x * b.x); }
 
     //******************************************************************************
     // DIVISION
@@ -340,8 +290,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <typename T>
-    inline Vec1<T> operator/(const Vec1<T>& a, const Vec1<T>& b)
+    template <typename T> inline Vec1<T> operator/(const Vec1<T>& a, const Vec1<T>& b)
     {
         assert(b.x != (T)0);
         return Vec1<T>(a.x / b.x);
@@ -352,18 +301,10 @@ namespace TwkMath
     // COMPARISON OPERATORS
     //******************************************************************************
     //******************************************************************************
-    template <typename T, typename T2>
-    inline bool operator==(const Vec1<T>& a, const Vec1<T2>& b)
-    {
-        return (a.x == b.x);
-    }
+    template <typename T, typename T2> inline bool operator==(const Vec1<T>& a, const Vec1<T2>& b) { return (a.x == b.x); }
 
     //******************************************************************************
-    template <typename T, typename T2>
-    inline bool operator!=(const Vec1<T>& a, const Vec1<T2>& b)
-    {
-        return (a.x != b.x);
-    }
+    template <typename T, typename T2> inline bool operator!=(const Vec1<T>& a, const Vec1<T2>& b) { return (a.x != b.x); }
 
 } // End namespace TwkMath
 

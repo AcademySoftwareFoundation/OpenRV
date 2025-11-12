@@ -37,17 +37,11 @@ namespace Rv
 
         m_createDialogUI.setupUi(m_createDialog = new QDialog(this, Qt::Sheet));
 
-        connect(m_ui.profileTreeView->selectionModel(),
-                SIGNAL(selectionChanged(const QItemSelection&,
-                                        const QItemSelection&)),
-                this,
-                SLOT(selectionChanged(const QItemSelection&,
-                                      const QItemSelection&)));
+        connect(m_ui.profileTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), this,
+                SLOT(selectionChanged(const QItemSelection&, const QItemSelection&)));
         connect(m_ui.addButton, SIGNAL(released()), this, SLOT(addProfile()));
-        connect(m_ui.deleteButton, SIGNAL(released()), this,
-                SLOT(deleteProfile()));
-        connect(m_ui.applyButton, SIGNAL(pressed()), this,
-                SLOT(applyProfile()));
+        connect(m_ui.deleteButton, SIGNAL(released()), this, SLOT(deleteProfile()));
+        connect(m_ui.applyButton, SIGNAL(pressed()), this, SLOT(applyProfile()));
     }
 
     RvProfileManager::~RvProfileManager() {}
@@ -63,8 +57,7 @@ namespace Rv
         m_model->setHorizontalHeaderLabels(headers);
 
         RvSession* session = Rv::RvSession::currentRvSession();
-        const IPCore::IPGraph::DisplayGroups& dgroups =
-            session->graph().displayGroups();
+        const IPCore::IPGraph::DisplayGroups& dgroups = session->graph().displayGroups();
 
         //
         //  At the moment we only manage "display" profiles.
@@ -89,9 +82,7 @@ namespace Rv
                 }
             }
 
-            QIcon icon = TwkUtil::isWritable(p->fileName().c_str())
-                             ? QIcon()
-                             : QIcon(":images/lock_out.png");
+            QIcon icon = TwkUtil::isWritable(p->fileName().c_str()) ? QIcon() : QIcon(":images/lock_out.png");
 
             QList<QStandardItem*> row;
 
@@ -144,8 +135,7 @@ namespace Rv
 
         for (int i = 0; i < supportPath.size(); ++i)
         {
-            if (userDir.canonicalPath()
-                == QDir(supportPath[i].c_str()).canonicalPath())
+            if (userDir.canonicalPath() == QDir(supportPath[i].c_str()).canonicalPath())
             {
                 foundIt = true;
             }
@@ -156,8 +146,7 @@ namespace Rv
             cerr << "ERROR: New Display Profiles will be created in the user "
                     "support area: "
                  << endl
-                 << "ERROR: '" << UTF8::qconvert(userDir.canonicalPath()) << "'"
-                 << endl
+                 << "ERROR: '" << UTF8::qconvert(userDir.canonicalPath()) << "'" << endl
                  << "ERROR: but that directory has been removed from the "
                     "RV_SUPPORT_PATH."
                  << endl
@@ -173,22 +162,19 @@ namespace Rv
 
         if (!profilesDir.exists())
         {
-            cerr << "ERROR: target Profiles directory does not exist: "
-                 << UTF8::qconvert(profilesDir.absolutePath()) << endl;
+            cerr << "ERROR: target Profiles directory does not exist: " << UTF8::qconvert(profilesDir.absolutePath()) << endl;
             return;
         }
 
         RvSession* session = Rv::RvSession::currentRvSession();
-        const IPCore::IPGraph::DisplayGroups& dgroups =
-            session->graph().displayGroups();
+        const IPCore::IPGraph::DisplayGroups& dgroups = session->graph().displayGroups();
 
         m_createDialogUI.deviceComboBox->clear();
 
         for (size_t i = 0; i < dgroups.size(); i++)
         {
             IPCore::DisplayGroupIPNode* dgroup = dgroups[i];
-            m_createDialogUI.deviceComboBox->addItem(
-                dgroup->physicalDevice()->name().c_str());
+            m_createDialogUI.deviceComboBox->addItem(dgroup->physicalDevice()->name().c_str());
         }
 
         m_createDialog->show();
@@ -200,10 +186,7 @@ namespace Rv
         IPCore::DisplayGroupIPNode* node = dgroups[index];
 
         Session::WriteRequest request;
-        request.setOption("comments",
-                          string(m_createDialogUI.commentsEdit->toPlainText()
-                                     .toUtf8()
-                                     .constData()));
+        request.setOption("comments", string(m_createDialogUI.commentsEdit->toPlainText().toUtf8().constData()));
         request.setOption("connections", true);
         request.setOption("membership", true);
         request.setOption("recursive", true);
@@ -226,22 +209,18 @@ namespace Rv
             QFileInfo fileInfo(profilesDir, QString(name.c_str()));
             QFileInfo dirInfo(profilesDir.canonicalPath());
 
-            const bool isDirWritable = TwkUtil::isWritable(
-                UTF8::qconvert(profilesDir.canonicalPath()).c_str());
-            const bool isFileWritable = TwkUtil::isWritable(
-                UTF8::qconvert(fileInfo.absoluteFilePath()).c_str());
+            const bool isDirWritable = TwkUtil::isWritable(UTF8::qconvert(profilesDir.canonicalPath()).c_str());
+            const bool isFileWritable = TwkUtil::isWritable(UTF8::qconvert(fileInfo.absoluteFilePath()).c_str());
 
             if (!isDirWritable || (fileInfo.exists() && !isFileWritable))
             {
-                cerr << "ERROR: User Profile directory \""
-                     << UTF8::qconvert(profilesDir.canonicalPath())
+                cerr << "ERROR: User Profile directory \"" << UTF8::qconvert(profilesDir.canonicalPath())
                      << "\" is unwriteable! Profile not saved!" << endl;
             }
             else
             {
                 QString file = profilesDir.absoluteFilePath(name.c_str());
-                session->writeProfile(file.toUtf8().constData(),
-                                      node->displayPipelineNode(), request);
+                session->writeProfile(file.toUtf8().constData(), node->displayPipelineNode(), request);
             }
         }
         loadModel();
@@ -255,8 +234,7 @@ namespace Rv
 
     Profile* RvProfileManager::currentProfile()
     {
-        QModelIndex index =
-            m_ui.profileTreeView->selectionModel()->currentIndex();
+        QModelIndex index = m_ui.profileTreeView->selectionModel()->currentIndex();
         if (index.isValid())
             return m_profiles[index.row()];
         return 0;
@@ -276,10 +254,8 @@ namespace Rv
             box.setText(tr("Are you sure you want to delete the profile?"));
 
             box.setWindowModality(Qt::WindowModal);
-            QPushButton* b1 =
-                box.addButton(tr("Cancel"), QMessageBox::RejectRole);
-            QPushButton* b2 =
-                box.addButton(tr("Delete"), QMessageBox::AcceptRole);
+            QPushButton* b1 = box.addButton(tr("Cancel"), QMessageBox::RejectRole);
+            QPushButton* b2 = box.addButton(tr("Delete"), QMessageBox::AcceptRole);
             box.setIcon(QMessageBox::Critical);
             box.exec();
 
@@ -292,8 +268,7 @@ namespace Rv
         }
     }
 
-    void RvProfileManager::selectionChanged(const QItemSelection&,
-                                            const QItemSelection&)
+    void RvProfileManager::selectionChanged(const QItemSelection&, const QItemSelection&)
     {
         Profile* profile = currentProfile();
         if (!profile)
@@ -329,8 +304,7 @@ namespace Rv
             return;
         RvSession* session = Rv::RvSession::currentRvSession();
 
-        profile->apply(
-            session->graph().primaryDisplayGroup()->displayPipelineNode());
+        profile->apply(session->graph().primaryDisplayGroup()->displayPipelineNode());
 
         loadModel();
         session->askForRedraw();

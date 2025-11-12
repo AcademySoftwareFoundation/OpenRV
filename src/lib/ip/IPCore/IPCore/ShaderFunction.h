@@ -96,8 +96,7 @@ namespace IPCore
 
             struct ImageParameterInfo
             {
-                ImageParameterInfo(const std::string& s, bool a, bool b,
-                                   bool samp, bool lookup)
+                ImageParameterInfo(const std::string& s, bool a, bool b, bool samp, bool lookup)
                     : name(s)
                     , usesST(a)
                     , usesSize(b)
@@ -143,30 +142,23 @@ namespace IPCore
             //  underestimation of number of fetches.
             //
 
-            enum Type //             FUNCTION TYPE
-            {         //             -------------
-                UndecidedType =
-                    0, //                            (inferred to be one of the
-                       //                            below)
-                Main = 1 << 0,   //               () -> void
-                Source = 1 << 1, // (sampler, coord) -> color4
-                Color =
-                    1 << 2, //           color4 -> color4 (assumed non-linear)
-                LinearColor =
-                    1 << 3,      //           color4 -> color4 (linear ops only)
-                Merge = 1 << 4,  //    (image,image) -> color4
-                Filter = 1 << 5, //          (image) -> color4
+            enum Type                        //             FUNCTION TYPE
+            {                                //             -------------
+                UndecidedType = 0,           //                            (inferred to be one of the
+                                             //                            below)
+                Main = 1 << 0,               //               () -> void
+                Source = 1 << 1,             // (sampler, coord) -> color4
+                Color = 1 << 2,              //           color4 -> color4 (assumed non-linear)
+                LinearColor = 1 << 3,        //           color4 -> color4 (linear ops only)
+                Merge = 1 << 4,              //    (image,image) -> color4
+                Filter = 1 << 5,             //          (image) -> color4
                 MorphologicalFilter = 1 << 6 //          (image) -> color4
             };
 
-            Function(const std::string& name, const std::string& glsl,
-                     Type type, const SymbolVector& params,
-                     const SymbolVector& globals, size_t numFetchesApprox = 0,
-                     const std::string& doc = "");
+            Function(const std::string& name, const std::string& glsl, Type type, const SymbolVector& params, const SymbolVector& globals,
+                     size_t numFetchesApprox = 0, const std::string& doc = "");
 
-            Function(const std::string& name, const std::string& glsl,
-                     Type type, size_t numFetchesApprox = 0,
-                     const std::string& doc = "");
+            Function(const std::string& name, const std::string& glsl, Type type, size_t numFetchesApprox = 0, const std::string& doc = "");
 
             static void useShadingLanguageVersion(const char*);
             static bool isGLSLVersionLessThan150();
@@ -189,10 +181,7 @@ namespace IPCore
 
             const SymbolVector& globals() const { return m_globals; }
 
-            const ImageParameterVector& imageParameters() const
-            {
-                return m_inImageParameters;
-            }
+            const ImageParameterVector& imageParameters() const { return m_inImageParameters; }
 
             const FunctionGLState* state() const { return m_state; }
 
@@ -220,24 +209,16 @@ namespace IPCore
             bool isSource() const;
 
             std::string prototype(const std::string& suffix = "") const;
-            std::string rewrite(const std::string& suffix,
-                                const StringVector& argNames,
-                                const StringVector& graphIDs) const;
+            std::string rewrite(const std::string& suffix, const StringVector& argNames, const StringVector& graphIDs) const;
 
             void parseDeclaration(bool);
 
-            const StringVector& parsedParameterDeclarations() const
-            {
-                return m_glslParameters;
-            }
+            const StringVector& parsedParameterDeclarations() const { return m_glslParameters; }
 
             std::string generateTestGLSL(bool gl2) const;
             ValidationResult validate() const;
 
-            const ResourceUsage& resourceUsage() const
-            {
-                return m_resourceUsage;
-            }
+            const ResourceUsage& resourceUsage() const { return m_resourceUsage; }
 
             bool equivalentInterface(const Function*);
 

@@ -15,8 +15,7 @@ namespace IPCore
     class ColorGrayScaleIPNode : public IPNode
     {
     public:
-        ColorGrayScaleIPNode(const std::string& name, const NodeDefinition* def,
-                             IPGraph* graph, GroupIPNode* group = 0);
+        ColorGrayScaleIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group = 0);
 
         virtual ~ColorGrayScaleIPNode();
 

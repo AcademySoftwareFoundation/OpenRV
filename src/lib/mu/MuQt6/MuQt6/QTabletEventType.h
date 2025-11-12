@@ -37,8 +37,7 @@ namespace Mu
         //  Constructors
         //
 
-        QTabletEventType(Context* context, const char* name,
-                         Class* superClass = 0);
+        QTabletEventType(Context* context, const char* name, Class* superClass = 0);
         virtual ~QTabletEventType();
 
         //

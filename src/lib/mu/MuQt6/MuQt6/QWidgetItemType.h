@@ -38,8 +38,7 @@ namespace Mu
         //  Constructors
         //
 
-        QWidgetItemType(Context* context, const char* name,
-                        Class* superClass = 0);
+        QWidgetItemType(Context* context, const char* name, Class* superClass = 0);
         virtual ~QWidgetItemType();
 
         static bool isInheritable() { return true; }
@@ -61,8 +60,7 @@ namespace Mu
     {
     public:
         virtual ~MuQt_QWidgetItem();
-        MuQt_QWidgetItem(Pointer muobj, const CallEnvironment*,
-                         QWidget* widget);
+        MuQt_QWidgetItem(Pointer muobj, const CallEnvironment*, QWidget* widget);
         virtual QSizePolicy::ControlTypes controlTypes() const;
         virtual Qt::Orientations expandingDirections() const;
         virtual QRect geometry() const;
@@ -84,11 +82,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance*
-    QWidgetItemType::cachedInstance(const QWidgetItemType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QWidgetItemType::cachedInstance(const QWidgetItemType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

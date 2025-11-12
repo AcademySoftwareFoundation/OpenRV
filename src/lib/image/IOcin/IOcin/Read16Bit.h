@@ -39,22 +39,15 @@ namespace TwkFB
 
         typedef U16 Pixel;
 
-        static void planarConfig(TwkFB::FrameBuffer&, int, int,
-                                 TwkFB::FrameBuffer::DataType);
+        static void planarConfig(TwkFB::FrameBuffer&, int, int, TwkFB::FrameBuffer::DataType);
 
-        static void readRGB16(const std::string&, const unsigned char*,
-                              TwkFB::FrameBuffer&, int, int, size_t maxbytes,
-                              bool swap, bool useRaw = false,
-                              unsigned char* deletePointer = 0);
+        static void readRGB16(const std::string&, const unsigned char*, TwkFB::FrameBuffer&, int, int, size_t maxbytes, bool swap,
+                              bool useRaw = false, unsigned char* deletePointer = 0);
 
-        static void readRGBA16(const std::string&, const unsigned char*,
-                               TwkFB::FrameBuffer&, int, int, size_t maxbytes,
-                               bool alpha, bool swap, bool useRaw = false,
-                               unsigned char* deletePointer = 0);
+        static void readRGBA16(const std::string&, const unsigned char*, TwkFB::FrameBuffer&, int, int, size_t maxbytes, bool alpha,
+                               bool swap, bool useRaw = false, unsigned char* deletePointer = 0);
 
-        static void readRGB16_PLANAR(const std::string&, const unsigned char*,
-                                     TwkFB::FrameBuffer&, int, int,
-                                     size_t maxbytes, bool swap);
+        static void readRGB16_PLANAR(const std::string&, const unsigned char*, TwkFB::FrameBuffer&, int, int, size_t maxbytes, bool swap);
     };
 
 } // namespace TwkFB

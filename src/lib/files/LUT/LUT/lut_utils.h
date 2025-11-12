@@ -45,12 +45,9 @@ namespace LUT
     // read lut: the float buffer we're reading into - this function will resize
     // it for you
 
-    bool ReadChannelLUTData(std::ifstream& file, int size, int depth,
-                            bool reverse_order, int in_padding,
-                            std::vector<float>& lut);
+    bool ReadChannelLUTData(std::ifstream& file, int size, int depth, bool reverse_order, int in_padding, std::vector<float>& lut);
 
-    bool Read3DLUTData(std::ifstream& file, int xsize, int ysize, int zsize,
-                       int depth, bool reverse_order, int in_padding,
+    bool Read3DLUTData(std::ifstream& file, int xsize, int ysize, int zsize, int depth, bool reverse_order, int in_padding,
                        std::vector<float>& lut);
 
 } // namespace LUT

@@ -36,11 +36,9 @@
 #include <pthread.h>
 
 #ifdef WIN32
-#define utf8toWChar(T, W) \
-    utf8::unchecked::utf8to16(T, T + strlen(T), std::back_inserter(W))
+#define utf8toWChar(T, W) utf8::unchecked::utf8to16(T, T + strlen(T), std::back_inserter(W))
 #else
-#define utf8toWChar(T, W) \
-    utf8::unchecked::utf8to32(T, T + strlen(T), std::back_inserter(W))
+#define utf8toWChar(T, W) utf8::unchecked::utf8to32(T, T + strlen(T), std::back_inserter(W))
 #endif
 
 namespace TwkGLText
@@ -69,9 +67,7 @@ namespace TwkGLText
 
         void clear()
         {
-            for (std::map<string, std::vector<FTFont*>*>::iterator it =
-                     fonts.begin();
-                 it != fonts.end(); it++)
+            for (std::map<string, std::vector<FTFont*>*>::iterator it = fonts.begin(); it != fonts.end(); it++)
             {
                 for (int i = 0; i < it->second->size(); i++)
                 {
@@ -99,8 +95,7 @@ namespace TwkGLText
     {
         if (pthread_key_create(&threadKey, NULL) != 0)
         {
-            cout << "ERRRO: pthread_key_create failed: in " << __FUNCTION__
-                 << ", " << __FILE__ << ", line " << __LINE__ << endl;
+            cout << "ERRRO: pthread_key_create failed: in " << __FUNCTION__ << ", " << __FILE__ << ", line " << __LINE__ << endl;
         }
     }
 
@@ -152,8 +147,7 @@ namespace TwkGLText
         if ((*ctx->fonts[ctx->fontName]).size() <= ctx->size)
             (*ctx->fonts[ctx->fontName]).resize(ctx->size + 1);
         if (!(*ctx->fonts[ctx->fontName])[ctx->size])
-            (*ctx->fonts[ctx->fontName])[ctx->size] =
-                newFont(default_font, 67548);
+            (*ctx->fonts[ctx->fontName])[ctx->size] = newFont(default_font, 67548);
         (*ctx->fonts[ctx->fontName])[ctx->size]->FaceSize(ctx->size);
         ctx->initialized = true;
 
@@ -199,8 +193,7 @@ namespace TwkGLText
             }
             if (!(*ctx->fonts[ctx->fontName])[ctx->size])
             {
-                (*ctx->fonts[ctx->fontName])[ctx->size] =
-                    newFont(default_font, 67548);
+                (*ctx->fonts[ctx->fontName])[ctx->size] = newFont(default_font, 67548);
                 (*ctx->fonts[ctx->fontName])[ctx->size]->FaceSize(ctx->size);
             }
             ctx->initialized = true;
@@ -231,14 +224,12 @@ namespace TwkGLText
 
         if (!TwkUtil::fileExists(ctx->fontName.c_str()))
         {
-            cerr << "WARNING: can't open '" << fontName
-                 << "'. Using default font." << endl;
+            cerr << "WARNING: can't open '" << fontName << "'. Using default font." << endl;
             init();
             return;
         }
 
-        (*ctx->fonts[ctx->fontName])[ctx->size] =
-            newFont(ctx->fontName.c_str());
+        (*ctx->fonts[ctx->fontName])[ctx->size] = newFont(ctx->fontName.c_str());
 
         if (!(*ctx->fonts[ctx->fontName])[ctx->size])
         {
@@ -264,8 +255,7 @@ namespace TwkGLText
 
         if (!(*ctx->fonts[ctx->fontName])[ctx->size])
         {
-            (*ctx->fonts[ctx->fontName])[ctx->size] =
-                newFont(fontData, fontDataSize);
+            (*ctx->fonts[ctx->fontName])[ctx->size] = newFont(fontData, fontDataSize);
             (*ctx->fonts[ctx->fontName])[ctx->size]->FaceSize(ctx->size);
         }
     }
@@ -279,8 +269,7 @@ namespace TwkGLText
         {
             init();
         }
-        else if (ctx->fonts[ctx->fontName]->size() <= s
-                 || !(*ctx->fonts[ctx->fontName])[s])
+        else if (ctx->fonts[ctx->fontName]->size() <= s || !(*ctx->fonts[ctx->fontName])[s])
         {
             if (ctx->fontName != "")
             {
@@ -313,8 +302,7 @@ namespace TwkGLText
             return TwkMath::Box2f();
         GLTextContext* ctx = (GLTextContext*)getContext();
 
-        if (ctx->fonts.count(ctx->fontName) == 0
-            || ctx->fonts[ctx->fontName]->size() <= ctx->size
+        if (ctx->fonts.count(ctx->fontName) == 0 || ctx->fonts[ctx->fontName]->size() <= ctx->size
             || !(*ctx->fonts[ctx->fontName])[ctx->size])
         {
             return TwkMath::Box2f();
@@ -327,8 +315,7 @@ namespace TwkGLText
         FTPoint p0 = b.Lower();
         FTPoint p1 = b.Upper();
 
-        return TwkMath::Box2f(TwkMath::Vec2f(p0.X(), p0.Y()),
-                              TwkMath::Vec2f(p1.X(), p1.Y()));
+        return TwkMath::Box2f(TwkMath::Vec2f(p0.X(), p0.Y()), TwkMath::Vec2f(p1.X(), p1.Y()));
     }
 
     TwkMath::Box2f GLtext::bounds(string text)
@@ -342,9 +329,7 @@ namespace TwkGLText
         GLTextContext* ctx = (GLTextContext*)getContext();
         vector<string> lines;
         stl_ext::tokenize(lines, text, "\n");
-        float advance =
-            (*ctx->fonts[ctx->fontName])[ctx->size]->Ascender()
-            - (2 * (*ctx->fonts[ctx->fontName])[ctx->size]->Descender());
+        float advance = (*ctx->fonts[ctx->fontName])[ctx->size]->Ascender() - (2 * (*ctx->fonts[ctx->fontName])[ctx->size]->Descender());
         advance *= mult;
 
         TwkMath::Box2f bounds;
@@ -371,15 +356,13 @@ namespace TwkGLText
         if (!text)
             return;
         GLTextContext* ctx = (GLTextContext*)getContext();
-        if (ctx->fonts.count(ctx->fontName) == 0
-            || ctx->fonts[ctx->fontName]->size() <= ctx->size
+        if (ctx->fonts.count(ctx->fontName) == 0 || ctx->fonts[ctx->fontName]->size() <= ctx->size
             || !(*ctx->fonts[ctx->fontName])[ctx->size])
         {
             init();
         }
 
-        glPushAttrib(GL_CURRENT_BIT | GL_COLOR_BUFFER_BIT | GL_ENABLE_BIT
-                     | GL_PIXEL_MODE_BIT);
+        glPushAttrib(GL_CURRENT_BIT | GL_COLOR_BUFFER_BIT | GL_ENABLE_BIT | GL_PIXEL_MODE_BIT);
         glPushMatrix();
         glTranslatef(x, y, 0);
 
@@ -412,9 +395,7 @@ namespace TwkGLText
         // ctx->font[ctx->size]->FaceSize( ctx->size );
 
         float advance =
-            mult
-            * ((*ctx->fonts[ctx->fontName])[ctx->size]->Ascender()
-               - (2.0 * (*ctx->fonts[ctx->fontName])[ctx->size]->Descender()));
+            mult * ((*ctx->fonts[ctx->fontName])[ctx->size]->Ascender() - (2.0 * (*ctx->fonts[ctx->fontName])[ctx->size]->Descender()));
         for (int i = 0; i < lines.size(); ++i)
         {
             GLtext::writeAt(x, y + (advance * i), lines[i]);
@@ -429,19 +410,14 @@ namespace TwkGLText
         return GLtext::writeAtNL(x, y, std::string(text), mult);
     }
 
-    int GLtext::writeAtNL(const TwkMath::Vec2f& pos, const char* text,
-                          float mult)
+    int GLtext::writeAtNL(const TwkMath::Vec2f& pos, const char* text, float mult)
     {
         if (!text)
             return 0;
         return GLtext::writeAtNL(pos.x, pos.y, std::string(text), mult);
     }
 
-    int GLtext::writeAtNL(const TwkMath::Vec2f& pos, std::string text,
-                          float mult)
-    {
-        return GLtext::writeAtNL(pos.x, pos.y, text, mult);
-    }
+    int GLtext::writeAtNL(const TwkMath::Vec2f& pos, std::string text, float mult) { return GLtext::writeAtNL(pos.x, pos.y, text, mult); }
 
     void GLtext::writeAt(const TwkMath::Vec2f& pos, const char* text)
     {
@@ -450,15 +426,9 @@ namespace TwkGLText
         writeAt(pos.x, pos.y, text);
     }
 
-    void GLtext::writeAt(float x, float y, std::string text)
-    {
-        writeAt(x, y, text.c_str());
-    }
+    void GLtext::writeAt(float x, float y, std::string text) { writeAt(x, y, text.c_str()); }
 
-    void GLtext::writeAt(const TwkMath::Vec2f& pos, string text)
-    {
-        writeAt(pos.x, pos.y, text.c_str());
-    }
+    void GLtext::writeAt(const TwkMath::Vec2f& pos, string text) { writeAt(pos.x, pos.y, text.c_str()); }
 
     void GLtext::color(float r, float g, float b, float a)
     {
@@ -481,8 +451,7 @@ namespace TwkGLText
     float GLtext::globalAscenderHeight()
     {
         GLTextContext* ctx = (GLTextContext*)getContext();
-        if (ctx->fonts.count(ctx->fontName) == 0
-            || ctx->fonts[ctx->fontName]->size() <= ctx->size
+        if (ctx->fonts.count(ctx->fontName) == 0 || ctx->fonts[ctx->fontName]->size() <= ctx->size
             || !(*ctx->fonts[ctx->fontName])[ctx->size])
             init();
         return (*ctx->fonts[ctx->fontName])[ctx->size]->Ascender();
@@ -491,8 +460,7 @@ namespace TwkGLText
     float GLtext::globalDescenderHeight()
     {
         GLTextContext* ctx = (GLTextContext*)getContext();
-        if (ctx->fonts.count(ctx->fontName) == 0
-            || ctx->fonts[ctx->fontName]->size() <= ctx->size
+        if (ctx->fonts.count(ctx->fontName) == 0 || ctx->fonts[ctx->fontName]->size() <= ctx->size
             || !(*ctx->fonts[ctx->fontName])[ctx->size])
             init();
         return (*ctx->fonts[ctx->fontName])[ctx->size]->Descender();

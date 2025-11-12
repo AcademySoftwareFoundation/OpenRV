@@ -42,8 +42,7 @@ namespace Mu
         //  Constructors
         //
 
-        QStackedLayoutType(Context* context, const char* name,
-                           Class* superClass = 0, Class* superClass2 = 0);
+        QStackedLayoutType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QStackedLayoutType();
 
@@ -67,10 +66,8 @@ namespace Mu
     public:
         virtual ~MuQt_QStackedLayout();
         MuQt_QStackedLayout(Pointer muobj, const CallEnvironment*);
-        MuQt_QStackedLayout(Pointer muobj, const CallEnvironment*,
-                            QWidget* parent);
-        MuQt_QStackedLayout(Pointer muobj, const CallEnvironment*,
-                            QLayout* parentLayout);
+        MuQt_QStackedLayout(Pointer muobj, const CallEnvironment*, QWidget* parent);
+        MuQt_QStackedLayout(Pointer muobj, const CallEnvironment*, QLayout* parentLayout);
         virtual void addItem(QLayoutItem* item);
         virtual int count() const;
         virtual bool hasHeightForWidth() const;
@@ -81,8 +78,7 @@ namespace Mu
         virtual QSize sizeHint() const;
         virtual QLayoutItem* takeAt(int index);
         virtual int indexOf(const QWidget* widget) const;
-        virtual QLayoutItem* replaceWidget(QWidget* from, QWidget* to,
-                                           Qt::FindChildOptions options);
+        virtual QLayoutItem* replaceWidget(QWidget* from, QWidget* to, Qt::FindChildOptions options);
         virtual void setSpacing(int _p3);
         virtual int spacing() const;
         virtual QSizePolicy::ControlTypes controlTypes() const;
@@ -99,11 +95,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance*
-    QStackedLayoutType::cachedInstance(const QStackedLayoutType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QStackedLayoutType::cachedInstance(const QStackedLayoutType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

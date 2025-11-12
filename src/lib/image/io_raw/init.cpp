@@ -46,17 +46,10 @@ extern "C"
                 int argc = newargs.size();
 
                 options_description desc("");
-                desc.add_options()("threads",
-                                   value<int>(&threads)->default_value(threads),
-                                   "Specify the number of threads to use")(
-                    "scale", value<double>(&scale)->default_value(scale),
-                    "Scaling factor used to normalize raw data")(
-                    "primaries",
-                    value<string>(&primaries)->default_value(primaries),
-                    "Set the primaries to use for the RAW source")(
-                    "bruteForce",
-                    value<int>(&bruteForce)->default_value(bruteForce),
-                    "Attempt to load any file extension");
+                desc.add_options()("threads", value<int>(&threads)->default_value(threads), "Specify the number of threads to use")(
+                    "scale", value<double>(&scale)->default_value(scale), "Scaling factor used to normalize raw data")(
+                    "primaries", value<string>(&primaries)->default_value(primaries), "Set the primaries to use for the RAW source")(
+                    "bruteForce", value<int>(&bruteForce)->default_value(bruteForce), "Attempt to load any file extension");
 
                 variables_map vm;
                 store(parse_command_line(argc, argv, desc), vm);

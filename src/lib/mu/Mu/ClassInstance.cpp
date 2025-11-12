@@ -49,8 +49,7 @@ namespace Mu
         {
             const InternalTypeMemberVariable* im = tms[i];
 
-            const Class** cp = reinterpret_cast<const Class**>(
-                structure() + im->instanceOffset());
+            const Class** cp = reinterpret_cast<const Class**>(structure() + im->instanceOffset());
             *cp = im->value();
         }
     }
@@ -89,9 +88,7 @@ namespace Mu
     ClassInstance* ClassInstance::allocate(const Class* c)
     {
         size_t s = c->objectSize();
-        unsigned char* obj =
-            (unsigned char*)(c->isGCAtomic() ? MU_GC_ALLOC_ATOMIC(s)
-                                             : MU_GC_ALLOC(s));
+        unsigned char* obj = (unsigned char*)(c->isGCAtomic() ? MU_GC_ALLOC_ATOMIC(s) : MU_GC_ALLOC(s));
         c->constructInstance(obj);
         return (ClassInstance*)obj;
     }
@@ -103,9 +100,7 @@ namespace Mu
         const Class* t = context->findSymbolOfTypeByQualifiedName<Class>(n);
         assert(t);
         size_t s = t->objectSize();
-        unsigned char* obj =
-            (unsigned char*)(t->isGCAtomic() ? MU_GC_ALLOC_ATOMIC(s)
-                                             : MU_GC_ALLOC(s));
+        unsigned char* obj = (unsigned char*)(t->isGCAtomic() ? MU_GC_ALLOC_ATOMIC(s) : MU_GC_ALLOC(s));
         t->constructInstance(obj);
         return (ClassInstance*)obj;
     }
@@ -139,16 +134,8 @@ namespace Mu
         return h ^ (unsigned long)c;
     }
 
-    ValuePointer ClassInstance::field(size_t i)
-    {
-        return structure()
-               + classType()->memberVariables()[i]->instanceOffset();
-    }
+    ValuePointer ClassInstance::field(size_t i) { return structure() + classType()->memberVariables()[i]->instanceOffset(); }
 
-    const ValuePointer ClassInstance::field(size_t i) const
-    {
-        return structure()
-               + classType()->memberVariables()[i]->instanceOffset();
-    }
+    const ValuePointer ClassInstance::field(size_t i) const { return structure() + classType()->memberVariables()[i]->instanceOffset(); }
 
 } // namespace Mu

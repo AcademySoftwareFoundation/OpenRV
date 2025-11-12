@@ -59,10 +59,8 @@ private slots:
     void bonjourSocketReadyRead();
 
 private:
-    static void bonjourRegisterService(DNSServiceRef sdRef, DNSServiceFlags,
-                                       DNSServiceErrorType errorCode,
-                                       const char* name, const char* regtype,
-                                       const char* domain, void* context);
+    static void bonjourRegisterService(DNSServiceRef sdRef, DNSServiceFlags, DNSServiceErrorType errorCode, const char* name,
+                                       const char* regtype, const char* domain, void* context);
     DNSServiceRef dnssref;
     QSocketNotifier* bonjourSocket;
     BonjourRecord finalRecord;

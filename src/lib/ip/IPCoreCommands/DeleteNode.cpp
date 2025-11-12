@@ -23,10 +23,7 @@ namespace IPCore
 
         DeleteNodeInfo::~DeleteNodeInfo() {}
 
-        TwkApp::Command* DeleteNodeInfo::newCommand() const
-        {
-            return new DeleteNode(this);
-        }
+        TwkApp::Command* DeleteNodeInfo::newCommand() const { return new DeleteNode(this); }
 
         //----------------------------------------------------------------------
 
@@ -67,9 +64,7 @@ namespace IPCore
             }
             else if (m_node->group())
             {
-                TWK_THROW_EXC_STREAM("DeleteNode: cannot delete "
-                                     << m_name
-                                     << " because its a group memeber");
+                TWK_THROW_EXC_STREAM("DeleteNode: cannot delete " << m_name << " because its a group memeber");
             }
 
             if (m_node)

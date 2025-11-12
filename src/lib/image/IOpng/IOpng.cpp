@@ -41,11 +41,9 @@ namespace TwkFB
         jmp_buf jmpbuf;
     };
 
-    static void png_error_handler(png_structp png_ptr,
-                                  png_const_charp error_msg)
+    static void png_error_handler(png_structp png_ptr, png_const_charp error_msg)
     {
-        IOpngErrorContext* context =
-            static_cast<IOpngErrorContext*>(png_get_error_ptr(png_ptr));
+        IOpngErrorContext* context = static_cast<IOpngErrorContext*>(png_get_error_ptr(png_ptr));
         if (context)
         {
             context->error = true;
@@ -53,8 +51,7 @@ namespace TwkFB
         }
     }
 
-    static void readAttrs(FrameBuffer& fb, png_structp png_ptr,
-                          png_infop info_ptr)
+    static void readAttrs(FrameBuffer& fb, png_structp png_ptr, png_infop info_ptr)
     {
         //
         //  Color Space
@@ -101,8 +98,7 @@ namespace TwkFB
             fb.newAttribute("PNG/sRGBIntent", itype);
         }
 
-        if (png_get_iCCP(png_ptr, info_ptr, &icc_name, &icc_compression,
-                         &icc_profile, &icc_proflen))
+        if (png_get_iCCP(png_ptr, info_ptr, &icc_name, &icc_compression, &icc_profile, &icc_proflen))
         {
             if (!fb.hasPrimaryColorSpace())
                 fb.setPrimaryColorSpace(ColorSpace::ICCProfile());
@@ -118,12 +114,10 @@ namespace TwkFB
             if (!fb.hasPrimaryColorSpace())
                 fb.setPrimaryColorSpace(ColorSpace::Rec709());
 
-            fb.attribute<float>(ColorSpace::Gamma()) =
-                1.0f / gamma; // PNG uses "file gamma"
+            fb.attribute<float>(ColorSpace::Gamma()) = 1.0f / gamma; // PNG uses "file gamma"
         }
 
-        if (png_get_cHRM(png_ptr, info_ptr, &w_x, &w_y, &r_x, &r_y, &g_x, &g_y,
-                         &b_x, &b_y))
+        if (png_get_cHRM(png_ptr, info_ptr, &w_x, &w_y, &r_x, &r_y, &g_x, &g_y, &b_x, &b_y))
         {
             fb.setPrimaryColorSpace(ColorSpace::Generic());
 
@@ -145,29 +139,24 @@ namespace TwkFB
         {
             for (int i = 0; i < num_blocks; i++)
             {
-                fb.newAttribute(
-                    text_blocks[i].key,
-                    string(text_blocks[i].text, text_blocks[i].text_length));
+                fb.newAttribute(text_blocks[i].key, string(text_blocks[i].text, text_blocks[i].text_length));
             }
         }
     }
 
-    static void pngNoMessageHandler(png_structp png_ptr,
-                                    png_const_charp error_message)
+    static void pngNoMessageHandler(png_structp png_ptr, png_const_charp error_message)
     {
 #ifdef USE_FAR_KEYWORD
         jmp_buf jmpbuf;
         png_memcpy(jmpbuf, png_ptr->jmpbuf, png_sizeof(jmp_buf));
-        IOpngErrorContext* context =
-            static_cast<IOpngErrorContext*>(png_get_error_ptr(png_ptr));
+        IOpngErrorContext* context = static_cast<IOpngErrorContext*>(png_get_error_ptr(png_ptr));
         if (context)
         {
             context->error = true;
             longjmp(jmpbuf, 1);
         }
 #else
-        IOpngErrorContext* context =
-            static_cast<IOpngErrorContext*>(png_get_error_ptr(png_ptr));
+        IOpngErrorContext* context = static_cast<IOpngErrorContext*>(png_get_error_ptr(png_ptr));
         if (context)
         {
             context->error = true;
@@ -176,8 +165,7 @@ namespace TwkFB
 #endif
     }
 
-    static void setjmpHandler(png_structp* pp, png_infop* ip, png_infop* ep,
-                              FILE* fp, const string& filename)
+    static void setjmpHandler(png_structp* pp, png_infop* ip, png_infop* ep, FILE* fp, const string& filename)
     {
         png_destroy_read_struct(pp, ip, ep);
         if (fp)
@@ -199,8 +187,7 @@ namespace TwkFB
         IOpngErrorContext errorContext;
         errorContext.error = m_error;
 
-        png_structp png_ptr = png_create_read_struct(
-            PNG_LIBPNG_VER_STRING, &errorContext, png_error_handler, 0);
+        png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, &errorContext, png_error_handler, 0);
 
         //
         //  Throttle error messages.
@@ -216,8 +203,7 @@ namespace TwkFB
                 fclose(fp);
                 fp = nullptr;
             }
-            TWK_THROW_STREAM(IOException,
-                             "PNG: error creating read struct " << filename);
+            TWK_THROW_STREAM(IOException, "PNG: error creating read struct " << filename);
         }
 
         if (setjmp(errorContext.jmpbuf))
@@ -227,16 +213,14 @@ namespace TwkFB
 
         if (!info_ptr)
         {
-            png_destroy_read_struct(&png_ptr, (png_infopp)NULL,
-                                    (png_infopp)NULL);
+            png_destroy_read_struct(&png_ptr, (png_infopp)NULL, (png_infopp)NULL);
 
             if (fp)
             {
                 fclose(fp);
                 fp = nullptr;
             }
-            TWK_THROW_STREAM(IOException,
-                             "PNG: error creating read struct " << filename);
+            TWK_THROW_STREAM(IOException, "PNG: error creating read struct " << filename);
         }
 
         if (setjmp(errorContext.jmpbuf))
@@ -252,8 +236,7 @@ namespace TwkFB
                 fclose(fp);
                 fp = nullptr;
             }
-            TWK_THROW_STREAM(IOException,
-                             "PNG: error creating info struct " << filename);
+            TWK_THROW_STREAM(IOException, "PNG: error creating info struct " << filename);
         }
 
         //
@@ -318,8 +301,7 @@ namespace TwkFB
         }
     }
 
-    void IOpng::readImage(FrameBuffer& fb, const std::string& filename,
-                          const ReadRequest& request) const
+    void IOpng::readImage(FrameBuffer& fb, const std::string& filename, const ReadRequest& request) const
     {
         FILE* fp = TwkUtil::fopen(filename.c_str(), "rb");
         if (!fp)
@@ -330,8 +312,7 @@ namespace TwkFB
         IOpngErrorContext errorContext;
         errorContext.error = m_error;
 
-        png_structp png_ptr = png_create_read_struct(
-            PNG_LIBPNG_VER_STRING, &errorContext, png_error_handler, 0);
+        png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, &errorContext, png_error_handler, 0);
 
         if (!png_ptr || errorContext.error)
         {
@@ -340,8 +321,7 @@ namespace TwkFB
                 fclose(fp);
                 fp = nullptr;
             }
-            TWK_THROW_STREAM(IOException,
-                             "PNG: error creating read struct " << filename);
+            TWK_THROW_STREAM(IOException, "PNG: error creating read struct " << filename);
         }
 
         if (setjmp(errorContext.jmpbuf))
@@ -351,16 +331,14 @@ namespace TwkFB
 
         if (!info_ptr)
         {
-            png_destroy_read_struct(&png_ptr, (png_infopp)NULL,
-                                    (png_infopp)NULL);
+            png_destroy_read_struct(&png_ptr, (png_infopp)NULL, (png_infopp)NULL);
 
             if (fp)
             {
                 fclose(fp);
                 fp = nullptr;
             }
-            TWK_THROW_STREAM(IOException,
-                             "PNG: error creating read struct " << filename);
+            TWK_THROW_STREAM(IOException, "PNG: error creating read struct " << filename);
         }
 
         if (setjmp(errorContext.jmpbuf))
@@ -376,8 +354,7 @@ namespace TwkFB
                 fclose(fp);
                 fp = nullptr;
             }
-            TWK_THROW_STREAM(IOException,
-                             "PNG: error creating info struct " << filename);
+            TWK_THROW_STREAM(IOException, "PNG: error creating info struct " << filename);
         }
 
         //
@@ -402,9 +379,8 @@ namespace TwkFB
         {
             png_set_palette_to_rgb(png_ptr);
 
-            components = png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS)
-                             ? 4 /*RGBA*/
-                             : 3 /*RGB*/;
+            components = png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS) ? 4 /*RGBA*/
+                                                                         : 3 /*RGB*/;
         }
 
         if (color_type == PNG_COLOR_TYPE_GRAY && bit_depth < 8)
@@ -418,8 +394,7 @@ namespace TwkFB
             png_set_tRNS_to_alpha(png_ptr);
         }
 
-        fb.restructure(w, h, 0, components,
-                       b == 8 ? FrameBuffer::UCHAR : FrameBuffer::USHORT);
+        fb.restructure(w, h, 0, components, b == 8 ? FrameBuffer::UCHAR : FrameBuffer::USHORT);
         fb.setOrientation(FrameBuffer::TOPLEFT);
 
         // make 16 eight bit
@@ -451,12 +426,10 @@ namespace TwkFB
 
         png_read_update_info(png_ptr, info_ptr);
 
-        if (png_get_y_pixels_per_meter(png_ptr, info_ptr)
-            != png_get_y_pixels_per_meter(png_ptr, info_ptr))
+        if (png_get_y_pixels_per_meter(png_ptr, info_ptr) != png_get_y_pixels_per_meter(png_ptr, info_ptr))
         {
-            fb.setPixelAspectRatio(
-                (float)png_get_y_pixels_per_meter(png_ptr, info_ptr)
-                / (float)png_get_x_pixels_per_meter(png_ptr, info_ptr));
+            fb.setPixelAspectRatio((float)png_get_y_pixels_per_meter(png_ptr, info_ptr)
+                                   / (float)png_get_x_pixels_per_meter(png_ptr, info_ptr));
         }
 
         readAttrs(fb, png_ptr, info_ptr);
@@ -511,8 +484,7 @@ namespace TwkFB
         }
     }
 
-    void IOpng::writeImage(const FrameBuffer& img, const std::string& filename,
-                           const WriteRequest& request) const
+    void IOpng::writeImage(const FrameBuffer& img, const std::string& filename, const WriteRequest& request) const
     {
         FILE* fp = TwkUtil::fopen(filename.c_str(), "wb");
 
@@ -593,8 +565,7 @@ namespace TwkFB
         IOpngErrorContext errorContext;
         errorContext.error = m_error;
 
-        png_structp png_ptr = png_create_write_struct(
-            PNG_LIBPNG_VER_STRING, &errorContext, pngNoMessageHandler, 0);
+        png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, &errorContext, pngNoMessageHandler, 0);
         if (!png_ptr)
         {
             if (fp)
@@ -602,8 +573,7 @@ namespace TwkFB
                 fclose(fp);
                 fp = nullptr;
             }
-            TWK_THROW_STREAM(IOException,
-                             "PNG: error creating png_struct " << filename);
+            TWK_THROW_STREAM(IOException, "PNG: error creating png_struct " << filename);
         }
 
         if (setjmp(errorContext.jmpbuf))
@@ -619,8 +589,7 @@ namespace TwkFB
                 fclose(fp);
                 fp = nullptr;
             }
-            TWK_THROW_STREAM(IOException,
-                             "PNG: error creating info struct " << filename);
+            TWK_THROW_STREAM(IOException, "PNG: error creating info struct " << filename);
         }
 
         if (setjmp(errorContext.jmpbuf))
@@ -663,12 +632,10 @@ namespace TwkFB
 
         for (size_t i = 0; i < img.height(); i++)
         {
-            rows[i] = (png_bytep)outfb->scanline<png_byte>(
-                needflip ? img.height() - i - 1 : i);
+            rows[i] = (png_bytep)outfb->scanline<png_byte>(needflip ? img.height() - i - 1 : i);
         }
 
-        png_set_IHDR(png_ptr, info_ptr, outfb->width(), outfb->height(),
-                     bit_depth, color_type, PNG_INTERLACE_NONE,
+        png_set_IHDR(png_ptr, info_ptr, outfb->width(), outfb->height(), bit_depth, color_type, PNG_INTERLACE_NONE,
                      PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
 
         png_set_rows(png_ptr, info_ptr, &rows.front());

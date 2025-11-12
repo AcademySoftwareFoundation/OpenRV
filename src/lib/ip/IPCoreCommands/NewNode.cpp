@@ -23,10 +23,7 @@ namespace IPCore
 
         NewNodeInfo::~NewNodeInfo() {}
 
-        TwkApp::Command* NewNodeInfo::newCommand() const
-        {
-            return new NewNode(this);
-        }
+        TwkApp::Command* NewNodeInfo::newCommand() const { return new NewNode(this); }
 
         //----------------------------------------------------------------------
 
@@ -57,8 +54,7 @@ namespace IPCore
             }
         }
 
-        void NewNode::setArgs(IPGraph* graph, const string& type,
-                              const string& name)
+        void NewNode::setArgs(IPGraph* graph, const string& type, const string& name)
         {
             m_graph = graph;
             m_type = type;
@@ -82,8 +78,7 @@ namespace IPCore
                 }
                 else
                 {
-                    TWK_THROW_EXC_STREAM(
-                        "NewNode: failed to create node of type " << m_type);
+                    TWK_THROW_EXC_STREAM("NewNode: failed to create node of type " << m_type);
                 }
             }
             else

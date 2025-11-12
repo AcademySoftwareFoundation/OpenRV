@@ -63,20 +63,17 @@ namespace Mu
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QJSEngineType>(
-            c->internName("qt.QJSEngine"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QJSEngineType>(c->internName("qt.QJSEngine"));
     }
 
-    MuQt_QJSEngine::MuQt_QJSEngine(Pointer muobj, const CallEnvironment* ce,
-                                   QObject* parent)
+    MuQt_QJSEngine::MuQt_QJSEngine(Pointer muobj, const CallEnvironment* ce, QObject* parent)
         : QJSEngine(parent)
     {
         _env = ce;
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QJSEngineType>(
-            c->internName("qt.QJSEngine"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QJSEngineType>(c->internName("qt.QJSEngine"));
     }
 
     bool MuQt_QJSEngine::event(QEvent* e)
@@ -111,8 +108,7 @@ namespace Mu
         {
             Function::ArgumentVector args(3);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeinstance<QObjectType>(c, watched, "qt.QObject"));
+            args[1] = Value(makeinstance<QObjectType>(c, watched, "qt.QObject"));
             args[2] = Value(makeqpointer<QEventType>(c, event, "qt.QEvent"));
             Value rval = _env->call(F, args);
             return (bool)(rval._bool);
@@ -160,8 +156,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QTimerEventType>(c, event, "qt.QTimerEvent"));
+            args[1] = Value(makeqpointer<QTimerEventType>(c, event, "qt.QTimerEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -173,8 +168,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  Mu Type CONSTRUCTORS
 
-    QJSEngineType::QJSEngineType(Context* c, const char* name, Class* super,
-                                 Class* super2)
+    QJSEngineType::QJSEngineType(Context* c, const char* name, Class* super, Class* super2)
         : Class(c, name, vectorOf2(super, super2))
     {
     }
@@ -195,9 +189,7 @@ namespace Mu
         }
         else if (QJSEngine* w = object<QJSEngine>(widget))
         {
-            QJSEngineType* type =
-                c->findSymbolOfTypeByQualifiedName<QJSEngineType>(
-                    c->internName("qt.QJSEngine"), false);
+            QJSEngineType* type = c->findSymbolOfTypeByQualifiedName<QJSEngineType>(c->internName("qt.QJSEngine"), false);
             ClassInstance* o = ClassInstance::allocate(type);
             setobject(o, w);
             return o;
@@ -208,67 +200,49 @@ namespace Mu
         }
     }
 
-    static NODE_IMPLEMENTATION(castFromObject, Pointer)
-    {
-        NODE_RETURN(
-            QJSEngine_QJSEngine_QObject(NODE_THREAD, NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(castFromObject, Pointer) { NODE_RETURN(QJSEngine_QJSEngine_QObject(NODE_THREAD, NODE_ARG(0, Pointer))); }
 
-    Pointer qt_QJSEngine_QJSEngine_QJSEngine_QJSEngine(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this)
+    Pointer qt_QJSEngine_QJSEngine_QJSEngine_QJSEngine(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-        setobject(
-            param_this,
-            new MuQt_QJSEngine(param_this, NODE_THREAD.process()->callEnv()));
+        setobject(param_this, new MuQt_QJSEngine(param_this, NODE_THREAD.process()->callEnv()));
         return param_this;
     }
 
-    Pointer qt_QJSEngine_QJSEngine_QJSEngine_QJSEngine_QObject(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
+    Pointer qt_QJSEngine_QJSEngine_QJSEngine_QJSEngine_QObject(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QObject* arg1 = object<QObject>(param_parent);
-        setobject(param_this,
-                  new MuQt_QJSEngine(param_this,
-                                     NODE_THREAD.process()->callEnv(), arg1));
+        setobject(param_this, new MuQt_QJSEngine(param_this, NODE_THREAD.process()->callEnv(), arg1));
         return param_this;
     }
 
-    void qt_QJSEngine_collectGarbage_void_QJSEngine(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this)
+    void qt_QJSEngine_collectGarbage_void_QJSEngine(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QJSEngine* arg0 = object<QJSEngine>(param_this);
         arg0->collectGarbage();
     }
 
-    bool qt_QJSEngine_event_bool_QJSEngine_QEvent(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this,
-                                                  Pointer param_e)
+    bool qt_QJSEngine_event_bool_QJSEngine_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QJSEngine* arg0 = object<QJSEngine>(param_this);
         QEvent* arg1 = getqpointer<QEventType>(param_e);
-        return isMuQtObject(arg0) ? arg0->QJSEngine::event(arg1)
-                                  : arg0->event(arg1);
+        return isMuQtObject(arg0) ? arg0->QJSEngine::event(arg1) : arg0->event(arg1);
     }
 
-    bool qt_QJSEngine_eventFilter_bool_QJSEngine_QObject_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_watched,
-        Pointer param_event)
+    bool qt_QJSEngine_eventFilter_bool_QJSEngine_QObject_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_watched,
+                                                                Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QJSEngine* arg0 = object<QJSEngine>(param_this);
         QObject* arg1 = object<QObject>(param_watched);
         QEvent* arg2 = getqpointer<QEventType>(param_event);
-        return isMuQtObject(arg0) ? arg0->QJSEngine::eventFilter(arg1, arg2)
-                                  : arg0->eventFilter(arg1, arg2);
+        return isMuQtObject(arg0) ? arg0->QJSEngine::eventFilter(arg1, arg2) : arg0->eventFilter(arg1, arg2);
     }
 
-    void qt_QJSEngine_customEvent_void_QJSEngine_QEvent(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this,
-                                                        Pointer param_event)
+    void qt_QJSEngine_customEvent_void_QJSEngine_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QJSEngine* arg0 = object<QJSEngine>(param_this);
@@ -279,8 +253,7 @@ namespace Mu
             ((MuQt_QJSEngine*)arg0)->customEvent_pub(arg1);
     }
 
-    void qt_QJSEngine_timerEvent_void_QJSEngine_QTimerEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QJSEngine_timerEvent_void_QJSEngine_QTimerEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QJSEngine* arg0 = object<QJSEngine>(param_this);
@@ -293,45 +266,38 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(_n_QJSEngine0, Pointer)
     {
-        NODE_RETURN(qt_QJSEngine_QJSEngine_QJSEngine_QJSEngine(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QJSEngine_QJSEngine_QJSEngine_QJSEngine(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_QJSEngine1, Pointer)
     {
-        NODE_RETURN(qt_QJSEngine_QJSEngine_QJSEngine_QJSEngine_QObject(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QJSEngine_QJSEngine_QJSEngine_QJSEngine_QObject(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_collectGarbage0, void)
     {
-        qt_QJSEngine_collectGarbage_void_QJSEngine(NODE_THREAD,
-                                                   NONNIL_NODE_ARG(0, Pointer));
+        qt_QJSEngine_collectGarbage_void_QJSEngine(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_event0, bool)
     {
-        NODE_RETURN(qt_QJSEngine_event_bool_QJSEngine_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QJSEngine_event_bool_QJSEngine_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_eventFilter0, bool)
     {
-        NODE_RETURN(qt_QJSEngine_eventFilter_bool_QJSEngine_QObject_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QJSEngine_eventFilter_bool_QJSEngine_QObject_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                           NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_customEvent0, void)
     {
-        qt_QJSEngine_customEvent_void_QJSEngine_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QJSEngine_customEvent_void_QJSEngine_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_timerEvent0, void)
     {
-        qt_QJSEngine_timerEvent_void_QJSEngine_QTimerEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QJSEngine_timerEvent_void_QJSEngine_QTimerEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     void QJSEngineType::load()
@@ -351,17 +317,13 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
-                   new Function(c, tn, castFromObject, Cast, Compiled,
-                                QJSEngine_QJSEngine_QObject, Return, ftn,
-                                Parameters,
+                   new Function(c, tn, castFromObject, Cast, Compiled, QJSEngine_QJSEngine_QObject, Return, ftn, Parameters,
                                 new Param(c, "object", "qt.QObject"), End),
 
                    EndArguments);
@@ -369,19 +331,12 @@ namespace Mu
         addSymbols(
             // enums
             // member functions
-            new Function(c, "QJSEngine", _n_QJSEngine0, None, Compiled,
-                         qt_QJSEngine_QJSEngine_QJSEngine_QJSEngine, Return,
-                         "qt.QJSEngine", Parameters,
-                         new Param(c, "this", "qt.QJSEngine"), End),
-            new Function(c, "QJSEngine", _n_QJSEngine1, None, Compiled,
-                         qt_QJSEngine_QJSEngine_QJSEngine_QJSEngine_QObject,
-                         Return, "qt.QJSEngine", Parameters,
-                         new Param(c, "this", "qt.QJSEngine"),
-                         new Param(c, "parent", "qt.QObject"), End),
-            new Function(c, "collectGarbage", _n_collectGarbage0, None,
-                         Compiled, qt_QJSEngine_collectGarbage_void_QJSEngine,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QJSEngine"), End),
+            new Function(c, "QJSEngine", _n_QJSEngine0, None, Compiled, qt_QJSEngine_QJSEngine_QJSEngine_QJSEngine, Return, "qt.QJSEngine",
+                         Parameters, new Param(c, "this", "qt.QJSEngine"), End),
+            new Function(c, "QJSEngine", _n_QJSEngine1, None, Compiled, qt_QJSEngine_QJSEngine_QJSEngine_QJSEngine_QObject, Return,
+                         "qt.QJSEngine", Parameters, new Param(c, "this", "qt.QJSEngine"), new Param(c, "parent", "qt.QObject"), End),
+            new Function(c, "collectGarbage", _n_collectGarbage0, None, Compiled, qt_QJSEngine_collectGarbage_void_QJSEngine, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QJSEngine"), End),
             // MISSING: evaluate ("QJSValue"; QJSEngine this, string program,
             // string fileName, int lineNumber) MISSING: fromScriptValue ("T";
             // QJSEngine this, "const QJSValue &" value) MISSING: globalObject
@@ -392,33 +347,24 @@ namespace Mu
             // MISSING: newQObject ("QJSValue"; QJSEngine this, QObject object)
             // MISSING: toScriptValue ("QJSValue"; QJSEngine this, "const T &"
             // value)
-            _func[0] = new MemberFunction(
-                c, "event", _n_event0, None, Compiled,
-                qt_QJSEngine_event_bool_QJSEngine_QEvent, Return, "bool",
-                Parameters, new Param(c, "this", "qt.QJSEngine"),
-                new Param(c, "e", "qt.QEvent"), End),
-            _func[1] = new MemberFunction(
-                c, "eventFilter", _n_eventFilter0, None, Compiled,
-                qt_QJSEngine_eventFilter_bool_QJSEngine_QObject_QEvent, Return,
-                "bool", Parameters, new Param(c, "this", "qt.QJSEngine"),
-                new Param(c, "watched", "qt.QObject"),
-                new Param(c, "event", "qt.QEvent"), End),
+            _func[0] = new MemberFunction(c, "event", _n_event0, None, Compiled, qt_QJSEngine_event_bool_QJSEngine_QEvent, Return, "bool",
+                                          Parameters, new Param(c, "this", "qt.QJSEngine"), new Param(c, "e", "qt.QEvent"), End),
+            _func[1] = new MemberFunction(c, "eventFilter", _n_eventFilter0, None, Compiled,
+                                          qt_QJSEngine_eventFilter_bool_QJSEngine_QObject_QEvent, Return, "bool", Parameters,
+                                          new Param(c, "this", "qt.QJSEngine"), new Param(c, "watched", "qt.QObject"),
+                                          new Param(c, "event", "qt.QEvent"), End),
             // MISSING: metaObject ("const QMetaObject *"; QJSEngine this)
             // MISSING: childEvent (void; QJSEngine this, "QChildEvent *" event)
             // // protected MISSING: connectNotify (void; QJSEngine this, "const
             // QMetaMethod &" signal) // protected
-            _func[2] = new MemberFunction(
-                c, "customEvent", _n_customEvent0, None, Compiled,
-                qt_QJSEngine_customEvent_void_QJSEngine_QEvent, Return, "void",
-                Parameters, new Param(c, "this", "qt.QJSEngine"),
-                new Param(c, "event", "qt.QEvent"), End),
+            _func[2] = new MemberFunction(c, "customEvent", _n_customEvent0, None, Compiled, qt_QJSEngine_customEvent_void_QJSEngine_QEvent,
+                                          Return, "void", Parameters, new Param(c, "this", "qt.QJSEngine"),
+                                          new Param(c, "event", "qt.QEvent"), End),
             // MISSING: disconnectNotify (void; QJSEngine this, "const
             // QMetaMethod &" signal) // protected
-            _func[3] = new MemberFunction(
-                c, "timerEvent", _n_timerEvent0, None, Compiled,
-                qt_QJSEngine_timerEvent_void_QJSEngine_QTimerEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QJSEngine"),
-                new Param(c, "event", "qt.QTimerEvent"), End),
+            _func[3] = new MemberFunction(c, "timerEvent", _n_timerEvent0, None, Compiled,
+                                          qt_QJSEngine_timerEvent_void_QJSEngine_QTimerEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QJSEngine"), new Param(c, "event", "qt.QTimerEvent"), End),
             // static functions
             EndArguments);
         globalScope()->addSymbols(EndArguments);

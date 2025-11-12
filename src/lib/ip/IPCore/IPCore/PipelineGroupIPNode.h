@@ -23,8 +23,7 @@ namespace IPCore
     class PipelineGroupIPNode : public GroupIPNode
     {
     public:
-        PipelineGroupIPNode(const std::string& name, const NodeDefinition* def,
-                            IPGraph* graph, GroupIPNode* group = 0);
+        PipelineGroupIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group = 0);
 
         virtual ~PipelineGroupIPNode();
         virtual void copyNode(const IPNode*);
@@ -34,10 +33,8 @@ namespace IPCore
 
         void setPipeline1(const std::string&);
         void setPipeline2(const std::string&, const std::string&);
-        void setPipeline3(const std::string&, const std::string&,
-                          const std::string&);
-        void setPipeline4(const std::string&, const std::string&,
-                          const std::string&, const std::string&);
+        void setPipeline3(const std::string&, const std::string&, const std::string&);
+        void setPipeline4(const std::string&, const std::string&, const std::string&, const std::string&);
         void setPipeline(const StringVector&);
         StringVector pipeline() const;
 

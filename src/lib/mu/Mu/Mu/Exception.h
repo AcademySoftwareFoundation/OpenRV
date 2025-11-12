@@ -97,15 +97,13 @@ namespace Mu
     MU_BASIC_EXC(ArchiveReadFailure, "archive read failure");
     MU_BASIC_EXC(StreamOpenFailure, "stream open failure");
     MU_BASIC_EXC(UnresolvedFunction, "attempted call to unresolved function");
-    MU_BASIC_EXC(UnresolvedReference,
-                 "attempted to reference unresolved symbol");
+    MU_BASIC_EXC(UnresolvedReference, "attempted to reference unresolved symbol");
     MU_BASIC_EXC(UnresolvableSymbol, "unable to resolve symbol");
     MU_BASIC_EXC(FileOpenError, "unable to open file");
     MU_BASIC_EXC(AbstractCall, "illegal call to abstract function")
     MU_BASIC_EXC(NodeAssembly, "construction error")
     MU_BASIC_EXC(BadInterfaceInvocation, "bad interface invocation")
-    MU_BASIC_EXC(LimitedNodeAssembler,
-                 "restricted action in limited node assembler")
+    MU_BASIC_EXC(LimitedNodeAssembler, "restricted action in limited node assembler")
     MU_BASIC_EXC(ParseSyntax, "syntax error")
     MU_BASIC_EXC(ThreadMismatch, "calling thread did not create thread object")
     MU_BASIC_EXC(MissingMatch, "missing matching pattern for variant")
@@ -138,10 +136,7 @@ namespace Mu
 
         const Value& returnValue() const noexcept { return _returnValue; }
 
-        const char* what() const noexcept override
-        {
-            return "return from Mu catch block";
-        }
+        const char* what() const noexcept override { return "return from Mu catch block"; }
 
     private:
         Value _returnValue;

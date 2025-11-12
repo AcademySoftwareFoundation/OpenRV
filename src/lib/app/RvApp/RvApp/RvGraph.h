@@ -38,9 +38,7 @@ namespace Rv
     {
     public:
         typedef std::vector<IPCore::SourceIPNode*> Sources;
-        typedef boost::signals2::signal<void(bool /*begin*/,
-                                             int /*fastAddSourceEnabled*/)>
-            FastAddSourceChangedSignal;
+        typedef boost::signals2::signal<void(bool /*begin*/, int /*fastAddSourceEnabled*/)> FastAddSourceChangedSignal;
 
         RvGraph(const IPCore::NodeManager*);
         ~RvGraph();
@@ -50,24 +48,17 @@ namespace Rv
         //  data via referencing
         //
 
-        virtual TwkContainer::PropertyContainer*
-        sparseContainer(IPCore::IPNode*);
+        virtual TwkContainer::PropertyContainer* sparseContainer(IPCore::IPNode*);
 
         virtual void initializeIPTree(const VideoModules&);
         virtual void removeNode(IPCore::IPNode*);
-        virtual IPCore::DisplayGroupIPNode*
-        newDisplayGroup(const std::string& nodeName,
-                        const TwkApp::VideoDevice* d = 0);
-        virtual IPCore::OutputGroupIPNode*
-        newOutputGroup(const std::string& nodeName,
-                       const TwkApp::VideoDevice* d = 0);
+        virtual IPCore::DisplayGroupIPNode* newDisplayGroup(const std::string& nodeName, const TwkApp::VideoDevice* d = 0);
+        virtual IPCore::OutputGroupIPNode* newOutputGroup(const std::string& nodeName, const TwkApp::VideoDevice* d = 0);
 
         const Sources& imageSources() const { return m_imageSources; }
 
-        IPCore::SourceIPNode*
-        addSource(const std::string& nodeType, const std::string& nodeName = "",
-                  const std::string& mediaRepName = "",
-                  IPCore::SourceIPNode* mediaRepSisterSrcNode = nullptr);
+        IPCore::SourceIPNode* addSource(const std::string& nodeType, const std::string& nodeName = "", const std::string& mediaRepName = "",
+                                        IPCore::SourceIPNode* mediaRepSisterSrcNode = nullptr);
 
         // Fast add source mechanism which postpones the default views' inputs
         // connection until all the new sources have been added to prevent
@@ -82,10 +73,7 @@ namespace Rv
 
         // gives access to the signal call when fastAddSourceEnabled changed
         //
-        FastAddSourceChangedSignal& fastAddSourceChangedSignal()
-        {
-            return m_fastAddSourceChangedSignal;
-        }
+        FastAddSourceChangedSignal& fastAddSourceChangedSignal() { return m_fastAddSourceChangedSignal; }
 
         // Scope guard of the same fast add source mechanism
         class FastAddSourceGuard
@@ -104,13 +92,9 @@ namespace Rv
         };
 
     protected:
-        IPCore::SourceGroupIPNode* newSourceGroup(const std::string& nodeName,
-                                                  IPCore::SourceIPNode*);
-        IPCore::SourceIPNode* newSource(const std::string& nodeName,
-                                        const std::string& nodeType,
-                                        const std::string& mediaRepName);
-        void setupSource(IPCore::SourceIPNode*,
-                         IPCore::SourceIPNode* mediaRepSisterSrcNode);
+        IPCore::SourceGroupIPNode* newSourceGroup(const std::string& nodeName, IPCore::SourceIPNode*);
+        IPCore::SourceIPNode* newSource(const std::string& nodeName, const std::string& nodeType, const std::string& mediaRepName);
+        void setupSource(IPCore::SourceIPNode*, IPCore::SourceIPNode* mediaRepSisterSrcNode);
 
     private:
         Sources m_imageSources;

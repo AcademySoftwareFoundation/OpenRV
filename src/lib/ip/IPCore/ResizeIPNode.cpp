@@ -16,9 +16,7 @@ namespace IPCore
     using namespace std;
     using namespace TwkMath;
 
-    ResizeIPNode::ResizeIPNode(const std::string& name,
-                               const NodeDefinition* def, IPGraph* graph,
-                               GroupIPNode* group)
+    ResizeIPNode::ResizeIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group)
         : IPNode(name, def, graph, group)
     {
         m_active = declareProperty<IntProperty>("node.active", 1);
@@ -64,14 +62,12 @@ namespace IPCore
         if (outWidth <= 0 || outHeight <= 0)
             return image;
 
-        const bool upSampling =
-            outWidth > image->width && outHeight > image->height;
+        const bool upSampling = outWidth > image->width && outHeight > image->height;
         if (upSampling)
         {
             // for now only do 2x upsampling
             const bool upQuality = propertyValue(m_upQuality, 0) == 1;
-            float scale = min(2.0f, (float)min(outWidth / image->width,
-                                               outHeight / image->height));
+            float scale = min(2.0f, (float)min(outWidth / image->width, outHeight / image->height));
             if (scale < 2.0)
                 return image;
             if (!image->shaderExpr && !image->mergeExpr)
@@ -97,14 +93,11 @@ namespace IPCore
             //  used.
             //
 
-            IPImage* insertImage2 = new IPImage(
-                this, IPImage::BlendRenderType, image->width * 2,
-                image->height * 2, 1.0, IPImage::IntermediateBuffer);
+            IPImage* insertImage2 =
+                new IPImage(this, IPImage::BlendRenderType, image->width * 2, image->height * 2, 1.0, IPImage::IntermediateBuffer);
             insertImage2->shaderExpr = Shader::newSourceRGBA(insertImage2);
-            image->shaderExpr =
-                newUpSampleHorizontal(image, image->shaderExpr, upQuality);
-            image->shaderExpr =
-                newUpSampleVertical(image, image->shaderExpr, upQuality);
+            image->shaderExpr = newUpSampleHorizontal(image, image->shaderExpr, upQuality);
+            image->shaderExpr = newUpSampleVertical(image, image->shaderExpr, upQuality);
             insertImage2->appendChild(image);
 
             return insertImage2;
@@ -136,9 +129,7 @@ namespace IPCore
             const size_t newWidth = image->width / scale;
             const size_t newHeight = image->height / scale;
 
-            IPImage* insertImage2 =
-                new IPImage(this, IPImage::BlendRenderType, newWidth, newHeight,
-                            1.0, IPImage::IntermediateBuffer);
+            IPImage* insertImage2 = new IPImage(this, IPImage::BlendRenderType, newWidth, newHeight, 1.0, IPImage::IntermediateBuffer);
             insertImage2->shaderExpr = Shader::newSourceRGBA(insertImage2);
             image->shaderExpr = newDownSample(image, image->shaderExpr, scale);
             insertImage2->appendChild(image);
@@ -147,8 +138,7 @@ namespace IPCore
         return image;
     }
 
-    IPNode::ImageStructureInfo
-    ResizeIPNode::imageStructureInfo(const Context& context) const
+    IPNode::ImageStructureInfo ResizeIPNode::imageStructureInfo(const Context& context) const
     {
         if (propertyValue(m_active, 0) == 0)
         {

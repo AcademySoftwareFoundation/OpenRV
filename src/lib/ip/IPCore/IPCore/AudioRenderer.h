@@ -95,8 +95,7 @@ namespace IPCore
 
         struct Module
         {
-            Module(const std::string& n, const std::string& s,
-                   ModuleCreateFunc F, bool isinternal = false)
+            Module(const std::string& n, const std::string& s, ModuleCreateFunc F, bool isinternal = false)
                 : name(n)
                 , so(s)
                 , func(F)
@@ -209,8 +208,7 @@ namespace IPCore
         ///  during audio initialization.
         ///
 
-        static void addModuleInitFunc(ModuleInitializationFunc F,
-                                      std::string name);
+        static void addModuleInitFunc(ModuleInitializationFunc F, std::string name);
 
         ///
         ///  Initialize needs to be called early to set up the possible
@@ -243,10 +241,7 @@ namespace IPCore
         ///  indicate the current settings.
         ///
 
-        static const RendererParameters& defaultParameters()
-        {
-            return m_defaultParameters;
-        }
+        static const RendererParameters& defaultParameters() { return m_defaultParameters; }
 
         static void setDefaultParameters(const RendererParameters&);
 
@@ -334,10 +329,7 @@ namespace IPCore
         ///  set a new module.
         ///
 
-        const RendererParameters& currentParameters() const
-        {
-            return m_parameters;
-        }
+        const RendererParameters& currentParameters() const { return m_parameters; }
 
         ///
         ///  Get possible formats and rates for a given device. These
@@ -465,8 +457,7 @@ namespace IPCore
                 a = 1.0f;
             else if (a < -1.0f)
                 a = -1.0f;
-            return T((double(a) + 1.0) * 0.5
-                     * double(std::numeric_limits<T>::max()));
+            return T((double(a) + 1.0) * 0.5 * double(std::numeric_limits<T>::max()));
         }
 
         static UInt32 toUInt32_SMPTE272M_20(float a, UInt32 adminBits)
@@ -569,10 +560,8 @@ namespace IPCore
             }
         };
 
-        static void
-        transformFloat32ToInt24(TwkAudio::AudioBuffer::BufferPointer inData,
-                                char* outData, size_t dataCount,
-                                bool isLittleEndian = true);
+        static void transformFloat32ToInt24(TwkAudio::AudioBuffer::BufferPointer inData, char* outData, size_t dataCount,
+                                            bool isLittleEndian = true);
 
     protected:
         AudioRenderer(const RendererParameters&);

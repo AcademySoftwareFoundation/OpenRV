@@ -41,16 +41,12 @@ namespace IPCore
             NewNode(const NewNodeInfo*);
             virtual ~NewNode();
 
-            void setArgs(IPGraph* graph, const std::string& type,
-                         const std::string& name);
+            void setArgs(IPGraph* graph, const std::string& type, const std::string& name);
 
             virtual void doit();
             virtual void undo();
 
-            template <typename T> T* node() const
-            {
-                return dynamic_cast<T*>(m_node);
-            }
+            template <typename T> T* node() const { return dynamic_cast<T*>(m_node); }
 
         protected:
             NewNode(const TwkApp::CommandInfo*);

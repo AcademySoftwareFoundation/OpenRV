@@ -35,14 +35,12 @@ int utf8Main(int argc, char* argv[])
             if (info.addresses()[i].protocol() == QAbstractSocket::IPv4Protocol)
             {
                 addr = info.addresses()[i];
-                cout << "found: "
-                     << info.addresses()[i].toString().toUtf8().data() << endl;
+                cout << "found: " << info.addresses()[i].toString().toUtf8().data() << endl;
                 break;
             }
         }
 
-        cout << "Connecting to " << argv[1] << " at "
-             << addr.toString().toUtf8().data() << ":" << port << endl;
+        cout << "Connecting to " << argv[1] << " at " << addr.toString().toUtf8().data() << ":" << port << endl;
 
         dialog.client()->connectTo(argv[1], addr, port);
     }

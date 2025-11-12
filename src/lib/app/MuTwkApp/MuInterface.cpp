@@ -93,8 +93,7 @@ namespace TwkApp
 
     CallEnv::~CallEnv() {}
 
-    const Value CallEnv::call(const Function* F,
-                              Function::ArgumentVector& args) const
+    const Value CallEnv::call(const Function* F, Function::ArgumentVector& args) const
     {
         if (_doc)
         {
@@ -112,8 +111,7 @@ namespace TwkApp
         }
     }
 
-    const Value CallEnv::callMethodByName(const char* Fname,
-                                          Function::ArgumentVector& args) const
+    const Value CallEnv::callMethodByName(const char* Fname, Function::ArgumentVector& args) const
     {
         if (_doc)
         {
@@ -149,10 +147,7 @@ namespace TwkApp
 
     void setDebugMUC(bool b) { Module::setDebugArchive(b); }
 
-    bool isDebuggingOn()
-    {
-        return g_context ? g_context->debugging() : debugging;
-    }
+    bool isDebuggingOn() { return g_context ? g_context->debugging() : debugging; }
 
     Context::ModuleList& muModuleList() { return g_modules; }
 
@@ -224,8 +219,7 @@ namespace TwkApp
 
     //----------------------------------------------------------------------
 
-    std::string muEval(MuLangContext* context, Process* process,
-                       const Context::ModuleList& modules, const char* line,
+    std::string muEval(MuLangContext* context, Process* process, const Context::ModuleList& modules, const char* line,
                        const char* contextName, bool showType)
     {
         ostringstream str;
@@ -234,8 +228,7 @@ namespace TwkApp
         {
             try
             {
-                Mu::TypedValue value =
-                    context->evalText(line, contextName, process, modules);
+                Mu::TypedValue value = context->evalText(line, contextName, process, modules);
 
                 if (value._type && value._type != context->voidType())
                 {
@@ -250,8 +243,7 @@ namespace TwkApp
             }
             catch (Mu::TypedValue value)
             {
-                if (Mu::ExceptionType::Exception* e =
-                        (Mu::ExceptionType::Exception*)value._value._Pointer)
+                if (Mu::ExceptionType::Exception* e = (Mu::ExceptionType::Exception*)value._value._Pointer)
                 {
                     str << "ERROR: " << e->string() << endl;
                     cerr << e->backtraceAsString() << endl;
@@ -266,9 +258,8 @@ namespace TwkApp
         return str.str();
     }
 
-    std::string muEvalStringExpr(MuLangContext* context, Process* process,
-                                 const Context::ModuleList& modules,
-                                 const char* line, const char* contextName)
+    std::string muEvalStringExpr(MuLangContext* context, Process* process, const Context::ModuleList& modules, const char* line,
+                                 const char* contextName)
     {
         ostringstream str;
 
@@ -276,21 +267,17 @@ namespace TwkApp
         {
             try
             {
-                Mu::TypedValue value =
-                    context->evalText(line, contextName, process, modules);
+                Mu::TypedValue value = context->evalText(line, contextName, process, modules);
 
                 if (value._type && value._type == context->stringType())
                 {
-                    StringType::String* s =
-                        reinterpret_cast<StringType::String*>(
-                            value._value._Pointer);
+                    StringType::String* s = reinterpret_cast<StringType::String*>(value._value._Pointer);
                     str << s->c_str();
                 }
             }
             catch (Mu::TypedValue value)
             {
-                if (Mu::ExceptionType::Exception* e =
-                        (Mu::ExceptionType::Exception*)value._value._Pointer)
+                if (Mu::ExceptionType::Exception* e = (Mu::ExceptionType::Exception*)value._value._Pointer)
                 {
                     str << "ERROR: " << e->string() << endl;
                     cerr << e->backtraceAsString() << endl;
@@ -308,8 +295,7 @@ namespace TwkApp
     void cli()
     {
         cout << "Type `help()' for a list of commands." << endl;
-        cout << "or `help(\"name of command\")' for help on a specific command."
-             << endl;
+        cout << "or `help(\"name of command\")' for help on a specific command." << endl;
 
         while (1)
         {
@@ -328,8 +314,7 @@ namespace TwkApp
 
             try
             {
-                Mu::TypedValue value = g_context->evalText(
-                    command.c_str(), "input", g_process, g_modules);
+                Mu::TypedValue value = g_context->evalText(command.c_str(), "input", g_process, g_modules);
 
                 if (value._type && value._type != g_context->voidType())
                 {
@@ -341,8 +326,7 @@ namespace TwkApp
             }
             catch (Mu::TypedValue value)
             {
-                if (Mu::ExceptionType::Exception* e =
-                        (Mu::ExceptionType::Exception*)value._value._Pointer)
+                if (Mu::ExceptionType::Exception* e = (Mu::ExceptionType::Exception*)value._value._Pointer)
                 {
                     cout << "ERROR: " << e->string() << endl;
                     cerr << e->backtraceAsString() << endl;
@@ -355,8 +339,7 @@ namespace TwkApp
         }
     }
 
-    void batch(MuLangContext* context, Process* process,
-               const Context::ModuleList& modules, const char* filename)
+    void batch(MuLangContext* context, Process* process, const Context::ModuleList& modules, const char* filename)
     {
         NodeAssembler as(context, process);
 
@@ -377,8 +360,7 @@ namespace TwkApp
 
                 if (thread->uncaughtException())
                 {
-                    if (Mu::ExceptionType::Exception* e =
-                            (Mu::ExceptionType::Exception*)thread->exception())
+                    if (Mu::ExceptionType::Exception* e = (Mu::ExceptionType::Exception*)thread->exception())
 
                     {
                         cerr << "ERROR: " << e->string() << endl;
@@ -395,8 +377,7 @@ namespace TwkApp
         }
     }
 
-    MuLangContext* newMuContext(const char* batchFile, GCFilterFunc gc_filter,
-                                Context::ModuleList& modules)
+    MuLangContext* newMuContext(const char* batchFile, GCFilterFunc gc_filter, Context::ModuleList& modules)
     {
 #ifdef PLATFORM_DARWIN
         GarbageCollector::init();
@@ -409,8 +390,7 @@ namespace TwkApp
         if (!g_language)
             g_language = new MuLangLanguage;
 
-        MuLangContext* context = new MuLangContext(
-            batchFile ? "batch" : "cli", batchFile ? batchFile : "input");
+        MuLangContext* context = new MuLangContext(batchFile ? "batch" : "cli", batchFile ? batchFile : "input");
 
         context->debugging(debugging);
 
@@ -459,8 +439,7 @@ namespace TwkApp
         }
     }
 
-    void initWithString(MuLangContext* context, Process* process,
-                        const Context::ModuleList& modules, const char* p)
+    void initWithString(MuLangContext* context, Process* process, const Context::ModuleList& modules, const char* p)
     {
         try
         {
@@ -474,8 +453,7 @@ namespace TwkApp
         }
     }
 
-    void initWithFile(MuLangContext* context, Process* process,
-                      const Context::ModuleList& modules, const char* file)
+    void initWithFile(MuLangContext* context, Process* process, const Context::ModuleList& modules, const char* file)
     {
         try
         {
@@ -489,8 +467,7 @@ namespace TwkApp
         }
     }
 
-    void initRc(MuLangContext* context, Process* process,
-                const Context::ModuleList& modules, const char* rcfile)
+    void initRc(MuLangContext* context, Process* process, const Context::ModuleList& modules, const char* rcfile)
     {
         ostringstream str;
         str << getenv("HOME") << rcfile;
@@ -514,14 +491,10 @@ namespace TwkApp
                     subMenu = createTwkAppMenu(s->label->c_str(), s->subMenu);
                 }
 
-                MuFuncAction* action =
-                    s->actionCB ? new MuFuncAction(s->actionCB) : 0;
-                MuStateFunc* sfunc =
-                    s->stateCB ? new MuStateFunc(s->stateCB) : 0;
+                MuFuncAction* action = s->actionCB ? new MuFuncAction(s->actionCB) : 0;
+                MuStateFunc* sfunc = s->stateCB ? new MuStateFunc(s->stateCB) : 0;
 
-                menu->addItem(new Menu::Item(s->label->c_str(), action,
-                                             s->key ? s->key->c_str() : "",
-                                             sfunc, subMenu));
+                menu->addItem(new Menu::Item(s->label->c_str(), action, s->key ? s->key->c_str() : "", sfunc, subMenu));
             }
         }
 

@@ -26,9 +26,7 @@ namespace IPCore
 
 #define NO_FLOAT_3D_TEXTURES
 
-    ColorExposureIPNode::ColorExposureIPNode(const std::string& name,
-                                             const NodeDefinition* def,
-                                             IPGraph* graph, GroupIPNode* group)
+    ColorExposureIPNode::ColorExposureIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group)
         : IPNode(name, def, graph, group)
     {
         setMaxInputs(1);
@@ -37,8 +35,7 @@ namespace IPCore
         info->setPersistent(false);
 
         m_active = declareProperty<IntProperty>("color.active", 1);
-        m_colorExposure =
-            declareProperty<FloatProperty>("color.exposure", 0.0f);
+        m_colorExposure = declareProperty<FloatProperty>("color.exposure", 0.0f);
     }
 
     ColorExposureIPNode::~ColorExposureIPNode() {}

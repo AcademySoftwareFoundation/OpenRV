@@ -109,13 +109,10 @@ namespace Mu
         _fixedFrameBlock = new FixedFrameBlock(this, "__frame");
         _dynamicCast = new DynamicCast(this, "__dynamic_cast");
         _curry = new Curry(this, "__curry");
-        _dynamicPartialApply =
-            new DynamicPartialApplication(this, "__partial_apply");
-        _dynamicPartialEval =
-            new DynamicPartialEvaluate(this, "__partial_eval");
+        _dynamicPartialApply = new DynamicPartialApplication(this, "__partial_apply");
+        _dynamicPartialEval = new DynamicPartialEvaluate(this, "__partial_eval");
         _returnFromFunction = new ReturnFromFunction(this, "__return");
-        _returnFromVoidFunction =
-            new ReturnFromFunction(this, "__return", false);
+        _returnFromVoidFunction = new ReturnFromFunction(this, "__return", false);
         _matchFunction = new VariantMatch(this, "__case");
 
         s->addSymbol(new NonPrimitiveCondExr(this, "?:"));
@@ -175,31 +172,26 @@ namespace Mu
 
         _nameType = rtm->findSymbolOfType<OpaqueType>(internName("name"));
         _symbolType = rtm->findSymbolOfType<OpaqueType>(internName("symbol"));
-        _typeSymbolType =
-            rtm->findSymbolOfType<OpaqueType>(internName("type_symbol"));
-        _functionSymbolType =
-            rtm->findSymbolOfType<OpaqueType>(internName("function_symbol"));
+        _typeSymbolType = rtm->findSymbolOfType<OpaqueType>(internName("type_symbol"));
+        _functionSymbolType = rtm->findSymbolOfType<OpaqueType>(internName("function_symbol"));
     }
 
     MuLangContext::~MuLangContext() {}
 
-    Type* MuLangContext::arrayType(const Type* elementType,
-                                   const size_t* dimensions, size_t nDimensions)
+    Type* MuLangContext::arrayType(const Type* elementType, const size_t* dimensions, size_t nDimensions)
     {
         if (nDimensions == 1)
         {
             if (*dimensions == 0)
             {
-                DynamicArrayTypeCache::const_iterator i =
-                    _dynArrayCache.find(elementType);
+                DynamicArrayTypeCache::const_iterator i = _dynArrayCache.find(elementType);
                 if (i != _dynArrayCache.end())
                     return i->second;
             }
             else
             {
                 Fixed1DArrayTypeCache::key_type p(elementType, *dimensions);
-                Fixed1DArrayTypeCache::const_iterator i =
-                    _fixed1ArrayCache.find(p);
+                Fixed1DArrayTypeCache::const_iterator i = _fixed1ArrayCache.find(p);
                 if (i != _fixed1ArrayCache.end())
                     return i->second;
             }
@@ -258,16 +250,14 @@ namespace Mu
             {
                 // if (DynamicArrayType* t =
                 //     globalScope()->findSymbolOfType<DynamicArrayType>(n))
-                if (DynamicArrayType* t =
-                        scope->findSymbolOfType<DynamicArrayType>(n))
+                if (DynamicArrayType* t = scope->findSymbolOfType<DynamicArrayType>(n))
                 {
                     return t;
                 }
             }
             else
             {
-                if (FixedArrayType* t =
-                        scope->findSymbolOfType<FixedArrayType>(n))
+                if (FixedArrayType* t = scope->findSymbolOfType<FixedArrayType>(n))
                 {
                     return t;
                 }
@@ -279,15 +269,13 @@ namespace Mu
 
         if (dynamicArray)
         {
-            t = new DynamicArrayType(this, name.c_str(), 0, elementType,
-                                     nDimensions);
+            t = new DynamicArrayType(this, name.c_str(), 0, elementType, nDimensions);
 
             _dynArrayCache[elementType] = t;
         }
         else
         {
-            t = new FixedArrayType(this, name.c_str(), 0, elementType,
-                                   dimensions, nDimensions);
+            t = new FixedArrayType(this, name.c_str(), 0, elementType, dimensions, nDimensions);
 
             if (nDimensions == 1)
             {
@@ -300,20 +288,17 @@ namespace Mu
         return t;
     }
 
-    Type* MuLangContext::arrayType(const Type* elementType,
-                                   const SizeVector& dimensions)
+    Type* MuLangContext::arrayType(const Type* elementType, const SizeVector& dimensions)
     {
         return arrayType(elementType, &dimensions.front(), dimensions.size());
     }
 
-    Type* MuLangContext::arrayType(const Type* elementType,
-                                   const STLVector<size_t>::Type& dimensions)
+    Type* MuLangContext::arrayType(const Type* elementType, const STLVector<size_t>::Type& dimensions)
     {
         return arrayType(elementType, &dimensions.front(), dimensions.size());
     }
 
-    Type* MuLangContext::arrayType(const Type* elementType, size_t dimensions,
-                                   ...)
+    Type* MuLangContext::arrayType(const Type* elementType, size_t dimensions, ...)
     {
         va_list ap;
         va_start(ap, dimensions);
@@ -330,8 +315,7 @@ namespace Mu
 
     //----------------------------------------------------------------------
 
-    TypedValue MuLangContext::evalText(const char* text, const char* inputName,
-                                       Process* p, const ModuleList& modules)
+    TypedValue MuLangContext::evalText(const char* text, const char* inputName, Process* p, const ModuleList& modules)
     {
         if (!p)
             p = new Process(this);
@@ -384,8 +368,7 @@ namespace Mu
         return TypedValue();
     }
 
-    TypedValue MuLangContext::evalFile(const char* file, Process* p,
-                                       const ModuleList& modules)
+    TypedValue MuLangContext::evalFile(const char* file, Process* p, const ModuleList& modules)
     {
         bool deleteProcess = false;
 
@@ -479,8 +462,7 @@ namespace Mu
         return 0;
     }
 
-    void MuLangContext::parseStream(Process* process, istream& in,
-                                    const char* inputName)
+    void MuLangContext::parseStream(Process* process, istream& in, const char* inputName)
     {
         PushInputStream p(this, in);
         NodeAssembler as(this, process);
@@ -489,8 +471,7 @@ namespace Mu
 
     Object* MuLangContext::exceptionObject(Exception& exc)
     {
-        ExceptionType::Exception* e =
-            new ExceptionType::Exception(exceptionType());
+        ExceptionType::Exception* e = new ExceptionType::Exception(exceptionType());
         e->setBackTrace(exc);
 
         if (exc.what() != 0 && *exc.what() != 0)

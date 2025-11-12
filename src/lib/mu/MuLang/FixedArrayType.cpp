@@ -28,9 +28,7 @@ namespace Mu
 
     //----------------------------------------------------------------------
 
-    FixedArrayType::FixedArrayType(Context* c, const char* name, Class* super,
-                                   const Type* elementType,
-                                   const SizeVector& dimensions)
+    FixedArrayType::FixedArrayType(Context* c, const char* name, Class* super, const Type* elementType, const SizeVector& dimensions)
         : Class(c, name, super)
         , _elementType(elementType)
     {
@@ -47,9 +45,8 @@ namespace Mu
         }
     }
 
-    FixedArrayType::FixedArrayType(Context* c, const char* name, Class* super,
-                                   const Type* elementType,
-                                   const size_t* dimensions, size_t nDimensions)
+    FixedArrayType::FixedArrayType(Context* c, const char* name, Class* super, const Type* elementType, const size_t* dimensions,
+                                   size_t nDimensions)
         : Class(c, name, super)
         , _elementType(elementType)
         , _dimensions(nDimensions)
@@ -99,8 +96,7 @@ namespace Mu
         //}
     }
 
-    void FixedArrayType::outputValueRecursive(ostream& o, const ValuePointer vp,
-                                              ValueOutputState& state) const
+    void FixedArrayType::outputValueRecursive(ostream& o, const ValuePointer vp, ValueOutputState& state) const
     {
         const Type* etype = elementType();
         const FixedArray* a = *reinterpret_cast<FixedArray**>(vp);
@@ -121,8 +117,7 @@ namespace Mu
                 {
                     if (i)
                         o << ", ";
-                    etype->outputValueRecursive(
-                        o, ValuePointer(a->elementPointer(i)), state);
+                    etype->outputValueRecursive(o, ValuePointer(a->elementPointer(i)), state);
                 }
 
                 state.traversedObjects.erase(a);
@@ -146,8 +141,7 @@ namespace Mu
         return 0;
     }
 
-    const ValuePointer FixedArrayType::fieldPointer(const Object* o,
-                                                    size_t index) const
+    const ValuePointer FixedArrayType::fieldPointer(const Object* o, size_t index) const
     {
         const FixedArray* array = reinterpret_cast<const FixedArray*>(o);
         if (index < array->size())
@@ -183,8 +177,7 @@ namespace Mu
         const char* rn = rname.c_str();
         const char* frn = rname.c_str();
         const char* et = elementType()->fullyQualifiedName().c_str();
-        const char* re =
-            elementType()->referenceType()->fullyQualifiedName().c_str();
+        const char* re = elementType()->referenceType()->fullyQualifiedName().c_str();
 
         //
         //	If a new MachineRep is added, this section of code must be
@@ -195,48 +188,37 @@ namespace Mu
 
         s->addSymbols(new ReferenceType(c, rn, this),
 
-                      new Function(c, tn, FixedArrayType::fixed_construct, None,
+                      new Function(c, tn, FixedArrayType::fixed_construct, None, Return, ftn, End),
+
+                      new Function(c, tn, FixedArrayType::fixed_construct_aggregate, Mapped, Args, et, Optional, "?+", Maximum, fixedSize(),
                                    Return, ftn, End),
 
-                      new Function(c, tn,
-                                   FixedArrayType::fixed_construct_aggregate,
-                                   Mapped, Args, et, Optional, "?+", Maximum,
-                                   fixedSize(), Return, ftn, End),
+                      new Function(c, tn, FixedArrayType::fixed_copyconstruct, None, Return, ftn, Args, ftn, End),
 
-                      new Function(c, tn, FixedArrayType::fixed_copyconstruct,
-                                   None, Return, ftn, Args, ftn, End),
-
-                      new Function(c, tn, BaseFunctions::dereference, Cast,
-                                   Return, ftn, Args, frn, End),
+                      new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frn, End),
 
                       EndArguments);
 
         globalScope()->addSymbols(
 
-            new Function(c, "==", FixedArrayType::fixed_equals, Mapped, Return,
-                         "bool", Args, ftn, ftn, End),
+            new Function(c, "==", FixedArrayType::fixed_equals, Mapped, Return, "bool", Args, ftn, ftn, End),
 
-            new Function(c, "=", BaseFunctions::assign, AsOp, Return, frn, Args,
-                         frn, ftn, End),
+            new Function(c, "=", BaseFunctions::assign, AsOp, Return, frn, Args, frn, ftn, End),
 
-            new Function(c, "eq", BaseFunctions::eq, CommOp, Return, "bool",
-                         Args, ftn, ftn, End),
+            new Function(c, "eq", BaseFunctions::eq, CommOp, Return, "bool", Args, ftn, ftn, End),
 
-            new Function(c, "print", FixedArrayType::fixed_print, None, Return,
-                         "void", Args, ftn, End),
+            new Function(c, "print", FixedArrayType::fixed_print, None, Return, "void", Args, ftn, End),
 
             EndArguments);
 
-        addSymbols(new Function(c, "size", FixedArrayType::fixed_size, Mapped,
-                                Return, "int", Args, ftn, End),
+        addSymbols(new Function(c, "size", FixedArrayType::fixed_size, Mapped, Return, "int", Args, ftn, End),
 
                    EndArguments);
 
         if (_dimensions.size() > 1)
         {
             STLVector<ParameterVariable*>::Type parameters;
-            Type* intType =
-                globalScope()->findSymbolOfType<Type>(c->lookupName("int"));
+            Type* intType = globalScope()->findSymbolOfType<Type>(c->lookupName("int"));
 
             parameters.push_back(new ParameterVariable(c, "this", this));
             for (int i = 0; i < _dimensions.size(); i++)
@@ -246,11 +228,8 @@ namespace Mu
                 parameters.push_back(new ParameterVariable(c, temp, intType));
             }
 
-            addSymbol(new Function(
-                c, "[]", (Type*)elementType()->referenceType(),
-                parameters.size(), &parameters.front(),
-                FixedArrayType::fixed_indexN,
-                Mapped & Function::Native & Function::MemberOperator));
+            addSymbol(new Function(c, "[]", (Type*)elementType()->referenceType(), parameters.size(), &parameters.front(),
+                                   FixedArrayType::fixed_indexN, Mapped & Function::Native & Function::MemberOperator));
         }
 
         if (_dimensions.size() == 1)
@@ -259,17 +238,15 @@ namespace Mu
             //  Add only if its one dimensional
             //
 
-            addSymbol(new Function(c, "[]", FixedArrayType::fixed_index1,
-                                   Mapped & Function::MemberOperator, Return,
-                                   re, Args, ftn, "int", End));
+            addSymbol(
+                new Function(c, "[]", FixedArrayType::fixed_index1, Mapped & Function::MemberOperator, Return, re, Args, ftn, "int", End));
         }
     }
 
     NODE_IMPLEMENTATION(FixedArrayType::fixed_construct, Pointer)
     {
         Process* p = NODE_THREAD.process();
-        const FixedArrayType* c =
-            static_cast<const FixedArrayType*>(NODE_THIS.type());
+        const FixedArrayType* c = static_cast<const FixedArrayType*>(NODE_THIS.type());
         ClassInstance* o = ClassInstance::allocate(c);
         NODE_RETURN(Pointer(o));
     }
@@ -277,8 +254,7 @@ namespace Mu
     NODE_IMPLEMENTATION(FixedArrayType::fixed_construct_aggregate, Pointer)
     {
         Process* p = NODE_THREAD.process();
-        const FixedArrayType* c =
-            static_cast<const FixedArrayType*>(NODE_THIS.type());
+        const FixedArrayType* c = static_cast<const FixedArrayType*>(NODE_THIS.type());
         const Type* etype = c->elementType();
         FixedArray* o = static_cast<FixedArray*>(ClassInstance::allocate(c));
 
@@ -298,15 +274,13 @@ namespace Mu
     NODE_IMPLEMENTATION(FixedArrayType::fixed_copyconstruct, Pointer)
     {
         Process* p = NODE_THREAD.process();
-        const FixedArrayType* c =
-            static_cast<const FixedArrayType*>(NODE_THIS.type());
+        const FixedArrayType* c = static_cast<const FixedArrayType*>(NODE_THIS.type());
 
         FixedArray* o = reinterpret_cast<FixedArray*>(NODE_ARG(0, Pointer));
         if (!o)
             throw NilArgumentException(NODE_THREAD);
         FixedArray* n = static_cast<FixedArray*>(ClassInstance::allocate(c));
-        memcpy(n->data<unsigned char>(), o->data<unsigned char>(),
-               c->elementRep()->size() * c->fixedSize());
+        memcpy(n->data<unsigned char>(), o->data<unsigned char>(), c->elementRep()->size() * c->fixedSize());
 
         NODE_RETURN(Pointer(n));
     }
@@ -321,10 +295,7 @@ namespace Mu
 
         if (a && b && a->size() == b->size())
         {
-            return !memcmp(
-                a->elementPointer(0), b->elementPointer(0),
-                a->size()
-                    * a->arrayType()->elementType()->machineRep()->size());
+            return !memcmp(a->elementPointer(0), b->elementPointer(0), a->size() * a->arrayType()->elementType()->machineRep()->size());
         }
 
         NODE_RETURN(false);
@@ -405,8 +376,7 @@ namespace Mu
         case 3:
             NODE_RETURN(self->elementPointer(indices[0], indices[1]));
         case 4:
-            NODE_RETURN(
-                self->elementPointer(indices[0], indices[1], indices[2]));
+            NODE_RETURN(self->elementPointer(indices[0], indices[1], indices[2]));
         default:
             throw UnimplementedFeatureException(NODE_THREAD);
         }

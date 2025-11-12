@@ -69,10 +69,8 @@ namespace Mu
         virtual size_t objectSize() const;
         virtual Value nodeEval(const Node*, Thread& t) const;
         virtual void nodeEval(void*, const Node*, Thread& t) const;
-        virtual void outputValue(std::ostream&, const Value&,
-                                 bool full = false) const;
-        virtual void outputValueRecursive(std::ostream&, const ValuePointer,
-                                          ValueOutputState&) const;
+        virtual void outputValue(std::ostream&, const Value&, bool full = false) const;
+        virtual void outputValueRecursive(std::ostream&, const ValuePointer, ValueOutputState&) const;
         virtual void constructInstance(Pointer) const;
         virtual void copyInstance(Pointer, Pointer) const;
 

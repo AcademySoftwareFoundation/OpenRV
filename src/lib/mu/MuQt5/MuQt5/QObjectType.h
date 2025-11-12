@@ -44,8 +44,7 @@ namespace Mu
         //  Constructors
         //
 
-        QObjectType(Context* context, const char* name, Class* superClass = 0,
-                    Class* superClass2 = 0);
+        QObjectType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QObjectType();
 
@@ -79,10 +78,7 @@ namespace Mu
     public:
         void customEvent_pub(QEvent* event) { customEvent(event); }
 
-        void customEvent_pub_parent(QEvent* event)
-        {
-            QObject::customEvent(event);
-        }
+        void customEvent_pub_parent(QEvent* event) { QObject::customEvent(event); }
 
         QObject* sender_pub() const { return sender(); }
 
@@ -90,17 +86,11 @@ namespace Mu
 
         int senderSignalIndex_pub() const { return senderSignalIndex(); }
 
-        int senderSignalIndex_pub_parent() const
-        {
-            return QObject::senderSignalIndex();
-        }
+        int senderSignalIndex_pub_parent() const { return QObject::senderSignalIndex(); }
 
         void timerEvent_pub(QTimerEvent* event) { timerEvent(event); }
 
-        void timerEvent_pub_parent(QTimerEvent* event)
-        {
-            QObject::timerEvent(event);
-        }
+        void timerEvent_pub_parent(QTimerEvent* event) { QObject::timerEvent(event); }
 
     public:
         const QObjectType* _baseType;
@@ -108,11 +98,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance*
-    QObjectType::cachedInstance(const QObjectType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QObjectType::cachedInstance(const QObjectType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

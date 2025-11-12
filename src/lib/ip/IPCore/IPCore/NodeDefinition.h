@@ -71,9 +71,7 @@ namespace IPCore
             InternalNodeType
         };
 
-        typedef IPNode* (*NodeConstructor)(const std::string&,
-                                           const NodeDefinition*, IPGraph*,
-                                           GroupIPNode*);
+        typedef IPNode* (*NodeConstructor)(const std::string&, const NodeDefinition*, IPGraph*, GroupIPNode*);
 
         typedef std::map<std::string, NodeConstructor> NodeConstructorMap;
         typedef TwkContainer::ByteProperty::container_type ByteVector;
@@ -96,11 +94,8 @@ namespace IPCore
         //  Constructor for internal code
         //
 
-        NodeDefinition(const std::string& typeName, unsigned int version,
-                       bool isGroup, const std::string& defaultName,
-                       NodeConstructor, const std::string& summary,
-                       const std::string& htmlDocs, const ByteVector iconRGBA,
-                       bool userVisible = true);
+        NodeDefinition(const std::string& typeName, unsigned int version, bool isGroup, const std::string& defaultName, NodeConstructor,
+                       const std::string& summary, const std::string& htmlDocs, const ByteVector iconRGBA, bool userVisible = true);
 
         virtual ~NodeDefinition();
 
@@ -108,12 +103,9 @@ namespace IPCore
         //  Create a node of this type
         //
 
-        IPNode* newNode(const std::string& name, IPGraph* graph,
-                        GroupIPNode* group) const;
+        IPNode* newNode(const std::string& name, IPGraph* graph, GroupIPNode* group) const;
 
-        template <typename T>
-        T* newNodeOfType(const std::string& name, IPGraph* graph,
-                         GroupIPNode* group) const
+        template <typename T> T* newNodeOfType(const std::string& name, IPGraph* graph, GroupIPNode* group) const
         {
             return dynamic_cast<T*>(newNode(name, graph, group));
         }
@@ -126,10 +118,8 @@ namespace IPCore
         void setString(const std::string& fullname, const std::string&);
         void setInt(const std::string& fullname, int);
 
-        std::string stringValue(const std::string& fullname,
-                                const std::string& defaultValue = "") const;
-        std::vector<std::string>
-        stringArrayValue(const std::string& fullname) const;
+        std::string stringValue(const std::string& fullname, const std::string& defaultValue = "") const;
+        std::vector<std::string> stringArrayValue(const std::string& fullname) const;
         int intValue(const std::string& fullname, int defaultValue = 0) const;
 
         bool userVisible() const { return intValue("node.userVisible") == 1; }

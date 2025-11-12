@@ -23,8 +23,7 @@ namespace IPCore
     class Transform2DIPNode : public IPNode
     {
     public:
-        Transform2DIPNode(const std::string& name, const NodeDefinition* def,
-                          IPGraph* graph, GroupIPNode* group = 0);
+        Transform2DIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group = 0);
 
         virtual ~Transform2DIPNode();
 

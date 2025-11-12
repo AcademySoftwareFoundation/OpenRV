@@ -51,19 +51,14 @@ namespace Rv
         std::string modifierString(Qt::KeyboardModifiers, bool) const;
         int key(int) const;
         int pointer(int) const;
-        std::string pointerString(bool, bool, bool, QEvent::Type,
-                                  Qt::KeyboardModifiers, Qt::MouseButtons,
-                                  bool) const;
+        std::string pointerString(bool, bool, bool, QEvent::Type, Qt::KeyboardModifiers, Qt::MouseButtons, bool) const;
 
         void setRelativeDomain(float w, float h) const;
         void setScaleAndOffset(float x, float y, float sx, float sy) const;
 
         Qt::KeyboardModifiers currentModifiers() const { return m_modifiers; };
 
-        void setCurrentModifiers(Qt::KeyboardModifiers m) const
-        {
-            m_modifiers = m;
-        };
+        void setCurrentModifiers(Qt::KeyboardModifiers m) const { m_modifiers = m; };
 
     private:
         TwkApp::EventNode* m_node;

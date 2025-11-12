@@ -85,8 +85,7 @@ namespace TwkMovie
         //
 
         bool success = false;
-        if (const FrameBufferIO* imgio = TwkFB::GenericIO::findByExtension(
-                extension(m_imagePattern), FrameBufferIO::ImageRead))
+        if (const FrameBufferIO* imgio = TwkFB::GenericIO::findByExtension(extension(m_imagePattern), FrameBufferIO::ImageRead))
         {
             try
             {
@@ -96,14 +95,11 @@ namespace TwkMovie
             }
             catch (const std::exception& exc)
             {
-                cerr << "ERROR: plugin '" << imgio->identifier()
-                     << "' cannot read '" << filename << "': " << exc.what()
-                     << endl;
+                cerr << "ERROR: plugin '" << imgio->identifier() << "' cannot read '" << filename << "': " << exc.what() << endl;
             }
             catch (...)
             {
-                cerr << "ERROR: plugin '" << imgio->identifier()
-                     << "' cannot read '" << filename << "'" << endl;
+                cerr << "ERROR: plugin '" << imgio->identifier() << "' cannot read '" << filename << "'" << endl;
             }
         }
 
@@ -113,8 +109,7 @@ namespace TwkMovie
 
         if (!success)
         {
-            if (const FrameBufferIO* imgio = TwkFB::GenericIO::findByBruteForce(
-                    filename, FrameBufferIO::ImageRead))
+            if (const FrameBufferIO* imgio = TwkFB::GenericIO::findByBruteForce(filename, FrameBufferIO::ImageRead))
             {
                 try
                 {
@@ -124,14 +119,11 @@ namespace TwkMovie
                 }
                 catch (const std::exception& exc)
                 {
-                    cerr << "ERROR: plugin '" << imgio->identifier()
-                         << "' cannot read '" << filename << "': " << exc.what()
-                         << endl;
+                    cerr << "ERROR: plugin '" << imgio->identifier() << "' cannot read '" << filename << "': " << exc.what() << endl;
                 }
                 catch (...)
                 {
-                    cerr << "ERROR: plugin '" << imgio->identifier()
-                         << "' cannot read '" << filename << "'" << endl;
+                    cerr << "ERROR: plugin '" << imgio->identifier() << "' cannot read '" << filename << "'" << endl;
                 }
             }
         }
@@ -139,15 +131,13 @@ namespace TwkMovie
         return success;
     }
 
-    void MovieFB::preloadOpen(const std::string& filename,
-                              const ReadRequest& request)
+    void MovieFB::preloadOpen(const std::string& filename, const ReadRequest& request)
     {
         m_filename = filename;
         m_request = request;
     }
 
-    void MovieFB::postPreloadOpen(const MovieInfo& info,
-                                  const ReadRequest& request)
+    void MovieFB::postPreloadOpen(const MovieInfo& info, const ReadRequest& request)
     {
         m_imagePattern = pathConform(m_filename);
         m_info = info;
@@ -170,15 +160,12 @@ namespace TwkMovie
 
         int successFrame = -1;
         bool infoSuccess = false;
-        int testFrames[4] = {1, static_cast<int>(existingFiles.size() / 2),
-                             static_cast<int>(existingFiles.size() / 4), 0};
+        int testFrames[4] = {1, static_cast<int>(existingFiles.size() / 2), static_cast<int>(existingFiles.size() / 4), 0};
         std::set<int> testedFrames;
         for (int t = 0; t < 4 && !infoSuccess; ++t)
         {
             int testFrame = testFrames[t];
-            if (!infoSuccess
-                && testedFrames.find(testFrame) == testedFrames.end()
-                && testFrame < existingFiles.size()
+            if (!infoSuccess && testedFrames.find(testFrame) == testedFrames.end() && testFrame < existingFiles.size()
                 && existingFiles[testFrame].exists)
             {
                 testedFrames.insert(testFrame);
@@ -191,12 +178,9 @@ namespace TwkMovie
         // Last Ditch effort, try and read all frames...
         if (!infoSuccess)
         {
-            for (int testFrame = 0;
-                 testFrame < existingFiles.size() && !infoSuccess; ++testFrame)
+            for (int testFrame = 0; testFrame < existingFiles.size() && !infoSuccess; ++testFrame)
             {
-                if (!infoSuccess
-                    && testedFrames.find(testFrame) == testedFrames.end()
-                    && testFrame < existingFiles.size()
+                if (!infoSuccess && testedFrames.find(testFrame) == testedFrames.end() && testFrame < existingFiles.size()
                     && existingFiles[testFrame].exists)
                 {
                     testedFrames.insert(testFrame);
@@ -211,21 +195,17 @@ namespace TwkMovie
         {
             if (m_imgio)
             {
-                TWK_THROW_EXC_STREAM("Failed to read " << m_imagePattern
-                                                       << " using "
-                                                       << m_imgio->about());
+                TWK_THROW_EXC_STREAM("Failed to read " << m_imagePattern << " using " << m_imgio->about());
             }
             else
             {
 
-                TWK_THROW_EXC_STREAM("No plugin found can read "
-                                     << m_imagePattern);
+                TWK_THROW_EXC_STREAM("No plugin found can read " << m_imagePattern);
             }
         }
         else
         {
-            std::cout << "INFO: Read image info from "
-                      << existingFiles[successFrame].name << std::endl;
+            std::cout << "INFO: Read image info from " << existingFiles[successFrame].name << std::endl;
         }
 
         m_info = m_imgInfo;
@@ -256,16 +236,10 @@ namespace TwkMovie
         // as a slate so this is why we are NOT using the == operator here.
         if (infoSuccess)
         {
-            const bool sameInfo =
-                m_imgInfo.width == m_info.width
-                && m_imgInfo.height == m_info.height
-                && m_imgInfo.uncropWidth == m_info.uncropWidth
-                && m_imgInfo.uncropHeight == m_info.uncropHeight
-                && m_imgInfo.numChannels == m_info.numChannels
-                && m_imgInfo.viewInfos.empty() == m_info.viewInfos.empty()
-                && (m_imgInfo.viewInfos.empty()
-                    || (m_imgInfo.viewInfos.front().name
-                        == m_info.viewInfos.front().name));
+            const bool sameInfo = m_imgInfo.width == m_info.width && m_imgInfo.height == m_info.height
+                                  && m_imgInfo.uncropWidth == m_info.uncropWidth && m_imgInfo.uncropHeight == m_info.uncropHeight
+                                  && m_imgInfo.numChannels == m_info.numChannels && m_imgInfo.viewInfos.empty() == m_info.viewInfos.empty()
+                                  && (m_imgInfo.viewInfos.empty() || (m_imgInfo.viewInfos.front().name == m_info.viewInfos.front().name));
             if (!sameInfo)
             {
                 m_info.slate = m_imgInfo;
@@ -298,69 +272,49 @@ namespace TwkMovie
 
         if (m_info.proxy.hasAttribute("DPX-MP/FrameRate"))
         {
-            if (TwkFB::FBAttribute* a =
-                    m_info.proxy.findAttribute("DPX-MP/FrameRate"))
+            if (TwkFB::FBAttribute* a = m_info.proxy.findAttribute("DPX-MP/FrameRate"))
             {
-                if (TwkFB::TypedFBAttribute<float>* ta =
-                        dynamic_cast<TypedFBAttribute<float>*>(a))
+                if (TwkFB::TypedFBAttribute<float>* ta = dynamic_cast<TypedFBAttribute<float>*>(a))
                 {
-                    m_info.fps =
-                        m_info.proxy.attribute<float>("DPX-MP/FrameRate");
+                    m_info.fps = m_info.proxy.attribute<float>("DPX-MP/FrameRate");
                 }
-                else if (TwkFB::TypedFBAttribute<string>* ta =
-                             dynamic_cast<TypedFBAttribute<string>*>(a))
+                else if (TwkFB::TypedFBAttribute<string>* ta = dynamic_cast<TypedFBAttribute<string>*>(a))
                 {
-                    m_info.fps =
-                        atof(m_info.proxy.attribute<string>("DPX-MP/FrameRate")
-                                 .c_str());
+                    m_info.fps = atof(m_info.proxy.attribute<string>("DPX-MP/FrameRate").c_str());
                 }
             }
             if (m_info.fps)
                 m_info.proxy.newAttribute<float>("FPS", m_info.fps);
         }
 
-        if ((m_info.fps == 0.0 || m_info.fps == 1.0)
-            && m_info.proxy.hasAttribute("DPX-TV/FrameRate"))
+        if ((m_info.fps == 0.0 || m_info.fps == 1.0) && m_info.proxy.hasAttribute("DPX-TV/FrameRate"))
         {
-            if (TwkFB::FBAttribute* a =
-                    m_info.proxy.findAttribute("DPX-TV/FrameRate"))
+            if (TwkFB::FBAttribute* a = m_info.proxy.findAttribute("DPX-TV/FrameRate"))
             {
-                if (TwkFB::TypedFBAttribute<float>* ta =
-                        dynamic_cast<TypedFBAttribute<float>*>(a))
+                if (TwkFB::TypedFBAttribute<float>* ta = dynamic_cast<TypedFBAttribute<float>*>(a))
                 {
-                    m_info.fps =
-                        m_info.proxy.attribute<float>("DPX-TV/FrameRate");
+                    m_info.fps = m_info.proxy.attribute<float>("DPX-TV/FrameRate");
                 }
-                else if (TwkFB::TypedFBAttribute<string>* ta =
-                             dynamic_cast<TypedFBAttribute<string>*>(a))
+                else if (TwkFB::TypedFBAttribute<string>* ta = dynamic_cast<TypedFBAttribute<string>*>(a))
                 {
-                    m_info.fps =
-                        atof(m_info.proxy.attribute<string>("DPX-TV/FrameRate")
-                                 .c_str());
+                    m_info.fps = atof(m_info.proxy.attribute<string>("DPX-TV/FrameRate").c_str());
                 }
             }
             if (m_info.fps)
                 m_info.proxy.newAttribute<float>("FPS", m_info.fps);
         }
 
-        if (m_info.fps == 0.0
-            && m_info.proxy.hasAttribute("EXR/framesPerSecond"))
+        if (m_info.fps == 0.0 && m_info.proxy.hasAttribute("EXR/framesPerSecond"))
         {
-            if (TwkFB::FBAttribute* a =
-                    m_info.proxy.findAttribute("EXR/framesPerSecond"))
+            if (TwkFB::FBAttribute* a = m_info.proxy.findAttribute("EXR/framesPerSecond"))
             {
-                if (TwkFB::TypedFBAttribute<float>* ta =
-                        dynamic_cast<TypedFBAttribute<float>*>(a))
+                if (TwkFB::TypedFBAttribute<float>* ta = dynamic_cast<TypedFBAttribute<float>*>(a))
                 {
-                    m_info.fps =
-                        m_info.proxy.attribute<float>("EXR/framesPerSecond");
+                    m_info.fps = m_info.proxy.attribute<float>("EXR/framesPerSecond");
                 }
-                else if (TwkFB::TypedFBAttribute<string>* ta =
-                             dynamic_cast<TypedFBAttribute<string>*>(a))
+                else if (TwkFB::TypedFBAttribute<string>* ta = dynamic_cast<TypedFBAttribute<string>*>(a))
                 {
-                    m_info.fps = atof(
-                        m_info.proxy.attribute<string>("EXR/framesPerSecond")
-                            .c_str());
+                    m_info.fps = atof(m_info.proxy.attribute<string>("EXR/framesPerSecond").c_str());
                 }
             }
             if (m_info.fps)
@@ -371,16 +325,13 @@ namespace TwkMovie
         {
             if (TwkFB::FBAttribute* a = m_info.proxy.findAttribute("EXR/FPS"))
             {
-                if (TwkFB::TypedFBAttribute<float>* ta =
-                        dynamic_cast<TypedFBAttribute<float>*>(a))
+                if (TwkFB::TypedFBAttribute<float>* ta = dynamic_cast<TypedFBAttribute<float>*>(a))
                 {
                     m_info.fps = m_info.proxy.attribute<float>("EXR/FPS");
                 }
-                else if (TwkFB::TypedFBAttribute<string>* ta =
-                             dynamic_cast<TypedFBAttribute<string>*>(a))
+                else if (TwkFB::TypedFBAttribute<string>* ta = dynamic_cast<TypedFBAttribute<string>*>(a))
                 {
-                    m_info.fps =
-                        atof(m_info.proxy.attribute<string>("EXR/FPS").c_str());
+                    m_info.fps = atof(m_info.proxy.attribute<string>("EXR/FPS").c_str());
                 }
             }
             if (m_info.fps)
@@ -390,8 +341,7 @@ namespace TwkMovie
         if (m_info.fps != m_info.fps)
         {
             if (m_info.fps != m_info.fps)
-                m_info.proxy.attribute<string>("WARNING:") =
-                    "Bogus FPS -- set to 24.0";
+                m_info.proxy.attribute<string>("WARNING:") = "Bogus FPS -- set to 24.0";
 
             m_info.fps = 24;
         }
@@ -402,8 +352,7 @@ namespace TwkMovie
         //
     }
 
-    bool MovieFB::fileAndIdAtFrame(int& frame, string& filename,
-                                   ostream& idstream, bool nearby)
+    bool MovieFB::fileAndIdAtFrame(int& frame, string& filename, ostream& idstream, bool nearby)
     {
         updateFrameInfo();
 
@@ -427,9 +376,8 @@ namespace TwkMovie
             if (nearby)
             {
                 CompareFrameFilePair cffp;
-                FrameMap::const_iterator n = lower_bound(
-                    m_frameMap.begin(), m_frameMap.end(),
-                    FrameMap::value_type(frame, FrameFile("")), cffp);
+                FrameMap::const_iterator n =
+                    lower_bound(m_frameMap.begin(), m_frameMap.end(), FrameMap::value_type(frame, FrameFile("")), cffp);
 
                 //
                 //  n is the smallest frame > target frame, or there are
@@ -444,8 +392,7 @@ namespace TwkMovie
                 return false;
             }
 
-            TWK_THROW_EXC_STREAM("really didn't find anything at frame "
-                                 << frame << " for " << m_filename);
+            TWK_THROW_EXC_STREAM("really didn't find anything at frame " << frame << " for " << m_filename);
         }
         else
         {
@@ -458,8 +405,7 @@ namespace TwkMovie
         return false;
     }
 
-    void MovieFB::imagesAtFrame(const ReadRequest& mrequest,
-                                FrameBufferVector& fbs)
+    void MovieFB::imagesAtFrame(const ReadRequest& mrequest, FrameBufferVector& fbs)
     {
         updateFrameInfo();
 
@@ -485,9 +431,7 @@ namespace TwkMovie
 
         if (!found && !mrequest.missing)
         {
-            TWK_THROW_EXC_STREAM("Out of range frame " << mrequest.frame
-                                                       << " in "
-                                                       << basename(m_filename));
+            TWK_THROW_EXC_STREAM("Out of range frame " << mrequest.frame << " in " << basename(m_filename));
         }
 
         m_imgio->readImages(fbs, filename, request);
@@ -542,8 +486,7 @@ namespace TwkMovie
         }
     }
 
-    void MovieFB::identifiersAtFrame(const ReadRequest& request,
-                                     IdentifierVector& ids)
+    void MovieFB::identifiersAtFrame(const ReadRequest& request, IdentifierVector& ids)
     {
         //
         //  There are two things about this function that are tricky:
@@ -576,16 +519,13 @@ namespace TwkMovie
 
         string baseid = idstr.str() + "/";
 
-        for (unsigned int i = 0;
-             (i == 0 && request.views.empty()) || i < request.views.size(); i++)
+        for (unsigned int i = 0; (i == 0 && request.views.empty()) || i < request.views.size(); i++)
         {
             ostringstream id;
 
-            const string& viewName =
-                (m_info.hasSlate && request.frame == m_info.start)
-                    ? m_info.slate.defaultView
-                : request.views.empty() ? m_info.defaultView
-                                        : request.views[i];
+            const string& viewName = (m_info.hasSlate && request.frame == m_info.start) ? m_info.slate.defaultView
+                                     : request.views.empty()                            ? m_info.defaultView
+                                                                                        : request.views[i];
 
             id << baseid;
 
@@ -612,8 +552,7 @@ namespace TwkMovie
                     {
                         id << ":";
 
-                        if (find(layers.begin(), layers.end(), layerName)
-                            != layers.end())
+                        if (find(layers.begin(), layers.end(), layerName) != layers.end())
                         {
                             id << layerName;
                         }
@@ -765,8 +704,7 @@ namespace TwkMovie
             {
                 if (files[i].exists)
                 {
-                    DB("    i " << i << ": adding " << files[i].frame << " -> '"
-                                << files[i].name << "'");
+                    DB("    i " << i << ": adding " << files[i].frame << " -> '" << files[i].name << "'");
                     m_frameMap[files[i].frame] = FrameFile(files[i].name);
                 }
             }
@@ -780,13 +718,11 @@ namespace TwkMovie
         //  the next time we want to show or cache that frame.
         //
 
-        for (FrameMap::iterator i = m_frameMap.begin(); i != m_frameMap.end();
-             ++i)
+        for (FrameMap::iterator i = m_frameMap.begin(); i != m_frameMap.end(); ++i)
         {
             FrameMap::iterator oldI = oldFrameMap.find(i->first);
 
-            if (oldI != oldFrameMap.end()
-                && oldI->second.fileName == i->second.fileName)
+            if (oldI != oldFrameMap.end() && oldI->second.fileName == i->second.fileName)
             {
                 //  The file may have been read more than once already, so adopt
                 //  that generation/readTime.
@@ -802,8 +738,7 @@ namespace TwkMovie
                 {
                     boost::filesystem::path p(UNICODE_STR(i->second.fileName));
 
-                    if (boost::filesystem::last_write_time(p)
-                        > i->second.readTime)
+                    if (boost::filesystem::last_write_time(p) > i->second.readTime)
                     {
                         ++(i->second.generation);
                     }
@@ -822,11 +757,9 @@ namespace TwkMovie
         typedef FrameBufferIO::ImageTypeInfos ImageInfos;
         typedef FrameBufferIO::ImageTypeInfo ImageInfo;
 
-        const TwkFB::GenericIO::Plugins& plugins =
-            TwkFB::GenericIO::allPlugins();
+        const TwkFB::GenericIO::Plugins& plugins = TwkFB::GenericIO::allPlugins();
 
-        for (TwkFB::GenericIO::Plugins::const_iterator i = plugins.begin();
-             i != plugins.end(); ++i)
+        for (TwkFB::GenericIO::Plugins::const_iterator i = plugins.begin(); i != plugins.end(); ++i)
         {
             const FrameBufferIO* io = *i;
             const ImageInfos& infos = io->extensionsSupported();
@@ -859,18 +792,14 @@ namespace TwkMovie
                     eparams.push_back(Parameter(p.first, p.second, ""));
                 }
 
-                addType(info.extension, info.description, capabilities,
-                        info.compressionSchemes, audioCodecs, dparams, eparams);
+                addType(info.extension, info.description, capabilities, info.compressionSchemes, audioCodecs, dparams, eparams);
             }
         }
     }
 
     MovieFBIO::~MovieFBIO() {}
 
-    std::string MovieFBIO::about() const
-    {
-        return "Tweak Image I/O Movie Sequence";
-    }
+    std::string MovieFBIO::about() const { return "Tweak Image I/O Movie Sequence"; }
 
     MovieReader* MovieFBIO::movieReader() const
     {
@@ -880,8 +809,7 @@ namespace TwkMovie
 
     MovieWriter* MovieFBIO::movieWriter() const { return new MovieFBWriter(); }
 
-    void MovieFBIO::getMovieInfo(const std::string& filename,
-                                 MovieInfo& minfo) const
+    void MovieFBIO::getMovieInfo(const std::string& filename, MovieInfo& minfo) const
     {
         string fname = firstFileInPattern(filename);
         string ext = extension(fname);
@@ -902,8 +830,7 @@ namespace TwkMovie
                 }
                 else
                 {
-                    TWK_THROW_STREAM(IOException,
-                                     "Unsupported file: " << filename);
+                    TWK_THROW_STREAM(IOException, "Unsupported file: " << filename);
                 }
             }
         }

@@ -18,18 +18,13 @@ using namespace ILMTHREAD_NAMESPACE;
 
 //------------------------------------------------------------------------------
 //
-void convert_ABGR10_to_RGBA10(size_t width, size_t height,
-                              const uint32_t* FASTMEMCPYRESTRICT inBuf,
-                              uint32_t* FASTMEMCPYRESTRICT outBuf)
+void convert_ABGR10_to_RGBA10(size_t width, size_t height, const uint32_t* FASTMEMCPYRESTRICT inBuf, uint32_t* FASTMEMCPYRESTRICT outBuf)
 {
     uint32_t* FASTMEMCPYRESTRICT p1 = outBuf;
 
     for (size_t row = 0; row < height; row++)
     {
-        for (const uint32_t *FASTMEMCPYRESTRICT
-                 p0 = inBuf + row * width,
-                 *FASTMEMCPYRESTRICT e = p0 + width;
-             p0 < e; p0++)
+        for (const uint32_t *FASTMEMCPYRESTRICT p0 = inBuf + row * width, *FASTMEMCPYRESTRICT e = p0 + width; p0 < e; p0++)
         {
             // Converts ABGR10 to RGBA10
             // From ABGR10:
@@ -53,9 +48,7 @@ void convert_ABGR10_to_RGBA10(size_t width, size_t height,
 class Convert_ABGR10_to_RGBA10_MP_Task : public Task
 {
 public:
-    Convert_ABGR10_to_RGBA10_MP_Task(TaskGroup* group, size_t width,
-                                     size_t height,
-                                     const uint32_t* FASTMEMCPYRESTRICT inBuf,
+    Convert_ABGR10_to_RGBA10_MP_Task(TaskGroup* group, size_t width, size_t height, const uint32_t* FASTMEMCPYRESTRICT inBuf,
                                      uint32_t* FASTMEMCPYRESTRICT outBuf)
         : Task(group)
         , _width(width)
@@ -67,10 +60,7 @@ public:
 
     virtual ~Convert_ABGR10_to_RGBA10_MP_Task() {}
 
-    virtual void execute()
-    {
-        convert_ABGR10_to_RGBA10(_width, _height, _inBuf, _outBuf);
-    }
+    virtual void execute() { convert_ABGR10_to_RGBA10(_width, _height, _inBuf, _outBuf); }
 
     const size_t _width;
     const size_t _height;
@@ -80,9 +70,7 @@ public:
 
 //------------------------------------------------------------------------------
 //
-void convert_ABGR10_to_RGBA10_MP(size_t width, size_t height,
-                                 const uint32_t* FASTMEMCPYRESTRICT inBuf,
-                                 uint32_t* FASTMEMCPYRESTRICT outBuf)
+void convert_ABGR10_to_RGBA10_MP(size_t width, size_t height, const uint32_t* FASTMEMCPYRESTRICT inBuf, uint32_t* FASTMEMCPYRESTRICT outBuf)
 {
     static bool use_standard_memcpy = getenv("RV_USE_STD_MEMCPY");
     if (use_standard_memcpy)
@@ -106,24 +94,20 @@ void convert_ABGR10_to_RGBA10_MP(size_t width, size_t height,
         const uint32_t* FASTMEMCPYRESTRICT curInBuf = inBuf + curY * bufStride;
         uint32_t* FASTMEMCPYRESTRICT curOutBuf = outBuf + curY * bufStride;
         const size_t curHeight = std::min(taskHeight, height - curY);
-        TwkFB::ThreadPool::addTask(new Convert_ABGR10_to_RGBA10_MP_Task(
-            &taskGroup, width, curHeight, curInBuf, curOutBuf));
+        TwkFB::ThreadPool::addTask(new Convert_ABGR10_to_RGBA10_MP_Task(&taskGroup, width, curHeight, curInBuf, curOutBuf));
         curY += curHeight;
     }
 }
 
 //------------------------------------------------------------------------------
 //
-void convert_RGB16_to_RGB12(size_t width, size_t height,
-                            const void* FASTMEMCPYRESTRICT inBuf,
-                            void* FASTMEMCPYRESTRICT outBuf, size_t inBufStride,
-                            size_t outBufStride)
+void convert_RGB16_to_RGB12(size_t width, size_t height, const void* FASTMEMCPYRESTRICT inBuf, void* FASTMEMCPYRESTRICT outBuf,
+                            size_t inBufStride, size_t outBufStride)
 {
     const size_t src_uint16_per_row = inBufStride / sizeof(uint16_t);
     const size_t dst_uint16_per_row = outBufStride / sizeof(uint16_t);
 
-    const uint16_t* FASTMEMCPYRESTRICT src =
-        reinterpret_cast<const uint16_t*>(inBuf);
+    const uint16_t* FASTMEMCPYRESTRICT src = reinterpret_cast<const uint16_t*>(inBuf);
     uint16_t* FASTMEMCPYRESTRICT dst = reinterpret_cast<uint16_t*>(outBuf);
 
     // Convert :
@@ -185,11 +169,8 @@ void convert_RGB16_to_RGB12(size_t width, size_t height,
 class Convert_RGB16_to_RGB12_MP_Task : public Task
 {
 public:
-    Convert_RGB16_to_RGB12_MP_Task(TaskGroup* group, size_t width,
-                                   size_t height,
-                                   const void* FASTMEMCPYRESTRICT inBuf,
-                                   void* FASTMEMCPYRESTRICT outBuf,
-                                   size_t inBufStride, size_t outBufStride)
+    Convert_RGB16_to_RGB12_MP_Task(TaskGroup* group, size_t width, size_t height, const void* FASTMEMCPYRESTRICT inBuf,
+                                   void* FASTMEMCPYRESTRICT outBuf, size_t inBufStride, size_t outBufStride)
         : Task(group)
         , _width(width)
         , _height(height)
@@ -202,11 +183,7 @@ public:
 
     virtual ~Convert_RGB16_to_RGB12_MP_Task() {}
 
-    virtual void execute()
-    {
-        convert_RGB16_to_RGB12(_width, _height, _inBuf, _outBuf, _inBufStride,
-                               _outBufStride);
-    }
+    virtual void execute() { convert_RGB16_to_RGB12(_width, _height, _inBuf, _outBuf, _inBufStride, _outBufStride); }
 
     const size_t _width;
     const size_t _height;
@@ -218,9 +195,7 @@ public:
 
 //------------------------------------------------------------------------------
 //
-void convert_RGB16_to_RGB12_MP(size_t width, size_t height,
-                               const void* FASTMEMCPYRESTRICT inBuf,
-                               void* FASTMEMCPYRESTRICT outBuf,
+void convert_RGB16_to_RGB12_MP(size_t width, size_t height, const void* FASTMEMCPYRESTRICT inBuf, void* FASTMEMCPYRESTRICT outBuf,
                                size_t inBufStride, size_t outBufStride)
 {
     HOP_PROF_FUNC();
@@ -233,14 +208,11 @@ void convert_RGB16_to_RGB12_MP(size_t width, size_t height,
 
     while (curY < height)
     {
-        const void* FASTMEMCPYRESTRICT curInBuf =
-            reinterpret_cast<const uint8_t*>(inBuf) + curY * inBufStride;
-        void* FASTMEMCPYRESTRICT curOutBuf =
-            reinterpret_cast<uint8_t*>(outBuf) + curY * outBufStride;
+        const void* FASTMEMCPYRESTRICT curInBuf = reinterpret_cast<const uint8_t*>(inBuf) + curY * inBufStride;
+        void* FASTMEMCPYRESTRICT curOutBuf = reinterpret_cast<uint8_t*>(outBuf) + curY * outBufStride;
         const size_t curHeight = std::min(taskHeight, height - curY);
-        TwkFB::ThreadPool::addTask(new Convert_RGB16_to_RGB12_MP_Task(
-            &taskGroup, width, curHeight, curInBuf, curOutBuf, inBufStride,
-            outBufStride));
+        TwkFB::ThreadPool::addTask(
+            new Convert_RGB16_to_RGB12_MP_Task(&taskGroup, width, curHeight, curInBuf, curOutBuf, inBufStride, outBufStride));
         curY += curHeight;
     }
 }
@@ -251,12 +223,8 @@ void convert_RGB16_to_RGB12_MP(size_t width, size_t height,
 // per component.
 // See v210 at http://developer.apple.com/library/mac/technotes/tn2162/
 //
-void packedUYVY10_to_planarYUV16(size_t width, size_t height,
-                                 const uint32_t* FASTMEMCPYRESTRICT inBuf,
-                                 uint16_t* FASTMEMCPYRESTRICT outY,
-                                 uint16_t* FASTMEMCPYRESTRICT outCb,
-                                 uint16_t* FASTMEMCPYRESTRICT outCr,
-                                 size_t strideY, size_t strideCb,
+void packedUYVY10_to_planarYUV16(size_t width, size_t height, const uint32_t* FASTMEMCPYRESTRICT inBuf, uint16_t* FASTMEMCPYRESTRICT outY,
+                                 uint16_t* FASTMEMCPYRESTRICT outCb, uint16_t* FASTMEMCPYRESTRICT outCr, size_t strideY, size_t strideCb,
                                  size_t strideCr)
 {
     const size_t nbPixelGroups = width / 16;
@@ -310,14 +278,9 @@ void packedUYVY10_to_planarYUV16(size_t width, size_t height,
 class PackedUYVY10_to_planarYUV16_Task : public Task
 {
 public:
-    PackedUYVY10_to_planarYUV16_Task(TaskGroup* group, size_t width,
-                                     size_t height,
-                                     const uint32_t* FASTMEMCPYRESTRICT inBuf,
-                                     uint16_t* FASTMEMCPYRESTRICT outY,
-                                     uint16_t* FASTMEMCPYRESTRICT outCb,
-                                     uint16_t* FASTMEMCPYRESTRICT outCr,
-                                     size_t strideY, size_t strideCb,
-                                     size_t strideCr)
+    PackedUYVY10_to_planarYUV16_Task(TaskGroup* group, size_t width, size_t height, const uint32_t* FASTMEMCPYRESTRICT inBuf,
+                                     uint16_t* FASTMEMCPYRESTRICT outY, uint16_t* FASTMEMCPYRESTRICT outCb,
+                                     uint16_t* FASTMEMCPYRESTRICT outCr, size_t strideY, size_t strideCb, size_t strideCr)
         : Task(group)
         , _width(width)
         , _height(height)
@@ -333,11 +296,7 @@ public:
 
     virtual ~PackedUYVY10_to_planarYUV16_Task() {}
 
-    virtual void execute()
-    {
-        packedUYVY10_to_planarYUV16(_width, _height, _inBuf, _outY, _outCb,
-                                    _outCr, _strideY, _strideCb, _strideCr);
-    }
+    virtual void execute() { packedUYVY10_to_planarYUV16(_width, _height, _inBuf, _outY, _outCb, _outCr, _strideY, _strideCb, _strideCr); }
 
 private:
     const size_t _width;
@@ -353,20 +312,15 @@ private:
 
 //------------------------------------------------------------------------------
 //
-void packedUYVY10_to_planarYUV16_MP(size_t width, size_t height,
-                                    const uint32_t* FASTMEMCPYRESTRICT inBuf,
-                                    uint16_t* FASTMEMCPYRESTRICT outY,
-                                    uint16_t* FASTMEMCPYRESTRICT outCb,
-                                    uint16_t* FASTMEMCPYRESTRICT outCr,
-                                    size_t strideY, size_t strideCb,
-                                    size_t strideCr)
+void packedUYVY10_to_planarYUV16_MP(size_t width, size_t height, const uint32_t* FASTMEMCPYRESTRICT inBuf,
+                                    uint16_t* FASTMEMCPYRESTRICT outY, uint16_t* FASTMEMCPYRESTRICT outCb,
+                                    uint16_t* FASTMEMCPYRESTRICT outCr, size_t strideY, size_t strideCb, size_t strideCr)
 {
     static bool use_standard_memcpy = getenv("RV_USE_STD_MEMCPY");
     if (use_standard_memcpy)
     {
         HOP_PROF("packedUYVY10_to_planarYUV16()");
-        packedUYVY10_to_planarYUV16(width, height, inBuf, outY, outCb, outCr,
-                                    strideY, strideCb, strideCr);
+        packedUYVY10_to_planarYUV16(width, height, inBuf, outY, outCb, outCr, strideY, strideCb, strideCr);
         return;
     }
 
@@ -388,9 +342,8 @@ void packedUYVY10_to_planarYUV16_MP(size_t width, size_t height,
         uint16_t* FASTMEMCPYRESTRICT curOutCb = outCb + curY * strideCb / 2;
         uint16_t* FASTMEMCPYRESTRICT curOutCr = outCr + curY * strideCr / 2;
         const size_t curHeight = std::min(taskHeight, height - curY);
-        TwkFB::ThreadPool::addTask(new PackedUYVY10_to_planarYUV16_Task(
-            &taskGroup, width, curHeight, curInBuf, curOutY, curOutCb, curOutCr,
-            strideY, strideCb, strideCr));
+        TwkFB::ThreadPool::addTask(new PackedUYVY10_to_planarYUV16_Task(&taskGroup, width, curHeight, curInBuf, curOutY, curOutCb, curOutCr,
+                                                                        strideY, strideCb, strideCr));
         curY += curHeight;
     }
 }
@@ -401,12 +354,8 @@ void packedUYVY10_to_planarYUV16_MP(size_t width, size_t height,
 // per component.
 // See v216 at http://developer.apple.com/library/mac/technotes/tn2162/
 //
-void packedUYVY16_to_planarYUV16(size_t width, size_t height,
-                                 const uint16_t* FASTMEMCPYRESTRICT inBuf,
-                                 uint16_t* FASTMEMCPYRESTRICT outY,
-                                 uint16_t* FASTMEMCPYRESTRICT outCb,
-                                 uint16_t* FASTMEMCPYRESTRICT outCr,
-                                 size_t strideY, size_t strideCb,
+void packedUYVY16_to_planarYUV16(size_t width, size_t height, const uint16_t* FASTMEMCPYRESTRICT inBuf, uint16_t* FASTMEMCPYRESTRICT outY,
+                                 uint16_t* FASTMEMCPYRESTRICT outCb, uint16_t* FASTMEMCPYRESTRICT outCr, size_t strideY, size_t strideCb,
                                  size_t strideCr)
 {
     const size_t nbPixelGroups = width / 8;
@@ -441,14 +390,9 @@ void packedUYVY16_to_planarYUV16(size_t width, size_t height,
 class PackedUYVY16_to_planarYUV16_Task : public Task
 {
 public:
-    PackedUYVY16_to_planarYUV16_Task(TaskGroup* group, size_t width,
-                                     size_t height,
-                                     const uint16_t* FASTMEMCPYRESTRICT inBuf,
-                                     uint16_t* FASTMEMCPYRESTRICT outY,
-                                     uint16_t* FASTMEMCPYRESTRICT outCb,
-                                     uint16_t* FASTMEMCPYRESTRICT outCr,
-                                     size_t strideY, size_t strideCb,
-                                     size_t strideCr)
+    PackedUYVY16_to_planarYUV16_Task(TaskGroup* group, size_t width, size_t height, const uint16_t* FASTMEMCPYRESTRICT inBuf,
+                                     uint16_t* FASTMEMCPYRESTRICT outY, uint16_t* FASTMEMCPYRESTRICT outCb,
+                                     uint16_t* FASTMEMCPYRESTRICT outCr, size_t strideY, size_t strideCb, size_t strideCr)
         : Task(group)
         , _width(width)
         , _height(height)
@@ -464,11 +408,7 @@ public:
 
     virtual ~PackedUYVY16_to_planarYUV16_Task() {}
 
-    virtual void execute()
-    {
-        packedUYVY16_to_planarYUV16(_width, _height, _inBuf, _outY, _outCb,
-                                    _outCr, _strideY, _strideCb, _strideCr);
-    }
+    virtual void execute() { packedUYVY16_to_planarYUV16(_width, _height, _inBuf, _outY, _outCb, _outCr, _strideY, _strideCb, _strideCr); }
 
 private:
     const size_t _width;
@@ -482,20 +422,15 @@ private:
     const size_t _strideCr;
 };
 
-void packedUYVY16_to_planarYUV16_MP(size_t width, size_t height,
-                                    const uint16_t* FASTMEMCPYRESTRICT inBuf,
-                                    uint16_t* FASTMEMCPYRESTRICT outY,
-                                    uint16_t* FASTMEMCPYRESTRICT outCb,
-                                    uint16_t* FASTMEMCPYRESTRICT outCr,
-                                    size_t strideY, size_t strideCb,
-                                    size_t strideCr)
+void packedUYVY16_to_planarYUV16_MP(size_t width, size_t height, const uint16_t* FASTMEMCPYRESTRICT inBuf,
+                                    uint16_t* FASTMEMCPYRESTRICT outY, uint16_t* FASTMEMCPYRESTRICT outCb,
+                                    uint16_t* FASTMEMCPYRESTRICT outCr, size_t strideY, size_t strideCb, size_t strideCr)
 {
     static bool use_standard_memcpy = getenv("RV_USE_STD_MEMCPY");
     if (use_standard_memcpy)
     {
         HOP_PROF("packedUYVY16_to_planarYUV16()");
-        packedUYVY16_to_planarYUV16(width, height, inBuf, outY, outCb, outCr,
-                                    strideY, strideCb, strideCr);
+        packedUYVY16_to_planarYUV16(width, height, inBuf, outY, outCb, outCr, strideY, strideCb, strideCr);
         return;
     }
 
@@ -517,9 +452,8 @@ void packedUYVY16_to_planarYUV16_MP(size_t width, size_t height,
         uint16_t* FASTMEMCPYRESTRICT curOutCb = outCb + curY * strideCb / 2;
         uint16_t* FASTMEMCPYRESTRICT curOutCr = outCr + curY * strideCr / 2;
         const size_t curHeight = std::min(taskHeight, height - curY);
-        TwkFB::ThreadPool::addTask(new PackedUYVY16_to_planarYUV16_Task(
-            &taskGroup, width, curHeight, curInBuf, curOutY, curOutCb, curOutCr,
-            strideY, strideCb, strideCr));
+        TwkFB::ThreadPool::addTask(new PackedUYVY16_to_planarYUV16_Task(&taskGroup, width, curHeight, curInBuf, curOutY, curOutCb, curOutCr,
+                                                                        strideY, strideCb, strideCr));
         curY += curHeight;
     }
 }
@@ -529,11 +463,9 @@ void packedUYVY16_to_planarYUV16_MP(size_t width, size_t height,
 // from packed UVYA 16 bits per component to planar YUVA with 16 bits per
 // component.
 //
-void packedUVYA16_to_planarYUVA16(
-    size_t width, size_t height, const uint64_t* FASTMEMCPYRESTRICT inBuf,
-    uint16_t* FASTMEMCPYRESTRICT outY, uint16_t* FASTMEMCPYRESTRICT outCb,
-    uint16_t* FASTMEMCPYRESTRICT outCr, uint16_t* FASTMEMCPYRESTRICT outA,
-    size_t strideY, size_t strideCb, size_t strideCr, size_t strideA)
+void packedUVYA16_to_planarYUVA16(size_t width, size_t height, const uint64_t* FASTMEMCPYRESTRICT inBuf, uint16_t* FASTMEMCPYRESTRICT outY,
+                                  uint16_t* FASTMEMCPYRESTRICT outCb, uint16_t* FASTMEMCPYRESTRICT outCr, uint16_t* FASTMEMCPYRESTRICT outA,
+                                  size_t strideY, size_t strideCb, size_t strideCr, size_t strideA)
 {
     const size_t nbPixels = width / 8;
     uint16_t* FASTMEMCPYRESTRICT startOutY = outY;
@@ -566,12 +498,10 @@ void packedUVYA16_to_planarYUVA16(
 class PackedUVYA16_to_planarYUVA16_Task : public Task
 {
 public:
-    PackedUVYA16_to_planarYUVA16_Task(
-        TaskGroup* group, size_t width, size_t height,
-        const uint64_t* FASTMEMCPYRESTRICT inBuf,
-        uint16_t* FASTMEMCPYRESTRICT outY, uint16_t* FASTMEMCPYRESTRICT outCb,
-        uint16_t* FASTMEMCPYRESTRICT outCr, uint16_t* FASTMEMCPYRESTRICT outA,
-        size_t strideY, size_t strideCb, size_t strideCr, size_t strideA)
+    PackedUVYA16_to_planarYUVA16_Task(TaskGroup* group, size_t width, size_t height, const uint64_t* FASTMEMCPYRESTRICT inBuf,
+                                      uint16_t* FASTMEMCPYRESTRICT outY, uint16_t* FASTMEMCPYRESTRICT outCb,
+                                      uint16_t* FASTMEMCPYRESTRICT outCr, uint16_t* FASTMEMCPYRESTRICT outA, size_t strideY,
+                                      size_t strideCb, size_t strideCr, size_t strideA)
         : Task(group)
         , _width(width)
         , _height(height)
@@ -591,9 +521,7 @@ public:
 
     virtual void execute()
     {
-        packedUVYA16_to_planarYUVA16(_width, _height, _inBuf, _outY, _outCb,
-                                     _outCr, _outA, _strideY, _strideCb,
-                                     _strideCr, _strideA);
+        packedUVYA16_to_planarYUVA16(_width, _height, _inBuf, _outY, _outCb, _outCr, _outA, _strideY, _strideCb, _strideCr, _strideA);
     }
 
 private:
@@ -610,19 +538,16 @@ private:
     const size_t _strideA;
 };
 
-void packedUVYA16_to_planarYUVA16_MP(
-    size_t width, size_t height, const uint64_t* FASTMEMCPYRESTRICT inBuf,
-    uint16_t* FASTMEMCPYRESTRICT outY, uint16_t* FASTMEMCPYRESTRICT outCb,
-    uint16_t* FASTMEMCPYRESTRICT outCr, uint16_t* FASTMEMCPYRESTRICT outA,
-    size_t strideY, size_t strideCb, size_t strideCr, size_t strideA)
+void packedUVYA16_to_planarYUVA16_MP(size_t width, size_t height, const uint64_t* FASTMEMCPYRESTRICT inBuf,
+                                     uint16_t* FASTMEMCPYRESTRICT outY, uint16_t* FASTMEMCPYRESTRICT outCb,
+                                     uint16_t* FASTMEMCPYRESTRICT outCr, uint16_t* FASTMEMCPYRESTRICT outA, size_t strideY, size_t strideCb,
+                                     size_t strideCr, size_t strideA)
 {
     static bool use_standard_memcpy = getenv("RV_USE_STD_MEMCPY");
     if (use_standard_memcpy)
     {
         HOP_PROF("packedUVYA16_to_planarYUVA16()");
-        packedUVYA16_to_planarYUVA16(width, height, inBuf, outY, outCb, outCr,
-                                     outA, strideY, strideCb, strideCr,
-                                     strideA);
+        packedUVYA16_to_planarYUVA16(width, height, inBuf, outY, outCb, outCr, outA, strideY, strideCb, strideCr, strideA);
         return;
     }
 
@@ -645,9 +570,8 @@ void packedUVYA16_to_planarYUVA16_MP(
         uint16_t* FASTMEMCPYRESTRICT curOutCr = outCr + curY * strideCr / 2;
         uint16_t* FASTMEMCPYRESTRICT curOutA = outA + curY * strideA / 2;
         const size_t curHeight = std::min(taskHeight, height - curY);
-        TwkFB::ThreadPool::addTask(new PackedUVYA16_to_planarYUVA16_Task(
-            &taskGroup, width, curHeight, curInBuf, curOutY, curOutCb, curOutCr,
-            curOutA, strideY, strideCb, strideCr, strideA));
+        TwkFB::ThreadPool::addTask(new PackedUVYA16_to_planarYUVA16_Task(&taskGroup, width, curHeight, curInBuf, curOutY, curOutCb,
+                                                                         curOutCr, curOutA, strideY, strideCb, strideCr, strideA));
         curY += curHeight;
     }
 }
@@ -720,24 +644,18 @@ static inline uint16_t denormalizeC16(const float in_val)
 #define U10MASK 0x000FFC00
 #define V10MASK 0x3FF00000
 
-void packedYUV444_10bits_to_P216(size_t width, size_t height,
-                                 const uint32_t* FASTMEMCPYRESTRICT inBuf,
-                                 uint16_t* FASTMEMCPYRESTRICT outBufY,
-                                 uint16_t* FASTMEMCPYRESTRICT outBufCbCy,
-                                 size_t inBufStride, size_t outBufStride,
-                                 bool flip)
+void packedYUV444_10bits_to_P216(size_t width, size_t height, const uint32_t* FASTMEMCPYRESTRICT inBuf,
+                                 uint16_t* FASTMEMCPYRESTRICT outBufY, uint16_t* FASTMEMCPYRESTRICT outBufCbCy, size_t inBufStride,
+                                 size_t outBufStride, bool flip)
 {
     const size_t nbPixelsPerLoop = 2;
     const size_t nbPixelGroups = width / nbPixelsPerLoop;
     for (size_t y = 0; y < height; ++y)
     {
         size_t input_y = flip ? (height - 1 - y) : y;
-        const uint32_t* inYUV = reinterpret_cast<const uint32_t*>(
-            reinterpret_cast<const uint8_t*>(inBuf) + input_y * inBufStride);
-        uint16_t* outY = reinterpret_cast<uint16_t*>(
-            reinterpret_cast<uint8_t*>(outBufY) + y * outBufStride);
-        uint16_t* outCbCr = reinterpret_cast<uint16_t*>(
-            reinterpret_cast<uint8_t*>(outBufCbCy) + y * outBufStride);
+        const uint32_t* inYUV = reinterpret_cast<const uint32_t*>(reinterpret_cast<const uint8_t*>(inBuf) + input_y * inBufStride);
+        uint16_t* outY = reinterpret_cast<uint16_t*>(reinterpret_cast<uint8_t*>(outBufY) + y * outBufStride);
+        uint16_t* outCbCr = reinterpret_cast<uint16_t*>(reinterpret_cast<uint8_t*>(outBufCbCy) + y * outBufStride);
         for (size_t i = 0; i < nbPixelGroups; ++i)
         {
             *outY = denormalizeY16(normalizeY10((*inYUV) & Y10MASK));
@@ -760,13 +678,9 @@ void packedYUV444_10bits_to_P216(size_t width, size_t height,
 class PackedYUV444_10bits_to_P216_Task : public Task
 {
 public:
-    PackedYUV444_10bits_to_P216_Task(TaskGroup* group, size_t width,
-                                     size_t height,
-                                     const uint32_t* FASTMEMCPYRESTRICT inBuf,
-                                     uint16_t* FASTMEMCPYRESTRICT outBufY,
-                                     uint16_t* FASTMEMCPYRESTRICT outBufCbCr,
-                                     size_t inBufStride, size_t outBufStride,
-                                     bool flip)
+    PackedYUV444_10bits_to_P216_Task(TaskGroup* group, size_t width, size_t height, const uint32_t* FASTMEMCPYRESTRICT inBuf,
+                                     uint16_t* FASTMEMCPYRESTRICT outBufY, uint16_t* FASTMEMCPYRESTRICT outBufCbCr, size_t inBufStride,
+                                     size_t outBufStride, bool flip)
         : Task(group)
         , _width(width)
         , _height(height)
@@ -783,9 +697,7 @@ public:
 
     virtual void execute()
     {
-        packedYUV444_10bits_to_P216(_width, _height, _inBuf, _outBufY,
-                                    _outBufCbCr, _inBufStride, _outBufStride,
-                                    _flip);
+        packedYUV444_10bits_to_P216(_width, _height, _inBuf, _outBufY, _outBufCbCr, _inBufStride, _outBufStride, _flip);
     }
 
 private:
@@ -801,19 +713,15 @@ private:
 
 //------------------------------------------------------------------------------
 //
-void packedYUV444_10bits_to_P216_MP(size_t width, size_t height,
-                                    const uint32_t* FASTMEMCPYRESTRICT inBuf,
-                                    uint16_t* FASTMEMCPYRESTRICT outBufY,
-                                    uint16_t* FASTMEMCPYRESTRICT outBufCbCr,
-                                    size_t inBufStride, size_t outBufStride,
-                                    bool flip)
+void packedYUV444_10bits_to_P216_MP(size_t width, size_t height, const uint32_t* FASTMEMCPYRESTRICT inBuf,
+                                    uint16_t* FASTMEMCPYRESTRICT outBufY, uint16_t* FASTMEMCPYRESTRICT outBufCbCr, size_t inBufStride,
+                                    size_t outBufStride, bool flip)
 {
     static bool use_standard_memcpy = getenv("RV_USE_STD_MEMCPY");
     if (use_standard_memcpy)
     {
         HOP_PROF("packedYUV444_10bits_to_P216()");
-        packedYUV444_10bits_to_P216(width, height, inBuf, outBufY, outBufCbCr,
-                                    inBufStride, outBufStride, flip);
+        packedYUV444_10bits_to_P216(width, height, inBuf, outBufY, outBufCbCr, inBufStride, outBufStride, flip);
         return;
     }
 
@@ -830,16 +738,11 @@ void packedYUV444_10bits_to_P216_MP(size_t width, size_t height,
         const size_t curHeight = std::min(taskHeight, height - curY);
         size_t input_y = flip ? (height - curHeight - curY) : curY;
         const uint32_t* FASTMEMCPYRESTRICT curInBuf =
-            reinterpret_cast<const uint32_t*>(
-                reinterpret_cast<const uint8_t*>(inBuf)
-                + input_y * inBufStride);
-        uint16_t* curOutY = reinterpret_cast<uint16_t*>(
-            reinterpret_cast<uint8_t*>(outBufY) + curY * outBufStride);
-        uint16_t* curOutCbCr = reinterpret_cast<uint16_t*>(
-            reinterpret_cast<uint8_t*>(outBufCbCr) + curY * outBufStride);
-        TwkFB::ThreadPool::addTask(new PackedYUV444_10bits_to_P216_Task(
-            &taskGroup, width, curHeight, curInBuf, curOutY, curOutCbCr,
-            inBufStride, outBufStride, flip));
+            reinterpret_cast<const uint32_t*>(reinterpret_cast<const uint8_t*>(inBuf) + input_y * inBufStride);
+        uint16_t* curOutY = reinterpret_cast<uint16_t*>(reinterpret_cast<uint8_t*>(outBufY) + curY * outBufStride);
+        uint16_t* curOutCbCr = reinterpret_cast<uint16_t*>(reinterpret_cast<uint8_t*>(outBufCbCr) + curY * outBufStride);
+        TwkFB::ThreadPool::addTask(new PackedYUV444_10bits_to_P216_Task(&taskGroup, width, curHeight, curInBuf, curOutY, curOutCbCr,
+                                                                        inBufStride, outBufStride, flip));
         curY += curHeight;
     }
 }
@@ -849,10 +752,8 @@ void packedYUV444_10bits_to_P216_MP(size_t width, size_t height,
 // from packed BGRA with 16 bits BE per component to packed ABGR with 16 bits LE
 // per component.
 //
-void packedBGRA64BE_to_packedABGR64LE(size_t inStride, size_t height,
-                                      const uint64_t* FASTMEMCPYRESTRICT inBuf,
-                                      uint64_t* FASTMEMCPYRESTRICT outBuf,
-                                      size_t outStride)
+void packedBGRA64BE_to_packedABGR64LE(size_t inStride, size_t height, const uint64_t* FASTMEMCPYRESTRICT inBuf,
+                                      uint64_t* FASTMEMCPYRESTRICT outBuf, size_t outStride)
 {
     // Big endian to little endiant
     const size_t nbPixelsPerRow = std::min(inStride, outStride) / 8;
@@ -860,14 +761,10 @@ void packedBGRA64BE_to_packedABGR64LE(size_t inStride, size_t height,
     {
         for (size_t i = 0; i < nbPixelsPerRow; ++i)
         {
-            *(outBuf + i) = ((*(inBuf + i) & 0xFF00000000000000) >> 24)
-                            | ((*(inBuf + i) & 0x00FF000000000000) >> 8)
-                            | ((*(inBuf + i) & 0x0000FF0000000000) >> 24)
-                            | ((*(inBuf + i) & 0x000000FF00000000) >> 8)
-                            | ((*(inBuf + i) & 0x00000000FF000000) >> 24)
-                            | ((*(inBuf + i) & 0x0000000000FF0000) >> 8)
-                            | ((*(inBuf + i) & 0x000000000000FF00) << 40)
-                            | ((*(inBuf + i) & 0x00000000000000FF) << 56);
+            *(outBuf + i) = ((*(inBuf + i) & 0xFF00000000000000) >> 24) | ((*(inBuf + i) & 0x00FF000000000000) >> 8)
+                            | ((*(inBuf + i) & 0x0000FF0000000000) >> 24) | ((*(inBuf + i) & 0x000000FF00000000) >> 8)
+                            | ((*(inBuf + i) & 0x00000000FF000000) >> 24) | ((*(inBuf + i) & 0x0000000000FF0000) >> 8)
+                            | ((*(inBuf + i) & 0x000000000000FF00) << 40) | ((*(inBuf + i) & 0x00000000000000FF) << 56);
         }
         inBuf += (inStride / 8);
         outBuf += (outStride / 8);
@@ -879,10 +776,8 @@ void packedBGRA64BE_to_packedABGR64LE(size_t inStride, size_t height,
 class PackedBGRA64BE_to_packedABGR64LETask : public Task
 {
 public:
-    PackedBGRA64BE_to_packedABGR64LETask(
-        TaskGroup* group, size_t width, size_t height,
-        const uint64_t* FASTMEMCPYRESTRICT inBuf,
-        uint64_t* FASTMEMCPYRESTRICT outBuf, size_t outStride)
+    PackedBGRA64BE_to_packedABGR64LETask(TaskGroup* group, size_t width, size_t height, const uint64_t* FASTMEMCPYRESTRICT inBuf,
+                                         uint64_t* FASTMEMCPYRESTRICT outBuf, size_t outStride)
         : Task(group)
         , _width(width)
         , _height(height)
@@ -894,11 +789,7 @@ public:
 
     virtual ~PackedBGRA64BE_to_packedABGR64LETask() {}
 
-    virtual void execute()
-    {
-        packedBGRA64BE_to_packedABGR64LE(_width, _height, _inBuf, _outBuf,
-                                         _outStride);
-    }
+    virtual void execute() { packedBGRA64BE_to_packedABGR64LE(_width, _height, _inBuf, _outBuf, _outStride); }
 
 private:
     const size_t _width;
@@ -908,16 +799,14 @@ private:
     const size_t _outStride;
 };
 
-void packedBGRA64BE_to_packedABGR64LE_MP(
-    size_t width, size_t height, const uint64_t* FASTMEMCPYRESTRICT inBuf,
-    uint64_t* FASTMEMCPYRESTRICT outBuf, size_t outStride)
+void packedBGRA64BE_to_packedABGR64LE_MP(size_t width, size_t height, const uint64_t* FASTMEMCPYRESTRICT inBuf,
+                                         uint64_t* FASTMEMCPYRESTRICT outBuf, size_t outStride)
 {
     static bool use_standard_memcpy = getenv("RV_USE_STD_MEMCPY");
     if (use_standard_memcpy)
     {
         HOP_PROF("packedBGRA64BE_to_packedABGR64LE()");
-        packedBGRA64BE_to_packedABGR64LE(width, height, inBuf, outBuf,
-                                         outStride);
+        packedBGRA64BE_to_packedABGR64LE(width, height, inBuf, outBuf, outStride);
         return;
     }
 
@@ -937,8 +826,7 @@ void packedBGRA64BE_to_packedABGR64LE_MP(
         const uint64_t* FASTMEMCPYRESTRICT curInBuf = inBuf + curY * bufStride;
         uint64_t* FASTMEMCPYRESTRICT curOutBuf = outBuf + curY * outStride / 8;
         const size_t curHeight = std::min(taskHeight, height - curY);
-        TwkFB::ThreadPool::addTask(new PackedBGRA64BE_to_packedABGR64LETask(
-            &taskGroup, width, curHeight, curInBuf, curOutBuf, outStride));
+        TwkFB::ThreadPool::addTask(new PackedBGRA64BE_to_packedABGR64LETask(&taskGroup, width, curHeight, curInBuf, curOutBuf, outStride));
         curY += curHeight;
     }
 }
@@ -959,11 +847,8 @@ void packedBGRA64BE_to_packedABGR64LE_MP(
 // AV_PIX_FMT_YUV422P16LE - planar YUV 4:2:2, 32bpp, (1 Cr &
 // Cb sample per 2x1 Y samples), little-endian
 //
-void planarP210_to_planarYUV422P16(size_t width, size_t height,
-                                   const uint16_t* inY, const uint16_t* inCbCr,
-                                   size_t inStrideY, size_t inStrideCbCr,
-                                   uint16_t* outY, uint16_t* outCb,
-                                   uint16_t* outCr, size_t outStrideY,
+void planarP210_to_planarYUV422P16(size_t width, size_t height, const uint16_t* inY, const uint16_t* inCbCr, size_t inStrideY,
+                                   size_t inStrideCbCr, uint16_t* outY, uint16_t* outCb, uint16_t* outCr, size_t outStrideY,
                                    size_t outStrideCb, size_t outStrideCr)
 {
     const size_t nbPixelGroups = width / 2;
@@ -985,21 +870,17 @@ void planarP210_to_planarYUV422P16(size_t width, size_t height,
         outCr = startOutCr + i * outStrideCr / 2;
         for (size_t j = 0; j < nbPixelGroups; ++j)
         {
-            *outY =
-                denormalizeY16(normalizeY10(((*inY) & bit_mask) >> bit_shift));
+            *outY = denormalizeY16(normalizeY10(((*inY) & bit_mask) >> bit_shift));
             ++outY;
             ++inY;
-            *outY =
-                denormalizeY16(normalizeY10(((*inY) & bit_mask) >> bit_shift));
+            *outY = denormalizeY16(normalizeY10(((*inY) & bit_mask) >> bit_shift));
             ++outY;
             ++inY;
 
-            *outCb = denormalizeY16(
-                normalizeY10(((*inCbCr) & bit_mask) >> bit_shift));
+            *outCb = denormalizeY16(normalizeY10(((*inCbCr) & bit_mask) >> bit_shift));
             ++outCb;
             ++inCbCr;
-            *outCr = denormalizeY16(
-                normalizeY10(((*inCbCr) & bit_mask) >> bit_shift));
+            *outCr = denormalizeY16(normalizeY10(((*inCbCr) & bit_mask) >> bit_shift));
             ++outCr;
             ++inCbCr;
         }
@@ -1019,12 +900,10 @@ void planarP210_to_planarYUV422P16(size_t width, size_t height,
 // AV_PIX_FMT_YUV444P16LE - planar YUV 4:4:4, 48bpp, (1 Cr & Cb sample per 1x1 Y
 // samples), little-endian
 //
-void planarP416_to_planarYUV444P16(
-    size_t width, size_t height, const uint16_t* FASTMEMCPYRESTRICT inY,
-    const uint16_t* FASTMEMCPYRESTRICT inCbCr, size_t inStrideY,
-    size_t inStrideCbCr, uint16_t* FASTMEMCPYRESTRICT outY,
-    uint16_t* FASTMEMCPYRESTRICT outCb, uint16_t* FASTMEMCPYRESTRICT outCr,
-    size_t outStrideY, size_t outStrideCb, size_t outStrideCr)
+void planarP416_to_planarYUV444P16(size_t width, size_t height, const uint16_t* FASTMEMCPYRESTRICT inY,
+                                   const uint16_t* FASTMEMCPYRESTRICT inCbCr, size_t inStrideY, size_t inStrideCbCr,
+                                   uint16_t* FASTMEMCPYRESTRICT outY, uint16_t* FASTMEMCPYRESTRICT outCb,
+                                   uint16_t* FASTMEMCPYRESTRICT outCr, size_t outStrideY, size_t outStrideCb, size_t outStrideCr)
 {
     const size_t nbPixelGroups = width;
     const uint16_t* FASTMEMCPYRESTRICT startInY = inY;
@@ -1069,10 +948,8 @@ void planarP416_to_planarYUV444P16(
 // AV_PIX_FMT_YUVA444P16LE - planar YUVA 4:4:4:4, 64bpp, (1 Cr & Cb sample per
 // 1x1 Y samples & A samples), little-endian
 //
-void packedAYUV64_to_planarYUVA16(std::size_t width, std::size_t height,
-                                  const uint8_t* const inBuf,
-                                  std::uint16_t* outY, std::uint16_t* outCb,
-                                  std::uint16_t* outCr, std::uint16_t* outA)
+void packedAYUV64_to_planarYUVA16(std::size_t width, std::size_t height, const uint8_t* const inBuf, std::uint16_t* outY,
+                                  std::uint16_t* outCb, std::uint16_t* outCr, std::uint16_t* outA)
 {
 #pragma pack(push, 1)
 

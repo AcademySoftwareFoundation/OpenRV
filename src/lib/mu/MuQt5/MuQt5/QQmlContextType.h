@@ -39,8 +39,7 @@ namespace Mu
         //  Constructors
         //
 
-        QQmlContextType(Context* context, const char* name,
-                        Class* superClass = 0, Class* superClass2 = 0);
+        QQmlContextType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QQmlContextType();
 
@@ -63,10 +62,8 @@ namespace Mu
     {
     public:
         virtual ~MuQt_QQmlContext();
-        MuQt_QQmlContext(Pointer muobj, const CallEnvironment*,
-                         QQmlEngine* engine, QObject* parent);
-        MuQt_QQmlContext(Pointer muobj, const CallEnvironment*,
-                         QQmlContext* parentContext, QObject* parent);
+        MuQt_QQmlContext(Pointer muobj, const CallEnvironment*, QQmlEngine* engine, QObject* parent);
+        MuQt_QQmlContext(Pointer muobj, const CallEnvironment*, QQmlContext* parentContext, QObject* parent);
         virtual bool event(QEvent* e);
         virtual bool eventFilter(QObject* watched, QEvent* event);
 
@@ -77,17 +74,11 @@ namespace Mu
     public:
         void customEvent_pub(QEvent* event) { customEvent(event); }
 
-        void customEvent_pub_parent(QEvent* event)
-        {
-            QQmlContext::customEvent(event);
-        }
+        void customEvent_pub_parent(QEvent* event) { QQmlContext::customEvent(event); }
 
         void timerEvent_pub(QTimerEvent* event) { timerEvent(event); }
 
-        void timerEvent_pub_parent(QTimerEvent* event)
-        {
-            QQmlContext::timerEvent(event);
-        }
+        void timerEvent_pub_parent(QTimerEvent* event) { QQmlContext::timerEvent(event); }
 
     public:
         const QQmlContextType* _baseType;
@@ -95,11 +86,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance*
-    QQmlContextType::cachedInstance(const QQmlContextType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QQmlContextType::cachedInstance(const QQmlContextType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

@@ -42,8 +42,7 @@ namespace Mu
         //  Constructors
         //
 
-        QFileDialogType(Context* context, const char* name,
-                        Class* superClass = 0, Class* superClass2 = 0);
+        QFileDialogType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QFileDialogType();
 
@@ -66,10 +65,8 @@ namespace Mu
     {
     public:
         virtual ~MuQt_QFileDialog();
-        MuQt_QFileDialog(Pointer muobj, const CallEnvironment*, QWidget* parent,
-                         Qt::WindowFlags flags);
-        MuQt_QFileDialog(Pointer muobj, const CallEnvironment*, QWidget* parent,
-                         const QString& caption, const QString& directory,
+        MuQt_QFileDialog(Pointer muobj, const CallEnvironment*, QWidget* parent, Qt::WindowFlags flags);
+        MuQt_QFileDialog(Pointer muobj, const CallEnvironment*, QWidget* parent, const QString& caption, const QString& directory,
                          const QString& filter);
         virtual void setVisible(bool visible);
 
@@ -105,48 +102,27 @@ namespace Mu
 
         void closeEvent_pub(QCloseEvent* e) { closeEvent(e); }
 
-        void closeEvent_pub_parent(QCloseEvent* e)
-        {
-            QFileDialog::closeEvent(e);
-        }
+        void closeEvent_pub_parent(QCloseEvent* e) { QFileDialog::closeEvent(e); }
 
         void contextMenuEvent_pub(QContextMenuEvent* e) { contextMenuEvent(e); }
 
-        void contextMenuEvent_pub_parent(QContextMenuEvent* e)
-        {
-            QFileDialog::contextMenuEvent(e);
-        }
+        void contextMenuEvent_pub_parent(QContextMenuEvent* e) { QFileDialog::contextMenuEvent(e); }
 
-        bool eventFilter_pub(QObject* o, QEvent* e)
-        {
-            return eventFilter(o, e);
-        }
+        bool eventFilter_pub(QObject* o, QEvent* e) { return eventFilter(o, e); }
 
-        bool eventFilter_pub_parent(QObject* o, QEvent* e)
-        {
-            return QFileDialog::eventFilter(o, e);
-        }
+        bool eventFilter_pub_parent(QObject* o, QEvent* e) { return QFileDialog::eventFilter(o, e); }
 
         void keyPressEvent_pub(QKeyEvent* e) { keyPressEvent(e); }
 
-        void keyPressEvent_pub_parent(QKeyEvent* e)
-        {
-            QFileDialog::keyPressEvent(e);
-        }
+        void keyPressEvent_pub_parent(QKeyEvent* e) { QFileDialog::keyPressEvent(e); }
 
         void resizeEvent_pub(QResizeEvent* _p15) { resizeEvent(_p15); }
 
-        void resizeEvent_pub_parent(QResizeEvent* _p15)
-        {
-            QFileDialog::resizeEvent(_p15);
-        }
+        void resizeEvent_pub_parent(QResizeEvent* _p15) { QFileDialog::resizeEvent(_p15); }
 
         void showEvent_pub(QShowEvent* event) { showEvent(event); }
 
-        void showEvent_pub_parent(QShowEvent* event)
-        {
-            QFileDialog::showEvent(event);
-        }
+        void showEvent_pub_parent(QShowEvent* event) { QFileDialog::showEvent(event); }
 
     public:
         const QFileDialogType* _baseType;
@@ -154,11 +130,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance*
-    QFileDialogType::cachedInstance(const QFileDialogType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QFileDialogType::cachedInstance(const QFileDialogType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

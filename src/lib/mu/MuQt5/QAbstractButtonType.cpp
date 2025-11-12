@@ -75,17 +75,14 @@ namespace Mu
         _baseType = 0;
     }
 
-    MuQt_QAbstractButton::MuQt_QAbstractButton(Pointer muobj,
-                                               const CallEnvironment* ce,
-                                               QWidget* parent)
+    MuQt_QAbstractButton::MuQt_QAbstractButton(Pointer muobj, const CallEnvironment* ce, QWidget* parent)
         : QAbstractButton(parent)
     {
         _env = ce;
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QAbstractButtonType>(
-            c->internName("qt.QAbstractButton"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QAbstractButtonType>(c->internName("qt.QAbstractButton"));
     }
 
     void MuQt_QAbstractButton::checkStateSet()
@@ -211,8 +208,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QFocusEventType>(c, e, "qt.QFocusEvent"));
+            args[1] = Value(makeqpointer<QFocusEventType>(c, e, "qt.QFocusEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -235,8 +231,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QFocusEventType>(c, e, "qt.QFocusEvent"));
+            args[1] = Value(makeqpointer<QFocusEventType>(c, e, "qt.QFocusEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -305,8 +300,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -329,8 +323,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -353,8 +346,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -374,8 +366,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QPaintEventType>(c, e, "qt.QPaintEvent"));
+            args[1] = Value(makeqpointer<QPaintEventType>(c, e, "qt.QPaintEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -398,8 +389,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QTimerEventType>(c, e, "qt.QTimerEvent"));
+            args[1] = Value(makeqpointer<QTimerEventType>(c, e, "qt.QTimerEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -449,8 +439,7 @@ namespace Mu
         }
     }
 
-    QVariant
-    MuQt_QAbstractButton::inputMethodQuery(Qt::InputMethodQuery query) const
+    QVariant MuQt_QAbstractButton::inputMethodQuery(Qt::InputMethodQuery query) const
     {
         if (!_env)
             return QAbstractButton::inputMethodQuery(query);
@@ -525,8 +514,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QCloseEventType>(c, event, "qt.QCloseEvent"));
+            args[1] = Value(makeqpointer<QCloseEventType>(c, event, "qt.QCloseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -549,8 +537,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqpointer<QContextMenuEventType>(
-                c, event, "qt.QContextMenuEvent"));
+            args[1] = Value(makeqpointer<QContextMenuEventType>(c, event, "qt.QContextMenuEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -573,8 +560,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqpointer<QDragEnterEventType>(
-                c, event, "qt.QDragEnterEvent"));
+            args[1] = Value(makeqpointer<QDragEnterEventType>(c, event, "qt.QDragEnterEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -597,8 +583,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqpointer<QDragLeaveEventType>(
-                c, event, "qt.QDragLeaveEvent"));
+            args[1] = Value(makeqpointer<QDragLeaveEventType>(c, event, "qt.QDragLeaveEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -621,8 +606,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqpointer<QDragMoveEventType>(
-                c, event, "qt.QDragMoveEvent"));
+            args[1] = Value(makeqpointer<QDragMoveEventType>(c, event, "qt.QDragMoveEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -645,8 +629,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QDropEventType>(c, event, "qt.QDropEvent"));
+            args[1] = Value(makeqpointer<QDropEventType>(c, event, "qt.QDropEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -713,8 +696,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QHideEventType>(c, event, "qt.QHideEvent"));
+            args[1] = Value(makeqpointer<QHideEventType>(c, event, "qt.QHideEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -760,8 +742,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -784,8 +765,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QMoveEventType>(c, event, "qt.QMoveEvent"));
+            args[1] = Value(makeqpointer<QMoveEventType>(c, event, "qt.QMoveEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -808,8 +788,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QResizeEventType>(c, event, "qt.QResizeEvent"));
+            args[1] = Value(makeqpointer<QResizeEventType>(c, event, "qt.QResizeEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -832,8 +811,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QShowEventType>(c, event, "qt.QShowEvent"));
+            args[1] = Value(makeqpointer<QShowEventType>(c, event, "qt.QShowEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -856,8 +834,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QTabletEventType>(c, event, "qt.QTabletEvent"));
+            args[1] = Value(makeqpointer<QTabletEventType>(c, event, "qt.QTabletEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -880,8 +857,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QWheelEventType>(c, event, "qt.QWheelEvent"));
+            args[1] = Value(makeqpointer<QWheelEventType>(c, event, "qt.QWheelEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -893,8 +869,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  Mu Type CONSTRUCTORS
 
-    QAbstractButtonType::QAbstractButtonType(Context* c, const char* name,
-                                             Class* super, Class* super2)
+    QAbstractButtonType::QAbstractButtonType(Context* c, const char* name, Class* super, Class* super2)
         : Class(c, name, vectorOf2(super, super2))
     {
     }
@@ -904,8 +879,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    static Pointer QAbstractButton_QAbstractButton_QObject(Thread& NODE_THREAD,
-                                                           Pointer obj)
+    static Pointer QAbstractButton_QAbstractButton_QObject(Thread& NODE_THREAD, Pointer obj)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         ClassInstance* widget = reinterpret_cast<ClassInstance*>(obj);
@@ -916,9 +890,7 @@ namespace Mu
         }
         else if (QAbstractButton* w = object<QAbstractButton>(widget))
         {
-            QAbstractButtonType* type =
-                c->findSymbolOfTypeByQualifiedName<QAbstractButtonType>(
-                    c->internName("qt.QAbstractButton"), false);
+            QAbstractButtonType* type = c->findSymbolOfTypeByQualifiedName<QAbstractButtonType>(c->internName("qt.QAbstractButton"), false);
             ClassInstance* o = ClassInstance::allocate(type);
             setobject(o, w);
             return o;
@@ -931,33 +903,26 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(castFromObject, Pointer)
     {
-        NODE_RETURN(QAbstractButton_QAbstractButton_QObject(
-            NODE_THREAD, NODE_ARG(0, Pointer)));
+        NODE_RETURN(QAbstractButton_QAbstractButton_QObject(NODE_THREAD, NODE_ARG(0, Pointer)));
     }
 
-    Pointer
-    qt_QAbstractButton_QAbstractButton_QAbstractButton_QAbstractButton_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
+    Pointer qt_QAbstractButton_QAbstractButton_QAbstractButton_QAbstractButton_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                       Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWidget* arg1 = object<QWidget>(param_parent);
-        setobject(param_this,
-                  new MuQt_QAbstractButton(
-                      param_this, NODE_THREAD.process()->callEnv(), arg1));
+        setobject(param_this, new MuQt_QAbstractButton(param_this, NODE_THREAD.process()->callEnv(), arg1));
         return param_this;
     }
 
-    Pointer qt_QAbstractButton_group_QButtonGroup_QAbstractButton(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QAbstractButton_group_QButtonGroup_QAbstractButton(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractButton* arg0 = object<QAbstractButton>(param_this);
-        return makeinstance<QButtonGroupType>(c, arg0->group(),
-                                              "qt.QButtonGroup");
+        return makeinstance<QButtonGroupType>(c, arg0->group(), "qt.QButtonGroup");
     }
 
-    void qt_QAbstractButton_checkStateSet_void_QAbstractButton(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    void qt_QAbstractButton_checkStateSet_void_QAbstractButton(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractButton* arg0 = object<QAbstractButton>(param_this);
@@ -967,19 +932,16 @@ namespace Mu
             ((MuQt_QAbstractButton*)arg0)->checkStateSet_pub();
     }
 
-    bool qt_QAbstractButton_hitButton_bool_QAbstractButton_QPoint(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_pos)
+    bool qt_QAbstractButton_hitButton_bool_QAbstractButton_QPoint(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_pos)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractButton* arg0 = object<QAbstractButton>(param_this);
         const QPoint arg1 = getqtype<QPointType>(param_pos);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QAbstractButton*)arg0)->hitButton_pub_parent(arg1)
-                   : ((MuQt_QAbstractButton*)arg0)->hitButton_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QAbstractButton*)arg0)->hitButton_pub_parent(arg1)
+                                  : ((MuQt_QAbstractButton*)arg0)->hitButton_pub(arg1);
     }
 
-    void qt_QAbstractButton_nextCheckState_void_QAbstractButton(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    void qt_QAbstractButton_nextCheckState_void_QAbstractButton(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractButton* arg0 = object<QAbstractButton>(param_this);
@@ -989,8 +951,7 @@ namespace Mu
             ((MuQt_QAbstractButton*)arg0)->nextCheckState_pub();
     }
 
-    void qt_QAbstractButton_changeEvent_void_QAbstractButton_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QAbstractButton_changeEvent_void_QAbstractButton_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractButton* arg0 = object<QAbstractButton>(param_this);
@@ -1001,19 +962,15 @@ namespace Mu
             ((MuQt_QAbstractButton*)arg0)->changeEvent_pub(arg1);
     }
 
-    bool qt_QAbstractButton_event_bool_QAbstractButton_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    bool qt_QAbstractButton_event_bool_QAbstractButton_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractButton* arg0 = object<QAbstractButton>(param_this);
         QEvent* arg1 = getqpointer<QEventType>(param_e);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QAbstractButton*)arg0)->event_pub_parent(arg1)
-                   : ((MuQt_QAbstractButton*)arg0)->event_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QAbstractButton*)arg0)->event_pub_parent(arg1) : ((MuQt_QAbstractButton*)arg0)->event_pub(arg1);
     }
 
-    void qt_QAbstractButton_focusInEvent_void_QAbstractButton_QFocusEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QAbstractButton_focusInEvent_void_QAbstractButton_QFocusEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractButton* arg0 = object<QAbstractButton>(param_this);
@@ -1024,8 +981,7 @@ namespace Mu
             ((MuQt_QAbstractButton*)arg0)->focusInEvent_pub(arg1);
     }
 
-    void qt_QAbstractButton_focusOutEvent_void_QAbstractButton_QFocusEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QAbstractButton_focusOutEvent_void_QAbstractButton_QFocusEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractButton* arg0 = object<QAbstractButton>(param_this);
@@ -1036,8 +992,7 @@ namespace Mu
             ((MuQt_QAbstractButton*)arg0)->focusOutEvent_pub(arg1);
     }
 
-    void qt_QAbstractButton_keyPressEvent_void_QAbstractButton_QKeyEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QAbstractButton_keyPressEvent_void_QAbstractButton_QKeyEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractButton* arg0 = object<QAbstractButton>(param_this);
@@ -1048,8 +1003,7 @@ namespace Mu
             ((MuQt_QAbstractButton*)arg0)->keyPressEvent_pub(arg1);
     }
 
-    void qt_QAbstractButton_keyReleaseEvent_void_QAbstractButton_QKeyEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QAbstractButton_keyReleaseEvent_void_QAbstractButton_QKeyEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractButton* arg0 = object<QAbstractButton>(param_this);
@@ -1060,8 +1014,7 @@ namespace Mu
             ((MuQt_QAbstractButton*)arg0)->keyReleaseEvent_pub(arg1);
     }
 
-    void qt_QAbstractButton_mouseMoveEvent_void_QAbstractButton_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QAbstractButton_mouseMoveEvent_void_QAbstractButton_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractButton* arg0 = object<QAbstractButton>(param_this);
@@ -1072,8 +1025,7 @@ namespace Mu
             ((MuQt_QAbstractButton*)arg0)->mouseMoveEvent_pub(arg1);
     }
 
-    void qt_QAbstractButton_mousePressEvent_void_QAbstractButton_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QAbstractButton_mousePressEvent_void_QAbstractButton_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractButton* arg0 = object<QAbstractButton>(param_this);
@@ -1084,8 +1036,7 @@ namespace Mu
             ((MuQt_QAbstractButton*)arg0)->mousePressEvent_pub(arg1);
     }
 
-    void qt_QAbstractButton_mouseReleaseEvent_void_QAbstractButton_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QAbstractButton_mouseReleaseEvent_void_QAbstractButton_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractButton* arg0 = object<QAbstractButton>(param_this);
@@ -1096,8 +1047,7 @@ namespace Mu
             ((MuQt_QAbstractButton*)arg0)->mouseReleaseEvent_pub(arg1);
     }
 
-    void qt_QAbstractButton_paintEvent_void_QAbstractButton_QPaintEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QAbstractButton_paintEvent_void_QAbstractButton_QPaintEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractButton* arg0 = object<QAbstractButton>(param_this);
@@ -1105,8 +1055,7 @@ namespace Mu
         ((MuQt_QAbstractButton*)arg0)->paintEvent_pub(arg1);
     }
 
-    void qt_QAbstractButton_timerEvent_void_QAbstractButton_QTimerEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QAbstractButton_timerEvent_void_QAbstractButton_QTimerEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractButton* arg0 = object<QAbstractButton>(param_this);
@@ -1117,66 +1066,47 @@ namespace Mu
             ((MuQt_QAbstractButton*)arg0)->timerEvent_pub(arg1);
     }
 
-    bool qt_QAbstractButton_hasHeightForWidth_bool_QAbstractButton(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    bool qt_QAbstractButton_hasHeightForWidth_bool_QAbstractButton(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractButton* arg0 = object<QAbstractButton>(param_this);
-        return isMuQtObject(arg0) ? arg0->QAbstractButton::hasHeightForWidth()
-                                  : arg0->hasHeightForWidth();
+        return isMuQtObject(arg0) ? arg0->QAbstractButton::hasHeightForWidth() : arg0->hasHeightForWidth();
     }
 
-    int qt_QAbstractButton_heightForWidth_int_QAbstractButton_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_w)
+    int qt_QAbstractButton_heightForWidth_int_QAbstractButton_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_w)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractButton* arg0 = object<QAbstractButton>(param_this);
         int arg1 = (int)(param_w);
-        return isMuQtObject(arg0) ? arg0->QAbstractButton::heightForWidth(arg1)
-                                  : arg0->heightForWidth(arg1);
+        return isMuQtObject(arg0) ? arg0->QAbstractButton::heightForWidth(arg1) : arg0->heightForWidth(arg1);
     }
 
-    Pointer qt_QAbstractButton_inputMethodQuery_QVariant_QAbstractButton_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_query)
+    Pointer qt_QAbstractButton_inputMethodQuery_QVariant_QAbstractButton_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_query)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractButton* arg0 = object<QAbstractButton>(param_this);
         Qt::InputMethodQuery arg1 = (Qt::InputMethodQuery)(param_query);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QVariantType>(
-                         c, arg0->QAbstractButton::inputMethodQuery(arg1),
-                         "qt.QVariant")
-                   : makeqtype<QVariantType>(c, arg0->inputMethodQuery(arg1),
-                                             "qt.QVariant");
+        return isMuQtObject(arg0) ? makeqtype<QVariantType>(c, arg0->QAbstractButton::inputMethodQuery(arg1), "qt.QVariant")
+                                  : makeqtype<QVariantType>(c, arg0->inputMethodQuery(arg1), "qt.QVariant");
     }
 
-    Pointer qt_QAbstractButton_minimumSizeHint_QSize_QAbstractButton(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QAbstractButton_minimumSizeHint_QSize_QAbstractButton(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractButton* arg0 = object<QAbstractButton>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QSizeType>(
-                         c, arg0->QAbstractButton::minimumSizeHint(),
-                         "qt.QSize")
-                   : makeqtype<QSizeType>(c, arg0->minimumSizeHint(),
-                                          "qt.QSize");
+        return isMuQtObject(arg0) ? makeqtype<QSizeType>(c, arg0->QAbstractButton::minimumSizeHint(), "qt.QSize")
+                                  : makeqtype<QSizeType>(c, arg0->minimumSizeHint(), "qt.QSize");
     }
 
-    Pointer
-    qt_QAbstractButton_sizeHint_QSize_QAbstractButton(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    Pointer qt_QAbstractButton_sizeHint_QSize_QAbstractButton(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractButton* arg0 = object<QAbstractButton>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QSizeType>(c, arg0->QAbstractButton::sizeHint(),
-                                          "qt.QSize")
-                   : makeqtype<QSizeType>(c, arg0->sizeHint(), "qt.QSize");
+        return isMuQtObject(arg0) ? makeqtype<QSizeType>(c, arg0->QAbstractButton::sizeHint(), "qt.QSize")
+                                  : makeqtype<QSizeType>(c, arg0->sizeHint(), "qt.QSize");
     }
 
-    void qt_QAbstractButton_closeEvent_void_QAbstractButton_QCloseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractButton_closeEvent_void_QAbstractButton_QCloseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractButton* arg0 = object<QAbstractButton>(param_this);
@@ -1187,22 +1117,20 @@ namespace Mu
             ((MuQt_QAbstractButton*)arg0)->closeEvent_pub(arg1);
     }
 
-    void
-    qt_QAbstractButton_contextMenuEvent_void_QAbstractButton_QContextMenuEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractButton_contextMenuEvent_void_QAbstractButton_QContextMenuEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                    Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractButton* arg0 = object<QAbstractButton>(param_this);
-        QContextMenuEvent* arg1 =
-            getqpointer<QContextMenuEventType>(param_event);
+        QContextMenuEvent* arg1 = getqpointer<QContextMenuEventType>(param_event);
         if (isMuQtObject(arg0))
             ((MuQt_QAbstractButton*)arg0)->contextMenuEvent_pub_parent(arg1);
         else
             ((MuQt_QAbstractButton*)arg0)->contextMenuEvent_pub(arg1);
     }
 
-    void qt_QAbstractButton_dragEnterEvent_void_QAbstractButton_QDragEnterEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractButton_dragEnterEvent_void_QAbstractButton_QDragEnterEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractButton* arg0 = object<QAbstractButton>(param_this);
@@ -1213,8 +1141,8 @@ namespace Mu
             ((MuQt_QAbstractButton*)arg0)->dragEnterEvent_pub(arg1);
     }
 
-    void qt_QAbstractButton_dragLeaveEvent_void_QAbstractButton_QDragLeaveEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractButton_dragLeaveEvent_void_QAbstractButton_QDragLeaveEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractButton* arg0 = object<QAbstractButton>(param_this);
@@ -1225,8 +1153,8 @@ namespace Mu
             ((MuQt_QAbstractButton*)arg0)->dragLeaveEvent_pub(arg1);
     }
 
-    void qt_QAbstractButton_dragMoveEvent_void_QAbstractButton_QDragMoveEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractButton_dragMoveEvent_void_QAbstractButton_QDragMoveEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                              Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractButton* arg0 = object<QAbstractButton>(param_this);
@@ -1237,8 +1165,7 @@ namespace Mu
             ((MuQt_QAbstractButton*)arg0)->dragMoveEvent_pub(arg1);
     }
 
-    void qt_QAbstractButton_dropEvent_void_QAbstractButton_QDropEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractButton_dropEvent_void_QAbstractButton_QDropEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractButton* arg0 = object<QAbstractButton>(param_this);
@@ -1249,8 +1176,7 @@ namespace Mu
             ((MuQt_QAbstractButton*)arg0)->dropEvent_pub(arg1);
     }
 
-    void qt_QAbstractButton_enterEvent_void_QAbstractButton_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractButton_enterEvent_void_QAbstractButton_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractButton* arg0 = object<QAbstractButton>(param_this);
@@ -1261,20 +1187,16 @@ namespace Mu
             ((MuQt_QAbstractButton*)arg0)->enterEvent_pub(arg1);
     }
 
-    bool qt_QAbstractButton_focusNextPrevChild_bool_QAbstractButton_bool(
-        Mu::Thread& NODE_THREAD, Pointer param_this, bool param_next)
+    bool qt_QAbstractButton_focusNextPrevChild_bool_QAbstractButton_bool(Mu::Thread& NODE_THREAD, Pointer param_this, bool param_next)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractButton* arg0 = object<QAbstractButton>(param_this);
         bool arg1 = (bool)(param_next);
-        return isMuQtObject(arg0) ? ((MuQt_QAbstractButton*)arg0)
-                                        ->focusNextPrevChild_pub_parent(arg1)
-                                  : ((MuQt_QAbstractButton*)arg0)
-                                        ->focusNextPrevChild_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QAbstractButton*)arg0)->focusNextPrevChild_pub_parent(arg1)
+                                  : ((MuQt_QAbstractButton*)arg0)->focusNextPrevChild_pub(arg1);
     }
 
-    void qt_QAbstractButton_hideEvent_void_QAbstractButton_QHideEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractButton_hideEvent_void_QAbstractButton_QHideEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractButton* arg0 = object<QAbstractButton>(param_this);
@@ -1285,8 +1207,7 @@ namespace Mu
             ((MuQt_QAbstractButton*)arg0)->hideEvent_pub(arg1);
     }
 
-    void qt_QAbstractButton_leaveEvent_void_QAbstractButton_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractButton_leaveEvent_void_QAbstractButton_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractButton* arg0 = object<QAbstractButton>(param_this);
@@ -1297,22 +1218,19 @@ namespace Mu
             ((MuQt_QAbstractButton*)arg0)->leaveEvent_pub(arg1);
     }
 
-    void
-    qt_QAbstractButton_mouseDoubleClickEvent_void_QAbstractButton_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractButton_mouseDoubleClickEvent_void_QAbstractButton_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                   Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractButton* arg0 = object<QAbstractButton>(param_this);
         QMouseEvent* arg1 = getqpointer<QMouseEventType>(param_event);
         if (isMuQtObject(arg0))
-            ((MuQt_QAbstractButton*)arg0)
-                ->mouseDoubleClickEvent_pub_parent(arg1);
+            ((MuQt_QAbstractButton*)arg0)->mouseDoubleClickEvent_pub_parent(arg1);
         else
             ((MuQt_QAbstractButton*)arg0)->mouseDoubleClickEvent_pub(arg1);
     }
 
-    void qt_QAbstractButton_moveEvent_void_QAbstractButton_QMoveEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractButton_moveEvent_void_QAbstractButton_QMoveEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractButton* arg0 = object<QAbstractButton>(param_this);
@@ -1323,8 +1241,7 @@ namespace Mu
             ((MuQt_QAbstractButton*)arg0)->moveEvent_pub(arg1);
     }
 
-    void qt_QAbstractButton_resizeEvent_void_QAbstractButton_QResizeEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractButton_resizeEvent_void_QAbstractButton_QResizeEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractButton* arg0 = object<QAbstractButton>(param_this);
@@ -1335,8 +1252,7 @@ namespace Mu
             ((MuQt_QAbstractButton*)arg0)->resizeEvent_pub(arg1);
     }
 
-    void qt_QAbstractButton_showEvent_void_QAbstractButton_QShowEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractButton_showEvent_void_QAbstractButton_QShowEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractButton* arg0 = object<QAbstractButton>(param_this);
@@ -1347,8 +1263,7 @@ namespace Mu
             ((MuQt_QAbstractButton*)arg0)->showEvent_pub(arg1);
     }
 
-    void qt_QAbstractButton_tabletEvent_void_QAbstractButton_QTabletEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractButton_tabletEvent_void_QAbstractButton_QTabletEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractButton* arg0 = object<QAbstractButton>(param_this);
@@ -1359,8 +1274,7 @@ namespace Mu
             ((MuQt_QAbstractButton*)arg0)->tabletEvent_pub(arg1);
     }
 
-    void qt_QAbstractButton_wheelEvent_void_QAbstractButton_QWheelEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractButton_wheelEvent_void_QAbstractButton_QWheelEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractButton* arg0 = object<QAbstractButton>(param_this);
@@ -1373,228 +1287,197 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(_n_QAbstractButton0, Pointer)
     {
-        NODE_RETURN(
-            qt_QAbstractButton_QAbstractButton_QAbstractButton_QAbstractButton_QWidget(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QAbstractButton_QAbstractButton_QAbstractButton_QAbstractButton_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                               NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_group0, Pointer)
     {
-        NODE_RETURN(qt_QAbstractButton_group_QButtonGroup_QAbstractButton(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QAbstractButton_group_QButtonGroup_QAbstractButton(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_checkStateSet0, void)
     {
-        qt_QAbstractButton_checkStateSet_void_QAbstractButton(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
+        qt_QAbstractButton_checkStateSet_void_QAbstractButton(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_hitButton0, bool)
     {
-        NODE_RETURN(qt_QAbstractButton_hitButton_bool_QAbstractButton_QPoint(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(
+            qt_QAbstractButton_hitButton_bool_QAbstractButton_QPoint(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_nextCheckState0, void)
     {
-        qt_QAbstractButton_nextCheckState_void_QAbstractButton(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
+        qt_QAbstractButton_nextCheckState_void_QAbstractButton(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_changeEvent0, void)
     {
-        qt_QAbstractButton_changeEvent_void_QAbstractButton_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractButton_changeEvent_void_QAbstractButton_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_event0, bool)
     {
-        NODE_RETURN(qt_QAbstractButton_event_bool_QAbstractButton_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QAbstractButton_event_bool_QAbstractButton_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_focusInEvent0, void)
     {
-        qt_QAbstractButton_focusInEvent_void_QAbstractButton_QFocusEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractButton_focusInEvent_void_QAbstractButton_QFocusEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_focusOutEvent0, void)
     {
-        qt_QAbstractButton_focusOutEvent_void_QAbstractButton_QFocusEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractButton_focusOutEvent_void_QAbstractButton_QFocusEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_keyPressEvent0, void)
     {
-        qt_QAbstractButton_keyPressEvent_void_QAbstractButton_QKeyEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractButton_keyPressEvent_void_QAbstractButton_QKeyEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_keyReleaseEvent0, void)
     {
-        qt_QAbstractButton_keyReleaseEvent_void_QAbstractButton_QKeyEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractButton_keyReleaseEvent_void_QAbstractButton_QKeyEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseMoveEvent0, void)
     {
-        qt_QAbstractButton_mouseMoveEvent_void_QAbstractButton_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractButton_mouseMoveEvent_void_QAbstractButton_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mousePressEvent0, void)
     {
-        qt_QAbstractButton_mousePressEvent_void_QAbstractButton_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractButton_mousePressEvent_void_QAbstractButton_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseReleaseEvent0, void)
     {
-        qt_QAbstractButton_mouseReleaseEvent_void_QAbstractButton_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractButton_mouseReleaseEvent_void_QAbstractButton_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                              NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_paintEvent0, void)
     {
-        qt_QAbstractButton_paintEvent_void_QAbstractButton_QPaintEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractButton_paintEvent_void_QAbstractButton_QPaintEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_timerEvent0, void)
     {
-        qt_QAbstractButton_timerEvent_void_QAbstractButton_QTimerEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractButton_timerEvent_void_QAbstractButton_QTimerEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_hasHeightForWidth0, bool)
     {
-        NODE_RETURN(qt_QAbstractButton_hasHeightForWidth_bool_QAbstractButton(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QAbstractButton_hasHeightForWidth_bool_QAbstractButton(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_heightForWidth0, int)
     {
-        NODE_RETURN(qt_QAbstractButton_heightForWidth_int_QAbstractButton_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QAbstractButton_heightForWidth_int_QAbstractButton_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_inputMethodQuery0, Pointer)
     {
         NODE_RETURN(
-            qt_QAbstractButton_inputMethodQuery_QVariant_QAbstractButton_int(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+            qt_QAbstractButton_inputMethodQuery_QVariant_QAbstractButton_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_minimumSizeHint0, Pointer)
     {
-        NODE_RETURN(qt_QAbstractButton_minimumSizeHint_QSize_QAbstractButton(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QAbstractButton_minimumSizeHint_QSize_QAbstractButton(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_sizeHint0, Pointer)
     {
-        NODE_RETURN(qt_QAbstractButton_sizeHint_QSize_QAbstractButton(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QAbstractButton_sizeHint_QSize_QAbstractButton(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_closeEvent0, void)
     {
-        qt_QAbstractButton_closeEvent_void_QAbstractButton_QCloseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractButton_closeEvent_void_QAbstractButton_QCloseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_contextMenuEvent0, void)
     {
-        qt_QAbstractButton_contextMenuEvent_void_QAbstractButton_QContextMenuEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractButton_contextMenuEvent_void_QAbstractButton_QContextMenuEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                   NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_dragEnterEvent0, void)
     {
-        qt_QAbstractButton_dragEnterEvent_void_QAbstractButton_QDragEnterEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractButton_dragEnterEvent_void_QAbstractButton_QDragEnterEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                               NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_dragLeaveEvent0, void)
     {
-        qt_QAbstractButton_dragLeaveEvent_void_QAbstractButton_QDragLeaveEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractButton_dragLeaveEvent_void_QAbstractButton_QDragLeaveEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                               NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_dragMoveEvent0, void)
     {
-        qt_QAbstractButton_dragMoveEvent_void_QAbstractButton_QDragMoveEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractButton_dragMoveEvent_void_QAbstractButton_QDragMoveEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                             NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_dropEvent0, void)
     {
-        qt_QAbstractButton_dropEvent_void_QAbstractButton_QDropEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractButton_dropEvent_void_QAbstractButton_QDropEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_enterEvent0, void)
     {
-        qt_QAbstractButton_enterEvent_void_QAbstractButton_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractButton_enterEvent_void_QAbstractButton_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_focusNextPrevChild0, bool)
     {
         NODE_RETURN(
-            qt_QAbstractButton_focusNextPrevChild_bool_QAbstractButton_bool(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool)));
+            qt_QAbstractButton_focusNextPrevChild_bool_QAbstractButton_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool)));
     }
 
     static NODE_IMPLEMENTATION(_n_hideEvent0, void)
     {
-        qt_QAbstractButton_hideEvent_void_QAbstractButton_QHideEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractButton_hideEvent_void_QAbstractButton_QHideEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_leaveEvent0, void)
     {
-        qt_QAbstractButton_leaveEvent_void_QAbstractButton_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractButton_leaveEvent_void_QAbstractButton_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseDoubleClickEvent0, void)
     {
-        qt_QAbstractButton_mouseDoubleClickEvent_void_QAbstractButton_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractButton_mouseDoubleClickEvent_void_QAbstractButton_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                  NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_moveEvent0, void)
     {
-        qt_QAbstractButton_moveEvent_void_QAbstractButton_QMoveEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractButton_moveEvent_void_QAbstractButton_QMoveEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_resizeEvent0, void)
     {
-        qt_QAbstractButton_resizeEvent_void_QAbstractButton_QResizeEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractButton_resizeEvent_void_QAbstractButton_QResizeEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_showEvent0, void)
     {
-        qt_QAbstractButton_showEvent_void_QAbstractButton_QShowEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractButton_showEvent_void_QAbstractButton_QShowEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_tabletEvent0, void)
     {
-        qt_QAbstractButton_tabletEvent_void_QAbstractButton_QTabletEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractButton_tabletEvent_void_QAbstractButton_QTabletEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_wheelEvent0, void)
     {
-        qt_QAbstractButton_wheelEvent_void_QAbstractButton_QWheelEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractButton_wheelEvent_void_QAbstractButton_QWheelEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     void QAbstractButtonType::load()
@@ -1614,17 +1497,13 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
-                   new Function(c, tn, castFromObject, Cast, Compiled,
-                                QAbstractButton_QAbstractButton_QObject, Return,
-                                ftn, Parameters,
+                   new Function(c, tn, castFromObject, Cast, Compiled, QAbstractButton_QAbstractButton_QObject, Return, ftn, Parameters,
                                 new Param(c, "object", "qt.QObject"), End),
 
                    EndArguments);
@@ -1632,20 +1511,15 @@ namespace Mu
         addSymbols(
             // enums
             // member functions
-            new Function(
-                c, "QAbstractButton", _n_QAbstractButton0, None, Compiled,
-                qt_QAbstractButton_QAbstractButton_QAbstractButton_QAbstractButton_QWidget,
-                Return, "qt.QAbstractButton", Parameters,
-                new Param(c, "this", "qt.QAbstractButton"),
-                new Param(c, "parent", "qt.QWidget"), End),
+            new Function(c, "QAbstractButton", _n_QAbstractButton0, None, Compiled,
+                         qt_QAbstractButton_QAbstractButton_QAbstractButton_QAbstractButton_QWidget, Return, "qt.QAbstractButton",
+                         Parameters, new Param(c, "this", "qt.QAbstractButton"), new Param(c, "parent", "qt.QWidget"), End),
             // PROP: autoExclusive (bool; QAbstractButton this)
             // PROP: autoRepeat (bool; QAbstractButton this)
             // PROP: autoRepeatDelay (int; QAbstractButton this)
             // PROP: autoRepeatInterval (int; QAbstractButton this)
-            new Function(c, "group", _n_group0, None, Compiled,
-                         qt_QAbstractButton_group_QButtonGroup_QAbstractButton,
-                         Return, "qt.QButtonGroup", Parameters,
-                         new Param(c, "this", "qt.QAbstractButton"), End),
+            new Function(c, "group", _n_group0, None, Compiled, qt_QAbstractButton_group_QButtonGroup_QAbstractButton, Return,
+                         "qt.QButtonGroup", Parameters, new Param(c, "this", "qt.QAbstractButton"), End),
             // PROP: icon (QIcon; QAbstractButton this)
             // PROP: iconSize (QSize; QAbstractButton this)
             // PROP: isCheckable (bool; QAbstractButton this)
@@ -1662,218 +1536,122 @@ namespace Mu
             // PROP: setText (void; QAbstractButton this, string text)
             // PROP: shortcut (QKeySequence; QAbstractButton this)
             // PROP: text (string; QAbstractButton this)
-            _func[0] = new MemberFunction(
-                c, "checkStateSet", _n_checkStateSet0, None, Compiled,
-                qt_QAbstractButton_checkStateSet_void_QAbstractButton, Return,
-                "void", Parameters, new Param(c, "this", "qt.QAbstractButton"),
-                End),
-            _func[1] = new MemberFunction(
-                c, "hitButton", _n_hitButton0, None, Compiled,
-                qt_QAbstractButton_hitButton_bool_QAbstractButton_QPoint,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QAbstractButton"),
-                new Param(c, "pos", "qt.QPoint"), End),
-            _func[2] = new MemberFunction(
-                c, "nextCheckState", _n_nextCheckState0, None, Compiled,
-                qt_QAbstractButton_nextCheckState_void_QAbstractButton, Return,
-                "void", Parameters, new Param(c, "this", "qt.QAbstractButton"),
-                End),
-            _func[3] = new MemberFunction(
-                c, "changeEvent", _n_changeEvent0, None, Compiled,
-                qt_QAbstractButton_changeEvent_void_QAbstractButton_QEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractButton"),
-                new Param(c, "e", "qt.QEvent"), End),
-            _func[4] = new MemberFunction(
-                c, "event", _n_event0, None, Compiled,
-                qt_QAbstractButton_event_bool_QAbstractButton_QEvent, Return,
-                "bool", Parameters, new Param(c, "this", "qt.QAbstractButton"),
-                new Param(c, "e", "qt.QEvent"), End),
-            _func[5] = new MemberFunction(
-                c, "focusInEvent", _n_focusInEvent0, None, Compiled,
-                qt_QAbstractButton_focusInEvent_void_QAbstractButton_QFocusEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractButton"),
-                new Param(c, "e", "qt.QFocusEvent"), End),
-            _func[6] = new MemberFunction(
-                c, "focusOutEvent", _n_focusOutEvent0, None, Compiled,
-                qt_QAbstractButton_focusOutEvent_void_QAbstractButton_QFocusEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractButton"),
-                new Param(c, "e", "qt.QFocusEvent"), End),
-            _func[7] = new MemberFunction(
-                c, "keyPressEvent", _n_keyPressEvent0, None, Compiled,
-                qt_QAbstractButton_keyPressEvent_void_QAbstractButton_QKeyEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractButton"),
-                new Param(c, "e", "qt.QKeyEvent"), End),
-            _func[8] = new MemberFunction(
-                c, "keyReleaseEvent", _n_keyReleaseEvent0, None, Compiled,
-                qt_QAbstractButton_keyReleaseEvent_void_QAbstractButton_QKeyEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractButton"),
-                new Param(c, "e", "qt.QKeyEvent"), End),
-            _func[9] = new MemberFunction(
-                c, "mouseMoveEvent", _n_mouseMoveEvent0, None, Compiled,
-                qt_QAbstractButton_mouseMoveEvent_void_QAbstractButton_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractButton"),
-                new Param(c, "e", "qt.QMouseEvent"), End),
-            _func[10] = new MemberFunction(
-                c, "mousePressEvent", _n_mousePressEvent0, None, Compiled,
-                qt_QAbstractButton_mousePressEvent_void_QAbstractButton_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractButton"),
-                new Param(c, "e", "qt.QMouseEvent"), End),
-            _func[11] = new MemberFunction(
-                c, "mouseReleaseEvent", _n_mouseReleaseEvent0, None, Compiled,
-                qt_QAbstractButton_mouseReleaseEvent_void_QAbstractButton_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractButton"),
-                new Param(c, "e", "qt.QMouseEvent"), End),
-            _func[12] = new MemberFunction(
-                c, "paintEvent", _n_paintEvent0, None, Compiled,
-                qt_QAbstractButton_paintEvent_void_QAbstractButton_QPaintEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractButton"),
-                new Param(c, "e", "qt.QPaintEvent"), End),
-            _func[13] = new MemberFunction(
-                c, "timerEvent", _n_timerEvent0, None, Compiled,
-                qt_QAbstractButton_timerEvent_void_QAbstractButton_QTimerEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractButton"),
-                new Param(c, "e", "qt.QTimerEvent"), End),
-            _func[14] = new MemberFunction(
-                c, "hasHeightForWidth", _n_hasHeightForWidth0, None, Compiled,
-                qt_QAbstractButton_hasHeightForWidth_bool_QAbstractButton,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QAbstractButton"), End),
-            _func[15] = new MemberFunction(
-                c, "heightForWidth", _n_heightForWidth0, None, Compiled,
-                qt_QAbstractButton_heightForWidth_int_QAbstractButton_int,
-                Return, "int", Parameters,
-                new Param(c, "this", "qt.QAbstractButton"),
-                new Param(c, "w", "int"), End),
-            _func[16] = new MemberFunction(
-                c, "inputMethodQuery", _n_inputMethodQuery0, None, Compiled,
-                qt_QAbstractButton_inputMethodQuery_QVariant_QAbstractButton_int,
-                Return, "qt.QVariant", Parameters,
-                new Param(c, "this", "qt.QAbstractButton"),
-                new Param(c, "query", "int"), End),
-            _func[17] = new MemberFunction(
-                c, "minimumSizeHint", _n_minimumSizeHint0, None, Compiled,
-                qt_QAbstractButton_minimumSizeHint_QSize_QAbstractButton,
-                Return, "qt.QSize", Parameters,
-                new Param(c, "this", "qt.QAbstractButton"), End),
-            _func[18] = new MemberFunction(
-                c, "sizeHint", _n_sizeHint0, None, Compiled,
-                qt_QAbstractButton_sizeHint_QSize_QAbstractButton, Return,
-                "qt.QSize", Parameters,
-                new Param(c, "this", "qt.QAbstractButton"), End),
+            _func[0] = new MemberFunction(c, "checkStateSet", _n_checkStateSet0, None, Compiled,
+                                          qt_QAbstractButton_checkStateSet_void_QAbstractButton, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QAbstractButton"), End),
+            _func[1] = new MemberFunction(c, "hitButton", _n_hitButton0, None, Compiled,
+                                          qt_QAbstractButton_hitButton_bool_QAbstractButton_QPoint, Return, "bool", Parameters,
+                                          new Param(c, "this", "qt.QAbstractButton"), new Param(c, "pos", "qt.QPoint"), End),
+            _func[2] = new MemberFunction(c, "nextCheckState", _n_nextCheckState0, None, Compiled,
+                                          qt_QAbstractButton_nextCheckState_void_QAbstractButton, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QAbstractButton"), End),
+            _func[3] = new MemberFunction(c, "changeEvent", _n_changeEvent0, None, Compiled,
+                                          qt_QAbstractButton_changeEvent_void_QAbstractButton_QEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QAbstractButton"), new Param(c, "e", "qt.QEvent"), End),
+            _func[4] =
+                new MemberFunction(c, "event", _n_event0, None, Compiled, qt_QAbstractButton_event_bool_QAbstractButton_QEvent, Return,
+                                   "bool", Parameters, new Param(c, "this", "qt.QAbstractButton"), new Param(c, "e", "qt.QEvent"), End),
+            _func[5] = new MemberFunction(c, "focusInEvent", _n_focusInEvent0, None, Compiled,
+                                          qt_QAbstractButton_focusInEvent_void_QAbstractButton_QFocusEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QAbstractButton"), new Param(c, "e", "qt.QFocusEvent"), End),
+            _func[6] = new MemberFunction(c, "focusOutEvent", _n_focusOutEvent0, None, Compiled,
+                                          qt_QAbstractButton_focusOutEvent_void_QAbstractButton_QFocusEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QAbstractButton"), new Param(c, "e", "qt.QFocusEvent"), End),
+            _func[7] = new MemberFunction(c, "keyPressEvent", _n_keyPressEvent0, None, Compiled,
+                                          qt_QAbstractButton_keyPressEvent_void_QAbstractButton_QKeyEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QAbstractButton"), new Param(c, "e", "qt.QKeyEvent"), End),
+            _func[8] = new MemberFunction(c, "keyReleaseEvent", _n_keyReleaseEvent0, None, Compiled,
+                                          qt_QAbstractButton_keyReleaseEvent_void_QAbstractButton_QKeyEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QAbstractButton"), new Param(c, "e", "qt.QKeyEvent"), End),
+            _func[9] = new MemberFunction(c, "mouseMoveEvent", _n_mouseMoveEvent0, None, Compiled,
+                                          qt_QAbstractButton_mouseMoveEvent_void_QAbstractButton_QMouseEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QAbstractButton"), new Param(c, "e", "qt.QMouseEvent"), End),
+            _func[10] = new MemberFunction(c, "mousePressEvent", _n_mousePressEvent0, None, Compiled,
+                                           qt_QAbstractButton_mousePressEvent_void_QAbstractButton_QMouseEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QAbstractButton"), new Param(c, "e", "qt.QMouseEvent"), End),
+            _func[11] =
+                new MemberFunction(c, "mouseReleaseEvent", _n_mouseReleaseEvent0, None, Compiled,
+                                   qt_QAbstractButton_mouseReleaseEvent_void_QAbstractButton_QMouseEvent, Return, "void", Parameters,
+                                   new Param(c, "this", "qt.QAbstractButton"), new Param(c, "e", "qt.QMouseEvent"), End),
+            _func[12] = new MemberFunction(c, "paintEvent", _n_paintEvent0, None, Compiled,
+                                           qt_QAbstractButton_paintEvent_void_QAbstractButton_QPaintEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QAbstractButton"), new Param(c, "e", "qt.QPaintEvent"), End),
+            _func[13] = new MemberFunction(c, "timerEvent", _n_timerEvent0, None, Compiled,
+                                           qt_QAbstractButton_timerEvent_void_QAbstractButton_QTimerEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QAbstractButton"), new Param(c, "e", "qt.QTimerEvent"), End),
+            _func[14] = new MemberFunction(c, "hasHeightForWidth", _n_hasHeightForWidth0, None, Compiled,
+                                           qt_QAbstractButton_hasHeightForWidth_bool_QAbstractButton, Return, "bool", Parameters,
+                                           new Param(c, "this", "qt.QAbstractButton"), End),
+            _func[15] = new MemberFunction(c, "heightForWidth", _n_heightForWidth0, None, Compiled,
+                                           qt_QAbstractButton_heightForWidth_int_QAbstractButton_int, Return, "int", Parameters,
+                                           new Param(c, "this", "qt.QAbstractButton"), new Param(c, "w", "int"), End),
+            _func[16] = new MemberFunction(c, "inputMethodQuery", _n_inputMethodQuery0, None, Compiled,
+                                           qt_QAbstractButton_inputMethodQuery_QVariant_QAbstractButton_int, Return, "qt.QVariant",
+                                           Parameters, new Param(c, "this", "qt.QAbstractButton"), new Param(c, "query", "int"), End),
+            _func[17] = new MemberFunction(c, "minimumSizeHint", _n_minimumSizeHint0, None, Compiled,
+                                           qt_QAbstractButton_minimumSizeHint_QSize_QAbstractButton, Return, "qt.QSize", Parameters,
+                                           new Param(c, "this", "qt.QAbstractButton"), End),
+            _func[18] = new MemberFunction(c, "sizeHint", _n_sizeHint0, None, Compiled, qt_QAbstractButton_sizeHint_QSize_QAbstractButton,
+                                           Return, "qt.QSize", Parameters, new Param(c, "this", "qt.QAbstractButton"), End),
             // MISSING: paintEngine ("QPaintEngine *"; QAbstractButton this)
             // MISSING: actionEvent (void; QAbstractButton this, "QActionEvent
             // *" event) // protected
-            _func[19] = new MemberFunction(
-                c, "closeEvent", _n_closeEvent0, None, Compiled,
-                qt_QAbstractButton_closeEvent_void_QAbstractButton_QCloseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractButton"),
-                new Param(c, "event", "qt.QCloseEvent"), End),
-            _func[20] = new MemberFunction(
-                c, "contextMenuEvent", _n_contextMenuEvent0, None, Compiled,
-                qt_QAbstractButton_contextMenuEvent_void_QAbstractButton_QContextMenuEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractButton"),
-                new Param(c, "event", "qt.QContextMenuEvent"), End),
-            _func[21] = new MemberFunction(
-                c, "dragEnterEvent", _n_dragEnterEvent0, None, Compiled,
-                qt_QAbstractButton_dragEnterEvent_void_QAbstractButton_QDragEnterEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractButton"),
-                new Param(c, "event", "qt.QDragEnterEvent"), End),
-            _func[22] = new MemberFunction(
-                c, "dragLeaveEvent", _n_dragLeaveEvent0, None, Compiled,
-                qt_QAbstractButton_dragLeaveEvent_void_QAbstractButton_QDragLeaveEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractButton"),
-                new Param(c, "event", "qt.QDragLeaveEvent"), End),
-            _func[23] = new MemberFunction(
-                c, "dragMoveEvent", _n_dragMoveEvent0, None, Compiled,
-                qt_QAbstractButton_dragMoveEvent_void_QAbstractButton_QDragMoveEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractButton"),
-                new Param(c, "event", "qt.QDragMoveEvent"), End),
-            _func[24] = new MemberFunction(
-                c, "dropEvent", _n_dropEvent0, None, Compiled,
-                qt_QAbstractButton_dropEvent_void_QAbstractButton_QDropEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractButton"),
-                new Param(c, "event", "qt.QDropEvent"), End),
-            _func[25] = new MemberFunction(
-                c, "enterEvent", _n_enterEvent0, None, Compiled,
-                qt_QAbstractButton_enterEvent_void_QAbstractButton_QEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractButton"),
-                new Param(c, "event", "qt.QEvent"), End),
-            _func[26] = new MemberFunction(
-                c, "focusNextPrevChild", _n_focusNextPrevChild0, None, Compiled,
-                qt_QAbstractButton_focusNextPrevChild_bool_QAbstractButton_bool,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QAbstractButton"),
-                new Param(c, "next", "bool"), End),
-            _func[27] = new MemberFunction(
-                c, "hideEvent", _n_hideEvent0, None, Compiled,
-                qt_QAbstractButton_hideEvent_void_QAbstractButton_QHideEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractButton"),
-                new Param(c, "event", "qt.QHideEvent"), End),
+            _func[19] = new MemberFunction(c, "closeEvent", _n_closeEvent0, None, Compiled,
+                                           qt_QAbstractButton_closeEvent_void_QAbstractButton_QCloseEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QAbstractButton"), new Param(c, "event", "qt.QCloseEvent"), End),
+            _func[20] =
+                new MemberFunction(c, "contextMenuEvent", _n_contextMenuEvent0, None, Compiled,
+                                   qt_QAbstractButton_contextMenuEvent_void_QAbstractButton_QContextMenuEvent, Return, "void", Parameters,
+                                   new Param(c, "this", "qt.QAbstractButton"), new Param(c, "event", "qt.QContextMenuEvent"), End),
+            _func[21] =
+                new MemberFunction(c, "dragEnterEvent", _n_dragEnterEvent0, None, Compiled,
+                                   qt_QAbstractButton_dragEnterEvent_void_QAbstractButton_QDragEnterEvent, Return, "void", Parameters,
+                                   new Param(c, "this", "qt.QAbstractButton"), new Param(c, "event", "qt.QDragEnterEvent"), End),
+            _func[22] =
+                new MemberFunction(c, "dragLeaveEvent", _n_dragLeaveEvent0, None, Compiled,
+                                   qt_QAbstractButton_dragLeaveEvent_void_QAbstractButton_QDragLeaveEvent, Return, "void", Parameters,
+                                   new Param(c, "this", "qt.QAbstractButton"), new Param(c, "event", "qt.QDragLeaveEvent"), End),
+            _func[23] = new MemberFunction(c, "dragMoveEvent", _n_dragMoveEvent0, None, Compiled,
+                                           qt_QAbstractButton_dragMoveEvent_void_QAbstractButton_QDragMoveEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QAbstractButton"), new Param(c, "event", "qt.QDragMoveEvent"), End),
+            _func[24] = new MemberFunction(c, "dropEvent", _n_dropEvent0, None, Compiled,
+                                           qt_QAbstractButton_dropEvent_void_QAbstractButton_QDropEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QAbstractButton"), new Param(c, "event", "qt.QDropEvent"), End),
+            _func[25] = new MemberFunction(c, "enterEvent", _n_enterEvent0, None, Compiled,
+                                           qt_QAbstractButton_enterEvent_void_QAbstractButton_QEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QAbstractButton"), new Param(c, "event", "qt.QEvent"), End),
+            _func[26] = new MemberFunction(c, "focusNextPrevChild", _n_focusNextPrevChild0, None, Compiled,
+                                           qt_QAbstractButton_focusNextPrevChild_bool_QAbstractButton_bool, Return, "bool", Parameters,
+                                           new Param(c, "this", "qt.QAbstractButton"), new Param(c, "next", "bool"), End),
+            _func[27] = new MemberFunction(c, "hideEvent", _n_hideEvent0, None, Compiled,
+                                           qt_QAbstractButton_hideEvent_void_QAbstractButton_QHideEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QAbstractButton"), new Param(c, "event", "qt.QHideEvent"), End),
             // MISSING: inputMethodEvent (void; QAbstractButton this,
             // "QInputMethodEvent *" event) // protected
-            _func[28] = new MemberFunction(
-                c, "leaveEvent", _n_leaveEvent0, None, Compiled,
-                qt_QAbstractButton_leaveEvent_void_QAbstractButton_QEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractButton"),
-                new Param(c, "event", "qt.QEvent"), End),
-            _func[29] = new MemberFunction(
-                c, "mouseDoubleClickEvent", _n_mouseDoubleClickEvent0, None,
-                Compiled,
-                qt_QAbstractButton_mouseDoubleClickEvent_void_QAbstractButton_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractButton"),
-                new Param(c, "event", "qt.QMouseEvent"), End),
-            _func[30] = new MemberFunction(
-                c, "moveEvent", _n_moveEvent0, None, Compiled,
-                qt_QAbstractButton_moveEvent_void_QAbstractButton_QMoveEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractButton"),
-                new Param(c, "event", "qt.QMoveEvent"), End),
+            _func[28] = new MemberFunction(c, "leaveEvent", _n_leaveEvent0, None, Compiled,
+                                           qt_QAbstractButton_leaveEvent_void_QAbstractButton_QEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QAbstractButton"), new Param(c, "event", "qt.QEvent"), End),
+            _func[29] =
+                new MemberFunction(c, "mouseDoubleClickEvent", _n_mouseDoubleClickEvent0, None, Compiled,
+                                   qt_QAbstractButton_mouseDoubleClickEvent_void_QAbstractButton_QMouseEvent, Return, "void", Parameters,
+                                   new Param(c, "this", "qt.QAbstractButton"), new Param(c, "event", "qt.QMouseEvent"), End),
+            _func[30] = new MemberFunction(c, "moveEvent", _n_moveEvent0, None, Compiled,
+                                           qt_QAbstractButton_moveEvent_void_QAbstractButton_QMoveEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QAbstractButton"), new Param(c, "event", "qt.QMoveEvent"), End),
             // MISSING: nativeEvent (bool; QAbstractButton this, QByteArray
             // eventType, "void *" message, "long *" result) // protected
-            _func[31] = new MemberFunction(
-                c, "resizeEvent", _n_resizeEvent0, None, Compiled,
-                qt_QAbstractButton_resizeEvent_void_QAbstractButton_QResizeEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractButton"),
-                new Param(c, "event", "qt.QResizeEvent"), End),
-            _func[32] = new MemberFunction(
-                c, "showEvent", _n_showEvent0, None, Compiled,
-                qt_QAbstractButton_showEvent_void_QAbstractButton_QShowEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractButton"),
-                new Param(c, "event", "qt.QShowEvent"), End),
-            _func[33] = new MemberFunction(
-                c, "tabletEvent", _n_tabletEvent0, None, Compiled,
-                qt_QAbstractButton_tabletEvent_void_QAbstractButton_QTabletEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractButton"),
-                new Param(c, "event", "qt.QTabletEvent"), End),
-            _func[34] = new MemberFunction(
-                c, "wheelEvent", _n_wheelEvent0, None, Compiled,
-                qt_QAbstractButton_wheelEvent_void_QAbstractButton_QWheelEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractButton"),
-                new Param(c, "event", "qt.QWheelEvent"), End),
+            _func[31] = new MemberFunction(c, "resizeEvent", _n_resizeEvent0, None, Compiled,
+                                           qt_QAbstractButton_resizeEvent_void_QAbstractButton_QResizeEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QAbstractButton"), new Param(c, "event", "qt.QResizeEvent"), End),
+            _func[32] = new MemberFunction(c, "showEvent", _n_showEvent0, None, Compiled,
+                                           qt_QAbstractButton_showEvent_void_QAbstractButton_QShowEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QAbstractButton"), new Param(c, "event", "qt.QShowEvent"), End),
+            _func[33] = new MemberFunction(c, "tabletEvent", _n_tabletEvent0, None, Compiled,
+                                           qt_QAbstractButton_tabletEvent_void_QAbstractButton_QTabletEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QAbstractButton"), new Param(c, "event", "qt.QTabletEvent"), End),
+            _func[34] = new MemberFunction(c, "wheelEvent", _n_wheelEvent0, None, Compiled,
+                                           qt_QAbstractButton_wheelEvent_void_QAbstractButton_QWheelEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QAbstractButton"), new Param(c, "event", "qt.QWheelEvent"), End),
             // MISSING: initPainter (void; QAbstractButton this, "QPainter *"
             // painter) // protected MISSING: metric (int; QAbstractButton this,
             // "PaintDeviceMetric" m) // protected static functions

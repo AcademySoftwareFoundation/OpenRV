@@ -60,16 +60,14 @@ namespace Mu
         _baseType = 0;
     }
 
-    MuQt_QWebChannel::MuQt_QWebChannel(Pointer muobj, const CallEnvironment* ce,
-                                       QObject* parent)
+    MuQt_QWebChannel::MuQt_QWebChannel(Pointer muobj, const CallEnvironment* ce, QObject* parent)
         : QWebChannel(parent)
     {
         _env = ce;
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QWebChannelType>(
-            c->internName("qt.QWebChannel"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QWebChannelType>(c->internName("qt.QWebChannel"));
     }
 
     bool MuQt_QWebChannel::event(QEvent* e)
@@ -104,8 +102,7 @@ namespace Mu
         {
             Function::ArgumentVector args(3);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeinstance<QObjectType>(c, watched, "qt.QObject"));
+            args[1] = Value(makeinstance<QObjectType>(c, watched, "qt.QObject"));
             args[2] = Value(makeqpointer<QEventType>(c, event, "qt.QEvent"));
             Value rval = _env->call(F, args);
             return (bool)(rval._bool);
@@ -153,8 +150,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QTimerEventType>(c, event, "qt.QTimerEvent"));
+            args[1] = Value(makeqpointer<QTimerEventType>(c, event, "qt.QTimerEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -166,8 +162,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  Mu Type CONSTRUCTORS
 
-    QWebChannelType::QWebChannelType(Context* c, const char* name, Class* super,
-                                     Class* super2)
+    QWebChannelType::QWebChannelType(Context* c, const char* name, Class* super, Class* super2)
         : Class(c, name, vectorOf2(super, super2))
     {
     }
@@ -177,8 +172,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    static Pointer QWebChannel_QWebChannel_QObject(Thread& NODE_THREAD,
-                                                   Pointer obj)
+    static Pointer QWebChannel_QWebChannel_QObject(Thread& NODE_THREAD, Pointer obj)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         ClassInstance* widget = reinterpret_cast<ClassInstance*>(obj);
@@ -189,9 +183,7 @@ namespace Mu
         }
         else if (QWebChannel* w = object<QWebChannel>(widget))
         {
-            QWebChannelType* type =
-                c->findSymbolOfTypeByQualifiedName<QWebChannelType>(
-                    c->internName("qt.QWebChannel"), false);
+            QWebChannelType* type = c->findSymbolOfTypeByQualifiedName<QWebChannelType>(c->internName("qt.QWebChannel"), false);
             ClassInstance* o = ClassInstance::allocate(type);
             setobject(o, w);
             return o;
@@ -202,25 +194,17 @@ namespace Mu
         }
     }
 
-    static NODE_IMPLEMENTATION(castFromObject, Pointer)
-    {
-        NODE_RETURN(
-            QWebChannel_QWebChannel_QObject(NODE_THREAD, NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(castFromObject, Pointer) { NODE_RETURN(QWebChannel_QWebChannel_QObject(NODE_THREAD, NODE_ARG(0, Pointer))); }
 
-    Pointer qt_QWebChannel_QWebChannel_QWebChannel_QWebChannel_QObject(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
+    Pointer qt_QWebChannel_QWebChannel_QWebChannel_QWebChannel_QObject(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QObject* arg1 = object<QObject>(param_parent);
-        setobject(param_this,
-                  new MuQt_QWebChannel(param_this,
-                                       NODE_THREAD.process()->callEnv(), arg1));
+        setobject(param_this, new MuQt_QWebChannel(param_this, NODE_THREAD.process()->callEnv(), arg1));
         return param_this;
     }
 
-    void qt_QWebChannel_deregisterObject_void_QWebChannel_QObject(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_object)
+    void qt_QWebChannel_deregisterObject_void_QWebChannel_QObject(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_object)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebChannel* arg0 = object<QWebChannel>(param_this);
@@ -228,9 +212,8 @@ namespace Mu
         arg0->deregisterObject(arg1);
     }
 
-    void qt_QWebChannel_registerObject_void_QWebChannel_string_QObject(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_id,
-        Pointer param_object)
+    void qt_QWebChannel_registerObject_void_QWebChannel_string_QObject(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_id,
+                                                                       Pointer param_object)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebChannel* arg0 = object<QWebChannel>(param_this);
@@ -239,31 +222,25 @@ namespace Mu
         arg0->registerObject(arg1, arg2);
     }
 
-    bool qt_QWebChannel_event_bool_QWebChannel_QEvent(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this,
-                                                      Pointer param_e)
+    bool qt_QWebChannel_event_bool_QWebChannel_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebChannel* arg0 = object<QWebChannel>(param_this);
         QEvent* arg1 = getqpointer<QEventType>(param_e);
-        return isMuQtObject(arg0) ? arg0->QWebChannel::event(arg1)
-                                  : arg0->event(arg1);
+        return isMuQtObject(arg0) ? arg0->QWebChannel::event(arg1) : arg0->event(arg1);
     }
 
-    bool qt_QWebChannel_eventFilter_bool_QWebChannel_QObject_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_watched,
-        Pointer param_event)
+    bool qt_QWebChannel_eventFilter_bool_QWebChannel_QObject_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_watched,
+                                                                    Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebChannel* arg0 = object<QWebChannel>(param_this);
         QObject* arg1 = object<QObject>(param_watched);
         QEvent* arg2 = getqpointer<QEventType>(param_event);
-        return isMuQtObject(arg0) ? arg0->QWebChannel::eventFilter(arg1, arg2)
-                                  : arg0->eventFilter(arg1, arg2);
+        return isMuQtObject(arg0) ? arg0->QWebChannel::eventFilter(arg1, arg2) : arg0->eventFilter(arg1, arg2);
     }
 
-    void qt_QWebChannel_customEvent_void_QWebChannel_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QWebChannel_customEvent_void_QWebChannel_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebChannel* arg0 = object<QWebChannel>(param_this);
@@ -274,8 +251,7 @@ namespace Mu
             ((MuQt_QWebChannel*)arg0)->customEvent_pub(arg1);
     }
 
-    void qt_QWebChannel_timerEvent_void_QWebChannel_QTimerEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QWebChannel_timerEvent_void_QWebChannel_QTimerEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebChannel* arg0 = object<QWebChannel>(param_this);
@@ -288,46 +264,40 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(_n_QWebChannel0, Pointer)
     {
-        NODE_RETURN(qt_QWebChannel_QWebChannel_QWebChannel_QWebChannel_QObject(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(
+            qt_QWebChannel_QWebChannel_QWebChannel_QWebChannel_QObject(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_deregisterObject0, void)
     {
-        qt_QWebChannel_deregisterObject_void_QWebChannel_QObject(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QWebChannel_deregisterObject_void_QWebChannel_QObject(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_registerObject0, void)
     {
-        qt_QWebChannel_registerObject_void_QWebChannel_string_QObject(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer));
+        qt_QWebChannel_registerObject_void_QWebChannel_string_QObject(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                      NODE_ARG(2, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_event0, bool)
     {
-        NODE_RETURN(qt_QWebChannel_event_bool_QWebChannel_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QWebChannel_event_bool_QWebChannel_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_eventFilter0, bool)
     {
-        NODE_RETURN(qt_QWebChannel_eventFilter_bool_QWebChannel_QObject_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QWebChannel_eventFilter_bool_QWebChannel_QObject_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                               NODE_ARG(1, Pointer), NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_customEvent0, void)
     {
-        qt_QWebChannel_customEvent_void_QWebChannel_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QWebChannel_customEvent_void_QWebChannel_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_timerEvent0, void)
     {
-        qt_QWebChannel_timerEvent_void_QWebChannel_QTimerEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QWebChannel_timerEvent_void_QWebChannel_QTimerEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     void QWebChannelType::load()
@@ -347,17 +317,13 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
-                   new Function(c, tn, castFromObject, Cast, Compiled,
-                                QWebChannel_QWebChannel_QObject, Return, ftn,
-                                Parameters,
+                   new Function(c, tn, castFromObject, Cast, Compiled, QWebChannel_QWebChannel_QObject, Return, ftn, Parameters,
                                 new Param(c, "object", "qt.QObject"), End),
 
                    EndArguments);
@@ -365,62 +331,42 @@ namespace Mu
         addSymbols(
             // enums
             // member functions
-            new Function(
-                c, "QWebChannel", _n_QWebChannel0, None, Compiled,
-                qt_QWebChannel_QWebChannel_QWebChannel_QWebChannel_QObject,
-                Return, "qt.QWebChannel", Parameters,
-                new Param(c, "this", "qt.QWebChannel"),
-                new Param(c, "parent", "qt.QObject"), End),
+            new Function(c, "QWebChannel", _n_QWebChannel0, None, Compiled, qt_QWebChannel_QWebChannel_QWebChannel_QWebChannel_QObject,
+                         Return, "qt.QWebChannel", Parameters, new Param(c, "this", "qt.QWebChannel"), new Param(c, "parent", "qt.QObject"),
+                         End),
             // MISSING: bindableBlockUpdates ("QBindable<bool>"; QWebChannel
             // this) MISSING: bindablePropertyUpdateInterval ("QBindable<int>";
             // QWebChannel this) PROP: blockUpdates (bool; QWebChannel this)
-            new Function(
-                c, "deregisterObject", _n_deregisterObject0, None, Compiled,
-                qt_QWebChannel_deregisterObject_void_QWebChannel_QObject,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QWebChannel"),
-                new Param(c, "object", "qt.QObject"), End),
+            new Function(c, "deregisterObject", _n_deregisterObject0, None, Compiled,
+                         qt_QWebChannel_deregisterObject_void_QWebChannel_QObject, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QWebChannel"), new Param(c, "object", "qt.QObject"), End),
             // PROP: propertyUpdateInterval (int; QWebChannel this)
-            new Function(
-                c, "registerObject", _n_registerObject0, None, Compiled,
-                qt_QWebChannel_registerObject_void_QWebChannel_string_QObject,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QWebChannel"),
-                new Param(c, "id", "string"),
-                new Param(c, "object", "qt.QObject"), End),
+            new Function(c, "registerObject", _n_registerObject0, None, Compiled,
+                         qt_QWebChannel_registerObject_void_QWebChannel_string_QObject, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QWebChannel"), new Param(c, "id", "string"), new Param(c, "object", "qt.QObject"), End),
             // MISSING: registerObjects (void; QWebChannel this, "const
             // QHash<QString, QObject * > &" objects) MISSING: registeredObjects
             // ("QHash<QString, QObject * >"; QWebChannel this) PROP:
             // setBlockUpdates (void; QWebChannel this, bool block) PROP:
             // setPropertyUpdateInterval (void; QWebChannel this, int ms)
-            _func[0] = new MemberFunction(
-                c, "event", _n_event0, None, Compiled,
-                qt_QWebChannel_event_bool_QWebChannel_QEvent, Return, "bool",
-                Parameters, new Param(c, "this", "qt.QWebChannel"),
-                new Param(c, "e", "qt.QEvent"), End),
-            _func[1] = new MemberFunction(
-                c, "eventFilter", _n_eventFilter0, None, Compiled,
-                qt_QWebChannel_eventFilter_bool_QWebChannel_QObject_QEvent,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QWebChannel"),
-                new Param(c, "watched", "qt.QObject"),
-                new Param(c, "event", "qt.QEvent"), End),
+            _func[0] = new MemberFunction(c, "event", _n_event0, None, Compiled, qt_QWebChannel_event_bool_QWebChannel_QEvent, Return,
+                                          "bool", Parameters, new Param(c, "this", "qt.QWebChannel"), new Param(c, "e", "qt.QEvent"), End),
+            _func[1] = new MemberFunction(c, "eventFilter", _n_eventFilter0, None, Compiled,
+                                          qt_QWebChannel_eventFilter_bool_QWebChannel_QObject_QEvent, Return, "bool", Parameters,
+                                          new Param(c, "this", "qt.QWebChannel"), new Param(c, "watched", "qt.QObject"),
+                                          new Param(c, "event", "qt.QEvent"), End),
             // MISSING: metaObject ("const QMetaObject *"; QWebChannel this)
             // MISSING: childEvent (void; QWebChannel this, "QChildEvent *"
             // event) // protected MISSING: connectNotify (void; QWebChannel
             // this, "const QMetaMethod &" signal) // protected
-            _func[2] = new MemberFunction(
-                c, "customEvent", _n_customEvent0, None, Compiled,
-                qt_QWebChannel_customEvent_void_QWebChannel_QEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QWebChannel"),
-                new Param(c, "event", "qt.QEvent"), End),
+            _func[2] = new MemberFunction(c, "customEvent", _n_customEvent0, None, Compiled,
+                                          qt_QWebChannel_customEvent_void_QWebChannel_QEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QWebChannel"), new Param(c, "event", "qt.QEvent"), End),
             // MISSING: disconnectNotify (void; QWebChannel this, "const
             // QMetaMethod &" signal) // protected
-            _func[3] = new MemberFunction(
-                c, "timerEvent", _n_timerEvent0, None, Compiled,
-                qt_QWebChannel_timerEvent_void_QWebChannel_QTimerEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QWebChannel"),
-                new Param(c, "event", "qt.QTimerEvent"), End),
+            _func[3] = new MemberFunction(c, "timerEvent", _n_timerEvent0, None, Compiled,
+                                          qt_QWebChannel_timerEvent_void_QWebChannel_QTimerEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QWebChannel"), new Param(c, "event", "qt.QTimerEvent"), End),
             // static functions
             EndArguments);
         globalScope()->addSymbols(EndArguments);

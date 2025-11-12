@@ -41,10 +41,8 @@ namespace Mu
         //	Output the appropriate Value in human readable form
         //
 
-        virtual void outputValue(std::ostream&, const Value&,
-                                 bool full = false) const;
-        virtual void outputValueRecursive(std::ostream&, const ValuePointer,
-                                          ValueOutputState&) const;
+        virtual void outputValue(std::ostream&, const Value&, bool full = false) const;
+        virtual void outputValueRecursive(std::ostream&, const ValuePointer, ValueOutputState&) const;
 
         //
         //	Load function is called when the symbol is added to the

@@ -36,8 +36,7 @@ namespace IPCore
     // as in RV 2024 and earlier versions of RV, the following environment
     // variable can be defined to tell OCIO to use the legacy GPU processor
     // implementation (OCIO::getOptimizedLegacyGPUProcessor()):
-    static ENVVAR_BOOL(evOCIOUseLegacyGPUProcessor,
-                       "RV_OCIO_USE_LEGACY_GPU_PROCESSOR", false);
+    static ENVVAR_BOOL(evOCIOUseLegacyGPUProcessor, "RV_OCIO_USE_LEGACY_GPU_PROCESSOR", false);
 
     // Note: This env var is only taken into account when using the legacy GPU
     // processor implementation (see above)
@@ -65,8 +64,7 @@ namespace IPCore
         OCIO::GpuLanguage GPULanguage = GPU_LANGUAGE_UNKNOWN;
     } // namespace
 
-    string OCIOIPNode::stringProp(const string& name,
-                                  const string& defaultValue) const
+    string OCIOIPNode::stringProp(const string& name, const string& defaultValue) const
     {
         if (const StringProperty* p = property<StringProperty>(name))
         {
@@ -92,8 +90,7 @@ namespace IPCore
         return defaultValue;
     }
 
-    OCIOIPNode::OCIOIPNode(const string& name, const NodeDefinition* def,
-                           IPGraph* graph, GroupIPNode* group)
+    OCIOIPNode::OCIOIPNode(const string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group)
         : IPNode(name, def, graph, group)
         , m_useRawConfig(false)
     {
@@ -106,8 +103,7 @@ namespace IPCore
         m_activeProperty = declareProperty<IntProperty>("ocio.active", 1);
 
         declareProperty<FloatProperty>("ocio.lut", info);
-        declareProperty<IntProperty>("ocio.lut3DSize",
-                                     evOCIOLegacyLut3DSize.getValue());
+        declareProperty<IntProperty>("ocio.lut3DSize", evOCIOLegacyLut3DSize.getValue());
         declareProperty<StringProperty>("ocio.inColorSpace", "");
 
         declareProperty<StringProperty>("ocio_color.outColorSpace", "");
@@ -125,27 +121,22 @@ namespace IPCore
 
         if (func == "synlinearize")
         {
-            m_inTransformURL =
-                declareProperty<StringProperty>("inTransform.url", "", info);
-            m_inTransformData =
-                declareProperty<ByteProperty>("inTransform.data", info);
+            m_inTransformURL = declareProperty<StringProperty>("inTransform.url", "", info);
+            m_inTransformData = declareProperty<ByteProperty>("inTransform.data", info);
             m_useRawConfig = true;
         }
 
         if (func == "syndisplay")
         {
-            m_outTransformURL =
-                declareProperty<StringProperty>("outTransform.url", "", info);
+            m_outTransformURL = declareProperty<StringProperty>("outTransform.url", "", info);
             m_useRawConfig = true;
         }
 
         //
         //  Read-only properties to report config info to the user
         //
-        m_configDescription =
-            declareProperty<StringProperty>("config.description", "");
-        m_configWorkingDir =
-            declareProperty<StringProperty>("config.workingDir", "");
+        m_configDescription = declareProperty<StringProperty>("config.description", "");
+        m_configWorkingDir = declareProperty<StringProperty>("config.workingDir", "");
 
         m_state = new OCIOState;
 
@@ -157,12 +148,8 @@ namespace IPCore
         if (GPULanguage == GPU_LANGUAGE_UNKNOWN)
         {
             IPNode* session = graph->sessionNode();
-            int major =
-                session->property<IntProperty>("opengl.glsl.majorVersion")
-                    ->front();
-            int minor =
-                session->property<IntProperty>("opengl.glsl.minorVersion")
-                    ->front();
+            int major = session->property<IntProperty>("opengl.glsl.majorVersion")->front();
+            int minor = session->property<IntProperty>("opengl.glsl.minorVersion")->front();
 
             if (major == 1 && minor < 30)
             {
@@ -193,8 +180,7 @@ namespace IPCore
         {
             if (useRawConfig())
             {
-                m_state->config = OCIO::Config::CreateFromConfigIOProxy(
-                    std::make_shared<ConfigIOProxy>(this));
+                m_state->config = OCIO::Config::CreateFromConfigIOProxy(std::make_shared<ConfigIOProxy>(this));
             }
             else
             {
@@ -204,8 +190,7 @@ namespace IPCore
         catch (std::exception& exc)
         {
             delete m_state;
-            cerr << "ERROR: OCIOIPNode updateConfig caught: " << exc.what()
-                 << endl;
+            cerr << "ERROR: OCIOIPNode updateConfig caught: " << exc.what() << endl;
             m_state = 0;
             throw;
         }
@@ -225,8 +210,7 @@ namespace IPCore
         m_configWorkingDir->front() = m_state->config->getWorkingDir();
 
         m_state->display = m_state->config->getDefaultDisplay();
-        m_state->view =
-            m_state->config->getDefaultView(m_state->display.c_str());
+        m_state->view = m_state->config->getDefaultView(m_state->display.c_str());
 
         if (useRawConfig())
         {
@@ -234,16 +218,13 @@ namespace IPCore
         }
         else if (getenv("OCIO"))
         {
-            OCIO::ConstColorSpaceRcPtr linearColorSpace =
-                m_state->config->getColorSpace(OCIO::ROLE_SCENE_LINEAR);
-            m_state->linear =
-                linearColorSpace ? linearColorSpace->getName() : "";
+            OCIO::ConstColorSpaceRcPtr linearColorSpace = m_state->config->getColorSpace(OCIO::ROLE_SCENE_LINEAR);
+            m_state->linear = linearColorSpace ? linearColorSpace->getName() : "";
         }
         else
         {
             m_state->linear = "";
-            std::cerr << "ERROR: OCIO environment variable not set"
-                      << std::endl;
+            std::cerr << "ERROR: OCIO environment variable not set" << std::endl;
         }
 
         m_state->shaderID = "";
@@ -254,8 +235,7 @@ namespace IPCore
 
     void OCIOIPNode::updateContext()
     {
-        m_state->context =
-            m_state->config->getCurrentContext()->createEditableCopy();
+        m_state->context = m_state->config->getCurrentContext()->createEditableCopy();
 
         if (Component* context = component("ocio_context"))
         {
@@ -263,13 +243,11 @@ namespace IPCore
 
             for (size_t i = 0; i < props.size(); i++)
             {
-                if (StringProperty* sp =
-                        dynamic_cast<StringProperty*>(props[i]))
+                if (StringProperty* sp = dynamic_cast<StringProperty*>(props[i]))
                 {
                     if (!sp->empty())
                     {
-                        m_state->context->setStringVar(sp->name().c_str(),
-                                                       sp->front().c_str());
+                        m_state->context->setStringVar(sp->name().c_str(), sp->front().c_str());
                     }
                 }
             }
@@ -292,9 +270,8 @@ namespace IPCore
             // OCIO:GPUShaderDesc::setFunctionName) In order to keep the names
             // aligned use: GPUShaderDesc::getFunctionName() to get the name
             // OCIO uses to set RV's Shader Function and bind the parameters.
-            ns = std::regex_replace(
-                ns, std::regex("_+"),
-                "_"); // one or more underscore: replace by only one.
+            ns = std::regex_replace(ns, std::regex("_+"),
+                                    "_"); // one or more underscore: replace by only one.
             ns = std::regex_replace(ns, std::regex("_+$"),
                                     ""); // do not end by an underscore because
                                          // the code will append another one
@@ -307,23 +284,18 @@ namespace IPCore
         // variables being passed as function arguments for all its shaders.
         // Note that the OCIOv2 generated shader no longer passes the LUTs as
         // function arguments.
-        void shaderAddLutAsParameter(std::string& inout_glsl,
-                                     const std::string& lutSamplerName,
-                                     const std::string& lutSamplerType)
+        void shaderAddLutAsParameter(std::string& inout_glsl, const std::string& lutSamplerName, const std::string& lutSamplerType)
         {
             const std::string from = "vec4 inPixel";
-            std::string to = from + std::string(", ") + lutSamplerType
-                             + std::string(" ") + lutSamplerName;
+            std::string to = from + std::string(", ") + lutSamplerType + std::string(" ") + lutSamplerName;
             inout_glsl = std::regex_replace(inout_glsl, std::regex(from), to);
         }
 
     }; // namespace
 
-    OCIO::MatrixTransformRcPtr
-    OCIOIPNode::createMatrixTransformXYZToRec709() const
+    OCIO::MatrixTransformRcPtr OCIOIPNode::createMatrixTransformXYZToRec709() const
     {
-        OCIO::MatrixTransformRcPtr matrix_xyz_to_rec709 =
-            OCIO::MatrixTransform::Create();
+        OCIO::MatrixTransformRcPtr matrix_xyz_to_rec709 = OCIO::MatrixTransform::Create();
         double m44[16] = {3.240969941905,
                           -1.537383177570,
                           -0.498610760293,
@@ -385,8 +357,7 @@ namespace IPCore
 
         try
         {
-            OCIO::ConstColorSpaceRcPtr srcCS =
-                m_state->config->getColorSpace(inName.c_str());
+            OCIO::ConstColorSpaceRcPtr srcCS = m_state->config->getColorSpace(inName.c_str());
             OCIO::ConstProcessorRcPtr processor;
             ostringstream shaderName;
 
@@ -396,17 +367,12 @@ namespace IPCore
                 //  Emulate the nuke OCIOColor node
                 //
 
-                string outName =
-                    stringProp("ocio_color.outColorSpace", m_state->linear);
-                OCIO::ConstColorSpaceRcPtr dstCS =
-                    m_state->config->getColorSpace(outName.c_str());
-                processor = m_state->config->getProcessor(m_state->context,
-                                                          srcCS, dstCS);
+                string outName = stringProp("ocio_color.outColorSpace", m_state->linear);
+                OCIO::ConstColorSpaceRcPtr dstCS = m_state->config->getColorSpace(outName.c_str());
+                processor = m_state->config->getProcessor(m_state->context, srcCS, dstCS);
 
                 size_t hashValue = string_hash(inName + outName);
-                shaderName << "OCIO_c_" << shaderLegal(inName) << "_2_"
-                           << shaderLegal(outName) << "_" << name() << "_"
-                           << hex << hashValue;
+                shaderName << "OCIO_c_" << shaderLegal(inName) << "_2_" << shaderLegal(outName) << "_" << name() << "_" << hex << hashValue;
             }
             else if (ociofunction == "look")
             {
@@ -414,16 +380,12 @@ namespace IPCore
                 //  Emulate the nuke OCIOLook node
                 //
 
-                OCIO::LookTransformRcPtr transform =
-                    OCIO::LookTransform::Create();
-                OCIO::TransformDirection direction =
-                    OCIO::TRANSFORM_DIR_FORWARD;
+                OCIO::LookTransformRcPtr transform = OCIO::LookTransform::Create();
+                OCIO::TransformDirection direction = OCIO::TRANSFORM_DIR_FORWARD;
                 string looksName = stringProp("ocio_look.look", "");
-                string outName =
-                    stringProp("ocio_look.outColorSpace", m_state->linear);
+                string outName = stringProp("ocio_look.outColorSpace", m_state->linear);
                 bool reverse = intProp("ocio_look.direction", 0) == 1;
-                OCIO::ConstColorSpaceRcPtr dstCS =
-                    m_state->config->getColorSpace(outName.c_str());
+                OCIO::ConstColorSpaceRcPtr dstCS = m_state->config->getColorSpace(outName.c_str());
 
                 transform->setLooks(looksName.c_str());
 
@@ -444,13 +406,10 @@ namespace IPCore
                     direction = OCIO::TRANSFORM_DIR_FORWARD;
                 }
 
-                processor = m_state->config->getProcessor(m_state->context,
-                                                          transform, direction);
+                processor = m_state->config->getProcessor(m_state->context, transform, direction);
 
                 size_t hashValue = string_hash(inName + outName);
-                shaderName << "OCIO_l_" << shaderLegal(looksName) << "_"
-                           << name() << "_" << hex << hashValue << "_"
-                           << direction;
+                shaderName << "OCIO_l_" << shaderLegal(looksName) << "_" << name() << "_" << hex << hashValue << "_" << direction;
             }
             else if (ociofunction == "display")
             {
@@ -458,34 +417,27 @@ namespace IPCore
                 //  Emulate the nuke OCIODisplay node
                 //
 
-                OCIO::DisplayViewTransformRcPtr transform =
-                    OCIO::DisplayViewTransform::Create();
-                string display =
-                    stringProp("ocio_display.display", m_state->display);
+                OCIO::DisplayViewTransformRcPtr transform = OCIO::DisplayViewTransform::Create();
+                string display = stringProp("ocio_display.display", m_state->display);
                 string view = stringProp("ocio_display.view", m_state->view);
 
                 transform->setSrc(inName.c_str());
                 transform->setDisplay(display.c_str());
                 transform->setView(view.c_str());
-                processor = m_state->config->getProcessor(
-                    m_state->context, transform, OCIO::TRANSFORM_DIR_FORWARD);
+                processor = m_state->config->getProcessor(m_state->context, transform, OCIO::TRANSFORM_DIR_FORWARD);
 
                 size_t hashValue = string_hash(inName + display + view);
-                shaderName << "OCIO_d_" << shaderLegal(display) << "_"
-                           << shaderLegal(view) << "_" << name() << "_" << hex
-                           << hashValue;
+                shaderName << "OCIO_d_" << shaderLegal(display) << "_" << shaderLegal(view) << "_" << name() << "_" << hex << hashValue;
             }
             else if (ociofunction == "synlinearize")
             {
                 // The input transform can be specified in two ways: via a url
                 // or via a data array
                 string inTransformURL = stringProp("inTransform.url", "");
-                if (inTransformURL.empty()
-                    && (!m_inTransformData || m_inTransformData->size() == 0))
+                if (inTransformURL.empty() && (!m_inTransformData || m_inTransformData->size() == 0))
                 {
-                    TWK_THROW_EXC_STREAM(
-                        "Either inTransform.url or inTransform.data property "
-                        "needs to be set for synlinearize function");
+                    TWK_THROW_EXC_STREAM("Either inTransform.url or inTransform.data property "
+                                         "needs to be set for synlinearize function");
                 }
 
                 if (!m_transform)
@@ -501,13 +453,11 @@ namespace IPCore
                         // cache.
                         static int uniqueCounter = 0;
                         inTransformURL =
-                            name() + "." + std::to_string(uniqueCounter++) + "."
-                            + ConfigIOProxy::USE_IN_TRANSFORM_DATA_PROPERTY;
+                            name() + "." + std::to_string(uniqueCounter++) + "." + ConfigIOProxy::USE_IN_TRANSFORM_DATA_PROPERTY;
                     }
 
                     // Inverse the ICC transform
-                    OCIO::FileTransformRcPtr transform =
-                        OCIO::FileTransform::Create();
+                    OCIO::FileTransformRcPtr transform = OCIO::FileTransform::Create();
                     transform->setSrc(inTransformURL.c_str());
                     transform->setInterpolation(OCIO::INTERP_BEST);
                     transform->setDirection(OCIO::TRANSFORM_DIR_INVERSE);
@@ -516,12 +466,10 @@ namespace IPCore
                     // Concatenate it with the RV's working space transform
                     // which is currently assumed to be 709 linear like the
                     // original EXR spec.
-                    m_transform->appendTransform(
-                        getMatrixTransformXYZToRec709());
+                    m_transform->appendTransform(getMatrixTransformXYZToRec709());
                 }
 
-                processor = m_state->config->getProcessor(
-                    m_state->context, m_transform, OCIO::TRANSFORM_DIR_FORWARD);
+                processor = m_state->config->getProcessor(m_state->context, m_transform, OCIO::TRANSFORM_DIR_FORWARD);
 
                 size_t hashValue = string_hash(name());
                 shaderName << "OCIO_sl_" << name() << "_" << hex << hashValue;
@@ -530,8 +478,7 @@ namespace IPCore
             {
                 // The outTransform.url property typically refers to an ICC
                 // monitor profile
-                const string outTransformURL =
-                    stringProp("outTransform.url", "");
+                const string outTransformURL = stringProp("outTransform.url", "");
                 if (outTransformURL.empty())
                 {
                     TWK_THROW_EXC_STREAM("outTransform.url property needs to "
@@ -545,42 +492,35 @@ namespace IPCore
                     // RV's working space is currently assumed to be 709
                     // linear like the original EXR spec. In the display
                     // case this transform is inverted.
-                    m_transform->appendTransform(
-                        getMatrixTransformRec709ToXYZ());
+                    m_transform->appendTransform(getMatrixTransformRec709ToXYZ());
 
                     // Concatenate the inverse workingSpaceTransform with
                     // the ICC monitor profile transforma
-                    OCIO::FileTransformRcPtr transform =
-                        OCIO::FileTransform::Create();
+                    OCIO::FileTransformRcPtr transform = OCIO::FileTransform::Create();
                     transform->setSrc(outTransformURL.c_str());
                     transform->setInterpolation(OCIO::INTERP_BEST);
                     m_transform->appendTransform(transform);
                 }
 
-                processor = m_state->config->getProcessor(
-                    m_state->context, m_transform, OCIO::TRANSFORM_DIR_FORWARD);
+                processor = m_state->config->getProcessor(m_state->context, m_transform, OCIO::TRANSFORM_DIR_FORWARD);
 
                 size_t hashValue = string_hash(outTransformURL);
                 shaderName << "OCIO_sd_" << name() << "_" << hex << hashValue;
             }
 
-            OCIO::GpuShaderDescRcPtr shaderDesc =
-                OCIO::GpuShaderDesc::CreateShaderDesc();
+            OCIO::GpuShaderDescRcPtr shaderDesc = OCIO::GpuShaderDesc::CreateShaderDesc();
             shaderDesc->setFunctionName(shaderName.str().c_str());
             shaderDesc->setLanguage(GPULanguage);
             OCIO::ConstGPUProcessorRcPtr gpuProcessor;
 
             if (evOCIOUseLegacyGPUProcessor.getValue())
             {
-                const int legacyLutSize =
-                    intProp("ocio.lut3DSize", evOCIOLegacyLut3DSize.getValue());
-                gpuProcessor = processor->getOptimizedLegacyGPUProcessor(
-                    OCIO::OPTIMIZATION_DEFAULT, legacyLutSize);
+                const int legacyLutSize = intProp("ocio.lut3DSize", evOCIOLegacyLut3DSize.getValue());
+                gpuProcessor = processor->getOptimizedLegacyGPUProcessor(OCIO::OPTIMIZATION_DEFAULT, legacyLutSize);
             }
             else
             {
-                gpuProcessor = processor->getOptimizedGPUProcessor(
-                    OCIO::OPTIMIZATION_DEFAULT);
+                gpuProcessor = processor->getOptimizedGPUProcessor(OCIO::OPTIMIZATION_DEFAULT);
             }
 
             // Fills the shaderDesc from the proc.
@@ -601,42 +541,33 @@ namespace IPCore
                 const unsigned int numTextures = shaderDesc->getNumTextures();
                 for (unsigned idx = 0; idx < numTextures; ++idx)
                 {
-                    m_1DLUTs.push_back(std::make_shared<OCIO1DLUT>(
-                        shaderDesc, idx, shaderCacheID));
+                    m_1DLUTs.push_back(std::make_shared<OCIO1DLUT>(shaderDesc, idx, shaderCacheID));
 
                     // Add the LUTs'shader uniform as a shader function
                     // parameter
-                    shaderAddLutAsParameter(glsl, m_1DLUTs[idx]->samplerName(),
-                                            m_1DLUTs[idx]->samplerType());
+                    shaderAddLutAsParameter(glsl, m_1DLUTs[idx]->samplerName(), m_1DLUTs[idx]->samplerType());
                 }
 
                 m_3DLUTs.clear();
-                const unsigned int num3DTextures =
-                    shaderDesc->getNum3DTextures();
+                const unsigned int num3DTextures = shaderDesc->getNum3DTextures();
                 for (unsigned idx = 0; idx < num3DTextures; ++idx)
                 {
-                    m_3DLUTs.push_back(std::make_shared<OCIO3DLUT>(
-                        shaderDesc, idx, shaderCacheID));
+                    m_3DLUTs.push_back(std::make_shared<OCIO3DLUT>(shaderDesc, idx, shaderCacheID));
 
                     // Add the LUTs'shader uniform as a shader function
                     // parameter
-                    shaderAddLutAsParameter(glsl, m_3DLUTs[idx]->samplerName(),
-                                            m_3DLUTs[idx]->samplerType());
+                    shaderAddLutAsParameter(glsl, m_3DLUTs[idx]->samplerName(), m_3DLUTs[idx]->samplerType());
                 }
 
-                m_state->function = new Shader::Function(
-                    shaderDesc->getFunctionName(), glsl,
-                    Shader::Function::Color, numTextures + num3DTextures);
+                m_state->function =
+                    new Shader::Function(shaderDesc->getFunctionName(), glsl, Shader::Function::Color, numTextures + num3DTextures);
                 m_state->shaderID = shaderCacheID;
 
                 if (Shader::debuggingType() != Shader::NoDebugInfo)
                 {
-                    cout << "OCIONode: " << name() << " new shaderID "
-                         << shaderCacheID << endl
-                         << "OCIONode: " << numTextures << "x 1D LUTs, "
-                         << num3DTextures << "x 3D LUTs"
-                         << "OCIONode:     new Shader '"
-                         << shaderDesc->getFunctionName() << "':" << endl
+                    cout << "OCIONode: " << name() << " new shaderID " << shaderCacheID << endl
+                         << "OCIONode: " << numTextures << "x 1D LUTs, " << num3DTextures << "x 3D LUTs"
+                         << "OCIONode:     new Shader '" << shaderDesc->getFunctionName() << "':" << endl
                          << glsl << endl;
                 }
             }
@@ -653,8 +584,7 @@ namespace IPCore
         if (!image)
             return IPImage::newNoImage(this, "No Input");
 
-        if (m_activeProperty->size() != 1 || m_activeProperty->front() == 0
-            || !m_state->function)
+        if (m_activeProperty->size() != 1 || m_activeProperty->front() == 0 || !m_state->function)
             return image;
 
         string order = propertyValue(m_channelOrder, "");
@@ -678,8 +608,7 @@ namespace IPCore
             images[0] = image;
 
             convertBlendRenderTypeToIntermediate(images, modifiedImages);
-            balanceResourceUsage(IPNode::accumulate, images, modifiedImages, 8,
-                                 8, 81, 1);
+            balanceResourceUsage(IPNode::accumulate, images, modifiedImages, 8, 8, 81, 1);
         }
         else
         {
@@ -691,9 +620,7 @@ namespace IPCore
             //
             if (willConvertToIntermediate(child))
             {
-                image = new IPImage(this, IPImage::BlendRenderType,
-                                    context.viewWidth, context.viewHeight, 1.0,
-                                    IPImage::IntermediateBuffer,
+                image = new IPImage(this, IPImage::BlendRenderType, context.viewWidth, context.viewHeight, 1.0, IPImage::IntermediateBuffer,
                                     IPImage::FloatDataType);
 
                 image->appendChild(child);
@@ -706,8 +633,7 @@ namespace IPCore
                 images[0] = image = child;
 
                 convertBlendRenderTypeToIntermediate(images, modifiedImages);
-                balanceResourceUsage(IPNode::accumulate, images, modifiedImages,
-                                     8, 8, 81, 1);
+                balanceResourceUsage(IPNode::accumulate, images, modifiedImages, 8, 8, 81, 1);
                 image = images[0];
             }
         }
@@ -716,27 +642,22 @@ namespace IPCore
         {
             const Shader::Function* F = m_state->function;
             Shader::ArgumentVector args(F->parameters().size());
-            Shader::Expression*& expr =
-                image->mergeExpr ? image->mergeExpr : image->shaderExpr;
+            Shader::Expression*& expr = image->mergeExpr ? image->mergeExpr : image->shaderExpr;
 
             args[0] = new Shader::BoundExpression(F->parameters()[0], expr);
 
             // Add the 3D LUTs expressions (if any)
             for (unsigned idx = 0; idx < m_3DLUTs.size(); ++idx)
             {
-                args[idx + 1] = new Shader::BoundSampler(
-                    F->parameters()[idx + 1],
-                    Shader::ImageOrFB(
-                        m_3DLUTs[m_3DLUTs.size() - 1 - idx]->lutfb(), 0));
+                args[idx + 1] =
+                    new Shader::BoundSampler(F->parameters()[idx + 1], Shader::ImageOrFB(m_3DLUTs[m_3DLUTs.size() - 1 - idx]->lutfb(), 0));
             }
 
             // Add the 1D LUTs expressions (if any)
             for (unsigned idx = 0; idx < m_1DLUTs.size(); ++idx)
             {
                 args[idx + m_3DLUTs.size() + 1] = new Shader::BoundSampler(
-                    F->parameters()[idx + m_3DLUTs.size() + 1],
-                    Shader::ImageOrFB(
-                        m_1DLUTs[m_1DLUTs.size() - 1 - idx]->lutfb(), 0));
+                    F->parameters()[idx + m_3DLUTs.size() + 1], Shader::ImageOrFB(m_1DLUTs[m_1DLUTs.size() - 1 - idx]->lutfb(), 0));
             }
 
             expr = new Shader::Expression(F, args, image);
@@ -805,8 +726,7 @@ namespace IPCore
                         F = Mat44f(0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1);
                         break;
                     case 5:
-                        F = Mat44f(rw709, gw709, bw709, 0, rw709, gw709, bw709, 0,
-                                rw709, gw709, bw709, 0, 0, 0, 0, 1);
+                        F = Mat44f(rw709, gw709, bw709, 0, rw709, gw709, bw709, 0, rw709, gw709, bw709, 0, 0, 0, 0, 1);
                         break;
                     default:
                         // nothing
@@ -828,8 +748,7 @@ namespace IPCore
 
             if (ociofunction == "display" && image->shaderExpr)
             {
-                image->resourceUsage =
-                    image->shaderExpr->computeResourceUsageRecursive();
+                image->resourceUsage = image->shaderExpr->computeResourceUsageRecursive();
             }
         }
 
@@ -849,8 +768,7 @@ namespace IPCore
         // synlinearize/syndisplay functions:
         // Reset transforms and associated color transform files if a linked
         // property changed
-        if (p == m_inTransformURL || p == m_inTransformData
-            || p == m_outTransformURL)
+        if (p == m_inTransformURL || p == m_inTransformData || p == m_outTransformURL)
         {
             m_transform.reset();
         }

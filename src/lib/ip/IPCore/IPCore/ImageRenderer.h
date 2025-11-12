@@ -211,12 +211,8 @@ namespace IPCore
             std::shared_ptr<TwkGLF::GLPixelBufferObjectFromPool> pPBOToGPU;
         };
 
-        typedef stl_ext::replacement_allocator<
-            std::pair<const std::string, TextureDescription*>>
-            TextureDescriptionAlloc;
-        typedef std::map<const std::string, TextureDescription*,
-                         std::less<const std::string>, TextureDescriptionAlloc>
-            FBToTextureMap;
+        typedef stl_ext::replacement_allocator<std::pair<const std::string, TextureDescription*>> TextureDescriptionAlloc;
+        typedef std::map<const std::string, TextureDescription*, std::less<const std::string>, TextureDescriptionAlloc> FBToTextureMap;
 
         //
         // image plane contains info about how the texture will be rendered
@@ -285,8 +281,7 @@ namespace IPCore
             {
             }
 
-            DeviceSet
-                devices; // maintains all the devices that rendered this image
+            DeviceSet devices; // maintains all the devices that rendered this image
             size_t serialNum;
             int width;
             int height;
@@ -297,12 +292,11 @@ namespace IPCore
             int uncropY;
             float pixelAspect;
             float initPixelAspect;
-            std::string idhash; // used to identify a logical image
-            std::string fbhash; // fb->identifier or ""
-            std::string
-                texturehash; // fbhash or a GLFBO id
-                             // or img->graphID for non resident
-                             // this is needed to correctly assign texture units
+            std::string idhash;      // used to identify a logical image
+            std::string fbhash;      // fb->identifier or ""
+            std::string texturehash; // fbhash or a GLFBO id
+                                     // or img->graphID for non resident
+                                     // this is needed to correctly assign texture units
             std::string source;
             bool isvirtual;  // has no pixels (ever)
             bool isresident; // pixels already on card
@@ -348,12 +342,8 @@ namespace IPCore
             ActiveImageVector memberImages;
         };
 
-        typedef stl_ext::replacement_allocator<
-            std::pair<const HashValue, ImagePassState*>>
-            ImagePassStateAlloc;
-        typedef std::map<HashValue, ImagePassState*, std::less<HashValue>,
-                         ImagePassStateAlloc>
-            ImagePassStateMap;
+        typedef stl_ext::replacement_allocator<std::pair<const HashValue, ImagePassState*>> ImagePassStateAlloc;
+        typedef std::map<HashValue, ImagePassState*, std::less<HashValue>, ImagePassStateAlloc> ImagePassStateMap;
 
         //
         // these are used to record render related info for each IPImage
@@ -402,10 +392,8 @@ namespace IPCore
             bool render;
         };
 
-        typedef stl_ext::replacement_allocator<RenderedImage>
-            RenderedImageAlloc;
-        typedef std::vector<RenderedImage, RenderedImageAlloc>
-            RenderedImagesVector;
+        typedef stl_ext::replacement_allocator<RenderedImage> RenderedImageAlloc;
+        typedef std::vector<RenderedImage, RenderedImageAlloc> RenderedImagesVector;
 
         //
         // the reason this is a struct is for future development where
@@ -464,9 +452,8 @@ namespace IPCore
 
         struct Device
         {
-            Device(const VideoDevice* d = 0, const GLVideoDevice* g = 0,
-                   const GLBindableVideoDevice* bd = 0,
-                   size_t ringBufferSize = 1, size_t nviews = 1);
+            Device(const VideoDevice* d = 0, const GLVideoDevice* g = 0, const GLBindableVideoDevice* bd = 0, size_t ringBufferSize = 1,
+                   size_t nviews = 1);
 
             const VideoDevice* device;
             const GLVideoDevice* glDevice;
@@ -493,9 +480,7 @@ namespace IPCore
 
             virtual ~AuxRender() {}
 
-            virtual void render(VideoDevice::DisplayMode, bool leftEye,
-                                bool rightEye, bool forController,
-                                bool forOuput) const = 0;
+            virtual void render(VideoDevice::DisplayMode, bool leftEye, bool rightEye, bool forController, bool forOuput) const = 0;
         };
 
         //
@@ -511,8 +496,7 @@ namespace IPCore
 
             virtual ~AuxAudio() {}
 
-            virtual void* audioForFrame(int frame, size_t seqindex,
-                                        size_t& n) const = 0;
+            virtual void* audioForFrame(int frame, size_t seqindex, size_t& n) const = 0;
             virtual bool isAvailable() const = 0;
         };
 
@@ -548,13 +532,13 @@ namespace IPCore
             }
 
             int frame;
-            const GLFBO* targetFBO;  // current render target
-            const GLFBO* targetLFBO; // left eye target (from device, may be 0)
-            const GLFBO* targetRFBO; // right eye target (from device, may be 0)
-            bool mergeRender;        // use the IPImage::mergeExpr instead of
-                                     // IPImage::shaderExpr
-            const IPImage* image;    // current image being rendered
-            const GLFBO* imageFBO;   // if virtual this may contain image pixels
+            const GLFBO* targetFBO;    // current render target
+            const GLFBO* targetLFBO;   // left eye target (from device, may be 0)
+            const GLFBO* targetRFBO;   // right eye target (from device, may be 0)
+            bool mergeRender;          // use the IPImage::mergeExpr instead of
+                                       // IPImage::shaderExpr
+            const IPImage* image;      // current image being rendered
+            const GLFBO* imageFBO;     // if virtual this may contain image pixels
             const VideoDevice* device; // current device (from image tree)
 
             size_t fullSerialNum;
@@ -630,11 +614,7 @@ namespace IPCore
         void setControlDevice(const VideoDevice*);
         void setOutputDevice(const VideoDevice*);
 
-        bool hasMultipleOutputs() const
-        {
-            return m_controlDevice.device != m_outputDevice.device
-                   && m_outputDevice.device != 0;
-        }
+        bool hasMultipleOutputs() const { return m_controlDevice.device != m_outputDevice.device && m_outputDevice.device != 0; }
 
         const Device& controlDevice() const { return m_controlDevice; }
 
@@ -646,19 +626,14 @@ namespace IPCore
         //  lifting.
         //
 
-        void render(int frame, IPImage* root, const AuxRender* aux = 0,
-                    const AuxAudio* auxAudio = 0, IPImage* uploadRoot = 0);
+        void render(int frame, IPImage* root, const AuxRender* aux = 0, const AuxAudio* auxAudio = 0, IPImage* uploadRoot = 0);
 
         void prepareTextureDescriptionsForUpload(const IPImage* img);
         void prefetch(const IPImage*);
 
-        ImageFBO* newOutputOnlyImageFBO(GLenum internalFormat,
-                                        size_t samples = 0);
+        ImageFBO* newOutputOnlyImageFBO(GLenum internalFormat, size_t samples = 0);
 
-        void releaseImageFBO(const GLFBO* fbo)
-        {
-            m_imageFBOManager.releaseImageFBO(fbo);
-        }
+        void releaseImageFBO(const GLFBO* fbo) { m_imageFBOManager.releaseImageFBO(fbo); }
 
         void flushImageFBOs() { m_imageFBOManager.flushImageFBOs(); }
 
@@ -687,19 +662,13 @@ namespace IPCore
 
         static void setDrawPixelsOnly(bool b) { m_drawPixelsOnly = b; }
 
-        static void setAltGetProcAddress(GetProcAddressFunc f)
-        {
-            m_procFunc = f;
-        }
+        static void setAltGetProcAddress(GetProcAddressFunc f) { m_procFunc = f; }
 
         static bool queryClientStorage() { return m_hasClientStorage; }
 
         static void setUseAppleClientStorage(bool b) { m_useClientStorage = b; }
 
-        static bool useAppleClientStorage()
-        {
-            return m_useClientStorage && m_hasClientStorage;
-        }
+        static bool useAppleClientStorage() { return m_useClientStorage && m_hasClientStorage; }
 
         static bool queryThreadedUpload() { return m_hasThreadedUpload; }
 
@@ -707,10 +676,7 @@ namespace IPCore
 
         static void setUseThreadedUpload(bool b) { m_useThreadedUpload = b; }
 
-        static bool useThreadedUpload()
-        {
-            return m_useThreadedUpload && m_hasThreadedUpload;
-        }
+        static bool useThreadedUpload() { return m_useThreadedUpload && m_hasThreadedUpload; }
 
         static void reportGL(bool b) { m_reportGL = b; }
 
@@ -720,10 +686,7 @@ namespace IPCore
 
         static bool hasFloatFormats() { return m_floatFormats; }
 
-        static const FBAcceptableTypes& fbAcceptableTypes()
-        {
-            return m_FBAcceptableTypes;
-        }
+        static const FBAcceptableTypes& fbAcceptableTypes() { return m_FBAcceptableTypes; }
 
         static BGPattern defaultBGPattern;
 
@@ -762,10 +725,7 @@ namespace IPCore
 
         int filterType() const { return m_filter; }
 
-        const RenderedImagesVector* renderedImages() const
-        {
-            return &m_renderedImages;
-        }
+        const RenderedImagesVector* renderedImages() const { return &m_renderedImages; }
 
         void clearRenderedImages() { m_renderedImages.clear(); }
 
@@ -795,10 +755,7 @@ namespace IPCore
 
         const bool stopUploadThread() const { return m_stopUploadThread; }
 
-        const GLVideoDevice* uploadThreadDevice() const
-        {
-            return m_uploadThreadDevice;
-        }
+        const GLVideoDevice* uploadThreadDevice() const { return m_uploadThreadDevice; }
 
         ConditionalVariable& drawCond() { return m_drawCond; }
 
@@ -831,10 +788,8 @@ namespace IPCore
         void createCLContexts();
         void compileCLPrograms();
         void compileCLHistogram();
-        void executeCLKernel(
-            const CLContext& context, const cl_kernel& kernel,
-            const size_t globalThreads[3], const size_t localThreads[3],
-            const std::vector<std::pair<size_t, const void*>>& args) const;
+        void executeCLKernel(const CLContext& context, const cl_kernel& kernel, const size_t globalThreads[3], const size_t localThreads[3],
+                             const std::vector<std::pair<size_t, const void*>>& args) const;
 
         const bool CLContextNotSet() const { return !m_setCLContext; }
 #endif
@@ -849,36 +804,29 @@ namespace IPCore
         void renderExternal(InternalRenderContext&);
         void renderRootBuffer(InternalRenderContext&);
         void renderRecursive(InternalRenderContext&);
-        void renderCurrentImage(InternalRenderContext&,
-                                const GLFBO* fbo = NULL);
+        void renderCurrentImage(InternalRenderContext&, const GLFBO* fbo = NULL);
 
         void renderAllChildren(InternalRenderContext&);
-        void renderIntermediate(InternalRenderContext&,
-                                const GLFBO* fbo = NULL);
+        void renderIntermediate(InternalRenderContext&, const GLFBO* fbo = NULL);
 
         void renderNonIntermediate(InternalRenderContext&);
         void renderDataBuffer(InternalRenderContext&);
 
-        void renderOutputs(int frame, const IPImage*, const AuxRender*,
-                           const AuxAudio*);
+        void renderOutputs(int frame, const IPImage*, const AuxRender*, const AuxAudio*);
 
-        void renderMain(const GLFBO* Ftarget, const GLFBO* Ltarget,
-                        const GLFBO* Rtarget, const AuxRender* auxRenderer,
-                        int frame, const IPImage*);
+        void renderMain(const GLFBO* Ftarget, const GLFBO* Ltarget, const GLFBO* Rtarget, const AuxRender* auxRenderer, int frame,
+                        const IPImage*);
 
         void renderBegin(const InternalRenderContext&);
         void renderEnd(const InternalRenderContext&);
         void renderInternal(const InternalRenderContext&);
 
         void assignTextureUnits(const IPImage*, bool);
-        bool assignTextureUnits2(const IPImage*, LogicalImage*, size_t&,
-                                 size_t);
+        bool assignTextureUnits2(const IPImage*, LogicalImage*, size_t&, size_t);
 
         void activateTextures(LogicalImageVector&);
 
-        void markProgramRequirements(const IPImage*,
-                                     const InternalRenderContext&,
-                                     const Shader::Program*);
+        void markProgramRequirements(const IPImage*, const InternalRenderContext&, const Shader::Program*);
 
         void recordTransforms(const InternalRenderContext&);
 
@@ -886,12 +834,9 @@ namespace IPCore
 
         void drawMerge(const InternalRenderContext&);
 
-        void computeMergeMatrix(const InternalRenderContext&,
-                                const LogicalImage*, const IPImage*,
-                                Mat44f&) const;
+        void computeMergeMatrix(const InternalRenderContext&, const LogicalImage*, const IPImage*, Mat44f&) const;
 
-        void computeDataBufferMergeMatrix(const InternalRenderContext&,
-                                          const IPImage*, Mat44f&) const;
+        void computeDataBufferMergeMatrix(const InternalRenderContext&, const IPImage*, Mat44f&) const;
 
         //
         // Prefetch
@@ -904,8 +849,7 @@ namespace IPCore
         //  Functions that operate on ImagePassStates
         //
 
-        void assignMemberImages(const IPImage*,
-                                const ImageRenderer::ActiveImageVector&);
+        void assignMemberImages(const IPImage*, const ImageRenderer::ActiveImageVector&);
 
         void assembleAuxLogicalImage(const FrameBuffer*, LogicalImage*);
 
@@ -915,8 +859,7 @@ namespace IPCore
         //  Functions related to textures
         //
 
-        TextureDescription* getTexture(const FrameBuffer*,
-                                       TextureDescription::TextureMatch&);
+        TextureDescription* getTexture(const FrameBuffer*, TextureDescription::TextureMatch&);
 
         //  Same fb identifier different pixel aspect means a new upload
         std::string logicalImageHash(const IPImage*) const;
@@ -927,8 +870,7 @@ namespace IPCore
 
         void uploadImage(LogicalImage*, const IPImage*);
 
-        void assignImage(LogicalImage*, const IPImage*, const GLFBO*, bool,
-                         bool, size_t);
+        void assignImage(LogicalImage*, const IPImage*, const GLFBO*, bool, bool, size_t);
 
         void assignAuxImage(LogicalImage* i, const FrameBuffer* fb);
 
@@ -936,42 +878,31 @@ namespace IPCore
 
         void computeImageGeometry(const IPImage* img, ImagePlane& plane) const;
 
-        void computePlaneGeometry(const IPImage* img, const FrameBuffer* fb,
-                                  ImagePlane& plane) const;
+        void computePlaneGeometry(const IPImage* img, const FrameBuffer* fb, ImagePlane& plane) const;
 
-        void initializeTexture(const FrameBuffer* fb,
-                               TextureDescription* tex) const;
+        void initializeTexture(const FrameBuffer* fb, TextureDescription* tex) const;
 
-        void initializeTextureFormat(const FrameBuffer* fb,
-                                     TextureDescription* tex) const;
+        void initializeTextureFormat(const FrameBuffer* fb, TextureDescription* tex) const;
 
-        void initializePlane(const IPImage* img, const GLFBO*,
-                             ImagePlane&) const;
+        void initializePlane(const IPImage* img, const GLFBO*, ImagePlane&) const;
 
-        void initializeFBPlane(const IPImage* img, const FrameBuffer*,
-                               ImagePlane&, float, bool,
-                               bool generateTexture = false) const;
+        void initializeFBPlane(const IPImage* img, const FrameBuffer*, ImagePlane&, float, bool, bool generateTexture = false) const;
 
-        bool compatible(const FrameBuffer* fb,
-                        const TextureDescription* tex) const;
+        bool compatible(const FrameBuffer* fb, const TextureDescription* tex) const;
 
         //
         //  Functions that operate on Image Plane
         //
 
-        void uploadPlane(const FrameBuffer*, TextureDescription*,
-                         GLuint filter);
+        void uploadPlane(const FrameBuffer*, TextureDescription*, GLuint filter);
 
         //
         //  Functions that operate on Texture
         //
 
-        void upload3DTexture(const FrameBuffer*, GLuint pixelInterpolation,
-                             TextureDescription*);
-        void upload2DTexture(const FrameBuffer*, GLuint pixelInterpolation,
-                             TextureDescription*);
-        void upload1DTexture(const FrameBuffer*, GLuint pixelInterpolation,
-                             TextureDescription*);
+        void upload3DTexture(const FrameBuffer*, GLuint pixelInterpolation, TextureDescription*);
+        void upload2DTexture(const FrameBuffer*, GLuint pixelInterpolation, TextureDescription*);
+        void upload1DTexture(const FrameBuffer*, GLuint pixelInterpolation, TextureDescription*);
 
         //
         // Miscellaneous
@@ -1009,16 +940,14 @@ namespace IPCore
         //
 
 #ifdef PLATFORM_DARWIN
-        void computeHistogram(const ConstFBOVector& childrenFBO,
-                              const GLFBO* resultFBO) const;
+        void computeHistogram(const ConstFBOVector& childrenFBO, const GLFBO* resultFBO) const;
         void histogramOCL(cl_mem&, cl_mem&, const size_t, const size_t) const;
 #endif
 
     private:
         RenderedImagesVector m_renderedImages;
-        FBToTextureMap
-            m_texturesToUpload; // render and upload thread will never
-                                // read/write this simultaneously
+        FBToTextureMap m_texturesToUpload; // render and upload thread will never
+                                           // read/write this simultaneously
         FBToTextureMap m_uploadedTextures; // only read/write from render thread
         ImagePassStateMap m_imagePassStates;
         ImageFBOManager m_imageFBOManager;

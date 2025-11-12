@@ -72,19 +72,13 @@ namespace TwkFB
 
         char temp[80];
 
-        sprintf(temp, "%02d:%02d:%02d:%02d",
-                ((u >> 28) & 0xF) * 10 + ((u >> 24) & 0xF),
-                ((u >> 20) & 0xF) * 10 + ((u >> 16) & 0xF),
-                ((u >> 12) & 0xF) * 10 + ((u >> 8) & 0xF),
-                ((u >> 4) & 0xF) * 10 + ((u >> 0) & 0xF));
+        sprintf(temp, "%02d:%02d:%02d:%02d", ((u >> 28) & 0xF) * 10 + ((u >> 24) & 0xF), ((u >> 20) & 0xF) * 10 + ((u >> 16) & 0xF),
+                ((u >> 12) & 0xF) * 10 + ((u >> 8) & 0xF), ((u >> 4) & 0xF) * 10 + ((u >> 0) & 0xF));
 
         return temp;
     }
 
-    static int U32TCByteToInt(U32 u)
-    {
-        return int((u & 0xf) + 10 * ((u & 0xf0) >> 4));
-    }
+    static int U32TCByteToInt(U32 u) { return int((u & 0xf) + 10 * ((u & 0xf0) >> 4)); }
 
     static int U32TCToFrames(U32 u, float fps)
     {
@@ -166,8 +160,7 @@ namespace TwkFB
 //
 #define DPX_NO_DATA_R32_CUTOFF IOdpx::R32(2.139e+09)
 
-    static void setFBOrientation(FrameBuffer& infb,
-                                 FrameBuffer::Orientation orientation)
+    static void setFBOrientation(FrameBuffer& infb, FrameBuffer::Orientation orientation)
     {
         for (FrameBuffer* fb = &infb; fb; fb = fb->nextPlane())
         {
@@ -175,14 +168,11 @@ namespace TwkFB
         }
     }
 
-    static inline bool hasData(IOdpx::ASCII* p)
-    {
-        return *p && *p != DPX_NO_DATA_ASCII;
-    }
+    static inline bool hasData(IOdpx::ASCII* p) { return *p && *p != DPX_NO_DATA_ASCII; }
 
     static inline bool hasData(IOdpx::R32 p)
     {
-        return p == p && // spec requires undefined R32 = 0xffffffff (NaN)
+        return p == p &&                   // spec requires undefined R32 = 0xffffffff (NaN)
                p < DPX_NO_DATA_R32_CUTOFF; // shake puts high values in R32
                                            // fields
     }
@@ -191,10 +181,7 @@ namespace TwkFB
 
     static inline bool hasData(IOdpx::U8 p) { return p != DPX_NO_DATA_U8; }
 
-    static inline void fillNoData(IOdpx::ASCII* p, size_t n)
-    {
-        fill(p, p + n, DPX_NO_DATA_ASCII);
-    }
+    static inline void fillNoData(IOdpx::ASCII* p, size_t n) { fill(p, p + n, DPX_NO_DATA_ASCII); }
 
     static inline void fillNoData(IOdpx::R32& p) { p = DPX_NO_DATA_R32; }
 
@@ -212,63 +199,58 @@ namespace TwkFB
         unsigned int value;
     };
 
-    static NameValue orientation[] = {
-        {"Top Left", IOdpx::DPX_TOP_LEFT},
-        {"Bottom Left", IOdpx::DPX_BOTTOM_LEFT},
-        {"Top Right", IOdpx::DPX_TOP_RIGHT},
-        {"Bottom Right", IOdpx::DPX_BOTTOM_RIGHT},
-        {"Rotated Top Left", IOdpx::DPX_ROTATED_TOP_LEFT},
-        {"Rotated Bottom Left", IOdpx::DPX_ROTATED_BOTTOM_LEFT},
-        {"Rotated Top Right", IOdpx::DPX_ROTATED_TOP_RIGHT},
-        {"Rotated Bottom Right", IOdpx::DPX_ROTATED_BOTTOM_RIGHT},
-        {"", 0}};
+    static NameValue orientation[] = {{"Top Left", IOdpx::DPX_TOP_LEFT},
+                                      {"Bottom Left", IOdpx::DPX_BOTTOM_LEFT},
+                                      {"Top Right", IOdpx::DPX_TOP_RIGHT},
+                                      {"Bottom Right", IOdpx::DPX_BOTTOM_RIGHT},
+                                      {"Rotated Top Left", IOdpx::DPX_ROTATED_TOP_LEFT},
+                                      {"Rotated Bottom Left", IOdpx::DPX_ROTATED_BOTTOM_LEFT},
+                                      {"Rotated Top Right", IOdpx::DPX_ROTATED_TOP_RIGHT},
+                                      {"Rotated Bottom Right", IOdpx::DPX_ROTATED_BOTTOM_RIGHT},
+                                      {"", 0}};
 
-    static NameValue colorspace[] = {
-        {"Other (0)", IOdpx::DPX_USER_DEFINED_COLOR},
-        {"Printing Density", IOdpx::DPX_PRINTING_DENSITY},
-        {"Linear", IOdpx::DPX_LINEAR},
-        {"Logarithmic", IOdpx::DPX_LOGARITHMIC},
-        {"Unspecified Video", IOdpx::DPX_UNSPECIFIED_VIDEO},
-        {"SMPTE 274M", IOdpx::DPX_SMPTE274M},
-        {"ITU Rec-709", IOdpx::DPX_ITU_R709},
-        {"ITU Rec-601 625 lines", IOdpx::DPX_ITU_R601_625L},
-        {"ITU Rec-601 525 lines", IOdpx::DPX_ITU_R601_525L},
-        {"NTSC", IOdpx::DPX_NTSC},
-        {"PAL", IOdpx::DPX_PAL},
-        {"Linear Depth", IOdpx::DPX_Z_LINEAR},
-        {"Homogeneous Depth", IOdpx::DPX_Z_HOMOGENEOUS},
-        {"", 0}};
+    static NameValue colorspace[] = {{"Other (0)", IOdpx::DPX_USER_DEFINED_COLOR},
+                                     {"Printing Density", IOdpx::DPX_PRINTING_DENSITY},
+                                     {"Linear", IOdpx::DPX_LINEAR},
+                                     {"Logarithmic", IOdpx::DPX_LOGARITHMIC},
+                                     {"Unspecified Video", IOdpx::DPX_UNSPECIFIED_VIDEO},
+                                     {"SMPTE 274M", IOdpx::DPX_SMPTE274M},
+                                     {"ITU Rec-709", IOdpx::DPX_ITU_R709},
+                                     {"ITU Rec-601 625 lines", IOdpx::DPX_ITU_R601_625L},
+                                     {"ITU Rec-601 525 lines", IOdpx::DPX_ITU_R601_525L},
+                                     {"NTSC", IOdpx::DPX_NTSC},
+                                     {"PAL", IOdpx::DPX_PAL},
+                                     {"Linear Depth", IOdpx::DPX_Z_LINEAR},
+                                     {"Homogeneous Depth", IOdpx::DPX_Z_HOMOGENEOUS},
+                                     {"", 0}};
 
-    static NameValue packing[] = {{"Not Padded", IOdpx::DPX_PAD_NONE},
-                                  {"LSB Padded", IOdpx::DPX_PAD_LSB_WORD},
-                                  {"MSB Padded", IOdpx::DPX_PAD_MSB_WORD},
-                                  {"", 0}};
+    static NameValue packing[] = {
+        {"Not Padded", IOdpx::DPX_PAD_NONE}, {"LSB Padded", IOdpx::DPX_PAD_LSB_WORD}, {"MSB Padded", IOdpx::DPX_PAD_MSB_WORD}, {"", 0}};
 
-    static NameValue pixelFormat[] = {
-        {"Unknown Format", IOdpx::DPX_PIXEL_UNKNOWN},
-        {"R", IOdpx::DPX_PIXEL_R},
-        {"G", IOdpx::DPX_PIXEL_G},
-        {"B", IOdpx::DPX_PIXEL_B},
-        {"A", IOdpx::DPX_PIXEL_A},
-        {"Y", IOdpx::DPX_PIXEL_Y},
-        {"CbCr", IOdpx::DPX_PIXEL_CbCr},
-        {"Z", IOdpx::DPX_PIXEL_Z},
-        {"Composite Video", IOdpx::DPX_PIXEL_COMPOSITE_VIDEO},
-        {"RGB", IOdpx::DPX_PIXEL_RGB},
-        {"RGBA", IOdpx::DPX_PIXEL_RGBA},
-        {"ABGR", IOdpx::DPX_PIXEL_ABGR},
-        {"CbYCrY 4:2:2", IOdpx::DPX_PIXEL_CbYCrY_422},
-        {"CbYACrYA 4:2:2:4", IOdpx::DPX_PIXEL_CbYACrYA_4224},
-        {"CbYCr 4:4:4", IOdpx::DPX_PIXEL_CbYCr_444},
-        {"CbYCrA 4:4:4:4", IOdpx::DPX_PIXEL_CbYCrA_4444},
-        {"User Defined 2 Component", IOdpx::DPX_PIXEL_USER_2_COMPONENT},
-        {"User Defined 3 Component", IOdpx::DPX_PIXEL_USER_3_COMPONENT},
-        {"User Defined 4 Component", IOdpx::DPX_PIXEL_USER_4_COMPONENT},
-        {"User Defined 5 Component", IOdpx::DPX_PIXEL_USER_5_COMPONENT},
-        {"User Defined 6 Component", IOdpx::DPX_PIXEL_USER_6_COMPONENT},
-        {"User Defined 7 Component", IOdpx::DPX_PIXEL_USER_7_COMPONENT},
-        {"User Defined 8 Component", IOdpx::DPX_PIXEL_USER_8_COMPONENT},
-        {"", 0}};
+    static NameValue pixelFormat[] = {{"Unknown Format", IOdpx::DPX_PIXEL_UNKNOWN},
+                                      {"R", IOdpx::DPX_PIXEL_R},
+                                      {"G", IOdpx::DPX_PIXEL_G},
+                                      {"B", IOdpx::DPX_PIXEL_B},
+                                      {"A", IOdpx::DPX_PIXEL_A},
+                                      {"Y", IOdpx::DPX_PIXEL_Y},
+                                      {"CbCr", IOdpx::DPX_PIXEL_CbCr},
+                                      {"Z", IOdpx::DPX_PIXEL_Z},
+                                      {"Composite Video", IOdpx::DPX_PIXEL_COMPOSITE_VIDEO},
+                                      {"RGB", IOdpx::DPX_PIXEL_RGB},
+                                      {"RGBA", IOdpx::DPX_PIXEL_RGBA},
+                                      {"ABGR", IOdpx::DPX_PIXEL_ABGR},
+                                      {"CbYCrY 4:2:2", IOdpx::DPX_PIXEL_CbYCrY_422},
+                                      {"CbYACrYA 4:2:2:4", IOdpx::DPX_PIXEL_CbYACrYA_4224},
+                                      {"CbYCr 4:4:4", IOdpx::DPX_PIXEL_CbYCr_444},
+                                      {"CbYCrA 4:4:4:4", IOdpx::DPX_PIXEL_CbYCrA_4444},
+                                      {"User Defined 2 Component", IOdpx::DPX_PIXEL_USER_2_COMPONENT},
+                                      {"User Defined 3 Component", IOdpx::DPX_PIXEL_USER_3_COMPONENT},
+                                      {"User Defined 4 Component", IOdpx::DPX_PIXEL_USER_4_COMPONENT},
+                                      {"User Defined 5 Component", IOdpx::DPX_PIXEL_USER_5_COMPONENT},
+                                      {"User Defined 6 Component", IOdpx::DPX_PIXEL_USER_6_COMPONENT},
+                                      {"User Defined 7 Component", IOdpx::DPX_PIXEL_USER_7_COMPONENT},
+                                      {"User Defined 8 Component", IOdpx::DPX_PIXEL_USER_8_COMPONENT},
+                                      {"", 0}};
 
     static const char* nameForValue(const NameValue* ptr, unsigned int value)
     {
@@ -434,8 +416,7 @@ static const char* read(IOdpx::DPXHeader& h, const char* p)
 
     //----------------------------------------------------------------------
 
-    IOdpx::IOdpx(StorageFormat format, bool useChromaticies, IOType type,
-                 size_t chunksize, int maxAsync)
+    IOdpx::IOdpx(StorageFormat format, bool useChromaticies, IOType type, size_t chunksize, int maxAsync)
         : StreamingFrameBufferIO("IOdpx", "m5", type, chunksize, maxAsync)
         , m_format(format)
         , m_useChromaticities(useChromaticies)
@@ -443,8 +424,7 @@ static const char* read(IOdpx::DPXHeader& h, const char* p)
         init();
     }
 
-    IOdpx::IOdpx(const std::string& format, bool useChromaticies, IOType type,
-                 size_t chunksize, int maxAsync)
+    IOdpx::IOdpx(const std::string& format, bool useChromaticies, IOType type, size_t chunksize, int maxAsync)
         : StreamingFrameBufferIO("IOdpx", "m5", type, chunksize, maxAsync)
         , m_useChromaticities(useChromaticies)
     {
@@ -481,101 +461,62 @@ static const char* read(IOdpx::DPXHeader& h, const char* p)
 
         codecs.push_back(StringPair("NONE", "uncompressed"));
 
-        eparams.push_back(StringPair(
-            "transfer",
-            "Transfer function (LOG, DENSITY, REC709, USER, VIDEO, SMPTE274M, "
-            "REC601-625, REC601-525, NTSC, PAL, or number)"));
-        eparams.push_back(StringPair(
-            "colorimetric",
-            "Colorimetric specification (REC709, USER, VIDEO, SMPTE274M, "
-            "REC601-625, REC601-525, NTSC, PAL, or number)"));
+        eparams.push_back(StringPair("transfer", "Transfer function (LOG, DENSITY, REC709, USER, VIDEO, SMPTE274M, "
+                                                 "REC601-625, REC601-525, NTSC, PAL, or number)"));
+        eparams.push_back(StringPair("colorimetric", "Colorimetric specification (REC709, USER, VIDEO, SMPTE274M, "
+                                                     "REC601-625, REC601-525, NTSC, PAL, or number)"));
         eparams.push_back(StringPair("creator", "ASCII string"));
         eparams.push_back(StringPair("copyright", "ASCII string"));
         eparams.push_back(StringPair("project", "ASCII string"));
-        eparams.push_back(StringPair(
-            "orientation",
-            "Pixel Origin string or int (TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, "
-            "BOTTOM_RIGHT, ROTATED_TOP_LEFT, ROTATED_TOP_RIGHT, "
-            "ROTATED_BOTTOM_LEFT, ROTATED_BOTTOM_RIGHT)"));
-        eparams.push_back(StringPair(
-            "create_time", "ISO 8601 ASCII string: YYYY:MM:DD:hh:mm:ssTZ "));
-        eparams.push_back(
-            StringPair("film/mfg_id", "2 digit manufacturer ID edge code"));
-        eparams.push_back(
-            StringPair("film/type", "2 digit film type edge code"));
-        eparams.push_back(StringPair("film/offset",
-                                     "2 digit film offset in perfs edge code"));
-        eparams.push_back(
-            StringPair("film/prefix", "6 digit film prefix edge code"));
-        eparams.push_back(
-            StringPair("film/count", "4 digit film count edge code"));
-        eparams.push_back(
-            StringPair("film/format", "32 char film format (e.g. Academy)"));
-        eparams.push_back(
-            StringPair("film/frame_position", "Frame position in sequence"));
+        eparams.push_back(StringPair("orientation", "Pixel Origin string or int (TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, "
+                                                    "BOTTOM_RIGHT, ROTATED_TOP_LEFT, ROTATED_TOP_RIGHT, "
+                                                    "ROTATED_BOTTOM_LEFT, ROTATED_BOTTOM_RIGHT)"));
+        eparams.push_back(StringPair("create_time", "ISO 8601 ASCII string: YYYY:MM:DD:hh:mm:ssTZ "));
+        eparams.push_back(StringPair("film/mfg_id", "2 digit manufacturer ID edge code"));
+        eparams.push_back(StringPair("film/type", "2 digit film type edge code"));
+        eparams.push_back(StringPair("film/offset", "2 digit film offset in perfs edge code"));
+        eparams.push_back(StringPair("film/prefix", "6 digit film prefix edge code"));
+        eparams.push_back(StringPair("film/count", "4 digit film count edge code"));
+        eparams.push_back(StringPair("film/format", "32 char film format (e.g. Academy)"));
+        eparams.push_back(StringPair("film/frame_position", "Frame position in sequence"));
         eparams.push_back(StringPair("film/sequence_len", "Sequence length"));
-        eparams.push_back(
-            StringPair("film/frame_rate", "Frame rate (frames per second)"));
-        eparams.push_back(
-            StringPair("film/shutter_angle", "Shutter angle in degrees"));
-        eparams.push_back(
-            StringPair("film/frame_id", "32 character frame identification"));
-        eparams.push_back(
-            StringPair("film/slate_info", "100 character slate info"));
-        eparams.push_back(
-            StringPair("tv/time_code", "SMPTE time code as XX:XX:XX:XX"));
-        eparams.push_back(
-            StringPair("tv/user_bits", "SMPTE user bits as XX:XX:XX:XX"));
-        eparams.push_back(
-            StringPair("tv/interlace", "Interlace (0=no, 1=2:1)"));
+        eparams.push_back(StringPair("film/frame_rate", "Frame rate (frames per second)"));
+        eparams.push_back(StringPair("film/shutter_angle", "Shutter angle in degrees"));
+        eparams.push_back(StringPair("film/frame_id", "32 character frame identification"));
+        eparams.push_back(StringPair("film/slate_info", "100 character slate info"));
+        eparams.push_back(StringPair("tv/time_code", "SMPTE time code as XX:XX:XX:XX"));
+        eparams.push_back(StringPair("tv/user_bits", "SMPTE user bits as XX:XX:XX:XX"));
+        eparams.push_back(StringPair("tv/interlace", "Interlace (0=no, 1=2:1)"));
         eparams.push_back(StringPair("tv/field_num", "Field number"));
-        eparams.push_back(StringPair(
-            "tv/video_signal", "Video signal standard 0-254 (see DPX spec)"));
-        eparams.push_back(StringPair("tv/horizontal_sample_rate",
-                                     "Horizontal sampling rate in Hz"));
-        eparams.push_back(StringPair("tv/vertical_sample_rate",
-                                     "Vertical sampling rate in Hz"));
-        eparams.push_back(StringPair(
-            "tv/frame_rate", "Temporal sampling rate or frame rate in Hz"));
-        eparams.push_back(StringPair(
-            "tv/time_offset", "Time offset from sync to first pixel in ms"));
+        eparams.push_back(StringPair("tv/video_signal", "Video signal standard 0-254 (see DPX spec)"));
+        eparams.push_back(StringPair("tv/horizontal_sample_rate", "Horizontal sampling rate in Hz"));
+        eparams.push_back(StringPair("tv/vertical_sample_rate", "Vertical sampling rate in Hz"));
+        eparams.push_back(StringPair("tv/frame_rate", "Temporal sampling rate or frame rate in Hz"));
+        eparams.push_back(StringPair("tv/time_offset", "Time offset from sync to first pixel in ms"));
         eparams.push_back(StringPair("tv/gamma", "Gamma"));
         eparams.push_back(StringPair("tv/black_level", "Black level"));
         eparams.push_back(StringPair("tv/black_gain", "Black gain"));
         eparams.push_back(StringPair("tv/break_point", "Breakpoint"));
         eparams.push_back(StringPair("tv/white_level", "White level"));
-        eparams.push_back(
-            StringPair("tv/integration_times", "Integration times"));
+        eparams.push_back(StringPair("tv/integration_times", "Integration times"));
         eparams.push_back(StringPair("source/x_offset", "X offset"));
         eparams.push_back(StringPair("source/y_offset", "X offset"));
         eparams.push_back(StringPair("source/x_center", "X center"));
         eparams.push_back(StringPair("source/y_center", "Y center"));
-        eparams.push_back(
-            StringPair("source/x_original_size", "X original size"));
-        eparams.push_back(
-            StringPair("source/y_original_size", "Y original size"));
+        eparams.push_back(StringPair("source/x_original_size", "X original size"));
+        eparams.push_back(StringPair("source/y_original_size", "Y original size"));
         eparams.push_back(StringPair("source/file_name", "Source file name"));
-        eparams.push_back(
-            StringPair("source/creation_time",
-                       "Source creation time YYYY:MM:DD:hh:mm:ssTZ"));
+        eparams.push_back(StringPair("source/creation_time", "Source creation time YYYY:MM:DD:hh:mm:ssTZ"));
         eparams.push_back(StringPair("source/input_dev", "Input device name"));
-        eparams.push_back(
-            StringPair("source/input_dev", "Input device serial number"));
-        eparams.push_back(
-            StringPair("source/border_XL", "Border validity left"));
-        eparams.push_back(
-            StringPair("source/border_XR", "Border validity right"));
-        eparams.push_back(
-            StringPair("source/border_YT", "Border validity top"));
-        eparams.push_back(
-            StringPair("source/border_YB", "Border validity bottom"));
-        eparams.push_back(StringPair("source/pixel_aspect_H",
-                                     "Pixel aspect ratio horizonal component"));
-        eparams.push_back(StringPair("source/pixel_aspect_V",
-                                     "Pixel aspect ratio vertical component"));
+        eparams.push_back(StringPair("source/input_dev", "Input device serial number"));
+        eparams.push_back(StringPair("source/border_XL", "Border validity left"));
+        eparams.push_back(StringPair("source/border_XR", "Border validity right"));
+        eparams.push_back(StringPair("source/border_YT", "Border validity top"));
+        eparams.push_back(StringPair("source/border_YB", "Border validity bottom"));
+        eparams.push_back(StringPair("source/pixel_aspect_H", "Pixel aspect ratio horizonal component"));
+        eparams.push_back(StringPair("source/pixel_aspect_V", "Pixel aspect ratio vertical component"));
 
-        addType("dpx", "Digital Picture Exchange Image", cap, codecs, eparams,
-                dparams);
+        addType("dpx", "Digital Picture Exchange Image", cap, codecs, eparams, dparams);
     }
 
     bool IOdpx::getBoolAttribute(const std::string& name) const
@@ -620,8 +561,7 @@ static const char* read(IOdpx::DPXHeader& h, const char* p)
         return StreamingFrameBufferIO::getStringAttribute(name);
     }
 
-    void IOdpx::setStringAttribute(const std::string& name,
-                                   const std::string& value)
+    void IOdpx::setStringAttribute(const std::string& name, const std::string& value)
     {
         if (name == "format")
         {
@@ -652,8 +592,7 @@ static const char* read(IOdpx::DPXHeader& h, const char* p)
 
     string IOdpx::about() const { return "DPX (Tweak)"; }
 
-    static void setAttr(FrameBuffer& fb, const char* name, char* value,
-                        size_t size)
+    static void setAttr(FrameBuffer& fb, const char* name, char* value, size_t size)
     {
         if (hasData(value))
         {
@@ -688,18 +627,13 @@ static const char* read(IOdpx::DPXHeader& h, const char* p)
     {
         if (header.file.user_data_size)
         {
-            fb.attribute<int>("DPX/userDataSize") =
-                int(header.file.user_data_size);
+            fb.attribute<int>("DPX/userDataSize") = int(header.file.user_data_size);
         }
 
-        if (hasData(header.orientation.pixel_aspect_H)
-            && hasData(header.orientation.pixel_aspect_V)
-            && header.orientation.pixel_aspect_H != 0
-            && header.orientation.pixel_aspect_V != 0)
+        if (hasData(header.orientation.pixel_aspect_H) && hasData(header.orientation.pixel_aspect_V)
+            && header.orientation.pixel_aspect_H != 0 && header.orientation.pixel_aspect_V != 0)
         {
-            fb.setPixelAspectRatio(
-                float(double(header.orientation.pixel_aspect_H)
-                      / double(header.orientation.pixel_aspect_V)));
+            fb.setPixelAspectRatio(float(double(header.orientation.pixel_aspect_H) / double(header.orientation.pixel_aspect_V)));
         }
         else
         {
@@ -728,10 +662,8 @@ static const char* read(IOdpx::DPXHeader& h, const char* p)
         {
         }
 
-        if (colorimetric == DPX_SMPTE274M || colorimetric == DPX_ITU_R709
-            || colorimetric == DPX_ITU_R601_625L
-            || colorimetric == DPX_ITU_R601_525L || colorimetric == DPX_NTSC
-            || colorimetric == DPX_PAL)
+        if (colorimetric == DPX_SMPTE274M || colorimetric == DPX_ITU_R709 || colorimetric == DPX_ITU_R601_625L
+            || colorimetric == DPX_ITU_R601_525L || colorimetric == DPX_NTSC || colorimetric == DPX_PAL)
         {
             fb.setPrimaryColorSpace(ColorSpace::Rec709());
         }
@@ -742,9 +674,8 @@ static const char* read(IOdpx::DPXHeader& h, const char* p)
             {
                 fb.setConversion(ColorSpace::Rec709());
             }
-            else if (colorimetric == DPX_ITU_R601_625L
-                     || colorimetric == DPX_ITU_R601_525L
-                     || colorimetric == DPX_NTSC || colorimetric == DPX_PAL)
+            else if (colorimetric == DPX_ITU_R601_625L || colorimetric == DPX_ITU_R601_525L || colorimetric == DPX_NTSC
+                     || colorimetric == DPX_PAL)
             {
                 fb.setConversion(ColorSpace::Rec601());
             }
@@ -760,20 +691,16 @@ static const char* read(IOdpx::DPXHeader& h, const char* p)
 
             if (header.tv.white_level != 0 && hasData(header.tv.white_level))
             {
-                fb.attribute<float>(ColorSpace::WhitePoint()) =
-                    header.tv.white_level;
-                fb.attribute<float>(ColorSpace::BlackPoint()) =
-                    header.tv.black_level;
+                fb.attribute<float>(ColorSpace::WhitePoint()) = header.tv.white_level;
+                fb.attribute<float>(ColorSpace::BlackPoint()) = header.tv.black_level;
             }
 
             //
             // Cineon specs the max softClip (whitept - breakpt) at 50.
             //
-            if (header.tv.break_point != 0 && hasData(header.tv.break_point)
-                && (header.tv.white_level - header.tv.break_point) <= 50.0f)
+            if (header.tv.break_point != 0 && hasData(header.tv.break_point) && (header.tv.white_level - header.tv.break_point) <= 50.0f)
             {
-                fb.attribute<float>(ColorSpace::BreakPoint()) =
-                    header.tv.break_point;
+                fb.attribute<float>(ColorSpace::BreakPoint()) = header.tv.break_point;
             }
 
             if (hasData(header.tv.gamma) && header.tv.gamma != 0.0)
@@ -785,8 +712,7 @@ static const char* read(IOdpx::DPXHeader& h, const char* p)
         {
             fb.setTransferFunction(ColorSpace::Rec709());
         }
-        else if (transfer == DPX_ITU_R601_625L || transfer == DPX_ITU_R601_525L
-                 || transfer == DPX_NTSC || transfer == DPX_PAL)
+        else if (transfer == DPX_ITU_R601_625L || transfer == DPX_ITU_R601_525L || transfer == DPX_NTSC || transfer == DPX_PAL)
         {
             fb.setTransferFunction(ColorSpace::Rec601());
         }
@@ -807,8 +733,7 @@ static const char* read(IOdpx::DPXHeader& h, const char* p)
         }
 
         if (hasData(header.tv.integration_times))
-            fb.newAttribute("DPX-TV/IntegrationTimes",
-                            (header.tv.integration_times));
+            fb.newAttribute("DPX-TV/IntegrationTimes", (header.tv.integration_times));
         if (hasData(header.tv.white_level))
             fb.newAttribute("DPX-TV/WhiteLevel", (header.tv.white_level));
         if (hasData(header.tv.break_point))
@@ -824,11 +749,9 @@ static const char* read(IOdpx::DPXHeader& h, const char* p)
         if (hasData(header.tv.frame_rate))
             fb.newAttribute("DPX-TV/FrameRate", (header.tv.frame_rate));
         if (hasData(header.tv.ver_sample_rate))
-            fb.newAttribute("DPX-TV/VeritcalSampleRate",
-                            (header.tv.ver_sample_rate));
+            fb.newAttribute("DPX-TV/VeritcalSampleRate", (header.tv.ver_sample_rate));
         if (hasData(header.tv.hor_sample_rate))
-            fb.newAttribute("DPX-TV/HorizontalSampleRate",
-                            (header.tv.hor_sample_rate));
+            fb.newAttribute("DPX-TV/HorizontalSampleRate", (header.tv.hor_sample_rate));
 
         if (header.tv.video_signal != 255)
             fb.newAttribute("DPX-TV/VideoSignal", int(header.tv.video_signal));
@@ -837,26 +760,22 @@ static const char* read(IOdpx::DPXHeader& h, const char* p)
 
         if (hasData(header.tv.tim_code))
         {
-            fb.newAttribute("DPX-TV/TimeCode",
-                            U32TCToTimeCodeString(header.tv.tim_code));
+            fb.newAttribute("DPX-TV/TimeCode", U32TCToTimeCodeString(header.tv.tim_code));
         }
 
         if (hasData(header.tv.userBits))
         {
-            fb.newAttribute("DPX-TV/UserBits",
-                            U32TCToTimeCodeString(header.tv.userBits));
+            fb.newAttribute("DPX-TV/UserBits", U32TCToTimeCodeString(header.tv.userBits));
         }
 
         if (hasData(header.film.sequence_len))
         {
-            fb.newAttribute("DPX-MP/SequenceLength",
-                            int(header.film.sequence_len));
+            fb.newAttribute("DPX-MP/SequenceLength", int(header.film.sequence_len));
         }
 
         if (hasData(header.film.frame_position))
         {
-            fb.newAttribute("DPX-MP/FramePosition",
-                            int(header.film.frame_position));
+            fb.newAttribute("DPX-MP/FramePosition", int(header.film.frame_position));
         }
 
         setAttr(fb, "DPX-MP/Format", header.film.format, 32);
@@ -872,19 +791,15 @@ static const char* read(IOdpx::DPXHeader& h, const char* p)
 
         if (hasData(header.film.count))
         {
-            sprintf(temp, "%c%c%c%c", header.film.count[0],
-                    header.film.count[1], header.film.count[2],
-                    header.film.count[3]);
+            sprintf(temp, "%c%c%c%c", header.film.count[0], header.film.count[1], header.film.count[2], header.film.count[3]);
 
             fb.newAttribute("DPX-MP/Count", string(temp));
         }
 
         if (hasData(header.film.prefix))
         {
-            sprintf(temp, "%c%c%c%c%c%c", header.film.prefix[0],
-                    header.film.prefix[1], header.film.prefix[2],
-                    header.film.prefix[3], header.film.prefix[4],
-                    header.film.prefix[5]);
+            sprintf(temp, "%c%c%c%c%c%c", header.film.prefix[0], header.film.prefix[1], header.film.prefix[2], header.film.prefix[3],
+                    header.film.prefix[4], header.film.prefix[5]);
 
             fb.newAttribute("DPX-MP/Prefix", string(temp));
         }
@@ -898,16 +813,14 @@ static const char* read(IOdpx::DPXHeader& h, const char* p)
 
         if (hasData(header.film.film_type))
         {
-            sprintf(temp, "%c%c", header.film.film_type[0],
-                    header.film.film_type[1]);
+            sprintf(temp, "%c%c", header.film.film_type[0], header.film.film_type[1]);
 
             fb.newAttribute("DPX-MP/FilmType", string(temp));
         }
 
         if (hasData(header.film.film_mfg_id))
         {
-            sprintf(temp, "%c%c", header.film.film_mfg_id[0],
-                    header.film.film_mfg_id[1]);
+            sprintf(temp, "%c%c", header.film.film_mfg_id[0], header.film.film_mfg_id[1]);
 
             fb.newAttribute("DPX-MP/ManufacturerId", string(temp));
         }
@@ -915,76 +828,55 @@ static const char* read(IOdpx::DPXHeader& h, const char* p)
         for (int i = 0; i < header.image.element_number; i++)
         {
             sprintf(temp, "DPX-%d/Packing", i);
-            fb.newAttribute(
-                temp, string(nameForValue(
-                          packing, header.image.image_element[i].packing)));
+            fb.newAttribute(temp, string(nameForValue(packing, header.image.image_element[i].packing)));
 
             if (header.image.image_element[i].encoding)
-                fb.newAttribute("DPX/Encoding",
-                                int(header.image.image_element[i].encoding));
+                fb.newAttribute("DPX/Encoding", int(header.image.image_element[i].encoding));
 
-            fb.newAttribute("DPX/BitSize",
-                            int(header.image.image_element[i].bit_size));
+            fb.newAttribute("DPX/BitSize", int(header.image.image_element[i].bit_size));
 
             sprintf(temp, "DPX-%d/Transfer", i);
-            fb.newAttribute(
-                temp, string(nameForValue(
-                          colorspace, header.image.image_element[i].transfer)));
+            fb.newAttribute(temp, string(nameForValue(colorspace, header.image.image_element[i].transfer)));
             sprintf(temp, "DPX-%d/Colorimetric", i);
-            fb.newAttribute(
-                temp,
-                string(nameForValue(
-                    colorspace, header.image.image_element[i].colorimetric)));
+            fb.newAttribute(temp, string(nameForValue(colorspace, header.image.image_element[i].colorimetric)));
 
             if (header.image.image_element[i].eol_padding > 0)
             {
                 sprintf(temp, "DPX-%d/EndOfLinePadding", i);
-                fb.newAttribute(temp,
-                                int(header.image.image_element[i].eol_padding));
+                fb.newAttribute(temp, int(header.image.image_element[i].eol_padding));
             }
 
             if (header.image.image_element[i].eo_image_padding > 0)
             {
                 sprintf(temp, "DPX-%d/EndOfImagePadding", i);
-                fb.newAttribute(
-                    temp, int(header.image.image_element[i].eo_image_padding));
+                fb.newAttribute(temp, int(header.image.image_element[i].eo_image_padding));
             }
 
             sprintf(temp, "DPX-%d/Descriptor", i);
-            fb.newAttribute(
-                temp,
-                string(nameForValue(pixelFormat,
-                                    header.image.image_element[i].descriptor)));
+            fb.newAttribute(temp, string(nameForValue(pixelFormat, header.image.image_element[i].descriptor)));
 
             if (hasData(header.image.image_element[i].description))
             {
                 sprintf(temp, "DPX-%d/Description", i);
-                fb.newAttribute(
-                    temp, string(header.image.image_element[i].description));
+                fb.newAttribute(temp, string(header.image.image_element[i].description));
             }
         }
 
         if (hasData(header.orientation.pixel_aspect_V))
         {
-            fb.newAttribute("DPX-Source/VerticalPixelAspect",
-                            header.orientation.pixel_aspect_V);
+            fb.newAttribute("DPX-Source/VerticalPixelAspect", header.orientation.pixel_aspect_V);
         }
 
         if (hasData(header.orientation.pixel_aspect_H))
         {
-            fb.newAttribute("DPX-Source/HorizontalPixelAspect",
-                            header.orientation.pixel_aspect_H);
+            fb.newAttribute("DPX-Source/HorizontalPixelAspect", header.orientation.pixel_aspect_H);
         }
 
-        fb.newAttribute(
-            "DPX/Orientation",
-            string(nameForValue(orientation, header.image.orientation)));
+        fb.newAttribute("DPX/Orientation", string(nameForValue(orientation, header.image.orientation)));
 
-        setAttr(fb, "DPX-Source/InputSerialNumber",
-                header.orientation.input_serial, 32);
+        setAttr(fb, "DPX-Source/InputSerialNumber", header.orientation.input_serial, 32);
         setAttr(fb, "DPX-Source/InputDevice", header.orientation.input_dev, 32);
-        setAttr(fb, "DPX-Source/CreationTime", header.orientation.creation_time,
-                24);
+        setAttr(fb, "DPX-Source/CreationTime", header.orientation.creation_time, 24);
         setAttr(fb, "DPX-Source/FileName", header.orientation.file_name, 100);
         fb.newAttribute("DPX/DataOffset", int(header.file.offset));
         setAttr(fb, "DPX/Copyright", header.file.copyright, 200);
@@ -1085,15 +977,13 @@ static const char* read(IOdpx::DPXHeader& h, const char* p)
 
         try
         {
-            FileStream fmap(filename, FileStream::MemoryMap, m_iosize,
-                            m_iomaxAsync);
+            FileStream fmap(filename, FileStream::MemoryMap, m_iosize, m_iomaxAsync);
             data = (const unsigned char*)fmap.data();
             memcpy((char*)&header, data, sizeof(DPXHeader));
         }
         catch (...)
         {
-            FileStream fmap(filename, 0, sizeof(DPXHeader),
-                            FileStream::Buffering, m_iosize, m_iomaxAsync);
+            FileStream fmap(filename, 0, sizeof(DPXHeader), FileStream::Buffering, m_iosize, m_iomaxAsync);
             data = (const unsigned char*)fmap.data();
             memcpy((char*)&header, data, sizeof(DPXHeader));
         }
@@ -1112,17 +1002,14 @@ static const char* read(IOdpx::DPXHeader& h, const char* p)
                 //  cineon file. So just pretend like it works
                 //
 
-                IOcin cin(IOcin::StorageFormat(m_format), m_useChromaticities,
-                          IOcin::IOType(m_iotype), m_iosize, m_iomaxAsync);
+                IOcin cin(IOcin::StorageFormat(m_format), m_useChromaticities, IOcin::IOType(m_iotype), m_iosize, m_iomaxAsync);
 
                 cin.getImageInfo(filename, fbi);
                 return;
             }
             else
             {
-                TWK_THROW_STREAM(IOException, "DPX: cannot open "
-                                                  << filename
-                                                  << " -- bad magic number");
+                TWK_THROW_STREAM(IOException, "DPX: cannot open " << filename << " -- bad magic number");
             }
         }
 
@@ -1131,9 +1018,7 @@ static const char* read(IOdpx::DPXHeader& h, const char* p)
         const U32 fmt = header.image.image_element[0].descriptor;
         const bool packedYUV = fmt == IOdpx::DPX_PIXEL_CbYCrY_422;
         const bool alpha = fmt == IOdpx::DPX_PIXEL_RGBA;
-        const bool threeOrFourChannel = packedYUV
-                                        || fmt == IOdpx::DPX_PIXEL_RGBA
-                                        || fmt == IOdpx::DPX_PIXEL_RGB;
+        const bool threeOrFourChannel = packedYUV || fmt == IOdpx::DPX_PIXEL_RGBA || fmt == IOdpx::DPX_PIXEL_RGB;
 
         if (numImages > 1)
         {
@@ -1145,37 +1030,30 @@ static const char* read(IOdpx::DPXHeader& h, const char* p)
             }
         }
 
-        if (inputBits == 10
-            && header.image.image_element[0].packing == IOdpx::DPX_PAD_NONE)
+        if (inputBits == 10 && header.image.image_element[0].packing == IOdpx::DPX_PAD_NONE)
         {
             //  Some writers just put 0s in header, but we can't read "unfilled"
             //  10bit pixels anyway, so try LSB Filling.
 
-            cerr << "WARNING: DPX metadata specifies unaligned pixels: ignoring"
-                 << endl;
+            cerr << "WARNING: DPX metadata specifies unaligned pixels: ignoring" << endl;
             header.image.image_element[0].packing = IOdpx::DPX_PAD_LSB_WORD;
         }
 
         const U16 packing0 = header.image.image_element[0].packing;
 
-        if (((inputBits == 10 || inputBits == 12)
-             && packing0 == IOdpx::DPX_PAD_MSB_WORD)
-            || inputBits == 32 || inputBits == 64 || !threeOrFourChannel)
+        if (((inputBits == 10 || inputBits == 12) && packing0 == IOdpx::DPX_PAD_MSB_WORD) || inputBits == 32 || inputBits == 64
+            || !threeOrFourChannel)
         {
-            TWK_THROW_STREAM(UnsupportedException,
-                             "DPX: unsupported internal layout " << filename);
+            TWK_THROW_STREAM(UnsupportedException, "DPX: unsupported internal layout " << filename);
         }
 
         fbi.width = header.image.pixels_per_line;
         fbi.height = header.image.lines_per_image_ele;
 
-        if (hasData(header.orientation.pixel_aspect_H)
-            && hasData(header.orientation.pixel_aspect_V)
-            && header.orientation.pixel_aspect_H != 0
-            && header.orientation.pixel_aspect_V != 0)
+        if (hasData(header.orientation.pixel_aspect_H) && hasData(header.orientation.pixel_aspect_V)
+            && header.orientation.pixel_aspect_H != 0 && header.orientation.pixel_aspect_V != 0)
         {
-            fbi.pixelAspect = double(header.orientation.pixel_aspect_H)
-                              / double(header.orientation.pixel_aspect_V);
+            fbi.pixelAspect = double(header.orientation.pixel_aspect_H) / double(header.orientation.pixel_aspect_V);
         }
         else
         {
@@ -1240,12 +1118,9 @@ static const char* read(IOdpx::DPXHeader& h, const char* p)
         fbi.numChannels = fbi.proxy.attribute<int>("ChannelsInFile");
     }
 
-    void IOdpx::readImages(FrameBufferVector& fbs, const std::string& filename,
-                           const ReadRequest& request) const
+    void IOdpx::readImages(FrameBufferVector& fbs, const std::string& filename, const ReadRequest& request) const
     {
-        FileStream::Type ftype = m_iotype == StandardIO
-                                     ? FileStream::Buffering
-                                     : (FileStream::Type)(m_iotype - 1);
+        FileStream::Type ftype = m_iotype == StandardIO ? FileStream::Buffering : (FileStream::Type)(m_iotype - 1);
 
         FileStream fstream(filename, ftype, m_iosize, m_iomaxAsync);
 
@@ -1267,13 +1142,11 @@ static const char* read(IOdpx::DPXHeader& h, const char* p)
                 //  Its a Cineon file
                 //
 
-                IOcin cin(IOcin::StorageFormat(m_format), m_useChromaticities,
-                          IOcin::IOType(m_iotype), m_iosize, m_iomaxAsync);
+                IOcin cin(IOcin::StorageFormat(m_format), m_useChromaticities, IOcin::IOType(m_iotype), m_iosize, m_iomaxAsync);
 
                 fbs.push_back(new FrameBuffer());
                 cin.readImage(fstream, *fbs.front(), filename, request);
-                fbs.front()->attribute<string>("IOdpx/WARNING") =
-                    "File is actually a Cineon file";
+                fbs.front()->attribute<string>("IOdpx/WARNING") = "File is actually a Cineon file";
                 return;
             }
             else
@@ -1317,28 +1190,23 @@ static const char* read(IOdpx::DPXHeader& h, const char* p)
 
             if (maxData == 0)
             {
-                TWK_THROW_STREAM(IOException,
-                                 "DPX: file truncated: " << filename);
+                TWK_THROW_STREAM(IOException, "DPX: file truncated: " << filename);
             }
 
             const int inputBits = int(header.image.image_element[i].bit_size);
             const U32 fmt = header.image.image_element[i].descriptor;
             const bool alpha = fmt == IOdpx::DPX_PIXEL_RGBA;
             const bool packedYUV = fmt == IOdpx::DPX_PIXEL_CbYCrY_422;
-            const bool threeOrFourChannel = packedYUV
-                                            || fmt == IOdpx::DPX_PIXEL_RGBA
-                                            || fmt == IOdpx::DPX_PIXEL_RGB;
+            const bool threeOrFourChannel = packedYUV || fmt == IOdpx::DPX_PIXEL_RGBA || fmt == IOdpx::DPX_PIXEL_RGB;
             const int w = header.image.pixels_per_line;
             const int h = header.image.lines_per_image_ele;
             U16 packing = header.image.image_element[i].packing;
 
-            data = (unsigned char*)fstream.data()
-                   + header.image.image_element[i].data_offset;
+            data = (unsigned char*)fstream.data() + header.image.image_element[i].data_offset;
 
             bool badPadding = false;
 
-            if (inputBits == 10 && packing == IOdpx::DPX_PAD_NONE
-                && // DPX_PAD_NONE == 0
+            if (inputBits == 10 && packing == IOdpx::DPX_PAD_NONE && // DPX_PAD_NONE == 0
                 maxData == (w * h * sizeof(U32)))
             {
                 //
@@ -1356,13 +1224,10 @@ static const char* read(IOdpx::DPXHeader& h, const char* p)
                 readerComment << "Assumed LSB padding from data size" << endl;
             }
 
-            if (((inputBits == 10 || inputBits == 12)
-                 && packing == IOdpx::DPX_PAD_MSB_WORD)
-                || inputBits == 32 || inputBits == 64 || !threeOrFourChannel)
+            if (((inputBits == 10 || inputBits == 12) && packing == IOdpx::DPX_PAD_MSB_WORD) || inputBits == 32 || inputBits == 64
+                || !threeOrFourChannel)
             {
-                TWK_THROW_STREAM(UnsupportedException,
-                                 "DPX: unsupported internal layout "
-                                     << filename);
+                TWK_THROW_STREAM(UnsupportedException, "DPX: unsupported internal layout " << filename);
             }
 
             //
@@ -1376,8 +1241,7 @@ static const char* read(IOdpx::DPXHeader& h, const char* p)
             //
 
             const size_t alignment = size_t(data) & 0xFFF;
-            const bool canUseRaw =
-                size_t(data) % 16 == 0 && m_iotype != MemoryMappedIO;
+            const bool canUseRaw = size_t(data) % 16 == 0 && m_iotype != MemoryMappedIO;
             bool didUseRaw = false;
 
             bool readit = false;
@@ -1390,8 +1254,7 @@ static const char* read(IOdpx::DPXHeader& h, const char* p)
 
                     if (packedYUV)
                     {
-                        Read10Bit::readYCrYCb8_422_PLANAR(filename, data, fb, w,
-                                                          h, maxData, swap);
+                        Read10Bit::readYCrYCb8_422_PLANAR(filename, data, fb, w, h, maxData, swap);
                         readit = true;
                     }
                     else
@@ -1402,41 +1265,34 @@ static const char* read(IOdpx::DPXHeader& h, const char* p)
                         case RGB8:
                         {
                             if (alpha)
-                                Read10Bit::readRGBA8(filename, data, fb, w, h,
-                                                     maxData, true, swap);
+                                Read10Bit::readRGBA8(filename, data, fb, w, h, maxData, true, swap);
                             else
-                                Read10Bit::readRGB8(filename, data, fb, w, h,
-                                                    maxData, swap);
+                                Read10Bit::readRGB8(filename, data, fb, w, h, maxData, swap);
                             readit = true;
                             break;
                         }
                         case RGBA8:
-                            Read10Bit::readRGBA8(filename, data, fb, w, h,
-                                                 maxData, alpha, swap);
+                            Read10Bit::readRGBA8(filename, data, fb, w, h, maxData, alpha, swap);
                             readit = true;
                             break;
                         case RGB16:
                         {
                             if (alpha)
-                                Read10Bit::readRGBA16(filename, data, fb, w, h,
-                                                      maxData, alpha, swap);
+                                Read10Bit::readRGBA16(filename, data, fb, w, h, maxData, alpha, swap);
                             else
-                                Read10Bit::readRGB16(filename, data, fb, w, h,
-                                                     maxData, swap);
+                                Read10Bit::readRGB16(filename, data, fb, w, h, maxData, swap);
                             readit = true;
                             break;
                         }
                         case RGBA16:
-                            Read10Bit::readRGBA16(filename, data, fb, w, h,
-                                                  maxData, alpha, swap);
+                            Read10Bit::readRGBA16(filename, data, fb, w, h, maxData, alpha, swap);
                             readit = true;
                             break;
                         case RGB10_A2:
                         {
                             if (alpha)
                             {
-                                Read10Bit::readRGBA8(filename, data, fb, w, h,
-                                                     maxData, true, swap);
+                                Read10Bit::readRGBA8(filename, data, fb, w, h, maxData, true, swap);
                                 nonspec = true;
                             }
                             else
@@ -1446,13 +1302,10 @@ static const char* read(IOdpx::DPXHeader& h, const char* p)
                                 // we cannot use raw directly.
                                 //
 
-                                const bool partial =
-                                    size_t(4 * w * h) > maxData;
+                                const bool partial = size_t(4 * w * h) > maxData;
                                 didUseRaw = canUseRaw && !partial;
 
-                                Read10Bit::readRGB10_A2(
-                                    filename, data, fb, w, h, maxData, swap,
-                                    didUseRaw, (unsigned char*)fstream.data());
+                                Read10Bit::readRGB10_A2(filename, data, fb, w, h, maxData, swap, didUseRaw, (unsigned char*)fstream.data());
                             }
 
                             readit = true;
@@ -1462,16 +1315,14 @@ static const char* read(IOdpx::DPXHeader& h, const char* p)
                         {
                             if (alpha)
                             {
-                                Read10Bit::readRGBA8(filename, data, fb, w, h,
-                                                     maxData, true, swap);
+                                Read10Bit::readRGBA8(filename, data, fb, w, h, maxData, true, swap);
                                 nonspec = true;
                             }
                             else
                             {
                                 didUseRaw = false;
 
-                                Read10Bit::readA2_BGR10(filename, data, fb, w,
-                                                        h, maxData, swap);
+                                Read10Bit::readA2_BGR10(filename, data, fb, w, h, maxData, swap);
                             }
 
                             readit = true;
@@ -1481,14 +1332,12 @@ static const char* read(IOdpx::DPXHeader& h, const char* p)
                         {
                             if (alpha)
                             {
-                                Read10Bit::readRGBA8(filename, data, fb, w, h,
-                                                     maxData, true, swap);
+                                Read10Bit::readRGBA8(filename, data, fb, w, h, maxData, true, swap);
                                 nonspec = true;
                             }
                             else
                             {
-                                Read10Bit::readRGB8_PLANAR(filename, data, fb,
-                                                           w, h, maxData, swap);
+                                Read10Bit::readRGB8_PLANAR(filename, data, fb, w, h, maxData, swap);
                             }
 
                             readit = true;
@@ -1498,14 +1347,12 @@ static const char* read(IOdpx::DPXHeader& h, const char* p)
                         {
                             if (alpha)
                             {
-                                Read10Bit::readRGBA8(filename, data, fb, w, h,
-                                                     maxData, true, swap);
+                                Read10Bit::readRGBA8(filename, data, fb, w, h, maxData, true, swap);
                                 nonspec = true;
                             }
                             else
                             {
-                                Read10Bit::readRGB16_PLANAR(
-                                    filename, data, fb, w, h, maxData, swap);
+                                Read10Bit::readRGB16_PLANAR(filename, data, fb, w, h, maxData, swap);
                             }
 
                             readit = true;
@@ -1521,16 +1368,14 @@ static const char* read(IOdpx::DPXHeader& h, const char* p)
 
                     if (nonspec)
                     {
-                        readerComment << "Used non-spec scanline boundaries."
-                                      << endl;
+                        readerComment << "Used non-spec scanline boundaries." << endl;
                     }
                 }
                 else if (inputBits == 12)
                 {
                     if (packing == IOdpx::DPX_PAD_NONE)
                     {
-                        Read12Bit::readNoPaddingRGB16(filename, data, fb, w, h,
-                                                      maxData, swap);
+                        Read12Bit::readNoPaddingRGB16(filename, data, fb, w, h, maxData, swap);
                     }
                     else
                     {
@@ -1540,16 +1385,14 @@ static const char* read(IOdpx::DPXHeader& h, const char* p)
                         case RGB8:
                         case RGBA8:
                         case RGB8_PLANAR:
-                            Read12Bit::readRGB8_PLANAR(filename, data, fb, w, h,
-                                                       maxData, swap);
+                            Read12Bit::readRGB8_PLANAR(filename, data, fb, w, h, maxData, swap);
                             break;
                         case RGB10_A2:
                         case A2_BGR10:
                         case RGB16:
                         case RGBA16:
                         case RGB16_PLANAR:
-                            Read12Bit::readRGB16_PLANAR(filename, data, fb, w,
-                                                        h, maxData, swap);
+                            Read12Bit::readRGB16_PLANAR(filename, data, fb, w, h, maxData, swap);
                             break;
                         }
 
@@ -1569,14 +1412,11 @@ static const char* read(IOdpx::DPXHeader& h, const char* p)
                         {
                             didUseRaw = true;
 
-                            Read16Bit::readRGBA16(
-                                filename, data, fb, w, h, maxData, true, swap,
-                                didUseRaw, (unsigned char*)fstream.data());
+                            Read16Bit::readRGBA16(filename, data, fb, w, h, maxData, true, swap, didUseRaw, (unsigned char*)fstream.data());
                         }
                         else
                         {
-                            Read16Bit::readRGBA16(filename, data, fb, w, h,
-                                                  maxData, true, swap);
+                            Read16Bit::readRGBA16(filename, data, fb, w, h, maxData, true, swap);
                         }
 
                         readit = true;
@@ -1590,14 +1430,11 @@ static const char* read(IOdpx::DPXHeader& h, const char* p)
                         if (m_format == RGB16 && canUseRaw && !partial)
                         {
                             didUseRaw = true;
-                            Read16Bit::readRGB16(
-                                filename, data, fb, w, h, maxData, swap,
-                                didUseRaw, (unsigned char*)fstream.data());
+                            Read16Bit::readRGB16(filename, data, fb, w, h, maxData, swap, didUseRaw, (unsigned char*)fstream.data());
                         }
                         else
                         {
-                            Read16Bit::readRGB16_PLANAR(filename, data, fb, w,
-                                                        h, maxData, swap);
+                            Read16Bit::readRGB16_PLANAR(filename, data, fb, w, h, maxData, swap);
                         }
 
                         if (partial)
@@ -1613,14 +1450,11 @@ static const char* read(IOdpx::DPXHeader& h, const char* p)
                         if (canUseRaw && !partial)
                         {
                             didUseRaw = true;
-                            Read8Bit::readRGBA8(filename, data, fb, w, h,
-                                                maxData, swap, didUseRaw,
-                                                (unsigned char*)fstream.data());
+                            Read8Bit::readRGBA8(filename, data, fb, w, h, maxData, swap, didUseRaw, (unsigned char*)fstream.data());
                         }
                         else
                         {
-                            Read8Bit::readRGBA8(filename, data, fb, w, h,
-                                                maxData, swap);
+                            Read8Bit::readRGBA8(filename, data, fb, w, h, maxData, swap);
                         }
 
                         if (partial)
@@ -1635,8 +1469,7 @@ static const char* read(IOdpx::DPXHeader& h, const char* p)
 
                         const bool partial = (w * h * 3) > maxData;
 
-                        Read8Bit::readRGB8_PLANAR(filename, data, fb, w, h,
-                                                  maxData, swap);
+                        Read8Bit::readRGB8_PLANAR(filename, data, fb, w, h, maxData, swap);
 
                         if (partial)
                             fb.attribute<float>("PartialImage") = 1.0;
@@ -1695,8 +1528,7 @@ static const char* read(IOdpx::DPXHeader& h, const char* p)
 
             readAttrs(fb, header, i);
 
-            if (!readit && fb.hasAttribute("ChannelsInFile")
-                && 4 == fb.attribute<int>("ChannelsInFile"))
+            if (!readit && fb.hasAttribute("ChannelsInFile") && 4 == fb.attribute<int>("ChannelsInFile"))
             {
                 cerr << "WARNING: This type of RGBA DPX file is not currently "
                         "supported."
@@ -1705,8 +1537,7 @@ static const char* read(IOdpx::DPXHeader& h, const char* p)
         }
     }
 
-    void IOdpx::writeImage(const FrameBuffer& img, const std::string& filename,
-                           const WriteRequest& request) const
+    void IOdpx::writeImage(const FrameBuffer& img, const std::string& filename, const WriteRequest& request) const
     {
         int bits = 10;
         float fps = 24.0;
@@ -2000,15 +1831,11 @@ static const char* read(IOdpx::DPXHeader& h, const char* p)
                 film_slate_info = value;
             else if (name == "tv/time_code")
             {
-                tv_tim_code = framesToU32TC(
-                    U32TCToFrames(timeCodeStringToU32TC(value), fps) + fpos,
-                    fps);
+                tv_tim_code = framesToU32TC(U32TCToFrames(timeCodeStringToU32TC(value), fps) + fpos, fps);
             }
             else if (name == "tv/user_bits")
             {
-                tv_userBits = framesToU32TC(
-                    U32TCToFrames(timeCodeStringToU32TC(value), fps) + fpos,
-                    fps);
+                tv_userBits = framesToU32TC(U32TCToFrames(timeCodeStringToU32TC(value), fps) + fpos, fps);
             }
             else if (name == "tv/interlace")
                 tv_interlace = atoi(value.c_str());
@@ -2064,11 +1891,9 @@ static const char* read(IOdpx::DPXHeader& h, const char* p)
                 o_border_YT = atoi(value.c_str());
             else if (name == "source/border_YB")
                 o_border_YB = atoi(value.c_str());
-            else if (name == "output/pa/numerator"
-                     || name == "source/pixel_aspect_H")
+            else if (name == "output/pa/numerator" || name == "source/pixel_aspect_H")
                 o_pixel_aspect_H = atoi(value.c_str());
-            else if (name == "output/pa/denominator"
-                     || name == "source/pixel_aspect_V")
+            else if (name == "output/pa/denominator" || name == "source/pixel_aspect_V")
                 o_pixel_aspect_V = atoi(value.c_str());
         }
 
@@ -2088,8 +1913,7 @@ static const char* read(IOdpx::DPXHeader& h, const char* p)
         //  Convert color to REC709 primaries
         //
 
-        if (outfb->hasPrimaries() || outfb->isYUV() || outfb->isYRYBY()
-            || outfb->dataType() >= FrameBuffer::PACKED_R10_G10_B10_X2)
+        if (outfb->hasPrimaries() || outfb->isYUV() || outfb->isYRYBY() || outfb->dataType() >= FrameBuffer::PACKED_R10_G10_B10_X2)
         {
             const FrameBuffer* fb = outfb;
             outfb = convertToLinearRGB709(outfb);
@@ -2102,8 +1926,7 @@ static const char* read(IOdpx::DPXHeader& h, const char* p)
         //  Convert to 3 channel, RGB
         //
 
-        if (img.channelNames().size() != 3 || img.channelName(0) != "R"
-            || img.channelName(1) != "G" || img.channelName(2) != "B")
+        if (img.channelNames().size() != 3 || img.channelName(0) != "R" || img.channelName(1) != "G" || img.channelName(2) != "B")
         {
             const FrameBuffer* fb = outfb;
             vector<string> mapping;
@@ -2130,8 +1953,7 @@ static const char* read(IOdpx::DPXHeader& h, const char* p)
             break;
         }
 
-        const size_t imageDataInBytes =
-            outfb->width() * outfb->height() * sizeof(U32);
+        const size_t imageDataInBytes = outfb->width() * outfb->height() * sizeof(U32);
 
         //
         //  HEADERS
@@ -2156,11 +1978,8 @@ static const char* read(IOdpx::DPXHeader& h, const char* p)
         header.file.ditto_key = 1; // new
         header.file.key = 0xFFFFFFFF;
         header.file.user_data_size = 0;
-        header.file.gen_hdr_size = sizeof(DPXFileInformation)
-                                   + sizeof(DPXImageInformation)
-                                   + sizeof(DPXImageOrientation); // FIX
-        header.file.ind_hdr_size =
-            sizeof(DPXFilmHeader) + sizeof(DPXTelevisionHeader); // FIX
+        header.file.gen_hdr_size = sizeof(DPXFileInformation) + sizeof(DPXImageInformation) + sizeof(DPXImageOrientation); // FIX
+        header.file.ind_hdr_size = sizeof(DPXFilmHeader) + sizeof(DPXTelevisionHeader);                                    // FIX
 
         setField(header.file.vers, 8, "V2.0");
         setField(header.file.file_name, 100, filename);
@@ -2334,18 +2153,10 @@ static const char* read(IOdpx::DPXHeader& h, const char* p)
         header.orientation.border_YB = o_border_YB;
         header.orientation.pixel_aspect_H = o_pixel_aspect_H;
         header.orientation.pixel_aspect_V = o_pixel_aspect_V;
-        header.orientation.x_center = (!hasData(o_x_center))
-                                          ? header.image.pixels_per_line / 2
-                                          : o_x_center;
-        header.orientation.y_center = (!hasData(o_y_center))
-                                          ? header.image.lines_per_image_ele / 2
-                                          : o_y_center;
-        header.orientation.x_orig_size = (!hasData(o_x_orig_size))
-                                             ? header.image.pixels_per_line
-                                             : o_x_orig_size;
-        header.orientation.y_orig_size = (!hasData(o_y_orig_size))
-                                             ? header.image.lines_per_image_ele
-                                             : o_y_orig_size;
+        header.orientation.x_center = (!hasData(o_x_center)) ? header.image.pixels_per_line / 2 : o_x_center;
+        header.orientation.y_center = (!hasData(o_y_center)) ? header.image.lines_per_image_ele / 2 : o_y_center;
+        header.orientation.x_orig_size = (!hasData(o_x_orig_size)) ? header.image.pixels_per_line : o_x_orig_size;
+        header.orientation.y_orig_size = (!hasData(o_y_orig_size)) ? header.image.lines_per_image_ele : o_y_orig_size;
 
         setField(header.orientation.file_name, 100, o_file_name);
         setField(header.orientation.creation_time, 24, o_creation_time);
@@ -2424,8 +2235,7 @@ static const char* read(IOdpx::DPXHeader& h, const char* p)
             {
                 size_t index = doflip ? outfb->height() - i - 1 : i;
 
-                const unsigned short* in =
-                    outfb->scanline<unsigned short>(index);
+                const unsigned short* in = outfb->scanline<unsigned short>(index);
                 OutputPixel* out = o;
                 const unsigned short* e = in + (outfb->width() * ch);
 

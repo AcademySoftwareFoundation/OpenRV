@@ -37,8 +37,7 @@ namespace TwkUtil
         //
         // @return modified generic JobData
         //
-        template <typename JobDataType>
-        JobDataType update(Id id, OpType op, JobDataType info);
+        template <typename JobDataType> JobDataType update(Id id, OpType op, JobDataType info);
     } // namespace JobOps
 
     /// @brief Dispatches a Job to a thread-pool and notifies on state change
@@ -114,8 +113,7 @@ namespace TwkUtil
         /// @param threadName Name to set on the threads. Threads will
         //               have an index appended to the name.
         ///
-        explicit JobDispatcher(unsigned maxJobs,
-                               const char* threadName = nullptr);
+        explicit JobDispatcher(unsigned maxJobs, const char* threadName = nullptr);
 
         /// @brief destructor
         ///
@@ -168,12 +166,9 @@ namespace TwkUtil
         ///         dependencies in jobs that are added. Not doing so can cause
         ///         deadlock.
         ///
-        template <typename JobDataType>
-        JobOps::Id addJob(const JobDataType& jobInfo,
-                          JobOps::Id dependency = JobOps::NO_DEPENDENCY)
+        template <typename JobDataType> JobOps::Id addJob(const JobDataType& jobInfo, JobOps::Id dependency = JobOps::NO_DEPENDENCY)
         {
-            return addJob(
-                JobBase::Ptr(new Job<JobDataType>(jobInfo, dependency)));
+            return addJob(JobBase::Ptr(new Job<JobDataType>(jobInfo, dependency)));
         }
 
         /// @brief Dequeue the job for execution by the thread pool

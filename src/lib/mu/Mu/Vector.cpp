@@ -12,10 +12,6 @@ namespace Mu
 {
     using namespace std;
 
-    ostream& operator<<(ostream& o, const Vector4f& v)
-    {
-        return o << "<" << v[0] << ", " << v[1] << ", " << v[2] << ", " << v[3]
-                 << ">";
-    }
+    ostream& operator<<(ostream& o, const Vector4f& v) { return o << "<" << v[0] << ", " << v[1] << ", " << v[2] << ", " << v[3] << ">"; }
 
 } // namespace Mu

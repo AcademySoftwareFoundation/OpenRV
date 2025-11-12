@@ -28,11 +28,9 @@ namespace IPCore
     using namespace std;
     using namespace boost;
 
-    NodeDefinition::NodeDefinition(const string& typeName, unsigned int version,
-                                   bool isGroup, const string& defaultName,
-                                   NodeConstructor constructor,
-                                   const string& summary, const string& html,
-                                   ByteVector iconRGBA, bool userVisible)
+    NodeDefinition::NodeDefinition(const string& typeName, unsigned int version, bool isGroup, const string& defaultName,
+                                   NodeConstructor constructor, const string& summary, const string& html, ByteVector iconRGBA,
+                                   bool userVisible)
         : TwkContainer::PropertyContainer()
         , m_constructor(constructor)
         , m_type(InternalNodeType)
@@ -45,8 +43,7 @@ namespace IPCore
         declareProperty<IntProperty>("node.version", int(version));
         declareProperty<IntProperty>("node.isGroup", int(isGroup ? 1 : 0));
         declareProperty<StringProperty>("node.defaultName", defaultName);
-        declareProperty<StringProperty>("node.evaluationType",
-                                        isGroup ? "group" : "merge");
+        declareProperty<StringProperty>("node.evaluationType", isGroup ? "group" : "merge");
         declareProperty<StringProperty>("node.author", "internal");
         declareProperty<StringProperty>("node.company", "");
         declareProperty<StringProperty>("node.comment", "");
@@ -76,14 +73,12 @@ namespace IPCore
 
             if (version != 1)
             {
-                cout << "WARNING: node definition version " << version
-                     << " is newer than version 1 for " << objName << endl;
+                cout << "WARNING: node definition version " << version << " is newer than version 1 for " << objName << endl;
             }
         }
         else if (protocol == "Dynamic")
         {
-            objName = pc->propertyValue<StringProperty>(
-                "node.name", "AGoodNameForANodeType");
+            objName = pc->propertyValue<StringProperty>("node.name", "AGoodNameForANodeType");
             setName(objName);
             setProtocol("IPNodeDefinition");
             setProtocolVersion(1);
@@ -99,8 +94,7 @@ namespace IPCore
 
             if (version != 1)
             {
-                cout << "WARNING: group node definition version " << version
-                     << " is newer than version 1 for " << objName << endl;
+                cout << "WARNING: group node definition version " << version << " is newer than version 1 for " << objName << endl;
             }
         }
         else
@@ -113,8 +107,7 @@ namespace IPCore
         declareProperty<IntProperty>("node.version", 1, 0, false);
         declareProperty<IntProperty>("node.isGroup", 0, 0, false);
         declareProperty<StringProperty>("node.defaultName", "node", 0, false);
-        declareProperty<StringProperty>("node.evaluationType", "merge", 0,
-                                        false);
+        declareProperty<StringProperty>("node.evaluationType", "merge", 0, false);
         declareProperty<StringProperty>("node.author", "", 0, false);
         declareProperty<StringProperty>("node.company", "", 0, false);
         declareProperty<StringProperty>("node.comment", "", 0, false);
@@ -146,8 +139,7 @@ namespace IPCore
         m_function = 0;
     }
 
-    IPNode* NodeDefinition::newNode(const std::string& name, IPGraph* graph,
-                                    GroupIPNode* group) const
+    IPNode* NodeDefinition::newNode(const std::string& name, IPGraph* graph, GroupIPNode* group) const
     {
         IPNode* node = 0;
 
@@ -168,8 +160,7 @@ namespace IPCore
 
             if (ntype == "transition")
             {
-                node =
-                    new TransitionIPInstanceNode(nodeName, this, graph, group);
+                node = new TransitionIPInstanceNode(nodeName, this, graph, group);
             }
             else if (ntype == "color")
             {
@@ -189,9 +180,7 @@ namespace IPCore
             }
             else
             {
-                TWK_THROW_EXC_STREAM("unknown node.evaluationType \""
-                                     << ntype << "\" for definition "
-                                     << this->name());
+                TWK_THROW_EXC_STREAM("unknown node.evaluationType \"" << ntype << "\" for definition " << this->name());
             }
         }
         break;
@@ -230,8 +219,7 @@ namespace IPCore
         return node;
     }
 
-    string NodeDefinition::stringValue(const string& name,
-                                       const string& defaultValue) const
+    string NodeDefinition::stringValue(const string& name, const string& defaultValue) const
     {
         return propertyValue<StringProperty>(name, defaultValue);
     }
@@ -246,20 +234,11 @@ namespace IPCore
         return vector<string>();
     }
 
-    void NodeDefinition::setString(const string& name, const string& value)
-    {
-        setProperty<StringProperty>(name, value);
-    }
+    void NodeDefinition::setString(const string& name, const string& value) { setProperty<StringProperty>(name, value); }
 
-    int NodeDefinition::intValue(const string& name, int defaultValue) const
-    {
-        return propertyValue<IntProperty>(name, defaultValue);
-    }
+    int NodeDefinition::intValue(const string& name, int defaultValue) const { return propertyValue<IntProperty>(name, defaultValue); }
 
-    void NodeDefinition::setInt(const string& name, int value)
-    {
-        setProperty<IntProperty>(name, value);
-    }
+    void NodeDefinition::setInt(const string& name, int value) { setProperty<IntProperty>(name, value); }
 
     bool NodeDefinition::reify()
     {
@@ -309,8 +288,7 @@ namespace IPCore
                 if (varName == "HERE")
                 {
                     boost::filesystem::path p = origin;
-                    fileName = regex_replace(fileName, varRE,
-                                             p.parent_path().string());
+                    fileName = regex_replace(fileName, varRE, p.parent_path().string());
                 }
                 else if (const char* value = getenv(varName.c_str()))
                 {
@@ -344,8 +322,7 @@ namespace IPCore
             //  continuing, but whatever. This *should* be a rare case.
             //
 
-            if (source.size() > 3 && source[0] == string::value_type(0xEF)
-                && source[1] == string::value_type(0xBB)
+            if (source.size() > 3 && source[0] == string::value_type(0xEF) && source[1] == string::value_type(0xBB)
                 && source[2] == string::value_type(0xBF))
             {
                 source.erase(0, 3);
@@ -419,8 +396,7 @@ namespace IPCore
 
         try
         {
-            f = new Shader::Function(fname, source, type,
-                                     intValue("function.fetches"), docs);
+            f = new Shader::Function(fname, source, type, intValue("function.fetches"), docs);
 
             if (type == Shader::Function::UndecidedType)
             {
@@ -487,16 +463,13 @@ namespace IPCore
             {
                 // nothing
             }
-            else if (evalType != "transition" && evalType != "merge"
-                     && f->imageParameters().size() > 1)
+            else if (evalType != "transition" && evalType != "merge" && f->imageParameters().size() > 1)
             {
                 setString("node.evaluationType", "merge");
             }
             else if (eguess != evalType
-                     && (((evalType == "color" || evalType == "filter")
-                          && eguess == "merge")
-                         || (evalType == "filter" && eguess != "filter")
-                         || (evalType == "transition" && eguess == "generator")
+                     && (((evalType == "color" || evalType == "filter") && eguess == "merge")
+                         || (evalType == "filter" && eguess != "filter") || (evalType == "transition" && eguess == "generator")
                          || (evalType == "color" && eguess == "filter")))
             {
                 setString("node.evaluationType", eguess);
@@ -506,8 +479,7 @@ namespace IPCore
         {
             ostringstream str;
             str << "ERROR: " << exc.what();
-            declareProperty<StringProperty>("error.message", str.str(), 0,
-                                            true);
+            declareProperty<StringProperty>("error.message", str.str(), 0, true);
             cout << "ERROR: failed to build/parse function " << fname << endl;
             f = NULL;
         }
@@ -515,8 +487,7 @@ namespace IPCore
         {
             ostringstream str;
             str << "ERROR: failed to build/parse function " << fname << endl;
-            declareProperty<StringProperty>("error.message", str.str(), 0,
-                                            true);
+            declareProperty<StringProperty>("error.message", str.str(), 0, true);
             cout << "ERROR: failed to build/parse function " << fname << endl;
             f = NULL;
         }
@@ -539,8 +510,7 @@ namespace IPCore
 
         if (!m_function->equivalentInterface(f))
         {
-            cerr << "ERROR: rebuilt shader for '" << name()
-                 << "' has different interface." << endl;
+            cerr << "ERROR: rebuilt shader for '" << name() << "' has different interface." << endl;
             return false;
         }
 

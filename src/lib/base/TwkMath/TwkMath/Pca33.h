@@ -93,8 +93,7 @@ namespace TwkMath
     template <typename T> size_t realCubicRoots(T a0, T a1, T a2, T roots[])
     {
         T Q = ((T3 * a1) - (a2 * a2)) / ((T)9);
-        T R = ((((T)9) * a2 * a1) - (((T)27) * a0) - (T2 * a2 * a2 * a2))
-              / ((T)54);
+        T R = ((((T)9) * a2 * a1) - (((T)27) * a0) - (T2 * a2 * a2 * a2)) / ((T)54);
 
         T D = (Q * Q * Q) + (R * R);
 
@@ -148,8 +147,7 @@ namespace TwkMath
 
     //******************************************************************************
     // Finding an eigenvector for a given symmetric matrix
-    template <typename T>
-    Vec3<T> findUnitEigenVector(T A, T B, T C, T D, T E, T F, T Y)
+    template <typename T> Vec3<T> findUnitEigenVector(T A, T B, T C, T D, T E, T F, T Y)
     {
         // The solution if x == 1 for the eigenvector:
         //
@@ -303,9 +301,7 @@ namespace TwkMath
     // D = sum( ( yi - yMean )^2 )
     // E = sum( ( yi - yMean ) * ( zi - zMean ) )
     // F = sum( ( zi - zMean )^2 )
-    template <typename T>
-    void eigenAnalysisOf3x3CovarianceMatrix(T A, T B, T C, T D, T E, T F,
-                                            Vec3<T> vecs[], T vals[])
+    template <typename T> void eigenAnalysisOf3x3CovarianceMatrix(T A, T B, T C, T D, T E, T F, Vec3<T> vecs[], T vals[])
     {
         // See if we can do a 2x2
         Vec2<T> vecs2[2];
@@ -433,8 +429,7 @@ namespace TwkMath
 
         T a2 = (-A - D - F);
         T a1 = ((A * D) + (A * F) + (D * F) - (E * E) - (B * B) - (C * C));
-        T a0 = ((A * E * E) + (F * B * B) + (D * C * C) - (A * D * F)
-                - (T2 * B * C * E));
+        T a0 = ((A * E * E) + (F * B * B) + (D * C * C) - (A * D * F) - (T2 * B * C * E));
         T roots[3] = {T0, T0, T0};
         size_t numRoots = realCubicRoots(a0, a1, a2, roots);
 
@@ -523,8 +518,7 @@ namespace TwkMath
     //******************************************************************************
     // Find the principal components of a 3d point distribution.
     template <class ITER, class VEC, typename TA, typename TB>
-    void principalComponentAnalysis3(ITER begin, ITER end, VEC& mean,
-                                     VEC components[], TA vals[], TB dummy)
+    void principalComponentAnalysis3(ITER begin, ITER end, VEC& mean, VEC components[], TA vals[], TB dummy)
     {
         size_t numVerts = (size_t)(end - begin);
 
@@ -577,8 +571,7 @@ namespace TwkMath
         // Get eigenvectors/values
         Vec3<TB> evecs[3];
         TB evals[3];
-        eigenAnalysisOf3x3CovarianceMatrix(mxx, mxy, mxz, myy, myz, mzz, evecs,
-                                           evals);
+        eigenAnalysisOf3x3CovarianceMatrix(mxx, mxy, mxz, myy, myz, mzz, evecs, evals);
 
         // Put values in
         mean.set(meanD.x, meanD.y, meanD.z);

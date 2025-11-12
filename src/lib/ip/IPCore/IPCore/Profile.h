@@ -61,11 +61,8 @@ namespace IPCore
 
     typedef std::vector<Profile*> ProfileVector;
 
-    void profilesInPath(ProfileVector& profiles, const std::string& tag,
-                        IPGraph*);
-    std::string profileMatchingNameInPath(const std::string& name,
-                                          const std::string& tag,
-                                          IPGraph* graph);
+    void profilesInPath(ProfileVector& profiles, const std::string& tag, IPGraph*);
+    std::string profileMatchingNameInPath(const std::string& name, const std::string& tag, IPGraph* graph);
 
 } // namespace IPCore
 

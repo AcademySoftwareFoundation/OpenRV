@@ -129,8 +129,7 @@ namespace stl_ext
     //
 
     template <class T, class Traits>
-    inline hash_table<T, Traits>::iterator::iterator(
-        hash_table<T, Traits>* table)
+    inline hash_table<T, Traits>::iterator::iterator(hash_table<T, Traits>* table)
         : _table(table)
         , _index(0)
         , _item(0)
@@ -140,8 +139,7 @@ namespace stl_ext
     }
 
     template <class T, class Traits>
-    inline hash_table<T, Traits>::iterator::iterator(
-        hash_table<T, Traits>& table)
+    inline hash_table<T, Traits>::iterator::iterator(hash_table<T, Traits>& table)
         : _table(&table)
         , _index(0)
         , _item(0)
@@ -150,8 +148,7 @@ namespace stl_ext
             this->operator++();
     }
 
-    template <class T, class Traits>
-    void hash_table<T, Traits>::iterator::operator++()
+    template <class T, class Traits> void hash_table<T, Traits>::iterator::operator++()
     {
         if (_item)
             if (!(_item = _item->next()))
@@ -159,24 +156,19 @@ namespace stl_ext
 
         if (!_item && _table)
         {
-            for (; _index < _table->_tableSize && !_table->_table[_index];
-                 _index++)
+            for (; _index < _table->_tableSize && !_table->_table[_index]; _index++)
                 ;
             if (_index < _table->_tableSize)
                 _item = _table->_table[_index];
         }
     }
 
-    template <class T, class Traits>
-    inline bool
-    hash_table<T, Traits>::iterator::operator==(const iterator& i) const
+    template <class T, class Traits> inline bool hash_table<T, Traits>::iterator::operator==(const iterator& i) const
     {
         return bool(*this) == bool(i);
     }
 
-    template <class T, class Traits>
-    inline bool
-    hash_table<T, Traits>::iterator::operator!=(const iterator& i) const
+    template <class T, class Traits> inline bool hash_table<T, Traits>::iterator::operator!=(const iterator& i) const
     {
         return bool(*this) != bool(i);
     }
@@ -215,9 +207,7 @@ namespace stl_ext
         delete[] _table;
     }
 
-    template <class T, class Traits>
-    const typename hash_table<T, Traits>::item*
-    hash_table<T, Traits>::insert(const T& thing)
+    template <class T, class Traits> const typename hash_table<T, Traits>::item* hash_table<T, Traits>::insert(const T& thing)
     {
         if (const item* item = find(thing))
             return item;
@@ -227,8 +217,7 @@ namespace stl_ext
     }
 
     template <class T, class Traits>
-    const typename hash_table<T, Traits>::item*
-    hash_table<T, Traits>::add_item(typename hash_table<T, Traits>::item* item)
+    const typename hash_table<T, Traits>::item* hash_table<T, Traits>::add_item(typename hash_table<T, Traits>::item* item)
     {
         hash_value hashIndex = Traits::hash(item->data()) % _tableSize;
         item->_next = _table[hashIndex];
@@ -236,9 +225,7 @@ namespace stl_ext
         return item;
     }
 
-    template <class T, class Traits>
-    const typename hash_table<T, Traits>::item*
-    hash_table<T, Traits>::find(const T& thing) const
+    template <class T, class Traits> const typename hash_table<T, Traits>::item* hash_table<T, Traits>::find(const T& thing) const
     {
         hash_value hashIndex = Traits::hash(thing) % _tableSize;
 
@@ -249,9 +236,7 @@ namespace stl_ext
     }
 
     template <class T, class Traits>
-    const typename hash_table<T, Traits>::item*
-    hash_table<T, Traits>::first_item_of(
-        typename hash_table<T, Traits>::hash_value h) const
+    const typename hash_table<T, Traits>::item* hash_table<T, Traits>::first_item_of(typename hash_table<T, Traits>::hash_value h) const
     {
         return _table[h % _tableSize];
     }

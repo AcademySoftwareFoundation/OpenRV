@@ -63,8 +63,7 @@ namespace TwkImg
     public:
         typedef COLOR ColorType;
 
-        MipMap(const TwkImg::Image<COLOR>& img, int maxLods = MAX_NUM_LODS,
-               float workGamma = 1.0f);
+        MipMap(const TwkImg::Image<COLOR>& img, int maxLods = MAX_NUM_LODS, float workGamma = 1.0f);
         ~MipMap();
 
         // Basic data access.
@@ -342,8 +341,7 @@ namespace TwkImg
     } // End unnamed namespace
 
     //******************************************************************************
-    template <class COLOR>
-    MipMap<COLOR>::MipMap(const Image<COLOR>& img, int maxLods, float workGamma)
+    template <class COLOR> MipMap<COLOR>::MipMap(const Image<COLOR>& img, int maxLods, float workGamma)
     {
         if (maxLods > MAX_NUM_LODS)
         {
@@ -361,9 +359,7 @@ namespace TwkImg
 
         int dstWidth = m_lods[0]->width();
         int dstHeight = m_lods[0]->height();
-        for (m_numLods = 1;
-             (dstWidth > 1 || dstHeight > 1) && m_numLods <= maxLods;
-             m_numLods++)
+        for (m_numLods = 1; (dstWidth > 1 || dstHeight > 1) && m_numLods <= maxLods; m_numLods++)
         {
             const int srcWidth = dstWidth;
             const int srcHeight = dstHeight;
@@ -447,23 +443,17 @@ namespace TwkImg
             COLOR* src3 = srcRow3;
             COLOR* dst = dstRow;
             COLOR* dstLast = dst + (dstStride - 1);
-            (*dst) = (src3[3]) * corner3x3
-                     + (src1[3] + src2[3] + src3[1] + src3[2]) * edge3x3
+            (*dst) = (src3[3]) * corner3x3 + (src1[3] + src2[3] + src3[1] + src3[2]) * edge3x3
                      + (src1[1] + src1[2] + src2[1] + src2[2]) * center3x3;
 
             // Do the normal pixels of the first row.
             // Increment the pointer in the initializer.
             // We move the src pointers by two because that image
             // is twice as large as we are.
-            for (src0 += 2, src1 += 2, src2 += 2, src3 += 2, dst++;
-                 dst < dstLast;
-                 src0 += 2, src1 += 2, src2 += 2, src3 += 2, dst++)
+            for (src0 += 2, src1 += 2, src2 += 2, src3 += 2, dst++; dst < dstLast; src0 += 2, src1 += 2, src2 += 2, src3 += 2, dst++)
             {
                 // src0 is invalid.
-                (*dst) = (src3[0] + src3[3]) * corner4x3
-                         + (src1[0] + src1[3] + src2[0] + src2[3] + src3[1]
-                            + src3[2])
-                               * edge4x3
+                (*dst) = (src3[0] + src3[3]) * corner4x3 + (src1[0] + src1[3] + src2[0] + src2[3] + src3[1] + src3[2]) * edge4x3
                          + (src1[1] + src1[2] + src2[1] + src2[2]) * center4x3;
             }
 
@@ -472,16 +462,13 @@ namespace TwkImg
             {
                 // src0 is invalid
                 // indices 2 & 3 are also invalid.
-                (*dst) = (src3[0]) * corner3x2
-                         + (src1[0] + src2[0] + src3[1]) * edge3x2
-                         + (src1[1] + src2[1]) * center3x2;
+                (*dst) = (src3[0]) * corner3x2 + (src1[0] + src2[0] + src3[1]) * edge3x2 + (src1[1] + src2[1]) * center3x2;
             }
             else
             {
                 // src0 is invalid.
                 // index 3 is also invalid
-                (*dst) = (src3[0]) * corner3x3
-                         + (src1[0] + src2[0] + src3[1] + src3[2]) * edge3x3
+                (*dst) = (src3[0]) * corner3x3 + (src1[0] + src2[0] + src3[1] + src3[2]) * edge3x3
                          + (src1[1] + src1[2] + src2[1] + src2[2]) * center3x3;
             }
 
@@ -491,12 +478,10 @@ namespace TwkImg
             // do later.
             // We increment the rows and in both the initializer and the
             // increment, since we already did one row.
-            for (srcRow0 += srcStride2, srcRow1 += srcStride2,
-                 srcRow2 += srcStride2, srcRow3 += srcStride2,
+            for (srcRow0 += srcStride2, srcRow1 += srcStride2, srcRow2 += srcStride2, srcRow3 += srcStride2,
                  dstRow += dstStride; // End initializer
                  dstRow < dstRowLast; // Test
-                 srcRow0 += srcStride2, srcRow1 += srcStride2,
-                 srcRow2 += srcStride2, srcRow3 += srcStride2,
+                 srcRow0 += srcStride2, srcRow1 += srcStride2, srcRow2 += srcStride2, srcRow3 += srcStride2,
                  dstRow += dstStride) // Increment
             {
                 src0 = srcRow0;
@@ -508,46 +493,33 @@ namespace TwkImg
 
                 // Do the first pixel of the row.
                 // Index 0 is invalid.
-                (*dst) = (src0[3] + src3[3]) * corner4x3
-                         + (src0[1] + src0[2] + src1[3] + src2[3] + src3[1]
-                            + src3[2])
-                               * edge4x3
+                (*dst) = (src0[3] + src3[3]) * corner4x3 + (src0[1] + src0[2] + src1[3] + src2[3] + src3[1] + src3[2]) * edge4x3
                          + (src1[1] + src1[2] + src2[1] + src2[2]) * center4x3;
 
                 // Loop over the pixels in the middle of the row
-                for (src0 += 2, src1 += 2, src2 += 2, src3 += 2, dst++;
-                     dst < dstLast;
-                     src0 += 2, src1 += 2, src2 += 2, src3 += 2, dst++)
+                for (src0 += 2, src1 += 2, src2 += 2, src3 += 2, dst++; dst < dstLast; src0 += 2, src1 += 2, src2 += 2, src3 += 2, dst++)
                 {
                     // In this inner loop, we're always using
                     // the normal kernel
                     // Nothing is invalid!!!
-                    (*dst) =
-                        (src0[0] + src0[3] + src3[0] + src3[3]) * corner4x4
-                        + (src0[1] + src0[2] + src1[0] + src1[3] + src2[0]
-                           + src2[3] + src3[1] + src3[2])
-                              * edge4x4
-                        + (src1[1] + src1[2] + src2[1] + src2[2]) * center4x4;
+                    (*dst) = (src0[0] + src0[3] + src3[0] + src3[3]) * corner4x4
+                             + (src0[1] + src0[2] + src1[0] + src1[3] + src2[0] + src2[3] + src3[1] + src3[2]) * edge4x4
+                             + (src1[1] + src1[2] + src2[1] + src2[2]) * center4x4;
                 }
 
                 if (wOdd)
                 {
                     // Do the last pixel of the row.
                     // Indices 2 and 3 are invalid.
-                    (*dst) = (src0[0] + src3[0]) * corner4x2
-                             + (src0[1] + src1[0] + src2[0] + src3[1]) * edge4x2
+                    (*dst) = (src0[0] + src3[0]) * corner4x2 + (src0[1] + src1[0] + src2[0] + src3[1]) * edge4x2
                              + (src1[1] + src2[1]) * center4x2;
                 }
                 else
                 {
                     // Do the last pixel of the row.
                     // Index 3 is invalid.
-                    (*dst) =
-                        (src0[0] + src3[0]) * corner4x3
-                        + (src0[1] + src0[2] + src1[0] + src2[0] + src3[1]
-                           + src3[2])
-                              * edge4x3
-                        + (src1[1] + src1[2] + src2[1] + src2[2]) * center4x3;
+                    (*dst) = (src0[0] + src3[0]) * corner4x3 + (src0[1] + src0[2] + src1[0] + src2[0] + src3[1] + src3[2]) * edge4x3
+                             + (src1[1] + src1[2] + src2[1] + src2[2]) * center4x3;
                 }
             }
 
@@ -566,18 +538,13 @@ namespace TwkImg
 
                 // Do the start corner of the first row.
                 // index 0 is also invalid.
-                (*dst) = (src0[3]) * corner3x2
-                         + (src0[1] + src0[2] + src1[3]) * edge3x2
-                         + (src1[1] + src1[2]) * center3x2;
+                (*dst) = (src0[3]) * corner3x2 + (src0[1] + src0[2] + src1[3]) * edge3x2 + (src1[1] + src1[2]) * center3x2;
 
                 // Do the normal pixels of the last row.
-                for (src0 += 2, src1 += 2, src2 += 2, src3 += 2, dst++;
-                     dst < dstLast;
-                     src0 += 2, src1 += 2, src2 += 2, src3 += 2, dst++)
+                for (src0 += 2, src1 += 2, src2 += 2, src3 += 2, dst++; dst < dstLast; src0 += 2, src1 += 2, src2 += 2, src3 += 2, dst++)
                 {
                     // src2 and src3 are invalid.
-                    (*dst) = (src0[0] + src0[3]) * corner4x2
-                             + (src0[1] + src0[2] + src1[0] + src1[3]) * edge4x2
+                    (*dst) = (src0[0] + src0[3]) * corner4x2 + (src0[1] + src0[2] + src1[0] + src1[3]) * edge4x2
                              + (src1[1] + src1[2]) * center4x2;
                 }
 
@@ -586,17 +553,13 @@ namespace TwkImg
                 {
                     // src2 and src3 are invalid
                     // indices 2 & 3 are also invalid.
-                    (*dst) = (src0[0]) * corner2x2
-                             + (src0[1] + src1[0]) * edge2x2
-                             + (src1[1]) * center2x2;
+                    (*dst) = (src0[0]) * corner2x2 + (src0[1] + src1[0]) * edge2x2 + (src1[1]) * center2x2;
                 }
                 else
                 {
                     // src2 and src3 are invalid.
                     // index 3 is also invalid
-                    (*dst) = (src0[0]) * corner3x2
-                             + (src0[1] + src0[2] + src1[0]) * edge3x2
-                             + (src1[1] + src1[2]) * center3x2;
+                    (*dst) = (src0[0]) * corner3x2 + (src0[1] + src0[2] + src1[0]) * edge3x2 + (src1[1] + src1[2]) * center3x2;
                 }
             }
             else
@@ -606,22 +569,15 @@ namespace TwkImg
 
                 // Do the start corner of the first row.
                 // index 0 is also invalid.
-                (*dst) = (src0[3]) * corner4x3
-                         + (src0[1] + src0[2] + src1[3] + src2[3]) * edge3x3
+                (*dst) = (src0[3]) * corner4x3 + (src0[1] + src0[2] + src1[3] + src2[3]) * edge3x3
                          + (src1[1] + src1[2] + src2[1] + src2[2]) * center3x3;
 
                 // Do the normal pixels of the last row.
-                for (src0 += 2, src1 += 2, src2 += 2, src3 += 2, dst++;
-                     dst < dstLast;
-                     src0 += 2, src1 += 2, src2 += 2, src3 += 2, dst++)
+                for (src0 += 2, src1 += 2, src2 += 2, src3 += 2, dst++; dst < dstLast; src0 += 2, src1 += 2, src2 += 2, src3 += 2, dst++)
                 {
                     // src3 is invalid.
-                    (*dst) =
-                        (src0[0] + src0[3]) * corner4x3
-                        + (src0[1] + src0[2] + src1[0] + src1[3] + src2[0]
-                           + src2[3])
-                              * edge4x3
-                        + (src1[1] + src1[2] + src2[1] + src2[2]) * center4x3;
+                    (*dst) = (src0[0] + src0[3]) * corner4x3 + (src0[1] + src0[2] + src1[0] + src1[3] + src2[0] + src2[3]) * edge4x3
+                             + (src1[1] + src1[2] + src2[1] + src2[2]) * center4x3;
                 }
 
                 // Do the end corner of the last row.
@@ -629,18 +585,14 @@ namespace TwkImg
                 {
                     // src3 is invalid
                     // indices 2 & 3 are also invalid.
-                    (*dst) = (src0[0]) * corner3x2
-                             + (src0[1] + src1[0] + src2[0]) * edge3x2
-                             + (src1[1] + src2[1]) * center3x2;
+                    (*dst) = (src0[0]) * corner3x2 + (src0[1] + src1[0] + src2[0]) * edge3x2 + (src1[1] + src2[1]) * center3x2;
                 }
                 else
                 {
                     // src3 is invalid.
                     // index 3 is also invalid
-                    (*dst) =
-                        (src0[0]) * corner3x3
-                        + (src0[1] + src0[2] + src1[0] + src2[0]) * edge3x3
-                        + (src1[1] + src1[2] + src2[1] + src2[2]) * center3x3;
+                    (*dst) = (src0[0]) * corner3x3 + (src0[1] + src0[2] + src1[0] + src2[0]) * edge3x3
+                             + (src1[1] + src1[2] + src2[1] + src2[2]) * center3x3;
                 }
             }
         } // End of loop over lods.
@@ -662,14 +614,10 @@ namespace TwkImg
     }
 
     //******************************************************************************
-    template <class COLOR> inline int MipMap<COLOR>::numLods() const
-    {
-        return m_numLods;
-    }
+    template <class COLOR> inline int MipMap<COLOR>::numLods() const { return m_numLods; }
 
     //******************************************************************************
-    template <class COLOR>
-    inline const Image<COLOR>* MipMap<COLOR>::lod(int d) const
+    template <class COLOR> inline const Image<COLOR>* MipMap<COLOR>::lod(int d) const
     {
 
         assert(d >= 0 && d < m_numLods);
@@ -687,15 +635,10 @@ namespace TwkImg
     }
 
     //******************************************************************************
-    template <class COLOR>
-    inline const TwkMath::Vec2i& MipMap<COLOR>::origin() const
-    {
-        return m_origin;
-    }
+    template <class COLOR> inline const TwkMath::Vec2i& MipMap<COLOR>::origin() const { return m_origin; }
 
     //******************************************************************************
-    template <class COLOR>
-    void MipMap<COLOR>::specialCaseSquare(Image<COLOR>& src, Image<COLOR>& dst)
+    template <class COLOR> void MipMap<COLOR>::specialCaseSquare(Image<COLOR>& src, Image<COLOR>& dst)
     {
         // So we only have to handle half as many cases, we
         // transpose the images if it's not oriented how
@@ -717,15 +660,9 @@ namespace TwkImg
         {
             if (srcHeight == 3)
             {
-                dst.pixel(0, 0) = (src.pixel(0, 0) + src.pixel(1, 0)
-                                   + src.pixel(0, 1) + src.pixel(1, 1))
-                                      * center3x3
-                                  +
+                dst.pixel(0, 0) = (src.pixel(0, 0) + src.pixel(1, 0) + src.pixel(0, 1) + src.pixel(1, 1)) * center3x3 +
 
-                                  (src.pixel(0, 2) + src.pixel(1, 2)
-                                   + src.pixel(2, 0) + src.pixel(2, 1))
-                                      * edge3x3
-                                  +
+                                  (src.pixel(0, 2) + src.pixel(1, 2) + src.pixel(2, 0) + src.pixel(2, 1)) * edge3x3 +
 
                                   (src.pixel(2, 2)) * corner3x3;
 
@@ -733,22 +670,19 @@ namespace TwkImg
                 // by the masks, 2x2.
                 dst.pixel(1, 0) = (src.pixel(2, 0)) * center2x2 +
 
-                                  (src.pixel(1, 0) + src.pixel(2, 1)) * edge2x2
-                                  +
+                                  (src.pixel(1, 0) + src.pixel(2, 1)) * edge2x2 +
 
                                   (src.pixel(1, 1)) * corner2x2;
 
                 dst.pixel(0, 1) = (src.pixel(0, 2)) * center2x2 +
 
-                                  (src.pixel(0, 1) + src.pixel(1, 2)) * edge2x2
-                                  +
+                                  (src.pixel(0, 1) + src.pixel(1, 2)) * edge2x2 +
 
                                   (src.pixel(1, 1)) * corner2x2;
 
                 dst.pixel(1, 1) = (src.pixel(2, 2)) * center2x2 +
 
-                                  (src.pixel(1, 2) + src.pixel(2, 1)) * edge2x2
-                                  +
+                                  (src.pixel(1, 2) + src.pixel(2, 1)) * edge2x2 +
 
                                   (src.pixel(1, 1)) * corner2x2;
             }
@@ -760,8 +694,7 @@ namespace TwkImg
                 tmp[2] = 0.5f * (src.pixel(2, 0) + src.pixel(2, 1));
 
                 // Now it's 3x1, so average the two with the 3x1 filter
-                dst.pixel(0, 0) =
-                    (tmp[0] + tmp[1]) * center3x1 + (tmp[2]) * edge3x1;
+                dst.pixel(0, 0) = (tmp[0] + tmp[1]) * center3x1 + (tmp[2]) * edge3x1;
                 dst.pixel(1, 0) = (tmp[2]) * center2x1 + (tmp[1]) * edge2x1;
             }
             else
@@ -770,11 +703,8 @@ namespace TwkImg
 
                 assert(srcHeight == 1);
 
-                dst.pixel(0, 0) =
-                    (src.pixel(0, 0) + src.pixel(1, 0)) * center3x1
-                    + (src.pixel(2, 0)) * edge3x1;
-                dst.pixel(1, 0) =
-                    (src.pixel(2, 0)) * center2x1 + (src.pixel(1, 0)) * edge2x1;
+                dst.pixel(0, 0) = (src.pixel(0, 0) + src.pixel(1, 0)) * center3x1 + (src.pixel(2, 0)) * edge3x1;
+                dst.pixel(1, 0) = (src.pixel(2, 0)) * center2x1 + (src.pixel(1, 0)) * edge2x1;
             }
         }
         else
@@ -784,9 +714,7 @@ namespace TwkImg
 
             if (srcHeight == 2)
             {
-                dst.pixel(0, 0) = 0.25f
-                                  * (src.pixel(0, 0) + src.pixel(1, 0)
-                                     + src.pixel(0, 1) + src.pixel(1, 1));
+                dst.pixel(0, 0) = 0.25f * (src.pixel(0, 0) + src.pixel(1, 0) + src.pixel(0, 1) + src.pixel(1, 1));
             }
             else
             {
@@ -807,9 +735,7 @@ namespace TwkImg
     }
 
     //******************************************************************************
-    template <class COLOR>
-    void MipMap<COLOR>::specialCaseRectangle(Image<COLOR>& srcImg,
-                                             Image<COLOR>& dstImg)
+    template <class COLOR> void MipMap<COLOR>::specialCaseRectangle(Image<COLOR>& srcImg, Image<COLOR>& dstImg)
     {
         // Just like the special case square, we want an
         // image that's aligned conveniently for us. We want
@@ -879,16 +805,13 @@ namespace TwkImg
             dst[1] = (tmp[3] + tmp[5]) * center3x1 + (tmp[7]) * edge3x1;
 
             // Loop over all the pixels except the last.
-            for (dst += dstStride, tmp += tmpStride2; dst < dstLast;
-                 dst += dstStride, tmp += tmpStride2)
+            for (dst += dstStride, tmp += tmpStride2; dst < dstLast; dst += dstStride, tmp += tmpStride2)
             {
                 // First dst row is made up of
                 // tmp[0] tmp[2] tmp[4] tmp[6]
                 // tmp[1] tmp[3] tmp[5] tmp[7]
-                dst[0] =
-                    (tmp[2] + tmp[4]) * center4x1 + (tmp[0] + tmp[6]) * edge4x1;
-                dst[1] =
-                    (tmp[3] + tmp[5]) * center4x1 + (tmp[1] + tmp[7]) * edge4x1;
+                dst[0] = (tmp[2] + tmp[4]) * center4x1 + (tmp[0] + tmp[6]) * edge4x1;
+                dst[1] = (tmp[3] + tmp[5]) * center4x1 + (tmp[1] + tmp[7]) * edge4x1;
             }
 
             // Do the last pixels
@@ -939,13 +862,11 @@ namespace TwkImg
             (*dst) = (tmp[1] + tmp[2]) * center3x1 + (tmp[3]) * edge3x1;
 
             // Loop over all the pixels except the last.
-            for (dst += dstStride, tmp += tmpStride2; dst < dstLast;
-                 dst += dstStride, tmp += tmpStride2)
+            for (dst += dstStride, tmp += tmpStride2; dst < dstLast; dst += dstStride, tmp += tmpStride2)
             {
                 // First dst row is made up of
                 // tmp[0] tmp[1] tmp[2] tmp[3]
-                (*dst) =
-                    (tmp[1] + tmp[2]) * center4x1 + (tmp[0] + tmp[3]) * edge4x1;
+                (*dst) = (tmp[1] + tmp[2]) * center4x1 + (tmp[0] + tmp[3]) * edge4x1;
             }
 
             // Do the last pixels
@@ -982,13 +903,11 @@ namespace TwkImg
             (*dst) = (src[1] + src[2]) * center3x1 + (src[3]) * edge3x1;
 
             // Loop over all the pixels except the last.
-            for (dst += dstStride, src += srcStride2; dst < dstLast;
-                 dst += dstStride, src += srcStride2)
+            for (dst += dstStride, src += srcStride2; dst < dstLast; dst += dstStride, src += srcStride2)
             {
                 // First dst row is made up of
                 // tmp[0] tmp[1] tmp[2] tmp[3]
-                (*dst) =
-                    (src[1] + src[2]) * center4x1 + (src[0] + src[3]) * edge4x1;
+                (*dst) = (src[1] + src[2]) * center4x1 + (src[0] + src[3]) * edge4x1;
             }
 
             // Do the last pixels

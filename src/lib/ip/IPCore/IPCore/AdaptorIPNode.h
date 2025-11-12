@@ -33,11 +33,9 @@ namespace IPCore
     class AdaptorIPNode : public IPNode
     {
     public:
-        AdaptorIPNode(const std::string& name, const NodeDefinition* definition,
-                      IPGraph* graph, GroupIPNode* group);
+        AdaptorIPNode(const std::string& name, const NodeDefinition* definition, IPGraph* graph, GroupIPNode* group);
 
-        AdaptorIPNode(const std::string& name, const NodeDefinition* definition,
-                      IPNode* groupInputNode, GroupIPNode* group,
+        AdaptorIPNode(const std::string& name, const NodeDefinition* definition, IPNode* groupInputNode, GroupIPNode* group,
                       IPGraph* graph);
 
         virtual ~AdaptorIPNode();

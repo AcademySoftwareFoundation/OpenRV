@@ -53,25 +53,15 @@ namespace Rv
         std::vector<std::string> applications() const;
         std::vector<std::string> sessions();
 
-        void spoofConnectionStream(const QString& fileName,
-                                   float timeScale = 1.0, bool verbose = false);
+        void spoofConnectionStream(const QString& fileName, float timeScale = 1.0, bool verbose = false);
 
-        std::string localContactName()
-        {
-            return std::string(m_ui.nameLineEdit->text().toUtf8().constData());
-        }
+        std::string localContactName() { return std::string(m_ui.nameLineEdit->text().toUtf8().constData()); }
 
-        void setLocalContactName(std::string n)
-        {
-            m_ui.nameLineEdit->setText(n.c_str());
-        }
+        void setLocalContactName(std::string n) { m_ui.nameLineEdit->setText(n.c_str()); }
 
         int defaultPermission() { return m_ui.permissionCombo->currentIndex(); }
 
-        void setDefaultPermission(int i)
-        {
-            m_ui.permissionCombo->setCurrentIndex(i);
-        }
+        void setDefaultPermission(int i) { m_ui.permissionCombo->setCurrentIndex(i); }
 
     public slots:
         void newRemoteContact(const QString&);
@@ -106,8 +96,7 @@ namespace Rv
 
         int findContact(const QString& name, const QString& host);
 
-        void addContact(const QString& name, const QString& host,
-                        TwkQtChat::Connection* connection, unsigned int perms,
+        void addContact(const QString& name, const QString& host, TwkQtChat::Connection* connection, unsigned int perms,
                         const QString& capp, bool checkForExisting = true);
 
         ConnectPermission contactPermission(const QStringList& parts);
@@ -117,8 +106,7 @@ namespace Rv
         bool confirmDisconnect(const QString&);
         std::set<int> selectedContacts();
 
-        IPCore::Session* targetSession(QString sender,
-                                       bool doDisconnect = true);
+        IPCore::Session* targetSession(QString sender, bool doDisconnect = true);
 
         void savePortNumber();
         void deletePortNumberFile();

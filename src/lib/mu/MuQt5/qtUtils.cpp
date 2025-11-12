@@ -31,16 +31,12 @@ namespace Mu
 
             if (f && f->hasParameters())
             {
-                str << " (" << f->parameter(n)->name() << " of type "
-                    << f->parameter(n)->storageClass()->fullyQualifiedName()
-                    << ")";
+                str << " (" << f->parameter(n)->name() << " of type " << f->parameter(n)->storageClass()->fullyQualifiedName() << ")";
             }
 
-            str << " in function " << s->fullyQualifiedName()
-                << ": unexpected nil argument";
+            str << " in function " << s->fullyQualifiedName() << ": unexpected nil argument";
 
-            ExceptionType::Exception* e =
-                new ExceptionType::Exception(context->exceptionType());
+            ExceptionType::Exception* e = new ExceptionType::Exception(context->exceptionType());
             e->string() += str.str().c_str();
             thread.setException(e);
             ProgramException exc(thread);
@@ -68,15 +64,9 @@ namespace Mu
         return o ? strstr(typeid(*o).name(), "MuQt") != 0 : false;
     }
 
-    bool isMuQtLayoutItem(QLayoutItem* o)
-    {
-        return o ? strstr(typeid(*o).name(), "MuQt") != 0 : false;
-    }
+    bool isMuQtLayoutItem(QLayoutItem* o) { return o ? strstr(typeid(*o).name(), "MuQt") != 0 : false; }
 
-    bool isMuQtPaintDevice(QPaintDevice* o)
-    {
-        return o ? strstr(typeid(*o).name(), "MuQt") != 0 : false;
-    }
+    bool isMuQtPaintDevice(QPaintDevice* o) { return o ? strstr(typeid(*o).name(), "MuQt") != 0 : false; }
 
 #if 0
 static MuQtQObjectFinalizer(void* obj, void* data)

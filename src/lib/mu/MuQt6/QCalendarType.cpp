@@ -55,37 +55,30 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(__allocate, Pointer)
     {
-        QCalendarType::Instance* i =
-            new QCalendarType::Instance((Class*)NODE_THIS.type());
+        QCalendarType::Instance* i = new QCalendarType::Instance((Class*)NODE_THIS.type());
         QCalendarType::registerFinalizer(i);
         NODE_RETURN(i);
     }
 
-    void QCalendarType::registerFinalizer(void* o)
-    {
-        GC_register_finalizer(o, QCalendarType::finalizer, 0, 0, 0);
-    }
+    void QCalendarType::registerFinalizer(void* o) { GC_register_finalizer(o, QCalendarType::finalizer, 0, 0, 0); }
 
     void QCalendarType::finalizer(void* obj, void* data)
     {
-        QCalendarType::Instance* i =
-            reinterpret_cast<QCalendarType::Instance*>(obj);
+        QCalendarType::Instance* i = reinterpret_cast<QCalendarType::Instance*>(obj);
         delete i;
     }
 
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    Pointer qt_QCalendar_QCalendar_QCalendar_QCalendar(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this)
+    Pointer qt_QCalendar_QCalendar_QCalendar_QCalendar(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         setqtype<QCalendarType>(param_this, QCalendar());
         return param_this;
     }
 
-    Pointer qt_QCalendar_QCalendar_QCalendar_QCalendar_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_system)
+    Pointer qt_QCalendar_QCalendar_QCalendar_QCalendar_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_system)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QCalendar::System arg1 = (QCalendar::System)(param_system);
@@ -93,9 +86,7 @@ namespace Mu
         return param_this;
     }
 
-    int qt_QCalendar_dayOfWeek_int_QCalendar_QDate(Mu::Thread& NODE_THREAD,
-                                                   Pointer param_this,
-                                                   Pointer param_date)
+    int qt_QCalendar_dayOfWeek_int_QCalendar_QDate(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_date)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QCalendar arg0 = getqtype<QCalendarType>(param_this);
@@ -103,9 +94,7 @@ namespace Mu
         return arg0.dayOfWeek(arg1);
     }
 
-    int qt_QCalendar_daysInYear_int_QCalendar_int(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this,
-                                                  int param_year)
+    int qt_QCalendar_daysInYear_int_QCalendar_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_year)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QCalendar arg0 = getqtype<QCalendarType>(param_this);
@@ -113,17 +102,15 @@ namespace Mu
         return arg0.daysInYear(arg1);
     }
 
-    bool qt_QCalendar_hasYearZero_bool_QCalendar(Mu::Thread& NODE_THREAD,
-                                                 Pointer param_this)
+    bool qt_QCalendar_hasYearZero_bool_QCalendar(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QCalendar arg0 = getqtype<QCalendarType>(param_this);
         return arg0.hasYearZero();
     }
 
-    bool qt_QCalendar_isDateValid_bool_QCalendar_int_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_year,
-        int param_month, int param_day)
+    bool qt_QCalendar_isDateValid_bool_QCalendar_int_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_year, int param_month,
+                                                             int param_day)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QCalendar arg0 = getqtype<QCalendarType>(param_this);
@@ -133,17 +120,14 @@ namespace Mu
         return arg0.isDateValid(arg1, arg2, arg3);
     }
 
-    bool qt_QCalendar_isGregorian_bool_QCalendar(Mu::Thread& NODE_THREAD,
-                                                 Pointer param_this)
+    bool qt_QCalendar_isGregorian_bool_QCalendar(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QCalendar arg0 = getqtype<QCalendarType>(param_this);
         return arg0.isGregorian();
     }
 
-    bool qt_QCalendar_isLeapYear_bool_QCalendar_int(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this,
-                                                    int param_year)
+    bool qt_QCalendar_isLeapYear_bool_QCalendar_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_year)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QCalendar arg0 = getqtype<QCalendarType>(param_this);
@@ -151,73 +135,63 @@ namespace Mu
         return arg0.isLeapYear(arg1);
     }
 
-    bool qt_QCalendar_isLunar_bool_QCalendar(Mu::Thread& NODE_THREAD,
-                                             Pointer param_this)
+    bool qt_QCalendar_isLunar_bool_QCalendar(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QCalendar arg0 = getqtype<QCalendarType>(param_this);
         return arg0.isLunar();
     }
 
-    bool qt_QCalendar_isLuniSolar_bool_QCalendar(Mu::Thread& NODE_THREAD,
-                                                 Pointer param_this)
+    bool qt_QCalendar_isLuniSolar_bool_QCalendar(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QCalendar arg0 = getqtype<QCalendarType>(param_this);
         return arg0.isLuniSolar();
     }
 
-    bool qt_QCalendar_isProleptic_bool_QCalendar(Mu::Thread& NODE_THREAD,
-                                                 Pointer param_this)
+    bool qt_QCalendar_isProleptic_bool_QCalendar(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QCalendar arg0 = getqtype<QCalendarType>(param_this);
         return arg0.isProleptic();
     }
 
-    bool qt_QCalendar_isSolar_bool_QCalendar(Mu::Thread& NODE_THREAD,
-                                             Pointer param_this)
+    bool qt_QCalendar_isSolar_bool_QCalendar(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QCalendar arg0 = getqtype<QCalendarType>(param_this);
         return arg0.isSolar();
     }
 
-    bool qt_QCalendar_isValid_bool_QCalendar(Mu::Thread& NODE_THREAD,
-                                             Pointer param_this)
+    bool qt_QCalendar_isValid_bool_QCalendar(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QCalendar arg0 = getqtype<QCalendarType>(param_this);
         return arg0.isValid();
     }
 
-    int qt_QCalendar_maximumDaysInMonth_int_QCalendar(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    int qt_QCalendar_maximumDaysInMonth_int_QCalendar(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QCalendar arg0 = getqtype<QCalendarType>(param_this);
         return arg0.maximumDaysInMonth();
     }
 
-    int qt_QCalendar_maximumMonthsInYear_int_QCalendar(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this)
+    int qt_QCalendar_maximumMonthsInYear_int_QCalendar(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QCalendar arg0 = getqtype<QCalendarType>(param_this);
         return arg0.maximumMonthsInYear();
     }
 
-    int qt_QCalendar_minimumDaysInMonth_int_QCalendar(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    int qt_QCalendar_minimumDaysInMonth_int_QCalendar(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QCalendar arg0 = getqtype<QCalendarType>(param_this);
         return arg0.minimumDaysInMonth();
     }
 
-    int qt_QCalendar_monthsInYear_int_QCalendar_int(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this,
-                                                    int param_year)
+    int qt_QCalendar_monthsInYear_int_QCalendar_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_year)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QCalendar arg0 = getqtype<QCalendarType>(param_this);
@@ -225,16 +199,14 @@ namespace Mu
         return arg0.monthsInYear(arg1);
     }
 
-    Pointer qt_QCalendar_name_string_QCalendar(Mu::Thread& NODE_THREAD,
-                                               Pointer param_this)
+    Pointer qt_QCalendar_name_string_QCalendar(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QCalendar arg0 = getqtype<QCalendarType>(param_this);
         return makestring(c, arg0.name());
     }
 
-    Pointer
-    qt_QCalendar_availableCalendars_stringBSB_ESB_(Mu::Thread& NODE_THREAD)
+    Pointer qt_QCalendar_availableCalendars_stringBSB_ESB_(Mu::Thread& NODE_THREAD)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         return makestringlist(c, QCalendar::availableCalendars());
@@ -242,117 +214,98 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(_n_QCalendar0, Pointer)
     {
-        NODE_RETURN(qt_QCalendar_QCalendar_QCalendar_QCalendar(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QCalendar_QCalendar_QCalendar_QCalendar(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_QCalendar1, Pointer)
     {
-        NODE_RETURN(qt_QCalendar_QCalendar_QCalendar_QCalendar_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QCalendar_QCalendar_QCalendar_QCalendar_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_dayOfWeek0, int)
     {
-        NODE_RETURN(qt_QCalendar_dayOfWeek_int_QCalendar_QDate(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QCalendar_dayOfWeek_int_QCalendar_QDate(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_daysInYear0, int)
     {
-        NODE_RETURN(qt_QCalendar_daysInYear_int_QCalendar_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QCalendar_daysInYear_int_QCalendar_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_hasYearZero0, bool)
     {
-        NODE_RETURN(qt_QCalendar_hasYearZero_bool_QCalendar(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QCalendar_hasYearZero_bool_QCalendar(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isDateValid0, bool)
     {
-        NODE_RETURN(qt_QCalendar_isDateValid_bool_QCalendar_int_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int), NODE_ARG(3, int)));
+        NODE_RETURN(qt_QCalendar_isDateValid_bool_QCalendar_int_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                        NODE_ARG(2, int), NODE_ARG(3, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_isGregorian0, bool)
     {
-        NODE_RETURN(qt_QCalendar_isGregorian_bool_QCalendar(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QCalendar_isGregorian_bool_QCalendar(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isLeapYear0, bool)
     {
-        NODE_RETURN(qt_QCalendar_isLeapYear_bool_QCalendar_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QCalendar_isLeapYear_bool_QCalendar_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_isLunar0, bool)
     {
-        NODE_RETURN(qt_QCalendar_isLunar_bool_QCalendar(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QCalendar_isLunar_bool_QCalendar(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isLuniSolar0, bool)
     {
-        NODE_RETURN(qt_QCalendar_isLuniSolar_bool_QCalendar(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QCalendar_isLuniSolar_bool_QCalendar(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isProleptic0, bool)
     {
-        NODE_RETURN(qt_QCalendar_isProleptic_bool_QCalendar(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QCalendar_isProleptic_bool_QCalendar(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isSolar0, bool)
     {
-        NODE_RETURN(qt_QCalendar_isSolar_bool_QCalendar(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QCalendar_isSolar_bool_QCalendar(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isValid0, bool)
     {
-        NODE_RETURN(qt_QCalendar_isValid_bool_QCalendar(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QCalendar_isValid_bool_QCalendar(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_maximumDaysInMonth0, int)
     {
-        NODE_RETURN(qt_QCalendar_maximumDaysInMonth_int_QCalendar(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QCalendar_maximumDaysInMonth_int_QCalendar(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_maximumMonthsInYear0, int)
     {
-        NODE_RETURN(qt_QCalendar_maximumMonthsInYear_int_QCalendar(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QCalendar_maximumMonthsInYear_int_QCalendar(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_minimumDaysInMonth0, int)
     {
-        NODE_RETURN(qt_QCalendar_minimumDaysInMonth_int_QCalendar(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QCalendar_minimumDaysInMonth_int_QCalendar(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_monthsInYear0, int)
     {
-        NODE_RETURN(qt_QCalendar_monthsInYear_int_QCalendar_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QCalendar_monthsInYear_int_QCalendar_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_name0, Pointer)
     {
-        NODE_RETURN(qt_QCalendar_name_string_QCalendar(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QCalendar_name_string_QCalendar(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_availableCalendars0, Pointer)
     {
-        NODE_RETURN(
-            qt_QCalendar_availableCalendars_stringBSB_ESB_(NODE_THREAD));
+        NODE_RETURN(qt_QCalendar_availableCalendars_stringBSB_ESB_(NODE_THREAD));
     }
 
     void QCalendarType::load()
@@ -372,116 +325,67 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(
-            new Function(c, "__allocate", __allocate, None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", __allocate, None, Return, ftn, End),
 
-            EndArguments);
+                   EndArguments);
 
-        addSymbols(
-            new Alias(c, "System", "int"),
-            new SymbolicConstant(c, "Gregorian", "int",
-                                 Value(int(QCalendar::System::Gregorian))),
-            new SymbolicConstant(c, "Julian", "int",
-                                 Value(int(QCalendar::System::Julian))),
-            new SymbolicConstant(c, "Milankovic", "int",
-                                 Value(int(QCalendar::System::Milankovic))),
-            new SymbolicConstant(c, "Jalali", "int",
-                                 Value(int(QCalendar::System::Jalali))),
-            new SymbolicConstant(c, "IslamicCivil", "int",
-                                 Value(int(QCalendar::System::IslamicCivil))),
-            EndArguments);
+        addSymbols(new Alias(c, "System", "int"), new SymbolicConstant(c, "Gregorian", "int", Value(int(QCalendar::System::Gregorian))),
+                   new SymbolicConstant(c, "Julian", "int", Value(int(QCalendar::System::Julian))),
+                   new SymbolicConstant(c, "Milankovic", "int", Value(int(QCalendar::System::Milankovic))),
+                   new SymbolicConstant(c, "Jalali", "int", Value(int(QCalendar::System::Jalali))),
+                   new SymbolicConstant(c, "IslamicCivil", "int", Value(int(QCalendar::System::IslamicCivil))), EndArguments);
 
         addSymbols(
             // enums
             // member functions
-            new Function(c, "QCalendar", _n_QCalendar0, None, Compiled,
-                         qt_QCalendar_QCalendar_QCalendar_QCalendar, Return,
-                         "qt.QCalendar", Parameters,
-                         new Param(c, "this", "qt.QCalendar"), End),
-            new Function(c, "QCalendar", _n_QCalendar1, None, Compiled,
-                         qt_QCalendar_QCalendar_QCalendar_QCalendar_int, Return,
-                         "qt.QCalendar", Parameters,
-                         new Param(c, "this", "qt.QCalendar"),
-                         new Param(c, "system", "int"), End),
+            new Function(c, "QCalendar", _n_QCalendar0, None, Compiled, qt_QCalendar_QCalendar_QCalendar_QCalendar, Return, "qt.QCalendar",
+                         Parameters, new Param(c, "this", "qt.QCalendar"), End),
+            new Function(c, "QCalendar", _n_QCalendar1, None, Compiled, qt_QCalendar_QCalendar_QCalendar_QCalendar_int, Return,
+                         "qt.QCalendar", Parameters, new Param(c, "this", "qt.QCalendar"), new Param(c, "system", "int"), End),
             // MISSING: QCalendar (QCalendar; QCalendar this, "QAnyStringView"
             // name) MISSING: QCalendar (QCalendar; QCalendar this, flags
             // QCalendar::SystemId id) MISSING: dateTimeToString (string;
             // QCalendar this, "QStringView" format, QDateTime datetime, QDate
             // dateOnly, QTime timeOnly, "const QLocale &" locale)
-            new Function(c, "dayOfWeek", _n_dayOfWeek0, None, Compiled,
-                         qt_QCalendar_dayOfWeek_int_QCalendar_QDate, Return,
-                         "int", Parameters,
-                         new Param(c, "this", "qt.QCalendar"),
-                         new Param(c, "date", "qt.QDate"), End),
-            new Function(c, "daysInYear", _n_daysInYear0, None, Compiled,
-                         qt_QCalendar_daysInYear_int_QCalendar_int, Return,
-                         "int", Parameters,
-                         new Param(c, "this", "qt.QCalendar"),
-                         new Param(c, "year", "int"), End),
-            new Function(c, "hasYearZero", _n_hasYearZero0, None, Compiled,
-                         qt_QCalendar_hasYearZero_bool_QCalendar, Return,
-                         "bool", Parameters,
-                         new Param(c, "this", "qt.QCalendar"), End),
-            new Function(
-                c, "isDateValid", _n_isDateValid0, None, Compiled,
-                qt_QCalendar_isDateValid_bool_QCalendar_int_int_int, Return,
-                "bool", Parameters, new Param(c, "this", "qt.QCalendar"),
-                new Param(c, "year", "int"), new Param(c, "month", "int"),
-                new Param(c, "day", "int"), End),
-            new Function(c, "isGregorian", _n_isGregorian0, None, Compiled,
-                         qt_QCalendar_isGregorian_bool_QCalendar, Return,
-                         "bool", Parameters,
-                         new Param(c, "this", "qt.QCalendar"), End),
-            new Function(c, "isLeapYear", _n_isLeapYear0, None, Compiled,
-                         qt_QCalendar_isLeapYear_bool_QCalendar_int, Return,
-                         "bool", Parameters,
-                         new Param(c, "this", "qt.QCalendar"),
-                         new Param(c, "year", "int"), End),
-            new Function(c, "isLunar", _n_isLunar0, None, Compiled,
-                         qt_QCalendar_isLunar_bool_QCalendar, Return, "bool",
+            new Function(c, "dayOfWeek", _n_dayOfWeek0, None, Compiled, qt_QCalendar_dayOfWeek_int_QCalendar_QDate, Return, "int",
+                         Parameters, new Param(c, "this", "qt.QCalendar"), new Param(c, "date", "qt.QDate"), End),
+            new Function(c, "daysInYear", _n_daysInYear0, None, Compiled, qt_QCalendar_daysInYear_int_QCalendar_int, Return, "int",
+                         Parameters, new Param(c, "this", "qt.QCalendar"), new Param(c, "year", "int"), End),
+            new Function(c, "hasYearZero", _n_hasYearZero0, None, Compiled, qt_QCalendar_hasYearZero_bool_QCalendar, Return, "bool",
                          Parameters, new Param(c, "this", "qt.QCalendar"), End),
-            new Function(c, "isLuniSolar", _n_isLuniSolar0, None, Compiled,
-                         qt_QCalendar_isLuniSolar_bool_QCalendar, Return,
-                         "bool", Parameters,
-                         new Param(c, "this", "qt.QCalendar"), End),
-            new Function(c, "isProleptic", _n_isProleptic0, None, Compiled,
-                         qt_QCalendar_isProleptic_bool_QCalendar, Return,
-                         "bool", Parameters,
-                         new Param(c, "this", "qt.QCalendar"), End),
-            new Function(c, "isSolar", _n_isSolar0, None, Compiled,
-                         qt_QCalendar_isSolar_bool_QCalendar, Return, "bool",
+            new Function(c, "isDateValid", _n_isDateValid0, None, Compiled, qt_QCalendar_isDateValid_bool_QCalendar_int_int_int, Return,
+                         "bool", Parameters, new Param(c, "this", "qt.QCalendar"), new Param(c, "year", "int"),
+                         new Param(c, "month", "int"), new Param(c, "day", "int"), End),
+            new Function(c, "isGregorian", _n_isGregorian0, None, Compiled, qt_QCalendar_isGregorian_bool_QCalendar, Return, "bool",
                          Parameters, new Param(c, "this", "qt.QCalendar"), End),
-            new Function(c, "isValid", _n_isValid0, None, Compiled,
-                         qt_QCalendar_isValid_bool_QCalendar, Return, "bool",
-                         Parameters, new Param(c, "this", "qt.QCalendar"), End),
-            new Function(
-                c, "maximumDaysInMonth", _n_maximumDaysInMonth0, None, Compiled,
-                qt_QCalendar_maximumDaysInMonth_int_QCalendar, Return, "int",
-                Parameters, new Param(c, "this", "qt.QCalendar"), End),
-            new Function(c, "maximumMonthsInYear", _n_maximumMonthsInYear0,
-                         None, Compiled,
-                         qt_QCalendar_maximumMonthsInYear_int_QCalendar, Return,
-                         "int", Parameters,
+            new Function(c, "isLeapYear", _n_isLeapYear0, None, Compiled, qt_QCalendar_isLeapYear_bool_QCalendar_int, Return, "bool",
+                         Parameters, new Param(c, "this", "qt.QCalendar"), new Param(c, "year", "int"), End),
+            new Function(c, "isLunar", _n_isLunar0, None, Compiled, qt_QCalendar_isLunar_bool_QCalendar, Return, "bool", Parameters,
                          new Param(c, "this", "qt.QCalendar"), End),
-            new Function(
-                c, "minimumDaysInMonth", _n_minimumDaysInMonth0, None, Compiled,
-                qt_QCalendar_minimumDaysInMonth_int_QCalendar, Return, "int",
-                Parameters, new Param(c, "this", "qt.QCalendar"), End),
+            new Function(c, "isLuniSolar", _n_isLuniSolar0, None, Compiled, qt_QCalendar_isLuniSolar_bool_QCalendar, Return, "bool",
+                         Parameters, new Param(c, "this", "qt.QCalendar"), End),
+            new Function(c, "isProleptic", _n_isProleptic0, None, Compiled, qt_QCalendar_isProleptic_bool_QCalendar, Return, "bool",
+                         Parameters, new Param(c, "this", "qt.QCalendar"), End),
+            new Function(c, "isSolar", _n_isSolar0, None, Compiled, qt_QCalendar_isSolar_bool_QCalendar, Return, "bool", Parameters,
+                         new Param(c, "this", "qt.QCalendar"), End),
+            new Function(c, "isValid", _n_isValid0, None, Compiled, qt_QCalendar_isValid_bool_QCalendar, Return, "bool", Parameters,
+                         new Param(c, "this", "qt.QCalendar"), End),
+            new Function(c, "maximumDaysInMonth", _n_maximumDaysInMonth0, None, Compiled, qt_QCalendar_maximumDaysInMonth_int_QCalendar,
+                         Return, "int", Parameters, new Param(c, "this", "qt.QCalendar"), End),
+            new Function(c, "maximumMonthsInYear", _n_maximumMonthsInYear0, None, Compiled, qt_QCalendar_maximumMonthsInYear_int_QCalendar,
+                         Return, "int", Parameters, new Param(c, "this", "qt.QCalendar"), End),
+            new Function(c, "minimumDaysInMonth", _n_minimumDaysInMonth0, None, Compiled, qt_QCalendar_minimumDaysInMonth_int_QCalendar,
+                         Return, "int", Parameters, new Param(c, "this", "qt.QCalendar"), End),
             // MISSING: monthName (string; QCalendar this, "const QLocale &"
             // locale, int month, int year, flags QLocale::FormatType format)
-            new Function(c, "monthsInYear", _n_monthsInYear0, None, Compiled,
-                         qt_QCalendar_monthsInYear_int_QCalendar_int, Return,
-                         "int", Parameters,
-                         new Param(c, "this", "qt.QCalendar"),
-                         new Param(c, "year", "int"), End),
-            new Function(c, "name", _n_name0, None, Compiled,
-                         qt_QCalendar_name_string_QCalendar, Return, "string",
-                         Parameters, new Param(c, "this", "qt.QCalendar"), End),
+            new Function(c, "monthsInYear", _n_monthsInYear0, None, Compiled, qt_QCalendar_monthsInYear_int_QCalendar_int, Return, "int",
+                         Parameters, new Param(c, "this", "qt.QCalendar"), new Param(c, "year", "int"), End),
+            new Function(c, "name", _n_name0, None, Compiled, qt_QCalendar_name_string_QCalendar, Return, "string", Parameters,
+                         new Param(c, "this", "qt.QCalendar"), End),
             // MISSING: standaloneMonthName (string; QCalendar this, "const
             // QLocale &" locale, int month, int year, flags QLocale::FormatType
             // format) MISSING: standaloneWeekDayName (string; QCalendar this,
@@ -489,10 +393,8 @@ namespace Mu
             // format) MISSING: weekDayName (string; QCalendar this, "const
             // QLocale &" locale, int day, flags QLocale::FormatType format)
             // static functions
-            new Function(c, "availableCalendars", _n_availableCalendars0, None,
-                         Compiled,
-                         qt_QCalendar_availableCalendars_stringBSB_ESB_, Return,
-                         "string[]", End),
+            new Function(c, "availableCalendars", _n_availableCalendars0, None, Compiled, qt_QCalendar_availableCalendars_stringBSB_ESB_,
+                         Return, "string[]", End),
             EndArguments);
         globalScope()->addSymbols(EndArguments);
         scope()->addSymbols(EndArguments);

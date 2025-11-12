@@ -29,8 +29,7 @@ namespace IPCore
     class RootIPNode : public IPNode
     {
     public:
-        RootIPNode(const std::string&, const NodeDefinition*, IPGraph*,
-                   GroupIPNode*);
+        RootIPNode(const std::string&, const NodeDefinition*, IPGraph*, GroupIPNode*);
 
         virtual ~RootIPNode();
 

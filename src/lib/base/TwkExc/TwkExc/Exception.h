@@ -98,8 +98,7 @@ namespace TwkExc
     //  I/O stream functions make exceptions look like streams
     //
 
-    template <typename T>
-    inline std::ostream& operator<<(Exception& e, const T& v)
+    template <typename T> inline std::ostream& operator<<(Exception& e, const T& v)
     {
         e.stream() << v;
         return e.stream();
@@ -127,23 +126,20 @@ namespace TwkExc
         EXC_TYPE(const std::ostringstream& str) throw(); \
     };
 
-#define TWK_DERIVED_EXCEPTION(T) \
-    TWK_DERIVED_EXCEPTION_FROM(TwkExc::Exception, T)
+#define TWK_DERIVED_EXCEPTION(T) TWK_DERIVED_EXCEPTION_FROM(TwkExc::Exception, T)
 
-#define TWK_DERIVED_EXCEPTION_FROM_WITH_EXPORT(BASE_TYPE, EXC_TYPE, \
-                                               EXPORT_TYPE)         \
-    class EXPORT_TYPE EXC_TYPE : public BASE_TYPE                   \
-    {                                                               \
-    public:                                                         \
-        EXC_TYPE() throw();                                         \
-        virtual ~EXC_TYPE() throw();                                \
-        EXC_TYPE(const char* str) throw();                          \
-        EXC_TYPE(const std::string& str) throw();                   \
-        EXC_TYPE(const std::ostringstream& str) throw();            \
+#define TWK_DERIVED_EXCEPTION_FROM_WITH_EXPORT(BASE_TYPE, EXC_TYPE, EXPORT_TYPE) \
+    class EXPORT_TYPE EXC_TYPE : public BASE_TYPE                                \
+    {                                                                            \
+    public:                                                                      \
+        EXC_TYPE() throw();                                                      \
+        virtual ~EXC_TYPE() throw();                                             \
+        EXC_TYPE(const char* str) throw();                                       \
+        EXC_TYPE(const std::string& str) throw();                                \
+        EXC_TYPE(const std::ostringstream& str) throw();                         \
     };
 
-#define TWK_DERIVED_EXCEPTION_WITH_EXPORT(T, EXPORT_TYPE) \
-    TWK_DERIVED_EXCEPTION_FROM_WITH_EXPORT(TwkExc::Exception, T, EXPORT_TYPE)
+#define TWK_DERIVED_EXCEPTION_WITH_EXPORT(T, EXPORT_TYPE) TWK_DERIVED_EXCEPTION_FROM_WITH_EXPORT(TwkExc::Exception, T, EXPORT_TYPE)
 
 #define TWK_DERIVED_EXCEPTION_FROM_IMP(BASE_TYPE, EXC_TYPE)   \
     EXC_TYPE::EXC_TYPE() throw()                              \
@@ -164,8 +160,7 @@ namespace TwkExc
     }                                                         \
     EXC_TYPE::~EXC_TYPE() throw() {}
 
-#define TWK_DERIVED_EXCEPTION_IMP(T) \
-    TWK_DERIVED_EXCEPTION_FROM_IMP(TwkExc::Exception, T)
+#define TWK_DERIVED_EXCEPTION_IMP(T) TWK_DERIVED_EXCEPTION_FROM_IMP(TwkExc::Exception, T)
 
 #define TWK_THROW_STREAM(EXC, STREAM_TOKENS) \
     {                                        \

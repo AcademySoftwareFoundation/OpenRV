@@ -55,30 +55,26 @@ namespace Mu
 
     //----------------------------------------------------------------------
 
-    template <typename T, size_t S>
-    inline void assignOp(Vector<T, S>& a, const Vector<T, S>& b)
+    template <typename T, size_t S> inline void assignOp(Vector<T, S>& a, const Vector<T, S>& b)
     {
         for (int i = 0; i < S; i++)
             a[i] = b[i];
     }
 
-    template <typename T, size_t S>
-    inline void assignOp(Vector<T, S>& a, const T b)
+    template <typename T, size_t S> inline void assignOp(Vector<T, S>& a, const T b)
     {
         for (int i = 0; i < S; i++)
             a[i] = b;
     }
 
-    template <typename T, size_t S>
-    inline Vector<T, S> constructVector(const T a)
+    template <typename T, size_t S> inline Vector<T, S> constructVector(const T a)
     {
         Vector<T, S> v;
         v.data[0] = a;
         return v;
     }
 
-    template <typename T, size_t S>
-    inline Vector<T, S> constructVector(const T a, const T b)
+    template <typename T, size_t S> inline Vector<T, S> constructVector(const T a, const T b)
     {
         Vector<T, S> v;
         v.data[0] = a;
@@ -86,8 +82,7 @@ namespace Mu
         return v;
     }
 
-    template <typename T, size_t S>
-    inline Vector<T, S> constructVector(const T a, const T b, const T c)
+    template <typename T, size_t S> inline Vector<T, S> constructVector(const T a, const T b, const T c)
     {
         Vector<T, S> v;
         v.data[0] = a;
@@ -96,9 +91,7 @@ namespace Mu
         return v;
     }
 
-    template <typename T, size_t S>
-    inline Vector<T, S> constructVector(const T a, const T b, const T c,
-                                        const T d)
+    template <typename T, size_t S> inline Vector<T, S> constructVector(const T a, const T b, const T c, const T d)
     {
         Vector<T, S> v;
         v.data[0] = a;
@@ -108,8 +101,7 @@ namespace Mu
         return v;
     }
 
-    template <typename T, size_t S>
-    std::ostream& operator<<(std::ostream& o, const Vector<T, S>& v)
+    template <typename T, size_t S> std::ostream& operator<<(std::ostream& o, const Vector<T, S>& v)
     {
         o << "<";
         for (int i = 0; i < S; i++)
@@ -122,8 +114,7 @@ namespace Mu
         return o;
     }
 
-    template <typename T, size_t S>
-    inline bool operator==(const Vector<T, S>& a, const Vector<T, S>& b)
+    template <typename T, size_t S> inline bool operator==(const Vector<T, S>& a, const Vector<T, S>& b)
     {
         for (int i = 0; i < S; i++)
             if (a[i] != b[i])
@@ -131,14 +122,9 @@ namespace Mu
         return true;
     }
 
-    template <typename T, size_t S>
-    inline bool operator!=(const Vector<T, S>& a, const Vector<T, S>& b)
-    {
-        return !(a == b);
-    }
+    template <typename T, size_t S> inline bool operator!=(const Vector<T, S>& a, const Vector<T, S>& b) { return !(a == b); }
 
-    template <typename T, size_t S>
-    inline Vector<T, S> operator-(const Vector<T, S>& v)
+    template <typename T, size_t S> inline Vector<T, S> operator-(const Vector<T, S>& v)
     {
         Vector<T, S> n;
         for (int i = 0; i < S; i++)
@@ -146,8 +132,7 @@ namespace Mu
         return n;
     }
 
-    template <typename T, size_t S>
-    inline Vector<T, S> operator+(const Vector<T, S>& a, const Vector<T, S>& b)
+    template <typename T, size_t S> inline Vector<T, S> operator+(const Vector<T, S>& a, const Vector<T, S>& b)
     {
         Vector<T, S> n;
         for (int i = 0; i < S; i++)
@@ -155,8 +140,7 @@ namespace Mu
         return n;
     }
 
-    template <typename T, size_t S>
-    inline Vector<T, S> operator-(const Vector<T, S>& a, const Vector<T, S>& b)
+    template <typename T, size_t S> inline Vector<T, S> operator-(const Vector<T, S>& a, const Vector<T, S>& b)
     {
         Vector<T, S> n;
         for (int i = 0; i < S; i++)
@@ -164,8 +148,7 @@ namespace Mu
         return n;
     }
 
-    template <typename T, size_t S>
-    inline Vector<T, S> operator*(const Vector<T, S>& a, const Vector<T, S>& b)
+    template <typename T, size_t S> inline Vector<T, S> operator*(const Vector<T, S>& a, const Vector<T, S>& b)
     {
         Vector<T, S> n;
         for (int i = 0; i < S; i++)
@@ -173,8 +156,7 @@ namespace Mu
         return n;
     }
 
-    template <typename T, size_t S>
-    inline Vector<T, S> operator*(const Vector<T, S>& a, T b)
+    template <typename T, size_t S> inline Vector<T, S> operator*(const Vector<T, S>& a, T b)
     {
         Vector<T, S> n;
         for (int i = 0; i < S; i++)
@@ -182,8 +164,7 @@ namespace Mu
         return n;
     }
 
-    template <typename T, size_t S>
-    inline Vector<T, S> operator*(T b, const Vector<T, S>& a)
+    template <typename T, size_t S> inline Vector<T, S> operator*(T b, const Vector<T, S>& a)
     {
         Vector<T, S> n;
         for (int i = 0; i < S; i++)
@@ -191,8 +172,7 @@ namespace Mu
         return n;
     }
 
-    template <typename T, size_t S>
-    inline Vector<T, S> operator/(T b, const Vector<T, S>& a)
+    template <typename T, size_t S> inline Vector<T, S> operator/(T b, const Vector<T, S>& a)
     {
         Vector<T, S> n;
         for (int i = 0; i < S; i++)
@@ -200,8 +180,7 @@ namespace Mu
         return n;
     }
 
-    template <typename T, size_t S>
-    inline Vector<T, S> operator/(const Vector<T, S>& a, const Vector<T, S>& b)
+    template <typename T, size_t S> inline Vector<T, S> operator/(const Vector<T, S>& a, const Vector<T, S>& b)
     {
         Vector<T, S> n;
         for (int i = 0; i < S; i++)
@@ -209,8 +188,7 @@ namespace Mu
         return n;
     }
 
-    template <typename T, size_t S>
-    inline Vector<T, S> operator/(const Vector<T, S>& a, T s)
+    template <typename T, size_t S> inline Vector<T, S> operator/(const Vector<T, S>& a, T s)
     {
         Vector<T, S> v = a;
         for (int i = 0; i < S; i++)
@@ -218,8 +196,7 @@ namespace Mu
         return v;
     }
 
-    template <typename T, size_t S>
-    inline T dot(const Vector<T, S>& a, const Vector<T, S>& b)
+    template <typename T, size_t S> inline T dot(const Vector<T, S>& a, const Vector<T, S>& b)
     {
         T s = 0;
         for (int i = 0; i < S; i++)
@@ -227,26 +204,13 @@ namespace Mu
         return s;
     }
 
-    template <typename T, size_t S> inline T mag(const Vector<T, S>& a)
-    {
-        return T(::sqrt(dot(a, a)));
-    }
+    template <typename T, size_t S> inline T mag(const Vector<T, S>& a) { return T(::sqrt(dot(a, a))); }
 
-    template <typename T, size_t S>
-    inline Vector<T, S> normalize(const Vector<T, S>& a)
-    {
-        return a / mag(a);
-    }
+    template <typename T, size_t S> inline Vector<T, S> normalize(const Vector<T, S>& a) { return a / mag(a); }
 
-    template <typename T, size_t S>
-    inline Vector<T, S> cross(const Vector<T, S>& a, const Vector<T, S>& b)
-    {
-        return a;
-    }
+    template <typename T, size_t S> inline Vector<T, S> cross(const Vector<T, S>& a, const Vector<T, S>& b) { return a; }
 
-    template <>
-    inline Vector<float, 3> cross(const Vector<float, 3>& a,
-                                  const Vector<float, 3>& b)
+    template <> inline Vector<float, 3> cross(const Vector<float, 3>& a, const Vector<float, 3>& b)
     {
         Vector<float, 3> c;
         c[0] = a[1] * b[2] - a[2] * b[1];

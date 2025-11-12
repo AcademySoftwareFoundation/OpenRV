@@ -59,9 +59,7 @@
 //
 namespace TwkUtil::JobOps
 {
-    template <>
-    IPCore::IPGraph::WorkItem update<>(Id id, OpType op,
-                                       IPCore::IPGraph::WorkItem info)
+    template <> IPCore::IPGraph::WorkItem update<>(Id id, OpType op, IPCore::IPGraph::WorkItem info)
     {
         switch (op)
         {
@@ -158,8 +156,7 @@ namespace IPCore
         }
         catch (std::exception& exc)
         {
-            cerr << "ERROR: evaluation thread " << d->id
-                 << " exited via exception: " << exc.what() << endl;
+            cerr << "ERROR: evaluation thread " << d->id << " exited via exception: " << exc.what() << endl;
             d->running = false;
         }
         catch (...)
@@ -179,13 +176,11 @@ namespace IPCore
         }
         catch (...)
         {
-            cerr << "ERROR: audio evaluation thread exited via exception"
-                 << endl;
+            cerr << "ERROR: audio evaluation thread exited via exception" << endl;
         }
     }
 
-    IPGraph::GraphEdit::GraphEdit(IPGraph& graph, bool lock, bool pflush,
-                                  bool aflush)
+    IPGraph::GraphEdit::GraphEdit(IPGraph& graph, bool lock, bool pflush, bool aflush)
         : m_graph(graph)
         , m_lock(lock)
         , m_programFlush(pflush)
@@ -323,12 +318,10 @@ namespace IPCore
         // The number of threads for workItem is based on 25% of the available
         // CPUs with a minimum of 1 and a maximum of 4. It is possible to force
         // this value with the workItemThreads option.
-        auto workItemThreads = Application::optionValue<int>(
-            "workItemThreads", std::clamp(TwkUtil::SystemInfo::numCPUs() / 4,
-                                          (size_t)MIN_WORK_ITEM_THREADS,
-                                          (size_t)MAX_WORK_ITEM_THREADS));
-        auto jobDispatcher =
-            new TwkUtil::JobDispatcher(workItemThreads, "graph job dispatcher");
+        auto workItemThreads =
+            Application::optionValue<int>("workItemThreads", std::clamp(TwkUtil::SystemInfo::numCPUs() / 4, (size_t)MIN_WORK_ITEM_THREADS,
+                                                                        (size_t)MAX_WORK_ITEM_THREADS));
+        auto jobDispatcher = new TwkUtil::JobDispatcher(workItemThreads, "graph job dispatcher");
         jobDispatcher->start();
         m_jobDispatcher = reinterpret_cast<void*>(jobDispatcher);
     }
@@ -337,8 +330,7 @@ namespace IPCore
     {
         if (m_jobDispatcher)
         {
-            auto jobDispatcher =
-                reinterpret_cast<JobDispatcher*>(m_jobDispatcher);
+            auto jobDispatcher = reinterpret_cast<JobDispatcher*>(m_jobDispatcher);
             jobDispatcher->stop();
             delete jobDispatcher;
         }
@@ -386,22 +378,15 @@ namespace IPCore
         initializeIPTree(empty);
     }
 
-    void IPGraph::setDevice(const TwkApp::VideoDevice* controlDevice,
-                            const TwkApp::VideoDevice* outputDevice)
+    void IPGraph::setDevice(const TwkApp::VideoDevice* controlDevice, const TwkApp::VideoDevice* outputDevice)
     {
         m_controlDevice = controlDevice;
         m_outputDevice = outputDevice;
     }
 
-    void IPGraph::addIsolatedNode(IPNode* node)
-    {
-        m_isolatedNodes[node->name()] = node;
-    }
+    void IPGraph::addIsolatedNode(IPNode* node) { m_isolatedNodes[node->name()] = node; }
 
-    void IPGraph::removeIsolatedNode(IPNode* node)
-    {
-        m_isolatedNodes.erase(node->name());
-    }
+    void IPGraph::removeIsolatedNode(IPNode* node) { m_isolatedNodes.erase(node->name()); }
 
     void IPGraph::isolateNode(IPNode* node)
     {
@@ -418,14 +403,12 @@ namespace IPCore
 
         if (node->group() != NULL)
         {
-            TWK_THROW_EXC_STREAM(
-                "IPGraph::isolateNode: only top level nodes can be used");
+            TWK_THROW_EXC_STREAM("IPGraph::isolateNode: only top level nodes can be used");
         }
 
         if (m_defaultViewsMap.find(node->name()) != m_defaultViewsMap.end())
         {
-            TWK_THROW_EXC_STREAM(
-                "IPGraph::isolateNode: default view cannot be used");
+            TWK_THROW_EXC_STREAM("IPGraph::isolateNode: default view cannot be used");
         }
 
         node->willDeleteSignal()();
@@ -528,8 +511,7 @@ namespace IPCore
 
         if (DisplayGroupIPNode* dnode = dynamic_cast<DisplayGroupIPNode*>(n))
         {
-            DisplayGroups::iterator i =
-                find(m_displayGroups.begin(), m_displayGroups.end(), dnode);
+            DisplayGroups::iterator i = find(m_displayGroups.begin(), m_displayGroups.end(), dnode);
             if (i != m_displayGroups.end())
             {
                 m_displayGroups.erase(i);
@@ -646,8 +628,7 @@ namespace IPCore
         //  deletion -- at least at the top level.
         //
 
-        for (NodeMap::iterator i = m_viewNodeMap.begin();
-             i != m_viewNodeMap.end(); ++i)
+        for (NodeMap::iterator i = m_viewNodeMap.begin(); i != m_viewNodeMap.end(); ++i)
         {
             IPNode* n = i->second;
             n->willDelete();
@@ -676,26 +657,16 @@ namespace IPCore
 
         m_rootNode = newNode("Root", "root");
         m_sessionNode = newNodeOfType<SessionIPNode>("Session", "session");
-        m_viewGroupNode =
-            newNodeOfType<ViewGroupIPNode>("ViewGroup", "viewGroup");
+        m_viewGroupNode = newNodeOfType<ViewGroupIPNode>("ViewGroup", "viewGroup");
         m_defaultOutputGroup = newOutputGroup("defaultOutputGroup");
         m_viewNode = 0;
 
-        m_volume = m_viewGroupNode->soundtrackNode()->property<FloatProperty>(
-            "audio.volume");
-        m_balance = m_viewGroupNode->soundtrackNode()->property<FloatProperty>(
-            "audio.balance");
-        m_mute = m_viewGroupNode->soundtrackNode()->property<IntProperty>(
-            "audio.mute");
-        m_audioSoftClamp =
-            m_viewGroupNode->soundtrackNode()->property<IntProperty>(
-                "audio.softClamp");
-        m_audioOffset =
-            m_viewGroupNode->soundtrackNode()->property<FloatProperty>(
-                "audio.offset");
-        m_audioOffset2 =
-            m_viewGroupNode->soundtrackNode()->property<FloatProperty>(
-                "audio.internalOffset");
+        m_volume = m_viewGroupNode->soundtrackNode()->property<FloatProperty>("audio.volume");
+        m_balance = m_viewGroupNode->soundtrackNode()->property<FloatProperty>("audio.balance");
+        m_mute = m_viewGroupNode->soundtrackNode()->property<IntProperty>("audio.mute");
+        m_audioSoftClamp = m_viewGroupNode->soundtrackNode()->property<IntProperty>("audio.softClamp");
+        m_audioOffset = m_viewGroupNode->soundtrackNode()->property<FloatProperty>("audio.offset");
+        m_audioOffset2 = m_viewGroupNode->soundtrackNode()->property<FloatProperty>("audio.internalOffset");
 
         setPhysicalDevicesInternal(modules);
 
@@ -756,8 +727,7 @@ namespace IPCore
             for (size_t i = 0; i < modules.size(); i++)
             {
                 const VideoModule* module = modules[i].get();
-                const TwkApp::VideoModule::VideoDevices& devices =
-                    module->devices();
+                const TwkApp::VideoModule::VideoDevices& devices = module->devices();
 
                 for (size_t j = 0; j < devices.size(); j++)
                 {
@@ -784,8 +754,7 @@ namespace IPCore
 
     void IPGraph::setPrimaryDisplayGroup(DisplayGroupIPNode* node)
     {
-        DisplayGroups::iterator i =
-            std::find(m_displayGroups.begin(), m_displayGroups.end(), node);
+        DisplayGroups::iterator i = std::find(m_displayGroups.begin(), m_displayGroups.end(), node);
 
         //
         //  If already the current display group return
@@ -809,10 +778,7 @@ namespace IPCore
 
     void IPGraph::setRootNodes1(IPNode* node) { m_rootNode->setInputs1(node); }
 
-    void IPGraph::setRootNodes(const IPNodes& nodes)
-    {
-        m_rootNode->setInputs(nodes);
-    }
+    void IPGraph::setRootNodes(const IPNodes& nodes) { m_rootNode->setInputs(nodes); }
 
     void IPGraph::setPrimaryDisplayGroup(const TwkApp::VideoDevice* d)
     {
@@ -821,8 +787,7 @@ namespace IPCore
         //  and switch to that.
         //
 
-        if (DisplayGroupIPNode* node =
-                findDisplayGroupByDevice(d->physicalDevice()))
+        if (DisplayGroupIPNode* node = findDisplayGroupByDevice(d->physicalDevice()))
         {
             if (DisplayGroupIPNode* d = primaryDisplayGroup())
                 d->setOutputVideoDevice(0);
@@ -832,8 +797,7 @@ namespace IPCore
         }
     }
 
-    void IPGraph::deviceChanged(const VideoDevice* oldDevice,
-                                const VideoDevice* newDevice) const
+    void IPGraph::deviceChanged(const VideoDevice* oldDevice, const VideoDevice* newDevice) const
     {
         if (DisplayGroupIPNode* dnode = findDisplayGroupByDevice(oldDevice))
         {
@@ -846,8 +810,7 @@ namespace IPCore
         }
     }
 
-    DisplayGroupIPNode*
-    IPGraph::findDisplayGroupByDevice(const TwkApp::VideoDevice* device) const
+    DisplayGroupIPNode* IPGraph::findDisplayGroupByDevice(const TwkApp::VideoDevice* device) const
     {
         for (size_t i = 0; i < m_displayGroups.size(); i++)
         {
@@ -870,8 +833,7 @@ namespace IPCore
 
     void IPGraph::addDisplayGroup(DisplayGroupIPNode* node)
     {
-        DisplayGroups::iterator i =
-            find(m_displayGroups.begin(), m_displayGroups.end(), node);
+        DisplayGroups::iterator i = find(m_displayGroups.begin(), m_displayGroups.end(), node);
 
         if (i == m_displayGroups.end())
             m_displayGroups.push_back(node);
@@ -893,8 +855,7 @@ namespace IPCore
         }
     }
 
-    void IPGraph::connectDisplayGroup(DisplayGroupIPNode* node,
-                                      bool atbeginning, bool connectToView)
+    void IPGraph::connectDisplayGroup(DisplayGroupIPNode* node, bool atbeginning, bool connectToView)
     {
         if (m_rootNode->isInput(node))
             return;
@@ -906,8 +867,7 @@ namespace IPCore
             node->setInputs1(m_viewGroupNode);
     }
 
-    void IPGraph::connectDisplayGroup(const TwkApp::VideoDevice* device,
-                                      bool atbeginning, bool connectToView)
+    void IPGraph::connectDisplayGroup(const TwkApp::VideoDevice* device, bool atbeginning, bool connectToView)
     {
         if (DisplayGroupIPNode* node = findDisplayGroupByDevice(device))
         {
@@ -937,12 +897,9 @@ namespace IPCore
         }
     }
 
-    IPNode::Context IPGraph::contextForFrame(int frame,
-                                             IPNode::ThreadType threadType,
-                                             bool stereo) const
+    IPNode::Context IPGraph::contextForFrame(int frame, IPNode::ThreadType threadType, bool stereo) const
     {
-        return IPNode::Context(frame, frame, m_fbcache.displayFPS(), 0, 0,
-                               threadType, size_t(0), m_fbcache, stereo);
+        return IPNode::Context(frame, frame, m_fbcache.displayFPS(), 0, 0, threadType, size_t(0), m_fbcache, stereo);
     }
 
     void IPGraph::beginGraphEdit()
@@ -1042,8 +999,7 @@ namespace IPCore
         info[2] = str.str();
         info[3] = node->group() ? node->group()->name() : "";
 
-        TwkApp::GenericStringEvent bevent("graph-before-delete-node", this,
-                                          info[0]);
+        TwkApp::GenericStringEvent bevent("graph-before-delete-node", this, info[0]);
         bevent.setStringContentVector(info);
         sendEvent(bevent);
 
@@ -1053,8 +1009,7 @@ namespace IPCore
         m_frameCacheInvalid = true;
         m_topologyChanged = true;
 
-        TwkApp::GenericStringEvent aevent("graph-after-delete-node", this,
-                                          info[0]);
+        TwkApp::GenericStringEvent aevent("graph-after-delete-node", this, info[0]);
         aevent.setStringContentVector(info);
         sendEvent(aevent);
 
@@ -1070,8 +1025,7 @@ namespace IPCore
             return pc;
         }
 
-        cerr << "ERROR: couldn't make " << node->name() << " of type \""
-             << node->protocol() << "\"" << endl;
+        cerr << "ERROR: couldn't make " << node->name() << " of type \"" << node->protocol() << "\"" << endl;
 
         return 0;
     }
@@ -1089,8 +1043,7 @@ IPGraph::findNodesByAbstractPath(int frame,
 }
 #endif
 
-    void IPGraph::findNodesByPattern(int frame, NodeVector& nodes,
-                                     const std::string& pattern)
+    void IPGraph::findNodesByPattern(int frame, NodeVector& nodes, const std::string& pattern)
     {
         if (pattern[0] == '#')
         {
@@ -1107,8 +1060,7 @@ IPGraph::findNodesByAbstractPath(int frame,
         }
     }
 
-    void IPGraph::findNodesByTypeName(int frame, NodeVector& nodes,
-                                      const string& typeName) const
+    void IPGraph::findNodesByTypeName(int frame, NodeVector& nodes, const string& typeName) const
     {
         if (typeName == "View")
         {
@@ -1130,8 +1082,7 @@ IPGraph::findNodesByAbstractPath(int frame,
         }
     }
 
-    void IPGraph::findNodesByTypeName(NodeVector& nodes,
-                                      const string& typeName) const
+    void IPGraph::findNodesByTypeName(NodeVector& nodes, const string& typeName) const
     {
         if (typeName == "View")
         {
@@ -1143,8 +1094,7 @@ IPGraph::findNodesByAbstractPath(int frame,
         }
         else
         {
-            for (NodeMap::const_iterator i = m_nodeMap.begin();
-                 i != m_nodeMap.end(); ++i)
+            for (NodeMap::const_iterator i = m_nodeMap.begin(); i != m_nodeMap.end(); ++i)
             {
                 IPNode* node = i->second;
 
@@ -1156,9 +1106,7 @@ IPGraph::findNodesByAbstractPath(int frame,
         }
     }
 
-    void IPGraph::findNodesByTypeNameWithProperty(NodeVector& nodes,
-                                                  const string& typeName,
-                                                  const string& propName)
+    void IPGraph::findNodesByTypeNameWithProperty(NodeVector& nodes, const string& typeName, const string& propName)
     {
         NodeVector temp;
         findNodesByTypeName(temp, typeName);
@@ -1170,8 +1118,7 @@ IPGraph::findNodesByAbstractPath(int frame,
         }
     }
 
-    void IPGraph::findProperty(int frame, PropertyVector& props,
-                               const string& name)
+    void IPGraph::findProperty(int frame, PropertyVector& props, const string& name)
     {
         vector<string> buffer;
         algorithm::split(buffer, name, is_any_of("."), token_compress_on);
@@ -1182,8 +1129,7 @@ IPGraph::findNodesByAbstractPath(int frame,
         IPNode* rootNode = m_rootNode;
 
         vector<string> prefixBuffer;
-        algorithm::split(prefixBuffer, buffer[0], is_any_of("/"),
-                         token_compress_on);
+        algorithm::split(prefixBuffer, buffer[0], is_any_of("/"), token_compress_on);
 
         if (prefixBuffer.size() > 1)
         {
@@ -1222,8 +1168,7 @@ IPGraph::findNodesByAbstractPath(int frame,
             else
             {
                 IPNode::MetaEvalInfoVector infos;
-                IPNode::MetaEvalClosestByTypeName closest(
-                    infos, head.substr(1, head.size() - 1));
+                IPNode::MetaEvalClosestByTypeName closest(infos, head.substr(1, head.size() - 1));
                 rootNode->metaEvaluate(contextForFrame(frame), closest);
 
                 if (!infos.empty())
@@ -1250,8 +1195,7 @@ IPGraph::findNodesByAbstractPath(int frame,
         else if (qualifier == '@')
         {
             IPNode::MetaEvalInfoVector infos;
-            IPNode::MetaEvalFirstClosestByTypeName closest(
-                infos, head.substr(1, head.size() - 1));
+            IPNode::MetaEvalFirstClosestByTypeName closest(infos, head.substr(1, head.size() - 1));
             rootNode->metaEvaluate(contextForFrame(frame), closest);
 
             if (!infos.empty())
@@ -1310,8 +1254,7 @@ IPGraph::findNodesByAbstractPath(int frame,
         {
             char c = cname[i];
 
-            if ((c < 'a' || c > 'z') && (c < 'A' || c > 'Z')
-                && (c < '0' || c > '9') && (c != '_'))
+            if ((c < 'a' || c > 'z') && (c < 'A' || c > 'Z') && (c < '0' || c > '9') && (c != '_'))
             {
                 break;
             }
@@ -1338,8 +1281,7 @@ IPGraph::findNodesByAbstractPath(int frame,
     {
         string name = canonicalNodeName(inname);
 
-        for (NodeMap::const_iterator i = m_nodeMap.begin();
-             i != m_nodeMap.end(); ++i)
+        for (NodeMap::const_iterator i = m_nodeMap.begin(); i != m_nodeMap.end(); ++i)
         {
             IPNode* node = i->second;
             if (node->uiName() == name)
@@ -1349,8 +1291,7 @@ IPGraph::findNodesByAbstractPath(int frame,
         return 0;
     }
 
-    IPNode* IPGraph::findNodeAssociatedWith(IPNode* source,
-                                            const std::string& typeName) const
+    IPNode* IPGraph::findNodeAssociatedWith(IPNode* source, const std::string& typeName) const
     {
         const IPNode::IPNodes& outputs = source->outputs();
 
@@ -1366,8 +1307,7 @@ IPGraph::findNodesByAbstractPath(int frame,
             {
                 const IPNode::IPNodeSet& members = group->members();
 
-                for (IPNode::IPNodeSet::const_iterator i = members.begin();
-                     i != members.end(); ++i)
+                for (IPNode::IPNodeSet::const_iterator i = members.begin(); i != members.end(); ++i)
                 {
                     IPNode* mnode = *i;
 
@@ -1403,9 +1343,7 @@ IPGraph::findNodesByAbstractPath(int frame,
 
     //----------------------------------------------------------------------
 
-    void IPGraph::setCachingMode(CachingMode mode, int inframe, int outframe,
-                                 int minFrame, int maxFrame, int inc, int frame,
-                                 float fps)
+    void IPGraph::setCachingMode(CachingMode mode, int inframe, int outframe, int minFrame, int maxFrame, int inc, int frame, float fps)
     {
         //
         //  UTILITY_CACHING
@@ -1415,23 +1353,15 @@ IPGraph::findNodesByAbstractPath(int frame,
         size_t memUsage = m_cacheSizeMap[mode];
         bool doDispatch = true;
         if (m_editing || isMediaLoading()
-            || (m_fbcache.minFrame() == minFrame
-                && m_fbcache.maxFrame() == maxFrame
-                && m_fbcache.inFrame() == inframe
-                && m_fbcache.outFrame() == outframe
-                && m_fbcache.capacity() == memUsage && m_cacheMode == mode
-                && isCacheThreadRunning()))
+            || (m_fbcache.minFrame() == minFrame && m_fbcache.maxFrame() == maxFrame && m_fbcache.inFrame() == inframe
+                && m_fbcache.outFrame() == outframe && m_fbcache.capacity() == memUsage && m_cacheMode == mode && isCacheThreadRunning()))
         {
             doDispatch = false;
         }
 
-        DBL(DB_DISP, "setCachingMode mode "
-                         << mode << " editing " << m_editing
-                         << " isMediaLoading " << isMediaLoading()
-                         << " doDispatch " << doDispatch << " min " << minFrame
-                         << " max " << maxFrame << " in " << inframe << " out "
-                         << outframe << " thread running "
-                         << isCacheThreadRunning());
+        DBL(DB_DISP, "setCachingMode mode " << mode << " editing " << m_editing << " isMediaLoading " << isMediaLoading() << " doDispatch "
+                                            << doDispatch << " min " << minFrame << " max " << maxFrame << " in " << inframe << " out "
+                                            << outframe << " thread running " << isCacheThreadRunning());
 
         if (doDispatch && m_cacheMode != NeverCache)
             finishCachingThread();
@@ -1439,8 +1369,7 @@ IPGraph::findNodesByAbstractPath(int frame,
         bool modeChanged = (m_cacheMode != mode);
         m_cacheMode = mode;
 
-        IPNode::GraphConfiguration gconfig(minFrame, maxFrame, inframe,
-                                           outframe, fps);
+        IPNode::GraphConfiguration gconfig(minFrame, maxFrame, inframe, outframe, fps);
 
         switch (mode)
         {
@@ -1462,8 +1391,7 @@ IPGraph::findNodesByAbstractPath(int frame,
             m_fbcache.unlock();
             if (doDispatch)
             {
-                dispatchCachingThread(inframe, outframe, minFrame, maxFrame,
-                                      inc, frame, fps, modeChanged);
+                dispatchCachingThread(inframe, outframe, minFrame, maxFrame, inc, frame, fps, modeChanged);
             }
             else
             {
@@ -1486,8 +1414,7 @@ IPGraph::findNodesByAbstractPath(int frame,
             m_fbcache.unlock();
             if (doDispatch)
             {
-                dispatchCachingThread(inframe, outframe, minFrame, maxFrame,
-                                      inc, frame, fps, modeChanged);
+                dispatchCachingThread(inframe, outframe, minFrame, maxFrame, inc, frame, fps, modeChanged);
             }
             else
             {
@@ -1534,10 +1461,8 @@ IPGraph::findNodesByAbstractPath(int frame,
 
     void IPGraph::setCacheModeSize(CachingMode mode, size_t size)
     {
-        DBL(DB_SIZE, "IPGraph::setCacheModeSize mode "
-                         << mode << " size " << size << ", was "
-                         << m_cacheSizeMap[mode] << ", used "
-                         << m_fbcache.used());
+        DBL(DB_SIZE, "IPGraph::setCacheModeSize mode " << mode << " size " << size << ", was " << m_cacheSizeMap[mode] << ", used "
+                                                       << m_fbcache.used());
         m_cacheSizeMap[mode] = size;
 
         if (m_cacheMode == mode)
@@ -1594,8 +1519,7 @@ IPGraph::findNodesByAbstractPath(int frame,
 
         for (int frame = start; frame <= end; frame++)
         {
-            IPNode::Context context =
-                contextForFrame(frame, IPNode::CacheLockedThread, false);
+            IPNode::Context context = contextForFrame(frame, IPNode::CacheLockedThread, false);
 
             try
             {
@@ -1726,9 +1650,7 @@ IPGraph::findNodesByAbstractPath(int frame,
 
             try
             {
-                IPNode::ThreadType t = m_cacheMode == NeverCache
-                                           ? IPNode::DisplayMaybeEvalThread
-                                           : IPNode::DisplayNoEvalThread;
+                IPNode::ThreadType t = m_cacheMode == NeverCache ? IPNode::DisplayMaybeEvalThread : IPNode::DisplayNoEvalThread;
 
                 PROFILE_SAMPLE(evalInternalStart);
 
@@ -1832,8 +1754,7 @@ IPGraph::findNodesByAbstractPath(int frame,
 
             try
             {
-                DBL(DB_CACHE,
-                    "overrun: evaling in display thread, frame " << frame);
+                DBL(DB_CACHE, "overrun: evaling in display thread, frame " << frame);
                 img = evaluate(frame, IPNode::DisplayCacheEvalThread);
                 if (willPause)
                     status = EvalBufferNeedsRefill;
@@ -1864,8 +1785,7 @@ IPGraph::findNodesByAbstractPath(int frame,
             }
             catch (std::exception& exc)
             {
-                cerr << "ERROR: display pass-through caught: " << exc.what()
-                     << endl;
+                cerr << "ERROR: display pass-through caught: " << exc.what() << endl;
                 status = EvalError;
             }
 
@@ -1912,30 +1832,23 @@ IPGraph::findNodesByAbstractPath(int frame,
             {
                 //  awakenAllCachingThreads();
                 //  redispatchCachingThread();
-                IPGraph::setCachingMode(
-                    m_cacheMode, m_fbcache.inFrame(), m_fbcache.outFrame(),
-                    m_fbcache.minFrame(), m_fbcache.maxFrame(),
-                    m_fbcache.displayInc(), m_fbcache.displayFrame(),
-                    m_fbcache.displayFPS());
+                IPGraph::setCachingMode(m_cacheMode, m_fbcache.inFrame(), m_fbcache.outFrame(), m_fbcache.minFrame(), m_fbcache.maxFrame(),
+                                        m_fbcache.displayInc(), m_fbcache.displayFrame(), m_fbcache.displayFPS());
             }
         }
 
         return make_pair(status, img);
     }
 
-    void IPGraph::promoteFBsInFrameRange(int beg, int end, int inc,
-                                         TwkUtil::Timer t)
+    void IPGraph::promoteFBsInFrameRange(int beg, int end, int inc, TwkUtil::Timer t)
     {
         if (m_noPromotion)
             return;
 
         int first = (inc > 0) ? beg : end;
         int last = (inc > 0) ? end : beg;
-        DBL(DB_PROMOTE, "promoteFBsInFrameRange beg "
-                            << beg << " end " << end << " inc " << inc
-                            << " first " << first << " last " << last
-                            << " trashCount " << m_fbcache.trashCount()
-                            << " elapsed " << t.elapsed());
+        DBL(DB_PROMOTE, "promoteFBsInFrameRange beg " << beg << " end " << end << " inc " << inc << " first " << first << " last " << last
+                                                      << " trashCount " << m_fbcache.trashCount() << " elapsed " << t.elapsed());
 
         if (!m_rootNode)
             return;
@@ -1967,9 +1880,7 @@ IPGraph::findNodesByAbstractPath(int frame,
             bool ok = true;
             try
             {
-                IPNode::Context context(f, f, m_fbcache.displayFPS(), 0, 0,
-                                        IPNode::DisplayNoEvalThread, 0,
-                                        m_fbcache, false);
+                IPNode::Context context(f, f, m_fbcache.displayFPS(), 0, 0, IPNode::DisplayNoEvalThread, 0, m_fbcache, false);
 
                 idTree = m_rootNode->evaluateIdentifier(context);
             }
@@ -2012,13 +1923,11 @@ IPGraph::findNodesByAbstractPath(int frame,
             }
         }
 
-        DBL(DB_PROMOTE,
-            "tested count " << count << " promoteCount " << promoteCount);
+        DBL(DB_PROMOTE, "tested count " << count << " promoteCount " << promoteCount);
     }
 
-    void IPGraph::dispatchCachingThread(int inframe, int outframe, int minFrame,
-                                        int maxFrame, int inc, int frame,
-                                        float fps, bool modeChanged)
+    void IPGraph::dispatchCachingThread(int inframe, int outframe, int minFrame, int maxFrame, int inc, int frame, float fps,
+                                        bool modeChanged)
     {
         if (m_cacheMode == NeverCache || m_editing || isMediaLoading())
             return;
@@ -2039,18 +1948,14 @@ IPGraph::findNodesByAbstractPath(int frame,
         m_fbcache.setInOutFrames(inframe, outframe, minFrame, maxFrame);
         int cacheFrame = m_fbcache.displayFrame();
         int otherframe = inc > 0 ? inframe : outframe - 1;
-        m_fbcache.setCacheFrame(m_cacheMode == BufferCache ? cacheFrame
-                                                           : otherframe);
+        m_fbcache.setCacheFrame(m_cacheMode == BufferCache ? cacheFrame : otherframe);
         m_fbcache.setCacheWrapFrame(otherframe);
 
         if (m_fbcache.used() > m_fbcache.capacity())
             m_fbcache.emergencyFree();
 
-        DBL(DB_DISP, "dispatching, over " << m_fbcache.overflowing() << " min "
-                                          << minFrame << " max " << maxFrame
-                                          << " in " << inframe << " out "
-                                          << outframe << " cacheInvalid "
-                                          << m_frameCacheInvalid);
+        DBL(DB_DISP, "dispatching, over " << m_fbcache.overflowing() << " min " << minFrame << " max " << maxFrame << " in " << inframe
+                                          << " out " << outframe << " cacheInvalid " << m_frameCacheInvalid);
         TWK_CACHE_UNLOCK(m_fbcache, "");
 
         lockInternal();
@@ -2060,12 +1965,9 @@ IPGraph::findNodesByAbstractPath(int frame,
         static IPNode* savedViewNode = 0;
         if (modeChanged || m_viewNode != savedViewNode || m_frameCacheInvalid)
         {
-            DBL(DB_PROMOTE, "dispatchCachingThread viewNode "
-                                << m_viewNode->name() << " modeChanged "
-                                << modeChanged << " cacheFrame " << cacheFrame
-                                << " minFrame " << minFrame << " maxFrame "
-                                << maxFrame << " cache invalid "
-                                << m_frameCacheInvalid);
+            DBL(DB_PROMOTE, "dispatchCachingThread viewNode " << m_viewNode->name() << " modeChanged " << modeChanged << " cacheFrame "
+                                                              << cacheFrame << " minFrame " << minFrame << " maxFrame " << maxFrame
+                                                              << " cache invalid " << m_frameCacheInvalid);
 
             //
             //  Caching should be stopped at this point, but if not, we need to
@@ -2128,8 +2030,7 @@ IPGraph::findNodesByAbstractPath(int frame,
         int inc = m_fbcache.displayInc();
         int cacheFrame = m_fbcache.displayFrame();
         int otherframe = inc > 0 ? inframe : outframe - 1;
-        m_fbcache.setCacheFrame(m_cacheMode == BufferCache ? cacheFrame
-                                                           : otherframe);
+        m_fbcache.setCacheFrame(m_cacheMode == BufferCache ? cacheFrame : otherframe);
         m_fbcache.setCacheWrapFrame(otherframe);
 
         if (m_fbcache.used() > m_fbcache.capacity())
@@ -2207,8 +2108,7 @@ IPGraph::findNodesByAbstractPath(int frame,
                 //  caching threads.
                 //
 
-                DBL(DB_DISP,
-                    "IPGraph::awakenAllCachingThreads workers arise !");
+                DBL(DB_DISP, "IPGraph::awakenAllCachingThreads workers arise !");
                 m_fbcache.resetUtilityState();
                 if (m_threadGroupSingle)
                     m_threadGroupSingle->awaken_all_workers();
@@ -2224,15 +2124,13 @@ IPGraph::findNodesByAbstractPath(int frame,
     //  Called by Evaluation Thread
     //
 
-    IPGraph::TestEvalResult
-    IPGraph::testEvaluate(int frame, IPNode::ThreadType thread, size_t n)
+    IPGraph::TestEvalResult IPGraph::testEvaluate(int frame, IPNode::ThreadType thread, size_t n)
     {
         IPGraph::TestEvalResult result;
 
         if (m_rootNode)
         {
-            IPNode::Context context(frame, frame, m_fbcache.displayFPS(), 0, 0,
-                                    thread, n, m_fbcache, false);
+            IPNode::Context context(frame, frame, m_fbcache.displayFPS(), 0, 0, thread, n, m_fbcache, false);
 
             m_rootNode->testEvaluate(context, result);
         }
@@ -2247,8 +2145,7 @@ IPGraph::findNodesByAbstractPath(int frame,
 
         if (m_rootNode)
         {
-            IPNode::Context context(frame, frame, m_fbcache.displayFPS(), 0, 0,
-                                    thread, n, m_fbcache, false);
+            IPNode::Context context(frame, frame, m_fbcache.displayFPS(), 0, 0, thread, n, m_fbcache, false);
 
             IPImage* img = m_rootNode->evaluate(context);
 
@@ -2283,8 +2180,7 @@ IPGraph::findNodesByAbstractPath(int frame,
                 img->assembleAuxFrameBuffers();
                 img->computeRenderIDRecursive();
 
-                if (m_debugTreeOutput && thread >= IPNode::DisplayNoEvalThread
-                    && thread <= IPNode::DisplayThreadMarker)
+                if (m_debugTreeOutput && thread >= IPNode::DisplayNoEvalThread && thread <= IPNode::DisplayThreadMarker)
                 {
                     cout << endl;
                     printTreeStdout(img);
@@ -2311,14 +2207,12 @@ IPGraph::findNodesByAbstractPath(int frame,
         if (slowMedia)
         {
             const int defaultSlowMaxGroupSize = 20;
-            return (m_maxCacheGroupSize != 0) ? m_maxCacheGroupSize
-                                              : defaultSlowMaxGroupSize;
+            return (m_maxCacheGroupSize != 0) ? m_maxCacheGroupSize : defaultSlowMaxGroupSize;
         }
         else
         {
             const int defaultFastMaxGroupSize = 1;
-            return (m_maxCacheGroupSize != 0) ? m_maxCacheGroupSize
-                                              : defaultFastMaxGroupSize;
+            return (m_maxCacheGroupSize != 0) ? m_maxCacheGroupSize : defaultFastMaxGroupSize;
         }
     }
 
@@ -2352,8 +2246,7 @@ IPGraph::findNodesByAbstractPath(int frame,
 #if (DB_LEVEL & DB_CACHE)
         {
             stringstream out;
-            out << "evalThreadMain, thread " << id << " START, dispFrame "
-                << m_fbcache.displayFrame() << ", cacheThreadContinue "
+            out << "evalThreadMain, thread " << id << " START, dispFrame " << m_fbcache.displayFrame() << ", cacheThreadContinue "
                 << cacheThreadContinue() << endl;
             cerr << out.str();
         }
@@ -2399,8 +2292,7 @@ IPGraph::findNodesByAbstractPath(int frame,
                 {
                     IPNode* itemNode = findNode(itemName);
                     TextureOutputGroupIPNode* textNode = 0;
-                    if (textNode =
-                            dynamic_cast<TextureOutputGroupIPNode*>(itemNode))
+                    if (textNode = dynamic_cast<TextureOutputGroupIPNode*>(itemNode))
                     {
                         if (textNode->isActive())
                         {
@@ -2411,9 +2303,7 @@ IPGraph::findNodesByAbstractPath(int frame,
                             cerr << str.str();
                             */
 
-                            IPNode::Context context(
-                                1, 1, m_fbcache.displayFPS(), 0, 0,
-                                IPNode::CacheEvalThread, id, m_fbcache, false);
+                            IPNode::Context context(1, 1, m_fbcache.displayFPS(), 0, 0, IPNode::CacheEvalThread, id, m_fbcache, false);
 
                             context.cacheNode = textNode;
 
@@ -2450,8 +2340,7 @@ IPGraph::findNodesByAbstractPath(int frame,
                 if (frames.empty())
                 {
                     TWK_CACHE_LOCK(m_fbcache, "");
-                    m_fbcache.initiateCachingOfBestFrameGroup(frames,
-                                                              maxGroupSize);
+                    m_fbcache.initiateCachingOfBestFrameGroup(frames, maxGroupSize);
                     TWK_CACHE_UNLOCK(m_fbcache, "");
                 }
 
@@ -2476,8 +2365,7 @@ IPGraph::findNodesByAbstractPath(int frame,
                     bool poorPerf = false;
                     try
                     {
-                        TestEvalResult r =
-                            testEvaluate(frame, IPNode::CacheEvalThread, id);
+                        TestEvalResult r = testEvaluate(frame, IPNode::CacheEvalThread, id);
                         poorPerf = r.poorRandomAccessPerformance;
                     }
                     catch (std::exception& exc)
@@ -2486,8 +2374,7 @@ IPGraph::findNodesByAbstractPath(int frame,
                         //  This is an odd case. It shouldn't happen.
                         //
 
-                        cerr << "ERROR: testEvaluate unexpected exception: "
-                             << exc.what() << ", at frame " << frame << endl;
+                        cerr << "ERROR: testEvaluate unexpected exception: " << exc.what() << ", at frame " << frame << endl;
 
                         skipThisFrame = true;
                     }
@@ -2545,8 +2432,7 @@ IPGraph::findNodesByAbstractPath(int frame,
                     //  by dispatch() or by awaken_all_workers() when the
                     //  frame changes or from some other state change.
                     //
-                    DB("bad target frame: frame " << frame << " skip "
-                                                  << skipThisFrame);
+                    DB("bad target frame: frame " << frame << " skip " << skipThisFrame);
 
                     break;
                 }
@@ -2582,8 +2468,7 @@ IPGraph::findNodesByAbstractPath(int frame,
                 */
                 TWK_CACHE_LOCK(m_fbcache, "");
                 size_t minBuffer = 64 * 1024 * 1024;
-                unsigned char* chkData =
-                    TWK_ALLOCATE_ARRAY_PAGE_ALIGNED(unsigned char, minBuffer);
+                unsigned char* chkData = TWK_ALLOCATE_ARRAY_PAGE_ALIGNED(unsigned char, minBuffer);
 
                 //  fprintf (stderr, "%p evaluate, frame %d\n", pthread_self(),
                 //  frame);
@@ -2606,15 +2491,13 @@ IPGraph::findNodesByAbstractPath(int frame,
                 }
                 else
                 {
-                    DB("caching thread " << id << " failed to allocate "
-                                         << minBuffer);
+                    DB("caching thread " << id << " failed to allocate " << minBuffer);
 
                     size_t newCacheSize = m_fbcache.used();
                     if (newCacheSize > minBuffer)
                         newCacheSize -= minBuffer;
                     newCacheSize = max(size_t(128 * 1024 * 1024), newCacheSize);
-                    DB("caching thread " << id << " setting cache size to "
-                                         << newCacheSize);
+                    DB("caching thread " << id << " setting cache size to " << newCacheSize);
 
                     //
                     //  Can't call setCacheModeSize here, since it may
@@ -2625,25 +2508,19 @@ IPGraph::findNodesByAbstractPath(int frame,
                     m_fbcache.setMemoryUsage(newCacheSize);
                     m_fbcache.emergencyFree();
 
-                    DB("caching thread " << id << " current "
-                                         << m_fbcache.used() << " max "
-                                         << m_fbcache.capacity() << " "
-                                         << double(m_fbcache.used())
-                                                / double(m_fbcache.capacity()));
+                    DB("caching thread " << id << " current " << m_fbcache.used() << " max " << m_fbcache.capacity() << " "
+                                         << double(m_fbcache.used()) / double(m_fbcache.capacity()));
                 }
                 TWK_CACHE_UNLOCK(m_fbcache, "");
 #endif
 
                 try
                 {
-                    DB("thread " << id << " evaluate frame " << frame
-                                 << ", overflowing "
-                                 << m_fbcache.overflowing());
+                    DB("thread " << id << " evaluate frame " << frame << ", overflowing " << m_fbcache.overflowing());
                     IPImage* img = evaluate(frame, IPNode::CacheEvalThread, id);
 
                     TWK_CACHE_LOCK(m_fbcache, "");
-                    DB("thread " << id << " evaluate frame " << frame
-                                 << " ok ");
+                    DB("thread " << id << " evaluate frame " << frame << " ok ");
                     //  m_fbcache.trimFBsOfFrame(frame, img);
                     m_fbcache.checkInAndDelete(img);
                     DB("thread " << id << " checkin frame " << frame << " ok ");
@@ -2657,8 +2534,7 @@ IPGraph::findNodesByAbstractPath(int frame,
                     //  frame.
                     //
 
-                    DB("thread " << id << " cache is full, overflowing "
-                                 << m_fbcache.overflowing());
+                    DB("thread " << id << " cache is full, overflowing " << m_fbcache.overflowing());
                     //  UTILITY_CACHING
                     //
                     //  We no longer want to exit here, since although
@@ -2677,9 +2553,7 @@ IPGraph::findNodesByAbstractPath(int frame,
                     //  Should never get here
                     //
 
-                    cerr
-                        << "ERROR: caching thread caught unexpected exception: "
-                        << exc.what() << ", at frame " << frame << endl;
+                    cerr << "ERROR: caching thread caught unexpected exception: " << exc.what() << ", at frame " << frame << endl;
 
                     stopCachingInternal();
                 }
@@ -2746,10 +2620,8 @@ IPGraph::findNodesByAbstractPath(int frame,
             out << "evalThreadMain, thread " << id << " END";
             if (framesCached || texturesCached)
             {
-                out << ", " << framesCached << " frames ("
-                    << (1000.0 * elap / float(framesCached)) << " ms/frame, "
-                    << texturesCached << " textures, " << (1000.0 * elap)
-                    << " total), last frame: " << lastFrameCached;
+                out << ", " << framesCached << " frames (" << (1000.0 * elap / float(framesCached)) << " ms/frame, " << texturesCached
+                    << " textures, " << (1000.0 * elap) << " total), last frame: " << lastFrameCached;
             }
             out << endl;
             cerr << out.str();
@@ -2760,10 +2632,8 @@ IPGraph::findNodesByAbstractPath(int frame,
         {
             stringstream out;
             float elap = timer->elapsed();
-            out << "Caching thread " << id << " END" << ", " << framesCached
-                << " frames (" << (1000.0 * elap / float(framesCached))
-                << " ms/frame, " << texturesCached << " textures, "
-                << (1000.0 * elap) << " total), last frame: " << lastFrameCached
+            out << "Caching thread " << id << " END" << ", " << framesCached << " frames (" << (1000.0 * elap / float(framesCached))
+                << " ms/frame, " << texturesCached << " textures, " << (1000.0 * elap) << " total), last frame: " << lastFrameCached
                 << endl;
             cerr << out.str();
         }
@@ -2812,9 +2682,7 @@ IPGraph::findNodesByAbstractPath(int frame,
 
             finishAudioThread();
 
-            IPNode::AudioConfiguration config(m_audioCache.rate(),
-                                              m_audioCache.layout(),
-                                              m_audioCache.packetSize());
+            IPNode::AudioConfiguration config(m_audioCache.rate(), m_audioCache.layout(), m_audioCache.packetSize());
 
             m_rootNode->propagateAudioConfigToInputs(config);
 
@@ -2830,37 +2698,21 @@ IPGraph::findNodesByAbstractPath(int frame,
         }
     }
 
-    void IPGraph::setAudioCacheExtents(TwkAudio::Time minSec,
-                                       TwkAudio::Time maxSec)
+    void IPGraph::setAudioCacheExtents(TwkAudio::Time minSec, TwkAudio::Time maxSec)
     {
         m_audioMinCache = minSec;
         m_audioMaxCache = maxSec;
     }
 
-    void IPGraph::lockAudioInternal() const
-    {
-        pthread_mutex_lock(&m_audioInternalLock);
-    }
+    void IPGraph::lockAudioInternal() const { pthread_mutex_lock(&m_audioInternalLock); }
 
-    void IPGraph::unlockAudioInternal() const
-    {
-        pthread_mutex_unlock(&m_audioInternalLock);
-    }
+    void IPGraph::unlockAudioInternal() const { pthread_mutex_unlock(&m_audioInternalLock); }
 
-    void IPGraph::lockAudioFill() const
-    {
-        pthread_mutex_lock(&m_audioFillLock);
-    }
+    void IPGraph::lockAudioFill() const { pthread_mutex_lock(&m_audioFillLock); }
 
-    bool IPGraph::tryLockAudioFill() const
-    {
-        return pthread_mutex_trylock(&m_audioFillLock) == 0;
-    }
+    bool IPGraph::tryLockAudioFill() const { return pthread_mutex_trylock(&m_audioFillLock) == 0; }
 
-    void IPGraph::unlockAudioFill() const
-    {
-        pthread_mutex_unlock(&m_audioFillLock);
-    }
+    void IPGraph::unlockAudioFill() const { pthread_mutex_unlock(&m_audioFillLock); }
 
     double IPGraph::audioSecondsCached() const
     {
@@ -2895,8 +2747,7 @@ IPGraph::findNodesByAbstractPath(int frame,
 
         if (ok)
         {
-            m_audioThreadGroup.maybe_dispatch(evalAudioThreadTrampoline, this,
-                                              true);
+            m_audioThreadGroup.maybe_dispatch(evalAudioThreadTrampoline, this, true);
         }
     }
 
@@ -2942,8 +2793,7 @@ IPGraph::findNodesByAbstractPath(int frame,
         lockAudioInternal();
         SampleTime t = m_lastFillSample;
         m_audioCacheComplete = false;
-        m_currentAudioSample =
-            t + m_audioCache.packetSize() - (t % m_audioCache.packetSize());
+        m_currentAudioSample = t + m_audioCache.packetSize() - (t % m_audioCache.packetSize());
         unlockAudioInternal();
         m_audioCache.unlock();
 
@@ -2953,19 +2803,16 @@ IPGraph::findNodesByAbstractPath(int frame,
 
     void IPGraph::primeAudioCache(int frame, float frameRate)
     {
-        if (hasAudio() && (audioCachingMode() != NeverCache)
-            && isAudioConfigured())
+        if (hasAudio() && (audioCachingMode() != NeverCache) && isAudioConfigured())
         {
             // Prime the audio cache so that it is ready when the playback
             // starts.
             m_audioCache.lock();
             lockAudioInternal();
             TwkAudio::Time audioTime = (TwkAudio::Time)frame / frameRate;
-            TwkAudio::SampleTime audioSample =
-                TwkAudio::timeToSamples(audioTime, audioCache().rate());
+            TwkAudio::SampleTime audioSample = TwkAudio::timeToSamples(audioTime, audioCache().rate());
             m_audioCacheComplete = false;
-            m_currentAudioSample = audioSample + m_audioCache.packetSize()
-                                   - (audioSample % m_audioCache.packetSize());
+            m_currentAudioSample = audioSample + m_audioCache.packetSize() - (audioSample % m_audioCache.packetSize());
             m_lastFillSample = audioSample;
             unlockAudioInternal();
             m_audioCache.unlock();
@@ -2976,10 +2823,7 @@ IPGraph::findNodesByAbstractPath(int frame,
         }
     }
 
-    TwkAudio::Time IPGraph::globalAudioOffset() const
-    {
-        return m_audioOffset->front() + m_audioOffset2->front();
-    }
+    TwkAudio::Time IPGraph::globalAudioOffset() const { return m_audioOffset->front() + m_audioOffset2->front(); }
 
     void IPGraph::audioConfigure(const AudioConfiguration& config)
     {
@@ -2987,9 +2831,7 @@ IPGraph::findNodesByAbstractPath(int frame,
         //  Check to see if there's any point in reconfiguration
         //
 
-        bool notify = !m_audioConfigured
-                      || m_lastAudioConfiguration.rate != config.rate
-                      || m_lastAudioConfiguration.layout != config.layout
+        bool notify = !m_audioConfigured || m_lastAudioConfiguration.rate != config.rate || m_lastAudioConfiguration.layout != config.layout
                       || m_lastAudioConfiguration.samples != config.samples;
 
         //
@@ -3004,21 +2846,15 @@ IPGraph::findNodesByAbstractPath(int frame,
         if (notify)
             finishAudioThread();
 
-        m_audioPacketSize =
-            Application::optionValue<size_t>("acachesize", 2048);
-        m_audioMinCache =
-            Application::optionValue<double>("audioMinCache", m_audioMinCache);
-        m_audioMaxCache =
-            Application::optionValue<double>("audioMaxCache", m_audioMaxCache);
+        m_audioPacketSize = Application::optionValue<size_t>("acachesize", 2048);
+        m_audioMinCache = Application::optionValue<double>("audioMinCache", m_audioMinCache);
+        m_audioMaxCache = Application::optionValue<double>("audioMaxCache", m_audioMaxCache);
 
         m_audioCache.lock();
 
-        if (m_audioCache.packetSize() != m_audioPacketSize
-            || m_audioCache.layout() != config.layout
-            || m_audioCache.rate() != config.rate)
+        if (m_audioCache.packetSize() != m_audioPacketSize || m_audioCache.layout() != config.layout || m_audioCache.rate() != config.rate)
         {
-            m_audioCache.configurePacket(m_audioPacketSize, config.layout,
-                                         config.rate);
+            m_audioCache.configurePacket(m_audioPacketSize, config.layout, config.rate);
             m_audioCacheComplete = false;
         }
 
@@ -3043,11 +2879,9 @@ IPGraph::findNodesByAbstractPath(int frame,
         // the containing packet boundary.
         //
 
-        SampleTime globalOffset =
-            timeToSamples(globalAudioOffset(), config.rate);
+        SampleTime globalOffset = timeToSamples(globalAudioOffset(), config.rate);
         SampleTime offsetStartSample = config.startSample - globalOffset;
-        SampleTime boundaryBeginStart =
-            offsetStartSample - offsetStartSample % m_audioPacketSize;
+        SampleTime boundaryBeginStart = offsetStartSample - offsetStartSample % m_audioPacketSize;
 
         m_currentAudioSample = boundaryBeginStart;
         m_lastFillSample = boundaryBeginStart;
@@ -3065,8 +2899,7 @@ IPGraph::findNodesByAbstractPath(int frame,
 
         if (notify)
         {
-            IPNode::AudioConfiguration newConfig(config.rate, config.layout,
-                                                 m_audioPacketSize);
+            IPNode::AudioConfiguration newConfig(config.rate, config.layout, m_audioPacketSize);
 
             m_rootNode->propagateAudioConfigToInputs(newConfig);
         }
@@ -3090,8 +2923,7 @@ IPGraph::findNodesByAbstractPath(int frame,
 
     size_t IPGraph::audioFillBuffer(const IPNode::AudioContext& incontext)
     {
-        AudioBuffer abuffer(incontext.buffer, 0, incontext.buffer.size(),
-                            incontext.buffer.startTime() - globalAudioOffset());
+        AudioBuffer abuffer(incontext.buffer, 0, incontext.buffer.size(), incontext.buffer.startTime() - globalAudioOffset());
 
         IPNode::AudioContext context(abuffer, incontext.fps);
 
@@ -3104,8 +2936,7 @@ IPGraph::findNodesByAbstractPath(int frame,
             //  possible.
             //
 
-            SampleTime s = timeToSamples(context.buffer.startTime(),
-                                         context.buffer.rate());
+            SampleTime s = timeToSamples(context.buffer.startTime(), context.buffer.rate());
 
             TwkMath::Time bufferDuration = context.buffer.duration();
 
@@ -3180,10 +3011,8 @@ IPGraph::findNodesByAbstractPath(int frame,
                 // Or if we the lastly accessed audio sample is within a certain
                 // threshold of the current head and tail
                 if ((m_audioCache.totalSecondsCached() <= m_audioMinCache)
-                    || (!m_audioBackwards
-                        && m_lastFillSample >= m_restartAudioThreadSample)
-                    || (m_audioBackwards
-                        && m_lastFillSample <= m_restartAudioThreadSample))
+                    || (!m_audioBackwards && m_lastFillSample >= m_restartAudioThreadSample)
+                    || (m_audioBackwards && m_lastFillSample <= m_restartAudioThreadSample))
                 {
                     maybeDispatchAudioThread();
                 }
@@ -3259,30 +3088,23 @@ IPGraph::findNodesByAbstractPath(int frame,
 
         // Validate that the s_audioLastBuffer is compatible and is actually the
         // previous buffer prior to using it
-        if (s_audioLastBuffer.rate() == inout_buffer.rate()
-            && s_audioLastBuffer.size() == inout_buffer.size()
+        if (s_audioLastBuffer.rate() == inout_buffer.rate() && s_audioLastBuffer.size() == inout_buffer.size()
             && s_audioLastBuffer.startTime() != inout_buffer.startTime())
         {
-            const SampleTime expectedPrevFirstSample = timeToSamples(
-                m_lastAudioConfiguration.backwards
-                    ? (inout_buffer.startTime() + s_audioLastBuffer.duration())
-                    : (inout_buffer.startTime() - s_audioLastBuffer.duration()),
-                inout_buffer.rate());
-            const SampleTime lastBufferFirstSample = timeToSamples(
-                s_audioLastBuffer.startTime(), inout_buffer.rate());
+            const SampleTime expectedPrevFirstSample =
+                timeToSamples(m_lastAudioConfiguration.backwards ? (inout_buffer.startTime() + s_audioLastBuffer.duration())
+                                                                 : (inout_buffer.startTime() - s_audioLastBuffer.duration()),
+                              inout_buffer.rate());
+            const SampleTime lastBufferFirstSample = timeToSamples(s_audioLastBuffer.startTime(), inout_buffer.rate());
             if (lastBufferFirstSample == expectedPrevFirstSample)
             {
-                lowPassFilter(inout_buffer, s_audioLastBuffer, inout_buffer,
-                              cutoff, m_lastAudioConfiguration.backwards);
+                lowPassFilter(inout_buffer, s_audioLastBuffer, inout_buffer, cutoff, m_lastAudioConfiguration.backwards);
             }
         }
 
-        s_audioLastBuffer.reconfigure(
-            inout_buffer.size(), inout_buffer.channels(), inout_buffer.rate(),
-            inout_buffer.startTime());
+        s_audioLastBuffer.reconfigure(inout_buffer.size(), inout_buffer.channels(), inout_buffer.rate(), inout_buffer.startTime());
 
-        memcpy(reinterpret_cast<void*>(s_audioLastBuffer.pointer()),
-               reinterpret_cast<void*>(inout_buffer.pointer()),
+        memcpy(reinterpret_cast<void*>(s_audioLastBuffer.pointer()), reinterpret_cast<void*>(inout_buffer.pointer()),
                inout_buffer.sizeInBytes());
     }
 
@@ -3295,18 +3117,11 @@ IPGraph::findNodesByAbstractPath(int frame,
             return;
 
         lockAudioInternal();
-        const double audioDuration = samplesToTime(
-            m_maxAudioSample - m_minAudioSample + 1, m_audioCache.rate());
-        const double audioMaxCache =
-            (m_audioCacheMode == BufferCache)
-                ? std::min(m_audioMaxCache.load(), audioDuration)
-                : audioDuration;
-        const double lastFillAudioBufferTime =
-            samplesToTime(m_lastFillSample, m_audioCache.rate());
-        const double minAudioTime =
-            samplesToTime(m_minAudioSample, m_audioCache.rate());
-        const double maxAudioTime =
-            samplesToTime(m_maxAudioSample, m_audioCache.rate());
+        const double audioDuration = samplesToTime(m_maxAudioSample - m_minAudioSample + 1, m_audioCache.rate());
+        const double audioMaxCache = (m_audioCacheMode == BufferCache) ? std::min(m_audioMaxCache.load(), audioDuration) : audioDuration;
+        const double lastFillAudioBufferTime = samplesToTime(m_lastFillSample, m_audioCache.rate());
+        const double minAudioTime = samplesToTime(m_minAudioSample, m_audioCache.rate());
+        const double maxAudioTime = samplesToTime(m_maxAudioSample, m_audioCache.rate());
         const Time audioRate = m_audioCache.rate();
         unlockAudioInternal();
 
@@ -3315,8 +3130,7 @@ IPGraph::findNodesByAbstractPath(int frame,
             return;
 
         // Compute the head and tail durations
-        double tailDuration =
-            static_cast<double>(lookBehindFraction()) * audioMaxCache / 100.0;
+        double tailDuration = static_cast<double>(lookBehindFraction()) * audioMaxCache / 100.0;
         double headDuration = audioMaxCache - tailDuration;
 
         // Simply invert the head and tail if we are playing backwards
@@ -3331,27 +3145,21 @@ IPGraph::findNodesByAbstractPath(int frame,
         // the audio cache in chunks as opposed to 1 audio sample at a time.
         if (!m_audioBackwards)
         {
-            double restartAudioThreadTime =
-                lastFillAudioBufferTime + 0.5 * headDuration;
+            double restartAudioThreadTime = lastFillAudioBufferTime + 0.5 * headDuration;
             if (restartAudioThreadTime > maxAudioTime)
             {
-                restartAudioThreadTime =
-                    restartAudioThreadTime - maxAudioTime + minAudioTime;
+                restartAudioThreadTime = restartAudioThreadTime - maxAudioTime + minAudioTime;
             }
-            m_restartAudioThreadSample =
-                timeToSamples(restartAudioThreadTime, audioRate);
+            m_restartAudioThreadSample = timeToSamples(restartAudioThreadTime, audioRate);
         }
         else
         {
-            double restartAudioThreadTime =
-                lastFillAudioBufferTime - 0.5 * tailDuration;
+            double restartAudioThreadTime = lastFillAudioBufferTime - 0.5 * tailDuration;
             if (restartAudioThreadTime < minAudioTime)
             {
-                restartAudioThreadTime =
-                    restartAudioThreadTime + maxAudioTime - minAudioTime;
+                restartAudioThreadTime = restartAudioThreadTime + maxAudioTime - minAudioTime;
             }
-            m_restartAudioThreadSample =
-                timeToSamples(restartAudioThreadTime, audioRate);
+            m_restartAudioThreadSample = timeToSamples(restartAudioThreadTime, audioRate);
         }
 
         AudioCache::AudioCacheLock lock(m_audioCache);
@@ -3367,14 +3175,11 @@ IPGraph::findNodesByAbstractPath(int frame,
 
             if (AudioRenderer::debug)
             {
-                const int clear_before_frame =
-                    ROUND(tail * m_fbcache.displayFPS());
-                const int clear_after_frame =
-                    ROUND(head * m_fbcache.displayFPS());
-                TwkUtil::Log("AUDIO")
-                    << "_audioClearCacheOutsideHeadAndTail()-"
-                    << "m_audioCache.clearBefore=" << clear_before_frame
-                    << ", m_audioCache.clearAfter=" << clear_after_frame;
+                const int clear_before_frame = ROUND(tail * m_fbcache.displayFPS());
+                const int clear_after_frame = ROUND(head * m_fbcache.displayFPS());
+                TwkUtil::Log("AUDIO") << "_audioClearCacheOutsideHeadAndTail()-"
+                                      << "m_audioCache.clearBefore=" << clear_before_frame
+                                      << ", m_audioCache.clearAfter=" << clear_after_frame;
             }
         }
         // Cache wrap around case
@@ -3403,22 +3208,17 @@ IPGraph::findNodesByAbstractPath(int frame,
 
             if (AudioRenderer::debug)
             {
-                const int clear_left_frame =
-                    ROUND(left * m_fbcache.displayFPS());
-                const int clear_right_frame =
-                    ROUND(right * m_fbcache.displayFPS());
-                TwkUtil::Log("AUDIO")
-                    << "_audioClearCacheOutsideHeadAndTail() "
-                    << "m_audioCache.clear(" << clear_left_frame << ","
-                    << clear_right_frame << ")";
+                const int clear_left_frame = ROUND(left * m_fbcache.displayFPS());
+                const int clear_right_frame = ROUND(right * m_fbcache.displayFPS());
+                TwkUtil::Log("AUDIO") << "_audioClearCacheOutsideHeadAndTail() "
+                                      << "m_audioCache.clear(" << clear_left_frame << "," << clear_right_frame << ")";
             }
         }
     }
 
     //------------------------------------------------------------------------------
     //
-    bool IPGraph::_isCurrentAudioSampleBeyondHead(
-        const SampleTime audioHeadSamples) const
+    bool IPGraph::_isCurrentAudioSampleBeyondHead(const SampleTime audioHeadSamples) const
     {
         if (!m_audioBackwards)
         {
@@ -3427,8 +3227,7 @@ IPGraph::findNodesByAbstractPath(int frame,
             {
                 // Handle wrap around case
                 head = head - m_maxAudioSample + m_minAudioSample;
-                return (m_currentAudioSample > head
-                        && m_currentAudioSample < m_lastFillSample);
+                return (m_currentAudioSample > head && m_currentAudioSample < m_lastFillSample);
             }
             else
             {
@@ -3443,8 +3242,7 @@ IPGraph::findNodesByAbstractPath(int frame,
             {
                 // Handle wrap around case
                 head = m_maxAudioSample - (m_minAudioSample - head);
-                return (m_currentAudioSample < head
-                        && m_currentAudioSample > m_lastFillSample);
+                return (m_currentAudioSample < head && m_currentAudioSample > m_lastFillSample);
             }
             else
             {
@@ -3460,8 +3258,7 @@ IPGraph::findNodesByAbstractPath(int frame,
     //
     void IPGraph::evalAudioThreadMain()
     {
-        if (m_audioThreadStop || !m_audioConfigured || m_inAudioConfig
-            || !m_rootNode)
+        if (m_audioThreadStop || !m_audioConfigured || m_inAudioConfig || !m_rootNode)
         {
             return;
         }
@@ -3477,18 +3274,11 @@ IPGraph::findNodesByAbstractPath(int frame,
 
         lockAudioInternal();
         const double fps = m_audioFPS;
-        const double audioDuration = samplesToTime(
-            m_maxAudioSample - m_minAudioSample + 1, m_audioCache.rate());
-        const double audioMaxCache =
-            (m_audioCacheMode == BufferCache)
-                ? std::min(m_audioMaxCache.load(), audioDuration)
-                : audioDuration;
+        const double audioDuration = samplesToTime(m_maxAudioSample - m_minAudioSample + 1, m_audioCache.rate());
+        const double audioMaxCache = (m_audioCacheMode == BufferCache) ? std::min(m_audioMaxCache.load(), audioDuration) : audioDuration;
         const bool audioFitsIntoCache = audioDuration <= audioMaxCache;
-        const SampleTime audioMaxCacheInSamples =
-            timeToSamples(m_audioMaxCache, m_audioCache.rate());
-        const SampleTime audioHeadSamples =
-            audioMaxCacheInSamples / 100LL
-            * static_cast<SampleTime>(100.0 - lookBehindFraction());
+        const SampleTime audioMaxCacheInSamples = timeToSamples(m_audioMaxCache, m_audioCache.rate());
+        const SampleTime audioHeadSamples = audioMaxCacheInSamples / 100LL * static_cast<SampleTime>(100.0 - lookBehindFraction());
         unlockAudioInternal();
 
         // Make sure to free enough room in the cache
@@ -3507,11 +3297,9 @@ IPGraph::findNodesByAbstractPath(int frame,
 
         if (AudioRenderer::debug)
         {
-            TwkUtil::Log("AUDIO")
-                << "evalAudioThreadMain()-"
-                << "secondsBuffered=" << secondsBuffered
-                << ", audioMaxCache=" << audioMaxCache
-                << ", m_audioThreadStop=" << m_audioThreadStop;
+            TwkUtil::Log("AUDIO") << "evalAudioThreadMain()-"
+                                  << "secondsBuffered=" << secondsBuffered << ", audioMaxCache=" << audioMaxCache
+                                  << ", m_audioThreadStop=" << m_audioThreadStop;
         }
 
         while (!m_audioThreadStop && secondsBuffered < audioMaxCache)
@@ -3528,12 +3316,10 @@ IPGraph::findNodesByAbstractPath(int frame,
                 if (AudioRenderer::debug)
                 {
                     TwkUtil::Log("AUDIO") << "Audio sample not in cache, "
-                                          << "requesting m_currentAudioSample="
-                                          << m_currentAudioSample.load();
+                                          << "requesting m_currentAudioSample=" << m_currentAudioSample.load();
                 }
 
-                AudioBuffer abuffer(packetSize, layout, rate,
-                                    samplesToTime(m_currentAudioSample, rate));
+                AudioBuffer abuffer(packetSize, layout, rate, samplesToTime(m_currentAudioSample, rate));
 
                 IPNode::AudioContext context(abuffer, fps);
 
@@ -3557,13 +3343,11 @@ IPGraph::findNodesByAbstractPath(int frame,
                 }
                 catch (std::exception& exc)
                 {
-                    cerr << "WARNING: audio eval thread: " << exc.what()
-                         << endl;
+                    cerr << "WARNING: audio eval thread: " << exc.what() << endl;
                 }
                 catch (...)
                 {
-                    cerr << "ERROR: audio eval thread caught unknown exception"
-                         << endl;
+                    cerr << "ERROR: audio eval thread caught unknown exception" << endl;
                 }
             }
 
@@ -3571,15 +3355,12 @@ IPGraph::findNodesByAbstractPath(int frame,
             // Note: We actively fetch the head audio samples but not the tail
             // audio samples: those are passively generated by preserving the
             // tail audio samples in the cache as we go along.
-            if (!audioFitsIntoCache
-                && _isCurrentAudioSampleBeyondHead(audioHeadSamples))
+            if (!audioFitsIntoCache && _isCurrentAudioSampleBeyondHead(audioHeadSamples))
             {
                 if (AudioRenderer::debug)
                 {
-                    TwkUtil::Log("AUDIO")
-                        << "Stop fetching audio, we have enough audio samples"
-                        << " m_currentAudioSample="
-                        << m_currentAudioSample.load() << " beyond head";
+                    TwkUtil::Log("AUDIO") << "Stop fetching audio, we have enough audio samples"
+                                          << " m_currentAudioSample=" << m_currentAudioSample.load() << " beyond head";
                 }
 
                 break;
@@ -3588,13 +3369,10 @@ IPGraph::findNodesByAbstractPath(int frame,
             m_currentAudioSample += m_audioBackwards ? -packetSize : packetSize;
 
             // Handle wrap around
-            if ((m_currentAudioSample > m_maxAudioSample
-                 || m_currentAudioSample < m_minAudioSample))
+            if ((m_currentAudioSample > m_maxAudioSample || m_currentAudioSample < m_minAudioSample))
             {
                 m_currentAudioSample =
-                    !m_audioBackwards ? m_minAudioSample.load()
-                                      : m_maxAudioSample + packetSize
-                                            - (m_maxAudioSample % packetSize);
+                    !m_audioBackwards ? m_minAudioSample.load() : m_maxAudioSample + packetSize - (m_maxAudioSample % packetSize);
             }
         }
 
@@ -3602,29 +3380,23 @@ IPGraph::findNodesByAbstractPath(int frame,
         {
             if (cachedSome)
             {
-                TwkUtil::Log("AUDIO")
-                    << "After adding to audio cache:"
-                    << " m_currentAudioSample = " << m_currentAudioSample
-                    << ", m_minAudioSample = " << m_minAudioSample
-                    << ", m_maxAudioSample = " << m_maxAudioSample
-                    << ", secondsBuffered = " << secondsBuffered
-                    << ", audioMaxCache = " << audioMaxCache
-                    << ", m_audioThreadStop = " << m_audioThreadStop;
+                TwkUtil::Log("AUDIO") << "After adding to audio cache:"
+                                      << " m_currentAudioSample = " << m_currentAudioSample << ", m_minAudioSample = " << m_minAudioSample
+                                      << ", m_maxAudioSample = " << m_maxAudioSample << ", secondsBuffered = " << secondsBuffered
+                                      << ", audioMaxCache = " << audioMaxCache << ", m_audioThreadStop = " << m_audioThreadStop;
             }
         }
     }
 
     void IPGraph::beginNodeValidation(IPNode* node)
     {
-        TwkApp::GenericStringEvent event("graph-validation-begin", this,
-                                         node->name());
+        TwkApp::GenericStringEvent event("graph-validation-begin", this, node->name());
         sendEvent(event);
     }
 
     void IPGraph::endNodeValidation(IPNode* node)
     {
-        TwkApp::GenericStringEvent event("graph-validation-end", this,
-                                         node->name());
+        TwkApp::GenericStringEvent event("graph-validation-end", this, node->name());
         sendEvent(event);
     }
 
@@ -3653,8 +3425,7 @@ IPGraph::findNodesByAbstractPath(int frame,
     {
         if (n == root())
         {
-            TwkApp::GenericStringEvent event("image-structure-change", this,
-                                             "");
+            TwkApp::GenericStringEvent event("image-structure-change", this, "");
             sendEvent(event);
             m_nodeImageStructureChangedSignal(n);
         }
@@ -3674,15 +3445,13 @@ IPGraph::findNodesByAbstractPath(int frame,
     {
         if (n && !n->group()) // top level only
         {
-            TwkApp::GenericStringEvent event("graph-node-inputs-changed", this,
-                                             n->name());
+            TwkApp::GenericStringEvent event("graph-node-inputs-changed", this, n->name());
             sendEvent(event);
             m_nodeInputsChangedSignal(n);
         }
     }
 
-    void IPGraph::propertyDidInsert(const Property* p, size_t index,
-                                    size_t size)
+    void IPGraph::propertyDidInsert(const Property* p, size_t index, size_t size)
     {
         ostringstream str;
         const IPNode* pc = dynamic_cast<const IPNode*>(p->container());
@@ -3691,13 +3460,11 @@ IPGraph::findNodesByAbstractPath(int frame,
         str << pc->name() << "." << c->name() << "." << p->name();
         str << ";" << index << ";" << size;
 
-        TwkApp::GenericStringEvent event("graph-state-change-insert", this,
-                                         str.str());
+        TwkApp::GenericStringEvent event("graph-state-change-insert", this, str.str());
         sendEvent(event);
     }
 
-    void IPGraph::propertyWillInsert(const Property* p, size_t index,
-                                     size_t size)
+    void IPGraph::propertyWillInsert(const Property* p, size_t index, size_t size)
     {
         ostringstream str;
         const IPNode* pc = dynamic_cast<const IPNode*>(p->container());
@@ -3706,8 +3473,7 @@ IPGraph::findNodesByAbstractPath(int frame,
         str << pc->name() << "." << c->name() << "." << p->name();
         str << ";" << index << ";" << size;
 
-        TwkApp::GenericStringEvent event("graph-state-will-insert", this,
-                                         str.str());
+        TwkApp::GenericStringEvent event("graph-state-will-insert", this, str.str());
         sendEvent(event);
     }
 
@@ -3717,9 +3483,8 @@ IPGraph::findNodesByAbstractPath(int frame,
         const IPNode* pc = dynamic_cast<const IPNode*>(p->container());
         const Component* c = pc->componentOf(p);
 
-        str << Property::layoutAsString(p->layoutTrait()) << ";"
-            << p->xsizeTrait() << "," << p->ysizeTrait() << ","
-            << p->zsizeTrait() << "," << p->wsizeTrait() << ";";
+        str << Property::layoutAsString(p->layoutTrait()) << ";" << p->xsizeTrait() << "," << p->ysizeTrait() << "," << p->zsizeTrait()
+            << "," << p->wsizeTrait() << ";";
 
         str << pc->name() << "." << c->name() << "." << p->name();
 
@@ -3733,21 +3498,18 @@ IPGraph::findNodesByAbstractPath(int frame,
         const IPNode* pc = dynamic_cast<const IPNode*>(p->container());
         const Component* c = pc->componentOf(p);
 
-        str << Property::layoutAsString(p->layoutTrait()) << ";"
-            << p->xsizeTrait() << "," << p->ysizeTrait() << ","
-            << p->zsizeTrait() << "," << p->wsizeTrait() << ";";
+        str << Property::layoutAsString(p->layoutTrait()) << ";" << p->xsizeTrait() << "," << p->ysizeTrait() << "," << p->zsizeTrait()
+            << "," << p->wsizeTrait() << ";";
 
         str << pc->name() << "." << c->name() << "." << p->name();
 
-        TwkApp::GenericStringEvent event("graph-property-will-delete", this,
-                                         str.str());
+        TwkApp::GenericStringEvent event("graph-property-will-delete", this, str.str());
         sendEvent(event);
     }
 
     void IPGraph::propertyDeleted(const std::string& name)
     {
-        TwkApp::GenericStringEvent event("graph-property-did-delete", this,
-                                         name);
+        TwkApp::GenericStringEvent event("graph-property-did-delete", this, name);
         sendEvent(event);
     }
 
@@ -3761,18 +3523,15 @@ IPGraph::findNodesByAbstractPath(int frame,
         TWK_CACHE_UNLOCK(m_fbcache, "lookBehind");
     }
 
-    void IPGraph::nodeConnections(StringPairVector& connections,
-                                  bool toplevel) const
+    void IPGraph::nodeConnections(StringPairVector& connections, bool toplevel) const
     {
         connections.clear();
 
-        for (NodeMap::const_iterator i = m_nodeMap.begin();
-             i != m_nodeMap.end(); ++i)
+        for (NodeMap::const_iterator i = m_nodeMap.begin(); i != m_nodeMap.end(); ++i)
         {
             IPNode* n = (*i).second;
 
-            if (n->protocol() == "Root" || n->protocol() == "RenderOutput"
-                || n->protocol() == "AudioWaveform")
+            if (n->protocol() == "Root" || n->protocol() == "RenderOutput" || n->protocol() == "AudioWaveform")
                 continue;
 
             if (!n->isWritable())
@@ -3791,8 +3550,7 @@ IPGraph::findNodesByAbstractPath(int frame,
                     //  NOTE: data flow direction not dependency direction
                     //  (i.e. from input node to output node)
                     //
-                    connections.push_back(
-                        StringPair(innode->name(), n->name()));
+                    connections.push_back(StringPair(innode->name(), n->name()));
                 }
             }
         }
@@ -3803,8 +3561,7 @@ IPGraph::findNodesByAbstractPath(int frame,
         string name = canonicalNodeName(inname);
         static char buf[16];
         static RegEx endRE("(.*[^0-9])([0-9]+)");
-        static RegEx midRE(
-            "(.*[^0-9])([0-9][0-9][0-9][0-9][0-9][0-9])([^0-9].*)");
+        static RegEx midRE("(.*[^0-9])([0-9][0-9][0-9][0-9][0-9][0-9])([^0-9].*)");
 
         if (m_nodeMap.count(name) > 0)
         {
@@ -3865,43 +3622,29 @@ IPGraph::findNodesByAbstractPath(int frame,
         return name;
     }
 
-    bool IPGraph::hasConstructor(const string& typeName)
-    {
-        return nodeDefinition(typeName) != NULL;
-    }
+    bool IPGraph::hasConstructor(const string& typeName) { return nodeDefinition(typeName) != NULL; }
 
-    const NodeDefinition* IPGraph::nodeDefinition(const string& typeName)
-    {
-        return m_nodeManager->definition(typeName);
-    }
+    const NodeDefinition* IPGraph::nodeDefinition(const string& typeName) { return m_nodeManager->definition(typeName); }
 
-    DisplayGroupIPNode*
-    IPGraph::newDisplayGroup(const std::string& nodeName,
-                             const TwkApp::VideoDevice* device)
+    DisplayGroupIPNode* IPGraph::newDisplayGroup(const std::string& nodeName, const TwkApp::VideoDevice* device)
     {
-        DisplayGroupIPNode* group =
-            newNodeOfType<DisplayGroupIPNode>("DisplayGroup", nodeName);
+        DisplayGroupIPNode* group = newNodeOfType<DisplayGroupIPNode>("DisplayGroup", nodeName);
         if (group)
             group->setPhysicalVideoDevice(device);
         return group;
     }
 
-    OutputGroupIPNode*
-    IPGraph::newOutputGroup(const std::string& nodeName,
-                            const TwkApp::VideoDevice* device)
+    OutputGroupIPNode* IPGraph::newOutputGroup(const std::string& nodeName, const TwkApp::VideoDevice* device)
     {
-        OutputGroupIPNode* group =
-            newNodeOfType<OutputGroupIPNode>("OutputGroup", nodeName);
+        OutputGroupIPNode* group = newNodeOfType<OutputGroupIPNode>("OutputGroup", nodeName);
         if (group)
             group->setPhysicalVideoDevice(device);
         return group;
     }
 
-    IPNode* IPGraph::newNode(const string& typeName, const string& nodeName,
-                             GroupIPNode* group)
+    IPNode* IPGraph::newNode(const string& typeName, const string& nodeName, GroupIPNode* group)
     {
-        if (IPNode* node =
-                m_nodeManager->newNode(typeName, nodeName, this, group))
+        if (IPNode* node = m_nodeManager->newNode(typeName, nodeName, this, group))
         {
             if (node->definition()->userVisible() && node->group() == NULL)
             {
@@ -3918,8 +3661,7 @@ IPGraph::findNodesByAbstractPath(int frame,
             info[2] = str.str();
             info[3] = group ? group->name() : "";
 
-            TwkApp::GenericStringEvent event("graph-new-node", this,
-                                             node->name());
+            TwkApp::GenericStringEvent event("graph-new-node", this, node->name());
             event.setStringContentVector(info);
             sendEvent(event);
 
@@ -3935,10 +3677,7 @@ IPGraph::findNodesByAbstractPath(int frame,
 
     void IPGraph::setProfilingClock(Timer* t) { m_profilingTimer = t; }
 
-    double IPGraph::profilingElapsedTime()
-    {
-        return m_profilingTimer->elapsed();
-    }
+    double IPGraph::profilingElapsedTime() { return m_profilingTimer->elapsed(); }
 
     IPGraph::EvalProfilingRecord& IPGraph::beginProfilingSample()
     {
@@ -3946,10 +3685,7 @@ IPGraph::findNodesByAbstractPath(int frame,
         return m_profilingSamples.back();
     }
 
-    IPGraph::EvalProfilingRecord& IPGraph::currentProfilingSample()
-    {
-        return m_profilingSamples.back();
-    }
+    IPGraph::EvalProfilingRecord& IPGraph::currentProfilingSample() { return m_profilingSamples.back(); }
 
     void IPGraph::updateHasAudioStatus(IPNode* node)
     {
@@ -4012,8 +3748,7 @@ IPGraph::findNodesByAbstractPath(int frame,
         }
     }
 
-    IPGraph::WorkItemID IPGraph::addWorkItem(const VoidFunction& function,
-                                             const char* tag)
+    IPGraph::WorkItemID IPGraph::addWorkItem(const VoidFunction& function, const char* tag)
     {
         auto jobDispatcher = reinterpret_cast<JobDispatcher*>(m_jobDispatcher);
 
@@ -4036,8 +3771,7 @@ IPGraph::findNodesByAbstractPath(int frame,
     {
         if (id)
         {
-            auto jobDispatcher =
-                reinterpret_cast<JobDispatcher*>(m_jobDispatcher);
+            auto jobDispatcher = reinterpret_cast<JobDispatcher*>(m_jobDispatcher);
             jobDispatcher->prioritizeJob(id);
         }
     }

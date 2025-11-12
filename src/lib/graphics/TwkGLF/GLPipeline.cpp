@@ -39,8 +39,7 @@ namespace TwkGLF
         }
     }
 
-    void GLPipeline::setViewport(const int x, const int y, const int w,
-                                 const int h)
+    void GLPipeline::setViewport(const int x, const int y, const int w, const int h)
     {
         // only change gl state if necessary
         // if (m_viewport[0] != x || m_viewport[1] != y || m_viewport[2] != w ||
@@ -85,13 +84,11 @@ namespace TwkGLF
         }
         catch (std::exception& exc)
         {
-            cerr << "ERROR: failed to set float array uniform in glProgram "
-                 << m_program->programId() << ": " << exc.what() << endl;
+            cerr << "ERROR: failed to set float array uniform in glProgram " << m_program->programId() << ": " << exc.what() << endl;
             return;
         }
 #endif
-        setUniformGLFloat(m_program->programId(),
-                          m_program->uniformLocation(name), no, data);
+        setUniformGLFloat(m_program->programId(), m_program->uniformLocation(name), no, data);
     }
 
     void GLPipeline::setUniformInt(const char* name, size_t no, GLint* data)
@@ -103,13 +100,11 @@ namespace TwkGLF
         }
         catch (std::exception& exc)
         {
-            cerr << "ERROR: failed to set int array uniform in glProgram "
-                 << m_program->programId() << ": " << exc.what() << endl;
+            cerr << "ERROR: failed to set int array uniform in glProgram " << m_program->programId() << ": " << exc.what() << endl;
             return;
         }
 #endif
-        setUniformGLInt(m_program->programId(),
-                        m_program->uniformLocation(name), no, data);
+        setUniformGLInt(m_program->programId(), m_program->uniformLocation(name), no, data);
     }
 
     void GLPipeline::setUniformMatrix(const char* name, TwkMath::Mat44f& data)
@@ -121,13 +116,11 @@ namespace TwkGLF
         }
         catch (std::exception& exc)
         {
-            cerr << "ERROR: failed to set matrix uniform in glProgram "
-                 << m_program->programId() << ": " << exc.what() << endl;
+            cerr << "ERROR: failed to set matrix uniform in glProgram " << m_program->programId() << ": " << exc.what() << endl;
             return;
         }
 #endif
-        setUniformGLMatrix(m_program->programId(),
-                           m_program->uniformLocation(name), &(data[0][0]));
+        setUniformGLMatrix(m_program->programId(), m_program->uniformLocation(name), &(data[0][0]));
     }
 
     //----------------------------------------------------------------------
@@ -144,13 +137,11 @@ namespace TwkGLF
         }
         catch (std::exception& exc)
         {
-            cerr << "ERROR: failed to read matrix uniform in glProgram "
-                 << m_program->programId() << ": " << exc.what() << endl;
+            cerr << "ERROR: failed to read matrix uniform in glProgram " << m_program->programId() << ": " << exc.what() << endl;
             return;
         }
 #endif
-        getUniformGLFloat(m_program->programId(),
-                          m_program->uniformLocation(name), data);
+        getUniformGLFloat(m_program->programId(), m_program->uniformLocation(name), data);
     }
 
     void GLPipeline::uniformInt(const char* name, GLint* data) const
@@ -162,13 +153,11 @@ namespace TwkGLF
         }
         catch (std::exception& exc)
         {
-            cerr << "ERROR: failed to read int array uniform in glProgram "
-                 << m_program->programId() << ": " << exc.what() << endl;
+            cerr << "ERROR: failed to read int array uniform in glProgram " << m_program->programId() << ": " << exc.what() << endl;
             return;
         }
 #endif
-        getUniformGLInt(m_program->programId(),
-                        m_program->uniformLocation(name), data);
+        getUniformGLInt(m_program->programId(), m_program->uniformLocation(name), data);
     }
 
     void GLPipeline::uniformMatrix(const char* name, GLfloat* data) const
@@ -180,13 +169,11 @@ namespace TwkGLF
         }
         catch (std::exception& exc)
         {
-            cerr << "ERROR: failed to read int array uniform in glProgram "
-                 << m_program->programId() << ": " << exc.what() << endl;
+            cerr << "ERROR: failed to read int array uniform in glProgram " << m_program->programId() << ": " << exc.what() << endl;
             return;
         }
 #endif
-        getUniformGLMatrix(m_program->programId(),
-                           m_program->uniformLocation(name), data);
+        getUniformGLMatrix(m_program->programId(), m_program->uniformLocation(name), data);
     }
 
     //----------------------------------------------------------------------
@@ -206,10 +193,7 @@ namespace TwkGLF
     //----------------------------------------------------------------------
     // private
     // check if a uniform of name 'name' exists in this gl program
-    bool GLPipeline::uniformIsValid(const string& name) const
-    {
-        return m_program->uniformLocation(name) != -1;
-    }
+    bool GLPipeline::uniformIsValid(const string& name) const { return m_program->uniformLocation(name) != -1; }
 
     void GLPipeline::use() const { glUseProgram(m_program->programId()); }
 

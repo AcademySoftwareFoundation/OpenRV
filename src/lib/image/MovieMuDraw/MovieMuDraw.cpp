@@ -37,8 +37,7 @@ namespace TwkMovie
     static bool init = true;
     static pthread_mutex_t lock;
 
-    MovieMuDraw::MovieMuDraw(Movie* movie, MuLangContext* context,
-                             Process* process, TwkGLF::GLVideoDevice* d)
+    MovieMuDraw::MovieMuDraw(Movie* movie, MuLangContext* context, Process* process, TwkGLF::GLVideoDevice* d)
         : Movie()
         , m_context(context)
         , m_process(process)
@@ -65,15 +64,13 @@ namespace TwkMovie
 
     Movie* MovieMuDraw::clone() const { return 0; }
 
-    void MovieMuDraw::setFunction(const string& moduleName,
-                                  const StringVector& args)
+    void MovieMuDraw::setFunction(const string& moduleName, const StringVector& args)
     {
         static const char* funcSig = "(void;int,int,int,int,int,int,"
                                      "bool,bool,int,[string])";
 
-        static const char* funcSig2 =
-            "(void;int,int,int,int,int,int,"
-            "bool,bool,int,[string],[(string,string)])";
+        static const char* funcSig2 = "(void;int,int,int,int,int,int,"
+                                      "bool,bool,int,[string],[(string,string)])";
 
         Name name = m_context->internName(moduleName.c_str());
         Module* module = Module::load(name, m_process, m_context);
@@ -83,18 +80,14 @@ namespace TwkMovie
             TWK_THROW_EXC_STREAM("can't find " << moduleName);
         }
 
-        if (m_main = module->findSymbolOfType<Mu::Function>(
-                m_context->internName("main")))
+        if (m_main = module->findSymbolOfType<Mu::Function>(m_context->internName("main")))
         {
-            bool sig1 =
-                m_main->type() == m_context->parseType(funcSig, m_process);
-            bool sig2 =
-                m_main->type() == m_context->parseType(funcSig2, m_process);
+            bool sig1 = m_main->type() == m_context->parseType(funcSig, m_process);
+            bool sig2 = m_main->type() == m_context->parseType(funcSig2, m_process);
 
             if (!sig1 && !sig2)
             {
-                TWK_THROW_EXC_STREAM(moduleName
-                                     << ".main has wrong function signature");
+                TWK_THROW_EXC_STREAM(moduleName << ".main has wrong function signature");
             }
 
             m_extraArg = sig2;
@@ -104,13 +97,11 @@ namespace TwkMovie
             TWK_THROW_EXC_STREAM(moduleName << ".main not found");
         }
 
-        if (m_init = module->findSymbolOfType<Mu::Function>(
-                m_context->internName("init")))
+        if (m_init = module->findSymbolOfType<Mu::Function>(m_context->internName("init")))
         {
             if (m_init->type() != m_context->parseType(funcSig, m_process))
             {
-                TWK_THROW_EXC_STREAM(moduleName
-                                     << ".init has wrong function signature");
+                TWK_THROW_EXC_STREAM(moduleName << ".init has wrong function signature");
             }
         }
         else
@@ -128,8 +119,7 @@ namespace TwkMovie
         Pointer _2;
     };
 
-    void MovieMuDraw::imagesAtFrame(const ReadRequest& request,
-                                    FrameBufferVector& fbs)
+    void MovieMuDraw::imagesAtFrame(const ReadRequest& request, FrameBufferVector& fbs)
     {
         int frame = request.frame;
         bool stereo = request.stereo;
@@ -154,11 +144,9 @@ namespace TwkMovie
         for (size_t i = 0; i < fbs.size(); i++)
         {
             TwkFB::FrameBuffer* fb = fbs[i];
-            TwkGLF::GLState* glstate =
-                fb->attribute<TwkGLF::GLState*>("glState");
+            TwkGLF::GLState* glstate = fb->attribute<TwkGLF::GLState*>("glState");
 
-            if (TwkGLF::GLVideoDevice* d =
-                    fb->attribute<TwkGLF::GLVideoDevice*>("videoDevice"))
+            if (TwkGLF::GLVideoDevice* d = fb->attribute<TwkGLF::GLVideoDevice*>("videoDevice"))
             {
                 d->setDefaultFBOIndex(i);
                 d->makeCurrent(fb);
@@ -226,8 +214,7 @@ namespace TwkMovie
 
                 List arglist2(m_process, listType);
 
-                const TwkFB::FrameBuffer::AttributeVector& attrs =
-                    fb->attributes();
+                const TwkFB::FrameBuffer::AttributeVector& attrs = fb->attributes();
 
                 for (size_t j = 0; j < attrs.size(); j++)
                 {
@@ -250,8 +237,7 @@ namespace TwkMovie
             GLState::FixedFunctionPipeline FFP(glstate);
 
             glPushAttrib(GL_ALL_ATTRIB_BITS);
-            FFP.setViewport(0, 0, m_movie->info().uncropWidth,
-                            m_movie->info().uncropHeight);
+            FFP.setViewport(0, 0, m_movie->info().uncropWidth, m_movie->info().uncropHeight);
 
             if (fb->attribute<string>("renderer") == "sw" && fbs.size() > 1)
             {
@@ -276,8 +262,7 @@ namespace TwkMovie
                     break;
                 }
 
-                glDrawPixels(fb->width(), fb->height(), ctype, dtype,
-                             fb->pixels<GLvoid>());
+                glDrawPixels(fb->width(), fb->height(), ctype, dtype, fb->pixels<GLvoid>());
             }
 
             if (m_init)
@@ -320,8 +305,7 @@ namespace TwkMovie
                     break;
                 }
 
-                glReadPixels(0, 0, fb->width(), fb->height(), ctype, dtype,
-                             fb->pixels<GLvoid>());
+                glReadPixels(0, 0, fb->width(), fb->height(), ctype, dtype, fb->pixels<GLvoid>());
             }
 
             glFlush();
@@ -333,14 +317,9 @@ namespace TwkMovie
 #endif
     }
 
-    void MovieMuDraw::identifiersAtFrame(const ReadRequest& request,
-                                         IdentifierVector& ids)
-    {
-        m_movie->identifiersAtFrame(request, ids);
-    }
+    void MovieMuDraw::identifiersAtFrame(const ReadRequest& request, IdentifierVector& ids) { m_movie->identifiersAtFrame(request, ids); }
 
-    size_t MovieMuDraw::audioFillBuffer(const AudioReadRequest& request,
-                                        AudioBuffer& buffer)
+    size_t MovieMuDraw::audioFillBuffer(const AudioReadRequest& request, AudioBuffer& buffer)
     {
         return m_movie->audioFillBuffer(request, buffer);
     }

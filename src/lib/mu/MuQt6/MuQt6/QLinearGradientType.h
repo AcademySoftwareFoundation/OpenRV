@@ -47,8 +47,7 @@ namespace Mu
         //  Constructors
         //
 
-        QLinearGradientType(Context* context, const char* name,
-                            Class* superClass = 0);
+        QLinearGradientType(Context* context, const char* name, Class* superClass = 0);
         virtual ~QLinearGradientType();
 
         //

@@ -36,9 +36,7 @@ namespace Rv
     using namespace TwkGLF;
     using namespace TwkApp;
 
-    DesktopVideoDevice::DesktopVideoDevice(VideoModule* m,
-                                           const std::string& name, int screen,
-                                           const QTGLVideoDevice* glViewShared)
+    DesktopVideoDevice::DesktopVideoDevice(VideoModule* m, const std::string& name, int screen, const QTGLVideoDevice* glViewShared)
         : GLBindableVideoDevice(m, name, ImageOutput | NormalizedCoordinates)
         , m_viewDevice(0)
         , m_share(glViewShared)
@@ -64,8 +62,7 @@ namespace Rv
 
         ostringstream str;
         str << rect.width() << " x " << rect.height();
-        m_videoFormats.push_back(
-            VideoFormat(rect.width(), rect.height(), 1.0, 1.0, 0.0, str.str()));
+        m_videoFormats.push_back(VideoFormat(rect.width(), rect.height(), 1.0, 1.0, 0.0, str.str()));
         addDefaultDataFormats();
     }
 
@@ -102,10 +99,7 @@ namespace Rv
         }
     }
 
-    void DesktopVideoDevice::blockUntilSyncComplete() const
-    {
-        ScopedLock lock(m_mutex);
-    }
+    void DesktopVideoDevice::blockUntilSyncComplete() const { ScopedLock lock(m_mutex); }
 
     void DesktopVideoDevice::transfer(const GLFBO* sourceFbo) const
     {
@@ -137,12 +131,10 @@ namespace Rv
             // Afterwards, associate the source FBO's color attachment to the
             // clone's color attachment, because color attachments *can* be
             // shared for the blit operation
-            svSourceFbo = new GLFBO(sourceFbo->width(), sourceFbo->height(),
-                                    sourceFbo->primaryColorFormat());
+            svSourceFbo = new GLFBO(sourceFbo->width(), sourceFbo->height(), sourceFbo->primaryColorFormat());
 
-            svSourceFbo->attachColorTexture(
-                sourceFbo->colorTarget(0),
-                sourceFbo->colorID(0)); // PB: What's colorId ?
+            svSourceFbo->attachColorTexture(sourceFbo->colorTarget(0),
+                                            sourceFbo->colorID(0)); // PB: What's colorId ?
             m_fboMap[sourceFbo] = svSourceFbo;
         }
 
@@ -168,8 +160,7 @@ namespace Rv
         QSurfaceFormat fmt = shareDevice()->widget()->format();
         fmt.setSwapInterval(m_vsync ? 1 : 0);
 
-        ScreenView* vw =
-            new ScreenView(fmt, 0, shareDevice()->widget(), Qt::Window);
+        ScreenView* vw = new ScreenView(fmt, 0, shareDevice()->widget(), Qt::Window);
         setViewWidget(vw);
 
         QTGLVideoDevice* vd = new QTGLVideoDevice(0, "local view", vw);
@@ -217,14 +208,12 @@ namespace Rv
             m_view->makeCurrent();
     }
 
-    void DesktopVideoDevice::setupModelviewAndProjection(
-        float w, float h, GLPipeline* glPipeline) const
+    void DesktopVideoDevice::setupModelviewAndProjection(float w, float h, GLPipeline* glPipeline) const
     {
         // viewport, modelview, proj
         glPipeline->setViewport(0, 0, w, h);
 
-        TwkMath::Mat44f identity(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0,
-                                 1);
+        TwkMath::Mat44f identity(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
         glPipeline->setModelview(identity);
 
         TwkMath::Frustumf f;
@@ -234,9 +223,7 @@ namespace Rv
         glPipeline->setProjection(projMat);
     }
 
-    void DesktopVideoDevice::fillWithTexture2(const GLFBO* fbo1,
-                                              const GLFBO* fbo2, size_t n,
-                                              float w, float h,
+    void DesktopVideoDevice::fillWithTexture2(const GLFBO* fbo1, const GLFBO* fbo2, size_t n, float w, float h,
                                               GLPipeline* glPipeline) const
     {
         // tex
@@ -250,30 +237,22 @@ namespace Rv
         fbo2->bindColorTexture(n);
 
         // draw
-        float data[] = {0, 0, 0,     0,     w, 0, w - 1, 0,
-                        w, h, w - 1, h - 1, 0, h, 0,     h - 1};
+        float data[] = {0, 0, 0, 0, w, 0, w - 1, 0, w, h, w - 1, h - 1, 0, h, 0, h - 1};
         PrimitiveData buffer(data, NULL, GL_QUADS, 4, 1, 16 * sizeof(float));
         std::vector<VertexAttribute> attributeInfo;
 
-        attributeInfo.push_back(VertexAttribute(std::string("in_Position"),
-                                                GL_FLOAT, 2, 2 * sizeof(float),
-                                                4 * sizeof(float)));
+        attributeInfo.push_back(VertexAttribute(std::string("in_Position"), GL_FLOAT, 2, 2 * sizeof(float), 4 * sizeof(float)));
 
-        attributeInfo.push_back(VertexAttribute(
-            std::string("in_TexCoord0"), GL_FLOAT, 2, 0, 4 * sizeof(float)));
+        attributeInfo.push_back(VertexAttribute(std::string("in_TexCoord0"), GL_FLOAT, 2, 0, 4 * sizeof(float)));
 
-        RenderPrimitives renderprimitives(m_glGlobalState->activeGLProgram(),
-                                          buffer, attributeInfo,
-                                          m_glGlobalState->vboList());
+        RenderPrimitives renderprimitives(m_glGlobalState->activeGLProgram(), buffer, attributeInfo, m_glGlobalState->vboList());
         renderprimitives.setupAndRender();
 
         fbo1->unbindColorTexture();
         fbo2->unbindColorTexture();
     }
 
-    void DesktopVideoDevice::fillWithTexture(const GLFBO* fbo, size_t n,
-                                             float w, float h,
-                                             GLPipeline* glPipeline) const
+    void DesktopVideoDevice::fillWithTexture(const GLFBO* fbo, size_t n, float w, float h, GLPipeline* glPipeline) const
     {
         // tex
         GLint id = 0;
@@ -282,28 +261,21 @@ namespace Rv
         fbo->bindColorTexture(n);
 
         // draw
-        float data[] = {0, 0, 0,     0,     w, 0, w - 1, 0,
-                        w, h, w - 1, h - 1, 0, h, 0,     h - 1};
+        float data[] = {0, 0, 0, 0, w, 0, w - 1, 0, w, h, w - 1, h - 1, 0, h, 0, h - 1};
         PrimitiveData buffer(data, NULL, GL_QUADS, 4, 1, 16 * sizeof(float));
         std::vector<VertexAttribute> attributeInfo;
 
-        attributeInfo.push_back(VertexAttribute(std::string("in_Position"),
-                                                GL_FLOAT, 2, 2 * sizeof(float),
-                                                4 * sizeof(float)));
+        attributeInfo.push_back(VertexAttribute(std::string("in_Position"), GL_FLOAT, 2, 2 * sizeof(float), 4 * sizeof(float)));
 
-        attributeInfo.push_back(VertexAttribute(
-            std::string("in_TexCoord0"), GL_FLOAT, 2, 0, 4 * sizeof(float)));
+        attributeInfo.push_back(VertexAttribute(std::string("in_TexCoord0"), GL_FLOAT, 2, 0, 4 * sizeof(float)));
 
-        RenderPrimitives renderprimitives(m_glGlobalState->activeGLProgram(),
-                                          buffer, attributeInfo,
-                                          m_glGlobalState->vboList());
+        RenderPrimitives renderprimitives(m_glGlobalState->activeGLProgram(), buffer, attributeInfo, m_glGlobalState->vboList());
         renderprimitives.setupAndRender();
 
         fbo->unbindColorTexture();
     }
 
-    void DesktopVideoDevice::transfer2(const GLFBO* fbo1,
-                                       const GLFBO* fbo2) const
+    void DesktopVideoDevice::transfer2(const GLFBO* fbo1, const GLFBO* fbo2) const
     {
         //
         //  NOTE: fbo1 and fbo2 are in the controllers context. So we
@@ -323,19 +295,15 @@ namespace Rv
 
         if (!local_fbo1)
         {
-            local_fbo1 = new GLFBO(fbo1->width(), fbo1->height(),
-                                   fbo1->primaryColorFormat());
-            local_fbo1->attachColorTexture(fbo1->colorTarget(0),
-                                           fbo1->colorID(0));
+            local_fbo1 = new GLFBO(fbo1->width(), fbo1->height(), fbo1->primaryColorFormat());
+            local_fbo1->attachColorTexture(fbo1->colorTarget(0), fbo1->colorID(0));
             m_fboMap[fbo1] = local_fbo1;
         }
 
         if (!local_fbo2)
         {
-            local_fbo2 = new GLFBO(fbo2->width(), fbo2->height(),
-                                   fbo2->primaryColorFormat());
-            local_fbo2->attachColorTexture(fbo2->colorTarget(0),
-                                           fbo2->colorID(0));
+            local_fbo2 = new GLFBO(fbo2->width(), fbo2->height(), fbo2->primaryColorFormat());
+            local_fbo2->attachColorTexture(fbo2->colorTarget(0), fbo2->colorID(0));
             m_fboMap[fbo2] = local_fbo2;
         }
 
@@ -390,30 +358,24 @@ namespace Rv
         if (m_stereoMode == SideBySideStereo)
         {
             const GLFBO* outputFBO = m_viewDevice->defaultFBO();
-            local_fbo1->copyRegionTo(outputFBO, 0, 0, 1, 1, 0, 0, .5, 1,
-                                     GL_COLOR_BUFFER_BIT, GL_LINEAR);
-            local_fbo2->copyRegionTo(outputFBO, 0, 0, 1, 1, .5, 0, .5, 1,
-                                     GL_COLOR_BUFFER_BIT, GL_LINEAR);
+            local_fbo1->copyRegionTo(outputFBO, 0, 0, 1, 1, 0, 0, .5, 1, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+            local_fbo2->copyRegionTo(outputFBO, 0, 0, 1, 1, .5, 0, .5, 1, GL_COLOR_BUFFER_BIT, GL_LINEAR);
             outputFBO->unbind();
         }
         else if (m_stereoMode == TopBottomStereo)
         {
             const GLFBO* outputFBO = m_viewDevice->defaultFBO();
-            local_fbo1->copyRegionTo(outputFBO, 0, 0, 1, 1, 0, .5, 1, .5,
-                                     GL_COLOR_BUFFER_BIT, GL_LINEAR);
-            local_fbo2->copyRegionTo(outputFBO, 0, 0, 1, 1, 0, 0, 1, .5,
-                                     GL_COLOR_BUFFER_BIT, GL_LINEAR);
+            local_fbo1->copyRegionTo(outputFBO, 0, 0, 1, 1, 0, .5, 1, .5, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+            local_fbo2->copyRegionTo(outputFBO, 0, 0, 1, 1, 0, 0, 1, .5, GL_COLOR_BUFFER_BIT, GL_LINEAR);
             outputFBO->unbind();
         }
         else if (m_stereoMode == QuadBufferStereo)
         {
-            local_fbo1
-                ->unbind(); // this is necessary, because a fbo could be bound
-                            // (from the render) at this point, and it will not
-                            // have stereo, or double buffering causing the
-                            // following glDrawBuffer lines to crash.
-            GLPipeline* glPipeline =
-                m_glGlobalState->useGLProgram(textureRectGLProgram());
+            local_fbo1->unbind(); // this is necessary, because a fbo could be bound
+                                  // (from the render) at this point, and it will not
+                                  // have stereo, or double buffering causing the
+                                  // following glDrawBuffer lines to crash.
+            GLPipeline* glPipeline = m_glGlobalState->useGLProgram(textureRectGLProgram());
             setupModelviewAndProjection(w, h, glPipeline);
             glDrawBuffer(GL_BACK_LEFT); // CORE DUMPS!? on Mac
             fillWithTexture(fbo1, 0, w, h, glPipeline);
@@ -425,16 +387,14 @@ namespace Rv
         {
             const GLFBO* outputFBO = m_viewDevice->defaultFBO();
             outputFBO->bind();
-            GLPipeline* glPipeline =
-                m_glGlobalState->useGLProgram(stereoScanlineGLProgram());
+            GLPipeline* glPipeline = m_glGlobalState->useGLProgram(stereoScanlineGLProgram());
             setupModelviewAndProjection(w, h, glPipeline);
             // send in uniforms
             VideoDevice::Offset o = this->offset();
             int viewYOrigin = this->height() - o.y - 1 - this->margins().bottom;
             float parity = viewYOrigin % 2 == 0 ? 0.0 : 1.0;
-            glPipeline->setUniformFloat(
-                "parityOffset", 1, &parity); // send GL the uniform values to
-                                             // the current active glProgram
+            glPipeline->setUniformFloat("parityOffset", 1, &parity); // send GL the uniform values to
+                                                                     // the current active glProgram
             fillWithTexture2(leftFBO, rightFBO, 0, w, h, glPipeline);
             outputFBO->unbind();
         }
@@ -442,8 +402,7 @@ namespace Rv
         {
             const GLFBO* outputFBO = m_viewDevice->defaultFBO();
             outputFBO->bind();
-            GLPipeline* glPipeline =
-                m_glGlobalState->useGLProgram(stereoCheckerGLProgram());
+            GLPipeline* glPipeline = m_glGlobalState->useGLProgram(stereoCheckerGLProgram());
             setupModelviewAndProjection(w, h, glPipeline);
             // send in uniforms
             VideoDevice::Offset o = this->offset();
@@ -452,9 +411,8 @@ namespace Rv
             float parity[2];
             parity[0] = viewXOrigin % 2 == 0 ? 0.0 : 1.0;
             parity[1] = viewYOrigin % 2 == 0 ? 0.0 : 1.0;
-            glPipeline->setUniformFloat(
-                "parityOffset", 2, parity); // send GL the uniform values to the
-                                            // current active glProgram
+            glPipeline->setUniformFloat("parityOffset", 2, parity); // send GL the uniform values to the
+                                                                    // current active glProgram
             fillWithTexture2(leftFBO, rightFBO, 0, w, h, glPipeline);
             outputFBO->unbind();
         }
@@ -479,37 +437,25 @@ namespace Rv
             static bool userOverrideFirst = true;
             static bool userOverride = false;
 
-            static float userOverrideLSrcX, userOverrideLSrcY,
-                userOverrideLSrcW, userOverrideLSrcH;
-            static float userOverrideLDstX, userOverrideLDstY,
-                userOverrideLDstW, userOverrideLDstH;
-            static float userOverrideRSrcX, userOverrideRSrcY,
-                userOverrideRSrcW, userOverrideRSrcH;
-            static float userOverrideRDstX, userOverrideRDstY,
-                userOverrideRDstW, userOverrideRDstH;
+            static float userOverrideLSrcX, userOverrideLSrcY, userOverrideLSrcW, userOverrideLSrcH;
+            static float userOverrideLDstX, userOverrideLDstY, userOverrideLDstW, userOverrideLDstH;
+            static float userOverrideRSrcX, userOverrideRSrcY, userOverrideRSrcW, userOverrideRSrcH;
+            static float userOverrideRDstX, userOverrideRDstY, userOverrideRDstW, userOverrideRDstH;
 
             if (userOverrideFirst)
             {
                 userOverrideFirst = false;
 
-                const char* leftCopyString =
-                    getenv("RV_FRAME_PACKED_LEFT_COPY");
-                const char* rightCopyString =
-                    getenv("RV_FRAME_PACKED_RIGHT_COPY");
+                const char* leftCopyString = getenv("RV_FRAME_PACKED_LEFT_COPY");
+                const char* rightCopyString = getenv("RV_FRAME_PACKED_RIGHT_COPY");
 
                 if (leftCopyString && rightCopyString)
                 {
-                    sscanf(leftCopyString, "%f %f %f %f %f %f %f %f",
-                           &userOverrideLSrcX, &userOverrideLSrcY,
-                           &userOverrideLSrcW, &userOverrideLSrcH,
-                           &userOverrideLDstX, &userOverrideLDstY,
-                           &userOverrideLDstW, &userOverrideLDstH);
+                    sscanf(leftCopyString, "%f %f %f %f %f %f %f %f", &userOverrideLSrcX, &userOverrideLSrcY, &userOverrideLSrcW,
+                           &userOverrideLSrcH, &userOverrideLDstX, &userOverrideLDstY, &userOverrideLDstW, &userOverrideLDstH);
 
-                    sscanf(rightCopyString, "%f %f %f %f %f %f %f %f",
-                           &userOverrideRSrcX, &userOverrideRSrcY,
-                           &userOverrideRSrcW, &userOverrideRSrcH,
-                           &userOverrideRDstX, &userOverrideRDstY,
-                           &userOverrideRDstW, &userOverrideRDstH);
+                    sscanf(rightCopyString, "%f %f %f %f %f %f %f %f", &userOverrideRSrcX, &userOverrideRSrcY, &userOverrideRSrcW,
+                           &userOverrideRSrcH, &userOverrideRDstX, &userOverrideRDstY, &userOverrideRDstW, &userOverrideRDstH);
 
                     userOverride = true;
 
@@ -521,61 +467,37 @@ namespace Rv
                     float dw = outputFBO->width();
                     float dh = outputFBO->height();
 
-                    cerr << "ndc left copy  " << " x " << userOverrideLSrcX
-                         << " y " << userOverrideLSrcY << " w "
-                         << userOverrideLSrcW << " h " << userOverrideLSrcH
-                         << " -> " << " x " << userOverrideLDstX << " y "
-                         << userOverrideLDstY << " w " << userOverrideLDstW
-                         << " h " << userOverrideLDstH << endl;
+                    cerr << "ndc left copy  " << " x " << userOverrideLSrcX << " y " << userOverrideLSrcY << " w " << userOverrideLSrcW
+                         << " h " << userOverrideLSrcH << " -> " << " x " << userOverrideLDstX << " y " << userOverrideLDstY << " w "
+                         << userOverrideLDstW << " h " << userOverrideLDstH << endl;
 
-                    cerr << "ndc right copy " << " x " << userOverrideRSrcX
-                         << " y " << userOverrideRSrcY << " w "
-                         << userOverrideRSrcW << " h " << userOverrideRSrcH
-                         << " -> " << " x " << userOverrideRDstX << " y "
-                         << userOverrideRDstY << " w " << userOverrideRDstW
-                         << " h " << userOverrideRDstH << endl;
+                    cerr << "ndc right copy " << " x " << userOverrideRSrcX << " y " << userOverrideRSrcY << " w " << userOverrideRSrcW
+                         << " h " << userOverrideRSrcH << " -> " << " x " << userOverrideRDstX << " y " << userOverrideRDstY << " w "
+                         << userOverrideRDstW << " h " << userOverrideRDstH << endl;
 
-                    cerr << "pixel left copy  " << " x0 "
-                         << int(userOverrideLSrcX * lw) << " y0 "
-                         << int(userOverrideLSrcY * lh) << " x1 "
-                         << int((userOverrideLSrcX + userOverrideLSrcW) * lw)
-                         << " y1 "
-                         << int((userOverrideLSrcY + userOverrideLSrcH) * lh)
-                         << " -> " << " x0 " << int(userOverrideLDstX * dw)
-                         << " y0 " << int(userOverrideLDstY * dh) << " x1 "
-                         << int((userOverrideLDstX + userOverrideLDstW) * dw)
-                         << " y1 "
-                         << int((userOverrideLDstY + userOverrideLDstH) * dh)
+                    cerr << "pixel left copy  " << " x0 " << int(userOverrideLSrcX * lw) << " y0 " << int(userOverrideLSrcY * lh) << " x1 "
+                         << int((userOverrideLSrcX + userOverrideLSrcW) * lw) << " y1 " << int((userOverrideLSrcY + userOverrideLSrcH) * lh)
+                         << " -> " << " x0 " << int(userOverrideLDstX * dw) << " y0 " << int(userOverrideLDstY * dh) << " x1 "
+                         << int((userOverrideLDstX + userOverrideLDstW) * dw) << " y1 " << int((userOverrideLDstY + userOverrideLDstH) * dh)
                          << endl;
 
-                    cerr << "pixel right copy " << " x0 "
-                         << int(userOverrideRSrcX * rw) << " y0 "
-                         << int(userOverrideRSrcY * rh) << " x1 "
-                         << int((userOverrideRSrcX + userOverrideRSrcW) * rw)
-                         << " y1 "
-                         << int((userOverrideRSrcY + userOverrideRSrcH) * rh)
-                         << " -> " << " x0 " << int(userOverrideRDstX * dw)
-                         << " y0 " << int(userOverrideRDstY * dh) << " x1 "
-                         << int((userOverrideRDstX + userOverrideRDstW) * dw)
-                         << " y1 "
-                         << int((userOverrideRDstY + userOverrideRDstH) * dh)
+                    cerr << "pixel right copy " << " x0 " << int(userOverrideRSrcX * rw) << " y0 " << int(userOverrideRSrcY * rh) << " x1 "
+                         << int((userOverrideRSrcX + userOverrideRSrcW) * rw) << " y1 " << int((userOverrideRSrcY + userOverrideRSrcH) * rh)
+                         << " -> " << " x0 " << int(userOverrideRDstX * dw) << " y0 " << int(userOverrideRDstY * dh) << " x1 "
+                         << int((userOverrideRDstX + userOverrideRDstW) * dw) << " y1 " << int((userOverrideRDstY + userOverrideRDstH) * dh)
                          << endl;
                 }
             }
 
             if (userOverride)
             {
-                leftFBO->copyRegionTo(
-                    outputFBO, userOverrideLSrcX, userOverrideLSrcY,
-                    userOverrideLSrcW, userOverrideLSrcH, userOverrideLDstX,
-                    userOverrideLDstY, userOverrideLDstW, userOverrideLDstH,
-                    GL_COLOR_BUFFER_BIT, GL_LINEAR);
+                leftFBO->copyRegionTo(outputFBO, userOverrideLSrcX, userOverrideLSrcY, userOverrideLSrcW, userOverrideLSrcH,
+                                      userOverrideLDstX, userOverrideLDstY, userOverrideLDstW, userOverrideLDstH, GL_COLOR_BUFFER_BIT,
+                                      GL_LINEAR);
 
-                rightFBO->copyRegionTo(
-                    outputFBO, userOverrideRSrcX, userOverrideRSrcY,
-                    userOverrideRSrcW, userOverrideRSrcH, userOverrideRDstX,
-                    userOverrideRDstY, userOverrideRDstW, userOverrideRDstH,
-                    GL_COLOR_BUFFER_BIT, GL_LINEAR);
+                rightFBO->copyRegionTo(outputFBO, userOverrideRSrcX, userOverrideRSrcY, userOverrideRSrcW, userOverrideRSrcH,
+                                       userOverrideRDstX, userOverrideRDstY, userOverrideRDstW, userOverrideRDstH, GL_COLOR_BUFFER_BIT,
+                                       GL_LINEAR);
             }
             //
             //  XXX This block for testing -- END
@@ -587,8 +509,7 @@ namespace Rv
                                          0, p1, 1, p0, // NDC dst x, y, w, h
                                          GL_COLOR_BUFFER_BIT, GL_LINEAR);
 
-                local_fbo2->copyRegionTo(outputFBO, 0, 0, 1, 1, 0, 0, 1, p0,
-                                         GL_COLOR_BUFFER_BIT, GL_LINEAR);
+                local_fbo2->copyRegionTo(outputFBO, 0, 0, 1, 1, 0, 0, 1, p0, GL_COLOR_BUFFER_BIT, GL_LINEAR);
             }
             outputFBO->unbind();
         }
@@ -610,21 +531,16 @@ namespace Rv
         m_fboMap.clear();
     }
 
-    size_t DesktopVideoDevice::numVideoFormats() const
-    {
-        return m_videoFormats.size();
-    }
+    size_t DesktopVideoDevice::numVideoFormats() const { return m_videoFormats.size(); }
 
-    DesktopVideoDevice::VideoFormat
-    DesktopVideoDevice::videoFormatAtIndex(size_t i) const
+    DesktopVideoDevice::VideoFormat DesktopVideoDevice::videoFormatAtIndex(size_t i) const
     {
         if (i >= m_videoFormats.size())
             i = m_videoFormats.size() - 1;
         return m_videoFormats[i];
     }
 
-    DesktopVideoDevice::VideoFormat
-    DesktopVideoDevice::videoFormatFromData(void* data) const
+    DesktopVideoDevice::VideoFormat DesktopVideoDevice::videoFormatFromData(void* data) const
     {
         for (int i = 0; i < m_videoFormats.size(); ++i)
             if (m_videoFormats[i].data == data)
@@ -641,27 +557,20 @@ namespace Rv
         GLBindableVideoDevice::setVideoFormat(i);
     }
 
-    size_t DesktopVideoDevice::currentVideoFormat() const
-    {
-        return m_videoFormatIndex;
-    }
+    size_t DesktopVideoDevice::currentVideoFormat() const { return m_videoFormatIndex; }
 
-    bool DesktopVideoDevice::maybeFramePacked(
-        const TwkApp::VideoDevice::VideoFormat& d) const
+    bool DesktopVideoDevice::maybeFramePacked(const TwkApp::VideoDevice::VideoFormat& d) const
     {
         return
             //(d.width == 1920 && d.height >= 1080 * 2 && d.hz == 24) ||
             //(d.width == 1280 && d.height >= 720 * 2 && (d.hz == 50 || d.hz ==
             // 60));
-            (d.width == 1920 && d.height >= 1080 * 2)
-            || (d.width == 1280 && d.height >= 720 * 2);
+            (d.width == 1920 && d.height >= 1080 * 2) || (d.width == 1280 && d.height >= 720 * 2);
     }
 
-    TwkApp::VideoDevice::Resolution
-    DesktopVideoDevice::internalResolution() const
+    TwkApp::VideoDevice::Resolution DesktopVideoDevice::internalResolution() const
     {
-        const DesktopVideoDevice::DesktopVideoFormat& d =
-            m_videoFormats[m_videoFormatIndex];
+        const DesktopVideoDevice::DesktopVideoFormat& d = m_videoFormats[m_videoFormatIndex];
 
         if (maybeFramePacked(d))
         {
@@ -676,17 +585,14 @@ namespace Rv
 
     TwkApp::VideoDevice::VideoFormat DesktopVideoDevice::internalFormat() const
     {
-        const DesktopVideoDevice::DesktopVideoFormat& d =
-            m_videoFormats[m_videoFormatIndex];
+        const DesktopVideoDevice::DesktopVideoFormat& d = m_videoFormats[m_videoFormatIndex];
 
         if (maybeFramePacked(d))
         {
             if (d.width == 1920)
-                return VideoFormat(1920, 1080, d.pixelAspect, d.pixelScale,
-                                   d.hz, d.description);
+                return VideoFormat(1920, 1080, d.pixelAspect, d.pixelScale, d.hz, d.description);
             else if (d.width == 1280)
-                return VideoFormat(1280, 720, d.pixelAspect, d.pixelScale, d.hz,
-                                   d.description);
+                return VideoFormat(1280, 720, d.pixelAspect, d.pixelScale, d.hz, d.description);
         }
 
         return format();
@@ -694,8 +600,7 @@ namespace Rv
 
     size_t DesktopVideoDevice::internalHeight() const
     {
-        const DesktopVideoDevice::DesktopVideoFormat& d =
-            m_videoFormats[m_videoFormatIndex];
+        const DesktopVideoDevice::DesktopVideoFormat& d = m_videoFormats[m_videoFormatIndex];
 
         if (maybeFramePacked(d))
         {
@@ -710,16 +615,13 @@ namespace Rv
 
     size_t DesktopVideoDevice::numDataFormats() const
     {
-        const DesktopVideoDevice::DesktopVideoFormat& d =
-            m_videoFormats[m_videoFormatIndex];
+        const DesktopVideoDevice::DesktopVideoFormat& d = m_videoFormats[m_videoFormatIndex];
         return m_dataFormats.size() + (maybeFramePacked(d) ? 1 : 0);
     }
 
-    DesktopVideoDevice::DataFormat
-    DesktopVideoDevice::dataFormatAtIndex(size_t i) const
+    DesktopVideoDevice::DataFormat DesktopVideoDevice::dataFormatAtIndex(size_t i) const
     {
-        const DesktopVideoDevice::DesktopVideoFormat& d =
-            m_videoFormats[m_videoFormatIndex];
+        const DesktopVideoDevice::DesktopVideoFormat& d = m_videoFormats[m_videoFormatIndex];
 
         if (maybeFramePacked(d) && i == m_dataFormats.size())
         {
@@ -739,8 +641,7 @@ namespace Rv
 
     void DesktopVideoDevice::setDataFormat(size_t i)
     {
-        const DesktopVideoDevice::DesktopVideoFormat& d =
-            m_videoFormats[m_videoFormatIndex];
+        const DesktopVideoDevice::DesktopVideoFormat& d = m_videoFormats[m_videoFormatIndex];
 
         if (maybeFramePacked(d) && i == m_dataFormats.size())
         {
@@ -757,15 +658,11 @@ namespace Rv
         }
     }
 
-    size_t DesktopVideoDevice::currentDataFormat() const
-    {
-        return m_dataFormatIndex;
-    }
+    size_t DesktopVideoDevice::currentDataFormat() const { return m_dataFormatIndex; }
 
     size_t DesktopVideoDevice::numSyncModes() const { return 2; }
 
-    DesktopVideoDevice::SyncMode
-    DesktopVideoDevice::syncModeAtIndex(size_t i) const
+    DesktopVideoDevice::SyncMode DesktopVideoDevice::syncModeAtIndex(size_t i) const
     {
         if (i == 0)
             return SyncMode("No Sync");
@@ -775,25 +672,17 @@ namespace Rv
 
     void DesktopVideoDevice::setSyncMode(size_t i) { m_vsync = i != 0; }
 
-    size_t DesktopVideoDevice::currentSyncMode() const
-    {
-        return m_vsync ? 1 : 0;
-    }
+    size_t DesktopVideoDevice::currentSyncMode() const { return m_vsync ? 1 : 0; }
 
     size_t DesktopVideoDevice::numSyncSources() const { return 0; }
 
-    DesktopVideoDevice::SyncSource
-    DesktopVideoDevice::syncSourceAtIndex(size_t) const
-    {
-        return SyncSource();
-    }
+    DesktopVideoDevice::SyncSource DesktopVideoDevice::syncSourceAtIndex(size_t) const { return SyncSource(); }
 
     void DesktopVideoDevice::setSyncSource(size_t) {}
 
     size_t DesktopVideoDevice::currentSyncSource() const { return 0; }
 
-    void DesktopVideoDevice::addDataFormatAtDepth(size_t depth,
-                                                  DesktopStereoMode m)
+    void DesktopVideoDevice::addDataFormatAtDepth(size_t depth, DesktopStereoMode m)
     {
         ostringstream str;
         str << "RGB";
@@ -842,8 +731,7 @@ namespace Rv
     namespace
     {
 
-        bool widthSort(const TwkApp::VideoDevice::VideoFormat& a,
-                       const TwkApp::VideoDevice::VideoFormat& b)
+        bool widthSort(const TwkApp::VideoDevice::VideoFormat& a, const TwkApp::VideoDevice::VideoFormat& b)
         {
             if (a.width != b.width)
                 return a.width < b.width;
@@ -857,14 +745,9 @@ namespace Rv
 
     } // namespace
 
-    void DesktopVideoDevice::sortVideoFormatsByWidth()
-    {
-        sort(m_videoFormats.begin(), m_videoFormats.end(), widthSort);
-    }
+    void DesktopVideoDevice::sortVideoFormatsByWidth() { sort(m_videoFormats.begin(), m_videoFormats.end(), widthSort); }
 
-    DesktopVideoDevice::ScreenView::ScreenView(const QSurfaceFormat& fmt,
-                                               QWidget* parent,
-                                               QOpenGLWidget* glViewShare,
+    DesktopVideoDevice::ScreenView::ScreenView(const QSurfaceFormat& fmt, QWidget* parent, QOpenGLWidget* glViewShare,
                                                Qt::WindowFlags flags)
         : QOpenGLWidget(parent, flags)
     {
@@ -950,10 +833,7 @@ namespace Rv
         return VideoFormat(g.width(), g.height(), pa, ps, rate, str.str());
     }
 
-    VideoDevice::Offset DesktopVideoDevice::offset() const
-    {
-        return Offset(0, 0);
-    }
+    VideoDevice::Offset DesktopVideoDevice::offset() const { return Offset(0, 0); }
 
     VideoDevice::Timing DesktopVideoDevice::timing() const { return format(); }
 
@@ -1018,8 +898,7 @@ namespace Rv
 
                 char desc[256];
                 cmsHPROFILE profile = cmsOpenProfileFromFile(path, "r");
-                cmsGetProfileInfoASCII(profile, cmsInfoDescription, "en", "US",
-                                       desc, 256);
+                cmsGetProfileInfoASCII(profile, cmsInfoDescription, "en", "US", desc, 256);
                 m_colorProfile.description = desc;
 
                 delete url;
@@ -1037,8 +916,7 @@ namespace Rv
     }
 #endif
 
-    std::vector<VideoDevice*> DesktopVideoDevice::createDesktopVideoDevices(
-        TwkApp::VideoModule* module, const QTGLVideoDevice* shareDevice)
+    std::vector<VideoDevice*> DesktopVideoDevice::createDesktopVideoDevices(TwkApp::VideoModule* module, const QTGLVideoDevice* shareDevice)
     {
         std::vector<VideoDevice*> devices;
 
@@ -1046,17 +924,14 @@ namespace Rv
         for (int screen = 0; screen < screens.size(); screen++)
         {
             const QScreen* w = screens[screen];
-            QString name = QString("%1 %2 %3")
-                               .arg(w->manufacturer())
-                               .arg(w->model())
-                               .arg(w->name());
+            QString name = QString("%1 %2 %3").arg(w->manufacturer()).arg(w->model()).arg(w->name());
 
-            if (name.trimmed().isEmpty()) {
+            if (name.trimmed().isEmpty())
+            {
                 name = QString("Screen %1").arg(screen);
             }
 
-            DesktopVideoDevice* sd = new DesktopVideoDevice(
-                module, name.toUtf8().constData(), screen, shareDevice);
+            DesktopVideoDevice* sd = new DesktopVideoDevice(module, name.toUtf8().constData(), screen, shareDevice);
 
             devices.push_back(sd);
         }

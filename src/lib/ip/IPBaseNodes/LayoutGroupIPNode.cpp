@@ -26,17 +26,14 @@ namespace IPCore
     string LayoutGroupIPNode::m_defaultMode = "packed";
     bool LayoutGroupIPNode::m_defaultAutoRetime = true;
 
-    LayoutGroupIPNode::LayoutGroupIPNode(const std::string& name,
-                                         const NodeDefinition* def,
-                                         IPGraph* graph, GroupIPNode* group)
+    LayoutGroupIPNode::LayoutGroupIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group)
         : GroupIPNode(name, def, graph, group)
         , m_layoutRequested(false)
     {
         declareProperty<StringProperty>("ui.name", name);
 
         m_mode = declareProperty<StringProperty>("layout.mode", m_defaultMode);
-        m_retimeToOutput = declareProperty<IntProperty>(
-            "timing.retimeInputs", m_defaultAutoRetime ? 1 : 0);
+        m_retimeToOutput = declareProperty<IntProperty>("timing.retimeInputs", m_defaultAutoRetime ? 1 : 0);
         m_spacing = declareProperty<FloatProperty>("layout.spacing", 1.0f);
         m_gridRows = declareProperty<IntProperty>("layout.gridRows", 0);
         m_gridColumns = declareProperty<IntProperty>("layout.gridColumns", 0);
@@ -55,29 +52,15 @@ namespace IPCore
         //
     }
 
-    string LayoutGroupIPNode::retimeType()
-    {
-        return definition()->stringValue("defaults.retimeType", "Retime");
-    }
+    string LayoutGroupIPNode::retimeType() { return definition()->stringValue("defaults.retimeType", "Retime"); }
 
-    string LayoutGroupIPNode::transformType()
-    {
-        return definition()->stringValue("defaults.transformType",
-                                         "Transform2D");
-    }
+    string LayoutGroupIPNode::transformType() { return definition()->stringValue("defaults.transformType", "Transform2D"); }
 
-    string LayoutGroupIPNode::stackType()
-    {
-        return definition()->stringValue("defaults.stackType", "Stack");
-    }
+    string LayoutGroupIPNode::stackType() { return definition()->stringValue("defaults.stackType", "Stack"); }
 
-    string LayoutGroupIPNode::paintType()
-    {
-        return definition()->stringValue("defaults.paintType", "Paint");
-    }
+    string LayoutGroupIPNode::paintType() { return definition()->stringValue("defaults.paintType", "Paint"); }
 
-    IPNode* LayoutGroupIPNode::newSubGraphForInput(size_t index,
-                                                   const IPNodes& newInputs)
+    IPNode* LayoutGroupIPNode::newSubGraphForInput(size_t index, const IPNodes& newInputs)
     {
         layoutIfRequested();
 
@@ -93,9 +76,7 @@ namespace IPCore
 
         IPNode* in = newInputs[index];
         AdaptorIPNode* anode = newAdaptorForInput(in);
-        Transform2DIPNode* tnode =
-            newMemberNodeOfTypeForInput<Transform2DIPNode>(transformType(), in,
-                                                           "t");
+        Transform2DIPNode* tnode = newMemberNodeOfTypeForInput<Transform2DIPNode>(transformType(), in, "t");
 
         tnode->setAdaptiveResampling(true);
         tnode->setInputs1(anode);
@@ -112,9 +93,7 @@ namespace IPCore
         return node;
     }
 
-    IPNode* LayoutGroupIPNode::modifySubGraphForInput(size_t index,
-                                                      const IPNodes& newInputs,
-                                                      IPNode* subgraph)
+    IPNode* LayoutGroupIPNode::modifySubGraphForInput(size_t index, const IPNodes& newInputs, IPNode* subgraph)
     {
         layoutIfRequested();
 
@@ -131,11 +110,9 @@ namespace IPCore
             if (!inputRangeInfo.isUndiscovered)
             {
                 IPNode* innode = newInputs[index];
-                IPNode* retimer =
-                    newMemberNodeForInput(retimeType(), innode, "rt");
+                IPNode* retimer = newMemberNodeForInput(retimeType(), innode, "rt");
                 retimer->setInputs1(subgraph);
-                retimer->setProperty<FloatProperty>("output.fps",
-                                                    inputRangeInfo.fps);
+                retimer->setProperty<FloatProperty>("output.fps", inputRangeInfo.fps);
                 subgraph = retimer;
             }
         }
@@ -188,8 +165,7 @@ namespace IPCore
         class LayoutItem
         {
         public:
-            LayoutItem(float w = 0.0f, float h = 0.0f, float s = 1.0f,
-                       float xt = 0.0f, float yt = 0.0f, float r = 0.0f)
+            LayoutItem(float w = 0.0f, float h = 0.0f, float s = 1.0f, float xt = 0.0f, float yt = 0.0f, float r = 0.0f)
                 : width(w)
                 , height(h)
                 , scale(s)
@@ -218,47 +194,38 @@ namespace IPCore
         typedef vector<LayoutItem> LayoutItems;
         typedef vector<LayoutItem*> LayoutItemPointers;
 
-        void geometryAtNode(int frame, IPNode* node, float& width,
-                            float& height)
+        void geometryAtNode(int frame, IPNode* node, float& width, float& height)
         {
-            IPNode::ImageStructureInfo i =
-                node->imageStructureInfo(node->graph()->contextForFrame(frame));
+            IPNode::ImageStructureInfo i = node->imageStructureInfo(node->graph()->contextForFrame(frame));
             width = (i.height > 0) ? float(i.width) / float(i.height) : 0;
             height = 1.0;
         }
 
-        void convertToLayoutItems(int frame,
-                                  const IPNode::MetaEvalInfoVector& infos,
-                                  LayoutItems& items,
-                                  LayoutItemPointers& itemPointers)
+        void convertToLayoutItems(int frame, const IPNode::MetaEvalInfoVector& infos, LayoutItems& items, LayoutItemPointers& itemPointers)
         {
             items.resize(infos.size());
             itemPointers.resize(infos.size());
 
             for (size_t i = 0; i < infos.size(); i++)
             {
-                geometryAtNode(frame, infos[i].node, items[i].width,
-                               items[i].height);
+                geometryAtNode(frame, infos[i].node, items[i].width, items[i].height);
                 itemPointers[i] = &items[i];
             }
         }
 
         void setTransform(IPNode* node, float x, float y, float s, float r)
         {
-            node->setProperty<Vec2fProperty>("transform.translate",
-                                             Vec2f(x, y));
+            node->setProperty<Vec2fProperty>("transform.translate", Vec2f(x, y));
             node->setProperty<Vec2fProperty>("transform.scale", Vec2f(s, s));
             node->setProperty<FloatProperty>("transform.rotate", r);
         }
 
-        void setTransforms(const IPNode::MetaEvalInfoVector& infos,
-                           const LayoutItems& items)
+        void setTransforms(const IPNode::MetaEvalInfoVector& infos, const LayoutItems& items)
         {
             for (size_t i = 0; i < infos.size(); i++)
             {
                 const LayoutItem& item = items[i];
-                setTransform(infos[i].node, item.xtrans, item.ytrans,
-                             item.scale, item.rotation);
+                setTransform(infos[i].node, item.xtrans, item.ytrans, item.scale, item.rotation);
             }
         }
 
@@ -296,8 +263,7 @@ namespace IPCore
             return maxW;
         }
 
-        void layoutItemsInGrid(LayoutItemPointers& items, float aspect,
-                               int cols, int rows)
+        void layoutItemsInGrid(LayoutItemPointers& items, float aspect, int cols, int rows)
         {
             if (items.size() == 0)
                 return;
@@ -316,8 +282,7 @@ namespace IPCore
             if (rows < 0)
                 rows = 0;
 
-            float maxW =
-                maxItemWidth(items); // Use widest element for column width
+            float maxW = maxItemWidth(items); // Use widest element for column width
 
             //
             // There are three possible cases for using layoutItemsInGrid
@@ -356,10 +321,8 @@ namespace IPCore
                     float bestScale = 0;
                     for (int colsC = 1; colsC < items.size(); colsC++)
                     {
-                        int rowsC =
-                            int(ceil(double(items.size()) / double(colsC)));
-                        float scaleC = min(aspect / (float(colsC) * maxW),
-                                           1.0f / float(rowsC));
+                        int rowsC = int(ceil(double(items.size()) / double(colsC)));
+                        float scaleC = min(aspect / (float(colsC) * maxW), 1.0f / float(rowsC));
                         if (scaleC > bestScale)
                         {
                             bestScale = scaleC;
@@ -375,8 +338,7 @@ namespace IPCore
             // height.
             //
 
-            float scale =
-                min(aspect / (float(cols) * maxW), 1.0f / float(rows));
+            float scale = min(aspect / (float(cols) * maxW), 1.0f / float(rows));
 
             //
             // If the layout is fixed by row count then we need to make sure to
@@ -397,8 +359,7 @@ namespace IPCore
                     LayoutItem* item = items[n++];
                     int c = (fixedRows) ? o : i;
                     int r = (fixedRows) ? i : o;
-                    float x = (((float(cols) - 1.0) / -2.0) + float(c)) * maxW
-                              * scale;
+                    float x = (((float(cols) - 1.0) / -2.0) + float(c)) * maxW * scale;
                     float y = (((float(rows) - 1.0) / -2.0) + float(r)) * scale;
                     item->set(x, -1.0 * y, scale);
                 }
@@ -420,8 +381,7 @@ namespace IPCore
             return xtotal;
         }
 
-        float layoutRowOfItems(LayoutItemPointers& items, float y, float s,
-                               float off)
+        float layoutRowOfItems(LayoutItemPointers& items, float y, float s, float off)
         {
             float xaccum = 0;
 
@@ -444,8 +404,7 @@ namespace IPCore
             return xaccum;
         }
 
-        bool isAbleToLayoutRows(LayoutItemPointers& items, const float aspect,
-                                const size_t rowNo, size_t& actualNo)
+        bool isAbleToLayoutRows(LayoutItemPointers& items, const float aspect, const size_t rowNo, size_t& actualNo)
         {
             size_t rowCount = 1;
             float curRow = 0;
@@ -561,11 +520,8 @@ namespace IPCore
                         const float w = items[markers[row + 1] - 1]->width;
                         if (w + rowaspects[row + 1] <= rowa)
                         {
-                            const float es = max(rowa - rowaspects[row + 1],
-                                                 rowa - rowaspects[row]);
-                            const float es2 =
-                                max(rowa - rowaspects[row + 1] - w,
-                                    rowa - rowaspects[row] + w);
+                            const float es = max(rowa - rowaspects[row + 1], rowa - rowaspects[row]);
+                            const float es2 = max(rowa - rowaspects[row + 1] - w, rowa - rowaspects[row] + w);
                             if (es2 < es)
                             {
                                 markers[row + 1]--;
@@ -612,15 +568,12 @@ namespace IPCore
                 {
                     tempRow.push_back(items[i]);
                 }
-                layoutRowOfItems(
-                    tempRow, 0.5 * sy * actualRows - 0.5 * sy - row * sy, sy,
-                    (rowWidthOfItems(tempRow) / 2.0
-                     - tempRow.front()->width / 2.0));
+                layoutRowOfItems(tempRow, 0.5 * sy * actualRows - 0.5 * sy - row * sy, sy,
+                                 (rowWidthOfItems(tempRow) / 2.0 - tempRow.front()->width / 2.0));
             }
         }
 
-        void layoutItemsPacked2(LayoutItemPointers& items, float aspect,
-                                int fixedRows = 0)
+        void layoutItemsPacked2(LayoutItemPointers& items, float aspect, int fixedRows = 0)
         {
             float totalWidth = rowWidthOfItems(items);
             const float root = std::sqrt(totalWidth / aspect);
@@ -653,9 +606,7 @@ namespace IPCore
                 {
                     const float hwidth = tempRow.front()->width / 2.0f;
 
-                    layoutRowOfItems(tempRow,
-                                     y + rows * s / 2.0 - 1.0 / rows / 2.0f, s,
-                                     rowWidth / 2.0 / s - hwidth);
+                    layoutRowOfItems(tempRow, y + rows * s / 2.0 - 1.0 / rows / 2.0f, s, rowWidth / 2.0 / s - hwidth);
 
                     if (n > 1)
                     {
@@ -706,8 +657,7 @@ namespace IPCore
         LayoutItemPointers itemPointers;
         convertToLayoutItems(frame, infos, items, itemPointers);
 
-        ImageStructureInfo geom =
-            imageStructureInfo(graph()->contextForFrame(frame));
+        ImageStructureInfo geom = imageStructureInfo(graph()->contextForFrame(frame));
         float aspect = float(geom.width) / float(geom.height);
         if (std::isnan(aspect))
             aspect = 16.0 / 9.0;
@@ -748,8 +698,7 @@ namespace IPCore
     {
         if (!isDeleting())
         {
-            if (p == m_mode || p == m_spacing || p == m_gridRows
-                || p == m_gridColumns)
+            if (p == m_mode || p == m_spacing || p == m_gridRows || p == m_gridColumns)
             {
                 requestLayout();
             }
@@ -765,15 +714,12 @@ namespace IPCore
         GroupIPNode::propertyChanged(p);
     }
 
-    void LayoutGroupIPNode::inputImageStructureChanged(int index,
-                                                       PropagateTarget target)
+    void LayoutGroupIPNode::inputImageStructureChanged(int index, PropagateTarget target)
     {
         GroupIPNode::inputImageStructureChanged(index, target);
 
         const string& m = m_mode->front();
-        if (!isDeleting()
-            && (m == "packed" || m == "packed2" || m == "column" || m == "row"
-                || m == "grid"))
+        if (!isDeleting() && (m == "packed" || m == "packed2" || m == "column" || m == "row" || m == "grid"))
         {
             requestLayout();
         }
@@ -825,8 +771,7 @@ namespace IPCore
         return GroupIPNode::evaluate(context);
     }
 
-    void LayoutGroupIPNode::inputMediaChanged(IPNode* srcNode, int srcOutIndex,
-                                              PropagateTarget target)
+    void LayoutGroupIPNode::inputMediaChanged(IPNode* srcNode, int srcOutIndex, PropagateTarget target)
     {
         IPNode::inputMediaChanged(srcNode, srcOutIndex, target);
 

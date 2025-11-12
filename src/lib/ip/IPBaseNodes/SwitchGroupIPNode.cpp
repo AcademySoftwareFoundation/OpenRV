@@ -20,14 +20,11 @@ namespace IPCore
     using namespace std;
     using namespace TwkContainer;
 
-    SwitchGroupIPNode::SwitchGroupIPNode(const std::string& name,
-                                         const NodeDefinition* def,
-                                         IPGraph* graph, GroupIPNode* group)
+    SwitchGroupIPNode::SwitchGroupIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group)
         : GroupIPNode(name, def, graph, group)
     {
         declareProperty<StringProperty>("ui.name", name);
-        string switchType =
-            definition()->stringValue("defaults.switchType", "Switch");
+        string switchType = definition()->stringValue("defaults.switchType", "Switch");
         m_switchNode = newMemberNodeOfType<SwitchIPNode>(switchType, "switch");
         setRoot(m_switchNode);
 
@@ -44,8 +41,7 @@ namespace IPCore
         //
     }
 
-    IPNode* SwitchGroupIPNode::newSubGraphForInput(size_t index,
-                                                   const IPNodes& newInputs)
+    IPNode* SwitchGroupIPNode::newSubGraphForInput(size_t index, const IPNodes& newInputs)
     {
         IPNode* innode = newInputs[index];
         return newAdaptorForInput(innode);

@@ -27,8 +27,7 @@ namespace Mu
 {
     using namespace std;
 
-    FunctionSpecializer::FunctionSpecializer(const Function* f, Process* p,
-                                             Thread* t)
+    FunctionSpecializer::FunctionSpecializer(const Function* f, Process* p, Thread* t)
         : _as(p->context(), p, t)
         , _root(0)
         , _f(f)
@@ -38,8 +37,7 @@ namespace Mu
 
     FunctionSpecializer::~FunctionSpecializer() {}
 
-    void FunctionSpecializer::doit(const char* name, SymbolList newParams,
-                                   bool lambda)
+    void FunctionSpecializer::doit(const char* name, SymbolList newParams, bool lambda)
     {
         accumulateVariables(_f);
 
@@ -47,18 +45,14 @@ namespace Mu
 
         if (newParams.empty())
         {
-            _lambda = new Function(
-                _as.context(), name, translate(_f->returnType()), 0, 0, 0,
-                _f->baseAttributes() | Function::ContextDependent
-                    | Function::LambdaExpression);
+            _lambda = new Function(_as.context(), name, translate(_f->returnType()), 0, 0, 0,
+                                   _f->baseAttributes() | Function::ContextDependent | Function::LambdaExpression);
         }
         else
         {
-            _lambda = new Function(
-                _as.context(), name, translate(_f->returnType()),
-                newParams.size(), (ParameterVariable**)&(newParams.front()), 0,
-                _f->baseAttributes() | Function::ContextDependent
-                    | Function::LambdaExpression);
+            _lambda =
+                new Function(_as.context(), name, translate(_f->returnType()), newParams.size(), (ParameterVariable**)&(newParams.front()),
+                             0, _f->baseAttributes() | Function::ContextDependent | Function::LambdaExpression);
         }
 
         if (lambda)
@@ -106,8 +100,7 @@ namespace Mu
         }
     }
 
-    Function* FunctionSpecializer::partiallyEvaluate(const ArgumentVector& args,
-                                                     const ArgumentMask& mask)
+    Function* FunctionSpecializer::partiallyEvaluate(const ArgumentVector& args, const ArgumentMask& mask)
     {
         _args = args;
         _mask = mask;
@@ -121,8 +114,7 @@ namespace Mu
 
             if (!_mask[i])
             {
-                Param nv = new ParameterVariable(
-                    _as.context(), p->name().c_str(), p->storageClass());
+                Param nv = new ParameterVariable(_as.context(), p->name().c_str(), p->storageClass());
 
                 if (!dynamic_cast<FreeVariable*>(p))
                 {
@@ -147,8 +139,7 @@ namespace Mu
             Param p = (Param)_f->parameter(i);
             _originalIndex[p] = i;
 
-            Param nv = new ParameterVariable(_as.context(), p->name().c_str(),
-                                             translate(p->storageClass()));
+            Param nv = new ParameterVariable(_as.context(), p->name().c_str(), translate(p->storageClass()));
 
             if (!dynamic_cast<FreeVariable*>(p))
             {
@@ -206,8 +197,7 @@ namespace Mu
         {
             const Variable* v = _variables[i];
 
-            if (const ParameterVariable* pv =
-                    dynamic_cast<const ParameterVariable*>(v))
+            if (const ParameterVariable* pv = dynamic_cast<const ParameterVariable*>(v))
             {
                 Variable* np = _map[(ParameterVariable*)pv];
                 _variableMap[v] = np;
@@ -233,16 +223,13 @@ namespace Mu
             if (dynamic_cast<const StackVariable*>(v))
             {
                 _as.declarationType(t);
-                Variable* nv = _as.declareStackVariable(
-                    t, _as.context()->internName(temp), Variable::ReadWrite);
+                Variable* nv = _as.declareStackVariable(t, _as.context()->internName(temp), Variable::ReadWrite);
                 _variableMap[v] = nv;
             }
             else if (dynamic_cast<const GlobalVariable*>(v))
             {
                 _as.declarationType(t, true);
-                Variable* nv = new GlobalVariable(
-                    _as.context(), temp, t, _as.process()->globals().size(),
-                    Variable::ReadWrite, 0);
+                Variable* nv = new GlobalVariable(_as.context(), temp, t, _as.process()->globals().size(), Variable::ReadWrite, 0);
                 _as.scope()->addSymbol(nv);
                 _as.process()->globals().push_back(Value());
                 _variableMap[v] = nv;
@@ -263,8 +250,7 @@ namespace Mu
 
             for (Symbol* s = is->firstOverload(); s; s = s->nextOverload())
             {
-                if (const ParameterVariable* pv =
-                        dynamic_cast<const ParameterVariable*>(s))
+                if (const ParameterVariable* pv = dynamic_cast<const ParameterVariable*>(s))
                 {
                     int index = _originalIndex[(ParameterVariable*)pv];
                     assert(index != -1);
@@ -312,8 +298,7 @@ namespace Mu
                 drn->_data = dn->_data;
             }
 
-            if (f == _as.context()->returnFromFunction()
-                || f == _as.context()->returnFromVoidFunction())
+            if (f == _as.context()->returnFromFunction() || f == _as.context()->returnFromVoidFunction())
             {
                 _lambda->hasReturn(true);
             }
@@ -347,8 +332,7 @@ namespace Mu
             const DataNode* dn = static_cast<const DataNode*>(n);
             Name uname = dn->_data._name;
 
-            if (const Type* t =
-                    _as.context()->findSymbolOfTypeByQualifiedName<Type>(uname))
+            if (const Type* t = _as.context()->findSymbolOfTypeByQualifiedName<Type>(uname))
             {
                 Node* rn = _as.cast(translate(n->argNode(0)), t);
                 assert(rn);
@@ -374,8 +358,7 @@ namespace Mu
                     nl.push_back(translate(n->argNode(i)));
                 }
 
-                Node* rn =
-                    _as.memberOperator("[]", translate(n->argNode(0)), nl);
+                Node* rn = _as.memberOperator("[]", translate(n->argNode(0)), nl);
                 _as.removeNodeList(nl);
 
                 assert(rn);
@@ -401,27 +384,21 @@ namespace Mu
             {
                 const Node* lhs = n->argNode(0);
 
-                if (lhs->type() == _as.context()->unresolvedType()
-                    && lhs->symbol()
-                           == _as.context()->unresolvedStackReference())
+                if (lhs->type() == _as.context()->unresolvedType() && lhs->symbol() == _as.context()->unresolvedStackReference())
                 {
                     const DataNode* dn = static_cast<const DataNode*>(lhs);
-                    StackVariable* sv =
-                        reinterpret_cast<StackVariable*>(dn->_data._Pointer);
+                    StackVariable* sv = reinterpret_cast<StackVariable*>(dn->_data._Pointer);
 
                     Variable* nv = _variableMap[sv];
 
                     if (sv->isImplicitlyTyped())
                     {
-                        if (nv->storageClass()
-                            == _as.context()->unresolvedType())
+                        if (nv->storageClass() == _as.context()->unresolvedType())
                         {
                             Node* rhs = translate(n->argNode(1));
                             if (rhs->type()->isReferenceType())
                             {
-                                const ReferenceType* rt =
-                                    static_cast<const ReferenceType*>(
-                                        rhs->type());
+                                const ReferenceType* rt = static_cast<const ReferenceType*>(rhs->type());
                                 nv->setStorageClass(rt->dereferenceType());
                             }
                             else
@@ -463,8 +440,7 @@ namespace Mu
             //
 
             const DataNode* mr = (const DataNode*)n->argNode(0);
-            const UnresolvedMemberReference* mrsym =
-                dynamic_cast<const UnresolvedMemberReference*>(mr->symbol());
+            const UnresolvedMemberReference* mrsym = dynamic_cast<const UnresolvedMemberReference*>(mr->symbol());
             Name uname = mr->_data._name;
 
             if (mrsym)
@@ -481,8 +457,7 @@ namespace Mu
             //
 
             const DataNode* mr = (const DataNode*)n->argNode(0);
-            const UnresolvedMemberReference* mrsym =
-                dynamic_cast<const UnresolvedMemberReference*>(mr->symbol());
+            const UnresolvedMemberReference* mrsym = dynamic_cast<const UnresolvedMemberReference*>(mr->symbol());
             Name uname = mr->_data._name;
 
             if (mrsym)
@@ -495,8 +470,7 @@ namespace Mu
         else if (dynamic_cast<const UnresolvedStackReference*>(sym))
         {
             const DataNode* dn = static_cast<const DataNode*>(n);
-            StackVariable* sv =
-                reinterpret_cast<StackVariable*>(dn->_data._Pointer);
+            StackVariable* sv = reinterpret_cast<StackVariable*>(dn->_data._Pointer);
             Variable* v = _variableMap[sv];
             return _as.referenceVariable(v);
         }
@@ -504,8 +478,7 @@ namespace Mu
         else if (dynamic_cast<const UnresolvedStackDereference*>(sym))
         {
             const DataNode* dn = static_cast<const DataNode*>(n);
-            StackVariable* sv =
-                reinterpret_cast<StackVariable*>(dn->_data._Pointer);
+            StackVariable* sv = reinterpret_cast<StackVariable*>(dn->_data._Pointer);
             Variable* v = _variableMap[sv];
             return _as.dereferenceVariable(v);
         }
@@ -528,8 +501,7 @@ namespace Mu
             return dn;
         }
 
-        else if (const ParameterVariable* v =
-                     dynamic_cast<const ParameterVariable*>(sym))
+        else if (const ParameterVariable* v = dynamic_cast<const ParameterVariable*>(sym))
         {
             int n = _originalIndex[(ParameterVariable*)v];
             assert(n != -1);
@@ -590,8 +562,7 @@ namespace Mu
                     nn = _as.dereferenceLValue(nn);
                 return nn;
             }
-            else if (const MemberVariable* v =
-                         dynamic_cast<const MemberVariable*>(sym))
+            else if (const MemberVariable* v = dynamic_cast<const MemberVariable*>(sym))
             {
                 Node* a = translate(n->argNode(0));
                 Node* nn = _as.referenceMemberVariable(v, a);

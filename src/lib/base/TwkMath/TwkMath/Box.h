@@ -228,9 +228,7 @@ namespace TwkMath
     //******************************************************************************
     // TEMPLATE AND INLINE FUNCTIONS
     //******************************************************************************
-    template <class VEC>
-    inline Box<VEC>&
-    Box<VEC>::operator=(const typename Box<VEC>::value_type& val)
+    template <class VEC> inline Box<VEC>& Box<VEC>::operator=(const typename Box<VEC>::value_type& val)
     {
         min = val;
         max = val;
@@ -270,8 +268,7 @@ namespace TwkMath
     {
         for (size_type i = 0; i < dimension(); ++i)
         {
-            if (min[i] != Math<value_type>::min()
-                || max[i] != Math<value_type>::max())
+            if (min[i] != Math<value_type>::min() || max[i] != Math<value_type>::max())
             {
                 return false;
             }
@@ -354,17 +351,14 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <class VEC>
-    typename Box<VEC>::value_type
-    Box<VEC>::size(typename Box<VEC>::size_type i) const
+    template <class VEC> typename Box<VEC>::value_type Box<VEC>::size(typename Box<VEC>::size_type i) const
     {
         if (min[i] > max[i])
         {
             // Empty
             return (value_type)0;
         }
-        else if (min[i] == Math<value_type>::min()
-                 && max[i] == Math<value_type>::max())
+        else if (min[i] == Math<value_type>::min() && max[i] == Math<value_type>::max())
         {
             // infinite
             return Math<value_type>::max();
@@ -398,13 +392,9 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <class VEC>
-    inline typename Box<VEC>::value_type
-    Box<VEC>::center(typename Box<VEC>::size_type i) const
+    template <class VEC> inline typename Box<VEC>::value_type Box<VEC>::center(typename Box<VEC>::size_type i) const
     {
-        if ((min[i] > max[i])
-            || (min[i] == Math<value_type>::min()
-                && max[i] == Math<value_type>::max()))
+        if ((min[i] > max[i]) || (min[i] == Math<value_type>::min() && max[i] == Math<value_type>::max()))
         {
             return (value_type)0;
         }
@@ -484,14 +474,11 @@ namespace TwkMath
 
     template <> inline bool Box<Vec3f>::intersects(const Vec3f& v) const
     {
-        return !(v[0] < min[0] || v[0] > max[0] || v[1] < min[1]
-                 || v[1] > max[1] || v[2] < min[2] || v[2] > max[2]);
+        return !(v[0] < min[0] || v[0] > max[0] || v[1] < min[1] || v[1] > max[1] || v[2] < min[2] || v[2] > max[2]);
     }
 
     //******************************************************************************
-    template <class VEC>
-    bool Box<VEC>::intersects(const VEC& p,
-                              typename Box<VEC>::value_type radius) const
+    template <class VEC> bool Box<VEC>::intersects(const VEC& p, typename Box<VEC>::value_type radius) const
     {
         //
         //	Ripped off from graphics gems with improvements
@@ -521,8 +508,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <class VEC>
-    bool Box<VEC>::intersects(const VEC& origin, const VEC& dir) const
+    template <class VEC> bool Box<VEC>::intersects(const VEC& origin, const VEC& dir) const
     {
         //
         //	Ripped off of GGEMS
@@ -625,8 +611,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <class VEC>
-    bool Box<VEC>::closestInteriorPoint(const VEC& pt, VEC& ret) const
+    template <class VEC> bool Box<VEC>::closestInteriorPoint(const VEC& pt, VEC& ret) const
     {
         // Don't have to check empty or infinite here
         // because the check below implicitly does so.
@@ -652,8 +637,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <class VEC>
-    Box<VEC>& Box<VEC>::operator+=(const typename Box<VEC>::value_type& rhs)
+    template <class VEC> Box<VEC>& Box<VEC>::operator+=(const typename Box<VEC>::value_type& rhs)
     {
         if (!isEmpty() && !isInfinite())
         {
@@ -675,8 +659,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <class VEC>
-    Box<VEC>& Box<VEC>::operator-=(const typename Box<VEC>::value_type& rhs)
+    template <class VEC> Box<VEC>& Box<VEC>::operator-=(const typename Box<VEC>::value_type& rhs)
     {
         if (!isEmpty() && !isInfinite())
         {
@@ -698,8 +681,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <class VEC>
-    Box<VEC>& Box<VEC>::operator*=(const typename Box<VEC>::value_type& rhs)
+    template <class VEC> Box<VEC>& Box<VEC>::operator*=(const typename Box<VEC>::value_type& rhs)
     {
         if (!isEmpty() && !isInfinite())
         {
@@ -734,8 +716,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <class VEC>
-    Box<VEC>& Box<VEC>::operator/=(const typename Box<VEC>::value_type& rhs)
+    template <class VEC> Box<VEC>& Box<VEC>::operator/=(const typename Box<VEC>::value_type& rhs)
     {
         assert(rhs != 0);
         if (!isEmpty() && !isInfinite())
@@ -776,93 +757,55 @@ namespace TwkMath
     // FUNCTIONS WHICH OPERATE ON BOXES
     //******************************************************************************
     //******************************************************************************
-    template <class VEC>
-    inline typename Box<VEC>::size_type dimension(const Box<VEC>& b)
-    {
-        return VEC::dimension();
-    }
+    template <class VEC> inline typename Box<VEC>::size_type dimension(const Box<VEC>& b) { return VEC::dimension(); }
 
     //******************************************************************************
     template <class VEC> inline VEC size(const Box<VEC>& b) { return b.size(); }
 
     //******************************************************************************
-    template <class VEC>
-    inline typename Box<VEC>::value_type size(const Box<VEC>& b,
-                                              typename Box<VEC>::size_type i)
-    {
-        return b.size(i);
-    }
+    template <class VEC> inline typename Box<VEC>::value_type size(const Box<VEC>& b, typename Box<VEC>::size_type i) { return b.size(i); }
 
     //******************************************************************************
-    template <class VEC> inline VEC center(const Box<VEC>& b)
-    {
-        return b.center();
-    }
+    template <class VEC> inline VEC center(const Box<VEC>& b) { return b.center(); }
 
     //******************************************************************************
-    template <class VEC>
-    inline typename Box<VEC>::value_type center(const Box<VEC>& b,
-                                                typename Box<VEC>::size_type i)
+    template <class VEC> inline typename Box<VEC>::value_type center(const Box<VEC>& b, typename Box<VEC>::size_type i)
     {
         return b.center(i);
     }
 
     //******************************************************************************
-    template <class VEC> inline bool isEmpty(const Box<VEC>& b)
-    {
-        return b.isEmpty();
-    }
+    template <class VEC> inline bool isEmpty(const Box<VEC>& b) { return b.isEmpty(); }
 
     //******************************************************************************
     template <class VEC> inline void makeEmpty(Box<VEC>& b) { b.makeEmpty(); }
 
     //******************************************************************************
-    template <class VEC> inline bool isInfinite(const Box<VEC>& b)
-    {
-        return b.isInfinite();
-    }
+    template <class VEC> inline bool isInfinite(const Box<VEC>& b) { return b.isInfinite(); }
 
     //******************************************************************************
-    template <class VEC> inline void makeInfinite(Box<VEC>& b)
-    {
-        b.makeInfinite();
-    }
+    template <class VEC> inline void makeInfinite(Box<VEC>& b) { b.makeInfinite(); }
 
     //******************************************************************************
-    template <class VEC> inline void extendBy(Box<VEC>& b, const VEC& v)
-    {
-        b.extendBy(v);
-    }
+    template <class VEC> inline void extendBy(Box<VEC>& b, const VEC& v) { b.extendBy(v); }
 
     //******************************************************************************
-    template <class VEC> inline void extendBy(Box<VEC>& b, const Box<VEC>& b2)
-    {
-        b.extendBy(b2);
-    }
+    template <class VEC> inline void extendBy(Box<VEC>& b, const Box<VEC>& b2) { b.extendBy(b2); }
 
     //******************************************************************************
-    template <class VEC> inline bool intersects(const Box<VEC>& b, const VEC& v)
-    {
-        return b.intersects(v);
-    }
+    template <class VEC> inline bool intersects(const Box<VEC>& b, const VEC& v) { return b.intersects(v); }
 
     //******************************************************************************
-    template <class VEC>
-    inline bool intersects(const Box<VEC>& b, const Box<VEC>& b2)
-    {
-        return b.intersects(b2);
-    }
+    template <class VEC> inline bool intersects(const Box<VEC>& b, const Box<VEC>& b2) { return b.intersects(b2); }
 
     //******************************************************************************
-    template <class VEC>
-    inline Box<VEC> intersection(const Box<VEC>& a, const Box<VEC>& b)
+    template <class VEC> inline Box<VEC> intersection(const Box<VEC>& a, const Box<VEC>& b)
     {
         if (a.intersects(b))
         {
             VEC min;
             VEC max;
-            for (typename Box<VEC>::size_type i = 0; i < Box<VEC>::dimension();
-                 ++i)
+            for (typename Box<VEC>::size_type i = 0; i < Box<VEC>::dimension(); ++i)
             {
                 min[i] = STD_MAX(a.min[i], b.min[i]);
                 max[i] = STD_MIN(a.max[i], b.max[i]);
@@ -876,8 +819,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <class VEC>
-    inline bool closestInteriorPoint(const Box<VEC>& b, const VEC& pt, VEC& ret)
+    template <class VEC> inline bool closestInteriorPoint(const Box<VEC>& b, const VEC& pt, VEC& ret)
     {
         return b.closestInteriorPoint(pt, ret);
     }
@@ -887,9 +829,7 @@ namespace TwkMath
     // ARITHMETIC OPERATORS
     //******************************************************************************
     //******************************************************************************
-    template <class VEC>
-    Box<VEC> operator+(const typename Box<VEC>::value_type& a,
-                       const Box<VEC>& b)
+    template <class VEC> Box<VEC> operator+(const typename Box<VEC>::value_type& a, const Box<VEC>& b)
     {
         if (b.isEmpty() || b.isInfinite())
         {
@@ -915,9 +855,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <class VEC>
-    Box<VEC> operator+(const Box<VEC>& a,
-                       const typename Box<VEC>::value_type& b)
+    template <class VEC> Box<VEC> operator+(const Box<VEC>& a, const typename Box<VEC>::value_type& b)
     {
         if (a.isEmpty() || a.isInfinite())
         {
@@ -943,9 +881,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <class VEC>
-    Box<VEC> operator-(const typename Box<VEC>::value_type& a,
-                       const Box<VEC>& b)
+    template <class VEC> Box<VEC> operator-(const typename Box<VEC>::value_type& a, const Box<VEC>& b)
     {
         if (b.isEmpty() || b.isInfinite())
         {
@@ -971,9 +907,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <class VEC>
-    Box<VEC> operator-(const Box<VEC>& a,
-                       const typename Box<VEC>::value_type& b)
+    template <class VEC> Box<VEC> operator-(const Box<VEC>& a, const typename Box<VEC>::value_type& b)
     {
         if (a.isEmpty() || a.isInfinite())
         {
@@ -999,68 +933,56 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <class VEC>
-    inline Box<VEC> operator*(const typename Box<VEC>::value_type& a,
-                              const Box<VEC>& b)
+    template <class VEC> inline Box<VEC> operator*(const typename Box<VEC>::value_type& a, const Box<VEC>& b)
     {
         Box<VEC> c(b);
         return (c *= a);
     }
 
     //******************************************************************************
-    template <class VEC>
-    inline Box<VEC> operator*(const VEC& a, const Box<VEC>& b)
+    template <class VEC> inline Box<VEC> operator*(const VEC& a, const Box<VEC>& b)
     {
         Box<VEC> c(b);
         return (c *= a);
     }
 
     //******************************************************************************
-    template <class VEC>
-    inline Box<VEC> operator*(const Box<VEC>& a,
-                              const typename Box<VEC>::value_type& b)
+    template <class VEC> inline Box<VEC> operator*(const Box<VEC>& a, const typename Box<VEC>::value_type& b)
     {
         Box<VEC> c(a);
         return (c *= b);
     }
 
     //******************************************************************************
-    template <class VEC>
-    inline Box<VEC> operator*(const Box<VEC>& a, const VEC& b)
+    template <class VEC> inline Box<VEC> operator*(const Box<VEC>& a, const VEC& b)
     {
         Box<VEC> c(a);
         return (c *= b);
     }
 
     //******************************************************************************
-    template <class VEC>
-    inline Box<VEC> operator/(const typename Box<VEC>::value_type& a,
-                              const Box<VEC>& b)
+    template <class VEC> inline Box<VEC> operator/(const typename Box<VEC>::value_type& a, const Box<VEC>& b)
     {
         Box<VEC> c(b);
         return (c /= a);
     }
 
     //******************************************************************************
-    template <class VEC>
-    inline Box<VEC> operator/(const VEC& a, const Box<VEC>& b)
+    template <class VEC> inline Box<VEC> operator/(const VEC& a, const Box<VEC>& b)
     {
         Box<VEC> c(b);
         return (c /= a);
     }
 
     //******************************************************************************
-    template <class VEC>
-    inline Box<VEC> operator/(const Box<VEC>& a,
-                              const typename Box<VEC>::value_type& b)
+    template <class VEC> inline Box<VEC> operator/(const Box<VEC>& a, const typename Box<VEC>::value_type& b)
     {
         Box<VEC> c(a);
         return (c /= b);
     }
 
     //******************************************************************************
-    template <class VEC>
-    inline Box<VEC> operator/(const Box<VEC>& a, const VEC& b)
+    template <class VEC> inline Box<VEC> operator/(const Box<VEC>& a, const VEC& b)
     {
         Box<VEC> c(a);
         return (c /= b);
@@ -1071,8 +993,7 @@ namespace TwkMath
     // COMPARISON OPERATORS
     //******************************************************************************
     //******************************************************************************
-    template <class VEC, class VEC2>
-    bool operator==(const Box<VEC>& a, const Box<VEC2>& b)
+    template <class VEC, class VEC2> bool operator==(const Box<VEC>& a, const Box<VEC2>& b)
     {
         if (a.isEmpty() || a.isInfinite() || b.isEmpty() || b.isInfinite())
         {
@@ -1095,8 +1016,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <class VEC, class VEC2>
-    bool operator!=(const Box<VEC>& a, const Box<VEC2>& b)
+    template <class VEC, class VEC2> bool operator!=(const Box<VEC>& a, const Box<VEC2>& b)
     {
         if (a.isEmpty() || a.isInfinite() || b.isEmpty() || b.isInfinite())
         {

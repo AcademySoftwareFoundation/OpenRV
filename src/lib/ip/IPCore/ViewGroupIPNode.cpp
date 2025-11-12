@@ -19,29 +19,19 @@ namespace IPCore
 {
     using namespace std;
 
-    ViewGroupIPNode::ViewGroupIPNode(const std::string& name,
-                                     const NodeDefinition* def, IPGraph* graph,
-                                     GroupIPNode* group)
+    ViewGroupIPNode::ViewGroupIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group)
         : GroupIPNode(name, def, graph, group)
     {
-        string soundtrackType =
-            def->stringValue("defaults.soundtrackType", "SoundTrack");
-        string transformType =
-            def->stringValue("defaults.dispTransformType", "DispTransform2D");
-        string waveformType =
-            def->stringValue("defaults.waveformType", "AudioTexture");
-        string pipelineType =
-            def->stringValue("defaults.pipelineType", "PipelineGroup");
+        string soundtrackType = def->stringValue("defaults.soundtrackType", "SoundTrack");
+        string transformType = def->stringValue("defaults.dispTransformType", "DispTransform2D");
+        string waveformType = def->stringValue("defaults.waveformType", "AudioTexture");
+        string pipelineType = def->stringValue("defaults.pipelineType", "PipelineGroup");
 
         m_adaptor = newMemberNodeOfType<AdaptorIPNode>("Adaptor", "adaptor");
-        m_viewPipelineNode = newMemberNodeOfType<PipelineGroupIPNode>(
-            pipelineType, "viewPipeline");
-        m_soundtrackNode =
-            newMemberNodeOfType<SoundTrackIPNode>(soundtrackType, "soundtrack");
-        m_transformNode =
-            newMemberNodeOfType<DispTransform2DIPNode>(transformType, "dxform");
-        m_waveformNode = newMemberNodeOfType<AudioTextureIPNode>(
-            waveformType, "audioWaveform");
+        m_viewPipelineNode = newMemberNodeOfType<PipelineGroupIPNode>(pipelineType, "viewPipeline");
+        m_soundtrackNode = newMemberNodeOfType<SoundTrackIPNode>(soundtrackType, "soundtrack");
+        m_transformNode = newMemberNodeOfType<DispTransform2DIPNode>(transformType, "dxform");
+        m_waveformNode = newMemberNodeOfType<AudioTextureIPNode>(waveformType, "audioWaveform");
 
         m_viewPipelineNode->setInputs1(m_adaptor);
         m_soundtrackNode->setInputs1(m_viewPipelineNode);

@@ -51,116 +51,77 @@ namespace NDI
     static const std::vector<NDIDataFormat> dataFormats{
         {VideoDevice::RGBA8, NDIlib_FourCC_type_RGBA, true, "8-bit RGBA"},
         {VideoDevice::BGRA8, NDIlib_FourCC_type_BGRA, true, "8-bit BGRA"},
-        {VideoDevice::YCbCr_P216_16_422, NDIlib_FourCC_video_type_P216, true,
-         "16-bit YCbCr 4:2:2 (P216)"}};
+        {VideoDevice::YCbCr_P216_16_422, NDIlib_FourCC_video_type_P216, true, "16-bit YCbCr 4:2:2 (P216)"}};
 
-    static const std::vector<NDIVideoFormat> videoFormats{
-        {1280, 720, 1.0, 23.98, 24000, 1001, "720p 23.98Hz"},
-        {1280, 720, 1.0, 24.00, 24000, 1000, "720p 24Hz"},
-        {1280, 720, 1.0, 29.97, 30000, 1001, "720p 29.97Hz"},
-        {1280, 720, 1.0, 30.00, 30000, 1000, "720p 30Hz"},
-        {1280, 720, 1.0, 50.00, 50000, 1000, "720p 50Hz"},
-        {1280, 720, 1.0, 59.94, 60000, 1001, "720p 59.94Hz"},
-        {1280, 720, 1.0, 60.00, 60000, 1000, "720p 60Hz"},
-        {1920, 1080, 1.0, 23.98, 24000, 1001, "1080p 23.98Hz"},
-        {1920, 1080, 1.0, 24.00, 24000, 1000, "1080p 24Hz"},
-        {1920, 1080, 1.0, 25.00, 25000, 1000, "1080p 25Hz"},
-        {1920, 1080, 1.0, 29.97, 30000, 1001, "1080p 29.97Hz"},
-        {1920, 1080, 1.0, 30.00, 30000, 1000, "1080p 30Hz"},
-        {1920, 1080, 1.0, 50.00, 50000, 1000, "1080p 50Hz"},
-        {1920, 1080, 1.0, 59.94, 60000, 1001, "1080p 59.94Hz"},
-        {1920, 1080, 1.0, 60.00, 60000, 1000, "1080p 60Hz"},
-        {2048, 1080, 1.0, 23.98, 24000, 1001,
-         "1080p (2048x1080) DCI 2K 23.98Hz"},
-        {2048, 1080, 1.0, 24.00, 24000, 1000, "1080p (2048x1080) DCI 2K 24Hz"},
-        {2048, 1080, 1.0, 25.00, 25000, 1000, "1080p (2048x1080) DCI 2K 25Hz"},
-        {2048, 1080, 1.0, 29.97, 30000, 1001,
-         "1080p (2048x1080) DCI 2K 29.97Hz"},
-        {2048, 1080, 1.0, 30.00, 30000, 1000, "1080p (2048x1080) DCI 2K 30Hz"},
-        {2048, 1080, 1.0, 50.00, 50000, 1000, "1080p (2048x1080) DCI 2K 50Hz"},
-        {2048, 1080, 1.0, 59.94, 60000, 1001,
-         "1080p (2048x1080) DCI 2K 59.94Hz"},
-        {2048, 1080, 1.0, 60.00, 60000, 1000, "1080p (2048x1080) DCI 2K 60Hz"},
-        {3840, 2160, 1.0, 23.98, 24000, 1001,
-         "2160p (3840x2160) UHD 4K 23.98Hz"},
-        {3840, 2160, 1.0, 24.00, 24000, 1000, "2160p (3840x2160) UHD 4K 24Hz"},
-        {3840, 2160, 1.0, 25.00, 25000, 1000, "2160p (3840x2160) UHD 4K 25Hz"},
-        {3840, 2160, 1.0, 29.97, 30000, 1001,
-         "2160p (3840x2160) UHD 4K 29.97Hz"},
-        {3840, 2160, 1.0, 30.00, 30000, 1000, "2160p (3840x2160) UHD 4K 30Hz"},
-        {3840, 2160, 1.0, 50.00, 50000, 1000, "2160p (3840x2160) UHD 4K 50Hz"},
-        {3840, 2160, 1.0, 59.94, 60000, 1001,
-         "2160p (3840x2160) UHD 4K 59.94Hz"},
-        {3840, 2160, 1.0, 60.00, 60000, 1000, "2160p (3840x2160) UHD 4K 60Hz"},
-        {4096, 2160, 1.0, 23.98, 24000, 1001,
-         "2160p (4096x2160) DCI 4K 23.98Hz"},
-        {4096, 2160, 1.0, 24.00, 24000, 1000, "2160p (4096x2160) DCI 4K 24Hz"},
-        {4096, 2160, 1.0, 25.00, 25000, 1000, "2160p (4096x2160) DCI 4K 25Hz"},
-        {4096, 2160, 1.0, 29.97, 30000, 1001,
-         "2160p (4096x2160) DCI 4K 29.97Hz"},
-        {4096, 2160, 1.0, 30.00, 30000, 1000, "2160p (4096x2160) DCI 4K 30Hz"},
-        {4096, 2160, 1.0, 50.00, 50000, 1000, "2160p (4096x2160) DCI 4K 50Hz"},
-        {4096, 2160, 1.0, 59.94, 50000, 1001,
-         "2160p (4096x2160) DCI 4K 59.94Hz"},
-        {4096, 2160, 1.0, 60.00, 1, 1, "2160p (4096x2160) DCI 4K 60Hz"}};
+    static const std::vector<NDIVideoFormat> videoFormats{{1280, 720, 1.0, 23.98, 24000, 1001, "720p 23.98Hz"},
+                                                          {1280, 720, 1.0, 24.00, 24000, 1000, "720p 24Hz"},
+                                                          {1280, 720, 1.0, 29.97, 30000, 1001, "720p 29.97Hz"},
+                                                          {1280, 720, 1.0, 30.00, 30000, 1000, "720p 30Hz"},
+                                                          {1280, 720, 1.0, 50.00, 50000, 1000, "720p 50Hz"},
+                                                          {1280, 720, 1.0, 59.94, 60000, 1001, "720p 59.94Hz"},
+                                                          {1280, 720, 1.0, 60.00, 60000, 1000, "720p 60Hz"},
+                                                          {1920, 1080, 1.0, 23.98, 24000, 1001, "1080p 23.98Hz"},
+                                                          {1920, 1080, 1.0, 24.00, 24000, 1000, "1080p 24Hz"},
+                                                          {1920, 1080, 1.0, 25.00, 25000, 1000, "1080p 25Hz"},
+                                                          {1920, 1080, 1.0, 29.97, 30000, 1001, "1080p 29.97Hz"},
+                                                          {1920, 1080, 1.0, 30.00, 30000, 1000, "1080p 30Hz"},
+                                                          {1920, 1080, 1.0, 50.00, 50000, 1000, "1080p 50Hz"},
+                                                          {1920, 1080, 1.0, 59.94, 60000, 1001, "1080p 59.94Hz"},
+                                                          {1920, 1080, 1.0, 60.00, 60000, 1000, "1080p 60Hz"},
+                                                          {2048, 1080, 1.0, 23.98, 24000, 1001, "1080p (2048x1080) DCI 2K 23.98Hz"},
+                                                          {2048, 1080, 1.0, 24.00, 24000, 1000, "1080p (2048x1080) DCI 2K 24Hz"},
+                                                          {2048, 1080, 1.0, 25.00, 25000, 1000, "1080p (2048x1080) DCI 2K 25Hz"},
+                                                          {2048, 1080, 1.0, 29.97, 30000, 1001, "1080p (2048x1080) DCI 2K 29.97Hz"},
+                                                          {2048, 1080, 1.0, 30.00, 30000, 1000, "1080p (2048x1080) DCI 2K 30Hz"},
+                                                          {2048, 1080, 1.0, 50.00, 50000, 1000, "1080p (2048x1080) DCI 2K 50Hz"},
+                                                          {2048, 1080, 1.0, 59.94, 60000, 1001, "1080p (2048x1080) DCI 2K 59.94Hz"},
+                                                          {2048, 1080, 1.0, 60.00, 60000, 1000, "1080p (2048x1080) DCI 2K 60Hz"},
+                                                          {3840, 2160, 1.0, 23.98, 24000, 1001, "2160p (3840x2160) UHD 4K 23.98Hz"},
+                                                          {3840, 2160, 1.0, 24.00, 24000, 1000, "2160p (3840x2160) UHD 4K 24Hz"},
+                                                          {3840, 2160, 1.0, 25.00, 25000, 1000, "2160p (3840x2160) UHD 4K 25Hz"},
+                                                          {3840, 2160, 1.0, 29.97, 30000, 1001, "2160p (3840x2160) UHD 4K 29.97Hz"},
+                                                          {3840, 2160, 1.0, 30.00, 30000, 1000, "2160p (3840x2160) UHD 4K 30Hz"},
+                                                          {3840, 2160, 1.0, 50.00, 50000, 1000, "2160p (3840x2160) UHD 4K 50Hz"},
+                                                          {3840, 2160, 1.0, 59.94, 60000, 1001, "2160p (3840x2160) UHD 4K 59.94Hz"},
+                                                          {3840, 2160, 1.0, 60.00, 60000, 1000, "2160p (3840x2160) UHD 4K 60Hz"},
+                                                          {4096, 2160, 1.0, 23.98, 24000, 1001, "2160p (4096x2160) DCI 4K 23.98Hz"},
+                                                          {4096, 2160, 1.0, 24.00, 24000, 1000, "2160p (4096x2160) DCI 4K 24Hz"},
+                                                          {4096, 2160, 1.0, 25.00, 25000, 1000, "2160p (4096x2160) DCI 4K 25Hz"},
+                                                          {4096, 2160, 1.0, 29.97, 30000, 1001, "2160p (4096x2160) DCI 4K 29.97Hz"},
+                                                          {4096, 2160, 1.0, 30.00, 30000, 1000, "2160p (4096x2160) DCI 4K 30Hz"},
+                                                          {4096, 2160, 1.0, 50.00, 50000, 1000, "2160p (4096x2160) DCI 4K 50Hz"},
+                                                          {4096, 2160, 1.0, 59.94, 50000, 1001, "2160p (4096x2160) DCI 4K 59.94Hz"},
+                                                          {4096, 2160, 1.0, 60.00, 1, 1, "2160p (4096x2160) DCI 4K 60Hz"}};
 
     static const std::vector<NDIAudioFormat> audioFormats{
-        {48000, TwkAudio::Int16Format, 2, TwkAudio::Stereo_2,
-         "16-bit 48kHz Stereo"},
-        {48000, TwkAudio::Int32Format, 2, TwkAudio::Stereo_2,
-         "32-bit 48kHz Stereo"},
-        {48000, TwkAudio::Float32Format, 8, TwkAudio::Surround_7_1,
-         "32-bit Float 48kHz 7.1 Surround"},
-        {48000, TwkAudio::Int32Format, 8, TwkAudio::SDDS_7_1,
-         "32-bit 48kHz 7.1 Surround SDDS"},
-        {48000, TwkAudio::Int32Format, 9, TwkAudio::Generic_9,
-         "32-bit 48kHz 9 channel"},
-        {48000, TwkAudio::Int32Format, 10, TwkAudio::Surround_9_1,
-         "32-bit 48kHz 9.1 Surround"},
-        {48000, TwkAudio::Int32Format, 11, TwkAudio::Generic_11,
-         "32-bit 48kHz 11 channel"},
-        {48000, TwkAudio::Int32Format, 12, TwkAudio::Generic_12,
-         "32-bit 48kHz 12 channel"},
-        {48000, TwkAudio::Int32Format, 13, TwkAudio::Generic_13,
-         "32-bit 48kHz 13 channel"},
-        {48000, TwkAudio::Int32Format, 14, TwkAudio::Generic_14,
-         "32-bit 48kHz 14 channel"},
-        {48000, TwkAudio::Int32Format, 15, TwkAudio::Generic_15,
-         "32-bit 48kHz 15 channel"},
-        {48000, TwkAudio::Int32Format, 16, TwkAudio::Generic_16,
-         "32-bit 48kHz 16 channel"},
-        {48000, TwkAudio::Int32Format, 17, TwkAudio::Generic_17,
-         "32-bit 48kHz 17 channel"},
-        {48000, TwkAudio::Int32Format, 18, TwkAudio::Generic_18,
-         "32-bit 48kHz 18 channel"},
-        {48000, TwkAudio::Int32Format, 19, TwkAudio::Generic_19,
-         "32-bit 48kHz 19 channel"},
-        {48000, TwkAudio::Int32Format, 20, TwkAudio::Generic_20,
-         "32-bit 48kHz 20 channel"},
-        {48000, TwkAudio::Int32Format, 21, TwkAudio::Generic_21,
-         "32-bit 48kHz 21 channel"},
-        {48000, TwkAudio::Int32Format, 22, TwkAudio::Generic_22,
-         "32-bit 48kHz 22 channel"},
-        {48000, TwkAudio::Int32Format, 23, TwkAudio::Generic_23,
-         "32-bit 48kHz 23 channel"},
-        {48000, TwkAudio::Int32Format, 24, TwkAudio::Generic_24,
-         "32-bit 48kHz 24 channel"},
-        {48000, TwkAudio::Int32Format, 25, TwkAudio::Generic_25,
-         "32-bit 48kHz 25 channel"},
-        {48000, TwkAudio::Int32Format, 26, TwkAudio::Generic_26,
-         "32-bit 48kHz 26 channel"},
-        {48000, TwkAudio::Int32Format, 27, TwkAudio::Generic_27,
-         "32-bit 48kHz 27 channel"},
-        {48000, TwkAudio::Int32Format, 28, TwkAudio::Generic_28,
-         "32-bit 48kHz 28 channel"},
-        {48000, TwkAudio::Int32Format, 29, TwkAudio::Generic_29,
-         "32-bit 48kHz 29 channel"},
-        {48000, TwkAudio::Int32Format, 30, TwkAudio::Generic_30,
-         "32-bit 48kHz 30 channel"},
-        {48000, TwkAudio::Int32Format, 31, TwkAudio::Generic_31,
-         "32-bit 48kHz 31 channel"},
-        {48000, TwkAudio::Int32Format, 32, TwkAudio::Generic_32,
-         "32-bit 48kHz 32 channel"}};
+        {48000, TwkAudio::Int16Format, 2, TwkAudio::Stereo_2, "16-bit 48kHz Stereo"},
+        {48000, TwkAudio::Int32Format, 2, TwkAudio::Stereo_2, "32-bit 48kHz Stereo"},
+        {48000, TwkAudio::Float32Format, 8, TwkAudio::Surround_7_1, "32-bit Float 48kHz 7.1 Surround"},
+        {48000, TwkAudio::Int32Format, 8, TwkAudio::SDDS_7_1, "32-bit 48kHz 7.1 Surround SDDS"},
+        {48000, TwkAudio::Int32Format, 9, TwkAudio::Generic_9, "32-bit 48kHz 9 channel"},
+        {48000, TwkAudio::Int32Format, 10, TwkAudio::Surround_9_1, "32-bit 48kHz 9.1 Surround"},
+        {48000, TwkAudio::Int32Format, 11, TwkAudio::Generic_11, "32-bit 48kHz 11 channel"},
+        {48000, TwkAudio::Int32Format, 12, TwkAudio::Generic_12, "32-bit 48kHz 12 channel"},
+        {48000, TwkAudio::Int32Format, 13, TwkAudio::Generic_13, "32-bit 48kHz 13 channel"},
+        {48000, TwkAudio::Int32Format, 14, TwkAudio::Generic_14, "32-bit 48kHz 14 channel"},
+        {48000, TwkAudio::Int32Format, 15, TwkAudio::Generic_15, "32-bit 48kHz 15 channel"},
+        {48000, TwkAudio::Int32Format, 16, TwkAudio::Generic_16, "32-bit 48kHz 16 channel"},
+        {48000, TwkAudio::Int32Format, 17, TwkAudio::Generic_17, "32-bit 48kHz 17 channel"},
+        {48000, TwkAudio::Int32Format, 18, TwkAudio::Generic_18, "32-bit 48kHz 18 channel"},
+        {48000, TwkAudio::Int32Format, 19, TwkAudio::Generic_19, "32-bit 48kHz 19 channel"},
+        {48000, TwkAudio::Int32Format, 20, TwkAudio::Generic_20, "32-bit 48kHz 20 channel"},
+        {48000, TwkAudio::Int32Format, 21, TwkAudio::Generic_21, "32-bit 48kHz 21 channel"},
+        {48000, TwkAudio::Int32Format, 22, TwkAudio::Generic_22, "32-bit 48kHz 22 channel"},
+        {48000, TwkAudio::Int32Format, 23, TwkAudio::Generic_23, "32-bit 48kHz 23 channel"},
+        {48000, TwkAudio::Int32Format, 24, TwkAudio::Generic_24, "32-bit 48kHz 24 channel"},
+        {48000, TwkAudio::Int32Format, 25, TwkAudio::Generic_25, "32-bit 48kHz 25 channel"},
+        {48000, TwkAudio::Int32Format, 26, TwkAudio::Generic_26, "32-bit 48kHz 26 channel"},
+        {48000, TwkAudio::Int32Format, 27, TwkAudio::Generic_27, "32-bit 48kHz 27 channel"},
+        {48000, TwkAudio::Int32Format, 28, TwkAudio::Generic_28, "32-bit 48kHz 28 channel"},
+        {48000, TwkAudio::Int32Format, 29, TwkAudio::Generic_29, "32-bit 48kHz 29 channel"},
+        {48000, TwkAudio::Int32Format, 30, TwkAudio::Generic_30, "32-bit 48kHz 30 channel"},
+        {48000, TwkAudio::Int32Format, 31, TwkAudio::Generic_31, "32-bit 48kHz 31 channel"},
+        {48000, TwkAudio::Int32Format, 32, TwkAudio::Generic_32, "32-bit 48kHz 32 channel"}};
 
     static const std::vector<NDISyncMode> syncModes{{0, "Free Running"}};
 
@@ -204,14 +165,10 @@ namespace NDI
         }
     }
 
-    void NDIVideoDevice::PBOData::unlockState()
-    {
-        pthread_mutex_unlock(&stateMutex);
-    }
+    void NDIVideoDevice::PBOData::unlockState() { pthread_mutex_unlock(&stateMutex); }
 
     // Returns pixel size in bytes from NDI Video Type
-    static int lineStrideInBytesFromNDIVideoType(
-        const NDIlib_FourCC_video_type_e ndiVideoType, const int resX)
+    static int lineStrideInBytesFromNDIVideoType(const NDIlib_FourCC_video_type_e ndiVideoType, const int resX)
     {
         switch (ndiVideoType)
         {
@@ -233,12 +190,9 @@ namespace NDI
     }
 
     // Returns the buffer size in bytes from NDI Video Type
-    static size_t bufferSizeInBytesFromNDIVideoType(
-        const NDIlib_FourCC_video_type_e ndiVideoType, const int resX,
-        const int resY)
+    static size_t bufferSizeInBytesFromNDIVideoType(const NDIlib_FourCC_video_type_e ndiVideoType, const int resX, const int resY)
     {
-        const size_t lineStrideInBytes =
-            std::abs(lineStrideInBytesFromNDIVideoType(ndiVideoType, resX));
+        const size_t lineStrideInBytes = std::abs(lineStrideInBytesFromNDIVideoType(ndiVideoType, resX));
         switch (ndiVideoType)
         {
         case NDIlib_FourCC_video_type_P216:
@@ -260,10 +214,8 @@ namespace NDI
     //  NDIVideoDevice
     //
     NDIVideoDevice::NDIVideoDevice(NDIModule* module, const std::string& name)
-        : GLBindableVideoDevice(module, name,
-                                BlockingTransfer | ImageOutput | ProvidesSync
-                                    | FixedResolution | Clock | AudioOutput
-                                    | NormalizedCoordinates)
+        : GLBindableVideoDevice(
+              module, name, BlockingTransfer | ImageOutput | ProvidesSync | FixedResolution | Clock | AudioOutput | NormalizedCoordinates)
         , m_readyFrame(nullptr)
         , m_needsFrameConverter(false)
         , m_hasAudio(false)
@@ -335,13 +287,9 @@ namespace NDI
 
     VideoDevice::Time NDIVideoDevice::deviceLatency() const { return Time(0); }
 
-    size_t NDIVideoDevice::numVideoFormats() const
-    {
-        return m_ndiVideoFormats.size();
-    }
+    size_t NDIVideoDevice::numVideoFormats() const { return m_ndiVideoFormats.size(); }
 
-    NDIVideoDevice::VideoFormat
-    NDIVideoDevice::videoFormatAtIndex(size_t index) const
+    NDIVideoDevice::VideoFormat NDIVideoDevice::videoFormatAtIndex(size_t index) const
     {
         const NDIVideoFormat& videoFormat = m_ndiVideoFormats[index];
         return {static_cast<size_t>(videoFormat.width),
@@ -379,22 +327,14 @@ namespace NDI
         m_audioFrameSizes.clear();
     }
 
-    size_t NDIVideoDevice::currentVideoFormat() const
-    {
-        return m_internalVideoFormat;
-    }
+    size_t NDIVideoDevice::currentVideoFormat() const { return m_internalVideoFormat; }
 
-    size_t NDIVideoDevice::numAudioFormats() const
-    {
-        return audioFormats.size();
-    }
+    size_t NDIVideoDevice::numAudioFormats() const { return audioFormats.size(); }
 
-    NDIVideoDevice::AudioFormat
-    NDIVideoDevice::audioFormatAtIndex(size_t index) const
+    NDIVideoDevice::AudioFormat NDIVideoDevice::audioFormatAtIndex(size_t index) const
     {
         const NDIAudioFormat& audioFormat = audioFormats.at(index);
-        return {static_cast<Time>(audioFormat.hertz), audioFormat.precision,
-                audioFormat.numChannels, audioFormat.layout,
+        return {static_cast<Time>(audioFormat.hertz), audioFormat.precision, audioFormat.numChannels, audioFormat.layout,
                 audioFormat.description};
     }
 
@@ -409,40 +349,22 @@ namespace NDI
         m_audioFrameSizes.clear();
     }
 
-    size_t NDIVideoDevice::currentAudioFormat() const
+    size_t NDIVideoDevice::currentAudioFormat() const { return m_internalAudioFormat; }
+
+    size_t NDIVideoDevice::numDataFormats() const { return m_ndiDataFormats.size(); }
+
+    NDIVideoDevice::DataFormat NDIVideoDevice::dataFormatAtIndex(size_t index) const
     {
-        return m_internalAudioFormat;
+        return {m_ndiDataFormats[index].iformat, m_ndiDataFormats[index].description};
     }
 
-    size_t NDIVideoDevice::numDataFormats() const
-    {
-        return m_ndiDataFormats.size();
-    }
+    void NDIVideoDevice::setDataFormat(size_t index) { m_internalDataFormat = index; }
 
-    NDIVideoDevice::DataFormat
-    NDIVideoDevice::dataFormatAtIndex(size_t index) const
-    {
-        return {m_ndiDataFormats[index].iformat,
-                m_ndiDataFormats[index].description};
-    }
-
-    void NDIVideoDevice::setDataFormat(size_t index)
-    {
-        m_internalDataFormat = index;
-    }
-
-    size_t NDIVideoDevice::currentDataFormat() const
-    {
-        return m_internalDataFormat;
-    }
+    size_t NDIVideoDevice::currentDataFormat() const { return m_internalDataFormat; }
 
     size_t NDIVideoDevice::numSyncSources() const { return 0; }
 
-    NDIVideoDevice::SyncSource
-    NDIVideoDevice::syncSourceAtIndex(size_t index) const
-    {
-        return {};
-    }
+    NDIVideoDevice::SyncSource NDIVideoDevice::syncSourceAtIndex(size_t index) const { return {}; }
 
     size_t NDIVideoDevice::currentSyncSource() const { return 0; }
 
@@ -454,27 +376,19 @@ namespace NDI
         return {mode.description};
     }
 
-    void NDIVideoDevice::setSyncMode(size_t index)
-    {
-        m_internalSyncMode = index;
-    }
+    void NDIVideoDevice::setSyncMode(size_t index) { m_internalSyncMode = index; }
 
-    size_t NDIVideoDevice::currentSyncMode() const
-    {
-        return m_internalSyncMode;
-    }
+    size_t NDIVideoDevice::currentSyncMode() const { return m_internalSyncMode; }
 
     NDIVideoDevice::Timing NDIVideoDevice::timing() const
     {
-        const NDIVideoFormat& videoFormat =
-            m_ndiVideoFormats[m_internalVideoFormat];
+        const NDIVideoFormat& videoFormat = m_ndiVideoFormats[m_internalVideoFormat];
         return {static_cast<float>(videoFormat.hertz)};
     }
 
     NDIVideoDevice::VideoFormat NDIVideoDevice::format() const
     {
-        const NDIVideoFormat& videoFormat =
-            m_ndiVideoFormats[m_internalVideoFormat];
+        const NDIVideoFormat& videoFormat = m_ndiVideoFormats[m_internalVideoFormat];
         return {static_cast<size_t>(videoFormat.width),
                 static_cast<size_t>(videoFormat.height),
                 videoFormat.pixelAspect,
@@ -483,8 +397,7 @@ namespace NDI
                 videoFormat.description};
     }
 
-    void
-    NDIVideoDevice::audioFrameSizeSequence(AudioFrameSizeVector& fsizes) const
+    void NDIVideoDevice::audioFrameSizeSequence(AudioFrameSizeVector& fsizes) const
     {
         const int frameSizes = 5;
         m_audioFrameSizes.resize(frameSizes);
@@ -539,19 +452,15 @@ namespace NDI
 
         options_description description("NDI Device Options");
 
-        description.add_options()("help,h", "Usage Message")(
-            "verbose,v", "Verbose")("method,m", value<std::string>(),
-                                    "Method (ipbo, basic)")(
-            "ring-buffer-size,s",
-            value<int>()->default_value(defaultRingBufferSize),
-            "Ring Buffer Size");
+        description.add_options()("help,h", "Usage Message")("verbose,v", "Verbose")("method,m", value<std::string>(),
+                                                                                     "Method (ipbo, basic)")(
+            "ring-buffer-size,s", value<int>()->default_value(defaultRingBufferSize), "Ring Buffer Size");
 
         variables_map variables;
 
         try
         {
-            store(command_line_parser(args).options(description).run(),
-                  variables);
+            store(command_line_parser(args).options(description).run(), variables);
             store(parse_environment(description, mapToEnvVar), variables);
             notify(variables);
         }
@@ -622,23 +531,18 @@ namespace NDI
             m_ndiDataFormats.push_back(dataFormat);
         }
 
-        const NDIVideoFormat& videoFormat =
-            m_ndiVideoFormats[m_internalVideoFormat];
+        const NDIVideoFormat& videoFormat = m_ndiVideoFormats[m_internalVideoFormat];
         m_frameWidth = static_cast<size_t>(videoFormat.width);
         m_frameHeight = static_cast<size_t>(videoFormat.height);
 
-        const NDIDataFormat& dataFormat =
-            m_ndiDataFormats[m_internalDataFormat];
+        const NDIDataFormat& dataFormat = m_ndiDataFormats[m_internalDataFormat];
         const std::string& dname = dataFormat.description;
 
-        const NDIAudioFormat& audioFormat =
-            audioFormats.at(m_internalAudioFormat);
-        m_audioChannelCount =
-            static_cast<unsigned long>(audioFormat.numChannels);
+        const NDIAudioFormat& audioFormat = audioFormats.at(m_internalAudioFormat);
+        m_audioChannelCount = static_cast<unsigned long>(audioFormat.numChannels);
         m_audioFormat = audioFormat.precision;
 
-        GLenumPair epair =
-            TwkGLF::textureFormatFromDataFormat(dataFormat.iformat);
+        GLenumPair epair = TwkGLF::textureFormatFromDataFormat(dataFormat.iformat);
         m_textureFormat = epair.first;
         m_textureType = epair.second;
 
@@ -647,48 +551,35 @@ namespace NDI
         m_ndiVideoFrame.xres = videoFormat.width;
         m_ndiVideoFrame.yres = videoFormat.height;
         m_ndiVideoFrame.FourCC = dataFormat.ndiFormat;
-        m_ndiVideoFrame.frame_rate_N =
-            static_cast<int>(videoFormat.frame_rate_N);
-        m_ndiVideoFrame.frame_rate_D =
-            static_cast<int>(videoFormat.frame_rate_D);
+        m_ndiVideoFrame.frame_rate_N = static_cast<int>(videoFormat.frame_rate_N);
+        m_ndiVideoFrame.frame_rate_D = static_cast<int>(videoFormat.frame_rate_D);
 
         m_audioSampleRate = static_cast<float>(audioFormat.hertz);
-        const float frameDuration =
-            videoFormat.frame_rate_D / videoFormat.frame_rate_N;
-        m_audioSamplesPerFrame =
-            static_cast<unsigned long>(m_audioSampleRate * frameDuration + 0.5);
+        const float frameDuration = videoFormat.frame_rate_D / videoFormat.frame_rate_N;
+        m_audioSamplesPerFrame = static_cast<unsigned long>(m_audioSampleRate * frameDuration + 0.5);
 
         // Allocate audio buffers
         m_audioFormatSizeInBytes = TwkAudio::formatSizeInBytes(m_audioFormat);
-        m_audioData = new char[2 * m_audioSamplesPerFrame * m_audioChannelCount
-                               * m_audioFormatSizeInBytes];
-        memset(m_audioData, 0,
-               2 * m_audioSamplesPerFrame * m_audioChannelCount
-                   * m_audioFormatSizeInBytes);
+        m_audioData = new char[2 * m_audioSamplesPerFrame * m_audioChannelCount * m_audioFormatSizeInBytes];
+        memset(m_audioData, 0, 2 * m_audioSamplesPerFrame * m_audioChannelCount * m_audioFormatSizeInBytes);
 
         if (m_audioFormat == TwkAudio::Int16Format)
         {
             m_ndiInterleaved16AudioFrame.sample_rate = audioFormat.hertz;
-            m_ndiInterleaved16AudioFrame.no_channels =
-                static_cast<int>(audioFormat.numChannels);
-            m_ndiInterleaved16AudioFrame.no_samples =
-                static_cast<int>(m_audioSamplesPerFrame);
+            m_ndiInterleaved16AudioFrame.no_channels = static_cast<int>(audioFormat.numChannels);
+            m_ndiInterleaved16AudioFrame.no_samples = static_cast<int>(m_audioSamplesPerFrame);
         }
         else if (m_audioFormat == TwkAudio::Float32Format)
         {
             m_ndiInterleaved32fAudioFrame.sample_rate = audioFormat.hertz;
-            m_ndiInterleaved32fAudioFrame.no_channels =
-                static_cast<int>(audioFormat.numChannels);
-            m_ndiInterleaved32fAudioFrame.no_samples =
-                static_cast<int>(m_audioSamplesPerFrame);
+            m_ndiInterleaved32fAudioFrame.no_channels = static_cast<int>(audioFormat.numChannels);
+            m_ndiInterleaved32fAudioFrame.no_samples = static_cast<int>(m_audioSamplesPerFrame);
         }
         else
         {
             m_ndiInterleaved32AudioFrame.sample_rate = audioFormat.hertz;
-            m_ndiInterleaved32AudioFrame.no_channels =
-                static_cast<int>(audioFormat.numChannels);
-            m_ndiInterleaved32AudioFrame.no_samples =
-                static_cast<int>(m_audioSamplesPerFrame);
+            m_ndiInterleaved32AudioFrame.no_channels = static_cast<int>(audioFormat.numChannels);
+            m_ndiInterleaved32AudioFrame.no_samples = static_cast<int>(m_audioSamplesPerFrame);
         }
 
         if (!dataFormat.isRGB)
@@ -700,13 +591,11 @@ namespace NDI
         // Create a queue of NDIVideoFrame objects to use for
         // scheduling output video frames.
         //
-        const size_t bufferSizeInBytes = bufferSizeInBytesFromNDIVideoType(
-            m_ndiVideoFrame.FourCC, m_frameWidth, m_frameHeight);
+        const size_t bufferSizeInBytes = bufferSizeInBytesFromNDIVideoType(m_ndiVideoFrame.FourCC, m_frameWidth, m_frameHeight);
         for (size_t i = 0; i < m_videoFrameBufferSize; i++)
         {
             NDIVideoFrame* outputFrame = nullptr;
-            const NDIDataFormat& internalDataFormat =
-                m_ndiDataFormats[m_internalDataFormat];
+            const NDIDataFormat& internalDataFormat = m_ndiDataFormats[m_internalDataFormat];
 
             outputFrame = new NDIVideoFrame[bufferSizeInBytes];
             std::memset(outputFrame, 0, bufferSizeInBytes);
@@ -753,8 +642,7 @@ namespace NDI
 
             for (const auto& frame : m_DLOutputVideoFrameQueue)
             {
-                NDIVideoFrame* ndiVideoFrame =
-                    static_cast<NDIVideoFrame*>(frame);
+                NDIVideoFrame* ndiVideoFrame = static_cast<NDIVideoFrame*>(frame);
                 delete[] ndiVideoFrame;
             }
 
@@ -762,8 +650,7 @@ namespace NDI
 
             for (const auto& frame : m_DLReadbackVideoFrameQueue)
             {
-                NDIVideoFrame* ndiVideoFrame =
-                    static_cast<NDIVideoFrame*>(frame);
+                NDIVideoFrame* ndiVideoFrame = static_cast<NDIVideoFrame*>(frame);
                 delete[] ndiVideoFrame;
             }
 
@@ -792,12 +679,8 @@ namespace NDI
         }
         m_hasAudio = true;
 
-        std::memcpy(
-            &m_audioData[m_audioDataIndex * m_audioFormatSizeInBytes
-                         * m_audioSamplesPerFrame * m_audioChannelCount],
-            data,
-            m_audioFormatSizeInBytes * m_audioSamplesPerFrame
-                * m_audioChannelCount);
+        std::memcpy(&m_audioData[m_audioDataIndex * m_audioFormatSizeInBytes * m_audioSamplesPerFrame * m_audioChannelCount], data,
+                    m_audioFormatSizeInBytes * m_audioSamplesPerFrame * m_audioChannelCount);
         m_audioDataIndex = (m_audioDataIndex + 1) % 2;
     }
 
@@ -821,13 +704,11 @@ namespace NDI
 
         if (m_isPbos)
         {
-            transferChannelPBO(index, fbo, outputVideoFrame,
-                               readbackVideoFrame);
+            transferChannelPBO(index, fbo, outputVideoFrame, readbackVideoFrame);
         }
         else
         {
-            transferChannelReadPixels(index, fbo, outputVideoFrame,
-                                      readbackVideoFrame);
+            transferChannelReadPixels(index, fbo, outputVideoFrame, readbackVideoFrame);
         }
 
         m_readyFrame = outputVideoFrame;
@@ -838,44 +719,31 @@ namespace NDI
         // So we might need to flip the frame vertically .
         // For this we'll tell NDI to use a negative stride and
         // tell it the frame's first line is at the end of the source buffer.
-        const int lineStrideInBytes = lineStrideInBytesFromNDIVideoType(
-            m_ndiVideoFrame.FourCC, m_ndiVideoFrame.xres);
+        const int lineStrideInBytes = lineStrideInBytesFromNDIVideoType(m_ndiVideoFrame.FourCC, m_ndiVideoFrame.xres);
         m_ndiVideoFrame.line_stride_in_bytes = lineStrideInBytes;
         m_ndiVideoFrame.p_data =
-            (lineStrideInBytes > 0)
-                ? m_readyFrame
-                : (m_readyFrame
-                   + (m_ndiVideoFrame.yres - 1) * std::abs(lineStrideInBytes));
+            (lineStrideInBytes > 0) ? m_readyFrame : (m_readyFrame + (m_ndiVideoFrame.yres - 1) * std::abs(lineStrideInBytes));
 
         if (m_hasAudio)
         {
             const size_t index = (m_audioDataIndex == 1) ? 0 : 1;
             if (m_audioFormat == TwkAudio::Int16Format)
             {
-                m_ndiInterleaved16AudioFrame.p_data = reinterpret_cast<short*>(
-                    &m_audioData[index * m_audioSamplesPerFrame
-                                 * m_audioChannelCount
-                                 * m_audioFormatSizeInBytes]);
-                NDIlib_util_send_send_audio_interleaved_16s(
-                    m_ndiSender, &m_ndiInterleaved16AudioFrame);
+                m_ndiInterleaved16AudioFrame.p_data =
+                    reinterpret_cast<short*>(&m_audioData[index * m_audioSamplesPerFrame * m_audioChannelCount * m_audioFormatSizeInBytes]);
+                NDIlib_util_send_send_audio_interleaved_16s(m_ndiSender, &m_ndiInterleaved16AudioFrame);
             }
             else if (m_audioFormat == TwkAudio::Float32Format)
             {
-                m_ndiInterleaved32fAudioFrame.p_data = reinterpret_cast<float*>(
-                    &m_audioData[index * m_audioSamplesPerFrame
-                                 * m_audioChannelCount
-                                 * m_audioFormatSizeInBytes]);
-                NDIlib_util_send_send_audio_interleaved_32f(
-                    m_ndiSender, &m_ndiInterleaved32fAudioFrame);
+                m_ndiInterleaved32fAudioFrame.p_data =
+                    reinterpret_cast<float*>(&m_audioData[index * m_audioSamplesPerFrame * m_audioChannelCount * m_audioFormatSizeInBytes]);
+                NDIlib_util_send_send_audio_interleaved_32f(m_ndiSender, &m_ndiInterleaved32fAudioFrame);
             }
             else
             {
-                m_ndiInterleaved32AudioFrame.p_data = reinterpret_cast<int*>(
-                    &m_audioData[index * m_audioSamplesPerFrame
-                                 * m_audioChannelCount
-                                 * m_audioFormatSizeInBytes]);
-                NDIlib_util_send_send_audio_interleaved_32s(
-                    m_ndiSender, &m_ndiInterleaved32AudioFrame);
+                m_ndiInterleaved32AudioFrame.p_data =
+                    reinterpret_cast<int*>(&m_audioData[index * m_audioSamplesPerFrame * m_audioChannelCount * m_audioFormatSizeInBytes]);
+                NDIlib_util_send_send_audio_interleaved_32s(m_ndiSender, &m_ndiInterleaved32AudioFrame);
             }
         }
 
@@ -885,17 +753,14 @@ namespace NDI
         return true;
     }
 
-    void NDIVideoDevice::transferChannelPBO(size_t index, const GLFBO* fbo,
-                                            NDIVideoFrame* outputVideoFrame,
-                                            NDIVideoFrame*) const
+    void NDIVideoDevice::transferChannelPBO(size_t index, const GLFBO* fbo, NDIVideoFrame* outputVideoFrame, NDIVideoFrame*) const
     {
         HOP_CALL(glFinish();)
         HOP_PROF_FUNC();
 
         PBOData* lastPboData = m_lastPboData;
 
-        const NDIDataFormat& dataFormat =
-            m_ndiDataFormats[m_internalDataFormat];
+        const NDIDataFormat& dataFormat = m_ndiDataFormats[m_internalDataFormat];
 
         // GL_UNSIGNED_INT_10_10_10_2 is a non native GPU format which leads to
         // costly GPU readbacks. To work around this performance issue we will
@@ -920,8 +785,7 @@ namespace NDI
             lastPboData->state = PBOData::State::Transferring;
             lastPboData->unlockState();
 
-            int* p = static_cast<int*>(
-                glMapBuffer(GL_PIXEL_PACK_BUFFER_ARB, GL_READ_ONLY_ARB));
+            int* p = static_cast<int*>(glMapBuffer(GL_PIXEL_PACK_BUFFER_ARB, GL_READ_ONLY_ARB));
             TWK_GLDEBUG;
             if (p != nullptr)
             {
@@ -933,27 +797,20 @@ namespace NDI
                     const size_t inBufStride = m_frameWidth * sizeof(uint32_t);
                     const size_t outBufStride = m_frameWidth * sizeof(uint16_t);
                     uint16_t* outY = reinterpret_cast<uint16_t*>(pFrame);
-                    uint16_t* outCbCr = reinterpret_cast<uint16_t*>(
-                        reinterpret_cast<uint8_t*>(pFrame)
-                        + m_frameHeight * outBufStride);
-                    packedYUV444_10bits_to_P216_MP(
-                        m_frameWidth, m_frameHeight,
-                        reinterpret_cast<uint32_t*>(p), outY, outCbCr,
-                        inBufStride, outBufStride, true /*flip*/);
+                    uint16_t* outCbCr = reinterpret_cast<uint16_t*>(reinterpret_cast<uint8_t*>(pFrame) + m_frameHeight * outBufStride);
+                    packedYUV444_10bits_to_P216_MP(m_frameWidth, m_frameHeight, reinterpret_cast<uint32_t*>(p), outY, outCbCr, inBufStride,
+                                                   outBufStride, true /*flip*/);
                 }
                 else
                 {
                     if (perform_ABGR10_to_RGBA10_conversion)
                     {
-                        convert_ABGR10_to_RGBA10_MP(
-                            m_frameWidth, m_frameHeight,
-                            reinterpret_cast<uint32_t*>(p),
-                            reinterpret_cast<uint32_t*>(pFrame));
+                        convert_ABGR10_to_RGBA10_MP(m_frameWidth, m_frameHeight, reinterpret_cast<uint32_t*>(p),
+                                                    reinterpret_cast<uint32_t*>(pFrame));
                     }
                     else
                     {
-                        FastMemcpy_MP(pFrame, p,
-                                      m_frameHeight * m_frameWidth * 4);
+                        FastMemcpy_MP(pFrame, p, m_frameHeight * m_frameWidth * 4);
                     }
                 }
             }
@@ -970,15 +827,10 @@ namespace NDI
         {
 #if defined(HOP_ENABLED)
             std::string hopMsg = std::string("glReadPixels() next PBO");
-            const size_t pixelSize = TwkGLF::pixelSizeFromTextureFormat(
-                m_textureFormat, m_textureType);
-            hopMsg += std::string(" - width=") + std::to_string(m_frameWidth)
-                      + std::string(", height=") + std::to_string(m_frameHeight)
-                      + std::string(", pixelSize=") + std::to_string(pixelSize)
-                      + std::string(", textureFormat=")
-                      + std::to_string(m_textureFormat)
-                      + std::string(", textureType=")
-                      + std::to_string(m_textureType);
+            const size_t pixelSize = TwkGLF::pixelSizeFromTextureFormat(m_textureFormat, m_textureType);
+            hopMsg += std::string(" - width=") + std::to_string(m_frameWidth) + std::string(", height=") + std::to_string(m_frameHeight)
+                      + std::string(", pixelSize=") + std::to_string(pixelSize) + std::string(", textureFormat=")
+                      + std::to_string(m_textureFormat) + std::string(", textureType=") + std::to_string(m_textureType);
             HOP_PROF_DYN_NAME(hopMsg.c_str());
 #endif
 
@@ -1006,9 +858,7 @@ namespace NDI
                 TWK_GLDEBUG;
             }
 
-            glReadPixels(0, 0, static_cast<int>(m_frameWidth),
-                         static_cast<int>(m_frameHeight), m_textureFormat,
-                         textureTypeToUse, nullptr);
+            glReadPixels(0, 0, static_cast<int>(m_frameWidth), static_cast<int>(m_frameHeight), m_textureFormat, textureTypeToUse, nullptr);
             TWK_GLDEBUG;
 
             m_lastPboData = pboData;
@@ -1018,9 +868,8 @@ namespace NDI
         }
     }
 
-    void NDIVideoDevice::transferChannelReadPixels(
-        size_t, const GLFBO* fbo, NDIVideoFrame* outputVideoFrame,
-        NDIVideoFrame* readbackVideoFrame) const
+    void NDIVideoDevice::transferChannelReadPixels(size_t, const GLFBO* fbo, NDIVideoFrame* outputVideoFrame,
+                                                   NDIVideoFrame* readbackVideoFrame) const
     {
         HOP_PROF_FUNC();
 
@@ -1034,15 +883,12 @@ namespace NDI
             pFrame = outputVideoFrame;
         }
 
-        const NDIDataFormat& dataFormat =
-            m_ndiDataFormats[m_internalDataFormat];
+        const NDIDataFormat& dataFormat = m_ndiDataFormats[m_internalDataFormat];
 
         TwkUtil::Timer timer;
         timer.start();
 
-        glReadPixels(0, 0, static_cast<int>(m_frameWidth),
-                     static_cast<int>(m_frameHeight), m_textureFormat,
-                     m_textureType, pFrame);
+        glReadPixels(0, 0, static_cast<int>(m_frameWidth), static_cast<int>(m_frameHeight), m_textureFormat, m_textureType, pFrame);
 
         timer.stop();
 
@@ -1057,16 +903,13 @@ namespace NDI
             outData = outputVideoFrame;
             if (dataFormat.iformat == VideoDevice::CbY0CrY1_8_422)
             {
-                subsample422_8bit_UYVY_MP(m_frameWidth, m_frameHeight,
-                                          reinterpret_cast<uint8_t*>(pFrame),
+                subsample422_8bit_UYVY_MP(m_frameWidth, m_frameHeight, reinterpret_cast<uint8_t*>(pFrame),
                                           reinterpret_cast<uint8_t*>(outData));
             }
             else
             {
-                subsample422_10bit_MP(m_frameWidth, m_frameHeight,
-                                      reinterpret_cast<uint32_t*>(pFrame),
-                                      reinterpret_cast<uint32_t*>(outData),
-                                      m_frameWidth * sizeof(uint32_t),
+                subsample422_10bit_MP(m_frameWidth, m_frameHeight, reinterpret_cast<uint32_t*>(pFrame),
+                                      reinterpret_cast<uint32_t*>(outData), m_frameWidth * sizeof(uint32_t),
                                       m_frameWidth * sizeof(uint32_t));
             }
 
@@ -1154,10 +997,7 @@ namespace NDI
                 TWK_GLDEBUG;
                 glBindBuffer(GL_PIXEL_PACK_BUFFER_ARB, glObject);
                 TWK_GLDEBUG;
-                glBufferData(
-                    GL_PIXEL_PACK_BUFFER_ARB,
-                    static_cast<long>(m_frameWidth * 4 * m_frameHeight),
-                    nullptr, GL_STATIC_READ);
+                glBufferData(GL_PIXEL_PACK_BUFFER_ARB, static_cast<long>(m_frameWidth * 4 * m_frameHeight), nullptr, GL_STATIC_READ);
                 TWK_GLDEBUG; // read back is always in 4 bytes
                 glBindBuffer(GL_PIXEL_PACK_BUFFER_ARB, 0);
                 TWK_GLDEBUG;
@@ -1169,10 +1009,6 @@ namespace NDI
         resetClock();
     }
 
-    void NDIVideoDevice::bind2(const GLVideoDevice* device,
-                               const GLVideoDevice*) const
-    {
-        bind(device);
-    }
+    void NDIVideoDevice::bind2(const GLVideoDevice* device, const GLVideoDevice*) const { bind(device); }
 
 } // namespace NDI

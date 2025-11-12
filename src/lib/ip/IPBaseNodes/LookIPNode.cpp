@@ -19,8 +19,7 @@ namespace IPCore
     using namespace TwkContainer;
     using namespace TwkMath;
 
-    LookIPNode::LookIPNode(const std::string& name, const NodeDefinition* def,
-                           IPGraph* g, GroupIPNode* group)
+    LookIPNode::LookIPNode(const std::string& name, const NodeDefinition* def, IPGraph* g, GroupIPNode* group)
         : LUTIPNode(name, def, g, group)
     {
     }

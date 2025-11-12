@@ -88,16 +88,12 @@ namespace TwkFB
                                  // "TRUEVISION-XFILE.\0" means "new tga"
         };
 
-        IOtarga(IOType ioMethod = StandardIO, size_t chunkSize = 61440,
-                int maxAsync = 16);
+        IOtarga(IOType ioMethod = StandardIO, size_t chunkSize = 61440, int maxAsync = 16);
 
         virtual ~IOtarga();
 
-        virtual void readImage(FrameBuffer& fb, const std::string& filename,
-                               const ReadRequest& request) const;
-        virtual void writeImage(const FrameBuffer& img,
-                                const std::string& filename,
-                                const WriteRequest& request) const;
+        virtual void readImage(FrameBuffer& fb, const std::string& filename, const ReadRequest& request) const;
+        virtual void writeImage(const FrameBuffer& img, const std::string& filename, const WriteRequest& request) const;
         virtual std::string about() const;
         virtual void getImageInfo(const std::string& filename, FBInfo&) const;
 
@@ -107,12 +103,9 @@ namespace TwkFB
         void readAttributes(FrameBuffer& fb, const TGAFileHeader& header) const;
         void readHeader(const unsigned char*, TGAFileHeader&) const;
         void readFooter(const unsigned char*, TGAFileFooter&) const;
-        void readExtensionArea(FrameBuffer& fb,
-                               const unsigned char* data) const;
-        void writeRLE(std::ofstream* outfile, unsigned char* pixel,
-                      int numChannels, int count) const;
-        bool pixelsMatch(const unsigned char* p1, const unsigned char* p2,
-                         bool alpha) const;
+        void readExtensionArea(FrameBuffer& fb, const unsigned char* data) const;
+        void writeRLE(std::ofstream* outfile, unsigned char* pixel, int numChannels, int count) const;
+        bool pixelsMatch(const unsigned char* p1, const unsigned char* p2, bool alpha) const;
     };
 
 } // namespace TwkFB

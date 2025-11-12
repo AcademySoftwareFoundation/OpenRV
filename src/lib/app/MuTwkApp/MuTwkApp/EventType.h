@@ -41,10 +41,8 @@ namespace TwkApp
 
         virtual Mu::Object* newObject() const;
         virtual void deleteObject(Mu::Object*) const;
-        virtual void outputValue(std::ostream&, const Mu::Value&,
-                                 bool full = false) const;
-        virtual void outputValueRecursive(std::ostream&, const Mu::ValuePointer,
-                                          Mu::Type::ValueOutputState&) const;
+        virtual void outputValue(std::ostream&, const Mu::Value&, bool full = false) const;
+        virtual void outputValueRecursive(std::ostream&, const Mu::ValuePointer, Mu::Type::ValueOutputState&) const;
         virtual void load();
 
         static NODE_DECLARATION(print, void);

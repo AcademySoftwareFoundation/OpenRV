@@ -14,8 +14,7 @@ namespace TwkFB
     using namespace std;
     using namespace TwkExc;
 
-    FileStreamIStream::FileStreamIStream(const std::string& filename, Type type,
-                                         size_t chunk, int maxAsync)
+    FileStreamIStream::FileStreamIStream(const std::string& filename, Type type, size_t chunk, int maxAsync)
         : IStream(filename.c_str())
         , m_stream(filename, type, chunk, maxAsync)
         , m_index(0)
@@ -35,8 +34,7 @@ namespace TwkFB
             n = size - m_index;
 
         if (n <= 0)
-            TWK_THROW_STREAM(Exception,
-                             "Incomplete EXR file: " << size << " bytes");
+            TWK_THROW_STREAM(Exception, "Incomplete EXR file: " << size << " bytes");
 
         memcpy(c, p, size_t(n));
         m_index += n;

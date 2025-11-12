@@ -52,8 +52,7 @@ namespace Mu
             FunctionObject* o = gc_callbacks[i];
             Thread* thread = gc_callback_threads[i];
 
-            const FunctionType* ftype =
-                static_cast<const FunctionType*>(o->type());
+            const FunctionType* ftype = static_cast<const FunctionType*>(o->type());
 
             const Function* f = o->function();
             Node node(0, f);
@@ -133,350 +132,207 @@ namespace Mu
 
         Module* gc = new Module(context, "gc");
 
-        gc->addSymbols(
-            new Function(c, "perform_collection",
-                         RuntimeModule::gc_perform_collection, None, Return,
-                         "void", End),
+        gc->addSymbols(new Function(c, "perform_collection", RuntimeModule::gc_perform_collection, None, Return, "void", End),
 
-            new Function(c, "parallel_enabled",
-                         RuntimeModule::gc_parallel_enabled, None, Return,
-                         "bool", End),
+                       new Function(c, "parallel_enabled", RuntimeModule::gc_parallel_enabled, None, Return, "bool", End),
 
-            new Function(c, "all_interior_pointers",
-                         RuntimeModule::gc_all_interior_pointers, None, Return,
-                         "bool", End),
+                       new Function(c, "all_interior_pointers", RuntimeModule::gc_all_interior_pointers, None, Return, "bool", End),
 
-            new Function(c, "num_collections",
-                         RuntimeModule::gc_num_collections, None, Return, "int",
-                         End),
+                       new Function(c, "num_collections", RuntimeModule::gc_num_collections, None, Return, "int", End),
 
-            new Function(c, "call_on_collect",
-                         RuntimeModule::gc_call_on_collect, None, Return,
-                         "void", Args, "(void;)", End),
+                       new Function(c, "call_on_collect", RuntimeModule::gc_call_on_collect, None, Return, "void", Args, "(void;)", End),
 
-            new Function(c, "dump", RuntimeModule::gc_dump, None, Return,
-                         "void", End),
+                       new Function(c, "dump", RuntimeModule::gc_dump, None, Return, "void", End),
 
-            new Function(c, "enable", RuntimeModule::gc_enable, None, Return,
-                         "void", End),
+                       new Function(c, "enable", RuntimeModule::gc_enable, None, Return, "void", End),
 
-            new Function(c, "disable", RuntimeModule::gc_disable, None, Return,
-                         "void", End),
+                       new Function(c, "disable", RuntimeModule::gc_disable, None, Return, "void", End),
 
-            new Function(c, "get_heap_size", RuntimeModule::gc_get_heap_size,
-                         None, Return, "int64", End),
+                       new Function(c, "get_heap_size", RuntimeModule::gc_get_heap_size, None, Return, "int64", End),
 
-            new Function(c, "get_free_bytes", RuntimeModule::gc_get_free_bytes,
-                         None, Return, "int64", End),
+                       new Function(c, "get_free_bytes", RuntimeModule::gc_get_free_bytes, None, Return, "int64", End),
 
-            new Function(c, "get_bytes_since_gc",
-                         RuntimeModule::gc_get_bytes_since_gc, None, Return,
-                         "int64", End),
+                       new Function(c, "get_bytes_since_gc", RuntimeModule::gc_get_bytes_since_gc, None, Return, "int64", End),
 
-            new Function(c, "get_total_bytes",
-                         RuntimeModule::gc_get_total_bytes, None, Return,
-                         "int64", End),
+                       new Function(c, "get_total_bytes", RuntimeModule::gc_get_total_bytes, None, Return, "int64", End),
 
-            new Function(
-                c, "set_warning_function",
-                RuntimeModule::gc_set_warning_function, None, Return,
-                "(void;string,int64)", Parameters,
-                new ParameterVariable(c, "func", "(void;string,int64)"), End),
+                       new Function(c, "set_warning_function", RuntimeModule::gc_set_warning_function, None, Return, "(void;string,int64)",
+                                    Parameters, new ParameterVariable(c, "func", "(void;string,int64)"), End),
 
-            new Function(c, "push_api", RuntimeModule::gc_push_api, None,
-                         Return, "void", Parameters,
-                         new ParameterVariable(c, "api", "int"), End),
+                       new Function(c, "push_api", RuntimeModule::gc_push_api, None, Return, "void", Parameters,
+                                    new ParameterVariable(c, "api", "int"), End),
 
-            new Function(c, "pop_api", RuntimeModule::gc_pop_api, None, Return,
-                         "void", End),
+                       new Function(c, "pop_api", RuntimeModule::gc_pop_api, None, Return, "void", End),
 
-            EndArguments);
+                       EndArguments);
 
-        addSymbols(
-            gc,
+        addSymbols(gc,
 
-            new Function(c, "eval", RuntimeModule::eval, None, Return, "string",
-                         Parameters, new ParameterVariable(c, "text", "string"),
-                         new ParameterVariable(c, "module_list", "[string]"),
-                         End),
+                   new Function(c, "eval", RuntimeModule::eval, None, Return, "string", Parameters,
+                                new ParameterVariable(c, "text", "string"), new ParameterVariable(c, "module_list", "[string]"), End),
 
-            new Function(c, "varying_size", RuntimeModule::varying_size, None,
-                         Return, "int", Args, "int", End),
-
-            new Function(c, "set_varying_size", RuntimeModule::set_varying_size,
-                         None, Return, "void", Args, "int", "int", End),
+                   new Function(c, "varying_size", RuntimeModule::varying_size, None, Return, "int", Args, "int", End),
 
-            new Function(
-                c, "dump_symbols", RuntimeModule::dump_symbols, None, Return,
-                "string", Parameters,
-                new ParameterVariable(c, "symbol_name", "string", Value()),
-                new ParameterVariable(c, "primary_only", "bool", Value(false)),
-                End),
-
-            new Function(c, "layout_traits", RuntimeModule::layout_traits, None,
-                         Return, "[int]", End),
-
-            new Function(c, "machine_types", RuntimeModule::machine_types, None,
-                         Return, "[(string,string,int,int,int,int)]", End),
-
-            new Function(
-                c, "exit", RuntimeModule::exit, None, Parameters,
-                new ParameterVariable(c, "exit_value", "int", Value(0)), Return,
-                "void", End),
-
-            new Function(c, "stack_traits", RuntimeModule::stack_traits, None,
-                         Return, "[int]", End),
-
-            new Function(c, "module_locations", RuntimeModule::module_locations,
-                         None, Return, "[(string,string)]", End),
-
-            new Function(c, "backtrace", RuntimeModule::backtrace, None, Return,
-                         "[string]", End),
-
-            new Function(c, "load_module", RuntimeModule::load_module, None,
-                         Return, "bool", Parameters,
-                         new ParameterVariable(c, "module_name", "string"),
-                         End),
-
-            new Function(c, "intern_name", RuntimeModule::intern_name, None,
-                         Return, "runtime.name", Parameters,
-                         new ParameterVariable(c, "name", "string"), End),
-
-            new Function(c, "lookup_name", RuntimeModule::lookup_name, None,
-                         Return, "runtime.name", Parameters,
-                         new ParameterVariable(c, "name", "string"), End),
-
-            new Function(c, "lookup_function", RuntimeModule::lookup_function,
-                         None, Return, "(;)", Parameters,
-                         new ParameterVariable(c, "name", "runtime.name"), End),
-
-            new Function(c, "build_os", RuntimeModule::build_os, None, Return,
-                         "string", End),
-
-            new Function(c, "build_architecture", RuntimeModule::build_arch,
-                         None, Return, "string", End),
-
-            new Function(c, "build_compiler", RuntimeModule::build_compiler,
-                         None, Return, "string", End),
-
-            new Function(c, "symbol_from_name", RuntimeModule::symbol_from_name,
-                         None, Return, "runtime.symbol", Parameters,
-                         new ParameterVariable(c, "name", "runtime.name"), End),
-
-            new Function(c, "symbol_is_nil", RuntimeModule::symbol_is_nil, None,
-                         Return, "bool", Parameters,
-                         new ParameterVariable(c, "sym", "runtime.symbol"),
-                         End),
-
-            new Function(c, "symbol_is_type", RuntimeModule::symbol_is_type,
-                         None, Return, "bool", Parameters,
-                         new ParameterVariable(c, "sym", "runtime.symbol"),
-                         End),
-
-            new Function(c, "symbol_is_module", RuntimeModule::symbol_is_module,
-                         None, Return, "bool", Parameters,
-                         new ParameterVariable(c, "sym", "runtime.symbol"),
-                         End),
-
-            new Function(c, "symbol_is_symbolic_constant",
-                         RuntimeModule::symbol_is_symbolic_constant, None,
-                         Return, "bool", Parameters,
-                         new ParameterVariable(c, "sym", "runtime.symbol"),
-                         End),
-
-            new Function(
-                c, "symbol_is_function", RuntimeModule::symbol_is_function,
-                None, Return, "bool", Parameters,
-                new ParameterVariable(c, "sym", "runtime.symbol"), End),
-
-            new Function(c, "symbol_is_method", RuntimeModule::symbol_is_method,
-                         None, Return, "bool", Parameters,
-                         new ParameterVariable(c, "sym", "runtime.symbol"),
-                         End),
-
-            new Function(
-                c, "symbol_is_parameter", RuntimeModule::symbol_is_parameter,
-                None, Return, "bool", Parameters,
-                new ParameterVariable(c, "sym", "runtime.symbol"), End),
-
-            new Function(c, "symbol_is_type_modifier",
-                         RuntimeModule::symbol_is_type_modifier, None, Return,
-                         "bool", Parameters,
-                         new ParameterVariable(c, "sym", "runtime.symbol"),
-                         End),
-
-            new Function(
-                c, "symbol_is_variable", RuntimeModule::symbol_is_variable,
-                None, Return, "bool", Parameters,
-                new ParameterVariable(c, "sym", "runtime.symbol"), End),
-
-            new Function(c, "symbol", RuntimeModule::cast_to_symbol, Cast,
-                         Return, "runtime.symbol", Parameters,
-                         new ParameterVariable(c, "typ", "runtime.type_symbol"),
-                         End),
-
-            new Function(
-                c, "symbol", RuntimeModule::cast_to_symbol, Cast, Parameters,
-                new ParameterVariable(c, "func", "runtime.function_symbol"),
-                Return, "runtime.symbol", End),
-
-            new Function(
-                c, "symbol", RuntimeModule::cast_to_symbol, Cast, Parameters,
-                new ParameterVariable(c, "func", "runtime.parameter_symbol"),
-                Return, "runtime.symbol", End),
-
-            new Function(
-                c, "symbol", RuntimeModule::cast_to_symbol, Cast, Parameters,
-                new ParameterVariable(c, "func", "runtime.variable_symbol"),
-                Return, "runtime.symbol", End),
-
-            new Function(
-                c, "variable_symbol", RuntimeModule::cast_to_symbol, Cast,
-                Parameters,
-                new ParameterVariable(c, "func", "runtime.parameter_symbol"),
-                Return, "runtime.variable_symbol", End),
-
-            new Function(c, "type_from_symbol", RuntimeModule::type_from_symbol,
-                         None, Return, "runtime.type_symbol", Parameters,
-                         new ParameterVariable(c, "sym", "runtime.symbol"),
-                         End),
-
-            new Function(
-                c, "function_from_symbol", RuntimeModule::function_from_symbol,
-                None, Return, "runtime.function_symbol", Parameters,
-                new ParameterVariable(c, "sym", "runtime.symbol"), End),
-
-            new Function(c, "parameter_from_symbol",
-                         RuntimeModule::parameter_from_symbol, None, Return,
-                         "runtime.parameter_symbol", Parameters,
-                         new ParameterVariable(c, "sym", "runtime.symbol"),
-                         End),
-
-            new Function(c, "symbol_scope", RuntimeModule::symbol_scope, None,
-                         Return, "runtime.symbol", Parameters,
-                         new ParameterVariable(c, "sym", "runtime.symbol"),
-                         End),
-
-            new Function(c, "symbol_symbols_in_scope",
-                         RuntimeModule::symbol_symbols_in_scope, None, Return,
-                         "[runtime.symbol]", Parameters,
-                         new ParameterVariable(c, "sym", "runtime.symbol"),
-                         End),
-
-            new Function(c, "symbol_name", RuntimeModule::symbol_name, None,
-                         Return, "string", Parameters,
-                         new ParameterVariable(c, "sym", "runtime.symbol"),
-                         End),
-
-            new Function(c, "symbol_fully_qualified_name",
-                         RuntimeModule::symbol_fully_qualified_name, None,
-                         Return, "string", Parameters,
-                         new ParameterVariable(c, "sym", "runtime.symbol"),
-                         End),
-
-            new Function(
-                c, "symbol_documentation", RuntimeModule::symbol_documentation,
-                None, Return, "string", Parameters,
-                new ParameterVariable(c, "sym", "runtime.symbol"), End),
-
-            new Function(c, "symbol_overloaded_symbols",
-                         RuntimeModule::symbol_overloaded_symbols, None, Return,
-                         "[runtime.symbol]", Parameters,
-                         new ParameterVariable(c, "sym", "runtime.symbol"),
-                         End),
-
-            new Function(
-                c, "function_type", RuntimeModule::function_type, None, Return,
-                "runtime.type_symbol", Parameters,
-                new ParameterVariable(c, "func", "runtime.function_symbol"),
-                End),
-
-            new Function(
-                c, "function_signature", RuntimeModule::function_signature,
-                None, Return,
-                "(runtime.type_symbol,[runtime.type_symbol],[runtime.parameter_"
-                "symbol])",
-                Parameters,
-                new ParameterVariable(c, "func", "runtime.function_symbol"),
-                End),
-
-            new Function(
-                c, "variable_from_symbol", RuntimeModule::variable_from_symbol,
-                None, Return, "runtime.variable_symbol", Parameters,
-                new ParameterVariable(c, "sym", "runtime.symbol"), End),
-
-            new Function(
-                c, "variable_type", RuntimeModule::variable_type, None, Return,
-                "runtime.type_symbol", Parameters,
-                new ParameterVariable(c, "sym", "runtime.variable_symbol"),
-                End),
-
-            new Function(
-                c, "parameter_default_value_as_string",
-                RuntimeModule::parameter_default_value_as_string, None, Return,
-                "string", Parameters,
-                new ParameterVariable(c, "sym", "runtime.parameter_symbol"),
-                End),
-
-            new Function(c, "type_is_union", RuntimeModule::type_is_union, None,
-                         Return, "bool", Parameters,
-                         new ParameterVariable(c, "sym", "runtime.type_symbol"),
-                         End),
-
-            new Function(c, "type_is_class", RuntimeModule::type_is_class, None,
-                         Return, "bool", Parameters,
-                         new ParameterVariable(c, "sym", "runtime.type_symbol"),
-                         End),
-
-            new Function(
-                c, "type_is_interface", RuntimeModule::type_is_interface, None,
-                Return, "bool", Parameters,
-                new ParameterVariable(c, "sym", "runtime.type_symbol"), End),
-
-            new Function(c, "type_is_opaque", RuntimeModule::type_is_opaque,
-                         None, Return, "bool", Parameters,
-                         new ParameterVariable(c, "sym", "runtime.type_symbol"),
-                         End),
-
-            new Function(
-                c, "type_is_union_tag", RuntimeModule::type_is_union_tag, None,
-                Return, "bool", Parameters,
-                new ParameterVariable(c, "sym", "runtime.type_symbol"), End),
-
-            new Function(c, "type_is_reference_type",
-                         RuntimeModule::type_is_reference_type, None, Return,
-                         "bool", Parameters,
-                         new ParameterVariable(c, "sym", "runtime.type_symbol"),
-                         End),
-
-            new Function(
-                c, "type_structure_info", RuntimeModule::type_structure_info,
-                None, Return,
-                "([runtime.function_symbol],[runtime.variable_symbol])",
-                Parameters,
-                new ParameterVariable(c, "sym", "runtime.type_symbol"), End),
-
-            new Function(c, "symbolic_constant_from_symbol",
-                         RuntimeModule::symbolic_constant_from_symbol, None,
-                         Return, "runtime.symbolic_constant", Parameters,
-                         new ParameterVariable(c, "sym", "runtime.symbol"),
-                         End),
-
-            new Function(
-                c, "symbolic_constant_value_as_string",
-                RuntimeModule::symbolic_constant_value_as_string, None, Return,
-                "string", Parameters,
-                new ParameterVariable(c, "sym", "runtime.symbolic_constant"),
-                End),
-
-            EndArguments);
+                   new Function(c, "set_varying_size", RuntimeModule::set_varying_size, None, Return, "void", Args, "int", "int", End),
+
+                   new Function(c, "dump_symbols", RuntimeModule::dump_symbols, None, Return, "string", Parameters,
+                                new ParameterVariable(c, "symbol_name", "string", Value()),
+                                new ParameterVariable(c, "primary_only", "bool", Value(false)), End),
+
+                   new Function(c, "layout_traits", RuntimeModule::layout_traits, None, Return, "[int]", End),
+
+                   new Function(c, "machine_types", RuntimeModule::machine_types, None, Return, "[(string,string,int,int,int,int)]", End),
+
+                   new Function(c, "exit", RuntimeModule::exit, None, Parameters, new ParameterVariable(c, "exit_value", "int", Value(0)),
+                                Return, "void", End),
+
+                   new Function(c, "stack_traits", RuntimeModule::stack_traits, None, Return, "[int]", End),
+
+                   new Function(c, "module_locations", RuntimeModule::module_locations, None, Return, "[(string,string)]", End),
+
+                   new Function(c, "backtrace", RuntimeModule::backtrace, None, Return, "[string]", End),
+
+                   new Function(c, "load_module", RuntimeModule::load_module, None, Return, "bool", Parameters,
+                                new ParameterVariable(c, "module_name", "string"), End),
+
+                   new Function(c, "intern_name", RuntimeModule::intern_name, None, Return, "runtime.name", Parameters,
+                                new ParameterVariable(c, "name", "string"), End),
+
+                   new Function(c, "lookup_name", RuntimeModule::lookup_name, None, Return, "runtime.name", Parameters,
+                                new ParameterVariable(c, "name", "string"), End),
+
+                   new Function(c, "lookup_function", RuntimeModule::lookup_function, None, Return, "(;)", Parameters,
+                                new ParameterVariable(c, "name", "runtime.name"), End),
+
+                   new Function(c, "build_os", RuntimeModule::build_os, None, Return, "string", End),
+
+                   new Function(c, "build_architecture", RuntimeModule::build_arch, None, Return, "string", End),
+
+                   new Function(c, "build_compiler", RuntimeModule::build_compiler, None, Return, "string", End),
+
+                   new Function(c, "symbol_from_name", RuntimeModule::symbol_from_name, None, Return, "runtime.symbol", Parameters,
+                                new ParameterVariable(c, "name", "runtime.name"), End),
+
+                   new Function(c, "symbol_is_nil", RuntimeModule::symbol_is_nil, None, Return, "bool", Parameters,
+                                new ParameterVariable(c, "sym", "runtime.symbol"), End),
+
+                   new Function(c, "symbol_is_type", RuntimeModule::symbol_is_type, None, Return, "bool", Parameters,
+                                new ParameterVariable(c, "sym", "runtime.symbol"), End),
+
+                   new Function(c, "symbol_is_module", RuntimeModule::symbol_is_module, None, Return, "bool", Parameters,
+                                new ParameterVariable(c, "sym", "runtime.symbol"), End),
+
+                   new Function(c, "symbol_is_symbolic_constant", RuntimeModule::symbol_is_symbolic_constant, None, Return, "bool",
+                                Parameters, new ParameterVariable(c, "sym", "runtime.symbol"), End),
+
+                   new Function(c, "symbol_is_function", RuntimeModule::symbol_is_function, None, Return, "bool", Parameters,
+                                new ParameterVariable(c, "sym", "runtime.symbol"), End),
+
+                   new Function(c, "symbol_is_method", RuntimeModule::symbol_is_method, None, Return, "bool", Parameters,
+                                new ParameterVariable(c, "sym", "runtime.symbol"), End),
+
+                   new Function(c, "symbol_is_parameter", RuntimeModule::symbol_is_parameter, None, Return, "bool", Parameters,
+                                new ParameterVariable(c, "sym", "runtime.symbol"), End),
+
+                   new Function(c, "symbol_is_type_modifier", RuntimeModule::symbol_is_type_modifier, None, Return, "bool", Parameters,
+                                new ParameterVariable(c, "sym", "runtime.symbol"), End),
+
+                   new Function(c, "symbol_is_variable", RuntimeModule::symbol_is_variable, None, Return, "bool", Parameters,
+                                new ParameterVariable(c, "sym", "runtime.symbol"), End),
+
+                   new Function(c, "symbol", RuntimeModule::cast_to_symbol, Cast, Return, "runtime.symbol", Parameters,
+                                new ParameterVariable(c, "typ", "runtime.type_symbol"), End),
+
+                   new Function(c, "symbol", RuntimeModule::cast_to_symbol, Cast, Parameters,
+                                new ParameterVariable(c, "func", "runtime.function_symbol"), Return, "runtime.symbol", End),
+
+                   new Function(c, "symbol", RuntimeModule::cast_to_symbol, Cast, Parameters,
+                                new ParameterVariable(c, "func", "runtime.parameter_symbol"), Return, "runtime.symbol", End),
+
+                   new Function(c, "symbol", RuntimeModule::cast_to_symbol, Cast, Parameters,
+                                new ParameterVariable(c, "func", "runtime.variable_symbol"), Return, "runtime.symbol", End),
+
+                   new Function(c, "variable_symbol", RuntimeModule::cast_to_symbol, Cast, Parameters,
+                                new ParameterVariable(c, "func", "runtime.parameter_symbol"), Return, "runtime.variable_symbol", End),
+
+                   new Function(c, "type_from_symbol", RuntimeModule::type_from_symbol, None, Return, "runtime.type_symbol", Parameters,
+                                new ParameterVariable(c, "sym", "runtime.symbol"), End),
+
+                   new Function(c, "function_from_symbol", RuntimeModule::function_from_symbol, None, Return, "runtime.function_symbol",
+                                Parameters, new ParameterVariable(c, "sym", "runtime.symbol"), End),
+
+                   new Function(c, "parameter_from_symbol", RuntimeModule::parameter_from_symbol, None, Return, "runtime.parameter_symbol",
+                                Parameters, new ParameterVariable(c, "sym", "runtime.symbol"), End),
+
+                   new Function(c, "symbol_scope", RuntimeModule::symbol_scope, None, Return, "runtime.symbol", Parameters,
+                                new ParameterVariable(c, "sym", "runtime.symbol"), End),
+
+                   new Function(c, "symbol_symbols_in_scope", RuntimeModule::symbol_symbols_in_scope, None, Return, "[runtime.symbol]",
+                                Parameters, new ParameterVariable(c, "sym", "runtime.symbol"), End),
+
+                   new Function(c, "symbol_name", RuntimeModule::symbol_name, None, Return, "string", Parameters,
+                                new ParameterVariable(c, "sym", "runtime.symbol"), End),
+
+                   new Function(c, "symbol_fully_qualified_name", RuntimeModule::symbol_fully_qualified_name, None, Return, "string",
+                                Parameters, new ParameterVariable(c, "sym", "runtime.symbol"), End),
+
+                   new Function(c, "symbol_documentation", RuntimeModule::symbol_documentation, None, Return, "string", Parameters,
+                                new ParameterVariable(c, "sym", "runtime.symbol"), End),
+
+                   new Function(c, "symbol_overloaded_symbols", RuntimeModule::symbol_overloaded_symbols, None, Return, "[runtime.symbol]",
+                                Parameters, new ParameterVariable(c, "sym", "runtime.symbol"), End),
+
+                   new Function(c, "function_type", RuntimeModule::function_type, None, Return, "runtime.type_symbol", Parameters,
+                                new ParameterVariable(c, "func", "runtime.function_symbol"), End),
+
+                   new Function(c, "function_signature", RuntimeModule::function_signature, None, Return,
+                                "(runtime.type_symbol,[runtime.type_symbol],[runtime.parameter_"
+                                "symbol])",
+                                Parameters, new ParameterVariable(c, "func", "runtime.function_symbol"), End),
+
+                   new Function(c, "variable_from_symbol", RuntimeModule::variable_from_symbol, None, Return, "runtime.variable_symbol",
+                                Parameters, new ParameterVariable(c, "sym", "runtime.symbol"), End),
+
+                   new Function(c, "variable_type", RuntimeModule::variable_type, None, Return, "runtime.type_symbol", Parameters,
+                                new ParameterVariable(c, "sym", "runtime.variable_symbol"), End),
+
+                   new Function(c, "parameter_default_value_as_string", RuntimeModule::parameter_default_value_as_string, None, Return,
+                                "string", Parameters, new ParameterVariable(c, "sym", "runtime.parameter_symbol"), End),
+
+                   new Function(c, "type_is_union", RuntimeModule::type_is_union, None, Return, "bool", Parameters,
+                                new ParameterVariable(c, "sym", "runtime.type_symbol"), End),
+
+                   new Function(c, "type_is_class", RuntimeModule::type_is_class, None, Return, "bool", Parameters,
+                                new ParameterVariable(c, "sym", "runtime.type_symbol"), End),
+
+                   new Function(c, "type_is_interface", RuntimeModule::type_is_interface, None, Return, "bool", Parameters,
+                                new ParameterVariable(c, "sym", "runtime.type_symbol"), End),
+
+                   new Function(c, "type_is_opaque", RuntimeModule::type_is_opaque, None, Return, "bool", Parameters,
+                                new ParameterVariable(c, "sym", "runtime.type_symbol"), End),
+
+                   new Function(c, "type_is_union_tag", RuntimeModule::type_is_union_tag, None, Return, "bool", Parameters,
+                                new ParameterVariable(c, "sym", "runtime.type_symbol"), End),
+
+                   new Function(c, "type_is_reference_type", RuntimeModule::type_is_reference_type, None, Return, "bool", Parameters,
+                                new ParameterVariable(c, "sym", "runtime.type_symbol"), End),
+
+                   new Function(c, "type_structure_info", RuntimeModule::type_structure_info, None, Return,
+                                "([runtime.function_symbol],[runtime.variable_symbol])", Parameters,
+                                new ParameterVariable(c, "sym", "runtime.type_symbol"), End),
+
+                   new Function(c, "symbolic_constant_from_symbol", RuntimeModule::symbolic_constant_from_symbol, None, Return,
+                                "runtime.symbolic_constant", Parameters, new ParameterVariable(c, "sym", "runtime.symbol"), End),
+
+                   new Function(c, "symbolic_constant_value_as_string", RuntimeModule::symbolic_constant_value_as_string, None, Return,
+                                "string", Parameters, new ParameterVariable(c, "sym", "runtime.symbolic_constant"), End),
+
+                   EndArguments);
 
         globalScope()->addSymbols(
-            new Function(c, "==", RuntimeModule::symbol_equals, CommOp, Return,
-                         "bool", Args, "runtime.symbol", "runtime.symbol", End),
+            new Function(c, "==", RuntimeModule::symbol_equals, CommOp, Return, "bool", Args, "runtime.symbol", "runtime.symbol", End),
 
-            new Function(c, "!=", RuntimeModule::symbol_nequals, CommOp, Return,
-                         "bool", Args, "runtime.symbol", "runtime.symbol", End),
+            new Function(c, "!=", RuntimeModule::symbol_nequals, CommOp, Return, "bool", Args, "runtime.symbol", "runtime.symbol", End),
 
             EndArguments);
     }
@@ -522,30 +378,15 @@ namespace Mu
         NODE_RETURN(o);
     }
 
-    NODE_IMPLEMENTATION(RuntimeModule::gc_set_warning_function, Pointer)
-    {
-        NODE_RETURN(0);
-    }
+    NODE_IMPLEMENTATION(RuntimeModule::gc_set_warning_function, Pointer) { NODE_RETURN(0); }
 
-    NODE_IMPLEMENTATION(RuntimeModule::gc_get_heap_size, int64)
-    {
-        NODE_RETURN(int64(GC_get_heap_size()));
-    }
+    NODE_IMPLEMENTATION(RuntimeModule::gc_get_heap_size, int64) { NODE_RETURN(int64(GC_get_heap_size())); }
 
-    NODE_IMPLEMENTATION(RuntimeModule::gc_get_free_bytes, int64)
-    {
-        NODE_RETURN(int64(GC_get_free_bytes()));
-    }
+    NODE_IMPLEMENTATION(RuntimeModule::gc_get_free_bytes, int64) { NODE_RETURN(int64(GC_get_free_bytes())); }
 
-    NODE_IMPLEMENTATION(RuntimeModule::gc_get_bytes_since_gc, int64)
-    {
-        NODE_RETURN(int64(GC_get_bytes_since_gc()));
-    }
+    NODE_IMPLEMENTATION(RuntimeModule::gc_get_bytes_since_gc, int64) { NODE_RETURN(int64(GC_get_bytes_since_gc())); }
 
-    NODE_IMPLEMENTATION(RuntimeModule::gc_get_total_bytes, int64)
-    {
-        NODE_RETURN(int64(GC_get_total_bytes()));
-    }
+    NODE_IMPLEMENTATION(RuntimeModule::gc_get_total_bytes, int64) { NODE_RETURN(int64(GC_get_total_bytes())); }
 
     NODE_IMPLEMENTATION(RuntimeModule::gc_dump, void) { GC_dump(); }
 
@@ -558,33 +399,20 @@ namespace Mu
         Process* p = NODE_THREAD.process();
         FunctionObject* F = NODE_ARG_OBJECT(0, FunctionObject);
 
-        if (find(gc_callbacks.begin(), gc_callbacks.end(), F)
-            == gc_callbacks.end())
+        if (find(gc_callbacks.begin(), gc_callbacks.end(), F) == gc_callbacks.end())
         {
             gc_callbacks.push_back(F);
             gc_callback_threads.push_back(&NODE_THREAD);
         }
     }
 
-    NODE_IMPLEMENTATION(RuntimeModule::gc_perform_collection, void)
-    {
-        GC_gcollect();
-    }
+    NODE_IMPLEMENTATION(RuntimeModule::gc_perform_collection, void) { GC_gcollect(); }
 
-    NODE_IMPLEMENTATION(RuntimeModule::gc_parallel_enabled, bool)
-    {
-        NODE_RETURN(GC_parallel ? true : false);
-    }
+    NODE_IMPLEMENTATION(RuntimeModule::gc_parallel_enabled, bool) { NODE_RETURN(GC_parallel ? true : false); }
 
-    NODE_IMPLEMENTATION(RuntimeModule::gc_all_interior_pointers, bool)
-    {
-        NODE_RETURN(GC_all_interior_pointers ? true : false);
-    }
+    NODE_IMPLEMENTATION(RuntimeModule::gc_all_interior_pointers, bool) { NODE_RETURN(GC_all_interior_pointers ? true : false); }
 
-    NODE_IMPLEMENTATION(RuntimeModule::gc_num_collections, int)
-    {
-        NODE_RETURN(GC_gc_no);
-    }
+    NODE_IMPLEMENTATION(RuntimeModule::gc_num_collections, int) { NODE_RETURN(GC_gc_no); }
 
     NODE_IMPLEMENTATION(RuntimeModule::gc_push_api, void)
     {
@@ -612,10 +440,7 @@ namespace Mu
         }
     }
 
-    NODE_IMPLEMENTATION(RuntimeModule::gc_pop_api, void)
-    {
-        GarbageCollector::popAPI();
-    }
+    NODE_IMPLEMENTATION(RuntimeModule::gc_pop_api, void) { GarbageCollector::popAPI(); }
 
     //----------------------------------------------------------------------
 
@@ -646,8 +471,7 @@ namespace Mu
         p->setVaryingSizeDimension(dimension, size);
     }
 
-    static void dumpSymbols(ostream& o, Symbol* s, int depth,
-                            bool primaryOnly = false)
+    static void dumpSymbols(ostream& o, Symbol* s, int depth, bool primaryOnly = false)
     {
         typedef Mu::SymbolTable::SymbolHashTable HT;
 
@@ -705,8 +529,7 @@ namespace Mu
             }
             else
             {
-                ExceptionType::Exception* e =
-                    new ExceptionType::Exception(c->exceptionType());
+                ExceptionType::Exception* e = new ExceptionType::Exception(c->exceptionType());
                 e->string() += "no symbol with qualified name ";
                 e->string() += n->c_str();
                 e->string() += " exists";
@@ -756,8 +579,7 @@ namespace Mu
     {
         Process* p = NODE_THREAD.process();
         const ListType* type = static_cast<const ListType*>(NODE_THIS.type());
-        const TupleType* ttype =
-            static_cast<const TupleType*>(type->elementType());
+        const TupleType* ttype = static_cast<const TupleType*>(type->elementType());
         const MachineRep::MachineReps& reps = MachineRep::allReps();
         List list(p, type);
 
@@ -823,16 +645,12 @@ namespace Mu
     {
         Process* p = NODE_THREAD.process();
         const ListType* ltype = static_cast<const ListType*>(NODE_THIS.type());
-        const TupleType* ttype =
-            static_cast<const TupleType*>(ltype->elementType());
-        const StringType* stype =
-            static_cast<const StringType*>(ttype->fieldType(0));
+        const TupleType* ttype = static_cast<const TupleType*>(ltype->elementType());
+        const StringType* stype = static_cast<const StringType*>(ttype->fieldType(0));
 
         List list(p, ltype);
 
-        for (SymbolTable::RecursiveIterator i(
-                 p->context()->globalScope()->symbolTable());
-             i; ++i)
+        for (SymbolTable::RecursiveIterator i(p->context()->globalScope()->symbolTable()); i; ++i)
         {
             if (const Module* m = dynamic_cast<const Module*>(*i))
             {
@@ -873,9 +691,7 @@ namespace Mu
 
                 if (anode->sourceFileName())
                 {
-                    cstr << anode->sourceFileName() << ", line "
-                         << anode->linenum() << ", char " << anode->charnum()
-                         << ": ";
+                    cstr << anode->sourceFileName() << ", line " << anode->linenum() << ", char " << anode->charnum() << ": ";
                 }
             }
 
@@ -942,8 +758,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(p->context());
         Name qname = reinterpret_cast<Name::Ref>(NODE_ARG(0, Pointer));
 
-        if (const Function* F =
-                c->findSymbolOfTypeByQualifiedName<Function>(qname))
+        if (const Function* F = c->findSymbolOfTypeByQualifiedName<Function>(qname))
         {
             const Function* F0 = F->firstFunctionOverload();
             FunctionObject* obj = new FunctionObject(F0);
@@ -960,22 +775,19 @@ namespace Mu
 
     NODE_IMPLEMENTATION(RuntimeModule::build_os, Pointer)
     {
-        const Mu::StringType* stype =
-            static_cast<const Mu::StringType*>(NODE_THIS.type());
+        const Mu::StringType* stype = static_cast<const Mu::StringType*>(NODE_THIS.type());
         NODE_RETURN(stype->allocate(xstr(PLATFORM)));
     }
 
     NODE_IMPLEMENTATION(RuntimeModule::build_arch, Pointer)
     {
-        const Mu::StringType* stype =
-            static_cast<const Mu::StringType*>(NODE_THIS.type());
+        const Mu::StringType* stype = static_cast<const Mu::StringType*>(NODE_THIS.type());
         NODE_RETURN(stype->allocate(xstr(ARCH)));
     }
 
     NODE_IMPLEMENTATION(RuntimeModule::build_compiler, Pointer)
     {
-        const Mu::StringType* stype =
-            static_cast<const Mu::StringType*>(NODE_THIS.type());
+        const Mu::StringType* stype = static_cast<const Mu::StringType*>(NODE_THIS.type());
         NODE_RETURN(stype->allocate(xstr(COMPILER)));
     }
 
@@ -1111,8 +923,7 @@ namespace Mu
 
     NODE_IMPLEMENTATION(RuntimeModule::symbol_name, Pointer)
     {
-        const Mu::StringType* stype =
-            static_cast<const Mu::StringType*>(NODE_THIS.type());
+        const Mu::StringType* stype = static_cast<const Mu::StringType*>(NODE_THIS.type());
         const Symbol* symbol = NODE_ARG_OBJECT(0, const Symbol);
         if (!symbol)
             throw NilArgumentException();
@@ -1130,8 +941,7 @@ namespace Mu
 
     NODE_IMPLEMENTATION(RuntimeModule::symbol_fully_qualified_name, Pointer)
     {
-        const Mu::StringType* stype =
-            static_cast<const Mu::StringType*>(NODE_THIS.type());
+        const Mu::StringType* stype = static_cast<const Mu::StringType*>(NODE_THIS.type());
         const Symbol* symbol = NODE_ARG_OBJECT(0, const Symbol);
         if (!symbol)
             throw NilArgumentException();
@@ -1149,8 +959,7 @@ namespace Mu
     NODE_IMPLEMENTATION(RuntimeModule::symbol_documentation, Pointer)
     {
         Process* p = NODE_THREAD.process();
-        const Mu::StringType* stype =
-            static_cast<const Mu::StringType*>(NODE_THIS.type());
+        const Mu::StringType* stype = static_cast<const Mu::StringType*>(NODE_THIS.type());
 
         const Symbol* symbol = NODE_ARG_OBJECT(0, const Symbol);
         if (!symbol)
@@ -1179,8 +988,7 @@ namespace Mu
 
         List list(p, ltype);
 
-        for (const Symbol* s = symbol->firstOverload(); s;
-             s = s->nextOverload())
+        for (const Symbol* s = symbol->firstOverload(); s; s = s->nextOverload())
         {
             list.append(s);
         }
@@ -1266,8 +1074,7 @@ namespace Mu
         if (!symbol)
             throw NilArgumentException();
 
-        if (const ParameterVariable* v =
-                dynamic_cast<const ParameterVariable*>(symbol))
+        if (const ParameterVariable* v = dynamic_cast<const ParameterVariable*>(symbol))
         {
             NODE_RETURN(Pointer(v));
         }
@@ -1291,12 +1098,9 @@ namespace Mu
         if (!f)
             throw NilArgumentException();
 
-        const TupleType* ttype =
-            static_cast<const TupleType*>(NODE_THIS.type());
-        const ListType* lttype =
-            static_cast<const ListType*>(ttype->fieldType(1));
-        const ListType* lptype =
-            static_cast<const ListType*>(ttype->fieldType(2));
+        const TupleType* ttype = static_cast<const TupleType*>(NODE_THIS.type());
+        const ListType* lttype = static_cast<const ListType*>(ttype->fieldType(1));
+        const ListType* lptype = static_cast<const ListType*>(ttype->fieldType(2));
 
         ClassInstance* obj = ClassInstance::allocate(ttype);
         PPTuple* pp = obj->data<PPTuple>();
@@ -1325,14 +1129,11 @@ namespace Mu
         NODE_RETURN(obj);
     }
 
-    NODE_IMPLEMENTATION(RuntimeModule::parameter_default_value_as_string,
-                        Pointer)
+    NODE_IMPLEMENTATION(RuntimeModule::parameter_default_value_as_string, Pointer)
     {
         Process* p = NODE_THREAD.process();
-        const Mu::StringType* stype =
-            static_cast<const Mu::StringType*>(NODE_THIS.type());
-        const ParameterVariable* param =
-            NODE_ARG_OBJECT(0, const ParameterVariable);
+        const Mu::StringType* stype = static_cast<const Mu::StringType*>(NODE_THIS.type());
+        const ParameterVariable* param = NODE_ARG_OBJECT(0, const ParameterVariable);
         if (!param)
             throw NilArgumentException();
 
@@ -1409,12 +1210,9 @@ namespace Mu
         if (!symbol)
             throw NilArgumentException();
 
-        const TupleType* ttype =
-            static_cast<const TupleType*>(NODE_THIS.type());
-        const ListType* cttype =
-            static_cast<const ListType*>(ttype->fieldType(0));
-        const ListType* fttype =
-            static_cast<const ListType*>(ttype->fieldType(1));
+        const TupleType* ttype = static_cast<const TupleType*>(NODE_THIS.type());
+        const ListType* cttype = static_cast<const ListType*>(ttype->fieldType(0));
+        const ListType* fttype = static_cast<const ListType*>(ttype->fieldType(1));
 
         ClassInstance* obj = ClassInstance::allocate(ttype);
         TSITuple* pp = obj->data<TSITuple>();
@@ -1432,19 +1230,16 @@ namespace Mu
 
             if (const Function* F = c->findSymbolOfType<Function>(c->name()))
             {
-                for (const Function* fo = F->firstFunctionOverload(); fo;
-                     fo = fo->nextFunctionOverload())
+                for (const Function* fo = F->firstFunctionOverload(); fo; fo = fo->nextFunctionOverload())
                 {
                     if (fo->name() == c->name())
                         clist.append(fo);
                 }
             }
 
-            if (const Function* F =
-                    c->scope()->findSymbolOfType<Function>(c->name()))
+            if (const Function* F = c->scope()->findSymbolOfType<Function>(c->name()))
             {
-                for (const Function* fo = F->firstFunctionOverload(); fo;
-                     fo = fo->nextFunctionOverload())
+                for (const Function* fo = F->firstFunctionOverload(); fo; fo = fo->nextFunctionOverload())
                 {
                     if (fo->name() == c->name())
                         clist.append(fo);
@@ -1460,11 +1255,9 @@ namespace Mu
 
                 for (HT::Iterator it(table); it; ++it)
                 {
-                    if (const VariantTagType* t =
-                            dynamic_cast<const VariantTagType*>(*it))
+                    if (const VariantTagType* t = dynamic_cast<const VariantTagType*>(*it))
                     {
-                        if (const Function* C =
-                                t->findSymbolOfType<Function>(t->name()))
+                        if (const Function* C = t->findSymbolOfType<Function>(t->name()))
                         {
                             clist.append(C);
                         }
@@ -1500,8 +1293,7 @@ namespace Mu
         if (!symbol)
             throw NilArgumentException();
 
-        if (const SymbolicConstant* s =
-                dynamic_cast<const SymbolicConstant*>(symbol))
+        if (const SymbolicConstant* s = dynamic_cast<const SymbolicConstant*>(symbol))
         {
             NODE_RETURN(Pointer(s));
         }
@@ -1511,12 +1303,10 @@ namespace Mu
         }
     }
 
-    NODE_IMPLEMENTATION(RuntimeModule::symbolic_constant_value_as_string,
-                        Pointer)
+    NODE_IMPLEMENTATION(RuntimeModule::symbolic_constant_value_as_string, Pointer)
     {
         Process* p = NODE_THREAD.process();
-        const Mu::StringType* stype =
-            static_cast<const Mu::StringType*>(NODE_THIS.type());
+        const Mu::StringType* stype = static_cast<const Mu::StringType*>(NODE_THIS.type());
         const SymbolicConstant* sc = NODE_ARG_OBJECT(0, const SymbolicConstant);
         if (!sc)
             throw NilArgumentException();

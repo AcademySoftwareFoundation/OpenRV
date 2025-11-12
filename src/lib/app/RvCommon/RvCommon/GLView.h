@@ -31,16 +31,12 @@ namespace Rv
     public:
         typedef TwkUtil::Timer Timer;
 
-        GLView(QWidget* parent, QOpenGLContext* sharedContext, RvDocument* doc,
-               bool stereo = false, bool vsync = true, bool doubleBuffer = true,
-               int red = 0, int green = 0, int blue = 0, int alpha = 0,
-               bool noResize = true);
+        GLView(QWidget* parent, QOpenGLContext* sharedContext, RvDocument* doc, bool stereo = false, bool vsync = true,
+               bool doubleBuffer = true, int red = 0, int green = 0, int blue = 0, int alpha = 0, bool noResize = true);
         ~GLView();
 
-        static QSurfaceFormat rvGLFormat(bool stereo = false, bool vsync = true,
-                                         bool doubleBuffer = true, int red = 8,
-                                         int green = 8, int blue = 8,
-                                         int alpha = 8);
+        static QSurfaceFormat rvGLFormat(bool stereo = false, bool vsync = true, bool doubleBuffer = true, int red = 8, int green = 8,
+                                         int blue = 8, int alpha = 8);
 
         void absolutePosition(int& x, int& y) const;
 

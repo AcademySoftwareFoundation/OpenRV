@@ -28,8 +28,7 @@ namespace Mu
         //  Constructors
         //
 
-        QPaintDeviceType(Context* context, const char* name,
-                         Class* superClass = 0);
+        QPaintDeviceType(Context* context, const char* name, Class* superClass = 0);
         virtual ~QPaintDeviceType();
 
         //

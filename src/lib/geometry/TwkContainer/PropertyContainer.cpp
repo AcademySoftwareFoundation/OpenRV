@@ -33,8 +33,7 @@ namespace TwkContainer
         m_components.clear();
     }
 
-    void PropertyContainer::parseFullName(const string& fullname,
-                                          StringVector& parts)
+    void PropertyContainer::parseFullName(const string& fullname, StringVector& parts)
     {
         algorithm::split(parts, fullname, is_any_of(string(".")));
     }
@@ -55,8 +54,7 @@ namespace TwkContainer
         {
             if (m_components[i]->isCopyable())
             {
-                if (Component* o =
-                        c->component(m_components[i]->name().c_str()))
+                if (Component* o = c->component(m_components[i]->name().c_str()))
                 {
                     c->remove(o);
                     delete o;
@@ -79,8 +77,7 @@ namespace TwkContainer
         {
             if (m_components[i]->isCopyable())
             {
-                if (Component* o =
-                        c->component(m_components[i]->name().c_str()))
+                if (Component* o = c->component(m_components[i]->name().c_str()))
                 {
                     c->remove(o);
                     delete o;
@@ -119,9 +116,7 @@ namespace TwkContainer
                 }
                 catch (TypeMismatchExc&)
                 {
-                    errors << endl
-                           << "ERROR: copying " << container->name() << "."
-                           << c->name() << endl;
+                    errors << endl << "ERROR: copying " << container->name() << "." << c->name() << endl;
                 }
             }
         }
@@ -135,10 +130,7 @@ namespace TwkContainer
         // nothing
     }
 
-    PropertyContainer* PropertyContainer::emptyContainer() const
-    {
-        return new PropertyContainer;
-    }
+    PropertyContainer* PropertyContainer::emptyContainer() const { return new PropertyContainer; }
 
     void PropertyContainer::add(Component* c)
     {
@@ -146,8 +138,7 @@ namespace TwkContainer
         {
             if (m_components[i]->name() == c->name())
             {
-                throw UnexpectedExc(
-                    ", component with same name already exists");
+                throw UnexpectedExc(", component with same name already exists");
             }
         }
 
@@ -157,8 +148,7 @@ namespace TwkContainer
 
     void PropertyContainer::remove(Component* c)
     {
-        Components::iterator i =
-            std::find(m_components.begin(), m_components.end(), c);
+        Components::iterator i = std::find(m_components.begin(), m_components.end(), c);
 
         if (i != m_components.end())
         {
@@ -166,9 +156,7 @@ namespace TwkContainer
         }
     }
 
-    Component* PropertyContainer::createComponent(NameIterator i,
-                                                  NameIterator end,
-                                                  bool synchronized)
+    Component* PropertyContainer::createComponent(NameIterator i, NameIterator end, bool synchronized)
     {
         if (Component* c = component(*i))
         {
@@ -182,16 +170,14 @@ namespace TwkContainer
         }
     }
 
-    Component* PropertyContainer::createComponent(const string& name,
-                                                  bool synchronized)
+    Component* PropertyContainer::createComponent(const string& name, bool synchronized)
     {
         StringVector parts;
         parseFullName(name, parts);
         return createComponent(parts.begin(), parts.end(), synchronized);
     }
 
-    Component* PropertyContainer::component(NameIterator begin,
-                                            NameIterator end)
+    Component* PropertyContainer::component(NameIterator begin, NameIterator end)
     {
         if (begin == end)
             return 0;
@@ -207,8 +193,7 @@ namespace TwkContainer
         return 0;
     }
 
-    const Component* PropertyContainer::component(NameIterator begin,
-                                                  NameIterator end) const
+    const Component* PropertyContainer::component(NameIterator begin, NameIterator end) const
     {
         if (begin == end)
             return 0;
@@ -274,8 +259,7 @@ namespace TwkContainer
         }
     }
 
-    const Property* PropertyContainer::find(NameIterator begin,
-                                            NameIterator end) const
+    const Property* PropertyContainer::find(NameIterator begin, NameIterator end) const
     {
         if (begin == end)
             return 0;
@@ -315,8 +299,7 @@ namespace TwkContainer
         return find(parts.begin(), parts.end());
     }
 
-    Property* PropertyContainer::find(const std::string& comp,
-                                      const std::string& name)
+    Property* PropertyContainer::find(const std::string& comp, const std::string& name)
     {
         if (Component* c = component(comp))
         {
@@ -326,8 +309,7 @@ namespace TwkContainer
         return 0;
     }
 
-    const Property* PropertyContainer::find(const std::string& comp,
-                                            const std::string& name) const
+    const Property* PropertyContainer::find(const std::string& comp, const std::string& name) const
     {
         if (const Component* c = component(comp))
         {
@@ -403,8 +385,7 @@ namespace TwkContainer
     {
         for (int i = 0; i < m_components.size(); i++)
         {
-            if (m_components[i] == c
-                || m_components[i]->hasComponentRecursive(c))
+            if (m_components[i] == c || m_components[i]->hasComponentRecursive(c))
                 return true;
         }
 
@@ -430,8 +411,7 @@ namespace TwkContainer
         }
     }
 
-    bool PropertyContainer::propertyPathInternal(const Property* p,
-                                                 ConstComponents& comps) const
+    bool PropertyContainer::propertyPathInternal(const Property* p, ConstComponents& comps) const
     {
         for (size_t i = 0; i < m_components.size(); i++)
         {
@@ -443,16 +423,14 @@ namespace TwkContainer
         return false;
     }
 
-    PropertyContainer::ConstComponents
-    PropertyContainer::propertyPath(const Property* p) const
+    PropertyContainer::ConstComponents PropertyContainer::propertyPath(const Property* p) const
     {
         ConstComponents comps;
         propertyPathInternal(p, comps);
         return comps;
     }
 
-    string PropertyContainer::propertyFullName(const Property* p,
-                                               bool withContainer) const
+    string PropertyContainer::propertyFullName(const Property* p, bool withContainer) const
     {
         ostringstream str;
         ConstComponents comps;
@@ -462,8 +440,7 @@ namespace TwkContainer
             if (withContainer)
                 str << name() << ".";
 
-            for (ConstComponents::const_reverse_iterator i = comps.rbegin();
-                 i != comps.rend(); ++i)
+            for (ConstComponents::const_reverse_iterator i = comps.rbegin(); i != comps.rend(); ++i)
             {
                 str << (*i)->name() << ".";
             }
@@ -480,30 +457,17 @@ namespace TwkContainer
 
     std::string name(const PropertyContainer& g) { return g.name(); }
 
-    void setName(PropertyContainer& g, const std::string& name)
-    {
-        g.setName(name);
-    }
+    void setName(PropertyContainer& g, const std::string& name) { g.setName(name); }
 
-    void setProtocol(PropertyContainer& g, const std::string& name)
-    {
-        g.setProtocol(name);
-    }
+    void setProtocol(PropertyContainer& g, const std::string& name) { g.setProtocol(name); }
 
-    void setProtocolVersion(PropertyContainer& g, int version)
-    {
-        g.setProtocolVersion((unsigned int)version);
-    }
+    void setProtocolVersion(PropertyContainer& g, int version) { g.setProtocolVersion((unsigned int)version); }
 
-    int protocolVersion(const PropertyContainer& g)
-    {
-        return (int)g.protocolVersion();
-    }
+    int protocolVersion(const PropertyContainer& g) { return (int)g.protocolVersion(); }
 
     std::string protocol(const PropertyContainer& g) { return g.protocol(); }
 
-    PropertyContainer*
-    PropertyContainer::shallowDiffCopy(const PropertyContainer* ref)
+    PropertyContainer* PropertyContainer::shallowDiffCopy(const PropertyContainer* ref)
     {
         PropertyContainer* pc = new PropertyContainer();
         Components& comps = components();
@@ -516,9 +480,7 @@ namespace TwkContainer
             {
                 if (const Component* refcomp = ref->component(c->name()))
                 {
-                    Component* newc = c->name() == "object"
-                                          ? c->shallowCopy()
-                                          : c->shallowDiffCopy(refcomp);
+                    Component* newc = c->name() == "object" ? c->shallowCopy() : c->shallowDiffCopy(refcomp);
 
                     if (newc->properties().empty())
                     {

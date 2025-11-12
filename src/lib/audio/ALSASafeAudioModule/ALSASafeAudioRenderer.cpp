@@ -181,23 +181,16 @@ namespace IPCore
     namespace
     {
 
-        template <typename T> T toType(float a)
-        {
-            return T(double(a) * double(numeric_limits<T>::max()));
-        }
+        template <typename T> T toType(float a) { return T(double(a) * double(numeric_limits<T>::max())); }
 
     } // namespace
 
-    static void alsaErrorHandler(const char* file, int line,
-                                 const char* function, int err, const char* fmt,
-                                 ...)
+    static void alsaErrorHandler(const char* file, int line, const char* function, int err, const char* fmt, ...)
     {
         // don't print out ALSA asserts
     }
 
-    static int snd_pcm_open_real_hard(snd_pcm_t** pcm, const char* name,
-                                      snd_pcm_stream_t stream, int mode,
-                                      size_t iterations = 1)
+    static int snd_pcm_open_real_hard(snd_pcm_t** pcm, const char* name, snd_pcm_stream_t stream, int mode, size_t iterations = 1)
     {
         //
         //  Try REAL HARD to open the device. If it doesn't open right
@@ -353,8 +346,7 @@ namespace IPCore
                 snd_pcm_info_t* info = 0;
                 snd_pcm_info_alloca(&info);
 
-                for (int device = -1;
-                     snd_ctl_pcm_next_device(ctl, &device) >= 0 && device >= 0;)
+                for (int device = -1; snd_ctl_pcm_next_device(ctl, &device) >= 0 && device >= 0;)
                 {
                     snd_pcm_info_set_device(info, device);
                     snd_pcm_info_set_subdevice(info, 0);
@@ -364,9 +356,7 @@ namespace IPCore
                     {
                         ostringstream fullname;
 
-                        fullname << cardname << ": "
-                                 << snd_pcm_info_get_name(info) << " ("
-                                 << hwcard.str() << "," << device << ")";
+                        fullname << cardname << ": " << snd_pcm_info_get_name(info) << " (" << hwcard.str() << "," << device << ")";
 
                         ostringstream dname;
                         dname << hwcard.str() << "," << device;
@@ -488,14 +478,11 @@ namespace IPCore
         //
 
         int channelsCount = TwkAudio::channelsCount(state.layout);
-        m_abuffer.reconfigure(state.framesPerBuffer, state.layout,
-                              Time(state.rate), 0, 0);
-        m_outBuffer.resize(m_abuffer.size() * channelsCount
-                           * formatSizeInBytes(state.format));
+        m_abuffer.reconfigure(state.framesPerBuffer, state.layout, Time(state.rate), 0, 0);
+        m_outBuffer.resize(m_abuffer.size() * channelsCount * formatSizeInBytes(state.format));
     }
 
-    void ALSASafeAudioRenderer::availableLayouts(const Device& d,
-                                                 LayoutsVector& layouts)
+    void ALSASafeAudioRenderer::availableLayouts(const Device& d, LayoutsVector& layouts)
     {
         layouts.clear();
 
@@ -503,8 +490,7 @@ namespace IPCore
         layouts.push_back(TwkAudio::Stereo_2);
     }
 
-    void ALSASafeAudioRenderer::availableFormats(const Device& d,
-                                                 FormatVector& formats)
+    void ALSASafeAudioRenderer::availableFormats(const Device& d, FormatVector& formats)
     {
         //
         //  The base class ensures that this function is not called when a
@@ -512,8 +498,7 @@ namespace IPCore
         //
 
         formats.clear();
-        static Format allformats[4] = {Float32Format, Int32Format, Int16Format,
-                                       Int8Format};
+        static Format allformats[4] = {Float32Format, Int32Format, Int16Format, Int8Format};
 
         const ALSADevice& ad = m_alsaDevices[d.index];
         const string& deviceName = ad.name;
@@ -525,10 +510,7 @@ namespace IPCore
             snd_pcm_t* pcm;
             int err;
 
-            if ((err = snd_pcm_open_real_hard(&pcm, deviceName.c_str(),
-                                              SND_PCM_STREAM_PLAYBACK,
-                                              SND_PCM_NONBLOCK, 10))
-                == 0)
+            if ((err = snd_pcm_open_real_hard(&pcm, deviceName.c_str(), SND_PCM_STREAM_PLAYBACK, SND_PCM_NONBLOCK, 10)) == 0)
             {
                 snd_pcm_hw_params_t* params;
                 snd_pcm_hw_params_alloca(&params);
@@ -555,12 +537,9 @@ namespace IPCore
                 }
 
                 int dir = 0;
-                snd_pcm_hw_params_set_access(pcm, params,
-                                             SND_PCM_ACCESS_RW_INTERLEAVED);
-                bool ok =
-                    snd_pcm_hw_params_set_format(pcm, params, alsaformat) == 0;
-                snd_pcm_hw_params_set_channels(
-                    pcm, params, TwkAudio::channelsCount(m_parameters.layout));
+                snd_pcm_hw_params_set_access(pcm, params, SND_PCM_ACCESS_RW_INTERLEAVED);
+                bool ok = snd_pcm_hw_params_set_format(pcm, params, alsaformat) == 0;
+                snd_pcm_hw_params_set_channels(pcm, params, TwkAudio::channelsCount(m_parameters.layout));
                 snd_pcm_hw_params_set_rate_near(pcm, params, &rrate, &dir);
 
                 if (ok && rrate == m_parameters.rate)
@@ -570,8 +549,7 @@ namespace IPCore
                     snd_pcm_uframes_t buffer_size = 0;
 
                     snd_pcm_hw_params_set_periods(pcm, params, periods, 0);
-                    snd_pcm_hw_params_set_buffer_size(
-                        pcm, params, (period_size * periods) >> 2);
+                    snd_pcm_hw_params_set_buffer_size(pcm, params, (period_size * periods) >> 2);
 
                     if (snd_pcm_hw_params(pcm, params) >= 0)
                     {
@@ -592,8 +570,7 @@ namespace IPCore
         }
     }
 
-    void ALSASafeAudioRenderer::availableRates(const Device& device,
-                                               Format format, RateVector& rates)
+    void ALSASafeAudioRenderer::availableRates(const Device& device, Format format, RateVector& rates)
     {
         //
         //  The base class ensures that this function is not called when a
@@ -603,9 +580,8 @@ namespace IPCore
         rates.clear();
 
         static double standardSampleRates[] = {
-            8000.0,  9600.0,  11025.0,  12000.0, 16000.0,
-            22050.0, 24000.0, 32000.0,  44100.0, 48000.0,
-            88200.0, 96000.0, 192000.0, -1 /* negative terminated  list */
+            8000.0,  9600.0,  11025.0, 12000.0, 16000.0, 22050.0,  24000.0,
+            32000.0, 44100.0, 48000.0, 88200.0, 96000.0, 192000.0, -1 /* negative terminated  list */
         };
 
         const ALSADevice& ad = m_alsaDevices[device.index];
@@ -617,10 +593,7 @@ namespace IPCore
             snd_pcm_t* pcm;
             int err;
 
-            if ((err = snd_pcm_open_real_hard(&pcm, deviceName.c_str(),
-                                              SND_PCM_STREAM_PLAYBACK,
-                                              SND_PCM_NONBLOCK, 10))
-                == 0)
+            if ((err = snd_pcm_open_real_hard(&pcm, deviceName.c_str(), SND_PCM_STREAM_PLAYBACK, SND_PCM_NONBLOCK, 10)) == 0)
             {
                 snd_pcm_hw_params_t* params;
                 snd_pcm_hw_params_alloca(&params);
@@ -651,11 +624,9 @@ namespace IPCore
                 //
 
                 int dir = 0;
-                snd_pcm_hw_params_set_access(pcm, params,
-                                             SND_PCM_ACCESS_RW_INTERLEAVED);
+                snd_pcm_hw_params_set_access(pcm, params, SND_PCM_ACCESS_RW_INTERLEAVED);
                 snd_pcm_hw_params_set_format(pcm, params, alsaformat);
-                snd_pcm_hw_params_set_channels(
-                    pcm, params, TwkAudio::channelsCount(m_parameters.layout));
+                snd_pcm_hw_params_set_channels(pcm, params, TwkAudio::channelsCount(m_parameters.layout));
                 snd_pcm_hw_params_set_rate_near(pcm, params, &rrate, &dir);
 
                 if (rrate == rate)
@@ -701,32 +672,22 @@ namespace IPCore
                 alsaDeviceName = ad.name;
             }
 
-            if ((err = snd_pcm_open_real_hard(&m_pcm, alsaDeviceName.c_str(),
-                                              SND_PCM_STREAM_PLAYBACK,
-                                              SND_PCM_NONBLOCK))
-                < 0)
+            if ((err = snd_pcm_open_real_hard(&m_pcm, alsaDeviceName.c_str(), SND_PCM_STREAM_PLAYBACK, SND_PCM_NONBLOCK)) < 0)
             {
-                cerr << "WARNING: ALSA: Playback open error (" << err
-                     << "): " << snd_strerror(err) << endl;
+                cerr << "WARNING: ALSA: Playback open error (" << err << "): " << snd_strerror(err) << endl;
 
                 if (alsaDeviceName != "default" && err != -16) /* busy */
                 {
-                    cerr << "WARNING: ALSA: trying default instead of "
-                         << alsaDeviceName << endl;
+                    cerr << "WARNING: ALSA: trying default instead of " << alsaDeviceName << endl;
 
-                    if ((err = snd_pcm_open_real_hard(&m_pcm, "default",
-                                                      SND_PCM_STREAM_PLAYBACK,
-                                                      SND_PCM_NONBLOCK))
-                        < 0)
+                    if ((err = snd_pcm_open_real_hard(&m_pcm, "default", SND_PCM_STREAM_PLAYBACK, SND_PCM_NONBLOCK)) < 0)
                     {
-                        cerr << "WARNING: ALSA: no luck with default either"
-                             << endl;
+                        cerr << "WARNING: ALSA: no luck with default either" << endl;
                         setErrorCondition("Unable to open an audio device");
                     }
                     else
                     {
-                        cerr << "WARNING: ALSA: using default device instead"
-                             << endl;
+                        cerr << "WARNING: ALSA: using default device instead" << endl;
                         m_deviceState.device = "default";
                         alsaDeviceName = "default";
                     }
@@ -768,9 +729,7 @@ namespace IPCore
             unsigned int rrate = (unsigned int)m_parameters.rate;
             int dir = 0;
 
-            if (snd_pcm_hw_params_set_access(m_pcm, params,
-                                             SND_PCM_ACCESS_RW_INTERLEAVED)
-                < 0)
+            if (snd_pcm_hw_params_set_access(m_pcm, params, SND_PCM_ACCESS_RW_INTERLEAVED) < 0)
             {
                 cerr << "ERROR: ALSA: access (interleaved) failed - can't "
                         "continue"
@@ -783,19 +742,15 @@ namespace IPCore
 
             if (snd_pcm_hw_params_set_format(m_pcm, params, alsaformat) < 0)
             {
-                if (snd_pcm_hw_params_set_format(m_pcm, params,
-                                                 SND_PCM_FORMAT_S16_LE)
-                    >= 0)
+                if (snd_pcm_hw_params_set_format(m_pcm, params, SND_PCM_FORMAT_S16_LE) >= 0)
                 {
                     if (debug)
-                        cerr << "WARNING: ALSA: format falling back to Int16"
-                             << endl;
+                        cerr << "WARNING: ALSA: format falling back to Int16" << endl;
                     m_parameters.format = Int16Format;
                 }
                 else
                 {
-                    cerr << "ERROR: ALSA: format failed - can't continue"
-                         << endl;
+                    cerr << "ERROR: ALSA: format failed - can't continue" << endl;
                     outputParameters(m_parameters);
                     snd_pcm_close(m_pcm);
                     m_pcm = 0;
@@ -805,22 +760,18 @@ namespace IPCore
 
             int channelsCount = TwkAudio::channelsCount(m_parameters.layout);
 
-            if (snd_pcm_hw_params_set_channels(m_pcm, params, channelsCount)
-                < 0)
+            if (snd_pcm_hw_params_set_channels(m_pcm, params, channelsCount) < 0)
             {
-                cerr << "ERROR: ALSA: can't use " << channelsCount
-                     << " channels -- can't continue" << endl;
+                cerr << "ERROR: ALSA: can't use " << channelsCount << " channels -- can't continue" << endl;
                 outputParameters(m_parameters);
                 snd_pcm_close(m_pcm);
                 m_pcm = 0;
                 setErrorCondition("unable to configure audio device");
             }
 
-            if (snd_pcm_hw_params_set_rate_near(m_pcm, params, &rrate, &dir)
-                < 0)
+            if (snd_pcm_hw_params_set_rate_near(m_pcm, params, &rrate, &dir) < 0)
             {
-                cerr << "ERROR: ALSA: unable to set rate near " << rrate
-                     << " -- can't continue" << endl;
+                cerr << "ERROR: ALSA: unable to set rate near " << rrate << " -- can't continue" << endl;
                 outputParameters(m_parameters);
                 snd_pcm_close(m_pcm);
                 m_pcm = 0;
@@ -834,21 +785,17 @@ namespace IPCore
             //
 
             unsigned int periods = 2;
-            m_periodSize = snd_pcm_uframes_t(double(512) / double(48000.0)
-                                             * double(m_parameters.rate));
+            m_periodSize = snd_pcm_uframes_t(double(512) / double(48000.0) * double(m_parameters.rate));
             m_bufferSize = m_periodSize * periods * channelsCount * dataSize;
             dir = 0;
 
             snd_pcm_hw_params_set_periods(m_pcm, params, periods, 0);
-            snd_pcm_hw_params_set_period_size_near(m_pcm, params, &m_periodSize,
-                                                   &dir);
-            snd_pcm_hw_params_set_buffer_size_near(m_pcm, params,
-                                                   &m_bufferSize);
+            snd_pcm_hw_params_set_period_size_near(m_pcm, params, &m_periodSize, &dir);
+            snd_pcm_hw_params_set_buffer_size_near(m_pcm, params, &m_bufferSize);
 
             if ((err = snd_pcm_hw_params(m_pcm, params)) < 0)
             {
-                cerr << "ERROR: ALSA: params failed: " << snd_strerror(err)
-                     << endl;
+                cerr << "ERROR: ALSA: params failed: " << snd_strerror(err) << endl;
                 snd_pcm_close(m_pcm);
                 m_pcm = 0;
                 setErrorCondition("unable to configure audio device");
@@ -872,10 +819,7 @@ namespace IPCore
             nstate.format = m_parameters.format;
             nstate.rate = rrate;
             nstate.layout = m_parameters.layout;
-            nstate.latency =
-                m_parameters.latency
-                + m_periodSize * periods
-                      / (nstate.rate * sizeof(short) * channelsCount);
+            nstate.latency = m_parameters.latency + m_periodSize * periods / (nstate.rate * sizeof(short) * channelsCount);
             // THIS WILL BLOW IT UP IF ITS NOT 512
             // nstate.framesPerBuffer = 2048;
             nstate.framesPerBuffer = m_parameters.framesPerBuffer;
@@ -886,8 +830,7 @@ namespace IPCore
                 cout << "DEBUG: alsa buffer_size = " << m_bufferSize << endl
                      << "DEBUG: alsa period_size = " << m_periodSize << endl
                      << "DEBUG: alsa periods = " << periods << endl
-                     << "DEBUG: alsa device latency = " << nstate.latency
-                     << endl;
+                     << "DEBUG: alsa device latency = " << nstate.latency << endl;
             }
 
             //
@@ -966,8 +909,7 @@ namespace IPCore
 
         AudioBuffer buffer(state.framesPerBuffer, state.layout, state.rate);
 
-        m_abuffer.reconfigure(state.framesPerBuffer, state.layout,
-                              Time(state.rate));
+        m_abuffer.reconfigure(state.framesPerBuffer, state.layout, Time(state.rate));
 
         const size_t formatSize = formatSizeInBytes(m_parameters.format);
         m_outBuffer.resize(state.framesPerBuffer * channelsCount * formatSize);
@@ -1003,11 +945,8 @@ namespace IPCore
 
         m_startSample = 0;
 
-        for (size_t count = 0;
-             pcmState != SND_PCM_STATE_DISCONNECTED
-             && pcmState != SND_PCM_STATE_XRUN
-             && (isPlaying() || (m_startSample % m_periodSize != 0)
-                 || m_parameters.holdOpen);
+        for (size_t count = 0; pcmState != SND_PCM_STATE_DISCONNECTED && pcmState != SND_PCM_STATE_XRUN
+                               && (isPlaying() || (m_startSample % m_periodSize != 0) || m_parameters.holdOpen);
              count++)
         {
             //
@@ -1036,9 +975,7 @@ namespace IPCore
                     //  (i.e. latencyFrames > 0)
                     //
 
-                    m_deviceState.latency =
-                        m_parameters.latency
-                        + latencyFrames / double(state.rate);
+                    m_deviceState.latency = m_parameters.latency + latencyFrames / double(state.rate);
                 }
                 else
                 {
@@ -1050,9 +987,7 @@ namespace IPCore
             //  Call the evaluation function
             //
 
-            buffer.reconfigure(state.framesPerBuffer, state.layout,
-                               Time(state.rate),
-                               samplesToTime(m_startSample, state.rate));
+            buffer.reconfigure(state.framesPerBuffer, state.layout, Time(state.rate), samplesToTime(m_startSample, state.rate));
 
             buffer.zero();
 
@@ -1075,21 +1010,15 @@ namespace IPCore
                 break;
 
             case Int16Format:
-                transform(buffer.pointer(),
-                          buffer.pointer() + buffer.sizeInFloats(), (short*)out,
-                          toType<short>);
+                transform(buffer.pointer(), buffer.pointer() + buffer.sizeInFloats(), (short*)out, toType<short>);
                 break;
 
             case Int32Format:
-                transform(buffer.pointer(),
-                          buffer.pointer() + buffer.sizeInFloats(),
-                          (signed int*)out, toType<signed int>);
+                transform(buffer.pointer(), buffer.pointer() + buffer.sizeInFloats(), (signed int*)out, toType<signed int>);
                 break;
 
             case Int8Format:
-                transform(buffer.pointer(),
-                          buffer.pointer() + buffer.sizeInFloats(),
-                          (signed char*)out, toType<signed char>);
+                transform(buffer.pointer(), buffer.pointer() + buffer.sizeInFloats(), (signed char*)out, toType<signed char>);
                 break;
             }
 
@@ -1115,27 +1044,20 @@ namespace IPCore
             //  of time.
             //
 
-            for (size_t wcount = 0; (pcmState == SND_PCM_STATE_RUNNING
-                                     || pcmState == SND_PCM_STATE_PREPARED)
-                                    && total < buffer.size() && frames >= 0
-                                    && wcount < buffer.size();
+            for (size_t wcount = 0; (pcmState == SND_PCM_STATE_RUNNING || pcmState == SND_PCM_STATE_PREPARED) && total < buffer.size()
+                                    && frames >= 0 && wcount < buffer.size();
                  wcount++)
             {
                 if (!m_pcm)
                     return;
                 if (debug)
                 {
-                    cerr << "INFO: pcm_writei: wcount " << wcount << ", count "
-                         << count << ", total " << total << ", chan "
-                         << channelsCount << ", formatSize " << formatSize
-                         << ", bufferSize " << buffer.size() << endl;
+                    cerr << "INFO: pcm_writei: wcount " << wcount << ", count " << count << ", total " << total << ", chan "
+                         << channelsCount << ", formatSize " << formatSize << ", bufferSize " << buffer.size() << endl;
                 }
-                frames = snd_pcm_writei(
-                    m_pcm, out + (total * channelsCount * formatSize),
-                    buffer.size() - total);
+                frames = snd_pcm_writei(m_pcm, out + (total * channelsCount * formatSize), buffer.size() - total);
                 if (debug)
-                    cerr << "INFO: pcm_writei complete, frames " << frames
-                         << endl;
+                    cerr << "INFO: pcm_writei complete, frames " << frames << endl;
 
                 if (frames >= 0)
                 {
@@ -1151,8 +1073,7 @@ namespace IPCore
 
                     if (debug)
                     {
-                        cerr << "ERROR: ASLA: write failed (" << frames
-                             << "): " << snd_strerror(frames) << " -- ";
+                        cerr << "ERROR: ASLA: write failed (" << frames << "): " << snd_strerror(frames) << " -- ";
 
                         switch (frames)
                         {

@@ -100,8 +100,7 @@ namespace TwkMovie
                 if (i)
                     str << "|";
                 const FBInfo::ViewInfo& vi = v[i];
-                str << vi.name << '|' << encodeLayerInfoVector(vi.layers) << '|'
-                    << encodeChannelInfoVector(vi.otherChannels);
+                str << vi.name << '|' << encodeLayerInfoVector(vi.layers) << '|' << encodeChannelInfoVector(vi.otherChannels);
             }
 
             return str.str();
@@ -137,8 +136,7 @@ namespace TwkMovie
 
     // static ofstream fout("log");
 
-    SideCar::SideCar(const string& cname, const string& rname, size_t pid,
-                     MovieIO* io)
+    SideCar::SideCar(const string& cname, const string& rname, size_t pid, MovieIO* io)
         : m_launchProcessPID(pid)
         , m_io(io)
         , m_commandQueue(interprocess::open_only, cname.c_str())
@@ -217,17 +215,14 @@ namespace TwkMovie
             *m_buffer = 0;
             returnSize = 0;
 
-            bool timedout =
-                !m_commandQueue.timed_receive(m_buffer, Message::SizeInBytes(),
-                                              returnSize, priority, timeout);
+            bool timedout = !m_commandQueue.timed_receive(m_buffer, Message::SizeInBytes(), returnSize, priority, timeout);
 
             if (returnSize == 0)
                 m_buffer[0] = 0;
 
             if (timedout)
             {
-                boost::this_thread::sleep(millisec(
-                    std::min(timeoutCount * timeoutCount, size_t(500))));
+                boost::this_thread::sleep(millisec(std::min(timeoutCount * timeoutCount, size_t(500))));
                 timeoutCount++;
             }
         }
@@ -237,8 +232,7 @@ namespace TwkMovie
             *m_buffer = 0;
             returnSize = 0;
 
-            m_commandQueue.receive(m_buffer, Message::SizeInBytes(), returnSize,
-                                   priority);
+            m_commandQueue.receive(m_buffer, Message::SizeInBytes(), returnSize, priority);
             if (returnSize == 0)
                 m_buffer[0] = 0;
         }
@@ -302,8 +296,7 @@ namespace TwkMovie
                     {
                         ostringstream str;
                         str << m_sharedObjectName << "|" << 0 // image offset
-                            << "|" << m_imageRegionSize << "|" << m_audioOffset
-                            << "|" << m_audioRegionSize;
+                            << "|" << m_imageRegionSize << "|" << m_audioOffset << "|" << m_audioRegionSize;
 
                         respond(Message::FileOpened(), str.str());
                     }
@@ -448,10 +441,8 @@ namespace TwkMovie
 
         const size_t attrSize = m_info.proxy.attributes().size() * 256 * 2;
         const size_t imageSize = attrSize + pixelSize;
-        const size_t audioSize = 4096 * m_info.audioChannels.size()
-                                 * (m_info.audio ? 1 : 0) * sizeof(float);
-        const size_t overhead =
-            4096 * 11; // to account for unexpected huge attr sizes
+        const size_t audioSize = 4096 * m_info.audioChannels.size() * (m_info.audio ? 1 : 0) * sizeof(float);
+        const size_t overhead = 4096 * 11; // to account for unexpected huge attr sizes
 
         size_t totalSize = pixelSize + audioSize + overhead;
         totalSize -= totalSize % 4096;
@@ -469,8 +460,7 @@ namespace TwkMovie
 
             m_audioRegionSize = audioSize + 4096 - audioSize % 4096;
             m_audioOffset = totalSize - m_audioRegionSize;
-            m_audioRegion =
-                ((char*)m_sharedRegion->get_address()) + m_audioOffset;
+            m_audioRegion = ((char*)m_sharedRegion->get_address()) + m_audioOffset;
         }
 
         //
@@ -487,13 +477,11 @@ namespace TwkMovie
         //  Create a managed shared memory object and map the entire thing
         //
 
-        m_sharedObject = new SharedMemory(
-            interprocess::create_only, name.c_str(), interprocess::read_write);
+        m_sharedObject = new SharedMemory(interprocess::create_only, name.c_str(), interprocess::read_write);
         m_sharedObjectName = name;
         m_sharedObject->truncate(size);
 
-        m_sharedRegion =
-            new MappedRegion(*m_sharedObject, interprocess::read_write);
+        m_sharedRegion = new MappedRegion(*m_sharedObject, interprocess::read_write);
         m_sharedRegionSize = size;
     }
 
@@ -530,8 +518,7 @@ namespace TwkMovie
         string layers = Message::encodeStringVector(m_info.layers);
         string audioChannels = encodeAudioChannelsVector(m_info.audioChannels);
 
-        str << "@" << channelInfos << "@" << viewInfos << "@" << views << "@"
-            << layers << "@" << audioChannels;
+        str << "@" << channelInfos << "@" << viewInfos << "@" << views << "@" << layers << "@" << audioChannels;
 
         //
         //  Write the proxy fb to the image area
@@ -623,8 +610,7 @@ namespace TwkMovie
         iarg >> layoutArg >> pipe >> rate >> pipe >> bufferSize;
 
         TwkAudio::Layout layout = TwkAudio::Layout(layoutArg);
-        m_audioBuffer.reconfigure(bufferSize, TwkAudio::layoutChannels(layout),
-                                  rate);
+        m_audioBuffer.reconfigure(bufferSize, TwkAudio::layoutChannels(layout), rate);
 
         Movie::AudioConfiguration conf(rate, layout, bufferSize);
         m_reader->audioConfigure(conf);
@@ -644,13 +630,10 @@ namespace TwkMovie
 
         Movie::AudioReadRequest request(startTime, duration, margin);
 
-        m_audioBuffer.reconfigure(m_audioBuffer.size(),
-                                  m_audioBuffer.channels(),
-                                  m_audioBuffer.rate(), startTime, margin);
+        m_audioBuffer.reconfigure(m_audioBuffer.size(), m_audioBuffer.channels(), m_audioBuffer.rate(), startTime, margin);
 
         size_t n = m_reader->audioFillBuffer(request, m_audioBuffer);
-        memcpy(m_audioRegion, m_audioBuffer.pointer(),
-               m_audioBuffer.sizeInBytes());
+        memcpy(m_audioRegion, m_audioBuffer.pointer(), m_audioBuffer.sizeInBytes());
 
         return n;
     }

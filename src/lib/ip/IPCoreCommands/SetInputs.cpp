@@ -14,18 +14,14 @@ namespace IPCore
     {
         using namespace std;
 
-        SetInputsInfo::SetInputsInfo(const std::string& name,
-                                     TwkApp::CommandInfo::UndoType type)
+        SetInputsInfo::SetInputsInfo(const std::string& name, TwkApp::CommandInfo::UndoType type)
             : CommandInfo(name, type)
         {
         }
 
         SetInputsInfo::~SetInputsInfo() {}
 
-        TwkApp::Command* SetInputsInfo::newCommand() const
-        {
-            return new SetInputs(this);
-        }
+        TwkApp::Command* SetInputsInfo::newCommand() const { return new SetInputs(this); }
 
         //----------------------------------------------------------------------
 
@@ -37,8 +33,7 @@ namespace IPCore
 
         SetInputs::~SetInputs() {}
 
-        void SetInputs::setArgs(IPGraph* graph, const string& name,
-                                const StringVector& inputs)
+        void SetInputs::setArgs(IPGraph* graph, const string& name, const StringVector& inputs)
         {
             m_graph = graph;
             m_name = name;

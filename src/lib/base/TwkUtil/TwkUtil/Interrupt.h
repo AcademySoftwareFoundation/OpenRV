@@ -77,10 +77,7 @@ namespace TwkUtil
 
         static bool isWorking() { return m_computations.size() != 0; }
 
-        static const Computation& currentComputation()
-        {
-            return m_computations.front();
-        }
+        static const Computation& currentComputation() { return m_computations.front(); }
 
         static void beginComputation(const std::string& message);
         static void continueComputation(float percent);
@@ -93,20 +90,11 @@ namespace TwkUtil
         static void addMessageFunc(MessageFuncs&, MessageFunc);
         static void removeMessageFunc(MessageFuncs&, MessageFunc);
 
-        static void addWarningFunc(MessageFunc m)
-        {
-            addMessageFunc(m_warningFuncs, m);
-        }
+        static void addWarningFunc(MessageFunc m) { addMessageFunc(m_warningFuncs, m); }
 
-        static void addErrorFunc(MessageFunc m)
-        {
-            addMessageFunc(m_errorFuncs, m);
-        }
+        static void addErrorFunc(MessageFunc m) { addMessageFunc(m_errorFuncs, m); }
 
-        static void addInfoFunc(MessageFunc m)
-        {
-            addMessageFunc(m_infoFuncs, m);
-        }
+        static void addInfoFunc(MessageFunc m) { addMessageFunc(m_infoFuncs, m); }
 
         //
         //  Messages: INFO, ERROR, WARNING

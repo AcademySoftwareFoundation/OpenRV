@@ -30,8 +30,7 @@
 #define TWK_ALLOCATE(T) ((T*)nedmalloc(sizeof(T)))
 #define TWK_ALLOCATE_ARRAY(T, n) ((T*)nedmalloc(n * sizeof(T)))
 #define TWK_ALLOCATE_PAGE_ALIGNED(T) ((T*)nedmemalign(4096, sizeof(T)))
-#define TWK_ALLOCATE_ARRAY_PAGE_ALIGNED(T, n) \
-    ((T*)nedmemalign(4096, n * sizeof(T)))
+#define TWK_ALLOCATE_ARRAY_PAGE_ALIGNED(T, n) ((T*)nedmemalign(4096, n * sizeof(T)))
 #define TWK_DEALLOCATE(p)      \
     {                          \
         if (p)                 \
@@ -59,8 +58,7 @@
     }
 #ifdef PLATFORM_LINUX
 #define TWK_ALLOCATE_PAGE_ALIGNED(T) ((T*)memalign(4096, sizeof(T)))
-#define TWK_ALLOCATE_ARRAY_PAGE_ALIGNED(T, n) \
-    ((T*)memalign(4096, sizeof(T) * n))
+#define TWK_ALLOCATE_ARRAY_PAGE_ALIGNED(T, n) ((T*)memalign(4096, sizeof(T) * n))
 #endif
 #if defined(PLATFORM_APPLE_MACH_BSD)
 #define TWK_ALLOCATE_PAGE_ALIGNED(T) ((T*)valloc(sizeof(T)))
@@ -68,18 +66,12 @@
 #endif
 #endif
 
-#define TWK_CLASS_NEW_DELETE(T)                      \
-    void* T::operator new(size_t s)                  \
-    {                                                \
-        return TWK_ALLOCATE_ARRAY(unsigned char, s); \
-    }                                                \
+#define TWK_CLASS_NEW_DELETE(T)                                                      \
+    void* T::operator new(size_t s) { return TWK_ALLOCATE_ARRAY(unsigned char, s); } \
     void T::operator delete(void* p, size_t s) { TWK_DEALLOCATE_ARRAY(p); }
 
-#define TWK_CLASS_NEW_DELETE_PAGE_ALIGNED(T)                      \
-    void* T::operator new(size_t s)                               \
-    {                                                             \
-        return TWK_ALLOCATE_ARRAY_PAGE_ALIGNED(unsigned char, s); \
-    }                                                             \
+#define TWK_CLASS_NEW_DELETE_PAGE_ALIGNED(T)                                                      \
+    void* T::operator new(size_t s) { return TWK_ALLOCATE_ARRAY_PAGE_ALIGNED(unsigned char, s); } \
     void T::operator delete(void* p, size_t s) { TWK_DEALLOCATE_ARRAY(p); }
 
 namespace stl_ext
@@ -105,10 +97,7 @@ namespace stl_ext
 
         replacement_allocator(const replacement_allocator&) throw() {}
 
-        template <class T1>
-        replacement_allocator(const replacement_allocator<T1>&) throw()
-        {
-        }
+        template <class T1> replacement_allocator(const replacement_allocator<T1>&) throw() {}
 
         ~replacement_allocator() throw() {}
 
@@ -134,16 +123,12 @@ namespace stl_ext
         void destroy(pointer p) { p->~T(); }
     };
 
-    template <class T1, class T2>
-    inline bool operator==(const replacement_allocator<T1>&,
-                           const replacement_allocator<T2>&)
+    template <class T1, class T2> inline bool operator==(const replacement_allocator<T1>&, const replacement_allocator<T2>&)
     {
         return true;
     }
 
-    template <class T1, class T2>
-    inline bool operator!=(const replacement_allocator<T1>&,
-                           const replacement_allocator<T2>&)
+    template <class T1, class T2> inline bool operator!=(const replacement_allocator<T1>&, const replacement_allocator<T2>&)
     {
         return false;
     }

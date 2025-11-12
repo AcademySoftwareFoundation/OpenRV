@@ -37,8 +37,7 @@ namespace Mu
         typedef std::vector<size_t> SizeVector; // should not require being GC'd
         typedef STLVector<String>::Type StringVector;
         typedef STLMap<const Type*, Type*>::Type DynamicArrayTypeCache;
-        typedef STLMap<std::pair<const Type*, size_t>, Type*>::Type
-            Fixed1DArrayTypeCache;
+        typedef STLMap<std::pair<const Type*, size_t>, Type*>::Type Fixed1DArrayTypeCache;
 
         MuLangContext(const char* imp, const char* name);
         ~MuLangContext();
@@ -51,14 +50,11 @@ namespace Mu
         //  Single Entry API
         //
 
-        virtual TypedValue evalText(const char* text, const char* inputName,
-                                    Process*, const ModuleList&);
+        virtual TypedValue evalText(const char* text, const char* inputName, Process*, const ModuleList&);
 
-        virtual TypedValue evalFile(const char* file, Process*,
-                                    const ModuleList&);
+        virtual TypedValue evalFile(const char* file, Process*, const ModuleList&);
 
-        virtual void parseStream(Process*, std::istream&,
-                                 const char* inputName);
+        virtual void parseStream(Process*, std::istream&, const char* inputName);
 
         virtual Type* parseType(const char* text, Process*);
 
@@ -114,11 +110,9 @@ namespace Mu
 
         Type* arrayType(const Type* elementType, const SizeVector& dimensions);
 
-        Type* arrayType(const Type* elementType,
-                        const STLVector<size_t>::Type& dimensions);
+        Type* arrayType(const Type* elementType, const STLVector<size_t>::Type& dimensions);
 
-        Type* arrayType(const Type* elementType, const size_t* dimensions,
-                        size_t nDimensions);
+        Type* arrayType(const Type* elementType, const size_t* dimensions, size_t nDimensions);
 
         //
         //	Same as above except uses stdargs:

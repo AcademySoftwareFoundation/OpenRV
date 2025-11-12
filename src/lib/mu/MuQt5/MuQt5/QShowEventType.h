@@ -34,8 +34,7 @@ namespace Mu
         //  Constructors
         //
 
-        QShowEventType(Context* context, const char* name,
-                       Class* superClass = 0);
+        QShowEventType(Context* context, const char* name, Class* superClass = 0);
         virtual ~QShowEventType();
 
         //

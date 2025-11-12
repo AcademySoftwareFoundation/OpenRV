@@ -79,10 +79,7 @@ namespace TwkUtil
         return m_tags[tag];
     }
 
-    inline void TextMsg::setAllPrefix(const char* str)
-    {
-        strncpy(m_allPrefix, str, 32);
-    }
+    inline void TextMsg::setAllPrefix(const char* str) { strncpy(m_allPrefix, str, 32); }
 
     inline void TextMsg::setOutFunction(void (*outFunc)(const char*))
     {

@@ -17,17 +17,14 @@ namespace TwkAudio
     using namespace TwkMath;
     using namespace std;
 
-    void mixChannels(const AudioBuffer& in, AudioBuffer& out,
-                     const float lVolume, const float rVolume,
-                     const bool compose)
+    void mixChannels(const AudioBuffer& in, AudioBuffer& out, const float lVolume, const float rVolume, const bool compose)
     {
         const size_t inSize = in.size();
         const size_t outSize = out.size();
 
         if (inSize != outSize)
         {
-            cout << "WARNING: audio mix: inSize = " << inSize
-                 << ", outSize = " << outSize << endl;
+            cout << "WARNING: audio mix: inSize = " << inSize << ", outSize = " << outSize << endl;
             return;
         }
 
@@ -68,12 +65,10 @@ namespace TwkAudio
                 {
                     for (int och = 0; och < out.channels().size(); och++)
                     {
-                        const ChannelMixState& cmixState =
-                            chmap[out.channels()[och]];
+                        const ChannelMixState& cmixState = chmap[out.channels()[och]];
 
                         float lMix = 0.0f;
-                        const std::vector<ChannelState>& leftChs =
-                            cmixState.lefts;
+                        const std::vector<ChannelState>& leftChs = cmixState.lefts;
                         for (int n = 0; n < leftChs.size(); ++n)
                         {
                             const ChannelState& chState = leftChs[n];
@@ -81,8 +76,7 @@ namespace TwkAudio
                         }
 
                         float rMix = 0.0f;
-                        const std::vector<ChannelState>& rightCh =
-                            cmixState.rights;
+                        const std::vector<ChannelState>& rightCh = cmixState.rights;
                         for (int n = 0; n < rightCh.size(); ++n)
                         {
                             const ChannelState& chState = rightCh[n];
@@ -101,12 +95,10 @@ namespace TwkAudio
                 {
                     for (int och = 0; och < out.channels().size(); och++)
                     {
-                        const ChannelMixState& cmixState =
-                            chmap[out.channels()[och]];
+                        const ChannelMixState& cmixState = chmap[out.channels()[och]];
 
                         float lMix = 0.0f;
-                        const std::vector<ChannelState>& leftChs =
-                            cmixState.lefts;
+                        const std::vector<ChannelState>& leftChs = cmixState.lefts;
                         for (int n = 0; n < leftChs.size(); ++n)
                         {
                             const ChannelState& chState = leftChs[n];
@@ -114,8 +106,7 @@ namespace TwkAudio
                         }
 
                         float rMix = 0.0f;
-                        const std::vector<ChannelState>& rightCh =
-                            cmixState.rights;
+                        const std::vector<ChannelState>& rightCh = cmixState.rights;
                         for (int n = 0; n < rightCh.size(); ++n)
                         {
                             const ChannelState& chState = rightCh[n];

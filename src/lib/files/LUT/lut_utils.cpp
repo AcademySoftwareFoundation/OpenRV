@@ -21,8 +21,7 @@
 #define BUF_LEN 1024
 #define WHITESPACE " \t\r\n"
 
-#define string2float(STR, DEPTH, DEN) \
-    ((DEPTH) == 32 ? atof(STR) : float(double(atoi(STR)) / double(DEN)))
+#define string2float(STR, DEPTH, DEN) ((DEPTH) == 32 ? atof(STR) : float(double(atoi(STR)) / double(DEN)))
 
 namespace LUT
 {
@@ -88,9 +87,7 @@ namespace LUT
     // reads LUT data into memory based on parameters
     //
 
-    bool ReadChannelLUTData(std::ifstream& file, int size, int depth,
-                            bool reverse_order, int in_padding,
-                            std::vector<float>& lut)
+    bool ReadChannelLUTData(std::ifstream& file, int size, int depth, bool reverse_order, int in_padding, std::vector<float>& lut)
     {
         bool no_eof = true;
 
@@ -121,26 +118,20 @@ namespace LUT
 
             int place = i * 3;
 
-            lut[place + 0] =
-                string2float(vals[0 + in_padding].c_str(), depth, den);
-            lut[place + 1] =
-                string2float(vals[1 + in_padding].c_str(), depth, den);
-            lut[place + 2] =
-                string2float(vals[2 + in_padding].c_str(), depth, den);
+            lut[place + 0] = string2float(vals[0 + in_padding].c_str(), depth, den);
+            lut[place + 1] = string2float(vals[1 + in_padding].c_str(), depth, den);
+            lut[place + 2] = string2float(vals[2 + in_padding].c_str(), depth, den);
         }
 
         if (i != entries)
         {
-            cerr << "ERROR: reading 1D lut data: expected " << entries
-                 << " values but found " << i << endl;
+            cerr << "ERROR: reading 1D lut data: expected " << entries << " values but found " << i << endl;
         }
 
         return no_eof;
     }
 
-    bool Read3DLUTData(std::ifstream& file, int dx, int dy, int dz, int depth,
-                       bool reverse_order, int in_padding,
-                       std::vector<float>& lut)
+    bool Read3DLUTData(std::ifstream& file, int dx, int dy, int dz, int depth, bool reverse_order, int in_padding, std::vector<float>& lut)
     {
         bool no_eof = true;
         char buf[BUF_LEN + 1];
@@ -155,8 +146,7 @@ namespace LUT
 
         lut.resize(entries * 3);
 
-        for (int i = 0; i < entries && (no_eof = nextline(file, buf, BUF_LEN));
-             i++)
+        for (int i = 0; i < entries && (no_eof = nextline(file, buf, BUF_LEN)); i++)
         {
             vals.clear();
             stl_ext::tokenize(vals, buf, WHITESPACE);
@@ -183,12 +173,9 @@ namespace LUT
                 place = i * 3;
             }
 
-            lut[place + 0] =
-                string2float(vals[0 + in_padding].c_str(), depth, den);
-            lut[place + 1] =
-                string2float(vals[1 + in_padding].c_str(), depth, den);
-            lut[place + 2] =
-                string2float(vals[2 + in_padding].c_str(), depth, den);
+            lut[place + 0] = string2float(vals[0 + in_padding].c_str(), depth, den);
+            lut[place + 1] = string2float(vals[1 + in_padding].c_str(), depth, den);
+            lut[place + 2] = string2float(vals[2 + in_padding].c_str(), depth, den);
         }
 
         return no_eof;

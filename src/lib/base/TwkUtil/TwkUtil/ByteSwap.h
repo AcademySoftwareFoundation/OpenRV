@@ -42,10 +42,8 @@ namespace TwkUtil
         {
             const uint32_t x = *ip;
 
-            *ip = ((uint32_t)((((uint32_t)(x) & 0xff000000) >> 24)
-                              | (((uint32_t)(x) & 0x00ff0000) >> 8)
-                              | (((uint32_t)(x) & 0x0000ff00) << 8)
-                              | (((uint32_t)(x) & 0x000000ff) << 24)));
+            *ip = ((uint32_t)((((uint32_t)(x) & 0xff000000) >> 24) | (((uint32_t)(x) & 0x00ff0000) >> 8)
+                              | (((uint32_t)(x) & 0x0000ff00) << 8) | (((uint32_t)(x) & 0x000000ff) << 24)));
         }
     }
 
@@ -55,21 +53,18 @@ namespace TwkUtil
         {
             const uint16_t x = *ip;
 
-            *ip = ((uint16_t)((((uint16_t)(x) & 0xff00) >> 8)
-                              | (((uint16_t)(x) & 0x00ff) << 8)));
+            *ip = ((uint16_t)((((uint16_t)(x) & 0xff00) >> 8) | (((uint16_t)(x) & 0x00ff) << 8)));
         }
     }
 
     inline void swapShortsCopy(void* dst, const void* src, size_t size)
     {
         const uint16_t* ip = (const uint16_t*)src;
-        for (uint16_t *op = (uint16_t*)dst, *ep = op + size; op < ep;
-             ip++, op++)
+        for (uint16_t *op = (uint16_t*)dst, *ep = op + size; op < ep; ip++, op++)
         {
             const uint16_t x = *ip;
 
-            *op = ((uint16_t)((((uint16_t)(x) & 0xff00) >> 8)
-                              | (((uint16_t)(x) & 0x00ff) << 8)));
+            *op = ((uint16_t)((((uint16_t)(x) & 0xff00) >> 8) | (((uint16_t)(x) & 0x00ff) << 8)));
         }
     }
 

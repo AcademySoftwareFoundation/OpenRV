@@ -29,11 +29,9 @@ namespace IPCore
 
         namespace
         {
-            const char* global_glsl =
-                "#version 150\n"
-                "#extension GL_ARB_texture_rectangle : require\n";
-            const char* global_glsl_gl2 =
-                "#extension GL_ARB_texture_rectangle : require\n";
+            const char* global_glsl = "#version 150\n"
+                                      "#extension GL_ARB_texture_rectangle : require\n";
+            const char* global_glsl_gl2 = "#extension GL_ARB_texture_rectangle : require\n";
             const char* global_glsl_lt_150 = "#version 120\n";
         } // namespace
 
@@ -43,30 +41,29 @@ namespace IPCore
             Symbol::Type type;
         };
 
-        const std::array<SymbolTypeAssociation, 23> symbolTypeAssociations = {
-            {{"float", Symbol::FloatType},
-             {"vec2", Symbol::Vec2fType},
-             {"vec3", Symbol::Vec3fType},
-             {"vec4", Symbol::Vec4fType},
-             {"int", Symbol::IntType},
-             {"ivec2", Symbol::Vec2iType},
-             {"ivec3", Symbol::Vec3iType},
-             {"ivec4", Symbol::Vec4iType},
-             {"bool", Symbol::IntType},
-             {"bvec2", Symbol::Vec2bType},
-             {"bvec3", Symbol::Vec3bType},
-             {"bvec4", Symbol::Vec4bType},
-             {"mat4", Symbol::Matrix4fType},
-             {"mat3", Symbol::Matrix3fType},
-             {"mat2", Symbol::Matrix2fType},
-             {"sampler1D", Symbol::Sampler1DType},
-             {"sampler2D", Symbol::Sampler2DType},
-             {"sampler2DRect", Symbol::Sampler2DRectType},
-             {"sampler3D", Symbol::Sampler3DType},
-             {"inputImage", Symbol::InputImageType},
-             {"outputImage", Symbol::OutputImageType},
-             {"fragmentPosition", Symbol::FragmentPositionType},
-             {nullptr, Symbol::VoidType}}};
+        const std::array<SymbolTypeAssociation, 23> symbolTypeAssociations = {{{"float", Symbol::FloatType},
+                                                                               {"vec2", Symbol::Vec2fType},
+                                                                               {"vec3", Symbol::Vec3fType},
+                                                                               {"vec4", Symbol::Vec4fType},
+                                                                               {"int", Symbol::IntType},
+                                                                               {"ivec2", Symbol::Vec2iType},
+                                                                               {"ivec3", Symbol::Vec3iType},
+                                                                               {"ivec4", Symbol::Vec4iType},
+                                                                               {"bool", Symbol::IntType},
+                                                                               {"bvec2", Symbol::Vec2bType},
+                                                                               {"bvec3", Symbol::Vec3bType},
+                                                                               {"bvec4", Symbol::Vec4bType},
+                                                                               {"mat4", Symbol::Matrix4fType},
+                                                                               {"mat3", Symbol::Matrix3fType},
+                                                                               {"mat2", Symbol::Matrix2fType},
+                                                                               {"sampler1D", Symbol::Sampler1DType},
+                                                                               {"sampler2D", Symbol::Sampler2DType},
+                                                                               {"sampler2DRect", Symbol::Sampler2DRectType},
+                                                                               {"sampler3D", Symbol::Sampler3DType},
+                                                                               {"inputImage", Symbol::InputImageType},
+                                                                               {"outputImage", Symbol::OutputImageType},
+                                                                               {"fragmentPosition", Symbol::FragmentPositionType},
+                                                                               {nullptr, Symbol::VoidType}}};
 
         namespace
         {
@@ -79,16 +76,13 @@ namespace IPCore
                 {
                     //
                     //  NOTE: its much better to have assigned
-                    if (const char* glVersion = (const char*)glGetString(
-                            GL_SHADING_LANGUAGE_VERSION))
+                    if (const char* glVersion = (const char*)glGetString(GL_SHADING_LANGUAGE_VERSION))
                     {
                         Shader::Function::useShadingLanguageVersion(glVersion);
                     }
                     else
                     {
-                        cerr
-                            << "ERROR: GL_SHADING_LANGUAGE_VERSION query failed"
-                            << endl;
+                        cerr << "ERROR: GL_SHADING_LANGUAGE_VERSION query failed" << endl;
                         abort();
                     }
                 }
@@ -101,8 +95,7 @@ namespace IPCore
         void Function::useShadingLanguageVersion(const char* glVersion)
         {
             vector<string> buffer;
-            algorithm::split(buffer, glVersion, is_any_of(string(". ")),
-                             token_compress_on);
+            algorithm::split(buffer, glVersion, is_any_of(string(". ")), token_compress_on);
 
             if (buffer.size() >= 2)
             {
@@ -155,10 +148,8 @@ namespace IPCore
             }
         }
 
-        Function::Function(const string& name, const string& glsl, Type type,
-                           const SymbolVector& params,
-                           const SymbolVector& globals, size_t numFetchesApprox,
-                           const string& doc)
+        Function::Function(const string& name, const string& glsl, Type type, const SymbolVector& params, const SymbolVector& globals,
+                           size_t numFetchesApprox, const string& doc)
             : m_name(name)
             , m_type(type)
             , m_parameters(params)
@@ -181,8 +172,7 @@ namespace IPCore
             initResourceUsage();
         }
 
-        Function::Function(const string& name, const string& glsl, Type type,
-                           size_t numFetchesApprox, const string& doc)
+        Function::Function(const string& name, const string& glsl, Type type, size_t numFetchesApprox, const string& doc)
             : m_name(name)
             , m_type(type)
             , m_state(nullptr)
@@ -309,8 +299,7 @@ namespace IPCore
             {
                 ostringstream str;
                 size_t nbytes = sizeof(m_hash) / 2;
-                str << hex
-                    << (((m_hash >> (nbytes * 8)) ^ m_hash) >> (nbytes * 8));
+                str << hex << (((m_hash >> (nbytes * 8)) ^ m_hash) >> (nbytes * 8));
                 m_hashString = str.str();
                 m_callName = m_name + m_hashString;
             }
@@ -422,8 +411,7 @@ namespace IPCore
             if (regex_search(m_sourceCode, m, re))
             {
                 string mstring = m[1];
-                algorithm::split(sourceParameters, mstring,
-                                 is_any_of(string(",")), token_compress_on);
+                algorithm::split(sourceParameters, mstring, is_any_of(string(",")), token_compress_on);
 
                 for (size_t i = 0; i < sourceParameters.size(); i++)
                 {
@@ -445,8 +433,7 @@ namespace IPCore
                     //
 
                     StringVector parts;
-                    algorithm::split(parts, sourceParameters[i],
-                                     algorithm::is_space(), token_compress_on);
+                    algorithm::split(parts, sourceParameters[i], algorithm::is_space(), token_compress_on);
 
                     //
                     //  Found qualifiers and any special cookies we need to
@@ -486,16 +473,12 @@ namespace IPCore
 
                     if (parts.size() == 0)
                     {
-                        TWK_THROW_EXC_STREAM(
-                            "empty parameter declaration for parameter "
-                            << (i + 1));
+                        TWK_THROW_EXC_STREAM("empty parameter declaration for parameter " << (i + 1));
                     }
 
                     if (parts.size() == 1)
                     {
-                        TWK_THROW_EXC_STREAM("invalid parameter declaration \'"
-                                             << parts.front()
-                                             << "\' for parameter " << (i + 1));
+                        TWK_THROW_EXC_STREAM("invalid parameter declaration \'" << parts.front() << "\' for parameter " << (i + 1));
                     }
 
                     string name = parts.back();
@@ -507,9 +490,7 @@ namespace IPCore
                     //  the shader generator.
                     //
 
-                    pp.special = (name == "time" && ptype == "float")
-                                 || (name == "_offset" && ptype == "vec2")
-                                 || ptype == "outputImage"
+                    pp.special = (name == "time" && ptype == "float") || (name == "_offset" && ptype == "vec2") || ptype == "outputImage"
                                  || ptype == "fragmentPosition";
                     pp.name = name;
                     pp.type = ptype;
@@ -552,18 +533,13 @@ namespace IPCore
                                          "rgba]{1,4})\\b");
                         regex usesSamplingRE("\\b" + name + R"(\s*\(\s*[^\)])");
                         regex usesLookupRE("\\b" + name + R"(\s*\(\s*\))");
-                        regex usesSizeRE("\\b" + name
-                                         + R"(\s*\.\s*size\s*\(\s*\))");
+                        regex usesSizeRE("\\b" + name + R"(\s*\.\s*size\s*\(\s*\))");
 
                         pp.usesST = regex_search(m_sourceCode, sm, usesSTRE);
-                        pp.usesSampling =
-                            regex_search(m_sourceCode, sm, usesSamplingRE);
-                        pp.usesLookup =
-                            regex_search(m_sourceCode, sm, usesLookupRE);
-                        pp.usesSize =
-                            regex_search(m_sourceCode, sm, usesSizeRE);
-                        pp.requiresInline =
-                            pp.usesSampling || pp.usesST || pp.usesSize;
+                        pp.usesSampling = regex_search(m_sourceCode, sm, usesSamplingRE);
+                        pp.usesLookup = regex_search(m_sourceCode, sm, usesLookupRE);
+                        pp.usesSize = regex_search(m_sourceCode, sm, usesSizeRE);
+                        pp.requiresInline = pp.usesSampling || pp.usesST || pp.usesSize;
 
                         if (pp.usesSampling)
                         {
@@ -604,10 +580,7 @@ namespace IPCore
                             //  notify user (shader writer)
                             //
 
-                            TWK_THROW_EXC_STREAM(
-                                "inputImage argument \'"
-                                << p.name
-                                << "\' must have qualifier \'const in\'");
+                            TWK_THROW_EXC_STREAM("inputImage argument \'" << p.name << "\' must have qualifier \'const in\'");
                         }
 
                         if (!p.usesSampling)
@@ -620,9 +593,7 @@ namespace IPCore
 
                             p.type = "vec4";
                             ostringstream str;
-                            str << (p.q_const ? "const" : "") << " "
-                                << (p.q_in ? "in" : "")
-                                << (p.q_out ? "out" : "") << " " << p.type
+                            str << (p.q_const ? "const" : "") << " " << (p.q_in ? "in" : "") << (p.q_out ? "out" : "") << " " << p.type
                                 << " " << p.name;
 
                             m_glslParameters.push_back(str.str());
@@ -642,16 +613,12 @@ namespace IPCore
                             //  so we need to make sure we don't use those.
                             //
 
-                            string replacePat =
-                                p.requiresInline ? "_x_x\\1" : "\\1";
+                            string replacePat = p.requiresInline ? "_x_x\\1" : "\\1";
                             regex re("\\b(" + p.name + ")\\s*\\(\\s*\\)");
-                            m_sourceCode =
-                                regex_replace(m_sourceCode, re, replacePat);
+                            m_sourceCode = regex_replace(m_sourceCode, re, replacePat);
                         }
 
-                        m_inImageParameters.push_back(
-                            ImageParameterInfo(p.name, p.usesST, p.usesSize,
-                                               p.usesSampling, p.usesLookup));
+                        m_inImageParameters.push_back(ImageParameterInfo(p.name, p.usesST, p.usesSize, p.usesSampling, p.usesLookup));
                     }
                     else if (p.type == "outputImage")
                     {
@@ -668,10 +635,7 @@ namespace IPCore
                             //  is expected behavior.
                             //
 
-                            TWK_THROW_EXC_STREAM(
-                                "outputImage argument \'"
-                                << p.name
-                                << "\' must have qualifier \'const in\'");
+                            TWK_THROW_EXC_STREAM("outputImage argument \'" << p.name << "\' must have qualifier \'const in\'");
                         }
 
                         //
@@ -684,11 +648,8 @@ namespace IPCore
                         //
 
                         smatch sm;
-                        regex regwh("\\b(" + p.name
-                                    + ")\\s*\\.\\s*size\\s*\\(\\s*\\)");
-                        regex regf(
-                            "\\b(" + p.name
-                            + ")\\s*\\.\\s*([st]{1,2}|[xy]{1,2}|[rg]{1,2})\\b");
+                        regex regwh("\\b(" + p.name + ")\\s*\\.\\s*size\\s*\\(\\s*\\)");
+                        regex regf("\\b(" + p.name + ")\\s*\\.\\s*([st]{1,2}|[xy]{1,2}|[rg]{1,2})\\b");
 
                         //
                         //  look for occurence of foo.size or swizzle and
@@ -698,8 +659,7 @@ namespace IPCore
                         if (regex_search(m_sourceCode, sm, regwh))
                         {
                             m_usesOutputSize = true;
-                            m_sourceCode = regex_replace(m_sourceCode, regwh,
-                                                         "_windowSize");
+                            m_sourceCode = regex_replace(m_sourceCode, regwh, "_windowSize");
                             m_inline = true;
                         }
 
@@ -714,8 +674,7 @@ namespace IPCore
                             //  substituting in fragCoord.
                             //
 
-                            m_sourceCode = regex_replace(m_sourceCode, regf,
-                                                         "_fragCoord.\\2");
+                            m_sourceCode = regex_replace(m_sourceCode, regf, "_fragCoord.\\2");
                             m_inline = true;
                         }
 
@@ -727,13 +686,11 @@ namespace IPCore
 
                         if (i == 0)
                         {
-                            re = regex("\\s*const\\s+in\\s+outputImage\\s+"
-                                       + p.name + "\\s*,");
+                            re = regex("\\s*const\\s+in\\s+outputImage\\s+" + p.name + "\\s*,");
                         }
                         else
                         {
-                            re = regex(",\\s*const\\s+in\\s+outputImage\\s+"
-                                       + p.name + "\\b");
+                            re = regex(",\\s*const\\s+in\\s+outputImage\\s+" + p.name + "\\b");
                         }
                         m_sourceCode = regex_replace(m_sourceCode, re, "");
                     }
@@ -751,9 +708,7 @@ namespace IPCore
                             //  to whoever tried to make then function. This
                             //  is expected behavior.
 
-                            throw std::runtime_error(
-                                "inputImage argument '" + p.name
-                                + "' must have qualifier 'const in'");
+                            throw std::runtime_error("inputImage argument '" + p.name + "' must have qualifier 'const in'");
                         }
 
                         //  NOTE: "fragmentPosition" is a special type that
@@ -764,16 +719,14 @@ namespace IPCore
                         //  vec3) with _fragPosition.
 
                         boost::smatch stringMatch;
-                        boost::regex regexFunction(
-                            "\\b(" + p.name
-                            + ")\\s*\\.\\s*([stp]{1,3}|[xyz]{1,3}|[rgb]{"
-                              "1,3})\\b");
+                        boost::regex regexFunction("\\b(" + p.name
+                                                   + ")\\s*\\.\\s*([stp]{1,3}|[xyz]{1,3}|[rgb]{"
+                                                     "1,3})\\b");
 
                         //  Look for occurence of foo.size or swizzle and
                         //  replace with corresponding symbols.
 
-                        if (boost::regex_search(m_sourceCode, stringMatch,
-                                                regexFunction))
+                        if (boost::regex_search(m_sourceCode, stringMatch, regexFunction))
                         {
                             m_usesFragmentPosition = true;
 
@@ -781,9 +734,7 @@ namespace IPCore
                             //  done on the outputImage coords when
                             //  substituting in fragCoord.
 
-                            m_sourceCode = boost::regex_replace(
-                                m_sourceCode, regexFunction,
-                                "_fragPosition.\\2");
+                            m_sourceCode = boost::regex_replace(m_sourceCode, regexFunction, "_fragPosition.\\2");
                             m_inline = true;
                         }
 
@@ -793,15 +744,11 @@ namespace IPCore
 
                         if (i == 0)
                         {
-                            regex = boost::regex(
-                                R"(\s*const\s+in\s+fragmentPosition\s+)"
-                                + p.name + "\\s*,");
+                            regex = boost::regex(R"(\s*const\s+in\s+fragmentPosition\s+)" + p.name + "\\s*,");
                         }
                         else
                         {
-                            regex = boost::regex(
-                                R"(,\s*const\s+in\s+fragmentPosition\s+)"
-                                + p.name + "\\b");
+                            regex = boost::regex(R"(,\s*const\s+in\s+fragmentPosition\s+)" + p.name + "\\b");
                         }
 
                         m_sourceCode = regex_replace(m_sourceCode, regex, "");
@@ -809,9 +756,8 @@ namespace IPCore
                     else
                     {
                         ostringstream str;
-                        str << (p.q_const ? "const" : "") << " "
-                            << (p.q_in ? "in" : "") << (p.q_out ? "out" : "")
-                            << " " << p.type << " " << p.name;
+                        str << (p.q_const ? "const" : "") << " " << (p.q_in ? "in" : "") << (p.q_out ? "out" : "") << " " << p.type << " "
+                            << p.name;
 
                         m_glslParameters.push_back(str.str());
                     }
@@ -864,9 +810,7 @@ namespace IPCore
                                     qualifier |= Symbol::Special;
                                 }
 
-                                auto symbol = std::make_unique<Symbol>(
-                                    static_cast<Symbol::Qualifier>(qualifier),
-                                    p.name, stype);
+                                auto symbol = std::make_unique<Symbol>(static_cast<Symbol::Qualifier>(qualifier), p.name, stype);
                                 m_parameters.push_back(symbol.release());
                                 break; // in case of typo in
                                        // symbolTypeAssociations
@@ -877,8 +821,7 @@ namespace IPCore
 
                 if (m_inline && usesSampling)
                 {
-                    Symbol* s = new Symbol(Symbol::SpecialParameterConstIn,
-                                           "_offset", Symbol::Vec2fType);
+                    Symbol* s = new Symbol(Symbol::SpecialParameterConstIn, "_offset", Symbol::Vec2fType);
                     m_parameters.push_back(s);
                     m_glslParameters.push_back("const in vec2 _offset");
                 }
@@ -889,8 +832,7 @@ namespace IPCore
                 //
 
                 ostringstream str;
-                str << m_callName << " ("
-                    << algorithm::join(m_glslParameters, ", ") << ")";
+                str << m_callName << " (" << algorithm::join(m_glslParameters, ", ") << ")";
                 m_sourceCode = regex_replace(m_sourceCode, re, str.str());
 
                 //
@@ -911,9 +853,7 @@ namespace IPCore
             }
             else
             {
-                TWK_THROW_EXC_STREAM(
-                    "expected to find function definition for \'"
-                    << name() << "\' but did not");
+                TWK_THROW_EXC_STREAM("expected to find function definition for \'" << name() << "\' but did not");
             }
         }
 
@@ -985,13 +925,11 @@ namespace IPCore
                     //  we're using a GLSL newer than that.
                     //
 
-                    reStr << "\\b" << func << "\\s*\\(\\s*" << sym->name()
-                          << "\\b";
+                    reStr << "\\b" << func << "\\s*\\(\\s*" << sym->name() << "\\b";
                     replaceStr << "texture(" << sym->name();
                 }
 
-                m_sourceCode = regex_replace(m_sourceCode, regex(reStr.str()),
-                                             replaceStr.str());
+                m_sourceCode = regex_replace(m_sourceCode, regex(reStr.str()), replaceStr.str());
             }
         }
 
@@ -1003,8 +941,7 @@ namespace IPCore
             {
                 if (nullptr == glVersion)
                 {
-                    std::cerr << "get_glsl_header error: glVersion is null."
-                              << std::endl;
+                    std::cerr << "get_glsl_header error: glVersion is null." << std::endl;
                     return global_glsl;
                 }
 
@@ -1015,15 +952,13 @@ namespace IPCore
                 }
                 else
                 {
-                    glsl_header =
-                        glVersion[0] <= '2' ? global_glsl_gl2 : global_glsl;
+                    glsl_header = glVersion[0] <= '2' ? global_glsl_gl2 : global_glsl;
                 }
 
                 return glsl_header;
             }
 
-            void compileGLSL(const string& source, GLuint& shaderID,
-                             int& status, vector<char>& log)
+            void compileGLSL(const string& source, GLuint& shaderID, int& status, vector<char>& log)
             {
                 shaderID = glCreateShader(GL_FRAGMENT_SHADER);
 
@@ -1069,8 +1004,7 @@ namespace IPCore
             int status;
             if (Shader::debuggingType() != Shader::NoDebugInfo)
             {
-                cout << "INFO: compiling GLSL shader " << name() << " " << m_doc
-                     << endl;
+                cout << "INFO: compiling GLSL shader " << name() << " " << m_doc << endl;
             }
 
             compileGLSL(m_sourceCode, m_state->shader, status, buffer);
@@ -1079,8 +1013,7 @@ namespace IPCore
 
             if (status != GL_TRUE)
             {
-                cout << "ERROR: compiling shader " << m_name << ": " << endl
-                     << &buffer.front() << endl;
+                cout << "ERROR: compiling shader " << m_name << ": " << endl << &buffer.front() << endl;
 
                 cout << "ERROR: ----- source follows ----" << endl;
                 outputAnnotatedCode(cout, glsl_header + m_sourceCode);
@@ -1088,8 +1021,7 @@ namespace IPCore
             }
             else if (Shader::debuggingType() != Shader::NoDebugInfo)
             {
-                cout << "INFO: ---- " << name() << " source follows ----"
-                     << endl;
+                cout << "INFO: ---- " << name() << " source follows ----" << endl;
                 outputAnnotatedCode(cout, glsl_header + m_sourceCode);
             }
 
@@ -1125,8 +1057,7 @@ namespace IPCore
             ostringstream code;
             const SymbolVector& symbols = parameters();
 
-            code << glslNameOfSymbolType(returnType()) << " " << callName()
-                 << suffix << "(";
+            code << glslNameOfSymbolType(returnType()) << " " << callName() << suffix << "(";
 
             bool first = true;
 
@@ -1135,8 +1066,7 @@ namespace IPCore
                 // those symbols get passed from the vertex shader to the
                 // fragment shader using the "in"/"out" storage qualifiers, so
                 // we don't have to include them in the function's prototype.
-                if (symbol->type() == Symbol::InputImageType
-                    || symbol->type() == Symbol::OutputImageType
+                if (symbol->type() == Symbol::InputImageType || symbol->type() == Symbol::OutputImageType
                     || symbol->type() == Symbol::FragmentPositionType)
                 {
                     continue;
@@ -1145,17 +1075,14 @@ namespace IPCore
                 if (!first)
                     code << ", ";
                 first = false;
-                code << symbol->glslQualifierName() << " "
-                     << symbol->glslTypeName();
+                code << symbol->glslQualifierName() << " " << symbol->glslTypeName();
             }
 
             code << ")";
             return code.str();
         }
 
-        string Function::rewrite(const string& suffix,
-                                 const StringVector& argNames,
-                                 const StringVector& graphIDs) const
+        string Function::rewrite(const string& suffix, const StringVector& argNames, const StringVector& graphIDs) const
         {
             //
             //  This code is called in the case of Inline functions. Its called
@@ -1191,8 +1118,7 @@ namespace IPCore
                 {
                     try
                     {
-                        const ImageParameterInfo& pinfo =
-                            m_inImageParameters[i];
+                        const ImageParameterInfo& pinfo = m_inImageParameters[i];
                         const string& inName = pinfo.name;
 
                         //
@@ -1227,8 +1153,7 @@ namespace IPCore
                             ostringstream replaceExpr;
                             replaceExpr << "Size" << graphIDs[i];
 
-                            regex re2("\\b" + inName
-                                      + "\\s*\\.\\s*size\\s*\\(\\s*\\)");
+                            regex re2("\\b" + inName + "\\s*\\.\\s*size\\s*\\(\\s*\\)");
                             a = regex_replace(a, re2, replaceExpr.str());
                         }
                     }
@@ -1297,10 +1222,7 @@ namespace IPCore
             return a;
         }
 
-        bool Function::isColor() const
-        {
-            return type() == Color || type() == LinearColor;
-        }
+        bool Function::isColor() const { return type() == Color || type() == LinearColor; }
 
         bool Function::isFilter() const { return type() >= Filter; }
 
@@ -1499,8 +1421,7 @@ namespace IPCore
 
             static regex funcDefRE(" ?\\w+ (\\w+) ?\\([^\\{]+\\{\\}$");
             static regex varRE("const .*?(\\w+) ?=");
-            static regex varArrayRE(
-                "const .*?(\\w+)\\[\\w+] ?= ?\\w+\\[\\w+].*$");
+            static regex varArrayRE("const .*?(\\w+)\\[\\w+] ?= ?\\w+\\[\\w+].*$");
             static regex uniformSamplerRE("uniform sampler\\wD (\\w+).*$");
 
             for (size_t i = 0; i < lines.size(); i++)
@@ -1508,9 +1429,7 @@ namespace IPCore
                 const string& line = lines[i];
                 smatch sm;
 
-                if (regex_search(line, sm, funcDefRE)
-                    || regex_search(line, sm, varRE)
-                    || regex_search(line, sm, varArrayRE)
+                if (regex_search(line, sm, funcDefRE) || regex_search(line, sm, varRE) || regex_search(line, sm, varArrayRE)
                     || regex_search(line, sm, uniformSamplerRE))
                 {
                     if (sm[1] != m_name)
@@ -1519,15 +1438,13 @@ namespace IPCore
                         m_auxNames.push_back(s);
 
                         regex re("\\b" + s + "\\b");
-                        m_sourceCode =
-                            regex_replace(m_sourceCode, re, s + m_hashString);
+                        m_sourceCode = regex_replace(m_sourceCode, re, s + m_hashString);
                     }
                 }
             }
         }
 
-        const Function::ImageParameterInfo*
-        Function::imageParameterInfo(size_t index) const
+        const Function::ImageParameterInfo* Function::imageParameterInfo(size_t index) const
         {
             const string& name = m_parameters[index]->name();
 
@@ -1555,8 +1472,7 @@ namespace IPCore
 
         bool Function::equivalentInterface(const Function* other)
         {
-            if (m_type != other->m_type
-                || m_parameters.size() != other->m_parameters.size())
+            if (m_type != other->m_type || m_parameters.size() != other->m_parameters.size())
             {
                 return false;
             }
@@ -1626,8 +1542,7 @@ namespace IPCore
                     string replacePat = "_color_\\1";
                     glsl = regex_replace(glsl, colorRE, replacePat);
 
-                    str << inKeyword << " vec4 " << "_color_" << info.name
-                        << ";" << endl;
+                    str << inKeyword << " vec4 " << "_color_" << info.name << ";" << endl;
                     lineCount++;
                 }
 
@@ -1643,8 +1558,7 @@ namespace IPCore
                     string replacePat = "_st_\\1.\\2";
                     glsl = regex_replace(glsl, stRE, replacePat);
 
-                    str << inKeyword << " vec4 " << "_st_" << info.name << ";"
-                        << endl;
+                    str << inKeyword << " vec4 " << "_st_" << info.name << ";" << endl;
                     lineCount++;
                 }
 
@@ -1654,13 +1568,11 @@ namespace IPCore
                     //  NAME.size() -> _size_NAME
                     //
 
-                    regex sizeRE("\\b(" + info.name
-                                 + ")\\s*\\.\\s*size\\s*\\(\\s*\\)");
+                    regex sizeRE("\\b(" + info.name + ")\\s*\\.\\s*size\\s*\\(\\s*\\)");
                     string replacePat = "_size_\\1";
                     glsl = regex_replace(glsl, sizeRE, replacePat);
 
-                    str << "uniform vec2 " << "_size_" << info.name << ";"
-                        << endl;
+                    str << "uniform vec2 " << "_size_" << info.name << ";" << endl;
                     lineCount++;
                 }
 
@@ -1674,8 +1586,7 @@ namespace IPCore
                     string replacePat = "_sampler_\\1";
                     glsl = regex_replace(glsl, samplingRE, replacePat);
 
-                    str << "vec4 " << "_sampler_" << info.name
-                        << "(const in vec2);" << endl;
+                    str << "vec4 " << "_sampler_" << info.name << "(const in vec2);" << endl;
                     lineCount++;
                 }
             }
@@ -1696,16 +1607,12 @@ namespace IPCore
 
                     if (i > 0)
                     {
-                        regex outRE =
-                            regex(",(\\s*)const(\\s+)in(\\s+)outputImage(\\s+)"
-                                  + name + "\\b");
+                        regex outRE = regex(",(\\s*)const(\\s+)in(\\s+)outputImage(\\s+)" + name + "\\b");
                         glsl = regex_replace(glsl, outRE, "\\1\\2\\3\\4");
                     }
                     else
                     {
-                        regex outRE =
-                            regex("(\\s*)const(\\s+)in(\\s+)outputImage(\\s+)"
-                                  + name + "(\\s*),");
+                        regex outRE = regex("(\\s*)const(\\s+)in(\\s+)outputImage(\\s+)" + name + "(\\s*),");
                         glsl = regex_replace(glsl, outRE, "\\1\\2\\3\\4\\5");
                     }
 
@@ -1715,9 +1622,7 @@ namespace IPCore
                         //  OUT.st -> _outST.st
                         //
 
-                        regex outSTRE(
-                            "\\b" + name
-                            + "\\s*\\.\\s*([st]{1,2}|[xy]{1,2}|[rg]{1,2})\\b");
+                        regex outSTRE("\\b" + name + "\\s*\\.\\s*([st]{1,2}|[xy]{1,2}|[rg]{1,2})\\b");
                         glsl = regex_replace(glsl, outSTRE, "_outST.\\1");
 
                         str << "uniform vec2 _outST;" << endl;
@@ -1745,8 +1650,7 @@ namespace IPCore
                         //  OUT.size() -> _outSize
                         //
 
-                        regex outSizeRE("\\b" + name
-                                        + "\\s*\\.\\s*size\\s*\\(\\s*\\)");
+                        regex outSizeRE("\\b" + name + "\\s*\\.\\s*size\\s*\\(\\s*\\)");
                         glsl = regex_replace(glsl, outSizeRE, "_outSize");
 
                         str << "uniform vec2 _outSize;" << endl;
@@ -1775,13 +1679,10 @@ namespace IPCore
 
         void Function::deleteRetired()
         {
-            auto last = std::unique(
-                m_retiredFunctions.begin(),
-                m_retiredFunctions
-                    .end()); // assumption an object cannot be added more than
-                             // once non-consecutively (lifetime of objects)
-            for (FunctionVector::iterator i = m_retiredFunctions.begin();
-                 i != last; ++i)
+            auto last = std::unique(m_retiredFunctions.begin(),
+                                    m_retiredFunctions.end()); // assumption an object cannot be added more than
+                                                               // once non-consecutively (lifetime of objects)
+            for (FunctionVector::iterator i = m_retiredFunctions.begin(); i != last; ++i)
             {
                 delete *i;
             }

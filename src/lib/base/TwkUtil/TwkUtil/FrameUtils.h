@@ -74,10 +74,8 @@ namespace TwkUtil
     //  Files will not be counted as part of a sequence if the size of the
     //  sequence they could make is fewer than minSequenceSize.
     //
-    TWKUTIL_EXPORT SequenceNameList
-    sequencesInFileList(const FileNameList& infiles, SequencePredicate P = NULL,
-                        bool includeNonMatching = true, bool frameRanges = true,
-                        int minSequenceSize = -1);
+    TWKUTIL_EXPORT SequenceNameList sequencesInFileList(const FileNameList& infiles, SequencePredicate P = NULL,
+                                                        bool includeNonMatching = true, bool frameRanges = true, int minSequenceSize = -1);
 
     //
     //  Returns all the SequenceNames in a directory.
@@ -90,10 +88,8 @@ namespace TwkUtil
     //  sequences. For example numbered .mov files may not be a good
     //  candidate for creating a sequence.
     //
-    TWKUTIL_EXPORT SequenceNameList
-    sequencesInDirectory(const std::string& path, SequencePredicate P = NULL,
-                         bool includeNonMatching = true,
-                         bool frameRanges = true, bool showDirs = false);
+    TWKUTIL_EXPORT SequenceNameList sequencesInDirectory(const std::string& path, SequencePredicate P = NULL,
+                                                         bool includeNonMatching = true, bool frameRanges = true, bool showDirs = false);
 
     //
     // Splits SequenceName with embedded frame range (i.e. "foo.1-10#.tif")
@@ -103,18 +99,14 @@ namespace TwkUtil
     // will be the same as sequenceName.  Currently only supports # and @ frame
     // cookies.  It will return false if there is no frame cookie at all.
     //
-    TWKUTIL_EXPORT bool splitSequenceName(const SequenceName& sequenceName,
-                                          std::string& timeStr,
-                                          std::string& sequencePattern);
+    TWKUTIL_EXPORT bool splitSequenceName(const SequenceName& sequenceName, std::string& timeStr, std::string& sequencePattern);
 
     //
     //  Returns a SequencePattern (i.e. foo.1-10#.tif) from an existing file
     //  list. If onlyExisting is true, only files which exist on disk will be
     //  represented in the returned pattern.
     //
-    TWKUTIL_EXPORT SequencePattern sequencePattern(const ExistingFileList& efl,
-                                                   bool onlyExisting = true,
-                                                   int minSequenceSize = 1);
+    TWKUTIL_EXPORT SequencePattern sequencePattern(const ExistingFileList& efl, bool onlyExisting = true, int minSequenceSize = 1);
 
     //
     //  Existing sequences for stereo
@@ -130,8 +122,7 @@ namespace TwkUtil
     // that pattern will be returned, and may or may not be consecutive (though
     // they will be in order).
     //
-    TWKUTIL_EXPORT ExistingFileList
-    existingFilesInSequence(const SequenceName&, bool justOne = false);
+    TWKUTIL_EXPORT ExistingFileList existingFilesInSequence(const SequenceName&, bool justOne = false);
 
     //
     // Returns the first existing file in a sequence
@@ -177,8 +168,7 @@ namespace TwkUtil
     //     foo.#/7+1.xxx   ->  foo.0006.xxx
     //     foo\@.#.xxx     ->  foo@.0012.xxx
     //
-    TWKUTIL_EXPORT std::string replaceFrameSymbols(const std::string& s,
-                                                   int frame, int fps = 24);
+    TWKUTIL_EXPORT std::string replaceFrameSymbols(const std::string& s, int frame, int fps = 24);
 
     //
     //     Parse a Shake-like time string and return a list of corresponding
@@ -211,8 +201,7 @@ namespace TwkUtil
     //     amount, or there are fewer than 'lookahead' numbers in the
     //     list, 1 is returned.
     //
-    TWKUTIL_EXPORT int guessIncrement(FrameList frames, int startPos = 0,
-                                      int lookahead = 3);
+    TWKUTIL_EXPORT int guessIncrement(FrameList frames, int startPos = 0, int lookahead = 3);
 
     //
     //     Given a list of numbers, come up with a Shake-like time string
@@ -227,16 +216,14 @@ namespace TwkUtil
     //  1-10 become file.1-10%04d.jpg)
     //
 
-    TWKUTIL_EXPORT std::string integrateFrameRange(const std::string& inpattern,
-                                                   const std::string& inrange);
+    TWKUTIL_EXPORT std::string integrateFrameRange(const std::string& inpattern, const std::string& inrange);
 
     //
     //     Convert sequences in Nuke sequence form to Shake form
     //     The argument will be modified
     //
 
-    TWKUTIL_EXPORT void convertNukeToShakeForm(const SequenceNameList& in,
-                                               SequenceNameList& out);
+    TWKUTIL_EXPORT void convertNukeToShakeForm(const SequenceNameList& in, SequenceNameList& out);
 
     //
     //      Sequence of file
@@ -248,9 +235,7 @@ namespace TwkUtil
     //      sequencesInDirectory().
     //
 
-    TWKUTIL_EXPORT PatternFramePair sequenceOfFile(const std::string& filename,
-                                                   SequencePredicate P = NULL,
-                                                   bool frameRanges = true);
+    TWKUTIL_EXPORT PatternFramePair sequenceOfFile(const std::string& filename, SequencePredicate P = NULL, bool frameRanges = true);
 
 } //  End namespace  TwkUtil
 

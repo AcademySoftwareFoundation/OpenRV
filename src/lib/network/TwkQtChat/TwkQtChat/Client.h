@@ -27,8 +27,8 @@ namespace TwkQtChat
     public:
         typedef QMultiHash<QHostAddress, Connection*> ConnectionMap;
 
-        Client(const QString& contactName, const QString& contactApp = "rv",
-               int port = 45124, bool pingpong = true, ConnectionFactory f = 0);
+        Client(const QString& contactName, const QString& contactApp = "rv", int port = 45124, bool pingpong = true,
+               ConnectionFactory f = 0);
         ~Client();
 
         ///
@@ -50,8 +50,7 @@ namespace TwkQtChat
         /// should tell the other end how to deal with it.
         ///
 
-        void sendData(const QString& contact, const QString& interp,
-                      const QByteArray& data);
+        void sendData(const QString& contact, const QString& interp, const QByteArray& data);
 
         ///
         /// Send message to all connected contacts
@@ -64,17 +63,14 @@ namespace TwkQtChat
         /// connected contacts.
         ///
 
-        void sendEvent(const QString& contact, const QString& event,
-                       const QString& target, const QString& message,
-                       bool rsvp = false);
+        void sendEvent(const QString& contact, const QString& event, const QString& target, const QString& message, bool rsvp = false);
 
         ///
         /// Formats a message as an event message and sends to all
         /// connected contacts.
         ///
 
-        void broadcastEvent(const QString& event, const QString& target,
-                            const QString& message, bool rsvp = false);
+        void broadcastEvent(const QString& event, const QString& target, const QString& message, bool rsvp = false);
 
         ///
         /// The local contact name (the name of this client)
@@ -94,17 +90,14 @@ namespace TwkQtChat
         /// in name a new contact will be formed.
         ///
 
-        void connectTo(const QString& name, const QString& host,
-                       int port = 45124);
-        void connectTo(const QString& name, const QHostAddress& ip,
-                       int port = 45124);
+        void connectTo(const QString& name, const QString& host, int port = 45124);
+        void connectTo(const QString& name, const QHostAddress& ip, int port = 45124);
 
         ///
         /// Test for existing connection to machine
         ///
 
-        bool hasConnection(const QHostAddress& senderIp,
-                           int senderPort = -1) const;
+        bool hasConnection(const QHostAddress& senderIp, int senderPort = -1) const;
 
         ///
         /// Disconnect from existing connection
@@ -146,14 +139,12 @@ namespace TwkQtChat
 
     signals:
         void newMessage(const QString& from, const QString& message);
-        void newData(const QString& from, const QString& interp,
-                     const QByteArray& data);
+        void newData(const QString& from, const QString& interp, const QByteArray& data);
         void newContact(const QString& contact);
         void contactLeft(const QString& contact);
         void requestConnection(TwkQtChat::Connection*);
         void connectionFailed(QAbstractSocket::SocketError);
-        void contactError(const QString& contact, const QString& host,
-                          const QString& error);
+        void contactError(const QString& contact, const QString& host, const QString& error);
 
     private slots:
         void newConnection(Connection* connection);

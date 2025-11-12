@@ -18,8 +18,7 @@ namespace Rv
     class RvViewGroupIPNode : public ViewGroupIPNode
     {
     public:
-        RvViewGroupIPNode(const std::string& name, const NodeDefinition* def,
-                          IPGraph* graph, GroupIPNode* group = 0)
+        RvViewGroupIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group = 0)
             : ViewGroupIPNode(name, def, graph, group) {};
 
         virtual ~RvViewGroupIPNode();

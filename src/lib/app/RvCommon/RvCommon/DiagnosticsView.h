@@ -49,7 +49,6 @@ namespace Rv
 
         QTimer m_timer;
         bool m_initialized = false;
-        
     };
 } // namespace Rv
 

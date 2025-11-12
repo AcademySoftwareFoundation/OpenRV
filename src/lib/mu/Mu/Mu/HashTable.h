@@ -119,8 +119,7 @@ namespace Mu
     //
 
     template <class T, class Traits>
-    inline HashTable<T, Traits>::Iterator::Iterator(
-        const HashTable<T, Traits>* table)
+    inline HashTable<T, Traits>::Iterator::Iterator(const HashTable<T, Traits>* table)
         : _table(table)
         , _index(0)
         , _item(0)
@@ -130,8 +129,7 @@ namespace Mu
     }
 
     template <class T, class Traits>
-    inline HashTable<T, Traits>::Iterator::Iterator(
-        const HashTable<T, Traits>& table)
+    inline HashTable<T, Traits>::Iterator::Iterator(const HashTable<T, Traits>& table)
         : _table(&table)
         , _index(0)
         , _item(0)
@@ -140,8 +138,7 @@ namespace Mu
             this->operator++();
     }
 
-    template <class T, class Traits>
-    void HashTable<T, Traits>::Iterator::operator++()
+    template <class T, class Traits> void HashTable<T, Traits>::Iterator::operator++()
     {
         if (_item)
             if (!(_item = _item->next()))
@@ -149,8 +146,7 @@ namespace Mu
 
         if (!_item)
         {
-            for (; _index < _table->_tableSize && !_table->_table[_index];
-                 _index++)
+            for (; _index < _table->_tableSize && !_table->_table[_index]; _index++)
                 ;
             if (_index < _table->_tableSize)
                 _item = _table->_table[_index];
@@ -198,9 +194,7 @@ namespace Mu
 #endif
     }
 
-    template <class T, class Traits>
-    const typename HashTable<T, Traits>::Item*
-    HashTable<T, Traits>::add(const T& thing)
+    template <class T, class Traits> const typename HashTable<T, Traits>::Item* HashTable<T, Traits>::add(const T& thing)
     {
         if (const Item* item = find(thing))
             return item;
@@ -210,8 +204,7 @@ namespace Mu
     }
 
     template <class T, class Traits>
-    const typename HashTable<T, Traits>::Item*
-    HashTable<T, Traits>::addItem(typename HashTable<T, Traits>::Item* item)
+    const typename HashTable<T, Traits>::Item* HashTable<T, Traits>::addItem(typename HashTable<T, Traits>::Item* item)
     {
         HashValue hashIndex = Traits::hash(item->data()) % _tableSize;
         item->_next = _table[hashIndex];
@@ -219,9 +212,7 @@ namespace Mu
         return item;
     }
 
-    template <class T, class Traits>
-    const typename HashTable<T, Traits>::Item*
-    HashTable<T, Traits>::find(const T& thing) const
+    template <class T, class Traits> const typename HashTable<T, Traits>::Item* HashTable<T, Traits>::find(const T& thing) const
     {
         HashValue hashIndex = Traits::hash(thing) % _tableSize;
 
@@ -232,9 +223,7 @@ namespace Mu
     }
 
     template <class T, class Traits>
-    const typename HashTable<T, Traits>::Item*
-    HashTable<T, Traits>::firstItemOf(
-        typename HashTable<T, Traits>::HashValue h) const
+    const typename HashTable<T, Traits>::Item* HashTable<T, Traits>::firstItemOf(typename HashTable<T, Traits>::HashValue h) const
     {
         return _table[h % _tableSize];
     }

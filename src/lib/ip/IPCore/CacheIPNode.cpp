@@ -42,9 +42,7 @@ namespace IPCore
 #define DBL(level, x)
 #endif
 
-    CacheIPNode::CacheIPNode(const std::string& name, const NodeDefinition* def,
-                             const IPNode* snode, IPGraph* g,
-                             GroupIPNode* group)
+    CacheIPNode::CacheIPNode(const std::string& name, const NodeDefinition* def, const IPNode* snode, IPGraph* g, GroupIPNode* group)
         : IPNode(name, def, g, group)
         , m_active(false)
         , m_sourceNode(snode)
@@ -52,8 +50,7 @@ namespace IPCore
         init();
     }
 
-    CacheIPNode::CacheIPNode(const std::string& name, const NodeDefinition* def,
-                             IPGraph* g, GroupIPNode* group)
+    CacheIPNode::CacheIPNode(const std::string& name, const NodeDefinition* def, IPGraph* g, GroupIPNode* group)
         : IPNode(name, def, g, group)
         , m_active(false)
         , m_sourceNode(0)
@@ -68,8 +65,7 @@ namespace IPCore
         setMaxInputs(1);
         pthread_mutex_init(&m_mutex, 0);
 
-        m_performDownSample =
-            declareProperty<IntProperty>("render.downSampling", 1);
+        m_performDownSample = declareProperty<IntProperty>("render.downSampling", 1);
     }
 
     //
@@ -100,8 +96,7 @@ namespace IPCore
                 DB("IPImageTreeFromIDTree: calling checkOut " << id->id);
                 TwkFB::FrameBuffer* fb = context.cache.checkOut(id->id);
                 const IPNode* snode = node->sourceNode();
-                img = fb ? (new IPImage(snode, IPImage::BlendRenderType, fb))
-                         : (new IPImage(snode));
+                img = fb ? (new IPImage(snode, IPImage::BlendRenderType, fb)) : (new IPImage(snode));
 
                 // Transfer the noIntermediate flag from the IPImageID to the
                 // associated IPImage.
@@ -112,22 +107,17 @@ namespace IPCore
 
                 if (fb)
                 {
-                    if (const TwkFB::TypedFBVectorAttribute<float>*
-                            transformMatrixAtt = dynamic_cast<
-                                const TwkFB::TypedFBVectorAttribute<float>*>(
-                                fb->findAttribute("TransformMatrix")))
+                    if (const TwkFB::TypedFBVectorAttribute<float>* transformMatrixAtt =
+                            dynamic_cast<const TwkFB::TypedFBVectorAttribute<float>*>(fb->findAttribute("TransformMatrix")))
                     {
-                        if (transformMatrixAtt
-                            && transformMatrixAtt->value().size() == 16)
+                        if (transformMatrixAtt && transformMatrixAtt->value().size() == 16)
                         {
                             std::vector<float> txMatCoeffs;
                             for (int rowIndex = 0; rowIndex < 4; rowIndex++)
                             {
                                 for (int colIndex = 0; colIndex < 4; colIndex++)
                                 {
-                                    img->transformMatrix(rowIndex, colIndex) =
-                                        transformMatrixAtt
-                                            ->value()[rowIndex * 4 + colIndex];
+                                    img->transformMatrix(rowIndex, colIndex) = transformMatrixAtt->value()[rowIndex * 4 + colIndex];
                                 }
                             }
                         }
@@ -171,8 +161,7 @@ namespace IPCore
             if (img->fb)
             {
                 img->shaderExpr = Shader::sourceAssemblyShader(img);
-                img->resourceUsage =
-                    img->shaderExpr->computeResourceUsageRecursive();
+                img->resourceUsage = img->shaderExpr->computeResourceUsageRecursive();
             }
         }
     };
@@ -194,8 +183,7 @@ namespace IPCore
         {
             if (img->fb)
             {
-                DB("evaluate:    after miss, checkIn of "
-                   << img->fb << " " << img->fb->identifier());
+                DB("evaluate:    after miss, checkIn of " << img->fb << " " << img->fb->identifier());
                 context.cache.Cache::checkIn(img->fb);
             }
             else
@@ -210,8 +198,7 @@ namespace IPCore
 
     struct UseCacheImageIfExists
     {
-        UseCacheImageIfExists(const IPNode::Context& c, bool m,
-                              IPNode::ThreadType t, IPImage* r)
+        UseCacheImageIfExists(const IPNode::Context& c, bool m, IPNode::ThreadType t, IPImage* r)
             : context(c)
             , missing(m)
             , thread(t)
@@ -235,15 +222,13 @@ namespace IPCore
             if (!fb)
                 return;
 
-            TWK_CACHE_LOCK(context.cache,
-                           "thread=" << thread << ", img=" << img);
+            TWK_CACHE_LOCK(context.cache, "thread=" << thread << ", img=" << img);
 
             TwkFB::FrameBuffer* cfb = 0;
 
             try
             {
-                DB("UseCacheImageIfExists: calling checkOut "
-                   << fb->identifier());
+                DB("UseCacheImageIfExists: calling checkOut " << fb->identifier());
                 cfb = context.cache.checkOut(fb->identifier());
             }
             catch (std::exception& exc)
@@ -252,10 +237,8 @@ namespace IPCore
                 // err << exc.what() << endl;
                 // abort();
                 // throw;
-                DB("UseCacheImageIfExists: calling checkOut "
-                   << fb->identifier());
-                DB("UseCacheImageIfExists: cache checkOut of "
-                   << fb->identifier() << " threw: " << exc.what());
+                DB("UseCacheImageIfExists: calling checkOut " << fb->identifier());
+                DB("UseCacheImageIfExists: cache checkOut of " << fb->identifier() << " threw: " << exc.what());
 
                 cfb = 0;
             }
@@ -280,8 +263,7 @@ namespace IPCore
 
                 if (context.cacheNode)
                 {
-                    context.cache.add(cfb, context.baseFrame, false,
-                                      context.cacheNode);
+                    context.cache.add(cfb, context.baseFrame, false, context.cacheNode);
                 }
                 else
                 {
@@ -290,19 +272,16 @@ namespace IPCore
 
                 TWK_CACHE_UNLOCK(context.cache, "thread=" << thread);
 
-                DB("UseCacheImageIfExists: found fb "
-                   << cfb << " " << cfb->identifier() << " in cache, so");
-                DB("UseCacheImageIfExists:     deleting evaluated fb "
-                   << fb << " " << fb->identifier());
+                DB("UseCacheImageIfExists: found fb " << cfb << " " << cfb->identifier() << " in cache, so");
+                DB("UseCacheImageIfExists:     deleting evaluated fb " << fb << " " << fb->identifier());
                 delete fb;
                 fb = cfb;
                 img->fb = cfb;
             }
             else
             {
-                DB("UseCacheImageIfExists: calling add, thread "
-                   << context.thread << ":" << context.threadNum << " id "
-                   << fb->identifier());
+                DB("UseCacheImageIfExists: calling add, thread " << context.thread << ":" << context.threadNum << " id "
+                                                                 << fb->identifier());
 
                 //
                 //  If we're going to possibly shove the fb into the cache, make
@@ -319,8 +298,7 @@ namespace IPCore
                 //  discard a frame when the cache fills during playback (we ask
                 //  for the same frame twice).  Further investigation needed.
                 //
-                bool addSucceeded = context.cache.add(fb, context.baseFrame,
-                                                      true, context.cacheNode);
+                bool addSucceeded = context.cache.add(fb, context.baseFrame, true, context.cacheNode);
                 DB("UseCacheImageIfExists: add succeeded: " << addSucceeded);
 
                 if (!addSucceeded && thread == IPNode::CacheEvalThread)
@@ -352,8 +330,7 @@ namespace IPCore
 
                     TWK_CACHE_UNLOCK(context.cache, "thread=" << thread);
 
-                    DB("UseCacheImageIfExists: throwing CacheFullExc, thread "
-                       << context.threadNum);
+                    DB("UseCacheImageIfExists: throwing CacheFullExc, thread " << context.threadNum);
                     throw CacheFullExc();
                 }
 
@@ -403,8 +380,7 @@ namespace IPCore
             // NOTE: already checked out
             if (img->fb)
             {
-                context.cache.add(img->fb, context.baseFrame, false,
-                                  context.cacheNode);
+                context.cache.add(img->fb, context.baseFrame, false, context.cacheNode);
             }
         }
     };
@@ -418,8 +394,7 @@ namespace IPCore
 
     IPImage* CacheIPNode::evaluate(const Context& context)
     {
-        DB(name() << " evaluate() frame " << context.frame
-                  << " ****************************************************");
+        DB(name() << " evaluate() frame " << context.frame << " ****************************************************");
 
         ThreadType thread = context.thread;
         IPNode* inNode = inputs().front();
@@ -439,8 +414,7 @@ namespace IPCore
         IPImageID* idTree = 0;
         bool missing = false;
         bool missed = false;
-        bool profile =
-            (thread & DisplayThread) && graph()->needsProfilingSamples();
+        bool profile = (thread & DisplayThread) && graph()->needsProfilingSamples();
 
         PROFILE_SAMPLE(profile, evalIDStart);
 
@@ -492,15 +466,12 @@ namespace IPCore
 
         DB("evaluate: calling transform_ip with callable "
            "IPImageTreeFromIDTree ");
-        IPImage* root =
-            transform_ip<IPImage, IPImageID, IPImageTreeFromIDTree>(idTree, F);
+        IPImage* root = transform_ip<IPImage, IPImageID, IPImageTreeFromIDTree>(idTree, F);
         missed = F.missed || missed;
 
         if (missed)
         {
-            DB("evaluate: cache miss frame " << context.frame << " thread "
-                                             << context.thread << ":"
-                                             << context.threadNum);
+            DB("evaluate: cache miss frame " << context.frame << " thread " << context.thread << ":" << context.threadNum);
 
             //
             //  Check them back in. We'll check them out one at a time
@@ -586,13 +557,11 @@ namespace IPCore
         foreach_ip(root, Fassign);
 
         static bool use_std_filtering = getenv("RV_USE_STD_FILTERING");
-        if (m_performDownSample->front() && !use_std_filtering
-            && root->shaderExpr)
+        if (m_performDownSample->front() && !use_std_filtering && root->shaderExpr)
         {
             HOP_PROF("CacheIPNode::evaluate() - root->shaderExpr = "
                      "Shader::newDerivativeDownSample");
-            root->shaderExpr =
-                Shader::newDerivativeDownSample(root->shaderExpr);
+            root->shaderExpr = Shader::newDerivativeDownSample(root->shaderExpr);
         }
 
         return root;
@@ -614,8 +583,7 @@ namespace IPCore
         {
             if (context.cacheNode)
             {
-                TwkFB::FrameBuffer* fb =
-                    context.cache.perNodeCacheContents(context.cacheNode);
+                TwkFB::FrameBuffer* fb = context.cache.perNodeCacheContents(context.cacheNode);
                 if (fb)
                     id->id = fb->identifier();
             }

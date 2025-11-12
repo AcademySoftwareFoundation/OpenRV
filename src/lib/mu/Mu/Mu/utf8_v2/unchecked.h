@@ -33,8 +33,7 @@ namespace utf8
 {
     namespace unchecked
     {
-        template <typename octet_iterator>
-        octet_iterator append(uint32_t cp, octet_iterator result)
+        template <typename octet_iterator> octet_iterator append(uint32_t cp, octet_iterator result)
         {
             if (cp < 0x80) // one octet
                 *(result++) = static_cast<uint8_t>(cp);
@@ -62,8 +61,7 @@ namespace utf8
         template <typename octet_iterator> uint32_t next(octet_iterator& it)
         {
             uint32_t cp = internal::mask8(*it);
-            typename std::iterator_traits<octet_iterator>::difference_type
-                length = utf8::internal::sequence_length(it);
+            typename std::iterator_traits<octet_iterator>::difference_type length = utf8::internal::sequence_length(it);
             switch (length)
             {
             case 1:
@@ -74,15 +72,13 @@ namespace utf8
                 break;
             case 3:
                 ++it;
-                cp = ((cp << 12) & 0xffff)
-                     + ((internal::mask8(*it) << 6) & 0xfff);
+                cp = ((cp << 12) & 0xffff) + ((internal::mask8(*it) << 6) & 0xfff);
                 ++it;
                 cp += (*it) & 0x3f;
                 break;
             case 4:
                 ++it;
-                cp = ((cp << 18) & 0x1fffff)
-                     + ((internal::mask8(*it) << 12) & 0x3ffff);
+                cp = ((cp << 18) & 0x1fffff) + ((internal::mask8(*it) << 12) & 0x3ffff);
                 ++it;
                 cp += (internal::mask8(*it) << 6) & 0xfff;
                 ++it;
@@ -93,10 +89,7 @@ namespace utf8
             return cp;
         }
 
-        template <typename octet_iterator> uint32_t peek_next(octet_iterator it)
-        {
-            return next(it);
-        }
+        template <typename octet_iterator> uint32_t peek_next(octet_iterator it) { return next(it); }
 
         template <typename octet_iterator> uint32_t prior(octet_iterator& it)
         {
@@ -108,22 +101,16 @@ namespace utf8
 
         // Deprecated in versions that include prior, but only for the sake of
         // consistency (see utf8::previous)
-        template <typename octet_iterator>
-        inline uint32_t previous(octet_iterator& it)
-        {
-            return prior(it);
-        }
+        template <typename octet_iterator> inline uint32_t previous(octet_iterator& it) { return prior(it); }
 
-        template <typename octet_iterator, typename distance_type>
-        void advance(octet_iterator& it, distance_type n)
+        template <typename octet_iterator, typename distance_type> void advance(octet_iterator& it, distance_type n)
         {
             for (distance_type i = 0; i < n; ++i)
                 next(it);
         }
 
         template <typename octet_iterator>
-        typename std::iterator_traits<octet_iterator>::difference_type
-        distance(octet_iterator first, octet_iterator last)
+        typename std::iterator_traits<octet_iterator>::difference_type distance(octet_iterator first, octet_iterator last)
         {
             typename std::iterator_traits<octet_iterator>::difference_type dist;
             for (dist = 0; first < last; ++dist)
@@ -132,8 +119,7 @@ namespace utf8
         }
 
         template <typename u16bit_iterator, typename octet_iterator>
-        octet_iterator utf16to8(u16bit_iterator start, u16bit_iterator end,
-                                octet_iterator result)
+        octet_iterator utf16to8(u16bit_iterator start, u16bit_iterator end, octet_iterator result)
         {
             while (start != end)
             {
@@ -142,8 +128,7 @@ namespace utf8
                 if (internal::is_surrogate(cp))
                 {
                     uint32_t trail_surrogate = internal::mask16(*start++);
-                    cp = (cp << 10) + trail_surrogate
-                         + internal::SURROGATE_OFFSET;
+                    cp = (cp << 10) + trail_surrogate + internal::SURROGATE_OFFSET;
                 }
                 result = append(cp, result);
             }
@@ -151,18 +136,15 @@ namespace utf8
         }
 
         template <typename u16bit_iterator, typename octet_iterator>
-        u16bit_iterator utf8to16(octet_iterator start, octet_iterator end,
-                                 u16bit_iterator result)
+        u16bit_iterator utf8to16(octet_iterator start, octet_iterator end, u16bit_iterator result)
         {
             while (start != end)
             {
                 uint32_t cp = next(start);
                 if (cp > 0xffff)
                 { // make a surrogate pair
-                    *result++ = static_cast<uint16_t>((cp >> 10)
-                                                      + internal::LEAD_OFFSET);
-                    *result++ = static_cast<uint16_t>(
-                        (cp & 0x3ff) + internal::TRAIL_SURROGATE_MIN);
+                    *result++ = static_cast<uint16_t>((cp >> 10) + internal::LEAD_OFFSET);
+                    *result++ = static_cast<uint16_t>((cp & 0x3ff) + internal::TRAIL_SURROGATE_MIN);
                 }
                 else
                     *result++ = static_cast<uint16_t>(cp);
@@ -171,8 +153,7 @@ namespace utf8
         }
 
         template <typename octet_iterator, typename u32bit_iterator>
-        octet_iterator utf32to8(u32bit_iterator start, u32bit_iterator end,
-                                octet_iterator result)
+        octet_iterator utf32to8(u32bit_iterator start, u32bit_iterator end, octet_iterator result)
         {
             while (start != end)
                 result = append(*(start++), result);
@@ -181,8 +162,7 @@ namespace utf8
         }
 
         template <typename octet_iterator, typename u32bit_iterator>
-        u32bit_iterator utf8to32(octet_iterator start, octet_iterator end,
-                                 u32bit_iterator result)
+        u32bit_iterator utf8to32(octet_iterator start, octet_iterator end, u32bit_iterator result)
         {
             while (start < end)
                 (*result++) = next(start);
@@ -191,9 +171,7 @@ namespace utf8
         }
 
         // The iterator class
-        template <typename octet_iterator>
-        class iterator
-            : public std::iterator<std::bidirectional_iterator_tag, uint32_t>
+        template <typename octet_iterator> class iterator : public std::iterator<std::bidirectional_iterator_tag, uint32_t>
         {
             octet_iterator it;
 
@@ -214,15 +192,9 @@ namespace utf8
                 return next(temp);
             }
 
-            bool operator==(const iterator& rhs) const
-            {
-                return (it == rhs.it);
-            }
+            bool operator==(const iterator& rhs) const { return (it == rhs.it); }
 
-            bool operator!=(const iterator& rhs) const
-            {
-                return !(operator==(rhs));
-            }
+            bool operator!=(const iterator& rhs) const { return !(operator==(rhs)); }
 
             iterator& operator++()
             {

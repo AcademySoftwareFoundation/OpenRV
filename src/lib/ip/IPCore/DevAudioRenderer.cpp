@@ -31,8 +31,7 @@ namespace IPCore
         const Session::Sources& sources = session->sources();
         m_movInfo = &sources.front()->movie()->info();
 
-        m_audioDev = new OSSDriver(OSSDriver::S16_LE, 2, OSSDriver::play,
-                                   TWEAK_AUDIO_DEFAULT_SAMPLE_RATE);
+        m_audioDev = new OSSDriver(OSSDriver::S16_LE, 2, OSSDriver::play, TWEAK_AUDIO_DEFAULT_SAMPLE_RATE);
     }
 
     DevAudioRenderer::~DevAudioRenderer()
@@ -50,10 +49,7 @@ namespace IPCore
         dar->playerThread();
     }
 
-    bool DevAudioRenderer::isPlaying() const
-    {
-        return (m_isPlaying == true) && (!m_firstTime);
-    }
+    bool DevAudioRenderer::isPlaying() const { return (m_isPlaying == true) && (!m_firstTime); }
 
     void DevAudioRenderer::play()
     {
@@ -77,8 +73,7 @@ namespace IPCore
             // if (m_deviceRate != m_movInfo->audioSampleRate)
             if (m_deviceRate != TWEAK_AUDIO_DEFAULT_SAMPLE_RATE)
             {
-                std::cerr
-                    << "WARNING: audio device rate != movie sample rate\n";
+                std::cerr << "WARNING: audio device rate != movie sample rate\n";
             }
 
             m_isPlaying = true;
@@ -117,8 +112,7 @@ namespace IPCore
 
         try
         {
-            size_t t = size_t(double(session->shift()) / session->fps()
-                              * m_deviceRate);
+            size_t t = size_t(double(session->shift()) / session->fps() * m_deviceRate);
             m_startSample = t;
             m_sampleShift = t;
             m_firstTime = false;
@@ -134,8 +128,7 @@ namespace IPCore
                 const double e = session->timer().elapsed();
                 const int od = m_audioDev->getODelay();
                 const int psamps = m_startSample - od / 4;
-                const double ae =
-                    double(psamps - m_sampleShift) / double(m_deviceRate);
+                const double ae = double(psamps - m_sampleShift) / double(m_deviceRate);
 
                 m_timeShift = ae - e;
 
@@ -153,8 +146,7 @@ namespace IPCore
         }
         catch (const std::exception& e)
         {
-            std::cerr << "DevAudioRenderer::playerThread: " << e.what()
-                      << std::endl;
+            std::cerr << "DevAudioRenderer::playerThread: " << e.what() << std::endl;
         }
     }
 
@@ -170,8 +162,7 @@ namespace IPCore
 
         const Session::Sources& sources = session->sources();
 
-        unsigned int n = session->rootNode()->audioFillBuffer(
-            fout, m_deviceRate, m_startSample, numSamples);
+        unsigned int n = session->rootNode()->audioFillBuffer(fout, m_deviceRate, m_startSample, numSamples);
 
         if (n != numSamples)
         {
@@ -195,9 +186,6 @@ namespace IPCore
         m_elapsedSincePlay += double(numSamples) / double(m_deviceRate);
     }
 
-    void DevAudioRenderer::setTime(double t)
-    {
-        m_startSample = (unsigned int)(t * double(m_deviceRate));
-    }
+    void DevAudioRenderer::setTime(double t) { m_startSample = (unsigned int)(t * double(m_deviceRate)); }
 
 } //  End namespace IPCore

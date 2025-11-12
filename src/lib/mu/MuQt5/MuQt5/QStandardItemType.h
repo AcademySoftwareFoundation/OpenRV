@@ -34,8 +34,7 @@ namespace Mu
         //  Constructors
         //
 
-        QStandardItemType(Context* context, const char* name,
-                          Class* superClass = 0);
+        QStandardItemType(Context* context, const char* name, Class* superClass = 0);
         virtual ~QStandardItemType();
 
         //

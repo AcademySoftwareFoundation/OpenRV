@@ -49,8 +49,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  Mu Type CONSTRUCTORS
 
-    QIODeviceType::QIODeviceType(Context* c, const char* name, Class* super,
-                                 Class* super2)
+    QIODeviceType::QIODeviceType(Context* c, const char* name, Class* super, Class* super2)
         : Class(c, name, vectorOf2(super, super2))
     {
     }
@@ -71,9 +70,7 @@ namespace Mu
         }
         else if (QIODevice* w = object<QIODevice>(widget))
         {
-            QIODeviceType* type =
-                c->findSymbolOfTypeByQualifiedName<QIODeviceType>(
-                    c->internName("qt.QIODevice"), false);
+            QIODeviceType* type = c->findSymbolOfTypeByQualifiedName<QIODeviceType>(c->internName("qt.QIODevice"), false);
             ClassInstance* o = ClassInstance::allocate(type);
             setobject(o, w);
             return o;
@@ -84,139 +81,117 @@ namespace Mu
         }
     }
 
-    static NODE_IMPLEMENTATION(castFromObject, Pointer)
-    {
-        NODE_RETURN(
-            QIODevice_QIODevice_QObject(NODE_THREAD, NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(castFromObject, Pointer) { NODE_RETURN(QIODevice_QIODevice_QObject(NODE_THREAD, NODE_ARG(0, Pointer))); }
 
     // NO FUNC: CLASS IS ABSTRACT: QIODevice (QIODevice; QIODevice this)
     // NO FUNC: CLASS IS ABSTRACT: QIODevice (QIODevice; QIODevice this, QObject
     // parent)
-    bool qt_QIODevice_atEnd_bool_QIODevice(Mu::Thread& NODE_THREAD,
-                                           Pointer param_this)
+    bool qt_QIODevice_atEnd_bool_QIODevice(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QIODevice* arg0 = object<QIODevice>(param_this);
         return arg0->atEnd();
     }
 
-    int64 qt_QIODevice_bytesAvailable_int64_QIODevice(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    int64 qt_QIODevice_bytesAvailable_int64_QIODevice(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QIODevice* arg0 = object<QIODevice>(param_this);
         return arg0->bytesAvailable();
     }
 
-    int64 qt_QIODevice_bytesToWrite_int64_QIODevice(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this)
+    int64 qt_QIODevice_bytesToWrite_int64_QIODevice(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QIODevice* arg0 = object<QIODevice>(param_this);
         return arg0->bytesToWrite();
     }
 
-    bool qt_QIODevice_canReadLine_bool_QIODevice(Mu::Thread& NODE_THREAD,
-                                                 Pointer param_this)
+    bool qt_QIODevice_canReadLine_bool_QIODevice(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QIODevice* arg0 = object<QIODevice>(param_this);
         return arg0->canReadLine();
     }
 
-    void qt_QIODevice_close_void_QIODevice(Mu::Thread& NODE_THREAD,
-                                           Pointer param_this)
+    void qt_QIODevice_close_void_QIODevice(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QIODevice* arg0 = object<QIODevice>(param_this);
         arg0->close();
     }
 
-    void qt_QIODevice_commitTransaction_void_QIODevice(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this)
+    void qt_QIODevice_commitTransaction_void_QIODevice(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QIODevice* arg0 = object<QIODevice>(param_this);
         arg0->commitTransaction();
     }
 
-    int qt_QIODevice_currentReadChannel_int_QIODevice(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    int qt_QIODevice_currentReadChannel_int_QIODevice(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QIODevice* arg0 = object<QIODevice>(param_this);
         return arg0->currentReadChannel();
     }
 
-    int qt_QIODevice_currentWriteChannel_int_QIODevice(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this)
+    int qt_QIODevice_currentWriteChannel_int_QIODevice(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QIODevice* arg0 = object<QIODevice>(param_this);
         return arg0->currentWriteChannel();
     }
 
-    Pointer qt_QIODevice_errorString_string_QIODevice(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    Pointer qt_QIODevice_errorString_string_QIODevice(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QIODevice* arg0 = object<QIODevice>(param_this);
         return makestring(c, arg0->errorString());
     }
 
-    bool qt_QIODevice_isOpen_bool_QIODevice(Mu::Thread& NODE_THREAD,
-                                            Pointer param_this)
+    bool qt_QIODevice_isOpen_bool_QIODevice(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QIODevice* arg0 = object<QIODevice>(param_this);
         return arg0->isOpen();
     }
 
-    bool qt_QIODevice_isReadable_bool_QIODevice(Mu::Thread& NODE_THREAD,
-                                                Pointer param_this)
+    bool qt_QIODevice_isReadable_bool_QIODevice(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QIODevice* arg0 = object<QIODevice>(param_this);
         return arg0->isReadable();
     }
 
-    bool qt_QIODevice_isSequential_bool_QIODevice(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this)
+    bool qt_QIODevice_isSequential_bool_QIODevice(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QIODevice* arg0 = object<QIODevice>(param_this);
         return arg0->isSequential();
     }
 
-    bool qt_QIODevice_isTextModeEnabled_bool_QIODevice(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this)
+    bool qt_QIODevice_isTextModeEnabled_bool_QIODevice(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QIODevice* arg0 = object<QIODevice>(param_this);
         return arg0->isTextModeEnabled();
     }
 
-    bool
-    qt_QIODevice_isTransactionStarted_bool_QIODevice(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_this)
+    bool qt_QIODevice_isTransactionStarted_bool_QIODevice(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QIODevice* arg0 = object<QIODevice>(param_this);
         return arg0->isTransactionStarted();
     }
 
-    bool qt_QIODevice_isWritable_bool_QIODevice(Mu::Thread& NODE_THREAD,
-                                                Pointer param_this)
+    bool qt_QIODevice_isWritable_bool_QIODevice(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QIODevice* arg0 = object<QIODevice>(param_this);
         return arg0->isWritable();
     }
 
-    bool qt_QIODevice_open_bool_QIODevice_int(Mu::Thread& NODE_THREAD,
-                                              Pointer param_this,
-                                              int param_mode)
+    bool qt_QIODevice_open_bool_QIODevice_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_mode)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QIODevice* arg0 = object<QIODevice>(param_this);
@@ -224,16 +199,14 @@ namespace Mu
         return arg0->open(arg1);
     }
 
-    int qt_QIODevice_openMode_int_QIODevice(Mu::Thread& NODE_THREAD,
-                                            Pointer param_this)
+    int qt_QIODevice_openMode_int_QIODevice(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QIODevice* arg0 = object<QIODevice>(param_this);
         return int(arg0->openMode());
     }
 
-    Pointer qt_QIODevice_peek_QByteArray_QIODevice_int64(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int64 param_maxSize)
+    Pointer qt_QIODevice_peek_QByteArray_QIODevice_int64(Mu::Thread& NODE_THREAD, Pointer param_this, int64 param_maxSize)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QIODevice* arg0 = object<QIODevice>(param_this);
@@ -241,16 +214,14 @@ namespace Mu
         return makeqtype<QByteArrayType>(c, arg0->peek(arg1), "qt.QByteArray");
     }
 
-    int64 qt_QIODevice_pos_int64_QIODevice(Mu::Thread& NODE_THREAD,
-                                           Pointer param_this)
+    int64 qt_QIODevice_pos_int64_QIODevice(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QIODevice* arg0 = object<QIODevice>(param_this);
         return arg0->pos();
     }
 
-    Pointer qt_QIODevice_read_QByteArray_QIODevice_int64(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int64 param_maxSize)
+    Pointer qt_QIODevice_read_QByteArray_QIODevice_int64(Mu::Thread& NODE_THREAD, Pointer param_this, int64 param_maxSize)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QIODevice* arg0 = object<QIODevice>(param_this);
@@ -258,52 +229,43 @@ namespace Mu
         return makeqtype<QByteArrayType>(c, arg0->read(arg1), "qt.QByteArray");
     }
 
-    Pointer qt_QIODevice_readAll_QByteArray_QIODevice(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    Pointer qt_QIODevice_readAll_QByteArray_QIODevice(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QIODevice* arg0 = object<QIODevice>(param_this);
         return makeqtype<QByteArrayType>(c, arg0->readAll(), "qt.QByteArray");
     }
 
-    int qt_QIODevice_readChannelCount_int_QIODevice(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this)
+    int qt_QIODevice_readChannelCount_int_QIODevice(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QIODevice* arg0 = object<QIODevice>(param_this);
         return arg0->readChannelCount();
     }
 
-    Pointer qt_QIODevice_readLine_QByteArray_QIODevice_int64(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int64 param_maxSize)
+    Pointer qt_QIODevice_readLine_QByteArray_QIODevice_int64(Mu::Thread& NODE_THREAD, Pointer param_this, int64 param_maxSize)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QIODevice* arg0 = object<QIODevice>(param_this);
         qint64 arg1 = (int64)(param_maxSize);
-        return makeqtype<QByteArrayType>(c, arg0->readLine(arg1),
-                                         "qt.QByteArray");
+        return makeqtype<QByteArrayType>(c, arg0->readLine(arg1), "qt.QByteArray");
     }
 
-    bool qt_QIODevice_reset_bool_QIODevice(Mu::Thread& NODE_THREAD,
-                                           Pointer param_this)
+    bool qt_QIODevice_reset_bool_QIODevice(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QIODevice* arg0 = object<QIODevice>(param_this);
         return arg0->reset();
     }
 
-    void
-    qt_QIODevice_rollbackTransaction_void_QIODevice(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this)
+    void qt_QIODevice_rollbackTransaction_void_QIODevice(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QIODevice* arg0 = object<QIODevice>(param_this);
         arg0->rollbackTransaction();
     }
 
-    bool qt_QIODevice_seek_bool_QIODevice_int64(Mu::Thread& NODE_THREAD,
-                                                Pointer param_this,
-                                                int64 param_pos)
+    bool qt_QIODevice_seek_bool_QIODevice_int64(Mu::Thread& NODE_THREAD, Pointer param_this, int64 param_pos)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QIODevice* arg0 = object<QIODevice>(param_this);
@@ -311,8 +273,7 @@ namespace Mu
         return arg0->seek(arg1);
     }
 
-    void qt_QIODevice_setCurrentReadChannel_void_QIODevice_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_channel)
+    void qt_QIODevice_setCurrentReadChannel_void_QIODevice_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_channel)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QIODevice* arg0 = object<QIODevice>(param_this);
@@ -320,8 +281,7 @@ namespace Mu
         arg0->setCurrentReadChannel(arg1);
     }
 
-    void qt_QIODevice_setCurrentWriteChannel_void_QIODevice_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_channel)
+    void qt_QIODevice_setCurrentWriteChannel_void_QIODevice_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_channel)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QIODevice* arg0 = object<QIODevice>(param_this);
@@ -329,8 +289,7 @@ namespace Mu
         arg0->setCurrentWriteChannel(arg1);
     }
 
-    void qt_QIODevice_setTextModeEnabled_void_QIODevice_bool(
-        Mu::Thread& NODE_THREAD, Pointer param_this, bool param_enabled)
+    void qt_QIODevice_setTextModeEnabled_void_QIODevice_bool(Mu::Thread& NODE_THREAD, Pointer param_this, bool param_enabled)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QIODevice* arg0 = object<QIODevice>(param_this);
@@ -338,17 +297,14 @@ namespace Mu
         arg0->setTextModeEnabled(arg1);
     }
 
-    int64 qt_QIODevice_size_int64_QIODevice(Mu::Thread& NODE_THREAD,
-                                            Pointer param_this)
+    int64 qt_QIODevice_size_int64_QIODevice(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QIODevice* arg0 = object<QIODevice>(param_this);
         return arg0->size();
     }
 
-    int64 qt_QIODevice_skip_int64_QIODevice_int64(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this,
-                                                  int64 param_maxSize)
+    int64 qt_QIODevice_skip_int64_QIODevice_int64(Mu::Thread& NODE_THREAD, Pointer param_this, int64 param_maxSize)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QIODevice* arg0 = object<QIODevice>(param_this);
@@ -356,16 +312,14 @@ namespace Mu
         return arg0->skip(arg1);
     }
 
-    void qt_QIODevice_startTransaction_void_QIODevice(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    void qt_QIODevice_startTransaction_void_QIODevice(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QIODevice* arg0 = object<QIODevice>(param_this);
         arg0->startTransaction();
     }
 
-    bool qt_QIODevice_waitForBytesWritten_bool_QIODevice_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_msecs)
+    bool qt_QIODevice_waitForBytesWritten_bool_QIODevice_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_msecs)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QIODevice* arg0 = object<QIODevice>(param_this);
@@ -373,8 +327,7 @@ namespace Mu
         return arg0->waitForBytesWritten(arg1);
     }
 
-    bool qt_QIODevice_waitForReadyRead_bool_QIODevice_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_msecs)
+    bool qt_QIODevice_waitForReadyRead_bool_QIODevice_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_msecs)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QIODevice* arg0 = object<QIODevice>(param_this);
@@ -382,9 +335,7 @@ namespace Mu
         return arg0->waitForReadyRead(arg1);
     }
 
-    int64 qt_QIODevice_write_int64_QIODevice_QByteArray(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this,
-                                                        Pointer param_data)
+    int64 qt_QIODevice_write_int64_QIODevice_QByteArray(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_data)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QIODevice* arg0 = object<QIODevice>(param_this);
@@ -392,17 +343,14 @@ namespace Mu
         return arg0->write(arg1);
     }
 
-    int qt_QIODevice_writeChannelCount_int_QIODevice(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_this)
+    int qt_QIODevice_writeChannelCount_int_QIODevice(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QIODevice* arg0 = object<QIODevice>(param_this);
         return arg0->writeChannelCount();
     }
 
-    bool qt_QIODevice_event_bool_QIODevice_QEvent(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this,
-                                                  Pointer param_e)
+    bool qt_QIODevice_event_bool_QIODevice_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QIODevice* arg0 = object<QIODevice>(param_this);
@@ -410,9 +358,8 @@ namespace Mu
         return arg0->event(arg1);
     }
 
-    bool qt_QIODevice_eventFilter_bool_QIODevice_QObject_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_watched,
-        Pointer param_event)
+    bool qt_QIODevice_eventFilter_bool_QIODevice_QObject_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_watched,
+                                                                Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QIODevice* arg0 = object<QIODevice>(param_this);
@@ -426,231 +373,187 @@ namespace Mu
     // parent)
     static NODE_IMPLEMENTATION(_n_atEnd0, bool)
     {
-        NODE_RETURN(qt_QIODevice_atEnd_bool_QIODevice(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QIODevice_atEnd_bool_QIODevice(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_bytesAvailable0, int64)
     {
-        NODE_RETURN(qt_QIODevice_bytesAvailable_int64_QIODevice(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QIODevice_bytesAvailable_int64_QIODevice(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_bytesToWrite0, int64)
     {
-        NODE_RETURN(qt_QIODevice_bytesToWrite_int64_QIODevice(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QIODevice_bytesToWrite_int64_QIODevice(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_canReadLine0, bool)
     {
-        NODE_RETURN(qt_QIODevice_canReadLine_bool_QIODevice(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QIODevice_canReadLine_bool_QIODevice(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
-    static NODE_IMPLEMENTATION(_n_close0, void)
-    {
-        qt_QIODevice_close_void_QIODevice(NODE_THREAD,
-                                          NONNIL_NODE_ARG(0, Pointer));
-    }
+    static NODE_IMPLEMENTATION(_n_close0, void) { qt_QIODevice_close_void_QIODevice(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)); }
 
     static NODE_IMPLEMENTATION(_n_commitTransaction0, void)
     {
-        qt_QIODevice_commitTransaction_void_QIODevice(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
+        qt_QIODevice_commitTransaction_void_QIODevice(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_currentReadChannel0, int)
     {
-        NODE_RETURN(qt_QIODevice_currentReadChannel_int_QIODevice(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QIODevice_currentReadChannel_int_QIODevice(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_currentWriteChannel0, int)
     {
-        NODE_RETURN(qt_QIODevice_currentWriteChannel_int_QIODevice(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QIODevice_currentWriteChannel_int_QIODevice(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_errorString0, Pointer)
     {
-        NODE_RETURN(qt_QIODevice_errorString_string_QIODevice(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QIODevice_errorString_string_QIODevice(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isOpen0, bool)
     {
-        NODE_RETURN(qt_QIODevice_isOpen_bool_QIODevice(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QIODevice_isOpen_bool_QIODevice(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isReadable0, bool)
     {
-        NODE_RETURN(qt_QIODevice_isReadable_bool_QIODevice(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QIODevice_isReadable_bool_QIODevice(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isSequential0, bool)
     {
-        NODE_RETURN(qt_QIODevice_isSequential_bool_QIODevice(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QIODevice_isSequential_bool_QIODevice(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isTextModeEnabled0, bool)
     {
-        NODE_RETURN(qt_QIODevice_isTextModeEnabled_bool_QIODevice(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QIODevice_isTextModeEnabled_bool_QIODevice(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isTransactionStarted0, bool)
     {
-        NODE_RETURN(qt_QIODevice_isTransactionStarted_bool_QIODevice(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QIODevice_isTransactionStarted_bool_QIODevice(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isWritable0, bool)
     {
-        NODE_RETURN(qt_QIODevice_isWritable_bool_QIODevice(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QIODevice_isWritable_bool_QIODevice(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_open0, bool)
     {
-        NODE_RETURN(qt_QIODevice_open_bool_QIODevice_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QIODevice_open_bool_QIODevice_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_openMode0, int)
     {
-        NODE_RETURN(qt_QIODevice_openMode_int_QIODevice(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QIODevice_openMode_int_QIODevice(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_peek1, Pointer)
     {
-        NODE_RETURN(qt_QIODevice_peek_QByteArray_QIODevice_int64(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int64)));
+        NODE_RETURN(qt_QIODevice_peek_QByteArray_QIODevice_int64(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int64)));
     }
 
-    static NODE_IMPLEMENTATION(_n_pos0, int64)
-    {
-        NODE_RETURN(qt_QIODevice_pos_int64_QIODevice(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_pos0, int64) { NODE_RETURN(qt_QIODevice_pos_int64_QIODevice(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
     static NODE_IMPLEMENTATION(_n_read1, Pointer)
     {
-        NODE_RETURN(qt_QIODevice_read_QByteArray_QIODevice_int64(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int64)));
+        NODE_RETURN(qt_QIODevice_read_QByteArray_QIODevice_int64(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int64)));
     }
 
     static NODE_IMPLEMENTATION(_n_readAll0, Pointer)
     {
-        NODE_RETURN(qt_QIODevice_readAll_QByteArray_QIODevice(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QIODevice_readAll_QByteArray_QIODevice(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_readChannelCount0, int)
     {
-        NODE_RETURN(qt_QIODevice_readChannelCount_int_QIODevice(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QIODevice_readChannelCount_int_QIODevice(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_readLine1, Pointer)
     {
-        NODE_RETURN(qt_QIODevice_readLine_QByteArray_QIODevice_int64(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int64)));
+        NODE_RETURN(qt_QIODevice_readLine_QByteArray_QIODevice_int64(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int64)));
     }
 
     static NODE_IMPLEMENTATION(_n_reset0, bool)
     {
-        NODE_RETURN(qt_QIODevice_reset_bool_QIODevice(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QIODevice_reset_bool_QIODevice(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_rollbackTransaction0, void)
     {
-        qt_QIODevice_rollbackTransaction_void_QIODevice(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
+        qt_QIODevice_rollbackTransaction_void_QIODevice(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_seek0, bool)
     {
-        NODE_RETURN(qt_QIODevice_seek_bool_QIODevice_int64(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int64)));
+        NODE_RETURN(qt_QIODevice_seek_bool_QIODevice_int64(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int64)));
     }
 
     static NODE_IMPLEMENTATION(_n_setCurrentReadChannel0, void)
     {
-        qt_QIODevice_setCurrentReadChannel_void_QIODevice_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QIODevice_setCurrentReadChannel_void_QIODevice_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setCurrentWriteChannel0, void)
     {
-        qt_QIODevice_setCurrentWriteChannel_void_QIODevice_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QIODevice_setCurrentWriteChannel_void_QIODevice_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setTextModeEnabled0, void)
     {
-        qt_QIODevice_setTextModeEnabled_void_QIODevice_bool(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool));
+        qt_QIODevice_setTextModeEnabled_void_QIODevice_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool));
     }
 
     static NODE_IMPLEMENTATION(_n_size0, int64)
     {
-        NODE_RETURN(qt_QIODevice_size_int64_QIODevice(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QIODevice_size_int64_QIODevice(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_skip0, int64)
     {
-        NODE_RETURN(qt_QIODevice_skip_int64_QIODevice_int64(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int64)));
+        NODE_RETURN(qt_QIODevice_skip_int64_QIODevice_int64(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int64)));
     }
 
     static NODE_IMPLEMENTATION(_n_startTransaction0, void)
     {
-        qt_QIODevice_startTransaction_void_QIODevice(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
+        qt_QIODevice_startTransaction_void_QIODevice(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_waitForBytesWritten0, bool)
     {
-        NODE_RETURN(qt_QIODevice_waitForBytesWritten_bool_QIODevice_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QIODevice_waitForBytesWritten_bool_QIODevice_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_waitForReadyRead0, bool)
     {
-        NODE_RETURN(qt_QIODevice_waitForReadyRead_bool_QIODevice_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QIODevice_waitForReadyRead_bool_QIODevice_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_write2, int64)
     {
-        NODE_RETURN(qt_QIODevice_write_int64_QIODevice_QByteArray(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QIODevice_write_int64_QIODevice_QByteArray(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_writeChannelCount0, int)
     {
-        NODE_RETURN(qt_QIODevice_writeChannelCount_int_QIODevice(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QIODevice_writeChannelCount_int_QIODevice(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_event0, bool)
     {
-        NODE_RETURN(qt_QIODevice_event_bool_QIODevice_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QIODevice_event_bool_QIODevice_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_eventFilter0, bool)
     {
-        NODE_RETURN(qt_QIODevice_eventFilter_bool_QIODevice_QObject_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QIODevice_eventFilter_bool_QIODevice_QObject_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                           NODE_ARG(2, Pointer)));
     }
 
     void QIODeviceType::load()
@@ -670,17 +573,13 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
-                   new Function(c, tn, castFromObject, Cast, Compiled,
-                                QIODevice_QIODevice_QObject, Return, ftn,
-                                Parameters,
+                   new Function(c, tn, castFromObject, Cast, Compiled, QIODevice_QIODevice_QObject, Return, ftn, Parameters,
                                 new Param(c, "object", "qt.QObject"), End),
 
                    EndArguments);
@@ -691,176 +590,96 @@ namespace Mu
             // ABSTRACT CONSTRUCTOR: QIODevice (QIODevice; QIODevice this)
             // ABSTRACT CONSTRUCTOR: QIODevice (QIODevice; QIODevice this,
             // QObject parent)
-            new MemberFunction(c, "atEnd", _n_atEnd0, None, Compiled,
-                               qt_QIODevice_atEnd_bool_QIODevice, Return,
-                               "bool", Parameters,
+            new MemberFunction(c, "atEnd", _n_atEnd0, None, Compiled, qt_QIODevice_atEnd_bool_QIODevice, Return, "bool", Parameters,
                                new Param(c, "this", "qt.QIODevice"), End),
-            new MemberFunction(
-                c, "bytesAvailable", _n_bytesAvailable0, None, Compiled,
-                qt_QIODevice_bytesAvailable_int64_QIODevice, Return, "int64",
-                Parameters, new Param(c, "this", "qt.QIODevice"), End),
-            new MemberFunction(
-                c, "bytesToWrite", _n_bytesToWrite0, None, Compiled,
-                qt_QIODevice_bytesToWrite_int64_QIODevice, Return, "int64",
-                Parameters, new Param(c, "this", "qt.QIODevice"), End),
-            new MemberFunction(
-                c, "canReadLine", _n_canReadLine0, None, Compiled,
-                qt_QIODevice_canReadLine_bool_QIODevice, Return, "bool",
-                Parameters, new Param(c, "this", "qt.QIODevice"), End),
-            new MemberFunction(c, "close", _n_close0, None, Compiled,
-                               qt_QIODevice_close_void_QIODevice, Return,
-                               "void", Parameters,
+            new MemberFunction(c, "bytesAvailable", _n_bytesAvailable0, None, Compiled, qt_QIODevice_bytesAvailable_int64_QIODevice, Return,
+                               "int64", Parameters, new Param(c, "this", "qt.QIODevice"), End),
+            new MemberFunction(c, "bytesToWrite", _n_bytesToWrite0, None, Compiled, qt_QIODevice_bytesToWrite_int64_QIODevice, Return,
+                               "int64", Parameters, new Param(c, "this", "qt.QIODevice"), End),
+            new MemberFunction(c, "canReadLine", _n_canReadLine0, None, Compiled, qt_QIODevice_canReadLine_bool_QIODevice, Return, "bool",
+                               Parameters, new Param(c, "this", "qt.QIODevice"), End),
+            new MemberFunction(c, "close", _n_close0, None, Compiled, qt_QIODevice_close_void_QIODevice, Return, "void", Parameters,
                                new Param(c, "this", "qt.QIODevice"), End),
-            new Function(
-                c, "commitTransaction", _n_commitTransaction0, None, Compiled,
-                qt_QIODevice_commitTransaction_void_QIODevice, Return, "void",
-                Parameters, new Param(c, "this", "qt.QIODevice"), End),
-            new Function(
-                c, "currentReadChannel", _n_currentReadChannel0, None, Compiled,
-                qt_QIODevice_currentReadChannel_int_QIODevice, Return, "int",
-                Parameters, new Param(c, "this", "qt.QIODevice"), End),
-            new Function(c, "currentWriteChannel", _n_currentWriteChannel0,
-                         None, Compiled,
-                         qt_QIODevice_currentWriteChannel_int_QIODevice, Return,
-                         "int", Parameters,
-                         new Param(c, "this", "qt.QIODevice"), End),
-            new Function(c, "errorString", _n_errorString0, None, Compiled,
-                         qt_QIODevice_errorString_string_QIODevice, Return,
-                         "string", Parameters,
-                         new Param(c, "this", "qt.QIODevice"), End),
+            new Function(c, "commitTransaction", _n_commitTransaction0, None, Compiled, qt_QIODevice_commitTransaction_void_QIODevice,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QIODevice"), End),
+            new Function(c, "currentReadChannel", _n_currentReadChannel0, None, Compiled, qt_QIODevice_currentReadChannel_int_QIODevice,
+                         Return, "int", Parameters, new Param(c, "this", "qt.QIODevice"), End),
+            new Function(c, "currentWriteChannel", _n_currentWriteChannel0, None, Compiled, qt_QIODevice_currentWriteChannel_int_QIODevice,
+                         Return, "int", Parameters, new Param(c, "this", "qt.QIODevice"), End),
+            new Function(c, "errorString", _n_errorString0, None, Compiled, qt_QIODevice_errorString_string_QIODevice, Return, "string",
+                         Parameters, new Param(c, "this", "qt.QIODevice"), End),
             // MISSING: getChar (bool; QIODevice this, "char *" c)
-            new Function(c, "isOpen", _n_isOpen0, None, Compiled,
-                         qt_QIODevice_isOpen_bool_QIODevice, Return, "bool",
-                         Parameters, new Param(c, "this", "qt.QIODevice"), End),
-            new Function(c, "isReadable", _n_isReadable0, None, Compiled,
-                         qt_QIODevice_isReadable_bool_QIODevice, Return, "bool",
-                         Parameters, new Param(c, "this", "qt.QIODevice"), End),
-            new MemberFunction(
-                c, "isSequential", _n_isSequential0, None, Compiled,
-                qt_QIODevice_isSequential_bool_QIODevice, Return, "bool",
-                Parameters, new Param(c, "this", "qt.QIODevice"), End),
-            new Function(
-                c, "isTextModeEnabled", _n_isTextModeEnabled0, None, Compiled,
-                qt_QIODevice_isTextModeEnabled_bool_QIODevice, Return, "bool",
-                Parameters, new Param(c, "this", "qt.QIODevice"), End),
-            new Function(c, "isTransactionStarted", _n_isTransactionStarted0,
-                         None, Compiled,
-                         qt_QIODevice_isTransactionStarted_bool_QIODevice,
-                         Return, "bool", Parameters,
+            new Function(c, "isOpen", _n_isOpen0, None, Compiled, qt_QIODevice_isOpen_bool_QIODevice, Return, "bool", Parameters,
                          new Param(c, "this", "qt.QIODevice"), End),
-            new Function(c, "isWritable", _n_isWritable0, None, Compiled,
-                         qt_QIODevice_isWritable_bool_QIODevice, Return, "bool",
+            new Function(c, "isReadable", _n_isReadable0, None, Compiled, qt_QIODevice_isReadable_bool_QIODevice, Return, "bool",
                          Parameters, new Param(c, "this", "qt.QIODevice"), End),
-            new MemberFunction(c, "open", _n_open0, None, Compiled,
-                               qt_QIODevice_open_bool_QIODevice_int, Return,
-                               "bool", Parameters,
-                               new Param(c, "this", "qt.QIODevice"),
-                               new Param(c, "mode", "int"), End),
-            new Function(c, "openMode", _n_openMode0, None, Compiled,
-                         qt_QIODevice_openMode_int_QIODevice, Return, "int",
+            new MemberFunction(c, "isSequential", _n_isSequential0, None, Compiled, qt_QIODevice_isSequential_bool_QIODevice, Return,
+                               "bool", Parameters, new Param(c, "this", "qt.QIODevice"), End),
+            new Function(c, "isTextModeEnabled", _n_isTextModeEnabled0, None, Compiled, qt_QIODevice_isTextModeEnabled_bool_QIODevice,
+                         Return, "bool", Parameters, new Param(c, "this", "qt.QIODevice"), End),
+            new Function(c, "isTransactionStarted", _n_isTransactionStarted0, None, Compiled,
+                         qt_QIODevice_isTransactionStarted_bool_QIODevice, Return, "bool", Parameters, new Param(c, "this", "qt.QIODevice"),
+                         End),
+            new Function(c, "isWritable", _n_isWritable0, None, Compiled, qt_QIODevice_isWritable_bool_QIODevice, Return, "bool",
                          Parameters, new Param(c, "this", "qt.QIODevice"), End),
+            new MemberFunction(c, "open", _n_open0, None, Compiled, qt_QIODevice_open_bool_QIODevice_int, Return, "bool", Parameters,
+                               new Param(c, "this", "qt.QIODevice"), new Param(c, "mode", "int"), End),
+            new Function(c, "openMode", _n_openMode0, None, Compiled, qt_QIODevice_openMode_int_QIODevice, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QIODevice"), End),
             // MISSING: peek (int64; QIODevice this, "char *" data, int64
             // maxSize)
-            new Function(c, "peek", _n_peek1, None, Compiled,
-                         qt_QIODevice_peek_QByteArray_QIODevice_int64, Return,
-                         "qt.QByteArray", Parameters,
-                         new Param(c, "this", "qt.QIODevice"),
-                         new Param(c, "maxSize", "int64"), End),
-            new MemberFunction(c, "pos", _n_pos0, None, Compiled,
-                               qt_QIODevice_pos_int64_QIODevice, Return,
-                               "int64", Parameters,
+            new Function(c, "peek", _n_peek1, None, Compiled, qt_QIODevice_peek_QByteArray_QIODevice_int64, Return, "qt.QByteArray",
+                         Parameters, new Param(c, "this", "qt.QIODevice"), new Param(c, "maxSize", "int64"), End),
+            new MemberFunction(c, "pos", _n_pos0, None, Compiled, qt_QIODevice_pos_int64_QIODevice, Return, "int64", Parameters,
                                new Param(c, "this", "qt.QIODevice"), End),
             // MISSING: putChar (bool; QIODevice this, "char" c)
             // MISSING: read (int64; QIODevice this, "char *" data, int64
             // maxSize)
-            new Function(c, "read", _n_read1, None, Compiled,
-                         qt_QIODevice_read_QByteArray_QIODevice_int64, Return,
-                         "qt.QByteArray", Parameters,
-                         new Param(c, "this", "qt.QIODevice"),
-                         new Param(c, "maxSize", "int64"), End),
-            new Function(c, "readAll", _n_readAll0, None, Compiled,
-                         qt_QIODevice_readAll_QByteArray_QIODevice, Return,
-                         "qt.QByteArray", Parameters,
-                         new Param(c, "this", "qt.QIODevice"), End),
-            new Function(c, "readChannelCount", _n_readChannelCount0, None,
-                         Compiled, qt_QIODevice_readChannelCount_int_QIODevice,
-                         Return, "int", Parameters,
-                         new Param(c, "this", "qt.QIODevice"), End),
+            new Function(c, "read", _n_read1, None, Compiled, qt_QIODevice_read_QByteArray_QIODevice_int64, Return, "qt.QByteArray",
+                         Parameters, new Param(c, "this", "qt.QIODevice"), new Param(c, "maxSize", "int64"), End),
+            new Function(c, "readAll", _n_readAll0, None, Compiled, qt_QIODevice_readAll_QByteArray_QIODevice, Return, "qt.QByteArray",
+                         Parameters, new Param(c, "this", "qt.QIODevice"), End),
+            new Function(c, "readChannelCount", _n_readChannelCount0, None, Compiled, qt_QIODevice_readChannelCount_int_QIODevice, Return,
+                         "int", Parameters, new Param(c, "this", "qt.QIODevice"), End),
             // MISSING: readLine (int64; QIODevice this, "char *" data, int64
             // maxSize)
-            new Function(c, "readLine", _n_readLine1, None, Compiled,
-                         qt_QIODevice_readLine_QByteArray_QIODevice_int64,
-                         Return, "qt.QByteArray", Parameters,
-                         new Param(c, "this", "qt.QIODevice"),
-                         new Param(c, "maxSize", "int64"), End),
-            new MemberFunction(c, "reset", _n_reset0, None, Compiled,
-                               qt_QIODevice_reset_bool_QIODevice, Return,
-                               "bool", Parameters,
+            new Function(c, "readLine", _n_readLine1, None, Compiled, qt_QIODevice_readLine_QByteArray_QIODevice_int64, Return,
+                         "qt.QByteArray", Parameters, new Param(c, "this", "qt.QIODevice"), new Param(c, "maxSize", "int64"), End),
+            new MemberFunction(c, "reset", _n_reset0, None, Compiled, qt_QIODevice_reset_bool_QIODevice, Return, "bool", Parameters,
                                new Param(c, "this", "qt.QIODevice"), End),
-            new Function(c, "rollbackTransaction", _n_rollbackTransaction0,
-                         None, Compiled,
-                         qt_QIODevice_rollbackTransaction_void_QIODevice,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QIODevice"), End),
-            new MemberFunction(c, "seek", _n_seek0, None, Compiled,
-                               qt_QIODevice_seek_bool_QIODevice_int64, Return,
-                               "bool", Parameters,
-                               new Param(c, "this", "qt.QIODevice"),
-                               new Param(c, "pos", "int64"), End),
-            new Function(c, "setCurrentReadChannel", _n_setCurrentReadChannel0,
-                         None, Compiled,
-                         qt_QIODevice_setCurrentReadChannel_void_QIODevice_int,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QIODevice"),
-                         new Param(c, "channel", "int"), End),
-            new Function(c, "setCurrentWriteChannel",
-                         _n_setCurrentWriteChannel0, None, Compiled,
-                         qt_QIODevice_setCurrentWriteChannel_void_QIODevice_int,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QIODevice"),
-                         new Param(c, "channel", "int"), End),
-            new Function(
-                c, "setTextModeEnabled", _n_setTextModeEnabled0, None, Compiled,
-                qt_QIODevice_setTextModeEnabled_void_QIODevice_bool, Return,
-                "void", Parameters, new Param(c, "this", "qt.QIODevice"),
-                new Param(c, "enabled", "bool"), End),
-            new MemberFunction(c, "size", _n_size0, None, Compiled,
-                               qt_QIODevice_size_int64_QIODevice, Return,
-                               "int64", Parameters,
+            new Function(c, "rollbackTransaction", _n_rollbackTransaction0, None, Compiled, qt_QIODevice_rollbackTransaction_void_QIODevice,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QIODevice"), End),
+            new MemberFunction(c, "seek", _n_seek0, None, Compiled, qt_QIODevice_seek_bool_QIODevice_int64, Return, "bool", Parameters,
+                               new Param(c, "this", "qt.QIODevice"), new Param(c, "pos", "int64"), End),
+            new Function(c, "setCurrentReadChannel", _n_setCurrentReadChannel0, None, Compiled,
+                         qt_QIODevice_setCurrentReadChannel_void_QIODevice_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QIODevice"), new Param(c, "channel", "int"), End),
+            new Function(c, "setCurrentWriteChannel", _n_setCurrentWriteChannel0, None, Compiled,
+                         qt_QIODevice_setCurrentWriteChannel_void_QIODevice_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QIODevice"), new Param(c, "channel", "int"), End),
+            new Function(c, "setTextModeEnabled", _n_setTextModeEnabled0, None, Compiled,
+                         qt_QIODevice_setTextModeEnabled_void_QIODevice_bool, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QIODevice"), new Param(c, "enabled", "bool"), End),
+            new MemberFunction(c, "size", _n_size0, None, Compiled, qt_QIODevice_size_int64_QIODevice, Return, "int64", Parameters,
                                new Param(c, "this", "qt.QIODevice"), End),
-            new Function(c, "skip", _n_skip0, None, Compiled,
-                         qt_QIODevice_skip_int64_QIODevice_int64, Return,
-                         "int64", Parameters,
-                         new Param(c, "this", "qt.QIODevice"),
-                         new Param(c, "maxSize", "int64"), End),
-            new Function(c, "startTransaction", _n_startTransaction0, None,
-                         Compiled, qt_QIODevice_startTransaction_void_QIODevice,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QIODevice"), End),
+            new Function(c, "skip", _n_skip0, None, Compiled, qt_QIODevice_skip_int64_QIODevice_int64, Return, "int64", Parameters,
+                         new Param(c, "this", "qt.QIODevice"), new Param(c, "maxSize", "int64"), End),
+            new Function(c, "startTransaction", _n_startTransaction0, None, Compiled, qt_QIODevice_startTransaction_void_QIODevice, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QIODevice"), End),
             // MISSING: ungetChar (void; QIODevice this, "char" c)
-            new MemberFunction(
-                c, "waitForBytesWritten", _n_waitForBytesWritten0, None,
-                Compiled, qt_QIODevice_waitForBytesWritten_bool_QIODevice_int,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QIODevice"),
-                new Param(c, "msecs", "int"), End),
-            new MemberFunction(
-                c, "waitForReadyRead", _n_waitForReadyRead0, None, Compiled,
-                qt_QIODevice_waitForReadyRead_bool_QIODevice_int, Return,
-                "bool", Parameters, new Param(c, "this", "qt.QIODevice"),
-                new Param(c, "msecs", "int"), End),
+            new MemberFunction(c, "waitForBytesWritten", _n_waitForBytesWritten0, None, Compiled,
+                               qt_QIODevice_waitForBytesWritten_bool_QIODevice_int, Return, "bool", Parameters,
+                               new Param(c, "this", "qt.QIODevice"), new Param(c, "msecs", "int"), End),
+            new MemberFunction(c, "waitForReadyRead", _n_waitForReadyRead0, None, Compiled,
+                               qt_QIODevice_waitForReadyRead_bool_QIODevice_int, Return, "bool", Parameters,
+                               new Param(c, "this", "qt.QIODevice"), new Param(c, "msecs", "int"), End),
             // MISSING: write (int64; QIODevice this, "const char *" data, int64
             // maxSize) MISSING: write (int64; QIODevice this, "const char *"
             // data)
-            new Function(c, "write", _n_write2, None, Compiled,
-                         qt_QIODevice_write_int64_QIODevice_QByteArray, Return,
-                         "int64", Parameters,
-                         new Param(c, "this", "qt.QIODevice"),
-                         new Param(c, "data", "qt.QByteArray"), End),
-            new Function(c, "writeChannelCount", _n_writeChannelCount0, None,
-                         Compiled, qt_QIODevice_writeChannelCount_int_QIODevice,
-                         Return, "int", Parameters,
-                         new Param(c, "this", "qt.QIODevice"), End),
+            new Function(c, "write", _n_write2, None, Compiled, qt_QIODevice_write_int64_QIODevice_QByteArray, Return, "int64", Parameters,
+                         new Param(c, "this", "qt.QIODevice"), new Param(c, "data", "qt.QByteArray"), End),
+            new Function(c, "writeChannelCount", _n_writeChannelCount0, None, Compiled, qt_QIODevice_writeChannelCount_int_QIODevice,
+                         Return, "int", Parameters, new Param(c, "this", "qt.QIODevice"), End),
             // MISSING: readData (int64; QIODevice this, "char *" data, int64
             // maxSize) // protected MISSING: readLineData (int64; QIODevice
             // this, "char *" data, int64 maxSize) // protected NOT INHERITABLE
@@ -870,17 +689,11 @@ namespace Mu
             // INHERITABLE PROTECTED: skipData (int64; QIODevice this, int64
             // maxSize) // protected MISSING: writeData (int64; QIODevice this,
             // "const char *" data, int64 maxSize) // protected
-            new MemberFunction(c, "event", _n_event0, None, Compiled,
-                               qt_QIODevice_event_bool_QIODevice_QEvent, Return,
-                               "bool", Parameters,
-                               new Param(c, "this", "qt.QIODevice"),
-                               new Param(c, "e", "qt.QEvent"), End),
-            new MemberFunction(
-                c, "eventFilter", _n_eventFilter0, None, Compiled,
-                qt_QIODevice_eventFilter_bool_QIODevice_QObject_QEvent, Return,
-                "bool", Parameters, new Param(c, "this", "qt.QIODevice"),
-                new Param(c, "watched", "qt.QObject"),
-                new Param(c, "event", "qt.QEvent"), End),
+            new MemberFunction(c, "event", _n_event0, None, Compiled, qt_QIODevice_event_bool_QIODevice_QEvent, Return, "bool", Parameters,
+                               new Param(c, "this", "qt.QIODevice"), new Param(c, "e", "qt.QEvent"), End),
+            new MemberFunction(c, "eventFilter", _n_eventFilter0, None, Compiled, qt_QIODevice_eventFilter_bool_QIODevice_QObject_QEvent,
+                               Return, "bool", Parameters, new Param(c, "this", "qt.QIODevice"), new Param(c, "watched", "qt.QObject"),
+                               new Param(c, "event", "qt.QEvent"), End),
             // MISSING: metaObject ("const QMetaObject *"; QIODevice this)
             // MISSING: childEvent (void; QIODevice this, "QChildEvent *" event)
             // // protected MISSING: connectNotify (void; QIODevice this, "const

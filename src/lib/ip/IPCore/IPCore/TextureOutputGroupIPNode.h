@@ -25,9 +25,7 @@ namespace IPCore
     class TextureOutputGroupIPNode : public DisplayGroupIPNode
     {
     public:
-        TextureOutputGroupIPNode(const std::string& name,
-                                 const NodeDefinition* def, IPGraph* graph,
-                                 GroupIPNode* group = 0);
+        TextureOutputGroupIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group = 0);
 
         virtual ~TextureOutputGroupIPNode();
 

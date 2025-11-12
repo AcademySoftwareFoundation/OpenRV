@@ -58,18 +58,15 @@ namespace IPCore
 
         typedef std::vector<EDLClipInfo> EDLInfo;
 
-        SequenceGroupIPNode(const std::string& name, const NodeDefinition* def,
-                            IPGraph* graph, GroupIPNode* group = 0);
+        SequenceGroupIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group = 0);
 
         virtual ~SequenceGroupIPNode();
 
         virtual void setInputs(const IPNodes&) override;
         virtual IPNode* newSubGraphForInput(size_t, const IPNodes&) override;
-        virtual IPNode* modifySubGraphForInput(size_t, const IPNodes&,
-                                               IPNode*) override;
+        virtual IPNode* modifySubGraphForInput(size_t, const IPNodes&, IPNode*) override;
         virtual void propertyChanged(const Property*) override;
-        void inputMediaChanged(IPNode* srcNode, int srcInputIndex,
-                               PropagateTarget target) override;
+        void inputMediaChanged(IPNode* srcNode, int srcInputIndex, PropagateTarget target) override;
 
         SequenceIPNode* sequenceNode() const { return m_sequenceNode; }
 

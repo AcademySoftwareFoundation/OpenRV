@@ -42,8 +42,7 @@ namespace Mu
         //  Constructors
         //
 
-        QMimeDataType(Context* context, const char* name, Class* superClass = 0,
-                      Class* superClass2 = 0);
+        QMimeDataType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QMimeDataType();
 
@@ -79,17 +78,11 @@ namespace Mu
     public:
         void customEvent_pub(QEvent* event) { customEvent(event); }
 
-        void customEvent_pub_parent(QEvent* event)
-        {
-            QMimeData::customEvent(event);
-        }
+        void customEvent_pub_parent(QEvent* event) { QMimeData::customEvent(event); }
 
         void timerEvent_pub(QTimerEvent* event) { timerEvent(event); }
 
-        void timerEvent_pub_parent(QTimerEvent* event)
-        {
-            QMimeData::timerEvent(event);
-        }
+        void timerEvent_pub_parent(QTimerEvent* event) { QMimeData::timerEvent(event); }
 
     public:
         const QMimeDataType* _baseType;
@@ -97,11 +90,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance*
-    QMimeDataType::cachedInstance(const QMimeDataType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QMimeDataType::cachedInstance(const QMimeDataType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

@@ -30,8 +30,7 @@ namespace TwkContainer
 
     Component::~Component()
     {
-        for_each(m_properties.begin(), m_properties.end(),
-                 std::mem_fn(&Property::unref));
+        for_each(m_properties.begin(), m_properties.end(), std::mem_fn(&Property::unref));
 
         m_properties.clear();
 
@@ -389,8 +388,7 @@ namespace TwkContainer
         {
             if (m_components[i]->name() == c->name())
             {
-                throw UnexpectedExc(
-                    ", component with same name already exists");
+                throw UnexpectedExc(", component with same name already exists");
             }
         }
 
@@ -400,8 +398,7 @@ namespace TwkContainer
 
     void Component::remove(Component* c)
     {
-        Components::iterator i =
-            std::find(m_components.begin(), m_components.end(), c);
+        Components::iterator i = std::find(m_components.begin(), m_components.end(), c);
 
         if (i != m_components.end())
         {
@@ -409,8 +406,7 @@ namespace TwkContainer
         }
     }
 
-    Component* Component::createComponent(NameIterator i, NameIterator end,
-                                          bool synchronized)
+    Component* Component::createComponent(NameIterator i, NameIterator end, bool synchronized)
     {
         if (i == end)
             return this;
@@ -427,8 +423,7 @@ namespace TwkContainer
         }
     }
 
-    Component* Component::createComponent(const std::string& name,
-                                          bool synchronized)
+    Component* Component::createComponent(const std::string& name, bool synchronized)
     {
         if (Component* c = component(name))
         {
@@ -442,8 +437,7 @@ namespace TwkContainer
         }
     }
 
-    const Component* Component::component(NameIterator begin,
-                                          NameIterator end) const
+    const Component* Component::component(NameIterator begin, NameIterator end) const
     {
         if (begin == end)
             return this;
@@ -504,16 +498,14 @@ namespace TwkContainer
     {
         for (int i = 0; i < m_components.size(); i++)
         {
-            if (m_components[i] == c
-                || m_components[i]->hasComponentRecursive(c))
+            if (m_components[i] == c || m_components[i]->hasComponentRecursive(c))
                 return true;
         }
 
         return false;
     }
 
-    void Component::propertiesAsMap(NamedPropertyMap& pmap,
-                                    std::string prefix) const
+    void Component::propertiesAsMap(NamedPropertyMap& pmap, std::string prefix) const
     {
         for (int i = 0; i < m_properties.size(); i++)
         {

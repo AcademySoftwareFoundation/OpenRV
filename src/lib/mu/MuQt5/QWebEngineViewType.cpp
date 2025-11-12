@@ -78,17 +78,14 @@ namespace Mu
         _baseType = 0;
     }
 
-    MuQt_QWebEngineView::MuQt_QWebEngineView(Pointer muobj,
-                                             const CallEnvironment* ce,
-                                             QWidget* parent)
+    MuQt_QWebEngineView::MuQt_QWebEngineView(Pointer muobj, const CallEnvironment* ce, QWidget* parent)
         : QWebEngineView(parent)
     {
         _env = ce;
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QWebEngineViewType>(
-            c->internName("qt.QWebEngineView"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QWebEngineViewType>(c->internName("qt.QWebEngineView"));
     }
 
     QSize MuQt_QWebEngineView::sizeHint() const
@@ -111,8 +108,7 @@ namespace Mu
         }
     }
 
-    QWebEngineView*
-    MuQt_QWebEngineView::createWindow(QWebEnginePage::WebWindowType type)
+    QWebEngineView* MuQt_QWebEngineView::createWindow(QWebEnginePage::WebWindowType type)
     {
         if (!_env)
             return QWebEngineView::createWindow(type);
@@ -168,8 +164,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqpointer<QContextMenuEventType>(
-                c, event, "qt.QContextMenuEvent"));
+            args[1] = Value(makeqpointer<QContextMenuEventType>(c, event, "qt.QContextMenuEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -192,8 +187,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QHideEventType>(c, event, "qt.QHideEvent"));
+            args[1] = Value(makeqpointer<QHideEventType>(c, event, "qt.QHideEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -216,8 +210,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QShowEventType>(c, event, "qt.QShowEvent"));
+            args[1] = Value(makeqpointer<QShowEventType>(c, event, "qt.QShowEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -267,8 +260,7 @@ namespace Mu
         }
     }
 
-    QVariant
-    MuQt_QWebEngineView::inputMethodQuery(Qt::InputMethodQuery query) const
+    QVariant MuQt_QWebEngineView::inputMethodQuery(Qt::InputMethodQuery query) const
     {
         if (!_env)
             return QWebEngineView::inputMethodQuery(query);
@@ -346,8 +338,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QCloseEventType>(c, event, "qt.QCloseEvent"));
+            args[1] = Value(makeqpointer<QCloseEventType>(c, event, "qt.QCloseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -370,8 +361,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqpointer<QDragEnterEventType>(
-                c, event, "qt.QDragEnterEvent"));
+            args[1] = Value(makeqpointer<QDragEnterEventType>(c, event, "qt.QDragEnterEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -394,8 +384,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqpointer<QDragLeaveEventType>(
-                c, event, "qt.QDragLeaveEvent"));
+            args[1] = Value(makeqpointer<QDragLeaveEventType>(c, event, "qt.QDragLeaveEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -418,8 +407,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqpointer<QDragMoveEventType>(
-                c, event, "qt.QDragMoveEvent"));
+            args[1] = Value(makeqpointer<QDragMoveEventType>(c, event, "qt.QDragMoveEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -442,8 +430,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QDropEventType>(c, event, "qt.QDropEvent"));
+            args[1] = Value(makeqpointer<QDropEventType>(c, event, "qt.QDropEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -489,8 +476,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QFocusEventType>(c, event, "qt.QFocusEvent"));
+            args[1] = Value(makeqpointer<QFocusEventType>(c, event, "qt.QFocusEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -534,8 +520,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QFocusEventType>(c, event, "qt.QFocusEvent"));
+            args[1] = Value(makeqpointer<QFocusEventType>(c, event, "qt.QFocusEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -558,8 +543,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QKeyEventType>(c, event, "qt.QKeyEvent"));
+            args[1] = Value(makeqpointer<QKeyEventType>(c, event, "qt.QKeyEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -582,8 +566,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QKeyEventType>(c, event, "qt.QKeyEvent"));
+            args[1] = Value(makeqpointer<QKeyEventType>(c, event, "qt.QKeyEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -629,8 +612,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -653,8 +635,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -677,8 +658,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -701,8 +681,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -725,8 +704,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QMoveEventType>(c, event, "qt.QMoveEvent"));
+            args[1] = Value(makeqpointer<QMoveEventType>(c, event, "qt.QMoveEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -749,8 +727,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QPaintEventType>(c, event, "qt.QPaintEvent"));
+            args[1] = Value(makeqpointer<QPaintEventType>(c, event, "qt.QPaintEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -773,8 +750,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QResizeEventType>(c, event, "qt.QResizeEvent"));
+            args[1] = Value(makeqpointer<QResizeEventType>(c, event, "qt.QResizeEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -797,8 +773,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QTabletEventType>(c, event, "qt.QTabletEvent"));
+            args[1] = Value(makeqpointer<QTabletEventType>(c, event, "qt.QTabletEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -821,8 +796,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QWheelEventType>(c, event, "qt.QWheelEvent"));
+            args[1] = Value(makeqpointer<QWheelEventType>(c, event, "qt.QWheelEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -834,8 +808,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  Mu Type CONSTRUCTORS
 
-    QWebEngineViewType::QWebEngineViewType(Context* c, const char* name,
-                                           Class* super, Class* super2)
+    QWebEngineViewType::QWebEngineViewType(Context* c, const char* name, Class* super, Class* super2)
         : Class(c, name, vectorOf2(super, super2))
     {
     }
@@ -845,8 +818,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    static Pointer QWebEngineView_QWebEngineView_QObject(Thread& NODE_THREAD,
-                                                         Pointer obj)
+    static Pointer QWebEngineView_QWebEngineView_QObject(Thread& NODE_THREAD, Pointer obj)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         ClassInstance* widget = reinterpret_cast<ClassInstance*>(obj);
@@ -857,9 +829,7 @@ namespace Mu
         }
         else if (QWebEngineView* w = object<QWebEngineView>(widget))
         {
-            QWebEngineViewType* type =
-                c->findSymbolOfTypeByQualifiedName<QWebEngineViewType>(
-                    c->internName("qt.QWebEngineView"), false);
+            QWebEngineViewType* type = c->findSymbolOfTypeByQualifiedName<QWebEngineViewType>(c->internName("qt.QWebEngineView"), false);
             ClassInstance* o = ClassInstance::allocate(type);
             setobject(o, w);
             return o;
@@ -872,45 +842,36 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(castFromObject, Pointer)
     {
-        NODE_RETURN(QWebEngineView_QWebEngineView_QObject(
-            NODE_THREAD, NODE_ARG(0, Pointer)));
+        NODE_RETURN(QWebEngineView_QWebEngineView_QObject(NODE_THREAD, NODE_ARG(0, Pointer)));
     }
 
-    Pointer
-    qt_QWebEngineView_QWebEngineView_QWebEngineView_QWebEngineView_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
+    Pointer qt_QWebEngineView_QWebEngineView_QWebEngineView_QWebEngineView_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                   Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWidget* arg1 = object<QWidget>(param_parent);
-        setobject(param_this,
-                  new MuQt_QWebEngineView(
-                      param_this, NODE_THREAD.process()->callEnv(), arg1));
+        setobject(param_this, new MuQt_QWebEngineView(param_this, NODE_THREAD.process()->callEnv(), arg1));
         return param_this;
     }
 
-    void qt_QWebEngineView_findText_void_QWebEngineView_string_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_subString,
-        int param_options)
+    void qt_QWebEngineView_findText_void_QWebEngineView_string_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_subString,
+                                                                   int param_options)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineView* arg0 = object<QWebEngineView>(param_this);
         const QString arg1 = qstring(param_subString);
-        QWebEnginePage::FindFlags arg2 =
-            (QWebEnginePage::FindFlags)(param_options);
+        QWebEnginePage::FindFlags arg2 = (QWebEnginePage::FindFlags)(param_options);
         arg0->findText(arg1, arg2);
     }
 
-    Pointer qt_QWebEngineView_history_QWebEngineHistory_QWebEngineView(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QWebEngineView_history_QWebEngineHistory_QWebEngineView(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineView* arg0 = object<QWebEngineView>(param_this);
-        return makeqpointer<QWebEngineHistoryType>(c, arg0->history(),
-                                                   "qt.QWebEngineHistory");
+        return makeqpointer<QWebEngineHistoryType>(c, arg0->history(), "qt.QWebEngineHistory");
     }
 
-    void qt_QWebEngineView_load_void_QWebEngineView_QUrl(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_url)
+    void qt_QWebEngineView_load_void_QWebEngineView_QUrl(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_url)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineView* arg0 = object<QWebEngineView>(param_this);
@@ -918,30 +879,24 @@ namespace Mu
         arg0->load(arg1);
     }
 
-    Pointer qt_QWebEngineView_page_QWebEnginePage_QWebEngineView(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QWebEngineView_page_QWebEnginePage_QWebEngineView(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineView* arg0 = object<QWebEngineView>(param_this);
-        return makeinstance<QWebEnginePageType>(c, arg0->page(),
-                                                "qt.QWebEnginePage");
+        return makeinstance<QWebEnginePageType>(c, arg0->page(), "qt.QWebEnginePage");
     }
 
-    Pointer qt_QWebEngineView_pageAction_QAction_QWebEngineView_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_action)
+    Pointer qt_QWebEngineView_pageAction_QAction_QWebEngineView_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_action)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineView* arg0 = object<QWebEngineView>(param_this);
-        QWebEnginePage::WebAction arg1 =
-            (QWebEnginePage::WebAction)(param_action);
-        return makeinstance<QActionType>(c, arg0->pageAction(arg1),
-                                         "qt.QAction");
+        QWebEnginePage::WebAction arg1 = (QWebEnginePage::WebAction)(param_action);
+        return makeinstance<QActionType>(c, arg0->pageAction(arg1), "qt.QAction");
     }
 
-    void
-    qt_QWebEngineView_setContent_void_QWebEngineView_QByteArray_string_QUrl(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_data,
-        Pointer param_mimeType, Pointer param_baseUrl)
+    void qt_QWebEngineView_setContent_void_QWebEngineView_QByteArray_string_QUrl(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                 Pointer param_data, Pointer param_mimeType,
+                                                                                 Pointer param_baseUrl)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineView* arg0 = object<QWebEngineView>(param_this);
@@ -951,9 +906,8 @@ namespace Mu
         arg0->setContent(arg1, arg2, arg3);
     }
 
-    void qt_QWebEngineView_setHtml_void_QWebEngineView_string_QUrl(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_html,
-        Pointer param_baseUrl)
+    void qt_QWebEngineView_setHtml_void_QWebEngineView_string_QUrl(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_html,
+                                                                   Pointer param_baseUrl)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineView* arg0 = object<QWebEngineView>(param_this);
@@ -962,8 +916,7 @@ namespace Mu
         arg0->setHtml(arg1, arg2);
     }
 
-    void qt_QWebEngineView_setPage_void_QWebEngineView_QWebEnginePage(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_page)
+    void qt_QWebEngineView_setPage_void_QWebEngineView_QWebEnginePage(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_page)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineView* arg0 = object<QWebEngineView>(param_this);
@@ -971,85 +924,62 @@ namespace Mu
         arg0->setPage(arg1);
     }
 
-    Pointer qt_QWebEngineView_settings_QWebEngineSettings_QWebEngineView(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QWebEngineView_settings_QWebEngineSettings_QWebEngineView(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineView* arg0 = object<QWebEngineView>(param_this);
-        return makeqpointer<QWebEngineSettingsType>(c, arg0->settings(),
-                                                    "qt.QWebEngineSettings");
+        return makeqpointer<QWebEngineSettingsType>(c, arg0->settings(), "qt.QWebEngineSettings");
     }
 
-    void qt_QWebEngineView_triggerPageAction_void_QWebEngineView_int_bool(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_action,
-        bool param_checked)
+    void qt_QWebEngineView_triggerPageAction_void_QWebEngineView_int_bool(Mu::Thread& NODE_THREAD, Pointer param_this, int param_action,
+                                                                          bool param_checked)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineView* arg0 = object<QWebEngineView>(param_this);
-        QWebEnginePage::WebAction arg1 =
-            (QWebEnginePage::WebAction)(param_action);
+        QWebEnginePage::WebAction arg1 = (QWebEnginePage::WebAction)(param_action);
         bool arg2 = (bool)(param_checked);
         arg0->triggerPageAction(arg1, arg2);
     }
 
-    Pointer
-    qt_QWebEngineView_sizeHint_QSize_QWebEngineView(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this)
+    Pointer qt_QWebEngineView_sizeHint_QSize_QWebEngineView(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineView* arg0 = object<QWebEngineView>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QSizeType>(c, arg0->QWebEngineView::sizeHint(),
-                                          "qt.QSize")
-                   : makeqtype<QSizeType>(c, arg0->sizeHint(), "qt.QSize");
+        return isMuQtObject(arg0) ? makeqtype<QSizeType>(c, arg0->QWebEngineView::sizeHint(), "qt.QSize")
+                                  : makeqtype<QSizeType>(c, arg0->sizeHint(), "qt.QSize");
     }
 
-    Pointer qt_QWebEngineView_createWindow_QWebEngineView_QWebEngineView_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_type)
+    Pointer qt_QWebEngineView_createWindow_QWebEngineView_QWebEngineView_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_type)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineView* arg0 = object<QWebEngineView>(param_this);
-        QWebEnginePage::WebWindowType arg1 =
-            (QWebEnginePage::WebWindowType)(param_type);
+        QWebEnginePage::WebWindowType arg1 = (QWebEnginePage::WebWindowType)(param_type);
         return isMuQtObject(arg0)
-                   ? makeinstance<QWebEngineViewType>(
-                         c,
-                         ((MuQt_QWebEngineView*)arg0)
-                             ->createWindow_pub_parent(arg1),
-                         "qt.QWebEngineView")
-                   : makeinstance<QWebEngineViewType>(
-                         c,
-                         ((MuQt_QWebEngineView*)arg0)->createWindow_pub(arg1),
-                         "qt.QWebEngineView");
+                   ? makeinstance<QWebEngineViewType>(c, ((MuQt_QWebEngineView*)arg0)->createWindow_pub_parent(arg1), "qt.QWebEngineView")
+                   : makeinstance<QWebEngineViewType>(c, ((MuQt_QWebEngineView*)arg0)->createWindow_pub(arg1), "qt.QWebEngineView");
     }
 
-    bool qt_QWebEngineView_event_bool_QWebEngineView_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_ev)
+    bool qt_QWebEngineView_event_bool_QWebEngineView_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_ev)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineView* arg0 = object<QWebEngineView>(param_this);
         QEvent* arg1 = getqpointer<QEventType>(param_ev);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QWebEngineView*)arg0)->event_pub_parent(arg1)
-                   : ((MuQt_QWebEngineView*)arg0)->event_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QWebEngineView*)arg0)->event_pub_parent(arg1) : ((MuQt_QWebEngineView*)arg0)->event_pub(arg1);
     }
 
-    void
-    qt_QWebEngineView_contextMenuEvent_void_QWebEngineView_QContextMenuEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QWebEngineView_contextMenuEvent_void_QWebEngineView_QContextMenuEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                  Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineView* arg0 = object<QWebEngineView>(param_this);
-        QContextMenuEvent* arg1 =
-            getqpointer<QContextMenuEventType>(param_event);
+        QContextMenuEvent* arg1 = getqpointer<QContextMenuEventType>(param_event);
         if (isMuQtObject(arg0))
             ((MuQt_QWebEngineView*)arg0)->contextMenuEvent_pub_parent(arg1);
         else
             ((MuQt_QWebEngineView*)arg0)->contextMenuEvent_pub(arg1);
     }
 
-    void qt_QWebEngineView_hideEvent_void_QWebEngineView_QHideEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QWebEngineView_hideEvent_void_QWebEngineView_QHideEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineView* arg0 = object<QWebEngineView>(param_this);
@@ -1060,8 +990,7 @@ namespace Mu
             ((MuQt_QWebEngineView*)arg0)->hideEvent_pub(arg1);
     }
 
-    void qt_QWebEngineView_showEvent_void_QWebEngineView_QShowEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QWebEngineView_showEvent_void_QWebEngineView_QShowEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineView* arg0 = object<QWebEngineView>(param_this);
@@ -1072,53 +1001,39 @@ namespace Mu
             ((MuQt_QWebEngineView*)arg0)->showEvent_pub(arg1);
     }
 
-    bool qt_QWebEngineView_hasHeightForWidth_bool_QWebEngineView(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    bool qt_QWebEngineView_hasHeightForWidth_bool_QWebEngineView(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineView* arg0 = object<QWebEngineView>(param_this);
-        return isMuQtObject(arg0) ? arg0->QWebEngineView::hasHeightForWidth()
-                                  : arg0->hasHeightForWidth();
+        return isMuQtObject(arg0) ? arg0->QWebEngineView::hasHeightForWidth() : arg0->hasHeightForWidth();
     }
 
-    int qt_QWebEngineView_heightForWidth_int_QWebEngineView_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_w)
+    int qt_QWebEngineView_heightForWidth_int_QWebEngineView_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_w)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineView* arg0 = object<QWebEngineView>(param_this);
         int arg1 = (int)(param_w);
-        return isMuQtObject(arg0) ? arg0->QWebEngineView::heightForWidth(arg1)
-                                  : arg0->heightForWidth(arg1);
+        return isMuQtObject(arg0) ? arg0->QWebEngineView::heightForWidth(arg1) : arg0->heightForWidth(arg1);
     }
 
-    Pointer qt_QWebEngineView_inputMethodQuery_QVariant_QWebEngineView_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_query)
+    Pointer qt_QWebEngineView_inputMethodQuery_QVariant_QWebEngineView_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_query)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineView* arg0 = object<QWebEngineView>(param_this);
         Qt::InputMethodQuery arg1 = (Qt::InputMethodQuery)(param_query);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QVariantType>(
-                         c, arg0->QWebEngineView::inputMethodQuery(arg1),
-                         "qt.QVariant")
-                   : makeqtype<QVariantType>(c, arg0->inputMethodQuery(arg1),
-                                             "qt.QVariant");
+        return isMuQtObject(arg0) ? makeqtype<QVariantType>(c, arg0->QWebEngineView::inputMethodQuery(arg1), "qt.QVariant")
+                                  : makeqtype<QVariantType>(c, arg0->inputMethodQuery(arg1), "qt.QVariant");
     }
 
-    Pointer qt_QWebEngineView_minimumSizeHint_QSize_QWebEngineView(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QWebEngineView_minimumSizeHint_QSize_QWebEngineView(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineView* arg0 = object<QWebEngineView>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QSizeType>(
-                         c, arg0->QWebEngineView::minimumSizeHint(), "qt.QSize")
-                   : makeqtype<QSizeType>(c, arg0->minimumSizeHint(),
-                                          "qt.QSize");
+        return isMuQtObject(arg0) ? makeqtype<QSizeType>(c, arg0->QWebEngineView::minimumSizeHint(), "qt.QSize")
+                                  : makeqtype<QSizeType>(c, arg0->minimumSizeHint(), "qt.QSize");
     }
 
-    void qt_QWebEngineView_changeEvent_void_QWebEngineView_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QWebEngineView_changeEvent_void_QWebEngineView_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineView* arg0 = object<QWebEngineView>(param_this);
@@ -1129,8 +1044,7 @@ namespace Mu
             ((MuQt_QWebEngineView*)arg0)->changeEvent_pub(arg1);
     }
 
-    void qt_QWebEngineView_closeEvent_void_QWebEngineView_QCloseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QWebEngineView_closeEvent_void_QWebEngineView_QCloseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineView* arg0 = object<QWebEngineView>(param_this);
@@ -1141,8 +1055,8 @@ namespace Mu
             ((MuQt_QWebEngineView*)arg0)->closeEvent_pub(arg1);
     }
 
-    void qt_QWebEngineView_dragEnterEvent_void_QWebEngineView_QDragEnterEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QWebEngineView_dragEnterEvent_void_QWebEngineView_QDragEnterEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                              Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineView* arg0 = object<QWebEngineView>(param_this);
@@ -1153,8 +1067,8 @@ namespace Mu
             ((MuQt_QWebEngineView*)arg0)->dragEnterEvent_pub(arg1);
     }
 
-    void qt_QWebEngineView_dragLeaveEvent_void_QWebEngineView_QDragLeaveEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QWebEngineView_dragLeaveEvent_void_QWebEngineView_QDragLeaveEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                              Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineView* arg0 = object<QWebEngineView>(param_this);
@@ -1165,8 +1079,8 @@ namespace Mu
             ((MuQt_QWebEngineView*)arg0)->dragLeaveEvent_pub(arg1);
     }
 
-    void qt_QWebEngineView_dragMoveEvent_void_QWebEngineView_QDragMoveEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QWebEngineView_dragMoveEvent_void_QWebEngineView_QDragMoveEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                            Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineView* arg0 = object<QWebEngineView>(param_this);
@@ -1177,8 +1091,7 @@ namespace Mu
             ((MuQt_QWebEngineView*)arg0)->dragMoveEvent_pub(arg1);
     }
 
-    void qt_QWebEngineView_dropEvent_void_QWebEngineView_QDropEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QWebEngineView_dropEvent_void_QWebEngineView_QDropEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineView* arg0 = object<QWebEngineView>(param_this);
@@ -1189,8 +1102,7 @@ namespace Mu
             ((MuQt_QWebEngineView*)arg0)->dropEvent_pub(arg1);
     }
 
-    void qt_QWebEngineView_enterEvent_void_QWebEngineView_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QWebEngineView_enterEvent_void_QWebEngineView_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineView* arg0 = object<QWebEngineView>(param_this);
@@ -1201,8 +1113,7 @@ namespace Mu
             ((MuQt_QWebEngineView*)arg0)->enterEvent_pub(arg1);
     }
 
-    void qt_QWebEngineView_focusInEvent_void_QWebEngineView_QFocusEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QWebEngineView_focusInEvent_void_QWebEngineView_QFocusEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineView* arg0 = object<QWebEngineView>(param_this);
@@ -1213,20 +1124,16 @@ namespace Mu
             ((MuQt_QWebEngineView*)arg0)->focusInEvent_pub(arg1);
     }
 
-    bool qt_QWebEngineView_focusNextPrevChild_bool_QWebEngineView_bool(
-        Mu::Thread& NODE_THREAD, Pointer param_this, bool param_next)
+    bool qt_QWebEngineView_focusNextPrevChild_bool_QWebEngineView_bool(Mu::Thread& NODE_THREAD, Pointer param_this, bool param_next)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineView* arg0 = object<QWebEngineView>(param_this);
         bool arg1 = (bool)(param_next);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QWebEngineView*)arg0)
-                         ->focusNextPrevChild_pub_parent(arg1)
-                   : ((MuQt_QWebEngineView*)arg0)->focusNextPrevChild_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QWebEngineView*)arg0)->focusNextPrevChild_pub_parent(arg1)
+                                  : ((MuQt_QWebEngineView*)arg0)->focusNextPrevChild_pub(arg1);
     }
 
-    void qt_QWebEngineView_focusOutEvent_void_QWebEngineView_QFocusEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QWebEngineView_focusOutEvent_void_QWebEngineView_QFocusEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineView* arg0 = object<QWebEngineView>(param_this);
@@ -1237,8 +1144,7 @@ namespace Mu
             ((MuQt_QWebEngineView*)arg0)->focusOutEvent_pub(arg1);
     }
 
-    void qt_QWebEngineView_keyPressEvent_void_QWebEngineView_QKeyEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QWebEngineView_keyPressEvent_void_QWebEngineView_QKeyEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineView* arg0 = object<QWebEngineView>(param_this);
@@ -1249,8 +1155,7 @@ namespace Mu
             ((MuQt_QWebEngineView*)arg0)->keyPressEvent_pub(arg1);
     }
 
-    void qt_QWebEngineView_keyReleaseEvent_void_QWebEngineView_QKeyEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QWebEngineView_keyReleaseEvent_void_QWebEngineView_QKeyEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineView* arg0 = object<QWebEngineView>(param_this);
@@ -1261,8 +1166,7 @@ namespace Mu
             ((MuQt_QWebEngineView*)arg0)->keyReleaseEvent_pub(arg1);
     }
 
-    void qt_QWebEngineView_leaveEvent_void_QWebEngineView_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QWebEngineView_leaveEvent_void_QWebEngineView_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineView* arg0 = object<QWebEngineView>(param_this);
@@ -1273,22 +1177,19 @@ namespace Mu
             ((MuQt_QWebEngineView*)arg0)->leaveEvent_pub(arg1);
     }
 
-    void
-    qt_QWebEngineView_mouseDoubleClickEvent_void_QWebEngineView_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QWebEngineView_mouseDoubleClickEvent_void_QWebEngineView_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                 Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineView* arg0 = object<QWebEngineView>(param_this);
         QMouseEvent* arg1 = getqpointer<QMouseEventType>(param_event);
         if (isMuQtObject(arg0))
-            ((MuQt_QWebEngineView*)arg0)
-                ->mouseDoubleClickEvent_pub_parent(arg1);
+            ((MuQt_QWebEngineView*)arg0)->mouseDoubleClickEvent_pub_parent(arg1);
         else
             ((MuQt_QWebEngineView*)arg0)->mouseDoubleClickEvent_pub(arg1);
     }
 
-    void qt_QWebEngineView_mouseMoveEvent_void_QWebEngineView_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QWebEngineView_mouseMoveEvent_void_QWebEngineView_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineView* arg0 = object<QWebEngineView>(param_this);
@@ -1299,8 +1200,7 @@ namespace Mu
             ((MuQt_QWebEngineView*)arg0)->mouseMoveEvent_pub(arg1);
     }
 
-    void qt_QWebEngineView_mousePressEvent_void_QWebEngineView_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QWebEngineView_mousePressEvent_void_QWebEngineView_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineView* arg0 = object<QWebEngineView>(param_this);
@@ -1311,8 +1211,8 @@ namespace Mu
             ((MuQt_QWebEngineView*)arg0)->mousePressEvent_pub(arg1);
     }
 
-    void qt_QWebEngineView_mouseReleaseEvent_void_QWebEngineView_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QWebEngineView_mouseReleaseEvent_void_QWebEngineView_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                             Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineView* arg0 = object<QWebEngineView>(param_this);
@@ -1323,8 +1223,7 @@ namespace Mu
             ((MuQt_QWebEngineView*)arg0)->mouseReleaseEvent_pub(arg1);
     }
 
-    void qt_QWebEngineView_moveEvent_void_QWebEngineView_QMoveEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QWebEngineView_moveEvent_void_QWebEngineView_QMoveEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineView* arg0 = object<QWebEngineView>(param_this);
@@ -1335,8 +1234,7 @@ namespace Mu
             ((MuQt_QWebEngineView*)arg0)->moveEvent_pub(arg1);
     }
 
-    void qt_QWebEngineView_paintEvent_void_QWebEngineView_QPaintEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QWebEngineView_paintEvent_void_QWebEngineView_QPaintEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineView* arg0 = object<QWebEngineView>(param_this);
@@ -1347,8 +1245,7 @@ namespace Mu
             ((MuQt_QWebEngineView*)arg0)->paintEvent_pub(arg1);
     }
 
-    void qt_QWebEngineView_resizeEvent_void_QWebEngineView_QResizeEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QWebEngineView_resizeEvent_void_QWebEngineView_QResizeEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineView* arg0 = object<QWebEngineView>(param_this);
@@ -1359,8 +1256,7 @@ namespace Mu
             ((MuQt_QWebEngineView*)arg0)->resizeEvent_pub(arg1);
     }
 
-    void qt_QWebEngineView_tabletEvent_void_QWebEngineView_QTabletEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QWebEngineView_tabletEvent_void_QWebEngineView_QTabletEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineView* arg0 = object<QWebEngineView>(param_this);
@@ -1371,8 +1267,7 @@ namespace Mu
             ((MuQt_QWebEngineView*)arg0)->tabletEvent_pub(arg1);
     }
 
-    void qt_QWebEngineView_wheelEvent_void_QWebEngineView_QWheelEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QWebEngineView_wheelEvent_void_QWebEngineView_QWheelEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineView* arg0 = object<QWebEngineView>(param_this);
@@ -1385,270 +1280,229 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(_n_QWebEngineView0, Pointer)
     {
-        NODE_RETURN(
-            qt_QWebEngineView_QWebEngineView_QWebEngineView_QWebEngineView_QWidget(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QWebEngineView_QWebEngineView_QWebEngineView_QWebEngineView_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                           NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_findText0, void)
     {
-        qt_QWebEngineView_findText_void_QWebEngineView_string_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int));
+        qt_QWebEngineView_findText_void_QWebEngineView_string_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                  NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_history0, Pointer)
     {
-        NODE_RETURN(qt_QWebEngineView_history_QWebEngineHistory_QWebEngineView(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QWebEngineView_history_QWebEngineHistory_QWebEngineView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_load0, void)
     {
-        qt_QWebEngineView_load_void_QWebEngineView_QUrl(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QWebEngineView_load_void_QWebEngineView_QUrl(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_page0, Pointer)
     {
-        NODE_RETURN(qt_QWebEngineView_page_QWebEnginePage_QWebEngineView(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QWebEngineView_page_QWebEnginePage_QWebEngineView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_pageAction0, Pointer)
     {
-        NODE_RETURN(qt_QWebEngineView_pageAction_QAction_QWebEngineView_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QWebEngineView_pageAction_QAction_QWebEngineView_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_setContent0, void)
     {
         qt_QWebEngineView_setContent_void_QWebEngineView_QByteArray_string_QUrl(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer), NODE_ARG(3, Pointer));
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, Pointer), NODE_ARG(3, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setHtml0, void)
     {
-        qt_QWebEngineView_setHtml_void_QWebEngineView_string_QUrl(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer));
+        qt_QWebEngineView_setHtml_void_QWebEngineView_string_QUrl(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                  NODE_ARG(2, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setPage0, void)
     {
-        qt_QWebEngineView_setPage_void_QWebEngineView_QWebEnginePage(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QWebEngineView_setPage_void_QWebEngineView_QWebEnginePage(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_settings0, Pointer)
     {
-        NODE_RETURN(
-            qt_QWebEngineView_settings_QWebEngineSettings_QWebEngineView(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QWebEngineView_settings_QWebEngineSettings_QWebEngineView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_triggerPageAction0, void)
     {
-        qt_QWebEngineView_triggerPageAction_void_QWebEngineView_int_bool(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, bool));
+        qt_QWebEngineView_triggerPageAction_void_QWebEngineView_int_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                         NODE_ARG(2, bool));
     }
 
     static NODE_IMPLEMENTATION(_n_sizeHint0, Pointer)
     {
-        NODE_RETURN(qt_QWebEngineView_sizeHint_QSize_QWebEngineView(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QWebEngineView_sizeHint_QSize_QWebEngineView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_createWindow0, Pointer)
     {
         NODE_RETURN(
-            qt_QWebEngineView_createWindow_QWebEngineView_QWebEngineView_int(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+            qt_QWebEngineView_createWindow_QWebEngineView_QWebEngineView_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_event0, bool)
     {
-        NODE_RETURN(qt_QWebEngineView_event_bool_QWebEngineView_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QWebEngineView_event_bool_QWebEngineView_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_contextMenuEvent0, void)
     {
-        qt_QWebEngineView_contextMenuEvent_void_QWebEngineView_QContextMenuEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QWebEngineView_contextMenuEvent_void_QWebEngineView_QContextMenuEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                 NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_hideEvent0, void)
     {
-        qt_QWebEngineView_hideEvent_void_QWebEngineView_QHideEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QWebEngineView_hideEvent_void_QWebEngineView_QHideEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_showEvent0, void)
     {
-        qt_QWebEngineView_showEvent_void_QWebEngineView_QShowEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QWebEngineView_showEvent_void_QWebEngineView_QShowEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_hasHeightForWidth0, bool)
     {
-        NODE_RETURN(qt_QWebEngineView_hasHeightForWidth_bool_QWebEngineView(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QWebEngineView_hasHeightForWidth_bool_QWebEngineView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_heightForWidth0, int)
     {
-        NODE_RETURN(qt_QWebEngineView_heightForWidth_int_QWebEngineView_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QWebEngineView_heightForWidth_int_QWebEngineView_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_inputMethodQuery0, Pointer)
     {
         NODE_RETURN(
-            qt_QWebEngineView_inputMethodQuery_QVariant_QWebEngineView_int(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+            qt_QWebEngineView_inputMethodQuery_QVariant_QWebEngineView_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_minimumSizeHint0, Pointer)
     {
-        NODE_RETURN(qt_QWebEngineView_minimumSizeHint_QSize_QWebEngineView(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QWebEngineView_minimumSizeHint_QSize_QWebEngineView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_changeEvent0, void)
     {
-        qt_QWebEngineView_changeEvent_void_QWebEngineView_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QWebEngineView_changeEvent_void_QWebEngineView_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_closeEvent0, void)
     {
-        qt_QWebEngineView_closeEvent_void_QWebEngineView_QCloseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QWebEngineView_closeEvent_void_QWebEngineView_QCloseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_dragEnterEvent0, void)
     {
-        qt_QWebEngineView_dragEnterEvent_void_QWebEngineView_QDragEnterEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QWebEngineView_dragEnterEvent_void_QWebEngineView_QDragEnterEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                             NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_dragLeaveEvent0, void)
     {
-        qt_QWebEngineView_dragLeaveEvent_void_QWebEngineView_QDragLeaveEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QWebEngineView_dragLeaveEvent_void_QWebEngineView_QDragLeaveEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                             NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_dragMoveEvent0, void)
     {
-        qt_QWebEngineView_dragMoveEvent_void_QWebEngineView_QDragMoveEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QWebEngineView_dragMoveEvent_void_QWebEngineView_QDragMoveEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_dropEvent0, void)
     {
-        qt_QWebEngineView_dropEvent_void_QWebEngineView_QDropEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QWebEngineView_dropEvent_void_QWebEngineView_QDropEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_enterEvent0, void)
     {
-        qt_QWebEngineView_enterEvent_void_QWebEngineView_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QWebEngineView_enterEvent_void_QWebEngineView_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_focusInEvent0, void)
     {
-        qt_QWebEngineView_focusInEvent_void_QWebEngineView_QFocusEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QWebEngineView_focusInEvent_void_QWebEngineView_QFocusEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_focusNextPrevChild0, bool)
     {
         NODE_RETURN(
-            qt_QWebEngineView_focusNextPrevChild_bool_QWebEngineView_bool(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool)));
+            qt_QWebEngineView_focusNextPrevChild_bool_QWebEngineView_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool)));
     }
 
     static NODE_IMPLEMENTATION(_n_focusOutEvent0, void)
     {
-        qt_QWebEngineView_focusOutEvent_void_QWebEngineView_QFocusEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QWebEngineView_focusOutEvent_void_QWebEngineView_QFocusEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_keyPressEvent0, void)
     {
-        qt_QWebEngineView_keyPressEvent_void_QWebEngineView_QKeyEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QWebEngineView_keyPressEvent_void_QWebEngineView_QKeyEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_keyReleaseEvent0, void)
     {
-        qt_QWebEngineView_keyReleaseEvent_void_QWebEngineView_QKeyEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QWebEngineView_keyReleaseEvent_void_QWebEngineView_QKeyEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_leaveEvent0, void)
     {
-        qt_QWebEngineView_leaveEvent_void_QWebEngineView_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QWebEngineView_leaveEvent_void_QWebEngineView_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseDoubleClickEvent0, void)
     {
-        qt_QWebEngineView_mouseDoubleClickEvent_void_QWebEngineView_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QWebEngineView_mouseDoubleClickEvent_void_QWebEngineView_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseMoveEvent0, void)
     {
-        qt_QWebEngineView_mouseMoveEvent_void_QWebEngineView_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QWebEngineView_mouseMoveEvent_void_QWebEngineView_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mousePressEvent0, void)
     {
-        qt_QWebEngineView_mousePressEvent_void_QWebEngineView_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QWebEngineView_mousePressEvent_void_QWebEngineView_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseReleaseEvent0, void)
     {
-        qt_QWebEngineView_mouseReleaseEvent_void_QWebEngineView_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QWebEngineView_mouseReleaseEvent_void_QWebEngineView_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_moveEvent0, void)
     {
-        qt_QWebEngineView_moveEvent_void_QWebEngineView_QMoveEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QWebEngineView_moveEvent_void_QWebEngineView_QMoveEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_paintEvent0, void)
     {
-        qt_QWebEngineView_paintEvent_void_QWebEngineView_QPaintEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QWebEngineView_paintEvent_void_QWebEngineView_QPaintEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_resizeEvent0, void)
     {
-        qt_QWebEngineView_resizeEvent_void_QWebEngineView_QResizeEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QWebEngineView_resizeEvent_void_QWebEngineView_QResizeEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_tabletEvent0, void)
     {
-        qt_QWebEngineView_tabletEvent_void_QWebEngineView_QTabletEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QWebEngineView_tabletEvent_void_QWebEngineView_QTabletEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_wheelEvent0, void)
     {
-        qt_QWebEngineView_wheelEvent_void_QWebEngineView_QWheelEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QWebEngineView_wheelEvent_void_QWebEngineView_QWheelEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     void QWebEngineViewType::load()
@@ -1668,17 +1522,13 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
-                   new Function(c, tn, castFromObject, Cast, Compiled,
-                                QWebEngineView_QWebEngineView_QObject, Return,
-                                ftn, Parameters,
+                   new Function(c, tn, castFromObject, Cast, Compiled, QWebEngineView_QWebEngineView_QObject, Return, ftn, Parameters,
                                 new Param(c, "object", "qt.QObject"), End),
 
                    EndArguments);
@@ -1686,275 +1536,148 @@ namespace Mu
         addSymbols(
             // enums
             // member functions
-            new Function(
-                c, "QWebEngineView", _n_QWebEngineView0, None, Compiled,
-                qt_QWebEngineView_QWebEngineView_QWebEngineView_QWebEngineView_QWidget,
-                Return, "qt.QWebEngineView", Parameters,
-                new Param(c, "this", "qt.QWebEngineView"),
-                new Param(c, "parent", "qt.QWidget"), End),
-            new Function(
-                c, "findText", _n_findText0, None, Compiled,
-                qt_QWebEngineView_findText_void_QWebEngineView_string_int,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QWebEngineView"),
-                new Param(c, "subString", "string"),
-                new Param(c, "options", "int", Value((int)0)), End),
+            new Function(c, "QWebEngineView", _n_QWebEngineView0, None, Compiled,
+                         qt_QWebEngineView_QWebEngineView_QWebEngineView_QWebEngineView_QWidget, Return, "qt.QWebEngineView", Parameters,
+                         new Param(c, "this", "qt.QWebEngineView"), new Param(c, "parent", "qt.QWidget"), End),
+            new Function(c, "findText", _n_findText0, None, Compiled, qt_QWebEngineView_findText_void_QWebEngineView_string_int, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QWebEngineView"), new Param(c, "subString", "string"),
+                         new Param(c, "options", "int", Value((int)0)), End),
             // MISSING: findText (void; QWebEngineView this, string subString,
             // flags QWebEnginePage::FindFlags options, "FunctorOrLambda"
             // resultCallback) PROP: hasSelection (bool; QWebEngineView this)
-            new Function(
-                c, "history", _n_history0, None, Compiled,
-                qt_QWebEngineView_history_QWebEngineHistory_QWebEngineView,
-                Return, "qt.QWebEngineHistory", Parameters,
-                new Param(c, "this", "qt.QWebEngineView"), End),
+            new Function(c, "history", _n_history0, None, Compiled, qt_QWebEngineView_history_QWebEngineHistory_QWebEngineView, Return,
+                         "qt.QWebEngineHistory", Parameters, new Param(c, "this", "qt.QWebEngineView"), End),
             // PROP: iconUrl (QUrl; QWebEngineView this)
-            new Function(c, "load", _n_load0, None, Compiled,
-                         qt_QWebEngineView_load_void_QWebEngineView_QUrl,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QWebEngineView"),
-                         new Param(c, "url", "qt.QUrl"), End),
-            new Function(c, "page", _n_page0, None, Compiled,
-                         qt_QWebEngineView_page_QWebEnginePage_QWebEngineView,
-                         Return, "qt.QWebEnginePage", Parameters,
-                         new Param(c, "this", "qt.QWebEngineView"), End),
-            new Function(
-                c, "pageAction", _n_pageAction0, None, Compiled,
-                qt_QWebEngineView_pageAction_QAction_QWebEngineView_int, Return,
-                "qt.QAction", Parameters,
-                new Param(c, "this", "qt.QWebEngineView"),
-                new Param(c, "action", "int"), End),
+            new Function(c, "load", _n_load0, None, Compiled, qt_QWebEngineView_load_void_QWebEngineView_QUrl, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QWebEngineView"), new Param(c, "url", "qt.QUrl"), End),
+            new Function(c, "page", _n_page0, None, Compiled, qt_QWebEngineView_page_QWebEnginePage_QWebEngineView, Return,
+                         "qt.QWebEnginePage", Parameters, new Param(c, "this", "qt.QWebEngineView"), End),
+            new Function(c, "pageAction", _n_pageAction0, None, Compiled, qt_QWebEngineView_pageAction_QAction_QWebEngineView_int, Return,
+                         "qt.QAction", Parameters, new Param(c, "this", "qt.QWebEngineView"), new Param(c, "action", "int"), End),
             // PROP: selectedText (string; QWebEngineView this)
-            new Function(
-                c, "setContent", _n_setContent0, None, Compiled,
-                qt_QWebEngineView_setContent_void_QWebEngineView_QByteArray_string_QUrl,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QWebEngineView"),
-                new Param(c, "data", "qt.QByteArray"),
-                new Param(c, "mimeType", "string"),
-                new Param(c, "baseUrl", "qt.QUrl"), End),
-            new Function(
-                c, "setHtml", _n_setHtml0, None, Compiled,
-                qt_QWebEngineView_setHtml_void_QWebEngineView_string_QUrl,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QWebEngineView"),
-                new Param(c, "html", "string"),
-                new Param(c, "baseUrl", "qt.QUrl"), End),
-            new Function(
-                c, "setPage", _n_setPage0, None, Compiled,
-                qt_QWebEngineView_setPage_void_QWebEngineView_QWebEnginePage,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QWebEngineView"),
-                new Param(c, "page", "qt.QWebEnginePage"), End),
+            new Function(c, "setContent", _n_setContent0, None, Compiled,
+                         qt_QWebEngineView_setContent_void_QWebEngineView_QByteArray_string_QUrl, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QWebEngineView"), new Param(c, "data", "qt.QByteArray"),
+                         new Param(c, "mimeType", "string"), new Param(c, "baseUrl", "qt.QUrl"), End),
+            new Function(c, "setHtml", _n_setHtml0, None, Compiled, qt_QWebEngineView_setHtml_void_QWebEngineView_string_QUrl, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QWebEngineView"), new Param(c, "html", "string"),
+                         new Param(c, "baseUrl", "qt.QUrl"), End),
+            new Function(c, "setPage", _n_setPage0, None, Compiled, qt_QWebEngineView_setPage_void_QWebEngineView_QWebEnginePage, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QWebEngineView"), new Param(c, "page", "qt.QWebEnginePage"), End),
             // PROP: setUrl (void; QWebEngineView this, QUrl url)
             // PROP: setZoomFactor (void; QWebEngineView this, double factor)
-            new Function(
-                c, "settings", _n_settings0, None, Compiled,
-                qt_QWebEngineView_settings_QWebEngineSettings_QWebEngineView,
-                Return, "qt.QWebEngineSettings", Parameters,
-                new Param(c, "this", "qt.QWebEngineView"), End),
+            new Function(c, "settings", _n_settings0, None, Compiled, qt_QWebEngineView_settings_QWebEngineSettings_QWebEngineView, Return,
+                         "qt.QWebEngineSettings", Parameters, new Param(c, "this", "qt.QWebEngineView"), End),
             // PROP: title (string; QWebEngineView this)
-            new Function(
-                c, "triggerPageAction", _n_triggerPageAction0, None, Compiled,
-                qt_QWebEngineView_triggerPageAction_void_QWebEngineView_int_bool,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QWebEngineView"),
-                new Param(c, "action", "int"), new Param(c, "checked", "bool"),
-                End),
+            new Function(c, "triggerPageAction", _n_triggerPageAction0, None, Compiled,
+                         qt_QWebEngineView_triggerPageAction_void_QWebEngineView_int_bool, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QWebEngineView"), new Param(c, "action", "int"), new Param(c, "checked", "bool"), End),
             // PROP: url (QUrl; QWebEngineView this)
             // PROP: zoomFactor (double; QWebEngineView this)
-            _func[0] = new MemberFunction(
-                c, "sizeHint", _n_sizeHint0, None, Compiled,
-                qt_QWebEngineView_sizeHint_QSize_QWebEngineView, Return,
-                "qt.QSize", Parameters,
-                new Param(c, "this", "qt.QWebEngineView"), End),
-            _func[1] = new MemberFunction(
-                c, "createWindow", _n_createWindow0, None, Compiled,
-                qt_QWebEngineView_createWindow_QWebEngineView_QWebEngineView_int,
-                Return, "qt.QWebEngineView", Parameters,
-                new Param(c, "this", "qt.QWebEngineView"),
-                new Param(c, "type", "int"), End),
-            _func[2] = new MemberFunction(
-                c, "event", _n_event0, None, Compiled,
-                qt_QWebEngineView_event_bool_QWebEngineView_QEvent, Return,
-                "bool", Parameters, new Param(c, "this", "qt.QWebEngineView"),
-                new Param(c, "ev", "qt.QEvent"), End),
-            _func[3] = new MemberFunction(
-                c, "contextMenuEvent", _n_contextMenuEvent0, None, Compiled,
-                qt_QWebEngineView_contextMenuEvent_void_QWebEngineView_QContextMenuEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QWebEngineView"),
-                new Param(c, "event", "qt.QContextMenuEvent"), End),
-            _func[4] = new MemberFunction(
-                c, "hideEvent", _n_hideEvent0, None, Compiled,
-                qt_QWebEngineView_hideEvent_void_QWebEngineView_QHideEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QWebEngineView"),
-                new Param(c, "event", "qt.QHideEvent"), End),
-            _func[5] = new MemberFunction(
-                c, "showEvent", _n_showEvent0, None, Compiled,
-                qt_QWebEngineView_showEvent_void_QWebEngineView_QShowEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QWebEngineView"),
-                new Param(c, "event", "qt.QShowEvent"), End),
-            _func[6] = new MemberFunction(
-                c, "hasHeightForWidth", _n_hasHeightForWidth0, None, Compiled,
-                qt_QWebEngineView_hasHeightForWidth_bool_QWebEngineView, Return,
-                "bool", Parameters, new Param(c, "this", "qt.QWebEngineView"),
-                End),
-            _func[7] = new MemberFunction(
-                c, "heightForWidth", _n_heightForWidth0, None, Compiled,
-                qt_QWebEngineView_heightForWidth_int_QWebEngineView_int, Return,
-                "int", Parameters, new Param(c, "this", "qt.QWebEngineView"),
-                new Param(c, "w", "int"), End),
-            _func[8] = new MemberFunction(
-                c, "inputMethodQuery", _n_inputMethodQuery0, None, Compiled,
-                qt_QWebEngineView_inputMethodQuery_QVariant_QWebEngineView_int,
-                Return, "qt.QVariant", Parameters,
-                new Param(c, "this", "qt.QWebEngineView"),
-                new Param(c, "query", "int"), End),
-            _func[9] = new MemberFunction(
-                c, "minimumSizeHint", _n_minimumSizeHint0, None, Compiled,
-                qt_QWebEngineView_minimumSizeHint_QSize_QWebEngineView, Return,
-                "qt.QSize", Parameters,
-                new Param(c, "this", "qt.QWebEngineView"), End),
+            _func[0] = new MemberFunction(c, "sizeHint", _n_sizeHint0, None, Compiled, qt_QWebEngineView_sizeHint_QSize_QWebEngineView,
+                                          Return, "qt.QSize", Parameters, new Param(c, "this", "qt.QWebEngineView"), End),
+            _func[1] = new MemberFunction(c, "createWindow", _n_createWindow0, None, Compiled,
+                                          qt_QWebEngineView_createWindow_QWebEngineView_QWebEngineView_int, Return, "qt.QWebEngineView",
+                                          Parameters, new Param(c, "this", "qt.QWebEngineView"), new Param(c, "type", "int"), End),
+            _func[2] =
+                new MemberFunction(c, "event", _n_event0, None, Compiled, qt_QWebEngineView_event_bool_QWebEngineView_QEvent, Return,
+                                   "bool", Parameters, new Param(c, "this", "qt.QWebEngineView"), new Param(c, "ev", "qt.QEvent"), End),
+            _func[3] =
+                new MemberFunction(c, "contextMenuEvent", _n_contextMenuEvent0, None, Compiled,
+                                   qt_QWebEngineView_contextMenuEvent_void_QWebEngineView_QContextMenuEvent, Return, "void", Parameters,
+                                   new Param(c, "this", "qt.QWebEngineView"), new Param(c, "event", "qt.QContextMenuEvent"), End),
+            _func[4] = new MemberFunction(c, "hideEvent", _n_hideEvent0, None, Compiled,
+                                          qt_QWebEngineView_hideEvent_void_QWebEngineView_QHideEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QWebEngineView"), new Param(c, "event", "qt.QHideEvent"), End),
+            _func[5] = new MemberFunction(c, "showEvent", _n_showEvent0, None, Compiled,
+                                          qt_QWebEngineView_showEvent_void_QWebEngineView_QShowEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QWebEngineView"), new Param(c, "event", "qt.QShowEvent"), End),
+            _func[6] = new MemberFunction(c, "hasHeightForWidth", _n_hasHeightForWidth0, None, Compiled,
+                                          qt_QWebEngineView_hasHeightForWidth_bool_QWebEngineView, Return, "bool", Parameters,
+                                          new Param(c, "this", "qt.QWebEngineView"), End),
+            _func[7] = new MemberFunction(c, "heightForWidth", _n_heightForWidth0, None, Compiled,
+                                          qt_QWebEngineView_heightForWidth_int_QWebEngineView_int, Return, "int", Parameters,
+                                          new Param(c, "this", "qt.QWebEngineView"), new Param(c, "w", "int"), End),
+            _func[8] = new MemberFunction(c, "inputMethodQuery", _n_inputMethodQuery0, None, Compiled,
+                                          qt_QWebEngineView_inputMethodQuery_QVariant_QWebEngineView_int, Return, "qt.QVariant", Parameters,
+                                          new Param(c, "this", "qt.QWebEngineView"), new Param(c, "query", "int"), End),
+            _func[9] = new MemberFunction(c, "minimumSizeHint", _n_minimumSizeHint0, None, Compiled,
+                                          qt_QWebEngineView_minimumSizeHint_QSize_QWebEngineView, Return, "qt.QSize", Parameters,
+                                          new Param(c, "this", "qt.QWebEngineView"), End),
             // MISSING: paintEngine ("QPaintEngine *"; QWebEngineView this)
             // MISSING: actionEvent (void; QWebEngineView this, "QActionEvent *"
             // event) // protected
-            _func[10] = new MemberFunction(
-                c, "changeEvent", _n_changeEvent0, None, Compiled,
-                qt_QWebEngineView_changeEvent_void_QWebEngineView_QEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QWebEngineView"),
-                new Param(c, "event", "qt.QEvent"), End),
-            _func[11] = new MemberFunction(
-                c, "closeEvent", _n_closeEvent0, None, Compiled,
-                qt_QWebEngineView_closeEvent_void_QWebEngineView_QCloseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QWebEngineView"),
-                new Param(c, "event", "qt.QCloseEvent"), End),
-            _func[12] = new MemberFunction(
-                c, "dragEnterEvent", _n_dragEnterEvent0, None, Compiled,
-                qt_QWebEngineView_dragEnterEvent_void_QWebEngineView_QDragEnterEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QWebEngineView"),
-                new Param(c, "event", "qt.QDragEnterEvent"), End),
-            _func[13] = new MemberFunction(
-                c, "dragLeaveEvent", _n_dragLeaveEvent0, None, Compiled,
-                qt_QWebEngineView_dragLeaveEvent_void_QWebEngineView_QDragLeaveEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QWebEngineView"),
-                new Param(c, "event", "qt.QDragLeaveEvent"), End),
-            _func[14] = new MemberFunction(
-                c, "dragMoveEvent", _n_dragMoveEvent0, None, Compiled,
-                qt_QWebEngineView_dragMoveEvent_void_QWebEngineView_QDragMoveEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QWebEngineView"),
-                new Param(c, "event", "qt.QDragMoveEvent"), End),
-            _func[15] = new MemberFunction(
-                c, "dropEvent", _n_dropEvent0, None, Compiled,
-                qt_QWebEngineView_dropEvent_void_QWebEngineView_QDropEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QWebEngineView"),
-                new Param(c, "event", "qt.QDropEvent"), End),
-            _func[16] = new MemberFunction(
-                c, "enterEvent", _n_enterEvent0, None, Compiled,
-                qt_QWebEngineView_enterEvent_void_QWebEngineView_QEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QWebEngineView"),
-                new Param(c, "event", "qt.QEvent"), End),
-            _func[17] = new MemberFunction(
-                c, "focusInEvent", _n_focusInEvent0, None, Compiled,
-                qt_QWebEngineView_focusInEvent_void_QWebEngineView_QFocusEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QWebEngineView"),
-                new Param(c, "event", "qt.QFocusEvent"), End),
-            _func[18] = new MemberFunction(
-                c, "focusNextPrevChild", _n_focusNextPrevChild0, None, Compiled,
-                qt_QWebEngineView_focusNextPrevChild_bool_QWebEngineView_bool,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QWebEngineView"),
-                new Param(c, "next", "bool"), End),
-            _func[19] = new MemberFunction(
-                c, "focusOutEvent", _n_focusOutEvent0, None, Compiled,
-                qt_QWebEngineView_focusOutEvent_void_QWebEngineView_QFocusEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QWebEngineView"),
-                new Param(c, "event", "qt.QFocusEvent"), End),
+            _func[10] = new MemberFunction(c, "changeEvent", _n_changeEvent0, None, Compiled,
+                                           qt_QWebEngineView_changeEvent_void_QWebEngineView_QEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QWebEngineView"), new Param(c, "event", "qt.QEvent"), End),
+            _func[11] = new MemberFunction(c, "closeEvent", _n_closeEvent0, None, Compiled,
+                                           qt_QWebEngineView_closeEvent_void_QWebEngineView_QCloseEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QWebEngineView"), new Param(c, "event", "qt.QCloseEvent"), End),
+            _func[12] = new MemberFunction(c, "dragEnterEvent", _n_dragEnterEvent0, None, Compiled,
+                                           qt_QWebEngineView_dragEnterEvent_void_QWebEngineView_QDragEnterEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QWebEngineView"), new Param(c, "event", "qt.QDragEnterEvent"), End),
+            _func[13] = new MemberFunction(c, "dragLeaveEvent", _n_dragLeaveEvent0, None, Compiled,
+                                           qt_QWebEngineView_dragLeaveEvent_void_QWebEngineView_QDragLeaveEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QWebEngineView"), new Param(c, "event", "qt.QDragLeaveEvent"), End),
+            _func[14] = new MemberFunction(c, "dragMoveEvent", _n_dragMoveEvent0, None, Compiled,
+                                           qt_QWebEngineView_dragMoveEvent_void_QWebEngineView_QDragMoveEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QWebEngineView"), new Param(c, "event", "qt.QDragMoveEvent"), End),
+            _func[15] = new MemberFunction(c, "dropEvent", _n_dropEvent0, None, Compiled,
+                                           qt_QWebEngineView_dropEvent_void_QWebEngineView_QDropEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QWebEngineView"), new Param(c, "event", "qt.QDropEvent"), End),
+            _func[16] = new MemberFunction(c, "enterEvent", _n_enterEvent0, None, Compiled,
+                                           qt_QWebEngineView_enterEvent_void_QWebEngineView_QEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QWebEngineView"), new Param(c, "event", "qt.QEvent"), End),
+            _func[17] = new MemberFunction(c, "focusInEvent", _n_focusInEvent0, None, Compiled,
+                                           qt_QWebEngineView_focusInEvent_void_QWebEngineView_QFocusEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QWebEngineView"), new Param(c, "event", "qt.QFocusEvent"), End),
+            _func[18] = new MemberFunction(c, "focusNextPrevChild", _n_focusNextPrevChild0, None, Compiled,
+                                           qt_QWebEngineView_focusNextPrevChild_bool_QWebEngineView_bool, Return, "bool", Parameters,
+                                           new Param(c, "this", "qt.QWebEngineView"), new Param(c, "next", "bool"), End),
+            _func[19] = new MemberFunction(c, "focusOutEvent", _n_focusOutEvent0, None, Compiled,
+                                           qt_QWebEngineView_focusOutEvent_void_QWebEngineView_QFocusEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QWebEngineView"), new Param(c, "event", "qt.QFocusEvent"), End),
             // MISSING: inputMethodEvent (void; QWebEngineView this,
             // "QInputMethodEvent *" event) // protected
-            _func[20] = new MemberFunction(
-                c, "keyPressEvent", _n_keyPressEvent0, None, Compiled,
-                qt_QWebEngineView_keyPressEvent_void_QWebEngineView_QKeyEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QWebEngineView"),
-                new Param(c, "event", "qt.QKeyEvent"), End),
-            _func[21] = new MemberFunction(
-                c, "keyReleaseEvent", _n_keyReleaseEvent0, None, Compiled,
-                qt_QWebEngineView_keyReleaseEvent_void_QWebEngineView_QKeyEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QWebEngineView"),
-                new Param(c, "event", "qt.QKeyEvent"), End),
-            _func[22] = new MemberFunction(
-                c, "leaveEvent", _n_leaveEvent0, None, Compiled,
-                qt_QWebEngineView_leaveEvent_void_QWebEngineView_QEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QWebEngineView"),
-                new Param(c, "event", "qt.QEvent"), End),
-            _func[23] = new MemberFunction(
-                c, "mouseDoubleClickEvent", _n_mouseDoubleClickEvent0, None,
-                Compiled,
-                qt_QWebEngineView_mouseDoubleClickEvent_void_QWebEngineView_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QWebEngineView"),
-                new Param(c, "event", "qt.QMouseEvent"), End),
-            _func[24] = new MemberFunction(
-                c, "mouseMoveEvent", _n_mouseMoveEvent0, None, Compiled,
-                qt_QWebEngineView_mouseMoveEvent_void_QWebEngineView_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QWebEngineView"),
-                new Param(c, "event", "qt.QMouseEvent"), End),
-            _func[25] = new MemberFunction(
-                c, "mousePressEvent", _n_mousePressEvent0, None, Compiled,
-                qt_QWebEngineView_mousePressEvent_void_QWebEngineView_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QWebEngineView"),
-                new Param(c, "event", "qt.QMouseEvent"), End),
-            _func[26] = new MemberFunction(
-                c, "mouseReleaseEvent", _n_mouseReleaseEvent0, None, Compiled,
-                qt_QWebEngineView_mouseReleaseEvent_void_QWebEngineView_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QWebEngineView"),
-                new Param(c, "event", "qt.QMouseEvent"), End),
-            _func[27] = new MemberFunction(
-                c, "moveEvent", _n_moveEvent0, None, Compiled,
-                qt_QWebEngineView_moveEvent_void_QWebEngineView_QMoveEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QWebEngineView"),
-                new Param(c, "event", "qt.QMoveEvent"), End),
+            _func[20] = new MemberFunction(c, "keyPressEvent", _n_keyPressEvent0, None, Compiled,
+                                           qt_QWebEngineView_keyPressEvent_void_QWebEngineView_QKeyEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QWebEngineView"), new Param(c, "event", "qt.QKeyEvent"), End),
+            _func[21] = new MemberFunction(c, "keyReleaseEvent", _n_keyReleaseEvent0, None, Compiled,
+                                           qt_QWebEngineView_keyReleaseEvent_void_QWebEngineView_QKeyEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QWebEngineView"), new Param(c, "event", "qt.QKeyEvent"), End),
+            _func[22] = new MemberFunction(c, "leaveEvent", _n_leaveEvent0, None, Compiled,
+                                           qt_QWebEngineView_leaveEvent_void_QWebEngineView_QEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QWebEngineView"), new Param(c, "event", "qt.QEvent"), End),
+            _func[23] =
+                new MemberFunction(c, "mouseDoubleClickEvent", _n_mouseDoubleClickEvent0, None, Compiled,
+                                   qt_QWebEngineView_mouseDoubleClickEvent_void_QWebEngineView_QMouseEvent, Return, "void", Parameters,
+                                   new Param(c, "this", "qt.QWebEngineView"), new Param(c, "event", "qt.QMouseEvent"), End),
+            _func[24] = new MemberFunction(c, "mouseMoveEvent", _n_mouseMoveEvent0, None, Compiled,
+                                           qt_QWebEngineView_mouseMoveEvent_void_QWebEngineView_QMouseEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QWebEngineView"), new Param(c, "event", "qt.QMouseEvent"), End),
+            _func[25] = new MemberFunction(c, "mousePressEvent", _n_mousePressEvent0, None, Compiled,
+                                           qt_QWebEngineView_mousePressEvent_void_QWebEngineView_QMouseEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QWebEngineView"), new Param(c, "event", "qt.QMouseEvent"), End),
+            _func[26] = new MemberFunction(c, "mouseReleaseEvent", _n_mouseReleaseEvent0, None, Compiled,
+                                           qt_QWebEngineView_mouseReleaseEvent_void_QWebEngineView_QMouseEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QWebEngineView"), new Param(c, "event", "qt.QMouseEvent"), End),
+            _func[27] = new MemberFunction(c, "moveEvent", _n_moveEvent0, None, Compiled,
+                                           qt_QWebEngineView_moveEvent_void_QWebEngineView_QMoveEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QWebEngineView"), new Param(c, "event", "qt.QMoveEvent"), End),
             // MISSING: nativeEvent (bool; QWebEngineView this, QByteArray
             // eventType, "void *" message, "long *" result) // protected
-            _func[28] = new MemberFunction(
-                c, "paintEvent", _n_paintEvent0, None, Compiled,
-                qt_QWebEngineView_paintEvent_void_QWebEngineView_QPaintEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QWebEngineView"),
-                new Param(c, "event", "qt.QPaintEvent"), End),
-            _func[29] = new MemberFunction(
-                c, "resizeEvent", _n_resizeEvent0, None, Compiled,
-                qt_QWebEngineView_resizeEvent_void_QWebEngineView_QResizeEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QWebEngineView"),
-                new Param(c, "event", "qt.QResizeEvent"), End),
-            _func[30] = new MemberFunction(
-                c, "tabletEvent", _n_tabletEvent0, None, Compiled,
-                qt_QWebEngineView_tabletEvent_void_QWebEngineView_QTabletEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QWebEngineView"),
-                new Param(c, "event", "qt.QTabletEvent"), End),
-            _func[31] = new MemberFunction(
-                c, "wheelEvent", _n_wheelEvent0, None, Compiled,
-                qt_QWebEngineView_wheelEvent_void_QWebEngineView_QWheelEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QWebEngineView"),
-                new Param(c, "event", "qt.QWheelEvent"), End),
+            _func[28] = new MemberFunction(c, "paintEvent", _n_paintEvent0, None, Compiled,
+                                           qt_QWebEngineView_paintEvent_void_QWebEngineView_QPaintEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QWebEngineView"), new Param(c, "event", "qt.QPaintEvent"), End),
+            _func[29] = new MemberFunction(c, "resizeEvent", _n_resizeEvent0, None, Compiled,
+                                           qt_QWebEngineView_resizeEvent_void_QWebEngineView_QResizeEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QWebEngineView"), new Param(c, "event", "qt.QResizeEvent"), End),
+            _func[30] = new MemberFunction(c, "tabletEvent", _n_tabletEvent0, None, Compiled,
+                                           qt_QWebEngineView_tabletEvent_void_QWebEngineView_QTabletEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QWebEngineView"), new Param(c, "event", "qt.QTabletEvent"), End),
+            _func[31] = new MemberFunction(c, "wheelEvent", _n_wheelEvent0, None, Compiled,
+                                           qt_QWebEngineView_wheelEvent_void_QWebEngineView_QWheelEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QWebEngineView"), new Param(c, "event", "qt.QWheelEvent"), End),
             // MISSING: initPainter (void; QWebEngineView this, "QPainter *"
             // painter) // protected MISSING: metric (int; QWebEngineView this,
             // "PaintDeviceMetric" m) // protected static functions

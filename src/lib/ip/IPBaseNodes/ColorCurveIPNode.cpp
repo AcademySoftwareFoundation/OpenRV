@@ -27,9 +27,7 @@ namespace IPCore
     // http://en.wikipedia.org/wiki/Monotone_cubic_interpolation
     // strictly monotonic
 
-    ColorCurveIPNode::ColorCurveIPNode(const std::string& name,
-                                       const NodeDefinition* def,
-                                       IPGraph* graph, GroupIPNode* group)
+    ColorCurveIPNode::ColorCurveIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group)
         : IPNode(name, def, graph, group)
     {
         setMaxInputs(1);
@@ -38,17 +36,14 @@ namespace IPCore
         info->setPersistent(false);
 
         m_active = declareProperty<IntProperty>("color.active", 1);
-        m_colorContrast =
-            declareProperty<FloatProperty>("color.contrast", 0.0f);
+        m_colorContrast = declareProperty<FloatProperty>("color.contrast", 0.0f);
     }
 
     ColorCurveIPNode::~ColorCurveIPNode() {}
 
     static bool meetConditions(float a1, float b1)
     {
-        if ((a1 + 2 * b1 - 3 <= 0) || (2 * a1 + b1 - 3 <= 0)
-            || (a1 - (2 * a1 + b1 - 3) * (2 * a1 + b1 - 3) / (a1 + b1 - 2) / 3)
-                   > 0)
+        if ((a1 + 2 * b1 - 3 <= 0) || (2 * a1 + b1 - 3 <= 0) || (a1 - (2 * a1 + b1 - 3) * (2 * a1 + b1 - 3) / (a1 + b1 - 2) / 3) > 0)
             return true;
         return false;
     }
@@ -123,8 +118,7 @@ namespace IPCore
             p3.z = m3;
             p4.z = m4;
 
-            img->shaderExpr =
-                Shader::newColorCurveonY(img->shaderExpr, p1, p2, p3, p4);
+            img->shaderExpr = Shader::newColorCurveonY(img->shaderExpr, p1, p2, p3, p4);
 
             img->shaderExpr = Shader::newColorYCbCrSRGB(img->shaderExpr);
         }

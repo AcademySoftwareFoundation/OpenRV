@@ -16,8 +16,7 @@ namespace IPCore
     class DisplayStereoIPNode : public StereoTransformIPNode
     {
     public:
-        DisplayStereoIPNode(const std::string& name, const NodeDefinition* def,
-                            IPGraph*, GroupIPNode* group = 0);
+        DisplayStereoIPNode(const std::string& name, const NodeDefinition* def, IPGraph*, GroupIPNode* group = 0);
         virtual ~DisplayStereoIPNode();
 
         virtual IPImage* evaluate(const Context&);

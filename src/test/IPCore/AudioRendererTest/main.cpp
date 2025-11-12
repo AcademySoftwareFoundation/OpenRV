@@ -17,29 +17,19 @@ using namespace IPCore;
 
 // The 'LD_LIBRARY_PATH' is mandatory for the RV app under Linux
 // let's check it is defined.
-TEST_CASE("test definition of the LD_LIBRARY_PATH environment variable")
-{
-    REQUIRE(getenv("LD_LIBRARY_PATH"));
-}
+TEST_CASE("test definition of the LD_LIBRARY_PATH environment variable") { REQUIRE(getenv("LD_LIBRARY_PATH")); }
 
-TEST_CASE("test creating RendererParameters instance")
-{
-    AudioRenderer::RendererParameters params =
-        AudioRenderer::defaultParameters();
-}
+TEST_CASE("test creating RendererParameters instance") { AudioRenderer::RendererParameters params = AudioRenderer::defaultParameters(); }
 
 TEST_CASE("test setting default parameters")
 {
-    AudioRenderer::RendererParameters params =
-        AudioRenderer::defaultParameters();
+    AudioRenderer::RendererParameters params = AudioRenderer::defaultParameters();
     AudioRenderer::setDefaultParameters(params);
 }
 
-TEST_CASE(
-    "test setting default parameters, initiazing & reset (with audio disabled)")
+TEST_CASE("test setting default parameters, initiazing & reset (with audio disabled)")
 {
-    AudioRenderer::RendererParameters params =
-        AudioRenderer::defaultParameters();
+    AudioRenderer::RendererParameters params = AudioRenderer::defaultParameters();
     AudioRenderer::setDefaultParameters(params);
     AudioRenderer::initialize();
     // With 'setAudioNever' true the 'reset' method is
@@ -51,23 +41,20 @@ TEST_CASE(
 
 TEST_CASE("test setting default parameters & initiazing")
 {
-    AudioRenderer::RendererParameters params =
-        AudioRenderer::defaultParameters();
+    AudioRenderer::RendererParameters params = AudioRenderer::defaultParameters();
     AudioRenderer::setDefaultParameters(params);
     AudioRenderer::initialize();
 
     AudioRenderer::outputParameters(params);
 }
 
-TEST_CASE(
-    "test setting default parameters, initiazing & reset (with audio enabled)")
+TEST_CASE("test setting default parameters, initiazing & reset (with audio enabled)")
 {
     vector<string> files = {"TEST SESSION"};
     Application app = Application();
     Application::instance()->createNewSessionFromFiles(files);
 
-    AudioRenderer::RendererParameters params =
-        AudioRenderer::defaultParameters();
+    AudioRenderer::RendererParameters params = AudioRenderer::defaultParameters();
     AudioRenderer::setDefaultParameters(params);
     AudioRenderer::initialize();
 
@@ -92,12 +79,10 @@ TEST_CASE(
     // INFO: Found module = 'Per-Frame'
     for (auto module : modules)
     {
-        cout << endl
-             << "INFO: Found module = '" << module.name.c_str() << "' " << endl;
+        cout << endl << "INFO: Found module = '" << module.name.c_str() << "' " << endl;
 
         CHECK(module.name.size() > 0);
-        cout << "INFO: ... Trying out the '" << module.name.c_str()
-             << "' audio module" << endl;
+        cout << "INFO: ... Trying out the '" << module.name.c_str() << "' audio module" << endl;
 
         AudioRenderer::setModule(module.name);
 
@@ -113,33 +98,28 @@ TEST_CASE(
         }
 
         auto state = renderer->deviceState();
-        cout << "INFO: ... state.device = '" << state.device.c_str() << "'"
-             << endl;
+        cout << "INFO: ... state.device = '" << state.device.c_str() << "'" << endl;
         cout << "INFO: ... state.rate = '" << state.rate << "'" << endl;
         cout << "INFO: ... state.latency = '" << state.latency << "'" << endl;
-        cout << "INFO: ... state.framesPerBuffer = '" << state.framesPerBuffer
-             << "'" << endl;
+        cout << "INFO: ... state.framesPerBuffer = '" << state.framesPerBuffer << "'" << endl;
 
         CHECK_FALSE(renderer->isPlaying());
         cout << "INFO: ... Trying out play() ..." << endl;
         renderer->play();
         CHECK(renderer->isPlaying());
         CHECK(renderer->isOK());
-        cout << "INFO: ... errorString = '" << renderer->errorString() << "'"
-             << endl;
+        cout << "INFO: ... errorString = '" << renderer->errorString() << "'" << endl;
 
         cout << "INFO: ... Trying out stop() ..." << endl;
         renderer->stop();
         CHECK_FALSE(renderer->isPlaying());
         CHECK(renderer->isOK());
-        cout << "INFO: ... errorString = '" << renderer->errorString() << "'"
-             << endl;
+        cout << "INFO: ... errorString = '" << renderer->errorString() << "'" << endl;
 
         cout << "INFO: ... Trying out shutdown() ..." << endl;
         renderer->shutdown();
         CHECK(renderer->isOK());
-        cout << "INFO: ... errorString = '" << renderer->errorString() << "'"
-             << endl;
+        cout << "INFO: ... errorString = '" << renderer->errorString() << "'" << endl;
     }
 
     if (!audioAvailable)
@@ -179,16 +159,14 @@ TEST_CASE("test simple app, start, stop (with audio enabled)")
 using namespace std::this_thread;     // sleep_for
 using namespace std::chrono_literals; // ns, us, ms, s, h, etc.
 
-TEST_CASE(
-    "test setting default parameters, initiazing & reset (with audio enabled)")
+TEST_CASE("test setting default parameters, initiazing & reset (with audio enabled)")
 {
     const string testMedia = "bogus_media.bog";
     cout << "INFO: Creating test application ... " << endl;
     Application app = Application();
 
     cout << "INFO: Setting up audio renderer ... " << endl;
-    AudioRenderer::RendererParameters params =
-        AudioRenderer::defaultParameters();
+    AudioRenderer::RendererParameters params = AudioRenderer::defaultParameters();
     AudioRenderer::setDefaultParameters(params);
     AudioRenderer::initialize();
     AudioRenderer::setAudioNever(false);
@@ -232,11 +210,9 @@ TEST_CASE(
         REQUIRE(renderer);
         while (sleepCount > 0)
         {
-            cout << "INFO: ... renderer->isOK() = '" << renderer->isOK() << "'"
-                 << endl;
+            cout << "INFO: ... renderer->isOK() = '" << renderer->isOK() << "'" << endl;
             CHECK(renderer->isOK());
-            cout << "INFO: ... renderer->isPlaying() = '"
-                 << renderer->isPlaying() << "'" << endl;
+            cout << "INFO: ... renderer->isPlaying() = '" << renderer->isPlaying() << "'" << endl;
             // Again, as-is, the test won't have audio :-(
             CHECK(!renderer->isPlaying());
             sleep_for(100ms);
@@ -250,10 +226,8 @@ TEST_CASE(
     // On CI it is reasonable not to have any audio hardware at all
     if (renderer)
     {
-        cout << "INFO: ... renderer->isOK() = '" << renderer->isOK() << "'"
-             << endl;
-        cout << "INFO: ... renderer->isPlaying() = '" << renderer->isPlaying()
-             << "'" << endl;
+        cout << "INFO: ... renderer->isOK() = '" << renderer->isOK() << "'" << endl;
+        cout << "INFO: ... renderer->isPlaying() = '" << renderer->isPlaying() << "'" << endl;
     }
 
     cout << "INFO: Cleanup up ..." << endl;

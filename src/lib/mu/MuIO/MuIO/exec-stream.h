@@ -40,9 +40,7 @@ class exec_stream_t
 public:
     exec_stream_t();
     exec_stream_t(std::string const& program, std::string const& arguments);
-    template <class iterator>
-    exec_stream_t(std::string const& program, iterator args_begin,
-                  iterator args_end);
+    template <class iterator> exec_stream_t(std::string const& program, iterator args_begin, iterator args_end);
 
     ~exec_stream_t();
 
@@ -64,12 +62,9 @@ public:
     void set_text_mode(int stream_kind);
 
     void start(std::string const& program, std::string const& arguments);
-    template <class iterator>
-    void start(std::string const& program, iterator args_begin,
-               iterator args_end);
-    void
-    start(std::string const& program, char const* arg1,
-          char const* arg2); // to compensate for damage from the previous one
+    template <class iterator> void start(std::string const& program, iterator args_begin, iterator args_end);
+    void start(std::string const& program, char const* arg1,
+               char const* arg2); // to compensate for damage from the previous one
     void start(std::string const& program, char* arg1, char* arg2);
 
     bool close_in();
@@ -151,25 +146,20 @@ private:
     void start(std::string const& program, next_arg_t& next_arg);
 };
 
-template <class iterator>
-inline exec_stream_t::exec_stream_t(std::string const& program,
-                                    iterator args_begin, iterator args_end)
+template <class iterator> inline exec_stream_t::exec_stream_t(std::string const& program, iterator args_begin, iterator args_end)
 {
     new_impl();
     exceptions(true);
     start(program, args_begin, args_end);
 }
 
-template <class iterator>
-inline void exec_stream_t::start(std::string const& program,
-                                 iterator args_begin, iterator args_end)
+template <class iterator> inline void exec_stream_t::start(std::string const& program, iterator args_begin, iterator args_end)
 {
     exec_stream_t::next_arg_impl_t<iterator> next_arg(args_begin, args_end);
     start(program, next_arg);
 }
 
-inline void exec_stream_t::start(std::string const& program, char const* arg1,
-                                 char const* arg2)
+inline void exec_stream_t::start(std::string const& program, char const* arg1, char const* arg2)
 {
     std::vector<std::string> args;
     args.push_back(std::string(arg1));
@@ -177,8 +167,7 @@ inline void exec_stream_t::start(std::string const& program, char const* arg1,
     start(program, args.begin(), args.end());
 }
 
-inline void exec_stream_t::start(std::string const& program, char* arg1,
-                                 char* arg2)
+inline void exec_stream_t::start(std::string const& program, char* arg1, char* arg2)
 {
     std::vector<std::string> args;
     args.push_back(std::string(arg1));

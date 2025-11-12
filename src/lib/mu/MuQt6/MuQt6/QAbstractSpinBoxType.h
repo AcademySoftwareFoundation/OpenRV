@@ -42,8 +42,7 @@ namespace Mu
         //  Constructors
         //
 
-        QAbstractSpinBoxType(Context* context, const char* name,
-                             Class* superClass = 0, Class* superClass2 = 0);
+        QAbstractSpinBoxType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QAbstractSpinBoxType();
 
@@ -66,8 +65,7 @@ namespace Mu
     {
     public:
         virtual ~MuQt_QAbstractSpinBox();
-        MuQt_QAbstractSpinBox(Pointer muobj, const CallEnvironment*,
-                              QWidget* parent);
+        MuQt_QAbstractSpinBox(Pointer muobj, const CallEnvironment*, QWidget* parent);
         virtual void stepBy(int steps);
         virtual bool event(QEvent* event_);
         virtual QVariant inputMethodQuery(Qt::InputMethodQuery query) const;
@@ -111,220 +109,115 @@ namespace Mu
     public:
         QLineEdit* lineEdit_pub() const { return lineEdit(); }
 
-        QLineEdit* lineEdit_pub_parent() const
-        {
-            return QAbstractSpinBox::lineEdit();
-        }
+        QLineEdit* lineEdit_pub_parent() const { return QAbstractSpinBox::lineEdit(); }
 
         void setLineEdit_pub(QLineEdit* lineEdit) { setLineEdit(lineEdit); }
 
-        void setLineEdit_pub_parent(QLineEdit* lineEdit)
-        {
-            QAbstractSpinBox::setLineEdit(lineEdit);
-        }
+        void setLineEdit_pub_parent(QLineEdit* lineEdit) { QAbstractSpinBox::setLineEdit(lineEdit); }
 
         void changeEvent_pub(QEvent* event) { changeEvent(event); }
 
-        void changeEvent_pub_parent(QEvent* event)
-        {
-            QAbstractSpinBox::changeEvent(event);
-        }
+        void changeEvent_pub_parent(QEvent* event) { QAbstractSpinBox::changeEvent(event); }
 
         void closeEvent_pub(QCloseEvent* event) { closeEvent(event); }
 
-        void closeEvent_pub_parent(QCloseEvent* event)
-        {
-            QAbstractSpinBox::closeEvent(event);
-        }
+        void closeEvent_pub_parent(QCloseEvent* event) { QAbstractSpinBox::closeEvent(event); }
 
-        void contextMenuEvent_pub(QContextMenuEvent* event)
-        {
-            contextMenuEvent(event);
-        }
+        void contextMenuEvent_pub(QContextMenuEvent* event) { contextMenuEvent(event); }
 
-        void contextMenuEvent_pub_parent(QContextMenuEvent* event)
-        {
-            QAbstractSpinBox::contextMenuEvent(event);
-        }
+        void contextMenuEvent_pub_parent(QContextMenuEvent* event) { QAbstractSpinBox::contextMenuEvent(event); }
 
         void focusInEvent_pub(QFocusEvent* event) { focusInEvent(event); }
 
-        void focusInEvent_pub_parent(QFocusEvent* event)
-        {
-            QAbstractSpinBox::focusInEvent(event);
-        }
+        void focusInEvent_pub_parent(QFocusEvent* event) { QAbstractSpinBox::focusInEvent(event); }
 
         void focusOutEvent_pub(QFocusEvent* event) { focusOutEvent(event); }
 
-        void focusOutEvent_pub_parent(QFocusEvent* event)
-        {
-            QAbstractSpinBox::focusOutEvent(event);
-        }
+        void focusOutEvent_pub_parent(QFocusEvent* event) { QAbstractSpinBox::focusOutEvent(event); }
 
         void hideEvent_pub(QHideEvent* event) { hideEvent(event); }
 
-        void hideEvent_pub_parent(QHideEvent* event)
-        {
-            QAbstractSpinBox::hideEvent(event);
-        }
+        void hideEvent_pub_parent(QHideEvent* event) { QAbstractSpinBox::hideEvent(event); }
 
         void keyPressEvent_pub(QKeyEvent* event) { keyPressEvent(event); }
 
-        void keyPressEvent_pub_parent(QKeyEvent* event)
-        {
-            QAbstractSpinBox::keyPressEvent(event);
-        }
+        void keyPressEvent_pub_parent(QKeyEvent* event) { QAbstractSpinBox::keyPressEvent(event); }
 
         void keyReleaseEvent_pub(QKeyEvent* event) { keyReleaseEvent(event); }
 
-        void keyReleaseEvent_pub_parent(QKeyEvent* event)
-        {
-            QAbstractSpinBox::keyReleaseEvent(event);
-        }
+        void keyReleaseEvent_pub_parent(QKeyEvent* event) { QAbstractSpinBox::keyReleaseEvent(event); }
 
         void mouseMoveEvent_pub(QMouseEvent* event) { mouseMoveEvent(event); }
 
-        void mouseMoveEvent_pub_parent(QMouseEvent* event)
-        {
-            QAbstractSpinBox::mouseMoveEvent(event);
-        }
+        void mouseMoveEvent_pub_parent(QMouseEvent* event) { QAbstractSpinBox::mouseMoveEvent(event); }
 
         void mousePressEvent_pub(QMouseEvent* event) { mousePressEvent(event); }
 
-        void mousePressEvent_pub_parent(QMouseEvent* event)
-        {
-            QAbstractSpinBox::mousePressEvent(event);
-        }
+        void mousePressEvent_pub_parent(QMouseEvent* event) { QAbstractSpinBox::mousePressEvent(event); }
 
-        void mouseReleaseEvent_pub(QMouseEvent* event)
-        {
-            mouseReleaseEvent(event);
-        }
+        void mouseReleaseEvent_pub(QMouseEvent* event) { mouseReleaseEvent(event); }
 
-        void mouseReleaseEvent_pub_parent(QMouseEvent* event)
-        {
-            QAbstractSpinBox::mouseReleaseEvent(event);
-        }
+        void mouseReleaseEvent_pub_parent(QMouseEvent* event) { QAbstractSpinBox::mouseReleaseEvent(event); }
 
         void paintEvent_pub(QPaintEvent* event) { paintEvent(event); }
 
-        void paintEvent_pub_parent(QPaintEvent* event)
-        {
-            QAbstractSpinBox::paintEvent(event);
-        }
+        void paintEvent_pub_parent(QPaintEvent* event) { QAbstractSpinBox::paintEvent(event); }
 
         void resizeEvent_pub(QResizeEvent* event) { resizeEvent(event); }
 
-        void resizeEvent_pub_parent(QResizeEvent* event)
-        {
-            QAbstractSpinBox::resizeEvent(event);
-        }
+        void resizeEvent_pub_parent(QResizeEvent* event) { QAbstractSpinBox::resizeEvent(event); }
 
         void showEvent_pub(QShowEvent* event) { showEvent(event); }
 
-        void showEvent_pub_parent(QShowEvent* event)
-        {
-            QAbstractSpinBox::showEvent(event);
-        }
+        void showEvent_pub_parent(QShowEvent* event) { QAbstractSpinBox::showEvent(event); }
 
         void timerEvent_pub(QTimerEvent* event) { timerEvent(event); }
 
-        void timerEvent_pub_parent(QTimerEvent* event)
-        {
-            QAbstractSpinBox::timerEvent(event);
-        }
+        void timerEvent_pub_parent(QTimerEvent* event) { QAbstractSpinBox::timerEvent(event); }
 
         void wheelEvent_pub(QWheelEvent* event) { wheelEvent(event); }
 
-        void wheelEvent_pub_parent(QWheelEvent* event)
-        {
-            QAbstractSpinBox::wheelEvent(event);
-        }
+        void wheelEvent_pub_parent(QWheelEvent* event) { QAbstractSpinBox::wheelEvent(event); }
 
-        void dragEnterEvent_pub(QDragEnterEvent* event)
-        {
-            dragEnterEvent(event);
-        }
+        void dragEnterEvent_pub(QDragEnterEvent* event) { dragEnterEvent(event); }
 
-        void dragEnterEvent_pub_parent(QDragEnterEvent* event)
-        {
-            QAbstractSpinBox::dragEnterEvent(event);
-        }
+        void dragEnterEvent_pub_parent(QDragEnterEvent* event) { QAbstractSpinBox::dragEnterEvent(event); }
 
-        void dragLeaveEvent_pub(QDragLeaveEvent* event)
-        {
-            dragLeaveEvent(event);
-        }
+        void dragLeaveEvent_pub(QDragLeaveEvent* event) { dragLeaveEvent(event); }
 
-        void dragLeaveEvent_pub_parent(QDragLeaveEvent* event)
-        {
-            QAbstractSpinBox::dragLeaveEvent(event);
-        }
+        void dragLeaveEvent_pub_parent(QDragLeaveEvent* event) { QAbstractSpinBox::dragLeaveEvent(event); }
 
         void dragMoveEvent_pub(QDragMoveEvent* event) { dragMoveEvent(event); }
 
-        void dragMoveEvent_pub_parent(QDragMoveEvent* event)
-        {
-            QAbstractSpinBox::dragMoveEvent(event);
-        }
+        void dragMoveEvent_pub_parent(QDragMoveEvent* event) { QAbstractSpinBox::dragMoveEvent(event); }
 
         void dropEvent_pub(QDropEvent* event) { dropEvent(event); }
 
-        void dropEvent_pub_parent(QDropEvent* event)
-        {
-            QAbstractSpinBox::dropEvent(event);
-        }
+        void dropEvent_pub_parent(QDropEvent* event) { QAbstractSpinBox::dropEvent(event); }
 
-        bool focusNextPrevChild_pub(bool next)
-        {
-            return focusNextPrevChild(next);
-        }
+        bool focusNextPrevChild_pub(bool next) { return focusNextPrevChild(next); }
 
-        bool focusNextPrevChild_pub_parent(bool next)
-        {
-            return QAbstractSpinBox::focusNextPrevChild(next);
-        }
+        bool focusNextPrevChild_pub_parent(bool next) { return QAbstractSpinBox::focusNextPrevChild(next); }
 
         void leaveEvent_pub(QEvent* event) { leaveEvent(event); }
 
-        void leaveEvent_pub_parent(QEvent* event)
-        {
-            QAbstractSpinBox::leaveEvent(event);
-        }
+        void leaveEvent_pub_parent(QEvent* event) { QAbstractSpinBox::leaveEvent(event); }
 
-        void mouseDoubleClickEvent_pub(QMouseEvent* event)
-        {
-            mouseDoubleClickEvent(event);
-        }
+        void mouseDoubleClickEvent_pub(QMouseEvent* event) { mouseDoubleClickEvent(event); }
 
-        void mouseDoubleClickEvent_pub_parent(QMouseEvent* event)
-        {
-            QAbstractSpinBox::mouseDoubleClickEvent(event);
-        }
+        void mouseDoubleClickEvent_pub_parent(QMouseEvent* event) { QAbstractSpinBox::mouseDoubleClickEvent(event); }
 
         void moveEvent_pub(QMoveEvent* event) { moveEvent(event); }
 
-        void moveEvent_pub_parent(QMoveEvent* event)
-        {
-            QAbstractSpinBox::moveEvent(event);
-        }
+        void moveEvent_pub_parent(QMoveEvent* event) { QAbstractSpinBox::moveEvent(event); }
 
         void tabletEvent_pub(QTabletEvent* event) { tabletEvent(event); }
 
-        void tabletEvent_pub_parent(QTabletEvent* event)
-        {
-            QAbstractSpinBox::tabletEvent(event);
-        }
+        void tabletEvent_pub_parent(QTabletEvent* event) { QAbstractSpinBox::tabletEvent(event); }
 
-        int metric_pub(QPaintDevice::PaintDeviceMetric m) const
-        {
-            return metric(m);
-        }
+        int metric_pub(QPaintDevice::PaintDeviceMetric m) const { return metric(m); }
 
-        int metric_pub_parent(QPaintDevice::PaintDeviceMetric m) const
-        {
-            return QAbstractSpinBox::metric(m);
-        }
+        int metric_pub_parent(QPaintDevice::PaintDeviceMetric m) const { return QAbstractSpinBox::metric(m); }
 
     public:
         const QAbstractSpinBoxType* _baseType;
@@ -332,11 +225,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance* QAbstractSpinBoxType::cachedInstance(
-        const QAbstractSpinBoxType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QAbstractSpinBoxType::cachedInstance(const QAbstractSpinBoxType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

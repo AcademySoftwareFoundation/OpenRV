@@ -24,8 +24,7 @@
 #endif
 
 #define SAMPLEFORMAT_INT8_NORM_VALUE float(std::numeric_limits<char>::max())
-#define SAMPLEFORMAT_INT16_NORM_VALUE \
-    float(std::numeric_limits<short int>::max())
+#define SAMPLEFORMAT_INT16_NORM_VALUE float(std::numeric_limits<short int>::max())
 #define SAMPLEFORMAT_INT32_NORM_VALUE float(std::numeric_limits<int>::max())
 
 namespace TwkFB
@@ -62,90 +61,88 @@ namespace TwkFB
         unsigned short tag;
     };
 
-    static const TagNameValue compTags[] = {
-        {"NONE", COMPRESSION_NONE},
-        {"CCITTRLE", COMPRESSION_CCITTRLE},
-        {"CCITTFAX3", COMPRESSION_CCITTFAX3},
-        {"CCITT_T4", COMPRESSION_CCITT_T4},
-        {"CCITTFAX4", COMPRESSION_CCITTFAX4},
-        {"CCITT_T6", COMPRESSION_CCITT_T6},
-        {"LZW", COMPRESSION_LZW},
-        {"JPEG", COMPRESSION_JPEG},
-        {"NEXT", COMPRESSION_NEXT},
-        {"CCITTRLEW", COMPRESSION_CCITTRLEW},
-        {"PACKBITS", COMPRESSION_PACKBITS},
-        {"THUNDERSCAN", COMPRESSION_THUNDERSCAN},
-        {"IT8CTPAD", COMPRESSION_IT8CTPAD},
-        {"IT8LW", COMPRESSION_IT8LW},
-        {"IT8BL", COMPRESSION_IT8BL},
-        {"PIXARFILM", COMPRESSION_PIXARFILM},
-        {"PIXARLOG", COMPRESSION_PIXARLOG},
-        {"DEFLATE", COMPRESSION_DEFLATE},
-        {"ADOBE_DEFLATE", COMPRESSION_ADOBE_DEFLATE},
-        {"DCS", COMPRESSION_DCS},
-        {"JBIG", COMPRESSION_JBIG},
-        {"SGILOG", COMPRESSION_SGILOG},
-        {"SGILOG24", COMPRESSION_SGILOG24},
-        {"JP2000", COMPRESSION_JP2000},
-        {0, 0}};
+    static const TagNameValue compTags[] = {{"NONE", COMPRESSION_NONE},
+                                            {"CCITTRLE", COMPRESSION_CCITTRLE},
+                                            {"CCITTFAX3", COMPRESSION_CCITTFAX3},
+                                            {"CCITT_T4", COMPRESSION_CCITT_T4},
+                                            {"CCITTFAX4", COMPRESSION_CCITTFAX4},
+                                            {"CCITT_T6", COMPRESSION_CCITT_T6},
+                                            {"LZW", COMPRESSION_LZW},
+                                            {"JPEG", COMPRESSION_JPEG},
+                                            {"NEXT", COMPRESSION_NEXT},
+                                            {"CCITTRLEW", COMPRESSION_CCITTRLEW},
+                                            {"PACKBITS", COMPRESSION_PACKBITS},
+                                            {"THUNDERSCAN", COMPRESSION_THUNDERSCAN},
+                                            {"IT8CTPAD", COMPRESSION_IT8CTPAD},
+                                            {"IT8LW", COMPRESSION_IT8LW},
+                                            {"IT8BL", COMPRESSION_IT8BL},
+                                            {"PIXARFILM", COMPRESSION_PIXARFILM},
+                                            {"PIXARLOG", COMPRESSION_PIXARLOG},
+                                            {"DEFLATE", COMPRESSION_DEFLATE},
+                                            {"ADOBE_DEFLATE", COMPRESSION_ADOBE_DEFLATE},
+                                            {"DCS", COMPRESSION_DCS},
+                                            {"JBIG", COMPRESSION_JBIG},
+                                            {"SGILOG", COMPRESSION_SGILOG},
+                                            {"SGILOG24", COMPRESSION_SGILOG24},
+                                            {"JP2000", COMPRESSION_JP2000},
+                                            {0, 0}};
 
-    static const TagNameValue exifTags[] = {
-        {"ExposureTime", EXIFTAG_EXPOSURETIME},
-        {"FNumber", EXIFTAG_FNUMBER},
-        {"ExposureProgram", EXIFTAG_EXPOSUREPROGRAM},
-        {"SpectralSensitivity", EXIFTAG_SPECTRALSENSITIVITY},
-        {"ISOSpeedRatings", EXIFTAG_ISOSPEEDRATINGS},
-        {"OptoelectricConversionFactor", EXIFTAG_OECF},
-        {"ExifVersion", EXIFTAG_EXIFVERSION},
-        {"DateTimeOriginal", EXIFTAG_DATETIMEORIGINAL},
-        {"DateTimeDigitized", EXIFTAG_DATETIMEDIGITIZED},
-        {"ComponentsConfiguration", EXIFTAG_COMPONENTSCONFIGURATION},
-        {"CompressedBitsPerPixel", EXIFTAG_COMPRESSEDBITSPERPIXEL},
-        {"ShutterSpeedValue", EXIFTAG_SHUTTERSPEEDVALUE},
-        {"ApertureValue", EXIFTAG_APERTUREVALUE},
-        {"BrightnessValue", EXIFTAG_BRIGHTNESSVALUE},
-        {"ExposureBiasValue", EXIFTAG_EXPOSUREBIASVALUE},
-        {"MaxApertureValue", EXIFTAG_MAXAPERTUREVALUE},
-        {"SubjectDistance", EXIFTAG_SUBJECTDISTANCE},
-        {"MeteringMode", EXIFTAG_METERINGMODE},
-        {"LightSource", EXIFTAG_LIGHTSOURCE},
-        {"Flash", EXIFTAG_FLASH},
-        {"FocalLength", EXIFTAG_FOCALLENGTH},
-        {"SubjectArea", EXIFTAG_SUBJECTAREA},
-        {"MakerNote", EXIFTAG_MAKERNOTE},
-        {"UserComment", EXIFTAG_USERCOMMENT},
-        {"SubSecTime", EXIFTAG_SUBSECTIME},
-        {"SubSecTimeOriginal", EXIFTAG_SUBSECTIMEORIGINAL},
-        {"SubSecTimeDigitized", EXIFTAG_SUBSECTIMEDIGITIZED},
-        {"FlashpixVersion", EXIFTAG_FLASHPIXVERSION},
-        {"PixelXDimension", EXIFTAG_PIXELXDIMENSION},
-        {"PixelYDimension", EXIFTAG_PIXELYDIMENSION},
-        {"RelatedSoundFile", EXIFTAG_RELATEDSOUNDFILE},
-        {"FlashEnergy", EXIFTAG_FLASHENERGY},
-        {"SpatialFrequencyResponse", EXIFTAG_SPATIALFREQUENCYRESPONSE},
-        {"FocalPlaneXResolution", EXIFTAG_FOCALPLANEXRESOLUTION},
-        {"FocalPlaneYResolution", EXIFTAG_FOCALPLANEYRESOLUTION},
-        {"FocalPlaneResolutionUnit", EXIFTAG_FOCALPLANERESOLUTIONUNIT},
-        {"SubjectLocation", EXIFTAG_SUBJECTLOCATION},
-        {"ExposureIndex", EXIFTAG_EXPOSUREINDEX},
-        {"SensingMethod", EXIFTAG_SENSINGMETHOD},
-        {"FileSource", EXIFTAG_FILESOURCE},
-        {"SceneType", EXIFTAG_SCENETYPE},
-        {"CFAPattern", EXIFTAG_CFAPATTERN},
-        {"CustomRendered", EXIFTAG_CUSTOMRENDERED},
-        {"ExposureMode", EXIFTAG_EXPOSUREMODE},
-        {"WhiteBalance", EXIFTAG_WHITEBALANCE},
-        {"DigitalZoomRatio", EXIFTAG_DIGITALZOOMRATIO},
-        {"FocalLengthIn35mmFilm", EXIFTAG_FOCALLENGTHIN35MMFILM},
-        {"SceneCaptureType", EXIFTAG_SCENECAPTURETYPE},
-        {"GainControl", EXIFTAG_GAINCONTROL},
-        {"Contrast", EXIFTAG_CONTRAST},
-        {"Saturation", EXIFTAG_SATURATION},
-        {"Sharpness", EXIFTAG_SHARPNESS},
-        {"DeviceSettingDescription", EXIFTAG_DEVICESETTINGDESCRIPTION},
-        {"SubjectDistanceRange", EXIFTAG_SUBJECTDISTANCERANGE},
-        {"ImageUniqueID", EXIFTAG_IMAGEUNIQUEID},
-        {0, 0}};
+    static const TagNameValue exifTags[] = {{"ExposureTime", EXIFTAG_EXPOSURETIME},
+                                            {"FNumber", EXIFTAG_FNUMBER},
+                                            {"ExposureProgram", EXIFTAG_EXPOSUREPROGRAM},
+                                            {"SpectralSensitivity", EXIFTAG_SPECTRALSENSITIVITY},
+                                            {"ISOSpeedRatings", EXIFTAG_ISOSPEEDRATINGS},
+                                            {"OptoelectricConversionFactor", EXIFTAG_OECF},
+                                            {"ExifVersion", EXIFTAG_EXIFVERSION},
+                                            {"DateTimeOriginal", EXIFTAG_DATETIMEORIGINAL},
+                                            {"DateTimeDigitized", EXIFTAG_DATETIMEDIGITIZED},
+                                            {"ComponentsConfiguration", EXIFTAG_COMPONENTSCONFIGURATION},
+                                            {"CompressedBitsPerPixel", EXIFTAG_COMPRESSEDBITSPERPIXEL},
+                                            {"ShutterSpeedValue", EXIFTAG_SHUTTERSPEEDVALUE},
+                                            {"ApertureValue", EXIFTAG_APERTUREVALUE},
+                                            {"BrightnessValue", EXIFTAG_BRIGHTNESSVALUE},
+                                            {"ExposureBiasValue", EXIFTAG_EXPOSUREBIASVALUE},
+                                            {"MaxApertureValue", EXIFTAG_MAXAPERTUREVALUE},
+                                            {"SubjectDistance", EXIFTAG_SUBJECTDISTANCE},
+                                            {"MeteringMode", EXIFTAG_METERINGMODE},
+                                            {"LightSource", EXIFTAG_LIGHTSOURCE},
+                                            {"Flash", EXIFTAG_FLASH},
+                                            {"FocalLength", EXIFTAG_FOCALLENGTH},
+                                            {"SubjectArea", EXIFTAG_SUBJECTAREA},
+                                            {"MakerNote", EXIFTAG_MAKERNOTE},
+                                            {"UserComment", EXIFTAG_USERCOMMENT},
+                                            {"SubSecTime", EXIFTAG_SUBSECTIME},
+                                            {"SubSecTimeOriginal", EXIFTAG_SUBSECTIMEORIGINAL},
+                                            {"SubSecTimeDigitized", EXIFTAG_SUBSECTIMEDIGITIZED},
+                                            {"FlashpixVersion", EXIFTAG_FLASHPIXVERSION},
+                                            {"PixelXDimension", EXIFTAG_PIXELXDIMENSION},
+                                            {"PixelYDimension", EXIFTAG_PIXELYDIMENSION},
+                                            {"RelatedSoundFile", EXIFTAG_RELATEDSOUNDFILE},
+                                            {"FlashEnergy", EXIFTAG_FLASHENERGY},
+                                            {"SpatialFrequencyResponse", EXIFTAG_SPATIALFREQUENCYRESPONSE},
+                                            {"FocalPlaneXResolution", EXIFTAG_FOCALPLANEXRESOLUTION},
+                                            {"FocalPlaneYResolution", EXIFTAG_FOCALPLANEYRESOLUTION},
+                                            {"FocalPlaneResolutionUnit", EXIFTAG_FOCALPLANERESOLUTIONUNIT},
+                                            {"SubjectLocation", EXIFTAG_SUBJECTLOCATION},
+                                            {"ExposureIndex", EXIFTAG_EXPOSUREINDEX},
+                                            {"SensingMethod", EXIFTAG_SENSINGMETHOD},
+                                            {"FileSource", EXIFTAG_FILESOURCE},
+                                            {"SceneType", EXIFTAG_SCENETYPE},
+                                            {"CFAPattern", EXIFTAG_CFAPATTERN},
+                                            {"CustomRendered", EXIFTAG_CUSTOMRENDERED},
+                                            {"ExposureMode", EXIFTAG_EXPOSUREMODE},
+                                            {"WhiteBalance", EXIFTAG_WHITEBALANCE},
+                                            {"DigitalZoomRatio", EXIFTAG_DIGITALZOOMRATIO},
+                                            {"FocalLengthIn35mmFilm", EXIFTAG_FOCALLENGTHIN35MMFILM},
+                                            {"SceneCaptureType", EXIFTAG_SCENECAPTURETYPE},
+                                            {"GainControl", EXIFTAG_GAINCONTROL},
+                                            {"Contrast", EXIFTAG_CONTRAST},
+                                            {"Saturation", EXIFTAG_SATURATION},
+                                            {"Sharpness", EXIFTAG_SHARPNESS},
+                                            {"DeviceSettingDescription", EXIFTAG_DEVICESETTINGDESCRIPTION},
+                                            {"SubjectDistanceRange", EXIFTAG_SUBJECTDISTANCERANGE},
+                                            {"ImageUniqueID", EXIFTAG_IMAGEUNIQUEID},
+                                            {0, 0}};
 
     static unsigned short nameToTag(const char* name, const TagNameValue* tags)
     {
@@ -171,8 +168,7 @@ namespace TwkFB
         return str.str();
     }
 
-    IOtiff::IOtiff(bool addAlphaTo3Channel, bool rgbPlanar, IOType ioMethod,
-                   size_t chunkSize, int maxAsync)
+    IOtiff::IOtiff(bool addAlphaTo3Channel, bool rgbPlanar, IOType ioMethod, size_t chunkSize, int maxAsync)
         : StreamingFrameBufferIO("IOtiff", "m1", ioMethod, chunkSize, maxAsync)
         , m_rgbPlanar(rgbPlanar)
         , m_addAlphaTo3Channel(addAlphaTo3Channel)
@@ -180,8 +176,7 @@ namespace TwkFB
         TIFFSetErrorHandler(0);
         TIFFSetWarningHandler(0);
 
-        unsigned int types = Int8Capable | Int16Capable | Float32Capable
-                             | PlanarRead /*| PlanarWrite*/;
+        unsigned int types = Int8Capable | Int16Capable | Float32Capable | PlanarRead /*| PlanarWrite*/;
         unsigned int capio = ImageRead | ImageWrite | BruteForceIO | types;
         unsigned int capi = ImageRead | types | BruteForceIO;
 
@@ -190,8 +185,7 @@ namespace TwkFB
         codecs.push_back(StringPair("DEFLATE", "Deflate compression"));
         codecs.push_back(StringPair("LZW", "Lempel-Ziv  & Welch"));
         codecs.push_back(StringPair("PACKBITS", "Macintosh RLE"));
-        codecs.push_back(StringPair(
-            "ADOBE_DEFLATE", "Deflate compression as recognized by Adobe"));
+        codecs.push_back(StringPair("ADOBE_DEFLATE", "Deflate compression as recognized by Adobe"));
         codecs.push_back(StringPair("CCITTRLE", "CCITT modified Huffman RLE"));
         codecs.push_back(StringPair("CCITTFAX3", "CCITT Group 3 fax encoding"));
         codecs.push_back(StringPair("CCITT_T4", "CCITT T.4 (TIFF 6 name)"));
@@ -313,15 +307,12 @@ namespace TwkFB
                         //  See: http://www.cpanforum.com/threads/2784
                         //
 
-                        img.attribute<string>("EXIF/ColorSpace") =
-                            "2 (Adobe RGB)";
+                        img.attribute<string>("EXIF/ColorSpace") = "2 (Adobe RGB)";
 
                         if (!set_profile)
                         {
                             img.setPrimaryColorSpace(ColorSpace::ICCProfile());
-                            img.attribute<string>(
-                                ColorSpace::ICCProfileDescription()) =
-                                string("Adobe RGB");
+                            img.attribute<string>(ColorSpace::ICCProfileDescription()) = string("Adobe RGB");
                         }
                     }
                     else
@@ -343,17 +334,12 @@ namespace TwkFB
         {
             const TIFFField* const fip = tif->tif_fields[fi];
 
-            if (fip->field_tag != TIFFTAG_ICCPROFILE
-                && // exclude tags we handle seperately
+            if (fip->field_tag != TIFFTAG_ICCPROFILE && // exclude tags we handle seperately
                 fip->field_tag != EXIFTAG_COLORSPACE &&
 
-                fip->field_tag != TIFFTAG_XRESOLUTION
-                && fip->field_tag != TIFFTAG_YRESOLUTION
-                && fip->field_tag != TIFFTAG_SOFTWARE
-                && fip->field_tag != EXIFTAG_PIXELXDIMENSION
-                && fip->field_tag != EXIFTAG_PIXELYDIMENSION
-                && fip->field_tag != TIFFTAG_RESOLUTIONUNIT
-                && fip->field_tag != TIFFTAG_PLANARCONFIG &&
+                fip->field_tag != TIFFTAG_XRESOLUTION && fip->field_tag != TIFFTAG_YRESOLUTION && fip->field_tag != TIFFTAG_SOFTWARE
+                && fip->field_tag != EXIFTAG_PIXELXDIMENSION && fip->field_tag != EXIFTAG_PIXELYDIMENSION
+                && fip->field_tag != TIFFTAG_RESOLUTIONUNIT && fip->field_tag != TIFFTAG_PLANARCONFIG &&
 
                 fip->field_tag != TIFFTAG_SUBIFD &&
 
@@ -365,9 +351,7 @@ namespace TwkFB
                 // see tif_dir.c _TIFFVGetField for multiple uses of va_arg()
                 // by a tag type.
 
-                (fip->field_readcount != TIFF_VARIABLE
-                 || fip->field_type == TIFF_ASCII)
-                &&
+                (fip->field_readcount != TIFF_VARIABLE || fip->field_type == TIFF_ASCII) &&
 
                 // fip->field_tag != TIFFTAG_COLORMAP &&
                 // fip->field_tag != TIFFTAG_HALFTONEHINTS &&
@@ -376,11 +360,8 @@ namespace TwkFB
                 fip->field_tag != TIFFTAG_YCBCRSUBSAMPLING &&
                 // fip->field_tag != TIFFTAG_TRANSFERFUNCTION &&
 
-                fip->field_tag != TIFFTAG_PHOTOMETRIC
-                && fip->field_tag != TIFFTAG_IMAGEWIDTH
-                && fip->field_tag != TIFFTAG_IMAGELENGTH
-                && fip->field_tag != TIFFTAG_BITSPERSAMPLE
-                && fip->field_tag != TIFFTAG_SAMPLESPERPIXEL)
+                fip->field_tag != TIFFTAG_PHOTOMETRIC && fip->field_tag != TIFFTAG_IMAGEWIDTH && fip->field_tag != TIFFTAG_IMAGELENGTH
+                && fip->field_tag != TIFFTAG_BITSPERSAMPLE && fip->field_tag != TIFFTAG_SAMPLESPERPIXEL)
             {
                 unsigned char ch;
                 char* text;
@@ -398,15 +379,13 @@ namespace TwkFB
                     //  EXIF
                     //
 
-                    for (unsigned int tag = exifTags[0].tag, i = 0;
-                         (tag = exifTags[i].tag) && !exif_tag; i++)
+                    for (unsigned int tag = exifTags[0].tag, i = 0; (tag = exifTags[i].tag) && !exif_tag; i++)
                     {
                         exif_tag = (tag == fip->field_tag);
                     }
                 }
 
-                string aname = (exif_tag ? string("EXIF/") : string("TIFF/"))
-                               + fip->field_name;
+                string aname = (exif_tag ? string("EXIF/") : string("TIFF/")) + fip->field_name;
 
                 switch (fip->field_type)
                 {
@@ -503,9 +482,8 @@ namespace TwkFB
     // The normalize value we use is the max value of its
     // signed type equivalent.
     //
-    static void storeIntAsNormalizedFloatSamples(
-        const int bitsPerSample, int rowSizeInBytes,
-        const unsigned char* srcBufferRow, float* fbBufferRow)
+    static void storeIntAsNormalizedFloatSamples(const int bitsPerSample, int rowSizeInBytes, const unsigned char* srcBufferRow,
+                                                 float* fbBufferRow)
     {
         switch (bitsPerSample)
         {
@@ -514,8 +492,7 @@ namespace TwkFB
             const char* srcPix = (const char*)srcBufferRow;
             for (int x = 0; x < rowSizeInBytes; ++x)
             {
-                (*fbBufferRow++) =
-                    float(*srcPix++) / SAMPLEFORMAT_INT8_NORM_VALUE;
+                (*fbBufferRow++) = float(*srcPix++) / SAMPLEFORMAT_INT8_NORM_VALUE;
             }
         }
         break;
@@ -525,8 +502,7 @@ namespace TwkFB
             const short int* srcPix = (const short int*)srcBufferRow;
             for (int x = 0; x < rowSizeInBytes; x += 2)
             {
-                (*fbBufferRow++) =
-                    float(*srcPix++) / SAMPLEFORMAT_INT16_NORM_VALUE;
+                (*fbBufferRow++) = float(*srcPix++) / SAMPLEFORMAT_INT16_NORM_VALUE;
             }
         }
         break;
@@ -536,8 +512,7 @@ namespace TwkFB
             const int* srcPix = (const int*)srcBufferRow;
             for (int x = 0; x < rowSizeInBytes; x += 4)
             {
-                (*fbBufferRow++) =
-                    float(*srcPix++) / SAMPLEFORMAT_INT32_NORM_VALUE;
+                (*fbBufferRow++) = float(*srcPix++) / SAMPLEFORMAT_INT32_NORM_VALUE;
             }
             break;
         }
@@ -547,8 +522,7 @@ namespace TwkFB
         }
     }
 
-    static void readContiguousScanlineImage3Planar(TIFF* tif, int w, int h,
-                                                   FrameBuffer& img)
+    static void readContiguousScanlineImage3Planar(TIFF* tif, int w, int h, FrameBuffer& img)
     {
         unsigned short orient = ORIENTATION_TOPLEFT;
         bool flip = false;
@@ -585,15 +559,13 @@ namespace TwkFB
 
                 float* fbBuf = img.scanline<float>(flipY);
 
-                storeIntAsNormalizedFloatSamples(bitsPerSample, rowsize, buf,
-                                                 fbBuf);
+                storeIntAsNormalizedFloatSamples(bitsPerSample, rowsize, buf, fbBuf);
 
                 memcpy(fbBuf, buf, rowsize);
             }
             else
             {
-                if (TIFFReadScanline(tif, img.scanline<unsigned char>(flipY), y)
-                    == -1)
+                if (TIFFReadScanline(tif, img.scanline<unsigned char>(flipY), y) == -1)
                 {
                     // Incomplete image read, just stop and return what we did
                     // get
@@ -611,8 +583,7 @@ namespace TwkFB
         }
     }
 
-    static void readContiguousScanlineImage(TIFF* tif, int w, int h,
-                                            FrameBuffer& img)
+    static void readContiguousScanlineImage(TIFF* tif, int w, int h, FrameBuffer& img)
     {
         unsigned short orient = ORIENTATION_TOPLEFT;
         bool flip = false;
@@ -657,15 +628,13 @@ namespace TwkFB
 
                 float* fbBuf = img.scanline<float>(flipY);
 
-                storeIntAsNormalizedFloatSamples(bitsPerSample, rowsize, buf,
-                                                 fbBuf);
+                storeIntAsNormalizedFloatSamples(bitsPerSample, rowsize, buf, fbBuf);
 
                 memcpy(fbBuf, buf, rowsize);
             }
             else
             {
-                if (TIFFReadScanline(tif, img.scanline<unsigned char>(flipY), y)
-                    == -1)
+                if (TIFFReadScanline(tif, img.scanline<unsigned char>(flipY), y) == -1)
                 {
                     // Incomplete image read, just stop and return what we did
                     // get
@@ -683,9 +652,7 @@ namespace TwkFB
         }
     }
 
-    template <typename T>
-    static void copyScanlineSamples(const T* src, T* dest, int width, int copy,
-                                    int skip)
+    template <typename T> static void copyScanlineSamples(const T* src, T* dest, int width, int copy, int skip)
     {
         for (int i = 0; i < width; i++)
         {
@@ -699,9 +666,7 @@ namespace TwkFB
     }
 
     template <typename T>
-    static void copyAndNormalizeScanlineSamples(const T* src, float* dest,
-                                                int width, int copy, int skip,
-                                                float normValue)
+    static void copyAndNormalizeScanlineSamples(const T* src, float* dest, int width, int copy, int skip, float normValue)
     {
         for (int i = 0; i < width; i++)
         {
@@ -714,8 +679,7 @@ namespace TwkFB
         }
     }
 
-    static void readContiguousScanlineImageOverflow(TIFF* tif, int w, int h,
-                                                    FrameBuffer& img)
+    static void readContiguousScanlineImageOverflow(TIFF* tif, int w, int h, FrameBuffer& img)
     {
         //
         //  This function is used when we have an interleaved TIFF with more
@@ -739,8 +703,7 @@ namespace TwkFB
         TIFFGetField(tif, TIFFTAG_BITSPERSAMPLE, &bitsPerSample);
         TIFFGetField(tif, TIFFTAG_SAMPLEFORMAT, &sampleFormat);
 
-        if (unsigned char* buf =
-                (unsigned char*)_TIFFmalloc(TIFFScanlineSize(tif)))
+        if (unsigned char* buf = (unsigned char*)_TIFFmalloc(TIFFScanlineSize(tif)))
         {
             //
             //  Because we use TIFF a lot, and tiff files are stored by default
@@ -766,21 +729,16 @@ namespace TwkFB
                     switch (bitsPerSample)
                     {
                     case 8:
-                        copyAndNormalizeScanlineSamples(
-                            (unsigned char*)buf, img.scanline<float>(flipY), w,
-                            4, samplesPerPixel - 4,
-                            SAMPLEFORMAT_INT8_NORM_VALUE);
+                        copyAndNormalizeScanlineSamples((unsigned char*)buf, img.scanline<float>(flipY), w, 4, samplesPerPixel - 4,
+                                                        SAMPLEFORMAT_INT8_NORM_VALUE);
                         break;
                     case 16:
-                        copyAndNormalizeScanlineSamples(
-                            (unsigned short*)buf, img.scanline<float>(flipY), w,
-                            4, samplesPerPixel - 4,
-                            SAMPLEFORMAT_INT16_NORM_VALUE);
+                        copyAndNormalizeScanlineSamples((unsigned short*)buf, img.scanline<float>(flipY), w, 4, samplesPerPixel - 4,
+                                                        SAMPLEFORMAT_INT16_NORM_VALUE);
                         break;
                     case 32:
-                        copyAndNormalizeScanlineSamples(
-                            (float*)buf, img.scanline<float>(flipY), w, 4,
-                            samplesPerPixel - 4, SAMPLEFORMAT_INT32_NORM_VALUE);
+                        copyAndNormalizeScanlineSamples((float*)buf, img.scanline<float>(flipY), w, 4, samplesPerPixel - 4,
+                                                        SAMPLEFORMAT_INT32_NORM_VALUE);
                         break;
                     }
                 }
@@ -790,19 +748,13 @@ namespace TwkFB
                     {
                     case 1:
                     case 8:
-                        copyScanlineSamples((unsigned char*)buf,
-                                            img.scanline<unsigned char>(flipY),
-                                            w, 4, samplesPerPixel - 4);
+                        copyScanlineSamples((unsigned char*)buf, img.scanline<unsigned char>(flipY), w, 4, samplesPerPixel - 4);
                         break;
                     case 16:
-                        copyScanlineSamples((unsigned short*)buf,
-                                            img.scanline<unsigned short>(flipY),
-                                            w, 4, samplesPerPixel - 4);
+                        copyScanlineSamples((unsigned short*)buf, img.scanline<unsigned short>(flipY), w, 4, samplesPerPixel - 4);
                         break;
                     case 32:
-                        copyScanlineSamples((float*)buf,
-                                            img.scanline<float>(flipY), w, 4,
-                                            samplesPerPixel - 4);
+                        copyScanlineSamples((float*)buf, img.scanline<float>(flipY), w, 4, samplesPerPixel - 4);
                         break;
                     }
                 }
@@ -817,8 +769,7 @@ namespace TwkFB
         }
     }
 
-    static void readContiguousScanlineImageAsPlanar(TIFF* tif, int w, int h,
-                                                    FrameBuffer& img)
+    static void readContiguousScanlineImageAsPlanar(TIFF* tif, int w, int h, FrameBuffer& img)
     {
         //
         //  This function is used when we have an interleaved TIFF with more
@@ -843,8 +794,7 @@ namespace TwkFB
         TIFFGetField(tif, TIFFTAG_BITSPERSAMPLE, &bitsPerSample);
         TIFFGetField(tif, TIFFTAG_SAMPLEFORMAT, &sampleFormat);
 
-        if (unsigned char* buf =
-                (unsigned char*)_TIFFmalloc(TIFFScanlineSize(tif)))
+        if (unsigned char* buf = (unsigned char*)_TIFFmalloc(TIFFScanlineSize(tif)))
         {
             //
             //  Because we use TIFF a lot, and tiff files are stored by default
@@ -867,8 +817,7 @@ namespace TwkFB
 
                 FrameBuffer* fbuf = &img;
 
-                for (int c = 0;
-                     c < img.planeSize() && c < samplesPerPixel && fbuf; c++)
+                for (int c = 0; c < img.planeSize() && c < samplesPerPixel && fbuf; c++)
                 {
 
                     if (sampleFormat == SAMPLEFORMAT_INT)
@@ -876,24 +825,16 @@ namespace TwkFB
                         switch (bitsPerSample)
                         {
                         case 8:
-                            copyAndNormalizeScanlineSamples(
-                                (unsigned char*)buf + c,
-                                &fbuf->pixel<float>(0, flipY), w, 1,
-                                samplesPerPixel - 1,
-                                SAMPLEFORMAT_INT8_NORM_VALUE);
+                            copyAndNormalizeScanlineSamples((unsigned char*)buf + c, &fbuf->pixel<float>(0, flipY), w, 1,
+                                                            samplesPerPixel - 1, SAMPLEFORMAT_INT8_NORM_VALUE);
                             break;
                         case 16:
-                            copyAndNormalizeScanlineSamples(
-                                (unsigned short*)buf + c,
-                                &fbuf->pixel<float>(0, flipY), w, 1,
-                                samplesPerPixel - 1,
-                                SAMPLEFORMAT_INT16_NORM_VALUE);
+                            copyAndNormalizeScanlineSamples((unsigned short*)buf + c, &fbuf->pixel<float>(0, flipY), w, 1,
+                                                            samplesPerPixel - 1, SAMPLEFORMAT_INT16_NORM_VALUE);
                             break;
                         case 32:
-                            copyAndNormalizeScanlineSamples(
-                                (float*)buf + c, &fbuf->pixel<float>(0, flipY),
-                                w, 1, samplesPerPixel - 1,
-                                SAMPLEFORMAT_INT32_NORM_VALUE);
+                            copyAndNormalizeScanlineSamples((float*)buf + c, &fbuf->pixel<float>(0, flipY), w, 1, samplesPerPixel - 1,
+                                                            SAMPLEFORMAT_INT32_NORM_VALUE);
                             break;
                         }
                     }
@@ -903,21 +844,14 @@ namespace TwkFB
                         {
                         case 1:
                         case 8:
-                            copyScanlineSamples(
-                                (unsigned char*)buf + c,
-                                &fbuf->pixel<unsigned char>(0, flipY), w, 1,
-                                samplesPerPixel - 1);
+                            copyScanlineSamples((unsigned char*)buf + c, &fbuf->pixel<unsigned char>(0, flipY), w, 1, samplesPerPixel - 1);
                             break;
                         case 16:
-                            copyScanlineSamples(
-                                (unsigned short*)buf + c,
-                                &fbuf->pixel<unsigned short>(0, flipY), w, 1,
-                                samplesPerPixel - 1);
+                            copyScanlineSamples((unsigned short*)buf + c, &fbuf->pixel<unsigned short>(0, flipY), w, 1,
+                                                samplesPerPixel - 1);
                             break;
                         case 32:
-                            copyScanlineSamples((float*)buf + c,
-                                                &fbuf->pixel<float>(0, flipY),
-                                                w, 1, samplesPerPixel - 1);
+                            copyScanlineSamples((float*)buf + c, &fbuf->pixel<float>(0, flipY), w, 1, samplesPerPixel - 1);
                             break;
                         }
                     }
@@ -935,8 +869,7 @@ namespace TwkFB
         }
     }
 
-    static void readPlanarScanlineImage(TIFF* tif, int w, int h, int planes,
-                                        FrameBuffer& img)
+    static void readPlanarScanlineImage(TIFF* tif, int w, int h, int planes, FrameBuffer& img)
     {
         unsigned short orient = ORIENTATION_TOPLEFT;
         bool flip = false;
@@ -985,16 +918,13 @@ namespace TwkFB
 
                     float* fbBuf = &fb->pixel<float>(0, flipY);
 
-                    storeIntAsNormalizedFloatSamples(bitsPerSample, rowsize,
-                                                     buf, fbBuf);
+                    storeIntAsNormalizedFloatSamples(bitsPerSample, rowsize, buf, fbBuf);
 
                     memcpy(fbBuf, buf, rowsize);
                 }
                 else
                 {
-                    if (TIFFReadScanline(
-                            tif, &fb->pixel<unsigned char>(0, flipY), y, p)
-                        == -1)
+                    if (TIFFReadScanline(tif, &fb->pixel<unsigned char>(0, flipY), y, p) == -1)
                     {
                         // Incomplete image read, just stop and return what we
                         // did get
@@ -1015,8 +945,7 @@ namespace TwkFB
         }
     }
 
-    static void readContiguousTiledImage(TIFF* tif, int w, int h,
-                                         FrameBuffer& img)
+    static void readContiguousTiledImage(TIFF* tif, int w, int h, FrameBuffer& img)
     {
         tsize_t rowsize = TIFFTileRowSize(tif);
 
@@ -1029,13 +958,11 @@ namespace TwkFB
 
         if (flip)
         {
-            img.setOrientation(flop ? FrameBuffer::TOPRIGHT
-                                    : FrameBuffer::TOPLEFT);
+            img.setOrientation(flop ? FrameBuffer::TOPRIGHT : FrameBuffer::TOPLEFT);
         }
         else
         {
-            img.setOrientation(flop ? FrameBuffer::BOTTOMRIGHT
-                                    : FrameBuffer::NATURAL);
+            img.setOrientation(flop ? FrameBuffer::BOTTOMRIGHT : FrameBuffer::NATURAL);
         }
 
         if (unsigned char* buf = (unsigned char*)_TIFFmalloc(TIFFTileSize(tif)))
@@ -1076,15 +1003,12 @@ namespace TwkFB
                         {
                             if (sampleFormat == SAMPLEFORMAT_INT)
                             {
-                                storeIntAsNormalizedFloatSamples(
-                                    bitsPerSample, copy_rowsize,
-                                    buf + y * rowsize,
-                                    &img.pixel<float>(col, row + y));
+                                storeIntAsNormalizedFloatSamples(bitsPerSample, copy_rowsize, buf + y * rowsize,
+                                                                 &img.pixel<float>(col, row + y));
                             }
                             else
                             {
-                                unsigned char* s =
-                                    &img.pixel<unsigned char>(col, row + y);
+                                unsigned char* s = &img.pixel<unsigned char>(col, row + y);
                                 memcpy(s, buf + y * rowsize, copy_rowsize);
                             }
                         }
@@ -1162,15 +1086,12 @@ namespace TwkFB
                             {
                                 if (sampleFormat == SAMPLEFORMAT_INT)
                                 {
-                                    storeIntAsNormalizedFloatSamples(
-                                        bitsPerSample, copy_rowsize,
-                                        buf + y * rowsize,
-                                        &fb->pixel<float>(col, row + y));
+                                    storeIntAsNormalizedFloatSamples(bitsPerSample, copy_rowsize, buf + y * rowsize,
+                                                                     &fb->pixel<float>(col, row + y));
                                 }
                                 else
                                 {
-                                    unsigned char* s =
-                                        &fb->pixel<unsigned char>(col, row + y);
+                                    unsigned char* s = &fb->pixel<unsigned char>(col, row + y);
                                     memcpy(s, buf + y * rowsize, copy_rowsize);
                                 }
                             }
@@ -1195,8 +1116,7 @@ namespace TwkFB
 
         if (!tif)
         {
-            TWK_THROW_STREAM(Exception,
-                             "TIFF cannot open \"" << filename << "\"");
+            TWK_THROW_STREAM(Exception, "TIFF cannot open \"" << filename << "\"");
         }
 
         unsigned short colorspace;
@@ -1221,8 +1141,7 @@ namespace TwkFB
         TIFFGetField(tif, TIFFTAG_PLANARCONFIG, &config);
 
         float x_rez, y_rez;
-        if (TIFFGetField(tif, TIFFTAG_XRESOLUTION, &x_rez)
-            && TIFFGetField(tif, TIFFTAG_YRESOLUTION, &y_rez))
+        if (TIFFGetField(tif, TIFFTAG_XRESOLUTION, &x_rez) && TIFFGetField(tif, TIFFTAG_YRESOLUTION, &y_rez))
         {
             fbi.pixelAspect = x_rez != 0.0 ? y_rez / x_rez : 1.0;
             unsigned short unit = 0;
@@ -1312,11 +1231,8 @@ namespace TwkFB
 
         bool readAsRGBA = false;
 
-        if ((colorspace != PHOTOMETRIC_RGB
-             && colorspace != PHOTOMETRIC_MINISBLACK
-             && colorspace != PHOTOMETRIC_MINISWHITE)
-            || (m_addAlphaTo3Channel && samplesPerPixel == 3)
-            || (config == PLANARCONFIG_CONTIG && samplesPerPixel > 4))
+        if ((colorspace != PHOTOMETRIC_RGB && colorspace != PHOTOMETRIC_MINISBLACK && colorspace != PHOTOMETRIC_MINISWHITE)
+            || (m_addAlphaTo3Channel && samplesPerPixel == 3) || (config == PLANARCONFIG_CONTIG && samplesPerPixel > 4))
         {
             readAsRGBA = true;
         }
@@ -1332,26 +1248,20 @@ namespace TwkFB
             //  or readPlanarTiledImage(tif, width, height, fb);
             bool flip = false;
             bool flop = false;
-            flip =
-                orient == ORIENTATION_TOPLEFT || orient == ORIENTATION_TOPRIGHT;
-            flop = orient == ORIENTATION_TOPRIGHT
-                   || orient == ORIENTATION_BOTRIGHT;
+            flip = orient == ORIENTATION_TOPLEFT || orient == ORIENTATION_TOPRIGHT;
+            flop = orient == ORIENTATION_TOPRIGHT || orient == ORIENTATION_BOTRIGHT;
 
             if (flip)
-                fbi.orientation =
-                    (flop ? FrameBuffer::TOPRIGHT : FrameBuffer::TOPLEFT);
+                fbi.orientation = (flop ? FrameBuffer::TOPRIGHT : FrameBuffer::TOPLEFT);
             else
-                fbi.orientation =
-                    (flop ? FrameBuffer::BOTTOMRIGHT : FrameBuffer::NATURAL);
+                fbi.orientation = (flop ? FrameBuffer::BOTTOMRIGHT : FrameBuffer::NATURAL);
         }
         else
         {
             bool flip = false;
             bool flop = false;
-            flop = orient == ORIENTATION_TOPRIGHT
-                   || orient == ORIENTATION_BOTRIGHT;
-            fbi.orientation =
-                flop ? FrameBuffer::BOTTOMRIGHT : FrameBuffer::NATURAL;
+            flop = orient == ORIENTATION_TOPRIGHT || orient == ORIENTATION_BOTRIGHT;
+            fbi.orientation = flop ? FrameBuffer::BOTTOMRIGHT : FrameBuffer::NATURAL;
         }
 
         TIFFClose(tif);
@@ -1359,9 +1269,8 @@ namespace TwkFB
 
     struct StreamData
     {
-        StreamData(const std::string& filename,
-                   FileStream::Type type = FileStream::Buffering,
-                   size_t chunkSize = 61440, int maxInFlight = 16)
+        StreamData(const std::string& filename, FileStream::Type type = FileStream::Buffering, size_t chunkSize = 61440,
+                   int maxInFlight = 16)
             : stream(filename, type, chunkSize, maxInFlight)
             , pos(0)
         {
@@ -1416,8 +1325,7 @@ namespace TwkFB
         return toff_t(stream->stream.size());
     }
 
-    void IOtiff::readImage(FrameBuffer& fb, const std::string& filename,
-                           const ReadRequest& request) const
+    void IOtiff::readImage(FrameBuffer& fb, const std::string& filename, const ReadRequest& request) const
     {
         TIFF* tif = NULL;
         StreamData* stream = NULL;
@@ -1434,27 +1342,22 @@ namespace TwkFB
             }
             else
             {
-                stream = new StreamData(
-                    filename, (FileStream::Type)((unsigned int)m_iotype - 1),
-                    m_iosize, m_iomaxAsync);
+                stream = new StreamData(filename, (FileStream::Type)((unsigned int)m_iotype - 1), m_iosize, m_iomaxAsync);
 
-                tif = TIFFClientOpen(filename.c_str(), "r", (thandle_t)stream,
-                                     readproc, writeproc, seekproc, closeproc,
-                                     sizeproc, NULL, NULL);
+                tif = TIFFClientOpen(filename.c_str(), "r", (thandle_t)stream, readproc, writeproc, seekproc, closeproc, sizeproc, NULL,
+                                     NULL);
             }
 
             if (!tif)
             {
-                TWK_THROW_STREAM(Exception,
-                                 "TIFF: cannot open \"" << filename << "\"");
+                TWK_THROW_STREAM(Exception, "TIFF: cannot open \"" << filename << "\"");
             }
 
             int width;
             int height;
             unsigned short bitsPerSample = DEFAULT_TIFFTAG_BITSPERSAMPLE_VALUE;
             FrameBuffer::DataType dataType = FrameBuffer::UCHAR;
-            unsigned short samplesPerPixel =
-                DEFAULT_TIFFTAG_SAMPLESPERPIXEL_VALUE;
+            unsigned short samplesPerPixel = DEFAULT_TIFFTAG_SAMPLESPERPIXEL_VALUE;
             uint16 config;
             bool istexture = false;
             bool isshadow = false;
@@ -1485,11 +1388,8 @@ namespace TwkFB
             FrameBuffer* img = NULL;
             bool readAsRGBA = false;
 
-            if ((colorspace != PHOTOMETRIC_RGB
-                 && colorspace != PHOTOMETRIC_MINISBLACK
-                 && colorspace != PHOTOMETRIC_MINISWHITE)
-                || (m_addAlphaTo3Channel && samplesPerPixel == 3)
-                || (config == PLANARCONFIG_CONTIG && samplesPerPixel > 4))
+            if ((colorspace != PHOTOMETRIC_RGB && colorspace != PHOTOMETRIC_MINISBLACK && colorspace != PHOTOMETRIC_MINISWHITE)
+                || (m_addAlphaTo3Channel && samplesPerPixel == 3) || (config == PLANARCONFIG_CONTIG && samplesPerPixel > 4))
             {
                 readAsRGBA = true;
                 samplesPerPixel = 4;
@@ -1548,16 +1448,12 @@ namespace TwkFB
                 break;
 
             default:
-                TWK_THROW_STREAM(UnsupportedException,
-                                 "TIFF: Unsupported bit depth ("
-                                     << bitsPerSample << ") trying to read "
-                                     << filename);
+                TWK_THROW_STREAM(UnsupportedException, "TIFF: Unsupported bit depth (" << bitsPerSample << ") trying to read " << filename);
             }
 
             if (config == PLANARCONFIG_SEPARATE)
             {
-                const char* chanNames[] = {"R", "G", "B", "A", "Z",
-                                           "X", "Y", "P", "D", "Q"};
+                const char* chanNames[] = {"R", "G", "B", "A", "Z", "X", "Y", "P", "D", "Q"};
 
                 StringVector planeNames;
 
@@ -1566,14 +1462,12 @@ namespace TwkFB
                     planeNames.push_back(string(chanNames[i]));
                 }
 
-                fb.restructurePlanar(width, height, planeNames, dataType,
-                                     FrameBuffer::NATURAL);
+                fb.restructurePlanar(width, height, planeNames, dataType, FrameBuffer::NATURAL);
             }
             else
             {
-                fb.restructure(
-                    width, height, 0, min((int)samplesPerPixel, 4),
-                    dataType); // interleaved, we can only do 4 channels
+                fb.restructure(width, height, 0, min((int)samplesPerPixel, 4),
+                               dataType); // interleaved, we can only do 4 channels
             }
 
             string message = "Reading TIFF " + stl_ext::basename(filename);
@@ -1589,9 +1483,7 @@ namespace TwkFB
                 for (; p < e; p++)
                 {
                     const uint32 i = *p;
-                    *p = (uint32(TIFFGetR(i)) << 24)
-                         | (uint32(TIFFGetG(i)) << 16)
-                         | (uint32(TIFFGetB(i)) << 8) | uint32(TIFFGetA(i));
+                    *p = (uint32(TIFFGetR(i)) << 24) | (uint32(TIFFGetG(i)) << 16) | (uint32(TIFFGetB(i)) << 8) | uint32(TIFFGetA(i));
                 }
 #endif
             }
@@ -1600,30 +1492,25 @@ namespace TwkFB
                 if (config == PLANARCONFIG_CONTIG)
                 {
                     readContiguousTiledImage(tif, width, height, fb);
-                    fb.newAttribute("TIFF/PlanarConfig",
-                                    string("Tiled Contiguous"));
+                    fb.newAttribute("TIFF/PlanarConfig", string("Tiled Contiguous"));
                 }
                 else
                 {
                     readPlanarTiledImage(tif, width, height, fb);
-                    fb.newAttribute("TIFF/PlanarConfig",
-                                    string("Tiled Separate"));
+                    fb.newAttribute("TIFF/PlanarConfig", string("Tiled Separate"));
                 }
             }
             else
             {
                 if (config == PLANARCONFIG_CONTIG)
                 {
-                    if (samplesPerPixel == 1
-                        || (dataType != FrameBuffer::USHORT
-                            && samplesPerPixel <= 4))
+                    if (samplesPerPixel == 1 || (dataType != FrameBuffer::USHORT && samplesPerPixel <= 4))
                     {
                         readContiguousScanlineImage(tif, width, height, fb);
                     }
                     else
                     {
-                        const char* chanNames[] = {"R", "G", "B", "A", "Z",
-                                                   "X", "Y", "P", "D", "Q"};
+                        const char* chanNames[] = {"R", "G", "B", "A", "Z", "X", "Y", "P", "D", "Q"};
 
                         if (!fb.isPlanar())
                         {
@@ -1634,20 +1521,16 @@ namespace TwkFB
                                 planeNames.push_back(string(chanNames[i]));
                             }
 
-                            fb.restructurePlanar(width, height, planeNames,
-                                                 dataType,
-                                                 FrameBuffer::NATURAL);
+                            fb.restructurePlanar(width, height, planeNames, dataType, FrameBuffer::NATURAL);
                         }
-                        readContiguousScanlineImageAsPlanar(tif, width, height,
-                                                            fb);
+                        readContiguousScanlineImageAsPlanar(tif, width, height, fb);
                     }
 
                     fb.newAttribute("TIFF/PlanarConfig", string("Contiguous"));
                 }
                 else
                 {
-                    readPlanarScanlineImage(tif, width, height, samplesPerPixel,
-                                            fb);
+                    readPlanarScanlineImage(tif, width, height, samplesPerPixel, fb);
                     fb.newAttribute("TIFF/PlanarConfig", string("Separate"));
                 }
             }
@@ -1678,8 +1561,7 @@ namespace TwkFB
                 }
             }
 
-            if (TIFFGetField(tif, TIFFTAG_XRESOLUTION, &x_rez)
-                && TIFFGetField(tif, TIFFTAG_YRESOLUTION, &y_rez))
+            if (TIFFGetField(tif, TIFFTAG_XRESOLUTION, &x_rez) && TIFFGetField(tif, TIFFTAG_YRESOLUTION, &y_rez))
             {
                 unsigned short unit = 0;
 
@@ -1744,8 +1626,7 @@ namespace TwkFB
             //
             //  Most cards can't handle RGB or RGBA 16bit int textures.
             //
-            if (fb.dataType() == FrameBuffer::USHORT && fb.numChannels() != 1
-                && !fb.isPlanar())
+            if (fb.dataType() == FrameBuffer::USHORT && fb.numChannels() != 1 && !fb.isPlanar())
             {
                 //  cerr << "converting tiff to planar" << endl;
                 FrameBufferVector fbv = split(&fb);
@@ -1767,8 +1648,7 @@ namespace TwkFB
         delete stream;
     }
 
-    void IOtiff::writeImage(const FrameBuffer& img, const std::string& filename,
-                            const WriteRequest& request) const
+    void IOtiff::writeImage(const FrameBuffer& img, const std::string& filename, const WriteRequest& request) const
     {
 #ifdef _MSC_VER
         TIFF* tif = TIFFOpenW(UNICODE_C_STR(filename.c_str()), "w");
@@ -1780,8 +1660,7 @@ namespace TwkFB
 
         if (!tif)
         {
-            TWK_THROW_STREAM(IOException, "TIFF: cannot open "
-                                              << filename << " for writing");
+            TWK_THROW_STREAM(IOException, "TIFF: cannot open " << filename << " for writing");
         }
 
         switch (outfb->dataType())
@@ -1808,8 +1687,7 @@ namespace TwkFB
             break;
         }
         default:
-            TWK_THROW_STREAM(Exception, "TIFF: Unsupported data format: "
-                                            << outfb->dataType());
+            TWK_THROW_STREAM(Exception, "TIFF: Unsupported data format: " << outfb->dataType());
         }
 
         //
@@ -1817,8 +1695,7 @@ namespace TwkFB
         //  the "common" format, then make the image packed RGB.
         //
 
-        if (img.isPlanar()
-            && (!request.keepPlanar || request.preferCommonFormat || yryby))
+        if (img.isPlanar() && (!request.keepPlanar || request.preferCommonFormat || yryby))
         {
             const FrameBuffer* fb = outfb;
             outfb = mergePlanes(outfb);
@@ -1832,9 +1709,7 @@ namespace TwkFB
         //  convert no matter what.
         //
 
-        if ((request.preferCommonFormat
-             && (outfb->hasPrimaries() || outfb->isYUV()))
-            || yryby)
+        if ((request.preferCommonFormat && (outfb->hasPrimaries() || outfb->isYUV())) || yryby)
         {
             const FrameBuffer* fb = outfb;
             outfb = convertToLinearRGB709(outfb);
@@ -1887,15 +1762,13 @@ namespace TwkFB
 
         unsigned int compression = COMPRESSION_DEFLATE; // default zip compress
 
-        if (unsigned int ctag =
-                nameToTag(request.compression.c_str(), compTags))
+        if (unsigned int ctag = nameToTag(request.compression.c_str(), compTags))
         {
             compression = ctag;
         }
         else if (request.compression != "")
         {
-            cerr << "WARNING: IOtiff: unknown compression type "
-                 << request.compression << ", using DEFLATE instead" << endl;
+            cerr << "WARNING: IOtiff: unknown compression type " << request.compression << ", using DEFLATE instead" << endl;
 
             compression = COMPRESSION_DEFLATE;
         }
@@ -1926,12 +1799,9 @@ namespace TwkFB
         {
             int flipY = outfb->height() - y - 1;
 
-            if (TIFFWriteScanline(
-                    tif, (void*)outfb->scanline<unsigned char>(flipY), y, 0)
-                == -1)
+            if (TIFFWriteScanline(tif, (void*)outfb->scanline<unsigned char>(flipY), y, 0) == -1)
             {
-                TWK_THROW_STREAM(IOException,
-                                 "TIFF: Error write scanline " << filename);
+                TWK_THROW_STREAM(IOException, "TIFF: Error write scanline " << filename);
             }
         }
 

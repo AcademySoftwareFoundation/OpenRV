@@ -490,8 +490,7 @@ resize(const FrameBuffer* src, FrameBuffer* dst)
     //
     // evn if the src has scanline padding, the dst will NOT have padding.
     //
-    template <typename T>
-    void resizeLinear(const FrameBuffer* src, FrameBuffer* dst)
+    template <typename T> void resizeLinear(const FrameBuffer* src, FrameBuffer* dst)
     {
         float scalew = (float)src->width() / dst->width();   // < 1
         float scaleh = (float)src->height() / dst->height(); // < 1
@@ -522,20 +521,15 @@ resize(const FrameBuffer* src, FrameBuffer* dst)
                 float xW = xCenter - xStartInt;
                 float yW = yCenter - yStartInt;
 
-                const T* startDownLeft =
-                    srcData + yStartInt * lineWidth + xStartInt * numChannels;
-                const T* startUpLeft =
-                    srcData + yEndInt * lineWidth + xStartInt * numChannels;
-                const T* startDownRight =
-                    srcData + yStartInt * lineWidth + xEndInt * numChannels;
-                const T* startUpRight =
-                    srcData + yEndInt * lineWidth + xEndInt * numChannels;
+                const T* startDownLeft = srcData + yStartInt * lineWidth + xStartInt * numChannels;
+                const T* startUpLeft = srcData + yEndInt * lineWidth + xStartInt * numChannels;
+                const T* startDownRight = srcData + yStartInt * lineWidth + xEndInt * numChannels;
+                const T* startUpRight = srcData + yEndInt * lineWidth + xEndInt * numChannels;
                 T* dstLoc = dstData + i * dstLineWidth + j * numChannels;
 
                 for (size_t n = 0; n < numChannels; ++n)
                 {
-                    float down =
-                        startDownLeft[n] * (1 - xW) + startDownRight[n] * xW;
+                    float down = startDownLeft[n] * (1 - xW) + startDownRight[n] * xW;
                     float up = startUpLeft[n] * (1 - xW) + startUpRight[n] * xW;
                     dstLoc[n] = down * (1 - yW) + up * yW;
                 }
@@ -544,8 +538,7 @@ resize(const FrameBuffer* src, FrameBuffer* dst)
         return;
     }
 
-    template <typename T>
-    void resizeArea(const FrameBuffer* src, FrameBuffer* dst)
+    template <typename T> void resizeArea(const FrameBuffer* src, FrameBuffer* dst)
     {
 
         float scalew = (float)src->width() / dst->width();   // > 1
@@ -578,8 +571,7 @@ resize(const FrameBuffer* src, FrameBuffer* dst)
                 size_t yStartInt = floor(yStart);
                 size_t yEndInt = ceil(yEnd - 1.0);
 
-                const T* start =
-                    srcData + yStartInt * lineWidth + xStartInt * numChannels;
+                const T* start = srcData + yStartInt * lineWidth + xStartInt * numChannels;
                 float w = 0;
                 T* dstLoc = dstData + i * dstLineWidth + j * numChannels;
                 for (size_t n = 0; n < numChannels; ++n)
@@ -600,8 +592,7 @@ resize(const FrameBuffer* src, FrameBuffer* dst)
                         else if (k == yEndInt)
                             weight *= yEnd - k;
                         w += weight;
-                        const T* d = start + (k - yStartInt) * lineWidth
-                                     + (m - xStartInt) * numChannels;
+                        const T* d = start + (k - yStartInt) * lineWidth + (m - xStartInt) * numChannels;
                         for (size_t n = 0; n < numChannels; ++n)
                         {
                             t[n] += weight * d[n];
@@ -617,8 +608,7 @@ resize(const FrameBuffer* src, FrameBuffer* dst)
         return;
     }
 
-    template <typename T>
-    void resizeFrameBuffer(const FrameBuffer* src, FrameBuffer* dst)
+    template <typename T> void resizeFrameBuffer(const FrameBuffer* src, FrameBuffer* dst)
     {
         if (src->width() <= dst->width() || src->height() <= dst->height())
             resizeLinear<T>(src, dst);
@@ -644,8 +634,7 @@ resize(const FrameBuffer* src, FrameBuffer* dst)
             resize(src->nextPlane(), dst->nextPlane());
         }
 
-        if (dst->width() == 0 || dst->height() == 0 || src->width() == 0
-            || src->height() == 0)
+        if (dst->width() == 0 || dst->height() == 0 || src->width() == 0 || src->height() == 0)
         {
             return;
         }
@@ -661,21 +650,14 @@ resize(const FrameBuffer* src, FrameBuffer* dst)
         //  Convert fbs to FLOAT for now because this resize function cannot
         //  operate on packed data.
         //
-        if (src->dataType() == TwkFB::FrameBuffer::PACKED_R10_G10_B10_X2
-            || src->dataType() == TwkFB::FrameBuffer::PACKED_X2_B10_G10_R10
-            || src->dataType() == TwkFB::FrameBuffer::PACKED_Y8_Cb8_Y8_Cr8
-            || src->dataType() == TwkFB::FrameBuffer::PACKED_Cb8_Y8_Cr8_Y8
-            || src->dataType() == TwkFB::FrameBuffer::HALF
-            || src->dataType() == TwkFB::FrameBuffer::DOUBLE)
+        if (src->dataType() == TwkFB::FrameBuffer::PACKED_R10_G10_B10_X2 || src->dataType() == TwkFB::FrameBuffer::PACKED_X2_B10_G10_R10
+            || src->dataType() == TwkFB::FrameBuffer::PACKED_Y8_Cb8_Y8_Cr8 || src->dataType() == TwkFB::FrameBuffer::PACKED_Cb8_Y8_Cr8_Y8
+            || src->dataType() == TwkFB::FrameBuffer::HALF || src->dataType() == TwkFB::FrameBuffer::DOUBLE)
         {
             needsConvert = true;
         }
-        const FrameBuffer* convertedSrc =
-            needsConvert ? copyConvertPlane(src, TwkFB::FrameBuffer::FLOAT)
-                         : src;
-        FrameBuffer* convertedDst =
-            needsConvert ? copyConvertPlane(dst, TwkFB::FrameBuffer::FLOAT)
-                         : dst;
+        const FrameBuffer* convertedSrc = needsConvert ? copyConvertPlane(src, TwkFB::FrameBuffer::FLOAT) : src;
+        FrameBuffer* convertedDst = needsConvert ? copyConvertPlane(dst, TwkFB::FrameBuffer::FLOAT) : dst;
 
         switch (convertedSrc->dataType())
         {
@@ -704,13 +686,10 @@ resize(const FrameBuffer* src, FrameBuffer* dst)
         if (src->uncrop())
         {
             const double xfactor = double(dst->width()) / double(src->width());
-            const double yfactor =
-                double(dst->height()) / double(src->height());
+            const double yfactor = double(dst->height()) / double(src->height());
 
-            dst->setUncrop(int(double(src->uncropWidth()) * xfactor),
-                           int(double(src->uncropHeight()) * yfactor),
-                           int(double(src->uncropX()) * xfactor),
-                           int(double(src->uncropY()) * yfactor));
+            dst->setUncrop(int(double(src->uncropWidth()) * xfactor), int(double(src->uncropHeight()) * yfactor),
+                           int(double(src->uncropX()) * xfactor), int(double(src->uncropY()) * yfactor));
         }
 
         dst->setPixelAspectRatio(src->pixelAspectRatio());
