@@ -21,6 +21,37 @@ if [[ $SOURCED == 0 ]]; then
   exit 1
 fi
 
+__rv_select_vfx_platform() {
+  # If RV_VFX_PLATFORM is already set to a valid value, use it.
+  if [[ "$RV_VFX_PLATFORM" =~ ^CY202(3|4|5|6)$ ]]; then
+    echo "RV_VFX_PLATFORM already set to $RV_VFX_PLATFORM."
+    return
+  fi
+
+  # If it's set to something invalid, unset it and prompt.
+  if [ -n "$RV_VFX_PLATFORM" ]; then
+    echo "Invalid RV_VFX_PLATFORM: '$RV_VFX_PLATFORM'. Please choose a valid option."
+    unset RV_VFX_PLATFORM
+  fi
+
+  while [ -z "$RV_VFX_PLATFORM" ]; do
+    echo "Please select the VFX Platform year to build for:"
+    PS3="Enter a number: "
+    select opt in CY2023 CY2024 CY2025 CY2026; do
+      if [[ -n "$opt" ]]; then
+        export RV_VFX_PLATFORM=$opt
+        echo "Using VFX Platform: $RV_VFX_PLATFORM"
+        break
+      else
+        echo "Invalid selection. Please try again."
+      fi
+    done
+  done
+}
+
+__rv_select_vfx_platform
+
+
 # Linux
 if [[ "$OSTYPE" == "linux"* ]]; then
   CMAKE_GENERATOR="${CMAKE_GENERATOR:-Ninja}"
@@ -50,57 +81,91 @@ if [ -z "$QT_HOME" ]; then
   echo "Searching for Qt installation..."
 
   if [[ "$OSTYPE" == "linux"* ]]; then
-    QT_HOME_6=$(find ~/Qt*/6.5* -maxdepth 4 -type d -path '*/gcc_64' | sort -V | tail -n 1)
+    QT_HOME_6_8=$(find ~/Qt*/6.8.* -maxdepth 4 -type d -path '*/gcc_64' | sort -V | tail -n 1)
+    QT_HOME_6_5=$(find ~/Qt*/6.5* -maxdepth 4 -type d -path '*/gcc_64' | sort -V | tail -n 1)
     QT_HOME_5=$(find ~/Qt*/5.15* -maxdepth 4 -type d -path '*/gcc_64' | sort -V | tail -n 1)
   elif [[ "$OSTYPE" == "darwin"* ]]; then
-    QT_HOME_6=$(find ~/Qt*/6.5* -maxdepth 4 -type d -path '*/macos' | sort -V | tail -n 1)
+    QT_HOME_6_8=$(find ~/Qt*/6.8.* -maxdepth 4 -type d -path '*/macos' | sort -V | tail -n 1)
+    QT_HOME_6_5=$(find ~/Qt*/6.5* -maxdepth 4 -type d -path '*/macos' | sort -V | tail -n 1)
     QT_HOME_5=$(find ~/Qt*/5.15* -maxdepth 4 -type d -path '*/macos' | sort -V | tail -n 1)
 
     # If no macos installation found, try clang_64
-    if [ -z "$QT_HOME_6" ]; then
-      QT_HOME_6=$(find ~/Qt*/6.5* -maxdepth 4 -type d -path '*/clang_64' | sort -V | tail -n 1)
+    if [ -z "$QT_HOME_6_8" ]; then
+      QT_HOME_6_8=$(find ~/Qt*/6.8.* -maxdepth 4 -type d -path '*/clang_64' | sort -V | tail -n 1)
     fi
-
+    if [ -z "$QT_HOME_6_5" ]; then
+      QT_HOME_6_5=$(find ~/Qt*/6.5* -maxdepth 4 -type d -path '*/clang_64' | sort -V | tail -n 1)
+    fi
     if [ -z "$QT_HOME_5" ]; then
       QT_HOME_5=$(find ~/Qt*/5.15* -maxdepth 4 -type d -path '*/clang_64' | sort -V | tail -n 1)
     fi
 
   elif [[ "$OSTYPE" == "msys"* || "$OSTYPE" == "cygwin"* ]]; then
-    QT_HOME_6=$(find c:/Qt*/6.5* -maxdepth 4 -type d -path '*/msvc2019_64' | sort -V | tail -n 1)
+    QT_HOME_6_8=$(find c:/Qt*/6.8* -maxdepth 4 -type d -path '*/msvc2019_64' | sort -V | tail -n 1)
+    QT_HOME_6_5=$(find c:/Qt*/6.5* -maxdepth 4 -type d -path '*/msvc2019_64' | sort -V | tail -n 1)
     QT_HOME_5=$(find c:/Qt*/5.15* -maxdepth 4 -type d -path '*/msvc2019_64' | sort -V | tail -n 1)
   fi
 
-  # Could not find Qt installation
-  if [ -z "$QT_HOME_6" ] && [ -z "$QT_HOME_5" ]; then
-    echo "Could not find Qt installation. Please set QT_HOME to the correct path in your environment variables."
-  else 
-    if [ -n "$QT_HOME_6" ]; then
-      QT_HOME="$QT_HOME_6"
-      QT_VERSION="6"
-      RV_DEPS_QT_LOCATION="RV_DEPS_QT6_LOCATION"
-      RV_VFX_PLATFORM="CY2024"
-    else
+  # Set Qt based on RV_VFX_PLATFORM
+  if [[ "$RV_VFX_PLATFORM" == "CY2023" ]]; then
+    if [ -n "$QT_HOME_5" ]; then
       QT_HOME="$QT_HOME_5"
-      QT_VERSION="5"
+      QT_VERSION="5.15"
       RV_DEPS_QT_LOCATION="RV_DEPS_QT5_LOCATION"
-      RV_VFX_PLATFORM="CY2023"
+    else
+      echo "Error: CY2023 requires a Qt 5.15 installation, but none was found."
     fi
+  elif [[ "$RV_VFX_PLATFORM" == "CY2024" || "$RV_VFX_PLATFORM" == "CY2025" ]]; then
+    if [ -n "$QT_HOME_6_5" ]; then
+      QT_HOME="$QT_HOME_6_5"
+      QT_VERSION="6.5"
+      RV_DEPS_QT_LOCATION="RV_DEPS_QT6_LOCATION"
+    else
+      echo "Error: $RV_VFX_PLATFORM requires a Qt 6.5 installation, but none was found."
+    fi
+  elif [[ "$RV_VFX_PLATFORM" == "CY2026" ]]; then
+    if [ -n "$QT_HOME_6_8" ]; then
+      QT_HOME="$QT_HOME_6_8"
+      QT_VERSION="6.8"
+      RV_DEPS_QT_LOCATION="RV_DEPS_QT6_LOCATION"
+    else
+      echo "Error: $RV_VFX_PLATFORM requires a Qt 6.8.3 installation, but none was found."
+    fi
+  fi
+
+  if [ -n "$QT_HOME" ]; then
     echo "Found Qt $QT_VERSION installation at $QT_HOME"
-    echo "Note: If you have multiple version of Qt installed, the first one found will be used. The search prioritize Qt 6."
+  else
+    echo "Could not find required Qt installation. Please set QT_HOME to the correct path in your environment variables."
   fi
  
 # Qt installation path already set
 else 
-  if [[ $QT_HOME == *"6.5"* ]]; then
-    echo "Using Qt 6 installation already set at $QT_HOME"
+  if [[ $QT_HOME == *"6.8"* ]]; then
+    echo "Using Qt 6.8 installation already set at $QT_HOME"
     RV_DEPS_QT_LOCATION="RV_DEPS_QT6_LOCATION"
-    RV_VFX_PLATFORM="CY2024"
+    if [[ "$RV_VFX_PLATFORM" != "CY2026" ]]; then
+        echo "Warning: QT_HOME is set to a Qt 6.8 path, but RV_VFX_PLATFORM is $RV_VFX_PLATFORM."
+    fi
+  elif [[ $QT_HOME == *"6.5"* ]]; then
+    echo "Using Qt 6.5 installation already set at $QT_HOME"
+    RV_DEPS_QT_LOCATION="RV_DEPS_QT6_LOCATION"
+    if [[ "$RV_VFX_PLATFORM" != "CY2024" && "$RV_VFX_PLATFORM" != "CY2025" ]]; then
+        echo "Warning: QT_HOME is set to a Qt 6.5 path, but RV_VFX_PLATFORM is $RV_VFX_PLATFORM."
+    fi
   elif [[ $QT_HOME == *"5.15"* ]]; then
-    echo "Using Qt 5 installation already set at $QT_HOME"
-      RV_DEPS_QT_LOCATION="RV_DEPS_QT5_LOCATION"
-      RV_VFX_PLATFORM="CY2023"
+    echo "Using Qt 5.15 installation already set at $QT_HOME"
+    RV_DEPS_QT_LOCATION="RV_DEPS_QT5_LOCATION"
+    if [[ "$RV_VFX_PLATFORM" != "CY2023" ]]; then
+        echo "Warning: QT_HOME is set to a Qt5 path, but RV_VFX_PLATFORM is $RV_VFX_PLATFORM."
+    fi
   else
-    echo "Invalid Qt installation path. Please set QT_HOME to the correct path in your environment variables."
+    echo "Warning: Could not determine Qt version from path: $QT_HOME. Assuming it is compatible."
+    if [[ "$RV_VFX_PLATFORM" == "CY2023" ]]; then
+        RV_DEPS_QT_LOCATION="RV_DEPS_QT5_LOCATION"
+    else
+        RV_DEPS_QT_LOCATION="RV_DEPS_QT6_LOCATION"
+    fi
   fi
 fi
 
