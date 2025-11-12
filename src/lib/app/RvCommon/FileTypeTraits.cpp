@@ -123,11 +123,11 @@ namespace Rv
 
     
 #ifndef PLATFORM_WINDOWS
-    #if defined(RV_VFX_CY2024)
+    #if defined(QT65ON)
         // Adding more heuristics to find the right icon for a file based on the
-        // MIME type. The following heuristics should work for Qt 5, but in
+        // MIME type. The following heuristics should work for Qt5, but in
         // order to keep the same behavior as before, this code will only run
-        // with Qt 6 and above.
+        // with Qt6 and above.
 
         QMimeDatabase mimeDb;
         QMimeType mime = mimeDb.mimeTypeForFile(info);
@@ -147,7 +147,7 @@ namespace Rv
         {
             return icon;
         }
-    #endif
+#endif
 #endif
 
         return provider.icon(info);

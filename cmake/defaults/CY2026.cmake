@@ -5,7 +5,7 @@ IF(RV_VFX_PLATFORM STREQUAL "CY2026")
     # Year
     SET(RV_VFX_CY_YEAR "2026")
     SET(RV_VFX_CY2026 ON )
-    ADD_COMPILE_DEFINITIONS(RV_VFX_CY2026)
+    ADD_COMPILE_DEFINITIONS(QT65ON)
 
     # Boost
     SET(RV_DEPS_BOOST_VERSION "1.88.0")
@@ -59,12 +59,10 @@ IF(RV_VFX_PLATFORM STREQUAL "CY2026")
     #
     # SET(RV_DEPS_PYSIDE_VERSION "6.8.3")
     # SET(RV_DEPS_PYSIDE_DOWNLOAD_HASH "2a81028f5896edeb9c2a80adac3a8e68")
-    # SET(RV_DEPS_PYSIDE_TARGET "RV_DEPS_PYSIDE6")
-    # SET(RV_DEPS_PYSIDE_ARCHIVE_URL "https://mirrors.ocf.berkeley.edu/qt/official_releases/QtForPython/pyside6/PySide6-${RV_DEPS_QT_VERSION}-src/pyside-setup-everywhere-src-${RV_DEPS_QT_VERSION}.zip")
     SET(RV_DEPS_PYSIDE_VERSION "6.5.3")
     SET(RV_DEPS_PYSIDE_DOWNLOAD_HASH "515d3249c6e743219ff0d7dd25b8c8d8")
     SET(RV_DEPS_PYSIDE_TARGET "RV_DEPS_PYSIDE6")
-    SET(RV_DEPS_PYSIDE_ARCHIVE_URL "https://mirrors.ocf.berkeley.edu/qt/official_releases/QtForPython/pyside6/PySide6-${RV_DEPS_QT_VERSION}-src/pyside-setup-everywhere-src-${RV_DEPS_QT_VERSION}.zip")
+    SET(RV_DEPS_PYSIDE_ARCHIVE_URL "https://mirrors.ocf.berkeley.edu/qt/official_releases/QtForPython/pyside6/PySide6-${RV_DEPS_PYSIDE_VERSION}-src/pyside-setup-everywhere-src-${RV_DEPS_PYSIDE_VERSION}.zip")
 
     # Python
     # https://www.python.org/downloads/source/
