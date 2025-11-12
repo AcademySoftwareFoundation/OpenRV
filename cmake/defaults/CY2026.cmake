@@ -76,4 +76,5 @@ IF(RV_VFX_PLATFORM STREQUAL "CY2026")
     # using 6.5.3 for now pending updates to RV
     #SET(RV_DEPS_QT_VERSION "6.8.3")
     SET(RV_DEPS_QT_VERSION "6.5.3")
+    SET(RV_DEPS_QT_MAJOR "6")
 ENDIF()
