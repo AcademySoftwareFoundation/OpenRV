@@ -137,7 +137,7 @@ IF(RV_TARGET_WINDOWS)
 ENDIF()
 
 SET(_openexr_patch_file_
-  "${CMAKE_CURRENT_SOURCE_DIR}"/patch/"${RV_DEPS_OPENEXR_PATCH_NAME}".patch
+  "${CMAKE_CURRENT_SOURCE_DIR}/patch/${RV_DEPS_OPENEXR_PATCH_NAME}.patch"
 )
 
 IF(EXISTS "${_openexr_patch_file_}")
