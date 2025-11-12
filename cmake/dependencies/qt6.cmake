@@ -49,6 +49,58 @@ FOREACH(
   ENDIF()
 ENDFOREACH()
 
+# For newer versions of Qt on macOS, QtWebEngine may not be part of the base installation.
+# This logic checks for its existence and, if missing for specific Qt versions, downloads and extracts it.
+string(REGEX MATCH "([0-9]+\.[0-9]+\.[0-9]+)" _qt_version_from_path "${RV_DEPS_QT6_LOCATION}")
+
+# If we are on macOS, with Qt 6.8.3, and WebEngine is missing, download it.
+if(_qt_version_from_path VERSION_EQUAL "6.8.3" AND RV_TARGET_DARWIN AND NOT EXISTS "${RV_DEPS_QT6_LOCATION}/lib/cmake/Qt6WebEngineCore/Qt6WebEngineCoreConfig.cmake")
+    message(STATUS "QtWebEngine component for 6.8.3 not found. Attempting to download and install it.")
+
+    # Find the 7z executable, which is required for extraction.
+    find_program(SEVEN_ZIP_EXECUTABLE NAMES 7z p7zip)
+    if(NOT SEVEN_ZIP_EXECUTABLE)
+        message(FATAL_ERROR "p7zip (or 7z) is required to extract the QtWebEngine module but was not found. Please install it (e.g., 'brew install p7zip').")
+    endif()
+
+    # Download the 7z archive provided by the user.
+    set(QT_WEBENGINE_URL "https://qt.mirror.constant.com/online/qtsdkrepository/mac_x64/extensions/qtwebengine/683/clang_64/extensions.qtwebengine.683.clang_64/6.8.3-0-202503201424qtwebengine-MacOS-MacOS_14-Clang-MacOS-MacOS_14-X86_64-ARM64.7z")
+    set(QT_WEBENGINE_ARCHIVE "${CMAKE_BINARY_DIR}/qtwebengine-6.8.3-macos.7z")
+
+    message(STATUS "Downloading QtWebEngine from ${QT_WEBENGINE_URL}")
+    file(DOWNLOAD ${QT_WEBENGINE_URL} ${QT_WEBENGINE_ARCHIVE} SHOW_PROGRESS)
+    
+    # Extract the archive into a temporary directory to handle its internal structure safely.
+    set(QT_WEBENGINE_TEMP_DIR "${CMAKE_BINARY_DIR}/qtwebengine_temp_extract")
+    if(EXISTS "${QT_WEBENGINE_TEMP_DIR}")
+        file(REMOVE_RECURSE "${QT_WEBENGINE_TEMP_DIR}")
+    endif()
+    file(MAKE_DIRECTORY "${QT_WEBENGINE_TEMP_DIR}")
+
+    message(STATUS "Extracting QtWebEngine to temporary directory: ${QT_WEBENGINE_TEMP_DIR}")
+    execute_process(
+        COMMAND ${SEVEN_ZIP_EXECUTABLE} x ${QT_WEBENGINE_ARCHIVE} -o${QT_WEBENGINE_TEMP_DIR}
+        RESULT_VARIABLE extract_result
+        OUTPUT_QUIET
+        ERROR_QUIET
+    )
+
+    if(NOT extract_result EQUAL 0)
+        message(FATAL_ERROR "Failed to extract QtWebEngine archive to temp directory. Result: ${extract_result}.")
+    endif()
+    
+    # The archive contains Qt component directories (lib, qml, etc.) directly.
+    # Copy the entire contents of the temporary directory into the Qt installation, merging the folders.
+    message(STATUS "Copying extracted files from ${QT_WEBENGINE_TEMP_DIR} to ${RV_DEPS_QT6_LOCATION}")
+    file(COPY "${QT_WEBENGINE_TEMP_DIR}/" DESTINATION "${RV_DEPS_QT6_LOCATION}")
+
+    # Clean up the temporary directory and downloaded archive
+    file(REMOVE_RECURSE "${QT_WEBENGINE_TEMP_DIR}")
+    file(REMOVE "${QT_WEBENGINE_ARCHIVE}")
+    
+    message(STATUS "QtWebEngine for 6.8.3 installed successfully.")
+endif()
+
 # Testing if everything is alright. In Qt6, QtWebEngine has been split into Qt6WebEngineCore and Qt6WebEngineWidgets.
 FIND_PACKAGE(
   Qt6
