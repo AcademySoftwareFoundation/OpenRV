@@ -13,8 +13,11 @@ IF(RV_VFX_PLATFORM STREQUAL "CY2024")
     SET(RV_DEPS_BOOST_DOWNLOAD_HASH "f7050f554a65f6a42ece221eaeec1660")
 
     # Imath
+    # Can find the build version in OpenRV/_build/RV_DEPS_IMATH/install/lib/
     SET(RV_DEPS_IMATH_VERSION "3.1.12")
     SET(RV_DEPS_IMATH_DOWNLOAD_HASH "d4059140972da68a2b5a1287ebe5a653")
+    SET(RV_DEPS_IMATH_LIB_VER "29.11.0")
+    SET(RV_DEPS_IMATH_LIB_MAJOR "3_1")
 
     # NumPy
     # https://numpy.org/doc/stable/release.html

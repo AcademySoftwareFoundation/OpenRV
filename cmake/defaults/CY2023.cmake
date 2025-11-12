@@ -33,8 +33,11 @@ IF(RV_VFX_PLATFORM STREQUAL "CY2023")
     endif()
 
     # Imath
+    # Can find the build version in OpenRV/_build/RV_DEPS_IMATH/install/lib/
     SET(RV_DEPS_IMATH_VERSION "3.1.12")
     SET(RV_DEPS_IMATH_DOWNLOAD_HASH "d4059140972da68a2b5a1287ebe5a653")
+    SET(RV_DEPS_IMATH_LIB_VER "29.11.0")
+    SET(RV_DEPS_IMATH_LIB_MAJOR "3_1")
 
     # NumPy
     SET(ENV{RV_DEPS_NUMPY_VERSION} "1.23.5")
