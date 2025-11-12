@@ -54,7 +54,7 @@ ENDFOREACH()
 string(REGEX MATCH "([0-9]+\.[0-9]+\.[0-9]+)" _qt_version_from_path "${RV_DEPS_QT6_LOCATION}")
 
 # If we are on macOS, with Qt 6.8.3, and WebEngine is missing, download it.
-if(_qt_version_from_path VERSION_EQUAL "6.8.3" AND RV_TARGET_DARWIN AND NOT EXISTS "${RV_DEPS_QT6_LOCATION}/lib/cmake/Qt6WebEngineCore/Qt6WebEngineCoreConfig.cmake")
+if(_qt_version_from_path VERSION_EQUAL "6.8.3" AND NOT EXISTS "${RV_DEPS_QT6_LOCATION}/lib/cmake/Qt6WebEngineCore/Qt6WebEngineCoreConfig.cmake")
     message(STATUS "QtWebEngine component for 6.8.3 not found. Attempting to download and install it.")
 
     # Find the 7z executable, which is required for extraction.
@@ -63,9 +63,19 @@ if(_qt_version_from_path VERSION_EQUAL "6.8.3" AND RV_TARGET_DARWIN AND NOT EXIS
         message(FATAL_ERROR "p7zip (or 7z) is required to extract the QtWebEngine module but was not found. Please install it (e.g., 'brew install p7zip').")
     endif()
 
+    IF (RV_TARGET_DARWIN))
     # Download the 7z archive provided by the user.
-    set(QT_WEBENGINE_URL "https://qt.mirror.constant.com/online/qtsdkrepository/mac_x64/extensions/qtwebengine/683/clang_64/extensions.qtwebengine.683.clang_64/6.8.3-0-202503201424qtwebengine-MacOS-MacOS_14-Clang-MacOS-MacOS_14-X86_64-ARM64.7z")
-    set(QT_WEBENGINE_ARCHIVE "${CMAKE_BINARY_DIR}/qtwebengine-6.8.3-macos.7z")
+      set(QT_WEBENGINE_URL "https://download.qt.io/online/qtsdkrepository/mac_x64/extensions/qtwebengine/683/clang_64/extensions.qtwebengine.683.clang_64/6.8.3-0-202503201424qtwebengine-MacOS-MacOS_14-Clang-MacOS-MacOS_14-X86_64-ARM64.7z")
+      set(QT_WEBENGINE_ARCHIVE "${CMAKE_BINARY_DIR}/qtwebengine-6.8.3-macos.7z")
+    ELSEIF(RV_TARGET_LINUX)
+      set(QT_WEBENGINE_URL "https://download.qt.io/online/qtsdkrepository/linux_x64/extensions/qtwebengine/683/x86_64/extensions.qtwebengine.683.linux_gcc_64/6.8.3-0-202503201424qtwebengine-Linux-RHEL_8_10-GCC-Linux-RHEL_8_10-X86_64.7z")
+      set(QT_WEBENGINE_ARCHIVE "${CMAKE_BINARY_DIR}/qtwebengine-6.8.3-linux.7z")
+    ELSEIF(RV_TARGET_WINDOWS)
+      set(QT_WEBENGINE_URL "https://download.qt.io/online/qtsdkrepository/windows_x86/extensions/qtwebengine/683/msvc2022_64/extensions.qtwebengine.683.win64_msvc2022_64/6.8.3-0-202503201424qtwebengine-Windows-Windows_11_23H2-MSVC2022-Windows-Windows_11_23H2-X86_64.7z")
+      set(QT_WEBENGINE_ARCHIVE "${CMAKE_BINARY_DIR}/qtwebengine-6.8.3-windows.7z")
+    ELSE()
+      message(FATAL_ERROR "Failed to determine platform for downloading QtWebEngine. Modify qt6.cmake to add support for this platform.  Installers can be found at https://download.qt.io/online/qtsdkrepository/ under platform/extensions/qtwebengine/683/")
+    ENDIF()
 
     message(STATUS "Downloading QtWebEngine from ${QT_WEBENGINE_URL}")
     file(DOWNLOAD ${QT_WEBENGINE_URL} ${QT_WEBENGINE_ARCHIVE} SHOW_PROGRESS)
