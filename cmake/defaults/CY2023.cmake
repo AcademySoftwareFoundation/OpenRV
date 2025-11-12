@@ -75,12 +75,12 @@ IF(RV_VFX_PLATFORM STREQUAL "CY2023")
     SET(RV_DEPS_OTIO_VERSION "0.18.1")
 
     # PySide
-    SET(RV_DEPS_PYSIDE_ARCHIVE_URL "https://mirrors.ocf.berkeley.edu/qt/official_releases/QtForPython/pyside2/PySide2-${RV_DEPS_QT_VERSION}-src/pyside-setup-opensource-src-${RV_DEPS_PYSIDE_VERSION}.zip")
     SET(RV_DEPS_PYSIDE_TARGET "RV_DEPS_PYSIDE2")
     SET(RV_DEPS_PYSIDE_VERSION "5.15.10")
     SET(RV_DEPS_PYSIDE_DOWNLOAD_HASH "87841aaced763b6b52e9b549e31a493f")
     # SET(RV_DEPS_PYSIDE_VERSION "5.15.18")
     # SET(RV_DEPS_PYSIDE_DOWNLOAD_HASH "52aa32613f7a69ff46e38ed8a427eb38")
+    SET(RV_DEPS_PYSIDE_ARCHIVE_URL "https://mirrors.ocf.berkeley.edu/qt/official_releases/QtForPython/pyside2/PySide2-${RV_DEPS_PYSIDE_VERSION}-src/pyside-setup-opensource-src-${RV_DEPS_PYSIDE_VERSION}.zip")
 
     # Python
     # https://www.python.org/downloads/source/
@@ -90,6 +90,6 @@ IF(RV_VFX_PLATFORM STREQUAL "CY2023")
     # SET(RV_DEPS_PYTHON_DOWNLOAD_HASH "e381359208e2bd0485169656b50ff24c")
 
     # Qt
-    SET(RV_DEPS_QT_VERSION "5.15.18")
+    SET(RV_DEPS_QT_VERSION "5.15.10")
     SET(RV_DEPS_QT_MAJOR "5")
 ENDIF()
