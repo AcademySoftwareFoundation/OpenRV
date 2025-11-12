@@ -103,10 +103,16 @@ EXTERNALPROJECT_ADD(
   USES_TERMINAL_DOWNLOAD TRUE
 )
 
-RV_VFX_SET_VARIABLE(_qt_location CY2023 "${RV_DEPS_QT5_LOCATION}" CY2024 "${RV_DEPS_QT6_LOCATION}")
-RV_VFX_SET_VARIABLE(_find_qt_version CY2023 "Qt5" CY2024 "Qt6")
+SET(_qt_location 
+  ${RV_DEPS_QT_LOCATION}
+)
+SET(_find_qt_version 
+  "Qt${RV_DEPS_QT_MAJOR}"
+)
 IF(NOT _qt_location)
-  RV_VFX_SET_VARIABLE(_qt_major CY2023 "5" CY2024 "6")
+  SET(_qt_major 
+    ${RV_DEPS_QT_MAJOR}
+  )
   MESSAGE(FATAL_ERROR "Qt is not found in path \"${_qt_location}\". Please provide -DRV_DEPS_QT${_qt_major}_LOCATION=<path> to CMake.")
 ENDIF()
 
