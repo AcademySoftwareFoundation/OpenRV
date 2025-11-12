@@ -142,7 +142,7 @@ SET(_openexr_patch_file_
 
 IF(EXISTS "${_openexr_patch_file_}")
     SET(_patch_command 
-      "patch -p1 < \"${_openexr_patch_file_}\""
+      patch -p1 < ${_openexr_patch_file_}
     )
     MESSAGE(STATUS "Patch command set for ${_target}: ${_patch_command}")
 ELSE()
