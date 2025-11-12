@@ -63,7 +63,7 @@ if(_qt_version_from_path VERSION_EQUAL "6.8.3" AND NOT EXISTS "${RV_DEPS_QT6_LOC
         message(FATAL_ERROR "p7zip (or 7z) is required to extract the QtWebEngine module but was not found. Please install it (e.g., 'brew install p7zip').")
     endif()
 
-    IF (RV_TARGET_DARWIN))
+    IF (RV_TARGET_DARWIN)
     # Download the 7z archive provided by the user.
       set(QT_WEBENGINE_URL "https://download.qt.io/online/qtsdkrepository/mac_x64/extensions/qtwebengine/683/clang_64/extensions.qtwebengine.683.clang_64/6.8.3-0-202503201424qtwebengine-MacOS-MacOS_14-Clang-MacOS-MacOS_14-X86_64-ARM64.7z")
       set(QT_WEBENGINE_ARCHIVE "${CMAKE_BINARY_DIR}/qtwebengine-6.8.3-macos.7z")
