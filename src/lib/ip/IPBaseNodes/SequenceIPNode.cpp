@@ -199,7 +199,7 @@ namespace IPCore
         //  Finally if our asssumption was too low then we use the first index.
         //
 
-        else if (index < 0)
+        if (index < 0)
         {
             index = 0;
         }
@@ -215,7 +215,7 @@ namespace IPCore
             if (index >= m_edlSource->size() - 1 || index >= m_edlSourceIn->size() - 1 || index >= m_edlSourceOut->size() - 1
                 || index >= m_edlGlobalIn->size() - 1 || index < 0)
             {
-                TWK_THROW_STREAM(SequenceOutOfBoundsExc, "Out-of-bounds EDL data");
+                return -1;
             }
         }
 
@@ -241,6 +241,8 @@ namespace IPCore
         const int globalOffset = m_edlGlobalIn->front();
         int seekFrame = int(samplesToTime(seekSample, sampleRate) * fps + 0.49);
         int index = indexAtFrame(seekFrame + globalOffset);
+        if (index < 0)
+            return -1;
 
         int inputFrame = (*m_edlGlobalIn)[index];
         SampleTime inputStart = frameToSample(inputFrame - globalOffset, fps, sampleRate);
@@ -267,30 +269,50 @@ namespace IPCore
     {
         const IPNodes& ins = inputs();
 
-        if (ins.size() > 0)
+        if (!ins.size()
+            || m_edlSource->size() < 1
+            || m_edlSourceIn->size() < 1
+            || m_edlSourceOut->size() < 1
+            || m_edlGlobalIn->size() < 1)
         {
-            const int index = (forceIndex == -1) ? indexAtFrame(frame) : forceIndex;
+            return EvalPoint(-1, 0, -1);
+        }
 
-            const int source = (*m_edlSource)[index];
-            const int in = (*m_edlSourceIn)[index];
-            const int out = (*m_edlSourceOut)[index];
-            const int iframe = (*m_edlGlobalIn)[index];
+        const int index =
+            (forceIndex == -1) ? indexAtFrame(frame) : forceIndex;
 
-            const int f0 = (frame - iframe) + in;
+        if (index >= (m_edlSource->size() - 1)
+            || index >= (m_edlSourceIn->size() - 1)
+            || index >= (m_edlSourceOut->size() - 1)
+            || index >= (m_edlGlobalIn->size() - 1)
+            || index < 0 )
+        {
+            return EvalPoint(-1, 0, -1);
+        }
 
-            if (forceIndex == -1)
-            {
-                const int f1 = min(f0, out);
-                const int f = max(f1, in);
+        const int source = (*m_edlSource)[index];
 
-                return EvalPoint(source, f, index);
-            }
-            else
-                return EvalPoint(source, f0, index);
+        if (source < 0 || source > ins.size())
+        {
+            return EvalPoint(-1, 0, -1);
+        }
+
+        const int in = (*m_edlSourceIn)[index];
+        const int out = (*m_edlSourceOut)[index];
+        const int iframe = (*m_edlGlobalIn)[index];
+
+        const int f0 = (frame - iframe) + in;
+
+        if (forceIndex == -1)
+        {
+            const int f1 = min(f0, out);
+            const int f = max(f1, in);
+
+            return EvalPoint(source, f, index);
         }
         else
         {
-            return EvalPoint(-1, 0, -1);
+            return EvalPoint(source, f0, index);
         }
     }
 
@@ -319,8 +341,10 @@ namespace IPCore
 
         if (source < 0 || source >= ins.size())
         {
-            TWK_THROW_STREAM(SequenceOutOfBoundsExc,
-                             "Bad Sequence EDL source number " << source << " is not in range [0," << ins.size() - 1 << "]");
+            stringstream msg;
+            msg << "Bad Sequence EDL source number " << source << " is not in range [0," << ins.size() - 1 << "]";
+
+            return IPImage::newNoImage(this, msg.str());
         }
 
         IPImage* root = new IPImage(this, IPImage::BlendRenderType, vw, vh, 1.0);
@@ -762,7 +786,7 @@ namespace IPCore
     {
         lazyBuildState();
 
-        if (inputs().size() >= 1)
+        if (inputs().size() >= 1 && m_edlGlobalIn->size() >= 1)
         {
             ImageRangeInfo info;
             info.inc = 1;
@@ -782,10 +806,12 @@ namespace IPCore
         lazyBuildState();
 
         const bool interactive = interactiveSize(context);
+        const IPNodes& ins = inputs();
         const float vw = interactive ? context.viewWidth : float(m_structInfo.width);
         const float vh = interactive ? context.viewHeight : float(m_structInfo.height);
 
-        if (inputs().empty() || interactive)
+
+        if (ins.empty() || interactive)
         {
             return ImageStructureInfo(vw, vh);
         }
@@ -793,8 +819,13 @@ namespace IPCore
         {
             const float aspect = vw / vh;
             EvalPoint ep = evaluationPoint(context.frame);
+            if (ep.sourceIndex < 0 || ep.sourceIndex >= ins.size())
+            {
+                return ImageStructureInfo(vw, vh);
+            }
+
             Context context = graph()->contextForFrame(ep.sourceFrame);
-            ImageStructureInfo ininfo = inputs()[ep.sourceIndex]->imageStructureInfo(context);
+            ImageStructureInfo ininfo = ins[ep.sourceIndex]->imageStructureInfo(context);
 
             //
             //  We may have an input that has no media "behind it" (IE a
@@ -895,6 +926,12 @@ namespace IPCore
             //
 
             int index = indexAtSample(readSample, rate, context.fps);
+            if (index < 0)
+            {
+                cerr << "ERROR: no samples read from input node" << endl;
+                break;
+            }
+
             int sourceIndex = (*m_edlSource)[index];
 
             //
@@ -1028,30 +1065,14 @@ namespace IPCore
 
         int frame = context.frame;
         const IPNodes& ins = inputs();
+        EvalPoint ep = evaluationPoint(frame);
+        const int source = ep.sourceIndex;
 
-        if (ins.size() > 1)
+        if (source > 0 && source < ins.size())
         {
-            EvalPoint ep = evaluationPoint(frame);
-            const int source = ep.sourceIndex;
-
-            if (source < 0 || source >= ins.size())
-            {
-                outputProp(m_edlSource);
-                outputProp(m_edlGlobalIn);
-                outputProp(m_edlSourceIn);
-                outputProp(m_edlSourceOut);
-
-                TWK_THROW_STREAM(SequenceOutOfBoundsExc,
-                                 "Bad Sequence EDL source number " << source << " is not in range [0," << ins.size() - 1 << "]");
-            }
-
             Context newContext = context;
             newContext.frame = ep.sourceFrame;
             ins[source]->testEvaluate(newContext, result);
-        }
-        else if (ins.size() == 1)
-        {
-            ins[0]->testEvaluate(context, result);
         }
     }
 
@@ -1061,31 +1082,17 @@ namespace IPCore
 
         visitor.enter(context, this);
         const IPNodes& ins = inputs();
+        EvalPoint ep = evaluationPoint(context.frame);
+        const int source = ep.sourceIndex;
 
-        if (ins.size() >= 1)
+        if (source >= 0 && source < ins.size())
         {
-            EvalPoint ep = evaluationPoint(context.frame);
-            const int source = ep.sourceIndex;
-
-            if (source < 0 || source >= ins.size())
-            {
-                TWK_THROW_STREAM(SequenceOutOfBoundsExc,
-                                 "Bad Sequence EDL source number " << source << " is not in range [0," << ins.size() - 1 << "]");
-            }
-
             Context c = context;
             c.frame = ep.sourceFrame;
 
             if (visitor.traverseChild(c, source, this, ins[source]))
             {
                 ins[source]->metaEvaluate(c, visitor);
-            }
-        }
-        else if (ins.size() == 1)
-        {
-            if (visitor.traverseChild(context, 0, this, ins[0]))
-            {
-                ins[0]->metaEvaluate(context, visitor);
             }
         }
 
