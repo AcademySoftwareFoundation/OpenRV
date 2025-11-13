@@ -520,12 +520,7 @@ class: ProcessInfo : Widget
                                 "Cancel?", details,
                                 "Don't Quit", "Quit", nil);
 
-        print("INFO: alertPanel returned choice = %d\n" % choice);
-        
-        if (choice == 1) 
-        {
-            p.cancel();
-        }
+        if (choice == 1) p.cancel();
         redraw();
     }
 
