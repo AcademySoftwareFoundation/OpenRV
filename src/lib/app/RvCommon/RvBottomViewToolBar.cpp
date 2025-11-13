@@ -685,18 +685,18 @@ namespace Rv
 
         for (int i = 0; i < m_playModeMenu->actions().size(); ++i)
         {
-            QAction* a = m_playModeMenu->actions()[i];
-            a->setCheckable(true);
+            QAction* playModeMenuAction = m_playModeMenu->actions()[i];
+            playModeMenuAction->setCheckable(true);
 
-            if (a->isEnabled())
+            if (playModeMenuAction->isEnabled())
             {
                 // For enabled items, check if they match the current playmode
-                a->setChecked(a->data().toMap()["enum"].toInt() == m_session->playMode());
+                playModeMenuAction->setChecked(playModeMenuAction->data().toMap()["enum"].toInt() == m_session->playMode());
             }
             else
             {
                 // For disabled items, always uncheck them.
-                a->setChecked(false);
+                playModeMenuAction->setChecked(false);
             }
         }
     }
