@@ -111,7 +111,6 @@ if [ -z "$QT_HOME" ]; then
     if [ -n "$QT_HOME_5" ]; then
       QT_HOME="$QT_HOME_5"
       QT_VERSION="5.15"
-      QTENVVAR="RV_DEPS_QT5_LOCATION"
     else
       echo "Error: CY2023 requires a Qt 5.15 installation, but none was found."
     fi
@@ -119,7 +118,6 @@ if [ -z "$QT_HOME" ]; then
     if [ -n "$QT_HOME_6_5" ]; then
       QT_HOME="$QT_HOME_6_5"
       QT_VERSION="6.5"
-      QTENVVAR="RV_DEPS_QT6_LOCATION"
     else
       echo "Error: $RV_VFX_PLATFORM requires a Qt 6.5 installation, but none was found."
     fi
@@ -127,7 +125,6 @@ if [ -z "$QT_HOME" ]; then
     if [ -n "$QT_HOME_6_8" ]; then
       QT_HOME="$QT_HOME_6_8"
       QT_VERSION="6.8"
-      QTENVVAR="RV_DEPS_QT6_LOCATION"
     else
       echo "Error: $RV_VFX_PLATFORM requires a Qt 6.8.3 installation, but none was found."
     fi
@@ -143,29 +140,21 @@ if [ -z "$QT_HOME" ]; then
 else 
   if [[ $QT_HOME == *"6.8"* ]]; then
     echo "Using Qt 6.8 installation already set at $QT_HOME"
-    QTENVVAR="RV_DEPS_QT6_LOCATION"
     if [[ "$RV_VFX_PLATFORM" != "CY2026" ]]; then
         echo "Warning: QT_HOME is set to a Qt 6.8 path, but RV_VFX_PLATFORM is $RV_VFX_PLATFORM."
     fi
   elif [[ $QT_HOME == *"6.5"* ]]; then
     echo "Using Qt 6.5 installation already set at $QT_HOME"
-    QTENVVAR="RV_DEPS_QT6_LOCATION"
     if [[ "$RV_VFX_PLATFORM" != "CY2024" && "$RV_VFX_PLATFORM" != "CY2025" ]]; then
         echo "Warning: QT_HOME is set to a Qt 6.5 path, but RV_VFX_PLATFORM is $RV_VFX_PLATFORM."
     fi
   elif [[ $QT_HOME == *"5.15"* ]]; then
     echo "Using Qt 5.15 installation already set at $QT_HOME"
-    QTENVVAR="RV_DEPS_QT5_LOCATION"
     if [[ "$RV_VFX_PLATFORM" != "CY2023" ]]; then
         echo "Warning: QT_HOME is set to a Qt5 path, but RV_VFX_PLATFORM is $RV_VFX_PLATFORM."
     fi
   else
     echo "Warning: Could not determine Qt version from path: $QT_HOME. Assuming it is compatible."
-    if [[ "$RV_VFX_PLATFORM" == "CY2023" ]]; then
-        QTENVVAR="RV_DEPS_QT5_LOCATION"
-    else
-        QTENVVAR="RV_DEPS_QT6_LOCATION"
-    fi
   fi
 fi
 
@@ -283,7 +272,6 @@ rvrelease() {
   __rv_switch_config
 }
 
-
 # VARIABLES
 RV_HOME="${RV_HOME:-$SCRIPT_HOME}"
 RV_BUILD_PARALLELISM="${RV_BUILD_PARALLELISM:-$(python3 -c 'import os; print(os.cpu_count())')}"
@@ -297,7 +285,6 @@ RV_BUILD_DIR=""
 RV_INST_DIR=""
 RV_APP_DIR=""
 RV_PATH_SUFFIX=""
-
 
 # Deactivate virtual environment if active when sourcing
 if [ -n "$VIRTUAL_ENV" ]; then
@@ -315,7 +302,7 @@ alias rvappdir='cd ${RV_APP_DIR}'
 alias rvhomedir='cd ${RV_HOME}'
 alias rvenv='rvhomedir && __rv_env_shell'
 alias rvsetup='rvenv && SETUPTOOLS_USE_DISTUTILS=${SETUPTOOLS_USE_DISTUTILS} python3 -m pip install --upgrade -r ${RV_HOME}/requirements.txt'
-alias rvcfg='rvhomedir && rvenv && cmake -B ${RV_BUILD_DIR} -G "${CMAKE_GENERATOR}" ${RV_TOOLCHAIN} ${CMAKE_WIN_ARCH} -DCMAKE_BUILD_TYPE=${RV_BUILD_TYPE} -D${QTENVVAR}=${QT_HOME} -DRV_DEPS_QT_LOCATION=${QT_HOME} -DQT_HOME=${QT_HOME} -DRV_VFX_PLATFORM=${RV_VFX_PLATFORM} -DRV_DEPS_WIN_PERL_ROOT=${WIN_PERL}'
+alias rvcfg='rvhomedir && rvenv && cmake -B ${RV_BUILD_DIR} -G "${CMAKE_GENERATOR}" ${RV_TOOLCHAIN} ${CMAKE_WIN_ARCH} -DCMAKE_BUILD_TYPE=${RV_BUILD_TYPE} -DRV_DEPS_QT_LOCATION=${QT_HOME} -DRV_VFX_PLATFORM=${RV_VFX_PLATFORM} -DRV_DEPS_WIN_PERL_ROOT=${WIN_PERL}'
 alias rvbuildt='rvenv && cmake --build ${RV_BUILD_DIR} --config ${RV_BUILD_TYPE} -v --parallel=${RV_BUILD_PARALLELISM} --target '
 alias rvbuild='rvenv && rvbuildt main_executable'
 alias rvtest='rvenv && ctest --test-dir ${RV_BUILD_DIR} --extra-verbose'

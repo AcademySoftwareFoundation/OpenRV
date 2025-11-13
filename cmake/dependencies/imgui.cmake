@@ -104,7 +104,7 @@ EXTERNALPROJECT_ADD(
 )
 
 SET(_qt_location 
-  ${QT_HOME}
+  ${RV_DEPS_QT_LOCATION}
 )
 SET(_find_qt_version 
   "Qt${RV_DEPS_QT_MAJOR}"
@@ -113,7 +113,7 @@ IF(NOT _qt_location)
   SET(_qt_major 
     ${RV_DEPS_QT_MAJOR}
   )
-  MESSAGE(FATAL_ERROR "Qt is not found in path \"${_qt_location}\". Please provide -DRV_DEPS_QT${_qt_major}_LOCATION=<path> to CMake.")
+  MESSAGE(FATAL_ERROR "Qt is not found in path \"${_qt_location}\". Please provide -DRV_DEPS_QT_LOCATION=<path> to CMake.")
 ENDIF()
 
 
