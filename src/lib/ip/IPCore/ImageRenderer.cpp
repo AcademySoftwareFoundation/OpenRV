@@ -1596,8 +1596,7 @@ namespace IPCore
                     {
                         uploadRoot = root;
                     }
-                    m_uploadThreadPrefetch =
-                        (root == uploadRoot) ? false : true;
+                    m_uploadThreadPrefetch = (root == uploadRoot) ? false : true;
 
                     //
                     // traverse our IPTree, and create gl textures/buffers for
@@ -4892,6 +4891,7 @@ namespace IPCore
             // a recompute of the renderID which is a unique identifier
             // associated with the render.
 
+            ostringstream newRenderID;
             newRenderID << root->renderIDWithPartialPaint(true /*force_recompute*/) << " " << m_filter << " " << m_bgpattern << " "
                         << fbo->width() << "x" << fbo->height() << " paintCmdNo" << curCmdNum - 1;
 
