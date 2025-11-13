@@ -5230,21 +5230,9 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
                 state.ddFileKind == MovieFileKind ||
                 state.ddFileKind == DirectoryFileKind)
             {
-                // Check if media operations are allowed
+                string[] regions = string[] {"Add as Layer", "Add Source to Session"};
                 bool mediaAllowed = isEventCategoryEnabled("media_category");
-                
-                // Build list of available drop regions based on category state
-                string[] regions;
-                if (mediaAllowed)
-                {
-                    regions = string[] {"Add as Layer", "Add Source to Session"};
-                }
-                else
-                {
-                    // Show blocked regions when media category is disabled
-                    regions = string[] {"Add as Layer", "Add Source to Session"};
-                }
-                
+
                 if (mediaAllowed)
                 {
                     state.ddRegion = drawDropRegions(w, h, x, y, 20, regions);
@@ -5292,7 +5280,6 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
             }
             else if (state.ddFileKind == CDLFileKind)
             {
-                // Check if source modifications are allowed
                 bool sourceAllowed = isEventCategoryEnabled("source_category");
                 
                 if (sourceAllowed)
@@ -5385,7 +5372,6 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
             }
             else if (state.ddFileKind == RVFileKind)
             {
-                // Check if media operations are allowed
                 bool mediaAllowed = isEventCategoryEnabled("media_category");
                 
                 if (mediaAllowed)
@@ -5434,7 +5420,6 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
                 state.ddFileKind == MovieFileKind ||
                 state.ddFileKind == DirectoryFileKind)
             {
-                // Check if media operations are allowed
                 bool mediaAllowed = isEventCategoryEnabled("media_category");
                 
                 if (mediaAllowed)
@@ -5471,7 +5456,6 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
             }
             else if (state.ddFileKind == RVFileKind)
             {
-                // Check if media operations are allowed
                 bool mediaAllowed = isEventCategoryEnabled("media_category");
                 
                 if (mediaAllowed)
