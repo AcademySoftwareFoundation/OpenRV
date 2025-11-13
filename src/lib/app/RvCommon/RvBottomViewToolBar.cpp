@@ -9,8 +9,10 @@
 #include <RvCommon/RvApplication.h>
 #include <RvPackage/PackageManager.h>
 #include <QtCore/QVariant>
+#include <QtGui/QMouseEvent>
 #include <QtWidgets/QToolButton>
 #include <QtWidgets/QMenu>
+#include <QtWidgets/QToolTip>
 #include <QAction>
 #include <QtWidgets/QWidgetAction>
 #include <QtWidgets/QFrame>
@@ -306,6 +308,9 @@ namespace Rv
         //  m_playModeMenu->addAction("  Loop with Black 1.0 Second");
 
         b->setMenu(m_playModeMenu);
+        
+        // Install event filter to show tooltips on disabled menu items
+        m_playModeMenu->installEventFilter(this);
 
         connect(m_playModeMenu, SIGNAL(triggered(QAction*)), this, SLOT(playModeMenuTriggered(QAction*)));
         connect(m_playModeMenu, SIGNAL(aboutToShow()), this, SLOT(playModeMenuUpdate()));
@@ -648,8 +653,46 @@ namespace Rv
         bool pingPongEnabled = m_session->isEventCategoryEnabled(IPCore::EventCategories::playmodePingPongCategory);
 
         m_playModeLoopAction->setEnabled(loopEnabled);
+        if (!loopEnabled && !m_customCannotUseTooltip.isEmpty())
+        {
+            m_playModeLoopAction->setToolTip(m_customCannotUseTooltip);
+        }
+        else if (!loopEnabled && !m_customDisabledPrefix.isEmpty())
+        {
+            m_playModeLoopAction->setToolTip(m_customDisabledPrefix + "Loop");
+        }
+        else
+        {
+            m_playModeLoopAction->setToolTip("");
+        }
+
         m_playModeOnceAction->setEnabled(onceEnabled);
+        if (!onceEnabled && !m_customCannotUseTooltip.isEmpty())
+        {
+            m_playModeOnceAction->setToolTip(m_customCannotUseTooltip);
+        }
+        else if (!onceEnabled && !m_customDisabledPrefix.isEmpty())
+        {
+            m_playModeOnceAction->setToolTip(m_customDisabledPrefix + "Once");
+        }
+        else
+        {
+            m_playModeOnceAction->setToolTip("");
+        }
+
         m_playModePingPongAction->setEnabled(pingPongEnabled);
+        if (!pingPongEnabled && !m_customCannotUseTooltip.isEmpty())
+        {
+            m_playModePingPongAction->setToolTip(m_customCannotUseTooltip);
+        }
+        else if (!pingPongEnabled && !m_customDisabledPrefix.isEmpty())
+        {
+            m_playModePingPongAction->setToolTip(m_customDisabledPrefix + "PingPong");
+        }
+        else
+        {
+            m_playModePingPongAction->setToolTip("");
+        }
 
         // Disable the whole playmode button if all three options are disabled
         bool anyEnabled = loopEnabled || onceEnabled || pingPongEnabled;
@@ -725,6 +768,28 @@ namespace Rv
                 break;
             }
         }
+    }
+
+    bool RvBottomViewToolBar::eventFilter(QObject* obj, QEvent* event)
+    {
+        if (obj == m_playModeMenu && event->type() == QEvent::MouseMove)
+        {
+            auto* mouseEvent = dynamic_cast<QMouseEvent*>(event);
+            if (mouseEvent)
+            {
+                QAction* action = m_playModeMenu->actionAt(mouseEvent->pos());
+                
+                if (action && !action->isEnabled() && !action->toolTip().isEmpty())
+                {
+                    QToolTip::showText(mouseEvent->globalPos(), action->toolTip(), m_playModeMenu);
+                }
+                else
+                {
+                    QToolTip::hideText();
+                }
+            }
+        }
+        return QToolBar::eventFilter(obj, event);
     }
 
     void RvBottomViewToolBar::updateActionAvailability()

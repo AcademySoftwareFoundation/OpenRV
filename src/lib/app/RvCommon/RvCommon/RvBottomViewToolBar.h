@@ -68,6 +68,9 @@ namespace Rv
         void playModeMenuTriggered(QAction*);
         void playModeMenuUpdate();
 
+    protected:
+        bool eventFilter(QObject* obj, QEvent* event) override;
+
     private:
         struct ActionCategoryMapping
         {
