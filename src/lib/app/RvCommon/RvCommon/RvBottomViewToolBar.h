@@ -80,8 +80,11 @@ namespace Rv
 
         void setVolumeIcon();
         void updateActionAvailability();
+        void updatePlayModeButtonState();
 
         IPCore::Session* m_session;
+        QString m_customCannotUseTooltip;
+        QString m_customDisabledPrefix;
         QAction* m_smAction;
         QAction* m_paintAction;
         QAction* m_infoAction;
@@ -98,6 +101,9 @@ namespace Rv
         QAction* m_forwardMarkAction;
         QAction* m_playModeAction;
         QMenu* m_playModeMenu;
+        QAction* m_playModeLoopAction;
+        QAction* m_playModeOnceAction;
+        QAction* m_playModePingPongAction;
         QAction* m_audioAction;
         QSlider* m_audioSlider;
         QMenu* m_audioMenu;

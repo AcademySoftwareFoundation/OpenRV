@@ -35,6 +35,8 @@ namespace Rv
     using namespace boost;
     using namespace TwkQtCoreUtil;
 
+    static constexpr std::string_view playModeDefaultTooltip = "Select playback style";
+
     RvBottomViewToolBar::RvBottomViewToolBar(QWidget* parent)
         : QToolBar("bottom", parent)
         , EventNode("bottomToolBar")
@@ -269,7 +271,7 @@ namespace Rv
         addWidget(qf);
 
         m_playModeAction = addAction("");
-        m_playModeAction->setToolTip("Select playback style");
+        m_playModeAction->setToolTip(QString::fromUtf8(playModeDefaultTooltip.data(), playModeDefaultTooltip.size()));
         b = dynamic_cast<QToolButton*>(widgetForAction(m_playModeAction));
 
         switch (static_cast<Session::PlayMode>(opts.loopMode))
@@ -294,9 +296,12 @@ namespace Rv
 
         m_playModeMenu = new QMenu(b);
         m_playModeMenu->addAction("Playback")->setDisabled(true);
-        m_playModeMenu->addAction("  Once")->setData(enumCodeMap(Session::PlayOnce, "commands.setPlayMode(PlayOnce)"));
-        m_playModeMenu->addAction("  Loop")->setData(enumCodeMap(Session::PlayLoop, "commands.setPlayMode(PlayLoop)"));
-        m_playModeMenu->addAction("  PingPong")->setData(enumCodeMap(Session::PlayPingPong, "commands.setPlayMode(PlayPingPong)"));
+        m_playModeOnceAction = m_playModeMenu->addAction("  Once");
+        m_playModeOnceAction->setData(enumCodeMap(Session::PlayOnce, "commands.setPlayMode(PlayOnce)"));
+        m_playModeLoopAction = m_playModeMenu->addAction("  Loop");
+        m_playModeLoopAction->setData(enumCodeMap(Session::PlayLoop, "commands.setPlayMode(PlayLoop)"));
+        m_playModePingPongAction = m_playModeMenu->addAction("  PingPong");
+        m_playModePingPongAction->setData(enumCodeMap(Session::PlayPingPong, "commands.setPlayMode(PlayPingPong)"));
         //  m_playModeMenu->addAction("  Loop with Black 0.5 Second");
         //  m_playModeMenu->addAction("  Loop with Black 1.0 Second");
 
@@ -344,11 +349,11 @@ namespace Rv
             {m_ghostAction, IPCore::EventCategories::annotateCategory, m_ghostAction->toolTip()},
             {m_backStepAction, IPCore::EventCategories::playcontrolCategory, m_backStepAction->toolTip()},
             {m_forwardStepAction, IPCore::EventCategories::playcontrolCategory, m_forwardStepAction->toolTip()},
-            {m_backPlayAction, IPCore::EventCategories::playcontrolCategory, m_backPlayAction->toolTip()},
+            {m_backPlayAction, IPCore::EventCategories::backplayCategory, m_backPlayAction->toolTip()},
             {m_forwardPlayAction, IPCore::EventCategories::playcontrolCategory, m_forwardPlayAction->toolTip()},
+            {m_playModeAction, IPCore::EventCategories::playcontrolCategory, m_playModeAction->toolTip()},
             {m_backMarkAction, IPCore::EventCategories::markCategory, m_backMarkAction->toolTip()},
             {m_forwardMarkAction, IPCore::EventCategories::markCategory, m_forwardMarkAction->toolTip()},
-            {m_playModeAction, IPCore::EventCategories::playcontrolCategory, m_playModeAction->toolTip()},
         }};
 
         if (m_session)
@@ -458,6 +463,16 @@ namespace Rv
             else if (name == "event-category-state-changed")
             {
                 // Update action availability when presenter changes or session mode changes
+                updateActionAvailability();
+            }
+            else if (name == "toolbar-set-cannot-use-tooltip")
+            {
+                m_customCannotUseTooltip = QString::fromUtf8(contents.c_str());
+                updateActionAvailability();
+            }
+            else if (name == "toolbar-set-disabled-prefix")
+            {
+                m_customDisabledPrefix = QString::fromUtf8(contents.c_str());
                 updateActionAvailability();
             }
         }
@@ -623,6 +638,28 @@ namespace Rv
         setVolumeIcon();
     }
 
+    void RvBottomViewToolBar::updatePlayModeButtonState()
+    {
+        if (!m_session)
+            return;
+
+        bool loopEnabled = m_session->isEventCategoryEnabled(IPCore::EventCategories::playmodeLoopCategory);
+        bool onceEnabled = m_session->isEventCategoryEnabled(IPCore::EventCategories::playmodeOnceCategory);
+        bool pingPongEnabled = m_session->isEventCategoryEnabled(IPCore::EventCategories::playmodePingPongCategory);
+
+        m_playModeLoopAction->setEnabled(loopEnabled);
+        m_playModeOnceAction->setEnabled(onceEnabled);
+        m_playModePingPongAction->setEnabled(pingPongEnabled);
+
+        // Disable the whole playmode button if all three options are disabled
+        bool anyEnabled = loopEnabled || onceEnabled || pingPongEnabled;
+        m_playModeAction->setEnabled(anyEnabled);
+        QString tooltip = anyEnabled || m_customCannotUseTooltip.isEmpty() 
+                          ? QString::fromUtf8(playModeDefaultTooltip.data(), playModeDefaultTooltip.size())
+                          : m_customCannotUseTooltip;
+        m_playModeAction->setToolTip(tooltip);
+    }
+
     void RvBottomViewToolBar::playModeMenuUpdate()
     {
         if (!m_session)
@@ -631,12 +668,18 @@ namespace Rv
         for (int i = 0; i < m_playModeMenu->actions().size(); ++i)
         {
             QAction* a = m_playModeMenu->actions()[i];
-
-            if (!a->isEnabled())
-                continue;
-
             a->setCheckable(true);
-            a->setChecked(a->data().toMap()["enum"].toInt() == m_session->playMode());
+
+            if (a->isEnabled())
+            {
+                // For enabled items, check if they match the current playmode
+                a->setChecked(a->data().toMap()["enum"].toInt() == m_session->playMode());
+            }
+            else
+            {
+                // For disabled items, always uncheck them.
+                a->setChecked(false);
+            }
         }
     }
 
@@ -676,11 +719,39 @@ namespace Rv
         {
             if (mapping.action != nullptr)
             {
-                bool categoryEnabled = m_session->isEventCategoryEnabled(mapping.category);
+                if (mapping.action == m_playModeAction)
+                {
+                    updatePlayModeButtonState();
+                }
+                else if (mapping.action == m_backPlayAction)
+                {
+                    bool categoryEnabled = m_session->isEventCategoryEnabled(mapping.category);
 
-                mapping.action->setEnabled(categoryEnabled);
-                mapping.action->setToolTip(categoryEnabled ? mapping.defaultTooltip
-                                                           : QString("You must be presenter to use ") + mapping.defaultTooltip);
+                    mapping.action->setEnabled(categoryEnabled);
+                    QString tooltip = mapping.defaultTooltip;
+                    if (!categoryEnabled && !m_customCannotUseTooltip.isEmpty())
+                    {
+                        tooltip = m_customCannotUseTooltip;
+                    }
+                    mapping.action->setToolTip(tooltip);
+                }
+                else
+                {
+                    bool categoryEnabled = m_session->isEventCategoryEnabled(mapping.category);
+
+                    mapping.action->setEnabled(categoryEnabled);
+                    if (categoryEnabled)
+                    {
+                        mapping.action->setToolTip(mapping.defaultTooltip);
+                    }
+                    else
+                    {
+                        QString tooltip = m_customDisabledPrefix.isEmpty() 
+                                          ? mapping.defaultTooltip 
+                                          : m_customDisabledPrefix + mapping.defaultTooltip;
+                        mapping.action->setToolTip(tooltip);
+                    }
+                }
             }
         }
     }

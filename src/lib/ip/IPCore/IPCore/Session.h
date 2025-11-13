@@ -53,6 +53,7 @@ namespace IPCore
         inline constexpr std::string_view annotateSmudgeCategory = "annotate_smudge_category";
         inline constexpr std::string_view annotateSofteraseCategory = "annotate_softerase_category";
         inline constexpr std::string_view annotateTextCategory = "annotate_text_category";
+        inline constexpr std::string_view backplayCategory = "backplay_category";
         inline constexpr std::string_view clearCategory = "clear_category";
         inline constexpr std::string_view exportCategory = "export_category";
         inline constexpr std::string_view flowptCategory = "flowpt_category";
@@ -61,6 +62,9 @@ namespace IPCore
         inline constexpr std::string_view markCategory = "mark_category";
         inline constexpr std::string_view mediaCategory = "media_category";
         inline constexpr std::string_view playcontrolCategory = "playcontrol_category";
+        inline constexpr std::string_view playmodeLoopCategory = "playmode_loop_category";
+        inline constexpr std::string_view playmodeOnceCategory = "playmode_once_category";
+        inline constexpr std::string_view playmodePingPongCategory = "playmode_pingpong_category";
         inline constexpr std::string_view presentationCategory = "presentation_category";
         inline constexpr std::string_view sessionmanagerCategory = "sessionmanager_category";
         inline constexpr std::string_view sourceCategory = "source_category";
@@ -75,13 +79,14 @@ namespace IPCore
             // Explicitly specify template parameters for MSVC compatibility.
             // CTAD (Class Template Argument Deduction) works on GCC/Clang but
             // fails on Windows MSVC, so we specify the number of categories explicitly.
-            return std::array<std::string_view, 28>{
-                annotateCategory,         annotateAirbrushCategory, annotateBurnCategory,   annotateCloneCategory,  annotateDodgeCategory,
-                annotateHarderaseCategory, annotatePenCategory,     annotateSampleCategory, annotateSelectCategory, annotateSmudgeCategory,
-                annotateSofteraseCategory, annotateTextCategory,    clearCategory,          exportCategory,         flowptCategory,
-                helpCategory,             infoCategory,            markCategory,           mediaCategory,          playcontrolCategory,
-                presentationCategory,     sessionmanagerCategory,  sourceCategory,         systemCategory,         screeningroomCategory,
-                unclassifiedCategory,     viewmodeCategory,        wipesCategory};
+            return std::array<std::string_view, 32>{
+                annotateCategory,         annotateAirbrushCategory, annotateBurnCategory,      annotateCloneCategory,  annotateDodgeCategory,
+                annotateHarderaseCategory, annotatePenCategory,     annotateSampleCategory,    annotateSelectCategory, annotateSmudgeCategory,
+                annotateSofteraseCategory, annotateTextCategory,    backplayCategory,          clearCategory,          exportCategory,
+                flowptCategory,           helpCategory,            infoCategory,              markCategory,           mediaCategory,
+                playcontrolCategory,      playmodeLoopCategory,    playmodeOnceCategory,      playmodePingPongCategory, presentationCategory,
+                sessionmanagerCategory,   sourceCategory,          systemCategory,            screeningroomCategory,  unclassifiedCategory,
+                viewmodeCategory,         wipesCategory};
         }
     } // namespace EventCategories
 
