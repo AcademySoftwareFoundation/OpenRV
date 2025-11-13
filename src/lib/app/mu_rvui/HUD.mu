@@ -500,15 +500,32 @@ class: ProcessInfo : Widget
         _y = 60;
     }
 
-    \: killProcess (void; ExternalProcess p, Event ev)
+    \: killProcess (void; Event ev)
     {
+        State state = data();
+        
+        // Look up the process from state instead of capturing it in the closure
+        ExternalProcess p = state.externalProcess;
+        
+        // Check if process is still valid (might have finished already)
+        if (p eq nil || p.isFinished())
+        {
+            redraw();
+            return;
+        }
+        
         let details = if (p._cancelDetails neq nil) then p._cancelDetails else ("Do you want to quit \"%s\"?" % p._name);
         int choice = alertPanel(true, // associated panel (sheet on OSX)
                                 WarningAlert,
                                 "Cancel?", details,
                                 "Don't Quit", "Quit", nil);
 
-        if (choice == 1) p.cancel();
+        print("INFO: alertPanel returned choice = %d\n" % choice);
+        
+        if (choice == 1) 
+        {
+            p.cancel();
+        }
         redraw();
     }
 
@@ -612,7 +629,7 @@ class: ProcessInfo : Widget
         _buttons[0]._y = (pcy)/devicePixelRatio;
         _buttons[0]._w = (rad * 2)/devicePixelRatio;
         _buttons[0]._h = (rad * 2)/devicePixelRatio;
-        _buttons[0]._callback = killProcess(p,);
+        _buttons[0]._callback = killProcess;
 
         gltext.writeAt(pcx + 3.0 * rad, pcy, "%-3.1f%%" % pcent);
 
