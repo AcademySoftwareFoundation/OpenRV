@@ -654,9 +654,27 @@ namespace Rv
         // Disable the whole playmode button if all three options are disabled
         bool anyEnabled = loopEnabled || onceEnabled || pingPongEnabled;
         m_playModeAction->setEnabled(anyEnabled);
-        QString tooltip = anyEnabled || m_customCannotUseTooltip.isEmpty() 
-                          ? QString::fromUtf8(playModeDefaultTooltip.data(), playModeDefaultTooltip.size())
-                          : m_customCannotUseTooltip;
+        
+        QString tooltip;
+        if (anyEnabled)
+        {
+            tooltip = QString::fromUtf8(playModeDefaultTooltip.data(), playModeDefaultTooltip.size());
+        }
+        else
+        {
+            if (!m_customCannotUseTooltip.isEmpty())
+            {
+                tooltip = m_customCannotUseTooltip;
+            }
+            else if (!m_customDisabledPrefix.isEmpty())
+            {
+                tooltip = m_customDisabledPrefix + QString::fromUtf8(playModeDefaultTooltip.data(), playModeDefaultTooltip.size());
+            }
+            else
+            {
+                tooltip = QString::fromUtf8(playModeDefaultTooltip.data(), playModeDefaultTooltip.size());
+            }
+        }
         m_playModeAction->setToolTip(tooltip);
     }
 
@@ -728,10 +746,25 @@ namespace Rv
                     bool categoryEnabled = m_session->isEventCategoryEnabled(mapping.category);
 
                     mapping.action->setEnabled(categoryEnabled);
-                    QString tooltip = mapping.defaultTooltip;
-                    if (!categoryEnabled && !m_customCannotUseTooltip.isEmpty())
+                    QString tooltip;
+                    if (categoryEnabled)
                     {
-                        tooltip = m_customCannotUseTooltip;
+                        tooltip = mapping.defaultTooltip;
+                    }
+                    else
+                    {
+                        if (!m_customCannotUseTooltip.isEmpty())
+                        {
+                            tooltip = m_customCannotUseTooltip;
+                        }
+                        else if (!m_customDisabledPrefix.isEmpty())
+                        {
+                            tooltip = m_customDisabledPrefix + mapping.defaultTooltip;
+                        }
+                        else
+                        {
+                            tooltip = mapping.defaultTooltip;
+                        }
                     }
                     mapping.action->setToolTip(tooltip);
                 }
