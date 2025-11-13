@@ -765,7 +765,6 @@ QPushButton:disabled {
     background-color: {{SECONDARY_BACKGROUND}};	
     border: 1px solid {{BUTTON_BORDER_DISABLED}};
     border-radius: 10px;
-    padding: .1em 1em .1em 1em;
 }
 
 QPushButton:default {   	
@@ -773,16 +772,15 @@ QPushButton:default {
     background-color: {{SECONDARY_BACKGROUND}};
     border: 1px solid {{BUTTON_BORDER}};
     border-radius: 10px;
-    padding: .1em 1em .1em 1em;
 }
 
-QPushButton:default:hover {      
+QPushButton:hover, QPushButton:focus {       
     background-color: {{SECONDARY_BACKGROUND}};
     border: 1px solid {{ACCENT_PRIMARY}};
     color: white;
 }
 
-QPushButton:hover {       
+QPushButton:default:hover, QPushButton:default:focus {      
     background-color: {{SECONDARY_BACKGROUND}};
     border: 1px solid {{ACCENT_PRIMARY}}; 
     color: white;

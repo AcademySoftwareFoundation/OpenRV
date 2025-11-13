@@ -765,7 +765,6 @@ QPushButton:disabled {
     background-color: rgb(43,43,43);	
     border: 1px solid rgb(60, 60, 60);
     border-radius: 10px;
-    padding: .1em 1em .1em 1em;
 }
 
 QPushButton:default {   	
@@ -773,16 +772,15 @@ QPushButton:default {
     background-color: rgb(43,43,43);
     border: 1px solid rgb(70,70,70);
     border-radius: 10px;
-    padding: .1em 1em .1em 1em;
 }
 
-QPushButton:default:hover {      
+QPushButton:hover QPushButton:focus {       
     background-color: rgb(43,43,43);
     border: 1px solid rgb(7, 75, 120);
     color: white;
 }
 
-QPushButton:hover {       
+QPushButton:default:hover QPushButton:default:focus {      
     background-color: rgb(43,43,43);
     border: 1px solid rgb(7, 75, 120); 
     color: white;
