@@ -503,16 +503,7 @@ class: ProcessInfo : Widget
     \: killProcess (void; Event ev)
     {
         State state = data();
-        
-        // Look up the process from state instead of capturing it in the closure
         ExternalProcess p = state.externalProcess;
-        
-        // Check if process is still valid (might have finished already)
-        if (p eq nil || p.isFinished())
-        {
-            redraw();
-            return;
-        }
         
         let details = if (p._cancelDetails neq nil) then p._cancelDetails else ("Do you want to quit \"%s\"?" % p._name);
         int choice = alertPanel(true, // associated panel (sheet on OSX)
