@@ -47,7 +47,6 @@
 #include <stl_ext/string_algo.h>
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/regex.hpp>
-#include <boost/functional/hash.hpp>
 #include <boost/thread.hpp>
 #include <boost/thread/mutex.hpp>
 #include <IPCore/ImageRenderer.h>
@@ -4893,23 +4892,8 @@ namespace IPCore
             // a recompute of the renderID which is a unique identifier
             // associated with the render.
 
-            // Compute hash of commands that should be in the cache
-            // This detects if any previously cached commands have been modified (e.g., in live review)
-            // Process each command's hash individually and combine them
-            boost::hash<string> string_hash;
-            size_t hashValue = 0;
-            for (size_t i = 0; i < curCmdNum - 1; ++i)
-            {
-                ostringstream hash;
-                root->commands[i]->hash(hash);
-                size_t cmdHash = string_hash(hash.str());
-                hashValue ^= cmdHash + 0x9e3779b9 + (hashValue << 6) + (hashValue >> 2);
-            }
-
-            ostringstream newRenderID;
-            string imageRenderID = root->renderIDWithPartialPaint(true /*force_recompute*/);
-            newRenderID << imageRenderID << " " << m_filter << " " << m_bgpattern << " " << fbo->width() << "x" << fbo->height()
-                        << " paintCmdNo" << curCmdNum - 1 << " hash" << hashValue;
+            newRenderID << root->renderIDWithPartialPaint(true /*force_recompute*/) << " " << m_filter << " " << m_bgpattern << " "
+                        << fbo->width() << "x" << fbo->height() << " paintCmdNo" << curCmdNum - 1;
 
             cachedFBO =
                 m_imageFBOManager.findExistingPaintFBO(fbo, newRenderID.str(), foundCachedFBO, lastCmdNum, m_fullRenderSerialNumber);
@@ -4994,7 +4978,6 @@ namespace IPCore
         paintContext.hasStencil = hasStencil;
         paintContext.stencilBox = stencil;
         paintContext.lastCommand = root->commands.back();
-        paintContext.totalCommandsInCache = startCmd;
 
         fbo->unbind();
 

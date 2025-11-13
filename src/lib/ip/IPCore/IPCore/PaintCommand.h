@@ -392,7 +392,6 @@ namespace IPCore
                 , cacheUpdated(false)
                 , lastCommand(0)
                 , commandExecuted(0)
-                , totalCommandsInCache(0)
             {
             }
 
@@ -409,7 +408,6 @@ namespace IPCore
             IPImage::PaintCommands commands;
             GLState* glState;
             size_t commandExecuted;
-            size_t totalCommandsInCache;
         };
 
         void renderPaintCommands(PaintContext&);
