@@ -739,6 +739,47 @@ operator: & (Glyph; Glyph a, Glyph b)
     inregion;
 }
 
+\: drawBlockedRegions (void; 
+                        int w,
+                        int h,
+                        int x,
+                        int y,
+                        int margin,
+                        string[] descriptors)
+{
+    let m  = margins(),
+        devicePixelRatio=devicePixelRatio(),
+        bsize = (h - m[2] - m[3]) / descriptors.size();
+
+    // Take device pixel ratio into account
+    x *= devicePixelRatio;
+    y *= devicePixelRatio;
+    margin *= devicePixelRatio;
+
+    for_index (i; descriptors)
+    {
+        gltext.size(20*devicePixelRatio);
+
+        let y0 = bsize * i + margin + m[3],
+            x0 = m[0] + margin,
+            y1 = bsize * (i+1) - margin + m[3],
+            x1 = w - margin - m[1],
+            t  = descriptors[i] + " (Blocked)",
+            b  = gltext.bounds(t),
+            tw = b[2] + b[0],
+            fg = Color(.4, .4, .4, 1),  // Gray text for disabled
+            bg = Color(0.3, 0, 0, .85);  // Dark red background
+
+        drawRoundedBox(x0, y0, x1, y1, 10, bg, fg);
+
+        // Draw text
+        gltext.color(fg);
+        gltext.writeAt((x1 - x0 - tw) * .5 + x0, 
+                       math_util.lerp(y0, y1, 0.5), 
+                       t);
+    }
+}
+
 \: wrapValue(string; string value, int wrap)
 {
     if (wrap <= 0) return value;
