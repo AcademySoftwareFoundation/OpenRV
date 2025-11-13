@@ -104,7 +104,7 @@ EXTERNALPROJECT_ADD(
 )
 
 SET(_qt_location 
-  ${RV_DEPS_QT_LOCATION}
+  ${QT_HOME}
 )
 SET(_find_qt_version 
   "Qt${RV_DEPS_QT_MAJOR}"
