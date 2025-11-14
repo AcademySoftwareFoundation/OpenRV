@@ -7,7 +7,7 @@
 INCLUDE(ProcessorCount) # require CMake 3.15+
 PROCESSORCOUNT(_cpu_count)
 
-RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_PCRE2" "pcre2-10.43" "make" "")
+RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_PCRE2" "pcre2-${RV_DEPS_PCRE2_VERSION}" "make" "")
 RV_SHOW_STANDARD_DEPS_VARIABLES()
 
 SET(_download_url
@@ -15,7 +15,7 @@ SET(_download_url
 )
 
 SET(_download_hash
-    "e4c3f2a24eb5c15bec8360e50b3f0137"
+    ${RV_DEPS_PCRE2_DOWNLOAD_HASH}
 )
 
 SET(_install_dir
