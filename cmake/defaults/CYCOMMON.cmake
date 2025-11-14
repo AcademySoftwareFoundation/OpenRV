@@ -43,6 +43,11 @@ ELSE()
     MESSAGE(FATAL_ERROR "The requested version of FFmpeg is not supported.")
 ENDIF()
 
+# gc
+# https://github.com/ivmai/bdwgc
+SET(RV_DEPS_GC_VERSION "8.2.2")
+SET(RV_DEPS_GC_DOWNLOAD_HASH "2ca38d05e1026b3426cf6c24ca3a7787")
+
 # oiio
 # https://github.com/AcademySoftwareFoundation/OpenImageIO
 SET(RV_DEPS_OIIO_VERSION "2.5.19.1")
