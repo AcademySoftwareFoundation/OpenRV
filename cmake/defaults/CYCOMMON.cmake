@@ -105,3 +105,11 @@ SET(RV_DEPS_PCRE2_DOWNLOAD_HASH "e4c3f2a24eb5c15bec8360e50b3f0137")
 SET(RV_DEPS_PNG_VERSION "1.6.48")
 SET(RV_DEPS_PNG_DOWNLOAD_HASH "be6cc9e411c26115db3b9eab1159a1d9")
 
+# raw
+# https://github.com/LibRaw/LibRaw
+# Please check the libraw_version.h file for your version number to get the LIBRAW_SHLIB_CURRENT value
+# https://github.com/LibRaw/LibRaw/blob/0.21-stable/libraw/libraw_version.h
+SET(RV_DEPS_RAW_VERSION "0.21.1")
+SET(RV_DEPS_RAW_DOWNLOAD_HASH "3ad334296a7a2c8ee841f353cc1b450b")
+SET(RV_DEPS_RAW_VERSION_LIB "23")
+
