@@ -192,6 +192,7 @@ all_mu_commands = [
     "optionsNoPackages",
     "isCurrentFrameError",
     "alertPanel",
+    "alertPanelWithCheckBox",
     "stereoSupported",
     "nodeImageGeometry",
     "nodeRangeInfo",
