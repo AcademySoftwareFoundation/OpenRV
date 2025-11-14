@@ -213,7 +213,7 @@ namespace Rv
         b->setProperty("tbstyle", QVariant(QString("left")));
         b->setProperty("tbsize", QVariant(QString("double")));
         b->setToolButtonStyle(Qt::ToolButtonIconOnly);
-        m_backPlayAction = a;
+        m_backwardPlayAction = a;
 
         a = addAction("");
         a->setIcon(QIcon(":/images/control_play.png"));
@@ -244,7 +244,7 @@ namespace Rv
 
         connect(m_backStepAction, SIGNAL(triggered()), this, SLOT(backStepTriggered()));
         connect(m_forwardStepAction, SIGNAL(triggered()), this, SLOT(forwardStepTriggered()));
-        connect(m_backPlayAction, SIGNAL(triggered()), this, SLOT(backPlayTriggered()));
+        connect(m_backwardPlayAction, SIGNAL(triggered()), this, SLOT(backPlayTriggered()));
         connect(m_forwardPlayAction, SIGNAL(triggered()), this, SLOT(forwardPlayTriggered()));
         connect(m_backMarkAction, SIGNAL(triggered()), this, SLOT(backMarkTriggered()));
         connect(m_forwardMarkAction, SIGNAL(triggered()), this, SLOT(forwardMarkTriggered()));
@@ -354,7 +354,7 @@ namespace Rv
             {m_ghostAction, IPCore::EventCategories::annotateCategory, m_ghostAction->toolTip()},
             {m_backStepAction, IPCore::EventCategories::playcontrolCategory, m_backStepAction->toolTip()},
             {m_forwardStepAction, IPCore::EventCategories::playcontrolCategory, m_forwardStepAction->toolTip()},
-            {m_backPlayAction, IPCore::EventCategories::backplayCategory, m_backPlayAction->toolTip()},
+            {m_backwardPlayAction, IPCore::EventCategories::backwardplayCategory, m_backwardPlayAction->toolTip()},
             {m_forwardPlayAction, IPCore::EventCategories::playcontrolCategory, m_forwardPlayAction->toolTip()},
             {m_playModeAction, IPCore::EventCategories::playcontrolCategory, m_playModeAction->toolTip()},
             {m_backMarkAction, IPCore::EventCategories::markCategory, m_backMarkAction->toolTip()},
@@ -417,7 +417,7 @@ namespace Rv
             }
             else if (name == "play-start")
             {
-                QToolButton* bb = dynamic_cast<QToolButton*>(widgetForAction(m_backPlayAction));
+                QToolButton* bb = dynamic_cast<QToolButton*>(widgetForAction(m_backwardPlayAction));
                 QToolButton* bf = dynamic_cast<QToolButton*>(widgetForAction(m_forwardPlayAction));
 
                 if (m_session->inc() == -1)
@@ -431,7 +431,7 @@ namespace Rv
             }
             else if (name == "play-stop")
             {
-                QToolButton* bb = dynamic_cast<QToolButton*>(widgetForAction(m_backPlayAction));
+                QToolButton* bb = dynamic_cast<QToolButton*>(widgetForAction(m_backwardPlayAction));
                 QToolButton* bf = dynamic_cast<QToolButton*>(widgetForAction(m_forwardPlayAction));
 
                 bb->setIcon(QIcon(":/images/control_bplay.png"));
@@ -806,7 +806,7 @@ namespace Rv
                 {
                     updatePlayModeButtonState();
                 }
-                else if (mapping.action == m_backPlayAction)
+                else if (mapping.action == m_backwardPlayAction)
                 {
                     bool categoryEnabled = m_session->isEventCategoryEnabled(mapping.category);
 

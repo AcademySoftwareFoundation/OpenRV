@@ -53,7 +53,7 @@ namespace IPCore
         inline constexpr std::string_view annotateSmudgeCategory = "annotate_smudge_category";
         inline constexpr std::string_view annotateSofteraseCategory = "annotate_softerase_category";
         inline constexpr std::string_view annotateTextCategory = "annotate_text_category";
-        inline constexpr std::string_view backplayCategory = "backplay_category";
+        inline constexpr std::string_view backwardplayCategory = "backwardplay_category";
         inline constexpr std::string_view clearCategory = "clear_category";
         inline constexpr std::string_view exportCategory = "export_category";
         inline constexpr std::string_view flowptCategory = "flowpt_category";
@@ -82,7 +82,7 @@ namespace IPCore
             return std::array<std::string_view, 32>{
                 annotateCategory,         annotateAirbrushCategory, annotateBurnCategory,      annotateCloneCategory,  annotateDodgeCategory,
                 annotateHarderaseCategory, annotatePenCategory,     annotateSampleCategory,    annotateSelectCategory, annotateSmudgeCategory,
-                annotateSofteraseCategory, annotateTextCategory,    backplayCategory,          clearCategory,          exportCategory,
+                annotateSofteraseCategory, annotateTextCategory,    backwardplayCategory,          clearCategory,          exportCategory,
                 flowptCategory,           helpCategory,            infoCategory,              markCategory,           mediaCategory,
                 playcontrolCategory,      playmodeLoopCategory,    playmodeOnceCategory,      playmodePingPongCategory, presentationCategory,
                 sessionmanagerCategory,   sourceCategory,          systemCategory,            screeningroomCategory,  unclassifiedCategory,

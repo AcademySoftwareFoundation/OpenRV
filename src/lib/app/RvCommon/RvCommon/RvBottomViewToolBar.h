@@ -98,7 +98,7 @@ namespace Rv
         QAction* m_ghostAction;
         QAction* m_backStepAction;
         QAction* m_forwardStepAction;
-        QAction* m_backPlayAction;
+        QAction* m_backwardPlayAction;
         QAction* m_forwardPlayAction;
         QAction* m_backMarkAction;
         QAction* m_forwardMarkAction;
