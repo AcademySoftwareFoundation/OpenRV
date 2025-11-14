@@ -69,6 +69,7 @@ SET(RV_DEPS_IMGUI_BACKEND_QT_TAG "023345ca8abf731fc50568c0197ceebe76bb4324")
 SET(RV_DEPS_IMGUI_NODE_EDITOR_TAG "dae8edccf15d19e995599ecd505e7fa1d3264a4c")
 
 # jpegturbo
+# https://github.com/libjpeg-turbo/libjpeg-turbo
 # TODO: Needs additional work in cmake/dependencies/jpegturbo.cmake
 # to fully integrate new versioning scheme with libs
 SET(RV_DEPS_JPEGTURBO_VERSION "2.1.4")
