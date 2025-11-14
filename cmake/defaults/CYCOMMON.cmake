@@ -65,6 +65,9 @@ SET(RV_DEPS_GLEW_VERSION_LIB "2.2.0")
 SET(RV_DEPS_IMGUI_VERSION "bundle_20250323")
 SET(RV_DEPS_IMGUI_DOWNLOAD_HASH "1ea3f48e9c6ae8230dac6e8a54f6e74b") 
 SET(RV_DEPS_IMPLOT_TAG "61af48ee1369083a3da391a849867af6d1b811a6")
+SET(RV_DEPS_IMGUI_BACKEND_QT_TAG "023345ca8abf731fc50568c0197ceebe76bb4324")
+SET(RV_DEPS_IMGUI_NODE_EDITOR_TAG "dae8edccf15d19e995599ecd505e7fa1d3264a4c")
+
 # jpegturbo
 # TODO: Needs additional work in cmake/dependencies/jpegturbo.cmake
 # to fully integrate new versioning scheme with libs
