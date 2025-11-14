@@ -66,6 +66,11 @@ SET(RV_DEPS_IMGUI_VERSION "bundle_20250323")
 SET(RV_DEPS_IMGUI_DOWNLOAD_HASH "1ea3f48e9c6ae8230dac6e8a54f6e74b") 
 SET(RV_DEPS_IMPLOT_TAG "61af48ee1369083a3da391a849867af6d1b811a6")
 # jpegturbo
+# TODO: Needs additional work in cmake/dependencies/jpegturbo.cmake
+# to fully integrate new versioning scheme with libs
+SET(RV_DEPS_JPEGTURBO_VERSION "2.1.4")
+SET(RV_DEPS_JPEGTURBO_DOWNLOAD_HASH "357dc26a802c34387512a42697846d16")
+SET(RV_DEPS_JPEGTURBO_VERSION_LIB "62.3.0")
 
 # oiio
 # https://github.com/AcademySoftwareFoundation/OpenImageIO
