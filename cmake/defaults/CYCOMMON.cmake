@@ -23,6 +23,24 @@ SET(RV_DEPS_DOCTEST_DOWNLOAD_HASH "a7948b5ec1f69de6f84c7d7487aaf79b")
 # https://github.com/libexpat/libexpat
 SET(RV_DEPS_EXPAT_VERSION "2.6.3")
 SET(RV_DEPS_EXPAT_DOWNLOAD_HASH "985086e206a01e652ca460eb069e4780
+# ffmpeg
+# https://github.com/FFmpeg/FFmpeg
+# TODO: cmake/dependencies/ffmpeg.cmake defines library names and 
+# will need to updated for new versions and/or
+# the logic moved here
+IF(RV_FFMPEG_8)
+    SET(RV_DEPS_FFMPEG_VERSION "n8.0")
+    SET(RV_DEPS_FFMPEG_DOWNLOAD_HASH "fcf93d5855f654b82d4aa8aae62d64d3")
+ELSEIF(RV_FFMPEG_8)
+    SET(RV_DEPS_FFMPEG_VERSION "n7.1")
+    SET(RV_DEPS_FFMPEG_DOWNLOAD_HASH "a7a85ec05c9bc3aeefee12743899d8ab")
+ELSEIF(RV_FFMPEG_8)
+    SET(RV_DEPS_FFMPEG_VERSION "n6.1.2")
+    SET(RV_DEPS_FFMPEG_DOWNLOAD_HASH "953b858e5be3ab66232bdbb90e42f50d")
+ELSE()
+  # This will happene if a valid RV_FFMPEG is not defined
+    MESSAGE(FATAL_ERROR "The requested version of FFmpeg is not supported.")
+ENDIF()
 
 # oiio
 # https://github.com/AcademySoftwareFoundation/OpenImageIO

@@ -23,34 +23,13 @@ SET(_target
     "RV_DEPS_FFMPEG"
 )
 
-IF(RV_FFMPEG_8)
-  SET(_version
-      "n8.0"
-  )
+SET(_version
+    ${RV_DEPS_FFMPEG_VERSION}
+)
 
-  SET(_download_hash
-      "fcf93d5855f654b82d4aa8aae62d64d3"
-  )
-ELSEIF(RV_FFMPEG_7)
-  SET(_version
-      "n7.1"
-  )
-
-  SET(_download_hash
-      "a7a85ec05c9bc3aeefee12743899d8ab"
-  )
-ELSEIF(RV_FFMPEG_6)
-  SET(_version
-      "n6.1.2"
-  )
-
-  SET(_download_hash
-      "953b858e5be3ab66232bdbb90e42f50d"
-  )
-ELSE()
-  # This shouldn't happen, but it could if there are changes the acceptable versions of FFmpeg in ffmpeg.cmake and this section is not updated accordingly.
-  MESSAGE(FATAL_ERROR "The requested version of FFmpeg is not supported.")
-ENDIF()
+SET(_download_hash
+    ${RV_DEPS_FFMPEG_DOWNLOAD_HASH}
+)
 
 SET(_download_url
     "https://github.com/FFmpeg/FFmpeg/archive/refs/tags/${_version}.zip"
