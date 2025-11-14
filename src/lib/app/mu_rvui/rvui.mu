@@ -6233,7 +6233,7 @@ global bool debugGC = false;
         subMenu("Control", MenuItem[] {
             menuItem("Play", "key-down-- ", "playcontrol_category", ~togglePlayFunc, playState),
             menuItem("Stop", "", "playcontrol_category", ~stopFunc, rangeState),
-            menuItem("PingPong", "key-down--P", "playcontrol_category", ~togglePingPong, pingPongState),
+            menuItem("PingPong", "key-down--P", "playmode_pingpong_category", ~togglePingPong, pingPongState),
             menuItem("Play Once", "", "playcontrol_category", ~togglePlayOnce, playOnceState),
             menuItem("Step Forward", "key-down--right", "playcontrol_category", ~stepForward1, rangeState),
             menuItem("Step Backward", "key-down--left", "playcontrol_category", ~stepBackward1, rangeState),
@@ -6253,7 +6253,7 @@ global bool debugGC = false;
                 }),
                 menuSeparator(),
                 menuItem("Play Forward", "key-down--.", "playcontrol_category", ~incN(1), forwardState),
-                menuItem("Play Backward", "key-down--,", "playcontrol_category", ~incN(-1), backwardState),
+                menuItem("Play Backward", "key-down--,", "backwardplay_category", ~incN(-1), backwardState),
                 menuSeparator(),
                 menuItem("Jump To Beginning", "key-down--home", "playcontrol_category", ~beginning, rangeState),
                 menuItem("Jump To Ending", "key-down--end", "playcontrol_category", ~ending, rangeState),
