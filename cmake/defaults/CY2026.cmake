@@ -29,11 +29,6 @@ IF(RV_VFX_PLATFORM STREQUAL "CY2026")
     SET(RV_DEPS_OCIO_VERSION_SHORT "2_5")
     SET(RV_DEPS_OCIO_DOWNLOAD_HASH "fd402ea99fd2c4e5b43ea31b4a3387df")
 
-    # OIIO
-    # https://github.com/AcademySoftwareFoundation/OpenImageIO
-    SET(RV_DEPS_OIIO_VERSION "2.5.19.1")
-    SET(RV_DEPS_OIIO_DOWNLOAD_HASH "5af6de5a73c6d234eed8e2874a5aed62")
-
     # OpenEXR
     # https://github.com/AcademySoftwareFoundation/openexr/releases
     SET(RV_DEPS_OPENEXR_VERSION "3.4.3")
