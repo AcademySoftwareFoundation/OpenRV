@@ -22,7 +22,8 @@ SET(RV_DEPS_DOCTEST_DOWNLOAD_HASH "a7948b5ec1f69de6f84c7d7487aaf79b")
 # expat
 # https://github.com/libexpat/libexpat
 SET(RV_DEPS_EXPAT_VERSION "2.6.3")
-SET(RV_DEPS_EXPAT_DOWNLOAD_HASH "985086e206a01e652ca460eb069e4780
+SET(RV_DEPS_EXPAT_DOWNLOAD_HASH "985086e206a01e652ca460eb069e4780")
+
 # ffmpeg
 # https://github.com/FFmpeg/FFmpeg
 # TODO: cmake/dependencies/ffmpeg.cmake defines library names and 
