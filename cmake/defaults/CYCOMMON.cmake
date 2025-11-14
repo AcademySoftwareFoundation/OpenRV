@@ -48,6 +48,12 @@ ENDIF()
 SET(RV_DEPS_GC_VERSION "8.2.2")
 SET(RV_DEPS_GC_DOWNLOAD_HASH "2ca38d05e1026b3426cf6c24ca3a7787")
 
+# glew
+# https://github.com/nigels-com/glew
+SET(RV_DEPS_GLEW_VERSION "e1a80a9f12d7def202d394f46e44cfced1104bfb")
+SET(RV_DEPS_GLEW_DOWNLOAD_HASH "9bfc689dabeb4e305ce80b5b6f28bcf9")  
+SET(RV_DEPS_GLEW_VERSION_LIB "2.2.0")
+
 # oiio
 # https://github.com/AcademySoftwareFoundation/OpenImageIO
 SET(RV_DEPS_OIIO_VERSION "2.5.19.1")
