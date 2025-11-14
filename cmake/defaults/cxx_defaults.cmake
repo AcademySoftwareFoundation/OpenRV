@@ -59,7 +59,7 @@ ELSE()
 ENDIF()
 
 # Set 3rd party dependency versions and hashes
-INCLUDE(CYCOMMON.cmake)
+INCLUDE(CYCOMMON)
 
 #
 # VFX Platform option
