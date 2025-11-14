@@ -32,6 +32,7 @@ namespace Rv
     NODE_DECLARATION(saveFileDialog, Mu::Pointer);
     NODE_DECLARATION(setCursor, void);
     NODE_DECLARATION(alertPanel, int);
+    NODE_DECLARATION(alertPanelWithCheckBox, Mu::Pointer);
     NODE_DECLARATION(stereoSupported, bool);
     NODE_DECLARATION(watchFile, void);
     NODE_DECLARATION(showNetworkDialog, void);

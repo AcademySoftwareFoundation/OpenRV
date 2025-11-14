@@ -14,6 +14,7 @@
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QMessageBox>
+#include <QtWidgets/QCheckBox>
 
 class QAlertPanel : public QDialog
 {
@@ -43,10 +44,13 @@ public:
     void setIcon(IconType icon);
 
     QPushButton* addButton(const QString& text, ButtonRole role);
-    QPushButton* clickedButton() const;
-    QPushButton* defaultButton() const;
-    QPushButton* rejectButton() const;
+    [[nodiscard]] QPushButton* clickedButton() const;
+    [[nodiscard]] QPushButton* defaultButton() const;
+    [[nodiscard]] QPushButton* rejectButton() const;
     QPushButton* nextPrevButton(QPushButton* fromButton, bool next) const;
+    void setCheckBoxText(const QString& text);
+    void setCheckBoxVisible(bool visible);
+    [[nodiscard]] bool isCheckBoxChecked() const;
 
     int exec() override;
 
@@ -68,6 +72,7 @@ private:
     QVBoxLayout* m_mainLayout;
     QHBoxLayout* m_buttonLayout;
     QHBoxLayout* m_contentLayout;
+    QCheckBox* m_checkBox;
 
     IconType m_iconType;
     QString m_text;

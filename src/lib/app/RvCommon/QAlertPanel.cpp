@@ -12,8 +12,18 @@
 #include <QtCore/QTimer>
 #include <QtCore/QEvent>
 #include <QtGui/QKeyEvent>
-#include <iostream>
-#include <math.h>
+#include <cmath>
+
+namespace
+{
+    QSize getRichTextSize(const QString& richText, int maxWidth)
+    {
+        QTextDocument doc;
+        doc.setHtml(richText);
+        doc.setTextWidth(maxWidth);
+        return doc.size().toSize();
+    }
+} // namespace
 
 QAlertPanel::QAlertPanel(QWidget* parent)
     : QDialog(parent)
@@ -25,6 +35,7 @@ QAlertPanel::QAlertPanel(QWidget* parent)
     , m_contentLayout(nullptr)
     , m_iconType(NoIcon)
     , m_rejectButton(nullptr)
+    , m_checkBox(nullptr)
 {
     setupUI();
 }
@@ -55,7 +66,9 @@ void QAlertPanel::setupUI()
     m_textLabel = new QLabel();
     m_textLabel->setWordWrap(true);
     m_textLabel->setAlignment(Qt::AlignTop | Qt::AlignLeft);
-    m_textLabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
+    m_textLabel->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::LinksAccessibleByMouse);
+    m_textLabel->setOpenExternalLinks(true);
+    m_textLabel->setTextFormat(Qt::RichText);
     m_textLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     m_textLabel->setFixedSize(100, 50);       // by default, 2x large as high
     m_textLabel->setFocusPolicy(Qt::NoFocus); // Prevent text from taking focus
@@ -66,6 +79,12 @@ void QAlertPanel::setupUI()
     // Button layout
     m_buttonLayout = new QHBoxLayout();
     m_buttonLayout->setSpacing(10);
+
+    // Checkbox
+    m_checkBox = new QCheckBox();
+    m_checkBox->setVisible(false);
+    m_buttonLayout->addWidget(m_checkBox);
+
     m_buttonLayout->addStretch();
     m_mainLayout->addLayout(m_buttonLayout);
 
@@ -93,7 +112,7 @@ void QAlertPanel::setIcon(IconType icon)
 
 QPushButton* QAlertPanel::addButton(const QString& text, ButtonRole role)
 {
-    QPushButton* button = new QPushButton(text);
+    auto* button = new QPushButton(text);
     button->setFocusPolicy(Qt::StrongFocus);
 
     button->setDefault(false);
@@ -137,14 +156,20 @@ QPushButton* QAlertPanel::nextPrevButton(QPushButton* fromButton, bool next) con
 {
     QList<QPushButton*> buttons = findChildren<QPushButton*>();
     if (buttons.isEmpty())
+    {
         return nullptr;
+    }
 
-    int index = buttons.indexOf(fromButton);
+    qsizetype index = buttons.indexOf(fromButton);
     if (index == -1)
+    {
         return nullptr;
+    }
 
     if (buttons.size() == 1)
+    {
         return fromButton;
+    }
 
     int newIndex = next ? (index + 1) % buttons.size() : (index - 1 + buttons.size()) % buttons.size();
 
@@ -157,7 +182,7 @@ int QAlertPanel::exec()
     adjustBestFitDimensions();
 
     // Ensure the dialog is properly centered and visible
-    if (parentWidget())
+    if (parentWidget() != nullptr)
     {
         move(parentWidget()->geometry().center() - rect().center());
     }
@@ -178,8 +203,6 @@ void QAlertPanel::adjustBestFitDimensions()
     // Calculate optimal size based on text content for nice text wrapping
     if (!m_text.isEmpty())
     {
-        // Get the text size with word wrapping at a reasonable width
-        QFontMetrics fm(m_textLabel->font());
 
         // Try different widths to find the best text wrapping
         float bestFitRatio = 1e100;
@@ -194,7 +217,7 @@ void QAlertPanel::adjustBestFitDimensions()
         // Test widths from 100 to 1000 pixels to find optimal wrapping
         for (int testWidth = 100; testWidth <= 1000; testWidth += 20)
         {
-            QRect textRect = fm.boundingRect(QRect(0, 0, testWidth, 0), Qt::TextWordWrap, m_text);
+            QSize textRect = getRichTextSize(m_text, testWidth);
 
             float fitRatio = testWidth / (float)textRect.height();
 
@@ -226,8 +249,10 @@ void QAlertPanel::onButtonClicked() { accept(); }
 
 void QAlertPanel::updateIcon()
 {
-    if (!m_iconLabel)
+    if (m_iconLabel == nullptr)
+    {
         return;
+    }
 
     QStyle* style = QApplication::style();
     QIcon icon;
@@ -257,14 +282,16 @@ bool QAlertPanel::event(QEvent* event)
 {
     if (event->type() == QEvent::KeyPress)
     {
-        QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
+        auto* keyEvent = dynamic_cast<QKeyEvent*>(event);
 
         if (keyEvent->key() == Qt::Key_Enter || keyEvent->key() == Qt::Key_Return)
         {
             event->accept();
 
-            if (defaultButton())
+            if (defaultButton() != nullptr)
+            {
                 defaultButton()->click();
+            }
 
             return true;
         }
@@ -273,8 +300,10 @@ bool QAlertPanel::event(QEvent* event)
         {
             event->accept();
 
-            if (rejectButton())
+            if (rejectButton() != nullptr)
+            {
                 rejectButton()->click();
+            }
 
             return true;
         }
@@ -287,11 +316,13 @@ bool QAlertPanel::event(QEvent* event)
 bool QAlertPanel::focusNextPrevChild(bool next)
 {
     QPushButton* defButton = defaultButton();
-    if (!defButton)
+    if (defButton == nullptr)
+    {
         return false;
+    }
 
     QPushButton* npButton = nextPrevButton(defButton, next);
-    if (npButton)
+    if (npButton != nullptr)
     {
         npButton->setFocus();
         npButton->setDefault(true);
@@ -299,4 +330,21 @@ bool QAlertPanel::focusNextPrevChild(bool next)
     return true;
 }
 
-#include "QAlertPanel.moc"
+void QAlertPanel::setCheckBoxText(const QString& text)
+{
+    if (m_checkBox != nullptr)
+    {
+        m_checkBox->setText(text);
+        m_checkBox->setVisible(!text.isEmpty());
+    }
+}
+
+void QAlertPanel::setCheckBoxVisible(bool visible)
+{
+    if (m_checkBox != nullptr)
+    {
+        m_checkBox->setVisible(visible);
+    }
+}
+
+bool QAlertPanel::isCheckBoxChecked() const { return (m_checkBox != nullptr) ? m_checkBox->isChecked() : false; }

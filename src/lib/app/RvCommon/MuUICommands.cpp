@@ -65,7 +65,7 @@
 #include <TwkUtil/sgcHop.h>
 #include <TwkUtil/User.h>
 #include <TwkUtil/File.h>
-#include <assert.h>
+#include <cassert>
 #include <RvCommon/GLView.h> // WINDOWS NEEDS THIS LAST
 // #include <RvCommon/SequenceFileEngine.h>
 #ifdef PLATFORM_WINDOWS
@@ -203,6 +203,11 @@ namespace Rv
             new Function(c, "alertPanel", alertPanel, None, Return, "int", Parameters, new Param(c, "associated", "bool"),
                          new Param(c, "type", "int"), new Param(c, "title", "string"), new Param(c, "message", "string"),
                          new Param(c, "button0", "string"), new Param(c, "button1", "string"), new Param(c, "button2", "string"), End),
+
+            new Function(c, "alertPanelWithCheckBox", alertPanelWithCheckBox, None, Return, "(int,bool)", Parameters,
+                         new Param(c, "associated", "bool"), new Param(c, "type", "int"), new Param(c, "title", "string"),
+                         new Param(c, "message", "string"), new Param(c, "button0", "string"), new Param(c, "button1", "string"),
+                         new Param(c, "button2", "string"), new Param(c, "checkBoxText", "string"), End),
 
             new Function(c, "watchFile", watchFile, None, Return, "void", Parameters, new Param(c, "filename", "string"),
                          new Param(c, "watch", "bool"), End),
@@ -949,76 +954,157 @@ namespace Rv
         rvDoc->view()->setCursor(QCursor(Qt::CursorShape(NODE_ARG(0, int))));
     }
 
-    NODE_IMPLEMENTATION(alertPanel, int)
+    struct AlertPanelResult
     {
-        Session* s = Session::currentSession();
-        RvDocument* doc = (RvDocument*)s->opaquePointer();
-        Process* p = NODE_THREAD.process();
-        bool sheet = NODE_ARG(0, bool);
-        int type = NODE_ARG(1, int);
-        const StringType::String* title = NODE_ARG_OBJECT(2, StringType::String);
-        const StringType::String* msg = NODE_ARG_OBJECT(3, StringType::String);
-        const StringType::String* b1 = NODE_ARG_OBJECT(4, StringType::String);
-        const StringType::String* b2 = NODE_ARG_OBJECT(5, StringType::String);
-        const StringType::String* b3 = NODE_ARG_OBJECT(6, StringType::String);
+        int buttonResult{-1};
+        bool isCheckBoxChecked{false};
+    };
 
-        QAlertPanel box(doc);
-        QString temp = UTF8::qconvert(title->c_str());
+    namespace
+    {
 
-        if (msg && *msg != *title)
+        AlertPanelResult showAlertPanel(RvDocument* document, bool isSheet, int type, const StringType::String* title,
+                                        const StringType::String* message, const StringType::String* button0,
+                                        const StringType::String* button1 = nullptr, const StringType::String* button2 = nullptr,
+                                        const StringType::String* checkBoxText = nullptr)
         {
-            temp += "\n\n";
-            temp += UTF8::qconvert(msg->c_str());
-        }
+            QString qTitle = (title != nullptr) ? QString::fromUtf8(title->c_str()) : QString();
+            QString qMessage = (message != nullptr) ? QString::fromUtf8(message->c_str()) : QString();
 
-        box.setWindowTitle(UTF8::qconvert(title->c_str()));
-        box.setText(temp);
-        // box.setDetailedText(QString(msg->c_str()));
+            QString displayText;
+            if (isSheet)
+            {
+                displayText = QString("<b>%1</b>").arg(qTitle);
+                if ((message != nullptr) && qTitle != qMessage)
+                {
+                    displayText += "\n\n";
+                    displayText += qMessage;
+                }
+            }
+            else
+            {
+                displayText = qMessage;
+            }
+
+            QAlertPanel box(document);
+            box.setWindowTitle(qTitle);
+            displayText.replace('\n', "<br>");
+            box.setText(displayText);
 
 #ifdef PLATFORM_DARWIN
-        if (sheet)
-            box.setWindowModality(Qt::WindowModal);
+            if (isSheet)
+            {
+                box.setWindowModality(Qt::WindowModal);
+            }
 #else
-        box.setWindowModality(Qt::WindowModal);
+            box.setWindowModality(Qt::WindowModal);
 #endif
 
-        QPushButton* q1 = box.addButton(UTF8::qconvert(b1->c_str()), QAlertPanel::AcceptRole);
-        QPushButton* q2 = b2 ? box.addButton(UTF8::qconvert(b2->c_str()), QAlertPanel::RejectRole) : 0;
-        QPushButton* q3 = b3 ? box.addButton(UTF8::qconvert(b3->c_str()), QAlertPanel::ApplyRole) : 0;
+            QPushButton* pushButton0 = nullptr;
+            QPushButton* pushButton1 = nullptr;
+            QPushButton* pushButton2 = nullptr;
 
-        switch (type)
-        {
-        case 0:
-            // Info
-            box.setIcon(QAlertPanel::Information);
-            break;
+            if (button0 != nullptr)
+            {
+                pushButton0 = box.addButton(QString::fromUtf8(button0->c_str()), QAlertPanel::AcceptRole);
+            }
+            if (button1 != nullptr)
+            {
+                pushButton1 = box.addButton(QString::fromUtf8(button1->c_str()), QAlertPanel::RejectRole);
+            }
+            if (button2 != nullptr)
+            {
+                pushButton2 = box.addButton(QString::fromUtf8(button2->c_str()), QAlertPanel::ApplyRole);
+            }
 
-        case 1:
-            // Warning
-            box.setIcon(QAlertPanel::Warning);
-            break;
+            if (checkBoxText != nullptr)
+            {
+                box.setCheckBoxText(QString::fromUtf8(checkBoxText->c_str()));
+            }
 
-        case 2:
-            // Error
-            box.setIcon(QAlertPanel::Critical);
-            break;
+            switch (type)
+            {
+            case 0:
+                // Info
+                box.setIcon(QAlertPanel::Information);
+                break;
+            case 1:
+                // Warning
+                box.setIcon(QAlertPanel::Warning);
+                break;
+            case 2:
+                // Error
+                box.setIcon(QAlertPanel::Critical);
+                break;
+            default:
+                box.setIcon(QAlertPanel::NoIcon);
+                break;
+            }
+
+            document->setDocumentDisabled(true, true);
+            box.exec();
+            document->setDocumentDisabled(false);
+
+            AlertPanelResult result{};
+            const auto* clickedButton = box.clickedButton();
+
+            if (clickedButton == pushButton0)
+            {
+                result.buttonResult = 0;
+            }
+            else if (clickedButton == pushButton1)
+            {
+                result.buttonResult = 1;
+            }
+            else if (clickedButton == pushButton2)
+            {
+                result.buttonResult = 2;
+            }
+
+            result.isCheckBoxChecked = box.isCheckBoxChecked();
+            document->view()->setFocus(Qt::OtherFocusReason);
+
+            return result;
         }
+    } // namespace
 
-        doc->setDocumentDisabled(true, true);
-        box.exec();
-        doc->setDocumentDisabled(false);
+    NODE_IMPLEMENTATION(alertPanel, int)
+    {
+        const auto* session = Session::currentSession();
+        auto* document = static_cast<RvDocument*>(session->opaquePointer());
 
-        int result = 0;
+        const bool isSheet = NODE_ARG(0, bool);
+        const int type = NODE_ARG(1, int);
+        const auto* title = NODE_ARG_OBJECT(2, StringType::String);
+        const auto* message = NODE_ARG_OBJECT(3, StringType::String);
+        const auto* button0 = NODE_ARG_OBJECT(4, StringType::String);
+        const auto* button1 = NODE_ARG_OBJECT(5, StringType::String);
+        const auto* button2 = NODE_ARG_OBJECT(6, StringType::String);
 
-        if (box.clickedButton() == q1 && b1)
-            result = 0;
-        else if (box.clickedButton() == q2 && b2)
-            result = 1;
-        else if (box.clickedButton() == q3 && b3)
-            result = 2;
+        const auto result = showAlertPanel(document, isSheet, type, title, message, button0, button1, button2);
 
-        doc->view()->setFocus(Qt::OtherFocusReason);
-        NODE_RETURN(result);
+        NODE_RETURN(result.buttonResult);
+    }
+
+    NODE_IMPLEMENTATION(alertPanelWithCheckBox, Pointer)
+    {
+        const auto* session = Session::currentSession();
+        auto* document = static_cast<RvDocument*>(session->opaquePointer());
+
+        const bool isSheet = NODE_ARG(0, bool);
+        const int type = NODE_ARG(1, int);
+        const auto* title = NODE_ARG_OBJECT(2, StringType::String);
+        const auto* message = NODE_ARG_OBJECT(3, StringType::String);
+        const auto* button0 = NODE_ARG_OBJECT(4, StringType::String);
+        const auto* button1 = NODE_ARG_OBJECT(5, StringType::String);
+        const auto* button2 = NODE_ARG_OBJECT(6, StringType::String);
+        const auto* checkBoxText = NODE_ARG_OBJECT(7, StringType::String);
+
+        const auto* tupleType = dynamic_cast<const TupleType*>(NODE_THIS.type());
+        auto* tuple = ClassInstance::allocate(tupleType);
+        *tuple->data<AlertPanelResult>() = showAlertPanel(document, isSheet, type, title, message, button0, button1, button2, checkBoxText);
+
+        NODE_RETURN(tuple);
     }
 
     NODE_IMPLEMENTATION(stereoSupported, bool)
