@@ -79,6 +79,11 @@ SET(RV_DEPS_JPEGTURBO_VERSION_LIB "62.3.0")
 # https://github.com/AcademySoftwareFoundation/OpenImageIO
 SET(RV_DEPS_OIIO_VERSION "2.5.19.1")
 SET(RV_DEPS_OIIO_DOWNLOAD_HASH "5af6de5a73c6d234eed8e2874a5aed62")
+
+# openjpeg
+SET(RV_DEPS_OPENJPEG_VERSION "2.5.0")
+SET(RV_DEPS_OPENJPEG_DOWNLOAD_HASH "5cbb822a1203dd75b85639da4f4ecaab")  
+
 # otio
 # https://github.com/AcademySoftwareFoundation/OpenTimelineIO
 SET(RV_DEPS_OTIO_VERSION "0.18.1")
