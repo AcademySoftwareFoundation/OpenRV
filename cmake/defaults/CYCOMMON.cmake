@@ -81,6 +81,7 @@ SET(RV_DEPS_OIIO_VERSION "2.5.19.1")
 SET(RV_DEPS_OIIO_DOWNLOAD_HASH "5af6de5a73c6d234eed8e2874a5aed62")
 
 # openjpeg
+# https://github.com/uclouvain/openjpeg
 SET(RV_DEPS_OPENJPEG_VERSION "2.5.0")
 SET(RV_DEPS_OPENJPEG_DOWNLOAD_HASH "5cbb822a1203dd75b85639da4f4ecaab")  
 

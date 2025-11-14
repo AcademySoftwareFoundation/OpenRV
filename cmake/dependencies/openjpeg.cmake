@@ -17,9 +17,9 @@ PROCESSORCOUNT(_cpu_count)
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_OPENJPEG" "${RV_DEPS_OPENJPEG_VERSION}" "make" "")
 
 string(REPLACE "." ";" _version_list "${_version}")
-list(GET _version_list 0 VERSION_MAJOR)
-list(GET _version_list 1 VERSION_MINOR)
-list(GET _version_list 2 VERSION_PATCH)
+list(GET _version_list 0 _version_major)
+list(GET _version_list 1 _version_minor)
+list(GET _version_list 2 _version_patch)
 
 IF(RV_TARGET_LINUX)
   # Overriding _lib_dir created in 'RV_CREATE_STANDARD_DEPS_VARIABLES' since this CMake-based project isn't using lib64
@@ -97,7 +97,7 @@ SET_PROPERTY(
 
 # It is required to force directory creation at configure time otherwise CMake complains about importing a non-existing path
 SET(_openjpeg_include_dir
-    "${_include_dir}/openjpeg-${VERSION_MAJOR}.${VERSION_MINOR}"
+    "${_include_dir}/openjpeg-${_version_major}.${_version_minor}"
 )
 FILE(MAKE_DIRECTORY "${_openjpeg_include_dir}")
 TARGET_INCLUDE_DIRECTORIES(
