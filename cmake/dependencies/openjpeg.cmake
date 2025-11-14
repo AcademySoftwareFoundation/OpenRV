@@ -16,11 +16,6 @@ PROCESSORCOUNT(_cpu_count)
 # version 2+ requires changes to IOjp2 project
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_OPENJPEG" "${RV_DEPS_OPENJPEG_VERSION}" "make" "")
 
-string(REPLACE "." ";" _version_list "${_version}")
-list(GET _version_list 0 _version_major)
-list(GET _version_list 1 _version_minor)
-list(GET _version_list 2 _version_patch)
-
 IF(RV_TARGET_LINUX)
   # Overriding _lib_dir created in 'RV_CREATE_STANDARD_DEPS_VARIABLES' since this CMake-based project isn't using lib64
   SET(_lib_dir
