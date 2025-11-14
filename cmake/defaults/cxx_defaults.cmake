@@ -58,19 +58,19 @@ ELSE()
   MESSAGE(FATAL_ERROR "Couldn't determine compiler identity")
 ENDIF()
 
+# Set 3rd party dependency versions and hashes
+INCLUDE(CYCOMMON.cmake)
+
 #
 # VFX Platform option
 #
-INCLUDE(${RV_VFX_PLATFORM})
 # Add preprocessor variable for use in the code and cmake variable to 
 # decide the version of an external dependencies based on the VFX 
 # platform. 
 #
 # Note that the macro in rv_vfx.cmake are dependant on those
 # RV_VFX_CY20XX.
-
-# Include 3rd party Dependencies
-INCLUDE(CYCOMMON.cmake)
+INCLUDE(${RV_VFX_PLATFORM})
 
 IF(RV_VFX_PLATFORM STRGREATER_EQUAL "CY2024")
   SET(RV_QT_PACKAGE_NAME
