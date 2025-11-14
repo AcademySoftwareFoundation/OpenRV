@@ -69,6 +69,9 @@ INCLUDE(${RV_VFX_PLATFORM})
 # Note that the macro in rv_vfx.cmake are dependant on those
 # RV_VFX_CY20XX.
 
+# Include 3rd party Dependencies
+INCLUDE(CYCOMMON.cmake)
+
 IF(RV_VFX_PLATFORM STRGREATER_EQUAL "CY2024")
   SET(RV_QT_PACKAGE_NAME
       "Qt6"
