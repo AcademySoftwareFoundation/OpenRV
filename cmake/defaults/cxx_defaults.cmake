@@ -87,25 +87,3 @@ ELSEIF(RV_VFX_PLATFORM STREQUAL "CY2023")
   )
 ENDIF()
 
-#
-# FFmpeg option
-#
-
-# Add preprocessor variable for use in code and cmake to determine the current version of FFmpeg. Current version must be one of the supported versions, as
-# defined in ffmpeg.cmake.
-IF(RV_FFMPEG STREQUAL 6)
-  SET(RV_FFMPEG_6
-      ON
-  )
-  ADD_COMPILE_DEFINITIONS(RV_FFMPEG_6)
-ELSEIF(RV_FFMPEG STREQUAL 7)
-  SET(RV_FFMPEG_7
-      ON
-  )
-  ADD_COMPILE_DEFINITIONS(RV_FFMPEG_7)
-ELSEIF(RV_FFMPEG STREQUAL 8)
-  SET(RV_FFMPEG_8
-      ON
-  )
-  ADD_COMPILE_DEFINITIONS(RV_FFMPEG_8)
-ENDIF()
