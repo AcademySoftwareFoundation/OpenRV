@@ -10,13 +10,7 @@
 INCLUDE(ProcessorCount) # require CMake 3.15+
 PROCESSORCOUNT(_cpu_count)
 
-RV_VFX_SET_VARIABLE(
-  _ext_dep_version
-  CY2023 "2.2.1"
-  CY2024 "2.3.2"
-)
-
-RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_OCIO" "${_ext_dep_version}" "make" "")
+RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_OCIO" "${RV_DEPS_OCIO_VERSION}" "make" "")
 RV_SHOW_STANDARD_DEPS_VARIABLES()
 
 # The folder OCIO is building its own dependencies
@@ -36,14 +30,12 @@ ELSE()
   )
 ENDIF()
 
-RV_VFX_SET_VARIABLE(
-  _download_hash
-  CY2023 "372d6982cf01818a21a12f9628701a91"
-  CY2024 "8af74fcb8c4820ab21204463a06ba490"
+SET(_download_hash
+  ${RV_DEPS_OCIO_DOWNLOAD_HASH}
 )
 
 SET(_download_url
-    "https://github.com/AcademySoftwareFoundation/OpenColorIO/archive/refs/tags/v${_version}.tar.gz"
+    "https://github.com/AcademySoftwareFoundation/OpenColorIO/archive/refs/tags/v${_version}.zip"
 )
 
 # Another project that isn't adding a debug postfix
@@ -55,10 +47,8 @@ IF(RV_TARGET_WINDOWS)
   ) # Empty out the List as it has the wrong DLL name: it doesn't have the version suffix
 
   # OpenColorIO shared library has the same name on Release and Debug.
-  RV_VFX_SET_VARIABLE(
-    _ocio_win_sharedlibname
-    CY2023 "OpenColorIO_2_2.dll"
-    CY2024 "OpenColorIO_2_3.dll"
+  SET(_ocio_win_sharedlibname
+    "OpenColorIO_${RV_DEPS_OCIO_VERSION_SHORT}.dll"
   )
 
   SET(_ocio_win_sharedlib_path
@@ -107,10 +97,11 @@ ELSE()
   )
 ENDIF()
 
-RV_VFX_SET_VARIABLE(
-  _pyocio_lib_dir
-  CY2024 "${_pyocio_lib_dir}/PyOpenColorIO"
-)
+IF(RV_VFX_PLATFORM STRGREATER_EQUAL "CY2024")
+  SET(_pyocio_lib_dir
+    "${_pyocio_lib_dir}/PyOpenColorIO"
+  )
+ENDIF()
 
 SET(_pyocio_lib
     "${_pyocio_lib_dir}/${_pyocio_libname}"
@@ -129,13 +120,14 @@ LIST(APPEND _configure_options "-DOCIO_BUILD_GPU_TESTS=OFF")
 LIST(APPEND _configure_options "-DOCIO_BUILD_PYTHON=ON") # This build PyOpenColorIO
 
 # SIMD CPU performance optimizations
+# OCIO 2.2.1 only supports SSE
 # OCIO 2.3.X can utilize SSE/AVX (Intel) and ARM NEON (Apple M chips) SIMD instructions.
-RV_VFX_SET_VARIABLE(
-  _ocio_simd_options_str
-  CY2023 "-DOCIO_USE_SSE=ON"
-  CY2024 "-DOCIO_USE_SIMD=ON"
-)
+IF(RV_VFX_CY2023)
+  SET(_ocio_simd_options_str "-DOCIO_USE_SSE=ON")
+ELSEIF( RV_VFX_PLATFORM STRGREATER_EQUAL "CY2024" )
+  SET(_ocio_simd_options_str "-DOCIO_USE_SIMD=ON")
 LIST(APPEND _configure_options "${_ocio_simd_options_str}")
+ENDIF()
 
 # Ref.: https://cmake.org/cmake/help/latest/module/FindPython.html#hints
 LIST(APPEND _configure_options "-DPython_ROOT_DIR=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install")
@@ -274,7 +266,7 @@ ELSE() # Windows
 ENDIF()
 
 SET(_ocio_stage_plugins_python_dir "${RV_STAGE_PLUGINS_PYTHON_DIR}")
-IF(RV_VFX_CY2024)
+IF( RV_VFX_PLATFORM STRGREATER_EQUAL "CY2024" )
   SET(_ocio_stage_plugins_python_dir "${_ocio_stage_plugins_python_dir}/PyOpenColorIO")
 ENDIF()
 
@@ -286,8 +278,8 @@ IF(RV_VFX_CY2023)
     COMMENT "Copying PyOpenColorIO lib into '${_ocio_stage_plugins_python_dir}'."
     COMMAND ${CMAKE_COMMAND} -E copy ${_pyocio_lib} ${_ocio_stage_plugins_python_dir}
   )
-ELSEIF(RV_VFX_CY2024)
-  # All platform
+ELSEIF( RV_VFX_PLATFORM STRGREATER_EQUAL "CY2024" )
+  # All platform CY2024 and above
   ADD_CUSTOM_COMMAND(
     TARGET ${_target}
     POST_BUILD
@@ -307,7 +299,7 @@ ADD_CUSTOM_COMMAND(
 
 IF(RV_TARGET_WINDOWS)
   SET(_rv_stage_lib_site_package_dir "${RV_STAGE_LIB_DIR}/site-packages")
-  IF(RV_VFX_CY2024)
+  IF( RV_VFX_PLATFORM STRGREATER_EQUAL "CY2024" )
     SET(_rv_stage_lib_site_package_dir "${_rv_stage_lib_site_package_dir}/PyOpenColorIO")
   ENDIF()
 

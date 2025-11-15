@@ -12,7 +12,7 @@ SET(_target
 )
 
 SET(_version
-    "7.7.0"
+    ${RV_DEPS_ATOMIC_OPS_VERSION}
 )
 
 # Download a recent version that includes the feature we need (--disable-gpl) which hasn't been released nor tagged yet.
@@ -21,7 +21,7 @@ SET(_download_url
 )
 
 SET(_download_hash
-    cc7fad1e71b3064abe1ea821ae9a9a6e
+    ${RV_DEPS_ATOMIC_OPS_DOWNLOAD_HASH}
 )
 
 SET(_install_dir

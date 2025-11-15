@@ -312,7 +312,7 @@ SET_PROPERTY(
 
 ADD_CUSTOM_COMMAND(
   OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/${_target}/generated/moc_SignalSpy.cpp
-  COMMAND ${RV_DEPS_QT5_LOCATION}/bin/moc -I ${CMAKE_CURRENT_SOURCE_DIR} -o ${CMAKE_CURRENT_SOURCE_DIR}/${_target}/generated/moc_SignalSpy.cpp
+  COMMAND ${RV_DEPS_QT_LOCATION}/bin/moc -I ${CMAKE_CURRENT_SOURCE_DIR} -o ${CMAKE_CURRENT_SOURCE_DIR}/${_target}/generated/moc_SignalSpy.cpp
           ${CMAKE_CURRENT_SOURCE_DIR}/${_target}/SignalSpy.h
   DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/SignalSpy.cpp
   COMMENT "Generating SignalSpy moc file ..."

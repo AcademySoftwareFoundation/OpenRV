@@ -8,7 +8,7 @@ SET(_target
     "maya_tools"
 )
 
-IF(RV_VFX_PLATFORM STREQUAL CY2024)
+IF(RV_VFX_PLATFORM STRGREATER_EQUAL CY2024)
   SET(MAYA_TOOLS_UPDATE_MAYA_SOURCE
       "let t = qt.QDateTime.currentDateTime().toString(\"h:mm\",  qt.QCalendar());\n"
   )

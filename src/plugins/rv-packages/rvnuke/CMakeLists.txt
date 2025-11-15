@@ -8,7 +8,7 @@ SET(_target
     "rvnuke"
 )
 
-IF(RV_VFX_PLATFORM STREQUAL CY2024)
+IF(RV_VFX_PLATFORM STRGREATER_EQUAL CY2024)
   SET(RVNUKE_MODE_CURRENT_DATE_STRING
       "return d.toLocalTime().toString(\"MMM-dd hh:mm:ss\",  qt.QCalendar());\n"
   )

@@ -7,13 +7,13 @@
 INCLUDE(ProcessorCount) # require CMake 3.15+
 PROCESSORCOUNT(_cpu_count)
 
-RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_GC" "8.2.2" "" "")
+RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_GC" "${RV_DEPS_GC_VERSION}" "" "")
 
 SET(_download_url
     "https://github.com/ivmai/bdwgc/archive/refs/tags/v${_version}.zip"
 )
 SET(_download_hash
-    "2ca38d05e1026b3426cf6c24ca3a7787"
+    ${RV_DEPS_GC_DOWNLOAD_HASH}
 )
 
 SET(_install_dir

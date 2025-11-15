@@ -20,7 +20,7 @@ SET(_target
     "QTAudioRenderer"
 )
 
-IF(RV_VFX_PLATFORM STREQUAL CY2024)
+IF(RV_VFX_PLATFORM STRGREATER_EQUAL CY2024)
   FILE(GLOB _sources QTAudioRenderer.cpp QTAudioRenderer/QTAudioRenderer.h)
 ELSEIF(RV_VFX_PLATFORM STREQUAL CY2023)
   FILE(GLOB _sources QT5AudioRenderer.cpp QTAudioRenderer/QT5AudioRenderer.h)

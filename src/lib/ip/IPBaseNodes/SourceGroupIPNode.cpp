@@ -110,7 +110,12 @@ namespace IPCore
         static regex seqRE("(^.*)\\.-?[0-9]*-?-?[0-9]*[@#%]*[0-9]*d?\\.[a-zA-Z0-9]+$");
         static regex extRE("(^.*)\\.[a-zA-Z0-9]+$");
 
-        string uiname = (m_sourceNode && m_sourceNode->numMedia() > 0) ? boost::filesystem::basename(m_sourceNode->mediaName(index)) : "";
+        string uiname =
+            (m_sourceNode && m_sourceNode->numMedia() > 0)
+                ? boost::filesystem::path(m_sourceNode->mediaName(index))
+                      .filename()
+                      .string()
+                : "";
         smatch movMatch;
 
         if (regex_search(uiname, movMatch, movRE))

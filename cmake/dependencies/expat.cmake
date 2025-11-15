@@ -11,7 +11,7 @@
 INCLUDE(ProcessorCount) # require CMake 3.15+
 PROCESSORCOUNT(_cpu_count)
 
-RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_EXPAT" "2.6.3" "" "")
+RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_EXPAT" "${RV_DEPS_EXPAT_VERSION}" "" "")
 RV_SHOW_STANDARD_DEPS_VARIABLES()
 
 
@@ -21,11 +21,11 @@ SET(_download_url
 )
 
 SET(_download_hash
-    "985086e206a01e652ca460eb069e4780"
+    ${RV_DEPS_EXPAT_DOWNLOAD_HASH}
 )
 
 SET(_libexpat_lib_version
-    "2.6.3"
+    ${RV_DEPS_EXPAT_VERSION}
 )
 
 RV_MAKE_STANDARD_LIB_NAME("libexpat" "" "SHARED" "d")

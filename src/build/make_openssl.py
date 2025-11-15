@@ -260,7 +260,7 @@ if __name__ == "__main__":
         # TODO: Note: This might not be right on Debian based platform.
         if VFX_PLATFORM == 2023:
             LIB_DIR = "lib"
-        elif VFX_PLATFORM == 2024:
+        elif VFX_PLATFORM >= 2024:
             LIB_DIR = "lib64"
 
     if args.clean:

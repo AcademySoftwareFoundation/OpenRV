@@ -1,27 +1,69 @@
 # Preparing Open RV on Windows
 
-Open RV 2025 can be built for Windows using the VFX reference platform CY2023 or CY2024, with different versions of Qt and Python.
+Open RV 2025 can be built for Windows using the [VFX reference platform](https://vfxplatform.com/).  Dependencies can be viewed in the `cmake/defaults/` folder.  eg [cmake/defaults/CY2026.cmake](https://github.com/AcademySoftwareFoundation/OpenRV/tree/main/cmake/defaults)
 
 Select your VFX reference platform by clicking on the appropriate tab. Install instructions follows.
 
+* NOTE: CY2025 and CY2026 are experimental.  Noteably CY2026 for RV is still on Qt 6.5.3 pending changes necessary for 6.8.3
+
+
 ````{tabs}
-```{code-tab} bash VFX-CY2024
-Qt                  : 6.5.3
-Python              : 3.11.9
+```{code-tab} bash VFX-CY2026
+Boost               : 1.88.0
 Cmake               : 3.31.X+
+Imath               : 3.2.2
+NumPy               : 2.3.0
+OCIO                : 2.5.0
+OpenEXR             : 3.4.3
+OpenSSL             : 3.6.0
+Python              : 3.13.9
+Qt                  : 6.8.3 ** RV Still on 6.5.3 pending work
+Visual Studio       : 2022 (MSVC v143 14.40.X)
+
+```
+```{code-tab} bash VFX-CY2025
+Boost               : 1.85.0
+Cmake               : 3.31.X+
+Imath               : 3.1.12
+NumPy               : 1.26.4
+OCIO                : 2.4.2
+OpenEXR             : 3.3.6
+OpenSSL             : 3.4.0
+Python              : 3.11.14
+Qt                  : 6.5.3
+Visual Studio       : 2022 (MSVC v143 14.40.X)
+
+```
+```{code-tab} bash VFX-CY2024
+Boost               : 1.82.0
+Cmake               : 3.31.X+
+Imath               : 3.1.12
+NumPy               : 1.24.4
+OCIO                : 2.3.2
+OpenEXR             : 3.2.5
+OpenSSL             : 3.4.0
+Python              : 3.11.14
+Qt                  : 6.5.3
 Visual Studio       : 2022 (MSVC v143 14.40.X)
 
 ```
 ```{code-tab} bash VFX-CY2023
-Qt                  : 5.15.2
-Python              : 3.10.13
-Cmake               : 3.27.X+
+Boost               : 1.80
+Cmake               : 3.31.7
+Imath               : 3.1.12
+NumPy               : 1.23.5
+OCIO                : 2.2.1
+OpenEXR             : 3.1.13
+OpenSSL             : 1.1.1u
+Python              : 3.10.18
+Qt                  : 5.15.18
 Visual Studio       : 2022 (MSVC v143 14.40.X)
 
 ```
 ````
 
 All other dependencies are shared across variations.
+
 
 ## Summary
 

@@ -7,7 +7,7 @@
 INCLUDE(ProcessorCount) # require CMake 3.15+
 PROCESSORCOUNT(_cpu_count)
 
-RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_AJA" "17.1.0" "make" "")
+RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_AJA" "${RV_DEPS_AJA_VERSION}" "make" "")
 RV_SHOW_STANDARD_DEPS_VARIABLES()
 
 STRING(REPLACE "." "_" _version_with_underscore ${_version})
@@ -17,7 +17,7 @@ SET(_download_url
 )
 
 SET(_download_hash
-    "b9d189f77e18dbdff7c39a339b1a5dd4"
+    "${RV_DEPS_AJA_DOWNLOAD_HASH}"
 )
 
 IF(RV_TARGET_WINDOWS)

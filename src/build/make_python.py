@@ -824,7 +824,7 @@ if __name__ == "__main__":
         # TODO: Note: This might not be right on Debian based platform.
         if VFX_PLATFORM == 2023:
             LIB_DIR = "lib"
-        elif VFX_PLATFORM == 2024:
+        elif VFX_PLATFORM >= 2024:
             LIB_DIR = "lib64"
 
     if platform.system() == "Windows":
@@ -844,5 +844,5 @@ if __name__ == "__main__":
         # functions because it will be easier to drop the support for a VFX platform.
         if VFX_PLATFORM == 2023:
             install_python_vfx2023()
-        elif VFX_PLATFORM == 2024:
+        elif VFX_PLATFORM >= 2024:
             install_python_vfx2024()

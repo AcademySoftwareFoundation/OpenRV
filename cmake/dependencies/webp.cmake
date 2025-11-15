@@ -16,7 +16,7 @@ INCLUDE(ProcessorCount) # require CMake 3.15+
 PROCESSORCOUNT(_cpu_count)
 
 # OpenImageIO was tested up to 1.2.1
-RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_WEBP" "1.2.1" "make" "")
+RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_WEBP" "${RV_DEPS_WEBP_VERSION}" "make" "")
 RV_SHOW_STANDARD_DEPS_VARIABLES()
 
 SET(_download_url
@@ -24,7 +24,7 @@ SET(_download_url
 )
 
 SET(_download_hash
-    "ef5ac6de4b800afaebeb10df9ef189b2"
+    ${RV_DEPS_WEBP_DOWNLOAD_HASH}
 )
 
 IF(RV_TARGET_DARWIN

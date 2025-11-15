@@ -12,14 +12,14 @@ SET(_target
 )
 
 SET(_version
-    "1.4.3"
+    ${RV_DEPS_DAV1D_VERSION}
 )
 
 SET(_download_url
     "https://github.com/videolan/dav1d/archive/refs/tags/${_version}.zip"
 )
 SET(_download_hash
-    "2c62106fda87a69122dc8709243a34e8"
+    ${RV_DEPS_DAV1D_DOWNLOAD_HASH}
 )
 
 SET(_install_dir

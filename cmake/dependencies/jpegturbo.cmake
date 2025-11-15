@@ -7,18 +7,18 @@
 INCLUDE(ProcessorCount) # require CMake 3.15+
 PROCESSORCOUNT(_cpu_count)
 
-RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_JPEGTURBO" "2.1.4" "" "")
+RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_JPEGTURBO" "${RV_DEPS_JPEGTURBO_VERSION}" "" "")
 
 SET(_download_url
     "https://github.com/libjpeg-turbo/libjpeg-turbo/archive/refs/tags/${_version}.tar.gz"
 )
 
 SET(_download_hash
-    "357dc26a802c34387512a42697846d16"
+    ${RV_DEPS_JPEGTURBO_DOWNLOAD_HASH}
 )
 
 # CMake is not generating debug postfix for JpegTurbo
-RV_MAKE_STANDARD_LIB_NAME("jpeg" "62.3.0" "SHARED" "")
+RV_MAKE_STANDARD_LIB_NAME("jpeg" "${RV_DEPS_JPEGTURBO_VERSION_LIB}" "SHARED" "")
 SET(_winlibjpegname
     jpeg62.dll
 )

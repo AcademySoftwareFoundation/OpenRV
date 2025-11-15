@@ -9,14 +9,14 @@ SET(_target
 )
 
 SET(_version
-    "v2.4.9"
+    ${RV_DEPS_DOCTEST_VERSION}
 )
 
 SET(_download_url
-    "https://github.com/doctest/doctest/archive/refs/tags/${_version}.tar.gz"
+    "https://github.com/doctest/doctest/archive/refs/tags/v${_version}.tar.gz"
 )
 SET(_download_hash
-    "a7948b5ec1f69de6f84c7d7487aaf79b"
+    ${RV_DEPS_DOCTEST_DOWNLOAD_HASH}
 )
 
 SET(_install_dir

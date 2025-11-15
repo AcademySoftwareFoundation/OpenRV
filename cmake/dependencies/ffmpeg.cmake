@@ -23,34 +23,13 @@ SET(_target
     "RV_DEPS_FFMPEG"
 )
 
-IF(RV_FFMPEG_8)
-  SET(_version
-      "n8.0"
-  )
+SET(_version
+    ${RV_DEPS_FFMPEG_VERSION}
+)
 
-  SET(_download_hash
-      "fcf93d5855f654b82d4aa8aae62d64d3"
-  )
-ELSEIF(RV_FFMPEG_7)
-  SET(_version
-      "n7.1"
-  )
-
-  SET(_download_hash
-      "a7a85ec05c9bc3aeefee12743899d8ab"
-  )
-ELSEIF(RV_FFMPEG_6)
-  SET(_version
-      "n6.1.2"
-  )
-
-  SET(_download_hash
-      "953b858e5be3ab66232bdbb90e42f50d"
-  )
-ELSE()
-  # This shouldn't happen, but it could if there are changes the acceptable versions of FFmpeg in ffmpeg.cmake and this section is not updated accordingly.
-  MESSAGE(FATAL_ERROR "The requested version of FFmpeg is not supported.")
-ENDIF()
+SET(_download_hash
+    ${RV_DEPS_FFMPEG_DOWNLOAD_HASH}
+)
 
 SET(_download_url
     "https://github.com/FFmpeg/FFmpeg/archive/refs/tags/${_version}.zip"
@@ -87,159 +66,54 @@ ELSE()
   )
 ENDIF()
 
-IF(RV_FFMPEG_8)
-  IF(RV_TARGET_DARWIN)
-    SET(_ffmpeg_avutil_lib_name
-        ${CMAKE_SHARED_LIBRARY_PREFIX}avutil.60${CMAKE_SHARED_LIBRARY_SUFFIX}
-    )
-    SET(_ffmpeg_swresample_lib_name
-        ${CMAKE_SHARED_LIBRARY_PREFIX}swresample.6${CMAKE_SHARED_LIBRARY_SUFFIX}
-    )
-    SET(_ffmpeg_swscale_lib_name
-        ${CMAKE_SHARED_LIBRARY_PREFIX}swscale.9${CMAKE_SHARED_LIBRARY_SUFFIX}
-    )
-    SET(_ffmpeg_avcodec_lib_name
-        ${CMAKE_SHARED_LIBRARY_PREFIX}avcodec.62${CMAKE_SHARED_LIBRARY_SUFFIX}
-    )
-    SET(_ffmpeg_avformat_lib_name
-        ${CMAKE_SHARED_LIBRARY_PREFIX}avformat.62${CMAKE_SHARED_LIBRARY_SUFFIX}
-    )
-  ELSEIF(RV_TARGET_LINUX)
-    SET(_ffmpeg_avutil_lib_name
-        ${CMAKE_SHARED_LIBRARY_PREFIX}avutil${CMAKE_SHARED_LIBRARY_SUFFIX}.60
-    )
-    SET(_ffmpeg_swresample_lib_name
-        ${CMAKE_SHARED_LIBRARY_PREFIX}swresample${CMAKE_SHARED_LIBRARY_SUFFIX}.6
-    )
-    SET(_ffmpeg_swscale_lib_name
-        ${CMAKE_SHARED_LIBRARY_PREFIX}swscale${CMAKE_SHARED_LIBRARY_SUFFIX}.9
-    )
-    SET(_ffmpeg_avcodec_lib_name
-        ${CMAKE_SHARED_LIBRARY_PREFIX}avcodec${CMAKE_SHARED_LIBRARY_SUFFIX}.62
-    )
-    SET(_ffmpeg_avformat_lib_name
-        ${CMAKE_SHARED_LIBRARY_PREFIX}avformat${CMAKE_SHARED_LIBRARY_SUFFIX}.62
-    )
-  ELSEIF(RV_TARGET_WINDOWS)
-    SET(_ffmpeg_avutil_lib_name
-        ${CMAKE_SHARED_LIBRARY_PREFIX}avutil-60${CMAKE_SHARED_LIBRARY_SUFFIX}
-    )
-    SET(_ffmpeg_swresample_lib_name
-        ${CMAKE_SHARED_LIBRARY_PREFIX}swresample-6${CMAKE_SHARED_LIBRARY_SUFFIX}
-    )
-    SET(_ffmpeg_swscale_lib_name
-        ${CMAKE_SHARED_LIBRARY_PREFIX}swscale-9${CMAKE_SHARED_LIBRARY_SUFFIX}
-    )
-    SET(_ffmpeg_avcodec_lib_name
-        ${CMAKE_SHARED_LIBRARY_PREFIX}avcodec-62${CMAKE_SHARED_LIBRARY_SUFFIX}
-    )
-    SET(_ffmpeg_avformat_lib_name
-        ${CMAKE_SHARED_LIBRARY_PREFIX}avformat-62${CMAKE_SHARED_LIBRARY_SUFFIX}
-    )
-  ENDIF()
-ELSEIF(RV_FFMPEG_7)
-  IF(RV_TARGET_DARWIN)
-    SET(_ffmpeg_avutil_lib_name
-        ${CMAKE_SHARED_LIBRARY_PREFIX}avutil.59${CMAKE_SHARED_LIBRARY_SUFFIX}
-    )
-    SET(_ffmpeg_swresample_lib_name
-        ${CMAKE_SHARED_LIBRARY_PREFIX}swresample.5${CMAKE_SHARED_LIBRARY_SUFFIX}
-    )
-    SET(_ffmpeg_swscale_lib_name
-        ${CMAKE_SHARED_LIBRARY_PREFIX}swscale.8${CMAKE_SHARED_LIBRARY_SUFFIX}
-    )
-    SET(_ffmpeg_avcodec_lib_name
-        ${CMAKE_SHARED_LIBRARY_PREFIX}avcodec.61${CMAKE_SHARED_LIBRARY_SUFFIX}
-    )
-    SET(_ffmpeg_avformat_lib_name
-        ${CMAKE_SHARED_LIBRARY_PREFIX}avformat.61${CMAKE_SHARED_LIBRARY_SUFFIX}
-    )
-  ELSEIF(RV_TARGET_LINUX)
-    SET(_ffmpeg_avutil_lib_name
-        ${CMAKE_SHARED_LIBRARY_PREFIX}avutil${CMAKE_SHARED_LIBRARY_SUFFIX}.59
-    )
-    SET(_ffmpeg_swresample_lib_name
-        ${CMAKE_SHARED_LIBRARY_PREFIX}swresample${CMAKE_SHARED_LIBRARY_SUFFIX}.5
-    )
-    SET(_ffmpeg_swscale_lib_name
-        ${CMAKE_SHARED_LIBRARY_PREFIX}swscale${CMAKE_SHARED_LIBRARY_SUFFIX}.8
-    )
-    SET(_ffmpeg_avcodec_lib_name
-        ${CMAKE_SHARED_LIBRARY_PREFIX}avcodec${CMAKE_SHARED_LIBRARY_SUFFIX}.61
-    )
-    SET(_ffmpeg_avformat_lib_name
-        ${CMAKE_SHARED_LIBRARY_PREFIX}avformat${CMAKE_SHARED_LIBRARY_SUFFIX}.61
-    )
-  ELSEIF(RV_TARGET_WINDOWS)
-    SET(_ffmpeg_avutil_lib_name
-        ${CMAKE_SHARED_LIBRARY_PREFIX}avutil-59${CMAKE_SHARED_LIBRARY_SUFFIX}
-    )
-    SET(_ffmpeg_swresample_lib_name
-        ${CMAKE_SHARED_LIBRARY_PREFIX}swresample-5${CMAKE_SHARED_LIBRARY_SUFFIX}
-    )
-    SET(_ffmpeg_swscale_lib_name
-        ${CMAKE_SHARED_LIBRARY_PREFIX}swscale-8${CMAKE_SHARED_LIBRARY_SUFFIX}
-    )
-    SET(_ffmpeg_avcodec_lib_name
-        ${CMAKE_SHARED_LIBRARY_PREFIX}avcodec-61${CMAKE_SHARED_LIBRARY_SUFFIX}
-    )
-    SET(_ffmpeg_avformat_lib_name
-        ${CMAKE_SHARED_LIBRARY_PREFIX}avformat-61${CMAKE_SHARED_LIBRARY_SUFFIX}
-    )
-  ENDIF()
-ELSEIF(RV_FFMPEG_6)
-  IF(RV_TARGET_DARWIN)
-    SET(_ffmpeg_avutil_lib_name
-        ${CMAKE_SHARED_LIBRARY_PREFIX}avutil.58${CMAKE_SHARED_LIBRARY_SUFFIX}
-    )
-    SET(_ffmpeg_swresample_lib_name
-        ${CMAKE_SHARED_LIBRARY_PREFIX}swresample.4${CMAKE_SHARED_LIBRARY_SUFFIX}
-    )
-    SET(_ffmpeg_swscale_lib_name
-        ${CMAKE_SHARED_LIBRARY_PREFIX}swscale.7${CMAKE_SHARED_LIBRARY_SUFFIX}
-    )
-    SET(_ffmpeg_avcodec_lib_name
-        ${CMAKE_SHARED_LIBRARY_PREFIX}avcodec.60${CMAKE_SHARED_LIBRARY_SUFFIX}
-    )
-    SET(_ffmpeg_avformat_lib_name
-        ${CMAKE_SHARED_LIBRARY_PREFIX}avformat.60${CMAKE_SHARED_LIBRARY_SUFFIX}
-    )
-  ELSEIF(RV_TARGET_LINUX)
-    SET(_ffmpeg_avutil_lib_name
-        ${CMAKE_SHARED_LIBRARY_PREFIX}avutil${CMAKE_SHARED_LIBRARY_SUFFIX}.58
-    )
-    SET(_ffmpeg_swresample_lib_name
-        ${CMAKE_SHARED_LIBRARY_PREFIX}swresample${CMAKE_SHARED_LIBRARY_SUFFIX}.4
-    )
-    SET(_ffmpeg_swscale_lib_name
-        ${CMAKE_SHARED_LIBRARY_PREFIX}swscale${CMAKE_SHARED_LIBRARY_SUFFIX}.7
-    )
-    SET(_ffmpeg_avcodec_lib_name
-        ${CMAKE_SHARED_LIBRARY_PREFIX}avcodec${CMAKE_SHARED_LIBRARY_SUFFIX}.60
-    )
-    SET(_ffmpeg_avformat_lib_name
-        ${CMAKE_SHARED_LIBRARY_PREFIX}avformat${CMAKE_SHARED_LIBRARY_SUFFIX}.60
-    )
-  ELSEIF(RV_TARGET_WINDOWS)
-    SET(_ffmpeg_avutil_lib_name
-        ${CMAKE_SHARED_LIBRARY_PREFIX}avutil-58${CMAKE_SHARED_LIBRARY_SUFFIX}
-    )
-    SET(_ffmpeg_swresample_lib_name
-        ${CMAKE_SHARED_LIBRARY_PREFIX}swresample-4${CMAKE_SHARED_LIBRARY_SUFFIX}
-    )
-    SET(_ffmpeg_swscale_lib_name
-        ${CMAKE_SHARED_LIBRARY_PREFIX}swscale-7${CMAKE_SHARED_LIBRARY_SUFFIX}
-    )
-    SET(_ffmpeg_avcodec_lib_name
-        ${CMAKE_SHARED_LIBRARY_PREFIX}avcodec-60${CMAKE_SHARED_LIBRARY_SUFFIX}
-    )
-    SET(_ffmpeg_avformat_lib_name
-        ${CMAKE_SHARED_LIBRARY_PREFIX}avformat-60${CMAKE_SHARED_LIBRARY_SUFFIX}
-    )
-  ENDIF()
-ELSE()
-  # This shouldn't happen. But it could if there are changes the acceptable versions of FFmpeg in ffmpeg.cmake and this section is not updated accordingly.
-  MESSAGE(FATAL_ERROR "The requested version of FFmpeg is not supported.")
+IF(RV_TARGET_DARWIN)
+  SET(_ffmpeg_avutil_lib_name
+      ${CMAKE_SHARED_LIBRARY_PREFIX}avutil.${RV_DEPS_FFMPEG_VERSION_LIB_avutil}${CMAKE_SHARED_LIBRARY_SUFFIX}
+  )
+  SET(_ffmpeg_swresample_lib_name
+      ${CMAKE_SHARED_LIBRARY_PREFIX}swresample.${RV_DEPS_FFMPEG_VERSION_LIB_swresample}${CMAKE_SHARED_LIBRARY_SUFFIX}
+  )
+  SET(_ffmpeg_swscale_lib_name
+      ${CMAKE_SHARED_LIBRARY_PREFIX}swscale.${RV_DEPS_FFMPEG_VERSION_LIB_swscale}${CMAKE_SHARED_LIBRARY_SUFFIX}
+  )
+  SET(_ffmpeg_avcodec_lib_name
+      ${CMAKE_SHARED_LIBRARY_PREFIX}avcodec.${RV_DEPS_FFMPEG_VERSION_LIB_avcodec}${CMAKE_SHARED_LIBRARY_SUFFIX}
+  )
+  SET(_ffmpeg_avformat_lib_name
+      ${CMAKE_SHARED_LIBRARY_PREFIX}avformat.${RV_DEPS_FFMPEG_VERSION_LIB_avformat}${CMAKE_SHARED_LIBRARY_SUFFIX}
+  )
+ELSEIF(RV_TARGET_LINUX)
+  SET(_ffmpeg_avutil_lib_name
+      ${CMAKE_SHARED_LIBRARY_PREFIX}avutil${CMAKE_SHARED_LIBRARY_SUFFIX}.${RV_DEPS_FFMPEG_VERSION_LIB_avutil}
+  )
+  SET(_ffmpeg_swresample_lib_name
+      ${CMAKE_SHARED_LIBRARY_PREFIX}swresample${CMAKE_SHARED_LIBRARY_SUFFIX}.${RV_DEPS_FFMPEG_VERSION_LIB_swresample}
+  )
+  SET(_ffmpeg_swscale_lib_name
+      ${CMAKE_SHARED_LIBRARY_PREFIX}swscale${CMAKE_SHARED_LIBRARY_SUFFIX}.${RV_DEPS_FFMPEG_VERSION_LIB_swscale}
+  )
+  SET(_ffmpeg_avcodec_lib_name
+      ${CMAKE_SHARED_LIBRARY_PREFIX}avcodec${CMAKE_SHARED_LIBRARY_SUFFIX}.${RV_DEPS_FFMPEG_VERSION_LIB_avcodec}
+  )
+  SET(_ffmpeg_avformat_lib_name
+      ${CMAKE_SHARED_LIBRARY_PREFIX}avformat${CMAKE_SHARED_LIBRARY_SUFFIX}.${RV_DEPS_FFMPEG_VERSION_LIB_avformat}
+  )
+ELSEIF(RV_TARGET_WINDOWS)
+  SET(_ffmpeg_avutil_lib_name
+      ${CMAKE_SHARED_LIBRARY_PREFIX}avutil-${RV_DEPS_FFMPEG_VERSION_LIB_avutil}${CMAKE_SHARED_LIBRARY_SUFFIX}
+  )
+  SET(_ffmpeg_swresample_lib_name
+      ${CMAKE_SHARED_LIBRARY_PREFIX}swresample-${RV_DEPS_FFMPEG_VERSION_LIB_swresample}${CMAKE_SHARED_LIBRARY_SUFFIX}
+  )
+  SET(_ffmpeg_swscale_lib_name
+      ${CMAKE_SHARED_LIBRARY_PREFIX}swscale-${RV_DEPS_FFMPEG_VERSION_LIB_swscale}${CMAKE_SHARED_LIBRARY_SUFFIX}
+  )
+  SET(_ffmpeg_avcodec_lib_name
+      ${CMAKE_SHARED_LIBRARY_PREFIX}avcodec-${RV_DEPS_FFMPEG_VERSION_LIB_avcodec}${CMAKE_SHARED_LIBRARY_SUFFIX}
+  )
+  SET(_ffmpeg_avformat_lib_name
+      ${CMAKE_SHARED_LIBRARY_PREFIX}avformat-${RV_DEPS_FFMPEG_VERSION_LIB_avformat}${CMAKE_SHARED_LIBRARY_SUFFIX}
+  )
 ENDIF()
 
 SET(_ffmpeg_libs
