@@ -13,7 +13,7 @@ SET(_version
 )
 
 SET(_download_url
-    "https://github.com/doctest/doctest/archive/refs/tags/${_version}.tar.gz"
+    "https://github.com/doctest/doctest/archive/refs/tags/v${_version}.tar.gz"
 )
 SET(_download_hash
     ${RV_DEPS_DOCTEST_DOWNLOAD_HASH}
