@@ -472,6 +472,19 @@ jobs:
         with:
           cmake-version: "${{ matrix.cmake-version }}"
 
+      - name: Activate Python ${{ matrix.python-version }}
+        uses: actions/setup-python@f677139bbe7f9c59b41e40162b753c062f5d49a3 # 5.2.0
+        with:
+          python-version: '${{ matrix.python-version }}'
+
+      - name: Install Python packages for Qt installation
+        run: |
+          python3 -m pip install --user --upgrade setuptools py7zr==1.0.*
+
+      - name: Install Python dependencies
+        run: |
+          python3 -m pip install --user --upgrade -r requirements.txt
+          
       - name: Prepare Qt folder
         run: |
           mkdir -p "${{ github.workspace }}/deps"
@@ -524,19 +537,6 @@ jobs:
           curl -o file.zip https://codereview.qt-project.org/changes/qt%2Fqtbase~503172/revisions/3/files/mkspecs%2Ffeatures%2Ftoolchain.prf/download
           unzip file.zip
           cp $(unzip -l file.zip | awk 'NR==4 {print $4}') ${{ github.workspace }}/deps/Qt/${{ matrix.qt-version }}/clang_64/mkspecs/features/toolchain.prf
-
-      - name: Activate Python ${{ matrix.python-version }}
-        uses: actions/setup-python@f677139bbe7f9c59b41e40162b753c062f5d49a3 # 5.2.0
-        with:
-          python-version: '${{ matrix.python-version }}'
-
-      - name: Install Python packages for Qt installation
-        run: |
-          python3 -m pip install --user --upgrade setuptools py7zr==1.0.*
-
-      - name: Install Python dependencies
-        run: |
-          python3 -m pip install --user --upgrade -r requirements.txt
   
       - name: Install Homebrew dependencies
         # icu4c is needed for Qt UIC executable / AUTOUIC.
