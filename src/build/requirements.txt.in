@@ -13,7 +13,7 @@ PyOpenGL                # License: BSD License (BSD)
 
 # PyOpenGL_accelerate as issue with native arm64 build on MacOS.
 # Use PyOpenGL_accelerate only on x86_64 platform.
-PyOpenGL_accelerate ; (platform_system=='Windows' or platform_system=='Linux') and platform_machine=='x86_64' # License: BSD License (BSD)
+PyOpenGL_accelerate ; platform_machine=='x86_64' # License: BSD License (BSD)
 
 # Those are installed by the src/build/make_python.py script, adding them here to list their licenses.
 
