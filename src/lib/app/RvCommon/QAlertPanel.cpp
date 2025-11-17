@@ -12,6 +12,7 @@
 #include <QtCore/QTimer>
 #include <QtCore/QEvent>
 #include <QtGui/QKeyEvent>
+#include <QTextDocument> // Needed for Qt5
 #include <cmath>
 
 namespace
