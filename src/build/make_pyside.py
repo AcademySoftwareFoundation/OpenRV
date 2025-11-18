@@ -107,9 +107,10 @@ def prepare() -> None:
             elif major_minor_version_str == "15.0":
                 return "15.0.0-based-macos-universal.7z"
             elif major_version >= 16:
-                # For clang 16.0+, use 15.0.0 headers which are more compatible with PySide2
-                # PySide2 5.15.x has code generation issues with clang 17+ headers
-                return "15.0.0-based-macos-universal.7z"
+                # For clang 16.0+, use 14.0.3 headers which are more compatible with PySide2
+                # PySide2 5.15.x built with C++11 has issues with newer libclang headers
+                # and macOS 15+ SDK libc++. Clang 14.0 provides better C++11 compatibility.
+                return "14.0.3-based-macos-universal.7z"
             return None
 
         clang_version = get_clang_version()
