@@ -236,6 +236,17 @@ def build() -> None:
     python_home = PYTHON_OUTPUT_DIR
     python_interpreter_args = get_python_interpreter_args(python_home, VARIANT)
 
+    # Force C++14 on macOS 15+ since the SDK no longer supports C++11
+    # PySide2 5.15.x defaults to C++11, but Qt 5.15 supports C++14
+    if platform.system() == "Darwin":
+        # Override the C++ standard to C++14 for compatibility with modern macOS SDKs
+        existing_cxxflags = os.environ.get("CXXFLAGS", "")
+        if existing_cxxflags:
+            os.environ["CXXFLAGS"] = f"{existing_cxxflags} -std=gnu++14"
+        else:
+            os.environ["CXXFLAGS"] = "-std=gnu++14"
+        print(f"Setting CXXFLAGS={os.environ['CXXFLAGS']} to force C++14 for macOS SDK compatibility")
+
     pyside_build_args = python_interpreter_args + [
         os.path.join(SOURCE_DIR, "setup.py"),
         "install",
