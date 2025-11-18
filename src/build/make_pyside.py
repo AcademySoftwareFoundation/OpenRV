@@ -101,12 +101,15 @@ def prepare() -> None:
 
         def get_fallback_clang_filename_suffix(version):
             major_minor_version_str = ".".join(version[:2])
+            major_version = int(version[0])
             if major_minor_version_str == "14.0":
                 return "14.0.3-based-macos-universal.7z"
             elif major_minor_version_str == "15.0":
                 return "15.0.0-based-macos-universal.7z"
-            elif major_minor_version_str == "17.0":
-                return "17.0.1-based-macos-universal.7z"
+            elif major_version >= 16:
+                # For clang 16.0+, use 15.0.0 headers which are more compatible with PySide2
+                # PySide2 5.15.x has code generation issues with clang 17+ headers
+                return "15.0.0-based-macos-universal.7z"
             return None
 
         clang_version = get_clang_version()
