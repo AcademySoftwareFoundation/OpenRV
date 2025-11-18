@@ -297,6 +297,13 @@ int main(int argc, char* argv[])
     // Device.
     QApplication::setAttribute(Qt::AA_DontCheckOpenGLContextThreadAffinity);
 
+    // On macOS, ensure that the widget-based implementation is used instead of the native dialog.
+    // Rationale:
+    // - This prevents this Tahoe specific Qt bug (dialog buttons not clickable on macOS 26 Tahoe) :
+    // https://github.com/PCSX2/pcsx2/issues/13216
+    // - This will make RV more future proof when newer macOS versions are released
+    QApplication::setAttribute(Qt::AA_DontUseNativeDialogs);
+
     // Now supporting high DPI displays by default
     // Setting the following environment variable, disable the high DPI support
     const bool noHighDPISupport = getenv("RV_NO_QT_HDPI_SUPPORT") != nullptr;
