@@ -80,16 +80,40 @@ def prepare() -> None:
     # But clang 8 headers are not compatible with Mac SDK 13.3+ headers.
     # To workaround it, since Mac is clang-based, we'll detect the OS clang
     # version and download the matching headers to build PySide.
+    print("Setting up Clang...")
     clang_filename_suffix = ""
+    fallback_clang_filename_suffix = None
 
     system = platform.system()
     if system == "Darwin":
-        clang_version_search = re.search(
-            "version (\d+)\.(\d+)\.(\d+)",
-            os.popen("clang --version").read(),
-        )
-        clang_version_str = ".".join(clang_version_search.groups())
-        clang_filename_suffix = clang_version_str + "-based-macos-universal.7z"
+
+        def get_clang_version():
+            version_output = os.popen("clang --version").read()
+            version_search = re.search(r"version (\d+)\.(\d+)\.(\d+)", version_output)
+            if version_search:
+                return version_search.groups()
+            print("ERROR: Could not extract clang --version")
+            return None
+
+        def get_clang_filename_suffix(version):
+            version_str = ".".join(version)
+            return f"{version_str}-based-macos-universal.7z"
+
+        def get_fallback_clang_filename_suffix(version):
+            major_minor_version_str = ".".join(version[:2])
+            if major_minor_version_str == "14.0":
+                return "14.0.3-based-macos-universal.7z"
+            elif major_minor_version_str == "15.0":
+                return "15.0.0-based-macos-universal.7z"
+            elif major_minor_version_str == "17.0":
+                return "17.0.1-based-macos-universal.7z"
+            return None
+
+        clang_version = get_clang_version()
+        if clang_version:
+            clang_filename_suffix = get_clang_filename_suffix(clang_version)
+            fallback_clang_filename_suffix = get_fallback_clang_filename_suffix(clang_version)
+
     elif system == "Linux":
         clang_filename_suffix = "80-based-linux-Rhel7.2-gcc5.3-x86_64.7z"
     elif system == "Windows":
@@ -97,13 +121,22 @@ def prepare() -> None:
 
     download_url = LIBCLANG_URL_BASE + clang_filename_suffix
     libclang_zip = os.path.join(TEMP_DIR, "libclang.7z")
-    if os.path.exists(libclang_zip) is False:
-        download_file(download_url, libclang_zip)
+
     # if we have a failed download, clean it up and redownload.
     # checking for False since it can return None when archive doesn't have a CRC
-    elif verify_7z_archive(libclang_zip) is False:
+    if os.path.exists(libclang_zip) and verify_7z_archive(libclang_zip) is False:
         os.remove(libclang_zip)
-        download_file(download_url, libclang_zip)
+
+    # download it if necessary
+    if os.path.exists(libclang_zip) is False:
+        download_ok = download_file(download_url, libclang_zip)
+        if not download_ok and fallback_clang_filename_suffix:
+            fallback_download_url = LIBCLANG_URL_BASE + fallback_clang_filename_suffix
+            print(f"WARNING: Could not download or version does not exist: {download_url}")
+            print(f"WARNING: Attempting to fallback on known version: {fallback_download_url}...")
+            download_ok = download_file(fallback_download_url, libclang_zip)
+        if not download_ok:
+            print(f"ERROR: Could not download or version does not exist: {download_url}")
 
     # clean up previous failed extraction
     libclang_tmp = os.path.join(TEMP_DIR, "libclang-tmp")
