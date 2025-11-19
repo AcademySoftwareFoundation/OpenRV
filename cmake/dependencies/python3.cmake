@@ -41,7 +41,7 @@ SET(_opentimelineio_version
     "0.18.1"
 )
 
-RV_VFX_SET_VARIABLE(_pyside_version CY2023 "5.15.10" CY2024 "6.5.3")
+RV_VFX_SET_VARIABLE(_pyside_version CY2023 "5.15.18" CY2024 "6.5.3")
 
 SET(_python3_download_url
     "https://github.com/python/cpython/archive/refs/tags/v${_python3_version}.zip"
