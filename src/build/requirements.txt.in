@@ -4,7 +4,7 @@
 
 pip                     # License: MIT License (MIT)
 setuptools              # License: MIT License
-OpenTimelineIO==@_opentimelineio_version@ # License: Other/Proprietary License (Modified Apache 2.0 License)
+@_opentimelineio_pip_url@ # License: Other/Proprietary License (Modified Apache 2.0 License)
 PyOpenGL                # License: BSD License (BSD)
 
 # MacOS only - PyOpenGL_accelerate is built from source in python3.cmake as a workaround until the fix
