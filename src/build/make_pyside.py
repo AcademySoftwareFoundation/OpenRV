@@ -101,16 +101,12 @@ def prepare() -> None:
 
         def get_fallback_clang_filename_suffix(version):
             major_minor_version_str = ".".join(version[:2])
-            major_version = int(version[0])
             if major_minor_version_str == "14.0":
                 return "14.0.3-based-macos-universal.7z"
             elif major_minor_version_str == "15.0":
                 return "15.0.0-based-macos-universal.7z"
-            elif major_version >= 16:
-                # For clang 16.0+, use 14.0.3 headers which are more compatible with PySide2
-                # PySide2 5.15.x built with C++11 has issues with newer libclang headers
-                # and macOS 15+ SDK libc++. Clang 14.0 provides better C++11 compatibility.
-                return "14.0.3-based-macos-universal.7z"
+            elif major_minor_version_str == "17.0":
+                return "17.0.1-based-macos-universal.7z"
             return None
 
         clang_version = get_clang_version()
@@ -235,17 +231,6 @@ def build() -> None:
     """
     python_home = PYTHON_OUTPUT_DIR
     python_interpreter_args = get_python_interpreter_args(python_home, VARIANT)
-
-    # Force C++14 on macOS 15+ since the SDK no longer supports C++11
-    # PySide2 5.15.x defaults to C++11, but Qt 5.15 supports C++14
-    if platform.system() == "Darwin":
-        # Override the C++ standard to C++14 for compatibility with modern macOS SDKs
-        existing_cxxflags = os.environ.get("CXXFLAGS", "")
-        if existing_cxxflags:
-            os.environ["CXXFLAGS"] = f"{existing_cxxflags} -std=gnu++14"
-        else:
-            os.environ["CXXFLAGS"] = "-std=gnu++14"
-        print(f"Setting CXXFLAGS={os.environ['CXXFLAGS']} to force C++14 for macOS SDK compatibility")
 
     pyside_build_args = python_interpreter_args + [
         os.path.join(SOURCE_DIR, "setup.py"),
