@@ -63,7 +63,7 @@ RV_VFX_SET_VARIABLE(
   "https://mirrors.ocf.berkeley.edu/qt/official_releases/QtForPython/pyside6/PySide6-${_pyside_version}-src/pyside-setup-everywhere-src-${_pyside_version}.zip"
 )
 
-RV_VFX_SET_VARIABLE(_pyside_download_hash CY2023 "87841aaced763b6b52e9b549e31a493f" CY2024 "515d3249c6e743219ff0d7dd25b8c8d8")
+RV_VFX_SET_VARIABLE(_pyside_download_hash CY2023 "52aa32613f7a69ff46e38ed8a427eb38" CY2024 "515d3249c6e743219ff0d7dd25b8c8d8")
 
 SET(_install_dir
     ${RV_DEPS_BASE_DIR}/${_python3_target}/install
