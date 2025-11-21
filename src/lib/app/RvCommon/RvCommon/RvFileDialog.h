@@ -83,6 +83,7 @@ namespace Rv
         QString existingFileChoice() const { return m_currentFile; }
 
         QStringList selectedFiles() const;
+        bool confirmDeleteDialog(const QStringList &paths);
         void centerOverApp();
 
     public slots:
@@ -94,6 +95,9 @@ namespace Rv
         void reload(bool);
         void autoRefreshChanged(int);
         void watchedDirChanged(const QString&);
+        void createDirectory(bool);
+        void renameSelected(bool);
+        void deleteSelected(bool);
 
         void sidePanelInserted(const QModelIndex&, int, int);
         void sidePanelPopup(const QPoint&);
@@ -102,6 +106,8 @@ namespace Rv
         void sidePanelRemove(bool);
         void sidePanelClick(QListWidgetItem*);
         void sidePanelDoubleClick(QListWidgetItem*);
+
+        void selectionPopup(const QPoint& pos);
 
         void viewComboChanged(int);
         void sortComboChanged(int);
@@ -148,6 +154,7 @@ namespace Rv
         Role m_role;
         QDir::Filters m_filters;
         QString m_currentFile;
+        QString m_currentDir;
         QString m_settingsGroup;
         QStringList m_dirPrev;
         QStringList m_dirNext;
@@ -175,6 +182,11 @@ namespace Rv
         QAction* m_cpGeneric;
         QAction* m_cpNone;
         QAction* m_cpHidden;
+        QMenu* m_selectionPopup;
+        QAction* m_createDirectory;
+        QAction* m_rename;
+        QAction* m_delete;
+        QAction* m_reload;
         QSet<QString> m_drives;
         QFileSystemWatcher* m_watcher;
         static QMap<QString, QIcon> m_iconMap;
