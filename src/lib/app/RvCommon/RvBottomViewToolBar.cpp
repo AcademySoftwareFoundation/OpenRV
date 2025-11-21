@@ -467,7 +467,6 @@ namespace Rv
             }
             else if (name == "event-category-state-changed")
             {
-                // Update action availability when presenter changes or session mode changes
                 updateActionAvailability();
             }
             else if (name == "toolbar-set-cannot-use-tooltip")

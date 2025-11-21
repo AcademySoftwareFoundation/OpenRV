@@ -515,7 +515,11 @@ namespace Rv
             }
             else if (name == "event-category-state-changed")
             {
-                // Update action availability when presenter changes or session mode changes
+                updateActionAvailability();
+            }
+            else if (name == "toolbar-set-disabled-prefix")
+            {
+                m_customDisabledPrefix = QString::fromUtf8(contents.c_str());
                 updateActionAvailability();
             }
         }
@@ -1391,8 +1395,17 @@ namespace Rv
                 bool categoryEnabled = m_session->isEventCategoryEnabled(mapping.category);
 
                 mapping.action->setEnabled(categoryEnabled);
-                mapping.action->setToolTip(categoryEnabled ? mapping.defaultTooltip
-                                                           : QString("You must be presenter to use ") + mapping.defaultTooltip);
+                if (categoryEnabled)
+                {
+                    mapping.action->setToolTip(mapping.defaultTooltip);
+                }
+                else
+                {
+                    QString tooltip = m_customDisabledPrefix.isEmpty() 
+                                      ? mapping.defaultTooltip 
+                                      : m_customDisabledPrefix + mapping.defaultTooltip;
+                    mapping.action->setToolTip(tooltip);
+                }
             }
         }
     }

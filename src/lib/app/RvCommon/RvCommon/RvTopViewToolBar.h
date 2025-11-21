@@ -145,6 +145,7 @@ namespace Rv
 
     private:
         IPCore::Session* m_session;
+        QString m_customDisabledPrefix;
         QAction* m_viewBackAction;
         QAction* m_viewForwardAction;
         QComboBox* m_viewCombo;
