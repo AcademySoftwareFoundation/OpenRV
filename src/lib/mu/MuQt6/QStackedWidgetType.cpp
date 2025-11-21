@@ -61,17 +61,14 @@ namespace Mu
         _baseType = 0;
     }
 
-    MuQt_QStackedWidget::MuQt_QStackedWidget(Pointer muobj,
-                                             const CallEnvironment* ce,
-                                             QWidget* parent)
+    MuQt_QStackedWidget::MuQt_QStackedWidget(Pointer muobj, const CallEnvironment* ce, QWidget* parent)
         : QStackedWidget(parent)
     {
         _env = ce;
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QStackedWidgetType>(
-            c->internName("qt.QStackedWidget"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QStackedWidgetType>(c->internName("qt.QStackedWidget"));
     }
 
     bool MuQt_QStackedWidget::event(QEvent* e)
@@ -152,8 +149,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QPaintEventType>(c, _p14, "qt.QPaintEvent"));
+            args[1] = Value(makeqpointer<QPaintEventType>(c, _p14, "qt.QPaintEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -165,8 +161,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  Mu Type CONSTRUCTORS
 
-    QStackedWidgetType::QStackedWidgetType(Context* c, const char* name,
-                                           Class* super, Class* super2)
+    QStackedWidgetType::QStackedWidgetType(Context* c, const char* name, Class* super, Class* super2)
         : Class(c, name, vectorOf2(super, super2))
     {
     }
@@ -176,8 +171,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    static Pointer QStackedWidget_QStackedWidget_QObject(Thread& NODE_THREAD,
-                                                         Pointer obj)
+    static Pointer QStackedWidget_QStackedWidget_QObject(Thread& NODE_THREAD, Pointer obj)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         ClassInstance* widget = reinterpret_cast<ClassInstance*>(obj);
@@ -188,9 +182,7 @@ namespace Mu
         }
         else if (QStackedWidget* w = object<QStackedWidget>(widget))
         {
-            QStackedWidgetType* type =
-                c->findSymbolOfTypeByQualifiedName<QStackedWidgetType>(
-                    c->internName("qt.QStackedWidget"), false);
+            QStackedWidgetType* type = c->findSymbolOfTypeByQualifiedName<QStackedWidgetType>(c->internName("qt.QStackedWidget"), false);
             ClassInstance* o = ClassInstance::allocate(type);
             setobject(o, w);
             return o;
@@ -203,24 +195,19 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(castFromObject, Pointer)
     {
-        NODE_RETURN(QStackedWidget_QStackedWidget_QObject(
-            NODE_THREAD, NODE_ARG(0, Pointer)));
+        NODE_RETURN(QStackedWidget_QStackedWidget_QObject(NODE_THREAD, NODE_ARG(0, Pointer)));
     }
 
-    Pointer
-    qt_QStackedWidget_QStackedWidget_QStackedWidget_QStackedWidget_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
+    Pointer qt_QStackedWidget_QStackedWidget_QStackedWidget_QStackedWidget_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                   Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWidget* arg1 = object<QWidget>(param_parent);
-        setobject(param_this,
-                  new MuQt_QStackedWidget(
-                      param_this, NODE_THREAD.process()->callEnv(), arg1));
+        setobject(param_this, new MuQt_QStackedWidget(param_this, NODE_THREAD.process()->callEnv(), arg1));
         return param_this;
     }
 
-    int qt_QStackedWidget_addWidget_int_QStackedWidget_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_widget)
+    int qt_QStackedWidget_addWidget_int_QStackedWidget_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_widget)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QStackedWidget* arg0 = object<QStackedWidget>(param_this);
@@ -228,17 +215,14 @@ namespace Mu
         return arg0->addWidget(arg1);
     }
 
-    Pointer qt_QStackedWidget_currentWidget_QWidget_QStackedWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QStackedWidget_currentWidget_QWidget_QStackedWidget(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QStackedWidget* arg0 = object<QStackedWidget>(param_this);
-        return makeinstance<QWidgetType>(c, arg0->currentWidget(),
-                                         "qt.QWidget");
+        return makeinstance<QWidgetType>(c, arg0->currentWidget(), "qt.QWidget");
     }
 
-    int qt_QStackedWidget_indexOf_int_QStackedWidget_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_widget)
+    int qt_QStackedWidget_indexOf_int_QStackedWidget_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_widget)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QStackedWidget* arg0 = object<QStackedWidget>(param_this);
@@ -246,9 +230,8 @@ namespace Mu
         return arg0->indexOf(arg1);
     }
 
-    int qt_QStackedWidget_insertWidget_int_QStackedWidget_int_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_index,
-        Pointer param_widget)
+    int qt_QStackedWidget_insertWidget_int_QStackedWidget_int_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this, int param_index,
+                                                                      Pointer param_widget)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QStackedWidget* arg0 = object<QStackedWidget>(param_this);
@@ -257,8 +240,7 @@ namespace Mu
         return arg0->insertWidget(arg1, arg2);
     }
 
-    void qt_QStackedWidget_removeWidget_void_QStackedWidget_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_widget)
+    void qt_QStackedWidget_removeWidget_void_QStackedWidget_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_widget)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QStackedWidget* arg0 = object<QStackedWidget>(param_this);
@@ -266,8 +248,7 @@ namespace Mu
         arg0->removeWidget(arg1);
     }
 
-    Pointer qt_QStackedWidget_widget_QWidget_QStackedWidget_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_index)
+    Pointer qt_QStackedWidget_widget_QWidget_QStackedWidget_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_index)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QStackedWidget* arg0 = object<QStackedWidget>(param_this);
@@ -275,31 +256,23 @@ namespace Mu
         return makeinstance<QWidgetType>(c, arg0->widget(arg1), "qt.QWidget");
     }
 
-    bool qt_QStackedWidget_event_bool_QStackedWidget_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    bool qt_QStackedWidget_event_bool_QStackedWidget_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QStackedWidget* arg0 = object<QStackedWidget>(param_this);
         QEvent* arg1 = getqpointer<QEventType>(param_e);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QStackedWidget*)arg0)->event_pub_parent(arg1)
-                   : ((MuQt_QStackedWidget*)arg0)->event_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QStackedWidget*)arg0)->event_pub_parent(arg1) : ((MuQt_QStackedWidget*)arg0)->event_pub(arg1);
     }
 
-    Pointer
-    qt_QStackedWidget_sizeHint_QSize_QStackedWidget(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this)
+    Pointer qt_QStackedWidget_sizeHint_QSize_QStackedWidget(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QStackedWidget* arg0 = object<QStackedWidget>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QSizeType>(c, arg0->QStackedWidget::sizeHint(),
-                                          "qt.QSize")
-                   : makeqtype<QSizeType>(c, arg0->sizeHint(), "qt.QSize");
+        return isMuQtObject(arg0) ? makeqtype<QSizeType>(c, arg0->QStackedWidget::sizeHint(), "qt.QSize")
+                                  : makeqtype<QSizeType>(c, arg0->sizeHint(), "qt.QSize");
     }
 
-    void qt_QStackedWidget_changeEvent_void_QStackedWidget_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_ev)
+    void qt_QStackedWidget_changeEvent_void_QStackedWidget_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_ev)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QStackedWidget* arg0 = object<QStackedWidget>(param_this);
@@ -310,8 +283,7 @@ namespace Mu
             ((MuQt_QStackedWidget*)arg0)->changeEvent_pub(arg1);
     }
 
-    void qt_QStackedWidget_paintEvent_void_QStackedWidget_QPaintEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param__p14)
+    void qt_QStackedWidget_paintEvent_void_QStackedWidget_QPaintEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param__p14)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QStackedWidget* arg0 = object<QStackedWidget>(param_this);
@@ -324,72 +296,59 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(_n_QStackedWidget0, Pointer)
     {
-        NODE_RETURN(
-            qt_QStackedWidget_QStackedWidget_QStackedWidget_QStackedWidget_QWidget(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QStackedWidget_QStackedWidget_QStackedWidget_QStackedWidget_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                           NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_addWidget0, int)
     {
-        NODE_RETURN(qt_QStackedWidget_addWidget_int_QStackedWidget_QWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QStackedWidget_addWidget_int_QStackedWidget_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_currentWidget0, Pointer)
     {
-        NODE_RETURN(qt_QStackedWidget_currentWidget_QWidget_QStackedWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QStackedWidget_currentWidget_QWidget_QStackedWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_indexOf0, int)
     {
-        NODE_RETURN(qt_QStackedWidget_indexOf_int_QStackedWidget_QWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QStackedWidget_indexOf_int_QStackedWidget_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_insertWidget0, int)
     {
-        NODE_RETURN(
-            qt_QStackedWidget_insertWidget_int_QStackedWidget_int_QWidget(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-                NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QStackedWidget_insertWidget_int_QStackedWidget_int_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                  NODE_ARG(1, int), NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_removeWidget0, void)
     {
-        qt_QStackedWidget_removeWidget_void_QStackedWidget_QWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QStackedWidget_removeWidget_void_QStackedWidget_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_widget0, Pointer)
     {
-        NODE_RETURN(qt_QStackedWidget_widget_QWidget_QStackedWidget_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QStackedWidget_widget_QWidget_QStackedWidget_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_event0, bool)
     {
-        NODE_RETURN(qt_QStackedWidget_event_bool_QStackedWidget_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QStackedWidget_event_bool_QStackedWidget_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_sizeHint0, Pointer)
     {
-        NODE_RETURN(qt_QStackedWidget_sizeHint_QSize_QStackedWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QStackedWidget_sizeHint_QSize_QStackedWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_changeEvent0, void)
     {
-        qt_QStackedWidget_changeEvent_void_QStackedWidget_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QStackedWidget_changeEvent_void_QStackedWidget_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_paintEvent0, void)
     {
-        qt_QStackedWidget_paintEvent_void_QStackedWidget_QPaintEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QStackedWidget_paintEvent_void_QStackedWidget_QPaintEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     void QStackedWidgetType::load()
@@ -409,17 +368,13 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
-                   new Function(c, tn, castFromObject, Cast, Compiled,
-                                QStackedWidget_QStackedWidget_QObject, Return,
-                                ftn, Parameters,
+                   new Function(c, tn, castFromObject, Cast, Compiled, QStackedWidget_QStackedWidget_QObject, Return, ftn, Parameters,
                                 new Param(c, "object", "qt.QObject"), End),
 
                    EndArguments);
@@ -427,70 +382,37 @@ namespace Mu
         addSymbols(
             // enums
             // member functions
-            new Function(
-                c, "QStackedWidget", _n_QStackedWidget0, None, Compiled,
-                qt_QStackedWidget_QStackedWidget_QStackedWidget_QStackedWidget_QWidget,
-                Return, "qt.QStackedWidget", Parameters,
-                new Param(c, "this", "qt.QStackedWidget"),
-                new Param(c, "parent", "qt.QWidget"), End),
-            new Function(c, "addWidget", _n_addWidget0, None, Compiled,
-                         qt_QStackedWidget_addWidget_int_QStackedWidget_QWidget,
-                         Return, "int", Parameters,
-                         new Param(c, "this", "qt.QStackedWidget"),
-                         new Param(c, "widget", "qt.QWidget"), End),
+            new Function(c, "QStackedWidget", _n_QStackedWidget0, None, Compiled,
+                         qt_QStackedWidget_QStackedWidget_QStackedWidget_QStackedWidget_QWidget, Return, "qt.QStackedWidget", Parameters,
+                         new Param(c, "this", "qt.QStackedWidget"), new Param(c, "parent", "qt.QWidget"), End),
+            new Function(c, "addWidget", _n_addWidget0, None, Compiled, qt_QStackedWidget_addWidget_int_QStackedWidget_QWidget, Return,
+                         "int", Parameters, new Param(c, "this", "qt.QStackedWidget"), new Param(c, "widget", "qt.QWidget"), End),
             // PROP: count (int; QStackedWidget this)
             // PROP: currentIndex (int; QStackedWidget this)
-            new Function(c, "currentWidget", _n_currentWidget0, None, Compiled,
-                         qt_QStackedWidget_currentWidget_QWidget_QStackedWidget,
-                         Return, "qt.QWidget", Parameters,
-                         new Param(c, "this", "qt.QStackedWidget"), End),
-            new Function(c, "indexOf", _n_indexOf0, None, Compiled,
-                         qt_QStackedWidget_indexOf_int_QStackedWidget_QWidget,
-                         Return, "int", Parameters,
-                         new Param(c, "this", "qt.QStackedWidget"),
+            new Function(c, "currentWidget", _n_currentWidget0, None, Compiled, qt_QStackedWidget_currentWidget_QWidget_QStackedWidget,
+                         Return, "qt.QWidget", Parameters, new Param(c, "this", "qt.QStackedWidget"), End),
+            new Function(c, "indexOf", _n_indexOf0, None, Compiled, qt_QStackedWidget_indexOf_int_QStackedWidget_QWidget, Return, "int",
+                         Parameters, new Param(c, "this", "qt.QStackedWidget"), new Param(c, "widget", "qt.QWidget"), End),
+            new Function(c, "insertWidget", _n_insertWidget0, None, Compiled, qt_QStackedWidget_insertWidget_int_QStackedWidget_int_QWidget,
+                         Return, "int", Parameters, new Param(c, "this", "qt.QStackedWidget"), new Param(c, "index", "int"),
                          new Param(c, "widget", "qt.QWidget"), End),
-            new Function(
-                c, "insertWidget", _n_insertWidget0, None, Compiled,
-                qt_QStackedWidget_insertWidget_int_QStackedWidget_int_QWidget,
-                Return, "int", Parameters,
-                new Param(c, "this", "qt.QStackedWidget"),
-                new Param(c, "index", "int"),
-                new Param(c, "widget", "qt.QWidget"), End),
-            new Function(
-                c, "removeWidget", _n_removeWidget0, None, Compiled,
-                qt_QStackedWidget_removeWidget_void_QStackedWidget_QWidget,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QStackedWidget"),
-                new Param(c, "widget", "qt.QWidget"), End),
-            new Function(c, "widget", _n_widget0, None, Compiled,
-                         qt_QStackedWidget_widget_QWidget_QStackedWidget_int,
-                         Return, "qt.QWidget", Parameters,
-                         new Param(c, "this", "qt.QStackedWidget"),
-                         new Param(c, "index", "int"), End),
-            _func[0] = new MemberFunction(
-                c, "event", _n_event0, None, Compiled,
-                qt_QStackedWidget_event_bool_QStackedWidget_QEvent, Return,
-                "bool", Parameters, new Param(c, "this", "qt.QStackedWidget"),
-                new Param(c, "e", "qt.QEvent"), End),
-            _func[1] = new MemberFunction(
-                c, "sizeHint", _n_sizeHint0, None, Compiled,
-                qt_QStackedWidget_sizeHint_QSize_QStackedWidget, Return,
-                "qt.QSize", Parameters,
-                new Param(c, "this", "qt.QStackedWidget"), End),
+            new Function(c, "removeWidget", _n_removeWidget0, None, Compiled, qt_QStackedWidget_removeWidget_void_QStackedWidget_QWidget,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QStackedWidget"), new Param(c, "widget", "qt.QWidget"), End),
+            new Function(c, "widget", _n_widget0, None, Compiled, qt_QStackedWidget_widget_QWidget_QStackedWidget_int, Return, "qt.QWidget",
+                         Parameters, new Param(c, "this", "qt.QStackedWidget"), new Param(c, "index", "int"), End),
+            _func[0] =
+                new MemberFunction(c, "event", _n_event0, None, Compiled, qt_QStackedWidget_event_bool_QStackedWidget_QEvent, Return,
+                                   "bool", Parameters, new Param(c, "this", "qt.QStackedWidget"), new Param(c, "e", "qt.QEvent"), End),
+            _func[1] = new MemberFunction(c, "sizeHint", _n_sizeHint0, None, Compiled, qt_QStackedWidget_sizeHint_QSize_QStackedWidget,
+                                          Return, "qt.QSize", Parameters, new Param(c, "this", "qt.QStackedWidget"), End),
             // MISSING: initStyleOption (void; QStackedWidget this,
             // "QStyleOptionFrame *" option) // protected
-            _func[2] = new MemberFunction(
-                c, "changeEvent", _n_changeEvent0, None, Compiled,
-                qt_QStackedWidget_changeEvent_void_QStackedWidget_QEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QStackedWidget"),
-                new Param(c, "ev", "qt.QEvent"), End),
-            _func[3] = new MemberFunction(
-                c, "paintEvent", _n_paintEvent0, None, Compiled,
-                qt_QStackedWidget_paintEvent_void_QStackedWidget_QPaintEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QStackedWidget"),
-                new Param(c, "_p14", "qt.QPaintEvent"), End),
+            _func[2] = new MemberFunction(c, "changeEvent", _n_changeEvent0, None, Compiled,
+                                          qt_QStackedWidget_changeEvent_void_QStackedWidget_QEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QStackedWidget"), new Param(c, "ev", "qt.QEvent"), End),
+            _func[3] = new MemberFunction(c, "paintEvent", _n_paintEvent0, None, Compiled,
+                                          qt_QStackedWidget_paintEvent_void_QStackedWidget_QPaintEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QStackedWidget"), new Param(c, "_p14", "qt.QPaintEvent"), End),
             // static functions
             EndArguments);
         globalScope()->addSymbols(EndArguments);

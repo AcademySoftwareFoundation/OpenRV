@@ -27,8 +27,7 @@ namespace IPCore
     class IPInstanceGroupNode : public GroupIPNode
     {
     public:
-        IPInstanceGroupNode(const std::string& name, const NodeDefinition* def,
-                            IPGraph* graph, GroupIPNode* group = 0);
+        IPInstanceGroupNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group = 0);
 
         virtual ~IPInstanceGroupNode();
         virtual IPImage* evaluate(const Context&);

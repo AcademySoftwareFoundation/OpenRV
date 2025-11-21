@@ -8,6 +8,8 @@
 #
 # *****************************************************************************
 
+import unittest
+
 
 def _fetch(name, func, url):
     try:
@@ -102,14 +104,9 @@ def fetch_all(url, is_valid_url):
         raise AssertionError(f"FAILED: One of the libraries failed to fetch {url}")
 
     elif is_valid_url is False and any(results) is True:
-        raise AssertionError(
-            f"FAILED: One of the libraries failed to raise an error for {url}"
-        )
+        raise AssertionError(f"FAILED: One of the libraries failed to raise an error for {url}")
 
     print(f" - All libraries behaved well on {url}\n")
-
-
-import unittest
 
 
 class TestSSL(unittest.TestCase):

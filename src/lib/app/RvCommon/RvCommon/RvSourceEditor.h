@@ -35,8 +35,7 @@ namespace Rv
     public:
         struct NodeEditState
         {
-            NodeEditState(IPCore::DynamicIPNode* n = 0,
-                          const std::string& s = "")
+            NodeEditState(IPCore::DynamicIPNode* n = 0, const std::string& s = "")
                 : node(n)
                 , source(s)
             {

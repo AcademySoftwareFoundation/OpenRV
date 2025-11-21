@@ -95,8 +95,7 @@ void objectMerge(RawDataBase* out, RawDataBase* in, const char* stripPrefix)
 
             for (size_t q = 0; q < out->objects.size(); q++)
             {
-                std::string mungedNameOut(
-                    stripNamePrefix(out->objects[q]->name, stripPrefix));
+                std::string mungedNameOut(stripNamePrefix(out->objects[q]->name, stripPrefix));
                 if (mungedNameOut == mungedNameIn)
                 {
                     found = true;
@@ -215,8 +214,7 @@ int utf8Main(int argc, char* argv[])
 
         if (!reader.open(inputFiles[i].c_str()))
         {
-            cerr << "ERROR: unable to read file " << inputFiles[i].c_str()
-                 << endl;
+            cerr << "ERROR: unable to read file " << inputFiles[i].c_str() << endl;
             exit(-1);
         }
         else

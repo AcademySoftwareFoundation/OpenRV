@@ -96,10 +96,7 @@ void setEnvVar(const string& var, const string& val)
 #endif
 }
 
-void setEnvVar(const string& var, const QFileInfo& val)
-{
-    setEnvVar(var, val.absoluteFilePath().toUtf8().data());
-}
+void setEnvVar(const string& var, const QFileInfo& val) { setEnvVar(var, val.absoluteFilePath().toUtf8().data()); }
 
 void addPathToEnv(const string& var, const string& path)
 {
@@ -194,13 +191,9 @@ bool matchesNameOrFile(const PackageManager::Package& p, const QString& str)
     return false;
 }
 
-bool matchesNameOrFile(const PackageManager::Package& p, const std::string& str)
-{
-    return matchesNameOrFile(p, QString(str.c_str()));
-}
+bool matchesNameOrFile(const PackageManager::Package& p, const std::string& str) { return matchesNameOrFile(p, QString(str.c_str())); }
 
-void matchingPackages(const PackageManager::PackageList& inlist,
-                      vector<int>& outindexlist)
+void matchingPackages(const PackageManager::PackageList& inlist, vector<int>& outindexlist)
 {
     set<int> indexSet;
 
@@ -257,13 +250,11 @@ int utf8Main(int argc, char* argv[])
     }
 
     if (arg_parse(
-            argc, argv, "", "Usage: rvpkg command line .rvpkg management", "",
-            "  In examples below 'area' means a support area", "",
-            "  Many commands can use one of: package name, rvpkg file name,",
-            "", "  or full path to rvpkg file. the commands -remove, -info,",
-            "", "  -install, -uninstall, operating on already added packages.",
-            "", "  They will not work on packages not visible to -list", "", "",
-            "", "  List all in RV_SUPPORT_PATH:             rvpkg -list", "",
+            argc, argv, "", "Usage: rvpkg command line .rvpkg management", "", "  In examples below 'area' means a support area", "",
+            "  Many commands can use one of: package name, rvpkg file name,", "",
+            "  or full path to rvpkg file. the commands -remove, -info,", "",
+            "  -install, -uninstall, operating on already added packages.", "", "  They will not work on packages not visible to -list", "",
+            "", "", "  List all in RV_SUPPORT_PATH:             rvpkg -list", "",
             "  List in specific area:                   rvpkg -list -only "
             "/path/to/support/area",
             "",
@@ -290,28 +281,17 @@ int utf8Main(int argc, char* argv[])
             "",
             "  Opt-in all users to optional package(s): rvpkg -optin "
             "/path/to/file1.rvpkg ...",
-            "", "", "", ARG_SUBR(parseInFiles),
-            "Input packages names or rvpkg files", "-include %S", &withDir,
-            "include directory as if part of RV_SUPPORT_PATH", "-env",
-            ARG_FLAG(&env), "show RV_SUPPORT_PATH include app areas",
-            "-only %S", &onlyDir,
-            "use directory as sole content of RV_SUPPORT_PATH", "-add %S",
-            &addDir, "add packages to specified support directory", "-remove",
-            ARG_FLAG(&remove),
-            "remove packages (by name, rvpkg name, or full path to rvpkg)",
-            "-install", ARG_FLAG(&install),
-            "install packages (by name, rvpkg name, or full path to rvpkg)",
-            "-uninstall", ARG_FLAG(&uninstall),
-            "uninstall packages (by name, rvpkg name, or full path to rvpkg)",
-            "-optin", ARG_FLAG(&optin),
-            "make installed optional packages opt-in by default for all users",
-            "-list", ARG_FLAG(&list), "list installed packages", "-info",
-            ARG_FLAG(&info),
+            "", "", "", ARG_SUBR(parseInFiles), "Input packages names or rvpkg files", "-include %S", &withDir,
+            "include directory as if part of RV_SUPPORT_PATH", "-env", ARG_FLAG(&env), "show RV_SUPPORT_PATH include app areas", "-only %S",
+            &onlyDir, "use directory as sole content of RV_SUPPORT_PATH", "-add %S", &addDir, "add packages to specified support directory",
+            "-remove", ARG_FLAG(&remove), "remove packages (by name, rvpkg name, or full path to rvpkg)", "-install", ARG_FLAG(&install),
+            "install packages (by name, rvpkg name, or full path to rvpkg)", "-uninstall", ARG_FLAG(&uninstall),
+            "uninstall packages (by name, rvpkg name, or full path to rvpkg)", "-optin", ARG_FLAG(&optin),
+            "make installed optional packages opt-in by default for all users", "-list", ARG_FLAG(&list), "list installed packages",
+            "-info", ARG_FLAG(&info),
             "detailed info about packages (by name, rvpkg name, or full path "
             "to rvpkg)",
-            "-force", ARG_FLAG(&force),
-            "Assume answer is 'y' to any confirmations -- don't be interactive",
-            NULL)
+            "-force", ARG_FLAG(&force), "Assume answer is 'y' to any confirmations -- don't be interactive", NULL)
         < 0)
     {
         exit(-1);
@@ -349,8 +329,7 @@ int utf8Main(int argc, char* argv[])
 
     if ((remove || add || install || uninstall) && (list || info))
     {
-        cerr << "ERROR: -list and -info do not work with other arguments"
-             << endl;
+        cerr << "ERROR: -list and -info do not work with other arguments" << endl;
         exit(-1);
     }
 
@@ -414,9 +393,7 @@ int utf8Main(int argc, char* argv[])
         exit(0);
     }
 
-    TWK_DEPLOY_APP_OBJECT dobj(MAJOR_VERSION, MINOR_VERSION, REVISION_NUMBER,
-                               argc, argv, RELEASE_DESCRIPTION,
-                               "HEAD=" GIT_HEAD);
+    TWK_DEPLOY_APP_OBJECT dobj(MAJOR_VERSION, MINOR_VERSION, REVISION_NUMBER, argc, argv, RELEASE_DESCRIPTION, "HEAD=" GIT_HEAD);
 
     Rv::PackageManager manager;
     manager.loadPackages();
@@ -439,8 +416,7 @@ int utf8Main(int argc, char* argv[])
             cout << " " << (p.loadable ? "L" : "-");
             cout << " " << (p.optional ? "O" : "-");
 
-            cout << " " << p.version << " \"" << p.name << "\" " << p.file
-                 << endl;
+            cout << " " << p.version << " \"" << p.name << "\" " << p.file << endl;
         }
     }
 
@@ -516,8 +492,7 @@ int utf8Main(int argc, char* argv[])
 
             if (!p.optional)
             {
-                cerr << "ERROR: " << p.file.toUtf8().constData()
-                     << " is not an optional package -- ignoring" << endl;
+                cerr << "ERROR: " << p.file.toUtf8().constData() << " is not an optional package -- ignoring" << endl;
                 continue;
             }
 
@@ -526,8 +501,7 @@ int utf8Main(int argc, char* argv[])
 
             if (!info.exists())
             {
-                cerr << "ERROR: " << p.file.toUtf8().constData()
-                     << " doesn't exist -- ignoring" << endl;
+                cerr << "ERROR: " << p.file.toUtf8().constData() << " doesn't exist -- ignoring" << endl;
                 continue;
             }
 
@@ -539,21 +513,18 @@ int utf8Main(int argc, char* argv[])
 
             if (!rvloadInfo.exists())
             {
-                cerr << "ERROR: missing rvload2 file at "
-                     << rvload2.toUtf8().constData() << " -- ignoring" << endl;
+                cerr << "ERROR: missing rvload2 file at " << rvload2.toUtf8().constData() << " -- ignoring" << endl;
                 break;
             }
 
-            PackageManager::ModeEntryList entries =
-                manager.loadModeFile(rvload2);
+            PackageManager::ModeEntryList entries = manager.loadModeFile(rvload2);
 
             //
             //  Just force the package to become not optional
             //
 
             QString basename = info.fileName();
-            cout << "INFO: for package " << basename.toUtf8().constData()
-                 << endl;
+            cout << "INFO: for package " << basename.toUtf8().constData() << endl;
 
             for (size_t i = 0; i < entries.size(); i++)
             {
@@ -564,8 +535,7 @@ int utf8Main(int argc, char* argv[])
                     entry.loaded = true;
                     entry.optional = false;
 
-                    cout << "INFO: opting-in all users for mode "
-                         << entry.name.toUtf8().constData() << endl;
+                    cout << "INFO: opting-in all users for mode " << entry.name.toUtf8().constData() << endl;
                 }
             }
 
@@ -592,8 +562,7 @@ int utf8Main(int argc, char* argv[])
                 // Unpacking bundle
                 QString toUnzip = QString::fromStdString(curFile);
                 string addDirStr = addDir;
-                QString outputDir =
-                    QString::fromStdString(addDirStr.append("/Packages"));
+                QString outputDir = QString::fromStdString(addDirStr.append("/Packages"));
                 addedPackages = manager.handleBundle(toUnzip, outputDir);
 
                 // Ensuring that the bundle unpacked successfully
@@ -679,8 +648,7 @@ int utf8Main(int argc, char* argv[])
             // Ensuring package not installed already
             if (p.installed)
             {
-                cout << "WARNING: " << p.name << " is already installed"
-                     << endl;
+                cout << "WARNING: " << p.name << " is already installed" << endl;
             }
 
             else

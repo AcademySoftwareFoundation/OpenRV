@@ -39,8 +39,7 @@ namespace Mu
         //  Constructors
         //
 
-        QAbstractSliderType(Context* context, const char* name,
-                            Class* superClass = 0, Class* superClass2 = 0);
+        QAbstractSliderType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QAbstractSliderType();
 
@@ -63,8 +62,7 @@ namespace Mu
     {
     public:
         virtual ~MuQt_QAbstractSlider();
-        MuQt_QAbstractSlider(Pointer muobj, const CallEnvironment*,
-                             QWidget* parent);
+        MuQt_QAbstractSlider(Pointer muobj, const CallEnvironment*, QWidget* parent);
 
     protected:
         virtual void sliderChange(QAbstractSlider::SliderChange change);
@@ -107,45 +105,27 @@ namespace Mu
         virtual int metric(PaintDeviceMetric m) const;
 
     public:
-        QAbstractSlider::SliderAction repeatAction_pub() const
-        {
-            return repeatAction();
-        }
+        QAbstractSlider::SliderAction repeatAction_pub() const { return repeatAction(); }
 
-        QAbstractSlider::SliderAction repeatAction_pub_parent() const
-        {
-            return QAbstractSlider::repeatAction();
-        }
+        QAbstractSlider::SliderAction repeatAction_pub_parent() const { return QAbstractSlider::repeatAction(); }
 
-        void setRepeatAction_pub(QAbstractSlider::SliderAction action,
-                                 int thresholdTime, int repeatTime)
+        void setRepeatAction_pub(QAbstractSlider::SliderAction action, int thresholdTime, int repeatTime)
         {
             setRepeatAction(action, thresholdTime, repeatTime);
         }
 
-        void setRepeatAction_pub_parent(QAbstractSlider::SliderAction action,
-                                        int thresholdTime, int repeatTime)
+        void setRepeatAction_pub_parent(QAbstractSlider::SliderAction action, int thresholdTime, int repeatTime)
         {
             QAbstractSlider::setRepeatAction(action, thresholdTime, repeatTime);
         }
 
-        void sliderChange_pub(MuQtPublicEnum change)
-        {
-            sliderChange((QAbstractSlider::SliderChange)change);
-        }
+        void sliderChange_pub(MuQtPublicEnum change) { sliderChange((QAbstractSlider::SliderChange)change); }
 
-        void sliderChange_pub_parent(MuQtPublicEnum change)
-        {
-            QAbstractSlider::sliderChange(
-                (QAbstractSlider::SliderChange)change);
-        }
+        void sliderChange_pub_parent(MuQtPublicEnum change) { QAbstractSlider::sliderChange((QAbstractSlider::SliderChange)change); }
 
         void changeEvent_pub(QEvent* ev) { changeEvent(ev); }
 
-        void changeEvent_pub_parent(QEvent* ev)
-        {
-            QAbstractSlider::changeEvent(ev);
-        }
+        void changeEvent_pub_parent(QEvent* ev) { QAbstractSlider::changeEvent(ev); }
 
         bool event_pub(QEvent* e) { return event(e); }
 
@@ -153,203 +133,107 @@ namespace Mu
 
         void keyPressEvent_pub(QKeyEvent* ev) { keyPressEvent(ev); }
 
-        void keyPressEvent_pub_parent(QKeyEvent* ev)
-        {
-            QAbstractSlider::keyPressEvent(ev);
-        }
+        void keyPressEvent_pub_parent(QKeyEvent* ev) { QAbstractSlider::keyPressEvent(ev); }
 
         void timerEvent_pub(QTimerEvent* e) { timerEvent(e); }
 
-        void timerEvent_pub_parent(QTimerEvent* e)
-        {
-            QAbstractSlider::timerEvent(e);
-        }
+        void timerEvent_pub_parent(QTimerEvent* e) { QAbstractSlider::timerEvent(e); }
 
         void wheelEvent_pub(QWheelEvent* e) { wheelEvent(e); }
 
-        void wheelEvent_pub_parent(QWheelEvent* e)
-        {
-            QAbstractSlider::wheelEvent(e);
-        }
+        void wheelEvent_pub_parent(QWheelEvent* e) { QAbstractSlider::wheelEvent(e); }
 
         void closeEvent_pub(QCloseEvent* event) { closeEvent(event); }
 
-        void closeEvent_pub_parent(QCloseEvent* event)
-        {
-            QAbstractSlider::closeEvent(event);
-        }
+        void closeEvent_pub_parent(QCloseEvent* event) { QAbstractSlider::closeEvent(event); }
 
-        void contextMenuEvent_pub(QContextMenuEvent* event)
-        {
-            contextMenuEvent(event);
-        }
+        void contextMenuEvent_pub(QContextMenuEvent* event) { contextMenuEvent(event); }
 
-        void contextMenuEvent_pub_parent(QContextMenuEvent* event)
-        {
-            QAbstractSlider::contextMenuEvent(event);
-        }
+        void contextMenuEvent_pub_parent(QContextMenuEvent* event) { QAbstractSlider::contextMenuEvent(event); }
 
-        void dragEnterEvent_pub(QDragEnterEvent* event)
-        {
-            dragEnterEvent(event);
-        }
+        void dragEnterEvent_pub(QDragEnterEvent* event) { dragEnterEvent(event); }
 
-        void dragEnterEvent_pub_parent(QDragEnterEvent* event)
-        {
-            QAbstractSlider::dragEnterEvent(event);
-        }
+        void dragEnterEvent_pub_parent(QDragEnterEvent* event) { QAbstractSlider::dragEnterEvent(event); }
 
-        void dragLeaveEvent_pub(QDragLeaveEvent* event)
-        {
-            dragLeaveEvent(event);
-        }
+        void dragLeaveEvent_pub(QDragLeaveEvent* event) { dragLeaveEvent(event); }
 
-        void dragLeaveEvent_pub_parent(QDragLeaveEvent* event)
-        {
-            QAbstractSlider::dragLeaveEvent(event);
-        }
+        void dragLeaveEvent_pub_parent(QDragLeaveEvent* event) { QAbstractSlider::dragLeaveEvent(event); }
 
         void dragMoveEvent_pub(QDragMoveEvent* event) { dragMoveEvent(event); }
 
-        void dragMoveEvent_pub_parent(QDragMoveEvent* event)
-        {
-            QAbstractSlider::dragMoveEvent(event);
-        }
+        void dragMoveEvent_pub_parent(QDragMoveEvent* event) { QAbstractSlider::dragMoveEvent(event); }
 
         void dropEvent_pub(QDropEvent* event) { dropEvent(event); }
 
-        void dropEvent_pub_parent(QDropEvent* event)
-        {
-            QAbstractSlider::dropEvent(event);
-        }
+        void dropEvent_pub_parent(QDropEvent* event) { QAbstractSlider::dropEvent(event); }
 
         void enterEvent_pub(QEvent* event) { enterEvent(event); }
 
-        void enterEvent_pub_parent(QEvent* event)
-        {
-            QAbstractSlider::enterEvent(event);
-        }
+        void enterEvent_pub_parent(QEvent* event) { QAbstractSlider::enterEvent(event); }
 
         void focusInEvent_pub(QFocusEvent* event) { focusInEvent(event); }
 
-        void focusInEvent_pub_parent(QFocusEvent* event)
-        {
-            QAbstractSlider::focusInEvent(event);
-        }
+        void focusInEvent_pub_parent(QFocusEvent* event) { QAbstractSlider::focusInEvent(event); }
 
-        bool focusNextPrevChild_pub(bool next)
-        {
-            return focusNextPrevChild(next);
-        }
+        bool focusNextPrevChild_pub(bool next) { return focusNextPrevChild(next); }
 
-        bool focusNextPrevChild_pub_parent(bool next)
-        {
-            return QAbstractSlider::focusNextPrevChild(next);
-        }
+        bool focusNextPrevChild_pub_parent(bool next) { return QAbstractSlider::focusNextPrevChild(next); }
 
         void focusOutEvent_pub(QFocusEvent* event) { focusOutEvent(event); }
 
-        void focusOutEvent_pub_parent(QFocusEvent* event)
-        {
-            QAbstractSlider::focusOutEvent(event);
-        }
+        void focusOutEvent_pub_parent(QFocusEvent* event) { QAbstractSlider::focusOutEvent(event); }
 
         void hideEvent_pub(QHideEvent* event) { hideEvent(event); }
 
-        void hideEvent_pub_parent(QHideEvent* event)
-        {
-            QAbstractSlider::hideEvent(event);
-        }
+        void hideEvent_pub_parent(QHideEvent* event) { QAbstractSlider::hideEvent(event); }
 
         void keyReleaseEvent_pub(QKeyEvent* event) { keyReleaseEvent(event); }
 
-        void keyReleaseEvent_pub_parent(QKeyEvent* event)
-        {
-            QAbstractSlider::keyReleaseEvent(event);
-        }
+        void keyReleaseEvent_pub_parent(QKeyEvent* event) { QAbstractSlider::keyReleaseEvent(event); }
 
         void leaveEvent_pub(QEvent* event) { leaveEvent(event); }
 
-        void leaveEvent_pub_parent(QEvent* event)
-        {
-            QAbstractSlider::leaveEvent(event);
-        }
+        void leaveEvent_pub_parent(QEvent* event) { QAbstractSlider::leaveEvent(event); }
 
-        void mouseDoubleClickEvent_pub(QMouseEvent* event)
-        {
-            mouseDoubleClickEvent(event);
-        }
+        void mouseDoubleClickEvent_pub(QMouseEvent* event) { mouseDoubleClickEvent(event); }
 
-        void mouseDoubleClickEvent_pub_parent(QMouseEvent* event)
-        {
-            QAbstractSlider::mouseDoubleClickEvent(event);
-        }
+        void mouseDoubleClickEvent_pub_parent(QMouseEvent* event) { QAbstractSlider::mouseDoubleClickEvent(event); }
 
         void mouseMoveEvent_pub(QMouseEvent* event) { mouseMoveEvent(event); }
 
-        void mouseMoveEvent_pub_parent(QMouseEvent* event)
-        {
-            QAbstractSlider::mouseMoveEvent(event);
-        }
+        void mouseMoveEvent_pub_parent(QMouseEvent* event) { QAbstractSlider::mouseMoveEvent(event); }
 
         void mousePressEvent_pub(QMouseEvent* event) { mousePressEvent(event); }
 
-        void mousePressEvent_pub_parent(QMouseEvent* event)
-        {
-            QAbstractSlider::mousePressEvent(event);
-        }
+        void mousePressEvent_pub_parent(QMouseEvent* event) { QAbstractSlider::mousePressEvent(event); }
 
-        void mouseReleaseEvent_pub(QMouseEvent* event)
-        {
-            mouseReleaseEvent(event);
-        }
+        void mouseReleaseEvent_pub(QMouseEvent* event) { mouseReleaseEvent(event); }
 
-        void mouseReleaseEvent_pub_parent(QMouseEvent* event)
-        {
-            QAbstractSlider::mouseReleaseEvent(event);
-        }
+        void mouseReleaseEvent_pub_parent(QMouseEvent* event) { QAbstractSlider::mouseReleaseEvent(event); }
 
         void moveEvent_pub(QMoveEvent* event) { moveEvent(event); }
 
-        void moveEvent_pub_parent(QMoveEvent* event)
-        {
-            QAbstractSlider::moveEvent(event);
-        }
+        void moveEvent_pub_parent(QMoveEvent* event) { QAbstractSlider::moveEvent(event); }
 
         void paintEvent_pub(QPaintEvent* event) { paintEvent(event); }
 
-        void paintEvent_pub_parent(QPaintEvent* event)
-        {
-            QAbstractSlider::paintEvent(event);
-        }
+        void paintEvent_pub_parent(QPaintEvent* event) { QAbstractSlider::paintEvent(event); }
 
         void resizeEvent_pub(QResizeEvent* event) { resizeEvent(event); }
 
-        void resizeEvent_pub_parent(QResizeEvent* event)
-        {
-            QAbstractSlider::resizeEvent(event);
-        }
+        void resizeEvent_pub_parent(QResizeEvent* event) { QAbstractSlider::resizeEvent(event); }
 
         void showEvent_pub(QShowEvent* event) { showEvent(event); }
 
-        void showEvent_pub_parent(QShowEvent* event)
-        {
-            QAbstractSlider::showEvent(event);
-        }
+        void showEvent_pub_parent(QShowEvent* event) { QAbstractSlider::showEvent(event); }
 
         void tabletEvent_pub(QTabletEvent* event) { tabletEvent(event); }
 
-        void tabletEvent_pub_parent(QTabletEvent* event)
-        {
-            QAbstractSlider::tabletEvent(event);
-        }
+        void tabletEvent_pub_parent(QTabletEvent* event) { QAbstractSlider::tabletEvent(event); }
 
         int metric_pub(PaintDeviceMetric m) const { return metric(m); }
 
-        int metric_pub_parent(PaintDeviceMetric m) const
-        {
-            return QAbstractSlider::metric(m);
-        }
+        int metric_pub_parent(PaintDeviceMetric m) const { return QAbstractSlider::metric(m); }
 
     public:
         const QAbstractSliderType* _baseType;
@@ -357,11 +241,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance* QAbstractSliderType::cachedInstance(
-        const QAbstractSliderType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QAbstractSliderType::cachedInstance(const QAbstractSliderType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

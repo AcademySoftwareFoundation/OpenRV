@@ -17,8 +17,7 @@ namespace IPCore
         using namespace std;
         using namespace TwkMath;
 
-        ExpressionVisitor::ExpressionVisitor(Expression* Fexpr, bool onEnter,
-                                             bool onLeave, bool eachSymbol)
+        ExpressionVisitor::ExpressionVisitor(Expression* Fexpr, bool onEnter, bool onLeave, bool eachSymbol)
             : m_root(Fexpr)
             , m_stop(false)
             , m_enter(onEnter)
@@ -42,8 +41,7 @@ namespace IPCore
 
             for (size_t i = 0; i < args.size() && !m_stop; i++)
             {
-                if (BoundExpression* be =
-                        dynamic_cast<BoundExpression*>(args[i]))
+                if (BoundExpression* be = dynamic_cast<BoundExpression*>(args[i]))
                 {
                     visitRecursive(be->value());
                 }
@@ -84,13 +82,11 @@ namespace IPCore
             }
             else
             {
-                ExpressionQuery findResampler(image->shaderExpr,
-                                              Function::MorphologicalFilter, 1);
+                ExpressionQuery findResampler(image->shaderExpr, Function::MorphologicalFilter, 1);
 
                 if (findResampler.count() == 0)
                 {
-                    image->shaderExpr = newInlineBoxResize(
-                        true, image, image->shaderExpr, Vec2f(0.0f));
+                    image->shaderExpr = newInlineBoxResize(true, image, image->shaderExpr, Vec2f(0.0f));
                 }
             }
         }
@@ -103,8 +99,7 @@ namespace IPCore
 
         size_t filterFunctionCount(Expression* expr, size_t limit)
         {
-            ExpressionQuery Q(
-                expr, Function::Filter | Function::MorphologicalFilter, limit);
+            ExpressionQuery Q(expr, Function::Filter | Function::MorphologicalFilter, limit);
             return Q.count();
         }
 

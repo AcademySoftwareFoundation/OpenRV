@@ -1,7 +1,7 @@
 #
-# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved. 
-# 
-# SPDX-License-Identifier: Apache-2.0 
+# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
 #
 from rv import commands, rvtypes, extra_commands
 import os
@@ -22,9 +22,7 @@ class CustomMatteMinorMode(rvtypes.MinorMode):
         try:
             definition = os.environ["RV_CUSTOM_MATTE_DEFINITIONS"]
         except KeyError:
-            definition = str(
-                commands.readSettings("CUSTOM_MATTES", "customMattesDefinition", "")
-            )
+            definition = str(commands.readSettings("CUSTOM_MATTES", "customMattesDefinition", ""))
         try:
             if os.path.exists(definition):
                 self.updateMattesFromFile(definition)
@@ -46,7 +44,6 @@ class CustomMatteMinorMode(rvtypes.MinorMode):
         return matteState
 
     def selectMatte(self, matte):
-
         # Create a method that is specific to each matte for setting the
         # relavent session node properties to display the matte
         def select(event):
@@ -56,12 +53,8 @@ class CustomMatteMinorMode(rvtypes.MinorMode):
                 extra_commands.displayFeedback("Disabling mattes", 2.0)
             else:
                 m = self._mattes[matte]
-                commands.setFloatProperty(
-                    "#Session.matte.aspect", [float(m["ratio"])], True
-                )
-                commands.setFloatProperty(
-                    "#Session.matte.heightVisible", [float(m["heightVisible"])], True
-                )
+                commands.setFloatProperty("#Session.matte.aspect", [float(m["ratio"])], True)
+                commands.setFloatProperty("#Session.matte.heightVisible", [float(m["heightVisible"])], True)
                 commands.setFloatProperty(
                     "#Session.matte.centerPoint",
                     [float(m["centerX"]), float(m["centerY"])],
@@ -82,7 +75,6 @@ class CustomMatteMinorMode(rvtypes.MinorMode):
         self.setMenuAndBindings()
 
     def setMenuAndBindings(self):
-
         # Walk through all of the mattes adding a menu entry as well as a
         # hotkey binding for alt + index number
         # NOTE: The bindings will only matter for the first 9 mattes since you
@@ -90,9 +82,7 @@ class CustomMatteMinorMode(rvtypes.MinorMode):
         matteItems = []
         bindings = []
         if len(self._order) > 0:
-            matteItems.append(
-                ("No Matte", self.selectMatte(""), "alt `", self.currentMatteState(""))
-            )
+            matteItems.append(("No Matte", self.selectMatte(""), "alt `", self.currentMatteState("")))
             bindings.append(("key-down--alt--`", ""))
 
             for i, m in enumerate(self._order):
@@ -126,24 +116,16 @@ class CustomMatteMinorMode(rvtypes.MinorMode):
         # Create hotkeys for each matte
         for b in bindings:
             (event, matte) = b
-            commands.bind(
-                "custom-mattes-mode", "global", event, self.selectMatte(matte), ""
-            )
+            commands.bind("custom-mattes-mode", "global", event, self.selectMatte(matte), "")
 
     def updateMattesFromFile(self, filename):
-
         # Make sure the definition file exists
         if not os.path.exists(filename):
-            raise KnownError(
-                "ERROR: Custom Mattes Mode: Non-existent mattes"
-                + " definition file: '%s'" % filename
-            )
+            raise KnownError("ERROR: Custom Mattes Mode: Non-existent mattes" + " definition file: '%s'" % filename)
 
         # Clear existing key bindings
         for i in range(len(self._order)):
-            commands.unbind(
-                "custom-mattes-mode", "global", "key-down--alt--%d" % (i + 1)
-            )
+            commands.unbind("custom-mattes-mode", "global", "key-down--alt--%d" % (i + 1))
 
         # Walk through the lines of the definition file collecting matte
         # parameters
@@ -166,10 +148,7 @@ class CustomMatteMinorMode(rvtypes.MinorMode):
         if len(order) == 0:
             self._order = []
             self._mattes = {}
-            raise KnownError(
-                "ERROR: Custom Mattes Mode: Empty mattes"
-                + " definition file: '%s'" % filename
-            )
+            raise KnownError("ERROR: Custom Mattes Mode: Empty mattes" + " definition file: '%s'" % filename)
 
         # Save the definition path and assign the mattes
         commands.writeSettings("CUSTOM_MATTES", "customMattesDefinition", filename)

@@ -184,10 +184,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <typename T> inline bool Range<T>::isEmpty() const
-    {
-        return (bool)(min > max);
-    }
+    template <typename T> inline bool Range<T>::isEmpty() const { return (bool)(min > max); }
 
     //******************************************************************************
     template <typename T> inline void Range<T>::makeEmpty()
@@ -355,8 +352,7 @@ namespace TwkMath
     }
 
     //*****************************************************************************
-    template <typename T>
-    bool Range<T>::closestInteriorPoint(const T& pt, T& ret) const
+    template <typename T> bool Range<T>::closestInteriorPoint(const T& pt, T& ret) const
     {
         // We don't have to check empty or infinite here
         // because the check below implicitly does so.
@@ -443,60 +439,34 @@ namespace TwkMath
     template <typename T> inline T size(const Range<T>& r) { return r.size(); }
 
     //******************************************************************************
-    template <typename T> inline T center(const Range<T>& r)
-    {
-        return r.center();
-    }
+    template <typename T> inline T center(const Range<T>& r) { return r.center(); }
 
     //******************************************************************************
-    template <typename T> inline bool isEmpty(const Range<T>& r)
-    {
-        return r.isEmpty();
-    }
+    template <typename T> inline bool isEmpty(const Range<T>& r) { return r.isEmpty(); }
 
     //******************************************************************************
     template <typename T> inline void makeEmpty(Range<T>& r) { r.makeEmpty(); }
 
     //******************************************************************************
-    template <typename T> inline bool isInfinite(const Range<T>& r)
-    {
-        return r.isInfinite();
-    }
+    template <typename T> inline bool isInfinite(const Range<T>& r) { return r.isInfinite(); }
 
     //******************************************************************************
-    template <typename T> inline void makeInfinite(Range<T>& r)
-    {
-        r.makeInfinite();
-    }
+    template <typename T> inline void makeInfinite(Range<T>& r) { r.makeInfinite(); }
 
     //******************************************************************************
-    template <typename T> inline void extendBy(Range<T>& r, const T& v)
-    {
-        r.extendBy(v);
-    }
+    template <typename T> inline void extendBy(Range<T>& r, const T& v) { r.extendBy(v); }
 
     //******************************************************************************
-    template <typename T> inline void extendBy(Range<T>& r, const Range<T>& r2)
-    {
-        r.extendBy(r2);
-    }
+    template <typename T> inline void extendBy(Range<T>& r, const Range<T>& r2) { r.extendBy(r2); }
 
     //******************************************************************************
-    template <typename T> inline bool intersects(const Range<T>& r, const T& v)
-    {
-        return r.intersects(v);
-    }
+    template <typename T> inline bool intersects(const Range<T>& r, const T& v) { return r.intersects(v); }
 
     //******************************************************************************
-    template <typename T>
-    inline bool intersects(const Range<T>& r, const Range<T>& r2)
-    {
-        return r.intersects(r2);
-    }
+    template <typename T> inline bool intersects(const Range<T>& r, const Range<T>& r2) { return r.intersects(r2); }
 
     //******************************************************************************
-    template <typename T>
-    inline Range<T> intersection(const Range<T>& a, const Range<T>& b)
+    template <typename T> inline Range<T> intersection(const Range<T>& a, const Range<T>& b)
     {
         if (a.intersects(b))
         {
@@ -509,8 +479,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <typename T>
-    inline bool closestInteriorPoint(const Range<T>& r, const T& pt, T& ret)
+    template <typename T> inline bool closestInteriorPoint(const Range<T>& r, const T& pt, T& ret)
     {
         return r.closestInteriorPoint(pt, ret);
     }
@@ -520,8 +489,7 @@ namespace TwkMath
     // ARITHMETIC OPERATORS
     //******************************************************************************
     //******************************************************************************
-    template <typename T>
-    inline Range<T> operator+(const T& a, const Range<T>& b)
+    template <typename T> inline Range<T> operator+(const T& a, const Range<T>& b)
     {
         if (b.isEmpty() || b.isInfinite())
         {
@@ -534,8 +502,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <typename T>
-    inline Range<T> operator+(const Range<T>& a, const T& b)
+    template <typename T> inline Range<T> operator+(const Range<T>& a, const T& b)
     {
         if (a.isEmpty() || a.isInfinite())
         {
@@ -548,8 +515,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <typename T>
-    inline Range<T> operator-(const T& a, const Range<T>& b)
+    template <typename T> inline Range<T> operator-(const T& a, const Range<T>& b)
     {
         if (b.isEmpty() || b.isInfinite())
         {
@@ -562,8 +528,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <typename T>
-    inline Range<T> operator-(const Range<T>& a, const T& b)
+    template <typename T> inline Range<T> operator-(const Range<T>& a, const T& b)
     {
         if (a.isEmpty() || a.isInfinite())
         {
@@ -576,8 +541,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <typename T>
-    inline Range<T> operator*(const T& a, const Range<T>& b)
+    template <typename T> inline Range<T> operator*(const T& a, const Range<T>& b)
     {
         if (b.isEmpty() || b.isInfinite())
         {
@@ -599,8 +563,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <typename T>
-    inline Range<T> operator*(const Range<T>& a, const T& b)
+    template <typename T> inline Range<T> operator*(const Range<T>& a, const T& b)
     {
         if (a.isEmpty() || a.isInfinite())
         {
@@ -624,8 +587,7 @@ namespace TwkMath
     //******************************************************************************
     // This operation doesn't really make any sense, but since
     // there's a consistent way of performing it, I'll put it here anyway
-    template <typename T>
-    inline Range<T> operator/(const T& a, const Range<T>& b)
+    template <typename T> inline Range<T> operator/(const T& a, const Range<T>& b)
     {
         assert(b.min != (T)0);
         assert(b.max != (T)0);
@@ -649,8 +611,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <typename T>
-    inline Range<T> operator/(const Range<T>& a, const T& b)
+    template <typename T> inline Range<T> operator/(const Range<T>& a, const T& b)
     {
         assert(b != (T)0);
         if (a.isEmpty() || a.isInfinite())
@@ -677,8 +638,7 @@ namespace TwkMath
     // COMPARISON OPERATORS
     //******************************************************************************
     //******************************************************************************
-    template <typename T, typename T2>
-    inline bool operator==(const Range<T>& a, const Range<T2>& b)
+    template <typename T, typename T2> inline bool operator==(const Range<T>& a, const Range<T2>& b)
     {
         if (a.isEmpty() || a.isInfinite() || b.isEmpty() || b.isInfinite())
         {
@@ -700,8 +660,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <typename T, typename T2>
-    bool operator!=(const Range<T>& a, const Range<T2>& b)
+    template <typename T, typename T2> bool operator!=(const Range<T>& a, const Range<T2>& b)
     {
         if (a.isEmpty() || a.isInfinite() || b.isEmpty() || b.isInfinite())
         {

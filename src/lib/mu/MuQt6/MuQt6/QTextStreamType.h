@@ -37,8 +37,7 @@ namespace Mu
         //  Constructors
         //
 
-        QTextStreamType(Context* context, const char* name,
-                        Class* superClass = 0);
+        QTextStreamType(Context* context, const char* name, Class* superClass = 0);
         virtual ~QTextStreamType();
 
         //

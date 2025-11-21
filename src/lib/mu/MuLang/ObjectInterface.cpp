@@ -39,20 +39,17 @@ namespace Mu
 
         s->addSymbols(new ReferenceType(c, "object&", this),
 
-                      new Function(c, "object", BaseFunctions::dereference,
-                                   Cast, Return, tn, Args, rn, End),
+                      new Function(c, "object", BaseFunctions::dereference, Cast, Return, tn, Args, rn, End),
 
                       EndArguments);
 
-        addSymbols(new MemberFunction(c, "identity", ObjectInterface::identity,
-                                      None, Return, tn, Args, tn, End),
+        addSymbols(new MemberFunction(c, "identity", ObjectInterface::identity, None, Return, tn, Args, tn, End),
 
                    EndArguments);
 
         globalScope()->addSymbols(
 
-            new Function(c, "=", BaseFunctions::assign, AsOp, Return, rn, Args,
-                         rn, tn, End),
+            new Function(c, "=", BaseFunctions::assign, AsOp, Return, rn, Args, rn, tn, End),
 
 #if 0
                    new Function(c, "eq", BaseFunctions::eq, CommOp,
@@ -63,9 +60,6 @@ namespace Mu
             EndArguments);
     }
 
-    NODE_IMPLEMENTATION(ObjectInterface::identity, Pointer)
-    {
-        NODE_RETURN((Pointer)NODE_ARG_OBJECT(0, Object));
-    }
+    NODE_IMPLEMENTATION(ObjectInterface::identity, Pointer) { NODE_RETURN((Pointer)NODE_ARG_OBJECT(0, Object)); }
 
 } // namespace Mu

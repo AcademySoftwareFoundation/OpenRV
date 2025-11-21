@@ -42,9 +42,7 @@ namespace Mu
         //  Constructors
         //
 
-        QQmlApplicationEngineType(Context* context, const char* name,
-                                  Class* superClass = 0,
-                                  Class* superClass2 = 0);
+        QQmlApplicationEngineType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QQmlApplicationEngineType();
 
@@ -67,12 +65,9 @@ namespace Mu
     {
     public:
         virtual ~MuQt_QQmlApplicationEngine();
-        MuQt_QQmlApplicationEngine(Pointer muobj, const CallEnvironment*,
-                                   QObject* parent);
-        MuQt_QQmlApplicationEngine(Pointer muobj, const CallEnvironment*,
-                                   const QUrl& url, QObject* parent);
-        MuQt_QQmlApplicationEngine(Pointer muobj, const CallEnvironment*,
-                                   const QString& filePath, QObject* parent);
+        MuQt_QQmlApplicationEngine(Pointer muobj, const CallEnvironment*, QObject* parent);
+        MuQt_QQmlApplicationEngine(Pointer muobj, const CallEnvironment*, const QUrl& url, QObject* parent);
+        MuQt_QQmlApplicationEngine(Pointer muobj, const CallEnvironment*, const QString& filePath, QObject* parent);
 
     protected:
         virtual bool event(QEvent* e);
@@ -80,10 +75,7 @@ namespace Mu
     public:
         bool event_pub(QEvent* e) { return event(e); }
 
-        bool event_pub_parent(QEvent* e)
-        {
-            return QQmlApplicationEngine::event(e);
-        }
+        bool event_pub_parent(QEvent* e) { return QQmlApplicationEngine::event(e); }
 
     public:
         const QQmlApplicationEngineType* _baseType;
@@ -91,11 +83,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance* QQmlApplicationEngineType::cachedInstance(
-        const QQmlApplicationEngineType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QQmlApplicationEngineType::cachedInstance(const QQmlApplicationEngineType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

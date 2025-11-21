@@ -120,13 +120,7 @@ def get_extension_from_info_file(info_file):
     """
     Returns the extension from the infos["file"] media info
     """
-    return (
-        ""
-        if not info_file
-        else "URL"
-        if is_url(info_file)
-        else info_file.split(".")[-1].upper()
-    )
+    return "" if not info_file else "URL" if is_url(info_file) else info_file.split(".")[-1].upper()
 
 
 def get_common_source_media_infos(sources):

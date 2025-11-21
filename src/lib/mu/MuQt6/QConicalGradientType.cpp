@@ -46,8 +46,7 @@ namespace Mu
     {
     }
 
-    QConicalGradientType::QConicalGradientType(Context* c, const char* name,
-                                               Class* super)
+    QConicalGradientType::QConicalGradientType(Context* c, const char* name, Class* super)
         : Class(c, name, super)
     {
     }
@@ -56,83 +55,67 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(__allocate, Pointer)
     {
-        QConicalGradientType::Instance* i =
-            new QConicalGradientType::Instance((Class*)NODE_THIS.type());
+        QConicalGradientType::Instance* i = new QConicalGradientType::Instance((Class*)NODE_THIS.type());
         QConicalGradientType::registerFinalizer(i);
         NODE_RETURN(i);
     }
 
-    void QConicalGradientType::registerFinalizer(void* o)
-    {
-        GC_register_finalizer(o, QConicalGradientType::finalizer, 0, 0, 0);
-    }
+    void QConicalGradientType::registerFinalizer(void* o) { GC_register_finalizer(o, QConicalGradientType::finalizer, 0, 0, 0); }
 
     void QConicalGradientType::finalizer(void* obj, void* data)
     {
-        QConicalGradientType::Instance* i =
-            reinterpret_cast<QConicalGradientType::Instance*>(obj);
+        QConicalGradientType::Instance* i = reinterpret_cast<QConicalGradientType::Instance*>(obj);
         delete i;
     }
 
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    Pointer
-    qt_QConicalGradient_QConicalGradient_QConicalGradient_QConicalGradient(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QConicalGradient_QConicalGradient_QConicalGradient_QConicalGradient(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         setqtype<QConicalGradientType>(param_this, QConicalGradient());
         return param_this;
     }
 
-    Pointer
-    qt_QConicalGradient_QConicalGradient_QConicalGradient_QConicalGradient_QPointF_double(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_center,
-        double param_angle)
+    Pointer qt_QConicalGradient_QConicalGradient_QConicalGradient_QConicalGradient_QPointF_double(Mu::Thread& NODE_THREAD,
+                                                                                                  Pointer param_this, Pointer param_center,
+                                                                                                  double param_angle)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QPointF arg1 = getqtype<QPointFType>(param_center);
         qreal arg2 = (double)(param_angle);
-        setqtype<QConicalGradientType>(param_this,
-                                       QConicalGradient(arg1, arg2));
+        setqtype<QConicalGradientType>(param_this, QConicalGradient(arg1, arg2));
         return param_this;
     }
 
-    Pointer
-    qt_QConicalGradient_QConicalGradient_QConicalGradient_QConicalGradient_double_double_double(
-        Mu::Thread& NODE_THREAD, Pointer param_this, double param_cx,
-        double param_cy, double param_angle)
+    Pointer qt_QConicalGradient_QConicalGradient_QConicalGradient_QConicalGradient_double_double_double(Mu::Thread& NODE_THREAD,
+                                                                                                        Pointer param_this, double param_cx,
+                                                                                                        double param_cy, double param_angle)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         qreal arg1 = (double)(param_cx);
         qreal arg2 = (double)(param_cy);
         qreal arg3 = (double)(param_angle);
-        setqtype<QConicalGradientType>(param_this,
-                                       QConicalGradient(arg1, arg2, arg3));
+        setqtype<QConicalGradientType>(param_this, QConicalGradient(arg1, arg2, arg3));
         return param_this;
     }
 
-    double
-    qt_QConicalGradient_angle_double_QConicalGradient(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    double qt_QConicalGradient_angle_double_QConicalGradient(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QConicalGradient arg0 = getqtype<QConicalGradientType>(param_this);
         return arg0.angle();
     }
 
-    Pointer
-    qt_QConicalGradient_center_QPointF_QConicalGradient(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this)
+    Pointer qt_QConicalGradient_center_QPointF_QConicalGradient(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QConicalGradient arg0 = getqtype<QConicalGradientType>(param_this);
         return makeqtype<QPointFType>(c, arg0.center(), "qt.QPointF");
     }
 
-    void qt_QConicalGradient_setAngle_void_QConicalGradient_double(
-        Mu::Thread& NODE_THREAD, Pointer param_this, double param_angle)
+    void qt_QConicalGradient_setAngle_void_QConicalGradient_double(Mu::Thread& NODE_THREAD, Pointer param_this, double param_angle)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QConicalGradient arg0 = getqtype<QConicalGradientType>(param_this);
@@ -141,8 +124,7 @@ namespace Mu
         setqtype<QConicalGradientType>(param_this, arg0);
     }
 
-    void qt_QConicalGradient_setCenter_void_QConicalGradient_QPointF(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_center)
+    void qt_QConicalGradient_setCenter_void_QConicalGradient_QPointF(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_center)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QConicalGradient arg0 = getqtype<QConicalGradientType>(param_this);
@@ -151,9 +133,8 @@ namespace Mu
         setqtype<QConicalGradientType>(param_this, arg0);
     }
 
-    void qt_QConicalGradient_setCenter_void_QConicalGradient_double_double(
-        Mu::Thread& NODE_THREAD, Pointer param_this, double param_x,
-        double param_y)
+    void qt_QConicalGradient_setCenter_void_QConicalGradient_double_double(Mu::Thread& NODE_THREAD, Pointer param_this, double param_x,
+                                                                           double param_y)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QConicalGradient arg0 = getqtype<QConicalGradientType>(param_this);
@@ -165,56 +146,45 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(_n_QConicalGradient0, Pointer)
     {
-        NODE_RETURN(
-            qt_QConicalGradient_QConicalGradient_QConicalGradient_QConicalGradient(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QConicalGradient_QConicalGradient_QConicalGradient_QConicalGradient(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_QConicalGradient1, Pointer)
     {
-        NODE_RETURN(
-            qt_QConicalGradient_QConicalGradient_QConicalGradient_QConicalGradient_QPointF_double(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, double)));
+        NODE_RETURN(qt_QConicalGradient_QConicalGradient_QConicalGradient_QConicalGradient_QPointF_double(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, double)));
     }
 
     static NODE_IMPLEMENTATION(_n_QConicalGradient2, Pointer)
     {
-        NODE_RETURN(
-            qt_QConicalGradient_QConicalGradient_QConicalGradient_QConicalGradient_double_double_double(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, double),
-                NODE_ARG(2, double), NODE_ARG(3, double)));
+        NODE_RETURN(qt_QConicalGradient_QConicalGradient_QConicalGradient_QConicalGradient_double_double_double(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, double), NODE_ARG(2, double), NODE_ARG(3, double)));
     }
 
     static NODE_IMPLEMENTATION(_n_angle0, double)
     {
-        NODE_RETURN(qt_QConicalGradient_angle_double_QConicalGradient(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QConicalGradient_angle_double_QConicalGradient(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_center0, Pointer)
     {
-        NODE_RETURN(qt_QConicalGradient_center_QPointF_QConicalGradient(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QConicalGradient_center_QPointF_QConicalGradient(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_setAngle0, void)
     {
-        qt_QConicalGradient_setAngle_void_QConicalGradient_double(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, double));
+        qt_QConicalGradient_setAngle_void_QConicalGradient_double(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, double));
     }
 
     static NODE_IMPLEMENTATION(_n_setCenter0, void)
     {
-        qt_QConicalGradient_setCenter_void_QConicalGradient_QPointF(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QConicalGradient_setCenter_void_QConicalGradient_QPointF(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setCenter1, void)
     {
-        qt_QConicalGradient_setCenter_void_QConicalGradient_double_double(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, double),
-            NODE_ARG(2, double));
+        qt_QConicalGradient_setCenter_void_QConicalGradient_double_double(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, double),
+                                                                          NODE_ARG(2, double));
     }
 
     void QConicalGradientType::load()
@@ -234,66 +204,41 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(
-            new Function(c, "__allocate", __allocate, None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", __allocate, None, Return, ftn, End),
 
-            EndArguments);
+                   EndArguments);
 
         addSymbols(EndArguments);
 
         addSymbols(
             // enums
             // member functions
-            new Function(
-                c, "QConicalGradient", _n_QConicalGradient0, None, Compiled,
-                qt_QConicalGradient_QConicalGradient_QConicalGradient_QConicalGradient,
-                Return, "qt.QConicalGradient", Parameters,
-                new Param(c, "this", "qt.QConicalGradient"), End),
-            new Function(
-                c, "QConicalGradient", _n_QConicalGradient1, None, Compiled,
-                qt_QConicalGradient_QConicalGradient_QConicalGradient_QConicalGradient_QPointF_double,
-                Return, "qt.QConicalGradient", Parameters,
-                new Param(c, "this", "qt.QConicalGradient"),
-                new Param(c, "center", "qt.QPointF"),
-                new Param(c, "angle", "double"), End),
-            new Function(
-                c, "QConicalGradient", _n_QConicalGradient2, None, Compiled,
-                qt_QConicalGradient_QConicalGradient_QConicalGradient_QConicalGradient_double_double_double,
-                Return, "qt.QConicalGradient", Parameters,
-                new Param(c, "this", "qt.QConicalGradient"),
-                new Param(c, "cx", "double"), new Param(c, "cy", "double"),
-                new Param(c, "angle", "double"), End),
-            new Function(c, "angle", _n_angle0, None, Compiled,
-                         qt_QConicalGradient_angle_double_QConicalGradient,
-                         Return, "double", Parameters,
+            new Function(c, "QConicalGradient", _n_QConicalGradient0, None, Compiled,
+                         qt_QConicalGradient_QConicalGradient_QConicalGradient_QConicalGradient, Return, "qt.QConicalGradient", Parameters,
                          new Param(c, "this", "qt.QConicalGradient"), End),
-            new Function(c, "center", _n_center0, None, Compiled,
-                         qt_QConicalGradient_center_QPointF_QConicalGradient,
-                         Return, "qt.QPointF", Parameters,
-                         new Param(c, "this", "qt.QConicalGradient"), End),
-            new Function(
-                c, "setAngle", _n_setAngle0, None, Compiled,
-                qt_QConicalGradient_setAngle_void_QConicalGradient_double,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QConicalGradient"),
-                new Param(c, "angle", "double"), End),
-            new Function(
-                c, "setCenter", _n_setCenter0, None, Compiled,
-                qt_QConicalGradient_setCenter_void_QConicalGradient_QPointF,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QConicalGradient"),
-                new Param(c, "center", "qt.QPointF"), End),
-            new Function(
-                c, "setCenter", _n_setCenter1, None, Compiled,
-                qt_QConicalGradient_setCenter_void_QConicalGradient_double_double,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QConicalGradient"),
-                new Param(c, "x", "double"), new Param(c, "y", "double"), End),
+            new Function(c, "QConicalGradient", _n_QConicalGradient1, None, Compiled,
+                         qt_QConicalGradient_QConicalGradient_QConicalGradient_QConicalGradient_QPointF_double, Return,
+                         "qt.QConicalGradient", Parameters, new Param(c, "this", "qt.QConicalGradient"),
+                         new Param(c, "center", "qt.QPointF"), new Param(c, "angle", "double"), End),
+            new Function(c, "QConicalGradient", _n_QConicalGradient2, None, Compiled,
+                         qt_QConicalGradient_QConicalGradient_QConicalGradient_QConicalGradient_double_double_double, Return,
+                         "qt.QConicalGradient", Parameters, new Param(c, "this", "qt.QConicalGradient"), new Param(c, "cx", "double"),
+                         new Param(c, "cy", "double"), new Param(c, "angle", "double"), End),
+            new Function(c, "angle", _n_angle0, None, Compiled, qt_QConicalGradient_angle_double_QConicalGradient, Return, "double",
+                         Parameters, new Param(c, "this", "qt.QConicalGradient"), End),
+            new Function(c, "center", _n_center0, None, Compiled, qt_QConicalGradient_center_QPointF_QConicalGradient, Return, "qt.QPointF",
+                         Parameters, new Param(c, "this", "qt.QConicalGradient"), End),
+            new Function(c, "setAngle", _n_setAngle0, None, Compiled, qt_QConicalGradient_setAngle_void_QConicalGradient_double, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QConicalGradient"), new Param(c, "angle", "double"), End),
+            new Function(c, "setCenter", _n_setCenter0, None, Compiled, qt_QConicalGradient_setCenter_void_QConicalGradient_QPointF, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QConicalGradient"), new Param(c, "center", "qt.QPointF"), End),
+            new Function(c, "setCenter", _n_setCenter1, None, Compiled, qt_QConicalGradient_setCenter_void_QConicalGradient_double_double,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QConicalGradient"), new Param(c, "x", "double"),
+                         new Param(c, "y", "double"), End),
             // static functions
             EndArguments);
         globalScope()->addSymbols(EndArguments);

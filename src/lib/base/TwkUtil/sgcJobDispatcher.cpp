@@ -43,13 +43,9 @@ class JobDispatcher::Imp
 
     //----------------------------------------------------------------------------
     //
-    template <typename Container>
-    auto findById(const Container& data, JobOps::Id id)
+    template <typename Container> auto findById(const Container& data, JobOps::Id id)
     {
-        return std::find_if(
-            data.begin(), data.end(),
-            [id](typename Container::value_type const& rhs) -> bool
-            { return id == rhs->m_id; });
+        return std::find_if(data.begin(), data.end(), [id](typename Container::value_type const& rhs) -> bool { return id == rhs->m_id; });
     }
 
 public:
@@ -98,9 +94,7 @@ public:
                             // complete) or shutdown
                             //
                             MutexGuard lock{&m_mutex};
-                            m_signal.wait(
-                                lock.native(), [this]() -> bool
-                                { return m_numPendingJobs || m_shutdown; });
+                            m_signal.wait(lock.native(), [this]() -> bool { return m_numPendingJobs || m_shutdown; });
 
                             // If shutdown occurred, finish executing all
                             // remaining jobs and then exit
@@ -113,16 +107,10 @@ public:
                             // found, go back to waiting
                             //
                             bool foundJob = false;
-                            for (auto nextJob = m_waiting.begin(),
-                                      end = m_waiting.end();
-                                 nextJob != end; ++nextJob)
+                            for (auto nextJob = m_waiting.begin(), end = m_waiting.end(); nextJob != end; ++nextJob)
                             {
-                                foundJob = findById(m_waiting,
-                                                    (*nextJob)->m_dependency)
-                                               == end
-                                           && findById(m_running,
-                                                       (*nextJob)->m_dependency)
-                                                  == m_running.end();
+                                foundJob = findById(m_waiting, (*nextJob)->m_dependency) == end
+                                           && findById(m_running, (*nextJob)->m_dependency) == m_running.end();
                                 if (foundJob)
                                 {
                                     job = *nextJob;
@@ -151,9 +139,7 @@ public:
                         //
                         {
                             MutexGuard lock{&m_mutex};
-                            if (auto runningJob =
-                                    findById(m_running, job->m_id);
-                                runningJob != m_running.end())
+                            if (auto runningJob = findById(m_running, job->m_id); runningJob != m_running.end())
                             {
                                 m_running.erase(runningJob);
                             }
@@ -240,8 +226,7 @@ public:
     {
         MutexGuard lock{&m_mutex};
 
-        while ((findById(m_waiting, id) != m_waiting.end())
-               || (findById(m_running, id) != m_running.end()))
+        while ((findById(m_waiting, id) != m_waiting.end()) || (findById(m_running, id) != m_running.end()))
         {
             m_signal.wait(lock.native());
         }
@@ -278,10 +263,7 @@ JobDispatcher::~JobDispatcher() { delete m_imp; }
 
 //-----------------------------------------------------------------------------
 //
-JobOps::Id JobDispatcher::addJob(const JobBase::Ptr& job)
-{
-    return m_imp->addJob(job);
-}
+JobOps::Id JobDispatcher::addJob(const JobBase::Ptr& job) { return m_imp->addJob(job); }
 
 //-----------------------------------------------------------------------------
 //

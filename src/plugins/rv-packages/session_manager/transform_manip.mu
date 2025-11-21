@@ -392,12 +392,13 @@ class: TransformManip : MinorMode
               ("stylus-pen--push", push, "Move"),
               ("stylus-pen--drag", drag, "Move"),
               ("stylus-pen--release", release, "")],
-             Menu {
-                 {"Layout", Menu {
-                         {"_", nil, nil, nil},
-                         {"Fit All Images", fitAll, nil, nil},
-                         {"Reset All Manips", resetAll, nil, nil}
-                     }}}
+             newMenu(MenuItem[] {
+                 subMenu("Layout", MenuItem[] {
+                         menuSeparator(),
+                         menuItem("Fit All Images", "", "viewmode_category", fitAll, enabledItem),
+                         menuItem("Reset All Manips", "", "viewmode_category", resetAll, enabledItem)
+                     })
+             })
              ,
              //
              //  manip events must be processed nearly last, since

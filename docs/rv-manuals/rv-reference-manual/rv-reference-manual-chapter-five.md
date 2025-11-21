@@ -192,6 +192,8 @@ Some events will originate from RV itself. These include things like new-source 
 | after-graph-view-change | nodename |  | The current view node changed. |
 | new-node | nodename |  | A new view node was created. |
 | graph-new-node | nodename | nodename protocol version groupname | A new node of any kind was created. |
+| set-current-annotate-mode-node | nodename |  | Set the Paint node to use for the _currentNode in the annotate mode package. Calling this event with an empty string will reset its behaviour. |
+| annotate-mode-activated | | | The annotate mode package is activated |
 | before-progressive-loading |  |  | Loading will start |
 | after-progressive-loading |  |  | Loading is complete (sent immediately if no files will be loaded) |
 | graph-layer-change |  |  | **DEPRECATED** use after-graph-view-change |
@@ -302,4 +304,23 @@ Sometimes an image is not available on disk when RV tries to read. This is often
 }
 
 bind("missing-image", missingImage); 
+```
+
+#### 5.6.4 Drag and Drop Filtering.
+
+Sometimes dragging in a directory into RV, the directory might contain files that RV cannot load (e.g. sidecar files), the directory-filter allows you to filter out certain file types.
+
+The Filter should return "1" if you want the file, "0" if you dont.
+
+A python example of using this is:
+
+```
+def filter_directory (event):
+  file = event.contents();
+  if file.endswith(".info"):
+    event.setReturnContent("0");
+    return
+  event.setReturnContent("1");
+
+commands.bind("default", "global", "directory-filter", filter_directory, "Doc string");
 ```

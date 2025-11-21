@@ -47,8 +47,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    Pointer qt_QTimerEvent_QTimerEvent_QTimerEvent_QTimerEvent_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_timerId)
+    Pointer qt_QTimerEvent_QTimerEvent_QTimerEvent_QTimerEvent_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_timerId)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         int arg1 = (int)(param_timerId);
@@ -56,8 +55,7 @@ namespace Mu
         return param_this;
     }
 
-    int qt_QTimerEvent_timerId_int_QTimerEvent(Mu::Thread& NODE_THREAD,
-                                               Pointer param_this)
+    int qt_QTimerEvent_timerId_int_QTimerEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTimerEvent* arg0 = getqpointer<QTimerEventType>(param_this);
@@ -66,14 +64,12 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(_n_QTimerEvent0, Pointer)
     {
-        NODE_RETURN(qt_QTimerEvent_QTimerEvent_QTimerEvent_QTimerEvent_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QTimerEvent_QTimerEvent_QTimerEvent_QTimerEvent_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_timerId0, int)
     {
-        NODE_RETURN(qt_QTimerEvent_timerId_int_QTimerEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTimerEvent_timerId_int_QTimerEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     void QTimerEventType::load()
@@ -93,13 +89,11 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
                    new MemberVariable(c, "native", "qt.NativeObject"),
 
@@ -110,15 +104,10 @@ namespace Mu
         addSymbols(
             // enums
             // member functions
-            new Function(c, "QTimerEvent", _n_QTimerEvent0, None, Compiled,
-                         qt_QTimerEvent_QTimerEvent_QTimerEvent_QTimerEvent_int,
-                         Return, "qt.QTimerEvent", Parameters,
-                         new Param(c, "this", "qt.QTimerEvent"),
-                         new Param(c, "timerId", "int"), End),
-            new Function(c, "timerId", _n_timerId0, None, Compiled,
-                         qt_QTimerEvent_timerId_int_QTimerEvent, Return, "int",
-                         Parameters, new Param(c, "this", "qt.QTimerEvent"),
-                         End),
+            new Function(c, "QTimerEvent", _n_QTimerEvent0, None, Compiled, qt_QTimerEvent_QTimerEvent_QTimerEvent_QTimerEvent_int, Return,
+                         "qt.QTimerEvent", Parameters, new Param(c, "this", "qt.QTimerEvent"), new Param(c, "timerId", "int"), End),
+            new Function(c, "timerId", _n_timerId0, None, Compiled, qt_QTimerEvent_timerId_int_QTimerEvent, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QTimerEvent"), End),
             // static functions
             EndArguments);
         globalScope()->addSymbols(EndArguments);

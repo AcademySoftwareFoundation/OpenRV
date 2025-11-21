@@ -39,8 +39,7 @@ namespace Mu
         //  Constructors
         //
 
-        QTableWidgetType(Context* context, const char* name,
-                         Class* superClass = 0, Class* superClass2 = 0);
+        QTableWidgetType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QTableWidgetType();
 
@@ -63,16 +62,12 @@ namespace Mu
     {
     public:
         virtual ~MuQt_QTableWidget();
-        MuQt_QTableWidget(Pointer muobj, const CallEnvironment*,
-                          QWidget* parent);
-        MuQt_QTableWidget(Pointer muobj, const CallEnvironment*, int rows,
-                          int columns, QWidget* parent);
+        MuQt_QTableWidget(Pointer muobj, const CallEnvironment*, QWidget* parent);
+        MuQt_QTableWidget(Pointer muobj, const CallEnvironment*, int rows, int columns, QWidget* parent);
 
     protected:
-        virtual bool dropMimeData(int row, int column, const QMimeData* data,
-                                  Qt::DropAction action);
-        virtual QMimeData*
-        mimeData(const QList<QTableWidgetItem*>& items) const;
+        virtual bool dropMimeData(int row, int column, const QMimeData* data, Qt::DropAction action);
+        virtual QMimeData* mimeData(const QList<QTableWidgetItem*>& items) const;
         virtual QStringList mimeTypes() const;
         virtual Qt::DropActions supportedDropActions() const;
         virtual void dropEvent(QDropEvent* event);
@@ -84,16 +79,13 @@ namespace Mu
         virtual void setSelectionModel(QItemSelectionModel* selectionModel);
 
     protected:
-        virtual void currentChanged(const QModelIndex& current,
-                                    const QModelIndex& previous);
+        virtual void currentChanged(const QModelIndex& current, const QModelIndex& previous);
         virtual int horizontalOffset() const;
         virtual bool isIndexHidden(const QModelIndex& index) const;
         virtual void paintEvent(QPaintEvent* event);
         virtual QModelIndexList selectedIndexes() const;
-        virtual void selectionChanged(const QItemSelection& selected,
-                                      const QItemSelection& deselected);
-        virtual void setSelection(const QRect& rect,
-                                  QItemSelectionModel::SelectionFlags flags);
+        virtual void selectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
+        virtual void setSelection(const QRect& rect, QItemSelectionModel::SelectionFlags flags);
         virtual int sizeHintForColumn(int column) const;
         virtual int sizeHintForRow(int row) const;
         virtual void timerEvent(QTimerEvent* event);
@@ -102,181 +94,99 @@ namespace Mu
         virtual QSize viewportSizeHint() const;
 
     public:
-        bool dropMimeData_pub(int row, int column, const QMimeData* data,
-                              Qt::DropAction action)
+        bool dropMimeData_pub(int row, int column, const QMimeData* data, Qt::DropAction action)
         {
             return dropMimeData(row, column, data, action);
         }
 
-        bool dropMimeData_pub_parent(int row, int column, const QMimeData* data,
-                                     Qt::DropAction action)
+        bool dropMimeData_pub_parent(int row, int column, const QMimeData* data, Qt::DropAction action)
         {
             return QTableWidget::dropMimeData(row, column, data, action);
         }
 
-        QModelIndex indexFromItem_pub(QTableWidgetItem* item) const
-        {
-            return indexFromItem(item);
-        }
+        QModelIndex indexFromItem_pub(QTableWidgetItem* item) const { return indexFromItem(item); }
 
-        QModelIndex indexFromItem_pub_parent(QTableWidgetItem* item) const
-        {
-            return QTableWidget::indexFromItem(item);
-        }
+        QModelIndex indexFromItem_pub_parent(QTableWidgetItem* item) const { return QTableWidget::indexFromItem(item); }
 
-        QTableWidgetItem* itemFromIndex_pub(const QModelIndex& index) const
-        {
-            return itemFromIndex(index);
-        }
+        QTableWidgetItem* itemFromIndex_pub(const QModelIndex& index) const { return itemFromIndex(index); }
 
-        QTableWidgetItem*
-        itemFromIndex_pub_parent(const QModelIndex& index) const
-        {
-            return QTableWidget::itemFromIndex(index);
-        }
+        QTableWidgetItem* itemFromIndex_pub_parent(const QModelIndex& index) const { return QTableWidget::itemFromIndex(index); }
 
-        QList<QTableWidgetItem*> items_pub(const QMimeData* data) const
-        {
-            return items(data);
-        }
+        QList<QTableWidgetItem*> items_pub(const QMimeData* data) const { return items(data); }
 
-        QList<QTableWidgetItem*> items_pub_parent(const QMimeData* data) const
-        {
-            return QTableWidget::items(data);
-        }
+        QList<QTableWidgetItem*> items_pub_parent(const QMimeData* data) const { return QTableWidget::items(data); }
 
-        QMimeData* mimeData_pub(const QList<QTableWidgetItem*>& items) const
-        {
-            return mimeData(items);
-        }
+        QMimeData* mimeData_pub(const QList<QTableWidgetItem*>& items) const { return mimeData(items); }
 
-        QMimeData*
-        mimeData_pub_parent(const QList<QTableWidgetItem*>& items) const
-        {
-            return QTableWidget::mimeData(items);
-        }
+        QMimeData* mimeData_pub_parent(const QList<QTableWidgetItem*>& items) const { return QTableWidget::mimeData(items); }
 
         QStringList mimeTypes_pub() const { return mimeTypes(); }
 
-        QStringList mimeTypes_pub_parent() const
-        {
-            return QTableWidget::mimeTypes();
-        }
+        QStringList mimeTypes_pub_parent() const { return QTableWidget::mimeTypes(); }
 
-        Qt::DropActions supportedDropActions_pub() const
-        {
-            return supportedDropActions();
-        }
+        Qt::DropActions supportedDropActions_pub() const { return supportedDropActions(); }
 
-        Qt::DropActions supportedDropActions_pub_parent() const
-        {
-            return QTableWidget::supportedDropActions();
-        }
+        Qt::DropActions supportedDropActions_pub_parent() const { return QTableWidget::supportedDropActions(); }
 
         void dropEvent_pub(QDropEvent* event) { dropEvent(event); }
 
-        void dropEvent_pub_parent(QDropEvent* event)
-        {
-            QTableWidget::dropEvent(event);
-        }
+        void dropEvent_pub_parent(QDropEvent* event) { QTableWidget::dropEvent(event); }
 
         bool event_pub(QEvent* e) { return event(e); }
 
         bool event_pub_parent(QEvent* e) { return QTableWidget::event(e); }
 
-        void currentChanged_pub(const QModelIndex& current,
-                                const QModelIndex& previous)
-        {
-            currentChanged(current, previous);
-        }
+        void currentChanged_pub(const QModelIndex& current, const QModelIndex& previous) { currentChanged(current, previous); }
 
-        void currentChanged_pub_parent(const QModelIndex& current,
-                                       const QModelIndex& previous)
+        void currentChanged_pub_parent(const QModelIndex& current, const QModelIndex& previous)
         {
             QTableWidget::currentChanged(current, previous);
         }
 
         int horizontalOffset_pub() const { return horizontalOffset(); }
 
-        int horizontalOffset_pub_parent() const
-        {
-            return QTableWidget::horizontalOffset();
-        }
+        int horizontalOffset_pub_parent() const { return QTableWidget::horizontalOffset(); }
 
-        bool isIndexHidden_pub(const QModelIndex& index) const
-        {
-            return isIndexHidden(index);
-        }
+        bool isIndexHidden_pub(const QModelIndex& index) const { return isIndexHidden(index); }
 
-        bool isIndexHidden_pub_parent(const QModelIndex& index) const
-        {
-            return QTableWidget::isIndexHidden(index);
-        }
+        bool isIndexHidden_pub_parent(const QModelIndex& index) const { return QTableWidget::isIndexHidden(index); }
 
         void paintEvent_pub(QPaintEvent* event) { paintEvent(event); }
 
-        void paintEvent_pub_parent(QPaintEvent* event)
-        {
-            QTableWidget::paintEvent(event);
-        }
+        void paintEvent_pub_parent(QPaintEvent* event) { QTableWidget::paintEvent(event); }
 
-        QModelIndexList selectedIndexes_pub() const
-        {
-            return selectedIndexes();
-        }
+        QModelIndexList selectedIndexes_pub() const { return selectedIndexes(); }
 
-        QModelIndexList selectedIndexes_pub_parent() const
-        {
-            return QTableWidget::selectedIndexes();
-        }
+        QModelIndexList selectedIndexes_pub_parent() const { return QTableWidget::selectedIndexes(); }
 
-        void selectionChanged_pub(const QItemSelection& selected,
-                                  const QItemSelection& deselected)
+        void selectionChanged_pub(const QItemSelection& selected, const QItemSelection& deselected)
         {
             selectionChanged(selected, deselected);
         }
 
-        void selectionChanged_pub_parent(const QItemSelection& selected,
-                                         const QItemSelection& deselected)
+        void selectionChanged_pub_parent(const QItemSelection& selected, const QItemSelection& deselected)
         {
             QTableWidget::selectionChanged(selected, deselected);
         }
 
-        void setSelection_pub(const QRect& rect,
-                              QItemSelectionModel::SelectionFlags flags)
-        {
-            setSelection(rect, flags);
-        }
+        void setSelection_pub(const QRect& rect, QItemSelectionModel::SelectionFlags flags) { setSelection(rect, flags); }
 
-        void setSelection_pub_parent(const QRect& rect,
-                                     QItemSelectionModel::SelectionFlags flags)
+        void setSelection_pub_parent(const QRect& rect, QItemSelectionModel::SelectionFlags flags)
         {
             QTableWidget::setSelection(rect, flags);
         }
 
-        int sizeHintForColumn_pub(int column) const
-        {
-            return sizeHintForColumn(column);
-        }
+        int sizeHintForColumn_pub(int column) const { return sizeHintForColumn(column); }
 
-        int sizeHintForColumn_pub_parent(int column) const
-        {
-            return QTableWidget::sizeHintForColumn(column);
-        }
+        int sizeHintForColumn_pub_parent(int column) const { return QTableWidget::sizeHintForColumn(column); }
 
         int sizeHintForRow_pub(int row) const { return sizeHintForRow(row); }
 
-        int sizeHintForRow_pub_parent(int row) const
-        {
-            return QTableWidget::sizeHintForRow(row);
-        }
+        int sizeHintForRow_pub_parent(int row) const { return QTableWidget::sizeHintForRow(row); }
 
         void timerEvent_pub(QTimerEvent* event) { timerEvent(event); }
 
-        void timerEvent_pub_parent(QTimerEvent* event)
-        {
-            QTableWidget::timerEvent(event);
-        }
+        void timerEvent_pub_parent(QTimerEvent* event) { QTableWidget::timerEvent(event); }
 
         void updateGeometries_pub() { updateGeometries(); }
 
@@ -284,17 +194,11 @@ namespace Mu
 
         int verticalOffset_pub() const { return verticalOffset(); }
 
-        int verticalOffset_pub_parent() const
-        {
-            return QTableWidget::verticalOffset();
-        }
+        int verticalOffset_pub_parent() const { return QTableWidget::verticalOffset(); }
 
         QSize viewportSizeHint_pub() const { return viewportSizeHint(); }
 
-        QSize viewportSizeHint_pub_parent() const
-        {
-            return QTableWidget::viewportSizeHint();
-        }
+        QSize viewportSizeHint_pub_parent() const { return QTableWidget::viewportSizeHint(); }
 
     public:
         const QTableWidgetType* _baseType;
@@ -302,11 +206,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance*
-    QTableWidgetType::cachedInstance(const QTableWidgetType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QTableWidgetType::cachedInstance(const QTableWidgetType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

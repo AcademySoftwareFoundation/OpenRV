@@ -61,8 +61,7 @@ template <typename T> double sumChannels(const T& v)
 }
 
 template <typename Tunsigned, typename Tdouble, typename Tfloat>
-int computeRMS(const FrameBuffer* a, const FrameBuffer* b, bool doFloat,
-               bool findMax, bool doCompare, double dmax)
+int computeRMS(const FrameBuffer* a, const FrameBuffer* b, bool doFloat, bool findMax, bool doCompare, double dmax)
 {
 
     Tdouble sum(0.0);
@@ -109,10 +108,8 @@ int computeRMS(const FrameBuffer* a, const FrameBuffer* b, bool doFloat,
                     {
                         if (fabs((double)cd[c]) > dmax)
                         {
-                            cout << "Pixel difference at (" << x << ", " << y
-                                 << ") channel[" << c
-                                 << "] = " << fabs((double)cd[c]) << " found."
-                                 << endl;
+                            cout << "Pixel difference at (" << x << ", " << y << ") channel[" << c << "] = " << fabs((double)cd[c])
+                                 << " found." << endl;
                             noMatch = true;
                             break;
                         }
@@ -149,8 +146,7 @@ int computeRMS(const FrameBuffer* a, const FrameBuffer* b, bool doFloat,
 
         if (findMax && maxX > -1)
         {
-            cout << "max diff at (" << maxX << ", " << maxY << "):  " << maxA
-                 << " vs. " << maxB << endl;
+            cout << "max diff at (" << maxX << ", " << maxY << "):  " << maxA << " vs. " << maxB << endl;
         }
     }
     else
@@ -187,10 +183,8 @@ int computeRMS(const FrameBuffer* a, const FrameBuffer* b, bool doFloat,
                     {
                         if (fabs((double)cd[c]) > dmax)
                         {
-                            cout << "Pixel difference at (" << x << ", " << y
-                                 << ") channel[" << c
-                                 << "] = " << fabs((double)cd[c]) << " found."
-                                 << endl;
+                            cout << "Pixel difference at (" << x << ", " << y << ") channel[" << c << "] = " << fabs((double)cd[c])
+                                 << " found." << endl;
                             noMatch = true;
                             break;
                         }
@@ -226,8 +220,7 @@ int computeRMS(const FrameBuffer* a, const FrameBuffer* b, bool doFloat,
 
         if (findMax && maxX > -1)
         {
-            cout << "max diff at (" << maxX << ", " << maxY << "):  " << maxA
-                 << " vs. " << maxB << endl;
+            cout << "max diff at (" << maxX << ", " << maxY << "):  " << maxA << " vs. " << maxB << endl;
         }
     }
 
@@ -237,12 +230,10 @@ int computeRMS(const FrameBuffer* a, const FrameBuffer* b, bool doFloat,
 int utf8Main(int argc, char* argv[])
 {
 #ifdef PLATFORM_DARWIN
-    TwkApp::DarwinBundle bundle("RV", MAJOR_VERSION, MINOR_VERSION,
-                                REVISION_NUMBER);
+    TwkApp::DarwinBundle bundle("RV", MAJOR_VERSION, MINOR_VERSION, REVISION_NUMBER);
 #else
     QCoreApplication qapp(argc, argv);
-    TwkApp::QTBundle bundle("rv", MAJOR_VERSION, MINOR_VERSION,
-                            REVISION_NUMBER);
+    TwkApp::QTBundle bundle("rv", MAJOR_VERSION, MINOR_VERSION, REVISION_NUMBER);
     (void)bundle.top();
 #endif
 
@@ -258,14 +249,11 @@ int utf8Main(int argc, char* argv[])
     //  Parse cmd line args
     //
 
-    string usage =
-        string("usage: ") + argv[0]
-        + " [-f] [-m] [-cmp] [-dmax <value>] <image1> <image2>\n"
-        + "    -f: operate on FLOAT pixels\n"
-        + "    -m: print location and values of pixel with max difference\n"
-        + "    -cmp: perform image comparison (returns exit 1 if not matched)"
-        + "    -dmax: Maximum allow channel error during comparison "
-          "(default=0.0)";
+    string usage = string("usage: ") + argv[0] + " [-f] [-m] [-cmp] [-dmax <value>] <image1> <image2>\n"
+                   + "    -f: operate on FLOAT pixels\n" + "    -m: print location and values of pixel with max difference\n"
+                   + "    -cmp: perform image comparison (returns exit 1 if not matched)"
+                   + "    -dmax: Maximum allow channel error during comparison "
+                     "(default=0.0)";
 
     for (int i = 1; i < argc; ++i)
     {
@@ -346,10 +334,8 @@ int utf8Main(int argc, char* argv[])
         bi = temp;
     }
 
-    FrameBuffer* a =
-        convertBoth(ai, (doFloat) ? FrameBuffer::FLOAT : FrameBuffer::USHORT);
-    FrameBuffer* b =
-        convertBoth(bi, (doFloat) ? FrameBuffer::FLOAT : FrameBuffer::USHORT);
+    FrameBuffer* a = convertBoth(ai, (doFloat) ? FrameBuffer::FLOAT : FrameBuffer::USHORT);
+    FrameBuffer* b = convertBoth(bi, (doFloat) ? FrameBuffer::FLOAT : FrameBuffer::USHORT);
 
     if (a->width() != b->width() || a->height() != b->height())
     {
@@ -402,23 +388,19 @@ int utf8Main(int argc, char* argv[])
 
     if (a->numChannels() == 1)
     {
-        status = computeRMS<Col1us, Col1d, Col1f>(a, b, doFloat, findMax,
-                                                  doCompare, dmax);
+        status = computeRMS<Col1us, Col1d, Col1f>(a, b, doFloat, findMax, doCompare, dmax);
     }
     else if (a->numChannels() == 2)
     {
-        status = computeRMS<Col2us, Col2d, Col2f>(a, b, doFloat, findMax,
-                                                  doCompare, dmax);
+        status = computeRMS<Col2us, Col2d, Col2f>(a, b, doFloat, findMax, doCompare, dmax);
     }
     else if (a->numChannels() == 3)
     {
-        status = computeRMS<Col3us, Col3d, Col3f>(a, b, doFloat, findMax,
-                                                  doCompare, dmax);
+        status = computeRMS<Col3us, Col3d, Col3f>(a, b, doFloat, findMax, doCompare, dmax);
     }
     else if (a->numChannels() == 4)
     {
-        status = computeRMS<Col4us, Col4d, Col4f>(a, b, doFloat, findMax,
-                                                  doCompare, dmax);
+        status = computeRMS<Col4us, Col4d, Col4f>(a, b, doFloat, findMax, doCompare, dmax);
     }
 
     TwkMovie::GenericIO::shutdown(); // Shutdown TwkMovie::GenericIO plugins

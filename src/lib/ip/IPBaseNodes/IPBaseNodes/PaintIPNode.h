@@ -89,15 +89,13 @@ namespace IPCore
         using TextMap = std::map<Component*, LocalText>;
         using FrameMap = std::map<int, Components>;
 
-        PaintIPNode(const std::string& name, const NodeDefinition* def,
-                    IPGraph* graph, GroupIPNode* group);
+        PaintIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group);
         virtual ~PaintIPNode();
 
         IPImage* evaluate(const Context& context) override;
 
         void propertyChanged(const Property* proprety) override;
-        void readCompleted(const std::string& typeName,
-                           unsigned int version) override;
+        void readCompleted(const std::string& typeName, unsigned int version) override;
 
     protected:
         void compilePenComponent(Component*);

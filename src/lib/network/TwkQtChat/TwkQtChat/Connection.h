@@ -57,8 +57,7 @@ namespace TwkQtChat
 
         virtual bool sendData(const QString& interp, const QByteArray& data);
 
-        void connectToContact(const QString& name, const QHostAddress& ip,
-                              quint16 port, OpenMode openMode = ReadWrite);
+        void connectToContact(const QString& name, const QHostAddress& ip, quint16 port, OpenMode openMode = ReadWrite);
 
         virtual bool isLocal() { return m_local; };
 
@@ -75,8 +74,7 @@ namespace TwkQtChat
     signals:
         void readyForUse();
         void newMessage(const QString& from, const QString& message);
-        void newData(const QString& from, const QString& interp,
-                     const QByteArray& data);
+        void newData(const QString& from, const QString& interp, const QByteArray& data);
         void requestGreeting();
 
     protected:

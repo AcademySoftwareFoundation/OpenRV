@@ -37,7 +37,7 @@ CAVEATS:
 
 * This is write-only, no session file reading yet.
 
-* Only version 4 session files (RV v4.0.7 and above) are supported 
+* Only version 4 session files (RV v4.0.7 and above) are supported
 
 RELEASE NOTES:
 
@@ -106,15 +106,11 @@ class _Node:
         """
         nodeType = six.ensure_binary(nodeType)
         try:
-            pipeProp = self.getProperty(
-                pipelineType, pipelineSuffix, "pipeline", "nodes"
-            )
+            pipeProp = self.getProperty(pipelineType, pipelineSuffix, "pipeline", "nodes")
             pipenodes = pipeProp[1] + [nodeType]
         except KeyError:
             pipenodes = [nodeType]
-        self.setProperty(
-            pipelineType, pipelineSuffix, "pipeline", "nodes", gto.STRING, pipenodes
-        )
+        self.setProperty(pipelineType, pipelineSuffix, "pipeline", "nodes", gto.STRING, pipenodes)
 
         return "%s_%d" % (pipelineSuffix, len(pipenodes) - 1)
 
@@ -124,9 +120,7 @@ class _Node:
         return None if it cannot be located.
         """
         try:
-            pipeProp = self.getProperty(
-                pipelineType, pipelineSuffix, "pipeline", "nodes"
-            )
+            pipeProp = self.getProperty(pipelineType, pipelineSuffix, "pipeline", "nodes")
         except KeyError:
             return None
 
@@ -174,10 +168,7 @@ class _Node:
         others may only allow a certain number of inputs.
         """
         if self.maxInputs != -1 and len(self.inputs) + 1 > self.maxInputs:
-            raise Exception(
-                "ERROR: node '%s' (%s) only allowed %d inputs"
-                % (self.name, self.typeName, self.maxInputs)
-            )
+            raise Exception("ERROR: node '%s' (%s) only allowed %d inputs" % (self.name, self.typeName, self.maxInputs))
         else:
             self.inputs.append(node.name)
 
@@ -230,9 +221,7 @@ class Source(_GroupNode):
         """
         Offset must be in _seconds_.
         """
-        self.setProperty(
-            "RVFileSource", "source", "group", "audioOffset", gto.FLOAT, offset
-        )
+        self.setProperty("RVFileSource", "source", "group", "audioOffset", gto.FLOAT, offset)
 
     def setRangeOffset(self, offset):
         """
@@ -240,9 +229,7 @@ class Source(_GroupNode):
         to have the first frame of foo.mov set to 101, set range
         offset to 100.
         """
-        self.setProperty(
-            "RVFileSource", "source", "group", "rangeOffset", gto.INT, offset
-        )
+        self.setProperty("RVFileSource", "source", "group", "rangeOffset", gto.INT, offset)
 
     def setCutIn(self, frame):
         """
@@ -271,10 +258,7 @@ class Source(_GroupNode):
         As a helper, a dictionary can be supplied that will print metadata sorted by the keys
         """
         if isinstance(metadata, dict):
-            metadata = [
-                "{0}={1}".format(k, v)
-                for k, v in sorted(metadata.items(), reverse=True)
-            ]
+            metadata = ["{0}={1}".format(k, v) for k, v in sorted(metadata.items(), reverse=True)]
 
         self.setProperty(
             "RVFileSource",
@@ -292,7 +276,7 @@ class Source(_GroupNode):
         """
         args = ["RVLinearize", "RVLinearizePipelineGroup", "tolinPipeline"]
         pipeNode = self.getPipelineNode(*args)
-        if pipeNode == None:
+        if pipeNode is None:
             pipeNode = self.addPipelineNode(*args)
         self.setProperty(
             "RVLinearize",
@@ -311,11 +295,9 @@ class Source(_GroupNode):
         """
         args = ["RVLensWarp", "RVLinearizePipelineGroup", "tolinPipeline"]
         pipeNode = self.getPipelineNode(*args)
-        if pipeNode == None:
+        if pipeNode is None:
             pipeNode = self.addPipelineNode(*args)
-        self.setProperty(
-            "RVLensWarp", pipeNode, "warp", "pixelAspectRatio", gto.FLOAT, pa
-        )
+        self.setProperty("RVLensWarp", pipeNode, "warp", "pixelAspectRatio", gto.FLOAT, pa)
         self.setProperty("RVLensWarp", pipeNode, "node", "active", gto.INT, 1)
 
     ## Color
@@ -328,13 +310,11 @@ class Source(_GroupNode):
         """
         args = ["RVColor", "RVColorPipelineGroup", "colorPipeline"]
         pipeNode = self.getPipelineNode(*args)
-        if pipeNode == None:
+        if pipeNode is None:
             pipeNode = self.addPipelineNode(*args)
         self.setProperty("RVColor", pipeNode, "color", "exposure", gto.FLOAT, exp)
         self.setProperty("RVColor", pipeNode, "color", "active", gto.INT, 1)
-        self.setProperty(
-            "RVFormat", "format", "color", "allowFloatingPoint", gto.INT, 1
-        )
+        self.setProperty("RVFormat", "format", "color", "allowFloatingPoint", gto.INT, 1)
         self.setProperty("RVFormat", "format", "color", "maxBitDepth", gto.INT, 0)
 
     def setColorScale(self, scale):
@@ -345,13 +325,11 @@ class Source(_GroupNode):
         """
         args = ["RVColor", "RVColorPipelineGroup", "colorPipeline"]
         pipeNode = self.getPipelineNode(*args)
-        if pipeNode == None:
+        if pipeNode is None:
             pipeNode = self.addPipelineNode(*args)
         self.setProperty("RVColor", pipeNode, "color", "scale", gto.FLOAT, scale)
         self.setProperty("RVColor", pipeNode, "color", "active", gto.INT, 1)
-        self.setProperty(
-            "RVFormat", "format", "color", "allowFloatingPoint", gto.INT, 1
-        )
+        self.setProperty("RVFormat", "format", "color", "allowFloatingPoint", gto.INT, 1)
         self.setProperty("RVFormat", "format", "color", "maxBitDepth", gto.INT, 0)
 
     ## Channels and Layers
@@ -363,19 +341,13 @@ class Source(_GroupNode):
         """
         args = ["RVColor", "RVColorPipelineGroup", "colorPipeline"]
         pipeNode = self.getPipelineNode(*args)
-        if pipeNode == None:
+        if pipeNode is None:
             pipeNode = self.addPipelineNode(*args)
-        self.setProperty(
-            "RVColor", pipeNode, "color", "channelOrder", gto.STRING, channelOrder
-        )
+        self.setProperty("RVColor", pipeNode, "color", "channelOrder", gto.STRING, channelOrder)
         self.setProperty("RVColor", pipeNode, "color", "active", gto.INT, 1)
-        self.setProperty(
-            "RVFormat", "format", "color", "allowFloatingPoint", gto.INT, 1
-        )
+        self.setProperty("RVFormat", "format", "color", "allowFloatingPoint", gto.INT, 1)
         self.setProperty("RVFormat", "format", "color", "maxBitDepth", gto.INT, 0)
-        self.setProperty(
-            "RVFileSource", "source", "request", "readAllChannels", gto.INT, 1
-        )
+        self.setProperty("RVFileSource", "source", "request", "readAllChannels", gto.INT, 1)
 
     def setImageLayerSelection(self, layer):
         """
@@ -395,16 +367,10 @@ class Source(_GroupNode):
         channelMap can be a single channel which represents RGB, or a tuple ("Z","A"). Mapping
         happens in software
         """
-        self.setProperty(
-            "RVChannelMap", "channelMap", "format", "channels", gto.STRING, channelMap
-        )
-        self.setProperty(
-            "RVFormat", "format", "color", "allowFloatingPoint", gto.INT, 1
-        )
+        self.setProperty("RVChannelMap", "channelMap", "format", "channels", gto.STRING, channelMap)
+        self.setProperty("RVFormat", "format", "color", "allowFloatingPoint", gto.INT, 1)
         self.setProperty("RVFormat", "format", "color", "maxBitDepth", gto.INT, 0)
-        self.setProperty(
-            "RVFileSource", "source", "request", "readAllChannels", gto.INT, 1
-        )
+        self.setProperty("RVFileSource", "source", "request", "readAllChannels", gto.INT, 1)
 
     ## Text
     def setTextPosition(self, x, y):
@@ -415,17 +381,13 @@ class Source(_GroupNode):
         lower right == 1,1
         upper right == 1,0
         """
-        self.setProperty(
-            "RVPaint", "paint", self.txt.name, "position", gto.FLOAT, (x, y)
-        )
+        self.setProperty("RVPaint", "paint", self.txt.name, "position", gto.FLOAT, (x, y))
 
     def setTextColor(self, r=1, g=1, b=1, a=1):
         """
         modify color to text # note: this should probably use a tuple like other "set" functions
         """
-        self.setProperty(
-            "RVPaint", "paint", self.txt.name, "color", gto.FLOAT, (r, g, b, a)
-        )
+        self.setProperty("RVPaint", "paint", self.txt.name, "color", gto.FLOAT, (r, g, b, a))
 
     def setTextSize(self, size):
         """
@@ -445,9 +407,7 @@ class Source(_GroupNode):
             if k not in ["order", "sourceCount", "name"]:
                 if isinstance(v, str):
                     valueType = gto.STRING
-                self.setProperty(
-                    "RVPaint", "paint", self.txt.name, "{0}".format(k), valueType, v
-                )
+                self.setProperty("RVPaint", "paint", self.txt.name, "{0}".format(k), valueType, v)
         # For layout, but not source
         # self.txt.order.append(self.txt.name)
         return self.txt.name
@@ -620,17 +580,13 @@ class Layout(_GroupNode):
         """
         modify position of text. Positions are x, y values from lower left == 0, upper right == 1
         """
-        self.setProperty(
-            "RVPaint", "paint", self.txt.name, "position", gto.FLOAT, (x, y)
-        )
+        self.setProperty("RVPaint", "paint", self.txt.name, "position", gto.FLOAT, (x, y))
 
     def setTextColor(self, r=1, g=1, b=1, a=1):
         """
         modify color to text
         """
-        self.setProperty(
-            "RVPaint", "paint", self.txt.name, "color", gto.FLOAT, (r, g, b, a)
-        )
+        self.setProperty("RVPaint", "paint", self.txt.name, "color", gto.FLOAT, (r, g, b, a))
 
     def setTextSize(self, size):
         """
@@ -650,9 +606,7 @@ class Layout(_GroupNode):
             if k not in ["order", "sourceCount", "name"]:
                 if isinstance(v, str):
                     valueType = gto.STRING
-                self.setProperty(
-                    "RVPaint", "paint", self.txt.name, "{0}".format(k), valueType, v
-                )
+                self.setProperty("RVPaint", "paint", self.txt.name, "{0}".format(k), valueType, v)
         self.txt.order.append(self.txt.name)
 
     def setFrameNumberForText(self, frame):
@@ -691,7 +645,6 @@ class Layout(_GroupNode):
         scale = 1.0 / nside
 
         pos = []
-        total = 0
         for row in reversed(range(0, nside)):
             y = scale * row - (0.5 * scale)
             for column in range(0, nside):
@@ -770,7 +723,6 @@ class Session:
 
     @staticmethod
     def lookupNodeType(key):
-
         if key in Session.nodeTypes.keys():
             return Session.nodeTypes[key]
 
@@ -808,9 +760,7 @@ class Session:
         LUTs, or stereo modes.
         """
 
-        self.outputGroup.setProperty(
-            objType, objName, contName, propName, valueType, value
-        )
+        self.outputGroup.setProperty(objType, objName, contName, propName, valueType, value)
 
     def newNode(self, nodeType, uiName=None):
         """
@@ -828,10 +778,8 @@ class Session:
         try:
             (objType, cons) = Session.lookupNodeType(nodeType)
             node = cons()
-        except:
-            raise Exception(
-                "Can't construct node of type '%s':" % nodeType, sys.exc_info()[0]
-            )
+        except Exception:
+            raise Exception("Can't construct node of type '%s':" % nodeType, sys.exc_info()[0])
 
         if nodeType == "Source":
             node.name = "sourceGroup%06d" % self.sourceCount
@@ -875,13 +823,12 @@ class Session:
         """
 
         subObjects = {}
-        if obj != None:
+        if obj is not None:
             subObjects[""] = (obj, {})
 
         containers = {}
 
-        for (path, info) in sorted(properties.items()):
-
+        for path, info in sorted(properties.items()):
             (subObjType, subObject, container, prop) = path
             (typeName, value) = info
 
@@ -910,28 +857,22 @@ class Session:
 
             w = 1
             element = value
-            if type(element) == type([]):
+            if type(element) is type([]):
                 element = element[0]
             else:
                 value = [value]
 
-            if type(element) == type((0,)):
+            if type(element) is type((0,)):
                 w = len(element)
 
-            gtoContainer.append(
-                gc.Property(prop, typeName, size=len(value), width=w, data=value)
-            )
+            gtoContainer.append(gc.Property(prop, typeName, size=len(value), width=w, data=value))
 
     def _writeSessionObject(self, top):
-
         top.rv = self._getVersionedObj("rv", "RVSession")
         self._writeProperties(top, top.rv, "rv", self.properties)
 
     def _writeDefaultOutput(self, top):
-
-        top.defaultOutputGroup = self._getVersionedObj(
-            "defaultOutputGroup", "RVOutputGroup"
-        )
+        top.defaultOutputGroup = self._getVersionedObj("defaultOutputGroup", "RVOutputGroup")
         self._writeProperties(
             top,
             top.defaultOutputGroup,
@@ -940,7 +881,6 @@ class Session:
         )
 
     def _writeConnections(self, top):
-
         #
         #   Input order is significant for stack/sequence/layout
         #   nodes, so preserve it here.
@@ -957,9 +897,7 @@ class Session:
         top.connections = self._getVersionedObj("connections", "connection")
 
         top.connections.evaluation = gc.Component("evaluation", "compinterp")
-        top.connections.evaluation.append(
-            gc.Property("connections", gto.STRING, size=len(cons), width=2, data=cons)
-        )
+        top.connections.evaluation.append(gc.Property("connections", gto.STRING, size=len(cons), width=2, data=cons))
 
     def _writeNodes(self, top):
         """
@@ -1014,9 +952,7 @@ class Session:
         "pair"     Left eye on left, Right eye on right
         "mirror"   Like "pair" but with right eye mirrored
         """
-        self.setOutputProperty(
-            "RVOutputDisplayStereo", "stereo", "stereo", "type", gto.STRING, mode
-        )
+        self.setOutputProperty("RVOutputDisplayStereo", "stereo", "stereo", "type", gto.STRING, mode)
 
     def setOutputGamma(self, gamma):
         """
@@ -1024,14 +960,10 @@ class Session:
         """
         args = ["RVDisplayColor", "RVDisplayPipelineGroup", "colorPipeline"]
         pipeNode = self.outputGroup.getPipelineNode(*args)
-        if pipeNode == None:
+        if pipeNode is None:
             pipeNode = self.outputGroup.addPipelineNode(*args)
-        self.setOutputProperty(
-            "RVDisplayColor", pipeNode, "color", "gamma", gto.FLOAT, gamma
-        )
-        self.setOutputProperty(
-            "RVDisplayColor", pipeNode, "color", "active", gto.INT, 1
-        )
+        self.setOutputProperty("RVDisplayColor", pipeNode, "color", "gamma", gto.FLOAT, gamma)
+        self.setOutputProperty("RVDisplayColor", pipeNode, "color", "active", gto.INT, 1)
 
         return pipeNode
 
@@ -1041,11 +973,9 @@ class Session:
         """
         args = ["RVDisplayColor", "RVDisplayPipelineGroup", "colorPipeline"]
         pipeNode = self.outputGroup.getPipelineNode(*args)
-        if pipeNode == None:
+        if pipeNode is None:
             pipeNode = self.outputGroup.addPipelineNode(*args)
-        self.setOutputProperty(
-            "RVDisplayColor", pipeNode, "lut", "file", gto.STRING, name
-        )
+        self.setOutputProperty("RVDisplayColor", pipeNode, "lut", "file", gto.STRING, name)
         self.setOutputProperty("RVDIsplayColor", pipeNode, "lut", "active", gto.INT, 1)
 
         return pipeNode

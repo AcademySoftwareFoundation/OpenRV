@@ -24,9 +24,7 @@ namespace IPCore
     using namespace TwkContainer;
     using namespace TwkMath;
 
-    ColorVibranceIPNode::ColorVibranceIPNode(const std::string& name,
-                                             const NodeDefinition* def,
-                                             IPGraph* graph, GroupIPNode* group)
+    ColorVibranceIPNode::ColorVibranceIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group)
         : IPNode(name, def, graph, group)
     {
         setMaxInputs(1);
@@ -35,8 +33,7 @@ namespace IPCore
         info->setPersistent(false);
 
         m_active = declareProperty<IntProperty>("color.active", 1);
-        m_ColorVibrance =
-            declareProperty<FloatProperty>("color.vibrance", 0.0f);
+        m_ColorVibrance = declareProperty<FloatProperty>("color.vibrance", 0.0f);
     }
 
     ColorVibranceIPNode::~ColorVibranceIPNode() {}
@@ -71,8 +68,7 @@ namespace IPCore
                 const float bw709 = M.m02;
 
                 Vec3f rgb709(rw709, gw709, bw709);
-                img->shaderExpr =
-                    Shader::newColorVibrance(img->shaderExpr, rgb709, s);
+                img->shaderExpr = Shader::newColorVibrance(img->shaderExpr, rgb709, s);
             }
         }
 

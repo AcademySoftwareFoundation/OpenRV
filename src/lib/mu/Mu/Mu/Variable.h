@@ -56,11 +56,9 @@ namespace Mu
         //	not enforced at run-time.
         //
 
-        Variable(Context* context, const char* name, const Type* storageClass,
-                 int address = 0, Attributes a = ReadWrite);
+        Variable(Context* context, const char* name, const Type* storageClass, int address = 0, Attributes a = ReadWrite);
 
-        Variable(Context* context, const char* name, const char* storageClass,
-                 int address = 0, Attributes a = ReadWrite);
+        Variable(Context* context, const char* name, const char* storageClass, int address = 0, Attributes a = ReadWrite);
 
         virtual ~Variable();
 

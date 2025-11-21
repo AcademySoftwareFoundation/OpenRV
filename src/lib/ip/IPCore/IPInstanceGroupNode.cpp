@@ -11,9 +11,7 @@ namespace IPCore
 {
     using namespace std;
 
-    IPInstanceGroupNode::IPInstanceGroupNode(const std::string& name,
-                                             const NodeDefinition* def,
-                                             IPGraph* graph, GroupIPNode* group)
+    IPInstanceGroupNode::IPInstanceGroupNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group)
         : GroupIPNode(name, def, graph, group)
     {
     }

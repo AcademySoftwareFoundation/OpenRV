@@ -113,10 +113,7 @@ namespace TwkUtil
         // Match object
         bool matches(const char* fullStr) const;
 
-        bool matches(const std::string& fullStr) const
-        {
-            return matches(fullStr.c_str());
-        }
+        bool matches(const std::string& fullStr) const { return matches(fullStr.c_str()); }
 
     protected:
         // Match functions
@@ -163,10 +160,7 @@ namespace TwkUtil
         }
 
         // Assignment operator
-        GlobEx& operator=(const GlobEx& copy)
-        {
-            return (GlobEx&)(RegEx::operator=(copy));
-        }
+        GlobEx& operator=(const GlobEx& copy) { return (GlobEx&)(RegEx::operator=(copy)); }
 
         // Deglob syntax thingy.
         static std::string deglobSyntax(const char* globSyntaxPattern);
@@ -215,15 +209,9 @@ namespace TwkUtil
         int subLen(const int subNum) const;
         std::string subStr(const int subNum) const;
 
-        int subInt(const int subNum) const
-        {
-            return atoi(subStr(subNum).c_str());
-        }
+        int subInt(const int subNum) const { return atoi(subStr(subNum).c_str()); }
 
-        float subFloat(const int subNum) const
-        {
-            return atof(subStr(subNum).c_str());
-        }
+        float subFloat(const int subNum) const { return atof(subStr(subNum).c_str()); }
 
     protected:
         const RegEx* m_regex;

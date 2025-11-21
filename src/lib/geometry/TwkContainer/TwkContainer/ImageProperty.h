@@ -29,18 +29,14 @@ namespace TwkContainer
         virtual ~ImageProperty();
 
         size_t sizeOfDimension(size_t dim) const;
-        void restructure(size_t s0, size_t s1, size_t s2, size_t s3,
-                         size_t num = 1);
+        void restructure(size_t s0, size_t s1, size_t s2, size_t s3, size_t num = 1);
         void clear();
 
         size_t sizeInBytes() const;
 
         template <typename T> T* data() { return reinterpret_cast<T*>(m_data); }
 
-        template <typename T> const T* data() const
-        {
-            return reinterpret_cast<T*>(m_data);
-        }
+        template <typename T> const T* data() const { return reinterpret_cast<T*>(m_data); }
 
         virtual Layout layoutTrait() const;
         virtual size_t xsizeTrait() const;

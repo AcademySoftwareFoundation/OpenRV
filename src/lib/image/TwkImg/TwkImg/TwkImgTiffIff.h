@@ -23,19 +23,14 @@ namespace TwkImg
 
         static bool write(const Img4f* img, const char* fileName,
                           const int depth = 16); // 8, 16, or 32 (float)
-        static bool write(const Img4f* img, const char* fileName,
-                          const TwkMath::Mat44f& Mcamera,
-                          const TwkMath::Mat44f& Mscreen, const int depth = 16);
+        static bool write(const Img4f* img, const char* fileName, const TwkMath::Mat44f& Mcamera, const TwkMath::Mat44f& Mscreen,
+                          const int depth = 16);
 
         static bool write(const Img4uc* img, const char* fileName);
-        static bool write(const Img4uc* img, const char* fileName,
-                          const TwkMath::Mat44f& Mcamera,
-                          const TwkMath::Mat44f& Mscreen);
+        static bool write(const Img4uc* img, const char* fileName, const TwkMath::Mat44f& Mcamera, const TwkMath::Mat44f& Mscreen);
 
         static bool write(const Img4us* img, const char* fileName);
-        static bool write(const Img4us* img, const char* fileName,
-                          const TwkMath::Mat44f& Mcamera,
-                          const TwkMath::Mat44f& Mscreen);
+        static bool write(const Img4us* img, const char* fileName, const TwkMath::Mat44f& Mcamera, const TwkMath::Mat44f& Mscreen);
     };
 
 } // End namespace TwkImg

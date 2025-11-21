@@ -50,8 +50,7 @@ namespace TwkImg
         Array2D<Rgba> exrBuffer;
         exrBuffer.resizeErase(height, width);
 
-        file.setFrameBuffer(&exrBuffer[0][0] - dw.min.x - dw.min.y * width, 1,
-                            width);
+        file.setFrameBuffer(&exrBuffer[0][0] - dw.min.x - dw.min.y * width, 1, width);
         file.readPixels(dw.min.y, dw.max.y);
 
         Img4f* ret = new Img4f(width, height);
@@ -72,8 +71,7 @@ namespace TwkImg
     }
 
     //*****************************************************************************
-    Img4f* ExrIff::read(const char* imgFileName, TwkMath::Mat44f& Mcamera,
-                        TwkMath::Mat44f& Mscreen)
+    Img4f* ExrIff::read(const char* imgFileName, TwkMath::Mat44f& Mcamera, TwkMath::Mat44f& Mscreen)
     {
         RgbaInputFile file(imgFileName);
         Box2i dw = file.dataWindow();
@@ -81,9 +79,7 @@ namespace TwkImg
         int width = dw.max.x - dw.min.x + 1;
         int height = dw.max.y - dw.min.y + 1;
 
-        const Imf::M44fAttribute* w2cAttr =
-            file.header().findTypedAttribute<Imf::M44fAttribute>(
-                "worldToCamera");
+        const Imf::M44fAttribute* w2cAttr = file.header().findTypedAttribute<Imf::M44fAttribute>("worldToCamera");
         if (w2cAttr != NULL)
         {
             // Note that we're NOT reading it transposed!
@@ -96,9 +92,7 @@ namespace TwkImg
             }
         }
 
-        const Imf::M44fAttribute* w2sAttr =
-            file.header().findTypedAttribute<Imf::M44fAttribute>(
-                "worldToScreen");
+        const Imf::M44fAttribute* w2sAttr = file.header().findTypedAttribute<Imf::M44fAttribute>("worldToScreen");
         if (w2sAttr != NULL)
         {
             // Note that we're NOT reading it TRANSPOSED!!!
@@ -114,8 +108,7 @@ namespace TwkImg
         Array2D<Rgba> exrBuffer;
         exrBuffer.resizeErase(height, width);
 
-        file.setFrameBuffer(&exrBuffer[0][0] - dw.min.x - dw.min.y * width, 1,
-                            width);
+        file.setFrameBuffer(&exrBuffer[0][0] - dw.min.x - dw.min.y * width, 1, width);
         file.readPixels(dw.min.y, dw.max.y);
 
         Img4f* ret = new Img4f(width, height);
@@ -136,8 +129,7 @@ namespace TwkImg
     }
 
     // *****************************************************************************
-    bool ExrIff::write(const Img4f* img, const char* fileName,
-                       Imf::Compression compression)
+    bool ExrIff::write(const Img4f* img, const char* fileName, Imf::Compression compression)
     {
         Header header(img->width(), img->height(),
                       1.0f,              // pixelAspectRatio = 1
@@ -175,9 +167,7 @@ namespace TwkImg
     }
 
     // *****************************************************************************
-    bool ExrIff::write(const Img4f* img, const char* fileName,
-                       const Mat44f& Mcamera, const Mat44f& Mscreen,
-                       Imf::Compression compression)
+    bool ExrIff::write(const Img4f* img, const char* fileName, const Mat44f& Mcamera, const Mat44f& Mscreen, Imf::Compression compression)
     {
         Header header(img->width(), img->height(),
                       1.0f,              // pixelAspectRatio = 1

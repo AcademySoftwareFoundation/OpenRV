@@ -71,35 +71,27 @@ namespace Mu
         _baseType = 0;
     }
 
-    MuQt_QTableWidget::MuQt_QTableWidget(Pointer muobj,
-                                         const CallEnvironment* ce,
-                                         QWidget* parent)
+    MuQt_QTableWidget::MuQt_QTableWidget(Pointer muobj, const CallEnvironment* ce, QWidget* parent)
         : QTableWidget(parent)
     {
         _env = ce;
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QTableWidgetType>(
-            c->internName("qt.QTableWidget"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QTableWidgetType>(c->internName("qt.QTableWidget"));
     }
 
-    MuQt_QTableWidget::MuQt_QTableWidget(Pointer muobj,
-                                         const CallEnvironment* ce, int rows,
-                                         int columns, QWidget* parent)
+    MuQt_QTableWidget::MuQt_QTableWidget(Pointer muobj, const CallEnvironment* ce, int rows, int columns, QWidget* parent)
         : QTableWidget(rows, columns, parent)
     {
         _env = ce;
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QTableWidgetType>(
-            c->internName("qt.QTableWidget"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QTableWidgetType>(c->internName("qt.QTableWidget"));
     }
 
-    bool MuQt_QTableWidget::dropMimeData(int row, int column,
-                                         const QMimeData* data,
-                                         Qt::DropAction action)
+    bool MuQt_QTableWidget::dropMimeData(int row, int column, const QMimeData* data, Qt::DropAction action)
     {
         if (!_env)
             return QTableWidget::dropMimeData(row, column, data, action);
@@ -112,8 +104,7 @@ namespace Mu
             args[0] = Value(Pointer(_obj));
             args[1] = Value(row);
             args[2] = Value(column);
-            args[3] =
-                Value(makeinstance<QMimeDataType>(c, data, "qt.QMimeData"));
+            args[3] = Value(makeinstance<QMimeDataType>(c, data, "qt.QMimeData"));
             args[4] = Value(int(action));
             Value rval = _env->call(F, args);
             return (bool)(rval._bool);
@@ -124,8 +115,7 @@ namespace Mu
         }
     }
 
-    QMimeData*
-    MuQt_QTableWidget::mimeData(const QList<QTableWidgetItem*>& items) const
+    QMimeData* MuQt_QTableWidget::mimeData(const QList<QTableWidgetItem*>& items) const
     {
         if (!_env)
             return QTableWidget::mimeData(items);
@@ -136,8 +126,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqpointerlist<QTableWidgetItemType>(
-                c, items, "qt.QTableWidgetItem"));
+            args[1] = Value(makeqpointerlist<QTableWidgetItemType>(c, items, "qt.QTableWidgetItem"));
             Value rval = _env->call(F, args);
             return object<QMimeData>(rval._Pointer);
         }
@@ -201,8 +190,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QDropEventType>(c, event, "qt.QDropEvent"));
+            args[1] = Value(makeqpointer<QDropEventType>(c, event, "qt.QDropEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -253,8 +241,7 @@ namespace Mu
         }
     }
 
-    void MuQt_QTableWidget::scrollTo(const QModelIndex& index,
-                                     QAbstractItemView::ScrollHint hint)
+    void MuQt_QTableWidget::scrollTo(const QModelIndex& index, QAbstractItemView::ScrollHint hint)
     {
         if (!_env)
         {
@@ -268,8 +255,7 @@ namespace Mu
         {
             Function::ArgumentVector args(3);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
+            args[1] = Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
             args[2] = Value(int(hint));
             Value rval = _env->call(F, args);
         }
@@ -293,8 +279,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
+            args[1] = Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
             Value rval = _env->call(F, args);
         }
         else
@@ -303,8 +288,7 @@ namespace Mu
         }
     }
 
-    void
-    MuQt_QTableWidget::setSelectionModel(QItemSelectionModel* selectionModel)
+    void MuQt_QTableWidget::setSelectionModel(QItemSelectionModel* selectionModel)
     {
         if (!_env)
         {
@@ -318,8 +302,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeinstance<QItemSelectionModelType>(
-                c, selectionModel, "qt.QItemSelectionModel"));
+            args[1] = Value(makeinstance<QItemSelectionModelType>(c, selectionModel, "qt.QItemSelectionModel"));
             Value rval = _env->call(F, args);
         }
         else
@@ -339,8 +322,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
+            args[1] = Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
             Value rval = _env->call(F, args);
             return getqtype<QRectType>(rval._Pointer);
         }
@@ -350,8 +332,7 @@ namespace Mu
         }
     }
 
-    void MuQt_QTableWidget::currentChanged(const QModelIndex& current,
-                                           const QModelIndex& previous)
+    void MuQt_QTableWidget::currentChanged(const QModelIndex& current, const QModelIndex& previous)
     {
         if (!_env)
         {
@@ -365,10 +346,8 @@ namespace Mu
         {
             Function::ArgumentVector args(3);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqtype<QModelIndexType>(c, current, "qt.QModelIndex"));
-            args[2] = Value(
-                makeqtype<QModelIndexType>(c, previous, "qt.QModelIndex"));
+            args[1] = Value(makeqtype<QModelIndexType>(c, current, "qt.QModelIndex"));
+            args[2] = Value(makeqtype<QModelIndexType>(c, previous, "qt.QModelIndex"));
             Value rval = _env->call(F, args);
         }
         else
@@ -408,8 +387,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
+            args[1] = Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
             Value rval = _env->call(F, args);
             return (bool)(rval._bool);
         }
@@ -433,8 +411,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QPaintEventType>(c, event, "qt.QPaintEvent"));
+            args[1] = Value(makeqpointer<QPaintEventType>(c, event, "qt.QPaintEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -487,8 +464,7 @@ namespace Mu
         }
     }
 
-    void MuQt_QTableWidget::selectionChanged(const QItemSelection& selected,
-                                             const QItemSelection& deselected)
+    void MuQt_QTableWidget::selectionChanged(const QItemSelection& selected, const QItemSelection& deselected)
     {
         if (!_env)
         {
@@ -502,10 +478,8 @@ namespace Mu
         {
             Function::ArgumentVector args(3);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqtype<QItemSelectionType>(c, selected,
-                                                          "qt.QItemSelection"));
-            args[2] = Value(makeqtype<QItemSelectionType>(c, deselected,
-                                                          "qt.QItemSelection"));
+            args[1] = Value(makeqtype<QItemSelectionType>(c, selected, "qt.QItemSelection"));
+            args[2] = Value(makeqtype<QItemSelectionType>(c, deselected, "qt.QItemSelection"));
             Value rval = _env->call(F, args);
         }
         else
@@ -514,9 +488,7 @@ namespace Mu
         }
     }
 
-    void
-    MuQt_QTableWidget::setSelection(const QRect& rect,
-                                    QItemSelectionModel::SelectionFlags flags)
+    void MuQt_QTableWidget::setSelection(const QRect& rect, QItemSelectionModel::SelectionFlags flags)
     {
         if (!_env)
         {
@@ -596,8 +568,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QTimerEventType>(c, event, "qt.QTimerEvent"));
+            args[1] = Value(makeqpointer<QTimerEventType>(c, event, "qt.QTimerEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -668,8 +639,7 @@ namespace Mu
         }
     }
 
-    QRegion MuQt_QTableWidget::visualRegionForSelection(
-        const QItemSelection& selection) const
+    QRegion MuQt_QTableWidget::visualRegionForSelection(const QItemSelection& selection) const
     {
         if (!_env)
             return QTableWidget::visualRegionForSelection(selection);
@@ -680,8 +650,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqtype<QItemSelectionType>(c, selection,
-                                                          "qt.QItemSelection"));
+            args[1] = Value(makeqtype<QItemSelectionType>(c, selection, "qt.QItemSelection"));
             Value rval = _env->call(F, args);
             return getqtype<QRegionType>(rval._Pointer);
         }
@@ -694,8 +663,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  Mu Type CONSTRUCTORS
 
-    QTableWidgetType::QTableWidgetType(Context* c, const char* name,
-                                       Class* super, Class* super2)
+    QTableWidgetType::QTableWidgetType(Context* c, const char* name, Class* super, Class* super2)
         : Class(c, name, vectorOf2(super, super2))
     {
     }
@@ -705,8 +673,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    static Pointer QTableWidget_QTableWidget_QObject(Thread& NODE_THREAD,
-                                                     Pointer obj)
+    static Pointer QTableWidget_QTableWidget_QObject(Thread& NODE_THREAD, Pointer obj)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         ClassInstance* widget = reinterpret_cast<ClassInstance*>(obj);
@@ -717,9 +684,7 @@ namespace Mu
         }
         else if (QTableWidget* w = object<QTableWidget>(widget))
         {
-            QTableWidgetType* type =
-                c->findSymbolOfTypeByQualifiedName<QTableWidgetType>(
-                    c->internName("qt.QTableWidget"), false);
+            QTableWidgetType* type = c->findSymbolOfTypeByQualifiedName<QTableWidgetType>(c->internName("qt.QTableWidget"), false);
             ClassInstance* o = ClassInstance::allocate(type);
             setobject(o, w);
             return o;
@@ -732,51 +697,41 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(castFromObject, Pointer)
     {
-        NODE_RETURN(QTableWidget_QTableWidget_QObject(NODE_THREAD,
-                                                      NODE_ARG(0, Pointer)));
+        NODE_RETURN(QTableWidget_QTableWidget_QObject(NODE_THREAD, NODE_ARG(0, Pointer)));
     }
 
-    Pointer qt_QTableWidget_QTableWidget_QTableWidget_QTableWidget_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
+    Pointer qt_QTableWidget_QTableWidget_QTableWidget_QTableWidget_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                           Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWidget* arg1 = object<QWidget>(param_parent);
-        setobject(param_this,
-                  new MuQt_QTableWidget(
-                      param_this, NODE_THREAD.process()->callEnv(), arg1));
+        setobject(param_this, new MuQt_QTableWidget(param_this, NODE_THREAD.process()->callEnv(), arg1));
         return param_this;
     }
 
-    Pointer
-    qt_QTableWidget_QTableWidget_QTableWidget_QTableWidget_int_int_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_rows,
-        int param_columns, Pointer param_parent)
+    Pointer qt_QTableWidget_QTableWidget_QTableWidget_QTableWidget_int_int_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                   int param_rows, int param_columns, Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         int arg1 = (int)(param_rows);
         int arg2 = (int)(param_columns);
         QWidget* arg3 = object<QWidget>(param_parent);
-        setobject(param_this, new MuQt_QTableWidget(
-                                  param_this, NODE_THREAD.process()->callEnv(),
-                                  arg1, arg2, arg3));
+        setobject(param_this, new MuQt_QTableWidget(param_this, NODE_THREAD.process()->callEnv(), arg1, arg2, arg3));
         return param_this;
     }
 
-    Pointer qt_QTableWidget_cellWidget_QWidget_QTableWidget_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
-        int param_column)
+    Pointer qt_QTableWidget_cellWidget_QWidget_QTableWidget_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
+                                                                    int param_column)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
         int arg1 = (int)(param_row);
         int arg2 = (int)(param_column);
-        return makeinstance<QWidgetType>(c, arg0->cellWidget(arg1, arg2),
-                                         "qt.QWidget");
+        return makeinstance<QWidgetType>(c, arg0->cellWidget(arg1, arg2), "qt.QWidget");
     }
 
-    void
-    qt_QTableWidget_closePersistentEditor_void_QTableWidget_QTableWidgetItem(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_item)
+    void qt_QTableWidget_closePersistentEditor_void_QTableWidget_QTableWidgetItem(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                  Pointer param_item)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
@@ -784,51 +739,43 @@ namespace Mu
         arg0->closePersistentEditor(arg1);
     }
 
-    int qt_QTableWidget_column_int_QTableWidget_QTableWidgetItem(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_item)
+    int qt_QTableWidget_column_int_QTableWidget_QTableWidgetItem(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_item)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
-        const QTableWidgetItem* arg1 =
-            getqpointer<QTableWidgetItemType>(param_item);
+        const QTableWidgetItem* arg1 = getqpointer<QTableWidgetItemType>(param_item);
         return arg0->column(arg1);
     }
 
-    int qt_QTableWidget_columnCount_int_QTableWidget(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_this)
+    int qt_QTableWidget_columnCount_int_QTableWidget(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
         return arg0->columnCount();
     }
 
-    int qt_QTableWidget_currentColumn_int_QTableWidget(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this)
+    int qt_QTableWidget_currentColumn_int_QTableWidget(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
         return arg0->currentColumn();
     }
 
-    Pointer qt_QTableWidget_currentItem_QTableWidgetItem_QTableWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QTableWidget_currentItem_QTableWidgetItem_QTableWidget(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
-        return makeqpointer<QTableWidgetItemType>(c, arg0->currentItem(),
-                                                  "qt.QTableWidgetItem");
+        return makeqpointer<QTableWidgetItemType>(c, arg0->currentItem(), "qt.QTableWidgetItem");
     }
 
-    int qt_QTableWidget_currentRow_int_QTableWidget(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this)
+    int qt_QTableWidget_currentRow_int_QTableWidget(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
         return arg0->currentRow();
     }
 
-    void qt_QTableWidget_editItem_void_QTableWidget_QTableWidgetItem(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_item)
+    void qt_QTableWidget_editItem_void_QTableWidget_QTableWidgetItem(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_item)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
@@ -836,45 +783,36 @@ namespace Mu
         arg0->editItem(arg1);
     }
 
-    Pointer
-    qt_QTableWidget_findItems_qt__QTableWidgetItemBSB_ESB__QTableWidget_string_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_text,
-        int param_flags)
+    Pointer qt_QTableWidget_findItems_qt__QTableWidgetItemBSB_ESB__QTableWidget_string_int(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                           Pointer param_text, int param_flags)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
         const QString arg1 = qstring(param_text);
         Qt::MatchFlags arg2 = (Qt::MatchFlags)(param_flags);
-        return makeqpointerlist<QTableWidgetItemType>(
-            c, arg0->findItems(arg1, arg2), "qt.QTableWidgetItem");
+        return makeqpointerlist<QTableWidgetItemType>(c, arg0->findItems(arg1, arg2), "qt.QTableWidgetItem");
     }
 
-    Pointer
-    qt_QTableWidget_horizontalHeaderItem_QTableWidgetItem_QTableWidget_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_column)
+    Pointer qt_QTableWidget_horizontalHeaderItem_QTableWidgetItem_QTableWidget_int(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                   int param_column)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
         int arg1 = (int)(param_column);
-        return makeqpointer<QTableWidgetItemType>(
-            c, arg0->horizontalHeaderItem(arg1), "qt.QTableWidgetItem");
+        return makeqpointer<QTableWidgetItemType>(c, arg0->horizontalHeaderItem(arg1), "qt.QTableWidgetItem");
     }
 
-    Pointer
-    qt_QTableWidget_indexFromItem_QModelIndex_QTableWidget_QTableWidgetItem(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_item)
+    Pointer qt_QTableWidget_indexFromItem_QModelIndex_QTableWidget_QTableWidgetItem(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                    Pointer param_item)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
-        const QTableWidgetItem* arg1 =
-            getqpointer<QTableWidgetItemType>(param_item);
-        return makeqtype<QModelIndexType>(c, arg0->indexFromItem(arg1),
-                                          "qt.QModelIndex");
+        const QTableWidgetItem* arg1 = getqpointer<QTableWidgetItemType>(param_item);
+        return makeqtype<QModelIndexType>(c, arg0->indexFromItem(arg1), "qt.QModelIndex");
     }
 
-    bool
-    qt_QTableWidget_isPersistentEditorOpen_bool_QTableWidget_QTableWidgetItem(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_item)
+    bool qt_QTableWidget_isPersistentEditorOpen_bool_QTableWidget_QTableWidgetItem(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                   Pointer param_item)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
@@ -882,73 +820,61 @@ namespace Mu
         return arg0->isPersistentEditorOpen(arg1);
     }
 
-    Pointer qt_QTableWidget_item_QTableWidgetItem_QTableWidget_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
-        int param_column)
+    Pointer qt_QTableWidget_item_QTableWidgetItem_QTableWidget_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
+                                                                       int param_column)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
         int arg1 = (int)(param_row);
         int arg2 = (int)(param_column);
-        return makeqpointer<QTableWidgetItemType>(c, arg0->item(arg1, arg2),
-                                                  "qt.QTableWidgetItem");
+        return makeqpointer<QTableWidgetItemType>(c, arg0->item(arg1, arg2), "qt.QTableWidgetItem");
     }
 
-    Pointer qt_QTableWidget_itemAt_QTableWidgetItem_QTableWidget_QPoint(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_point)
+    Pointer qt_QTableWidget_itemAt_QTableWidgetItem_QTableWidget_QPoint(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_point)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
         const QPoint arg1 = getqtype<QPointType>(param_point);
-        return makeqpointer<QTableWidgetItemType>(c, arg0->itemAt(arg1),
-                                                  "qt.QTableWidgetItem");
+        return makeqpointer<QTableWidgetItemType>(c, arg0->itemAt(arg1), "qt.QTableWidgetItem");
     }
 
-    Pointer qt_QTableWidget_itemAt_QTableWidgetItem_QTableWidget_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_ax, int param_ay)
+    Pointer qt_QTableWidget_itemAt_QTableWidgetItem_QTableWidget_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_ax,
+                                                                         int param_ay)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
         int arg1 = (int)(param_ax);
         int arg2 = (int)(param_ay);
-        return makeqpointer<QTableWidgetItemType>(c, arg0->itemAt(arg1, arg2),
-                                                  "qt.QTableWidgetItem");
+        return makeqpointer<QTableWidgetItemType>(c, arg0->itemAt(arg1, arg2), "qt.QTableWidgetItem");
     }
 
-    Pointer
-    qt_QTableWidget_itemFromIndex_QTableWidgetItem_QTableWidget_QModelIndex(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index)
+    Pointer qt_QTableWidget_itemFromIndex_QTableWidgetItem_QTableWidget_QModelIndex(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                    Pointer param_index)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
         const QModelIndex arg1 = getqtype<QModelIndexType>(param_index);
-        return makeqpointer<QTableWidgetItemType>(c, arg0->itemFromIndex(arg1),
-                                                  "qt.QTableWidgetItem");
+        return makeqpointer<QTableWidgetItemType>(c, arg0->itemFromIndex(arg1), "qt.QTableWidgetItem");
     }
 
-    Pointer qt_QTableWidget_itemPrototype_QTableWidgetItem_QTableWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QTableWidget_itemPrototype_QTableWidgetItem_QTableWidget(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
-        return makeqpointer<QTableWidgetItemType>(c, arg0->itemPrototype(),
-                                                  "qt.QTableWidgetItem");
+        return makeqpointer<QTableWidgetItemType>(c, arg0->itemPrototype(), "qt.QTableWidgetItem");
     }
 
-    Pointer
-    qt_QTableWidget_items_qt__QTableWidgetItemBSB_ESB__QTableWidget_QMimeData(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_data)
+    Pointer qt_QTableWidget_items_qt__QTableWidgetItemBSB_ESB__QTableWidget_QMimeData(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                      Pointer param_data)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
         const QMimeData* arg1 = object<QMimeData>(param_data);
-        return makeqpointerlist<QTableWidgetItemType>(c, arg0->items(arg1),
-                                                      "qt.QTableWidgetItem");
+        return makeqpointerlist<QTableWidgetItemType>(c, arg0->items(arg1), "qt.QTableWidgetItem");
     }
 
-    void
-    qt_QTableWidget_openPersistentEditor_void_QTableWidget_QTableWidgetItem(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_item)
+    void qt_QTableWidget_openPersistentEditor_void_QTableWidget_QTableWidgetItem(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                 Pointer param_item)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
@@ -956,9 +882,8 @@ namespace Mu
         arg0->openPersistentEditor(arg1);
     }
 
-    void qt_QTableWidget_removeCellWidget_void_QTableWidget_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
-        int param_column)
+    void qt_QTableWidget_removeCellWidget_void_QTableWidget_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
+                                                                    int param_column)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
@@ -967,37 +892,30 @@ namespace Mu
         arg0->removeCellWidget(arg1, arg2);
     }
 
-    int qt_QTableWidget_row_int_QTableWidget_QTableWidgetItem(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_item)
+    int qt_QTableWidget_row_int_QTableWidget_QTableWidgetItem(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_item)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
-        const QTableWidgetItem* arg1 =
-            getqpointer<QTableWidgetItemType>(param_item);
+        const QTableWidgetItem* arg1 = getqpointer<QTableWidgetItemType>(param_item);
         return arg0->row(arg1);
     }
 
-    int qt_QTableWidget_rowCount_int_QTableWidget(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this)
+    int qt_QTableWidget_rowCount_int_QTableWidget(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
         return arg0->rowCount();
     }
 
-    Pointer
-    qt_QTableWidget_selectedItems_qt__QTableWidgetItemBSB_ESB__QTableWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QTableWidget_selectedItems_qt__QTableWidgetItemBSB_ESB__QTableWidget(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
-        return makeqpointerlist<QTableWidgetItemType>(c, arg0->selectedItems(),
-                                                      "qt.QTableWidgetItem");
+        return makeqpointerlist<QTableWidgetItemType>(c, arg0->selectedItems(), "qt.QTableWidgetItem");
     }
 
-    void qt_QTableWidget_setCellWidget_void_QTableWidget_int_int_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
-        int param_column, Pointer param_widget)
+    void qt_QTableWidget_setCellWidget_void_QTableWidget_int_int_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
+                                                                         int param_column, Pointer param_widget)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
@@ -1007,8 +925,7 @@ namespace Mu
         arg0->setCellWidget(arg1, arg2, arg3);
     }
 
-    void qt_QTableWidget_setColumnCount_void_QTableWidget_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_columns)
+    void qt_QTableWidget_setColumnCount_void_QTableWidget_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_columns)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
@@ -1016,9 +933,8 @@ namespace Mu
         arg0->setColumnCount(arg1);
     }
 
-    void qt_QTableWidget_setCurrentCell_void_QTableWidget_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
-        int param_column)
+    void qt_QTableWidget_setCurrentCell_void_QTableWidget_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
+                                                                  int param_column)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
@@ -1027,21 +943,18 @@ namespace Mu
         arg0->setCurrentCell(arg1, arg2);
     }
 
-    void qt_QTableWidget_setCurrentCell_void_QTableWidget_int_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
-        int param_column, int param_command)
+    void qt_QTableWidget_setCurrentCell_void_QTableWidget_int_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
+                                                                      int param_column, int param_command)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
         int arg1 = (int)(param_row);
         int arg2 = (int)(param_column);
-        QItemSelectionModel::SelectionFlags arg3 =
-            (QItemSelectionModel::SelectionFlags)(param_command);
+        QItemSelectionModel::SelectionFlags arg3 = (QItemSelectionModel::SelectionFlags)(param_command);
         arg0->setCurrentCell(arg1, arg2, arg3);
     }
 
-    void qt_QTableWidget_setCurrentItem_void_QTableWidget_QTableWidgetItem(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_item)
+    void qt_QTableWidget_setCurrentItem_void_QTableWidget_QTableWidgetItem(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_item)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
@@ -1049,22 +962,18 @@ namespace Mu
         arg0->setCurrentItem(arg1);
     }
 
-    void qt_QTableWidget_setCurrentItem_void_QTableWidget_QTableWidgetItem_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_item,
-        int param_command)
+    void qt_QTableWidget_setCurrentItem_void_QTableWidget_QTableWidgetItem_int(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                               Pointer param_item, int param_command)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
         QTableWidgetItem* arg1 = getqpointer<QTableWidgetItemType>(param_item);
-        QItemSelectionModel::SelectionFlags arg2 =
-            (QItemSelectionModel::SelectionFlags)(param_command);
+        QItemSelectionModel::SelectionFlags arg2 = (QItemSelectionModel::SelectionFlags)(param_command);
         arg0->setCurrentItem(arg1, arg2);
     }
 
-    void
-    qt_QTableWidget_setHorizontalHeaderItem_void_QTableWidget_int_QTableWidgetItem(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_column,
-        Pointer param_item)
+    void qt_QTableWidget_setHorizontalHeaderItem_void_QTableWidget_int_QTableWidgetItem(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                        int param_column, Pointer param_item)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
@@ -1073,9 +982,8 @@ namespace Mu
         arg0->setHorizontalHeaderItem(arg1, arg2);
     }
 
-    void
-    qt_QTableWidget_setHorizontalHeaderLabels_void_QTableWidget_stringBSB_ESB_(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_labels)
+    void qt_QTableWidget_setHorizontalHeaderLabels_void_QTableWidget_stringBSB_ESB_(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                    Pointer param_labels)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
@@ -1083,9 +991,8 @@ namespace Mu
         arg0->setHorizontalHeaderLabels(arg1);
     }
 
-    void qt_QTableWidget_setItem_void_QTableWidget_int_int_QTableWidgetItem(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
-        int param_column, Pointer param_item)
+    void qt_QTableWidget_setItem_void_QTableWidget_int_int_QTableWidgetItem(Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
+                                                                            int param_column, Pointer param_item)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
@@ -1095,18 +1002,16 @@ namespace Mu
         arg0->setItem(arg1, arg2, arg3);
     }
 
-    void qt_QTableWidget_setItemPrototype_void_QTableWidget_QTableWidgetItem(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_item)
+    void qt_QTableWidget_setItemPrototype_void_QTableWidget_QTableWidgetItem(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                             Pointer param_item)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
-        const QTableWidgetItem* arg1 =
-            getqpointer<QTableWidgetItemType>(param_item);
+        const QTableWidgetItem* arg1 = getqpointer<QTableWidgetItemType>(param_item);
         arg0->setItemPrototype(arg1);
     }
 
-    void qt_QTableWidget_setRowCount_void_QTableWidget_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_rows)
+    void qt_QTableWidget_setRowCount_void_QTableWidget_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_rows)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
@@ -1114,10 +1019,8 @@ namespace Mu
         arg0->setRowCount(arg1);
     }
 
-    void
-    qt_QTableWidget_setVerticalHeaderItem_void_QTableWidget_int_QTableWidgetItem(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
-        Pointer param_item)
+    void qt_QTableWidget_setVerticalHeaderItem_void_QTableWidget_int_QTableWidgetItem(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                      int param_row, Pointer param_item)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
@@ -1126,9 +1029,8 @@ namespace Mu
         arg0->setVerticalHeaderItem(arg1, arg2);
     }
 
-    void
-    qt_QTableWidget_setVerticalHeaderLabels_void_QTableWidget_stringBSB_ESB_(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_labels)
+    void qt_QTableWidget_setVerticalHeaderLabels_void_QTableWidget_stringBSB_ESB_(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                  Pointer param_labels)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
@@ -1136,9 +1038,7 @@ namespace Mu
         arg0->setVerticalHeaderLabels(arg1);
     }
 
-    void qt_QTableWidget_sortItems_void_QTableWidget_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_column,
-        int param_order)
+    void qt_QTableWidget_sortItems_void_QTableWidget_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_column, int param_order)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
@@ -1147,53 +1047,43 @@ namespace Mu
         arg0->sortItems(arg1, arg2);
     }
 
-    Pointer
-    qt_QTableWidget_takeHorizontalHeaderItem_QTableWidgetItem_QTableWidget_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_column)
+    Pointer qt_QTableWidget_takeHorizontalHeaderItem_QTableWidgetItem_QTableWidget_int(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                       int param_column)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
         int arg1 = (int)(param_column);
-        return makeqpointer<QTableWidgetItemType>(
-            c, arg0->takeHorizontalHeaderItem(arg1), "qt.QTableWidgetItem");
+        return makeqpointer<QTableWidgetItemType>(c, arg0->takeHorizontalHeaderItem(arg1), "qt.QTableWidgetItem");
     }
 
-    Pointer qt_QTableWidget_takeItem_QTableWidgetItem_QTableWidget_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
-        int param_column)
+    Pointer qt_QTableWidget_takeItem_QTableWidgetItem_QTableWidget_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
+                                                                           int param_column)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
         int arg1 = (int)(param_row);
         int arg2 = (int)(param_column);
-        return makeqpointer<QTableWidgetItemType>(c, arg0->takeItem(arg1, arg2),
-                                                  "qt.QTableWidgetItem");
+        return makeqpointer<QTableWidgetItemType>(c, arg0->takeItem(arg1, arg2), "qt.QTableWidgetItem");
     }
 
-    Pointer
-    qt_QTableWidget_takeVerticalHeaderItem_QTableWidgetItem_QTableWidget_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_row)
+    Pointer qt_QTableWidget_takeVerticalHeaderItem_QTableWidgetItem_QTableWidget_int(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                     int param_row)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
         int arg1 = (int)(param_row);
-        return makeqpointer<QTableWidgetItemType>(
-            c, arg0->takeVerticalHeaderItem(arg1), "qt.QTableWidgetItem");
+        return makeqpointer<QTableWidgetItemType>(c, arg0->takeVerticalHeaderItem(arg1), "qt.QTableWidgetItem");
     }
 
-    Pointer
-    qt_QTableWidget_verticalHeaderItem_QTableWidgetItem_QTableWidget_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_row)
+    Pointer qt_QTableWidget_verticalHeaderItem_QTableWidgetItem_QTableWidget_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_row)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
         int arg1 = (int)(param_row);
-        return makeqpointer<QTableWidgetItemType>(
-            c, arg0->verticalHeaderItem(arg1), "qt.QTableWidgetItem");
+        return makeqpointer<QTableWidgetItemType>(c, arg0->verticalHeaderItem(arg1), "qt.QTableWidgetItem");
     }
 
-    int qt_QTableWidget_visualColumn_int_QTableWidget_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_logicalColumn)
+    int qt_QTableWidget_visualColumn_int_QTableWidget_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_logicalColumn)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
@@ -1201,19 +1091,16 @@ namespace Mu
         return arg0->visualColumn(arg1);
     }
 
-    Pointer qt_QTableWidget_visualItemRect_QRect_QTableWidget_QTableWidgetItem(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_item)
+    Pointer qt_QTableWidget_visualItemRect_QRect_QTableWidget_QTableWidgetItem(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                               Pointer param_item)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
-        const QTableWidgetItem* arg1 =
-            getqpointer<QTableWidgetItemType>(param_item);
+        const QTableWidgetItem* arg1 = getqpointer<QTableWidgetItemType>(param_item);
         return makeqtype<QRectType>(c, arg0->visualItemRect(arg1), "qt.QRect");
     }
 
-    int qt_QTableWidget_visualRow_int_QTableWidget_int(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this,
-                                                       int param_logicalRow)
+    int qt_QTableWidget_visualRow_int_QTableWidget_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_logicalRow)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
@@ -1221,9 +1108,8 @@ namespace Mu
         return arg0->visualRow(arg1);
     }
 
-    bool qt_QTableWidget_dropMimeData_bool_QTableWidget_int_int_QMimeData_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
-        int param_column, Pointer param_data, int param_action)
+    bool qt_QTableWidget_dropMimeData_bool_QTableWidget_int_int_QMimeData_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
+                                                                              int param_column, Pointer param_data, int param_action)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
@@ -1231,56 +1117,37 @@ namespace Mu
         int arg2 = (int)(param_column);
         const QMimeData* arg3 = object<QMimeData>(param_data);
         Qt::DropAction arg4 = (Qt::DropAction)(param_action);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QTableWidget*)arg0)
-                         ->dropMimeData_pub_parent(arg1, arg2, arg3, arg4)
-                   : ((MuQt_QTableWidget*)arg0)
-                         ->dropMimeData_pub(arg1, arg2, arg3, arg4);
+        return isMuQtObject(arg0) ? ((MuQt_QTableWidget*)arg0)->dropMimeData_pub_parent(arg1, arg2, arg3, arg4)
+                                  : ((MuQt_QTableWidget*)arg0)->dropMimeData_pub(arg1, arg2, arg3, arg4);
     }
 
-    Pointer
-    qt_QTableWidget_mimeData_QMimeData_QTableWidget_qt__QTableWidgetItemBSB_ESB_(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_items)
+    Pointer qt_QTableWidget_mimeData_QMimeData_QTableWidget_qt__QTableWidgetItemBSB_ESB_(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                         Pointer param_items)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
-        const QList<QTableWidgetItem*> arg1 =
-            qpointerlist<QTableWidgetItemType>(param_items);
-        return isMuQtObject(arg0)
-                   ? makeinstance<QMimeDataType>(
-                         c,
-                         ((MuQt_QTableWidget*)arg0)->mimeData_pub_parent(arg1),
-                         "qt.QMimeData")
-                   : makeinstance<QMimeDataType>(
-                         c, ((MuQt_QTableWidget*)arg0)->mimeData_pub(arg1),
-                         "qt.QMimeData");
+        const QList<QTableWidgetItem*> arg1 = qpointerlist<QTableWidgetItemType>(param_items);
+        return isMuQtObject(arg0) ? makeinstance<QMimeDataType>(c, ((MuQt_QTableWidget*)arg0)->mimeData_pub_parent(arg1), "qt.QMimeData")
+                                  : makeinstance<QMimeDataType>(c, ((MuQt_QTableWidget*)arg0)->mimeData_pub(arg1), "qt.QMimeData");
     }
 
-    Pointer qt_QTableWidget_mimeTypes_stringBSB_ESB__QTableWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QTableWidget_mimeTypes_stringBSB_ESB__QTableWidget(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
-        return isMuQtObject(arg0)
-                   ? makestringlist(
-                         c, ((MuQt_QTableWidget*)arg0)->mimeTypes_pub_parent())
-                   : makestringlist(
-                         c, ((MuQt_QTableWidget*)arg0)->mimeTypes_pub());
+        return isMuQtObject(arg0) ? makestringlist(c, ((MuQt_QTableWidget*)arg0)->mimeTypes_pub_parent())
+                                  : makestringlist(c, ((MuQt_QTableWidget*)arg0)->mimeTypes_pub());
     }
 
-    int qt_QTableWidget_supportedDropActions_int_QTableWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    int qt_QTableWidget_supportedDropActions_int_QTableWidget(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
-        return isMuQtObject(arg0) ? int(((MuQt_QTableWidget*)arg0)
-                                            ->supportedDropActions_pub_parent())
-                                  : int(((MuQt_QTableWidget*)arg0)
-                                            ->supportedDropActions_pub());
+        return isMuQtObject(arg0) ? int(((MuQt_QTableWidget*)arg0)->supportedDropActions_pub_parent())
+                                  : int(((MuQt_QTableWidget*)arg0)->supportedDropActions_pub());
     }
 
-    void qt_QTableWidget_dropEvent_void_QTableWidget_QDropEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QTableWidget_dropEvent_void_QTableWidget_QDropEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
@@ -1291,48 +1158,37 @@ namespace Mu
             ((MuQt_QTableWidget*)arg0)->dropEvent_pub(arg1);
     }
 
-    bool qt_QTableWidget_event_bool_QTableWidget_QEvent(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this,
-                                                        Pointer param_e)
+    bool qt_QTableWidget_event_bool_QTableWidget_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
         QEvent* arg1 = getqpointer<QEventType>(param_e);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QTableWidget*)arg0)->event_pub_parent(arg1)
-                   : ((MuQt_QTableWidget*)arg0)->event_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QTableWidget*)arg0)->event_pub_parent(arg1) : ((MuQt_QTableWidget*)arg0)->event_pub(arg1);
     }
 
-    Pointer qt_QTableWidget_indexAt_QModelIndex_QTableWidget_QPoint(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_pos)
+    Pointer qt_QTableWidget_indexAt_QModelIndex_QTableWidget_QPoint(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_pos)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
         const QPoint arg1 = getqtype<QPointType>(param_pos);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QModelIndexType>(
-                         c, arg0->QTableWidget::indexAt(arg1), "qt.QModelIndex")
-                   : makeqtype<QModelIndexType>(c, arg0->indexAt(arg1),
-                                                "qt.QModelIndex");
+        return isMuQtObject(arg0) ? makeqtype<QModelIndexType>(c, arg0->QTableWidget::indexAt(arg1), "qt.QModelIndex")
+                                  : makeqtype<QModelIndexType>(c, arg0->indexAt(arg1), "qt.QModelIndex");
     }
 
-    void qt_QTableWidget_scrollTo_void_QTableWidget_QModelIndex_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index,
-        int param_hint)
+    void qt_QTableWidget_scrollTo_void_QTableWidget_QModelIndex_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index,
+                                                                    int param_hint)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
         const QModelIndex arg1 = getqtype<QModelIndexType>(param_index);
-        QAbstractItemView::ScrollHint arg2 =
-            (QAbstractItemView::ScrollHint)(param_hint);
+        QAbstractItemView::ScrollHint arg2 = (QAbstractItemView::ScrollHint)(param_hint);
         if (isMuQtObject(arg0))
             arg0->QTableWidget::scrollTo(arg1, arg2);
         else
             arg0->scrollTo(arg1, arg2);
     }
 
-    void qt_QTableWidget_setRootIndex_void_QTableWidget_QModelIndex(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index)
+    void qt_QTableWidget_setRootIndex_void_QTableWidget_QModelIndex(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
@@ -1343,38 +1199,29 @@ namespace Mu
             arg0->setRootIndex(arg1);
     }
 
-    void
-    qt_QTableWidget_setSelectionModel_void_QTableWidget_QItemSelectionModel(
-        Mu::Thread& NODE_THREAD, Pointer param_this,
-        Pointer param_selectionModel)
+    void qt_QTableWidget_setSelectionModel_void_QTableWidget_QItemSelectionModel(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                 Pointer param_selectionModel)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
-        QItemSelectionModel* arg1 =
-            object<QItemSelectionModel>(param_selectionModel);
+        QItemSelectionModel* arg1 = object<QItemSelectionModel>(param_selectionModel);
         if (isMuQtObject(arg0))
             arg0->QTableWidget::setSelectionModel(arg1);
         else
             arg0->setSelectionModel(arg1);
     }
 
-    Pointer qt_QTableWidget_visualRect_QRect_QTableWidget_QModelIndex(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index)
+    Pointer qt_QTableWidget_visualRect_QRect_QTableWidget_QModelIndex(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
         const QModelIndex arg1 = getqtype<QModelIndexType>(param_index);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QRectType>(
-                         c, arg0->QTableWidget::visualRect(arg1), "qt.QRect")
-                   : makeqtype<QRectType>(c, arg0->visualRect(arg1),
-                                          "qt.QRect");
+        return isMuQtObject(arg0) ? makeqtype<QRectType>(c, arg0->QTableWidget::visualRect(arg1), "qt.QRect")
+                                  : makeqtype<QRectType>(c, arg0->visualRect(arg1), "qt.QRect");
     }
 
-    void
-    qt_QTableWidget_currentChanged_void_QTableWidget_QModelIndex_QModelIndex(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_current,
-        Pointer param_previous)
+    void qt_QTableWidget_currentChanged_void_QTableWidget_QModelIndex_QModelIndex(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                  Pointer param_current, Pointer param_previous)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
@@ -1386,30 +1233,24 @@ namespace Mu
             ((MuQt_QTableWidget*)arg0)->currentChanged_pub(arg1, arg2);
     }
 
-    int
-    qt_QTableWidget_horizontalOffset_int_QTableWidget(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    int qt_QTableWidget_horizontalOffset_int_QTableWidget(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QTableWidget*)arg0)->horizontalOffset_pub_parent()
-                   : ((MuQt_QTableWidget*)arg0)->horizontalOffset_pub();
+        return isMuQtObject(arg0) ? ((MuQt_QTableWidget*)arg0)->horizontalOffset_pub_parent()
+                                  : ((MuQt_QTableWidget*)arg0)->horizontalOffset_pub();
     }
 
-    bool qt_QTableWidget_isIndexHidden_bool_QTableWidget_QModelIndex(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index)
+    bool qt_QTableWidget_isIndexHidden_bool_QTableWidget_QModelIndex(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
         const QModelIndex arg1 = getqtype<QModelIndexType>(param_index);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QTableWidget*)arg0)->isIndexHidden_pub_parent(arg1)
-                   : ((MuQt_QTableWidget*)arg0)->isIndexHidden_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QTableWidget*)arg0)->isIndexHidden_pub_parent(arg1)
+                                  : ((MuQt_QTableWidget*)arg0)->isIndexHidden_pub(arg1);
     }
 
-    void qt_QTableWidget_paintEvent_void_QTableWidget_QPaintEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QTableWidget_paintEvent_void_QTableWidget_QPaintEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
@@ -1420,8 +1261,7 @@ namespace Mu
             ((MuQt_QTableWidget*)arg0)->paintEvent_pub(arg1);
     }
 
-    void qt_QTableWidget_scrollContentsBy_void_QTableWidget_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_dx, int param_dy)
+    void qt_QTableWidget_scrollContentsBy_void_QTableWidget_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_dx, int param_dy)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
@@ -1433,76 +1273,59 @@ namespace Mu
             ((MuQt_QTableWidget*)arg0)->scrollContentsBy_pub(arg1, arg2);
     }
 
-    Pointer
-    qt_QTableWidget_selectedIndexes_qt__QModelIndexBSB_ESB__QTableWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QTableWidget_selectedIndexes_qt__QModelIndexBSB_ESB__QTableWidget(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqmodelindexlist(c, ((MuQt_QTableWidget*)arg0)
-                                                ->selectedIndexes_pub_parent())
-                   : makeqmodelindexlist(
-                         c, ((MuQt_QTableWidget*)arg0)->selectedIndexes_pub());
+        return isMuQtObject(arg0) ? makeqmodelindexlist(c, ((MuQt_QTableWidget*)arg0)->selectedIndexes_pub_parent())
+                                  : makeqmodelindexlist(c, ((MuQt_QTableWidget*)arg0)->selectedIndexes_pub());
     }
 
-    void
-    qt_QTableWidget_selectionChanged_void_QTableWidget_QItemSelection_QItemSelection(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_selected,
-        Pointer param_deselected)
+    void qt_QTableWidget_selectionChanged_void_QTableWidget_QItemSelection_QItemSelection(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                          Pointer param_selected, Pointer param_deselected)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
-        const QItemSelection arg1 =
-            getqtype<QItemSelectionType>(param_selected);
-        const QItemSelection arg2 =
-            getqtype<QItemSelectionType>(param_deselected);
+        const QItemSelection arg1 = getqtype<QItemSelectionType>(param_selected);
+        const QItemSelection arg2 = getqtype<QItemSelectionType>(param_deselected);
         if (isMuQtObject(arg0))
             ((MuQt_QTableWidget*)arg0)->selectionChanged_pub_parent(arg1, arg2);
         else
             ((MuQt_QTableWidget*)arg0)->selectionChanged_pub(arg1, arg2);
     }
 
-    void qt_QTableWidget_setSelection_void_QTableWidget_QRect_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_rect,
-        int param_flags)
+    void qt_QTableWidget_setSelection_void_QTableWidget_QRect_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_rect,
+                                                                  int param_flags)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
         const QRect arg1 = getqtype<QRectType>(param_rect);
-        QItemSelectionModel::SelectionFlags arg2 =
-            (QItemSelectionModel::SelectionFlags)(param_flags);
+        QItemSelectionModel::SelectionFlags arg2 = (QItemSelectionModel::SelectionFlags)(param_flags);
         if (isMuQtObject(arg0))
             ((MuQt_QTableWidget*)arg0)->setSelection_pub_parent(arg1, arg2);
         else
             ((MuQt_QTableWidget*)arg0)->setSelection_pub(arg1, arg2);
     }
 
-    int qt_QTableWidget_sizeHintForColumn_int_QTableWidget_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_column)
+    int qt_QTableWidget_sizeHintForColumn_int_QTableWidget_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_column)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
         int arg1 = (int)(param_column);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QTableWidget*)arg0)
-                         ->sizeHintForColumn_pub_parent(arg1)
-                   : ((MuQt_QTableWidget*)arg0)->sizeHintForColumn_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QTableWidget*)arg0)->sizeHintForColumn_pub_parent(arg1)
+                                  : ((MuQt_QTableWidget*)arg0)->sizeHintForColumn_pub(arg1);
     }
 
-    int qt_QTableWidget_sizeHintForRow_int_QTableWidget_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_row)
+    int qt_QTableWidget_sizeHintForRow_int_QTableWidget_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_row)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
         int arg1 = (int)(param_row);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QTableWidget*)arg0)->sizeHintForRow_pub_parent(arg1)
-                   : ((MuQt_QTableWidget*)arg0)->sizeHintForRow_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QTableWidget*)arg0)->sizeHintForRow_pub_parent(arg1)
+                                  : ((MuQt_QTableWidget*)arg0)->sizeHintForRow_pub(arg1);
     }
 
-    void qt_QTableWidget_timerEvent_void_QTableWidget_QTimerEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QTableWidget_timerEvent_void_QTableWidget_QTimerEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
@@ -1513,9 +1336,7 @@ namespace Mu
             ((MuQt_QTableWidget*)arg0)->timerEvent_pub(arg1);
     }
 
-    void
-    qt_QTableWidget_updateGeometries_void_QTableWidget(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this)
+    void qt_QTableWidget_updateGeometries_void_QTableWidget(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
@@ -1525,531 +1346,433 @@ namespace Mu
             ((MuQt_QTableWidget*)arg0)->updateGeometries_pub();
     }
 
-    int qt_QTableWidget_verticalOffset_int_QTableWidget(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this)
+    int qt_QTableWidget_verticalOffset_int_QTableWidget(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QTableWidget*)arg0)->verticalOffset_pub_parent()
-                   : ((MuQt_QTableWidget*)arg0)->verticalOffset_pub();
+        return isMuQtObject(arg0) ? ((MuQt_QTableWidget*)arg0)->verticalOffset_pub_parent()
+                                  : ((MuQt_QTableWidget*)arg0)->verticalOffset_pub();
     }
 
-    Pointer
-    qt_QTableWidget_viewportSizeHint_QSize_QTableWidget(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this)
+    Pointer qt_QTableWidget_viewportSizeHint_QSize_QTableWidget(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QSizeType>(c,
-                                          ((MuQt_QTableWidget*)arg0)
-                                              ->viewportSizeHint_pub_parent(),
-                                          "qt.QSize")
-                   : makeqtype<QSizeType>(
-                         c, ((MuQt_QTableWidget*)arg0)->viewportSizeHint_pub(),
-                         "qt.QSize");
+        return isMuQtObject(arg0) ? makeqtype<QSizeType>(c, ((MuQt_QTableWidget*)arg0)->viewportSizeHint_pub_parent(), "qt.QSize")
+                                  : makeqtype<QSizeType>(c, ((MuQt_QTableWidget*)arg0)->viewportSizeHint_pub(), "qt.QSize");
     }
 
-    Pointer
-    qt_QTableWidget_visualRegionForSelection_QRegion_QTableWidget_QItemSelection(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_selection)
+    Pointer qt_QTableWidget_visualRegionForSelection_QRegion_QTableWidget_QItemSelection(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                         Pointer param_selection)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTableWidget* arg0 = object<QTableWidget>(param_this);
-        const QItemSelection arg1 =
-            getqtype<QItemSelectionType>(param_selection);
+        const QItemSelection arg1 = getqtype<QItemSelectionType>(param_selection);
         return isMuQtObject(arg0)
-                   ? makeqtype<QRegionType>(
-                         c,
-                         ((MuQt_QTableWidget*)arg0)
-                             ->visualRegionForSelection_pub_parent(arg1),
-                         "qt.QRegion")
-                   : makeqtype<QRegionType>(
-                         c,
-                         ((MuQt_QTableWidget*)arg0)
-                             ->visualRegionForSelection_pub(arg1),
-                         "qt.QRegion");
+                   ? makeqtype<QRegionType>(c, ((MuQt_QTableWidget*)arg0)->visualRegionForSelection_pub_parent(arg1), "qt.QRegion")
+                   : makeqtype<QRegionType>(c, ((MuQt_QTableWidget*)arg0)->visualRegionForSelection_pub(arg1), "qt.QRegion");
     }
 
     static NODE_IMPLEMENTATION(_n_QTableWidget0, Pointer)
     {
         NODE_RETURN(
-            qt_QTableWidget_QTableWidget_QTableWidget_QTableWidget_QWidget(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+            qt_QTableWidget_QTableWidget_QTableWidget_QTableWidget_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_QTableWidget1, Pointer)
     {
-        NODE_RETURN(
-            qt_QTableWidget_QTableWidget_QTableWidget_QTableWidget_int_int_QWidget(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-                NODE_ARG(2, int), NODE_ARG(3, Pointer)));
+        NODE_RETURN(qt_QTableWidget_QTableWidget_QTableWidget_QTableWidget_int_int_QWidget(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int), NODE_ARG(3, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_cellWidget0, Pointer)
     {
-        NODE_RETURN(qt_QTableWidget_cellWidget_QWidget_QTableWidget_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int)));
+        NODE_RETURN(qt_QTableWidget_cellWidget_QWidget_QTableWidget_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                            NODE_ARG(2, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_closePersistentEditor0, void)
     {
-        qt_QTableWidget_closePersistentEditor_void_QTableWidget_QTableWidgetItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTableWidget_closePersistentEditor_void_QTableWidget_QTableWidgetItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                 NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_column0, int)
     {
-        NODE_RETURN(qt_QTableWidget_column_int_QTableWidget_QTableWidgetItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(
+            qt_QTableWidget_column_int_QTableWidget_QTableWidgetItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_columnCount0, int)
     {
-        NODE_RETURN(qt_QTableWidget_columnCount_int_QTableWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTableWidget_columnCount_int_QTableWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_currentColumn0, int)
     {
-        NODE_RETURN(qt_QTableWidget_currentColumn_int_QTableWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTableWidget_currentColumn_int_QTableWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_currentItem0, Pointer)
     {
-        NODE_RETURN(qt_QTableWidget_currentItem_QTableWidgetItem_QTableWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTableWidget_currentItem_QTableWidgetItem_QTableWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_currentRow0, int)
     {
-        NODE_RETURN(qt_QTableWidget_currentRow_int_QTableWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTableWidget_currentRow_int_QTableWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_editItem0, void)
     {
-        qt_QTableWidget_editItem_void_QTableWidget_QTableWidgetItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTableWidget_editItem_void_QTableWidget_QTableWidgetItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_findItems0, Pointer)
     {
-        NODE_RETURN(
-            qt_QTableWidget_findItems_qt__QTableWidgetItemBSB_ESB__QTableWidget_string_int(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, int)));
+        NODE_RETURN(qt_QTableWidget_findItems_qt__QTableWidgetItemBSB_ESB__QTableWidget_string_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                                   NODE_ARG(1, Pointer), NODE_ARG(2, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_horizontalHeaderItem0, Pointer)
     {
-        NODE_RETURN(
-            qt_QTableWidget_horizontalHeaderItem_QTableWidgetItem_QTableWidget_int(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QTableWidget_horizontalHeaderItem_QTableWidgetItem_QTableWidget_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                           NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_indexFromItem0, Pointer)
     {
-        NODE_RETURN(
-            qt_QTableWidget_indexFromItem_QModelIndex_QTableWidget_QTableWidgetItem(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QTableWidget_indexFromItem_QModelIndex_QTableWidget_QTableWidgetItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                            NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isPersistentEditorOpen0, bool)
     {
-        NODE_RETURN(
-            qt_QTableWidget_isPersistentEditorOpen_bool_QTableWidget_QTableWidgetItem(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QTableWidget_isPersistentEditorOpen_bool_QTableWidget_QTableWidgetItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                              NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_item0, Pointer)
     {
-        NODE_RETURN(qt_QTableWidget_item_QTableWidgetItem_QTableWidget_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int)));
+        NODE_RETURN(qt_QTableWidget_item_QTableWidgetItem_QTableWidget_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                               NODE_ARG(2, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_itemAt0, Pointer)
     {
-        NODE_RETURN(qt_QTableWidget_itemAt_QTableWidgetItem_QTableWidget_QPoint(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(
+            qt_QTableWidget_itemAt_QTableWidgetItem_QTableWidget_QPoint(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_itemAt1, Pointer)
     {
-        NODE_RETURN(
-            qt_QTableWidget_itemAt_QTableWidgetItem_QTableWidget_int_int(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-                NODE_ARG(2, int)));
+        NODE_RETURN(qt_QTableWidget_itemAt_QTableWidgetItem_QTableWidget_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                                 NODE_ARG(2, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_itemFromIndex0, Pointer)
     {
-        NODE_RETURN(
-            qt_QTableWidget_itemFromIndex_QTableWidgetItem_QTableWidget_QModelIndex(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QTableWidget_itemFromIndex_QTableWidgetItem_QTableWidget_QModelIndex(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                            NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_itemPrototype0, Pointer)
     {
-        NODE_RETURN(qt_QTableWidget_itemPrototype_QTableWidgetItem_QTableWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTableWidget_itemPrototype_QTableWidgetItem_QTableWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_items0, Pointer)
     {
-        NODE_RETURN(
-            qt_QTableWidget_items_qt__QTableWidgetItemBSB_ESB__QTableWidget_QMimeData(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QTableWidget_items_qt__QTableWidgetItemBSB_ESB__QTableWidget_QMimeData(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                              NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_openPersistentEditor0, void)
     {
-        qt_QTableWidget_openPersistentEditor_void_QTableWidget_QTableWidgetItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTableWidget_openPersistentEditor_void_QTableWidget_QTableWidgetItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_removeCellWidget0, void)
     {
-        qt_QTableWidget_removeCellWidget_void_QTableWidget_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int));
+        qt_QTableWidget_removeCellWidget_void_QTableWidget_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                   NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_row0, int)
     {
-        NODE_RETURN(qt_QTableWidget_row_int_QTableWidget_QTableWidgetItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QTableWidget_row_int_QTableWidget_QTableWidgetItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_rowCount0, int)
     {
-        NODE_RETURN(qt_QTableWidget_rowCount_int_QTableWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTableWidget_rowCount_int_QTableWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_selectedItems0, Pointer)
     {
-        NODE_RETURN(
-            qt_QTableWidget_selectedItems_qt__QTableWidgetItemBSB_ESB__QTableWidget(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTableWidget_selectedItems_qt__QTableWidgetItemBSB_ESB__QTableWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_setCellWidget0, void)
     {
-        qt_QTableWidget_setCellWidget_void_QTableWidget_int_int_QWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int), NODE_ARG(3, Pointer));
+        qt_QTableWidget_setCellWidget_void_QTableWidget_int_int_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                        NODE_ARG(2, int), NODE_ARG(3, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setColumnCount0, void)
     {
-        qt_QTableWidget_setColumnCount_void_QTableWidget_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QTableWidget_setColumnCount_void_QTableWidget_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setCurrentCell0, void)
     {
-        qt_QTableWidget_setCurrentCell_void_QTableWidget_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int));
+        qt_QTableWidget_setCurrentCell_void_QTableWidget_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                 NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setCurrentCell1, void)
     {
-        qt_QTableWidget_setCurrentCell_void_QTableWidget_int_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int), NODE_ARG(3, int));
+        qt_QTableWidget_setCurrentCell_void_QTableWidget_int_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                     NODE_ARG(2, int), NODE_ARG(3, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setCurrentItem0, void)
     {
-        qt_QTableWidget_setCurrentItem_void_QTableWidget_QTableWidgetItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTableWidget_setCurrentItem_void_QTableWidget_QTableWidgetItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setCurrentItem1, void)
     {
-        qt_QTableWidget_setCurrentItem_void_QTableWidget_QTableWidgetItem_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int));
+        qt_QTableWidget_setCurrentItem_void_QTableWidget_QTableWidgetItem_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                              NODE_ARG(1, Pointer), NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setHorizontalHeaderItem0, void)
     {
-        qt_QTableWidget_setHorizontalHeaderItem_void_QTableWidget_int_QTableWidgetItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, Pointer));
+        qt_QTableWidget_setHorizontalHeaderItem_void_QTableWidget_int_QTableWidgetItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                       NODE_ARG(1, int), NODE_ARG(2, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setHorizontalHeaderLabels0, void)
     {
-        qt_QTableWidget_setHorizontalHeaderLabels_void_QTableWidget_stringBSB_ESB_(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTableWidget_setHorizontalHeaderLabels_void_QTableWidget_stringBSB_ESB_(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                   NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setItem0, void)
     {
-        qt_QTableWidget_setItem_void_QTableWidget_int_int_QTableWidgetItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int), NODE_ARG(3, Pointer));
+        qt_QTableWidget_setItem_void_QTableWidget_int_int_QTableWidgetItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                           NODE_ARG(2, int), NODE_ARG(3, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setItemPrototype0, void)
     {
-        qt_QTableWidget_setItemPrototype_void_QTableWidget_QTableWidgetItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTableWidget_setItemPrototype_void_QTableWidget_QTableWidgetItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setRowCount0, void)
     {
-        qt_QTableWidget_setRowCount_void_QTableWidget_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QTableWidget_setRowCount_void_QTableWidget_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setVerticalHeaderItem0, void)
     {
-        qt_QTableWidget_setVerticalHeaderItem_void_QTableWidget_int_QTableWidgetItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, Pointer));
+        qt_QTableWidget_setVerticalHeaderItem_void_QTableWidget_int_QTableWidgetItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                     NODE_ARG(1, int), NODE_ARG(2, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setVerticalHeaderLabels0, void)
     {
-        qt_QTableWidget_setVerticalHeaderLabels_void_QTableWidget_stringBSB_ESB_(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTableWidget_setVerticalHeaderLabels_void_QTableWidget_stringBSB_ESB_(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                 NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_sortItems0, void)
     {
-        qt_QTableWidget_sortItems_void_QTableWidget_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int));
+        qt_QTableWidget_sortItems_void_QTableWidget_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_takeHorizontalHeaderItem0, Pointer)
     {
-        NODE_RETURN(
-            qt_QTableWidget_takeHorizontalHeaderItem_QTableWidgetItem_QTableWidget_int(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QTableWidget_takeHorizontalHeaderItem_QTableWidgetItem_QTableWidget_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                               NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_takeItem0, Pointer)
     {
-        NODE_RETURN(
-            qt_QTableWidget_takeItem_QTableWidgetItem_QTableWidget_int_int(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-                NODE_ARG(2, int)));
+        NODE_RETURN(qt_QTableWidget_takeItem_QTableWidgetItem_QTableWidget_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                   NODE_ARG(1, int), NODE_ARG(2, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_takeVerticalHeaderItem0, Pointer)
     {
-        NODE_RETURN(
-            qt_QTableWidget_takeVerticalHeaderItem_QTableWidgetItem_QTableWidget_int(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QTableWidget_takeVerticalHeaderItem_QTableWidgetItem_QTableWidget_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                             NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_verticalHeaderItem0, Pointer)
     {
-        NODE_RETURN(
-            qt_QTableWidget_verticalHeaderItem_QTableWidgetItem_QTableWidget_int(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QTableWidget_verticalHeaderItem_QTableWidgetItem_QTableWidget_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                         NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_visualColumn0, int)
     {
-        NODE_RETURN(qt_QTableWidget_visualColumn_int_QTableWidget_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QTableWidget_visualColumn_int_QTableWidget_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_visualItemRect0, Pointer)
     {
-        NODE_RETURN(
-            qt_QTableWidget_visualItemRect_QRect_QTableWidget_QTableWidgetItem(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QTableWidget_visualItemRect_QRect_QTableWidget_QTableWidgetItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                       NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_visualRow0, int)
     {
-        NODE_RETURN(qt_QTableWidget_visualRow_int_QTableWidget_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QTableWidget_visualRow_int_QTableWidget_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_dropMimeData0, bool)
     {
-        NODE_RETURN(
-            qt_QTableWidget_dropMimeData_bool_QTableWidget_int_int_QMimeData_int(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-                NODE_ARG(2, int), NODE_ARG(3, Pointer), NODE_ARG(4, int)));
+        NODE_RETURN(qt_QTableWidget_dropMimeData_bool_QTableWidget_int_int_QMimeData_int(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int), NODE_ARG(3, Pointer), NODE_ARG(4, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_mimeData0, Pointer)
     {
-        NODE_RETURN(
-            qt_QTableWidget_mimeData_QMimeData_QTableWidget_qt__QTableWidgetItemBSB_ESB_(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QTableWidget_mimeData_QMimeData_QTableWidget_qt__QTableWidgetItemBSB_ESB_(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                                 NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_mimeTypes0, Pointer)
     {
-        NODE_RETURN(qt_QTableWidget_mimeTypes_stringBSB_ESB__QTableWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTableWidget_mimeTypes_stringBSB_ESB__QTableWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_supportedDropActions0, int)
     {
-        NODE_RETURN(qt_QTableWidget_supportedDropActions_int_QTableWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTableWidget_supportedDropActions_int_QTableWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_dropEvent0, void)
     {
-        qt_QTableWidget_dropEvent_void_QTableWidget_QDropEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTableWidget_dropEvent_void_QTableWidget_QDropEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_event0, bool)
     {
-        NODE_RETURN(qt_QTableWidget_event_bool_QTableWidget_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QTableWidget_event_bool_QTableWidget_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_indexAt0, Pointer)
     {
-        NODE_RETURN(qt_QTableWidget_indexAt_QModelIndex_QTableWidget_QPoint(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(
+            qt_QTableWidget_indexAt_QModelIndex_QTableWidget_QPoint(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_scrollTo0, void)
     {
-        qt_QTableWidget_scrollTo_void_QTableWidget_QModelIndex_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int));
+        qt_QTableWidget_scrollTo_void_QTableWidget_QModelIndex_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                   NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setRootIndex0, void)
     {
-        qt_QTableWidget_setRootIndex_void_QTableWidget_QModelIndex(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTableWidget_setRootIndex_void_QTableWidget_QModelIndex(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setSelectionModel0, void)
     {
-        qt_QTableWidget_setSelectionModel_void_QTableWidget_QItemSelectionModel(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTableWidget_setSelectionModel_void_QTableWidget_QItemSelectionModel(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_visualRect0, Pointer)
     {
-        NODE_RETURN(qt_QTableWidget_visualRect_QRect_QTableWidget_QModelIndex(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(
+            qt_QTableWidget_visualRect_QRect_QTableWidget_QModelIndex(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_currentChanged0, void)
     {
-        qt_QTableWidget_currentChanged_void_QTableWidget_QModelIndex_QModelIndex(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer));
+        qt_QTableWidget_currentChanged_void_QTableWidget_QModelIndex_QModelIndex(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                 NODE_ARG(1, Pointer), NODE_ARG(2, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_horizontalOffset0, int)
     {
-        NODE_RETURN(qt_QTableWidget_horizontalOffset_int_QTableWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTableWidget_horizontalOffset_int_QTableWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isIndexHidden0, bool)
     {
-        NODE_RETURN(qt_QTableWidget_isIndexHidden_bool_QTableWidget_QModelIndex(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(
+            qt_QTableWidget_isIndexHidden_bool_QTableWidget_QModelIndex(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_paintEvent0, void)
     {
-        qt_QTableWidget_paintEvent_void_QTableWidget_QPaintEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTableWidget_paintEvent_void_QTableWidget_QPaintEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_scrollContentsBy0, void)
     {
-        qt_QTableWidget_scrollContentsBy_void_QTableWidget_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int));
+        qt_QTableWidget_scrollContentsBy_void_QTableWidget_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                   NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_selectedIndexes0, Pointer)
     {
-        NODE_RETURN(
-            qt_QTableWidget_selectedIndexes_qt__QModelIndexBSB_ESB__QTableWidget(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTableWidget_selectedIndexes_qt__QModelIndexBSB_ESB__QTableWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_selectionChanged0, void)
     {
-        qt_QTableWidget_selectionChanged_void_QTableWidget_QItemSelection_QItemSelection(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer));
+        qt_QTableWidget_selectionChanged_void_QTableWidget_QItemSelection_QItemSelection(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                         NODE_ARG(1, Pointer), NODE_ARG(2, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setSelection0, void)
     {
-        qt_QTableWidget_setSelection_void_QTableWidget_QRect_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int));
+        qt_QTableWidget_setSelection_void_QTableWidget_QRect_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                 NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_sizeHintForColumn0, int)
     {
-        NODE_RETURN(qt_QTableWidget_sizeHintForColumn_int_QTableWidget_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QTableWidget_sizeHintForColumn_int_QTableWidget_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_sizeHintForRow0, int)
     {
-        NODE_RETURN(qt_QTableWidget_sizeHintForRow_int_QTableWidget_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QTableWidget_sizeHintForRow_int_QTableWidget_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_timerEvent0, void)
     {
-        qt_QTableWidget_timerEvent_void_QTableWidget_QTimerEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTableWidget_timerEvent_void_QTableWidget_QTimerEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_updateGeometries0, void)
     {
-        qt_QTableWidget_updateGeometries_void_QTableWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
+        qt_QTableWidget_updateGeometries_void_QTableWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_verticalOffset0, int)
     {
-        NODE_RETURN(qt_QTableWidget_verticalOffset_int_QTableWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTableWidget_verticalOffset_int_QTableWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_viewportSizeHint0, Pointer)
     {
-        NODE_RETURN(qt_QTableWidget_viewportSizeHint_QSize_QTableWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTableWidget_viewportSizeHint_QSize_QTableWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_visualRegionForSelection0, Pointer)
     {
-        NODE_RETURN(
-            qt_QTableWidget_visualRegionForSelection_QRegion_QTableWidget_QItemSelection(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QTableWidget_visualRegionForSelection_QRegion_QTableWidget_QItemSelection(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                                 NODE_ARG(1, Pointer)));
     }
 
     void QTableWidgetType::load()
@@ -2069,17 +1792,13 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
-                   new Function(c, tn, castFromObject, Cast, Compiled,
-                                QTableWidget_QTableWidget_QObject, Return, ftn,
-                                Parameters,
+                   new Function(c, tn, castFromObject, Cast, Compiled, QTableWidget_QTableWidget_QObject, Return, ftn, Parameters,
                                 new Param(c, "object", "qt.QObject"), End),
 
                    EndArguments);
@@ -2087,444 +1806,231 @@ namespace Mu
         addSymbols(
             // enums
             // member functions
-            new Function(
-                c, "QTableWidget", _n_QTableWidget0, None, Compiled,
-                qt_QTableWidget_QTableWidget_QTableWidget_QTableWidget_QWidget,
-                Return, "qt.QTableWidget", Parameters,
-                new Param(c, "this", "qt.QTableWidget"),
-                new Param(c, "parent", "qt.QWidget"), End),
-            new Function(
-                c, "QTableWidget", _n_QTableWidget1, None, Compiled,
-                qt_QTableWidget_QTableWidget_QTableWidget_QTableWidget_int_int_QWidget,
-                Return, "qt.QTableWidget", Parameters,
-                new Param(c, "this", "qt.QTableWidget"),
-                new Param(c, "rows", "int"), new Param(c, "columns", "int"),
-                new Param(c, "parent", "qt.QWidget"), End),
-            new Function(
-                c, "cellWidget", _n_cellWidget0, None, Compiled,
-                qt_QTableWidget_cellWidget_QWidget_QTableWidget_int_int, Return,
-                "qt.QWidget", Parameters,
-                new Param(c, "this", "qt.QTableWidget"),
-                new Param(c, "row", "int"), new Param(c, "column", "int"), End),
-            new Function(
-                c, "closePersistentEditor", _n_closePersistentEditor0, None,
-                Compiled,
-                qt_QTableWidget_closePersistentEditor_void_QTableWidget_QTableWidgetItem,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTableWidget"),
-                new Param(c, "item", "qt.QTableWidgetItem"), End),
-            new Function(
-                c, "column", _n_column0, None, Compiled,
-                qt_QTableWidget_column_int_QTableWidget_QTableWidgetItem,
-                Return, "int", Parameters,
-                new Param(c, "this", "qt.QTableWidget"),
-                new Param(c, "item", "qt.QTableWidgetItem"), End),
-            new Function(c, "columnCount", _n_columnCount0, None, Compiled,
-                         qt_QTableWidget_columnCount_int_QTableWidget, Return,
-                         "int", Parameters,
+            new Function(c, "QTableWidget", _n_QTableWidget0, None, Compiled,
+                         qt_QTableWidget_QTableWidget_QTableWidget_QTableWidget_QWidget, Return, "qt.QTableWidget", Parameters,
+                         new Param(c, "this", "qt.QTableWidget"), new Param(c, "parent", "qt.QWidget"), End),
+            new Function(c, "QTableWidget", _n_QTableWidget1, None, Compiled,
+                         qt_QTableWidget_QTableWidget_QTableWidget_QTableWidget_int_int_QWidget, Return, "qt.QTableWidget", Parameters,
+                         new Param(c, "this", "qt.QTableWidget"), new Param(c, "rows", "int"), new Param(c, "columns", "int"),
+                         new Param(c, "parent", "qt.QWidget"), End),
+            new Function(c, "cellWidget", _n_cellWidget0, None, Compiled, qt_QTableWidget_cellWidget_QWidget_QTableWidget_int_int, Return,
+                         "qt.QWidget", Parameters, new Param(c, "this", "qt.QTableWidget"), new Param(c, "row", "int"),
+                         new Param(c, "column", "int"), End),
+            new Function(c, "closePersistentEditor", _n_closePersistentEditor0, None, Compiled,
+                         qt_QTableWidget_closePersistentEditor_void_QTableWidget_QTableWidgetItem, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QTableWidget"), new Param(c, "item", "qt.QTableWidgetItem"), End),
+            new Function(c, "column", _n_column0, None, Compiled, qt_QTableWidget_column_int_QTableWidget_QTableWidgetItem, Return, "int",
+                         Parameters, new Param(c, "this", "qt.QTableWidget"), new Param(c, "item", "qt.QTableWidgetItem"), End),
+            new Function(c, "columnCount", _n_columnCount0, None, Compiled, qt_QTableWidget_columnCount_int_QTableWidget, Return, "int",
+                         Parameters, new Param(c, "this", "qt.QTableWidget"), End),
+            new Function(c, "currentColumn", _n_currentColumn0, None, Compiled, qt_QTableWidget_currentColumn_int_QTableWidget, Return,
+                         "int", Parameters, new Param(c, "this", "qt.QTableWidget"), End),
+            new Function(c, "currentItem", _n_currentItem0, None, Compiled, qt_QTableWidget_currentItem_QTableWidgetItem_QTableWidget,
+                         Return, "qt.QTableWidgetItem", Parameters, new Param(c, "this", "qt.QTableWidget"), End),
+            new Function(c, "currentRow", _n_currentRow0, None, Compiled, qt_QTableWidget_currentRow_int_QTableWidget, Return, "int",
+                         Parameters, new Param(c, "this", "qt.QTableWidget"), End),
+            new Function(c, "editItem", _n_editItem0, None, Compiled, qt_QTableWidget_editItem_void_QTableWidget_QTableWidgetItem, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QTableWidget"), new Param(c, "item", "qt.QTableWidgetItem"), End),
+            new Function(c, "findItems", _n_findItems0, None, Compiled,
+                         qt_QTableWidget_findItems_qt__QTableWidgetItemBSB_ESB__QTableWidget_string_int, Return, "qt.QTableWidgetItem[]",
+                         Parameters, new Param(c, "this", "qt.QTableWidget"), new Param(c, "text", "string"), new Param(c, "flags", "int"),
+                         End),
+            new Function(c, "horizontalHeaderItem", _n_horizontalHeaderItem0, None, Compiled,
+                         qt_QTableWidget_horizontalHeaderItem_QTableWidgetItem_QTableWidget_int, Return, "qt.QTableWidgetItem", Parameters,
+                         new Param(c, "this", "qt.QTableWidget"), new Param(c, "column", "int"), End),
+            new Function(c, "indexFromItem", _n_indexFromItem0, None, Compiled,
+                         qt_QTableWidget_indexFromItem_QModelIndex_QTableWidget_QTableWidgetItem, Return, "qt.QModelIndex", Parameters,
+                         new Param(c, "this", "qt.QTableWidget"), new Param(c, "item", "qt.QTableWidgetItem"), End),
+            new Function(c, "isPersistentEditorOpen", _n_isPersistentEditorOpen0, None, Compiled,
+                         qt_QTableWidget_isPersistentEditorOpen_bool_QTableWidget_QTableWidgetItem, Return, "bool", Parameters,
+                         new Param(c, "this", "qt.QTableWidget"), new Param(c, "item", "qt.QTableWidgetItem"), End),
+            new Function(c, "item", _n_item0, None, Compiled, qt_QTableWidget_item_QTableWidgetItem_QTableWidget_int_int, Return,
+                         "qt.QTableWidgetItem", Parameters, new Param(c, "this", "qt.QTableWidget"), new Param(c, "row", "int"),
+                         new Param(c, "column", "int"), End),
+            new Function(c, "itemAt", _n_itemAt0, None, Compiled, qt_QTableWidget_itemAt_QTableWidgetItem_QTableWidget_QPoint, Return,
+                         "qt.QTableWidgetItem", Parameters, new Param(c, "this", "qt.QTableWidget"), new Param(c, "point", "qt.QPoint"),
+                         End),
+            new Function(c, "itemAt", _n_itemAt1, None, Compiled, qt_QTableWidget_itemAt_QTableWidgetItem_QTableWidget_int_int, Return,
+                         "qt.QTableWidgetItem", Parameters, new Param(c, "this", "qt.QTableWidget"), new Param(c, "ax", "int"),
+                         new Param(c, "ay", "int"), End),
+            new Function(c, "itemFromIndex", _n_itemFromIndex0, None, Compiled,
+                         qt_QTableWidget_itemFromIndex_QTableWidgetItem_QTableWidget_QModelIndex, Return, "qt.QTableWidgetItem", Parameters,
+                         new Param(c, "this", "qt.QTableWidget"), new Param(c, "index", "qt.QModelIndex"), End),
+            new Function(c, "itemPrototype", _n_itemPrototype0, None, Compiled, qt_QTableWidget_itemPrototype_QTableWidgetItem_QTableWidget,
+                         Return, "qt.QTableWidgetItem", Parameters, new Param(c, "this", "qt.QTableWidget"), End),
+            new Function(c, "items", _n_items0, None, Compiled, qt_QTableWidget_items_qt__QTableWidgetItemBSB_ESB__QTableWidget_QMimeData,
+                         Return, "qt.QTableWidgetItem[]", Parameters, new Param(c, "this", "qt.QTableWidget"),
+                         new Param(c, "data", "qt.QMimeData"), End),
+            new Function(c, "openPersistentEditor", _n_openPersistentEditor0, None, Compiled,
+                         qt_QTableWidget_openPersistentEditor_void_QTableWidget_QTableWidgetItem, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QTableWidget"), new Param(c, "item", "qt.QTableWidgetItem"), End),
+            new Function(c, "removeCellWidget", _n_removeCellWidget0, None, Compiled,
+                         qt_QTableWidget_removeCellWidget_void_QTableWidget_int_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QTableWidget"), new Param(c, "row", "int"), new Param(c, "column", "int"), End),
+            new Function(c, "row", _n_row0, None, Compiled, qt_QTableWidget_row_int_QTableWidget_QTableWidgetItem, Return, "int",
+                         Parameters, new Param(c, "this", "qt.QTableWidget"), new Param(c, "item", "qt.QTableWidgetItem"), End),
+            new Function(c, "rowCount", _n_rowCount0, None, Compiled, qt_QTableWidget_rowCount_int_QTableWidget, Return, "int", Parameters,
                          new Param(c, "this", "qt.QTableWidget"), End),
-            new Function(c, "currentColumn", _n_currentColumn0, None, Compiled,
-                         qt_QTableWidget_currentColumn_int_QTableWidget, Return,
-                         "int", Parameters,
-                         new Param(c, "this", "qt.QTableWidget"), End),
-            new Function(
-                c, "currentItem", _n_currentItem0, None, Compiled,
-                qt_QTableWidget_currentItem_QTableWidgetItem_QTableWidget,
-                Return, "qt.QTableWidgetItem", Parameters,
-                new Param(c, "this", "qt.QTableWidget"), End),
-            new Function(c, "currentRow", _n_currentRow0, None, Compiled,
-                         qt_QTableWidget_currentRow_int_QTableWidget, Return,
-                         "int", Parameters,
-                         new Param(c, "this", "qt.QTableWidget"), End),
-            new Function(
-                c, "editItem", _n_editItem0, None, Compiled,
-                qt_QTableWidget_editItem_void_QTableWidget_QTableWidgetItem,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTableWidget"),
-                new Param(c, "item", "qt.QTableWidgetItem"), End),
-            new Function(
-                c, "findItems", _n_findItems0, None, Compiled,
-                qt_QTableWidget_findItems_qt__QTableWidgetItemBSB_ESB__QTableWidget_string_int,
-                Return, "qt.QTableWidgetItem[]", Parameters,
-                new Param(c, "this", "qt.QTableWidget"),
-                new Param(c, "text", "string"), new Param(c, "flags", "int"),
-                End),
-            new Function(
-                c, "horizontalHeaderItem", _n_horizontalHeaderItem0, None,
-                Compiled,
-                qt_QTableWidget_horizontalHeaderItem_QTableWidgetItem_QTableWidget_int,
-                Return, "qt.QTableWidgetItem", Parameters,
-                new Param(c, "this", "qt.QTableWidget"),
-                new Param(c, "column", "int"), End),
-            new Function(
-                c, "indexFromItem", _n_indexFromItem0, None, Compiled,
-                qt_QTableWidget_indexFromItem_QModelIndex_QTableWidget_QTableWidgetItem,
-                Return, "qt.QModelIndex", Parameters,
-                new Param(c, "this", "qt.QTableWidget"),
-                new Param(c, "item", "qt.QTableWidgetItem"), End),
-            new Function(
-                c, "isPersistentEditorOpen", _n_isPersistentEditorOpen0, None,
-                Compiled,
-                qt_QTableWidget_isPersistentEditorOpen_bool_QTableWidget_QTableWidgetItem,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QTableWidget"),
-                new Param(c, "item", "qt.QTableWidgetItem"), End),
-            new Function(
-                c, "item", _n_item0, None, Compiled,
-                qt_QTableWidget_item_QTableWidgetItem_QTableWidget_int_int,
-                Return, "qt.QTableWidgetItem", Parameters,
-                new Param(c, "this", "qt.QTableWidget"),
-                new Param(c, "row", "int"), new Param(c, "column", "int"), End),
-            new Function(
-                c, "itemAt", _n_itemAt0, None, Compiled,
-                qt_QTableWidget_itemAt_QTableWidgetItem_QTableWidget_QPoint,
-                Return, "qt.QTableWidgetItem", Parameters,
-                new Param(c, "this", "qt.QTableWidget"),
-                new Param(c, "point", "qt.QPoint"), End),
-            new Function(
-                c, "itemAt", _n_itemAt1, None, Compiled,
-                qt_QTableWidget_itemAt_QTableWidgetItem_QTableWidget_int_int,
-                Return, "qt.QTableWidgetItem", Parameters,
-                new Param(c, "this", "qt.QTableWidget"),
-                new Param(c, "ax", "int"), new Param(c, "ay", "int"), End),
-            new Function(
-                c, "itemFromIndex", _n_itemFromIndex0, None, Compiled,
-                qt_QTableWidget_itemFromIndex_QTableWidgetItem_QTableWidget_QModelIndex,
-                Return, "qt.QTableWidgetItem", Parameters,
-                new Param(c, "this", "qt.QTableWidget"),
-                new Param(c, "index", "qt.QModelIndex"), End),
-            new Function(
-                c, "itemPrototype", _n_itemPrototype0, None, Compiled,
-                qt_QTableWidget_itemPrototype_QTableWidgetItem_QTableWidget,
-                Return, "qt.QTableWidgetItem", Parameters,
-                new Param(c, "this", "qt.QTableWidget"), End),
-            new Function(
-                c, "items", _n_items0, None, Compiled,
-                qt_QTableWidget_items_qt__QTableWidgetItemBSB_ESB__QTableWidget_QMimeData,
-                Return, "qt.QTableWidgetItem[]", Parameters,
-                new Param(c, "this", "qt.QTableWidget"),
-                new Param(c, "data", "qt.QMimeData"), End),
-            new Function(
-                c, "openPersistentEditor", _n_openPersistentEditor0, None,
-                Compiled,
-                qt_QTableWidget_openPersistentEditor_void_QTableWidget_QTableWidgetItem,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTableWidget"),
-                new Param(c, "item", "qt.QTableWidgetItem"), End),
-            new Function(
-                c, "removeCellWidget", _n_removeCellWidget0, None, Compiled,
-                qt_QTableWidget_removeCellWidget_void_QTableWidget_int_int,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTableWidget"),
-                new Param(c, "row", "int"), new Param(c, "column", "int"), End),
-            new Function(c, "row", _n_row0, None, Compiled,
-                         qt_QTableWidget_row_int_QTableWidget_QTableWidgetItem,
-                         Return, "int", Parameters,
-                         new Param(c, "this", "qt.QTableWidget"),
-                         new Param(c, "item", "qt.QTableWidgetItem"), End),
-            new Function(c, "rowCount", _n_rowCount0, None, Compiled,
-                         qt_QTableWidget_rowCount_int_QTableWidget, Return,
-                         "int", Parameters,
-                         new Param(c, "this", "qt.QTableWidget"), End),
-            new Function(
-                c, "selectedItems", _n_selectedItems0, None, Compiled,
-                qt_QTableWidget_selectedItems_qt__QTableWidgetItemBSB_ESB__QTableWidget,
-                Return, "qt.QTableWidgetItem[]", Parameters,
-                new Param(c, "this", "qt.QTableWidget"), End),
+            new Function(c, "selectedItems", _n_selectedItems0, None, Compiled,
+                         qt_QTableWidget_selectedItems_qt__QTableWidgetItemBSB_ESB__QTableWidget, Return, "qt.QTableWidgetItem[]",
+                         Parameters, new Param(c, "this", "qt.QTableWidget"), End),
             // MISSING: selectedRanges ("QList<QTableWidgetSelectionRange>";
             // QTableWidget this)
-            new Function(
-                c, "setCellWidget", _n_setCellWidget0, None, Compiled,
-                qt_QTableWidget_setCellWidget_void_QTableWidget_int_int_QWidget,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTableWidget"),
-                new Param(c, "row", "int"), new Param(c, "column", "int"),
-                new Param(c, "widget", "qt.QWidget"), End),
-            new Function(
-                c, "setColumnCount", _n_setColumnCount0, None, Compiled,
-                qt_QTableWidget_setColumnCount_void_QTableWidget_int, Return,
-                "void", Parameters, new Param(c, "this", "qt.QTableWidget"),
-                new Param(c, "columns", "int"), End),
-            new Function(
-                c, "setCurrentCell", _n_setCurrentCell0, None, Compiled,
-                qt_QTableWidget_setCurrentCell_void_QTableWidget_int_int,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTableWidget"),
-                new Param(c, "row", "int"), new Param(c, "column", "int"), End),
-            new Function(
-                c, "setCurrentCell", _n_setCurrentCell1, None, Compiled,
-                qt_QTableWidget_setCurrentCell_void_QTableWidget_int_int_int,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTableWidget"),
-                new Param(c, "row", "int"), new Param(c, "column", "int"),
-                new Param(c, "command", "int"), End),
-            new Function(
-                c, "setCurrentItem", _n_setCurrentItem0, None, Compiled,
-                qt_QTableWidget_setCurrentItem_void_QTableWidget_QTableWidgetItem,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTableWidget"),
-                new Param(c, "item", "qt.QTableWidgetItem"), End),
-            new Function(
-                c, "setCurrentItem", _n_setCurrentItem1, None, Compiled,
-                qt_QTableWidget_setCurrentItem_void_QTableWidget_QTableWidgetItem_int,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTableWidget"),
-                new Param(c, "item", "qt.QTableWidgetItem"),
-                new Param(c, "command", "int"), End),
-            new Function(
-                c, "setHorizontalHeaderItem", _n_setHorizontalHeaderItem0, None,
-                Compiled,
-                qt_QTableWidget_setHorizontalHeaderItem_void_QTableWidget_int_QTableWidgetItem,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTableWidget"),
-                new Param(c, "column", "int"),
-                new Param(c, "item", "qt.QTableWidgetItem"), End),
-            new Function(
-                c, "setHorizontalHeaderLabels", _n_setHorizontalHeaderLabels0,
-                None, Compiled,
-                qt_QTableWidget_setHorizontalHeaderLabels_void_QTableWidget_stringBSB_ESB_,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTableWidget"),
-                new Param(c, "labels", "string[]"), End),
-            new Function(
-                c, "setItem", _n_setItem0, None, Compiled,
-                qt_QTableWidget_setItem_void_QTableWidget_int_int_QTableWidgetItem,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTableWidget"),
-                new Param(c, "row", "int"), new Param(c, "column", "int"),
-                new Param(c, "item", "qt.QTableWidgetItem"), End),
-            new Function(
-                c, "setItemPrototype", _n_setItemPrototype0, None, Compiled,
-                qt_QTableWidget_setItemPrototype_void_QTableWidget_QTableWidgetItem,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTableWidget"),
-                new Param(c, "item", "qt.QTableWidgetItem"), End),
+            new Function(c, "setCellWidget", _n_setCellWidget0, None, Compiled,
+                         qt_QTableWidget_setCellWidget_void_QTableWidget_int_int_QWidget, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QTableWidget"), new Param(c, "row", "int"), new Param(c, "column", "int"),
+                         new Param(c, "widget", "qt.QWidget"), End),
+            new Function(c, "setColumnCount", _n_setColumnCount0, None, Compiled, qt_QTableWidget_setColumnCount_void_QTableWidget_int,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QTableWidget"), new Param(c, "columns", "int"), End),
+            new Function(c, "setCurrentCell", _n_setCurrentCell0, None, Compiled, qt_QTableWidget_setCurrentCell_void_QTableWidget_int_int,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QTableWidget"), new Param(c, "row", "int"),
+                         new Param(c, "column", "int"), End),
+            new Function(c, "setCurrentCell", _n_setCurrentCell1, None, Compiled,
+                         qt_QTableWidget_setCurrentCell_void_QTableWidget_int_int_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QTableWidget"), new Param(c, "row", "int"), new Param(c, "column", "int"),
+                         new Param(c, "command", "int"), End),
+            new Function(c, "setCurrentItem", _n_setCurrentItem0, None, Compiled,
+                         qt_QTableWidget_setCurrentItem_void_QTableWidget_QTableWidgetItem, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QTableWidget"), new Param(c, "item", "qt.QTableWidgetItem"), End),
+            new Function(c, "setCurrentItem", _n_setCurrentItem1, None, Compiled,
+                         qt_QTableWidget_setCurrentItem_void_QTableWidget_QTableWidgetItem_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QTableWidget"), new Param(c, "item", "qt.QTableWidgetItem"),
+                         new Param(c, "command", "int"), End),
+            new Function(c, "setHorizontalHeaderItem", _n_setHorizontalHeaderItem0, None, Compiled,
+                         qt_QTableWidget_setHorizontalHeaderItem_void_QTableWidget_int_QTableWidgetItem, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QTableWidget"), new Param(c, "column", "int"),
+                         new Param(c, "item", "qt.QTableWidgetItem"), End),
+            new Function(c, "setHorizontalHeaderLabels", _n_setHorizontalHeaderLabels0, None, Compiled,
+                         qt_QTableWidget_setHorizontalHeaderLabels_void_QTableWidget_stringBSB_ESB_, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QTableWidget"), new Param(c, "labels", "string[]"), End),
+            new Function(c, "setItem", _n_setItem0, None, Compiled, qt_QTableWidget_setItem_void_QTableWidget_int_int_QTableWidgetItem,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QTableWidget"), new Param(c, "row", "int"),
+                         new Param(c, "column", "int"), new Param(c, "item", "qt.QTableWidgetItem"), End),
+            new Function(c, "setItemPrototype", _n_setItemPrototype0, None, Compiled,
+                         qt_QTableWidget_setItemPrototype_void_QTableWidget_QTableWidgetItem, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QTableWidget"), new Param(c, "item", "qt.QTableWidgetItem"), End),
             // MISSING: setRangeSelected (void; QTableWidget this, "const
             // QTableWidgetSelectionRange &" range, bool select)
-            new Function(c, "setRowCount", _n_setRowCount0, None, Compiled,
-                         qt_QTableWidget_setRowCount_void_QTableWidget_int,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QTableWidget"),
-                         new Param(c, "rows", "int"), End),
-            new Function(
-                c, "setVerticalHeaderItem", _n_setVerticalHeaderItem0, None,
-                Compiled,
-                qt_QTableWidget_setVerticalHeaderItem_void_QTableWidget_int_QTableWidgetItem,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTableWidget"),
-                new Param(c, "row", "int"),
-                new Param(c, "item", "qt.QTableWidgetItem"), End),
-            new Function(
-                c, "setVerticalHeaderLabels", _n_setVerticalHeaderLabels0, None,
-                Compiled,
-                qt_QTableWidget_setVerticalHeaderLabels_void_QTableWidget_stringBSB_ESB_,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTableWidget"),
-                new Param(c, "labels", "string[]"), End),
-            new Function(
-                c, "sortItems", _n_sortItems0, None, Compiled,
-                qt_QTableWidget_sortItems_void_QTableWidget_int_int, Return,
-                "void", Parameters, new Param(c, "this", "qt.QTableWidget"),
-                new Param(c, "column", "int"),
-                new Param(c, "order", "int", Value((int)Qt::AscendingOrder)),
-                End),
-            new Function(
-                c, "takeHorizontalHeaderItem", _n_takeHorizontalHeaderItem0,
-                None, Compiled,
-                qt_QTableWidget_takeHorizontalHeaderItem_QTableWidgetItem_QTableWidget_int,
-                Return, "qt.QTableWidgetItem", Parameters,
-                new Param(c, "this", "qt.QTableWidget"),
-                new Param(c, "column", "int"), End),
-            new Function(
-                c, "takeItem", _n_takeItem0, None, Compiled,
-                qt_QTableWidget_takeItem_QTableWidgetItem_QTableWidget_int_int,
-                Return, "qt.QTableWidgetItem", Parameters,
-                new Param(c, "this", "qt.QTableWidget"),
-                new Param(c, "row", "int"), new Param(c, "column", "int"), End),
-            new Function(
-                c, "takeVerticalHeaderItem", _n_takeVerticalHeaderItem0, None,
-                Compiled,
-                qt_QTableWidget_takeVerticalHeaderItem_QTableWidgetItem_QTableWidget_int,
-                Return, "qt.QTableWidgetItem", Parameters,
-                new Param(c, "this", "qt.QTableWidget"),
-                new Param(c, "row", "int"), End),
-            new Function(
-                c, "verticalHeaderItem", _n_verticalHeaderItem0, None, Compiled,
-                qt_QTableWidget_verticalHeaderItem_QTableWidgetItem_QTableWidget_int,
-                Return, "qt.QTableWidgetItem", Parameters,
-                new Param(c, "this", "qt.QTableWidget"),
-                new Param(c, "row", "int"), End),
-            new Function(c, "visualColumn", _n_visualColumn0, None, Compiled,
-                         qt_QTableWidget_visualColumn_int_QTableWidget_int,
-                         Return, "int", Parameters,
-                         new Param(c, "this", "qt.QTableWidget"),
-                         new Param(c, "logicalColumn", "int"), End),
-            new Function(
-                c, "visualItemRect", _n_visualItemRect0, None, Compiled,
-                qt_QTableWidget_visualItemRect_QRect_QTableWidget_QTableWidgetItem,
-                Return, "qt.QRect", Parameters,
-                new Param(c, "this", "qt.QTableWidget"),
-                new Param(c, "item", "qt.QTableWidgetItem"), End),
-            new Function(c, "visualRow", _n_visualRow0, None, Compiled,
-                         qt_QTableWidget_visualRow_int_QTableWidget_int, Return,
-                         "int", Parameters,
-                         new Param(c, "this", "qt.QTableWidget"),
-                         new Param(c, "logicalRow", "int"), End),
+            new Function(c, "setRowCount", _n_setRowCount0, None, Compiled, qt_QTableWidget_setRowCount_void_QTableWidget_int, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QTableWidget"), new Param(c, "rows", "int"), End),
+            new Function(c, "setVerticalHeaderItem", _n_setVerticalHeaderItem0, None, Compiled,
+                         qt_QTableWidget_setVerticalHeaderItem_void_QTableWidget_int_QTableWidgetItem, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QTableWidget"), new Param(c, "row", "int"), new Param(c, "item", "qt.QTableWidgetItem"),
+                         End),
+            new Function(c, "setVerticalHeaderLabels", _n_setVerticalHeaderLabels0, None, Compiled,
+                         qt_QTableWidget_setVerticalHeaderLabels_void_QTableWidget_stringBSB_ESB_, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QTableWidget"), new Param(c, "labels", "string[]"), End),
+            new Function(c, "sortItems", _n_sortItems0, None, Compiled, qt_QTableWidget_sortItems_void_QTableWidget_int_int, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QTableWidget"), new Param(c, "column", "int"),
+                         new Param(c, "order", "int", Value((int)Qt::AscendingOrder)), End),
+            new Function(c, "takeHorizontalHeaderItem", _n_takeHorizontalHeaderItem0, None, Compiled,
+                         qt_QTableWidget_takeHorizontalHeaderItem_QTableWidgetItem_QTableWidget_int, Return, "qt.QTableWidgetItem",
+                         Parameters, new Param(c, "this", "qt.QTableWidget"), new Param(c, "column", "int"), End),
+            new Function(c, "takeItem", _n_takeItem0, None, Compiled, qt_QTableWidget_takeItem_QTableWidgetItem_QTableWidget_int_int,
+                         Return, "qt.QTableWidgetItem", Parameters, new Param(c, "this", "qt.QTableWidget"), new Param(c, "row", "int"),
+                         new Param(c, "column", "int"), End),
+            new Function(c, "takeVerticalHeaderItem", _n_takeVerticalHeaderItem0, None, Compiled,
+                         qt_QTableWidget_takeVerticalHeaderItem_QTableWidgetItem_QTableWidget_int, Return, "qt.QTableWidgetItem",
+                         Parameters, new Param(c, "this", "qt.QTableWidget"), new Param(c, "row", "int"), End),
+            new Function(c, "verticalHeaderItem", _n_verticalHeaderItem0, None, Compiled,
+                         qt_QTableWidget_verticalHeaderItem_QTableWidgetItem_QTableWidget_int, Return, "qt.QTableWidgetItem", Parameters,
+                         new Param(c, "this", "qt.QTableWidget"), new Param(c, "row", "int"), End),
+            new Function(c, "visualColumn", _n_visualColumn0, None, Compiled, qt_QTableWidget_visualColumn_int_QTableWidget_int, Return,
+                         "int", Parameters, new Param(c, "this", "qt.QTableWidget"), new Param(c, "logicalColumn", "int"), End),
+            new Function(c, "visualItemRect", _n_visualItemRect0, None, Compiled,
+                         qt_QTableWidget_visualItemRect_QRect_QTableWidget_QTableWidgetItem, Return, "qt.QRect", Parameters,
+                         new Param(c, "this", "qt.QTableWidget"), new Param(c, "item", "qt.QTableWidgetItem"), End),
+            new Function(c, "visualRow", _n_visualRow0, None, Compiled, qt_QTableWidget_visualRow_int_QTableWidget_int, Return, "int",
+                         Parameters, new Param(c, "this", "qt.QTableWidget"), new Param(c, "logicalRow", "int"), End),
             _func[0] = new MemberFunction(
-                c, "dropMimeData", _n_dropMimeData0, None, Compiled,
-                qt_QTableWidget_dropMimeData_bool_QTableWidget_int_int_QMimeData_int,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QTableWidget"),
-                new Param(c, "row", "int"), new Param(c, "column", "int"),
-                new Param(c, "data", "qt.QMimeData"),
-                new Param(c, "action", "int"), End),
-            _func[1] = new MemberFunction(
-                c, "mimeData", _n_mimeData0, None, Compiled,
-                qt_QTableWidget_mimeData_QMimeData_QTableWidget_qt__QTableWidgetItemBSB_ESB_,
-                Return, "qt.QMimeData", Parameters,
-                new Param(c, "this", "qt.QTableWidget"),
-                new Param(c, "items", "qt.QTableWidgetItem[]"), End),
-            _func[2] = new MemberFunction(
-                c, "mimeTypes", _n_mimeTypes0, None, Compiled,
-                qt_QTableWidget_mimeTypes_stringBSB_ESB__QTableWidget, Return,
-                "string[]", Parameters, new Param(c, "this", "qt.QTableWidget"),
-                End),
-            _func[3] = new MemberFunction(
-                c, "supportedDropActions", _n_supportedDropActions0, None,
-                Compiled, qt_QTableWidget_supportedDropActions_int_QTableWidget,
-                Return, "int", Parameters,
-                new Param(c, "this", "qt.QTableWidget"), End),
-            _func[4] = new MemberFunction(
-                c, "dropEvent", _n_dropEvent0, None, Compiled,
-                qt_QTableWidget_dropEvent_void_QTableWidget_QDropEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QTableWidget"),
-                new Param(c, "event", "qt.QDropEvent"), End),
-            _func[5] = new MemberFunction(
-                c, "event", _n_event0, None, Compiled,
-                qt_QTableWidget_event_bool_QTableWidget_QEvent, Return, "bool",
-                Parameters, new Param(c, "this", "qt.QTableWidget"),
-                new Param(c, "e", "qt.QEvent"), End),
-            _func[6] = new MemberFunction(
-                c, "indexAt", _n_indexAt0, None, Compiled,
-                qt_QTableWidget_indexAt_QModelIndex_QTableWidget_QPoint, Return,
-                "qt.QModelIndex", Parameters,
-                new Param(c, "this", "qt.QTableWidget"),
-                new Param(c, "pos", "qt.QPoint"), End),
-            _func[7] = new MemberFunction(
-                c, "scrollTo", _n_scrollTo0, None, Compiled,
-                qt_QTableWidget_scrollTo_void_QTableWidget_QModelIndex_int,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTableWidget"),
-                new Param(c, "index", "qt.QModelIndex"),
-                new Param(c, "hint", "int",
-                          Value((int)QAbstractItemView::EnsureVisible)),
-                End),
-            _func[8] = new MemberFunction(
-                c, "setRootIndex", _n_setRootIndex0, None, Compiled,
-                qt_QTableWidget_setRootIndex_void_QTableWidget_QModelIndex,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTableWidget"),
-                new Param(c, "index", "qt.QModelIndex"), End),
-            _func[9] = new MemberFunction(
-                c, "setSelectionModel", _n_setSelectionModel0, None, Compiled,
-                qt_QTableWidget_setSelectionModel_void_QTableWidget_QItemSelectionModel,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTableWidget"),
-                new Param(c, "selectionModel", "qt.QItemSelectionModel"), End),
-            _func[10] = new MemberFunction(
-                c, "visualRect", _n_visualRect0, None, Compiled,
-                qt_QTableWidget_visualRect_QRect_QTableWidget_QModelIndex,
-                Return, "qt.QRect", Parameters,
-                new Param(c, "this", "qt.QTableWidget"),
-                new Param(c, "index", "qt.QModelIndex"), End),
-            _func[11] = new MemberFunction(
-                c, "currentChanged", _n_currentChanged0, None, Compiled,
-                qt_QTableWidget_currentChanged_void_QTableWidget_QModelIndex_QModelIndex,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTableWidget"),
-                new Param(c, "current", "qt.QModelIndex"),
-                new Param(c, "previous", "qt.QModelIndex"), End),
-            _func[12] = new MemberFunction(
-                c, "horizontalOffset", _n_horizontalOffset0, None, Compiled,
-                qt_QTableWidget_horizontalOffset_int_QTableWidget, Return,
-                "int", Parameters, new Param(c, "this", "qt.QTableWidget"),
-                End),
+                c, "dropMimeData", _n_dropMimeData0, None, Compiled, qt_QTableWidget_dropMimeData_bool_QTableWidget_int_int_QMimeData_int,
+                Return, "bool", Parameters, new Param(c, "this", "qt.QTableWidget"), new Param(c, "row", "int"),
+                new Param(c, "column", "int"), new Param(c, "data", "qt.QMimeData"), new Param(c, "action", "int"), End),
+            _func[1] = new MemberFunction(c, "mimeData", _n_mimeData0, None, Compiled,
+                                          qt_QTableWidget_mimeData_QMimeData_QTableWidget_qt__QTableWidgetItemBSB_ESB_, Return,
+                                          "qt.QMimeData", Parameters, new Param(c, "this", "qt.QTableWidget"),
+                                          new Param(c, "items", "qt.QTableWidgetItem[]"), End),
+            _func[2] =
+                new MemberFunction(c, "mimeTypes", _n_mimeTypes0, None, Compiled, qt_QTableWidget_mimeTypes_stringBSB_ESB__QTableWidget,
+                                   Return, "string[]", Parameters, new Param(c, "this", "qt.QTableWidget"), End),
+            _func[3] = new MemberFunction(c, "supportedDropActions", _n_supportedDropActions0, None, Compiled,
+                                          qt_QTableWidget_supportedDropActions_int_QTableWidget, Return, "int", Parameters,
+                                          new Param(c, "this", "qt.QTableWidget"), End),
+            _func[4] = new MemberFunction(c, "dropEvent", _n_dropEvent0, None, Compiled,
+                                          qt_QTableWidget_dropEvent_void_QTableWidget_QDropEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QTableWidget"), new Param(c, "event", "qt.QDropEvent"), End),
+            _func[5] = new MemberFunction(c, "event", _n_event0, None, Compiled, qt_QTableWidget_event_bool_QTableWidget_QEvent, Return,
+                                          "bool", Parameters, new Param(c, "this", "qt.QTableWidget"), new Param(c, "e", "qt.QEvent"), End),
+            _func[6] = new MemberFunction(c, "indexAt", _n_indexAt0, None, Compiled,
+                                          qt_QTableWidget_indexAt_QModelIndex_QTableWidget_QPoint, Return, "qt.QModelIndex", Parameters,
+                                          new Param(c, "this", "qt.QTableWidget"), new Param(c, "pos", "qt.QPoint"), End),
+            _func[7] = new MemberFunction(c, "scrollTo", _n_scrollTo0, None, Compiled,
+                                          qt_QTableWidget_scrollTo_void_QTableWidget_QModelIndex_int, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QTableWidget"), new Param(c, "index", "qt.QModelIndex"),
+                                          new Param(c, "hint", "int", Value((int)QAbstractItemView::EnsureVisible)), End),
+            _func[8] = new MemberFunction(c, "setRootIndex", _n_setRootIndex0, None, Compiled,
+                                          qt_QTableWidget_setRootIndex_void_QTableWidget_QModelIndex, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QTableWidget"), new Param(c, "index", "qt.QModelIndex"), End),
+            _func[9] =
+                new MemberFunction(c, "setSelectionModel", _n_setSelectionModel0, None, Compiled,
+                                   qt_QTableWidget_setSelectionModel_void_QTableWidget_QItemSelectionModel, Return, "void", Parameters,
+                                   new Param(c, "this", "qt.QTableWidget"), new Param(c, "selectionModel", "qt.QItemSelectionModel"), End),
+            _func[10] = new MemberFunction(c, "visualRect", _n_visualRect0, None, Compiled,
+                                           qt_QTableWidget_visualRect_QRect_QTableWidget_QModelIndex, Return, "qt.QRect", Parameters,
+                                           new Param(c, "this", "qt.QTableWidget"), new Param(c, "index", "qt.QModelIndex"), End),
+            _func[11] = new MemberFunction(c, "currentChanged", _n_currentChanged0, None, Compiled,
+                                           qt_QTableWidget_currentChanged_void_QTableWidget_QModelIndex_QModelIndex, Return, "void",
+                                           Parameters, new Param(c, "this", "qt.QTableWidget"), new Param(c, "current", "qt.QModelIndex"),
+                                           new Param(c, "previous", "qt.QModelIndex"), End),
+            _func[12] = new MemberFunction(c, "horizontalOffset", _n_horizontalOffset0, None, Compiled,
+                                           qt_QTableWidget_horizontalOffset_int_QTableWidget, Return, "int", Parameters,
+                                           new Param(c, "this", "qt.QTableWidget"), End),
             // MISSING: initViewItemOption (void; QTableWidget this,
             // "QStyleOptionViewItem *" option) // protected
-            _func[13] = new MemberFunction(
-                c, "isIndexHidden", _n_isIndexHidden0, None, Compiled,
-                qt_QTableWidget_isIndexHidden_bool_QTableWidget_QModelIndex,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QTableWidget"),
-                new Param(c, "index", "qt.QModelIndex"), End),
-            _func[14] = new MemberFunction(
-                c, "paintEvent", _n_paintEvent0, None, Compiled,
-                qt_QTableWidget_paintEvent_void_QTableWidget_QPaintEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTableWidget"),
-                new Param(c, "event", "qt.QPaintEvent"), End),
-            _func[15] = new MemberFunction(
-                c, "scrollContentsBy", _n_scrollContentsBy0, None, Compiled,
-                qt_QTableWidget_scrollContentsBy_void_QTableWidget_int_int,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTableWidget"),
-                new Param(c, "dx", "int"), new Param(c, "dy", "int"), End),
-            _func[16] = new MemberFunction(
-                c, "selectedIndexes", _n_selectedIndexes0, None, Compiled,
-                qt_QTableWidget_selectedIndexes_qt__QModelIndexBSB_ESB__QTableWidget,
-                Return, "qt.QModelIndex[]", Parameters,
-                new Param(c, "this", "qt.QTableWidget"), End),
-            _func[17] = new MemberFunction(
-                c, "selectionChanged", _n_selectionChanged0, None, Compiled,
-                qt_QTableWidget_selectionChanged_void_QTableWidget_QItemSelection_QItemSelection,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTableWidget"),
-                new Param(c, "selected", "qt.QItemSelection"),
-                new Param(c, "deselected", "qt.QItemSelection"), End),
-            _func[18] = new MemberFunction(
-                c, "setSelection", _n_setSelection0, None, Compiled,
-                qt_QTableWidget_setSelection_void_QTableWidget_QRect_int,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTableWidget"),
-                new Param(c, "rect", "qt.QRect"), new Param(c, "flags", "int"),
-                End),
-            _func[19] = new MemberFunction(
-                c, "sizeHintForColumn", _n_sizeHintForColumn0, None, Compiled,
-                qt_QTableWidget_sizeHintForColumn_int_QTableWidget_int, Return,
-                "int", Parameters, new Param(c, "this", "qt.QTableWidget"),
-                new Param(c, "column", "int"), End),
-            _func[20] = new MemberFunction(
-                c, "sizeHintForRow", _n_sizeHintForRow0, None, Compiled,
-                qt_QTableWidget_sizeHintForRow_int_QTableWidget_int, Return,
-                "int", Parameters, new Param(c, "this", "qt.QTableWidget"),
-                new Param(c, "row", "int"), End),
-            _func[21] = new MemberFunction(
-                c, "timerEvent", _n_timerEvent0, None, Compiled,
-                qt_QTableWidget_timerEvent_void_QTableWidget_QTimerEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTableWidget"),
-                new Param(c, "event", "qt.QTimerEvent"), End),
-            _func[22] = new MemberFunction(
-                c, "updateGeometries", _n_updateGeometries0, None, Compiled,
-                qt_QTableWidget_updateGeometries_void_QTableWidget, Return,
-                "void", Parameters, new Param(c, "this", "qt.QTableWidget"),
-                End),
-            _func[23] = new MemberFunction(
-                c, "verticalOffset", _n_verticalOffset0, None, Compiled,
-                qt_QTableWidget_verticalOffset_int_QTableWidget, Return, "int",
-                Parameters, new Param(c, "this", "qt.QTableWidget"), End),
-            _func[24] = new MemberFunction(
-                c, "viewportSizeHint", _n_viewportSizeHint0, None, Compiled,
-                qt_QTableWidget_viewportSizeHint_QSize_QTableWidget, Return,
-                "qt.QSize", Parameters, new Param(c, "this", "qt.QTableWidget"),
-                End),
-            _func[25] = new MemberFunction(
-                c, "visualRegionForSelection", _n_visualRegionForSelection0,
-                None, Compiled,
-                qt_QTableWidget_visualRegionForSelection_QRegion_QTableWidget_QItemSelection,
-                Return, "qt.QRegion", Parameters,
-                new Param(c, "this", "qt.QTableWidget"),
-                new Param(c, "selection", "qt.QItemSelection"), End),
+            _func[13] = new MemberFunction(c, "isIndexHidden", _n_isIndexHidden0, None, Compiled,
+                                           qt_QTableWidget_isIndexHidden_bool_QTableWidget_QModelIndex, Return, "bool", Parameters,
+                                           new Param(c, "this", "qt.QTableWidget"), new Param(c, "index", "qt.QModelIndex"), End),
+            _func[14] = new MemberFunction(c, "paintEvent", _n_paintEvent0, None, Compiled,
+                                           qt_QTableWidget_paintEvent_void_QTableWidget_QPaintEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QTableWidget"), new Param(c, "event", "qt.QPaintEvent"), End),
+            _func[15] =
+                new MemberFunction(c, "scrollContentsBy", _n_scrollContentsBy0, None, Compiled,
+                                   qt_QTableWidget_scrollContentsBy_void_QTableWidget_int_int, Return, "void", Parameters,
+                                   new Param(c, "this", "qt.QTableWidget"), new Param(c, "dx", "int"), new Param(c, "dy", "int"), End),
+            _func[16] = new MemberFunction(c, "selectedIndexes", _n_selectedIndexes0, None, Compiled,
+                                           qt_QTableWidget_selectedIndexes_qt__QModelIndexBSB_ESB__QTableWidget, Return, "qt.QModelIndex[]",
+                                           Parameters, new Param(c, "this", "qt.QTableWidget"), End),
+            _func[17] =
+                new MemberFunction(c, "selectionChanged", _n_selectionChanged0, None, Compiled,
+                                   qt_QTableWidget_selectionChanged_void_QTableWidget_QItemSelection_QItemSelection, Return, "void",
+                                   Parameters, new Param(c, "this", "qt.QTableWidget"), new Param(c, "selected", "qt.QItemSelection"),
+                                   new Param(c, "deselected", "qt.QItemSelection"), End),
+            _func[18] = new MemberFunction(c, "setSelection", _n_setSelection0, None, Compiled,
+                                           qt_QTableWidget_setSelection_void_QTableWidget_QRect_int, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QTableWidget"), new Param(c, "rect", "qt.QRect"),
+                                           new Param(c, "flags", "int"), End),
+            _func[19] = new MemberFunction(c, "sizeHintForColumn", _n_sizeHintForColumn0, None, Compiled,
+                                           qt_QTableWidget_sizeHintForColumn_int_QTableWidget_int, Return, "int", Parameters,
+                                           new Param(c, "this", "qt.QTableWidget"), new Param(c, "column", "int"), End),
+            _func[20] = new MemberFunction(c, "sizeHintForRow", _n_sizeHintForRow0, None, Compiled,
+                                           qt_QTableWidget_sizeHintForRow_int_QTableWidget_int, Return, "int", Parameters,
+                                           new Param(c, "this", "qt.QTableWidget"), new Param(c, "row", "int"), End),
+            _func[21] = new MemberFunction(c, "timerEvent", _n_timerEvent0, None, Compiled,
+                                           qt_QTableWidget_timerEvent_void_QTableWidget_QTimerEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QTableWidget"), new Param(c, "event", "qt.QTimerEvent"), End),
+            _func[22] = new MemberFunction(c, "updateGeometries", _n_updateGeometries0, None, Compiled,
+                                           qt_QTableWidget_updateGeometries_void_QTableWidget, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QTableWidget"), End),
+            _func[23] =
+                new MemberFunction(c, "verticalOffset", _n_verticalOffset0, None, Compiled, qt_QTableWidget_verticalOffset_int_QTableWidget,
+                                   Return, "int", Parameters, new Param(c, "this", "qt.QTableWidget"), End),
+            _func[24] = new MemberFunction(c, "viewportSizeHint", _n_viewportSizeHint0, None, Compiled,
+                                           qt_QTableWidget_viewportSizeHint_QSize_QTableWidget, Return, "qt.QSize", Parameters,
+                                           new Param(c, "this", "qt.QTableWidget"), End),
+            _func[25] = new MemberFunction(c, "visualRegionForSelection", _n_visualRegionForSelection0, None, Compiled,
+                                           qt_QTableWidget_visualRegionForSelection_QRegion_QTableWidget_QItemSelection, Return,
+                                           "qt.QRegion", Parameters, new Param(c, "this", "qt.QTableWidget"),
+                                           new Param(c, "selection", "qt.QItemSelection"), End),
             // static functions
             EndArguments);
         globalScope()->addSymbols(EndArguments);

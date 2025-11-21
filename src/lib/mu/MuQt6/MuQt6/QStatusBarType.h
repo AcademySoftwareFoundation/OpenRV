@@ -42,8 +42,7 @@ namespace Mu
         //  Constructors
         //
 
-        QStatusBarType(Context* context, const char* name,
-                       Class* superClass = 0, Class* superClass2 = 0);
+        QStatusBarType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QStatusBarType();
 
@@ -120,199 +119,103 @@ namespace Mu
 
         void paintEvent_pub(QPaintEvent* event) { paintEvent(event); }
 
-        void paintEvent_pub_parent(QPaintEvent* event)
-        {
-            QStatusBar::paintEvent(event);
-        }
+        void paintEvent_pub_parent(QPaintEvent* event) { QStatusBar::paintEvent(event); }
 
         void resizeEvent_pub(QResizeEvent* e) { resizeEvent(e); }
 
-        void resizeEvent_pub_parent(QResizeEvent* e)
-        {
-            QStatusBar::resizeEvent(e);
-        }
+        void resizeEvent_pub_parent(QResizeEvent* e) { QStatusBar::resizeEvent(e); }
 
         void showEvent_pub(QShowEvent* _p13) { showEvent(_p13); }
 
-        void showEvent_pub_parent(QShowEvent* _p13)
-        {
-            QStatusBar::showEvent(_p13);
-        }
+        void showEvent_pub_parent(QShowEvent* _p13) { QStatusBar::showEvent(_p13); }
 
         void changeEvent_pub(QEvent* event) { changeEvent(event); }
 
-        void changeEvent_pub_parent(QEvent* event)
-        {
-            QStatusBar::changeEvent(event);
-        }
+        void changeEvent_pub_parent(QEvent* event) { QStatusBar::changeEvent(event); }
 
         void closeEvent_pub(QCloseEvent* event) { closeEvent(event); }
 
-        void closeEvent_pub_parent(QCloseEvent* event)
-        {
-            QStatusBar::closeEvent(event);
-        }
+        void closeEvent_pub_parent(QCloseEvent* event) { QStatusBar::closeEvent(event); }
 
-        void contextMenuEvent_pub(QContextMenuEvent* event)
-        {
-            contextMenuEvent(event);
-        }
+        void contextMenuEvent_pub(QContextMenuEvent* event) { contextMenuEvent(event); }
 
-        void contextMenuEvent_pub_parent(QContextMenuEvent* event)
-        {
-            QStatusBar::contextMenuEvent(event);
-        }
+        void contextMenuEvent_pub_parent(QContextMenuEvent* event) { QStatusBar::contextMenuEvent(event); }
 
-        void dragEnterEvent_pub(QDragEnterEvent* event)
-        {
-            dragEnterEvent(event);
-        }
+        void dragEnterEvent_pub(QDragEnterEvent* event) { dragEnterEvent(event); }
 
-        void dragEnterEvent_pub_parent(QDragEnterEvent* event)
-        {
-            QStatusBar::dragEnterEvent(event);
-        }
+        void dragEnterEvent_pub_parent(QDragEnterEvent* event) { QStatusBar::dragEnterEvent(event); }
 
-        void dragLeaveEvent_pub(QDragLeaveEvent* event)
-        {
-            dragLeaveEvent(event);
-        }
+        void dragLeaveEvent_pub(QDragLeaveEvent* event) { dragLeaveEvent(event); }
 
-        void dragLeaveEvent_pub_parent(QDragLeaveEvent* event)
-        {
-            QStatusBar::dragLeaveEvent(event);
-        }
+        void dragLeaveEvent_pub_parent(QDragLeaveEvent* event) { QStatusBar::dragLeaveEvent(event); }
 
         void dragMoveEvent_pub(QDragMoveEvent* event) { dragMoveEvent(event); }
 
-        void dragMoveEvent_pub_parent(QDragMoveEvent* event)
-        {
-            QStatusBar::dragMoveEvent(event);
-        }
+        void dragMoveEvent_pub_parent(QDragMoveEvent* event) { QStatusBar::dragMoveEvent(event); }
 
         void dropEvent_pub(QDropEvent* event) { dropEvent(event); }
 
-        void dropEvent_pub_parent(QDropEvent* event)
-        {
-            QStatusBar::dropEvent(event);
-        }
+        void dropEvent_pub_parent(QDropEvent* event) { QStatusBar::dropEvent(event); }
 
         void focusInEvent_pub(QFocusEvent* event) { focusInEvent(event); }
 
-        void focusInEvent_pub_parent(QFocusEvent* event)
-        {
-            QStatusBar::focusInEvent(event);
-        }
+        void focusInEvent_pub_parent(QFocusEvent* event) { QStatusBar::focusInEvent(event); }
 
-        bool focusNextPrevChild_pub(bool next)
-        {
-            return focusNextPrevChild(next);
-        }
+        bool focusNextPrevChild_pub(bool next) { return focusNextPrevChild(next); }
 
-        bool focusNextPrevChild_pub_parent(bool next)
-        {
-            return QStatusBar::focusNextPrevChild(next);
-        }
+        bool focusNextPrevChild_pub_parent(bool next) { return QStatusBar::focusNextPrevChild(next); }
 
         void focusOutEvent_pub(QFocusEvent* event) { focusOutEvent(event); }
 
-        void focusOutEvent_pub_parent(QFocusEvent* event)
-        {
-            QStatusBar::focusOutEvent(event);
-        }
+        void focusOutEvent_pub_parent(QFocusEvent* event) { QStatusBar::focusOutEvent(event); }
 
         void hideEvent_pub(QHideEvent* event) { hideEvent(event); }
 
-        void hideEvent_pub_parent(QHideEvent* event)
-        {
-            QStatusBar::hideEvent(event);
-        }
+        void hideEvent_pub_parent(QHideEvent* event) { QStatusBar::hideEvent(event); }
 
         void keyPressEvent_pub(QKeyEvent* event) { keyPressEvent(event); }
 
-        void keyPressEvent_pub_parent(QKeyEvent* event)
-        {
-            QStatusBar::keyPressEvent(event);
-        }
+        void keyPressEvent_pub_parent(QKeyEvent* event) { QStatusBar::keyPressEvent(event); }
 
         void keyReleaseEvent_pub(QKeyEvent* event) { keyReleaseEvent(event); }
 
-        void keyReleaseEvent_pub_parent(QKeyEvent* event)
-        {
-            QStatusBar::keyReleaseEvent(event);
-        }
+        void keyReleaseEvent_pub_parent(QKeyEvent* event) { QStatusBar::keyReleaseEvent(event); }
 
         void leaveEvent_pub(QEvent* event) { leaveEvent(event); }
 
-        void leaveEvent_pub_parent(QEvent* event)
-        {
-            QStatusBar::leaveEvent(event);
-        }
+        void leaveEvent_pub_parent(QEvent* event) { QStatusBar::leaveEvent(event); }
 
-        void mouseDoubleClickEvent_pub(QMouseEvent* event)
-        {
-            mouseDoubleClickEvent(event);
-        }
+        void mouseDoubleClickEvent_pub(QMouseEvent* event) { mouseDoubleClickEvent(event); }
 
-        void mouseDoubleClickEvent_pub_parent(QMouseEvent* event)
-        {
-            QStatusBar::mouseDoubleClickEvent(event);
-        }
+        void mouseDoubleClickEvent_pub_parent(QMouseEvent* event) { QStatusBar::mouseDoubleClickEvent(event); }
 
         void mouseMoveEvent_pub(QMouseEvent* event) { mouseMoveEvent(event); }
 
-        void mouseMoveEvent_pub_parent(QMouseEvent* event)
-        {
-            QStatusBar::mouseMoveEvent(event);
-        }
+        void mouseMoveEvent_pub_parent(QMouseEvent* event) { QStatusBar::mouseMoveEvent(event); }
 
         void mousePressEvent_pub(QMouseEvent* event) { mousePressEvent(event); }
 
-        void mousePressEvent_pub_parent(QMouseEvent* event)
-        {
-            QStatusBar::mousePressEvent(event);
-        }
+        void mousePressEvent_pub_parent(QMouseEvent* event) { QStatusBar::mousePressEvent(event); }
 
-        void mouseReleaseEvent_pub(QMouseEvent* event)
-        {
-            mouseReleaseEvent(event);
-        }
+        void mouseReleaseEvent_pub(QMouseEvent* event) { mouseReleaseEvent(event); }
 
-        void mouseReleaseEvent_pub_parent(QMouseEvent* event)
-        {
-            QStatusBar::mouseReleaseEvent(event);
-        }
+        void mouseReleaseEvent_pub_parent(QMouseEvent* event) { QStatusBar::mouseReleaseEvent(event); }
 
         void moveEvent_pub(QMoveEvent* event) { moveEvent(event); }
 
-        void moveEvent_pub_parent(QMoveEvent* event)
-        {
-            QStatusBar::moveEvent(event);
-        }
+        void moveEvent_pub_parent(QMoveEvent* event) { QStatusBar::moveEvent(event); }
 
         void tabletEvent_pub(QTabletEvent* event) { tabletEvent(event); }
 
-        void tabletEvent_pub_parent(QTabletEvent* event)
-        {
-            QStatusBar::tabletEvent(event);
-        }
+        void tabletEvent_pub_parent(QTabletEvent* event) { QStatusBar::tabletEvent(event); }
 
         void wheelEvent_pub(QWheelEvent* event) { wheelEvent(event); }
 
-        void wheelEvent_pub_parent(QWheelEvent* event)
-        {
-            QStatusBar::wheelEvent(event);
-        }
+        void wheelEvent_pub_parent(QWheelEvent* event) { QStatusBar::wheelEvent(event); }
 
-        int metric_pub(QPaintDevice::PaintDeviceMetric m) const
-        {
-            return metric(m);
-        }
+        int metric_pub(QPaintDevice::PaintDeviceMetric m) const { return metric(m); }
 
-        int metric_pub_parent(QPaintDevice::PaintDeviceMetric m) const
-        {
-            return QStatusBar::metric(m);
-        }
+        int metric_pub_parent(QPaintDevice::PaintDeviceMetric m) const { return QStatusBar::metric(m); }
 
     public:
         const QStatusBarType* _baseType;
@@ -320,11 +223,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance*
-    QStatusBarType::cachedInstance(const QStatusBarType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QStatusBarType::cachedInstance(const QStatusBarType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

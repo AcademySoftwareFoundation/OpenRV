@@ -61,15 +61,13 @@ namespace Rv
     //  Orientation on all nodes
     //
 
-    void setFlipFlopOnAll(const IPCore::IPGraph& graph, bool setFlip, bool flip,
-                          bool setFlop, bool flop);
+    void setFlipFlopOnAll(const IPCore::IPGraph& graph, bool setFlip, bool flip, bool setFlop, bool flop);
 
     //
     //
     //
 
-    void setChannelMapOnAll(const IPCore::IPGraph& graph,
-                            const std::vector<std::string>& ch);
+    void setChannelMapOnAll(const IPCore::IPGraph& graph, const std::vector<std::string>& ch);
 
     //
     //  sets FormatIPNode's xfit and yfit on all inputs

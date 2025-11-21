@@ -6,7 +6,6 @@
 #
 from __future__ import print_function
 
-import os
 import socket
 import sys
 import time
@@ -92,7 +91,7 @@ class RvCommunicator:
                 self._sendMessage("DISCONNECT")
             self.sock.shutdown(socket.SHUT_RDWR)
             self.sock.close()
-        except:
+        except Exception:
             pass
         self.connected = False
 
@@ -166,8 +165,7 @@ class RvCommunicator:
                 sanitized_msg = (msg.errno, msg.strerror)
             if (
                 sanitized_msg[1] != "Resource temporarily unavailable"
-                and sanitized_msg[1]
-                != "A non-blocking socket operation could not be completed immediately"
+                and sanitized_msg[1] != "A non-blocking socket operation could not be completed immediately"
                 and sanitized_msg[0] != 10035
             ):
                 print("ERROR: peek for messages failed: %s\n" % msg, file=sys.stderr)
@@ -185,7 +183,6 @@ class RvCommunicator:
         return field
 
     def _receiveSingleMessage(self):
-
         messType = 0
         messContents = 0
 
@@ -271,7 +268,6 @@ class RvCommunicator:
         self._processEvents()
 
     def _processEvents(self, processReturnOnly=False):
-
         while 1:
             noMessage = True
             while noMessage:
@@ -300,10 +296,7 @@ class RvCommunicator:
                             file=sys.stderr,
                         )
                         return six.ensure_binary("")
-                elif (
-                    len(self.eventQueue) == 0
-                    or (event, contents) != self.eventQueue[-1:]
-                ):
+                elif len(self.eventQueue) == 0 or (event, contents) != self.eventQueue[-1:]:
                     self.eventQueue.append((event, contents))
 
             elif messType == six.ensure_binary("PING"):

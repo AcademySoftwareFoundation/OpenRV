@@ -50,20 +50,16 @@ namespace TwkMovie
         //
         //  MovieReader API
         //
-        virtual void preloadOpen(const std::string& filename,
-                                 const ReadRequest& request);
+        virtual void preloadOpen(const std::string& filename, const ReadRequest& request);
 
-        virtual void postPreloadOpen(const MovieInfo& as,
-                                     const ReadRequest& request);
+        virtual void postPreloadOpen(const MovieInfo& as, const ReadRequest& request);
 
         //
         //  Movie API
         //
 
-        virtual void imagesAtFrame(const ReadRequest& request,
-                                   FrameBufferVector&);
-        virtual void identifiersAtFrame(const ReadRequest& request,
-                                        IdentifierVector&);
+        virtual void imagesAtFrame(const ReadRequest& request, FrameBufferVector&);
+        virtual void identifiersAtFrame(const ReadRequest& request, IdentifierVector&);
 
         void cacheFrames();
         void identifier(int frame, std::ostream&);
@@ -89,8 +85,7 @@ namespace TwkMovie
         virtual std::string about() const;
         virtual MovieReader* movieReader() const;
         virtual MovieWriter* movieWriter() const;
-        virtual void getMovieInfo(const std::string& filename,
-                                  MovieInfo&) const;
+        virtual void getMovieInfo(const std::string& filename, MovieInfo&) const;
     };
 
 } // namespace TwkMovie

@@ -35,16 +35,13 @@ namespace Mu
         //  function in Function.
         //
 
-        MemberFunction(Context* context, const char* name, NodeFunc,
-                       Attributes attributes, ...);
+        MemberFunction(Context* context, const char* name, NodeFunc, Attributes attributes, ...);
 
-        MemberFunction(Context* context, const char* name,
-                       const Type* returnType, int nparams, ParameterVariable**,
-                       Node*, Attributes attributes);
+        MemberFunction(Context* context, const char* name, const Type* returnType, int nparams, ParameterVariable**, Node*,
+                       Attributes attributes);
 
-        MemberFunction(Context* context, const char* name,
-                       const Type* returnType, int nparams, ParameterVariable**,
-                       NodeFunc, Attributes attributes);
+        MemberFunction(Context* context, const char* name, const Type* returnType, int nparams, ParameterVariable**, NodeFunc,
+                       Attributes attributes);
 
         virtual ~MemberFunction();
 

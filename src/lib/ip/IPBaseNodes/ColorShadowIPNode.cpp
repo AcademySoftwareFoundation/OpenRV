@@ -24,9 +24,7 @@ namespace IPCore
     using namespace TwkContainer;
     using namespace TwkMath;
 
-    ColorShadowIPNode::ColorShadowIPNode(const std::string& name,
-                                         const NodeDefinition* def,
-                                         IPGraph* graph, GroupIPNode* group)
+    ColorShadowIPNode::ColorShadowIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group)
         : IPNode(name, def, graph, group)
     {
         setMaxInputs(1);
@@ -89,22 +87,17 @@ namespace IPCore
             Mat44f mInv = m.inverted();
 
             Vec4f coeff;
-            coeff[0] =
-                mInv[0][0] * 0 + mInv[0][1] * down + mInv[0][2] * shadowPoint;
-            coeff[1] =
-                mInv[1][0] * 0 + mInv[1][1] * down + mInv[1][2] * shadowPoint;
-            coeff[2] =
-                mInv[2][0] * 0 + mInv[2][1] * down + mInv[2][2] * shadowPoint;
-            coeff[3] =
-                mInv[3][0] * 0 + mInv[3][1] * down + mInv[3][2] * shadowPoint;
+            coeff[0] = mInv[0][0] * 0 + mInv[0][1] * down + mInv[0][2] * shadowPoint;
+            coeff[1] = mInv[1][0] * 0 + mInv[1][1] * down + mInv[1][2] * shadowPoint;
+            coeff[2] = mInv[2][0] * 0 + mInv[2][1] * down + mInv[2][2] * shadowPoint;
+            coeff[3] = mInv[3][0] * 0 + mInv[3][1] * down + mInv[3][2] * shadowPoint;
 
             coeff[0] += mInv[0][3];
             coeff[1] += mInv[1][3];
             coeff[2] += mInv[2][3];
             coeff[3] += mInv[3][3];
 
-            img->shaderExpr =
-                Shader::newColorShadowonY(img->shaderExpr, coeff, shadowPoint);
+            img->shaderExpr = Shader::newColorShadowonY(img->shaderExpr, coeff, shadowPoint);
 
             img->shaderExpr = Shader::newColorYCbCrSRGB(img->shaderExpr);
         }

@@ -47,8 +47,7 @@ namespace TwkImg
     }
 
     // *****************************************************************************
-    static inline int expandrow(unsigned char* optr, unsigned char* iptr,
-                                int offset, int step = 1)
+    static inline int expandrow(unsigned char* optr, unsigned char* iptr, int offset, int step = 1)
     {
         unsigned char pixel;
         unsigned char count;

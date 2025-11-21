@@ -173,8 +173,7 @@ namespace Mu
         //	passing in NonNative.
         //
 
-        Function(Context* context, const char* name, NodeFunc,
-                 Attributes attributes, ...);
+        Function(Context* context, const char* name, NodeFunc, Attributes attributes, ...);
 
         //
         //	This constructor is used for non-native functions. NonNative
@@ -182,12 +181,10 @@ namespace Mu
         //	attributes.
         //
 
-        Function(Context* context, const char* name, const Type* returnType,
-                 int nparams, ParameterVariable**, Node*,
+        Function(Context* context, const char* name, const Type* returnType, int nparams, ParameterVariable**, Node*,
                  Attributes attributes);
 
-        Function(Context* context, const char* name, const Type* returnType,
-                 int nparams, ParameterVariable**, NodeFunc,
+        Function(Context* context, const char* name, const Type* returnType, int nparams, ParameterVariable**, NodeFunc,
                  Attributes attributes);
 
         //
@@ -336,16 +333,9 @@ namespace Mu
 
         bool isGenerated() const { return _generated; }
 
-        bool isPure() const
-        {
-            return isMapped() && !hasSideEffects()
-                   && !hasDependentSideEffects();
-        }
+        bool isPure() const { return isMapped() && !hasSideEffects() && !hasDependentSideEffects(); }
 
-        bool maybePure() const
-        {
-            return isMapped() && hasDependentSideEffects();
-        }
+        bool maybePure() const { return isMapped() && hasDependentSideEffects(); }
 
         bool isDynamicActivation() const { return _dynamicActivation; }
 
@@ -355,10 +345,7 @@ namespace Mu
 
         bool hasUnresolvedStubs() const { return _unresolvedStubs; }
 
-        bool isConstructor() const
-        {
-            return fullyQualifiedName() == returnTypeName();
-        }
+        bool isConstructor() const { return fullyQualifiedName() == returnTypeName(); }
 
         Attributes baseAttributes() const;
 
@@ -441,36 +428,30 @@ namespace Mu
 //  Big ugly define which makes pulls a bunch of crap in to the local scope
 //
 
-#define USING_MU_FUNCTION_SYMBOLS                                         \
-    const unsigned int NoHint = 0;                                        \
-    Mu::Function::ArgKeyword Return = Mu::Function::Return;               \
-    Mu::Function::ArgKeyword Compiled = Mu::Function::Compiled;           \
-    Mu::Function::ArgKeyword Args = Mu::Function::Args;                   \
-    Mu::Function::ArgKeyword Optional = Mu::Function::Optional;           \
-    Mu::Function::ArgKeyword Maximum = Mu::Function::Maximum;             \
-    Mu::Function::ArgKeyword End = Mu::Function::End;                     \
-    Mu::Function::ArgKeyword Generated = Mu::Function::Generated;         \
-    Mu::Function::ArgKeyword Parameters = Mu::Function::Parameters;       \
-    Mu::Function::Attributes Retaining = Mu::Function::Retaining;         \
-    typedef Mu::ParameterVariable Param;                                  \
-    typedef Mu::FreeVariable FreeParam;                                   \
-    typedef Mu::Function::CompiledFunction CompiledFunction;              \
-    Mu::Function::Attributes None = Mu::Function::None;                   \
-    Mu::Function::Attributes NativeInlined = Mu::Function::NativeInlined; \
-    Mu::Function::Attributes CommOp =                                     \
-        Mu::Function::Mapped | Mu::Function::Commutative                  \
-        | Mu::Function::Operator | Mu::Function::NoSideEffects;           \
-    Mu::Function::Attributes Op = Mu::Function::Mapped                    \
-                                  | Mu::Function::Operator                \
-                                  | Mu::Function::NoSideEffects;          \
-    Mu::Function::Attributes Mapped =                                     \
-        Mu::Function::Mapped | Mu::Function::NoSideEffects;               \
-    Mu::Function::Attributes Pure =                                       \
-        Mu::Function::Mapped | Mu::Function::NoSideEffects;               \
-    Mu::Function::Attributes Cast = Mapped | Mu::Function::Cast;          \
-    Mu::Function::Attributes Lossy = Cast | Mu::Function::Lossy;          \
-    Mu::Function::Attributes AsOp =                                       \
-        Mu::Function::MemberOperator | Mu::Function::Operator;
+#define USING_MU_FUNCTION_SYMBOLS                                                                                \
+    const unsigned int NoHint = 0;                                                                               \
+    Mu::Function::ArgKeyword Return = Mu::Function::Return;                                                      \
+    Mu::Function::ArgKeyword Compiled = Mu::Function::Compiled;                                                  \
+    Mu::Function::ArgKeyword Args = Mu::Function::Args;                                                          \
+    Mu::Function::ArgKeyword Optional = Mu::Function::Optional;                                                  \
+    Mu::Function::ArgKeyword Maximum = Mu::Function::Maximum;                                                    \
+    Mu::Function::ArgKeyword End = Mu::Function::End;                                                            \
+    Mu::Function::ArgKeyword Generated = Mu::Function::Generated;                                                \
+    Mu::Function::ArgKeyword Parameters = Mu::Function::Parameters;                                              \
+    Mu::Function::Attributes Retaining = Mu::Function::Retaining;                                                \
+    typedef Mu::ParameterVariable Param;                                                                         \
+    typedef Mu::FreeVariable FreeParam;                                                                          \
+    typedef Mu::Function::CompiledFunction CompiledFunction;                                                     \
+    Mu::Function::Attributes None = Mu::Function::None;                                                          \
+    Mu::Function::Attributes NativeInlined = Mu::Function::NativeInlined;                                        \
+    Mu::Function::Attributes CommOp =                                                                            \
+        Mu::Function::Mapped | Mu::Function::Commutative | Mu::Function::Operator | Mu::Function::NoSideEffects; \
+    Mu::Function::Attributes Op = Mu::Function::Mapped | Mu::Function::Operator | Mu::Function::NoSideEffects;   \
+    Mu::Function::Attributes Mapped = Mu::Function::Mapped | Mu::Function::NoSideEffects;                        \
+    Mu::Function::Attributes Pure = Mu::Function::Mapped | Mu::Function::NoSideEffects;                          \
+    Mu::Function::Attributes Cast = Mapped | Mu::Function::Cast;                                                 \
+    Mu::Function::Attributes Lossy = Cast | Mu::Function::Lossy;                                                 \
+    Mu::Function::Attributes AsOp = Mu::Function::MemberOperator | Mu::Function::Operator;
 
 // Mu::Symbol::VariadicKeyword EndArguments = Mu::Symbol::EndArguments;
 

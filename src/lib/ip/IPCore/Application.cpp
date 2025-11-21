@@ -33,12 +33,9 @@ namespace IPCore
     using namespace TwkUtil;
     using namespace std;
 
-    NOTIFIER_MESSAGE_IMP(Application, startTimerMessage,
-                         "app start timer message")
-    NOTIFIER_MESSAGE_IMP(Application, stopTimerMessage,
-                         "app stop timer message")
-    NOTIFIER_MESSAGE_IMP(Application, createNewSessionFromFiles,
-                         "app create new session from files")
+    NOTIFIER_MESSAGE_IMP(Application, startTimerMessage, "app start timer message")
+    NOTIFIER_MESSAGE_IMP(Application, stopTimerMessage, "app stop timer message")
+    NOTIFIER_MESSAGE_IMP(Application, createNewSessionFromFiles, "app create new session from files")
 
     Application::PropEnvMap Application::m_toVarMap;
     Application::PropEnvMap Application::m_fromVarMap;
@@ -84,8 +81,7 @@ namespace IPCore
         if (nodePath != "")
             m_nodeManager->loadDefinitionsAlongPathVar(nodePath);
 
-        string nodeOverrideFile =
-            optionValue<string>("nodeDefinitionOverride", "");
+        string nodeOverrideFile = optionValue<string>("nodeDefinitionOverride", "");
         if (nodeOverrideFile != "")
             m_nodeManager->loadDefinitions(nodeOverrideFile);
     }
@@ -96,15 +92,13 @@ namespace IPCore
         m_createNewSessionFromFilesSignal(files);
     }
 
-    Application::DispatchID
-    Application::dispatchToMainThread(Application::DispatchCallback callback)
+    Application::DispatchID Application::dispatchToMainThread(Application::DispatchCallback callback)
     {
         callback(0);
         return 0;
     }
 
-    void Application::undispatchToMainThread(DispatchID /*dispatchID*/,
-                                             double /*maxDuration*/)
+    void Application::undispatchToMainThread(DispatchID /*dispatchID*/, double /*maxDuration*/)
     {
         // do nothing
     }
@@ -177,9 +171,7 @@ namespace IPCore
         }
     }
 
-    bool Application::receive(Notifier* originator, Notifier* sender,
-                              Notifier::MessageId id,
-                              Notifier::MessageData* data)
+    bool Application::receive(Notifier* originator, Notifier* sender, Notifier::MessageId id, Notifier::MessageData* data)
     {
         return TwkApp::Application::receive(originator, sender, id, data);
     }
@@ -211,8 +203,7 @@ namespace IPCore
     {
         if (!fileExists(filename.c_str()))
         {
-            TWK_THROW_STREAM(ReadFailedExc,
-                             "File " << filename << " does not exist");
+            TWK_THROW_STREAM(ReadFailedExc, "File " << filename << " does not exist");
         }
     }
 
@@ -269,9 +260,7 @@ namespace IPCore
         }
     }
 
-    string Application::userGenericEventOnAll(const string& eventName,
-                                              const string& contents,
-                                              const string& sender)
+    string Application::userGenericEventOnAll(const string& eventName, const string& contents, const string& sender)
     {
         string r;
 
@@ -402,8 +391,7 @@ namespace IPCore
 
         // load OS path maps
 
-        for (PropEnvMap::const_iterator i = m_osVarMap.begin();
-             i != m_osVarMap.end(); ++i)
+        for (PropEnvMap::const_iterator i = m_osVarMap.begin(); i != m_osVarMap.end(); ++i)
         {
             string k = i->first;
             string v = i->second;
@@ -414,8 +402,7 @@ namespace IPCore
             case RVMac:
                 if (i->first.find("RV_OS_PATH_WINDOWS") != string::npos)
                 {
-                    k = k.replace(0, strlen("RV_OS_PATH_WINDOWS"),
-                                  "RV_OS_PATH_OSX");
+                    k = k.replace(0, strlen("RV_OS_PATH_WINDOWS"), "RV_OS_PATH_OSX");
                     if (m_osVarMap.count(k))
                     {
                         m_fromWINDOWS[v] = m_osVarMap[k];
@@ -423,8 +410,7 @@ namespace IPCore
                 }
                 if (i->first.find("RV_OS_PATH_LINUX") != string::npos)
                 {
-                    k = k.replace(0, strlen("RV_OS_PATH_LINUX"),
-                                  "RV_OS_PATH_OSX");
+                    k = k.replace(0, strlen("RV_OS_PATH_LINUX"), "RV_OS_PATH_OSX");
                     if (m_osVarMap.count(k))
                     {
                         m_fromLINUX[v] = m_osVarMap[k];
@@ -435,8 +421,7 @@ namespace IPCore
                 if (i->first.find("RV_OS_PATH_OSX") != string::npos)
                 {
                     string k = i->first;
-                    k = k.replace(0, strlen("RV_OS_PATH_OSX"),
-                                  "RV_OS_PATH_WINDOWS");
+                    k = k.replace(0, strlen("RV_OS_PATH_OSX"), "RV_OS_PATH_WINDOWS");
                     if (m_osVarMap.count(k))
                     {
                         m_fromOSX[v] = m_osVarMap[k];
@@ -445,8 +430,7 @@ namespace IPCore
                 if (i->first.find("RV_OS_PATH_LINUX") != string::npos)
                 {
                     string k = i->first;
-                    k = k.replace(0, strlen("RV_OS_PATH_LINUX"),
-                                  "RV_OS_PATH_WINDOWS");
+                    k = k.replace(0, strlen("RV_OS_PATH_LINUX"), "RV_OS_PATH_WINDOWS");
                     if (m_osVarMap.count(k))
                     {
                         m_fromLINUX[v] = m_osVarMap[k];
@@ -457,8 +441,7 @@ namespace IPCore
                 if (i->first.find("RV_OS_PATH_OSX") != string::npos)
                 {
                     string k = i->first;
-                    k = k.replace(0, strlen("RV_OS_PATH_OSX"),
-                                  "RV_OS_PATH_LINUX");
+                    k = k.replace(0, strlen("RV_OS_PATH_OSX"), "RV_OS_PATH_LINUX");
                     if (m_osVarMap.count(k))
                     {
                         m_fromOSX[v] = m_osVarMap[k];
@@ -467,8 +450,7 @@ namespace IPCore
                 if (i->first.find("RV_OS_PATH_WINDOWS") != string::npos)
                 {
                     string k = i->first;
-                    k = k.replace(0, strlen("RV_OS_PATH_WINDOWS"),
-                                  "RV_OS_PATH_LINUX");
+                    k = k.replace(0, strlen("RV_OS_PATH_WINDOWS"), "RV_OS_PATH_LINUX");
                     if (m_osVarMap.count(k))
                     {
                         m_fromWINDOWS[v] = m_osVarMap[k];
@@ -482,8 +464,7 @@ namespace IPCore
     //
     //  Case-independent find
     //
-    static int myFind(string lookingIn, string lookingFor,
-                      Application::HostOS rvHostOS, bool wantLowerCase = false)
+    static int myFind(string lookingIn, string lookingFor, Application::HostOS rvHostOS, bool wantLowerCase = false)
     {
         // this lowercaseing used to be done with defines for windows only,
         // but since there is no platform specific API calls, use our new enum
@@ -502,9 +483,7 @@ namespace IPCore
     // added a wantLowerCase arg to enable case insenstive matching of windows
     // based paths default false assignments allows previous API to be
     // unchanged, especially for write cases.
-    string Application::mapToFrom(const string& s, PropEnvMap& em,
-                                  bool wantLowerCase = false,
-                                  bool wantPathSanitize = false)
+    string Application::mapToFrom(const string& s, PropEnvMap& em, bool wantLowerCase = false, bool wantPathSanitize = false)
     {
         string newS = s;
         string path;
@@ -578,13 +557,9 @@ namespace IPCore
         return mapToFrom(in_clean, m_fromWINDOWS, true, true);
     }
 
-    string Application::mapToVar(const string& in)
-    {
-        return mapToFrom(in, m_toVarMap);
-    }
+    string Application::mapToVar(const string& in) { return mapToFrom(in, m_toVarMap); }
 
-    void Application::setOptionValueFromEnvironment(const string& key,
-                                                    const std::string& envVar)
+    void Application::setOptionValueFromEnvironment(const string& key, const std::string& envVar)
     {
         if (const char* c = getenv(envVar.c_str()))
             setOptionValue<string>(key, c);

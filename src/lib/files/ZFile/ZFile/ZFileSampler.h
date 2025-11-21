@@ -43,10 +43,7 @@ namespace ZFile
         //  Return the depth at a pixel
         //
 
-        float depthAtPixel(uint16 x, uint16 y) const
-        {
-            return m_reader->depthAt(x, y);
-        }
+        float depthAtPixel(uint16 x, uint16 y) const { return m_reader->depthAt(x, y); }
 
         //
         //	Returns depth for a given world value in the ZFile. This is
@@ -91,8 +88,7 @@ namespace ZFile
 
     //----------------------------------------------------------------------
 
-    inline void Sampler::matrixMultiply(const float* M, float& x, float& y,
-                                        float& z) const
+    inline void Sampler::matrixMultiply(const float* M, float& x, float& y, float& z) const
     {
         float nx = x * M[0] + y * M[4] + z * M[8] + M[12];
         float ny = x * M[1] + y * M[5] + z * M[9] + M[13];
@@ -126,8 +122,7 @@ namespace ZFile
         return z;
     }
 
-    inline float Sampler::relativeDepthAtWorldPoint(float x, float y,
-                                                    float z) const
+    inline float Sampler::relativeDepthAtWorldPoint(float x, float y, float z) const
     {
         return depthOfWorldPoint(x, y, z) - depthAtWorldPoint(x, y, z);
     }

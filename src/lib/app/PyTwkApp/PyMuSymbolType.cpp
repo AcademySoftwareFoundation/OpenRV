@@ -45,16 +45,38 @@
 #include <MuTwkApp/EventType.h>
 #include <MuTwkApp/MuInterface.h>
 #include <boost/algorithm/string.hpp>
+#include <boost/thread.hpp>
 #include <half.h>
 #include <sstream>
 #include <stdexcept>
+#include <iostream>
 
 namespace TwkApp
 {
     using namespace std;
 
-    Mu::FunctionObject*
-    createFunctionObjectFromPyObject(const Mu::FunctionType* t, PyObject* pyobj)
+    // Thread safety tracking
+    // Default constructor creates "not-a-thread" ID
+    static boost::thread::id s_mainThreadId;
+
+    // Helper function for direct cout printing
+    static PyObject* unsafe_mu_print(PyObject* args)
+    {
+        size_t nargs = PyTuple_Size(args);
+        if (nargs >= 1)
+        {
+            PyObject* arg = PyTuple_GetItem(args, 0);
+            if (PyUnicode_Check(arg))
+            {
+                const char* str = PyUnicode_AsUTF8(arg);
+                if (str)
+                    cout << str;
+            }
+        }
+        Py_RETURN_NONE;
+    }
+
+    Mu::FunctionObject* createFunctionObjectFromPyObject(const Mu::FunctionType* t, PyObject* pyobj)
     {
         PyLockObject locker;
         Mu::MuLangContext* c = (Mu::MuLangContext*)t->context();
@@ -62,11 +84,8 @@ namespace TwkApp
         const Mu::Signature* sig = t->signature();
         size_t nargs = sig->size() - 1;
         const Mu::Type* rtype = sig->returnType();
-        const Mu::Type* ptype = c->findSymbolOfTypeByQualifiedName<Mu::Type>(
-            c->internName("python.PyObject"));
-        const Mu::Function* C =
-            c->findSymbolOfTypeByQualifiedName<Mu::Function>(
-                c->internName("python.PyObject_CallObject"));
+        const Mu::Type* ptype = c->findSymbolOfTypeByQualifiedName<Mu::Type>(c->internName("python.PyObject"));
+        const Mu::Function* C = c->findSymbolOfTypeByQualifiedName<Mu::Function>(c->internName("python.PyObject_CallObject"));
         assert(C);
         assert(ptype);
 
@@ -77,22 +96,17 @@ namespace TwkApp
 
         string cname = "to_";
         cname += rtype->name().c_str();
-        const Mu::Function* Fcast =
-            c->findSymbolOfTypeByQualifiedName<Mu::Function>(
-                c->internName(cname.c_str()));
+        const Mu::Function* Fcast = c->findSymbolOfTypeByQualifiedName<Mu::Function>(c->internName(cname.c_str()));
 
         if (Fcast)
         {
             bool found = false;
 
-            for (const Mu::Symbol* s = Fcast->firstOverload(); s;
-                 s = s->nextOverload())
+            for (const Mu::Symbol* s = Fcast->firstOverload(); s; s = s->nextOverload())
             {
-                if (const Mu::Function* f =
-                        dynamic_cast<const Mu::Function*>(s))
+                if (const Mu::Function* f = dynamic_cast<const Mu::Function*>(s))
                 {
-                    if (f->returnType() == rtype && f->numArgs() == 1
-                        && f->argType(0) == ptype)
+                    if (f->returnType() == rtype && f->numArgs() == 1 && f->argType(0) == ptype)
                     {
                         found = true;
                         break;
@@ -107,8 +121,7 @@ namespace TwkApp
         if (!Fcast && rtype != c->voidType())
         {
             ostringstream str;
-            str << "can't create PyCallable thunk which returns "
-                << rtype->fullyQualifiedName();
+            str << "can't create PyCallable thunk which returns " << rtype->fullyQualifiedName();
             throw invalid_argument(str.str().c_str());
         }
 
@@ -124,8 +137,7 @@ namespace TwkApp
             ostringstream name;
             name << "_" << i;
             const Mu::Type* argType = sig->argType(i);
-            params.push_back(
-                new Mu::ParameterVariable(c, name.str().c_str(), argType));
+            params.push_back(new Mu::ParameterVariable(c, name.str().c_str(), argType));
         }
 
         as.newStackFrame();
@@ -134,16 +146,12 @@ namespace TwkApp
 
         if (nargs > 0)
         {
-            F = new Mu::Function(c, "__lambda", rtype, nargs,
-                                 (Mu::ParameterVariable**)&params.front(), 0,
-                                 Mu::Function::ContextDependent
-                                     | Mu::Function::LambdaExpression);
+            F = new Mu::Function(c, "__lambda", rtype, nargs, (Mu::ParameterVariable**)&params.front(), 0,
+                                 Mu::Function::ContextDependent | Mu::Function::LambdaExpression);
         }
         else
         {
-            F = new Mu::Function(c, "__lambda", rtype, 0, 0, 0,
-                                 Mu::Function::ContextDependent
-                                     | Mu::Function::LambdaExpression);
+            F = new Mu::Function(c, "__lambda", rtype, 0, 0, 0, Mu::Function::ContextDependent | Mu::Function::LambdaExpression);
         }
 
         as.scope()->addAnonymousSymbol(F);
@@ -210,16 +218,14 @@ namespace TwkApp
         }
         else
         {
-            throw invalid_argument(
-                "failed to build closue for PyObject because of bad cast");
+            throw invalid_argument("failed to build closue for PyObject because of bad cast");
         }
 
         fobj->setFunction(F);
         return fobj;
     }
 
-    static PyObject* MuSymbol_new(PyTypeObject* type, PyObject* args,
-                                  PyObject* kwds)
+    static PyObject* MuSymbol_new(PyTypeObject* type, PyObject* args, PyObject* kwds)
     {
         PyLockObject locker;
         PyMuSymbolObject* self;
@@ -244,8 +250,7 @@ namespace TwkApp
         if (!ok)
             return -1;
 
-        const Mu::Symbol* symbol = muContext()->findSymbolByQualifiedName(
-            muContext()->internName(name), true);
+        const Mu::Symbol* symbol = muContext()->findSymbolByQualifiedName(muContext()->internName(name), true);
 
         if (!symbol)
         {
@@ -255,8 +260,7 @@ namespace TwkApp
             {
                 Mu::Name modname = muContext()->internName(parts[0].c_str());
                 Mu::Module::load(modname, muProcess(), muContext());
-                symbol = muContext()->findSymbolByQualifiedName(
-                    muContext()->internName(name), true);
+                symbol = muContext()->findSymbolByQualifiedName(muContext()->internName(name), true);
             }
         }
 
@@ -286,8 +290,7 @@ namespace TwkApp
 
     //----------------------------------------------------------------------
 
-    static PyObject* MuSymbol_call(PyObject* _self, PyObject* args,
-                                   PyObject* kwds)
+    static PyObject* MuSymbol_call(PyObject* _self, PyObject* args, PyObject* kwds)
     {
 
         PyLockObject locker;
@@ -295,9 +298,34 @@ namespace TwkApp
 
         if (!self->function)
         {
-            PyErr_SetString(PyExc_Exception,
-                            "Mu symbol is not a function -- cannot call");
+            PyErr_SetString(PyExc_Exception, "Mu symbol is not a function -- cannot call");
             return NULL;
+        }
+
+        // Thread safety check - initialize main thread ID on first call
+        boost::thread::id currentThreadId = boost::this_thread::get_id();
+        if (s_mainThreadId == boost::thread::id()) // Check if uninitialized
+                                                   // (default constructed)
+        {
+            s_mainThreadId = currentThreadId;
+        }
+
+        if (currentThreadId != s_mainThreadId)
+        {
+            // fix mu print commands from python to at least not crash from
+            // non-main thread
+            //  (because python print is often used to debug python code, so
+            //  we'll tolerate this because print is likely redirected to the RV
+            //  console)
+            if (self->function->fullyQualifiedName() == "extra_commands._print")
+            {
+                return unsafe_mu_print(args);
+            }
+
+            // this cout will probably get redirected to the RV console, or go
+            // to the terminal window.
+            cout << "WARNING: Mu " << self->function->fullyQualifiedName() << "() called from non-main thread, will eventually crash "
+                 << "(Mu isn't thread-safe)." << endl;
         }
 
         size_t nargs = PyTuple_Size(args);
@@ -308,14 +336,11 @@ namespace TwkApp
         //
         //  Check that caller provided an acceptable number of args.
         //
-        if (nargs > self->function->numArgs()
-            || nargs < self->function->minimumArgs())
+        if (nargs > self->function->numArgs() || nargs < self->function->minimumArgs())
         {
             ostringstream str;
-            str << "Wrong number of arguments (" << nargs << ") to function "
-                << self->function->fullyQualifiedName() << " -- requires "
-                << self->function->numArgs() << " or less and at least "
-                << self->function->minimumArgs() << endl;
+            str << "Wrong number of arguments (" << nargs << ") to function " << self->function->fullyQualifiedName() << " -- requires "
+                << self->function->numArgs() << " or less and at least " << self->function->minimumArgs() << endl;
 
             PyErr_SetString(PyExc_Exception, str.str().c_str());
             return NULL;
@@ -328,16 +353,13 @@ namespace TwkApp
         {
             for (i = 0; i < nargs; i++)
             {
-                muargs[i] = Mu::PyModule::py2mu(muContext(), muProcess(),
-                                                self->function->argType(i),
-                                                PyTuple_GetItem(args, i));
+                muargs[i] = Mu::PyModule::py2mu(muContext(), muProcess(), self->function->argType(i), PyTuple_GetItem(args, i));
             }
         }
         catch (std::exception& e)
         {
             ostringstream str;
-            str << "Bad argument (" << i << ") to function "
-                << self->function->fullyQualifiedName() << ": " << e.what();
+            str << "Bad argument (" << i << ") to function " << self->function->fullyQualifiedName() << ": " << e.what();
 
             PyErr_SetString(PyExc_TypeError, str.str().c_str());
             return NULL;
@@ -353,9 +375,8 @@ namespace TwkApp
             if (!p->hasDefaultValue())
             {
                 ostringstream str;
-                str << "Bad argument (" << i << ") to function "
-                    << self->function->fullyQualifiedName() << ": "
-                    << p->fullyQualifiedName() << " has no default value";
+                str << "Bad argument (" << i << ") to function " << self->function->fullyQualifiedName() << ": " << p->fullyQualifiedName()
+                    << " has no default value";
 
                 PyErr_SetString(PyExc_TypeError, str.str().c_str());
                 return NULL;
@@ -365,8 +386,7 @@ namespace TwkApp
 
         try
         {
-            const Mu::Value v =
-                muAppThread()->call(self->function, muargs, false);
+            const Mu::Value v = muAppThread()->call(self->function, muargs, false);
 
             if (muAppThread()->uncaughtException())
             {
@@ -374,15 +394,13 @@ namespace TwkApp
             }
             else
             {
-                return Mu::PyModule::mu2py(muContext(), muProcess(),
-                                           self->function->returnType(), v);
+                return Mu::PyModule::mu2py(muContext(), muProcess(), self->function->returnType(), v);
             }
         }
         catch (std::exception& exc)
         {
             ostringstream str;
-            str << "Exception thrown while calling "
-                << self->function->fullyQualifiedName();
+            str << "Exception thrown while calling " << self->function->fullyQualifiedName();
 
             if (const Mu::Object* o = muAppThread()->exception())
             {
@@ -408,8 +426,7 @@ namespace TwkApp
         catch (...)
         {
             ostringstream str;
-            str << "Exception thrown while calling "
-                << self->function->fullyQualifiedName();
+            str << "Exception thrown while calling " << self->function->fullyQualifiedName();
 
             if (const Mu::Object* o = muAppThread()->exception())
             {

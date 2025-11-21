@@ -118,140 +118,102 @@ namespace Mu
 
         //
 
-        addSymbols(
-            streamType, ostreamType, ofstreamType, istreamType, ifstreamType,
-            processType,
+        addSymbols(streamType, ostreamType, ofstreamType, istreamType, ifstreamType, processType,
 
 #ifndef TWK_STUB_IT_OUT
-            isstreamType, osstreamType,
+                   isstreamType, osstreamType,
 #endif
 
         /* AJG - Linux dirent64 d_type's - not needed in win32 'cuz there is no
          * d_type */
 #if !defined _MSC_VER
-            new SymbolicConstant(c, "UnknownFileType", "int",
-                                 Value(DT_UNKNOWN)),
-            new SymbolicConstant(c, "RegularFileType", "int", Value(DT_REG)),
-            new SymbolicConstant(c, "DirFileType", "int", Value(DT_DIR)),
-            new SymbolicConstant(c, "SymbolicLinkFileType", "int",
-                                 Value(DT_LNK)),
-            new SymbolicConstant(c, "FIFOFileType", "int", Value(DT_FIFO)),
-            new SymbolicConstant(c, "CharDeviceFileType", "int", Value(DT_CHR)),
-            new SymbolicConstant(c, "BlockDeviceFileType", "int",
-                                 Value(DT_BLK)),
-            new SymbolicConstant(c, "SocketFileType", "int", Value(DT_SOCK)),
+                   new SymbolicConstant(c, "UnknownFileType", "int", Value(DT_UNKNOWN)),
+                   new SymbolicConstant(c, "RegularFileType", "int", Value(DT_REG)),
+                   new SymbolicConstant(c, "DirFileType", "int", Value(DT_DIR)),
+                   new SymbolicConstant(c, "SymbolicLinkFileType", "int", Value(DT_LNK)),
+                   new SymbolicConstant(c, "FIFOFileType", "int", Value(DT_FIFO)),
+                   new SymbolicConstant(c, "CharDeviceFileType", "int", Value(DT_CHR)),
+                   new SymbolicConstant(c, "BlockDeviceFileType", "int", Value(DT_BLK)),
+                   new SymbolicConstant(c, "SocketFileType", "int", Value(DT_SOCK)),
 #endif
-            new Function(c, "print", IOModule::printString, None, Return, os,
-                         Args, os, "string", End),
+                   new Function(c, "print", IOModule::printString, None, Return, os, Args, os, "string", End),
 
-            new Function(c, "print", IOModule::print_int, None, Return, os,
-                         Args, os, "int", End),
+                   new Function(c, "print", IOModule::print_int, None, Return, os, Args, os, "int", End),
 
-            new Function(c, "print", IOModule::print_float, None, Return, os,
-                         Args, os, "float", End),
+                   new Function(c, "print", IOModule::print_float, None, Return, os, Args, os, "float", End),
 
-            new Function(c, "print", IOModule::print_double, None, Return, os,
-                         Args, os, "double", End),
+                   new Function(c, "print", IOModule::print_double, None, Return, os, Args, os, "double", End),
 
-            new Function(c, "print", IOModule::print_bool, None, Return, os,
-                         Args, os, "bool", End),
+                   new Function(c, "print", IOModule::print_bool, None, Return, os, Args, os, "bool", End),
 
-            new Function(c, "print", IOModule::print_byte, None, Return, os,
-                         Args, os, "byte", End),
+                   new Function(c, "print", IOModule::print_byte, None, Return, os, Args, os, "byte", End),
 
-            new Function(c, "print", IOModule::print_char, None, Return, os,
-                         Args, os, "char", End),
+                   new Function(c, "print", IOModule::print_char, None, Return, os, Args, os, "char", End),
 
-            new Function(c, "endl", IOModule::print_endl, None, Return, os,
-                         Args, os, End),
+                   new Function(c, "endl", IOModule::print_endl, None, Return, os, Args, os, End),
 
-            new Function(c, "flush", IOModule::print_flush, None, Return, os,
-                         Args, os, End),
+                   new Function(c, "flush", IOModule::print_flush, None, Return, os, Args, os, End),
 
-            new Function(c, "read_string", IOModule::readString, None, Return,
-                         "string", Parameters, new Param(c, "is", is),
-                         new Param(c, "count", "int", Value(int(1))), End),
+                   new Function(c, "read_string", IOModule::readString, None, Return, "string", Parameters, new Param(c, "is", is),
+                                new Param(c, "count", "int", Value(int(1))), End),
 
-            new Function(c, "read_int", IOModule::read_int, None, Return, "int",
-                         Args, is, End),
+                   new Function(c, "read_int", IOModule::read_int, None, Return, "int", Args, is, End),
 
-            new Function(c, "read_float", IOModule::read_float, None, Return,
-                         "float", Args, is, End),
+                   new Function(c, "read_float", IOModule::read_float, None, Return, "float", Args, is, End),
 
-            new Function(c, "read_double", IOModule::read_double, None, Return,
-                         "double", Args, is, End),
+                   new Function(c, "read_double", IOModule::read_double, None, Return, "double", Args, is, End),
 
-            new Function(c, "read_bool", IOModule::read_bool, None, Return,
-                         "bool", Args, is, End),
+                   new Function(c, "read_bool", IOModule::read_bool, None, Return, "bool", Args, is, End),
 
-            new Function(c, "read_byte", IOModule::read_byte, None, Return,
-                         "byte", Args, is, End),
+                   new Function(c, "read_byte", IOModule::read_byte, None, Return, "byte", Args, is, End),
 
-            new Function(c, "read_char", IOModule::read_char, None, Return,
-                         "char", Args, is, End),
+                   new Function(c, "read_char", IOModule::read_char, None, Return, "char", Args, is, End),
 
-            new Function(c, "read_line", IOModule::read_line, None, Return,
-                         "string", Args, is, "char", End),
+                   new Function(c, "read_line", IOModule::read_line, None, Return, "string", Args, is, "char", End),
 
-            new Function(c, "read_all", IOModule::read_all, None, Return,
-                         "string", Args, is, End),
+                   new Function(c, "read_all", IOModule::read_all, None, Return, "string", Args, is, End),
 
-            new Function(c, "read_all_bytes", IOModule::read_all_bytes, None,
-                         Return, "byte[]", Args, is, End),
+                   new Function(c, "read_all_bytes", IOModule::read_all_bytes, None, Return, "byte[]", Args, is, End),
 
-            new Function(c, "serialize", IOModule::serialize, None, Return,
-                         "int", Args, os, "object", End),
+                   new Function(c, "serialize", IOModule::serialize, None, Return, "int", Args, os, "object", End),
 
-            new Function(c, "deserialize", IOModule::deserialize, None, Return,
-                         "object", Args, is, End),
+                   new Function(c, "deserialize", IOModule::deserialize, None, Return, "object", Args, is, End),
 
-            new Function(c, "out", IOModule::out, None, Return, os, End),
+                   new Function(c, "out", IOModule::out, None, Return, os, End),
 
-            new Function(c, "err", IOModule::err, None, Return, os, End),
+                   new Function(c, "err", IOModule::err, None, Return, os, End),
 
-            new Function(c, "in", IOModule::in, None, Return, is, End),
+                   new Function(c, "in", IOModule::in, None, Return, is, End),
 
-            new Function(c, "directory", IOModule::directory, None, Return,
-                         "[(string,int)]", Args, "string", End),
+                   new Function(c, "directory", IOModule::directory, None, Return, "[(string,int)]", Args, "string", End),
 
-            EndArguments);
+                   EndArguments);
 
         //
         //  Path module
         //
 
-        path->addSymbols(
-            new Function(c, "basename", IOModule::basename, Mapped, Return,
-                         "string", Args, "string", End),
+        path->addSymbols(new Function(c, "basename", IOModule::basename, Mapped, Return, "string", Args, "string", End),
 
-            new Function(c, "dirname", IOModule::dirname, Mapped, Return,
-                         "string", Args, "string", End),
+                         new Function(c, "dirname", IOModule::dirname, Mapped, Return, "string", Args, "string", End),
 
-            new Function(c, "extension", IOModule::extension, Mapped, Return,
-                         "string", Args, "string", End),
+                         new Function(c, "extension", IOModule::extension, Mapped, Return, "string", Args, "string", End),
 
-            new Function(c, "without_extension", IOModule::without_extension,
-                         Mapped, Return, "string", Args, "string", End),
+                         new Function(c, "without_extension", IOModule::without_extension, Mapped, Return, "string", Args, "string", End),
 
-            new Function(c, "exists", IOModule::exists, None, Return, "bool",
-                         Args, "string", End),
+                         new Function(c, "exists", IOModule::exists, None, Return, "bool", Args, "string", End),
 
-            new Function(c, "expand", IOModule::expand, None, Return, "string",
-                         Args, "string", End),
+                         new Function(c, "expand", IOModule::expand, None, Return, "string", Args, "string", End),
 
-            new Function(c, "join", IOModule::join, None, Return, "string",
-                         Args, "string", "string", End),
+                         new Function(c, "join", IOModule::join, None, Return, "string", Args, "string", "string", End),
 
-            new Function(c, "concat_paths", IOModule::concat_paths, None,
-                         Return, "string", Args, "string", "string", End),
+                         new Function(c, "concat_paths", IOModule::concat_paths, None, Return, "string", Args, "string", "string", End),
 
-            new Function(c, "path_separator", IOModule::path_separator, None,
-                         Return, "string", End),
+                         new Function(c, "path_separator", IOModule::path_separator, None, Return, "string", End),
 
-            new Function(c, "concat_separator", IOModule::concat_separator,
-                         None, Return, "string", End),
+                         new Function(c, "concat_separator", IOModule::concat_separator, None, Return, "string", End),
 
-            EndArguments);
+                         EndArguments);
 
         addSymbol(path);
     }
@@ -264,26 +226,24 @@ namespace Mu
         NODE_RETURN(stream);
     }
 
-#define PRINT_MANIP(MANIP)                                \
-    NODE_IMPLEMENTATION(IOModule::print_##MANIP, Pointer) \
-    {                                                     \
-        OStreamType::OStream* stream =                    \
-            NODE_ARG_OBJECT(0, OStreamType::OStream);     \
-        *stream->_ostream << MANIP;                       \
-        NODE_RETURN(stream);                              \
+#define PRINT_MANIP(MANIP)                                                       \
+    NODE_IMPLEMENTATION(IOModule::print_##MANIP, Pointer)                        \
+    {                                                                            \
+        OStreamType::OStream* stream = NODE_ARG_OBJECT(0, OStreamType::OStream); \
+        *stream->_ostream << MANIP;                                              \
+        NODE_RETURN(stream);                                                     \
     }
 
     PRINT_MANIP(endl)
     PRINT_MANIP(flush)
 
-#define PRINT_TYPE(TYPE)                                 \
-    NODE_IMPLEMENTATION(IOModule::print_##TYPE, Pointer) \
-    {                                                    \
-        OStreamType::OStream* stream =                   \
-            NODE_ARG_OBJECT(0, OStreamType::OStream);    \
-        TYPE i = NODE_ARG(1, TYPE);                      \
-        *stream->_ostream << i;                          \
-        NODE_RETURN(stream);                             \
+#define PRINT_TYPE(TYPE)                                                         \
+    NODE_IMPLEMENTATION(IOModule::print_##TYPE, Pointer)                         \
+    {                                                                            \
+        OStreamType::OStream* stream = NODE_ARG_OBJECT(0, OStreamType::OStream); \
+        TYPE i = NODE_ARG(1, TYPE);                                              \
+        *stream->_ostream << i;                                                  \
+        NODE_RETURN(stream);                                                     \
     }
 
     PRINT_TYPE(int)
@@ -303,8 +263,7 @@ namespace Mu
     NODE_IMPLEMENTATION(IOModule::readString, Pointer)
     {
         Process* p = NODE_THREAD.process();
-        const StringType* stype =
-            static_cast<const StringType*>(NODE_THIS.type());
+        const StringType* stype = static_cast<const StringType*>(NODE_THIS.type());
 
         IStreamType::IStream* stream = NODE_ARG_OBJECT(0, IStreamType::IStream);
         int count = NODE_ARG(1, int) - 1;
@@ -323,8 +282,7 @@ namespace Mu
     NODE_IMPLEMENTATION(IOModule::read_line, Pointer)
     {
         Process* p = NODE_THREAD.process();
-        const StringType* stype =
-            static_cast<const StringType*>(NODE_THIS.type());
+        const StringType* stype = static_cast<const StringType*>(NODE_THIS.type());
 
         IStreamType::IStream* stream = NODE_ARG_OBJECT(0, IStreamType::IStream);
         char delim = NODE_ARG(1, char);
@@ -344,8 +302,7 @@ namespace Mu
     NODE_IMPLEMENTATION(IOModule::read_all, Pointer)
     {
         Process* p = NODE_THREAD.process();
-        const StringType* stype =
-            static_cast<const StringType*>(NODE_THIS.type());
+        const StringType* stype = static_cast<const StringType*>(NODE_THIS.type());
         IStreamType::IStream* stream = NODE_ARG_OBJECT(0, IStreamType::IStream);
         ostringstream ss;
 
@@ -384,14 +341,13 @@ namespace Mu
         NODE_RETURN(array);
     }
 
-#define READ_TYPE(TYPE)                               \
-    NODE_IMPLEMENTATION(IOModule::read_##TYPE, TYPE)  \
-    {                                                 \
-        IStreamType::IStream* stream =                \
-            NODE_ARG_OBJECT(0, IStreamType::IStream); \
-        TYPE tp;                                      \
-        *stream->_istream >> tp;                      \
-        NODE_RETURN(tp);                              \
+#define READ_TYPE(TYPE)                                                          \
+    NODE_IMPLEMENTATION(IOModule::read_##TYPE, TYPE)                             \
+    {                                                                            \
+        IStreamType::IStream* stream = NODE_ARG_OBJECT(0, IStreamType::IStream); \
+        TYPE tp;                                                                 \
+        *stream->_istream >> tp;                                                 \
+        NODE_RETURN(tp);                                                         \
     }
 
     // READ_TYPE(int)
@@ -566,8 +522,7 @@ namespace Mu
 
         if (i != size - 1)
         {
-            StringType::String* r =
-                new StringType::String((const Class*)NODE_THIS.type());
+            StringType::String* r = new StringType::String((const Class*)NODE_THIS.type());
 
             if (i == string::npos)
             {
@@ -575,8 +530,7 @@ namespace Mu
             }
             else
             {
-                NODE_RETURN(
-                    c->stringType()->allocate(s->utf8().substr(0, i + 1)));
+                NODE_RETURN(c->stringType()->allocate(s->utf8().substr(0, i + 1)));
             }
         }
 
@@ -599,8 +553,7 @@ namespace Mu
         }
         else
         {
-            NODE_RETURN(
-                c->stringType()->allocate(s->utf8().substr(i + 1, s->size())));
+            NODE_RETURN(c->stringType()->allocate(s->utf8().substr(i + 1, s->size())));
         }
     }
 
@@ -702,10 +655,8 @@ namespace Mu
     {
         Process* p = NODE_THREAD.process();
         const ListType* ltype = static_cast<const ListType*>(NODE_THIS.type());
-        const Class* tupleType =
-            static_cast<const Class*>(ltype->elementType());
-        const StringType* stype =
-            static_cast<const StringType*>(tupleType->fieldType(0));
+        const Class* tupleType = static_cast<const Class*>(ltype->elementType());
+        const StringType* stype = static_cast<const StringType*>(tupleType->fieldType(0));
 
         const StringType::String* path = NODE_ARG_OBJECT(0, StringType::String);
         List list(p, ltype);

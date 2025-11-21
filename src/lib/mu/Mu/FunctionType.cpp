@@ -33,8 +33,7 @@ namespace Mu
         _isSerializable = true;
     }
 
-    FunctionType::FunctionType(Context* context, const char* name,
-                               const Signature* sig)
+    FunctionType::FunctionType(Context* context, const char* name, const Signature* sig)
         : Class(context, name)
         , _signature(sig)
     {
@@ -50,10 +49,7 @@ namespace Mu
 
     Object* FunctionType::newObject() const { return new FunctionObject(this); }
 
-    Value FunctionType::nodeEval(const Node* n, Thread& thread) const
-    {
-        return Value((*n->func()._PointerFunc)(*n, thread));
-    }
+    Value FunctionType::nodeEval(const Node* n, Thread& thread) const { return Value((*n->func()._PointerFunc)(*n, thread)); }
 
     void FunctionType::nodeEval(void* p, const Node* n, Thread& thread) const
     {
@@ -63,17 +59,13 @@ namespace Mu
 
     void FunctionType::outputNode(std::ostream&, const Node*) const {}
 
-    void FunctionType::outputValueRecursive(std::ostream& o,
-                                            const ValuePointer vp,
-                                            ValueOutputState& state) const
+    void FunctionType::outputValueRecursive(std::ostream& o, const ValuePointer vp, ValueOutputState& state) const
     {
-        const FunctionObject* obj =
-            *reinterpret_cast<const FunctionObject**>(vp);
+        const FunctionObject* obj = *reinterpret_cast<const FunctionObject**>(vp);
 
         if (obj)
         {
-            if (state.traversedObjects.find(obj)
-                != state.traversedObjects.end())
+            if (state.traversedObjects.find(obj) != state.traversedObjects.end())
             {
                 o << "...ad infinitum...";
             }
@@ -81,8 +73,7 @@ namespace Mu
             {
                 state.traversedObjects.insert(obj);
 
-                const FunctionType* type =
-                    static_cast<const FunctionType*>(obj->type());
+                const FunctionType* type = static_cast<const FunctionType*>(obj->type());
 
                 if (const Function* f = obj->function())
                 {
@@ -90,8 +81,7 @@ namespace Mu
                     {
                         f->output(o);
                         o << " ";
-                        NodePrinter printer(f->body(), o, state,
-                                            NodePrinter::Lispy);
+                        NodePrinter printer(f->body(), o, state, NodePrinter::Lispy);
                         printer.traverse();
                     }
                     else if (type->name() == "(;)")
@@ -118,11 +108,9 @@ namespace Mu
         }
     }
 
-    void FunctionType::serialize(std::ostream& o, Archive::Writer& archive,
-                                 const ValuePointer p) const
+    void FunctionType::serialize(std::ostream& o, Archive::Writer& archive, const ValuePointer p) const
     {
-        const FunctionObject* obj =
-            *reinterpret_cast<const FunctionObject**>(p);
+        const FunctionObject* obj = *reinterpret_cast<const FunctionObject**>(p);
 
         unsigned char flags = 0;
 
@@ -134,23 +122,18 @@ namespace Mu
         archive.writeNameId(o, obj->function()->fullyQualifiedName());
     }
 
-    void FunctionType::deserialize(std::istream& i, Archive::Reader& archive,
-                                   ValuePointer p) const
+    void FunctionType::deserialize(std::istream& i, Archive::Reader& archive, ValuePointer p) const
     {
         FunctionObject* obj = *reinterpret_cast<FunctionObject**>(p);
         unsigned char flags = archive.readByte(i);
 
         Name fname = archive.readNameId(i);
-        const Function* F =
-            _context->findSymbolOfTypeByQualifiedName<Function>(fname, false);
+        const Function* F = _context->findSymbolOfTypeByQualifiedName<Function>(fname, false);
         assert(F);
         obj->_function = F;
     }
 
-    void FunctionType::reconstitute(Archive::Reader& archive, Object* o) const
-    {
-        FunctionObject* obj = static_cast<FunctionObject*>(o);
-    }
+    void FunctionType::reconstitute(Archive::Reader& archive, Object* o) const { FunctionObject* obj = static_cast<FunctionObject*>(o); }
 
     void FunctionType::load()
     {
@@ -180,17 +163,13 @@ namespace Mu
 
             if (signature()->resolved())
             {
-                const Type* t = static_cast<const Type*>(
-                    signature()->types().front().symbol);
+                const Type* t = static_cast<const Type*>(signature()->types().front().symbol);
                 rt = t->fullyQualifiedName().c_str();
                 rep = t->machineRep();
 
                 for (int i = 1; i < size; i++)
                 {
-                    args[i] = signature()
-                                  ->types()[i]
-                                  .symbol->fullyQualifiedName()
-                                  .c_str();
+                    args[i] = signature()->types()[i].symbol->fullyQualifiedName().c_str();
                 }
             }
             else
@@ -216,32 +195,24 @@ namespace Mu
 
         Context* c = context();
 
-        addSymbol(
-            new Function(c, "()", NodeFunc(0),
-                         Function::DynamicActivation
-                             | Function::ContextDependent | Function::MaybePure,
-                         Return, rt.c_str(), Function::ArgVector, &args, End));
+        addSymbol(new Function(c, "()", NodeFunc(0), Function::DynamicActivation | Function::ContextDependent | Function::MaybePure, Return,
+                               rt.c_str(), Function::ArgVector, &args, End));
 
         s->addSymbols(new ReferenceType(c, rn, this),
 
-                      new Function(c, tn, FunctionType::dereference, Cast,
-                                   Return, tn, Args, rn, End),
+                      new Function(c, tn, FunctionType::dereference, Cast, Return, tn, Args, rn, End),
 
-                      new Function(c, "=", FunctionType::assign, AsOp, Return,
-                                   rn, Args, rn, tn, End),
+                      new Function(c, "=", FunctionType::assign, AsOp, Return, rn, Args, rn, tn, End),
 
-                      new Function(c, "print", FunctionType::print, None,
-                                   Return, "void", Args, tn, End),
+                      new Function(c, "print", FunctionType::print, None, Return, "void", Args, tn, End),
 
                       EndArguments);
 
         if (signature())
         {
-            s->addSymbols(new Function(c, tn, FunctionType::disambiguate, Cast,
-                                       Return, tn, Args, an, End),
+            s->addSymbols(new Function(c, tn, FunctionType::disambiguate, Cast, Return, tn, Args, an, End),
 
-                          new Function(c, tn, FunctionType::ambiguate, Cast,
-                                       Return, an, Args, tn, End),
+                          new Function(c, tn, FunctionType::ambiguate, Cast, Return, an, Args, tn, End),
 
                           EndArguments);
         }
@@ -274,17 +245,13 @@ namespace Mu
         NODE_RETURN(*pp);
     }
 
-    NODE_IMPLEMENTATION(FunctionType::ambiguate, Pointer)
-    {
-        NODE_RETURN((Pointer)NODE_ARG_OBJECT(0, FunctionObject));
-    }
+    NODE_IMPLEMENTATION(FunctionType::ambiguate, Pointer) { NODE_RETURN((Pointer)NODE_ARG_OBJECT(0, FunctionObject)); }
 
     NODE_IMPLEMENTATION(FunctionType::disambiguate, Pointer)
     {
         Process* p = NODE_THREAD.process();
         FunctionObject* o = NODE_ARG_OBJECT(0, FunctionObject);
-        const FunctionType* ftype =
-            static_cast<const FunctionType*>(NODE_THIS.type());
+        const FunctionType* ftype = static_cast<const FunctionType*>(NODE_THIS.type());
 
         if (o)
         {
@@ -299,8 +266,7 @@ namespace Mu
             }
             else
             {
-                for (const Function* f = func->firstFunctionOverload(); f;
-                     f = f->nextFunctionOverload())
+                for (const Function* f = func->firstFunctionOverload(); f; f = f->nextFunctionOverload())
                 {
                     if (f->type() == ftype)
                     {

@@ -19,14 +19,11 @@ namespace IPCore
     using namespace std;
     using namespace TwkContainer;
 
-    RetimeGroupIPNode::RetimeGroupIPNode(const std::string& name,
-                                         const NodeDefinition* def,
-                                         IPGraph* graph, GroupIPNode* group)
+    RetimeGroupIPNode::RetimeGroupIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group)
         : GroupIPNode(name, def, graph, group)
     {
         declareProperty<StringProperty>("ui.name", name);
-        m_retimeNode =
-            newMemberNodeOfType<RetimeIPNode>(retimeType(), "retime");
+        m_retimeNode = newMemberNodeOfType<RetimeIPNode>(retimeType(), "retime");
         setMaxInputs(m_retimeNode->maximumNumberOfInputs());
         setRoot(m_retimeNode);
     }
@@ -38,23 +35,15 @@ namespace IPCore
         //
     }
 
-    string RetimeGroupIPNode::retimeType()
-    {
-        return definition()->stringValue("defaults.retimeType", "Retime");
-    }
+    string RetimeGroupIPNode::retimeType() { return definition()->stringValue("defaults.retimeType", "Retime"); }
 
-    string RetimeGroupIPNode::paintType()
-    {
-        return definition()->stringValue("defaults.paintType", "Paint");
-    }
+    string RetimeGroupIPNode::paintType() { return definition()->stringValue("defaults.paintType", "Paint"); }
 
-    IPNode* RetimeGroupIPNode::newSubGraphForInput(size_t index,
-                                                   const IPNodes& newInputs)
+    IPNode* RetimeGroupIPNode::newSubGraphForInput(size_t index, const IPNodes& newInputs)
     {
         IPNode* innode = newInputs[index];
         AdaptorIPNode* anode = newAdaptorForInput(innode);
-        PaintIPNode* paintNode =
-            newMemberNodeOfTypeForInput<PaintIPNode>(paintType(), innode, "p");
+        PaintIPNode* paintNode = newMemberNodeOfTypeForInput<PaintIPNode>(paintType(), innode, "p");
 
         paintNode->setInputs1(anode);
         return paintNode;

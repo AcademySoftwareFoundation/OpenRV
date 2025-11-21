@@ -78,8 +78,7 @@ namespace IPCore
         //  Constructors
         //
 
-        ICCIPNode(const std::string& name, const NodeDefinition* def,
-                  IPGraph* graph, GroupIPNode* group = 0);
+        ICCIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group = 0);
 
         virtual ~ICCIPNode();
 
@@ -88,8 +87,7 @@ namespace IPCore
         virtual IPImage* evaluateLinearize(const Context& context);
         virtual IPImage* evaluateTransform(const Context& context);
         virtual void propertyChanged(const Property*);
-        virtual void readCompleted(const std::string& type,
-                                   unsigned int version);
+        virtual void readCompleted(const std::string& type, unsigned int version);
 
         void setInProfile(const std::string&);
         void setOutProfile(const std::string&);
@@ -106,8 +104,7 @@ namespace IPCore
     private:
         void clearState();
         void updateState();
-        void updateProfileMetaData(const ProfileState&, StringProperty*,
-                                   FloatProperty*);
+        void updateProfileMetaData(const ProfileState&, StringProperty*, FloatProperty*);
         void applyTransform(IPImage*, bool, bool) const;
 
     private:

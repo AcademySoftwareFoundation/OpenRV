@@ -44,8 +44,7 @@ namespace Mu
         //  Constructors
         //
 
-        QItemSelectionRangeType(Context* context, const char* name,
-                                Class* superClass = 0);
+        QItemSelectionRangeType(Context* context, const char* name, Class* superClass = 0);
         virtual ~QItemSelectionRangeType();
 
         //

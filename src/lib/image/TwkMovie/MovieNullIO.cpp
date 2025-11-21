@@ -14,9 +14,7 @@ namespace TwkMovie
 
     MovieNullIO::MovieNullIO()
     {
-        unsigned int capabilities = MovieIO::MovieWrite
-                                    | MovieIO::MovieWriteAudio
-                                    | MovieIO::AttributeWrite;
+        unsigned int capabilities = MovieIO::MovieWrite | MovieIO::MovieWriteAudio | MovieIO::AttributeWrite;
 
         StringPairVector video;
         StringPairVector audio;

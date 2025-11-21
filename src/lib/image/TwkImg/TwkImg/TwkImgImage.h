@@ -167,8 +167,7 @@ namespace TwkImg
         // is represented by dstTile.
         // The tile, in relative coordinates, in the SRC image that will be
         // copied from is ( srcOffset, srcOffset + dstTile.size() - 1 ).
-        void copyRect(const Image<COLOR>& src, const vec_size_type& srcOffset,
-                      const bounds_type& dstTile, bool black = true);
+        void copyRect(const Image<COLOR>& src, const vec_size_type& srcOffset, const bounds_type& dstTile, bool black = true);
 
         // The coordinates used here are ABSOLUTE coordinates,
         // for both the source and the dst images.
@@ -176,8 +175,7 @@ namespace TwkImg
         // is represented by dstTile.
         // The tile, in absolute coordinates, in the SRC image that will be
         // copied from is ( srcOffset, srcOffset + dstTile.size() - 1 ).
-        void copyRectAbs(const Image<COLOR>& src, const vec_loc_type& srcOffset,
-                         const bounds_type& dstTile, bool black = true);
+        void copyRectAbs(const Image<COLOR>& src, const vec_loc_type& srcOffset, const bounds_type& dstTile, bool black = true);
 
         // Transpose an image. An image which is size WxH becomes size HxW
         // with every pixel that was at x,y being moved to y,x. The origin
@@ -211,16 +209,12 @@ namespace TwkImg
     // APPLY RECT FUNCTION HEADERS
     //******************************************************************************
     template <typename C, class PIXELFUNC>
-    void applyRect(Image<C>& dst, const Image<C>& src,
-                   const typename Image<C>::vec_size_type& srcOffset,
-                   const typename Image<C>::bounds_type& uncheckedDstTile,
-                   PIXELFUNC& pfunc);
+    void applyRect(Image<C>& dst, const Image<C>& src, const typename Image<C>::vec_size_type& srcOffset,
+                   const typename Image<C>::bounds_type& uncheckedDstTile, PIXELFUNC& pfunc);
 
     template <typename C, class PIXELFUNC>
-    void applyRectAbs(Image<C>& dst, const Image<C>& src,
-                      const typename Image<C>::vec_loc_type& srcOffset,
-                      const typename Image<C>::bounds_type& uncheckedDstTile,
-                      PIXELFUNC& pfunc);
+    void applyRectAbs(Image<C>& dst, const Image<C>& src, const typename Image<C>::vec_loc_type& srcOffset,
+                      const typename Image<C>::bounds_type& uncheckedDstTile, PIXELFUNC& pfunc);
 
     //******************************************************************************
     // TYPEDEFS
@@ -274,8 +268,7 @@ namespace TwkImg
 
     //******************************************************************************
     template <typename C>
-    Image<C>::Image(typename Image<C>::size_type w,
-                    typename Image<C>::size_type h, C* pixels)
+    Image<C>::Image(typename Image<C>::size_type w, typename Image<C>::size_type h, C* pixels)
         : m_size(w, h)
         , m_bounds(vec_loc_type(0), vec_loc_type(w - 1, h - 1))
         , m_boundsAbs(vec_loc_type(0), vec_loc_type(w - 1, h - 1))
@@ -299,8 +292,7 @@ namespace TwkImg
 
     //******************************************************************************
     template <typename C>
-    Image<C>::Image(const typename Image<C>::vec_loc_type& orig,
-                    const typename Image<C>::vec_size_type& sze)
+    Image<C>::Image(const typename Image<C>::vec_loc_type& orig, const typename Image<C>::vec_size_type& sze)
         : m_size(sze)
         , m_bounds(vec_loc_type(0), vec_loc_type(sze[0] - 1, sze[1] - 1))
         , m_boundsAbs(orig, orig + vec_loc_type(sze[0] - 1, sze[1] - 1))
@@ -314,8 +306,7 @@ namespace TwkImg
     template <typename C>
     Image<C>::Image(const typename Image<C>::bounds_type& bnds)
         : m_size(bnds.size())
-        , m_bounds(Image<C>::vec_loc_type(0, 0),
-                   Image<C>::vec_loc_type(bnds.size(0) - 1, bnds.size(1) - 1))
+        , m_bounds(Image<C>::vec_loc_type(0, 0), Image<C>::vec_loc_type(bnds.size(0) - 1, bnds.size(1) - 1))
         , m_boundsAbs(bnds)
         , m_pixels(NULL)
         , m_mypixels(true)
@@ -337,8 +328,7 @@ namespace TwkImg
         assert(m_boundsAbs.size() == m_size);
 
         initPixels();
-        memcpy((void*)m_pixels, (const void*)copy.m_pixels,
-               m_numPixels * sizeof(C));
+        memcpy((void*)m_pixels, (const void*)copy.m_pixels, m_numPixels * sizeof(C));
     }
 
     //******************************************************************************
@@ -357,8 +347,7 @@ namespace TwkImg
             assert(m_boundsAbs.size() == m_size);
 
             initPixels();
-            memcpy((void*)m_pixels, (const void*)copy.m_pixels,
-                   m_numPixels * sizeof(C));
+            memcpy((void*)m_pixels, (const void*)copy.m_pixels, m_numPixels * sizeof(C));
         }
     }
 
@@ -374,9 +363,7 @@ namespace TwkImg
     }
 
     //******************************************************************************
-    template <typename C>
-    void Image<C>::setSize(typename Image<C>::size_type w,
-                           typename Image<C>::size_type h)
+    template <typename C> void Image<C>::setSize(typename Image<C>::size_type w, typename Image<C>::size_type h)
     {
         m_size[0] = w;
         m_size[1] = h;
@@ -392,15 +379,10 @@ namespace TwkImg
     }
 
     //******************************************************************************
-    template <typename C>
-    inline void Image<C>::setSize(const typename Image<C>::vec_size_type& sze)
-    {
-        setSize(sze[0], sze[1]);
-    }
+    template <typename C> inline void Image<C>::setSize(const typename Image<C>::vec_size_type& sze) { setSize(sze[0], sze[1]); }
 
     //******************************************************************************
-    template <typename C>
-    inline void Image<C>::setOrigin(const typename Image<C>::vec_loc_type& orig)
+    template <typename C> inline void Image<C>::setOrigin(const typename Image<C>::vec_loc_type& orig)
     {
         m_boundsAbs.min = orig;
         m_boundsAbs.max = orig + vec_loc_type(m_size[0] - 1, m_size[1] - 1);
@@ -411,160 +393,121 @@ namespace TwkImg
     // PIXEL ACCESS FUNCTIONS
     //******************************************************************************
     //******************************************************************************
-    template <typename C>
-    inline const C& Image<C>::operator()(typename Image<C>::size_type i) const
+    template <typename C> inline const C& Image<C>::operator()(typename Image<C>::size_type i) const
     {
         assert(i >= 0 && i < m_numPixels);
         return m_pixels[i];
     }
 
     //******************************************************************************
-    template <typename C>
-    inline C& Image<C>::operator()(typename Image<C>::size_type i)
+    template <typename C> inline C& Image<C>::operator()(typename Image<C>::size_type i)
     {
         assert(i >= 0 && i < m_numPixels);
         return m_pixels[i];
     }
 
     //******************************************************************************
-    template <typename C>
-    inline const C& Image<C>::operator()(typename Image<C>::size_type x,
-                                         typename Image<C>::size_type y) const
+    template <typename C> inline const C& Image<C>::operator()(typename Image<C>::size_type x, typename Image<C>::size_type y) const
     {
         assert(x >= 0 && x < m_size[0] && y >= 0 && y < m_size[1]);
         return m_pixels[(x + stride() * y)];
     }
 
     //******************************************************************************
-    template <typename C>
-    inline C& Image<C>::operator()(typename Image<C>::size_type x,
-                                   typename Image<C>::size_type y)
+    template <typename C> inline C& Image<C>::operator()(typename Image<C>::size_type x, typename Image<C>::size_type y)
     {
         assert(x >= 0 && x < m_size[0] && y >= 0 && y < m_size[1]);
         return m_pixels[(x + stride() * y)];
     }
 
     //******************************************************************************
-    template <typename C>
-    inline const C&
-    Image<C>::operator()(const typename Image<C>::vec_size_type& loc) const
+    template <typename C> inline const C& Image<C>::operator()(const typename Image<C>::vec_size_type& loc) const
     {
         return operator()(loc[0], loc[1]);
     }
 
     //******************************************************************************
-    template <typename C>
-    inline C& Image<C>::operator()(const typename Image<C>::vec_size_type& loc)
-    {
-        return operator()(loc[0], loc[1]);
-    }
+    template <typename C> inline C& Image<C>::operator()(const typename Image<C>::vec_size_type& loc) { return operator()(loc[0], loc[1]); }
 
     //******************************************************************************
-    template <typename C>
-    inline const C*
-    Image<C>::operator[](const typename Image<C>::size_type y) const
+    template <typename C> inline const C* Image<C>::operator[](const typename Image<C>::size_type y) const
     {
         assert(y >= 0 && y < m_size[1]);
         return m_pixels + (stride() * y);
     }
 
     //******************************************************************************
-    template <typename C>
-    inline C* Image<C>::operator[](const typename Image<C>::size_type y)
+    template <typename C> inline C* Image<C>::operator[](const typename Image<C>::size_type y)
     {
         assert(y >= 0 && y < m_size[1]);
         return m_pixels + (stride() * y);
     }
 
     //******************************************************************************
-    template <typename C>
-    inline const C& Image<C>::pixel(typename Image<C>::size_type i) const
+    template <typename C> inline const C& Image<C>::pixel(typename Image<C>::size_type i) const
     {
         assert(i >= 0 && i < m_numPixels);
         return m_pixels[i];
     }
 
     //******************************************************************************
-    template <typename C>
-    inline C& Image<C>::pixel(typename Image<C>::size_type i)
+    template <typename C> inline C& Image<C>::pixel(typename Image<C>::size_type i)
     {
         assert(i >= 0 && i < m_numPixels);
         return m_pixels[i];
     }
 
     //******************************************************************************
-    template <typename C>
-    inline const C& Image<C>::pixel(typename Image<C>::size_type x,
-                                    typename Image<C>::size_type y) const
+    template <typename C> inline const C& Image<C>::pixel(typename Image<C>::size_type x, typename Image<C>::size_type y) const
     {
         assert(x >= 0 && x < m_size[0] && y >= 0 && y < m_size[1]);
         return m_pixels[(x + stride() * y)];
     }
 
     //******************************************************************************
-    template <typename C>
-    inline C& Image<C>::pixel(typename Image<C>::size_type x,
-                              typename Image<C>::size_type y)
+    template <typename C> inline C& Image<C>::pixel(typename Image<C>::size_type x, typename Image<C>::size_type y)
     {
         assert(x >= 0 && x < m_size[0] && y >= 0 && y < m_size[1]);
         return m_pixels[(x + stride() * y)];
     }
 
     //******************************************************************************
-    template <typename C>
-    inline const C&
-    Image<C>::pixel(const typename Image<C>::vec_size_type& loc) const
+    template <typename C> inline const C& Image<C>::pixel(const typename Image<C>::vec_size_type& loc) const
     {
-        assert(loc[0] >= 0 && loc[0] < m_size[0] && loc[1] >= 0
-               && loc[1] < m_size[1]);
+        assert(loc[0] >= 0 && loc[0] < m_size[0] && loc[1] >= 0 && loc[1] < m_size[1]);
         return m_pixels[(loc[0] + (stride() * loc[1]))];
     }
 
     //******************************************************************************
-    template <typename C>
-    inline C& Image<C>::pixel(const typename Image<C>::vec_size_type& loc)
+    template <typename C> inline C& Image<C>::pixel(const typename Image<C>::vec_size_type& loc)
     {
-        assert(loc[0] >= 0 && loc[0] < m_size[0] && loc[1] >= 0
-               && loc[1] < m_size[1]);
+        assert(loc[0] >= 0 && loc[0] < m_size[0] && loc[1] >= 0 && loc[1] < m_size[1]);
         return m_pixels[(loc[0] + (stride() * loc[1]))];
     }
 
     //******************************************************************************
-    template <typename C>
-    inline const C& Image<C>::pixelAbs(typename Image<C>::loc_type x,
-                                       typename Image<C>::loc_type y) const
+    template <typename C> inline const C& Image<C>::pixelAbs(typename Image<C>::loc_type x, typename Image<C>::loc_type y) const
     {
         return pixel(x - m_boundsAbs.min[0], y - m_boundsAbs.min[1]);
     }
 
     //******************************************************************************
-    template <typename C>
-    inline C& Image<C>::pixelAbs(typename Image<C>::loc_type x,
-                                 typename Image<C>::loc_type y)
+    template <typename C> inline C& Image<C>::pixelAbs(typename Image<C>::loc_type x, typename Image<C>::loc_type y)
     {
         return pixel(x - m_boundsAbs.min[0], y - m_boundsAbs.min[1]);
     }
 
     //******************************************************************************
-    template <typename C>
-    inline const C&
-    Image<C>::pixelAbs(const typename Image<C>::vec_loc_type& loc) const
+    template <typename C> inline const C& Image<C>::pixelAbs(const typename Image<C>::vec_loc_type& loc) const
     {
         return pixel(loc - m_boundsAbs.min);
     }
 
     //******************************************************************************
-    template <typename C>
-    inline C& Image<C>::pixelAbs(const typename Image<C>::vec_loc_type& loc)
-    {
-        return pixel(loc - m_boundsAbs.min);
-    }
+    template <typename C> inline C& Image<C>::pixelAbs(const typename Image<C>::vec_loc_type& loc) { return pixel(loc - m_boundsAbs.min); }
 
     //******************************************************************************
-    template <typename C> inline const C* Image<C>::pixels() const
-    {
-        return m_pixels;
-    }
+    template <typename C> inline const C* Image<C>::pixels() const { return m_pixels; }
 
     //******************************************************************************
     template <typename C> inline C* Image<C>::pixels() { return m_pixels; }
@@ -574,14 +517,10 @@ namespace TwkImg
     // IMAGE MODIFICATION FUNCTIONS
     //******************************************************************************
     //******************************************************************************
-    template <typename C> inline void Image<C>::clear()
-    {
-        memset((void*)m_pixels, 0, m_numPixels * sizeof(C));
-    }
+    template <typename C> inline void Image<C>::clear() { memset((void*)m_pixels, 0, m_numPixels * sizeof(C)); }
 
     //******************************************************************************
-    template <typename C>
-    void Image<C>::clearRect(const typename Image<C>::bounds_type& rect)
+    template <typename C> void Image<C>::clearRect(const typename Image<C>::bounds_type& rect)
     {
         // Fix rect. Can't decide if I like this or not.
         bounds_type irect = TwkMath::intersection(m_bounds, rect);
@@ -608,9 +547,7 @@ namespace TwkImg
     }
 
     //******************************************************************************
-    template <typename C>
-    inline void
-    Image<C>::clearRectAbs(const typename Image<C>::bounds_type& rect)
+    template <typename C> inline void Image<C>::clearRectAbs(const typename Image<C>::bounds_type& rect)
     {
         clearRect(rect - m_boundsAbs.min);
     }
@@ -625,9 +562,7 @@ namespace TwkImg
     }
 
     //******************************************************************************
-    template <typename C>
-    void Image<C>::fillRect(const typename Image<C>::bounds_type& rect,
-                            const C& fillCol)
+    template <typename C> void Image<C>::fillRect(const typename Image<C>::bounds_type& rect, const C& fillCol)
     {
         // Fix rect.
         bounds_type irect = TwkMath::intersection(m_bounds, rect);
@@ -654,19 +589,15 @@ namespace TwkImg
     }
 
     //******************************************************************************
-    template <typename C>
-    inline void
-    Image<C>::fillRectAbs(const typename Image<C>::bounds_type& rect,
-                          const C& fillCol)
+    template <typename C> inline void Image<C>::fillRectAbs(const typename Image<C>::bounds_type& rect, const C& fillCol)
     {
         fillRect(rect - m_boundsAbs.min, fillCol);
     }
 
     //******************************************************************************
     template <typename C>
-    void Image<C>::copyRect(
-        const Image<C>& src, const typename Image<C>::vec_size_type& srcOffset,
-        const typename Image<C>::bounds_type& uncheckedDstTile, bool black)
+    void Image<C>::copyRect(const Image<C>& src, const typename Image<C>::vec_size_type& srcOffset,
+                            const typename Image<C>::bounds_type& uncheckedDstTile, bool black)
     {
         // Fix dstTile
         bounds_type irect = TwkMath::intersection(m_bounds, uncheckedDstTile);
@@ -774,12 +705,10 @@ namespace TwkImg
 
     //******************************************************************************
     template <typename C>
-    inline void Image<C>::copyRectAbs(
-        const Image<C>& src, const typename Image<C>::vec_loc_type& srcOffset,
-        const typename Image<C>::bounds_type& uncheckedDstTile, bool black)
+    inline void Image<C>::copyRectAbs(const Image<C>& src, const typename Image<C>::vec_loc_type& srcOffset,
+                                      const typename Image<C>::bounds_type& uncheckedDstTile, bool black)
     {
-        copyRect(src, srcOffset - src.origin(),
-                 uncheckedDstTile - m_boundsAbs.min, black);
+        copyRect(src, srcOffset - src.origin(), uncheckedDstTile - m_boundsAbs.min, black);
     }
 
     //******************************************************************************
@@ -809,14 +738,11 @@ namespace TwkImg
 
     //******************************************************************************
     template <typename C, class PIXELFUNC>
-    void applyRect(Image<C>& dst, const Image<C>& src,
-                   const typename Image<C>::vec_size_type& srcOffset,
-                   const typename Image<C>::bounds_type& uncheckedDstTile,
-                   PIXELFUNC& pfunc)
+    void applyRect(Image<C>& dst, const Image<C>& src, const typename Image<C>::vec_size_type& srcOffset,
+                   const typename Image<C>::bounds_type& uncheckedDstTile, PIXELFUNC& pfunc)
     {
         // Fix dstTile
-        typename Image<C>::bounds_type irect =
-            TwkMath::intersection(dst.bounds(), uncheckedDstTile);
+        typename Image<C>::bounds_type irect = TwkMath::intersection(dst.bounds(), uncheckedDstTile);
         if (irect.isEmpty())
         {
             return;
@@ -825,8 +751,7 @@ namespace TwkImg
         // Determine irect offset
         // This is the difference between the lower left corners
         // of the irect tile from the dstTile.
-        typename Image<C>::vec_size_type irectOffset(irect.min
-                                                     - uncheckedDstTile.min);
+        typename Image<C>::vec_size_type irectOffset(irect.min - uncheckedDstTile.min);
 
         // Create srcTile
         typename Image<C>::bounds_type fullSrcTile;
@@ -834,8 +759,7 @@ namespace TwkImg
         fullSrcTile.max = fullSrcTile.min + (irect.max - irect.min);
 
         // Calculate intersection of srcTile with its bounds
-        typename Image<C>::bounds_type srcTile =
-            TwkMath::intersection(src.bounds(), fullSrcTile);
+        typename Image<C>::bounds_type srcTile = TwkMath::intersection(src.bounds(), fullSrcTile);
         if (srcTile.isEmpty())
         {
             return;
@@ -863,8 +787,7 @@ namespace TwkImg
         const C* srcRow = &(src.pixel(srcTile.min));
         C* dstRow = &(dst.pixel(irect.min));
         C* dstTileStart = &(dst.pixel(irect.min.x, dstTile.min.y));
-        C* blackTStart =
-            &(dst.pixel(irect.min.x, dstTile.max.y)) + dst.stride();
+        C* blackTStart = &(dst.pixel(irect.min.x, dstTile.max.y)) + dst.stride();
         C* dstEnd = &(dst.pixel(irect.min.x, irect.max.y)) + dst.stride();
 
         typename Image<C>::size_type irectCopySize = irect.size(0) * sizeof(C);
@@ -873,8 +796,7 @@ namespace TwkImg
         int blackRSize = irect.max.x - dstTile.max.x;
 
         // Do middle band
-        for (dstRow = dstTileStart; dstRow < blackTStart;
-             dstRow += dst.stride())
+        for (dstRow = dstTileStart; dstRow < blackTStart; dstRow += dst.stride())
         {
             // do dstTile
             C* dp = dstRow + blackLSize;
@@ -890,14 +812,10 @@ namespace TwkImg
 
     //******************************************************************************
     template <typename C, class PIXELFUNC>
-    inline void
-    applyRectAbs(Image<C>& dst, const Image<C>& src,
-                 const typename Image<C>::vec_loc_type& srcOffset,
-                 const typename Image<C>::bounds_type& uncheckedDstTile,
-                 PIXELFUNC& pfunc)
+    inline void applyRectAbs(Image<C>& dst, const Image<C>& src, const typename Image<C>::vec_loc_type& srcOffset,
+                             const typename Image<C>::bounds_type& uncheckedDstTile, PIXELFUNC& pfunc)
     {
-        applyRect(dst, src, srcOffset - src.origin(),
-                  uncheckedDstTile - dst.origin(), pfunc);
+        applyRect(dst, src, srcOffset - src.origin(), uncheckedDstTile - dst.origin(), pfunc);
     }
 
 } // End namespace TwkImg

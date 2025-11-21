@@ -1,8 +1,8 @@
 #! /depot/python/arch/bin/python
-# 
-# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved. 
-# 
-# SPDX-License-Identifier: Apache-2.0 
+#
+# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
 #
 # takeuchi benchmark in Python
 # see <url:http://www.lib.uchicago.edu/keith/crisis/benchmarks/tak/>

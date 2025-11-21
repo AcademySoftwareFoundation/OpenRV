@@ -42,8 +42,7 @@ namespace Mu
         //  Constructors
         //
 
-        QProcessType(Context* context, const char* name, Class* superClass = 0,
-                     Class* superClass2 = 0);
+        QProcessType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QProcessType();
 
@@ -85,22 +84,13 @@ namespace Mu
         virtual qint64 skipData(qint64 maxSize);
 
     public:
-        void setProcessState_pub(QProcess::ProcessState state)
-        {
-            setProcessState(state);
-        }
+        void setProcessState_pub(QProcess::ProcessState state) { setProcessState(state); }
 
-        void setProcessState_pub_parent(QProcess::ProcessState state)
-        {
-            QProcess::setProcessState(state);
-        }
+        void setProcessState_pub_parent(QProcess::ProcessState state) { QProcess::setProcessState(state); }
 
         qint64 skipData_pub(qint64 maxSize) { return skipData(maxSize); }
 
-        qint64 skipData_pub_parent(qint64 maxSize)
-        {
-            return QProcess::skipData(maxSize);
-        }
+        qint64 skipData_pub_parent(qint64 maxSize) { return QProcess::skipData(maxSize); }
 
     public:
         const QProcessType* _baseType;
@@ -108,11 +98,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance*
-    QProcessType::cachedInstance(const QProcessType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QProcessType::cachedInstance(const QProcessType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

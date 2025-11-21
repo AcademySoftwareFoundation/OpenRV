@@ -82,28 +82,24 @@ namespace Mu
         _baseType = 0;
     }
 
-    MuQt_QTextEdit::MuQt_QTextEdit(Pointer muobj, const CallEnvironment* ce,
-                                   QWidget* parent)
+    MuQt_QTextEdit::MuQt_QTextEdit(Pointer muobj, const CallEnvironment* ce, QWidget* parent)
         : QTextEdit(parent)
     {
         _env = ce;
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QTextEditType>(
-            c->internName("qt.QTextEdit"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QTextEditType>(c->internName("qt.QTextEdit"));
     }
 
-    MuQt_QTextEdit::MuQt_QTextEdit(Pointer muobj, const CallEnvironment* ce,
-                                   const QString& text, QWidget* parent)
+    MuQt_QTextEdit::MuQt_QTextEdit(Pointer muobj, const CallEnvironment* ce, const QString& text, QWidget* parent)
         : QTextEdit(text, parent)
     {
         _env = ce;
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QTextEditType>(
-            c->internName("qt.QTextEdit"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QTextEditType>(c->internName("qt.QTextEdit"));
     }
 
     QVariant MuQt_QTextEdit::loadResource(int type, const QUrl& name)
@@ -128,8 +124,7 @@ namespace Mu
         }
     }
 
-    QVariant
-    MuQt_QTextEdit::inputMethodQuery(Qt::InputMethodQuery property) const
+    QVariant MuQt_QTextEdit::inputMethodQuery(Qt::InputMethodQuery property) const
     {
         if (!_env)
             return QTextEdit::inputMethodQuery(property);
@@ -161,8 +156,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeinstance<QMimeDataType>(c, source, "qt.QMimeData"));
+            args[1] = Value(makeinstance<QMimeDataType>(c, source, "qt.QMimeData"));
             Value rval = _env->call(F, args);
             return (bool)(rval._bool);
         }
@@ -206,8 +200,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeinstance<QMimeDataType>(c, source, "qt.QMimeData"));
+            args[1] = Value(makeinstance<QMimeDataType>(c, source, "qt.QMimeData"));
             Value rval = _env->call(F, args);
         }
         else
@@ -253,8 +246,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqpointer<QContextMenuEventType>(
-                c, event, "qt.QContextMenuEvent"));
+            args[1] = Value(makeqpointer<QContextMenuEventType>(c, event, "qt.QContextMenuEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -277,8 +269,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QDragEnterEventType>(c, e, "qt.QDragEnterEvent"));
+            args[1] = Value(makeqpointer<QDragEnterEventType>(c, e, "qt.QDragEnterEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -301,8 +292,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QDragLeaveEventType>(c, e, "qt.QDragLeaveEvent"));
+            args[1] = Value(makeqpointer<QDragLeaveEventType>(c, e, "qt.QDragLeaveEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -325,8 +315,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QDragMoveEventType>(c, e, "qt.QDragMoveEvent"));
+            args[1] = Value(makeqpointer<QDragMoveEventType>(c, e, "qt.QDragMoveEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -349,8 +338,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QDropEventType>(c, e, "qt.QDropEvent"));
+            args[1] = Value(makeqpointer<QDropEventType>(c, e, "qt.QDropEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -373,8 +361,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QFocusEventType>(c, e, "qt.QFocusEvent"));
+            args[1] = Value(makeqpointer<QFocusEventType>(c, e, "qt.QFocusEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -418,8 +405,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QFocusEventType>(c, e, "qt.QFocusEvent"));
+            args[1] = Value(makeqpointer<QFocusEventType>(c, e, "qt.QFocusEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -488,8 +474,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -512,8 +497,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -536,8 +520,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -560,8 +543,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -584,8 +566,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QPaintEventType>(c, event, "qt.QPaintEvent"));
+            args[1] = Value(makeqpointer<QPaintEventType>(c, event, "qt.QPaintEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -608,8 +589,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QResizeEventType>(c, e, "qt.QResizeEvent"));
+            args[1] = Value(makeqpointer<QResizeEventType>(c, e, "qt.QResizeEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -656,8 +636,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QShowEventType>(c, _p13, "qt.QShowEvent"));
+            args[1] = Value(makeqpointer<QShowEventType>(c, _p13, "qt.QShowEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -680,8 +659,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QWheelEventType>(c, e, "qt.QWheelEvent"));
+            args[1] = Value(makeqpointer<QWheelEventType>(c, e, "qt.QWheelEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -704,8 +682,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeinstance<QWidgetType>(c, viewport, "qt.QWidget"));
+            args[1] = Value(makeinstance<QWidgetType>(c, viewport, "qt.QWidget"));
             Value rval = _env->call(F, args);
         }
         else
@@ -819,8 +796,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  Mu Type CONSTRUCTORS
 
-    QTextEditType::QTextEditType(Context* c, const char* name, Class* super,
-                                 Class* super2)
+    QTextEditType::QTextEditType(Context* c, const char* name, Class* super, Class* super2)
         : Class(c, name, vectorOf2(super, super2))
     {
     }
@@ -841,9 +817,7 @@ namespace Mu
         }
         else if (QTextEdit* w = object<QTextEdit>(widget))
         {
-            QTextEditType* type =
-                c->findSymbolOfTypeByQualifiedName<QTextEditType>(
-                    c->internName("qt.QTextEdit"), false);
+            QTextEditType* type = c->findSymbolOfTypeByQualifiedName<QTextEditType>(c->internName("qt.QTextEdit"), false);
             ClassInstance* o = ClassInstance::allocate(type);
             setobject(o, w);
             return o;
@@ -854,46 +828,34 @@ namespace Mu
         }
     }
 
-    static NODE_IMPLEMENTATION(castFromObject, Pointer)
-    {
-        NODE_RETURN(
-            QTextEdit_QTextEdit_QObject(NODE_THREAD, NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(castFromObject, Pointer) { NODE_RETURN(QTextEdit_QTextEdit_QObject(NODE_THREAD, NODE_ARG(0, Pointer))); }
 
-    Pointer qt_QTextEdit_QTextEdit_QTextEdit_QTextEdit_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
+    Pointer qt_QTextEdit_QTextEdit_QTextEdit_QTextEdit_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWidget* arg1 = object<QWidget>(param_parent);
-        setobject(param_this,
-                  new MuQt_QTextEdit(param_this,
-                                     NODE_THREAD.process()->callEnv(), arg1));
+        setobject(param_this, new MuQt_QTextEdit(param_this, NODE_THREAD.process()->callEnv(), arg1));
         return param_this;
     }
 
-    Pointer qt_QTextEdit_QTextEdit_QTextEdit_QTextEdit_string_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_text,
-        Pointer param_parent)
+    Pointer qt_QTextEdit_QTextEdit_QTextEdit_QTextEdit_string_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_text,
+                                                                      Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QString arg1 = qstring(param_text);
         QWidget* arg2 = object<QWidget>(param_parent);
-        setobject(param_this, new MuQt_QTextEdit(
-                                  param_this, NODE_THREAD.process()->callEnv(),
-                                  arg1, arg2));
+        setobject(param_this, new MuQt_QTextEdit(param_this, NODE_THREAD.process()->callEnv(), arg1, arg2));
         return param_this;
     }
 
-    int qt_QTextEdit_alignment_int_QTextEdit(Mu::Thread& NODE_THREAD,
-                                             Pointer param_this)
+    int qt_QTextEdit_alignment_int_QTextEdit(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextEdit* arg0 = object<QTextEdit>(param_this);
         return int(arg0->alignment());
     }
 
-    Pointer qt_QTextEdit_anchorAt_string_QTextEdit_QPoint(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_pos)
+    Pointer qt_QTextEdit_anchorAt_string_QTextEdit_QPoint(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_pos)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextEdit* arg0 = object<QTextEdit>(param_this);
@@ -901,53 +863,45 @@ namespace Mu
         return makestring(c, arg0->anchorAt(arg1));
     }
 
-    bool qt_QTextEdit_canPaste_bool_QTextEdit(Mu::Thread& NODE_THREAD,
-                                              Pointer param_this)
+    bool qt_QTextEdit_canPaste_bool_QTextEdit(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextEdit* arg0 = object<QTextEdit>(param_this);
         return arg0->canPaste();
     }
 
-    Pointer qt_QTextEdit_createStandardContextMenu_QMenu_QTextEdit(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QTextEdit_createStandardContextMenu_QMenu_QTextEdit(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextEdit* arg0 = object<QTextEdit>(param_this);
-        return makeinstance<QMenuType>(c, arg0->createStandardContextMenu(),
-                                       "qt.QMenu");
+        return makeinstance<QMenuType>(c, arg0->createStandardContextMenu(), "qt.QMenu");
     }
 
-    Pointer qt_QTextEdit_createStandardContextMenu_QMenu_QTextEdit_QPoint(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_position)
+    Pointer qt_QTextEdit_createStandardContextMenu_QMenu_QTextEdit_QPoint(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                          Pointer param_position)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextEdit* arg0 = object<QTextEdit>(param_this);
         const QPoint arg1 = getqtype<QPointType>(param_position);
-        return makeinstance<QMenuType>(c, arg0->createStandardContextMenu(arg1),
-                                       "qt.QMenu");
+        return makeinstance<QMenuType>(c, arg0->createStandardContextMenu(arg1), "qt.QMenu");
     }
 
-    Pointer qt_QTextEdit_currentFont_QFont_QTextEdit(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_this)
+    Pointer qt_QTextEdit_currentFont_QFont_QTextEdit(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextEdit* arg0 = object<QTextEdit>(param_this);
         return makeqtype<QFontType>(c, arg0->currentFont(), "qt.QFont");
     }
 
-    Pointer qt_QTextEdit_cursorForPosition_QTextCursor_QTextEdit_QPoint(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_pos)
+    Pointer qt_QTextEdit_cursorForPosition_QTextCursor_QTextEdit_QPoint(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_pos)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextEdit* arg0 = object<QTextEdit>(param_this);
         const QPoint arg1 = getqtype<QPointType>(param_pos);
-        return makeqtype<QTextCursorType>(c, arg0->cursorForPosition(arg1),
-                                          "qt.QTextCursor");
+        return makeqtype<QTextCursorType>(c, arg0->cursorForPosition(arg1), "qt.QTextCursor");
     }
 
-    Pointer qt_QTextEdit_cursorRect_QRect_QTextEdit_QTextCursor(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_cursor)
+    Pointer qt_QTextEdit_cursorRect_QRect_QTextEdit_QTextCursor(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_cursor)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextEdit* arg0 = object<QTextEdit>(param_this);
@@ -955,120 +909,95 @@ namespace Mu
         return makeqtype<QRectType>(c, arg0->cursorRect(arg1), "qt.QRect");
     }
 
-    Pointer qt_QTextEdit_cursorRect_QRect_QTextEdit(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this)
+    Pointer qt_QTextEdit_cursorRect_QRect_QTextEdit(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextEdit* arg0 = object<QTextEdit>(param_this);
         return makeqtype<QRectType>(c, arg0->cursorRect(), "qt.QRect");
     }
 
-    void
-    qt_QTextEdit_ensureCursorVisible_void_QTextEdit(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this)
+    void qt_QTextEdit_ensureCursorVisible_void_QTextEdit(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextEdit* arg0 = object<QTextEdit>(param_this);
         arg0->ensureCursorVisible();
     }
 
-    bool qt_QTextEdit_find_bool_QTextEdit_string_int(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_this,
-                                                     Pointer param_exp,
-                                                     int param_options)
+    bool qt_QTextEdit_find_bool_QTextEdit_string_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_exp, int param_options)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextEdit* arg0 = object<QTextEdit>(param_this);
         const QString arg1 = qstring(param_exp);
-        QTextDocument::FindFlags arg2 =
-            (QTextDocument::FindFlags)(param_options);
+        QTextDocument::FindFlags arg2 = (QTextDocument::FindFlags)(param_options);
         return arg0->find(arg1, arg2);
     }
 
-    bool qt_QTextEdit_find_bool_QTextEdit_QRegularExpression_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_exp,
-        int param_options)
+    bool qt_QTextEdit_find_bool_QTextEdit_QRegularExpression_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_exp,
+                                                                 int param_options)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextEdit* arg0 = object<QTextEdit>(param_this);
-        const QRegularExpression arg1 =
-            getqtype<QRegularExpressionType>(param_exp);
-        QTextDocument::FindFlags arg2 =
-            (QTextDocument::FindFlags)(param_options);
+        const QRegularExpression arg1 = getqtype<QRegularExpressionType>(param_exp);
+        QTextDocument::FindFlags arg2 = (QTextDocument::FindFlags)(param_options);
         return arg0->find(arg1, arg2);
     }
 
-    Pointer qt_QTextEdit_fontFamily_string_QTextEdit(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_this)
+    Pointer qt_QTextEdit_fontFamily_string_QTextEdit(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextEdit* arg0 = object<QTextEdit>(param_this);
         return makestring(c, arg0->fontFamily());
     }
 
-    bool qt_QTextEdit_fontItalic_bool_QTextEdit(Mu::Thread& NODE_THREAD,
-                                                Pointer param_this)
+    bool qt_QTextEdit_fontItalic_bool_QTextEdit(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextEdit* arg0 = object<QTextEdit>(param_this);
         return arg0->fontItalic();
     }
 
-    double qt_QTextEdit_fontPointSize_double_QTextEdit(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this)
+    double qt_QTextEdit_fontPointSize_double_QTextEdit(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextEdit* arg0 = object<QTextEdit>(param_this);
         return arg0->fontPointSize();
     }
 
-    bool qt_QTextEdit_fontUnderline_bool_QTextEdit(Mu::Thread& NODE_THREAD,
-                                                   Pointer param_this)
+    bool qt_QTextEdit_fontUnderline_bool_QTextEdit(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextEdit* arg0 = object<QTextEdit>(param_this);
         return arg0->fontUnderline();
     }
 
-    int qt_QTextEdit_fontWeight_int_QTextEdit(Mu::Thread& NODE_THREAD,
-                                              Pointer param_this)
+    int qt_QTextEdit_fontWeight_int_QTextEdit(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextEdit* arg0 = object<QTextEdit>(param_this);
         return arg0->fontWeight();
     }
 
-    Pointer qt_QTextEdit_loadResource_QVariant_QTextEdit_int_QUrl(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_type,
-        Pointer param_name)
+    Pointer qt_QTextEdit_loadResource_QVariant_QTextEdit_int_QUrl(Mu::Thread& NODE_THREAD, Pointer param_this, int param_type,
+                                                                  Pointer param_name)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextEdit* arg0 = object<QTextEdit>(param_this);
         int arg1 = (int)(param_type);
         const QUrl arg2 = getqtype<QUrlType>(param_name);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QVariantType>(
-                         c, arg0->QTextEdit::loadResource(arg1, arg2),
-                         "qt.QVariant")
-                   : makeqtype<QVariantType>(c, arg0->loadResource(arg1, arg2),
-                                             "qt.QVariant");
+        return isMuQtObject(arg0) ? makeqtype<QVariantType>(c, arg0->QTextEdit::loadResource(arg1, arg2), "qt.QVariant")
+                                  : makeqtype<QVariantType>(c, arg0->loadResource(arg1, arg2), "qt.QVariant");
     }
 
-    void qt_QTextEdit_moveCursor_void_QTextEdit_int_int(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this,
-                                                        int param_operation,
-                                                        int param_mode)
+    void qt_QTextEdit_moveCursor_void_QTextEdit_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_operation, int param_mode)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextEdit* arg0 = object<QTextEdit>(param_this);
-        QTextCursor::MoveOperation arg1 =
-            (QTextCursor::MoveOperation)(param_operation);
+        QTextCursor::MoveOperation arg1 = (QTextCursor::MoveOperation)(param_operation);
         QTextCursor::MoveMode arg2 = (QTextCursor::MoveMode)(param_mode);
         arg0->moveCursor(arg1, arg2);
     }
 
-    void qt_QTextEdit_setTextCursor_void_QTextEdit_QTextCursor(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_cursor)
+    void qt_QTextEdit_setTextCursor_void_QTextEdit_QTextCursor(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_cursor)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextEdit* arg0 = object<QTextEdit>(param_this);
@@ -1076,88 +1005,62 @@ namespace Mu
         arg0->setTextCursor(arg1);
     }
 
-    Pointer
-    qt_QTextEdit_textBackgroundColor_QColor_QTextEdit(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    Pointer qt_QTextEdit_textBackgroundColor_QColor_QTextEdit(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextEdit* arg0 = object<QTextEdit>(param_this);
-        return makeqtype<QColorType>(c, arg0->textBackgroundColor(),
-                                     "qt.QColor");
+        return makeqtype<QColorType>(c, arg0->textBackgroundColor(), "qt.QColor");
     }
 
-    Pointer qt_QTextEdit_textColor_QColor_QTextEdit(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this)
+    Pointer qt_QTextEdit_textColor_QColor_QTextEdit(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextEdit* arg0 = object<QTextEdit>(param_this);
         return makeqtype<QColorType>(c, arg0->textColor(), "qt.QColor");
     }
 
-    Pointer
-    qt_QTextEdit_textCursor_QTextCursor_QTextEdit(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this)
+    Pointer qt_QTextEdit_textCursor_QTextCursor_QTextEdit(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextEdit* arg0 = object<QTextEdit>(param_this);
-        return makeqtype<QTextCursorType>(c, arg0->textCursor(),
-                                          "qt.QTextCursor");
+        return makeqtype<QTextCursorType>(c, arg0->textCursor(), "qt.QTextCursor");
     }
 
-    Pointer qt_QTextEdit_toPlainText_string_QTextEdit(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    Pointer qt_QTextEdit_toPlainText_string_QTextEdit(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextEdit* arg0 = object<QTextEdit>(param_this);
         return makestring(c, arg0->toPlainText());
     }
 
-    Pointer qt_QTextEdit_inputMethodQuery_QVariant_QTextEdit_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_property)
+    Pointer qt_QTextEdit_inputMethodQuery_QVariant_QTextEdit_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_property)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextEdit* arg0 = object<QTextEdit>(param_this);
         Qt::InputMethodQuery arg1 = (Qt::InputMethodQuery)(param_property);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QVariantType>(
-                         c, arg0->QTextEdit::inputMethodQuery(arg1),
-                         "qt.QVariant")
-                   : makeqtype<QVariantType>(c, arg0->inputMethodQuery(arg1),
-                                             "qt.QVariant");
+        return isMuQtObject(arg0) ? makeqtype<QVariantType>(c, arg0->QTextEdit::inputMethodQuery(arg1), "qt.QVariant")
+                                  : makeqtype<QVariantType>(c, arg0->inputMethodQuery(arg1), "qt.QVariant");
     }
 
-    bool qt_QTextEdit_canInsertFromMimeData_bool_QTextEdit_QMimeData(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_source)
+    bool qt_QTextEdit_canInsertFromMimeData_bool_QTextEdit_QMimeData(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_source)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextEdit* arg0 = object<QTextEdit>(param_this);
         const QMimeData* arg1 = object<QMimeData>(param_source);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QTextEdit*)arg0)
-                         ->canInsertFromMimeData_pub_parent(arg1)
-                   : ((MuQt_QTextEdit*)arg0)->canInsertFromMimeData_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QTextEdit*)arg0)->canInsertFromMimeData_pub_parent(arg1)
+                                  : ((MuQt_QTextEdit*)arg0)->canInsertFromMimeData_pub(arg1);
     }
 
-    Pointer qt_QTextEdit_createMimeDataFromSelection_QMimeData_QTextEdit(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QTextEdit_createMimeDataFromSelection_QMimeData_QTextEdit(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextEdit* arg0 = object<QTextEdit>(param_this);
         return isMuQtObject(arg0)
-                   ? makeinstance<QMimeDataType>(
-                         c,
-                         ((MuQt_QTextEdit*)arg0)
-                             ->createMimeDataFromSelection_pub_parent(),
-                         "qt.QMimeData")
-                   : makeinstance<QMimeDataType>(
-                         c,
-                         ((MuQt_QTextEdit*)arg0)
-                             ->createMimeDataFromSelection_pub(),
-                         "qt.QMimeData");
+                   ? makeinstance<QMimeDataType>(c, ((MuQt_QTextEdit*)arg0)->createMimeDataFromSelection_pub_parent(), "qt.QMimeData")
+                   : makeinstance<QMimeDataType>(c, ((MuQt_QTextEdit*)arg0)->createMimeDataFromSelection_pub(), "qt.QMimeData");
     }
 
-    void qt_QTextEdit_insertFromMimeData_void_QTextEdit_QMimeData(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_source)
+    void qt_QTextEdit_insertFromMimeData_void_QTextEdit_QMimeData(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_source)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextEdit* arg0 = object<QTextEdit>(param_this);
@@ -1168,9 +1071,7 @@ namespace Mu
             ((MuQt_QTextEdit*)arg0)->insertFromMimeData_pub(arg1);
     }
 
-    void qt_QTextEdit_changeEvent_void_QTextEdit_QEvent(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this,
-                                                        Pointer param_e)
+    void qt_QTextEdit_changeEvent_void_QTextEdit_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextEdit* arg0 = object<QTextEdit>(param_this);
@@ -1181,21 +1082,18 @@ namespace Mu
             ((MuQt_QTextEdit*)arg0)->changeEvent_pub(arg1);
     }
 
-    void qt_QTextEdit_contextMenuEvent_void_QTextEdit_QContextMenuEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QTextEdit_contextMenuEvent_void_QTextEdit_QContextMenuEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextEdit* arg0 = object<QTextEdit>(param_this);
-        QContextMenuEvent* arg1 =
-            getqpointer<QContextMenuEventType>(param_event);
+        QContextMenuEvent* arg1 = getqpointer<QContextMenuEventType>(param_event);
         if (isMuQtObject(arg0))
             ((MuQt_QTextEdit*)arg0)->contextMenuEvent_pub_parent(arg1);
         else
             ((MuQt_QTextEdit*)arg0)->contextMenuEvent_pub(arg1);
     }
 
-    void qt_QTextEdit_dragEnterEvent_void_QTextEdit_QDragEnterEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QTextEdit_dragEnterEvent_void_QTextEdit_QDragEnterEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextEdit* arg0 = object<QTextEdit>(param_this);
@@ -1206,8 +1104,7 @@ namespace Mu
             ((MuQt_QTextEdit*)arg0)->dragEnterEvent_pub(arg1);
     }
 
-    void qt_QTextEdit_dragLeaveEvent_void_QTextEdit_QDragLeaveEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QTextEdit_dragLeaveEvent_void_QTextEdit_QDragLeaveEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextEdit* arg0 = object<QTextEdit>(param_this);
@@ -1218,8 +1115,7 @@ namespace Mu
             ((MuQt_QTextEdit*)arg0)->dragLeaveEvent_pub(arg1);
     }
 
-    void qt_QTextEdit_dragMoveEvent_void_QTextEdit_QDragMoveEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QTextEdit_dragMoveEvent_void_QTextEdit_QDragMoveEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextEdit* arg0 = object<QTextEdit>(param_this);
@@ -1230,8 +1126,7 @@ namespace Mu
             ((MuQt_QTextEdit*)arg0)->dragMoveEvent_pub(arg1);
     }
 
-    void qt_QTextEdit_dropEvent_void_QTextEdit_QDropEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QTextEdit_dropEvent_void_QTextEdit_QDropEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextEdit* arg0 = object<QTextEdit>(param_this);
@@ -1242,8 +1137,7 @@ namespace Mu
             ((MuQt_QTextEdit*)arg0)->dropEvent_pub(arg1);
     }
 
-    void qt_QTextEdit_focusInEvent_void_QTextEdit_QFocusEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QTextEdit_focusInEvent_void_QTextEdit_QFocusEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextEdit* arg0 = object<QTextEdit>(param_this);
@@ -1254,20 +1148,16 @@ namespace Mu
             ((MuQt_QTextEdit*)arg0)->focusInEvent_pub(arg1);
     }
 
-    bool qt_QTextEdit_focusNextPrevChild_bool_QTextEdit_bool(
-        Mu::Thread& NODE_THREAD, Pointer param_this, bool param_next)
+    bool qt_QTextEdit_focusNextPrevChild_bool_QTextEdit_bool(Mu::Thread& NODE_THREAD, Pointer param_this, bool param_next)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextEdit* arg0 = object<QTextEdit>(param_this);
         bool arg1 = (bool)(param_next);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QTextEdit*)arg0)
-                         ->focusNextPrevChild_pub_parent(arg1)
-                   : ((MuQt_QTextEdit*)arg0)->focusNextPrevChild_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QTextEdit*)arg0)->focusNextPrevChild_pub_parent(arg1)
+                                  : ((MuQt_QTextEdit*)arg0)->focusNextPrevChild_pub(arg1);
     }
 
-    void qt_QTextEdit_focusOutEvent_void_QTextEdit_QFocusEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QTextEdit_focusOutEvent_void_QTextEdit_QFocusEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextEdit* arg0 = object<QTextEdit>(param_this);
@@ -1278,8 +1168,7 @@ namespace Mu
             ((MuQt_QTextEdit*)arg0)->focusOutEvent_pub(arg1);
     }
 
-    void qt_QTextEdit_keyPressEvent_void_QTextEdit_QKeyEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QTextEdit_keyPressEvent_void_QTextEdit_QKeyEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextEdit* arg0 = object<QTextEdit>(param_this);
@@ -1290,8 +1179,7 @@ namespace Mu
             ((MuQt_QTextEdit*)arg0)->keyPressEvent_pub(arg1);
     }
 
-    void qt_QTextEdit_keyReleaseEvent_void_QTextEdit_QKeyEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QTextEdit_keyReleaseEvent_void_QTextEdit_QKeyEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextEdit* arg0 = object<QTextEdit>(param_this);
@@ -1302,8 +1190,7 @@ namespace Mu
             ((MuQt_QTextEdit*)arg0)->keyReleaseEvent_pub(arg1);
     }
 
-    void qt_QTextEdit_mouseDoubleClickEvent_void_QTextEdit_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QTextEdit_mouseDoubleClickEvent_void_QTextEdit_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextEdit* arg0 = object<QTextEdit>(param_this);
@@ -1314,8 +1201,7 @@ namespace Mu
             ((MuQt_QTextEdit*)arg0)->mouseDoubleClickEvent_pub(arg1);
     }
 
-    void qt_QTextEdit_mouseMoveEvent_void_QTextEdit_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QTextEdit_mouseMoveEvent_void_QTextEdit_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextEdit* arg0 = object<QTextEdit>(param_this);
@@ -1326,8 +1212,7 @@ namespace Mu
             ((MuQt_QTextEdit*)arg0)->mouseMoveEvent_pub(arg1);
     }
 
-    void qt_QTextEdit_mousePressEvent_void_QTextEdit_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QTextEdit_mousePressEvent_void_QTextEdit_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextEdit* arg0 = object<QTextEdit>(param_this);
@@ -1338,8 +1223,7 @@ namespace Mu
             ((MuQt_QTextEdit*)arg0)->mousePressEvent_pub(arg1);
     }
 
-    void qt_QTextEdit_mouseReleaseEvent_void_QTextEdit_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QTextEdit_mouseReleaseEvent_void_QTextEdit_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextEdit* arg0 = object<QTextEdit>(param_this);
@@ -1350,8 +1234,7 @@ namespace Mu
             ((MuQt_QTextEdit*)arg0)->mouseReleaseEvent_pub(arg1);
     }
 
-    void qt_QTextEdit_paintEvent_void_QTextEdit_QPaintEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QTextEdit_paintEvent_void_QTextEdit_QPaintEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextEdit* arg0 = object<QTextEdit>(param_this);
@@ -1362,8 +1245,7 @@ namespace Mu
             ((MuQt_QTextEdit*)arg0)->paintEvent_pub(arg1);
     }
 
-    void qt_QTextEdit_resizeEvent_void_QTextEdit_QResizeEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QTextEdit_resizeEvent_void_QTextEdit_QResizeEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextEdit* arg0 = object<QTextEdit>(param_this);
@@ -1374,8 +1256,7 @@ namespace Mu
             ((MuQt_QTextEdit*)arg0)->resizeEvent_pub(arg1);
     }
 
-    void qt_QTextEdit_scrollContentsBy_void_QTextEdit_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_dx, int param_dy)
+    void qt_QTextEdit_scrollContentsBy_void_QTextEdit_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_dx, int param_dy)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextEdit* arg0 = object<QTextEdit>(param_this);
@@ -1387,8 +1268,7 @@ namespace Mu
             ((MuQt_QTextEdit*)arg0)->scrollContentsBy_pub(arg1, arg2);
     }
 
-    void qt_QTextEdit_showEvent_void_QTextEdit_QShowEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param__p13)
+    void qt_QTextEdit_showEvent_void_QTextEdit_QShowEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param__p13)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextEdit* arg0 = object<QTextEdit>(param_this);
@@ -1399,8 +1279,7 @@ namespace Mu
             ((MuQt_QTextEdit*)arg0)->showEvent_pub(arg1);
     }
 
-    void qt_QTextEdit_wheelEvent_void_QTextEdit_QWheelEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QTextEdit_wheelEvent_void_QTextEdit_QWheelEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextEdit* arg0 = object<QTextEdit>(param_this);
@@ -1411,8 +1290,7 @@ namespace Mu
             ((MuQt_QTextEdit*)arg0)->wheelEvent_pub(arg1);
     }
 
-    void qt_QTextEdit_setupViewport_void_QTextEdit_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_viewport)
+    void qt_QTextEdit_setupViewport_void_QTextEdit_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_viewport)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextEdit* arg0 = object<QTextEdit>(param_this);
@@ -1423,412 +1301,332 @@ namespace Mu
             arg0->setupViewport(arg1);
     }
 
-    Pointer
-    qt_QTextEdit_minimumSizeHint_QSize_QTextEdit(Mu::Thread& NODE_THREAD,
-                                                 Pointer param_this)
+    Pointer qt_QTextEdit_minimumSizeHint_QSize_QTextEdit(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextEdit* arg0 = object<QTextEdit>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QSizeType>(c, arg0->QTextEdit::minimumSizeHint(),
-                                          "qt.QSize")
-                   : makeqtype<QSizeType>(c, arg0->minimumSizeHint(),
-                                          "qt.QSize");
+        return isMuQtObject(arg0) ? makeqtype<QSizeType>(c, arg0->QTextEdit::minimumSizeHint(), "qt.QSize")
+                                  : makeqtype<QSizeType>(c, arg0->minimumSizeHint(), "qt.QSize");
     }
 
-    Pointer qt_QTextEdit_sizeHint_QSize_QTextEdit(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this)
+    Pointer qt_QTextEdit_sizeHint_QSize_QTextEdit(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextEdit* arg0 = object<QTextEdit>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QSizeType>(c, arg0->QTextEdit::sizeHint(),
-                                          "qt.QSize")
-                   : makeqtype<QSizeType>(c, arg0->sizeHint(), "qt.QSize");
+        return isMuQtObject(arg0) ? makeqtype<QSizeType>(c, arg0->QTextEdit::sizeHint(), "qt.QSize")
+                                  : makeqtype<QSizeType>(c, arg0->sizeHint(), "qt.QSize");
     }
 
-    bool qt_QTextEdit_viewportEvent_bool_QTextEdit_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    bool qt_QTextEdit_viewportEvent_bool_QTextEdit_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextEdit* arg0 = object<QTextEdit>(param_this);
         QEvent* arg1 = getqpointer<QEventType>(param_event);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QTextEdit*)arg0)->viewportEvent_pub_parent(arg1)
-                   : ((MuQt_QTextEdit*)arg0)->viewportEvent_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QTextEdit*)arg0)->viewportEvent_pub_parent(arg1)
+                                  : ((MuQt_QTextEdit*)arg0)->viewportEvent_pub(arg1);
     }
 
-    Pointer
-    qt_QTextEdit_viewportSizeHint_QSize_QTextEdit(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this)
+    Pointer qt_QTextEdit_viewportSizeHint_QSize_QTextEdit(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextEdit* arg0 = object<QTextEdit>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QSizeType>(
-                         c,
-                         ((MuQt_QTextEdit*)arg0)->viewportSizeHint_pub_parent(),
-                         "qt.QSize")
-                   : makeqtype<QSizeType>(
-                         c, ((MuQt_QTextEdit*)arg0)->viewportSizeHint_pub(),
-                         "qt.QSize");
+        return isMuQtObject(arg0) ? makeqtype<QSizeType>(c, ((MuQt_QTextEdit*)arg0)->viewportSizeHint_pub_parent(), "qt.QSize")
+                                  : makeqtype<QSizeType>(c, ((MuQt_QTextEdit*)arg0)->viewportSizeHint_pub(), "qt.QSize");
     }
 
-    bool qt_QTextEdit_event_bool_QTextEdit_QEvent(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this,
-                                                  Pointer param_event_)
+    bool qt_QTextEdit_event_bool_QTextEdit_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event_)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextEdit* arg0 = object<QTextEdit>(param_this);
         QEvent* arg1 = getqpointer<QEventType>(param_event_);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QTextEdit*)arg0)->event_pub_parent(arg1)
-                   : ((MuQt_QTextEdit*)arg0)->event_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QTextEdit*)arg0)->event_pub_parent(arg1) : ((MuQt_QTextEdit*)arg0)->event_pub(arg1);
     }
 
     static NODE_IMPLEMENTATION(_n_QTextEdit0, Pointer)
     {
-        NODE_RETURN(qt_QTextEdit_QTextEdit_QTextEdit_QTextEdit_QWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QTextEdit_QTextEdit_QTextEdit_QTextEdit_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_QTextEdit1, Pointer)
     {
-        NODE_RETURN(qt_QTextEdit_QTextEdit_QTextEdit_QTextEdit_string_QWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QTextEdit_QTextEdit_QTextEdit_QTextEdit_string_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                              NODE_ARG(1, Pointer), NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_alignment0, int)
     {
-        NODE_RETURN(qt_QTextEdit_alignment_int_QTextEdit(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTextEdit_alignment_int_QTextEdit(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_anchorAt0, Pointer)
     {
-        NODE_RETURN(qt_QTextEdit_anchorAt_string_QTextEdit_QPoint(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QTextEdit_anchorAt_string_QTextEdit_QPoint(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_canPaste0, bool)
     {
-        NODE_RETURN(qt_QTextEdit_canPaste_bool_QTextEdit(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTextEdit_canPaste_bool_QTextEdit(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_createStandardContextMenu0, Pointer)
     {
-        NODE_RETURN(qt_QTextEdit_createStandardContextMenu_QMenu_QTextEdit(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTextEdit_createStandardContextMenu_QMenu_QTextEdit(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_createStandardContextMenu1, Pointer)
     {
         NODE_RETURN(
-            qt_QTextEdit_createStandardContextMenu_QMenu_QTextEdit_QPoint(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+            qt_QTextEdit_createStandardContextMenu_QMenu_QTextEdit_QPoint(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_currentFont0, Pointer)
     {
-        NODE_RETURN(qt_QTextEdit_currentFont_QFont_QTextEdit(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTextEdit_currentFont_QFont_QTextEdit(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_cursorForPosition0, Pointer)
     {
-        NODE_RETURN(qt_QTextEdit_cursorForPosition_QTextCursor_QTextEdit_QPoint(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(
+            qt_QTextEdit_cursorForPosition_QTextCursor_QTextEdit_QPoint(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_cursorRect0, Pointer)
     {
-        NODE_RETURN(qt_QTextEdit_cursorRect_QRect_QTextEdit_QTextCursor(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QTextEdit_cursorRect_QRect_QTextEdit_QTextCursor(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_cursorRect1, Pointer)
     {
-        NODE_RETURN(qt_QTextEdit_cursorRect_QRect_QTextEdit(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTextEdit_cursorRect_QRect_QTextEdit(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_ensureCursorVisible0, void)
     {
-        qt_QTextEdit_ensureCursorVisible_void_QTextEdit(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
+        qt_QTextEdit_ensureCursorVisible_void_QTextEdit(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_find0, bool)
     {
-        NODE_RETURN(qt_QTextEdit_find_bool_QTextEdit_string_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int)));
+        NODE_RETURN(
+            qt_QTextEdit_find_bool_QTextEdit_string_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_find1, bool)
     {
-        NODE_RETURN(qt_QTextEdit_find_bool_QTextEdit_QRegularExpression_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int)));
+        NODE_RETURN(qt_QTextEdit_find_bool_QTextEdit_QRegularExpression_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                            NODE_ARG(2, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_fontFamily0, Pointer)
     {
-        NODE_RETURN(qt_QTextEdit_fontFamily_string_QTextEdit(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTextEdit_fontFamily_string_QTextEdit(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_fontItalic0, bool)
     {
-        NODE_RETURN(qt_QTextEdit_fontItalic_bool_QTextEdit(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTextEdit_fontItalic_bool_QTextEdit(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_fontPointSize0, double)
     {
-        NODE_RETURN(qt_QTextEdit_fontPointSize_double_QTextEdit(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTextEdit_fontPointSize_double_QTextEdit(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_fontUnderline0, bool)
     {
-        NODE_RETURN(qt_QTextEdit_fontUnderline_bool_QTextEdit(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTextEdit_fontUnderline_bool_QTextEdit(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_fontWeight0, int)
     {
-        NODE_RETURN(qt_QTextEdit_fontWeight_int_QTextEdit(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTextEdit_fontWeight_int_QTextEdit(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_loadResource0, Pointer)
     {
-        NODE_RETURN(qt_QTextEdit_loadResource_QVariant_QTextEdit_int_QUrl(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QTextEdit_loadResource_QVariant_QTextEdit_int_QUrl(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                          NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_moveCursor0, void)
     {
-        qt_QTextEdit_moveCursor_void_QTextEdit_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int));
+        qt_QTextEdit_moveCursor_void_QTextEdit_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setTextCursor0, void)
     {
-        qt_QTextEdit_setTextCursor_void_QTextEdit_QTextCursor(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTextEdit_setTextCursor_void_QTextEdit_QTextCursor(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_textBackgroundColor0, Pointer)
     {
-        NODE_RETURN(qt_QTextEdit_textBackgroundColor_QColor_QTextEdit(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTextEdit_textBackgroundColor_QColor_QTextEdit(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_textColor0, Pointer)
     {
-        NODE_RETURN(qt_QTextEdit_textColor_QColor_QTextEdit(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTextEdit_textColor_QColor_QTextEdit(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_textCursor0, Pointer)
     {
-        NODE_RETURN(qt_QTextEdit_textCursor_QTextCursor_QTextEdit(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTextEdit_textCursor_QTextCursor_QTextEdit(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_toPlainText0, Pointer)
     {
-        NODE_RETURN(qt_QTextEdit_toPlainText_string_QTextEdit(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTextEdit_toPlainText_string_QTextEdit(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_inputMethodQuery0, Pointer)
     {
-        NODE_RETURN(qt_QTextEdit_inputMethodQuery_QVariant_QTextEdit_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QTextEdit_inputMethodQuery_QVariant_QTextEdit_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_canInsertFromMimeData0, bool)
     {
-        NODE_RETURN(qt_QTextEdit_canInsertFromMimeData_bool_QTextEdit_QMimeData(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(
+            qt_QTextEdit_canInsertFromMimeData_bool_QTextEdit_QMimeData(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_createMimeDataFromSelection0, Pointer)
     {
-        NODE_RETURN(
-            qt_QTextEdit_createMimeDataFromSelection_QMimeData_QTextEdit(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTextEdit_createMimeDataFromSelection_QMimeData_QTextEdit(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_insertFromMimeData0, void)
     {
-        qt_QTextEdit_insertFromMimeData_void_QTextEdit_QMimeData(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTextEdit_insertFromMimeData_void_QTextEdit_QMimeData(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_changeEvent0, void)
     {
-        qt_QTextEdit_changeEvent_void_QTextEdit_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTextEdit_changeEvent_void_QTextEdit_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_contextMenuEvent0, void)
     {
-        qt_QTextEdit_contextMenuEvent_void_QTextEdit_QContextMenuEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTextEdit_contextMenuEvent_void_QTextEdit_QContextMenuEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_dragEnterEvent0, void)
     {
-        qt_QTextEdit_dragEnterEvent_void_QTextEdit_QDragEnterEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTextEdit_dragEnterEvent_void_QTextEdit_QDragEnterEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_dragLeaveEvent0, void)
     {
-        qt_QTextEdit_dragLeaveEvent_void_QTextEdit_QDragLeaveEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTextEdit_dragLeaveEvent_void_QTextEdit_QDragLeaveEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_dragMoveEvent0, void)
     {
-        qt_QTextEdit_dragMoveEvent_void_QTextEdit_QDragMoveEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTextEdit_dragMoveEvent_void_QTextEdit_QDragMoveEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_dropEvent0, void)
     {
-        qt_QTextEdit_dropEvent_void_QTextEdit_QDropEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTextEdit_dropEvent_void_QTextEdit_QDropEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_focusInEvent0, void)
     {
-        qt_QTextEdit_focusInEvent_void_QTextEdit_QFocusEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTextEdit_focusInEvent_void_QTextEdit_QFocusEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_focusNextPrevChild0, bool)
     {
-        NODE_RETURN(qt_QTextEdit_focusNextPrevChild_bool_QTextEdit_bool(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool)));
+        NODE_RETURN(qt_QTextEdit_focusNextPrevChild_bool_QTextEdit_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool)));
     }
 
     static NODE_IMPLEMENTATION(_n_focusOutEvent0, void)
     {
-        qt_QTextEdit_focusOutEvent_void_QTextEdit_QFocusEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTextEdit_focusOutEvent_void_QTextEdit_QFocusEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_keyPressEvent0, void)
     {
-        qt_QTextEdit_keyPressEvent_void_QTextEdit_QKeyEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTextEdit_keyPressEvent_void_QTextEdit_QKeyEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_keyReleaseEvent0, void)
     {
-        qt_QTextEdit_keyReleaseEvent_void_QTextEdit_QKeyEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTextEdit_keyReleaseEvent_void_QTextEdit_QKeyEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseDoubleClickEvent0, void)
     {
-        qt_QTextEdit_mouseDoubleClickEvent_void_QTextEdit_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTextEdit_mouseDoubleClickEvent_void_QTextEdit_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseMoveEvent0, void)
     {
-        qt_QTextEdit_mouseMoveEvent_void_QTextEdit_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTextEdit_mouseMoveEvent_void_QTextEdit_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mousePressEvent0, void)
     {
-        qt_QTextEdit_mousePressEvent_void_QTextEdit_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTextEdit_mousePressEvent_void_QTextEdit_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseReleaseEvent0, void)
     {
-        qt_QTextEdit_mouseReleaseEvent_void_QTextEdit_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTextEdit_mouseReleaseEvent_void_QTextEdit_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_paintEvent0, void)
     {
-        qt_QTextEdit_paintEvent_void_QTextEdit_QPaintEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTextEdit_paintEvent_void_QTextEdit_QPaintEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_resizeEvent0, void)
     {
-        qt_QTextEdit_resizeEvent_void_QTextEdit_QResizeEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTextEdit_resizeEvent_void_QTextEdit_QResizeEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_scrollContentsBy0, void)
     {
-        qt_QTextEdit_scrollContentsBy_void_QTextEdit_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int));
+        qt_QTextEdit_scrollContentsBy_void_QTextEdit_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_showEvent0, void)
     {
-        qt_QTextEdit_showEvent_void_QTextEdit_QShowEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTextEdit_showEvent_void_QTextEdit_QShowEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_wheelEvent0, void)
     {
-        qt_QTextEdit_wheelEvent_void_QTextEdit_QWheelEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTextEdit_wheelEvent_void_QTextEdit_QWheelEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setupViewport0, void)
     {
-        qt_QTextEdit_setupViewport_void_QTextEdit_QWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTextEdit_setupViewport_void_QTextEdit_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_minimumSizeHint0, Pointer)
     {
-        NODE_RETURN(qt_QTextEdit_minimumSizeHint_QSize_QTextEdit(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTextEdit_minimumSizeHint_QSize_QTextEdit(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_sizeHint0, Pointer)
     {
-        NODE_RETURN(qt_QTextEdit_sizeHint_QSize_QTextEdit(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTextEdit_sizeHint_QSize_QTextEdit(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_viewportEvent0, bool)
     {
-        NODE_RETURN(qt_QTextEdit_viewportEvent_bool_QTextEdit_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QTextEdit_viewportEvent_bool_QTextEdit_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_viewportSizeHint0, Pointer)
     {
-        NODE_RETURN(qt_QTextEdit_viewportSizeHint_QSize_QTextEdit(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTextEdit_viewportSizeHint_QSize_QTextEdit(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_event0, bool)
     {
-        NODE_RETURN(qt_QTextEdit_event_bool_QTextEdit_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QTextEdit_event_bool_QTextEdit_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     void QTextEditType::load()
@@ -1848,17 +1646,13 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
-                   new Function(c, tn, castFromObject, Cast, Compiled,
-                                QTextEdit_QTextEdit_QObject, Return, ftn,
-                                Parameters,
+                   new Function(c, tn, castFromObject, Cast, Compiled, QTextEdit_QTextEdit_QObject, Return, ftn, Parameters,
                                 new Param(c, "object", "qt.QObject"), End),
 
                    EndArguments);
@@ -1866,127 +1660,71 @@ namespace Mu
         addSymbols(
             // enums
             // member functions
-            new Function(c, "QTextEdit", _n_QTextEdit0, None, Compiled,
-                         qt_QTextEdit_QTextEdit_QTextEdit_QTextEdit_QWidget,
-                         Return, "qt.QTextEdit", Parameters,
-                         new Param(c, "this", "qt.QTextEdit"),
+            new Function(c, "QTextEdit", _n_QTextEdit0, None, Compiled, qt_QTextEdit_QTextEdit_QTextEdit_QTextEdit_QWidget, Return,
+                         "qt.QTextEdit", Parameters, new Param(c, "this", "qt.QTextEdit"), new Param(c, "parent", "qt.QWidget"), End),
+            new Function(c, "QTextEdit", _n_QTextEdit1, None, Compiled, qt_QTextEdit_QTextEdit_QTextEdit_QTextEdit_string_QWidget, Return,
+                         "qt.QTextEdit", Parameters, new Param(c, "this", "qt.QTextEdit"), new Param(c, "text", "string"),
                          new Param(c, "parent", "qt.QWidget"), End),
-            new Function(
-                c, "QTextEdit", _n_QTextEdit1, None, Compiled,
-                qt_QTextEdit_QTextEdit_QTextEdit_QTextEdit_string_QWidget,
-                Return, "qt.QTextEdit", Parameters,
-                new Param(c, "this", "qt.QTextEdit"),
-                new Param(c, "text", "string"),
-                new Param(c, "parent", "qt.QWidget"), End),
             // PROP: acceptRichText (bool; QTextEdit this)
-            new Function(c, "alignment", _n_alignment0, None, Compiled,
-                         qt_QTextEdit_alignment_int_QTextEdit, Return, "int",
-                         Parameters, new Param(c, "this", "qt.QTextEdit"), End),
-            new Function(c, "anchorAt", _n_anchorAt0, None, Compiled,
-                         qt_QTextEdit_anchorAt_string_QTextEdit_QPoint, Return,
-                         "string", Parameters,
-                         new Param(c, "this", "qt.QTextEdit"),
-                         new Param(c, "pos", "qt.QPoint"), End),
+            new Function(c, "alignment", _n_alignment0, None, Compiled, qt_QTextEdit_alignment_int_QTextEdit, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QTextEdit"), End),
+            new Function(c, "anchorAt", _n_anchorAt0, None, Compiled, qt_QTextEdit_anchorAt_string_QTextEdit_QPoint, Return, "string",
+                         Parameters, new Param(c, "this", "qt.QTextEdit"), new Param(c, "pos", "qt.QPoint"), End),
             // PROP: autoFormatting (flags QTextEdit::AutoFormatting; QTextEdit
             // this)
-            new Function(c, "canPaste", _n_canPaste0, None, Compiled,
-                         qt_QTextEdit_canPaste_bool_QTextEdit, Return, "bool",
-                         Parameters, new Param(c, "this", "qt.QTextEdit"), End),
-            new Function(c, "createStandardContextMenu",
-                         _n_createStandardContextMenu0, None, Compiled,
-                         qt_QTextEdit_createStandardContextMenu_QMenu_QTextEdit,
-                         Return, "qt.QMenu", Parameters,
+            new Function(c, "canPaste", _n_canPaste0, None, Compiled, qt_QTextEdit_canPaste_bool_QTextEdit, Return, "bool", Parameters,
                          new Param(c, "this", "qt.QTextEdit"), End),
-            new Function(
-                c, "createStandardContextMenu", _n_createStandardContextMenu1,
-                None, Compiled,
-                qt_QTextEdit_createStandardContextMenu_QMenu_QTextEdit_QPoint,
-                Return, "qt.QMenu", Parameters,
-                new Param(c, "this", "qt.QTextEdit"),
-                new Param(c, "position", "qt.QPoint"), End),
+            new Function(c, "createStandardContextMenu", _n_createStandardContextMenu0, None, Compiled,
+                         qt_QTextEdit_createStandardContextMenu_QMenu_QTextEdit, Return, "qt.QMenu", Parameters,
+                         new Param(c, "this", "qt.QTextEdit"), End),
+            new Function(c, "createStandardContextMenu", _n_createStandardContextMenu1, None, Compiled,
+                         qt_QTextEdit_createStandardContextMenu_QMenu_QTextEdit_QPoint, Return, "qt.QMenu", Parameters,
+                         new Param(c, "this", "qt.QTextEdit"), new Param(c, "position", "qt.QPoint"), End),
             // MISSING: currentCharFormat ("QTextCharFormat"; QTextEdit this)
-            new Function(c, "currentFont", _n_currentFont0, None, Compiled,
-                         qt_QTextEdit_currentFont_QFont_QTextEdit, Return,
-                         "qt.QFont", Parameters,
-                         new Param(c, "this", "qt.QTextEdit"), End),
-            new Function(
-                c, "cursorForPosition", _n_cursorForPosition0, None, Compiled,
-                qt_QTextEdit_cursorForPosition_QTextCursor_QTextEdit_QPoint,
-                Return, "qt.QTextCursor", Parameters,
-                new Param(c, "this", "qt.QTextEdit"),
-                new Param(c, "pos", "qt.QPoint"), End),
-            new Function(c, "cursorRect", _n_cursorRect0, None, Compiled,
-                         qt_QTextEdit_cursorRect_QRect_QTextEdit_QTextCursor,
-                         Return, "qt.QRect", Parameters,
-                         new Param(c, "this", "qt.QTextEdit"),
-                         new Param(c, "cursor", "qt.QTextCursor"), End),
-            new Function(c, "cursorRect", _n_cursorRect1, None, Compiled,
-                         qt_QTextEdit_cursorRect_QRect_QTextEdit, Return,
-                         "qt.QRect", Parameters,
-                         new Param(c, "this", "qt.QTextEdit"), End),
+            new Function(c, "currentFont", _n_currentFont0, None, Compiled, qt_QTextEdit_currentFont_QFont_QTextEdit, Return, "qt.QFont",
+                         Parameters, new Param(c, "this", "qt.QTextEdit"), End),
+            new Function(c, "cursorForPosition", _n_cursorForPosition0, None, Compiled,
+                         qt_QTextEdit_cursorForPosition_QTextCursor_QTextEdit_QPoint, Return, "qt.QTextCursor", Parameters,
+                         new Param(c, "this", "qt.QTextEdit"), new Param(c, "pos", "qt.QPoint"), End),
+            new Function(c, "cursorRect", _n_cursorRect0, None, Compiled, qt_QTextEdit_cursorRect_QRect_QTextEdit_QTextCursor, Return,
+                         "qt.QRect", Parameters, new Param(c, "this", "qt.QTextEdit"), new Param(c, "cursor", "qt.QTextCursor"), End),
+            new Function(c, "cursorRect", _n_cursorRect1, None, Compiled, qt_QTextEdit_cursorRect_QRect_QTextEdit, Return, "qt.QRect",
+                         Parameters, new Param(c, "this", "qt.QTextEdit"), End),
             // PROP: cursorWidth (int; QTextEdit this)
             // PROP: document (QTextDocument; QTextEdit this)
             // PROP: documentTitle (string; QTextEdit this)
-            new Function(c, "ensureCursorVisible", _n_ensureCursorVisible0,
-                         None, Compiled,
-                         qt_QTextEdit_ensureCursorVisible_void_QTextEdit,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QTextEdit"), End),
-            new Function(c, "find", _n_find0, None, Compiled,
-                         qt_QTextEdit_find_bool_QTextEdit_string_int, Return,
-                         "bool", Parameters,
-                         new Param(c, "this", "qt.QTextEdit"),
-                         new Param(c, "exp", "string"),
-                         new Param(c, "options", "int",
-                                   Value((int)QTextDocument::FindFlags())),
-                         End),
-            new Function(
-                c, "find", _n_find1, None, Compiled,
-                qt_QTextEdit_find_bool_QTextEdit_QRegularExpression_int, Return,
-                "bool", Parameters, new Param(c, "this", "qt.QTextEdit"),
-                new Param(c, "exp", "qt.QRegularExpression"),
-                new Param(c, "options", "int",
-                          Value((int)QTextDocument::FindFlags())),
-                End),
-            new Function(c, "fontFamily", _n_fontFamily0, None, Compiled,
-                         qt_QTextEdit_fontFamily_string_QTextEdit, Return,
-                         "string", Parameters,
-                         new Param(c, "this", "qt.QTextEdit"), End),
-            new Function(c, "fontItalic", _n_fontItalic0, None, Compiled,
-                         qt_QTextEdit_fontItalic_bool_QTextEdit, Return, "bool",
+            new Function(c, "ensureCursorVisible", _n_ensureCursorVisible0, None, Compiled, qt_QTextEdit_ensureCursorVisible_void_QTextEdit,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QTextEdit"), End),
+            new Function(c, "find", _n_find0, None, Compiled, qt_QTextEdit_find_bool_QTextEdit_string_int, Return, "bool", Parameters,
+                         new Param(c, "this", "qt.QTextEdit"), new Param(c, "exp", "string"),
+                         new Param(c, "options", "int", Value((int)QTextDocument::FindFlags())), End),
+            new Function(c, "find", _n_find1, None, Compiled, qt_QTextEdit_find_bool_QTextEdit_QRegularExpression_int, Return, "bool",
+                         Parameters, new Param(c, "this", "qt.QTextEdit"), new Param(c, "exp", "qt.QRegularExpression"),
+                         new Param(c, "options", "int", Value((int)QTextDocument::FindFlags())), End),
+            new Function(c, "fontFamily", _n_fontFamily0, None, Compiled, qt_QTextEdit_fontFamily_string_QTextEdit, Return, "string",
                          Parameters, new Param(c, "this", "qt.QTextEdit"), End),
-            new Function(c, "fontPointSize", _n_fontPointSize0, None, Compiled,
-                         qt_QTextEdit_fontPointSize_double_QTextEdit, Return,
-                         "double", Parameters,
-                         new Param(c, "this", "qt.QTextEdit"), End),
-            new Function(c, "fontUnderline", _n_fontUnderline0, None, Compiled,
-                         qt_QTextEdit_fontUnderline_bool_QTextEdit, Return,
-                         "bool", Parameters,
-                         new Param(c, "this", "qt.QTextEdit"), End),
-            new Function(c, "fontWeight", _n_fontWeight0, None, Compiled,
-                         qt_QTextEdit_fontWeight_int_QTextEdit, Return, "int",
+            new Function(c, "fontItalic", _n_fontItalic0, None, Compiled, qt_QTextEdit_fontItalic_bool_QTextEdit, Return, "bool",
                          Parameters, new Param(c, "this", "qt.QTextEdit"), End),
+            new Function(c, "fontPointSize", _n_fontPointSize0, None, Compiled, qt_QTextEdit_fontPointSize_double_QTextEdit, Return,
+                         "double", Parameters, new Param(c, "this", "qt.QTextEdit"), End),
+            new Function(c, "fontUnderline", _n_fontUnderline0, None, Compiled, qt_QTextEdit_fontUnderline_bool_QTextEdit, Return, "bool",
+                         Parameters, new Param(c, "this", "qt.QTextEdit"), End),
+            new Function(c, "fontWeight", _n_fontWeight0, None, Compiled, qt_QTextEdit_fontWeight_int_QTextEdit, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QTextEdit"), End),
             // PROP: isReadOnly (bool; QTextEdit this)
             // PROP: isUndoRedoEnabled (bool; QTextEdit this)
             // PROP: lineWrapColumnOrWidth (int; QTextEdit this)
             // PROP: lineWrapMode (flags QTextEdit::LineWrapMode; QTextEdit
             // this)
-            _func[0] = new MemberFunction(
-                c, "loadResource", _n_loadResource0, None, Compiled,
-                qt_QTextEdit_loadResource_QVariant_QTextEdit_int_QUrl, Return,
-                "qt.QVariant", Parameters, new Param(c, "this", "qt.QTextEdit"),
-                new Param(c, "type", "int"), new Param(c, "name", "qt.QUrl"),
-                End),
+            _func[0] =
+                new MemberFunction(c, "loadResource", _n_loadResource0, None, Compiled,
+                                   qt_QTextEdit_loadResource_QVariant_QTextEdit_int_QUrl, Return, "qt.QVariant", Parameters,
+                                   new Param(c, "this", "qt.QTextEdit"), new Param(c, "type", "int"), new Param(c, "name", "qt.QUrl"), End),
             // MISSING: mergeCurrentCharFormat (void; QTextEdit this, "const
             // QTextCharFormat &" modifier)
-            new Function(c, "moveCursor", _n_moveCursor0, None, Compiled,
-                         qt_QTextEdit_moveCursor_void_QTextEdit_int_int, Return,
-                         "void", Parameters,
-                         new Param(c, "this", "qt.QTextEdit"),
-                         new Param(c, "operation", "int"),
-                         new Param(c, "mode", "int",
-                                   Value((int)QTextCursor::MoveAnchor)),
-                         End),
+            new Function(c, "moveCursor", _n_moveCursor0, None, Compiled, qt_QTextEdit_moveCursor_void_QTextEdit_int_int, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QTextEdit"), new Param(c, "operation", "int"),
+                         new Param(c, "mode", "int", Value((int)QTextCursor::MoveAnchor)), End),
             // PROP: overwriteMode (bool; QTextEdit this)
             // PROP: placeholderText (string; QTextEdit this)
             // MISSING: print (void; QTextEdit this, "QPagedPaintDevice *"
@@ -2005,201 +1743,118 @@ namespace Mu
             // QTextEdit this, bool ro) PROP: setTabChangesFocus (void;
             // QTextEdit this, bool b) PROP: setTabStopDistance (void; QTextEdit
             // this, double distance)
-            new Function(c, "setTextCursor", _n_setTextCursor0, None, Compiled,
-                         qt_QTextEdit_setTextCursor_void_QTextEdit_QTextCursor,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QTextEdit"),
-                         new Param(c, "cursor", "qt.QTextCursor"), End),
+            new Function(c, "setTextCursor", _n_setTextCursor0, None, Compiled, qt_QTextEdit_setTextCursor_void_QTextEdit_QTextCursor,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QTextEdit"), new Param(c, "cursor", "qt.QTextCursor"), End),
             // PROP: setTextInteractionFlags (void; QTextEdit this, flags
             // Qt::TextInteractionFlags flags) PROP: setUndoRedoEnabled (void;
             // QTextEdit this, bool enable) PROP: setWordWrapMode (void;
             // QTextEdit this, flags QTextOption::WrapMode policy) PROP:
             // tabChangesFocus (bool; QTextEdit this) PROP: tabStopDistance
             // (double; QTextEdit this)
-            new Function(c, "textBackgroundColor", _n_textBackgroundColor0,
-                         None, Compiled,
-                         qt_QTextEdit_textBackgroundColor_QColor_QTextEdit,
-                         Return, "qt.QColor", Parameters,
+            new Function(c, "textBackgroundColor", _n_textBackgroundColor0, None, Compiled,
+                         qt_QTextEdit_textBackgroundColor_QColor_QTextEdit, Return, "qt.QColor", Parameters,
                          new Param(c, "this", "qt.QTextEdit"), End),
-            new Function(c, "textColor", _n_textColor0, None, Compiled,
-                         qt_QTextEdit_textColor_QColor_QTextEdit, Return,
-                         "qt.QColor", Parameters,
-                         new Param(c, "this", "qt.QTextEdit"), End),
-            new Function(c, "textCursor", _n_textCursor0, None, Compiled,
-                         qt_QTextEdit_textCursor_QTextCursor_QTextEdit, Return,
-                         "qt.QTextCursor", Parameters,
-                         new Param(c, "this", "qt.QTextEdit"), End),
+            new Function(c, "textColor", _n_textColor0, None, Compiled, qt_QTextEdit_textColor_QColor_QTextEdit, Return, "qt.QColor",
+                         Parameters, new Param(c, "this", "qt.QTextEdit"), End),
+            new Function(c, "textCursor", _n_textCursor0, None, Compiled, qt_QTextEdit_textCursor_QTextCursor_QTextEdit, Return,
+                         "qt.QTextCursor", Parameters, new Param(c, "this", "qt.QTextEdit"), End),
             // PROP: textInteractionFlags (flags Qt::TextInteractionFlags;
             // QTextEdit this) PROP: toHtml (string; QTextEdit this) PROP:
             // toMarkdown (string; QTextEdit this, flags
             // QTextDocument::MarkdownFeatures features)
-            new Function(c, "toPlainText", _n_toPlainText0, None, Compiled,
-                         qt_QTextEdit_toPlainText_string_QTextEdit, Return,
-                         "string", Parameters,
-                         new Param(c, "this", "qt.QTextEdit"), End),
+            new Function(c, "toPlainText", _n_toPlainText0, None, Compiled, qt_QTextEdit_toPlainText_string_QTextEdit, Return, "string",
+                         Parameters, new Param(c, "this", "qt.QTextEdit"), End),
             // PROP: wordWrapMode (flags QTextOption::WrapMode; QTextEdit this)
-            _func[1] = new MemberFunction(
-                c, "inputMethodQuery", _n_inputMethodQuery0, None, Compiled,
-                qt_QTextEdit_inputMethodQuery_QVariant_QTextEdit_int, Return,
-                "qt.QVariant", Parameters, new Param(c, "this", "qt.QTextEdit"),
-                new Param(c, "property", "int"), End),
-            _func[2] = new MemberFunction(
-                c, "canInsertFromMimeData", _n_canInsertFromMimeData0, None,
-                Compiled,
-                qt_QTextEdit_canInsertFromMimeData_bool_QTextEdit_QMimeData,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QTextEdit"),
-                new Param(c, "source", "qt.QMimeData"), End),
-            _func[3] = new MemberFunction(
-                c, "createMimeDataFromSelection",
-                _n_createMimeDataFromSelection0, None, Compiled,
-                qt_QTextEdit_createMimeDataFromSelection_QMimeData_QTextEdit,
-                Return, "qt.QMimeData", Parameters,
-                new Param(c, "this", "qt.QTextEdit"), End),
-            _func[4] = new MemberFunction(
-                c, "insertFromMimeData", _n_insertFromMimeData0, None, Compiled,
-                qt_QTextEdit_insertFromMimeData_void_QTextEdit_QMimeData,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTextEdit"),
-                new Param(c, "source", "qt.QMimeData"), End),
-            _func[5] = new MemberFunction(
-                c, "changeEvent", _n_changeEvent0, None, Compiled,
-                qt_QTextEdit_changeEvent_void_QTextEdit_QEvent, Return, "void",
-                Parameters, new Param(c, "this", "qt.QTextEdit"),
-                new Param(c, "e", "qt.QEvent"), End),
-            _func[6] = new MemberFunction(
-                c, "contextMenuEvent", _n_contextMenuEvent0, None, Compiled,
-                qt_QTextEdit_contextMenuEvent_void_QTextEdit_QContextMenuEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTextEdit"),
-                new Param(c, "event", "qt.QContextMenuEvent"), End),
-            _func[7] = new MemberFunction(
-                c, "dragEnterEvent", _n_dragEnterEvent0, None, Compiled,
-                qt_QTextEdit_dragEnterEvent_void_QTextEdit_QDragEnterEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTextEdit"),
-                new Param(c, "e", "qt.QDragEnterEvent"), End),
-            _func[8] = new MemberFunction(
-                c, "dragLeaveEvent", _n_dragLeaveEvent0, None, Compiled,
-                qt_QTextEdit_dragLeaveEvent_void_QTextEdit_QDragLeaveEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTextEdit"),
-                new Param(c, "e", "qt.QDragLeaveEvent"), End),
-            _func[9] = new MemberFunction(
-                c, "dragMoveEvent", _n_dragMoveEvent0, None, Compiled,
-                qt_QTextEdit_dragMoveEvent_void_QTextEdit_QDragMoveEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTextEdit"),
-                new Param(c, "e", "qt.QDragMoveEvent"), End),
-            _func[10] = new MemberFunction(
-                c, "dropEvent", _n_dropEvent0, None, Compiled,
-                qt_QTextEdit_dropEvent_void_QTextEdit_QDropEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QTextEdit"),
-                new Param(c, "e", "qt.QDropEvent"), End),
-            _func[11] = new MemberFunction(
-                c, "focusInEvent", _n_focusInEvent0, None, Compiled,
-                qt_QTextEdit_focusInEvent_void_QTextEdit_QFocusEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QTextEdit"),
-                new Param(c, "e", "qt.QFocusEvent"), End),
-            _func[12] = new MemberFunction(
-                c, "focusNextPrevChild", _n_focusNextPrevChild0, None, Compiled,
-                qt_QTextEdit_focusNextPrevChild_bool_QTextEdit_bool, Return,
-                "bool", Parameters, new Param(c, "this", "qt.QTextEdit"),
-                new Param(c, "next", "bool"), End),
-            _func[13] = new MemberFunction(
-                c, "focusOutEvent", _n_focusOutEvent0, None, Compiled,
-                qt_QTextEdit_focusOutEvent_void_QTextEdit_QFocusEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QTextEdit"),
-                new Param(c, "e", "qt.QFocusEvent"), End),
+            _func[1] = new MemberFunction(c, "inputMethodQuery", _n_inputMethodQuery0, None, Compiled,
+                                          qt_QTextEdit_inputMethodQuery_QVariant_QTextEdit_int, Return, "qt.QVariant", Parameters,
+                                          new Param(c, "this", "qt.QTextEdit"), new Param(c, "property", "int"), End),
+            _func[2] = new MemberFunction(c, "canInsertFromMimeData", _n_canInsertFromMimeData0, None, Compiled,
+                                          qt_QTextEdit_canInsertFromMimeData_bool_QTextEdit_QMimeData, Return, "bool", Parameters,
+                                          new Param(c, "this", "qt.QTextEdit"), new Param(c, "source", "qt.QMimeData"), End),
+            _func[3] = new MemberFunction(c, "createMimeDataFromSelection", _n_createMimeDataFromSelection0, None, Compiled,
+                                          qt_QTextEdit_createMimeDataFromSelection_QMimeData_QTextEdit, Return, "qt.QMimeData", Parameters,
+                                          new Param(c, "this", "qt.QTextEdit"), End),
+            _func[4] = new MemberFunction(c, "insertFromMimeData", _n_insertFromMimeData0, None, Compiled,
+                                          qt_QTextEdit_insertFromMimeData_void_QTextEdit_QMimeData, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QTextEdit"), new Param(c, "source", "qt.QMimeData"), End),
+            _func[5] =
+                new MemberFunction(c, "changeEvent", _n_changeEvent0, None, Compiled, qt_QTextEdit_changeEvent_void_QTextEdit_QEvent,
+                                   Return, "void", Parameters, new Param(c, "this", "qt.QTextEdit"), new Param(c, "e", "qt.QEvent"), End),
+            _func[6] = new MemberFunction(c, "contextMenuEvent", _n_contextMenuEvent0, None, Compiled,
+                                          qt_QTextEdit_contextMenuEvent_void_QTextEdit_QContextMenuEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QTextEdit"), new Param(c, "event", "qt.QContextMenuEvent"), End),
+            _func[7] = new MemberFunction(c, "dragEnterEvent", _n_dragEnterEvent0, None, Compiled,
+                                          qt_QTextEdit_dragEnterEvent_void_QTextEdit_QDragEnterEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QTextEdit"), new Param(c, "e", "qt.QDragEnterEvent"), End),
+            _func[8] = new MemberFunction(c, "dragLeaveEvent", _n_dragLeaveEvent0, None, Compiled,
+                                          qt_QTextEdit_dragLeaveEvent_void_QTextEdit_QDragLeaveEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QTextEdit"), new Param(c, "e", "qt.QDragLeaveEvent"), End),
+            _func[9] = new MemberFunction(c, "dragMoveEvent", _n_dragMoveEvent0, None, Compiled,
+                                          qt_QTextEdit_dragMoveEvent_void_QTextEdit_QDragMoveEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QTextEdit"), new Param(c, "e", "qt.QDragMoveEvent"), End),
+            _func[10] =
+                new MemberFunction(c, "dropEvent", _n_dropEvent0, None, Compiled, qt_QTextEdit_dropEvent_void_QTextEdit_QDropEvent, Return,
+                                   "void", Parameters, new Param(c, "this", "qt.QTextEdit"), new Param(c, "e", "qt.QDropEvent"), End),
+            _func[11] = new MemberFunction(c, "focusInEvent", _n_focusInEvent0, None, Compiled,
+                                           qt_QTextEdit_focusInEvent_void_QTextEdit_QFocusEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QTextEdit"), new Param(c, "e", "qt.QFocusEvent"), End),
+            _func[12] = new MemberFunction(c, "focusNextPrevChild", _n_focusNextPrevChild0, None, Compiled,
+                                           qt_QTextEdit_focusNextPrevChild_bool_QTextEdit_bool, Return, "bool", Parameters,
+                                           new Param(c, "this", "qt.QTextEdit"), new Param(c, "next", "bool"), End),
+            _func[13] = new MemberFunction(c, "focusOutEvent", _n_focusOutEvent0, None, Compiled,
+                                           qt_QTextEdit_focusOutEvent_void_QTextEdit_QFocusEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QTextEdit"), new Param(c, "e", "qt.QFocusEvent"), End),
             // MISSING: inputMethodEvent (void; QTextEdit this,
             // "QInputMethodEvent *" e) // protected
-            _func[14] = new MemberFunction(
-                c, "keyPressEvent", _n_keyPressEvent0, None, Compiled,
-                qt_QTextEdit_keyPressEvent_void_QTextEdit_QKeyEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QTextEdit"),
-                new Param(c, "e", "qt.QKeyEvent"), End),
-            _func[15] = new MemberFunction(
-                c, "keyReleaseEvent", _n_keyReleaseEvent0, None, Compiled,
-                qt_QTextEdit_keyReleaseEvent_void_QTextEdit_QKeyEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QTextEdit"),
-                new Param(c, "e", "qt.QKeyEvent"), End),
-            _func[16] = new MemberFunction(
-                c, "mouseDoubleClickEvent", _n_mouseDoubleClickEvent0, None,
-                Compiled,
-                qt_QTextEdit_mouseDoubleClickEvent_void_QTextEdit_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTextEdit"),
-                new Param(c, "e", "qt.QMouseEvent"), End),
-            _func[17] = new MemberFunction(
-                c, "mouseMoveEvent", _n_mouseMoveEvent0, None, Compiled,
-                qt_QTextEdit_mouseMoveEvent_void_QTextEdit_QMouseEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QTextEdit"),
-                new Param(c, "e", "qt.QMouseEvent"), End),
-            _func[18] = new MemberFunction(
-                c, "mousePressEvent", _n_mousePressEvent0, None, Compiled,
-                qt_QTextEdit_mousePressEvent_void_QTextEdit_QMouseEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QTextEdit"),
-                new Param(c, "e", "qt.QMouseEvent"), End),
-            _func[19] = new MemberFunction(
-                c, "mouseReleaseEvent", _n_mouseReleaseEvent0, None, Compiled,
-                qt_QTextEdit_mouseReleaseEvent_void_QTextEdit_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTextEdit"),
-                new Param(c, "e", "qt.QMouseEvent"), End),
-            _func[20] = new MemberFunction(
-                c, "paintEvent", _n_paintEvent0, None, Compiled,
-                qt_QTextEdit_paintEvent_void_QTextEdit_QPaintEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QTextEdit"),
-                new Param(c, "event", "qt.QPaintEvent"), End),
-            _func[21] = new MemberFunction(
-                c, "resizeEvent", _n_resizeEvent0, None, Compiled,
-                qt_QTextEdit_resizeEvent_void_QTextEdit_QResizeEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QTextEdit"),
-                new Param(c, "e", "qt.QResizeEvent"), End),
-            _func[22] = new MemberFunction(
-                c, "scrollContentsBy", _n_scrollContentsBy0, None, Compiled,
-                qt_QTextEdit_scrollContentsBy_void_QTextEdit_int_int, Return,
-                "void", Parameters, new Param(c, "this", "qt.QTextEdit"),
-                new Param(c, "dx", "int"), new Param(c, "dy", "int"), End),
-            _func[23] = new MemberFunction(
-                c, "showEvent", _n_showEvent0, None, Compiled,
-                qt_QTextEdit_showEvent_void_QTextEdit_QShowEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QTextEdit"),
-                new Param(c, "_p13", "qt.QShowEvent"), End),
-            _func[24] = new MemberFunction(
-                c, "wheelEvent", _n_wheelEvent0, None, Compiled,
-                qt_QTextEdit_wheelEvent_void_QTextEdit_QWheelEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QTextEdit"),
-                new Param(c, "e", "qt.QWheelEvent"), End),
-            _func[25] = new MemberFunction(
-                c, "setupViewport", _n_setupViewport0, None, Compiled,
-                qt_QTextEdit_setupViewport_void_QTextEdit_QWidget, Return,
-                "void", Parameters, new Param(c, "this", "qt.QTextEdit"),
-                new Param(c, "viewport", "qt.QWidget"), End),
-            _func[26] = new MemberFunction(
-                c, "minimumSizeHint", _n_minimumSizeHint0, None, Compiled,
-                qt_QTextEdit_minimumSizeHint_QSize_QTextEdit, Return,
-                "qt.QSize", Parameters, new Param(c, "this", "qt.QTextEdit"),
-                End),
-            _func[27] = new MemberFunction(
-                c, "sizeHint", _n_sizeHint0, None, Compiled,
-                qt_QTextEdit_sizeHint_QSize_QTextEdit, Return, "qt.QSize",
-                Parameters, new Param(c, "this", "qt.QTextEdit"), End),
-            _func[28] = new MemberFunction(
-                c, "viewportEvent", _n_viewportEvent0, None, Compiled,
-                qt_QTextEdit_viewportEvent_bool_QTextEdit_QEvent, Return,
-                "bool", Parameters, new Param(c, "this", "qt.QTextEdit"),
-                new Param(c, "event", "qt.QEvent"), End),
-            _func[29] = new MemberFunction(
-                c, "viewportSizeHint", _n_viewportSizeHint0, None, Compiled,
-                qt_QTextEdit_viewportSizeHint_QSize_QTextEdit, Return,
-                "qt.QSize", Parameters, new Param(c, "this", "qt.QTextEdit"),
-                End),
-            _func[30] = new MemberFunction(
-                c, "event", _n_event0, None, Compiled,
-                qt_QTextEdit_event_bool_QTextEdit_QEvent, Return, "bool",
-                Parameters, new Param(c, "this", "qt.QTextEdit"),
-                new Param(c, "event_", "qt.QEvent"), End),
+            _func[14] = new MemberFunction(c, "keyPressEvent", _n_keyPressEvent0, None, Compiled,
+                                           qt_QTextEdit_keyPressEvent_void_QTextEdit_QKeyEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QTextEdit"), new Param(c, "e", "qt.QKeyEvent"), End),
+            _func[15] = new MemberFunction(c, "keyReleaseEvent", _n_keyReleaseEvent0, None, Compiled,
+                                           qt_QTextEdit_keyReleaseEvent_void_QTextEdit_QKeyEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QTextEdit"), new Param(c, "e", "qt.QKeyEvent"), End),
+            _func[16] = new MemberFunction(c, "mouseDoubleClickEvent", _n_mouseDoubleClickEvent0, None, Compiled,
+                                           qt_QTextEdit_mouseDoubleClickEvent_void_QTextEdit_QMouseEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QTextEdit"), new Param(c, "e", "qt.QMouseEvent"), End),
+            _func[17] = new MemberFunction(c, "mouseMoveEvent", _n_mouseMoveEvent0, None, Compiled,
+                                           qt_QTextEdit_mouseMoveEvent_void_QTextEdit_QMouseEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QTextEdit"), new Param(c, "e", "qt.QMouseEvent"), End),
+            _func[18] = new MemberFunction(c, "mousePressEvent", _n_mousePressEvent0, None, Compiled,
+                                           qt_QTextEdit_mousePressEvent_void_QTextEdit_QMouseEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QTextEdit"), new Param(c, "e", "qt.QMouseEvent"), End),
+            _func[19] = new MemberFunction(c, "mouseReleaseEvent", _n_mouseReleaseEvent0, None, Compiled,
+                                           qt_QTextEdit_mouseReleaseEvent_void_QTextEdit_QMouseEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QTextEdit"), new Param(c, "e", "qt.QMouseEvent"), End),
+            _func[20] = new MemberFunction(c, "paintEvent", _n_paintEvent0, None, Compiled,
+                                           qt_QTextEdit_paintEvent_void_QTextEdit_QPaintEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QTextEdit"), new Param(c, "event", "qt.QPaintEvent"), End),
+            _func[21] = new MemberFunction(c, "resizeEvent", _n_resizeEvent0, None, Compiled,
+                                           qt_QTextEdit_resizeEvent_void_QTextEdit_QResizeEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QTextEdit"), new Param(c, "e", "qt.QResizeEvent"), End),
+            _func[22] = new MemberFunction(c, "scrollContentsBy", _n_scrollContentsBy0, None, Compiled,
+                                           qt_QTextEdit_scrollContentsBy_void_QTextEdit_int_int, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QTextEdit"), new Param(c, "dx", "int"), new Param(c, "dy", "int"), End),
+            _func[23] =
+                new MemberFunction(c, "showEvent", _n_showEvent0, None, Compiled, qt_QTextEdit_showEvent_void_QTextEdit_QShowEvent, Return,
+                                   "void", Parameters, new Param(c, "this", "qt.QTextEdit"), new Param(c, "_p13", "qt.QShowEvent"), End),
+            _func[24] = new MemberFunction(c, "wheelEvent", _n_wheelEvent0, None, Compiled,
+                                           qt_QTextEdit_wheelEvent_void_QTextEdit_QWheelEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QTextEdit"), new Param(c, "e", "qt.QWheelEvent"), End),
+            _func[25] = new MemberFunction(c, "setupViewport", _n_setupViewport0, None, Compiled,
+                                           qt_QTextEdit_setupViewport_void_QTextEdit_QWidget, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QTextEdit"), new Param(c, "viewport", "qt.QWidget"), End),
+            _func[26] =
+                new MemberFunction(c, "minimumSizeHint", _n_minimumSizeHint0, None, Compiled, qt_QTextEdit_minimumSizeHint_QSize_QTextEdit,
+                                   Return, "qt.QSize", Parameters, new Param(c, "this", "qt.QTextEdit"), End),
+            _func[27] = new MemberFunction(c, "sizeHint", _n_sizeHint0, None, Compiled, qt_QTextEdit_sizeHint_QSize_QTextEdit, Return,
+                                           "qt.QSize", Parameters, new Param(c, "this", "qt.QTextEdit"), End),
+            _func[28] = new MemberFunction(c, "viewportEvent", _n_viewportEvent0, None, Compiled,
+                                           qt_QTextEdit_viewportEvent_bool_QTextEdit_QEvent, Return, "bool", Parameters,
+                                           new Param(c, "this", "qt.QTextEdit"), new Param(c, "event", "qt.QEvent"), End),
+            _func[29] = new MemberFunction(c, "viewportSizeHint", _n_viewportSizeHint0, None, Compiled,
+                                           qt_QTextEdit_viewportSizeHint_QSize_QTextEdit, Return, "qt.QSize", Parameters,
+                                           new Param(c, "this", "qt.QTextEdit"), End),
+            _func[30] = new MemberFunction(c, "event", _n_event0, None, Compiled, qt_QTextEdit_event_bool_QTextEdit_QEvent, Return, "bool",
+                                           Parameters, new Param(c, "this", "qt.QTextEdit"), new Param(c, "event_", "qt.QEvent"), End),
             // static functions
             EndArguments);
         globalScope()->addSymbols(EndArguments);

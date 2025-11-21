@@ -61,29 +61,24 @@ namespace Mu
         _baseType = 0;
     }
 
-    MuQt_QLabel::MuQt_QLabel(Pointer muobj, const CallEnvironment* ce,
-                             QWidget* parent, Qt::WindowFlags f)
+    MuQt_QLabel::MuQt_QLabel(Pointer muobj, const CallEnvironment* ce, QWidget* parent, Qt::WindowFlags f)
         : QLabel(parent, f)
     {
         _env = ce;
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QLabelType>(
-            c->internName("qt.QLabel"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QLabelType>(c->internName("qt.QLabel"));
     }
 
-    MuQt_QLabel::MuQt_QLabel(Pointer muobj, const CallEnvironment* ce,
-                             const QString& text, QWidget* parent,
-                             Qt::WindowFlags f)
+    MuQt_QLabel::MuQt_QLabel(Pointer muobj, const CallEnvironment* ce, const QString& text, QWidget* parent, Qt::WindowFlags f)
         : QLabel(text, parent, f)
     {
         _env = ce;
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QLabelType>(
-            c->internName("qt.QLabel"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QLabelType>(c->internName("qt.QLabel"));
     }
 
     int MuQt_QLabel::heightForWidth(int w) const
@@ -184,8 +179,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqpointer<QContextMenuEventType>(
-                c, ev, "qt.QContextMenuEvent"));
+            args[1] = Value(makeqpointer<QContextMenuEventType>(c, ev, "qt.QContextMenuEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -229,8 +223,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QFocusEventType>(c, ev, "qt.QFocusEvent"));
+            args[1] = Value(makeqpointer<QFocusEventType>(c, ev, "qt.QFocusEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -274,8 +267,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QFocusEventType>(c, ev, "qt.QFocusEvent"));
+            args[1] = Value(makeqpointer<QFocusEventType>(c, ev, "qt.QFocusEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -321,8 +313,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QMouseEventType>(c, ev, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, ev, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -345,8 +336,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QMouseEventType>(c, ev, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, ev, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -369,8 +359,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QMouseEventType>(c, ev, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, ev, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -393,8 +382,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QPaintEventType>(c, _p14, "qt.QPaintEvent"));
+            args[1] = Value(makeqpointer<QPaintEventType>(c, _p14, "qt.QPaintEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -406,8 +394,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  Mu Type CONSTRUCTORS
 
-    QLabelType::QLabelType(Context* c, const char* name, Class* super,
-                           Class* super2)
+    QLabelType::QLabelType(Context* c, const char* name, Class* super, Class* super2)
         : Class(c, name, vectorOf2(super, super2))
     {
     }
@@ -428,8 +415,7 @@ namespace Mu
         }
         else if (QLabel* w = object<QLabel>(widget))
         {
-            QLabelType* type = c->findSymbolOfTypeByQualifiedName<QLabelType>(
-                c->internName("qt.QLabel"), false);
+            QLabelType* type = c->findSymbolOfTypeByQualifiedName<QLabelType>(c->internName("qt.QLabel"), false);
             ClassInstance* o = ClassInstance::allocate(type);
             setobject(o, w);
             return o;
@@ -440,58 +426,43 @@ namespace Mu
         }
     }
 
-    static NODE_IMPLEMENTATION(castFromObject, Pointer)
-    {
-        NODE_RETURN(QLabel_QLabel_QObject(NODE_THREAD, NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(castFromObject, Pointer) { NODE_RETURN(QLabel_QLabel_QObject(NODE_THREAD, NODE_ARG(0, Pointer))); }
 
-    Pointer qt_QLabel_QLabel_QLabel_QLabel_QWidget_int(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this,
-                                                       Pointer param_parent,
-                                                       int param_f)
+    Pointer qt_QLabel_QLabel_QLabel_QLabel_QWidget_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent, int param_f)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWidget* arg1 = object<QWidget>(param_parent);
         Qt::WindowFlags arg2 = (Qt::WindowFlags)(param_f);
-        setobject(param_this,
-                  new MuQt_QLabel(param_this, NODE_THREAD.process()->callEnv(),
-                                  arg1, arg2));
+        setobject(param_this, new MuQt_QLabel(param_this, NODE_THREAD.process()->callEnv(), arg1, arg2));
         return param_this;
     }
 
-    Pointer qt_QLabel_QLabel_QLabel_QLabel_string_QWidget_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_text,
-        Pointer param_parent, int param_f)
+    Pointer qt_QLabel_QLabel_QLabel_QLabel_string_QWidget_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_text,
+                                                              Pointer param_parent, int param_f)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QString arg1 = qstring(param_text);
         QWidget* arg2 = object<QWidget>(param_parent);
         Qt::WindowFlags arg3 = (Qt::WindowFlags)(param_f);
-        setobject(param_this,
-                  new MuQt_QLabel(param_this, NODE_THREAD.process()->callEnv(),
-                                  arg1, arg2, arg3));
+        setobject(param_this, new MuQt_QLabel(param_this, NODE_THREAD.process()->callEnv(), arg1, arg2, arg3));
         return param_this;
     }
 
-    Pointer qt_QLabel_buddy_QWidget_QLabel(Mu::Thread& NODE_THREAD,
-                                           Pointer param_this)
+    Pointer qt_QLabel_buddy_QWidget_QLabel(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QLabel* arg0 = object<QLabel>(param_this);
         return makeinstance<QWidgetType>(c, arg0->buddy(), "qt.QWidget");
     }
 
-    int qt_QLabel_selectionStart_int_QLabel(Mu::Thread& NODE_THREAD,
-                                            Pointer param_this)
+    int qt_QLabel_selectionStart_int_QLabel(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QLabel* arg0 = object<QLabel>(param_this);
         return arg0->selectionStart();
     }
 
-    void qt_QLabel_setBuddy_void_QLabel_QWidget(Mu::Thread& NODE_THREAD,
-                                                Pointer param_this,
-                                                Pointer param_buddy)
+    void qt_QLabel_setBuddy_void_QLabel_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_buddy)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QLabel* arg0 = object<QLabel>(param_this);
@@ -499,10 +470,7 @@ namespace Mu
         arg0->setBuddy(arg1);
     }
 
-    void qt_QLabel_setSelection_void_QLabel_int_int(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this,
-                                                    int param_start,
-                                                    int param_length)
+    void qt_QLabel_setSelection_void_QLabel_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_start, int param_length)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QLabel* arg0 = object<QLabel>(param_this);
@@ -511,42 +479,31 @@ namespace Mu
         arg0->setSelection(arg1, arg2);
     }
 
-    int qt_QLabel_heightForWidth_int_QLabel_int(Mu::Thread& NODE_THREAD,
-                                                Pointer param_this, int param_w)
+    int qt_QLabel_heightForWidth_int_QLabel_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_w)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QLabel* arg0 = object<QLabel>(param_this);
         int arg1 = (int)(param_w);
-        return isMuQtObject(arg0) ? arg0->QLabel::heightForWidth(arg1)
-                                  : arg0->heightForWidth(arg1);
+        return isMuQtObject(arg0) ? arg0->QLabel::heightForWidth(arg1) : arg0->heightForWidth(arg1);
     }
 
-    Pointer qt_QLabel_minimumSizeHint_QSize_QLabel(Mu::Thread& NODE_THREAD,
-                                                   Pointer param_this)
+    Pointer qt_QLabel_minimumSizeHint_QSize_QLabel(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QLabel* arg0 = object<QLabel>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QSizeType>(c, arg0->QLabel::minimumSizeHint(),
-                                          "qt.QSize")
-                   : makeqtype<QSizeType>(c, arg0->minimumSizeHint(),
-                                          "qt.QSize");
+        return isMuQtObject(arg0) ? makeqtype<QSizeType>(c, arg0->QLabel::minimumSizeHint(), "qt.QSize")
+                                  : makeqtype<QSizeType>(c, arg0->minimumSizeHint(), "qt.QSize");
     }
 
-    Pointer qt_QLabel_sizeHint_QSize_QLabel(Mu::Thread& NODE_THREAD,
-                                            Pointer param_this)
+    Pointer qt_QLabel_sizeHint_QSize_QLabel(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QLabel* arg0 = object<QLabel>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QSizeType>(c, arg0->QLabel::sizeHint(),
-                                          "qt.QSize")
-                   : makeqtype<QSizeType>(c, arg0->sizeHint(), "qt.QSize");
+        return isMuQtObject(arg0) ? makeqtype<QSizeType>(c, arg0->QLabel::sizeHint(), "qt.QSize")
+                                  : makeqtype<QSizeType>(c, arg0->sizeHint(), "qt.QSize");
     }
 
-    void qt_QLabel_changeEvent_void_QLabel_QEvent(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this,
-                                                  Pointer param_ev)
+    void qt_QLabel_changeEvent_void_QLabel_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_ev)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QLabel* arg0 = object<QLabel>(param_this);
@@ -557,8 +514,7 @@ namespace Mu
             ((MuQt_QLabel*)arg0)->changeEvent_pub(arg1);
     }
 
-    void qt_QLabel_contextMenuEvent_void_QLabel_QContextMenuEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_ev)
+    void qt_QLabel_contextMenuEvent_void_QLabel_QContextMenuEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_ev)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QLabel* arg0 = object<QLabel>(param_this);
@@ -569,19 +525,15 @@ namespace Mu
             ((MuQt_QLabel*)arg0)->contextMenuEvent_pub(arg1);
     }
 
-    bool qt_QLabel_event_bool_QLabel_QEvent(Mu::Thread& NODE_THREAD,
-                                            Pointer param_this, Pointer param_e)
+    bool qt_QLabel_event_bool_QLabel_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QLabel* arg0 = object<QLabel>(param_this);
         QEvent* arg1 = getqpointer<QEventType>(param_e);
-        return isMuQtObject(arg0) ? ((MuQt_QLabel*)arg0)->event_pub_parent(arg1)
-                                  : ((MuQt_QLabel*)arg0)->event_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QLabel*)arg0)->event_pub_parent(arg1) : ((MuQt_QLabel*)arg0)->event_pub(arg1);
     }
 
-    void qt_QLabel_focusInEvent_void_QLabel_QFocusEvent(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this,
-                                                        Pointer param_ev)
+    void qt_QLabel_focusInEvent_void_QLabel_QFocusEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_ev)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QLabel* arg0 = object<QLabel>(param_this);
@@ -592,20 +544,16 @@ namespace Mu
             ((MuQt_QLabel*)arg0)->focusInEvent_pub(arg1);
     }
 
-    bool qt_QLabel_focusNextPrevChild_bool_QLabel_bool(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this,
-                                                       bool param_next)
+    bool qt_QLabel_focusNextPrevChild_bool_QLabel_bool(Mu::Thread& NODE_THREAD, Pointer param_this, bool param_next)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QLabel* arg0 = object<QLabel>(param_this);
         bool arg1 = (bool)(param_next);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QLabel*)arg0)->focusNextPrevChild_pub_parent(arg1)
-                   : ((MuQt_QLabel*)arg0)->focusNextPrevChild_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QLabel*)arg0)->focusNextPrevChild_pub_parent(arg1)
+                                  : ((MuQt_QLabel*)arg0)->focusNextPrevChild_pub(arg1);
     }
 
-    void qt_QLabel_focusOutEvent_void_QLabel_QFocusEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_ev)
+    void qt_QLabel_focusOutEvent_void_QLabel_QFocusEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_ev)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QLabel* arg0 = object<QLabel>(param_this);
@@ -616,9 +564,7 @@ namespace Mu
             ((MuQt_QLabel*)arg0)->focusOutEvent_pub(arg1);
     }
 
-    void qt_QLabel_keyPressEvent_void_QLabel_QKeyEvent(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this,
-                                                       Pointer param_ev)
+    void qt_QLabel_keyPressEvent_void_QLabel_QKeyEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_ev)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QLabel* arg0 = object<QLabel>(param_this);
@@ -629,8 +575,7 @@ namespace Mu
             ((MuQt_QLabel*)arg0)->keyPressEvent_pub(arg1);
     }
 
-    void qt_QLabel_mouseMoveEvent_void_QLabel_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_ev)
+    void qt_QLabel_mouseMoveEvent_void_QLabel_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_ev)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QLabel* arg0 = object<QLabel>(param_this);
@@ -641,8 +586,7 @@ namespace Mu
             ((MuQt_QLabel*)arg0)->mouseMoveEvent_pub(arg1);
     }
 
-    void qt_QLabel_mousePressEvent_void_QLabel_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_ev)
+    void qt_QLabel_mousePressEvent_void_QLabel_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_ev)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QLabel* arg0 = object<QLabel>(param_this);
@@ -653,8 +597,7 @@ namespace Mu
             ((MuQt_QLabel*)arg0)->mousePressEvent_pub(arg1);
     }
 
-    void qt_QLabel_mouseReleaseEvent_void_QLabel_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_ev)
+    void qt_QLabel_mouseReleaseEvent_void_QLabel_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_ev)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QLabel* arg0 = object<QLabel>(param_this);
@@ -665,9 +608,7 @@ namespace Mu
             ((MuQt_QLabel*)arg0)->mouseReleaseEvent_pub(arg1);
     }
 
-    void qt_QLabel_paintEvent_void_QLabel_QPaintEvent(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this,
-                                                      Pointer param__p14)
+    void qt_QLabel_paintEvent_void_QLabel_QPaintEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param__p14)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QLabel* arg0 = object<QLabel>(param_this);
@@ -680,125 +621,104 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(_n_QLabel0, Pointer)
     {
-        NODE_RETURN(qt_QLabel_QLabel_QLabel_QLabel_QWidget_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int)));
+        NODE_RETURN(
+            qt_QLabel_QLabel_QLabel_QLabel_QWidget_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_QLabel1, Pointer)
     {
-        NODE_RETURN(qt_QLabel_QLabel_QLabel_QLabel_string_QWidget_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer), NODE_ARG(3, int)));
+        NODE_RETURN(qt_QLabel_QLabel_QLabel_QLabel_string_QWidget_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                      NODE_ARG(2, Pointer), NODE_ARG(3, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_buddy0, Pointer)
     {
-        NODE_RETURN(qt_QLabel_buddy_QWidget_QLabel(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QLabel_buddy_QWidget_QLabel(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_selectionStart0, int)
     {
-        NODE_RETURN(qt_QLabel_selectionStart_int_QLabel(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QLabel_selectionStart_int_QLabel(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_setBuddy0, void)
     {
-        qt_QLabel_setBuddy_void_QLabel_QWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QLabel_setBuddy_void_QLabel_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setSelection0, void)
     {
-        qt_QLabel_setSelection_void_QLabel_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int));
+        qt_QLabel_setSelection_void_QLabel_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_heightForWidth0, int)
     {
-        NODE_RETURN(qt_QLabel_heightForWidth_int_QLabel_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QLabel_heightForWidth_int_QLabel_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_minimumSizeHint0, Pointer)
     {
-        NODE_RETURN(qt_QLabel_minimumSizeHint_QSize_QLabel(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QLabel_minimumSizeHint_QSize_QLabel(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_sizeHint0, Pointer)
     {
-        NODE_RETURN(qt_QLabel_sizeHint_QSize_QLabel(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QLabel_sizeHint_QSize_QLabel(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_changeEvent0, void)
     {
-        qt_QLabel_changeEvent_void_QLabel_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QLabel_changeEvent_void_QLabel_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_contextMenuEvent0, void)
     {
-        qt_QLabel_contextMenuEvent_void_QLabel_QContextMenuEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QLabel_contextMenuEvent_void_QLabel_QContextMenuEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_event0, bool)
     {
-        NODE_RETURN(qt_QLabel_event_bool_QLabel_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QLabel_event_bool_QLabel_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_focusInEvent0, void)
     {
-        qt_QLabel_focusInEvent_void_QLabel_QFocusEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QLabel_focusInEvent_void_QLabel_QFocusEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_focusNextPrevChild0, bool)
     {
-        NODE_RETURN(qt_QLabel_focusNextPrevChild_bool_QLabel_bool(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool)));
+        NODE_RETURN(qt_QLabel_focusNextPrevChild_bool_QLabel_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool)));
     }
 
     static NODE_IMPLEMENTATION(_n_focusOutEvent0, void)
     {
-        qt_QLabel_focusOutEvent_void_QLabel_QFocusEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QLabel_focusOutEvent_void_QLabel_QFocusEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_keyPressEvent0, void)
     {
-        qt_QLabel_keyPressEvent_void_QLabel_QKeyEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QLabel_keyPressEvent_void_QLabel_QKeyEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseMoveEvent0, void)
     {
-        qt_QLabel_mouseMoveEvent_void_QLabel_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QLabel_mouseMoveEvent_void_QLabel_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mousePressEvent0, void)
     {
-        qt_QLabel_mousePressEvent_void_QLabel_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QLabel_mousePressEvent_void_QLabel_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseReleaseEvent0, void)
     {
-        qt_QLabel_mouseReleaseEvent_void_QLabel_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QLabel_mouseReleaseEvent_void_QLabel_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_paintEvent0, void)
     {
-        qt_QLabel_paintEvent_void_QLabel_QPaintEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QLabel_paintEvent_void_QLabel_QPaintEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     void QLabelType::load()
@@ -818,16 +738,13 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
-                   new Function(c, tn, castFromObject, Cast, Compiled,
-                                QLabel_QLabel_QObject, Return, ftn, Parameters,
+                   new Function(c, tn, castFromObject, Cast, Compiled, QLabel_QLabel_QObject, Return, ftn, Parameters,
                                 new Param(c, "object", "qt.QObject"), End),
 
                    EndArguments);
@@ -835,23 +752,15 @@ namespace Mu
         addSymbols(
             // enums
             // member functions
-            new Function(
-                c, "QLabel", _n_QLabel0, None, Compiled,
-                qt_QLabel_QLabel_QLabel_QLabel_QWidget_int, Return, "qt.QLabel",
-                Parameters, new Param(c, "this", "qt.QLabel"),
-                new Param(c, "parent", "qt.QWidget"),
-                new Param(c, "f", "int", Value((int)Qt::WindowFlags())), End),
-            new Function(
-                c, "QLabel", _n_QLabel1, None, Compiled,
-                qt_QLabel_QLabel_QLabel_QLabel_string_QWidget_int, Return,
-                "qt.QLabel", Parameters, new Param(c, "this", "qt.QLabel"),
-                new Param(c, "text", "string"),
-                new Param(c, "parent", "qt.QWidget"),
-                new Param(c, "f", "int", Value((int)Qt::WindowFlags())), End),
+            new Function(c, "QLabel", _n_QLabel0, None, Compiled, qt_QLabel_QLabel_QLabel_QLabel_QWidget_int, Return, "qt.QLabel",
+                         Parameters, new Param(c, "this", "qt.QLabel"), new Param(c, "parent", "qt.QWidget"),
+                         new Param(c, "f", "int", Value((int)Qt::WindowFlags())), End),
+            new Function(c, "QLabel", _n_QLabel1, None, Compiled, qt_QLabel_QLabel_QLabel_QLabel_string_QWidget_int, Return, "qt.QLabel",
+                         Parameters, new Param(c, "this", "qt.QLabel"), new Param(c, "text", "string"),
+                         new Param(c, "parent", "qt.QWidget"), new Param(c, "f", "int", Value((int)Qt::WindowFlags())), End),
             // PROP: alignment (flags Qt::Alignment; QLabel this)
-            new Function(c, "buddy", _n_buddy0, None, Compiled,
-                         qt_QLabel_buddy_QWidget_QLabel, Return, "qt.QWidget",
-                         Parameters, new Param(c, "this", "qt.QLabel"), End),
+            new Function(c, "buddy", _n_buddy0, None, Compiled, qt_QLabel_buddy_QWidget_QLabel, Return, "qt.QWidget", Parameters,
+                         new Param(c, "this", "qt.QLabel"), End),
             // PROP: hasScaledContents (bool; QLabel this)
             // PROP: hasSelectedText (bool; QLabel this)
             // PROP: indent (int; QLabel this)
@@ -861,24 +770,17 @@ namespace Mu
             // MISSING: picture ("const QPicture *"; QLabel this)
             // PROP: pixmap (QPixmap; QLabel this)
             // PROP: selectedText (string; QLabel this)
-            new Function(c, "selectionStart", _n_selectionStart0, None,
-                         Compiled, qt_QLabel_selectionStart_int_QLabel, Return,
-                         "int", Parameters, new Param(c, "this", "qt.QLabel"),
-                         End),
+            new Function(c, "selectionStart", _n_selectionStart0, None, Compiled, qt_QLabel_selectionStart_int_QLabel, Return, "int",
+                         Parameters, new Param(c, "this", "qt.QLabel"), End),
             // PROP: setAlignment (void; QLabel this, flags Qt::Alignment _p14)
-            new Function(c, "setBuddy", _n_setBuddy0, None, Compiled,
-                         qt_QLabel_setBuddy_void_QLabel_QWidget, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QLabel"),
-                         new Param(c, "buddy", "qt.QWidget"), End),
+            new Function(c, "setBuddy", _n_setBuddy0, None, Compiled, qt_QLabel_setBuddy_void_QLabel_QWidget, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QLabel"), new Param(c, "buddy", "qt.QWidget"), End),
             // PROP: setIndent (void; QLabel this, int _p4)
             // PROP: setMargin (void; QLabel this, int _p4)
             // PROP: setOpenExternalLinks (void; QLabel this, bool open)
             // PROP: setScaledContents (void; QLabel this, bool _p5)
-            new Function(c, "setSelection", _n_setSelection0, None, Compiled,
-                         qt_QLabel_setSelection_void_QLabel_int_int, Return,
-                         "void", Parameters, new Param(c, "this", "qt.QLabel"),
-                         new Param(c, "start", "int"),
-                         new Param(c, "length", "int"), End),
+            new Function(c, "setSelection", _n_setSelection0, None, Compiled, qt_QLabel_setSelection_void_QLabel_int_int, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QLabel"), new Param(c, "start", "int"), new Param(c, "length", "int"), End),
             // PROP: setTextFormat (void; QLabel this, flags Qt::TextFormat
             // _p15) PROP: setTextInteractionFlags (void; QLabel this, flags
             // Qt::TextInteractionFlags flags) PROP: setWordWrap (void; QLabel
@@ -886,74 +788,44 @@ namespace Mu
             // (flags Qt::TextFormat; QLabel this) PROP: textInteractionFlags
             // (flags Qt::TextInteractionFlags; QLabel this) PROP: wordWrap
             // (bool; QLabel this)
-            _func[0] = new MemberFunction(
-                c, "heightForWidth", _n_heightForWidth0, None, Compiled,
-                qt_QLabel_heightForWidth_int_QLabel_int, Return, "int",
-                Parameters, new Param(c, "this", "qt.QLabel"),
-                new Param(c, "w", "int"), End),
-            _func[1] = new MemberFunction(
-                c, "minimumSizeHint", _n_minimumSizeHint0, None, Compiled,
-                qt_QLabel_minimumSizeHint_QSize_QLabel, Return, "qt.QSize",
-                Parameters, new Param(c, "this", "qt.QLabel"), End),
-            _func[2] = new MemberFunction(
-                c, "sizeHint", _n_sizeHint0, None, Compiled,
-                qt_QLabel_sizeHint_QSize_QLabel, Return, "qt.QSize", Parameters,
-                new Param(c, "this", "qt.QLabel"), End),
-            _func[3] = new MemberFunction(
-                c, "changeEvent", _n_changeEvent0, None, Compiled,
-                qt_QLabel_changeEvent_void_QLabel_QEvent, Return, "void",
-                Parameters, new Param(c, "this", "qt.QLabel"),
-                new Param(c, "ev", "qt.QEvent"), End),
-            _func[4] = new MemberFunction(
-                c, "contextMenuEvent", _n_contextMenuEvent0, None, Compiled,
-                qt_QLabel_contextMenuEvent_void_QLabel_QContextMenuEvent,
-                Return, "void", Parameters, new Param(c, "this", "qt.QLabel"),
-                new Param(c, "ev", "qt.QContextMenuEvent"), End),
-            _func[5] = new MemberFunction(c, "event", _n_event0, None, Compiled,
-                                          qt_QLabel_event_bool_QLabel_QEvent,
-                                          Return, "bool", Parameters,
-                                          new Param(c, "this", "qt.QLabel"),
-                                          new Param(c, "e", "qt.QEvent"), End),
-            _func[6] = new MemberFunction(
-                c, "focusInEvent", _n_focusInEvent0, None, Compiled,
-                qt_QLabel_focusInEvent_void_QLabel_QFocusEvent, Return, "void",
-                Parameters, new Param(c, "this", "qt.QLabel"),
-                new Param(c, "ev", "qt.QFocusEvent"), End),
-            _func[7] = new MemberFunction(
-                c, "focusNextPrevChild", _n_focusNextPrevChild0, None, Compiled,
-                qt_QLabel_focusNextPrevChild_bool_QLabel_bool, Return, "bool",
-                Parameters, new Param(c, "this", "qt.QLabel"),
-                new Param(c, "next", "bool"), End),
-            _func[8] = new MemberFunction(
-                c, "focusOutEvent", _n_focusOutEvent0, None, Compiled,
-                qt_QLabel_focusOutEvent_void_QLabel_QFocusEvent, Return, "void",
-                Parameters, new Param(c, "this", "qt.QLabel"),
-                new Param(c, "ev", "qt.QFocusEvent"), End),
-            _func[9] = new MemberFunction(
-                c, "keyPressEvent", _n_keyPressEvent0, None, Compiled,
-                qt_QLabel_keyPressEvent_void_QLabel_QKeyEvent, Return, "void",
-                Parameters, new Param(c, "this", "qt.QLabel"),
-                new Param(c, "ev", "qt.QKeyEvent"), End),
-            _func[10] = new MemberFunction(
-                c, "mouseMoveEvent", _n_mouseMoveEvent0, None, Compiled,
-                qt_QLabel_mouseMoveEvent_void_QLabel_QMouseEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QLabel"),
-                new Param(c, "ev", "qt.QMouseEvent"), End),
-            _func[11] = new MemberFunction(
-                c, "mousePressEvent", _n_mousePressEvent0, None, Compiled,
-                qt_QLabel_mousePressEvent_void_QLabel_QMouseEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QLabel"),
-                new Param(c, "ev", "qt.QMouseEvent"), End),
-            _func[12] = new MemberFunction(
-                c, "mouseReleaseEvent", _n_mouseReleaseEvent0, None, Compiled,
-                qt_QLabel_mouseReleaseEvent_void_QLabel_QMouseEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QLabel"),
-                new Param(c, "ev", "qt.QMouseEvent"), End),
-            _func[13] = new MemberFunction(
-                c, "paintEvent", _n_paintEvent0, None, Compiled,
-                qt_QLabel_paintEvent_void_QLabel_QPaintEvent, Return, "void",
-                Parameters, new Param(c, "this", "qt.QLabel"),
-                new Param(c, "_p14", "qt.QPaintEvent"), End),
+            _func[0] = new MemberFunction(c, "heightForWidth", _n_heightForWidth0, None, Compiled, qt_QLabel_heightForWidth_int_QLabel_int,
+                                          Return, "int", Parameters, new Param(c, "this", "qt.QLabel"), new Param(c, "w", "int"), End),
+            _func[1] = new MemberFunction(c, "minimumSizeHint", _n_minimumSizeHint0, None, Compiled, qt_QLabel_minimumSizeHint_QSize_QLabel,
+                                          Return, "qt.QSize", Parameters, new Param(c, "this", "qt.QLabel"), End),
+            _func[2] = new MemberFunction(c, "sizeHint", _n_sizeHint0, None, Compiled, qt_QLabel_sizeHint_QSize_QLabel, Return, "qt.QSize",
+                                          Parameters, new Param(c, "this", "qt.QLabel"), End),
+            _func[3] =
+                new MemberFunction(c, "changeEvent", _n_changeEvent0, None, Compiled, qt_QLabel_changeEvent_void_QLabel_QEvent, Return,
+                                   "void", Parameters, new Param(c, "this", "qt.QLabel"), new Param(c, "ev", "qt.QEvent"), End),
+            _func[4] = new MemberFunction(c, "contextMenuEvent", _n_contextMenuEvent0, None, Compiled,
+                                          qt_QLabel_contextMenuEvent_void_QLabel_QContextMenuEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QLabel"), new Param(c, "ev", "qt.QContextMenuEvent"), End),
+            _func[5] = new MemberFunction(c, "event", _n_event0, None, Compiled, qt_QLabel_event_bool_QLabel_QEvent, Return, "bool",
+                                          Parameters, new Param(c, "this", "qt.QLabel"), new Param(c, "e", "qt.QEvent"), End),
+            _func[6] = new MemberFunction(c, "focusInEvent", _n_focusInEvent0, None, Compiled,
+                                          qt_QLabel_focusInEvent_void_QLabel_QFocusEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QLabel"), new Param(c, "ev", "qt.QFocusEvent"), End),
+            _func[7] = new MemberFunction(c, "focusNextPrevChild", _n_focusNextPrevChild0, None, Compiled,
+                                          qt_QLabel_focusNextPrevChild_bool_QLabel_bool, Return, "bool", Parameters,
+                                          new Param(c, "this", "qt.QLabel"), new Param(c, "next", "bool"), End),
+            _func[8] = new MemberFunction(c, "focusOutEvent", _n_focusOutEvent0, None, Compiled,
+                                          qt_QLabel_focusOutEvent_void_QLabel_QFocusEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QLabel"), new Param(c, "ev", "qt.QFocusEvent"), End),
+            _func[9] =
+                new MemberFunction(c, "keyPressEvent", _n_keyPressEvent0, None, Compiled, qt_QLabel_keyPressEvent_void_QLabel_QKeyEvent,
+                                   Return, "void", Parameters, new Param(c, "this", "qt.QLabel"), new Param(c, "ev", "qt.QKeyEvent"), End),
+            _func[10] = new MemberFunction(c, "mouseMoveEvent", _n_mouseMoveEvent0, None, Compiled,
+                                           qt_QLabel_mouseMoveEvent_void_QLabel_QMouseEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QLabel"), new Param(c, "ev", "qt.QMouseEvent"), End),
+            _func[11] = new MemberFunction(c, "mousePressEvent", _n_mousePressEvent0, None, Compiled,
+                                           qt_QLabel_mousePressEvent_void_QLabel_QMouseEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QLabel"), new Param(c, "ev", "qt.QMouseEvent"), End),
+            _func[12] = new MemberFunction(c, "mouseReleaseEvent", _n_mouseReleaseEvent0, None, Compiled,
+                                           qt_QLabel_mouseReleaseEvent_void_QLabel_QMouseEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QLabel"), new Param(c, "ev", "qt.QMouseEvent"), End),
+            _func[13] =
+                new MemberFunction(c, "paintEvent", _n_paintEvent0, None, Compiled, qt_QLabel_paintEvent_void_QLabel_QPaintEvent, Return,
+                                   "void", Parameters, new Param(c, "this", "qt.QLabel"), new Param(c, "_p14", "qt.QPaintEvent"), End),
             // static functions
             EndArguments);
         globalScope()->addSymbols(EndArguments);

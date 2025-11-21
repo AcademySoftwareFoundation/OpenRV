@@ -31,8 +31,7 @@ namespace IPCore
         //  Constructors
         //
 
-        LUTIPNode(const std::string& name, const NodeDefinition* def,
-                  IPGraph* graph, GroupIPNode* group = 0);
+        LUTIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group = 0);
 
         void lutinit();
         virtual ~LUTIPNode();

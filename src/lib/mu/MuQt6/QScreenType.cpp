@@ -96,8 +96,7 @@ namespace Mu
         {
             Function::ArgumentVector args(3);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeinstance<QObjectType>(c, watched, "qt.QObject"));
+            args[1] = Value(makeinstance<QObjectType>(c, watched, "qt.QObject"));
             args[2] = Value(makeqpointer<QEventType>(c, event, "qt.QEvent"));
             Value rval = _env->call(F, args);
             return (bool)(rval._bool);
@@ -145,8 +144,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QTimerEventType>(c, event, "qt.QTimerEvent"));
+            args[1] = Value(makeqpointer<QTimerEventType>(c, event, "qt.QTimerEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -158,8 +156,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  Mu Type CONSTRUCTORS
 
-    QScreenType::QScreenType(Context* c, const char* name, Class* super,
-                             Class* super2)
+    QScreenType::QScreenType(Context* c, const char* name, Class* super, Class* super2)
         : Class(c, name, vectorOf2(super, super2))
     {
     }
@@ -180,8 +177,7 @@ namespace Mu
         }
         else if (QScreen* w = object<QScreen>(widget))
         {
-            QScreenType* type = c->findSymbolOfTypeByQualifiedName<QScreenType>(
-                c->internName("qt.QScreen"), false);
+            QScreenType* type = c->findSymbolOfTypeByQualifiedName<QScreenType>(c->internName("qt.QScreen"), false);
             ClassInstance* o = ClassInstance::allocate(type);
             setobject(o, w);
             return o;
@@ -192,14 +188,9 @@ namespace Mu
         }
     }
 
-    static NODE_IMPLEMENTATION(castFromObject, Pointer)
-    {
-        NODE_RETURN(QScreen_QScreen_QObject(NODE_THREAD, NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(castFromObject, Pointer) { NODE_RETURN(QScreen_QScreen_QObject(NODE_THREAD, NODE_ARG(0, Pointer))); }
 
-    int qt_QScreen_angleBetween_int_QScreen_int_int(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this,
-                                                    int param_a, int param_b)
+    int qt_QScreen_angleBetween_int_QScreen_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_a, int param_b)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QScreen* arg0 = object<QScreen>(param_this);
@@ -208,17 +199,14 @@ namespace Mu
         return arg0->angleBetween(arg1, arg2);
     }
 
-    Pointer qt_QScreen_availableGeometry_QRect_QScreen(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this)
+    Pointer qt_QScreen_availableGeometry_QRect_QScreen(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QScreen* arg0 = object<QScreen>(param_this);
         return makeqtype<QRectType>(c, arg0->availableGeometry(), "qt.QRect");
     }
 
-    bool qt_QScreen_isLandscape_bool_QScreen_int(Mu::Thread& NODE_THREAD,
-                                                 Pointer param_this,
-                                                 int param_o)
+    bool qt_QScreen_isLandscape_bool_QScreen_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_o)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QScreen* arg0 = object<QScreen>(param_this);
@@ -226,8 +214,7 @@ namespace Mu
         return arg0->isLandscape(arg1);
     }
 
-    bool qt_QScreen_isPortrait_bool_QScreen_int(Mu::Thread& NODE_THREAD,
-                                                Pointer param_this, int param_o)
+    bool qt_QScreen_isPortrait_bool_QScreen_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_o)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QScreen* arg0 = object<QScreen>(param_this);
@@ -235,42 +222,36 @@ namespace Mu
         return arg0->isPortrait(arg1);
     }
 
-    Pointer qt_QScreen_mapBetween_QRect_QScreen_int_int_QRect(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_a, int param_b,
-        Pointer param_rect)
+    Pointer qt_QScreen_mapBetween_QRect_QScreen_int_int_QRect(Mu::Thread& NODE_THREAD, Pointer param_this, int param_a, int param_b,
+                                                              Pointer param_rect)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QScreen* arg0 = object<QScreen>(param_this);
         Qt::ScreenOrientation arg1 = (Qt::ScreenOrientation)(param_a);
         Qt::ScreenOrientation arg2 = (Qt::ScreenOrientation)(param_b);
         const QRect arg3 = getqtype<QRectType>(param_rect);
-        return makeqtype<QRectType>(c, arg0->mapBetween(arg1, arg2, arg3),
-                                    "qt.QRect");
+        return makeqtype<QRectType>(c, arg0->mapBetween(arg1, arg2, arg3), "qt.QRect");
     }
 
-    Pointer qt_QScreen_transformBetween_QTransform_QScreen_int_int_QRect(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_a, int param_b,
-        Pointer param_target)
+    Pointer qt_QScreen_transformBetween_QTransform_QScreen_int_int_QRect(Mu::Thread& NODE_THREAD, Pointer param_this, int param_a,
+                                                                         int param_b, Pointer param_target)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QScreen* arg0 = object<QScreen>(param_this);
         Qt::ScreenOrientation arg1 = (Qt::ScreenOrientation)(param_a);
         Qt::ScreenOrientation arg2 = (Qt::ScreenOrientation)(param_b);
         const QRect arg3 = getqtype<QRectType>(param_target);
-        return makeqtype<QTransformType>(
-            c, arg0->transformBetween(arg1, arg2, arg3), "qt.QTransform");
+        return makeqtype<QTransformType>(c, arg0->transformBetween(arg1, arg2, arg3), "qt.QTransform");
     }
 
-    Pointer qt_QScreen_virtualGeometry_QRect_QScreen(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_this)
+    Pointer qt_QScreen_virtualGeometry_QRect_QScreen(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QScreen* arg0 = object<QScreen>(param_this);
         return makeqtype<QRectType>(c, arg0->virtualGeometry(), "qt.QRect");
     }
 
-    Pointer qt_QScreen_virtualSiblingAt_QScreen_QScreen_QPoint(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_point)
+    Pointer qt_QScreen_virtualSiblingAt_QScreen_QScreen_QPoint(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_point)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QScreen* arg0 = object<QScreen>(param_this);
@@ -290,40 +271,32 @@ namespace Mu
         return makeinstance<QScreenType>(c, screen, "qt.QScreen");
     }
 
-    Pointer qt_QScreen_virtualSize_QSize_QScreen(Mu::Thread& NODE_THREAD,
-                                                 Pointer param_this)
+    Pointer qt_QScreen_virtualSize_QSize_QScreen(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QScreen* arg0 = object<QScreen>(param_this);
         return makeqtype<QSizeType>(c, arg0->virtualSize(), "qt.QSize");
     }
 
-    bool qt_QScreen_event_bool_QScreen_QEvent(Mu::Thread& NODE_THREAD,
-                                              Pointer param_this,
-                                              Pointer param_e)
+    bool qt_QScreen_event_bool_QScreen_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QScreen* arg0 = object<QScreen>(param_this);
         QEvent* arg1 = getqpointer<QEventType>(param_e);
-        return isMuQtObject(arg0) ? arg0->QScreen::event(arg1)
-                                  : arg0->event(arg1);
+        return isMuQtObject(arg0) ? arg0->QScreen::event(arg1) : arg0->event(arg1);
     }
 
-    bool qt_QScreen_eventFilter_bool_QScreen_QObject_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_watched,
-        Pointer param_event)
+    bool qt_QScreen_eventFilter_bool_QScreen_QObject_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_watched,
+                                                            Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QScreen* arg0 = object<QScreen>(param_this);
         QObject* arg1 = object<QObject>(param_watched);
         QEvent* arg2 = getqpointer<QEventType>(param_event);
-        return isMuQtObject(arg0) ? arg0->QScreen::eventFilter(arg1, arg2)
-                                  : arg0->eventFilter(arg1, arg2);
+        return isMuQtObject(arg0) ? arg0->QScreen::eventFilter(arg1, arg2) : arg0->eventFilter(arg1, arg2);
     }
 
-    void qt_QScreen_customEvent_void_QScreen_QEvent(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this,
-                                                    Pointer param_event)
+    void qt_QScreen_customEvent_void_QScreen_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QScreen* arg0 = object<QScreen>(param_this);
@@ -334,9 +307,7 @@ namespace Mu
             ((MuQt_QScreen*)arg0)->customEvent_pub(arg1);
     }
 
-    void qt_QScreen_timerEvent_void_QScreen_QTimerEvent(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this,
-                                                        Pointer param_event)
+    void qt_QScreen_timerEvent_void_QScreen_QTimerEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QScreen* arg0 = object<QScreen>(param_this);
@@ -349,85 +320,71 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(_n_angleBetween0, int)
     {
-        NODE_RETURN(qt_QScreen_angleBetween_int_QScreen_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int)));
+        NODE_RETURN(
+            qt_QScreen_angleBetween_int_QScreen_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_availableGeometry0, Pointer)
     {
-        NODE_RETURN(qt_QScreen_availableGeometry_QRect_QScreen(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QScreen_availableGeometry_QRect_QScreen(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isLandscape0, bool)
     {
-        NODE_RETURN(qt_QScreen_isLandscape_bool_QScreen_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QScreen_isLandscape_bool_QScreen_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_isPortrait0, bool)
     {
-        NODE_RETURN(qt_QScreen_isPortrait_bool_QScreen_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QScreen_isPortrait_bool_QScreen_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_mapBetween0, Pointer)
     {
-        NODE_RETURN(qt_QScreen_mapBetween_QRect_QScreen_int_int_QRect(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int), NODE_ARG(3, Pointer)));
+        NODE_RETURN(qt_QScreen_mapBetween_QRect_QScreen_int_int_QRect(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                      NODE_ARG(2, int), NODE_ARG(3, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_transformBetween0, Pointer)
     {
-        NODE_RETURN(
-            qt_QScreen_transformBetween_QTransform_QScreen_int_int_QRect(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-                NODE_ARG(2, int), NODE_ARG(3, Pointer)));
+        NODE_RETURN(qt_QScreen_transformBetween_QTransform_QScreen_int_int_QRect(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                                 NODE_ARG(2, int), NODE_ARG(3, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_virtualGeometry0, Pointer)
     {
-        NODE_RETURN(qt_QScreen_virtualGeometry_QRect_QScreen(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QScreen_virtualGeometry_QRect_QScreen(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_virtualSiblingAt0, Pointer)
     {
-        NODE_RETURN(qt_QScreen_virtualSiblingAt_QScreen_QScreen_QPoint(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QScreen_virtualSiblingAt_QScreen_QScreen_QPoint(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_virtualSize0, Pointer)
     {
-        NODE_RETURN(qt_QScreen_virtualSize_QSize_QScreen(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QScreen_virtualSize_QSize_QScreen(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_event0, bool)
     {
-        NODE_RETURN(qt_QScreen_event_bool_QScreen_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QScreen_event_bool_QScreen_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_eventFilter0, bool)
     {
-        NODE_RETURN(qt_QScreen_eventFilter_bool_QScreen_QObject_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QScreen_eventFilter_bool_QScreen_QObject_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                       NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_customEvent0, void)
     {
-        qt_QScreen_customEvent_void_QScreen_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QScreen_customEvent_void_QScreen_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_timerEvent0, void)
     {
-        qt_QScreen_timerEvent_void_QScreen_QTimerEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QScreen_timerEvent_void_QScreen_QTimerEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     void QScreenType::load()
@@ -447,17 +404,13 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
-                   new Function(c, tn, castFromObject, Cast, Compiled,
-                                QScreen_QScreen_QObject, Return, ftn,
-                                Parameters,
+                   new Function(c, tn, castFromObject, Cast, Compiled, QScreen_QScreen_QObject, Return, ftn, Parameters,
                                 new Param(c, "object", "qt.QObject"), End),
 
                    EndArguments);
@@ -465,15 +418,10 @@ namespace Mu
         addSymbols(
             // enums
             // member functions
-            new Function(c, "angleBetween", _n_angleBetween0, None, Compiled,
-                         qt_QScreen_angleBetween_int_QScreen_int_int, Return,
-                         "int", Parameters, new Param(c, "this", "qt.QScreen"),
-                         new Param(c, "a", "int"), new Param(c, "b", "int"),
-                         End),
-            new Function(c, "availableGeometry", _n_availableGeometry0, None,
-                         Compiled, qt_QScreen_availableGeometry_QRect_QScreen,
-                         Return, "qt.QRect", Parameters,
-                         new Param(c, "this", "qt.QScreen"), End),
+            new Function(c, "angleBetween", _n_angleBetween0, None, Compiled, qt_QScreen_angleBetween_int_QScreen_int_int, Return, "int",
+                         Parameters, new Param(c, "this", "qt.QScreen"), new Param(c, "a", "int"), new Param(c, "b", "int"), End),
+            new Function(c, "availableGeometry", _n_availableGeometry0, None, Compiled, qt_QScreen_availableGeometry_QRect_QScreen, Return,
+                         "qt.QRect", Parameters, new Param(c, "this", "qt.QScreen"), End),
             // PROP: availableSize (QSize; QScreen this)
             // PROP: availableVirtualGeometry (QRect; QScreen this)
             // PROP: availableVirtualSize (QSize; QScreen this)
@@ -483,23 +431,16 @@ namespace Mu
             // MISSING: grabWindow (QPixmap; QScreen this, "WId" window, int x,
             // int y, int width, int height) MISSING: handle ("QPlatformScreen
             // *"; QScreen this)
-            new Function(c, "isLandscape", _n_isLandscape0, None, Compiled,
-                         qt_QScreen_isLandscape_bool_QScreen_int, Return,
-                         "bool", Parameters, new Param(c, "this", "qt.QScreen"),
-                         new Param(c, "o", "int"), End),
-            new Function(c, "isPortrait", _n_isPortrait0, None, Compiled,
-                         qt_QScreen_isPortrait_bool_QScreen_int, Return, "bool",
-                         Parameters, new Param(c, "this", "qt.QScreen"),
-                         new Param(c, "o", "int"), End),
+            new Function(c, "isLandscape", _n_isLandscape0, None, Compiled, qt_QScreen_isLandscape_bool_QScreen_int, Return, "bool",
+                         Parameters, new Param(c, "this", "qt.QScreen"), new Param(c, "o", "int"), End),
+            new Function(c, "isPortrait", _n_isPortrait0, None, Compiled, qt_QScreen_isPortrait_bool_QScreen_int, Return, "bool",
+                         Parameters, new Param(c, "this", "qt.QScreen"), new Param(c, "o", "int"), End),
             // PROP: logicalDotsPerInch (double; QScreen this)
             // PROP: logicalDotsPerInchX (double; QScreen this)
             // PROP: logicalDotsPerInchY (double; QScreen this)
             // PROP: manufacturer (string; QScreen this)
-            new Function(c, "mapBetween", _n_mapBetween0, None, Compiled,
-                         qt_QScreen_mapBetween_QRect_QScreen_int_int_QRect,
-                         Return, "qt.QRect", Parameters,
-                         new Param(c, "this", "qt.QScreen"),
-                         new Param(c, "a", "int"), new Param(c, "b", "int"),
+            new Function(c, "mapBetween", _n_mapBetween0, None, Compiled, qt_QScreen_mapBetween_QRect_QScreen_int_int_QRect, Return,
+                         "qt.QRect", Parameters, new Param(c, "this", "qt.QScreen"), new Param(c, "a", "int"), new Param(c, "b", "int"),
                          new Param(c, "rect", "qt.QRect"), End),
             // PROP: model (string; QScreen this)
             // PROP: name (string; QScreen this)
@@ -512,54 +453,35 @@ namespace Mu
             // Qt::ScreenOrientation; QScreen this) PROP: refreshRate (double;
             // QScreen this) PROP: serialNumber (string; QScreen this) PROP:
             // size (QSize; QScreen this)
-            new Function(
-                c, "transformBetween", _n_transformBetween0, None, Compiled,
-                qt_QScreen_transformBetween_QTransform_QScreen_int_int_QRect,
-                Return, "qt.QTransform", Parameters,
-                new Param(c, "this", "qt.QScreen"), new Param(c, "a", "int"),
-                new Param(c, "b", "int"), new Param(c, "target", "qt.QRect"),
-                End),
-            new Function(c, "virtualGeometry", _n_virtualGeometry0, None,
-                         Compiled, qt_QScreen_virtualGeometry_QRect_QScreen,
-                         Return, "qt.QRect", Parameters,
-                         new Param(c, "this", "qt.QScreen"), End),
-            new Function(
-                c, "virtualSiblingAt", _n_virtualSiblingAt0, None, Compiled,
-                qt_QScreen_virtualSiblingAt_QScreen_QScreen_QPoint, Return,
-                "qt.QScreen", Parameters, new Param(c, "this", "qt.QScreen"),
-                new Param(c, "point", "qt.QPoint"), End),
+            new Function(c, "transformBetween", _n_transformBetween0, None, Compiled,
+                         qt_QScreen_transformBetween_QTransform_QScreen_int_int_QRect, Return, "qt.QTransform", Parameters,
+                         new Param(c, "this", "qt.QScreen"), new Param(c, "a", "int"), new Param(c, "b", "int"),
+                         new Param(c, "target", "qt.QRect"), End),
+            new Function(c, "virtualGeometry", _n_virtualGeometry0, None, Compiled, qt_QScreen_virtualGeometry_QRect_QScreen, Return,
+                         "qt.QRect", Parameters, new Param(c, "this", "qt.QScreen"), End),
+            new Function(c, "virtualSiblingAt", _n_virtualSiblingAt0, None, Compiled, qt_QScreen_virtualSiblingAt_QScreen_QScreen_QPoint,
+                         Return, "qt.QScreen", Parameters, new Param(c, "this", "qt.QScreen"), new Param(c, "point", "qt.QPoint"), End),
             // MISSING: virtualSiblings ("QList<QScreen * >"; QScreen this)
-            new Function(c, "virtualSize", _n_virtualSize0, None, Compiled,
-                         qt_QScreen_virtualSize_QSize_QScreen, Return,
-                         "qt.QSize", Parameters,
-                         new Param(c, "this", "qt.QScreen"), End),
-            _func[0] = new MemberFunction(c, "event", _n_event0, None, Compiled,
-                                          qt_QScreen_event_bool_QScreen_QEvent,
-                                          Return, "bool", Parameters,
-                                          new Param(c, "this", "qt.QScreen"),
-                                          new Param(c, "e", "qt.QEvent"), End),
-            _func[1] = new MemberFunction(
-                c, "eventFilter", _n_eventFilter0, None, Compiled,
-                qt_QScreen_eventFilter_bool_QScreen_QObject_QEvent, Return,
-                "bool", Parameters, new Param(c, "this", "qt.QScreen"),
-                new Param(c, "watched", "qt.QObject"),
-                new Param(c, "event", "qt.QEvent"), End),
+            new Function(c, "virtualSize", _n_virtualSize0, None, Compiled, qt_QScreen_virtualSize_QSize_QScreen, Return, "qt.QSize",
+                         Parameters, new Param(c, "this", "qt.QScreen"), End),
+            _func[0] = new MemberFunction(c, "event", _n_event0, None, Compiled, qt_QScreen_event_bool_QScreen_QEvent, Return, "bool",
+                                          Parameters, new Param(c, "this", "qt.QScreen"), new Param(c, "e", "qt.QEvent"), End),
+            _func[1] =
+                new MemberFunction(c, "eventFilter", _n_eventFilter0, None, Compiled, qt_QScreen_eventFilter_bool_QScreen_QObject_QEvent,
+                                   Return, "bool", Parameters, new Param(c, "this", "qt.QScreen"), new Param(c, "watched", "qt.QObject"),
+                                   new Param(c, "event", "qt.QEvent"), End),
             // MISSING: metaObject ("const QMetaObject *"; QScreen this)
             // MISSING: childEvent (void; QScreen this, "QChildEvent *" event)
             // // protected MISSING: connectNotify (void; QScreen this, "const
             // QMetaMethod &" signal) // protected
-            _func[2] = new MemberFunction(
-                c, "customEvent", _n_customEvent0, None, Compiled,
-                qt_QScreen_customEvent_void_QScreen_QEvent, Return, "void",
-                Parameters, new Param(c, "this", "qt.QScreen"),
-                new Param(c, "event", "qt.QEvent"), End),
+            _func[2] =
+                new MemberFunction(c, "customEvent", _n_customEvent0, None, Compiled, qt_QScreen_customEvent_void_QScreen_QEvent, Return,
+                                   "void", Parameters, new Param(c, "this", "qt.QScreen"), new Param(c, "event", "qt.QEvent"), End),
             // MISSING: disconnectNotify (void; QScreen this, "const QMetaMethod
             // &" signal) // protected
-            _func[3] = new MemberFunction(
-                c, "timerEvent", _n_timerEvent0, None, Compiled,
-                qt_QScreen_timerEvent_void_QScreen_QTimerEvent, Return, "void",
-                Parameters, new Param(c, "this", "qt.QScreen"),
-                new Param(c, "event", "qt.QTimerEvent"), End),
+            _func[3] =
+                new MemberFunction(c, "timerEvent", _n_timerEvent0, None, Compiled, qt_QScreen_timerEvent_void_QScreen_QTimerEvent, Return,
+                                   "void", Parameters, new Param(c, "this", "qt.QScreen"), new Param(c, "event", "qt.QTimerEvent"), End),
             // static functions
             EndArguments);
         globalScope()->addSymbols(EndArguments);

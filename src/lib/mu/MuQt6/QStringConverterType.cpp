@@ -41,8 +41,7 @@ namespace Mu
 {
     using namespace std;
 
-    QStringConverterType::QStringConverterType(Context* c, const char* name,
-                                               Class* super)
+    QStringConverterType::QStringConverterType(Context* c, const char* name, Class* super)
         : Class(c, name, super)
     {
     }
@@ -52,26 +51,21 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    bool
-    qt_QStringConverter_hasError_bool_QStringConverter(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this)
+    bool qt_QStringConverter_hasError_bool_QStringConverter(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QStringConverter* arg0 = getqpointer<QStringConverterType>(param_this);
         return arg0->hasError();
     }
 
-    bool
-    qt_QStringConverter_isValid_bool_QStringConverter(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    bool qt_QStringConverter_isValid_bool_QStringConverter(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QStringConverter* arg0 = getqpointer<QStringConverterType>(param_this);
         return arg0->isValid();
     }
 
-    void qt_QStringConverter_resetState_void_QStringConverter(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    void qt_QStringConverter_resetState_void_QStringConverter(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QStringConverter* arg0 = getqpointer<QStringConverterType>(param_this);
@@ -81,20 +75,17 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(_n_hasError0, bool)
     {
-        NODE_RETURN(qt_QStringConverter_hasError_bool_QStringConverter(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QStringConverter_hasError_bool_QStringConverter(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isValid0, bool)
     {
-        NODE_RETURN(qt_QStringConverter_isValid_bool_QStringConverter(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QStringConverter_isValid_bool_QStringConverter(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_resetState0, void)
     {
-        qt_QStringConverter_resetState_void_QStringConverter(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
+        qt_QStringConverter_resetState_void_QStringConverter(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
     }
 
     void QStringConverterType::load()
@@ -114,69 +105,41 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
                    new MemberVariable(c, "native", "qt.NativeObject"),
 
                    EndArguments);
 
-        addSymbols(
-            new Alias(c, "Encoding", "int"),
-            new SymbolicConstant(c, "Utf8", "int",
-                                 Value(int(QStringConverter::Utf8))),
-            new SymbolicConstant(c, "Utf16", "int",
-                                 Value(int(QStringConverter::Utf16))),
-            new SymbolicConstant(c, "Utf16BE", "int",
-                                 Value(int(QStringConverter::Utf16BE))),
-            new SymbolicConstant(c, "Utf16LE", "int",
-                                 Value(int(QStringConverter::Utf16LE))),
-            new SymbolicConstant(c, "Utf32", "int",
-                                 Value(int(QStringConverter::Utf32))),
-            new SymbolicConstant(c, "Utf32BE", "int",
-                                 Value(int(QStringConverter::Utf32BE))),
-            new SymbolicConstant(c, "Utf32LE", "int",
-                                 Value(int(QStringConverter::Utf32LE))),
-            new SymbolicConstant(c, "Latin1", "int",
-                                 Value(int(QStringConverter::Latin1))),
-            new SymbolicConstant(c, "System", "int",
-                                 Value(int(QStringConverter::System))),
-            new Alias(c, "Flag", "int"), new Alias(c, "Flags", "int"),
-            new SymbolicConstant(c, "Default", "int",
-                                 Value(int(QStringConverter::Flag::Default))),
-            new SymbolicConstant(
-                c, "ConvertInvalidToNull", "int",
-                Value(int(QStringConverter::Flag::ConvertInvalidToNull))),
-            new SymbolicConstant(c, "WriteBom", "int",
-                                 Value(int(QStringConverter::Flag::WriteBom))),
-            new SymbolicConstant(
-                c, "ConvertInitialBom", "int",
-                Value(int(QStringConverter::Flag::ConvertInitialBom))),
-            new SymbolicConstant(c, "Stateless", "int",
-                                 Value(int(QStringConverter::Flag::Stateless))),
-            EndArguments);
+        addSymbols(new Alias(c, "Encoding", "int"), new SymbolicConstant(c, "Utf8", "int", Value(int(QStringConverter::Utf8))),
+                   new SymbolicConstant(c, "Utf16", "int", Value(int(QStringConverter::Utf16))),
+                   new SymbolicConstant(c, "Utf16BE", "int", Value(int(QStringConverter::Utf16BE))),
+                   new SymbolicConstant(c, "Utf16LE", "int", Value(int(QStringConverter::Utf16LE))),
+                   new SymbolicConstant(c, "Utf32", "int", Value(int(QStringConverter::Utf32))),
+                   new SymbolicConstant(c, "Utf32BE", "int", Value(int(QStringConverter::Utf32BE))),
+                   new SymbolicConstant(c, "Utf32LE", "int", Value(int(QStringConverter::Utf32LE))),
+                   new SymbolicConstant(c, "Latin1", "int", Value(int(QStringConverter::Latin1))),
+                   new SymbolicConstant(c, "System", "int", Value(int(QStringConverter::System))), new Alias(c, "Flag", "int"),
+                   new Alias(c, "Flags", "int"), new SymbolicConstant(c, "Default", "int", Value(int(QStringConverter::Flag::Default))),
+                   new SymbolicConstant(c, "ConvertInvalidToNull", "int", Value(int(QStringConverter::Flag::ConvertInvalidToNull))),
+                   new SymbolicConstant(c, "WriteBom", "int", Value(int(QStringConverter::Flag::WriteBom))),
+                   new SymbolicConstant(c, "ConvertInitialBom", "int", Value(int(QStringConverter::Flag::ConvertInitialBom))),
+                   new SymbolicConstant(c, "Stateless", "int", Value(int(QStringConverter::Flag::Stateless))), EndArguments);
 
         addSymbols(
             // enums
             // member functions
-            new Function(c, "hasError", _n_hasError0, None, Compiled,
-                         qt_QStringConverter_hasError_bool_QStringConverter,
-                         Return, "bool", Parameters,
-                         new Param(c, "this", "qt.QStringConverter"), End),
-            new Function(c, "isValid", _n_isValid0, None, Compiled,
-                         qt_QStringConverter_isValid_bool_QStringConverter,
-                         Return, "bool", Parameters,
-                         new Param(c, "this", "qt.QStringConverter"), End),
+            new Function(c, "hasError", _n_hasError0, None, Compiled, qt_QStringConverter_hasError_bool_QStringConverter, Return, "bool",
+                         Parameters, new Param(c, "this", "qt.QStringConverter"), End),
+            new Function(c, "isValid", _n_isValid0, None, Compiled, qt_QStringConverter_isValid_bool_QStringConverter, Return, "bool",
+                         Parameters, new Param(c, "this", "qt.QStringConverter"), End),
             // MISSING: name ("const char *"; QStringConverter this)
-            new Function(c, "resetState", _n_resetState0, None, Compiled,
-                         qt_QStringConverter_resetState_void_QStringConverter,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QStringConverter"), End),
+            new Function(c, "resetState", _n_resetState0, None, Compiled, qt_QStringConverter_resetState_void_QStringConverter, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QStringConverter"), End),
             // static functions
             // MISSING: encodingForData (flags std::optional<Encoding>;
             // "QByteArrayView" data, "char16_t" expectedFirstCharacter)

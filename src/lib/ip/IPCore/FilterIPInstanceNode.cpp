@@ -18,9 +18,7 @@ namespace IPCore
     using namespace std;
     using namespace TwkMath;
 
-    FilterIPInstanceNode::FilterIPInstanceNode(const std::string& name,
-                                               const NodeDefinition* def,
-                                               IPGraph* g, GroupIPNode* group)
+    FilterIPInstanceNode::FilterIPInstanceNode(const std::string& name, const NodeDefinition* def, IPGraph* g, GroupIPNode* group)
         : IPInstanceNode(name, def, g, group)
     {
         const Shader::Function* F = def->function();
@@ -50,9 +48,7 @@ namespace IPCore
 
         if (!current)
         {
-            TWK_THROW_STREAM(EvaluationFailedExc,
-                             "FilterIPInstanceNode evaluation failed on node "
-                                 << nodes[0]->name());
+            TWK_THROW_STREAM(EvaluationFailedExc, "FilterIPInstanceNode evaluation failed on node " << nodes[0]->name());
         }
 
         IPImageVector images(1);
@@ -62,12 +58,10 @@ namespace IPCore
 
         convertBlendRenderTypeToIntermediate(images, modifiedImages);
 
-        balanceResourceUsage(IPNode::filterAccumulate, images, modifiedImages,
-                             8, 8, 81);
+        balanceResourceUsage(IPNode::filterAccumulate, images, modifiedImages, 8, 8, 81);
 
-        IPImage* root = new IPImage(
-            this, IPImage::MergeRenderType, current->width, current->height,
-            1.0, IPImage::IntermediateBuffer, IPImage::FloatDataType);
+        IPImage* root = new IPImage(this, IPImage::MergeRenderType, current->width, current->height, 1.0, IPImage::IntermediateBuffer,
+                                    IPImage::FloatDataType);
 
         //
         //  Copy the transform over to our image and remove the
@@ -81,8 +75,7 @@ namespace IPCore
         //  Prep merge
         //
 
-        assembleMergeExpressions(root, images, modifiedImages, true,
-                                 inExpressions);
+        assembleMergeExpressions(root, images, modifiedImages, true, inExpressions);
 
         //
         //  Assemble shaders and add the children

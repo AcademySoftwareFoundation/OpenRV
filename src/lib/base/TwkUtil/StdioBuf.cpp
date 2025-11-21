@@ -29,22 +29,13 @@ namespace TwkUtil
 
     int StdioBuf::uflow() { return getc(m_file); }
 
-    int StdioBuf::pbackfail(int c)
-    {
-        return c != EOF ? ungetc(c, m_file) : EOF;
-    }
+    int StdioBuf::pbackfail(int c) { return c != EOF ? ungetc(c, m_file) : EOF; }
 
     int StdioBuf::sync() { return fflush(m_file); }
 
-    std::streampos StdioBuf::seekpos(std::streampos sp,
-                                     std::ios_base::openmode which)
-    {
-        return seekoff(sp, std::ios_base::beg, which);
-    }
+    std::streampos StdioBuf::seekpos(std::streampos sp, std::ios_base::openmode which) { return seekoff(sp, std::ios_base::beg, which); }
 
-    std::streampos StdioBuf::seekoff(std::streamoff off,
-                                     std::ios_base::seekdir way,
-                                     std::ios_base::openmode which)
+    std::streampos StdioBuf::seekoff(std::streamoff off, std::ios_base::seekdir way, std::ios_base::openmode which)
     {
         int whence;
 

@@ -43,8 +43,7 @@ namespace IPCore
             typedef std::vector<std::string> StringVector;
             typedef PropertyEditor<T> Editor;
 
-            void setArgs(IPGraph* graph, int frame, const std::string& propPath,
-                         const Container& value);
+            void setArgs(IPGraph* graph, int frame, const std::string& propPath, const Container& value);
 
             virtual void doit();
             virtual void undo();
@@ -58,9 +57,7 @@ namespace IPCore
         };
 
         template <typename T>
-        void SetPropertyVector<T>::setArgs(IPGraph* graph, int frame,
-                                           const std::string& propPath,
-                                           const Container& value)
+        void SetPropertyVector<T>::setArgs(IPGraph* graph, int frame, const std::string& propPath, const Container& value)
         {
             m_graph = graph;
             m_propPath = propPath;
@@ -71,8 +68,7 @@ namespace IPCore
         template <typename T> void SetPropertyVector<T>::doit()
         {
             Editor edit(*m_graph, m_frame, m_propPath);
-            const typename Editor::PropertyVector& props =
-                edit.propertyVector();
+            const typename Editor::PropertyVector& props = edit.propertyVector();
 
             m_oldValues.resize(props.size());
 
@@ -90,8 +86,7 @@ namespace IPCore
             edit.setValue(m_oldValues);
         }
 
-        template <typename T>
-        class SetPropertyVectorInfo : public TwkApp::CommandInfo
+        template <typename T> class SetPropertyVectorInfo : public TwkApp::CommandInfo
         {
         public:
             SetPropertyVectorInfo(const std::string& name)
@@ -101,10 +96,7 @@ namespace IPCore
 
             virtual ~SetPropertyVectorInfo() {}
 
-            virtual TwkApp::Command* newCommand() const
-            {
-                return new SetPropertyVector<T>(this);
-            }
+            virtual TwkApp::Command* newCommand() const { return new SetPropertyVector<T>(this); }
         };
 
     } // namespace Commands

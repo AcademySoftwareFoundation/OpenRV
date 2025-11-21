@@ -91,22 +91,17 @@ namespace TwkFB
         IOsoftimage();
         virtual ~IOsoftimage();
 
-        virtual void readImage(FrameBuffer& fb, const std::string& filename,
-                               const ReadRequest& request) const;
+        virtual void readImage(FrameBuffer& fb, const std::string& filename, const ReadRequest& request) const;
 
-        virtual void writeImage(const FrameBuffer& img,
-                                const std::string& filename,
-                                const WriteRequest& request) const;
+        virtual void writeImage(const FrameBuffer& img, const std::string& filename, const WriteRequest& request) const;
 
         virtual std::string about() const;
         virtual void getImageInfo(const std::string& filename, FBInfo&) const;
 
     private:
-        void readPixels(std::ifstream&, const Header&, FrameBuffer&, bool,
-                        const ChannelPacketVector&) const;
+        void readPixels(std::ifstream&, const Header&, FrameBuffer&, bool, const ChannelPacketVector&) const;
 
-        void readAttrs(TwkFB::FrameBuffer&, const Header&,
-                       const ChannelPacketVector&) const;
+        void readAttrs(TwkFB::FrameBuffer&, const Header&, const ChannelPacketVector&) const;
     };
 
 } // namespace TwkFB

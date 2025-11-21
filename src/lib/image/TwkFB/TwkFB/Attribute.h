@@ -60,8 +60,7 @@ namespace TwkFB
     class TWKFB_EXPORT DataContainerAttribute : public FBAttribute
     {
     public:
-        DataContainerAttribute(std::string name, const void* memory,
-                               size_t size)
+        DataContainerAttribute(std::string name, const void* memory, size_t size)
             : FBAttribute(name)
             , m_container(size)
         {
@@ -125,23 +124,14 @@ namespace TwkFB
     {
     }
 
-    template <>
-    TypedFBAttribute<const char*>::TypedFBAttribute(const std::string& name,
-                                                    const char* value);
-    template <>
-    TypedFBAttribute<char*>::TypedFBAttribute(const std::string& name,
-                                              char* value);
+    template <> TypedFBAttribute<const char*>::TypedFBAttribute(const std::string& name, const char* value);
+    template <> TypedFBAttribute<char*>::TypedFBAttribute(const std::string& name, char* value);
 
     template <typename T> TypedFBAttribute<T>::~TypedFBAttribute() {}
 
-    template <typename T> FBAttribute* TypedFBAttribute<T>::copy() const
-    {
-        return new TypedFBAttribute<T>(name(), m_value);
-    }
+    template <typename T> FBAttribute* TypedFBAttribute<T>::copy() const { return new TypedFBAttribute<T>(name(), m_value); }
 
-    template <typename T>
-    FBAttribute*
-    TypedFBAttribute<T>::copyWithPrefix(const std::string& prefix) const
+    template <typename T> FBAttribute* TypedFBAttribute<T>::copyWithPrefix(const std::string& prefix) const
     {
         return new TypedFBAttribute<T>(prefix + name(), m_value);
     }
@@ -190,24 +180,16 @@ namespace TwkFB
         TVector m_value;
     };
 
-    template <typename T> TypedFBVectorAttribute<T>::~TypedFBVectorAttribute()
-    {
-    }
+    template <typename T> TypedFBVectorAttribute<T>::~TypedFBVectorAttribute() {}
 
-    template <typename T> FBAttribute* TypedFBVectorAttribute<T>::copy() const
-    {
-        return new TypedFBVectorAttribute<T>(name(), m_value);
-    }
+    template <typename T> FBAttribute* TypedFBVectorAttribute<T>::copy() const { return new TypedFBVectorAttribute<T>(name(), m_value); }
 
-    template <typename T>
-    FBAttribute*
-    TypedFBVectorAttribute<T>::copyWithPrefix(const std::string& prefix) const
+    template <typename T> FBAttribute* TypedFBVectorAttribute<T>::copyWithPrefix(const std::string& prefix) const
     {
         return new TypedFBVectorAttribute<T>(prefix + name(), m_value);
     }
 
-    template <typename T>
-    std::string TypedFBVectorAttribute<T>::valueAsString() const
+    template <typename T> std::string TypedFBVectorAttribute<T>::valueAsString() const
     {
         std::ostringstream str;
 

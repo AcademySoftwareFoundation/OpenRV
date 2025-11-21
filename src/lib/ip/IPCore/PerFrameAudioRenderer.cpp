@@ -80,11 +80,9 @@ namespace IPCore
 
         const DeviceState& state = deviceState();
 
-        m_totalAudioFrameSizes = accumulate(nstate.frameSizes.begin(),
-                                            nstate.frameSizes.end(), size_t(0));
+        m_totalAudioFrameSizes = accumulate(nstate.frameSizes.begin(), nstate.frameSizes.end(), size_t(0));
 
-        m_abuffer.reconfigure(state.framesPerBuffer, state.layout,
-                              Time(state.rate));
+        m_abuffer.reconfigure(state.framesPerBuffer, state.layout, Time(state.rate));
 
         AudioRenderer::play(s);
 
@@ -140,8 +138,7 @@ namespace IPCore
         m_parameters.holdOpen = holdOpen;
     }
 
-    PerFrameAudioRenderer::FrameData
-    PerFrameAudioRenderer::dataForFrame(int f, size_t seqIndex, bool silence)
+    PerFrameAudioRenderer::FrameData PerFrameAudioRenderer::dataForFrame(int f, size_t seqIndex, bool silence)
     {
         const DeviceState& state = deviceState();
 
@@ -156,12 +153,9 @@ namespace IPCore
         size_t nframes = state.frameSizes[seqIndex];
 
         size_t start =
-            nsequences * m_totalAudioFrameSizes
-            + accumulate(state.frameSizes.begin(),
-                         state.frameSizes.begin() + seqIndex, size_t(0));
+            nsequences * m_totalAudioFrameSizes + accumulate(state.frameSizes.begin(), state.frameSizes.begin() + seqIndex, size_t(0));
 
-        AudioBuffer buffer(nframes, state.layout, state.rate,
-                           samplesToTime(start, state.rate));
+        AudioBuffer buffer(nframes, state.layout, state.rate, samplesToTime(start, state.rate));
 
         const size_t formatSize = formatSizeInBytes(state.format);
         m_outBuffer.resize(nframes * numChannels * formatSize);
@@ -190,38 +184,27 @@ namespace IPCore
             break;
 
         case Int32Format:
-            transform(buffer.pointer(),
-                      buffer.pointer() + buffer.sizeInFloats(), (int*)out,
-                      toType<int>);
+            transform(buffer.pointer(), buffer.pointer() + buffer.sizeInFloats(), (int*)out, toType<int>);
             break;
 
         case Int24Format:
-            AudioRenderer::transformFloat32ToInt24(buffer.pointer(), (char*)out,
-                                                   buffer.sizeInFloats());
+            AudioRenderer::transformFloat32ToInt24(buffer.pointer(), (char*)out, buffer.sizeInFloats());
             break;
 
         case Int16Format:
-            transform(buffer.pointer(),
-                      buffer.pointer() + buffer.sizeInFloats(), (short*)out,
-                      toType<short>);
+            transform(buffer.pointer(), buffer.pointer() + buffer.sizeInFloats(), (short*)out, toType<short>);
             break;
 
         case Int8Format:
-            transform(buffer.pointer(),
-                      buffer.pointer() + buffer.sizeInFloats(),
-                      (signed char*)out, toType<signed char>);
+            transform(buffer.pointer(), buffer.pointer() + buffer.sizeInFloats(), (signed char*)out, toType<signed char>);
             break;
 
         case UInt32_SMPTE272M_20Format:
-            transform(buffer.pointer(),
-                      buffer.pointer() + buffer.sizeInFloats(), (UInt32*)out,
-                      toUInt32_SMPTE272M_20_transformer());
+            transform(buffer.pointer(), buffer.pointer() + buffer.sizeInFloats(), (UInt32*)out, toUInt32_SMPTE272M_20_transformer());
             break;
 
         case UInt32_SMPTE299M_24Format:
-            transform(buffer.pointer(),
-                      buffer.pointer() + buffer.sizeInFloats(), (UInt32*)out,
-                      toUInt32_SMPTE299M_24_transformer());
+            transform(buffer.pointer(), buffer.pointer() + buffer.sizeInFloats(), (UInt32*)out, toUInt32_SMPTE299M_24_transformer());
             break;
 
         case UnknownFormat:

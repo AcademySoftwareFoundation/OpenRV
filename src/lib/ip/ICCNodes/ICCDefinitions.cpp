@@ -22,25 +22,20 @@ namespace IPCore
         NodeDefinition::ByteVector emptyIcon;
 
         {
-            NodeDefinition* def = new NodeDefinition(
-                "ICCDisplayTransform", 1, false, "icc", newIPNode<ICCIPNode>,
-                "", "", emptyIcon, true);
+            NodeDefinition* def = new NodeDefinition("ICCDisplayTransform", 1, false, "icc", newIPNode<ICCIPNode>, "", "", emptyIcon, true);
 
             m->addDefinition(def);
         }
 
         {
-            NodeDefinition* def = new NodeDefinition(
-                "ICCLinearizeTransform", 1, false, "icc", newIPNode<ICCIPNode>,
-                "", "", emptyIcon, true);
+            NodeDefinition* def =
+                new NodeDefinition("ICCLinearizeTransform", 1, false, "icc", newIPNode<ICCIPNode>, "", "", emptyIcon, true);
 
             m->addDefinition(def);
         }
 
         {
-            NodeDefinition* def = new NodeDefinition(
-                "ICCTransform", 1, false, "icc", newIPNode<ICCIPNode>, "", "",
-                emptyIcon, true);
+            NodeDefinition* def = new NodeDefinition("ICCTransform", 1, false, "icc", newIPNode<ICCIPNode>, "", "", emptyIcon, true);
 
             m->addDefinition(def);
         }

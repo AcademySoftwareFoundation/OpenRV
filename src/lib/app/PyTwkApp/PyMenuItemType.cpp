@@ -17,8 +17,7 @@ namespace TwkApp
 {
     using namespace std;
 
-    static PyObject* MenuItem_new(PyTypeObject* type, PyObject* args,
-                                  PyObject* kwds)
+    static PyObject* MenuItem_new(PyTypeObject* type, PyObject* args, PyObject* kwds)
     {
         PyLockObject locker;
         PyMenuItemObject* self;
@@ -46,8 +45,7 @@ namespace TwkApp
         PyObject* state;
         PyObject* subMenu;
 
-        int ok = PyArg_ParseTuple(args, "sOsOO", &label, &action, &key, &state,
-                                  &subMenu);
+        int ok = PyArg_ParseTuple(args, "sOsOO", &label, &action, &key, &state, &subMenu);
 
         if (!ok)
             return -1;
@@ -84,16 +82,11 @@ namespace TwkApp
     };
 
     static PyMemberDef members[] = {
-        {"label", T_OBJECT_EX, offsetof(PyMenuItemObject, label), 0,
-         "User visible label"},
-        {"actionHook", T_OBJECT_EX, offsetof(PyMenuItemObject, actionHook), 0,
-         "Activation callback"},
-        {"key", T_OBJECT_EX, offsetof(PyMenuItemObject, actionHook), 0,
-         "Accelerator key"},
-        {"stateHook", T_OBJECT_EX, offsetof(PyMenuItemObject, stateHook), 0,
-         "State callback"},
-        {"subMenu", T_OBJECT_EX, offsetof(PyMenuItemObject, subMenu), 0,
-         "Sub-menu"},
+        {"label", T_OBJECT_EX, offsetof(PyMenuItemObject, label), 0, "User visible label"},
+        {"actionHook", T_OBJECT_EX, offsetof(PyMenuItemObject, actionHook), 0, "Activation callback"},
+        {"key", T_OBJECT_EX, offsetof(PyMenuItemObject, actionHook), 0, "Accelerator key"},
+        {"stateHook", T_OBJECT_EX, offsetof(PyMenuItemObject, stateHook), 0, "State callback"},
+        {"subMenu", T_OBJECT_EX, offsetof(PyMenuItemObject, subMenu), 0, "Sub-menu"},
         {NULL} /* Sentinel */
     };
 

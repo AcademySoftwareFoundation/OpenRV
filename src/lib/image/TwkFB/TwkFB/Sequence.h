@@ -20,8 +20,7 @@ namespace TwkFB
     class TWKFB_EXPORT FBSequence
     {
     public:
-        TWK_EXC_DECLARE(Exception, TwkExc::Exception,
-                        "FBSequence::Exception: ");
+        TWK_EXC_DECLARE(Exception, TwkExc::Exception, "FBSequence::Exception: ");
 
         FBSequence(std::string sequencePattern);
         virtual ~FBSequence();

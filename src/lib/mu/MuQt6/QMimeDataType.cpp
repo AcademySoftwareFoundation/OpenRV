@@ -70,8 +70,7 @@ namespace Mu
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QMimeDataType>(
-            c->internName("qt.QMimeData"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QMimeDataType>(c->internName("qt.QMimeData"));
     }
 
     QStringList MuQt_QMimeData::formats() const
@@ -147,8 +146,7 @@ namespace Mu
         {
             Function::ArgumentVector args(3);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeinstance<QObjectType>(c, watched, "qt.QObject"));
+            args[1] = Value(makeinstance<QObjectType>(c, watched, "qt.QObject"));
             args[2] = Value(makeqpointer<QEventType>(c, event, "qt.QEvent"));
             Value rval = _env->call(F, args);
             return (bool)(rval._bool);
@@ -196,8 +194,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QTimerEventType>(c, event, "qt.QTimerEvent"));
+            args[1] = Value(makeqpointer<QTimerEventType>(c, event, "qt.QTimerEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -209,8 +206,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  Mu Type CONSTRUCTORS
 
-    QMimeDataType::QMimeDataType(Context* c, const char* name, Class* super,
-                                 Class* super2)
+    QMimeDataType::QMimeDataType(Context* c, const char* name, Class* super, Class* super2)
         : Class(c, name, vectorOf2(super, super2))
     {
     }
@@ -231,9 +227,7 @@ namespace Mu
         }
         else if (QMimeData* w = object<QMimeData>(widget))
         {
-            QMimeDataType* type =
-                c->findSymbolOfTypeByQualifiedName<QMimeDataType>(
-                    c->internName("qt.QMimeData"), false);
+            QMimeDataType* type = c->findSymbolOfTypeByQualifiedName<QMimeDataType>(c->internName("qt.QMimeData"), false);
             ClassInstance* o = ClassInstance::allocate(type);
             setobject(o, w);
             return o;
@@ -244,40 +238,30 @@ namespace Mu
         }
     }
 
-    static NODE_IMPLEMENTATION(castFromObject, Pointer)
-    {
-        NODE_RETURN(
-            QMimeData_QMimeData_QObject(NODE_THREAD, NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(castFromObject, Pointer) { NODE_RETURN(QMimeData_QMimeData_QObject(NODE_THREAD, NODE_ARG(0, Pointer))); }
 
-    Pointer qt_QMimeData_QMimeData_QMimeData_QMimeData(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this)
+    Pointer qt_QMimeData_QMimeData_QMimeData_QMimeData(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-        setobject(
-            param_this,
-            new MuQt_QMimeData(param_this, NODE_THREAD.process()->callEnv()));
+        setobject(param_this, new MuQt_QMimeData(param_this, NODE_THREAD.process()->callEnv()));
         return param_this;
     }
 
-    void qt_QMimeData_clear_void_QMimeData(Mu::Thread& NODE_THREAD,
-                                           Pointer param_this)
+    void qt_QMimeData_clear_void_QMimeData(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMimeData* arg0 = object<QMimeData>(param_this);
         arg0->clear();
     }
 
-    Pointer qt_QMimeData_colorData_QVariant_QMimeData(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    Pointer qt_QMimeData_colorData_QVariant_QMimeData(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMimeData* arg0 = object<QMimeData>(param_this);
         return makeqtype<QVariantType>(c, arg0->colorData(), "qt.QVariant");
     }
 
-    Pointer qt_QMimeData_data_QByteArray_QMimeData_string(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_mimeType)
+    Pointer qt_QMimeData_data_QByteArray_QMimeData_string(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_mimeType)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMimeData* arg0 = object<QMimeData>(param_this);
@@ -285,86 +269,71 @@ namespace Mu
         return makeqtype<QByteArrayType>(c, arg0->data(arg1), "qt.QByteArray");
     }
 
-    Pointer
-    qt_QMimeData_formats_stringBSB_ESB__QMimeData(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this)
+    Pointer qt_QMimeData_formats_stringBSB_ESB__QMimeData(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMimeData* arg0 = object<QMimeData>(param_this);
-        return isMuQtObject(arg0)
-                   ? makestringlist(c, arg0->QMimeData::formats())
-                   : makestringlist(c, arg0->formats());
+        return isMuQtObject(arg0) ? makestringlist(c, arg0->QMimeData::formats()) : makestringlist(c, arg0->formats());
     }
 
-    bool qt_QMimeData_hasColor_bool_QMimeData(Mu::Thread& NODE_THREAD,
-                                              Pointer param_this)
+    bool qt_QMimeData_hasColor_bool_QMimeData(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMimeData* arg0 = object<QMimeData>(param_this);
         return arg0->hasColor();
     }
 
-    bool qt_QMimeData_hasFormat_bool_QMimeData_string(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this,
-                                                      Pointer param_mimeType)
+    bool qt_QMimeData_hasFormat_bool_QMimeData_string(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_mimeType)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMimeData* arg0 = object<QMimeData>(param_this);
         const QString arg1 = qstring(param_mimeType);
-        return isMuQtObject(arg0) ? arg0->QMimeData::hasFormat(arg1)
-                                  : arg0->hasFormat(arg1);
+        return isMuQtObject(arg0) ? arg0->QMimeData::hasFormat(arg1) : arg0->hasFormat(arg1);
     }
 
-    bool qt_QMimeData_hasHtml_bool_QMimeData(Mu::Thread& NODE_THREAD,
-                                             Pointer param_this)
+    bool qt_QMimeData_hasHtml_bool_QMimeData(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMimeData* arg0 = object<QMimeData>(param_this);
         return arg0->hasHtml();
     }
 
-    bool qt_QMimeData_hasImage_bool_QMimeData(Mu::Thread& NODE_THREAD,
-                                              Pointer param_this)
+    bool qt_QMimeData_hasImage_bool_QMimeData(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMimeData* arg0 = object<QMimeData>(param_this);
         return arg0->hasImage();
     }
 
-    bool qt_QMimeData_hasText_bool_QMimeData(Mu::Thread& NODE_THREAD,
-                                             Pointer param_this)
+    bool qt_QMimeData_hasText_bool_QMimeData(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMimeData* arg0 = object<QMimeData>(param_this);
         return arg0->hasText();
     }
 
-    bool qt_QMimeData_hasUrls_bool_QMimeData(Mu::Thread& NODE_THREAD,
-                                             Pointer param_this)
+    bool qt_QMimeData_hasUrls_bool_QMimeData(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMimeData* arg0 = object<QMimeData>(param_this);
         return arg0->hasUrls();
     }
 
-    Pointer qt_QMimeData_html_string_QMimeData(Mu::Thread& NODE_THREAD,
-                                               Pointer param_this)
+    Pointer qt_QMimeData_html_string_QMimeData(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMimeData* arg0 = object<QMimeData>(param_this);
         return makestring(c, arg0->html());
     }
 
-    Pointer qt_QMimeData_imageData_QVariant_QMimeData(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    Pointer qt_QMimeData_imageData_QVariant_QMimeData(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMimeData* arg0 = object<QMimeData>(param_this);
         return makeqtype<QVariantType>(c, arg0->imageData(), "qt.QVariant");
     }
 
-    void qt_QMimeData_removeFormat_void_QMimeData_string(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_mimeType)
+    void qt_QMimeData_removeFormat_void_QMimeData_string(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_mimeType)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMimeData* arg0 = object<QMimeData>(param_this);
@@ -372,8 +341,7 @@ namespace Mu
         arg0->removeFormat(arg1);
     }
 
-    void qt_QMimeData_setColorData_void_QMimeData_QVariant(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_color)
+    void qt_QMimeData_setColorData_void_QMimeData_QVariant(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_color)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMimeData* arg0 = object<QMimeData>(param_this);
@@ -381,9 +349,8 @@ namespace Mu
         arg0->setColorData(arg1);
     }
 
-    void qt_QMimeData_setData_void_QMimeData_string_QByteArray(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_mimeType,
-        Pointer param_data)
+    void qt_QMimeData_setData_void_QMimeData_string_QByteArray(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_mimeType,
+                                                               Pointer param_data)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMimeData* arg0 = object<QMimeData>(param_this);
@@ -392,9 +359,7 @@ namespace Mu
         arg0->setData(arg1, arg2);
     }
 
-    void qt_QMimeData_setHtml_void_QMimeData_string(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this,
-                                                    Pointer param_html)
+    void qt_QMimeData_setHtml_void_QMimeData_string(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_html)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMimeData* arg0 = object<QMimeData>(param_this);
@@ -402,8 +367,7 @@ namespace Mu
         arg0->setHtml(arg1);
     }
 
-    void qt_QMimeData_setImageData_void_QMimeData_QVariant(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_image)
+    void qt_QMimeData_setImageData_void_QMimeData_QVariant(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_image)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMimeData* arg0 = object<QMimeData>(param_this);
@@ -411,9 +375,7 @@ namespace Mu
         arg0->setImageData(arg1);
     }
 
-    void qt_QMimeData_setText_void_QMimeData_string(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this,
-                                                    Pointer param_text)
+    void qt_QMimeData_setText_void_QMimeData_string(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_text)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMimeData* arg0 = object<QMimeData>(param_this);
@@ -421,8 +383,7 @@ namespace Mu
         arg0->setText(arg1);
     }
 
-    void qt_QMimeData_setUrls_void_QMimeData_qt__QUrlBSB_ESB_(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_urls)
+    void qt_QMimeData_setUrls_void_QMimeData_qt__QUrlBSB_ESB_(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_urls)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMimeData* arg0 = object<QMimeData>(param_this);
@@ -430,49 +391,39 @@ namespace Mu
         arg0->setUrls(arg1);
     }
 
-    Pointer qt_QMimeData_text_string_QMimeData(Mu::Thread& NODE_THREAD,
-                                               Pointer param_this)
+    Pointer qt_QMimeData_text_string_QMimeData(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMimeData* arg0 = object<QMimeData>(param_this);
         return makestring(c, arg0->text());
     }
 
-    Pointer
-    qt_QMimeData_urls_qt__QUrlBSB_ESB__QMimeData(Mu::Thread& NODE_THREAD,
-                                                 Pointer param_this)
+    Pointer qt_QMimeData_urls_qt__QUrlBSB_ESB__QMimeData(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMimeData* arg0 = object<QMimeData>(param_this);
         return makeqtypelist<QUrl, QUrlType>(c, arg0->urls(), "qt.QUrl");
     }
 
-    bool qt_QMimeData_event_bool_QMimeData_QEvent(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this,
-                                                  Pointer param_e)
+    bool qt_QMimeData_event_bool_QMimeData_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMimeData* arg0 = object<QMimeData>(param_this);
         QEvent* arg1 = getqpointer<QEventType>(param_e);
-        return isMuQtObject(arg0) ? arg0->QMimeData::event(arg1)
-                                  : arg0->event(arg1);
+        return isMuQtObject(arg0) ? arg0->QMimeData::event(arg1) : arg0->event(arg1);
     }
 
-    bool qt_QMimeData_eventFilter_bool_QMimeData_QObject_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_watched,
-        Pointer param_event)
+    bool qt_QMimeData_eventFilter_bool_QMimeData_QObject_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_watched,
+                                                                Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMimeData* arg0 = object<QMimeData>(param_this);
         QObject* arg1 = object<QObject>(param_watched);
         QEvent* arg2 = getqpointer<QEventType>(param_event);
-        return isMuQtObject(arg0) ? arg0->QMimeData::eventFilter(arg1, arg2)
-                                  : arg0->eventFilter(arg1, arg2);
+        return isMuQtObject(arg0) ? arg0->QMimeData::eventFilter(arg1, arg2) : arg0->eventFilter(arg1, arg2);
     }
 
-    void qt_QMimeData_customEvent_void_QMimeData_QEvent(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this,
-                                                        Pointer param_event)
+    void qt_QMimeData_customEvent_void_QMimeData_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMimeData* arg0 = object<QMimeData>(param_this);
@@ -483,8 +434,7 @@ namespace Mu
             ((MuQt_QMimeData*)arg0)->customEvent_pub(arg1);
     }
 
-    void qt_QMimeData_timerEvent_void_QMimeData_QTimerEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QMimeData_timerEvent_void_QMimeData_QTimerEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMimeData* arg0 = object<QMimeData>(param_this);
@@ -497,160 +447,131 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(_n_QMimeData0, Pointer)
     {
-        NODE_RETURN(qt_QMimeData_QMimeData_QMimeData_QMimeData(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QMimeData_QMimeData_QMimeData_QMimeData(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
-    static NODE_IMPLEMENTATION(_n_clear0, void)
-    {
-        qt_QMimeData_clear_void_QMimeData(NODE_THREAD,
-                                          NONNIL_NODE_ARG(0, Pointer));
-    }
+    static NODE_IMPLEMENTATION(_n_clear0, void) { qt_QMimeData_clear_void_QMimeData(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)); }
 
     static NODE_IMPLEMENTATION(_n_colorData0, Pointer)
     {
-        NODE_RETURN(qt_QMimeData_colorData_QVariant_QMimeData(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QMimeData_colorData_QVariant_QMimeData(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_data0, Pointer)
     {
-        NODE_RETURN(qt_QMimeData_data_QByteArray_QMimeData_string(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QMimeData_data_QByteArray_QMimeData_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_formats0, Pointer)
     {
-        NODE_RETURN(qt_QMimeData_formats_stringBSB_ESB__QMimeData(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QMimeData_formats_stringBSB_ESB__QMimeData(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_hasColor0, bool)
     {
-        NODE_RETURN(qt_QMimeData_hasColor_bool_QMimeData(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QMimeData_hasColor_bool_QMimeData(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_hasFormat0, bool)
     {
-        NODE_RETURN(qt_QMimeData_hasFormat_bool_QMimeData_string(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QMimeData_hasFormat_bool_QMimeData_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_hasHtml0, bool)
     {
-        NODE_RETURN(qt_QMimeData_hasHtml_bool_QMimeData(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QMimeData_hasHtml_bool_QMimeData(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_hasImage0, bool)
     {
-        NODE_RETURN(qt_QMimeData_hasImage_bool_QMimeData(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QMimeData_hasImage_bool_QMimeData(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_hasText0, bool)
     {
-        NODE_RETURN(qt_QMimeData_hasText_bool_QMimeData(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QMimeData_hasText_bool_QMimeData(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_hasUrls0, bool)
     {
-        NODE_RETURN(qt_QMimeData_hasUrls_bool_QMimeData(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QMimeData_hasUrls_bool_QMimeData(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_html0, Pointer)
     {
-        NODE_RETURN(qt_QMimeData_html_string_QMimeData(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QMimeData_html_string_QMimeData(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_imageData0, Pointer)
     {
-        NODE_RETURN(qt_QMimeData_imageData_QVariant_QMimeData(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QMimeData_imageData_QVariant_QMimeData(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_removeFormat0, void)
     {
-        qt_QMimeData_removeFormat_void_QMimeData_string(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QMimeData_removeFormat_void_QMimeData_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setColorData0, void)
     {
-        qt_QMimeData_setColorData_void_QMimeData_QVariant(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QMimeData_setColorData_void_QMimeData_QVariant(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setData0, void)
     {
-        qt_QMimeData_setData_void_QMimeData_string_QByteArray(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer));
+        qt_QMimeData_setData_void_QMimeData_string_QByteArray(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                              NODE_ARG(2, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setHtml0, void)
     {
-        qt_QMimeData_setHtml_void_QMimeData_string(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QMimeData_setHtml_void_QMimeData_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setImageData0, void)
     {
-        qt_QMimeData_setImageData_void_QMimeData_QVariant(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QMimeData_setImageData_void_QMimeData_QVariant(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setText0, void)
     {
-        qt_QMimeData_setText_void_QMimeData_string(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QMimeData_setText_void_QMimeData_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setUrls0, void)
     {
-        qt_QMimeData_setUrls_void_QMimeData_qt__QUrlBSB_ESB_(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QMimeData_setUrls_void_QMimeData_qt__QUrlBSB_ESB_(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_text0, Pointer)
     {
-        NODE_RETURN(qt_QMimeData_text_string_QMimeData(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QMimeData_text_string_QMimeData(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_urls0, Pointer)
     {
-        NODE_RETURN(qt_QMimeData_urls_qt__QUrlBSB_ESB__QMimeData(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QMimeData_urls_qt__QUrlBSB_ESB__QMimeData(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_event0, bool)
     {
-        NODE_RETURN(qt_QMimeData_event_bool_QMimeData_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QMimeData_event_bool_QMimeData_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_eventFilter0, bool)
     {
-        NODE_RETURN(qt_QMimeData_eventFilter_bool_QMimeData_QObject_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QMimeData_eventFilter_bool_QMimeData_QObject_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                           NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_customEvent0, void)
     {
-        qt_QMimeData_customEvent_void_QMimeData_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QMimeData_customEvent_void_QMimeData_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_timerEvent0, void)
     {
-        qt_QMimeData_timerEvent_void_QMimeData_QTimerEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QMimeData_timerEvent_void_QMimeData_QTimerEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     void QMimeDataType::load()
@@ -670,17 +591,13 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
-                   new Function(c, tn, castFromObject, Cast, Compiled,
-                                QMimeData_QMimeData_QObject, Return, ftn,
-                                Parameters,
+                   new Function(c, tn, castFromObject, Cast, Compiled, QMimeData_QMimeData_QObject, Return, ftn, Parameters,
                                 new Param(c, "object", "qt.QObject"), End),
 
                    EndArguments);
@@ -688,126 +605,72 @@ namespace Mu
         addSymbols(
             // enums
             // member functions
-            new Function(c, "QMimeData", _n_QMimeData0, None, Compiled,
-                         qt_QMimeData_QMimeData_QMimeData_QMimeData, Return,
-                         "qt.QMimeData", Parameters,
+            new Function(c, "QMimeData", _n_QMimeData0, None, Compiled, qt_QMimeData_QMimeData_QMimeData_QMimeData, Return, "qt.QMimeData",
+                         Parameters, new Param(c, "this", "qt.QMimeData"), End),
+            new Function(c, "clear", _n_clear0, None, Compiled, qt_QMimeData_clear_void_QMimeData, Return, "void", Parameters,
                          new Param(c, "this", "qt.QMimeData"), End),
-            new Function(c, "clear", _n_clear0, None, Compiled,
-                         qt_QMimeData_clear_void_QMimeData, Return, "void",
+            new Function(c, "colorData", _n_colorData0, None, Compiled, qt_QMimeData_colorData_QVariant_QMimeData, Return, "qt.QVariant",
                          Parameters, new Param(c, "this", "qt.QMimeData"), End),
-            new Function(c, "colorData", _n_colorData0, None, Compiled,
-                         qt_QMimeData_colorData_QVariant_QMimeData, Return,
-                         "qt.QVariant", Parameters,
+            new Function(c, "data", _n_data0, None, Compiled, qt_QMimeData_data_QByteArray_QMimeData_string, Return, "qt.QByteArray",
+                         Parameters, new Param(c, "this", "qt.QMimeData"), new Param(c, "mimeType", "string"), End),
+            _func[0] = new MemberFunction(c, "formats", _n_formats0, None, Compiled, qt_QMimeData_formats_stringBSB_ESB__QMimeData, Return,
+                                          "string[]", Parameters, new Param(c, "this", "qt.QMimeData"), End),
+            new Function(c, "hasColor", _n_hasColor0, None, Compiled, qt_QMimeData_hasColor_bool_QMimeData, Return, "bool", Parameters,
                          new Param(c, "this", "qt.QMimeData"), End),
-            new Function(c, "data", _n_data0, None, Compiled,
-                         qt_QMimeData_data_QByteArray_QMimeData_string, Return,
-                         "qt.QByteArray", Parameters,
-                         new Param(c, "this", "qt.QMimeData"),
-                         new Param(c, "mimeType", "string"), End),
-            _func[0] = new MemberFunction(
-                c, "formats", _n_formats0, None, Compiled,
-                qt_QMimeData_formats_stringBSB_ESB__QMimeData, Return,
-                "string[]", Parameters, new Param(c, "this", "qt.QMimeData"),
-                End),
-            new Function(c, "hasColor", _n_hasColor0, None, Compiled,
-                         qt_QMimeData_hasColor_bool_QMimeData, Return, "bool",
-                         Parameters, new Param(c, "this", "qt.QMimeData"), End),
-            _func[1] = new MemberFunction(
-                c, "hasFormat", _n_hasFormat0, None, Compiled,
-                qt_QMimeData_hasFormat_bool_QMimeData_string, Return, "bool",
-                Parameters, new Param(c, "this", "qt.QMimeData"),
-                new Param(c, "mimeType", "string"), End),
-            new Function(c, "hasHtml", _n_hasHtml0, None, Compiled,
-                         qt_QMimeData_hasHtml_bool_QMimeData, Return, "bool",
-                         Parameters, new Param(c, "this", "qt.QMimeData"), End),
-            new Function(c, "hasImage", _n_hasImage0, None, Compiled,
-                         qt_QMimeData_hasImage_bool_QMimeData, Return, "bool",
-                         Parameters, new Param(c, "this", "qt.QMimeData"), End),
-            new Function(c, "hasText", _n_hasText0, None, Compiled,
-                         qt_QMimeData_hasText_bool_QMimeData, Return, "bool",
-                         Parameters, new Param(c, "this", "qt.QMimeData"), End),
-            new Function(c, "hasUrls", _n_hasUrls0, None, Compiled,
-                         qt_QMimeData_hasUrls_bool_QMimeData, Return, "bool",
-                         Parameters, new Param(c, "this", "qt.QMimeData"), End),
-            new Function(c, "html", _n_html0, None, Compiled,
-                         qt_QMimeData_html_string_QMimeData, Return, "string",
-                         Parameters, new Param(c, "this", "qt.QMimeData"), End),
-            new Function(c, "imageData", _n_imageData0, None, Compiled,
-                         qt_QMimeData_imageData_QVariant_QMimeData, Return,
-                         "qt.QVariant", Parameters,
+            _func[1] =
+                new MemberFunction(c, "hasFormat", _n_hasFormat0, None, Compiled, qt_QMimeData_hasFormat_bool_QMimeData_string, Return,
+                                   "bool", Parameters, new Param(c, "this", "qt.QMimeData"), new Param(c, "mimeType", "string"), End),
+            new Function(c, "hasHtml", _n_hasHtml0, None, Compiled, qt_QMimeData_hasHtml_bool_QMimeData, Return, "bool", Parameters,
                          new Param(c, "this", "qt.QMimeData"), End),
-            new Function(c, "removeFormat", _n_removeFormat0, None, Compiled,
-                         qt_QMimeData_removeFormat_void_QMimeData_string,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QMimeData"),
-                         new Param(c, "mimeType", "string"), End),
-            new Function(c, "setColorData", _n_setColorData0, None, Compiled,
-                         qt_QMimeData_setColorData_void_QMimeData_QVariant,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QMimeData"),
-                         new Param(c, "color", "qt.QVariant"), End),
-            new Function(c, "setData", _n_setData0, None, Compiled,
-                         qt_QMimeData_setData_void_QMimeData_string_QByteArray,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QMimeData"),
-                         new Param(c, "mimeType", "string"),
+            new Function(c, "hasImage", _n_hasImage0, None, Compiled, qt_QMimeData_hasImage_bool_QMimeData, Return, "bool", Parameters,
+                         new Param(c, "this", "qt.QMimeData"), End),
+            new Function(c, "hasText", _n_hasText0, None, Compiled, qt_QMimeData_hasText_bool_QMimeData, Return, "bool", Parameters,
+                         new Param(c, "this", "qt.QMimeData"), End),
+            new Function(c, "hasUrls", _n_hasUrls0, None, Compiled, qt_QMimeData_hasUrls_bool_QMimeData, Return, "bool", Parameters,
+                         new Param(c, "this", "qt.QMimeData"), End),
+            new Function(c, "html", _n_html0, None, Compiled, qt_QMimeData_html_string_QMimeData, Return, "string", Parameters,
+                         new Param(c, "this", "qt.QMimeData"), End),
+            new Function(c, "imageData", _n_imageData0, None, Compiled, qt_QMimeData_imageData_QVariant_QMimeData, Return, "qt.QVariant",
+                         Parameters, new Param(c, "this", "qt.QMimeData"), End),
+            new Function(c, "removeFormat", _n_removeFormat0, None, Compiled, qt_QMimeData_removeFormat_void_QMimeData_string, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QMimeData"), new Param(c, "mimeType", "string"), End),
+            new Function(c, "setColorData", _n_setColorData0, None, Compiled, qt_QMimeData_setColorData_void_QMimeData_QVariant, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QMimeData"), new Param(c, "color", "qt.QVariant"), End),
+            new Function(c, "setData", _n_setData0, None, Compiled, qt_QMimeData_setData_void_QMimeData_string_QByteArray, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QMimeData"), new Param(c, "mimeType", "string"),
                          new Param(c, "data", "qt.QByteArray"), End),
-            new Function(c, "setHtml", _n_setHtml0, None, Compiled,
-                         qt_QMimeData_setHtml_void_QMimeData_string, Return,
-                         "void", Parameters,
-                         new Param(c, "this", "qt.QMimeData"),
-                         new Param(c, "html", "string"), End),
-            new Function(c, "setImageData", _n_setImageData0, None, Compiled,
-                         qt_QMimeData_setImageData_void_QMimeData_QVariant,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QMimeData"),
-                         new Param(c, "image", "qt.QVariant"), End),
-            new Function(c, "setText", _n_setText0, None, Compiled,
-                         qt_QMimeData_setText_void_QMimeData_string, Return,
-                         "void", Parameters,
-                         new Param(c, "this", "qt.QMimeData"),
-                         new Param(c, "text", "string"), End),
-            new Function(c, "setUrls", _n_setUrls0, None, Compiled,
-                         qt_QMimeData_setUrls_void_QMimeData_qt__QUrlBSB_ESB_,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QMimeData"),
-                         new Param(c, "urls", "qt.QUrl[]"), End),
-            new Function(c, "text", _n_text0, None, Compiled,
-                         qt_QMimeData_text_string_QMimeData, Return, "string",
-                         Parameters, new Param(c, "this", "qt.QMimeData"), End),
-            new Function(c, "urls", _n_urls0, None, Compiled,
-                         qt_QMimeData_urls_qt__QUrlBSB_ESB__QMimeData, Return,
-                         "qt.QUrl[]", Parameters,
+            new Function(c, "setHtml", _n_setHtml0, None, Compiled, qt_QMimeData_setHtml_void_QMimeData_string, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QMimeData"), new Param(c, "html", "string"), End),
+            new Function(c, "setImageData", _n_setImageData0, None, Compiled, qt_QMimeData_setImageData_void_QMimeData_QVariant, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QMimeData"), new Param(c, "image", "qt.QVariant"), End),
+            new Function(c, "setText", _n_setText0, None, Compiled, qt_QMimeData_setText_void_QMimeData_string, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QMimeData"), new Param(c, "text", "string"), End),
+            new Function(c, "setUrls", _n_setUrls0, None, Compiled, qt_QMimeData_setUrls_void_QMimeData_qt__QUrlBSB_ESB_, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QMimeData"), new Param(c, "urls", "qt.QUrl[]"), End),
+            new Function(c, "text", _n_text0, None, Compiled, qt_QMimeData_text_string_QMimeData, Return, "string", Parameters,
+                         new Param(c, "this", "qt.QMimeData"), End),
+            new Function(c, "urls", _n_urls0, None, Compiled, qt_QMimeData_urls_qt__QUrlBSB_ESB__QMimeData, Return, "qt.QUrl[]", Parameters,
                          new Param(c, "this", "qt.QMimeData"), End),
             // MISSING: retrieveData (QVariant; QMimeData this, string mimeType,
             // "QMetaType" type) // protected
-            _func[2] = new MemberFunction(
-                c, "event", _n_event0, None, Compiled,
-                qt_QMimeData_event_bool_QMimeData_QEvent, Return, "bool",
-                Parameters, new Param(c, "this", "qt.QMimeData"),
-                new Param(c, "e", "qt.QEvent"), End),
-            _func[3] = new MemberFunction(
-                c, "eventFilter", _n_eventFilter0, None, Compiled,
-                qt_QMimeData_eventFilter_bool_QMimeData_QObject_QEvent, Return,
-                "bool", Parameters, new Param(c, "this", "qt.QMimeData"),
-                new Param(c, "watched", "qt.QObject"),
-                new Param(c, "event", "qt.QEvent"), End),
+            _func[2] = new MemberFunction(c, "event", _n_event0, None, Compiled, qt_QMimeData_event_bool_QMimeData_QEvent, Return, "bool",
+                                          Parameters, new Param(c, "this", "qt.QMimeData"), new Param(c, "e", "qt.QEvent"), End),
+            _func[3] = new MemberFunction(c, "eventFilter", _n_eventFilter0, None, Compiled,
+                                          qt_QMimeData_eventFilter_bool_QMimeData_QObject_QEvent, Return, "bool", Parameters,
+                                          new Param(c, "this", "qt.QMimeData"), new Param(c, "watched", "qt.QObject"),
+                                          new Param(c, "event", "qt.QEvent"), End),
             // MISSING: metaObject ("const QMetaObject *"; QMimeData this)
             // MISSING: childEvent (void; QMimeData this, "QChildEvent *" event)
             // // protected MISSING: connectNotify (void; QMimeData this, "const
             // QMetaMethod &" signal) // protected
-            _func[4] = new MemberFunction(
-                c, "customEvent", _n_customEvent0, None, Compiled,
-                qt_QMimeData_customEvent_void_QMimeData_QEvent, Return, "void",
-                Parameters, new Param(c, "this", "qt.QMimeData"),
-                new Param(c, "event", "qt.QEvent"), End),
+            _func[4] = new MemberFunction(c, "customEvent", _n_customEvent0, None, Compiled, qt_QMimeData_customEvent_void_QMimeData_QEvent,
+                                          Return, "void", Parameters, new Param(c, "this", "qt.QMimeData"),
+                                          new Param(c, "event", "qt.QEvent"), End),
             // MISSING: disconnectNotify (void; QMimeData this, "const
             // QMetaMethod &" signal) // protected
-            _func[5] = new MemberFunction(
-                c, "timerEvent", _n_timerEvent0, None, Compiled,
-                qt_QMimeData_timerEvent_void_QMimeData_QTimerEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QMimeData"),
-                new Param(c, "event", "qt.QTimerEvent"), End),
+            _func[5] = new MemberFunction(c, "timerEvent", _n_timerEvent0, None, Compiled,
+                                          qt_QMimeData_timerEvent_void_QMimeData_QTimerEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QMimeData"), new Param(c, "event", "qt.QTimerEvent"), End),
             // static functions
             EndArguments);
         globalScope()->addSymbols(EndArguments);

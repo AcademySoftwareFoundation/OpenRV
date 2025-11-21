@@ -4,8 +4,7 @@
 // SPDX-License-Identifier: Apache-2.0
 //
 
-Pointer QByteArray_constData_QByteArray_byteECB_BSB__(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+Pointer QByteArray_constData_QByteArray_byteECB_BSB__(Mu::Thread& NODE_THREAD, Pointer param_this)
 {
     MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
     QByteArray arg0 = getqtype<QByteArrayType>(param_this);
@@ -18,22 +17,18 @@ Pointer QByteArray_constData_QByteArray_byteECB_BSB__(Mu::Thread& NODE_THREAD,
 
 static NODE_IMPLEMENTATION(constData, Pointer)
 {
-    NODE_RETURN(QByteArray_constData_QByteArray_byteECB_BSB__(
-        NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+    NODE_RETURN(QByteArray_constData_QByteArray_byteECB_BSB__(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
 }
 
-Pointer qt_QByteArray_append_QByteArray_QByteArray_string(
-    Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_str)
+Pointer qt_QByteArray_append_QByteArray_QByteArray_string(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_str)
 {
     MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
     QByteArray& arg0 = getqtype<QByteArrayType>(param_this);
     const QString arg1 = qstring(param_str);
-    return makeqtype<QByteArrayType>(c, arg0.append(arg1.toStdString().c_str()),
-                                     "qt.QByteArray");
+    return makeqtype<QByteArrayType>(c, arg0.append(arg1.toStdString().c_str()), "qt.QByteArray");
 }
 
 static NODE_IMPLEMENTATION(_n_append4, Pointer)
 {
-    NODE_RETURN(qt_QByteArray_append_QByteArray_QByteArray_string(
-        NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+    NODE_RETURN(qt_QByteArray_append_QByteArray_QByteArray_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
 }

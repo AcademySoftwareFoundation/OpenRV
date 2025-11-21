@@ -36,23 +36,13 @@
 //
 
 #define MU_HEAP_ALLOC(T, C) (new T(C))
-#define MU_NEW_STRING(S) \
-    (((MuLangContext*)NODE_THREAD.context())->stringType()->allocate(S))
-#define MU_NEW_REGEX(S, F)                                                     \
-    (new Mu::RegexType::Regex(                                                 \
-        ((MuLangContext*)NODE_THREAD.context())->stringType(), NODE_THREAD, S, \
-        F))
+#define MU_NEW_STRING(S) (((MuLangContext*)NODE_THREAD.context())->stringType()->allocate(S))
+#define MU_NEW_REGEX(S, F) (new Mu::RegexType::Regex(((MuLangContext*)NODE_THREAD.context())->stringType(), NODE_THREAD, S, F))
 #define MU_NEW_FUNCTIONOBJ(T) (new Mu::FunctionObject(T))
 
-#define MU_ARENA_ALLOC_OPERATORS()                 \
-    static void* operator new(size_t s)            \
-    {                                              \
-        return Object::arena().allocate(s);        \
-    }                                              \
-    static void operator delete(void* p, size_t s) \
-    {                                              \
-        Object::arena().deallocate(p, s);          \
-    }
+#define MU_ARENA_ALLOC_OPERATORS()                                              \
+    static void* operator new(size_t s) { return Object::arena().allocate(s); } \
+    static void operator delete(void* p, size_t s) { Object::arena().deallocate(p, s); }
 
 // #define MU_ALLOC_INSTANCE(T,N,D) (ClassInstance::allocate(T,N,D))
 
@@ -143,18 +133,14 @@
 #define EQ_EQ__bool_bool_bool(T, A, B) ((A) == (B))
 #define Bang_EQ__bool_bool_bool(T, A, B) ((A) != (B))
 #define EQ__boolAmp__boolAmp__bool(T, A, B) ((A) = (B))
-#define eq_QMark_non_primitive_or_nil_QMark_non_primitive_or_nil(T, A, B) \
-    ((A) == (B))
-#define neq_QMark_non_primitive_or_nil_QMark_non_primitive_or_nil(T, A, B) \
-    ((A) != (B))
+#define eq_QMark_non_primitive_or_nil_QMark_non_primitive_or_nil(T, A, B) ((A) == (B))
+#define neq_QMark_non_primitive_or_nil_QMark_non_primitive_or_nil(T, A, B) ((A) != (B))
 #define assert_void_bool(T, A)              \
     {                                       \
         if (!(A))                           \
             throw_assertion_failure(T, #A); \
     }
-#define EQ__QMark__QMark_non_primitive_reference_QMark_non_primitive_or_nil( \
-    T, A, B)                                                                 \
-    ((A) = (B))
+#define EQ__QMark__QMark_non_primitive_reference_QMark_non_primitive_or_nil(T, A, B) ((A) = (B))
 
 namespace Mu
 {
@@ -179,10 +165,8 @@ namespace Mu
 #define Minus_EQ__floatAmp__floatAmp__float(T, A, B) ((A) -= (B))
 #define Star_EQ__floatAmp__floatAmp__float(T, A, B) ((A) *= (B))
 #define Slash_EQ__floatAmp__floatAmp__float(T, A, B) ((A) /= (B))
-#define PCent_EQ__floatAmp__floatAmp__float(T, A, B) \
-    ((A) = float(::mod(double(A), double(B))))
-#define Caret_EQ__floatAmp__floatAmp__float(T, A, B) \
-    ((A) = float(::pow(double(A), double(B))))
+#define PCent_EQ__floatAmp__floatAmp__float(T, A, B) ((A) = float(::mod(double(A), double(B))))
+#define Caret_EQ__floatAmp__floatAmp__float(T, A, B) ((A) = float(::pow(double(A), double(B))))
 #define prePlus_Plus__float_floatAmp_(T, A) (++(A))
 #define postPlus_Plus__float_floatAmp_(T, A) ((A)++)
 #define preMinus_Minus__float_floatAmp_(T, A) (--(A))
@@ -192,36 +176,24 @@ namespace Mu
 
 // ----- half Type ------
 
-#define Plus__half_half_half(T, A, B) \
-    halfToShort(shortToHalf(A) + shortToHalf(B))
-#define Minus__half_half_half(T, A, B) \
-    halfToShort(shortToHalf(A) - shortToHalf(B))
-#define Star__half_half_half(T, A, B) \
-    halfToShort(shortToHalf(A) * shortToHalf(B))
-#define Slash__half_half_half(T, A, B) \
-    halfToShort(shortToHalf(A) / shortToHalf(B))
-#define PCent__half_half_half(T, A, B) \
-    halfToShort(half(::mod(floatshortToHalf(A), floatshortToHalf(B))))
-#define Caret__half_half_half(T, A, B) \
-    halfToShort(half(::pow(floatshortToHalf(A), floatshortToHalf(B))))
+#define Plus__half_half_half(T, A, B) halfToShort(shortToHalf(A) + shortToHalf(B))
+#define Minus__half_half_half(T, A, B) halfToShort(shortToHalf(A) - shortToHalf(B))
+#define Star__half_half_half(T, A, B) halfToShort(shortToHalf(A) * shortToHalf(B))
+#define Slash__half_half_half(T, A, B) halfToShort(shortToHalf(A) / shortToHalf(B))
+#define PCent__half_half_half(T, A, B) halfToShort(half(::mod(floatshortToHalf(A), floatshortToHalf(B))))
+#define Caret__half_half_half(T, A, B) halfToShort(half(::pow(floatshortToHalf(A), floatshortToHalf(B))))
 #define GT__bool_half_half(T, A, B) (shortToHalf(A) > shortToHalf(B))
 #define LT__bool_half_half(T, A, B) (shortToHalf(A) < shortToHalf(B))
 #define GT_EQ__bool_half_half(T, A, B) (shortToHalf(A) >= shortToHalf(B))
 #define LT_EQ__bool_half_half(T, A, B) (shortToHalf(A) <= shortToHalf(B))
 #define Minus__half_half(T, A) halfToShort(-shortToHalf(A))
 #define EQ__halfAmp__halfAmp__half(T, A, B) (shortToHalf(A) = shortToHalf(B))
-#define Plus_EQ__halfAmp__halfAmp__half(T, A, B) \
-    ((A) = shortToHalf(A) + shortToHalf(B))
-#define Minus_EQ__halfAmp__halfAmp__half(T, A, B) \
-    ((A) = shortToHalf(A) - shortToHalf(B))
-#define Star_EQ__halfAmp__halfAmp__half(T, A, B) \
-    ((A) = shortToHalf(A) * shortToHalf(B))
-#define Slash_EQ__halfAmp__halfAmp__half(T, A, B) \
-    ((A) = shortToHalf(A) / shortToHalf(B))
-#define PCent_EQ__halfAmp__halfAmp__half(T, A, B) \
-    ((A) = half(::mod(float(shortToHalf(A)), float(shortToHalf(B)))))
-#define Caret_EQ__halfAmp__halfAmp__half(T, A, B) \
-    (shortToHalf(A) = half(::pow(doubleshortToHalf(A), doubleshortToHalf(B))))
+#define Plus_EQ__halfAmp__halfAmp__half(T, A, B) ((A) = shortToHalf(A) + shortToHalf(B))
+#define Minus_EQ__halfAmp__halfAmp__half(T, A, B) ((A) = shortToHalf(A) - shortToHalf(B))
+#define Star_EQ__halfAmp__halfAmp__half(T, A, B) ((A) = shortToHalf(A) * shortToHalf(B))
+#define Slash_EQ__halfAmp__halfAmp__half(T, A, B) ((A) = shortToHalf(A) / shortToHalf(B))
+#define PCent_EQ__halfAmp__halfAmp__half(T, A, B) ((A) = half(::mod(float(shortToHalf(A)), float(shortToHalf(B)))))
+#define Caret_EQ__halfAmp__halfAmp__half(T, A, B) (shortToHalf(A) = half(::pow(doubleshortToHalf(A), doubleshortToHalf(B))))
 #define prePlus_Plus__half_halfAmp_(T, A) halfToShort(++shortToHalf(A))
 #define postPlus_Plus__half_halfAmp_(T, A) halfToShort(shortToHalf(A)++)
 #define preMinus_Minus__half_halfAmp_(T, A) halfToShort(--shortToHalf(A))
@@ -371,159 +343,69 @@ namespace Mu
 
 // ----- vector float[2] Type -----
 
-#define Plus__vector_floatBSB_2ESB__vector_floatBSB_2ESB__vector_floatBSB_2ESB_( \
-    T, A, B)                                                                     \
-    ((A) + (B))
-#define Minus__vector_floatBSB_2ESB__vector_floatBSB_2ESB__vector_floatBSB_2ESB_( \
-    T, A, B)                                                                      \
-    ((A) - (B))
-#define Star__vector_floatBSB_2ESB__vector_floatBSB_2ESB__vector_floatBSB_2ESB_( \
-    T, A, B)                                                                     \
-    ((A) * (B))
-#define Slash__vector_floatBSB_2ESB__vector_floatBSB_2ESB__vector_floatBSB_2ESB_( \
-    T, A, B)                                                                      \
-    ((A) / (B))
-#define PCent__vector_floatBSB_2ESB__vector_floatBSB_2ESB__vector_floatBSB_2ESB_( \
-    T, A, B)                                                                      \
-    ((A) % (B))
-#define Caret__vector_floatBSB_2ESB__vector_floatBSB_2ESB__vector_floatBSB_2ESB_( \
-    T, A, B)                                                                      \
-    ((A) ^ (B))
-#define cross_vector_floatBSB_2ESB__vector_floatBSB_2ESB__vector_floatBSB_2ESB_( \
-    T, A, B)                                                                     \
-    (cross((A), (B)))
-#define normalize_vector_floatBSB_2ESB__vector_floatBSB_2ESB_(T, A) \
-    (normalize(A))
-#define dot_float_vector_floatBSB_2ESB__vector_floatBSB_2ESB_(T, A, B) \
-    (dot((A), (B)))
+#define Plus__vector_floatBSB_2ESB__vector_floatBSB_2ESB__vector_floatBSB_2ESB_(T, A, B) ((A) + (B))
+#define Minus__vector_floatBSB_2ESB__vector_floatBSB_2ESB__vector_floatBSB_2ESB_(T, A, B) ((A) - (B))
+#define Star__vector_floatBSB_2ESB__vector_floatBSB_2ESB__vector_floatBSB_2ESB_(T, A, B) ((A) * (B))
+#define Slash__vector_floatBSB_2ESB__vector_floatBSB_2ESB__vector_floatBSB_2ESB_(T, A, B) ((A) / (B))
+#define PCent__vector_floatBSB_2ESB__vector_floatBSB_2ESB__vector_floatBSB_2ESB_(T, A, B) ((A) % (B))
+#define Caret__vector_floatBSB_2ESB__vector_floatBSB_2ESB__vector_floatBSB_2ESB_(T, A, B) ((A) ^ (B))
+#define cross_vector_floatBSB_2ESB__vector_floatBSB_2ESB__vector_floatBSB_2ESB_(T, A, B) (cross((A), (B)))
+#define normalize_vector_floatBSB_2ESB__vector_floatBSB_2ESB_(T, A) (normalize(A))
+#define dot_float_vector_floatBSB_2ESB__vector_floatBSB_2ESB_(T, A, B) (dot((A), (B)))
 #define mag_float_vector_floatBSB_2ESB_(T, A) (mag(A))
 #define Minus__vector_floatBSB_2ESB__vector_floatBSB_2ESB_(T, A) (-(A))
 
-#define EQ__vector_floatBSB_2ESB_Amp__vector_floatBSB_2ESB_Amp__vector_floatBSB_2ESB_( \
-    T, A, B)                                                                           \
-    ((A) = (B))
-#define Plus_EQ__vector_floatBSB_2ESB_Amp__vector_floatBSB_2ESB_Amp__vector_floatBSB_2ESB_( \
-    T, A, B)                                                                                \
-    ((A) += (B))
-#define Minus_EQ__vector_floatBSB_2ESB_Amp__vector_floatBSB_2ESB_Amp__vector_floatBSB_2ESB_( \
-    T, A, B)                                                                                 \
-    ((A) -= (B))
-#define Star_EQ__vector_floatBSB_2ESB_Amp__vector_floatBSB_2ESB_Amp__vector_floatBSB_2ESB_( \
-    T, A, B)                                                                                \
-    ((A) *= (B))
-#define Slash_EQ__vector_floatBSB_2ESB_Amp__vector_floatBSB_2ESB_Amp__vector_floatBSB_2ESB_( \
-    T, A, B)                                                                                 \
-    ((A) /= (B))
-#define PCent_EQ__vector_floatBSB_2ESB_Amp__vector_floatBSB_2ESB_Amp__vector_floatBSB_2ESB_( \
-    T, A, B)                                                                                 \
-    ((A) %= (B))
-#define Caret_EQ__vector_floatBSB_2ESB_Amp__vector_floatBSB_2ESB_Amp__vector_floatBSB_2ESB_( \
-    T, A, B)                                                                                 \
-    ((A) ^= (B))
+#define EQ__vector_floatBSB_2ESB_Amp__vector_floatBSB_2ESB_Amp__vector_floatBSB_2ESB_(T, A, B) ((A) = (B))
+#define Plus_EQ__vector_floatBSB_2ESB_Amp__vector_floatBSB_2ESB_Amp__vector_floatBSB_2ESB_(T, A, B) ((A) += (B))
+#define Minus_EQ__vector_floatBSB_2ESB_Amp__vector_floatBSB_2ESB_Amp__vector_floatBSB_2ESB_(T, A, B) ((A) -= (B))
+#define Star_EQ__vector_floatBSB_2ESB_Amp__vector_floatBSB_2ESB_Amp__vector_floatBSB_2ESB_(T, A, B) ((A) *= (B))
+#define Slash_EQ__vector_floatBSB_2ESB_Amp__vector_floatBSB_2ESB_Amp__vector_floatBSB_2ESB_(T, A, B) ((A) /= (B))
+#define PCent_EQ__vector_floatBSB_2ESB_Amp__vector_floatBSB_2ESB_Amp__vector_floatBSB_2ESB_(T, A, B) ((A) %= (B))
+#define Caret_EQ__vector_floatBSB_2ESB_Amp__vector_floatBSB_2ESB_Amp__vector_floatBSB_2ESB_(T, A, B) ((A) ^= (B))
 
 // ----- vector float[3] Type -----
 
-#define Plus__vector_floatBSB_3ESB__vector_floatBSB_3ESB__vector_floatBSB_3ESB_( \
-    T, A, B)                                                                     \
-    ((A) + (B))
-#define Minus__vector_floatBSB_3ESB__vector_floatBSB_3ESB__vector_floatBSB_3ESB_( \
-    T, A, B)                                                                      \
-    ((A) - (B))
-#define Star__vector_floatBSB_3ESB__vector_floatBSB_3ESB__vector_floatBSB_3ESB_( \
-    T, A, B)                                                                     \
-    ((A) * (B))
-#define Slash__vector_floatBSB_3ESB__vector_floatBSB_3ESB__vector_floatBSB_3ESB_( \
-    T, A, B)                                                                      \
-    ((A) / (B))
-#define PCent__vector_floatBSB_3ESB__vector_floatBSB_3ESB__vector_floatBSB_3ESB_( \
-    T, A, B)                                                                      \
-    ((A) % (B))
-#define Caret__vector_floatBSB_3ESB__vector_floatBSB_3ESB__vector_floatBSB_3ESB_( \
-    T, A, B)                                                                      \
-    ((A) ^ (B))
-#define cross_vector_floatBSB_3ESB__vector_floatBSB_3ESB__vector_floatBSB_3ESB_( \
-    T, A, B)                                                                     \
-    (cross((A), (B)))
-#define normalize_vector_floatBSB_3ESB__vector_floatBSB_3ESB_(T, A) \
-    (normalize(A))
-#define dot_float_vector_floatBSB_3ESB__vector_floatBSB_3ESB_(T, A, B) \
-    (dot((A), (B)))
+#define Plus__vector_floatBSB_3ESB__vector_floatBSB_3ESB__vector_floatBSB_3ESB_(T, A, B) ((A) + (B))
+#define Minus__vector_floatBSB_3ESB__vector_floatBSB_3ESB__vector_floatBSB_3ESB_(T, A, B) ((A) - (B))
+#define Star__vector_floatBSB_3ESB__vector_floatBSB_3ESB__vector_floatBSB_3ESB_(T, A, B) ((A) * (B))
+#define Slash__vector_floatBSB_3ESB__vector_floatBSB_3ESB__vector_floatBSB_3ESB_(T, A, B) ((A) / (B))
+#define PCent__vector_floatBSB_3ESB__vector_floatBSB_3ESB__vector_floatBSB_3ESB_(T, A, B) ((A) % (B))
+#define Caret__vector_floatBSB_3ESB__vector_floatBSB_3ESB__vector_floatBSB_3ESB_(T, A, B) ((A) ^ (B))
+#define cross_vector_floatBSB_3ESB__vector_floatBSB_3ESB__vector_floatBSB_3ESB_(T, A, B) (cross((A), (B)))
+#define normalize_vector_floatBSB_3ESB__vector_floatBSB_3ESB_(T, A) (normalize(A))
+#define dot_float_vector_floatBSB_3ESB__vector_floatBSB_3ESB_(T, A, B) (dot((A), (B)))
 #define mag_float_vector_floatBSB_3ESB_(T, A) (mag(A))
 #define Minus__vector_floatBSB_3ESB__vector_floatBSB_3ESB_(T, A) (-(A))
 
-#define EQ__vector_floatBSB_3ESB_Amp__vector_floatBSB_3ESB_Amp__vector_floatBSB_3ESB_( \
-    T, A, B)                                                                           \
-    ((A) = (B))
-#define Plus_EQ__vector_floatBSB_3ESB_Amp__vector_floatBSB_3ESB_Amp__vector_floatBSB_3ESB_( \
-    T, A, B)                                                                                \
-    ((A) += (B))
-#define Minus_EQ__vector_floatBSB_3ESB_Amp__vector_floatBSB_3ESB_Amp__vector_floatBSB_3ESB_( \
-    T, A, B)                                                                                 \
-    ((A) -= (B))
-#define Star_EQ__vector_floatBSB_3ESB_Amp__vector_floatBSB_3ESB_Amp__vector_floatBSB_3ESB_( \
-    T, A, B)                                                                                \
-    ((A) *= (B))
-#define Slash_EQ__vector_floatBSB_3ESB_Amp__vector_floatBSB_3ESB_Amp__vector_floatBSB_3ESB_( \
-    T, A, B)                                                                                 \
-    ((A) /= (B))
-#define PCent_EQ__vector_floatBSB_3ESB_Amp__vector_floatBSB_3ESB_Amp__vector_floatBSB_3ESB_( \
-    T, A, B)                                                                                 \
-    ((A) %= (B))
-#define Caret_EQ__vector_floatBSB_3ESB_Amp__vector_floatBSB_3ESB_Amp__vector_floatBSB_3ESB_( \
-    T, A, B)                                                                                 \
-    ((A) ^= (B))
+#define EQ__vector_floatBSB_3ESB_Amp__vector_floatBSB_3ESB_Amp__vector_floatBSB_3ESB_(T, A, B) ((A) = (B))
+#define Plus_EQ__vector_floatBSB_3ESB_Amp__vector_floatBSB_3ESB_Amp__vector_floatBSB_3ESB_(T, A, B) ((A) += (B))
+#define Minus_EQ__vector_floatBSB_3ESB_Amp__vector_floatBSB_3ESB_Amp__vector_floatBSB_3ESB_(T, A, B) ((A) -= (B))
+#define Star_EQ__vector_floatBSB_3ESB_Amp__vector_floatBSB_3ESB_Amp__vector_floatBSB_3ESB_(T, A, B) ((A) *= (B))
+#define Slash_EQ__vector_floatBSB_3ESB_Amp__vector_floatBSB_3ESB_Amp__vector_floatBSB_3ESB_(T, A, B) ((A) /= (B))
+#define PCent_EQ__vector_floatBSB_3ESB_Amp__vector_floatBSB_3ESB_Amp__vector_floatBSB_3ESB_(T, A, B) ((A) %= (B))
+#define Caret_EQ__vector_floatBSB_3ESB_Amp__vector_floatBSB_3ESB_Amp__vector_floatBSB_3ESB_(T, A, B) ((A) ^= (B))
 
 // ----- vector float[4] Type -----
 
-#define Plus__vector_floatBSB_4ESB__vector_floatBSB_4ESB__vector_floatBSB_4ESB_( \
-    T, A, B)                                                                     \
-    ((A) + (B))
-#define Minus__vector_floatBSB_4ESB__vector_floatBSB_4ESB__vector_floatBSB_4ESB_( \
-    T, A, B)                                                                      \
-    ((A) - (B))
-#define Star__vector_floatBSB_4ESB__vector_floatBSB_4ESB__vector_floatBSB_4ESB_( \
-    T, A, B)                                                                     \
-    ((A) * (B))
-#define Slash__vector_floatBSB_4ESB__vector_floatBSB_4ESB__vector_floatBSB_4ESB_( \
-    T, A, B)                                                                      \
-    ((A) / (B))
-#define PCent__vector_floatBSB_4ESB__vector_floatBSB_4ESB__vector_floatBSB_4ESB_( \
-    T, A, B)                                                                      \
-    ((A) % (B))
-#define Caret__vector_floatBSB_4ESB__vector_floatBSB_4ESB__vector_floatBSB_4ESB_( \
-    T, A, B)                                                                      \
-    ((A) ^ (B))
-#define cross_vector_floatBSB_4ESB__vector_floatBSB_4ESB__vector_floatBSB_4ESB_( \
-    T, A, B)                                                                     \
-    (cross((A), (B)))
-#define normalize_vector_floatBSB_4ESB__vector_floatBSB_4ESB_(T, A) \
-    (normalize((A)))
-#define dot_float_vector_floatBSB_4ESB__vector_floatBSB_4ESB_(T, A, B) \
-    (dot((A), (B)))
+#define Plus__vector_floatBSB_4ESB__vector_floatBSB_4ESB__vector_floatBSB_4ESB_(T, A, B) ((A) + (B))
+#define Minus__vector_floatBSB_4ESB__vector_floatBSB_4ESB__vector_floatBSB_4ESB_(T, A, B) ((A) - (B))
+#define Star__vector_floatBSB_4ESB__vector_floatBSB_4ESB__vector_floatBSB_4ESB_(T, A, B) ((A) * (B))
+#define Slash__vector_floatBSB_4ESB__vector_floatBSB_4ESB__vector_floatBSB_4ESB_(T, A, B) ((A) / (B))
+#define PCent__vector_floatBSB_4ESB__vector_floatBSB_4ESB__vector_floatBSB_4ESB_(T, A, B) ((A) % (B))
+#define Caret__vector_floatBSB_4ESB__vector_floatBSB_4ESB__vector_floatBSB_4ESB_(T, A, B) ((A) ^ (B))
+#define cross_vector_floatBSB_4ESB__vector_floatBSB_4ESB__vector_floatBSB_4ESB_(T, A, B) (cross((A), (B)))
+#define normalize_vector_floatBSB_4ESB__vector_floatBSB_4ESB_(T, A) (normalize((A)))
+#define dot_float_vector_floatBSB_4ESB__vector_floatBSB_4ESB_(T, A, B) (dot((A), (B)))
 #define mag_float_vector_floatBSB_4ESB_(T, A) (mag((A)))
 #define Minus__vector_floatBSB_4ESB__vector_floatBSB_4ESB_(T, A) (-(A))
 
-#define EQ__vector_floatBSB_4ESB_Amp__vector_floatBSB_4ESB_Amp__vector_floatBSB_4ESB_( \
-    T, A, B)                                                                           \
-    ((A) = (B))
-#define Plus_EQ__vector_floatBSB_4ESB_Amp__vector_floatBSB_4ESB_Amp__vector_floatBSB_4ESB_( \
-    T, A, B)                                                                                \
-    ((A) += (B))
-#define Minus_EQ__vector_floatBSB_4ESB_Amp__vector_floatBSB_4ESB_Amp__vector_floatBSB_4ESB_( \
-    T, A, B)                                                                                 \
-    ((A) -= (B))
-#define Star_EQ__vector_floatBSB_4ESB_Amp__vector_floatBSB_4ESB_Amp__vector_floatBSB_4ESB_( \
-    T, A, B)                                                                                \
-    ((A) *= (B))
-#define Slash_EQ__vector_floatBSB_4ESB_Amp__vector_floatBSB_4ESB_Amp__vector_floatBSB_4ESB_( \
-    T, A, B)                                                                                 \
-    ((A) /= (B))
-#define PCent_EQ__vector_floatBSB_4ESB_Amp__vector_floatBSB_4ESB_Amp__vector_floatBSB_4ESB_( \
-    T, A, B)                                                                                 \
-    ((A) %= (B))
-#define Caret_EQ__vector_floatBSB_4ESB_Amp__vector_floatBSB_4ESB_Amp__vector_floatBSB_4ESB_( \
-    T, A, B)                                                                                 \
-    ((A) ^= (B))
+#define EQ__vector_floatBSB_4ESB_Amp__vector_floatBSB_4ESB_Amp__vector_floatBSB_4ESB_(T, A, B) ((A) = (B))
+#define Plus_EQ__vector_floatBSB_4ESB_Amp__vector_floatBSB_4ESB_Amp__vector_floatBSB_4ESB_(T, A, B) ((A) += (B))
+#define Minus_EQ__vector_floatBSB_4ESB_Amp__vector_floatBSB_4ESB_Amp__vector_floatBSB_4ESB_(T, A, B) ((A) -= (B))
+#define Star_EQ__vector_floatBSB_4ESB_Amp__vector_floatBSB_4ESB_Amp__vector_floatBSB_4ESB_(T, A, B) ((A) *= (B))
+#define Slash_EQ__vector_floatBSB_4ESB_Amp__vector_floatBSB_4ESB_Amp__vector_floatBSB_4ESB_(T, A, B) ((A) /= (B))
+#define PCent_EQ__vector_floatBSB_4ESB_Amp__vector_floatBSB_4ESB_Amp__vector_floatBSB_4ESB_(T, A, B) ((A) %= (B))
+#define Caret_EQ__vector_floatBSB_4ESB_Amp__vector_floatBSB_4ESB_Amp__vector_floatBSB_4ESB_(T, A, B) ((A) ^= (B))
 
 // ----- math module -----
 
@@ -601,28 +483,20 @@ namespace Mu
     float gauss(float);
 }; // namespace Mu
 
-#define math_util_rotate_vector_floatBSB_3ESB__vector_floatBSB_3ESB__vector_floatBSB_3ESB_float( \
-    T, A, B, C)                                                                                  \
-    (Mu::rotate((A), (B), (C)))
-#define math_util_dnoise3_vector_floatBSB_3ESB__vector_floatBSB_3ESB_(T, A) \
-    (Mu::dnoise3((A)))
-#define math_util_dnoise2_vector_floatBSB_2ESB__vector_floatBSB_2ESB_(T, A) \
-    (Mu::dnoise2((A)))
+#define math_util_rotate_vector_floatBSB_3ESB__vector_floatBSB_3ESB__vector_floatBSB_3ESB_float(T, A, B, C) (Mu::rotate((A), (B), (C)))
+#define math_util_dnoise3_vector_floatBSB_3ESB__vector_floatBSB_3ESB_(T, A) (Mu::dnoise3((A)))
+#define math_util_dnoise2_vector_floatBSB_2ESB__vector_floatBSB_2ESB_(T, A) (Mu::dnoise2((A)))
 #define math_util_dnoise1_float_float(T, A) (Mu::dnoise1((A)))
 #define math_util_noise3_float_vector_floatBSB_3ESB_(T, A) (Mu::noise3((A)))
 #define math_util_noise2_float_vector_floatBSB_2ESB_(T, A) (Mu::noise2((A)))
 #define math_util_noise1_float_float(T, A) (Mu::noise1((A)))
 #define math_util_sphrand_vector_floatBSB_3ESB_(T) (Mu::sphrand())
-#define math_util_smoothstep_float_float_float_float(T, A, B, C) \
-    (Mu::smoothstep((A), (B), (C)))
-#define math_util_linstep_float_float_float_float(T, A, B, C) \
-    (Mu::linstep((A), (B), (C)))
+#define math_util_smoothstep_float_float_float_float(T, A, B, C) (Mu::smoothstep((A), (B), (C)))
+#define math_util_linstep_float_float_float_float(T, A, B, C) (Mu::linstep((A), (B), (C)))
 #define math_util_degrees_float_float(T, A) ((A) * 57.29578)
 #define math_util_radians_float_float(T, A) ((A) * 0.017453293)
 #define math_util_step_float_float_float(T, A, U) ((U) < (A) ? 0.0f : 1.0f)
-#define math_util_hermite_float_float_float_float_float_float(T, A, B, C, D, \
-                                                              E)             \
-    (Mu::hermite((A), (B), (C), (D), (E)))
+#define math_util_hermite_float_float_float_float_float_float(T, A, B, C, D, E) (Mu::hermite((A), (B), (C), (D), (E)))
 #define math_util_seed_void_int(T, A) (::srandom((A)))
 #define math_util_gauss_float_float(T, A) (Mu::gauss((A)))
 #define math_util_random_float_float(T, A) (Mu::extrand((A)))
@@ -632,35 +506,27 @@ namespace Mu
 //  multiple evaluation of the arguments
 //
 
-inline Mu::Vector4f
-math_util_lerp_vector_floatBSB_4ESB__vector_floatBSB_4ESB__vector_floatBSB_4ESB_(
-    Mu::Thread&, const Mu::Vector4f& a, const Mu::Vector4f& b, float t)
+inline Mu::Vector4f math_util_lerp_vector_floatBSB_4ESB__vector_floatBSB_4ESB__vector_floatBSB_4ESB_(Mu::Thread&, const Mu::Vector4f& a,
+                                                                                                     const Mu::Vector4f& b, float t)
 {
     return b * t + a * (1.0f - t);
 }
 
-inline Mu::Vector2f
-math_util_lerp_vector_floatBSB_2ESB__vector_floatBSB_2ESB__vector_floatBSB_2ESB_(
-    Mu::Thread&, const Mu::Vector2f& a, const Mu::Vector2f& b, float t)
+inline Mu::Vector2f math_util_lerp_vector_floatBSB_2ESB__vector_floatBSB_2ESB__vector_floatBSB_2ESB_(Mu::Thread&, const Mu::Vector2f& a,
+                                                                                                     const Mu::Vector2f& b, float t)
 {
     return b * t + a * (1.0f - t);
 }
 
-inline Mu::Vector3f
-math_util_lerp_vector_floatBSB_3ESB__vector_floatBSB_3ESB__vector_floatBSB_3ESB_(
-    Mu::Thread&, const Mu::Vector3f& a, const Mu::Vector3f& b, float t)
+inline Mu::Vector3f math_util_lerp_vector_floatBSB_3ESB__vector_floatBSB_3ESB__vector_floatBSB_3ESB_(Mu::Thread&, const Mu::Vector3f& a,
+                                                                                                     const Mu::Vector3f& b, float t)
 {
     return b * t + a * (1.0f - t);
 }
 
-inline float math_util_lerp_float_float_float_float(Mu::Thread&, float a,
-                                                    float b, float t)
-{
-    return b * t + a * (1.0f - t);
-}
+inline float math_util_lerp_float_float_float_float(Mu::Thread&, float a, float b, float t) { return b * t + a * (1.0f - t); }
 
-inline float math_util_clamp_float_float_float_float(Mu::Thread&, float val,
-                                                     float mn, float mx)
+inline float math_util_clamp_float_float_float_float(Mu::Thread&, float val, float mn, float mx)
 {
     return val < mn ? mn : (val > mx ? mx : val);
 }
@@ -711,8 +577,7 @@ Mu::Pointer string_string_vector_floatBSB_4ESB_(Mu::Thread&, Mu::Vector4f);
 Mu::Pointer string_string_vector_floatBSB_3ESB_(Mu::Thread&, Mu::Vector3f);
 Mu::Pointer string_string_vector_floatBSB_2ESB_(Mu::Thread&, Mu::Vector2f);
 Mu::Pointer Plus__string_string_string(Mu::Thread&, Mu::Pointer, Mu::Pointer);
-Mu::Pointer Plus_EQ__stringAmp__stringAmp__string(Mu::Thread&, Mu::Pointer,
-                                                  Mu::Pointer);
+Mu::Pointer Plus_EQ__stringAmp__stringAmp__string(Mu::Thread&, Mu::Pointer, Mu::Pointer);
 
 int int_int_string(Mu::Thread&, Mu::Pointer);
 float float_float_string(Mu::Thread&, Mu::Pointer);
@@ -721,34 +586,26 @@ bool EQ_EQ__bool_string_string(Mu::Thread&, Mu::Pointer, Mu::Pointer);
 bool Bang_EQ__bool_string_string(Mu::Thread&, Mu::Pointer, Mu::Pointer);
 
 // these are the format operator (%)
-Mu::Pointer PCent__string_string_QMark_tuple(Mu::Thread&, Mu::Pointer,
-                                             Mu::Pointer);
+Mu::Pointer PCent__string_string_QMark_tuple(Mu::Thread&, Mu::Pointer, Mu::Pointer);
 Mu::Pointer PCent__string_string_int(Mu::Thread&, Mu::Pointer, int);
 Mu::Pointer PCent__string_string_float(Mu::Thread&, Mu::Pointer, float);
 Mu::Pointer PCent__string_string_short(Mu::Thread&, Mu::Pointer, short);
 Mu::Pointer PCent__string_string_char(Mu::Thread&, Mu::Pointer, int);
 Mu::Pointer PCent__string_string_byte(Mu::Thread&, Mu::Pointer, char);
 Mu::Pointer PCent__string_string_bool(Mu::Thread&, Mu::Pointer, bool);
-Mu::Pointer PCent__string_string_vector_floatBSB_4ESB_(Mu::Thread&, Mu::Pointer,
-                                                       Mu::Vector4f);
-Mu::Pointer PCent__string_string_vector_floatBSB_3ESB_(Mu::Thread&, Mu::Pointer,
-                                                       Mu::Vector3f);
-Mu::Pointer PCent__string_string_vector_floatBSB_2ESB_(Mu::Thread&, Mu::Pointer,
-                                                       Mu::Vector2f);
-Mu::Pointer PCent__string_string_QMark_class_not_tuple(Mu::Thread& NODE_THREAD,
-                                                       Mu::Pointer,
-                                                       Mu::Pointer);
+Mu::Pointer PCent__string_string_vector_floatBSB_4ESB_(Mu::Thread&, Mu::Pointer, Mu::Vector4f);
+Mu::Pointer PCent__string_string_vector_floatBSB_3ESB_(Mu::Thread&, Mu::Pointer, Mu::Vector3f);
+Mu::Pointer PCent__string_string_vector_floatBSB_2ESB_(Mu::Thread&, Mu::Pointer, Mu::Vector2f);
+Mu::Pointer PCent__string_string_QMark_class_not_tuple(Mu::Thread& NODE_THREAD, Mu::Pointer, Mu::Pointer);
 
 void print_void_string(Mu::Thread&, Mu::Pointer);
 
 int string_size_int_string(Mu::Thread&, Mu::Pointer);
 int string_hash_int_string(Mu::Thread&, Mu::Pointer);
 int compare_int_string_string(Mu::Thread&, Mu::Pointer, Mu::Pointer);
-Mu::Pointer string_substr_string_string_int_int(Mu::Thread&, Mu::Pointer, int,
-                                                int);
+Mu::Pointer string_substr_string_string_int_int(Mu::Thread&, Mu::Pointer, int, int);
 int string_BSB_ESB__char_string_int(Mu::Thread&, Mu::Pointer, int);
-Mu::Pointer string_split_stringBSB_ESB__string_string(Mu::Thread&, Mu::Pointer,
-                                                      Mu::Pointer);
+Mu::Pointer string_split_stringBSB_ESB__string_string(Mu::Thread&, Mu::Pointer, Mu::Pointer);
 
 // ---- regex type ----
 //
@@ -758,10 +615,8 @@ Mu::Pointer string_split_stringBSB_ESB__string_string(Mu::Thread&, Mu::Pointer,
 Mu::Pointer regex_regex_string(Mu::Thread&, Mu::Pointer);
 Mu::Pointer regex_regex_string_int(Mu::Thread&, Mu::Pointer, int);
 bool regex_match_bool_regex_string(Mu::Thread&, Mu::Pointer, Mu::Pointer);
-Mu::Pointer regex_smatch_stringBSB_ESB__regex_string(Mu::Thread&, Mu::Pointer,
-                                                     Mu::Pointer);
+Mu::Pointer regex_smatch_stringBSB_ESB__regex_string(Mu::Thread&, Mu::Pointer, Mu::Pointer);
 void print_void_string(Mu::Thread&, Mu::Pointer);
-Mu::Pointer regex_replace_string_regex_string_string(Mu::Thread&, Mu::Pointer,
-                                                     Mu::Pointer, Mu::Pointer);
+Mu::Pointer regex_replace_string_regex_string_string(Mu::Thread&, Mu::Pointer, Mu::Pointer, Mu::Pointer);
 
 #endif // __Mu__CPPIntType__h__

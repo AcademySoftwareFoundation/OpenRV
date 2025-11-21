@@ -65,11 +65,8 @@ namespace TwkGLF
 
         struct Attachment
         {
-            Attachment(GLuint _id = 0, GLuint _attachPoint = 0,
-                       GLenum _target = GL_TEXTURE_RECTANGLE_ARB,
-                       GLenum _type = 0, bool _istexture = false,
-                       bool _isstencil = false, bool _isdepth = false,
-                       bool _owner = true)
+            Attachment(GLuint _id = 0, GLuint _attachPoint = 0, GLenum _target = GL_TEXTURE_RECTANGLE_ARB, GLenum _type = 0,
+                       bool _istexture = false, bool _isstencil = false, bool _isdepth = false, bool _owner = true)
                 : id(_id)
                 , attachPoint(_attachPoint)
                 , type(_type)
@@ -125,7 +122,7 @@ namespace TwkGLF
         //
 
         GLFBO(size_t width, size_t height,
-              GLenum colorFormat, // internal format of color attachment point
+              GLenum colorFormat,         // internal format of color attachment point
               size_t multiSampleSize = 0, // 0 == 1
               void* data = 0);
 
@@ -139,10 +136,7 @@ namespace TwkGLF
         size_t width() const;
         size_t height() const;
 
-        template <class T> T* data() const
-        {
-            return reinterpret_cast<T*>(m_data);
-        }
+        template <class T> T* data() const { return reinterpret_cast<T*>(m_data); }
 
         void setData(void* d) { m_data = d; }
 
@@ -184,9 +178,7 @@ namespace TwkGLF
         Attachment newColorTexture(GLenum target, // texture target
                                    GLenum format, // internal format
                                    GLenum type,   //
-                                   GLenum minFilter = GL_LINEAR,
-                                   GLenum magFilter = GL_LINEAR,
-                                   GLenum clamping = GL_CLAMP_TO_EDGE);
+                                   GLenum minFilter = GL_LINEAR, GLenum magFilter = GL_LINEAR, GLenum clamping = GL_CLAMP_TO_EDGE);
 
         //
         //  Attach existing texture as color attachment. The internalFormat has
@@ -255,19 +247,14 @@ namespace TwkGLF
         //  The read and write buffers will be set
         //
 
-        void copyTo(const GLFBO* destinationFBO,
-                    GLenum mask = GL_COLOR_BUFFER_BIT,
-                    GLenum filter = GL_NEAREST) const;
+        void copyTo(const GLFBO* destinationFBO, GLenum mask = GL_COLOR_BUFFER_BIT, GLenum filter = GL_NEAREST) const;
 
         //
         //  src and dst coordinates are in NDC coords
         //
 
-        void copyRegionTo(const GLFBO* destinationFBO, float srcX, float srcY,
-                          float srcW, float srcH, float dstX, float dstY,
-                          float dstW, float dstH,
-                          GLenum mask = GL_COLOR_BUFFER_BIT,
-                          GLenum filter = GL_NEAREST) const;
+        void copyRegionTo(const GLFBO* destinationFBO, float srcX, float srcY, float srcW, float srcH, float dstX, float dstY, float dstW,
+                          float dstH, GLenum mask = GL_COLOR_BUFFER_BIT, GLenum filter = GL_NEAREST) const;
 
         //
         //  For reading/processing back to host memory possibly with
@@ -282,7 +269,7 @@ namespace TwkGLF
 
         void initReadBack(GLenum hint = GL_STATIC_READ);
 
-        void insertFence() const; // after rendering commands are complete
+        void insertFence() const;                    // after rendering commands are complete
         void waitForFence(bool client = true) const; // waits on inserted fence
 
         void beginExternalReadback() const;

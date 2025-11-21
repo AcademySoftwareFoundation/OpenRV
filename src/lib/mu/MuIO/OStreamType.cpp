@@ -45,10 +45,7 @@ namespace Mu
 
     Object* OStreamType::newObject() const { return new OStream(this); }
 
-    void OStreamType::deleteObject(Object* obj) const
-    {
-        delete static_cast<OStreamType::OStream*>(obj);
-    }
+    void OStreamType::deleteObject(Object* obj) const { delete static_cast<OStreamType::OStream*>(obj); }
 
     void OStreamType::load()
     {
@@ -68,35 +65,27 @@ namespace Mu
 
         s->addSymbols(new ReferenceType(c, "ostream&", this),
 
-                      new Function(c, "ostream", BaseFunctions::dereference,
-                                   Cast, Return, tn, Args, rn, End),
+                      new Function(c, "ostream", BaseFunctions::dereference, Cast, Return, tn, Args, rn, End),
 
                       EndArguments);
 
         globalScope()->addSymbols(
 
-            new Function(c, "print", StreamType::print, None, Return, "void",
-                         Args, tn, End),
+            new Function(c, "print", StreamType::print, None, Return, "void", Args, tn, End),
 
-            new Function(c, "=", BaseFunctions::assign, AsOp, Return, rn, Args,
-                         rn, tn, End),
+            new Function(c, "=", BaseFunctions::assign, AsOp, Return, rn, Args, rn, tn, End),
 
             EndArguments);
 
-        addSymbols(new Function(c, "putc", OStreamType::putc, None, Return, tn,
-                                Args, tn, "char", End),
+        addSymbols(new Function(c, "putc", OStreamType::putc, None, Return, tn, Args, tn, "char", End),
 
-                   new Function(c, "write", OStreamType::write, None, Return,
-                                tn, Args, tn, "byte", End),
+                   new Function(c, "write", OStreamType::write, None, Return, tn, Args, tn, "byte", End),
 
-                   new Function(c, "write", OStreamType::writeBytes, None,
-                                Return, tn, Args, tn, "byte[]", End),
+                   new Function(c, "write", OStreamType::writeBytes, None, Return, tn, Args, tn, "byte[]", End),
 
-                   new Function(c, "seekp", OStreamType::seek, None, Return, tn,
-                                Args, tn, "int", End),
+                   new Function(c, "seekp", OStreamType::seek, None, Return, tn, Args, tn, "int", End),
 
-                   new Function(c, "tellp", OStreamType::tell, None, Return,
-                                "int", Args, tn, End),
+                   new Function(c, "tellp", OStreamType::tell, None, Return, "int", Args, tn, End),
 
                    EndArguments);
     }

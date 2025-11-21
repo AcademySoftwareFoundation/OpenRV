@@ -9,6 +9,7 @@ module: presentation_mode {
 use rvtypes;
 use commands;
 use extra_commands;
+use app_utils;
 use gl;
 use glyph;
 
@@ -234,6 +235,79 @@ class: PresentationControlMinorMode : MinorMode
 	runtime.gc.pop_api();
     }
 
+    method: _drawFormat (void; Event event)
+    {
+        if (!_showFormat) return;
+        let vstate = videoState();
+        if (vstate eq nil) return;
+
+        let domain = event.domain(),
+            width  = domain.x,
+            height = domain.y,
+            h      = height / 4,
+            w      = width * 0.6,
+            m      = (width - w) / 2;
+
+        setupProjection(domain.x, domain.y, event.domainVerticalFlip());
+
+        \: init (void; FormatText t, string text, int w, int h)
+        {
+            if (text eq nil || text.size() == 0) text = " ";
+            t.text     = "%s" % text;
+            t.fontSize = fitTextInBox(text, w, h);
+
+            gltext.size(t.fontSize);
+
+            let b  = gltext.bounds(text);
+            t.width    = b[0] + b[2];
+            t.height   = -b[1] + b[3];
+            t.valid    = true;
+        }
+
+        if (!_deviceText.valid)
+        {
+            runtime.gc.push_api(0);
+            init(_deviceText, "%s/%s" % (vstate.module, vstate.device), w, h);
+            init(_formatText, vstate.videoFormat, w, h);
+            init(_dataFormatText, vstate.dataFormat, w, h);
+            init(_audioFormatText, vstate.audioFormat, w, h);
+
+            _totalHeight = _deviceText.height + _formatText.height +
+                _dataFormatText.height + _audioFormatText.height;
+
+            runtime.gc.pop_api();
+        }
+
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        let hm = (height - _totalHeight) / 2,
+            sep = (height / 4.0) * 0.1;
+
+        int y = height - hm;
+
+        drawRoundedBox(m, y - _totalHeight - sep * 4,
+                        width - m, y,
+                        20,
+                        Color(0,0,0,.75), Color(0,0,0,1));
+
+        for_each (t; [_deviceText, _formatText, _dataFormatText, _audioFormatText])
+        {
+            y -= t.height;
+
+            gltext.size(t.fontSize);
+
+            gltext.color(Color(0,0,0,.1)); gltext.writeAt(m - 2, y - 2, t.text);
+            gltext.color(Color(0,0,0,.1)); gltext.writeAt(m + 2, y + 2, t.text);
+            gltext.color(Color(0,0,0,.1)); gltext.writeAt(m - 2, y + 2, t.text);
+            gltext.color(Color(0,0,0,.25)); gltext.writeAt(m + 4, y - 4, t.text);
+            gltext.color(Color(.75,.75,.75,1)); gltext.writeAt(m, y, t.text);
+
+            y -= sep;
+        }
+
+        glDisable(GL_BLEND);
+    }
+
     method: render (void; Event event)
     {
         event.reject();
@@ -312,67 +386,7 @@ class: PresentationControlMinorMode : MinorMode
         setupProjection(domain.x, domain.y, event.domainVerticalFlip());
 
         _drawPointer (event, state);
-
-        if (_showFormat)
-        {
-            let vstate = videoState(),
-                h = vstate.height / 4,
-                w = vstate.width * 0.6,
-                m = (vstate.width - w) / 2;
-
-            \: init (void; FormatText t, string text, int w, int h)
-            {
-                t.text     = text;
-                t.fontSize = fitTextInBox(text, w, h);
-
-                gltext.size(t.fontSize);
-
-                let b  = gltext.bounds(text);
-                t.width    = b[0] + b[2];
-                t.height   = -b[1] + b[3];
-                t.valid    = true;
-            }
-
-            if (!_deviceText.valid)
-            {
-                init(_deviceText, "%s/%s" % (vstate.module, vstate.device), w, h);
-                init(_formatText, vstate.videoFormat, w, h);
-                init(_dataFormatText, vstate.dataFormat, w, h);
-                init(_audioFormatText, vstate.audioFormat, w, h);
-
-                _totalHeight = _deviceText.height + _formatText.height + 
-                    _dataFormatText.height + _audioFormatText.height;
-            }
-
-            glEnable(GL_BLEND);
-            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-            let hm = (vstate.height - _totalHeight) / 2,
-                sep = (vstate.height / 4.0) * 0.1;
-
-            int y = vstate.height - hm;
-
-            drawRoundedBox(m, y - _totalHeight - sep * 4, 
-                           vstate.width - m, y,
-                           20,
-                           Color(0,0,0,.75), Color(0,0,0,1));
-
-            for_each (t; [_deviceText, _formatText, _dataFormatText, _audioFormatText])
-            {
-                y -= t.height;
-
-                gltext.size(t.fontSize);
-
-                gltext.color(Color(0,0,0,.1)); gltext.writeAt(m - 2, y - 2, t.text);
-                gltext.color(Color(0,0,0,.1)); gltext.writeAt(m + 2, y + 2, t.text);
-                gltext.color(Color(0,0,0,.1)); gltext.writeAt(m - 2, y + 2, t.text);
-                gltext.color(Color(0,0,0,.25)); gltext.writeAt(m + 4, y - 4, t.text);
-                gltext.color(Color(.75,.75,.75,1)); gltext.writeAt(m, y, t.text);
-
-                y -= sep;
-            }
-
-            glDisable(GL_BLEND);
-        }
+        _drawFormat (event);
 
 	}
 	catch (object obj)
@@ -495,34 +509,36 @@ class: PresentationControlMinorMode : MinorMode
               ("key-down--alt--f", scaleFrameWidth, "Set image scale fit image width on presentation device")
                ],
              nil,
-             Menu {
-                 {"Image", Menu {
-                    {"Scale", Menu {
-                         {"_",  nil},
-                         {"On Presentation Device",  nil,  nil, inactiveState},
-                         {"   1:1",  scaleOneToOne,  "!", presentationModeState},
-                         {"   1:2",  scaleOneToTwo,  nil, presentationModeState},
-                         {"   Frame Width",  scaleFrameWidth,  "alt f", presentationModeState},
-                        }}}},
-                 {"View", Menu {
-                    {"Presentation Settings", Menu {
-                         {"Show",  nil,  nil, inactiveState},
-                         {"   Pointer", togglePointer, nil, pointerState},
-			 //  XXX
-			 //  This errors in pres mode in rv4, crashes rvsdi, turn off for now
-                         //  {"   Video Format", toggleFormat, nil, formatState},
-                         {"_", nil, nil},
-                         {"Mirror",  nil,  nil, inactiveState},
-                         {"   Timeline", toggleTimeline, nil, timelineState},
-                         {"   Timeline Magnitifer", toggleTimelineMag, nil, timelineMagState},
-                         {"   Image Info", toggleImageInfo, nil, imageInfoState},
-                         {"   Source Details", toggleSourceDetails, nil, sourceDetailsState},
-                         {"   Color Inspector", toggleInspector, nil, inspectorState},
-                         {"   Wipes", toggleWipes, nil, wipesState},
-                         {"   Info Strip", toggleInfoStrip, nil, infoStripState},
-                         {"   Feedback Messages", toggleFeedback, nil, feedbackState},
-                         {"   Remote Sync Pointers", toggleSync, nil, syncState}
-                     }}}}});
+            newMenu(MenuItem[] {
+                subMenu("Image", MenuItem[] {
+                    subMenu("Scale", MenuItem[] {
+                        menuSeparator(),
+                        menuText("On Presentation Device"),
+                        menuItem("   1:1", "key-down--!", "presentation_category", scaleOneToOne, presentationModeState),
+                        menuItem("   1:2", "", "presentation_category", scaleOneToTwo, presentationModeState),
+                        menuItem("   Frame Width", "key-down--alt--f", "presentation_category", scaleFrameWidth, presentationModeState)
+                    })
+                }),
+                subMenu("View", MenuItem[] {
+                    subMenu("Presentation Settings", MenuItem[] {
+                        menuText("Show"),
+                        menuItem("   Pointer", "", "presentation_category", togglePointer, pointerState),
+                        menuItem("   Video Format", "", "presentation_category", toggleFormat, formatState),
+                        menuSeparator(),
+                        menuText("Mirror"),
+                        menuItem("   Timeline", "", "presentation_category", toggleTimeline, timelineState),
+                        menuItem("   Timeline Magnitifer", "", "presentation_category", toggleTimelineMag, timelineMagState),
+                        menuItem("   Image Info", "", "presentation_category", toggleImageInfo, imageInfoState),
+                        menuItem("   Source Details", "", "presentation_category", toggleSourceDetails, sourceDetailsState),
+                        menuItem("   Color Inspector", "", "presentation_category", toggleInspector, inspectorState),
+                        menuItem("   Wipes", "", "presentation_category", toggleWipes, wipesState),
+                        menuItem("   Info Strip", "", "presentation_category", toggleInfoStrip, infoStripState),
+                        menuItem("   Feedback Messages", "", "presentation_category", toggleFeedback, feedbackState),
+                        menuItem("   Remote Sync Pointers", "", "presentation_category", toggleSync, syncState)
+                    })
+                })
+            })
+        );
     }
 }
 

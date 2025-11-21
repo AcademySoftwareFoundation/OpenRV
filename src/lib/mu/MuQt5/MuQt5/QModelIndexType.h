@@ -44,8 +44,7 @@ namespace Mu
         //  Constructors
         //
 
-        QModelIndexType(Context* context, const char* name,
-                        Class* superClass = 0);
+        QModelIndexType(Context* context, const char* name, Class* superClass = 0);
         virtual ~QModelIndexType();
 
         //

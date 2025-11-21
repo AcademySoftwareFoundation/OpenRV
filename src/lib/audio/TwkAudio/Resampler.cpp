@@ -29,8 +29,7 @@ namespace TwkAudio
 
     Resampler::~Resampler() { close(); }
 
-    size_t Resampler::process(const float* in, size_t inSize, float* out,
-                              size_t outSize, bool endFlag, bool enableClamp)
+    size_t Resampler::process(const float* in, size_t inSize, float* out, size_t outSize, bool endFlag, bool enableClamp)
     {
         int inUsed = 0;
         int inUsedTotal = 0;
@@ -41,10 +40,8 @@ namespace TwkAudio
             size_t left = inSize - inUsedTotal;
             int bsize = std::min(left, m_blocksize);
 
-            size_t outUsed =
-                resample_process(m_handle, m_factor, (float*)(in + inUsedTotal),
-                                 bsize, endFlag && left < m_blocksize, &inUsed,
-                                 out + outUsedTotal, outSize - outUsedTotal);
+            size_t outUsed = resample_process(m_handle, m_factor, (float*)(in + inUsedTotal), bsize, endFlag && left < m_blocksize, &inUsed,
+                                              out + outUsedTotal, outSize - outUsedTotal);
 
             inUsedTotal += inUsed;
 
@@ -73,13 +70,11 @@ namespace TwkAudio
         return outUsedTotal;
     }
 
-    void Resampler::process(const SampleVector& in, SampleVector& out,
-                            bool endFlag, bool enableClamp)
+    void Resampler::process(const SampleVector& in, SampleVector& out, bool endFlag, bool enableClamp)
     {
         size_t n = size_t(double(in.size()) * m_factor);
         out.resize(n);
-        process(&in.front(), in.size(), &out.front(), out.size(), endFlag,
-                enableClamp);
+        process(&in.front(), in.size(), &out.front(), out.size(), endFlag, enableClamp);
     }
 
     void Resampler::reset() { resample_reset(m_handle); }
@@ -103,8 +98,7 @@ namespace TwkAudio
 
     //----------------------------------------------------------------------
 
-    MultiResampler::MultiResampler(int numChannels, double factor,
-                                   size_t blocksize)
+    MultiResampler::MultiResampler(int numChannels, double factor, size_t blocksize)
         : m_inbuffers(numChannels)
         , m_outbuffers(numChannels)
     {
@@ -132,9 +126,7 @@ namespace TwkAudio
         }
     }
 
-    size_t MultiResampler::process(const float* in, size_t inSize, float* out,
-                                   size_t outSize, bool endFlag,
-                                   bool enableClamp)
+    size_t MultiResampler::process(const float* in, size_t inSize, float* out, size_t outSize, bool endFlag, bool enableClamp)
     {
         deinterlace(in, inSize, m_resamplers.size(), m_inbuffers);
 
@@ -152,9 +144,8 @@ namespace TwkAudio
         size_t samples = 0;
         for (int ch = 0; ch < m_resamplers.size(); ch++)
         {
-            size_t nsamps = m_resamplers[ch]->process(
-                &(m_inbuffers[ch].front()), inSize, &(m_outbuffers[ch].front()),
-                outSize, endFlag, enableClamp);
+            size_t nsamps =
+                m_resamplers[ch]->process(&(m_inbuffers[ch].front()), inSize, &(m_outbuffers[ch].front()), outSize, endFlag, enableClamp);
 #ifndef NDEBUG
             if (samples != 0 && samples != nsamps)
             {

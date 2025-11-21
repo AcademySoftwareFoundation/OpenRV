@@ -46,9 +46,7 @@ namespace TwkApp
         class Item
         {
         public:
-            Item(const std::string& title, Action* action,
-                 const std::string& key = "", StateFunc* stateFunc = 0,
-                 Menu* subMenu = 0)
+            Item(const std::string& title, Action* action, const std::string& key = "", StateFunc* stateFunc = 0, Menu* subMenu = 0)
                 : m_title(title)
                 , m_action(action)
                 , m_key(key)

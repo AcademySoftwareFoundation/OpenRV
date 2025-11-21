@@ -51,9 +51,7 @@ namespace stl_ext
     static int currentTime(struct timeval* tp) { return gettimeofday(tp, 0); }
 #endif
 
-    thread_group::thread_group(int num_threads, int stack_mult, thread_api* api,
-                               const func_vector* funcs,
-                               const data_vector* datas)
+    thread_group::thread_group(int num_threads, int stack_mult, thread_api* api, const func_vector* funcs, const data_vector* datas)
         : _num_finished(0)
         , _num_threads(0)
         , _data(0)
@@ -99,8 +97,7 @@ namespace stl_ext
 
         while (_num_threads > 0)
         {
-            debug("~thread_group: control dispatch with noop, num_threads = %d",
-                  _num_threads);
+            debug("~thread_group: control dispatch with noop, num_threads = %d", _num_threads);
             dispatch(noop, 0);
             debug("~thread_group: control joining worker: %d", _num_threads);
 
@@ -117,15 +114,13 @@ namespace stl_ext
             // do guard against a zero value for _join_thread.
             //
             size_t threadID = 0;
-            memcpy(&threadID, &_join_thread,
-                   std::min(sizeof(threadID), sizeof(_join_thread)));
+            memcpy(&threadID, &_join_thread, std::min(sizeof(threadID), sizeof(_join_thread)));
             if (threadID)
             {
                 if (int err = _api.join(_join_thread, NULL))
                 {
                     pthread_t thread = pthread_self();
-                    printf("~thread_group: %p -- join: %s", thread,
-                           strerror(err));
+                    printf("~thread_group: %p -- join: %s", thread, strerror(err));
                 }
             }
             /* AJG - This WILL break something */
@@ -184,9 +179,7 @@ namespace stl_ext
             struct timeval tv;
             int t = currentTime(&tv);
 
-            fprintf(stderr, "%d %d %p/%p/%d/%lu: ", (int)tv.tv_sec,
-                    (int)tv.tv_usec, this, thread, worker_num + 1,
-                    _threads.size());
+            fprintf(stderr, "%d %d %p/%p/%d/%lu: ", (int)tv.tv_sec, (int)tv.tv_usec, this, thread, worker_num + 1, _threads.size());
 #endif
             vfprintf(stderr, c, ap);
             fprintf(stderr, "\n");
@@ -210,8 +203,7 @@ namespace stl_ext
     void* thread_group::thread_main(void* arg)
     {
         thread_package pack = *((thread_package*)arg);
-        pack.group->debug("thread_main: worker in main, thread_package: %p",
-                          arg);
+        pack.group->debug("thread_main: worker in main, thread_package: %p", arg);
 
 #ifdef PLATFORM_APPLE_MACH_BSD
         //
@@ -221,9 +213,8 @@ namespace stl_ext
 
         pthread_setname_np("thread_group");
 #endif
-        pack.group->debug("thread_main: pthread_setspecific: %p %p %p %p",
-                          pack.group->_funcKey, (void*)pack.func,
-                          pack.group->_dataKey, pack.data);
+        pack.group->debug("thread_main: pthread_setspecific: %p %p %p %p", pack.group->_funcKey, (void*)pack.func, pack.group->_dataKey,
+                          pack.data);
 
         pthread_setspecific(pack.group->_funcKey, (void*)pack.func);
         pthread_setspecific(pack.group->_dataKey, pack.data);
@@ -244,9 +235,7 @@ namespace stl_ext
         return 0;
     }
 
-    void thread_group::add_thread(int num_to_add, size_t stack_mult,
-                                  const func_vector* funcs,
-                                  const data_vector* datas)
+    void thread_group::add_thread(int num_to_add, size_t stack_mult, const func_vector* funcs, const data_vector* datas)
     {
         debug("add_thread");
         if (num_to_add)
@@ -257,8 +246,7 @@ namespace stl_ext
             size_t s = _threads.size();
             _threads.resize(s + num_to_add);
             _packages.resize(_threads.size());
-            pthread_attr_setstacksize(&_thread_attr,
-                                      _default_stack_size * stack_mult);
+            pthread_attr_setstacksize(&_thread_attr, _default_stack_size * stack_mult);
 
             if (funcs)
                 assert(funcs->size() == num_to_add);
@@ -278,11 +266,9 @@ namespace stl_ext
                 pack.data = (funcs) ? (*datas)[i - s] : 0;
 
                 memset(&_threads[i], 0, sizeof(pthread_t));
-                if (int err = _api.create(&_threads[i], &_thread_attr,
-                                          thread_main, &pack))
+                if (int err = _api.create(&_threads[i], &_thread_attr, thread_main, &pack))
                 {
-                    printf("add_thread: Error trying to create thread %d: %d",
-                           i, err);
+                    printf("add_thread: Error trying to create thread %d: %d", i, err);
                     abort();
                 }
                 _num_threads++;
@@ -344,8 +330,7 @@ namespace stl_ext
         }
     }
 
-    bool thread_group::wait_cond_time(pthread_cond_t& cond,
-                                      pthread_mutex_t& mutex, size_t usec)
+    bool thread_group::wait_cond_time(pthread_cond_t& cond, pthread_mutex_t& mutex, size_t usec)
     {
         timespec ts;
 
@@ -383,8 +368,7 @@ namespace stl_ext
             if (err != ETIMEDOUT)
             {
                 pthread_t thread = pthread_self();
-                printf("ERROR: %p -- cond_wait_timed: %s\n", thread,
-                       strerror(err));
+                printf("ERROR: %p -- cond_wait_timed: %s\n", thread, strerror(err));
                 fflush(stdout);
             }
             //  fprintf (stderr, "err %d %s\n", err, strerror(err));
@@ -442,14 +426,12 @@ namespace stl_ext
 
                     if (seconds)
                     {
-                        timedout = !wait_cond_time(_wait_cond, _wait_mutex,
-                                                   size_t(seconds * 1000000.0));
+                        timedout = !wait_cond_time(_wait_cond, _wait_mutex, size_t(seconds * 1000000.0));
                         if (timedout)
                         {
-                            debug(
-                                "control_wait: control wait timed out, %d "
-                                "threads remaining, _wait_cond and _wait_mutex",
-                                (_num_threads - _num_finished));
+                            debug("control_wait: control wait timed out, %d "
+                                  "threads remaining, _wait_cond and _wait_mutex",
+                                  (_num_threads - _num_finished));
                             break;
                         }
                     }
@@ -471,8 +453,7 @@ namespace stl_ext
 
                     if (seconds)
                     {
-                        timedout = !wait_cond_time(_wait_cond, _wait_mutex,
-                                                   size_t(seconds * 1000000.0));
+                        timedout = !wait_cond_time(_wait_cond, _wait_mutex, size_t(seconds * 1000000.0));
                         if (timedout)
                         {
                             debug("control_wait: control wait on any thread "
@@ -524,8 +505,7 @@ namespace stl_ext
             {
                 _wait_flag = true;
                 unlock(_worker_mutex);
-                debug("worker_wait: ERROR: _num_finished %d _num_threads %d",
-                      _num_finished, _num_threads);
+                debug("worker_wait: ERROR: _num_finished %d _num_threads %d", _num_finished, _num_threads);
                 return;
             }
             debug("worker_wait: %d workers left", _num_threads - _num_finished);
@@ -557,8 +537,7 @@ namespace stl_ext
             {
                 _recall = false;
 
-                thread_function savedFunc =
-                    (thread_function)pthread_getspecific(_funcKey);
+                thread_function savedFunc = (thread_function)pthread_getspecific(_funcKey);
                 void* savedData = pthread_getspecific(_dataKey);
 
                 if (savedFunc)
@@ -704,12 +683,10 @@ namespace stl_ext
         unlock(_control_mutex);
     }
 
-    bool thread_group::maybe_dispatch(thread_group::thread_function func,
-                                      void* data, bool async)
+    bool thread_group::maybe_dispatch(thread_group::thread_function func, void* data, bool async)
     {
         bool ret = false;
-        debug("control maybe dispatching worker num_finished %d",
-              _num_finished);
+        debug("control maybe dispatching worker num_finished %d", _num_finished);
 
         lock(_control_mutex);
 

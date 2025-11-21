@@ -55,20 +55,11 @@ namespace IPCore
     //  The compiled in modules
     //
 
-    static AudioRenderer*
-    createPerFrameAudio(const AudioRenderer::RendererParameters& p)
-    {
-        return new PerFrameAudioRenderer(p);
-    }
+    static AudioRenderer* createPerFrameAudio(const AudioRenderer::RendererParameters& p) { return new PerFrameAudioRenderer(p); }
 
-    static AudioRenderer*
-    createNothng(const AudioRenderer::RendererParameters& p)
-    {
-        TWK_THROW_EXC_STREAM("No audio module available");
-    }
+    static AudioRenderer* createNothng(const AudioRenderer::RendererParameters& p) { TWK_THROW_EXC_STREAM("No audio module available"); }
 
-    void AudioRenderer::addModuleInitFunc(ModuleInitializationFunc F,
-                                          std::string name)
+    void AudioRenderer::addModuleInitFunc(ModuleInitializationFunc F, std::string name)
     {
         ModuleInitObject initObj;
 
@@ -81,9 +72,7 @@ namespace IPCore
     namespace
     {
 
-        void addModuleIfAllowed(AudioRenderer::ModuleVector& modules,
-                                set<string>& badMods, string name,
-                                string plugName,
+        void addModuleIfAllowed(AudioRenderer::ModuleVector& modules, set<string>& badMods, string name, string plugName,
                                 AudioRenderer::ModuleCreateFunc F)
         {
             if (!badMods.count(name))
@@ -103,8 +92,7 @@ namespace IPCore
         void GetTrueWindowsVersion(OSVERSIONINFOEX* pOSversion)
         {
             // Function pointer to driver function
-            NTSTATUS(WINAPI * pRtlGetVersion)(
-                PRTL_OSVERSIONINFOW lpVersionInformation) = NULL;
+            NTSTATUS(WINAPI * pRtlGetVersion)(PRTL_OSVERSIONINFOW lpVersionInformation) = NULL;
 
             // load the System-DLL
             HINSTANCE hNTdllDll = LoadLibrary("ntdll.dll");
@@ -113,9 +101,7 @@ namespace IPCore
             if (hNTdllDll != NULL)
             {
                 // get the function pointer to RtlGetVersion
-                pRtlGetVersion =
-                    (NTSTATUS(WINAPI*)(PRTL_OSVERSIONINFOW))GetProcAddress(
-                        hNTdllDll, "RtlGetVersion");
+                pRtlGetVersion = (NTSTATUS(WINAPI*)(PRTL_OSVERSIONINFOW))GetProcAddress(hNTdllDll, "RtlGetVersion");
 
                 // if successfull then read the function
                 if (pRtlGetVersion != NULL)
@@ -152,10 +138,7 @@ namespace IPCore
 
     void AudioRenderer::setDebug(bool b) { AudioRenderer::debug = b; }
 
-    void AudioRenderer::setDebugVerbose(bool b)
-    {
-        AudioRenderer::debugVerbose = b;
-    }
+    void AudioRenderer::setDebugVerbose(bool b) { AudioRenderer::debugVerbose = b; }
 
     void AudioRenderer::setDumpAudio(bool b) { AudioRenderer::dump = b; }
 
@@ -180,16 +163,13 @@ namespace IPCore
 #ifdef PLATFORM_DARWIN
 
 #ifdef HAVE_COREAUDIO
-        addModuleIfAllowed(m_modules, badMods, "Core Audio (HAL)",
-                           "libCoreAudioHALModule", NULL);
+        addModuleIfAllowed(m_modules, badMods, "Core Audio (HAL)", "libCoreAudioHALModule", NULL);
 #endif
 #endif
 
 #ifdef PLATFORM_LINUX
-        addModuleIfAllowed(m_modules, badMods, "ALSA (Pre-1.0.14)",
-                           "libALSAAudioModule", NULL);
-        addModuleIfAllowed(m_modules, badMods, "ALSA (Safe)",
-                           "libALSASafeAudioModule", NULL);
+        addModuleIfAllowed(m_modules, badMods, "ALSA (Pre-1.0.14)", "libALSAAudioModule", NULL);
+        addModuleIfAllowed(m_modules, badMods, "ALSA (Safe)", "libALSASafeAudioModule", NULL);
 #endif
 
         for (size_t i = 0; i < m_moduleInitObjects.size(); i++)
@@ -234,8 +214,7 @@ namespace IPCore
 
                 if (parts.size() == 2)
                 {
-                    addModuleIfAllowed(m_modules, badMods, parts[0], parts[1],
-                                       NULL);
+                    addModuleIfAllowed(m_modules, badMods, parts[0], parts[1], NULL);
                 }
             }
         }
@@ -249,8 +228,7 @@ namespace IPCore
 
         if (!badMods.count("Per-Frame"))
         {
-            m_modules.push_back(
-                Module("Per-Frame", "", createPerFrameAudio, true));
+            m_modules.push_back(Module("Per-Frame", "", createPerFrameAudio, true));
         }
 
         //
@@ -278,15 +256,9 @@ namespace IPCore
              << "DEBUG:    device = " << p.device << endl;
     }
 
-    void AudioRenderer::setDefaultParameters(const RendererParameters& p)
-    {
-        m_defaultParameters = p;
-    }
+    void AudioRenderer::setDefaultParameters(const RendererParameters& p) { m_defaultParameters = p; }
 
-    static bool operator==(const AudioRenderer::Module& m, const string& s)
-    {
-        return m.name == s;
-    }
+    static bool operator==(const AudioRenderer::Module& m, const string& s) { return m.name == s; }
 
     void AudioRenderer::loadModule(Module& module)
     {
@@ -312,24 +284,20 @@ namespace IPCore
 
                 if (void* handle = dlopen(file.c_str(), RTLD_LAZY))
                 {
-                    ModuleCreateFunc F =
-                        (ModuleCreateFunc)dlsym(handle, "CreateAudioModule");
+                    ModuleCreateFunc F = (ModuleCreateFunc)dlsym(handle, "CreateAudioModule");
 
                     if (!F)
                     {
                         dlclose(handle);
 
-                        cerr << "ERROR: ignoring audio module " << file
-                             << ": missing CreateAudioModule function: "
-                             << dlerror() << endl;
+                        cerr << "ERROR: ignoring audio module " << file << ": missing CreateAudioModule function: " << dlerror() << endl;
                     }
 
                     module.func = F;
                 }
                 else
                 {
-                    cerr << "ERROR: opening audio module " << file << ": "
-                         << dlerror() << endl;
+                    cerr << "ERROR: opening audio module " << file << ": " << dlerror() << endl;
                 }
             }
         }
@@ -421,8 +389,7 @@ namespace IPCore
 
     void AudioRenderer::pushPerFrameModule(const RendererParameters& p)
     {
-        ModuleVector::iterator i =
-            find(m_modules.begin(), m_modules.end(), "Per-Frame");
+        ModuleVector::iterator i = find(m_modules.begin(), m_modules.end(), "Per-Frame");
 
         if (i != m_modules.end())
         {
@@ -443,14 +410,10 @@ namespace IPCore
         reset();
     }
 
-    const std::string& AudioRenderer::currentModule()
-    {
-        return m_modules[m_moduleIndex].name;
-    }
+    const std::string& AudioRenderer::currentModule() { return m_modules[m_moduleIndex].name; }
 
-    void AudioRenderer::transformFloat32ToInt24(
-        TwkAudio::AudioBuffer::BufferPointer inData, char* outData,
-        size_t dataCount, bool isLittleEndian)
+    void AudioRenderer::transformFloat32ToInt24(TwkAudio::AudioBuffer::BufferPointer inData, char* outData, size_t dataCount,
+                                                bool isLittleEndian)
     {
         char* out24 = (char*)outData;
         const double dscale24 = (double)0x7FFFFF; // 8388607;
@@ -512,10 +475,7 @@ namespace IPCore
         m_renderer = NULL;
     }
 
-    void AudioRenderer::setDeviceState(const DeviceState& state)
-    {
-        m_deviceState = state;
-    }
+    void AudioRenderer::setDeviceState(const DeviceState& state) { m_deviceState = state; }
 
     int AudioRenderer::findDeviceByName(const std::string& name) const
     {
@@ -543,10 +503,7 @@ namespace IPCore
 
     void AudioRenderer::lockPlaying() const { pthread_mutex_lock(&m_playLock); }
 
-    void AudioRenderer::unlockPlaying() const
-    {
-        pthread_mutex_unlock(&m_playLock);
-    }
+    void AudioRenderer::unlockPlaying() const { pthread_mutex_unlock(&m_playLock); }
 
     void AudioRenderer::availableLayouts(const Device&, LayoutsVector&) {}
 
@@ -581,10 +538,7 @@ namespace IPCore
 
     void AudioRenderer::lockSessions() { pthread_mutex_lock(&m_sessionsLock); }
 
-    void AudioRenderer::unlockSessions()
-    {
-        pthread_mutex_unlock(&m_sessionsLock);
-    }
+    void AudioRenderer::unlockSessions() { pthread_mutex_unlock(&m_sessionsLock); }
 
     void AudioRenderer::getSessions(vector<Session*>& temp)
     {
@@ -715,10 +669,7 @@ namespace IPCore
         return ok;
     }
 
-    void AudioRenderer::resetErrorCondition()
-    {
-        setErrorCondition(errorString());
-    }
+    void AudioRenderer::resetErrorCondition() { setErrorCondition(errorString()); }
 
     void AudioRenderer::setErrorCondition(const std::string& msg)
     {
@@ -740,8 +691,7 @@ namespace IPCore
 
         if (AudioRenderer::dump && !audioDumpFile)
         {
-            audioDumpFile =
-                new ofstream("audio-dump", std::ios::binary | std::ios::out);
+            audioDumpFile = new ofstream("audio-dump", std::ios::binary | std::ios::out);
         }
 
 #if 0
@@ -773,8 +723,7 @@ namespace IPCore
 
             lockSessions();
 
-            for (Sessions::iterator i = m_sessions.begin();
-                 i != m_sessions.end(); ++i)
+            for (Sessions::iterator i = m_sessions.begin(); i != m_sessions.end(); ++i)
             {
                 audioFillBuffer(*i, outBuffer);
             }
@@ -838,9 +787,7 @@ namespace IPCore
 
         if (AudioRenderer::dump)
         {
-            audioDumpFile->write(
-                reinterpret_cast<const char*>(outBuffer.pointer()),
-                outBuffer.sizeInBytes());
+            audioDumpFile->write(reinterpret_cast<const char*>(outBuffer.pointer()), outBuffer.sizeInBytes());
         }
     }
 
@@ -862,8 +809,7 @@ namespace IPCore
         const size_t loopSamples = timeToSamples(loopDuration, state.rate);
         const size_t elapsedSamples = timeToSamples(elapsed0, state.rate);
 
-        if (!s->audioFirstPass() && loopDuration != 0.0
-            && elapsed0 > loopDuration)
+        if (!s->audioFirstPass() && loopDuration != 0.0 && elapsed0 > loopDuration)
         {
             if (s->audioLoopCount() <= 0)
             {
@@ -879,8 +825,7 @@ namespace IPCore
 
         if (s->audioFirstPass())
         {
-            size_t initialSample =
-                timeToSamples(s->shift() / s->fps(), state.rate);
+            size_t initialSample = timeToSamples(s->shift() / s->fps(), state.rate);
             s->setAudioInitialSample(initialSample);
             s->setAudioStartSample(initialSample);
 
@@ -934,15 +879,11 @@ namespace IPCore
                 // the preRollDelay while the elapsed time computed from
                 // (startTime - s->audioSampleShift()) does not. NB: if
                 // m_parameters.preRoll is false preRollDelay() is zero.
-                s->setAudioTimeShift(startTime - s->audioSampleShift()
-                                     - s->elapsedPlaySecondsRaw()
-                                     + preRollDelay() - state.latency);
+                s->setAudioTimeShift(startTime - s->audioSampleShift() - s->elapsedPlaySecondsRaw() + preRollDelay() - state.latency);
             }
             else
             {
-                s->setAudioTimeShift(s->audioPlayTimer().elapsed()
-                                     - s->elapsedPlaySecondsRaw()
-                                     - state.latency);
+                s->setAudioTimeShift(s->audioPlayTimer().elapsed() - s->elapsedPlaySecondsRaw() - state.latency);
             }
         }
 
@@ -950,11 +891,8 @@ namespace IPCore
 
         if (AudioRenderer::debugVerbose)
         {
-            TwkUtil::Log("AUDIO")
-                << "AudioRenderer audio time shift set to "
-                << s->audioTimeShift() << " " << startTime << " "
-                << s->audioSampleShift() << " " << s->elapsedPlaySecondsRaw()
-                << " " << preRollDelay() << " ";
+            TwkUtil::Log("AUDIO") << "AudioRenderer audio time shift set to " << s->audioTimeShift() << " " << startTime << " "
+                                  << s->audioSampleShift() << " " << s->elapsedPlaySecondsRaw() << " " << preRollDelay() << " ";
         }
 
         size_t n;
@@ -962,8 +900,7 @@ namespace IPCore
 
         if (backwards)
         {
-            size_t boff =
-                s->audioStartSample() - s->audioInitialSample() + numSamples;
+            size_t boff = s->audioStartSample() - s->audioInitialSample() + numSamples;
 
             if (s->audioInitialSample() < boff)
             {
@@ -977,8 +914,7 @@ namespace IPCore
 
         try
         {
-            m_abuffer.reconfigure(numSamples, state.layout, Time(state.rate),
-                                  samplesToTime(start, state.rate), 0);
+            m_abuffer.reconfigure(numSamples, state.layout, Time(state.rate), samplesToTime(start, state.rate), 0);
 
             m_abuffer.zero();
             IPNode::AudioContext context(m_abuffer, s->fps());

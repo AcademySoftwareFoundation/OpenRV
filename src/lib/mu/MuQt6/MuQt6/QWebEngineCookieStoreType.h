@@ -42,9 +42,7 @@ namespace Mu
         //  Constructors
         //
 
-        QWebEngineCookieStoreType(Context* context, const char* name,
-                                  Class* superClass = 0,
-                                  Class* superClass2 = 0);
+        QWebEngineCookieStoreType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QWebEngineCookieStoreType();
 
@@ -77,17 +75,11 @@ namespace Mu
     public:
         void customEvent_pub(QEvent* event) { customEvent(event); }
 
-        void customEvent_pub_parent(QEvent* event)
-        {
-            QWebEngineCookieStore::customEvent(event);
-        }
+        void customEvent_pub_parent(QEvent* event) { QWebEngineCookieStore::customEvent(event); }
 
         void timerEvent_pub(QTimerEvent* event) { timerEvent(event); }
 
-        void timerEvent_pub_parent(QTimerEvent* event)
-        {
-            QWebEngineCookieStore::timerEvent(event);
-        }
+        void timerEvent_pub_parent(QTimerEvent* event) { QWebEngineCookieStore::timerEvent(event); }
 
     public:
         const QWebEngineCookieStoreType* _baseType;
@@ -95,11 +87,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance* QWebEngineCookieStoreType::cachedInstance(
-        const QWebEngineCookieStoreType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QWebEngineCookieStoreType::cachedInstance(const QWebEngineCookieStoreType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

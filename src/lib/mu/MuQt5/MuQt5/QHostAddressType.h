@@ -44,8 +44,7 @@ namespace Mu
         //  Constructors
         //
 
-        QHostAddressType(Context* context, const char* name,
-                         Class* superClass = 0);
+        QHostAddressType(Context* context, const char* name, Class* superClass = 0);
         virtual ~QHostAddressType();
 
         //

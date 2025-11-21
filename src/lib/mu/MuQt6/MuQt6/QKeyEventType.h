@@ -37,8 +37,7 @@ namespace Mu
         //  Constructors
         //
 
-        QKeyEventType(Context* context, const char* name,
-                      Class* superClass = 0);
+        QKeyEventType(Context* context, const char* name, Class* superClass = 0);
         virtual ~QKeyEventType();
 
         //

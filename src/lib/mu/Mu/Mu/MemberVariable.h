@@ -25,13 +25,11 @@ namespace Mu
     class MemberVariable : public Variable
     {
     public:
-        MemberVariable(Context* context, const char* name,
-                       const Type* storageClass, int address = 0,
-                       bool hidden = false, Attribute a = ReadWrite);
+        MemberVariable(Context* context, const char* name, const Type* storageClass, int address = 0, bool hidden = false,
+                       Attribute a = ReadWrite);
 
-        MemberVariable(Context* context, const char* name,
-                       const char* storageClass, int address = 0,
-                       bool hidden = false, Attribute a = ReadWrite);
+        MemberVariable(Context* context, const char* name, const char* storageClass, int address = 0, bool hidden = false,
+                       Attribute a = ReadWrite);
 
         bool isHidden() const { return _hidden; }
 
@@ -74,8 +72,7 @@ namespace Mu
     class InternalTypeMemberVariable : public MemberVariable
     {
     public:
-        InternalTypeMemberVariable(Context* c, const char* name,
-                                   const Class* value);
+        InternalTypeMemberVariable(Context* c, const char* name, const Class* value);
 
         const Class* value() const { return _value; }
 
@@ -96,17 +93,11 @@ namespace Mu
     class FunctionMemberVariable : public MemberVariable
     {
     public:
-        FunctionMemberVariable(Context* context, const char* name,
-                               const char* storageClass,
-                               const Function* refFunction,
-                               const Function* extractFunction = 0,
-                               int address = 0, Attribute a = ReadWrite);
+        FunctionMemberVariable(Context* context, const char* name, const char* storageClass, const Function* refFunction,
+                               const Function* extractFunction = 0, int address = 0, Attribute a = ReadWrite);
 
-        FunctionMemberVariable(Context* context, const char* name,
-                               const Type* storageClass,
-                               const Function* refFunction,
-                               const Function* extractFunction = 0,
-                               int address = 0, Attribute a = ReadWrite);
+        FunctionMemberVariable(Context* context, const char* name, const Type* storageClass, const Function* refFunction,
+                               const Function* extractFunction = 0, int address = 0, Attribute a = ReadWrite);
 
         //
         //	Variable API

@@ -1,7 +1,7 @@
 #
-# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved. 
-# 
-# SPDX-License-Identifier: Apache-2.0 
+# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
 #
 from __future__ import print_function
 
@@ -27,17 +27,10 @@ class StereoAutoloadMode(rvtypes.MinorMode):
             )
         )
 
-        self._autoLoadStereo = bool(
-            commands.readSettings("stereo_autoload", "autoStereo", False)
-        )
-        self._autoLoadAlways = bool(
-            commands.readSettings("stereo_autoload", "autoAlways", False)
-        )
+        self._autoLoadStereo = bool(commands.readSettings("stereo_autoload", "autoStereo", False))
+        self._autoLoadAlways = bool(commands.readSettings("stereo_autoload", "autoAlways", False))
 
-        deb(
-            "    after read: %s %s\n"
-            % (str(self._autoLoadStereo), str(self._autoLoadAlways))
-        )
+        deb("    after read: %s %s\n" % (str(self._autoLoadStereo), str(self._autoLoadAlways)))
 
     def writePrefs(self):
         deb("writing settings %s %s\n" % (self._autoLoadStereo, self._autoLoadAlways))
@@ -76,8 +69,7 @@ class StereoAutoloadMode(rvtypes.MinorMode):
             elems = val.split(":")
             if len(elems) % 2 != 0:
                 print(
-                    "ERROR: eyes env var '%s' does not have even number of elements.\n"
-                    % varName,
+                    "ERROR: eyes env var '%s' does not have even number of elements.\n" % varName,
                     file=sys.stderr,
                 )
                 return
@@ -127,7 +119,6 @@ class StereoAutoloadMode(rvtypes.MinorMode):
         return (nviews, leftMedia)
 
     def swapLeftForRight(self, leftMedia):
-
         rightMedia = leftMedia
         for pair in self._pairs:
             rightMedia = re.sub(
@@ -152,7 +143,7 @@ class StereoAutoloadMode(rvtypes.MinorMode):
                 rightMedia,
             )
 
-        if not rightMedia in ret:
+        if rightMedia not in ret:
             ret.append(rightMedia)
 
         #
@@ -166,7 +157,7 @@ class StereoAutoloadMode(rvtypes.MinorMode):
                 rightMedia,
             )
 
-        if not rightMedia in ret:
+        if rightMedia not in ret:
             ret.append(rightMedia)
 
         return ret
@@ -206,9 +197,7 @@ class StereoAutoloadMode(rvtypes.MinorMode):
 
         if not rightMedia:
             for m in rightMediaList:
-                print(
-                    "INFO: Right eye media '%s' does not exist\n" % m, file=sys.stderr
-                )
+                print("INFO: Right eye media '%s' does not exist\n" % m, file=sys.stderr)
             return
 
         #
@@ -228,9 +217,7 @@ class StereoAutoloadMode(rvtypes.MinorMode):
             self.updateSource(s, "force")
 
     def viewStereoOn(self):
-        return (
-            "off" != commands.getStringProperty("#RVDisplayStereo.stereo.type", 0, 1)[0]
-        )
+        return "off" != commands.getStringProperty("#RVDisplayStereo.stereo.type", 0, 1)[0]
 
     def presentationStereoOn(self):
         s = commands.videoState()
@@ -313,7 +300,6 @@ class StereoAutoloadMode(rvtypes.MinorMode):
             self.updateAllSources()
 
     def __init__(self):
-
         rvtypes.MinorMode.__init__(self)
 
         self.initStereoPairs()

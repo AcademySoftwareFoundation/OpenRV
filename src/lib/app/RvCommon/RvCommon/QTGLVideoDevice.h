@@ -28,8 +28,7 @@ namespace Rv
     class QTGLVideoDevice : public TwkGLF::GLVideoDevice
     {
     public:
-        QTGLVideoDevice(TwkApp::VideoModule*, const std::string& name,
-                        QOpenGLWidget* view);
+        QTGLVideoDevice(TwkApp::VideoModule*, const std::string& name, QOpenGLWidget* view);
         QTGLVideoDevice(TwkApp::VideoModule*, const std::string& name);
         virtual ~QTGLVideoDevice();
 
@@ -69,10 +68,7 @@ namespace Rv
 
         virtual GLuint fboID() const;
 
-        bool isWorkerDevice() const
-        {
-            return Capabilities(capabilities()) == NoCapabilities;
-        }
+        bool isWorkerDevice() const { return Capabilities(capabilities()) == NoCapabilities; }
 
         virtual void setPhysicalDevice(VideoDevice* d);
 

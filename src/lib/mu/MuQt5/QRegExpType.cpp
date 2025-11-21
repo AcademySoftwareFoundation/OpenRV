@@ -50,38 +50,31 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(__allocate, Pointer)
     {
-        QRegExpType::Instance* i =
-            new QRegExpType::Instance((Class*)NODE_THIS.type());
+        QRegExpType::Instance* i = new QRegExpType::Instance((Class*)NODE_THIS.type());
         QRegExpType::registerFinalizer(i);
         NODE_RETURN(i);
     }
 
-    void QRegExpType::registerFinalizer(void* o)
-    {
-        GC_register_finalizer(o, QRegExpType::finalizer, 0, 0, 0);
-    }
+    void QRegExpType::registerFinalizer(void* o) { GC_register_finalizer(o, QRegExpType::finalizer, 0, 0, 0); }
 
     void QRegExpType::finalizer(void* obj, void* data)
     {
-        QRegExpType::Instance* i =
-            reinterpret_cast<QRegExpType::Instance*>(obj);
+        QRegExpType::Instance* i = reinterpret_cast<QRegExpType::Instance*>(obj);
         delete i;
     }
 
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    Pointer qt_QRegExp_QRegExp_QRegExp_QRegExp(Mu::Thread& NODE_THREAD,
-                                               Pointer param_this)
+    Pointer qt_QRegExp_QRegExp_QRegExp_QRegExp(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         setqtype<QRegExpType>(param_this, QRegExp());
         return param_this;
     }
 
-    Pointer qt_QRegExp_QRegExp_QRegExp_QRegExp_string_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_pattern,
-        int param_cs, int param_syntax)
+    Pointer qt_QRegExp_QRegExp_QRegExp_QRegExp_string_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_pattern,
+                                                              int param_cs, int param_syntax)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QString arg1 = qstring(param_pattern);
@@ -91,8 +84,7 @@ namespace Mu
         return param_this;
     }
 
-    Pointer qt_QRegExp_cap_string_QRegExp_int(Mu::Thread& NODE_THREAD,
-                                              Pointer param_this, int param_nth)
+    Pointer qt_QRegExp_cap_string_QRegExp_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_nth)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QRegExp& arg0 = getqtype<QRegExpType>(param_this);
@@ -100,42 +92,35 @@ namespace Mu
         return makestring(c, arg0.cap(arg1));
     }
 
-    int qt_QRegExp_captureCount_int_QRegExp(Mu::Thread& NODE_THREAD,
-                                            Pointer param_this)
+    int qt_QRegExp_captureCount_int_QRegExp(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QRegExp& arg0 = getqtype<QRegExpType>(param_this);
         return arg0.captureCount();
     }
 
-    Pointer
-    qt_QRegExp_capturedTexts_stringBSB_ESB__QRegExp(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this)
+    Pointer qt_QRegExp_capturedTexts_stringBSB_ESB__QRegExp(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QRegExp& arg0 = getqtype<QRegExpType>(param_this);
         return makestringlist(c, arg0.capturedTexts());
     }
 
-    int qt_QRegExp_caseSensitivity_int_QRegExp(Mu::Thread& NODE_THREAD,
-                                               Pointer param_this)
+    int qt_QRegExp_caseSensitivity_int_QRegExp(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QRegExp& arg0 = getqtype<QRegExpType>(param_this);
         return int(arg0.caseSensitivity());
     }
 
-    Pointer qt_QRegExp_errorString_string_QRegExp(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this)
+    Pointer qt_QRegExp_errorString_string_QRegExp(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QRegExp& arg0 = getqtype<QRegExpType>(param_this);
         return makestring(c, arg0.errorString());
     }
 
-    bool qt_QRegExp_exactMatch_bool_QRegExp_string(Mu::Thread& NODE_THREAD,
-                                                   Pointer param_this,
-                                                   Pointer param_str)
+    bool qt_QRegExp_exactMatch_bool_QRegExp_string(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_str)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QRegExp& arg0 = getqtype<QRegExpType>(param_this);
@@ -143,10 +128,7 @@ namespace Mu
         return arg0.exactMatch(arg1);
     }
 
-    int qt_QRegExp_indexIn_int_QRegExp_string_int_int(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this,
-                                                      Pointer param_str,
-                                                      int param_offset,
+    int qt_QRegExp_indexIn_int_QRegExp_string_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_str, int param_offset,
                                                       int param_caretMode)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
@@ -157,33 +139,29 @@ namespace Mu
         return arg0.indexIn(arg1, arg2, arg3);
     }
 
-    bool qt_QRegExp_isEmpty_bool_QRegExp(Mu::Thread& NODE_THREAD,
-                                         Pointer param_this)
+    bool qt_QRegExp_isEmpty_bool_QRegExp(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QRegExp& arg0 = getqtype<QRegExpType>(param_this);
         return arg0.isEmpty();
     }
 
-    bool qt_QRegExp_isMinimal_bool_QRegExp(Mu::Thread& NODE_THREAD,
-                                           Pointer param_this)
+    bool qt_QRegExp_isMinimal_bool_QRegExp(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QRegExp& arg0 = getqtype<QRegExpType>(param_this);
         return arg0.isMinimal();
     }
 
-    bool qt_QRegExp_isValid_bool_QRegExp(Mu::Thread& NODE_THREAD,
-                                         Pointer param_this)
+    bool qt_QRegExp_isValid_bool_QRegExp(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QRegExp& arg0 = getqtype<QRegExpType>(param_this);
         return arg0.isValid();
     }
 
-    int qt_QRegExp_lastIndexIn_int_QRegExp_string_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_str,
-        int param_offset, int param_caretMode)
+    int qt_QRegExp_lastIndexIn_int_QRegExp_string_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_str, int param_offset,
+                                                          int param_caretMode)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QRegExp& arg0 = getqtype<QRegExpType>(param_this);
@@ -193,32 +171,28 @@ namespace Mu
         return arg0.lastIndexIn(arg1, arg2, arg3);
     }
 
-    int qt_QRegExp_matchedLength_int_QRegExp(Mu::Thread& NODE_THREAD,
-                                             Pointer param_this)
+    int qt_QRegExp_matchedLength_int_QRegExp(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QRegExp& arg0 = getqtype<QRegExpType>(param_this);
         return arg0.matchedLength();
     }
 
-    Pointer qt_QRegExp_pattern_string_QRegExp(Mu::Thread& NODE_THREAD,
-                                              Pointer param_this)
+    Pointer qt_QRegExp_pattern_string_QRegExp(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QRegExp& arg0 = getqtype<QRegExpType>(param_this);
         return makestring(c, arg0.pattern());
     }
 
-    int qt_QRegExp_patternSyntax_int_QRegExp(Mu::Thread& NODE_THREAD,
-                                             Pointer param_this)
+    int qt_QRegExp_patternSyntax_int_QRegExp(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QRegExp& arg0 = getqtype<QRegExpType>(param_this);
         return int(arg0.patternSyntax());
     }
 
-    int qt_QRegExp_pos_int_QRegExp_int(Mu::Thread& NODE_THREAD,
-                                       Pointer param_this, int param_nth)
+    int qt_QRegExp_pos_int_QRegExp_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_nth)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QRegExp& arg0 = getqtype<QRegExpType>(param_this);
@@ -226,9 +200,7 @@ namespace Mu
         return arg0.pos(arg1);
     }
 
-    void qt_QRegExp_setCaseSensitivity_void_QRegExp_int(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this,
-                                                        int param_cs)
+    void qt_QRegExp_setCaseSensitivity_void_QRegExp_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_cs)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRegExp& arg0 = getqtype<QRegExpType>(param_this);
@@ -237,9 +209,7 @@ namespace Mu
         setqtype<QRegExpType>(param_this, arg0);
     }
 
-    void qt_QRegExp_setMinimal_void_QRegExp_bool(Mu::Thread& NODE_THREAD,
-                                                 Pointer param_this,
-                                                 bool param_minimal)
+    void qt_QRegExp_setMinimal_void_QRegExp_bool(Mu::Thread& NODE_THREAD, Pointer param_this, bool param_minimal)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRegExp& arg0 = getqtype<QRegExpType>(param_this);
@@ -248,9 +218,7 @@ namespace Mu
         setqtype<QRegExpType>(param_this, arg0);
     }
 
-    void qt_QRegExp_setPattern_void_QRegExp_string(Mu::Thread& NODE_THREAD,
-                                                   Pointer param_this,
-                                                   Pointer param_pattern)
+    void qt_QRegExp_setPattern_void_QRegExp_string(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_pattern)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRegExp& arg0 = getqtype<QRegExpType>(param_this);
@@ -259,9 +227,7 @@ namespace Mu
         setqtype<QRegExpType>(param_this, arg0);
     }
 
-    void qt_QRegExp_setPatternSyntax_void_QRegExp_int(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this,
-                                                      int param_syntax)
+    void qt_QRegExp_setPatternSyntax_void_QRegExp_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_syntax)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRegExp& arg0 = getqtype<QRegExpType>(param_this);
@@ -270,9 +236,7 @@ namespace Mu
         setqtype<QRegExpType>(param_this, arg0);
     }
 
-    void qt_QRegExp_swap_void_QRegExp_QRegExp(Mu::Thread& NODE_THREAD,
-                                              Pointer param_this,
-                                              Pointer param_other)
+    void qt_QRegExp_swap_void_QRegExp_QRegExp(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_other)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRegExp& arg0 = getqtype<QRegExpType>(param_this);
@@ -281,8 +245,7 @@ namespace Mu
         setqtype<QRegExpType>(param_this, arg0);
     }
 
-    bool qt_QRegExp_operatorBang_EQ__bool_QRegExp_QRegExp(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_rx)
+    bool qt_QRegExp_operatorBang_EQ__bool_QRegExp_QRegExp(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_rx)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QRegExp& arg0 = getqtype<QRegExpType>(param_this);
@@ -290,9 +253,7 @@ namespace Mu
         return arg0.operator!=(arg1);
     }
 
-    bool qt_QRegExp_operatorEQ_EQ__bool_QRegExp_QRegExp(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this,
-                                                        Pointer param_rx)
+    bool qt_QRegExp_operatorEQ_EQ__bool_QRegExp_QRegExp(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_rx)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QRegExp& arg0 = getqtype<QRegExpType>(param_this);
@@ -300,8 +261,7 @@ namespace Mu
         return arg0.operator==(arg1);
     }
 
-    Pointer qt_QRegExp_escape_string_string(Mu::Thread& NODE_THREAD,
-                                            Pointer param_str)
+    Pointer qt_QRegExp_escape_string_string(Mu::Thread& NODE_THREAD, Pointer param_str)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QString arg0 = qstring(param_str);
@@ -310,156 +270,128 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(_n_QRegExp0, Pointer)
     {
-        NODE_RETURN(qt_QRegExp_QRegExp_QRegExp_QRegExp(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QRegExp_QRegExp_QRegExp_QRegExp(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_QRegExp1, Pointer)
     {
-        NODE_RETURN(qt_QRegExp_QRegExp_QRegExp_QRegExp_string_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int), NODE_ARG(3, int)));
+        NODE_RETURN(qt_QRegExp_QRegExp_QRegExp_QRegExp_string_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                      NODE_ARG(2, int), NODE_ARG(3, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_cap0, Pointer)
     {
-        NODE_RETURN(qt_QRegExp_cap_string_QRegExp_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QRegExp_cap_string_QRegExp_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_captureCount0, int)
     {
-        NODE_RETURN(qt_QRegExp_captureCount_int_QRegExp(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QRegExp_captureCount_int_QRegExp(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_capturedTexts0, Pointer)
     {
-        NODE_RETURN(qt_QRegExp_capturedTexts_stringBSB_ESB__QRegExp(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QRegExp_capturedTexts_stringBSB_ESB__QRegExp(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_caseSensitivity0, int)
     {
-        NODE_RETURN(qt_QRegExp_caseSensitivity_int_QRegExp(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QRegExp_caseSensitivity_int_QRegExp(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_errorString0, Pointer)
     {
-        NODE_RETURN(qt_QRegExp_errorString_string_QRegExp(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QRegExp_errorString_string_QRegExp(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_exactMatch0, bool)
     {
-        NODE_RETURN(qt_QRegExp_exactMatch_bool_QRegExp_string(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QRegExp_exactMatch_bool_QRegExp_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_indexIn0, int)
     {
-        NODE_RETURN(qt_QRegExp_indexIn_int_QRegExp_string_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int), NODE_ARG(3, int)));
+        NODE_RETURN(qt_QRegExp_indexIn_int_QRegExp_string_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                  NODE_ARG(2, int), NODE_ARG(3, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_isEmpty0, bool)
     {
-        NODE_RETURN(qt_QRegExp_isEmpty_bool_QRegExp(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QRegExp_isEmpty_bool_QRegExp(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isMinimal0, bool)
     {
-        NODE_RETURN(qt_QRegExp_isMinimal_bool_QRegExp(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QRegExp_isMinimal_bool_QRegExp(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isValid0, bool)
     {
-        NODE_RETURN(qt_QRegExp_isValid_bool_QRegExp(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QRegExp_isValid_bool_QRegExp(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_lastIndexIn0, int)
     {
-        NODE_RETURN(qt_QRegExp_lastIndexIn_int_QRegExp_string_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int), NODE_ARG(3, int)));
+        NODE_RETURN(qt_QRegExp_lastIndexIn_int_QRegExp_string_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                      NODE_ARG(2, int), NODE_ARG(3, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_matchedLength0, int)
     {
-        NODE_RETURN(qt_QRegExp_matchedLength_int_QRegExp(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QRegExp_matchedLength_int_QRegExp(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_pattern0, Pointer)
     {
-        NODE_RETURN(qt_QRegExp_pattern_string_QRegExp(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QRegExp_pattern_string_QRegExp(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_patternSyntax0, int)
     {
-        NODE_RETURN(qt_QRegExp_patternSyntax_int_QRegExp(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QRegExp_patternSyntax_int_QRegExp(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_pos0, int)
     {
-        NODE_RETURN(qt_QRegExp_pos_int_QRegExp_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QRegExp_pos_int_QRegExp_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_setCaseSensitivity0, void)
     {
-        qt_QRegExp_setCaseSensitivity_void_QRegExp_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QRegExp_setCaseSensitivity_void_QRegExp_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setMinimal0, void)
     {
-        qt_QRegExp_setMinimal_void_QRegExp_bool(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool));
+        qt_QRegExp_setMinimal_void_QRegExp_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool));
     }
 
     static NODE_IMPLEMENTATION(_n_setPattern0, void)
     {
-        qt_QRegExp_setPattern_void_QRegExp_string(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QRegExp_setPattern_void_QRegExp_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setPatternSyntax0, void)
     {
-        qt_QRegExp_setPatternSyntax_void_QRegExp_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QRegExp_setPatternSyntax_void_QRegExp_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_swap0, void)
     {
-        qt_QRegExp_swap_void_QRegExp_QRegExp(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QRegExp_swap_void_QRegExp_QRegExp(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorBang_EQ_0, bool)
     {
-        NODE_RETURN(qt_QRegExp_operatorBang_EQ__bool_QRegExp_QRegExp(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QRegExp_operatorBang_EQ__bool_QRegExp_QRegExp(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorEQ_EQ_0, bool)
     {
-        NODE_RETURN(qt_QRegExp_operatorEQ_EQ__bool_QRegExp_QRegExp(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QRegExp_operatorEQ_EQ__bool_QRegExp_QRegExp(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
-    static NODE_IMPLEMENTATION(_n_escape0, Pointer)
-    {
-        NODE_RETURN(
-            qt_QRegExp_escape_string_string(NODE_THREAD, NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_escape0, Pointer) { NODE_RETURN(qt_QRegExp_escape_string_string(NODE_THREAD, NODE_ARG(0, Pointer))); }
 
     void QRegExpType::load()
     {
@@ -478,155 +410,89 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(
-            new Function(c, "__allocate", __allocate, None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", __allocate, None, Return, ftn, End),
 
-            EndArguments);
-
-        addSymbols(new Alias(c, "CaretMode", "int"),
-                   new SymbolicConstant(c, "CaretAtZero", "int",
-                                        Value(int(QRegExp::CaretAtZero))),
-                   new SymbolicConstant(c, "CaretAtOffset", "int",
-                                        Value(int(QRegExp::CaretAtOffset))),
-                   new SymbolicConstant(c, "CaretWontMatch", "int",
-                                        Value(int(QRegExp::CaretWontMatch))),
-                   new Alias(c, "PatternSyntax", "int"),
-                   new SymbolicConstant(c, "RegExp", "int",
-                                        Value(int(QRegExp::RegExp))),
-                   new SymbolicConstant(c, "RegExp2", "int",
-                                        Value(int(QRegExp::RegExp2))),
-                   new SymbolicConstant(c, "Wildcard", "int",
-                                        Value(int(QRegExp::Wildcard))),
-                   new SymbolicConstant(c, "WildcardUnix", "int",
-                                        Value(int(QRegExp::WildcardUnix))),
-                   new SymbolicConstant(c, "FixedString", "int",
-                                        Value(int(QRegExp::FixedString))),
-                   new SymbolicConstant(c, "W3CXmlSchema11", "int",
-                                        Value(int(QRegExp::W3CXmlSchema11))),
                    EndArguments);
+
+        addSymbols(new Alias(c, "CaretMode", "int"), new SymbolicConstant(c, "CaretAtZero", "int", Value(int(QRegExp::CaretAtZero))),
+                   new SymbolicConstant(c, "CaretAtOffset", "int", Value(int(QRegExp::CaretAtOffset))),
+                   new SymbolicConstant(c, "CaretWontMatch", "int", Value(int(QRegExp::CaretWontMatch))),
+                   new Alias(c, "PatternSyntax", "int"), new SymbolicConstant(c, "RegExp", "int", Value(int(QRegExp::RegExp))),
+                   new SymbolicConstant(c, "RegExp2", "int", Value(int(QRegExp::RegExp2))),
+                   new SymbolicConstant(c, "Wildcard", "int", Value(int(QRegExp::Wildcard))),
+                   new SymbolicConstant(c, "WildcardUnix", "int", Value(int(QRegExp::WildcardUnix))),
+                   new SymbolicConstant(c, "FixedString", "int", Value(int(QRegExp::FixedString))),
+                   new SymbolicConstant(c, "W3CXmlSchema11", "int", Value(int(QRegExp::W3CXmlSchema11))), EndArguments);
 
         addSymbols(
             // enums
             // member functions
-            new Function(c, "QRegExp", _n_QRegExp0, None, Compiled,
-                         qt_QRegExp_QRegExp_QRegExp_QRegExp, Return,
-                         "qt.QRegExp", Parameters,
+            new Function(c, "QRegExp", _n_QRegExp0, None, Compiled, qt_QRegExp_QRegExp_QRegExp_QRegExp, Return, "qt.QRegExp", Parameters,
                          new Param(c, "this", "qt.QRegExp"), End),
-            new Function(
-                c, "QRegExp", _n_QRegExp1, None, Compiled,
-                qt_QRegExp_QRegExp_QRegExp_QRegExp_string_int_int, Return,
-                "qt.QRegExp", Parameters, new Param(c, "this", "qt.QRegExp"),
-                new Param(c, "pattern", "string"),
-                new Param(c, "cs", "int", Value((int)Qt::CaseSensitive)),
-                new Param(c, "syntax", "int", Value((int)QRegExp::RegExp)),
-                End),
+            new Function(c, "QRegExp", _n_QRegExp1, None, Compiled, qt_QRegExp_QRegExp_QRegExp_QRegExp_string_int_int, Return, "qt.QRegExp",
+                         Parameters, new Param(c, "this", "qt.QRegExp"), new Param(c, "pattern", "string"),
+                         new Param(c, "cs", "int", Value((int)Qt::CaseSensitive)),
+                         new Param(c, "syntax", "int", Value((int)QRegExp::RegExp)), End),
             // MISSING: QRegExp (QRegExp; QRegExp this, QRegExp rx)
-            new Function(c, "cap", _n_cap0, None, Compiled,
-                         qt_QRegExp_cap_string_QRegExp_int, Return, "string",
-                         Parameters, new Param(c, "this", "qt.QRegExp"),
-                         new Param(c, "nth", "int", Value((int)0)), End),
-            new Function(c, "captureCount", _n_captureCount0, None, Compiled,
-                         qt_QRegExp_captureCount_int_QRegExp, Return, "int",
+            new Function(c, "cap", _n_cap0, None, Compiled, qt_QRegExp_cap_string_QRegExp_int, Return, "string", Parameters,
+                         new Param(c, "this", "qt.QRegExp"), new Param(c, "nth", "int", Value((int)0)), End),
+            new Function(c, "captureCount", _n_captureCount0, None, Compiled, qt_QRegExp_captureCount_int_QRegExp, Return, "int",
                          Parameters, new Param(c, "this", "qt.QRegExp"), End),
-            new Function(c, "capturedTexts", _n_capturedTexts0, None, Compiled,
-                         qt_QRegExp_capturedTexts_stringBSB_ESB__QRegExp,
-                         Return, "string[]", Parameters,
-                         new Param(c, "this", "qt.QRegExp"), End),
-            new Function(c, "caseSensitivity", _n_caseSensitivity0, None,
-                         Compiled, qt_QRegExp_caseSensitivity_int_QRegExp,
-                         Return, "int", Parameters,
-                         new Param(c, "this", "qt.QRegExp"), End),
-            new Function(c, "errorString", _n_errorString0, None, Compiled,
-                         qt_QRegExp_errorString_string_QRegExp, Return,
-                         "string", Parameters,
-                         new Param(c, "this", "qt.QRegExp"), End),
-            new Function(c, "exactMatch", _n_exactMatch0, None, Compiled,
-                         qt_QRegExp_exactMatch_bool_QRegExp_string, Return,
-                         "bool", Parameters, new Param(c, "this", "qt.QRegExp"),
-                         new Param(c, "str", "string"), End),
-            new Function(c, "indexIn", _n_indexIn0, None, Compiled,
-                         qt_QRegExp_indexIn_int_QRegExp_string_int_int, Return,
-                         "int", Parameters, new Param(c, "this", "qt.QRegExp"),
-                         new Param(c, "str", "string"),
-                         new Param(c, "offset", "int", Value((int)0)),
-                         new Param(c, "caretMode", "int",
-                                   Value((int)QRegExp::CaretAtZero)),
+            new Function(c, "capturedTexts", _n_capturedTexts0, None, Compiled, qt_QRegExp_capturedTexts_stringBSB_ESB__QRegExp, Return,
+                         "string[]", Parameters, new Param(c, "this", "qt.QRegExp"), End),
+            new Function(c, "caseSensitivity", _n_caseSensitivity0, None, Compiled, qt_QRegExp_caseSensitivity_int_QRegExp, Return, "int",
+                         Parameters, new Param(c, "this", "qt.QRegExp"), End),
+            new Function(c, "errorString", _n_errorString0, None, Compiled, qt_QRegExp_errorString_string_QRegExp, Return, "string",
+                         Parameters, new Param(c, "this", "qt.QRegExp"), End),
+            new Function(c, "exactMatch", _n_exactMatch0, None, Compiled, qt_QRegExp_exactMatch_bool_QRegExp_string, Return, "bool",
+                         Parameters, new Param(c, "this", "qt.QRegExp"), new Param(c, "str", "string"), End),
+            new Function(c, "indexIn", _n_indexIn0, None, Compiled, qt_QRegExp_indexIn_int_QRegExp_string_int_int, Return, "int",
+                         Parameters, new Param(c, "this", "qt.QRegExp"), new Param(c, "str", "string"),
+                         new Param(c, "offset", "int", Value((int)0)), new Param(c, "caretMode", "int", Value((int)QRegExp::CaretAtZero)),
                          End),
-            new Function(c, "isEmpty", _n_isEmpty0, None, Compiled,
-                         qt_QRegExp_isEmpty_bool_QRegExp, Return, "bool",
-                         Parameters, new Param(c, "this", "qt.QRegExp"), End),
-            new Function(c, "isMinimal", _n_isMinimal0, None, Compiled,
-                         qt_QRegExp_isMinimal_bool_QRegExp, Return, "bool",
-                         Parameters, new Param(c, "this", "qt.QRegExp"), End),
-            new Function(c, "isValid", _n_isValid0, None, Compiled,
-                         qt_QRegExp_isValid_bool_QRegExp, Return, "bool",
-                         Parameters, new Param(c, "this", "qt.QRegExp"), End),
-            new Function(c, "lastIndexIn", _n_lastIndexIn0, None, Compiled,
-                         qt_QRegExp_lastIndexIn_int_QRegExp_string_int_int,
-                         Return, "int", Parameters,
-                         new Param(c, "this", "qt.QRegExp"),
-                         new Param(c, "str", "string"),
-                         new Param(c, "offset", "int", Value((int)-1)),
-                         new Param(c, "caretMode", "int",
-                                   Value((int)QRegExp::CaretAtZero)),
+            new Function(c, "isEmpty", _n_isEmpty0, None, Compiled, qt_QRegExp_isEmpty_bool_QRegExp, Return, "bool", Parameters,
+                         new Param(c, "this", "qt.QRegExp"), End),
+            new Function(c, "isMinimal", _n_isMinimal0, None, Compiled, qt_QRegExp_isMinimal_bool_QRegExp, Return, "bool", Parameters,
+                         new Param(c, "this", "qt.QRegExp"), End),
+            new Function(c, "isValid", _n_isValid0, None, Compiled, qt_QRegExp_isValid_bool_QRegExp, Return, "bool", Parameters,
+                         new Param(c, "this", "qt.QRegExp"), End),
+            new Function(c, "lastIndexIn", _n_lastIndexIn0, None, Compiled, qt_QRegExp_lastIndexIn_int_QRegExp_string_int_int, Return,
+                         "int", Parameters, new Param(c, "this", "qt.QRegExp"), new Param(c, "str", "string"),
+                         new Param(c, "offset", "int", Value((int)-1)), new Param(c, "caretMode", "int", Value((int)QRegExp::CaretAtZero)),
                          End),
-            new Function(c, "matchedLength", _n_matchedLength0, None, Compiled,
-                         qt_QRegExp_matchedLength_int_QRegExp, Return, "int",
+            new Function(c, "matchedLength", _n_matchedLength0, None, Compiled, qt_QRegExp_matchedLength_int_QRegExp, Return, "int",
                          Parameters, new Param(c, "this", "qt.QRegExp"), End),
-            new Function(c, "pattern", _n_pattern0, None, Compiled,
-                         qt_QRegExp_pattern_string_QRegExp, Return, "string",
+            new Function(c, "pattern", _n_pattern0, None, Compiled, qt_QRegExp_pattern_string_QRegExp, Return, "string", Parameters,
+                         new Param(c, "this", "qt.QRegExp"), End),
+            new Function(c, "patternSyntax", _n_patternSyntax0, None, Compiled, qt_QRegExp_patternSyntax_int_QRegExp, Return, "int",
                          Parameters, new Param(c, "this", "qt.QRegExp"), End),
-            new Function(c, "patternSyntax", _n_patternSyntax0, None, Compiled,
-                         qt_QRegExp_patternSyntax_int_QRegExp, Return, "int",
-                         Parameters, new Param(c, "this", "qt.QRegExp"), End),
-            new Function(c, "pos", _n_pos0, None, Compiled,
-                         qt_QRegExp_pos_int_QRegExp_int, Return, "int",
-                         Parameters, new Param(c, "this", "qt.QRegExp"),
-                         new Param(c, "nth", "int", Value((int)0)), End),
-            new Function(c, "setCaseSensitivity", _n_setCaseSensitivity0, None,
-                         Compiled,
-                         qt_QRegExp_setCaseSensitivity_void_QRegExp_int, Return,
-                         "void", Parameters, new Param(c, "this", "qt.QRegExp"),
-                         new Param(c, "cs", "int"), End),
-            new Function(c, "setMinimal", _n_setMinimal0, None, Compiled,
-                         qt_QRegExp_setMinimal_void_QRegExp_bool, Return,
-                         "void", Parameters, new Param(c, "this", "qt.QRegExp"),
-                         new Param(c, "minimal", "bool"), End),
-            new Function(c, "setPattern", _n_setPattern0, None, Compiled,
-                         qt_QRegExp_setPattern_void_QRegExp_string, Return,
-                         "void", Parameters, new Param(c, "this", "qt.QRegExp"),
-                         new Param(c, "pattern", "string"), End),
-            new Function(c, "setPatternSyntax", _n_setPatternSyntax0, None,
-                         Compiled, qt_QRegExp_setPatternSyntax_void_QRegExp_int,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QRegExp"),
-                         new Param(c, "syntax", "int"), End),
-            new Function(c, "swap", _n_swap0, None, Compiled,
-                         qt_QRegExp_swap_void_QRegExp_QRegExp, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QRegExp"),
-                         new Param(c, "other", "qt.QRegExp"), End),
+            new Function(c, "pos", _n_pos0, None, Compiled, qt_QRegExp_pos_int_QRegExp_int, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QRegExp"), new Param(c, "nth", "int", Value((int)0)), End),
+            new Function(c, "setCaseSensitivity", _n_setCaseSensitivity0, None, Compiled, qt_QRegExp_setCaseSensitivity_void_QRegExp_int,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QRegExp"), new Param(c, "cs", "int"), End),
+            new Function(c, "setMinimal", _n_setMinimal0, None, Compiled, qt_QRegExp_setMinimal_void_QRegExp_bool, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QRegExp"), new Param(c, "minimal", "bool"), End),
+            new Function(c, "setPattern", _n_setPattern0, None, Compiled, qt_QRegExp_setPattern_void_QRegExp_string, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QRegExp"), new Param(c, "pattern", "string"), End),
+            new Function(c, "setPatternSyntax", _n_setPatternSyntax0, None, Compiled, qt_QRegExp_setPatternSyntax_void_QRegExp_int, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QRegExp"), new Param(c, "syntax", "int"), End),
+            new Function(c, "swap", _n_swap0, None, Compiled, qt_QRegExp_swap_void_QRegExp_QRegExp, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QRegExp"), new Param(c, "other", "qt.QRegExp"), End),
             // static functions
-            new Function(c, "escape", _n_escape0, None, Compiled,
-                         qt_QRegExp_escape_string_string, Return, "string",
-                         Parameters, new Param(c, "str", "string"), End),
+            new Function(c, "escape", _n_escape0, None, Compiled, qt_QRegExp_escape_string_string, Return, "string", Parameters,
+                         new Param(c, "str", "string"), End),
             EndArguments);
         globalScope()->addSymbols(
-            new Function(c, "!=", _n_operatorBang_EQ_0, Op, Compiled,
-                         qt_QRegExp_operatorBang_EQ__bool_QRegExp_QRegExp,
-                         Return, "bool", Parameters,
-                         new Param(c, "this", "qt.QRegExp"),
-                         new Param(c, "rx", "qt.QRegExp"), End),
+            new Function(c, "!=", _n_operatorBang_EQ_0, Op, Compiled, qt_QRegExp_operatorBang_EQ__bool_QRegExp_QRegExp, Return, "bool",
+                         Parameters, new Param(c, "this", "qt.QRegExp"), new Param(c, "rx", "qt.QRegExp"), End),
             // MISSING: = (QRegExp; QRegExp this, QRegExp rx)
             // MISSING: = (QRegExp; QRegExp this, QRegExp other)
-            new Function(c, "==", _n_operatorEQ_EQ_0, Op, Compiled,
-                         qt_QRegExp_operatorEQ_EQ__bool_QRegExp_QRegExp, Return,
-                         "bool", Parameters, new Param(c, "this", "qt.QRegExp"),
-                         new Param(c, "rx", "qt.QRegExp"), End),
+            new Function(c, "==", _n_operatorEQ_EQ_0, Op, Compiled, qt_QRegExp_operatorEQ_EQ__bool_QRegExp_QRegExp, Return, "bool",
+                         Parameters, new Param(c, "this", "qt.QRegExp"), new Param(c, "rx", "qt.QRegExp"), End),
             EndArguments);
         scope()->addSymbols(EndArguments);
     }

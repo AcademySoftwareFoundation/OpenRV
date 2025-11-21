@@ -79,17 +79,14 @@ namespace Mu
         _baseType = 0;
     }
 
-    MuQt_QHeaderView::MuQt_QHeaderView(Pointer muobj, const CallEnvironment* ce,
-                                       Qt::Orientation orientation,
-                                       QWidget* parent)
+    MuQt_QHeaderView::MuQt_QHeaderView(Pointer muobj, const CallEnvironment* ce, Qt::Orientation orientation, QWidget* parent)
         : QHeaderView(orientation, parent)
     {
         _env = ce;
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QHeaderViewType>(
-            c->internName("qt.QHeaderView"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QHeaderViewType>(c->internName("qt.QHeaderView"));
     }
 
     void MuQt_QHeaderView::reset()
@@ -128,8 +125,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeinstance<QAbstractItemModelType>(
-                c, model, "qt.QAbstractItemModel"));
+            args[1] = Value(makeinstance<QAbstractItemModelType>(c, model, "qt.QAbstractItemModel"));
             Value rval = _env->call(F, args);
         }
         else
@@ -202,8 +198,7 @@ namespace Mu
         }
     }
 
-    void MuQt_QHeaderView::currentChanged(const QModelIndex& current,
-                                          const QModelIndex& old)
+    void MuQt_QHeaderView::currentChanged(const QModelIndex& current, const QModelIndex& old)
     {
         if (!_env)
         {
@@ -217,10 +212,8 @@ namespace Mu
         {
             Function::ArgumentVector args(3);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqtype<QModelIndexType>(c, current, "qt.QModelIndex"));
-            args[2] =
-                Value(makeqtype<QModelIndexType>(c, old, "qt.QModelIndex"));
+            args[1] = Value(makeqtype<QModelIndexType>(c, current, "qt.QModelIndex"));
+            args[2] = Value(makeqtype<QModelIndexType>(c, old, "qt.QModelIndex"));
             Value rval = _env->call(F, args);
         }
         else
@@ -284,8 +277,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -308,8 +300,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -332,8 +323,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -356,8 +346,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -380,8 +369,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QPaintEventType>(c, e, "qt.QPaintEvent"));
+            args[1] = Value(makeqpointer<QPaintEventType>(c, e, "qt.QPaintEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -390,9 +378,7 @@ namespace Mu
         }
     }
 
-    void
-    MuQt_QHeaderView::setSelection(const QRect& rect,
-                                   QItemSelectionModel::SelectionFlags flags)
+    void MuQt_QHeaderView::setSelection(const QRect& rect, QItemSelectionModel::SelectionFlags flags)
     {
         if (!_env)
         {
@@ -480,8 +466,7 @@ namespace Mu
         }
     }
 
-    void
-    MuQt_QHeaderView::setSelectionModel(QItemSelectionModel* selectionModel)
+    void MuQt_QHeaderView::setSelectionModel(QItemSelectionModel* selectionModel)
     {
         if (!_env)
         {
@@ -495,8 +480,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeinstance<QItemSelectionModelType>(
-                c, selectionModel, "qt.QItemSelectionModel"));
+            args[1] = Value(makeinstance<QItemSelectionModelType>(c, selectionModel, "qt.QItemSelectionModel"));
             Value rval = _env->call(F, args);
         }
         else
@@ -547,8 +531,7 @@ namespace Mu
         }
     }
 
-    QVariant
-    MuQt_QHeaderView::inputMethodQuery(Qt::InputMethodQuery query) const
+    QVariant MuQt_QHeaderView::inputMethodQuery(Qt::InputMethodQuery query) const
     {
         if (!_env)
             return QHeaderView::inputMethodQuery(query);
@@ -569,9 +552,7 @@ namespace Mu
         }
     }
 
-    bool MuQt_QHeaderView::edit(const QModelIndex& index,
-                                QAbstractItemView::EditTrigger trigger,
-                                QEvent* event)
+    bool MuQt_QHeaderView::edit(const QModelIndex& index, QAbstractItemView::EditTrigger trigger, QEvent* event)
     {
         if (!_env)
             return QHeaderView::edit(index, trigger, event);
@@ -582,8 +563,7 @@ namespace Mu
         {
             Function::ArgumentVector args(4);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
+            args[1] = Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
             args[2] = Value(int(trigger));
             args[3] = Value(makeqpointer<QEventType>(c, event, "qt.QEvent"));
             Value rval = _env->call(F, args);
@@ -595,8 +575,7 @@ namespace Mu
         }
     }
 
-    bool MuQt_QHeaderView::isIndexHidden(
-        const QModelIndex& index) const // pure virtual
+    bool MuQt_QHeaderView::isIndexHidden(const QModelIndex& index) const // pure virtual
     {
         if (!_env)
             return defaultValue<bool>();
@@ -607,8 +586,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
+            args[1] = Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
             Value rval = _env->call(F, args);
             return (bool)(rval._bool);
         }
@@ -638,9 +616,7 @@ namespace Mu
         }
     }
 
-    QItemSelectionModel::SelectionFlags
-    MuQt_QHeaderView::selectionCommand(const QModelIndex& index,
-                                       const QEvent* event) const
+    QItemSelectionModel::SelectionFlags MuQt_QHeaderView::selectionCommand(const QModelIndex& index, const QEvent* event) const
     {
         if (!_env)
             return QHeaderView::selectionCommand(index, event);
@@ -651,8 +627,7 @@ namespace Mu
         {
             Function::ArgumentVector args(3);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
+            args[1] = Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
             args[2] = Value(makeqpointer<QEventType>(c, event, "qt.QEvent"));
             Value rval = _env->call(F, args);
             return (QItemSelectionModel::SelectionFlags)(rval._int);
@@ -686,8 +661,7 @@ namespace Mu
         }
     }
 
-    QRegion MuQt_QHeaderView::visualRegionForSelection(
-        const QItemSelection& selection) const // pure virtual
+    QRegion MuQt_QHeaderView::visualRegionForSelection(const QItemSelection& selection) const // pure virtual
     {
         if (!_env)
             return defaultValue<QRegion>();
@@ -698,8 +672,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqtype<QItemSelectionType>(c, selection,
-                                                          "qt.QItemSelection"));
+            args[1] = Value(makeqtype<QItemSelectionType>(c, selection, "qt.QItemSelection"));
             Value rval = _env->call(F, args);
             return getqtype<QRegionType>(rval._Pointer);
         }
@@ -723,8 +696,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqpointer<QDragEnterEventType>(
-                c, event, "qt.QDragEnterEvent"));
+            args[1] = Value(makeqpointer<QDragEnterEventType>(c, event, "qt.QDragEnterEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -747,8 +719,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqpointer<QDragLeaveEventType>(
-                c, event, "qt.QDragLeaveEvent"));
+            args[1] = Value(makeqpointer<QDragLeaveEventType>(c, event, "qt.QDragLeaveEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -771,8 +742,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqpointer<QDragMoveEventType>(
-                c, event, "qt.QDragMoveEvent"));
+            args[1] = Value(makeqpointer<QDragMoveEventType>(c, event, "qt.QDragMoveEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -795,8 +765,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QDropEventType>(c, event, "qt.QDropEvent"));
+            args[1] = Value(makeqpointer<QDropEventType>(c, event, "qt.QDropEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -841,8 +810,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QFocusEventType>(c, event, "qt.QFocusEvent"));
+            args[1] = Value(makeqpointer<QFocusEventType>(c, event, "qt.QFocusEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -886,8 +854,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QFocusEventType>(c, event, "qt.QFocusEvent"));
+            args[1] = Value(makeqpointer<QFocusEventType>(c, event, "qt.QFocusEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -910,8 +877,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QKeyEventType>(c, event, "qt.QKeyEvent"));
+            args[1] = Value(makeqpointer<QKeyEventType>(c, event, "qt.QKeyEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -934,8 +900,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QResizeEventType>(c, event, "qt.QResizeEvent"));
+            args[1] = Value(makeqpointer<QResizeEventType>(c, event, "qt.QResizeEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -958,8 +923,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QTimerEventType>(c, event, "qt.QTimerEvent"));
+            args[1] = Value(makeqpointer<QTimerEventType>(c, event, "qt.QTimerEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -991,8 +955,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  Mu Type CONSTRUCTORS
 
-    QHeaderViewType::QHeaderViewType(Context* c, const char* name, Class* super,
-                                     Class* super2)
+    QHeaderViewType::QHeaderViewType(Context* c, const char* name, Class* super, Class* super2)
         : Class(c, name, vectorOf2(super, super2))
     {
     }
@@ -1002,8 +965,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    static Pointer QHeaderView_QHeaderView_QObject(Thread& NODE_THREAD,
-                                                   Pointer obj)
+    static Pointer QHeaderView_QHeaderView_QObject(Thread& NODE_THREAD, Pointer obj)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         ClassInstance* widget = reinterpret_cast<ClassInstance*>(obj);
@@ -1014,9 +976,7 @@ namespace Mu
         }
         else if (QHeaderView* w = object<QHeaderView>(widget))
         {
-            QHeaderViewType* type =
-                c->findSymbolOfTypeByQualifiedName<QHeaderViewType>(
-                    c->internName("qt.QHeaderView"), false);
+            QHeaderViewType* type = c->findSymbolOfTypeByQualifiedName<QHeaderViewType>(c->internName("qt.QHeaderView"), false);
             ClassInstance* o = ClassInstance::allocate(type);
             setobject(o, w);
             return o;
@@ -1027,44 +987,33 @@ namespace Mu
         }
     }
 
-    static NODE_IMPLEMENTATION(castFromObject, Pointer)
-    {
-        NODE_RETURN(
-            QHeaderView_QHeaderView_QObject(NODE_THREAD, NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(castFromObject, Pointer) { NODE_RETURN(QHeaderView_QHeaderView_QObject(NODE_THREAD, NODE_ARG(0, Pointer))); }
 
-    Pointer qt_QHeaderView_QHeaderView_QHeaderView_QHeaderView_int_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_orientation,
-        Pointer param_parent)
+    Pointer qt_QHeaderView_QHeaderView_QHeaderView_QHeaderView_int_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                           int param_orientation, Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         Qt::Orientation arg1 = (Qt::Orientation)(param_orientation);
         QWidget* arg2 = object<QWidget>(param_parent);
-        setobject(param_this, new MuQt_QHeaderView(
-                                  param_this, NODE_THREAD.process()->callEnv(),
-                                  arg1, arg2));
+        setobject(param_this, new MuQt_QHeaderView(param_this, NODE_THREAD.process()->callEnv(), arg1, arg2));
         return param_this;
     }
 
-    int qt_QHeaderView_count_int_QHeaderView(Mu::Thread& NODE_THREAD,
-                                             Pointer param_this)
+    int qt_QHeaderView_count_int_QHeaderView(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
         return arg0->count();
     }
 
-    int
-    qt_QHeaderView_hiddenSectionCount_int_QHeaderView(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    int qt_QHeaderView_hiddenSectionCount_int_QHeaderView(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
         return arg0->hiddenSectionCount();
     }
 
-    void qt_QHeaderView_hideSection_void_QHeaderView_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_logicalIndex)
+    void qt_QHeaderView_hideSection_void_QHeaderView_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_logicalIndex)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
@@ -1072,8 +1021,7 @@ namespace Mu
         arg0->hideSection(arg1);
     }
 
-    bool qt_QHeaderView_isSectionHidden_bool_QHeaderView_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_logicalIndex)
+    bool qt_QHeaderView_isSectionHidden_bool_QHeaderView_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_logicalIndex)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
@@ -1081,17 +1029,14 @@ namespace Mu
         return arg0->isSectionHidden(arg1);
     }
 
-    int qt_QHeaderView_length_int_QHeaderView(Mu::Thread& NODE_THREAD,
-                                              Pointer param_this)
+    int qt_QHeaderView_length_int_QHeaderView(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
         return arg0->length();
     }
 
-    int qt_QHeaderView_logicalIndex_int_QHeaderView_int(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this,
-                                                        int param_visualIndex)
+    int qt_QHeaderView_logicalIndex_int_QHeaderView_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_visualIndex)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
@@ -1099,8 +1044,7 @@ namespace Mu
         return arg0->logicalIndex(arg1);
     }
 
-    int qt_QHeaderView_logicalIndexAt_int_QHeaderView_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_position)
+    int qt_QHeaderView_logicalIndexAt_int_QHeaderView_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_position)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
@@ -1108,8 +1052,7 @@ namespace Mu
         return arg0->logicalIndexAt(arg1);
     }
 
-    int qt_QHeaderView_logicalIndexAt_int_QHeaderView_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_x, int param_y)
+    int qt_QHeaderView_logicalIndexAt_int_QHeaderView_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_x, int param_y)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
@@ -1118,8 +1061,7 @@ namespace Mu
         return arg0->logicalIndexAt(arg1, arg2);
     }
 
-    int qt_QHeaderView_logicalIndexAt_int_QHeaderView_QPoint(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_pos)
+    int qt_QHeaderView_logicalIndexAt_int_QHeaderView_QPoint(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_pos)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
@@ -1127,9 +1069,7 @@ namespace Mu
         return arg0->logicalIndexAt(arg1);
     }
 
-    void qt_QHeaderView_moveSection_void_QHeaderView_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_from,
-        int param_to)
+    void qt_QHeaderView_moveSection_void_QHeaderView_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_from, int param_to)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
@@ -1138,33 +1078,29 @@ namespace Mu
         arg0->moveSection(arg1, arg2);
     }
 
-    int qt_QHeaderView_offset_int_QHeaderView(Mu::Thread& NODE_THREAD,
-                                              Pointer param_this)
+    int qt_QHeaderView_offset_int_QHeaderView(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
         return arg0->offset();
     }
 
-    int qt_QHeaderView_orientation_int_QHeaderView(Mu::Thread& NODE_THREAD,
-                                                   Pointer param_this)
+    int qt_QHeaderView_orientation_int_QHeaderView(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
         return int(arg0->orientation());
     }
 
-    int qt_QHeaderView_resizeContentsPrecision_int_QHeaderView(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    int qt_QHeaderView_resizeContentsPrecision_int_QHeaderView(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
         return arg0->resizeContentsPrecision();
     }
 
-    void qt_QHeaderView_resizeSection_void_QHeaderView_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_logicalIndex,
-        int param_size)
+    void qt_QHeaderView_resizeSection_void_QHeaderView_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_logicalIndex,
+                                                               int param_size)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
@@ -1173,8 +1109,7 @@ namespace Mu
         arg0->resizeSection(arg1, arg2);
     }
 
-    void qt_QHeaderView_resizeSections_void_QHeaderView_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_mode)
+    void qt_QHeaderView_resizeSections_void_QHeaderView_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_mode)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
@@ -1182,8 +1117,7 @@ namespace Mu
         arg0->resizeSections(arg1);
     }
 
-    bool qt_QHeaderView_restoreState_bool_QHeaderView_QByteArray(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_state)
+    bool qt_QHeaderView_restoreState_bool_QHeaderView_QByteArray(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_state)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
@@ -1191,17 +1125,14 @@ namespace Mu
         return arg0->restoreState(arg1);
     }
 
-    Pointer
-    qt_QHeaderView_saveState_QByteArray_QHeaderView(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this)
+    Pointer qt_QHeaderView_saveState_QByteArray_QHeaderView(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
         return makeqtype<QByteArrayType>(c, arg0->saveState(), "qt.QByteArray");
     }
 
-    int qt_QHeaderView_sectionPosition_int_QHeaderView_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_logicalIndex)
+    int qt_QHeaderView_sectionPosition_int_QHeaderView_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_logicalIndex)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
@@ -1209,8 +1140,7 @@ namespace Mu
         return arg0->sectionPosition(arg1);
     }
 
-    int qt_QHeaderView_sectionResizeMode_int_QHeaderView_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_logicalIndex)
+    int qt_QHeaderView_sectionResizeMode_int_QHeaderView_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_logicalIndex)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
@@ -1218,9 +1148,7 @@ namespace Mu
         return int(arg0->sectionResizeMode(arg1));
     }
 
-    int qt_QHeaderView_sectionSize_int_QHeaderView_int(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this,
-                                                       int param_logicalIndex)
+    int qt_QHeaderView_sectionSize_int_QHeaderView_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_logicalIndex)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
@@ -1228,8 +1156,7 @@ namespace Mu
         return arg0->sectionSize(arg1);
     }
 
-    int qt_QHeaderView_sectionSizeHint_int_QHeaderView_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_logicalIndex)
+    int qt_QHeaderView_sectionSizeHint_int_QHeaderView_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_logicalIndex)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
@@ -1237,8 +1164,7 @@ namespace Mu
         return arg0->sectionSizeHint(arg1);
     }
 
-    int qt_QHeaderView_sectionViewportPosition_int_QHeaderView_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_logicalIndex)
+    int qt_QHeaderView_sectionViewportPosition_int_QHeaderView_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_logicalIndex)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
@@ -1246,42 +1172,35 @@ namespace Mu
         return arg0->sectionViewportPosition(arg1);
     }
 
-    bool
-    qt_QHeaderView_sectionsClickable_bool_QHeaderView(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    bool qt_QHeaderView_sectionsClickable_bool_QHeaderView(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
         return arg0->sectionsClickable();
     }
 
-    bool qt_QHeaderView_sectionsHidden_bool_QHeaderView(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this)
+    bool qt_QHeaderView_sectionsHidden_bool_QHeaderView(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
         return arg0->sectionsHidden();
     }
 
-    bool
-    qt_QHeaderView_sectionsMovable_bool_QHeaderView(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this)
+    bool qt_QHeaderView_sectionsMovable_bool_QHeaderView(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
         return arg0->sectionsMovable();
     }
 
-    bool qt_QHeaderView_sectionsMoved_bool_QHeaderView(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this)
+    bool qt_QHeaderView_sectionsMoved_bool_QHeaderView(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
         return arg0->sectionsMoved();
     }
 
-    void qt_QHeaderView_setResizeContentsPrecision_void_QHeaderView_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_precision)
+    void qt_QHeaderView_setResizeContentsPrecision_void_QHeaderView_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_precision)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
@@ -1289,9 +1208,8 @@ namespace Mu
         arg0->setResizeContentsPrecision(arg1);
     }
 
-    void qt_QHeaderView_setSectionHidden_void_QHeaderView_int_bool(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_logicalIndex,
-        bool param_hide)
+    void qt_QHeaderView_setSectionHidden_void_QHeaderView_int_bool(Mu::Thread& NODE_THREAD, Pointer param_this, int param_logicalIndex,
+                                                                   bool param_hide)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
@@ -1300,8 +1218,7 @@ namespace Mu
         arg0->setSectionHidden(arg1, arg2);
     }
 
-    void qt_QHeaderView_setSectionResizeMode_void_QHeaderView_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_mode)
+    void qt_QHeaderView_setSectionResizeMode_void_QHeaderView_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_mode)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
@@ -1309,9 +1226,8 @@ namespace Mu
         arg0->setSectionResizeMode(arg1);
     }
 
-    void qt_QHeaderView_setSectionResizeMode_void_QHeaderView_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_logicalIndex,
-        int param_mode)
+    void qt_QHeaderView_setSectionResizeMode_void_QHeaderView_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_logicalIndex,
+                                                                      int param_mode)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
@@ -1320,8 +1236,7 @@ namespace Mu
         arg0->setSectionResizeMode(arg1, arg2);
     }
 
-    void qt_QHeaderView_setSectionsClickable_void_QHeaderView_bool(
-        Mu::Thread& NODE_THREAD, Pointer param_this, bool param_clickable)
+    void qt_QHeaderView_setSectionsClickable_void_QHeaderView_bool(Mu::Thread& NODE_THREAD, Pointer param_this, bool param_clickable)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
@@ -1329,8 +1244,7 @@ namespace Mu
         arg0->setSectionsClickable(arg1);
     }
 
-    void qt_QHeaderView_setSectionsMovable_void_QHeaderView_bool(
-        Mu::Thread& NODE_THREAD, Pointer param_this, bool param_movable)
+    void qt_QHeaderView_setSectionsMovable_void_QHeaderView_bool(Mu::Thread& NODE_THREAD, Pointer param_this, bool param_movable)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
@@ -1338,9 +1252,8 @@ namespace Mu
         arg0->setSectionsMovable(arg1);
     }
 
-    void qt_QHeaderView_setSortIndicator_void_QHeaderView_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_logicalIndex,
-        int param_order)
+    void qt_QHeaderView_setSortIndicator_void_QHeaderView_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_logicalIndex,
+                                                                  int param_order)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
@@ -1349,8 +1262,7 @@ namespace Mu
         arg0->setSortIndicator(arg1, arg2);
     }
 
-    void qt_QHeaderView_showSection_void_QHeaderView_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_logicalIndex)
+    void qt_QHeaderView_showSection_void_QHeaderView_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_logicalIndex)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
@@ -1358,36 +1270,29 @@ namespace Mu
         arg0->showSection(arg1);
     }
 
-    int
-    qt_QHeaderView_sortIndicatorOrder_int_QHeaderView(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    int qt_QHeaderView_sortIndicatorOrder_int_QHeaderView(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
         return int(arg0->sortIndicatorOrder());
     }
 
-    int
-    qt_QHeaderView_sortIndicatorSection_int_QHeaderView(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this)
+    int qt_QHeaderView_sortIndicatorSection_int_QHeaderView(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
         return arg0->sortIndicatorSection();
     }
 
-    int
-    qt_QHeaderView_stretchSectionCount_int_QHeaderView(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this)
+    int qt_QHeaderView_stretchSectionCount_int_QHeaderView(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
         return arg0->stretchSectionCount();
     }
 
-    void qt_QHeaderView_swapSections_void_QHeaderView_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_first,
-        int param_second)
+    void qt_QHeaderView_swapSections_void_QHeaderView_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_first,
+                                                              int param_second)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
@@ -1396,9 +1301,7 @@ namespace Mu
         arg0->swapSections(arg1, arg2);
     }
 
-    int qt_QHeaderView_visualIndex_int_QHeaderView_int(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this,
-                                                       int param_logicalIndex)
+    int qt_QHeaderView_visualIndex_int_QHeaderView_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_logicalIndex)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
@@ -1406,8 +1309,7 @@ namespace Mu
         return arg0->visualIndex(arg1);
     }
 
-    int qt_QHeaderView_visualIndexAt_int_QHeaderView_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_position)
+    int qt_QHeaderView_visualIndexAt_int_QHeaderView_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_position)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
@@ -1415,8 +1317,7 @@ namespace Mu
         return arg0->visualIndexAt(arg1);
     }
 
-    void qt_QHeaderView_reset_void_QHeaderView(Mu::Thread& NODE_THREAD,
-                                               Pointer param_this)
+    void qt_QHeaderView_reset_void_QHeaderView(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
@@ -1426,8 +1327,7 @@ namespace Mu
             arg0->reset();
     }
 
-    void qt_QHeaderView_setModel_void_QHeaderView_QAbstractItemModel(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_model)
+    void qt_QHeaderView_setModel_void_QHeaderView_QAbstractItemModel(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_model)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
@@ -1438,8 +1338,7 @@ namespace Mu
             arg0->setModel(arg1);
     }
 
-    void qt_QHeaderView_setVisible_void_QHeaderView_bool(
-        Mu::Thread& NODE_THREAD, Pointer param_this, bool param_v)
+    void qt_QHeaderView_setVisible_void_QHeaderView_bool(Mu::Thread& NODE_THREAD, Pointer param_this, bool param_v)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
@@ -1450,39 +1349,26 @@ namespace Mu
             arg0->setVisible(arg1);
     }
 
-    Pointer qt_QHeaderView_sizeHint_QSize_QHeaderView(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    Pointer qt_QHeaderView_sizeHint_QSize_QHeaderView(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QSizeType>(c, arg0->QHeaderView::sizeHint(),
-                                          "qt.QSize")
-                   : makeqtype<QSizeType>(c, arg0->sizeHint(), "qt.QSize");
+        return isMuQtObject(arg0) ? makeqtype<QSizeType>(c, arg0->QHeaderView::sizeHint(), "qt.QSize")
+                                  : makeqtype<QSizeType>(c, arg0->sizeHint(), "qt.QSize");
     }
 
-    Pointer qt_QHeaderView_sectionSizeFromContents_QSize_QHeaderView_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_logicalIndex)
+    Pointer qt_QHeaderView_sectionSizeFromContents_QSize_QHeaderView_int(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                         int param_logicalIndex)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
         int arg1 = (int)(param_logicalIndex);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QSizeType>(
-                         c,
-                         ((MuQt_QHeaderView*)arg0)
-                             ->sectionSizeFromContents_pub_parent(arg1),
-                         "qt.QSize")
-                   : makeqtype<QSizeType>(
-                         c,
-                         ((MuQt_QHeaderView*)arg0)
-                             ->sectionSizeFromContents_pub(arg1),
-                         "qt.QSize");
+        return isMuQtObject(arg0) ? makeqtype<QSizeType>(c, ((MuQt_QHeaderView*)arg0)->sectionSizeFromContents_pub_parent(arg1), "qt.QSize")
+                                  : makeqtype<QSizeType>(c, ((MuQt_QHeaderView*)arg0)->sectionSizeFromContents_pub(arg1), "qt.QSize");
     }
 
-    void qt_QHeaderView_currentChanged_void_QHeaderView_QModelIndex_QModelIndex(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_current,
-        Pointer param_old)
+    void qt_QHeaderView_currentChanged_void_QHeaderView_QModelIndex_QModelIndex(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                Pointer param_current, Pointer param_old)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
@@ -1494,30 +1380,23 @@ namespace Mu
             ((MuQt_QHeaderView*)arg0)->currentChanged_pub(arg1, arg2);
     }
 
-    bool qt_QHeaderView_event_bool_QHeaderView_QEvent(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this,
-                                                      Pointer param_e)
+    bool qt_QHeaderView_event_bool_QHeaderView_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
         QEvent* arg1 = getqpointer<QEventType>(param_e);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QHeaderView*)arg0)->event_pub_parent(arg1)
-                   : ((MuQt_QHeaderView*)arg0)->event_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QHeaderView*)arg0)->event_pub_parent(arg1) : ((MuQt_QHeaderView*)arg0)->event_pub(arg1);
     }
 
-    int qt_QHeaderView_horizontalOffset_int_QHeaderView(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this)
+    int qt_QHeaderView_horizontalOffset_int_QHeaderView(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QHeaderView*)arg0)->horizontalOffset_pub_parent()
-                   : ((MuQt_QHeaderView*)arg0)->horizontalOffset_pub();
+        return isMuQtObject(arg0) ? ((MuQt_QHeaderView*)arg0)->horizontalOffset_pub_parent()
+                                  : ((MuQt_QHeaderView*)arg0)->horizontalOffset_pub();
     }
 
-    void qt_QHeaderView_mouseDoubleClickEvent_void_QHeaderView_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QHeaderView_mouseDoubleClickEvent_void_QHeaderView_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
@@ -1528,8 +1407,7 @@ namespace Mu
             ((MuQt_QHeaderView*)arg0)->mouseDoubleClickEvent_pub(arg1);
     }
 
-    void qt_QHeaderView_mouseMoveEvent_void_QHeaderView_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QHeaderView_mouseMoveEvent_void_QHeaderView_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
@@ -1540,8 +1418,7 @@ namespace Mu
             ((MuQt_QHeaderView*)arg0)->mouseMoveEvent_pub(arg1);
     }
 
-    void qt_QHeaderView_mousePressEvent_void_QHeaderView_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QHeaderView_mousePressEvent_void_QHeaderView_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
@@ -1552,8 +1429,7 @@ namespace Mu
             ((MuQt_QHeaderView*)arg0)->mousePressEvent_pub(arg1);
     }
 
-    void qt_QHeaderView_mouseReleaseEvent_void_QHeaderView_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QHeaderView_mouseReleaseEvent_void_QHeaderView_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
@@ -1564,8 +1440,7 @@ namespace Mu
             ((MuQt_QHeaderView*)arg0)->mouseReleaseEvent_pub(arg1);
     }
 
-    void qt_QHeaderView_paintEvent_void_QHeaderView_QPaintEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QHeaderView_paintEvent_void_QHeaderView_QPaintEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
@@ -1576,44 +1451,37 @@ namespace Mu
             ((MuQt_QHeaderView*)arg0)->paintEvent_pub(arg1);
     }
 
-    void qt_QHeaderView_setSelection_void_QHeaderView_QRect_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_rect,
-        int param_flags)
+    void qt_QHeaderView_setSelection_void_QHeaderView_QRect_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_rect,
+                                                                int param_flags)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
         const QRect arg1 = getqtype<QRectType>(param_rect);
-        QItemSelectionModel::SelectionFlags arg2 =
-            (QItemSelectionModel::SelectionFlags)(param_flags);
+        QItemSelectionModel::SelectionFlags arg2 = (QItemSelectionModel::SelectionFlags)(param_flags);
         if (isMuQtObject(arg0))
             ((MuQt_QHeaderView*)arg0)->setSelection_pub_parent(arg1, arg2);
         else
             ((MuQt_QHeaderView*)arg0)->setSelection_pub(arg1, arg2);
     }
 
-    int qt_QHeaderView_verticalOffset_int_QHeaderView(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    int qt_QHeaderView_verticalOffset_int_QHeaderView(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QHeaderView*)arg0)->verticalOffset_pub_parent()
-                   : ((MuQt_QHeaderView*)arg0)->verticalOffset_pub();
+        return isMuQtObject(arg0) ? ((MuQt_QHeaderView*)arg0)->verticalOffset_pub_parent()
+                                  : ((MuQt_QHeaderView*)arg0)->verticalOffset_pub();
     }
 
-    bool qt_QHeaderView_viewportEvent_bool_QHeaderView_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    bool qt_QHeaderView_viewportEvent_bool_QHeaderView_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
         QEvent* arg1 = getqpointer<QEventType>(param_e);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QHeaderView*)arg0)->viewportEvent_pub_parent(arg1)
-                   : ((MuQt_QHeaderView*)arg0)->viewportEvent_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QHeaderView*)arg0)->viewportEvent_pub_parent(arg1)
+                                  : ((MuQt_QHeaderView*)arg0)->viewportEvent_pub(arg1);
     }
 
-    void qt_QHeaderView_keyboardSearch_void_QHeaderView_string(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_search)
+    void qt_QHeaderView_keyboardSearch_void_QHeaderView_string(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_search)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
@@ -1624,72 +1492,56 @@ namespace Mu
             arg0->keyboardSearch(arg1);
     }
 
-    void qt_QHeaderView_setSelectionModel_void_QHeaderView_QItemSelectionModel(
-        Mu::Thread& NODE_THREAD, Pointer param_this,
-        Pointer param_selectionModel)
+    void qt_QHeaderView_setSelectionModel_void_QHeaderView_QItemSelectionModel(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                               Pointer param_selectionModel)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
-        QItemSelectionModel* arg1 =
-            object<QItemSelectionModel>(param_selectionModel);
+        QItemSelectionModel* arg1 = object<QItemSelectionModel>(param_selectionModel);
         if (isMuQtObject(arg0))
             arg0->QHeaderView::setSelectionModel(arg1);
         else
             arg0->setSelectionModel(arg1);
     }
 
-    int qt_QHeaderView_sizeHintForColumn_int_QHeaderView_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_column)
+    int qt_QHeaderView_sizeHintForColumn_int_QHeaderView_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_column)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
         int arg1 = (int)(param_column);
-        return isMuQtObject(arg0) ? arg0->QHeaderView::sizeHintForColumn(arg1)
-                                  : arg0->sizeHintForColumn(arg1);
+        return isMuQtObject(arg0) ? arg0->QHeaderView::sizeHintForColumn(arg1) : arg0->sizeHintForColumn(arg1);
     }
 
-    int qt_QHeaderView_sizeHintForRow_int_QHeaderView_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_row)
+    int qt_QHeaderView_sizeHintForRow_int_QHeaderView_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_row)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
         int arg1 = (int)(param_row);
-        return isMuQtObject(arg0) ? arg0->QHeaderView::sizeHintForRow(arg1)
-                                  : arg0->sizeHintForRow(arg1);
+        return isMuQtObject(arg0) ? arg0->QHeaderView::sizeHintForRow(arg1) : arg0->sizeHintForRow(arg1);
     }
 
-    Pointer qt_QHeaderView_inputMethodQuery_QVariant_QHeaderView_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_query)
+    Pointer qt_QHeaderView_inputMethodQuery_QVariant_QHeaderView_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_query)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
         Qt::InputMethodQuery arg1 = (Qt::InputMethodQuery)(param_query);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QVariantType>(
-                         c, arg0->QHeaderView::inputMethodQuery(arg1),
-                         "qt.QVariant")
-                   : makeqtype<QVariantType>(c, arg0->inputMethodQuery(arg1),
-                                             "qt.QVariant");
+        return isMuQtObject(arg0) ? makeqtype<QVariantType>(c, arg0->QHeaderView::inputMethodQuery(arg1), "qt.QVariant")
+                                  : makeqtype<QVariantType>(c, arg0->inputMethodQuery(arg1), "qt.QVariant");
     }
 
-    bool qt_QHeaderView_edit_bool_QHeaderView_QModelIndex_int_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index,
-        int param_trigger, Pointer param_event)
+    bool qt_QHeaderView_edit_bool_QHeaderView_QModelIndex_int_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index,
+                                                                     int param_trigger, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
         const QModelIndex arg1 = getqtype<QModelIndexType>(param_index);
-        QAbstractItemView::EditTrigger arg2 =
-            (QAbstractItemView::EditTrigger)(param_trigger);
+        QAbstractItemView::EditTrigger arg2 = (QAbstractItemView::EditTrigger)(param_trigger);
         QEvent* arg3 = getqpointer<QEventType>(param_event);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QHeaderView*)arg0)
-                         ->edit_pub_parent(arg1, arg2, arg3)
-                   : ((MuQt_QHeaderView*)arg0)->edit_pub(arg1, arg2, arg3);
+        return isMuQtObject(arg0) ? ((MuQt_QHeaderView*)arg0)->edit_pub_parent(arg1, arg2, arg3)
+                                  : ((MuQt_QHeaderView*)arg0)->edit_pub(arg1, arg2, arg3);
     }
 
-    bool qt_QHeaderView_isIndexHidden_bool_QHeaderView_QModelIndex(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index)
+    bool qt_QHeaderView_isIndexHidden_bool_QHeaderView_QModelIndex(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
@@ -1697,35 +1549,26 @@ namespace Mu
         return ((MuQt_QHeaderView*)arg0)->isIndexHidden_pub(arg1);
     }
 
-    Pointer qt_QHeaderView_selectedIndexes_qt__QModelIndexBSB_ESB__QHeaderView(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QHeaderView_selectedIndexes_qt__QModelIndexBSB_ESB__QHeaderView(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqmodelindexlist(c, ((MuQt_QHeaderView*)arg0)
-                                                ->selectedIndexes_pub_parent())
-                   : makeqmodelindexlist(
-                         c, ((MuQt_QHeaderView*)arg0)->selectedIndexes_pub());
+        return isMuQtObject(arg0) ? makeqmodelindexlist(c, ((MuQt_QHeaderView*)arg0)->selectedIndexes_pub_parent())
+                                  : makeqmodelindexlist(c, ((MuQt_QHeaderView*)arg0)->selectedIndexes_pub());
     }
 
-    int qt_QHeaderView_selectionCommand_int_QHeaderView_QModelIndex_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index,
-        Pointer param_event)
+    int qt_QHeaderView_selectionCommand_int_QHeaderView_QModelIndex_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index,
+                                                                           Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
         const QModelIndex arg1 = getqtype<QModelIndexType>(param_index);
         const QEvent* arg2 = getqpointer<QEventType>(param_event);
-        return isMuQtObject(arg0)
-                   ? int(((MuQt_QHeaderView*)arg0)
-                             ->selectionCommand_pub_parent(arg1, arg2))
-                   : int(((MuQt_QHeaderView*)arg0)
-                             ->selectionCommand_pub(arg1, arg2));
+        return isMuQtObject(arg0) ? int(((MuQt_QHeaderView*)arg0)->selectionCommand_pub_parent(arg1, arg2))
+                                  : int(((MuQt_QHeaderView*)arg0)->selectionCommand_pub(arg1, arg2));
     }
 
-    void qt_QHeaderView_startDrag_void_QHeaderView_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_supportedActions)
+    void qt_QHeaderView_startDrag_void_QHeaderView_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_supportedActions)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
@@ -1736,21 +1579,16 @@ namespace Mu
             ((MuQt_QHeaderView*)arg0)->startDrag_pub(arg1);
     }
 
-    Pointer
-    qt_QHeaderView_visualRegionForSelection_QRegion_QHeaderView_QItemSelection(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_selection)
+    Pointer qt_QHeaderView_visualRegionForSelection_QRegion_QHeaderView_QItemSelection(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                       Pointer param_selection)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
-        const QItemSelection arg1 =
-            getqtype<QItemSelectionType>(param_selection);
-        return makeqtype<QRegionType>(
-            c, ((MuQt_QHeaderView*)arg0)->visualRegionForSelection_pub(arg1),
-            "qt.QRegion");
+        const QItemSelection arg1 = getqtype<QItemSelectionType>(param_selection);
+        return makeqtype<QRegionType>(c, ((MuQt_QHeaderView*)arg0)->visualRegionForSelection_pub(arg1), "qt.QRegion");
     }
 
-    void qt_QHeaderView_dragEnterEvent_void_QHeaderView_QDragEnterEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QHeaderView_dragEnterEvent_void_QHeaderView_QDragEnterEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
@@ -1761,8 +1599,7 @@ namespace Mu
             ((MuQt_QHeaderView*)arg0)->dragEnterEvent_pub(arg1);
     }
 
-    void qt_QHeaderView_dragLeaveEvent_void_QHeaderView_QDragLeaveEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QHeaderView_dragLeaveEvent_void_QHeaderView_QDragLeaveEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
@@ -1773,8 +1610,7 @@ namespace Mu
             ((MuQt_QHeaderView*)arg0)->dragLeaveEvent_pub(arg1);
     }
 
-    void qt_QHeaderView_dragMoveEvent_void_QHeaderView_QDragMoveEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QHeaderView_dragMoveEvent_void_QHeaderView_QDragMoveEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
@@ -1785,8 +1621,7 @@ namespace Mu
             ((MuQt_QHeaderView*)arg0)->dragMoveEvent_pub(arg1);
     }
 
-    void qt_QHeaderView_dropEvent_void_QHeaderView_QDropEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QHeaderView_dropEvent_void_QHeaderView_QDropEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
@@ -1797,22 +1632,18 @@ namespace Mu
             ((MuQt_QHeaderView*)arg0)->dropEvent_pub(arg1);
     }
 
-    bool qt_QHeaderView_eventFilter_bool_QHeaderView_QObject_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_object,
-        Pointer param_event)
+    bool qt_QHeaderView_eventFilter_bool_QHeaderView_QObject_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_object,
+                                                                    Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
         QObject* arg1 = object<QObject>(param_object);
         QEvent* arg2 = getqpointer<QEventType>(param_event);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QHeaderView*)arg0)
-                         ->eventFilter_pub_parent(arg1, arg2)
-                   : ((MuQt_QHeaderView*)arg0)->eventFilter_pub(arg1, arg2);
+        return isMuQtObject(arg0) ? ((MuQt_QHeaderView*)arg0)->eventFilter_pub_parent(arg1, arg2)
+                                  : ((MuQt_QHeaderView*)arg0)->eventFilter_pub(arg1, arg2);
     }
 
-    void qt_QHeaderView_focusInEvent_void_QHeaderView_QFocusEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QHeaderView_focusInEvent_void_QHeaderView_QFocusEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
@@ -1823,20 +1654,16 @@ namespace Mu
             ((MuQt_QHeaderView*)arg0)->focusInEvent_pub(arg1);
     }
 
-    bool qt_QHeaderView_focusNextPrevChild_bool_QHeaderView_bool(
-        Mu::Thread& NODE_THREAD, Pointer param_this, bool param_next)
+    bool qt_QHeaderView_focusNextPrevChild_bool_QHeaderView_bool(Mu::Thread& NODE_THREAD, Pointer param_this, bool param_next)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
         bool arg1 = (bool)(param_next);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QHeaderView*)arg0)
-                         ->focusNextPrevChild_pub_parent(arg1)
-                   : ((MuQt_QHeaderView*)arg0)->focusNextPrevChild_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QHeaderView*)arg0)->focusNextPrevChild_pub_parent(arg1)
+                                  : ((MuQt_QHeaderView*)arg0)->focusNextPrevChild_pub(arg1);
     }
 
-    void qt_QHeaderView_focusOutEvent_void_QHeaderView_QFocusEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QHeaderView_focusOutEvent_void_QHeaderView_QFocusEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
@@ -1847,8 +1674,7 @@ namespace Mu
             ((MuQt_QHeaderView*)arg0)->focusOutEvent_pub(arg1);
     }
 
-    void qt_QHeaderView_keyPressEvent_void_QHeaderView_QKeyEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QHeaderView_keyPressEvent_void_QHeaderView_QKeyEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
@@ -1859,8 +1685,7 @@ namespace Mu
             ((MuQt_QHeaderView*)arg0)->keyPressEvent_pub(arg1);
     }
 
-    void qt_QHeaderView_resizeEvent_void_QHeaderView_QResizeEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QHeaderView_resizeEvent_void_QHeaderView_QResizeEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
@@ -1871,8 +1696,7 @@ namespace Mu
             ((MuQt_QHeaderView*)arg0)->resizeEvent_pub(arg1);
     }
 
-    void qt_QHeaderView_timerEvent_void_QHeaderView_QTimerEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QHeaderView_timerEvent_void_QHeaderView_QTimerEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
@@ -1883,519 +1707,424 @@ namespace Mu
             ((MuQt_QHeaderView*)arg0)->timerEvent_pub(arg1);
     }
 
-    Pointer
-    qt_QHeaderView_viewportSizeHint_QSize_QHeaderView(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    Pointer qt_QHeaderView_viewportSizeHint_QSize_QHeaderView(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHeaderView* arg0 = object<QHeaderView>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QSizeType>(c,
-                                          ((MuQt_QHeaderView*)arg0)
-                                              ->viewportSizeHint_pub_parent(),
-                                          "qt.QSize")
-                   : makeqtype<QSizeType>(
-                         c, ((MuQt_QHeaderView*)arg0)->viewportSizeHint_pub(),
-                         "qt.QSize");
+        return isMuQtObject(arg0) ? makeqtype<QSizeType>(c, ((MuQt_QHeaderView*)arg0)->viewportSizeHint_pub_parent(), "qt.QSize")
+                                  : makeqtype<QSizeType>(c, ((MuQt_QHeaderView*)arg0)->viewportSizeHint_pub(), "qt.QSize");
     }
 
     static NODE_IMPLEMENTATION(_n_QHeaderView0, Pointer)
     {
-        NODE_RETURN(
-            qt_QHeaderView_QHeaderView_QHeaderView_QHeaderView_int_QWidget(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-                NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QHeaderView_QHeaderView_QHeaderView_QHeaderView_int_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                   NODE_ARG(1, int), NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_count0, int)
     {
-        NODE_RETURN(qt_QHeaderView_count_int_QHeaderView(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QHeaderView_count_int_QHeaderView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_hiddenSectionCount0, int)
     {
-        NODE_RETURN(qt_QHeaderView_hiddenSectionCount_int_QHeaderView(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QHeaderView_hiddenSectionCount_int_QHeaderView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_hideSection0, void)
     {
-        qt_QHeaderView_hideSection_void_QHeaderView_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QHeaderView_hideSection_void_QHeaderView_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_isSectionHidden0, bool)
     {
-        NODE_RETURN(qt_QHeaderView_isSectionHidden_bool_QHeaderView_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QHeaderView_isSectionHidden_bool_QHeaderView_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_length0, int)
     {
-        NODE_RETURN(qt_QHeaderView_length_int_QHeaderView(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QHeaderView_length_int_QHeaderView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_logicalIndex0, int)
     {
-        NODE_RETURN(qt_QHeaderView_logicalIndex_int_QHeaderView_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QHeaderView_logicalIndex_int_QHeaderView_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_logicalIndexAt0, int)
     {
-        NODE_RETURN(qt_QHeaderView_logicalIndexAt_int_QHeaderView_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QHeaderView_logicalIndexAt_int_QHeaderView_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_logicalIndexAt1, int)
     {
-        NODE_RETURN(qt_QHeaderView_logicalIndexAt_int_QHeaderView_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int)));
+        NODE_RETURN(qt_QHeaderView_logicalIndexAt_int_QHeaderView_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                          NODE_ARG(2, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_logicalIndexAt2, int)
     {
-        NODE_RETURN(qt_QHeaderView_logicalIndexAt_int_QHeaderView_QPoint(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QHeaderView_logicalIndexAt_int_QHeaderView_QPoint(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_moveSection0, void)
     {
-        qt_QHeaderView_moveSection_void_QHeaderView_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int));
+        qt_QHeaderView_moveSection_void_QHeaderView_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_offset0, int)
     {
-        NODE_RETURN(qt_QHeaderView_offset_int_QHeaderView(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QHeaderView_offset_int_QHeaderView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_orientation0, int)
     {
-        NODE_RETURN(qt_QHeaderView_orientation_int_QHeaderView(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QHeaderView_orientation_int_QHeaderView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_resizeContentsPrecision0, int)
     {
-        NODE_RETURN(qt_QHeaderView_resizeContentsPrecision_int_QHeaderView(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QHeaderView_resizeContentsPrecision_int_QHeaderView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_resizeSection0, void)
     {
-        qt_QHeaderView_resizeSection_void_QHeaderView_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int));
+        qt_QHeaderView_resizeSection_void_QHeaderView_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_resizeSections0, void)
     {
-        qt_QHeaderView_resizeSections_void_QHeaderView_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QHeaderView_resizeSections_void_QHeaderView_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_restoreState0, bool)
     {
-        NODE_RETURN(qt_QHeaderView_restoreState_bool_QHeaderView_QByteArray(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(
+            qt_QHeaderView_restoreState_bool_QHeaderView_QByteArray(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_saveState0, Pointer)
     {
-        NODE_RETURN(qt_QHeaderView_saveState_QByteArray_QHeaderView(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QHeaderView_saveState_QByteArray_QHeaderView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_sectionPosition0, int)
     {
-        NODE_RETURN(qt_QHeaderView_sectionPosition_int_QHeaderView_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QHeaderView_sectionPosition_int_QHeaderView_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_sectionResizeMode0, int)
     {
-        NODE_RETURN(qt_QHeaderView_sectionResizeMode_int_QHeaderView_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QHeaderView_sectionResizeMode_int_QHeaderView_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_sectionSize0, int)
     {
-        NODE_RETURN(qt_QHeaderView_sectionSize_int_QHeaderView_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QHeaderView_sectionSize_int_QHeaderView_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_sectionSizeHint0, int)
     {
-        NODE_RETURN(qt_QHeaderView_sectionSizeHint_int_QHeaderView_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QHeaderView_sectionSizeHint_int_QHeaderView_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_sectionViewportPosition0, int)
     {
-        NODE_RETURN(qt_QHeaderView_sectionViewportPosition_int_QHeaderView_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QHeaderView_sectionViewportPosition_int_QHeaderView_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_sectionsClickable0, bool)
     {
-        NODE_RETURN(qt_QHeaderView_sectionsClickable_bool_QHeaderView(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QHeaderView_sectionsClickable_bool_QHeaderView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_sectionsHidden0, bool)
     {
-        NODE_RETURN(qt_QHeaderView_sectionsHidden_bool_QHeaderView(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QHeaderView_sectionsHidden_bool_QHeaderView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_sectionsMovable0, bool)
     {
-        NODE_RETURN(qt_QHeaderView_sectionsMovable_bool_QHeaderView(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QHeaderView_sectionsMovable_bool_QHeaderView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_sectionsMoved0, bool)
     {
-        NODE_RETURN(qt_QHeaderView_sectionsMoved_bool_QHeaderView(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QHeaderView_sectionsMoved_bool_QHeaderView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_setResizeContentsPrecision0, void)
     {
-        qt_QHeaderView_setResizeContentsPrecision_void_QHeaderView_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QHeaderView_setResizeContentsPrecision_void_QHeaderView_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setSectionHidden0, void)
     {
-        qt_QHeaderView_setSectionHidden_void_QHeaderView_int_bool(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, bool));
+        qt_QHeaderView_setSectionHidden_void_QHeaderView_int_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                  NODE_ARG(2, bool));
     }
 
     static NODE_IMPLEMENTATION(_n_setSectionResizeMode0, void)
     {
-        qt_QHeaderView_setSectionResizeMode_void_QHeaderView_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QHeaderView_setSectionResizeMode_void_QHeaderView_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setSectionResizeMode1, void)
     {
-        qt_QHeaderView_setSectionResizeMode_void_QHeaderView_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int));
+        qt_QHeaderView_setSectionResizeMode_void_QHeaderView_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                     NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setSectionsClickable0, void)
     {
-        qt_QHeaderView_setSectionsClickable_void_QHeaderView_bool(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool));
+        qt_QHeaderView_setSectionsClickable_void_QHeaderView_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool));
     }
 
     static NODE_IMPLEMENTATION(_n_setSectionsMovable0, void)
     {
-        qt_QHeaderView_setSectionsMovable_void_QHeaderView_bool(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool));
+        qt_QHeaderView_setSectionsMovable_void_QHeaderView_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool));
     }
 
     static NODE_IMPLEMENTATION(_n_setSortIndicator0, void)
     {
-        qt_QHeaderView_setSortIndicator_void_QHeaderView_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int));
+        qt_QHeaderView_setSortIndicator_void_QHeaderView_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                 NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_showSection0, void)
     {
-        qt_QHeaderView_showSection_void_QHeaderView_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QHeaderView_showSection_void_QHeaderView_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_sortIndicatorOrder0, int)
     {
-        NODE_RETURN(qt_QHeaderView_sortIndicatorOrder_int_QHeaderView(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QHeaderView_sortIndicatorOrder_int_QHeaderView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_sortIndicatorSection0, int)
     {
-        NODE_RETURN(qt_QHeaderView_sortIndicatorSection_int_QHeaderView(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QHeaderView_sortIndicatorSection_int_QHeaderView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_stretchSectionCount0, int)
     {
-        NODE_RETURN(qt_QHeaderView_stretchSectionCount_int_QHeaderView(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QHeaderView_stretchSectionCount_int_QHeaderView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_swapSections0, void)
     {
-        qt_QHeaderView_swapSections_void_QHeaderView_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int));
+        qt_QHeaderView_swapSections_void_QHeaderView_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_visualIndex0, int)
     {
-        NODE_RETURN(qt_QHeaderView_visualIndex_int_QHeaderView_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QHeaderView_visualIndex_int_QHeaderView_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_visualIndexAt0, int)
     {
-        NODE_RETURN(qt_QHeaderView_visualIndexAt_int_QHeaderView_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QHeaderView_visualIndexAt_int_QHeaderView_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
-    static NODE_IMPLEMENTATION(_n_reset0, void)
-    {
-        qt_QHeaderView_reset_void_QHeaderView(NODE_THREAD,
-                                              NONNIL_NODE_ARG(0, Pointer));
-    }
+    static NODE_IMPLEMENTATION(_n_reset0, void) { qt_QHeaderView_reset_void_QHeaderView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)); }
 
     static NODE_IMPLEMENTATION(_n_setModel0, void)
     {
-        qt_QHeaderView_setModel_void_QHeaderView_QAbstractItemModel(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QHeaderView_setModel_void_QHeaderView_QAbstractItemModel(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setVisible0, void)
     {
-        qt_QHeaderView_setVisible_void_QHeaderView_bool(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool));
+        qt_QHeaderView_setVisible_void_QHeaderView_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool));
     }
 
     static NODE_IMPLEMENTATION(_n_sizeHint0, Pointer)
     {
-        NODE_RETURN(qt_QHeaderView_sizeHint_QSize_QHeaderView(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QHeaderView_sizeHint_QSize_QHeaderView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_sectionSizeFromContents0, Pointer)
     {
         NODE_RETURN(
-            qt_QHeaderView_sectionSizeFromContents_QSize_QHeaderView_int(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+            qt_QHeaderView_sectionSizeFromContents_QSize_QHeaderView_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_currentChanged0, void)
     {
-        qt_QHeaderView_currentChanged_void_QHeaderView_QModelIndex_QModelIndex(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer));
+        qt_QHeaderView_currentChanged_void_QHeaderView_QModelIndex_QModelIndex(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                               NODE_ARG(1, Pointer), NODE_ARG(2, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_event0, bool)
     {
-        NODE_RETURN(qt_QHeaderView_event_bool_QHeaderView_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QHeaderView_event_bool_QHeaderView_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_horizontalOffset0, int)
     {
-        NODE_RETURN(qt_QHeaderView_horizontalOffset_int_QHeaderView(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QHeaderView_horizontalOffset_int_QHeaderView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseDoubleClickEvent0, void)
     {
-        qt_QHeaderView_mouseDoubleClickEvent_void_QHeaderView_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QHeaderView_mouseDoubleClickEvent_void_QHeaderView_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseMoveEvent0, void)
     {
-        qt_QHeaderView_mouseMoveEvent_void_QHeaderView_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QHeaderView_mouseMoveEvent_void_QHeaderView_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mousePressEvent0, void)
     {
-        qt_QHeaderView_mousePressEvent_void_QHeaderView_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QHeaderView_mousePressEvent_void_QHeaderView_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseReleaseEvent0, void)
     {
-        qt_QHeaderView_mouseReleaseEvent_void_QHeaderView_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QHeaderView_mouseReleaseEvent_void_QHeaderView_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_paintEvent0, void)
     {
-        qt_QHeaderView_paintEvent_void_QHeaderView_QPaintEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QHeaderView_paintEvent_void_QHeaderView_QPaintEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setSelection0, void)
     {
-        qt_QHeaderView_setSelection_void_QHeaderView_QRect_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int));
+        qt_QHeaderView_setSelection_void_QHeaderView_QRect_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                               NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_verticalOffset0, int)
     {
-        NODE_RETURN(qt_QHeaderView_verticalOffset_int_QHeaderView(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QHeaderView_verticalOffset_int_QHeaderView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_viewportEvent0, bool)
     {
-        NODE_RETURN(qt_QHeaderView_viewportEvent_bool_QHeaderView_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QHeaderView_viewportEvent_bool_QHeaderView_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_keyboardSearch0, void)
     {
-        qt_QHeaderView_keyboardSearch_void_QHeaderView_string(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QHeaderView_keyboardSearch_void_QHeaderView_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setSelectionModel0, void)
     {
-        qt_QHeaderView_setSelectionModel_void_QHeaderView_QItemSelectionModel(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QHeaderView_setSelectionModel_void_QHeaderView_QItemSelectionModel(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                              NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_sizeHintForColumn0, int)
     {
-        NODE_RETURN(qt_QHeaderView_sizeHintForColumn_int_QHeaderView_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QHeaderView_sizeHintForColumn_int_QHeaderView_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_sizeHintForRow0, int)
     {
-        NODE_RETURN(qt_QHeaderView_sizeHintForRow_int_QHeaderView_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QHeaderView_sizeHintForRow_int_QHeaderView_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_inputMethodQuery0, Pointer)
     {
-        NODE_RETURN(qt_QHeaderView_inputMethodQuery_QVariant_QHeaderView_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QHeaderView_inputMethodQuery_QVariant_QHeaderView_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_edit0, bool)
     {
         NODE_RETURN(qt_QHeaderView_edit_bool_QHeaderView_QModelIndex_int_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int), NODE_ARG(3, Pointer)));
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, int), NODE_ARG(3, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isIndexHidden0, bool)
     {
-        NODE_RETURN(qt_QHeaderView_isIndexHidden_bool_QHeaderView_QModelIndex(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(
+            qt_QHeaderView_isIndexHidden_bool_QHeaderView_QModelIndex(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_selectedIndexes0, Pointer)
     {
-        NODE_RETURN(
-            qt_QHeaderView_selectedIndexes_qt__QModelIndexBSB_ESB__QHeaderView(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QHeaderView_selectedIndexes_qt__QModelIndexBSB_ESB__QHeaderView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_selectionCommand0, int)
     {
-        NODE_RETURN(
-            qt_QHeaderView_selectionCommand_int_QHeaderView_QModelIndex_QEvent(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QHeaderView_selectionCommand_int_QHeaderView_QModelIndex_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                       NODE_ARG(1, Pointer), NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_startDrag0, void)
     {
-        qt_QHeaderView_startDrag_void_QHeaderView_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QHeaderView_startDrag_void_QHeaderView_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_visualRegionForSelection0, Pointer)
     {
-        NODE_RETURN(
-            qt_QHeaderView_visualRegionForSelection_QRegion_QHeaderView_QItemSelection(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QHeaderView_visualRegionForSelection_QRegion_QHeaderView_QItemSelection(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                               NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_dragEnterEvent0, void)
     {
-        qt_QHeaderView_dragEnterEvent_void_QHeaderView_QDragEnterEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QHeaderView_dragEnterEvent_void_QHeaderView_QDragEnterEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_dragLeaveEvent0, void)
     {
-        qt_QHeaderView_dragLeaveEvent_void_QHeaderView_QDragLeaveEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QHeaderView_dragLeaveEvent_void_QHeaderView_QDragLeaveEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_dragMoveEvent0, void)
     {
-        qt_QHeaderView_dragMoveEvent_void_QHeaderView_QDragMoveEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QHeaderView_dragMoveEvent_void_QHeaderView_QDragMoveEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_dropEvent0, void)
     {
-        qt_QHeaderView_dropEvent_void_QHeaderView_QDropEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QHeaderView_dropEvent_void_QHeaderView_QDropEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_eventFilter0, bool)
     {
-        NODE_RETURN(qt_QHeaderView_eventFilter_bool_QHeaderView_QObject_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QHeaderView_eventFilter_bool_QHeaderView_QObject_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                               NODE_ARG(1, Pointer), NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_focusInEvent0, void)
     {
-        qt_QHeaderView_focusInEvent_void_QHeaderView_QFocusEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QHeaderView_focusInEvent_void_QHeaderView_QFocusEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_focusNextPrevChild0, bool)
     {
-        NODE_RETURN(qt_QHeaderView_focusNextPrevChild_bool_QHeaderView_bool(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool)));
+        NODE_RETURN(qt_QHeaderView_focusNextPrevChild_bool_QHeaderView_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool)));
     }
 
     static NODE_IMPLEMENTATION(_n_focusOutEvent0, void)
     {
-        qt_QHeaderView_focusOutEvent_void_QHeaderView_QFocusEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QHeaderView_focusOutEvent_void_QHeaderView_QFocusEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_keyPressEvent0, void)
     {
-        qt_QHeaderView_keyPressEvent_void_QHeaderView_QKeyEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QHeaderView_keyPressEvent_void_QHeaderView_QKeyEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_resizeEvent0, void)
     {
-        qt_QHeaderView_resizeEvent_void_QHeaderView_QResizeEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QHeaderView_resizeEvent_void_QHeaderView_QResizeEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_timerEvent0, void)
     {
-        qt_QHeaderView_timerEvent_void_QHeaderView_QTimerEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QHeaderView_timerEvent_void_QHeaderView_QTimerEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_viewportSizeHint0, Pointer)
     {
-        NODE_RETURN(qt_QHeaderView_viewportSizeHint_QSize_QHeaderView(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QHeaderView_viewportSizeHint_QSize_QHeaderView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     void QHeaderViewType::load()
@@ -2415,17 +2144,13 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
-                   new Function(c, tn, castFromObject, Cast, Compiled,
-                                QHeaderView_QHeaderView_QObject, Return, ftn,
-                                Parameters,
+                   new Function(c, tn, castFromObject, Cast, Compiled, QHeaderView_QHeaderView_QObject, Return, ftn, Parameters,
                                 new Param(c, "object", "qt.QObject"), End),
 
                    EndArguments);
@@ -2433,147 +2158,77 @@ namespace Mu
         addSymbols(
             // enums
             // member functions
-            new Function(
-                c, "QHeaderView", _n_QHeaderView0, None, Compiled,
-                qt_QHeaderView_QHeaderView_QHeaderView_QHeaderView_int_QWidget,
-                Return, "qt.QHeaderView", Parameters,
-                new Param(c, "this", "qt.QHeaderView"),
-                new Param(c, "orientation", "int"),
-                new Param(c, "parent", "qt.QWidget"), End),
+            new Function(c, "QHeaderView", _n_QHeaderView0, None, Compiled, qt_QHeaderView_QHeaderView_QHeaderView_QHeaderView_int_QWidget,
+                         Return, "qt.QHeaderView", Parameters, new Param(c, "this", "qt.QHeaderView"), new Param(c, "orientation", "int"),
+                         new Param(c, "parent", "qt.QWidget"), End),
             // PROP: cascadingSectionResizes (bool; QHeaderView this)
-            new Function(c, "count", _n_count0, None, Compiled,
-                         qt_QHeaderView_count_int_QHeaderView, Return, "int",
-                         Parameters, new Param(c, "this", "qt.QHeaderView"),
-                         End),
+            new Function(c, "count", _n_count0, None, Compiled, qt_QHeaderView_count_int_QHeaderView, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QHeaderView"), End),
             // PROP: defaultAlignment (flags Qt::Alignment; QHeaderView this)
             // PROP: defaultSectionSize (int; QHeaderView this)
-            new Function(
-                c, "hiddenSectionCount", _n_hiddenSectionCount0, None, Compiled,
-                qt_QHeaderView_hiddenSectionCount_int_QHeaderView, Return,
-                "int", Parameters, new Param(c, "this", "qt.QHeaderView"), End),
-            new Function(c, "hideSection", _n_hideSection0, None, Compiled,
-                         qt_QHeaderView_hideSection_void_QHeaderView_int,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QHeaderView"),
-                         new Param(c, "logicalIndex", "int"), End),
+            new Function(c, "hiddenSectionCount", _n_hiddenSectionCount0, None, Compiled, qt_QHeaderView_hiddenSectionCount_int_QHeaderView,
+                         Return, "int", Parameters, new Param(c, "this", "qt.QHeaderView"), End),
+            new Function(c, "hideSection", _n_hideSection0, None, Compiled, qt_QHeaderView_hideSection_void_QHeaderView_int, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QHeaderView"), new Param(c, "logicalIndex", "int"), End),
             // PROP: highlightSections (bool; QHeaderView this)
             // PROP: isFirstSectionMovable (bool; QHeaderView this)
-            new Function(
-                c, "isSectionHidden", _n_isSectionHidden0, None, Compiled,
-                qt_QHeaderView_isSectionHidden_bool_QHeaderView_int, Return,
-                "bool", Parameters, new Param(c, "this", "qt.QHeaderView"),
-                new Param(c, "logicalIndex", "int"), End),
+            new Function(c, "isSectionHidden", _n_isSectionHidden0, None, Compiled, qt_QHeaderView_isSectionHidden_bool_QHeaderView_int,
+                         Return, "bool", Parameters, new Param(c, "this", "qt.QHeaderView"), new Param(c, "logicalIndex", "int"), End),
             // PROP: isSortIndicatorClearable (bool; QHeaderView this)
             // PROP: isSortIndicatorShown (bool; QHeaderView this)
-            new Function(c, "length", _n_length0, None, Compiled,
-                         qt_QHeaderView_length_int_QHeaderView, Return, "int",
-                         Parameters, new Param(c, "this", "qt.QHeaderView"),
-                         End),
-            new Function(c, "logicalIndex", _n_logicalIndex0, None, Compiled,
-                         qt_QHeaderView_logicalIndex_int_QHeaderView_int,
-                         Return, "int", Parameters,
-                         new Param(c, "this", "qt.QHeaderView"),
-                         new Param(c, "visualIndex", "int"), End),
-            new Function(
-                c, "logicalIndexAt", _n_logicalIndexAt0, None, Compiled,
-                qt_QHeaderView_logicalIndexAt_int_QHeaderView_int, Return,
-                "int", Parameters, new Param(c, "this", "qt.QHeaderView"),
-                new Param(c, "position", "int"), End),
-            new Function(
-                c, "logicalIndexAt", _n_logicalIndexAt1, None, Compiled,
-                qt_QHeaderView_logicalIndexAt_int_QHeaderView_int_int, Return,
-                "int", Parameters, new Param(c, "this", "qt.QHeaderView"),
-                new Param(c, "x", "int"), new Param(c, "y", "int"), End),
-            new Function(
-                c, "logicalIndexAt", _n_logicalIndexAt2, None, Compiled,
-                qt_QHeaderView_logicalIndexAt_int_QHeaderView_QPoint, Return,
-                "int", Parameters, new Param(c, "this", "qt.QHeaderView"),
-                new Param(c, "pos", "qt.QPoint"), End),
+            new Function(c, "length", _n_length0, None, Compiled, qt_QHeaderView_length_int_QHeaderView, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QHeaderView"), End),
+            new Function(c, "logicalIndex", _n_logicalIndex0, None, Compiled, qt_QHeaderView_logicalIndex_int_QHeaderView_int, Return,
+                         "int", Parameters, new Param(c, "this", "qt.QHeaderView"), new Param(c, "visualIndex", "int"), End),
+            new Function(c, "logicalIndexAt", _n_logicalIndexAt0, None, Compiled, qt_QHeaderView_logicalIndexAt_int_QHeaderView_int, Return,
+                         "int", Parameters, new Param(c, "this", "qt.QHeaderView"), new Param(c, "position", "int"), End),
+            new Function(c, "logicalIndexAt", _n_logicalIndexAt1, None, Compiled, qt_QHeaderView_logicalIndexAt_int_QHeaderView_int_int,
+                         Return, "int", Parameters, new Param(c, "this", "qt.QHeaderView"), new Param(c, "x", "int"),
+                         new Param(c, "y", "int"), End),
+            new Function(c, "logicalIndexAt", _n_logicalIndexAt2, None, Compiled, qt_QHeaderView_logicalIndexAt_int_QHeaderView_QPoint,
+                         Return, "int", Parameters, new Param(c, "this", "qt.QHeaderView"), new Param(c, "pos", "qt.QPoint"), End),
             // PROP: maximumSectionSize (int; QHeaderView this)
             // PROP: minimumSectionSize (int; QHeaderView this)
-            new Function(
-                c, "moveSection", _n_moveSection0, None, Compiled,
-                qt_QHeaderView_moveSection_void_QHeaderView_int_int, Return,
-                "void", Parameters, new Param(c, "this", "qt.QHeaderView"),
-                new Param(c, "from", "int"), new Param(c, "to", "int"), End),
-            new Function(c, "offset", _n_offset0, None, Compiled,
-                         qt_QHeaderView_offset_int_QHeaderView, Return, "int",
-                         Parameters, new Param(c, "this", "qt.QHeaderView"),
+            new Function(c, "moveSection", _n_moveSection0, None, Compiled, qt_QHeaderView_moveSection_void_QHeaderView_int_int, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QHeaderView"), new Param(c, "from", "int"), new Param(c, "to", "int"),
                          End),
-            new Function(c, "orientation", _n_orientation0, None, Compiled,
-                         qt_QHeaderView_orientation_int_QHeaderView, Return,
-                         "int", Parameters,
+            new Function(c, "offset", _n_offset0, None, Compiled, qt_QHeaderView_offset_int_QHeaderView, Return, "int", Parameters,
                          new Param(c, "this", "qt.QHeaderView"), End),
+            new Function(c, "orientation", _n_orientation0, None, Compiled, qt_QHeaderView_orientation_int_QHeaderView, Return, "int",
+                         Parameters, new Param(c, "this", "qt.QHeaderView"), End),
             // PROP: resetDefaultSectionSize (void; QHeaderView this)
-            new Function(c, "resizeContentsPrecision",
-                         _n_resizeContentsPrecision0, None, Compiled,
-                         qt_QHeaderView_resizeContentsPrecision_int_QHeaderView,
-                         Return, "int", Parameters,
+            new Function(c, "resizeContentsPrecision", _n_resizeContentsPrecision0, None, Compiled,
+                         qt_QHeaderView_resizeContentsPrecision_int_QHeaderView, Return, "int", Parameters,
                          new Param(c, "this", "qt.QHeaderView"), End),
-            new Function(c, "resizeSection", _n_resizeSection0, None, Compiled,
-                         qt_QHeaderView_resizeSection_void_QHeaderView_int_int,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QHeaderView"),
-                         new Param(c, "logicalIndex", "int"),
+            new Function(c, "resizeSection", _n_resizeSection0, None, Compiled, qt_QHeaderView_resizeSection_void_QHeaderView_int_int,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QHeaderView"), new Param(c, "logicalIndex", "int"),
                          new Param(c, "size", "int"), End),
-            new Function(
-                c, "resizeSections", _n_resizeSections0, None, Compiled,
-                qt_QHeaderView_resizeSections_void_QHeaderView_int, Return,
-                "void", Parameters, new Param(c, "this", "qt.QHeaderView"),
-                new Param(c, "mode", "int"), End),
-            new Function(
-                c, "restoreState", _n_restoreState0, None, Compiled,
-                qt_QHeaderView_restoreState_bool_QHeaderView_QByteArray, Return,
-                "bool", Parameters, new Param(c, "this", "qt.QHeaderView"),
-                new Param(c, "state", "qt.QByteArray"), End),
-            new Function(c, "saveState", _n_saveState0, None, Compiled,
-                         qt_QHeaderView_saveState_QByteArray_QHeaderView,
-                         Return, "qt.QByteArray", Parameters,
-                         new Param(c, "this", "qt.QHeaderView"), End),
-            new Function(
-                c, "sectionPosition", _n_sectionPosition0, None, Compiled,
-                qt_QHeaderView_sectionPosition_int_QHeaderView_int, Return,
-                "int", Parameters, new Param(c, "this", "qt.QHeaderView"),
-                new Param(c, "logicalIndex", "int"), End),
-            new Function(
-                c, "sectionResizeMode", _n_sectionResizeMode0, None, Compiled,
-                qt_QHeaderView_sectionResizeMode_int_QHeaderView_int, Return,
-                "int", Parameters, new Param(c, "this", "qt.QHeaderView"),
-                new Param(c, "logicalIndex", "int"), End),
-            new Function(c, "sectionSize", _n_sectionSize0, None, Compiled,
-                         qt_QHeaderView_sectionSize_int_QHeaderView_int, Return,
-                         "int", Parameters,
-                         new Param(c, "this", "qt.QHeaderView"),
-                         new Param(c, "logicalIndex", "int"), End),
-            new Function(
-                c, "sectionSizeHint", _n_sectionSizeHint0, None, Compiled,
-                qt_QHeaderView_sectionSizeHint_int_QHeaderView_int, Return,
-                "int", Parameters, new Param(c, "this", "qt.QHeaderView"),
-                new Param(c, "logicalIndex", "int"), End),
-            new Function(
-                c, "sectionViewportPosition", _n_sectionViewportPosition0, None,
-                Compiled,
-                qt_QHeaderView_sectionViewportPosition_int_QHeaderView_int,
-                Return, "int", Parameters,
-                new Param(c, "this", "qt.QHeaderView"),
-                new Param(c, "logicalIndex", "int"), End),
-            new Function(c, "sectionsClickable", _n_sectionsClickable0, None,
-                         Compiled,
-                         qt_QHeaderView_sectionsClickable_bool_QHeaderView,
-                         Return, "bool", Parameters,
-                         new Param(c, "this", "qt.QHeaderView"), End),
-            new Function(
-                c, "sectionsHidden", _n_sectionsHidden0, None, Compiled,
-                qt_QHeaderView_sectionsHidden_bool_QHeaderView, Return, "bool",
-                Parameters, new Param(c, "this", "qt.QHeaderView"), End),
-            new Function(
-                c, "sectionsMovable", _n_sectionsMovable0, None, Compiled,
-                qt_QHeaderView_sectionsMovable_bool_QHeaderView, Return, "bool",
-                Parameters, new Param(c, "this", "qt.QHeaderView"), End),
-            new Function(c, "sectionsMoved", _n_sectionsMoved0, None, Compiled,
-                         qt_QHeaderView_sectionsMoved_bool_QHeaderView, Return,
-                         "bool", Parameters,
-                         new Param(c, "this", "qt.QHeaderView"), End),
+            new Function(c, "resizeSections", _n_resizeSections0, None, Compiled, qt_QHeaderView_resizeSections_void_QHeaderView_int,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QHeaderView"), new Param(c, "mode", "int"), End),
+            new Function(c, "restoreState", _n_restoreState0, None, Compiled, qt_QHeaderView_restoreState_bool_QHeaderView_QByteArray,
+                         Return, "bool", Parameters, new Param(c, "this", "qt.QHeaderView"), new Param(c, "state", "qt.QByteArray"), End),
+            new Function(c, "saveState", _n_saveState0, None, Compiled, qt_QHeaderView_saveState_QByteArray_QHeaderView, Return,
+                         "qt.QByteArray", Parameters, new Param(c, "this", "qt.QHeaderView"), End),
+            new Function(c, "sectionPosition", _n_sectionPosition0, None, Compiled, qt_QHeaderView_sectionPosition_int_QHeaderView_int,
+                         Return, "int", Parameters, new Param(c, "this", "qt.QHeaderView"), new Param(c, "logicalIndex", "int"), End),
+            new Function(c, "sectionResizeMode", _n_sectionResizeMode0, None, Compiled,
+                         qt_QHeaderView_sectionResizeMode_int_QHeaderView_int, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QHeaderView"), new Param(c, "logicalIndex", "int"), End),
+            new Function(c, "sectionSize", _n_sectionSize0, None, Compiled, qt_QHeaderView_sectionSize_int_QHeaderView_int, Return, "int",
+                         Parameters, new Param(c, "this", "qt.QHeaderView"), new Param(c, "logicalIndex", "int"), End),
+            new Function(c, "sectionSizeHint", _n_sectionSizeHint0, None, Compiled, qt_QHeaderView_sectionSizeHint_int_QHeaderView_int,
+                         Return, "int", Parameters, new Param(c, "this", "qt.QHeaderView"), new Param(c, "logicalIndex", "int"), End),
+            new Function(c, "sectionViewportPosition", _n_sectionViewportPosition0, None, Compiled,
+                         qt_QHeaderView_sectionViewportPosition_int_QHeaderView_int, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QHeaderView"), new Param(c, "logicalIndex", "int"), End),
+            new Function(c, "sectionsClickable", _n_sectionsClickable0, None, Compiled, qt_QHeaderView_sectionsClickable_bool_QHeaderView,
+                         Return, "bool", Parameters, new Param(c, "this", "qt.QHeaderView"), End),
+            new Function(c, "sectionsHidden", _n_sectionsHidden0, None, Compiled, qt_QHeaderView_sectionsHidden_bool_QHeaderView, Return,
+                         "bool", Parameters, new Param(c, "this", "qt.QHeaderView"), End),
+            new Function(c, "sectionsMovable", _n_sectionsMovable0, None, Compiled, qt_QHeaderView_sectionsMovable_bool_QHeaderView, Return,
+                         "bool", Parameters, new Param(c, "this", "qt.QHeaderView"), End),
+            new Function(c, "sectionsMoved", _n_sectionsMoved0, None, Compiled, qt_QHeaderView_sectionsMoved_bool_QHeaderView, Return,
+                         "bool", Parameters, new Param(c, "this", "qt.QHeaderView"), End),
             // PROP: setCascadingSectionResizes (void; QHeaderView this, bool
             // enable) PROP: setDefaultAlignment (void; QHeaderView this, flags
             // Qt::Alignment alignment) PROP: setDefaultSectionSize (void;
@@ -2582,326 +2237,181 @@ namespace Mu
             // QHeaderView this, bool highlight) PROP: setMaximumSectionSize
             // (void; QHeaderView this, int size) PROP: setMinimumSectionSize
             // (void; QHeaderView this, int size)
-            new Function(
-                c, "setResizeContentsPrecision", _n_setResizeContentsPrecision0,
-                None, Compiled,
-                qt_QHeaderView_setResizeContentsPrecision_void_QHeaderView_int,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QHeaderView"),
-                new Param(c, "precision", "int"), End),
-            new Function(
-                c, "setSectionHidden", _n_setSectionHidden0, None, Compiled,
-                qt_QHeaderView_setSectionHidden_void_QHeaderView_int_bool,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QHeaderView"),
-                new Param(c, "logicalIndex", "int"),
-                new Param(c, "hide", "bool"), End),
-            new Function(
-                c, "setSectionResizeMode", _n_setSectionResizeMode0, None,
-                Compiled,
-                qt_QHeaderView_setSectionResizeMode_void_QHeaderView_int,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QHeaderView"),
-                new Param(c, "mode", "int"), End),
-            new Function(
-                c, "setSectionResizeMode", _n_setSectionResizeMode1, None,
-                Compiled,
-                qt_QHeaderView_setSectionResizeMode_void_QHeaderView_int_int,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QHeaderView"),
-                new Param(c, "logicalIndex", "int"),
-                new Param(c, "mode", "int"), End),
-            new Function(
-                c, "setSectionsClickable", _n_setSectionsClickable0, None,
-                Compiled,
-                qt_QHeaderView_setSectionsClickable_void_QHeaderView_bool,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QHeaderView"),
-                new Param(c, "clickable", "bool"), End),
-            new Function(
-                c, "setSectionsMovable", _n_setSectionsMovable0, None, Compiled,
-                qt_QHeaderView_setSectionsMovable_void_QHeaderView_bool, Return,
-                "void", Parameters, new Param(c, "this", "qt.QHeaderView"),
-                new Param(c, "movable", "bool"), End),
-            new Function(
-                c, "setSortIndicator", _n_setSortIndicator0, None, Compiled,
-                qt_QHeaderView_setSortIndicator_void_QHeaderView_int_int,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QHeaderView"),
-                new Param(c, "logicalIndex", "int"),
-                new Param(c, "order", "int"), End),
+            new Function(c, "setResizeContentsPrecision", _n_setResizeContentsPrecision0, None, Compiled,
+                         qt_QHeaderView_setResizeContentsPrecision_void_QHeaderView_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QHeaderView"), new Param(c, "precision", "int"), End),
+            new Function(c, "setSectionHidden", _n_setSectionHidden0, None, Compiled,
+                         qt_QHeaderView_setSectionHidden_void_QHeaderView_int_bool, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QHeaderView"), new Param(c, "logicalIndex", "int"), new Param(c, "hide", "bool"), End),
+            new Function(c, "setSectionResizeMode", _n_setSectionResizeMode0, None, Compiled,
+                         qt_QHeaderView_setSectionResizeMode_void_QHeaderView_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QHeaderView"), new Param(c, "mode", "int"), End),
+            new Function(c, "setSectionResizeMode", _n_setSectionResizeMode1, None, Compiled,
+                         qt_QHeaderView_setSectionResizeMode_void_QHeaderView_int_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QHeaderView"), new Param(c, "logicalIndex", "int"), new Param(c, "mode", "int"), End),
+            new Function(c, "setSectionsClickable", _n_setSectionsClickable0, None, Compiled,
+                         qt_QHeaderView_setSectionsClickable_void_QHeaderView_bool, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QHeaderView"), new Param(c, "clickable", "bool"), End),
+            new Function(c, "setSectionsMovable", _n_setSectionsMovable0, None, Compiled,
+                         qt_QHeaderView_setSectionsMovable_void_QHeaderView_bool, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QHeaderView"), new Param(c, "movable", "bool"), End),
+            new Function(c, "setSortIndicator", _n_setSortIndicator0, None, Compiled,
+                         qt_QHeaderView_setSortIndicator_void_QHeaderView_int_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QHeaderView"), new Param(c, "logicalIndex", "int"), new Param(c, "order", "int"), End),
             // PROP: setSortIndicatorClearable (void; QHeaderView this, bool
             // clearable) PROP: setSortIndicatorShown (void; QHeaderView this,
             // bool show) PROP: setStretchLastSection (void; QHeaderView this,
             // bool stretch)
-            new Function(c, "showSection", _n_showSection0, None, Compiled,
-                         qt_QHeaderView_showSection_void_QHeaderView_int,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QHeaderView"),
-                         new Param(c, "logicalIndex", "int"), End),
-            new Function(
-                c, "sortIndicatorOrder", _n_sortIndicatorOrder0, None, Compiled,
-                qt_QHeaderView_sortIndicatorOrder_int_QHeaderView, Return,
-                "int", Parameters, new Param(c, "this", "qt.QHeaderView"), End),
-            new Function(c, "sortIndicatorSection", _n_sortIndicatorSection0,
-                         None, Compiled,
-                         qt_QHeaderView_sortIndicatorSection_int_QHeaderView,
-                         Return, "int", Parameters,
+            new Function(c, "showSection", _n_showSection0, None, Compiled, qt_QHeaderView_showSection_void_QHeaderView_int, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QHeaderView"), new Param(c, "logicalIndex", "int"), End),
+            new Function(c, "sortIndicatorOrder", _n_sortIndicatorOrder0, None, Compiled, qt_QHeaderView_sortIndicatorOrder_int_QHeaderView,
+                         Return, "int", Parameters, new Param(c, "this", "qt.QHeaderView"), End),
+            new Function(c, "sortIndicatorSection", _n_sortIndicatorSection0, None, Compiled,
+                         qt_QHeaderView_sortIndicatorSection_int_QHeaderView, Return, "int", Parameters,
                          new Param(c, "this", "qt.QHeaderView"), End),
             // PROP: stretchLastSection (bool; QHeaderView this)
-            new Function(c, "stretchSectionCount", _n_stretchSectionCount0,
-                         None, Compiled,
-                         qt_QHeaderView_stretchSectionCount_int_QHeaderView,
-                         Return, "int", Parameters,
+            new Function(c, "stretchSectionCount", _n_stretchSectionCount0, None, Compiled,
+                         qt_QHeaderView_stretchSectionCount_int_QHeaderView, Return, "int", Parameters,
                          new Param(c, "this", "qt.QHeaderView"), End),
-            new Function(c, "swapSections", _n_swapSections0, None, Compiled,
-                         qt_QHeaderView_swapSections_void_QHeaderView_int_int,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QHeaderView"),
-                         new Param(c, "first", "int"),
+            new Function(c, "swapSections", _n_swapSections0, None, Compiled, qt_QHeaderView_swapSections_void_QHeaderView_int_int, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QHeaderView"), new Param(c, "first", "int"),
                          new Param(c, "second", "int"), End),
-            new Function(c, "visualIndex", _n_visualIndex0, None, Compiled,
-                         qt_QHeaderView_visualIndex_int_QHeaderView_int, Return,
-                         "int", Parameters,
-                         new Param(c, "this", "qt.QHeaderView"),
-                         new Param(c, "logicalIndex", "int"), End),
-            new Function(c, "visualIndexAt", _n_visualIndexAt0, None, Compiled,
-                         qt_QHeaderView_visualIndexAt_int_QHeaderView_int,
-                         Return, "int", Parameters,
-                         new Param(c, "this", "qt.QHeaderView"),
-                         new Param(c, "position", "int"), End),
-            _func[0] = new MemberFunction(
-                c, "reset", _n_reset0, None, Compiled,
-                qt_QHeaderView_reset_void_QHeaderView, Return, "void",
-                Parameters, new Param(c, "this", "qt.QHeaderView"), End),
-            _func[1] = new MemberFunction(
-                c, "setModel", _n_setModel0, None, Compiled,
-                qt_QHeaderView_setModel_void_QHeaderView_QAbstractItemModel,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QHeaderView"),
-                new Param(c, "model", "qt.QAbstractItemModel"), End),
-            _func[2] = new MemberFunction(
-                c, "setVisible", _n_setVisible0, None, Compiled,
-                qt_QHeaderView_setVisible_void_QHeaderView_bool, Return, "void",
-                Parameters, new Param(c, "this", "qt.QHeaderView"),
-                new Param(c, "v", "bool"), End),
-            _func[3] = new MemberFunction(
-                c, "sizeHint", _n_sizeHint0, None, Compiled,
-                qt_QHeaderView_sizeHint_QSize_QHeaderView, Return, "qt.QSize",
-                Parameters, new Param(c, "this", "qt.QHeaderView"), End),
+            new Function(c, "visualIndex", _n_visualIndex0, None, Compiled, qt_QHeaderView_visualIndex_int_QHeaderView_int, Return, "int",
+                         Parameters, new Param(c, "this", "qt.QHeaderView"), new Param(c, "logicalIndex", "int"), End),
+            new Function(c, "visualIndexAt", _n_visualIndexAt0, None, Compiled, qt_QHeaderView_visualIndexAt_int_QHeaderView_int, Return,
+                         "int", Parameters, new Param(c, "this", "qt.QHeaderView"), new Param(c, "position", "int"), End),
+            _func[0] = new MemberFunction(c, "reset", _n_reset0, None, Compiled, qt_QHeaderView_reset_void_QHeaderView, Return, "void",
+                                          Parameters, new Param(c, "this", "qt.QHeaderView"), End),
+            _func[1] = new MemberFunction(c, "setModel", _n_setModel0, None, Compiled,
+                                          qt_QHeaderView_setModel_void_QHeaderView_QAbstractItemModel, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QHeaderView"), new Param(c, "model", "qt.QAbstractItemModel"), End),
+            _func[2] =
+                new MemberFunction(c, "setVisible", _n_setVisible0, None, Compiled, qt_QHeaderView_setVisible_void_QHeaderView_bool, Return,
+                                   "void", Parameters, new Param(c, "this", "qt.QHeaderView"), new Param(c, "v", "bool"), End),
+            _func[3] = new MemberFunction(c, "sizeHint", _n_sizeHint0, None, Compiled, qt_QHeaderView_sizeHint_QSize_QHeaderView, Return,
+                                          "qt.QSize", Parameters, new Param(c, "this", "qt.QHeaderView"), End),
             // MISSING: initStyleOption (void; QHeaderView this,
             // "QStyleOptionHeader *" option) // protected MISSING:
             // initStyleOptionForIndex (void; QHeaderView this,
             // "QStyleOptionHeader *" option, int logicalIndex) // protected
             // MISSING: paintSection (void; QHeaderView this, "QPainter *"
             // painter, QRect rect, int logicalIndex) // protected
-            _func[4] = new MemberFunction(
-                c, "sectionSizeFromContents", _n_sectionSizeFromContents0, None,
-                Compiled,
-                qt_QHeaderView_sectionSizeFromContents_QSize_QHeaderView_int,
-                Return, "qt.QSize", Parameters,
-                new Param(c, "this", "qt.QHeaderView"),
-                new Param(c, "logicalIndex", "int"), End),
-            _func[5] = new MemberFunction(
-                c, "currentChanged", _n_currentChanged0, None, Compiled,
-                qt_QHeaderView_currentChanged_void_QHeaderView_QModelIndex_QModelIndex,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QHeaderView"),
-                new Param(c, "current", "qt.QModelIndex"),
-                new Param(c, "old", "qt.QModelIndex"), End),
-            _func[6] = new MemberFunction(
-                c, "event", _n_event0, None, Compiled,
-                qt_QHeaderView_event_bool_QHeaderView_QEvent, Return, "bool",
-                Parameters, new Param(c, "this", "qt.QHeaderView"),
-                new Param(c, "e", "qt.QEvent"), End),
-            _func[7] = new MemberFunction(
-                c, "horizontalOffset", _n_horizontalOffset0, None, Compiled,
-                qt_QHeaderView_horizontalOffset_int_QHeaderView, Return, "int",
-                Parameters, new Param(c, "this", "qt.QHeaderView"), End),
-            _func[8] = new MemberFunction(
-                c, "mouseDoubleClickEvent", _n_mouseDoubleClickEvent0, None,
-                Compiled,
-                qt_QHeaderView_mouseDoubleClickEvent_void_QHeaderView_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QHeaderView"),
-                new Param(c, "e", "qt.QMouseEvent"), End),
-            _func[9] = new MemberFunction(
-                c, "mouseMoveEvent", _n_mouseMoveEvent0, None, Compiled,
-                qt_QHeaderView_mouseMoveEvent_void_QHeaderView_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QHeaderView"),
-                new Param(c, "e", "qt.QMouseEvent"), End),
-            _func[10] = new MemberFunction(
-                c, "mousePressEvent", _n_mousePressEvent0, None, Compiled,
-                qt_QHeaderView_mousePressEvent_void_QHeaderView_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QHeaderView"),
-                new Param(c, "e", "qt.QMouseEvent"), End),
-            _func[11] = new MemberFunction(
-                c, "mouseReleaseEvent", _n_mouseReleaseEvent0, None, Compiled,
-                qt_QHeaderView_mouseReleaseEvent_void_QHeaderView_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QHeaderView"),
-                new Param(c, "e", "qt.QMouseEvent"), End),
-            _func[12] = new MemberFunction(
-                c, "paintEvent", _n_paintEvent0, None, Compiled,
-                qt_QHeaderView_paintEvent_void_QHeaderView_QPaintEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QHeaderView"),
-                new Param(c, "e", "qt.QPaintEvent"), End),
+            _func[4] = new MemberFunction(c, "sectionSizeFromContents", _n_sectionSizeFromContents0, None, Compiled,
+                                          qt_QHeaderView_sectionSizeFromContents_QSize_QHeaderView_int, Return, "qt.QSize", Parameters,
+                                          new Param(c, "this", "qt.QHeaderView"), new Param(c, "logicalIndex", "int"), End),
+            _func[5] = new MemberFunction(c, "currentChanged", _n_currentChanged0, None, Compiled,
+                                          qt_QHeaderView_currentChanged_void_QHeaderView_QModelIndex_QModelIndex, Return, "void",
+                                          Parameters, new Param(c, "this", "qt.QHeaderView"), new Param(c, "current", "qt.QModelIndex"),
+                                          new Param(c, "old", "qt.QModelIndex"), End),
+            _func[6] = new MemberFunction(c, "event", _n_event0, None, Compiled, qt_QHeaderView_event_bool_QHeaderView_QEvent, Return,
+                                          "bool", Parameters, new Param(c, "this", "qt.QHeaderView"), new Param(c, "e", "qt.QEvent"), End),
+            _func[7] = new MemberFunction(c, "horizontalOffset", _n_horizontalOffset0, None, Compiled,
+                                          qt_QHeaderView_horizontalOffset_int_QHeaderView, Return, "int", Parameters,
+                                          new Param(c, "this", "qt.QHeaderView"), End),
+            _func[8] = new MemberFunction(c, "mouseDoubleClickEvent", _n_mouseDoubleClickEvent0, None, Compiled,
+                                          qt_QHeaderView_mouseDoubleClickEvent_void_QHeaderView_QMouseEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QHeaderView"), new Param(c, "e", "qt.QMouseEvent"), End),
+            _func[9] = new MemberFunction(c, "mouseMoveEvent", _n_mouseMoveEvent0, None, Compiled,
+                                          qt_QHeaderView_mouseMoveEvent_void_QHeaderView_QMouseEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QHeaderView"), new Param(c, "e", "qt.QMouseEvent"), End),
+            _func[10] = new MemberFunction(c, "mousePressEvent", _n_mousePressEvent0, None, Compiled,
+                                           qt_QHeaderView_mousePressEvent_void_QHeaderView_QMouseEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QHeaderView"), new Param(c, "e", "qt.QMouseEvent"), End),
+            _func[11] = new MemberFunction(c, "mouseReleaseEvent", _n_mouseReleaseEvent0, None, Compiled,
+                                           qt_QHeaderView_mouseReleaseEvent_void_QHeaderView_QMouseEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QHeaderView"), new Param(c, "e", "qt.QMouseEvent"), End),
+            _func[12] = new MemberFunction(c, "paintEvent", _n_paintEvent0, None, Compiled,
+                                           qt_QHeaderView_paintEvent_void_QHeaderView_QPaintEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QHeaderView"), new Param(c, "e", "qt.QPaintEvent"), End),
             _func[13] = new MemberFunction(
-                c, "setSelection", _n_setSelection0, None, Compiled,
-                qt_QHeaderView_setSelection_void_QHeaderView_QRect_int, Return,
-                "void", Parameters, new Param(c, "this", "qt.QHeaderView"),
-                new Param(c, "rect", "qt.QRect"), new Param(c, "flags", "int"),
-                End),
-            _func[14] = new MemberFunction(
-                c, "verticalOffset", _n_verticalOffset0, None, Compiled,
-                qt_QHeaderView_verticalOffset_int_QHeaderView, Return, "int",
-                Parameters, new Param(c, "this", "qt.QHeaderView"), End),
-            _func[15] = new MemberFunction(
-                c, "viewportEvent", _n_viewportEvent0, None, Compiled,
-                qt_QHeaderView_viewportEvent_bool_QHeaderView_QEvent, Return,
-                "bool", Parameters, new Param(c, "this", "qt.QHeaderView"),
-                new Param(c, "e", "qt.QEvent"), End),
+                c, "setSelection", _n_setSelection0, None, Compiled, qt_QHeaderView_setSelection_void_QHeaderView_QRect_int, Return, "void",
+                Parameters, new Param(c, "this", "qt.QHeaderView"), new Param(c, "rect", "qt.QRect"), new Param(c, "flags", "int"), End),
+            _func[14] =
+                new MemberFunction(c, "verticalOffset", _n_verticalOffset0, None, Compiled, qt_QHeaderView_verticalOffset_int_QHeaderView,
+                                   Return, "int", Parameters, new Param(c, "this", "qt.QHeaderView"), End),
+            _func[15] = new MemberFunction(c, "viewportEvent", _n_viewportEvent0, None, Compiled,
+                                           qt_QHeaderView_viewportEvent_bool_QHeaderView_QEvent, Return, "bool", Parameters,
+                                           new Param(c, "this", "qt.QHeaderView"), new Param(c, "e", "qt.QEvent"), End),
             // MISSING: itemDelegateForIndex ("QAbstractItemDelegate *";
             // QHeaderView this, QModelIndex index)
-            _func[16] = new MemberFunction(
-                c, "keyboardSearch", _n_keyboardSearch0, None, Compiled,
-                qt_QHeaderView_keyboardSearch_void_QHeaderView_string, Return,
-                "void", Parameters, new Param(c, "this", "qt.QHeaderView"),
-                new Param(c, "search", "string"), End),
-            _func[17] = new MemberFunction(
-                c, "setSelectionModel", _n_setSelectionModel0, None, Compiled,
-                qt_QHeaderView_setSelectionModel_void_QHeaderView_QItemSelectionModel,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QHeaderView"),
-                new Param(c, "selectionModel", "qt.QItemSelectionModel"), End),
-            _func[18] = new MemberFunction(
-                c, "sizeHintForColumn", _n_sizeHintForColumn0, None, Compiled,
-                qt_QHeaderView_sizeHintForColumn_int_QHeaderView_int, Return,
-                "int", Parameters, new Param(c, "this", "qt.QHeaderView"),
-                new Param(c, "column", "int"), End),
-            _func[19] = new MemberFunction(
-                c, "sizeHintForRow", _n_sizeHintForRow0, None, Compiled,
-                qt_QHeaderView_sizeHintForRow_int_QHeaderView_int, Return,
-                "int", Parameters, new Param(c, "this", "qt.QHeaderView"),
-                new Param(c, "row", "int"), End),
-            _func[20] = new MemberFunction(
-                c, "inputMethodQuery", _n_inputMethodQuery0, None, Compiled,
-                qt_QHeaderView_inputMethodQuery_QVariant_QHeaderView_int,
-                Return, "qt.QVariant", Parameters,
-                new Param(c, "this", "qt.QHeaderView"),
-                new Param(c, "query", "int"), End),
-            _func[21] = new MemberFunction(
-                c, "edit", _n_edit0, None, Compiled,
-                qt_QHeaderView_edit_bool_QHeaderView_QModelIndex_int_QEvent,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QHeaderView"),
-                new Param(c, "index", "qt.QModelIndex"),
-                new Param(c, "trigger", "int"),
-                new Param(c, "event", "qt.QEvent"), End),
+            _func[16] = new MemberFunction(c, "keyboardSearch", _n_keyboardSearch0, None, Compiled,
+                                           qt_QHeaderView_keyboardSearch_void_QHeaderView_string, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QHeaderView"), new Param(c, "search", "string"), End),
+            _func[17] =
+                new MemberFunction(c, "setSelectionModel", _n_setSelectionModel0, None, Compiled,
+                                   qt_QHeaderView_setSelectionModel_void_QHeaderView_QItemSelectionModel, Return, "void", Parameters,
+                                   new Param(c, "this", "qt.QHeaderView"), new Param(c, "selectionModel", "qt.QItemSelectionModel"), End),
+            _func[18] = new MemberFunction(c, "sizeHintForColumn", _n_sizeHintForColumn0, None, Compiled,
+                                           qt_QHeaderView_sizeHintForColumn_int_QHeaderView_int, Return, "int", Parameters,
+                                           new Param(c, "this", "qt.QHeaderView"), new Param(c, "column", "int"), End),
+            _func[19] = new MemberFunction(c, "sizeHintForRow", _n_sizeHintForRow0, None, Compiled,
+                                           qt_QHeaderView_sizeHintForRow_int_QHeaderView_int, Return, "int", Parameters,
+                                           new Param(c, "this", "qt.QHeaderView"), new Param(c, "row", "int"), End),
+            _func[20] = new MemberFunction(c, "inputMethodQuery", _n_inputMethodQuery0, None, Compiled,
+                                           qt_QHeaderView_inputMethodQuery_QVariant_QHeaderView_int, Return, "qt.QVariant", Parameters,
+                                           new Param(c, "this", "qt.QHeaderView"), new Param(c, "query", "int"), End),
+            _func[21] =
+                new MemberFunction(c, "edit", _n_edit0, None, Compiled, qt_QHeaderView_edit_bool_QHeaderView_QModelIndex_int_QEvent, Return,
+                                   "bool", Parameters, new Param(c, "this", "qt.QHeaderView"), new Param(c, "index", "qt.QModelIndex"),
+                                   new Param(c, "trigger", "int"), new Param(c, "event", "qt.QEvent"), End),
             // MISSING: initViewItemOption (void; QHeaderView this,
             // "QStyleOptionViewItem *" option) // protected
-            _func[22] = new MemberFunction(
-                c, "isIndexHidden", _n_isIndexHidden0, None, Compiled,
-                qt_QHeaderView_isIndexHidden_bool_QHeaderView_QModelIndex,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QHeaderView"),
-                new Param(c, "index", "qt.QModelIndex"), End),
-            _func[23] = new MemberFunction(
-                c, "selectedIndexes", _n_selectedIndexes0, None, Compiled,
-                qt_QHeaderView_selectedIndexes_qt__QModelIndexBSB_ESB__QHeaderView,
-                Return, "qt.QModelIndex[]", Parameters,
-                new Param(c, "this", "qt.QHeaderView"), End),
-            _func[24] = new MemberFunction(
-                c, "selectionCommand", _n_selectionCommand0, None, Compiled,
-                qt_QHeaderView_selectionCommand_int_QHeaderView_QModelIndex_QEvent,
-                Return, "int", Parameters,
-                new Param(c, "this", "qt.QHeaderView"),
-                new Param(c, "index", "qt.QModelIndex"),
-                new Param(c, "event", "qt.QEvent"), End),
-            _func[25] = new MemberFunction(
-                c, "startDrag", _n_startDrag0, None, Compiled,
-                qt_QHeaderView_startDrag_void_QHeaderView_int, Return, "void",
-                Parameters, new Param(c, "this", "qt.QHeaderView"),
-                new Param(c, "supportedActions", "int"), End),
-            _func[26] = new MemberFunction(
-                c, "visualRegionForSelection", _n_visualRegionForSelection0,
-                None, Compiled,
-                qt_QHeaderView_visualRegionForSelection_QRegion_QHeaderView_QItemSelection,
-                Return, "qt.QRegion", Parameters,
-                new Param(c, "this", "qt.QHeaderView"),
-                new Param(c, "selection", "qt.QItemSelection"), End),
-            _func[27] = new MemberFunction(
-                c, "dragEnterEvent", _n_dragEnterEvent0, None, Compiled,
-                qt_QHeaderView_dragEnterEvent_void_QHeaderView_QDragEnterEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QHeaderView"),
-                new Param(c, "event", "qt.QDragEnterEvent"), End),
-            _func[28] = new MemberFunction(
-                c, "dragLeaveEvent", _n_dragLeaveEvent0, None, Compiled,
-                qt_QHeaderView_dragLeaveEvent_void_QHeaderView_QDragLeaveEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QHeaderView"),
-                new Param(c, "event", "qt.QDragLeaveEvent"), End),
-            _func[29] = new MemberFunction(
-                c, "dragMoveEvent", _n_dragMoveEvent0, None, Compiled,
-                qt_QHeaderView_dragMoveEvent_void_QHeaderView_QDragMoveEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QHeaderView"),
-                new Param(c, "event", "qt.QDragMoveEvent"), End),
-            _func[30] = new MemberFunction(
-                c, "dropEvent", _n_dropEvent0, None, Compiled,
-                qt_QHeaderView_dropEvent_void_QHeaderView_QDropEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QHeaderView"),
-                new Param(c, "event", "qt.QDropEvent"), End),
-            _func[31] = new MemberFunction(
-                c, "eventFilter", _n_eventFilter0, None, Compiled,
-                qt_QHeaderView_eventFilter_bool_QHeaderView_QObject_QEvent,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QHeaderView"),
-                new Param(c, "object", "qt.QObject"),
-                new Param(c, "event", "qt.QEvent"), End),
-            _func[32] = new MemberFunction(
-                c, "focusInEvent", _n_focusInEvent0, None, Compiled,
-                qt_QHeaderView_focusInEvent_void_QHeaderView_QFocusEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QHeaderView"),
-                new Param(c, "event", "qt.QFocusEvent"), End),
-            _func[33] = new MemberFunction(
-                c, "focusNextPrevChild", _n_focusNextPrevChild0, None, Compiled,
-                qt_QHeaderView_focusNextPrevChild_bool_QHeaderView_bool, Return,
-                "bool", Parameters, new Param(c, "this", "qt.QHeaderView"),
-                new Param(c, "next", "bool"), End),
-            _func[34] = new MemberFunction(
-                c, "focusOutEvent", _n_focusOutEvent0, None, Compiled,
-                qt_QHeaderView_focusOutEvent_void_QHeaderView_QFocusEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QHeaderView"),
-                new Param(c, "event", "qt.QFocusEvent"), End),
+            _func[22] = new MemberFunction(c, "isIndexHidden", _n_isIndexHidden0, None, Compiled,
+                                           qt_QHeaderView_isIndexHidden_bool_QHeaderView_QModelIndex, Return, "bool", Parameters,
+                                           new Param(c, "this", "qt.QHeaderView"), new Param(c, "index", "qt.QModelIndex"), End),
+            _func[23] = new MemberFunction(c, "selectedIndexes", _n_selectedIndexes0, None, Compiled,
+                                           qt_QHeaderView_selectedIndexes_qt__QModelIndexBSB_ESB__QHeaderView, Return, "qt.QModelIndex[]",
+                                           Parameters, new Param(c, "this", "qt.QHeaderView"), End),
+            _func[24] = new MemberFunction(c, "selectionCommand", _n_selectionCommand0, None, Compiled,
+                                           qt_QHeaderView_selectionCommand_int_QHeaderView_QModelIndex_QEvent, Return, "int", Parameters,
+                                           new Param(c, "this", "qt.QHeaderView"), new Param(c, "index", "qt.QModelIndex"),
+                                           new Param(c, "event", "qt.QEvent"), End),
+            _func[25] = new MemberFunction(c, "startDrag", _n_startDrag0, None, Compiled, qt_QHeaderView_startDrag_void_QHeaderView_int,
+                                           Return, "void", Parameters, new Param(c, "this", "qt.QHeaderView"),
+                                           new Param(c, "supportedActions", "int"), End),
+            _func[26] =
+                new MemberFunction(c, "visualRegionForSelection", _n_visualRegionForSelection0, None, Compiled,
+                                   qt_QHeaderView_visualRegionForSelection_QRegion_QHeaderView_QItemSelection, Return, "qt.QRegion",
+                                   Parameters, new Param(c, "this", "qt.QHeaderView"), new Param(c, "selection", "qt.QItemSelection"), End),
+            _func[27] = new MemberFunction(c, "dragEnterEvent", _n_dragEnterEvent0, None, Compiled,
+                                           qt_QHeaderView_dragEnterEvent_void_QHeaderView_QDragEnterEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QHeaderView"), new Param(c, "event", "qt.QDragEnterEvent"), End),
+            _func[28] = new MemberFunction(c, "dragLeaveEvent", _n_dragLeaveEvent0, None, Compiled,
+                                           qt_QHeaderView_dragLeaveEvent_void_QHeaderView_QDragLeaveEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QHeaderView"), new Param(c, "event", "qt.QDragLeaveEvent"), End),
+            _func[29] = new MemberFunction(c, "dragMoveEvent", _n_dragMoveEvent0, None, Compiled,
+                                           qt_QHeaderView_dragMoveEvent_void_QHeaderView_QDragMoveEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QHeaderView"), new Param(c, "event", "qt.QDragMoveEvent"), End),
+            _func[30] = new MemberFunction(c, "dropEvent", _n_dropEvent0, None, Compiled,
+                                           qt_QHeaderView_dropEvent_void_QHeaderView_QDropEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QHeaderView"), new Param(c, "event", "qt.QDropEvent"), End),
+            _func[31] = new MemberFunction(c, "eventFilter", _n_eventFilter0, None, Compiled,
+                                           qt_QHeaderView_eventFilter_bool_QHeaderView_QObject_QEvent, Return, "bool", Parameters,
+                                           new Param(c, "this", "qt.QHeaderView"), new Param(c, "object", "qt.QObject"),
+                                           new Param(c, "event", "qt.QEvent"), End),
+            _func[32] = new MemberFunction(c, "focusInEvent", _n_focusInEvent0, None, Compiled,
+                                           qt_QHeaderView_focusInEvent_void_QHeaderView_QFocusEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QHeaderView"), new Param(c, "event", "qt.QFocusEvent"), End),
+            _func[33] = new MemberFunction(c, "focusNextPrevChild", _n_focusNextPrevChild0, None, Compiled,
+                                           qt_QHeaderView_focusNextPrevChild_bool_QHeaderView_bool, Return, "bool", Parameters,
+                                           new Param(c, "this", "qt.QHeaderView"), new Param(c, "next", "bool"), End),
+            _func[34] = new MemberFunction(c, "focusOutEvent", _n_focusOutEvent0, None, Compiled,
+                                           qt_QHeaderView_focusOutEvent_void_QHeaderView_QFocusEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QHeaderView"), new Param(c, "event", "qt.QFocusEvent"), End),
             // MISSING: inputMethodEvent (void; QHeaderView this,
             // "QInputMethodEvent *" event) // protected
-            _func[35] = new MemberFunction(
-                c, "keyPressEvent", _n_keyPressEvent0, None, Compiled,
-                qt_QHeaderView_keyPressEvent_void_QHeaderView_QKeyEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QHeaderView"),
-                new Param(c, "event", "qt.QKeyEvent"), End),
-            _func[36] = new MemberFunction(
-                c, "resizeEvent", _n_resizeEvent0, None, Compiled,
-                qt_QHeaderView_resizeEvent_void_QHeaderView_QResizeEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QHeaderView"),
-                new Param(c, "event", "qt.QResizeEvent"), End),
-            _func[37] = new MemberFunction(
-                c, "timerEvent", _n_timerEvent0, None, Compiled,
-                qt_QHeaderView_timerEvent_void_QHeaderView_QTimerEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QHeaderView"),
-                new Param(c, "event", "qt.QTimerEvent"), End),
-            _func[38] = new MemberFunction(
-                c, "viewportSizeHint", _n_viewportSizeHint0, None, Compiled,
-                qt_QHeaderView_viewportSizeHint_QSize_QHeaderView, Return,
-                "qt.QSize", Parameters, new Param(c, "this", "qt.QHeaderView"),
-                End),
+            _func[35] = new MemberFunction(c, "keyPressEvent", _n_keyPressEvent0, None, Compiled,
+                                           qt_QHeaderView_keyPressEvent_void_QHeaderView_QKeyEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QHeaderView"), new Param(c, "event", "qt.QKeyEvent"), End),
+            _func[36] = new MemberFunction(c, "resizeEvent", _n_resizeEvent0, None, Compiled,
+                                           qt_QHeaderView_resizeEvent_void_QHeaderView_QResizeEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QHeaderView"), new Param(c, "event", "qt.QResizeEvent"), End),
+            _func[37] = new MemberFunction(c, "timerEvent", _n_timerEvent0, None, Compiled,
+                                           qt_QHeaderView_timerEvent_void_QHeaderView_QTimerEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QHeaderView"), new Param(c, "event", "qt.QTimerEvent"), End),
+            _func[38] = new MemberFunction(c, "viewportSizeHint", _n_viewportSizeHint0, None, Compiled,
+                                           qt_QHeaderView_viewportSizeHint_QSize_QHeaderView, Return, "qt.QSize", Parameters,
+                                           new Param(c, "this", "qt.QHeaderView"), End),
             // static functions
             EndArguments);
         globalScope()->addSymbols(EndArguments);

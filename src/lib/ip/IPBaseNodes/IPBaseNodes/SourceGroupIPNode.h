@@ -25,18 +25,14 @@ namespace IPCore
     class SourceGroupIPNode : public GroupIPNode
     {
     public:
-        SourceGroupIPNode(const std::string& name, const NodeDefinition* def,
-                          IPGraph* graph, GroupIPNode* group = 0);
+        SourceGroupIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group = 0);
 
-        SourceGroupIPNode(const std::string& name, const NodeDefinition* def,
-                          SourceIPNode*, IPGraph* graph,
-                          GroupIPNode* group = 0);
+        SourceGroupIPNode(const std::string& name, const NodeDefinition* def, SourceIPNode*, IPGraph* graph, GroupIPNode* group = 0);
 
         virtual ~SourceGroupIPNode();
 
         virtual void setInputs(const IPNodes&);
-        virtual void readCompleted(const std::string& type,
-                                   unsigned int version);
+        virtual void readCompleted(const std::string& type, unsigned int version);
 
         void setUINameFromMedia(int index = 0);
 
@@ -50,18 +46,14 @@ namespace IPCore
 
         IPNode* afterColorNode() const { return m_afterColorNode; }
 
-        PipelineGroupIPNode* linearizePipeline() const
-        {
-            return m_linearizePipeline;
-        }
+        PipelineGroupIPNode* linearizePipeline() const { return m_linearizePipeline; }
 
         PipelineGroupIPNode* colorPipeline() const { return m_colorPipeline; }
 
         PipelineGroupIPNode* lookPipeline() const { return m_lookPipeline; }
 
     private:
-        void init(const std::string&, const NodeDefinition*, SourceIPNode*,
-                  IPGraph*, GroupIPNode*);
+        void init(const std::string&, const NodeDefinition*, SourceIPNode*, IPGraph*, GroupIPNode*);
 
     private:
         SourceIPNode* m_sourceNode;

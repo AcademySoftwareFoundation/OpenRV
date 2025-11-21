@@ -43,16 +43,11 @@ namespace IPCore
 
         inline Vec3f convert(Imath::V3f v) { return Vec3f(v.x, v.y, v.z); }
 
-        inline Mat44f convert(const Imath::M44f& m)
-        {
-            return reinterpret_cast<const Mat44f*>(&m)->transposed();
-        }
+        inline Mat44f convert(const Imath::M44f& m) { return reinterpret_cast<const Mat44f*>(&m)->transposed(); }
 
     } // namespace
 
-    LinearizeIPNode::LinearizeIPNode(const std::string& name,
-                                     const NodeDefinition* def, IPGraph* graph,
-                                     GroupIPNode* group)
+    LinearizeIPNode::LinearizeIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group)
         : IPNode(name, def, graph, group)
         , m_transferName(0)
         , m_primariesName(0)
@@ -68,34 +63,21 @@ namespace IPCore
         //  do that.
         //
 
-        PropertyInfo* info = new PropertyInfo(
-            PropertyInfo::Persistent | PropertyInfo::RequiresGraphEdit, 1);
+        PropertyInfo* info = new PropertyInfo(PropertyInfo::Persistent | PropertyInfo::RequiresGraphEdit, 1);
 
         m_active = declareProperty<IntProperty>("node.active", 1);
-        m_transferName =
-            declareProperty<StringProperty>("color.transfer", "File", info);
-        m_primariesName =
-            declareProperty<StringProperty>("color.primaries", "File", info);
-        m_alphaTypeName =
-            declareProperty<StringProperty>("color.alphaType", "File", info);
+        m_transferName = declareProperty<StringProperty>("color.transfer", "File", info);
+        m_primariesName = declareProperty<StringProperty>("color.primaries", "File", info);
+        m_alphaTypeName = declareProperty<StringProperty>("color.alphaType", "File", info);
     }
 
     LinearizeIPNode::~LinearizeIPNode() {}
 
-    void LinearizeIPNode::setTransfer(const std::string& s)
-    {
-        setProperty(m_transferName, s);
-    }
+    void LinearizeIPNode::setTransfer(const std::string& s) { setProperty(m_transferName, s); }
 
-    void LinearizeIPNode::setPrimaries(const std::string& s)
-    {
-        setProperty(m_primariesName, s);
-    }
+    void LinearizeIPNode::setPrimaries(const std::string& s) { setProperty(m_primariesName, s); }
 
-    void LinearizeIPNode::setAlphaType(const std::string& s)
-    {
-        setProperty(m_alphaTypeName, s);
-    }
+    void LinearizeIPNode::setAlphaType(const std::string& s) { setProperty(m_alphaTypeName, s); }
 
     string LinearizeIPNode::fbPrimariesToPropertyValue(const string& p)
     {
@@ -140,6 +122,10 @@ namespace IPCore
             return "ITU Rec.2020";
         else if (t == ColorSpace::SMPTE240M())
             return "SMPTE 240M";
+        else if (t == ColorSpace::SMPTE2084())
+            return "SMPTE 2084";
+        else if (t == ColorSpace::HybridLogGamma())
+            return "Hybrid Log-Gamma";
         else if (t == ColorSpace::ArriLogC())
             return "ARRI LogC";
         else if (t == ColorSpace::ArriLogCFilm())
@@ -163,8 +149,7 @@ namespace IPCore
         return "File";
     }
 
-    string
-    LinearizeIPNode::chromaticitiesToPropertyValue(const Chromaticities& chr)
+    string LinearizeIPNode::chromaticitiesToPropertyValue(const Chromaticities& chr)
     {
         if (chr == Chromaticities::Rec709())
             return "ITU Rec.709";
@@ -240,8 +225,7 @@ namespace IPCore
         {
             if (const TwkFB::FBAttribute* a = fb->findAttribute("AlphaType"))
             {
-                if (const TwkFB::StringAttribute* sa =
-                        dynamic_cast<const TwkFB::StringAttribute*>(a))
+                if (const TwkFB::StringAttribute* sa = dynamic_cast<const TwkFB::StringAttribute*>(a))
                 {
                     alreadyUnpremulted = sa->value() == "Unpremultiplied";
                 }
@@ -346,8 +330,7 @@ namespace IPCore
                 cc = CIECoords::DragonColor();
             else if (p == ColorSpace::DragonColor2())
                 cc = CIECoords::DragonColor2();
-            else if (p == ColorSpace::ArriWideGamut()
-                     && !fb->hasRGBtoXYZMatrix())
+            else if (p == ColorSpace::ArriWideGamut() && !fb->hasRGBtoXYZMatrix())
             {
                 //
                 //  If its marked as ArriWideGamut but there's no RGB->XYZ use
@@ -426,29 +409,22 @@ namespace IPCore
             if (xyzMatrix)
             {
                 Mat44f A;
-                TwkFB::colorSpaceConversionMatrix(
-                    (const float*)&chr709, (const float*)&chr709,
-                    (const float*)&cneutral, (const float*)&chr709.white, true,
-                    (float*)&A);
+                TwkFB::colorSpaceConversionMatrix((const float*)&chr709, (const float*)&chr709, (const float*)&cneutral,
+                                                  (const float*)&chr709.white, true, (float*)&A);
 
                 Mat44f m1 = convert(XYZtoRGB(Imf::Chromaticities(), 1.0));
                 C = m1 * A * RGBXYZ * C;
             }
             else
             {
-                Imf::Chromaticities chr(convert(cc.red), convert(cc.green),
-                                        convert(cc.blue), convert(cc.white));
+                Imf::Chromaticities chr(convert(cc.red), convert(cc.green), convert(cc.blue), convert(cc.white));
 
-                TwkFB::colorSpaceConversionMatrix(
-                    (const float*)&chr, (const float*)&chr709,
-                    (const float*)&cneutral, (const float*)&chr709.white, true,
-                    (float*)&C);
+                TwkFB::colorSpaceConversionMatrix((const float*)&chr, (const float*)&chr709, (const float*)&cneutral,
+                                                  (const float*)&chr709.white, true, (float*)&C);
             }
         }
 
-        if (const TwkFB::FloatAttribute* lsa =
-                dynamic_cast<const TwkFB::FloatAttribute*>(
-                    fb->findAttribute(ColorSpace::LinearScale())))
+        if (const TwkFB::FloatAttribute* lsa = dynamic_cast<const TwkFB::FloatAttribute*>(fb->findAttribute(ColorSpace::LinearScale())))
         {
             Mat44f S;
             Vec3f scl(lsa->value());
@@ -474,8 +450,7 @@ namespace IPCore
             if (fb)
             {
                 if (const TwkFB::FloatAttribute* fattr =
-                        dynamic_cast<const TwkFB::FloatAttribute*>(
-                            fb->findAttribute(ColorSpace::BlackPoint())))
+                        dynamic_cast<const TwkFB::FloatAttribute*>(fb->findAttribute(ColorSpace::BlackPoint())))
                 {
                     float ftmp = fattr->value();
                     if (ftmp >= 1.0f)
@@ -483,8 +458,7 @@ namespace IPCore
                 }
 
                 if (const TwkFB::FloatAttribute* fattr =
-                        dynamic_cast<const TwkFB::FloatAttribute*>(
-                            fb->findAttribute(ColorSpace::WhitePoint())))
+                        dynamic_cast<const TwkFB::FloatAttribute*>(fb->findAttribute(ColorSpace::WhitePoint())))
                 {
                     float ftmp = fattr->value();
                     if (ftmp >= 1.0f)
@@ -493,8 +467,7 @@ namespace IPCore
                 }
 
                 if (const TwkFB::FloatAttribute* fattr =
-                        dynamic_cast<const TwkFB::FloatAttribute*>(
-                            fb->findAttribute(ColorSpace::BreakPoint())))
+                        dynamic_cast<const TwkFB::FloatAttribute*>(fb->findAttribute(ColorSpace::BreakPoint())))
                 {
                     float ftmp = fattr->value();
                     if (ftmp >= 1.0f)
@@ -502,9 +475,7 @@ namespace IPCore
                 }
             }
 
-            img->shaderExpr = Shader::newColorCineonLogToLinear(
-                img->shaderExpr, cinblack, cinwhite,
-                (cinwhite - cinbreakpoint));
+            img->shaderExpr = Shader::newColorCineonLogToLinear(img->shaderExpr, cinblack, cinwhite, (cinwhite - cinbreakpoint));
         }
         else if (transfer == "ACES ADX")
         {
@@ -525,9 +496,7 @@ namespace IPCore
             double cinwhite = 685;
             double cinbreakpoint = cinwhite;
 
-            img->shaderExpr = Shader::newColorCineonLogToLinear(
-                img->shaderExpr, cinblack, cinwhite,
-                (cinwhite - cinbreakpoint));
+            img->shaderExpr = Shader::newColorCineonLogToLinear(img->shaderExpr, cinblack, cinwhite, (cinwhite - cinbreakpoint));
         }
         else if ((transfer == "ARRI LogC") || (transfer == "ARRI LogC Film"))
         {
@@ -537,24 +506,22 @@ namespace IPCore
                 // Undo the Film Style Matrix; this is done prior to linearizing
                 // the logC.
                 //
-                img->shaderExpr = Shader::newColorMatrix(
-                    img->shaderExpr, ArriFilmStyleInverseMatrix<float>());
+                img->shaderExpr = Shader::newColorMatrix(img->shaderExpr, ArriFilmStyleInverseMatrix<float>());
             }
 
             TwkFB::LogCTransformParams params;
 
             TwkFB::getLogCCurveParams(params, fb);
 
-            img->shaderExpr = Shader::newColorLogCLinear(
-                img->shaderExpr,
-                params.LogCBlackSignal,     // pbs
-                params.LogCEncodingOffset,  // eo
-                params.LogCEncodingGain,    // eg
-                params.LogCGraySignal,      // gs
-                params.LogCBlackOffset,     // bo
-                params.LogCLinearSlope,     // ls
-                params.LogCLinearOffset,    // lo
-                params.LogCLinearCutPoint); // // logc to linear cutoff
+            img->shaderExpr = Shader::newColorLogCLinear(img->shaderExpr,
+                                                         params.LogCBlackSignal,     // pbs
+                                                         params.LogCEncodingOffset,  // eo
+                                                         params.LogCEncodingGain,    // eg
+                                                         params.LogCGraySignal,      // gs
+                                                         params.LogCBlackOffset,     // bo
+                                                         params.LogCLinearSlope,     // ls
+                                                         params.LogCLinearOffset,    // lo
+                                                         params.LogCLinearCutPoint); // // logc to linear cutoff
         }
         else if (transfer == "sRGB")
         {
@@ -575,8 +542,15 @@ namespace IPCore
         }
         else if (transfer == "SMPTE 240M")
         {
-            img->shaderExpr =
-                Shader::newColorSMPTE240MToLinear(img->shaderExpr);
+            img->shaderExpr = Shader::newColorSMPTE240MToLinear(img->shaderExpr);
+        }
+        else if (transfer == "SMPTE 2084")
+        {
+            img->shaderExpr = Shader::newColorSMPTE2084ToLinear(img->shaderExpr);
+        }
+        else if (transfer == "Hybrid Log-Gamma")
+        {
+            img->shaderExpr = Shader::newColorHLGToLinear(img->shaderExpr);
         }
         else if (transfer == "Gamma 1.8")
         {

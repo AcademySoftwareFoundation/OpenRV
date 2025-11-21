@@ -13,12 +13,8 @@ using namespace std;
 namespace Rv
 {
 
-    static CVReturn CVDisplayLinkCallback(CVDisplayLinkRef displayLink,
-                                          const CVTimeStamp* inNow,
-                                          const CVTimeStamp* inOutputTime,
-                                          CVOptionFlags flagsIn,
-                                          CVOptionFlags* flagsOut,
-                                          void* displayLinkContext)
+    static CVReturn CVDisplayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeStamp* inNow, const CVTimeStamp* inOutputTime,
+                                          CVOptionFlags flagsIn, CVOptionFlags* flagsOut, void* displayLinkContext)
     {
         DisplayLink* link = (DisplayLink*)displayLinkContext;
         link->displayLinkEvent(inNow, inOutputTime);
@@ -37,12 +33,10 @@ namespace Rv
         if (m_displayLink)
         {
             // set the current display of a display link.
-            CVDisplayLinkSetCurrentCGDisplay(m_displayLink,
-                                             kCGDirectMainDisplay);
+            CVDisplayLinkSetCurrentCGDisplay(m_displayLink, kCGDirectMainDisplay);
 
             // set the renderer output callback function
-            CVDisplayLinkSetOutputCallback(m_displayLink,
-                                           &CVDisplayLinkCallback, this);
+            CVDisplayLinkSetOutputCallback(m_displayLink, &CVDisplayLinkCallback, this);
         }
     }
 
@@ -60,13 +54,11 @@ namespace Rv
 
     bool DisplayLink::isActive() const { return m_isActive; }
 
-    void DisplayLink::start(IPCore::Session* s,
-                            const CGDesktopVideoDevice* cgdevice)
+    void DisplayLink::start(IPCore::Session* s, const CGDesktopVideoDevice* cgdevice)
     {
         if (m_displayLink && !m_isActive)
         {
-            CVDisplayLinkSetCurrentCGDisplay(m_displayLink,
-                                             cgdevice->cgDisplay());
+            CVDisplayLinkSetCurrentCGDisplay(m_displayLink, cgdevice->cgDisplay());
             CVDisplayLinkStart(m_displayLink);
             m_isActive = true;
             m_session = s;
@@ -91,13 +83,11 @@ namespace Rv
         }
     }
 
-    void DisplayLink::displayLinkEvent(const CVTimeStamp* now,
-                                       const CVTimeStamp* ts)
+    void DisplayLink::displayLinkEvent(const CVTimeStamp* now, const CVTimeStamp* ts)
     {
         if (ts && now)
         {
-            const double secs = double(ts->videoTime - now->videoTime)
-                                / double(now->videoTimeScale);
+            const double secs = double(ts->videoTime - now->videoTime) / double(now->videoTimeScale);
             m_serial++;
             m_session->setNextVSyncOffset(secs, m_serial);
         }

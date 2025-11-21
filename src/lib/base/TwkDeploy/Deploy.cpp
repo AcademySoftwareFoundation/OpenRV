@@ -84,8 +84,7 @@ void TWK_DEPLOY_SET_CRASHLOG_FILE(const char* c, const char* r)
     remotelog = r;
 }
 
-void TWK_DEPLOY_INITIALIZE(int major, int minor, int patch_level, int argc,
-                           char** argv, const char* release_description,
+void TWK_DEPLOY_INITIALIZE(int major, int minor, int patch_level, int argc, char** argv, const char* release_description,
                            const char* scm_id, const char* d, const char* t)
 {
     Vmajor = major;
@@ -108,8 +107,7 @@ void TWK_DEPLOY_SHOW_PROGRAM_BANNER(ostream& o, const char* m)
 
     o << endl;
 
-    o << "Version " << Vmajor << "." << Vminor << "." << Vpatch_level << " ("
-      << Vdesc << "), built on "
+    o << "Version " << Vmajor << "." << Vminor << "." << Vpatch_level << " (" << Vdesc << "), built on "
       << Cdate
       //<< " at " << Ctime << " (" << 8*sizeof(void*) << "bit).";
       << " at " << Ctime << " (" << SCM_ID << ").";

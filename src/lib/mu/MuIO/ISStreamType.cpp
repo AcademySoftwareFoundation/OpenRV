@@ -44,10 +44,7 @@ namespace Mu
 
     Object* ISStreamType::newObject() const { return new ISStream(this); }
 
-    void ISStreamType::deleteObject(Object* obj) const
-    {
-        delete static_cast<ISStreamType::ISStream*>(obj);
-    }
+    void ISStreamType::deleteObject(Object* obj) const { delete static_cast<ISStreamType::ISStream*>(obj); }
 
     void ISStreamType::load()
     {
@@ -65,21 +62,17 @@ namespace Mu
 
         s->addSymbols(new ReferenceType(c, "isstream&", this),
 
-                      new Function(c, "isstream", ISStreamType::construct, None,
-                                   Return, tn, Args, "string", End),
+                      new Function(c, "isstream", ISStreamType::construct, None, Return, tn, Args, "string", End),
 
-                      new Function(c, "isstream", BaseFunctions::dereference,
-                                   Cast, Return, tn, Args, rn, End),
+                      new Function(c, "isstream", BaseFunctions::dereference, Cast, Return, tn, Args, rn, End),
 
                       EndArguments);
 
         globalScope()->addSymbols(
 
-            new Function(c, "print", StreamType::print, None, Return, "void",
-                         Args, tn, End),
+            new Function(c, "print", StreamType::print, None, Return, "void", Args, tn, End),
 
-            new Function(c, "=", BaseFunctions::assign, AsOp, Return, rn, Args,
-                         rn, tn, End),
+            new Function(c, "=", BaseFunctions::assign, AsOp, Return, rn, Args, rn, tn, End),
 
             EndArguments);
     }
@@ -100,8 +93,7 @@ namespace Mu
             an += "...";
         o->setString(an);
 
-        o->_ios = o->_istream = o->_isstream =
-            new std::istringstream(str->c_str());
+        o->_ios = o->_istream = o->_isstream = new std::istringstream(str->c_str());
         NODE_RETURN(Pointer(o));
     }
 

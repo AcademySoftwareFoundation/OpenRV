@@ -78,6 +78,8 @@ namespace Rv
     NODE_DECLARATION(setDriverAttribute, void);
     NODE_DECLARATION(setPresentationMode, void);
     NODE_DECLARATION(presentationMode, bool);
+    NODE_DECLARATION(setPresentationDevice, void);
+    NODE_DECLARATION(loadSettingsIntoOptions, void);
     NODE_DECLARATION(packageListFromSetting, Mu::Pointer);
     NODE_DECLARATION(showTopViewToolbar, void);
     NODE_DECLARATION(showBottomViewToolbar, void);

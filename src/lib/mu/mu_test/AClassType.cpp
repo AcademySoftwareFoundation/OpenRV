@@ -57,21 +57,17 @@ namespace Mu
 
         s->addSymbols(new ReferenceType(c, "a_class&", this),
 
-                      new Function(c, "a_class", AClassType::construct, None,
-                                   Return, tn, Args, "string", End),
+                      new Function(c, "a_class", AClassType::construct, None, Return, tn, Args, "string", End),
 
-                      new Function(c, "a_class", BaseFunctions::dereference,
-                                   Cast, Return, tn, Args, rn, End),
+                      new Function(c, "a_class", BaseFunctions::dereference, Cast, Return, tn, Args, rn, End),
 
                       EndArguments);
 
         globalScope()->addSymbols(
 
-            new Function(c, "print", AClassType::print, None, Return, "void",
-                         Args, tn, End),
+            new Function(c, "print", AClassType::print, None, Return, "void", Args, tn, End),
 
-            new Function(c, "=", BaseFunctions::assign, AsOp, Return, rn, Args,
-                         rn, tn, End),
+            new Function(c, "=", BaseFunctions::assign, AsOp, Return, rn, Args, rn, tn, End),
 
             EndArguments);
 
@@ -79,11 +75,9 @@ namespace Mu
 
         addSymbols(new MemberVariable(c, "value", "int"),
 
-                   new MemberFunction(c, "foo", AClassType::foo, None, Return,
-                                      "string", Args, tn, End),
+                   new MemberFunction(c, "foo", AClassType::foo, None, Return, "string", Args, tn, End),
 
-                   new MemberFunction(c, "bar", AClassType::bar, None, Return,
-                                      "string", Args, tn, End),
+                   new MemberFunction(c, "bar", AClassType::bar, None, Return, "string", Args, tn, End),
 
                    EndArguments);
     }

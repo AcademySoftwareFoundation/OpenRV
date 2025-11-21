@@ -12,8 +12,7 @@ namespace TwkAudio
 {
     using namespace std;
 
-    void lowPassFilter(AudioBuffer& inBuffer, AudioBuffer& prevBuffer,
-                       AudioBuffer& outBuffer, float freq, bool isBackwards)
+    void lowPassFilter(AudioBuffer& inBuffer, AudioBuffer& prevBuffer, AudioBuffer& outBuffer, float freq, bool isBackwards)
     {
         //
         //  Simple low-pass, seeded with outPrevious's last sample
@@ -28,12 +27,10 @@ namespace TwkAudio
         //  alpha = dt / ( 1 / (f * 2 * pi) + dt )
         //
 
-        assert(inBuffer.rate() == outBuffer.rate()
-               && inBuffer.rate() == prevBuffer.rate());
+        assert(inBuffer.rate() == outBuffer.rate() && inBuffer.rate() == prevBuffer.rate());
 
         const double dt = 1.0 / inBuffer.rate();
-        const float alpha =
-            float(dt / (1.0 / (double(freq) * 2 * 3.14159265359) + dt));
+        const float alpha = float(dt / (1.0 / (double(freq) * 2 * 3.14159265359) + dt));
 
         // Reverse the buffers on backwards playback
         // otherwise the buffer segments will be discontinuous

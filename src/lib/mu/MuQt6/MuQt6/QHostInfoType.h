@@ -47,8 +47,7 @@ namespace Mu
         //  Constructors
         //
 
-        QHostInfoType(Context* context, const char* name,
-                      Class* superClass = 0);
+        QHostInfoType(Context* context, const char* name, Class* superClass = 0);
         virtual ~QHostInfoType();
 
         //

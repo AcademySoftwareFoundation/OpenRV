@@ -37,8 +37,7 @@ namespace Mu
     using namespace std;
 
     NoOp::NoOp(Context* context, const char* name)
-        : Function(context, name, NoOp::node, Function::Pure, Function::Return,
-                   "void", Function::End)
+        : Function(context, name, NoOp::node, Function::Pure, Function::Return, "void", Function::End)
     {
     }
 
@@ -47,10 +46,8 @@ namespace Mu
     //----------------------------------------------------------------------
 
     SimpleBlock::SimpleBlock(Context* context, const char* name)
-        : Function(context, name, NodeFunc(0), Function::ContextDependent,
-                   Function::Return, "void", Function::Args, "?",
-                   Function::Optional, "?varargs", Function::Maximum,
-                   Function::MaxArgValue, Function::End)
+        : Function(context, name, NodeFunc(0), Function::ContextDependent, Function::Return, "void", Function::Args, "?",
+                   Function::Optional, "?varargs", Function::Maximum, Function::MaxArgValue, Function::End)
     {
     }
 
@@ -79,11 +76,8 @@ namespace Mu
     //----------------------------------------------------------------------
 
     FixedFrameBlock::FixedFrameBlock(Context* context, const char* name)
-        : Function(context, name, FixedFrameBlock::node,
-                   Function::ContextDependent | Function::HiddenArgument,
-                   Function::Return, "void", Function::Args, "?",
-                   Function::Optional, "?varargs", Function::Maximum,
-                   Function::MaxArgValue, Function::End)
+        : Function(context, name, FixedFrameBlock::node, Function::ContextDependent | Function::HiddenArgument, Function::Return, "void",
+                   Function::Args, "?", Function::Optional, "?varargs", Function::Maximum, Function::MaxArgValue, Function::End)
     {
     }
 
@@ -101,10 +95,7 @@ namespace Mu
         }
     }
 
-    const Type* FixedFrameBlock::nodeReturnType(const Node* node) const
-    {
-        return node->argNode(node->numArgs() - 1)->type();
-    }
+    const Type* FixedFrameBlock::nodeReturnType(const Node* node) const { return node->argNode(node->numArgs() - 1)->type(); }
 
     NODE_IMPLEMENTATION(FixedFrameBlock::node, void)
     {
@@ -131,16 +122,12 @@ namespace Mu
     //----------------------------------------------------------------------
 
     DynamicCast::DynamicCast(Context* context, const char* name)
-        : Function(context, name, DynamicCast::node, Function::Mapped,
-                   Function::Return, "?class_or_interface", Function::Args,
+        : Function(context, name, DynamicCast::node, Function::Mapped, Function::Return, "?class_or_interface", Function::Args,
                    "?class_or_interface", "?class_or_interface", Function::End)
     {
     }
 
-    const Type* DynamicCast::nodeReturnType(const Node* n) const
-    {
-        return dynamic_cast<const Type*>(n->argNode(0)->symbol());
-    }
+    const Type* DynamicCast::nodeReturnType(const Node* n) const { return dynamic_cast<const Type*>(n->argNode(0)->symbol()); }
 
     NODE_IMPLEMENTATION(DynamicCast::node, Pointer)
     {
@@ -197,14 +184,9 @@ namespace Mu
 
     //----------------------------------------------------------------------
 
-    DynamicActivation::DynamicActivation(Context* context,
-                                         const String& returnType,
-                                         const STLVector<String>::Type& args)
-        : Function(context, "()", NodeFunc(0),
-                   Function::DynamicActivation | Function::ContextDependent
-                       | Function::MaybePure,
-                   Function::Return, returnType.c_str(), Function::ArgVector,
-                   &args)
+    DynamicActivation::DynamicActivation(Context* context, const String& returnType, const STLVector<String>::Type& args)
+        : Function(context, "()", NodeFunc(0), Function::DynamicActivation | Function::ContextDependent | Function::MaybePure,
+                   Function::Return, returnType.c_str(), Function::ArgVector, &args)
     {
     }
 
@@ -234,18 +216,15 @@ namespace Mu
 
     //----------------------------------------------------------------------
 
-    ReturnFromFunction::ReturnFromFunction(Context* context, const char* name,
-                                           bool arg)
-        : Function(context, name, NodeFunc(0), Function::ContextDependent,
-                   Function::Return, (arg ? "?" : "void"), Function::Args,
+    ReturnFromFunction::ReturnFromFunction(Context* context, const char* name, bool arg)
+        : Function(context, name, NodeFunc(0), Function::ContextDependent, Function::Return, (arg ? "?" : "void"), Function::Args,
                    (arg ? "?" : 0), Function::End)
     {
     }
 
     const Type* ReturnFromFunction::nodeReturnType(const Node* n) const
     {
-        const ReturnFromFunction* R =
-            static_cast<const ReturnFromFunction*>(n->symbol());
+        const ReturnFromFunction* R = static_cast<const ReturnFromFunction*>(n->symbol());
 
         if (R->numArgs())
         {
@@ -284,15 +263,11 @@ namespace Mu
     //----------------------------------------------------------------------
 
     TailFuseReturn::TailFuseReturn(Context* context, const char* name)
-        : Function(context, name, NodeFunc(0), Function::ContextDependent,
-                   Function::Return, ("?"), Function::Args, "?", Function::End)
+        : Function(context, name, NodeFunc(0), Function::ContextDependent, Function::Return, ("?"), Function::Args, "?", Function::End)
     {
     }
 
-    const Type* TailFuseReturn::nodeReturnType(const Node* n) const
-    {
-        return n->argNode(0)->type();
-    }
+    const Type* TailFuseReturn::nodeReturnType(const Node* n) const { return n->argNode(0)->type(); }
 
     NodeFunc TailFuseReturn::func(Node* node) const
     {
@@ -311,22 +286,16 @@ namespace Mu
     //----------------------------------------------------------------------
 
     Curry::Curry(Context* context, const char* name)
-        : Function(context, name, Curry::node, Function::Pure, Function::Return,
-                   "?function", Function::Args, "?function", "?function",
+        : Function(context, name, Curry::node, Function::Pure, Function::Return, "?function", Function::Args, "?function", "?function",
                    "?bool_rep", "?varargs", Function::End)
     {
     }
 
     Curry::~Curry() {}
 
-    const Type* Curry::nodeReturnType(const Node* n) const
-    {
-        return dynamic_cast<const Type*>(n->argNode(0)->symbol());
-    }
+    const Type* Curry::nodeReturnType(const Node* n) const { return dynamic_cast<const Type*>(n->argNode(0)->symbol()); }
 
-    FunctionObject* Curry::evaluate(Thread& t, FunctionObject* inObj,
-                                    const Function::ArgumentVector& args,
-                                    const vector<bool>& mask,
+    FunctionObject* Curry::evaluate(Thread& t, FunctionObject* inObj, const Function::ArgumentVector& args, const vector<bool>& mask,
                                     bool dynamicDispatch)
     {
         //
@@ -346,8 +315,7 @@ namespace Mu
         {
             if (apply)
             {
-                PartialApplicator evaluator(F, p, &t, args, mask,
-                                            dynamicDispatch);
+                PartialApplicator evaluator(F, p, &t, args, mask, dynamicDispatch);
 
                 const FunctionType* rt = evaluator.result()->type();
                 FunctionObject* outObj = new FunctionObject(rt);
@@ -403,28 +371,22 @@ namespace Mu
 
     //----------------------------------------------------------------------
 
-    DynamicPartialEvaluate::DynamicPartialEvaluate(Context* context,
-                                                   const char* name)
-        : Function(context, name, DynamicPartialEvaluate::node, Function::Pure,
-                   Function::Return, "?function", Function::Args, "?function",
+    DynamicPartialEvaluate::DynamicPartialEvaluate(Context* context, const char* name)
+        : Function(context, name, DynamicPartialEvaluate::node, Function::Pure, Function::Return, "?function", Function::Args, "?function",
                    "?function", "?varargs", Function::End)
     {
     }
 
     DynamicPartialEvaluate::~DynamicPartialEvaluate() {}
 
-    const Type* DynamicPartialEvaluate::nodeReturnType(const Node* n) const
-    {
-        return dynamic_cast<const Type*>(n->argNode(0)->symbol());
-    }
+    const Type* DynamicPartialEvaluate::nodeReturnType(const Node* n) const { return dynamic_cast<const Type*>(n->argNode(0)->symbol()); }
 
     NODE_IMPLEMENTATION(DynamicPartialEvaluate::node, Pointer)
     {
         typedef FunctionSpecializer Generator;
 
         FunctionObject* f = NODE_ARG_OBJECT(1, FunctionObject);
-        Generator::ArgumentVector args(f->function()->numArgs()
-                                       + f->function()->numFreeVariables());
+        Generator::ArgumentVector args(f->function()->numArgs() + f->function()->numFreeVariables());
         Generator::ArgumentMask mask(args.size());
         Process* p = NODE_THREAD.process();
         Context* c = p->context();
@@ -462,12 +424,9 @@ namespace Mu
 
     //----------------------------------------------------------------------
 
-    DynamicPartialApplication::DynamicPartialApplication(Context* context,
-                                                         const char* name)
-        : Function(context, name, DynamicPartialApplication::node,
-                   Function::Pure, Function::Return, "?function",
-                   Function::Args, "?function", "?function", "?varargs",
-                   Function::End)
+    DynamicPartialApplication::DynamicPartialApplication(Context* context, const char* name)
+        : Function(context, name, DynamicPartialApplication::node, Function::Pure, Function::Return, "?function", Function::Args,
+                   "?function", "?function", "?varargs", Function::End)
     {
     }
 
@@ -499,9 +458,7 @@ namespace Mu
             if (apply)
             {
                 typedef PartialApplicator Generator;
-                Generator::ArgumentVector args(
-                    f->function()->numArgs()
-                    + f->function()->numFreeVariables());
+                Generator::ArgumentVector args(f->function()->numArgs() + f->function()->numFreeVariables());
                 Generator::ArgumentMask mask(args.size());
 
                 for (int i = 0; i < args.size(); i++)
@@ -525,9 +482,7 @@ namespace Mu
             else
             {
                 typedef FunctionSpecializer Generator;
-                Generator::ArgumentVector args(
-                    f->function()->numArgs()
-                    + f->function()->numFreeVariables());
+                Generator::ArgumentVector args(f->function()->numArgs() + f->function()->numFreeVariables());
                 Generator::ArgumentMask mask(args.size());
 
                 for (int i = 0; i < args.size(); i++)
@@ -565,10 +520,8 @@ namespace Mu
     //----------------------------------------------------------------------
 
     NonPrimitiveCondExr::NonPrimitiveCondExr(Context* context, const char* name)
-        : Function(context, name, NonPrimitiveCondExr::node, Function::Pure,
-                   Function::Return, "?non_primitive_or_nil", Function::Args,
-                   "bool", "?non_primitive_or_nil", "?non_primitive_or_nil",
-                   Function::End)
+        : Function(context, name, NonPrimitiveCondExr::node, Function::Pure, Function::Return, "?non_primitive_or_nil", Function::Args,
+                   "bool", "?non_primitive_or_nil", "?non_primitive_or_nil", Function::End)
     {
     }
 
@@ -590,17 +543,14 @@ namespace Mu
 
     NODE_IMPLEMENTATION(NonPrimitiveCondExr::node, Pointer)
     {
-        NODE_RETURN(NODE_ARG(0, bool) ? NODE_ARG(1, Pointer)
-                                      : NODE_ARG(2, Pointer));
+        NODE_RETURN(NODE_ARG(0, bool) ? NODE_ARG(1, Pointer) : NODE_ARG(2, Pointer));
     }
 
     //----------------------------------------------------------------------
 
     VariantMatch::VariantMatch(Context* context, const char* name)
-        : Function(context, name, VariantMatch::node, Function::None,
-                   Function::Return, "void", Function::Args, "?reference", "?",
-                   Function::Optional, "?varargs", Function::Maximum,
-                   Function::MaxArgValue, Function::End)
+        : Function(context, name, VariantMatch::node, Function::None, Function::Return, "void", Function::Args, "?reference", "?",
+                   Function::Optional, "?varargs", Function::Maximum, Function::MaxArgValue, Function::End)
     {
     }
 
@@ -612,8 +562,7 @@ namespace Mu
         //  Get result of assignment
         //
 
-        VariantInstance* i =
-            *reinterpret_cast<VariantInstance**>(NODE_ARG(0, Pointer));
+        VariantInstance* i = *reinterpret_cast<VariantInstance**>(NODE_ARG(0, Pointer));
 
         //
         //  Eval argument corresponding to tag
@@ -695,16 +644,14 @@ namespace Mu
             {
                 n = nnode->name;
             }
-            else if (const ASTSymbol* snode =
-                         dynamic_cast<const ASTSymbol*>(astnode))
+            else if (const ASTSymbol* snode = dynamic_cast<const ASTSymbol*>(astnode))
             {
                 n = snode->symbol->fullyQualifiedName();
             }
 
             ostringstream str;
             str << " \"" << n.c_str() << "\""
-                << " at " << astnode->sourceFileName().c_str() << ", line "
-                << astnode->linenum() << ", char " << astnode->charnum();
+                << " at " << astnode->sourceFileName().c_str() << ", line " << astnode->linenum() << ", char " << astnode->charnum();
 
             string s = str.str();
 
@@ -733,38 +680,27 @@ namespace Mu
 
         NODE_IMPLEMENTATION(classAllocate, Pointer)
         {
-            const Class* c =
-                static_cast<const Class*>(NODE_THIS.symbol()->scope());
+            const Class* c = static_cast<const Class*>(NODE_THIS.symbol()->scope());
             NODE_RETURN(ClassInstance::allocate(c));
         }
 
-        NODE_IMPLEMENTATION(objIdent, Pointer)
-        {
-            NODE_RETURN((Pointer)NODE_ARG_OBJECT(0, Pointer));
-        }
+        NODE_IMPLEMENTATION(objIdent, Pointer) { NODE_RETURN((Pointer)NODE_ARG_OBJECT(0, Pointer)); }
 
     } // namespace BaseFunctions
 
     AssignAsReference::AssignAsReference(Context* c)
-        : Function(c, "=", BaseFunctions::assign, Function::None,
-                   Function::Return, "?", Function::Args,
-                   "?non_primitive_reference", "?non_primitive_or_nil",
-                   Function::End)
+        : Function(c, "=", BaseFunctions::assign, Function::None, Function::Return, "?", Function::Args, "?non_primitive_reference",
+                   "?non_primitive_or_nil", Function::End)
     {
     }
 
     AssignAsReference::~AssignAsReference() {}
 
-    const Type* AssignAsReference::nodeReturnType(const Node* n) const
-    {
-        return n->argNode(0)->type();
-    }
+    const Type* AssignAsReference::nodeReturnType(const Node* n) const { return n->argNode(0)->type(); }
 
     PatternTest::PatternTest(Context* c)
-        : Function(c, "__pattern_test", PatternTest::node, Function::None,
-                   Function::Return,
-                   c->boolType()->fullyQualifiedName().c_str(), Function::Args,
-                   "?", Function::Optional, "?", Function::End)
+        : Function(c, "__pattern_test", PatternTest::node, Function::None, Function::Return, c->boolType()->fullyQualifiedName().c_str(),
+                   Function::Args, "?", Function::Optional, "?", Function::End)
     {
     }
 
@@ -811,10 +747,8 @@ namespace Mu
     }
 
     BoolPatternTest::BoolPatternTest(Context* c)
-        : Function(c, "__bool_pattern_test", BoolPatternTest::node,
-                   Function::None, Function::Return,
-                   c->boolType()->fullyQualifiedName().c_str(), Function::Args,
-                   "?", Function::Optional, "?", Function::End)
+        : Function(c, "__bool_pattern_test", BoolPatternTest::node, Function::None, Function::Return,
+                   c->boolType()->fullyQualifiedName().c_str(), Function::Args, "?", Function::Optional, "?", Function::End)
     {
     }
 
@@ -831,11 +765,9 @@ namespace Mu
     }
 
     CaseTest::CaseTest(Context* c)
-        : Function(c, "__case_test", CaseTest::node, Function::None,
-                   Function::Return,
-                   c->boolType()->fullyQualifiedName().c_str(), Function::Args,
-                   "?reference", "?", Function::Optional, "?varargs",
-                   Function::Maximum, Function::MaxArgValue, Function::End)
+        : Function(c, "__case_test", CaseTest::node, Function::None, Function::Return, c->boolType()->fullyQualifiedName().c_str(),
+                   Function::Args, "?reference", "?", Function::Optional, "?varargs", Function::Maximum, Function::MaxArgValue,
+                   Function::End)
     {
     }
 
@@ -857,10 +789,8 @@ namespace Mu
     //----------------------------------------------------------------------
 
     PatternBlock::PatternBlock(Context* context, const char* name)
-        : Function(context, name, NodeFunc(0), Function::ContextDependent,
-                   Function::Return, "void", Function::Args, "?",
-                   Function::Optional, "?varargs", Function::Maximum,
-                   Function::MaxArgValue, Function::End)
+        : Function(context, name, NodeFunc(0), Function::ContextDependent, Function::Return, "void", Function::Args, "?",
+                   Function::Optional, "?varargs", Function::Maximum, Function::MaxArgValue, Function::End)
     {
     }
 

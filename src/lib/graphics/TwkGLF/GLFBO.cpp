@@ -20,8 +20,7 @@ namespace TwkGLF
 {
     using namespace std;
 
-    GLFBO::GLFBO(size_t width, size_t height, GLenum colorFormat,
-                 size_t numSamples, void* data)
+    GLFBO::GLFBO(size_t width, size_t height, GLenum colorFormat, size_t numSamples, void* data)
         : m_width(width)
         , m_height(height)
         , m_samples(numSamples == 0 ? 1 : numSamples)
@@ -73,16 +72,11 @@ namespace TwkGLF
 
         TWK_GLDEBUG;
 
-        const TwkApp::VideoDevice::DataFormat& df =
-            d->dataFormatAtIndex(d->currentDataFormat());
+        const TwkApp::VideoDevice::DataFormat& df = d->dataFormatAtIndex(d->currentDataFormat());
         m_colorFormat = TwkGLF::internalFormatFromDataFormat(df.iformat);
-        m_defaultTarget =
-            d->capabilities() & TwkApp::VideoDevice::NormalizedCoordinates
-                ? GL_TEXTURE_2D
-                : GL_TEXTURE_RECTANGLE_ARB;
+        m_defaultTarget = d->capabilities() & TwkApp::VideoDevice::NormalizedCoordinates ? GL_TEXTURE_2D : GL_TEXTURE_RECTANGLE_ARB;
 
-        TwkGLF::GLenumPair tformat =
-            TwkGLF::textureFormatFromDataFormat(df.iformat);
+        TwkGLF::GLenumPair tformat = TwkGLF::textureFormatFromDataFormat(df.iformat);
         m_defaultTextureFormat = tformat.first;
         m_defaultType = tformat.second;
     }
@@ -170,8 +164,7 @@ namespace TwkGLF
                 const Attachment& a = m_attachments[q];
                 GLuint apoint = a.attachPoint;
 
-                if (apoint >= GL_COLOR_ATTACHMENT0_EXT
-                    && apoint < GL_COLOR_ATTACHMENT0_EXT + m_colorCount)
+                if (apoint >= GL_COLOR_ATTACHMENT0_EXT && apoint < GL_COLOR_ATTACHMENT0_EXT + m_colorCount)
                 {
                     if (count == i)
                         return &a;
@@ -267,13 +260,9 @@ namespace TwkGLF
     {
         bind();
 
-        glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT,
-                                     GL_COLOR_ATTACHMENT0_EXT + m_colorCount,
-                                     GL_RENDERBUFFER_EXT, id);
+        glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT + m_colorCount, GL_RENDERBUFFER_EXT, id);
 
-        m_attachments.push_back(
-            Attachment(id, GL_COLOR_ATTACHMENT0_EXT + m_colorCount,
-                       GL_UNSIGNED_BYTE, false, false, false, false));
+        m_attachments.push_back(Attachment(id, GL_COLOR_ATTACHMENT0_EXT + m_colorCount, GL_UNSIGNED_BYTE, false, false, false, false));
         m_colorCount++;
 
         // avoid checking gl status unless in debug mode
@@ -297,21 +286,16 @@ namespace TwkGLF
 
         if (m_samples > 1)
         {
-            glRenderbufferStorageMultisampleEXT(GL_RENDERBUFFER_EXT, m_samples,
-                                                m_colorFormat, m_width,
-                                                m_height);
+            glRenderbufferStorageMultisampleEXT(GL_RENDERBUFFER_EXT, m_samples, m_colorFormat, m_width, m_height);
             TWK_GLDEBUG;
         }
         else
         {
-            glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, m_colorFormat,
-                                     m_width, m_height);
+            glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, m_colorFormat, m_width, m_height);
             TWK_GLDEBUG;
         }
 
-        glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT,
-                                     GL_COLOR_ATTACHMENT0_EXT + m_colorCount,
-                                     GL_RENDERBUFFER_EXT, id);
+        glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT + m_colorCount, GL_RENDERBUFFER_EXT, id);
         TWK_GLDEBUG;
 
         // avoid checking gl status unless in debug mode
@@ -319,9 +303,7 @@ namespace TwkGLF
         check();
 #endif
 
-        m_attachments.push_back(
-            Attachment(id, m_colorCount + GL_COLOR_ATTACHMENT0_EXT,
-                       GL_UNSIGNED_BYTE, false));
+        m_attachments.push_back(Attachment(id, m_colorCount + GL_COLOR_ATTACHMENT0_EXT, GL_UNSIGNED_BYTE, false));
         m_colorCount++;
 
         return m_attachments.back();
@@ -331,14 +313,11 @@ namespace TwkGLF
     {
         bind();
 
-        glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT,
-                                  GL_COLOR_ATTACHMENT0_EXT + m_colorCount,
-                                  target, id, 0);
+        glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT + m_colorCount, target, id, 0);
         TWK_GLDEBUG;
 
         m_attachments.push_back(
-            Attachment(id, GL_COLOR_ATTACHMENT0_EXT + m_colorCount, target,
-                       GL_UNSIGNED_BYTE, true, false, false, false));
+            Attachment(id, GL_COLOR_ATTACHMENT0_EXT + m_colorCount, target, GL_UNSIGNED_BYTE, true, false, false, false));
         m_colorCount++;
 
         // avoid checking gl status unless in debug mode
@@ -349,9 +328,7 @@ namespace TwkGLF
         return m_attachments.back();
     }
 
-    GLFBO::Attachment GLFBO::newColorTexture(GLenum target, GLenum format,
-                                             GLenum type, GLenum minFilter,
-                                             GLenum magFilter, GLenum clamping)
+    GLFBO::Attachment GLFBO::newColorTexture(GLenum target, GLenum format, GLenum type, GLenum minFilter, GLenum magFilter, GLenum clamping)
     {
         bind();
 
@@ -370,12 +347,10 @@ namespace TwkGLF
         glTexParameterf(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_PRIORITY, 1.0f);
         TWK_GLDEBUG;
 
-        glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MIN_FILTER,
-                        minFilter);
+        glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MIN_FILTER, minFilter);
         TWK_GLDEBUG;
 
-        glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MAG_FILTER,
-                        magFilter);
+        glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MAG_FILTER, magFilter);
 
         TWK_GLDEBUG;
         glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_WRAP_S, clamping);
@@ -387,19 +362,15 @@ namespace TwkGLF
         // glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_GENERATE_MIPMAP,
         // GL_TRUE); // automatic mipmap
 
-        glTexImage2D(target, 0, m_colorFormat, m_width, m_height, 0, format,
-                     type, 0);
+        glTexImage2D(target, 0, m_colorFormat, m_width, m_height, 0, format, type, 0);
 
         TWK_GLDEBUG;
 
         glBindTexture(target, 0);
 
-        glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT,
-                                  GL_COLOR_ATTACHMENT0_EXT + m_colorCount,
-                                  target, id, 0);
+        glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT + m_colorCount, target, id, 0);
 
-        m_attachments.push_back(Attachment(
-            id, GL_COLOR_ATTACHMENT0_EXT + m_colorCount, target, type, true));
+        m_attachments.push_back(Attachment(id, GL_COLOR_ATTACHMENT0_EXT + m_colorCount, target, type, true));
         m_colorCount++;
 
         // avoid checking gl status unless in debug mode
@@ -422,27 +393,19 @@ namespace TwkGLF
 
         if (m_samples > 1)
         {
-            glRenderbufferStorageMultisampleEXT(GL_RENDERBUFFER_EXT, m_samples,
-                                                GL_DEPTH24_STENCIL8_EXT,
-                                                m_width, m_height);
+            glRenderbufferStorageMultisampleEXT(GL_RENDERBUFFER_EXT, m_samples, GL_DEPTH24_STENCIL8_EXT, m_width, m_height);
             TWK_GLDEBUG;
         }
         else
         {
-            glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT,
-                                     GL_DEPTH24_STENCIL8_EXT, m_width,
-                                     m_height);
+            glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH24_STENCIL8_EXT, m_width, m_height);
             TWK_GLDEBUG;
         }
 
-        glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT,
-                                     GL_STENCIL_ATTACHMENT_EXT,
-                                     GL_RENDERBUFFER_EXT, id);
+        glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, id);
         TWK_GLDEBUG;
 
-        glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT,
-                                     GL_DEPTH_ATTACHMENT_EXT,
-                                     GL_RENDERBUFFER_EXT, id);
+        glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, id);
         TWK_GLDEBUG;
 
         glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);
@@ -450,9 +413,7 @@ namespace TwkGLF
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
         TWK_GLDEBUG;
 
-        m_attachments.push_back(Attachment(id, GL_STENCIL_ATTACHMENT_EXT, 0,
-                                           GL_UNSIGNED_BYTE, false, true, true,
-                                           true));
+        m_attachments.push_back(Attachment(id, GL_STENCIL_ATTACHMENT_EXT, 0, GL_UNSIGNED_BYTE, false, true, true, true));
         TWK_GLDEBUG;
         // avoid checking gl status unless in debug mode
 #ifdef NDEBUG
@@ -466,15 +427,11 @@ namespace TwkGLF
     {
         bind();
 
-        glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT_EXT,
-                                  GL_RENDERBUFFER_EXT, id, 0);
+        glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, id, 0);
         TWK_GLDEBUG;
-        glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT,
-                                  GL_RENDERBUFFER_EXT, id, 0);
+        glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, id, 0);
         TWK_GLDEBUG;
-        m_attachments.push_back(Attachment(id, GL_STENCIL_ATTACHMENT_EXT, 0,
-                                           GL_UNSIGNED_BYTE, false, true, true,
-                                           false));
+        m_attachments.push_back(Attachment(id, GL_STENCIL_ATTACHMENT_EXT, 0, GL_UNSIGNED_BYTE, false, true, true, false));
         // avoid checking gl status unless in debug mode
 #ifdef NDEBUG
         check();
@@ -513,8 +470,7 @@ namespace TwkGLF
             //        a message
             //
 
-            TWK_THROW_EXC_STREAM(
-                "ERROR: OpenGL: frame buffer incomplete: status = " << status);
+            TWK_THROW_EXC_STREAM("ERROR: OpenGL: frame buffer incomplete: status = " << status);
         }
     }
 
@@ -548,8 +504,7 @@ namespace TwkGLF
         // image.save("/Users/pbergeron/fbo.png");
     }
 
-    void GLFBO::copyTo(const GLFBO* destinationGLFBO, GLenum mask,
-                       GLenum filter) const
+    void GLFBO::copyTo(const GLFBO* destinationGLFBO, GLenum mask, GLenum filter) const
     {
         HOP_ZONE(HOP_ZONE_COLOR_6);
         HOP_CALL(glFinish();)
@@ -575,16 +530,13 @@ namespace TwkGLF
         bind(GL_READ_FRAMEBUFFER_EXT);
         destinationGLFBO->bind(GL_DRAW_FRAMEBUFFER_EXT);
 
-        glBlitFramebufferEXT(srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1,
-                             dstY1, mask, filter);
+        glBlitFramebufferEXT(srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1, mask, filter);
 
         HOP_CALL(glFinish();)
     }
 
-    void GLFBO::copyRegionTo(const GLFBO* destinationGLFBO, float srcX,
-                             float srcY, float srcW, float srcH, float dstX,
-                             float dstY, float dstW, float dstH, GLenum mask,
-                             GLenum filter) const
+    void GLFBO::copyRegionTo(const GLFBO* destinationGLFBO, float srcX, float srcY, float srcW, float srcH, float dstX, float dstY,
+                             float dstW, float dstH, GLenum mask, GLenum filter) const
     {
         const float sw = float(width());
         const float sh = float(height());
@@ -604,8 +556,7 @@ namespace TwkGLF
         bind(GL_READ_FRAMEBUFFER_EXT);
         destinationGLFBO->bind(GL_DRAW_FRAMEBUFFER_EXT);
 
-        glBlitFramebufferEXT(srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1,
-                             dstY1, mask, filter);
+        glBlitFramebufferEXT(srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1, mask, filter);
         TWK_GLDEBUG;
     }
 
@@ -686,8 +637,7 @@ namespace TwkGLF
     {
         if (m_pbo)
             return;
-        size_t totalSizeInBytes =
-            m_width * m_height * pixelSizeOfInternalFormat(m_colorFormat);
+        size_t totalSizeInBytes = m_width * m_height * pixelSizeOfInternalFormat(m_colorFormat);
         glGenBuffers(1, &m_pbo);
         TWK_GLDEBUG;
         glBindBuffer(GL_PIXEL_PACK_BUFFER_ARB, m_pbo);
@@ -750,8 +700,7 @@ namespace TwkGLF
     {
         glBindBuffer(GL_PIXEL_PACK_BUFFER_ARB, m_pbo);
         TWK_GLDEBUG;
-        m_mappedBuffer =
-            glMapBuffer(GL_PIXEL_PACK_BUFFER_ARB, GL_READ_ONLY_ARB);
+        m_mappedBuffer = glMapBuffer(GL_PIXEL_PACK_BUFFER_ARB, GL_READ_ONLY_ARB);
         TWK_GLDEBUG;
         m_state = Mapped;
 

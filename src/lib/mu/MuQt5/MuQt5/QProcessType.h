@@ -39,8 +39,7 @@ namespace Mu
         //  Constructors
         //
 
-        QProcessType(Context* context, const char* name, Class* superClass = 0,
-                     Class* superClass2 = 0);
+        QProcessType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QProcessType();
 
@@ -84,15 +83,9 @@ namespace Mu
         virtual qint64 size() const;
 
     public:
-        void setProcessState_pub(QProcess::ProcessState state)
-        {
-            setProcessState(state);
-        }
+        void setProcessState_pub(QProcess::ProcessState state) { setProcessState(state); }
 
-        void setProcessState_pub_parent(QProcess::ProcessState state)
-        {
-            QProcess::setProcessState(state);
-        }
+        void setProcessState_pub_parent(QProcess::ProcessState state) { QProcess::setProcessState(state); }
 
         void setupChildProcess_pub() { setupChildProcess(); }
 
@@ -104,11 +97,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance*
-    QProcessType::cachedInstance(const QProcessType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QProcessType::cachedInstance(const QProcessType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

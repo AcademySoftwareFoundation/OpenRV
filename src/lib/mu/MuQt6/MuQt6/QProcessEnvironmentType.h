@@ -47,8 +47,7 @@ namespace Mu
         //  Constructors
         //
 
-        QProcessEnvironmentType(Context* context, const char* name,
-                                Class* superClass = 0);
+        QProcessEnvironmentType(Context* context, const char* name, Class* superClass = 0);
         virtual ~QProcessEnvironmentType();
 
         //

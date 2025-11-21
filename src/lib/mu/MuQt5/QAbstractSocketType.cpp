@@ -55,17 +55,15 @@ namespace Mu
         _baseType = 0;
     }
 
-    MuQt_QAbstractSocket::MuQt_QAbstractSocket(
-        Pointer muobj, const CallEnvironment* ce,
-        QAbstractSocket::SocketType socketType, QObject* parent)
+    MuQt_QAbstractSocket::MuQt_QAbstractSocket(Pointer muobj, const CallEnvironment* ce, QAbstractSocket::SocketType socketType,
+                                               QObject* parent)
         : QAbstractSocket(socketType, parent)
     {
         _env = ce;
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QAbstractSocketType>(
-            c->internName("qt.QAbstractSocket"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QAbstractSocketType>(c->internName("qt.QAbstractSocket"));
     }
 
     void MuQt_QAbstractSocket::disconnectFromHost()
@@ -135,9 +133,7 @@ namespace Mu
         }
     }
 
-    void
-    MuQt_QAbstractSocket::setSocketOption(QAbstractSocket::SocketOption option,
-                                          const QVariant& value)
+    void MuQt_QAbstractSocket::setSocketOption(QAbstractSocket::SocketOption option, const QVariant& value)
     {
         if (!_env)
         {
@@ -161,8 +157,7 @@ namespace Mu
         }
     }
 
-    QVariant
-    MuQt_QAbstractSocket::socketOption(QAbstractSocket::SocketOption option)
+    QVariant MuQt_QAbstractSocket::socketOption(QAbstractSocket::SocketOption option)
     {
         if (!_env)
             return QAbstractSocket::socketOption(option);
@@ -494,8 +489,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  Mu Type CONSTRUCTORS
 
-    QAbstractSocketType::QAbstractSocketType(Context* c, const char* name,
-                                             Class* super, Class* super2)
+    QAbstractSocketType::QAbstractSocketType(Context* c, const char* name, Class* super, Class* super2)
         : Class(c, name, vectorOf2(super, super2))
     {
     }
@@ -505,8 +499,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    static Pointer QAbstractSocket_QAbstractSocket_QObject(Thread& NODE_THREAD,
-                                                           Pointer obj)
+    static Pointer QAbstractSocket_QAbstractSocket_QObject(Thread& NODE_THREAD, Pointer obj)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         ClassInstance* widget = reinterpret_cast<ClassInstance*>(obj);
@@ -517,9 +510,7 @@ namespace Mu
         }
         else if (QAbstractSocket* w = object<QAbstractSocket>(widget))
         {
-            QAbstractSocketType* type =
-                c->findSymbolOfTypeByQualifiedName<QAbstractSocketType>(
-                    c->internName("qt.QAbstractSocket"), false);
+            QAbstractSocketType* type = c->findSymbolOfTypeByQualifiedName<QAbstractSocketType>(c->internName("qt.QAbstractSocket"), false);
             ClassInstance* o = ClassInstance::allocate(type);
             setobject(o, w);
             return o;
@@ -532,35 +523,27 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(castFromObject, Pointer)
     {
-        NODE_RETURN(QAbstractSocket_QAbstractSocket_QObject(
-            NODE_THREAD, NODE_ARG(0, Pointer)));
+        NODE_RETURN(QAbstractSocket_QAbstractSocket_QObject(NODE_THREAD, NODE_ARG(0, Pointer)));
     }
 
-    Pointer
-    qt_QAbstractSocket_QAbstractSocket_QAbstractSocket_QAbstractSocket_int_QObject(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_socketType,
-        Pointer param_parent)
+    Pointer qt_QAbstractSocket_QAbstractSocket_QAbstractSocket_QAbstractSocket_int_QObject(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                           int param_socketType, Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-        QAbstractSocket::SocketType arg1 =
-            (QAbstractSocket::SocketType)(param_socketType);
+        QAbstractSocket::SocketType arg1 = (QAbstractSocket::SocketType)(param_socketType);
         QObject* arg2 = object<QObject>(param_parent);
-        setobject(param_this, new MuQt_QAbstractSocket(
-                                  param_this, NODE_THREAD.process()->callEnv(),
-                                  arg1, arg2));
+        setobject(param_this, new MuQt_QAbstractSocket(param_this, NODE_THREAD.process()->callEnv(), arg1, arg2));
         return param_this;
     }
 
-    void qt_QAbstractSocket_abort_void_QAbstractSocket(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this)
+    void qt_QAbstractSocket_abort_void_QAbstractSocket(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSocket* arg0 = object<QAbstractSocket>(param_this);
         arg0->abort();
     }
 
-    void qt_QAbstractSocket_disconnectFromHost_void_QAbstractSocket(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    void qt_QAbstractSocket_disconnectFromHost_void_QAbstractSocket(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSocket* arg0 = object<QAbstractSocket>(param_this);
@@ -570,77 +553,63 @@ namespace Mu
             arg0->disconnectFromHost();
     }
 
-    int qt_QAbstractSocket_error_int_QAbstractSocket(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_this)
+    int qt_QAbstractSocket_error_int_QAbstractSocket(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSocket* arg0 = object<QAbstractSocket>(param_this);
         return int(arg0->error());
     }
 
-    bool qt_QAbstractSocket_flush_bool_QAbstractSocket(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this)
+    bool qt_QAbstractSocket_flush_bool_QAbstractSocket(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSocket* arg0 = object<QAbstractSocket>(param_this);
         return arg0->flush();
     }
 
-    bool
-    qt_QAbstractSocket_isValid_bool_QAbstractSocket(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this)
+    bool qt_QAbstractSocket_isValid_bool_QAbstractSocket(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSocket* arg0 = object<QAbstractSocket>(param_this);
         return arg0->isValid();
     }
 
-    Pointer qt_QAbstractSocket_localAddress_QHostAddress_QAbstractSocket(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QAbstractSocket_localAddress_QHostAddress_QAbstractSocket(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSocket* arg0 = object<QAbstractSocket>(param_this);
-        return makeqtype<QHostAddressType>(c, arg0->localAddress(),
-                                           "qt.QHostAddress");
+        return makeqtype<QHostAddressType>(c, arg0->localAddress(), "qt.QHostAddress");
     }
 
-    int
-    qt_QAbstractSocket_pauseMode_int_QAbstractSocket(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_this)
+    int qt_QAbstractSocket_pauseMode_int_QAbstractSocket(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSocket* arg0 = object<QAbstractSocket>(param_this);
         return int(arg0->pauseMode());
     }
 
-    Pointer qt_QAbstractSocket_peerAddress_QHostAddress_QAbstractSocket(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QAbstractSocket_peerAddress_QHostAddress_QAbstractSocket(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSocket* arg0 = object<QAbstractSocket>(param_this);
-        return makeqtype<QHostAddressType>(c, arg0->peerAddress(),
-                                           "qt.QHostAddress");
+        return makeqtype<QHostAddressType>(c, arg0->peerAddress(), "qt.QHostAddress");
     }
 
-    Pointer
-    qt_QAbstractSocket_peerName_string_QAbstractSocket(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this)
+    Pointer qt_QAbstractSocket_peerName_string_QAbstractSocket(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSocket* arg0 = object<QAbstractSocket>(param_this);
         return makestring(c, arg0->peerName());
     }
 
-    int64 qt_QAbstractSocket_readBufferSize_int64_QAbstractSocket(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    int64 qt_QAbstractSocket_readBufferSize_int64_QAbstractSocket(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSocket* arg0 = object<QAbstractSocket>(param_this);
         return arg0->readBufferSize();
     }
 
-    void qt_QAbstractSocket_resume_void_QAbstractSocket(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this)
+    void qt_QAbstractSocket_resume_void_QAbstractSocket(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSocket* arg0 = object<QAbstractSocket>(param_this);
@@ -650,18 +619,15 @@ namespace Mu
             arg0->resume();
     }
 
-    void qt_QAbstractSocket_setPauseMode_void_QAbstractSocket_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_pauseMode)
+    void qt_QAbstractSocket_setPauseMode_void_QAbstractSocket_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_pauseMode)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSocket* arg0 = object<QAbstractSocket>(param_this);
-        QAbstractSocket::PauseModes arg1 =
-            (QAbstractSocket::PauseModes)(param_pauseMode);
+        QAbstractSocket::PauseModes arg1 = (QAbstractSocket::PauseModes)(param_pauseMode);
         arg0->setPauseMode(arg1);
     }
 
-    void qt_QAbstractSocket_setReadBufferSize_void_QAbstractSocket_int64(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int64 param_size)
+    void qt_QAbstractSocket_setReadBufferSize_void_QAbstractSocket_int64(Mu::Thread& NODE_THREAD, Pointer param_this, int64 param_size)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSocket* arg0 = object<QAbstractSocket>(param_this);
@@ -672,14 +638,12 @@ namespace Mu
             arg0->setReadBufferSize(arg1);
     }
 
-    void qt_QAbstractSocket_setSocketOption_void_QAbstractSocket_int_QVariant(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_option,
-        Pointer param_value)
+    void qt_QAbstractSocket_setSocketOption_void_QAbstractSocket_int_QVariant(Mu::Thread& NODE_THREAD, Pointer param_this, int param_option,
+                                                                              Pointer param_value)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSocket* arg0 = object<QAbstractSocket>(param_this);
-        QAbstractSocket::SocketOption arg1 =
-            (QAbstractSocket::SocketOption)(param_option);
+        QAbstractSocket::SocketOption arg1 = (QAbstractSocket::SocketOption)(param_option);
         const QVariant arg2 = getqtype<QVariantType>(param_value);
         if (isMuQtObject(arg0))
             arg0->QAbstractSocket::setSocketOption(arg1, arg2);
@@ -687,99 +651,74 @@ namespace Mu
             arg0->setSocketOption(arg1, arg2);
     }
 
-    Pointer qt_QAbstractSocket_socketOption_QVariant_QAbstractSocket_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_option)
+    Pointer qt_QAbstractSocket_socketOption_QVariant_QAbstractSocket_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_option)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSocket* arg0 = object<QAbstractSocket>(param_this);
-        QAbstractSocket::SocketOption arg1 =
-            (QAbstractSocket::SocketOption)(param_option);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QVariantType>(
-                         c, arg0->QAbstractSocket::socketOption(arg1),
-                         "qt.QVariant")
-                   : makeqtype<QVariantType>(c, arg0->socketOption(arg1),
-                                             "qt.QVariant");
+        QAbstractSocket::SocketOption arg1 = (QAbstractSocket::SocketOption)(param_option);
+        return isMuQtObject(arg0) ? makeqtype<QVariantType>(c, arg0->QAbstractSocket::socketOption(arg1), "qt.QVariant")
+                                  : makeqtype<QVariantType>(c, arg0->socketOption(arg1), "qt.QVariant");
     }
 
-    int
-    qt_QAbstractSocket_socketType_int_QAbstractSocket(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    int qt_QAbstractSocket_socketType_int_QAbstractSocket(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSocket* arg0 = object<QAbstractSocket>(param_this);
         return int(arg0->socketType());
     }
 
-    int qt_QAbstractSocket_state_int_QAbstractSocket(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_this)
+    int qt_QAbstractSocket_state_int_QAbstractSocket(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSocket* arg0 = object<QAbstractSocket>(param_this);
         return int(arg0->state());
     }
 
-    bool qt_QAbstractSocket_waitForConnected_bool_QAbstractSocket_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_msecs)
+    bool qt_QAbstractSocket_waitForConnected_bool_QAbstractSocket_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_msecs)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSocket* arg0 = object<QAbstractSocket>(param_this);
         int arg1 = (int)(param_msecs);
-        return isMuQtObject(arg0)
-                   ? arg0->QAbstractSocket::waitForConnected(arg1)
-                   : arg0->waitForConnected(arg1);
+        return isMuQtObject(arg0) ? arg0->QAbstractSocket::waitForConnected(arg1) : arg0->waitForConnected(arg1);
     }
 
-    bool qt_QAbstractSocket_waitForDisconnected_bool_QAbstractSocket_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_msecs)
+    bool qt_QAbstractSocket_waitForDisconnected_bool_QAbstractSocket_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_msecs)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSocket* arg0 = object<QAbstractSocket>(param_this);
         int arg1 = (int)(param_msecs);
-        return isMuQtObject(arg0)
-                   ? arg0->QAbstractSocket::waitForDisconnected(arg1)
-                   : arg0->waitForDisconnected(arg1);
+        return isMuQtObject(arg0) ? arg0->QAbstractSocket::waitForDisconnected(arg1) : arg0->waitForDisconnected(arg1);
     }
 
-    bool qt_QAbstractSocket_atEnd_bool_QAbstractSocket(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this)
+    bool qt_QAbstractSocket_atEnd_bool_QAbstractSocket(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSocket* arg0 = object<QAbstractSocket>(param_this);
-        return isMuQtObject(arg0) ? arg0->QAbstractSocket::atEnd()
-                                  : arg0->atEnd();
+        return isMuQtObject(arg0) ? arg0->QAbstractSocket::atEnd() : arg0->atEnd();
     }
 
-    int64 qt_QAbstractSocket_bytesAvailable_int64_QAbstractSocket(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    int64 qt_QAbstractSocket_bytesAvailable_int64_QAbstractSocket(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSocket* arg0 = object<QAbstractSocket>(param_this);
-        return isMuQtObject(arg0) ? arg0->QAbstractSocket::bytesAvailable()
-                                  : arg0->bytesAvailable();
+        return isMuQtObject(arg0) ? arg0->QAbstractSocket::bytesAvailable() : arg0->bytesAvailable();
     }
 
-    int64 qt_QAbstractSocket_bytesToWrite_int64_QAbstractSocket(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    int64 qt_QAbstractSocket_bytesToWrite_int64_QAbstractSocket(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSocket* arg0 = object<QAbstractSocket>(param_this);
-        return isMuQtObject(arg0) ? arg0->QAbstractSocket::bytesToWrite()
-                                  : arg0->bytesToWrite();
+        return isMuQtObject(arg0) ? arg0->QAbstractSocket::bytesToWrite() : arg0->bytesToWrite();
     }
 
-    bool
-    qt_QAbstractSocket_canReadLine_bool_QAbstractSocket(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this)
+    bool qt_QAbstractSocket_canReadLine_bool_QAbstractSocket(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSocket* arg0 = object<QAbstractSocket>(param_this);
-        return isMuQtObject(arg0) ? arg0->QAbstractSocket::canReadLine()
-                                  : arg0->canReadLine();
+        return isMuQtObject(arg0) ? arg0->QAbstractSocket::canReadLine() : arg0->canReadLine();
     }
 
-    void qt_QAbstractSocket_close_void_QAbstractSocket(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this)
+    void qt_QAbstractSocket_close_void_QAbstractSocket(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSocket* arg0 = object<QAbstractSocket>(param_this);
@@ -789,39 +728,31 @@ namespace Mu
             arg0->close();
     }
 
-    bool qt_QAbstractSocket_isSequential_bool_QAbstractSocket(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    bool qt_QAbstractSocket_isSequential_bool_QAbstractSocket(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSocket* arg0 = object<QAbstractSocket>(param_this);
-        return isMuQtObject(arg0) ? arg0->QAbstractSocket::isSequential()
-                                  : arg0->isSequential();
+        return isMuQtObject(arg0) ? arg0->QAbstractSocket::isSequential() : arg0->isSequential();
     }
 
-    bool qt_QAbstractSocket_waitForBytesWritten_bool_QAbstractSocket_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_msecs)
-    {
-        MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-        QAbstractSocket* arg0 = object<QAbstractSocket>(param_this);
-        int arg1 = (int)(param_msecs);
-        return isMuQtObject(arg0)
-                   ? arg0->QAbstractSocket::waitForBytesWritten(arg1)
-                   : arg0->waitForBytesWritten(arg1);
-    }
-
-    bool qt_QAbstractSocket_waitForReadyRead_bool_QAbstractSocket_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_msecs)
+    bool qt_QAbstractSocket_waitForBytesWritten_bool_QAbstractSocket_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_msecs)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSocket* arg0 = object<QAbstractSocket>(param_this);
         int arg1 = (int)(param_msecs);
-        return isMuQtObject(arg0)
-                   ? arg0->QAbstractSocket::waitForReadyRead(arg1)
-                   : arg0->waitForReadyRead(arg1);
+        return isMuQtObject(arg0) ? arg0->QAbstractSocket::waitForBytesWritten(arg1) : arg0->waitForBytesWritten(arg1);
     }
 
-    void qt_QAbstractSocket_setLocalAddress_void_QAbstractSocket_QHostAddress(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_address)
+    bool qt_QAbstractSocket_waitForReadyRead_bool_QAbstractSocket_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_msecs)
+    {
+        MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
+        QAbstractSocket* arg0 = object<QAbstractSocket>(param_this);
+        int arg1 = (int)(param_msecs);
+        return isMuQtObject(arg0) ? arg0->QAbstractSocket::waitForReadyRead(arg1) : arg0->waitForReadyRead(arg1);
+    }
+
+    void qt_QAbstractSocket_setLocalAddress_void_QAbstractSocket_QHostAddress(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                              Pointer param_address)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSocket* arg0 = object<QAbstractSocket>(param_this);
@@ -829,8 +760,8 @@ namespace Mu
         ((MuQt_QAbstractSocket*)arg0)->setLocalAddress_pub(arg1);
     }
 
-    void qt_QAbstractSocket_setPeerAddress_void_QAbstractSocket_QHostAddress(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_address)
+    void qt_QAbstractSocket_setPeerAddress_void_QAbstractSocket_QHostAddress(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                             Pointer param_address)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSocket* arg0 = object<QAbstractSocket>(param_this);
@@ -838,8 +769,7 @@ namespace Mu
         ((MuQt_QAbstractSocket*)arg0)->setPeerAddress_pub(arg1);
     }
 
-    void qt_QAbstractSocket_setPeerName_void_QAbstractSocket_string(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_name)
+    void qt_QAbstractSocket_setPeerName_void_QAbstractSocket_string(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_name)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSocket* arg0 = object<QAbstractSocket>(param_this);
@@ -847,307 +777,249 @@ namespace Mu
         ((MuQt_QAbstractSocket*)arg0)->setPeerName_pub(arg1);
     }
 
-    void qt_QAbstractSocket_setSocketError_void_QAbstractSocket_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_socketError)
+    void qt_QAbstractSocket_setSocketError_void_QAbstractSocket_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_socketError)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSocket* arg0 = object<QAbstractSocket>(param_this);
-        QAbstractSocket::SocketError arg1 =
-            (QAbstractSocket::SocketError)(param_socketError);
+        QAbstractSocket::SocketError arg1 = (QAbstractSocket::SocketError)(param_socketError);
         ((MuQt_QAbstractSocket*)arg0)->setSocketError_pub(arg1);
     }
 
-    void qt_QAbstractSocket_setSocketState_void_QAbstractSocket_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_state)
+    void qt_QAbstractSocket_setSocketState_void_QAbstractSocket_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_state)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSocket* arg0 = object<QAbstractSocket>(param_this);
-        QAbstractSocket::SocketState arg1 =
-            (QAbstractSocket::SocketState)(param_state);
+        QAbstractSocket::SocketState arg1 = (QAbstractSocket::SocketState)(param_state);
         ((MuQt_QAbstractSocket*)arg0)->setSocketState_pub(arg1);
     }
 
-    bool qt_QAbstractSocket_open_bool_QAbstractSocket_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_mode)
+    bool qt_QAbstractSocket_open_bool_QAbstractSocket_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_mode)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSocket* arg0 = object<QAbstractSocket>(param_this);
         QIODevice::OpenMode arg1 = (QIODevice::OpenMode)(param_mode);
-        return isMuQtObject(arg0) ? arg0->QAbstractSocket::open(arg1)
-                                  : arg0->open(arg1);
+        return isMuQtObject(arg0) ? arg0->QAbstractSocket::open(arg1) : arg0->open(arg1);
     }
 
-    int64 qt_QAbstractSocket_pos_int64_QAbstractSocket(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this)
+    int64 qt_QAbstractSocket_pos_int64_QAbstractSocket(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSocket* arg0 = object<QAbstractSocket>(param_this);
         return isMuQtObject(arg0) ? arg0->QAbstractSocket::pos() : arg0->pos();
     }
 
-    bool qt_QAbstractSocket_reset_bool_QAbstractSocket(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this)
+    bool qt_QAbstractSocket_reset_bool_QAbstractSocket(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSocket* arg0 = object<QAbstractSocket>(param_this);
-        return isMuQtObject(arg0) ? arg0->QAbstractSocket::reset()
-                                  : arg0->reset();
+        return isMuQtObject(arg0) ? arg0->QAbstractSocket::reset() : arg0->reset();
     }
 
-    bool qt_QAbstractSocket_seek_bool_QAbstractSocket_int64(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int64 param_pos)
+    bool qt_QAbstractSocket_seek_bool_QAbstractSocket_int64(Mu::Thread& NODE_THREAD, Pointer param_this, int64 param_pos)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSocket* arg0 = object<QAbstractSocket>(param_this);
         qint64 arg1 = (int64)(param_pos);
-        return isMuQtObject(arg0) ? arg0->QAbstractSocket::seek(arg1)
-                                  : arg0->seek(arg1);
+        return isMuQtObject(arg0) ? arg0->QAbstractSocket::seek(arg1) : arg0->seek(arg1);
     }
 
-    int64 qt_QAbstractSocket_size_int64_QAbstractSocket(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this)
+    int64 qt_QAbstractSocket_size_int64_QAbstractSocket(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSocket* arg0 = object<QAbstractSocket>(param_this);
-        return isMuQtObject(arg0) ? arg0->QAbstractSocket::size()
-                                  : arg0->size();
+        return isMuQtObject(arg0) ? arg0->QAbstractSocket::size() : arg0->size();
     }
 
     static NODE_IMPLEMENTATION(_n_QAbstractSocket0, Pointer)
     {
-        NODE_RETURN(
-            qt_QAbstractSocket_QAbstractSocket_QAbstractSocket_QAbstractSocket_int_QObject(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-                NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QAbstractSocket_QAbstractSocket_QAbstractSocket_QAbstractSocket_int_QObject(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                                   NODE_ARG(1, int), NODE_ARG(2, Pointer)));
     }
 
-    static NODE_IMPLEMENTATION(_n_abort0, void)
-    {
-        qt_QAbstractSocket_abort_void_QAbstractSocket(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
-    }
+    static NODE_IMPLEMENTATION(_n_abort0, void) { qt_QAbstractSocket_abort_void_QAbstractSocket(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)); }
 
     static NODE_IMPLEMENTATION(_n_disconnectFromHost0, void)
     {
-        qt_QAbstractSocket_disconnectFromHost_void_QAbstractSocket(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
+        qt_QAbstractSocket_disconnectFromHost_void_QAbstractSocket(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_error0, int)
     {
-        NODE_RETURN(qt_QAbstractSocket_error_int_QAbstractSocket(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QAbstractSocket_error_int_QAbstractSocket(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_flush0, bool)
     {
-        NODE_RETURN(qt_QAbstractSocket_flush_bool_QAbstractSocket(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QAbstractSocket_flush_bool_QAbstractSocket(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isValid0, bool)
     {
-        NODE_RETURN(qt_QAbstractSocket_isValid_bool_QAbstractSocket(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QAbstractSocket_isValid_bool_QAbstractSocket(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_localAddress0, Pointer)
     {
-        NODE_RETURN(
-            qt_QAbstractSocket_localAddress_QHostAddress_QAbstractSocket(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QAbstractSocket_localAddress_QHostAddress_QAbstractSocket(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_pauseMode0, int)
     {
-        NODE_RETURN(qt_QAbstractSocket_pauseMode_int_QAbstractSocket(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QAbstractSocket_pauseMode_int_QAbstractSocket(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_peerAddress0, Pointer)
     {
-        NODE_RETURN(qt_QAbstractSocket_peerAddress_QHostAddress_QAbstractSocket(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QAbstractSocket_peerAddress_QHostAddress_QAbstractSocket(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_peerName0, Pointer)
     {
-        NODE_RETURN(qt_QAbstractSocket_peerName_string_QAbstractSocket(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QAbstractSocket_peerName_string_QAbstractSocket(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_readBufferSize0, int64)
     {
-        NODE_RETURN(qt_QAbstractSocket_readBufferSize_int64_QAbstractSocket(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QAbstractSocket_readBufferSize_int64_QAbstractSocket(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_resume0, void)
     {
-        qt_QAbstractSocket_resume_void_QAbstractSocket(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
+        qt_QAbstractSocket_resume_void_QAbstractSocket(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setPauseMode0, void)
     {
-        qt_QAbstractSocket_setPauseMode_void_QAbstractSocket_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QAbstractSocket_setPauseMode_void_QAbstractSocket_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setReadBufferSize0, void)
     {
-        qt_QAbstractSocket_setReadBufferSize_void_QAbstractSocket_int64(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int64));
+        qt_QAbstractSocket_setReadBufferSize_void_QAbstractSocket_int64(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int64));
     }
 
     static NODE_IMPLEMENTATION(_n_setSocketOption0, void)
     {
-        qt_QAbstractSocket_setSocketOption_void_QAbstractSocket_int_QVariant(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, Pointer));
+        qt_QAbstractSocket_setSocketOption_void_QAbstractSocket_int_QVariant(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                             NODE_ARG(2, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_socketOption0, Pointer)
     {
         NODE_RETURN(
-            qt_QAbstractSocket_socketOption_QVariant_QAbstractSocket_int(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+            qt_QAbstractSocket_socketOption_QVariant_QAbstractSocket_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_socketType0, int)
     {
-        NODE_RETURN(qt_QAbstractSocket_socketType_int_QAbstractSocket(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QAbstractSocket_socketType_int_QAbstractSocket(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_state0, int)
     {
-        NODE_RETURN(qt_QAbstractSocket_state_int_QAbstractSocket(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QAbstractSocket_state_int_QAbstractSocket(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_waitForConnected0, bool)
     {
         NODE_RETURN(
-            qt_QAbstractSocket_waitForConnected_bool_QAbstractSocket_int(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+            qt_QAbstractSocket_waitForConnected_bool_QAbstractSocket_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_waitForDisconnected0, bool)
     {
         NODE_RETURN(
-            qt_QAbstractSocket_waitForDisconnected_bool_QAbstractSocket_int(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+            qt_QAbstractSocket_waitForDisconnected_bool_QAbstractSocket_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_atEnd0, bool)
     {
-        NODE_RETURN(qt_QAbstractSocket_atEnd_bool_QAbstractSocket(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QAbstractSocket_atEnd_bool_QAbstractSocket(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_bytesAvailable0, int64)
     {
-        NODE_RETURN(qt_QAbstractSocket_bytesAvailable_int64_QAbstractSocket(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QAbstractSocket_bytesAvailable_int64_QAbstractSocket(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_bytesToWrite0, int64)
     {
-        NODE_RETURN(qt_QAbstractSocket_bytesToWrite_int64_QAbstractSocket(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QAbstractSocket_bytesToWrite_int64_QAbstractSocket(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_canReadLine0, bool)
     {
-        NODE_RETURN(qt_QAbstractSocket_canReadLine_bool_QAbstractSocket(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QAbstractSocket_canReadLine_bool_QAbstractSocket(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
-    static NODE_IMPLEMENTATION(_n_close0, void)
-    {
-        qt_QAbstractSocket_close_void_QAbstractSocket(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
-    }
+    static NODE_IMPLEMENTATION(_n_close0, void) { qt_QAbstractSocket_close_void_QAbstractSocket(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)); }
 
     static NODE_IMPLEMENTATION(_n_isSequential0, bool)
     {
-        NODE_RETURN(qt_QAbstractSocket_isSequential_bool_QAbstractSocket(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QAbstractSocket_isSequential_bool_QAbstractSocket(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_waitForBytesWritten0, bool)
     {
         NODE_RETURN(
-            qt_QAbstractSocket_waitForBytesWritten_bool_QAbstractSocket_int(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+            qt_QAbstractSocket_waitForBytesWritten_bool_QAbstractSocket_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_waitForReadyRead0, bool)
     {
         NODE_RETURN(
-            qt_QAbstractSocket_waitForReadyRead_bool_QAbstractSocket_int(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+            qt_QAbstractSocket_waitForReadyRead_bool_QAbstractSocket_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_setLocalAddress0, void)
     {
-        qt_QAbstractSocket_setLocalAddress_void_QAbstractSocket_QHostAddress(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractSocket_setLocalAddress_void_QAbstractSocket_QHostAddress(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                             NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setPeerAddress0, void)
     {
-        qt_QAbstractSocket_setPeerAddress_void_QAbstractSocket_QHostAddress(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractSocket_setPeerAddress_void_QAbstractSocket_QHostAddress(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setPeerName0, void)
     {
-        qt_QAbstractSocket_setPeerName_void_QAbstractSocket_string(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractSocket_setPeerName_void_QAbstractSocket_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setSocketError0, void)
     {
-        qt_QAbstractSocket_setSocketError_void_QAbstractSocket_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QAbstractSocket_setSocketError_void_QAbstractSocket_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setSocketState0, void)
     {
-        qt_QAbstractSocket_setSocketState_void_QAbstractSocket_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QAbstractSocket_setSocketState_void_QAbstractSocket_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_open0, bool)
     {
-        NODE_RETURN(qt_QAbstractSocket_open_bool_QAbstractSocket_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QAbstractSocket_open_bool_QAbstractSocket_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_pos0, int64)
     {
-        NODE_RETURN(qt_QAbstractSocket_pos_int64_QAbstractSocket(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QAbstractSocket_pos_int64_QAbstractSocket(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_reset0, bool)
     {
-        NODE_RETURN(qt_QAbstractSocket_reset_bool_QAbstractSocket(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QAbstractSocket_reset_bool_QAbstractSocket(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_seek0, bool)
     {
-        NODE_RETURN(qt_QAbstractSocket_seek_bool_QAbstractSocket_int64(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int64)));
+        NODE_RETURN(qt_QAbstractSocket_seek_bool_QAbstractSocket_int64(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int64)));
     }
 
     static NODE_IMPLEMENTATION(_n_size0, int64)
     {
-        NODE_RETURN(qt_QAbstractSocket_size_int64_QAbstractSocket(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QAbstractSocket_size_int64_QAbstractSocket(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     void QAbstractSocketType::load()
@@ -1167,17 +1039,13 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
-                   new Function(c, tn, castFromObject, Cast, Compiled,
-                                QAbstractSocket_QAbstractSocket_QObject, Return,
-                                ftn, Parameters,
+                   new Function(c, tn, castFromObject, Cast, Compiled, QAbstractSocket_QAbstractSocket_QObject, Return, ftn, Parameters,
                                 new Param(c, "object", "qt.QObject"), End),
 
                    EndArguments);
@@ -1185,118 +1053,53 @@ namespace Mu
         addSymbols(
             // enums
             new Alias(c, "NetworkLayerProtocol", "int"),
-            new SymbolicConstant(c, "IPv4Protocol", "int",
-                                 Value(int(QAbstractSocket::IPv4Protocol))),
-            new SymbolicConstant(c, "IPv6Protocol", "int",
-                                 Value(int(QAbstractSocket::IPv6Protocol))),
-            new SymbolicConstant(c, "AnyIPProtocol", "int",
-                                 Value(int(QAbstractSocket::AnyIPProtocol))),
-            new SymbolicConstant(
-                c, "UnknownNetworkLayerProtocol", "int",
-                Value(int(QAbstractSocket::UnknownNetworkLayerProtocol))),
+            new SymbolicConstant(c, "IPv4Protocol", "int", Value(int(QAbstractSocket::IPv4Protocol))),
+            new SymbolicConstant(c, "IPv6Protocol", "int", Value(int(QAbstractSocket::IPv6Protocol))),
+            new SymbolicConstant(c, "AnyIPProtocol", "int", Value(int(QAbstractSocket::AnyIPProtocol))),
+            new SymbolicConstant(c, "UnknownNetworkLayerProtocol", "int", Value(int(QAbstractSocket::UnknownNetworkLayerProtocol))),
             new Alias(c, "SocketError", "int"),
-            new SymbolicConstant(
-                c, "ConnectionRefusedError", "int",
-                Value(int(QAbstractSocket::ConnectionRefusedError))),
-            new SymbolicConstant(
-                c, "RemoteHostClosedError", "int",
-                Value(int(QAbstractSocket::RemoteHostClosedError))),
-            new SymbolicConstant(
-                c, "HostNotFoundError", "int",
-                Value(int(QAbstractSocket::HostNotFoundError))),
-            new SymbolicConstant(
-                c, "SocketAccessError", "int",
-                Value(int(QAbstractSocket::SocketAccessError))),
-            new SymbolicConstant(
-                c, "SocketResourceError", "int",
-                Value(int(QAbstractSocket::SocketResourceError))),
-            new SymbolicConstant(
-                c, "SocketTimeoutError", "int",
-                Value(int(QAbstractSocket::SocketTimeoutError))),
-            new SymbolicConstant(
-                c, "DatagramTooLargeError", "int",
-                Value(int(QAbstractSocket::DatagramTooLargeError))),
-            new SymbolicConstant(c, "NetworkError", "int",
-                                 Value(int(QAbstractSocket::NetworkError))),
-            new SymbolicConstant(
-                c, "AddressInUseError", "int",
-                Value(int(QAbstractSocket::AddressInUseError))),
-            new SymbolicConstant(
-                c, "SocketAddressNotAvailableError", "int",
-                Value(int(QAbstractSocket::SocketAddressNotAvailableError))),
-            new SymbolicConstant(
-                c, "UnsupportedSocketOperationError", "int",
-                Value(int(QAbstractSocket::UnsupportedSocketOperationError))),
-            new SymbolicConstant(
-                c, "ProxyAuthenticationRequiredError", "int",
-                Value(int(QAbstractSocket::ProxyAuthenticationRequiredError))),
-            new SymbolicConstant(
-                c, "SslHandshakeFailedError", "int",
-                Value(int(QAbstractSocket::SslHandshakeFailedError))),
-            new SymbolicConstant(
-                c, "UnfinishedSocketOperationError", "int",
-                Value(int(QAbstractSocket::UnfinishedSocketOperationError))),
-            new SymbolicConstant(
-                c, "ProxyConnectionRefusedError", "int",
-                Value(int(QAbstractSocket::ProxyConnectionRefusedError))),
-            new SymbolicConstant(
-                c, "ProxyConnectionClosedError", "int",
-                Value(int(QAbstractSocket::ProxyConnectionClosedError))),
-            new SymbolicConstant(
-                c, "ProxyConnectionTimeoutError", "int",
-                Value(int(QAbstractSocket::ProxyConnectionTimeoutError))),
-            new SymbolicConstant(
-                c, "ProxyNotFoundError", "int",
-                Value(int(QAbstractSocket::ProxyNotFoundError))),
-            new SymbolicConstant(
-                c, "ProxyProtocolError", "int",
-                Value(int(QAbstractSocket::ProxyProtocolError))),
-            new SymbolicConstant(c, "OperationError", "int",
-                                 Value(int(QAbstractSocket::OperationError))),
-            new SymbolicConstant(c, "SslInternalError", "int",
-                                 Value(int(QAbstractSocket::SslInternalError))),
-            new SymbolicConstant(
-                c, "SslInvalidUserDataError", "int",
-                Value(int(QAbstractSocket::SslInvalidUserDataError))),
-            new SymbolicConstant(c, "TemporaryError", "int",
-                                 Value(int(QAbstractSocket::TemporaryError))),
-            new SymbolicConstant(
-                c, "UnknownSocketError", "int",
-                Value(int(QAbstractSocket::UnknownSocketError))),
+            new SymbolicConstant(c, "ConnectionRefusedError", "int", Value(int(QAbstractSocket::ConnectionRefusedError))),
+            new SymbolicConstant(c, "RemoteHostClosedError", "int", Value(int(QAbstractSocket::RemoteHostClosedError))),
+            new SymbolicConstant(c, "HostNotFoundError", "int", Value(int(QAbstractSocket::HostNotFoundError))),
+            new SymbolicConstant(c, "SocketAccessError", "int", Value(int(QAbstractSocket::SocketAccessError))),
+            new SymbolicConstant(c, "SocketResourceError", "int", Value(int(QAbstractSocket::SocketResourceError))),
+            new SymbolicConstant(c, "SocketTimeoutError", "int", Value(int(QAbstractSocket::SocketTimeoutError))),
+            new SymbolicConstant(c, "DatagramTooLargeError", "int", Value(int(QAbstractSocket::DatagramTooLargeError))),
+            new SymbolicConstant(c, "NetworkError", "int", Value(int(QAbstractSocket::NetworkError))),
+            new SymbolicConstant(c, "AddressInUseError", "int", Value(int(QAbstractSocket::AddressInUseError))),
+            new SymbolicConstant(c, "SocketAddressNotAvailableError", "int", Value(int(QAbstractSocket::SocketAddressNotAvailableError))),
+            new SymbolicConstant(c, "UnsupportedSocketOperationError", "int", Value(int(QAbstractSocket::UnsupportedSocketOperationError))),
+            new SymbolicConstant(c, "ProxyAuthenticationRequiredError", "int",
+                                 Value(int(QAbstractSocket::ProxyAuthenticationRequiredError))),
+            new SymbolicConstant(c, "SslHandshakeFailedError", "int", Value(int(QAbstractSocket::SslHandshakeFailedError))),
+            new SymbolicConstant(c, "UnfinishedSocketOperationError", "int", Value(int(QAbstractSocket::UnfinishedSocketOperationError))),
+            new SymbolicConstant(c, "ProxyConnectionRefusedError", "int", Value(int(QAbstractSocket::ProxyConnectionRefusedError))),
+            new SymbolicConstant(c, "ProxyConnectionClosedError", "int", Value(int(QAbstractSocket::ProxyConnectionClosedError))),
+            new SymbolicConstant(c, "ProxyConnectionTimeoutError", "int", Value(int(QAbstractSocket::ProxyConnectionTimeoutError))),
+            new SymbolicConstant(c, "ProxyNotFoundError", "int", Value(int(QAbstractSocket::ProxyNotFoundError))),
+            new SymbolicConstant(c, "ProxyProtocolError", "int", Value(int(QAbstractSocket::ProxyProtocolError))),
+            new SymbolicConstant(c, "OperationError", "int", Value(int(QAbstractSocket::OperationError))),
+            new SymbolicConstant(c, "SslInternalError", "int", Value(int(QAbstractSocket::SslInternalError))),
+            new SymbolicConstant(c, "SslInvalidUserDataError", "int", Value(int(QAbstractSocket::SslInvalidUserDataError))),
+            new SymbolicConstant(c, "TemporaryError", "int", Value(int(QAbstractSocket::TemporaryError))),
+            new SymbolicConstant(c, "UnknownSocketError", "int", Value(int(QAbstractSocket::UnknownSocketError))),
             new Alias(c, "SocketState", "int"),
-            new SymbolicConstant(c, "UnconnectedState", "int",
-                                 Value(int(QAbstractSocket::UnconnectedState))),
-            new SymbolicConstant(c, "HostLookupState", "int",
-                                 Value(int(QAbstractSocket::HostLookupState))),
-            new SymbolicConstant(c, "ConnectingState", "int",
-                                 Value(int(QAbstractSocket::ConnectingState))),
-            new SymbolicConstant(c, "ConnectedState", "int",
-                                 Value(int(QAbstractSocket::ConnectedState))),
-            new SymbolicConstant(c, "BoundState", "int",
-                                 Value(int(QAbstractSocket::BoundState))),
-            new SymbolicConstant(c, "ClosingState", "int",
-                                 Value(int(QAbstractSocket::ClosingState))),
-            new SymbolicConstant(c, "ListeningState", "int",
-                                 Value(int(QAbstractSocket::ListeningState))),
-            new Alias(c, "SocketType", "int"),
-            new SymbolicConstant(c, "TcpSocket", "int",
-                                 Value(int(QAbstractSocket::TcpSocket))),
-            new SymbolicConstant(c, "UdpSocket", "int",
-                                 Value(int(QAbstractSocket::UdpSocket))),
-            new SymbolicConstant(
-                c, "UnknownSocketType", "int",
-                Value(int(QAbstractSocket::UnknownSocketType))),
+            new SymbolicConstant(c, "UnconnectedState", "int", Value(int(QAbstractSocket::UnconnectedState))),
+            new SymbolicConstant(c, "HostLookupState", "int", Value(int(QAbstractSocket::HostLookupState))),
+            new SymbolicConstant(c, "ConnectingState", "int", Value(int(QAbstractSocket::ConnectingState))),
+            new SymbolicConstant(c, "ConnectedState", "int", Value(int(QAbstractSocket::ConnectedState))),
+            new SymbolicConstant(c, "BoundState", "int", Value(int(QAbstractSocket::BoundState))),
+            new SymbolicConstant(c, "ClosingState", "int", Value(int(QAbstractSocket::ClosingState))),
+            new SymbolicConstant(c, "ListeningState", "int", Value(int(QAbstractSocket::ListeningState))),
+            new Alias(c, "SocketType", "int"), new SymbolicConstant(c, "TcpSocket", "int", Value(int(QAbstractSocket::TcpSocket))),
+            new SymbolicConstant(c, "UdpSocket", "int", Value(int(QAbstractSocket::UdpSocket))),
+            new SymbolicConstant(c, "UnknownSocketType", "int", Value(int(QAbstractSocket::UnknownSocketType))),
             // member functions
-            new Function(
-                c, "QAbstractSocket", _n_QAbstractSocket0, None, Compiled,
-                qt_QAbstractSocket_QAbstractSocket_QAbstractSocket_QAbstractSocket_int_QObject,
-                Return, "qt.QAbstractSocket", Parameters,
-                new Param(c, "this", "qt.QAbstractSocket"),
-                new Param(c, "socketType", "int"),
-                new Param(c, "parent", "qt.QObject"), End),
-            new Function(c, "abort", _n_abort0, None, Compiled,
-                         qt_QAbstractSocket_abort_void_QAbstractSocket, Return,
-                         "void", Parameters,
+            new Function(c, "QAbstractSocket", _n_QAbstractSocket0, None, Compiled,
+                         qt_QAbstractSocket_QAbstractSocket_QAbstractSocket_QAbstractSocket_int_QObject, Return, "qt.QAbstractSocket",
+                         Parameters, new Param(c, "this", "qt.QAbstractSocket"), new Param(c, "socketType", "int"),
+                         new Param(c, "parent", "qt.QObject"), End),
+            new Function(c, "abort", _n_abort0, None, Compiled, qt_QAbstractSocket_abort_void_QAbstractSocket, Return, "void", Parameters,
                          new Param(c, "this", "qt.QAbstractSocket"), End),
             // MISSING: bind (bool; QAbstractSocket this, QHostAddress address,
             // "quint16" port, flags QAbstractSocket::BindMode mode) MISSING:
@@ -1307,207 +1110,117 @@ namespace Mu
             // QAbstractSocket::NetworkLayerProtocol protocol) MISSING:
             // connectToHost (void; QAbstractSocket this, QHostAddress address,
             // "quint16" port, flags QIODevice::OpenModeFlag openMode)
-            _func[0] = new MemberFunction(
-                c, "disconnectFromHost", _n_disconnectFromHost0, None, Compiled,
-                qt_QAbstractSocket_disconnectFromHost_void_QAbstractSocket,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractSocket"), End),
-            new Function(c, "error", _n_error0, None, Compiled,
-                         qt_QAbstractSocket_error_int_QAbstractSocket, Return,
-                         "int", Parameters,
+            _func[0] = new MemberFunction(c, "disconnectFromHost", _n_disconnectFromHost0, None, Compiled,
+                                          qt_QAbstractSocket_disconnectFromHost_void_QAbstractSocket, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QAbstractSocket"), End),
+            new Function(c, "error", _n_error0, None, Compiled, qt_QAbstractSocket_error_int_QAbstractSocket, Return, "int", Parameters,
                          new Param(c, "this", "qt.QAbstractSocket"), End),
-            new Function(c, "flush", _n_flush0, None, Compiled,
-                         qt_QAbstractSocket_flush_bool_QAbstractSocket, Return,
-                         "bool", Parameters,
+            new Function(c, "flush", _n_flush0, None, Compiled, qt_QAbstractSocket_flush_bool_QAbstractSocket, Return, "bool", Parameters,
                          new Param(c, "this", "qt.QAbstractSocket"), End),
-            new Function(c, "isValid", _n_isValid0, None, Compiled,
-                         qt_QAbstractSocket_isValid_bool_QAbstractSocket,
-                         Return, "bool", Parameters,
-                         new Param(c, "this", "qt.QAbstractSocket"), End),
-            new Function(
-                c, "localAddress", _n_localAddress0, None, Compiled,
-                qt_QAbstractSocket_localAddress_QHostAddress_QAbstractSocket,
-                Return, "qt.QHostAddress", Parameters,
-                new Param(c, "this", "qt.QAbstractSocket"), End),
+            new Function(c, "isValid", _n_isValid0, None, Compiled, qt_QAbstractSocket_isValid_bool_QAbstractSocket, Return, "bool",
+                         Parameters, new Param(c, "this", "qt.QAbstractSocket"), End),
+            new Function(c, "localAddress", _n_localAddress0, None, Compiled, qt_QAbstractSocket_localAddress_QHostAddress_QAbstractSocket,
+                         Return, "qt.QHostAddress", Parameters, new Param(c, "this", "qt.QAbstractSocket"), End),
             // MISSING: localPort ("quint16"; QAbstractSocket this)
-            new Function(c, "pauseMode", _n_pauseMode0, None, Compiled,
-                         qt_QAbstractSocket_pauseMode_int_QAbstractSocket,
-                         Return, "int", Parameters,
-                         new Param(c, "this", "qt.QAbstractSocket"), End),
-            new Function(
-                c, "peerAddress", _n_peerAddress0, None, Compiled,
-                qt_QAbstractSocket_peerAddress_QHostAddress_QAbstractSocket,
-                Return, "qt.QHostAddress", Parameters,
-                new Param(c, "this", "qt.QAbstractSocket"), End),
-            new Function(c, "peerName", _n_peerName0, None, Compiled,
-                         qt_QAbstractSocket_peerName_string_QAbstractSocket,
-                         Return, "string", Parameters,
-                         new Param(c, "this", "qt.QAbstractSocket"), End),
+            new Function(c, "pauseMode", _n_pauseMode0, None, Compiled, qt_QAbstractSocket_pauseMode_int_QAbstractSocket, Return, "int",
+                         Parameters, new Param(c, "this", "qt.QAbstractSocket"), End),
+            new Function(c, "peerAddress", _n_peerAddress0, None, Compiled, qt_QAbstractSocket_peerAddress_QHostAddress_QAbstractSocket,
+                         Return, "qt.QHostAddress", Parameters, new Param(c, "this", "qt.QAbstractSocket"), End),
+            new Function(c, "peerName", _n_peerName0, None, Compiled, qt_QAbstractSocket_peerName_string_QAbstractSocket, Return, "string",
+                         Parameters, new Param(c, "this", "qt.QAbstractSocket"), End),
             // MISSING: peerPort ("quint16"; QAbstractSocket this)
             // MISSING: proxy ("QNetworkProxy"; QAbstractSocket this)
-            new Function(
-                c, "readBufferSize", _n_readBufferSize0, None, Compiled,
-                qt_QAbstractSocket_readBufferSize_int64_QAbstractSocket, Return,
-                "int64", Parameters, new Param(c, "this", "qt.QAbstractSocket"),
-                End),
-            _func[1] = new MemberFunction(
-                c, "resume", _n_resume0, None, Compiled,
-                qt_QAbstractSocket_resume_void_QAbstractSocket, Return, "void",
-                Parameters, new Param(c, "this", "qt.QAbstractSocket"), End),
-            new Function(
-                c, "setPauseMode", _n_setPauseMode0, None, Compiled,
-                qt_QAbstractSocket_setPauseMode_void_QAbstractSocket_int,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractSocket"),
-                new Param(c, "pauseMode", "int"), End),
+            new Function(c, "readBufferSize", _n_readBufferSize0, None, Compiled, qt_QAbstractSocket_readBufferSize_int64_QAbstractSocket,
+                         Return, "int64", Parameters, new Param(c, "this", "qt.QAbstractSocket"), End),
+            _func[1] = new MemberFunction(c, "resume", _n_resume0, None, Compiled, qt_QAbstractSocket_resume_void_QAbstractSocket, Return,
+                                          "void", Parameters, new Param(c, "this", "qt.QAbstractSocket"), End),
+            new Function(c, "setPauseMode", _n_setPauseMode0, None, Compiled, qt_QAbstractSocket_setPauseMode_void_QAbstractSocket_int,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QAbstractSocket"), new Param(c, "pauseMode", "int"), End),
             // MISSING: setProxy (void; QAbstractSocket this, "const
             // QNetworkProxy &" networkProxy)
-            _func[2] = new MemberFunction(
-                c, "setReadBufferSize", _n_setReadBufferSize0, None, Compiled,
-                qt_QAbstractSocket_setReadBufferSize_void_QAbstractSocket_int64,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractSocket"),
-                new Param(c, "size", "int64"), End),
+            _func[2] = new MemberFunction(c, "setReadBufferSize", _n_setReadBufferSize0, None, Compiled,
+                                          qt_QAbstractSocket_setReadBufferSize_void_QAbstractSocket_int64, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QAbstractSocket"), new Param(c, "size", "int64"), End),
             // MISSING: setSocketDescriptor (bool; QAbstractSocket this,
             // "qintptr" socketDescriptor, flags QAbstractSocket::SocketState
             // socketState, flags QIODevice::OpenModeFlag openMode)
-            _func[3] = new MemberFunction(
-                c, "setSocketOption", _n_setSocketOption0, None, Compiled,
-                qt_QAbstractSocket_setSocketOption_void_QAbstractSocket_int_QVariant,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractSocket"),
-                new Param(c, "option", "int"),
-                new Param(c, "value", "qt.QVariant"), End),
+            _func[3] = new MemberFunction(c, "setSocketOption", _n_setSocketOption0, None, Compiled,
+                                          qt_QAbstractSocket_setSocketOption_void_QAbstractSocket_int_QVariant, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QAbstractSocket"), new Param(c, "option", "int"),
+                                          new Param(c, "value", "qt.QVariant"), End),
             // MISSING: socketDescriptor ("qintptr"; QAbstractSocket this)
-            _func[4] = new MemberFunction(
-                c, "socketOption", _n_socketOption0, None, Compiled,
-                qt_QAbstractSocket_socketOption_QVariant_QAbstractSocket_int,
-                Return, "qt.QVariant", Parameters,
-                new Param(c, "this", "qt.QAbstractSocket"),
-                new Param(c, "option", "int"), End),
-            new Function(c, "socketType", _n_socketType0, None, Compiled,
-                         qt_QAbstractSocket_socketType_int_QAbstractSocket,
-                         Return, "int", Parameters,
+            _func[4] = new MemberFunction(c, "socketOption", _n_socketOption0, None, Compiled,
+                                          qt_QAbstractSocket_socketOption_QVariant_QAbstractSocket_int, Return, "qt.QVariant", Parameters,
+                                          new Param(c, "this", "qt.QAbstractSocket"), new Param(c, "option", "int"), End),
+            new Function(c, "socketType", _n_socketType0, None, Compiled, qt_QAbstractSocket_socketType_int_QAbstractSocket, Return, "int",
+                         Parameters, new Param(c, "this", "qt.QAbstractSocket"), End),
+            new Function(c, "state", _n_state0, None, Compiled, qt_QAbstractSocket_state_int_QAbstractSocket, Return, "int", Parameters,
                          new Param(c, "this", "qt.QAbstractSocket"), End),
-            new Function(c, "state", _n_state0, None, Compiled,
-                         qt_QAbstractSocket_state_int_QAbstractSocket, Return,
-                         "int", Parameters,
-                         new Param(c, "this", "qt.QAbstractSocket"), End),
-            _func[5] = new MemberFunction(
-                c, "waitForConnected", _n_waitForConnected0, None, Compiled,
-                qt_QAbstractSocket_waitForConnected_bool_QAbstractSocket_int,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QAbstractSocket"),
-                new Param(c, "msecs", "int", Value((int)30000)), End),
-            _func[6] = new MemberFunction(
-                c, "waitForDisconnected", _n_waitForDisconnected0, None,
-                Compiled,
-                qt_QAbstractSocket_waitForDisconnected_bool_QAbstractSocket_int,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QAbstractSocket"),
-                new Param(c, "msecs", "int", Value((int)30000)), End),
-            _func[7] = new MemberFunction(
-                c, "atEnd", _n_atEnd0, None, Compiled,
-                qt_QAbstractSocket_atEnd_bool_QAbstractSocket, Return, "bool",
-                Parameters, new Param(c, "this", "qt.QAbstractSocket"), End),
-            _func[8] = new MemberFunction(
-                c, "bytesAvailable", _n_bytesAvailable0, None, Compiled,
-                qt_QAbstractSocket_bytesAvailable_int64_QAbstractSocket, Return,
-                "int64", Parameters, new Param(c, "this", "qt.QAbstractSocket"),
-                End),
-            _func[9] = new MemberFunction(
-                c, "bytesToWrite", _n_bytesToWrite0, None, Compiled,
-                qt_QAbstractSocket_bytesToWrite_int64_QAbstractSocket, Return,
-                "int64", Parameters, new Param(c, "this", "qt.QAbstractSocket"),
-                End),
-            _func[10] = new MemberFunction(
-                c, "canReadLine", _n_canReadLine0, None, Compiled,
-                qt_QAbstractSocket_canReadLine_bool_QAbstractSocket, Return,
-                "bool", Parameters, new Param(c, "this", "qt.QAbstractSocket"),
-                End),
-            _func[11] = new MemberFunction(
-                c, "close", _n_close0, None, Compiled,
-                qt_QAbstractSocket_close_void_QAbstractSocket, Return, "void",
-                Parameters, new Param(c, "this", "qt.QAbstractSocket"), End),
-            _func[12] = new MemberFunction(
-                c, "isSequential", _n_isSequential0, None, Compiled,
-                qt_QAbstractSocket_isSequential_bool_QAbstractSocket, Return,
-                "bool", Parameters, new Param(c, "this", "qt.QAbstractSocket"),
-                End),
-            _func[13] = new MemberFunction(
-                c, "waitForBytesWritten", _n_waitForBytesWritten0, None,
-                Compiled,
-                qt_QAbstractSocket_waitForBytesWritten_bool_QAbstractSocket_int,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QAbstractSocket"),
-                new Param(c, "msecs", "int", Value((int)30000)), End),
-            _func[14] = new MemberFunction(
-                c, "waitForReadyRead", _n_waitForReadyRead0, None, Compiled,
-                qt_QAbstractSocket_waitForReadyRead_bool_QAbstractSocket_int,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QAbstractSocket"),
-                new Param(c, "msecs", "int", Value((int)30000)), End),
-            new Function(
-                c, "setLocalAddress", _n_setLocalAddress0, None, Compiled,
-                qt_QAbstractSocket_setLocalAddress_void_QAbstractSocket_QHostAddress,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractSocket"),
-                new Param(c, "address", "qt.QHostAddress"), End),
+            _func[5] = new MemberFunction(c, "waitForConnected", _n_waitForConnected0, None, Compiled,
+                                          qt_QAbstractSocket_waitForConnected_bool_QAbstractSocket_int, Return, "bool", Parameters,
+                                          new Param(c, "this", "qt.QAbstractSocket"), new Param(c, "msecs", "int", Value((int)30000)), End),
+            _func[6] = new MemberFunction(c, "waitForDisconnected", _n_waitForDisconnected0, None, Compiled,
+                                          qt_QAbstractSocket_waitForDisconnected_bool_QAbstractSocket_int, Return, "bool", Parameters,
+                                          new Param(c, "this", "qt.QAbstractSocket"), new Param(c, "msecs", "int", Value((int)30000)), End),
+            _func[7] = new MemberFunction(c, "atEnd", _n_atEnd0, None, Compiled, qt_QAbstractSocket_atEnd_bool_QAbstractSocket, Return,
+                                          "bool", Parameters, new Param(c, "this", "qt.QAbstractSocket"), End),
+            _func[8] = new MemberFunction(c, "bytesAvailable", _n_bytesAvailable0, None, Compiled,
+                                          qt_QAbstractSocket_bytesAvailable_int64_QAbstractSocket, Return, "int64", Parameters,
+                                          new Param(c, "this", "qt.QAbstractSocket"), End),
+            _func[9] = new MemberFunction(c, "bytesToWrite", _n_bytesToWrite0, None, Compiled,
+                                          qt_QAbstractSocket_bytesToWrite_int64_QAbstractSocket, Return, "int64", Parameters,
+                                          new Param(c, "this", "qt.QAbstractSocket"), End),
+            _func[10] =
+                new MemberFunction(c, "canReadLine", _n_canReadLine0, None, Compiled, qt_QAbstractSocket_canReadLine_bool_QAbstractSocket,
+                                   Return, "bool", Parameters, new Param(c, "this", "qt.QAbstractSocket"), End),
+            _func[11] = new MemberFunction(c, "close", _n_close0, None, Compiled, qt_QAbstractSocket_close_void_QAbstractSocket, Return,
+                                           "void", Parameters, new Param(c, "this", "qt.QAbstractSocket"), End),
+            _func[12] = new MemberFunction(c, "isSequential", _n_isSequential0, None, Compiled,
+                                           qt_QAbstractSocket_isSequential_bool_QAbstractSocket, Return, "bool", Parameters,
+                                           new Param(c, "this", "qt.QAbstractSocket"), End),
+            _func[13] =
+                new MemberFunction(c, "waitForBytesWritten", _n_waitForBytesWritten0, None, Compiled,
+                                   qt_QAbstractSocket_waitForBytesWritten_bool_QAbstractSocket_int, Return, "bool", Parameters,
+                                   new Param(c, "this", "qt.QAbstractSocket"), new Param(c, "msecs", "int", Value((int)30000)), End),
+            _func[14] =
+                new MemberFunction(c, "waitForReadyRead", _n_waitForReadyRead0, None, Compiled,
+                                   qt_QAbstractSocket_waitForReadyRead_bool_QAbstractSocket_int, Return, "bool", Parameters,
+                                   new Param(c, "this", "qt.QAbstractSocket"), new Param(c, "msecs", "int", Value((int)30000)), End),
+            new Function(c, "setLocalAddress", _n_setLocalAddress0, None, Compiled,
+                         qt_QAbstractSocket_setLocalAddress_void_QAbstractSocket_QHostAddress, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QAbstractSocket"), new Param(c, "address", "qt.QHostAddress"), End),
             // MISSING: setLocalPort (void; QAbstractSocket this, "quint16"
             // port) // protected
-            new Function(
-                c, "setPeerAddress", _n_setPeerAddress0, None, Compiled,
-                qt_QAbstractSocket_setPeerAddress_void_QAbstractSocket_QHostAddress,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractSocket"),
-                new Param(c, "address", "qt.QHostAddress"), End),
-            new Function(
-                c, "setPeerName", _n_setPeerName0, None, Compiled,
-                qt_QAbstractSocket_setPeerName_void_QAbstractSocket_string,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractSocket"),
-                new Param(c, "name", "string"), End),
+            new Function(c, "setPeerAddress", _n_setPeerAddress0, None, Compiled,
+                         qt_QAbstractSocket_setPeerAddress_void_QAbstractSocket_QHostAddress, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QAbstractSocket"), new Param(c, "address", "qt.QHostAddress"), End),
+            new Function(c, "setPeerName", _n_setPeerName0, None, Compiled, qt_QAbstractSocket_setPeerName_void_QAbstractSocket_string,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QAbstractSocket"), new Param(c, "name", "string"), End),
             // MISSING: setPeerPort (void; QAbstractSocket this, "quint16" port)
             // // protected
-            new Function(
-                c, "setSocketError", _n_setSocketError0, None, Compiled,
-                qt_QAbstractSocket_setSocketError_void_QAbstractSocket_int,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractSocket"),
-                new Param(c, "socketError", "int"), End),
-            new Function(
-                c, "setSocketState", _n_setSocketState0, None, Compiled,
-                qt_QAbstractSocket_setSocketState_void_QAbstractSocket_int,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractSocket"),
-                new Param(c, "state", "int"), End),
+            new Function(c, "setSocketError", _n_setSocketError0, None, Compiled,
+                         qt_QAbstractSocket_setSocketError_void_QAbstractSocket_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QAbstractSocket"), new Param(c, "socketError", "int"), End),
+            new Function(c, "setSocketState", _n_setSocketState0, None, Compiled,
+                         qt_QAbstractSocket_setSocketState_void_QAbstractSocket_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QAbstractSocket"), new Param(c, "state", "int"), End),
             // MISSING: readData (int64; QAbstractSocket this, "char *" data,
             // int64 maxSize) // protected MISSING: readLineData (int64;
             // QAbstractSocket this, "char *" data, int64 maxlen) // protected
             // MISSING: writeData (int64; QAbstractSocket this, "const char *"
             // data, int64 size) // protected
-            _func[15] = new MemberFunction(
-                c, "open", _n_open0, None, Compiled,
-                qt_QAbstractSocket_open_bool_QAbstractSocket_int, Return,
-                "bool", Parameters, new Param(c, "this", "qt.QAbstractSocket"),
-                new Param(c, "mode", "int"), End),
-            _func[16] = new MemberFunction(
-                c, "pos", _n_pos0, None, Compiled,
-                qt_QAbstractSocket_pos_int64_QAbstractSocket, Return, "int64",
-                Parameters, new Param(c, "this", "qt.QAbstractSocket"), End),
-            _func[17] = new MemberFunction(
-                c, "reset", _n_reset0, None, Compiled,
-                qt_QAbstractSocket_reset_bool_QAbstractSocket, Return, "bool",
-                Parameters, new Param(c, "this", "qt.QAbstractSocket"), End),
-            _func[18] = new MemberFunction(
-                c, "seek", _n_seek0, None, Compiled,
-                qt_QAbstractSocket_seek_bool_QAbstractSocket_int64, Return,
-                "bool", Parameters, new Param(c, "this", "qt.QAbstractSocket"),
-                new Param(c, "pos", "int64"), End),
-            _func[19] = new MemberFunction(
-                c, "size", _n_size0, None, Compiled,
-                qt_QAbstractSocket_size_int64_QAbstractSocket, Return, "int64",
-                Parameters, new Param(c, "this", "qt.QAbstractSocket"), End),
+            _func[15] =
+                new MemberFunction(c, "open", _n_open0, None, Compiled, qt_QAbstractSocket_open_bool_QAbstractSocket_int, Return, "bool",
+                                   Parameters, new Param(c, "this", "qt.QAbstractSocket"), new Param(c, "mode", "int"), End),
+            _func[16] = new MemberFunction(c, "pos", _n_pos0, None, Compiled, qt_QAbstractSocket_pos_int64_QAbstractSocket, Return, "int64",
+                                           Parameters, new Param(c, "this", "qt.QAbstractSocket"), End),
+            _func[17] = new MemberFunction(c, "reset", _n_reset0, None, Compiled, qt_QAbstractSocket_reset_bool_QAbstractSocket, Return,
+                                           "bool", Parameters, new Param(c, "this", "qt.QAbstractSocket"), End),
+            _func[18] =
+                new MemberFunction(c, "seek", _n_seek0, None, Compiled, qt_QAbstractSocket_seek_bool_QAbstractSocket_int64, Return, "bool",
+                                   Parameters, new Param(c, "this", "qt.QAbstractSocket"), new Param(c, "pos", "int64"), End),
+            _func[19] = new MemberFunction(c, "size", _n_size0, None, Compiled, qt_QAbstractSocket_size_int64_QAbstractSocket, Return,
+                                           "int64", Parameters, new Param(c, "this", "qt.QAbstractSocket"), End),
             // static functions
             EndArguments);
         globalScope()->addSymbols(EndArguments);

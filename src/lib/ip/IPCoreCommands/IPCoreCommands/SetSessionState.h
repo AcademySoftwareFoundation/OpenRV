@@ -20,8 +20,7 @@ namespace IPCore
         //  Set values on the session.
         //
 
-        template <typename ValueType>
-        class SetSessionState : public TwkApp::Command
+        template <typename ValueType> class SetSessionState : public TwkApp::Command
         {
         public:
             SetSessionState(const TwkApp::CommandInfo* info)
@@ -54,17 +53,14 @@ namespace IPCore
             ValueType m_value;
         };
 
-        template <typename ValueType>
-        class SetSessionStateInfo : public TwkApp::CommandInfo
+        template <typename ValueType> class SetSessionStateInfo : public TwkApp::CommandInfo
         {
         public:
             typedef void (IPCore::Session::*SetFunction)(ValueType);
             typedef ValueType (IPCore::Session::*GetFunction)() const;
             typedef TwkApp::Command Command;
 
-            SetSessionStateInfo(const std::string& name, SetFunction setF,
-                                GetFunction getF,
-                                TwkApp::CommandInfo::UndoType type)
+            SetSessionStateInfo(const std::string& name, SetFunction setF, GetFunction getF, TwkApp::CommandInfo::UndoType type)
                 : CommandInfo(name, type)
                 , m_setFunction(setF)
                 , m_getFunction(getF)
@@ -79,24 +75,19 @@ namespace IPCore
             GetFunction m_getFunction;
         };
 
-        template <typename ValueType>
-        ValueType SetSessionState<ValueType>::get() const
+        template <typename ValueType> ValueType SetSessionState<ValueType>::get() const
         {
-            const SetSessionStateInfo<ValueType>* i =
-                static_cast<const SetSessionStateInfo<ValueType>*>(info());
+            const SetSessionStateInfo<ValueType>* i = static_cast<const SetSessionStateInfo<ValueType>*>(info());
             return (m_session->*(i->m_getFunction))();
         }
 
-        template <typename ValueType>
-        void SetSessionState<ValueType>::set(ValueType v) const
+        template <typename ValueType> void SetSessionState<ValueType>::set(ValueType v) const
         {
-            const SetSessionStateInfo<ValueType>* i =
-                static_cast<const SetSessionStateInfo<ValueType>*>(info());
+            const SetSessionStateInfo<ValueType>* i = static_cast<const SetSessionStateInfo<ValueType>*>(info());
             (m_session->*(i->m_setFunction))(v);
         }
 
-        template <typename ValueType>
-        TwkApp::Command* SetSessionStateInfo<ValueType>::newCommand() const
+        template <typename ValueType> TwkApp::Command* SetSessionStateInfo<ValueType>::newCommand() const
         {
             return new SetSessionState<ValueType>(this);
         }
@@ -107,8 +98,7 @@ namespace IPCore
         //  Set values on the session.
         //
 
-        template <typename ValueType>
-        class SetSessionObjectState : public TwkApp::Command
+        template <typename ValueType> class SetSessionObjectState : public TwkApp::Command
         {
         public:
             SetSessionObjectState(const TwkApp::CommandInfo* info)
@@ -140,17 +130,14 @@ namespace IPCore
             ValueType m_value;
         };
 
-        template <typename ValueType>
-        class SetSessionObjectStateInfo : public TwkApp::CommandInfo
+        template <typename ValueType> class SetSessionObjectStateInfo : public TwkApp::CommandInfo
         {
         public:
             typedef void (IPCore::Session::*SetFunction)(const ValueType&);
             typedef const ValueType& (IPCore::Session::*GetFunction)() const;
             typedef TwkApp::Command Command;
 
-            SetSessionObjectStateInfo(const std::string& name, SetFunction setF,
-                                      GetFunction getF,
-                                      TwkApp::CommandInfo::UndoType type)
+            SetSessionObjectStateInfo(const std::string& name, SetFunction setF, GetFunction getF, TwkApp::CommandInfo::UndoType type)
                 : CommandInfo(name, type)
                 , m_setFunction(setF)
                 , m_getFunction(getF)
@@ -165,27 +152,19 @@ namespace IPCore
             GetFunction m_getFunction;
         };
 
-        template <typename ValueType>
-        const ValueType& SetSessionObjectState<ValueType>::get() const
+        template <typename ValueType> const ValueType& SetSessionObjectState<ValueType>::get() const
         {
-            const SetSessionObjectStateInfo<ValueType>* i =
-                static_cast<const SetSessionObjectStateInfo<ValueType>*>(
-                    info());
+            const SetSessionObjectStateInfo<ValueType>* i = static_cast<const SetSessionObjectStateInfo<ValueType>*>(info());
             return (m_session->*(i->m_getFunction))();
         }
 
-        template <typename ValueType>
-        void SetSessionObjectState<ValueType>::set(const ValueType& v) const
+        template <typename ValueType> void SetSessionObjectState<ValueType>::set(const ValueType& v) const
         {
-            const SetSessionObjectStateInfo<ValueType>* i =
-                static_cast<const SetSessionObjectStateInfo<ValueType>*>(
-                    info());
+            const SetSessionObjectStateInfo<ValueType>* i = static_cast<const SetSessionObjectStateInfo<ValueType>*>(info());
             (m_session->*(i->m_setFunction))(v);
         }
 
-        template <typename ValueType>
-        TwkApp::Command*
-        SetSessionObjectStateInfo<ValueType>::newCommand() const
+        template <typename ValueType> TwkApp::Command* SetSessionObjectStateInfo<ValueType>::newCommand() const
         {
             return new SetSessionObjectState<ValueType>(this);
         }

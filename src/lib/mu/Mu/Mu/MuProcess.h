@@ -33,10 +33,8 @@ namespace Mu
 
         virtual ~CallEnvironment() {}
 
-        virtual const Value call(const Function*,
-                                 Function::ArgumentVector&) const = 0;
-        virtual const Value
-        callMethodByName(const char* name, Function::ArgumentVector&) const = 0;
+        virtual const Value call(const Function*, Function::ArgumentVector&) const = 0;
+        virtual const Value callMethodByName(const char* name, Function::ArgumentVector&) const = 0;
         virtual const Context* context() const = 0;
     };
 
@@ -115,9 +113,7 @@ namespace Mu
         //	returnArguments.
         //
 
-        const Value call(Thread* t, const Function* f,
-                         Function::ArgumentVector& args,
-                         bool returnArguments = false);
+        const Value call(Thread* t, const Function* f, Function::ArgumentVector& args, bool returnArguments = false);
 
         //
         //  The CallEnvironment can be set prior to execution and may be
@@ -186,10 +182,7 @@ namespace Mu
 
         void setVaryingSize(size_t s0, size_t s1, size_t s2);
 
-        void setVaryingSizeDimension(size_t d, size_t s)
-        {
-            _varyingSize[d] = s;
-        }
+        void setVaryingSizeDimension(size_t d, size_t s) { _varyingSize[d] = s; }
 
         size_t varyingSize(size_t d) { return _varyingSize[d]; }
 
@@ -197,10 +190,7 @@ namespace Mu
         //  Documentation
         //
 
-        void addDocumentation(const Symbol* s, Object* o)
-        {
-            _symbolDocs[s] = o;
-        }
+        void addDocumentation(const Symbol* s, Object* o) { _symbolDocs[s] = o; }
 
     private:
         void clearNodes();
@@ -248,10 +238,8 @@ namespace Mu
 
         virtual ~BasicCallEnvironment() {}
 
-        virtual const Value call(const Function*,
-                                 Function::ArgumentVector&) const;
-        virtual const Value callMethodByName(const char* name,
-                                             Function::ArgumentVector&) const;
+        virtual const Value call(const Function*, Function::ArgumentVector&) const;
+        virtual const Value callMethodByName(const char* name, Function::ArgumentVector&) const;
 
         virtual const Context* context() const { return _process->context(); }
 

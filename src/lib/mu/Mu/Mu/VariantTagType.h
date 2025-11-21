@@ -30,10 +30,7 @@ namespace Mu
 
         const Type* representationType() const;
 
-        const VariantType* variantType() const
-        {
-            return static_cast<const VariantType*>(scope());
-        }
+        const VariantType* variantType() const { return static_cast<const VariantType*>(scope()); }
 
         size_t index() const { return _index; }
 
@@ -41,10 +38,8 @@ namespace Mu
         //  Type API
         //
 
-        virtual void serialize(std::ostream&, Archive::Writer&,
-                               const ValuePointer) const;
-        virtual void deserialize(std::istream&, Archive::Reader&,
-                                 ValuePointer) const;
+        virtual void serialize(std::ostream&, Archive::Writer&, const ValuePointer) const;
+        virtual void deserialize(std::istream&, Archive::Reader&, ValuePointer) const;
         virtual void reconstitute(Archive::Reader&, Object*) const;
 
         virtual MatchResult match(const Type*, Bindings&) const;
@@ -54,10 +49,8 @@ namespace Mu
         virtual void nodeEval(void*, const Node*, Thread& t) const;
         virtual const Type* nodeReturnType(const Node*) const;
 
-        virtual void outputValue(std::ostream&, const Value&,
-                                 bool full = false) const;
-        virtual void outputValueRecursive(std::ostream&, const ValuePointer,
-                                          ValueOutputState&) const;
+        virtual void outputValue(std::ostream&, const Value&, bool full = false) const;
+        virtual void outputValueRecursive(std::ostream&, const ValuePointer, ValueOutputState&) const;
         virtual const Type* fieldType(size_t) const;
         virtual ValuePointer fieldPointer(Object*, size_t) const;
         virtual const ValuePointer fieldPointer(const Object*, size_t) const;

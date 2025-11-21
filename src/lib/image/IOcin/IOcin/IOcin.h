@@ -117,11 +117,10 @@ namespace TwkFB
 
         struct ImageInformation
         {
-            U8 orientation;  // Image orientation
-            U8 num_channels; // Number of image elements
-            U8 UNUSED1[2];   // 2 byte space for word alignment
-            ImageElement
-                image_element[8]; // Note there are eight image elements
+            U8 orientation;                // Image orientation
+            U8 num_channels;               // Number of image elements
+            U8 UNUSED1[2];                 // 2 byte space for word alignment
+            ImageElement image_element[8]; // Note there are eight image elements
             R32 white_X;
             R32 white_Y;
             R32 red_X;
@@ -254,13 +253,10 @@ namespace TwkFB
         //  Ctors
         //
 
-        IOcin(StorageFormat format = RGB16, bool useChromaticies = false,
-              IOType type = StandardIO, size_t iosize = 61440,
+        IOcin(StorageFormat format = RGB16, bool useChromaticies = false, IOType type = StandardIO, size_t iosize = 61440,
               int maxAsync = 16);
 
-        IOcin(const std::string& format, bool useChromaticies = false,
-              IOType type = StandardIO, size_t iosize = 61440,
-              int maxAsync = 16);
+        IOcin(const std::string& format, bool useChromaticies = false, IOType type = StandardIO, size_t iosize = 61440, int maxAsync = 16);
 
         virtual ~IOcin();
 
@@ -270,11 +266,9 @@ namespace TwkFB
         //  FrameBufferIO API
         //
 
-        virtual void readImage(FrameBuffer&, const std::string& filename,
-                               const ReadRequest& request) const;
+        virtual void readImage(FrameBuffer&, const std::string& filename, const ReadRequest& request) const;
 
-        virtual void writeImage(const FrameBuffer&, const std::string& filename,
-                                const WriteRequest& request) const;
+        virtual void writeImage(const FrameBuffer&, const std::string& filename, const WriteRequest& request) const;
 
         virtual std::string about() const;
 
@@ -284,21 +278,15 @@ namespace TwkFB
 
         void format(StorageFormat f) { m_format = f; }
 
-        void readAttrs(FrameBuffer& fb, FileInformation& genericHeader,
-                       ImageInformation& infoHeader,
-                       DataFormatInformation& dataFormatHeader,
-                       ImageOriginInformation& originHeader,
-                       FilmInformation& filmHeader) const;
+        void readAttrs(FrameBuffer& fb, FileInformation& genericHeader, ImageInformation& infoHeader,
+                       DataFormatInformation& dataFormatHeader, ImageOriginInformation& originHeader, FilmInformation& filmHeader) const;
 
-        void readImage(TwkUtil::FileStream&, FrameBuffer&,
-                       const std::string& filename,
-                       const ReadRequest& request) const;
+        void readImage(TwkUtil::FileStream&, FrameBuffer&, const std::string& filename, const ReadRequest& request) const;
 
         virtual bool getBoolAttribute(const std::string& name) const;
         virtual void setBoolAttribute(const std::string& name, bool value);
         virtual std::string getStringAttribute(const std::string& name) const;
-        virtual void setStringAttribute(const std::string& name,
-                                        const std::string& value);
+        virtual void setStringAttribute(const std::string& name, const std::string& value);
 
     private:
         bool m_useChromaticities;

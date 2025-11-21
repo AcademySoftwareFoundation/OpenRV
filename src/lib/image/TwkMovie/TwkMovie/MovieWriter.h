@@ -74,9 +74,7 @@ namespace TwkMovie
         /// FBs in any format.
         ///
 
-        virtual MovieInfo open(const MovieInfo& info,
-                               const std::string& filename,
-                               const WriteRequest& request);
+        virtual MovieInfo open(const MovieInfo& info, const std::string& filename, const WriteRequest& request);
 
         ///
         /// The thread will return from the function when the movie as
@@ -93,8 +91,7 @@ namespace TwkMovie
         /// MovieWriters should use one or the other API.
         ///
 
-        virtual bool write(Movie* inMovie, const std::string& filename,
-                           WriteRequest&) = 0;
+        virtual bool write(Movie* inMovie, const std::string& filename, WriteRequest&) = 0;
 
         static bool reallyVerbose();
         static void setReallyVerbose(bool);

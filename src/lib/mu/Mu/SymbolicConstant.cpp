@@ -13,8 +13,7 @@ namespace Mu
 {
     using namespace std;
 
-    SymbolicConstant::SymbolicConstant(Context* context, const char* name,
-                                       const Type* type, const Value& v)
+    SymbolicConstant::SymbolicConstant(Context* context, const char* name, const Type* type, const Value& v)
         : Symbol(context, name)
         , _value(v)
     {
@@ -22,8 +21,7 @@ namespace Mu
         _state = ResolvedState;
     }
 
-    SymbolicConstant::SymbolicConstant(Context* context, const char* name,
-                                       const char* type, const Value& v)
+    SymbolicConstant::SymbolicConstant(Context* context, const char* name, const char* type, const Value& v)
         : Symbol(context, name)
         , _value(v)
     {
@@ -39,10 +37,7 @@ namespace Mu
         return type();
     }
 
-    void SymbolicConstant::outputNode(std::ostream& o, const Node*) const
-    {
-        output(o);
-    }
+    void SymbolicConstant::outputNode(std::ostream& o, const Node*) const { output(o); }
 
     void SymbolicConstant::output(std::ostream& o) const
     {
@@ -55,8 +50,7 @@ namespace Mu
 
     bool SymbolicConstant::resolveSymbols() const
     {
-        if (const Type* s =
-                globalScope()->findSymbolOfType<Type>(Name(_type.name)))
+        if (const Type* s = globalScope()->findSymbolOfType<Type>(Name(_type.name)))
         {
             _type.symbol = s;
             return true;

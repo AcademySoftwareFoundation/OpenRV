@@ -585,7 +585,7 @@
       <key>CFBundleIconFile</key>
       <string>RV.icns</string>
       <key>CFBundleIdentifier</key>
-      <string>com.autodesk.RV</string>
+      <string>com.autodesk.${RV_INTERNAL_APPLICATION_NAME}</string>
       <key>CFBundleName</key>
       <string>${RV_UI_APPLICATION_NAME}</string>
       <key>CFBundlePackageType</key>

@@ -47,8 +47,7 @@ namespace Mu
         //  Constructors
         //
 
-        QByteArrayType(Context* context, const char* name,
-                       Class* superClass = 0);
+        QByteArrayType(Context* context, const char* name, Class* superClass = 0);
         virtual ~QByteArrayType();
 
         //

@@ -39,8 +39,7 @@ namespace Mu
         //  Constructors
         //
 
-        QAbstractButtonType(Context* context, const char* name,
-                            Class* superClass = 0, Class* superClass2 = 0);
+        QAbstractButtonType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QAbstractButtonType();
 
@@ -63,8 +62,7 @@ namespace Mu
     {
     public:
         virtual ~MuQt_QAbstractButton();
-        MuQt_QAbstractButton(Pointer muobj, const CallEnvironment*,
-                             QWidget* parent);
+        MuQt_QAbstractButton(Pointer muobj, const CallEnvironment*, QWidget* parent);
 
     protected:
         virtual void checkStateSet();
@@ -114,10 +112,7 @@ namespace Mu
 
         bool hitButton_pub(const QPoint& pos) const { return hitButton(pos); }
 
-        bool hitButton_pub_parent(const QPoint& pos) const
-        {
-            return QAbstractButton::hitButton(pos);
-        }
+        bool hitButton_pub_parent(const QPoint& pos) const { return QAbstractButton::hitButton(pos); }
 
         void nextCheckState_pub() { nextCheckState(); }
 
@@ -125,10 +120,7 @@ namespace Mu
 
         void changeEvent_pub(QEvent* e) { changeEvent(e); }
 
-        void changeEvent_pub_parent(QEvent* e)
-        {
-            QAbstractButton::changeEvent(e);
-        }
+        void changeEvent_pub_parent(QEvent* e) { QAbstractButton::changeEvent(e); }
 
         bool event_pub(QEvent* e) { return event(e); }
 
@@ -136,193 +128,103 @@ namespace Mu
 
         void focusInEvent_pub(QFocusEvent* e) { focusInEvent(e); }
 
-        void focusInEvent_pub_parent(QFocusEvent* e)
-        {
-            QAbstractButton::focusInEvent(e);
-        }
+        void focusInEvent_pub_parent(QFocusEvent* e) { QAbstractButton::focusInEvent(e); }
 
         void focusOutEvent_pub(QFocusEvent* e) { focusOutEvent(e); }
 
-        void focusOutEvent_pub_parent(QFocusEvent* e)
-        {
-            QAbstractButton::focusOutEvent(e);
-        }
+        void focusOutEvent_pub_parent(QFocusEvent* e) { QAbstractButton::focusOutEvent(e); }
 
         void keyPressEvent_pub(QKeyEvent* e) { keyPressEvent(e); }
 
-        void keyPressEvent_pub_parent(QKeyEvent* e)
-        {
-            QAbstractButton::keyPressEvent(e);
-        }
+        void keyPressEvent_pub_parent(QKeyEvent* e) { QAbstractButton::keyPressEvent(e); }
 
         void keyReleaseEvent_pub(QKeyEvent* e) { keyReleaseEvent(e); }
 
-        void keyReleaseEvent_pub_parent(QKeyEvent* e)
-        {
-            QAbstractButton::keyReleaseEvent(e);
-        }
+        void keyReleaseEvent_pub_parent(QKeyEvent* e) { QAbstractButton::keyReleaseEvent(e); }
 
         void mouseMoveEvent_pub(QMouseEvent* e) { mouseMoveEvent(e); }
 
-        void mouseMoveEvent_pub_parent(QMouseEvent* e)
-        {
-            QAbstractButton::mouseMoveEvent(e);
-        }
+        void mouseMoveEvent_pub_parent(QMouseEvent* e) { QAbstractButton::mouseMoveEvent(e); }
 
         void mousePressEvent_pub(QMouseEvent* e) { mousePressEvent(e); }
 
-        void mousePressEvent_pub_parent(QMouseEvent* e)
-        {
-            QAbstractButton::mousePressEvent(e);
-        }
+        void mousePressEvent_pub_parent(QMouseEvent* e) { QAbstractButton::mousePressEvent(e); }
 
         void mouseReleaseEvent_pub(QMouseEvent* e) { mouseReleaseEvent(e); }
 
-        void mouseReleaseEvent_pub_parent(QMouseEvent* e)
-        {
-            QAbstractButton::mouseReleaseEvent(e);
-        }
+        void mouseReleaseEvent_pub_parent(QMouseEvent* e) { QAbstractButton::mouseReleaseEvent(e); }
 
         void paintEvent_pub(QPaintEvent* e) { paintEvent(e); }
 
-        void paintEvent_pub_parent(QPaintEvent* e)
-        {
-            QAbstractButton::paintEvent(e);
-        }
+        void paintEvent_pub_parent(QPaintEvent* e) { QAbstractButton::paintEvent(e); }
 
         void timerEvent_pub(QTimerEvent* e) { timerEvent(e); }
 
-        void timerEvent_pub_parent(QTimerEvent* e)
-        {
-            QAbstractButton::timerEvent(e);
-        }
+        void timerEvent_pub_parent(QTimerEvent* e) { QAbstractButton::timerEvent(e); }
 
         void closeEvent_pub(QCloseEvent* event) { closeEvent(event); }
 
-        void closeEvent_pub_parent(QCloseEvent* event)
-        {
-            QAbstractButton::closeEvent(event);
-        }
+        void closeEvent_pub_parent(QCloseEvent* event) { QAbstractButton::closeEvent(event); }
 
-        void contextMenuEvent_pub(QContextMenuEvent* event)
-        {
-            contextMenuEvent(event);
-        }
+        void contextMenuEvent_pub(QContextMenuEvent* event) { contextMenuEvent(event); }
 
-        void contextMenuEvent_pub_parent(QContextMenuEvent* event)
-        {
-            QAbstractButton::contextMenuEvent(event);
-        }
+        void contextMenuEvent_pub_parent(QContextMenuEvent* event) { QAbstractButton::contextMenuEvent(event); }
 
-        void dragEnterEvent_pub(QDragEnterEvent* event)
-        {
-            dragEnterEvent(event);
-        }
+        void dragEnterEvent_pub(QDragEnterEvent* event) { dragEnterEvent(event); }
 
-        void dragEnterEvent_pub_parent(QDragEnterEvent* event)
-        {
-            QAbstractButton::dragEnterEvent(event);
-        }
+        void dragEnterEvent_pub_parent(QDragEnterEvent* event) { QAbstractButton::dragEnterEvent(event); }
 
-        void dragLeaveEvent_pub(QDragLeaveEvent* event)
-        {
-            dragLeaveEvent(event);
-        }
+        void dragLeaveEvent_pub(QDragLeaveEvent* event) { dragLeaveEvent(event); }
 
-        void dragLeaveEvent_pub_parent(QDragLeaveEvent* event)
-        {
-            QAbstractButton::dragLeaveEvent(event);
-        }
+        void dragLeaveEvent_pub_parent(QDragLeaveEvent* event) { QAbstractButton::dragLeaveEvent(event); }
 
         void dragMoveEvent_pub(QDragMoveEvent* event) { dragMoveEvent(event); }
 
-        void dragMoveEvent_pub_parent(QDragMoveEvent* event)
-        {
-            QAbstractButton::dragMoveEvent(event);
-        }
+        void dragMoveEvent_pub_parent(QDragMoveEvent* event) { QAbstractButton::dragMoveEvent(event); }
 
         void dropEvent_pub(QDropEvent* event) { dropEvent(event); }
 
-        void dropEvent_pub_parent(QDropEvent* event)
-        {
-            QAbstractButton::dropEvent(event);
-        }
+        void dropEvent_pub_parent(QDropEvent* event) { QAbstractButton::dropEvent(event); }
 
         void enterEvent_pub(QEvent* event) { enterEvent(event); }
 
-        void enterEvent_pub_parent(QEvent* event)
-        {
-            QAbstractButton::enterEvent(event);
-        }
+        void enterEvent_pub_parent(QEvent* event) { QAbstractButton::enterEvent(event); }
 
-        bool focusNextPrevChild_pub(bool next)
-        {
-            return focusNextPrevChild(next);
-        }
+        bool focusNextPrevChild_pub(bool next) { return focusNextPrevChild(next); }
 
-        bool focusNextPrevChild_pub_parent(bool next)
-        {
-            return QAbstractButton::focusNextPrevChild(next);
-        }
+        bool focusNextPrevChild_pub_parent(bool next) { return QAbstractButton::focusNextPrevChild(next); }
 
         void hideEvent_pub(QHideEvent* event) { hideEvent(event); }
 
-        void hideEvent_pub_parent(QHideEvent* event)
-        {
-            QAbstractButton::hideEvent(event);
-        }
+        void hideEvent_pub_parent(QHideEvent* event) { QAbstractButton::hideEvent(event); }
 
         void leaveEvent_pub(QEvent* event) { leaveEvent(event); }
 
-        void leaveEvent_pub_parent(QEvent* event)
-        {
-            QAbstractButton::leaveEvent(event);
-        }
+        void leaveEvent_pub_parent(QEvent* event) { QAbstractButton::leaveEvent(event); }
 
-        void mouseDoubleClickEvent_pub(QMouseEvent* event)
-        {
-            mouseDoubleClickEvent(event);
-        }
+        void mouseDoubleClickEvent_pub(QMouseEvent* event) { mouseDoubleClickEvent(event); }
 
-        void mouseDoubleClickEvent_pub_parent(QMouseEvent* event)
-        {
-            QAbstractButton::mouseDoubleClickEvent(event);
-        }
+        void mouseDoubleClickEvent_pub_parent(QMouseEvent* event) { QAbstractButton::mouseDoubleClickEvent(event); }
 
         void moveEvent_pub(QMoveEvent* event) { moveEvent(event); }
 
-        void moveEvent_pub_parent(QMoveEvent* event)
-        {
-            QAbstractButton::moveEvent(event);
-        }
+        void moveEvent_pub_parent(QMoveEvent* event) { QAbstractButton::moveEvent(event); }
 
         void resizeEvent_pub(QResizeEvent* event) { resizeEvent(event); }
 
-        void resizeEvent_pub_parent(QResizeEvent* event)
-        {
-            QAbstractButton::resizeEvent(event);
-        }
+        void resizeEvent_pub_parent(QResizeEvent* event) { QAbstractButton::resizeEvent(event); }
 
         void showEvent_pub(QShowEvent* event) { showEvent(event); }
 
-        void showEvent_pub_parent(QShowEvent* event)
-        {
-            QAbstractButton::showEvent(event);
-        }
+        void showEvent_pub_parent(QShowEvent* event) { QAbstractButton::showEvent(event); }
 
         void tabletEvent_pub(QTabletEvent* event) { tabletEvent(event); }
 
-        void tabletEvent_pub_parent(QTabletEvent* event)
-        {
-            QAbstractButton::tabletEvent(event);
-        }
+        void tabletEvent_pub_parent(QTabletEvent* event) { QAbstractButton::tabletEvent(event); }
 
         void wheelEvent_pub(QWheelEvent* event) { wheelEvent(event); }
 
-        void wheelEvent_pub_parent(QWheelEvent* event)
-        {
-            QAbstractButton::wheelEvent(event);
-        }
+        void wheelEvent_pub_parent(QWheelEvent* event) { QAbstractButton::wheelEvent(event); }
 
     public:
         const QAbstractButtonType* _baseType;
@@ -330,11 +232,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance* QAbstractButtonType::cachedInstance(
-        const QAbstractButtonType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QAbstractButtonType::cachedInstance(const QAbstractButtonType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

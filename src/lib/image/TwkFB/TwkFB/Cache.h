@@ -208,10 +208,7 @@ namespace TwkFB
         bool trashContains(FrameBuffer* fb);
         size_t deleteFB(FrameBuffer* fb);
 
-        static bool retrievalCompare(FrameBuffer* a, FrameBuffer* b)
-        {
-            return a->m_retrievalTime > b->m_retrievalTime;
-        }
+        static bool retrievalCompare(FrameBuffer* a, FrameBuffer* b) { return a->m_retrievalTime > b->m_retrievalTime; }
 
         //
         //  Derived classes can access FB cache members via these
@@ -222,15 +219,9 @@ namespace TwkFB
         void referenceFB(FrameBuffer* fb);
         void dereferenceFB(FrameBuffer* fb);
 
-        size_t fbReferenceCount(FrameBuffer* fb) const
-        {
-            return fb->m_cacheRef;
-        }
+        size_t fbReferenceCount(FrameBuffer* fb) const { return fb->m_cacheRef; }
 
-        bool hasOneReference(FrameBuffer* fb) const
-        {
-            return fb->m_cacheRef == 1;
-        }
+        bool hasOneReference(FrameBuffer* fb) const { return fb->m_cacheRef == 1; }
 
     protected:
         bool m_full;

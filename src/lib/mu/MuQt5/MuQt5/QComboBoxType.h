@@ -39,8 +39,7 @@ namespace Mu
         //  Constructors
         //
 
-        QComboBoxType(Context* context, const char* name, Class* superClass = 0,
-                      Class* superClass2 = 0);
+        QComboBoxType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QComboBoxType();
 
@@ -112,24 +111,15 @@ namespace Mu
 
         void contextMenuEvent_pub(QContextMenuEvent* e) { contextMenuEvent(e); }
 
-        void contextMenuEvent_pub_parent(QContextMenuEvent* e)
-        {
-            QComboBox::contextMenuEvent(e);
-        }
+        void contextMenuEvent_pub_parent(QContextMenuEvent* e) { QComboBox::contextMenuEvent(e); }
 
         void focusInEvent_pub(QFocusEvent* e) { focusInEvent(e); }
 
-        void focusInEvent_pub_parent(QFocusEvent* e)
-        {
-            QComboBox::focusInEvent(e);
-        }
+        void focusInEvent_pub_parent(QFocusEvent* e) { QComboBox::focusInEvent(e); }
 
         void focusOutEvent_pub(QFocusEvent* e) { focusOutEvent(e); }
 
-        void focusOutEvent_pub_parent(QFocusEvent* e)
-        {
-            QComboBox::focusOutEvent(e);
-        }
+        void focusOutEvent_pub_parent(QFocusEvent* e) { QComboBox::focusOutEvent(e); }
 
         void hideEvent_pub(QHideEvent* e) { hideEvent(e); }
 
@@ -137,31 +127,19 @@ namespace Mu
 
         void keyPressEvent_pub(QKeyEvent* e) { keyPressEvent(e); }
 
-        void keyPressEvent_pub_parent(QKeyEvent* e)
-        {
-            QComboBox::keyPressEvent(e);
-        }
+        void keyPressEvent_pub_parent(QKeyEvent* e) { QComboBox::keyPressEvent(e); }
 
         void keyReleaseEvent_pub(QKeyEvent* e) { keyReleaseEvent(e); }
 
-        void keyReleaseEvent_pub_parent(QKeyEvent* e)
-        {
-            QComboBox::keyReleaseEvent(e);
-        }
+        void keyReleaseEvent_pub_parent(QKeyEvent* e) { QComboBox::keyReleaseEvent(e); }
 
         void mousePressEvent_pub(QMouseEvent* e) { mousePressEvent(e); }
 
-        void mousePressEvent_pub_parent(QMouseEvent* e)
-        {
-            QComboBox::mousePressEvent(e);
-        }
+        void mousePressEvent_pub_parent(QMouseEvent* e) { QComboBox::mousePressEvent(e); }
 
         void mouseReleaseEvent_pub(QMouseEvent* e) { mouseReleaseEvent(e); }
 
-        void mouseReleaseEvent_pub_parent(QMouseEvent* e)
-        {
-            QComboBox::mouseReleaseEvent(e);
-        }
+        void mouseReleaseEvent_pub_parent(QMouseEvent* e) { QComboBox::mouseReleaseEvent(e); }
 
         void paintEvent_pub(QPaintEvent* e) { paintEvent(e); }
 
@@ -169,10 +147,7 @@ namespace Mu
 
         void resizeEvent_pub(QResizeEvent* e) { resizeEvent(e); }
 
-        void resizeEvent_pub_parent(QResizeEvent* e)
-        {
-            QComboBox::resizeEvent(e);
-        }
+        void resizeEvent_pub_parent(QResizeEvent* e) { QComboBox::resizeEvent(e); }
 
         void showEvent_pub(QShowEvent* e) { showEvent(e); }
 
@@ -184,106 +159,55 @@ namespace Mu
 
         void closeEvent_pub(QCloseEvent* event) { closeEvent(event); }
 
-        void closeEvent_pub_parent(QCloseEvent* event)
-        {
-            QComboBox::closeEvent(event);
-        }
+        void closeEvent_pub_parent(QCloseEvent* event) { QComboBox::closeEvent(event); }
 
-        void dragEnterEvent_pub(QDragEnterEvent* event)
-        {
-            dragEnterEvent(event);
-        }
+        void dragEnterEvent_pub(QDragEnterEvent* event) { dragEnterEvent(event); }
 
-        void dragEnterEvent_pub_parent(QDragEnterEvent* event)
-        {
-            QComboBox::dragEnterEvent(event);
-        }
+        void dragEnterEvent_pub_parent(QDragEnterEvent* event) { QComboBox::dragEnterEvent(event); }
 
-        void dragLeaveEvent_pub(QDragLeaveEvent* event)
-        {
-            dragLeaveEvent(event);
-        }
+        void dragLeaveEvent_pub(QDragLeaveEvent* event) { dragLeaveEvent(event); }
 
-        void dragLeaveEvent_pub_parent(QDragLeaveEvent* event)
-        {
-            QComboBox::dragLeaveEvent(event);
-        }
+        void dragLeaveEvent_pub_parent(QDragLeaveEvent* event) { QComboBox::dragLeaveEvent(event); }
 
         void dragMoveEvent_pub(QDragMoveEvent* event) { dragMoveEvent(event); }
 
-        void dragMoveEvent_pub_parent(QDragMoveEvent* event)
-        {
-            QComboBox::dragMoveEvent(event);
-        }
+        void dragMoveEvent_pub_parent(QDragMoveEvent* event) { QComboBox::dragMoveEvent(event); }
 
         void dropEvent_pub(QDropEvent* event) { dropEvent(event); }
 
-        void dropEvent_pub_parent(QDropEvent* event)
-        {
-            QComboBox::dropEvent(event);
-        }
+        void dropEvent_pub_parent(QDropEvent* event) { QComboBox::dropEvent(event); }
 
         void enterEvent_pub(QEvent* event) { enterEvent(event); }
 
-        void enterEvent_pub_parent(QEvent* event)
-        {
-            QComboBox::enterEvent(event);
-        }
+        void enterEvent_pub_parent(QEvent* event) { QComboBox::enterEvent(event); }
 
-        bool focusNextPrevChild_pub(bool next)
-        {
-            return focusNextPrevChild(next);
-        }
+        bool focusNextPrevChild_pub(bool next) { return focusNextPrevChild(next); }
 
-        bool focusNextPrevChild_pub_parent(bool next)
-        {
-            return QComboBox::focusNextPrevChild(next);
-        }
+        bool focusNextPrevChild_pub_parent(bool next) { return QComboBox::focusNextPrevChild(next); }
 
         void leaveEvent_pub(QEvent* event) { leaveEvent(event); }
 
-        void leaveEvent_pub_parent(QEvent* event)
-        {
-            QComboBox::leaveEvent(event);
-        }
+        void leaveEvent_pub_parent(QEvent* event) { QComboBox::leaveEvent(event); }
 
-        void mouseDoubleClickEvent_pub(QMouseEvent* event)
-        {
-            mouseDoubleClickEvent(event);
-        }
+        void mouseDoubleClickEvent_pub(QMouseEvent* event) { mouseDoubleClickEvent(event); }
 
-        void mouseDoubleClickEvent_pub_parent(QMouseEvent* event)
-        {
-            QComboBox::mouseDoubleClickEvent(event);
-        }
+        void mouseDoubleClickEvent_pub_parent(QMouseEvent* event) { QComboBox::mouseDoubleClickEvent(event); }
 
         void mouseMoveEvent_pub(QMouseEvent* event) { mouseMoveEvent(event); }
 
-        void mouseMoveEvent_pub_parent(QMouseEvent* event)
-        {
-            QComboBox::mouseMoveEvent(event);
-        }
+        void mouseMoveEvent_pub_parent(QMouseEvent* event) { QComboBox::mouseMoveEvent(event); }
 
         void moveEvent_pub(QMoveEvent* event) { moveEvent(event); }
 
-        void moveEvent_pub_parent(QMoveEvent* event)
-        {
-            QComboBox::moveEvent(event);
-        }
+        void moveEvent_pub_parent(QMoveEvent* event) { QComboBox::moveEvent(event); }
 
         void tabletEvent_pub(QTabletEvent* event) { tabletEvent(event); }
 
-        void tabletEvent_pub_parent(QTabletEvent* event)
-        {
-            QComboBox::tabletEvent(event);
-        }
+        void tabletEvent_pub_parent(QTabletEvent* event) { QComboBox::tabletEvent(event); }
 
         int metric_pub(PaintDeviceMetric m) const { return metric(m); }
 
-        int metric_pub_parent(PaintDeviceMetric m) const
-        {
-            return QComboBox::metric(m);
-        }
+        int metric_pub_parent(PaintDeviceMetric m) const { return QComboBox::metric(m); }
 
     public:
         const QComboBoxType* _baseType;
@@ -291,11 +215,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance*
-    QComboBoxType::cachedInstance(const QComboBoxType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QComboBoxType::cachedInstance(const QComboBoxType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

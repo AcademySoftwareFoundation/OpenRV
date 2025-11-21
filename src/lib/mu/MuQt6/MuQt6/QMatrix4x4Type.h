@@ -47,8 +47,7 @@ namespace Mu
         //  Constructors
         //
 
-        QMatrix4x4Type(Context* context, const char* name,
-                       Class* superClass = 0);
+        QMatrix4x4Type(Context* context, const char* name, Class* superClass = 0);
         virtual ~QMatrix4x4Type();
 
         //

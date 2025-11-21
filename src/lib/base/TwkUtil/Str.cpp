@@ -14,26 +14,14 @@ namespace TwkUtil
     using namespace std;
 
     // Returns true if s1 ends with s2
-    bool endswith(string s1, string s2)
-    {
-        return s1.substr(s1.length() - s2.length(), s2.length()) == s2;
-    }
+    bool endswith(string s1, string s2) { return s1.substr(s1.length() - s2.length(), s2.length()) == s2; }
 
     // Returns true if s1 starts with s2
-    bool startswith(string s1, string s2)
-    {
-        return s1.substr(0, s2.length()) == s2;
-    }
+    bool startswith(string s1, string s2) { return s1.substr(0, s2.length()) == s2; }
 
-    static unsigned char upit(unsigned char c)
-    {
-        return (unsigned char)toupper(c);
-    }
+    static unsigned char upit(unsigned char c) { return (unsigned char)toupper(c); }
 
-    static unsigned char lowit(unsigned char c)
-    {
-        return (unsigned char)tolower(c);
-    }
+    static unsigned char lowit(unsigned char c) { return (unsigned char)tolower(c); }
 
     // Case conversion
     string uc(string str)

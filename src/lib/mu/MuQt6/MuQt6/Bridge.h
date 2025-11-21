@@ -22,13 +22,9 @@ namespace Mu
 
     void populate(Class*, const QMetaObject&, const char** propExclusions = 0);
 
-    QMetaMethodArgument argument(STLVector<Pointer>::Type& gcCache,
-                                 const Type* T, Value& v, QString& s,
-                                 QVariant& qv);
+    QMetaMethodArgument argument(STLVector<Pointer>::Type& gcCache, const Type* T, Value& v, QString& s, QVariant& qv);
 
-    QMetaMethodArgument argument(STLVector<Pointer>::Type& gcCache,
-                                 QMetaMethod& method, const Type* T, Value& v,
-                                 QString& s, QVariant& qv);
+    QMetaMethodArgument argument(STLVector<Pointer>::Type& gcCache, QMetaMethod& method, const Type* T, Value& v, QString& s, QVariant& qv);
 
 } // namespace Mu
 

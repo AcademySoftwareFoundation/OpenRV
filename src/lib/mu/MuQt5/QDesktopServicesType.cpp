@@ -37,8 +37,7 @@ namespace Mu
 {
     using namespace std;
 
-    QDesktopServicesType::QDesktopServicesType(Context* c, const char* name,
-                                               Class* super)
+    QDesktopServicesType::QDesktopServicesType(Context* c, const char* name, Class* super)
         : Class(c, name, super)
     {
     }
@@ -48,8 +47,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    static Pointer
-    QDesktopServices_QDesktopServices_QObject(Thread& NODE_THREAD, Pointer obj)
+    static Pointer QDesktopServices_QDesktopServices_QObject(Thread& NODE_THREAD, Pointer obj)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         ClassInstance* widget = reinterpret_cast<ClassInstance*>(obj);
@@ -57,8 +55,7 @@ namespace Mu
         if (QDesktopServices* w = object<QDesktopServices>(widget))
         {
             QDesktopServicesType* type =
-                c->findSymbolOfTypeByQualifiedName<QDesktopServicesType>(
-                    c->internName("qt.QDesktopServices"), false);
+                c->findSymbolOfTypeByQualifiedName<QDesktopServicesType>(c->internName("qt.QDesktopServices"), false);
             ClassInstance* o = ClassInstance::allocate(type);
             setobject(o, w);
             return o;
@@ -71,8 +68,7 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(castFromObject, Pointer)
     {
-        NODE_RETURN(QDesktopServices_QDesktopServices_QObject(
-            NODE_THREAD, NODE_ARG(0, Pointer)));
+        NODE_RETURN(QDesktopServices_QDesktopServices_QObject(NODE_THREAD, NODE_ARG(0, Pointer)));
     }
 
     void QDesktopServicesType::load()
@@ -92,17 +88,13 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
-                   new Function(c, tn, castFromObject, Cast, Compiled,
-                                QDesktopServices_QDesktopServices_QObject,
-                                Return, ftn, Parameters,
+                   new Function(c, tn, castFromObject, Cast, Compiled, QDesktopServices_QDesktopServices_QObject, Return, ftn, Parameters,
                                 new Param(c, "object", "qt.QObject"), End),
 
                    EndArguments);

@@ -56,11 +56,9 @@ private slots:
     void finishConnect(const QHostInfo& hostInfo);
 
 private:
-    static void DNSSD_API bonjourResolveReply(
-        DNSServiceRef sdRef, DNSServiceFlags flags, quint32 interfaceIndex,
-        DNSServiceErrorType errorCode, const char* fullName,
-        const char* hosttarget, quint16 port, quint16 txtLen,
-        const char* txtRecord, void* context);
+    static void DNSSD_API bonjourResolveReply(DNSServiceRef sdRef, DNSServiceFlags flags, quint32 interfaceIndex,
+                                              DNSServiceErrorType errorCode, const char* fullName, const char* hosttarget, quint16 port,
+                                              quint16 txtLen, const char* txtRecord, void* context);
     DNSServiceRef dnssref;
     QSocketNotifier* bonjourSocket;
     int bonjourPort;

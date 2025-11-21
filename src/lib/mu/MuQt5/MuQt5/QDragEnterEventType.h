@@ -34,8 +34,7 @@ namespace Mu
         //  Constructors
         //
 
-        QDragEnterEventType(Context* context, const char* name,
-                            Class* superClass = 0);
+        QDragEnterEventType(Context* context, const char* name, Class* superClass = 0);
         virtual ~QDragEnterEventType();
 
         //

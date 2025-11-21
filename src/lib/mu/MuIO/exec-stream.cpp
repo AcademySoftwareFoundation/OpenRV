@@ -109,10 +109,8 @@ namespace
         std::size_t written_size = 0;
         while (size > 0 && m_total_size > 0)
         {
-            std::size_t portion_size =
-                std::min(size, m_buffers.front().size - m_read_offset);
-            std::char_traits<char>::copy(
-                dst, m_buffers.front().data + m_read_offset, portion_size);
+            std::size_t portion_size = std::min(size, m_buffers.front().size - m_read_offset);
+            std::char_traits<char>::copy(dst, m_buffers.front().data + m_read_offset, portion_size);
             dst += portion_size;
             size -= portion_size;
             m_total_size -= portion_size;
@@ -133,8 +131,7 @@ namespace
         std::size_t written_size = 0;
         while (written_size != size && m_total_size > 0)
         {
-            while (written_size != size
-                   && m_read_offset != m_buffers.front().size)
+            while (written_size != size && m_read_offset != m_buffers.front().size)
             {
                 char c = m_buffers.front().data[m_read_offset];
                 if (c != '\r')
@@ -205,15 +202,11 @@ namespace
 
     bool buffer_list_t::empty() { return m_total_size == 0; }
 
-    bool buffer_list_t::full(std::size_t limit)
-    {
-        return limit != 0 && m_total_size >= limit;
-    }
+    bool buffer_list_t::full(std::size_t limit) { return limit != 0 && m_total_size >= limit; }
 
     void buffer_list_t::clear()
     {
-        for (buffers_t::iterator i = m_buffers.begin(); i != m_buffers.end();
-             ++i)
+        for (buffers_t::iterator i = m_buffers.begin(); i != m_buffers.end(); ++i)
         {
             delete[] i->data;
         }
@@ -241,8 +234,7 @@ namespace
     class exec_stream_buffer_t : public std::streambuf
     {
     public:
-        exec_stream_buffer_t(exec_stream_t::stream_kind_t kind,
-                             thread_buffer_t& thread_buffer);
+        exec_stream_buffer_t(exec_stream_t::stream_kind_t kind, thread_buffer_t& thread_buffer);
         virtual ~exec_stream_buffer_t();
 
         void clear();
@@ -263,8 +255,7 @@ namespace
 
     const std::size_t STREAM_BUFFER_SIZE = 4096;
 
-    exec_stream_buffer_t::exec_stream_buffer_t(
-        exec_stream_t::stream_kind_t kind, thread_buffer_t& thread_buffer)
+    exec_stream_buffer_t::exec_stream_buffer_t(exec_stream_t::stream_kind_t kind, thread_buffer_t& thread_buffer)
         : m_kind(kind)
         , m_thread_buffer(thread_buffer)
     {
@@ -282,8 +273,7 @@ namespace
         }
         else
         {
-            setg(m_stream_buffer, m_stream_buffer + STREAM_BUFFER_SIZE,
-                 m_stream_buffer + STREAM_BUFFER_SIZE);
+            setg(m_stream_buffer, m_stream_buffer + STREAM_BUFFER_SIZE, m_stream_buffer + STREAM_BUFFER_SIZE);
         }
     }
 
@@ -301,8 +291,7 @@ namespace
             }
             else
             {
-                setg(m_stream_buffer, m_stream_buffer,
-                     m_stream_buffer + read_size);
+                setg(m_stream_buffer, m_stream_buffer, m_stream_buffer + read_size);
             }
         }
         return traits_type::to_int_type(*eback());
@@ -336,8 +325,7 @@ namespace
         return write_size == 1 && !no_more;
     }
 
-    exec_stream_buffer_t::int_type
-    exec_stream_buffer_t::overflow(exec_stream_buffer_t::int_type c)
+    exec_stream_buffer_t::int_type exec_stream_buffer_t::overflow(exec_stream_buffer_t::int_type c)
     {
         if (!send_buffer())
         {
@@ -401,8 +389,7 @@ exec_stream_t::exec_stream_t()
     exceptions(true);
 }
 
-exec_stream_t::exec_stream_t(std::string const& program,
-                             std::string const& arguments)
+exec_stream_t::exec_stream_t(std::string const& program, std::string const& arguments)
 {
     m_impl = new impl_t;
     exceptions(true);
@@ -476,21 +463,14 @@ exec_stream_t::error_t::error_t() {}
 
 exec_stream_t::error_t::error_t(std::string const& msg) { m_msg = msg; }
 
-exec_stream_t::error_t::error_t(std::string const& msg, error_code_t code)
-{
-    compose(msg, code);
-}
+exec_stream_t::error_t::error_t(std::string const& msg, error_code_t code) { compose(msg, code); }
 
 exec_stream_t::error_t::~error_t() throw() {}
 
-char const* exec_stream_t::error_t::what() const throw()
-{
-    return m_msg.c_str();
-}
+char const* exec_stream_t::error_t::what() const throw() { return m_msg.c_str(); }
 
 void exec_stream_t::error_t::compose(std::string const& msg, error_code_t code)
 {
     m_msg = msg;
-    m_msg += "\n[code 0x" + int2str(code, 16, 4) + " (" + int2str(code, 10, 0)
-             + ")]";
+    m_msg += "\n[code 0x" + int2str(code, 16, 4) + " (" + int2str(code, 10, 0) + ")]";
 }

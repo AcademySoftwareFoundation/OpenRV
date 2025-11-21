@@ -42,8 +42,7 @@ namespace Mu
         //  Constructors
         //
 
-        QActionGroupType(Context* context, const char* name,
-                         Class* superClass = 0, Class* superClass2 = 0);
+        QActionGroupType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QActionGroupType();
 
@@ -66,8 +65,7 @@ namespace Mu
     {
     public:
         virtual ~MuQt_QActionGroup();
-        MuQt_QActionGroup(Pointer muobj, const CallEnvironment*,
-                          QObject* parent);
+        MuQt_QActionGroup(Pointer muobj, const CallEnvironment*, QObject* parent);
         virtual bool event(QEvent* e);
         virtual bool eventFilter(QObject* watched, QEvent* event);
 
@@ -78,17 +76,11 @@ namespace Mu
     public:
         void customEvent_pub(QEvent* event) { customEvent(event); }
 
-        void customEvent_pub_parent(QEvent* event)
-        {
-            QActionGroup::customEvent(event);
-        }
+        void customEvent_pub_parent(QEvent* event) { QActionGroup::customEvent(event); }
 
         void timerEvent_pub(QTimerEvent* event) { timerEvent(event); }
 
-        void timerEvent_pub_parent(QTimerEvent* event)
-        {
-            QActionGroup::timerEvent(event);
-        }
+        void timerEvent_pub_parent(QTimerEvent* event) { QActionGroup::timerEvent(event); }
 
     public:
         const QActionGroupType* _baseType;
@@ -96,11 +88,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance*
-    QActionGroupType::cachedInstance(const QActionGroupType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QActionGroupType::cachedInstance(const QActionGroupType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

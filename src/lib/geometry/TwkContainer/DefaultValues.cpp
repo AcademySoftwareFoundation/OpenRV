@@ -11,9 +11,6 @@ namespace TwkContainer
 {
     using namespace std;
 
-    ostream& operator<<(ostream& o, const StringPair& v)
-    {
-        return o << "(" << v.first << ", " << v.second << ")";
-    }
+    ostream& operator<<(ostream& o, const StringPair& v) { return o << "(" << v.first << ", " << v.second << ")"; }
 
 } // namespace TwkContainer

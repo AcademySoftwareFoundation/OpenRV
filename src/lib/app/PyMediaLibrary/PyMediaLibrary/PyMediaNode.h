@@ -26,8 +26,7 @@ namespace TwkMediaLibrary
         , public MediaAPI
     {
     public:
-        PyMediaNode(Library* lib, URL url, PyNode* parent, Plugin plugin,
-                    std::string pluginName);
+        PyMediaNode(Library* lib, URL url, PyNode* parent, Plugin plugin, std::string pluginName);
         virtual ~PyMediaNode();
         virtual const Node* node() const;
         URL mediaURL() const override;

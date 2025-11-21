@@ -56,17 +56,14 @@ namespace Mu
         _baseType = 0;
     }
 
-    MuQt_QWidgetAction::MuQt_QWidgetAction(Pointer muobj,
-                                           const CallEnvironment* ce,
-                                           QObject* parent)
+    MuQt_QWidgetAction::MuQt_QWidgetAction(Pointer muobj, const CallEnvironment* ce, QObject* parent)
         : QWidgetAction(parent)
     {
         _env = ce;
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QWidgetActionType>(
-            c->internName("qt.QWidgetAction"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QWidgetActionType>(c->internName("qt.QWidgetAction"));
     }
 
     QWidget* MuQt_QWidgetAction::createWidget(QWidget* parent)
@@ -159,8 +156,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  Mu Type CONSTRUCTORS
 
-    QWidgetActionType::QWidgetActionType(Context* c, const char* name,
-                                         Class* super, Class* super2)
+    QWidgetActionType::QWidgetActionType(Context* c, const char* name, Class* super, Class* super2)
         : Class(c, name, vectorOf2(super, super2))
     {
     }
@@ -170,8 +166,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    static Pointer QWidgetAction_QWidgetAction_QObject(Thread& NODE_THREAD,
-                                                       Pointer obj)
+    static Pointer QWidgetAction_QWidgetAction_QObject(Thread& NODE_THREAD, Pointer obj)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         ClassInstance* widget = reinterpret_cast<ClassInstance*>(obj);
@@ -182,9 +177,7 @@ namespace Mu
         }
         else if (QWidgetAction* w = object<QWidgetAction>(widget))
         {
-            QWidgetActionType* type =
-                c->findSymbolOfTypeByQualifiedName<QWidgetActionType>(
-                    c->internName("qt.QWidgetAction"), false);
+            QWidgetActionType* type = c->findSymbolOfTypeByQualifiedName<QWidgetActionType>(c->internName("qt.QWidgetAction"), false);
             ClassInstance* o = ClassInstance::allocate(type);
             setobject(o, w);
             return o;
@@ -197,32 +190,26 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(castFromObject, Pointer)
     {
-        NODE_RETURN(QWidgetAction_QWidgetAction_QObject(NODE_THREAD,
-                                                        NODE_ARG(0, Pointer)));
+        NODE_RETURN(QWidgetAction_QWidgetAction_QObject(NODE_THREAD, NODE_ARG(0, Pointer)));
     }
 
-    Pointer qt_QWidgetAction_QWidgetAction_QWidgetAction_QWidgetAction_QObject(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
+    Pointer qt_QWidgetAction_QWidgetAction_QWidgetAction_QWidgetAction_QObject(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                               Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QObject* arg1 = object<QObject>(param_parent);
-        setobject(param_this,
-                  new MuQt_QWidgetAction(
-                      param_this, NODE_THREAD.process()->callEnv(), arg1));
+        setobject(param_this, new MuQt_QWidgetAction(param_this, NODE_THREAD.process()->callEnv(), arg1));
         return param_this;
     }
 
-    Pointer qt_QWidgetAction_defaultWidget_QWidget_QWidgetAction(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QWidgetAction_defaultWidget_QWidget_QWidgetAction(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWidgetAction* arg0 = object<QWidgetAction>(param_this);
-        return makeinstance<QWidgetType>(c, arg0->defaultWidget(),
-                                         "qt.QWidget");
+        return makeinstance<QWidgetType>(c, arg0->defaultWidget(), "qt.QWidget");
     }
 
-    void qt_QWidgetAction_releaseWidget_void_QWidgetAction_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_widget)
+    void qt_QWidgetAction_releaseWidget_void_QWidgetAction_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_widget)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWidgetAction* arg0 = object<QWidgetAction>(param_this);
@@ -230,18 +217,15 @@ namespace Mu
         arg0->releaseWidget(arg1);
     }
 
-    Pointer qt_QWidgetAction_requestWidget_QWidget_QWidgetAction_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
+    Pointer qt_QWidgetAction_requestWidget_QWidget_QWidgetAction_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWidgetAction* arg0 = object<QWidgetAction>(param_this);
         QWidget* arg1 = object<QWidget>(param_parent);
-        return makeinstance<QWidgetType>(c, arg0->requestWidget(arg1),
-                                         "qt.QWidget");
+        return makeinstance<QWidgetType>(c, arg0->requestWidget(arg1), "qt.QWidget");
     }
 
-    void qt_QWidgetAction_setDefaultWidget_void_QWidgetAction_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_widget)
+    void qt_QWidgetAction_setDefaultWidget_void_QWidgetAction_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_widget)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWidgetAction* arg0 = object<QWidgetAction>(param_this);
@@ -249,25 +233,16 @@ namespace Mu
         arg0->setDefaultWidget(arg1);
     }
 
-    Pointer qt_QWidgetAction_createWidget_QWidget_QWidgetAction_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
+    Pointer qt_QWidgetAction_createWidget_QWidget_QWidgetAction_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWidgetAction* arg0 = object<QWidgetAction>(param_this);
         QWidget* arg1 = object<QWidget>(param_parent);
-        return isMuQtObject(arg0)
-                   ? makeinstance<QWidgetType>(
-                         c,
-                         ((MuQt_QWidgetAction*)arg0)
-                             ->createWidget_pub_parent(arg1),
-                         "qt.QWidget")
-                   : makeinstance<QWidgetType>(
-                         c, ((MuQt_QWidgetAction*)arg0)->createWidget_pub(arg1),
-                         "qt.QWidget");
+        return isMuQtObject(arg0) ? makeinstance<QWidgetType>(c, ((MuQt_QWidgetAction*)arg0)->createWidget_pub_parent(arg1), "qt.QWidget")
+                                  : makeinstance<QWidgetType>(c, ((MuQt_QWidgetAction*)arg0)->createWidget_pub(arg1), "qt.QWidget");
     }
 
-    void qt_QWidgetAction_deleteWidget_void_QWidgetAction_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_widget)
+    void qt_QWidgetAction_deleteWidget_void_QWidgetAction_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_widget)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWidgetAction* arg0 = object<QWidgetAction>(param_this);
@@ -278,89 +253,72 @@ namespace Mu
             ((MuQt_QWidgetAction*)arg0)->deleteWidget_pub(arg1);
     }
 
-    bool qt_QWidgetAction_event_bool_QWidgetAction_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event_)
+    bool qt_QWidgetAction_event_bool_QWidgetAction_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event_)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWidgetAction* arg0 = object<QWidgetAction>(param_this);
         QEvent* arg1 = getqpointer<QEventType>(param_event_);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QWidgetAction*)arg0)->event_pub_parent(arg1)
-                   : ((MuQt_QWidgetAction*)arg0)->event_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QWidgetAction*)arg0)->event_pub_parent(arg1) : ((MuQt_QWidgetAction*)arg0)->event_pub(arg1);
     }
 
-    bool qt_QWidgetAction_eventFilter_bool_QWidgetAction_QObject_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_obj,
-        Pointer param_event)
+    bool qt_QWidgetAction_eventFilter_bool_QWidgetAction_QObject_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_obj,
+                                                                        Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWidgetAction* arg0 = object<QWidgetAction>(param_this);
         QObject* arg1 = object<QObject>(param_obj);
         QEvent* arg2 = getqpointer<QEventType>(param_event);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QWidgetAction*)arg0)
-                         ->eventFilter_pub_parent(arg1, arg2)
-                   : ((MuQt_QWidgetAction*)arg0)->eventFilter_pub(arg1, arg2);
+        return isMuQtObject(arg0) ? ((MuQt_QWidgetAction*)arg0)->eventFilter_pub_parent(arg1, arg2)
+                                  : ((MuQt_QWidgetAction*)arg0)->eventFilter_pub(arg1, arg2);
     }
 
     static NODE_IMPLEMENTATION(_n_QWidgetAction0, Pointer)
     {
-        NODE_RETURN(
-            qt_QWidgetAction_QWidgetAction_QWidgetAction_QWidgetAction_QObject(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QWidgetAction_QWidgetAction_QWidgetAction_QWidgetAction_QObject(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                       NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_defaultWidget0, Pointer)
     {
-        NODE_RETURN(qt_QWidgetAction_defaultWidget_QWidget_QWidgetAction(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QWidgetAction_defaultWidget_QWidget_QWidgetAction(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_releaseWidget0, void)
     {
-        qt_QWidgetAction_releaseWidget_void_QWidgetAction_QWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QWidgetAction_releaseWidget_void_QWidgetAction_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_requestWidget0, Pointer)
     {
         NODE_RETURN(
-            qt_QWidgetAction_requestWidget_QWidget_QWidgetAction_QWidget(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+            qt_QWidgetAction_requestWidget_QWidget_QWidgetAction_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_setDefaultWidget0, void)
     {
-        qt_QWidgetAction_setDefaultWidget_void_QWidgetAction_QWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QWidgetAction_setDefaultWidget_void_QWidgetAction_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_createWidget0, Pointer)
     {
-        NODE_RETURN(qt_QWidgetAction_createWidget_QWidget_QWidgetAction_QWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(
+            qt_QWidgetAction_createWidget_QWidget_QWidgetAction_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_deleteWidget0, void)
     {
-        qt_QWidgetAction_deleteWidget_void_QWidgetAction_QWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QWidgetAction_deleteWidget_void_QWidgetAction_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_event0, bool)
     {
-        NODE_RETURN(qt_QWidgetAction_event_bool_QWidgetAction_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QWidgetAction_event_bool_QWidgetAction_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_eventFilter0, bool)
     {
-        NODE_RETURN(
-            qt_QWidgetAction_eventFilter_bool_QWidgetAction_QObject_QEvent(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QWidgetAction_eventFilter_bool_QWidgetAction_QObject_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                   NODE_ARG(1, Pointer), NODE_ARG(2, Pointer)));
     }
 
     void QWidgetActionType::load()
@@ -380,17 +338,13 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
-                   new Function(c, tn, castFromObject, Cast, Compiled,
-                                QWidgetAction_QWidgetAction_QObject, Return,
-                                ftn, Parameters,
+                   new Function(c, tn, castFromObject, Cast, Compiled, QWidgetAction_QWidgetAction_QObject, Return, ftn, Parameters,
                                 new Param(c, "object", "qt.QObject"), End),
 
                    EndArguments);
@@ -398,60 +352,34 @@ namespace Mu
         addSymbols(
             // enums
             // member functions
-            new Function(
-                c, "QWidgetAction", _n_QWidgetAction0, None, Compiled,
-                qt_QWidgetAction_QWidgetAction_QWidgetAction_QWidgetAction_QObject,
-                Return, "qt.QWidgetAction", Parameters,
-                new Param(c, "this", "qt.QWidgetAction"),
-                new Param(c, "parent", "qt.QObject"), End),
-            new Function(c, "defaultWidget", _n_defaultWidget0, None, Compiled,
-                         qt_QWidgetAction_defaultWidget_QWidget_QWidgetAction,
-                         Return, "qt.QWidget", Parameters,
-                         new Param(c, "this", "qt.QWidgetAction"), End),
-            new Function(
-                c, "releaseWidget", _n_releaseWidget0, None, Compiled,
-                qt_QWidgetAction_releaseWidget_void_QWidgetAction_QWidget,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QWidgetAction"),
-                new Param(c, "widget", "qt.QWidget"), End),
-            new Function(
-                c, "requestWidget", _n_requestWidget0, None, Compiled,
-                qt_QWidgetAction_requestWidget_QWidget_QWidgetAction_QWidget,
-                Return, "qt.QWidget", Parameters,
-                new Param(c, "this", "qt.QWidgetAction"),
-                new Param(c, "parent", "qt.QWidget"), End),
-            new Function(
-                c, "setDefaultWidget", _n_setDefaultWidget0, None, Compiled,
-                qt_QWidgetAction_setDefaultWidget_void_QWidgetAction_QWidget,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QWidgetAction"),
-                new Param(c, "widget", "qt.QWidget"), End),
-            _func[0] = new MemberFunction(
-                c, "createWidget", _n_createWidget0, None, Compiled,
-                qt_QWidgetAction_createWidget_QWidget_QWidgetAction_QWidget,
-                Return, "qt.QWidget", Parameters,
-                new Param(c, "this", "qt.QWidgetAction"),
-                new Param(c, "parent", "qt.QWidget"), End),
+            new Function(c, "QWidgetAction", _n_QWidgetAction0, None, Compiled,
+                         qt_QWidgetAction_QWidgetAction_QWidgetAction_QWidgetAction_QObject, Return, "qt.QWidgetAction", Parameters,
+                         new Param(c, "this", "qt.QWidgetAction"), new Param(c, "parent", "qt.QObject"), End),
+            new Function(c, "defaultWidget", _n_defaultWidget0, None, Compiled, qt_QWidgetAction_defaultWidget_QWidget_QWidgetAction,
+                         Return, "qt.QWidget", Parameters, new Param(c, "this", "qt.QWidgetAction"), End),
+            new Function(c, "releaseWidget", _n_releaseWidget0, None, Compiled, qt_QWidgetAction_releaseWidget_void_QWidgetAction_QWidget,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QWidgetAction"), new Param(c, "widget", "qt.QWidget"), End),
+            new Function(c, "requestWidget", _n_requestWidget0, None, Compiled,
+                         qt_QWidgetAction_requestWidget_QWidget_QWidgetAction_QWidget, Return, "qt.QWidget", Parameters,
+                         new Param(c, "this", "qt.QWidgetAction"), new Param(c, "parent", "qt.QWidget"), End),
+            new Function(c, "setDefaultWidget", _n_setDefaultWidget0, None, Compiled,
+                         qt_QWidgetAction_setDefaultWidget_void_QWidgetAction_QWidget, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QWidgetAction"), new Param(c, "widget", "qt.QWidget"), End),
+            _func[0] = new MemberFunction(c, "createWidget", _n_createWidget0, None, Compiled,
+                                          qt_QWidgetAction_createWidget_QWidget_QWidgetAction_QWidget, Return, "qt.QWidget", Parameters,
+                                          new Param(c, "this", "qt.QWidgetAction"), new Param(c, "parent", "qt.QWidget"), End),
             // MISSING: createdWidgets ("QList<QWidget * >"; QWidgetAction this)
             // // protected
-            _func[1] = new MemberFunction(
-                c, "deleteWidget", _n_deleteWidget0, None, Compiled,
-                qt_QWidgetAction_deleteWidget_void_QWidgetAction_QWidget,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QWidgetAction"),
-                new Param(c, "widget", "qt.QWidget"), End),
-            _func[2] = new MemberFunction(
-                c, "event", _n_event0, None, Compiled,
-                qt_QWidgetAction_event_bool_QWidgetAction_QEvent, Return,
-                "bool", Parameters, new Param(c, "this", "qt.QWidgetAction"),
-                new Param(c, "event_", "qt.QEvent"), End),
-            _func[3] = new MemberFunction(
-                c, "eventFilter", _n_eventFilter0, None, Compiled,
-                qt_QWidgetAction_eventFilter_bool_QWidgetAction_QObject_QEvent,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QWidgetAction"),
-                new Param(c, "obj", "qt.QObject"),
-                new Param(c, "event", "qt.QEvent"), End),
+            _func[1] = new MemberFunction(c, "deleteWidget", _n_deleteWidget0, None, Compiled,
+                                          qt_QWidgetAction_deleteWidget_void_QWidgetAction_QWidget, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QWidgetAction"), new Param(c, "widget", "qt.QWidget"), End),
+            _func[2] =
+                new MemberFunction(c, "event", _n_event0, None, Compiled, qt_QWidgetAction_event_bool_QWidgetAction_QEvent, Return, "bool",
+                                   Parameters, new Param(c, "this", "qt.QWidgetAction"), new Param(c, "event_", "qt.QEvent"), End),
+            _func[3] = new MemberFunction(c, "eventFilter", _n_eventFilter0, None, Compiled,
+                                          qt_QWidgetAction_eventFilter_bool_QWidgetAction_QObject_QEvent, Return, "bool", Parameters,
+                                          new Param(c, "this", "qt.QWidgetAction"), new Param(c, "obj", "qt.QObject"),
+                                          new Param(c, "event", "qt.QEvent"), End),
             // static functions
             EndArguments);
         globalScope()->addSymbols(EndArguments);

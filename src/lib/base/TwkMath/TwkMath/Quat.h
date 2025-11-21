@@ -95,10 +95,7 @@ namespace TwkMath
         {
         }
 
-        template <typename S> operator Vec4<S>() const
-        {
-            return Vec4<S>(s, v.x, v.y, v.z);
-        }
+        template <typename S> operator Vec4<S>() const { return Vec4<S>(s, v.x, v.y, v.z); }
 
         template <typename S> operator Mat33<S>() const;
         template <typename S> operator Mat44<S>() const;
@@ -188,8 +185,7 @@ namespace TwkMath
         {
             S sq = S(.5) / Math<S>::sqrt(trace);
             s = S(.25) / sq;
-            v = Vec(R(2, 1) - R(1, 2), R(0, 2) - R(2, 0), R(1, 0) - R(0, 1))
-                * sq;
+            v = Vec(R(2, 1) - R(1, 2), R(0, 2) - R(2, 0), R(1, 0) - R(0, 1)) * sq;
         }
         else
         {
@@ -209,27 +205,21 @@ namespace TwkMath
         normalize();
     }
 
-    template <typename T>
-    template <typename S>
-    inline Quat<T>& Quat<T>::operator+=(const Quat<S>& a)
+    template <typename T> template <typename S> inline Quat<T>& Quat<T>::operator+=(const Quat<S>& a)
     {
         s += a.s;
         v += a.v;
         return *this;
     }
 
-    template <typename T>
-    template <typename S>
-    inline Quat<T>& Quat<T>::operator-=(const Quat<S>& a)
+    template <typename T> template <typename S> inline Quat<T>& Quat<T>::operator-=(const Quat<S>& a)
     {
         s -= a.s;
         v -= a.v;
         return *this;
     }
 
-    template <typename T>
-    template <typename S>
-    inline Quat<T>& Quat<T>::operator*=(const Quat<S>& a)
+    template <typename T> template <typename S> inline Quat<T>& Quat<T>::operator*=(const Quat<S>& a)
     {
         v = dot(v, a.v) + s * a.v + a.s * v + cross(v, a.v);
         s *= a.s;
@@ -258,38 +248,20 @@ namespace TwkMath
         return *this;
     }
 
-    template <typename T, typename S>
-    inline Quat<T> operator+(const Quat<T>& a, const Quat<S>& b)
+    template <typename T, typename S> inline Quat<T> operator+(const Quat<T>& a, const Quat<S>& b) { return Quat<T>(a.s + b.s, a.v + b.v); }
+
+    template <typename T, typename S> inline Quat<T> operator-(const Quat<T>& a, const Quat<S>& b) { return Quat<T>(a.s - b.s, a.v - b.v); }
+
+    template <typename T> inline Quat<T> operator-(const Quat<T>& a) { return Quat<T>(-a.s, -a.v); }
+
+    template <typename T, typename S> inline Quat<T> operator*(const Quat<T>& a, const Quat<S>& b)
     {
-        return Quat<T>(a.s + b.s, a.v + b.v);
+        return Quat<T>(a.s * b.s - dot(a.v, b.v), a.s * b.v + b.s * a.v + cross(a.v, b.v));
     }
 
-    template <typename T, typename S>
-    inline Quat<T> operator-(const Quat<T>& a, const Quat<S>& b)
-    {
-        return Quat<T>(a.s - b.s, a.v - b.v);
-    }
+    template <typename T, typename S> inline Quat<T> operator*(const Quat<T>& a, S b) { return Quat<T>(a.s * b, a.v * b); }
 
-    template <typename T> inline Quat<T> operator-(const Quat<T>& a)
-    {
-        return Quat<T>(-a.s, -a.v);
-    }
-
-    template <typename T, typename S>
-    inline Quat<T> operator*(const Quat<T>& a, const Quat<S>& b)
-    {
-        return Quat<T>(a.s * b.s - dot(a.v, b.v),
-                       a.s * b.v + b.s * a.v + cross(a.v, b.v));
-    }
-
-    template <typename T, typename S>
-    inline Quat<T> operator*(const Quat<T>& a, S b)
-    {
-        return Quat<T>(a.s * b, a.v * b);
-    }
-
-    template <typename T, typename S>
-    inline Vec3<T> operator*(const Quat<T>& q, const Vec3<S> v)
+    template <typename T, typename S> inline Vec3<T> operator*(const Quat<T>& q, const Vec3<S> v)
     {
         //
         //  This only works if q is normalized! But presumably it is or
@@ -299,38 +271,19 @@ namespace TwkMath
         return (q * Quat<T>(T(0), v) * ~q).v;
     }
 
-    template <typename T, typename S>
-    inline Quat<T> operator/(const Quat<T>& a, S b)
-    {
-        return Quat<T>(a.s / b, a.v / b);
-    }
+    template <typename T, typename S> inline Quat<T> operator/(const Quat<T>& a, S b) { return Quat<T>(a.s / b, a.v / b); }
 
-    template <typename T> inline T magnitudeSquared(const Quat<T>& a)
-    {
-        return a.s * a.s + dot(a.v, a.v);
-    }
+    template <typename T> inline T magnitudeSquared(const Quat<T>& a) { return a.s * a.s + dot(a.v, a.v); }
 
-    template <typename T> inline T norm(const Quat<T>& a)
-    {
-        return magnitudeSquared(a);
-    }
+    template <typename T> inline T norm(const Quat<T>& a) { return magnitudeSquared(a); }
 
-    template <typename T> inline T magnitude(const Quat<T>& a)
-    {
-        return Math<T>::sqrt(norm(a));
-    }
+    template <typename T> inline T magnitude(const Quat<T>& a) { return Math<T>::sqrt(norm(a)); }
 
-    template <typename T> inline Quat<T> Quat<T>::inverted() const
-    {
-        return Quat<T>(~(*this) / norm(*this));
-    }
+    template <typename T> inline Quat<T> Quat<T>::inverted() const { return Quat<T>(~(*this) / norm(*this)); }
 
     template <typename T> inline void Quat<T>::invert() { *this = inverted(); }
 
-    template <typename T> inline Quat<T> inverse(const Quat<T>& q)
-    {
-        return q.inverted();
-    }
+    template <typename T> inline Quat<T> inverse(const Quat<T>& q) { return q.inverted(); }
 
     template <typename T> inline void Quat<T>::normalize()
     {
@@ -345,34 +298,19 @@ namespace TwkMath
         return Quat<T>(s / m, v / m);
     }
 
-    template <typename T> inline Quat<T> normalize(const Quat<T>& q)
-    {
-        return q.normalized();
-    }
+    template <typename T> inline Quat<T> normalize(const Quat<T>& q) { return q.normalized(); }
 
-    template <typename T, typename S>
-    inline Quat<T> operator/(const Quat<T>& a, const Quat<S>& b)
-    {
-        return Quat<T>(a * b.inverted());
-    }
+    template <typename T, typename S> inline Quat<T> operator/(const Quat<T>& a, const Quat<S>& b) { return Quat<T>(a * b.inverted()); }
 
-    template <typename T>
-    template <typename S>
-    inline Quat<T>& Quat<T>::operator/=(const Quat<S>& a)
-    {
-        return *this *= a.inverted();
-    }
+    template <typename T> template <typename S> inline Quat<T>& Quat<T>::operator/=(const Quat<S>& a) { return *this *= a.inverted(); }
 
-    template <typename T>
-    inline void Quat<T>::setAxisAngle(const typename Quat<T>::Vec& axis,
-                                      T radians)
+    template <typename T> inline void Quat<T>::setAxisAngle(const typename Quat<T>::Vec& axis, T radians)
     {
         s = Math<T>::cos(radians / T(2));
         v = axis.normalized() * Math<T>::sin(radians / T(2));
     }
 
-    template <typename T>
-    void Quat<T>::rotateVector(const Vec3<T>& from, const Vec3<T>& to)
+    template <typename T> void Quat<T>::rotateVector(const Vec3<T>& from, const Vec3<T>& to)
     {
         Vec3<T> nf = from.normalized();
         Vec3<T> nt = to.normalized();
@@ -401,8 +339,7 @@ namespace TwkMath
             // w part is cosine of half the rotation angle
             //
 
-            T cost =
-                dot(from, to) / Math<T>::sqrt(dot(from, from) * dot(to, to));
+            T cost = dot(from, to) / Math<T>::sqrt(dot(from, from) * dot(to, to));
             s = Math<T>::sqrt(T(0.5) * (T(1) + cost));
 
             //
@@ -416,15 +353,9 @@ namespace TwkMath
         }
     }
 
-    template <typename T, typename S>
-    inline T dot(const Quat<T>& a, const Quat<S>& b)
-    {
-        return dot(a.v, b.v) + a.s * b.s;
-    }
+    template <typename T, typename S> inline T dot(const Quat<T>& a, const Quat<S>& b) { return dot(a.v, b.v) + a.s * b.s; }
 
-    template <typename T>
-    template <typename S>
-    inline Quat<T>::operator Mat33<S>() const
+    template <typename T> template <typename S> inline Quat<T>::operator Mat33<S>() const
     {
         const S xx = v.x * v.x;
         const S yy = v.y * v.y;
@@ -449,9 +380,7 @@ namespace TwkMath
         return Mat33<S>(a, d, g, b, e, h, c, f, i);
     }
 
-    template <typename T>
-    template <typename S>
-    inline Quat<T>::operator Mat44<S>() const
+    template <typename T> template <typename S> inline Quat<T>::operator Mat44<S>() const
     {
         const S xx = v.x * v.x;
         const S yy = v.y * v.y;
@@ -473,22 +402,14 @@ namespace TwkMath
         const S h = S(2) * (yz - sx);
         const S i = S(1) - S(2) * (yy + xx);
 
-        return Mat44<S>(a, d, g, S(0), b, e, h, S(0), c, f, i, S(0), S(0), S(0),
-                        S(0), S(1));
+        return Mat44<S>(a, d, g, S(0), b, e, h, S(0), c, f, i, S(0), S(0), S(0), S(0), S(1));
     }
 
-    template <typename T> inline T Quat<T>::angle() const
-    {
-        return Math<T>::acos(s) * T(2);
-    }
+    template <typename T> inline T Quat<T>::angle() const { return Math<T>::acos(s) * T(2); }
 
-    template <typename T> Vec3<T> Quat<T>::axis() const
-    {
-        return v.normalized();
-    }
+    template <typename T> Vec3<T> Quat<T>::axis() const { return v.normalized(); }
 
-    template <typename T, typename S>
-    Quat<T> slerp(const Quat<T>& q1, const Quat<T>& q2, const S& t)
+    template <typename T, typename S> Quat<T> slerp(const Quat<T>& q1, const Quat<T>& q2, const S& t)
     {
         // Spherical linear interpolation.
         // Given two quaternions q1 and q2, there

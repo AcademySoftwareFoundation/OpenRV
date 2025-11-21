@@ -60,8 +60,7 @@ namespace Mu
         cout << "stack = (" << n.size() << ")";
         for (int i = 0; i < n.size(); i++)
         {
-            cout << " (" << n[i]->symbol()->name() << ")=" << hex << n[i]
-                 << dec;
+            cout << " (" << n[i]->symbol()->name() << ")=" << hex << n[i] << dec;
         }
         cout << endl << flush;
     }
@@ -150,9 +149,7 @@ namespace Mu
     {
         if (lineNum() > 0)
         {
-            context()->errorStream()
-                << sourceName() << ", line " << lineNum() << ", char "
-                << charNum() << ": " << msg << endl;
+            context()->errorStream() << sourceName() << ", line " << lineNum() << ", char " << charNum() << ": " << msg << endl;
         }
         else
         {
@@ -171,8 +168,7 @@ namespace Mu
         int nchar = charNum();
         string file = sourceName().c_str();
 
-        if (context()->debugging()
-            || dynamic_cast<const UnresolvedSymbol*>(n->symbol()))
+        if (context()->debugging() || dynamic_cast<const UnresolvedSymbol*>(n->symbol()))
         {
             AnnotatedNode* anode = static_cast<AnnotatedNode*>(n);
             nline = anode->linenum();
@@ -182,8 +178,7 @@ namespace Mu
 
         if (nline > 0)
         {
-            context()->errorStream() << file << ", line " << nline << ", char "
-                                     << nchar << ": " << msg << endl;
+            context()->errorStream() << file << ", line " << nline << ", char " << nchar << ": " << msg << endl;
         }
         else
         {
@@ -284,10 +279,7 @@ namespace Mu
         nl[0] = n;
     }
 
-    void NodeAssembler::removeNodeList(NodeList l)
-    {
-        _nodeStack.resize(l.start());
-    }
+    void NodeAssembler::removeNodeList(NodeList l) { _nodeStack.resize(l.start()); }
 
     bool NodeAssembler::containsNoOps(NodeList l) const
     {
@@ -327,10 +319,7 @@ namespace Mu
         return sl;
     }
 
-    void NodeAssembler::removeSymbolList(SymbolList l)
-    {
-        _symbolStack.resize(l.start());
-    }
+    void NodeAssembler::removeSymbolList(SymbolList l) { _symbolStack.resize(l.start()); }
 
     void NodeAssembler::insertSymbolAtFront(SymbolList sl, Symbol* symbol)
     {
@@ -360,15 +349,11 @@ namespace Mu
         return nl;
     }
 
-    void NodeAssembler::removeNameList(NameList l)
-    {
-        _nameStack.resize(l.start());
-    }
+    void NodeAssembler::removeNameList(NameList l) { _nameStack.resize(l.start()); }
 
     DataNode* NodeAssembler::constant(const Type* type, Object* o) const
     {
-        DataNode* dn =
-            new DataNode(0, type->machineRep()->constantFunc(), type);
+        DataNode* dn = new DataNode(0, type->machineRep()->constantFunc(), type);
         // if (o) process()->constants().push_back(o);
         return dn;
     }
@@ -390,8 +375,7 @@ namespace Mu
         }
         else if (context()->debugging())
         {
-            n = new AnnotatedNode(nargs, f->func(), f, _line, _char,
-                                  _sourceName);
+            n = new AnnotatedNode(nargs, f->func(), f, _line, _char, _sourceName);
         }
         else
         {
@@ -418,8 +402,7 @@ namespace Mu
         {
             o = new FunctionObject(f);
             // CONSTANT
-            n = new DataNode(0, f->type()->machineRep()->constantFunc(),
-                             f->type());
+            n = new DataNode(0, f->type()->machineRep()->constantFunc(), f->type());
 
             if (f->numFreeVariables())
             {
@@ -432,8 +415,7 @@ namespace Mu
 
                 for (int i = 0; i < nargs; i++)
                 {
-                    nl.push_back(callBestOverloadedFunction(context()->noop(),
-                                                            emptyNodeList()));
+                    nl.push_back(callBestOverloadedFunction(context()->noop(), emptyNodeList()));
                 }
 
                 for (int i = nargs; i < ntotal; i++)
@@ -448,8 +430,7 @@ namespace Mu
                     {
                         freportError("unable to bind free variable \"%s\" in "
                                      "function \"%s\"",
-                                     pv->name().c_str(),
-                                     f->fullyQualifiedName().c_str());
+                                     pv->name().c_str(), f->fullyQualifiedName().c_str());
                         return 0;
                     }
                 }
@@ -510,8 +491,7 @@ namespace Mu
             //
 
             Node* fn = n->argNode(0);
-            const FunctionType* t =
-                dynamic_cast<const FunctionType*>(fn->type());
+            const FunctionType* t = dynamic_cast<const FunctionType*>(fn->type());
 
             if (fn->symbol() == t)
             {
@@ -520,8 +500,7 @@ namespace Mu
                 //
 
                 DataNode* dn = static_cast<DataNode*>(fn);
-                FunctionObject* fobj =
-                    reinterpret_cast<FunctionObject*>(dn->_data._Pointer);
+                FunctionObject* fobj = reinterpret_cast<FunctionObject*>(dn->_data._Pointer);
 
                 if (!fobj)
                     return n;
@@ -548,8 +527,7 @@ namespace Mu
 
                     if (!nn)
                     {
-                        freportWarning(
-                            "function indirection simplification failed");
+                        freportWarning("function indirection simplification failed");
                         return n;
                     }
                     else
@@ -591,11 +569,8 @@ namespace Mu
         //  reduced without additional information.
         //
 
-        if ((f->isPure() || f->maybePure())
-            && (!f->isConstructor()
-                || (f->isConstructor() && !f->returnType()->isMutable()))
-            && f != context()->noop()
-            && n->type() != context()->unresolvedType() && _thread)
+        if ((f->isPure() || f->maybePure()) && (!f->isConstructor() || (f->isConstructor() && !f->returnType()->isMutable()))
+            && f != context()->noop() && n->type() != context()->unresolvedType() && _thread)
         {
             for (int i = 0, s = n->numArgs(); i < s; i++)
             {
@@ -615,14 +590,11 @@ namespace Mu
                     //  not pure.
                     //
 
-                    if (const FunctionType* t =
-                            dynamic_cast<const FunctionType*>(argNode->type()))
+                    if (const FunctionType* t = dynamic_cast<const FunctionType*>(argNode->type()))
                     {
                         DataNode* dn = static_cast<DataNode*>(argNode);
 
-                        if (FunctionObject* fobj =
-                                reinterpret_cast<FunctionObject*>(
-                                    dn->_data._Pointer))
+                        if (FunctionObject* fobj = reinterpret_cast<FunctionObject*>(dn->_data._Pointer))
                         {
                             const Function* fn = fobj->function();
                             if (!fn->isPure() && !fn->maybePure())
@@ -630,13 +602,11 @@ namespace Mu
                         }
                         else
                         {
-                            freportWarning(
-                                "While trying to reduce function \"%s\", "
-                                "argument %d which should have been a function "
-                                "object "
-                                "of type \"%s\" was found to be nil",
-                                f->fullyQualifiedName().c_str(), i,
-                                t->fullyQualifiedName().c_str());
+                            freportWarning("While trying to reduce function \"%s\", "
+                                           "argument %d which should have been a function "
+                                           "object "
+                                           "of type \"%s\" was found to be nil",
+                                           f->fullyQualifiedName().c_str(), i, t->fullyQualifiedName().c_str());
                             return n;
                         }
                     }
@@ -658,8 +628,7 @@ namespace Mu
                 //  Make the new object a constant
                 //
 
-                if (!t->isReferenceType()
-                    && t->machineRep() == PointerRep::rep())
+                if (!t->isReferenceType() && t->machineRep() == PointerRep::rep())
                 {
                     Object* o = reinterpret_cast<Object*>(dn->_data._Pointer);
                     // process()->constants().push_back(o);
@@ -706,8 +675,7 @@ namespace Mu
                     // process()->constants().push_back((Object*)(v._Pointer));
                 }
 
-                SymbolicConstant* s =
-                    new SymbolicConstant(context(), name.c_str(), t, v);
+                SymbolicConstant* s = new SymbolicConstant(context(), name.c_str(), t, v);
 
                 if (Object* o = retrieveDocumentation(s->name()))
                 {
@@ -750,8 +718,7 @@ namespace Mu
         {
             if (const Function* f = type->findSymbolOfType<Function>(name))
             {
-                if (f->returnType() == type && f->numArgs() == 1
-                    && f->argType(0) == type)
+                if (f->returnType() == type && f->numArgs() == 1 && f->argType(0) == type)
                 {
                     Node* n = newNode(f, 1);
                     n->setArg(node, 0);
@@ -759,30 +726,21 @@ namespace Mu
                 }
                 else
                 {
-                    freportError(
-                        "Function \"%s\" of type %s does not have proper "
-                        "signature",
-                        f->name().c_str(), type->name().c_str());
+                    freportError("Function \"%s\" of type %s does not have proper "
+                                 "signature",
+                                 f->name().c_str(), type->name().c_str());
                 }
             }
         }
 
-        freportError(
-            "Type \"%s\" requires \"%s\" function but does not implement it",
-            type->fullyQualifiedName().c_str(), fname);
+        freportError("Type \"%s\" requires \"%s\" function but does not implement it", type->fullyQualifiedName().c_str(), fname);
 
         return node;
     }
 
-    Node* NodeAssembler::retain(Node* n) const
-    {
-        return retainOrRelease(n, true);
-    }
+    Node* NodeAssembler::retain(Node* n) const { return retainOrRelease(n, true); }
 
-    Node* NodeAssembler::release(Node* n) const
-    {
-        return retainOrRelease(n, false);
-    }
+    Node* NodeAssembler::release(Node* n) const { return retainOrRelease(n, false); }
 
     Node* NodeAssembler::cast(Node* node, const Type* toType)
     {
@@ -828,8 +786,7 @@ namespace Mu
         const Class* toClass = dynamic_cast<const Class*>(toType);
         const Class* fromClass = dynamic_cast<const Class*>(fromType);
         const Interface* toInterface = dynamic_cast<const Interface*>(toType);
-        const Interface* fromInterface =
-            dynamic_cast<const Interface*>(fromType);
+        const Interface* fromInterface = dynamic_cast<const Interface*>(fromType);
 
         bool match = toType->match(fromType);
 
@@ -848,8 +805,7 @@ namespace Mu
             }
         }
 
-        if ((toInterface && fromClass) || (toClass && fromInterface)
-            || (match && toClass && fromClass))
+        if ((toInterface && fromClass) || (toClass && fromInterface) || (match && toClass && fromClass))
         {
             //
             //  Use the dynamic cast
@@ -879,8 +835,7 @@ namespace Mu
 
         while (!function && startSym)
         {
-            for (const Symbol* s = startSym->firstOverload(); s;
-                 s = s->nextOverload())
+            for (const Symbol* s = startSym->firstOverload(); s; s = s->nextOverload())
             {
                 if (const Function* f = dynamic_cast<const Function*>(s))
                 {
@@ -895,8 +850,7 @@ namespace Mu
                         }
                         else if (atype->isTypePattern())
                         {
-                            const TypePattern* pt =
-                                static_cast<const TypePattern*>(atype);
+                            const TypePattern* pt = static_cast<const TypePattern*>(atype);
 
                             if (pt->match(fromType))
                             {
@@ -966,8 +920,7 @@ namespace Mu
         return n;
     }
 
-    Node* NodeAssembler::binaryOperator(const char* op, Node* node1,
-                                        Node* node2)
+    Node* NodeAssembler::binaryOperator(const char* op, Node* node1, Node* node2)
     {
         NodeList nl = newNodeList(node1);
         nl.push_back(node2);
@@ -977,13 +930,11 @@ namespace Mu
         return n;
     }
 
-    Node* NodeAssembler::assignmentOperator(const char* op, Node* node1,
-                                            Node* node2)
+    Node* NodeAssembler::assignmentOperator(const char* op, Node* node1, Node* node2)
     {
         Node* n = 0;
 
-        if (node1->type() == context()->unresolvedType()
-            || node2->type() == context()->unresolvedType())
+        if (node1->type() == context()->unresolvedType() || node2->type() == context()->unresolvedType())
         {
             //
             //  Just pass it to binaryOperator() to take care of it
@@ -991,13 +942,11 @@ namespace Mu
 
             // n = binaryOperator(op, node1, node2);
 
-            n = new ASTAssign(*this, context()->unresolvedAssignment(), node1,
-                              node2);
+            n = new ASTAssign(*this, context()->unresolvedAssignment(), node1, node2);
         }
         else
         {
-            if (const ReferenceType* rtype =
-                    dynamic_cast<const ReferenceType*>(node1->type()))
+            if (const ReferenceType* rtype = dynamic_cast<const ReferenceType*>(node1->type()))
             {
                 if (Node* n2 = cast(node2, rtype->dereferenceType()))
                 {
@@ -1005,10 +954,8 @@ namespace Mu
                 }
                 else
                 {
-                    freportError(
-                        "cannot cast \"%s\" to \"%s\" for assignment.",
-                        node2->type()->fullyQualifiedName().c_str(),
-                        rtype->dereferenceType()->fullyQualifiedName().c_str());
+                    freportError("cannot cast \"%s\" to \"%s\" for assignment.", node2->type()->fullyQualifiedName().c_str(),
+                                 rtype->dereferenceType()->fullyQualifiedName().c_str());
                 }
             }
             else
@@ -1016,10 +963,8 @@ namespace Mu
                 //
                 //  Can this happen?
                 //
-                freportError(
-                    "illegal assignment from \"%s\" to \"%s\" in this context.",
-                    node2->type()->fullyQualifiedName().c_str(),
-                    node1->type()->fullyQualifiedName().c_str());
+                freportError("illegal assignment from \"%s\" to \"%s\" in this context.", node2->type()->fullyQualifiedName().c_str(),
+                             node1->type()->fullyQualifiedName().c_str());
             }
         }
 
@@ -1072,8 +1017,7 @@ namespace Mu
         {
             insertNodeAtFront(nl, n);
             markCurrentFunctionUnresolved();
-            return new ASTIndexMember(*this, nl.size(), &nl.front(),
-                                      context()->unresolvedCall());
+            return new ASTIndexMember(*this, nl.size(), &nl.front(), context()->unresolvedCall());
 
             // unresolvableCall(opName, nl);
         }
@@ -1102,8 +1046,7 @@ namespace Mu
             }
             else
             {
-                freportError("operator%s not defined for type %s", op,
-                             type->fullyQualifiedName().c_str());
+                freportError("operator%s not defined for type %s", op, type->fullyQualifiedName().c_str());
                 return 0;
             }
         }
@@ -1139,8 +1082,7 @@ namespace Mu
         return 0;
     }
 
-    Node* NodeAssembler::callBestOverloadedFunction(const Function* func,
-                                                    NodeList nodes)
+    Node* NodeAssembler::callBestOverloadedFunction(const Function* func, NodeList nodes)
     {
         FunctionVector functions;
 
@@ -1228,8 +1170,7 @@ namespace Mu
         }
     }
 
-    Node* NodeAssembler::callExactOverloadedFunction(const Function* Fin,
-                                                     NodeList nodes)
+    Node* NodeAssembler::callExactOverloadedFunction(const Function* Fin, NodeList nodes)
     {
         Context::TypeVector argTypes(nodes.size());
         const Function* F = 0;
@@ -1292,8 +1233,7 @@ namespace Mu
         return node;
     }
 
-    Node* NodeAssembler::callBestFunction(const FunctionVector& functions,
-                                          NodeList nodes)
+    Node* NodeAssembler::callBestFunction(const FunctionVector& functions, NodeList nodes)
     {
         Context::TypeVector argTypes(nodes.size());
         bool unresolvedArgument = false;
@@ -1310,8 +1250,7 @@ namespace Mu
                 {
                     if (_allowUnresolved)
                     {
-                        return unresolvableCall(
-                            functions.front()->fullyQualifiedName(), nodes);
+                        return unresolvableCall(functions.front()->fullyQualifiedName(), nodes);
                     }
                     else
                     {
@@ -1328,15 +1267,13 @@ namespace Mu
 
         Context::MatchType matchType = Context::TypeMatch;
 
-        if (const Function* function = context()->matchSpecializedFunction(
-                process(), thread(), functions, argTypes, matchType))
+        if (const Function* function = context()->matchSpecializedFunction(process(), thread(), functions, argTypes, matchType))
         {
             if (matchType == Context::TypeMatch)
             {
                 if (nodes.size() != 2)
                 {
-                    reportError(
-                        "TypeMatch not implemented for function signatures");
+                    reportError("TypeMatch not implemented for function signatures");
                     return 0;
                 }
                 else
@@ -1355,8 +1292,7 @@ namespace Mu
 
             int totalArgs = freevars;
 
-            if (matchType == Context::BestPartialMatch
-                && function->hasParameters())
+            if (matchType == Context::BestPartialMatch && function->hasParameters())
             {
                 totalArgs += function->isVariadic() ? nodes.size() : fmax;
             }
@@ -1398,8 +1334,7 @@ namespace Mu
                 node->setArg(arg, i);
             }
 
-            if (matchType == Context::BestPartialMatch
-                && function->hasParameters())
+            if (matchType == Context::BestPartialMatch && function->hasParameters())
             {
                 for (int i = nodes.size(); i < fmax; i++)
                 {
@@ -1429,8 +1364,7 @@ namespace Mu
                     {
                         freportError("unable to bind free variable \"%s\" in "
                                      "function \"%s\"",
-                                     pv->name().c_str(),
-                                     function->fullyQualifiedName().c_str());
+                                     pv->name().c_str(), function->fullyQualifiedName().c_str());
                         return 0;
                     }
                 }
@@ -1489,12 +1423,8 @@ namespace Mu
                 {
                     const Function* g = functions[i];
 
-                    if ((g->minimumArgs() <= nodes.size() + 1
-                         && g->maximumArgs() >= nodes.size() + 1)
-                        && (g->scope() == func->scope()
-                            || (fscope
-                                && fscope->isA(
-                                    dynamic_cast<const Class*>(g->scope())))))
+                    if ((g->minimumArgs() <= nodes.size() + 1 && g->maximumArgs() >= nodes.size() + 1)
+                        && (g->scope() == func->scope() || (fscope && fscope->isA(dynamic_cast<const Class*>(g->scope())))))
                     {
                         mfuncs.push_back(g);
                     }
@@ -1502,8 +1432,7 @@ namespace Mu
 
                 if (mfuncs.size())
                 {
-                    insertNodeAtFront(nodes,
-                                      dereferenceVariable(func->parameter(0)));
+                    insertNodeAtFront(nodes, dereferenceVariable(func->parameter(0)));
                     return callBestFunction(mfuncs, nodes);
                 }
             }
@@ -1535,13 +1464,11 @@ namespace Mu
         return 0;
     }
 
-    void NodeAssembler::showOptions(const FunctionVector& functions,
-                                    NodeList nodes)
+    void NodeAssembler::showOptions(const FunctionVector& functions, NodeList nodes)
     {
         ostream& err = context()->errorStream();
         context()->error("No match found for function \"");
-        err << functions.front()->name() << "\" with " << nodes.size()
-            << " argument" << (nodes.size() == 1 ? "" : "s") << ": ";
+        err << functions.front()->name() << "\" with " << nodes.size() << " argument" << (nodes.size() == 1 ? "" : "s") << ": ";
 
         for (int i = 0; i < nodes.size(); i++)
         {
@@ -1602,11 +1529,9 @@ namespace Mu
         err << flush;
     }
 
-    Node* NodeAssembler::unresolvableCall(Name name, NodeList nl,
-                                          const Symbol* s)
+    Node* NodeAssembler::unresolvableCall(Name name, NodeList nl, const Symbol* s)
     {
-        ASTCall* astcall = new ASTCall(
-            *this, nl.size(), s ? s : context()->unresolvedCall(), name);
+        ASTCall* astcall = new ASTCall(*this, nl.size(), s ? s : context()->unresolvedCall(), name);
 
         if (nl.size())
             astcall->setArgs(&nl.front(), nl.size());
@@ -1620,14 +1545,11 @@ namespace Mu
         Variable::Attributes rw = Variable::ReadWrite;
         Variable::Attributes rwi = rw | Variable::ImplicitType;
 
-        StackVariable* svar =
-            new StackVariable(context(), n.c_str(), context()->unresolvedType(),
-                              _stackOffset++, rwi);
+        StackVariable* svar = new StackVariable(context(), n.c_str(), context()->unresolvedType(), _stackOffset++, rwi);
 
         _stackVariables.push_back(svar);
 
-        ASTNode* astnode = new ASTStackDeclaration(
-            *this, context()->unresolvedDeclaration(), n, svar);
+        ASTNode* astnode = new ASTStackDeclaration(*this, context()->unresolvedDeclaration(), n, svar);
 
         markCurrentFunctionUnresolved();
 
@@ -1636,8 +1558,7 @@ namespace Mu
 
     Node* NodeAssembler::unresolvableCast(Name name, NodeList nl)
     {
-        ASTCast* astnode =
-            new ASTCast(*this, nl.size(), context()->unresolvedCast(), name);
+        ASTCast* astnode = new ASTCast(*this, nl.size(), context()->unresolvedCast(), name);
 
         if (nl.size())
             astnode->setArgs(&nl.front(), nl.size());
@@ -1648,8 +1569,7 @@ namespace Mu
 
     Node* NodeAssembler::unresolvableMemberCall(Name name, NodeList nl)
     {
-        ASTMemberCall* astnode = new ASTMemberCall(
-            *this, nl.size(), context()->unresolvedMemberCall(), name);
+        ASTMemberCall* astnode = new ASTMemberCall(*this, nl.size(), context()->unresolvedMemberCall(), name);
 
         if (nl.size())
             astnode->setArgs(&nl.front(), nl.size());
@@ -1659,8 +1579,7 @@ namespace Mu
 
     Node* NodeAssembler::unresolvableConstructor(const Type* t, NodeList nl)
     {
-        DataNode* dn = new DataNode(nl.size(), BaseFunctions::unresolved,
-                                    context()->unresolvedConstructor());
+        DataNode* dn = new DataNode(nl.size(), BaseFunctions::unresolved, context()->unresolvedConstructor());
 
         dn->_data._Pointer = (Pointer)t;
 
@@ -1680,8 +1599,7 @@ namespace Mu
 
         if (dynamic_cast<Function*>(s))
         {
-            ASTStackReference* astnode = new ASTStackReference(
-                *this, 0, context()->unresolvedStackReference(), sv);
+            ASTStackReference* astnode = new ASTStackReference(*this, 0, context()->unresolvedStackReference(), sv);
 
             markCurrentFunctionUnresolved();
             return astnode;
@@ -1697,8 +1615,7 @@ namespace Mu
     {
         Symbol* s = nonAnonymousScope();
         markCurrentFunctionUnresolved();
-        return new ASTReference(*this, context()->unresolvedStackReference(),
-                                name);
+        return new ASTReference(*this, context()->unresolvedStackReference(), name);
     }
 
     Node* NodeAssembler::callMethod(const Function* method, NodeList nl)
@@ -1707,16 +1624,14 @@ namespace Mu
 
         if (node)
         {
-            if (const Interface* i =
-                    dynamic_cast<const Interface*>(method->scope()))
+            if (const Interface* i = dynamic_cast<const Interface*>(method->scope()))
             {
                 node->_func = node->type()->machineRep()->invokeInterfaceFunc();
                 // Node* n = newNode(context()->instanceCache(), 1);
                 // n->setArg(node->_argv[0], 0);
                 // node->_argv[0] = n;
             }
-            else if (const MemberFunction* nf =
-                         dynamic_cast<const MemberFunction*>(node->symbol()))
+            else if (const MemberFunction* nf = dynamic_cast<const MemberFunction*>(node->symbol()))
             {
                 node->_func = node->type()->machineRep()->callMethodFunc();
                 // Node* n = newNode(context()->instanceCache(), 1);
@@ -1729,8 +1644,7 @@ namespace Mu
         return node;
     }
 
-    Node* NodeAssembler::callMethod(const Function* method, Node* self,
-                                    NodeList arguments)
+    Node* NodeAssembler::callMethod(const Function* method, Node* self, NodeList arguments)
     {
         size_t s = arguments.size();
         NodeList nl = newNodeList(self);
@@ -1750,8 +1664,7 @@ namespace Mu
 
         for (size_t i = 1; i < f->numArgs() + f->numFreeVariables(); i++)
         {
-            Node* noop =
-                callBestOverloadedFunction(context()->noop(), emptyNodeList());
+            Node* noop = callBestOverloadedFunction(context()->noop(), emptyNodeList());
             nl.push_back(noop);
         }
 
@@ -1776,8 +1689,7 @@ namespace Mu
             {
                 if (containsNoOps(nl))
                 {
-                    rn = dynamicPartialEvalOrApply(n, nl, false,
-                                                   dynamicDispatch);
+                    rn = dynamicPartialEvalOrApply(n, nl, false, dynamicDispatch);
                 }
                 else
                 {
@@ -1796,8 +1708,7 @@ namespace Mu
             {
                 if (n->symbol() == context()->unresolvedMemberReference()
                     || (n->symbol() == context()->unresolvedDereference()
-                        && n->argNode(0)->symbol()
-                               == context()->unresolvedMemberReference()))
+                        && n->argNode(0)->symbol() == context()->unresolvedMemberReference()))
                 {
                     Name iname = context()->lookupName("()");
                     insertNodeAtFront(nl, n);
@@ -1809,23 +1720,19 @@ namespace Mu
                 }
                 else
                 {
-                    freportError(
-                        "unresolved in this context (needs implementing?)",
-                        n->type()->fullyQualifiedName().c_str());
+                    freportError("unresolved in this context (needs implementing?)", n->type()->fullyQualifiedName().c_str());
                 }
             }
             else if (!(rn = callBestFunction("()", nl)))
             {
-                freportError("operator() is not defined for type %s",
-                             n->type()->fullyQualifiedName().c_str());
+                freportError("operator() is not defined for type %s", n->type()->fullyQualifiedName().c_str());
             }
         }
 
         return rn;
     }
 
-    Node* NodeAssembler::call(const Symbol* sym, NodeList nl,
-                              bool dynamicDispatch)
+    Node* NodeAssembler::call(const Symbol* sym, NodeList nl, bool dynamicDispatch)
     {
         stl_ext::StaticPointerCast<Symbol, Function> castOp;
         FunctionVector functions;
@@ -1856,22 +1763,18 @@ namespace Mu
                 //  object which we add here.
                 //
 
-                Symbol::SymbolVector symbols =
-                    ((Symbol*)sym)->findSymbolsOfType<Function>(sym->name());
+                Symbol::SymbolVector symbols = ((Symbol*)sym)->findSymbolsOfType<Function>(sym->name());
 
                 functions.resize(symbols.size());
-                transform(symbols.begin(), symbols.end(), functions.begin(),
-                          castOp);
+                transform(symbols.begin(), symbols.end(), functions.begin(), castOp);
 
                 if (!functions.empty())
                 {
                     Name allocName = context()->lookupName("__allocate");
 
-                    if (const Function* alloc =
-                            sym->findSymbolOfType<Function>(allocName))
+                    if (const Function* alloc = sym->findSymbolOfType<Function>(allocName))
                     {
-                        Node* a =
-                            callBestOverloadedFunction(alloc, emptyNodeList());
+                        Node* a = callBestOverloadedFunction(alloc, emptyNodeList());
                         insertNodeAtFront(nl, a);
                         return callBestFunction(functions, nl);
                     }
@@ -1880,13 +1783,9 @@ namespace Mu
 
             if (functions.empty())
             {
-                Symbol::SymbolVector symbols =
-                    ((Symbol*)sym)
-                        ->scope()
-                        ->findSymbolsOfType<Function>(sym->name());
+                Symbol::SymbolVector symbols = ((Symbol*)sym)->scope()->findSymbolsOfType<Function>(sym->name());
                 functions.resize(symbols.size());
-                transform(symbols.begin(), symbols.end(), functions.begin(),
-                          castOp);
+                transform(symbols.begin(), symbols.end(), functions.begin(), castOp);
             }
 
             found = !functions.empty();
@@ -1919,13 +1818,11 @@ namespace Mu
                     }
                 }
 
-                if (const Function* f = context()->matchSpecializedFunction(
-                        process(), thread(), functions, types, matchType))
+                if (const Function* f = context()->matchSpecializedFunction(process(), thread(), functions, types, matchType))
                 {
                     Node* rn = functionConstant(f, true);
                     const Type* ft = rn->type();
-                    return dynamicPartialEvalOrApply(rn, nl, false,
-                                                     dynamicDispatch);
+                    return dynamicPartialEvalOrApply(rn, nl, false, dynamicDispatch);
                 }
             }
             else
@@ -1969,11 +1866,9 @@ namespace Mu
                         }
                     }
 
-                    if (const Function* f = context()->matchSpecializedFunction(
-                            process(), thread(), functions, types, matchType))
+                    if (const Function* f = context()->matchSpecializedFunction(process(), thread(), functions, types, matchType))
                     {
-                        if (const MemberFunction* mf =
-                                dynamic_cast<const MemberFunction*>(f))
+                        if (const MemberFunction* mf = dynamic_cast<const MemberFunction*>(f))
                         {
                             if (dynamicDispatch)
                             {
@@ -1991,8 +1886,7 @@ namespace Mu
                     }
                 }
 
-                if (const MemberFunction* mf =
-                        dynamic_cast<const MemberFunction*>(sym))
+                if (const MemberFunction* mf = dynamic_cast<const MemberFunction*>(sym))
                 {
                     if (dynamicDispatch)
                     {
@@ -2015,8 +1909,7 @@ namespace Mu
 
             if (!(rn = referenceVariable(v)))
             {
-                freportError("Unable to reference variable \"%s\"",
-                             v->fullyQualifiedName().c_str());
+                freportError("Unable to reference variable \"%s\"", v->fullyQualifiedName().c_str());
                 return 0;
             }
 
@@ -2031,8 +1924,7 @@ namespace Mu
             {
                 if (containsNoOps(nl))
                 {
-                    return dynamicPartialEvalOrApply(rn, nl, false,
-                                                     dynamicDispatch);
+                    return dynamicPartialEvalOrApply(rn, nl, false, dynamicDispatch);
                 }
                 else if (dynamicDispatch)
                 {
@@ -2066,14 +1958,10 @@ namespace Mu
         return rnode;
     }
 
-    Node* NodeAssembler::dynamicPartialEvalOrApply(Node* self,
-                                                   NodeList arguments,
-                                                   bool reduce,
-                                                   bool dynamicDispatch)
+    Node* NodeAssembler::dynamicPartialEvalOrApply(Node* self, NodeList arguments, bool reduce, bool dynamicDispatch)
     {
         self = dereferenceLValue(self);
-        const FunctionType* outType =
-            dynamic_cast<const FunctionType*>(self->type());
+        const FunctionType* outType = dynamic_cast<const FunctionType*>(self->type());
         if (!outType)
             return 0;
 
@@ -2099,8 +1987,7 @@ namespace Mu
         if (isConstant(self))
         {
             DataNode* dn = static_cast<DataNode*>(self);
-            FunctionObject* fobj =
-                reinterpret_cast<FunctionObject*>(dn->_data._Pointer);
+            FunctionObject* fobj = reinterpret_cast<FunctionObject*>(dn->_data._Pointer);
             selfFunc = fobj->function();
         }
 
@@ -2136,8 +2023,7 @@ namespace Mu
         //
 
         const Type* rtype = context()->functionType(s);
-        DataNode* dn =
-            new DataNode(0, rtype->machineRep()->constantFunc(), rtype);
+        DataNode* dn = new DataNode(0, rtype->machineRep()->constantFunc(), rtype);
         fn->setArg(dn, 0);
         fn->setArg(self, 1);
 
@@ -2169,8 +2055,7 @@ namespace Mu
 
         for (int i = 0; i < parameters.size(); i++)
         {
-            ParameterVariable* p =
-                static_cast<ParameterVariable*>(parameters[i]);
+            ParameterVariable* p = static_cast<ParameterVariable*>(parameters[i]);
             p->setAddress(_stackOffset++);
             _stackVariables.push_back(p);
 
@@ -2206,16 +2091,14 @@ namespace Mu
                 //  Can't do this in a class declaration
                 //
 
-                freportError("initializer not allowed for member \"%s\"",
-                             in.name.c_str());
+                freportError("initializer not allowed for member \"%s\"", in.name.c_str());
 
                 clearInitializerList();
                 return false;
             }
             else
             {
-                MemberVariable* m =
-                    new MemberVariable(context(), in.name.c_str(), type);
+                MemberVariable* m = new MemberVariable(context(), in.name.c_str(), type);
                 scope()->addSymbol(m);
 
                 if (Object* o = retrieveDocumentation(m->name()))
@@ -2229,9 +2112,7 @@ namespace Mu
         return true;
     }
 
-    Node* NodeAssembler::declareVariables(const Type* declarationType,
-                                          const char* asOp,
-                                          NodeAssembler::VariableType kind)
+    Node* NodeAssembler::declareVariables(const Type* declarationType, const char* asOp, NodeAssembler::VariableType kind)
     {
         NodeList nl = emptyNodeList();
         bool used = false;
@@ -2255,8 +2136,7 @@ namespace Mu
 
             if (type == context()->nilType())
             {
-                freportError("cannot declare variable \"%s\" as type nil",
-                             in.name.c_str());
+                freportError("cannot declare variable \"%s\" as type nil", in.name.c_str());
                 return 0;
             }
 
@@ -2266,15 +2146,13 @@ namespace Mu
                 //	Look for default constructor -- if it exists use it
                 //
 
-                for (const Symbol* s = type->firstOverload(); s;
-                     s = s->nextOverload())
+                for (const Symbol* s = type->firstOverload(); s; s = s->nextOverload())
                 {
                     if (const Function* f = dynamic_cast<const Function*>(s))
                     {
                         if (!f->numArgs() && f->returnType() == type)
                         {
-                            in.node =
-                                callBestOverloadedFunction(f, emptyNodeList());
+                            in.node = callBestOverloadedFunction(f, emptyNodeList());
                             break;
                         }
                     }
@@ -2296,16 +2174,13 @@ namespace Mu
             {
                 Variable::Attributes rw = Variable::ReadWrite;
                 Variable::Attributes rwi = rw | Variable::ImplicitType;
-                var = declareStackVariable(type, in.name,
-                                           declarationType ? rw : rwi);
+                var = declareStackVariable(type, in.name, declarationType ? rw : rwi);
             }
             else if (kind == Global)
             {
                 String temp(in.name);
 
-                var = new GlobalVariable(context(), temp.c_str(), type,
-                                         process()->globals().size(),
-                                         Variable::ReadWrite, 0);
+                var = new GlobalVariable(context(), temp.c_str(), type, process()->globals().size(), Variable::ReadWrite, 0);
 
                 scope()->addSymbol(var);
                 process()->globals().push_back(Value());
@@ -2353,10 +2228,8 @@ namespace Mu
                     else
                     {
                         // memory leak?
-                        freportError(
-                            "Unable to cast \"%s\" to \"%s\"",
-                            in.node->type()->fullyQualifiedName().c_str(),
-                            type->fullyQualifiedName().c_str());
+                        freportError("Unable to cast \"%s\" to \"%s\"", in.node->type()->fullyQualifiedName().c_str(),
+                                     type->fullyQualifiedName().c_str());
 
                         clearInitializerList();
                         return 0;
@@ -2364,8 +2237,7 @@ namespace Mu
                 }
                 else
                 {
-                    freportError("Unable to reference \"%s\"",
-                                 var->name().c_str());
+                    freportError("Unable to reference \"%s\"", var->name().c_str());
                     clearInitializerList();
                     return 0;
                 }
@@ -2401,12 +2273,9 @@ namespace Mu
         return n;
     }
 
-    StackVariable*
-    NodeAssembler::declareStackVariable(const Type* t, Name n,
-                                        Variable::Attributes attrs)
+    StackVariable* NodeAssembler::declareStackVariable(const Type* t, Name n, Variable::Attributes attrs)
     {
-        StackVariable* svar =
-            new StackVariable(context(), n.c_str(), t, _stackOffset++, attrs);
+        StackVariable* svar = new StackVariable(context(), n.c_str(), t, _stackOffset++, attrs);
         _stackVariables.push_back(svar);
         scope()->addSymbol(svar);
         return svar;
@@ -2414,9 +2283,7 @@ namespace Mu
 
     GlobalVariable* NodeAssembler::declareGlobalVariable(const Type* t, Name n)
     {
-        GlobalVariable* var = new GlobalVariable(context(), n.c_str(), t,
-                                                 process()->globals().size(),
-                                                 Variable::ReadWrite, 0);
+        GlobalVariable* var = new GlobalVariable(context(), n.c_str(), t, process()->globals().size(), Variable::ReadWrite, 0);
 
         if (Object* o = retrieveDocumentation(var->name()))
         {
@@ -2444,8 +2311,7 @@ namespace Mu
         //
 
         int s = _stackVariables.size();
-        stable_partition(_stackVariables.begin(), _stackVariables.end(),
-                         stl_ext::IsA_p<StackVariable, ParameterVariable>());
+        stable_partition(_stackVariables.begin(), _stackVariables.end(), stl_ext::IsA_p<StackVariable, ParameterVariable>());
 
         int base = _stackOffset - _stackVariables.size();
 
@@ -2497,8 +2363,7 @@ namespace Mu
 	}
 #endif
             // n = callBestOverloadedFunction(context()->fixedFrameBlock(), nl);
-            DataNode* dn = new DataNode(nl.size(), NodeFunc(0),
-                                        context()->fixedFrameBlock());
+            DataNode* dn = new DataNode(nl.size(), NodeFunc(0), context()->fixedFrameBlock());
             if (nl.size())
                 dn->setArgs(&nl.front(), nl.size());
             dn->_func = context()->fixedFrameBlock()->func(dn);
@@ -2507,9 +2372,7 @@ namespace Mu
 
             if (scope() != context()->globalScope())
             {
-                I = new Function(context(), uniqueNameInScope("__init").c_str(),
-                                 context()->voidType(), 0, 0, n,
-                                 Function::None);
+                I = new Function(context(), uniqueNameInScope("__init").c_str(), context()->voidType(), 0, 0, n, Function::None);
             }
         }
 
@@ -2553,8 +2416,7 @@ namespace Mu
 
     void NodeAssembler::pushAnonymousScope(const char* name)
     {
-        if (Symbol* anon =
-                new Namespace(context(), uniqueNameInScope(name).c_str()))
+        if (Symbol* anon = new Namespace(context(), uniqueNameInScope(name).c_str()))
         {
             scope()->addSymbol(anon);
             pushScope(anon);
@@ -2590,8 +2452,7 @@ namespace Mu
             }
             else
             {
-                return new ASTDereference(
-                    *this, context()->unresolvedDereference(), n);
+                return new ASTDereference(*this, context()->unresolvedDereference(), n);
             }
         }
         else if (t->isReferenceType())
@@ -2619,8 +2480,7 @@ namespace Mu
                 n->_func = rep->dereferenceGlobalFunc();
                 return n;
             }
-            else if (const MemberVariable* mv =
-                         dynamic_cast<const MemberVariable*>(n->symbol()))
+            else if (const MemberVariable* mv = dynamic_cast<const MemberVariable*>(n->symbol()))
             {
                 //
                 //	If its a member variable and its a reference we can
@@ -2642,10 +2502,9 @@ namespace Mu
                         if (!n->_func)
                         {
                             String temp(rep->name());
-                            freportError(
-                                "MachineRep \"%s\" does not "
-                                "implement class member dereference function",
-                                temp.c_str());
+                            freportError("MachineRep \"%s\" does not "
+                                         "implement class member dereference function",
+                                         temp.c_str());
                             return 0;
                         }
 
@@ -2661,10 +2520,9 @@ namespace Mu
                         if (!n->_func)
                         {
                             String temp(rep->name());
-                            freportError(
-                                "MachineRep \"%s\" does not "
-                                "implement class member dereference function",
-                                temp.c_str());
+                            freportError("MachineRep \"%s\" does not "
+                                         "implement class member dereference function",
+                                         temp.c_str());
                             return 0;
                         }
 
@@ -2679,8 +2537,7 @@ namespace Mu
 
             n = cast(n, r->dereferenceType());
         }
-        else if (const VariantTagType* vt =
-                     dynamic_cast<const VariantTagType*>(t))
+        else if (const VariantTagType* vt = dynamic_cast<const VariantTagType*>(t))
         {
             n = cast(n, vt->variantType());
         }
@@ -2699,8 +2556,7 @@ namespace Mu
         return 0;
     }
 
-    const StackVariable*
-    NodeAssembler::findStackVariable(const StackVariable* var) const
+    const StackVariable* NodeAssembler::findStackVariable(const StackVariable* var) const
     {
         for (int i = _stackVariables.size(); i--;)
         {
@@ -2721,8 +2577,7 @@ namespace Mu
             {
                 Name tname = context()->internName("this");
 
-                if (ParameterVariable* thisp =
-                        F->findSymbolOfType<ParameterVariable>(tname))
+                if (ParameterVariable* thisp = F->findSymbolOfType<ParameterVariable>(tname))
                 {
                     Node* prefix = dereferenceVariable(thisp);
                     return prefix ? referenceMemberVariable(v, prefix) : 0;
@@ -2736,11 +2591,9 @@ namespace Mu
             n->_symbol = var;
             const MachineRep* rep = var->storageClass()->machineRep();
 
-            if (const StackVariable* sv =
-                    dynamic_cast<const StackVariable*>(var))
+            if (const StackVariable* sv = dynamic_cast<const StackVariable*>(var))
             {
-                if (sv->storageClass() == context()->unresolvedType()
-                    || sv->storageClass()->isTypeVariable())
+                if (sv->storageClass() == context()->unresolvedType() || sv->storageClass()->isTypeVariable())
                 {
                     n->deleteSelf();
                     return unresolvableStackReference(sv);
@@ -2750,8 +2603,7 @@ namespace Mu
                     n->_func = rep->referenceStackFunc();
                 }
             }
-            else if (const GlobalVariable* gv =
-                         dynamic_cast<const GlobalVariable*>(var))
+            else if (const GlobalVariable* gv = dynamic_cast<const GlobalVariable*>(var))
             {
                 n->_func = rep->referenceGlobalFunc();
             }
@@ -2764,8 +2616,7 @@ namespace Mu
 
     Node* NodeAssembler::dereferenceVariable(const char* name)
     {
-        if (const Variable* var =
-                findTypeInScope<Variable>(context()->internName(name)))
+        if (const Variable* var = findTypeInScope<Variable>(context()->internName(name)))
         {
             return dereferenceVariable(var);
         }
@@ -2776,23 +2627,18 @@ namespace Mu
         }
     }
 
-    Node* NodeAssembler::dereferenceVariable(const Variable* v)
-    {
-        return dereferenceLValue(referenceVariable(v));
-    }
+    Node* NodeAssembler::dereferenceVariable(const Variable* v) { return dereferenceLValue(referenceVariable(v)); }
 
     Node* NodeAssembler::unresolvableMemberReference(Name name, Node* n)
     {
-        ASTMemberReference* astnode = new ASTMemberReference(
-            *this, 1, context()->unresolvedMemberReference(), name);
+        ASTMemberReference* astnode = new ASTMemberReference(*this, 1, context()->unresolvedMemberReference(), name);
 
         astnode->setArg(n, 0);
         markCurrentFunctionUnresolved();
         return astnode;
     }
 
-    Node* NodeAssembler::referenceMemberVariable(const MemberVariable* var,
-                                                 Node* a)
+    Node* NodeAssembler::referenceMemberVariable(const MemberVariable* var, Node* a)
     {
         const Type* t = dynamic_cast<const Type*>(var->scope());
 
@@ -2800,8 +2646,7 @@ namespace Mu
         {
             freportError("Member variable \"%s\" is a member of \"%s\" which "
                          "is not a type",
-                         var->fullyQualifiedName().c_str(),
-                         var->scope()->fullyQualifiedName().c_str());
+                         var->fullyQualifiedName().c_str(), var->scope()->fullyQualifiedName().c_str());
 
             return 0;
         }
@@ -2905,8 +2750,7 @@ namespace Mu
 
     void NodeAssembler::patchUnresolved()
     {
-        for_each(_unresolvedFunctions.begin(), _unresolvedFunctions.end(),
-                 Patch(this));
+        for_each(_unresolvedFunctions.begin(), _unresolvedFunctions.end(), Patch(this));
 
         _unresolvedFunctions.clear();
     }
@@ -2920,10 +2764,9 @@ namespace Mu
 
             if (f->_unresolvedStubs)
             {
-                freportError(
-                    "While back patching unresolved symbols in function \"%s\""
-                    " some symbols not resolvable",
-                    f->fullyQualifiedName().c_str());
+                freportError("While back patching unresolved symbols in function \"%s\""
+                             " some symbols not resolvable",
+                             f->fullyQualifiedName().c_str());
             }
             else
             {
@@ -2932,10 +2775,7 @@ namespace Mu
         }
     }
 
-    void NodeAssembler::pushScope(Symbol* s, bool declarative)
-    {
-        _scope = new ScopeState(s, _scope, declarative);
-    }
+    void NodeAssembler::pushScope(Symbol* s, bool declarative) { _scope = new ScopeState(s, _scope, declarative); }
 
     void NodeAssembler::setScope(const ScopeState* ss) { _scope = ss; }
 
@@ -3011,8 +2851,7 @@ namespace Mu
 
     void NodeAssembler::pushType(const Type* t) { _typeStack.push_back(t); }
 
-    Interface* NodeAssembler::declareInterface(const char* name,
-                                               SymbolList inheritance)
+    Interface* NodeAssembler::declareInterface(const char* name, SymbolList inheritance)
     {
         Interface::Interfaces ilist;
 
@@ -3062,12 +2901,9 @@ namespace Mu
         //  Declare = functions
         //
 
-        Function* OpAs =
-            new Function(context(), "=", BaseFunctions::assign,
-                         Function::MemberOperator | Function::Operator,
-                         Function::Return, rt->fullyQualifiedName().c_str(),
-                         Function::Args, rt->fullyQualifiedName().c_str(),
-                         i->fullyQualifiedName().c_str(), Function::End);
+        Function* OpAs = new Function(context(), "=", BaseFunctions::assign, Function::MemberOperator | Function::Operator,
+                                      Function::Return, rt->fullyQualifiedName().c_str(), Function::Args, rt->fullyQualifiedName().c_str(),
+                                      i->fullyQualifiedName().c_str(), Function::End);
 
         i->globalScope()->addSymbol(OpAs);
     }
@@ -3081,17 +2917,12 @@ namespace Mu
         ReferenceType* rt = new ReferenceType(context(), rtname.c_str(), t);
         scope()->addSymbol(rt);
 
-        Function* dr = new Function(
-            context(), t->name().c_str(), BaseFunctions::dereference,
-            Function::Cast, Function::Return, t->fullyQualifiedName().c_str(),
-            Function::Args, t->fullyQualifiedName().c_str(), Function::End);
+        Function* dr = new Function(context(), t->name().c_str(), BaseFunctions::dereference, Function::Cast, Function::Return,
+                                    t->fullyQualifiedName().c_str(), Function::Args, t->fullyQualifiedName().c_str(), Function::End);
 
-        Function* OpAs =
-            new Function(context(), "=", BaseFunctions::assign,
-                         Function::MemberOperator | Function::Operator,
-                         Function::Return, rt->fullyQualifiedName().c_str(),
-                         Function::Args, rt->fullyQualifiedName().c_str(),
-                         t->fullyQualifiedName().c_str(), Function::End);
+        Function* OpAs = new Function(context(), "=", BaseFunctions::assign, Function::MemberOperator | Function::Operator,
+                                      Function::Return, rt->fullyQualifiedName().c_str(), Function::Args, rt->fullyQualifiedName().c_str(),
+                                      t->fullyQualifiedName().c_str(), Function::End);
 
         t->globalScope()->addSymbol(dr);
         t->globalScope()->addSymbol(OpAs);
@@ -3100,8 +2931,7 @@ namespace Mu
         return t;
     }
 
-    VariantTagType* NodeAssembler::declareVariantTagType(const char* name,
-                                                         const Type* type)
+    VariantTagType* NodeAssembler::declareVariantTagType(const char* name, const Type* type)
     {
         if (VariantType* v = dynamic_cast<VariantType*>(scope()))
         {
@@ -3127,16 +2957,13 @@ namespace Mu
 
                 if (r->scope()->symbolTable())
                 {
-                    for (SymbolTable::Iterator i(r->scope()->symbolTable()); i;
-                         ++i)
+                    for (SymbolTable::Iterator i(r->scope()->symbolTable()); i; ++i)
                     {
                         for (const Symbol* s = *i; s; s = s->nextOverload())
                         {
-                            if (const Function* F =
-                                    dynamic_cast<const Function*>(s))
+                            if (const Function* F = dynamic_cast<const Function*>(s))
                             {
-                                if (F->name() == r->name()
-                                    && F->isConstructor())
+                                if (F->name() == r->name() && F->isConstructor())
                                 {
                                     constructors.push_back(F);
                                 }
@@ -3151,8 +2978,7 @@ namespace Mu
                     {
                         for (const Symbol* s = *i; s; s = s->nextOverload())
                         {
-                            if (const Function* F =
-                                    dynamic_cast<const Function*>(s))
+                            if (const Function* F = dynamic_cast<const Function*>(s))
                             {
                                 if (F->name() == r->name())
                                     constructors.push_back(F);
@@ -3211,8 +3037,7 @@ namespace Mu
                     //  Requires allocator call?
                     //
 
-                    bool needsAlloc = F->scope() == r && F->numArgs() > 1
-                                      && F->argType(0) == r;
+                    bool needsAlloc = F->scope() == r && F->numArgs() > 1 && F->argType(0) == r;
 
                     SymbolList sl = emptySymbolList();
 
@@ -3220,8 +3045,7 @@ namespace Mu
                     {
                         char temp[80];
                         sprintf(temp, "_%d", q);
-                        sl.push_back(new ParameterVariable(context(), temp,
-                                                           F->argType(q)));
+                        sl.push_back(new ParameterVariable(context(), temp, F->argType(q)));
                     }
 
                     newStackFrame();
@@ -3231,11 +3055,9 @@ namespace Mu
                     //  output to a muc file
                     //
 
-                    Function* FC = new Function(
-                        context(), t->name().c_str(), v, sl.size(),
-                        (ParameterVariable**)(sl.size() ? &sl[0] : NULL),
-                        (Node*)0,
-                        Function::Cast | Function::Pure | Function::Generated);
+                    Function* FC =
+                        new Function(context(), t->name().c_str(), v, sl.size(), (ParameterVariable**)(sl.size() ? &sl[0] : NULL), (Node*)0,
+                                     Function::Cast | Function::Pure | Function::Generated);
                     t->addSymbol(FC);
                     pushScope(FC);
                     declareParameters(sl);
@@ -3252,20 +3074,16 @@ namespace Mu
                     {
                         Name allocName = context()->lookupName("__allocate");
 
-                        if (const Function* alloc =
-                                r->findSymbolOfType<Function>(allocName))
+                        if (const Function* alloc = r->findSymbolOfType<Function>(allocName))
                         {
-                            Node* a = callBestOverloadedFunction(
-                                alloc, emptyNodeList());
+                            Node* a = callBestOverloadedFunction(alloc, emptyNodeList());
                             nl.push_back(a);
                         }
                         else
                         {
-                            freportError(
-                                "Internal failure generating union constructor "
-                                "%s: __allocate() not found in type %s",
-                                FC->fullyQualifiedName().c_str(),
-                                F->fullyQualifiedName().c_str());
+                            freportError("Internal failure generating union constructor "
+                                         "%s: __allocate() not found in type %s",
+                                         FC->fullyQualifiedName().c_str(), F->fullyQualifiedName().c_str());
                             abort();
                         }
                     }
@@ -3294,14 +3112,12 @@ namespace Mu
         {
             freportError("Variant Tag \"%s\" of type \"%s\" cannot "
                          "be declared in this scope (\"%s\")",
-                         name, type->fullyQualifiedName().c_str(),
-                         scope()->fullyQualifiedName().c_str());
+                         name, type->fullyQualifiedName().c_str(), scope()->fullyQualifiedName().c_str());
             return 0;
         }
     }
 
-    Class* NodeAssembler::declareClass(const char* name, SymbolList inheritance,
-                                       bool globalScope)
+    Class* NodeAssembler::declareClass(const char* name, SymbolList inheritance, bool globalScope)
     {
         Class::ClassVector supers;
 
@@ -3335,18 +3151,14 @@ namespace Mu
         // c->globalScope()->addSymbol(rt);
         c->scope()->addSymbol(rt);
 
-        Function* dr = new Function(
-            context(), c->name().c_str(), BaseFunctions::dereference,
-            Function::Cast, Function::Return, c->fullyQualifiedName().c_str(),
-            Function::Args, rt->fullyQualifiedName().c_str(), Function::End);
+        Function* dr = new Function(context(), c->name().c_str(), BaseFunctions::dereference, Function::Cast, Function::Return,
+                                    c->fullyQualifiedName().c_str(), Function::Args, rt->fullyQualifiedName().c_str(), Function::End);
 
         // c->globalScope()->addSymbol(dr);
         c->scope()->addSymbol(dr);
 
-        Function* A =
-            new Function(context(), "__allocate", BaseFunctions::classAllocate,
-                         Function::None, Function::Return,
-                         c->fullyQualifiedName().c_str(), Function::End);
+        Function* A = new Function(context(), "__allocate", BaseFunctions::classAllocate, Function::None, Function::Return,
+                                   c->fullyQualifiedName().c_str(), Function::End);
 
         c->addSymbol(A);
 
@@ -3390,8 +3202,7 @@ namespace Mu
         types[0] = c;
         for (int i = 0; i < mvars.size(); i++)
             types[i + 1] = mvars[i]->storageClass();
-        Symbol::SymbolVector symbols =
-            c->findSymbolsOfType<Function>(c->name());
+        Symbol::SymbolVector symbols = c->findSymbolsOfType<Function>(c->name());
         Context::FunctionVector functions;
         functions.resize(symbols.size());
         transform(symbols.begin(), symbols.end(), functions.begin(), castOp);
@@ -3400,16 +3211,14 @@ namespace Mu
         bool hasMemberInit = false;
         bool hasDefaultInit = false;
 
-        if (const Function* f = context()->matchSpecializedFunction(
-                process(), thread(), functions, types, matchType))
+        if (const Function* f = context()->matchSpecializedFunction(process(), thread(), functions, types, matchType))
         {
             hasMemberInit = true;
         }
 
         types.resize(1);
 
-        if (const Function* f = context()->matchSpecializedFunction(
-                process(), thread(), functions, types, matchType))
+        if (const Function* f = context()->matchSpecializedFunction(process(), thread(), functions, types, matchType))
         {
             hasDefaultInit = true;
         }
@@ -3422,8 +3231,7 @@ namespace Mu
             //  Create the parameters (named _0 ... _N)
             //
 
-            ParameterVariable* thisv =
-                new ParameterVariable(context(), "this", c);
+            ParameterVariable* thisv = new ParameterVariable(context(), "this", c);
             SymbolList params = newSymbolList(thisv);
 
             for (int i = 0; i < mvars.size(); i++)
@@ -3437,8 +3245,7 @@ namespace Mu
                 //  default constructor and the aggregate constructor
                 //
 
-                params.push_back(
-                    new ParameterVariable(context(), temp, t, Value()));
+                params.push_back(new ParameterVariable(context(), temp, t, Value()));
             }
 
             newStackFrame();
@@ -3448,10 +3255,8 @@ namespace Mu
             //  it Function::Generated -- we want it output into muc files
             //
 
-            Function* F =
-                new Function(context(), c->name().c_str(), c, params.size(),
-                             (ParameterVariable**)&params.front(), 0,
-                             Function::ContextDependent);
+            Function* F = new Function(context(), c->name().c_str(), c, params.size(), (ParameterVariable**)&params.front(), 0,
+                                       Function::ContextDependent);
             c->addSymbol(F);
             pushScope(F);
             declareParameters(params);
@@ -3468,8 +3273,7 @@ namespace Mu
             for (int i = 0; i < mvars.size(); i++)
             {
                 const ParameterVariable* pv = F->parameter(i + 1);
-                Node* lval = referenceMemberVariable(
-                    mvars[i], dereferenceVariable(thisv));
+                Node* lval = referenceMemberVariable(mvars[i], dereferenceVariable(thisv));
                 Node* rval = dereferenceVariable(pv);
                 Node* asop = binaryOperator("=", lval, rval);
                 nl.push_back(asop);
@@ -3478,8 +3282,7 @@ namespace Mu
             // return this
             nl.push_back(dereferenceVariable(thisv));
 
-            Node* body =
-                callBestOverloadedFunction(context()->simpleBlock(), nl);
+            Node* body = callBestOverloadedFunction(context()->simpleBlock(), nl);
             removeNodeList(nl);
 
             F->stackSize(endStackFrame());
@@ -3488,15 +3291,12 @@ namespace Mu
         }
     }
 
-    bool NodeAssembler::checkRedeclaration(const char* name,
-                                           const Type* returnType,
-                                           SymbolList parameters)
+    bool NodeAssembler::checkRedeclaration(const char* name, const Type* returnType, SymbolList parameters)
     {
         if (!name)
             return true;
 
-        if (const Function* G = scope()->findSymbolOfType<Function>(
-                context()->internName(name)))
+        if (const Function* G = scope()->findSymbolOfType<Function>(context()->internName(name)))
         {
             for (const Symbol* s = G->firstOverload(); s; s = s->nextOverload())
             {
@@ -3508,9 +3308,7 @@ namespace Mu
 
                         for (size_t i = 0; i < parameters.size(); i++)
                         {
-                            const ParameterVariable* p =
-                                static_cast<const ParameterVariable*>(
-                                    parameters[i]);
+                            const ParameterVariable* p = static_cast<const ParameterVariable*>(parameters[i]);
 
                             if (p->storageClass() != G0->argType(i))
                             {
@@ -3525,11 +3323,9 @@ namespace Mu
 
                             if (G0->body() && context()->debugging())
                             {
-                                AnnotatedNode* anode =
-                                    static_cast<AnnotatedNode*>(G0->body());
-                                str << "declared at " << anode->sourceFileName()
-                                    << ", line " << anode->linenum()
-                                    << ", char " << anode->charnum();
+                                AnnotatedNode* anode = static_cast<AnnotatedNode*>(G0->body());
+                                str << "declared at " << anode->sourceFileName() << ", line " << anode->linenum() << ", char "
+                                    << anode->charnum();
                             }
                             else if (!G0->body())
                             {
@@ -3537,9 +3333,7 @@ namespace Mu
                             }
 
                             string temp(str.str());
-                            freportError("Redeclaration of \"%s\" %s",
-                                         G0->fullyQualifiedName().c_str(),
-                                         temp.c_str());
+                            freportError("Redeclaration of \"%s\" %s", G0->fullyQualifiedName().c_str(), temp.c_str());
 
                             return false;
                         }
@@ -3551,18 +3345,14 @@ namespace Mu
         return true;
     }
 
-    Function* NodeAssembler::declareFunction(const char* name,
-                                             const Type* returnType,
-                                             SymbolList parameters,
-                                             unsigned int attrs,
+    Function* NodeAssembler::declareFunction(const char* name, const Type* returnType, SymbolList parameters, unsigned int attrs,
                                              bool addToContext)
     {
         if (!checkRedeclaration(name, returnType, parameters))
             return 0;
 
         newStackFrame();
-        const char* fname =
-            name ? name : context()->uniqueName(scope(), "__lambda").c_str();
+        const char* fname = name ? name : context()->uniqueName(scope(), "__lambda").c_str();
 
         Function* f;
 
@@ -3573,9 +3363,7 @@ namespace Mu
         }
         else
         {
-            f = new Function(context(), fname, returnType, parameters.size(),
-                             (ParameterVariable**)&(parameters.front()), 0,
-                             attrs);
+            f = new Function(context(), fname, returnType, parameters.size(), (ParameterVariable**)&(parameters.front()), 0, attrs);
         }
 
         if (Object* o = retrieveDocumentation(f->name()))
@@ -3600,15 +3388,12 @@ namespace Mu
         return f;
     }
 
-    MemberFunction* NodeAssembler::declareMemberFunction(const char* name,
-                                                         const Type* returnType,
-                                                         SymbolList parameters,
+    MemberFunction* NodeAssembler::declareMemberFunction(const char* name, const Type* returnType, SymbolList parameters,
                                                          unsigned int attrs)
     {
         Object* odoc = retrieveDocumentation(context()->internName(name));
 
-        ParameterVariable* self =
-            new ParameterVariable(context(), "this", classScope());
+        ParameterVariable* self = new ParameterVariable(context(), "this", classScope());
         insertSymbolAtFront(parameters, self);
 
         if (!checkRedeclaration(name, returnType, parameters))
@@ -3624,9 +3409,7 @@ namespace Mu
         }
         else
         {
-            f = new MemberFunction(
-                context(), name, returnType, parameters.size(),
-                (ParameterVariable**)&(parameters.front()), 0, attrs);
+            f = new MemberFunction(context(), name, returnType, parameters.size(), (ParameterVariable**)&(parameters.front()), 0, attrs);
         }
 
         if (odoc)
@@ -3681,8 +3464,7 @@ namespace Mu
             }
             else
             {
-                freportError("Function body returns %s; cannot cast to %s.",
-                             n->type()->fullyQualifiedName().c_str(),
+                freportError("Function body returns %s; cannot cast to %s.", n->type()->fullyQualifiedName().c_str(),
                              F->returnTypeName().c_str());
 
                 return 0;
@@ -3743,9 +3525,8 @@ namespace Mu
 
                     if (!rn)
                     {
-                        freportError(
-                            "Cannot use default constructor with implicit "
-                            "type declaration (what type is it?).");
+                        freportError("Cannot use default constructor with implicit "
+                                     "type declaration (what type is it?).");
                     }
 
                     return rn;
@@ -3796,8 +3577,7 @@ namespace Mu
             {
                 // Node* n = unresolvableCall(context()->internName("(type*)"),
                 // nl);
-                Node* n = new ASTTupleConstructor(*this, nl.size(), &nl.front(),
-                                                  context()->unresolvedCall());
+                Node* n = new ASTTupleConstructor(*this, nl.size(), &nl.front(), context()->unresolvedCall());
                 markCurrentFunctionUnresolved();
                 removeSymbolList(sl);
                 return n;
@@ -3831,8 +3611,7 @@ namespace Mu
             {
                 markCurrentFunctionUnresolved();
 
-                return new ASTListConstructor(*this, nl.size(), &nl.front(),
-                                              context()->unresolvedCall());
+                return new ASTListConstructor(*this, nl.size(), &nl.front(), context()->unresolvedCall());
             }
         }
 
@@ -3845,13 +3624,11 @@ namespace Mu
 
             if (!etype->match(ntype))
             {
-                freportError(
-                    "cannot construct \"%s\" list "
-                    "because of inconsistant element types: "
-                    "at element %d: \"%s\" does not match expected \"%s\"",
-                    t->fullyQualifiedName().c_str(), i + 1,
-                    ntype->fullyQualifiedName().c_str(),
-                    etype->fullyQualifiedName().c_str());
+                freportError("cannot construct \"%s\" list "
+                             "because of inconsistant element types: "
+                             "at element %d: \"%s\" does not match expected \"%s\"",
+                             t->fullyQualifiedName().c_str(), i + 1, ntype->fullyQualifiedName().c_str(),
+                             etype->fullyQualifiedName().c_str());
 
                 return 0;
             }
@@ -3883,14 +3660,12 @@ namespace Mu
         if (!_suffixModule)
         {
             Name moduleName = context()->internName("suffix");
-            _suffixModule =
-                _context->globalScope()->findSymbolOfType<Module>(moduleName);
+            _suffixModule = _context->globalScope()->findSymbolOfType<Module>(moduleName);
         }
 
         if (_suffixModule)
         {
-            if (Function* f =
-                    _suffixModule->findSymbolOfType<Function>(suffixName))
+            if (Function* f = _suffixModule->findSymbolOfType<Function>(suffixName))
             {
                 NodeList nl = newNodeList(n);
 
@@ -3912,13 +3687,11 @@ namespace Mu
     {
         if (_docmodule)
         {
-            if (Symbol* symbol =
-                    _docmodule->findSymbolByQualifiedName(n, false))
+            if (Symbol* symbol = _docmodule->findSymbolByQualifiedName(n, false))
             {
                 bool add = false;
 
-                for (Symbol* sym = symbol->firstOverload(); sym;
-                     sym = sym->nextOverload())
+                for (Symbol* sym = symbol->firstOverload(); sym; sym = sym->nextOverload())
                 {
                     add = false;
 
@@ -3980,10 +3753,7 @@ namespace Mu
         }
     }
 
-    NodeAssembler::Pattern* NodeAssembler::newPattern(Name n)
-    {
-        return new Pattern(n);
-    }
+    NodeAssembler::Pattern* NodeAssembler::newPattern(Name n) { return new Pattern(n); }
 
     NodeAssembler::Pattern* NodeAssembler::newPattern(Node* n)
     {
@@ -3991,8 +3761,7 @@ namespace Mu
         return new Pattern(n);
     }
 
-    NodeAssembler::Pattern* NodeAssembler::newPattern(Pattern* p,
-                                                      const char* name)
+    NodeAssembler::Pattern* NodeAssembler::newPattern(Pattern* p, const char* name)
     {
         Name n = context()->lookupName(name);
 
@@ -4024,15 +3793,12 @@ namespace Mu
             rhs = cast(rhs, pattern->constructor);
             if (!rhs)
                 return 0;
-            const Function* F =
-                pattern->constructor->findSymbolOfType<Function>(
-                    context()->lookupName("__unpack"));
+            const Function* F = pattern->constructor->findSymbolOfType<Function>(context()->lookupName("__unpack"));
             NodeList nl = newNodeList(rhs);
             rhs = callFunction(F, nl);
             removeNodeList(nl);
 
-            if (const VariantTagType* tt =
-                    dynamic_cast<const VariantTagType*>(pattern->constructor))
+            if (const VariantTagType* tt = dynamic_cast<const VariantTagType*>(pattern->constructor))
             {
                 if (tt->representationType() == context()->voidType())
                     return rhs;
@@ -4043,24 +3809,20 @@ namespace Mu
         {
             if (!pattern->typePattern->match(rhs->type()))
             {
-                freportError(
-                    "Pattern will not match against type \"%s\", "
-                    "requires match of type pattern \"%s\"",
-                    rhs->type()->fullyQualifiedName().c_str(),
-                    pattern->typePattern->fullyQualifiedName().c_str());
+                freportError("Pattern will not match against type \"%s\", "
+                             "requires match of type pattern \"%s\"",
+                             rhs->type()->fullyQualifiedName().c_str(), pattern->typePattern->fullyQualifiedName().c_str());
                 return 0;
             }
 
             Name name = uniqueNameInScope("__var");
             Node* n = declareInitializer(name, rhs);
-            NodeList nl = resolvePatternList(pattern->children, n,
-                                             findTypeInScope<Variable>(name));
+            NodeList nl = resolvePatternList(pattern->children, n, findTypeInScope<Variable>(name));
             if (nl.empty())
                 return 0;
             insertNodeAtFront(nl, n);
 
-            Node* block =
-                callBestOverloadedFunction(context()->simpleBlock(), nl);
+            Node* block = callBestOverloadedFunction(context()->simpleBlock(), nl);
             removeNodeList(nl);
             return block;
         }
@@ -4068,9 +3830,7 @@ namespace Mu
         {
             Node* n = 0;
 
-            n = binaryOperator(
-                rhs->type() == context()->nilType() ? "eq" : "==", rhs,
-                pattern->expression);
+            n = binaryOperator(rhs->type() == context()->nilType() ? "eq" : "==", rhs, pattern->expression);
 
             NodeList nl = newNodeList(n);
             n = callBestFunction("__bool_pattern_test", nl);
@@ -4090,9 +3850,7 @@ namespace Mu
         }
     }
 
-    NodeAssembler::NodeList NodeAssembler::resolvePatternList(Pattern* pattern,
-                                                              Node* rhs,
-                                                              Variable* var)
+    NodeAssembler::NodeList NodeAssembler::resolvePatternList(Pattern* pattern, Node* rhs, Variable* var)
     {
         NodeList nl = emptyNodeList();
         const Type* t = var->storageClass();
@@ -4109,8 +3867,7 @@ namespace Mu
             {
                 freportError("Number of patterns (%d) does not match "
                              "number of fields (%d) in type \"%s\"",
-                             count, mvars.size(),
-                             t->fullyQualifiedName().c_str());
+                             count, mvars.size(), t->fullyQualifiedName().c_str());
 
                 removeNodeList(nl);
                 return emptyNodeList();
@@ -4139,15 +3896,13 @@ namespace Mu
         }
         else
         {
-            freportError("pattern cannot match type \"%s\"",
-                         t->fullyQualifiedName().c_str());
+            freportError("pattern cannot match type \"%s\"", t->fullyQualifiedName().c_str());
         }
 
         return nl;
     }
 
-    void NodeAssembler::unflattenPattern(Pattern* pattern, const char* tname,
-                                         bool keepLeaf)
+    void NodeAssembler::unflattenPattern(Pattern* pattern, const char* tname, bool keepLeaf)
     {
         if (pattern->next)
         {
@@ -4217,11 +3972,9 @@ namespace Mu
         {
             if (p->constructor->scope() != _caseStack.back().exprType)
             {
-                freportError(
-                    "case pattern constructor \"%s\" does not match case expr "
-                    "type \"%s\"",
-                    p->constructor->fullyQualifiedName().c_str(),
-                    _caseStack.back().exprType->fullyQualifiedName().c_str());
+                freportError("case pattern constructor \"%s\" does not match case expr "
+                             "type \"%s\"",
+                             p->constructor->fullyQualifiedName().c_str(), _caseStack.back().exprType->fullyQualifiedName().c_str());
             }
             else if (Node* n = dereferenceVariable("__case_result"))
             {
@@ -4252,11 +4005,9 @@ namespace Mu
     {
         if (constructor->scope() != _caseStack.back().exprType)
         {
-            freportError(
-                "case pattern constructor \"%s\" does not match case expr type "
-                "\"%s\"",
-                constructor->fullyQualifiedName().c_str(),
-                _caseStack.back().exprType->fullyQualifiedName().c_str());
+            freportError("case pattern constructor \"%s\" does not match case expr type "
+                         "\"%s\"",
+                         constructor->fullyQualifiedName().c_str(), _caseStack.back().exprType->fullyQualifiedName().c_str());
             _caseStack.pop_back();
             return false;
         }
@@ -4291,20 +4042,17 @@ namespace Mu
 
         if (!bnode)
         {
-            bnode =
-                callBestOverloadedFunction(context()->noop(), emptyNodeList());
+            bnode = callBestOverloadedFunction(context()->noop(), emptyNodeList());
         }
 
-        if (_allowUnresolved
-            && (stype->isUnresolvedType() || bnode->type()->isUnresolvedType()))
+        if (_allowUnresolved && (stype->isUnresolvedType() || bnode->type()->isUnresolvedType()))
         {
             Node* args[3];
             args[0] = cnode;
             args[1] = dnode;
             args[2] = bnode;
 
-            Node* astforeach =
-                new ASTForEach(*this, args, context()->unresolvedCall());
+            Node* astforeach = new ASTForEach(*this, args, context()->unresolvedCall());
 
             markCurrentFunctionUnresolved();
             return astforeach;
@@ -4325,8 +4073,7 @@ namespace Mu
         cout << "scope:" << endl;
         for (const ScopeState* ss = this; ss; ss = ss->parent)
         {
-            cout << "    " << ss->symbol->fullyQualifiedName().c_str()
-                 << (ss->declaration ? "  declaration" : "") << endl;
+            cout << "    " << ss->symbol->fullyQualifiedName().c_str() << (ss->declaration ? "  declaration" : "") << endl;
         }
     }
 

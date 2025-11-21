@@ -36,10 +36,7 @@ namespace Mu
 
     Object* TypePattern::newObject() const { return 0; }
 
-    void TypePattern::outputValue(std::ostream& o, Value& value) const
-    {
-        o << "\"" << name() << "\" is a type pattern";
-    }
+    void TypePattern::outputValue(std::ostream& o, Value& value) const { o << "\"" << name() << "\" is a type pattern"; }
 
     void TypePattern::argumentAdjust(int& index, int& funcIndex) const
     {
@@ -81,10 +78,7 @@ namespace Mu
 
     //----------------------------------------------------------------------
 
-    Type::MatchResult MatchAnyThing::match(const Type* other, Bindings&) const
-    {
-        return Match;
-    }
+    Type::MatchResult MatchAnyThing::match(const Type* other, Bindings&) const { return Match; }
 
     //----------------------------------------------------------------------
 
@@ -99,10 +93,7 @@ namespace Mu
 
     //----------------------------------------------------------------------
 
-    Type::MatchResult VarArg::match(const Type* other, Bindings&) const
-    {
-        return Match;
-    }
+    Type::MatchResult VarArg::match(const Type* other, Bindings&) const { return Match; }
 
     void VarArg::argumentAdjust(int& index, int& funcIndex) const
     {
@@ -116,10 +107,7 @@ namespace Mu
 
     //----------------------------------------------------------------------
 
-    Type::MatchResult OneRepeatedArg::match(const Type* other, Bindings&) const
-    {
-        return Match;
-    }
+    Type::MatchResult OneRepeatedArg::match(const Type* other, Bindings&) const { return Match; }
 
     void OneRepeatedArg::argumentAdjust(int& index, int& funcIndex) const
     {
@@ -139,10 +127,7 @@ namespace Mu
 
     //----------------------------------------------------------------------
 
-    Type::MatchResult TwoRepeatedArg::match(const Type* other, Bindings&) const
-    {
-        return Match;
-    }
+    Type::MatchResult TwoRepeatedArg::match(const Type* other, Bindings&) const { return Match; }
 
     void TwoRepeatedArg::argumentAdjust(int& index, int& funcIndex) const
     {
@@ -186,11 +171,9 @@ namespace Mu
 
     //----------------------------------------------------------------------
 
-    Type::MatchResult MatchAnyObjectButNotTuple::match(const Type* other,
-                                                       Bindings&) const
+    Type::MatchResult MatchAnyObjectButNotTuple::match(const Type* other, Bindings&) const
     {
-        if (dynamic_cast<const Class*>(other)
-            || dynamic_cast<const VariantType*>(other))
+        if (dynamic_cast<const Class*>(other) || dynamic_cast<const VariantType*>(other))
         {
             if (dynamic_cast<const TupleType*>(other))
             {
@@ -207,8 +190,7 @@ namespace Mu
 
     //----------------------------------------------------------------------
 
-    Type::MatchResult MatchAnyClassButNotTuple::match(const Type* other,
-                                                      Bindings&) const
+    Type::MatchResult MatchAnyClassButNotTuple::match(const Type* other, Bindings&) const
     {
         if (const Class* c = dynamic_cast<const Class*>(other))
         {
@@ -227,13 +209,11 @@ namespace Mu
 
     //----------------------------------------------------------------------
 
-    Type::MatchResult MatchAnyClassButNotTupleOrList::match(const Type* other,
-                                                            Bindings&) const
+    Type::MatchResult MatchAnyClassButNotTupleOrList::match(const Type* other, Bindings&) const
     {
         if (const Class* c = dynamic_cast<const Class*>(other))
         {
-            if (dynamic_cast<const TupleType*>(c)
-                || dynamic_cast<const ListType*>(c))
+            if (dynamic_cast<const TupleType*>(c) || dynamic_cast<const ListType*>(c))
             {
                 return NoMatch;
             }
@@ -248,54 +228,43 @@ namespace Mu
 
     //----------------------------------------------------------------------
 
-    Type::MatchResult MatchAnyInterface::match(const Type* other,
-                                               Bindings&) const
+    Type::MatchResult MatchAnyInterface::match(const Type* other, Bindings&) const
     {
         return dynamic_cast<const Interface*>(other) != 0 ? Match : NoMatch;
     }
 
     //----------------------------------------------------------------------
 
-    Type::MatchResult MatchAnyClassOrInterface::match(const Type* other,
-                                                      Bindings&) const
+    Type::MatchResult MatchAnyClassOrInterface::match(const Type* other, Bindings&) const
     {
-        return (dynamic_cast<const Interface*>(other) != 0
-                || dynamic_cast<const Class*>(other) != 0)
-                   ? Match
-                   : NoMatch;
+        return (dynamic_cast<const Interface*>(other) != 0 || dynamic_cast<const Class*>(other) != 0) ? Match : NoMatch;
     }
 
     //----------------------------------------------------------------------
 
-    Type::MatchResult MatchNonPrimitiveOrNil::match(const Type* other,
-                                                    Bindings&) const
+    Type::MatchResult MatchNonPrimitiveOrNil::match(const Type* other, Bindings&) const
     {
         return !other->isPrimitiveType() ? Match : NoMatch;
     }
 
     //----------------------------------------------------------------------
 
-    Type::MatchResult MatchAnyReference::match(const Type* other,
-                                               Bindings&) const
+    Type::MatchResult MatchAnyReference::match(const Type* other, Bindings&) const
     {
         return dynamic_cast<const ReferenceType*>(other) != 0 ? Match : NoMatch;
     }
 
     //----------------------------------------------------------------------
 
-    Type::MatchResult MatchAnyNonPrimitiveReference::match(const Type* other,
-                                                           Bindings&) const
+    Type::MatchResult MatchAnyNonPrimitiveReference::match(const Type* other, Bindings&) const
     {
         const ReferenceType* rtype = dynamic_cast<const ReferenceType*>(other);
-        return (rtype && !rtype->dereferenceType()->isPrimitiveType())
-                   ? Match
-                   : NoMatch;
+        return (rtype && !rtype->dereferenceType()->isPrimitiveType()) ? Match : NoMatch;
     }
 
     //----------------------------------------------------------------------
 
-    Type::MatchResult MatchAnyFunction::match(const Type* other,
-                                              Bindings&) const
+    Type::MatchResult MatchAnyFunction::match(const Type* other, Bindings&) const
     {
         return dynamic_cast<const FunctionType*>(other) != 0 ? Match : NoMatch;
     }

@@ -68,53 +68,51 @@ namespace Rv
 
 #if defined(RV_VFX_CY2024)
 #ifdef PLATFORM_WINDOWS
-    // On Windows, there is an issue with the default delegate for QTreeView and the option to alternate 
-    // the background color of the rows. The issue is that the background is painted on top of the icon, 
-    // which is not the expected behavior. The workaround is to use a custom deletegate to make sure 
+    // On Windows, there is an issue with the default delegate for QTreeView and the option to alternate
+    // the background color of the rows. The issue is that the background is painted on top of the icon,
+    // which is not the expected behavior. The workaround is to use a custom deletegate to make sure
     // that the background of the row is painted BEFORE the icon.
     class RvFileDelegate : public QStyledItemDelegate
     {
-        public:
-            using QStyledItemDelegate::QStyledItemDelegate;
+    public:
+        using QStyledItemDelegate::QStyledItemDelegate;
 
-            void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const override
+        void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const override
+        {
+            QStyleOptionViewItem opt = option;
+            initStyleOption(&opt, index);
+
+            QStyle* style = opt.widget ? opt.widget->style() : QApplication::style();
+
+            // The first thing to paint is the background.
+            style->drawPrimitive(QStyle::PE_PanelItemViewItem, &opt, painter, opt.widget);
+
+            // Draw the highlight if the item is selected.
+            if (opt.state & QStyle::State_Selected)
             {
-                QStyleOptionViewItem opt = option;
-                initStyleOption(&opt, index);
-
-                QStyle* style = opt.widget ? opt.widget->style() : QApplication::style();
-
-                // The first thing to paint is the background.
-                style->drawPrimitive(QStyle::PE_PanelItemViewItem, &opt, painter, opt.widget);
-
-                // Draw the highlight if the item is selected.
-                if (opt.state & QStyle::State_Selected)
-                {
-                    painter->fillRect(opt.rect, opt.palette.highlight());
-                }
-                
-                // After the background, the icon should be painted.
-                QVariant decoration = index.data(Qt::DecorationRole);
-                QRect iconRect = style->subElementRect(QStyle::SE_ItemViewItemDecoration, &opt, opt.widget);
-                if (decoration.canConvert<QIcon>())
-                {
-                    QIcon icon = qvariant_cast<QIcon>(decoration);
-                    icon.paint(painter, iconRect, Qt::AlignCenter, QIcon::Normal, QIcon::On);
-                }
-
-                // Once the background and icon are painted, we can draw the text.
-                QString text = index.data(Qt::DisplayRole).toString();
-                QRect textRect = style->subElementRect(QStyle::SE_ItemViewItemText, &opt, opt.widget);
-                painter->setPen(opt.palette.color((opt.state & QStyle::State_Selected) ? QPalette::HighlightedText : QPalette::Text));
-                painter->drawText(textRect, opt.displayAlignment, text);
+                painter->fillRect(opt.rect, opt.palette.highlight());
             }
+
+            // After the background, the icon should be painted.
+            QVariant decoration = index.data(Qt::DecorationRole);
+            QRect iconRect = style->subElementRect(QStyle::SE_ItemViewItemDecoration, &opt, opt.widget);
+            if (decoration.canConvert<QIcon>())
+            {
+                QIcon icon = qvariant_cast<QIcon>(decoration);
+                icon.paint(painter, iconRect, Qt::AlignCenter, QIcon::Normal, QIcon::On);
+            }
+
+            // Once the background and icon are painted, we can draw the text.
+            QString text = index.data(Qt::DisplayRole).toString();
+            QRect textRect = style->subElementRect(QStyle::SE_ItemViewItemText, &opt, opt.widget);
+            painter->setPen(opt.palette.color((opt.state & QStyle::State_Selected) ? QPalette::HighlightedText : QPalette::Text));
+            painter->drawText(textRect, opt.displayAlignment, text);
+        }
     };
-#endif 
+#endif
 #endif
 
-    RvFileDialog::RvFileDialog(QWidget* parent, FileTypeTraits* traits,
-                               Role role, Qt::WindowFlags flags,
-                               QString settingsGroup)
+    RvFileDialog::RvFileDialog(QWidget* parent, FileTypeTraits* traits, Role role, Qt::WindowFlags flags, QString settingsGroup)
         : QDialog(parent, flags)
         , m_building(false)
         , m_fileMode(OneExistingFile)
@@ -148,11 +146,9 @@ namespace Rv
         centerOverApp();
 
 #ifdef PLATFORM_WINDOWS
-        int iconMode =
-            settings.value("iconMode", FileTypeTraits::NoIcons).toInt();
+        int iconMode = settings.value("iconMode", FileTypeTraits::NoIcons).toInt();
 #else
-        int iconMode =
-            settings.value("iconMode", FileTypeTraits::SystemIcons).toInt();
+        int iconMode = settings.value("iconMode", FileTypeTraits::SystemIcons).toInt();
 #endif
 
         switch (iconMode)
@@ -177,12 +173,10 @@ namespace Rv
 
         int vmode = settings.value("viewModeNew", -1).toInt();
         int smode = settings.value("sortMethod", -1).toInt();
-        bool showHiddenFiles =
-            settings.value("showHiddenFiles", false).toBool();
+        bool showHiddenFiles = settings.value("showHiddenFiles", false).toBool();
 
         m_allowAutoRefresh = settings.value("allowAutoRefresh", false).toBool();
-        m_ui.autoRefreshCheckbox->setCheckState(
-            (m_allowAutoRefresh) ? Qt::Checked : Qt::Unchecked);
+        m_ui.autoRefreshCheckbox->setCheckState((m_allowAutoRefresh) ? Qt::Checked : Qt::Unchecked);
 
         setWindowTitle("Select Files/Directories");
         setSizeGripEnabled(true);
@@ -193,13 +187,10 @@ namespace Rv
         m_sidePanelTimer->setSingleShot(true);
         m_columnViewTimer->setSingleShot(true);
         m_columnViewTimer->start(100);
-        m_ui.buttonBox->setStandardButtons(
-            m_role == OpenFileRole
-                ? (QDialogButtonBox::Open | QDialogButtonBox::Cancel)
-                : (QDialogButtonBox::Save | QDialogButtonBox::Cancel));
+        m_ui.buttonBox->setStandardButtons(m_role == OpenFileRole ? (QDialogButtonBox::Open | QDialogButtonBox::Cancel)
+                                                                  : (QDialogButtonBox::Save | QDialogButtonBox::Cancel));
 
-        m_ui.sidePanelList->setSelectionMode(
-            QAbstractItemView::SingleSelection);
+        m_ui.sidePanelList->setSelectionMode(QAbstractItemView::SingleSelection);
         loadSidePanel();
 
         while (QWidget* w = m_ui.viewStack->currentWidget())
@@ -209,8 +200,7 @@ namespace Rv
         QAction* spGo = m_sidePanelPopup->addAction("Go to Location");
         QAction* spUse = m_sidePanelPopup->addAction("Use Selection");
         m_sidePanelPopup->addSeparator();
-        QAction* spRemove =
-            m_sidePanelPopup->addAction("Remove Item from Panel");
+        QAction* spRemove = m_sidePanelPopup->addAction("Remove Item from Panel");
 
         m_configPopup = new QMenu(this);
         m_cpSystem = m_configPopup->addAction("System Icons");
@@ -320,108 +310,71 @@ namespace Rv
         m_ui.sidePanelList->installEventFilter(this);
 
         connect(spGo, SIGNAL(triggered(bool)), this, SLOT(sidePanelGo(bool)));
-        connect(spRemove, SIGNAL(triggered(bool)), this,
-                SLOT(sidePanelRemove(bool)));
-        connect(spUse, SIGNAL(triggered(bool)), this,
-                SLOT(sidePanelAccept(bool)));
+        connect(spRemove, SIGNAL(triggered(bool)), this, SLOT(sidePanelRemove(bool)));
+        connect(spUse, SIGNAL(triggered(bool)), this, SLOT(sidePanelAccept(bool)));
 
-        connect(cpGroup, SIGNAL(triggered(QAction*)), this,
-                SLOT(iconViewChanged(QAction*)));
-        connect(m_cpHidden, SIGNAL(triggered(bool)), this,
-                SLOT(hiddenViewChanged(bool)));
+        connect(cpGroup, SIGNAL(triggered(QAction*)), this, SLOT(iconViewChanged(QAction*)));
+        connect(m_cpHidden, SIGNAL(triggered(bool)), this, SLOT(hiddenViewChanged(bool)));
 
-        connect(m_rename, SIGNAL(triggered(bool)), this,
-                SLOT(renameSelected(bool)));
+        connect(m_rename, SIGNAL(triggered(bool)), this, SLOT(renameSelected(bool)));
 
-        connect(m_delete, SIGNAL(triggered(bool)), this,
-                SLOT(deleteSelected(bool)));
+        connect(m_delete, SIGNAL(triggered(bool)), this, SLOT(deleteSelected(bool)));
 
         connect(m_ui.previousButton, SIGNAL(triggered(QAction*)), this,
                 SLOT(prevButtonTrigger(QAction*)));
 
-        connect(m_ui.nextButton, SIGNAL(triggered(QAction*)), this,
-                SLOT(nextButtonTrigger(QAction*)));
+        connect(m_ui.nextButton, SIGNAL(triggered(QAction*)), this, SLOT(nextButtonTrigger(QAction*)));
 
-        connect(m_ui.sidePanelList->model(),
-                SIGNAL(rowsInserted(const QModelIndex&, int, int)), this,
+        connect(m_ui.sidePanelList->model(), SIGNAL(rowsInserted(const QModelIndex&, int, int)), this,
                 SLOT(sidePanelInserted(const QModelIndex&, int, int)));
 
-        connect(m_ui.sidePanelList, SIGNAL(itemClicked(QListWidgetItem*)), this,
-                SLOT(sidePanelClick(QListWidgetItem*)));
+        connect(m_ui.sidePanelList, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(sidePanelClick(QListWidgetItem*)));
 
-        connect(m_ui.sidePanelList, SIGNAL(itemDoubleClicked(QListWidgetItem*)),
-                this, SLOT(sidePanelDoubleClick(QListWidgetItem*)));
+        connect(m_ui.sidePanelList, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(sidePanelDoubleClick(QListWidgetItem*)));
 
-        connect(m_ui.sidePanelList,
-                SIGNAL(customContextMenuRequested(const QPoint&)), this,
-                SLOT(sidePanelPopup(const QPoint&)));
+        connect(m_ui.sidePanelList, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(sidePanelPopup(const QPoint&)));
 
         connect(m_reloadTimer, SIGNAL(timeout()), this, SLOT(reloadTimeout()));
 
-        connect(m_sidePanelTimer, SIGNAL(timeout()), this,
-                SLOT(sidePanelTimeout()));
+        connect(m_sidePanelTimer, SIGNAL(timeout()), this, SLOT(sidePanelTimeout()));
 
-        connect(m_columnViewTimer, SIGNAL(timeout()), this,
-                SLOT(columnViewTimeout()));
+        connect(m_columnViewTimer, SIGNAL(timeout()), this, SLOT(columnViewTimeout()));
 
-        connect(m_ui.sortCombo, SIGNAL(currentIndexChanged(int)), this,
-                SLOT(sortComboChanged(int)));
+        connect(m_ui.sortCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(sortComboChanged(int)));
 
-        connect(m_ui.viewCombo, SIGNAL(currentIndexChanged(int)), this,
-                SLOT(viewComboChanged(int)));
+        connect(m_ui.viewCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(viewComboChanged(int)));
 
-        connect(m_ui.pathCombo, SIGNAL(currentIndexChanged(int)), this,
-                SLOT(pathComboChanged(int)));
+        connect(m_ui.pathCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(pathComboChanged(int)));
 
-        connect(m_ui.currentPath, SIGNAL(returnPressed()), this,
-                SLOT(inputPathEntry()));
+        connect(m_ui.currentPath, SIGNAL(returnPressed()), this, SLOT(inputPathEntry()));
 
-        connect(m_detailTree, SIGNAL(doubleClicked(const QModelIndex&)), this,
-                SLOT(doubleClickAccept(const QModelIndex&)));
+        connect(m_detailTree, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(doubleClickAccept(const QModelIndex&)));
 
-        connect(m_detailTree, SIGNAL(collapsed(const QModelIndex&)), this,
-                SLOT(resizeColumns(const QModelIndex&)));
+        connect(m_detailTree, SIGNAL(collapsed(const QModelIndex&)), this, SLOT(resizeColumns(const QModelIndex&)));
 
-        connect(m_detailTree, SIGNAL(expanded(const QModelIndex&)), this,
-                SLOT(resizeColumns(const QModelIndex&)));
+        connect(m_detailTree, SIGNAL(expanded(const QModelIndex&)), this, SLOT(resizeColumns(const QModelIndex&)));
 
-        connect(m_columnView, SIGNAL(doubleClicked(const QModelIndex&)), this,
-                SLOT(doubleClickAccept(const QModelIndex&)));
+        connect(m_columnView, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(doubleClickAccept(const QModelIndex&)));
 
-        connect(m_columnView->selectionModel(),
-                SIGNAL(selectionChanged(const QItemSelection&,
-                                        const QItemSelection&)),
-                this,
-                SLOT(columnSelectionChanged(const QItemSelection&,
-                                            const QItemSelection&)));
+        connect(m_columnView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), this,
+                SLOT(columnSelectionChanged(const QItemSelection&, const QItemSelection&)));
 
-        connect(m_detailTree->selectionModel(),
-                SIGNAL(selectionChanged(const QItemSelection&,
-                                        const QItemSelection&)),
-                this,
-                SLOT(treeSelectionChanged(const QItemSelection&,
-                                          const QItemSelection&)));
+        connect(m_detailTree->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), this,
+                SLOT(treeSelectionChanged(const QItemSelection&, const QItemSelection&)));
 
-        connect(m_columnView, SIGNAL(updatePreviewWidget(const QModelIndex&)),
-                this, SLOT(columnUpdatePreview(const QModelIndex&)));
+        connect(m_columnView, SIGNAL(updatePreviewWidget(const QModelIndex&)), this, SLOT(columnUpdatePreview(const QModelIndex&)));
 
-        connect(m_ui.newFolderButton, SIGNAL(clicked(bool)), this,
-                SLOT(createDirectory(bool)));
+        connect(m_ui.newFolderButton, SIGNAL(clicked(bool)), this, SLOT(createDirectory(bool)));
 
-        connect(m_createDirectory, SIGNAL(triggered(bool)), this,
-                SLOT(createDirectory(bool)));
+        connect(m_createDirectory, SIGNAL(triggered(bool)), this, SLOT(createDirectory(bool)));
 
-        connect(m_ui.reloadButton, SIGNAL(clicked(bool)), this,
-                SLOT(reload(bool)));
+        connect(m_ui.reloadButton, SIGNAL(clicked(bool)), this, SLOT(reload(bool)));
 
-        connect(m_reload, SIGNAL(triggered(bool)), this,
-                SLOT(reload(bool)));
+        connect(m_reload, SIGNAL(triggered(bool)), this, SLOT(reload(bool)));
 
-        connect(m_ui.autoRefreshCheckbox, SIGNAL(stateChanged(int)), this,
-                SLOT(autoRefreshChanged(int)));
+        connect(m_ui.autoRefreshCheckbox, SIGNAL(stateChanged(int)), this, SLOT(autoRefreshChanged(int)));
 
-        connect(m_ui.fileTypeCombo, SIGNAL(currentIndexChanged(int)), this,
-                SLOT(fileTypeChanged(int)));
+        connect(m_ui.fileTypeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(fileTypeChanged(int)));
 
         connect(m_columnView,
                 SIGNAL(customContextMenuRequested(const QPoint&)), this,
@@ -500,21 +453,16 @@ namespace Rv
         setFileTypeIndex(0);
     }
 
-    void RvFileDialog::setFileTypeIndex(size_t index)
-    {
-        m_ui.fileTypeCombo->setCurrentIndex(index);
-    }
+    void RvFileDialog::setFileTypeIndex(size_t index) { m_ui.fileTypeCombo->setCurrentIndex(index); }
 
     void RvFileDialog::setFileMode(FileMode m)
     {
         DB("setFileMode " << m);
         m_fileMode = m;
 
-        if (m_fileMode == ManyExistingFiles
-            || m_fileMode == ManyExistingFilesAndDirectories)
+        if (m_fileMode == ManyExistingFiles || m_fileMode == ManyExistingFilesAndDirectories)
         {
-            m_detailTree->setSelectionMode(
-                QAbstractItemView::ExtendedSelection);
+            m_detailTree->setSelectionMode(QAbstractItemView::ExtendedSelection);
         }
         else
         {
@@ -541,16 +489,11 @@ namespace Rv
     void RvFileDialog::setRole(Role r)
     {
         m_role = r;
-        m_ui.buttonBox->setStandardButtons(
-            m_role == OpenFileRole
-                ? (QDialogButtonBox::Open | QDialogButtonBox::Cancel)
-                : (QDialogButtonBox::Save | QDialogButtonBox::Cancel));
+        m_ui.buttonBox->setStandardButtons(m_role == OpenFileRole ? (QDialogButtonBox::Open | QDialogButtonBox::Cancel)
+                                                                  : (QDialogButtonBox::Save | QDialogButtonBox::Cancel));
     }
 
-    void RvFileDialog::setTitleLabel(const QString& text)
-    {
-        m_ui.titleLabel->setText(text);
-    }
+    void RvFileDialog::setTitleLabel(const QString& text) { m_ui.titleLabel->setText(text); }
 
     QFileInfoList RvFileDialog::findMountPoints()
     {
@@ -667,15 +610,13 @@ namespace Rv
         l->clear();
 
         settings.beginGroup("RvFileDialog");
-        QStringList paths =
-            settings.value("sidePanelPaths", QStringList()).toStringList();
+        QStringList paths = settings.value("sidePanelPaths", QStringList()).toStringList();
         DB("    settings value, " << paths.size() << "items");
         settings.endGroup();
 
         //  Add current working directory to head of list
         //
-        QListWidgetItem* item =
-            newItemForFile(QFileInfo(QDir::current().path()));
+        QListWidgetItem* item = newItemForFile(QFileInfo(QDir::current().path()));
         item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
         item->setText("Current Directory");
         l->addItem(item);
@@ -907,8 +848,7 @@ namespace Rv
         QString path = inpath;
         QString cpath = m_ui.currentPath->text();
 
-        DB("setDirectory " << path.toUtf8().data() << " "
-                           << m_ui.currentPath->text().toUtf8().data());
+        DB("setDirectory " << path.toUtf8().data() << " " << m_ui.currentPath->text().toUtf8().data());
 
         QFileInfo pathInfo(path);
 
@@ -968,8 +908,7 @@ namespace Rv
             if (!m_watcher)
             {
                 m_watcher = new QFileSystemWatcher(this);
-                connect(m_watcher, SIGNAL(directoryChanged(const QString&)),
-                        this, SLOT(watchedDirChanged(const QString&)));
+                connect(m_watcher, SIGNAL(directoryChanged(const QString&)), this, SLOT(watchedDirChanged(const QString&)));
             }
 
             if (!m_watcher->directories().empty())
@@ -989,8 +928,7 @@ namespace Rv
         }
         else
         {
-            dir = QDir(pathInfo.absolutePath(), "",
-                       QDir::Name | QDir::IgnoreCase, m_filters);
+            dir = QDir(pathInfo.absolutePath(), "", QDir::Name | QDir::IgnoreCase, m_filters);
         }
         DB("    setting currentPath " << absoluteDirPath.toUtf8().data());
         m_ui.currentPath->setText(absoluteDirPath);
@@ -999,19 +937,15 @@ namespace Rv
 
         if (m_viewMode == DetailedFileView || m_viewMode == DetailedMediaView)
         {
-            MediaDirModel* model =
-                dynamic_cast<MediaDirModel*>(m_detailTree->model());
-            model->setDirectory(dir, m_viewMode == DetailedFileView
-                                         ? MediaDirModel::BasicFileDetails
-                                         : MediaDirModel::MediaDetails);
+            MediaDirModel* model = dynamic_cast<MediaDirModel*>(m_detailTree->model());
+            model->setDirectory(dir, m_viewMode == DetailedFileView ? MediaDirModel::BasicFileDetails : MediaDirModel::MediaDetails);
 
             for (int i = 0; i < 8; i++)
                 m_detailTree->resizeColumnToContents(i);
         }
         else if (m_viewMode == ColumnView)
         {
-            QModelIndex i =
-                m_columnModel->indexOfPath(QFileInfo(absoluteDirPath));
+            QModelIndex i = m_columnModel->indexOfPath(QFileInfo(absoluteDirPath));
 
             if (!i.isValid())
             {
@@ -1033,8 +967,7 @@ namespace Rv
             //    scrolled too far by setCurrentIndex() if its called before
             //    the dialog box is fully formed.
             //
-            DB("    m_columnViewTimer active "
-               << m_columnViewTimer->isActive());
+            DB("    m_columnViewTimer active " << m_columnViewTimer->isActive());
 
             if (i != m_columnView->currentIndex())
             {
@@ -1044,8 +977,7 @@ namespace Rv
                 }
                 else if (i.isValid())
                 {
-                    DB("    setCurrentIndex on "
-                       << absoluteDirPath.toUtf8().data());
+                    DB("    setCurrentIndex on " << absoluteDirPath.toUtf8().data());
                     m_columnView->setCurrentIndex(i);
                 }
             }
@@ -1071,16 +1003,14 @@ namespace Rv
                 if (aPathNoSlash.endsWith("/"))
                     aPathNoSlash.chop(1);
 #endif
-                m_ui.pathCombo->addItem(iconForFile(QFileInfo(aPath)),
-                                        aPathNoSlash, aPath);
+                m_ui.pathCombo->addItem(iconForFile(QFileInfo(aPath)), aPathNoSlash, aPath);
 
                 done = true;
             }
             else
             {
                 DB("    not at root: '" << aPath.toUtf8().data() << "'");
-                m_ui.pathCombo->addItem(iconForFile(QFileInfo(aPath)), dName,
-                                        aPath);
+                m_ui.pathCombo->addItem(iconForFile(QFileInfo(aPath)), dName, aPath);
             }
         }
 
@@ -1104,8 +1034,7 @@ namespace Rv
 
         QStringList newVisited;
 
-        for (QStringList::const_iterator i = m_visited.begin();
-             i != m_visited.end(); ++i)
+        for (QStringList::const_iterator i = m_visited.begin(); i != m_visited.end(); ++i)
         {
             QString name = *i;
             QFileInfo info(*i);
@@ -1197,8 +1126,7 @@ namespace Rv
         //
         if (!mdm || !view)
         {
-            DB("ERROR: RvFileDialog::" << __FUNCTION__
-                                       << " Can't find Data Model or View");
+            DB("ERROR: RvFileDialog::" << __FUNCTION__ << " Can't find Data Model or View");
         }
         else
         {
@@ -1259,8 +1187,7 @@ namespace Rv
 
                 if (info.exists())
                 {
-                    if ((m_fileMode == OneExistingFile && !info.isDir())
-                        || (m_fileMode == OneDirectory && info.isDir()))
+                    if ((m_fileMode == OneExistingFile && !info.isDir()) || (m_fileMode == OneDirectory && info.isDir()))
                     {
                         QDialog::accept();
                     }
@@ -1287,8 +1214,7 @@ namespace Rv
 
                 if (!info.exists())
                 {
-                    QString test =
-                        firstFileInPattern(files[i].toUtf8().data()).c_str();
+                    QString test = firstFileInPattern(files[i].toUtf8().data()).c_str();
                     QFileInfo testinfo(test);
                     if (!testinfo.exists())
                         ok = false;
@@ -1329,9 +1255,7 @@ namespace Rv
 
                 if (!info.exists()
                     || (info.exists()
-                        && ((m_fileMode == OneFileName && !info.isDir())
-                            || (m_fileMode == OneDirectoryName
-                                && info.isDir()))))
+                        && ((m_fileMode == OneFileName && !info.isDir()) || (m_fileMode == OneDirectoryName && info.isDir()))))
                 {
                     QDialog::accept();
                 }
@@ -1386,12 +1310,10 @@ namespace Rv
             reload(true);
     }
 
-    void RvFileDialog::columnSelectionChanged(const QItemSelection& selected,
-                                              const QItemSelection& deselected)
+    void RvFileDialog::columnSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected)
     {
-        DB("columnSelectionChanged() m_building "
-           << m_building << " sel " << selected.indexes().size() << " desel "
-           << deselected.indexes().size());
+        DB("columnSelectionChanged() m_building " << m_building << " sel " << selected.indexes().size() << " desel "
+                                                  << deselected.indexes().size());
 
         if (selected.empty())
             return;
@@ -1411,12 +1333,10 @@ namespace Rv
         }
     }
 
-    void RvFileDialog::treeSelectionChanged(const QItemSelection& selected,
-                                            const QItemSelection& deselected)
+    void RvFileDialog::treeSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected)
     {
-        DB("treeSelectionChanged() m_building "
-           << m_building << " sel " << selected.indexes().size() << " desel "
-           << deselected.indexes().size());
+        DB("treeSelectionChanged() m_building " << m_building << " sel " << selected.indexes().size() << " desel "
+                                                << deselected.indexes().size());
 
         if (m_building)
         {
@@ -1427,8 +1347,7 @@ namespace Rv
         if (selected.empty())
             return;
 
-        QModelIndexList selection =
-            m_detailTree->selectionModel()->selectedIndexes();
+        QModelIndexList selection = m_detailTree->selectionModel()->selectedIndexes();
         DB("    selection size " << selection.size());
         int reallyHowManySelected = 0;
         for (int i = 0; i < selection.size(); i++)
@@ -1449,10 +1368,8 @@ namespace Rv
             if (m_viewMode == DetailedMediaView)
                 model = m_detailMediaModel;
 
-            const QModelIndex& i =
-                m_detailTree->selectionModel()->currentIndex();
-            const QModelIndex& s =
-                i.sibling(i.row(), 0); // Read path from first col
+            const QModelIndex& i = m_detailTree->selectionModel()->currentIndex();
+            const QModelIndex& s = i.sibling(i.row(), 0); // Read path from first col
             QString path = "";
             if (s.isValid())
             {
@@ -1490,8 +1407,7 @@ namespace Rv
             {
                 if (m_visited.removeOne(t))
                 {
-                    cerr << "WARNING: " << t.toUtf8().data()
-                         << " does not exist, removing from list." << endl;
+                    cerr << "WARNING: " << t.toUtf8().data() << " does not exist, removing from list." << endl;
                 }
                 m_ui.pathCombo->setCurrentIndex(0);
             }
@@ -1631,8 +1547,7 @@ namespace Rv
         settings.endGroup();
     }
 
-    void RvFileDialog::sidePanelInserted(const QModelIndex& parent, int first,
-                                         int last)
+    void RvFileDialog::sidePanelInserted(const QModelIndex& parent, int first, int last)
     {
         //
         //  For some reason, we can't get ahold of the side panel's new
@@ -1647,10 +1562,7 @@ namespace Rv
         m_sidePanelTimer->start();
     }
 
-    void RvFileDialog::sidePanelPopup(const QPoint& pos)
-    {
-        m_sidePanelPopup->popup(m_ui.sidePanelList->mapToGlobal(pos));
-    }
+    void RvFileDialog::sidePanelPopup(const QPoint& pos) { m_sidePanelPopup->popup(m_ui.sidePanelList->mapToGlobal(pos)); }
 
     void RvFileDialog::sidePanelClick(QListWidgetItem* item)
     {
@@ -1748,8 +1660,7 @@ namespace Rv
         {
             QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
 
-            if (keyEvent->modifiers() == Qt::ControlModifier
-                && keyEvent->key() == Qt::Key_D)
+            if (keyEvent->modifiers() == Qt::ControlModifier && keyEvent->key() == Qt::Key_D)
             {
                 //
                 //  Go to ~/Desktop
@@ -1758,9 +1669,7 @@ namespace Rv
                 setDirectory(QDir::home().absoluteFilePath("Desktop"));
                 return true;
             }
-            else if (keyEvent->modifiers()
-                         == (Qt::ControlModifier | Qt::ShiftModifier)
-                     && keyEvent->key() == Qt::Key_H)
+            else if (keyEvent->modifiers() == (Qt::ControlModifier | Qt::ShiftModifier) && keyEvent->key() == Qt::Key_H)
             {
                 //
                 //  Go to ~
@@ -1793,16 +1702,14 @@ namespace Rv
                 string utf8string = keyEvent->text().toUtf8().data();
                 bool tab = keyEvent->key() == Qt::Key_Tab;
 
-                if ((tab || utf8string == "/" || utf8string == "\\")
-                    && m_ui.currentPath->selectionStart() != 0)
+                if ((tab || utf8string == "/" || utf8string == "\\") && m_ui.currentPath->selectionStart() != 0)
                 {
                     m_ui.currentPath->end(true);
 
 #ifdef WIN32
                     return false;
 #else
-                    string p =
-                        varTildExp(m_ui.currentPath->text().toUtf8().data());
+                    string p = varTildExp(m_ui.currentPath->text().toUtf8().data());
 
                     if (utf8string == "/")
                     {
@@ -1899,8 +1806,7 @@ namespace Rv
             if (index.isValid() && index.column() == 0)
                 ++reallyHowManySelected;
         }
-        DB("RvFileDialog::selectedFiles() selection size "
-           << selection.size() << " really " << reallyHowManySelected);
+        DB("RvFileDialog::selectedFiles() selection size " << selection.size() << " really " << reallyHowManySelected);
 
         QStringList files;
         //
@@ -1988,8 +1894,7 @@ namespace Rv
             //
             if (m_drives.contains(file))
             {
-                icon =
-                    m_fileTraits->fileInfoIcon(info, QFileIconProvider::Drive);
+                icon = m_fileTraits->fileInfoIcon(info, QFileIconProvider::Drive);
             }
 #ifdef PLATFORM_WINDOWS
             //
@@ -2002,8 +1907,7 @@ namespace Rv
             else if (file.startsWith("//"))
             {
                 DBL(DB_ICON, "    calling m_fileTraits->fileInfoIcon() 1");
-                icon = m_fileTraits->fileInfoIcon(info,
-                                                  QFileIconProvider::Network);
+                icon = m_fileTraits->fileInfoIcon(info, QFileIconProvider::Network);
             }
 #endif
             else
@@ -2012,8 +1916,7 @@ namespace Rv
                 if (!info.exists())
                 {
                     DBL(DB_ICON, "    checking non-existant file");
-                    QString name =
-                        firstFileInPattern(file.toUtf8().data()).c_str();
+                    QString name = firstFileInPattern(file.toUtf8().data()).c_str();
                     info = QFileInfo(info.absoluteDir().absoluteFilePath(name));
                 }
                 DBL(DB_ICON, "    calling m_fileTraits->fileInfoIcon() 2");
@@ -2035,8 +1938,7 @@ namespace Rv
         if (!index.isValid())
             return;
 
-        if (const MediaDirModel* model =
-                dynamic_cast<const MediaDirModel*>(index.model()))
+        if (const MediaDirModel* model = dynamic_cast<const MediaDirModel*>(index.model()))
         {
             if (model->flags(index) == Qt::NoItemFlags)
                 return;
@@ -2139,8 +2041,7 @@ namespace Rv
                 DB("    switching to ColumnView");
                 m_viewMode = ColumnView;
                 m_ui.viewStack->setCurrentIndex(0);
-                m_columnModel->setDirectory(QDir::root(),
-                                            MediaDirModel::NoDetails);
+                m_columnModel->setDirectory(QDir::root(), MediaDirModel::NoDetails);
 
                 if (!m_dirPrev.empty())
                     setDirectory(m_dirPrev.back(), true);
@@ -2179,12 +2080,8 @@ namespace Rv
                 m_viewMode = DetailedFileView;
                 m_ui.viewStack->setCurrentIndex(1);
                 m_detailTree->setModel(m_detailFileModel);
-                connect(m_detailTree->selectionModel(),
-                        SIGNAL(selectionChanged(const QItemSelection&,
-                                                const QItemSelection&)),
-                        this,
-                        SLOT(treeSelectionChanged(const QItemSelection&,
-                                                  const QItemSelection&)));
+                connect(m_detailTree->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), this,
+                        SLOT(treeSelectionChanged(const QItemSelection&, const QItemSelection&)));
                 if (!m_dirPrev.empty())
                     setDirectory(m_dirPrev.back(), true);
                 else
@@ -2199,12 +2096,8 @@ namespace Rv
                 m_viewMode = DetailedMediaView;
                 m_ui.viewStack->setCurrentIndex(1);
                 m_detailTree->setModel(m_detailMediaModel);
-                connect(m_detailTree->selectionModel(),
-                        SIGNAL(selectionChanged(const QItemSelection&,
-                                                const QItemSelection&)),
-                        this,
-                        SLOT(treeSelectionChanged(const QItemSelection&,
-                                                  const QItemSelection&)));
+                connect(m_detailTree->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), this,
+                        SLOT(treeSelectionChanged(const QItemSelection&, const QItemSelection&)));
                 if (!m_dirPrev.empty())
                     setDirectory(m_dirPrev.back(), true);
                 else
@@ -2227,30 +2120,25 @@ namespace Rv
         if (m_fileTraits->hasImage(file))
         {
             QImage image = m_fileTraits->fileImage(file);
-            m_columnPreview->document()->addResource(
-                QTextDocument::ImageResource, QUrl("icon://file.raw"), image);
+            m_columnPreview->document()->addResource(QTextDocument::ImageResource, QUrl("icon://file.raw"), image);
         }
         else
         {
-            QPixmap pixmap =
-                m_fileTraits->fileIcon(file).pixmap(QSize(128, 128));
-            m_columnPreview->document()->addResource(
-                QTextDocument::ImageResource, QUrl("icon://file.raw"), pixmap);
+            QPixmap pixmap = m_fileTraits->fileIcon(file).pixmap(QSize(128, 128));
+            m_columnPreview->document()->addResource(QTextDocument::ImageResource, QUrl("icon://file.raw"), pixmap);
         }
 
         ostringstream str;
         str << "<html><body>"
             << "<center><img src=\"icon://file.raw\"><small>"
-            << "<br><b><u>" << QFileInfo(file).fileName().toUtf8().data()
-            << "</u></b><br>"
+            << "<br><b><u>" << QFileInfo(file).fileName().toUtf8().data() << "</u></b><br>"
             << "<table width=95% border=0 cellspacing=1 cellpadding=0>";
 
         DB("    attrs size: " << attrs.size());
         for (size_t i = 0; i < attrs.size(); i += 2)
         {
             str << "<tr>"
-                << "<td align=right><b>" << attrs[i].toUtf8().data()
-                << "</b></td>"
+                << "<td align=right><b>" << attrs[i].toUtf8().data() << "</b></td>"
                 << "<td width=5></td>"
                 << "<td align=left>" << attrs[i + 1].toUtf8().data() << "</td>"
                 << "</tr>";
@@ -2288,8 +2176,7 @@ namespace Rv
 
             int x = appX - int(width() / 2);
             int y = appY - int(height() / 2);
-            DB("appX: " << appX << " appY: " << appY << " x: " << x
-                        << " y: " << y);
+            DB("appX: " << appX << " appY: " << appY << " x: " << x << " y: " << y);
             move(x, y);
         }
     }

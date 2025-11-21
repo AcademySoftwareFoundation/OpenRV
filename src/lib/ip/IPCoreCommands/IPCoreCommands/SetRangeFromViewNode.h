@@ -28,8 +28,7 @@ namespace IPCore
         public:
             typedef TwkApp::Command Command;
 
-            SetRangeFromViewNodeInfo(const std::string& name,
-                                     TwkApp::CommandInfo::UndoType type);
+            SetRangeFromViewNodeInfo(const std::string& name, TwkApp::CommandInfo::UndoType type);
             virtual ~SetRangeFromViewNodeInfo();
             virtual Command* newCommand() const;
         };

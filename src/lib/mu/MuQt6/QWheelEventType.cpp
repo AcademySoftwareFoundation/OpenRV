@@ -52,58 +52,49 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    Pointer
-    qt_QWheelEvent_angleDelta_QPoint_QWheelEvent(Mu::Thread& NODE_THREAD,
-                                                 Pointer param_this)
+    Pointer qt_QWheelEvent_angleDelta_QPoint_QWheelEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWheelEvent* arg0 = getqpointer<QWheelEventType>(param_this);
         return makeqtype<QPointType>(c, arg0->angleDelta(), "qt.QPoint");
     }
 
-    bool qt_QWheelEvent_inverted_bool_QWheelEvent(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this)
+    bool qt_QWheelEvent_inverted_bool_QWheelEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWheelEvent* arg0 = getqpointer<QWheelEventType>(param_this);
         return arg0->inverted();
     }
 
-    int qt_QWheelEvent_phase_int_QWheelEvent(Mu::Thread& NODE_THREAD,
-                                             Pointer param_this)
+    int qt_QWheelEvent_phase_int_QWheelEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWheelEvent* arg0 = getqpointer<QWheelEventType>(param_this);
         return int(arg0->phase());
     }
 
-    Pointer
-    qt_QWheelEvent_pixelDelta_QPoint_QWheelEvent(Mu::Thread& NODE_THREAD,
-                                                 Pointer param_this)
+    Pointer qt_QWheelEvent_pixelDelta_QPoint_QWheelEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWheelEvent* arg0 = getqpointer<QWheelEventType>(param_this);
         return makeqtype<QPointType>(c, arg0->pixelDelta(), "qt.QPoint");
     }
 
-    bool qt_QWheelEvent_isBeginEvent_bool_QWheelEvent(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    bool qt_QWheelEvent_isBeginEvent_bool_QWheelEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWheelEvent* arg0 = getqpointer<QWheelEventType>(param_this);
         return arg0->isBeginEvent();
     }
 
-    bool qt_QWheelEvent_isEndEvent_bool_QWheelEvent(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this)
+    bool qt_QWheelEvent_isEndEvent_bool_QWheelEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWheelEvent* arg0 = getqpointer<QWheelEventType>(param_this);
         return arg0->isEndEvent();
     }
 
-    bool qt_QWheelEvent_isUpdateEvent_bool_QWheelEvent(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this)
+    bool qt_QWheelEvent_isUpdateEvent_bool_QWheelEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWheelEvent* arg0 = getqpointer<QWheelEventType>(param_this);
@@ -112,44 +103,37 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(_n_angleDelta0, Pointer)
     {
-        NODE_RETURN(qt_QWheelEvent_angleDelta_QPoint_QWheelEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QWheelEvent_angleDelta_QPoint_QWheelEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_inverted0, bool)
     {
-        NODE_RETURN(qt_QWheelEvent_inverted_bool_QWheelEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QWheelEvent_inverted_bool_QWheelEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_phase0, int)
     {
-        NODE_RETURN(qt_QWheelEvent_phase_int_QWheelEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QWheelEvent_phase_int_QWheelEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_pixelDelta0, Pointer)
     {
-        NODE_RETURN(qt_QWheelEvent_pixelDelta_QPoint_QWheelEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QWheelEvent_pixelDelta_QPoint_QWheelEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isBeginEvent0, bool)
     {
-        NODE_RETURN(qt_QWheelEvent_isBeginEvent_bool_QWheelEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QWheelEvent_isBeginEvent_bool_QWheelEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isEndEvent0, bool)
     {
-        NODE_RETURN(qt_QWheelEvent_isEndEvent_bool_QWheelEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QWheelEvent_isEndEvent_bool_QWheelEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isUpdateEvent0, bool)
     {
-        NODE_RETURN(qt_QWheelEvent_isUpdateEvent_bool_QWheelEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QWheelEvent_isUpdateEvent_bool_QWheelEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     void QWheelEventType::load()
@@ -169,13 +153,11 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
                    new MemberVariable(c, "native", "qt.NativeObject"),
 
@@ -191,34 +173,20 @@ namespace Mu
             // Qt::MouseButtons buttons, flags Qt::KeyboardModifiers modifiers,
             // flags Qt::ScrollPhase phase, bool inverted, flags
             // Qt::MouseEventSource source, "const QPointingDevice *" device)
-            new Function(c, "angleDelta", _n_angleDelta0, None, Compiled,
-                         qt_QWheelEvent_angleDelta_QPoint_QWheelEvent, Return,
-                         "qt.QPoint", Parameters,
+            new Function(c, "angleDelta", _n_angleDelta0, None, Compiled, qt_QWheelEvent_angleDelta_QPoint_QWheelEvent, Return, "qt.QPoint",
+                         Parameters, new Param(c, "this", "qt.QWheelEvent"), End),
+            new Function(c, "inverted", _n_inverted0, None, Compiled, qt_QWheelEvent_inverted_bool_QWheelEvent, Return, "bool", Parameters,
                          new Param(c, "this", "qt.QWheelEvent"), End),
-            new Function(c, "inverted", _n_inverted0, None, Compiled,
-                         qt_QWheelEvent_inverted_bool_QWheelEvent, Return,
-                         "bool", Parameters,
+            new Function(c, "phase", _n_phase0, None, Compiled, qt_QWheelEvent_phase_int_QWheelEvent, Return, "int", Parameters,
                          new Param(c, "this", "qt.QWheelEvent"), End),
-            new Function(c, "phase", _n_phase0, None, Compiled,
-                         qt_QWheelEvent_phase_int_QWheelEvent, Return, "int",
-                         Parameters, new Param(c, "this", "qt.QWheelEvent"),
-                         End),
-            new Function(c, "pixelDelta", _n_pixelDelta0, None, Compiled,
-                         qt_QWheelEvent_pixelDelta_QPoint_QWheelEvent, Return,
-                         "qt.QPoint", Parameters,
-                         new Param(c, "this", "qt.QWheelEvent"), End),
-            new MemberFunction(
-                c, "isBeginEvent", _n_isBeginEvent0, None, Compiled,
-                qt_QWheelEvent_isBeginEvent_bool_QWheelEvent, Return, "bool",
-                Parameters, new Param(c, "this", "qt.QWheelEvent"), End),
-            new MemberFunction(c, "isEndEvent", _n_isEndEvent0, None, Compiled,
-                               qt_QWheelEvent_isEndEvent_bool_QWheelEvent,
-                               Return, "bool", Parameters,
-                               new Param(c, "this", "qt.QWheelEvent"), End),
-            new MemberFunction(
-                c, "isUpdateEvent", _n_isUpdateEvent0, None, Compiled,
-                qt_QWheelEvent_isUpdateEvent_bool_QWheelEvent, Return, "bool",
-                Parameters, new Param(c, "this", "qt.QWheelEvent"), End),
+            new Function(c, "pixelDelta", _n_pixelDelta0, None, Compiled, qt_QWheelEvent_pixelDelta_QPoint_QWheelEvent, Return, "qt.QPoint",
+                         Parameters, new Param(c, "this", "qt.QWheelEvent"), End),
+            new MemberFunction(c, "isBeginEvent", _n_isBeginEvent0, None, Compiled, qt_QWheelEvent_isBeginEvent_bool_QWheelEvent, Return,
+                               "bool", Parameters, new Param(c, "this", "qt.QWheelEvent"), End),
+            new MemberFunction(c, "isEndEvent", _n_isEndEvent0, None, Compiled, qt_QWheelEvent_isEndEvent_bool_QWheelEvent, Return, "bool",
+                               Parameters, new Param(c, "this", "qt.QWheelEvent"), End),
+            new MemberFunction(c, "isUpdateEvent", _n_isUpdateEvent0, None, Compiled, qt_QWheelEvent_isUpdateEvent_bool_QWheelEvent, Return,
+                               "bool", Parameters, new Param(c, "this", "qt.QWheelEvent"), End),
             // static functions
             EndArguments);
         globalScope()->addSymbols(EndArguments);

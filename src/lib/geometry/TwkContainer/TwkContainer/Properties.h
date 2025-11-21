@@ -50,30 +50,24 @@ namespace TwkContainer
 // typedef TypedProperty<PropertyTraits<TYPE>::Container,                  \
 //                 WIDTH, 0, 0, Property::LAYOUT> PTYPENAME;
 
-#define PROPERTY_TRAITS(PTYPENAME, TYPE, TYPENAME, LAYOUT, WIDTH)              \
-    typedef TypedProperty<std::vector<TYPE>, WIDTH, 0, 0, 0, Property::LAYOUT> \
-        PTYPENAME;
+#define PROPERTY_TRAITS(PTYPENAME, TYPE, TYPENAME, LAYOUT, WIDTH) \
+    typedef TypedProperty<std::vector<TYPE>, WIDTH, 0, 0, 0, Property::LAYOUT> PTYPENAME;
 
-#define PROPERTY_TRAITS2(PTYPENAME, TYPE, TYPENAME, LAYOUT, XSIZE, YSIZE)   \
-    template <> const char* PropertyTraits<TYPE>::typeName();               \
-    template <> Property::Layout PropertyTraits<TYPE>::layout();            \
-    template <> size_t PropertyTraits<TYPE>::xsize();                       \
-    template <> size_t PropertyTraits<TYPE>::ysize();                       \
-    template <> size_t PropertyTraits<TYPE>::zsize();                       \
-    typedef TypedProperty<PropertyTraits<TYPE>::Container, XSIZE, YSIZE, 0, \
-                          Property::LAYOUT>                                 \
-        PTYPENAME;
-
-#define PROPERTY_TRAITS3(PTYPENAME, TYPE, TYPENAME, LAYOUT, XSIZE, YSIZE, \
-                         ZSIZE)                                           \
+#define PROPERTY_TRAITS2(PTYPENAME, TYPE, TYPENAME, LAYOUT, XSIZE, YSIZE) \
     template <> const char* PropertyTraits<TYPE>::typeName();             \
     template <> Property::Layout PropertyTraits<TYPE>::layout();          \
     template <> size_t PropertyTraits<TYPE>::xsize();                     \
     template <> size_t PropertyTraits<TYPE>::ysize();                     \
     template <> size_t PropertyTraits<TYPE>::zsize();                     \
-    typedef TypedProperty<PropertyTraits<TYPE>::Container, XSIZE, YSIZE,  \
-                          ZSIZE, Property::LAYOUT>                        \
-        PTYPENAME;
+    typedef TypedProperty<PropertyTraits<TYPE>::Container, XSIZE, YSIZE, 0, Property::LAYOUT> PTYPENAME;
+
+#define PROPERTY_TRAITS3(PTYPENAME, TYPE, TYPENAME, LAYOUT, XSIZE, YSIZE, ZSIZE) \
+    template <> const char* PropertyTraits<TYPE>::typeName();                    \
+    template <> Property::Layout PropertyTraits<TYPE>::layout();                 \
+    template <> size_t PropertyTraits<TYPE>::xsize();                            \
+    template <> size_t PropertyTraits<TYPE>::ysize();                            \
+    template <> size_t PropertyTraits<TYPE>::zsize();                            \
+    typedef TypedProperty<PropertyTraits<TYPE>::Container, XSIZE, YSIZE, ZSIZE, Property::LAYOUT> PTYPENAME;
 
     PROPERTY_TRAITS(FloatProperty, float, "float", FloatLayout, 1)
     PROPERTY_TRAITS(HalfProperty, half, "half", HalfLayout, 1)
@@ -100,11 +94,9 @@ namespace TwkContainer
     PROPERTY_TRAITS(Box3fProperty, TwkMath::Box3f, "float[6]", FloatLayout, 6)
 
     PROPERTY_TRAITS(StringProperty, std::string, "string", StringLayout, 1)
-    PROPERTY_TRAITS(StringPairProperty, StringPair, "string[2]", StringLayout,
-                    2)
+    PROPERTY_TRAITS(StringPairProperty, StringPair, "string[2]", StringLayout, 2)
 
-    PROPERTY_TRAITS(Mat44fProperty, TwkMath::Mat44f, "float[16]", FloatLayout,
-                    16)
+    PROPERTY_TRAITS(Mat44fProperty, TwkMath::Mat44f, "float[16]", FloatLayout, 16)
     PROPERTY_TRAITS(Mat33fProperty, TwkMath::Mat33f, "float[9]", FloatLayout, 9)
     // PROPERTY_TRAITS(Mat22fProperty, TwkMath::Mat22f, "float[4]", FloatLayout,
     // 4) PROPERTY_TRAITS2(Mat44fProperty, TwkMath::Mat44f, "float[4,4]",

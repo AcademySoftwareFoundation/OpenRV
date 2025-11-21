@@ -27,7 +27,6 @@ class PlayControl:
         self.frameChanged = True
 
     def run(self):
-
         sys.stdout.write("Type: p=play, s=stop, r=reverse play, q=quit\r\n")
 
         while 1:

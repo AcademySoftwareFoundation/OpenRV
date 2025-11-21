@@ -33,15 +33,9 @@ namespace Mu
 
     CharType::~CharType() {}
 
-    PrimitiveObject* CharType::newObject() const
-    {
-        return new PrimitiveObject(this);
-    }
+    PrimitiveObject* CharType::newObject() const { return new PrimitiveObject(this); }
 
-    Value CharType::nodeEval(const Node* n, Thread& thread) const
-    {
-        return Value((*n->func()._intFunc)(*n, thread));
-    }
+    Value CharType::nodeEval(const Node* n, Thread& thread) const { return Value((*n->func()._intFunc)(*n, thread)); }
 
     void CharType::nodeEval(void* p, const Node* n, Thread& thread) const
     {
@@ -57,8 +51,7 @@ namespace Mu
         StringType::outputQuotedString(o, s, '\'');
     }
 
-    void CharType::outputValueRecursive(ostream& o, const ValuePointer vp,
-                                        ValueOutputState& state) const
+    void CharType::outputValueRecursive(ostream& o, const ValuePointer vp, ValueOutputState& state) const
     {
         String s;
         int c = *reinterpret_cast<const int*>(vp);
@@ -101,10 +94,7 @@ namespace Mu
 
     int& __C_Plus_EQ__charAmp__charAmp__int(T, int& a, int b) { return a += b; }
 
-    int& __C_Minus_EQ__charAmp__charAmp__int(T, int& a, int b)
-    {
-        return a -= b;
-    }
+    int& __C_Minus_EQ__charAmp__charAmp__int(T, int& a, int b) { return a -= b; }
 
     int __C_prePlus_Plus__char_charAmp_(T, int& a) { return ++a; }
 
@@ -118,10 +108,7 @@ namespace Mu
 
     int __C_int_int_char(T, int a) { return a; }
 
-    void __C_print_void_char(T, int a)
-    {
-        cout << "PRINT: " << a << endl << flush;
-    }
+    void __C_print_void_char(T, int a) { cout << "PRINT: " << a << endl << flush; }
 
     //
     //  This function is delt with directly by muc, it translates
@@ -129,10 +116,7 @@ namespace Mu
     //  lambda expressions.
     //
 
-    char __C_QMark_Colon__bool_char_char(T, bool p, int a, int b)
-    {
-        return p ? a : b;
-    }
+    char __C_QMark_Colon__bool_char_char(T, bool p, int a, int b) { return p ? a : b; }
 
 #undef T
 
@@ -159,89 +143,57 @@ namespace Mu
         s->addSymbols(
             new ReferenceType(c, "char&", this),
 
-            new Function(c, "char", IntType::defaultInt, Mapped, Compiled,
-                         __C_char_char, Return, "char", End),
+            new Function(c, "char", IntType::defaultInt, Mapped, Compiled, __C_char_char, Return, "char", End),
 
-            new Function(c, "char", IntType::dereference, Cast, Return, "char",
-                         Args, "char&", End),
+            new Function(c, "char", IntType::dereference, Cast, Return, "char", Args, "char&", End),
 
-            new Function(c, "char", CharType::fromInt, Mapped, Compiled,
-                         __C_char_char_int, Return, "char", Args, "int", End),
+            new Function(c, "char", CharType::fromInt, Mapped, Compiled, __C_char_char_int, Return, "char", Args, "int", End),
 
             // pass through same as fromInt
-            new Function(c, "int", CharType::fromInt, Mapped, Compiled,
-                         __C_int_int_char, Return, "int", Args, "char", End),
+            new Function(c, "int", CharType::fromInt, Mapped, Compiled, __C_int_int_char, Return, "int", Args, "char", End),
 
-            new Function(c, "string", CharType::toString, Cast, Return,
-                         "string", Args, "char", End),
+            new Function(c, "string", CharType::toString, Cast, Return, "string", Args, "char", End),
 
-            new Function(c, "=", IntType::assign, AsOp, Compiled,
-                         __C_EQ__charAmp__charAmp__char, Return, "char&", Args,
-                         "char&", "char", End),
+            new Function(c, "=", IntType::assign, AsOp, Compiled, __C_EQ__charAmp__charAmp__char, Return, "char&", Args, "char&", "char",
+                         End),
 
-            new Function(c, "?:", IntType::conditionalExpr, Op, Compiled,
-                         __C_QMark_Colon__bool_char_char, Return, "char", Args,
-                         "bool", "char", "char", End),
+            new Function(c, "?:", IntType::conditionalExpr, Op, Compiled, __C_QMark_Colon__bool_char_char, Return, "char", Args, "bool",
+                         "char", "char", End),
 
-            new Function(c, "+", IntType::add, CommOp, Compiled,
-                         __C_Plus__char_char_int, Return, "char", Args, "char",
+            new Function(c, "+", IntType::add, CommOp, Compiled, __C_Plus__char_char_int, Return, "char", Args, "char", "int", End),
+
+            new Function(c, "-", IntType::sub, Op, Compiled, __C_Minus__char_char_int, Return, "int", Args, "char", "char", End),
+
+            new Function(c, "-", IntType::sub, Op, Compiled, __C_Minus__char_char_int, Return, "char", Args, "char", "int", End),
+
+            new Function(c, "+=", IntType::assignPlus, AsOp, Compiled, __C_Plus_EQ__charAmp__charAmp__int, Return, "char&", Args, "char&",
                          "int", End),
 
-            new Function(c, "-", IntType::sub, Op, Compiled,
-                         __C_Minus__char_char_int, Return, "int", Args, "char",
-                         "char", End),
-
-            new Function(c, "-", IntType::sub, Op, Compiled,
-                         __C_Minus__char_char_int, Return, "char", Args, "char",
+            new Function(c, "-=", IntType::assignSub, AsOp, Compiled, __C_Minus_EQ__charAmp__charAmp__int, Return, "char&", Args, "char&",
                          "int", End),
 
-            new Function(c, "+=", IntType::assignPlus, AsOp, Compiled,
-                         __C_Plus_EQ__charAmp__charAmp__int, Return, "char&",
-                         Args, "char&", "int", End),
+            new Function(c, "==", IntType::equals, CommOp, Compiled, __C_EQ_EQ__bool_char_char, Return, "bool", Args, "char", "char", End),
 
-            new Function(c, "-=", IntType::assignSub, AsOp, Compiled,
-                         __C_Minus_EQ__charAmp__charAmp__int, Return, "char&",
-                         Args, "char&", "int", End),
+            new Function(c, "!=", IntType::notEquals, CommOp, Compiled, __C_Bang_EQ__bool_char_char, Return, "bool", Args, "char", "char",
+                         End),
 
-            new Function(c, "==", IntType::equals, CommOp, Compiled,
-                         __C_EQ_EQ__bool_char_char, Return, "bool", Args,
-                         "char", "char", End),
+            new Function(c, ">=", IntType::greaterThanEq, Op, Compiled, __C_GT_EQ__bool_char_char, Return, "bool", Args, "char", "char",
+                         End),
 
-            new Function(c, "!=", IntType::notEquals, CommOp, Compiled,
-                         __C_Bang_EQ__bool_char_char, Return, "bool", Args,
-                         "char", "char", End),
+            new Function(c, "<=", IntType::lessThanEq, Op, Compiled, __C_LT_EQ__bool_char_char, Return, "bool", Args, "char", "char", End),
 
-            new Function(c, ">=", IntType::greaterThanEq, Op, Compiled,
-                         __C_GT_EQ__bool_char_char, Return, "bool", Args,
-                         "char", "char", End),
+            new Function(c, "<", IntType::lessThan, Op, Compiled, __C_LT__bool_char_char, Return, "bool", Args, "char", "char", End),
 
-            new Function(c, "<=", IntType::lessThanEq, Op, Compiled,
-                         __C_LT_EQ__bool_char_char, Return, "bool", Args,
-                         "char", "char", End),
+            new Function(c, ">", IntType::greaterThan, Op, Compiled, __C_GT__bool_char_char, Return, "bool", Args, "char", "char", End),
 
-            new Function(c, "<", IntType::lessThan, Op, Compiled,
-                         __C_LT__bool_char_char, Return, "bool", Args, "char",
-                         "char", End),
+            new Function(c, "pre++", IntType::preInc, Op, Compiled, __C_prePlus_Plus__char_charAmp_, Return, "char", Args, "char&", End),
 
-            new Function(c, ">", IntType::greaterThan, Op, Compiled,
-                         __C_GT__bool_char_char, Return, "bool", Args, "char",
-                         "char", End),
+            new Function(c, "post++", IntType::postInc, Op, Compiled, __C_postPlus_Plus__char_charAmp_, Return, "char", Args, "char&", End),
 
-            new Function(c, "pre++", IntType::preInc, Op, Compiled,
-                         __C_prePlus_Plus__char_charAmp_, Return, "char", Args,
-                         "char&", End),
+            new Function(c, "pre--", IntType::preDec, Op, Compiled, __C_preMinus_Minus__char_charAmp_, Return, "char", Args, "char&", End),
 
-            new Function(c, "post++", IntType::postInc, Op, Compiled,
-                         __C_postPlus_Plus__char_charAmp_, Return, "char", Args,
-                         "char&", End),
-
-            new Function(c, "pre--", IntType::preDec, Op, Compiled,
-                         __C_preMinus_Minus__char_charAmp_, Return, "char",
-                         Args, "char&", End),
-
-            new Function(c, "post--", IntType::postDec, Op, Compiled,
-                         __C_postMinus_Minus__char_charAmp_, Return, "char",
-                         Args, "char&", End),
+            new Function(c, "post--", IntType::postDec, Op, Compiled, __C_postMinus_Minus__char_charAmp_, Return, "char", Args, "char&",
+                         End),
 
             EndArguments);
     }
@@ -250,8 +202,7 @@ namespace Mu
     {
         int c = NODE_ARG(0, int);
         Process* p = NODE_THREAD.process();
-        const StringType* stype =
-            static_cast<const StringType*>(NODE_THIS.type());
+        const StringType* stype = static_cast<const StringType*>(NODE_THIS.type());
 
         String o;
         utf8::utf32to8(&c, &c + 1, back_inserter(o));

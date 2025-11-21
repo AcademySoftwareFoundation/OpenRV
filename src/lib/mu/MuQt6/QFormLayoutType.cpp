@@ -62,16 +62,14 @@ namespace Mu
         _baseType = 0;
     }
 
-    MuQt_QFormLayout::MuQt_QFormLayout(Pointer muobj, const CallEnvironment* ce,
-                                       QWidget* parent)
+    MuQt_QFormLayout::MuQt_QFormLayout(Pointer muobj, const CallEnvironment* ce, QWidget* parent)
         : QFormLayout(parent)
     {
         _env = ce;
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QFormLayoutType>(
-            c->internName("qt.QFormLayout"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QFormLayoutType>(c->internName("qt.QFormLayout"));
     }
 
     void MuQt_QFormLayout::addItem(QLayoutItem* item)
@@ -88,8 +86,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makelayoutitem<QLayoutItemType>(c, item, "qt.QLayoutItem"));
+            args[1] = Value(makelayoutitem<QLayoutItemType>(c, item, "qt.QLayoutItem"));
             Value rval = _env->call(F, args);
         }
         else
@@ -370,8 +367,7 @@ namespace Mu
         }
     }
 
-    QLayoutItem* MuQt_QFormLayout::replaceWidget(QWidget* from, QWidget* to,
-                                                 Qt::FindChildOptions options)
+    QLayoutItem* MuQt_QFormLayout::replaceWidget(QWidget* from, QWidget* to, Qt::FindChildOptions options)
     {
         if (!_env)
             return QFormLayout::replaceWidget(from, to, options);
@@ -497,8 +493,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  Mu Type CONSTRUCTORS
 
-    QFormLayoutType::QFormLayoutType(Context* c, const char* name, Class* super,
-                                     Class* super2)
+    QFormLayoutType::QFormLayoutType(Context* c, const char* name, Class* super, Class* super2)
         : Class(c, name, vectorOf2(super, super2))
     {
     }
@@ -508,8 +503,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    static Pointer QFormLayout_QFormLayout_QObject(Thread& NODE_THREAD,
-                                                   Pointer obj)
+    static Pointer QFormLayout_QFormLayout_QObject(Thread& NODE_THREAD, Pointer obj)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         ClassInstance* widget = reinterpret_cast<ClassInstance*>(obj);
@@ -520,9 +514,7 @@ namespace Mu
         }
         else if (QFormLayout* w = object<QFormLayout>(widget))
         {
-            QFormLayoutType* type =
-                c->findSymbolOfTypeByQualifiedName<QFormLayoutType>(
-                    c->internName("qt.QFormLayout"), false);
+            QFormLayoutType* type = c->findSymbolOfTypeByQualifiedName<QFormLayoutType>(c->internName("qt.QFormLayout"), false);
             ClassInstance* o = ClassInstance::allocate(type);
             setobject(o, w);
             return o;
@@ -533,26 +525,18 @@ namespace Mu
         }
     }
 
-    static NODE_IMPLEMENTATION(castFromObject, Pointer)
-    {
-        NODE_RETURN(
-            QFormLayout_QFormLayout_QObject(NODE_THREAD, NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(castFromObject, Pointer) { NODE_RETURN(QFormLayout_QFormLayout_QObject(NODE_THREAD, NODE_ARG(0, Pointer))); }
 
-    Pointer qt_QFormLayout_QFormLayout_QFormLayout_QFormLayout_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
+    Pointer qt_QFormLayout_QFormLayout_QFormLayout_QFormLayout_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWidget* arg1 = object<QWidget>(param_parent);
-        setobject(param_this,
-                  new MuQt_QFormLayout(param_this,
-                                       NODE_THREAD.process()->callEnv(), arg1));
+        setobject(param_this, new MuQt_QFormLayout(param_this, NODE_THREAD.process()->callEnv(), arg1));
         return param_this;
     }
 
-    void qt_QFormLayout_addRow_void_QFormLayout_QWidget_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_label,
-        Pointer param_field)
+    void qt_QFormLayout_addRow_void_QFormLayout_QWidget_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_label,
+                                                                Pointer param_field)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFormLayout* arg0 = object<QFormLayout>(param_this);
@@ -561,9 +545,8 @@ namespace Mu
         arg0->addRow(arg1, arg2);
     }
 
-    void qt_QFormLayout_addRow_void_QFormLayout_QWidget_QLayout(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_label,
-        Pointer param_field)
+    void qt_QFormLayout_addRow_void_QFormLayout_QWidget_QLayout(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_label,
+                                                                Pointer param_field)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFormLayout* arg0 = object<QFormLayout>(param_this);
@@ -572,9 +555,8 @@ namespace Mu
         arg0->addRow(arg1, arg2);
     }
 
-    void qt_QFormLayout_addRow_void_QFormLayout_string_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_labelText,
-        Pointer param_field)
+    void qt_QFormLayout_addRow_void_QFormLayout_string_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_labelText,
+                                                               Pointer param_field)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFormLayout* arg0 = object<QFormLayout>(param_this);
@@ -583,9 +565,8 @@ namespace Mu
         arg0->addRow(arg1, arg2);
     }
 
-    void qt_QFormLayout_addRow_void_QFormLayout_string_QLayout(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_labelText,
-        Pointer param_field)
+    void qt_QFormLayout_addRow_void_QFormLayout_string_QLayout(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_labelText,
+                                                               Pointer param_field)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFormLayout* arg0 = object<QFormLayout>(param_this);
@@ -594,9 +575,7 @@ namespace Mu
         arg0->addRow(arg1, arg2);
     }
 
-    void qt_QFormLayout_addRow_void_QFormLayout_QWidget(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this,
-                                                        Pointer param_widget)
+    void qt_QFormLayout_addRow_void_QFormLayout_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_widget)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFormLayout* arg0 = object<QFormLayout>(param_this);
@@ -604,9 +583,7 @@ namespace Mu
         arg0->addRow(arg1);
     }
 
-    void qt_QFormLayout_addRow_void_QFormLayout_QLayout(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this,
-                                                        Pointer param_layout)
+    void qt_QFormLayout_addRow_void_QFormLayout_QLayout(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_layout)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFormLayout* arg0 = object<QFormLayout>(param_this);
@@ -614,9 +591,8 @@ namespace Mu
         arg0->addRow(arg1);
     }
 
-    void qt_QFormLayout_insertRow_void_QFormLayout_int_QWidget_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
-        Pointer param_label, Pointer param_field)
+    void qt_QFormLayout_insertRow_void_QFormLayout_int_QWidget_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
+                                                                       Pointer param_label, Pointer param_field)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFormLayout* arg0 = object<QFormLayout>(param_this);
@@ -626,9 +602,8 @@ namespace Mu
         arg0->insertRow(arg1, arg2, arg3);
     }
 
-    void qt_QFormLayout_insertRow_void_QFormLayout_int_QWidget_QLayout(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
-        Pointer param_label, Pointer param_field)
+    void qt_QFormLayout_insertRow_void_QFormLayout_int_QWidget_QLayout(Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
+                                                                       Pointer param_label, Pointer param_field)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFormLayout* arg0 = object<QFormLayout>(param_this);
@@ -638,9 +613,8 @@ namespace Mu
         arg0->insertRow(arg1, arg2, arg3);
     }
 
-    void qt_QFormLayout_insertRow_void_QFormLayout_int_string_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
-        Pointer param_labelText, Pointer param_field)
+    void qt_QFormLayout_insertRow_void_QFormLayout_int_string_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
+                                                                      Pointer param_labelText, Pointer param_field)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFormLayout* arg0 = object<QFormLayout>(param_this);
@@ -650,9 +624,8 @@ namespace Mu
         arg0->insertRow(arg1, arg2, arg3);
     }
 
-    void qt_QFormLayout_insertRow_void_QFormLayout_int_string_QLayout(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
-        Pointer param_labelText, Pointer param_field)
+    void qt_QFormLayout_insertRow_void_QFormLayout_int_string_QLayout(Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
+                                                                      Pointer param_labelText, Pointer param_field)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFormLayout* arg0 = object<QFormLayout>(param_this);
@@ -662,9 +635,8 @@ namespace Mu
         arg0->insertRow(arg1, arg2, arg3);
     }
 
-    void qt_QFormLayout_insertRow_void_QFormLayout_int_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
-        Pointer param_widget)
+    void qt_QFormLayout_insertRow_void_QFormLayout_int_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
+                                                               Pointer param_widget)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFormLayout* arg0 = object<QFormLayout>(param_this);
@@ -673,9 +645,8 @@ namespace Mu
         arg0->insertRow(arg1, arg2);
     }
 
-    void qt_QFormLayout_insertRow_void_QFormLayout_int_QLayout(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
-        Pointer param_layout)
+    void qt_QFormLayout_insertRow_void_QFormLayout_int_QLayout(Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
+                                                               Pointer param_layout)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFormLayout* arg0 = object<QFormLayout>(param_this);
@@ -684,8 +655,7 @@ namespace Mu
         arg0->insertRow(arg1, arg2);
     }
 
-    bool qt_QFormLayout_isRowVisible_bool_QFormLayout_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_row)
+    bool qt_QFormLayout_isRowVisible_bool_QFormLayout_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_row)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFormLayout* arg0 = object<QFormLayout>(param_this);
@@ -693,8 +663,7 @@ namespace Mu
         return arg0->isRowVisible(arg1);
     }
 
-    bool qt_QFormLayout_isRowVisible_bool_QFormLayout_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_widget)
+    bool qt_QFormLayout_isRowVisible_bool_QFormLayout_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_widget)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFormLayout* arg0 = object<QFormLayout>(param_this);
@@ -702,8 +671,7 @@ namespace Mu
         return arg0->isRowVisible(arg1);
     }
 
-    bool qt_QFormLayout_isRowVisible_bool_QFormLayout_QLayout(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_layout)
+    bool qt_QFormLayout_isRowVisible_bool_QFormLayout_QLayout(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_layout)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFormLayout* arg0 = object<QFormLayout>(param_this);
@@ -711,41 +679,33 @@ namespace Mu
         return arg0->isRowVisible(arg1);
     }
 
-    Pointer qt_QFormLayout_itemAt_QLayoutItem_QFormLayout_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
-        int param_role)
+    Pointer qt_QFormLayout_itemAt_QLayoutItem_QFormLayout_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
+                                                                  int param_role)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFormLayout* arg0 = object<QFormLayout>(param_this);
         int arg1 = (int)(param_row);
         QFormLayout::ItemRole arg2 = (QFormLayout::ItemRole)(param_role);
-        return makelayoutitem<QLayoutItemType>(c, arg0->itemAt(arg1, arg2),
-                                               "qt.QLayoutItem");
+        return makelayoutitem<QLayoutItemType>(c, arg0->itemAt(arg1, arg2), "qt.QLayoutItem");
     }
 
-    Pointer qt_QFormLayout_labelForField_QWidget_QFormLayout_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_field)
+    Pointer qt_QFormLayout_labelForField_QWidget_QFormLayout_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_field)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFormLayout* arg0 = object<QFormLayout>(param_this);
         QWidget* arg1 = object<QWidget>(param_field);
-        return makeinstance<QWidgetType>(c, arg0->labelForField(arg1),
-                                         "qt.QWidget");
+        return makeinstance<QWidgetType>(c, arg0->labelForField(arg1), "qt.QWidget");
     }
 
-    Pointer qt_QFormLayout_labelForField_QWidget_QFormLayout_QLayout(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_field)
+    Pointer qt_QFormLayout_labelForField_QWidget_QFormLayout_QLayout(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_field)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFormLayout* arg0 = object<QFormLayout>(param_this);
         QLayout* arg1 = object<QLayout>(param_field);
-        return makeinstance<QWidgetType>(c, arg0->labelForField(arg1),
-                                         "qt.QWidget");
+        return makeinstance<QWidgetType>(c, arg0->labelForField(arg1), "qt.QWidget");
     }
 
-    void qt_QFormLayout_removeRow_void_QFormLayout_int(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this,
-                                                       int param_row)
+    void qt_QFormLayout_removeRow_void_QFormLayout_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_row)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFormLayout* arg0 = object<QFormLayout>(param_this);
@@ -753,8 +713,7 @@ namespace Mu
         arg0->removeRow(arg1);
     }
 
-    void qt_QFormLayout_removeRow_void_QFormLayout_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_widget)
+    void qt_QFormLayout_removeRow_void_QFormLayout_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_widget)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFormLayout* arg0 = object<QFormLayout>(param_this);
@@ -762,8 +721,7 @@ namespace Mu
         arg0->removeRow(arg1);
     }
 
-    void qt_QFormLayout_removeRow_void_QFormLayout_QLayout(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_layout)
+    void qt_QFormLayout_removeRow_void_QFormLayout_QLayout(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_layout)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFormLayout* arg0 = object<QFormLayout>(param_this);
@@ -771,17 +729,15 @@ namespace Mu
         arg0->removeRow(arg1);
     }
 
-    int qt_QFormLayout_rowCount_int_QFormLayout(Mu::Thread& NODE_THREAD,
-                                                Pointer param_this)
+    int qt_QFormLayout_rowCount_int_QFormLayout(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFormLayout* arg0 = object<QFormLayout>(param_this);
         return arg0->rowCount();
     }
 
-    void qt_QFormLayout_setItem_void_QFormLayout_int_int_QLayoutItem(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
-        int param_role, Pointer param_item)
+    void qt_QFormLayout_setItem_void_QFormLayout_int_int_QLayoutItem(Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
+                                                                     int param_role, Pointer param_item)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFormLayout* arg0 = object<QFormLayout>(param_this);
@@ -791,9 +747,8 @@ namespace Mu
         arg0->setItem(arg1, arg2, arg3);
     }
 
-    void qt_QFormLayout_setLayout_void_QFormLayout_int_int_QLayout(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
-        int param_role, Pointer param_layout)
+    void qt_QFormLayout_setLayout_void_QFormLayout_int_int_QLayout(Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
+                                                                   int param_role, Pointer param_layout)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFormLayout* arg0 = object<QFormLayout>(param_this);
@@ -803,9 +758,7 @@ namespace Mu
         arg0->setLayout(arg1, arg2, arg3);
     }
 
-    void qt_QFormLayout_setRowVisible_void_QFormLayout_int_bool(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
-        bool param_on)
+    void qt_QFormLayout_setRowVisible_void_QFormLayout_int_bool(Mu::Thread& NODE_THREAD, Pointer param_this, int param_row, bool param_on)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFormLayout* arg0 = object<QFormLayout>(param_this);
@@ -814,9 +767,8 @@ namespace Mu
         arg0->setRowVisible(arg1, arg2);
     }
 
-    void qt_QFormLayout_setRowVisible_void_QFormLayout_QWidget_bool(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_widget,
-        bool param_on)
+    void qt_QFormLayout_setRowVisible_void_QFormLayout_QWidget_bool(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_widget,
+                                                                    bool param_on)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFormLayout* arg0 = object<QFormLayout>(param_this);
@@ -825,9 +777,8 @@ namespace Mu
         arg0->setRowVisible(arg1, arg2);
     }
 
-    void qt_QFormLayout_setRowVisible_void_QFormLayout_QLayout_bool(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_layout,
-        bool param_on)
+    void qt_QFormLayout_setRowVisible_void_QFormLayout_QLayout_bool(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_layout,
+                                                                    bool param_on)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFormLayout* arg0 = object<QFormLayout>(param_this);
@@ -836,9 +787,8 @@ namespace Mu
         arg0->setRowVisible(arg1, arg2);
     }
 
-    void qt_QFormLayout_setWidget_void_QFormLayout_int_int_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
-        int param_role, Pointer param_widget)
+    void qt_QFormLayout_setWidget_void_QFormLayout_int_int_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
+                                                                   int param_role, Pointer param_widget)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFormLayout* arg0 = object<QFormLayout>(param_this);
@@ -848,8 +798,7 @@ namespace Mu
         arg0->setWidget(arg1, arg2, arg3);
     }
 
-    void qt_QFormLayout_addItem_void_QFormLayout_QLayoutItem(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_item)
+    void qt_QFormLayout_addItem_void_QFormLayout_QLayoutItem(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_item)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFormLayout* arg0 = object<QFormLayout>(param_this);
@@ -860,47 +809,36 @@ namespace Mu
             arg0->addItem(arg1);
     }
 
-    int qt_QFormLayout_count_int_QFormLayout(Mu::Thread& NODE_THREAD,
-                                             Pointer param_this)
+    int qt_QFormLayout_count_int_QFormLayout(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFormLayout* arg0 = object<QFormLayout>(param_this);
         return isMuQtObject(arg0) ? arg0->QFormLayout::count() : arg0->count();
     }
 
-    int
-    qt_QFormLayout_expandingDirections_int_QFormLayout(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this)
+    int qt_QFormLayout_expandingDirections_int_QFormLayout(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFormLayout* arg0 = object<QFormLayout>(param_this);
-        return isMuQtObject(arg0)
-                   ? int(arg0->QFormLayout::expandingDirections())
-                   : int(arg0->expandingDirections());
+        return isMuQtObject(arg0) ? int(arg0->QFormLayout::expandingDirections()) : int(arg0->expandingDirections());
     }
 
-    bool
-    qt_QFormLayout_hasHeightForWidth_bool_QFormLayout(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    bool qt_QFormLayout_hasHeightForWidth_bool_QFormLayout(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFormLayout* arg0 = object<QFormLayout>(param_this);
-        return isMuQtObject(arg0) ? arg0->QFormLayout::hasHeightForWidth()
-                                  : arg0->hasHeightForWidth();
+        return isMuQtObject(arg0) ? arg0->QFormLayout::hasHeightForWidth() : arg0->hasHeightForWidth();
     }
 
-    int qt_QFormLayout_heightForWidth_int_QFormLayout_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_width)
+    int qt_QFormLayout_heightForWidth_int_QFormLayout_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_width)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFormLayout* arg0 = object<QFormLayout>(param_this);
         int arg1 = (int)(param_width);
-        return isMuQtObject(arg0) ? arg0->QFormLayout::heightForWidth(arg1)
-                                  : arg0->heightForWidth(arg1);
+        return isMuQtObject(arg0) ? arg0->QFormLayout::heightForWidth(arg1) : arg0->heightForWidth(arg1);
     }
 
-    void qt_QFormLayout_invalidate_void_QFormLayout(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this)
+    void qt_QFormLayout_invalidate_void_QFormLayout(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFormLayout* arg0 = object<QFormLayout>(param_this);
@@ -910,33 +848,24 @@ namespace Mu
             arg0->invalidate();
     }
 
-    Pointer qt_QFormLayout_itemAt_QLayoutItem_QFormLayout_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_index)
+    Pointer qt_QFormLayout_itemAt_QLayoutItem_QFormLayout_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_index)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFormLayout* arg0 = object<QFormLayout>(param_this);
         int arg1 = (int)(param_index);
-        return isMuQtObject(arg0)
-                   ? makelayoutitem<QLayoutItemType>(
-                         c, arg0->QFormLayout::itemAt(arg1), "qt.QLayoutItem")
-                   : makelayoutitem<QLayoutItemType>(c, arg0->itemAt(arg1),
-                                                     "qt.QLayoutItem");
+        return isMuQtObject(arg0) ? makelayoutitem<QLayoutItemType>(c, arg0->QFormLayout::itemAt(arg1), "qt.QLayoutItem")
+                                  : makelayoutitem<QLayoutItemType>(c, arg0->itemAt(arg1), "qt.QLayoutItem");
     }
 
-    Pointer
-    qt_QFormLayout_minimumSize_QSize_QFormLayout(Mu::Thread& NODE_THREAD,
-                                                 Pointer param_this)
+    Pointer qt_QFormLayout_minimumSize_QSize_QFormLayout(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFormLayout* arg0 = object<QFormLayout>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QSizeType>(c, arg0->QFormLayout::minimumSize(),
-                                          "qt.QSize")
-                   : makeqtype<QSizeType>(c, arg0->minimumSize(), "qt.QSize");
+        return isMuQtObject(arg0) ? makeqtype<QSizeType>(c, arg0->QFormLayout::minimumSize(), "qt.QSize")
+                                  : makeqtype<QSizeType>(c, arg0->minimumSize(), "qt.QSize");
     }
 
-    void qt_QFormLayout_setGeometry_void_QFormLayout_QRect(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_rect)
+    void qt_QFormLayout_setGeometry_void_QFormLayout_QRect(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_rect)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFormLayout* arg0 = object<QFormLayout>(param_this);
@@ -947,9 +876,7 @@ namespace Mu
             arg0->setGeometry(arg1);
     }
 
-    void qt_QFormLayout_setSpacing_void_QFormLayout_int(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this,
-                                                        int param_spacing)
+    void qt_QFormLayout_setSpacing_void_QFormLayout_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_spacing)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFormLayout* arg0 = object<QFormLayout>(param_this);
@@ -960,432 +887,353 @@ namespace Mu
             arg0->setSpacing(arg1);
     }
 
-    Pointer qt_QFormLayout_sizeHint_QSize_QFormLayout(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    Pointer qt_QFormLayout_sizeHint_QSize_QFormLayout(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFormLayout* arg0 = object<QFormLayout>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QSizeType>(c, arg0->QFormLayout::sizeHint(),
-                                          "qt.QSize")
-                   : makeqtype<QSizeType>(c, arg0->sizeHint(), "qt.QSize");
+        return isMuQtObject(arg0) ? makeqtype<QSizeType>(c, arg0->QFormLayout::sizeHint(), "qt.QSize")
+                                  : makeqtype<QSizeType>(c, arg0->sizeHint(), "qt.QSize");
     }
 
-    int qt_QFormLayout_spacing_int_QFormLayout(Mu::Thread& NODE_THREAD,
-                                               Pointer param_this)
+    int qt_QFormLayout_spacing_int_QFormLayout(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFormLayout* arg0 = object<QFormLayout>(param_this);
-        return isMuQtObject(arg0) ? arg0->QFormLayout::spacing()
-                                  : arg0->spacing();
+        return isMuQtObject(arg0) ? arg0->QFormLayout::spacing() : arg0->spacing();
     }
 
-    Pointer qt_QFormLayout_takeAt_QLayoutItem_QFormLayout_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_index)
+    Pointer qt_QFormLayout_takeAt_QLayoutItem_QFormLayout_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_index)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFormLayout* arg0 = object<QFormLayout>(param_this);
         int arg1 = (int)(param_index);
-        return isMuQtObject(arg0)
-                   ? makelayoutitem<QLayoutItemType>(
-                         c, arg0->QFormLayout::takeAt(arg1), "qt.QLayoutItem")
-                   : makelayoutitem<QLayoutItemType>(c, arg0->takeAt(arg1),
-                                                     "qt.QLayoutItem");
+        return isMuQtObject(arg0) ? makelayoutitem<QLayoutItemType>(c, arg0->QFormLayout::takeAt(arg1), "qt.QLayoutItem")
+                                  : makelayoutitem<QLayoutItemType>(c, arg0->takeAt(arg1), "qt.QLayoutItem");
     }
 
-    int qt_QFormLayout_indexOf_int_QFormLayout_QWidget(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this,
-                                                       Pointer param_widget)
+    int qt_QFormLayout_indexOf_int_QFormLayout_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_widget)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFormLayout* arg0 = object<QFormLayout>(param_this);
         const QWidget* arg1 = object<QWidget>(param_widget);
-        return isMuQtObject(arg0) ? arg0->QFormLayout::indexOf(arg1)
-                                  : arg0->indexOf(arg1);
+        return isMuQtObject(arg0) ? arg0->QFormLayout::indexOf(arg1) : arg0->indexOf(arg1);
     }
 
-    Pointer
-    qt_QFormLayout_replaceWidget_QLayoutItem_QFormLayout_QWidget_QWidget_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_from,
-        Pointer param_to, int param_options)
+    Pointer qt_QFormLayout_replaceWidget_QLayoutItem_QFormLayout_QWidget_QWidget_int(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                     Pointer param_from, Pointer param_to,
+                                                                                     int param_options)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFormLayout* arg0 = object<QFormLayout>(param_this);
         QWidget* arg1 = object<QWidget>(param_from);
         QWidget* arg2 = object<QWidget>(param_to);
         Qt::FindChildOptions arg3 = (Qt::FindChildOptions)(param_options);
-        return isMuQtObject(arg0)
-                   ? makelayoutitem<QLayoutItemType>(
-                         c, arg0->QFormLayout::replaceWidget(arg1, arg2, arg3),
-                         "qt.QLayoutItem")
-                   : makelayoutitem<QLayoutItemType>(
-                         c, arg0->replaceWidget(arg1, arg2, arg3),
-                         "qt.QLayoutItem");
+        return isMuQtObject(arg0) ? makelayoutitem<QLayoutItemType>(c, arg0->QFormLayout::replaceWidget(arg1, arg2, arg3), "qt.QLayoutItem")
+                                  : makelayoutitem<QLayoutItemType>(c, arg0->replaceWidget(arg1, arg2, arg3), "qt.QLayoutItem");
     }
 
-    int qt_QFormLayout_controlTypes_int_QFormLayout(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this)
+    int qt_QFormLayout_controlTypes_int_QFormLayout(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFormLayout* arg0 = object<QFormLayout>(param_this);
-        return isMuQtObject(arg0) ? int(arg0->QFormLayout::controlTypes())
-                                  : int(arg0->controlTypes());
+        return isMuQtObject(arg0) ? int(arg0->QFormLayout::controlTypes()) : int(arg0->controlTypes());
     }
 
-    Pointer qt_QFormLayout_geometry_QRect_QFormLayout(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    Pointer qt_QFormLayout_geometry_QRect_QFormLayout(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFormLayout* arg0 = object<QFormLayout>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QRectType>(c, arg0->QFormLayout::geometry(),
-                                          "qt.QRect")
-                   : makeqtype<QRectType>(c, arg0->geometry(), "qt.QRect");
+        return isMuQtObject(arg0) ? makeqtype<QRectType>(c, arg0->QFormLayout::geometry(), "qt.QRect")
+                                  : makeqtype<QRectType>(c, arg0->geometry(), "qt.QRect");
     }
 
-    bool qt_QFormLayout_isEmpty_bool_QFormLayout(Mu::Thread& NODE_THREAD,
-                                                 Pointer param_this)
+    bool qt_QFormLayout_isEmpty_bool_QFormLayout(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFormLayout* arg0 = object<QFormLayout>(param_this);
-        return isMuQtObject(arg0) ? arg0->QFormLayout::isEmpty()
-                                  : arg0->isEmpty();
+        return isMuQtObject(arg0) ? arg0->QFormLayout::isEmpty() : arg0->isEmpty();
     }
 
-    Pointer qt_QFormLayout_layout_QLayout_QFormLayout(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    Pointer qt_QFormLayout_layout_QLayout_QFormLayout(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFormLayout* arg0 = object<QFormLayout>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeinstance<QLayoutType>(c, arg0->QFormLayout::layout(),
-                                               "qt.QLayout")
-                   : makeinstance<QLayoutType>(c, arg0->layout(), "qt.QLayout");
+        return isMuQtObject(arg0) ? makeinstance<QLayoutType>(c, arg0->QFormLayout::layout(), "qt.QLayout")
+                                  : makeinstance<QLayoutType>(c, arg0->layout(), "qt.QLayout");
     }
 
-    Pointer
-    qt_QFormLayout_maximumSize_QSize_QFormLayout(Mu::Thread& NODE_THREAD,
-                                                 Pointer param_this)
+    Pointer qt_QFormLayout_maximumSize_QSize_QFormLayout(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QFormLayout* arg0 = object<QFormLayout>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QSizeType>(c, arg0->QFormLayout::maximumSize(),
-                                          "qt.QSize")
-                   : makeqtype<QSizeType>(c, arg0->maximumSize(), "qt.QSize");
+        return isMuQtObject(arg0) ? makeqtype<QSizeType>(c, arg0->QFormLayout::maximumSize(), "qt.QSize")
+                                  : makeqtype<QSizeType>(c, arg0->maximumSize(), "qt.QSize");
     }
 
     static NODE_IMPLEMENTATION(_n_QFormLayout0, Pointer)
     {
-        NODE_RETURN(qt_QFormLayout_QFormLayout_QFormLayout_QFormLayout_QWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(
+            qt_QFormLayout_QFormLayout_QFormLayout_QFormLayout_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_addRow0, void)
     {
-        qt_QFormLayout_addRow_void_QFormLayout_QWidget_QWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer));
+        qt_QFormLayout_addRow_void_QFormLayout_QWidget_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                               NODE_ARG(2, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_addRow1, void)
     {
-        qt_QFormLayout_addRow_void_QFormLayout_QWidget_QLayout(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer));
+        qt_QFormLayout_addRow_void_QFormLayout_QWidget_QLayout(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                               NODE_ARG(2, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_addRow2, void)
     {
-        qt_QFormLayout_addRow_void_QFormLayout_string_QWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer));
+        qt_QFormLayout_addRow_void_QFormLayout_string_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                              NODE_ARG(2, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_addRow3, void)
     {
-        qt_QFormLayout_addRow_void_QFormLayout_string_QLayout(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer));
+        qt_QFormLayout_addRow_void_QFormLayout_string_QLayout(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                              NODE_ARG(2, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_addRow4, void)
     {
-        qt_QFormLayout_addRow_void_QFormLayout_QWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QFormLayout_addRow_void_QFormLayout_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_addRow5, void)
     {
-        qt_QFormLayout_addRow_void_QFormLayout_QLayout(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QFormLayout_addRow_void_QFormLayout_QLayout(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_insertRow0, void)
     {
-        qt_QFormLayout_insertRow_void_QFormLayout_int_QWidget_QWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, Pointer), NODE_ARG(3, Pointer));
+        qt_QFormLayout_insertRow_void_QFormLayout_int_QWidget_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                      NODE_ARG(2, Pointer), NODE_ARG(3, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_insertRow1, void)
     {
-        qt_QFormLayout_insertRow_void_QFormLayout_int_QWidget_QLayout(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, Pointer), NODE_ARG(3, Pointer));
+        qt_QFormLayout_insertRow_void_QFormLayout_int_QWidget_QLayout(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                      NODE_ARG(2, Pointer), NODE_ARG(3, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_insertRow2, void)
     {
-        qt_QFormLayout_insertRow_void_QFormLayout_int_string_QWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, Pointer), NODE_ARG(3, Pointer));
+        qt_QFormLayout_insertRow_void_QFormLayout_int_string_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                     NODE_ARG(2, Pointer), NODE_ARG(3, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_insertRow3, void)
     {
-        qt_QFormLayout_insertRow_void_QFormLayout_int_string_QLayout(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, Pointer), NODE_ARG(3, Pointer));
+        qt_QFormLayout_insertRow_void_QFormLayout_int_string_QLayout(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                     NODE_ARG(2, Pointer), NODE_ARG(3, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_insertRow4, void)
     {
-        qt_QFormLayout_insertRow_void_QFormLayout_int_QWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, Pointer));
+        qt_QFormLayout_insertRow_void_QFormLayout_int_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                              NODE_ARG(2, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_insertRow5, void)
     {
-        qt_QFormLayout_insertRow_void_QFormLayout_int_QLayout(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, Pointer));
+        qt_QFormLayout_insertRow_void_QFormLayout_int_QLayout(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                              NODE_ARG(2, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_isRowVisible0, bool)
     {
-        NODE_RETURN(qt_QFormLayout_isRowVisible_bool_QFormLayout_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QFormLayout_isRowVisible_bool_QFormLayout_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_isRowVisible1, bool)
     {
-        NODE_RETURN(qt_QFormLayout_isRowVisible_bool_QFormLayout_QWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QFormLayout_isRowVisible_bool_QFormLayout_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isRowVisible2, bool)
     {
-        NODE_RETURN(qt_QFormLayout_isRowVisible_bool_QFormLayout_QLayout(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QFormLayout_isRowVisible_bool_QFormLayout_QLayout(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_itemAt0, Pointer)
     {
-        NODE_RETURN(qt_QFormLayout_itemAt_QLayoutItem_QFormLayout_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int)));
+        NODE_RETURN(qt_QFormLayout_itemAt_QLayoutItem_QFormLayout_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                          NODE_ARG(2, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_labelForField0, Pointer)
     {
-        NODE_RETURN(qt_QFormLayout_labelForField_QWidget_QFormLayout_QWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(
+            qt_QFormLayout_labelForField_QWidget_QFormLayout_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_labelForField1, Pointer)
     {
-        NODE_RETURN(qt_QFormLayout_labelForField_QWidget_QFormLayout_QLayout(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(
+            qt_QFormLayout_labelForField_QWidget_QFormLayout_QLayout(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_removeRow0, void)
     {
-        qt_QFormLayout_removeRow_void_QFormLayout_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QFormLayout_removeRow_void_QFormLayout_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_removeRow1, void)
     {
-        qt_QFormLayout_removeRow_void_QFormLayout_QWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QFormLayout_removeRow_void_QFormLayout_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_removeRow2, void)
     {
-        qt_QFormLayout_removeRow_void_QFormLayout_QLayout(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QFormLayout_removeRow_void_QFormLayout_QLayout(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_rowCount0, int)
     {
-        NODE_RETURN(qt_QFormLayout_rowCount_int_QFormLayout(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QFormLayout_rowCount_int_QFormLayout(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_setItem0, void)
     {
-        qt_QFormLayout_setItem_void_QFormLayout_int_int_QLayoutItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int), NODE_ARG(3, Pointer));
+        qt_QFormLayout_setItem_void_QFormLayout_int_int_QLayoutItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                    NODE_ARG(2, int), NODE_ARG(3, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setLayout0, void)
     {
-        qt_QFormLayout_setLayout_void_QFormLayout_int_int_QLayout(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int), NODE_ARG(3, Pointer));
+        qt_QFormLayout_setLayout_void_QFormLayout_int_int_QLayout(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                  NODE_ARG(2, int), NODE_ARG(3, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setRowVisible0, void)
     {
-        qt_QFormLayout_setRowVisible_void_QFormLayout_int_bool(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, bool));
+        qt_QFormLayout_setRowVisible_void_QFormLayout_int_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                               NODE_ARG(2, bool));
     }
 
     static NODE_IMPLEMENTATION(_n_setRowVisible1, void)
     {
-        qt_QFormLayout_setRowVisible_void_QFormLayout_QWidget_bool(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, bool));
+        qt_QFormLayout_setRowVisible_void_QFormLayout_QWidget_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                   NODE_ARG(2, bool));
     }
 
     static NODE_IMPLEMENTATION(_n_setRowVisible2, void)
     {
-        qt_QFormLayout_setRowVisible_void_QFormLayout_QLayout_bool(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, bool));
+        qt_QFormLayout_setRowVisible_void_QFormLayout_QLayout_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                   NODE_ARG(2, bool));
     }
 
     static NODE_IMPLEMENTATION(_n_setWidget0, void)
     {
-        qt_QFormLayout_setWidget_void_QFormLayout_int_int_QWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int), NODE_ARG(3, Pointer));
+        qt_QFormLayout_setWidget_void_QFormLayout_int_int_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                  NODE_ARG(2, int), NODE_ARG(3, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_addItem0, void)
     {
-        qt_QFormLayout_addItem_void_QFormLayout_QLayoutItem(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QFormLayout_addItem_void_QFormLayout_QLayoutItem(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_count0, int)
     {
-        NODE_RETURN(qt_QFormLayout_count_int_QFormLayout(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QFormLayout_count_int_QFormLayout(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_expandingDirections0, int)
     {
-        NODE_RETURN(qt_QFormLayout_expandingDirections_int_QFormLayout(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QFormLayout_expandingDirections_int_QFormLayout(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_hasHeightForWidth0, bool)
     {
-        NODE_RETURN(qt_QFormLayout_hasHeightForWidth_bool_QFormLayout(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QFormLayout_hasHeightForWidth_bool_QFormLayout(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_heightForWidth0, int)
     {
-        NODE_RETURN(qt_QFormLayout_heightForWidth_int_QFormLayout_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QFormLayout_heightForWidth_int_QFormLayout_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_invalidate0, void)
     {
-        qt_QFormLayout_invalidate_void_QFormLayout(NODE_THREAD,
-                                                   NONNIL_NODE_ARG(0, Pointer));
+        qt_QFormLayout_invalidate_void_QFormLayout(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_itemAt1, Pointer)
     {
-        NODE_RETURN(qt_QFormLayout_itemAt_QLayoutItem_QFormLayout_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QFormLayout_itemAt_QLayoutItem_QFormLayout_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_minimumSize0, Pointer)
     {
-        NODE_RETURN(qt_QFormLayout_minimumSize_QSize_QFormLayout(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QFormLayout_minimumSize_QSize_QFormLayout(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_setGeometry0, void)
     {
-        qt_QFormLayout_setGeometry_void_QFormLayout_QRect(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QFormLayout_setGeometry_void_QFormLayout_QRect(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setSpacing0, void)
     {
-        qt_QFormLayout_setSpacing_void_QFormLayout_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QFormLayout_setSpacing_void_QFormLayout_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_sizeHint0, Pointer)
     {
-        NODE_RETURN(qt_QFormLayout_sizeHint_QSize_QFormLayout(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QFormLayout_sizeHint_QSize_QFormLayout(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_spacing0, int)
     {
-        NODE_RETURN(qt_QFormLayout_spacing_int_QFormLayout(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QFormLayout_spacing_int_QFormLayout(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_takeAt0, Pointer)
     {
-        NODE_RETURN(qt_QFormLayout_takeAt_QLayoutItem_QFormLayout_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QFormLayout_takeAt_QLayoutItem_QFormLayout_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_indexOf0, int)
     {
-        NODE_RETURN(qt_QFormLayout_indexOf_int_QFormLayout_QWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QFormLayout_indexOf_int_QFormLayout_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_replaceWidget0, Pointer)
     {
-        NODE_RETURN(
-            qt_QFormLayout_replaceWidget_QLayoutItem_QFormLayout_QWidget_QWidget_int(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, Pointer), NODE_ARG(3, int)));
+        NODE_RETURN(qt_QFormLayout_replaceWidget_QLayoutItem_QFormLayout_QWidget_QWidget_int(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, Pointer), NODE_ARG(3, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_controlTypes0, int)
     {
-        NODE_RETURN(qt_QFormLayout_controlTypes_int_QFormLayout(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QFormLayout_controlTypes_int_QFormLayout(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_geometry0, Pointer)
     {
-        NODE_RETURN(qt_QFormLayout_geometry_QRect_QFormLayout(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QFormLayout_geometry_QRect_QFormLayout(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isEmpty0, bool)
     {
-        NODE_RETURN(qt_QFormLayout_isEmpty_bool_QFormLayout(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QFormLayout_isEmpty_bool_QFormLayout(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_layout0, Pointer)
     {
-        NODE_RETURN(qt_QFormLayout_layout_QLayout_QFormLayout(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QFormLayout_layout_QLayout_QFormLayout(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_maximumSize0, Pointer)
     {
-        NODE_RETURN(qt_QFormLayout_maximumSize_QSize_QFormLayout(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QFormLayout_maximumSize_QSize_QFormLayout(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     void QFormLayoutType::load()
@@ -1405,17 +1253,13 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
-                   new Function(c, tn, castFromObject, Cast, Compiled,
-                                QFormLayout_QFormLayout_QObject, Return, ftn,
-                                Parameters,
+                   new Function(c, tn, castFromObject, Cast, Compiled, QFormLayout_QFormLayout_QObject, Return, ftn, Parameters,
                                 new Param(c, "object", "qt.QObject"), End),
 
                    EndArguments);
@@ -1423,46 +1267,25 @@ namespace Mu
         addSymbols(
             // enums
             // member functions
-            new Function(
-                c, "QFormLayout", _n_QFormLayout0, None, Compiled,
-                qt_QFormLayout_QFormLayout_QFormLayout_QFormLayout_QWidget,
-                Return, "qt.QFormLayout", Parameters,
-                new Param(c, "this", "qt.QFormLayout"),
-                new Param(c, "parent", "qt.QWidget"), End),
-            new Function(c, "addRow", _n_addRow0, None, Compiled,
-                         qt_QFormLayout_addRow_void_QFormLayout_QWidget_QWidget,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QFormLayout"),
-                         new Param(c, "label", "qt.QWidget"),
+            new Function(c, "QFormLayout", _n_QFormLayout0, None, Compiled, qt_QFormLayout_QFormLayout_QFormLayout_QFormLayout_QWidget,
+                         Return, "qt.QFormLayout", Parameters, new Param(c, "this", "qt.QFormLayout"), new Param(c, "parent", "qt.QWidget"),
+                         End),
+            new Function(c, "addRow", _n_addRow0, None, Compiled, qt_QFormLayout_addRow_void_QFormLayout_QWidget_QWidget, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QFormLayout"), new Param(c, "label", "qt.QWidget"),
                          new Param(c, "field", "qt.QWidget"), End),
-            new Function(c, "addRow", _n_addRow1, None, Compiled,
-                         qt_QFormLayout_addRow_void_QFormLayout_QWidget_QLayout,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QFormLayout"),
-                         new Param(c, "label", "qt.QWidget"),
+            new Function(c, "addRow", _n_addRow1, None, Compiled, qt_QFormLayout_addRow_void_QFormLayout_QWidget_QLayout, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QFormLayout"), new Param(c, "label", "qt.QWidget"),
                          new Param(c, "field", "qt.QLayout"), End),
-            new Function(c, "addRow", _n_addRow2, None, Compiled,
-                         qt_QFormLayout_addRow_void_QFormLayout_string_QWidget,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QFormLayout"),
-                         new Param(c, "labelText", "string"),
+            new Function(c, "addRow", _n_addRow2, None, Compiled, qt_QFormLayout_addRow_void_QFormLayout_string_QWidget, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QFormLayout"), new Param(c, "labelText", "string"),
                          new Param(c, "field", "qt.QWidget"), End),
-            new Function(c, "addRow", _n_addRow3, None, Compiled,
-                         qt_QFormLayout_addRow_void_QFormLayout_string_QLayout,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QFormLayout"),
-                         new Param(c, "labelText", "string"),
+            new Function(c, "addRow", _n_addRow3, None, Compiled, qt_QFormLayout_addRow_void_QFormLayout_string_QLayout, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QFormLayout"), new Param(c, "labelText", "string"),
                          new Param(c, "field", "qt.QLayout"), End),
-            new Function(c, "addRow", _n_addRow4, None, Compiled,
-                         qt_QFormLayout_addRow_void_QFormLayout_QWidget, Return,
-                         "void", Parameters,
-                         new Param(c, "this", "qt.QFormLayout"),
-                         new Param(c, "widget", "qt.QWidget"), End),
-            new Function(c, "addRow", _n_addRow5, None, Compiled,
-                         qt_QFormLayout_addRow_void_QFormLayout_QLayout, Return,
-                         "void", Parameters,
-                         new Param(c, "this", "qt.QFormLayout"),
-                         new Param(c, "layout", "qt.QLayout"), End),
+            new Function(c, "addRow", _n_addRow4, None, Compiled, qt_QFormLayout_addRow_void_QFormLayout_QWidget, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QFormLayout"), new Param(c, "widget", "qt.QWidget"), End),
+            new Function(c, "addRow", _n_addRow5, None, Compiled, qt_QFormLayout_addRow_void_QFormLayout_QLayout, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QFormLayout"), new Param(c, "layout", "qt.QLayout"), End),
             // PROP: fieldGrowthPolicy (flags QFormLayout::FieldGrowthPolicy;
             // QFormLayout this) PROP: formAlignment (flags Qt::Alignment;
             // QFormLayout this) MISSING: getItemPosition (void; QFormLayout
@@ -1472,250 +1295,130 @@ namespace Mu
             // rolePtr) MISSING: getWidgetPosition (void; QFormLayout this,
             // QWidget widget, "int *" rowPtr, flags QFormLayout::ItemRole *
             // rolePtr) PROP: horizontalSpacing (int; QFormLayout this)
-            new Function(
-                c, "insertRow", _n_insertRow0, None, Compiled,
-                qt_QFormLayout_insertRow_void_QFormLayout_int_QWidget_QWidget,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QFormLayout"),
-                new Param(c, "row", "int"), new Param(c, "label", "qt.QWidget"),
-                new Param(c, "field", "qt.QWidget"), End),
-            new Function(
-                c, "insertRow", _n_insertRow1, None, Compiled,
-                qt_QFormLayout_insertRow_void_QFormLayout_int_QWidget_QLayout,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QFormLayout"),
-                new Param(c, "row", "int"), new Param(c, "label", "qt.QWidget"),
-                new Param(c, "field", "qt.QLayout"), End),
-            new Function(
-                c, "insertRow", _n_insertRow2, None, Compiled,
-                qt_QFormLayout_insertRow_void_QFormLayout_int_string_QWidget,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QFormLayout"),
-                new Param(c, "row", "int"), new Param(c, "labelText", "string"),
-                new Param(c, "field", "qt.QWidget"), End),
-            new Function(
-                c, "insertRow", _n_insertRow3, None, Compiled,
-                qt_QFormLayout_insertRow_void_QFormLayout_int_string_QLayout,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QFormLayout"),
-                new Param(c, "row", "int"), new Param(c, "labelText", "string"),
-                new Param(c, "field", "qt.QLayout"), End),
-            new Function(c, "insertRow", _n_insertRow4, None, Compiled,
-                         qt_QFormLayout_insertRow_void_QFormLayout_int_QWidget,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QFormLayout"),
-                         new Param(c, "row", "int"),
+            new Function(c, "insertRow", _n_insertRow0, None, Compiled, qt_QFormLayout_insertRow_void_QFormLayout_int_QWidget_QWidget,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QFormLayout"), new Param(c, "row", "int"),
+                         new Param(c, "label", "qt.QWidget"), new Param(c, "field", "qt.QWidget"), End),
+            new Function(c, "insertRow", _n_insertRow1, None, Compiled, qt_QFormLayout_insertRow_void_QFormLayout_int_QWidget_QLayout,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QFormLayout"), new Param(c, "row", "int"),
+                         new Param(c, "label", "qt.QWidget"), new Param(c, "field", "qt.QLayout"), End),
+            new Function(c, "insertRow", _n_insertRow2, None, Compiled, qt_QFormLayout_insertRow_void_QFormLayout_int_string_QWidget,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QFormLayout"), new Param(c, "row", "int"),
+                         new Param(c, "labelText", "string"), new Param(c, "field", "qt.QWidget"), End),
+            new Function(c, "insertRow", _n_insertRow3, None, Compiled, qt_QFormLayout_insertRow_void_QFormLayout_int_string_QLayout,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QFormLayout"), new Param(c, "row", "int"),
+                         new Param(c, "labelText", "string"), new Param(c, "field", "qt.QLayout"), End),
+            new Function(c, "insertRow", _n_insertRow4, None, Compiled, qt_QFormLayout_insertRow_void_QFormLayout_int_QWidget, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QFormLayout"), new Param(c, "row", "int"),
                          new Param(c, "widget", "qt.QWidget"), End),
-            new Function(c, "insertRow", _n_insertRow5, None, Compiled,
-                         qt_QFormLayout_insertRow_void_QFormLayout_int_QLayout,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QFormLayout"),
-                         new Param(c, "row", "int"),
+            new Function(c, "insertRow", _n_insertRow5, None, Compiled, qt_QFormLayout_insertRow_void_QFormLayout_int_QLayout, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QFormLayout"), new Param(c, "row", "int"),
                          new Param(c, "layout", "qt.QLayout"), End),
-            new Function(c, "isRowVisible", _n_isRowVisible0, None, Compiled,
-                         qt_QFormLayout_isRowVisible_bool_QFormLayout_int,
-                         Return, "bool", Parameters,
-                         new Param(c, "this", "qt.QFormLayout"),
-                         new Param(c, "row", "int"), End),
-            new Function(c, "isRowVisible", _n_isRowVisible1, None, Compiled,
-                         qt_QFormLayout_isRowVisible_bool_QFormLayout_QWidget,
-                         Return, "bool", Parameters,
-                         new Param(c, "this", "qt.QFormLayout"),
-                         new Param(c, "widget", "qt.QWidget"), End),
-            new Function(c, "isRowVisible", _n_isRowVisible2, None, Compiled,
-                         qt_QFormLayout_isRowVisible_bool_QFormLayout_QLayout,
-                         Return, "bool", Parameters,
-                         new Param(c, "this", "qt.QFormLayout"),
-                         new Param(c, "layout", "qt.QLayout"), End),
-            new Function(c, "itemAt", _n_itemAt0, None, Compiled,
-                         qt_QFormLayout_itemAt_QLayoutItem_QFormLayout_int_int,
-                         Return, "qt.QLayoutItem", Parameters,
-                         new Param(c, "this", "qt.QFormLayout"),
-                         new Param(c, "row", "int"),
+            new Function(c, "isRowVisible", _n_isRowVisible0, None, Compiled, qt_QFormLayout_isRowVisible_bool_QFormLayout_int, Return,
+                         "bool", Parameters, new Param(c, "this", "qt.QFormLayout"), new Param(c, "row", "int"), End),
+            new Function(c, "isRowVisible", _n_isRowVisible1, None, Compiled, qt_QFormLayout_isRowVisible_bool_QFormLayout_QWidget, Return,
+                         "bool", Parameters, new Param(c, "this", "qt.QFormLayout"), new Param(c, "widget", "qt.QWidget"), End),
+            new Function(c, "isRowVisible", _n_isRowVisible2, None, Compiled, qt_QFormLayout_isRowVisible_bool_QFormLayout_QLayout, Return,
+                         "bool", Parameters, new Param(c, "this", "qt.QFormLayout"), new Param(c, "layout", "qt.QLayout"), End),
+            new Function(c, "itemAt", _n_itemAt0, None, Compiled, qt_QFormLayout_itemAt_QLayoutItem_QFormLayout_int_int, Return,
+                         "qt.QLayoutItem", Parameters, new Param(c, "this", "qt.QFormLayout"), new Param(c, "row", "int"),
                          new Param(c, "role", "int"), End),
             // PROP: labelAlignment (flags Qt::Alignment; QFormLayout this)
-            new Function(
-                c, "labelForField", _n_labelForField0, None, Compiled,
-                qt_QFormLayout_labelForField_QWidget_QFormLayout_QWidget,
-                Return, "qt.QWidget", Parameters,
-                new Param(c, "this", "qt.QFormLayout"),
-                new Param(c, "field", "qt.QWidget"), End),
-            new Function(
-                c, "labelForField", _n_labelForField1, None, Compiled,
-                qt_QFormLayout_labelForField_QWidget_QFormLayout_QLayout,
-                Return, "qt.QWidget", Parameters,
-                new Param(c, "this", "qt.QFormLayout"),
-                new Param(c, "field", "qt.QLayout"), End),
-            new Function(c, "removeRow", _n_removeRow0, None, Compiled,
-                         qt_QFormLayout_removeRow_void_QFormLayout_int, Return,
-                         "void", Parameters,
-                         new Param(c, "this", "qt.QFormLayout"),
-                         new Param(c, "row", "int"), End),
-            new Function(c, "removeRow", _n_removeRow1, None, Compiled,
-                         qt_QFormLayout_removeRow_void_QFormLayout_QWidget,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QFormLayout"),
-                         new Param(c, "widget", "qt.QWidget"), End),
-            new Function(c, "removeRow", _n_removeRow2, None, Compiled,
-                         qt_QFormLayout_removeRow_void_QFormLayout_QLayout,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QFormLayout"),
-                         new Param(c, "layout", "qt.QLayout"), End),
-            new Function(c, "rowCount", _n_rowCount0, None, Compiled,
-                         qt_QFormLayout_rowCount_int_QFormLayout, Return, "int",
-                         Parameters, new Param(c, "this", "qt.QFormLayout"),
+            new Function(c, "labelForField", _n_labelForField0, None, Compiled, qt_QFormLayout_labelForField_QWidget_QFormLayout_QWidget,
+                         Return, "qt.QWidget", Parameters, new Param(c, "this", "qt.QFormLayout"), new Param(c, "field", "qt.QWidget"),
                          End),
+            new Function(c, "labelForField", _n_labelForField1, None, Compiled, qt_QFormLayout_labelForField_QWidget_QFormLayout_QLayout,
+                         Return, "qt.QWidget", Parameters, new Param(c, "this", "qt.QFormLayout"), new Param(c, "field", "qt.QLayout"),
+                         End),
+            new Function(c, "removeRow", _n_removeRow0, None, Compiled, qt_QFormLayout_removeRow_void_QFormLayout_int, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QFormLayout"), new Param(c, "row", "int"), End),
+            new Function(c, "removeRow", _n_removeRow1, None, Compiled, qt_QFormLayout_removeRow_void_QFormLayout_QWidget, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QFormLayout"), new Param(c, "widget", "qt.QWidget"), End),
+            new Function(c, "removeRow", _n_removeRow2, None, Compiled, qt_QFormLayout_removeRow_void_QFormLayout_QLayout, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QFormLayout"), new Param(c, "layout", "qt.QLayout"), End),
+            new Function(c, "rowCount", _n_rowCount0, None, Compiled, qt_QFormLayout_rowCount_int_QFormLayout, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QFormLayout"), End),
             // PROP: rowWrapPolicy (flags QFormLayout::RowWrapPolicy;
             // QFormLayout this) PROP: setFieldGrowthPolicy (void; QFormLayout
             // this, flags QFormLayout::FieldGrowthPolicy policy) PROP:
             // setFormAlignment (void; QFormLayout this, flags Qt::Alignment
             // alignment) PROP: setHorizontalSpacing (void; QFormLayout this,
             // int spacing)
-            new Function(
-                c, "setItem", _n_setItem0, None, Compiled,
-                qt_QFormLayout_setItem_void_QFormLayout_int_int_QLayoutItem,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QFormLayout"),
-                new Param(c, "row", "int"), new Param(c, "role", "int"),
-                new Param(c, "item", "qt.QLayoutItem"), End),
+            new Function(c, "setItem", _n_setItem0, None, Compiled, qt_QFormLayout_setItem_void_QFormLayout_int_int_QLayoutItem, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QFormLayout"), new Param(c, "row", "int"),
+                         new Param(c, "role", "int"), new Param(c, "item", "qt.QLayoutItem"), End),
             // PROP: setLabelAlignment (void; QFormLayout this, flags
             // Qt::Alignment alignment)
-            new Function(
-                c, "setLayout", _n_setLayout0, None, Compiled,
-                qt_QFormLayout_setLayout_void_QFormLayout_int_int_QLayout,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QFormLayout"),
-                new Param(c, "row", "int"), new Param(c, "role", "int"),
-                new Param(c, "layout", "qt.QLayout"), End),
-            new Function(
-                c, "setRowVisible", _n_setRowVisible0, None, Compiled,
-                qt_QFormLayout_setRowVisible_void_QFormLayout_int_bool, Return,
-                "void", Parameters, new Param(c, "this", "qt.QFormLayout"),
-                new Param(c, "row", "int"), new Param(c, "on", "bool"), End),
-            new Function(
-                c, "setRowVisible", _n_setRowVisible1, None, Compiled,
-                qt_QFormLayout_setRowVisible_void_QFormLayout_QWidget_bool,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QFormLayout"),
-                new Param(c, "widget", "qt.QWidget"),
-                new Param(c, "on", "bool"), End),
-            new Function(
-                c, "setRowVisible", _n_setRowVisible2, None, Compiled,
-                qt_QFormLayout_setRowVisible_void_QFormLayout_QLayout_bool,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QFormLayout"),
-                new Param(c, "layout", "qt.QLayout"),
-                new Param(c, "on", "bool"), End),
+            new Function(c, "setLayout", _n_setLayout0, None, Compiled, qt_QFormLayout_setLayout_void_QFormLayout_int_int_QLayout, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QFormLayout"), new Param(c, "row", "int"),
+                         new Param(c, "role", "int"), new Param(c, "layout", "qt.QLayout"), End),
+            new Function(c, "setRowVisible", _n_setRowVisible0, None, Compiled, qt_QFormLayout_setRowVisible_void_QFormLayout_int_bool,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QFormLayout"), new Param(c, "row", "int"),
+                         new Param(c, "on", "bool"), End),
+            new Function(c, "setRowVisible", _n_setRowVisible1, None, Compiled, qt_QFormLayout_setRowVisible_void_QFormLayout_QWidget_bool,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QFormLayout"), new Param(c, "widget", "qt.QWidget"),
+                         new Param(c, "on", "bool"), End),
+            new Function(c, "setRowVisible", _n_setRowVisible2, None, Compiled, qt_QFormLayout_setRowVisible_void_QFormLayout_QLayout_bool,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QFormLayout"), new Param(c, "layout", "qt.QLayout"),
+                         new Param(c, "on", "bool"), End),
             // PROP: setRowWrapPolicy (void; QFormLayout this, flags
             // QFormLayout::RowWrapPolicy policy) PROP: setVerticalSpacing
             // (void; QFormLayout this, int spacing)
-            new Function(
-                c, "setWidget", _n_setWidget0, None, Compiled,
-                qt_QFormLayout_setWidget_void_QFormLayout_int_int_QWidget,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QFormLayout"),
-                new Param(c, "row", "int"), new Param(c, "role", "int"),
-                new Param(c, "widget", "qt.QWidget"), End),
+            new Function(c, "setWidget", _n_setWidget0, None, Compiled, qt_QFormLayout_setWidget_void_QFormLayout_int_int_QWidget, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QFormLayout"), new Param(c, "row", "int"),
+                         new Param(c, "role", "int"), new Param(c, "widget", "qt.QWidget"), End),
             // PROP: verticalSpacing (int; QFormLayout this)
-            _func[0] = new MemberFunction(
-                c, "addItem", _n_addItem0, None, Compiled,
-                qt_QFormLayout_addItem_void_QFormLayout_QLayoutItem, Return,
-                "void", Parameters, new Param(c, "this", "qt.QFormLayout"),
-                new Param(c, "item", "qt.QLayoutItem"), End),
-            _func[1] = new MemberFunction(
-                c, "count", _n_count0, None, Compiled,
-                qt_QFormLayout_count_int_QFormLayout, Return, "int", Parameters,
-                new Param(c, "this", "qt.QFormLayout"), End),
-            _func[2] = new MemberFunction(
-                c, "expandingDirections", _n_expandingDirections0, None,
-                Compiled, qt_QFormLayout_expandingDirections_int_QFormLayout,
-                Return, "int", Parameters,
-                new Param(c, "this", "qt.QFormLayout"), End),
-            _func[3] = new MemberFunction(
-                c, "hasHeightForWidth", _n_hasHeightForWidth0, None, Compiled,
-                qt_QFormLayout_hasHeightForWidth_bool_QFormLayout, Return,
-                "bool", Parameters, new Param(c, "this", "qt.QFormLayout"),
-                End),
-            _func[4] = new MemberFunction(
-                c, "heightForWidth", _n_heightForWidth0, None, Compiled,
-                qt_QFormLayout_heightForWidth_int_QFormLayout_int, Return,
-                "int", Parameters, new Param(c, "this", "qt.QFormLayout"),
-                new Param(c, "width", "int"), End),
-            _func[5] = new MemberFunction(
-                c, "invalidate", _n_invalidate0, None, Compiled,
-                qt_QFormLayout_invalidate_void_QFormLayout, Return, "void",
-                Parameters, new Param(c, "this", "qt.QFormLayout"), End),
-            _func[6] = new MemberFunction(
-                c, "itemAt", _n_itemAt1, None, Compiled,
-                qt_QFormLayout_itemAt_QLayoutItem_QFormLayout_int, Return,
-                "qt.QLayoutItem", Parameters,
-                new Param(c, "this", "qt.QFormLayout"),
-                new Param(c, "index", "int"), End),
-            _func[7] = new MemberFunction(
-                c, "minimumSize", _n_minimumSize0, None, Compiled,
-                qt_QFormLayout_minimumSize_QSize_QFormLayout, Return,
-                "qt.QSize", Parameters, new Param(c, "this", "qt.QFormLayout"),
-                End),
-            _func[8] = new MemberFunction(
-                c, "setGeometry", _n_setGeometry0, None, Compiled,
-                qt_QFormLayout_setGeometry_void_QFormLayout_QRect, Return,
-                "void", Parameters, new Param(c, "this", "qt.QFormLayout"),
-                new Param(c, "rect", "qt.QRect"), End),
-            _func[9] = new MemberFunction(
-                c, "setSpacing", _n_setSpacing0, None, Compiled,
-                qt_QFormLayout_setSpacing_void_QFormLayout_int, Return, "void",
-                Parameters, new Param(c, "this", "qt.QFormLayout"),
-                new Param(c, "spacing", "int"), End),
-            _func[10] = new MemberFunction(
-                c, "sizeHint", _n_sizeHint0, None, Compiled,
-                qt_QFormLayout_sizeHint_QSize_QFormLayout, Return, "qt.QSize",
-                Parameters, new Param(c, "this", "qt.QFormLayout"), End),
-            _func[11] = new MemberFunction(
-                c, "spacing", _n_spacing0, None, Compiled,
-                qt_QFormLayout_spacing_int_QFormLayout, Return, "int",
-                Parameters, new Param(c, "this", "qt.QFormLayout"), End),
-            _func[12] = new MemberFunction(
-                c, "takeAt", _n_takeAt0, None, Compiled,
-                qt_QFormLayout_takeAt_QLayoutItem_QFormLayout_int, Return,
-                "qt.QLayoutItem", Parameters,
-                new Param(c, "this", "qt.QFormLayout"),
-                new Param(c, "index", "int"), End),
-            _func[13] = new MemberFunction(
-                c, "indexOf", _n_indexOf0, None, Compiled,
-                qt_QFormLayout_indexOf_int_QFormLayout_QWidget, Return, "int",
-                Parameters, new Param(c, "this", "qt.QFormLayout"),
-                new Param(c, "widget", "qt.QWidget"), End),
-            _func[14] = new MemberFunction(
-                c, "replaceWidget", _n_replaceWidget0, None, Compiled,
-                qt_QFormLayout_replaceWidget_QLayoutItem_QFormLayout_QWidget_QWidget_int,
-                Return, "qt.QLayoutItem", Parameters,
-                new Param(c, "this", "qt.QFormLayout"),
-                new Param(c, "from", "qt.QWidget"),
-                new Param(c, "to", "qt.QWidget"),
-                new Param(c, "options", "int",
-                          Value((int)Qt::FindChildrenRecursively)),
-                End),
-            _func[15] = new MemberFunction(
-                c, "controlTypes", _n_controlTypes0, None, Compiled,
-                qt_QFormLayout_controlTypes_int_QFormLayout, Return, "int",
-                Parameters, new Param(c, "this", "qt.QFormLayout"), End),
-            _func[16] = new MemberFunction(
-                c, "geometry", _n_geometry0, None, Compiled,
-                qt_QFormLayout_geometry_QRect_QFormLayout, Return, "qt.QRect",
-                Parameters, new Param(c, "this", "qt.QFormLayout"), End),
-            _func[17] = new MemberFunction(
-                c, "isEmpty", _n_isEmpty0, None, Compiled,
-                qt_QFormLayout_isEmpty_bool_QFormLayout, Return, "bool",
-                Parameters, new Param(c, "this", "qt.QFormLayout"), End),
-            _func[18] = new MemberFunction(
-                c, "layout", _n_layout0, None, Compiled,
-                qt_QFormLayout_layout_QLayout_QFormLayout, Return, "qt.QLayout",
-                Parameters, new Param(c, "this", "qt.QFormLayout"), End),
-            _func[19] = new MemberFunction(
-                c, "maximumSize", _n_maximumSize0, None, Compiled,
-                qt_QFormLayout_maximumSize_QSize_QFormLayout, Return,
-                "qt.QSize", Parameters, new Param(c, "this", "qt.QFormLayout"),
-                End),
+            _func[0] =
+                new MemberFunction(c, "addItem", _n_addItem0, None, Compiled, qt_QFormLayout_addItem_void_QFormLayout_QLayoutItem, Return,
+                                   "void", Parameters, new Param(c, "this", "qt.QFormLayout"), new Param(c, "item", "qt.QLayoutItem"), End),
+            _func[1] = new MemberFunction(c, "count", _n_count0, None, Compiled, qt_QFormLayout_count_int_QFormLayout, Return, "int",
+                                          Parameters, new Param(c, "this", "qt.QFormLayout"), End),
+            _func[2] = new MemberFunction(c, "expandingDirections", _n_expandingDirections0, None, Compiled,
+                                          qt_QFormLayout_expandingDirections_int_QFormLayout, Return, "int", Parameters,
+                                          new Param(c, "this", "qt.QFormLayout"), End),
+            _func[3] = new MemberFunction(c, "hasHeightForWidth", _n_hasHeightForWidth0, None, Compiled,
+                                          qt_QFormLayout_hasHeightForWidth_bool_QFormLayout, Return, "bool", Parameters,
+                                          new Param(c, "this", "qt.QFormLayout"), End),
+            _func[4] = new MemberFunction(c, "heightForWidth", _n_heightForWidth0, None, Compiled,
+                                          qt_QFormLayout_heightForWidth_int_QFormLayout_int, Return, "int", Parameters,
+                                          new Param(c, "this", "qt.QFormLayout"), new Param(c, "width", "int"), End),
+            _func[5] = new MemberFunction(c, "invalidate", _n_invalidate0, None, Compiled, qt_QFormLayout_invalidate_void_QFormLayout,
+                                          Return, "void", Parameters, new Param(c, "this", "qt.QFormLayout"), End),
+            _func[6] =
+                new MemberFunction(c, "itemAt", _n_itemAt1, None, Compiled, qt_QFormLayout_itemAt_QLayoutItem_QFormLayout_int, Return,
+                                   "qt.QLayoutItem", Parameters, new Param(c, "this", "qt.QFormLayout"), new Param(c, "index", "int"), End),
+            _func[7] = new MemberFunction(c, "minimumSize", _n_minimumSize0, None, Compiled, qt_QFormLayout_minimumSize_QSize_QFormLayout,
+                                          Return, "qt.QSize", Parameters, new Param(c, "this", "qt.QFormLayout"), End),
+            _func[8] = new MemberFunction(c, "setGeometry", _n_setGeometry0, None, Compiled,
+                                          qt_QFormLayout_setGeometry_void_QFormLayout_QRect, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QFormLayout"), new Param(c, "rect", "qt.QRect"), End),
+            _func[9] =
+                new MemberFunction(c, "setSpacing", _n_setSpacing0, None, Compiled, qt_QFormLayout_setSpacing_void_QFormLayout_int, Return,
+                                   "void", Parameters, new Param(c, "this", "qt.QFormLayout"), new Param(c, "spacing", "int"), End),
+            _func[10] = new MemberFunction(c, "sizeHint", _n_sizeHint0, None, Compiled, qt_QFormLayout_sizeHint_QSize_QFormLayout, Return,
+                                           "qt.QSize", Parameters, new Param(c, "this", "qt.QFormLayout"), End),
+            _func[11] = new MemberFunction(c, "spacing", _n_spacing0, None, Compiled, qt_QFormLayout_spacing_int_QFormLayout, Return, "int",
+                                           Parameters, new Param(c, "this", "qt.QFormLayout"), End),
+            _func[12] =
+                new MemberFunction(c, "takeAt", _n_takeAt0, None, Compiled, qt_QFormLayout_takeAt_QLayoutItem_QFormLayout_int, Return,
+                                   "qt.QLayoutItem", Parameters, new Param(c, "this", "qt.QFormLayout"), new Param(c, "index", "int"), End),
+            _func[13] =
+                new MemberFunction(c, "indexOf", _n_indexOf0, None, Compiled, qt_QFormLayout_indexOf_int_QFormLayout_QWidget, Return, "int",
+                                   Parameters, new Param(c, "this", "qt.QFormLayout"), new Param(c, "widget", "qt.QWidget"), End),
+            _func[14] = new MemberFunction(c, "replaceWidget", _n_replaceWidget0, None, Compiled,
+                                           qt_QFormLayout_replaceWidget_QLayoutItem_QFormLayout_QWidget_QWidget_int, Return,
+                                           "qt.QLayoutItem", Parameters, new Param(c, "this", "qt.QFormLayout"),
+                                           new Param(c, "from", "qt.QWidget"), new Param(c, "to", "qt.QWidget"),
+                                           new Param(c, "options", "int", Value((int)Qt::FindChildrenRecursively)), End),
+            _func[15] = new MemberFunction(c, "controlTypes", _n_controlTypes0, None, Compiled, qt_QFormLayout_controlTypes_int_QFormLayout,
+                                           Return, "int", Parameters, new Param(c, "this", "qt.QFormLayout"), End),
+            _func[16] = new MemberFunction(c, "geometry", _n_geometry0, None, Compiled, qt_QFormLayout_geometry_QRect_QFormLayout, Return,
+                                           "qt.QRect", Parameters, new Param(c, "this", "qt.QFormLayout"), End),
+            _func[17] = new MemberFunction(c, "isEmpty", _n_isEmpty0, None, Compiled, qt_QFormLayout_isEmpty_bool_QFormLayout, Return,
+                                           "bool", Parameters, new Param(c, "this", "qt.QFormLayout"), End),
+            _func[18] = new MemberFunction(c, "layout", _n_layout0, None, Compiled, qt_QFormLayout_layout_QLayout_QFormLayout, Return,
+                                           "qt.QLayout", Parameters, new Param(c, "this", "qt.QFormLayout"), End),
+            _func[19] = new MemberFunction(c, "maximumSize", _n_maximumSize0, None, Compiled, qt_QFormLayout_maximumSize_QSize_QFormLayout,
+                                           Return, "qt.QSize", Parameters, new Param(c, "this", "qt.QFormLayout"), End),
             // MISSING: childEvent (void; QFormLayout this, "QChildEvent *" e)
             // // protected static functions
             EndArguments);

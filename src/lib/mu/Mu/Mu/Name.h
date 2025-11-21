@@ -48,10 +48,7 @@ namespace Mu
 
         operator String() const { return _item ? _item->data() : "$noname$"; }
 #ifdef MU_USE_BOEHM_COLLECTOR
-        operator std::string() const
-        {
-            return _item ? _item->data().c_str() : "$noname$";
-        }
+        operator std::string() const { return _item ? _item->data().c_str() : "$noname$"; }
 #endif
 
         //
@@ -143,25 +140,13 @@ namespace Mu
 
     typedef Name QualifiedName;
 
-    inline unsigned long Name::hash() const
-    {
-        return _item ? StringTraits::hash(_item->data()) : 0;
-    }
+    inline unsigned long Name::hash() const { return _item ? StringTraits::hash(_item->data()) : 0; }
 
-    inline bool Name::operator==(const char* text) const
-    {
-        return _item ? _item->data() == text : false;
-    }
+    inline bool Name::operator==(const char* text) const { return _item ? _item->data() == text : false; }
 
-    inline bool Name::operator==(const String& text) const
-    {
-        return _item ? _item->data() == text : false;
-    }
+    inline bool Name::operator==(const String& text) const { return _item ? _item->data() == text : false; }
 
-    inline bool Name::operator<(Name n) const
-    {
-        return StringTraits::compare(_item->data(), String(n)) < 0;
-    }
+    inline bool Name::operator<(Name n) const { return StringTraits::compare(_item->data(), String(n)) < 0; }
 
     //
     //  class NamePool
@@ -194,10 +179,7 @@ namespace Mu
         return 0;
     }
 
-    inline bool NamePool::exists(const String& s) const
-    {
-        return _hashTable.find(s) ? true : false;
-    }
+    inline bool NamePool::exists(const String& s) const { return _hashTable.find(s) ? true : false; }
 
 } // namespace Mu
 

@@ -47,8 +47,7 @@ namespace Mu
         //  Constructors
         //
 
-        QTextOptionType(Context* context, const char* name,
-                        Class* superClass = 0);
+        QTextOptionType(Context* context, const char* name, Class* superClass = 0);
         virtual ~QTextOptionType();
 
         //
