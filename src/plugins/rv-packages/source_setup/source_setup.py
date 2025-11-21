@@ -360,8 +360,14 @@ class SourceSetupMode(rvtypes.MinorMode):
             dICCNode = groupMemberOfType(dpipe, "ICCDisplayTransform")
             if dICCNode:
                 commands.setIntProperty(dICCNode + ".node.active", [0], True)
-
-            if dgroup is not None and commands.nodeType(dgroup) == "RVDisplayGroup" and dgroup not in dnodesWithProfile:
+            # BUGFIX: Also handle RVOutputGroup in addition to RVDisplayGroup
+            # When RV is run in command-line mode (e.g., via -pyeval), it uses RVOutputGroup
+            # instead of RVDisplayGroup for the default display output
+            if (
+                dgroup is not None
+                and commands.nodeType(dgroup) in ["RVDisplayGroup", "RVOutputGroup"]
+                and dgroup not in dnodesWithProfile
+            ):
                 dICC = commands.getStringProperty(dgroup + ".device.systemProfileURL")
                 if dICCNode and len(dICC) == 1 and not dICC[0] == "":
                     dICCPath = urlparse(dICC[0].replace("%20", " ")).path
@@ -504,6 +510,9 @@ class SourceSetupMode(rvtypes.MinorMode):
         event.reject()
         if commands.nodeType(event.contents()) == "RVDisplayGroup":
             self._haveNewDisplayGroups = True
+            # BUGFIX: When a new RVDisplayGroup is created AFTER initial setup
+            # (e.g., when UI starts after -pyeval), configure it immediately
+            self.setDisplayFromProfile()
 
     def __init__(self):
         self._readingSession = False
