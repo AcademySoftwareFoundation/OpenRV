@@ -209,7 +209,7 @@ namespace Rv
         QIconMap m_iconMap;
         const VideoDevice* m_device;
         const VideoDevice* m_outputDevice;
-        std::array<ActionCategoryMapping, 6> m_actionCategoryMappings;
+        std::array<ActionCategoryMapping, 9> m_actionCategoryMappings;
     };
 
 } // namespace Rv

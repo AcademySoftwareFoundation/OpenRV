@@ -129,20 +129,20 @@ namespace Rv
 
         m_fullScreenAction = addAction("");
         m_fullScreenAction->setIcon(QIcon(":/images/fullscreen.png"));
+        m_fullScreenAction->setToolTip("Toggle full-screen mode");
         b = dynamic_cast<QToolButton*>(widgetForAction(m_fullScreenAction));
         b->setProperty("tbstyle", QVariant(QString("view_menu")));
         b->setToolButtonStyle(Qt::ToolButtonIconOnly);
         b->setPopupMode(QToolButton::InstantPopup);
-        b->setToolTip("Toggle full-screen mode");
 
         m_frameAction = addAction("");
+        m_frameAction->setToolTip("Frame image in view");
         b = dynamic_cast<QToolButton*>(widgetForAction(m_frameAction));
         b->setIcon(QIcon(":/images/frame.png"));
         b->setProperty("tbstyle", QVariant(QString("view_menu")));
         b->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
         b->setPopupMode(QToolButton::DelayedPopup);
         b->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-        b->setToolTip("Frame image in view");
 
         m = new QMenu(b);
         a = m->addAction("Frame");
@@ -377,9 +377,12 @@ namespace Rv
         connect(m_dither10, SIGNAL(triggered()), this, SLOT(dither10()));
 
         // Map toolbar actions to their corresponding event categories
-        m_actionCategoryMappings = {{{m_viewMenuAction, IPCore::EventCategories::viewmodeCategory, m_viewMenuAction->toolTip()},
-                                     {m_viewBackAction, IPCore::EventCategories::viewmodeCategory, m_viewBackAction->toolTip()},
+        m_actionCategoryMappings = {{{m_viewBackAction, IPCore::EventCategories::viewmodeCategory, m_viewBackAction->toolTip()},
                                      {m_viewForwardAction, IPCore::EventCategories::viewmodeCategory, m_viewForwardAction->toolTip()},
+                                     {m_viewMenuAction, IPCore::EventCategories::viewmodeCategory, m_viewMenuAction->toolTip()},
+                                     {m_fullScreenAction, IPCore::EventCategories::viewmodeCategory, m_fullScreenAction->toolTip()},
+                                     {m_frameAction, IPCore::EventCategories::viewmodeCategory, m_frameAction->toolTip()},
+                                     {m_bgMenuAction, IPCore::EventCategories::viewmodeCategory, m_bgMenuAction->toolTip()},
                                      {m_stereoMenuAction, IPCore::EventCategories::viewmodeCategory, m_stereoMenuAction->toolTip()},
                                      {m_channelMenuAction, IPCore::EventCategories::viewmodeCategory, m_channelMenuAction->toolTip()},
                                      {m_monitorMenuAction, IPCore::EventCategories::viewmodeCategory, m_monitorMenuAction->toolTip()}}};
