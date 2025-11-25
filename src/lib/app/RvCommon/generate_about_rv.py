@@ -73,15 +73,17 @@ def get_dependencies_info(vfx_platform, versions, app_name, platform=""):
     # RV-specific proprietary components (only for commercial RV)
     rv_specific_deps = []
     if is_commercial_rv:
-        # Apple ProRes is only available on macOS
+        # Apple ProRes is only available on macOS (and not on ARM64 currently)
         if is_macos:
-            rv_specific_deps.append(("Apple ProRes", "Integrated", "Apple Proprietary"))
+            prores_ver = get_ver("prores", "Not Used")
+            rv_specific_deps.append(("Apple ProRes", prores_ver, "Apple Proprietary"))
 
+        # Always add these for commercial RV (version will show "Not Used" if not available)
         rv_specific_deps.extend(
             [
-                ("RED R3D SDK", "Integrated", "RED Proprietary"),
-                ("ARRI SDK", "Integrated", "ARRI Proprietary"),
-                ("x264", "Integrated", "x264 Commercial License"),
+                ("RED R3D SDK", get_ver("r3dsdk", "Not Used"), "RED Proprietary"),
+                ("ARRI SDK", get_ver("arriraw", "Not Used"), "ARRI Proprietary"),
+                ("x264", get_ver("x264", "Not Used"), "x264 Commercial License"),
             ]
         )
 
