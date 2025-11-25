@@ -58,7 +58,7 @@ namespace IPCore
 
     private:
         QTAudioThread& m_thread;
-        bool m_silence;
+        bool m_silence = false;
     };
 
     class QTAudioOutput : public QAudioSink
@@ -97,7 +97,7 @@ namespace IPCore
         QAudioFormat& m_format;
         QTAudioIODevice& m_ioDevice;
         QTAudioThread& m_thread;
-        bool m_isFlushing;
+        bool m_isFlushing = false;
         qint64 m_flushedBytes;
     };
 
