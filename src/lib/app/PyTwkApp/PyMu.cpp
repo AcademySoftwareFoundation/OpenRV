@@ -52,9 +52,7 @@ namespace TwkApp
     }
 
     static PyMethodDef pymu_methods[] = {
-        {"muEval", mu_eval, METH_VARARGS,
-         "evaluate mu code -- to be used a fallback only"},
-        {NULL, NULL} /* sentinel */
+        {"muEval", mu_eval, METH_VARARGS, "evaluate mu code -- to be used a fallback only"}, {NULL, NULL} /* sentinel */
     };
 
     static struct PyModuleDef moduledef = {

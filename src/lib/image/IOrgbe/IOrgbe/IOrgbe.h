@@ -45,22 +45,16 @@ namespace TwkFB
         IOrgbe();
         virtual ~IOrgbe();
 
-        virtual void readImage(FrameBuffer&, const std::string& filename,
-                               const ReadRequest& request) const;
-        virtual void writeImage(const FrameBuffer&, const std::string& filename,
-                                const WriteRequest& request) const;
+        virtual void readImage(FrameBuffer&, const std::string& filename, const ReadRequest& request) const;
+        virtual void writeImage(const FrameBuffer&, const std::string& filename, const WriteRequest& request) const;
         virtual std::string about() const;
         virtual void getImageInfo(const std::string& filename, FBInfo&) const;
 
         /* read or write headers */
         /* you may set rgbe_header_info to null if you want to */
-        int RGBE_WriteHeader(FILE* fp, int width, int height,
-                             rgbe_header_info* info) const;
-        int RGBE_ReadHeader(FILE* fp, int* width, int* height,
-                            rgbe_header_info* info, bool silent = false) const;
-        int RGBE_ReadHeader_OLD(FILE* fp, int* width, int* height,
-                                rgbe_header_info* info,
-                                bool silent = false) const;
+        int RGBE_WriteHeader(FILE* fp, int width, int height, rgbe_header_info* info) const;
+        int RGBE_ReadHeader(FILE* fp, int* width, int* height, rgbe_header_info* info, bool silent = false) const;
+        int RGBE_ReadHeader_OLD(FILE* fp, int* width, int* height, rgbe_header_info* info, bool silent = false) const;
 
         /* read or write pixels */
         /* can read or write pixels in chunks of any size including single
@@ -70,19 +64,13 @@ namespace TwkFB
 
         /* read or write run length encoded files */
         /* must be called to read or write whole scanlines */
-        int RGBE_WritePixels_RLE(FILE* fp, float* data, int scanline_width,
-                                 int num_scanlines) const;
-        int RGBE_ReadPixels_RLE(FILE* fp, float* data, int scanline_width,
-                                int num_scanlines) const;
+        int RGBE_WritePixels_RLE(FILE* fp, float* data, int scanline_width, int num_scanlines) const;
+        int RGBE_ReadPixels_RLE(FILE* fp, float* data, int scanline_width, int num_scanlines) const;
 
-        int rgbe_error(int rgbe_error_code, char* msg,
-                       bool silent = false) const;
-        void float2rgbe(unsigned char rgbe[4], float red, float green,
-                        float blue) const;
-        void rgbe2float(float* red, float* green, float* blue,
-                        unsigned char rgbe[4]) const;
-        int RGBE_WriteBytes_RLE(FILE* fp, unsigned char* data,
-                                int numbytes) const;
+        int rgbe_error(int rgbe_error_code, char* msg, bool silent = false) const;
+        void float2rgbe(unsigned char rgbe[4], float red, float green, float blue) const;
+        void rgbe2float(float* red, float* green, float* blue, unsigned char rgbe[4]) const;
+        int RGBE_WriteBytes_RLE(FILE* fp, unsigned char* data, int numbytes) const;
     };
 
 } // namespace TwkFB

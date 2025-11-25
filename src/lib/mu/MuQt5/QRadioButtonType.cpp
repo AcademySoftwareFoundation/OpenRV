@@ -61,30 +61,24 @@ namespace Mu
         _baseType = 0;
     }
 
-    MuQt_QRadioButton::MuQt_QRadioButton(Pointer muobj,
-                                         const CallEnvironment* ce,
-                                         QWidget* parent)
+    MuQt_QRadioButton::MuQt_QRadioButton(Pointer muobj, const CallEnvironment* ce, QWidget* parent)
         : QRadioButton(parent)
     {
         _env = ce;
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QRadioButtonType>(
-            c->internName("qt.QRadioButton"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QRadioButtonType>(c->internName("qt.QRadioButton"));
     }
 
-    MuQt_QRadioButton::MuQt_QRadioButton(Pointer muobj,
-                                         const CallEnvironment* ce,
-                                         const QString& text, QWidget* parent)
+    MuQt_QRadioButton::MuQt_QRadioButton(Pointer muobj, const CallEnvironment* ce, const QString& text, QWidget* parent)
         : QRadioButton(text, parent)
     {
         _env = ce;
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QRadioButtonType>(
-            c->internName("qt.QRadioButton"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QRadioButtonType>(c->internName("qt.QRadioButton"));
     }
 
     QSize MuQt_QRadioButton::minimumSizeHint() const
@@ -183,8 +177,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -207,8 +200,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QPaintEventType>(c, _p14, "qt.QPaintEvent"));
+            args[1] = Value(makeqpointer<QPaintEventType>(c, _p14, "qt.QPaintEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -298,8 +290,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QFocusEventType>(c, e, "qt.QFocusEvent"));
+            args[1] = Value(makeqpointer<QFocusEventType>(c, e, "qt.QFocusEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -322,8 +313,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QFocusEventType>(c, e, "qt.QFocusEvent"));
+            args[1] = Value(makeqpointer<QFocusEventType>(c, e, "qt.QFocusEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -392,8 +382,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -416,8 +405,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -440,8 +428,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QTimerEventType>(c, e, "qt.QTimerEvent"));
+            args[1] = Value(makeqpointer<QTimerEventType>(c, e, "qt.QTimerEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -453,8 +440,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  Mu Type CONSTRUCTORS
 
-    QRadioButtonType::QRadioButtonType(Context* c, const char* name,
-                                       Class* super, Class* super2)
+    QRadioButtonType::QRadioButtonType(Context* c, const char* name, Class* super, Class* super2)
         : Class(c, name, vectorOf2(super, super2))
     {
     }
@@ -464,8 +450,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    static Pointer QRadioButton_QRadioButton_QObject(Thread& NODE_THREAD,
-                                                     Pointer obj)
+    static Pointer QRadioButton_QRadioButton_QObject(Thread& NODE_THREAD, Pointer obj)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         ClassInstance* widget = reinterpret_cast<ClassInstance*>(obj);
@@ -476,9 +461,7 @@ namespace Mu
         }
         else if (QRadioButton* w = object<QRadioButton>(widget))
         {
-            QRadioButtonType* type =
-                c->findSymbolOfTypeByQualifiedName<QRadioButtonType>(
-                    c->internName("qt.QRadioButton"), false);
+            QRadioButtonType* type = c->findSymbolOfTypeByQualifiedName<QRadioButtonType>(c->internName("qt.QRadioButton"), false);
             ClassInstance* o = ClassInstance::allocate(type);
             setobject(o, w);
             return o;
@@ -491,84 +474,62 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(castFromObject, Pointer)
     {
-        NODE_RETURN(QRadioButton_QRadioButton_QObject(NODE_THREAD,
-                                                      NODE_ARG(0, Pointer)));
+        NODE_RETURN(QRadioButton_QRadioButton_QObject(NODE_THREAD, NODE_ARG(0, Pointer)));
     }
 
-    Pointer qt_QRadioButton_QRadioButton_QRadioButton_QRadioButton_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
+    Pointer qt_QRadioButton_QRadioButton_QRadioButton_QRadioButton_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                           Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWidget* arg1 = object<QWidget>(param_parent);
-        setobject(param_this,
-                  new MuQt_QRadioButton(
-                      param_this, NODE_THREAD.process()->callEnv(), arg1));
+        setobject(param_this, new MuQt_QRadioButton(param_this, NODE_THREAD.process()->callEnv(), arg1));
         return param_this;
     }
 
-    Pointer
-    qt_QRadioButton_QRadioButton_QRadioButton_QRadioButton_string_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_text,
-        Pointer param_parent)
+    Pointer qt_QRadioButton_QRadioButton_QRadioButton_QRadioButton_string_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                  Pointer param_text, Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QString arg1 = qstring(param_text);
         QWidget* arg2 = object<QWidget>(param_parent);
-        setobject(param_this, new MuQt_QRadioButton(
-                                  param_this, NODE_THREAD.process()->callEnv(),
-                                  arg1, arg2));
+        setobject(param_this, new MuQt_QRadioButton(param_this, NODE_THREAD.process()->callEnv(), arg1, arg2));
         return param_this;
     }
 
-    Pointer
-    qt_QRadioButton_minimumSizeHint_QSize_QRadioButton(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this)
+    Pointer qt_QRadioButton_minimumSizeHint_QSize_QRadioButton(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRadioButton* arg0 = object<QRadioButton>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QSizeType>(
-                         c, arg0->QRadioButton::minimumSizeHint(), "qt.QSize")
-                   : makeqtype<QSizeType>(c, arg0->minimumSizeHint(),
-                                          "qt.QSize");
+        return isMuQtObject(arg0) ? makeqtype<QSizeType>(c, arg0->QRadioButton::minimumSizeHint(), "qt.QSize")
+                                  : makeqtype<QSizeType>(c, arg0->minimumSizeHint(), "qt.QSize");
     }
 
-    Pointer qt_QRadioButton_sizeHint_QSize_QRadioButton(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this)
+    Pointer qt_QRadioButton_sizeHint_QSize_QRadioButton(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRadioButton* arg0 = object<QRadioButton>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QSizeType>(c, arg0->QRadioButton::sizeHint(),
-                                          "qt.QSize")
-                   : makeqtype<QSizeType>(c, arg0->sizeHint(), "qt.QSize");
+        return isMuQtObject(arg0) ? makeqtype<QSizeType>(c, arg0->QRadioButton::sizeHint(), "qt.QSize")
+                                  : makeqtype<QSizeType>(c, arg0->sizeHint(), "qt.QSize");
     }
 
-    bool qt_QRadioButton_event_bool_QRadioButton_QEvent(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this,
-                                                        Pointer param_e)
+    bool qt_QRadioButton_event_bool_QRadioButton_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRadioButton* arg0 = object<QRadioButton>(param_this);
         QEvent* arg1 = getqpointer<QEventType>(param_e);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QRadioButton*)arg0)->event_pub_parent(arg1)
-                   : ((MuQt_QRadioButton*)arg0)->event_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QRadioButton*)arg0)->event_pub_parent(arg1) : ((MuQt_QRadioButton*)arg0)->event_pub(arg1);
     }
 
-    bool qt_QRadioButton_hitButton_bool_QRadioButton_QPoint(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_pos)
+    bool qt_QRadioButton_hitButton_bool_QRadioButton_QPoint(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_pos)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRadioButton* arg0 = object<QRadioButton>(param_this);
         const QPoint arg1 = getqtype<QPointType>(param_pos);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QRadioButton*)arg0)->hitButton_pub_parent(arg1)
-                   : ((MuQt_QRadioButton*)arg0)->hitButton_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QRadioButton*)arg0)->hitButton_pub_parent(arg1)
+                                  : ((MuQt_QRadioButton*)arg0)->hitButton_pub(arg1);
     }
 
-    void qt_QRadioButton_mouseMoveEvent_void_QRadioButton_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QRadioButton_mouseMoveEvent_void_QRadioButton_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRadioButton* arg0 = object<QRadioButton>(param_this);
@@ -579,8 +540,7 @@ namespace Mu
             ((MuQt_QRadioButton*)arg0)->mouseMoveEvent_pub(arg1);
     }
 
-    void qt_QRadioButton_paintEvent_void_QRadioButton_QPaintEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param__p14)
+    void qt_QRadioButton_paintEvent_void_QRadioButton_QPaintEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param__p14)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRadioButton* arg0 = object<QRadioButton>(param_this);
@@ -591,9 +551,7 @@ namespace Mu
             ((MuQt_QRadioButton*)arg0)->paintEvent_pub(arg1);
     }
 
-    void
-    qt_QRadioButton_checkStateSet_void_QRadioButton(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this)
+    void qt_QRadioButton_checkStateSet_void_QRadioButton(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRadioButton* arg0 = object<QRadioButton>(param_this);
@@ -603,9 +561,7 @@ namespace Mu
             ((MuQt_QRadioButton*)arg0)->checkStateSet_pub();
     }
 
-    void
-    qt_QRadioButton_nextCheckState_void_QRadioButton(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_this)
+    void qt_QRadioButton_nextCheckState_void_QRadioButton(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRadioButton* arg0 = object<QRadioButton>(param_this);
@@ -615,8 +571,7 @@ namespace Mu
             ((MuQt_QRadioButton*)arg0)->nextCheckState_pub();
     }
 
-    void qt_QRadioButton_changeEvent_void_QRadioButton_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QRadioButton_changeEvent_void_QRadioButton_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRadioButton* arg0 = object<QRadioButton>(param_this);
@@ -627,8 +582,7 @@ namespace Mu
             ((MuQt_QRadioButton*)arg0)->changeEvent_pub(arg1);
     }
 
-    void qt_QRadioButton_focusInEvent_void_QRadioButton_QFocusEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QRadioButton_focusInEvent_void_QRadioButton_QFocusEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRadioButton* arg0 = object<QRadioButton>(param_this);
@@ -639,8 +593,7 @@ namespace Mu
             ((MuQt_QRadioButton*)arg0)->focusInEvent_pub(arg1);
     }
 
-    void qt_QRadioButton_focusOutEvent_void_QRadioButton_QFocusEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QRadioButton_focusOutEvent_void_QRadioButton_QFocusEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRadioButton* arg0 = object<QRadioButton>(param_this);
@@ -651,8 +604,7 @@ namespace Mu
             ((MuQt_QRadioButton*)arg0)->focusOutEvent_pub(arg1);
     }
 
-    void qt_QRadioButton_keyPressEvent_void_QRadioButton_QKeyEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QRadioButton_keyPressEvent_void_QRadioButton_QKeyEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRadioButton* arg0 = object<QRadioButton>(param_this);
@@ -663,8 +615,7 @@ namespace Mu
             ((MuQt_QRadioButton*)arg0)->keyPressEvent_pub(arg1);
     }
 
-    void qt_QRadioButton_keyReleaseEvent_void_QRadioButton_QKeyEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QRadioButton_keyReleaseEvent_void_QRadioButton_QKeyEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRadioButton* arg0 = object<QRadioButton>(param_this);
@@ -675,8 +626,7 @@ namespace Mu
             ((MuQt_QRadioButton*)arg0)->keyReleaseEvent_pub(arg1);
     }
 
-    void qt_QRadioButton_mousePressEvent_void_QRadioButton_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QRadioButton_mousePressEvent_void_QRadioButton_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRadioButton* arg0 = object<QRadioButton>(param_this);
@@ -687,8 +637,7 @@ namespace Mu
             ((MuQt_QRadioButton*)arg0)->mousePressEvent_pub(arg1);
     }
 
-    void qt_QRadioButton_mouseReleaseEvent_void_QRadioButton_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QRadioButton_mouseReleaseEvent_void_QRadioButton_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRadioButton* arg0 = object<QRadioButton>(param_this);
@@ -699,8 +648,7 @@ namespace Mu
             ((MuQt_QRadioButton*)arg0)->mouseReleaseEvent_pub(arg1);
     }
 
-    void qt_QRadioButton_timerEvent_void_QRadioButton_QTimerEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QRadioButton_timerEvent_void_QRadioButton_QTimerEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRadioButton* arg0 = object<QRadioButton>(param_this);
@@ -714,113 +662,93 @@ namespace Mu
     static NODE_IMPLEMENTATION(_n_QRadioButton0, Pointer)
     {
         NODE_RETURN(
-            qt_QRadioButton_QRadioButton_QRadioButton_QRadioButton_QWidget(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+            qt_QRadioButton_QRadioButton_QRadioButton_QRadioButton_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_QRadioButton1, Pointer)
     {
-        NODE_RETURN(
-            qt_QRadioButton_QRadioButton_QRadioButton_QRadioButton_string_QWidget(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QRadioButton_QRadioButton_QRadioButton_QRadioButton_string_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                          NODE_ARG(1, Pointer), NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_minimumSizeHint0, Pointer)
     {
-        NODE_RETURN(qt_QRadioButton_minimumSizeHint_QSize_QRadioButton(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QRadioButton_minimumSizeHint_QSize_QRadioButton(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_sizeHint0, Pointer)
     {
-        NODE_RETURN(qt_QRadioButton_sizeHint_QSize_QRadioButton(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QRadioButton_sizeHint_QSize_QRadioButton(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_event0, bool)
     {
-        NODE_RETURN(qt_QRadioButton_event_bool_QRadioButton_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QRadioButton_event_bool_QRadioButton_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_hitButton0, bool)
     {
-        NODE_RETURN(qt_QRadioButton_hitButton_bool_QRadioButton_QPoint(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QRadioButton_hitButton_bool_QRadioButton_QPoint(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseMoveEvent0, void)
     {
-        qt_QRadioButton_mouseMoveEvent_void_QRadioButton_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QRadioButton_mouseMoveEvent_void_QRadioButton_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_paintEvent0, void)
     {
-        qt_QRadioButton_paintEvent_void_QRadioButton_QPaintEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QRadioButton_paintEvent_void_QRadioButton_QPaintEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_checkStateSet0, void)
     {
-        qt_QRadioButton_checkStateSet_void_QRadioButton(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
+        qt_QRadioButton_checkStateSet_void_QRadioButton(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_nextCheckState0, void)
     {
-        qt_QRadioButton_nextCheckState_void_QRadioButton(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
+        qt_QRadioButton_nextCheckState_void_QRadioButton(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_changeEvent0, void)
     {
-        qt_QRadioButton_changeEvent_void_QRadioButton_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QRadioButton_changeEvent_void_QRadioButton_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_focusInEvent0, void)
     {
-        qt_QRadioButton_focusInEvent_void_QRadioButton_QFocusEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QRadioButton_focusInEvent_void_QRadioButton_QFocusEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_focusOutEvent0, void)
     {
-        qt_QRadioButton_focusOutEvent_void_QRadioButton_QFocusEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QRadioButton_focusOutEvent_void_QRadioButton_QFocusEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_keyPressEvent0, void)
     {
-        qt_QRadioButton_keyPressEvent_void_QRadioButton_QKeyEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QRadioButton_keyPressEvent_void_QRadioButton_QKeyEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_keyReleaseEvent0, void)
     {
-        qt_QRadioButton_keyReleaseEvent_void_QRadioButton_QKeyEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QRadioButton_keyReleaseEvent_void_QRadioButton_QKeyEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mousePressEvent0, void)
     {
-        qt_QRadioButton_mousePressEvent_void_QRadioButton_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QRadioButton_mousePressEvent_void_QRadioButton_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseReleaseEvent0, void)
     {
-        qt_QRadioButton_mouseReleaseEvent_void_QRadioButton_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QRadioButton_mouseReleaseEvent_void_QRadioButton_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_timerEvent0, void)
     {
-        qt_QRadioButton_timerEvent_void_QRadioButton_QTimerEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QRadioButton_timerEvent_void_QRadioButton_QTimerEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     void QRadioButtonType::load()
@@ -840,17 +768,13 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
-                   new Function(c, tn, castFromObject, Cast, Compiled,
-                                QRadioButton_QRadioButton_QObject, Return, ftn,
-                                Parameters,
+                   new Function(c, tn, castFromObject, Cast, Compiled, QRadioButton_QRadioButton_QObject, Return, ftn, Parameters,
                                 new Param(c, "object", "qt.QObject"), End),
 
                    EndArguments);
@@ -858,108 +782,61 @@ namespace Mu
         addSymbols(
             // enums
             // member functions
-            new Function(
-                c, "QRadioButton", _n_QRadioButton0, None, Compiled,
-                qt_QRadioButton_QRadioButton_QRadioButton_QRadioButton_QWidget,
-                Return, "qt.QRadioButton", Parameters,
-                new Param(c, "this", "qt.QRadioButton"),
-                new Param(c, "parent", "qt.QWidget"), End),
-            new Function(
-                c, "QRadioButton", _n_QRadioButton1, None, Compiled,
-                qt_QRadioButton_QRadioButton_QRadioButton_QRadioButton_string_QWidget,
-                Return, "qt.QRadioButton", Parameters,
-                new Param(c, "this", "qt.QRadioButton"),
-                new Param(c, "text", "string"),
-                new Param(c, "parent", "qt.QWidget"), End),
-            _func[0] = new MemberFunction(
-                c, "minimumSizeHint", _n_minimumSizeHint0, None, Compiled,
-                qt_QRadioButton_minimumSizeHint_QSize_QRadioButton, Return,
-                "qt.QSize", Parameters, new Param(c, "this", "qt.QRadioButton"),
-                End),
-            _func[1] = new MemberFunction(
-                c, "sizeHint", _n_sizeHint0, None, Compiled,
-                qt_QRadioButton_sizeHint_QSize_QRadioButton, Return, "qt.QSize",
-                Parameters, new Param(c, "this", "qt.QRadioButton"), End),
+            new Function(c, "QRadioButton", _n_QRadioButton0, None, Compiled,
+                         qt_QRadioButton_QRadioButton_QRadioButton_QRadioButton_QWidget, Return, "qt.QRadioButton", Parameters,
+                         new Param(c, "this", "qt.QRadioButton"), new Param(c, "parent", "qt.QWidget"), End),
+            new Function(c, "QRadioButton", _n_QRadioButton1, None, Compiled,
+                         qt_QRadioButton_QRadioButton_QRadioButton_QRadioButton_string_QWidget, Return, "qt.QRadioButton", Parameters,
+                         new Param(c, "this", "qt.QRadioButton"), new Param(c, "text", "string"), new Param(c, "parent", "qt.QWidget"),
+                         End),
+            _func[0] = new MemberFunction(c, "minimumSizeHint", _n_minimumSizeHint0, None, Compiled,
+                                          qt_QRadioButton_minimumSizeHint_QSize_QRadioButton, Return, "qt.QSize", Parameters,
+                                          new Param(c, "this", "qt.QRadioButton"), End),
+            _func[1] = new MemberFunction(c, "sizeHint", _n_sizeHint0, None, Compiled, qt_QRadioButton_sizeHint_QSize_QRadioButton, Return,
+                                          "qt.QSize", Parameters, new Param(c, "this", "qt.QRadioButton"), End),
             // MISSING: initStyleOption (void; QRadioButton this,
             // "QStyleOptionButton *" option) // protected
-            _func[2] = new MemberFunction(
-                c, "event", _n_event0, None, Compiled,
-                qt_QRadioButton_event_bool_QRadioButton_QEvent, Return, "bool",
-                Parameters, new Param(c, "this", "qt.QRadioButton"),
-                new Param(c, "e", "qt.QEvent"), End),
-            _func[3] = new MemberFunction(
-                c, "hitButton", _n_hitButton0, None, Compiled,
-                qt_QRadioButton_hitButton_bool_QRadioButton_QPoint, Return,
-                "bool", Parameters, new Param(c, "this", "qt.QRadioButton"),
-                new Param(c, "pos", "qt.QPoint"), End),
-            _func[4] = new MemberFunction(
-                c, "mouseMoveEvent", _n_mouseMoveEvent0, None, Compiled,
-                qt_QRadioButton_mouseMoveEvent_void_QRadioButton_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QRadioButton"),
-                new Param(c, "e", "qt.QMouseEvent"), End),
-            _func[5] = new MemberFunction(
-                c, "paintEvent", _n_paintEvent0, None, Compiled,
-                qt_QRadioButton_paintEvent_void_QRadioButton_QPaintEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QRadioButton"),
-                new Param(c, "_p14", "qt.QPaintEvent"), End),
-            _func[6] = new MemberFunction(
-                c, "checkStateSet", _n_checkStateSet0, None, Compiled,
-                qt_QRadioButton_checkStateSet_void_QRadioButton, Return, "void",
-                Parameters, new Param(c, "this", "qt.QRadioButton"), End),
-            _func[7] = new MemberFunction(
-                c, "nextCheckState", _n_nextCheckState0, None, Compiled,
-                qt_QRadioButton_nextCheckState_void_QRadioButton, Return,
-                "void", Parameters, new Param(c, "this", "qt.QRadioButton"),
-                End),
-            _func[8] = new MemberFunction(
-                c, "changeEvent", _n_changeEvent0, None, Compiled,
-                qt_QRadioButton_changeEvent_void_QRadioButton_QEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QRadioButton"),
-                new Param(c, "e", "qt.QEvent"), End),
-            _func[9] = new MemberFunction(
-                c, "focusInEvent", _n_focusInEvent0, None, Compiled,
-                qt_QRadioButton_focusInEvent_void_QRadioButton_QFocusEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QRadioButton"),
-                new Param(c, "e", "qt.QFocusEvent"), End),
-            _func[10] = new MemberFunction(
-                c, "focusOutEvent", _n_focusOutEvent0, None, Compiled,
-                qt_QRadioButton_focusOutEvent_void_QRadioButton_QFocusEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QRadioButton"),
-                new Param(c, "e", "qt.QFocusEvent"), End),
-            _func[11] = new MemberFunction(
-                c, "keyPressEvent", _n_keyPressEvent0, None, Compiled,
-                qt_QRadioButton_keyPressEvent_void_QRadioButton_QKeyEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QRadioButton"),
-                new Param(c, "e", "qt.QKeyEvent"), End),
-            _func[12] = new MemberFunction(
-                c, "keyReleaseEvent", _n_keyReleaseEvent0, None, Compiled,
-                qt_QRadioButton_keyReleaseEvent_void_QRadioButton_QKeyEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QRadioButton"),
-                new Param(c, "e", "qt.QKeyEvent"), End),
-            _func[13] = new MemberFunction(
-                c, "mousePressEvent", _n_mousePressEvent0, None, Compiled,
-                qt_QRadioButton_mousePressEvent_void_QRadioButton_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QRadioButton"),
-                new Param(c, "e", "qt.QMouseEvent"), End),
-            _func[14] = new MemberFunction(
-                c, "mouseReleaseEvent", _n_mouseReleaseEvent0, None, Compiled,
-                qt_QRadioButton_mouseReleaseEvent_void_QRadioButton_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QRadioButton"),
-                new Param(c, "e", "qt.QMouseEvent"), End),
-            _func[15] = new MemberFunction(
-                c, "timerEvent", _n_timerEvent0, None, Compiled,
-                qt_QRadioButton_timerEvent_void_QRadioButton_QTimerEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QRadioButton"),
-                new Param(c, "e", "qt.QTimerEvent"), End),
+            _func[2] = new MemberFunction(c, "event", _n_event0, None, Compiled, qt_QRadioButton_event_bool_QRadioButton_QEvent, Return,
+                                          "bool", Parameters, new Param(c, "this", "qt.QRadioButton"), new Param(c, "e", "qt.QEvent"), End),
+            _func[3] = new MemberFunction(c, "hitButton", _n_hitButton0, None, Compiled, qt_QRadioButton_hitButton_bool_QRadioButton_QPoint,
+                                          Return, "bool", Parameters, new Param(c, "this", "qt.QRadioButton"),
+                                          new Param(c, "pos", "qt.QPoint"), End),
+            _func[4] = new MemberFunction(c, "mouseMoveEvent", _n_mouseMoveEvent0, None, Compiled,
+                                          qt_QRadioButton_mouseMoveEvent_void_QRadioButton_QMouseEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QRadioButton"), new Param(c, "e", "qt.QMouseEvent"), End),
+            _func[5] = new MemberFunction(c, "paintEvent", _n_paintEvent0, None, Compiled,
+                                          qt_QRadioButton_paintEvent_void_QRadioButton_QPaintEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QRadioButton"), new Param(c, "_p14", "qt.QPaintEvent"), End),
+            _func[6] =
+                new MemberFunction(c, "checkStateSet", _n_checkStateSet0, None, Compiled, qt_QRadioButton_checkStateSet_void_QRadioButton,
+                                   Return, "void", Parameters, new Param(c, "this", "qt.QRadioButton"), End),
+            _func[7] = new MemberFunction(c, "nextCheckState", _n_nextCheckState0, None, Compiled,
+                                          qt_QRadioButton_nextCheckState_void_QRadioButton, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QRadioButton"), End),
+            _func[8] = new MemberFunction(c, "changeEvent", _n_changeEvent0, None, Compiled,
+                                          qt_QRadioButton_changeEvent_void_QRadioButton_QEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QRadioButton"), new Param(c, "e", "qt.QEvent"), End),
+            _func[9] = new MemberFunction(c, "focusInEvent", _n_focusInEvent0, None, Compiled,
+                                          qt_QRadioButton_focusInEvent_void_QRadioButton_QFocusEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QRadioButton"), new Param(c, "e", "qt.QFocusEvent"), End),
+            _func[10] = new MemberFunction(c, "focusOutEvent", _n_focusOutEvent0, None, Compiled,
+                                           qt_QRadioButton_focusOutEvent_void_QRadioButton_QFocusEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QRadioButton"), new Param(c, "e", "qt.QFocusEvent"), End),
+            _func[11] = new MemberFunction(c, "keyPressEvent", _n_keyPressEvent0, None, Compiled,
+                                           qt_QRadioButton_keyPressEvent_void_QRadioButton_QKeyEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QRadioButton"), new Param(c, "e", "qt.QKeyEvent"), End),
+            _func[12] = new MemberFunction(c, "keyReleaseEvent", _n_keyReleaseEvent0, None, Compiled,
+                                           qt_QRadioButton_keyReleaseEvent_void_QRadioButton_QKeyEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QRadioButton"), new Param(c, "e", "qt.QKeyEvent"), End),
+            _func[13] = new MemberFunction(c, "mousePressEvent", _n_mousePressEvent0, None, Compiled,
+                                           qt_QRadioButton_mousePressEvent_void_QRadioButton_QMouseEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QRadioButton"), new Param(c, "e", "qt.QMouseEvent"), End),
+            _func[14] = new MemberFunction(c, "mouseReleaseEvent", _n_mouseReleaseEvent0, None, Compiled,
+                                           qt_QRadioButton_mouseReleaseEvent_void_QRadioButton_QMouseEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QRadioButton"), new Param(c, "e", "qt.QMouseEvent"), End),
+            _func[15] = new MemberFunction(c, "timerEvent", _n_timerEvent0, None, Compiled,
+                                           qt_QRadioButton_timerEvent_void_QRadioButton_QTimerEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QRadioButton"), new Param(c, "e", "qt.QTimerEvent"), End),
             // static functions
             EndArguments);
         globalScope()->addSymbols(EndArguments);

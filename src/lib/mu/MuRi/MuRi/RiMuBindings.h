@@ -72,12 +72,10 @@ namespace RiMu
         static void RiProceduralFinished(RtPointer data);
         static RtBasis& basisFromStr(std::string name);
 
-        static bool parseTokens(const Mu::Node& node_, Mu::Thread& thread_,
-                                RtToken* tokens, RtPointer* pointers,
-                                int& numTokens, int& numP, int startAtArg = 0);
+        static bool parseTokens(const Mu::Node& node_, Mu::Thread& thread_, RtToken* tokens, RtPointer* pointers, int& numTokens, int& numP,
+                                int startAtArg = 0);
 
-        static void freeTokens(RtToken* tokens, int numTokens,
-                               int startAtArg = 0);
+        static void freeTokens(RtToken* tokens, int numTokens, int startAtArg = 0);
 
         static LightHandles m_lightHandles;
     };

@@ -14,8 +14,7 @@ namespace Gto
 {
     using namespace std;
 
-    Property::Property(const std::string& n, const std::string& i,
-                       Gto::DataType t, size_t s, size_t w, bool allocate)
+    Property::Property(const std::string& n, const std::string& i, Gto::DataType t, size_t s, size_t w, bool allocate)
         : name(n)
         , fullName(n)
         , interp(i)
@@ -37,8 +36,7 @@ namespace Gto
         }
     }
 
-    Property::Property(const std::string& n, Gto::DataType t, size_t s,
-                       size_t w, bool allocate)
+    Property::Property(const std::string& n, Gto::DataType t, size_t s, size_t w, bool allocate)
         : name(n)
         , fullName(n)
         , interp("")
@@ -60,9 +58,8 @@ namespace Gto
         }
     }
 
-    Property::Property(const std::string& n, const std::string& fn,
-                       const std::string& i, Gto::DataType t, size_t s,
-                       const Dimensions& d, bool allocate)
+    Property::Property(const std::string& n, const std::string& fn, const std::string& i, Gto::DataType t, size_t s, const Dimensions& d,
+                       bool allocate)
         : name(n)
         , fullName(fn)
         , interp(i)
@@ -84,9 +81,7 @@ namespace Gto
         }
     }
 
-    Property::Property(const std::string& n, const std::string& fn,
-                       Gto::DataType t, size_t s, const Dimensions& d,
-                       bool allocate)
+    Property::Property(const std::string& n, const std::string& fn, Gto::DataType t, size_t s, const Dimensions& d, bool allocate)
         : name(n)
         , fullName(fn)
         , interp("")
@@ -186,9 +181,7 @@ namespace Gto
         }
     }
 
-    Reader::Request RawDataBaseReader::object(const string& name,
-                                              const string& protocol,
-                                              unsigned int protocolVersion,
+    Reader::Request RawDataBaseReader::object(const string& name, const string& protocol, unsigned int protocolVersion,
                                               const ObjectInfo& info)
     {
         Object* o = new Object(name, protocol, protocolVersion);
@@ -196,15 +189,12 @@ namespace Gto
         return Request(true, o);
     }
 
-    Reader::Request RawDataBaseReader::component(const string& name,
-                                                 const string& interp,
-                                                 const ComponentInfo& info)
+    Reader::Request RawDataBaseReader::component(const string& name, const string& interp, const ComponentInfo& info)
     {
         Object* o = reinterpret_cast<Object*>(info.object->objectData);
         Component* c = new Component(name, interp, info.flags);
 
-        while (info.childLevel < m_componentStack.size()
-               && !m_componentStack.empty())
+        while (info.childLevel < m_componentStack.size() && !m_componentStack.empty())
         {
             while (m_componentStack.size() > info.childLevel)
                 m_componentStack.pop_back();
@@ -230,17 +220,13 @@ namespace Gto
         return Request(true, c);
     }
 
-    Reader::Request RawDataBaseReader::property(const string& name,
-                                                const string& interp,
-                                                const PropertyInfo& info)
+    Reader::Request RawDataBaseReader::property(const string& name, const string& interp, const PropertyInfo& info)
     {
         // Object *o    =
         // reinterpret_cast<Object*>(info.component->object->objectData);
-        Component* c =
-            reinterpret_cast<Component*>(info.component->componentData);
+        Component* c = reinterpret_cast<Component*>(info.component->componentData);
 
-        Property* p = new Property(name, info.fullName, interp,
-                                   (DataType)info.type, info.size, info.dims);
+        Property* p = new Property(name, info.fullName, interp, (DataType)info.type, info.size, info.dims);
 
         c->properties.push_back(p);
         return Request(true, p);
@@ -291,10 +277,8 @@ namespace Gto
                 }
                 else
                 {
-                    cout << "ERROR: string index out of range in " << p->name
-                         << " property: " << index
-                         << " is larger than string table size of "
-                         << stringTable().size() << endl;
+                    cout << "ERROR: string index out of range in " << p->name << " property: " << index
+                         << " is larger than string table size of " << stringTable().size() << endl;
                 }
             }
 
@@ -308,9 +292,7 @@ namespace Gto
     {
         if (header)
         {
-            m_writer.property(property->name.c_str(), property->type,
-                              property->size, property->dims,
-                              property->interp.c_str());
+            m_writer.property(property->name.c_str(), property->type, property->size, property->dims, property->interp.c_str());
 
             if (property->type == Gto::String)
             {
@@ -357,8 +339,7 @@ namespace Gto
 
                     if (stringId == uint32(-1))
                     {
-                        cerr << "WARNING: writer detected bogus string id in "
-                             << property->name << ", value is \""
+                        cerr << "WARNING: writer detected bogus string id in " << property->name << ", value is \""
                              << property->stringData[i] << "\"" << endl;
 
                         stringId = 0;
@@ -374,15 +355,13 @@ namespace Gto
         }
     }
 
-    void RawDataBaseWriter::writeComponent(bool header,
-                                           const Component* component)
+    void RawDataBaseWriter::writeComponent(bool header, const Component* component)
     {
         const Properties& props = component->properties;
         const Gto::Components& comps = component->components;
 
         if (header)
-            m_writer.beginComponent(component->name.c_str(),
-                                    component->interp.c_str());
+            m_writer.beginComponent(component->name.c_str(), component->interp.c_str());
 
         for (size_t i = 0; i < props.size(); i++)
         {
@@ -404,8 +383,7 @@ namespace Gto
             m_writer.endComponent();
     }
 
-    bool RawDataBaseWriter::write(const char* filename, const RawDataBase& db,
-                                  Writer::FileType type)
+    bool RawDataBaseWriter::write(const char* filename, const RawDataBase& db, Writer::FileType type)
     {
         if (!m_writer.open(filename, type))
         {
@@ -423,8 +401,7 @@ namespace Gto
             {
                 const Object& o = *db.objects[i];
 
-                m_writer.beginObject(o.name.c_str(), o.protocol.c_str(),
-                                     o.protocolVersion);
+                m_writer.beginObject(o.name.c_str(), o.protocol.c_str(), o.protocolVersion);
 
                 const Components& components = o.components;
 

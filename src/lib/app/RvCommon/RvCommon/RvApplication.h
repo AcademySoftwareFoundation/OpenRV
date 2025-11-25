@@ -73,8 +73,7 @@ namespace Rv
 
         void createNewSessionFromFiles(const StringVector&) override;
         DispatchID dispatchToMainThread(DispatchCallback callback) override;
-        void undispatchToMainThread(DispatchID dispatchID,
-                                    double maxDuration) override;
+        void undispatchToMainThread(DispatchID dispatchID, double maxDuration) override;
         bool isDispatchExecuting(DispatchID dispatchID);
 
         RvDocument* newSessionFromFiles(const StringVector&);
@@ -100,10 +99,7 @@ namespace Rv
         RvPreferences* prefDialog();
         RvProfileManager* profileManager();
 
-        bool networkDialogRunning() const
-        {
-            return m_networkDialog ? true : false;
-        }
+        bool networkDialogRunning() const { return m_networkDialog ? true : false; }
 
         void processNetworkOpts(bool startup = true);
 
@@ -112,34 +108,25 @@ namespace Rv
 
         static void parseURL(const char* s, std::vector<char*>& av);
         static void sessionFromUrl(std::string url);
-        static void putUrlOnClipboard(std::string url, std::string title,
-                                      bool doEncode = true);
+        static void putUrlOnClipboard(std::string url, std::string title, bool doEncode = true);
         static std::string encodeCommandLineURL(int argc, char* argv[]);
         static std::string bakeCommandLineURL(int argc, char* argv[]);
         static void initializeQSettings(std::string altPath);
 
-        void setExecutableNameCaps(std::string nm)
-        {
-            m_executableNameCaps = nm;
-        }
+        void setExecutableNameCaps(std::string nm) { m_executableNameCaps = nm; }
 
         static std::string queryDriverAttribute(const std::string& var);
-        static void setDriverAttribute(const std::string& var,
-                                       const std::string& val);
+        static void setDriverAttribute(const std::string& var, const std::string& val);
 
         void openVideoModule(VideoModule*) const;
         int findVideoModuleIndexByName(const std::string&) const;
-        TwkApp::VideoDevice*
-        findPresentationDevice(const std::string& dpath) const;
+        TwkApp::VideoDevice* findPresentationDevice(const std::string& dpath) const;
         std::string setVideoDeviceStateFromSettings(TwkApp::VideoDevice*) const;
 
         void setPresentationMode(bool);
         bool isInPresentationMode();
 
-        DesktopVideoModule* desktopVideoModule() const
-        {
-            return m_desktopModule;
-        }
+        DesktopVideoModule* desktopVideoModule() const { return m_desktopModule; }
 
         static int parseInFiles(int argc, char* argv[]);
         virtual VideoModule* primaryVideoModule() const override;
@@ -186,10 +173,7 @@ namespace Rv
         std::atomic<int> m_dispatchAtomicInt;
     };
 
-    inline RvApplication* RvApp()
-    {
-        return static_cast<RvApplication*>(IPCore::App());
-    }
+    inline RvApplication* RvApp() { return static_cast<RvApplication*>(IPCore::App()); }
 
 } // namespace Rv
 

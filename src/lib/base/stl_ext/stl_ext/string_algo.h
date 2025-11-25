@@ -18,17 +18,13 @@ namespace stl_ext
     //  the tokens in it. Lifted from some linux help site.
     //
 
-    STL_EXT_EXPORT void tokenize(std::vector<std::string>& tokens,
-                                 const std::string& str,
-                                 const std::string& delimiters = " ");
+    STL_EXT_EXPORT void tokenize(std::vector<std::string>& tokens, const std::string& str, const std::string& delimiters = " ");
 
     //
     //  Wrap the text to some column width, break at char
     //
 
-    STL_EXT_EXPORT std::string wrap(const std::string& text,
-                                    char wrapChar = ' ',
-                                    const std::string& breakString = "\n",
+    STL_EXT_EXPORT std::string wrap(const std::string& text, char wrapChar = ' ', const std::string& breakString = "\n",
                                     std::string::size_type column = 65);
 
     // Returns the directory part of the path

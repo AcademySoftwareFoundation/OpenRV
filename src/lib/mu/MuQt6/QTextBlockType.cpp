@@ -55,53 +55,44 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(__allocate, Pointer)
     {
-        QTextBlockType::Instance* i =
-            new QTextBlockType::Instance((Class*)NODE_THIS.type());
+        QTextBlockType::Instance* i = new QTextBlockType::Instance((Class*)NODE_THIS.type());
         QTextBlockType::registerFinalizer(i);
         NODE_RETURN(i);
     }
 
-    void QTextBlockType::registerFinalizer(void* o)
-    {
-        GC_register_finalizer(o, QTextBlockType::finalizer, 0, 0, 0);
-    }
+    void QTextBlockType::registerFinalizer(void* o) { GC_register_finalizer(o, QTextBlockType::finalizer, 0, 0, 0); }
 
     void QTextBlockType::finalizer(void* obj, void* data)
     {
-        QTextBlockType::Instance* i =
-            reinterpret_cast<QTextBlockType::Instance*>(obj);
+        QTextBlockType::Instance* i = reinterpret_cast<QTextBlockType::Instance*>(obj);
         delete i;
     }
 
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    int qt_QTextBlock_blockFormatIndex_int_QTextBlock(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    int qt_QTextBlock_blockFormatIndex_int_QTextBlock(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextBlock arg0 = getqtype<QTextBlockType>(param_this);
         return arg0.blockFormatIndex();
     }
 
-    int qt_QTextBlock_blockNumber_int_QTextBlock(Mu::Thread& NODE_THREAD,
-                                                 Pointer param_this)
+    int qt_QTextBlock_blockNumber_int_QTextBlock(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextBlock arg0 = getqtype<QTextBlockType>(param_this);
         return arg0.blockNumber();
     }
 
-    int qt_QTextBlock_charFormatIndex_int_QTextBlock(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_this)
+    int qt_QTextBlock_charFormatIndex_int_QTextBlock(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextBlock arg0 = getqtype<QTextBlockType>(param_this);
         return arg0.charFormatIndex();
     }
 
-    void qt_QTextBlock_clearLayout_void_QTextBlock(Mu::Thread& NODE_THREAD,
-                                                   Pointer param_this)
+    void qt_QTextBlock_clearLayout_void_QTextBlock(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextBlock arg0 = getqtype<QTextBlockType>(param_this);
@@ -109,9 +100,7 @@ namespace Mu
         setqtype<QTextBlockType>(param_this, arg0);
     }
 
-    bool qt_QTextBlock_contains_bool_QTextBlock_int(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this,
-                                                    int param_position)
+    bool qt_QTextBlock_contains_bool_QTextBlock_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_position)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextBlock arg0 = getqtype<QTextBlockType>(param_this);
@@ -119,92 +108,77 @@ namespace Mu
         return arg0.contains(arg1);
     }
 
-    Pointer
-    qt_QTextBlock_document_QTextDocument_QTextBlock(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this)
+    Pointer qt_QTextBlock_document_QTextDocument_QTextBlock(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextBlock arg0 = getqtype<QTextBlockType>(param_this);
-        return makeinstance<QTextDocumentType>(c, arg0.document(),
-                                               "qt.QTextDocument");
+        return makeinstance<QTextDocumentType>(c, arg0.document(), "qt.QTextDocument");
     }
 
-    int qt_QTextBlock_firstLineNumber_int_QTextBlock(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_this)
+    int qt_QTextBlock_firstLineNumber_int_QTextBlock(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextBlock arg0 = getqtype<QTextBlockType>(param_this);
         return arg0.firstLineNumber();
     }
 
-    bool qt_QTextBlock_isValid_bool_QTextBlock(Mu::Thread& NODE_THREAD,
-                                               Pointer param_this)
+    bool qt_QTextBlock_isValid_bool_QTextBlock(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextBlock arg0 = getqtype<QTextBlockType>(param_this);
         return arg0.isValid();
     }
 
-    bool qt_QTextBlock_isVisible_bool_QTextBlock(Mu::Thread& NODE_THREAD,
-                                                 Pointer param_this)
+    bool qt_QTextBlock_isVisible_bool_QTextBlock(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextBlock arg0 = getqtype<QTextBlockType>(param_this);
         return arg0.isVisible();
     }
 
-    int qt_QTextBlock_length_int_QTextBlock(Mu::Thread& NODE_THREAD,
-                                            Pointer param_this)
+    int qt_QTextBlock_length_int_QTextBlock(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextBlock arg0 = getqtype<QTextBlockType>(param_this);
         return arg0.length();
     }
 
-    int qt_QTextBlock_lineCount_int_QTextBlock(Mu::Thread& NODE_THREAD,
-                                               Pointer param_this)
+    int qt_QTextBlock_lineCount_int_QTextBlock(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextBlock arg0 = getqtype<QTextBlockType>(param_this);
         return arg0.lineCount();
     }
 
-    Pointer qt_QTextBlock_next_QTextBlock_QTextBlock(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_this)
+    Pointer qt_QTextBlock_next_QTextBlock_QTextBlock(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextBlock arg0 = getqtype<QTextBlockType>(param_this);
         return makeqtype<QTextBlockType>(c, arg0.next(), "qt.QTextBlock");
     }
 
-    int qt_QTextBlock_position_int_QTextBlock(Mu::Thread& NODE_THREAD,
-                                              Pointer param_this)
+    int qt_QTextBlock_position_int_QTextBlock(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextBlock arg0 = getqtype<QTextBlockType>(param_this);
         return arg0.position();
     }
 
-    Pointer
-    qt_QTextBlock_previous_QTextBlock_QTextBlock(Mu::Thread& NODE_THREAD,
-                                                 Pointer param_this)
+    Pointer qt_QTextBlock_previous_QTextBlock_QTextBlock(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextBlock arg0 = getqtype<QTextBlockType>(param_this);
         return makeqtype<QTextBlockType>(c, arg0.previous(), "qt.QTextBlock");
     }
 
-    int qt_QTextBlock_revision_int_QTextBlock(Mu::Thread& NODE_THREAD,
-                                              Pointer param_this)
+    int qt_QTextBlock_revision_int_QTextBlock(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextBlock arg0 = getqtype<QTextBlockType>(param_this);
         return arg0.revision();
     }
 
-    void qt_QTextBlock_setLineCount_void_QTextBlock_int(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this,
-                                                        int param_count)
+    void qt_QTextBlock_setLineCount_void_QTextBlock_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_count)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextBlock arg0 = getqtype<QTextBlockType>(param_this);
@@ -213,9 +187,7 @@ namespace Mu
         setqtype<QTextBlockType>(param_this, arg0);
     }
 
-    void qt_QTextBlock_setRevision_void_QTextBlock_int(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this,
-                                                       int param_rev)
+    void qt_QTextBlock_setRevision_void_QTextBlock_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_rev)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextBlock arg0 = getqtype<QTextBlockType>(param_this);
@@ -224,9 +196,7 @@ namespace Mu
         setqtype<QTextBlockType>(param_this, arg0);
     }
 
-    void qt_QTextBlock_setUserState_void_QTextBlock_int(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this,
-                                                        int param_state)
+    void qt_QTextBlock_setUserState_void_QTextBlock_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_state)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextBlock arg0 = getqtype<QTextBlockType>(param_this);
@@ -235,9 +205,7 @@ namespace Mu
         setqtype<QTextBlockType>(param_this, arg0);
     }
 
-    void qt_QTextBlock_setVisible_void_QTextBlock_bool(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this,
-                                                       bool param_visible)
+    void qt_QTextBlock_setVisible_void_QTextBlock_bool(Mu::Thread& NODE_THREAD, Pointer param_this, bool param_visible)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextBlock arg0 = getqtype<QTextBlockType>(param_this);
@@ -246,32 +214,28 @@ namespace Mu
         setqtype<QTextBlockType>(param_this, arg0);
     }
 
-    Pointer qt_QTextBlock_text_string_QTextBlock(Mu::Thread& NODE_THREAD,
-                                                 Pointer param_this)
+    Pointer qt_QTextBlock_text_string_QTextBlock(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextBlock arg0 = getqtype<QTextBlockType>(param_this);
         return makestring(c, arg0.text());
     }
 
-    int qt_QTextBlock_textDirection_int_QTextBlock(Mu::Thread& NODE_THREAD,
-                                                   Pointer param_this)
+    int qt_QTextBlock_textDirection_int_QTextBlock(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextBlock arg0 = getqtype<QTextBlockType>(param_this);
         return int(arg0.textDirection());
     }
 
-    int qt_QTextBlock_userState_int_QTextBlock(Mu::Thread& NODE_THREAD,
-                                               Pointer param_this)
+    int qt_QTextBlock_userState_int_QTextBlock(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextBlock arg0 = getqtype<QTextBlockType>(param_this);
         return arg0.userState();
     }
 
-    bool qt_QTextBlock_operatorBang_EQ__bool_QTextBlock_QTextBlock(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_other)
+    bool qt_QTextBlock_operatorBang_EQ__bool_QTextBlock_QTextBlock(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_other)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextBlock arg0 = getqtype<QTextBlockType>(param_this);
@@ -279,8 +243,7 @@ namespace Mu
         return arg0.operator!=(arg1);
     }
 
-    bool qt_QTextBlock_operatorLT__bool_QTextBlock_QTextBlock(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_other)
+    bool qt_QTextBlock_operatorLT__bool_QTextBlock_QTextBlock(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_other)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextBlock arg0 = getqtype<QTextBlockType>(param_this);
@@ -288,8 +251,7 @@ namespace Mu
         return arg0.operator<(arg1);
     }
 
-    bool qt_QTextBlock_operatorEQ_EQ__bool_QTextBlock_QTextBlock(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_other)
+    bool qt_QTextBlock_operatorEQ_EQ__bool_QTextBlock_QTextBlock(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_other)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextBlock arg0 = getqtype<QTextBlockType>(param_this);
@@ -299,152 +261,129 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(_n_blockFormatIndex0, int)
     {
-        NODE_RETURN(qt_QTextBlock_blockFormatIndex_int_QTextBlock(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTextBlock_blockFormatIndex_int_QTextBlock(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_blockNumber0, int)
     {
-        NODE_RETURN(qt_QTextBlock_blockNumber_int_QTextBlock(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTextBlock_blockNumber_int_QTextBlock(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_charFormatIndex0, int)
     {
-        NODE_RETURN(qt_QTextBlock_charFormatIndex_int_QTextBlock(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTextBlock_charFormatIndex_int_QTextBlock(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_clearLayout0, void)
     {
-        qt_QTextBlock_clearLayout_void_QTextBlock(NODE_THREAD,
-                                                  NONNIL_NODE_ARG(0, Pointer));
+        qt_QTextBlock_clearLayout_void_QTextBlock(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_contains0, bool)
     {
-        NODE_RETURN(qt_QTextBlock_contains_bool_QTextBlock_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QTextBlock_contains_bool_QTextBlock_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_document0, Pointer)
     {
-        NODE_RETURN(qt_QTextBlock_document_QTextDocument_QTextBlock(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTextBlock_document_QTextDocument_QTextBlock(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_firstLineNumber0, int)
     {
-        NODE_RETURN(qt_QTextBlock_firstLineNumber_int_QTextBlock(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTextBlock_firstLineNumber_int_QTextBlock(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isValid0, bool)
     {
-        NODE_RETURN(qt_QTextBlock_isValid_bool_QTextBlock(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTextBlock_isValid_bool_QTextBlock(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isVisible0, bool)
     {
-        NODE_RETURN(qt_QTextBlock_isVisible_bool_QTextBlock(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTextBlock_isVisible_bool_QTextBlock(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_length0, int)
     {
-        NODE_RETURN(qt_QTextBlock_length_int_QTextBlock(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTextBlock_length_int_QTextBlock(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_lineCount0, int)
     {
-        NODE_RETURN(qt_QTextBlock_lineCount_int_QTextBlock(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTextBlock_lineCount_int_QTextBlock(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_next0, Pointer)
     {
-        NODE_RETURN(qt_QTextBlock_next_QTextBlock_QTextBlock(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTextBlock_next_QTextBlock_QTextBlock(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_position0, int)
     {
-        NODE_RETURN(qt_QTextBlock_position_int_QTextBlock(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTextBlock_position_int_QTextBlock(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_previous0, Pointer)
     {
-        NODE_RETURN(qt_QTextBlock_previous_QTextBlock_QTextBlock(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTextBlock_previous_QTextBlock_QTextBlock(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_revision0, int)
     {
-        NODE_RETURN(qt_QTextBlock_revision_int_QTextBlock(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTextBlock_revision_int_QTextBlock(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_setLineCount0, void)
     {
-        qt_QTextBlock_setLineCount_void_QTextBlock_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QTextBlock_setLineCount_void_QTextBlock_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setRevision0, void)
     {
-        qt_QTextBlock_setRevision_void_QTextBlock_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QTextBlock_setRevision_void_QTextBlock_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setUserState0, void)
     {
-        qt_QTextBlock_setUserState_void_QTextBlock_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QTextBlock_setUserState_void_QTextBlock_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setVisible0, void)
     {
-        qt_QTextBlock_setVisible_void_QTextBlock_bool(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool));
+        qt_QTextBlock_setVisible_void_QTextBlock_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool));
     }
 
     static NODE_IMPLEMENTATION(_n_text0, Pointer)
     {
-        NODE_RETURN(qt_QTextBlock_text_string_QTextBlock(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTextBlock_text_string_QTextBlock(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_textDirection0, int)
     {
-        NODE_RETURN(qt_QTextBlock_textDirection_int_QTextBlock(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTextBlock_textDirection_int_QTextBlock(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_userState0, int)
     {
-        NODE_RETURN(qt_QTextBlock_userState_int_QTextBlock(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTextBlock_userState_int_QTextBlock(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorBang_EQ_0, bool)
     {
-        NODE_RETURN(qt_QTextBlock_operatorBang_EQ__bool_QTextBlock_QTextBlock(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(
+            qt_QTextBlock_operatorBang_EQ__bool_QTextBlock_QTextBlock(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorLT_0, bool)
     {
-        NODE_RETURN(qt_QTextBlock_operatorLT__bool_QTextBlock_QTextBlock(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QTextBlock_operatorLT__bool_QTextBlock_QTextBlock(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorEQ_EQ_0, bool)
     {
-        NODE_RETURN(qt_QTextBlock_operatorEQ_EQ__bool_QTextBlock_QTextBlock(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(
+            qt_QTextBlock_operatorEQ_EQ__bool_QTextBlock_QTextBlock(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     void QTextBlockType::load()
@@ -464,15 +403,13 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(
-            new Function(c, "__allocate", __allocate, None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", __allocate, None, Return, ftn, End),
 
-            EndArguments);
+                   EndArguments);
 
         addSymbols(EndArguments);
 
@@ -482,126 +419,67 @@ namespace Mu
             // MISSING: QTextBlock (QTextBlock; QTextBlock this, QTextBlock
             // other) MISSING: begin ("QTextBlock::iterator"; QTextBlock this)
             // MISSING: blockFormat ("QTextBlockFormat"; QTextBlock this)
-            new Function(
-                c, "blockFormatIndex", _n_blockFormatIndex0, None, Compiled,
-                qt_QTextBlock_blockFormatIndex_int_QTextBlock, Return, "int",
-                Parameters, new Param(c, "this", "qt.QTextBlock"), End),
-            new Function(c, "blockNumber", _n_blockNumber0, None, Compiled,
-                         qt_QTextBlock_blockNumber_int_QTextBlock, Return,
-                         "int", Parameters,
-                         new Param(c, "this", "qt.QTextBlock"), End),
+            new Function(c, "blockFormatIndex", _n_blockFormatIndex0, None, Compiled, qt_QTextBlock_blockFormatIndex_int_QTextBlock, Return,
+                         "int", Parameters, new Param(c, "this", "qt.QTextBlock"), End),
+            new Function(c, "blockNumber", _n_blockNumber0, None, Compiled, qt_QTextBlock_blockNumber_int_QTextBlock, Return, "int",
+                         Parameters, new Param(c, "this", "qt.QTextBlock"), End),
             // MISSING: charFormat ("QTextCharFormat"; QTextBlock this)
-            new Function(c, "charFormatIndex", _n_charFormatIndex0, None,
-                         Compiled, qt_QTextBlock_charFormatIndex_int_QTextBlock,
-                         Return, "int", Parameters,
-                         new Param(c, "this", "qt.QTextBlock"), End),
-            new Function(c, "clearLayout", _n_clearLayout0, None, Compiled,
-                         qt_QTextBlock_clearLayout_void_QTextBlock, Return,
-                         "void", Parameters,
-                         new Param(c, "this", "qt.QTextBlock"), End),
-            new Function(c, "contains", _n_contains0, None, Compiled,
-                         qt_QTextBlock_contains_bool_QTextBlock_int, Return,
-                         "bool", Parameters,
-                         new Param(c, "this", "qt.QTextBlock"),
-                         new Param(c, "position", "int"), End),
-            new Function(c, "document", _n_document0, None, Compiled,
-                         qt_QTextBlock_document_QTextDocument_QTextBlock,
-                         Return, "qt.QTextDocument", Parameters,
-                         new Param(c, "this", "qt.QTextBlock"), End),
+            new Function(c, "charFormatIndex", _n_charFormatIndex0, None, Compiled, qt_QTextBlock_charFormatIndex_int_QTextBlock, Return,
+                         "int", Parameters, new Param(c, "this", "qt.QTextBlock"), End),
+            new Function(c, "clearLayout", _n_clearLayout0, None, Compiled, qt_QTextBlock_clearLayout_void_QTextBlock, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QTextBlock"), End),
+            new Function(c, "contains", _n_contains0, None, Compiled, qt_QTextBlock_contains_bool_QTextBlock_int, Return, "bool",
+                         Parameters, new Param(c, "this", "qt.QTextBlock"), new Param(c, "position", "int"), End),
+            new Function(c, "document", _n_document0, None, Compiled, qt_QTextBlock_document_QTextDocument_QTextBlock, Return,
+                         "qt.QTextDocument", Parameters, new Param(c, "this", "qt.QTextBlock"), End),
             // MISSING: end ("QTextBlock::iterator"; QTextBlock this)
-            new Function(c, "firstLineNumber", _n_firstLineNumber0, None,
-                         Compiled, qt_QTextBlock_firstLineNumber_int_QTextBlock,
-                         Return, "int", Parameters,
+            new Function(c, "firstLineNumber", _n_firstLineNumber0, None, Compiled, qt_QTextBlock_firstLineNumber_int_QTextBlock, Return,
+                         "int", Parameters, new Param(c, "this", "qt.QTextBlock"), End),
+            new Function(c, "isValid", _n_isValid0, None, Compiled, qt_QTextBlock_isValid_bool_QTextBlock, Return, "bool", Parameters,
                          new Param(c, "this", "qt.QTextBlock"), End),
-            new Function(c, "isValid", _n_isValid0, None, Compiled,
-                         qt_QTextBlock_isValid_bool_QTextBlock, Return, "bool",
-                         Parameters, new Param(c, "this", "qt.QTextBlock"),
-                         End),
-            new Function(c, "isVisible", _n_isVisible0, None, Compiled,
-                         qt_QTextBlock_isVisible_bool_QTextBlock, Return,
-                         "bool", Parameters,
+            new Function(c, "isVisible", _n_isVisible0, None, Compiled, qt_QTextBlock_isVisible_bool_QTextBlock, Return, "bool", Parameters,
                          new Param(c, "this", "qt.QTextBlock"), End),
             // MISSING: layout ("QTextLayout *"; QTextBlock this)
-            new Function(c, "length", _n_length0, None, Compiled,
-                         qt_QTextBlock_length_int_QTextBlock, Return, "int",
-                         Parameters, new Param(c, "this", "qt.QTextBlock"),
-                         End),
-            new Function(c, "lineCount", _n_lineCount0, None, Compiled,
-                         qt_QTextBlock_lineCount_int_QTextBlock, Return, "int",
-                         Parameters, new Param(c, "this", "qt.QTextBlock"),
-                         End),
-            new Function(c, "next", _n_next0, None, Compiled,
-                         qt_QTextBlock_next_QTextBlock_QTextBlock, Return,
-                         "qt.QTextBlock", Parameters,
+            new Function(c, "length", _n_length0, None, Compiled, qt_QTextBlock_length_int_QTextBlock, Return, "int", Parameters,
                          new Param(c, "this", "qt.QTextBlock"), End),
-            new Function(c, "position", _n_position0, None, Compiled,
-                         qt_QTextBlock_position_int_QTextBlock, Return, "int",
-                         Parameters, new Param(c, "this", "qt.QTextBlock"),
-                         End),
-            new Function(c, "previous", _n_previous0, None, Compiled,
-                         qt_QTextBlock_previous_QTextBlock_QTextBlock, Return,
-                         "qt.QTextBlock", Parameters,
+            new Function(c, "lineCount", _n_lineCount0, None, Compiled, qt_QTextBlock_lineCount_int_QTextBlock, Return, "int", Parameters,
                          new Param(c, "this", "qt.QTextBlock"), End),
-            new Function(c, "revision", _n_revision0, None, Compiled,
-                         qt_QTextBlock_revision_int_QTextBlock, Return, "int",
-                         Parameters, new Param(c, "this", "qt.QTextBlock"),
-                         End),
-            new Function(c, "setLineCount", _n_setLineCount0, None, Compiled,
-                         qt_QTextBlock_setLineCount_void_QTextBlock_int, Return,
-                         "void", Parameters,
-                         new Param(c, "this", "qt.QTextBlock"),
-                         new Param(c, "count", "int"), End),
-            new Function(c, "setRevision", _n_setRevision0, None, Compiled,
-                         qt_QTextBlock_setRevision_void_QTextBlock_int, Return,
-                         "void", Parameters,
-                         new Param(c, "this", "qt.QTextBlock"),
-                         new Param(c, "rev", "int"), End),
+            new Function(c, "next", _n_next0, None, Compiled, qt_QTextBlock_next_QTextBlock_QTextBlock, Return, "qt.QTextBlock", Parameters,
+                         new Param(c, "this", "qt.QTextBlock"), End),
+            new Function(c, "position", _n_position0, None, Compiled, qt_QTextBlock_position_int_QTextBlock, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QTextBlock"), End),
+            new Function(c, "previous", _n_previous0, None, Compiled, qt_QTextBlock_previous_QTextBlock_QTextBlock, Return, "qt.QTextBlock",
+                         Parameters, new Param(c, "this", "qt.QTextBlock"), End),
+            new Function(c, "revision", _n_revision0, None, Compiled, qt_QTextBlock_revision_int_QTextBlock, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QTextBlock"), End),
+            new Function(c, "setLineCount", _n_setLineCount0, None, Compiled, qt_QTextBlock_setLineCount_void_QTextBlock_int, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QTextBlock"), new Param(c, "count", "int"), End),
+            new Function(c, "setRevision", _n_setRevision0, None, Compiled, qt_QTextBlock_setRevision_void_QTextBlock_int, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QTextBlock"), new Param(c, "rev", "int"), End),
             // MISSING: setUserData (void; QTextBlock this, "QTextBlockUserData
             // *" data)
-            new Function(c, "setUserState", _n_setUserState0, None, Compiled,
-                         qt_QTextBlock_setUserState_void_QTextBlock_int, Return,
-                         "void", Parameters,
-                         new Param(c, "this", "qt.QTextBlock"),
-                         new Param(c, "state", "int"), End),
-            new Function(c, "setVisible", _n_setVisible0, None, Compiled,
-                         qt_QTextBlock_setVisible_void_QTextBlock_bool, Return,
-                         "void", Parameters,
-                         new Param(c, "this", "qt.QTextBlock"),
-                         new Param(c, "visible", "bool"), End),
-            new Function(c, "text", _n_text0, None, Compiled,
-                         qt_QTextBlock_text_string_QTextBlock, Return, "string",
-                         Parameters, new Param(c, "this", "qt.QTextBlock"),
-                         End),
-            new Function(c, "textDirection", _n_textDirection0, None, Compiled,
-                         qt_QTextBlock_textDirection_int_QTextBlock, Return,
-                         "int", Parameters,
+            new Function(c, "setUserState", _n_setUserState0, None, Compiled, qt_QTextBlock_setUserState_void_QTextBlock_int, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QTextBlock"), new Param(c, "state", "int"), End),
+            new Function(c, "setVisible", _n_setVisible0, None, Compiled, qt_QTextBlock_setVisible_void_QTextBlock_bool, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QTextBlock"), new Param(c, "visible", "bool"), End),
+            new Function(c, "text", _n_text0, None, Compiled, qt_QTextBlock_text_string_QTextBlock, Return, "string", Parameters,
                          new Param(c, "this", "qt.QTextBlock"), End),
+            new Function(c, "textDirection", _n_textDirection0, None, Compiled, qt_QTextBlock_textDirection_int_QTextBlock, Return, "int",
+                         Parameters, new Param(c, "this", "qt.QTextBlock"), End),
             // MISSING: textList ("QTextList *"; QTextBlock this)
             // MISSING: userData ("QTextBlockUserData *"; QTextBlock this)
-            new Function(c, "userState", _n_userState0, None, Compiled,
-                         qt_QTextBlock_userState_int_QTextBlock, Return, "int",
-                         Parameters, new Param(c, "this", "qt.QTextBlock"),
-                         End),
+            new Function(c, "userState", _n_userState0, None, Compiled, qt_QTextBlock_userState_int_QTextBlock, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QTextBlock"), End),
             // static functions
             EndArguments);
         globalScope()->addSymbols(
-            new Function(
-                c, "!=", _n_operatorBang_EQ_0, Op, Compiled,
-                qt_QTextBlock_operatorBang_EQ__bool_QTextBlock_QTextBlock,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QTextBlock"),
-                new Param(c, "other", "qt.QTextBlock"), End),
-            new Function(c, "<", _n_operatorLT_0, Op, Compiled,
-                         qt_QTextBlock_operatorLT__bool_QTextBlock_QTextBlock,
-                         Return, "bool", Parameters,
-                         new Param(c, "this", "qt.QTextBlock"),
-                         new Param(c, "other", "qt.QTextBlock"), End),
+            new Function(c, "!=", _n_operatorBang_EQ_0, Op, Compiled, qt_QTextBlock_operatorBang_EQ__bool_QTextBlock_QTextBlock, Return,
+                         "bool", Parameters, new Param(c, "this", "qt.QTextBlock"), new Param(c, "other", "qt.QTextBlock"), End),
+            new Function(c, "<", _n_operatorLT_0, Op, Compiled, qt_QTextBlock_operatorLT__bool_QTextBlock_QTextBlock, Return, "bool",
+                         Parameters, new Param(c, "this", "qt.QTextBlock"), new Param(c, "other", "qt.QTextBlock"), End),
             // MISSING: = (QTextBlock; QTextBlock this, QTextBlock other)
-            new Function(
-                c, "==", _n_operatorEQ_EQ_0, Op, Compiled,
-                qt_QTextBlock_operatorEQ_EQ__bool_QTextBlock_QTextBlock, Return,
-                "bool", Parameters, new Param(c, "this", "qt.QTextBlock"),
-                new Param(c, "other", "qt.QTextBlock"), End),
+            new Function(c, "==", _n_operatorEQ_EQ_0, Op, Compiled, qt_QTextBlock_operatorEQ_EQ__bool_QTextBlock_QTextBlock, Return, "bool",
+                         Parameters, new Param(c, "this", "qt.QTextBlock"), new Param(c, "other", "qt.QTextBlock"), End),
             EndArguments);
         scope()->addSymbols(EndArguments);
     }

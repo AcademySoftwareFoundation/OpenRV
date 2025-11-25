@@ -29,8 +29,7 @@ namespace Mu
 
     PyObjectType::~PyObjectType() {}
 
-    void PyObjectType::outputValue(ostream& o, const Value& value,
-                                   bool full) const
+    void PyObjectType::outputValue(ostream& o, const Value& value, bool full) const
     {
         o << "<#" << fullyQualifiedName() << " ";
 
@@ -50,8 +49,7 @@ namespace Mu
         o << ">";
     }
 
-    void PyObjectType::outputValueRecursive(ostream& o, const ValuePointer vp,
-                                            ValueOutputState& state) const
+    void PyObjectType::outputValueRecursive(ostream& o, const ValuePointer vp, ValueOutputState& state) const
     {
         Pointer p = *reinterpret_cast<Pointer*>(vp);
 

@@ -34,8 +34,7 @@ namespace Mu
         //  Constructors
         //
 
-        QDragLeaveEventType(Context* context, const char* name,
-                            Class* superClass = 0);
+        QDragLeaveEventType(Context* context, const char* name, Class* superClass = 0);
         virtual ~QDragLeaveEventType();
 
         //

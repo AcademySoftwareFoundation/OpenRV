@@ -28,9 +28,7 @@ namespace stl_ext
     //  an estimate of array size bounds.
     //
 
-    template <class T, unsigned int Bpower = 8,
-              class Alloc = std::allocator<T*>>
-    class barray
+    template <class T, unsigned int Bpower = 8, class Alloc = std::allocator<T*>> class barray
     {
     public:
         typedef T value_type;
@@ -38,15 +36,9 @@ namespace stl_ext
         typedef barray<T, Bpower, Alloc> this_type;
         typedef typename Alloc::template rebind<T>::other other_alloc;
 
-        T& operator[](int i)
-        {
-            return *(_blocks[i >> Bpower] + i % (1 << Bpower));
-        }
+        T& operator[](int i) { return *(_blocks[i >> Bpower] + i % (1 << Bpower)); }
 
-        const T& operator[](int i) const
-        {
-            return *(_blocks[i >> Bpower] + i % (1 << Bpower));
-        }
+        const T& operator[](int i) const { return *(_blocks[i >> Bpower] + i % (1 << Bpower)); }
 
         class iterator
         {
@@ -176,8 +168,7 @@ namespace stl_ext
         // Alloc                 _talloc;
     };
 
-    template <class T, unsigned int Bpower, class Alloc>
-    barray<T, Bpower, Alloc>::~barray()
+    template <class T, unsigned int Bpower, class Alloc> barray<T, Bpower, Alloc>::~barray()
     {
         for (int i = 0; i < _blocks.size(); i++)
         {
@@ -185,8 +176,7 @@ namespace stl_ext
         }
     }
 
-    template <class T, unsigned int Bpower, class Alloc>
-    void barray<T, Bpower, Alloc>::resize(size_t nsize, T c)
+    template <class T, unsigned int Bpower, class Alloc> void barray<T, Bpower, Alloc>::resize(size_t nsize, T c)
     {
         if (_size < nsize)
         {
@@ -201,23 +191,20 @@ namespace stl_ext
         _size = nsize;
     }
 
-    template <class T, unsigned int Bpower, class Alloc>
-    inline void barray<T, Bpower, Alloc>::push_back(const T& X)
+    template <class T, unsigned int Bpower, class Alloc> inline void barray<T, Bpower, Alloc>::push_back(const T& X)
     {
         resize(_size + 1);
         back() = X;
     }
 
-    template <class T, unsigned int Bpower, class Alloc>
-    void barray<T, Bpower, Alloc>::erase(iterator it)
+    template <class T, unsigned int Bpower, class Alloc> void barray<T, Bpower, Alloc>::erase(iterator it)
     {
         for (size_t i = it._index, s = size() = 1; i < s; i++)
             (*this)[i] = (*this)[i + 1];
         resize(size() - 1);
     }
 
-    template <class T, unsigned int Bpower, class Alloc>
-    void barray<T, Bpower, Alloc>::erase(iterator first, iterator last)
+    template <class T, unsigned int Bpower, class Alloc> void barray<T, Bpower, Alloc>::erase(iterator first, iterator last)
     {
         size_t i0 = first._index;
         size_t i1 = last._index;
@@ -225,8 +212,7 @@ namespace stl_ext
             (*this)[i] = (*this)[i + 1];
     }
 
-    template <class T, unsigned int Bpower, class Alloc>
-    bool barray<T, Bpower, Alloc>::is_allocated(const T* ptr)
+    template <class T, unsigned int Bpower, class Alloc> bool barray<T, Bpower, Alloc>::is_allocated(const T* ptr)
     {
         for (size_t i = _blocks.size(); i--;)
             if (_blocks[i] <= ptr && ptr < _blocks[i] + (1 << Bpower))
@@ -234,8 +220,7 @@ namespace stl_ext
         return false;
     }
 
-    template <class T, unsigned int Bpower, class Alloc>
-    size_t barray<T, Bpower, Alloc>::index_of(const T* ptr)
+    template <class T, unsigned int Bpower, class Alloc> size_t barray<T, Bpower, Alloc>::index_of(const T* ptr)
     {
         for (size_t i = _blocks.size(); i--;)
             if (_blocks[i] <= ptr && ptr < _blocks[i] + (1 << Bpower))
@@ -243,8 +228,7 @@ namespace stl_ext
         return _size;
     }
 
-    template <class T, unsigned int Bpower, class Alloc>
-    bool barray<T, Bpower, Alloc>::is_using(const T* ptr)
+    template <class T, unsigned int Bpower, class Alloc> bool barray<T, Bpower, Alloc>::is_using(const T* ptr)
     {
         size_t index = index_of(ptr);
         return index < _size;

@@ -14,8 +14,7 @@ namespace TwkGLF
     using namespace std;
     using namespace TwkApp;
 
-    GLVideoDevice::GLVideoDevice(VideoModule* m, const string& name,
-                                 unsigned int capabilities)
+    GLVideoDevice::GLVideoDevice(VideoModule* m, const string& name, unsigned int capabilities)
         : VideoDevice(m, name, capabilities)
         , m_textContext(TwkGLText::GLtext::newContext())
         , m_textContextOwner(true)
@@ -35,10 +34,7 @@ namespace TwkGLF
         delete m_fbo;
     }
 
-    GLVideoDevice* GLVideoDevice::newSharedContextWorkerDevice() const
-    {
-        return 0;
-    }
+    GLVideoDevice* GLVideoDevice::newSharedContextWorkerDevice() const { return 0; }
 
     void GLVideoDevice::setTextContext(TwkGLText::Context c, bool shared)
     {
@@ -52,15 +48,9 @@ namespace TwkGLF
         TwkGLText::GLtext::setContext(c);
     }
 
-    void GLVideoDevice::makeCurrent() const
-    {
-        TwkGLText::GLtext::setContext(m_textContext);
-    }
+    void GLVideoDevice::makeCurrent() const { TwkGLText::GLtext::setContext(m_textContext); }
 
-    void GLVideoDevice::makeCurrent(TwkFB::FrameBuffer* target) const
-    {
-        makeCurrent();
-    }
+    void GLVideoDevice::makeCurrent(TwkFB::FrameBuffer* target) const { makeCurrent(); }
 
     void GLVideoDevice::clearCaches() const
     {
@@ -76,10 +66,7 @@ namespace TwkGLF
 
     void GLVideoDevice::redrawImmediately() const {}
 
-    VideoDevice::Resolution GLVideoDevice::resolution() const
-    {
-        return Resolution(width(), height(), 1.0, 1.0);
-    }
+    VideoDevice::Resolution GLVideoDevice::resolution() const { return Resolution(width(), height(), 1.0, 1.0); }
 
     VideoDevice::Offset GLVideoDevice::offset() const { return Offset(0, 0); }
 
@@ -87,8 +74,7 @@ namespace TwkGLF
 
     VideoDevice::VideoFormat GLVideoDevice::format() const
     {
-        return VideoFormat(width(), height(), 1.0, 1.0, 0.0,
-                           hardwareIdentification());
+        return VideoFormat(width(), height(), 1.0, 1.0, 0.0, hardwareIdentification());
     }
 
     void GLVideoDevice::open(const StringVector& args) {}
@@ -117,9 +103,7 @@ namespace TwkGLF
 
     //----------------------------------------------------------------------
 
-    GLBindableVideoDevice::GLBindableVideoDevice(VideoModule* m,
-                                                 const std::string& name,
-                                                 unsigned int capabilities)
+    GLBindableVideoDevice::GLBindableVideoDevice(VideoModule* m, const std::string& name, unsigned int capabilities)
         : VideoDevice(m, name, capabilities)
     {
     }
@@ -132,10 +116,7 @@ namespace TwkGLF
 
     void GLBindableVideoDevice::bind(const GLVideoDevice*) const {}
 
-    void GLBindableVideoDevice::bind2(const GLVideoDevice*,
-                                      const GLVideoDevice*) const
-    {
-    }
+    void GLBindableVideoDevice::bind2(const GLVideoDevice*, const GLVideoDevice*) const {}
 
     void GLBindableVideoDevice::transfer(const GLFBO*) const {}
 
@@ -143,25 +124,15 @@ namespace TwkGLF
 
     bool GLBindableVideoDevice::readyForTransfer() const { return true; }
 
-    VideoDevice::Resolution GLBindableVideoDevice::resolution() const
-    {
-        return Resolution(width(), height(), 1.0, 1.0);
-    }
+    VideoDevice::Resolution GLBindableVideoDevice::resolution() const { return Resolution(width(), height(), 1.0, 1.0); }
 
-    VideoDevice::Offset GLBindableVideoDevice::offset() const
-    {
-        return Offset(0, 0);
-    }
+    VideoDevice::Offset GLBindableVideoDevice::offset() const { return Offset(0, 0); }
 
-    VideoDevice::Timing GLBindableVideoDevice::timing() const
-    {
-        return Timing(0.0);
-    }
+    VideoDevice::Timing GLBindableVideoDevice::timing() const { return Timing(0.0); }
 
     VideoDevice::VideoFormat GLBindableVideoDevice::format() const
     {
-        return VideoFormat(width(), height(), 1.0, 1.0, 0.0,
-                           hardwareIdentification());
+        return VideoFormat(width(), height(), 1.0, 1.0, 0.0, hardwareIdentification());
     }
 
     void GLBindableVideoDevice::open(const StringVector&) {}

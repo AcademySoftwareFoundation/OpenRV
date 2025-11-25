@@ -39,8 +39,7 @@ namespace Mu
         //  Constructors
         //
 
-        QRadioButtonType(Context* context, const char* name,
-                         Class* superClass = 0, Class* superClass2 = 0);
+        QRadioButtonType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QRadioButtonType();
 
@@ -63,10 +62,8 @@ namespace Mu
     {
     public:
         virtual ~MuQt_QRadioButton();
-        MuQt_QRadioButton(Pointer muobj, const CallEnvironment*,
-                          QWidget* parent);
-        MuQt_QRadioButton(Pointer muobj, const CallEnvironment*,
-                          const QString& text, QWidget* parent);
+        MuQt_QRadioButton(Pointer muobj, const CallEnvironment*, QWidget* parent);
+        MuQt_QRadioButton(Pointer muobj, const CallEnvironment*, const QString& text, QWidget* parent);
         virtual QSize minimumSizeHint() const;
         virtual QSize sizeHint() const;
 
@@ -93,24 +90,15 @@ namespace Mu
 
         bool hitButton_pub(const QPoint& pos) const { return hitButton(pos); }
 
-        bool hitButton_pub_parent(const QPoint& pos) const
-        {
-            return QRadioButton::hitButton(pos);
-        }
+        bool hitButton_pub_parent(const QPoint& pos) const { return QRadioButton::hitButton(pos); }
 
         void mouseMoveEvent_pub(QMouseEvent* e) { mouseMoveEvent(e); }
 
-        void mouseMoveEvent_pub_parent(QMouseEvent* e)
-        {
-            QRadioButton::mouseMoveEvent(e);
-        }
+        void mouseMoveEvent_pub_parent(QMouseEvent* e) { QRadioButton::mouseMoveEvent(e); }
 
         void paintEvent_pub(QPaintEvent* _p14) { paintEvent(_p14); }
 
-        void paintEvent_pub_parent(QPaintEvent* _p14)
-        {
-            QRadioButton::paintEvent(_p14);
-        }
+        void paintEvent_pub_parent(QPaintEvent* _p14) { QRadioButton::paintEvent(_p14); }
 
         void checkStateSet_pub() { checkStateSet(); }
 
@@ -126,52 +114,31 @@ namespace Mu
 
         void focusInEvent_pub(QFocusEvent* e) { focusInEvent(e); }
 
-        void focusInEvent_pub_parent(QFocusEvent* e)
-        {
-            QRadioButton::focusInEvent(e);
-        }
+        void focusInEvent_pub_parent(QFocusEvent* e) { QRadioButton::focusInEvent(e); }
 
         void focusOutEvent_pub(QFocusEvent* e) { focusOutEvent(e); }
 
-        void focusOutEvent_pub_parent(QFocusEvent* e)
-        {
-            QRadioButton::focusOutEvent(e);
-        }
+        void focusOutEvent_pub_parent(QFocusEvent* e) { QRadioButton::focusOutEvent(e); }
 
         void keyPressEvent_pub(QKeyEvent* e) { keyPressEvent(e); }
 
-        void keyPressEvent_pub_parent(QKeyEvent* e)
-        {
-            QRadioButton::keyPressEvent(e);
-        }
+        void keyPressEvent_pub_parent(QKeyEvent* e) { QRadioButton::keyPressEvent(e); }
 
         void keyReleaseEvent_pub(QKeyEvent* e) { keyReleaseEvent(e); }
 
-        void keyReleaseEvent_pub_parent(QKeyEvent* e)
-        {
-            QRadioButton::keyReleaseEvent(e);
-        }
+        void keyReleaseEvent_pub_parent(QKeyEvent* e) { QRadioButton::keyReleaseEvent(e); }
 
         void mousePressEvent_pub(QMouseEvent* e) { mousePressEvent(e); }
 
-        void mousePressEvent_pub_parent(QMouseEvent* e)
-        {
-            QRadioButton::mousePressEvent(e);
-        }
+        void mousePressEvent_pub_parent(QMouseEvent* e) { QRadioButton::mousePressEvent(e); }
 
         void mouseReleaseEvent_pub(QMouseEvent* e) { mouseReleaseEvent(e); }
 
-        void mouseReleaseEvent_pub_parent(QMouseEvent* e)
-        {
-            QRadioButton::mouseReleaseEvent(e);
-        }
+        void mouseReleaseEvent_pub_parent(QMouseEvent* e) { QRadioButton::mouseReleaseEvent(e); }
 
         void timerEvent_pub(QTimerEvent* e) { timerEvent(e); }
 
-        void timerEvent_pub_parent(QTimerEvent* e)
-        {
-            QRadioButton::timerEvent(e);
-        }
+        void timerEvent_pub_parent(QTimerEvent* e) { QRadioButton::timerEvent(e); }
 
     public:
         const QRadioButtonType* _baseType;
@@ -179,11 +146,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance*
-    QRadioButtonType::cachedInstance(const QRadioButtonType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QRadioButtonType::cachedInstance(const QRadioButtonType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

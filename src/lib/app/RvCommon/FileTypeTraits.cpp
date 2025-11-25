@@ -32,10 +32,7 @@ namespace Rv
         return list;
     }
 
-    bool FileTypeTraits::isKnown(size_t index, const QString&) const
-    {
-        return true;
-    }
+    bool FileTypeTraits::isKnown(size_t index, const QString&) const { return true; }
 
     QStringList FileTypeTraits::fileAttributes(const QString& file) const
     {
@@ -43,20 +40,16 @@ namespace Rv
         QFileInfo info(file);
 
 #if defined(RV_VFX_CY2023)
-        list << "Created"
-             << info.birthTime().toString(Qt::DefaultLocaleShortDate);
-        list << "Modified"
-             << info.lastModified().toString(Qt::DefaultLocaleShortDate);
+        list << "Created" << info.birthTime().toString(Qt::DefaultLocaleShortDate);
+        list << "Modified" << info.lastModified().toString(Qt::DefaultLocaleShortDate);
 #else
         // created() is deprecated.
         // birthTime() function to get the time the file was created.
         // metadataChangeTime() to get the time its metadata was last changed.
         // lastModified() to get the time it was last modified.
         QLocale locale = QLocale::system();
-        list << "Created"
-             << locale.toString(info.birthTime(), QLocale::ShortFormat);
-        list << "Modified"
-             << locale.toString(info.lastModified(), QLocale::ShortFormat);
+        list << "Created" << locale.toString(info.birthTime(), QLocale::ShortFormat);
+        list << "Modified" << locale.toString(info.lastModified(), QLocale::ShortFormat);
 #endif
 
         size_t s = info.size();
@@ -75,15 +68,13 @@ namespace Rv
         }
         else if (s < size_t(1024) * size_t(1024) * size_t(1024) * size_t(1024))
         {
-            list << "Size"
-                 << QString("%1 Gb").arg(info.size() / 1024 / 1024 / 1024);
+            list << "Size" << QString("%1 Gb").arg(info.size() / 1024 / 1024 / 1024);
         }
 
         return list;
     }
 
-    QIcon FileTypeTraits::fileIcon(const QString& file,
-                                   QFileIconProvider::IconType knownType) const
+    QIcon FileTypeTraits::fileIcon(const QString& file, QFileIconProvider::IconType knownType) const
     {
         if (m_iconMode == NoIcons)
             return QIcon();
@@ -92,9 +83,7 @@ namespace Rv
         return fileInfoIcon(info, knownType);
     }
 
-    QIcon
-    FileTypeTraits::fileInfoIcon(const QFileInfo& info,
-                                 QFileIconProvider::IconType knownType) const
+    QIcon FileTypeTraits::fileInfoIcon(const QFileInfo& info, QFileIconProvider::IconType knownType) const
     {
         static QFileIconProvider provider;
 
@@ -121,9 +110,8 @@ namespace Rv
             return provider.icon(QFileIconProvider::Folder);
         }
 
-    
 #ifndef PLATFORM_WINDOWS
-    #if defined(RV_VFX_CY2024)
+#if defined(RV_VFX_CY2024)
         // Adding more heuristics to find the right icon for a file based on the
         // MIME type. The following heuristics should work for Qt 5, but in
         // order to keep the same behavior as before, this code will only run
@@ -147,7 +135,7 @@ namespace Rv
         {
             return icon;
         }
-    #endif
+#endif
 #endif
 
         return provider.icon(info);
@@ -159,9 +147,6 @@ namespace Rv
 
     void FileTypeTraits::setIconMode(IconMode mode) { m_iconMode = mode; }
 
-    FileTypeTraits::IconMode FileTypeTraits::iconMode() const
-    {
-        return m_iconMode;
-    }
+    FileTypeTraits::IconMode FileTypeTraits::iconMode() const { return m_iconMode; }
 
 } // namespace Rv

@@ -19,8 +19,7 @@ namespace TwkGLF
     class OSMesaVideoDevice : public TwkGLF::GLVideoDevice
     {
     public:
-        OSMesaVideoDevice(TwkApp::VideoModule*, int w, int h, bool alpha,
-                          bool floatbuffer = true, bool topleftOrigin = false);
+        OSMesaVideoDevice(TwkApp::VideoModule*, int w, int h, bool alpha, bool floatbuffer = true, bool topleftOrigin = false);
 
         virtual ~OSMesaVideoDevice();
 

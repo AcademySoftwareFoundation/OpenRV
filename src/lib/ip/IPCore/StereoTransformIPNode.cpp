@@ -21,26 +21,18 @@ namespace IPCore
     using namespace TwkFB;
     using namespace std;
 
-    StereoTransformIPNode::StereoTransformIPNode(const std::string& name,
-                                                 const NodeDefinition* def,
-                                                 IPGraph* g, GroupIPNode* group)
+    StereoTransformIPNode::StereoTransformIPNode(const std::string& name, const NodeDefinition* def, IPGraph* g, GroupIPNode* group)
         : IPNode(name, def, g, group)
         , m_useAttrs(false)
     {
         setMaxInputs(1);
         m_stereoSwap = declareProperty<IntProperty>("stereo.swap", 0);
-        m_stereoRelativeOffset =
-            declareProperty<FloatProperty>("stereo.relativeOffset", 0.0f);
-        m_stereoRightOffset =
-            declareProperty<FloatProperty>("stereo.rightOffset", 0.0f);
-        m_rightTransformFlip =
-            declareProperty<IntProperty>("rightTransform.flip", 0);
-        m_rightTransformFlop =
-            declareProperty<IntProperty>("rightTransform.flop", 0);
-        m_rightTransformRotate =
-            declareProperty<FloatProperty>("rightTransform.rotate", 0.0f);
-        m_rightTransformTranslate = declareProperty<Vec2fProperty>(
-            "rightTransform.translate", Vec2f(0.0));
+        m_stereoRelativeOffset = declareProperty<FloatProperty>("stereo.relativeOffset", 0.0f);
+        m_stereoRightOffset = declareProperty<FloatProperty>("stereo.rightOffset", 0.0f);
+        m_rightTransformFlip = declareProperty<IntProperty>("rightTransform.flip", 0);
+        m_rightTransformFlop = declareProperty<IntProperty>("rightTransform.flop", 0);
+        m_rightTransformRotate = declareProperty<FloatProperty>("rightTransform.rotate", 0.0f);
+        m_rightTransformTranslate = declareProperty<Vec2fProperty>("rightTransform.translate", Vec2f(0.0));
     }
 
     StereoTransformIPNode::~StereoTransformIPNode() {}
@@ -132,8 +124,7 @@ namespace IPCore
         return IPNode::evaluateIdentifier(scontext);
     }
 
-    void StereoTransformIPNode::metaEvaluate(const Context& context,
-                                             MetaEvalVisitor& visitor)
+    void StereoTransformIPNode::metaEvaluate(const Context& context, MetaEvalVisitor& visitor)
     {
         visitor.enter(context, this);
 
@@ -153,8 +144,7 @@ namespace IPCore
         visitor.leave(context, this);
     }
 
-    void
-    StereoTransformIPNode::propagateFlushToInputs(const FlushContext& context)
+    void StereoTransformIPNode::propagateFlushToInputs(const FlushContext& context)
     {
         if (!context.stereo)
         {

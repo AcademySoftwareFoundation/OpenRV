@@ -24,10 +24,7 @@ namespace Mu
 
     VoidType::~VoidType() {}
 
-    PrimitiveObject* VoidType::newObject() const
-    {
-        return new PrimitiveObject(this);
-    }
+    PrimitiveObject* VoidType::newObject() const { return new PrimitiveObject(this); }
 
     Value VoidType::nodeEval(const Node* n, Thread& thread) const
     {
@@ -35,26 +32,16 @@ namespace Mu
         return Value();
     }
 
-    void VoidType::nodeEval(void*, const Node* n, Thread& thread) const
-    {
-        (*n->func()._voidFunc)(*n, thread);
-    }
+    void VoidType::nodeEval(void*, const Node* n, Thread& thread) const { (*n->func()._voidFunc)(*n, thread); }
 
     void VoidType::constructInstance(Pointer) const
     {
         // nothing
     }
 
-    void VoidType::outputValue(ostream& o, const Value& value, bool full) const
-    {
-        o << "void";
-    }
+    void VoidType::outputValue(ostream& o, const Value& value, bool full) const { o << "void"; }
 
-    void VoidType::outputValueRecursive(std::ostream& o, const ValuePointer,
-                                        ValueOutputState&) const
-    {
-        o << "void";
-    }
+    void VoidType::outputValueRecursive(std::ostream& o, const ValuePointer, ValueOutputState&) const { o << "void"; }
 
     void VoidType::load()
     {
@@ -63,9 +50,7 @@ namespace Mu
         Symbol* s = scope();
         Context* c = context();
 
-        s->addSymbols(new Function(c, "void", machineRep()->simpleBlockFunc(),
-                                   Cast, Return, "void", Args, "?", End),
-                      EndArguments);
+        s->addSymbols(new Function(c, "void", machineRep()->simpleBlockFunc(), Cast, Return, "void", Args, "?", End), EndArguments);
     }
 
 } // namespace Mu

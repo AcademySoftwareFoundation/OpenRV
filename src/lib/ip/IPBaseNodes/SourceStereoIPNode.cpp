@@ -14,9 +14,7 @@ namespace IPCore
     using namespace std;
     using namespace TwkMath;
 
-    SourceStereoIPNode::SourceStereoIPNode(const std::string& name,
-                                           const NodeDefinition* def,
-                                           IPGraph* graph, GroupIPNode* group)
+    SourceStereoIPNode::SourceStereoIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group)
         : StereoTransformIPNode(name, def, graph, group)
     {
         m_useAttrs = true;
@@ -27,8 +25,7 @@ namespace IPCore
     namespace
     {
 
-        void prepareForStereo(IPImage* img, bool isLeftEye, Mat44f& Mr,
-                              float offset, float roffset)
+        void prepareForStereo(IPImage* img, bool isLeftEye, Mat44f& Mr, float offset, float roffset)
         {
             if (!isLeftEye)
             {
@@ -58,8 +55,7 @@ namespace IPCore
         //  Apply StereoContext contents to IPImage matrices.
         //
 
-        void applyStereoContext(bool isLeft, IPNode::StereoContext& sc,
-                                IPImage* img)
+        void applyStereoContext(bool isLeft, IPNode::StereoContext& sc, IPImage* img)
         {
             if (!sc.active)
                 return;

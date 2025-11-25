@@ -51,8 +51,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    int qt_QMouseEvent_flags_int_QMouseEvent(Mu::Thread& NODE_THREAD,
-                                             Pointer param_this)
+    int qt_QMouseEvent_flags_int_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMouseEvent* arg0 = getqpointer<QMouseEventType>(param_this);
@@ -61,8 +60,7 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(_n_flags0, int)
     {
-        NODE_RETURN(qt_QMouseEvent_flags_int_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QMouseEvent_flags_int_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     void QMouseEventType::load()
@@ -82,13 +80,11 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
                    new MemberVariable(c, "native", "qt.NativeObject"),
 
@@ -108,10 +104,8 @@ namespace Mu
             // QPointF globalPos, flags Qt::MouseButton button, flags
             // Qt::MouseButtons buttons, flags Qt::KeyboardModifiers modifiers,
             // "const QPointingDevice *" device)
-            new Function(c, "flags", _n_flags0, None, Compiled,
-                         qt_QMouseEvent_flags_int_QMouseEvent, Return, "int",
-                         Parameters, new Param(c, "this", "qt.QMouseEvent"),
-                         End),
+            new Function(c, "flags", _n_flags0, None, Compiled, qt_QMouseEvent_flags_int_QMouseEvent, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QMouseEvent"), End),
             // static functions
             EndArguments);
         globalScope()->addSymbols(EndArguments);

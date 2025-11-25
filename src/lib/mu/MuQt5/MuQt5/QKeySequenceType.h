@@ -44,8 +44,7 @@ namespace Mu
         //  Constructors
         //
 
-        QKeySequenceType(Context* context, const char* name,
-                         Class* superClass = 0);
+        QKeySequenceType(Context* context, const char* name, Class* superClass = 0);
         virtual ~QKeySequenceType();
 
         //

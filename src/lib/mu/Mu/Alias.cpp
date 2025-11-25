@@ -32,15 +32,11 @@ namespace Mu
 
     void Alias::outputNode(std::ostream& o, const Node*) const { output(o); }
 
-    void Alias::output(std::ostream& o) const
-    {
-        o << fullyQualifiedName() << " -> " << alias()->fullyQualifiedName();
-    }
+    void Alias::output(std::ostream& o) const { o << fullyQualifiedName() << " -> " << alias()->fullyQualifiedName(); }
 
     bool Alias::resolveSymbols() const
     {
-        if (const Symbol* s =
-                globalScope()->findSymbolByQualifiedName(Name(_symbol.name)))
+        if (const Symbol* s = globalScope()->findSymbolByQualifiedName(Name(_symbol.name)))
         {
             _symbol.symbol = s;
             return true;

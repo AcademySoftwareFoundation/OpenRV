@@ -46,8 +46,7 @@ namespace Mu
         //  Constructors
         //
 
-        QTimeZoneType(Context* context, const char* name,
-                      Class* superClass = 0);
+        QTimeZoneType(Context* context, const char* name, Class* superClass = 0);
         virtual ~QTimeZoneType();
 
         //

@@ -52,10 +52,7 @@ namespace TwkMovie
 
     void Movie::flush() {}
 
-    size_t Movie::audioFillBuffer(const AudioReadRequest&, AudioBuffer&)
-    {
-        return 0;
-    }
+    size_t Movie::audioFillBuffer(const AudioReadRequest&, AudioBuffer&) { return 0; }
 
     bool Movie::canConvertAudioRate() const { return false; }
 
@@ -107,10 +104,7 @@ namespace TwkMovie
         }
     }
 
-    bool Movie::getBoolAttribute(const std::string& name) const
-    {
-        return false;
-    }
+    bool Movie::getBoolAttribute(const std::string& name) const { return false; }
 
     void Movie::setBoolAttribute(const std::string& name, bool value) {}
 
@@ -118,24 +112,13 @@ namespace TwkMovie
 
     void Movie::setIntAttribute(const std::string& name, int value) {}
 
-    string Movie::getStringAttribute(const std::string& name) const
-    {
-        return "";
-    }
+    string Movie::getStringAttribute(const std::string& name) const { return ""; }
 
-    void Movie::setStringAttribute(const std::string& name,
-                                   const std::string& value)
-    {
-    }
+    void Movie::setStringAttribute(const std::string& name, const std::string& value) {}
 
-    double Movie::getDoubleAttribute(const std::string& name) const
-    {
-        return 0.0;
-    }
+    double Movie::getDoubleAttribute(const std::string& name) const { return 0.0; }
 
-    void Movie::setDoubleAttribute(const std::string& name, double value) const
-    {
-    }
+    void Movie::setDoubleAttribute(const std::string& name, double value) const {}
 
 #if 0
 //

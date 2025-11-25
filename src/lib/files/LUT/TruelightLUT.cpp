@@ -65,16 +65,14 @@ namespace LUT
 
             if (s != line1 && s != line2)
             {
-                TWK_THROW_EXC_STREAM("CUB: expected " << line1 << " or "
-                                                      << line2);
+                TWK_THROW_EXC_STREAM("CUB: expected " << line1 << " or " << line2);
             }
 
             return s;
         }
     } // namespace
 
-    void readTruelightLUT(const string& filename, const string& type,
-                          LUTData& lut)
+    void readTruelightLUT(const string& filename, const string& type, LUTData& lut)
     {
         ifstream file(UNICODE_C_STR(filename.c_str()), ios::binary);
         lut.data.resize(0);
@@ -85,8 +83,7 @@ namespace LUT
         //  File should begin with "# Truelight Cube v2.0/v2.1"
         //
 
-        string last =
-            oneof(file, "# Truelight Cube v2.0", "# Truelight Cube v2.1");
+        string last = oneof(file, "# Truelight Cube v2.0", "# Truelight Cube v2.1");
 
         //
         //  Look for header info
@@ -104,14 +101,12 @@ namespace LUT
 
         while (line != "")
         {
-            if (line.substr(0, 7) == "# iDims"
-                || line.substr(0, 7) == "# oDims")
+            if (line.substr(0, 7) == "# iDims" || line.substr(0, 7) == "# oDims")
             {
                 int dims = atoi(line.substr(8, line.size() - 1).c_str());
                 if (dims != 3)
                 {
-                    TWK_THROW_EXC_STREAM(
-                        "CUB: Only 3 dimensions supported. Found " << dims);
+                    TWK_THROW_EXC_STREAM("CUB: Only 3 dimensions supported. Found " << dims);
                 }
             }
 
@@ -133,8 +128,7 @@ namespace LUT
                     {
                         if (spacePos != string::npos || i == 2)
                         {
-                            string dimStr =
-                                dims.substr(lastPos, (spacePos - lastPos));
+                            string dimStr = dims.substr(lastPos, (spacePos - lastPos));
                             lut.dimensions[i] = atoi(dimStr.c_str());
                             lastPos = spacePos + 1;
                         }
@@ -168,11 +162,9 @@ namespace LUT
                     {
                         if (spacePos != string::npos || i == 2)
                         {
-                            string iLutStr =
-                                line.substr(lastPos, (spacePos - lastPos));
+                            string iLutStr = line.substr(lastPos, (spacePos - lastPos));
                             lut.prelut[i][l].first = step;
-                            lut.prelut[i][l].second =
-                                atof(iLutStr.c_str()) / (lut.dimensions[i] - 1);
+                            lut.prelut[i][l].second = atof(iLutStr.c_str()) / (lut.dimensions[i] - 1);
                             lastPos = spacePos + 1;
                         }
                         spacePos = line.find_first_of(WHITESPACE, lastPos);
@@ -181,12 +173,9 @@ namespace LUT
             }
             else if (line.substr(0, 6) == "# Cube")
             {
-                if (!Read3DLUTData(file, lut.dimensions[0], lut.dimensions[1],
-                                   lut.dimensions[2], FLOAT_DEPTH, false, 0,
-                                   lut.data))
+                if (!Read3DLUTData(file, lut.dimensions[0], lut.dimensions[1], lut.dimensions[2], FLOAT_DEPTH, false, 0, lut.data))
                 {
-                    TWK_THROW_EXC_STREAM("CUB: data parsing error "
-                                         << filename);
+                    TWK_THROW_EXC_STREAM("CUB: data parsing error " << filename);
                 }
             }
             else if (line.substr(0, 5) == "# end")

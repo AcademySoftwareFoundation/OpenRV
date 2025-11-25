@@ -39,8 +39,7 @@ namespace Mu
         //  Constructors
         //
 
-        QQuickItemType(Context* context, const char* name,
-                       Class* superClass = 0, Class* superClass2 = 0);
+        QQuickItemType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QQuickItemType();
 
@@ -63,8 +62,7 @@ namespace Mu
     {
     public:
         virtual ~MuQt_QQuickItem();
-        MuQt_QQuickItem(Pointer muobj, const CallEnvironment*,
-                        QQuickItem* parent);
+        MuQt_QQuickItem(Pointer muobj, const CallEnvironment*, QQuickItem* parent);
         virtual bool contains(const QPointF& point) const;
         virtual QVariant inputMethodQuery(Qt::InputMethodQuery query) const;
         virtual bool isTextureProvider() const;
@@ -77,8 +75,7 @@ namespace Mu
         virtual void dropEvent(QDropEvent* event);
         virtual void focusInEvent(QFocusEvent* event);
         virtual void focusOutEvent(QFocusEvent* event);
-        virtual void geometryChanged(const QRectF& newGeometry,
-                                     const QRectF& oldGeometry);
+        virtual void geometryChanged(const QRectF& newGeometry, const QRectF& oldGeometry);
         virtual void hoverEnterEvent(QHoverEvent* event);
         virtual void hoverLeaveEvent(QHoverEvent* event);
         virtual void hoverMoveEvent(QHoverEvent* event);
@@ -105,158 +102,84 @@ namespace Mu
         virtual void timerEvent(QTimerEvent* event);
 
     public:
-        bool childMouseEventFilter_pub(QQuickItem* item, QEvent* event)
-        {
-            return childMouseEventFilter(item, event);
-        }
+        bool childMouseEventFilter_pub(QQuickItem* item, QEvent* event) { return childMouseEventFilter(item, event); }
 
-        bool childMouseEventFilter_pub_parent(QQuickItem* item, QEvent* event)
-        {
-            return QQuickItem::childMouseEventFilter(item, event);
-        }
+        bool childMouseEventFilter_pub_parent(QQuickItem* item, QEvent* event) { return QQuickItem::childMouseEventFilter(item, event); }
 
-        void dragEnterEvent_pub(QDragEnterEvent* event)
-        {
-            dragEnterEvent(event);
-        }
+        void dragEnterEvent_pub(QDragEnterEvent* event) { dragEnterEvent(event); }
 
-        void dragEnterEvent_pub_parent(QDragEnterEvent* event)
-        {
-            QQuickItem::dragEnterEvent(event);
-        }
+        void dragEnterEvent_pub_parent(QDragEnterEvent* event) { QQuickItem::dragEnterEvent(event); }
 
-        void dragLeaveEvent_pub(QDragLeaveEvent* event)
-        {
-            dragLeaveEvent(event);
-        }
+        void dragLeaveEvent_pub(QDragLeaveEvent* event) { dragLeaveEvent(event); }
 
-        void dragLeaveEvent_pub_parent(QDragLeaveEvent* event)
-        {
-            QQuickItem::dragLeaveEvent(event);
-        }
+        void dragLeaveEvent_pub_parent(QDragLeaveEvent* event) { QQuickItem::dragLeaveEvent(event); }
 
         void dragMoveEvent_pub(QDragMoveEvent* event) { dragMoveEvent(event); }
 
-        void dragMoveEvent_pub_parent(QDragMoveEvent* event)
-        {
-            QQuickItem::dragMoveEvent(event);
-        }
+        void dragMoveEvent_pub_parent(QDragMoveEvent* event) { QQuickItem::dragMoveEvent(event); }
 
         void dropEvent_pub(QDropEvent* event) { dropEvent(event); }
 
-        void dropEvent_pub_parent(QDropEvent* event)
-        {
-            QQuickItem::dropEvent(event);
-        }
+        void dropEvent_pub_parent(QDropEvent* event) { QQuickItem::dropEvent(event); }
 
         void focusInEvent_pub(QFocusEvent* event) { focusInEvent(event); }
 
-        void focusInEvent_pub_parent(QFocusEvent* event)
-        {
-            QQuickItem::focusInEvent(event);
-        }
+        void focusInEvent_pub_parent(QFocusEvent* event) { QQuickItem::focusInEvent(event); }
 
         void focusOutEvent_pub(QFocusEvent* event) { focusOutEvent(event); }
 
-        void focusOutEvent_pub_parent(QFocusEvent* event)
-        {
-            QQuickItem::focusOutEvent(event);
-        }
+        void focusOutEvent_pub_parent(QFocusEvent* event) { QQuickItem::focusOutEvent(event); }
 
-        void geometryChanged_pub(const QRectF& newGeometry,
-                                 const QRectF& oldGeometry)
-        {
-            geometryChanged(newGeometry, oldGeometry);
-        }
+        void geometryChanged_pub(const QRectF& newGeometry, const QRectF& oldGeometry) { geometryChanged(newGeometry, oldGeometry); }
 
-        void geometryChanged_pub_parent(const QRectF& newGeometry,
-                                        const QRectF& oldGeometry)
+        void geometryChanged_pub_parent(const QRectF& newGeometry, const QRectF& oldGeometry)
         {
             QQuickItem::geometryChanged(newGeometry, oldGeometry);
         }
 
         bool heightValid_pub() const { return heightValid(); }
 
-        bool heightValid_pub_parent() const
-        {
-            return QQuickItem::heightValid();
-        }
+        bool heightValid_pub_parent() const { return QQuickItem::heightValid(); }
 
         void hoverEnterEvent_pub(QHoverEvent* event) { hoverEnterEvent(event); }
 
-        void hoverEnterEvent_pub_parent(QHoverEvent* event)
-        {
-            QQuickItem::hoverEnterEvent(event);
-        }
+        void hoverEnterEvent_pub_parent(QHoverEvent* event) { QQuickItem::hoverEnterEvent(event); }
 
         void hoverLeaveEvent_pub(QHoverEvent* event) { hoverLeaveEvent(event); }
 
-        void hoverLeaveEvent_pub_parent(QHoverEvent* event)
-        {
-            QQuickItem::hoverLeaveEvent(event);
-        }
+        void hoverLeaveEvent_pub_parent(QHoverEvent* event) { QQuickItem::hoverLeaveEvent(event); }
 
         void hoverMoveEvent_pub(QHoverEvent* event) { hoverMoveEvent(event); }
 
-        void hoverMoveEvent_pub_parent(QHoverEvent* event)
-        {
-            QQuickItem::hoverMoveEvent(event);
-        }
+        void hoverMoveEvent_pub_parent(QHoverEvent* event) { QQuickItem::hoverMoveEvent(event); }
 
         bool isComponentComplete_pub() const { return isComponentComplete(); }
 
-        bool isComponentComplete_pub_parent() const
-        {
-            return QQuickItem::isComponentComplete();
-        }
+        bool isComponentComplete_pub_parent() const { return QQuickItem::isComponentComplete(); }
 
         void keyPressEvent_pub(QKeyEvent* event) { keyPressEvent(event); }
 
-        void keyPressEvent_pub_parent(QKeyEvent* event)
-        {
-            QQuickItem::keyPressEvent(event);
-        }
+        void keyPressEvent_pub_parent(QKeyEvent* event) { QQuickItem::keyPressEvent(event); }
 
         void keyReleaseEvent_pub(QKeyEvent* event) { keyReleaseEvent(event); }
 
-        void keyReleaseEvent_pub_parent(QKeyEvent* event)
-        {
-            QQuickItem::keyReleaseEvent(event);
-        }
+        void keyReleaseEvent_pub_parent(QKeyEvent* event) { QQuickItem::keyReleaseEvent(event); }
 
-        void mouseDoubleClickEvent_pub(QMouseEvent* event)
-        {
-            mouseDoubleClickEvent(event);
-        }
+        void mouseDoubleClickEvent_pub(QMouseEvent* event) { mouseDoubleClickEvent(event); }
 
-        void mouseDoubleClickEvent_pub_parent(QMouseEvent* event)
-        {
-            QQuickItem::mouseDoubleClickEvent(event);
-        }
+        void mouseDoubleClickEvent_pub_parent(QMouseEvent* event) { QQuickItem::mouseDoubleClickEvent(event); }
 
         void mouseMoveEvent_pub(QMouseEvent* event) { mouseMoveEvent(event); }
 
-        void mouseMoveEvent_pub_parent(QMouseEvent* event)
-        {
-            QQuickItem::mouseMoveEvent(event);
-        }
+        void mouseMoveEvent_pub_parent(QMouseEvent* event) { QQuickItem::mouseMoveEvent(event); }
 
         void mousePressEvent_pub(QMouseEvent* event) { mousePressEvent(event); }
 
-        void mousePressEvent_pub_parent(QMouseEvent* event)
-        {
-            QQuickItem::mousePressEvent(event);
-        }
+        void mousePressEvent_pub_parent(QMouseEvent* event) { QQuickItem::mousePressEvent(event); }
 
-        void mouseReleaseEvent_pub(QMouseEvent* event)
-        {
-            mouseReleaseEvent(event);
-        }
+        void mouseReleaseEvent_pub(QMouseEvent* event) { mouseReleaseEvent(event); }
 
-        void mouseReleaseEvent_pub_parent(QMouseEvent* event)
-        {
-            QQuickItem::mouseReleaseEvent(event);
-        }
+        void mouseReleaseEvent_pub_parent(QMouseEvent* event) { QQuickItem::mouseReleaseEvent(event); }
 
         void mouseUngrabEvent_pub() { mouseUngrabEvent(); }
 
@@ -270,15 +193,9 @@ namespace Mu
 
         void touchUngrabEvent_pub_parent() { QQuickItem::touchUngrabEvent(); }
 
-        void updateInputMethod_pub(Qt::InputMethodQueries queries)
-        {
-            updateInputMethod(queries);
-        }
+        void updateInputMethod_pub(Qt::InputMethodQueries queries) { updateInputMethod(queries); }
 
-        void updateInputMethod_pub_parent(Qt::InputMethodQueries queries)
-        {
-            QQuickItem::updateInputMethod(queries);
-        }
+        void updateInputMethod_pub_parent(Qt::InputMethodQueries queries) { QQuickItem::updateInputMethod(queries); }
 
         void updatePolish_pub() { updatePolish(); }
 
@@ -286,10 +203,7 @@ namespace Mu
 
         void wheelEvent_pub(QWheelEvent* event) { wheelEvent(event); }
 
-        void wheelEvent_pub_parent(QWheelEvent* event)
-        {
-            QQuickItem::wheelEvent(event);
-        }
+        void wheelEvent_pub_parent(QWheelEvent* event) { QQuickItem::wheelEvent(event); }
 
         bool widthValid_pub() const { return widthValid(); }
 
@@ -309,17 +223,11 @@ namespace Mu
 
         void customEvent_pub(QEvent* event) { customEvent(event); }
 
-        void customEvent_pub_parent(QEvent* event)
-        {
-            QQuickItem::customEvent(event);
-        }
+        void customEvent_pub_parent(QEvent* event) { QQuickItem::customEvent(event); }
 
         void timerEvent_pub(QTimerEvent* event) { timerEvent(event); }
 
-        void timerEvent_pub_parent(QTimerEvent* event)
-        {
-            QQuickItem::timerEvent(event);
-        }
+        void timerEvent_pub_parent(QTimerEvent* event) { QQuickItem::timerEvent(event); }
 
     public:
         const QQuickItemType* _baseType;
@@ -327,11 +235,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance*
-    QQuickItemType::cachedInstance(const QQuickItemType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QQuickItemType::cachedInstance(const QQuickItemType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

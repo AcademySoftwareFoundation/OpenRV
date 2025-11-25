@@ -20,8 +20,7 @@ namespace LUT
 {
     using namespace std;
 
-    void readAppleColorLUT(const string& filename, const string& type,
-                           LUTData& lut)
+    void readAppleColorLUT(const string& filename, const string& type, LUTData& lut)
     {
         ifstream file(UNICODE_C_STR(filename.c_str()), ios::binary);
         lut.data.resize(0);

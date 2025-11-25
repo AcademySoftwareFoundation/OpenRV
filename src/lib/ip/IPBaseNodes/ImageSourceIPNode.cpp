@@ -15,18 +15,14 @@ namespace IPCore
     using namespace std;
     using namespace TwkFB;
 
-    ImageSourceIPNode::ImageSourceIPNode(const string& name,
-                                         const NodeDefinition* def, IPGraph* g,
-                                         GroupIPNode* group,
+    ImageSourceIPNode::ImageSourceIPNode(const string& name, const NodeDefinition* def, IPGraph* g, GroupIPNode* group,
                                          const std::string mediaRepName)
         : SourceIPNode(name, def, g, group, mediaRepName)
     {
-        PropertyInfo* einfo = new PropertyInfo(
-            PropertyInfo::Persistent | PropertyInfo::ExcludeFromProfile
-            | PropertyInfo::RequiresGraphEdit);
+        PropertyInfo* einfo =
+            new PropertyInfo(PropertyInfo::Persistent | PropertyInfo::ExcludeFromProfile | PropertyInfo::RequiresGraphEdit);
 
-        PropertyInfo* minfo = new PropertyInfo(
-            PropertyInfo::Persistent | PropertyInfo::ExcludeFromProfile);
+        PropertyInfo* minfo = new PropertyInfo(PropertyInfo::Persistent | PropertyInfo::ExcludeFromProfile);
 
         //
         //  This function sets up the property values for an image
@@ -40,12 +36,9 @@ namespace IPCore
         //  weirdnesses that EXR can have.
         //
 
-        m_mediaName =
-            declareProperty<StringProperty>("media.name", name, minfo);
-        m_mediaMovie =
-            declareProperty<StringProperty>("media.movie", name, minfo);
-        m_mediaLocation =
-            declareProperty<StringProperty>("media.location", "image", minfo);
+        m_mediaName = declareProperty<StringProperty>("media.name", name, minfo);
+        m_mediaMovie = declareProperty<StringProperty>("media.movie", name, minfo);
+        m_mediaLocation = declareProperty<StringProperty>("media.location", "image", minfo);
 
         //
         //  .layers = ["diffuse" "specular" "ambient"]
@@ -55,32 +48,23 @@ namespace IPCore
 
         m_width = declareProperty<IntProperty>("image.width", 640, minfo);
         m_height = declareProperty<IntProperty>("image.height", 480, minfo);
-        m_uncropWidth =
-            declareProperty<IntProperty>("image.uncropWidth", 640, minfo);
-        m_uncropHeight =
-            declareProperty<IntProperty>("image.uncropHeight", 480, minfo);
+        m_uncropWidth = declareProperty<IntProperty>("image.uncropWidth", 640, minfo);
+        m_uncropHeight = declareProperty<IntProperty>("image.uncropHeight", 480, minfo);
         m_uncropX = declareProperty<IntProperty>("image.uncropX", 0, minfo);
         m_uncropY = declareProperty<IntProperty>("image.uncropY", 0, minfo);
-        m_pixelAspect =
-            declareProperty<FloatProperty>("image.pixelAspect", 1.0, minfo);
+        m_pixelAspect = declareProperty<FloatProperty>("image.pixelAspect", 1.0, minfo);
         m_fps = declareProperty<FloatProperty>("image.fps", 0.0, minfo);
         m_start = declareProperty<IntProperty>("image.start", 1, einfo);
         m_end = declareProperty<IntProperty>("image.end", 1, einfo);
-        m_cutIn = declareProperty<IntProperty>(
-            "cut.in", -numeric_limits<int>::max(), einfo);
-        m_cutOut = declareProperty<IntProperty>(
-            "cut.out", numeric_limits<int>::max(), einfo);
+        m_cutIn = declareProperty<IntProperty>("cut.in", -numeric_limits<int>::max(), einfo);
+        m_cutOut = declareProperty<IntProperty>("cut.out", numeric_limits<int>::max(), einfo);
         m_inc = declareProperty<IntProperty>("image.inc", 1, minfo);
-        m_encoding =
-            declareProperty<StringProperty>("image.encoding", "None", minfo);
-        m_channels =
-            declareProperty<StringProperty>("image.channels", "RGBA", minfo);
+        m_encoding = declareProperty<StringProperty>("image.encoding", "None", minfo);
+        m_channels = declareProperty<StringProperty>("image.channels", "RGBA", minfo);
         m_bits = declareProperty<IntProperty>("image.bitsPerChannel", 0, minfo);
         m_float = declareProperty<IntProperty>("image.float", 0, minfo);
-        m_defaultView =
-            declareProperty<StringProperty>("image.defaultView", "", minfo);
-        m_defaultLayer =
-            declareProperty<StringProperty>("image.defaultLayer", "", minfo);
+        m_defaultView = declareProperty<StringProperty>("image.defaultView", "", minfo);
+        m_defaultLayer = declareProperty<StringProperty>("image.defaultLayer", "", minfo);
 
         m_layers = createProperty<StringProperty>("image.layers");
         m_layers->setInfo(minfo);
@@ -93,8 +77,7 @@ namespace IPCore
         updateStereoViews(m_mediaInfo.views, m_eyeViews);
     }
 
-    void ImageSourceIPNode::set(const string& mediaName,
-                                const MovieInfo& mediaInfo)
+    void ImageSourceIPNode::set(const string& mediaName, const MovieInfo& mediaInfo)
     {
         m_mediaInfo = mediaInfo;
 
@@ -130,14 +113,12 @@ namespace IPCore
 
         if (m_mediaInfo.layers.size() > 0)
         {
-            std::copy(m_mediaInfo.layers.begin(), m_mediaInfo.layers.end(),
-                      m_layers->StringProperty::valueContainer().begin());
+            std::copy(m_mediaInfo.layers.begin(), m_mediaInfo.layers.end(), m_layers->StringProperty::valueContainer().begin());
         }
 
         if (m_mediaInfo.views.size() > 0)
         {
-            std::copy(m_mediaInfo.views.begin(), m_mediaInfo.views.end(),
-                      m_views->StringProperty::valueContainer().begin());
+            std::copy(m_mediaInfo.views.begin(), m_mediaInfo.views.end(), m_views->StringProperty::valueContainer().begin());
         }
 
         switch (m_mediaInfo.dataType)
@@ -170,8 +151,7 @@ namespace IPCore
         propagateMediaChange();
     }
 
-    void ImageSourceIPNode::readCompleted(const std::string& typeName,
-                                          unsigned int version)
+    void ImageSourceIPNode::readCompleted(const std::string& typeName, unsigned int version)
     {
         SourceIPNode::readCompleted(typeName, version);
 
@@ -220,12 +200,10 @@ namespace IPCore
         m_mediaInfo.views.resize(m_views->size());
         m_mediaInfo.layers.resize(m_layers->size());
 
-        std::copy(m_views->StringProperty::valueContainer().begin(),
-                  m_views->StringProperty::valueContainer().end(),
+        std::copy(m_views->StringProperty::valueContainer().begin(), m_views->StringProperty::valueContainer().end(),
                   m_mediaInfo.views.begin());
 
-        std::copy(m_layers->StringProperty::valueContainer().begin(),
-                  m_layers->StringProperty::valueContainer().end(),
+        std::copy(m_layers->StringProperty::valueContainer().begin(), m_layers->StringProperty::valueContainer().end(),
                   m_mediaInfo.layers.begin());
 
         m_mediaInfo.defaultView = m_defaultView->front();
@@ -319,8 +297,7 @@ namespace IPCore
         {
             FBInfo::ViewInfo& vinfo = m_mediaInfo.viewInfos[0];
 
-            vinfo.name =
-                m_mediaInfo.views.empty() ? string("") : m_mediaInfo.views[0];
+            vinfo.name = m_mediaInfo.views.empty() ? string("") : m_mediaInfo.views[0];
             vinfo.layers.resize(nlayers == 0 ? 1 : nlayers);
 
             for (size_t q = 0; q < nlayers; q++)
@@ -374,8 +351,7 @@ namespace IPCore
 
     ImageSourceIPNode::~ImageSourceIPNode() {}
 
-    ImageSourceIPNode::Property*
-    ImageSourceIPNode::makePixels(const string& comp, const string& prop)
+    ImageSourceIPNode::Property* ImageSourceIPNode::makePixels(const string& comp, const string& prop)
     {
         Property* p = 0;
 
@@ -429,33 +405,26 @@ namespace IPCore
         m_propMap[p]++;
         IPNode::propertyChanged(p);
 
-        if (p == m_width || p == m_height || p == m_uncropWidth
-            || p == m_uncropHeight || p == m_uncropX || p == m_uncropY
+        if (p == m_width || p == m_height || p == m_uncropWidth || p == m_uncropHeight || p == m_uncropX || p == m_uncropY
             || p == m_pixelAspect)
         {
             propagateImageStructureChange();
         }
 
-        if (p == m_fps || p == m_start || p == m_end || p == m_cutIn
-            || p == m_cutOut || p == m_inc)
+        if (p == m_fps || p == m_start || p == m_end || p == m_cutIn || p == m_cutOut || p == m_inc)
         {
             propagateRangeChange();
         }
     }
 
-    ImageSourceIPNode::Property*
-    ImageSourceIPNode::findCreatePixels(int frame, const string& view,
-                                        const string& layer)
+    ImageSourceIPNode::Property* ImageSourceIPNode::findCreatePixels(int frame, const string& view, const string& layer)
     {
-        const StringProperty::container_type& viewContainer =
-            m_views->valueContainer();
-        const StringProperty::container_type& layerContainer =
-            m_layers->valueContainer();
+        const StringProperty::container_type& viewContainer = m_views->valueContainer();
+        const StringProperty::container_type& layerContainer = m_layers->valueContainer();
 
         if (view != "-")
         {
-            if (std::find(viewContainer.begin(), viewContainer.end(), view)
-                == viewContainer.end())
+            if (std::find(viewContainer.begin(), viewContainer.end(), view) == viewContainer.end())
             {
                 TWK_THROW_EXC_STREAM("Bad view name: " << view);
             }
@@ -463,8 +432,7 @@ namespace IPCore
 
         if (layer != "-")
         {
-            if (std::find(layerContainer.begin(), layerContainer.end(), layer)
-                == layerContainer.end())
+            if (std::find(layerContainer.begin(), layerContainer.end(), layer) == layerContainer.end())
             {
                 TWK_THROW_EXC_STREAM("Bad layer name: " << layer);
             }
@@ -491,24 +459,18 @@ namespace IPCore
     {
         int in = m_cutIn->front();
         int out = m_cutOut->front();
-        return ImageRangeInfo(
-            m_start->front(), m_end->front(), m_inc->front(), m_fps->front(),
-            (in != -numeric_limits<int>::max()) ? in : m_start->front(),
-            (out != numeric_limits<int>::max()) ? out : m_end->front());
+        return ImageRangeInfo(m_start->front(), m_end->front(), m_inc->front(), m_fps->front(),
+                              (in != -numeric_limits<int>::max()) ? in : m_start->front(),
+                              (out != numeric_limits<int>::max()) ? out : m_end->front());
     }
 
-    IPNode::ImageStructureInfo
-    ImageSourceIPNode::imageStructureInfo(const Context& context) const
+    IPNode::ImageStructureInfo ImageSourceIPNode::imageStructureInfo(const Context& context) const
     {
-        return ImageStructureInfo(m_uncropWidth->front(),
-                                  m_uncropHeight->front(),
-                                  m_pixelAspect->front());
+        return ImageStructureInfo(m_uncropWidth->front(), m_uncropHeight->front(), m_pixelAspect->front());
     }
 
-    void ImageSourceIPNode::pixelPropNamesViewLayer(
-        const StringVector& suffixes1, const StringVector& suffixes2,
-        const string& separator1, const string& separator2, int frame,
-        LayerTree& layerTree, bool existingOnly)
+    void ImageSourceIPNode::pixelPropNamesViewLayer(const StringVector& suffixes1, const StringVector& suffixes2, const string& separator1,
+                                                    const string& separator2, int frame, LayerTree& layerTree, bool existingOnly)
     {
         //
         //  This function is a bit funky because it has to find alternate
@@ -548,8 +510,7 @@ namespace IPCore
                 if (!existingOnly)
                 {
                     ostringstream str;
-                    str << frame << separator1 << suffixes1[i] << separator2
-                        << cleanSuffixes2[q];
+                    str << frame << separator1 << suffixes1[i] << separator2 << cleanSuffixes2[q];
 
                     propNames.push_back(str.str());
                 }
@@ -561,8 +522,7 @@ namespace IPCore
                     {
                         ostringstream str;
 
-                        str << f << separator1 << suffixes1[i] << separator2
-                            << cleanSuffixes2[q];
+                        str << f << separator1 << suffixes1[i] << separator2 << cleanSuffixes2[q];
 
                         const string& name = str.str();
 
@@ -577,8 +537,7 @@ namespace IPCore
                     {
                         ostringstream str;
 
-                        str << f << separator1 << suffixes1[i] << separator2
-                            << cleanSuffixes2[q];
+                        str << f << separator1 << suffixes1[i] << separator2 << cleanSuffixes2[q];
 
                         const string& name = str.str();
 
@@ -593,9 +552,7 @@ namespace IPCore
         }
     }
 
-    void ImageSourceIPNode::pixelPropNames(const StringVector& views,
-                                           const StringVector& layers,
-                                           int frame, LayerTree& propNames,
+    void ImageSourceIPNode::pixelPropNames(const StringVector& views, const StringVector& layers, int frame, LayerTree& propNames,
                                            bool existingOnly)
     {
         if (views.empty() && layers.empty())
@@ -605,9 +562,7 @@ namespace IPCore
             suffixes1.front() = defaultView();
             suffixes2.front() = defaultLayer();
 
-            pixelPropNamesViewLayer(suffixes1, suffixes2,
-                                    suffixes1.front() == "" ? "" : ":",
-                                    suffixes2.front() == "" ? "" : ";", frame,
+            pixelPropNamesViewLayer(suffixes1, suffixes2, suffixes1.front() == "" ? "" : ":", suffixes2.front() == "" ? "" : ";", frame,
                                     propNames, existingOnly);
         }
         else if (views.empty())
@@ -615,23 +570,18 @@ namespace IPCore
             StringVector suffixes1(1);
             suffixes1.front() = defaultView();
 
-            pixelPropNamesViewLayer(suffixes1, layers,
-                                    suffixes1.front() == "" ? "" : ":", ";",
-                                    frame, propNames, existingOnly);
+            pixelPropNamesViewLayer(suffixes1, layers, suffixes1.front() == "" ? "" : ":", ";", frame, propNames, existingOnly);
         }
         else if (layers.empty())
         {
             StringVector suffixes2(1);
             suffixes2.front() = defaultLayer();
 
-            pixelPropNamesViewLayer(views, suffixes2, ":",
-                                    suffixes2.front() == "" ? "" : ";", frame,
-                                    propNames, existingOnly);
+            pixelPropNamesViewLayer(views, suffixes2, ":", suffixes2.front() == "" ? "" : ";", frame, propNames, existingOnly);
         }
         else
         {
-            pixelPropNamesViewLayer(views, layers, ":", ";", frame, propNames,
-                                    existingOnly);
+            pixelPropNamesViewLayer(views, layers, ":", ";", frame, propNames, existingOnly);
         }
     }
 
@@ -645,8 +595,7 @@ namespace IPCore
         ImageComponent selection = selectComponentFromContext(context);
         if (context.stereo)
         {
-            ImageComponent newSelection =
-                stereoComponent(selection, context.eye);
+            ImageComponent newSelection = stereoComponent(selection, context.eye);
 
             if (newSelection.isValid())
                 selection = newSelection;
@@ -735,18 +684,14 @@ namespace IPCore
                     for (size_t c = 0; c < numChannels; c++)
                         chans[c] = m_channels->front().at(c);
 
-                    FrameBuffer* fb = new FrameBuffer(
-                        m_width->front(), m_height->front(), numChannels, d,
-                        (unsigned char*)pixels->rawData(), &chans);
+                    FrameBuffer* fb =
+                        new FrameBuffer(m_width->front(), m_height->front(), numChannels, d, (unsigned char*)pixels->rawData(), &chans);
 
-                    IPImage* img =
-                        new IPImage(this, IPImage::BlendRenderType, fb);
+                    IPImage* img = new IPImage(this, IPImage::BlendRenderType, fb);
 
                     fb->attribute<int>("Eye") = eye;
 
-                    fb->idstream()
-                        << IPNode::name() << "/" << m_mediaName->front() << "/"
-                        << pixels->name();
+                    fb->idstream() << IPNode::name() << "/" << m_mediaName->front() << "/" << pixels->name();
 
                     //
                     //  The ID at this point (without the unique integer from
@@ -766,18 +711,14 @@ namespace IPCore
 
                     fb->idstream() << "/" << m_propMap[pixels];
 
-                    if (m_uncropHeight->front() != m_height->front()
-                        || m_uncropWidth->front() != m_width->front())
+                    if (m_uncropHeight->front() != m_height->front() || m_uncropWidth->front() != m_width->front())
                     {
-                        fb->setUncrop(m_uncropWidth->front(),
-                                      m_uncropHeight->front(),
-                                      m_uncropX->front(), m_uncropY->front());
+                        fb->setUncrop(m_uncropWidth->front(), m_uncropHeight->front(), m_uncropX->front(), m_uncropY->front());
                     }
                     addUserAttributes(img->fb);
 
                     ostringstream sourceName;
-                    sourceName << IPNode::name() << ".0/" << "0/"
-                               << pixels->name();
+                    sourceName << IPNode::name() << ".0/" << "0/" << pixels->name();
                     fb->attribute<string>("RVSource") = sourceName.str();
                     head = img;
 
@@ -802,8 +743,7 @@ namespace IPCore
         ImageComponent selection = selectComponentFromContext(context);
         if (context.stereo)
         {
-            ImageComponent newSelection =
-                stereoComponent(selection, context.eye);
+            ImageComponent newSelection = stereoComponent(selection, context.eye);
 
             if (newSelection.isValid())
                 selection = newSelection;
@@ -848,8 +788,7 @@ namespace IPCore
                 if (Property* pixels = c->find(name))
                 {
                     ostringstream str;
-                    str << IPNode::name() << "/" << m_mediaName->front() << "/"
-                        << pixels->name() << "/" << m_propMap[pixels]
+                    str << IPNode::name() << "/" << m_mediaName->front() << "/" << pixels->name() << "/" << m_propMap[pixels]
                         << idFromAttributes();
 
                     IPImageID* id = new IPImageID(str.str());
@@ -864,26 +803,14 @@ namespace IPCore
 
     size_t ImageSourceIPNode::numMedia() const { return 1; }
 
-    size_t ImageSourceIPNode::mediaIndex(const std::string& name) const
-    {
-        return name == m_mediaName->front() ? 0 : size_t(-1);
-    }
+    size_t ImageSourceIPNode::mediaIndex(const std::string& name) const { return name == m_mediaName->front() ? 0 : size_t(-1); }
 
-    const SourceIPNode::MovieInfo&
-    ImageSourceIPNode::mediaMovieInfo(size_t index) const
-    {
-        return m_mediaInfo;
-    }
+    const SourceIPNode::MovieInfo& ImageSourceIPNode::mediaMovieInfo(size_t index) const { return m_mediaInfo; }
 
-    const string& ImageSourceIPNode::mediaName(size_t index) const
-    {
-        return m_mediaName->front();
-    }
+    const string& ImageSourceIPNode::mediaName(size_t index) const { return m_mediaName->front(); }
 
-    void ImageSourceIPNode::insertPixels(const string& view,
-                                         const string& layer, int frame, int x,
-                                         int y, int w, int h,
-                                         const void* pixels, size_t size)
+    void ImageSourceIPNode::insertPixels(const string& view, const string& layer, int frame, int x, int y, int w, int h, const void* pixels,
+                                         size_t size)
     {
         Property* p = findCreatePixels(frame, view, layer);
         unsigned char* d = (unsigned char*)p->rawData();
@@ -896,25 +823,18 @@ namespace IPCore
         const size_t tRowSize = w * pixelSize;
         const size_t expectedSize = w * h * ch * esize;
 
-        if (layer.find('/') != string::npos || layer.find('@') != string::npos
-            || layer.find('#') != string::npos
-            || layer.find('*') != string::npos
-            || layer.find(':') != string::npos
-            || layer.find(';') != string::npos)
+        if (layer.find('/') != string::npos || layer.find('@') != string::npos || layer.find('#') != string::npos
+            || layer.find('*') != string::npos || layer.find(':') != string::npos || layer.find(';') != string::npos)
         {
             cerr << "ERROR: Characters /, @, #, *, :, ; are illegal in layer "
                     "names"
                  << endl;
-            TWK_THROW_STREAM(
-                LayerOutOfBoundsExc,
-                "Characters /, @, #, *, :, ; are illegal in layer names");
+            TWK_THROW_STREAM(LayerOutOfBoundsExc, "Characters /, @, #, *, :, ; are illegal in layer names");
         }
 
         if (expectedSize != size)
         {
-            TWK_THROW_STREAM(PixelBlockSizeMismatchExc,
-                             "Received pixels of size " << size << ". Expected "
-                                                        << expectedSize);
+            TWK_THROW_STREAM(PixelBlockSizeMismatchExc, "Received pixels of size " << size << ". Expected " << expectedSize);
         }
 
         for (size_t i = y; i < (y + h); i++)
@@ -956,8 +876,7 @@ namespace IPCore
             context.component = ImageComponent(LayerComponent, layer);
         }
 
-        propagateFlushToInputs(
-            context); // flush any old cached versions of the image
+        propagateFlushToInputs(context); // flush any old cached versions of the image
 
         //
         //  Ok, now notify that the property changed. The identifier will

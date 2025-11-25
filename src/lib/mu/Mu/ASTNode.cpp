@@ -29,8 +29,7 @@ namespace Mu
 
     void ASTNode::childVisit(NodePatch&, Node*, size_t) {}
 
-    ASTAssign::ASTAssign(NodeAssembler& as, const Symbol* s, Node* lhs,
-                         Node* rhs)
+    ASTAssign::ASTAssign(NodeAssembler& as, const Symbol* s, Node* lhs, Node* rhs)
         : ASTCall(as, 2, s, as.context()->internName("="))
     {
         setArg(lhs, 0);
@@ -42,25 +41,20 @@ namespace Mu
         NodeAssembler& as = visitor.as();
         Node* lhs = argNode(0);
         Node* rhs = argNode(1);
-        const ReferenceType* lhsRefType =
-            dynamic_cast<const ReferenceType*>(lhs->type());
+        const ReferenceType* lhsRefType = dynamic_cast<const ReferenceType*>(lhs->type());
         const Type* lhsType = lhsRefType ? lhsRefType->dereferenceType() : 0;
 
         if (lhs->type() == as.context()->unresolvedType())
         {
             if (lhs->symbol() == as.context()->unresolvedStackReference())
             {
-                ASTStackReference* astnode =
-                    static_cast<ASTStackReference*>(lhs);
-                const StackVariable* sv =
-                    static_cast<const StackVariable*>(astnode->symbol);
+                ASTStackReference* astnode = static_cast<ASTStackReference*>(lhs);
+                const StackVariable* sv = static_cast<const StackVariable*>(astnode->symbol);
 
                 if (sv->isImplicitlyTyped())
                 {
-                    const ReferenceType* reftype =
-                        dynamic_cast<const ReferenceType*>(rhs->type());
-                    const Type* t =
-                        reftype ? reftype->dereferenceType() : rhs->type();
+                    const ReferenceType* reftype = dynamic_cast<const ReferenceType*>(rhs->type());
+                    const Type* t = reftype ? reftype->dereferenceType() : rhs->type();
                     ((StackVariable*)sv)->setStorageClass(t);
 
                     Node* Nrhs = as.dereferenceLValue(rhs);
@@ -69,10 +63,8 @@ namespace Mu
 
                     if (!n)
                     {
-                        as.freportError(
-                            this, "cannot assign type \"%s\" to %s.",
-                            Nrhs->type()->fullyQualifiedName().c_str(),
-                            sv->name().c_str());
+                        as.freportError(this, "cannot assign type \"%s\" to %s.", Nrhs->type()->fullyQualifiedName().c_str(),
+                                        sv->name().c_str());
                     }
 
                     return n;
@@ -89,28 +81,22 @@ namespace Mu
 
                     if (!rnode)
                     {
-                        as.freportError(
-                            this, "cannot assign \"%s\".",
-                            n->type()->fullyQualifiedName().c_str());
+                        as.freportError(this, "cannot assign \"%s\".", n->type()->fullyQualifiedName().c_str());
                     }
 
                     return rnode;
                 }
                 else
                 {
-                    as.freportError(
-                        this, "cannot cast \"%s\" to \"%s\" for assignment.",
-                        rhs->type()->fullyQualifiedName().c_str(),
-                        lhsType ? lhsType->fullyQualifiedName().c_str() : "?");
+                    as.freportError(this, "cannot cast \"%s\" to \"%s\" for assignment.", rhs->type()->fullyQualifiedName().c_str(),
+                                    lhsType ? lhsType->fullyQualifiedName().c_str() : "?");
                 }
             }
         }
         else
         {
-            as.freportError(
-                this, "Failed to resolve assignment from \"%s\" to \"%s\".",
-                rhs->type()->fullyQualifiedName().c_str(),
-                lhsType ? lhsType->fullyQualifiedName().c_str() : "?");
+            as.freportError(this, "Failed to resolve assignment from \"%s\" to \"%s\".", rhs->type()->fullyQualifiedName().c_str(),
+                            lhsType ? lhsType->fullyQualifiedName().c_str() : "?");
         }
 
         return ASTCall::resolve(visitor);
@@ -137,31 +123,24 @@ namespace Mu
             //    case, we need to check in the type too.
             //
 
-            if (const Type* t =
-                    ss->symbol->findSymbolOfTypeByQualifiedName<Type>(uname))
+            if (const Type* t = ss->symbol->findSymbolOfTypeByQualifiedName<Type>(uname))
             {
-                if (const Function* f =
-                        t->findSymbolOfTypeByQualifiedName<Function>(t->name()))
+                if (const Function* f = t->findSymbolOfTypeByQualifiedName<Function>(t->name()))
                 {
-                    for (const Function* fo = f->firstFunctionOverload(); fo;
-                         fo = fo->nextFunctionOverload())
+                    for (const Function* fo = f->firstFunctionOverload(); fo; fo = fo->nextFunctionOverload())
                     {
                         functions.push_back(fo);
                     }
                 }
             }
 
-            if (const Function* f =
-                    ss->symbol->findSymbolOfTypeByQualifiedName<Function>(
-                        uname))
+            if (const Function* f = ss->symbol->findSymbolOfTypeByQualifiedName<Function>(uname))
             {
-                for (const Function* fo = f->firstFunctionOverload(); fo;
-                     fo = fo->nextFunctionOverload())
+                for (const Function* fo = f->firstFunctionOverload(); fo; fo = fo->nextFunctionOverload())
                 {
                     functions.push_back(fo);
 
-                    if (visitor.method()
-                        && (method = dynamic_cast<const MemberFunction*>(fo)))
+                    if (visitor.method() && (method = dynamic_cast<const MemberFunction*>(fo)))
                     {
                         if (fo->scope() == f->scope())
                         {
@@ -174,12 +153,8 @@ namespace Mu
 
                             if (nl.size() == fo->numArgs() - 1)
                             {
-                                Name thisname =
-                                    as.context()->internName("this");
-                                ParameterVariable* pthis =
-                                    visitor.function()
-                                        ->findSymbolOfType<ParameterVariable>(
-                                            thisname);
+                                Name thisname = as.context()->internName("this");
+                                ParameterVariable* pthis = visitor.function()->findSymbolOfType<ParameterVariable>(thisname);
                                 nthis = as.dereferenceVariable(pthis);
                             }
 
@@ -205,8 +180,7 @@ namespace Mu
             }
         }
 
-        as.freportError(this, "Unresolved function call to \"%s\"",
-                        uname.c_str());
+        as.freportError(this, "Unresolved function call to \"%s\"", uname.c_str());
 
         throw UnresolvedFunctionException();
     }
@@ -235,9 +209,7 @@ namespace Mu
             }
         }
 
-        as.freportError(this, "Cannot cast \"%s\" to \"%s\".",
-                        argNode(0)->type()->fullyQualifiedName().c_str(),
-                        uname.c_str());
+        as.freportError(this, "Cannot cast \"%s\" to \"%s\".", argNode(0)->type()->fullyQualifiedName().c_str(), uname.c_str());
 
         throw BadCastException();
     }
@@ -259,28 +231,24 @@ namespace Mu
             {
                 if (lhs->symbol() == as.context()->unresolvedMemberReference())
                 {
-                    ASTMemberReference* astref =
-                        static_cast<ASTMemberReference*>(lhs);
+                    ASTMemberReference* astref = static_cast<ASTMemberReference*>(lhs);
                     Name n = astref->name;
                     Node* prefix = astref->argNode(0);
                     const Type* t = prefix->type();
 
                     if (t->isReferenceType())
                     {
-                        t = static_cast<const ReferenceType*>(t)
-                                ->dereferenceType();
+                        t = static_cast<const ReferenceType*>(t)->dereferenceType();
                     }
 
-                    if (const MemberFunction* f =
-                            t->findSymbolOfType<MemberFunction>(n))
+                    if (const MemberFunction* f = t->findSymbolOfType<MemberFunction>(n))
                     {
                         //
                         //  This is a method call
                         //
 
                         Node* nthis = astref->argNode(0);
-                        NodeAssembler::NodeList nl =
-                            rhs ? as.newNodeList(rhs) : as.emptyNodeList();
+                        NodeAssembler::NodeList nl = rhs ? as.newNodeList(rhs) : as.emptyNodeList();
                         Node* nn = as.callMethod(f, nthis, nl);
 
                         as.removeNodeList(nl);
@@ -305,28 +273,23 @@ namespace Mu
             t = static_cast<const ReferenceType*>(t)->dereferenceType();
         }
 
-        if (const MemberVariable* v =
-                t->findSymbolOfType<MemberVariable>(uname))
+        if (const MemberVariable* v = t->findSymbolOfType<MemberVariable>(uname))
         {
             if (Node* nn = as.referenceMemberVariable(v, prefix))
             {
                 return nn;
             }
         }
-        else if (const MemberFunction* f =
-                     t->findSymbolOfType<MemberFunction>(uname))
+        else if (const MemberFunction* f = t->findSymbolOfType<MemberFunction>(uname))
         {
-            if (visitor.parent()->symbol()
-                == as.context()->unresolvedMemberCall())
+            if (visitor.parent()->symbol() == as.context()->unresolvedMemberCall())
             {
                 // handle it up in the hierarchy
                 return this;
             }
         }
 
-        as.freportError(this,
-                        "Unresolved member reference to \"%s\" in type \"%s\"",
-                        uname.c_str(), t->fullyQualifiedName().c_str());
+        as.freportError(this, "Unresolved member reference to \"%s\" in type \"%s\"", uname.c_str(), t->fullyQualifiedName().c_str());
 
         throw UnresolvedReferenceException();
     }
@@ -387,20 +350,14 @@ namespace Mu
         Name uname = name;
 
         Symbol* s = as.nonAnonymousScope();
-        bool inclass =
-            dynamic_cast<Function*>(s) && dynamic_cast<Class*>(s->scope());
+        bool inclass = dynamic_cast<Function*>(s) && dynamic_cast<Class*>(s->scope());
 
         if (inclass)
         {
-            if (const MemberVariable* v =
-                    visitor.function()
-                        ->scope()
-                        ->findSymbolOfType<MemberVariable>(uname))
+            if (const MemberVariable* v = visitor.function()->scope()->findSymbolOfType<MemberVariable>(uname))
             {
                 Name thisname = as.context()->internName("this");
-                ParameterVariable* pthis =
-                    visitor.function()->findSymbolOfType<ParameterVariable>(
-                        thisname);
+                ParameterVariable* pthis = visitor.function()->findSymbolOfType<ParameterVariable>(thisname);
 
                 if (pthis)
                 {
@@ -413,15 +370,10 @@ namespace Mu
                     }
                 }
             }
-            else if (const MemberFunction* f =
-                         visitor.function()
-                             ->scope()
-                             ->findSymbolOfType<MemberFunction>(uname))
+            else if (const MemberFunction* f = visitor.function()->scope()->findSymbolOfType<MemberFunction>(uname))
             {
                 Name thisname = as.context()->internName("this");
-                ParameterVariable* pthis =
-                    visitor.function()->findSymbolOfType<ParameterVariable>(
-                        thisname);
+                ParameterVariable* pthis = visitor.function()->findSymbolOfType<ParameterVariable>(thisname);
 
                 if (pthis)
                 {
@@ -438,9 +390,7 @@ namespace Mu
 
         for (const ScopeState* ss = scope; ss; ss = ss->parent)
         {
-            if (const Variable* var =
-                    ss->symbol->findSymbolOfTypeByQualifiedName<Variable>(
-                        uname))
+            if (const Variable* var = ss->symbol->findSymbolOfTypeByQualifiedName<Variable>(uname))
             {
                 return as.referenceVariable(var);
             }
@@ -459,8 +409,7 @@ namespace Mu
 
         for (const ScopeState* ss = scope; ss; ss = ss->parent)
         {
-            if (const StackVariable* svar =
-                    ss->symbol->findSymbolOfType<StackVariable>(name))
+            if (const StackVariable* svar = ss->symbol->findSymbolOfType<StackVariable>(name))
             {
                 return as.referenceVariable(svar);
             }
@@ -536,15 +485,12 @@ namespace Mu
                 {
                     if (const Mu::Type* ftype = stype->fieldType(0))
                     {
-                        ASTStackDeclaration* astdecl =
-                            static_cast<ASTStackDeclaration*>(argNode(1));
+                        ASTStackDeclaration* astdecl = static_cast<ASTStackDeclaration*>(argNode(1));
 
                         Variable::Attributes rw = Variable::ReadWrite;
                         Variable::Attributes rwi = rw | Variable::ImplicitType;
 
-                        StackVariable* svar = new StackVariable(
-                            as.context(), astdecl->name.c_str(), ftype,
-                            astdecl->dummy->address(), rwi);
+                        StackVariable* svar = new StackVariable(as.context(), astdecl->name.c_str(), ftype, astdecl->dummy->address(), rwi);
 
                         astdecl->scope->symbol->addSymbol(svar);
                         declNode = as.referenceVariable(svar);

@@ -15,9 +15,8 @@ namespace IPCore
     using namespace std;
     using namespace TwkMath;
 
-    TextureOutputGroupIPNode::TextureOutputGroupIPNode(
-        const std::string& name, const NodeDefinition* def, IPGraph* graph,
-        GroupIPNode* group)
+    TextureOutputGroupIPNode::TextureOutputGroupIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph,
+                                                       GroupIPNode* group)
         : DisplayGroupIPNode(name, def, graph, group)
     {
         setWritable(false);
@@ -28,10 +27,8 @@ namespace IPCore
         m_ndcCoords = declareProperty<IntProperty>("output.ndcCoordinates", 1);
         m_width = declareProperty<IntProperty>("output.width", 0);
         m_height = declareProperty<IntProperty>("output.height", 0);
-        m_dataType =
-            declareProperty<StringProperty>("output.dataType", "uint8");
-        m_pixelAspect =
-            declareProperty<FloatProperty>("output.pixelAspect", 1.0f);
+        m_dataType = declareProperty<StringProperty>("output.dataType", "uint8");
+        m_pixelAspect = declareProperty<FloatProperty>("output.pixelAspect", 1.0f);
         m_tag = declareProperty<StringProperty>("output.tag", "");
         m_outFrame = declareProperty<IntProperty>("output.frame", 1);
         m_flip = declareProperty<IntProperty>("output.flip", 0);
@@ -46,25 +43,13 @@ namespace IPCore
         graph()->cache().flushPerNodeCache(this);
     }
 
-    bool TextureOutputGroupIPNode::isActive() const
-    {
-        return propertyValue(m_active, 1);
-    }
+    bool TextureOutputGroupIPNode::isActive() const { return propertyValue(m_active, 1); }
 
-    void TextureOutputGroupIPNode::setFlip(bool b)
-    {
-        setProperty(m_flip, b ? 1 : 0);
-    }
+    void TextureOutputGroupIPNode::setFlip(bool b) { setProperty(m_flip, b ? 1 : 0); }
 
-    void TextureOutputGroupIPNode::setFlop(bool b)
-    {
-        setProperty(m_flop, b ? 1 : 0);
-    }
+    void TextureOutputGroupIPNode::setFlop(bool b) { setProperty(m_flop, b ? 1 : 0); }
 
-    void TextureOutputGroupIPNode::setTag(const string& tag)
-    {
-        setProperty(m_tag, tag);
-    }
+    void TextureOutputGroupIPNode::setTag(const string& tag) { setProperty(m_tag, tag); }
 
     void TextureOutputGroupIPNode::setFrame(int f)
     {
@@ -158,8 +143,7 @@ namespace IPCore
         //  (2b)    and the context.cacheNode is _not_ set (because the cache
         //          thread is just caching frames), return nothing
 
-        if (context.thread != CacheEvalThread
-            && !graph()->cache().perNodeCacheContents(this))
+        if (context.thread != CacheEvalThread && !graph()->cache().perNodeCacheContents(this))
             return 0;
         else if (context.thread == CacheEvalThread && context.cacheNode != this)
             return 0;
@@ -198,9 +182,8 @@ namespace IPCore
 
             IPImage* image = m_root->evaluate(c);
 
-            root = new IPImage(this, IPImage::BlendRenderType, c.viewWidth,
-                               c.viewHeight, m_pixelAspect->front(),
-                               IPImage::OutputTexture, dataType, stype);
+            root = new IPImage(this, IPImage::BlendRenderType, c.viewWidth, c.viewHeight, m_pixelAspect->front(), IPImage::OutputTexture,
+                               dataType, stype);
 
             image->fitToAspect(aspect);
             image->transformMatrix = S * image->transformMatrix;
@@ -216,8 +199,7 @@ namespace IPCore
         return root;
     }
 
-    IPImageID*
-    TextureOutputGroupIPNode::evaluateIdentifier(const Context& context)
+    IPImageID* TextureOutputGroupIPNode::evaluateIdentifier(const Context& context)
     {
         //
         //  If the tag has not been set, or has been re-set to "", do nothing
@@ -247,8 +229,7 @@ namespace IPCore
         //  (2b)    and the context.cacheNode is _not_ set (because the cache
         //          thread is just caching frames), return nothing
 
-        if (context.thread != CacheEvalThread
-            && !graph()->cache().perNodeCacheContents(this))
+        if (context.thread != CacheEvalThread && !graph()->cache().perNodeCacheContents(this))
             return 0;
         else if (context.thread == CacheEvalThread && context.cacheNode != this)
             return 0;
@@ -266,9 +247,6 @@ namespace IPCore
         return GroupIPNode::evaluateIdentifier(c);
     }
 
-    bool TextureOutputGroupIPNode::cached() const
-    {
-        return (graph()->cache().perNodeCacheContents(this) != 0);
-    }
+    bool TextureOutputGroupIPNode::cached() const { return (graph()->cache().perNodeCacheContents(this) != 0); }
 
 } // namespace IPCore

@@ -46,8 +46,7 @@ namespace Mu
         //  Constructors
         //
 
-        QDateTimeType(Context* context, const char* name,
-                      Class* superClass = 0);
+        QDateTimeType(Context* context, const char* name, Class* superClass = 0);
         virtual ~QDateTimeType();
 
         //

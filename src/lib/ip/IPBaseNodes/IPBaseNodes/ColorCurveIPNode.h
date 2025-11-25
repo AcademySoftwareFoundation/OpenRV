@@ -21,8 +21,7 @@ namespace IPCore
     class ColorCurveIPNode : public IPNode
     {
     public:
-        ColorCurveIPNode(const std::string& name, const NodeDefinition* def,
-                         IPGraph* graph, GroupIPNode* group = 0);
+        ColorCurveIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group = 0);
 
         virtual ~ColorCurveIPNode();
 

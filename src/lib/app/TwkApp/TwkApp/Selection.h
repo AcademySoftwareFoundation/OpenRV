@@ -73,8 +73,7 @@ namespace TwkApp
         // nothing
     }
 
-    template <class Container>
-    Selection* TypedSelection<Container>::copy() const
+    template <class Container> Selection* TypedSelection<Container>::copy() const
     {
         typedef TypedSelection<Container> ThisType;
         ThisType* c = new ThisType(type());

@@ -121,10 +121,7 @@ namespace Mu
             const Symbol* symbol;
             Name::Ref name;
 
-            template <class T> const T* symbolOfType() const
-            {
-                return dynamic_cast<const T*>(symbol);
-            }
+            template <class T> const T* symbolOfType() const { return dynamic_cast<const T*>(symbol); }
         };
 
         typedef STLVector<SymbolRef>::Type SymbolRefList;
@@ -211,10 +208,8 @@ namespace Mu
         Symbol* findSymbol(Name);
         virtual const Symbol* findSymbol(Name) const;
 
-        Symbol* findSymbolByQualifiedName(QualifiedName,
-                                          bool restricted = true);
-        const Symbol* findSymbolByQualifiedName(QualifiedName,
-                                                bool restricted = true) const;
+        Symbol* findSymbolByQualifiedName(QualifiedName, bool restricted = true);
+        const Symbol* findSymbolByQualifiedName(QualifiedName, bool restricted = true) const;
 
         //
         //  When find symbols by fully qualified name, there is a
@@ -240,21 +235,15 @@ namespace Mu
 
         template <class T> const T* findSymbolOfType(Name name) const;
 
-        template <class T>
-        T* findSymbolOfTypeByQualifiedName(Name name, bool restricted = true);
+        template <class T> T* findSymbolOfTypeByQualifiedName(Name name, bool restricted = true);
 
-        template <class T>
-        const T* findSymbolOfTypeByQualifiedName(Name name,
-                                                 bool restricted = true) const;
+        template <class T> const T* findSymbolOfTypeByQualifiedName(Name name, bool restricted = true) const;
 
-        template <class T>
-        const T* findSymbolOfTypeByMangledName(const String&,
-                                               QualifiedName) const;
+        template <class T> const T* findSymbolOfTypeByMangledName(const String&, QualifiedName) const;
 
         template <class T> SymbolVector findSymbolsOfType(QualifiedName);
 
-        template <class T>
-        ConstSymbolVector findSymbolsOfType(QualifiedName) const;
+        template <class T> ConstSymbolVector findSymbolsOfType(QualifiedName) const;
 
         //
         //	scope() returns the symbol which represents the scope in which
@@ -406,9 +395,7 @@ namespace Mu
         return 0;
     }
 
-    template <class T>
-    T* Symbol::findSymbolOfTypeByQualifiedName(QualifiedName name,
-                                               bool restricted)
+    template <class T> T* Symbol::findSymbolOfTypeByQualifiedName(QualifiedName name, bool restricted)
     {
         if (Symbol* s = findSymbolByQualifiedName(name, restricted))
         {
@@ -424,9 +411,7 @@ namespace Mu
         return 0;
     }
 
-    template <class T>
-    const T* Symbol::findSymbolOfTypeByQualifiedName(QualifiedName name,
-                                                     bool restricted) const
+    template <class T> const T* Symbol::findSymbolOfTypeByQualifiedName(QualifiedName name, bool restricted) const
     {
         if (const Symbol* symbol = findSymbolByQualifiedName(name, restricted))
         {
@@ -444,33 +429,23 @@ namespace Mu
         return 0;
     }
 
-    template <class T>
-    Symbol::SymbolVector Symbol::findSymbolsOfType(QualifiedName name)
+    template <class T> Symbol::SymbolVector Symbol::findSymbolsOfType(QualifiedName name)
     {
         SymbolVector s;
         findSymbols(name, s);
-        s.erase(
-            std::remove_if(s.begin(), s.end(), stl_ext::IsNotA_p<Symbol, T>()),
-            s.end());
+        s.erase(std::remove_if(s.begin(), s.end(), stl_ext::IsNotA_p<Symbol, T>()), s.end());
         return s;
     }
 
-    template <class T>
-    Symbol::ConstSymbolVector
-    Symbol::findSymbolsOfType(QualifiedName name) const
+    template <class T> Symbol::ConstSymbolVector Symbol::findSymbolsOfType(QualifiedName name) const
     {
         ConstSymbolVector s;
         findSymbols(name, s);
-        s.erase(std::remove_if(s.begin(), s.end(),
-                               stl_ext::IsNotA_p<const Symbol, const T>()),
-                s.end());
+        s.erase(std::remove_if(s.begin(), s.end(), stl_ext::IsNotA_p<const Symbol, const T>()), s.end());
         return s;
     }
 
-    template <class T>
-    const T*
-    Symbol::findSymbolOfTypeByMangledName(const Mu::String& mangledName,
-                                          QualifiedName name) const
+    template <class T> const T* Symbol::findSymbolOfTypeByMangledName(const Mu::String& mangledName, QualifiedName name) const
     {
         ConstSymbolVector s = findSymbolsOfType<T>(name);
 

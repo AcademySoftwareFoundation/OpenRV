@@ -22,11 +22,8 @@ namespace TwkFB
 
         static void useLocalMemoryPool();
 
-        virtual void readImage(FrameBuffer& fb, const std::string& filename,
-                               const ReadRequest& request) const;
-        virtual void writeImage(const FrameBuffer& img,
-                                const std::string& filename,
-                                const WriteRequest& request) const;
+        virtual void readImage(FrameBuffer& fb, const std::string& filename, const ReadRequest& request) const;
+        virtual void writeImage(const FrameBuffer& img, const std::string& filename, const WriteRequest& request) const;
         virtual std::string about() const;
         virtual void getImageInfo(const std::string& filename, FBInfo&) const;
     };

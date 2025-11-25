@@ -31,8 +31,7 @@ namespace TwkMovie
         //  the sequence given.
         //
 
-        virtual bool write(Movie* inMovie, const std::string& filename,
-                           WriteRequest&);
+        virtual bool write(Movie* inMovie, const std::string& filename, WriteRequest&);
 
     protected:
         Movie* m_movie;

@@ -36,8 +36,7 @@ namespace TwkFB
 #define restrict __restrict
 #endif
 
-    void Read12Bit::planarConfig(FrameBuffer& fb, int w, int h,
-                                 FrameBuffer::DataType type)
+    void Read12Bit::planarConfig(FrameBuffer& fb, int w, int h, FrameBuffer::DataType type)
     {
         vector<string> planeNames(3);
         planeNames[0] = "R";
@@ -46,9 +45,8 @@ namespace TwkFB
         fb.restructurePlanar(w, h, planeNames, type, FrameBuffer::TOPLEFT);
     }
 
-    void Read12Bit::readRGB8_PLANAR(const string& filename,
-                                    const unsigned char* data, FrameBuffer& fb,
-                                    int w, int h, size_t maxBytes, bool swap)
+    void Read12Bit::readRGB8_PLANAR(const string& filename, const unsigned char* data, FrameBuffer& fb, int w, int h, size_t maxBytes,
+                                    bool swap)
     {
         planarConfig(fb, w, h, FrameBuffer::UCHAR);
 
@@ -102,9 +100,8 @@ namespace TwkFB
         }
     }
 
-    void Read12Bit::readRGB16_PLANAR(const string& filename,
-                                     const unsigned char* data, FrameBuffer& fb,
-                                     int w, int h, size_t maxBytes, bool swap)
+    void Read12Bit::readRGB16_PLANAR(const string& filename, const unsigned char* data, FrameBuffer& fb, int w, int h, size_t maxBytes,
+                                     bool swap)
     {
         planarConfig(fb, w, h, FrameBuffer::USHORT);
 
@@ -156,10 +153,8 @@ namespace TwkFB
         }
     }
 
-    void Read12Bit::readNoPaddingRGB16(const string& filename,
-                                       const unsigned char* data,
-                                       FrameBuffer& fb, int w, int h,
-                                       size_t maxBytes, bool swap)
+    void Read12Bit::readNoPaddingRGB16(const string& filename, const unsigned char* data, FrameBuffer& fb, int w, int h, size_t maxBytes,
+                                       bool swap)
     {
         planarConfig(fb, w, h, FrameBuffer::USHORT);
 
@@ -176,8 +171,7 @@ namespace TwkFB
         FrameBuffer* G = R->nextPlane();
         FrameBuffer* B = G->nextPlane();
 
-        U16* elements[] = {R->pixels<U16>(), G->pixels<U16>(),
-                           B->pixels<U16>()};
+        U16* elements[] = {R->pixels<U16>(), G->pixels<U16>(), B->pixels<U16>()};
 
         //
         //  Loop over the nibbles
@@ -188,14 +182,12 @@ namespace TwkFB
         size_t elemIndex = 0;
         size_t iteration = 0;
 
-        for (const unsigned char *p = (swap ? data2 : data), *e = p + maxBytes;
-             p < e;)
+        for (const unsigned char *p = (swap ? data2 : data), *e = p + maxBytes; p < e;)
         {
             const U16 nibble = *p & (nibbleIndex == 0 ? 0x0f : 0xf0);
             if (valueIndex == 0)
                 *(elements[elemIndex]) = 0;
-            *(elements[elemIndex]) |=
-                nibble << (valueIndex * 4 + 4 * (1 - nibbleIndex));
+            *(elements[elemIndex]) |= nibble << (valueIndex * 4 + 4 * (1 - nibbleIndex));
 
             nibbleIndex ^= 0x1;
             valueIndex = (valueIndex + 1) % 3;

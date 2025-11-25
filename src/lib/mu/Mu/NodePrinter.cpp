@@ -28,8 +28,7 @@ namespace Mu
     {
     }
 
-    NodePrinter::NodePrinter(Node* n, ostream& o, Type::ValueOutputState& state,
-                             NodePrinter::Style s)
+    NodePrinter::NodePrinter(Node* n, ostream& o, Type::ValueOutputState& state, NodePrinter::Style s)
         : NodeVisitor(n)
         , _ostream(&o)
         , _style(s)
@@ -76,10 +75,7 @@ namespace Mu
                     DataNode* dnode = static_cast<DataNode*>(node);
                     if (_state)
                     {
-                        type->outputValueRecursive(
-                            out(),
-                            type->machineRep()->valuePointer(dnode->_data),
-                            *_state);
+                        type->outputValueRecursive(out(), type->machineRep()->valuePointer(dnode->_data), *_state);
                     }
                     else
                     {

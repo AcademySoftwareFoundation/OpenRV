@@ -24,9 +24,7 @@ namespace IPCore
     using namespace boost::posix_time;
     using namespace boost::gregorian;
 
-    DynamicIPNode::DynamicIPNode(const std::string& name,
-                                 const NodeDefinition* def, IPGraph* g,
-                                 GroupIPNode* group)
+    DynamicIPNode::DynamicIPNode(const std::string& name, const NodeDefinition* def, IPGraph* g, GroupIPNode* group)
         : GroupIPNode(name, def, g, group)
         , m_glslValid(0)
         , m_glslCurrent(0)
@@ -36,24 +34,19 @@ namespace IPCore
     {
         PropertyInfo* noSave = new PropertyInfo(PropertyInfo::NotPersistent);
         PropertyInfo* outputOnly = new PropertyInfo(PropertyInfo::OutputOnly);
-        PropertyInfo* programFlush = new PropertyInfo(
-            PropertyInfo::RequiresProgramFlush | PropertyInfo::Persistent);
+        PropertyInfo* programFlush = new PropertyInfo(PropertyInfo::RequiresProgramFlush | PropertyInfo::Persistent);
 
         m_parameters = createComponent("parameters");
-        m_glslCurrent =
-            declareProperty<StringProperty>("function.glsl", "", programFlush);
-        m_glslValid =
-            declareProperty<StringProperty>("function.glsl_valid", "");
+        m_glslCurrent = declareProperty<StringProperty>("function.glsl", "", programFlush);
+        m_glslValid = declareProperty<StringProperty>("function.glsl_valid", "");
 
-        m_glslCurrent->front() =
-            "//\n// Default Definition\n//\n\nvec4 main(const in inputImage "
-            "in0)\n{\n    return in0() + vec4(1,.5,0,1);\n}\n";
+        m_glslCurrent->front() = "//\n// Default Definition\n//\n\nvec4 main(const in inputImage "
+                                 "in0)\n{\n    return in0() + vec4(1,.5,0,1);\n}\n";
         declareProperty<IntProperty>("function.fetches", 1);
         declareProperty<IntProperty>("render.intermediate", 0);
         declareProperty<StringProperty>("node.evaluationType", "color");
         declareProperty<StringProperty>("function.name", "main", noSave);
-        declareProperty<StringProperty>("node.defaultName", "dynamicInternal",
-                                        noSave);
+        declareProperty<StringProperty>("node.defaultName", "dynamicInternal", noSave);
         declareProperty<StringProperty>("node.origin", "dynamic", noSave);
         declareProperty<StringProperty>("node.export", "");
         declareProperty<StringProperty>("node.author", "");
@@ -61,24 +54,16 @@ namespace IPCore
         declareProperty<StringProperty>("node.comment", "");
         declareProperty<StringProperty>("node.date", "");
         declareProperty<IntProperty>("node.userVisible", 1);
-        m_definitionName = declareProperty<StringProperty>(
-            "node.name", "AGoodNameForANodeType", noSave);
+        m_definitionName = declareProperty<StringProperty>("node.name", "AGoodNameForANodeType", noSave);
 
-        declareProperty<StringProperty>("documentation.html",
-                                        "Its a very nice node");
-        declareProperty<StringProperty>("documentation.summary",
-                                        "This node does something interesting");
+        declareProperty<StringProperty>("documentation.html", "Its a very nice node");
+        declareProperty<StringProperty>("documentation.summary", "This node does something interesting");
 
-        m_outputValid =
-            declareProperty<IntProperty>("output.valid", 1, outputOnly);
-        m_outputError =
-            declareProperty<IntProperty>("output.error", 0, outputOnly);
-        m_outputMessage =
-            declareProperty<StringProperty>("output.message", "", outputOnly);
-        m_outputMain = declareProperty<StringProperty>("output.functionName",
-                                                       "", outputOnly);
-        m_outputCallMain = declareProperty<StringProperty>(
-            "output.functionCallName", "", outputOnly);
+        m_outputValid = declareProperty<IntProperty>("output.valid", 1, outputOnly);
+        m_outputError = declareProperty<IntProperty>("output.error", 0, outputOnly);
+        m_outputMessage = declareProperty<StringProperty>("output.message", "", outputOnly);
+        m_outputMain = declareProperty<StringProperty>("output.functionName", "", outputOnly);
+        m_outputCallMain = declareProperty<StringProperty>("output.functionCallName", "", outputOnly);
     }
 
     DynamicIPNode::~DynamicIPNode()
@@ -115,14 +100,8 @@ namespace IPCore
         defs[0] = m_definition;
         setStringValue("node.export", filename);
 
-        static const char* copyProps[] = {"node.name",
-                                          "node.export",
-                                          "node.author",
-                                          "node.company",
-                                          "node.comment",
-                                          "documentation.html",
-                                          "documentation.summary",
-                                          0};
+        static const char* copyProps[] = {"node.name",    "node.export",        "node.author",           "node.company",
+                                          "node.comment", "documentation.html", "documentation.summary", 0};
 
         for (const char** c = copyProps; *c; c++)
         {
@@ -135,8 +114,7 @@ namespace IPCore
         ptime now = second_clock::local_time();
         datestr << now;
 
-        m_definition->declareProperty<StringProperty>("node.date",
-                                                      datestr.str(), 0, true);
+        m_definition->declareProperty<StringProperty>("node.date", datestr.str(), 0, true);
         m_definition->removeProperty<StringProperty>("function.glsl_valid");
 
         vector<string> removeComps(4);
@@ -166,8 +144,7 @@ namespace IPCore
         setProperty<StringProperty>("output.message", str);
     }
 
-    void DynamicIPNode::setOutputNames(const string& name,
-                                       const string& callName)
+    void DynamicIPNode::setOutputNames(const string& name, const string& callName)
     {
         setProperty<StringProperty>("output.functionName", name);
         setProperty<StringProperty>("output.functionCallName", callName);
@@ -201,8 +178,7 @@ namespace IPCore
 
         if (!F)
         {
-            string message =
-                def->stringValue("error.message", "unable to build definition");
+            string message = def->stringValue("error.message", "unable to build definition");
             setOutput(false, true, message);
             delete def;
             return;
@@ -323,10 +299,8 @@ namespace IPCore
 
             if (numFunctionParams != 2)
             {
-                str << "WARNING: transition requires 2 inputs, but "
-                    << numFunctionParams << " inputImage parameter"
-                    << (numFunctionParams > 1 ? "s were " : " was ") << "found"
-                    << endl;
+                str << "WARNING: transition requires 2 inputs, but " << numFunctionParams << " inputImage parameter"
+                    << (numFunctionParams > 1 ? "s were " : " was ") << "found" << endl;
             }
 
             bool startFrameFound = false;
@@ -339,8 +313,7 @@ namespace IPCore
                 Shader::Symbol::Type type = F->parameters()[i]->type();
                 if (name == "startFrame" && type == Shader::Symbol::FloatType)
                     startFrameFound = true;
-                else if (name == "numFrames"
-                         && type == Shader::Symbol::FloatType)
+                else if (name == "numFrames" && type == Shader::Symbol::FloatType)
                     numFramesFound = true;
                 else if (name == "frame" && type == Shader::Symbol::FloatType)
                     frameFound = true;
@@ -348,20 +321,17 @@ namespace IPCore
 
             if (!startFrameFound)
             {
-                str << "WARNING: transition requires float startFrame parameter"
-                    << endl;
+                str << "WARNING: transition requires float startFrame parameter" << endl;
             }
 
             if (!numFramesFound)
             {
-                str << "WARNING: transition requires float numFrames parameter"
-                    << endl;
+                str << "WARNING: transition requires float numFrames parameter" << endl;
             }
 
             if (!frameFound)
             {
-                str << "WARNING: transition requires float frame parameter"
-                    << endl;
+                str << "WARNING: transition requires float frame parameter" << endl;
             }
 
             setOutput(true, true, str.str());
@@ -369,13 +339,9 @@ namespace IPCore
         else if (ins.size() != numFunctionParams && evalType != "combine")
         {
             ostringstream str;
-            str << "WARNING: too "
-                << (ins.size() < numFunctionParams ? "few" : "many")
-                << " inputs: found " << F->imageParameters().size()
-                << " inputImage parameter"
-                << (F->imageParameters().size() > 1 ? "s" : "")
-                << " but node has " << inputs().size() << " input"
-                << (inputs().size() > 1 ? "s" : "");
+            str << "WARNING: too " << (ins.size() < numFunctionParams ? "few" : "many") << " inputs: found " << F->imageParameters().size()
+                << " inputImage parameter" << (F->imageParameters().size() > 1 ? "s" : "") << " but node has " << inputs().size()
+                << " input" << (inputs().size() > 1 ? "s" : "");
             setOutput(true, true, str.str());
         }
     }
@@ -423,18 +389,11 @@ namespace IPCore
         }
     }
 
-    string DynamicIPNode::stringValue(const string& name) const
-    {
-        return propertyValue<StringProperty>(name, "");
-    }
+    string DynamicIPNode::stringValue(const string& name) const { return propertyValue<StringProperty>(name, ""); }
 
-    IPNode::StringProperty* DynamicIPNode::stringProp(const string& name)
-    {
-        return property<StringProperty>(name);
-    }
+    IPNode::StringProperty* DynamicIPNode::stringProp(const string& name) { return property<StringProperty>(name); }
 
-    void DynamicIPNode::setStringValue(const string& name, const string& value,
-                                       bool withNotification)
+    void DynamicIPNode::setStringValue(const string& name, const string& value, bool withNotification)
     {
         if (StringProperty* sp = property<StringProperty>(name))
         {
@@ -443,18 +402,11 @@ namespace IPCore
         }
     }
 
-    int DynamicIPNode::intValue(const string& name) const
-    {
-        return propertyValue<IntProperty>(name, 0);
-    }
+    int DynamicIPNode::intValue(const string& name) const { return propertyValue<IntProperty>(name, 0); }
 
-    IPNode::IntProperty* DynamicIPNode::intProp(const string& name)
-    {
-        return property<IntProperty>(name);
-    }
+    IPNode::IntProperty* DynamicIPNode::intProp(const string& name) { return property<IntProperty>(name); }
 
-    void DynamicIPNode::setIntValue(const string& name, int value,
-                                    bool withNotification)
+    void DynamicIPNode::setIntValue(const string& name, int value, bool withNotification)
     {
         if (IntProperty* p = property<IntProperty>(name))
         {
@@ -463,29 +415,14 @@ namespace IPCore
         }
     }
 
-    bool DynamicIPNode::outputError() const
-    {
-        return property<IntProperty>("output.error")->front() != 0;
-    }
+    bool DynamicIPNode::outputError() const { return property<IntProperty>("output.error")->front() != 0; }
 
-    bool DynamicIPNode::outputValid() const
-    {
-        return property<IntProperty>("output.valid")->front() != 0;
-    }
+    bool DynamicIPNode::outputValid() const { return property<IntProperty>("output.valid")->front() != 0; }
 
-    string DynamicIPNode::outputMessage() const
-    {
-        return property<StringProperty>("output.message")->front();
-    }
+    string DynamicIPNode::outputMessage() const { return property<StringProperty>("output.message")->front(); }
 
-    string DynamicIPNode::outputFunctionName() const
-    {
-        return m_outputMain->front();
-    }
+    string DynamicIPNode::outputFunctionName() const { return m_outputMain->front(); }
 
-    string DynamicIPNode::outputFunctionCallName() const
-    {
-        return m_outputCallMain->front();
-    }
+    string DynamicIPNode::outputFunctionCallName() const { return m_outputCallMain->front(); }
 
 } // namespace IPCore

@@ -92,8 +92,7 @@ namespace Mu
 
         struct ScoredFunction
         {
-            ScoredFunction(const Function* f, const TypeBindings& b,
-                           const Scores& s)
+            ScoredFunction(const Function* f, const TypeBindings& b, const Scores& s)
                 : func(f)
                 , bindings(b)
                 , scores(s)
@@ -103,8 +102,7 @@ namespace Mu
                 computeTotalScore();
             }
 
-            ScoredFunction(const Function* f, const TypeBindings& b,
-                           const Scores& s, const Permutation& pt)
+            ScoredFunction(const Function* f, const TypeBindings& b, const Scores& s, const Permutation& pt)
                 : func(f)
                 , bindings(b)
                 , scores(s)
@@ -261,10 +259,7 @@ namespace Mu
         const SourceRecord* sourceRecordOfNode(const Node*) const;
         const SourceRecord* sourceRecordOfSymbol(const Symbol*) const;
 
-        void pushSourceRecordStack()
-        {
-            _sourceRecordStack.push_back(_sourceRecord);
-        }
+        void pushSourceRecordStack() { _sourceRecordStack.push_back(_sourceRecord); }
 
         void popSourceRecordStack()
         {
@@ -272,10 +267,7 @@ namespace Mu
             _sourceRecordStack.pop_back();
         }
 
-        const SymbolDefinitionMap& symbolDefinitions() const
-        {
-            return _symbolDefinitionMap;
-        }
+        const SymbolDefinitionMap& symbolDefinitions() const { return _symbolDefinitionMap; }
 
         //
         //  Names
@@ -310,14 +302,11 @@ namespace Mu
         //  a real return value.
         //
 
-        virtual TypedValue evalText(const char* text, const char* inputName,
-                                    Process*, const ModuleList&) = 0;
+        virtual TypedValue evalText(const char* text, const char* inputName, Process*, const ModuleList&) = 0;
 
-        virtual TypedValue evalFile(const char* file, Process*,
-                                    const ModuleList&) = 0;
+        virtual TypedValue evalFile(const char* file, Process*, const ModuleList&) = 0;
 
-        virtual void parseStream(Process*, std::istream&,
-                                 const char* inputName);
+        virtual void parseStream(Process*, std::istream&, const char* inputName);
 
         void parseFile(Process*, const char* file);
 
@@ -341,24 +330,16 @@ namespace Mu
         //  reason, specializations are needed for Type.
         //
 
-        void findSymbols(QualifiedName n, SymbolVector& v)
-        {
-            return globalScope()->findSymbols(n, v);
-        }
+        void findSymbols(QualifiedName n, SymbolVector& v) { return globalScope()->findSymbols(n, v); }
 
-        void findSymbols(QualifiedName n, ConstSymbolVector& v) const
-        {
-            return globalScope()->findSymbols(n, v);
-        }
+        void findSymbols(QualifiedName n, ConstSymbolVector& v) const { return globalScope()->findSymbols(n, v); }
 
-        Symbol* findSymbolByQualifiedName(QualifiedName n,
-                                          bool restricted = true)
+        Symbol* findSymbolByQualifiedName(QualifiedName n, bool restricted = true)
         {
             return globalScope()->findSymbolByQualifiedName(n, restricted);
         }
 
-        const Symbol* findSymbolByQualifiedName(QualifiedName n,
-                                                bool restricted = true) const
+        const Symbol* findSymbolByQualifiedName(QualifiedName n, bool restricted = true) const
         {
             return globalScope()->findSymbolByQualifiedName(n, restricted);
         }
@@ -367,21 +348,15 @@ namespace Mu
 
         template <class T> const T* findSymbolOfType(Name) const;
 
-        template <class T>
-        T* findSymbolOfTypeByQualifiedName(Name, bool restricted = true);
+        template <class T> T* findSymbolOfTypeByQualifiedName(Name, bool restricted = true);
 
-        template <class T>
-        const T* findSymbolOfTypeByQualifiedName(Name,
-                                                 bool restricted = true) const;
+        template <class T> const T* findSymbolOfTypeByQualifiedName(Name, bool restricted = true) const;
 
         template <class T> SymbolVector findSymbolsOfType(QualifiedName);
 
-        template <class T>
-        ConstSymbolVector findSymbolsOfType(QualifiedName) const;
+        template <class T> ConstSymbolVector findSymbolsOfType(QualifiedName) const;
 
-        template <class T>
-        const T* findSymbolOfTypeByMangledName(const String&,
-                                               QualifiedName) const;
+        template <class T> const T* findSymbolOfTypeByMangledName(const String&, QualifiedName) const;
 
         //
         //  Signature table. If you call an intern function, the context owns
@@ -399,10 +374,7 @@ namespace Mu
         FunctionType* functionType(const char*);
         FunctionType* functionType(const Signature*);
 
-        const FunctionType* ambiguousFunctionType() const
-        {
-            return _ambiguousFunctionType;
-        }
+        const FunctionType* ambiguousFunctionType() const { return _ambiguousFunctionType; }
 
         //
         //  Find or create a Tuple Type
@@ -414,8 +386,7 @@ namespace Mu
         //  Find or create a Struct Type
         //
 
-        StructType* structType(Symbol* root, const char* name,
-                               const NameValuePairs& fields);
+        StructType* structType(Symbol* root, const char* name, const NameValuePairs& fields);
 
         //
         //  List of T  (like above but for lists)
@@ -453,14 +424,9 @@ namespace Mu
             PolymorphicMatch  // matches a generic function
         };
 
-        virtual const Function* matchFunction(const FunctionVector&,
-                                              const TypeVector& args,
-                                              TypeBindings&,
-                                              MatchType& matchType) const;
+        virtual const Function* matchFunction(const FunctionVector&, const TypeVector& args, TypeBindings&, MatchType& matchType) const;
 
-        virtual const Function* matchSpecializedFunction(Process*, Thread*,
-                                                         const FunctionVector&,
-                                                         const TypeVector& args,
+        virtual const Function* matchSpecializedFunction(Process*, Thread*, const FunctionVector&, const TypeVector& args,
                                                          MatchType& matchType);
 
         void verbose(bool b) { _verbose = b; }
@@ -471,9 +437,7 @@ namespace Mu
 
         bool debugging() const { return _debugging; }
 
-        const Function* specializeFunction(Process*, Thread*,
-                                           const TypeBindings&, const Function*,
-                                           const TypeVector&);
+        const Function* specializeFunction(Process*, Thread*, const TypeBindings&, const Function*, const TypeVector&);
 
         //
         //  Symbols
@@ -507,90 +471,46 @@ namespace Mu
 
         const Function* curry() const { return _curry; }
 
-        const Function* dynamicPartialApply() const
-        {
-            return _dynamicPartialApply;
-        }
+        const Function* dynamicPartialApply() const { return _dynamicPartialApply; }
 
-        const Function* dynamicPartialEval() const
-        {
-            return _dynamicPartialEval;
-        }
+        const Function* dynamicPartialEval() const { return _dynamicPartialEval; }
 
-        const Function* returnFromVoidFunction() const
-        {
-            return _returnFromVoidFunction;
-        }
+        const Function* returnFromVoidFunction() const { return _returnFromVoidFunction; }
 
-        const Function* returnFromFunction() const
-        {
-            return _returnFromFunction;
-        }
+        const Function* returnFromFunction() const { return _returnFromFunction; }
 
         const Function* matchFunction() const { return _matchFunction; }
 
-        const Function* assignNonPrimitive() const
-        {
-            return _assignNonPrimitive;
-        }
+        const Function* assignNonPrimitive() const { return _assignNonPrimitive; }
 
         const Symbol* unresolvedCall() const { return _unresolvedCall; }
 
         const Symbol* unresolvedCast() const { return _unresolvedCast; }
 
-        const Symbol* unresolvedConstructor() const
-        {
-            return _unresolvedConstructor;
-        }
+        const Symbol* unresolvedConstructor() const { return _unresolvedConstructor; }
 
-        const Symbol* unresolvedReference() const
-        {
-            return _unresolvedReference;
-        }
+        const Symbol* unresolvedReference() const { return _unresolvedReference; }
 
-        const Symbol* unresolvedDereference() const
-        {
-            return _unresolvedDereference;
-        }
+        const Symbol* unresolvedDereference() const { return _unresolvedDereference; }
 
-        const Symbol* unresolvedStackReference() const
-        {
-            return _unresolvedStackReference;
-        }
+        const Symbol* unresolvedStackReference() const { return _unresolvedStackReference; }
 
-        const Symbol* unresolvedStackDereference() const
-        {
-            return _unresolvedStackDereference;
-        }
+        const Symbol* unresolvedStackDereference() const { return _unresolvedStackDereference; }
 
-        const Symbol* unresolvedMemberReference() const
-        {
-            return _unresolvedMemberReference;
-        }
+        const Symbol* unresolvedMemberReference() const { return _unresolvedMemberReference; }
 
-        const Symbol* unresolvedMemberCall() const
-        {
-            return _unresolvedMemberCall;
-        }
+        const Symbol* unresolvedMemberCall() const { return _unresolvedMemberCall; }
 
-        const Symbol* unresolvedDeclaration() const
-        {
-            return _unresolvedDeclaration;
-        }
+        const Symbol* unresolvedDeclaration() const { return _unresolvedDeclaration; }
 
-        const Symbol* unresolvedAssignment() const
-        {
-            return _unresolvedAssignment;
-        }
+        const Symbol* unresolvedAssignment() const { return _unresolvedAssignment; }
 
         static void setShowConstructed(bool);
 
     private:
-        bool scoreArgs(Scores& scores, TypeBindings& bindings,
-                       const Function* F, const TypeVector& args) const;
+        bool scoreArgs(Scores& scores, TypeBindings& bindings, const Function* F, const TypeVector& args) const;
 
-        int score(const Function* F, TypeBindings& bindings, const Type* ftype,
-                  const Type* type) const;
+        int score(const Function* F, TypeBindings& bindings, const Type* ftype, const Type* type) const;
 
         const Function* findCast(const Type* from, const Type* to) const;
 
@@ -691,12 +611,9 @@ namespace Mu
         return 0;
     }
 
-    template <class T>
-    T* Context::findSymbolOfTypeByQualifiedName(QualifiedName name,
-                                                bool restricted)
+    template <class T> T* Context::findSymbolOfTypeByQualifiedName(QualifiedName name, bool restricted)
     {
-        if (Symbol* s =
-                globalScope()->findSymbolByQualifiedName(name, restricted))
+        if (Symbol* s = globalScope()->findSymbolByQualifiedName(name, restricted))
         {
             for (s = s->firstOverload(); s; s = s->nextOverload())
             {
@@ -710,12 +627,9 @@ namespace Mu
         return 0;
     }
 
-    template <class T>
-    const T* Context::findSymbolOfTypeByQualifiedName(QualifiedName name,
-                                                      bool restricted) const
+    template <class T> const T* Context::findSymbolOfTypeByQualifiedName(QualifiedName name, bool restricted) const
     {
-        if (const Symbol* symbol =
-                globalScope()->findSymbolByQualifiedName(name, restricted))
+        if (const Symbol* symbol = globalScope()->findSymbolByQualifiedName(name, restricted))
         {
             while (symbol)
             {
@@ -731,33 +645,23 @@ namespace Mu
         return 0;
     }
 
-    template <class T>
-    Context::SymbolVector Context::findSymbolsOfType(QualifiedName name)
+    template <class T> Context::SymbolVector Context::findSymbolsOfType(QualifiedName name)
     {
         SymbolVector s;
         findSymbols(name, s);
-        s.erase(
-            std::remove_if(s.begin(), s.end(), stl_ext::IsNotA_p<Symbol, T>()),
-            s.end());
+        s.erase(std::remove_if(s.begin(), s.end(), stl_ext::IsNotA_p<Symbol, T>()), s.end());
         return s;
     }
 
-    template <class T>
-    Context::ConstSymbolVector
-    Context::findSymbolsOfType(QualifiedName name) const
+    template <class T> Context::ConstSymbolVector Context::findSymbolsOfType(QualifiedName name) const
     {
         ConstSymbolVector s;
         findSymbols(name, s);
-        s.erase(std::remove_if(s.begin(), s.end(),
-                               stl_ext::IsNotA_p<const Symbol, const T>()),
-                s.end());
+        s.erase(std::remove_if(s.begin(), s.end(), stl_ext::IsNotA_p<const Symbol, const T>()), s.end());
         return s;
     }
 
-    template <class T>
-    const T*
-    Context::findSymbolOfTypeByMangledName(const Mu::String& mangledName,
-                                           QualifiedName name) const
+    template <class T> const T* Context::findSymbolOfTypeByMangledName(const Mu::String& mangledName, QualifiedName name) const
     {
         ConstSymbolVector s = findSymbolsOfType<T>(name);
 

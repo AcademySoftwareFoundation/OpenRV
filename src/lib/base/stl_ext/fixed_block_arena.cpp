@@ -102,8 +102,7 @@ namespace stl_ext
         return bytes;
     }
 
-    bool
-    fixed_block_arena::is_allocated(fixed_block_arena::const_pointer p) const
+    bool fixed_block_arena::is_allocated(fixed_block_arena::const_pointer p) const
     {
         for (int i = _allocators.size() - 1; i >= 0; i--)
         {
@@ -135,10 +134,7 @@ namespace stl_ext
 
     //----------------------------------------------------------------------
 
-    void fixed_block_arena::iterator::init()
-    {
-        _it = _arena->_allocators.front()->begin();
-    }
+    void fixed_block_arena::iterator::init() { _it = _arena->_allocators.front()->begin(); }
 
     void fixed_block_arena::iterator::next()
     {

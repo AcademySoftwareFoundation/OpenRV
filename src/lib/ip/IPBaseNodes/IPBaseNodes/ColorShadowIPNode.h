@@ -20,8 +20,7 @@ namespace IPCore
     class ColorShadowIPNode : public IPNode
     {
     public:
-        ColorShadowIPNode(const std::string& name, const NodeDefinition* def,
-                          IPGraph* graph, GroupIPNode* group = 0);
+        ColorShadowIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group = 0);
 
         virtual ~ColorShadowIPNode();
 

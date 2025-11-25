@@ -65,8 +65,7 @@ namespace Mu
 
     InteractiveSession::InteractiveSession() {}
 
-    void InteractiveSession::run(Context* context, Process* process,
-                                 Thread* thread)
+    void InteractiveSession::run(Context* context, Process* process, Thread* thread)
     {
         char temp[1024];
 #ifndef MU_USE_READLINE
@@ -124,9 +123,7 @@ namespace Mu
                         Value v = p->evaluate(thread);
                         const Type* type = thread->returnValueType();
 
-                        if (!thread->uncaughtException()
-                            && type != context->voidType()
-                            && !type->isTypePattern())
+                        if (!thread->uncaughtException() && type != context->voidType() && !type->isTypePattern())
                         {
                             type->output(cout);
                             cout << " => ";

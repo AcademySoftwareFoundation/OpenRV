@@ -26,8 +26,7 @@ namespace IPCore
     class SwitchGroupIPNode : public GroupIPNode
     {
     public:
-        SwitchGroupIPNode(const std::string& name, const NodeDefinition* def,
-                          IPGraph* graph, GroupIPNode* group = 0);
+        SwitchGroupIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group = 0);
 
         virtual ~SwitchGroupIPNode();
         virtual void setInputs(const IPNodes&);

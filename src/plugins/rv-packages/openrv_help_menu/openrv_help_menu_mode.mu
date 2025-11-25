@@ -154,7 +154,7 @@ class: OpenRVHelpMenuMinorMode : MinorMode
         });
 
         Menu menu = newMenu(MenuItem[] {
-            subMenu("Help", menuList.items)
+            subMenu("Help", menuList)
         });
 
         \: bindDescribe (void; string name, EventFunc F)

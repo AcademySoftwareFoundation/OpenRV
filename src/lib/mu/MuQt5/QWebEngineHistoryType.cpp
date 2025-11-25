@@ -37,8 +37,7 @@ namespace Mu
 {
     using namespace std;
 
-    QWebEngineHistoryType::QWebEngineHistoryType(Context* c, const char* name,
-                                                 Class* super)
+    QWebEngineHistoryType::QWebEngineHistoryType(Context* c, const char* name, Class* super)
         : Class(c, name, super)
     {
     }
@@ -48,116 +47,91 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    void
-    qt_QWebEngineHistory_back_void_QWebEngineHistory(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_this)
+    void qt_QWebEngineHistory_back_void_QWebEngineHistory(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-        QWebEngineHistory* arg0 =
-            getqpointer<QWebEngineHistoryType>(param_this);
+        QWebEngineHistory* arg0 = getqpointer<QWebEngineHistoryType>(param_this);
         arg0->back();
         setqpointer<QWebEngineHistoryType>(param_this, arg0);
     }
 
-    bool qt_QWebEngineHistory_canGoBack_bool_QWebEngineHistory(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    bool qt_QWebEngineHistory_canGoBack_bool_QWebEngineHistory(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-        QWebEngineHistory* arg0 =
-            getqpointer<QWebEngineHistoryType>(param_this);
+        QWebEngineHistory* arg0 = getqpointer<QWebEngineHistoryType>(param_this);
         return arg0->canGoBack();
     }
 
-    bool qt_QWebEngineHistory_canGoForward_bool_QWebEngineHistory(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    bool qt_QWebEngineHistory_canGoForward_bool_QWebEngineHistory(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-        QWebEngineHistory* arg0 =
-            getqpointer<QWebEngineHistoryType>(param_this);
+        QWebEngineHistory* arg0 = getqpointer<QWebEngineHistoryType>(param_this);
         return arg0->canGoForward();
     }
 
-    void
-    qt_QWebEngineHistory_clear_void_QWebEngineHistory(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    void qt_QWebEngineHistory_clear_void_QWebEngineHistory(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-        QWebEngineHistory* arg0 =
-            getqpointer<QWebEngineHistoryType>(param_this);
+        QWebEngineHistory* arg0 = getqpointer<QWebEngineHistoryType>(param_this);
         arg0->clear();
         setqpointer<QWebEngineHistoryType>(param_this, arg0);
     }
 
-    int
-    qt_QWebEngineHistory_count_int_QWebEngineHistory(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_this)
+    int qt_QWebEngineHistory_count_int_QWebEngineHistory(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-        QWebEngineHistory* arg0 =
-            getqpointer<QWebEngineHistoryType>(param_this);
+        QWebEngineHistory* arg0 = getqpointer<QWebEngineHistoryType>(param_this);
         return arg0->count();
     }
 
-    int qt_QWebEngineHistory_currentItemIndex_int_QWebEngineHistory(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    int qt_QWebEngineHistory_currentItemIndex_int_QWebEngineHistory(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-        QWebEngineHistory* arg0 =
-            getqpointer<QWebEngineHistoryType>(param_this);
+        QWebEngineHistory* arg0 = getqpointer<QWebEngineHistoryType>(param_this);
         return arg0->currentItemIndex();
     }
 
-    void
-    qt_QWebEngineHistory_forward_void_QWebEngineHistory(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this)
+    void qt_QWebEngineHistory_forward_void_QWebEngineHistory(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-        QWebEngineHistory* arg0 =
-            getqpointer<QWebEngineHistoryType>(param_this);
+        QWebEngineHistory* arg0 = getqpointer<QWebEngineHistoryType>(param_this);
         arg0->forward();
         setqpointer<QWebEngineHistoryType>(param_this, arg0);
     }
 
     static NODE_IMPLEMENTATION(_n_back0, void)
     {
-        qt_QWebEngineHistory_back_void_QWebEngineHistory(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
+        qt_QWebEngineHistory_back_void_QWebEngineHistory(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_canGoBack0, bool)
     {
-        NODE_RETURN(qt_QWebEngineHistory_canGoBack_bool_QWebEngineHistory(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QWebEngineHistory_canGoBack_bool_QWebEngineHistory(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_canGoForward0, bool)
     {
-        NODE_RETURN(qt_QWebEngineHistory_canGoForward_bool_QWebEngineHistory(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QWebEngineHistory_canGoForward_bool_QWebEngineHistory(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_clear0, void)
     {
-        qt_QWebEngineHistory_clear_void_QWebEngineHistory(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
+        qt_QWebEngineHistory_clear_void_QWebEngineHistory(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_count0, int)
     {
-        NODE_RETURN(qt_QWebEngineHistory_count_int_QWebEngineHistory(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QWebEngineHistory_count_int_QWebEngineHistory(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_currentItemIndex0, int)
     {
-        NODE_RETURN(qt_QWebEngineHistory_currentItemIndex_int_QWebEngineHistory(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QWebEngineHistory_currentItemIndex_int_QWebEngineHistory(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_forward0, void)
     {
-        qt_QWebEngineHistory_forward_void_QWebEngineHistory(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
+        qt_QWebEngineHistory_forward_void_QWebEngineHistory(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
     }
 
     void QWebEngineHistoryType::load()
@@ -177,13 +151,11 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
                    new MemberVariable(c, "native", "qt.NativeObject"),
 
@@ -194,38 +166,23 @@ namespace Mu
         addSymbols(
             // enums
             // member functions
-            new Function(c, "back", _n_back0, None, Compiled,
-                         qt_QWebEngineHistory_back_void_QWebEngineHistory,
-                         Return, "void", Parameters,
+            new Function(c, "back", _n_back0, None, Compiled, qt_QWebEngineHistory_back_void_QWebEngineHistory, Return, "void", Parameters,
                          new Param(c, "this", "qt.QWebEngineHistory"), End),
             // MISSING: backItems ("QList<QWebEngineHistoryItem>";
             // QWebEngineHistory this, int maxItems)
-            new Function(c, "canGoBack", _n_canGoBack0, None, Compiled,
-                         qt_QWebEngineHistory_canGoBack_bool_QWebEngineHistory,
-                         Return, "bool", Parameters,
+            new Function(c, "canGoBack", _n_canGoBack0, None, Compiled, qt_QWebEngineHistory_canGoBack_bool_QWebEngineHistory, Return,
+                         "bool", Parameters, new Param(c, "this", "qt.QWebEngineHistory"), End),
+            new Function(c, "canGoForward", _n_canGoForward0, None, Compiled, qt_QWebEngineHistory_canGoForward_bool_QWebEngineHistory,
+                         Return, "bool", Parameters, new Param(c, "this", "qt.QWebEngineHistory"), End),
+            new Function(c, "clear", _n_clear0, None, Compiled, qt_QWebEngineHistory_clear_void_QWebEngineHistory, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QWebEngineHistory"), End),
+            new Function(c, "count", _n_count0, None, Compiled, qt_QWebEngineHistory_count_int_QWebEngineHistory, Return, "int", Parameters,
                          new Param(c, "this", "qt.QWebEngineHistory"), End),
-            new Function(
-                c, "canGoForward", _n_canGoForward0, None, Compiled,
-                qt_QWebEngineHistory_canGoForward_bool_QWebEngineHistory,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QWebEngineHistory"), End),
-            new Function(c, "clear", _n_clear0, None, Compiled,
-                         qt_QWebEngineHistory_clear_void_QWebEngineHistory,
-                         Return, "void", Parameters,
+            new Function(c, "currentItemIndex", _n_currentItemIndex0, None, Compiled,
+                         qt_QWebEngineHistory_currentItemIndex_int_QWebEngineHistory, Return, "int", Parameters,
                          new Param(c, "this", "qt.QWebEngineHistory"), End),
-            new Function(c, "count", _n_count0, None, Compiled,
-                         qt_QWebEngineHistory_count_int_QWebEngineHistory,
-                         Return, "int", Parameters,
-                         new Param(c, "this", "qt.QWebEngineHistory"), End),
-            new Function(
-                c, "currentItemIndex", _n_currentItemIndex0, None, Compiled,
-                qt_QWebEngineHistory_currentItemIndex_int_QWebEngineHistory,
-                Return, "int", Parameters,
-                new Param(c, "this", "qt.QWebEngineHistory"), End),
-            new Function(c, "forward", _n_forward0, None, Compiled,
-                         qt_QWebEngineHistory_forward_void_QWebEngineHistory,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QWebEngineHistory"), End),
+            new Function(c, "forward", _n_forward0, None, Compiled, qt_QWebEngineHistory_forward_void_QWebEngineHistory, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QWebEngineHistory"), End),
             // MISSING: forwardItems ("QList<QWebEngineHistoryItem>";
             // QWebEngineHistory this, int maxItems) MISSING: goToItem (void;
             // QWebEngineHistory this, "const QWebEngineHistoryItem &" item)

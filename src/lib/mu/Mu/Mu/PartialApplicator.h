@@ -37,9 +37,7 @@ namespace Mu
         typedef ParameterVariable* Param;
         typedef STLVector<Param>::Type ParameterVector;
 
-        PartialApplicator(const Function*, Process*, Thread*,
-                          const ArgumentVector&, const ArgumentMask&,
-                          bool dynamicDispatch = false);
+        PartialApplicator(const Function*, Process*, Thread*, const ArgumentVector&, const ArgumentMask&, bool dynamicDispatch = false);
 
         ~PartialApplicator();
 

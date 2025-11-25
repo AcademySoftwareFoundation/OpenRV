@@ -14,8 +14,7 @@ namespace TwkGLF
     using namespace std;
     using namespace TwkApp;
 
-    CGGLVideoDevice::CGGLVideoDevice(VideoModule* m, int w, int h, bool alpha,
-                                     CGLContextObj context, bool owner)
+    CGGLVideoDevice::CGGLVideoDevice(VideoModule* m, int w, int h, bool alpha, CGLContextObj context, bool owner)
         : TwkGLF::GLVideoDevice(m, "CoreGraphics", VideoDevice::ImageOutput)
         , m_width(w)
         , m_height(h)
@@ -39,14 +38,8 @@ namespace TwkGLF
 
     void CGGLVideoDevice::redrawImmediately() const {}
 
-    void CGGLVideoDevice::makeCurrent() const
-    {
-        CGLSetCurrentContext(m_context);
-    }
+    void CGGLVideoDevice::makeCurrent() const { CGLSetCurrentContext(m_context); }
 
-    string CGGLVideoDevice::hardwareIdentification() const
-    {
-        return "CoreGraphics";
-    }
+    string CGGLVideoDevice::hardwareIdentification() const { return "CoreGraphics"; }
 
 } // namespace TwkGLF

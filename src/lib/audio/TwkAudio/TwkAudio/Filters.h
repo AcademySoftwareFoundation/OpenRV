@@ -14,9 +14,7 @@
 namespace TwkAudio
 {
 
-    TWKAUDIO_EXPORT void lowPassFilter(AudioBuffer& in, AudioBuffer& prev,
-                                       AudioBuffer& out, float alpha,
-                                       bool isBackwards);
+    TWKAUDIO_EXPORT void lowPassFilter(AudioBuffer& in, AudioBuffer& prev, AudioBuffer& out, float alpha, bool isBackwards);
 
 } // namespace TwkAudio
 

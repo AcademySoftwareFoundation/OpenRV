@@ -42,8 +42,7 @@ namespace Mu
 {
     using namespace std;
 
-    QDragEnterEventType::QDragEnterEventType(Context* c, const char* name,
-                                             Class* super)
+    QDragEnterEventType::QDragEnterEventType(Context* c, const char* name, Class* super)
         : Class(c, name, super)
     {
     }
@@ -53,10 +52,8 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    Pointer
-    qt_QDragEnterEvent_QDragEnterEvent_QDragEnterEvent_QDragEnterEvent_QPoint_int_QMimeData_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_point,
-        int param_actions, Pointer param_data, int param_buttons,
+    Pointer qt_QDragEnterEvent_QDragEnterEvent_QDragEnterEvent_QDragEnterEvent_QPoint_int_QMimeData_int_int(
+        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_point, int param_actions, Pointer param_data, int param_buttons,
         int param_modifiers)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
@@ -65,18 +62,15 @@ namespace Mu
         const QMimeData* arg3 = object<QMimeData>(param_data);
         Qt::MouseButtons arg4 = (Qt::MouseButtons)(param_buttons);
         Qt::KeyboardModifiers arg5 = (Qt::KeyboardModifiers)(param_modifiers);
-        setqpointer<QDragEnterEventType>(
-            param_this, new QDragEnterEvent(arg1, arg2, arg3, arg4, arg5));
+        setqpointer<QDragEnterEventType>(param_this, new QDragEnterEvent(arg1, arg2, arg3, arg4, arg5));
         return param_this;
     }
 
     static NODE_IMPLEMENTATION(_n_QDragEnterEvent0, Pointer)
     {
-        NODE_RETURN(
-            qt_QDragEnterEvent_QDragEnterEvent_QDragEnterEvent_QDragEnterEvent_QPoint_int_QMimeData_int_int(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, int), NODE_ARG(3, Pointer), NODE_ARG(4, int),
-                NODE_ARG(5, int)));
+        NODE_RETURN(qt_QDragEnterEvent_QDragEnterEvent_QDragEnterEvent_QDragEnterEvent_QPoint_int_QMimeData_int_int(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, int), NODE_ARG(3, Pointer), NODE_ARG(4, int),
+            NODE_ARG(5, int)));
     }
 
     void QDragEnterEventType::load()
@@ -96,13 +90,11 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
                    new MemberVariable(c, "native", "qt.NativeObject"),
 
@@ -113,16 +105,11 @@ namespace Mu
         addSymbols(
             // enums
             // member functions
-            new Function(
-                c, "QDragEnterEvent", _n_QDragEnterEvent0, None, Compiled,
-                qt_QDragEnterEvent_QDragEnterEvent_QDragEnterEvent_QDragEnterEvent_QPoint_int_QMimeData_int_int,
-                Return, "qt.QDragEnterEvent", Parameters,
-                new Param(c, "this", "qt.QDragEnterEvent"),
-                new Param(c, "point", "qt.QPoint"),
-                new Param(c, "actions", "int"),
-                new Param(c, "data", "qt.QMimeData"),
-                new Param(c, "buttons", "int"),
-                new Param(c, "modifiers", "int"), End),
+            new Function(c, "QDragEnterEvent", _n_QDragEnterEvent0, None, Compiled,
+                         qt_QDragEnterEvent_QDragEnterEvent_QDragEnterEvent_QDragEnterEvent_QPoint_int_QMimeData_int_int, Return,
+                         "qt.QDragEnterEvent", Parameters, new Param(c, "this", "qt.QDragEnterEvent"), new Param(c, "point", "qt.QPoint"),
+                         new Param(c, "actions", "int"), new Param(c, "data", "qt.QMimeData"), new Param(c, "buttons", "int"),
+                         new Param(c, "modifiers", "int"), End),
             // static functions
             EndArguments);
         globalScope()->addSymbols(EndArguments);

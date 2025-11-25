@@ -40,16 +40,10 @@ namespace RiMu
     LightHandles RiMuBindings::m_lightHandles;
 
     // *****************************************************************************
-    NODE_IMPLEMENTATION(RiMuBindings::RiAttributeBegin, void)
-    {
-        ::RiAttributeBegin();
-    }
+    NODE_IMPLEMENTATION(RiMuBindings::RiAttributeBegin, void) { ::RiAttributeBegin(); }
 
     // *****************************************************************************
-    NODE_IMPLEMENTATION(RiMuBindings::RiAttributeEnd, void)
-    {
-        ::RiAttributeEnd();
-    }
+    NODE_IMPLEMENTATION(RiMuBindings::RiAttributeEnd, void) { ::RiAttributeEnd(); }
 
     // *****************************************************************************
     NODE_IMPLEMENTATION(RiMuBindings::RiAttribute, void)
@@ -61,8 +55,7 @@ namespace RiMu
         const char* name = NULL;
 
         name = NODE_ARG_OBJECT(0, StringType::String)->string().c_str();
-        if (!parseTokens(NODE_THIS, NODE_THREAD, tokens, pointers, numTokens,
-                         nPoints, 1))
+        if (!parseTokens(NODE_THIS, NODE_THREAD, tokens, pointers, numTokens, nPoints, 1))
         {
             std::cerr << "Error in parameters for RiAttribute" << std::endl;
             return;
@@ -73,23 +66,13 @@ namespace RiMu
     }
 
     // *****************************************************************************
-    NODE_IMPLEMENTATION(RiMuBindings::RiTransformBegin, void)
-    {
-        ::RiTransformBegin();
-    }
+    NODE_IMPLEMENTATION(RiMuBindings::RiTransformBegin, void) { ::RiTransformBegin(); }
 
     // *****************************************************************************
-    NODE_IMPLEMENTATION(RiMuBindings::RiTransformEnd, void)
-    {
-        ::RiTransformEnd();
-    }
+    NODE_IMPLEMENTATION(RiMuBindings::RiTransformEnd, void) { ::RiTransformEnd(); }
 
     // *****************************************************************************
-    NODE_IMPLEMENTATION(RiMuBindings::RiTranslatef, void)
-    {
-        ::RiTranslate(NODE_ARG(0, float), NODE_ARG(1, float),
-                      NODE_ARG(2, float));
-    }
+    NODE_IMPLEMENTATION(RiMuBindings::RiTranslatef, void) { ::RiTranslate(NODE_ARG(0, float), NODE_ARG(1, float), NODE_ARG(2, float)); }
 
     // *****************************************************************************
     NODE_IMPLEMENTATION(RiMuBindings::RiTranslatev, void)
@@ -101,15 +84,11 @@ namespace RiMu
     // *****************************************************************************
     NODE_IMPLEMENTATION(RiMuBindings::RiRotate, void)
     {
-        ::RiRotate(NODE_ARG(0, float), NODE_ARG(1, float), NODE_ARG(2, float),
-                   NODE_ARG(3, float));
+        ::RiRotate(NODE_ARG(0, float), NODE_ARG(1, float), NODE_ARG(2, float), NODE_ARG(3, float));
     }
 
     // *****************************************************************************
-    NODE_IMPLEMENTATION(RiMuBindings::RiScale, void)
-    {
-        ::RiScale(NODE_ARG(0, float), NODE_ARG(1, float), NODE_ARG(2, float));
-    }
+    NODE_IMPLEMENTATION(RiMuBindings::RiScale, void) { ::RiScale(NODE_ARG(0, float), NODE_ARG(1, float), NODE_ARG(2, float)); }
 
     // *****************************************************************************
     NODE_IMPLEMENTATION(RiMuBindings::RiTransformM, void)
@@ -181,10 +160,7 @@ namespace RiMu
     }
 
     // *****************************************************************************
-    NODE_IMPLEMENTATION(RiMuBindings::RiMotionBegin, void)
-    {
-        ::RiMotionBegin(2, NODE_ARG(0, float), NODE_ARG(1, float), NULL);
-    }
+    NODE_IMPLEMENTATION(RiMuBindings::RiMotionBegin, void) { ::RiMotionBegin(2, NODE_ARG(0, float), NODE_ARG(1, float), NULL); }
 
     // *****************************************************************************
     NODE_IMPLEMENTATION(RiMuBindings::RiMotionEnd, void) { ::RiMotionEnd(); }
@@ -192,8 +168,7 @@ namespace RiMu
     // *****************************************************************************
     NODE_IMPLEMENTATION(RiMuBindings::RiColor, void)
     {
-        RtColor Cs = {NODE_ARG(0, float), NODE_ARG(1, float),
-                      NODE_ARG(2, float)};
+        RtColor Cs = {NODE_ARG(0, float), NODE_ARG(1, float), NODE_ARG(2, float)};
         ::RiColor(Cs);
     }
 
@@ -234,24 +209,19 @@ namespace RiMu
     }
 
     // *****************************************************************************
-    NODE_IMPLEMENTATION(RiMuBindings::RiMatte, void)
-    {
-        ::RiMatte((RtBoolean)NODE_ARG(0, bool));
-    }
+    NODE_IMPLEMENTATION(RiMuBindings::RiMatte, void) { ::RiMatte((RtBoolean)NODE_ARG(0, bool)); }
 
     // *****************************************************************************
     NODE_IMPLEMENTATION(RiMuBindings::RiSurface, void)
     {
-        const char* shaderName =
-            NODE_ARG_OBJECT(0, StringType::String)->string().c_str();
+        const char* shaderName = NODE_ARG_OBJECT(0, StringType::String)->string().c_str();
 
         int nPoints = 0;
         int numTokens = 0;
         RtToken tokens[MAX_PARAMETER_TOKENS];
         RtPointer pointers[MAX_PARAMETER_TOKENS];
 
-        if (!parseTokens(NODE_THIS, NODE_THREAD, tokens, pointers, numTokens,
-                         nPoints, 1))
+        if (!parseTokens(NODE_THIS, NODE_THREAD, tokens, pointers, numTokens, nPoints, 1))
         {
             std::cerr << "Error in parameters for RiSurface" << std::endl;
             return;
@@ -265,16 +235,14 @@ namespace RiMu
     // *****************************************************************************
     NODE_IMPLEMENTATION(RiMuBindings::RiDisplacement, void)
     {
-        const char* shaderName =
-            NODE_ARG_OBJECT(0, StringType::String)->string().c_str();
+        const char* shaderName = NODE_ARG_OBJECT(0, StringType::String)->string().c_str();
 
         int nPoints = 0;
         int numTokens = 0;
         RtToken tokens[MAX_PARAMETER_TOKENS];
         RtPointer pointers[MAX_PARAMETER_TOKENS];
 
-        if (!parseTokens(NODE_THIS, NODE_THREAD, tokens, pointers, numTokens,
-                         nPoints, 1))
+        if (!parseTokens(NODE_THIS, NODE_THREAD, tokens, pointers, numTokens, nPoints, 1))
         {
             std::cerr << "Error in parameters for RiDisplacement" << std::endl;
             return;
@@ -288,23 +256,20 @@ namespace RiMu
     // *****************************************************************************
     NODE_IMPLEMENTATION(RiMuBindings::RiLightSource, int)
     {
-        const char* shaderName =
-            NODE_ARG_OBJECT(0, StringType::String)->string().c_str();
+        const char* shaderName = NODE_ARG_OBJECT(0, StringType::String)->string().c_str();
 
         int nPoints = 0;
         int numTokens = 0;
         RtToken tokens[MAX_PARAMETER_TOKENS];
         RtPointer pointers[MAX_PARAMETER_TOKENS];
 
-        if (!parseTokens(NODE_THIS, NODE_THREAD, tokens, pointers, numTokens,
-                         nPoints, 1))
+        if (!parseTokens(NODE_THIS, NODE_THREAD, tokens, pointers, numTokens, nPoints, 1))
         {
             std::cerr << "Error in parameters for RiLightSource" << std::endl;
             return -1;
         }
 
-        RtLightHandle light =
-            ::RiLightSourceV((char*)shaderName, numTokens, tokens, pointers);
+        RtLightHandle light = ::RiLightSourceV((char*)shaderName, numTokens, tokens, pointers);
 
         m_lightHandles.push_back(light);
 
@@ -331,8 +296,7 @@ namespace RiMu
     // *****************************************************************************
     NODE_IMPLEMENTATION(RiMuBindings::RiSphere, void)
     {
-        ::RiSphere(NODE_ARG(0, float), NODE_ARG(1, float), NODE_ARG(2, float),
-                   NODE_ARG(3, float), NULL);
+        ::RiSphere(NODE_ARG(0, float), NODE_ARG(1, float), NODE_ARG(2, float), NODE_ARG(3, float), NULL);
     }
 
     // *****************************************************************************
@@ -343,8 +307,7 @@ namespace RiMu
         StringType::String* vBasisName = NODE_ARG_OBJECT(2, StringType::String);
         int vStep = NODE_ARG(3, int);
 
-        ::RiBasis(basisFromStr(uBasisName->string().c_str()), uStep,
-                  basisFromStr(vBasisName->string().c_str()), vStep);
+        ::RiBasis(basisFromStr(uBasisName->string().c_str()), uStep, basisFromStr(vBasisName->string().c_str()), vStep);
     }
 
     // *****************************************************************************
@@ -371,8 +334,7 @@ namespace RiMu
         RtToken tokens[MAX_PARAMETER_TOKENS];
         RtPointer pointers[MAX_PARAMETER_TOKENS];
 
-        if (!parseTokens(NODE_THIS, NODE_THREAD, tokens, pointers, numTokens,
-                         nPoints))
+        if (!parseTokens(NODE_THIS, NODE_THREAD, tokens, pointers, numTokens, nPoints))
         {
             std::cerr << "Error in parameters for RiPoints" << std::endl;
             return;
@@ -404,15 +366,13 @@ namespace RiMu
         nVerts = NODE_ARG_OBJECT(2, DynamicArray)->data<int>();
         wrap = NODE_ARG_OBJECT(3, StringType::String)->string().c_str();
 
-        if (!parseTokens(NODE_THIS, NODE_THREAD, tokens, pointers, numTokens,
-                         nPoints, 4))
+        if (!parseTokens(NODE_THIS, NODE_THREAD, tokens, pointers, numTokens, nPoints, 4))
         {
             std::cerr << "Error in parameters for RiPoints" << std::endl;
             return;
         }
 
-        ::RiCurvesV((RtToken)degree, nCurves, nVerts, (RtToken)wrap, numTokens,
-                    tokens, pointers);
+        ::RiCurvesV((RtToken)degree, nCurves, nVerts, (RtToken)wrap, numTokens, tokens, pointers);
 
         freeTokens(tokens, numTokens, 4);
     }
@@ -425,8 +385,7 @@ namespace RiMu
         RtToken tokens[MAX_PARAMETER_TOKENS];
         RtPointer pointers[MAX_PARAMETER_TOKENS];
 
-        if (!parseTokens(NODE_THIS, NODE_THREAD, tokens, pointers, numTokens,
-                         nPoints))
+        if (!parseTokens(NODE_THIS, NODE_THREAD, tokens, pointers, numTokens, nPoints))
         {
             std::cerr << "Error in parameters for RiPolygon" << std::endl;
             return;
@@ -453,8 +412,7 @@ namespace RiMu
         RtString* twoStrings = (RtString*)malloc(2 * sizeof(RtString));
         twoStrings[0] = strdup(pluginName->string().c_str());
         twoStrings[1] = strdup(cfgString->string().c_str());
-        ::RiProcedural(twoStrings, bounds, RiProcDynamicLoad,
-                       RiProceduralFinished);
+        ::RiProcedural(twoStrings, bounds, RiProcDynamicLoad, RiProceduralFinished);
     }
 
     // *****************************************************************************
@@ -473,9 +431,7 @@ namespace RiMu
         std::string tospace = NODE_ARG_OBJECT(1, StringType::String)->c_str();
         DynamicArray* verts = NODE_ARG_OBJECT(2, DynamicArray);
 
-        RtPoint* result = ::RiTransformPoints(
-            (char*)fromspace.c_str(), (char*)tospace.c_str(), verts->size(),
-            verts->data<RtPoint>());
+        RtPoint* result = ::RiTransformPoints((char*)fromspace.c_str(), (char*)tospace.c_str(), verts->size(), verts->data<RtPoint>());
         if (!result)
         {
             NODE_RETURN(false);
@@ -484,9 +440,8 @@ namespace RiMu
     }
 
     // *****************************************************************************
-    bool RiMuBindings::parseTokens(const Mu::Node& node_, Mu::Thread& thread_,
-                                   RtToken* tokens, RtPointer* pointers,
-                                   int& numTokens, int& numP, int startAtArg)
+    bool RiMuBindings::parseTokens(const Mu::Node& node_, Mu::Thread& thread_, RtToken* tokens, RtPointer* pointers, int& numTokens,
+                                   int& numP, int startAtArg)
     {
         numTokens = 0;
         numP = 0;
@@ -501,16 +456,14 @@ namespace RiMu
             if (t != c->stringType() && t != c->charType())
             {
                 std::cerr << "Expected a string token, but got "
-                          << "data of type '" << t->name().c_str() << "'"
-                          << std::endl;
+                          << "data of type '" << t->name().c_str() << "'" << std::endl;
                 return false;
             }
 
             bool castToFloat = false;
             if (t == c->stringType())
             {
-                StringType::String* token =
-                    NODE_ARG_OBJECT(a, StringType::String);
+                StringType::String* token = NODE_ARG_OBJECT(a, StringType::String);
                 tokens[numTokens] = strdup((char*)token->string().c_str());
 
                 // This is needed if someone declares a parameter as "float",
@@ -540,8 +493,7 @@ namespace RiMu
             t = NODE_THIS.argNode(a)->type();
 
             // Float arrays...
-            if ((t == c->arrayType(c->floatType(), 1, 0))
-                || (t == c->arrayType(c->vec3fType(), 1, 0)))
+            if ((t == c->arrayType(c->floatType(), 1, 0)) || (t == c->arrayType(c->vec3fType(), 1, 0)))
             {
                 DynamicArray* da = NODE_ARG_OBJECT(a, DynamicArray);
                 pointers[numTokens] = da->data<float>();
@@ -555,8 +507,7 @@ namespace RiMu
             // String...
             else if (t == c->stringType())
             {
-                StringType::String* str =
-                    NODE_ARG_OBJECT(a, StringType::String);
+                StringType::String* str = NODE_ARG_OBJECT(a, StringType::String);
                 char** stringPointers = new (char*)[1];
                 stringPointers[0] = strdup((char*)str->string().c_str());
                 pointers[numTokens] = stringPointers;
@@ -593,8 +544,7 @@ namespace RiMu
             }
             else
             {
-                std::cerr << "RiMu::Unknown data type: '" << t->name().c_str()
-                          << "'" << std::endl;
+                std::cerr << "RiMu::Unknown data type: '" << t->name().c_str() << "'" << std::endl;
                 return false;
             }
 
@@ -604,8 +554,7 @@ namespace RiMu
     }
 
     // *****************************************************************************
-    void RiMuBindings::freeTokens(RtToken* tokens, int numTokens,
-                                  int startAtArg)
+    void RiMuBindings::freeTokens(RtToken* tokens, int numTokens, int startAtArg)
     {
         for (size_t i = startAtArg; i < numTokens; ++i)
         {
@@ -627,115 +576,78 @@ namespace RiMu
         Context* c = context;
 
         context->globalScope()->addSymbols(
-            new Function(c, "RiAttributeBegin", RiMuBindings::RiAttributeBegin,
-                         NoHint, Return, "void", End),
+            new Function(c, "RiAttributeBegin", RiMuBindings::RiAttributeBegin, NoHint, Return, "void", End),
 
-            new Function(c, "RiAttributeEnd", RiMuBindings::RiAttributeEnd,
-                         NoHint, Return, "void", End),
+            new Function(c, "RiAttributeEnd", RiMuBindings::RiAttributeEnd, NoHint, Return, "void", End),
 
-            new Function(c, "RiAttribute", RiMuBindings::RiAttribute, NoHint,
-                         Args, "string", "?varargs", Maximum,
-                         MAX_PARAMETER_TOKENS, Return, "void", End),
-
-            new Function(c, "RiTransformBegin", RiMuBindings::RiTransformBegin,
-                         NoHint, Return, "void", End),
-
-            new Function(c, "RiTransformEnd", RiMuBindings::RiTransformEnd,
-                         NoHint, Return, "void", End),
-
-            new Function(c, "RiTranslate", RiMuBindings::RiTranslatef, NoHint,
-                         Return, "void", Args, "float", "float", "float", End),
-
-            new Function(c, "RiTranslate", RiMuBindings::RiTranslatev, NoHint,
-                         Return, "void", Args, "vector float[3]", End),
-
-            new Function(c, "RiRotate", RiMuBindings::RiRotate, NoHint, Return,
-                         "void", Args, "float", "float", "float", "float", End),
-
-            new Function(c, "RiScale", RiMuBindings::RiScale, NoHint, Return,
-                         "void", Args, "float", "float", "float", End),
-
-            new Function(c, "RiTransform", RiMuBindings::RiTransformF, NoHint,
-                         Return, "void", Args, "float", "float", "float",
-                         "float", "float", "float", "float", "float", "float",
-                         "float", "float", "float", "float", "float", "float",
-                         "float", End),
-
-            new Function(c, "RiTransform", RiMuBindings::RiTransformM, NoHint,
-                         Return, "void", Args, "float[4,4]", End),
-
-            new Function(
-                c, "RiConcatTransform", RiMuBindings::RiConcatTransformF,
-                NoHint, Return, "void", Args, "float", "float", "float",
-                "float", "float", "float", "float", "float", "float", "float",
-                "float", "float", "float", "float", "float", "float", End),
-
-            new Function(c, "RiConcatTransform",
-                         RiMuBindings::RiConcatTransformM, NoHint, Return,
-                         "void", Args, "float[4,4]", End),
-
-            new Function(c, "RiMotionBegin", RiMuBindings::RiMotionBegin,
-                         NoHint, Return, "void", Args, "float", "float", End),
-
-            new Function(c, "RiMotionEnd", RiMuBindings::RiMotionEnd, NoHint,
+            new Function(c, "RiAttribute", RiMuBindings::RiAttribute, NoHint, Args, "string", "?varargs", Maximum, MAX_PARAMETER_TOKENS,
                          Return, "void", End),
 
-            new Function(c, "RiColor", RiMuBindings::RiColor, NoHint, Return,
-                         "void", Args, "float", "float", "float", End),
+            new Function(c, "RiTransformBegin", RiMuBindings::RiTransformBegin, NoHint, Return, "void", End),
 
-            new Function(c, "RiColor", RiMuBindings::RiColorf, NoHint, Return,
-                         "void", Args, "vector float[3]", End),
+            new Function(c, "RiTransformEnd", RiMuBindings::RiTransformEnd, NoHint, Return, "void", End),
 
-            new Function(c, "RiOpacity", RiMuBindings::RiOpacity, NoHint,
-                         Return, "void", Args, "float", Optional, "float",
+            new Function(c, "RiTranslate", RiMuBindings::RiTranslatef, NoHint, Return, "void", Args, "float", "float", "float", End),
+
+            new Function(c, "RiTranslate", RiMuBindings::RiTranslatev, NoHint, Return, "void", Args, "vector float[3]", End),
+
+            new Function(c, "RiRotate", RiMuBindings::RiRotate, NoHint, Return, "void", Args, "float", "float", "float", "float", End),
+
+            new Function(c, "RiScale", RiMuBindings::RiScale, NoHint, Return, "void", Args, "float", "float", "float", End),
+
+            new Function(c, "RiTransform", RiMuBindings::RiTransformF, NoHint, Return, "void", Args, "float", "float", "float", "float",
+                         "float", "float", "float", "float", "float", "float", "float", "float", "float", "float", "float", "float", End),
+
+            new Function(c, "RiTransform", RiMuBindings::RiTransformM, NoHint, Return, "void", Args, "float[4,4]", End),
+
+            new Function(c, "RiConcatTransform", RiMuBindings::RiConcatTransformF, NoHint, Return, "void", Args, "float", "float", "float",
+                         "float", "float", "float", "float", "float", "float", "float", "float", "float", "float", "float", "float",
                          "float", End),
 
-            new Function(c, "RiOpacity", RiMuBindings::RiOpacityf, NoHint,
-                         Return, "void", Args, "vector float[3]", End),
+            new Function(c, "RiConcatTransform", RiMuBindings::RiConcatTransformM, NoHint, Return, "void", Args, "float[4,4]", End),
 
-            new Function(c, "RiMatte", RiMuBindings::RiMatte, NoHint, Return,
-                         "void", Args, "bool", End),
+            new Function(c, "RiMotionBegin", RiMuBindings::RiMotionBegin, NoHint, Return, "void", Args, "float", "float", End),
 
-            new Function(c, "RiSurface", RiMuBindings::RiSurface, NoHint,
-                         Return, "void", Args, "string", Optional, "?varargs",
+            new Function(c, "RiMotionEnd", RiMuBindings::RiMotionEnd, NoHint, Return, "void", End),
+
+            new Function(c, "RiColor", RiMuBindings::RiColor, NoHint, Return, "void", Args, "float", "float", "float", End),
+
+            new Function(c, "RiColor", RiMuBindings::RiColorf, NoHint, Return, "void", Args, "vector float[3]", End),
+
+            new Function(c, "RiOpacity", RiMuBindings::RiOpacity, NoHint, Return, "void", Args, "float", Optional, "float", "float", End),
+
+            new Function(c, "RiOpacity", RiMuBindings::RiOpacityf, NoHint, Return, "void", Args, "vector float[3]", End),
+
+            new Function(c, "RiMatte", RiMuBindings::RiMatte, NoHint, Return, "void", Args, "bool", End),
+
+            new Function(c, "RiSurface", RiMuBindings::RiSurface, NoHint, Return, "void", Args, "string", Optional, "?varargs", Maximum,
+                         MAX_PARAMETER_TOKENS, End),
+
+            new Function(c, "RiDisplacement", RiMuBindings::RiDisplacement, NoHint, Return, "void", Args, "string", Optional, "?varargs",
                          Maximum, MAX_PARAMETER_TOKENS, End),
 
-            new Function(c, "RiDisplacement", RiMuBindings::RiDisplacement,
-                         NoHint, Return, "void", Args, "string", Optional,
-                         "?varargs", Maximum, MAX_PARAMETER_TOKENS, End),
+            new Function(c, "RiLightSource", RiMuBindings::RiLightSource, NoHint, Return, "int", Args, "string", Optional, "?varargs",
+                         Maximum, MAX_PARAMETER_TOKENS, End),
 
-            new Function(c, "RiLightSource", RiMuBindings::RiLightSource,
-                         NoHint, Return, "int", Args, "string", Optional,
-                         "?varargs", Maximum, MAX_PARAMETER_TOKENS, End),
+            new Function(c, "RiIlluminate", RiMuBindings::RiIlluminate, NoHint, Return, "void", Args, "int", "bool", End),
 
-            new Function(c, "RiIlluminate", RiMuBindings::RiIlluminate, NoHint,
-                         Return, "void", Args, "int", "bool", End),
+            new Function(c, "RiSphere", RiMuBindings::RiSphere, NoHint, Return, "void", Args, "float", "float", "float", "float", End),
 
-            new Function(c, "RiSphere", RiMuBindings::RiSphere, NoHint, Return,
-                         "void", Args, "float", "float", "float", "float", End),
+            new Function(c, "RiBasis", RiMuBindings::RiBasis, NoHint, Return, "void", Args, "string", "int", "string", "int", End),
 
-            new Function(c, "RiBasis", RiMuBindings::RiBasis, NoHint, Return,
-                         "void", Args, "string", "int", "string", "int", End),
-
-            new Function(c, "RiPoints", RiMuBindings::RiPoints, NoHint, Return,
-                         "void", Args, "string", "?varargs", Maximum,
+            new Function(c, "RiPoints", RiMuBindings::RiPoints, NoHint, Return, "void", Args, "string", "?varargs", Maximum,
                          MAX_PARAMETER_TOKENS, End),
 
-            new Function(c, "RiCurves", RiMuBindings::RiCurves, NoHint, Return,
-                         "void", Args, "string", "int", "int[]", "string",
+            new Function(c, "RiCurves", RiMuBindings::RiCurves, NoHint, Return, "void", Args, "string", "int", "int[]", "string",
                          "?varargs", Maximum, MAX_PARAMETER_TOKENS, End),
 
-            new Function(c, "RiPolygon", RiMuBindings::RiPolygon, NoHint,
-                         Return, "void", Args, "?varargs", Maximum,
-                         MAX_PARAMETER_TOKENS, End),
+            new Function(c, "RiPolygon", RiMuBindings::RiPolygon, NoHint, Return, "void", Args, "?varargs", Maximum, MAX_PARAMETER_TOKENS,
+                         End),
 
-            new Function(c, "RiProcedural", RiMuBindings::RiProcedural, NoHint,
-                         Return, "void", Args, "string", "string", Optional,
+            new Function(c, "RiProcedural", RiMuBindings::RiProcedural, NoHint, Return, "void", Args, "string", "string", Optional,
                          "float[6]", End),
 
-            new Function(c, "RiTransformPoints",
-                         RiMuBindings::RiTransformPoints, NoHint, Return,
-                         "bool", Args, "string", "string",
+            new Function(c, "RiTransformPoints", RiMuBindings::RiTransformPoints, NoHint, Return, "bool", Args, "string", "string",
                          "(vector float[3])[]", End),
 
             Symbol::EndArguments); // End addSymbols

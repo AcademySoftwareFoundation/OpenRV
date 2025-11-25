@@ -36,8 +36,7 @@
 #define A2 0x5
 #define C 0xB
 #define SET3(x, x0, x1, x2) ((x)[0] = (x0), (x)[1] = (x1), (x)[2] = (x2))
-#define SETLOW(x, y, n) \
-    SET3(x, LOW((y)[n]), LOW((y)[(n) + 1]), LOW((y)[(n) + 2]))
+#define SETLOW(x, y, n) SET3(x, LOW((y)[n]), LOW((y)[(n) + 1]), LOW((y)[(n) + 2]))
 #define SEED(x0, x1, x2) (SET3(m_x, x0, x1, x2), SET3(m_a, A0, A1, A2), m_c = C)
 
 #define HI_BIT (1L << (2 * N - 1))
@@ -73,10 +72,7 @@ namespace TwkMath
     }
 
     //*****************************************************************************
-    void Rand48::reset(unsigned long seedval)
-    {
-        SEED(X0, LOW(seedval), HIGH(seedval));
-    }
+    void Rand48::reset(unsigned long seedval) { SEED(X0, LOW(seedval), HIGH(seedval)); }
 
     //*****************************************************************************
     void Rand48::nextState()
@@ -89,9 +85,7 @@ namespace TwkMath
         MUL(m_a[0], m_x[1], q);
         ADDEQU(p[1], q[0], carry0);
         MUL(m_a[1], m_x[0], r);
-        m_x[2] =
-            LOW(carry0 + carry1 + CARRY(p[1], r[0]) + q[1] + r[1]
-                + (m_a[0] * m_x[2]) + (m_a[1] * m_x[1]) + (m_a[2] * m_x[0]));
+        m_x[2] = LOW(carry0 + carry1 + CARRY(p[1], r[0]) + q[1] + r[1] + (m_a[0] * m_x[2]) + (m_a[1] * m_x[1]) + (m_a[2] * m_x[0]));
         m_x[1] = LOW(p[1] + r[0]);
         m_x[0] = LOW(p[0]);
     }

@@ -34,8 +34,7 @@ namespace Mu
         //  Constructors
         //
 
-        QTouchEventType(Context* context, const char* name,
-                        Class* superClass = 0);
+        QTouchEventType(Context* context, const char* name, Class* superClass = 0);
         virtual ~QTouchEventType();
 
         //

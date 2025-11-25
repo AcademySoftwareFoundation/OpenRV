@@ -48,9 +48,8 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    Pointer qt_QMoveEvent_QMoveEvent_QMoveEvent_QMoveEvent_QPoint_QPoint(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_pos,
-        Pointer param_oldPos)
+    Pointer qt_QMoveEvent_QMoveEvent_QMoveEvent_QMoveEvent_QPoint_QPoint(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_pos,
+                                                                         Pointer param_oldPos)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QPoint arg1 = getqtype<QPointType>(param_pos);
@@ -59,16 +58,14 @@ namespace Mu
         return param_this;
     }
 
-    Pointer qt_QMoveEvent_oldPos_QPoint_QMoveEvent(Mu::Thread& NODE_THREAD,
-                                                   Pointer param_this)
+    Pointer qt_QMoveEvent_oldPos_QPoint_QMoveEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMoveEvent* arg0 = getqpointer<QMoveEventType>(param_this);
         return makeqtype<QPointType>(c, arg0->oldPos(), "qt.QPoint");
     }
 
-    Pointer qt_QMoveEvent_pos_QPoint_QMoveEvent(Mu::Thread& NODE_THREAD,
-                                                Pointer param_this)
+    Pointer qt_QMoveEvent_pos_QPoint_QMoveEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMoveEvent* arg0 = getqpointer<QMoveEventType>(param_this);
@@ -77,22 +74,18 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(_n_QMoveEvent0, Pointer)
     {
-        NODE_RETURN(
-            qt_QMoveEvent_QMoveEvent_QMoveEvent_QMoveEvent_QPoint_QPoint(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QMoveEvent_QMoveEvent_QMoveEvent_QMoveEvent_QPoint_QPoint(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                 NODE_ARG(1, Pointer), NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_oldPos0, Pointer)
     {
-        NODE_RETURN(qt_QMoveEvent_oldPos_QPoint_QMoveEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QMoveEvent_oldPos_QPoint_QMoveEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_pos0, Pointer)
     {
-        NODE_RETURN(qt_QMoveEvent_pos_QPoint_QMoveEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QMoveEvent_pos_QPoint_QMoveEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     void QMoveEventType::load()
@@ -112,13 +105,11 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
                    new MemberVariable(c, "native", "qt.NativeObject"),
 
@@ -129,20 +120,12 @@ namespace Mu
         addSymbols(
             // enums
             // member functions
-            new Function(
-                c, "QMoveEvent", _n_QMoveEvent0, None, Compiled,
-                qt_QMoveEvent_QMoveEvent_QMoveEvent_QMoveEvent_QPoint_QPoint,
-                Return, "qt.QMoveEvent", Parameters,
-                new Param(c, "this", "qt.QMoveEvent"),
-                new Param(c, "pos", "qt.QPoint"),
-                new Param(c, "oldPos", "qt.QPoint"), End),
-            new Function(c, "oldPos", _n_oldPos0, None, Compiled,
-                         qt_QMoveEvent_oldPos_QPoint_QMoveEvent, Return,
-                         "qt.QPoint", Parameters,
+            new Function(c, "QMoveEvent", _n_QMoveEvent0, None, Compiled, qt_QMoveEvent_QMoveEvent_QMoveEvent_QMoveEvent_QPoint_QPoint,
+                         Return, "qt.QMoveEvent", Parameters, new Param(c, "this", "qt.QMoveEvent"), new Param(c, "pos", "qt.QPoint"),
+                         new Param(c, "oldPos", "qt.QPoint"), End),
+            new Function(c, "oldPos", _n_oldPos0, None, Compiled, qt_QMoveEvent_oldPos_QPoint_QMoveEvent, Return, "qt.QPoint", Parameters,
                          new Param(c, "this", "qt.QMoveEvent"), End),
-            new Function(c, "pos", _n_pos0, None, Compiled,
-                         qt_QMoveEvent_pos_QPoint_QMoveEvent, Return,
-                         "qt.QPoint", Parameters,
+            new Function(c, "pos", _n_pos0, None, Compiled, qt_QMoveEvent_pos_QPoint_QMoveEvent, Return, "qt.QPoint", Parameters,
                          new Param(c, "this", "qt.QMoveEvent"), End),
             // static functions
             EndArguments);

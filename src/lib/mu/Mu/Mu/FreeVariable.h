@@ -19,11 +19,9 @@ namespace Mu
 
         FreeVariable(Context*, const char* name, const char* storageClass);
 
-        FreeVariable(Context*, const char* name, const Type* storageClass,
-                     const Value& defaultValue);
+        FreeVariable(Context*, const char* name, const Type* storageClass, const Value& defaultValue);
 
-        FreeVariable(Context*, const char* name, const char* storageClass,
-                     const Value& defaultValue);
+        FreeVariable(Context*, const char* name, const char* storageClass, const Value& defaultValue);
 
         virtual ~FreeVariable();
 

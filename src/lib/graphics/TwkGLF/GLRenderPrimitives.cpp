@@ -21,16 +21,11 @@ namespace TwkGLF
         //  Template function here replaces macro
         //
 
-        template <typename T> char* bufferOffset(T i)
-        {
-            return reinterpret_cast<char*>(NULL) + i;
-        }
+        template <typename T> char* bufferOffset(T i) { return reinterpret_cast<char*>(NULL) + i; }
 
     } // namespace
 
-    RenderPrimitives::RenderPrimitives(const GLProgram* p, PrimitiveData& data,
-                                       VertexAttributeList& attributes,
-                                       GLVBO::GLVBOVector& vbos)
+    RenderPrimitives::RenderPrimitives(const GLProgram* p, PrimitiveData& data, VertexAttributeList& attributes, GLVBO::GLVBOVector& vbos)
         : m_program(p)
         , m_primitiveData(data)
         , m_attributeList(attributes)
@@ -73,15 +68,12 @@ namespace TwkGLF
 
     void RenderPrimitives::pushDataToBuffer()
     {
-        m_dataVBO->setupData(m_primitiveData.m_dataBuffer, GL_ARRAY_BUFFER,
-                             m_primitiveData.m_size);
+        m_dataVBO->setupData(m_primitiveData.m_dataBuffer, GL_ARRAY_BUFFER, m_primitiveData.m_size);
 
         if (m_hasIndices)
         {
-            m_indexVBO->setupData(
-                m_primitiveData.m_indexBuffer, GL_ELEMENT_ARRAY_BUFFER,
-                sizeof(unsigned int) * m_primitiveData.m_primitiveNo
-                    * m_verticesPerPrimitive);
+            m_indexVBO->setupData(m_primitiveData.m_indexBuffer, GL_ELEMENT_ARRAY_BUFFER,
+                                  sizeof(unsigned int) * m_primitiveData.m_primitiveNo * m_verticesPerPrimitive);
         }
 
         TWK_GLDEBUG;
@@ -126,11 +118,8 @@ namespace TwkGLF
             int loc = m_program->attribLocation(m_attributeList[i].m_name);
             if (loc >= 0)
             {
-                glVertexAttribPointer(
-                    loc, m_attributeList[i].m_dimension,
-                    m_attributeList[i].m_dataType, GL_FALSE,
-                    m_attributeList[i].m_stride,
-                    bufferOffset(m_attributeList[i].m_offset));
+                glVertexAttribPointer(loc, m_attributeList[i].m_dimension, m_attributeList[i].m_dataType, GL_FALSE,
+                                      m_attributeList[i].m_stride, bufferOffset(m_attributeList[i].m_offset));
 
                 glEnableVertexAttribArray(loc);
             }
@@ -145,10 +134,7 @@ namespace TwkGLF
 
         if (m_hasIndices)
         {
-            glDrawElements(m_primitiveData.m_primitiveType,
-                           m_primitiveData.m_primitiveNo
-                               * m_verticesPerPrimitive,
-                           m_indexDataType, NULL);
+            glDrawElements(m_primitiveData.m_primitiveType, m_primitiveData.m_primitiveNo * m_verticesPerPrimitive, m_indexDataType, NULL);
             TWK_GLDEBUG;
         }
         else
@@ -156,8 +142,7 @@ namespace TwkGLF
             HOP_CALL(glFinish();)
             HOP_PROF("RenderPrimitives::render - glDrawArrays");
 
-            glDrawArrays(m_primitiveData.m_primitiveType, 0,
-                         m_primitiveData.m_vertexNo);
+            glDrawArrays(m_primitiveData.m_primitiveType, 0, m_primitiveData.m_vertexNo);
             TWK_GLDEBUG;
 
             HOP_CALL(glFinish();)

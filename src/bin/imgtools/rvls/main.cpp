@@ -483,8 +483,7 @@ string lsExtended(const string& seq, bool yaml = false)
 
         str << strs[3] << " x " << strs[4] << ", ";
         str << strs[2].size() << "ch, ";
-        str << strs[8] << " bits/ch"
-            << ((strs[9] == "0") ? "" : " floating point");
+        str << strs[8] << " bits/ch" << ((strs[9] == "0") ? "" : " floating point");
 
         out_yaml << YAML::Key << "Resolution";
         out_yaml << YAML::Value << YAML::BeginMap; // Resolution Map
@@ -552,8 +551,7 @@ vector<string> readSession(string path)
                     for (int m = 0; m < movs.size(); m++)
                     {
                         thispath = movs[m];
-                        if (movs[m].size() > 13
-                            && movs[m].substr(0, 14) == "${RV_PATHSWAP_")
+                        if (movs[m].size() > 13 && movs[m].substr(0, 14) == "${RV_PATHSWAP_")
                         {
                             int endpos = movs[m].find("}");
                             if (endpos == string::npos)
@@ -574,8 +572,7 @@ vector<string> readSession(string path)
         {
             ostringstream imgsrc;
             string name = "", channels = "";
-            int uncropWidth = 0, uncropHeight = 0, start = 0, end = 0, inc = 0,
-                bitsPerChannel = 0, isFloat = 0;
+            int uncropWidth = 0, uncropHeight = 0, start = 0, end = 0, inc = 0, bitsPerChannel = 0, isFloat = 0;
             float pixelAspect = 0.0, fps = 0.0;
             PropertyContainer::Components comps = nodes[n]->components();
             for (int c = 0; c < comps.size(); c++)
@@ -592,36 +589,27 @@ vector<string> readSession(string path)
                     else if (pName == "channels")
                         channels = props[p]->valueAsString();
                     else if (pName == "uncropWidth")
-                        uncropWidth =
-                            reinterpret_cast<IntProperty*>(props[p])->front();
+                        uncropWidth = reinterpret_cast<IntProperty*>(props[p])->front();
                     else if (pName == "uncropHeight")
-                        uncropHeight =
-                            reinterpret_cast<IntProperty*>(props[p])->front();
+                        uncropHeight = reinterpret_cast<IntProperty*>(props[p])->front();
                     else if (pName == "start")
-                        start =
-                            reinterpret_cast<IntProperty*>(props[p])->front();
+                        start = reinterpret_cast<IntProperty*>(props[p])->front();
                     else if (pName == "end")
                         end = reinterpret_cast<IntProperty*>(props[p])->front();
                     else if (pName == "inc")
                         inc = reinterpret_cast<IntProperty*>(props[p])->front();
                     else if (pName == "bitsPerChannel")
-                        bitsPerChannel =
-                            reinterpret_cast<IntProperty*>(props[p])->front();
+                        bitsPerChannel = reinterpret_cast<IntProperty*>(props[p])->front();
                     else if (pName == "float")
-                        isFloat =
-                            reinterpret_cast<IntProperty*>(props[p])->front();
+                        isFloat = reinterpret_cast<IntProperty*>(props[p])->front();
                     else if (pName == "pixelAspect")
-                        pixelAspect =
-                            reinterpret_cast<FloatProperty*>(props[p])->front();
+                        pixelAspect = reinterpret_cast<FloatProperty*>(props[p])->front();
                     else if (pName == "fps")
-                        fps =
-                            reinterpret_cast<FloatProperty*>(props[p])->front();
+                        fps = reinterpret_cast<FloatProperty*>(props[p])->front();
                 }
             }
-            imgsrc << "RVImageSource|" << name << "|" << channels << "|"
-                   << uncropWidth << "|" << uncropHeight << "|" << start << "|"
-                   << end << "|" << inc << "|" << bitsPerChannel << "|"
-                   << isFloat << "|" << pixelAspect << "|" << fps << "|";
+            imgsrc << "RVImageSource|" << name << "|" << channels << "|" << uncropWidth << "|" << uncropHeight << "|" << start << "|" << end
+                   << "|" << inc << "|" << bitsPerChannel << "|" << isFloat << "|" << pixelAspect << "|" << fps << "|";
 
             thispath = imgsrc.str();
             imgsrc.str("");
@@ -637,11 +625,9 @@ int utf8Main(int argc, char** argv)
     const QCoreApplication qapp(argc, argv);
 
 #ifdef PLATFORM_DARWIN
-    TwkApp::DarwinBundle bundle("RV", MAJOR_VERSION, MINOR_VERSION,
-                                REVISION_NUMBER);
+    TwkApp::DarwinBundle bundle("RV", MAJOR_VERSION, MINOR_VERSION, REVISION_NUMBER);
 #else
-    TwkApp::QTBundle bundle("rv", MAJOR_VERSION, MINOR_VERSION,
-                            REVISION_NUMBER);
+    TwkApp::QTBundle bundle("rv", MAJOR_VERSION, MINOR_VERSION, REVISION_NUMBER);
     (void)bundle.top();
 #endif
 
@@ -663,29 +649,18 @@ int utf8Main(int argc, char** argv)
     //  Call the deploy functions
     //
 
-    TWK_DEPLOY_APP_OBJECT dobj(MAJOR_VERSION, MINOR_VERSION, REVISION_NUMBER,
-                               argc, argv, RELEASE_DESCRIPTION,
-                               "HEAD=" GIT_HEAD);
+    TWK_DEPLOY_APP_OBJECT dobj(MAJOR_VERSION, MINOR_VERSION, REVISION_NUMBER, argc, argv, RELEASE_DESCRIPTION, "HEAD=" GIT_HEAD);
 
-    if (arg_parse(
-            argc, argv, "", "\nUsage: rvls list movies and image sequences\n",
-            "", ARG_SUBR(parseInFiles),
-            "Input sequence patterns, images, movies, or directories ", "-a",
-            ARG_FLAG(&a), "Show hidden files", "-s", ARG_FLAG(&s),
-            "Show sequences only (no non-sequence member files)", "-l",
-            ARG_FLAG(&l), "Show long listing", "-x", ARG_FLAG(&x),
-            "Show extended attributes and image structure", "-b", ARG_FLAG(&b),
-            "Use brute force if no reader found", "-o %S", &outputFile,
-            "Output log file. Results will be printed to stdout by default",
-            "-nr", ARG_FLAG(&nr), "Do not show frame ranges", "-ns",
-            ARG_FLAG(&ns), "Do not infer sequences (list each file separately)",
-            "-min %d", &minseq,
-            "Minimum number of files considered a sequence (default=%d)",
-            minseq, "-formats", ARG_FLAG(&showFormats),
-            "List image/movie formats", "-yaml", ARG_FLAG(&yaml),
-            "Output in YAML format. (-x only)", "-version",
-            ARG_FLAG(&showVersion), "Show rvls version number", "-debug %S",
-            &debugString, "Debug category (only 'plugins' for now)", NULL)
+    if (arg_parse(argc, argv, "", "\nUsage: rvls list movies and image sequences\n", "", ARG_SUBR(parseInFiles),
+                  "Input sequence patterns, images, movies, or directories ", "-a", ARG_FLAG(&a), "Show hidden files", "-s", ARG_FLAG(&s),
+                  "Show sequences only (no non-sequence member files)", "-l", ARG_FLAG(&l), "Show long listing", "-x", ARG_FLAG(&x),
+                  "Show extended attributes and image structure", "-b", ARG_FLAG(&b), "Use brute force if no reader found", "-o %S",
+                  &outputFile, "Output log file. Results will be printed to stdout by default", "-nr", ARG_FLAG(&nr),
+                  "Do not show frame ranges", "-ns", ARG_FLAG(&ns), "Do not infer sequences (list each file separately)", "-min %d",
+                  &minseq, "Minimum number of files considered a sequence (default=%d)", minseq, "-formats", ARG_FLAG(&showFormats),
+                  "List image/movie formats", "-yaml", ARG_FLAG(&yaml), "Output in YAML format. (-x only)", "-version",
+                  ARG_FLAG(&showVersion), "Show rvls version number", "-debug %S", &debugString, "Debug category (only 'plugins' for now)",
+                  NULL)
         < 0)
     {
         exit(-1);
@@ -707,8 +682,7 @@ int utf8Main(int argc, char** argv)
 
     if (showVersion)
     {
-        cout << MAJOR_VERSION << "." << MINOR_VERSION << "." << REVISION_NUMBER
-             << endl;
+        cout << MAJOR_VERSION << "." << MINOR_VERSION << "." << REVISION_NUMBER << endl;
 
         exit(0);
     }
@@ -723,8 +697,7 @@ int utf8Main(int argc, char** argv)
     }
     catch (...)
     {
-        cerr << "WARNING: a problem occured while loading image plugins."
-             << endl;
+        cerr << "WARNING: a problem occured while loading image plugins." << endl;
         cerr << "         some plugins may not have been loaded." << endl;
     }
 
@@ -783,8 +756,7 @@ int utf8Main(int argc, char** argv)
                     }
                 }
             }
-            else if (path.size() > 2
-                     && path.substr(path.size() - 3, path.size() - 1) == ".rv")
+            else if (path.size() > 2 && path.substr(path.size() - 3, path.size() - 1) == ".rv")
             {
                 allfiles = readSession(path);
             }
@@ -802,10 +774,8 @@ int utf8Main(int argc, char** argv)
         }
         else
         {
-            SequencePredicate sPred =
-                (bruteForce) ? AnySequencePredicate : GlobalExtensionPredicate;
-            seqs = sequencesInFileList(allfiles, sPred, nonmatching, showranges,
-                                       minseq);
+            SequencePredicate sPred = (bruteForce) ? AnySequencePredicate : GlobalExtensionPredicate;
+            seqs = sequencesInFileList(allfiles, sPred, nonmatching, showranges, minseq);
         }
         std::sort(seqs.begin(), seqs.end());
 

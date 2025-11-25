@@ -72,8 +72,7 @@ namespace stl_ext
     // class: pvector<class T>
     //
 
-    template <class T, class Alloc = std::allocator<T>>
-    class pvector : public void_vector<Alloc>
+    template <class T, class Alloc = std::allocator<T>> class pvector : public void_vector<Alloc>
     {
     public:
         typedef T* value_type;
@@ -132,15 +131,9 @@ namespace stl_ext
 
             bool operator>=(const itype& i) const { return !(_i < i._i); }
 
-            bool operator<=(const itype& i) const
-            {
-                return _i < i._i || (*this) == i;
-            }
+            bool operator<=(const itype& i) const { return _i < i._i || (*this) == i; }
 
-            bool operator>(const itype& i) const
-            {
-                return !((*this) < i) && ((*this) != i);
-            }
+            bool operator>(const itype& i) const { return !((*this) < i) && ((*this) != i); }
 
             itype operator+(int i) const { return itype(_i + i); }
 
@@ -191,15 +184,9 @@ namespace stl_ext
 
             bool operator>=(const itype& i) const { return !(_i < i._i); }
 
-            bool operator<=(const itype& i) const
-            {
-                return _i < i._i || (*this) == i;
-            }
+            bool operator<=(const itype& i) const { return _i < i._i || (*this) == i; }
 
-            bool operator>(const itype& i) const
-            {
-                return !((*this) < i) && ((*this) != i);
-            }
+            bool operator>(const itype& i) const { return !((*this) < i) && ((*this) != i); }
 
             itype operator+(int i) const { return itype(_i + i); }
 
@@ -247,31 +234,19 @@ namespace stl_ext
 
         iterator begin() { return iterator(this->_v.begin()); }
 
-        const_iterator begin() const
-        {
-            return const_iterator(this->_v.begin());
-        }
+        const_iterator begin() const { return const_iterator(this->_v.begin()); }
 
         iterator end() { return iterator(this->_v.end()); }
 
         const_iterator end() const { return const_iterator(this->_v.end()); }
 
-        reverse_iterator rbegin()
-        {
-            return reverse_iterator(this->_v.rbegin());
-        }
+        reverse_iterator rbegin() { return reverse_iterator(this->_v.rbegin()); }
 
-        const_reverse_iterator rbegin() const
-        {
-            return const_reverse_iterator(this->_v.rbegin);
-        }
+        const_reverse_iterator rbegin() const { return const_reverse_iterator(this->_v.rbegin); }
 
         reverse_iterator rend() { return reverse_iterator(this->_v.rend()); }
 
-        const_reverse_iterator rend() const
-        {
-            return const_reverse_iterator(this->_v.rend());
-        }
+        const_reverse_iterator rend() const { return const_reverse_iterator(this->_v.rend()); }
 
         reference front() { return reference(this->_v.begin()); }
 
@@ -295,10 +270,7 @@ namespace stl_ext
 
         void erase(iterator i) { this->_v.erase(i._i); }
 
-        void erase(iterator first, iterator last)
-        {
-            this->_v.erase(first._i, last._i);
-        }
+        void erase(iterator first, iterator last) { this->_v.erase(first._i, last._i); }
 
         void insert(iterator pos, value_type X) { this->_v.insert(pos._i, X); }
 

@@ -48,21 +48,13 @@ namespace Mu
         //  Add default constructors (w/o arguments).
         //
 
-        fp->addSymbol(new Function(c, fp->name().c_str(),
-                                   PixelsType::defaultPixelConstructor, None,
-                                   Return, tn, End));
+        fp->addSymbol(new Function(c, fp->name().c_str(), PixelsType::defaultPixelConstructor, None, Return, tn, End));
 
-        hp->addSymbol(new Function(c, hp->name().c_str(),
-                                   PixelsType::defaultPixelConstructor, None,
-                                   Return, tn, End));
+        hp->addSymbol(new Function(c, hp->name().c_str(), PixelsType::defaultPixelConstructor, None, Return, tn, End));
 
-        sp->addSymbol(new Function(c, sp->name().c_str(),
-                                   PixelsType::defaultPixelConstructor, None,
-                                   Return, tn, End));
+        sp->addSymbol(new Function(c, sp->name().c_str(), PixelsType::defaultPixelConstructor, None, Return, tn, End));
 
-        bp->addSymbol(new Function(c, bp->name().c_str(),
-                                   PixelsType::defaultPixelConstructor, None,
-                                   Return, tn, End));
+        bp->addSymbol(new Function(c, bp->name().c_str(), PixelsType::defaultPixelConstructor, None, Return, tn, End));
     }
 
     NODE_IMPLEMENTATION(PixelsType::defaultPixelConstructor, Pointer)
@@ -72,8 +64,7 @@ namespace Mu
         //  the tag type.
         //
 
-        const VariantTagType* t =
-            static_cast<const VariantTagType*>(NODE_THIS.symbol()->scope());
+        const VariantTagType* t = static_cast<const VariantTagType*>(NODE_THIS.symbol()->scope());
 
         NODE_RETURN(VariantInstance::allocate(t));
     }

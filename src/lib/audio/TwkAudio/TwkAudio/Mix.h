@@ -25,9 +25,7 @@ namespace TwkAudio
     /// in and out sample sizes must match.
     ///
 
-    TWKAUDIO_EXPORT void mixChannels(const AudioBuffer& in, AudioBuffer& out,
-                                     const float lVolume, const float rVolume,
-                                     const bool compose);
+    TWKAUDIO_EXPORT void mixChannels(const AudioBuffer& in, AudioBuffer& out, const float lVolume, const float rVolume, const bool compose);
 
 } // namespace TwkAudio
 

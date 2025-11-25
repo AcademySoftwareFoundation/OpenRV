@@ -14,8 +14,7 @@
 
 #define CompareREFIID(iid1, iid2) (memcmp(&iid1, &iid2, sizeof(REFIID)) == 0)
 
-StereoVideoFrame::Provider::Provider(IDeckLinkMutableVideoFrame* parent,
-                                     IDeckLinkMutableVideoFrame* right)
+StereoVideoFrame::Provider::Provider(IDeckLinkMutableVideoFrame* parent, IDeckLinkMutableVideoFrame* right)
     : m_parentFrame(parent)
     , m_rightFrame(right)
     , m_refCount(1)
@@ -40,8 +39,7 @@ StereoVideoFrame::Provider::~Provider()
 
 HRESULT StereoVideoFrame::Provider::QueryInterface(REFIID iid, LPVOID* ppv)
 {
-    return (new StereoVideoFrame(m_parentFrame, m_rightFrame))
-        ->QueryInterface(iid, ppv);
+    return (new StereoVideoFrame(m_parentFrame, m_rightFrame))->QueryInterface(iid, ppv);
 }
 
 ULONG StereoVideoFrame::Provider::AddRef() { return ++m_refCount; }
@@ -57,8 +55,7 @@ StereoVideoFrame::Provider::Release()
     return refCount;
 }
 
-StereoVideoFrame::StereoVideoFrame(IDeckLinkMutableVideoFrame* owner,
-                                   IDeckLinkMutableVideoFrame* right)
+StereoVideoFrame::StereoVideoFrame(IDeckLinkMutableVideoFrame* owner, IDeckLinkMutableVideoFrame* right)
     : m_frameLeft(owner)
     , m_frameRight(right)
     , m_refCount(1)
@@ -95,8 +92,7 @@ HRESULT StereoVideoFrame::QueryInterface(REFIID iid, LPVOID* ppv)
     REFIID iunknown = IID_IUnknown;
 #endif
 
-    if (CompareREFIID(iid, iunknown)
-        || CompareREFIID(iid, IID_IDeckLinkVideoFrame3DExtensions))
+    if (CompareREFIID(iid, iunknown) || CompareREFIID(iid, IID_IDeckLinkVideoFrame3DExtensions))
     {
         *ppv = static_cast<IDeckLinkVideoFrame3DExtensions*>(this);
         AddRef();
@@ -119,18 +115,14 @@ ULONG StereoVideoFrame::Release()
     return refCount;
 }
 
-BMDVideo3DPackingFormat StereoVideoFrame::Get3DPackingFormat()
-{
-    return bmdVideo3DPackingLeftOnly;
-}
+BMDVideo3DPackingFormat StereoVideoFrame::Get3DPackingFormat() { return bmdVideo3DPackingLeftOnly; }
 
 HRESULT
 StereoVideoFrame::GetFrameForRightEye(IDeckLinkVideoFrame** rightEyeFrame)
 {
     if (m_frameRight != nullptr)
     {
-        return m_frameRight->QueryInterface(
-            IID_IDeckLinkVideoFrame, reinterpret_cast<void**>(rightEyeFrame));
+        return m_frameRight->QueryInterface(IID_IDeckLinkVideoFrame, reinterpret_cast<void**>(rightEyeFrame));
     }
     return S_FALSE;
 }

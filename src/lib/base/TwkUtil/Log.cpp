@@ -70,10 +70,8 @@ namespace TwkUtil
         tm* ptm = localtime(&t);
 
         char buffer[100];
-        snprintf(buffer, sizeof(buffer), "%04d/%02d/%02d %02d:%02d:%02d.%06d",
-                 ptm->tm_year + 1900, ptm->tm_mon + 1, ptm->tm_mday,
-                 ptm->tm_hour, ptm->tm_min, ptm->tm_sec,
-                 (int)(fractPart * 1e6));
+        snprintf(buffer, sizeof(buffer), "%04d/%02d/%02d %02d:%02d:%02d.%06d", ptm->tm_year + 1900, ptm->tm_mon + 1, ptm->tm_mday,
+                 ptm->tm_hour, ptm->tm_min, ptm->tm_sec, (int)(fractPart * 1e6));
 
         return buffer;
     }

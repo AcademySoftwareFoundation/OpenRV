@@ -105,8 +105,7 @@ namespace TwkMovie
 
                             if (name == ":info")
                             {
-                                for (size_t x = 0; x < c->properties.size();
-                                     x++)
+                                for (size_t x = 0; x < c->properties.size(); x++)
                                 {
                                     const Property* p = c->properties[x];
 
@@ -118,8 +117,7 @@ namespace TwkMovie
                             }
                         }
 
-                        ProxyMovieIO* io =
-                            new ProxyMovieIO(identifier, sortKey, fname);
+                        ProxyMovieIO* io = new ProxyMovieIO(identifier, sortKey, fname);
 
                         for (size_t j = 0; j < o->components.size(); j++)
                         {
@@ -151,50 +149,37 @@ namespace TwkMovie
                                 }
                                 else if (p->name == "audio_codecs")
                                 {
-                                    for (int i = 0; i < p->size * p->dims.x;
-                                         i += 2)
+                                    for (int i = 0; i < p->size * p->dims.x; i += 2)
                                     {
-                                        audio_codecs.push_back(
-                                            make_pair((p->stringData)[i],
-                                                      (p->stringData)[i + 1]));
+                                        audio_codecs.push_back(make_pair((p->stringData)[i], (p->stringData)[i + 1]));
                                     }
                                 }
                                 else if (p->name == "video_codecs")
                                 {
-                                    for (int i = 0; i < p->size * p->dims.x;
-                                         i += 2)
+                                    for (int i = 0; i < p->size * p->dims.x; i += 2)
                                     {
-                                        video_codecs.push_back(
-                                            make_pair((p->stringData)[i],
-                                                      (p->stringData)[i + 1]));
+                                        video_codecs.push_back(make_pair((p->stringData)[i], (p->stringData)[i + 1]));
                                     }
                                 }
                                 else if (p->name == "encode_parameters")
                                 {
-                                    for (int i = 0; i < p->size * p->dims.x;
-                                         i += 3)
+                                    for (int i = 0; i < p->size * p->dims.x; i += 3)
                                     {
-                                        eparams.push_back(MovieIO::Parameter(
-                                            (p->stringData)[i],
-                                            (p->stringData)[i + 1],
-                                            (p->stringData)[i + 2]));
+                                        eparams.push_back(
+                                            MovieIO::Parameter((p->stringData)[i], (p->stringData)[i + 1], (p->stringData)[i + 2]));
                                     }
                                 }
                                 else if (p->name == "decode_parameters")
                                 {
-                                    for (int i = 0; i < p->size * p->dims.x;
-                                         i += 3)
+                                    for (int i = 0; i < p->size * p->dims.x; i += 3)
                                     {
-                                        dparams.push_back(MovieIO::Parameter(
-                                            (p->stringData)[i],
-                                            (p->stringData)[i + 1],
-                                            (p->stringData)[i + 2]));
+                                        dparams.push_back(
+                                            MovieIO::Parameter((p->stringData)[i], (p->stringData)[i + 1], (p->stringData)[i + 2]));
                                     }
                                 }
                             }
 
-                            io->add(name, desc, caps, video_codecs,
-                                    audio_codecs, eparams, dparams);
+                            io->add(name, desc, caps, video_codecs, audio_codecs, eparams, dparams);
                         }
 
                         GenericIO::addPlugin(io);

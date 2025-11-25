@@ -27,8 +27,7 @@ namespace TwkMath
     // population of samples. This version assumes that dimensions must be
     // iterated over individually.
     template <class ARRAY2D, class ARRAY1D, class T>
-    inline void sampleMean(const ARRAY2D& samples, int numSamples,
-                           int dimension, ARRAY1D& mean, T dummy)
+    inline void sampleMean(const ARRAY2D& samples, int numSamples, int dimension, ARRAY1D& mean, T dummy)
     {
         // Set mean to zero.
         int dim;
@@ -58,9 +57,7 @@ namespace TwkMath
     // population of samples. This version assumes that samples
     // have arithmetic operations built in, and can be assigned to
     // scalars.
-    template <class ARRAY2D, class ARRAY1D, class T>
-    inline void sampleMean(const ARRAY2D& samples, int numSamples,
-                           ARRAY1D& mean, T dummy)
+    template <class ARRAY2D, class ARRAY1D, class T> inline void sampleMean(const ARRAY2D& samples, int numSamples, ARRAY1D& mean, T dummy)
     {
         // Set mean to zero.
         mean = (T)0;
@@ -85,9 +82,7 @@ namespace TwkMath
     // Function to produce a uniformly weighted covariance matrix based on a
     // population of samples and their given mean.
     template <class ARRAY2D_1, class ARRAY2D_2, class ARRAY1D, class T>
-    void sampleCovarianceMatrix(const ARRAY2D_1& samples, int numSamples,
-                                int dimension, const ARRAY1D& mean,
-                                ARRAY2D_2& covarMat, T dummy)
+    void sampleCovarianceMatrix(const ARRAY2D_1& samples, int numSamples, int dimension, const ARRAY1D& mean, ARRAY2D_2& covarMat, T dummy)
     {
         // Counter variables
         int samp;
@@ -112,9 +107,7 @@ namespace TwkMath
             {
                 for (col = row; col < dimension; col++)
                 {
-                    covarMat[row][col] +=
-                        ((T)(samples[samp][row] - mean[row]))
-                        * ((T)(samples[samp][col] - mean[col]));
+                    covarMat[row][col] += ((T)(samples[samp][row] - mean[row])) * ((T)(samples[samp][col] - mean[col]));
                 }
             }
         }
@@ -127,8 +120,7 @@ namespace TwkMath
             {
                 // row,col is defined, but unnormalized.
                 // col,row is not.
-                covarMat[col][row] = covarMat[row][col] =
-                    covarMat[row][col] / (T)numSamples;
+                covarMat[col][row] = covarMat[row][col] = covarMat[row][col] / (T)numSamples;
             }
         }
     }
@@ -162,8 +154,7 @@ namespace TwkMath
         }
 
         //******************************************************************************
-        template <class T>
-        inline bool relativeUnderflowTest(const T& testVal, const T& anorm)
+        template <class T> inline bool relativeUnderflowTest(const T& testVal, const T& anorm)
         {
             // The original numerical recipies had this statement,
             // which really makes no sense to me:
@@ -178,8 +169,7 @@ namespace TwkMath
         }
 
         //******************************************************************************
-        template <class T>
-        inline T makeSameSign(const T& val, const T& desiredSign)
+        template <class T> inline T makeSameSign(const T& val, const T& desiredSign)
         {
             if (desiredSign > 0)
             {
@@ -242,8 +232,7 @@ namespace TwkMath
     // NOTE!!! This function is overkill when A is symmetric positive definite.
     //******************************************************************************
     template <class ARRAY2D_1, class ARRAY2D_2, class ARRAY1D, class T>
-    void singularValueDecomposition(ARRAY2D_1& A, int M, int N, ARRAY1D& W,
-                                    ARRAY2D_2& V, T dummy)
+    void singularValueDecomposition(ARRAY2D_1& A, int M, int N, ARRAY1D& W, ARRAY2D_2& V, T dummy)
     {
         // Declare constants
         static const int MAX_SVD_ITERS = 30;
@@ -515,8 +504,7 @@ namespace TwkMath
                     // Do a cleanup, just in case this is a handle-able
                     // exception in the calling function.
                     delete[] rv1;
-                    TWK_EXC_THROW_WHAT(EigenExc,
-                                       "SVD: No convergence in max iters");
+                    TWK_EXC_THROW_WHAT(EigenExc, "SVD: No convergence in max iters");
                 }
 
                 // Do some totally uncommented stuff.
@@ -527,9 +515,7 @@ namespace TwkMath
                 h = rv1[k];
                 f = ((y - z) * (y + z) + (g - h) * (g + h)) / (((T)2) * h * y);
                 g = safeHypot(f, (T)1);
-                f = ((x - z) * (x + z)
-                     + h * ((y / (f + makeSameSign(g, f))) - h))
-                    / x;
+                f = ((x - z) * (x + z) + h * ((y / (f + makeSameSign(g, f))) - h)) / x;
                 c = s = (T)1;
                 for (j = q; j <= nm; j++)
                 {
@@ -588,8 +574,7 @@ namespace TwkMath
     namespace
     {
 
-        template <class T1, class T2>
-        inline void jacobiRotate(T1& a0, T1& a1, const T2& s, const T2& tau)
+        template <class T1, class T2> inline void jacobiRotate(T1& a0, T1& a1, const T2& s, const T2& tau)
         {
             const T1 g = a0;
             const T1 h = a1;
@@ -597,8 +582,7 @@ namespace TwkMath
             a1 = h + (s * (g - (h * tau)));
         }
 
-        template <class T>
-        inline bool relativeUnderflowTest2(const T& f, const T& g)
+        template <class T> inline bool relativeUnderflowTest2(const T& f, const T& g)
         {
             const double adf = fabs(((double)f));
             const double dg = (double)g;
@@ -624,8 +608,7 @@ namespace TwkMath
     // The dummy variable is required for template resolution.
 
     template <class ARRAY2D_1, class ARRAY2D_2, class ARRAY1D, class T>
-    void jacobiEigenSolve(ARRAY2D_1& a, int N, ARRAY1D& d, ARRAY2D_2& v,
-                          int& numRotations, T dummy)
+    void jacobiEigenSolve(ARRAY2D_1& a, int N, ARRAY1D& d, ARRAY2D_2& v, int& numRotations, T dummy)
     {
         // Declare constants
         static const int MAX_JACOBI_ITERS = 50;
@@ -713,8 +696,7 @@ namespace TwkMath
                     // More of this weird round-off error stuff.
                     // After four sweeps, skip the rotation if the
                     // off-diagonal element is small.
-                    if (numRotations > 3 && relativeUnderflowTest2(d[ip], (T)g)
-                        && relativeUnderflowTest2(d[iq], (T)g))
+                    if (numRotations > 3 && relativeUnderflowTest2(d[ip], (T)g) && relativeUnderflowTest2(d[iq], (T)g))
                     {
                         a[ip][iq] = (T)0;
                     }
@@ -728,9 +710,7 @@ namespace TwkMath
                         else
                         {
                             theta = ((T)0.5) * h / (a[ip][iq]);
-                            t = ((T)1)
-                                / (Math<T>::abs(theta)
-                                   + Math<T>::sqrt(((T)1) + (theta * theta)));
+                            t = ((T)1) / (Math<T>::abs(theta) + Math<T>::sqrt(((T)1) + (theta * theta)));
                             if (theta < (T)0)
                             {
                                 t = -t;
@@ -837,19 +817,14 @@ namespace TwkMath
         //******************************************************************************
         template <class T> struct IvpComp
         {
-            bool operator()(const IndexValuePair<T>& lhs,
-                            const IndexValuePair<T>& rhs) const
-            {
-                return lhs.value > rhs.value;
-            }
+            bool operator()(const IndexValuePair<T>& lhs, const IndexValuePair<T>& rhs) const { return lhs.value > rhs.value; }
         };
 
     } // End unnamed namespace
 
     //******************************************************************************
     template <class ARRAY2D, class ARRAY1D, class T>
-    void eigenSort(ARRAY1D& eigenValues, ARRAY2D& eigenVectorsTransposed,
-                   int dimension, T dummy)
+    void eigenSort(ARRAY1D& eigenValues, ARRAY2D& eigenVectorsTransposed, int dimension, T dummy)
     {
         // Build a list of pairs.
         IndexValuePair<T>* pairs = new IndexValuePair<T>[dimension];

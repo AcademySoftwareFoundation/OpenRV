@@ -32,7 +32,6 @@ OUTPUT_DIR = ""
 TEMP_DIR = ""
 VARIANT = ""
 ARCH = ""
-OPENTIMELINEIO_SOURCE_DIR = ""
 
 LIB_DIR = ""
 
@@ -120,8 +119,9 @@ def get_python_interpreter_args(python_home: str, variant: str) -> List[str]:
     :return: Path to the python interpreter
     """
 
-    build_opentimelineio = platform.system() == "Windows" and variant == "Debug"
-    python_name_pattern = "python*" if not build_opentimelineio else "python_d*"
+    # On Windows Debug, use the debug Python interpreter (python_d.exe)
+    use_debug_python = platform.system() == "Windows" and variant == "Debug"
+    python_name_pattern = "python*" if not use_debug_python else "python_d*"
 
     python_interpreters = glob.glob(os.path.join(python_home, python_name_pattern), recursive=True)
     python_interpreters += glob.glob(os.path.join(python_home, "bin", python_name_pattern))
@@ -223,7 +223,7 @@ def patch_python_distribution(python_home: str) -> None:
 
     pip_args = python_interpreter_args + ["-m", "pip"]
 
-    for package in ["pip", "certifi", "six", "wheel", "packaging", "requests"]:
+    for package in ["pip", "certifi", "six", "wheel", "packaging", "requests", "pydantic"]:
         package_install_args = pip_args + [
             "install",
             "--upgrade",
@@ -279,48 +279,8 @@ def test_python_distribution(python_home: str) -> None:
 
         python_interpreter_args = get_python_interpreter_args(tmp_python_home, VARIANT)
 
-        # Note: We need to build opentimelineio from sources in Windows+Debug
-        #       because the official wheel links with the release version of
-        #       python while RV uses the debug version.
-        build_opentimelineio = platform.system() == "Windows" and VARIANT == "Debug"
-        if build_opentimelineio:
-            print("Building opentimelineio")
-
-            # Request an opentimelineio debug build
-            my_env = os.environ.copy()
-            my_env["OTIO_CXX_DEBUG_BUILD"] = "1"
-
-            # Specify the location of the debug python import lib (eg. python39_d.lib)
-            python_include_dirs = os.path.join(tmp_python_home, "include")
-            python_lib = os.path.join(tmp_python_home, "libs", f"python{PYTHON_VERSION}_d.lib")
-            my_env["CMAKE_ARGS"] = f"-DPython_LIBRARY={python_lib} -DCMAKE_INCLUDE_PATH={python_include_dirs}"
-
-            opentimelineio_install_arg = python_interpreter_args + [
-                "-m",
-                "pip",
-                "install",
-                ".",
-            ]
-
-            subprocess.run(
-                opentimelineio_install_arg,
-                env=my_env,
-                cwd=OPENTIMELINEIO_SOURCE_DIR,
-            ).check_returncode()
-
-            # Note : The OpenTimelineIO build will generate the pyd with names that are not loadable by default
-            # Example: _opentimed_d.cp39-win_amd64.pyd instead of _opentime_d.pyd
-            # and _otiod_d.cp39-win_amd64.pyd instead of _otio_d.pyd
-            # We fix those names here
-            otio_module_dir = os.path.join(tmp_python_home, "lib", "site-packages", "opentimelineio")
-            for _file in os.listdir(otio_module_dir):
-                if _file.endswith("pyd"):
-                    otio_lib_name_split = os.path.basename(_file).split(".")
-                    if len(otio_lib_name_split) > 2:
-                        new_otio_lib_name = otio_lib_name_split[0].replace("d_d", "_d") + ".pyd"
-                        src_file = os.path.join(otio_module_dir, _file)
-                        dst_file = os.path.join(otio_module_dir, new_otio_lib_name)
-                        shutil.copyfile(src_file, dst_file)
+        # Note: OpenTimelineIO is installed via requirements.txt for all platforms and build types.
+        # The git URL in requirements.txt ensures it builds from source with proper linkage.
 
         wheel_install_arg = python_interpreter_args + [
             "-m",
@@ -329,10 +289,7 @@ def test_python_distribution(python_home: str) -> None:
             "cryptography",
         ]
 
-        if not build_opentimelineio:
-            wheel_install_arg.append("opentimelineio")
-
-        print(f"Validating the that we can install a wheel with {wheel_install_arg}")
+        print(f"Validating that we can install a wheel with {wheel_install_arg}")
         subprocess.run(wheel_install_arg).check_returncode()
 
         python_validation_args = python_interpreter_args + [
@@ -786,14 +743,6 @@ if __name__ == "__main__":
 
     parser.add_argument("--vfx_platform", dest="vfx_platform", type=int, required=True)
 
-    parser.add_argument(
-        "--opentimelineio-source-dir",
-        dest="otio_source_dir",
-        type=str,
-        required=False,
-        default="",
-    )
-
     if platform.system() == "Windows":
         # Major and minor version of Python without dots. E.g. 3.10.3 -> 310
         parser.add_argument(
@@ -814,7 +763,6 @@ if __name__ == "__main__":
     OPENSSL_OUTPUT_DIR = args.openssl
     VARIANT = args.variant
     ARCH = args.arch
-    OPENTIMELINEIO_SOURCE_DIR = args.otio_source_dir
     VFX_PLATFORM = args.vfx_platform
 
     if platform.system() == "Darwin":

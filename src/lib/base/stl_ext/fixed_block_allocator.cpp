@@ -118,8 +118,7 @@ namespace stl_ext
         return bytes;
     }
 
-    bool fixed_block_allocator::is_allocated(
-        fixed_block_allocator::const_pointer ptr) const
+    bool fixed_block_allocator::is_allocated(fixed_block_allocator::const_pointer ptr) const
     {
         const_byte_pointer p = (const_byte_pointer)ptr;
 
@@ -151,13 +150,11 @@ namespace stl_ext
         return false;
     }
 
-    bool
-    fixed_block_allocator::is_live(fixed_block_allocator::const_pointer ptr)
+    bool fixed_block_allocator::is_live(fixed_block_allocator::const_pointer ptr)
     {
         if (is_allocated(ptr))
         {
-            for (dead_object_pointer p = _free; p;
-                 p = (dead_object_pointer)p->pointer())
+            for (dead_object_pointer p = _free; p; p = (dead_object_pointer)p->pointer())
             {
                 if (p == ptr)
                     return false;
@@ -173,8 +170,7 @@ namespace stl_ext
     {
         pthread_mutex_lock(&_lock);
 
-        for (dead_object_pointer p = _free; p;
-             p = (dead_object_pointer)(p->pointer()))
+        for (dead_object_pointer p = _free; p; p = (dead_object_pointer)(p->pointer()))
         {
             /* AJG - doesn't like STL_EXT_DEBUG
             #if STL_EXT_DEBUG

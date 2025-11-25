@@ -61,14 +61,9 @@ namespace TwkMovie
 
         const char* Flush() { return "flush"; }
 
-        bool isCommand(const char* buffer)
-        {
-            return buffer && buffer[0] == CommandPrefix()[0]
-                   && buffer[1] == CommandPrefix()[1];
-        }
+        bool isCommand(const char* buffer) { return buffer && buffer[0] == CommandPrefix()[0] && buffer[1] == CommandPrefix()[1]; }
 
-        StringPair parseMessage(const char* processName, ostream* log,
-                                const string& msg)
+        StringPair parseMessage(const char* processName, ostream* log, const string& msg)
         {
             if (!isCommand(msg.c_str()))
             {
@@ -91,8 +86,7 @@ namespace TwkMovie
             return make_pair(cmd, arg);
         }
 
-        size_t newMessage(const char* processName, ostream* log,
-                          const string& cmd, const string& arg, char* outBuffer)
+        size_t newMessage(const char* processName, ostream* log, const string& cmd, const string& arg, char* outBuffer)
         {
             if (log)
             {
@@ -115,8 +109,7 @@ namespace TwkMovie
             return outstr.size() + 1;
         }
 
-        void decodeStringVector(const string& buffer,
-                                TwkFB::FBInfo::StringVector& v)
+        void decodeStringVector(const string& buffer, TwkFB::FBInfo::StringVector& v)
         {
             split(v, buffer, is_any_of(string(",")));
             if (v.size() == 1 && v[0] == "")
@@ -141,16 +134,13 @@ namespace TwkMovie
         {
             ostringstream str;
 
-            str << request.frame << "|" << request.stereo << "|"
-                << request.missing << "|" << encodeStringVector(request.views)
-                << "|" << encodeStringVector(request.layers) << "|"
-                << encodeStringVector(request.channels);
+            str << request.frame << "|" << request.stereo << "|" << request.missing << "|" << encodeStringVector(request.views) << "|"
+                << encodeStringVector(request.layers) << "|" << encodeStringVector(request.channels);
 
             return str.str();
         }
 
-        void decodeMovieReadRequest(const std::string& buffer,
-                                    Movie::ReadRequest& request)
+        void decodeMovieReadRequest(const std::string& buffer, Movie::ReadRequest& request)
         {
             vector<string> v;
 

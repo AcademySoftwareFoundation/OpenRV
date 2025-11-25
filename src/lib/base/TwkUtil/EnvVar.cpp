@@ -74,10 +74,7 @@ namespace TwkUtil
         }
     }
 
-    int EnvVarRegistryImp::getNumElements() const
-    {
-        return static_cast<int>(_vars.size());
-    }
+    int EnvVarRegistryImp::getNumElements() const { return static_cast<int>(_vars.size()); }
 
     BaseRegEnvVar* EnvVarRegistryImp::getEnvVar(int index) const
     {
@@ -85,8 +82,7 @@ namespace TwkUtil
         return _vars[index];
     }
 
-    std::vector<int> EnvVarRegistryImp::search(const char* searchChr,
-                                               int searchType, bool exact)
+    std::vector<int> EnvVarRegistryImp::search(const char* searchChr, int searchType, bool exact)
     {
         std::vector<int> foundList;
         const std::string searchStr = searchChr != NULL ? searchChr : "";
@@ -102,9 +98,7 @@ namespace TwkUtil
         if (!exact)
         {
             // Lets make an uppercase version of our searchStr
-            std::transform(searchStr.begin(), searchStr.end(),
-                           uppedSearchStr.begin(),
-                           EnvVarUtils::myToUpperFunctor);
+            std::transform(searchStr.begin(), searchStr.end(), uppedSearchStr.begin(), EnvVarUtils::myToUpperFunctor);
         }
 
         char value[BaseEnvVar::MAX_STR_VALUE_LENGTH];
@@ -115,15 +109,11 @@ namespace TwkUtil
             if (!exact)
             {
                 // Lets make an uppercase version of our name
-                std::transform(fieldValue.begin(), fieldValue.end(),
-                               fieldValue.begin(),
-                               EnvVarUtils::myToUpperFunctor);
+                std::transform(fieldValue.begin(), fieldValue.end(), fieldValue.begin(), EnvVarUtils::myToUpperFunctor);
             }
             if (
                 // non exact search, search for substrings, case insensitive
-                (!exact
-                 && (fieldValue.find(uppedSearchStr) != std::string::npos))
-                ||
+                (!exact && (fieldValue.find(uppedSearchStr) != std::string::npos)) ||
 
                 // exact search, look for perfect match, case sensitive
                 (fieldValue == searchStr))
@@ -136,8 +126,7 @@ namespace TwkUtil
 
     //------------------------------------------------------------------------------
     //
-    void EnvVarRegistryImp::getFieldValueAsStr(char* val, int searchType,
-                                               int envVarNum) const
+    void EnvVarRegistryImp::getFieldValueAsStr(char* val, int searchType, int envVarNum) const
     {
         if (!val)
             return;
@@ -151,8 +140,7 @@ namespace TwkUtil
         switch (searchType)
         {
         case BaseEnvVar::EV_NAME:
-            snprintf(val, BaseEnvVar::MAX_STR_VALUE_LENGTH, "%s",
-                     var->getName());
+            snprintf(val, BaseEnvVar::MAX_STR_VALUE_LENGTH, "%s", var->getName());
             break;
         case BaseEnvVar::EV_VALUE:
             var->getValueAsStr(val, BaseEnvVar::MAX_STR_VALUE_LENGTH);
@@ -161,8 +149,7 @@ namespace TwkUtil
             var->getDefaultValueAsStr(val, BaseEnvVar::MAX_STR_VALUE_LENGTH);
             break;
         case BaseEnvVar::EV_FILE_NAME:
-            snprintf(val, BaseEnvVar::MAX_STR_VALUE_LENGTH, "%s",
-                     var->getFileName());
+            snprintf(val, BaseEnvVar::MAX_STR_VALUE_LENGTH, "%s", var->getFileName());
             break;
         default:
             // unknown type assert
@@ -174,8 +161,7 @@ namespace TwkUtil
     //
     inline void EnvVarRegistryImp::dump(std::ostream& os) const
     {
-        for (Container::const_iterator it = _vars.begin(); it != _vars.end();
-             ++it)
+        for (Container::const_iterator it = _vars.begin(); it != _vars.end(); ++it)
         {
 
             using namespace std;
@@ -211,14 +197,12 @@ namespace TwkUtil
            << "</tr>" << endl;
 
         // body of html file.
-        for (Container::const_iterator it = _vars.begin(); it != _vars.end();
-             ++it)
+        for (Container::const_iterator it = _vars.begin(); it != _vars.end(); ++it)
         {
 
             using namespace std;
 
-            os << "<tr>" << endl
-               << "<td align=left>" << (*it)->getName() << "</td>";
+            os << "<tr>" << endl << "<td align=left>" << (*it)->getName() << "</td>";
             char value[BaseEnvVar::MAX_STR_VALUE_LENGTH] = "(null)";
             (*it)->getValueAsStr(value, BaseEnvVar::MAX_STR_VALUE_LENGTH);
             os << "<td align=center>" << value << "</td>"

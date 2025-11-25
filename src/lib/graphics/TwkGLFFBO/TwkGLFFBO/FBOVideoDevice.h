@@ -22,8 +22,7 @@ namespace TwkGLF
         //  context (by calling makeCurrent()
         //
 
-        FBOVideoDevice(TwkApp::VideoModule* m, int w, int h, bool alpha,
-                       int numFBOs = 1);
+        FBOVideoDevice(TwkApp::VideoModule* m, int w, int h, bool alpha, int numFBOs = 1);
         virtual ~FBOVideoDevice();
 
         bool hasAlpha() const { return m_alpha; }

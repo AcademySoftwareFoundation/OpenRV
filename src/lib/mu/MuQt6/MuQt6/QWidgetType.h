@@ -42,8 +42,7 @@ namespace Mu
         //  Constructors
         //
 
-        QWidgetType(Context* context, const char* name, Class* superClass = 0,
-                    Class* superClass2 = 0);
+        QWidgetType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QWidgetType();
 
@@ -66,8 +65,7 @@ namespace Mu
     {
     public:
         virtual ~MuQt_QWidget();
-        MuQt_QWidget(Pointer muobj, const CallEnvironment*, QWidget* parent,
-                     Qt::WindowFlags f);
+        MuQt_QWidget(Pointer muobj, const CallEnvironment*, QWidget* parent, Qt::WindowFlags f);
         virtual bool hasHeightForWidth() const;
         virtual int heightForWidth(int w) const;
         virtual QVariant inputMethodQuery(Qt::InputMethodQuery query) const;
@@ -112,238 +110,127 @@ namespace Mu
     public:
         void changeEvent_pub(QEvent* event) { changeEvent(event); }
 
-        void changeEvent_pub_parent(QEvent* event)
-        {
-            QWidget::changeEvent(event);
-        }
+        void changeEvent_pub_parent(QEvent* event) { QWidget::changeEvent(event); }
 
         void closeEvent_pub(QCloseEvent* event) { closeEvent(event); }
 
-        void closeEvent_pub_parent(QCloseEvent* event)
-        {
-            QWidget::closeEvent(event);
-        }
+        void closeEvent_pub_parent(QCloseEvent* event) { QWidget::closeEvent(event); }
 
-        void contextMenuEvent_pub(QContextMenuEvent* event)
-        {
-            contextMenuEvent(event);
-        }
+        void contextMenuEvent_pub(QContextMenuEvent* event) { contextMenuEvent(event); }
 
-        void contextMenuEvent_pub_parent(QContextMenuEvent* event)
-        {
-            QWidget::contextMenuEvent(event);
-        }
+        void contextMenuEvent_pub_parent(QContextMenuEvent* event) { QWidget::contextMenuEvent(event); }
 
-        void destroy_pub(bool destroyWindow, bool destroySubWindows)
-        {
-            destroy(destroyWindow, destroySubWindows);
-        }
+        void destroy_pub(bool destroyWindow, bool destroySubWindows) { destroy(destroyWindow, destroySubWindows); }
 
-        void destroy_pub_parent(bool destroyWindow, bool destroySubWindows)
-        {
-            QWidget::destroy(destroyWindow, destroySubWindows);
-        }
+        void destroy_pub_parent(bool destroyWindow, bool destroySubWindows) { QWidget::destroy(destroyWindow, destroySubWindows); }
 
-        void dragEnterEvent_pub(QDragEnterEvent* event)
-        {
-            dragEnterEvent(event);
-        }
+        void dragEnterEvent_pub(QDragEnterEvent* event) { dragEnterEvent(event); }
 
-        void dragEnterEvent_pub_parent(QDragEnterEvent* event)
-        {
-            QWidget::dragEnterEvent(event);
-        }
+        void dragEnterEvent_pub_parent(QDragEnterEvent* event) { QWidget::dragEnterEvent(event); }
 
-        void dragLeaveEvent_pub(QDragLeaveEvent* event)
-        {
-            dragLeaveEvent(event);
-        }
+        void dragLeaveEvent_pub(QDragLeaveEvent* event) { dragLeaveEvent(event); }
 
-        void dragLeaveEvent_pub_parent(QDragLeaveEvent* event)
-        {
-            QWidget::dragLeaveEvent(event);
-        }
+        void dragLeaveEvent_pub_parent(QDragLeaveEvent* event) { QWidget::dragLeaveEvent(event); }
 
         void dragMoveEvent_pub(QDragMoveEvent* event) { dragMoveEvent(event); }
 
-        void dragMoveEvent_pub_parent(QDragMoveEvent* event)
-        {
-            QWidget::dragMoveEvent(event);
-        }
+        void dragMoveEvent_pub_parent(QDragMoveEvent* event) { QWidget::dragMoveEvent(event); }
 
         void dropEvent_pub(QDropEvent* event) { dropEvent(event); }
 
-        void dropEvent_pub_parent(QDropEvent* event)
-        {
-            QWidget::dropEvent(event);
-        }
+        void dropEvent_pub_parent(QDropEvent* event) { QWidget::dropEvent(event); }
 
         void focusInEvent_pub(QFocusEvent* event) { focusInEvent(event); }
 
-        void focusInEvent_pub_parent(QFocusEvent* event)
-        {
-            QWidget::focusInEvent(event);
-        }
+        void focusInEvent_pub_parent(QFocusEvent* event) { QWidget::focusInEvent(event); }
 
         bool focusNextChild_pub() { return focusNextChild(); }
 
         bool focusNextChild_pub_parent() { return QWidget::focusNextChild(); }
 
-        bool focusNextPrevChild_pub(bool next)
-        {
-            return focusNextPrevChild(next);
-        }
+        bool focusNextPrevChild_pub(bool next) { return focusNextPrevChild(next); }
 
-        bool focusNextPrevChild_pub_parent(bool next)
-        {
-            return QWidget::focusNextPrevChild(next);
-        }
+        bool focusNextPrevChild_pub_parent(bool next) { return QWidget::focusNextPrevChild(next); }
 
         void focusOutEvent_pub(QFocusEvent* event) { focusOutEvent(event); }
 
-        void focusOutEvent_pub_parent(QFocusEvent* event)
-        {
-            QWidget::focusOutEvent(event);
-        }
+        void focusOutEvent_pub_parent(QFocusEvent* event) { QWidget::focusOutEvent(event); }
 
         bool focusPreviousChild_pub() { return focusPreviousChild(); }
 
-        bool focusPreviousChild_pub_parent()
-        {
-            return QWidget::focusPreviousChild();
-        }
+        bool focusPreviousChild_pub_parent() { return QWidget::focusPreviousChild(); }
 
         void hideEvent_pub(QHideEvent* event) { hideEvent(event); }
 
-        void hideEvent_pub_parent(QHideEvent* event)
-        {
-            QWidget::hideEvent(event);
-        }
+        void hideEvent_pub_parent(QHideEvent* event) { QWidget::hideEvent(event); }
 
         void keyPressEvent_pub(QKeyEvent* event) { keyPressEvent(event); }
 
-        void keyPressEvent_pub_parent(QKeyEvent* event)
-        {
-            QWidget::keyPressEvent(event);
-        }
+        void keyPressEvent_pub_parent(QKeyEvent* event) { QWidget::keyPressEvent(event); }
 
         void keyReleaseEvent_pub(QKeyEvent* event) { keyReleaseEvent(event); }
 
-        void keyReleaseEvent_pub_parent(QKeyEvent* event)
-        {
-            QWidget::keyReleaseEvent(event);
-        }
+        void keyReleaseEvent_pub_parent(QKeyEvent* event) { QWidget::keyReleaseEvent(event); }
 
         void leaveEvent_pub(QEvent* event) { leaveEvent(event); }
 
-        void leaveEvent_pub_parent(QEvent* event)
-        {
-            QWidget::leaveEvent(event);
-        }
+        void leaveEvent_pub_parent(QEvent* event) { QWidget::leaveEvent(event); }
 
-        void mouseDoubleClickEvent_pub(QMouseEvent* event)
-        {
-            mouseDoubleClickEvent(event);
-        }
+        void mouseDoubleClickEvent_pub(QMouseEvent* event) { mouseDoubleClickEvent(event); }
 
-        void mouseDoubleClickEvent_pub_parent(QMouseEvent* event)
-        {
-            QWidget::mouseDoubleClickEvent(event);
-        }
+        void mouseDoubleClickEvent_pub_parent(QMouseEvent* event) { QWidget::mouseDoubleClickEvent(event); }
 
         void mouseMoveEvent_pub(QMouseEvent* event) { mouseMoveEvent(event); }
 
-        void mouseMoveEvent_pub_parent(QMouseEvent* event)
-        {
-            QWidget::mouseMoveEvent(event);
-        }
+        void mouseMoveEvent_pub_parent(QMouseEvent* event) { QWidget::mouseMoveEvent(event); }
 
         void mousePressEvent_pub(QMouseEvent* event) { mousePressEvent(event); }
 
-        void mousePressEvent_pub_parent(QMouseEvent* event)
-        {
-            QWidget::mousePressEvent(event);
-        }
+        void mousePressEvent_pub_parent(QMouseEvent* event) { QWidget::mousePressEvent(event); }
 
-        void mouseReleaseEvent_pub(QMouseEvent* event)
-        {
-            mouseReleaseEvent(event);
-        }
+        void mouseReleaseEvent_pub(QMouseEvent* event) { mouseReleaseEvent(event); }
 
-        void mouseReleaseEvent_pub_parent(QMouseEvent* event)
-        {
-            QWidget::mouseReleaseEvent(event);
-        }
+        void mouseReleaseEvent_pub_parent(QMouseEvent* event) { QWidget::mouseReleaseEvent(event); }
 
         void moveEvent_pub(QMoveEvent* event) { moveEvent(event); }
 
-        void moveEvent_pub_parent(QMoveEvent* event)
-        {
-            QWidget::moveEvent(event);
-        }
+        void moveEvent_pub_parent(QMoveEvent* event) { QWidget::moveEvent(event); }
 
         void paintEvent_pub(QPaintEvent* event) { paintEvent(event); }
 
-        void paintEvent_pub_parent(QPaintEvent* event)
-        {
-            QWidget::paintEvent(event);
-        }
+        void paintEvent_pub_parent(QPaintEvent* event) { QWidget::paintEvent(event); }
 
         void resizeEvent_pub(QResizeEvent* event) { resizeEvent(event); }
 
-        void resizeEvent_pub_parent(QResizeEvent* event)
-        {
-            QWidget::resizeEvent(event);
-        }
+        void resizeEvent_pub_parent(QResizeEvent* event) { QWidget::resizeEvent(event); }
 
         void showEvent_pub(QShowEvent* event) { showEvent(event); }
 
-        void showEvent_pub_parent(QShowEvent* event)
-        {
-            QWidget::showEvent(event);
-        }
+        void showEvent_pub_parent(QShowEvent* event) { QWidget::showEvent(event); }
 
         void tabletEvent_pub(QTabletEvent* event) { tabletEvent(event); }
 
-        void tabletEvent_pub_parent(QTabletEvent* event)
-        {
-            QWidget::tabletEvent(event);
-        }
+        void tabletEvent_pub_parent(QTabletEvent* event) { QWidget::tabletEvent(event); }
 
         void wheelEvent_pub(QWheelEvent* event) { wheelEvent(event); }
 
-        void wheelEvent_pub_parent(QWheelEvent* event)
-        {
-            QWidget::wheelEvent(event);
-        }
+        void wheelEvent_pub_parent(QWheelEvent* event) { QWidget::wheelEvent(event); }
 
         bool event_pub(QEvent* event_) { return event(event_); }
 
         bool event_pub_parent(QEvent* event_) { return QWidget::event(event_); }
 
-        int metric_pub(QPaintDevice::PaintDeviceMetric m) const
-        {
-            return metric(m);
-        }
+        int metric_pub(QPaintDevice::PaintDeviceMetric m) const { return metric(m); }
 
-        int metric_pub_parent(QPaintDevice::PaintDeviceMetric m) const
-        {
-            return QWidget::metric(m);
-        }
+        int metric_pub_parent(QPaintDevice::PaintDeviceMetric m) const { return QWidget::metric(m); }
 
         void customEvent_pub(QEvent* event) { customEvent(event); }
 
-        void customEvent_pub_parent(QEvent* event)
-        {
-            QWidget::customEvent(event);
-        }
+        void customEvent_pub_parent(QEvent* event) { QWidget::customEvent(event); }
 
         void timerEvent_pub(QTimerEvent* event) { timerEvent(event); }
 
-        void timerEvent_pub_parent(QTimerEvent* event)
-        {
-            QWidget::timerEvent(event);
-        }
+        void timerEvent_pub_parent(QTimerEvent* event) { QWidget::timerEvent(event); }
 
     public:
         const QWidgetType* _baseType;
@@ -351,11 +238,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance*
-    QWidgetType::cachedInstance(const QWidgetType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QWidgetType::cachedInstance(const QWidgetType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

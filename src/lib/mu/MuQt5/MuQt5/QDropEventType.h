@@ -34,8 +34,7 @@ namespace Mu
         //  Constructors
         //
 
-        QDropEventType(Context* context, const char* name,
-                       Class* superClass = 0);
+        QDropEventType(Context* context, const char* name, Class* superClass = 0);
         virtual ~QDropEventType();
 
         //

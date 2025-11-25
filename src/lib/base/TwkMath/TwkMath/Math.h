@@ -74,30 +74,16 @@
 #else
 
 //******************************************************************************
-template <typename T> inline const T& STD_MIN(const T& x, const T& y)
-{
-    return (x < y ? x : y);
-}
+template <typename T> inline const T& STD_MIN(const T& x, const T& y) { return (x < y ? x : y); }
 
 //******************************************************************************
-template <typename T, class P>
-inline const T& STD_MIN(const T& x, const T& y, P p)
-{
-    return (p(x, y) ? x : y);
-}
+template <typename T, class P> inline const T& STD_MIN(const T& x, const T& y, P p) { return (p(x, y) ? x : y); }
 
 //******************************************************************************
-template <typename T> inline const T& STD_MAX(const T& x, const T& y)
-{
-    return (x < y ? y : x);
-}
+template <typename T> inline const T& STD_MAX(const T& x, const T& y) { return (x < y ? y : x); }
 
 //******************************************************************************
-template <typename T, class P>
-inline const T& STD_MAX(const T& x, const T& y, P p)
-{
-    return (p(x, y) ? y : x);
-}
+template <typename T, class P> inline const T& STD_MAX(const T& x, const T& y, P p) { return (p(x, y) ? y : x); }
 
 #endif
 
@@ -171,100 +157,52 @@ namespace TwkMath
     // First the normal template stuff.
     // These will be used unless a specific
     // implementation is found
-    template <typename T> inline T Math<T>::abs(const T& a)
-    {
-        return (T)(::fabs((double)a));
-    }
+    template <typename T> inline T Math<T>::abs(const T& a) { return (T)(::fabs((double)a)); }
 
     //******************************************************************************
-    template <typename T> inline T Math<T>::acos(const T& a)
-    {
-        return (T)(::acos((double)a));
-    }
+    template <typename T> inline T Math<T>::acos(const T& a) { return (T)(::acos((double)a)); }
 
     //******************************************************************************
-    template <typename T> inline T Math<T>::asin(const T& a)
-    {
-        return (T)(::asin((double)a));
-    }
+    template <typename T> inline T Math<T>::asin(const T& a) { return (T)(::asin((double)a)); }
 
     //******************************************************************************
-    template <typename T> inline T Math<T>::atan(const T& a)
-    {
-        return (T)(::atan((double)a));
-    }
+    template <typename T> inline T Math<T>::atan(const T& a) { return (T)(::atan((double)a)); }
 
     //******************************************************************************
-    template <typename T> inline T Math<T>::atan2(const T& y, const T& x)
-    {
-        return (T)(::atan2((double)y, (double)x));
-    }
+    template <typename T> inline T Math<T>::atan2(const T& y, const T& x) { return (T)(::atan2((double)y, (double)x)); }
 
     //******************************************************************************
-    template <typename T> inline T Math<T>::cbrt(const T& a)
-    {
-        return (T)(::cbrt((double)a));
-    }
+    template <typename T> inline T Math<T>::cbrt(const T& a) { return (T)(::cbrt((double)a)); }
 
     //******************************************************************************
-    template <typename T> inline T Math<T>::ceil(const T& a)
-    {
-        return (T)(::ceil((double)a));
-    }
+    template <typename T> inline T Math<T>::ceil(const T& a) { return (T)(::ceil((double)a)); }
 
     //******************************************************************************
-    template <typename T> inline T Math<T>::cos(const T& a)
-    {
-        return (T)(::cos((double)a));
-    }
+    template <typename T> inline T Math<T>::cos(const T& a) { return (T)(::cos((double)a)); }
 
     //******************************************************************************
-    template <typename T> inline T Math<T>::cosh(const T& a)
-    {
-        return (T)(::cosh((double)a));
-    }
+    template <typename T> inline T Math<T>::cosh(const T& a) { return (T)(::cosh((double)a)); }
 
     //******************************************************************************
-    template <typename T> inline T Math<T>::degToRad(const T& deg)
-    {
-        return (T)(((double)deg) * ((double)M_PI_OVER_180));
-    }
+    template <typename T> inline T Math<T>::degToRad(const T& deg) { return (T)(((double)deg) * ((double)M_PI_OVER_180)); }
 
     //******************************************************************************
-    template <typename T> inline T Math<T>::exp(const T& a)
-    {
-        return (T)(::exp((double)a));
-    }
+    template <typename T> inline T Math<T>::exp(const T& a) { return (T)(::exp((double)a)); }
 
     //******************************************************************************
-    template <typename T> inline T Math<T>::floor(const T& a)
-    {
-        return (T)(::floor((double)a));
-    }
+    template <typename T> inline T Math<T>::floor(const T& a) { return (T)(::floor((double)a)); }
 
     //******************************************************************************
-    template <typename T> inline T Math<T>::hypot(const T& x, const T& y)
-    {
-        return (T)(::hypot((double)x, (double)y));
-    }
+    template <typename T> inline T Math<T>::hypot(const T& x, const T& y) { return (T)(::hypot((double)x, (double)y)); }
 
     //******************************************************************************
-    template <typename T> inline T Math<T>::log(const T& a)
-    {
-        return (T)(::log((double)a));
-    }
+    template <typename T> inline T Math<T>::log(const T& a) { return (T)(::log((double)a)); }
 
     //******************************************************************************
-    template <typename T> inline T Math<T>::log10(const T& a)
-    {
-        return (T)(::log10((double)a));
-    }
+    template <typename T> inline T Math<T>::log10(const T& a) { return (T)(::log10((double)a)); }
 
     //******************************************************************************
-    template <typename T> inline T Math<T>::mod(const T& numer, const T& denom)
-    {
-        return (T)(::fmod((double)numer, (double)denom));
-    }
+    template <typename T> inline T Math<T>::mod(const T& numer, const T& denom) { return (T)(::fmod((double)numer, (double)denom)); }
 
     //******************************************************************************
     template <typename T> inline T Math<T>::pi() { return (T)M_PI; }
@@ -273,22 +211,13 @@ namespace TwkMath
     template <typename T> inline T Math<T>::e() { return (T)M_E; }
 
     //******************************************************************************
-    template <typename T> inline T Math<T>::pow(const T& body, const T& expon)
-    {
-        return (T)(::pow((double)body, (double)expon));
-    }
+    template <typename T> inline T Math<T>::pow(const T& body, const T& expon) { return (T)(::pow((double)body, (double)expon)); }
 
     //******************************************************************************
-    template <typename T> inline T Math<T>::radToDeg(const T& rad)
-    {
-        return (T)(((double)rad) * ((double)M_180_OVER_PI));
-    }
+    template <typename T> inline T Math<T>::radToDeg(const T& rad) { return (T)(((double)rad) * ((double)M_180_OVER_PI)); }
 
     //******************************************************************************
-    template <typename T> inline T Math<T>::round(const T& dec)
-    {
-        return Math<T>::floor(dec + (T)0.5);
-    }
+    template <typename T> inline T Math<T>::round(const T& dec) { return Math<T>::floor(dec + (T)0.5); }
 
     //******************************************************************************
     template <typename T> inline T Math<T>::sign(const T& a)
@@ -308,37 +237,22 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <typename T> inline T Math<T>::sin(const T& a)
-    {
-        return (T)(::sin((double)a));
-    }
+    template <typename T> inline T Math<T>::sin(const T& a) { return (T)(::sin((double)a)); }
 
     //******************************************************************************
-    template <typename T> inline T Math<T>::sinh(const T& a)
-    {
-        return (T)(::sinh((double)a));
-    }
+    template <typename T> inline T Math<T>::sinh(const T& a) { return (T)(::sinh((double)a)); }
 
     //******************************************************************************
     template <typename T> inline T Math<T>::sqr(const T& a) { return a * a; }
 
     //******************************************************************************
-    template <typename T> inline T Math<T>::sqrt(const T& a)
-    {
-        return (T)(::sqrt((double)a));
-    }
+    template <typename T> inline T Math<T>::sqrt(const T& a) { return (T)(::sqrt((double)a)); }
 
     //******************************************************************************
-    template <typename T> inline T Math<T>::tan(const T& a)
-    {
-        return (T)(::tan((double)a));
-    }
+    template <typename T> inline T Math<T>::tan(const T& a) { return (T)(::tan((double)a)); }
 
     //******************************************************************************
-    template <typename T> inline T Math<T>::tanh(const T& a)
-    {
-        return (T)(::tanh((double)a));
-    }
+    template <typename T> inline T Math<T>::tanh(const T& a) { return (T)(::tanh((double)a)); }
 
 //******************************************************************************
 //******************************************************************************
@@ -346,70 +260,37 @@ namespace TwkMath
 //******************************************************************************
 //******************************************************************************
 #ifdef TWK_NO_FLOAT_INTRINSICS
-    template <> inline float Math<float>::abs(const float& a)
-    {
-        return ::fabs(a);
-    }
+    template <> inline float Math<float>::abs(const float& a) { return ::fabs(a); }
 
     //******************************************************************************
-    template <> inline float Math<float>::acos(const float& a)
-    {
-        return ::acos(a);
-    }
+    template <> inline float Math<float>::acos(const float& a) { return ::acos(a); }
 
     //******************************************************************************
-    template <> inline float Math<float>::asin(const float& a)
-    {
-        return ::asin(a);
-    }
+    template <> inline float Math<float>::asin(const float& a) { return ::asin(a); }
 
     //******************************************************************************
-    template <> inline float Math<float>::atan(const float& a)
-    {
-        return ::atan(a);
-    }
+    template <> inline float Math<float>::atan(const float& a) { return ::atan(a); }
 
     //******************************************************************************
-    template <> inline float Math<float>::atan2(const float& y, const float& x)
-    {
-        return ::atan2(y, x);
-    }
+    template <> inline float Math<float>::atan2(const float& y, const float& x) { return ::atan2(y, x); }
 
     //******************************************************************************
-    template <> inline float Math<float>::cbrt(const float& a)
-    {
-        return ::cbrt(a);
-    }
+    template <> inline float Math<float>::cbrt(const float& a) { return ::cbrt(a); }
 
     //******************************************************************************
-    template <> inline float Math<float>::ceil(const float& a)
-    {
-        return ::ceil(a);
-    }
+    template <> inline float Math<float>::ceil(const float& a) { return ::ceil(a); }
 
     //******************************************************************************
-    template <> inline float Math<float>::cos(const float& a)
-    {
-        return ::cos(a);
-    }
+    template <> inline float Math<float>::cos(const float& a) { return ::cos(a); }
 
     //******************************************************************************
-    template <> inline float Math<float>::cosh(const float& a)
-    {
-        return ::cosh(a);
-    }
+    template <> inline float Math<float>::cosh(const float& a) { return ::cosh(a); }
 
     //******************************************************************************
-    template <> inline float Math<float>::exp(const float& a)
-    {
-        return ::exp(a);
-    }
+    template <> inline float Math<float>::exp(const float& a) { return ::exp(a); }
 
     //******************************************************************************
-    template <> inline float Math<float>::floor(const float& a)
-    {
-        return ::floor(a);
-    }
+    template <> inline float Math<float>::floor(const float& a) { return ::floor(a); }
 
     //******************************************************************************
     template <> inline float Math<float>::hypot(const float& x, const float& y)
@@ -421,90 +302,46 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <> inline float Math<float>::log(const float& a)
-    {
-        return ::log(a);
-    }
+    template <> inline float Math<float>::log(const float& a) { return ::log(a); }
 
     //******************************************************************************
-    template <> inline float Math<float>::log10(const float& a)
-    {
-        return ::log10(a);
-    }
+    template <> inline float Math<float>::log10(const float& a) { return ::log10(a); }
 
     //******************************************************************************
-    template <>
-    inline float Math<float>::mod(const float& numer, const float& denom)
-    {
-        return ::fmod(numer, denom);
-    }
+    template <> inline float Math<float>::mod(const float& numer, const float& denom) { return ::fmod(numer, denom); }
 
     //******************************************************************************
-    template <>
-    inline float Math<float>::pow(const float& body, const float& expon)
-    {
-        return ::pow(body, expon);
-    }
+    template <> inline float Math<float>::pow(const float& body, const float& expon) { return ::pow(body, expon); }
 
     //******************************************************************************
-    template <> inline float Math<float>::sin(const float& a)
-    {
-        return ::sin(a);
-    }
+    template <> inline float Math<float>::sin(const float& a) { return ::sin(a); }
 
     //******************************************************************************
-    template <> inline float Math<float>::sinh(const float& a)
-    {
-        return ::sinh(a);
-    }
+    template <> inline float Math<float>::sinh(const float& a) { return ::sinh(a); }
 
     //******************************************************************************
-    template <> inline float Math<float>::sqrt(const float& a)
-    {
-        return ::sqrt(a);
-    }
+    template <> inline float Math<float>::sqrt(const float& a) { return ::sqrt(a); }
 
     //******************************************************************************
-    template <> inline float Math<float>::tan(const float& a)
-    {
-        return ::tan(a);
-    }
+    template <> inline float Math<float>::tan(const float& a) { return ::tan(a); }
 
     //******************************************************************************
-    template <> inline float Math<float>::tanh(const float& a)
-    {
-        return ::tanh(a);
-    }
+    template <> inline float Math<float>::tanh(const float& a) { return ::tanh(a); }
 
 #else
-    template <> inline float Math<float>::abs(const float& a)
-    {
-        return ::fabsf(a);
-    }
+    template <> inline float Math<float>::abs(const float& a) { return ::fabsf(a); }
 
     //******************************************************************************
-    template <> inline float Math<float>::acos(const float& a)
-    {
-        return ::acosf(a);
-    }
+    template <> inline float Math<float>::acos(const float& a) { return ::acosf(a); }
 
     //******************************************************************************
-    template <> inline float Math<float>::asin(const float& a)
-    {
-        return ::asinf(a);
-    }
+    template <> inline float Math<float>::asin(const float& a) { return ::asinf(a); }
 
     //******************************************************************************
-    template <> inline float Math<float>::atan(const float& a)
-    {
-        return ::atanf(a);
-    }
+    template <> inline float Math<float>::atan(const float& a) { return ::atanf(a); }
 
     //******************************************************************************
-    template <> inline float Math<float>::atan2(const float& y, const float& x)
-    {
-        return ::atan2f(y, x);
-    }
+    template <> inline float Math<float>::atan2(const float& y, const float& x) { return ::atan2f(y, x); }
 
     //******************************************************************************
     template <> inline float Math<float>::cbrt(const float& a)
@@ -518,34 +355,19 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <> inline float Math<float>::ceil(const float& a)
-    {
-        return ::ceilf(a);
-    }
+    template <> inline float Math<float>::ceil(const float& a) { return ::ceilf(a); }
 
     //******************************************************************************
-    template <> inline float Math<float>::cos(const float& a)
-    {
-        return ::cosf(a);
-    }
+    template <> inline float Math<float>::cos(const float& a) { return ::cosf(a); }
 
     //******************************************************************************
-    template <> inline float Math<float>::cosh(const float& a)
-    {
-        return ::coshf(a);
-    }
+    template <> inline float Math<float>::cosh(const float& a) { return ::coshf(a); }
 
     //******************************************************************************
-    template <> inline float Math<float>::exp(const float& a)
-    {
-        return ::expf(a);
-    }
+    template <> inline float Math<float>::exp(const float& a) { return ::expf(a); }
 
     //******************************************************************************
-    template <> inline float Math<float>::floor(const float& a)
-    {
-        return ::floorf(a);
-    }
+    template <> inline float Math<float>::floor(const float& a) { return ::floorf(a); }
 
     //******************************************************************************
     template <> inline float Math<float>::hypot(const float& x, const float& y)
@@ -557,84 +379,46 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <> inline float Math<float>::log(const float& a)
-    {
-        return ::logf(a);
-    }
+    template <> inline float Math<float>::log(const float& a) { return ::logf(a); }
 
     //******************************************************************************
-    template <> inline float Math<float>::log10(const float& a)
-    {
-        return ::log10f(a);
-    }
+    template <> inline float Math<float>::log10(const float& a) { return ::log10f(a); }
 
     //******************************************************************************
-    template <>
-    inline float Math<float>::mod(const float& numer, const float& denom)
-    {
-        return ::fmodf(numer, denom);
-    }
+    template <> inline float Math<float>::mod(const float& numer, const float& denom) { return ::fmodf(numer, denom); }
 
     //******************************************************************************
-    template <>
-    inline float Math<float>::pow(const float& body, const float& expon)
-    {
-        return ::powf(body, expon);
-    }
+    template <> inline float Math<float>::pow(const float& body, const float& expon) { return ::powf(body, expon); }
 
     //******************************************************************************
-    template <> inline float Math<float>::sin(const float& a)
-    {
-        return ::sinf(a);
-    }
+    template <> inline float Math<float>::sin(const float& a) { return ::sinf(a); }
 
     //******************************************************************************
-    template <> inline float Math<float>::sinh(const float& a)
-    {
-        return ::sinhf(a);
-    }
+    template <> inline float Math<float>::sinh(const float& a) { return ::sinhf(a); }
 
     //******************************************************************************
-    template <> inline float Math<float>::sqrt(const float& a)
-    {
-        return ::sqrtf(a);
-    }
+    template <> inline float Math<float>::sqrt(const float& a) { return ::sqrtf(a); }
 
     //******************************************************************************
-    template <> inline float Math<float>::tan(const float& a)
-    {
-        return ::tanf(a);
-    }
+    template <> inline float Math<float>::tan(const float& a) { return ::tanf(a); }
 
     //******************************************************************************
-    template <> inline float Math<float>::tanh(const float& a)
-    {
-        return ::tanhf(a);
-    }
+    template <> inline float Math<float>::tanh(const float& a) { return ::tanhf(a); }
 
 #endif // TWK_NO_FLOAT_INTRINSICS
 
     //******************************************************************************
-    template <> inline float Math<float>::degToRad(const float& deg)
-    {
-        return deg * (float)M_PI_OVER_180;
-    }
+    template <> inline float Math<float>::degToRad(const float& deg) { return deg * (float)M_PI_OVER_180; }
 
     //******************************************************************************
-    template <> inline float Math<float>::radToDeg(const float& rad)
-    {
-        return rad * (float)M_180_OVER_PI;
-    }
+    template <> inline float Math<float>::radToDeg(const float& rad) { return rad * (float)M_180_OVER_PI; }
 
     //******************************************************************************
     //******************************************************************************
     // INTEGER TYPE SPECIALIZATIONS
     //******************************************************************************
     //******************************************************************************
-    template <> inline char Math<char>::abs(const char& v)
-    {
-        return (v < 0) ? -v : v;
-    }
+    template <> inline char Math<char>::abs(const char& v) { return (v < 0) ? -v : v; }
 
     //******************************************************************************
     template <> inline char Math<char>::ceil(const char& v) { return v; }
@@ -643,48 +427,27 @@ namespace TwkMath
     template <> inline char Math<char>::floor(const char& v) { return v; }
 
     //******************************************************************************
-    template <>
-    inline char Math<char>::mod(const char& numer, const char& denom)
+    template <> inline char Math<char>::mod(const char& numer, const char& denom) { return numer % denom; }
+
+    //******************************************************************************
+    //******************************************************************************
+    template <> inline unsigned char Math<unsigned char>::abs(const unsigned char& v) { return v; }
+
+    //******************************************************************************
+    template <> inline unsigned char Math<unsigned char>::ceil(const unsigned char& v) { return v; }
+
+    //******************************************************************************
+    template <> inline unsigned char Math<unsigned char>::floor(const unsigned char& v) { return v; }
+
+    //******************************************************************************
+    template <> inline unsigned char Math<unsigned char>::mod(const unsigned char& numer, const unsigned char& denom)
     {
         return numer % denom;
     }
 
     //******************************************************************************
     //******************************************************************************
-    template <>
-    inline unsigned char Math<unsigned char>::abs(const unsigned char& v)
-    {
-        return v;
-    }
-
-    //******************************************************************************
-    template <>
-    inline unsigned char Math<unsigned char>::ceil(const unsigned char& v)
-    {
-        return v;
-    }
-
-    //******************************************************************************
-    template <>
-    inline unsigned char Math<unsigned char>::floor(const unsigned char& v)
-    {
-        return v;
-    }
-
-    //******************************************************************************
-    template <>
-    inline unsigned char Math<unsigned char>::mod(const unsigned char& numer,
-                                                  const unsigned char& denom)
-    {
-        return numer % denom;
-    }
-
-    //******************************************************************************
-    //******************************************************************************
-    template <> inline short Math<short>::abs(const short& v)
-    {
-        return (v < 0) ? -v : v;
-    }
+    template <> inline short Math<short>::abs(const short& v) { return (v < 0) ? -v : v; }
 
     //******************************************************************************
     template <> inline short Math<short>::ceil(const short& v) { return v; }
@@ -693,48 +456,27 @@ namespace TwkMath
     template <> inline short Math<short>::floor(const short& v) { return v; }
 
     //******************************************************************************
-    template <>
-    inline short Math<short>::mod(const short& numer, const short& denom)
+    template <> inline short Math<short>::mod(const short& numer, const short& denom) { return numer % denom; }
+
+    //******************************************************************************
+    //******************************************************************************
+    template <> inline unsigned short Math<unsigned short>::abs(const unsigned short& v) { return v; }
+
+    //******************************************************************************
+    template <> inline unsigned short Math<unsigned short>::ceil(const unsigned short& v) { return v; }
+
+    //******************************************************************************
+    template <> inline unsigned short Math<unsigned short>::floor(const unsigned short& v) { return v; }
+
+    //******************************************************************************
+    template <> inline unsigned short Math<unsigned short>::mod(const unsigned short& numer, const unsigned short& denom)
     {
         return numer % denom;
     }
 
     //******************************************************************************
     //******************************************************************************
-    template <>
-    inline unsigned short Math<unsigned short>::abs(const unsigned short& v)
-    {
-        return v;
-    }
-
-    //******************************************************************************
-    template <>
-    inline unsigned short Math<unsigned short>::ceil(const unsigned short& v)
-    {
-        return v;
-    }
-
-    //******************************************************************************
-    template <>
-    inline unsigned short Math<unsigned short>::floor(const unsigned short& v)
-    {
-        return v;
-    }
-
-    //******************************************************************************
-    template <>
-    inline unsigned short Math<unsigned short>::mod(const unsigned short& numer,
-                                                    const unsigned short& denom)
-    {
-        return numer % denom;
-    }
-
-    //******************************************************************************
-    //******************************************************************************
-    template <> inline int Math<int>::abs(const int& v)
-    {
-        return (v < 0) ? -v : v;
-    }
+    template <> inline int Math<int>::abs(const int& v) { return (v < 0) ? -v : v; }
 
     //******************************************************************************
     template <> inline int Math<int>::ceil(const int& v) { return v; }
@@ -743,47 +485,24 @@ namespace TwkMath
     template <> inline int Math<int>::floor(const int& v) { return v; }
 
     //******************************************************************************
-    template <> inline int Math<int>::mod(const int& numer, const int& denom)
-    {
-        return numer % denom;
-    }
+    template <> inline int Math<int>::mod(const int& numer, const int& denom) { return numer % denom; }
 
     //******************************************************************************
     //******************************************************************************
-    template <>
-    inline unsigned int Math<unsigned int>::abs(const unsigned int& v)
-    {
-        return v;
-    }
+    template <> inline unsigned int Math<unsigned int>::abs(const unsigned int& v) { return v; }
 
     //******************************************************************************
-    template <>
-    inline unsigned int Math<unsigned int>::ceil(const unsigned int& v)
-    {
-        return v;
-    }
+    template <> inline unsigned int Math<unsigned int>::ceil(const unsigned int& v) { return v; }
 
     //******************************************************************************
-    template <>
-    inline unsigned int Math<unsigned int>::floor(const unsigned int& v)
-    {
-        return v;
-    }
+    template <> inline unsigned int Math<unsigned int>::floor(const unsigned int& v) { return v; }
 
     //******************************************************************************
-    template <>
-    inline unsigned int Math<unsigned int>::mod(const unsigned int& numer,
-                                                const unsigned int& denom)
-    {
-        return numer % denom;
-    }
+    template <> inline unsigned int Math<unsigned int>::mod(const unsigned int& numer, const unsigned int& denom) { return numer % denom; }
 
     //******************************************************************************
     //******************************************************************************
-    template <> inline long Math<long>::abs(const long& v)
-    {
-        return (v < 0) ? -v : v;
-    }
+    template <> inline long Math<long>::abs(const long& v) { return (v < 0) ? -v : v; }
 
     //******************************************************************************
     template <> inline long Math<long>::ceil(const long& v) { return v; }
@@ -792,38 +511,20 @@ namespace TwkMath
     template <> inline long Math<long>::floor(const long& v) { return v; }
 
     //******************************************************************************
-    template <>
-    inline long Math<long>::mod(const long& numer, const long& denom)
-    {
-        return numer % denom;
-    }
+    template <> inline long Math<long>::mod(const long& numer, const long& denom) { return numer % denom; }
 
     //******************************************************************************
     //******************************************************************************
-    template <>
-    inline unsigned long Math<unsigned long>::abs(const unsigned long& v)
-    {
-        return v;
-    }
+    template <> inline unsigned long Math<unsigned long>::abs(const unsigned long& v) { return v; }
 
     //******************************************************************************
-    template <>
-    inline unsigned long Math<unsigned long>::ceil(const unsigned long& v)
-    {
-        return v;
-    }
+    template <> inline unsigned long Math<unsigned long>::ceil(const unsigned long& v) { return v; }
 
     //******************************************************************************
-    template <>
-    inline unsigned long Math<unsigned long>::floor(const unsigned long& v)
-    {
-        return v;
-    }
+    template <> inline unsigned long Math<unsigned long>::floor(const unsigned long& v) { return v; }
 
     //******************************************************************************
-    template <>
-    inline unsigned long Math<unsigned long>::mod(const unsigned long& numer,
-                                                  const unsigned long& denom)
+    template <> inline unsigned long Math<unsigned long>::mod(const unsigned long& numer, const unsigned long& denom)
     {
         return numer % denom;
     }
@@ -851,16 +552,10 @@ namespace TwkMath
     template <> inline unsigned char Math<unsigned char>::min() { return 0; }
 
     //******************************************************************************
-    template <> inline unsigned char Math<unsigned char>::max()
-    {
-        return UCHAR_MAX;
-    }
+    template <> inline unsigned char Math<unsigned char>::max() { return UCHAR_MAX; }
 
     //******************************************************************************
-    template <> inline unsigned char Math<unsigned char>::epsilon()
-    {
-        return 1;
-    }
+    template <> inline unsigned char Math<unsigned char>::epsilon() { return 1; }
 
     //******************************************************************************
     template <> inline bool Math<unsigned char>::isFloat() { return false; }
@@ -885,16 +580,10 @@ namespace TwkMath
     template <> inline unsigned short Math<unsigned short>::min() { return 0; }
 
     //******************************************************************************
-    template <> inline unsigned short Math<unsigned short>::max()
-    {
-        return USHRT_MAX;
-    }
+    template <> inline unsigned short Math<unsigned short>::max() { return USHRT_MAX; }
 
     //******************************************************************************
-    template <> inline unsigned short Math<unsigned short>::epsilon()
-    {
-        return 1;
-    }
+    template <> inline unsigned short Math<unsigned short>::epsilon() { return 1; }
 
     //******************************************************************************
     template <> inline bool Math<unsigned short>::isFloat() { return false; }
@@ -919,10 +608,7 @@ namespace TwkMath
     template <> inline unsigned int Math<unsigned int>::min() { return 0; }
 
     //******************************************************************************
-    template <> inline unsigned int Math<unsigned int>::max()
-    {
-        return UINT_MAX;
-    }
+    template <> inline unsigned int Math<unsigned int>::max() { return UINT_MAX; }
 
     //******************************************************************************
     template <> inline unsigned int Math<unsigned int>::epsilon() { return 1; }
@@ -950,16 +636,10 @@ namespace TwkMath
     template <> inline unsigned long Math<unsigned long>::min() { return 0; }
 
     //******************************************************************************
-    template <> inline unsigned long Math<unsigned long>::max()
-    {
-        return ULONG_MAX;
-    }
+    template <> inline unsigned long Math<unsigned long>::max() { return ULONG_MAX; }
 
     //******************************************************************************
-    template <> inline unsigned long Math<unsigned long>::epsilon()
-    {
-        return 1;
-    }
+    template <> inline unsigned long Math<unsigned long>::epsilon() { return 1; }
 
     //******************************************************************************
     template <> inline bool Math<unsigned long>::isFloat() { return false; }

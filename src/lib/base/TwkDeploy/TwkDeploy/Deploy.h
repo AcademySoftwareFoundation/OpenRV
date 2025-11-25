@@ -26,15 +26,11 @@ std::string TWK_DEPLOY_SHORT_APP_NAME();
 int TWK_DEPLOY_GET_LICENSE_STATE();
 
 // DONT CALL THIS DIRECTLY ANYMORE
-void TWK_DEPLOY_INITIALIZE(int majorVersion, int minorVersion, int patchLevel,
-                           int argc, char** argv,
-                           const char* release_description, const char* scm_id,
-                           const char* date = __DATE__,
-                           const char* time = __TIME__);
+void TWK_DEPLOY_INITIALIZE(int majorVersion, int minorVersion, int patchLevel, int argc, char** argv, const char* release_description,
+                           const char* scm_id, const char* date = __DATE__, const char* time = __TIME__);
 void TWK_DEPLOY_SET_HOME(const char* dir);
 
-void TWK_DEPLOY_SET_CRASHLOG_FILE(const char* localpath,
-                                  const char* remotename);
+void TWK_DEPLOY_SET_CRASHLOG_FILE(const char* localpath, const char* remotename);
 
 int TWK_DEPLOY_MAJOR_VERSION();
 int TWK_DEPLOY_MINOR_VERSION();
@@ -51,14 +47,10 @@ void TWK_DEPLOY_FINISH();
 
 struct TWK_DEPLOY_APP_OBJECT
 {
-    TWK_DEPLOY_APP_OBJECT(int majorVersion, int minorVersion, int patchLevel,
-                          int argc, char** argv,
-                          const char* release_description, const char* scm_id,
-                          const char* date = __DATE__,
-                          const char* time = __TIME__)
+    TWK_DEPLOY_APP_OBJECT(int majorVersion, int minorVersion, int patchLevel, int argc, char** argv, const char* release_description,
+                          const char* scm_id, const char* date = __DATE__, const char* time = __TIME__)
     {
-        TWK_DEPLOY_INITIALIZE(majorVersion, minorVersion, patchLevel, argc,
-                              argv, release_description, scm_id, date, time);
+        TWK_DEPLOY_INITIALIZE(majorVersion, minorVersion, patchLevel, argc, argv, release_description, scm_id, date, time);
     }
 
     ~TWK_DEPLOY_APP_OBJECT() { TWK_DEPLOY_FINISH(); }

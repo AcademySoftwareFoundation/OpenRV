@@ -39,9 +39,7 @@ namespace Mu
         //  Constructors
         //
 
-        QNetworkAccessManagerType(Context* context, const char* name,
-                                  Class* superClass = 0,
-                                  Class* superClass2 = 0);
+        QNetworkAccessManagerType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QNetworkAccessManagerType();
 
@@ -64,8 +62,7 @@ namespace Mu
     {
     public:
         virtual ~MuQt_QNetworkAccessManager();
-        MuQt_QNetworkAccessManager(Pointer muobj, const CallEnvironment*,
-                                   QObject* parent);
+        MuQt_QNetworkAccessManager(Pointer muobj, const CallEnvironment*, QObject* parent);
         virtual bool event(QEvent* e);
         virtual bool eventFilter(QObject* watched, QEvent* event);
 
@@ -76,17 +73,11 @@ namespace Mu
     public:
         void customEvent_pub(QEvent* event) { customEvent(event); }
 
-        void customEvent_pub_parent(QEvent* event)
-        {
-            QNetworkAccessManager::customEvent(event);
-        }
+        void customEvent_pub_parent(QEvent* event) { QNetworkAccessManager::customEvent(event); }
 
         void timerEvent_pub(QTimerEvent* event) { timerEvent(event); }
 
-        void timerEvent_pub_parent(QTimerEvent* event)
-        {
-            QNetworkAccessManager::timerEvent(event);
-        }
+        void timerEvent_pub_parent(QTimerEvent* event) { QNetworkAccessManager::timerEvent(event); }
 
     public:
         const QNetworkAccessManagerType* _baseType;
@@ -94,11 +85,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance* QNetworkAccessManagerType::cachedInstance(
-        const QNetworkAccessManagerType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QNetworkAccessManagerType::cachedInstance(const QNetworkAccessManagerType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

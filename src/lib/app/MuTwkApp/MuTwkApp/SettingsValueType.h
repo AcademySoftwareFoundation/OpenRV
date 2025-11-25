@@ -50,15 +50,9 @@ namespace TwkApp
 
         const Mu::VariantTagType* stringType() const { return _stringType; }
 
-        const Mu::VariantTagType* stringArrayType() const
-        {
-            return _stringArrayType;
-        }
+        const Mu::VariantTagType* stringArrayType() const { return _stringArrayType; }
 
-        const Mu::VariantTagType* floatArrayType() const
-        {
-            return _floatArrayType;
-        }
+        const Mu::VariantTagType* floatArrayType() const { return _floatArrayType; }
 
         const Mu::VariantTagType* intArrayType() const { return _intArrayType; }
 

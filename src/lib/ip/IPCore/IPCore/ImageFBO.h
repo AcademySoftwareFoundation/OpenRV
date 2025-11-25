@@ -34,8 +34,7 @@ namespace IPCore
     public:
         typedef TwkGLF::GLFBO GLFBO;
 
-        ImageFBO(GLFBO* f, bool a = true, GLenum t = 0, GLenum fmt = 0,
-                 GLenum tg = 0)
+        ImageFBO(GLFBO* f, bool a = true, GLenum t = 0, GLenum fmt = 0, GLenum tg = 0)
             : GLfbo(f)
             , available(a)
             , type(t)
@@ -110,25 +109,18 @@ namespace IPCore
 
         size_t totalSizeInBytes() const { return m_totalSizeInBytes; }
 
-        ImageFBO* newOutputOnlyImageFBO(GLenum internalFormat, size_t w,
-                                        size_t h, size_t samples = 0);
+        ImageFBO* newOutputOnlyImageFBO(GLenum internalFormat, size_t w, size_t h, size_t samples = 0);
 
-        ImageFBO* newImageFBO(const IPImage*, size_t fullSerialNum,
-                              const std::string& identifier);
+        ImageFBO* newImageFBO(const IPImage*, size_t fullSerialNum, const std::string& identifier);
 
-        ImageFBO* newImageFBO(const GLFBO*, size_t fullSerialNum,
-                              const std::string& identifier);
+        ImageFBO* newImageFBO(const GLFBO*, size_t fullSerialNum, const std::string& identifier);
 
-        ImageFBO* newImageFBO(size_t w, size_t h, GLenum target,
-                              GLenum internalFormat, GLenum format, GLenum type,
-                              size_t fullSerialNum,
-                              const std::string& identifier = "",
-                              size_t expectedUseCount = 1, size_t samples = 0);
+        ImageFBO* newImageFBO(size_t w, size_t h, GLenum target, GLenum internalFormat, GLenum format, GLenum type, size_t fullSerialNum,
+                              const std::string& identifier = "", size_t expectedUseCount = 1, size_t samples = 0);
 
         ImageFBO* findExistingImageFBO(GLuint textureID);
         ImageFBO* findExistingImageFBO(const std::string&, size_t);
-        ImageFBO* findExistingPaintFBO(const GLFBO*, const std::string&, bool&,
-                                       size_t&, size_t);
+        ImageFBO* findExistingPaintFBO(const GLFBO*, const std::string&, bool&, size_t&, size_t);
 
     private:
         ImageFBOVector m_outputImageFBOs;

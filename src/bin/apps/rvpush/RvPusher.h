@@ -30,8 +30,7 @@ class RvPusher : public QObject
     Q_OBJECT
 
 public:
-    RvPusher(QCoreApplication&, string, string, vector<string>,
-             QObject* parent = 0);
+    RvPusher(QCoreApplication&, string, string, vector<string>, QObject* parent = 0);
 
     //
     //  Errors can be encountered during construction, or later due to async

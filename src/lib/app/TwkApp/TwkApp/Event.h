@@ -100,8 +100,7 @@ namespace TwkApp
     {
     public:
         // RenderEvent() : Event() {}
-        RenderEvent(const std::string& name, const EventNode* sender, int w,
-                    int h, void* data = 0)
+        RenderEvent(const std::string& name, const EventNode* sender, int w, int h, void* data = 0)
             : m_w(w)
             , m_h(h)
             , m_device(0)
@@ -109,8 +108,7 @@ namespace TwkApp
         {
         }
 
-        RenderEvent(const std::string& name, const EventNode* sender, int w,
-                    int h, const std::string& contents, void* data = 0)
+        RenderEvent(const std::string& name, const EventNode* sender, int w, int h, const std::string& contents, void* data = 0)
             : m_w(w)
             , m_h(h)
             , m_device(0)
@@ -119,8 +117,7 @@ namespace TwkApp
         {
         }
 
-        RenderEvent(const std::string& name, const EventNode* sender,
-                    const VideoDevice* device, int w, int h, void* data = 0)
+        RenderEvent(const std::string& name, const EventNode* sender, const VideoDevice* device, int w, int h, void* data = 0)
             : m_w(w)
             , m_h(h)
             , m_device(device)
@@ -128,9 +125,8 @@ namespace TwkApp
         {
         }
 
-        RenderEvent(const std::string& name, const EventNode* sender,
-                    const VideoDevice* device, int w, int h,
-                    const std::string& contents, void* data = 0)
+        RenderEvent(const std::string& name, const EventNode* sender, const VideoDevice* device, int w, int h, const std::string& contents,
+                    void* data = 0)
             : m_w(w)
             , m_h(h)
             , m_device(device)
@@ -165,8 +161,7 @@ namespace TwkApp
     {
     public:
         // RenderContextChangeEvent() : Event() {}
-        RenderContextChangeEvent(const std::string& name,
-                                 const EventNode* sender, void* data = 0)
+        RenderContextChangeEvent(const std::string& name, const EventNode* sender, void* data = 0)
             : Event(name, sender, data)
         {
         }
@@ -185,11 +180,8 @@ namespace TwkApp
     {
     public:
         // VideoDeviceContextChangeEvent() : Event() {}
-        VideoDeviceContextChangeEvent(const std::string& name,
-                                      const EventNode* sender,
-                                      const VideoDevice* device,
-                                      const VideoDevice* physicalDevice,
-                                      void* data = 0)
+        VideoDeviceContextChangeEvent(const std::string& name, const EventNode* sender, const VideoDevice* device,
+                                      const VideoDevice* physicalDevice, void* data = 0)
             : Event(name, sender, data)
             , m_device(device)
             , m_physicalDevice(physicalDevice)
@@ -211,8 +203,7 @@ namespace TwkApp
     {
     public:
         // ActivityChangeEvent() : Event() {}
-        ActivityChangeEvent(const std::string& name, const EventNode* sender,
-                            void* data = 0)
+        ActivityChangeEvent(const std::string& name, const EventNode* sender, void* data = 0)
             : Event(name, sender, data)
         {
         }
@@ -244,17 +235,13 @@ namespace TwkApp
 
         // ModifierEvent() : Event(), m_modifiers(0) {}
 
-        ModifierEvent(const std::string& name, const EventNode* sender,
-                      unsigned int modifiers, void* data = 0)
+        ModifierEvent(const std::string& name, const EventNode* sender, unsigned int modifiers, void* data = 0)
             : Event(name, sender, data)
             , m_modifiers(modifiers)
         {
         }
 
-        bool modifierState(Modifier m) const
-        {
-            return (unsigned int)m & m_modifiers;
-        }
+        bool modifierState(Modifier m) const { return (unsigned int)m & m_modifiers; }
 
         unsigned int modifiers() const { return m_modifiers; }
 
@@ -272,8 +259,7 @@ namespace TwkApp
     class KeyEvent : public ModifierEvent
     {
     public:
-        KeyEvent(const std::string& name, const EventNode* sender,
-                 unsigned int key, unsigned int modifiers, void* data = 0)
+        KeyEvent(const std::string& name, const EventNode* sender, unsigned int key, unsigned int modifiers, void* data = 0)
             : ModifierEvent(name, sender, modifiers, data)
             , m_key(key)
         {
@@ -299,8 +285,7 @@ namespace TwkApp
     class KeyPressEvent : public KeyEvent
     {
     public:
-        KeyPressEvent(const std::string& name, const EventNode* sender,
-                      unsigned int key, unsigned int modifiers, void* data = 0)
+        KeyPressEvent(const std::string& name, const EventNode* sender, unsigned int key, unsigned int modifiers, void* data = 0)
             : KeyEvent(name, sender, key, modifiers, data)
         {
         }
@@ -309,9 +294,7 @@ namespace TwkApp
     class KeyReleaseEvent : public KeyEvent
     {
     public:
-        KeyReleaseEvent(const std::string& name, const EventNode* sender,
-                        unsigned int key, unsigned int modifiers,
-                        void* data = 0)
+        KeyReleaseEvent(const std::string& name, const EventNode* sender, unsigned int key, unsigned int modifiers, void* data = 0)
             : KeyEvent(name, sender, key, modifiers, data)
         {
         }
@@ -336,10 +319,9 @@ namespace TwkApp
         //                  m_x(0), m_y(0), m_w(0), m_h(0), m_px(0), m_py(0),
         //                  m_buttonStates(0) {}
 
-        PointerEvent(const std::string& name, const EventNode* sender,
-                     unsigned int modifiers, int x, int y, /// position
-                     int w, int h,                         /// size of domain
-                     int ox, int oy,                       /// "push" values
+        PointerEvent(const std::string& name, const EventNode* sender, unsigned int modifiers, int x, int y, /// position
+                     int w, int h,                                                                           /// size of domain
+                     int ox, int oy,                                                                         /// "push" values
                      unsigned int buttonStates, void* data = 0)
             : ModifierEvent(name, sender, modifiers, data)
             , m_x(x)
@@ -389,13 +371,9 @@ namespace TwkApp
     class PointerButtonPressEvent : public PointerEvent
     {
     public:
-        PointerButtonPressEvent(const std::string& name,
-                                const EventNode* sender, unsigned int modifiers,
-                                int x, int y, int w, int h, int ox, int oy,
-                                unsigned int buttonStates, void* data = 0,
-                                float aTime = 0.0)
-            : PointerEvent(name, sender, modifiers, x, y, w, h, ox, oy,
-                           buttonStates, data)
+        PointerButtonPressEvent(const std::string& name, const EventNode* sender, unsigned int modifiers, int x, int y, int w, int h,
+                                int ox, int oy, unsigned int buttonStates, void* data = 0, float aTime = 0.0)
+            : PointerEvent(name, sender, modifiers, x, y, w, h, ox, oy, buttonStates, data)
             , m_activationTime(aTime)
         {
         }
@@ -417,13 +395,9 @@ namespace TwkApp
     class PointerButtonReleaseEvent : public PointerEvent
     {
     public:
-        PointerButtonReleaseEvent(const std::string& name,
-                                  const EventNode* sender,
-                                  unsigned int modifiers, int x, int y, int w,
-                                  int h, int ox, int oy,
-                                  unsigned int buttonStates, void* data = 0)
-            : PointerEvent(name, sender, modifiers, x, y, w, h, ox, oy,
-                           buttonStates, data)
+        PointerButtonReleaseEvent(const std::string& name, const EventNode* sender, unsigned int modifiers, int x, int y, int w, int h,
+                                  int ox, int oy, unsigned int buttonStates, void* data = 0)
+            : PointerEvent(name, sender, modifiers, x, y, w, h, ox, oy, buttonStates, data)
         {
         }
     };
@@ -458,8 +432,7 @@ namespace TwkApp
 
         // DragDropEvent() : PointerEvent() {}
 
-        DragDropEvent(const std::string& name, const EventNode* sender,
-                      Type type, ContentType ctype, const std::string& content,
+        DragDropEvent(const std::string& name, const EventNode* sender, Type type, ContentType ctype, const std::string& content,
                       unsigned int modifiers, int x, int y, /// position
                       int w, int h,                         /// size of domain
                       int ox = -1, int oy = -1,
@@ -471,9 +444,8 @@ namespace TwkApp
         {
         }
 
-        DragDropEvent(const std::string& name, const EventNode* sender,
-                      Type type, ContentType ctype, unsigned int modifiers,
-                      int x, int y, /// position
+        DragDropEvent(const std::string& name, const EventNode* sender, Type type, ContentType ctype, unsigned int modifiers, int x,
+                      int y,        /// position
                       int w, int h, /// size of domain
                       int ox = -1, int oy = -1,
                       void* data = 0) /// "push" values if any
@@ -515,16 +487,14 @@ namespace TwkApp
     public:
         // GenericStringEvent() : Event() {}
 
-        GenericStringEvent(const std::string& name, const EventNode* sender,
-                           const std::string& content, void* data = 0)
+        GenericStringEvent(const std::string& name, const EventNode* sender, const std::string& content, void* data = 0)
             : Event(name, sender, data)
             , m_stringContent(content)
         {
         }
 
-        GenericStringEvent(const std::string& name, const EventNode* sender,
-                           const std::string& content,
-                           const std::string& senderName, void* data = 0)
+        GenericStringEvent(const std::string& name, const EventNode* sender, const std::string& content, const std::string& senderName,
+                           void* data = 0)
             : Event(name, sender, data)
             , m_stringContent(content)
             , m_senderName(senderName)
@@ -535,20 +505,11 @@ namespace TwkApp
 
         const std::string& stringContent() const { return m_stringContent; }
 
-        void setStringContentVector(const StringVector& sv)
-        {
-            m_stringContentVector = sv;
-        }
+        void setStringContentVector(const StringVector& sv) { m_stringContentVector = sv; }
 
-        const StringVector& stringContentVector() const
-        {
-            return m_stringContentVector;
-        }
+        const StringVector& stringContentVector() const { return m_stringContentVector; }
 
-        void setReturnContent(const std::string& s) const
-        {
-            m_returnContent = s;
-        }
+        void setReturnContent(const std::string& s) const { m_returnContent = s; }
 
         const std::string& returnContent() const { return m_returnContent; }
 
@@ -577,13 +538,9 @@ namespace TwkApp
     public:
         // PixelBlockTransferEvent() : Event() {}
 
-        PixelBlockTransferEvent(const std::string& name,
-                                const EventNode* sender,
-                                const std::string& media,
-                                const std::string& layer,
-                                const std::string& view, int frame, int x,
-                                int y, size_t w, size_t h, const void* pixels,
-                                size_t size, void* data)
+        PixelBlockTransferEvent(const std::string& name, const EventNode* sender, const std::string& media, const std::string& layer,
+                                const std::string& view, int frame, int x, int y, size_t w, size_t h, const void* pixels, size_t size,
+                                void* data)
             : Event(name, sender, data)
             , m_media(media)
             , m_layer(layer)
@@ -643,9 +600,8 @@ namespace TwkApp
     public:
         // RawDataEvent() : Event() {}
 
-        RawDataEvent(const std::string& name, const EventNode* sender,
-                     const std::string& contentType, const char* rawData,
-                     size_t size, const char* utf8 = 0,
+        RawDataEvent(const std::string& name, const EventNode* sender, const std::string& contentType, const char* rawData, size_t size,
+                     const char* utf8 = 0,
                      void* data = 0, // this is the base class "data"
                      const std::string& senderName = "")
             : Event(name, sender, data)
@@ -669,10 +625,7 @@ namespace TwkApp
 
         const std::string& senderName() const { return m_senderName; }
 
-        void setReturnContent(const std::string& s) const
-        {
-            m_returnContent = s;
-        }
+        void setReturnContent(const std::string& s) const { m_returnContent = s; }
 
         const std::string& returnContent() const { return m_returnContent; }
 
@@ -693,14 +646,10 @@ namespace TwkApp
     class TabletEvent : public PointerEvent
     {
     public:
-
-        TabletEvent(const std::string& name, const EventNode* sender,
-                    unsigned int modifiers, int x, int y, int w, int h, int ox,
-                    int oy, unsigned int buttonStates, double gx, double gy, double pres,
-                    double tpres, double rot, int xtilt, int ytilt, int z = 0,
+        TabletEvent(const std::string& name, const EventNode* sender, unsigned int modifiers, int x, int y, int w, int h, int ox, int oy,
+                    unsigned int buttonStates, double gx, double gy, double pres, double tpres, double rot, int xtilt, int ytilt, int z = 0,
                     void* data = 0)
-            : PointerEvent(name, sender, modifiers, x, y, w, h, ox, oy,
-                           buttonStates, data)
+            : PointerEvent(name, sender, modifiers, x, y, w, h, ox, oy, buttonStates, data)
             , _xFloat(gx)
             , _yFloat(gy)
             , _pressure(pres)

@@ -47,8 +47,7 @@ namespace Mu
         //  Constructors
         //
 
-        QTextCursorType(Context* context, const char* name,
-                        Class* superClass = 0);
+        QTextCursorType(Context* context, const char* name, Class* superClass = 0);
         virtual ~QTextCursorType();
 
         //

@@ -42,15 +42,9 @@ namespace Mu
 
     BoolType::~BoolType() {}
 
-    PrimitiveObject* BoolType::newObject() const
-    {
-        return new PrimitiveObject(this);
-    }
+    PrimitiveObject* BoolType::newObject() const { return new PrimitiveObject(this); }
 
-    Value BoolType::nodeEval(const Node* n, Thread& thread) const
-    {
-        return Value((*n->func()._boolFunc)(*n, thread));
-    }
+    Value BoolType::nodeEval(const Node* n, Thread& thread) const { return Value((*n->func()._boolFunc)(*n, thread)); }
 
     void BoolType::nodeEval(void* p, const Node* n, Thread& thread) const
     {
@@ -58,13 +52,9 @@ namespace Mu
         *bp = (*n->func()._boolFunc)(*n, thread);
     }
 
-    void BoolType::outputValue(ostream& o, const Value& value, bool full) const
-    {
-        o << (value._bool ? "true" : "false");
-    }
+    void BoolType::outputValue(ostream& o, const Value& value, bool full) const { o << (value._bool ? "true" : "false"); }
 
-    void BoolType::outputValueRecursive(ostream& o, const ValuePointer vp,
-                                        ValueOutputState& state) const
+    void BoolType::outputValueRecursive(ostream& o, const ValuePointer vp, ValueOutputState& state) const
     {
         const bool* p = reinterpret_cast<const bool*>(vp);
         o << (*p ? "true" : "false");
@@ -84,24 +74,11 @@ namespace Mu
 
     bool& __C_EQ__boolAmp__boolAmp__bool(T, bool& a, bool b) { return a = b; }
 
-    bool __C_QMark_Colon__bool_bool_bool(T, bool p, bool a, bool b)
-    {
-        return p ? a : b;
-    }
+    bool __C_QMark_Colon__bool_bool_bool(T, bool p, bool a, bool b) { return p ? a : b; }
 
-    bool __C_eq_QMark_non_primitive_or_nil_QMark_non_primitive_or_nil(T,
-                                                                      Pointer a,
-                                                                      Pointer b)
-    {
-        return a == b;
-    }
+    bool __C_eq_QMark_non_primitive_or_nil_QMark_non_primitive_or_nil(T, Pointer a, Pointer b) { return a == b; }
 
-    bool
-    __C_neq_QMark_non_primitive_or_nil_QMark_non_primitive_or_nil(T, Pointer a,
-                                                                  Pointer b)
-    {
-        return a != b;
-    }
+    bool __C_neq_QMark_non_primitive_or_nil_QMark_non_primitive_or_nil(T, Pointer a, Pointer b) { return a != b; }
 
     void __C_assert_void_bool(T t, bool a)
     {
@@ -118,105 +95,76 @@ namespace Mu
         Symbol* s = scope();
         Context* c = context();
 
-        s->addSymbols(
-            new ReferenceType(c, "bool&", this),
+        s->addSymbols(new ReferenceType(c, "bool&", this),
 
-            new Function(c, "bool", BoolType::defaultBool,
-                         Mapped | NativeInlined, Compiled, __C_bool_bool,
-                         Return, "bool", End),
+                      new Function(c, "bool", BoolType::defaultBool, Mapped | NativeInlined, Compiled, __C_bool_bool, Return, "bool", End),
 
-            new Function(c, "bool", BoolType::dereference, Cast | NativeInlined,
-                         Compiled, __C_bool_boolAmp_, Return, "bool", Args,
-                         "bool&", End),
+                      new Function(c, "bool", BoolType::dereference, Cast | NativeInlined, Compiled, __C_bool_boolAmp_, Return, "bool",
+                                   Args, "bool&", End),
 
-            new Function(c, "=", BoolType::assign, AsOp | NativeInlined,
-                         Compiled, __C_EQ__boolAmp__boolAmp__bool, Return,
-                         "bool&", Args, "bool&", "bool", End),
+                      new Function(c, "=", BoolType::assign, AsOp | NativeInlined, Compiled, __C_EQ__boolAmp__boolAmp__bool, Return,
+                                   "bool&", Args, "bool&", "bool", End),
 
-            new Function(c, "!", BoolType::logicalNot, Op | NativeInlined,
-                         Compiled, __C_Bang__bool_bool, Return, "bool", Args,
-                         "bool", End),
+                      new Function(c, "!", BoolType::logicalNot, Op | NativeInlined, Compiled, __C_Bang__bool_bool, Return, "bool", Args,
+                                   "bool", End),
 
-            new Function(c, "&&", BoolType::logicalAnd, Op | NativeInlined,
-                         Compiled, __C_Amp_Amp__bool_bool_bool, Return, "bool",
-                         Args, "bool", "bool", End),
+                      new Function(c, "&&", BoolType::logicalAnd, Op | NativeInlined, Compiled, __C_Amp_Amp__bool_bool_bool, Return, "bool",
+                                   Args, "bool", "bool", End),
 
-            new Function(c, "||", BoolType::logicalOr, Op | NativeInlined,
-                         Compiled, __C_Pipe_Pipe__bool_bool_bool, Return,
-                         "bool", Args, "bool", "bool", End),
+                      new Function(c, "||", BoolType::logicalOr, Op | NativeInlined, Compiled, __C_Pipe_Pipe__bool_bool_bool, Return,
+                                   "bool", Args, "bool", "bool", End),
 
-            new Function(c, "?:", BoolType::conditionalExpr, Op, Compiled,
-                         __C_QMark_Colon__bool_bool_bool, Return, "bool", Args,
-                         "bool", "bool", "bool", End),
+                      new Function(c, "?:", BoolType::conditionalExpr, Op, Compiled, __C_QMark_Colon__bool_bool_bool, Return, "bool", Args,
+                                   "bool", "bool", "bool", End),
 
-            new Function(c, "__if", BoolType::__if, None, Return, "void", Args,
-                         "bool", "?", End),
+                      new Function(c, "__if", BoolType::__if, None, Return, "void", Args, "bool", "?", End),
 
-            new Function(c, "__if", BoolType::__if_else, None, Return, "void",
-                         Args, "bool", "?", "?", End),
+                      new Function(c, "__if", BoolType::__if_else, None, Return, "void", Args, "bool", "?", "?", End),
 
-            new Function(c, "__for", BoolType::__for, None, Return, "void",
-                         Args, "?", "bool", "?", "?", End),
+                      new Function(c, "__for", BoolType::__for, None, Return, "void", Args, "?", "bool", "?", "?", End),
 
-            new Function(c, "__repeat", BoolType::__repeat, None, Return,
-                         "void", Args, "int", "?", End),
+                      new Function(c, "__repeat", BoolType::__repeat, None, Return, "void", Args, "int", "?", End),
 
-            new Function(c, "__for_each", BoolType::__for_each_fixed_array,
-                         None, Return, "void", Args, "?reference",
-                         "?fixed_array", "?", End),
+                      new Function(c, "__for_each", BoolType::__for_each_fixed_array, None, Return, "void", Args, "?reference",
+                                   "?fixed_array", "?", End),
 
-            new Function(c, "__for_each", BoolType::__for_each_dynamic_array,
-                         None, Return, "void", Args, "?reference", "?dyn_array",
-                         "?", End),
+                      new Function(c, "__for_each", BoolType::__for_each_dynamic_array, None, Return, "void", Args, "?reference",
+                                   "?dyn_array", "?", End),
 
-            new Function(c, "__for_each", BoolType::__for_each_list, None,
-                         Return, "void", Args, "?reference", "?list", "?", End),
+                      new Function(c, "__for_each", BoolType::__for_each_list, None, Return, "void", Args, "?reference", "?list", "?", End),
 
-            new Function(c, "__for_index", BoolType::__for_index_dynamic_array,
-                         None, Return, "void", Args, "?reference", "?dyn_array",
-                         "?", End),
+                      new Function(c, "__for_index", BoolType::__for_index_dynamic_array, None, Return, "void", Args, "?reference",
+                                   "?dyn_array", "?", End),
 
-            new Function(c, "__for_index", BoolType::__for_index_fixed1_array,
-                         None, Return, "void", Args, "?reference",
-                         "?fixed_array", "?", End),
+                      new Function(c, "__for_index", BoolType::__for_index_fixed1_array, None, Return, "void", Args, "?reference",
+                                   "?fixed_array", "?", End),
 
-            new Function(c, "__for_index", BoolType::__for_index_fixed2_array,
-                         None, Return, "void", Args, "?reference", "?reference",
-                         "?fixed_array", "?", End),
+                      new Function(c, "__for_index", BoolType::__for_index_fixed2_array, None, Return, "void", Args, "?reference",
+                                   "?reference", "?fixed_array", "?", End),
 
-            new Function(c, "__for_index", BoolType::__for_index_fixed3_array,
-                         None, Return, "void", Args, "?reference", "?reference",
-                         "?reference", "?fixed_array", "?", End),
+                      new Function(c, "__for_index", BoolType::__for_index_fixed3_array, None, Return, "void", Args, "?reference",
+                                   "?reference", "?reference", "?fixed_array", "?", End),
 
-            new Function(c, "__while", BoolType::__while, None, Return, "void",
-                         Args, "bool", "?", End),
+                      new Function(c, "__while", BoolType::__while, None, Return, "void", Args, "bool", "?", End),
 
-            new Function(c, "__do_while", BoolType::__do_while, None, Return,
-                         "void", Args, "?", "bool", End),
+                      new Function(c, "__do_while", BoolType::__do_while, None, Return, "void", Args, "?", "bool", End),
 
-            new Function(c, "__break", BoolType::__break, None, Return, "void",
-                         End),
+                      new Function(c, "__break", BoolType::__break, None, Return, "void", End),
 
-            new Function(c, "__continue", BoolType::__continue, None, Return,
-                         "void", End),
+                      new Function(c, "__continue", BoolType::__continue, None, Return, "void", End),
 
-            new Function(c, "assert", BoolType::assertion, NativeInlined,
-                         Compiled, __C_assert_void_bool, Return, "void", Args,
-                         "bool", End),
+                      new Function(c, "assert", BoolType::assertion, NativeInlined, Compiled, __C_assert_void_bool, Return, "void", Args,
+                                   "bool", End),
 
-            new Function(
-                c, "eq", BaseFunctions::eq, CommOp | NativeInlined, Compiled,
-                __C_eq_QMark_non_primitive_or_nil_QMark_non_primitive_or_nil,
-                Return, "bool", Args, "?non_primitive_or_nil",
-                "?non_primitive_or_nil", End),
+                      new Function(c, "eq", BaseFunctions::eq, CommOp | NativeInlined, Compiled,
+                                   __C_eq_QMark_non_primitive_or_nil_QMark_non_primitive_or_nil, Return, "bool", Args,
+                                   "?non_primitive_or_nil", "?non_primitive_or_nil", End),
 
-            new Function(
-                c, "neq", BaseFunctions::neq, CommOp | NativeInlined, Compiled,
-                __C_neq_QMark_non_primitive_or_nil_QMark_non_primitive_or_nil,
-                Return, "bool", Args, "?non_primitive_or_nil",
-                "?non_primitive_or_nil", End),
+                      new Function(c, "neq", BaseFunctions::neq, CommOp | NativeInlined, Compiled,
+                                   __C_neq_QMark_non_primitive_or_nil_QMark_non_primitive_or_nil, Return, "bool", Args,
+                                   "?non_primitive_or_nil", "?non_primitive_or_nil", End),
 
-            EndArguments);
+                      EndArguments);
     }
 
     NODE_IMPLEMENTATION(BoolType::dereference, bool)
@@ -227,25 +175,13 @@ namespace Mu
 
     NODE_IMPLEMENTATION(BoolType::defaultBool, bool) { NODE_RETURN(false); }
 
-    NODE_IMPLEMENTATION(BoolType::logicalNot, bool)
-    {
-        NODE_RETURN(!NODE_ARG(0, bool));
-    }
+    NODE_IMPLEMENTATION(BoolType::logicalNot, bool) { NODE_RETURN(!NODE_ARG(0, bool)); }
 
-    NODE_IMPLEMENTATION(BoolType::logicalOr, bool)
-    {
-        NODE_RETURN(NODE_ARG(0, bool) || NODE_ARG(1, bool));
-    }
+    NODE_IMPLEMENTATION(BoolType::logicalOr, bool) { NODE_RETURN(NODE_ARG(0, bool) || NODE_ARG(1, bool)); }
 
-    NODE_IMPLEMENTATION(BoolType::logicalAnd, bool)
-    {
-        NODE_RETURN(NODE_ARG(0, bool) && NODE_ARG(1, bool));
-    }
+    NODE_IMPLEMENTATION(BoolType::logicalAnd, bool) { NODE_RETURN(NODE_ARG(0, bool) && NODE_ARG(1, bool)); }
 
-    NODE_IMPLEMENTATION(BoolType::conditionalExpr, bool)
-    {
-        NODE_RETURN(NODE_ARG(0, bool) ? NODE_ARG(1, bool) : NODE_ARG(2, bool));
-    }
+    NODE_IMPLEMENTATION(BoolType::conditionalExpr, bool) { NODE_RETURN(NODE_ARG(0, bool) ? NODE_ARG(1, bool) : NODE_ARG(2, bool)); }
 
 #define ASOP(name, op)                                            \
     NODE_IMPLEMENTATION(name, Pointer)                            \
@@ -286,15 +222,9 @@ namespace Mu
         }
     }
 
-    NODE_IMPLEMENTATION(BoolType::__break, void)
-    {
-        NODE_THREAD.jump(JumpReturnCode::Break);
-    }
+    NODE_IMPLEMENTATION(BoolType::__break, void) { NODE_THREAD.jump(JumpReturnCode::Break); }
 
-    NODE_IMPLEMENTATION(BoolType::__continue, void)
-    {
-        NODE_THREAD.jump(JumpReturnCode::Continue);
-    }
+    NODE_IMPLEMENTATION(BoolType::__continue, void) { NODE_THREAD.jump(JumpReturnCode::Continue); }
 
     NODE_IMPLEMENTATION(BoolType::__for, void)
     {
@@ -302,8 +232,7 @@ namespace Mu
         //	See above regarding safety.
         //
 
-        NODE_THREAD.jumpPointBegin(JumpReturnCode::Continue
-                                   | JumpReturnCode::Break);
+        NODE_THREAD.jumpPointBegin(JumpReturnCode::Continue | JumpReturnCode::Break);
 
         int rv = JumpReturnCode::NoJump;
         bool sj = true;
@@ -337,8 +266,7 @@ namespace Mu
 
     NODE_IMPLEMENTATION(BoolType::__repeat, void)
     {
-        NODE_THREAD.jumpPointBegin(JumpReturnCode::Continue
-                                   | JumpReturnCode::Break);
+        NODE_THREAD.jumpPointBegin(JumpReturnCode::Continue | JumpReturnCode::Break);
 
         int rv = JumpReturnCode::NoJump;
         bool sj = true;
@@ -381,8 +309,7 @@ namespace Mu
 
     NODE_IMPLEMENTATION(BoolType::__for_each_fixed_array, void)
     {
-        NODE_THREAD.jumpPointBegin(JumpReturnCode::Continue
-                                   | JumpReturnCode::Break);
+        NODE_THREAD.jumpPointBegin(JumpReturnCode::Continue | JumpReturnCode::Break);
 
         int rv = JumpReturnCode::NoJump;
         bool sj = true;
@@ -390,8 +317,7 @@ namespace Mu
         const Node* n0 = NODE_THIS.argNode(0);
         const Node* n1 = NODE_THIS.argNode(1);
 
-        const ReferenceType* rtype =
-            dynamic_cast<const ReferenceType*>(n0->type());
+        const ReferenceType* rtype = dynamic_cast<const ReferenceType*>(n0->type());
         const Type* etype = dynamic_cast<const Type*>(rtype->dereferenceType());
         const MachineRep* rep = etype->machineRep();
 
@@ -449,8 +375,7 @@ namespace Mu
 
     NODE_IMPLEMENTATION(BoolType::__for_each_dynamic_array, void)
     {
-        NODE_THREAD.jumpPointBegin(JumpReturnCode::Continue
-                                   | JumpReturnCode::Break);
+        NODE_THREAD.jumpPointBegin(JumpReturnCode::Continue | JumpReturnCode::Break);
 
         int rv = JumpReturnCode::NoJump;
         bool sj = true;
@@ -458,8 +383,7 @@ namespace Mu
         const Node* n0 = NODE_THIS.argNode(0);
         const Node* n1 = NODE_THIS.argNode(1);
 
-        const ReferenceType* rtype =
-            dynamic_cast<const ReferenceType*>(n0->type());
+        const ReferenceType* rtype = dynamic_cast<const ReferenceType*>(n0->type());
         const Type* etype = dynamic_cast<const Type*>(rtype->dereferenceType());
         const MachineRep* rep = etype->machineRep();
 
@@ -517,8 +441,7 @@ namespace Mu
 
     NODE_IMPLEMENTATION(BoolType::__for_each_list, void)
     {
-        NODE_THREAD.jumpPointBegin(JumpReturnCode::Continue
-                                   | JumpReturnCode::Break);
+        NODE_THREAD.jumpPointBegin(JumpReturnCode::Continue | JumpReturnCode::Break);
 
         int rv = JumpReturnCode::NoJump;
         bool sj = true;
@@ -526,8 +449,7 @@ namespace Mu
         const Node* n0 = NODE_THIS.argNode(0);
         const Node* n1 = NODE_THIS.argNode(1);
 
-        const ReferenceType* rtype =
-            dynamic_cast<const ReferenceType*>(n0->type());
+        const ReferenceType* rtype = dynamic_cast<const ReferenceType*>(n0->type());
         const Type* etype = dynamic_cast<const Type*>(rtype->dereferenceType());
         const MachineRep* rep = etype->machineRep();
 
@@ -588,8 +510,7 @@ namespace Mu
 
     NODE_IMPLEMENTATION(BoolType::__for_index_fixed1_array, void)
     {
-        NODE_THREAD.jumpPointBegin(JumpReturnCode::Continue
-                                   | JumpReturnCode::Break);
+        NODE_THREAD.jumpPointBegin(JumpReturnCode::Continue | JumpReturnCode::Break);
 
         int rv = JumpReturnCode::NoJump;
         bool sj = true;
@@ -647,8 +568,7 @@ namespace Mu
 
     NODE_IMPLEMENTATION(BoolType::__for_index_fixed2_array, void)
     {
-        NODE_THREAD.jumpPointBegin(JumpReturnCode::Continue
-                                   | JumpReturnCode::Break);
+        NODE_THREAD.jumpPointBegin(JumpReturnCode::Continue | JumpReturnCode::Break);
 
         int rv = JumpReturnCode::NoJump;
         bool sj = true;
@@ -726,8 +646,7 @@ namespace Mu
 
     NODE_IMPLEMENTATION(BoolType::__for_index_fixed3_array, void)
     {
-        NODE_THREAD.jumpPointBegin(JumpReturnCode::Continue
-                                   | JumpReturnCode::Break);
+        NODE_THREAD.jumpPointBegin(JumpReturnCode::Continue | JumpReturnCode::Break);
 
         int rv = JumpReturnCode::NoJump;
         bool sj = true;
@@ -813,8 +732,7 @@ namespace Mu
 
     NODE_IMPLEMENTATION(BoolType::__for_index_dynamic_array, void)
     {
-        NODE_THREAD.jumpPointBegin(JumpReturnCode::Continue
-                                   | JumpReturnCode::Break);
+        NODE_THREAD.jumpPointBegin(JumpReturnCode::Continue | JumpReturnCode::Break);
 
         int rv = JumpReturnCode::NoJump;
         bool sj = true;
@@ -877,8 +795,7 @@ namespace Mu
         //	See above regarding safety.
         //
 
-        NODE_THREAD.jumpPointBegin(JumpReturnCode::Continue
-                                   | JumpReturnCode::Break);
+        NODE_THREAD.jumpPointBegin(JumpReturnCode::Continue | JumpReturnCode::Break);
 
         while (NODE_ARG(0, bool))
         {
@@ -904,8 +821,7 @@ namespace Mu
 
     NODE_IMPLEMENTATION(BoolType::__do_while, void)
     {
-        NODE_THREAD.jumpPointBegin(JumpReturnCode::Continue
-                                   | JumpReturnCode::Break);
+        NODE_THREAD.jumpPointBegin(JumpReturnCode::Continue | JumpReturnCode::Break);
 
         //
         //	See above regarding safety.
@@ -940,8 +856,7 @@ namespace Mu
         ostringstream str;
         str << "Assertion failed: " << expr;
 
-        ExceptionType::Exception* e =
-            new ExceptionType::Exception(context->exceptionType());
+        ExceptionType::Exception* e = new ExceptionType::Exception(context->exceptionType());
         string temp = str.str();
         e->string() += temp.c_str();
         NODE_THREAD.setException(e);
@@ -959,12 +874,10 @@ namespace Mu
 
             ostringstream str;
             str << "Assertion failed: ";
-            NodePrinter printer(const_cast<Node*>(NODE_THIS.argNode(0)), str,
-                                NodePrinter::Lispy);
+            NodePrinter printer(const_cast<Node*>(NODE_THIS.argNode(0)), str, NodePrinter::Lispy);
             printer.traverse();
 
-            ExceptionType::Exception* e =
-                new ExceptionType::Exception(context->exceptionType());
+            ExceptionType::Exception* e = new ExceptionType::Exception(context->exceptionType());
             string temp = str.str();
             e->string() += temp.c_str();
             NODE_THREAD.setException(e);

@@ -44,8 +44,7 @@ namespace IPCore
             {
                 if (exists(dir) && is_directory(dir))
                 {
-                    for (directory_iterator q(dir); q != directory_iterator();
-                         ++q)
+                    for (directory_iterator q(dir); q != directory_iterator(); ++q)
                     {
                         path p = q->path();
 
@@ -58,16 +57,14 @@ namespace IPCore
             }
             catch (filesystem_error& er)
             {
-                cout << "WARNING: cannot read from \"" << dir.string() << "\""
-                     << endl;
+                cout << "WARNING: cannot read from \"" << dir.string() << "\"" << endl;
                 continue;
             }
         }
         return fspaths;
     }
 
-    string profileMatchingNameInPath(const string& name, const string& tag,
-                                     IPGraph* graph)
+    string profileMatchingNameInPath(const string& name, const string& tag, IPGraph* graph)
     {
         vector<path> paths = collectProfilesFromPath();
 
@@ -93,8 +90,7 @@ namespace IPCore
         return "";
     }
 
-    void profilesInPath(ProfileVector& profiles, const string& tag,
-                        IPGraph* graph)
+    void profilesInPath(ProfileVector& profiles, const string& tag, IPGraph* graph)
     {
         profiles.clear();
         vector<path> paths = collectProfilesFromPath();
@@ -147,12 +143,10 @@ namespace IPCore
 
         if (!m_header)
         {
-            TWK_THROW_EXC_STREAM("File " << m_filename
-                                         << " contains no profile");
+            TWK_THROW_EXC_STREAM("File " << m_filename << " contains no profile");
         }
 
-        const string rootName =
-            m_header->propertyValue<StringProperty>("root.name", "");
+        const string rootName = m_header->propertyValue<StringProperty>("root.name", "");
         m_root = m_reader->findByName(rootName);
 
         if (!m_root)
@@ -164,16 +158,13 @@ namespace IPCore
     namespace
     {
 
-        typedef TwkContainer::StringPairProperty::container_type
-            ConnectionContainer;
+        typedef TwkContainer::StringPairProperty::container_type ConnectionContainer;
 
         //
         //  PROFILE HELPHER FUNCTIONS
         //
 
-        void profileNodeInputs(const GTOReader& reader,
-                               PropertyContainer* profileNode,
-                               const ConnectionContainer& connections,
+        void profileNodeInputs(const GTOReader& reader, PropertyContainer* profileNode, const ConnectionContainer& connections,
                                vector<PropertyContainer*>& containers)
         {
             containers.clear();
@@ -188,14 +179,12 @@ namespace IPCore
 
                 if (connections[i].second == profileNode->name())
                 {
-                    containers.push_back(
-                        reader.findByName(connections[i].first));
+                    containers.push_back(reader.findByName(connections[i].first));
                 }
             }
         }
 
-        void applyProfileGraph(const GTOReader& reader, IPNode* node,
-                               PropertyContainer* profileNode,
+        void applyProfileGraph(const GTOReader& reader, IPNode* node, PropertyContainer* profileNode,
                                const ConnectionContainer& connections)
         {
             //
@@ -243,19 +232,15 @@ namespace IPCore
             //  matched with the members of the actual node.
             //
 
-            const string rootName = profileNode->propertyValue<StringProperty>(
-                "evaluation.root", "");
+            const string rootName = profileNode->propertyValue<StringProperty>("evaluation.root", "");
 
             if (rootName != "")
             {
                 if (GroupIPNode* group = dynamic_cast<GroupIPNode*>(node))
                 {
-                    if (PropertyContainer* rootContainer =
-                            reader.findByName(rootName))
+                    if (PropertyContainer* rootContainer = reader.findByName(rootName))
                     {
-                        const ConnectionContainer& cons =
-                            profileNode->propertyContainer<StringPairProperty>(
-                                "evaluation.connections");
+                        const ConnectionContainer& cons = profileNode->propertyContainer<StringPairProperty>("evaluation.connections");
 
                         //
                         //  Only recursively apply if there's actually a
@@ -263,8 +248,7 @@ namespace IPCore
                         //
 
                         IPNode* groupRoot = group->rootNode();
-                        applyProfileGraph(reader, groupRoot, rootContainer,
-                                          cons);
+                        applyProfileGraph(reader, groupRoot, rootContainer, cons);
                     }
                 }
             }
@@ -285,8 +269,7 @@ namespace IPCore
                     {
                         PropertyContainer* input = profileInputs[i];
                         if (input)
-                            applyProfileGraph(reader, nodeInputs[i], input,
-                                              connections);
+                            applyProfileGraph(reader, nodeInputs[i], input, connections);
                     }
                 }
             }
@@ -310,8 +293,7 @@ namespace IPCore
 
         if (node->graph() != m_graph)
         {
-            TWK_THROW_EXC_STREAM(
-                "Profile: node graph does not match profile graph");
+            TWK_THROW_EXC_STREAM("Profile: node graph does not match profile graph");
         }
 
         //
@@ -321,9 +303,7 @@ namespace IPCore
 
         if (m_root->protocol() != node->protocol())
         {
-            TWK_THROW_EXC_STREAM("Profile: cannot apply "
-                                 << m_root->protocol() << " profile to "
-                                 << node->protocol() << " node.");
+            TWK_THROW_EXC_STREAM("Profile: cannot apply " << m_root->protocol() << " profile to " << node->protocol() << " node.");
         }
 
         IPGraph::GraphEdit edit(*node->graph());
@@ -331,21 +311,13 @@ namespace IPCore
 
         applyProfileGraph(*m_reader, node, m_root, emptyConnections);
 
-        PropertyInfo* noSave = new PropertyInfo(PropertyInfo::NotPersistent
-                                                | PropertyInfo::NotCopyable
-                                                | PropertyInfo::OutputOnly);
+        PropertyInfo* noSave = new PropertyInfo(PropertyInfo::NotPersistent | PropertyInfo::NotCopyable | PropertyInfo::OutputOnly);
 
         node->declareProperty<StringProperty>("profile.name", name(), noSave);
-        node->declareProperty<StringProperty>("profile.file", fileName(),
-                                              noSave);
+        node->declareProperty<StringProperty>("profile.file", fileName(), noSave);
     }
 
-    string Profile::comment() const
-    {
-        return m_header
-                   ? m_header->propertyValue<StringProperty>("root.comment", "")
-                   : "NOT LOADED";
-    }
+    string Profile::comment() const { return m_header ? m_header->propertyValue<StringProperty>("root.comment", "") : "NOT LOADED"; }
 
     string Profile::structureDescription() const
     {
@@ -377,22 +349,18 @@ namespace IPCore
                 PropertyContainer::NamedPropertyMap pmap;
                 diffpc->propertiesAsMap(pmap);
 
-                for (PropertyContainer::NamedPropertyMap::const_iterator q =
-                         pmap.begin();
-                     q != pmap.end(); ++q)
+                for (PropertyContainer::NamedPropertyMap::const_iterator q = pmap.begin(); q != pmap.end(); ++q)
                 {
                     const string& name = q->first;
                     Property* p = q->second;
 
-                    if (name == "evaluation.connections"
-                        || name == "evaluation.root" || name == "input.index"
+                    if (name == "evaluation.connections" || name == "evaluation.root" || name == "input.index"
                         || name == "membership.contains")
                     {
                         continue;
                     }
 
-                    str << protocol << "." << name << " = "
-                        << p->valueAsString() << endl;
+                    str << protocol << "." << name << " = " << p->valueAsString() << endl;
                 }
             }
         }

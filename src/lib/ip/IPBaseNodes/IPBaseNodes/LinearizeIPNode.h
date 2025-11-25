@@ -24,8 +24,7 @@ namespace IPCore
     public:
         typedef TwkMath::Chromaticities<float> Chromaticities;
 
-        LinearizeIPNode(const std::string& name, const NodeDefinition* def,
-                        IPGraph* graph, GroupIPNode* group = 0);
+        LinearizeIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group = 0);
 
         virtual ~LinearizeIPNode();
 

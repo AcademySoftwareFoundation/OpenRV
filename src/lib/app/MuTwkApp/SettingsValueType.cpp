@@ -46,9 +46,7 @@ namespace TwkApp
         _intArrayType = new VariantTagType(c, "IntArray", "int[]");
         _stringArrayType = new VariantTagType(c, "StringArray", "string[]");
 
-        addSymbols(_floatType, _intType, _stringType, _boolType,
-                   _floatArrayType, _intArrayType, _stringArrayType,
-                   EndArguments);
+        addSymbols(_floatType, _intType, _stringType, _boolType, _floatArrayType, _intArrayType, _stringArrayType, EndArguments);
 
         String rtname = name().c_str();
         rtname += "&";
@@ -73,11 +71,9 @@ namespace TwkApp
     }
 #endif
 
-        Function* OpAs = new Function(
-            c, "=", BaseFunctions::assign,
-            Function::MemberOperator | Function::Operator, Function::Return,
-            rt->fullyQualifiedName().c_str(), Function::Args,
-            rt->fullyQualifiedName().c_str(), tn, Function::End);
+        Function* OpAs =
+            new Function(c, "=", BaseFunctions::assign, Function::MemberOperator | Function::Operator, Function::Return,
+                         rt->fullyQualifiedName().c_str(), Function::Args, rt->fullyQualifiedName().c_str(), tn, Function::End);
 
         globalScope()->addSymbol(OpAs);
     }
@@ -89,17 +85,14 @@ namespace TwkApp
         //  the tag type.
         //
 
-        const VariantTagType* t =
-            static_cast<const VariantTagType*>(NODE_THIS.symbol()->scope());
+        const VariantTagType* t = static_cast<const VariantTagType*>(NODE_THIS.symbol()->scope());
 
         NODE_RETURN(VariantInstance::allocate(t));
     }
 
-    SettingsValueType::ValueType
-    SettingsValueType::valueType(VariantInstance* vobj) const
+    SettingsValueType::ValueType SettingsValueType::valueType(VariantInstance* vobj) const
     {
-        const VariantTagType* tt =
-            static_cast<const VariantTagType*>(vobj->type());
+        const VariantTagType* tt = static_cast<const VariantTagType*>(vobj->type());
 
         if (tt == _stringType)
             return StringType;

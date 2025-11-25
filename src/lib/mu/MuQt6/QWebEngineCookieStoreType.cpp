@@ -83,8 +83,7 @@ namespace Mu
         }
     }
 
-    bool MuQt_QWebEngineCookieStore::eventFilter(QObject* watched,
-                                                 QEvent* event)
+    bool MuQt_QWebEngineCookieStore::eventFilter(QObject* watched, QEvent* event)
     {
         if (!_env)
             return QWebEngineCookieStore::eventFilter(watched, event);
@@ -95,8 +94,7 @@ namespace Mu
         {
             Function::ArgumentVector args(3);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeinstance<QObjectType>(c, watched, "qt.QObject"));
+            args[1] = Value(makeinstance<QObjectType>(c, watched, "qt.QObject"));
             args[2] = Value(makeqpointer<QEventType>(c, event, "qt.QEvent"));
             Value rval = _env->call(F, args);
             return (bool)(rval._bool);
@@ -144,8 +142,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QTimerEventType>(c, event, "qt.QTimerEvent"));
+            args[1] = Value(makeqpointer<QTimerEventType>(c, event, "qt.QTimerEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -157,10 +154,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  Mu Type CONSTRUCTORS
 
-    QWebEngineCookieStoreType::QWebEngineCookieStoreType(Context* c,
-                                                         const char* name,
-                                                         Class* super,
-                                                         Class* super2)
+    QWebEngineCookieStoreType::QWebEngineCookieStoreType(Context* c, const char* name, Class* super, Class* super2)
         : Class(c, name, vectorOf2(super, super2))
     {
     }
@@ -170,9 +164,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    static Pointer
-    QWebEngineCookieStore_QWebEngineCookieStore_QObject(Thread& NODE_THREAD,
-                                                        Pointer obj)
+    static Pointer QWebEngineCookieStore_QWebEngineCookieStore_QObject(Thread& NODE_THREAD, Pointer obj)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         ClassInstance* widget = reinterpret_cast<ClassInstance*>(obj);
@@ -181,12 +173,10 @@ namespace Mu
         {
             return 0;
         }
-        else if (QWebEngineCookieStore* w =
-                     object<QWebEngineCookieStore>(widget))
+        else if (QWebEngineCookieStore* w = object<QWebEngineCookieStore>(widget))
         {
             QWebEngineCookieStoreType* type =
-                c->findSymbolOfTypeByQualifiedName<QWebEngineCookieStoreType>(
-                    c->internName("qt.QWebEngineCookieStore"), false);
+                c->findSymbolOfTypeByQualifiedName<QWebEngineCookieStoreType>(c->internName("qt.QWebEngineCookieStore"), false);
             ClassInstance* o = ClassInstance::allocate(type);
             setobject(o, w);
             return o;
@@ -199,22 +189,18 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(castFromObject, Pointer)
     {
-        NODE_RETURN(QWebEngineCookieStore_QWebEngineCookieStore_QObject(
-            NODE_THREAD, NODE_ARG(0, Pointer)));
+        NODE_RETURN(QWebEngineCookieStore_QWebEngineCookieStore_QObject(NODE_THREAD, NODE_ARG(0, Pointer)));
     }
 
-    void qt_QWebEngineCookieStore_deleteAllCookies_void_QWebEngineCookieStore(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    void qt_QWebEngineCookieStore_deleteAllCookies_void_QWebEngineCookieStore(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineCookieStore* arg0 = object<QWebEngineCookieStore>(param_this);
         arg0->deleteAllCookies();
     }
 
-    void
-    qt_QWebEngineCookieStore_deleteCookie_void_QWebEngineCookieStore_QNetworkCookie_QUrl(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_cookie,
-        Pointer param_origin)
+    void qt_QWebEngineCookieStore_deleteCookie_void_QWebEngineCookieStore_QNetworkCookie_QUrl(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                              Pointer param_cookie, Pointer param_origin)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineCookieStore* arg0 = object<QWebEngineCookieStore>(param_this);
@@ -223,27 +209,22 @@ namespace Mu
         arg0->deleteCookie(arg1, arg2);
     }
 
-    void
-    qt_QWebEngineCookieStore_deleteSessionCookies_void_QWebEngineCookieStore(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    void qt_QWebEngineCookieStore_deleteSessionCookies_void_QWebEngineCookieStore(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineCookieStore* arg0 = object<QWebEngineCookieStore>(param_this);
         arg0->deleteSessionCookies();
     }
 
-    void qt_QWebEngineCookieStore_loadAllCookies_void_QWebEngineCookieStore(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    void qt_QWebEngineCookieStore_loadAllCookies_void_QWebEngineCookieStore(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineCookieStore* arg0 = object<QWebEngineCookieStore>(param_this);
         arg0->loadAllCookies();
     }
 
-    void
-    qt_QWebEngineCookieStore_setCookie_void_QWebEngineCookieStore_QNetworkCookie_QUrl(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_cookie,
-        Pointer param_origin)
+    void qt_QWebEngineCookieStore_setCookie_void_QWebEngineCookieStore_QNetworkCookie_QUrl(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                           Pointer param_cookie, Pointer param_origin)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineCookieStore* arg0 = object<QWebEngineCookieStore>(param_this);
@@ -252,32 +233,26 @@ namespace Mu
         arg0->setCookie(arg1, arg2);
     }
 
-    bool qt_QWebEngineCookieStore_event_bool_QWebEngineCookieStore_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    bool qt_QWebEngineCookieStore_event_bool_QWebEngineCookieStore_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineCookieStore* arg0 = object<QWebEngineCookieStore>(param_this);
         QEvent* arg1 = getqpointer<QEventType>(param_e);
-        return isMuQtObject(arg0) ? arg0->QWebEngineCookieStore::event(arg1)
-                                  : arg0->event(arg1);
+        return isMuQtObject(arg0) ? arg0->QWebEngineCookieStore::event(arg1) : arg0->event(arg1);
     }
 
-    bool
-    qt_QWebEngineCookieStore_eventFilter_bool_QWebEngineCookieStore_QObject_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_watched,
-        Pointer param_event)
+    bool qt_QWebEngineCookieStore_eventFilter_bool_QWebEngineCookieStore_QObject_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                        Pointer param_watched, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineCookieStore* arg0 = object<QWebEngineCookieStore>(param_this);
         QObject* arg1 = object<QObject>(param_watched);
         QEvent* arg2 = getqpointer<QEventType>(param_event);
-        return isMuQtObject(arg0)
-                   ? arg0->QWebEngineCookieStore::eventFilter(arg1, arg2)
-                   : arg0->eventFilter(arg1, arg2);
+        return isMuQtObject(arg0) ? arg0->QWebEngineCookieStore::eventFilter(arg1, arg2) : arg0->eventFilter(arg1, arg2);
     }
 
-    void qt_QWebEngineCookieStore_customEvent_void_QWebEngineCookieStore_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QWebEngineCookieStore_customEvent_void_QWebEngineCookieStore_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineCookieStore* arg0 = object<QWebEngineCookieStore>(param_this);
@@ -288,9 +263,8 @@ namespace Mu
             ((MuQt_QWebEngineCookieStore*)arg0)->customEvent_pub(arg1);
     }
 
-    void
-    qt_QWebEngineCookieStore_timerEvent_void_QWebEngineCookieStore_QTimerEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QWebEngineCookieStore_timerEvent_void_QWebEngineCookieStore_QTimerEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                    Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWebEngineCookieStore* arg0 = object<QWebEngineCookieStore>(param_this);
@@ -303,62 +277,53 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(_n_deleteAllCookies0, void)
     {
-        qt_QWebEngineCookieStore_deleteAllCookies_void_QWebEngineCookieStore(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
+        qt_QWebEngineCookieStore_deleteAllCookies_void_QWebEngineCookieStore(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_deleteCookie0, void)
     {
-        qt_QWebEngineCookieStore_deleteCookie_void_QWebEngineCookieStore_QNetworkCookie_QUrl(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer));
+        qt_QWebEngineCookieStore_deleteCookie_void_QWebEngineCookieStore_QNetworkCookie_QUrl(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                             NODE_ARG(1, Pointer), NODE_ARG(2, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_deleteSessionCookies0, void)
     {
-        qt_QWebEngineCookieStore_deleteSessionCookies_void_QWebEngineCookieStore(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
+        qt_QWebEngineCookieStore_deleteSessionCookies_void_QWebEngineCookieStore(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_loadAllCookies0, void)
     {
-        qt_QWebEngineCookieStore_loadAllCookies_void_QWebEngineCookieStore(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
+        qt_QWebEngineCookieStore_loadAllCookies_void_QWebEngineCookieStore(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setCookie0, void)
     {
-        qt_QWebEngineCookieStore_setCookie_void_QWebEngineCookieStore_QNetworkCookie_QUrl(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer));
+        qt_QWebEngineCookieStore_setCookie_void_QWebEngineCookieStore_QNetworkCookie_QUrl(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                          NODE_ARG(1, Pointer), NODE_ARG(2, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_event0, bool)
     {
-        NODE_RETURN(
-            qt_QWebEngineCookieStore_event_bool_QWebEngineCookieStore_QEvent(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QWebEngineCookieStore_event_bool_QWebEngineCookieStore_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                     NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_eventFilter0, bool)
     {
-        NODE_RETURN(
-            qt_QWebEngineCookieStore_eventFilter_bool_QWebEngineCookieStore_QObject_QEvent(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QWebEngineCookieStore_eventFilter_bool_QWebEngineCookieStore_QObject_QEvent(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_customEvent0, void)
     {
-        qt_QWebEngineCookieStore_customEvent_void_QWebEngineCookieStore_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QWebEngineCookieStore_customEvent_void_QWebEngineCookieStore_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                               NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_timerEvent0, void)
     {
-        qt_QWebEngineCookieStore_timerEvent_void_QWebEngineCookieStore_QTimerEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QWebEngineCookieStore_timerEvent_void_QWebEngineCookieStore_QTimerEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                   NODE_ARG(1, Pointer));
     }
 
     void QWebEngineCookieStoreType::load()
@@ -378,87 +343,57 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(
-            new Function(c, "__allocate", BaseFunctions::classAllocate, None,
-                         Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
-            new Function(c, tn, castFromObject, Cast, Compiled,
-                         QWebEngineCookieStore_QWebEngineCookieStore_QObject,
-                         Return, ftn, Parameters,
-                         new Param(c, "object", "qt.QObject"), End),
+                   new Function(c, tn, castFromObject, Cast, Compiled, QWebEngineCookieStore_QWebEngineCookieStore_QObject, Return, ftn,
+                                Parameters, new Param(c, "object", "qt.QObject"), End),
 
-            EndArguments);
+                   EndArguments);
 
         addSymbols(
             // enums
             // member functions
-            new Function(
-                c, "deleteAllCookies", _n_deleteAllCookies0, None, Compiled,
-                qt_QWebEngineCookieStore_deleteAllCookies_void_QWebEngineCookieStore,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QWebEngineCookieStore"), End),
-            new Function(
-                c, "deleteCookie", _n_deleteCookie0, None, Compiled,
-                qt_QWebEngineCookieStore_deleteCookie_void_QWebEngineCookieStore_QNetworkCookie_QUrl,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QWebEngineCookieStore"),
-                new Param(c, "cookie", "qt.QNetworkCookie"),
-                new Param(c, "origin", "qt.QUrl"), End),
-            new Function(
-                c, "deleteSessionCookies", _n_deleteSessionCookies0, None,
-                Compiled,
-                qt_QWebEngineCookieStore_deleteSessionCookies_void_QWebEngineCookieStore,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QWebEngineCookieStore"), End),
-            new Function(
-                c, "loadAllCookies", _n_loadAllCookies0, None, Compiled,
-                qt_QWebEngineCookieStore_loadAllCookies_void_QWebEngineCookieStore,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QWebEngineCookieStore"), End),
-            new Function(
-                c, "setCookie", _n_setCookie0, None, Compiled,
-                qt_QWebEngineCookieStore_setCookie_void_QWebEngineCookieStore_QNetworkCookie_QUrl,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QWebEngineCookieStore"),
-                new Param(c, "cookie", "qt.QNetworkCookie"),
-                new Param(c, "origin", "qt.QUrl"), End),
-            _func[0] = new MemberFunction(
-                c, "event", _n_event0, None, Compiled,
-                qt_QWebEngineCookieStore_event_bool_QWebEngineCookieStore_QEvent,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QWebEngineCookieStore"),
-                new Param(c, "e", "qt.QEvent"), End),
-            _func[1] = new MemberFunction(
-                c, "eventFilter", _n_eventFilter0, None, Compiled,
-                qt_QWebEngineCookieStore_eventFilter_bool_QWebEngineCookieStore_QObject_QEvent,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QWebEngineCookieStore"),
-                new Param(c, "watched", "qt.QObject"),
-                new Param(c, "event", "qt.QEvent"), End),
+            new Function(c, "deleteAllCookies", _n_deleteAllCookies0, None, Compiled,
+                         qt_QWebEngineCookieStore_deleteAllCookies_void_QWebEngineCookieStore, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QWebEngineCookieStore"), End),
+            new Function(c, "deleteCookie", _n_deleteCookie0, None, Compiled,
+                         qt_QWebEngineCookieStore_deleteCookie_void_QWebEngineCookieStore_QNetworkCookie_QUrl, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QWebEngineCookieStore"), new Param(c, "cookie", "qt.QNetworkCookie"),
+                         new Param(c, "origin", "qt.QUrl"), End),
+            new Function(c, "deleteSessionCookies", _n_deleteSessionCookies0, None, Compiled,
+                         qt_QWebEngineCookieStore_deleteSessionCookies_void_QWebEngineCookieStore, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QWebEngineCookieStore"), End),
+            new Function(c, "loadAllCookies", _n_loadAllCookies0, None, Compiled,
+                         qt_QWebEngineCookieStore_loadAllCookies_void_QWebEngineCookieStore, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QWebEngineCookieStore"), End),
+            new Function(c, "setCookie", _n_setCookie0, None, Compiled,
+                         qt_QWebEngineCookieStore_setCookie_void_QWebEngineCookieStore_QNetworkCookie_QUrl, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QWebEngineCookieStore"), new Param(c, "cookie", "qt.QNetworkCookie"),
+                         new Param(c, "origin", "qt.QUrl"), End),
+            _func[0] = new MemberFunction(c, "event", _n_event0, None, Compiled,
+                                          qt_QWebEngineCookieStore_event_bool_QWebEngineCookieStore_QEvent, Return, "bool", Parameters,
+                                          new Param(c, "this", "qt.QWebEngineCookieStore"), new Param(c, "e", "qt.QEvent"), End),
+            _func[1] = new MemberFunction(c, "eventFilter", _n_eventFilter0, None, Compiled,
+                                          qt_QWebEngineCookieStore_eventFilter_bool_QWebEngineCookieStore_QObject_QEvent, Return, "bool",
+                                          Parameters, new Param(c, "this", "qt.QWebEngineCookieStore"),
+                                          new Param(c, "watched", "qt.QObject"), new Param(c, "event", "qt.QEvent"), End),
             // MISSING: metaObject ("const QMetaObject *"; QWebEngineCookieStore
             // this) MISSING: childEvent (void; QWebEngineCookieStore this,
             // "QChildEvent *" event) // protected MISSING: connectNotify (void;
             // QWebEngineCookieStore this, "const QMetaMethod &" signal) //
             // protected
             _func[2] = new MemberFunction(
-                c, "customEvent", _n_customEvent0, None, Compiled,
-                qt_QWebEngineCookieStore_customEvent_void_QWebEngineCookieStore_QEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QWebEngineCookieStore"),
-                new Param(c, "event", "qt.QEvent"), End),
+                c, "customEvent", _n_customEvent0, None, Compiled, qt_QWebEngineCookieStore_customEvent_void_QWebEngineCookieStore_QEvent,
+                Return, "void", Parameters, new Param(c, "this", "qt.QWebEngineCookieStore"), new Param(c, "event", "qt.QEvent"), End),
             // MISSING: disconnectNotify (void; QWebEngineCookieStore this,
             // "const QMetaMethod &" signal) // protected
             _func[3] = new MemberFunction(
-                c, "timerEvent", _n_timerEvent0, None, Compiled,
-                qt_QWebEngineCookieStore_timerEvent_void_QWebEngineCookieStore_QTimerEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QWebEngineCookieStore"),
-                new Param(c, "event", "qt.QTimerEvent"), End),
+                c, "timerEvent", _n_timerEvent0, None, Compiled, qt_QWebEngineCookieStore_timerEvent_void_QWebEngineCookieStore_QTimerEvent,
+                Return, "void", Parameters, new Param(c, "this", "qt.QWebEngineCookieStore"), new Param(c, "event", "qt.QTimerEvent"), End),
             // static functions
             EndArguments);
         globalScope()->addSymbols(EndArguments);

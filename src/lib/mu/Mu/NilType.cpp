@@ -38,29 +38,17 @@ namespace Mu
         return Value(Pointer(0));
     }
 
-    void NilType::nodeEval(void*, const Node* n, Thread& thread) const
-    {
-        (*n->func()._PointerFunc)(*n, thread);
-    }
+    void NilType::nodeEval(void*, const Node* n, Thread& thread) const { (*n->func()._PointerFunc)(*n, thread); }
 
-    void NilType::outputValue(ostream& o, const Value& value, bool) const
-    {
-        o << "nil";
-    }
+    void NilType::outputValue(ostream& o, const Value& value, bool) const { o << "nil"; }
 
-    void NilType::outputValueRecursive(std::ostream& o, const ValuePointer,
-                                       ValueOutputState&) const
-    {
-        o << "nil";
-    }
+    void NilType::outputValueRecursive(std::ostream& o, const ValuePointer, ValueOutputState&) const { o << "nil"; }
 
     void NilType::load()
     {
         USING_MU_FUNCTION_SYMBOLS;
 
-        scope()->addSymbols(new Function(context(), "nil",
-                                         machineRep()->constantFunc(), Mapped,
-                                         Return, "nil", End),
+        scope()->addSymbols(new Function(context(), "nil", machineRep()->constantFunc(), Mapped, Return, "nil", End),
 
                             EndArguments);
     }

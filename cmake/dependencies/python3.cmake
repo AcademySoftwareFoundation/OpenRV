@@ -8,10 +8,6 @@ SET(_python3_target
     "RV_DEPS_PYTHON3"
 )
 
-SET(_opentimelineio_target
-    "RV_DEPS_OPENTIMELINEIO"
-)
-
 RV_VFX_SET_VARIABLE(_pyside_target CY2023 "RV_DEPS_PYSIDE2" CY2024 "RV_DEPS_PYSIDE6")
 
 SET(PYTHON_VERSION_MAJOR
@@ -33,8 +29,16 @@ SET(RV_DEPS_PYTHON_VERSION_SHORT
     "${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}"
 )
 
+# This version is used for generating src/build/requirements.txt from requirements.txt.in template
+# All platforms install OpenTimelineIO from git to ensure consistent source builds.
 SET(_opentimelineio_version
-    "0.16.0"
+    "0.18.1"
+)
+
+# Construct the full git URL for pip to use in requirements.txt
+# Using this avoids @ symbol conflicts in CONFIGURE_FILE
+SET(_opentimelineio_pip_url
+    "git+https://github.com/AcademySoftwareFoundation/OpenTimelineIO@v${_opentimelineio_version}#egg=OpenTimelineIO"
 )
 
 RV_VFX_SET_VARIABLE(_pyside_version CY2023 "5.15.10" CY2024 "6.5.3")
@@ -43,13 +47,6 @@ SET(_python3_download_url
     "https://github.com/python/cpython/archive/refs/tags/v${_python3_version}.zip"
 )
 RV_VFX_SET_VARIABLE(_python3_download_hash CY2023 "21b32503f31386b37f0c42172dfe5637" CY2024 "392eccd4386936ffcc46ed08057db3e7")
-
-SET(_opentimelineio_download_url
-    "https://github.com/AcademySoftwareFoundation/OpenTimelineIO"
-)
-SET(_opentimelineio_git_tag
-    "v${_opentimelineio_version}"
-)
 
 RV_VFX_SET_VARIABLE(
   _pyside_archive_url
@@ -71,18 +68,8 @@ SET(_build_dir
     ${RV_DEPS_BASE_DIR}/${_python3_target}/build
 )
 
-IF(RV_TARGET_WINDOWS)
-
-  FETCHCONTENT_DECLARE(
-    ${_opentimelineio_target}
-    GIT_REPOSITORY ${_opentimelineio_download_url}
-    GIT_TAG ${_opentimelineio_git_tag}
-    SOURCE_SUBDIR "src" # Avoids the top level CMakeLists.txt
-  )
-
-  FETCHCONTENT_MAKEAVAILABLE(${_opentimelineio_target})
-
-ENDIF()
+# Note: OpenTimelineIO is now installed via requirements.txt from git URL for all platforms.
+# This ensures consistent source builds across Windows, Mac, and Linux.
 
 FETCHCONTENT_DECLARE(
   ${_pyside_target}
@@ -117,8 +104,6 @@ IF(DEFINED RV_DEPS_OPENSSL_INSTALL_DIR)
   LIST(APPEND _python3_make_command ${RV_DEPS_OPENSSL_INSTALL_DIR})
 ENDIF()
 IF(RV_TARGET_WINDOWS)
-  LIST(APPEND _python3_make_command "--opentimelineio-source-dir")
-  LIST(APPEND _python3_make_command ${rv_deps_opentimelineio_SOURCE_DIR})
   LIST(APPEND _python3_make_command "--python-version")
   LIST(APPEND _python3_make_command "${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR}")
 ENDIF()
@@ -249,12 +234,50 @@ ELSE() # Not WINDOWS
   )
 ENDIF()
 
-SET(_requirements_file
-    "${PROJECT_SOURCE_DIR}/src/build/requirements.txt"
+# Generate requirements.txt from template with the OpenTimelineIO version substituted
+SET(_requirements_input_file
+    "${PROJECT_SOURCE_DIR}/src/build/requirements.txt.in"
 )
-SET(_requirements_install_command
-    "${_python3_executable}" -m pip install --upgrade -r "${_requirements_file}"
+SET(_requirements_output_file
+    "${CMAKE_BINARY_DIR}/requirements.txt"
 )
+
+CONFIGURE_FILE(
+    ${_requirements_input_file}
+    ${_requirements_output_file}
+    @ONLY
+)
+
+IF(RV_TARGET_WINDOWS)
+  # On Windows, OpenTimelineIO needs to be built from source and requires
+  # CMake to find the Python libraries. Set CMAKE_ARGS to help pybind11
+  # locate the Python development files.
+  # This is required for both old and new versions of pybind11, but especially
+  # for pybind11 v2.13.6+ which has stricter Python library detection.
+  # Note: pybind11's FindPythonLibsNew.cmake uses PYTHON_LIBRARY (all caps),
+  # PYTHON_INCLUDE_DIR, and PYTHON_EXECUTABLE variables.
+  
+  IF(CMAKE_BUILD_TYPE MATCHES "^Debug$")
+    # For Debug builds, we need to tell OpenTimelineIO to build in debug mode
+    # and link against the debug Python library (python311_d.lib)
+    SET(_requirements_install_command
+        ${CMAKE_COMMAND} -E env
+        "OTIO_CXX_DEBUG_BUILD=1"
+        "CMAKE_ARGS=-DPYTHON_LIBRARY=${_python3_implib} -DPYTHON_INCLUDE_DIR=${_include_dir} -DPYTHON_EXECUTABLE=${_python3_executable}"
+        "${_python3_executable}" -m pip install --upgrade -r "${_requirements_output_file}"
+    )
+  ELSE()
+    SET(_requirements_install_command
+        ${CMAKE_COMMAND} -E env
+        "CMAKE_ARGS=-DPYTHON_LIBRARY=${_python3_implib} -DPYTHON_INCLUDE_DIR=${_include_dir} -DPYTHON_EXECUTABLE=${_python3_executable}"
+        "${_python3_executable}" -m pip install --upgrade -r "${_requirements_output_file}"
+    )
+  ENDIF()
+ELSE()
+  SET(_requirements_install_command
+      "${_python3_executable}" -m pip install --upgrade -r "${_requirements_output_file}"
+  )
+ENDIF()
 
 IF(RV_TARGET_WINDOWS)
   SET(_patch_python3_11_command
@@ -331,11 +354,11 @@ SET(${_python3_target}-requirements-flag
 )
 
 ADD_CUSTOM_COMMAND(
-  COMMENT "Installing requirements from ${_requirements_file}"
+  COMMENT "Installing requirements from ${_requirements_output_file}"
   OUTPUT ${${_python3_target}-requirements-flag}
   COMMAND ${_requirements_install_command}
   COMMAND cmake -E touch ${${_python3_target}-requirements-flag}
-  DEPENDS ${_python3_target} ${_requirements_file}
+  DEPENDS ${_python3_target} ${_requirements_output_file} ${_requirements_input_file}
 )
 
 IF(RV_TARGET_WINDOWS
@@ -347,7 +370,7 @@ IF(RV_TARGET_WINDOWS
     POST_BUILD
     COMMENT "Copying Debug Python lib as a unversionned file for Debug"
     COMMAND cmake -E copy_if_different ${_python3_implib} ${_python_release_libpath}
-    COMMAND cmake -E copy_if_different ${_python3_implib} ${_python_release_in_bin_libpath} DEPENDS ${_python3_target} ${_requirements_file}
+    COMMAND cmake -E copy_if_different ${_python3_implib} ${_python_release_in_bin_libpath} DEPENDS ${_python3_target} ${_requirements_output_file} ${_requirements_input_file}
   )
 ENDIF()
 

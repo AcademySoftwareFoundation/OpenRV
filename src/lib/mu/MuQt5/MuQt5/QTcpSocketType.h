@@ -39,8 +39,7 @@ namespace Mu
         //  Constructors
         //
 
-        QTcpSocketType(Context* context, const char* name,
-                       Class* superClass = 0, Class* superClass2 = 0);
+        QTcpSocketType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QTcpSocketType();
 
@@ -67,8 +66,7 @@ namespace Mu
         virtual void disconnectFromHost();
         virtual void resume();
         virtual void setReadBufferSize(qint64 size);
-        virtual void setSocketOption(QAbstractSocket::SocketOption option,
-                                     const QVariant& value);
+        virtual void setSocketOption(QAbstractSocket::SocketOption option, const QVariant& value);
         virtual QVariant socketOption(QAbstractSocket::SocketOption option);
         virtual bool waitForConnected(int msecs);
         virtual bool waitForDisconnected(int msecs);
@@ -87,11 +85,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance*
-    QTcpSocketType::cachedInstance(const QTcpSocketType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QTcpSocketType::cachedInstance(const QTcpSocketType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

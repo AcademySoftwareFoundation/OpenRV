@@ -37,8 +37,7 @@ namespace TwkFB
 #define restrict __restrict
 #endif
 
-    void Read8Bit::planarConfig(FrameBuffer& fb, int w, int h,
-                                FrameBuffer::DataType type)
+    void Read8Bit::planarConfig(FrameBuffer& fb, int w, int h, FrameBuffer::DataType type)
     {
         vector<string> planeNames(3);
         planeNames[0] = "R";
@@ -47,14 +46,11 @@ namespace TwkFB
         fb.restructurePlanar(w, h, planeNames, type, FrameBuffer::TOPLEFT);
     }
 
-    void Read8Bit::readRGB8(const string& filename, const unsigned char* data,
-                            FrameBuffer& fb, int w, int h, size_t maxBytes,
-                            bool swap, bool useRaw,
-                            unsigned char* deletePointer)
+    void Read8Bit::readRGB8(const string& filename, const unsigned char* data, FrameBuffer& fb, int w, int h, size_t maxBytes, bool swap,
+                            bool useRaw, unsigned char* deletePointer)
     {
-        fb.restructure(
-            w, h, 0, 3, FrameBuffer::UCHAR, useRaw ? (unsigned char*)data : 0,
-            0, FrameBuffer::TOPLEFT, true, 0, 0, useRaw ? deletePointer : 0);
+        fb.restructure(w, h, 0, 3, FrameBuffer::UCHAR, useRaw ? (unsigned char*)data : 0, 0, FrameBuffer::TOPLEFT, true, 0, 0,
+                       useRaw ? deletePointer : 0);
 
         if (useRaw)
         {
@@ -76,14 +72,11 @@ namespace TwkFB
         }
     }
 
-    void Read8Bit::readRGBA8(const string& filename, const unsigned char* data,
-                             FrameBuffer& fb, int w, int h, size_t maxBytes,
-                             bool swap, bool useRaw,
-                             unsigned char* deletePointer)
+    void Read8Bit::readRGBA8(const string& filename, const unsigned char* data, FrameBuffer& fb, int w, int h, size_t maxBytes, bool swap,
+                             bool useRaw, unsigned char* deletePointer)
     {
-        fb.restructure(
-            w, h, 0, 4, FrameBuffer::UCHAR, useRaw ? (unsigned char*)data : 0,
-            0, FrameBuffer::TOPLEFT, true, 0, 0, useRaw ? deletePointer : 0);
+        fb.restructure(w, h, 0, 4, FrameBuffer::UCHAR, useRaw ? (unsigned char*)data : 0, 0, FrameBuffer::TOPLEFT, true, 0, 0,
+                       useRaw ? deletePointer : 0);
 
         if (useRaw)
         {
@@ -105,9 +98,8 @@ namespace TwkFB
         }
     }
 
-    void Read8Bit::readRGB8_PLANAR(const string& filename,
-                                   const unsigned char* data, FrameBuffer& fb,
-                                   int w, int h, size_t maxBytes, bool swap)
+    void Read8Bit::readRGB8_PLANAR(const string& filename, const unsigned char* data, FrameBuffer& fb, int w, int h, size_t maxBytes,
+                                   bool swap)
     {
         planarConfig(fb, w, h, FrameBuffer::UCHAR);
 

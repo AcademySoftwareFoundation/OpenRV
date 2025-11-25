@@ -22,13 +22,9 @@ namespace Mu
     class StackVariable : public Variable
     {
     public:
-        StackVariable(Context* context, const char* name,
-                      const Type* storageClass, int stackPos,
-                      Attributes a = ReadWrite);
+        StackVariable(Context* context, const char* name, const Type* storageClass, int stackPos, Attributes a = ReadWrite);
 
-        StackVariable(Context* context, const char* name,
-                      const char* storageClass, int stackPos,
-                      Attributes a = ReadWrite);
+        StackVariable(Context* context, const char* name, const char* storageClass, int stackPos, Attributes a = ReadWrite);
 
         virtual ~StackVariable();
 

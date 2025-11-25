@@ -20,9 +20,7 @@ namespace IPCore
     class ColorSaturationIPNode : public IPNode
     {
     public:
-        ColorSaturationIPNode(const std::string& name,
-                              const NodeDefinition* def, IPGraph* graph,
-                              GroupIPNode* group = 0);
+        ColorSaturationIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group = 0);
 
         virtual ~ColorSaturationIPNode();
 

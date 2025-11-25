@@ -47,8 +47,7 @@ namespace Mu
         //  Constructors
         //
 
-        QCalendarType(Context* context, const char* name,
-                      Class* superClass = 0);
+        QCalendarType(Context* context, const char* name, Class* superClass = 0);
         virtual ~QCalendarType();
 
         //

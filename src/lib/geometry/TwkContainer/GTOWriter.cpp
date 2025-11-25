@@ -70,10 +70,7 @@ namespace TwkContainer
         }
     }
 
-    bool GTOWriter::shouldWriteProperty(const Property* property) const
-    {
-        return !property->info() || property->info()->isPersistent();
-    }
+    bool GTOWriter::shouldWriteProperty(const Property* property) const { return !property->info() || property->info()->isPersistent(); }
 
     void GTOWriter::writeProperty(bool header, const Property* property)
     {
@@ -82,8 +79,7 @@ namespace TwkContainer
 
         if (property->layoutTrait() == Property::CompoundLayout)
         {
-            cerr << "WARNING: GTOWriter does not understand type of property "
-                 << property->name() << endl;
+            cerr << "WARNING: GTOWriter does not understand type of property " << property->name() << endl;
             return;
         }
 
@@ -94,8 +90,7 @@ namespace TwkContainer
         int zsize = property->zsizeTrait();
         int wsize = property->wsizeTrait();
 
-        if (const StringProperty* sp =
-                dynamic_cast<const StringProperty*>(property))
+        if (const StringProperty* sp = dynamic_cast<const StringProperty*>(property))
         {
             if (header)
             {
@@ -105,9 +100,7 @@ namespace TwkContainer
                     m_writer.intern(s);
                 }
 
-                m_writer.property(property->name().c_str(), type,
-                                  property->size(),
-                                  Gto::Dimensions(xsize, ysize, zsize, wsize),
+                m_writer.property(property->name().c_str(), type, property->size(), Gto::Dimensions(xsize, ysize, zsize, wsize),
                                   interp.c_str());
             }
             else
@@ -123,8 +116,7 @@ namespace TwkContainer
                 m_writer.propertyData(data);
             }
         }
-        else if (const StringPairProperty* sp =
-                     dynamic_cast<const StringPairProperty*>(property))
+        else if (const StringPairProperty* sp = dynamic_cast<const StringPairProperty*>(property))
         {
             if (header)
             {
@@ -136,9 +128,7 @@ namespace TwkContainer
                     m_writer.intern(s1);
                 }
 
-                m_writer.property(property->name().c_str(), type,
-                                  property->size(),
-                                  Gto::Dimensions(xsize, ysize, zsize, wsize),
+                m_writer.property(property->name().c_str(), type, property->size(), Gto::Dimensions(xsize, ysize, zsize, wsize),
                                   interp.c_str());
             }
             else
@@ -160,9 +150,7 @@ namespace TwkContainer
         {
             if (header)
             {
-                m_writer.property(property->name().c_str(), type,
-                                  property->size(),
-                                  Gto::Dimensions(xsize, ysize, zsize, wsize),
+                m_writer.property(property->name().c_str(), type, property->size(), Gto::Dimensions(xsize, ysize, zsize, wsize),
                                   interp.c_str());
             }
             else
@@ -185,8 +173,7 @@ namespace TwkContainer
         {
             const Component::Container& props = component->properties();
             const Component::Components& comps = component->components();
-            const unsigned int flags =
-                component->isTransposable() ? Gto::Matrix : 0;
+            const unsigned int flags = component->isTransposable() ? Gto::Matrix : 0;
             const bool declare = header && (!props.empty() || !comps.empty());
 
             if (declare)
@@ -200,24 +187,21 @@ namespace TwkContainer
         }
     }
 
-    bool GTOWriter::write(ostream& out, const GTOWriter::ObjectVector& objects,
-                          FileType type)
+    bool GTOWriter::write(ostream& out, const GTOWriter::ObjectVector& objects, FileType type)
     {
         if (!m_writer.open(out, type))
             return false;
         return writeInternal(objects, type);
     }
 
-    bool GTOWriter::write(const char* filename,
-                          const GTOWriter::ObjectVector& objects, FileType type)
+    bool GTOWriter::write(const char* filename, const GTOWriter::ObjectVector& objects, FileType type)
     {
         if (!m_writer.open(filename, type))
             return false;
         return writeInternal(objects, type);
     }
 
-    bool GTOWriter::writeInternal(const GTOWriter::ObjectVector& objects,
-                                  FileType type)
+    bool GTOWriter::writeInternal(const GTOWriter::ObjectVector& objects, FileType type)
     {
         if (m_stamp != "")
         {
@@ -249,19 +233,13 @@ namespace TwkContainer
             //  library is being used) just set the ones we know.
             //
 
-            if (protocol == GTO_PROTOCOL_POLYGON
-                || protocol == GTO_PROTOCOL_TRANSFORM
-                || protocol == GTO_PROTOCOL_CATMULL_CLARK
+            if (protocol == GTO_PROTOCOL_POLYGON || protocol == GTO_PROTOCOL_TRANSFORM || protocol == GTO_PROTOCOL_CATMULL_CLARK
                 || protocol == GTO_PROTOCOL_LOOP)
             {
                 version = 2;
             }
-            else if (protocol == GTO_PROTOCOL_NURBS
-                     || protocol == GTO_PROTOCOL_PARTICLE
-                     || protocol == GTO_PROTOCOL_TEXCHANNEL
-                     || protocol == GTO_PROTOCOL_STRAND
-                     || protocol == GTO_PROTOCOL_IMAGE
-                     || protocol == GTO_EXT_PROTOCOL_SECONDARY_STRAND
+            else if (protocol == GTO_PROTOCOL_NURBS || protocol == GTO_PROTOCOL_PARTICLE || protocol == GTO_PROTOCOL_TEXCHANNEL
+                     || protocol == GTO_PROTOCOL_STRAND || protocol == GTO_PROTOCOL_IMAGE || protocol == GTO_EXT_PROTOCOL_SECONDARY_STRAND
                      || protocol == GTO_EXT_PROTOCOL_RIGID_BODY)
             {
                 version = 1;

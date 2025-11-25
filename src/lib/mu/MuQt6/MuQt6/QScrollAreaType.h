@@ -42,8 +42,7 @@ namespace Mu
         //  Constructors
         //
 
-        QScrollAreaType(Context* context, const char* name,
-                        Class* superClass = 0, Class* superClass2 = 0);
+        QScrollAreaType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QScrollAreaType();
 
@@ -66,8 +65,7 @@ namespace Mu
     {
     public:
         virtual ~MuQt_QScrollArea();
-        MuQt_QScrollArea(Pointer muobj, const CallEnvironment*,
-                         QWidget* parent);
+        MuQt_QScrollArea(Pointer muobj, const CallEnvironment*, QWidget* parent);
         virtual bool focusNextPrevChild(bool next);
         virtual QSize sizeHint() const;
 
@@ -102,136 +100,73 @@ namespace Mu
 
         bool event_pub_parent(QEvent* e) { return QScrollArea::event(e); }
 
-        bool eventFilter_pub(QObject* o, QEvent* e)
-        {
-            return eventFilter(o, e);
-        }
+        bool eventFilter_pub(QObject* o, QEvent* e) { return eventFilter(o, e); }
 
-        bool eventFilter_pub_parent(QObject* o, QEvent* e)
-        {
-            return QScrollArea::eventFilter(o, e);
-        }
+        bool eventFilter_pub_parent(QObject* o, QEvent* e) { return QScrollArea::eventFilter(o, e); }
 
         void resizeEvent_pub(QResizeEvent* _p15) { resizeEvent(_p15); }
 
-        void resizeEvent_pub_parent(QResizeEvent* _p15)
-        {
-            QScrollArea::resizeEvent(_p15);
-        }
+        void resizeEvent_pub_parent(QResizeEvent* _p15) { QScrollArea::resizeEvent(_p15); }
 
         void scrollContentsBy_pub(int dx, int dy) { scrollContentsBy(dx, dy); }
 
-        void scrollContentsBy_pub_parent(int dx, int dy)
-        {
-            QScrollArea::scrollContentsBy(dx, dy);
-        }
+        void scrollContentsBy_pub_parent(int dx, int dy) { QScrollArea::scrollContentsBy(dx, dy); }
 
         QSize viewportSizeHint_pub() const { return viewportSizeHint(); }
 
-        QSize viewportSizeHint_pub_parent() const
-        {
-            return QScrollArea::viewportSizeHint();
-        }
+        QSize viewportSizeHint_pub_parent() const { return QScrollArea::viewportSizeHint(); }
 
         bool viewportEvent_pub(QEvent* event) { return viewportEvent(event); }
 
-        bool viewportEvent_pub_parent(QEvent* event)
-        {
-            return QScrollArea::viewportEvent(event);
-        }
+        bool viewportEvent_pub_parent(QEvent* event) { return QScrollArea::viewportEvent(event); }
 
         void contextMenuEvent_pub(QContextMenuEvent* e) { contextMenuEvent(e); }
 
-        void contextMenuEvent_pub_parent(QContextMenuEvent* e)
-        {
-            QScrollArea::contextMenuEvent(e);
-        }
+        void contextMenuEvent_pub_parent(QContextMenuEvent* e) { QScrollArea::contextMenuEvent(e); }
 
-        void dragEnterEvent_pub(QDragEnterEvent* event)
-        {
-            dragEnterEvent(event);
-        }
+        void dragEnterEvent_pub(QDragEnterEvent* event) { dragEnterEvent(event); }
 
-        void dragEnterEvent_pub_parent(QDragEnterEvent* event)
-        {
-            QScrollArea::dragEnterEvent(event);
-        }
+        void dragEnterEvent_pub_parent(QDragEnterEvent* event) { QScrollArea::dragEnterEvent(event); }
 
-        void dragLeaveEvent_pub(QDragLeaveEvent* event)
-        {
-            dragLeaveEvent(event);
-        }
+        void dragLeaveEvent_pub(QDragLeaveEvent* event) { dragLeaveEvent(event); }
 
-        void dragLeaveEvent_pub_parent(QDragLeaveEvent* event)
-        {
-            QScrollArea::dragLeaveEvent(event);
-        }
+        void dragLeaveEvent_pub_parent(QDragLeaveEvent* event) { QScrollArea::dragLeaveEvent(event); }
 
         void dragMoveEvent_pub(QDragMoveEvent* event) { dragMoveEvent(event); }
 
-        void dragMoveEvent_pub_parent(QDragMoveEvent* event)
-        {
-            QScrollArea::dragMoveEvent(event);
-        }
+        void dragMoveEvent_pub_parent(QDragMoveEvent* event) { QScrollArea::dragMoveEvent(event); }
 
         void dropEvent_pub(QDropEvent* event) { dropEvent(event); }
 
-        void dropEvent_pub_parent(QDropEvent* event)
-        {
-            QScrollArea::dropEvent(event);
-        }
+        void dropEvent_pub_parent(QDropEvent* event) { QScrollArea::dropEvent(event); }
 
         void keyPressEvent_pub(QKeyEvent* e) { keyPressEvent(e); }
 
-        void keyPressEvent_pub_parent(QKeyEvent* e)
-        {
-            QScrollArea::keyPressEvent(e);
-        }
+        void keyPressEvent_pub_parent(QKeyEvent* e) { QScrollArea::keyPressEvent(e); }
 
-        void mouseDoubleClickEvent_pub(QMouseEvent* e)
-        {
-            mouseDoubleClickEvent(e);
-        }
+        void mouseDoubleClickEvent_pub(QMouseEvent* e) { mouseDoubleClickEvent(e); }
 
-        void mouseDoubleClickEvent_pub_parent(QMouseEvent* e)
-        {
-            QScrollArea::mouseDoubleClickEvent(e);
-        }
+        void mouseDoubleClickEvent_pub_parent(QMouseEvent* e) { QScrollArea::mouseDoubleClickEvent(e); }
 
         void mouseMoveEvent_pub(QMouseEvent* e) { mouseMoveEvent(e); }
 
-        void mouseMoveEvent_pub_parent(QMouseEvent* e)
-        {
-            QScrollArea::mouseMoveEvent(e);
-        }
+        void mouseMoveEvent_pub_parent(QMouseEvent* e) { QScrollArea::mouseMoveEvent(e); }
 
         void mousePressEvent_pub(QMouseEvent* e) { mousePressEvent(e); }
 
-        void mousePressEvent_pub_parent(QMouseEvent* e)
-        {
-            QScrollArea::mousePressEvent(e);
-        }
+        void mousePressEvent_pub_parent(QMouseEvent* e) { QScrollArea::mousePressEvent(e); }
 
         void mouseReleaseEvent_pub(QMouseEvent* e) { mouseReleaseEvent(e); }
 
-        void mouseReleaseEvent_pub_parent(QMouseEvent* e)
-        {
-            QScrollArea::mouseReleaseEvent(e);
-        }
+        void mouseReleaseEvent_pub_parent(QMouseEvent* e) { QScrollArea::mouseReleaseEvent(e); }
 
         void paintEvent_pub(QPaintEvent* event) { paintEvent(event); }
 
-        void paintEvent_pub_parent(QPaintEvent* event)
-        {
-            QScrollArea::paintEvent(event);
-        }
+        void paintEvent_pub_parent(QPaintEvent* event) { QScrollArea::paintEvent(event); }
 
         void wheelEvent_pub(QWheelEvent* e) { wheelEvent(e); }
 
-        void wheelEvent_pub_parent(QWheelEvent* e)
-        {
-            QScrollArea::wheelEvent(e);
-        }
+        void wheelEvent_pub_parent(QWheelEvent* e) { QScrollArea::wheelEvent(e); }
 
     public:
         const QScrollAreaType* _baseType;
@@ -239,11 +174,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance*
-    QScrollAreaType::cachedInstance(const QScrollAreaType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QScrollAreaType::cachedInstance(const QScrollAreaType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

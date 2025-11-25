@@ -80,12 +80,7 @@ namespace TwkUtil
 
         MbpsCalculator();
 
-        float mbps() const
-        {
-            return (0.0 != m_totalTime)
-                       ? 1.0e-6 * float(m_totalBytes) / m_totalTime
-                       : 0.0;
-        };
+        float mbps() const { return (0.0 != m_totalTime) ? 1.0e-6 * float(m_totalBytes) / m_totalTime : 0.0; };
 
         void resetMbps()
         {
@@ -197,8 +192,7 @@ namespace TwkUtil
     class KernelReadRequestList
     {
     public:
-        KernelReadRequestList(int fd, size_t cs, int nr, size_t total,
-                              void* buffer);
+        KernelReadRequestList(int fd, size_t cs, int nr, size_t total, void* buffer);
         ~KernelReadRequestList();
 
         //
@@ -208,8 +202,7 @@ namespace TwkUtil
         bool update();
 
     private:
-        void handleCompleted(KernelReadRequest* req, long bytesRead,
-                             long errorCode);
+        void handleCompleted(KernelReadRequest* req, long bytesRead, long errorCode);
 
         KernelReadRequest* nextFreeRequest();
 
@@ -247,8 +240,7 @@ namespace TwkUtil
         io_context_t context;
     };
 
-    KernelReadRequestList::KernelReadRequestList(int fd, size_t cs, int nr,
-                                                 size_t total, void* buf)
+    KernelReadRequestList::KernelReadRequestList(int fd, size_t cs, int nr, size_t total, void* buf)
         : fileDescriptor(fd)
         , chunkSize(cs)
         , numRequests(nr)
@@ -278,8 +270,7 @@ namespace TwkUtil
         int ret = io_queue_init(numRequests, &context);
         if (0 > ret)
         {
-            TWK_THROW_EXC_STREAM("io_queue_init returned "
-                                 << ret << ". ASync IO unavailable");
+            TWK_THROW_EXC_STREAM("io_queue_init returned " << ret << ". ASync IO unavailable");
         }
     }
 
@@ -312,19 +303,16 @@ namespace TwkUtil
     //  Handle a completed io request
     //
 
-    void KernelReadRequestList::handleCompleted(KernelReadRequest* req,
-                                                long bytesRead, long errorCode)
+    void KernelReadRequestList::handleCompleted(KernelReadRequest* req, long bytesRead, long errorCode)
     {
         if (0 != errorCode)
         {
-            TWK_THROW_EXC_STREAM(
-                "KernelReadRequestList async read failed: " << errorCode);
+            TWK_THROW_EXC_STREAM("KernelReadRequestList async read failed: " << errorCode);
         }
         if (req->u.c.nbytes != bytesRead)
         {
-            TWK_THROW_EXC_STREAM("KernelReadRequestList async read incomplete ("
-                                 << bytesRead << " bytes out of "
-                                 << req->u.c.nbytes << ")");
+            TWK_THROW_EXC_STREAM("KernelReadRequestList async read incomplete (" << bytesRead << " bytes out of " << req->u.c.nbytes
+                                                                                 << ")");
         }
 
         completedSize += bytesRead;
@@ -345,12 +333,10 @@ namespace TwkUtil
         //  then process all completed requests.
         //
         {
-            int n = io_getevents(context, 1, requestsInFlight,
-                                 &(requestEvents[0]), 0);
+            int n = io_getevents(context, 1, requestsInFlight, &(requestEvents[0]), 0);
             if (1 > n)
             {
-                TWK_THROW_EXC_STREAM("io_getevents returned "
-                                     << n << ". ASync IO unavailable");
+                TWK_THROW_EXC_STREAM("io_getevents returned " << n << ". ASync IO unavailable");
             }
 
             for (int i = 0; i < n; ++i)
@@ -375,8 +361,7 @@ namespace TwkUtil
 
                 size_t reqSize = min(chunkSize, totalSize - requestedSize);
 
-                io_prep_pread(req, fileDescriptor, buffer + requestedSize,
-                              reqSize, requestedSize);
+                io_prep_pread(req, fileDescriptor, buffer + requestedSize, reqSize, requestedSize);
 
                 currentRequests.push_back(req);
                 requestedSize += reqSize;
@@ -386,13 +371,10 @@ namespace TwkUtil
         //
         //  Launch requests
         //
-        int n = io_submit(context, currentRequests.size(),
-                          (struct iocb**)&(currentRequests[0]));
+        int n = io_submit(context, currentRequests.size(), (struct iocb**)&(currentRequests[0]));
         if (currentRequests.size() != n)
         {
-            TWK_THROW_EXC_STREAM("io_submit returned "
-                                 << n << ", expected " << currentRequests.size()
-                                 << ". ASync IO unavailable");
+            TWK_THROW_EXC_STREAM("io_submit returned " << n << ", expected " << currentRequests.size() << ". ASync IO unavailable");
         }
         requestsInFlight += n;
 
@@ -435,8 +417,7 @@ namespace TwkUtil
     class PosixReadRequestList
     {
     public:
-        PosixReadRequestList(int fd, size_t cs, int nr, size_t total,
-                             void* buffer);
+        PosixReadRequestList(int fd, size_t cs, int nr, size_t total, void* buffer);
         ~PosixReadRequestList();
 
         //
@@ -461,8 +442,7 @@ namespace TwkUtil
         char* buffer;
     };
 
-    PosixReadRequestList::PosixReadRequestList(int fd, size_t cs, int nr,
-                                               size_t total, void* buf)
+    PosixReadRequestList::PosixReadRequestList(int fd, size_t cs, int nr, size_t total, void* buf)
         : fileDescriptor(fd)
         , chunkSize(cs)
         , numRequests(nr)
@@ -520,9 +500,7 @@ namespace TwkUtil
             int ret = aio_read(req);
             if (0 > ret)
             {
-                TWK_THROW_EXC_STREAM("aio_read failed (1), returned "
-                                     << errno << ", " << strerror(errno)
-                                     << ". Async IO unavailable");
+                TWK_THROW_EXC_STREAM("aio_read failed (1), returned " << errno << ", " << strerror(errno) << ". Async IO unavailable");
             }
         }
         else
@@ -562,14 +540,11 @@ namespace TwkUtil
                 //  This request is neither complete, nor in progress
                 //
                 {
-                    TWK_THROW_EXC_STREAM("aio_error failed, returned "
-                                         << errno << ", " << strerror(errno)
-                                         << ". ASync IO unavailable");
+                    TWK_THROW_EXC_STREAM("aio_error failed, returned " << errno << ", " << strerror(errno) << ". ASync IO unavailable");
                 }
             }
 
-            if (!i->inUse() && requestedSize < totalSize
-                && requestsInFlight < numRequests)
+            if (!i->inUse() && requestedSize < totalSize && requestsInFlight < numRequests)
             //
             //  This request structure is not in use, and we still need data.
             //
@@ -584,8 +559,7 @@ namespace TwkUtil
                 int ret = aio_read(&(*i));
                 if (0 > ret)
                 {
-                    if (EAGAIN == errno && 1 < numRequests
-                        && 0 < requestsInFlight)
+                    if (EAGAIN == errno && 1 < numRequests && 0 < requestsInFlight)
                     //
                     //  aio_read failed due to lack of resources.  Drop
                     //  the number of in-flight requests allowed and go on.
@@ -596,9 +570,8 @@ namespace TwkUtil
                     }
                     else
                     {
-                        TWK_THROW_EXC_STREAM("aio_read failed (2), returned "
-                                             << errno << ", " << strerror(errno)
-                                             << ". ASync IO unavailable");
+                        TWK_THROW_EXC_STREAM("aio_read failed (2), returned " << errno << ", " << strerror(errno)
+                                                                              << ". ASync IO unavailable");
                     }
                 }
                 else
@@ -619,8 +592,7 @@ namespace TwkUtil
 
     static int bufferingMessageCount = 0;
 
-    FileStream::FileStream(const string& filename, Type type, size_t size,
-                           int maxInFlight, bool deleteOnDestruction)
+    FileStream::FileStream(const string& filename, Type type, size_t size, int maxInFlight, bool deleteOnDestruction)
         : m_filename(filename)
         , m_deleteOnDestruction(deleteOnDestruction)
         , m_rawdata(0)
@@ -635,9 +607,8 @@ namespace TwkUtil
         initialize();
     }
 
-    FileStream::FileStream(const string& filename, size_t startOffset,
-                           size_t readSize, Type type, size_t size,
-                           int maxInFlight, bool deleteOnDestruction)
+    FileStream::FileStream(const string& filename, size_t startOffset, size_t readSize, Type type, size_t size, int maxInFlight,
+                           bool deleteOnDestruction)
         : m_filename(filename)
         , m_deleteOnDestruction(deleteOnDestruction)
         , m_rawdata(0)
@@ -675,9 +646,7 @@ namespace TwkUtil
         //  Open the file
         //
 
-        int direct = (m_type == ASyncNonBuffering || m_type == NonBuffering)
-                         ? O_DIRECT
-                         : 0;
+        int direct = (m_type == ASyncNonBuffering || m_type == NonBuffering) ? O_DIRECT : 0;
         m_file = TwkUtil::open(m_filename.c_str(), O_RDONLY | direct);
 
         if (m_file == -1)
@@ -686,10 +655,9 @@ namespace TwkUtil
             {
                 if (bufferingMessageCount++ < 5)
                 {
-                    cerr
-                        << "WARNING: filesystem does not support direct "
-                           "(unbuffered) reads, falling back to buffered reads."
-                        << endl;
+                    cerr << "WARNING: filesystem does not support direct "
+                            "(unbuffered) reads, falling back to buffered reads."
+                         << endl;
                 }
                 direct = 0;
                 m_type = Buffering;
@@ -698,9 +666,7 @@ namespace TwkUtil
 
             if (m_file == -1)
             {
-                TWK_THROW_EXC_STREAM("Stream: cannot open " << m_filename
-                                                            << " errno "
-                                                            << strerror(errno));
+                TWK_THROW_EXC_STREAM("Stream: cannot open " << m_filename << " errno " << strerror(errno));
             }
         }
 
@@ -757,8 +723,7 @@ namespace TwkUtil
 
             if (readableSize)
             {
-                ReadRequestList list(m_file, m_chunkSize, m_maxInFlight,
-                                     readableSize, m_rawdata);
+                ReadRequestList list(m_file, m_chunkSize, m_maxInFlight, readableSize, m_rawdata);
 
                 while (!list.update())
                     ;
@@ -770,16 +735,14 @@ namespace TwkUtil
             m_rawdata = MemPool::alloc(m_fileSize);
             if (!m_rawdata)
                 TWK_THROW_EXC_STREAM("Out of memory");
-            posix_madvise(m_rawdata, m_fileSize,
-                          POSIX_MADV_SEQUENTIAL | POSIX_MADV_WILLNEED);
+            posix_madvise(m_rawdata, m_fileSize, POSIX_MADV_SEQUENTIAL | POSIX_MADV_WILLNEED);
 
             if (readableSize)
             {
                 if (-1 == read(m_file, m_rawdata, readableSize))
                 {
                     close(m_file);
-                    TWK_THROW_EXC_STREAM("read1: " << strerror(errno) << ": "
-                                                   << m_filename);
+                    TWK_THROW_EXC_STREAM("read1: " << strerror(errno) << ": " << m_filename);
                 }
             }
             close(m_file);
@@ -787,14 +750,12 @@ namespace TwkUtil
         else if (m_type == MemoryMap)
         {
             m_rawdata = mmap(0, m_fileSize, PROT_READ, MAP_SHARED, m_file, 0);
-            posix_madvise(m_rawdata, m_fileSize,
-                          POSIX_MADV_SEQUENTIAL | POSIX_MADV_WILLNEED);
+            posix_madvise(m_rawdata, m_fileSize, POSIX_MADV_SEQUENTIAL | POSIX_MADV_WILLNEED);
 
             if (m_rawdata == MAP_FAILED)
             {
                 close(m_file);
-                TWK_THROW_EXC_STREAM("MMap: " << strerror(errno) << ": "
-                                              << m_filename);
+                TWK_THROW_EXC_STREAM("MMap: " << strerror(errno) << ": " << m_filename);
             }
         }
 
@@ -805,13 +766,10 @@ namespace TwkUtil
         {
             m_file = TwkUtil::open(m_filename.c_str(), O_RDONLY);
             lseek(m_file, readableSize, SEEK_SET);
-            if (-1
-                == read(m_file, ((char*)(m_rawdata)) + readableSize,
-                        leftOverSize))
+            if (-1 == read(m_file, ((char*)(m_rawdata)) + readableSize, leftOverSize))
             {
                 close(m_file);
-                TWK_THROW_EXC_STREAM("read2: " << strerror(errno) << ": "
-                                               << m_filename);
+                TWK_THROW_EXC_STREAM("read2: " << strerror(errno) << ": " << m_filename);
             }
             close(m_file);
         }
@@ -872,8 +830,7 @@ namespace TwkUtil
 
         //  cerr << "completeFunc transferrred " << dwTransferred << endl;
 
-        if (dwTransferred == imp->m_requestSize
-            && imp->m_currentPointer < imp->m_endPointer)
+        if (dwTransferred == imp->m_requestSize && imp->m_currentPointer < imp->m_endPointer)
         {
             void* readLocation = imp->m_currentPointer;
             imp->m_currentPointer += imp->m_requestSize;
@@ -884,8 +841,7 @@ namespace TwkUtil
 
             size_t readSize = imp->m_requestSize;
 
-            if (ReadFileEx(imp->m_file, readLocation, readSize, o,
-                           completeFunc))
+            if (ReadFileEx(imp->m_file, readLocation, readSize, o, completeFunc))
             {
                 imp->m_numActive++;
             }
@@ -905,8 +861,7 @@ namespace TwkUtil
         }
     }
 
-    FileStream::FileStream(const string& filename, Type type, size_t size,
-                           int maxInFlight, bool deleteOnDestruction)
+    FileStream::FileStream(const string& filename, Type type, size_t size, int maxInFlight, bool deleteOnDestruction)
         : m_filename(filename)
         , m_deleteOnDestruction(deleteOnDestruction)
         , m_rawdata(0)
@@ -921,9 +876,8 @@ namespace TwkUtil
         initialize();
     }
 
-    FileStream::FileStream(const string& filename, size_t startOffset,
-                           size_t readSize, Type type, size_t size,
-                           int maxInFlight, bool deleteOnDestruction)
+    FileStream::FileStream(const string& filename, size_t startOffset, size_t readSize, Type type, size_t size, int maxInFlight,
+                           bool deleteOnDestruction)
         : m_filename(filename)
         , m_deleteOnDestruction(deleteOnDestruction)
         , m_rawdata(0)
@@ -980,8 +934,7 @@ namespace TwkUtil
 
         //  cerr << "m_type " << m_type << " asyncnonbuffering " <<
         //  ASyncNonBuffering << endl;
-        if ((m_type == ASyncBuffering || m_type == ASyncNonBuffering)
-            && m_fileSize < imp->m_requestSize * 8)
+        if ((m_type == ASyncBuffering || m_type == ASyncNonBuffering) && m_fileSize < imp->m_requestSize * 8)
         {
             //  cerr << "switching to mmap, size " << m_fileSize << endl;
             m_type = MemoryMap;
@@ -1006,9 +959,8 @@ namespace TwkUtil
 #else
         imp->m_file = CreateFile(
 #endif
-            UNICODE_C_STR(m_filename.c_str()), GENERIC_READ,
-            FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL,
-            OPEN_EXISTING, flags, NULL);
+            UNICODE_C_STR(m_filename.c_str()), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, OPEN_EXISTING,
+            flags, NULL);
 
         //
         //  Move the file pointer if needed
@@ -1039,8 +991,7 @@ namespace TwkUtil
         if (imp->m_file == INVALID_HANDLE_VALUE)
         {
             cout << "THROWING" << endl;
-            TWK_THROW_EXC_STREAM("CreateFile: cannot open "
-                                 << m_filename << " error: " << GetLastError());
+            TWK_THROW_EXC_STREAM("CreateFile: cannot open " << m_filename << " error: " << GetLastError());
         }
 
         if (m_type == Buffering || m_type == NonBuffering)
@@ -1060,24 +1011,20 @@ namespace TwkUtil
         }
         else if (m_type == MemoryMap)
         {
-            imp->m_map =
-                CreateFileMapping(imp->m_file, NULL, PAGE_READONLY, 0, 0, NULL);
+            imp->m_map = CreateFileMapping(imp->m_file, NULL, PAGE_READONLY, 0, 0, NULL);
 
             if (!imp->m_map || imp->m_map == INVALID_HANDLE_VALUE)
             {
                 CloseHandle(imp->m_file);
-                TWK_THROW_EXC_STREAM("CreateFileMapping: cannot open "
-                                     << m_filename);
+                TWK_THROW_EXC_STREAM("CreateFileMapping: cannot open " << m_filename);
             }
 
-            m_rawdata =
-                (void*)MapViewOfFile(imp->m_map, FILE_MAP_READ, 0, 0, 0);
+            m_rawdata = (void*)MapViewOfFile(imp->m_map, FILE_MAP_READ, 0, 0, 0);
 
             if (!m_rawdata)
             {
                 CloseHandle(imp->m_file);
-                TWK_THROW_EXC_STREAM("MapViewOfFile: cannot open "
-                                     << m_filename);
+                TWK_THROW_EXC_STREAM("MapViewOfFile: cannot open " << m_filename);
             }
         }
         else if (m_type == ASyncBuffering || m_type == ASyncNonBuffering)
@@ -1116,12 +1063,9 @@ namespace TwkUtil
                 {
                     //  cerr << "calling ReadFileEx i " << i << " remaining " <<
                     //  remaining << endl;
-                    if (!ReadFileEx(imp->m_file, readLocation,
-                                    imp->m_requestSize, o, completeFunc))
+                    if (!ReadFileEx(imp->m_file, readLocation, imp->m_requestSize, o, completeFunc))
                     {
-                        TWK_THROW_EXC_STREAM("CreateFile: cannot read "
-                                             << m_filename
-                                             << " error: " << GetLastError());
+                        TWK_THROW_EXC_STREAM("CreateFile: cannot read " << m_filename << " error: " << GetLastError());
                     }
 
                     imp->m_numActive++;

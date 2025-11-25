@@ -63,7 +63,7 @@ namespace TwkAudio
         Back_5_1,     // Stereo_2       | FrontCenter       | LowFrequency, |
                       // BackLeft     | BackRight,
         Generic_6_1,  // Generic_5_1    | BackCenter,
-        SDDS_7_1, // Surround_5_1   | FrontLeftOfCenter | FrontRightOfCenter,
+        SDDS_7_1,     // Surround_5_1   | FrontLeftOfCenter | FrontRightOfCenter,
         Surround_7_1, // Surround_5_1   | BackLeft          | BackRight,
         Back_7_1,     // Back_5_1       | SideLeft          | SideRight,
         Generic_9,    // Surround_7_1   | BackCenter,
@@ -71,27 +71,27 @@ namespace TwkAudio
         Generic_11,   // Base8+Heights  | Channel14,
         Generic_12,   // Base8+Heights  | FrontLeftOfCenter | Channel14,
         Generic_13,   // Base8+Heights  | FrontL/ROfCenter | Channel14,
-        Generic_14, // Base8+Heights  | FrontL/ROfCenter+BackCenter | Channel14,
-        Generic_15, // Base8+Heights  | FrontL/ROfCenter+BackCenter |
-                    // Channel14+15,
-        Generic_16, // Base8+Heights  | FrontL/ROfCenter+BackCenter |
-                    // Channel14-16,
-        Generic_17, // Generic_16     | Channel17,
-        Generic_18, // Generic_17     | Channel18,
-        Generic_19, // Generic_18     | Channel19,
-        Generic_20, // Generic_19     | Channel20,
-        Generic_21, // Generic_20     | Channel21,
-        Generic_22, // Generic_21     | Channel22,
-        Generic_23, // Generic_22     | Channel23,
-        Generic_24, // Generic_23     | Channel24,
-        Generic_25, // Generic_24     | Channel25,
-        Generic_26, // Generic_25     | Channel26,
-        Generic_27, // Generic_26     | Channel27,
-        Generic_28, // Generic_27     | Channel28,
-        Generic_29, // Generic_28     | Channel29,
-        Generic_30, // Generic_29     | Channel30,
-        Generic_31, // Generic_30     | Channel31,
-        Generic_32, // Generic_31     | Channel32,
+        Generic_14,   // Base8+Heights  | FrontL/ROfCenter+BackCenter | Channel14,
+        Generic_15,   // Base8+Heights  | FrontL/ROfCenter+BackCenter |
+                      // Channel14+15,
+        Generic_16,   // Base8+Heights  | FrontL/ROfCenter+BackCenter |
+                      // Channel14-16,
+        Generic_17,   // Generic_16     | Channel17,
+        Generic_18,   // Generic_17     | Channel18,
+        Generic_19,   // Generic_18     | Channel19,
+        Generic_20,   // Generic_19     | Channel20,
+        Generic_21,   // Generic_20     | Channel21,
+        Generic_22,   // Generic_21     | Channel22,
+        Generic_23,   // Generic_22     | Channel23,
+        Generic_24,   // Generic_23     | Channel24,
+        Generic_25,   // Generic_24     | Channel25,
+        Generic_26,   // Generic_25     | Channel26,
+        Generic_27,   // Generic_26     | Channel27,
+        Generic_28,   // Generic_27     | Channel28,
+        Generic_29,   // Generic_28     | Channel29,
+        Generic_30,   // Generic_29     | Channel30,
+        Generic_31,   // Generic_30     | Channel31,
+        Generic_32,   // Generic_31     | Channel32,
 
         AC3_5_1,  // FrontLeft   | FrontCenter | FrontRight | SideLeft |
                   // SideRight | LowFrequency
@@ -140,8 +140,7 @@ namespace TwkAudio
 
 #define RIGHT_CHANNEL_WEIGHT(_ch) float((_ch >> 2) & 0xF) / 10.0f
 
-#define MIX_CHANNEL(_ch, _lvol, _rvol) \
-    (_lvol * LEFT_CHANNEL_WEIGHT(_ch) + _rvol * RIGHT_CHANNEL_WEIGHT(_ch))
+#define MIX_CHANNEL(_ch, _lvol, _rvol) (_lvol * LEFT_CHANNEL_WEIGHT(_ch) + _rvol * RIGHT_CHANNEL_WEIGHT(_ch))
 
     enum Channels
     {
@@ -162,8 +161,7 @@ namespace TwkAudio
         RightHeight = SET_CHANNEL_VALUE(13, 0, 10) | Right,
         Channel14 = SET_CHANNEL_VALUE(14, 10, 10) | Center,
         Channel15 = SET_CHANNEL_VALUE(15, 10, 10) | Center,
-        Channel16 =
-            SET_CHANNEL_VALUE(16, 10, 10) | Center, // SDI has 16 channels
+        Channel16 = SET_CHANNEL_VALUE(16, 10, 10) | Center, // SDI has 16 channels
         Channel17 = SET_CHANNEL_VALUE(17, 10, 10) | Center,
         Channel18 = SET_CHANNEL_VALUE(18, 10, 10) | Center,
         Channel19 = SET_CHANNEL_VALUE(19, 10, 10) | Center,
@@ -185,15 +183,9 @@ namespace TwkAudio
     class TWKAUDIO_EXPORT ChannelsVector : public std::vector<Channels>
     {
     public:
-        bool operator==(const ChannelsVector& other) const
-        {
-            return identical(*this, other);
-        }
+        bool operator==(const ChannelsVector& other) const { return identical(*this, other); }
 
-        bool operator!=(const ChannelsVector& other) const
-        {
-            return !identical(*this, other);
-        }
+        bool operator!=(const ChannelsVector& other) const { return !identical(*this, other); }
 
         bool hasAllChannels(const ChannelsVector& b) const;
 
@@ -227,9 +219,7 @@ namespace TwkAudio
     TWKAUDIO_EXPORT std::string formatString(Format f);
     TWKAUDIO_EXPORT size_t formatSizeInBytes(Format f);
 
-    TWKAUDIO_EXPORT void initChannelsMap(const ChannelsVector& a,
-                                         const ChannelsVector& b,
-                                         ChannelsMap& chmap);
+    TWKAUDIO_EXPORT void initChannelsMap(const ChannelsVector& a, const ChannelsVector& b, ChannelsMap& chmap);
 
 } // namespace TwkAudio
 

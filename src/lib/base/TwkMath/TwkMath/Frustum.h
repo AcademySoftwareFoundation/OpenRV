@@ -47,12 +47,10 @@ namespace TwkMath
 
         Frustum() { window(-1, 1, -1, 1, .1, 1000.0); }
 
-        Frustum(value_type left, value_type right, value_type bottom,
-                value_type top, value_type nearPlane, value_type farPlane,
+        Frustum(value_type left, value_type right, value_type bottom, value_type top, value_type nearPlane, value_type farPlane,
                 bool ortho = false);
 
-        Frustum(value_type fovy, value_type aspect, value_type nearPlane,
-                value_type farPlane);
+        Frustum(value_type fovy, value_type aspect, value_type nearPlane, value_type farPlane);
 
         //
         //  Member access
@@ -93,8 +91,7 @@ namespace TwkMath
         //  relative to the near plane.
         //
 
-        void window(value_type left, value_type right, value_type bottom,
-                    value_type top, value_type nearPlane, value_type farPlane,
+        void window(value_type left, value_type right, value_type bottom, value_type top, value_type nearPlane, value_type farPlane,
                     bool ortho = false);
 
         //
@@ -102,16 +99,14 @@ namespace TwkMath
         //  "y". Fov is in radians.
         //
 
-        void perspective(value_type fovyRadians, value_type aspect,
-                         value_type nearPlane, value_type farPlane);
+        void perspective(value_type fovyRadians, value_type aspect, value_type nearPlane, value_type farPlane);
 
         //
         //  RIBPerspective -- just like a RenderMan RIB projection include
         //  the weird FOV thing they do.
         //
 
-        void RIBperspective(value_type RIBfovRadians, value_type aspect,
-                            value_type nearPlane, value_type farPlane);
+        void RIBperspective(value_type RIBfovRadians, value_type aspect, value_type nearPlane, value_type farPlane);
 
         //
         //  Modifying existing frustums.
@@ -121,8 +116,7 @@ namespace TwkMath
         //  device coordinates relative to the existing Frustum. [0.0, 1.0]
         //
 
-        Frustum<T> crop(value_type left, value_type right, value_type bottom,
-                        value_type top) const;
+        Frustum<T> crop(value_type left, value_type right, value_type bottom, value_type top) const;
 
         //
         //  Set values (while keeping the frustum geometry the same). Some
@@ -159,23 +153,18 @@ namespace TwkMath
         bool m_ortho;
     };
 
-    template <typename T>
-    inline Frustum<T>::Frustum(T left, T right, T bottom, T top, T nearPlane,
-                               T farPlane, bool ortho)
+    template <typename T> inline Frustum<T>::Frustum(T left, T right, T bottom, T top, T nearPlane, T farPlane, bool ortho)
     {
         window(left, right, bottom, top, nearPlane, farPlane, ortho);
     }
 
-    template <typename T>
-    inline Frustum<T>::Frustum(T fovy, T aspect, T nearPlane, T farPlane)
+    template <typename T> inline Frustum<T>::Frustum(T fovy, T aspect, T nearPlane, T farPlane)
     {
         perspective(fovy, aspect, nearPlane, farPlane);
     }
 
     /* ajg - nearplane, farplane */
-    template <typename T>
-    inline void Frustum<T>::window(T left, T right, T bottom, T top,
-                                   T nearPlane, T farPlane, bool ortho)
+    template <typename T> inline void Frustum<T>::window(T left, T right, T bottom, T top, T nearPlane, T farPlane, bool ortho)
     {
         m_left = left;
         m_right = right;
@@ -191,9 +180,7 @@ namespace TwkMath
         }
     }
 
-    template <typename T>
-    inline void Frustum<T>::perspective(T fovy, T aspect, T nearPlane,
-                                        T farPlane)
+    template <typename T> inline void Frustum<T>::perspective(T fovy, T aspect, T nearPlane, T farPlane)
     {
         m_top = nearPlane * Math<T>::tan(fovy / T(2));
         m_bottom = -m_top;
@@ -209,9 +196,7 @@ namespace TwkMath
         }
     }
 
-    template <typename T>
-    inline void Frustum<T>::RIBperspective(T fov, T aspect, T nearPlane,
-                                           T farPlane)
+    template <typename T> inline void Frustum<T>::RIBperspective(T fov, T aspect, T nearPlane, T farPlane)
     {
         perspective(fov, aspect, nearPlane, farPlane);
 
@@ -236,20 +221,11 @@ namespace TwkMath
         return true;
     }
 
-    template <typename T> inline T Frustum<T>::fovy() const
-    {
-        return Math<T>::atan2(m_top, m_near) - Math<T>::atan2(m_bottom, m_near);
-    }
+    template <typename T> inline T Frustum<T>::fovy() const { return Math<T>::atan2(m_top, m_near) - Math<T>::atan2(m_bottom, m_near); }
 
-    template <typename T> inline T Frustum<T>::fovx() const
-    {
-        return Math<T>::atan2(m_right, m_near) - Math<T>::atan2(m_left, m_near);
-    }
+    template <typename T> inline T Frustum<T>::fovx() const { return Math<T>::atan2(m_right, m_near) - Math<T>::atan2(m_left, m_near); }
 
-    template <typename T> inline T Frustum<T>::rmanFov() const
-    {
-        return (aspect() > 1.0) ? fovy() : fovx();
-    }
+    template <typename T> inline T Frustum<T>::rmanFov() const { return (aspect() > 1.0) ? fovy() : fovx(); }
 
     template <typename T> T Frustum<T>::aspect() const
     {
@@ -275,8 +251,7 @@ namespace TwkMath
         const float w = m_right - m_left;
         const float h = m_top - m_bottom;
 
-        return vec2(w * (T(1) + v.x) / T(2) + m_left,
-                    h * (T(1) + v.y) / T(2) + m_right);
+        return vec2(w * (T(1) + v.x) / T(2) + m_left, h * (T(1) + v.y) / T(2) + m_right);
     }
 
     template <typename T> Vec2<T> Frustum<T>::toScreen(const Vec2<T>& v)
@@ -288,8 +263,7 @@ namespace TwkMath
         return vec2((v.x - copX) / copX, (v.y - copY) / copY);
     }
 
-    template <typename T>
-    Frustum<T> Frustum<T>::crop(T left, T right, T bottom, T top) const
+    template <typename T> Frustum<T> Frustum<T>::crop(T left, T right, T bottom, T top) const
     {
         T w = m_right - m_left;
         T h = m_top - m_bottom;
@@ -311,8 +285,7 @@ namespace TwkMath
         {
             T u = newNear / m_near;
 
-            window(m_left * u, m_right * u, m_bottom * u, m_top * u, newNear,
-                   m_far, false);
+            window(m_left * u, m_right * u, m_bottom * u, m_top * u, newNear, m_far, false);
         }
     }
 
@@ -331,16 +304,13 @@ namespace TwkMath
             const T B = T(2) / tmb;
             const T C = T(-2) / fmn;
 
-            return matrix_type(A, 0, 0, -rpl / rml, 0, B, 0, -tpb / tmb, 0, 0,
-                               C, -fpn / fmn, 0, 0, 0, T(1));
+            return matrix_type(A, 0, 0, -rpl / rml, 0, B, 0, -tpb / tmb, 0, 0, C, -fpn / fmn, 0, 0, 0, T(1));
         }
         else
         {
             const T n2 = m_near * T(2);
 
-            return matrix_type(n2 / rml, 0, rpl / rml, 0, 0, n2 / tmb,
-                               tpb / tmb, 0, 0, 0, -fpn / fmn,
-                               (-n2 * m_far) / fmn, 0, 0, T(-1), 0);
+            return matrix_type(n2 / rml, 0, rpl / rml, 0, 0, n2 / tmb, tpb / tmb, 0, 0, 0, -fpn / fmn, (-n2 * m_far) / fmn, 0, 0, T(-1), 0);
         }
     }
 

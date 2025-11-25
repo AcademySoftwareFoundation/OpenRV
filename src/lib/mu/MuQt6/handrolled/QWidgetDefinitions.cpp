@@ -18,8 +18,7 @@ static NODE_IMPLEMENTATION(_n_QWidget_setWindowFlags_void_int, void)
     arg0->setWindowFlags(Qt::WindowFlags(NODE_ARG(0, int)));
 }
 
-Pointer qt_QWidget_action_QAction_QWidget_int(Mu::Thread& NODE_THREAD,
-                                              Pointer param_this, int index)
+Pointer qt_QWidget_action_QAction_QWidget_int(Mu::Thread& NODE_THREAD, Pointer param_this, int index)
 {
     MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
     QWidget* arg0 = object<QWidget>(param_this);
@@ -28,6 +27,5 @@ Pointer qt_QWidget_action_QAction_QWidget_int(Mu::Thread& NODE_THREAD,
 
 static NODE_IMPLEMENTATION(_n_action0, Pointer)
 {
-    NODE_RETURN(qt_QWidget_action_QAction_QWidget_int(
-        NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+    NODE_RETURN(qt_QWidget_action_QAction_QWidget_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
 }

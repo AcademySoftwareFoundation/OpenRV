@@ -29,14 +29,10 @@ extern "C"
     // To RGBA10:
     // M                                                             L
     // R9R8R7R6R5R4R3R2R1R0G9G8G7G6G5G4G3G2G1G0B9B8B7B6B5B4B3B2B1B0A1A0
-    TWKFB_EXPORT void
-    convert_ABGR10_to_RGBA10(size_t width, size_t height,
-                             const uint32_t* FASTMEMCPYRESTRICT inBuf,
-                             uint32_t* FASTMEMCPYRESTRICT outBuf);
-    TWKFB_EXPORT void
-    convert_ABGR10_to_RGBA10_MP(size_t width, size_t height,
-                                const uint32_t* FASTMEMCPYRESTRICT inBuf,
-                                uint32_t* FASTMEMCPYRESTRICT outBuf);
+    TWKFB_EXPORT void convert_ABGR10_to_RGBA10(size_t width, size_t height, const uint32_t* FASTMEMCPYRESTRICT inBuf,
+                                               uint32_t* FASTMEMCPYRESTRICT outBuf);
+    TWKFB_EXPORT void convert_ABGR10_to_RGBA10_MP(size_t width, size_t height, const uint32_t* FASTMEMCPYRESTRICT inBuf,
+                                                  uint32_t* FASTMEMCPYRESTRICT outBuf);
 
     // Converts RGB16 to RGB12
     //
@@ -61,16 +57,10 @@ extern "C"
     /// @param outBuf The output buffer.
     /// @param inBufStride The stride of the output buffer in bytes.
     /// @param outBufStride The stride of the input buffer in bytes.
-    TWKFB_EXPORT void
-    convert_RGB16_to_RGB12(size_t width, size_t height,
-                           const void* FASTMEMCPYRESTRICT inBuf,
-                           void* FASTMEMCPYRESTRICT outBuf, size_t inBufStride,
-                           size_t outBufStride);
-    TWKFB_EXPORT void
-    convert_RGB16_to_RGB12_MP(size_t width, size_t height,
-                              const void* FASTMEMCPYRESTRICT inBuf,
-                              void* FASTMEMCPYRESTRICT outBuf,
-                              size_t inBufStride, size_t outBufStride);
+    TWKFB_EXPORT void convert_RGB16_to_RGB12(size_t width, size_t height, const void* FASTMEMCPYRESTRICT inBuf,
+                                             void* FASTMEMCPYRESTRICT outBuf, size_t inBufStride, size_t outBufStride);
+    TWKFB_EXPORT void convert_RGB16_to_RGB12_MP(size_t width, size_t height, const void* FASTMEMCPYRESTRICT inBuf,
+                                                void* FASTMEMCPYRESTRICT outBuf, size_t inBufStride, size_t outBufStride);
 
     /// @brief Converts packed UYVY 10-bits to planar YUV 16-bits.
     ///
@@ -86,16 +76,12 @@ extern "C"
     /// component in bytes.
     /// @param strideCr The stride of the output channel buffer of the Cr
     /// component in bytes.
-    TWKFB_EXPORT void packedUYVY10_to_planarYUV16(
-        size_t width, size_t height, const uint32_t* FASTMEMCPYRESTRICT inBuf,
-        uint16_t* FASTMEMCPYRESTRICT outY, uint16_t* FASTMEMCPYRESTRICT outCb,
-        uint16_t* FASTMEMCPYRESTRICT outCr, size_t strideY, size_t strideCb,
-        size_t strideCr);
-    TWKFB_EXPORT void packedUYVY10_to_planarYUV16_MP(
-        size_t width, size_t height, const uint32_t* FASTMEMCPYRESTRICT inBuf,
-        uint16_t* FASTMEMCPYRESTRICT outY, uint16_t* FASTMEMCPYRESTRICT outCb,
-        uint16_t* FASTMEMCPYRESTRICT outCr, size_t strideY, size_t strideCb,
-        size_t strideCr);
+    TWKFB_EXPORT void packedUYVY10_to_planarYUV16(size_t width, size_t height, const uint32_t* FASTMEMCPYRESTRICT inBuf,
+                                                  uint16_t* FASTMEMCPYRESTRICT outY, uint16_t* FASTMEMCPYRESTRICT outCb,
+                                                  uint16_t* FASTMEMCPYRESTRICT outCr, size_t strideY, size_t strideCb, size_t strideCr);
+    TWKFB_EXPORT void packedUYVY10_to_planarYUV16_MP(size_t width, size_t height, const uint32_t* FASTMEMCPYRESTRICT inBuf,
+                                                     uint16_t* FASTMEMCPYRESTRICT outY, uint16_t* FASTMEMCPYRESTRICT outCb,
+                                                     uint16_t* FASTMEMCPYRESTRICT outCr, size_t strideY, size_t strideCb, size_t strideCr);
 
     /// @brief Converts semi-planar format P210 to planar YUV 422 16-bits.
     ///
@@ -116,12 +102,11 @@ extern "C"
     /// component in bytes.
     /// @param outStrideCr The stride of the output channel buffer of the Cr
     /// component in bytes.
-    TWKFB_EXPORT void planarP210_to_planarYUV422P16(
-        size_t width, size_t height, const uint16_t* FASTMEMCPYRESTRICT inY,
-        const uint16_t* FASTMEMCPYRESTRICT inCbCr, size_t inStrideY,
-        size_t inStrideCbCr, uint16_t* FASTMEMCPYRESTRICT outY,
-        uint16_t* FASTMEMCPYRESTRICT outCb, uint16_t* FASTMEMCPYRESTRICT outCr,
-        size_t outStrideY, size_t outStrideCb, size_t outStrideCr);
+    TWKFB_EXPORT void planarP210_to_planarYUV422P16(size_t width, size_t height, const uint16_t* FASTMEMCPYRESTRICT inY,
+                                                    const uint16_t* FASTMEMCPYRESTRICT inCbCr, size_t inStrideY, size_t inStrideCbCr,
+                                                    uint16_t* FASTMEMCPYRESTRICT outY, uint16_t* FASTMEMCPYRESTRICT outCb,
+                                                    uint16_t* FASTMEMCPYRESTRICT outCr, size_t outStrideY, size_t outStrideCb,
+                                                    size_t outStrideCr);
 
     /// @brief Converts semi-planar format P416 to planar YUV 444 16-bits.
     ///
@@ -142,12 +127,11 @@ extern "C"
     /// component in bytes.
     /// @param strideCr The stride of the output channel buffer of the Cr
     /// component in bytes.
-    TWKFB_EXPORT void planarP416_to_planarYUV444P16(
-        size_t width, size_t height, const uint16_t* FASTMEMCPYRESTRICT inY,
-        const uint16_t* FASTMEMCPYRESTRICT inCbCr, size_t inStrideY,
-        size_t inStrideCbCr, uint16_t* FASTMEMCPYRESTRICT outY,
-        uint16_t* FASTMEMCPYRESTRICT outCb, uint16_t* FASTMEMCPYRESTRICT outCr,
-        size_t outStrideY, size_t outStrideCb, size_t outStrideCr);
+    TWKFB_EXPORT void planarP416_to_planarYUV444P16(size_t width, size_t height, const uint16_t* FASTMEMCPYRESTRICT inY,
+                                                    const uint16_t* FASTMEMCPYRESTRICT inCbCr, size_t inStrideY, size_t inStrideCbCr,
+                                                    uint16_t* FASTMEMCPYRESTRICT outY, uint16_t* FASTMEMCPYRESTRICT outCb,
+                                                    uint16_t* FASTMEMCPYRESTRICT outCr, size_t outStrideY, size_t outStrideCb,
+                                                    size_t outStrideCr);
 
     /// @brief Converts packed AYUV 64-bits (16 bits per channel) to planar YUVA
     /// 16-bits.
@@ -167,9 +151,8 @@ extern "C"
     /// component in bytes.
     /// @param strideA The stride of the output channel buffer of the A
     /// component in bytes.
-    TWKFB_EXPORT void packedAYUV64_to_planarYUVA16(
-        size_t width, size_t height, const uint8_t* inBuf, uint16_t* outY,
-        uint16_t* outCb, uint16_t* outCr, uint16_t* outA);
+    TWKFB_EXPORT void packedAYUV64_to_planarYUVA16(size_t width, size_t height, const uint8_t* inBuf, uint16_t* outY, uint16_t* outCb,
+                                                   uint16_t* outCr, uint16_t* outA);
 
     /// @brief Converts packed UYVY 16-bits to planar YUV 16-bits.
     ///
@@ -185,16 +168,12 @@ extern "C"
     /// component in bytes.
     /// @param strideCr The stride of the output channel buffer of the Cr
     /// component in bytes.
-    TWKFB_EXPORT void packedUYVY16_to_planarYUV16(
-        size_t width, size_t height, const uint16_t* FASTMEMCPYRESTRICT inBuf,
-        uint16_t* FASTMEMCPYRESTRICT outY, uint16_t* FASTMEMCPYRESTRICT outCb,
-        uint16_t* FASTMEMCPYRESTRICT outCr, size_t strideY, size_t strideCb,
-        size_t strideCr);
-    TWKFB_EXPORT void packedUYVY16_to_planarYUV16_MP(
-        size_t width, size_t height, const uint16_t* FASTMEMCPYRESTRICT inBuf,
-        uint16_t* FASTMEMCPYRESTRICT outY, uint16_t* FASTMEMCPYRESTRICT outCb,
-        uint16_t* FASTMEMCPYRESTRICT outCr, size_t strideY, size_t strideCb,
-        size_t strideCr);
+    TWKFB_EXPORT void packedUYVY16_to_planarYUV16(size_t width, size_t height, const uint16_t* FASTMEMCPYRESTRICT inBuf,
+                                                  uint16_t* FASTMEMCPYRESTRICT outY, uint16_t* FASTMEMCPYRESTRICT outCb,
+                                                  uint16_t* FASTMEMCPYRESTRICT outCr, size_t strideY, size_t strideCb, size_t strideCr);
+    TWKFB_EXPORT void packedUYVY16_to_planarYUV16_MP(size_t width, size_t height, const uint16_t* FASTMEMCPYRESTRICT inBuf,
+                                                     uint16_t* FASTMEMCPYRESTRICT outY, uint16_t* FASTMEMCPYRESTRICT outCb,
+                                                     uint16_t* FASTMEMCPYRESTRICT outCr, size_t strideY, size_t strideCb, size_t strideCr);
 
     /// @brief Converts packed UVYA 16-bits to planar YUVA 16-bits.
     ///
@@ -213,16 +192,14 @@ extern "C"
     /// component in bytes.
     /// @param strideA The stride of the output channel buffer of the A
     /// component in bytes.
-    TWKFB_EXPORT void packedUVYA16_to_planarYUVA16(
-        size_t width, size_t height, const uint64_t* FASTMEMCPYRESTRICT inBuf,
-        uint16_t* FASTMEMCPYRESTRICT outY, uint16_t* FASTMEMCPYRESTRICT outCb,
-        uint16_t* FASTMEMCPYRESTRICT outCr, uint16_t* FASTMEMCPYRESTRICT outA,
-        size_t strideY, size_t strideCb, size_t strideCr, size_t strideA);
-    TWKFB_EXPORT void packedUVYA16_to_planarYUVA16_MP(
-        size_t width, size_t height, const uint64_t* FASTMEMCPYRESTRICT inBuf,
-        uint16_t* FASTMEMCPYRESTRICT outY, uint16_t* FASTMEMCPYRESTRICT outCb,
-        uint16_t* FASTMEMCPYRESTRICT outCr, uint16_t* FASTMEMCPYRESTRICT outA,
-        size_t strideY, size_t strideCb, size_t strideCr, size_t strideA);
+    TWKFB_EXPORT void packedUVYA16_to_planarYUVA16(size_t width, size_t height, const uint64_t* FASTMEMCPYRESTRICT inBuf,
+                                                   uint16_t* FASTMEMCPYRESTRICT outY, uint16_t* FASTMEMCPYRESTRICT outCb,
+                                                   uint16_t* FASTMEMCPYRESTRICT outCr, uint16_t* FASTMEMCPYRESTRICT outA, size_t strideY,
+                                                   size_t strideCb, size_t strideCr, size_t strideA);
+    TWKFB_EXPORT void packedUVYA16_to_planarYUVA16_MP(size_t width, size_t height, const uint64_t* FASTMEMCPYRESTRICT inBuf,
+                                                      uint16_t* FASTMEMCPYRESTRICT outY, uint16_t* FASTMEMCPYRESTRICT outCb,
+                                                      uint16_t* FASTMEMCPYRESTRICT outCr, uint16_t* FASTMEMCPYRESTRICT outA, size_t strideY,
+                                                      size_t strideCb, size_t strideCr, size_t strideA);
 
     /// @brief Converts packed YUV-444 10-bits to semi-planar YUV-422 16-bits
     /// (P216)
@@ -234,16 +211,12 @@ extern "C"
     /// @param outBufCbCr The output buffer CbCr
     /// @param inBufStride The stride of the output buffer in bytes.
     /// @param outBufStride The stride of the input buffer in bytes.
-    TWKFB_EXPORT void packedYUV444_10bits_to_P216(
-        size_t width, size_t height, const uint32_t* FASTMEMCPYRESTRICT inBuf,
-        uint16_t* FASTMEMCPYRESTRICT outBufY,
-        uint16_t* FASTMEMCPYRESTRICT outBufCbC, size_t inBufStride,
-        size_t outBufStride, bool flip);
-    TWKFB_EXPORT void packedYUV444_10bits_to_P216_MP(
-        size_t width, size_t height, const uint32_t* FASTMEMCPYRESTRICT inBuf,
-        uint16_t* FASTMEMCPYRESTRICT outBufY,
-        uint16_t* FASTMEMCPYRESTRICT outBufCbC, size_t inBufStride,
-        size_t outBufStride, bool flip);
+    TWKFB_EXPORT void packedYUV444_10bits_to_P216(size_t width, size_t height, const uint32_t* FASTMEMCPYRESTRICT inBuf,
+                                                  uint16_t* FASTMEMCPYRESTRICT outBufY, uint16_t* FASTMEMCPYRESTRICT outBufCbC,
+                                                  size_t inBufStride, size_t outBufStride, bool flip);
+    TWKFB_EXPORT void packedYUV444_10bits_to_P216_MP(size_t width, size_t height, const uint32_t* FASTMEMCPYRESTRICT inBuf,
+                                                     uint16_t* FASTMEMCPYRESTRICT outBufY, uint16_t* FASTMEMCPYRESTRICT outBufCbC,
+                                                     size_t inBufStride, size_t outBufStride, bool flip);
 
     /// @brief Converts packed BGRA 64-bits BE to packed ABGR 64-bits LE.
     ///
@@ -252,12 +225,10 @@ extern "C"
     /// @param inBuf The input buffer.
     /// @param outBuf The output buffer.
     /// @param outStride The stride of the output buffer in bytes.
-    TWKFB_EXPORT void packedBGRA64BE_to_packedABGR64LE(
-        size_t width, size_t height, const uint64_t* FASTMEMCPYRESTRICT inBuf,
-        uint64_t* FASTMEMCPYRESTRICT outBuf, size_t outStride);
-    TWKFB_EXPORT void packedBGRA64BE_to_packedABGR64LE_MP(
-        size_t width, size_t height, const uint64_t* FASTMEMCPYRESTRICT inBuf,
-        uint64_t* FASTMEMCPYRESTRICT outBuf, size_t outStride);
+    TWKFB_EXPORT void packedBGRA64BE_to_packedABGR64LE(size_t width, size_t height, const uint64_t* FASTMEMCPYRESTRICT inBuf,
+                                                       uint64_t* FASTMEMCPYRESTRICT outBuf, size_t outStride);
+    TWKFB_EXPORT void packedBGRA64BE_to_packedABGR64LE_MP(size_t width, size_t height, const uint64_t* FASTMEMCPYRESTRICT inBuf,
+                                                          uint64_t* FASTMEMCPYRESTRICT outBuf, size_t outStride);
 
 #ifdef __cplusplus
 }

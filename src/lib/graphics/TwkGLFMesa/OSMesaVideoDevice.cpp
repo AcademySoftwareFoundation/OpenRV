@@ -23,9 +23,7 @@ namespace TwkGLF
         OSMesaContext context;
     };
 
-    OSMesaVideoDevice::OSMesaVideoDevice(VideoModule* m, int w, int h,
-                                         bool alpha, bool floatbuffer,
-                                         bool topleft)
+    OSMesaVideoDevice::OSMesaVideoDevice(VideoModule* m, int w, int h, bool alpha, bool floatbuffer, bool topleft)
         : TwkGLF::GLVideoDevice(m, "mesa", VideoDevice::ImageOutput)
         , m_width(w)
         , m_height(h)
@@ -37,12 +35,11 @@ namespace TwkGLF
     {
         m_imp = new OSMesaImp();
 
-        m_imp->context =
-            OSMesaCreateContextExt(alpha ? OSMESA_RGBA : OSMESA_RGB,
-                                   0,  // depth bits
-                                   8,  // stencil bits
-                                   0,  // accum bits
-                                   0); // share context
+        m_imp->context = OSMesaCreateContextExt(alpha ? OSMESA_RGBA : OSMESA_RGB,
+                                                0,  // depth bits
+                                                8,  // stencil bits
+                                                0,  // accum bits
+                                                0); // share context
     }
 
     OSMesaVideoDevice::~OSMesaVideoDevice()
@@ -51,15 +48,9 @@ namespace TwkGLF
         delete m_imp;
     }
 
-    static OSMesaVideoDevice::VoidFunc GetAddressProc(const char* name)
-    {
-        return OSMesaGetProcAddress(name);
-    }
+    static OSMesaVideoDevice::VoidFunc GetAddressProc(const char* name) { return OSMesaGetProcAddress(name); }
 
-    OSMesaVideoDevice::ProcAddressFunc OSMesaVideoDevice::mesaProcAddressFunc()
-    {
-        return GetAddressProc;
-    }
+    OSMesaVideoDevice::ProcAddressFunc OSMesaVideoDevice::mesaProcAddressFunc() { return GetAddressProc; }
 
     void OSMesaVideoDevice::resize(int w, int h, bool alpha)
     {
@@ -69,12 +60,11 @@ namespace TwkGLF
 
         OSMesaDestroyContext(m_imp->context);
 
-        m_imp->context =
-            OSMesaCreateContextExt(alpha ? OSMESA_RGBA : OSMESA_RGB,
-                                   0,  // depth bits
-                                   8,  // stencil bits
-                                   0,  // accum bits
-                                   0); // share context
+        m_imp->context = OSMesaCreateContextExt(alpha ? OSMESA_RGBA : OSMESA_RGB,
+                                                0,  // depth bits
+                                                8,  // stencil bits
+                                                0,  // accum bits
+                                                0); // share context
     }
 
     size_t OSMesaVideoDevice::width() const { return m_width; }
@@ -94,17 +84,14 @@ namespace TwkGLF
         }
         else
         {
-            cout << "WARNING: OSMesaVideoDevice::makeCurrent requires FB"
-                 << endl;
+            cout << "WARNING: OSMesaVideoDevice::makeCurrent requires FB" << endl;
             GLVideoDevice::makeCurrent();
         }
     }
 
     void OSMesaVideoDevice::makeCurrent(TwkFB::FrameBuffer* fb) const
     {
-        OSMesaMakeCurrent(m_imp->context, fb->pixels<void>(),
-                          m_float ? GL_FLOAT : GL_UNSIGNED_BYTE, fb->width(),
-                          fb->height());
+        OSMesaMakeCurrent(m_imp->context, fb->pixels<void>(), m_float ? GL_FLOAT : GL_UNSIGNED_BYTE, fb->width(), fb->height());
 
         if (m_topleft)
         {
@@ -118,9 +105,6 @@ namespace TwkGLF
         GLVideoDevice::makeCurrent();
     }
 
-    string OSMesaVideoDevice::hardwareIdentification() const
-    {
-        return "osmesa";
-    }
+    string OSMesaVideoDevice::hardwareIdentification() const { return "osmesa"; }
 
 } // namespace TwkGLF

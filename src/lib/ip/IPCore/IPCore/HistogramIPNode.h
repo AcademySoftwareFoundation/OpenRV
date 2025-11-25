@@ -21,8 +21,7 @@ namespace IPCore
     class HistogramIPNode : public IPNode
     {
     public:
-        HistogramIPNode(const std::string& name, const NodeDefinition* def,
-                        IPGraph* graph, GroupIPNode* group = 0);
+        HistogramIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group = 0);
 
         virtual ~HistogramIPNode();
 

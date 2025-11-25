@@ -39,8 +39,7 @@ namespace Mu
         //  Constructors
         //
 
-        QStackedLayoutType(Context* context, const char* name,
-                           Class* superClass = 0, Class* superClass2 = 0);
+        QStackedLayoutType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QStackedLayoutType();
 
@@ -64,10 +63,8 @@ namespace Mu
     public:
         virtual ~MuQt_QStackedLayout();
         MuQt_QStackedLayout(Pointer muobj, const CallEnvironment*);
-        MuQt_QStackedLayout(Pointer muobj, const CallEnvironment*,
-                            QWidget* parent);
-        MuQt_QStackedLayout(Pointer muobj, const CallEnvironment*,
-                            QLayout* parentLayout);
+        MuQt_QStackedLayout(Pointer muobj, const CallEnvironment*, QWidget* parent);
+        MuQt_QStackedLayout(Pointer muobj, const CallEnvironment*, QLayout* parentLayout);
         virtual void addItem(QLayoutItem* item);
         virtual int count() const;
         virtual bool hasHeightForWidth() const;
@@ -92,11 +89,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance*
-    QStackedLayoutType::cachedInstance(const QStackedLayoutType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QStackedLayoutType::cachedInstance(const QStackedLayoutType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

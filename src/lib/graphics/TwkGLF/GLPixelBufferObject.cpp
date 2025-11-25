@@ -39,8 +39,7 @@ namespace TwkGLF
     class BufferObject
     {
     public:
-        BufferObject(GLenum target, GLenum usage, unsigned int num_bytes,
-                     unsigned int alignment);
+        BufferObject(GLenum target, GLenum usage, unsigned int num_bytes, unsigned int alignment);
         ~BufferObject();
 
         void bind(); // will create the buffer object if it is not created yet
@@ -80,8 +79,7 @@ namespace TwkGLF
     };
 
     //------------------------------------------------------------------------------
-    BufferObject::BufferObject(GLenum target, GLenum usage,
-                               unsigned int num_bytes, unsigned int alignment)
+    BufferObject::BufferObject(GLenum target, GLenum usage, unsigned int num_bytes, unsigned int alignment)
         : _id(0)
         , _target(target)
         , _usage(usage)
@@ -151,9 +149,7 @@ namespace TwkGLF
 
         glBindBuffer(_target, 0);
 
-        RV_LOG(
-            "BufferObject::unbind -- _id = %d, size = %u kB alignment = %u\n",
-            _id, _numBytes / 1024, _alignment);
+        RV_LOG("BufferObject::unbind -- _id = %d, size = %u kB alignment = %u\n", _id, _numBytes / 1024, _alignment);
     }
 
     //------------------------------------------------------------------------------
@@ -172,8 +168,7 @@ namespace TwkGLF
                     ptrdiff_t ptr = reinterpret_cast<ptrdiff_t>(_mappedPtr);
                     unsigned int offset = (ptr % _alignment);
                     _alignmentOffset = (offset > 0) ? (_alignment - offset) : 0;
-                    _mappedPtr =
-                        reinterpret_cast<void*>(ptr + _alignmentOffset);
+                    _mappedPtr = reinterpret_cast<void*>(ptr + _alignmentOffset);
                 }
                 unbind();
             }
@@ -254,16 +249,12 @@ namespace TwkGLF
     }
 
     //==============================================================================
-    GLPixelBufferObject::GLPixelBufferObject(GLPixelBufferObject::PackDir d,
-                                             unsigned int num_bytes,
-                                             unsigned int alignment)
+    GLPixelBufferObject::GLPixelBufferObject(GLPixelBufferObject::PackDir d, unsigned int num_bytes, unsigned int alignment)
     {
         RV_ASSERT_INTERNAL(d != FROM_GPU || alignment <= 1);
 
-        _bufferObject = new BufferObject(
-            d == TO_GPU ? GL_PIXEL_UNPACK_BUFFER : GL_PIXEL_PACK_BUFFER,
-            d == TO_GPU ? GL_STREAM_DRAW : GL_STREAM_READ, num_bytes,
-            alignment);
+        _bufferObject = new BufferObject(d == TO_GPU ? GL_PIXEL_UNPACK_BUFFER : GL_PIXEL_PACK_BUFFER,
+                                         d == TO_GPU ? GL_STREAM_DRAW : GL_STREAM_READ, num_bytes, alignment);
     }
 
     //------------------------------------------------------------------------------
@@ -294,43 +285,25 @@ namespace TwkGLF
     void GLPixelBufferObject::unmap() { _bufferObject->unmap(); }
 
     //------------------------------------------------------------------------------
-    void GLPixelBufferObject::resize(unsigned int num_bytes)
-    {
-        _bufferObject->resize(num_bytes);
-    }
+    void GLPixelBufferObject::resize(unsigned int num_bytes) { _bufferObject->resize(num_bytes); }
 
     //------------------------------------------------------------------------------
     void GLPixelBufferObject::release() { _bufferObject->release(); }
 
     //------------------------------------------------------------------------------
-    unsigned int GLPixelBufferObject::getSize() const
-    {
-        return _bufferObject->getSize();
-    }
+    unsigned int GLPixelBufferObject::getSize() const { return _bufferObject->getSize(); }
 
     //------------------------------------------------------------------------------
-    void* GLPixelBufferObject::getMappedPtr()
-    {
-        return _bufferObject->getMappedPtr();
-    }
+    void* GLPixelBufferObject::getMappedPtr() { return _bufferObject->getMappedPtr(); }
 
     //------------------------------------------------------------------------------
-    unsigned int GLPixelBufferObject::getOffset() const
-    {
-        return _bufferObject->getOffset();
-    }
+    unsigned int GLPixelBufferObject::getOffset() const { return _bufferObject->getOffset(); }
 
     //------------------------------------------------------------------------------
-    void GLPixelBufferObject::copyBufferData(void* data, unsigned size)
-    {
-        return _bufferObject->copyBufferData(data, size);
-    }
+    void GLPixelBufferObject::copyBufferData(void* data, unsigned size) { return _bufferObject->copyBufferData(data, size); }
 
     //------------------------------------------------------------------------------
-    bool GLPixelBufferObject::isValid() const
-    {
-        return _bufferObject->getId() != 0;
-    }
+    bool GLPixelBufferObject::isValid() const { return _bufferObject->getId() != 0; }
 
     //------------------------------------------------------------------------------
     GLuint GLPixelBufferObject::getId() const { return _bufferObject->getId(); }
@@ -338,8 +311,7 @@ namespace TwkGLF
     //------------------------------------------------------------------------------
     GLPixelBufferObject::PackDir GLPixelBufferObject::getPackDir() const
     {
-        return _bufferObject->getTarget() == GL_PIXEL_UNPACK_BUFFER ? TO_GPU
-                                                                    : FROM_GPU;
+        return _bufferObject->getTarget() == GL_PIXEL_UNPACK_BUFFER ? TO_GPU : FROM_GPU;
     }
 
 } // namespace TwkGLF

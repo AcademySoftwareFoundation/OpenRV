@@ -37,8 +37,7 @@ namespace Mu
         //  Constructors
         //
 
-        QTableWidgetItemType(Context* context, const char* name,
-                             Class* superClass = 0);
+        QTableWidgetItemType(Context* context, const char* name, Class* superClass = 0);
         virtual ~QTableWidgetItemType();
 
         //

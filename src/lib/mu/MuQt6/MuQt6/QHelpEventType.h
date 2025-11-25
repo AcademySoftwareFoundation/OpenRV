@@ -37,8 +37,7 @@ namespace Mu
         //  Constructors
         //
 
-        QHelpEventType(Context* context, const char* name,
-                       Class* superClass = 0);
+        QHelpEventType(Context* context, const char* name, Class* superClass = 0);
         virtual ~QHelpEventType();
 
         //

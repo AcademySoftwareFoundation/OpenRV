@@ -25,8 +25,7 @@ namespace TwkQtCoreUtil
     //    postToQObject(std::bind(&QObject::setObjectName, &o, "hello"), &o);
     //
 
-    template <typename F>
-    static void postToQObject(F&& fun, QObject* obj = qApp)
+    template <typename F> static void postToQObject(F&& fun, QObject* obj = qApp)
     {
         //
         //  Creates a queued connection with a dummy object and the incoming
@@ -37,8 +36,7 @@ namespace TwkQtCoreUtil
         //
 
         QObject src;
-        QObject::connect(&src, &QObject::destroyed, obj, std::forward<F>(fun),
-                         Qt::QueuedConnection);
+        QObject::connect(&src, &QObject::destroyed, obj, std::forward<F>(fun), Qt::QueuedConnection);
     }
 
 } // namespace TwkQtCoreUtil

@@ -14,6 +14,7 @@
 #include <TwkUtil/Notifier.h>
 #include <TwkApp/Menu.h>
 #include <RvApp/RvSession.h>
+#include <memory>
 
 class QAction;
 class QActionGroup;
@@ -36,6 +37,7 @@ namespace Rv
     class RvBottomViewToolBar;
     class RvSourceEditor;
     class DisplayLink;
+    class UIBlockingEventNode;
 
     class RvDocument
         : public QMainWindow
@@ -75,10 +77,7 @@ namespace Rv
 
         RvTopViewToolBar* topViewToolBar() const { return m_topViewToolBar; };
 
-        RvBottomViewToolBar* bottomViewToolBar() const
-        {
-            return m_bottomViewToolBar;
-        }
+        RvBottomViewToolBar* bottomViewToolBar() const { return m_bottomViewToolBar; }
 
         void setDocumentDisabled(bool window, bool menuBarOnly = false);
 
@@ -127,6 +126,8 @@ namespace Rv
 
         void initializeSession();
 
+        void setUIBlocked(bool blocked);
+
     protected:
         // Overrides for TwkUtil::Notifier
         virtual bool receive(Notifier*, Notifier*, MessageId, MessageData*);
@@ -147,15 +148,15 @@ namespace Rv
         void mergeMenu(const TwkApp::Menu*, bool shortcuts = true);
         void convert(QMenu*, const TwkApp::Menu*, bool shortcuts);
 
-        void closeEvent(QCloseEvent*);
-        void changeEvent(QEvent*);
-        bool event(QEvent*);
-        void moveEvent(QMoveEvent*);
+        void closeEvent(QCloseEvent*) override;
+        void changeEvent(QEvent*) override;
+        bool event(QEvent*) override;
+        void moveEvent(QMoveEvent*) override;
+        void resizeEvent(QResizeEvent*) override;
 
         void setBuildMenu();
 
-        void rebuildGLView(bool stereo, bool vsync, bool dbl, int, int, int,
-                           int);
+        void rebuildGLView(bool stereo, bool vsync, bool dbl, int, int, int, int);
 
     private:
         RvSession* m_session;
@@ -188,6 +189,8 @@ namespace Rv
         bool m_vsyncDisabled;
         RvSourceEditor* m_sourceEditor;
         DisplayLink* m_displayLink;
+        QWidget* m_blockingOverlay;
+        std::unique_ptr<UIBlockingEventNode> m_uiBlockingEventNode;
     };
 
 } // namespace Rv

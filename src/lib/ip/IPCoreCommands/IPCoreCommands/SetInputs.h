@@ -28,8 +28,7 @@ namespace IPCore
         public:
             typedef TwkApp::Command Command;
 
-            SetInputsInfo(const std::string& name,
-                          TwkApp::CommandInfo::UndoType type);
+            SetInputsInfo(const std::string& name, TwkApp::CommandInfo::UndoType type);
             virtual ~SetInputsInfo();
             virtual Command* newCommand() const;
         };
@@ -42,8 +41,7 @@ namespace IPCore
             SetInputs(const SetInputsInfo*);
             virtual ~SetInputs();
 
-            void setArgs(IPGraph* graph, const std::string& name,
-                         const StringVector& inputs);
+            void setArgs(IPGraph* graph, const std::string& name, const StringVector& inputs);
 
             virtual void doit();
             virtual void undo();

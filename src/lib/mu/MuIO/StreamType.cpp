@@ -45,13 +45,9 @@ namespace Mu
 
     Object* StreamType::newObject() const { return new Stream(this); }
 
-    void StreamType::deleteObject(Object* obj) const
-    {
-        delete static_cast<StreamType::Stream*>(obj);
-    }
+    void StreamType::deleteObject(Object* obj) const { delete static_cast<StreamType::Stream*>(obj); }
 
-    void StreamType::outputValue(ostream& o, const Value& value,
-                                 bool full) const
+    void StreamType::outputValue(ostream& o, const Value& value, bool full) const
     {
         Stream* s = reinterpret_cast<Stream*>(value._Pointer);
 
@@ -67,8 +63,7 @@ namespace Mu
         }
     }
 
-    void StreamType::outputValueRecursive(ostream& o, const ValuePointer vp,
-                                          ValueOutputState& state) const
+    void StreamType::outputValueRecursive(ostream& o, const ValuePointer vp, ValueOutputState& state) const
     {
         if (vp)
         {
@@ -97,24 +92,19 @@ namespace Mu
 
         s->addSymbols(new ReferenceType(c, "stream&", this),
 
-                      new Function(c, "stream", BaseFunctions::dereference,
-                                   Cast, Return, tn, Args, rn, End),
+                      new Function(c, "stream", BaseFunctions::dereference, Cast, Return, tn, Args, rn, End),
 
                       EndArguments);
 
         globalScope()->addSymbols(
 
-            new Function(c, "print", StreamType::print, None, Return, "void",
-                         Args, tn, End),
+            new Function(c, "print", StreamType::print, None, Return, "void", Args, tn, End),
 
-            new Function(c, "=", BaseFunctions::assign, AsOp, Return, rn, Args,
-                         rn, tn, End),
+            new Function(c, "=", BaseFunctions::assign, AsOp, Return, rn, Args, rn, tn, End),
 
-            new Function(c, "!", StreamType::eval, None, Return, "bool", Args,
-                         tn, End),
+            new Function(c, "!", StreamType::eval, None, Return, "bool", Args, tn, End),
 
-            new Function(c, "bool", StreamType::toBool, None, Return, "bool",
-                         Args, tn, End),
+            new Function(c, "bool", StreamType::toBool, None, Return, "bool", Args, tn, End),
 
             EndArguments);
 
@@ -126,39 +116,27 @@ namespace Mu
             new SymbolicConstant(c, "EofBit", "int", Value(int(ios::eofbit))),
 
             new SymbolicConstant(c, "Beginning", "int", Value(int(ios::beg))),
-            new SymbolicConstant(c, "Current", "int", Value(int(ios::cur))),
-            new SymbolicConstant(c, "End", "int", Value(int(ios::end))),
+            new SymbolicConstant(c, "Current", "int", Value(int(ios::cur))), new SymbolicConstant(c, "End", "int", Value(int(ios::end))),
 
-            new SymbolicConstant(c, "Append", "int", Value(int(ios::app))),
-            new SymbolicConstant(c, "AtEnd", "int", Value(int(ios::ate))),
-            new SymbolicConstant(c, "Binary", "int", Value(int(ios::binary))),
-            new SymbolicConstant(c, "In", "int", Value(int(ios::in))),
-            new SymbolicConstant(c, "Out", "int", Value(int(ios::out))),
-            new SymbolicConstant(c, "Truncate", "int", Value(int(ios::trunc))),
+            new SymbolicConstant(c, "Append", "int", Value(int(ios::app))), new SymbolicConstant(c, "AtEnd", "int", Value(int(ios::ate))),
+            new SymbolicConstant(c, "Binary", "int", Value(int(ios::binary))), new SymbolicConstant(c, "In", "int", Value(int(ios::in))),
+            new SymbolicConstant(c, "Out", "int", Value(int(ios::out))), new SymbolicConstant(c, "Truncate", "int", Value(int(ios::trunc))),
 
-            new Function(c, "bad", StreamType::bad, None, Return, "bool", Args,
-                         tn, End),
+            new Function(c, "bad", StreamType::bad, None, Return, "bool", Args, tn, End),
 
-            new Function(c, "eof", StreamType::eof, None, Return, "bool", Args,
-                         tn, End),
+            new Function(c, "eof", StreamType::eof, None, Return, "bool", Args, tn, End),
 
-            new Function(c, "fail", StreamType::fail, None, Return, "bool",
-                         Args, tn, End),
+            new Function(c, "fail", StreamType::fail, None, Return, "bool", Args, tn, End),
 
-            new Function(c, "good", StreamType::good, None, Return, "bool",
-                         Args, tn, End),
+            new Function(c, "good", StreamType::good, None, Return, "bool", Args, tn, End),
 
-            new Function(c, "clear", StreamType::clear, None, Return, "void",
-                         Args, tn, End),
+            new Function(c, "clear", StreamType::clear, None, Return, "void", Args, tn, End),
 
-            new Function(c, "clear", StreamType::clear, None, Return, "void",
-                         Args, tn, "int", End),
+            new Function(c, "clear", StreamType::clear, None, Return, "void", Args, tn, "int", End),
 
-            new Function(c, "rdstate", StreamType::rdstate, None, Return, "int",
-                         Args, tn, End),
+            new Function(c, "rdstate", StreamType::rdstate, None, Return, "int", Args, tn, End),
 
-            new Function(c, "setstate", StreamType::setstate, None, Return,
-                         "void", Args, tn, "int", End),
+            new Function(c, "setstate", StreamType::setstate, None, Return, "void", Args, tn, "int", End),
 
             EndArguments);
     }

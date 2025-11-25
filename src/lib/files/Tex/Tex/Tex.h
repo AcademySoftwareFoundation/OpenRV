@@ -20,12 +20,9 @@ namespace Tex
 
     //******************************************************************************
     // This function will read the two matrices OUTOF the tex file
-    void GetMatrices(const char* fileName, TwkMath::Mat44f& camera,
-                     TwkMath::Mat44f& screen, bool doTransposed);
+    void GetMatrices(const char* fileName, TwkMath::Mat44f& camera, TwkMath::Mat44f& screen, bool doTransposed);
 
-    void GetMatrices(const char* fileName, const char* texPath,
-                     TwkMath::Mat44f& camera, TwkMath::Mat44f& screen,
-                     bool doTransposed);
+    void GetMatrices(const char* fileName, const char* texPath, TwkMath::Mat44f& camera, TwkMath::Mat44f& screen, bool doTransposed);
 
 } // End namespace Tex
 

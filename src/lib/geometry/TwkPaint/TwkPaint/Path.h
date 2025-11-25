@@ -132,8 +132,7 @@ namespace TwkPaint
         //  width.
         //
 
-        void computeGeometry(JoinStyle, CapStyle, TextureStyle, Algorithm,
-                             bool smooth = true, float smoothInterval = 1.0,
+        void computeGeometry(JoinStyle, CapStyle, TextureStyle, Algorithm, bool smooth = true, float smoothInterval = 1.0,
                              bool splatOnly = false);
 
         const PointArray& outputPoints() const { return m_rPoints; }
@@ -142,10 +141,7 @@ namespace TwkPaint
 
         const IndexTriangleArray& outputTriangles() const { return m_rTris; }
 
-        const ScalarArray& outputDirectionalities() const
-        {
-            return m_rDirectionCoords;
-        }
+        const ScalarArray& outputDirectionalities() const { return m_rDirectionCoords; }
 
         const PointArray& filteredPoints() const { return m_fpoints; }
 
@@ -153,39 +149,24 @@ namespace TwkPaint
 
     protected:
         void smooth(float);
-        void addStamp(const float dir, Point, float, Color, PointArray&,
-                      PointArray&, IndexTriangleArray&, ScalarArray&,
-                      ColorArray&);
-        void filterPoints(PointArray&, ScalarArray&, ScalarArray&, ColorArray&,
-                          PointTypeVector&, bool);
-        void computeSegmentQuads(SegmentVector&, const PointArray& fpoints,
-                                 const ScalarArray& fwidths,
-                                 const ColorArray& fcolors,
+        void addStamp(const float dir, Point, float, Color, PointArray&, PointArray&, IndexTriangleArray&, ScalarArray&, ColorArray&);
+        void filterPoints(PointArray&, ScalarArray&, ScalarArray&, ColorArray&, PointTypeVector&, bool);
+        void computeSegmentQuads(SegmentVector&, const PointArray& fpoints, const ScalarArray& fwidths, const ColorArray& fcolors,
                                  const PointTypeVector&, bool);
 
-        void computeJoins(JoinVector& joins, const SegmentVector& segments,
-                          const PointArray& fpoints, const ScalarArray& fwidths,
-                          const ColorArray& fcolors,
-                          const PointTypeVector& pointTypes, bool);
+        void computeJoins(JoinVector& joins, const SegmentVector& segments, const PointArray& fpoints, const ScalarArray& fwidths,
+                          const ColorArray& fcolors, const PointTypeVector& pointTypes, bool);
 
-        void buildSegmentGeometry(const Segment& segment, Join& j0,
-                                  const float dir0, Join& j1, const float dir1,
-                                  PointArray& rPoints, PointArray& rTexCoords,
-                                  IndexTriangleArray& rTris,
-                                  ScalarArray& rDirectionCoords);
+        void buildSegmentGeometry(const Segment& segment, Join& j0, const float dir0, Join& j1, const float dir1, PointArray& rPoints,
+                                  PointArray& rTexCoords, IndexTriangleArray& rTris, ScalarArray& rDirectionCoords);
 
-        void buildJoin(JoinStyle, const Join& j, const float dir,
-                       PointArray& rPoints, PointArray& rTexCoords,
-                       IndexTriangleArray& rTris,
+        void buildJoin(JoinStyle, const Join& j, const float dir, PointArray& rPoints, PointArray& rTexCoords, IndexTriangleArray& rTris,
                        ScalarArray& rDirectionCoords);
 
-        void buildCap(CapStyle cs, const Join& j, const float directionality,
-                      PointArray& rPoints, PointArray& rTexCoords,
+        void buildCap(CapStyle cs, const Join& j, const float directionality, PointArray& rPoints, PointArray& rTexCoords,
                       IndexTriangleArray& rTris, ScalarArray& rDirectionCoords);
 
-        void sampleCentripetalCatmull(const Point p0, const Point p1,
-                                      const Point p2, const Point p3, size_t n,
-                                      PointArray& newPoints);
+        void sampleCentripetalCatmull(const Point p0, const Point p1, const Point p2, const Point p3, size_t n, PointArray& newPoints);
 
     private:
         Scalar m_width;

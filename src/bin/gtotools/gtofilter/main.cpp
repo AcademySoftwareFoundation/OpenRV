@@ -89,8 +89,7 @@ void gather(RawDataBase* db, FullProperties& all)
     }
 }
 
-void filter(RawDataBase* db, FullProperties& properties, const char* include,
-            const char* exclude)
+void filter(RawDataBase* db, FullProperties& properties, const char* include, const char* exclude)
 {
     for (size_t i = 0; i < properties.size(); i++)
     {
@@ -144,29 +143,23 @@ void filter(RawDataBase* db, FullProperties& properties, const char* include,
 
         if (include && imatch && exclude && ematch)
         {
-            cout << "gtomerge: including " << fp.name
-                 << " despite matching include and exclude pattern" << endl;
+            cout << "gtomerge: including " << fp.name << " despite matching include and exclude pattern" << endl;
         }
-        else if ((include && !exclude && !imatch)
-                 || (!include && exclude && ematch)
-                 || (include && !imatch && exclude && ematch))
+        else if ((include && !exclude && !imatch) || (!include && exclude && ematch) || (include && !imatch && exclude && ematch))
         {
             Object* o = fp.object;
             Component* c = fp.component;
             Property* p = fp.property;
 
-            c->properties.erase(
-                find(c->properties.begin(), c->properties.end(), p));
+            c->properties.erase(find(c->properties.begin(), c->properties.end(), p));
 
             if (c->properties.empty())
             {
-                fp.componentList->erase(find(fp.componentList->begin(),
-                                             fp.componentList->end(), c));
+                fp.componentList->erase(find(fp.componentList->begin(), fp.componentList->end(), c));
 
                 if (fp.object->components.empty())
                 {
-                    db->objects.erase(
-                        find(db->objects.begin(), db->objects.end(), o));
+                    db->objects.erase(find(db->objects.begin(), db->objects.end(), o));
                 }
             }
         }
@@ -178,14 +171,11 @@ void filter(RawDataBase* db, FullProperties& properties, const char* include,
 
     size_t n = db->objects.size();
 
-    db->objects.erase(
-        remove_if(db->objects.begin(), db->objects.end(), Empty_p()),
-        db->objects.end());
+    db->objects.erase(remove_if(db->objects.begin(), db->objects.end(), Empty_p()), db->objects.end());
 
     if (verbose && n != db->objects.size())
     {
-        cout << "gtofilter: removed " << (n - db->objects.size())
-             << " empty objects from input" << endl;
+        cout << "gtofilter: removed " << (n - db->objects.size()) << " empty objects from input" << endl;
     }
 }
 

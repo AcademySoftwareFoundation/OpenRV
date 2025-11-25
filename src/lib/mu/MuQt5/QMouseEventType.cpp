@@ -49,106 +49,91 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    int qt_QMouseEvent_button_int_QMouseEvent(Mu::Thread& NODE_THREAD,
-                                              Pointer param_this)
+    int qt_QMouseEvent_button_int_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMouseEvent* arg0 = getqpointer<QMouseEventType>(param_this);
         return int(arg0->button());
     }
 
-    int qt_QMouseEvent_buttons_int_QMouseEvent(Mu::Thread& NODE_THREAD,
-                                               Pointer param_this)
+    int qt_QMouseEvent_buttons_int_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMouseEvent* arg0 = getqpointer<QMouseEventType>(param_this);
         return int(arg0->buttons());
     }
 
-    int qt_QMouseEvent_flags_int_QMouseEvent(Mu::Thread& NODE_THREAD,
-                                             Pointer param_this)
+    int qt_QMouseEvent_flags_int_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMouseEvent* arg0 = getqpointer<QMouseEventType>(param_this);
         return int(arg0->flags());
     }
 
-    Pointer qt_QMouseEvent_globalPos_QPoint_QMouseEvent(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this)
+    Pointer qt_QMouseEvent_globalPos_QPoint_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMouseEvent* arg0 = getqpointer<QMouseEventType>(param_this);
         return makeqtype<QPointType>(c, arg0->globalPos(), "qt.QPoint");
     }
 
-    int qt_QMouseEvent_globalX_int_QMouseEvent(Mu::Thread& NODE_THREAD,
-                                               Pointer param_this)
+    int qt_QMouseEvent_globalX_int_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMouseEvent* arg0 = getqpointer<QMouseEventType>(param_this);
         return arg0->globalX();
     }
 
-    int qt_QMouseEvent_globalY_int_QMouseEvent(Mu::Thread& NODE_THREAD,
-                                               Pointer param_this)
+    int qt_QMouseEvent_globalY_int_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMouseEvent* arg0 = getqpointer<QMouseEventType>(param_this);
         return arg0->globalY();
     }
 
-    Pointer qt_QMouseEvent_localPos_QPointF_QMouseEvent(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this)
+    Pointer qt_QMouseEvent_localPos_QPointF_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMouseEvent* arg0 = getqpointer<QMouseEventType>(param_this);
         return makeqtype<QPointFType>(c, arg0->localPos(), "qt.QPointF");
     }
 
-    Pointer qt_QMouseEvent_pos_QPoint_QMouseEvent(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this)
+    Pointer qt_QMouseEvent_pos_QPoint_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMouseEvent* arg0 = getqpointer<QMouseEventType>(param_this);
         return makeqtype<QPointType>(c, arg0->pos(), "qt.QPoint");
     }
 
-    Pointer
-    qt_QMouseEvent_screenPos_QPointF_QMouseEvent(Mu::Thread& NODE_THREAD,
-                                                 Pointer param_this)
+    Pointer qt_QMouseEvent_screenPos_QPointF_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMouseEvent* arg0 = getqpointer<QMouseEventType>(param_this);
         return makeqtype<QPointFType>(c, arg0->screenPos(), "qt.QPointF");
     }
 
-    int qt_QMouseEvent_source_int_QMouseEvent(Mu::Thread& NODE_THREAD,
-                                              Pointer param_this)
+    int qt_QMouseEvent_source_int_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMouseEvent* arg0 = getqpointer<QMouseEventType>(param_this);
         return int(arg0->source());
     }
 
-    Pointer
-    qt_QMouseEvent_windowPos_QPointF_QMouseEvent(Mu::Thread& NODE_THREAD,
-                                                 Pointer param_this)
+    Pointer qt_QMouseEvent_windowPos_QPointF_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMouseEvent* arg0 = getqpointer<QMouseEventType>(param_this);
         return makeqtype<QPointFType>(c, arg0->windowPos(), "qt.QPointF");
     }
 
-    int qt_QMouseEvent_x_int_QMouseEvent(Mu::Thread& NODE_THREAD,
-                                         Pointer param_this)
+    int qt_QMouseEvent_x_int_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMouseEvent* arg0 = getqpointer<QMouseEventType>(param_this);
         return arg0->x();
     }
 
-    int qt_QMouseEvent_y_int_QMouseEvent(Mu::Thread& NODE_THREAD,
-                                         Pointer param_this)
+    int qt_QMouseEvent_y_int_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMouseEvent* arg0 = getqpointer<QMouseEventType>(param_this);
@@ -157,81 +142,62 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(_n_button0, int)
     {
-        NODE_RETURN(qt_QMouseEvent_button_int_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QMouseEvent_button_int_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_buttons0, int)
     {
-        NODE_RETURN(qt_QMouseEvent_buttons_int_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QMouseEvent_buttons_int_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_flags0, int)
     {
-        NODE_RETURN(qt_QMouseEvent_flags_int_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QMouseEvent_flags_int_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_globalPos0, Pointer)
     {
-        NODE_RETURN(qt_QMouseEvent_globalPos_QPoint_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QMouseEvent_globalPos_QPoint_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_globalX0, int)
     {
-        NODE_RETURN(qt_QMouseEvent_globalX_int_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QMouseEvent_globalX_int_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_globalY0, int)
     {
-        NODE_RETURN(qt_QMouseEvent_globalY_int_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QMouseEvent_globalY_int_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_localPos0, Pointer)
     {
-        NODE_RETURN(qt_QMouseEvent_localPos_QPointF_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QMouseEvent_localPos_QPointF_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_pos0, Pointer)
     {
-        NODE_RETURN(qt_QMouseEvent_pos_QPoint_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QMouseEvent_pos_QPoint_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_screenPos0, Pointer)
     {
-        NODE_RETURN(qt_QMouseEvent_screenPos_QPointF_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QMouseEvent_screenPos_QPointF_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_source0, int)
     {
-        NODE_RETURN(qt_QMouseEvent_source_int_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QMouseEvent_source_int_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_windowPos0, Pointer)
     {
-        NODE_RETURN(qt_QMouseEvent_windowPos_QPointF_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QMouseEvent_windowPos_QPointF_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
-    static NODE_IMPLEMENTATION(_n_x0, int)
-    {
-        NODE_RETURN(qt_QMouseEvent_x_int_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_x0, int) { NODE_RETURN(qt_QMouseEvent_x_int_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
-    static NODE_IMPLEMENTATION(_n_y0, int)
-    {
-        NODE_RETURN(qt_QMouseEvent_y_int_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_y0, int) { NODE_RETURN(qt_QMouseEvent_y_int_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
     void QMouseEventType::load()
     {
@@ -250,13 +216,11 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
                    new MemberVariable(c, "native", "qt.NativeObject"),
 
@@ -283,58 +247,32 @@ namespace Mu
             // button, flags Qt::MouseButtons buttons, flags
             // Qt::KeyboardModifiers modifiers, flags Qt::MouseEventSource
             // source)
-            new Function(c, "button", _n_button0, None, Compiled,
-                         qt_QMouseEvent_button_int_QMouseEvent, Return, "int",
-                         Parameters, new Param(c, "this", "qt.QMouseEvent"),
-                         End),
-            new Function(c, "buttons", _n_buttons0, None, Compiled,
-                         qt_QMouseEvent_buttons_int_QMouseEvent, Return, "int",
-                         Parameters, new Param(c, "this", "qt.QMouseEvent"),
-                         End),
-            new Function(c, "flags", _n_flags0, None, Compiled,
-                         qt_QMouseEvent_flags_int_QMouseEvent, Return, "int",
-                         Parameters, new Param(c, "this", "qt.QMouseEvent"),
-                         End),
-            new Function(c, "globalPos", _n_globalPos0, None, Compiled,
-                         qt_QMouseEvent_globalPos_QPoint_QMouseEvent, Return,
-                         "qt.QPoint", Parameters,
+            new Function(c, "button", _n_button0, None, Compiled, qt_QMouseEvent_button_int_QMouseEvent, Return, "int", Parameters,
                          new Param(c, "this", "qt.QMouseEvent"), End),
-            new Function(c, "globalX", _n_globalX0, None, Compiled,
-                         qt_QMouseEvent_globalX_int_QMouseEvent, Return, "int",
-                         Parameters, new Param(c, "this", "qt.QMouseEvent"),
-                         End),
-            new Function(c, "globalY", _n_globalY0, None, Compiled,
-                         qt_QMouseEvent_globalY_int_QMouseEvent, Return, "int",
-                         Parameters, new Param(c, "this", "qt.QMouseEvent"),
-                         End),
-            new Function(c, "localPos", _n_localPos0, None, Compiled,
-                         qt_QMouseEvent_localPos_QPointF_QMouseEvent, Return,
-                         "qt.QPointF", Parameters,
+            new Function(c, "buttons", _n_buttons0, None, Compiled, qt_QMouseEvent_buttons_int_QMouseEvent, Return, "int", Parameters,
                          new Param(c, "this", "qt.QMouseEvent"), End),
-            new Function(c, "pos", _n_pos0, None, Compiled,
-                         qt_QMouseEvent_pos_QPoint_QMouseEvent, Return,
-                         "qt.QPoint", Parameters,
+            new Function(c, "flags", _n_flags0, None, Compiled, qt_QMouseEvent_flags_int_QMouseEvent, Return, "int", Parameters,
                          new Param(c, "this", "qt.QMouseEvent"), End),
-            new Function(c, "screenPos", _n_screenPos0, None, Compiled,
-                         qt_QMouseEvent_screenPos_QPointF_QMouseEvent, Return,
-                         "qt.QPointF", Parameters,
+            new Function(c, "globalPos", _n_globalPos0, None, Compiled, qt_QMouseEvent_globalPos_QPoint_QMouseEvent, Return, "qt.QPoint",
+                         Parameters, new Param(c, "this", "qt.QMouseEvent"), End),
+            new Function(c, "globalX", _n_globalX0, None, Compiled, qt_QMouseEvent_globalX_int_QMouseEvent, Return, "int", Parameters,
                          new Param(c, "this", "qt.QMouseEvent"), End),
-            new Function(c, "source", _n_source0, None, Compiled,
-                         qt_QMouseEvent_source_int_QMouseEvent, Return, "int",
-                         Parameters, new Param(c, "this", "qt.QMouseEvent"),
-                         End),
-            new Function(c, "windowPos", _n_windowPos0, None, Compiled,
-                         qt_QMouseEvent_windowPos_QPointF_QMouseEvent, Return,
-                         "qt.QPointF", Parameters,
+            new Function(c, "globalY", _n_globalY0, None, Compiled, qt_QMouseEvent_globalY_int_QMouseEvent, Return, "int", Parameters,
                          new Param(c, "this", "qt.QMouseEvent"), End),
-            new Function(c, "x", _n_x0, None, Compiled,
-                         qt_QMouseEvent_x_int_QMouseEvent, Return, "int",
-                         Parameters, new Param(c, "this", "qt.QMouseEvent"),
-                         End),
-            new Function(c, "y", _n_y0, None, Compiled,
-                         qt_QMouseEvent_y_int_QMouseEvent, Return, "int",
-                         Parameters, new Param(c, "this", "qt.QMouseEvent"),
-                         End),
+            new Function(c, "localPos", _n_localPos0, None, Compiled, qt_QMouseEvent_localPos_QPointF_QMouseEvent, Return, "qt.QPointF",
+                         Parameters, new Param(c, "this", "qt.QMouseEvent"), End),
+            new Function(c, "pos", _n_pos0, None, Compiled, qt_QMouseEvent_pos_QPoint_QMouseEvent, Return, "qt.QPoint", Parameters,
+                         new Param(c, "this", "qt.QMouseEvent"), End),
+            new Function(c, "screenPos", _n_screenPos0, None, Compiled, qt_QMouseEvent_screenPos_QPointF_QMouseEvent, Return, "qt.QPointF",
+                         Parameters, new Param(c, "this", "qt.QMouseEvent"), End),
+            new Function(c, "source", _n_source0, None, Compiled, qt_QMouseEvent_source_int_QMouseEvent, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QMouseEvent"), End),
+            new Function(c, "windowPos", _n_windowPos0, None, Compiled, qt_QMouseEvent_windowPos_QPointF_QMouseEvent, Return, "qt.QPointF",
+                         Parameters, new Param(c, "this", "qt.QMouseEvent"), End),
+            new Function(c, "x", _n_x0, None, Compiled, qt_QMouseEvent_x_int_QMouseEvent, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QMouseEvent"), End),
+            new Function(c, "y", _n_y0, None, Compiled, qt_QMouseEvent_y_int_QMouseEvent, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QMouseEvent"), End),
             // static functions
             EndArguments);
         globalScope()->addSymbols(EndArguments);

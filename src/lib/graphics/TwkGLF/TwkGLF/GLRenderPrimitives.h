@@ -25,8 +25,7 @@ namespace TwkGLF
     //
     struct VertexAttribute
     {
-        VertexAttribute(std::string name, GLenum datatype, int dimension,
-                        int offset, int stride)
+        VertexAttribute(std::string name, GLenum datatype, int dimension, int offset, int stride)
             : m_name(name)
             , m_dataType(datatype)
             , m_dimension(dimension)
@@ -76,9 +75,7 @@ namespace TwkGLF
         {
         }
 
-        PrimitiveData(GLvoid* databuffer, GLvoid* indexbuffer,
-                      GLenum primitivetype, size_t vertexno, size_t primitiveno,
-                      size_t size)
+        PrimitiveData(GLvoid* databuffer, GLvoid* indexbuffer, GLenum primitivetype, size_t vertexno, size_t primitiveno, size_t size)
             : m_dataBuffer(databuffer)
             , m_indexBuffer(indexbuffer)
             , m_primitiveType(primitivetype)
@@ -126,8 +123,7 @@ namespace TwkGLF
         // including the current program id, primitive types, data types, vertex
         // attributes, etc.
         //
-        RenderPrimitives(const GLProgram*, PrimitiveData&, VertexAttributeList&,
-                         GLVBO::GLVBOVector&);
+        RenderPrimitives(const GLProgram*, PrimitiveData&, VertexAttributeList&, GLVBO::GLVBOVector&);
 
         ~RenderPrimitives();
 

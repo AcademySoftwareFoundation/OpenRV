@@ -47,9 +47,7 @@ BonjourServiceBrowser::~BonjourServiceBrowser()
 
 void BonjourServiceBrowser::browseForServiceType(const QString& serviceType)
 {
-    DNSServiceErrorType err =
-        DNSServiceBrowse(&dnssref, 0, 0, serviceType.toUtf8().constData(), 0,
-                         bonjourBrowseReply, this);
+    DNSServiceErrorType err = DNSServiceBrowse(&dnssref, 0, 0, serviceType.toUtf8().constData(), 0, bonjourBrowseReply, this);
     if (err != kDNSServiceErr_NoError)
     {
         emit error(err);
@@ -63,10 +61,8 @@ void BonjourServiceBrowser::browseForServiceType(const QString& serviceType)
         }
         else
         {
-            bonjourSocket =
-                new QSocketNotifier(sockfd, QSocketNotifier::Read, this);
-            connect(bonjourSocket, SIGNAL(activated(int)), this,
-                    SLOT(bonjourSocketReadyRead()));
+            bonjourSocket = new QSocketNotifier(sockfd, QSocketNotifier::Read, this);
+            connect(bonjourSocket, SIGNAL(activated(int)), this, SLOT(bonjourSocketReadyRead()));
         }
     }
 }
@@ -78,13 +74,10 @@ void BonjourServiceBrowser::bonjourSocketReadyRead()
         emit error(err);
 }
 
-void BonjourServiceBrowser::bonjourBrowseReply(
-    DNSServiceRef, DNSServiceFlags flags, quint32,
-    DNSServiceErrorType errorCode, const char* serviceName, const char* regType,
-    const char* replyDomain, void* context)
+void BonjourServiceBrowser::bonjourBrowseReply(DNSServiceRef, DNSServiceFlags flags, quint32, DNSServiceErrorType errorCode,
+                                               const char* serviceName, const char* regType, const char* replyDomain, void* context)
 {
-    BonjourServiceBrowser* serviceBrowser =
-        static_cast<BonjourServiceBrowser*>(context);
+    BonjourServiceBrowser* serviceBrowser = static_cast<BonjourServiceBrowser*>(context);
     if (errorCode != kDNSServiceErr_NoError)
     {
         emit serviceBrowser->error(errorCode);
@@ -103,8 +96,7 @@ void BonjourServiceBrowser::bonjourBrowseReply(
         }
         if (!(flags & kDNSServiceFlagsMoreComing))
         {
-            emit serviceBrowser->currentBonjourRecordsChanged(
-                serviceBrowser->bonjourRecords);
+            emit serviceBrowser->currentBonjourRecordsChanged(serviceBrowser->bonjourRecords);
         }
     }
 }

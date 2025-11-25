@@ -60,10 +60,7 @@ namespace Rv
 
         void postInitialize();
 
-        const RvGraph& rvgraph() const
-        {
-            return *static_cast<RvGraph*>(m_graph);
-        }
+        const RvGraph& rvgraph() const { return *static_cast<RvGraph*>(m_graph); }
 
         RvGraph& rvgraph() { return *static_cast<RvGraph*>(m_graph); }
 
@@ -86,9 +83,7 @@ namespace Rv
         //         ReadFailedExc (if some of the files worked)
         //
 
-        void readUnorganizedFileList(const StringVector& files,
-                                     bool doProcessOpts = false,
-                                     bool merge = false,
+        void readUnorganizedFileList(const StringVector& files, bool doProcessOpts = false, bool merge = false,
                                      const std::string& tag = "");
 
         //
@@ -112,8 +107,7 @@ namespace Rv
         //  Similar, but does not change the filename of the session
         //
 
-        void saveACopyAs(const char* filename, bool partial = false,
-                         bool compressed = false, bool sparse = true);
+        void saveACopyAs(const char* filename, bool partial = false, bool compressed = false, bool sparse = true);
 
         virtual void makeActive();
         virtual void clear();
@@ -141,20 +135,13 @@ namespace Rv
         //  it'll be created programmatically.
         //
 
-        IPCore::SourceIPNode* addSourceWithTag(const StringVector& files,
-                                               std::string tag,
-                                               std::string nodeName = "",
+        IPCore::SourceIPNode* addSourceWithTag(const StringVector& files, std::string tag, std::string nodeName = "",
                                                std::string mediaRepName = "");
-        IPCore::SourceIPNode* addSource(std::string, Options::SourceArgs& sargs,
-                                        std::string nodeName = "");
-        IPCore::SourceIPNode* addSource(const StringVector&,
-                                        Options::SourceArgs& sargs,
-                                        std::string nodeName = "",
-                                        std::string nodeType = "RVFileSource",
-                                        std::string mediaRepName = "",
+        IPCore::SourceIPNode* addSource(std::string, Options::SourceArgs& sargs, std::string nodeName = "");
+        IPCore::SourceIPNode* addSource(const StringVector&, Options::SourceArgs& sargs, std::string nodeName = "",
+                                        std::string nodeType = "RVFileSource", std::string mediaRepName = "",
                                         std::string mediaRepSource = "");
-        IPCore::SourceIPNode* addImageSource(const std::string&,
-                                             const TwkMovie::MovieInfo&);
+        IPCore::SourceIPNode* addImageSource(const std::string&, const TwkMovie::MovieInfo&);
 
         void newMediaLoaded(IPCore::SourceIPNode*);
 
@@ -169,37 +156,29 @@ namespace Rv
         //  can pass "" for sourceName to use the "current" source ala pre 3.8.7
         //
 
-        IPCore::SourceIPNode* addToSourceHelper(const std::string&,
-                                                StringVector files,
-                                                Options::SourceArgs& sargs);
+        IPCore::SourceIPNode* addToSourceHelper(const std::string&, StringVector files, Options::SourceArgs& sargs);
 
-        void addToSource(const std::string& sourceName,
-                         const std::string& filename,
-                         const std::string& tag = "");
+        void addToSource(const std::string& sourceName, const std::string& filename, const std::string& tag = "");
 
         //
         //  Relocate lost media files.
         //
 
-        void relocateSource(const std::string& oldFilename,
-                            const std::string& newFilename,
-                            const std::string& sourceNode = "");
+        void relocateSource(const std::string& oldFilename, const std::string& newFilename, const std::string& sourceNode = "");
 
         //
         //  Set all the media in a particular source
         //
 
-        void setSourceMedia(const std::string& sourceNode,
-                            const StringVector& files, const std::string& tag);
+        void setSourceMedia(const std::string& sourceNode, const StringVector& files, const std::string& tag);
 
         //
         //  Add a media representation to an existing source specified by
         //  srcNodeName
         //
 
-        IPCore::SourceIPNode* addSourceMediaRep(
-            const std::string& srcNodeName, const std::string& mediaRepName,
-            const StringVector& mediaRepPaths, const std::string& tag);
+        IPCore::SourceIPNode* addSourceMediaRep(const std::string& srcNodeName, const std::string& mediaRepName,
+                                                const StringVector& mediaRepPaths, const std::string& tag);
 
         //
         //  Set the active input of the Switch node specified or the ones
@@ -207,9 +186,7 @@ namespace Rv
         //  representation specified by name.
         //
 
-        void setActiveSourceMediaRep(const std::string& srcNodeOrSwitchNodeName,
-                                     const std::string& mediaRepName,
-                                     const std::string& tag);
+        void setActiveSourceMediaRep(const std::string& srcNodeOrSwitchNodeName, const std::string& mediaRepName, const std::string& tag);
 
         //
         //  Returns the name of the media representation currently selected by
@@ -225,8 +202,7 @@ namespace Rv
         //  with these media reps.
         //
 
-        void sourceMediaReps(const std::string& srcNodeOrSwitchNodeName,
-                             StringVector& sourceMediaReps,
+        void sourceMediaReps(const std::string& srcNodeOrSwitchNodeName, StringVector& sourceMediaReps,
                              StringVector* sourceNodes = nullptr);
 
         //
@@ -295,10 +271,7 @@ namespace Rv
 
         void* pyData() const { return m_pydata; }
 
-        static RvSession* currentRvSession()
-        {
-            return static_cast<RvSession*>(IPCore::Session::currentSession());
-        }
+        static RvSession* currentRvSession() { return static_cast<RvSession*>(IPCore::Session::currentSession()); }
 
         //
         //  Set scaling on all transform nodes. Used by linux
@@ -311,12 +284,9 @@ namespace Rv
         //  LUTs
         //
 
-        void readCDL(std::string, const std::string& node,
-                     bool activate = false);
-        void readLUT(std::string, const std::string& node,
-                     bool activate = false);
-        void readLUTOnAll(std::string, const std::string& nodeType,
-                          bool activate = true);
+        void readCDL(std::string, const std::string& node, bool activate = false);
+        void readLUT(std::string, const std::string& node, bool activate = false);
+        void readLUTOnAll(std::string, const std::string& nodeType, bool activate = true);
 
         std::string lookupMuFlag(std::string key);
 
@@ -330,24 +300,18 @@ namespace Rv
         //
         //  Override
         //
-        virtual void findProperty(PropertyVector& props,
-                                  const std::string& name);
-        virtual void findCurrentNodesByTypeName(NodeVector& nodes,
-                                                const std::string& typeName);
-        virtual void findNodesByTypeName(NodeVector& nodes,
-                                         const std::string& typeName);
+        virtual void findProperty(PropertyVector& props, const std::string& name);
+        virtual void findCurrentNodesByTypeName(NodeVector& nodes, const std::string& typeName);
+        virtual void findNodesByTypeName(NodeVector& nodes, const std::string& typeName);
 
-        virtual IPCore::IPNode* newNode(const std::string& typeName,
-                                        const std::string& nodeName);
+        virtual IPCore::IPNode* newNode(const std::string& typeName, const std::string& nodeName);
 
         virtual void setRendererType(const std::string&);
 
-        virtual void readProfile(const std::string& filename,
-                                 IPCore::IPNode* node, const WriteRequest&);
+        virtual void readProfile(const std::string& filename, IPCore::IPNode* node, const WriteRequest&);
 
     protected:
-        virtual void readGTO(const std::string& filename, bool merge,
-                             Options::SourceArgs& sargs);
+        virtual void readGTO(const std::string& filename, bool merge, Options::SourceArgs& sargs);
         void readEDL(const char* filename);
         void readGTOSessionContainer(PropertyContainer*);
 
@@ -355,34 +319,26 @@ namespace Rv
 
         void checkForStereoPaths(const std::string&, StringVector&);
 
-        void readSource(const std::string& filename, Options::SourceArgs& sargs,
-                        bool addContents, bool addToExistingSource,
+        void readSource(const std::string& filename, Options::SourceArgs& sargs, bool addContents, bool addToExistingSource,
                         const std::string& tag = "", bool merge = false);
 
-        void readSourceHelper(StringVector files, Options::SourceArgs& sargs,
-                              bool addContents, bool addToExistingSource);
+        void readSourceHelper(StringVector files, Options::SourceArgs& sargs, bool addContents, bool addToExistingSource);
 
         void continueLoading();
-        void applySingleSourceArgs(Options::SourceArgs& sargs,
-                                   IPCore::SourceIPNode* node);
+        void applySingleSourceArgs(Options::SourceArgs& sargs, IPCore::SourceIPNode* node);
 
         void processOptionsAfterSourcesLoaded(bool hadLoadError = false);
 
-        void buildFileList(const StringVector& files, std::string tag,
-                           StringVector& collected);
-        std::vector<IPCore::FileSourceIPNode*>
-        findSourcesByMedia(const std::string& filename,
-                           const std::string& sourceNode = "");
-        std::vector<IPCore::SwitchIPNode*>
-        findSwitchIPNodes(const std::string& srcNodeOrSwitchNodeName);
+        void buildFileList(const StringVector& files, std::string tag, StringVector& collected);
+        std::vector<IPCore::FileSourceIPNode*> findSourcesByMedia(const std::string& filename, const std::string& sourceNode = "");
+        std::vector<IPCore::SwitchIPNode*> findSwitchIPNodes(const std::string& srcNodeOrSwitchNodeName);
 
         void setSequenceEvents();
         void unsetSequenceEvents();
         void setSequenceIPNode(IPCore::SequenceIPNode* newSequenceIPNode);
         void onSequenceChanging();
         void onSequenceChanged();
-        void onGraphFastAddSourceChanged(bool begin,
-                                         int newFastAddSourceEnabled);
+        void onGraphFastAddSourceChanged(bool begin, int newFastAddSourceEnabled);
         void onGraphMediaSetEmpty();
         void onGraphNodeWillRemove(IPCore::IPNode* node);
 

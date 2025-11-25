@@ -19,8 +19,7 @@
 #include <limits>
 #include <sstream>
 
-#define AUDIO_READPOSITIONOFFSET_THRESHOLD \
-    0.01 // In secs; this is the max amount of slip we will allow
+#define AUDIO_READPOSITIONOFFSET_THRESHOLD 0.01 // In secs; this is the max amount of slip we will allow
 
 namespace TwkMovie
 {
@@ -138,8 +137,7 @@ namespace TwkMovie
 
     void ReformattingMovie::setFPS(float fps) { m_fps = fps; }
 
-    void ReformattingMovie::setAudio(float rate, size_t samples,
-                                     ChannelsVector channels)
+    void ReformattingMovie::setAudio(float rate, size_t samples, ChannelsVector channels)
     {
         m_audioRate = rate;
         m_audioChannels = channels;
@@ -152,8 +150,7 @@ namespace TwkMovie
 
         if (m_audioRate > 0)
         {
-            double factor =
-                m_audioRate / double(m_movie->info().audioSampleRate);
+            double factor = m_audioRate / double(m_movie->info().audioSampleRate);
             m_astate->reset(m_audioChannels.size(), factor, m_audioSamples);
         }
     }
@@ -164,12 +161,9 @@ namespace TwkMovie
         m_movie->audioConfigure(conf);
     }
 
-    size_t
-    ReformattingMovie::audioFillBuffer(const AudioReadRequest& outRequest,
-                                       AudioBuffer& inbuffer)
+    size_t ReformattingMovie::audioFillBuffer(const AudioReadRequest& outRequest, AudioBuffer& inbuffer)
     {
-        AudioBuffer rsBuffer(inbuffer.size(), inbuffer.channels(),
-                             inbuffer.rate(), inbuffer.startTime());
+        AudioBuffer rsBuffer(inbuffer.size(), inbuffer.channels(), inbuffer.rate(), inbuffer.startTime());
 
         size_t nread = m_astate->audioFillBuffer(rsBuffer);
 
@@ -230,8 +224,7 @@ namespace TwkMovie
     //  This is the meat of this class.
     //
 
-    void ReformattingMovie::imagesAtFrame(const ReadRequest& request,
-                                          FrameBufferVector& fbs)
+    void ReformattingMovie::imagesAtFrame(const ReadRequest& request, FrameBufferVector& fbs)
     {
         int frame = request.frame;
 
@@ -275,8 +268,7 @@ namespace TwkMovie
             //  what we expect.
             //
 
-            if (outfb->dataType() == FrameBuffer::PACKED_Cb8_Y8_Cr8_Y8
-                || outfb->dataType() == FrameBuffer::PACKED_Y8_Cb8_Y8_Cr8)
+            if (outfb->dataType() == FrameBuffer::PACKED_Cb8_Y8_Cr8_Y8 || outfb->dataType() == FrameBuffer::PACKED_Y8_Cb8_Y8_Cr8)
             {
                 FrameBuffer* infb = outfb;
 
@@ -305,11 +297,9 @@ namespace TwkMovie
                     delete infb;
             }
 
-            if ((outfb->numChannels() == 3 || outfb->numChannels() == 4)
-                && !outfb->isYUV() && !outfb->isYRYBY())
+            if ((outfb->numChannels() == 3 || outfb->numChannels() == 4) && !outfb->isYUV() && !outfb->isYRYBY())
             {
-                if (outfb->channelName(0) != "R" || outfb->channelName(1) != "G"
-                    || outfb->channelName(2) != "B")
+                if (outfb->channelName(0) != "R" || outfb->channelName(1) != "G" || outfb->channelName(2) != "B")
                 {
                     FrameBuffer* infb = outfb;
                     vector<string> chmap;
@@ -374,8 +364,7 @@ namespace TwkMovie
             }
             else if (m_outWhiteX != 999 && m_outWhiteY != 999)
             {
-                float chr[8] = {0.6400f, 0.3300f, 0.3000f, 0.6000f,
-                                0.1500f, 0.0600f, 0.3127f, 0.3290f};
+                float chr[8] = {0.6400f, 0.3300f, 0.3000f, 0.6000f, 0.1500f, 0.0600f, 0.3127f, 0.3290f};
 
                 FrameBuffer* infb = outfb;
                 Mat44f M;
@@ -383,10 +372,8 @@ namespace TwkMovie
                 float neutral[2] = {chr[6], chr[7]};
                 float newNeutral[2] = {m_outWhiteX, m_outWhiteY};
 
-                TwkFB::colorSpaceConversionMatrix(
-                    (const float*)&chr, (const float*)&chr,
-                    (const float*)&neutral, (const float*)&newNeutral, true,
-                    (float*)&M);
+                TwkFB::colorSpaceConversionMatrix((const float*)&chr, (const float*)&chr, (const float*)&neutral, (const float*)&newNeutral,
+                                                  true, (float*)&M);
 
                 applyTransform(infb, outfb, linearColorTransform, &M);
                 if (m_verbose)
@@ -473,8 +460,7 @@ namespace TwkMovie
                 outfb = infb->copy();
                 applyGamma(infb, outfb, 1.0 / m_ingamma);
                 if (m_verbose)
-                    cout << "INFO: applied input gamma correction of "
-                         << m_ingamma << endl;
+                    cout << "INFO: applied input gamma correction of " << m_ingamma << endl;
                 if (infb != &fb)
                     delete infb;
             }
@@ -509,11 +495,8 @@ namespace TwkMovie
             {
                 FrameBuffer* infb = outfb;
 
-                outfb = new FrameBuffer(
-                    infb->coordinateType(), int(infb->width() * m_scale),
-                    int(infb->height() * m_scale), infb->depth(),
-                    infb->numChannels(), infb->dataType(), 0,
-                    &infb->channelNames(), infb->orientation(), true);
+                outfb = new FrameBuffer(infb->coordinateType(), int(infb->width() * m_scale), int(infb->height() * m_scale), infb->depth(),
+                                        infb->numChannels(), infb->dataType(), 0, &infb->channelNames(), infb->orientation(), true);
 
                 resize(infb, outfb);
 
@@ -528,15 +511,12 @@ namespace TwkMovie
                     delete infb;
             }
 
-            if (m_xsize
-                && (outfb->width() != m_xsize || outfb->height() != m_ysize))
+            if (m_xsize && (outfb->width() != m_xsize || outfb->height() != m_ysize))
             {
                 FrameBuffer* infb = outfb;
 
-                outfb = new FrameBuffer(
-                    infb->coordinateType(), m_xsize, m_ysize, infb->depth(),
-                    infb->numChannels(), infb->dataType(), 0,
-                    &infb->channelNames(), infb->orientation(), true);
+                outfb = new FrameBuffer(infb->coordinateType(), m_xsize, m_ysize, infb->depth(), infb->numChannels(), infb->dataType(), 0,
+                                        &infb->channelNames(), infb->orientation(), true);
 
                 resize(infb, outfb);
 
@@ -560,8 +540,7 @@ namespace TwkMovie
                 M.makeScale(Vec3f(s, s, s));
                 applyTransform(infb, outfb, linearColorTransform, &M);
                 if (m_verbose)
-                    cout << "INFO: applied relative exposure of " << m_exposure
-                         << " stops" << endl;
+                    cout << "INFO: applied relative exposure of " << m_exposure << " stops" << endl;
                 if (infb != &fb)
                     delete infb;
             }
@@ -592,8 +571,7 @@ namespace TwkMovie
                     delete infb;
             }
 
-            if (m_orientation != FrameBuffer::__NUM_ORIENTATION__
-                && outfb->orientation() != m_orientation)
+            if (m_orientation != FrameBuffer::__NUM_ORIENTATION__ && outfb->orientation() != m_orientation)
             {
                 if (m_verbose)
                     cout << "INFO: reorienting" << endl;
@@ -713,9 +691,7 @@ namespace TwkMovie
                 outfb = infb->copy();
                 convertLinearToLogC(infb, outfb, m_outLogCEI);
                 if (m_verbose)
-                    cout << "INFO: lin -> LogC (EI="
-                         << (m_outLogCEI == 0.0f ? 800 : m_outLogCEI) << ")"
-                         << endl;
+                    cout << "INFO: lin -> LogC (EI=" << (m_outLogCEI == 0.0f ? 800 : m_outLogCEI) << ")" << endl;
                 if (infb != &fb)
                     delete infb;
             }
@@ -869,14 +845,10 @@ namespace TwkMovie
                     if (samples[i] > 1)
                     {
                         if (m_verbose)
-                            cout << "INFO: resampling plane "
-                                 << fb->channelName(0) << " factor "
-                                 << samples[i] << endl;
+                            cout << "INFO: resampling plane " << fb->channelName(0) << " factor " << samples[i] << endl;
 
-                        nfb = new FrameBuffer(
-                            fb->coordinateType(), fb->width() / samples[i],
-                            fb->height() / samples[i], 1, 1, outfb->dataType(),
-                            0, &fb->channelNames(), fb->orientation(), true);
+                        nfb = new FrameBuffer(fb->coordinateType(), fb->width() / samples[i], fb->height() / samples[i], 1, 1,
+                                              outfb->dataType(), 0, &fb->channelNames(), fb->orientation(), true);
 
                         resize(fb, nfb);
 
@@ -923,8 +895,7 @@ namespace TwkMovie
                 }
 
                 if (m_verbose)
-                    cout << "INFO: requested output " << outbits << " bit "
-                         << (fp ? "float" : "int") << endl;
+                    cout << "INFO: requested output " << outbits << " bit " << (fp ? "float" : "int") << endl;
 
                 if (infb != &fb)
                     delete infb;
@@ -935,22 +906,16 @@ namespace TwkMovie
                 if (fb.isPlanar())
                     fb.deleteAllPlanes();
 
-                fb.restructure(outfb->width(), outfb->height(), outfb->depth(),
-                               outfb->numChannels(), outfb->dataType(), 0,
-                               &outfb->channelNames(), outfb->orientation(),
-                               true);
+                fb.restructure(outfb->width(), outfb->height(), outfb->depth(), outfb->numChannels(), outfb->dataType(), 0,
+                               &outfb->channelNames(), outfb->orientation(), true);
 
                 if (outfb->isPlanar())
                 {
-                    for (FrameBuffer* plane = outfb->nextPlane(); plane;
-                         plane = plane->nextPlane())
+                    for (FrameBuffer* plane = outfb->nextPlane(); plane; plane = plane->nextPlane())
                     {
-                        fb.appendPlane(new FrameBuffer(
-                            plane->coordinateType(), plane->width(),
-                            plane->height(), plane->depth(),
-                            plane->numChannels(), plane->dataType(), 0,
-                            &plane->channelNames(), plane->orientation(),
-                            true));
+                        fb.appendPlane(new FrameBuffer(plane->coordinateType(), plane->width(), plane->height(), plane->depth(),
+                                                       plane->numChannels(), plane->dataType(), 0, &plane->channelNames(),
+                                                       plane->orientation(), true));
                     }
                 }
 
@@ -972,8 +937,7 @@ namespace TwkMovie
         }
     }
 
-    void ReformattingMovie::identifiersAtFrame(const ReadRequest& request,
-                                               IdentifierVector& ids)
+    void ReformattingMovie::identifiersAtFrame(const ReadRequest& request, IdentifierVector& ids)
     {
         int frame = request.frame;
 
@@ -1040,9 +1004,8 @@ namespace TwkMovie
             idstream << ":linredlogfilm";
         if (m_ysamples)
             idstream << ":s"
-                     << ":" << m_ysamples << ":" << m_usamples << ":"
-                     << m_vsamples << ":" << m_rysamples << ":" << m_bysamples
-                     << ":" << m_asamples;
+                     << ":" << m_ysamples << ":" << m_usamples << ":" << m_vsamples << ":" << m_rysamples << ":" << m_bysamples << ":"
+                     << m_asamples;
 
         idstream << ":b" << m_outtype;
     }

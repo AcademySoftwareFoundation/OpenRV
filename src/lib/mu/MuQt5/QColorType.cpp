@@ -51,16 +51,12 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(__allocate, Pointer)
     {
-        QColorType::Instance* i =
-            new QColorType::Instance((Class*)NODE_THIS.type());
+        QColorType::Instance* i = new QColorType::Instance((Class*)NODE_THIS.type());
         QColorType::registerFinalizer(i);
         NODE_RETURN(i);
     }
 
-    void QColorType::registerFinalizer(void* o)
-    {
-        GC_register_finalizer(o, QColorType::finalizer, 0, 0, 0);
-    }
+    void QColorType::registerFinalizer(void* o) { GC_register_finalizer(o, QColorType::finalizer, 0, 0, 0); }
 
     void QColorType::finalizer(void* obj, void* data)
     {
@@ -71,17 +67,14 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    Pointer qt_QColor_QColor_QColor_QColor(Mu::Thread& NODE_THREAD,
-                                           Pointer param_this)
+    Pointer qt_QColor_QColor_QColor_QColor(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         setqtype<QColorType>(param_this, QColor());
         return param_this;
     }
 
-    Pointer qt_QColor_QColor_QColor_QColor_int(Mu::Thread& NODE_THREAD,
-                                               Pointer param_this,
-                                               int param_color)
+    Pointer qt_QColor_QColor_QColor_QColor_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_color)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         Qt::GlobalColor arg1 = (Qt::GlobalColor)(param_color);
@@ -89,9 +82,8 @@ namespace Mu
         return param_this;
     }
 
-    Pointer qt_QColor_QColor_QColor_QColor_int_int_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_r, int param_g,
-        int param_b, int param_a)
+    Pointer qt_QColor_QColor_QColor_QColor_int_int_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_r, int param_g,
+                                                           int param_b, int param_a)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         int arg1 = (int)(param_r);
@@ -102,9 +94,7 @@ namespace Mu
         return param_this;
     }
 
-    Pointer qt_QColor_QColor_QColor_QColor_string(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this,
-                                                  Pointer param_name)
+    Pointer qt_QColor_QColor_QColor_QColor_string(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_name)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QString arg1 = qstring(param_name);
@@ -119,8 +109,7 @@ namespace Mu
         return arg0.alpha();
     }
 
-    double qt_QColor_alphaF_double_QColor(Mu::Thread& NODE_THREAD,
-                                          Pointer param_this)
+    double qt_QColor_alphaF_double_QColor(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColor arg0 = getqtype<QColorType>(param_this);
@@ -134,8 +123,7 @@ namespace Mu
         return arg0.black();
     }
 
-    double qt_QColor_blackF_double_QColor(Mu::Thread& NODE_THREAD,
-                                          Pointer param_this)
+    double qt_QColor_blackF_double_QColor(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColor arg0 = getqtype<QColorType>(param_this);
@@ -149,17 +137,14 @@ namespace Mu
         return arg0.blue();
     }
 
-    double qt_QColor_blueF_double_QColor(Mu::Thread& NODE_THREAD,
-                                         Pointer param_this)
+    double qt_QColor_blueF_double_QColor(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColor arg0 = getqtype<QColorType>(param_this);
         return arg0.blueF();
     }
 
-    Pointer qt_QColor_convertTo_QColor_QColor_int(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this,
-                                                  int param_colorSpec)
+    Pointer qt_QColor_convertTo_QColor_QColor_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_colorSpec)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColor arg0 = getqtype<QColorType>(param_this);
@@ -174,17 +159,14 @@ namespace Mu
         return arg0.cyan();
     }
 
-    double qt_QColor_cyanF_double_QColor(Mu::Thread& NODE_THREAD,
-                                         Pointer param_this)
+    double qt_QColor_cyanF_double_QColor(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColor arg0 = getqtype<QColorType>(param_this);
         return arg0.cyanF();
     }
 
-    Pointer qt_QColor_darker_QColor_QColor_int(Mu::Thread& NODE_THREAD,
-                                               Pointer param_this,
-                                               int param_factor)
+    Pointer qt_QColor_darker_QColor_QColor_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_factor)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColor arg0 = getqtype<QColorType>(param_this);
@@ -199,8 +181,7 @@ namespace Mu
         return arg0.green();
     }
 
-    double qt_QColor_greenF_double_QColor(Mu::Thread& NODE_THREAD,
-                                          Pointer param_this)
+    double qt_QColor_greenF_double_QColor(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColor arg0 = getqtype<QColorType>(param_this);
@@ -214,24 +195,21 @@ namespace Mu
         return arg0.hslHue();
     }
 
-    double qt_QColor_hslHueF_double_QColor(Mu::Thread& NODE_THREAD,
-                                           Pointer param_this)
+    double qt_QColor_hslHueF_double_QColor(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColor arg0 = getqtype<QColorType>(param_this);
         return arg0.hslHueF();
     }
 
-    int qt_QColor_hslSaturation_int_QColor(Mu::Thread& NODE_THREAD,
-                                           Pointer param_this)
+    int qt_QColor_hslSaturation_int_QColor(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColor arg0 = getqtype<QColorType>(param_this);
         return arg0.hslSaturation();
     }
 
-    double qt_QColor_hslSaturationF_double_QColor(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this)
+    double qt_QColor_hslSaturationF_double_QColor(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColor arg0 = getqtype<QColorType>(param_this);
@@ -245,24 +223,21 @@ namespace Mu
         return arg0.hsvHue();
     }
 
-    double qt_QColor_hsvHueF_double_QColor(Mu::Thread& NODE_THREAD,
-                                           Pointer param_this)
+    double qt_QColor_hsvHueF_double_QColor(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColor arg0 = getqtype<QColorType>(param_this);
         return arg0.hsvHueF();
     }
 
-    int qt_QColor_hsvSaturation_int_QColor(Mu::Thread& NODE_THREAD,
-                                           Pointer param_this)
+    int qt_QColor_hsvSaturation_int_QColor(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColor arg0 = getqtype<QColorType>(param_this);
         return arg0.hsvSaturation();
     }
 
-    double qt_QColor_hsvSaturationF_double_QColor(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this)
+    double qt_QColor_hsvSaturationF_double_QColor(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColor arg0 = getqtype<QColorType>(param_this);
@@ -276,25 +251,21 @@ namespace Mu
         return arg0.hue();
     }
 
-    double qt_QColor_hueF_double_QColor(Mu::Thread& NODE_THREAD,
-                                        Pointer param_this)
+    double qt_QColor_hueF_double_QColor(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColor arg0 = getqtype<QColorType>(param_this);
         return arg0.hueF();
     }
 
-    bool qt_QColor_isValid_bool_QColor(Mu::Thread& NODE_THREAD,
-                                       Pointer param_this)
+    bool qt_QColor_isValid_bool_QColor(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColor arg0 = getqtype<QColorType>(param_this);
         return arg0.isValid();
     }
 
-    Pointer qt_QColor_lighter_QColor_QColor_int(Mu::Thread& NODE_THREAD,
-                                                Pointer param_this,
-                                                int param_factor)
+    Pointer qt_QColor_lighter_QColor_QColor_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_factor)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColor arg0 = getqtype<QColorType>(param_this);
@@ -302,49 +273,42 @@ namespace Mu
         return makeqtype<QColorType>(c, arg0.lighter(arg1), "qt.QColor");
     }
 
-    int qt_QColor_lightness_int_QColor(Mu::Thread& NODE_THREAD,
-                                       Pointer param_this)
+    int qt_QColor_lightness_int_QColor(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColor arg0 = getqtype<QColorType>(param_this);
         return arg0.lightness();
     }
 
-    double qt_QColor_lightnessF_double_QColor(Mu::Thread& NODE_THREAD,
-                                              Pointer param_this)
+    double qt_QColor_lightnessF_double_QColor(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColor arg0 = getqtype<QColorType>(param_this);
         return arg0.lightnessF();
     }
 
-    int qt_QColor_magenta_int_QColor(Mu::Thread& NODE_THREAD,
-                                     Pointer param_this)
+    int qt_QColor_magenta_int_QColor(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColor arg0 = getqtype<QColorType>(param_this);
         return arg0.magenta();
     }
 
-    double qt_QColor_magentaF_double_QColor(Mu::Thread& NODE_THREAD,
-                                            Pointer param_this)
+    double qt_QColor_magentaF_double_QColor(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColor arg0 = getqtype<QColorType>(param_this);
         return arg0.magentaF();
     }
 
-    Pointer qt_QColor_name_string_QColor(Mu::Thread& NODE_THREAD,
-                                         Pointer param_this)
+    Pointer qt_QColor_name_string_QColor(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColor arg0 = getqtype<QColorType>(param_this);
         return makestring(c, arg0.name());
     }
 
-    Pointer qt_QColor_name_string_QColor_int(Mu::Thread& NODE_THREAD,
-                                             Pointer param_this,
-                                             int param_format)
+    Pointer qt_QColor_name_string_QColor_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_format)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColor arg0 = getqtype<QColorType>(param_this);
@@ -359,8 +323,7 @@ namespace Mu
         return arg0.red();
     }
 
-    double qt_QColor_redF_double_QColor(Mu::Thread& NODE_THREAD,
-                                        Pointer param_this)
+    double qt_QColor_redF_double_QColor(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColor arg0 = getqtype<QColorType>(param_this);
@@ -381,24 +344,21 @@ namespace Mu
         return arg0.rgba();
     }
 
-    int qt_QColor_saturation_int_QColor(Mu::Thread& NODE_THREAD,
-                                        Pointer param_this)
+    int qt_QColor_saturation_int_QColor(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColor arg0 = getqtype<QColorType>(param_this);
         return arg0.saturation();
     }
 
-    double qt_QColor_saturationF_double_QColor(Mu::Thread& NODE_THREAD,
-                                               Pointer param_this)
+    double qt_QColor_saturationF_double_QColor(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColor arg0 = getqtype<QColorType>(param_this);
         return arg0.saturationF();
     }
 
-    void qt_QColor_setAlpha_void_QColor_int(Mu::Thread& NODE_THREAD,
-                                            Pointer param_this, int param_alpha)
+    void qt_QColor_setAlpha_void_QColor_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_alpha)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColor arg0 = getqtype<QColorType>(param_this);
@@ -407,9 +367,7 @@ namespace Mu
         setqtype<QColorType>(param_this, arg0);
     }
 
-    void qt_QColor_setAlphaF_void_QColor_double(Mu::Thread& NODE_THREAD,
-                                                Pointer param_this,
-                                                double param_alpha)
+    void qt_QColor_setAlphaF_void_QColor_double(Mu::Thread& NODE_THREAD, Pointer param_this, double param_alpha)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColor arg0 = getqtype<QColorType>(param_this);
@@ -418,8 +376,7 @@ namespace Mu
         setqtype<QColorType>(param_this, arg0);
     }
 
-    void qt_QColor_setBlue_void_QColor_int(Mu::Thread& NODE_THREAD,
-                                           Pointer param_this, int param_blue)
+    void qt_QColor_setBlue_void_QColor_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_blue)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColor arg0 = getqtype<QColorType>(param_this);
@@ -428,9 +385,7 @@ namespace Mu
         setqtype<QColorType>(param_this, arg0);
     }
 
-    void qt_QColor_setBlueF_void_QColor_double(Mu::Thread& NODE_THREAD,
-                                               Pointer param_this,
-                                               double param_blue)
+    void qt_QColor_setBlueF_void_QColor_double(Mu::Thread& NODE_THREAD, Pointer param_this, double param_blue)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColor arg0 = getqtype<QColorType>(param_this);
@@ -439,9 +394,8 @@ namespace Mu
         setqtype<QColorType>(param_this, arg0);
     }
 
-    void qt_QColor_setCmyk_void_QColor_int_int_int_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_c, int param_m,
-        int param_y, int param_k, int param_a)
+    void qt_QColor_setCmyk_void_QColor_int_int_int_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_c, int param_m,
+                                                           int param_y, int param_k, int param_a)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColor arg0 = getqtype<QColorType>(param_this);
@@ -454,9 +408,8 @@ namespace Mu
         setqtype<QColorType>(param_this, arg0);
     }
 
-    void qt_QColor_setCmykF_void_QColor_double_double_double_double_double(
-        Mu::Thread& NODE_THREAD, Pointer param_this, double param_c,
-        double param_m, double param_y, double param_k, double param_a)
+    void qt_QColor_setCmykF_void_QColor_double_double_double_double_double(Mu::Thread& NODE_THREAD, Pointer param_this, double param_c,
+                                                                           double param_m, double param_y, double param_k, double param_a)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColor arg0 = getqtype<QColorType>(param_this);
@@ -469,8 +422,7 @@ namespace Mu
         setqtype<QColorType>(param_this, arg0);
     }
 
-    void qt_QColor_setGreen_void_QColor_int(Mu::Thread& NODE_THREAD,
-                                            Pointer param_this, int param_green)
+    void qt_QColor_setGreen_void_QColor_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_green)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColor arg0 = getqtype<QColorType>(param_this);
@@ -479,9 +431,7 @@ namespace Mu
         setqtype<QColorType>(param_this, arg0);
     }
 
-    void qt_QColor_setGreenF_void_QColor_double(Mu::Thread& NODE_THREAD,
-                                                Pointer param_this,
-                                                double param_green)
+    void qt_QColor_setGreenF_void_QColor_double(Mu::Thread& NODE_THREAD, Pointer param_this, double param_green)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColor arg0 = getqtype<QColorType>(param_this);
@@ -490,10 +440,8 @@ namespace Mu
         setqtype<QColorType>(param_this, arg0);
     }
 
-    void qt_QColor_setHsl_void_QColor_int_int_int_int(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this,
-                                                      int param_h, int param_s,
-                                                      int param_l, int param_a)
+    void qt_QColor_setHsl_void_QColor_int_int_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_h, int param_s, int param_l,
+                                                      int param_a)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColor arg0 = getqtype<QColorType>(param_this);
@@ -505,9 +453,8 @@ namespace Mu
         setqtype<QColorType>(param_this, arg0);
     }
 
-    void qt_QColor_setHslF_void_QColor_double_double_double_double(
-        Mu::Thread& NODE_THREAD, Pointer param_this, double param_h,
-        double param_s, double param_l, double param_a)
+    void qt_QColor_setHslF_void_QColor_double_double_double_double(Mu::Thread& NODE_THREAD, Pointer param_this, double param_h,
+                                                                   double param_s, double param_l, double param_a)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColor arg0 = getqtype<QColorType>(param_this);
@@ -519,10 +466,8 @@ namespace Mu
         setqtype<QColorType>(param_this, arg0);
     }
 
-    void qt_QColor_setHsv_void_QColor_int_int_int_int(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this,
-                                                      int param_h, int param_s,
-                                                      int param_v, int param_a)
+    void qt_QColor_setHsv_void_QColor_int_int_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_h, int param_s, int param_v,
+                                                      int param_a)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColor arg0 = getqtype<QColorType>(param_this);
@@ -534,9 +479,8 @@ namespace Mu
         setqtype<QColorType>(param_this, arg0);
     }
 
-    void qt_QColor_setHsvF_void_QColor_double_double_double_double(
-        Mu::Thread& NODE_THREAD, Pointer param_this, double param_h,
-        double param_s, double param_v, double param_a)
+    void qt_QColor_setHsvF_void_QColor_double_double_double_double(Mu::Thread& NODE_THREAD, Pointer param_this, double param_h,
+                                                                   double param_s, double param_v, double param_a)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColor arg0 = getqtype<QColorType>(param_this);
@@ -548,9 +492,7 @@ namespace Mu
         setqtype<QColorType>(param_this, arg0);
     }
 
-    void qt_QColor_setNamedColor_void_QColor_string(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this,
-                                                    Pointer param_name)
+    void qt_QColor_setNamedColor_void_QColor_string(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_name)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColor arg0 = getqtype<QColorType>(param_this);
@@ -559,8 +501,7 @@ namespace Mu
         setqtype<QColorType>(param_this, arg0);
     }
 
-    void qt_QColor_setRed_void_QColor_int(Mu::Thread& NODE_THREAD,
-                                          Pointer param_this, int param_red)
+    void qt_QColor_setRed_void_QColor_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_red)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColor arg0 = getqtype<QColorType>(param_this);
@@ -569,9 +510,7 @@ namespace Mu
         setqtype<QColorType>(param_this, arg0);
     }
 
-    void qt_QColor_setRedF_void_QColor_double(Mu::Thread& NODE_THREAD,
-                                              Pointer param_this,
-                                              double param_red)
+    void qt_QColor_setRedF_void_QColor_double(Mu::Thread& NODE_THREAD, Pointer param_this, double param_red)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColor arg0 = getqtype<QColorType>(param_this);
@@ -580,10 +519,8 @@ namespace Mu
         setqtype<QColorType>(param_this, arg0);
     }
 
-    void qt_QColor_setRgb_void_QColor_int_int_int_int(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this,
-                                                      int param_r, int param_g,
-                                                      int param_b, int param_a)
+    void qt_QColor_setRgb_void_QColor_int_int_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_r, int param_g, int param_b,
+                                                      int param_a)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColor arg0 = getqtype<QColorType>(param_this);
@@ -595,8 +532,7 @@ namespace Mu
         setqtype<QColorType>(param_this, arg0);
     }
 
-    void qt_QColor_setRgb_void_QColor_int(Mu::Thread& NODE_THREAD,
-                                          Pointer param_this, int param_rgb)
+    void qt_QColor_setRgb_void_QColor_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_rgb)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColor arg0 = getqtype<QColorType>(param_this);
@@ -605,9 +541,8 @@ namespace Mu
         setqtype<QColorType>(param_this, arg0);
     }
 
-    void qt_QColor_setRgbF_void_QColor_double_double_double_double(
-        Mu::Thread& NODE_THREAD, Pointer param_this, double param_r,
-        double param_g, double param_b, double param_a)
+    void qt_QColor_setRgbF_void_QColor_double_double_double_double(Mu::Thread& NODE_THREAD, Pointer param_this, double param_r,
+                                                                   double param_g, double param_b, double param_a)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColor arg0 = getqtype<QColorType>(param_this);
@@ -619,8 +554,7 @@ namespace Mu
         setqtype<QColorType>(param_this, arg0);
     }
 
-    void qt_QColor_setRgba_void_QColor_int(Mu::Thread& NODE_THREAD,
-                                           Pointer param_this, int param_rgba)
+    void qt_QColor_setRgba_void_QColor_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_rgba)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColor arg0 = getqtype<QColorType>(param_this);
@@ -636,32 +570,28 @@ namespace Mu
         return int(arg0.spec());
     }
 
-    Pointer qt_QColor_toCmyk_QColor_QColor(Mu::Thread& NODE_THREAD,
-                                           Pointer param_this)
+    Pointer qt_QColor_toCmyk_QColor_QColor(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColor arg0 = getqtype<QColorType>(param_this);
         return makeqtype<QColorType>(c, arg0.toCmyk(), "qt.QColor");
     }
 
-    Pointer qt_QColor_toHsl_QColor_QColor(Mu::Thread& NODE_THREAD,
-                                          Pointer param_this)
+    Pointer qt_QColor_toHsl_QColor_QColor(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColor arg0 = getqtype<QColorType>(param_this);
         return makeqtype<QColorType>(c, arg0.toHsl(), "qt.QColor");
     }
 
-    Pointer qt_QColor_toHsv_QColor_QColor(Mu::Thread& NODE_THREAD,
-                                          Pointer param_this)
+    Pointer qt_QColor_toHsv_QColor_QColor(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColor arg0 = getqtype<QColorType>(param_this);
         return makeqtype<QColorType>(c, arg0.toHsv(), "qt.QColor");
     }
 
-    Pointer qt_QColor_toRgb_QColor_QColor(Mu::Thread& NODE_THREAD,
-                                          Pointer param_this)
+    Pointer qt_QColor_toRgb_QColor_QColor(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColor arg0 = getqtype<QColorType>(param_this);
@@ -675,8 +605,7 @@ namespace Mu
         return arg0.value();
     }
 
-    double qt_QColor_valueF_double_QColor(Mu::Thread& NODE_THREAD,
-                                          Pointer param_this)
+    double qt_QColor_valueF_double_QColor(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColor arg0 = getqtype<QColorType>(param_this);
@@ -690,17 +619,14 @@ namespace Mu
         return arg0.yellow();
     }
 
-    double qt_QColor_yellowF_double_QColor(Mu::Thread& NODE_THREAD,
-                                           Pointer param_this)
+    double qt_QColor_yellowF_double_QColor(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColor arg0 = getqtype<QColorType>(param_this);
         return arg0.yellowF();
     }
 
-    bool qt_QColor_operatorBang_EQ__bool_QColor_QColor(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this,
-                                                       Pointer param_color)
+    bool qt_QColor_operatorBang_EQ__bool_QColor_QColor(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_color)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColor arg0 = getqtype<QColorType>(param_this);
@@ -708,9 +634,7 @@ namespace Mu
         return arg0.operator!=(arg1);
     }
 
-    bool qt_QColor_operatorEQ_EQ__bool_QColor_QColor(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_this,
-                                                     Pointer param_color)
+    bool qt_QColor_operatorEQ_EQ__bool_QColor_QColor(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_color)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColor arg0 = getqtype<QColorType>(param_this);
@@ -724,9 +648,8 @@ namespace Mu
         return makestringlist(c, QColor::colorNames());
     }
 
-    Pointer qt_QColor_fromCmyk_QColor_int_int_int_int_int(
-        Mu::Thread& NODE_THREAD, int param_c, int param_m, int param_y,
-        int param_k, int param_a)
+    Pointer qt_QColor_fromCmyk_QColor_int_int_int_int_int(Mu::Thread& NODE_THREAD, int param_c, int param_m, int param_y, int param_k,
+                                                          int param_a)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         int arg0 = (int)(param_c);
@@ -734,13 +657,11 @@ namespace Mu
         int arg2 = (int)(param_y);
         int arg3 = (int)(param_k);
         int arg4 = (int)(param_a);
-        return makeqtype<QColorType>(
-            c, QColor::fromCmyk(arg0, arg1, arg2, arg3, arg4), "qt.QColor");
+        return makeqtype<QColorType>(c, QColor::fromCmyk(arg0, arg1, arg2, arg3, arg4), "qt.QColor");
     }
 
-    Pointer qt_QColor_fromCmykF_QColor_double_double_double_double_double(
-        Mu::Thread& NODE_THREAD, double param_c, double param_m, double param_y,
-        double param_k, double param_a)
+    Pointer qt_QColor_fromCmykF_QColor_double_double_double_double_double(Mu::Thread& NODE_THREAD, double param_c, double param_m,
+                                                                          double param_y, double param_k, double param_a)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         qreal arg0 = (double)(param_c);
@@ -748,60 +669,49 @@ namespace Mu
         qreal arg2 = (double)(param_y);
         qreal arg3 = (double)(param_k);
         qreal arg4 = (double)(param_a);
-        return makeqtype<QColorType>(
-            c, QColor::fromCmykF(arg0, arg1, arg2, arg3, arg4), "qt.QColor");
+        return makeqtype<QColorType>(c, QColor::fromCmykF(arg0, arg1, arg2, arg3, arg4), "qt.QColor");
     }
 
-    Pointer qt_QColor_fromHsl_QColor_int_int_int_int(Mu::Thread& NODE_THREAD,
-                                                     int param_h, int param_s,
-                                                     int param_l, int param_a)
+    Pointer qt_QColor_fromHsl_QColor_int_int_int_int(Mu::Thread& NODE_THREAD, int param_h, int param_s, int param_l, int param_a)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         int arg0 = (int)(param_h);
         int arg1 = (int)(param_s);
         int arg2 = (int)(param_l);
         int arg3 = (int)(param_a);
-        return makeqtype<QColorType>(c, QColor::fromHsl(arg0, arg1, arg2, arg3),
-                                     "qt.QColor");
+        return makeqtype<QColorType>(c, QColor::fromHsl(arg0, arg1, arg2, arg3), "qt.QColor");
     }
 
-    Pointer qt_QColor_fromHslF_QColor_double_double_double_double(
-        Mu::Thread& NODE_THREAD, double param_h, double param_s, double param_l,
-        double param_a)
+    Pointer qt_QColor_fromHslF_QColor_double_double_double_double(Mu::Thread& NODE_THREAD, double param_h, double param_s, double param_l,
+                                                                  double param_a)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         qreal arg0 = (double)(param_h);
         qreal arg1 = (double)(param_s);
         qreal arg2 = (double)(param_l);
         qreal arg3 = (double)(param_a);
-        return makeqtype<QColorType>(
-            c, QColor::fromHslF(arg0, arg1, arg2, arg3), "qt.QColor");
+        return makeqtype<QColorType>(c, QColor::fromHslF(arg0, arg1, arg2, arg3), "qt.QColor");
     }
 
-    Pointer qt_QColor_fromHsv_QColor_int_int_int_int(Mu::Thread& NODE_THREAD,
-                                                     int param_h, int param_s,
-                                                     int param_v, int param_a)
+    Pointer qt_QColor_fromHsv_QColor_int_int_int_int(Mu::Thread& NODE_THREAD, int param_h, int param_s, int param_v, int param_a)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         int arg0 = (int)(param_h);
         int arg1 = (int)(param_s);
         int arg2 = (int)(param_v);
         int arg3 = (int)(param_a);
-        return makeqtype<QColorType>(c, QColor::fromHsv(arg0, arg1, arg2, arg3),
-                                     "qt.QColor");
+        return makeqtype<QColorType>(c, QColor::fromHsv(arg0, arg1, arg2, arg3), "qt.QColor");
     }
 
-    Pointer qt_QColor_fromHsvF_QColor_double_double_double_double(
-        Mu::Thread& NODE_THREAD, double param_h, double param_s, double param_v,
-        double param_a)
+    Pointer qt_QColor_fromHsvF_QColor_double_double_double_double(Mu::Thread& NODE_THREAD, double param_h, double param_s, double param_v,
+                                                                  double param_a)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         qreal arg0 = (double)(param_h);
         qreal arg1 = (double)(param_s);
         qreal arg2 = (double)(param_v);
         qreal arg3 = (double)(param_a);
-        return makeqtype<QColorType>(
-            c, QColor::fromHsvF(arg0, arg1, arg2, arg3), "qt.QColor");
+        return makeqtype<QColorType>(c, QColor::fromHsvF(arg0, arg1, arg2, arg3), "qt.QColor");
     }
 
     Pointer qt_QColor_fromRgb_QColor_int(Mu::Thread& NODE_THREAD, int param_rgb)
@@ -811,51 +721,42 @@ namespace Mu
         return makeqtype<QColorType>(c, QColor::fromRgb(arg0), "qt.QColor");
     }
 
-    Pointer qt_QColor_fromRgb_QColor_int_int_int_int(Mu::Thread& NODE_THREAD,
-                                                     int param_r, int param_g,
-                                                     int param_b, int param_a)
+    Pointer qt_QColor_fromRgb_QColor_int_int_int_int(Mu::Thread& NODE_THREAD, int param_r, int param_g, int param_b, int param_a)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         int arg0 = (int)(param_r);
         int arg1 = (int)(param_g);
         int arg2 = (int)(param_b);
         int arg3 = (int)(param_a);
-        return makeqtype<QColorType>(c, QColor::fromRgb(arg0, arg1, arg2, arg3),
-                                     "qt.QColor");
+        return makeqtype<QColorType>(c, QColor::fromRgb(arg0, arg1, arg2, arg3), "qt.QColor");
     }
 
-    Pointer qt_QColor_fromRgbF_QColor_double_double_double_double(
-        Mu::Thread& NODE_THREAD, double param_r, double param_g, double param_b,
-        double param_a)
+    Pointer qt_QColor_fromRgbF_QColor_double_double_double_double(Mu::Thread& NODE_THREAD, double param_r, double param_g, double param_b,
+                                                                  double param_a)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         qreal arg0 = (double)(param_r);
         qreal arg1 = (double)(param_g);
         qreal arg2 = (double)(param_b);
         qreal arg3 = (double)(param_a);
-        return makeqtype<QColorType>(
-            c, QColor::fromRgbF(arg0, arg1, arg2, arg3), "qt.QColor");
+        return makeqtype<QColorType>(c, QColor::fromRgbF(arg0, arg1, arg2, arg3), "qt.QColor");
     }
 
-    Pointer qt_QColor_fromRgba_QColor_int(Mu::Thread& NODE_THREAD,
-                                          int param_rgba)
+    Pointer qt_QColor_fromRgba_QColor_int(Mu::Thread& NODE_THREAD, int param_rgba)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRgb arg0 = (int)(param_rgba);
         return makeqtype<QColorType>(c, QColor::fromRgba(arg0), "qt.QColor");
     }
 
-    bool qt_QColor_isValidColor_bool_string(Mu::Thread& NODE_THREAD,
-                                            Pointer param_name)
+    bool qt_QColor_isValidColor_bool_string(Mu::Thread& NODE_THREAD, Pointer param_name)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QString arg0 = qstring(param_name);
         return QColor::isValidColor(arg0);
     }
 
-    Pointer qt_QColor_QVariant_QVariant_QVariant_QColor(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this,
-                                                        Pointer param_from)
+    Pointer qt_QColor_QVariant_QVariant_QVariant_QColor(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_from)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColor arg1 = getqtype<QColorType>(param_from);
@@ -865,519 +766,354 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(_n_QColor0, Pointer)
     {
-        NODE_RETURN(qt_QColor_QColor_QColor_QColor(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QColor_QColor_QColor_QColor(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_QColor1, Pointer)
     {
-        NODE_RETURN(qt_QColor_QColor_QColor_QColor_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QColor_QColor_QColor_QColor_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_QColor2, Pointer)
     {
-        NODE_RETURN(qt_QColor_QColor_QColor_QColor_int_int_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int), NODE_ARG(3, int), NODE_ARG(4, int)));
+        NODE_RETURN(qt_QColor_QColor_QColor_QColor_int_int_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                   NODE_ARG(2, int), NODE_ARG(3, int), NODE_ARG(4, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_QColor5, Pointer)
     {
-        NODE_RETURN(qt_QColor_QColor_QColor_QColor_string(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QColor_QColor_QColor_QColor_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
-    static NODE_IMPLEMENTATION(_n_alpha0, int)
-    {
-        NODE_RETURN(qt_QColor_alpha_int_QColor(NODE_THREAD,
-                                               NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_alpha0, int) { NODE_RETURN(qt_QColor_alpha_int_QColor(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
     static NODE_IMPLEMENTATION(_n_alphaF0, double)
     {
-        NODE_RETURN(qt_QColor_alphaF_double_QColor(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QColor_alphaF_double_QColor(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
-    static NODE_IMPLEMENTATION(_n_black0, int)
-    {
-        NODE_RETURN(qt_QColor_black_int_QColor(NODE_THREAD,
-                                               NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_black0, int) { NODE_RETURN(qt_QColor_black_int_QColor(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
     static NODE_IMPLEMENTATION(_n_blackF0, double)
     {
-        NODE_RETURN(qt_QColor_blackF_double_QColor(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QColor_blackF_double_QColor(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
-    static NODE_IMPLEMENTATION(_n_blue0, int)
-    {
-        NODE_RETURN(qt_QColor_blue_int_QColor(NODE_THREAD,
-                                              NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_blue0, int) { NODE_RETURN(qt_QColor_blue_int_QColor(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
-    static NODE_IMPLEMENTATION(_n_blueF0, double)
-    {
-        NODE_RETURN(qt_QColor_blueF_double_QColor(NODE_THREAD,
-                                                  NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_blueF0, double) { NODE_RETURN(qt_QColor_blueF_double_QColor(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
     static NODE_IMPLEMENTATION(_n_convertTo0, Pointer)
     {
-        NODE_RETURN(qt_QColor_convertTo_QColor_QColor_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QColor_convertTo_QColor_QColor_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
-    static NODE_IMPLEMENTATION(_n_cyan0, int)
-    {
-        NODE_RETURN(qt_QColor_cyan_int_QColor(NODE_THREAD,
-                                              NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_cyan0, int) { NODE_RETURN(qt_QColor_cyan_int_QColor(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
-    static NODE_IMPLEMENTATION(_n_cyanF0, double)
-    {
-        NODE_RETURN(qt_QColor_cyanF_double_QColor(NODE_THREAD,
-                                                  NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_cyanF0, double) { NODE_RETURN(qt_QColor_cyanF_double_QColor(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
     static NODE_IMPLEMENTATION(_n_darker0, Pointer)
     {
-        NODE_RETURN(qt_QColor_darker_QColor_QColor_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QColor_darker_QColor_QColor_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
-    static NODE_IMPLEMENTATION(_n_green0, int)
-    {
-        NODE_RETURN(qt_QColor_green_int_QColor(NODE_THREAD,
-                                               NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_green0, int) { NODE_RETURN(qt_QColor_green_int_QColor(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
     static NODE_IMPLEMENTATION(_n_greenF0, double)
     {
-        NODE_RETURN(qt_QColor_greenF_double_QColor(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QColor_greenF_double_QColor(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
-    static NODE_IMPLEMENTATION(_n_hslHue0, int)
-    {
-        NODE_RETURN(qt_QColor_hslHue_int_QColor(NODE_THREAD,
-                                                NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_hslHue0, int) { NODE_RETURN(qt_QColor_hslHue_int_QColor(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
     static NODE_IMPLEMENTATION(_n_hslHueF0, double)
     {
-        NODE_RETURN(qt_QColor_hslHueF_double_QColor(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QColor_hslHueF_double_QColor(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_hslSaturation0, int)
     {
-        NODE_RETURN(qt_QColor_hslSaturation_int_QColor(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QColor_hslSaturation_int_QColor(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_hslSaturationF0, double)
     {
-        NODE_RETURN(qt_QColor_hslSaturationF_double_QColor(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QColor_hslSaturationF_double_QColor(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
-    static NODE_IMPLEMENTATION(_n_hsvHue0, int)
-    {
-        NODE_RETURN(qt_QColor_hsvHue_int_QColor(NODE_THREAD,
-                                                NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_hsvHue0, int) { NODE_RETURN(qt_QColor_hsvHue_int_QColor(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
     static NODE_IMPLEMENTATION(_n_hsvHueF0, double)
     {
-        NODE_RETURN(qt_QColor_hsvHueF_double_QColor(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QColor_hsvHueF_double_QColor(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_hsvSaturation0, int)
     {
-        NODE_RETURN(qt_QColor_hsvSaturation_int_QColor(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QColor_hsvSaturation_int_QColor(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_hsvSaturationF0, double)
     {
-        NODE_RETURN(qt_QColor_hsvSaturationF_double_QColor(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QColor_hsvSaturationF_double_QColor(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
-    static NODE_IMPLEMENTATION(_n_hue0, int)
-    {
-        NODE_RETURN(
-            qt_QColor_hue_int_QColor(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_hue0, int) { NODE_RETURN(qt_QColor_hue_int_QColor(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
-    static NODE_IMPLEMENTATION(_n_hueF0, double)
-    {
-        NODE_RETURN(qt_QColor_hueF_double_QColor(NODE_THREAD,
-                                                 NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_hueF0, double) { NODE_RETURN(qt_QColor_hueF_double_QColor(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
-    static NODE_IMPLEMENTATION(_n_isValid0, bool)
-    {
-        NODE_RETURN(qt_QColor_isValid_bool_QColor(NODE_THREAD,
-                                                  NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_isValid0, bool) { NODE_RETURN(qt_QColor_isValid_bool_QColor(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
     static NODE_IMPLEMENTATION(_n_lighter0, Pointer)
     {
-        NODE_RETURN(qt_QColor_lighter_QColor_QColor_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QColor_lighter_QColor_QColor_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_lightness0, int)
     {
-        NODE_RETURN(qt_QColor_lightness_int_QColor(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QColor_lightness_int_QColor(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_lightnessF0, double)
     {
-        NODE_RETURN(qt_QColor_lightnessF_double_QColor(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QColor_lightnessF_double_QColor(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
-    static NODE_IMPLEMENTATION(_n_magenta0, int)
-    {
-        NODE_RETURN(qt_QColor_magenta_int_QColor(NODE_THREAD,
-                                                 NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_magenta0, int) { NODE_RETURN(qt_QColor_magenta_int_QColor(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
     static NODE_IMPLEMENTATION(_n_magentaF0, double)
     {
-        NODE_RETURN(qt_QColor_magentaF_double_QColor(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QColor_magentaF_double_QColor(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
-    static NODE_IMPLEMENTATION(_n_name0, Pointer)
-    {
-        NODE_RETURN(qt_QColor_name_string_QColor(NODE_THREAD,
-                                                 NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_name0, Pointer) { NODE_RETURN(qt_QColor_name_string_QColor(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
     static NODE_IMPLEMENTATION(_n_name1, Pointer)
     {
-        NODE_RETURN(qt_QColor_name_string_QColor_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QColor_name_string_QColor_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
-    static NODE_IMPLEMENTATION(_n_red0, int)
-    {
-        NODE_RETURN(
-            qt_QColor_red_int_QColor(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_red0, int) { NODE_RETURN(qt_QColor_red_int_QColor(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
-    static NODE_IMPLEMENTATION(_n_redF0, double)
-    {
-        NODE_RETURN(qt_QColor_redF_double_QColor(NODE_THREAD,
-                                                 NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_redF0, double) { NODE_RETURN(qt_QColor_redF_double_QColor(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
-    static NODE_IMPLEMENTATION(_n_rgb0, int)
-    {
-        NODE_RETURN(
-            qt_QColor_rgb_int_QColor(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_rgb0, int) { NODE_RETURN(qt_QColor_rgb_int_QColor(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
-    static NODE_IMPLEMENTATION(_n_rgba0, int)
-    {
-        NODE_RETURN(qt_QColor_rgba_int_QColor(NODE_THREAD,
-                                              NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_rgba0, int) { NODE_RETURN(qt_QColor_rgba_int_QColor(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
     static NODE_IMPLEMENTATION(_n_saturation0, int)
     {
-        NODE_RETURN(qt_QColor_saturation_int_QColor(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QColor_saturation_int_QColor(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_saturationF0, double)
     {
-        NODE_RETURN(qt_QColor_saturationF_double_QColor(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QColor_saturationF_double_QColor(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_setAlpha0, void)
     {
-        qt_QColor_setAlpha_void_QColor_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QColor_setAlpha_void_QColor_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setAlphaF0, void)
     {
-        qt_QColor_setAlphaF_void_QColor_double(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, double));
+        qt_QColor_setAlphaF_void_QColor_double(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, double));
     }
 
     static NODE_IMPLEMENTATION(_n_setBlue0, void)
     {
-        qt_QColor_setBlue_void_QColor_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QColor_setBlue_void_QColor_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setBlueF0, void)
     {
-        qt_QColor_setBlueF_void_QColor_double(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, double));
+        qt_QColor_setBlueF_void_QColor_double(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, double));
     }
 
     static NODE_IMPLEMENTATION(_n_setCmyk0, void)
     {
-        qt_QColor_setCmyk_void_QColor_int_int_int_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int), NODE_ARG(3, int), NODE_ARG(4, int),
-            NODE_ARG(5, int));
+        qt_QColor_setCmyk_void_QColor_int_int_int_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int),
+                                                          NODE_ARG(3, int), NODE_ARG(4, int), NODE_ARG(5, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setCmykF0, void)
     {
-        qt_QColor_setCmykF_void_QColor_double_double_double_double_double(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, double),
-            NODE_ARG(2, double), NODE_ARG(3, double), NODE_ARG(4, double),
-            NODE_ARG(5, double));
+        qt_QColor_setCmykF_void_QColor_double_double_double_double_double(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, double),
+                                                                          NODE_ARG(2, double), NODE_ARG(3, double), NODE_ARG(4, double),
+                                                                          NODE_ARG(5, double));
     }
 
     static NODE_IMPLEMENTATION(_n_setGreen0, void)
     {
-        qt_QColor_setGreen_void_QColor_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QColor_setGreen_void_QColor_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setGreenF0, void)
     {
-        qt_QColor_setGreenF_void_QColor_double(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, double));
+        qt_QColor_setGreenF_void_QColor_double(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, double));
     }
 
     static NODE_IMPLEMENTATION(_n_setHsl0, void)
     {
-        qt_QColor_setHsl_void_QColor_int_int_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int), NODE_ARG(3, int), NODE_ARG(4, int));
+        qt_QColor_setHsl_void_QColor_int_int_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int),
+                                                     NODE_ARG(3, int), NODE_ARG(4, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setHslF0, void)
     {
-        qt_QColor_setHslF_void_QColor_double_double_double_double(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, double),
-            NODE_ARG(2, double), NODE_ARG(3, double), NODE_ARG(4, double));
+        qt_QColor_setHslF_void_QColor_double_double_double_double(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, double),
+                                                                  NODE_ARG(2, double), NODE_ARG(3, double), NODE_ARG(4, double));
     }
 
     static NODE_IMPLEMENTATION(_n_setHsv0, void)
     {
-        qt_QColor_setHsv_void_QColor_int_int_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int), NODE_ARG(3, int), NODE_ARG(4, int));
+        qt_QColor_setHsv_void_QColor_int_int_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int),
+                                                     NODE_ARG(3, int), NODE_ARG(4, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setHsvF0, void)
     {
-        qt_QColor_setHsvF_void_QColor_double_double_double_double(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, double),
-            NODE_ARG(2, double), NODE_ARG(3, double), NODE_ARG(4, double));
+        qt_QColor_setHsvF_void_QColor_double_double_double_double(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, double),
+                                                                  NODE_ARG(2, double), NODE_ARG(3, double), NODE_ARG(4, double));
     }
 
     static NODE_IMPLEMENTATION(_n_setNamedColor0, void)
     {
-        qt_QColor_setNamedColor_void_QColor_string(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QColor_setNamedColor_void_QColor_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setRed0, void)
     {
-        qt_QColor_setRed_void_QColor_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QColor_setRed_void_QColor_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setRedF0, void)
     {
-        qt_QColor_setRedF_void_QColor_double(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, double));
+        qt_QColor_setRedF_void_QColor_double(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, double));
     }
 
     static NODE_IMPLEMENTATION(_n_setRgb0, void)
     {
-        qt_QColor_setRgb_void_QColor_int_int_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int), NODE_ARG(3, int), NODE_ARG(4, int));
+        qt_QColor_setRgb_void_QColor_int_int_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int),
+                                                     NODE_ARG(3, int), NODE_ARG(4, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setRgb1, void)
     {
-        qt_QColor_setRgb_void_QColor_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QColor_setRgb_void_QColor_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setRgbF0, void)
     {
-        qt_QColor_setRgbF_void_QColor_double_double_double_double(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, double),
-            NODE_ARG(2, double), NODE_ARG(3, double), NODE_ARG(4, double));
+        qt_QColor_setRgbF_void_QColor_double_double_double_double(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, double),
+                                                                  NODE_ARG(2, double), NODE_ARG(3, double), NODE_ARG(4, double));
     }
 
     static NODE_IMPLEMENTATION(_n_setRgba0, void)
     {
-        qt_QColor_setRgba_void_QColor_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QColor_setRgba_void_QColor_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
-    static NODE_IMPLEMENTATION(_n_spec0, int)
-    {
-        NODE_RETURN(qt_QColor_spec_int_QColor(NODE_THREAD,
-                                              NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_spec0, int) { NODE_RETURN(qt_QColor_spec_int_QColor(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
     static NODE_IMPLEMENTATION(_n_toCmyk0, Pointer)
     {
-        NODE_RETURN(qt_QColor_toCmyk_QColor_QColor(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QColor_toCmyk_QColor_QColor(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
-    static NODE_IMPLEMENTATION(_n_toHsl0, Pointer)
-    {
-        NODE_RETURN(qt_QColor_toHsl_QColor_QColor(NODE_THREAD,
-                                                  NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_toHsl0, Pointer) { NODE_RETURN(qt_QColor_toHsl_QColor_QColor(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
-    static NODE_IMPLEMENTATION(_n_toHsv0, Pointer)
-    {
-        NODE_RETURN(qt_QColor_toHsv_QColor_QColor(NODE_THREAD,
-                                                  NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_toHsv0, Pointer) { NODE_RETURN(qt_QColor_toHsv_QColor_QColor(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
-    static NODE_IMPLEMENTATION(_n_toRgb0, Pointer)
-    {
-        NODE_RETURN(qt_QColor_toRgb_QColor_QColor(NODE_THREAD,
-                                                  NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_toRgb0, Pointer) { NODE_RETURN(qt_QColor_toRgb_QColor_QColor(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
-    static NODE_IMPLEMENTATION(_n_value0, int)
-    {
-        NODE_RETURN(qt_QColor_value_int_QColor(NODE_THREAD,
-                                               NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_value0, int) { NODE_RETURN(qt_QColor_value_int_QColor(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
     static NODE_IMPLEMENTATION(_n_valueF0, double)
     {
-        NODE_RETURN(qt_QColor_valueF_double_QColor(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QColor_valueF_double_QColor(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
-    static NODE_IMPLEMENTATION(_n_yellow0, int)
-    {
-        NODE_RETURN(qt_QColor_yellow_int_QColor(NODE_THREAD,
-                                                NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_yellow0, int) { NODE_RETURN(qt_QColor_yellow_int_QColor(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
     static NODE_IMPLEMENTATION(_n_yellowF0, double)
     {
-        NODE_RETURN(qt_QColor_yellowF_double_QColor(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QColor_yellowF_double_QColor(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorBang_EQ_0, bool)
     {
-        NODE_RETURN(qt_QColor_operatorBang_EQ__bool_QColor_QColor(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QColor_operatorBang_EQ__bool_QColor_QColor(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorEQ_EQ_0, bool)
     {
-        NODE_RETURN(qt_QColor_operatorEQ_EQ__bool_QColor_QColor(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QColor_operatorEQ_EQ__bool_QColor_QColor(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
-    static NODE_IMPLEMENTATION(_n_colorNames0, Pointer)
-    {
-        NODE_RETURN(qt_QColor_colorNames_stringBSB_ESB_(NODE_THREAD));
-    }
+    static NODE_IMPLEMENTATION(_n_colorNames0, Pointer) { NODE_RETURN(qt_QColor_colorNames_stringBSB_ESB_(NODE_THREAD)); }
 
     static NODE_IMPLEMENTATION(_n_fromCmyk0, Pointer)
     {
-        NODE_RETURN(qt_QColor_fromCmyk_QColor_int_int_int_int_int(
-            NODE_THREAD, NODE_ARG(0, int), NODE_ARG(1, int), NODE_ARG(2, int),
-            NODE_ARG(3, int), NODE_ARG(4, int)));
+        NODE_RETURN(qt_QColor_fromCmyk_QColor_int_int_int_int_int(NODE_THREAD, NODE_ARG(0, int), NODE_ARG(1, int), NODE_ARG(2, int),
+                                                                  NODE_ARG(3, int), NODE_ARG(4, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_fromCmykF0, Pointer)
     {
-        NODE_RETURN(
-            qt_QColor_fromCmykF_QColor_double_double_double_double_double(
-                NODE_THREAD, NODE_ARG(0, double), NODE_ARG(1, double),
-                NODE_ARG(2, double), NODE_ARG(3, double), NODE_ARG(4, double)));
+        NODE_RETURN(qt_QColor_fromCmykF_QColor_double_double_double_double_double(
+            NODE_THREAD, NODE_ARG(0, double), NODE_ARG(1, double), NODE_ARG(2, double), NODE_ARG(3, double), NODE_ARG(4, double)));
     }
 
     static NODE_IMPLEMENTATION(_n_fromHsl0, Pointer)
     {
-        NODE_RETURN(qt_QColor_fromHsl_QColor_int_int_int_int(
-            NODE_THREAD, NODE_ARG(0, int), NODE_ARG(1, int), NODE_ARG(2, int),
-            NODE_ARG(3, int)));
+        NODE_RETURN(
+            qt_QColor_fromHsl_QColor_int_int_int_int(NODE_THREAD, NODE_ARG(0, int), NODE_ARG(1, int), NODE_ARG(2, int), NODE_ARG(3, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_fromHslF0, Pointer)
     {
-        NODE_RETURN(qt_QColor_fromHslF_QColor_double_double_double_double(
-            NODE_THREAD, NODE_ARG(0, double), NODE_ARG(1, double),
-            NODE_ARG(2, double), NODE_ARG(3, double)));
+        NODE_RETURN(qt_QColor_fromHslF_QColor_double_double_double_double(NODE_THREAD, NODE_ARG(0, double), NODE_ARG(1, double),
+                                                                          NODE_ARG(2, double), NODE_ARG(3, double)));
     }
 
     static NODE_IMPLEMENTATION(_n_fromHsv0, Pointer)
     {
-        NODE_RETURN(qt_QColor_fromHsv_QColor_int_int_int_int(
-            NODE_THREAD, NODE_ARG(0, int), NODE_ARG(1, int), NODE_ARG(2, int),
-            NODE_ARG(3, int)));
+        NODE_RETURN(
+            qt_QColor_fromHsv_QColor_int_int_int_int(NODE_THREAD, NODE_ARG(0, int), NODE_ARG(1, int), NODE_ARG(2, int), NODE_ARG(3, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_fromHsvF0, Pointer)
     {
-        NODE_RETURN(qt_QColor_fromHsvF_QColor_double_double_double_double(
-            NODE_THREAD, NODE_ARG(0, double), NODE_ARG(1, double),
-            NODE_ARG(2, double), NODE_ARG(3, double)));
+        NODE_RETURN(qt_QColor_fromHsvF_QColor_double_double_double_double(NODE_THREAD, NODE_ARG(0, double), NODE_ARG(1, double),
+                                                                          NODE_ARG(2, double), NODE_ARG(3, double)));
     }
 
-    static NODE_IMPLEMENTATION(_n_fromRgb0, Pointer)
-    {
-        NODE_RETURN(
-            qt_QColor_fromRgb_QColor_int(NODE_THREAD, NODE_ARG(0, int)));
-    }
+    static NODE_IMPLEMENTATION(_n_fromRgb0, Pointer) { NODE_RETURN(qt_QColor_fromRgb_QColor_int(NODE_THREAD, NODE_ARG(0, int))); }
 
     static NODE_IMPLEMENTATION(_n_fromRgb1, Pointer)
     {
-        NODE_RETURN(qt_QColor_fromRgb_QColor_int_int_int_int(
-            NODE_THREAD, NODE_ARG(0, int), NODE_ARG(1, int), NODE_ARG(2, int),
-            NODE_ARG(3, int)));
+        NODE_RETURN(
+            qt_QColor_fromRgb_QColor_int_int_int_int(NODE_THREAD, NODE_ARG(0, int), NODE_ARG(1, int), NODE_ARG(2, int), NODE_ARG(3, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_fromRgbF0, Pointer)
     {
-        NODE_RETURN(qt_QColor_fromRgbF_QColor_double_double_double_double(
-            NODE_THREAD, NODE_ARG(0, double), NODE_ARG(1, double),
-            NODE_ARG(2, double), NODE_ARG(3, double)));
+        NODE_RETURN(qt_QColor_fromRgbF_QColor_double_double_double_double(NODE_THREAD, NODE_ARG(0, double), NODE_ARG(1, double),
+                                                                          NODE_ARG(2, double), NODE_ARG(3, double)));
     }
 
-    static NODE_IMPLEMENTATION(_n_fromRgba0, Pointer)
-    {
-        NODE_RETURN(
-            qt_QColor_fromRgba_QColor_int(NODE_THREAD, NODE_ARG(0, int)));
-    }
+    static NODE_IMPLEMENTATION(_n_fromRgba0, Pointer) { NODE_RETURN(qt_QColor_fromRgba_QColor_int(NODE_THREAD, NODE_ARG(0, int))); }
 
     static NODE_IMPLEMENTATION(_n_isValidColor0, bool)
     {
-        NODE_RETURN(qt_QColor_isValidColor_bool_string(NODE_THREAD,
-                                                       NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QColor_isValidColor_bool_string(NODE_THREAD, NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_co_n_QVariant0, Pointer)
     {
-        NODE_RETURN(qt_QColor_QVariant_QVariant_QVariant_QColor(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QColor_QVariant_QVariant_QVariant_QColor(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     void QColorType::load()
@@ -1397,93 +1133,59 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(
-            new Function(c, "__allocate", __allocate, None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", __allocate, None, Return, ftn, End),
 
-            EndArguments);
+                   EndArguments);
 
-        addSymbols(
-            new Alias(c, "NameFormat", "int"),
-            new SymbolicConstant(c, "HexRgb", "int",
-                                 Value(int(QColor::HexRgb))),
-            new SymbolicConstant(c, "HexArgb", "int",
-                                 Value(int(QColor::HexArgb))),
-            new Alias(c, "Spec", "int"),
-            new SymbolicConstant(c, "Rgb", "int", Value(int(QColor::Rgb))),
-            new SymbolicConstant(c, "Hsv", "int", Value(int(QColor::Hsv))),
-            new SymbolicConstant(c, "Cmyk", "int", Value(int(QColor::Cmyk))),
-            new SymbolicConstant(c, "Hsl", "int", Value(int(QColor::Hsl))),
-            new SymbolicConstant(c, "Invalid", "int",
-                                 Value(int(QColor::Invalid))),
-            EndArguments);
+        addSymbols(new Alias(c, "NameFormat", "int"), new SymbolicConstant(c, "HexRgb", "int", Value(int(QColor::HexRgb))),
+                   new SymbolicConstant(c, "HexArgb", "int", Value(int(QColor::HexArgb))), new Alias(c, "Spec", "int"),
+                   new SymbolicConstant(c, "Rgb", "int", Value(int(QColor::Rgb))),
+                   new SymbolicConstant(c, "Hsv", "int", Value(int(QColor::Hsv))),
+                   new SymbolicConstant(c, "Cmyk", "int", Value(int(QColor::Cmyk))),
+                   new SymbolicConstant(c, "Hsl", "int", Value(int(QColor::Hsl))),
+                   new SymbolicConstant(c, "Invalid", "int", Value(int(QColor::Invalid))), EndArguments);
 
         addSymbols(
             // enums
             // member functions
-            new Function(c, "QColor", _n_QColor0, None, Compiled,
-                         qt_QColor_QColor_QColor_QColor, Return, "qt.QColor",
-                         Parameters, new Param(c, "this", "qt.QColor"), End),
-            new Function(c, "QColor", _n_QColor1, None, Compiled,
-                         qt_QColor_QColor_QColor_QColor_int, Return,
-                         "qt.QColor", Parameters,
-                         new Param(c, "this", "qt.QColor"),
-                         new Param(c, "color", "int"), End),
-            new Function(c, "QColor", _n_QColor2, None, Compiled,
-                         qt_QColor_QColor_QColor_QColor_int_int_int_int, Return,
-                         "qt.QColor", Parameters,
-                         new Param(c, "this", "qt.QColor"),
-                         new Param(c, "r", "int"), new Param(c, "g", "int"),
-                         new Param(c, "b", "int"),
-                         new Param(c, "a", "int", Value((int)255)), End),
+            new Function(c, "QColor", _n_QColor0, None, Compiled, qt_QColor_QColor_QColor_QColor, Return, "qt.QColor", Parameters,
+                         new Param(c, "this", "qt.QColor"), End),
+            new Function(c, "QColor", _n_QColor1, None, Compiled, qt_QColor_QColor_QColor_QColor_int, Return, "qt.QColor", Parameters,
+                         new Param(c, "this", "qt.QColor"), new Param(c, "color", "int"), End),
+            new Function(c, "QColor", _n_QColor2, None, Compiled, qt_QColor_QColor_QColor_QColor_int_int_int_int, Return, "qt.QColor",
+                         Parameters, new Param(c, "this", "qt.QColor"), new Param(c, "r", "int"), new Param(c, "g", "int"),
+                         new Param(c, "b", "int"), new Param(c, "a", "int", Value((int)255)), End),
             // MISSING: QColor (QColor; QColor this, int color)
             // MISSING: QColor (QColor; QColor this, "QRgba64" rgba64)
-            new Function(c, "QColor", _n_QColor5, None, Compiled,
-                         qt_QColor_QColor_QColor_QColor_string, Return,
-                         "qt.QColor", Parameters,
-                         new Param(c, "this", "qt.QColor"),
-                         new Param(c, "name", "string"), End),
+            new Function(c, "QColor", _n_QColor5, None, Compiled, qt_QColor_QColor_QColor_QColor_string, Return, "qt.QColor", Parameters,
+                         new Param(c, "this", "qt.QColor"), new Param(c, "name", "string"), End),
             // MISSING: QColor (QColor; QColor this, "const char *" name)
             // MISSING: QColor (QColor; QColor this, QColor color)
             // MISSING: QColor (QColor; QColor this, QColor other)
-            new Function(c, "alpha", _n_alpha0, None, Compiled,
-                         qt_QColor_alpha_int_QColor, Return, "int", Parameters,
+            new Function(c, "alpha", _n_alpha0, None, Compiled, qt_QColor_alpha_int_QColor, Return, "int", Parameters,
                          new Param(c, "this", "qt.QColor"), End),
-            new Function(c, "alphaF", _n_alphaF0, None, Compiled,
-                         qt_QColor_alphaF_double_QColor, Return, "double",
-                         Parameters, new Param(c, "this", "qt.QColor"), End),
-            new Function(c, "black", _n_black0, None, Compiled,
-                         qt_QColor_black_int_QColor, Return, "int", Parameters,
+            new Function(c, "alphaF", _n_alphaF0, None, Compiled, qt_QColor_alphaF_double_QColor, Return, "double", Parameters,
                          new Param(c, "this", "qt.QColor"), End),
-            new Function(c, "blackF", _n_blackF0, None, Compiled,
-                         qt_QColor_blackF_double_QColor, Return, "double",
-                         Parameters, new Param(c, "this", "qt.QColor"), End),
-            new Function(c, "blue", _n_blue0, None, Compiled,
-                         qt_QColor_blue_int_QColor, Return, "int", Parameters,
+            new Function(c, "black", _n_black0, None, Compiled, qt_QColor_black_int_QColor, Return, "int", Parameters,
                          new Param(c, "this", "qt.QColor"), End),
-            new Function(c, "blueF", _n_blueF0, None, Compiled,
-                         qt_QColor_blueF_double_QColor, Return, "double",
-                         Parameters, new Param(c, "this", "qt.QColor"), End),
-            new Function(c, "convertTo", _n_convertTo0, None, Compiled,
-                         qt_QColor_convertTo_QColor_QColor_int, Return,
-                         "qt.QColor", Parameters,
-                         new Param(c, "this", "qt.QColor"),
-                         new Param(c, "colorSpec", "int"), End),
-            new Function(c, "cyan", _n_cyan0, None, Compiled,
-                         qt_QColor_cyan_int_QColor, Return, "int", Parameters,
+            new Function(c, "blackF", _n_blackF0, None, Compiled, qt_QColor_blackF_double_QColor, Return, "double", Parameters,
                          new Param(c, "this", "qt.QColor"), End),
-            new Function(c, "cyanF", _n_cyanF0, None, Compiled,
-                         qt_QColor_cyanF_double_QColor, Return, "double",
-                         Parameters, new Param(c, "this", "qt.QColor"), End),
-            new Function(c, "darker", _n_darker0, None, Compiled,
-                         qt_QColor_darker_QColor_QColor_int, Return,
-                         "qt.QColor", Parameters,
-                         new Param(c, "this", "qt.QColor"),
-                         new Param(c, "factor", "int", Value((int)200)), End),
+            new Function(c, "blue", _n_blue0, None, Compiled, qt_QColor_blue_int_QColor, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QColor"), End),
+            new Function(c, "blueF", _n_blueF0, None, Compiled, qt_QColor_blueF_double_QColor, Return, "double", Parameters,
+                         new Param(c, "this", "qt.QColor"), End),
+            new Function(c, "convertTo", _n_convertTo0, None, Compiled, qt_QColor_convertTo_QColor_QColor_int, Return, "qt.QColor",
+                         Parameters, new Param(c, "this", "qt.QColor"), new Param(c, "colorSpec", "int"), End),
+            new Function(c, "cyan", _n_cyan0, None, Compiled, qt_QColor_cyan_int_QColor, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QColor"), End),
+            new Function(c, "cyanF", _n_cyanF0, None, Compiled, qt_QColor_cyanF_double_QColor, Return, "double", Parameters,
+                         new Param(c, "this", "qt.QColor"), End),
+            new Function(c, "darker", _n_darker0, None, Compiled, qt_QColor_darker_QColor_QColor_int, Return, "qt.QColor", Parameters,
+                         new Param(c, "this", "qt.QColor"), new Param(c, "factor", "int", Value((int)200)), End),
             // MISSING: getCmyk (void; QColor this, "int *" c, "int *" m, "int
             // *" y, "int *" k, "int *" a) MISSING: getCmykF (void; QColor this,
             // "qreal *" c, "qreal *" m, "qreal *" y, "qreal *" k, "qreal *" a)
@@ -1495,293 +1197,173 @@ namespace Mu
             // v, "qreal *" a) MISSING: getRgb (void; QColor this, "int *" r,
             // "int *" g, "int *" b, "int *" a) MISSING: getRgbF (void; QColor
             // this, "qreal *" r, "qreal *" g, "qreal *" b, "qreal *" a)
-            new Function(c, "green", _n_green0, None, Compiled,
-                         qt_QColor_green_int_QColor, Return, "int", Parameters,
+            new Function(c, "green", _n_green0, None, Compiled, qt_QColor_green_int_QColor, Return, "int", Parameters,
                          new Param(c, "this", "qt.QColor"), End),
-            new Function(c, "greenF", _n_greenF0, None, Compiled,
-                         qt_QColor_greenF_double_QColor, Return, "double",
-                         Parameters, new Param(c, "this", "qt.QColor"), End),
-            new Function(c, "hslHue", _n_hslHue0, None, Compiled,
-                         qt_QColor_hslHue_int_QColor, Return, "int", Parameters,
+            new Function(c, "greenF", _n_greenF0, None, Compiled, qt_QColor_greenF_double_QColor, Return, "double", Parameters,
                          new Param(c, "this", "qt.QColor"), End),
-            new Function(c, "hslHueF", _n_hslHueF0, None, Compiled,
-                         qt_QColor_hslHueF_double_QColor, Return, "double",
-                         Parameters, new Param(c, "this", "qt.QColor"), End),
-            new Function(c, "hslSaturation", _n_hslSaturation0, None, Compiled,
-                         qt_QColor_hslSaturation_int_QColor, Return, "int",
-                         Parameters, new Param(c, "this", "qt.QColor"), End),
-            new Function(c, "hslSaturationF", _n_hslSaturationF0, None,
-                         Compiled, qt_QColor_hslSaturationF_double_QColor,
-                         Return, "double", Parameters,
+            new Function(c, "hslHue", _n_hslHue0, None, Compiled, qt_QColor_hslHue_int_QColor, Return, "int", Parameters,
                          new Param(c, "this", "qt.QColor"), End),
-            new Function(c, "hsvHue", _n_hsvHue0, None, Compiled,
-                         qt_QColor_hsvHue_int_QColor, Return, "int", Parameters,
+            new Function(c, "hslHueF", _n_hslHueF0, None, Compiled, qt_QColor_hslHueF_double_QColor, Return, "double", Parameters,
                          new Param(c, "this", "qt.QColor"), End),
-            new Function(c, "hsvHueF", _n_hsvHueF0, None, Compiled,
-                         qt_QColor_hsvHueF_double_QColor, Return, "double",
+            new Function(c, "hslSaturation", _n_hslSaturation0, None, Compiled, qt_QColor_hslSaturation_int_QColor, Return, "int",
                          Parameters, new Param(c, "this", "qt.QColor"), End),
-            new Function(c, "hsvSaturation", _n_hsvSaturation0, None, Compiled,
-                         qt_QColor_hsvSaturation_int_QColor, Return, "int",
+            new Function(c, "hslSaturationF", _n_hslSaturationF0, None, Compiled, qt_QColor_hslSaturationF_double_QColor, Return, "double",
                          Parameters, new Param(c, "this", "qt.QColor"), End),
-            new Function(c, "hsvSaturationF", _n_hsvSaturationF0, None,
-                         Compiled, qt_QColor_hsvSaturationF_double_QColor,
-                         Return, "double", Parameters,
+            new Function(c, "hsvHue", _n_hsvHue0, None, Compiled, qt_QColor_hsvHue_int_QColor, Return, "int", Parameters,
                          new Param(c, "this", "qt.QColor"), End),
-            new Function(c, "hue", _n_hue0, None, Compiled,
-                         qt_QColor_hue_int_QColor, Return, "int", Parameters,
+            new Function(c, "hsvHueF", _n_hsvHueF0, None, Compiled, qt_QColor_hsvHueF_double_QColor, Return, "double", Parameters,
                          new Param(c, "this", "qt.QColor"), End),
-            new Function(c, "hueF", _n_hueF0, None, Compiled,
-                         qt_QColor_hueF_double_QColor, Return, "double",
+            new Function(c, "hsvSaturation", _n_hsvSaturation0, None, Compiled, qt_QColor_hsvSaturation_int_QColor, Return, "int",
                          Parameters, new Param(c, "this", "qt.QColor"), End),
-            new Function(c, "isValid", _n_isValid0, None, Compiled,
-                         qt_QColor_isValid_bool_QColor, Return, "bool",
+            new Function(c, "hsvSaturationF", _n_hsvSaturationF0, None, Compiled, qt_QColor_hsvSaturationF_double_QColor, Return, "double",
                          Parameters, new Param(c, "this", "qt.QColor"), End),
-            new Function(c, "lighter", _n_lighter0, None, Compiled,
-                         qt_QColor_lighter_QColor_QColor_int, Return,
-                         "qt.QColor", Parameters,
-                         new Param(c, "this", "qt.QColor"),
-                         new Param(c, "factor", "int", Value((int)150)), End),
-            new Function(c, "lightness", _n_lightness0, None, Compiled,
-                         qt_QColor_lightness_int_QColor, Return, "int",
-                         Parameters, new Param(c, "this", "qt.QColor"), End),
-            new Function(c, "lightnessF", _n_lightnessF0, None, Compiled,
-                         qt_QColor_lightnessF_double_QColor, Return, "double",
-                         Parameters, new Param(c, "this", "qt.QColor"), End),
-            new Function(c, "magenta", _n_magenta0, None, Compiled,
-                         qt_QColor_magenta_int_QColor, Return, "int",
-                         Parameters, new Param(c, "this", "qt.QColor"), End),
-            new Function(c, "magentaF", _n_magentaF0, None, Compiled,
-                         qt_QColor_magentaF_double_QColor, Return, "double",
-                         Parameters, new Param(c, "this", "qt.QColor"), End),
-            new Function(c, "name", _n_name0, None, Compiled,
-                         qt_QColor_name_string_QColor, Return, "string",
-                         Parameters, new Param(c, "this", "qt.QColor"), End),
-            new Function(c, "name", _n_name1, None, Compiled,
-                         qt_QColor_name_string_QColor_int, Return, "string",
-                         Parameters, new Param(c, "this", "qt.QColor"),
-                         new Param(c, "format", "int"), End),
-            new Function(c, "red", _n_red0, None, Compiled,
-                         qt_QColor_red_int_QColor, Return, "int", Parameters,
+            new Function(c, "hue", _n_hue0, None, Compiled, qt_QColor_hue_int_QColor, Return, "int", Parameters,
                          new Param(c, "this", "qt.QColor"), End),
-            new Function(c, "redF", _n_redF0, None, Compiled,
-                         qt_QColor_redF_double_QColor, Return, "double",
-                         Parameters, new Param(c, "this", "qt.QColor"), End),
-            new Function(c, "rgb", _n_rgb0, None, Compiled,
-                         qt_QColor_rgb_int_QColor, Return, "int", Parameters,
+            new Function(c, "hueF", _n_hueF0, None, Compiled, qt_QColor_hueF_double_QColor, Return, "double", Parameters,
+                         new Param(c, "this", "qt.QColor"), End),
+            new Function(c, "isValid", _n_isValid0, None, Compiled, qt_QColor_isValid_bool_QColor, Return, "bool", Parameters,
+                         new Param(c, "this", "qt.QColor"), End),
+            new Function(c, "lighter", _n_lighter0, None, Compiled, qt_QColor_lighter_QColor_QColor_int, Return, "qt.QColor", Parameters,
+                         new Param(c, "this", "qt.QColor"), new Param(c, "factor", "int", Value((int)150)), End),
+            new Function(c, "lightness", _n_lightness0, None, Compiled, qt_QColor_lightness_int_QColor, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QColor"), End),
+            new Function(c, "lightnessF", _n_lightnessF0, None, Compiled, qt_QColor_lightnessF_double_QColor, Return, "double", Parameters,
+                         new Param(c, "this", "qt.QColor"), End),
+            new Function(c, "magenta", _n_magenta0, None, Compiled, qt_QColor_magenta_int_QColor, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QColor"), End),
+            new Function(c, "magentaF", _n_magentaF0, None, Compiled, qt_QColor_magentaF_double_QColor, Return, "double", Parameters,
+                         new Param(c, "this", "qt.QColor"), End),
+            new Function(c, "name", _n_name0, None, Compiled, qt_QColor_name_string_QColor, Return, "string", Parameters,
+                         new Param(c, "this", "qt.QColor"), End),
+            new Function(c, "name", _n_name1, None, Compiled, qt_QColor_name_string_QColor_int, Return, "string", Parameters,
+                         new Param(c, "this", "qt.QColor"), new Param(c, "format", "int"), End),
+            new Function(c, "red", _n_red0, None, Compiled, qt_QColor_red_int_QColor, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QColor"), End),
+            new Function(c, "redF", _n_redF0, None, Compiled, qt_QColor_redF_double_QColor, Return, "double", Parameters,
+                         new Param(c, "this", "qt.QColor"), End),
+            new Function(c, "rgb", _n_rgb0, None, Compiled, qt_QColor_rgb_int_QColor, Return, "int", Parameters,
                          new Param(c, "this", "qt.QColor"), End),
             // MISSING: rgba64 ("QRgba64"; QColor this)
-            new Function(c, "rgba", _n_rgba0, None, Compiled,
-                         qt_QColor_rgba_int_QColor, Return, "int", Parameters,
+            new Function(c, "rgba", _n_rgba0, None, Compiled, qt_QColor_rgba_int_QColor, Return, "int", Parameters,
                          new Param(c, "this", "qt.QColor"), End),
-            new Function(c, "saturation", _n_saturation0, None, Compiled,
-                         qt_QColor_saturation_int_QColor, Return, "int",
+            new Function(c, "saturation", _n_saturation0, None, Compiled, qt_QColor_saturation_int_QColor, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QColor"), End),
+            new Function(c, "saturationF", _n_saturationF0, None, Compiled, qt_QColor_saturationF_double_QColor, Return, "double",
                          Parameters, new Param(c, "this", "qt.QColor"), End),
-            new Function(c, "saturationF", _n_saturationF0, None, Compiled,
-                         qt_QColor_saturationF_double_QColor, Return, "double",
-                         Parameters, new Param(c, "this", "qt.QColor"), End),
-            new Function(c, "setAlpha", _n_setAlpha0, None, Compiled,
-                         qt_QColor_setAlpha_void_QColor_int, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QColor"),
-                         new Param(c, "alpha", "int"), End),
-            new Function(c, "setAlphaF", _n_setAlphaF0, None, Compiled,
-                         qt_QColor_setAlphaF_void_QColor_double, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QColor"),
-                         new Param(c, "alpha", "double"), End),
-            new Function(c, "setBlue", _n_setBlue0, None, Compiled,
-                         qt_QColor_setBlue_void_QColor_int, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QColor"),
-                         new Param(c, "blue", "int"), End),
-            new Function(c, "setBlueF", _n_setBlueF0, None, Compiled,
-                         qt_QColor_setBlueF_void_QColor_double, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QColor"),
-                         new Param(c, "blue", "double"), End),
-            new Function(c, "setCmyk", _n_setCmyk0, None, Compiled,
-                         qt_QColor_setCmyk_void_QColor_int_int_int_int_int,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QColor"),
-                         new Param(c, "c", "int"), new Param(c, "m", "int"),
-                         new Param(c, "y", "int"), new Param(c, "k", "int"),
+            new Function(c, "setAlpha", _n_setAlpha0, None, Compiled, qt_QColor_setAlpha_void_QColor_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QColor"), new Param(c, "alpha", "int"), End),
+            new Function(c, "setAlphaF", _n_setAlphaF0, None, Compiled, qt_QColor_setAlphaF_void_QColor_double, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QColor"), new Param(c, "alpha", "double"), End),
+            new Function(c, "setBlue", _n_setBlue0, None, Compiled, qt_QColor_setBlue_void_QColor_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QColor"), new Param(c, "blue", "int"), End),
+            new Function(c, "setBlueF", _n_setBlueF0, None, Compiled, qt_QColor_setBlueF_void_QColor_double, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QColor"), new Param(c, "blue", "double"), End),
+            new Function(c, "setCmyk", _n_setCmyk0, None, Compiled, qt_QColor_setCmyk_void_QColor_int_int_int_int_int, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QColor"), new Param(c, "c", "int"), new Param(c, "m", "int"),
+                         new Param(c, "y", "int"), new Param(c, "k", "int"), new Param(c, "a", "int", Value((int)255)), End),
+            new Function(c, "setCmykF", _n_setCmykF0, None, Compiled, qt_QColor_setCmykF_void_QColor_double_double_double_double_double,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QColor"), new Param(c, "c", "double"),
+                         new Param(c, "m", "double"), new Param(c, "y", "double"), new Param(c, "k", "double"), new Param(c, "a", "double"),
+                         End),
+            new Function(c, "setGreen", _n_setGreen0, None, Compiled, qt_QColor_setGreen_void_QColor_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QColor"), new Param(c, "green", "int"), End),
+            new Function(c, "setGreenF", _n_setGreenF0, None, Compiled, qt_QColor_setGreenF_void_QColor_double, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QColor"), new Param(c, "green", "double"), End),
+            new Function(c, "setHsl", _n_setHsl0, None, Compiled, qt_QColor_setHsl_void_QColor_int_int_int_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QColor"), new Param(c, "h", "int"), new Param(c, "s", "int"), new Param(c, "l", "int"),
                          new Param(c, "a", "int", Value((int)255)), End),
-            new Function(
-                c, "setCmykF", _n_setCmykF0, None, Compiled,
-                qt_QColor_setCmykF_void_QColor_double_double_double_double_double,
-                Return, "void", Parameters, new Param(c, "this", "qt.QColor"),
-                new Param(c, "c", "double"), new Param(c, "m", "double"),
-                new Param(c, "y", "double"), new Param(c, "k", "double"),
-                new Param(c, "a", "double"), End),
-            new Function(c, "setGreen", _n_setGreen0, None, Compiled,
-                         qt_QColor_setGreen_void_QColor_int, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QColor"),
-                         new Param(c, "green", "int"), End),
-            new Function(c, "setGreenF", _n_setGreenF0, None, Compiled,
-                         qt_QColor_setGreenF_void_QColor_double, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QColor"),
-                         new Param(c, "green", "double"), End),
-            new Function(c, "setHsl", _n_setHsl0, None, Compiled,
-                         qt_QColor_setHsl_void_QColor_int_int_int_int, Return,
-                         "void", Parameters, new Param(c, "this", "qt.QColor"),
-                         new Param(c, "h", "int"), new Param(c, "s", "int"),
-                         new Param(c, "l", "int"),
+            new Function(c, "setHslF", _n_setHslF0, None, Compiled, qt_QColor_setHslF_void_QColor_double_double_double_double, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QColor"), new Param(c, "h", "double"), new Param(c, "s", "double"),
+                         new Param(c, "l", "double"), new Param(c, "a", "double"), End),
+            new Function(c, "setHsv", _n_setHsv0, None, Compiled, qt_QColor_setHsv_void_QColor_int_int_int_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QColor"), new Param(c, "h", "int"), new Param(c, "s", "int"), new Param(c, "v", "int"),
                          new Param(c, "a", "int", Value((int)255)), End),
-            new Function(
-                c, "setHslF", _n_setHslF0, None, Compiled,
-                qt_QColor_setHslF_void_QColor_double_double_double_double,
-                Return, "void", Parameters, new Param(c, "this", "qt.QColor"),
-                new Param(c, "h", "double"), new Param(c, "s", "double"),
-                new Param(c, "l", "double"), new Param(c, "a", "double"), End),
-            new Function(c, "setHsv", _n_setHsv0, None, Compiled,
-                         qt_QColor_setHsv_void_QColor_int_int_int_int, Return,
-                         "void", Parameters, new Param(c, "this", "qt.QColor"),
-                         new Param(c, "h", "int"), new Param(c, "s", "int"),
-                         new Param(c, "v", "int"),
+            new Function(c, "setHsvF", _n_setHsvF0, None, Compiled, qt_QColor_setHsvF_void_QColor_double_double_double_double, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QColor"), new Param(c, "h", "double"), new Param(c, "s", "double"),
+                         new Param(c, "v", "double"), new Param(c, "a", "double"), End),
+            new Function(c, "setNamedColor", _n_setNamedColor0, None, Compiled, qt_QColor_setNamedColor_void_QColor_string, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QColor"), new Param(c, "name", "string"), End),
+            new Function(c, "setRed", _n_setRed0, None, Compiled, qt_QColor_setRed_void_QColor_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QColor"), new Param(c, "red", "int"), End),
+            new Function(c, "setRedF", _n_setRedF0, None, Compiled, qt_QColor_setRedF_void_QColor_double, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QColor"), new Param(c, "red", "double"), End),
+            new Function(c, "setRgb", _n_setRgb0, None, Compiled, qt_QColor_setRgb_void_QColor_int_int_int_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QColor"), new Param(c, "r", "int"), new Param(c, "g", "int"), new Param(c, "b", "int"),
                          new Param(c, "a", "int", Value((int)255)), End),
-            new Function(
-                c, "setHsvF", _n_setHsvF0, None, Compiled,
-                qt_QColor_setHsvF_void_QColor_double_double_double_double,
-                Return, "void", Parameters, new Param(c, "this", "qt.QColor"),
-                new Param(c, "h", "double"), new Param(c, "s", "double"),
-                new Param(c, "v", "double"), new Param(c, "a", "double"), End),
-            new Function(c, "setNamedColor", _n_setNamedColor0, None, Compiled,
-                         qt_QColor_setNamedColor_void_QColor_string, Return,
-                         "void", Parameters, new Param(c, "this", "qt.QColor"),
-                         new Param(c, "name", "string"), End),
-            new Function(c, "setRed", _n_setRed0, None, Compiled,
-                         qt_QColor_setRed_void_QColor_int, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QColor"),
-                         new Param(c, "red", "int"), End),
-            new Function(c, "setRedF", _n_setRedF0, None, Compiled,
-                         qt_QColor_setRedF_void_QColor_double, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QColor"),
-                         new Param(c, "red", "double"), End),
-            new Function(c, "setRgb", _n_setRgb0, None, Compiled,
-                         qt_QColor_setRgb_void_QColor_int_int_int_int, Return,
-                         "void", Parameters, new Param(c, "this", "qt.QColor"),
-                         new Param(c, "r", "int"), new Param(c, "g", "int"),
-                         new Param(c, "b", "int"),
-                         new Param(c, "a", "int", Value((int)255)), End),
-            new Function(c, "setRgb", _n_setRgb1, None, Compiled,
-                         qt_QColor_setRgb_void_QColor_int, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QColor"),
-                         new Param(c, "rgb", "int"), End),
+            new Function(c, "setRgb", _n_setRgb1, None, Compiled, qt_QColor_setRgb_void_QColor_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QColor"), new Param(c, "rgb", "int"), End),
             // MISSING: setRgba64 (void; QColor this, "QRgba64" rgba)
-            new Function(
-                c, "setRgbF", _n_setRgbF0, None, Compiled,
-                qt_QColor_setRgbF_void_QColor_double_double_double_double,
-                Return, "void", Parameters, new Param(c, "this", "qt.QColor"),
-                new Param(c, "r", "double"), new Param(c, "g", "double"),
-                new Param(c, "b", "double"), new Param(c, "a", "double"), End),
-            new Function(c, "setRgba", _n_setRgba0, None, Compiled,
-                         qt_QColor_setRgba_void_QColor_int, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QColor"),
-                         new Param(c, "rgba", "int"), End),
-            new Function(c, "spec", _n_spec0, None, Compiled,
-                         qt_QColor_spec_int_QColor, Return, "int", Parameters,
+            new Function(c, "setRgbF", _n_setRgbF0, None, Compiled, qt_QColor_setRgbF_void_QColor_double_double_double_double, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QColor"), new Param(c, "r", "double"), new Param(c, "g", "double"),
+                         new Param(c, "b", "double"), new Param(c, "a", "double"), End),
+            new Function(c, "setRgba", _n_setRgba0, None, Compiled, qt_QColor_setRgba_void_QColor_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QColor"), new Param(c, "rgba", "int"), End),
+            new Function(c, "spec", _n_spec0, None, Compiled, qt_QColor_spec_int_QColor, Return, "int", Parameters,
                          new Param(c, "this", "qt.QColor"), End),
-            new Function(c, "toCmyk", _n_toCmyk0, None, Compiled,
-                         qt_QColor_toCmyk_QColor_QColor, Return, "qt.QColor",
-                         Parameters, new Param(c, "this", "qt.QColor"), End),
-            new Function(c, "toHsl", _n_toHsl0, None, Compiled,
-                         qt_QColor_toHsl_QColor_QColor, Return, "qt.QColor",
-                         Parameters, new Param(c, "this", "qt.QColor"), End),
-            new Function(c, "toHsv", _n_toHsv0, None, Compiled,
-                         qt_QColor_toHsv_QColor_QColor, Return, "qt.QColor",
-                         Parameters, new Param(c, "this", "qt.QColor"), End),
-            new Function(c, "toRgb", _n_toRgb0, None, Compiled,
-                         qt_QColor_toRgb_QColor_QColor, Return, "qt.QColor",
-                         Parameters, new Param(c, "this", "qt.QColor"), End),
-            new Function(c, "value", _n_value0, None, Compiled,
-                         qt_QColor_value_int_QColor, Return, "int", Parameters,
+            new Function(c, "toCmyk", _n_toCmyk0, None, Compiled, qt_QColor_toCmyk_QColor_QColor, Return, "qt.QColor", Parameters,
                          new Param(c, "this", "qt.QColor"), End),
-            new Function(c, "valueF", _n_valueF0, None, Compiled,
-                         qt_QColor_valueF_double_QColor, Return, "double",
-                         Parameters, new Param(c, "this", "qt.QColor"), End),
-            new Function(c, "yellow", _n_yellow0, None, Compiled,
-                         qt_QColor_yellow_int_QColor, Return, "int", Parameters,
+            new Function(c, "toHsl", _n_toHsl0, None, Compiled, qt_QColor_toHsl_QColor_QColor, Return, "qt.QColor", Parameters,
                          new Param(c, "this", "qt.QColor"), End),
-            new Function(c, "yellowF", _n_yellowF0, None, Compiled,
-                         qt_QColor_yellowF_double_QColor, Return, "double",
-                         Parameters, new Param(c, "this", "qt.QColor"), End),
+            new Function(c, "toHsv", _n_toHsv0, None, Compiled, qt_QColor_toHsv_QColor_QColor, Return, "qt.QColor", Parameters,
+                         new Param(c, "this", "qt.QColor"), End),
+            new Function(c, "toRgb", _n_toRgb0, None, Compiled, qt_QColor_toRgb_QColor_QColor, Return, "qt.QColor", Parameters,
+                         new Param(c, "this", "qt.QColor"), End),
+            new Function(c, "value", _n_value0, None, Compiled, qt_QColor_value_int_QColor, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QColor"), End),
+            new Function(c, "valueF", _n_valueF0, None, Compiled, qt_QColor_valueF_double_QColor, Return, "double", Parameters,
+                         new Param(c, "this", "qt.QColor"), End),
+            new Function(c, "yellow", _n_yellow0, None, Compiled, qt_QColor_yellow_int_QColor, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QColor"), End),
+            new Function(c, "yellowF", _n_yellowF0, None, Compiled, qt_QColor_yellowF_double_QColor, Return, "double", Parameters,
+                         new Param(c, "this", "qt.QColor"), End),
             // static functions
-            new Function(c, "colorNames", _n_colorNames0, None, Compiled,
-                         qt_QColor_colorNames_stringBSB_ESB_, Return,
-                         "string[]", End),
-            new Function(c, "fromCmyk", _n_fromCmyk0, None, Compiled,
-                         qt_QColor_fromCmyk_QColor_int_int_int_int_int, Return,
-                         "qt.QColor", Parameters, new Param(c, "c", "int"),
-                         new Param(c, "m", "int"), new Param(c, "y", "int"),
-                         new Param(c, "k", "int"),
+            new Function(c, "colorNames", _n_colorNames0, None, Compiled, qt_QColor_colorNames_stringBSB_ESB_, Return, "string[]", End),
+            new Function(c, "fromCmyk", _n_fromCmyk0, None, Compiled, qt_QColor_fromCmyk_QColor_int_int_int_int_int, Return, "qt.QColor",
+                         Parameters, new Param(c, "c", "int"), new Param(c, "m", "int"), new Param(c, "y", "int"), new Param(c, "k", "int"),
                          new Param(c, "a", "int", Value((int)255)), End),
-            new Function(
-                c, "fromCmykF", _n_fromCmykF0, None, Compiled,
-                qt_QColor_fromCmykF_QColor_double_double_double_double_double,
-                Return, "qt.QColor", Parameters, new Param(c, "c", "double"),
-                new Param(c, "m", "double"), new Param(c, "y", "double"),
-                new Param(c, "k", "double"), new Param(c, "a", "double"), End),
-            new Function(c, "fromHsl", _n_fromHsl0, None, Compiled,
-                         qt_QColor_fromHsl_QColor_int_int_int_int, Return,
-                         "qt.QColor", Parameters, new Param(c, "h", "int"),
-                         new Param(c, "s", "int"), new Param(c, "l", "int"),
+            new Function(c, "fromCmykF", _n_fromCmykF0, None, Compiled, qt_QColor_fromCmykF_QColor_double_double_double_double_double,
+                         Return, "qt.QColor", Parameters, new Param(c, "c", "double"), new Param(c, "m", "double"),
+                         new Param(c, "y", "double"), new Param(c, "k", "double"), new Param(c, "a", "double"), End),
+            new Function(c, "fromHsl", _n_fromHsl0, None, Compiled, qt_QColor_fromHsl_QColor_int_int_int_int, Return, "qt.QColor",
+                         Parameters, new Param(c, "h", "int"), new Param(c, "s", "int"), new Param(c, "l", "int"),
                          new Param(c, "a", "int", Value((int)255)), End),
-            new Function(
-                c, "fromHslF", _n_fromHslF0, None, Compiled,
-                qt_QColor_fromHslF_QColor_double_double_double_double, Return,
-                "qt.QColor", Parameters, new Param(c, "h", "double"),
-                new Param(c, "s", "double"), new Param(c, "l", "double"),
-                new Param(c, "a", "double"), End),
-            new Function(c, "fromHsv", _n_fromHsv0, None, Compiled,
-                         qt_QColor_fromHsv_QColor_int_int_int_int, Return,
-                         "qt.QColor", Parameters, new Param(c, "h", "int"),
-                         new Param(c, "s", "int"), new Param(c, "v", "int"),
+            new Function(c, "fromHslF", _n_fromHslF0, None, Compiled, qt_QColor_fromHslF_QColor_double_double_double_double, Return,
+                         "qt.QColor", Parameters, new Param(c, "h", "double"), new Param(c, "s", "double"), new Param(c, "l", "double"),
+                         new Param(c, "a", "double"), End),
+            new Function(c, "fromHsv", _n_fromHsv0, None, Compiled, qt_QColor_fromHsv_QColor_int_int_int_int, Return, "qt.QColor",
+                         Parameters, new Param(c, "h", "int"), new Param(c, "s", "int"), new Param(c, "v", "int"),
                          new Param(c, "a", "int", Value((int)255)), End),
-            new Function(
-                c, "fromHsvF", _n_fromHsvF0, None, Compiled,
-                qt_QColor_fromHsvF_QColor_double_double_double_double, Return,
-                "qt.QColor", Parameters, new Param(c, "h", "double"),
-                new Param(c, "s", "double"), new Param(c, "v", "double"),
-                new Param(c, "a", "double"), End),
-            new Function(c, "fromRgb", _n_fromRgb0, None, Compiled,
-                         qt_QColor_fromRgb_QColor_int, Return, "qt.QColor",
-                         Parameters, new Param(c, "rgb", "int"), End),
-            new Function(c, "fromRgb", _n_fromRgb1, None, Compiled,
-                         qt_QColor_fromRgb_QColor_int_int_int_int, Return,
-                         "qt.QColor", Parameters, new Param(c, "r", "int"),
-                         new Param(c, "g", "int"), new Param(c, "b", "int"),
+            new Function(c, "fromHsvF", _n_fromHsvF0, None, Compiled, qt_QColor_fromHsvF_QColor_double_double_double_double, Return,
+                         "qt.QColor", Parameters, new Param(c, "h", "double"), new Param(c, "s", "double"), new Param(c, "v", "double"),
+                         new Param(c, "a", "double"), End),
+            new Function(c, "fromRgb", _n_fromRgb0, None, Compiled, qt_QColor_fromRgb_QColor_int, Return, "qt.QColor", Parameters,
+                         new Param(c, "rgb", "int"), End),
+            new Function(c, "fromRgb", _n_fromRgb1, None, Compiled, qt_QColor_fromRgb_QColor_int_int_int_int, Return, "qt.QColor",
+                         Parameters, new Param(c, "r", "int"), new Param(c, "g", "int"), new Param(c, "b", "int"),
                          new Param(c, "a", "int", Value((int)255)), End),
             // MISSING: fromRgba64 (QColor; "ushort" r, "ushort" g, "ushort" b,
             // "ushort" a) MISSING: fromRgba64 (QColor; "QRgba64" rgba64)
-            new Function(
-                c, "fromRgbF", _n_fromRgbF0, None, Compiled,
-                qt_QColor_fromRgbF_QColor_double_double_double_double, Return,
-                "qt.QColor", Parameters, new Param(c, "r", "double"),
-                new Param(c, "g", "double"), new Param(c, "b", "double"),
-                new Param(c, "a", "double"), End),
-            new Function(c, "fromRgba", _n_fromRgba0, None, Compiled,
-                         qt_QColor_fromRgba_QColor_int, Return, "qt.QColor",
-                         Parameters, new Param(c, "rgba", "int"), End),
-            new Function(c, "isValidColor", _n_isValidColor0, None, Compiled,
-                         qt_QColor_isValidColor_bool_string, Return, "bool",
+            new Function(c, "fromRgbF", _n_fromRgbF0, None, Compiled, qt_QColor_fromRgbF_QColor_double_double_double_double, Return,
+                         "qt.QColor", Parameters, new Param(c, "r", "double"), new Param(c, "g", "double"), new Param(c, "b", "double"),
+                         new Param(c, "a", "double"), End),
+            new Function(c, "fromRgba", _n_fromRgba0, None, Compiled, qt_QColor_fromRgba_QColor_int, Return, "qt.QColor", Parameters,
+                         new Param(c, "rgba", "int"), End),
+            new Function(c, "isValidColor", _n_isValidColor0, None, Compiled, qt_QColor_isValidColor_bool_string, Return, "bool",
                          Parameters, new Param(c, "name", "string"), End),
             EndArguments);
         globalScope()->addSymbols(
-            new Function(c, "!=", _n_operatorBang_EQ_0, Op, Compiled,
-                         qt_QColor_operatorBang_EQ__bool_QColor_QColor, Return,
-                         "bool", Parameters, new Param(c, "this", "qt.QColor"),
-                         new Param(c, "color", "qt.QColor"), End),
+            new Function(c, "!=", _n_operatorBang_EQ_0, Op, Compiled, qt_QColor_operatorBang_EQ__bool_QColor_QColor, Return, "bool",
+                         Parameters, new Param(c, "this", "qt.QColor"), new Param(c, "color", "qt.QColor"), End),
             // MISSING: = (QColor; QColor this, QColor other)
             // MISSING: = (QColor; QColor this, QColor color)
             // MISSING: = (QColor; QColor this, flags Qt::GlobalColor color)
-            new Function(c, "==", _n_operatorEQ_EQ_0, Op, Compiled,
-                         qt_QColor_operatorEQ_EQ__bool_QColor_QColor, Return,
-                         "bool", Parameters, new Param(c, "this", "qt.QColor"),
-                         new Param(c, "color", "qt.QColor"), End),
+            new Function(c, "==", _n_operatorEQ_EQ_0, Op, Compiled, qt_QColor_operatorEQ_EQ__bool_QColor_QColor, Return, "bool", Parameters,
+                         new Param(c, "this", "qt.QColor"), new Param(c, "color", "qt.QColor"), End),
             EndArguments);
-        scope()->addSymbols(
-            new Function(c, "QVariant", _co_n_QVariant0, Cast, Compiled,
-                         qt_QColor_QVariant_QVariant_QVariant_QColor, Return,
-                         "qt.QVariant", Parameters,
-                         new Param(c, "this", "qt.QVariant"),
-                         new Param(c, "from", "qt.QColor"), End),
-            EndArguments);
+        scope()->addSymbols(new Function(c, "QVariant", _co_n_QVariant0, Cast, Compiled, qt_QColor_QVariant_QVariant_QVariant_QColor,
+                                         Return, "qt.QVariant", Parameters, new Param(c, "this", "qt.QVariant"),
+                                         new Param(c, "from", "qt.QColor"), End),
+                            EndArguments);
 
         //
         //  This is for QGradient

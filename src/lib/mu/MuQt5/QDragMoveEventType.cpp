@@ -38,8 +38,7 @@ namespace Mu
 {
     using namespace std;
 
-    QDragMoveEventType::QDragMoveEventType(Context* c, const char* name,
-                                           Class* super)
+    QDragMoveEventType::QDragMoveEventType(Context* c, const char* name, Class* super)
         : Class(c, name, super)
     {
     }
@@ -49,8 +48,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    void qt_QDragMoveEvent_accept_void_QDragMoveEvent_QRect(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_rectangle)
+    void qt_QDragMoveEvent_accept_void_QDragMoveEvent_QRect(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_rectangle)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QDragMoveEvent* arg0 = getqpointer<QDragMoveEventType>(param_this);
@@ -59,8 +57,7 @@ namespace Mu
         setqpointer<QDragMoveEventType>(param_this, arg0);
     }
 
-    void qt_QDragMoveEvent_accept_void_QDragMoveEvent(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    void qt_QDragMoveEvent_accept_void_QDragMoveEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QDragMoveEvent* arg0 = getqpointer<QDragMoveEventType>(param_this);
@@ -68,17 +65,14 @@ namespace Mu
         setqpointer<QDragMoveEventType>(param_this, arg0);
     }
 
-    Pointer
-    qt_QDragMoveEvent_answerRect_QRect_QDragMoveEvent(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    Pointer qt_QDragMoveEvent_answerRect_QRect_QDragMoveEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QDragMoveEvent* arg0 = getqpointer<QDragMoveEventType>(param_this);
         return makeqtype<QRectType>(c, arg0->answerRect(), "qt.QRect");
     }
 
-    void qt_QDragMoveEvent_ignore_void_QDragMoveEvent_QRect(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_rectangle)
+    void qt_QDragMoveEvent_ignore_void_QDragMoveEvent_QRect(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_rectangle)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QDragMoveEvent* arg0 = getqpointer<QDragMoveEventType>(param_this);
@@ -87,8 +81,7 @@ namespace Mu
         setqpointer<QDragMoveEventType>(param_this, arg0);
     }
 
-    void qt_QDragMoveEvent_ignore_void_QDragMoveEvent(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    void qt_QDragMoveEvent_ignore_void_QDragMoveEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QDragMoveEvent* arg0 = getqpointer<QDragMoveEventType>(param_this);
@@ -98,33 +91,22 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(_n_accept0, void)
     {
-        qt_QDragMoveEvent_accept_void_QDragMoveEvent_QRect(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QDragMoveEvent_accept_void_QDragMoveEvent_QRect(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
-    static NODE_IMPLEMENTATION(_n_accept1, void)
-    {
-        qt_QDragMoveEvent_accept_void_QDragMoveEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
-    }
+    static NODE_IMPLEMENTATION(_n_accept1, void) { qt_QDragMoveEvent_accept_void_QDragMoveEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)); }
 
     static NODE_IMPLEMENTATION(_n_answerRect0, Pointer)
     {
-        NODE_RETURN(qt_QDragMoveEvent_answerRect_QRect_QDragMoveEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QDragMoveEvent_answerRect_QRect_QDragMoveEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_ignore0, void)
     {
-        qt_QDragMoveEvent_ignore_void_QDragMoveEvent_QRect(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QDragMoveEvent_ignore_void_QDragMoveEvent_QRect(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
-    static NODE_IMPLEMENTATION(_n_ignore1, void)
-    {
-        qt_QDragMoveEvent_ignore_void_QDragMoveEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
-    }
+    static NODE_IMPLEMENTATION(_n_ignore1, void) { qt_QDragMoveEvent_ignore_void_QDragMoveEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)); }
 
     void QDragMoveEventType::load()
     {
@@ -143,13 +125,11 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
                    new MemberVariable(c, "native", "qt.NativeObject"),
 
@@ -164,27 +144,15 @@ namespace Mu
             // QPoint pos, flags Qt::DropActions actions, QMimeData data, flags
             // Qt::MouseButtons buttons, flags Qt::KeyboardModifiers modifiers,
             // "Type" type)
-            new Function(c, "accept", _n_accept0, None, Compiled,
-                         qt_QDragMoveEvent_accept_void_QDragMoveEvent_QRect,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QDragMoveEvent"),
-                         new Param(c, "rectangle", "qt.QRect"), End),
-            new Function(c, "accept", _n_accept1, None, Compiled,
-                         qt_QDragMoveEvent_accept_void_QDragMoveEvent, Return,
-                         "void", Parameters,
+            new Function(c, "accept", _n_accept0, None, Compiled, qt_QDragMoveEvent_accept_void_QDragMoveEvent_QRect, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QDragMoveEvent"), new Param(c, "rectangle", "qt.QRect"), End),
+            new Function(c, "accept", _n_accept1, None, Compiled, qt_QDragMoveEvent_accept_void_QDragMoveEvent, Return, "void", Parameters,
                          new Param(c, "this", "qt.QDragMoveEvent"), End),
-            new Function(c, "answerRect", _n_answerRect0, None, Compiled,
-                         qt_QDragMoveEvent_answerRect_QRect_QDragMoveEvent,
-                         Return, "qt.QRect", Parameters,
-                         new Param(c, "this", "qt.QDragMoveEvent"), End),
-            new Function(c, "ignore", _n_ignore0, None, Compiled,
-                         qt_QDragMoveEvent_ignore_void_QDragMoveEvent_QRect,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QDragMoveEvent"),
-                         new Param(c, "rectangle", "qt.QRect"), End),
-            new Function(c, "ignore", _n_ignore1, None, Compiled,
-                         qt_QDragMoveEvent_ignore_void_QDragMoveEvent, Return,
-                         "void", Parameters,
+            new Function(c, "answerRect", _n_answerRect0, None, Compiled, qt_QDragMoveEvent_answerRect_QRect_QDragMoveEvent, Return,
+                         "qt.QRect", Parameters, new Param(c, "this", "qt.QDragMoveEvent"), End),
+            new Function(c, "ignore", _n_ignore0, None, Compiled, qt_QDragMoveEvent_ignore_void_QDragMoveEvent_QRect, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QDragMoveEvent"), new Param(c, "rectangle", "qt.QRect"), End),
+            new Function(c, "ignore", _n_ignore1, None, Compiled, qt_QDragMoveEvent_ignore_void_QDragMoveEvent, Return, "void", Parameters,
                          new Param(c, "this", "qt.QDragMoveEvent"), End),
             // static functions
             EndArguments);

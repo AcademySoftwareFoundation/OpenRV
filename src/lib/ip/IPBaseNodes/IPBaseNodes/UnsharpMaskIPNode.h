@@ -21,8 +21,7 @@ namespace IPCore
     class UnsharpMaskIPNode : public IPNode
     {
     public:
-        UnsharpMaskIPNode(const std::string& name, const NodeDefinition* def,
-                          IPGraph* graph, GroupIPNode* group = 0);
+        UnsharpMaskIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group = 0);
 
         virtual ~UnsharpMaskIPNode();
 

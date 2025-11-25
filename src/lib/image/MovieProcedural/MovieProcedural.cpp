@@ -54,22 +54,18 @@ namespace TwkMovie
 
     MovieProcedural::~MovieProcedural() {}
 
-    void MovieProcedural::preloadOpen(const std::string& filename,
-                                      const ReadRequest& request)
+    void MovieProcedural::preloadOpen(const std::string& filename, const ReadRequest& request)
     {
         m_filename = filename;
         m_request = request;
     }
 
-    void MovieProcedural::postPreloadOpen(const MovieInfo& info,
-                                          const Movie::ReadRequest& request)
+    void MovieProcedural::postPreloadOpen(const MovieInfo& info, const Movie::ReadRequest& request)
     {
-        string description =
-            basename(m_filename.substr(0, m_filename.size() - 10));
+        string description = basename(m_filename.substr(0, m_filename.size() - 10));
 
         vector<string> tokens;
-        algorithm::split(tokens, description, is_any_of(string(",")),
-                         token_compress_on);
+        algorithm::split(tokens, description, is_any_of(string(",")), token_compress_on);
 
         m_imageType = tokens[0];
         m_info = info;
@@ -120,8 +116,7 @@ namespace TwkMovie
 
             if (statement.size() > 2)
             {
-                cerr << "ERROR: bad movieproc specification: " << statement[0]
-                     << endl;
+                cerr << "ERROR: bad movieproc specification: " << statement[0] << endl;
                 continue;
             }
 
@@ -184,8 +179,7 @@ namespace TwkMovie
                 m_filename = &filename[0];
                 addAttr = false;
             }
-            else if (statement.size() == 2 && name.size() > 4
-                     && name.substr(0, 5) == "attr:")
+            else if (statement.size() == 2 && name.size() > 4 && name.substr(0, 5) == "attr:")
             {
                 attrs.push_back(new StringAttribute(name.substr(5), val));
                 addAttr = false;
@@ -207,13 +201,11 @@ namespace TwkMovie
                     break;
 
                 case 16:
-                    dataType =
-                        back == 'f' ? FrameBuffer::HALF : FrameBuffer::USHORT;
+                    dataType = back == 'f' ? FrameBuffer::HALF : FrameBuffer::USHORT;
                     break;
 
                 case 32:
-                    dataType =
-                        back == 'f' ? FrameBuffer::FLOAT : FrameBuffer::UINT;
+                    dataType = back == 'f' ? FrameBuffer::FLOAT : FrameBuffer::UINT;
                     break;
                 }
             }
@@ -247,10 +239,8 @@ namespace TwkMovie
                 width << m_info.width;
                 ostringstream height;
                 height << m_info.height;
-                attrs.push_back(
-                    new StringAttribute("MovieProc/width", width.str()));
-                attrs.push_back(
-                    new StringAttribute("MovieProc/height", height.str()));
+                attrs.push_back(new StringAttribute("MovieProc/width", width.str()));
+                attrs.push_back(new StringAttribute("MovieProc/height", height.str()));
 
                 if (m[2] != "")
                 {
@@ -259,15 +249,13 @@ namespace TwkMovie
 
                     ostringstream fps;
                     fps << val;
-                    attrs.push_back(
-                        new StringAttribute("MovieProc/fps", fps.str()));
+                    attrs.push_back(new StringAttribute("MovieProc/fps", fps.str()));
                 }
             }
 
             if (statement.size() == 2 && addAttr)
             {
-                attrs.push_back(
-                    new StringAttribute("MovieProc/" + name, statement[1]));
+                attrs.push_back(new StringAttribute("MovieProc/" + name, statement[1]));
             }
         }
 
@@ -292,8 +280,7 @@ namespace TwkMovie
             m_img.attribute<string>("Type") = "Blank";
         }
 
-        if (m_flash && m_red == 0.0 && m_green == 0.0 && m_blue == 0.0
-            && m_alpha == 1.0)
+        if (m_flash && m_red == 0.0 && m_green == 0.0 && m_blue == 0.0 && m_alpha == 1.0)
         {
             //
             //  Make flash white by default; This helps testing with sync
@@ -326,8 +313,7 @@ namespace TwkMovie
                 m_img.attribute<string>("MovieProc/flash") = "NO";
                 m_flashImg.attribute<string>("MovieProc/audio") = m_audioType;
                 m_flashImg.attribute<float>("MovieProc/freq") = m_audioFreq;
-                m_flashImg.attribute<float>("MovieProc/rate") =
-                    m_info.audioSampleRate;
+                m_flashImg.attribute<float>("MovieProc/rate") = m_info.audioSampleRate;
                 m_flashImg.attribute<float>("MovieProc/amp") = m_audioAmp;
                 m_flashImg.attribute<string>("MovieProc/flash") = "YES";
             }
@@ -339,8 +325,7 @@ namespace TwkMovie
                 numAudioChans = 1;
             if (numAudioChans > 8)
                 numAudioChans = 8;
-            m_info.audioChannels =
-                layoutChannels(channelLayouts(numAudioChans).front());
+            m_info.audioChannels = layoutChannels(channelLayouts(numAudioChans).front());
         }
 
         if (m_flash)
@@ -357,8 +342,7 @@ namespace TwkMovie
         int frameCount = m_info.end - m_info.start + 1;
         ostringstream attr;
         attr.str("");
-        attr << frameCount << " frames, " << (double(frameCount) / m_info.fps)
-             << " sec";
+        attr << frameCount << " frames, " << (double(frameCount) / m_info.fps) << " sec";
         m_img.attribute<string>("Duration") = attr.str();
         if (m_flash)
             m_flashImg.attribute<string>("Duration") = attr.str();
@@ -459,9 +443,7 @@ namespace TwkMovie
         }
     }
 
-    void MovieProcedural::renderHRamp(FrameBuffer& fb, float r0, float g0,
-                                      float b0, float a0, float r1, float g1,
-                                      float b1, float a1)
+    void MovieProcedural::renderHRamp(FrameBuffer& fb, float r0, float g0, float b0, float a0, float r1, float g1, float b1, float a1)
     {
         const int w = fb.width();
         const int h = fb.height();
@@ -470,19 +452,16 @@ namespace TwkMovie
         {
             const float t = float(double(x) / double(w - 1));
 
-            fb.setPixel4f(lerp(r0, r1, t), lerp(g0, g1, t), lerp(b0, b1, t),
-                          lerp(a0, a1, t), x, 0);
+            fb.setPixel4f(lerp(r0, r1, t), lerp(g0, g1, t), lerp(b0, b1, t), lerp(a0, a1, t), x, 0);
         }
 
         for (int y = 1; y < h; y++)
         {
-            memcpy(fb.scanline<char>(y), fb.scanline<char>(0),
-                   fb.scanlineSize());
+            memcpy(fb.scanline<char>(y), fb.scanline<char>(0), fb.scanlineSize());
         }
     }
 
-    void MovieProcedural::renderSolid(FrameBuffer& fb, float r, float g,
-                                      float b, float a)
+    void MovieProcedural::renderSolid(FrameBuffer& fb, float r, float g, float b, float a)
     {
         for (int x = 0; x < fb.width(); x++)
         {
@@ -491,21 +470,16 @@ namespace TwkMovie
 
         for (int y = 1; y < fb.height(); y++)
         {
-            memcpy(fb.scanline<unsigned char>(y), fb.scanline<unsigned char>(0),
-                   fb.scanlineSize());
+            memcpy(fb.scanline<unsigned char>(y), fb.scanline<unsigned char>(0), fb.scanlineSize());
         }
     }
 
     void MovieProcedural::renderSMPTEBars(FrameBuffer& fb)
     {
-        static Col3f mainBars[] = {Col3f(0.8),       Col3f(.8, .8, 0),
-                                   Col3f(0, .8, .8), Col3f(0, .8, 0),
-                                   Col3f(.8, 0, .8), Col3f(.8, 0, 0),
-                                   Col3f(0, 0, .8)};
+        static Col3f mainBars[] = {Col3f(0.8),       Col3f(.8, .8, 0), Col3f(0, .8, .8), Col3f(0, .8, 0),
+                                   Col3f(.8, 0, .8), Col3f(.8, 0, 0),  Col3f(0, 0, .8)};
 
-        static Col3f smallbars[] = {
-            Col3f(0, 0, .8),  Col3f(.075), Col3f(.8, 0, .8), Col3f(.075),
-            Col3f(0, .8, .8), Col3f(.075), Col3f(.8)};
+        static Col3f smallbars[] = {Col3f(0, 0, .8), Col3f(.075), Col3f(.8, 0, .8), Col3f(.075), Col3f(0, .8, .8), Col3f(.075), Col3f(.8)};
 
         static Col3f botbars[] = {Col3f(.031373, 0.243137, 0.349020),
                                   Col3f(1.0),
@@ -518,8 +492,7 @@ namespace TwkMovie
 
         static double botstops[] = {0.0, 111 / 640.0, 224 / 640.0, 336 / 640.0,
                                     // 460 / 639.0,
-                                    (640 / 7 * 5) / 640.0, 488 / 640.0,
-                                    520 / 640.0, (640 / 7 * 6) / 640.0};
+                                    (640 / 7 * 5) / 640.0, 488 / 640.0, 520 / 640.0, (640 / 7 * 6) / 640.0};
 
         int modseven = fb.width() / 7;
         int lastline = fb.height() - 1;
@@ -754,8 +727,7 @@ namespace TwkMovie
         fb.setPrimaries(Chromaticities<float>::ACES());
     }
 
-    void MovieProcedural::imagesAtFrame(const ReadRequest& request,
-                                        FrameBufferVector& fbs)
+    void MovieProcedural::imagesAtFrame(const ReadRequest& request, FrameBufferVector& fbs)
     {
         int frame = request.frame;
         fbs.resize(1);
@@ -765,10 +737,7 @@ namespace TwkMovie
 
         const double adjustedFPS = double(m_info.fps * m_interval);
         const double t = double(frame - m_info.start) / double(adjustedFPS);
-        const bool flash =
-            (m_info.start == frame
-                 ? false
-                 : (t - floor(t)) < (1.0 / double(adjustedFPS) * 0.9));
+        const bool flash = (m_info.start == frame ? false : (t - floor(t)) < (1.0 / double(adjustedFPS) * 0.9));
         FrameBuffer& srcFB = (m_flash && flash) ? m_flashImg : m_img;
 
         if (m_hpan)
@@ -778,16 +747,14 @@ namespace TwkMovie
             //  the output frame buffer with per-scanline offset
             //
 
-            fb.restructure(srcFB.width(), srcFB.height(), srcFB.depth(),
-                           srcFB.numChannels(), srcFB.dataType(), NULL,
-                           &srcFB.channelNames(), srcFB.orientation());
+            fb.restructure(srcFB.width(), srcFB.height(), srcFB.depth(), srcFB.numChannels(), srcFB.dataType(), NULL, &srcFB.channelNames(),
+                           srcFB.orientation());
 
             const bool negative = m_hpan < 0;
             const size_t scanlineSize = srcFB.scanlineSize();
             const size_t pixelSize = srcFB.pixelSize();
             const size_t height = srcFB.height();
-            const size_t offset1 =
-                (pixelSize * ::abs(m_hpan) * size_t(frame - 1)) % scanlineSize;
+            const size_t offset1 = (pixelSize * ::abs(m_hpan) * size_t(frame - 1)) % scanlineSize;
             const size_t offset0 = scanlineSize - offset1;
 
             for (size_t row = 0; row < height; row++)
@@ -817,10 +784,8 @@ namespace TwkMovie
             //  No scanline offset. Just return the pixels
             //
 
-            fb.restructure(srcFB.width(), srcFB.height(), srcFB.depth(),
-                           srcFB.numChannels(), srcFB.dataType(),
-                           srcFB.pixels<Byte>(), &srcFB.channelNames(),
-                           srcFB.orientation(), false);
+            fb.restructure(srcFB.width(), srcFB.height(), srcFB.depth(), srcFB.numChannels(), srcFB.dataType(), srcFB.pixels<Byte>(),
+                           &srcFB.channelNames(), srcFB.orientation(), false);
         }
 
         fb.setIdentifier("");
@@ -828,8 +793,7 @@ namespace TwkMovie
 
         if (m_imageType == "error")
         {
-            if (m_errorStartTime <= 0
-                || (m_errorStartTime <= TwkUtil::SystemClock().now()))
+            if (m_errorStartTime <= 0 || (m_errorStartTime <= TwkUtil::SystemClock().now()))
             {
                 TWK_THROW_STREAM(IOException, m_errorMessage);
             }
@@ -839,8 +803,7 @@ namespace TwkMovie
         srcFB.copyAttributesTo(&fb);
     }
 
-    void MovieProcedural::identifiersAtFrame(const ReadRequest& request,
-                                             IdentifierVector& ids)
+    void MovieProcedural::identifiersAtFrame(const ReadRequest& request, IdentifierVector& ids)
     {
         int frame = request.frame;
         ostringstream str;
@@ -858,13 +821,9 @@ namespace TwkMovie
 
     bool MovieProcedural::hasAudio() const { return m_info.audio; }
 
-    bool MovieProcedural::canConvertAudioRate() const
-    {
-        return m_info.audioSampleRate == 0;
-    }
+    bool MovieProcedural::canConvertAudioRate() const { return m_info.audioSampleRate == 0; }
 
-    size_t MovieProcedural::audioFillBuffer(const AudioReadRequest& request,
-                                            AudioBuffer& buffer)
+    size_t MovieProcedural::audioFillBuffer(const AudioReadRequest& request, AudioBuffer& buffer)
     {
         //
         //  start and num are in audio frames (not image frames). An audio
@@ -874,8 +833,7 @@ namespace TwkMovie
         const double rate = m_info.audioSampleRate;
         const double tFrame = 1.0 / m_info.fps * .5;
         const double adjustedFPS = double(m_info.fps * m_interval);
-        const Time duration =
-            double(m_info.end - m_info.start + 1) / double(m_info.fps);
+        const Time duration = double(m_info.end - m_info.start + 1) / double(m_info.fps);
         const Time start = request.startTime;
         const Time length = request.duration;
         const SampleTime num = timeToSamples(length, rate);
@@ -895,15 +853,12 @@ namespace TwkMovie
             for (SampleTime i = 0; i < num; i++)
             {
                 double loc = (start + samplesToTime(i, rate)) / m_interval;
-                bool inSync = ((start - samplesToTime(i, rate) < 1.0 / rate)
-                                   ? false
-                                   : (loc - floor(loc))
-                                         < (1.0 / double(adjustedFPS) * 0.9));
+                bool inSync =
+                    ((start - samplesToTime(i, rate) < 1.0 / rate) ? false : (loc - floor(loc)) < (1.0 / double(adjustedFPS) * 0.9));
 
                 if (sine || inSync)
                 {
-                    const Time t = samplesToTime(i, rate) + start
-                                   - samplesToTime(margin, rate);
+                    const Time t = samplesToTime(i, rate) + start - samplesToTime(margin, rate);
 
                     for (int ch = 0; ch < numChannels; ch++, p++)
                     {
@@ -953,26 +908,18 @@ namespace TwkMovie
         StringPairVector video;
         StringPairVector audio;
         unsigned int capabilities = MovieIO::MovieRead | MovieIO::AttributeRead;
-        addType("movieproc", "Procedurally Generated Image/Movie", capabilities,
-                video, audio);
+        addType("movieproc", "Procedurally Generated Image/Movie", capabilities, video, audio);
     }
 
     MovieProceduralIO::~MovieProceduralIO() {}
 
-    std::string MovieProceduralIO::about() const
-    {
-        return "Tweak Procedural Movie";
-    }
+    std::string MovieProceduralIO::about() const { return "Tweak Procedural Movie"; }
 
-    MovieReader* MovieProceduralIO::movieReader() const
-    {
-        return new MovieProcedural();
-    }
+    MovieReader* MovieProceduralIO::movieReader() const { return new MovieProcedural(); }
 
     MovieWriter* MovieProceduralIO::movieWriter() const { return 0; }
 
-    void MovieProceduralIO::getMovieInfo(const std::string& filename,
-                                         MovieInfo& minfo) const
+    void MovieProceduralIO::getMovieInfo(const std::string& filename, MovieInfo& minfo) const
     {
         if (extension(filename) != "movieproc")
         {

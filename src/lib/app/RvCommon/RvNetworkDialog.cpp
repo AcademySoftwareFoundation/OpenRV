@@ -61,8 +61,7 @@ namespace Rv
         DB("");
         setWindowFlags(Qt::Window);
         setWindowModality(Qt::NonModal);
-        setWindowIcon(
-            QIcon(qApp->applicationDirPath() + QString(RV_ICON_PATH_SUFFIX)));
+        setWindowIcon(QIcon(qApp->applicationDirPath() + QString(RV_ICON_PATH_SUFFIX)));
         m_ui.setupUi(this);
 
         m_connectUI.setupUi(&m_connectDialog);
@@ -80,25 +79,16 @@ namespace Rv
         m_ui.contactTreeView->setModel(m_contactsModel);
         m_ui.contactTreeView->setItemDelegate(new PermDelegate());
 
-        connect(m_ui.startButton, SIGNAL(clicked()), this,
-                SLOT(toggleServer()));
-        connect(m_ui.connectButton, SIGNAL(clicked()), this,
-                SLOT(startConnect()));
-        connect(mconnect, SIGNAL(triggered(bool)), this,
-                SLOT(popupConnect(bool)));
-        connect(mdisconnect, SIGNAL(triggered(bool)), this,
-                SLOT(popupDisconnect(bool)));
-        connect(mdelete, SIGNAL(triggered(bool)), this,
-                SLOT(popupDelete(bool)));
-        connect(m_ui.resetConfigButton, SIGNAL(clicked()), this,
-                SLOT(resetConfig()));
+        connect(m_ui.startButton, SIGNAL(clicked()), this, SLOT(toggleServer()));
+        connect(m_ui.connectButton, SIGNAL(clicked()), this, SLOT(startConnect()));
+        connect(mconnect, SIGNAL(triggered(bool)), this, SLOT(popupConnect(bool)));
+        connect(mdisconnect, SIGNAL(triggered(bool)), this, SLOT(popupDisconnect(bool)));
+        connect(mdelete, SIGNAL(triggered(bool)), this, SLOT(popupDelete(bool)));
+        connect(m_ui.resetConfigButton, SIGNAL(clicked()), this, SLOT(resetConfig()));
 
-        connect(m_ui.contactTreeView,
-                SIGNAL(customContextMenuRequested(const QPoint&)), this,
-                SLOT(popup(const QPoint&)));
+        connect(m_ui.contactTreeView, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(popup(const QPoint&)));
 
-        connect(m_ui.contactTreeView, SIGNAL(doubleClicked(const QModelIndex&)),
-                this, SLOT(doubleClickContact(const QModelIndex&)));
+        connect(m_ui.contactTreeView, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(doubleClickContact(const QModelIndex&)));
 
         loadSettings();
     }
@@ -117,14 +107,11 @@ namespace Rv
 
         const Rv::Options& opts = Rv::Options::sharedOptions();
 
-        int permPrefs[3] = {opts.networkPerm,
-                            settings.value("defaultPermission").toInt(),
-                            AskConnect};
+        int permPrefs[3] = {opts.networkPerm, settings.value("defaultPermission").toInt(), AskConnect};
         for (int permIndex = 0; permIndex < 3; permIndex++)
         {
             int permCheck = permPrefs[permIndex];
-            if (permCheck == AskConnect || permCheck == AllowConnect
-                || permCheck == DenyConnect)
+            if (permCheck == AskConnect || permCheck == AllowConnect || permCheck == DenyConnect)
             {
                 m_ui.permissionCombo->setCurrentIndex(permCheck);
                 break;
@@ -182,8 +169,7 @@ namespace Rv
         }
         m_ui.nameLineEdit->setText(name);
 
-        QString port =
-            QString("%1").arg(settings.value("primaryPort", 45124).toInt());
+        QString port = QString("%1").arg(settings.value("primaryPort", 45124).toInt());
         if (opts.networkPort)
             port = QString(QString("%1").arg(opts.networkPort));
         m_ui.portLineEdit->setText(port);
@@ -216,9 +202,8 @@ namespace Rv
 
     bool RvNetworkDialog::confirmDisconnect(const QString& contact)
     {
-        QMessageBox box(QMessageBox::Warning, "Disconnect",
-                        QString("Disconnect from %1?").arg(contact),
-                        QMessageBox::NoButton, this, Qt::Sheet);
+        QMessageBox box(QMessageBox::Warning, "Disconnect", QString("Disconnect from %1?").arg(contact), QMessageBox::NoButton, this,
+                        Qt::Sheet);
 
         QPushButton* q1 = box.addButton("Disconnect", QMessageBox::AcceptRole);
         QPushButton* q2 = box.addButton("Cancel", QMessageBox::RejectRole);
@@ -229,9 +214,8 @@ namespace Rv
 
     void RvNetworkDialog::resetConfig()
     {
-        QMessageBox box(QMessageBox::Warning, "Reset Network Configuration",
-                        "Reset Network Configuration Settings?",
-                        QMessageBox::NoButton, this, Qt::Sheet);
+        QMessageBox box(QMessageBox::Warning, "Reset Network Configuration", "Reset Network Configuration Settings?", QMessageBox::NoButton,
+                        this, Qt::Sheet);
 
         QPushButton* q1 = box.addButton("Reset", QMessageBox::AcceptRole);
         QPushButton* q2 = box.addButton("Cancel", QMessageBox::RejectRole);
@@ -250,8 +234,7 @@ namespace Rv
 
         for (int i = 0; i < n; i++)
         {
-            if (m_contactsModel->item(i, 1)->text() == cname
-                && m_contactsModel->item(i, 2)->text() == chost)
+            if (m_contactsModel->item(i, 1)->text() == cname && m_contactsModel->item(i, 2)->text() == chost)
             {
                 return i;
             }
@@ -260,10 +243,8 @@ namespace Rv
         return -1;
     }
 
-    void RvNetworkDialog::addContact(const QString& cname, const QString& chost,
-                                     TwkQtChat::Connection* connection,
-                                     unsigned int cperms, const QString& capp,
-                                     bool checkForExisting)
+    void RvNetworkDialog::addContact(const QString& cname, const QString& chost, TwkQtChat::Connection* connection, unsigned int cperms,
+                                     const QString& capp, bool checkForExisting)
     {
         unsigned int tperms = cperms;
         if (tperms == CurrentConnect)
@@ -278,18 +259,14 @@ namespace Rv
             permText = "Deny";
         else
         {
-            cerr << "ERROR: Unable to determine default contact permission: "
-                 << tperms;
+            cerr << "ERROR: Unable to determine default contact permission: " << tperms;
             return;
         }
 
-        string sender = string(cname.toUtf8().constData()) + "@"
-                        + chost.toUtf8().constData();
+        string sender = string(cname.toUtf8().constData()) + "@" + chost.toUtf8().constData();
         QString csess(m_sessionMap[sender].c_str());
-        DB("RvNetworkDialog::addContact cname "
-           << cname.toUtf8().data() << " chost " << chost.toUtf8().data()
-           << " connection " << connection << " capp " << capp.toUtf8().data()
-           << " session " << csess.toUtf8().data());
+        DB("RvNetworkDialog::addContact cname " << cname.toUtf8().data() << " chost " << chost.toUtf8().data() << " connection "
+                                                << connection << " capp " << capp.toUtf8().data() << " session " << csess.toUtf8().data());
 
         if (checkForExisting)
         {
@@ -299,8 +276,7 @@ namespace Rv
             {
                 if (cperms != CurrentConnect)
                     m_contactsModel->item(i, 3)->setText(permText);
-                m_contactsModel->item(i, 0)->setCheckState(
-                    connection ? Qt::Checked : Qt::Unchecked);
+                m_contactsModel->item(i, 0)->setCheckState(connection ? Qt::Checked : Qt::Unchecked);
                 m_contactsModel->item(i, 4)->setText(capp);
                 m_contactsModel->item(i, 5)->setText(csess);
 
@@ -341,8 +317,7 @@ namespace Rv
         //
         if (connection && connection->isLocal())
         {
-            m_ui.contactTreeView->setRowHidden(m_contactsModel->rowCount() - 1,
-                                               QModelIndex(), true);
+            m_ui.contactTreeView->setRowHidden(m_contactsModel->rowCount() - 1, QModelIndex(), true);
         }
     }
 
@@ -380,8 +355,7 @@ namespace Rv
         }
 
         settings.setValue("contacts", contacts);
-        settings.setValue("defaultPermission",
-                          m_ui.permissionCombo->currentIndex());
+        settings.setValue("defaultPermission", m_ui.permissionCombo->currentIndex());
         settings.endGroup();
     }
 
@@ -419,12 +393,9 @@ namespace Rv
             DB("    dir doesn't exist");
             tmp.mkdir("tweak_rv_proc");
             tmp.cd("tweak_rv_proc");
-            QFile::setPermissions(
-                tmp.absolutePath(),
-                QFile::ReadOwner | QFile::ReadUser | QFile::ReadGroup
-                    | QFile::ReadOther | QFile::WriteOwner | QFile::WriteUser
-                    | QFile::WriteGroup | QFile::WriteOther | QFile::ExeOwner
-                    | QFile::ExeUser | QFile::ExeGroup | QFile::ExeOther);
+            QFile::setPermissions(tmp.absolutePath(), QFile::ReadOwner | QFile::ReadUser | QFile::ReadGroup | QFile::ReadOther
+                                                          | QFile::WriteOwner | QFile::WriteUser | QFile::WriteGroup | QFile::WriteOther
+                                                          | QFile::ExeOwner | QFile::ExeUser | QFile::ExeGroup | QFile::ExeOther);
         }
         else
             tmp.cd("tweak_rv_proc");
@@ -448,13 +419,10 @@ namespace Rv
 
         QFile portFile(tmp.absolutePath() + "/" + pid + tagString);
 
-        DB("    opening portfile '" << portFile.fileName().toUtf8().constData()
-                                    << "'");
+        DB("    opening portfile '" << portFile.fileName().toUtf8().constData() << "'");
         portFile.open(QIODevice::WriteOnly | QIODevice::Truncate);
-        portFile.setPermissions(QFile::ReadOwner | QFile::ReadUser
-                                | QFile::ReadGroup | QFile::ReadOther
-                                | QFile::WriteOwner | QFile::WriteUser
-                                | QFile::WriteGroup | QFile::WriteOther);
+        portFile.setPermissions(QFile::ReadOwner | QFile::ReadUser | QFile::ReadGroup | QFile::ReadOther | QFile::WriteOwner
+                                | QFile::WriteUser | QFile::WriteGroup | QFile::WriteOther);
 
         QString portNum;
         portNum.setNum(myPort());
@@ -483,22 +451,16 @@ namespace Rv
         if (m_client)
         {
             int n = m_ui.participantList->count();
-            const TwkApp::Application::Documents& docs =
-                IPCore::App()->documents();
+            const TwkApp::Application::Documents& docs = IPCore::App()->documents();
 
             if (n > 0 && docs.size())
             {
                 QMessageBox box(QMessageBox::Warning, "Stop Network",
-                                QString("%1 connection%2 %3 still active")
-                                    .arg(n)
-                                    .arg(n == 1 ? "" : "s")
-                                    .arg(n == 1 ? "is" : "are"),
+                                QString("%1 connection%2 %3 still active").arg(n).arg(n == 1 ? "" : "s").arg(n == 1 ? "is" : "are"),
                                 QMessageBox::NoButton, this, Qt::Sheet);
 
-                QPushButton* q1 =
-                    box.addButton("Stop Network", QMessageBox::AcceptRole);
-                QPushButton* q2 =
-                    box.addButton("Cancel", QMessageBox::RejectRole);
+                QPushButton* q1 = box.addButton("Stop Network", QMessageBox::AcceptRole);
+                QPushButton* q2 = box.addButton("Cancel", QMessageBox::RejectRole);
                 box.setIcon(QMessageBox::Warning);
                 box.exec();
                 if (box.clickedButton() == q2)
@@ -526,44 +488,28 @@ namespace Rv
         else
         {
             int port = m_ui.portLineEdit->text().toInt();
-            m_client = new Client(m_ui.nameLineEdit->text(), "rv", port, true,
-                                  StreamConnection::connectionFactory);
+            m_client = new Client(m_ui.nameLineEdit->text(), "rv", port, true, StreamConnection::connectionFactory);
 
             if (m_client->online())
             {
-                fprintf(stderr, "INFO: listening on port %d\n",
-                        m_client->serverPort());
-                QString portStr =
-                    QString(QString("%1").arg(m_client->serverPort()));
+                fprintf(stderr, "INFO: listening on port %d\n", m_client->serverPort());
+                QString portStr = QString(QString("%1").arg(m_client->serverPort()));
                 m_ui.portLineEdit->setText(portStr);
 
-                connect(m_client,
-                        SIGNAL(newData(const QString&, const QString&,
-                                       const QByteArray&)),
-                        this,
-                        SLOT(newData(const QString&, const QString&,
-                                     const QByteArray&)));
+                connect(m_client, SIGNAL(newData(const QString&, const QString&, const QByteArray&)), this,
+                        SLOT(newData(const QString&, const QString&, const QByteArray&)));
 
-                connect(m_client, SIGNAL(newContact(const QString&)), this,
-                        SLOT(newRemoteContact(const QString&)));
+                connect(m_client, SIGNAL(newContact(const QString&)), this, SLOT(newRemoteContact(const QString&)));
 
-                connect(m_client,
-                        SIGNAL(newMessage(const QString&, const QString&)),
-                        this, SLOT(newMessage(const QString&, const QString&)));
+                connect(m_client, SIGNAL(newMessage(const QString&, const QString&)), this,
+                        SLOT(newMessage(const QString&, const QString&)));
 
-                connect(m_client, SIGNAL(contactLeft(const QString&)), this,
-                        SLOT(remoteContactLeft(const QString&)));
+                connect(m_client, SIGNAL(contactLeft(const QString&)), this, SLOT(remoteContactLeft(const QString&)));
 
-                connect(m_client,
-                        SIGNAL(requestConnection(TwkQtChat::Connection*)), this,
-                        SLOT(requestConnection(TwkQtChat::Connection*)));
+                connect(m_client, SIGNAL(requestConnection(TwkQtChat::Connection*)), this, SLOT(requestConnection(TwkQtChat::Connection*)));
 
-                connect(m_client,
-                        SIGNAL(contactError(const QString&, const QString&,
-                                            const QString&)),
-                        this,
-                        SLOT(contactError(const QString&, const QString&,
-                                          const QString&)));
+                connect(m_client, SIGNAL(contactError(const QString&, const QString&, const QString&)), this,
+                        SLOT(contactError(const QString&, const QString&, const QString&)));
 
                 sendSessionEvent("remote-network-start", "", "");
 
@@ -579,21 +525,15 @@ namespace Rv
         updateStatus();
     }
 
-    IPCore::Session* RvNetworkDialog::targetSession(QString sender,
-                                                    bool doDisconnect)
+    IPCore::Session* RvNetworkDialog::targetSession(QString sender, bool doDisconnect)
     {
-        DB("targetSession sender " << sender.toUtf8().constData() << " doDis "
-                                   << doDisconnect);
-        Session* s =
-            RvApp()->session(m_sessionMap[sender.toUtf8().constData()]);
+        DB("targetSession sender " << sender.toUtf8().constData() << " doDis " << doDisconnect);
+        Session* s = RvApp()->session(m_sessionMap[sender.toUtf8().constData()]);
         if (!s && doDisconnect)
         {
-            cerr << "ERROR: Session associated with sender '"
-                 << sender.toUtf8().constData()
-                 << "' does not exist, disconnecting" << endl;
+            cerr << "ERROR: Session associated with sender '" << sender.toUtf8().constData() << "' does not exist, disconnecting" << endl;
 
-            QList<QListWidgetItem*> items =
-                m_ui.participantList->findItems(sender, Qt::MatchExactly);
+            QList<QListWidgetItem*> items = m_ui.participantList->findItems(sender, Qt::MatchExactly);
             for (int i = 0; i < items.size(); i++)
                 delete items[i];
 
@@ -614,12 +554,10 @@ namespace Rv
         m_ui.participantList->addItem(name);
         updateStatus();
 
-        s->userGenericEvent("remote-connection-start",
-                            name.toUtf8().constData(), "");
+        s->userGenericEvent("remote-connection-start", name.toUtf8().constData(), "");
     }
 
-    RvNetworkDialog::ConnectPermission
-    RvNetworkDialog::contactPermission(const QStringList& parts)
+    RvNetworkDialog::ConnectPermission RvNetworkDialog::contactPermission(const QStringList& parts)
     {
         int n = m_contactsModel->rowCount();
 
@@ -655,8 +593,7 @@ namespace Rv
 
     void RvNetworkDialog::requestConnection(TwkQtChat::Connection* c)
     {
-        DB("RvNetworkDialog::requestConnection "
-           << c->remoteContactName().toUtf8().constData());
+        DB("RvNetworkDialog::requestConnection " << c->remoteContactName().toUtf8().constData());
         //
         //  This may add the contact
         //
@@ -686,16 +623,14 @@ namespace Rv
         QString csess;
         if (!session)
         {
-            cerr << "ERROR: RvNetwork: no session for incoming connection"
-                 << endl;
+            cerr << "ERROR: RvNetwork: no session for incoming connection" << endl;
             m_client->rejectConnection(c);
             return;
         }
         string sender = name.toUtf8().constData();
         if (m_sessionMap[sender].size())
         {
-            cerr << "ERROR: RvNetwork: '" << sender << "' is already connected."
-                 << endl;
+            cerr << "ERROR: RvNetwork: '" << sender << "' is already connected." << endl;
             c->setDuplicate(true);
             m_client->rejectConnection(c);
             return;
@@ -719,14 +654,11 @@ namespace Rv
 
         if (perm == AskConnect)
         {
-            QMessageBox box(QMessageBox::Warning, "Connection Request",
-                            QString("%1 wants to connect\n ").arg(name),
-                            QMessageBox::NoButton, this, Qt::Dialog);
+            QMessageBox box(QMessageBox::Warning, "Connection Request", QString("%1 wants to connect\n ").arg(name), QMessageBox::NoButton,
+                            this, Qt::Dialog);
 
-            QPushButton* q3 =
-                box.addButton("Always Allow", QMessageBox::AcceptRole);
-            QPushButton* q1 =
-                box.addButton("Allow Once", QMessageBox::ApplyRole);
+            QPushButton* q3 = box.addButton("Always Allow", QMessageBox::AcceptRole);
+            QPushButton* q1 = box.addButton("Allow Once", QMessageBox::ApplyRole);
             QPushButton* q2 = box.addButton("Deny", QMessageBox::RejectRole);
             box.exec();
 
@@ -739,8 +671,7 @@ namespace Rv
             else if (box.clickedButton() == q1)
             {
                 // allow
-                addContact(parts[0], parts[1], c, CurrentConnect,
-                           c->remoteApp());
+                addContact(parts[0], parts[1], c, CurrentConnect, c->remoteApp());
             }
             else if (box.clickedButton() == q3)
             {
@@ -763,8 +694,7 @@ namespace Rv
 
     void RvNetworkDialog::remoteContactLeft(const QString& name)
     {
-        DB("RvNetworkDialog::remoteContactLeft name "
-           << name.toUtf8().constData());
+        DB("RvNetworkDialog::remoteContactLeft name " << name.toUtf8().constData());
         const TwkApp::Application::Documents& docs = App()->documents();
         if (!docs.size())
         {
@@ -773,8 +703,7 @@ namespace Rv
             return;
         }
 
-        QList<QListWidgetItem*> items =
-            m_ui.participantList->findItems(name, Qt::MatchExactly);
+        QList<QListWidgetItem*> items = m_ui.participantList->findItems(name, Qt::MatchExactly);
 
         for (int i = 0; i < items.size(); i++)
             delete items[i];
@@ -798,8 +727,7 @@ namespace Rv
         if (!s)
             return;
 
-        s->userGenericEvent("remote-connection-stop", name.toUtf8().constData(),
-                            "");
+        s->userGenericEvent("remote-connection-stop", name.toUtf8().constData(), "");
     }
 
     void RvNetworkDialog::updateStatus()
@@ -807,9 +735,7 @@ namespace Rv
         if (m_client)
         {
             int n = m_ui.participantList->count();
-            QString t = QString("<big><b>Running</b></big><br>%1 Connection%2")
-                            .arg(n)
-                            .arg(n == 1 ? "" : "s");
+            QString t = QString("<big><b>Running</b></big><br>%1 Connection%2").arg(n).arg(n == 1 ? "" : "s");
             m_ui.statusLabel->setText(t);
             m_ui.startButton->setText("Stop Network");
             m_ui.nameLineEdit->setDisabled(true);
@@ -832,20 +758,16 @@ namespace Rv
         }
     }
 
-    void RvNetworkDialog::newData(const QString& sender, const QString& interp,
-                                  const QByteArray& data)
+    void RvNetworkDialog::newData(const QString& sender, const QString& interp, const QByteArray& data)
     {
-        DB("newData from " << UTF8::qconvert(sender) << " interp '"
-                           << UTF8::qconvert(interp) << "' " << data.size()
-                           << " bytes");
+        DB("newData from " << UTF8::qconvert(sender) << " interp '" << UTF8::qconvert(interp) << "' " << data.size() << " bytes");
         Session* s = targetSession(sender);
         if (!s)
             return;
 
         if (interp.startsWith("PIXELTILE"))
         {
-            s->pixelBlockEvent("pixel-block", interp.toUtf8().constData(),
-                               data.constData(), data.size());
+            s->pixelBlockEvent("pixel-block", interp.toUtf8().constData(), data.constData(), data.size());
         }
         else if (interp.startsWith("DATAEVENT"))
         {
@@ -854,8 +776,7 @@ namespace Rv
 
             if (tokens.size() < 4)
             {
-                cerr << "ERROR: mal-formed DATAEVENT: "
-                     << interp.toUtf8().constData() << endl;
+                cerr << "ERROR: mal-formed DATAEVENT: " << interp.toUtf8().constData() << endl;
             }
             string ename = tokens[1];
             string etarget = tokens[2];
@@ -865,23 +786,19 @@ namespace Rv
             const TwkApp::Application::Documents& docs = App()->documents();
             if (docs.size())
             {
-                string r = s->userRawDataEvent(ename, dinterp, data.constData(),
-                                               data.size(), 0, senderName);
+                string r = s->userRawDataEvent(ename, dinterp, data.constData(), data.size(), 0, senderName);
                 //  XXX no replies from data events.
             }
         }
         else
         {
-            cerr << "ERROR: Unknown Data message: "
-                 << interp.toUtf8().constData() << endl;
+            cerr << "ERROR: Unknown Data message: " << interp.toUtf8().constData() << endl;
         }
     }
 
-    void RvNetworkDialog::newMessage(const QString& sender,
-                                     const QString& inmessage)
+    void RvNetworkDialog::newMessage(const QString& sender, const QString& inmessage)
     {
-        DB("newMessage from " << UTF8::qconvert(sender) << " '"
-                              << UTF8::qconvert(inmessage) << "'");
+        DB("newMessage from " << UTF8::qconvert(sender) << " '" << UTF8::qconvert(inmessage) << "'");
         Session* s = targetSession(sender);
         if (!s)
             return;
@@ -896,8 +813,7 @@ namespace Rv
             QString eventName = message.section(" ", 1, 1);
             QString eventTarget = message.section(" ", 2, 2);
             int typeSize = (isReturnEvent) ? 13 : 7;
-            message.remove(0, typeSize + eventName.size() + 1
-                                  + eventTarget.size());
+            message.remove(0, typeSize + eventName.size() + 1 + eventTarget.size());
 
             string ename = eventName.toUtf8().data();
             string contents = message.toUtf8().data();
@@ -905,8 +821,7 @@ namespace Rv
             string r = s->userGenericEvent(ename, contents, senderName);
             if (isReturnEvent)
             {
-                m_client->sendMessage(sender,
-                                      QString("RETURN %1").arg(r.c_str()));
+                m_client->sendMessage(sender, QString("RETURN %1").arg(r.c_str()));
             }
         }
         else if (inmessage.startsWith("DISCONNECT"))
@@ -939,9 +854,7 @@ namespace Rv
             }
             else
             {
-                QMessageBox::critical(
-                    this, "Unknown Host Name",
-                    QString("Could not resolve host name %1").arg(qhost));
+                QMessageBox::critical(this, "Unknown Host Name", QString("Could not resolve host name %1").arg(qhost));
             }
         }
     }
@@ -984,16 +897,13 @@ namespace Rv
             {
                 QHostAddress addr(hname);
 
-                if (addr.protocol()
-                    != QAbstractSocket::UnknownNetworkLayerProtocol)
+                if (addr.protocol() != QAbstractSocket::UnknownNetworkLayerProtocol)
                 {
                     m_client->connectTo(name, addr, port);
                 }
                 else
                 {
-                    QMessageBox::critical(
-                        this, "Unknown Host Name",
-                        QString("Could not resolve host name %1").arg(hname));
+                    QMessageBox::critical(this, "Unknown Host Name", QString("Could not resolve host name %1").arg(hname));
                 }
             }
         }
@@ -1001,8 +911,7 @@ namespace Rv
 
     set<int> RvNetworkDialog::selectedContacts()
     {
-        QModelIndexList selection =
-            m_ui.contactTreeView->selectionModel()->selectedIndexes();
+        QModelIndexList selection = m_ui.contactTreeView->selectionModel()->selectedIndexes();
 
         set<int> rows;
 
@@ -1027,8 +936,7 @@ namespace Rv
             QStandardItem* name = m_contactsModel->item(row, 1);
             QStandardItem* host = m_contactsModel->item(row, 2);
             bool connected = check->checkState() == Qt::Checked;
-            QString contact =
-                QString("%1@%2").arg(name->text()).arg(host->text());
+            QString contact = QString("%1@%2").arg(name->text()).arg(host->text());
             QList<QAction*> actions = m_contactPopup->actions();
 
             m_contactPopup->setTitle(contact);
@@ -1055,8 +963,7 @@ namespace Rv
             QStandardItem* host = m_contactsModel->item(row, 2);
             m_connectUI.hostnameLineEdit->setText(host->text());
 
-            QString contact =
-                QString("%1@%2").arg(name->text()).arg(host->text());
+            QString contact = QString("%1@%2").arg(name->text()).arg(host->text());
 
             if (confirmDisconnect(contact))
             {
@@ -1088,8 +995,7 @@ namespace Rv
         //  Delete all the selected rows
         //
 
-        QModelIndexList selection =
-            m_ui.contactTreeView->selectionModel()->selectedIndexes();
+        QModelIndexList selection = m_ui.contactTreeView->selectionModel()->selectedIndexes();
 
         set<int> rows;
 
@@ -1104,8 +1010,7 @@ namespace Rv
         //  numbers will not change).
         //
 
-        for (set<int>::reverse_iterator i = rows.rbegin(); i != rows.rend();
-             ++i)
+        for (set<int>::reverse_iterator i = rows.rbegin(); i != rows.rend(); ++i)
         {
             m_contactsModel->removeRow(*i);
         }
@@ -1139,8 +1044,7 @@ namespace Rv
 
         if (check->checkState() == Qt::Checked)
         {
-            QString contact =
-                QString("%1@%2").arg(name->text()).arg(host->text());
+            QString contact = QString("%1@%2").arg(name->text()).arg(host->text());
 
             if (confirmDisconnect(contact))
             {
@@ -1154,17 +1058,14 @@ namespace Rv
         }
     }
 
-    void RvNetworkDialog::contactError(const QString& contact,
-                                       const QString& machine,
-                                       const QString& msg)
+    void RvNetworkDialog::contactError(const QString& contact, const QString& machine, const QString& msg)
     {
         Session* s = targetSession(contact, false /*doDisconnect*/);
 
         bool showContactError = true;
         if (s)
         {
-            const string r = s->userGenericEvent(
-                "remote-contact-error-show", contact.toUtf8().constData(), "");
+            const string r = s->userGenericEvent("remote-contact-error-show", contact.toUtf8().constData(), "");
             showContactError = r != "no";
         }
 
@@ -1172,32 +1073,23 @@ namespace Rv
         {
             if (contact == "" || contact[0] == '@')
             {
-                QMessageBox::critical(
-                    this, "Network Error",
-                    QString("Connection to %1:\n%2").arg(machine).arg(msg));
+                QMessageBox::critical(this, "Network Error", QString("Connection to %1:\n%2").arg(machine).arg(msg));
             }
             else
             {
-                QMessageBox::critical(
-                    this, "Network Error",
-                    QString("Connection to %1:\n%3").arg(contact).arg(msg));
+                QMessageBox::critical(this, "Network Error", QString("Connection to %1:\n%3").arg(contact).arg(msg));
             }
         }
 
         if (!s)
             return;
 
-        s->userGenericEvent("remote-contact-error",
-                            contact.toUtf8().constData(), "");
+        s->userGenericEvent("remote-contact-error", contact.toUtf8().constData(), "");
     }
 
-    void RvNetworkDialog::sendSessionEvent(const QString& event,
-                                           const QString& contents,
-                                           const QString& sender)
+    void RvNetworkDialog::sendSessionEvent(const QString& event, const QString& contents, const QString& sender)
     {
-        RvApp()->userGenericEventOnAll(event.toUtf8().data(),
-                                       contents.toUtf8().data(),
-                                       sender.toUtf8().data());
+        RvApp()->userGenericEventOnAll(event.toUtf8().data(), contents.toUtf8().data(), sender.toUtf8().data());
     }
 
     vector<string> RvNetworkDialog::contacts() const
@@ -1282,8 +1174,7 @@ namespace Rv
             return;
         vector<string> contacts;
 
-        for (SessionMap::iterator i = m_sessionMap.begin();
-             i != m_sessionMap.end(); ++i)
+        for (SessionMap::iterator i = m_sessionMap.begin(); i != m_sessionMap.end(); ++i)
         {
             if ((*i).second == sstr)
                 contacts.push_back((*i).first);
@@ -1292,8 +1183,7 @@ namespace Rv
         for (int i = 0; i < contacts.size(); ++i)
         {
             DB("disconnecting from " << contacts[i]);
-            QList<QListWidgetItem*> items = m_ui.participantList->findItems(
-                contacts[i].c_str(), Qt::MatchExactly);
+            QList<QListWidgetItem*> items = m_ui.participantList->findItems(contacts[i].c_str(), Qt::MatchExactly);
             for (int j = 0; j < items.size(); j++)
                 delete items[i];
 
@@ -1306,8 +1196,7 @@ namespace Rv
         }
     }
 
-    void RvNetworkDialog::spoofConnectionStream(const QString& fileName,
-                                                float timeScale, bool verbose)
+    void RvNetworkDialog::spoofConnectionStream(const QString& fileName, float timeScale, bool verbose)
     {
         // XXX mem leak
         StreamConnection* stream = new StreamConnection(this, true);
@@ -1319,14 +1208,10 @@ namespace Rv
 
         newRemoteContact(stream->remoteContactName());
 
-        connect(
-            stream,
-            SIGNAL(newData(const QString&, const QString&, const QByteArray&)),
-            this,
-            SLOT(newData(const QString&, const QString&, const QByteArray&)));
+        connect(stream, SIGNAL(newData(const QString&, const QString&, const QByteArray&)), this,
+                SLOT(newData(const QString&, const QString&, const QByteArray&)));
 
-        connect(stream, SIGNAL(newMessage(const QString&, const QString&)),
-                this, SLOT(newMessage(const QString&, const QString&)));
+        connect(stream, SIGNAL(newMessage(const QString&, const QString&)), this, SLOT(newMessage(const QString&, const QString&)));
 
         stream->startSpoofing(timeScale);
     }

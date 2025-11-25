@@ -12,8 +12,7 @@
 #include <TwkAudio/Resampler.h>
 #include <fstream>
 
-#define AUDIO_READPOSITIONOFFSET_THRESHOLD \
-    0.01 // In secs; this is the max amount of slip we will allow
+#define AUDIO_READPOSITIONOFFSET_THRESHOLD 0.01 // In secs; this is the max amount of slip we will allow
 
 namespace TwkMovie
 {
@@ -35,20 +34,14 @@ namespace TwkMovie
 
         void setBackwards(bool backwards) { m_isBackwards = backwards; }
 
-        void reset(int channels, float factor, size_t samples,
-                   int blocksize = 256);
+        void reset(int channels, float factor, size_t samples, int blocksize = 256);
 
     private:
         TwkAudio::SampleTime offsetStart(double rate);
         void shiftBuffer(size_t samples, unsigned int channels);
-        TwkAudio::Time retimeAudioSampleTarget(TwkAudio::AudioBuffer buffer,
-                                               const TwkAudio::Time startTime,
-                                               const int numChannels);
-        void resampleAudio(TwkAudio::AudioBuffer& buffer, const size_t nread,
-                           const size_t numSamples,
-                           const TwkAudio::Time startTime,
-                           const TwkAudio::ChannelsVector audioChannels,
-                           const double rate);
+        TwkAudio::Time retimeAudioSampleTarget(TwkAudio::AudioBuffer buffer, const TwkAudio::Time startTime, const int numChannels);
+        void resampleAudio(TwkAudio::AudioBuffer& buffer, const size_t nread, const size_t numSamples, const TwkAudio::Time startTime,
+                           const TwkAudio::ChannelsVector audioChannels, const double rate);
         TwkAudio::SampleTime minAvailableSample(double rate);
         TwkAudio::SampleTime maxAvailableSample(double rate);
 

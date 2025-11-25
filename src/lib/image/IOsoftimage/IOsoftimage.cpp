@@ -46,8 +46,7 @@ namespace TwkFB
 
     string IOsoftimage::about() const { return "Softimage .pic (Tweak)"; }
 
-    void IOsoftimage::readAttrs(TwkFB::FrameBuffer& fb, const Header& header,
-                                const ChannelPacketVector& packets) const
+    void IOsoftimage::readAttrs(TwkFB::FrameBuffer& fb, const Header& header, const ChannelPacketVector& packets) const
     {
         string fieldString;
 
@@ -120,16 +119,13 @@ namespace TwkFB
         fb.setTransferFunction(ColorSpace::Linear());
     }
 
-    void IOsoftimage::getImageInfo(const std::string& filename,
-                                   FBInfo& fbi) const
+    void IOsoftimage::getImageInfo(const std::string& filename, FBInfo& fbi) const
     {
         ifstream infile(UNICODE_C_STR(filename.c_str()), ios::binary | ios::in);
 
         if (!infile)
         {
-            TWK_THROW_STREAM(IOException,
-                             "Unable to open softimage .pic file \""
-                                 << filename << "\" for reading");
+            TWK_THROW_STREAM(IOException, "Unable to open softimage .pic file \"" << filename << "\" for reading");
         }
 
         Header header;
@@ -172,14 +168,11 @@ namespace TwkFB
         }
         else
         {
-            TWK_THROW_STREAM(IOException,
-                             "Bad magic number in softimage file \"" << filename
-                                                                     << "\"");
+            TWK_THROW_STREAM(IOException, "Bad magic number in softimage file \"" << filename << "\"");
         }
     }
 
-    void IOsoftimage::readPixels(ifstream& infile, const Header& header,
-                                 FrameBuffer& fb, bool swap,
+    void IOsoftimage::readPixels(ifstream& infile, const Header& header, FrameBuffer& fb, bool swap,
                                  const ChannelPacketVector& packets) const
     {
         vector<FrameBuffer*> fbs;
@@ -230,15 +223,13 @@ namespace TwkFB
         }
     }
 
-    void IOsoftimage::readImage(FrameBuffer& fb, const std::string& filename,
-                                const ReadRequest& request) const
+    void IOsoftimage::readImage(FrameBuffer& fb, const std::string& filename, const ReadRequest& request) const
     {
         ifstream infile(UNICODE_C_STR(filename.c_str()), ios::binary);
 
         if (!infile)
         {
-            TWK_THROW_STREAM(IOException, "Unable to open softimage file \""
-                                              << filename << "\" for reading");
+            TWK_THROW_STREAM(IOException, "Unable to open softimage file \"" << filename << "\" for reading");
         }
 
         Header header;
@@ -307,15 +298,11 @@ namespace TwkFB
         }
         else
         {
-            TWK_THROW_STREAM(IOException,
-                             "Bad magic number in softimage file \"" << filename
-                                                                     << "\"");
+            TWK_THROW_STREAM(IOException, "Bad magic number in softimage file \"" << filename << "\"");
         }
     }
 
-    void IOsoftimage::writeImage(const FrameBuffer& img,
-                                 const std::string& filename,
-                                 const WriteRequest& request) const
+    void IOsoftimage::writeImage(const FrameBuffer& img, const std::string& filename, const WriteRequest& request) const
     {
         FrameBufferIO::writeImage(img, filename, request);
     }

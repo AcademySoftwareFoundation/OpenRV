@@ -18,8 +18,7 @@ namespace TwkApp
 
     Bundle* Bundle::m_mainBundle = 0;
 
-    Bundle::Bundle(const std::string& appName, size_t major_version,
-                   size_t minor_version, size_t revision_number, bool sandboxed,
+    Bundle::Bundle(const std::string& appName, size_t major_version, size_t minor_version, size_t revision_number, bool sandboxed,
                    bool inheritedSandbox)
         : m_applicationName(appName)
         , m_majorVersion(major_version)
@@ -51,15 +50,13 @@ namespace TwkApp
 
     void Bundle::rescanCache(const string& cacheName) {}
 
-    bool Bundle::hasCacheItem(const string& cacheName,
-                              const CacheItemName& item)
+    bool Bundle::hasCacheItem(const string& cacheName, const CacheItemName& item)
     {
         Path cachePath = cacheItemPath(cacheName, item);
         return cachePath != "" && TwkUtil::fileExists(cachePath.c_str());
     }
 
-    Bundle::Path Bundle::cacheItemPath(const string& cacheName,
-                                       const CacheItemName& item)
+    Bundle::Path Bundle::cacheItemPath(const string& cacheName, const CacheItemName& item)
     {
         boost::filesystem::path cachePath(userCacheDir());
         cachePath /= cacheName;
@@ -67,28 +64,18 @@ namespace TwkApp
         return cachePath.string();
     }
 
-    void Bundle::addCacheItem(const string& cacheName,
-                              const CacheItemName& item, size_t size)
+    void Bundle::addCacheItem(const string& cacheName, const CacheItemName& item, size_t size)
     {
         Path cachePath = cacheItemPath(cacheName, item);
     }
 
-    Bundle::FileAccessPermission
-    Bundle::permissionForFileAccess(const Path&, bool readonly) const
-    {
-        return FileAccessPermission();
-    }
+    Bundle::FileAccessPermission Bundle::permissionForFileAccess(const Path&, bool readonly) const { return FileAccessPermission(); }
 
-    Bundle::AccessObject
-    Bundle::beginFileAccessWithPermission(const FileAccessPermission&) const
-    {
-        return AccessObject(0);
-    }
+    Bundle::AccessObject Bundle::beginFileAccessWithPermission(const FileAccessPermission&) const { return AccessObject(0); }
 
     void Bundle::endFileAccessWithPermission(AccessObject) const {}
 
-    string Bundle::getEnvVar(const EnvVar& name,
-                             const std::string& defaultValue)
+    string Bundle::getEnvVar(const EnvVar& name, const std::string& defaultValue)
     {
         if (const char* v = getenv(name.c_str()))
         {

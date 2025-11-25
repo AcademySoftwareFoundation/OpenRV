@@ -31,8 +31,7 @@ namespace IPCore
         typedef boost::mutex Mutex;
         typedef boost::mutex::scoped_lock ScopedLock;
 
-        RetimeIPNode(const std::string& name, const NodeDefinition* def,
-                     IPGraph* graph, GroupIPNode* group = 0);
+        RetimeIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group = 0);
 
         virtual ~RetimeIPNode();
 
@@ -47,8 +46,7 @@ namespace IPCore
         virtual void propagateFlushToOutputs(const FlushContext&);
         virtual ImageRangeInfo imageRangeInfo() const;
         virtual size_t audioFillBuffer(const AudioContext&);
-        virtual void mapInputToEvalFrames(size_t inputIndex, const FrameVector&,
-                                          FrameVector&) const;
+        virtual void mapInputToEvalFrames(size_t inputIndex, const FrameVector&, FrameVector&) const;
 
         virtual void setInputs(const IPNodes&);
         virtual bool testInputs(const IPNodes&, std::ostringstream&) const;
@@ -60,9 +58,7 @@ namespace IPCore
 
     protected:
         virtual void inputChanged(int index);
-        virtual void
-        inputRangeChanged(int index,
-                          PropagateTarget target = LegacyPropagateTarget);
+        virtual void inputRangeChanged(int index, PropagateTarget target = LegacyPropagateTarget);
 
     private:
         int retimedFrame(int frame) const;
