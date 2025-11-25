@@ -191,6 +191,135 @@ FOREACH(
   LIST(APPEND _sources ${outfile})
 ENDFOREACH()
 
+#
+# Generate about_rv.cpp with build information
+#
+SET(_about_rv_cpp
+    ${CMAKE_CURRENT_BINARY_DIR}/about_rv.cpp
+)
+
+# Get compiler name
+IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+  SET(_compiler_name
+      "GCC ${CMAKE_CXX_COMPILER_VERSION}"
+  )
+ELSEIF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  IF(CMAKE_CXX_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC")
+    SET(_compiler_name
+        "Clang-cl ${CMAKE_CXX_COMPILER_VERSION}"
+    )
+  ELSE()
+    SET(_compiler_name
+        "Clang ${CMAKE_CXX_COMPILER_VERSION}"
+    )
+  ENDIF()
+ELSEIF(MSVC)
+  SET(_compiler_name
+      "MSVC ${CMAKE_CXX_COMPILER_VERSION}"
+  )
+ELSE()
+  SET(_compiler_name
+      "${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}"
+  )
+ENDIF()
+
+# Get CXX flags
+STRING(REPLACE ";" " " _cxx_flags_str "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_${CMAKE_BUILD_TYPE}}")
+
+# Get VFX platform
+IF(RV_VFX_PLATFORM)
+  SET(_vfx_platform_str
+      ${RV_VFX_PLATFORM}
+  )
+ELSE()
+  SET(_vfx_platform_str
+      "N/A"
+  )
+ENDIF()
+
+# Get build root
+GET_FILENAME_COMPONENT(_build_root ${CMAKE_BINARY_DIR} NAME)
+
+# Get platform and arch
+IF(RV_TARGET_DARWIN)
+  SET(_platform_name
+      "macOS"
+  )
+ELSEIF(RV_TARGET_LINUX)
+  SET(_platform_name
+      "Linux"
+  )
+ELSEIF(RV_TARGET_WINDOWS)
+  SET(_platform_name
+      "Windows"
+  )
+ELSE()
+  SET(_platform_name
+      ${CMAKE_SYSTEM_NAME}
+  )
+ENDIF()
+
+SET(_arch_name
+    ${CMAKE_SYSTEM_PROCESSOR}
+)
+
+# Gather dependency versions
+IF(RV_VFX_PLATFORM STREQUAL "CY2024")
+  SET(_qt_version
+      "${RV_DEPS_QT6_VERSION}"
+  )
+ELSE()
+  SET(_qt_version
+      "${RV_DEPS_QT5_VERSION}"
+  )
+ENDIF()
+
+# Create a JSON-like string with versions (using semicolon as separator for CMake list)
+SET(_versions_list
+    "Qt:${_qt_version}"
+    "CMake:${CMAKE_VERSION}"
+    "Python:${RV_DEPS_PYTHON3_VERSION}"
+    "PySide:${RV_DEPS_PYSIDE_VERSION}"
+    "Boost:${RV_DEPS_BOOST_VERSION}"
+    "Imath:${RV_DEPS_IMATH_VERSION}"
+    "OpenEXR:${RV_DEPS_OPENEXR_VERSION}"
+    "OpenImageIO:${RV_DEPS_OIIO_VERSION}"
+    "OpenColorIO:${RV_DEPS_OCIO_VERSION}"
+    "FFmpeg:${RV_DEPS_FFMPEG_VERSION}"
+    "OpenSSL:${RV_DEPS_OPENSSL_VERSION}"
+    "GLEW:${RV_DEPS_GLEW_VERSION}"
+    "spdlog:${RV_DEPS_SPDLOG_VERSION}"
+    "yaml-cpp:${RV_DEPS_YAML_CPP_VERSION}"
+    "zlib:${RV_DEPS_ZLIB_VERSION}"
+    "dav1d:${RV_DEPS_DAV1D_VERSION}"
+    "jpegturbo:${RV_DEPS_JPEGTURBO_VERSION}"
+    "png:${RV_DEPS_PNG_VERSION}"
+    "tiff:${RV_DEPS_TIFF_VERSION}"
+    "webp:${RV_DEPS_WEBP_VERSION}"
+    "openjpeg:${RV_DEPS_OPENJPEG_VERSION}"
+    "openjph:${RV_DEPS_OPENJPH_VERSION}"
+    "raw:${RV_DEPS_RAW_VERSION}"
+    "gc:${RV_DEPS_GC_VERSION}"
+    "aja:${RV_DEPS_AJA_VERSION}"
+    "bmd:${RV_DEPS_BMD_VERSION}"
+    "imgui:${RV_DEPS_IMGUI_VERSION}"
+    "numpy:${RV_DEPS_NUMPY_VERSION}"
+)
+STRING(REPLACE ";" "," _versions_str "${_versions_list}")
+
+ADD_CUSTOM_COMMAND(
+  OUTPUT ${_about_rv_cpp}
+  COMMAND
+    ${CMAKE_COMMAND} -E env ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/generate_about_rv.py ${_about_rv_cpp} "${_compiler_name}" "${CMAKE_BUILD_TYPE}"
+    "${_cxx_flags_str}" "${_vfx_platform_str}" "${_build_root}" "${_platform_name}" "${_arch_name}" "${RV_UI_APPLICATION_NAME}" "${_versions_str}"
+    "${RV_GIT_COMMIT_SHORT_HASH}"
+  DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/generate_about_rv.py
+  COMMENT "Generating about_rv.cpp with build information"
+  VERBATIM
+)
+
+LIST(APPEND _sources ${_about_rv_cpp})
+
 ADD_LIBRARY(
   ${_target} STATIC
   ${_sources} qrc/RvCommon.qrc

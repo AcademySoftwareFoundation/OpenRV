@@ -42,7 +42,7 @@ ENDIF()
 
 IF(RV_TARGET_WINDOWS)
   SET(_libpath
-    ${_bin_dir}/${_libname}
+      ${_bin_dir}/${_libname}
   )
 ELSE()
   SET(_libpath
@@ -110,7 +110,6 @@ IF(NOT _qt_location)
   MESSAGE(FATAL_ERROR "Qt is not found in path \"${_qt_location}\". Please provide -DRV_DEPS_QT${_qt_major}_LOCATION=<path> to CMake.")
 ENDIF()
 
-
 SET(_patch_command_for_imgui
     patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/patch/imgui_cpp_h.patch
 )
@@ -127,8 +126,8 @@ EXTERNALPROJECT_ADD(
     ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/imgui/CMakeLists.txt ${CMAKE_BINARY_DIR}/${_target}/src/CMakeLists.txt && ${CMAKE_COMMAND} -E
     copy_directory ${CMAKE_BINARY_DIR}/${_target}/deps/implot ${CMAKE_BINARY_DIR}/${_target}/src/implot && ${CMAKE_COMMAND} -E copy_directory
     ${CMAKE_BINARY_DIR}/${_target}/deps/imgui-backend-qt/backends ${CMAKE_BINARY_DIR}/${_target}/src/backends && ${CMAKE_COMMAND} -E copy_directory
-    ${CMAKE_BINARY_DIR}/${_target}/deps/imgui-node-editor ${CMAKE_BINARY_DIR}/${_target}/src/imgui-node-editor 
-    && ${_patch_command_for_imgui_backend_qt} && ${_patch_command_for_imgui}
+    ${CMAKE_BINARY_DIR}/${_target}/deps/imgui-node-editor ${CMAKE_BINARY_DIR}/${_target}/src/imgui-node-editor && ${_patch_command_for_imgui_backend_qt} &&
+    ${_patch_command_for_imgui}
   CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options} -DFIND_QT_VERSION=${_find_qt_version} -DCMAKE_PREFIX_PATH=${_qt_location}/lib/cmake
   BUILD_COMMAND ${_cmake_build_command}
   INSTALL_COMMAND ${_cmake_install_command}
@@ -168,3 +167,9 @@ TARGET_INCLUDE_DIRECTORIES(
 )
 
 LIST(APPEND RV_DEPS_LIST imgui::imgui)
+
+# Set version for about dialog
+SET(RV_DEPS_IMGUI_VERSION
+    ${_version}
+    CACHE INTERNAL "" FORCE
+)

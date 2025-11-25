@@ -9,6 +9,11 @@ PROCESSORCOUNT(_cpu_count)
 
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_GLEW" "e1a80a9f12d7def202d394f46e44cfced1104bfb" "make" "")
 
+# The actual GLEW version (the _version above is a git commit hash)
+SET(_glew_version
+    "2.2.0"
+)
+
 SET(_download_url
     "https://github.com/nigels-com/glew/archive/${_version}.zip"
 )
@@ -33,11 +38,11 @@ ENDIF()
 
 IF(RV_TARGET_DARWIN)
   SET(_glew_lib_name
-      ${CMAKE_SHARED_LIBRARY_PREFIX}GLEW.2.2.0${CMAKE_SHARED_LIBRARY_SUFFIX}
+      ${CMAKE_SHARED_LIBRARY_PREFIX}GLEW.${_glew_version}${CMAKE_SHARED_LIBRARY_SUFFIX}
   )
 ELSE()
   SET(_glew_lib_name
-      ${CMAKE_SHARED_LIBRARY_PREFIX}GLEW${CMAKE_SHARED_LIBRARY_SUFFIX}.2.2.0
+      ${CMAKE_SHARED_LIBRARY_PREFIX}GLEW${CMAKE_SHARED_LIBRARY_SUFFIX}.${_glew_version}
   )
 ENDIF()
 SET(_glew_lib
@@ -52,19 +57,12 @@ EXTERNALPROJECT_ADD(
   URL_MD5 ${_download_hash}
   DOWNLOAD_NAME ${_target}_${_version}.zip
   DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
-  # Patch to fix the build issue with OpenGL-Registry
-  # Pinning the OpenGL-Registry version to a specific commit
-  # https://github.com/nigels-com/glew/issues/449
+  # Patch to fix the build issue with OpenGL-Registry Pinning the OpenGL-Registry version to a specific commit https://github.com/nigels-com/glew/issues/449
   # Also clone the required glfixes repository
-  PATCH_COMMAND 
-    cd auto && 
-    git clone https://github.com/KhronosGroup/OpenGL-Registry.git || true &&
-    cd OpenGL-Registry && 
-    git checkout a77f5b6ffd0b0b74904f755ae977fa278eac4e95 && 
-    cd .. && 
-    git clone --depth=1 --branch glew https://github.com/nigels-com/glfixes glfixes || true &&
-    touch OpenGL-Registry/.dummy &&
-    cd ..
+  PATCH_COMMAND
+    cd auto && git clone https://github.com/KhronosGroup/OpenGL-Registry.git || true && cd OpenGL-Registry && git checkout
+    a77f5b6ffd0b0b74904f755ae977fa278eac4e95 && cd .. && git clone --depth=1 --branch glew https://github.com/nigels-com/glfixes glfixes || true && touch
+    OpenGL-Registry/.dummy && cd ..
   CONFIGURE_COMMAND cd auto && ${_make_command} && cd .. && ${_make_command}
   BUILD_COMMAND ${_make_command} -j${_cpu_count} GLEW_DEST=${_install_dir}
   INSTALL_COMMAND ${_make_command} install LIBDIR=${_lib_dir} GLEW_DEST=${_install_dir}
@@ -103,6 +101,6 @@ ADD_CUSTOM_TARGET(
 ADD_DEPENDENCIES(dependencies ${_target}-stage-target)
 
 SET(RV_DEPS_GLEW_VERSION
-    ${_version}
+    ${_glew_version}
     CACHE INTERNAL "" FORCE
 )

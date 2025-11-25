@@ -29,14 +29,13 @@ SET(RV_DEPS_PYTHON_VERSION_SHORT
     "${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}"
 )
 
-# This version is used for generating src/build/requirements.txt from requirements.txt.in template
-# All platforms install OpenTimelineIO from git to ensure consistent source builds.
+# This version is used for generating src/build/requirements.txt from requirements.txt.in template All platforms install OpenTimelineIO from git to ensure
+# consistent source builds.
 SET(_opentimelineio_version
     "0.18.1"
 )
 
-# Construct the full git URL for pip to use in requirements.txt
-# Using this avoids @ symbol conflicts in CONFIGURE_FILE
+# Construct the full git URL for pip to use in requirements.txt Using this avoids @ symbol conflicts in CONFIGURE_FILE
 SET(_opentimelineio_pip_url
     "git+https://github.com/AcademySoftwareFoundation/OpenTimelineIO@v${_opentimelineio_version}#egg=OpenTimelineIO"
 )
@@ -68,8 +67,8 @@ SET(_build_dir
     ${RV_DEPS_BASE_DIR}/${_python3_target}/build
 )
 
-# Note: OpenTimelineIO is now installed via requirements.txt from git URL for all platforms.
-# This ensures consistent source builds across Windows, Mac, and Linux.
+# Note: OpenTimelineIO is now installed via requirements.txt from git URL for all platforms. This ensures consistent source builds across Windows, Mac, and
+# Linux.
 
 FETCHCONTENT_DECLARE(
   ${_pyside_target}
@@ -242,27 +241,17 @@ SET(_requirements_output_file
     "${CMAKE_BINARY_DIR}/requirements.txt"
 )
 
-CONFIGURE_FILE(
-    ${_requirements_input_file}
-    ${_requirements_output_file}
-    @ONLY
-)
+CONFIGURE_FILE(${_requirements_input_file} ${_requirements_output_file} @ONLY)
 
 IF(RV_TARGET_WINDOWS)
-  # On Windows, OpenTimelineIO needs to be built from source and requires
-  # CMake to find the Python libraries. Set CMAKE_ARGS to help pybind11
-  # locate the Python development files.
-  # This is required for both old and new versions of pybind11, but especially
-  # for pybind11 v2.13.6+ which has stricter Python library detection.
-  # Note: pybind11's FindPythonLibsNew.cmake uses PYTHON_LIBRARY (all caps),
-  # PYTHON_INCLUDE_DIR, and PYTHON_EXECUTABLE variables.
-  
+  # On Windows, OpenTimelineIO needs to be built from source and requires CMake to find the Python libraries. Set CMAKE_ARGS to help pybind11 locate the Python
+  # development files. This is required for both old and new versions of pybind11, but especially for pybind11 v2.13.6+ which has stricter Python library
+  # detection. Note: pybind11's FindPythonLibsNew.cmake uses PYTHON_LIBRARY (all caps), PYTHON_INCLUDE_DIR, and PYTHON_EXECUTABLE variables.
+
   IF(CMAKE_BUILD_TYPE MATCHES "^Debug$")
-    # For Debug builds, we need to tell OpenTimelineIO to build in debug mode
-    # and link against the debug Python library (python311_d.lib)
+    # For Debug builds, we need to tell OpenTimelineIO to build in debug mode and link against the debug Python library (python311_d.lib)
     SET(_requirements_install_command
-        ${CMAKE_COMMAND} -E env
-        "OTIO_CXX_DEBUG_BUILD=1"
+        ${CMAKE_COMMAND} -E env "OTIO_CXX_DEBUG_BUILD=1"
         "CMAKE_ARGS=-DPYTHON_LIBRARY=${_python3_implib} -DPYTHON_INCLUDE_DIR=${_include_dir} -DPYTHON_EXECUTABLE=${_python3_executable}"
         "${_python3_executable}" -m pip install --upgrade -r "${_requirements_output_file}"
     )
@@ -370,7 +359,8 @@ IF(RV_TARGET_WINDOWS
     POST_BUILD
     COMMENT "Copying Debug Python lib as a unversionned file for Debug"
     COMMAND cmake -E copy_if_different ${_python3_implib} ${_python_release_libpath}
-    COMMAND cmake -E copy_if_different ${_python3_implib} ${_python_release_in_bin_libpath} DEPENDS ${_python3_target} ${_requirements_output_file} ${_requirements_input_file}
+    COMMAND cmake -E copy_if_different ${_python3_implib} ${_python_release_in_bin_libpath} DEPENDS ${_python3_target} ${_requirements_output_file}
+            ${_requirements_input_file}
   )
 ENDIF()
 
@@ -487,6 +477,24 @@ SET(RV_DEPS_PYSIDE_VERSION
     ${_pyside_version}
     CACHE INTERNAL "" FORCE
 )
+
+# Set NumPy version based on VFX Platform NumPy is a Python package dependency, version corresponds to VFX Platform year
+IF(RV_VFX_PLATFORM STREQUAL "CY2024")
+  SET(RV_DEPS_NUMPY_VERSION
+      "1.24"
+      CACHE INTERNAL "" FORCE
+  )
+ELSEIF(RV_VFX_PLATFORM STREQUAL "CY2023")
+  SET(RV_DEPS_NUMPY_VERSION
+      "1.23"
+      CACHE INTERNAL "" FORCE
+  )
+ELSE()
+  SET(RV_DEPS_NUMPY_VERSION
+      "Unknown"
+      CACHE INTERNAL "" FORCE
+  )
+ENDIF()
 
 SET(RV_DEPS_PYTHON3_EXECUTABLE
     ${_python3_executable}
