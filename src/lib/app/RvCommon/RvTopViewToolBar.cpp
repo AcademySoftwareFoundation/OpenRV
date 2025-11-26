@@ -380,9 +380,9 @@ namespace Rv
         m_actionCategoryMappings = {{{m_viewBackAction, IPCore::EventCategories::viewmodeCategory, m_viewBackAction->toolTip()},
                                      {m_viewForwardAction, IPCore::EventCategories::viewmodeCategory, m_viewForwardAction->toolTip()},
                                      {m_viewMenuAction, IPCore::EventCategories::viewmodeCategory, m_viewMenuAction->toolTip()},
-                                     {m_fullScreenAction, IPCore::EventCategories::viewmodeCategory, m_fullScreenAction->toolTip()},
+                                     {m_fullScreenAction, IPCore::EventCategories::fullscreenModeCategory, m_fullScreenAction->toolTip()},
                                      {m_frameAction, IPCore::EventCategories::viewmodeCategory, m_frameAction->toolTip()},
-                                     {m_bgMenuAction, IPCore::EventCategories::viewmodeCategory, m_bgMenuAction->toolTip()},
+                                     {m_bgMenuAction, IPCore::EventCategories::backgroundStyleCategory, m_bgMenuAction->toolTip()},
                                      {m_stereoMenuAction, IPCore::EventCategories::viewmodeCategory, m_stereoMenuAction->toolTip()},
                                      {m_channelMenuAction, IPCore::EventCategories::viewmodeCategory, m_channelMenuAction->toolTip()},
                                      {m_monitorMenuAction, IPCore::EventCategories::viewmodeCategory, m_monitorMenuAction->toolTip()}}};
