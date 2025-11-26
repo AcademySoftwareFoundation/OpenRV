@@ -16,6 +16,7 @@
 #include <IPCore/IPNode.h>
 #include <IPCore/ShaderProgram.h>
 #include <IPCore/Application.h>
+#include <IPCore/PaintCommand.h>
 #include <TwkExc/TwkExcException.h>
 #include <TwkGLF/GL.h>
 #include <TwkGLF/GLState.h>
@@ -1587,54 +1588,58 @@ namespace IPCore
             m_fullRenderSerialNumber++;
             freeOldTextures();
 
-            if (useThreadedUpload())
+            if (root != NULL)
             {
-                if (uploadRoot == NULL)
+                if (useThreadedUpload())
                 {
-                    uploadRoot = root;
-                }
-                m_uploadThreadPrefetch = (root == uploadRoot) ? false : true;
+                    if (uploadRoot == NULL)
+                    {
+                        uploadRoot = root;
+                    }
+                    m_uploadThreadPrefetch = (root == uploadRoot) ? false : true;
 
-                //
-                // traverse our IPTree, and create gl textures/buffers for all
-                // texture uploads the upload thread will need
-                // the reason for this is we want all the gen/deletion of
-                // textures/buffers to be handled by the main thread
-                //
-                if (m_uploadThreadPrefetch)
+                    //
+                    // traverse our IPTree, and create gl textures/buffers for
+                    // all texture uploads the upload thread will need the
+                    // reason for this is we want all the gen/deletion of
+                    // textures/buffers to be handled by the main thread
+                    //
+                    if (m_uploadThreadPrefetch)
+                    {
+                        //
+                        // Load the textures for the next frame
+                        // in case prefetch didnt fetch the current frame, fetch
+                        // it now. This only happens for the first frame, or
+                        // when the last render was N and this current render
+                        // isn't N+1 (say N+2) in which case the prefetch went
+                        // to a waste. Regardless we want to give prirority to
+                        // make sure everything is uploaded for the current
+                        // frame. This is overhead in most cases though
+                        //
+                        prepareTextureDescriptionsForUpload(root);
+                        prefetch(root);
+                    }
+
+                    prepareTextureDescriptionsForUpload(uploadRoot);
+                    setupUploadThread(uploadRoot);
+                }
+                else
                 {
                     //
-                    // Load the textures for the next frame
-                    // in case prefetch didnt fetch the current frame, fetch it
-                    // now. This only happens for the first frame, or when the
-                    // last render was N and this current render isn't N+1 (say
-                    // N+2) in which case the prefetch went to a waste.
-                    // Regardless we want to give prirority to make sure
-                    // everything is uploaded for the current frame. This is
-                    // overhead in most cases though
+                    // In case prefetch is on, in most cases textures should be
+                    // uploaded for this frame already with the exception of
+                    // first frame, or when the last render was N and this
+                    // current render isn't N+1 (say N+2) in which case the
+                    // prefetch went to a waste. In prefetch most cases this is
+                    // a overhead
                     //
+                    //
+
                     prepareTextureDescriptionsForUpload(root);
                     prefetch(root);
                 }
-
-                prepareTextureDescriptionsForUpload(uploadRoot);
-                setupUploadThread(uploadRoot);
+                HOP_CALL(glFinish();)
             }
-            else
-            {
-                //
-                // In case prefetch is on, in most cases textures should be
-                // uploaded for this frame already with the exception of first
-                // frame, or when the last render was N and this current render
-                // isn't N+1 (say N+2) in which case the prefetch went to a
-                // waste. In prefetch most cases this is a overhead
-                //
-                //
-
-                prepareTextureDescriptionsForUpload(root);
-                prefetch(root);
-            }
-            HOP_CALL(glFinish();)
         }
 
         {
@@ -4849,9 +4854,6 @@ namespace IPCore
             return;
 
         const string prenderID = imageToFBOIdentifier(root);
-        // these two are for pingpong
-        const GLFBO* tempfbo1 = m_imageFBOManager.newImageFBO(fbo, m_fullRenderSerialNumber, prenderID)->fbo();
-        const GLFBO* tempfbo2 = m_imageFBOManager.newImageFBO(fbo, m_fullRenderSerialNumber, prenderID)->fbo();
 
         assert(fbo);
 
@@ -4900,11 +4902,26 @@ namespace IPCore
             if (foundCachedFBO)
             {
                 startCmd = lastCmdNum;
-                cachedFBO->fbo()->copyTo(tempfbo1);
             }
             else
             {
                 cachedFBO = m_imageFBOManager.newImageFBO(fbo, m_fullRenderSerialNumber, newRenderID.str());
+            }
+        }
+
+        // Allocate temp FBOs AFTER cache lookup so the cached FBO is protected from being reused
+        const GLFBO* tempfbo1 = m_imageFBOManager.newImageFBO(fbo, m_fullRenderSerialNumber, prenderID)->fbo();
+        const GLFBO* tempfbo2 = m_imageFBOManager.newImageFBO(fbo, m_fullRenderSerialNumber, prenderID)->fbo();
+
+        // Copy initial render to temp buffer
+        if (root->commands.size() > 1)
+        {
+            if (foundCachedFBO)
+            {
+                cachedFBO->fbo()->copyTo(tempfbo1);
+            }
+            else
+            {
                 fbo->copyTo(tempfbo1);
             }
         }
@@ -5044,7 +5061,9 @@ namespace IPCore
             Paint::renderPaintCommands(paintContext);
         }
 
-        if (!paintContext.cacheUpdated && cachedFBO)
+        // Only clear the cache identifier if we didn't use an existing cache
+        // If we had a cache hit (foundCachedFBO), keep the identifier even if we didn't update it
+        if (!paintContext.cacheUpdated && cachedFBO && !foundCachedFBO)
             cachedFBO->identifier = "";
 
         /////////////////// clean up /////////////////////////////////////

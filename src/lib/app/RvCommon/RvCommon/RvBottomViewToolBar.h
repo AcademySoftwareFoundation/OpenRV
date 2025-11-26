@@ -68,6 +68,9 @@ namespace Rv
         void playModeMenuTriggered(QAction*);
         void playModeMenuUpdate();
 
+    protected:
+        bool eventFilter(QObject* obj, QEvent* event) override;
+
     private:
         struct ActionCategoryMapping
         {
@@ -80,8 +83,11 @@ namespace Rv
 
         void setVolumeIcon();
         void updateActionAvailability();
+        void updatePlayModeButtonState();
 
         IPCore::Session* m_session;
+        QString m_customCannotUseTooltip;
+        QString m_customDisabledPrefix;
         QAction* m_smAction;
         QAction* m_paintAction;
         QAction* m_infoAction;
@@ -92,12 +98,15 @@ namespace Rv
         QAction* m_ghostAction;
         QAction* m_backStepAction;
         QAction* m_forwardStepAction;
-        QAction* m_backPlayAction;
+        QAction* m_backwardPlayAction;
         QAction* m_forwardPlayAction;
         QAction* m_backMarkAction;
         QAction* m_forwardMarkAction;
         QAction* m_playModeAction;
         QMenu* m_playModeMenu;
+        QAction* m_playModeLoopAction;
+        QAction* m_playModeOnceAction;
+        QAction* m_playModePingPongAction;
         QAction* m_audioAction;
         QSlider* m_audioSlider;
         QMenu* m_audioMenu;

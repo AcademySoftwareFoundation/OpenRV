@@ -30,16 +30,19 @@ SET(RV_DEPS_PYTHON_VERSION_SHORT
     "${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}"
 )
 
-# This version is used for:
-# 1. Building OpenTimelineIO from source for Windows debug builds
-# 2. Generating src/build/requirements.txt from requirements.txt.in template
-#    (used by all other platforms/builds to install from PyPI)
+# This version is used for generating src/build/requirements.txt from requirements.txt.in template
+# All platforms install OpenTimelineIO from git to ensure consistent source builds.
 SET(_opentimelineio_version
     "${RV_DEPS_OTIO_VERSION}"
 )
 
 SET(_pyside_version 
     "${RV_DEPS_PYSIDE_VERSION}"
+)
+# Construct the full git URL for pip to use in requirements.txt
+# Using this avoids @ symbol conflicts in CONFIGURE_FILE
+SET(_opentimelineio_pip_url
+    "git+https://github.com/AcademySoftwareFoundation/OpenTimelineIO@v${_opentimelineio_version}#egg=OpenTimelineIO"
 )
 
 SET(_python3_download_url
@@ -53,12 +56,12 @@ SET(_python3_download_hash
 SET(_opentimelineio_download_url
     "https://github.com/AcademySoftwareFoundation/OpenTimelineIO"
 )
+
 SET(_opentimelineio_git_tag
     "v${_opentimelineio_version}"
 )
 
-SET(
-  _pyside_archive_url
+SET(_pyside_archive_url
   "${RV_DEPS_PYSIDE_ARCHIVE_URL}"
 )
 
@@ -76,18 +79,8 @@ SET(_build_dir
     ${RV_DEPS_BASE_DIR}/${_python3_target}/build
 )
 
-IF(RV_TARGET_WINDOWS)
-
-  FETCHCONTENT_DECLARE(
-    ${_opentimelineio_target}
-    GIT_REPOSITORY ${_opentimelineio_download_url}
-    GIT_TAG ${_opentimelineio_git_tag}
-    SOURCE_SUBDIR "src" # Avoids the top level CMakeLists.txt
-  )
-
-  FETCHCONTENT_MAKEAVAILABLE(${_opentimelineio_target})
-
-ENDIF()
+# Note: OpenTimelineIO is now installed via requirements.txt from git URL for all platforms.
+# This ensures consistent source builds across Windows, Mac, and Linux.
 
 FETCHCONTENT_DECLARE(
   ${_pyside_target}
@@ -122,8 +115,6 @@ IF(DEFINED RV_DEPS_OPENSSL_INSTALL_DIR)
   LIST(APPEND _python3_make_command ${RV_DEPS_OPENSSL_INSTALL_DIR})
 ENDIF()
 IF(RV_TARGET_WINDOWS)
-  LIST(APPEND _python3_make_command "--opentimelineio-source-dir")
-  LIST(APPEND _python3_make_command ${rv_deps_opentimelineio_SOURCE_DIR})
   LIST(APPEND _python3_make_command "--python-version")
   LIST(APPEND _python3_make_command "${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR}")
 ENDIF()

@@ -29,6 +29,8 @@
 #include <QtGui/QtGui>
 #include <QtWidgets/QCompleter>
 #include <QtWidgets/QMenu>
+#include <QtWidgets/QInputDialog>
+#include <QtWidgets/QMessageBox>
 #if defined(RV_VFX_CY2023)
 #include <QtWidgets/QDirModel>
 #endif
@@ -132,10 +134,6 @@ namespace Rv
         m_ui.searchButton->setVisible(false);
         m_ui.contentFrame->setMaximumHeight(0);
 
-        //
-        //   XXX hide the new folder button for now, since it's always
-        //   disabled.
-        m_ui.newFolderButton->hide();
         if (!traits)
             traits = new FileTypeTraits();
 
@@ -221,6 +219,14 @@ namespace Rv
         cpGroup->addAction(m_cpNone);
         m_ui.configButton->setMenu(m_configPopup);
 
+        m_selectionPopup = new QMenu(this);
+        m_createDirectory = m_selectionPopup->addAction("New Folder");
+        m_selectionPopup->addSeparator();
+        m_rename = m_selectionPopup->addAction("Rename");
+        m_delete = m_selectionPopup->addAction("Delete");
+        m_selectionPopup->addSeparator();
+        m_reload =  m_selectionPopup->addAction("Refresh");
+
         QIcon backIcon = colorAdjustedIcon(":images/back_32x32.png");
         QIcon forwardIcon = colorAdjustedIcon(":images/forwd_32x32.png");
         QIcon configIcon = colorAdjustedIcon(":images/confg_32x32.png");
@@ -255,10 +261,12 @@ namespace Rv
         m_columnPreview->setSizePolicy(p);
         preview->setSizePolicy(p);
         m_columnView->setPreviewWidget(preview);
+        m_columnView->setContextMenuPolicy(Qt::CustomContextMenu);
 
         m_detailTree = new QTreeView(this);
         m_detailTree->setExpandsOnDoubleClick(false);
         m_detailTree->setAlternatingRowColors(true);
+        m_detailTree->setContextMenuPolicy(Qt::CustomContextMenu);
 
         m_detailTree->setDragEnabled(true);
         m_columnView->setDragEnabled(true);
@@ -308,7 +316,12 @@ namespace Rv
         connect(cpGroup, SIGNAL(triggered(QAction*)), this, SLOT(iconViewChanged(QAction*)));
         connect(m_cpHidden, SIGNAL(triggered(bool)), this, SLOT(hiddenViewChanged(bool)));
 
-        connect(m_ui.previousButton, SIGNAL(triggered(QAction*)), this, SLOT(prevButtonTrigger(QAction*)));
+        connect(m_rename, SIGNAL(triggered(bool)), this, SLOT(renameSelected(bool)));
+
+        connect(m_delete, SIGNAL(triggered(bool)), this, SLOT(deleteSelected(bool)));
+
+        connect(m_ui.previousButton, SIGNAL(triggered(QAction*)), this,
+                SLOT(prevButtonTrigger(QAction*)));
 
         connect(m_ui.nextButton, SIGNAL(triggered(QAction*)), this, SLOT(nextButtonTrigger(QAction*)));
 
@@ -351,11 +364,25 @@ namespace Rv
 
         connect(m_columnView, SIGNAL(updatePreviewWidget(const QModelIndex&)), this, SLOT(columnUpdatePreview(const QModelIndex&)));
 
+        connect(m_ui.newFolderButton, SIGNAL(clicked(bool)), this, SLOT(createDirectory(bool)));
+
+        connect(m_createDirectory, SIGNAL(triggered(bool)), this, SLOT(createDirectory(bool)));
+
         connect(m_ui.reloadButton, SIGNAL(clicked(bool)), this, SLOT(reload(bool)));
+
+        connect(m_reload, SIGNAL(triggered(bool)), this, SLOT(reload(bool)));
 
         connect(m_ui.autoRefreshCheckbox, SIGNAL(stateChanged(int)), this, SLOT(autoRefreshChanged(int)));
 
         connect(m_ui.fileTypeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(fileTypeChanged(int)));
+
+        connect(m_columnView,
+                SIGNAL(customContextMenuRequested(const QPoint&)), this,
+                SLOT(selectionPopup(const QPoint&)));
+
+        connect(m_detailTree,
+                SIGNAL(customContextMenuRequested(const QPoint&)), this,
+                SLOT(selectionPopup(const QPoint&)));
 
         QCompleter* completer = new QCompleter(this);
 #if defined(RV_VFX_CY2023)
@@ -462,8 +489,6 @@ namespace Rv
     void RvFileDialog::setRole(Role r)
     {
         m_role = r;
-        //  XXX this is hidden for now
-        //  m_ui.newFolderButton->setDisabled(m_role == OpenFileRole);
         m_ui.buttonBox->setStandardButtons(m_role == OpenFileRole ? (QDialogButtonBox::Open | QDialogButtonBox::Cancel)
                                                                   : (QDialogButtonBox::Save | QDialogButtonBox::Cancel));
     }
@@ -619,6 +644,202 @@ namespace Rv
             m_reloadTimer->start(1000);
     }
 
+    void RvFileDialog::createDirectory(bool)
+    {
+        bool ok;
+
+        DB("createDirectory in \"" << m_currentDir.toUtf8().data() << "\"");
+        QDir dir(m_currentDir);
+
+        if (m_currentDir.isEmpty() || !dir.exists())
+        {
+            QMessageBox::critical(this, "Create New Folder Error",
+                QString("Current Directory does not exist: %1").arg(m_currentDir));
+
+            return;
+        }
+
+        QString folderName = QInputDialog::getText(this, "Create New Folder",
+            "Folder name:", QLineEdit::Normal, QString("untitled folder"), &ok);
+
+        if (ok && !folderName.isEmpty())
+        {
+            if (dir.mkdir(folderName))
+            {
+                reload(true);
+            }
+            else
+            {
+                QMessageBox::critical(this, "Create New Folder Error", "Failed to create the folder.\n"
+                    "It may already exist or the name is invalid.");
+            }
+        }
+    }
+
+    void RvFileDialog::renameSelected(bool)
+    {
+        QStringList files = selectedFiles();
+        if (files.size() == 0)
+        {
+            QMessageBox::critical(this, "Rename Error", "No folder or file selected.\n"
+                "Please select only one file or folder.");
+            return;
+        }
+        else if (files.size() > 1)
+        {
+            QMessageBox::critical(this, "Rename Error", "Too many folders and files selected.\n"
+               "Please select only one file or folder.");
+            return;
+        }
+
+        DB("renameSelected " << files.first().toUtf8().data());
+        QFileInfo info(files.first());
+
+        if (!info.exists())
+        {
+            QMessageBox::critical(this, "Rename Error",
+                QString("Unable to rename: %1").arg(info.fileName()));
+            return;
+        }
+
+        bool ok;
+        QString newName = QInputDialog::getText(this, "Rename",
+            "New name:", QLineEdit::Normal, info.fileName(), &ok);
+
+        if (!ok || newName.isEmpty() || newName == info.fileName())
+            return;
+
+        QString newPath = QDir(info.absolutePath()).filePath(newName);
+        DB("renameSelected to " << newPath.toUtf8().data());
+
+        if (QFile::rename(info.absoluteFilePath(), newPath))
+        {
+            QString currentDir = m_currentDir;
+            reload(true);
+            setDirectory(currentDir);
+        }
+        else
+        {
+            QMessageBox::critical(this, "Error",
+                QString("Failed to rename the %1.\nIt may already exist or you may not have permission.")
+                .arg(info.isDir() ? "folder" : "file"));
+        }
+    }
+
+    bool RvFileDialog::confirmDeleteDialog(const QStringList &paths)
+    {
+        QDialog dialog(this);
+        dialog.setWindowTitle("Confirm Deletion");
+
+        QVBoxLayout *layout = new QVBoxLayout(&dialog);
+
+        QHBoxLayout *messageLayout = new QHBoxLayout;
+        QLabel *iconLabel = new QLabel;
+        QIcon icon = QApplication::style()->standardIcon(QStyle::SP_MessageBoxQuestion);
+        iconLabel->setPixmap(icon.pixmap(48, 48));
+        messageLayout->addWidget(iconLabel, 0, Qt::AlignTop);
+
+        QLabel *label = new QLabel("Are you sure you want to delete the following paths?");
+        messageLayout->addWidget(label, 1);
+
+        layout->addLayout(messageLayout);
+
+        QListWidget *listWidget = new QListWidget;
+        listWidget->addItems(paths);
+        listWidget->setMinimumWidth(500);
+        listWidget->setSelectionMode(QAbstractItemView::NoSelection);
+        layout->addWidget(listWidget);
+
+        QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Yes | QDialogButtonBox::No);
+        layout->addWidget(buttonBox);
+
+        QObject::connect(buttonBox, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
+        QObject::connect(buttonBox, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
+
+        return dialog.exec() == QDialog::Accepted;
+    }
+
+    void RvFileDialog::deleteSelected(bool)
+    {
+        QStringList paths = selectedFiles();
+        if (paths.size() == 0)
+        {
+            QMessageBox::critical(
+                this, "Delete Error", "No items selected.\n"
+                "You must have one or more files selected");
+            return;
+        }
+
+        // check all paths exists and aren't image sequences
+        QString currentDir = m_currentDir;
+
+        for (const QString &path : paths)
+        {
+            DB("deleteSelected: " << path.toUtf8().data());
+            QFileInfo info(path);
+            if (!info.exists() || !(info.isFile() || info.isDir()))
+            {
+                QMessageBox::critical(
+                    this, "Delete Error",  QString("Unable to delete: %1").arg(info.fileName()));
+                return;
+            }
+
+            if (path == currentDir)
+            {
+                QDir dir(path);
+                if(dir.cdUp())
+                    currentDir = dir.absolutePath();
+            }
+        }
+
+        if (!confirmDeleteDialog(paths))
+            return;
+
+        // Sort paths in depth first order
+        std::sort(paths.begin(), paths.end(), [](const QString& a, const QString& b) {
+            return a.count(QDir::separator()) > b.count(QDir::separator());
+        });
+
+        for (const QString &path : paths)
+        {
+            QFileInfo info(path);
+            if (!info.exists())
+            {
+                QMessageBox::critical(
+                    this, "Delete Error",  QString("Path does not exist: %1").arg(path));
+                return;
+            }
+
+            if (info.isFile())
+            {
+                if (!QFile::remove(path))
+                {
+                    QMessageBox::critical(
+                        this, "Delete Error",  QString("Failed to delete file: %1").arg(path));
+                    return;
+                }
+            }
+            else if (info.isDir())
+            {
+                QDir dir(path);
+                if (!dir.removeRecursively())
+                {
+                    QMessageBox::critical(
+                        this, "Delete Error",  QString("Failed to delete directory: %1").arg(path));
+                    return;
+                }
+            }
+            else
+            {
+                QMessageBox::critical(
+                    this, "Delete Error",  QString("Unknown path type: %1").arg(path));
+                return;
+            }
+        }
+        setDirectory(currentDir);
+        reload(true);
+    }
+
     void RvFileDialog::setDirectory(const QString& inpath, bool force)
     {
         if (m_building)
@@ -764,6 +985,7 @@ namespace Rv
 
         DB("    rebuilding path combo");
         m_ui.pathCombo->clear();
+        m_currentDir = dir.absolutePath();
 
         for (bool done = false; !done;)
         {
@@ -1526,6 +1748,28 @@ namespace Rv
         }
 
         return false;
+    }
+
+    void RvFileDialog::selectionPopup(const QPoint& pos)
+    {
+        QAbstractItemView* view = 0;
+
+        switch (m_viewMode)
+        {
+        case DetailedFileView:
+            view = m_detailTree;
+            break;
+        case DetailedMediaView:
+            view = m_detailTree;
+            break;
+        case ColumnView:
+            view = m_columnView;
+            break;
+        default:
+            break;
+        }
+        if (view)
+            m_selectionPopup->popup(view->mapToGlobal(pos));
     }
 
     QStringList RvFileDialog::selectedFiles() const
