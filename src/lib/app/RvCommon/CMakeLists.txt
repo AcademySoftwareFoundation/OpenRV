@@ -287,7 +287,7 @@ SET(_versions_list
     "OpenColorIO:${RV_DEPS_OCIO_VERSION}"
     "FFmpeg:${RV_DEPS_FFMPEG_VERSION}"
     "OpenSSL:${RV_DEPS_OPENSSL_VERSION}"
-    "GLEW:${RV_DEPS_GLEW_VERSION}"
+    "GLEW:${RV_DEPS_GLEW_VERSION_LIB}"
     "spdlog:${RV_DEPS_SPDLOG_VERSION}"
     "yaml-cpp:${RV_DEPS_YAML_CPP_VERSION}"
     "zlib:${RV_DEPS_ZLIB_VERSION}"

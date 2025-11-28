@@ -49,8 +49,8 @@ def get_dependencies_info(vfx_platform, versions, app_name, platform=""):
     # Determine Qt license based on application type
     # OpenRV uses LGPL, commercial RV uses Qt Commercial
     is_commercial_rv = app_name == "RV"
-    qt_license = "Commercial" if is_commercial_rv else "LGPL v3"
-    pyside_license = "Commercial" if is_commercial_rv else "LGPL v3"
+    qt_license = "Qt Commercial" if is_commercial_rv else "LGPL v3"
+    pyside_license = "Qt Commercial" if is_commercial_rv else "LGPL v3"
 
     # Detect if we're on macOS
     is_macos = "darwin" in platform.lower() or "macos" in platform.lower()
