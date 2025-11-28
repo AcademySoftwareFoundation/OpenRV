@@ -282,8 +282,6 @@ namespace Rv
 
         //
         //  Create UI blocking overlay - transparent widget that captures all input
-        //  Used during presenter transitions in Live Review to prevent interaction
-        //  without closing panels
         //
         m_blockingOverlay = new QWidget(this);
         m_blockingOverlay->setObjectName("UIBlockingOverlay");

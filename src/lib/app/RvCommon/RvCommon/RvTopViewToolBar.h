@@ -145,6 +145,7 @@ namespace Rv
 
     private:
         IPCore::Session* m_session;
+        QString m_customDisabledPrefix;
         QAction* m_viewBackAction;
         QAction* m_viewForwardAction;
         QComboBox* m_viewCombo;
@@ -208,7 +209,7 @@ namespace Rv
         QIconMap m_iconMap;
         const VideoDevice* m_device;
         const VideoDevice* m_outputDevice;
-        std::array<ActionCategoryMapping, 6> m_actionCategoryMappings;
+        std::array<ActionCategoryMapping, 9> m_actionCategoryMappings;
     };
 
 } // namespace Rv
