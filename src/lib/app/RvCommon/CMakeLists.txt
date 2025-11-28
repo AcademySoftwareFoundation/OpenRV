@@ -264,7 +264,7 @@ SET(_arch_name
 )
 
 # Gather dependency versions
-IF(RV_VFX_PLATFORM STREQUAL "CY2024")
+IF(RV_VFX_PLATFORM STRGREATER_EQUAL CY2024)
   SET(_qt_version
       "${RV_DEPS_QT6_VERSION}"
   )
