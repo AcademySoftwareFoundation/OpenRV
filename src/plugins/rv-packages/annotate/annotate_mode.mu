@@ -396,9 +396,15 @@ class: AnnotateMinorMode : MinorMode
         "%s.frame:%d.order" % (node, frame);
     }
 
-    method: frameOrderRedoStackName (string; string node, int frame)
+
+    method: frameUserUndoStackName (string; string node, int frame)
     {
-        "%s.frame:%d.redo" % (node, frame);
+        "%s.frame:%d.undo_%s" % (node, frame, encodedName(_user));
+    }
+
+    method: frameUserRedoStackName (string; string node, int frame)
+    {
+        "%s.frame:%d.redo_%s" % (node, frame, encodedName(_user));
     }
 
     method: updateFrameDependentState (void;)
@@ -459,18 +465,19 @@ class: AnnotateMinorMode : MinorMode
                        int mode=RenderOverMode,
                        int debug=0)
     {
-        let n          = newUniqueName(node, "pen", frame),
-            colorName  = "%s.color" % n,
-            widthName  = "%s.width" % n,
-            brushName  = "%s.brush" % n,
-            debugName  = "%s.debug" % n,
-            joinName   = "%s.join" % n,
-            capName    = "%s.cap" % n,
-            pointsName = "%s.points" % n,
-            splatName  = "%s.splat" % n,
+        let n              = newUniqueName(node, "pen", frame),
+            colorName      = "%s.color" % n,
+            widthName      = "%s.width" % n,
+            brushName      = "%s.brush" % n,
+            debugName      = "%s.debug" % n,
+            joinName       = "%s.join" % n,
+            capName        = "%s.cap" % n,
+            pointsName     = "%s.points" % n,
+            splatName      = "%s.splat" % n,
             startFrameName = "%s.startFrame" % n,
-            durationName = "%s.duration" % n,
-            orderName  = frameOrderName(node, frame);
+            durationName   = "%s.duration" % n,
+            orderName      = frameOrderName(node, frame),
+            undoName       = frameUserUndoStackName(node, frame);
 
         beginCompoundStateChange();
         newProperty(colorName, FloatType, 4);
@@ -514,16 +521,21 @@ class: AnnotateMinorMode : MinorMode
         setIntProperty(startFrameName, int[] {startFrame}, true);
         setIntProperty(durationName, int[] {duration}, true);
 
-        try
-        {
-            propertyInfo(orderName);
-        }
-        catch (...)
+        let stroke = n.split(".").back();
+
+        if (!propertyExists(orderName))
         {
             newProperty(orderName, StringType, 1);
         }
 
-        insertStringProperty(orderName, string[] {n.split(".").back()});
+        insertStringProperty(orderName, string[] {stroke});
+        
+        if (!propertyExists(undoName))
+        {
+            newProperty(undoName, StringType, 1);
+        }
+
+        insertStringProperty(undoName, string[] {stroke});
 
         endCompoundStateChange();
         return n;
@@ -575,20 +587,21 @@ class: AnnotateMinorMode : MinorMode
                      int mode=RenderOverMode,
                      int debug=0)
     {
-        let n           = newUniqueName(node, "text", frame),
-            colorName   = "%s.color" % n,
-            sizeName    = "%s.size" % n,
-            scaleName   = "%s.scale" % n,
-            spacingName = "%s.spacing" % n,
-            rotName     = "%s.rotation" % n,
-            fontName    = "%s.font" % n,
-            textName    = "%s.text" % n,
-            originName  = "%s.origin" % n,
-            posName     = "%s.position" % n,
-            debugName   = "%s.debug" % n,
+        let n              = newUniqueName(node, "text", frame),
+            colorName      = "%s.color" % n,
+            sizeName       = "%s.size" % n,
+            scaleName      = "%s.scale" % n,
+            spacingName    = "%s.spacing" % n,
+            rotName        = "%s.rotation" % n,
+            fontName       = "%s.font" % n,
+            textName       = "%s.text" % n,
+            originName     = "%s.origin" % n,
+            posName        = "%s.position" % n,
+            debugName      = "%s.debug" % n,
             startFrameName = "%s.startFrame" % n,
-            durationName = "%s.duration" % n,
-            orderName   = frameOrderName(node, frame);
+            durationName   = "%s.duration" % n,
+            orderName      = frameOrderName(node, frame),
+            undoName       = frameUserUndoStackName(node, frame);
 
         beginCompoundStateChange();
         newProperty(posName, FloatType, 2);
@@ -621,16 +634,21 @@ class: AnnotateMinorMode : MinorMode
         setIntProperty(startFrameName, int[] {startFrame}, true);
         setIntProperty(durationName, int[] {duration}, true);
 
-        try
-        {
-            propertyInfo(orderName);
-        }
-        catch (...)
+        let stroke = n.split(".").back();
+
+        if (!propertyExists(orderName))
         {
             newProperty(orderName, StringType, 1);
         }
 
-        insertStringProperty(orderName, string[] {n.split(".").back()});
+        insertStringProperty(orderName, string[] {stroke});
+        
+        if (!propertyExists(undoName))
+        {
+            newProperty(undoName, StringType, 1);
+        }
+
+        insertStringProperty(undoName, string[] {stroke});
 
         endCompoundStateChange();
         return n;
@@ -648,9 +666,8 @@ class: AnnotateMinorMode : MinorMode
     method: saveAnnotation (void; string description)
     {
         let comp       = "annotation:%d" % nextAnnotationID(),
-            f          = frame(),
-            orderName  = frameOrderName(_currentNode, f),
-            redoName   = frameOrderRedoStackName(_currentNode, f),
+            frame      = frame(),
+            orderName  = frameOrderName(_currentNode, frame),
             orderArray = getStringProperty(orderName),
             propName   = _currentNode + "." + comp + ".order",
             descName   = _currentNode + "." + comp + ".description";
@@ -1088,16 +1105,23 @@ class: AnnotateMinorMode : MinorMode
         runtime.gc.enable();
         _currentDrawObject = nil;
 
-        let f = _currentNodeInfo.frame,
-            rprop= frameOrderRedoStackName(_currentNode, f);
+        let frame = _currentNodeInfo.frame;
+        let redoProperty = frameUserRedoStackName(_currentNode, frame);
 
-        if (propertyExists(rprop) && propertyInfo(rprop).size > 0)
+        if (propertyExists(redoProperty) && propertyInfo(redoProperty).size > 0)
         {
-            for_each (c; getStringProperty(rprop)) deleteStroke(_currentNode, c);
-            setStringProperty(rprop, string[](), true);
+            for_each (c; getStringProperty(redoProperty))
+            {
+                deleteStroke(_currentNode, c);
+            }
+            setStringProperty(redoProperty, string[](), true);
         }
 
-        if (_syncWholeStrokes) endCompoundStateChange();
+        if (_syncWholeStrokes)
+        {
+            endCompoundStateChange();
+        }
+
         undoRedoUpdate();
         redraw();
     }
@@ -1408,111 +1432,161 @@ class: AnnotateMinorMode : MinorMode
 
     method: undoRedoUpdate (void;)
     {
-        let f = _currentNodeInfo.frame,
-            uprop = frameOrderName(_currentNode, f),
-            rprop= frameOrderRedoStackName(_currentNode, f),
-            playing = isPlaying();
+        let frame = _currentNodeInfo.frame;
+        let undoProperty = frameUserUndoStackName(_currentNode, frame);
+        let redoProperty = frameUserRedoStackName(_currentNode, frame);
+        let playing = isPlaying();
 
         _undoAct.setEnabled(!playing &&
-                            propertyExists(uprop) &&
-                            propertyInfo(uprop).size > 0);
+                            propertyExists(undoProperty) &&
+                            propertyInfo(undoProperty).size > 0);
 
         _redoAct.setEnabled(!playing &&
-                            propertyExists(rprop) &&
-                            propertyInfo(rprop).size > 0);
+                            propertyExists(redoProperty) &&
+                            propertyInfo(redoProperty).size > 0);
     }
 
-    method: undoPaint (void; int frame)
+    method: undoPaint (void;)
     {
-        let f = _currentNodeInfo.frame,
-            upropName = frameOrderName(_currentNode, f),
-            rpropName = frameOrderRedoStackName(_currentNode, f);
+        let frame = _currentNodeInfo.frame;
+        let orderProperty = frameOrderName(_currentNode, frame);
+        let undoProperty = frameUserUndoStackName(_currentNode, frame);
+        let redoProperty = frameUserRedoStackName(_currentNode, frame);
 
-        if (propertyExists(upropName))
+        if (propertyExists(undoProperty))
         {
-            if (!propertyExists(rpropName)) newProperty(rpropName, StringType, 1);
+            if (!propertyExists(redoProperty))
+            {
+                newProperty(redoProperty, StringType, 1);
+            }
 
-            let u = getStringProperty(upropName),
-                r = getStringProperty(rpropName);
+            let undo = getStringProperty(undoProperty);
+            let redo = getStringProperty(redoProperty);
+            let order = getStringProperty(orderProperty);
 
-            r.push_back(u.back());
-            u.resize(u.size()-1);
+            let stroke = undo.back();
+            redo.push_back(stroke);
+            undo.resize(undo.size()-1);
 
-            setStringProperty(upropName, u, true);
-            setStringProperty(rpropName, r, true);
+            for_index(i; order)
+            {
+                if (order[i] == stroke)
+                {
+                    order.erase(i, 1);
+                    break;
+                }
+            }
+
+            beginCompoundStateChange();
+            setStringProperty(undoProperty, undo, true);
+            setStringProperty(redoProperty, redo, true);
+            setStringProperty(orderProperty, order, true);
+            endCompoundStateChange();
         }
     }
 
-    method: redoPaint (void; int frame)
+    method: redoPaint (void;)
     {
-        let f = _currentNodeInfo.frame,
-            upropName = frameOrderName(_currentNode, f),
-            rpropName = frameOrderRedoStackName(_currentNode, f);
+        let frame = _currentNodeInfo.frame;
+        let orderProperty = frameOrderName(_currentNode, frame);
+        let undoProperty = frameUserUndoStackName(_currentNode, frame);
+        let redoProperty = frameUserRedoStackName(_currentNode, frame);
 
-        if (propertyExists(rpropName))
+        if (propertyExists(redoProperty))
         {
-            if (!propertyExists(upropName)) newProperty(upropName, StringType, 1);
+            if (!propertyExists(undoProperty))
+            {
+                newProperty(undoProperty, StringType, 1);
+            }
 
-            let u = getStringProperty(upropName),
-                r = getStringProperty(rpropName);
+            let undo = getStringProperty(undoProperty);
+            let redo = getStringProperty(redoProperty);
+            let order = getStringProperty(orderProperty);
 
             int startIndex = -1;
             int endIndex = -1;
 
-            for (int i = 0; i < r.size(); i++)
+            for (int i = 0; i < redo.size(); i++)
             {
-                if (r[i] == "start")
+                if (redo[i] == "start")
                 {
                     startIndex = i;
                 }
-                if (r[i] == "end")
+                if (redo[i] == "end")
                 {
                     endIndex = i;
                 }
             }
 
-            if (r.size() >= 3 && startIndex != -1 && endIndex != -1)
+            string[] strokes;
+
+            if (redo.size() >= 3 && startIndex != -1 && endIndex != -1)
             {
                 for (int i = startIndex + 1; i < endIndex; i++)
                 {
-                    u.push_back(r[i]);
+                    let stroke = redo[i];
+                    strokes.push_back(stroke);
+                    undo.push_back(stroke);
                 }
-                r.erase(startIndex, endIndex - startIndex + 1);
+                redo.erase(startIndex, endIndex - startIndex + 1);
             }
             else
             {
-                u.push_back(r.back());
-                r.resize(r.size() - 1);
+                let stroke = redo.back();
+                strokes.push_back(stroke);
+                undo.push_back(stroke);
+                redo.resize(redo.size() - 1);
             }
 
-            setStringProperty(upropName, u, true);
-            setStringProperty(rpropName, r, true);
+
+            for_each(stroke; strokes)
+            {
+                order.push_back(stroke);
+            }
+
+            beginCompoundStateChange();
+            setStringProperty(undoProperty, undo, true);
+            setStringProperty(redoProperty, redo, true);
+            setStringProperty(orderProperty, order, true);
+            endCompoundStateChange();
         }
     }
 
     method: clearPaint (void; string node, int frame)
     {
-        let upropName = frameOrderName(node, frame);
-        let rpropName = frameOrderRedoStackName(node, frame);
+        let orderProperty = frameOrderName(node, frame);
+        let undoProperty = frameUserUndoStackName(node, frame);
+        let redoProperty = frameUserRedoStackName(node, frame);
 
-        if (propertyExists(upropName))
+        if (propertyExists(undoProperty))
         {
-            if (!propertyExists(rpropName)) newProperty(rpropName, StringType, 1);
-
-            let u = getStringProperty(upropName),
-                r = getStringProperty(rpropName);
-
-            if (u.size() > 0)
+            if (!propertyExists(redoProperty))
             {
-                r.push_back("start");
-                for (int i = 0; i < u.size(); i++)
-                    r.push_back(u[i]);
-                r.push_back("end");
-                u.clear();
+                newProperty(redoProperty, StringType, 1);
             }
 
-            setStringProperty(upropName, u, true);
-            setStringProperty(rpropName, r, true);
+            let undo = getStringProperty(undoProperty);
+            let redo = getStringProperty(redoProperty);
+            let order = getStringProperty(orderProperty);
+
+            if (undo.size() > 0)
+            {
+                redo.push_back("start");
+                for_each(stroke; undo)
+                {
+                    redo.push_back(stroke);
+                }
+                redo.push_back("end");
+
+                undo.clear();
+                order.clear();
+            }
+
+            beginCompoundStateChange();
+            setStringProperty(undoProperty, undo, true);
+            setStringProperty(redoProperty, redo, true);
+            setStringProperty(orderProperty, order, true);
+            endCompoundStateChange();
         }
     }
 
@@ -1638,7 +1712,7 @@ class: AnnotateMinorMode : MinorMode
 
     method: undoSlot (void; bool checked)
     {
-        undoPaint(sourceFrame(frame()));
+        undoPaint();
         updateFrameDependentState();
         redraw();
     }
@@ -1678,7 +1752,7 @@ class: AnnotateMinorMode : MinorMode
 
     method: redoSlot (void; bool checked)
     {
-        redoPaint(sourceFrame(frame()));
+        redoPaint();
         updateFrameDependentState();
         redraw();
     }
@@ -1696,13 +1770,12 @@ class: AnnotateMinorMode : MinorMode
 
     method: keyUndoEvent (void; Event event)
     {
-        let f = _currentNodeInfo.frame,
-            uprop = frameOrderName(_currentNode, f),
-            rprop= frameOrderRedoStackName(_currentNode, f),
-            playing = isPlaying();
+        let frame = _currentNodeInfo.frame;
+        let undoStackProp = frameUserUndoStackName(_currentNode, frame);
+        let playing = isPlaying();
 
-        if (!playing && propertyExists(uprop) &&
-            propertyInfo(uprop).size > 0)
+        if (!playing && propertyExists(undoStackProp) &&
+            propertyInfo(undoStackProp).size > 0)
         {
             undoSlot(true);
         }
@@ -1710,13 +1783,12 @@ class: AnnotateMinorMode : MinorMode
 
     method: keyRedoEvent (void; Event event)
     {
-        let f = _currentNodeInfo.frame,
-            uprop = frameOrderName(_currentNode, f),
-            rprop= frameOrderRedoStackName(_currentNode, f),
-            playing = isPlaying();
+        let frame = _currentNodeInfo.frame;
+        let redoStackProp = frameUserRedoStackName(_currentNode, frame);
+        let playing = isPlaying();
 
-        if (!playing && propertyExists(rprop) &&
-            propertyInfo(rprop).size > 0)
+        if (!playing && propertyExists(redoStackProp) &&
+            propertyInfo(redoStackProp).size > 0)
         {
             redoSlot(true);
         }
@@ -1733,14 +1805,14 @@ class: AnnotateMinorMode : MinorMode
     {
         if isSessionEmpty() || _currentNode eq nil
              then DisabledMenuState
-             else propOnState(frameOrderName(_currentNode, _currentNodeInfo.frame));
+             else propOnState(frameUserUndoStackName(_currentNode, _currentNodeInfo.frame));
     }
 
     method: redoState (int;)
     {
         if isSessionEmpty() || _currentNode eq nil
              then DisabledMenuState
-             else propOnState(frameOrderRedoStackName(_currentNode, _currentNodeInfo.frame));
+             else propOnState(frameUserRedoStackName(_currentNode, _currentNodeInfo.frame));
     }
 
     method: nextPrevState (int;)
