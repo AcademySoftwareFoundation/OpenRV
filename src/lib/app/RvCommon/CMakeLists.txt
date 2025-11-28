@@ -333,9 +333,8 @@ STRING(REPLACE ";" "," _versions_str "${_versions_list}")
 ADD_CUSTOM_COMMAND(
   OUTPUT ${_about_rv_cpp}
   COMMAND
-    ${CMAKE_COMMAND} -E env ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/generate_about_rv.py ${_about_rv_cpp} "${_compiler_name}" "${CMAKE_BUILD_TYPE}"
-    "${_cxx_flags_str}" "${_vfx_platform_str}" "${_build_root}" "${_platform_name}" "${_arch_name}" "${RV_UI_APPLICATION_NAME}" "${_versions_str}"
-    "${RV_GIT_COMMIT_SHORT_HASH}"
+    ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/generate_about_rv.py ${_about_rv_cpp} "${_compiler_name}" "${CMAKE_BUILD_TYPE}" "${_cxx_flags_str}"
+    "${_vfx_platform_str}" "${_build_root}" "${_platform_name}" "${_arch_name}" "${RV_UI_APPLICATION_NAME}" "${_versions_str}" "${RV_GIT_COMMIT_SHORT_HASH}"
   DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/generate_about_rv.py
   COMMENT "Generating about_rv.cpp with build information"
   VERBATIM
