@@ -82,7 +82,7 @@ ENDIF()
 
 FILE(GLOB _ui_sources ui/*.ui)
 
-IF(RV_VFX_PLATFORM STREQUAL CY2024)
+IF(RV_VFX_PLATFORM STRGREATER_EQUAL CY2024)
   FILE(GLOB _ui_sources_extra ui/RvPreferences/Qt6/RvPreferences.ui)
 ELSEIF(RV_VFX_PLATFORM STREQUAL CY2023)
   FILE(GLOB _ui_sources_extra ui/RvPreferences/Qt5/RvPreferences.ui)
@@ -90,7 +90,7 @@ ENDIF()
 
 LIST(APPEND _ui_sources ${_ui_sources_extra})
 
-IF(RV_VFX_PLATFORM STREQUAL CY2024)
+IF(RV_VFX_PLATFORM STRGREATER_EQUAL CY2024)
   # Use Qt6 connections syntax because it generates the wrong QObject::connect for RvConsoleWindow.ui. TODO_QT: Could remove the connections from the UI XML and
   # add them to RvConsoleWindow.cpp
   SET(ui_options
@@ -115,7 +115,7 @@ FOREACH(
       MAIN_DEPENDENCY ${infile}
       VERBATIM
     )
-  ELSEIF(RV_VFX_PLATFORM STREQUAL CY2024)
+  ELSEIF(RV_VFX_PLATFORM STRGREATER_EQUAL CY2024)
     ADD_CUSTOM_COMMAND(
       OUTPUT ${outfile}
       COMMAND ${QT_UIC_EXECUTABLE} ARGS ${ui_options} -o ${outfile} ${infile}
@@ -166,10 +166,10 @@ FOREACH(
       MAIN_DEPENDENCY ${infile}
       VERBATIM
     )
-  ELSEIF(RV_VFX_PLATFORM STREQUAL CY2024)
+  ELSEIF(RV_VFX_PLATFORM STRGREATER_EQUAL CY2024)
     ADD_CUSTOM_COMMAND(
       OUTPUT ${outfile}
-      COMMAND ${QT_MOC_EXECUTABLE} -DRV_VFX_CY2024 -I ${CMAKE_CURRENT_SOURCE_DIR} -o ${outfile} ${infile}
+      COMMAND ${QT_MOC_EXECUTABLE} -DRV_VFX_${RV_VFX_PLATFORM} -I ${CMAKE_CURRENT_SOURCE_DIR} -o ${outfile} ${infile}
       MAIN_DEPENDENCY ${infile}
       VERBATIM
     )
@@ -349,7 +349,7 @@ ADD_LIBRARY(
 
 # Need that with Qt6 since the code for this target does not support unicode correctly.
 IF(RV_TARGET_WINDOWS
-   AND RV_VFX_PLATFORM STREQUAL CY2024
+   AND RV_VFX_PLATFORM STRGREATER_EQUAL CY2024
 )
   QT_DISABLE_UNICODE_DEFINES(${_target})
 ENDIF()
@@ -433,7 +433,7 @@ IF(RV_TARGET_LINUX)
     SET(_rvcommon_link_libraries
         Qt::X11Extras
     )
-  ELSEIF(RV_VFX_PLATFORM STREQUAL CY2024)
+  ELSEIF(RV_VFX_PLATFORM STRGREATER_EQUAL CY2024)
     SET(_rvcommon_qt_components
         Gui
     )

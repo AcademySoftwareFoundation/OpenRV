@@ -160,11 +160,14 @@ def prepare() -> None:
     os.environ["CLANG_INSTALL_DIR"] = libclang_install_dir
 
     # PySide6 build requires numpy 1.26.3
+    numpy_version = os.environ.get("RV_DEPS_NUMPY_VERSION")
+    if not numpy_version:
+        raise ValueError("RV_DEPS_NUMPY_VERSION environment variable is not set.")
     install_numpy_args = get_python_interpreter_args(PYTHON_OUTPUT_DIR, VARIANT) + [
         "-m",
         "pip",
         "install",
-        "numpy==1.26.3",
+        f"numpy=={numpy_version}",
     ]
     print(f"Installing numpy with {install_numpy_args}")
     subprocess.run(install_numpy_args).check_returncode()
