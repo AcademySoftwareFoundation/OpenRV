@@ -48,17 +48,14 @@ namespace LUT
         }
         else
         {
-            TWK_THROW_EXC_STREAM("rv3dlut: error reading 3D LUT file "
-                                 << filename);
+            TWK_THROW_EXC_STREAM("rv3dlut: error reading 3D LUT file " << filename);
         }
 
         //
         // read data
         //
 
-        if (!Read3DLUTData(file, lut.dimensions[0], lut.dimensions[1],
-                           lut.dimensions[2], FLOAT_DEPTH, false, NO_PADDING,
-                           lut.data))
+        if (!Read3DLUTData(file, lut.dimensions[0], lut.dimensions[1], lut.dimensions[2], FLOAT_DEPTH, false, NO_PADDING, lut.data))
         {
             TWK_THROW_EXC_STREAM("rv3dlut: data parsing error " << filename);
         }

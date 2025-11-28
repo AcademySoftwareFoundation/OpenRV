@@ -36,9 +36,7 @@ namespace Rv
         QString evaluate(const QString& mu);
         QString pyevaluate(const QString& py);
         void pyexec(const QString& py);
-        QString sendInternalEvent(const QString& eventName,
-                                  const QString& contents,
-                                  const QString& sender);
+        QString sendInternalEvent(const QString& eventName, const QString& contents, const QString& sender);
         void bindToRegex(const QString& nameRegex);
         void unbindRegex(const QString& nameRegex);
         bool hasBinding(const QString& nameRegex);
@@ -65,20 +63,15 @@ namespace Rv
         //  pointer events it actually was along with the data.
         //
 
-        void eventString(const QString& eventName, const QString& contents,
-                         const QString& senderName);
+        void eventString(const QString& eventName, const QString& contents, const QString& senderName);
 
-        void eventKey(const QString& eventName, unsigned int key,
-                      unsigned int modifiers);
+        void eventKey(const QString& eventName, unsigned int key, unsigned int modifiers);
 
-        void eventPointer(const QString& eventName, int x, int y, int w, int h,
-                          int startX, int startY, int buttonStates,
+        void eventPointer(const QString& eventName, int x, int y, int w, int h, int startX, int startY, int buttonStates,
                           float activationTime);
 
-        void eventDragDrop(const QString& eventName, int x, int y, int w, int h,
-                           int startX, int startY, int buttonStates,
-                           const QString& dragDropType,
-                           const QString& contentType, const QString& contents);
+        void eventDragDrop(const QString& eventName, int x, int y, int w, int h, int startX, int startY, int buttonStates,
+                           const QString& dragDropType, const QString& contentType, const QString& contents);
 
     private:
         RvDocument* m_doc;

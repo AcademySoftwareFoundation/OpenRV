@@ -24,8 +24,7 @@ namespace IPCore
     class OCIO3DLUT : public OCIOLUT
     {
     public:
-        OCIO3DLUT(OCIO::GpuShaderDescRcPtr& shaderDesc, unsigned int idx,
-                  const std::string& shaderCacheID);
+        OCIO3DLUT(OCIO::GpuShaderDescRcPtr& shaderDesc, unsigned int idx, const std::string& shaderCacheID);
         virtual ~OCIO3DLUT() {};
 
         // Returns the LUT sampler type: sampler3D, sampler2D, or sampler1D

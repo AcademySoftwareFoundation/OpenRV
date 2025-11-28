@@ -65,8 +65,7 @@ namespace IPCore
 
 #define OPTIMIZED_UTILITY_CACHING
 
-    bool FBCache::m_cacheOutsideRegion =
-        false; // continue caching when in/out region is full ?
+    bool FBCache::m_cacheOutsideRegion = false; // continue caching when in/out region is full ?
 
     namespace
     {
@@ -169,9 +168,7 @@ namespace IPCore
     void CacheEdges::addEdge(Edge e)
     {
         m_edges[e.frame] = e;
-        DBL(DB_EDGES, "addEdge: added frame " << e.frame << " type "
-                                              << typeToText(e.type) << " ( "
-                                              << m_edges.size() << " edges)");
+        DBL(DB_EDGES, "addEdge: added frame " << e.frame << " type " << typeToText(e.type) << " ( " << m_edges.size() << " edges)");
     }
 
     void CacheEdges::removeEdge(int frame)
@@ -179,28 +176,22 @@ namespace IPCore
         EdgeSet::iterator i = m_edges.find(frame);
         if (m_edges.end() != i)
         {
-            DBL(DB_EDGES, "removeEdge: removed frame "
-                              << i->second.frame << " type "
-                              << typeToText(i->second.type) << " ( "
-                              << m_edges.size() << " edges)");
+            DBL(DB_EDGES, "removeEdge: removed frame " << i->second.frame << " type " << typeToText(i->second.type) << " ( "
+                                                       << m_edges.size() << " edges)");
             m_edges.erase(i);
         }
         else
         {
-            DBL(DB_EDGES, "removeEdge: removing frame "
-                              << frame << ": not found! ( " << m_edges.size()
-                              << " edges)");
+            DBL(DB_EDGES, "removeEdge: removing frame " << frame << ": not found! ( " << m_edges.size() << " edges)");
         }
     }
 
     void CacheEdges::dumpEdges()
     {
-        DBL(DB_EDGES, "---------------- " << m_edges.size()
-                                          << " edges --------------------");
+        DBL(DB_EDGES, "---------------- " << m_edges.size() << " edges --------------------");
         for (EdgeSet::iterator i = m_edges.begin(); i != m_edges.end(); ++i)
         {
-            DBL(DB_EDGES,
-                "    " << i->second.frame << " " << typeToText(i->second.type));
+            DBL(DB_EDGES, "    " << i->second.frame << " " << typeToText(i->second.type));
         }
     }
 
@@ -210,12 +201,8 @@ namespace IPCore
         {
             int f = i->second.frame;
             bool thisCached = m_cache->isFrameCached(f);
-            bool leftIsCached = (f > m_cache->m_minFrame)
-                                    ? m_cache->isFrameCached(f - 1)
-                                    : true;
-            bool rightIsCached = (f < m_cache->m_maxFrame - 1)
-                                     ? m_cache->isFrameCached(f + 1)
-                                     : true;
+            bool leftIsCached = (f > m_cache->m_minFrame) ? m_cache->isFrameCached(f - 1) : true;
+            bool rightIsCached = (f < m_cache->m_maxFrame - 1) ? m_cache->isFrameCached(f + 1) : true;
             EdgeType newType;
 
             if (!thisCached)
@@ -237,8 +224,7 @@ namespace IPCore
 
             if (newType != i->second.type || newType == NeitherSide)
             {
-                DBL(DB_EDGES, "ERROR: rationalizeEdges had to fix things up: "
-                                  << f << " " << typeToText(newType));
+                DBL(DB_EDGES, "ERROR: rationalizeEdges had to fix things up: " << f << " " << typeToText(newType));
             }
             EdgeSet::iterator tmp = i;
             ++i;
@@ -303,10 +289,8 @@ namespace IPCore
             //
             {
                 thisType = RightOnly;
-                DBL(DB_EDGES,
-                    "addCacheEdge: frame "
-                        << frame << ", edge on left: " << leftEdge->second.frame
-                        << " " << typeToText(leftEdge->second.type));
+                DBL(DB_EDGES, "addCacheEdge: frame " << frame << ", edge on left: " << leftEdge->second.frame << " "
+                                                     << typeToText(leftEdge->second.type));
 
                 if (BothSides == leftEdge->second.type)
                     leftEdge->second.type = LeftOnly;
@@ -332,10 +316,8 @@ namespace IPCore
             //
             {
                 thisType = (thisType == RightOnly) ? NeitherSide : LeftOnly;
-                DBL(DB_EDGES, "addCacheEdge: frame "
-                                  << frame << ", edge on right: "
-                                  << rightEdge->second.frame << " "
-                                  << typeToText(rightEdge->second.type));
+                DBL(DB_EDGES, "addCacheEdge: frame " << frame << ", edge on right: " << rightEdge->second.frame << " "
+                                                     << typeToText(rightEdge->second.type));
 
                 if (BothSides == rightEdge->second.type)
                     rightEdge->second.type = RightOnly;
@@ -351,8 +333,7 @@ namespace IPCore
         if (NeitherSide != thisType)
             addEdge(Edge(frame, thisType));
 
-        DBL(DB_EDGES, "addCacheEdge: frame " << frame << " done, thisType "
-                                             << typeToText(thisType));
+        DBL(DB_EDGES, "addCacheEdge: frame " << frame << " done, thisType " << typeToText(thisType));
 //  rationalizeEdges();
 #if 0
     //  sanity check
@@ -393,16 +374,13 @@ namespace IPCore
             //  Adjust existing edge
             //
             {
-                DBL(DB_EDGES, "removeCacheEdge: found edge to left: "
-                                  << leftEdge->second.frame << " "
-                                  << typeToText(leftEdge->second.type));
+                DBL(DB_EDGES,
+                    "removeCacheEdge: found edge to left: " << leftEdge->second.frame << " " << typeToText(leftEdge->second.type));
                 if (LeftOnly == leftEdge->second.type)
                 {
                     leftEdge->second.type = BothSides;
-                    DBL(DB_EDGES,
-                        "removeCacheEdge: adjusting edge to the left: "
-                            << leftEdge->second.frame << " "
-                            << typeToText(leftEdge->second.type));
+                    DBL(DB_EDGES, "removeCacheEdge: adjusting edge to the left: " << leftEdge->second.frame << " "
+                                                                                  << typeToText(leftEdge->second.type));
                 }
             }
             else if (m_cache->isFrameCached(frame - 1))
@@ -412,13 +390,11 @@ namespace IPCore
             {
                 EdgeType t = BothSides;
 
-                if (frame < m_cache->m_minFrame + 2
-                    || m_cache->isFrameCached(frame - 2))
+                if (frame < m_cache->m_minFrame + 2 || m_cache->isFrameCached(frame - 2))
                 {
                     t = RightOnly;
                 }
-                DBL(DB_EDGES, "removeCacheEdge: adding edge to left: "
-                                  << frame - 1 << " " << typeToText(t));
+                DBL(DB_EDGES, "removeCacheEdge: adding edge to left: " << frame - 1 << " " << typeToText(t));
                 addEdge(Edge(frame - 1, t));
             }
         }
@@ -435,16 +411,13 @@ namespace IPCore
             //  Adjust existing edge
             //
             {
-                DBL(DB_EDGES, "removeCacheEdge: found edge to right: "
-                                  << rightEdge->second.frame << " "
-                                  << typeToText(rightEdge->second.type));
+                DBL(DB_EDGES,
+                    "removeCacheEdge: found edge to right: " << rightEdge->second.frame << " " << typeToText(rightEdge->second.type));
                 if (RightOnly == rightEdge->second.type)
                 {
                     rightEdge->second.type = BothSides;
-                    DBL(DB_EDGES,
-                        "removeCacheEdge: adjusting edge to the right: "
-                            << rightEdge->second.frame << " "
-                            << typeToText(rightEdge->second.type));
+                    DBL(DB_EDGES, "removeCacheEdge: adjusting edge to the right: " << rightEdge->second.frame << " "
+                                                                                   << typeToText(rightEdge->second.type));
                 }
             }
             else if (m_cache->isFrameCached(frame + 1))
@@ -454,13 +427,11 @@ namespace IPCore
             {
                 EdgeType t = BothSides;
 
-                if (frame >= m_cache->m_maxFrame - 2
-                    || m_cache->isFrameCached(frame + 2))
+                if (frame >= m_cache->m_maxFrame - 2 || m_cache->isFrameCached(frame + 2))
                 {
                     t = LeftOnly;
                 }
-                DBL(DB_EDGES, "removeCacheEdge: adding edge to right: "
-                                  << frame + 1 << " " << typeToText(t));
+                DBL(DB_EDGES, "removeCacheEdge: adding edge to right: " << frame + 1 << " " << typeToText(t));
                 addEdge(Edge(frame + 1, t));
             }
         }
@@ -512,8 +483,7 @@ namespace IPCore
         {
             edges.push_back(i->second);
         }
-        DBL(DB_EDGES,
-            "possibleFreeTargets: returning " << edges.size() << " edges");
+        DBL(DB_EDGES, "possibleFreeTargets: returning " << edges.size() << " edges");
     }
 
     void CacheEdges::possibleCacheTargets(EdgeVector& edges)
@@ -549,8 +519,7 @@ namespace IPCore
 
             if (!m_cache->isFrameCached(m_cache->m_displayFrame))
             {
-                edges.push_back(Edge(m_cache->m_displayFrame,
-                                     forward ? RightOnly : LeftOnly));
+                edges.push_back(Edge(m_cache->m_displayFrame, forward ? RightOnly : LeftOnly));
             }
 
             if (!m_cache->isFrameCached(minF) && forward)
@@ -587,8 +556,7 @@ namespace IPCore
                 edges.push_back(Edge(e.frame + 1, RightOnly));
             }
         }
-        DBL(DB_EDGES,
-            "possibleCacheTargets: returning " << edges.size() << " edges");
+        DBL(DB_EDGES, "possibleCacheTargets: returning " << edges.size() << " edges");
     }
 
     //
@@ -806,8 +774,7 @@ namespace IPCore
         m_perNodeCache = new PerNodeCache(this);
         pthread_mutex_init(&m_statMutex, 0);
 
-        m_cacheStatsDisabled =
-            IPCore::App()->optionValue<bool>("disableCacheStats", false);
+        m_cacheStatsDisabled = IPCore::App()->optionValue<bool>("disableCacheStats", false);
 
         m_activeTailCachingEnabled = evActiveTailCaching.getValue();
         if (m_activeTailCachingEnabled)
@@ -859,9 +826,7 @@ namespace IPCore
 
         if (capacity() != oldCapacity)
         {
-            DBL(DB_SIZE, "setMemoryUsage() bytes " << bytes << " was "
-                                                   << oldCapacity << " used "
-                                                   << used());
+            DBL(DB_SIZE, "setMemoryUsage() bytes " << bytes << " was " << oldCapacity << " used " << used());
             m_utilityStateChanged = true;
             m_overflowBoundary = 0;
         }
@@ -901,8 +866,7 @@ namespace IPCore
 
         void operator()(IPImageID* idp)
         {
-            DBL(DB_PROMOTE,
-                "FramePromoter idp " << idp << ", fb id " << idp->id);
+            DBL(DB_PROMOTE, "FramePromoter idp " << idp << ", fb id " << idp->id);
 
             if (missedOne || idp->id == "")
                 return;
@@ -925,9 +889,7 @@ namespace IPCore
         FramePromoter fp(*this);
 
         foreach_ip(idTree, fp);
-        DBL(DB_PROMOTE, "promoteFrame " << frame << ", " << fp.ids.size()
-                                        << " cached, missedOne "
-                                        << fp.missedOne);
+        DBL(DB_PROMOTE, "promoteFrame " << frame << ", " << fp.ids.size() << " cached, missedOne " << fp.missedOne);
 
         if (fp.missedOne)
             return false;
@@ -944,8 +906,7 @@ namespace IPCore
         return true;
     }
 
-    bool FBCache::add(FrameBuffer* fb, int frame, bool force,
-                      const IPNode* node)
+    bool FBCache::add(FrameBuffer* fb, int frame, bool force, const IPNode* node)
     {
         if (node)
         {
@@ -959,8 +920,7 @@ namespace IPCore
             //
             return true;
         }
-        DB("add() frame " << frame << " (fb " << fb << ", " << fb->identifier()
-                          << ") force " << force << " frame in cache "
+        DB("add() frame " << frame << " (fb " << fb << ", " << fb->identifier() << ") force " << force << " frame in cache "
                           << isFrameCached(frame));
         if (frame == NAF)
         {
@@ -976,8 +936,7 @@ namespace IPCore
         i->second.size() << " items" << endl;
         */
 
-        DB("    itemInCache " << itemInCache << " this frame in itemMap entry: "
-                              << m_itemMap[fb].count(frame));
+        DB("    itemInCache " << itemInCache << " this frame in itemMap entry: " << m_itemMap[fb].count(frame));
         if (itemInCache && m_itemMap[fb].count(frame) > 0)
         {
             //
@@ -987,13 +946,11 @@ namespace IPCore
             //  we need to return false immediately.
             //
 
-            DB("    m_frames count "
-               << m_frames[frame].count(fb->identifier()));
+            DB("    m_frames count " << m_frames[frame].count(fb->identifier()));
             if (m_full && !partiallyCached)
                 return false;
 
-            DBL(DB_REF,
-                "add() possibly reffing " << fb << " " << fb->identifier());
+            DBL(DB_REF, "add() possibly reffing " << fb << " " << fb->identifier());
             referenceFrame(frame, fb);
 
             checkMetadata();
@@ -1001,9 +958,7 @@ namespace IPCore
         }
 
         DB("add()     cached " << fb->inCache());
-        DB("add()     current " << m_currentBytes << " max " << m_maxBytes
-                                << " "
-                                << double(m_currentBytes) / double(m_maxBytes));
+        DB("add()     current " << m_currentBytes << " max " << m_maxBytes << " " << double(m_currentBytes) / double(m_maxBytes));
 
         if (!fb->inCache())
         {
@@ -1016,8 +971,7 @@ namespace IPCore
                 freeTrash(fb->totalImageSize());
             }
 
-            if ((fb->totalImageSize() + used()) > capacity()
-                && (0 == m_overflowBoundary || used() < m_overflowBoundary))
+            if ((fb->totalImageSize() + used()) > capacity() && (0 == m_overflowBoundary || used() < m_overflowBoundary))
             //
             //  If the above didn't help, and we're going to overflow
             //  the cache with this addition, set the overfloat boundary
@@ -1035,8 +989,7 @@ namespace IPCore
 
             bool forceadd = partiallyCached || force || m_map.size() == 0;
 
-            DB("attempting TwkFB::add() forceadd "
-               << forceadd << " partially cached " << partiallyCached);
+            DB("attempting TwkFB::add() forceadd " << forceadd << " partially cached " << partiallyCached);
             m_targetCacheFrameUtility = utility(frame, FOR_CACHING);
             bool notfull = TwkFB::Cache::add(fb, forceadd);
             //
@@ -1053,19 +1006,16 @@ namespace IPCore
             //
             {
                 if (Cache::debug())
-                    cout << "ADDED: " << fb << " : " << fb->identifier()
-                         << endl;
+                    cout << "ADDED: " << fb << " : " << fb->identifier() << endl;
                 DB("add() forceadd || notfull, " << fb);
                 DB("    added frame " << frame << " id " << fb->identifier());
 
-                DBL(DB_REF, "add() (2) possibly reffing " << fb << " "
-                                                          << fb->identifier());
+                DBL(DB_REF, "add() (2) possibly reffing " << fb << " " << fb->identifier());
                 referenceFrame(frame, fb);
 
                 if (Cache::debug())
                 {
-                    for (IDSet::iterator i = m_frames[frame].begin();
-                         i != m_frames[frame].end(); ++i)
+                    for (IDSet::iterator i = m_frames[frame].begin(); i != m_frames[frame].end(); ++i)
                     {
                         cout << "  " << frame << " --> " << *i << endl;
                     }
@@ -1074,9 +1024,7 @@ namespace IPCore
                 setCacheStatsDirty();
                 if (isFrameCached(frame))
                 {
-                    DBL(DB_EDGES, "add() calling addCacheEdge (1)"
-                                      << frame << ", " << m_frames[frame].size()
-                                      << " ids for this frame");
+                    DBL(DB_EDGES, "add() calling addCacheEdge (1)" << frame << ", " << m_frames[frame].size() << " ids for this frame");
                     m_cacheEdges->addCacheEdge(frame);
                 }
 
@@ -1099,17 +1047,14 @@ namespace IPCore
         else
         {
             DB("add() fb was in cache " << fb);
-            DBL(DB_REF,
-                "add() (3) possibly reffing " << fb << " " << fb->identifier());
+            DBL(DB_REF, "add() (3) possibly reffing " << fb << " " << fb->identifier());
             referenceFrame(frame, fb);
 
             setCacheStatsDirty();
             if (isFrameCached(frame))
             {
                 m_cacheEdges->addCacheEdge(frame);
-                DBL(DB_EDGES, "add() calling addCacheEdge (2)"
-                                  << frame << ", " << m_frames[frame].size()
-                                  << " ids for this frame");
+                DBL(DB_EDGES, "add() calling addCacheEdge (2)" << frame << ", " << m_frames[frame].size() << " ids for this frame");
             }
         }
 
@@ -1117,15 +1062,9 @@ namespace IPCore
         return true;
     }
 
-    void FBCache::flushPerNodeCache(const IPNode* node)
-    {
-        m_perNodeCache->add(0, node);
-    }
+    void FBCache::flushPerNodeCache(const IPNode* node) { m_perNodeCache->add(0, node); }
 
-    TwkFB::FrameBuffer* FBCache::perNodeCacheContents(const IPNode* node) const
-    {
-        return m_perNodeCache->fbOfNode(node);
-    }
+    TwkFB::FrameBuffer* FBCache::perNodeCacheContents(const IPNode* node) const { return m_perNodeCache->fbOfNode(node); }
 
     bool FBCache::freeIDSet(const IDSet& idset, int frame)
     {
@@ -1134,8 +1073,7 @@ namespace IPCore
         IDSet myIDset = idset;
         set<string> idsToFlush;
 
-        for (IDSet::const_iterator id = myIDset.begin(); id != myIDset.end();
-             ++id)
+        for (IDSet::const_iterator id = myIDset.begin(); id != myIDset.end(); ++id)
         {
             FBMap::iterator i = m_map.find(*id);
 
@@ -1180,15 +1118,13 @@ namespace IPCore
             }
         }
         DB("freeIDSet() ready to flush " << idsToFlush.size() << " ids");
-        for (set<string>::iterator itf = idsToFlush.begin();
-             itf != idsToFlush.end(); ++itf)
+        for (set<string>::iterator itf = idsToFlush.begin(); itf != idsToFlush.end(); ++itf)
         {
             DB("freeIDSet() flushing: " << *itf);
             flush(*itf);
         }
 
-        DB("freeIDSet done with frame " << frame
-                                        << " cached: " << isFrameCached(frame));
+        DB("freeIDSet done with frame " << frame << " cached: " << isFrameCached(frame));
 
         return true;
     }
@@ -1200,19 +1136,15 @@ namespace IPCore
     //  it's used to clear the cache when turning off the cache, and you
     //  might just turn it on again.
 
-    bool FBCache::freeInRangeForwards(size_t bytes, FrameVector& toBeErased,
-                                      int minFrame, int maxFrame, bool greedy)
+    bool FBCache::freeInRangeForwards(size_t bytes, FrameVector& toBeErased, int minFrame, int maxFrame, bool greedy)
     {
-        DBL(DB_FREE, "free forwards " << minFrame << " - " << maxFrame
-                                      << " greedy " << greedy);
+        DBL(DB_FREE, "free forwards " << minFrame << " - " << maxFrame << " greedy " << greedy);
 
-        bool enough = m_currentBytes < m_maxBytes
-                      && (m_maxBytes - m_currentBytes >= bytes);
+        bool enough = m_currentBytes < m_maxBytes && (m_maxBytes - m_currentBytes >= bytes);
 
         size_t targetBytes = (m_maxBytes > bytes) ? m_maxBytes - bytes : 0;
 
-        for (FrameMap::iterator fi = m_frames.begin();
-             fi != m_frames.end() && (!enough || greedy); ++fi)
+        for (FrameMap::iterator fi = m_frames.begin(); fi != m_frames.end() && (!enough || greedy); ++fi)
         {
             int frame = fi->first;
 
@@ -1244,8 +1176,7 @@ namespace IPCore
                 }
                 */
 
-                enough = m_currentBytes < m_maxBytes
-                         && (m_maxBytes - m_currentBytes >= bytes);
+                enough = m_currentBytes < m_maxBytes && (m_maxBytes - m_currentBytes >= bytes);
             }
         }
 
@@ -1254,19 +1185,15 @@ namespace IPCore
         return (m_maxBytes - m_currentBytes >= bytes);
     }
 
-    bool FBCache::freeInRangeBackwards(size_t bytes, FrameVector& toBeErased,
-                                       int minFrame, int maxFrame, bool greedy)
+    bool FBCache::freeInRangeBackwards(size_t bytes, FrameVector& toBeErased, int minFrame, int maxFrame, bool greedy)
     {
-        DBL(DB_FREE, "free backwards " << minFrame << " - " << maxFrame
-                                       << " greedy " << greedy);
+        DBL(DB_FREE, "free backwards " << minFrame << " - " << maxFrame << " greedy " << greedy);
 
-        bool enough = m_currentBytes < m_maxBytes
-                      && (m_maxBytes - m_currentBytes >= bytes);
+        bool enough = m_currentBytes < m_maxBytes && (m_maxBytes - m_currentBytes >= bytes);
 
         size_t targetBytes = (m_maxBytes > bytes) ? m_maxBytes - bytes : 0;
 
-        for (FrameMap::reverse_iterator fi = m_frames.rbegin();
-             fi != m_frames.rend() && (!enough || greedy); ++fi)
+        for (FrameMap::reverse_iterator fi = m_frames.rbegin(); fi != m_frames.rend() && (!enough || greedy); ++fi)
         {
             int frame = fi->first;
 
@@ -1298,8 +1225,7 @@ namespace IPCore
                 }
                 */
 
-                enough = m_currentBytes < m_maxBytes
-                         && (m_maxBytes - m_currentBytes >= bytes);
+                enough = m_currentBytes < m_maxBytes && (m_maxBytes - m_currentBytes >= bytes);
             }
         }
 
@@ -1318,10 +1244,7 @@ namespace IPCore
             {
             }
 
-            bool operator()(int a, int b)
-            {
-                return (abs(dFrame - a) > abs(dFrame - b));
-            }
+            bool operator()(int a, int b) { return (abs(dFrame - a) > abs(dFrame - b)); }
 
             int dFrame;
         };
@@ -1368,9 +1291,8 @@ namespace IPCore
 
     void FBCache::clearInternal()
     {
-        DBL(DB_CLEAR, "clearInternal() current "
-                          << m_currentBytes << " max " << m_maxBytes << " "
-                          << double(m_currentBytes) / double(m_maxBytes));
+        DBL(DB_CLEAR,
+            "clearInternal() current " << m_currentBytes << " max " << m_maxBytes << " " << double(m_currentBytes) / double(m_maxBytes));
 
         clearFrameCaches();
         //
@@ -1383,18 +1305,14 @@ namespace IPCore
 
     void FBCache::clearAllButFrame(int frame, bool force)
     {
-        DBL(DB_CLEAR, "clearAllButFrame() frame "
-                          << frame << " m_frames size " << m_frames.size()
-                          << " current " << m_currentBytes << " max "
-                          << m_maxBytes << " "
-                          << double(m_currentBytes) / double(m_maxBytes));
+        DBL(DB_CLEAR, "clearAllButFrame() frame " << frame << " m_frames size " << m_frames.size() << " current " << m_currentBytes
+                                                  << " max " << m_maxBytes << " " << double(m_currentBytes) / double(m_maxBytes));
 
         //
         //  This only clears frame-level data unless "force" is true.
         //
 
-        if (m_frames.size() == 0
-            || (m_frames.size() == 1 && m_frames.begin()->first == frame))
+        if (m_frames.size() == 0 || (m_frames.size() == 1 && m_frames.begin()->first == frame))
         {
             //
             //  Nothing to do.
@@ -1406,11 +1324,9 @@ namespace IPCore
 
         FrameVector toBeErased;
 
-        freeInRangeForwards(numeric_limits<size_t>::max(), toBeErased,
-                            m_minFrame, frame - 1, true);
+        freeInRangeForwards(numeric_limits<size_t>::max(), toBeErased, m_minFrame, frame - 1, true);
 
-        freeInRangeBackwards(numeric_limits<size_t>::max(), toBeErased,
-                             frame + 1, m_maxFrame - 1, true);
+        freeInRangeBackwards(numeric_limits<size_t>::max(), toBeErased, frame + 1, m_maxFrame - 1, true);
 
         for (size_t i = 0; i < toBeErased.size(); i++)
         {
@@ -1449,13 +1365,11 @@ namespace IPCore
 
             if (m_inFrame > frame)
             {
-                d = (m_cacheOutsideRegion) ? 1.0 / (1.0 + m_inFrame - frame)
-                                           : 0.0;
+                d = (m_cacheOutsideRegion) ? 1.0 / (1.0 + m_inFrame - frame) : 0.0;
             }
             else if (m_outFrame <= frame)
             {
-                d = (m_cacheOutsideRegion) ? 1.0 / (2.0 + frame - m_outFrame)
-                                           : 0.0;
+                d = (m_cacheOutsideRegion) ? 1.0 / (2.0 + frame - m_outFrame) : 0.0;
             }
             else if (frame == m_inFrame)
             {
@@ -1466,9 +1380,7 @@ namespace IPCore
                 d = 1.0 + 1.0 / abs(frame - m_inFrame);
             }
 
-            DBL(DB_UTIL, "utility(" << frame << ") = " << d << ", dsp "
-                                    << m_displayFrame << " cacheOutside "
-                                    << m_cacheOutsideRegion);
+            DBL(DB_UTIL, "utility(" << frame << ") = " << d << ", dsp " << m_displayFrame << " cacheOutside " << m_cacheOutsideRegion);
             return d;
         }
 
@@ -1484,9 +1396,7 @@ namespace IPCore
         bool forward = (frame > m_displayFrame);
 
         const float fact =
-            (mode == FOR_CACHING && !isActiveTailCachingEnabled())
-                ? 0.001f
-                : min(max(m_lookBehindFraction / 100.0f, 0.001f), 0.999f);
+            (mode == FOR_CACHING && !isActiveTailCachingEnabled()) ? 0.001f : min(max(m_lookBehindFraction / 100.0f, 0.001f), 0.999f);
         //
         //  we apply fact if frame is in direction of playback,
         //  ffact incorporates that policy
@@ -1537,10 +1447,8 @@ namespace IPCore
             else
                 dRoundFront *= (1.0 - fact), dRoundBack *= fact;
 
-            DBL(DB_UTIL, "d " << 1.0 / d << " drf " << 1.0 / dRoundFront
-                              << " drb " << 1.0 / dRoundBack << " ffact "
-                              << ffact << " inc " << m_displayInc << " fwd "
-                              << forward);
+            DBL(DB_UTIL, "d " << 1.0 / d << " drf " << 1.0 / dRoundFront << " drb " << 1.0 / dRoundBack << " ffact " << ffact << " inc "
+                              << m_displayInc << " fwd " << forward);
 
             if (dRoundFront < d)
                 d = dRoundFront;
@@ -1549,9 +1457,7 @@ namespace IPCore
             d = 1.0 + 1.0 / d;
         }
 
-        DBL(DB_UTIL, "utility(" << frame << ") = " << d << ", dsp "
-                                << m_displayFrame << " cacheOutside "
-                                << m_cacheOutsideRegion);
+        DBL(DB_UTIL, "utility(" << frame << ") = " << d << ", dsp " << m_displayFrame << " cacheOutside " << m_cacheOutsideRegion);
         return d;
     }
 
@@ -1567,14 +1473,12 @@ namespace IPCore
         //
         //  First find caching target frame.
         //
-        for (CacheEdges::EdgeVector::iterator i = edges.begin();
-             i != edges.end(); ++i)
+        for (CacheEdges::EdgeVector::iterator i = edges.begin(); i != edges.end(); ++i)
         {
             int f = i->frame, f2 = NAF;
             CacheEdges::EdgeType type = i->type;
 
-            DBL(DB_EDGES,
-                " f " << f << " type " << m_cacheEdges->typeToText(type));
+            DBL(DB_EDGES, " f " << f << " type " << m_cacheEdges->typeToText(type));
 
             //
             //  Skip (in the right direction) past any frame we're
@@ -1583,28 +1487,20 @@ namespace IPCore
             //
             if (CacheEdges::LeftOnly == type)
             {
-                while (isFrameCached(f) || m_framesBeingCached.count(f)
-                       || m_framesScheduledForFreeing.count(f)
-                       || f == m_displayFrame)
+                while (isFrameCached(f) || m_framesBeingCached.count(f) || m_framesScheduledForFreeing.count(f) || f == m_displayFrame)
                     --f;
             }
             else if (CacheEdges::RightOnly == type)
             {
-                while (isFrameCached(f) || m_framesBeingCached.count(f)
-                       || m_framesScheduledForFreeing.count(f)
-                       || f == m_displayFrame)
+                while (isFrameCached(f) || m_framesBeingCached.count(f) || m_framesScheduledForFreeing.count(f) || f == m_displayFrame)
                     ++f;
             }
             else if (CacheEdges::BothSides == type)
             {
                 f2 = f;
-                while (isFrameCached(f) || m_framesBeingCached.count(f)
-                       || m_framesScheduledForFreeing.count(f)
-                       || f == m_displayFrame)
+                while (isFrameCached(f) || m_framesBeingCached.count(f) || m_framesScheduledForFreeing.count(f) || f == m_displayFrame)
                     --f;
-                while (isFrameCached(f2) || m_framesBeingCached.count(f2)
-                       || m_framesScheduledForFreeing.count(f2)
-                       || f2 == m_displayFrame)
+                while (isFrameCached(f2) || m_framesBeingCached.count(f2) || m_framesScheduledForFreeing.count(f2) || f2 == m_displayFrame)
                     ++f2;
             }
             else
@@ -1614,10 +1510,8 @@ namespace IPCore
             if (f >= m_minFrame && f < m_maxFrame && !isFrameCached(f))
             {
                 float u = utility(f, FOR_CACHING);
-                DBL(DB_EDGES, "consider frame for caching: frame "
-                                  << f << " utility " << u << " target "
-                                  << targetCacheFrame << " utility "
-                                  << targetCacheFrameUtility);
+                DBL(DB_EDGES, "consider frame for caching: frame " << f << " utility " << u << " target " << targetCacheFrame << " utility "
+                                                                   << targetCacheFrameUtility);
                 if (u > targetCacheFrameUtility)
                 {
                     targetCacheFrame = f;
@@ -1625,14 +1519,11 @@ namespace IPCore
                     result.inc = (type == CacheEdges::RightOnly) ? 1 : -1;
                 }
             }
-            if (NAF != f2 && f2 >= m_minFrame && f2 < m_maxFrame
-                && !isFrameCached(f2))
+            if (NAF != f2 && f2 >= m_minFrame && f2 < m_maxFrame && !isFrameCached(f2))
             {
                 float u = utility(f2, FOR_CACHING);
-                DBL(DB_EDGES, "consider frame for caching: frame "
-                                  << f << " utility " << u << " target "
-                                  << targetCacheFrame << " utility "
-                                  << targetCacheFrameUtility);
+                DBL(DB_EDGES, "consider frame for caching: frame " << f << " utility " << u << " target " << targetCacheFrame << " utility "
+                                                                   << targetCacheFrameUtility);
                 if (u > targetCacheFrameUtility)
                 {
                     targetCacheFrame = f2;
@@ -1648,8 +1539,7 @@ namespace IPCore
         return result;
     }
 
-    FBCache::CacheFrame
-    FBCache::findBestFreeTarget(const CacheFrame& cacheTarget)
+    FBCache::CacheFrame FBCache::findBestFreeTarget(const CacheFrame& cacheTarget)
     {
         //
         //  Then find freeing target frame.
@@ -1663,8 +1553,7 @@ namespace IPCore
         CacheEdges::EdgeVector edges;
         m_cacheEdges->possibleFreeTargets(edges);
 
-        for (CacheEdges::EdgeVector::iterator i = edges.begin();
-             i != edges.end(); ++i)
+        for (CacheEdges::EdgeVector::iterator i = edges.begin(); i != edges.end(); ++i)
         {
             int f = i->frame;
             CacheEdges::EdgeType type = i->type;
@@ -1717,18 +1606,14 @@ namespace IPCore
             }
 
             DB(endl
-               << "************** initiateCachingOfFrame cacheTarget "
-               << cacheFrame << " freeTarget " << freeFrame << " over "
+               << "************** initiateCachingOfFrame cacheTarget " << cacheFrame << " freeTarget " << freeFrame << " over "
                << overflowing());
-            DB("    freeingList size " << m_framesScheduledForFreeing.size()
-                                       << " cachingList size "
-                                       << m_framesBeingCached.size());
+            DB("    freeingList size " << m_framesScheduledForFreeing.size() << " cachingList size " << m_framesBeingCached.size());
             //  DB ("    target cached " << isFrameCached(targetCacheFrame));
         }
     }
 
-    void FBCache::initiateCachingOfBestFrameGroup(FrameVector& frames,
-                                                  int maxGroupSize)
+    void FBCache::initiateCachingOfBestFrameGroup(FrameVector& frames, int maxGroupSize)
     {
         frames.clear();
 
@@ -1748,8 +1633,7 @@ namespace IPCore
             }
             else
             {
-                if (freeTarget.utility
-                    >= (utility(cacheTarget.frame, FOR_FREEING) - 0.001))
+                if (freeTarget.utility >= (utility(cacheTarget.frame, FOR_FREEING) - 0.001))
                     return;
             }
         }
@@ -1761,13 +1645,11 @@ namespace IPCore
         int cacheFrameCount = 1;
         initCacheFreePair(cacheTarget.frame, freeTarget.frame);
 
-        for (int testFrame = cacheTarget.frame + cacheTarget.inc;
-             cacheFrameCount < maxGroupSize;
+        for (int testFrame = cacheTarget.frame + cacheTarget.inc; cacheFrameCount < maxGroupSize;
              testFrame += cacheTarget.inc, ++cacheFrameCount)
         {
-            if (m_framesBeingCached.count(testFrame)
-                || m_framesScheduledForFreeing.count(testFrame)
-                || testFrame == m_displayFrame || isFrameCached(testFrame))
+            if (m_framesBeingCached.count(testFrame) || m_framesScheduledForFreeing.count(testFrame) || testFrame == m_displayFrame
+                || isFrameCached(testFrame))
             {
                 break;
             }
@@ -1793,8 +1675,7 @@ namespace IPCore
                 }
                 else
                 {
-                    if (freeCF.utility
-                        >= (utility(testFrame, FOR_FREEING) - 0.001))
+                    if (freeCF.utility >= (utility(testFrame, FOR_FREEING) - 0.001))
                         break;
                 }
             }
@@ -1809,10 +1690,7 @@ namespace IPCore
         //  decreasing order.
         //
 
-        for (int f = (cacheTarget.inc > 0)
-                         ? cacheTarget.frame + cacheFrameCount - 1
-                         : cacheTarget.frame,
-                 lim = f - cacheFrameCount;
+        for (int f = (cacheTarget.inc > 0) ? cacheTarget.frame + cacheFrameCount - 1 : cacheTarget.frame, lim = f - cacheFrameCount;
              f > lim; --f)
         {
             frames.push_back(f);
@@ -1830,22 +1708,17 @@ namespace IPCore
             DB("-----     found in beingCached map");
             if (NAF != i->second)
             {
-                DB("removing " << i->second
-                               << " from scheduledForFreeing list");
+                DB("removing " << i->second << " from scheduledForFreeing list");
                 m_framesScheduledForFreeing.erase(i->second);
             }
             m_framesBeingCached.erase(i);
         }
     }
 
-    void FBCache::considerFrameForFreeing(int f, int& targetFrame,
-                                          float& targetUtility)
+    void FBCache::considerFrameForFreeing(int f, int& targetFrame, float& targetUtility)
     {
-        DBL(DB_EDGES, "considerFrameForFreeing: frame "
-                          << f << " target " << targetFrame << " utility "
-                          << targetUtility);
-        if (f < m_minFrame || f >= m_maxFrame || m_framesBeingCached.count(f)
-            || f == m_displayFrame)
+        DBL(DB_EDGES, "considerFrameForFreeing: frame " << f << " target " << targetFrame << " utility " << targetUtility);
+        if (f < m_minFrame || f >= m_maxFrame || m_framesBeingCached.count(f) || f == m_displayFrame)
         {
             return;
         }
@@ -1861,8 +1734,7 @@ namespace IPCore
             {
                 targetFrame = f;
                 targetUtility = u;
-                DBL(DB_EDGES, "considerFrameForFreeing: targeting new frame "
-                                  << f << " utility " << u);
+                DBL(DB_EDGES, "considerFrameForFreeing: targeting new frame " << f << " utility " << u);
             }
         }
     }
@@ -1877,11 +1749,9 @@ namespace IPCore
 
     bool FBCache::freeInternal(size_t inbytes, bool freeMemory)
     {
-        DBL(DB_FREE, "free() " << inbytes << " current " << m_currentBytes
-                               << " max " << m_maxBytes << " "
+        DBL(DB_FREE, "free() " << inbytes << " current " << m_currentBytes << " max " << m_maxBytes << " "
                                << double(m_currentBytes) / double(m_maxBytes));
-        if (m_maxBytes > m_currentBytes
-            && m_maxBytes - m_currentBytes >= inbytes)
+        if (m_maxBytes > m_currentBytes && m_maxBytes - m_currentBytes >= inbytes)
         {
             return true;
         }
@@ -1900,15 +1770,13 @@ namespace IPCore
 
         CacheEdges::EdgeVector edges;
 
-        while (m_maxBytes < m_currentBytes
-               || m_maxBytes - m_currentBytes < inbytes)
+        while (m_maxBytes < m_currentBytes || m_maxBytes - m_currentBytes < inbytes)
         {
             m_cacheEdges->possibleFreeTargets(edges);
             int targetFreeFrame = NAF;
             float targetFreeFrameUtility = m_targetCacheFrameUtility;
 
-            for (CacheEdges::EdgeVector::iterator i = edges.begin();
-                 i != edges.end(); ++i)
+            for (CacheEdges::EdgeVector::iterator i = edges.begin(); i != edges.end(); ++i)
             {
                 int f = i->frame;
                 CacheEdges::EdgeType type = i->type;
@@ -1922,16 +1790,14 @@ namespace IPCore
                 //
                 if (CacheEdges::LeftOnly == type)
                 {
-                    while (alreadyTried.count(f)
-                           || m_framesBeingCached.count(f))
+                    while (alreadyTried.count(f) || m_framesBeingCached.count(f))
                     {
                         ++f;
                     }
                 }
                 else if (CacheEdges::RightOnly == type)
                 {
-                    while (alreadyTried.count(f)
-                           || m_framesBeingCached.count(f))
+                    while (alreadyTried.count(f) || m_framesBeingCached.count(f))
                     {
                         --f;
                     }
@@ -1947,13 +1813,10 @@ namespace IPCore
                 else
                     continue; /* unexpected type !*/
 
-                considerFrameForFreeing(f, targetFreeFrame,
-                                        targetFreeFrameUtility);
+                considerFrameForFreeing(f, targetFreeFrame, targetFreeFrameUtility);
             }
-            DBL(DB_FREE, "free targetFreeFrame "
-                             << targetFreeFrame << " utility "
-                             << targetFreeFrameUtility << " < "
-                             << m_targetCacheFrameUtility);
+            DBL(DB_FREE,
+                "free targetFreeFrame " << targetFreeFrame << " utility " << targetFreeFrameUtility << " < " << m_targetCacheFrameUtility);
 
             if (NAF == targetFreeFrame)
             //
@@ -1977,9 +1840,7 @@ namespace IPCore
                 toBeErased.push_back(targetFreeFrame);
             }
 
-            DBL(DB_FREE, "free m_currentBytes " << m_currentBytes
-                                                << " targetBytes "
-                                                << targetBytes);
+            DBL(DB_FREE, "free m_currentBytes " << m_currentBytes << " targetBytes " << targetBytes);
             //
             //  At best freeIDSet just flushes ids from the frame-level
             //  data structures, adding them to the Cache-level
@@ -2002,8 +1863,7 @@ namespace IPCore
 
         setCacheStatsDirty();
 
-        for (std::set<int>::iterator i = alreadyTried.begin();
-             i != alreadyTried.end(); ++i)
+        for (std::set<int>::iterator i = alreadyTried.begin(); i != alreadyTried.end(); ++i)
         {
             DB("    frame " << *i << " still cached: " << isFrameCached(*i));
             m_cacheEdges->removeCacheEdge(*i);
@@ -2011,22 +1871,17 @@ namespace IPCore
 
         bool ok = (m_maxBytes - m_currentBytes >= inbytes);
 
-        DBL(DB_FREE, "free() complete"
-                         << " current " << m_currentBytes << " max "
-                         << m_maxBytes << ", "
-                         << double(m_currentBytes) / double(m_maxBytes)
-                         << ", ok " << ok);
+        DBL(DB_FREE, "free() complete" << " current " << m_currentBytes << " max " << m_maxBytes << ", "
+                                       << double(m_currentBytes) / double(m_maxBytes) << ", ok " << ok);
 
         return ok;
     }
 
     void FBCache::emergencyFree()
     {
-        DBL(DB_FREE, "******************* emergencyFree "
-                         << " current " << m_currentBytes << " max "
-                         << m_maxBytes << " "
-                         << double(m_currentBytes) / double(m_maxBytes)
-                         << " trash count " << trashCount());
+        DBL(DB_FREE, "******************* emergencyFree " << " current " << m_currentBytes << " max " << m_maxBytes << " "
+                                                          << double(m_currentBytes) / double(m_maxBytes) << " trash count "
+                                                          << trashCount());
 
         if (m_maxBytes < m_currentBytes)
         {
@@ -2036,11 +1891,9 @@ namespace IPCore
             //
             m_targetCacheFrameUtility = utilityMax;
             free(0);
-            DBL(DB_FREE, "******************* emergencyFree "
-                             << " current " << m_currentBytes << " max "
-                             << m_maxBytes << " "
-                             << double(m_currentBytes) / double(m_maxBytes)
-                             << " trash count " << trashCount());
+            DBL(DB_FREE, "******************* emergencyFree " << " current " << m_currentBytes << " max " << m_maxBytes << " "
+                                                              << double(m_currentBytes) / double(m_maxBytes) << " trash count "
+                                                              << trashCount());
         }
         setCacheStatsDirty();
     }
@@ -2108,8 +1961,7 @@ namespace IPCore
         try
         {
             computeCachedRangesStat(m_cacheStats.cachedRanges);
-            m_cacheStats.lookAheadSeconds =
-                computeLookAheadSecondsStat(m_cacheStats.cachedRanges);
+            m_cacheStats.lookAheadSeconds = computeLookAheadSecondsStat(m_cacheStats.cachedRanges);
 
             m_cacheStatsDirty = false;
             unlock();
@@ -2126,8 +1978,7 @@ namespace IPCore
     {
         array.clear();
 
-        for (FrameMap::const_iterator i = m_frames.begin(); i != m_frames.end();
-             ++i)
+        for (FrameMap::const_iterator i = m_frames.begin(); i != m_frames.end(); ++i)
         {
             int frame = i->first;
 
@@ -2153,11 +2004,9 @@ namespace IPCore
 
     //------------------------------------------------------------------------------
     //
-    float FBCache::computeLookAheadSecondsStat(
-        const FrameRangeVector& vecFrameRange) const
+    float FBCache::computeLookAheadSecondsStat(const FrameRangeVector& vecFrameRange) const
     {
-        if (m_displayFrame == NAF || m_inFrame == NAF || m_outFrame == NAF
-            || m_displayInc == 0 || vecFrameRange.empty())
+        if (m_displayFrame == NAF || m_inFrame == NAF || m_outFrame == NAF || m_displayInc == 0 || vecFrameRange.empty())
         {
             return 0.0f;
         }
@@ -2166,50 +2015,40 @@ namespace IPCore
         if (m_displayInc > 0)
         {
             // Positive increment
-            for (FrameRangeVector::const_iterator i = vecFrameRange.begin();
-                 i != vecFrameRange.end(); ++i)
+            for (FrameRangeVector::const_iterator i = vecFrameRange.begin(); i != vecFrameRange.end(); ++i)
             {
                 // Locate the range where the display frame is located if any
                 if (m_displayFrame >= i->first && m_displayFrame <= i->second)
                 {
                     // Locate the last matching range wrt m_displayInc
                     FrameRangeVector::const_iterator endFrameRangeIter = i;
-                    while (i != vecFrameRange.end()
-                           && (i->first
-                               <= (endFrameRangeIter->second + m_displayInc)))
+                    while (i != vecFrameRange.end() && (i->first <= (endFrameRangeIter->second + m_displayInc)))
                     {
                         endFrameRangeIter = i;
                         i++;
                     };
 
-                    return (endFrameRangeIter->second - m_displayFrame)
-                           / m_displayFPS;
+                    return (endFrameRangeIter->second - m_displayFrame) / m_displayFPS;
                 }
             }
         }
         else
         {
             // Negative increment
-            for (FrameRangeVector::const_reverse_iterator i =
-                     vecFrameRange.rbegin();
-                 i != vecFrameRange.rend(); ++i)
+            for (FrameRangeVector::const_reverse_iterator i = vecFrameRange.rbegin(); i != vecFrameRange.rend(); ++i)
             {
                 // Locate the range where the display frame is located if any
                 if (m_displayFrame >= i->first && m_displayFrame <= i->second)
                 {
                     // Locate the last matching range wrt m_displayInc
-                    FrameRangeVector::const_reverse_iterator endFrameRangeIter =
-                        i;
-                    while (i != vecFrameRange.rend()
-                           && (i->second
-                               <= (endFrameRangeIter->first + m_displayInc)))
+                    FrameRangeVector::const_reverse_iterator endFrameRangeIter = i;
+                    while (i != vecFrameRange.rend() && (i->second <= (endFrameRangeIter->first + m_displayInc)))
                     {
                         endFrameRangeIter = i;
                         i++;
                     };
 
-                    return (m_displayFrame - endFrameRangeIter->first)
-                           / m_displayFPS;
+                    return (m_displayFrame - endFrameRangeIter->first) / m_displayFPS;
                 }
             }
         }
@@ -2228,13 +2067,11 @@ namespace IPCore
 
         void operator()(IPImage* l)
         {
-            DB("checkInAndDelete() fb " << l->fb << " in cache "
-                                        << ((l->fb) ? l->fb->inCache() : 0));
+            DB("checkInAndDelete() fb " << l->fb << " in cache " << ((l->fb) ? l->fb->inCache() : 0));
             if (l->fb && l->fb->inCache())
             {
-                DB("checkInAndDelete() fb "
-                   << l->fb << " ref count " << cache.fbReferenceCount(l->fb)
-                   << " frames in itemMap " << cache.framesInItemMap(l->fb));
+                DB("checkInAndDelete() fb " << l->fb << " ref count " << cache.fbReferenceCount(l->fb) << " frames in itemMap "
+                                            << cache.framesInItemMap(l->fb));
                 cache.Cache::checkIn(l->fb);
                 l->fb = 0;
             }
@@ -2287,8 +2124,7 @@ namespace IPCore
         {
             const IDSet& idset = i->second;
 
-            for (IDSet::const_iterator id = idset.begin(); id != idset.end();
-                 ++id)
+            for (IDSet::const_iterator id = idset.begin(); id != idset.end(); ++id)
             {
                 //
                 //  Is the id still in the cache? If so add it to the
@@ -2382,9 +2218,8 @@ namespace IPCore
 
         bool reffed = (m_frames[frame].count(fb->identifier()) != 0);
 
-        DB("dereferernceFrame frame "
-           << frame << " fb " << fb << " id " << fb->identifier()
-           << " reffed: " << reffed << " refcount " << fbReferenceCount(fb));
+        DB("dereferernceFrame frame " << frame << " fb " << fb << " id " << fb->identifier() << " reffed: " << reffed << " refcount "
+                                      << fbReferenceCount(fb));
 
         if (reffed)
         {
@@ -2400,8 +2235,7 @@ namespace IPCore
             //  last external ref.
             //
             dereferenceFB(fb);
-            DB("frame " << frame << " size " << m_frames[frame].size()
-                        << " de-reffed '" << fb->identifier() << "' new count "
+            DB("frame " << frame << " size " << m_frames[frame].size() << " de-reffed '" << fb->identifier() << "' new count "
                         << fbReferenceCount(fb));
         }
     }
@@ -2410,10 +2244,8 @@ namespace IPCore
     {
         bool reffed = (m_frames[frame].count(fb->identifier()) != 0);
 
-        DB("referenceFrame frame "
-           << frame << " fb " << fb << " id " << fb->identifier()
-           << " already reffed: " << reffed << " refcount "
-           << fbReferenceCount(fb));
+        DB("referenceFrame frame " << frame << " fb " << fb << " id " << fb->identifier() << " already reffed: " << reffed << " refcount "
+                                   << fbReferenceCount(fb));
 
         if (!reffed)
         {
@@ -2457,8 +2289,7 @@ namespace IPCore
                 m_itemMap.erase(q);
                 DBL(DB_FLUSH, "flush() fset size " << fset.size());
 
-                for (FrameSet::iterator fs = fset.begin(); fs != fset.end();
-                     ++fs)
+                for (FrameSet::iterator fs = fset.begin(); fs != fset.end(); ++fs)
                 //
                 //  For every frame that references this fb
                 //
@@ -2480,8 +2311,7 @@ namespace IPCore
                     }
                 }
             }
-            for (FrameVector::iterator fvi = toBeErased.begin();
-                 fvi != toBeErased.end(); ++fvi)
+            for (FrameVector::iterator fvi = toBeErased.begin(); fvi != toBeErased.end(); ++fvi)
             {
                 m_frames.erase(*fvi);
                 m_cacheEdges->removeCacheEdge(*fvi);
@@ -2529,8 +2359,7 @@ namespace IPCore
 
         for (FBMap::iterator i = m_map.begin(); i != m_map.end(); ++i)
         {
-            for (IDSet::const_iterator ss = subStrings.begin();
-                 ss != subStrings.end(); ++ss)
+            for (IDSet::const_iterator ss = subStrings.begin(); ss != subStrings.end(); ++ss)
             {
                 if (i->first.find(*ss) != string::npos)
                     idsToBeFlushed.insert(i->first);
@@ -2538,8 +2367,7 @@ namespace IPCore
         }
 
         bool ret = false;
-        for (IDSet::iterator id = idsToBeFlushed.begin();
-             id != idsToBeFlushed.end(); ++id)
+        for (IDSet::iterator id = idsToBeFlushed.begin(); id != idsToBeFlushed.end(); ++id)
         {
             bool success = flush(*id);
             ret = ret || success;
@@ -2593,8 +2421,7 @@ namespace IPCore
         {
             cout << "INFO: GC: frames currently active: " << dec;
 
-            for (FrameMap::iterator i = m_frames.begin(); i != m_frames.end();
-                 ++i)
+            for (FrameMap::iterator i = m_frames.begin(); i != m_frames.end(); ++i)
             {
                 cout << " " << i->first;
             }
@@ -2627,15 +2454,13 @@ namespace IPCore
         {
             if (!orphans.empty())
             {
-                cout << "INFO: FB GC flushed " << orphans.size()
-                     << " orphaned frames" << endl;
+                cout << "INFO: FB GC flushed " << orphans.size() << " orphaned frames" << endl;
             }
         }
 
         vector<FrameBuffer*> garbageItems;
 
-        for (ItemFrames::iterator i = m_itemMap.begin(); i != m_itemMap.end();
-             ++i)
+        for (ItemFrames::iterator i = m_itemMap.begin(); i != m_itemMap.end(); ++i)
         {
             FrameBuffer* fb = i->first;
             FrameSet& fset = i->second;
@@ -2696,12 +2521,10 @@ namespace IPCore
             if (fset.empty())
                 garbageItems.push_back(fb);
         }
-        DB("    found " << garbageItems.size()
-                        << " 'garbage' items in m_itemMap");
+        DB("    found " << garbageItems.size() << " 'garbage' items in m_itemMap");
 
         if (Cache::debug() && garbageItems.size())
-            cout << "INFO: GC: " << garbageItems.size() << " items found"
-                 << endl;
+            cout << "INFO: GC: " << garbageItems.size() << " items found" << endl;
 
         size_t collected = 0;
 
@@ -2727,16 +2550,12 @@ namespace IPCore
             {
                 while (force && fbReferenceCount(fb) > 1)
                 {
-                    DBL(DB_REF,
-                        "garbageCollect() dereferencing in GC 2, fb " << fb);
-                    DBL(DB_REF, "                 id " << fb->identifier()
-                                                       << " ref count "
-                                                       << fbReferenceCount(fb));
+                    DBL(DB_REF, "garbageCollect() dereferencing in GC 2, fb " << fb);
+                    DBL(DB_REF, "                 id " << fb->identifier() << " ref count " << fbReferenceCount(fb));
                     dereferenceFB(fb);
                 }
 
-                DB("GC: flushing " << fb << " " << fb->identifier() << " with "
-                                   << item->second.size() << " frames ");
+                DB("GC: flushing " << fb << " " << fb->identifier() << " with " << item->second.size() << " frames ");
                 if (!flush(fb->identifier()))
                 {
 #if 0
@@ -2753,14 +2572,12 @@ namespace IPCore
             }
             else
             {
-                cerr << "WARNING: CACHE GC: found disconnected item "
-                     << fb->identifier() << endl;
+                cerr << "WARNING: CACHE GC: found disconnected item " << fb->identifier() << endl;
             }
         }
 
         if (Cache::debug() && collected)
-            cout << "INFO: CACHE GC: collected " << collected << " items"
-                 << endl;
+            cout << "INFO: CACHE GC: collected " << collected << " items" << endl;
 
 #if 0
     if (!force && collected != garbageItems.size())
@@ -2781,9 +2598,8 @@ namespace IPCore
 
         for (FBMap::const_iterator i = m_map.begin(); i != m_map.end(); ++i)
         {
-            cout << i->second->identifier()
-                 << (i->second->isCacheLocked() ? " -locked- " : "") << " -"
-                 << fbReferenceCount(i->second) << "- " << endl;
+            cout << i->second->identifier() << (i->second->isCacheLocked() ? " -locked- " : "") << " -" << fbReferenceCount(i->second)
+                 << "- " << endl;
         }
 
         cout << "---------------" << endl;
@@ -2791,8 +2607,7 @@ namespace IPCore
 
     void FBCache::setDisplayFrame(int f)
     {
-        if (f != m_displayFrame
-            && m_graph->cachingMode() == IPGraph::BufferCache)
+        if (f != m_displayFrame && m_graph->cachingMode() == IPGraph::BufferCache)
             m_utilityStateChanged = true;
         m_displayFrame = f;
     }
@@ -2806,10 +2621,8 @@ namespace IPCore
 
     void FBCache::setInOutFrames(int a, int b, int c, int d)
     {
-        DBL(DB_EDGES,
-            "setInOutFrames " << a << " " << b << " " << c << " " << d << endl);
-        if (a != m_inFrame || b != m_outFrame || c != m_minFrame
-            || d != m_maxFrame)
+        DBL(DB_EDGES, "setInOutFrames " << a << " " << b << " " << c << " " << d << endl);
+        if (a != m_inFrame || b != m_outFrame || c != m_minFrame || d != m_maxFrame)
         {
             m_utilityStateChanged = true;
         }
@@ -2821,8 +2634,7 @@ namespace IPCore
 
     void FBCache::setLookBehindFraction(float f)
     {
-        if (f != m_lookBehindFraction
-            && m_graph->cachingMode() == IPGraph::BufferCache)
+        if (f != m_lookBehindFraction && m_graph->cachingMode() == IPGraph::BufferCache)
             m_utilityStateChanged = true;
         m_lookBehindFraction = f;
     }
@@ -2847,10 +2659,7 @@ namespace IPCore
         m_utilityStateChanged = true;
     }
 
-    string FBCache::popCachableOutputItem()
-    {
-        return m_perNodeCache->popItem();
-    }
+    string FBCache::popCachableOutputItem() { return m_perNodeCache->popItem(); }
 
     void FBCache::checkMetadata()
     {
@@ -2861,8 +2670,7 @@ namespace IPCore
             int refs = fbReferenceCount(fb);
             if (framesInItemMap(fb) == 0 && refs > 1)
             {
-                cerr << "FB LOST: " << i->first << "(" << fb->identifier()
-                     << "), refs " << refs << ", in trash " << trashContains(fb)
+                cerr << "FB LOST: " << i->first << "(" << fb->identifier() << "), refs " << refs << ", in trash " << trashContains(fb)
                      << endl;
             }
         }

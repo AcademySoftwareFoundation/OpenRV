@@ -14,8 +14,7 @@ namespace IPCore
 {
     using namespace std;
 
-    GroupIPNode::GroupIPNode(const std::string& name, const NodeDefinition* def,
-                             IPGraph* graph, GroupIPNode* group)
+    GroupIPNode::GroupIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group)
         : IPNode(name, def, graph, group)
         , m_root(0)
     {
@@ -32,8 +31,7 @@ namespace IPCore
         //  less efficient).
         //
 
-        for (IPNodeSet::iterator i = m_members.begin(); i != m_members.end();
-             ++i)
+        for (IPNodeSet::iterator i = m_members.begin(); i != m_members.end(); ++i)
         {
             IPNode* n = *i;
             n->willDelete();
@@ -53,13 +51,9 @@ namespace IPCore
 
     void GroupIPNode::remove(IPNode* n) { m_members.erase(n); }
 
-    void GroupIPNode::setInputs(const IPNodes& newInputs)
-    {
-        IPNode::setInputs(newInputs);
-    }
+    void GroupIPNode::setInputs(const IPNodes& newInputs) { IPNode::setInputs(newInputs); }
 
-    string GroupIPNode::internalNodeNameForInput(IPNode* input,
-                                                 const string& smallIdString)
+    string GroupIPNode::internalNodeNameForInput(IPNode* input, const string& smallIdString)
     {
         ostringstream nout;
         nout << name() << "_" << smallIdString << "_" << input->name();
@@ -78,13 +72,11 @@ namespace IPCore
         nodes.clear();
         GroupIPNode* nodeGroup = node->group();
 
-        for (IPNodeSet::const_iterator i = m_members.begin();
-             i != m_members.end(); ++i)
+        for (IPNodeSet::const_iterator i = m_members.begin(); i != m_members.end(); ++i)
         {
             if (AdaptorIPNode* anode = dynamic_cast<AdaptorIPNode*>(*i))
             {
-                if (anode->groupInputNode() == node
-                    || (nodeGroup && nodeGroup == anode->groupInputNode()))
+                if (anode->groupInputNode() == node || (nodeGroup && nodeGroup == anode->groupInputNode()))
                 {
                     // cout << "found anode " << anode->name() << " in " <<
                     // name() << endl;
@@ -135,32 +127,22 @@ namespace IPCore
         }
     }
 
-    void GroupIPNode::testEvaluate(const Context& context,
-                                   TestEvaluationResult& results)
+    void GroupIPNode::testEvaluate(const Context& context, TestEvaluationResult& results)
     {
         if (m_root)
             m_root->testEvaluate(context, results);
     }
 
-    IPImageID* GroupIPNode::evaluateIdentifier(const Context& context)
+    IPImageID* GroupIPNode::evaluateIdentifier(const Context& context) { return m_root ? m_root->evaluateIdentifier(context) : 0; }
+
+    IPNode::ImageRangeInfo GroupIPNode::imageRangeInfo() const { return m_root ? m_root->imageRangeInfo() : ImageRangeInfo(); }
+
+    IPNode::ImageStructureInfo GroupIPNode::imageStructureInfo(const Context& context) const
     {
-        return m_root ? m_root->evaluateIdentifier(context) : 0;
+        return m_root ? m_root->imageStructureInfo(context) : ImageStructureInfo();
     }
 
-    IPNode::ImageRangeInfo GroupIPNode::imageRangeInfo() const
-    {
-        return m_root ? m_root->imageRangeInfo() : ImageRangeInfo();
-    }
-
-    IPNode::ImageStructureInfo
-    GroupIPNode::imageStructureInfo(const Context& context) const
-    {
-        return m_root ? m_root->imageStructureInfo(context)
-                      : ImageStructureInfo();
-    }
-
-    void GroupIPNode::mediaInfo(const Context& context,
-                                MediaInfoVector& infos) const
+    void GroupIPNode::mediaInfo(const Context& context, MediaInfoVector& infos) const
     {
         if (m_root)
             m_root->mediaInfo(context, infos);
@@ -186,8 +168,7 @@ namespace IPCore
 
     void GroupIPNode::inputChanged(int index)
     {
-        for (IPNodeSet::iterator i = m_members.begin(); i != m_members.end();
-             ++i)
+        for (IPNodeSet::iterator i = m_members.begin(); i != m_members.end(); ++i)
         {
             if (AdaptorIPNode* anode = dynamic_cast<AdaptorIPNode*>(*i))
             {
@@ -198,8 +179,7 @@ namespace IPCore
 
     void GroupIPNode::inputRangeChanged(int index, PropagateTarget target)
     {
-        for (IPNodeSet::iterator i = m_members.begin(); i != m_members.end();
-             ++i)
+        for (IPNodeSet::iterator i = m_members.begin(); i != m_members.end(); ++i)
         {
             if (AdaptorIPNode* anode = dynamic_cast<AdaptorIPNode*>(*i))
             {
@@ -208,13 +188,11 @@ namespace IPCore
         }
     }
 
-    void GroupIPNode::inputImageStructureChanged(int index,
-                                                 PropagateTarget target)
+    void GroupIPNode::inputImageStructureChanged(int index, PropagateTarget target)
     {
         if (target & MemberPropagateTarget)
         {
-            for (IPNodeSet::iterator i = m_members.begin();
-                 i != m_members.end(); ++i)
+            for (IPNodeSet::iterator i = m_members.begin(); i != m_members.end(); ++i)
             {
                 if (AdaptorIPNode* anode = dynamic_cast<AdaptorIPNode*>(*i))
                 {
@@ -238,10 +216,7 @@ namespace IPCore
         // IPNode::propagateFlushToInputs(c);
     }
 
-    size_t GroupIPNode::audioFillBuffer(const AudioContext& c)
-    {
-        return m_root ? m_root->audioFillBuffer(c) : 0;
-    }
+    size_t GroupIPNode::audioFillBuffer(const AudioContext& c) { return m_root ? m_root->audioFillBuffer(c) : 0; }
 
     void GroupIPNode::propagateAudioConfigToInputs(const AudioConfiguration& c)
     {
@@ -250,29 +225,18 @@ namespace IPCore
         IPNode::propagateAudioConfigToInputs(c);
     }
 
-    void
-    GroupIPNode::propagateGraphConfigToInputs(const GraphConfiguration& config)
+    void GroupIPNode::propagateGraphConfigToInputs(const GraphConfiguration& config)
     {
         if (m_root)
             m_root->propagateGraphConfigToInputs(config);
         IPNode::propagateGraphConfigToInputs(config);
     }
 
-    IPNode* GroupIPNode::newSubGraphForInput(size_t index, const IPNodes& nodes)
-    {
-        return nodes[index];
-    }
+    IPNode* GroupIPNode::newSubGraphForInput(size_t index, const IPNodes& nodes) { return nodes[index]; }
 
-    IPNode* GroupIPNode::modifySubGraphForInput(size_t index,
-                                                const IPNodes& newInputs,
-                                                IPNode* subgraph)
-    {
-        return subgraph;
-    }
+    IPNode* GroupIPNode::modifySubGraphForInput(size_t index, const IPNodes& newInputs, IPNode* subgraph) { return subgraph; }
 
-    void GroupIPNode::setInputsWithReordering(const IPNodes& newInputs,
-                                              IPNode* fanInNode,
-                                              int inputIndexOnly)
+    void GroupIPNode::setInputsWithReordering(const IPNodes& newInputs, IPNode* fanInNode, int inputIndexOnly)
     {
         HOP_PROF_FUNC();
         if (isDeleting())
@@ -305,8 +269,7 @@ namespace IPCore
                 if ((inputIndexOnly >= 0))
                 {
                     if ((i >= 0) && (inputIndexOnly == i))
-                        inputs[q] = modifySubGraphForInput(
-                            q, newInputs, fanInNode->inputs()[i]);
+                        inputs[q] = modifySubGraphForInput(q, newInputs, fanInNode->inputs()[i]);
                     else
                         inputs[q] = fanInNode->inputs()[i];
                 }
@@ -315,8 +278,7 @@ namespace IPCore
                     if (i >= 0)
                     {
                         HOP_PROF("modifySubGraphForInput");
-                        inputs[q] = modifySubGraphForInput(
-                            q, newInputs, fanInNode->inputs()[i]);
+                        inputs[q] = modifySubGraphForInput(q, newInputs, fanInNode->inputs()[i]);
                     }
                     else
                     {
@@ -389,29 +351,21 @@ namespace IPCore
         }
     }
 
-    void GroupIPNode::addAuxillaryOutput(IPNode* node)
-    {
-        m_auxOutputs.push_back(node);
-    }
+    void GroupIPNode::addAuxillaryOutput(IPNode* node) { m_auxOutputs.push_back(node); }
 
-    IPNode* GroupIPNode::newMemberNode(const std::string& typeName,
-                                       const std::string& nameStem)
+    IPNode* GroupIPNode::newMemberNode(const std::string& typeName, const std::string& nameStem)
     {
         return graph()->newNode(typeName, internalNodeName(nameStem), this);
     }
 
-    IPNode* GroupIPNode::newMemberNodeForInput(const std::string& typeName,
-                                               IPNode* input,
-                                               const std::string& nameStem)
+    IPNode* GroupIPNode::newMemberNodeForInput(const std::string& typeName, IPNode* input, const std::string& nameStem)
     {
-        return graph()->newNode(
-            typeName, internalNodeNameForInput(input, nameStem), this);
+        return graph()->newNode(typeName, internalNodeNameForInput(input, nameStem), this);
     }
 
     AdaptorIPNode* GroupIPNode::newAdaptorForInput(IPNode* input)
     {
-        AdaptorIPNode* n = dynamic_cast<AdaptorIPNode*>(graph()->newNode(
-            "Adaptor", internalNodeNameForInput(input, "a"), this));
+        AdaptorIPNode* n = dynamic_cast<AdaptorIPNode*>(graph()->newNode("Adaptor", internalNodeNameForInput(input, "a"), this));
 
         n->setGroupInputNode(input);
         return n;
@@ -419,8 +373,7 @@ namespace IPCore
 
     IPNode* GroupIPNode::memberByType(const std::string& typeName)
     {
-        for (IPNodeSet::iterator i = m_members.begin(); i != m_members.end();
-             ++i)
+        for (IPNodeSet::iterator i = m_members.begin(); i != m_members.end(); ++i)
         {
             IPNode* n = *i;
             if (n->protocol() == typeName)
@@ -431,8 +384,7 @@ namespace IPCore
 
     void GroupIPNode::collectMemberNodes(IPNodeSet& nodeSet, size_t depth)
     {
-        for (IPNodeSet::iterator i = m_members.begin(); i != m_members.end();
-             ++i)
+        for (IPNodeSet::iterator i = m_members.begin(); i != m_members.end(); ++i)
         {
             IPNode* n = *i;
             n->collectMemberNodes(nodeSet, depth + 1);
@@ -453,21 +405,15 @@ namespace IPCore
 
             string name;
 
-            bool operator()(const IPNode* node)
-            {
-                return node->protocol() != name;
-            }
+            bool operator()(const IPNode* node) { return node->protocol() != name; }
         };
     } // namespace
 
-    void GroupIPNode::collectMemberNodesByTypeName(const string& typeName,
-                                                   IPNodeSet& nodeSet,
-                                                   size_t depth)
+    void GroupIPNode::collectMemberNodesByTypeName(const string& typeName, IPNodeSet& nodeSet, size_t depth)
     {
         IPNodeSet nodes;
         collectMemberNodes(nodes, depth);
-        remove_copy_if(nodes.begin(), nodes.end(),
-                       inserter(nodeSet, nodeSet.end()), TypeFilter(typeName));
+        remove_copy_if(nodes.begin(), nodes.end(), inserter(nodeSet, nodeSet.end()), TypeFilter(typeName));
     }
 
     void GroupIPNode::isolate()
@@ -529,8 +475,7 @@ namespace IPCore
                     IPNode* externalNode = memberOutputs[i];
                     size_t index = externalNode->indexOfChild(mnode);
 
-                    externalOutputs.push_back(
-                        StringPair(mnode->name(), externalNode->name()));
+                    externalOutputs.push_back(StringPair(mnode->name(), externalNode->name()));
                     externalIndex.push_back(int(index));
                     outputNodesToRemove.push_back(externalNode);
                 }
@@ -546,10 +491,8 @@ namespace IPCore
 
         if (!externalOutputs.empty() && !hasGraphComp)
         {
-            StringPairProperty* sp =
-                createProperty<StringPairProperty>("__graph.externalOutputs");
-            IntProperty* ip =
-                createProperty<IntProperty>("__graph.externalIndex");
+            StringPairProperty* sp = createProperty<StringPairProperty>("__graph.externalOutputs");
+            IntProperty* ip = createProperty<IntProperty>("__graph.externalIndex");
 
             sp->valueContainer() = externalOutputs;
             ip->valueContainer() = externalIndex;
@@ -567,8 +510,7 @@ namespace IPCore
             graph()->addNode(mnode);
         }
 
-        StringPairProperty* sp =
-            property<StringPairProperty>("__graph.externalOutputs");
+        StringPairProperty* sp = property<StringPairProperty>("__graph.externalOutputs");
         IntProperty* ip = property<IntProperty>("__graph.externalIndex");
 
         if (sp && ip)
@@ -591,8 +533,7 @@ namespace IPCore
                 size_t index = (*ip)[i];
 
                 IPNode* mnode = graph()->findNodePossiblyIsolated(con.first);
-                IPNode* externalNode =
-                    graph()->findNodePossiblyIsolated(con.second);
+                IPNode* externalNode = graph()->findNodePossiblyIsolated(con.second);
 
                 if (mnode && externalNode)
                     externalNode->insertInput(mnode, index);

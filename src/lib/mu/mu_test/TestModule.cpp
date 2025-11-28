@@ -42,17 +42,12 @@ namespace Mu
         Function::ArgKeyword End = Function::End;
         Function::ArgKeyword Parameters = Function::Parameters;
 
-        Function::Attributes CommOp = Function::Mapped | Function::Commutative
-                                      | Function::Operator
-                                      | Function::NoSideEffects;
-        Function::Attributes Op =
-            Function::Mapped | Function::Operator | Function::NoSideEffects;
-        Function::Attributes Mapped =
-            Function::Mapped | Function::NoSideEffects;
+        Function::Attributes CommOp = Function::Mapped | Function::Commutative | Function::Operator | Function::NoSideEffects;
+        Function::Attributes Op = Function::Mapped | Function::Operator | Function::NoSideEffects;
+        Function::Attributes Mapped = Function::Mapped | Function::NoSideEffects;
         Function::Attributes Cast = Mapped | Function::Cast;
         Function::Attributes Lossy = Cast | Function::Lossy;
-        Function::Attributes AsOp =
-            Function::MemberOperator | Function::Operator;
+        Function::Attributes AsOp = Function::MemberOperator | Function::Operator;
 
         MuLangContext* context = (MuLangContext*)globalModule()->context();
 
@@ -63,8 +58,7 @@ namespace Mu
         Class* b = new BClassType(context, base);
         Class* c = new CClassType(context, base);
 
-        addSymbols(new SequenceInterface(context), new BarInterface(context),
-                   base, a, b, c,
+        addSymbols(new SequenceInterface(context), new BarInterface(context), base, a, b, c,
 
                    EndArguments);
     }

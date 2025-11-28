@@ -77,21 +77,17 @@ namespace Mu
         _baseType = 0;
     }
 
-    MuQt_QAbstractSlider::MuQt_QAbstractSlider(Pointer muobj,
-                                               const CallEnvironment* ce,
-                                               QWidget* parent)
+    MuQt_QAbstractSlider::MuQt_QAbstractSlider(Pointer muobj, const CallEnvironment* ce, QWidget* parent)
         : QAbstractSlider(parent)
     {
         _env = ce;
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QAbstractSliderType>(
-            c->internName("qt.QAbstractSlider"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QAbstractSliderType>(c->internName("qt.QAbstractSlider"));
     }
 
-    void
-    MuQt_QAbstractSlider::sliderChange(QAbstractSlider::SliderChange change)
+    void MuQt_QAbstractSlider::sliderChange(QAbstractSlider::SliderChange change)
     {
         if (!_env)
         {
@@ -195,8 +191,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QTimerEventType>(c, e, "qt.QTimerEvent"));
+            args[1] = Value(makeqpointer<QTimerEventType>(c, e, "qt.QTimerEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -219,8 +214,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QWheelEventType>(c, e, "qt.QWheelEvent"));
+            args[1] = Value(makeqpointer<QWheelEventType>(c, e, "qt.QWheelEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -270,8 +264,7 @@ namespace Mu
         }
     }
 
-    QVariant
-    MuQt_QAbstractSlider::inputMethodQuery(Qt::InputMethodQuery query) const
+    QVariant MuQt_QAbstractSlider::inputMethodQuery(Qt::InputMethodQuery query) const
     {
         if (!_env)
             return QAbstractSlider::inputMethodQuery(query);
@@ -346,8 +339,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QCloseEventType>(c, event, "qt.QCloseEvent"));
+            args[1] = Value(makeqpointer<QCloseEventType>(c, event, "qt.QCloseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -370,8 +362,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqpointer<QContextMenuEventType>(
-                c, event, "qt.QContextMenuEvent"));
+            args[1] = Value(makeqpointer<QContextMenuEventType>(c, event, "qt.QContextMenuEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -394,8 +385,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqpointer<QDragEnterEventType>(
-                c, event, "qt.QDragEnterEvent"));
+            args[1] = Value(makeqpointer<QDragEnterEventType>(c, event, "qt.QDragEnterEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -418,8 +408,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqpointer<QDragLeaveEventType>(
-                c, event, "qt.QDragLeaveEvent"));
+            args[1] = Value(makeqpointer<QDragLeaveEventType>(c, event, "qt.QDragLeaveEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -442,8 +431,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqpointer<QDragMoveEventType>(
-                c, event, "qt.QDragMoveEvent"));
+            args[1] = Value(makeqpointer<QDragMoveEventType>(c, event, "qt.QDragMoveEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -466,8 +454,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QDropEventType>(c, event, "qt.QDropEvent"));
+            args[1] = Value(makeqpointer<QDropEventType>(c, event, "qt.QDropEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -490,8 +477,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QFocusEventType>(c, event, "qt.QFocusEvent"));
+            args[1] = Value(makeqpointer<QFocusEventType>(c, event, "qt.QFocusEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -535,8 +521,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QFocusEventType>(c, event, "qt.QFocusEvent"));
+            args[1] = Value(makeqpointer<QFocusEventType>(c, event, "qt.QFocusEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -559,8 +544,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QHideEventType>(c, event, "qt.QHideEvent"));
+            args[1] = Value(makeqpointer<QHideEventType>(c, event, "qt.QHideEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -583,8 +567,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QKeyEventType>(c, event, "qt.QKeyEvent"));
+            args[1] = Value(makeqpointer<QKeyEventType>(c, event, "qt.QKeyEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -630,8 +613,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -654,8 +636,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -678,8 +659,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -702,8 +682,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -726,8 +705,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QMoveEventType>(c, event, "qt.QMoveEvent"));
+            args[1] = Value(makeqpointer<QMoveEventType>(c, event, "qt.QMoveEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -750,8 +728,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QPaintEventType>(c, event, "qt.QPaintEvent"));
+            args[1] = Value(makeqpointer<QPaintEventType>(c, event, "qt.QPaintEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -774,8 +751,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QResizeEventType>(c, event, "qt.QResizeEvent"));
+            args[1] = Value(makeqpointer<QResizeEventType>(c, event, "qt.QResizeEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -798,8 +774,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QShowEventType>(c, event, "qt.QShowEvent"));
+            args[1] = Value(makeqpointer<QShowEventType>(c, event, "qt.QShowEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -822,8 +797,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QTabletEventType>(c, event, "qt.QTabletEvent"));
+            args[1] = Value(makeqpointer<QTabletEventType>(c, event, "qt.QTabletEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -856,8 +830,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  Mu Type CONSTRUCTORS
 
-    QAbstractSliderType::QAbstractSliderType(Context* c, const char* name,
-                                             Class* super, Class* super2)
+    QAbstractSliderType::QAbstractSliderType(Context* c, const char* name, Class* super, Class* super2)
         : Class(c, name, vectorOf2(super, super2))
     {
     }
@@ -867,8 +840,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    static Pointer QAbstractSlider_QAbstractSlider_QObject(Thread& NODE_THREAD,
-                                                           Pointer obj)
+    static Pointer QAbstractSlider_QAbstractSlider_QObject(Thread& NODE_THREAD, Pointer obj)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         ClassInstance* widget = reinterpret_cast<ClassInstance*>(obj);
@@ -879,9 +851,7 @@ namespace Mu
         }
         else if (QAbstractSlider* w = object<QAbstractSlider>(widget))
         {
-            QAbstractSliderType* type =
-                c->findSymbolOfTypeByQualifiedName<QAbstractSliderType>(
-                    c->internName("qt.QAbstractSlider"), false);
+            QAbstractSliderType* type = c->findSymbolOfTypeByQualifiedName<QAbstractSliderType>(c->internName("qt.QAbstractSlider"), false);
             ClassInstance* o = ClassInstance::allocate(type);
             setobject(o, w);
             return o;
@@ -894,56 +864,45 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(castFromObject, Pointer)
     {
-        NODE_RETURN(QAbstractSlider_QAbstractSlider_QObject(
-            NODE_THREAD, NODE_ARG(0, Pointer)));
+        NODE_RETURN(QAbstractSlider_QAbstractSlider_QObject(NODE_THREAD, NODE_ARG(0, Pointer)));
     }
 
-    Pointer
-    qt_QAbstractSlider_QAbstractSlider_QAbstractSlider_QAbstractSlider_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
+    Pointer qt_QAbstractSlider_QAbstractSlider_QAbstractSlider_QAbstractSlider_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                       Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWidget* arg1 = object<QWidget>(param_parent);
-        setobject(param_this,
-                  new MuQt_QAbstractSlider(
-                      param_this, NODE_THREAD.process()->callEnv(), arg1));
+        setobject(param_this, new MuQt_QAbstractSlider(param_this, NODE_THREAD.process()->callEnv(), arg1));
         return param_this;
     }
 
-    void qt_QAbstractSlider_triggerAction_void_QAbstractSlider_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_action)
+    void qt_QAbstractSlider_triggerAction_void_QAbstractSlider_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_action)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSlider* arg0 = object<QAbstractSlider>(param_this);
-        QAbstractSlider::SliderAction arg1 =
-            (QAbstractSlider::SliderAction)(param_action);
+        QAbstractSlider::SliderAction arg1 = (QAbstractSlider::SliderAction)(param_action);
         arg0->triggerAction(arg1);
     }
 
-    int
-    qt_QAbstractSlider_repeatAction_int_QAbstractSlider(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this)
+    int qt_QAbstractSlider_repeatAction_int_QAbstractSlider(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSlider* arg0 = object<QAbstractSlider>(param_this);
         return int(((MuQt_QAbstractSlider*)arg0)->repeatAction_pub());
     }
 
-    void qt_QAbstractSlider_setRepeatAction_void_QAbstractSlider_int_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_action,
-        int param_thresholdTime, int param_repeatTime)
+    void qt_QAbstractSlider_setRepeatAction_void_QAbstractSlider_int_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_action,
+                                                                             int param_thresholdTime, int param_repeatTime)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSlider* arg0 = object<QAbstractSlider>(param_this);
-        QAbstractSlider::SliderAction arg1 =
-            (QAbstractSlider::SliderAction)(param_action);
+        QAbstractSlider::SliderAction arg1 = (QAbstractSlider::SliderAction)(param_action);
         int arg2 = (int)(param_thresholdTime);
         int arg3 = (int)(param_repeatTime);
         ((MuQt_QAbstractSlider*)arg0)->setRepeatAction_pub(arg1, arg2, arg3);
     }
 
-    void qt_QAbstractSlider_sliderChange_void_QAbstractSlider_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_change)
+    void qt_QAbstractSlider_sliderChange_void_QAbstractSlider_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_change)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSlider* arg0 = object<QAbstractSlider>(param_this);
@@ -954,8 +913,7 @@ namespace Mu
             ((MuQt_QAbstractSlider*)arg0)->sliderChange_pub(arg1);
     }
 
-    void qt_QAbstractSlider_changeEvent_void_QAbstractSlider_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_ev)
+    void qt_QAbstractSlider_changeEvent_void_QAbstractSlider_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_ev)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSlider* arg0 = object<QAbstractSlider>(param_this);
@@ -966,19 +924,15 @@ namespace Mu
             ((MuQt_QAbstractSlider*)arg0)->changeEvent_pub(arg1);
     }
 
-    bool qt_QAbstractSlider_event_bool_QAbstractSlider_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    bool qt_QAbstractSlider_event_bool_QAbstractSlider_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSlider* arg0 = object<QAbstractSlider>(param_this);
         QEvent* arg1 = getqpointer<QEventType>(param_e);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QAbstractSlider*)arg0)->event_pub_parent(arg1)
-                   : ((MuQt_QAbstractSlider*)arg0)->event_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QAbstractSlider*)arg0)->event_pub_parent(arg1) : ((MuQt_QAbstractSlider*)arg0)->event_pub(arg1);
     }
 
-    void qt_QAbstractSlider_keyPressEvent_void_QAbstractSlider_QKeyEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_ev)
+    void qt_QAbstractSlider_keyPressEvent_void_QAbstractSlider_QKeyEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_ev)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSlider* arg0 = object<QAbstractSlider>(param_this);
@@ -989,8 +943,7 @@ namespace Mu
             ((MuQt_QAbstractSlider*)arg0)->keyPressEvent_pub(arg1);
     }
 
-    void qt_QAbstractSlider_timerEvent_void_QAbstractSlider_QTimerEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QAbstractSlider_timerEvent_void_QAbstractSlider_QTimerEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSlider* arg0 = object<QAbstractSlider>(param_this);
@@ -1001,8 +954,7 @@ namespace Mu
             ((MuQt_QAbstractSlider*)arg0)->timerEvent_pub(arg1);
     }
 
-    void qt_QAbstractSlider_wheelEvent_void_QAbstractSlider_QWheelEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QAbstractSlider_wheelEvent_void_QAbstractSlider_QWheelEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSlider* arg0 = object<QAbstractSlider>(param_this);
@@ -1013,66 +965,47 @@ namespace Mu
             ((MuQt_QAbstractSlider*)arg0)->wheelEvent_pub(arg1);
     }
 
-    bool qt_QAbstractSlider_hasHeightForWidth_bool_QAbstractSlider(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    bool qt_QAbstractSlider_hasHeightForWidth_bool_QAbstractSlider(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSlider* arg0 = object<QAbstractSlider>(param_this);
-        return isMuQtObject(arg0) ? arg0->QAbstractSlider::hasHeightForWidth()
-                                  : arg0->hasHeightForWidth();
+        return isMuQtObject(arg0) ? arg0->QAbstractSlider::hasHeightForWidth() : arg0->hasHeightForWidth();
     }
 
-    int qt_QAbstractSlider_heightForWidth_int_QAbstractSlider_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_w)
+    int qt_QAbstractSlider_heightForWidth_int_QAbstractSlider_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_w)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSlider* arg0 = object<QAbstractSlider>(param_this);
         int arg1 = (int)(param_w);
-        return isMuQtObject(arg0) ? arg0->QAbstractSlider::heightForWidth(arg1)
-                                  : arg0->heightForWidth(arg1);
+        return isMuQtObject(arg0) ? arg0->QAbstractSlider::heightForWidth(arg1) : arg0->heightForWidth(arg1);
     }
 
-    Pointer qt_QAbstractSlider_inputMethodQuery_QVariant_QAbstractSlider_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_query)
+    Pointer qt_QAbstractSlider_inputMethodQuery_QVariant_QAbstractSlider_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_query)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSlider* arg0 = object<QAbstractSlider>(param_this);
         Qt::InputMethodQuery arg1 = (Qt::InputMethodQuery)(param_query);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QVariantType>(
-                         c, arg0->QAbstractSlider::inputMethodQuery(arg1),
-                         "qt.QVariant")
-                   : makeqtype<QVariantType>(c, arg0->inputMethodQuery(arg1),
-                                             "qt.QVariant");
+        return isMuQtObject(arg0) ? makeqtype<QVariantType>(c, arg0->QAbstractSlider::inputMethodQuery(arg1), "qt.QVariant")
+                                  : makeqtype<QVariantType>(c, arg0->inputMethodQuery(arg1), "qt.QVariant");
     }
 
-    Pointer qt_QAbstractSlider_minimumSizeHint_QSize_QAbstractSlider(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QAbstractSlider_minimumSizeHint_QSize_QAbstractSlider(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSlider* arg0 = object<QAbstractSlider>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QSizeType>(
-                         c, arg0->QAbstractSlider::minimumSizeHint(),
-                         "qt.QSize")
-                   : makeqtype<QSizeType>(c, arg0->minimumSizeHint(),
-                                          "qt.QSize");
+        return isMuQtObject(arg0) ? makeqtype<QSizeType>(c, arg0->QAbstractSlider::minimumSizeHint(), "qt.QSize")
+                                  : makeqtype<QSizeType>(c, arg0->minimumSizeHint(), "qt.QSize");
     }
 
-    Pointer
-    qt_QAbstractSlider_sizeHint_QSize_QAbstractSlider(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    Pointer qt_QAbstractSlider_sizeHint_QSize_QAbstractSlider(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSlider* arg0 = object<QAbstractSlider>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QSizeType>(c, arg0->QAbstractSlider::sizeHint(),
-                                          "qt.QSize")
-                   : makeqtype<QSizeType>(c, arg0->sizeHint(), "qt.QSize");
+        return isMuQtObject(arg0) ? makeqtype<QSizeType>(c, arg0->QAbstractSlider::sizeHint(), "qt.QSize")
+                                  : makeqtype<QSizeType>(c, arg0->sizeHint(), "qt.QSize");
     }
 
-    void qt_QAbstractSlider_closeEvent_void_QAbstractSlider_QCloseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractSlider_closeEvent_void_QAbstractSlider_QCloseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSlider* arg0 = object<QAbstractSlider>(param_this);
@@ -1083,22 +1016,20 @@ namespace Mu
             ((MuQt_QAbstractSlider*)arg0)->closeEvent_pub(arg1);
     }
 
-    void
-    qt_QAbstractSlider_contextMenuEvent_void_QAbstractSlider_QContextMenuEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractSlider_contextMenuEvent_void_QAbstractSlider_QContextMenuEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                    Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSlider* arg0 = object<QAbstractSlider>(param_this);
-        QContextMenuEvent* arg1 =
-            getqpointer<QContextMenuEventType>(param_event);
+        QContextMenuEvent* arg1 = getqpointer<QContextMenuEventType>(param_event);
         if (isMuQtObject(arg0))
             ((MuQt_QAbstractSlider*)arg0)->contextMenuEvent_pub_parent(arg1);
         else
             ((MuQt_QAbstractSlider*)arg0)->contextMenuEvent_pub(arg1);
     }
 
-    void qt_QAbstractSlider_dragEnterEvent_void_QAbstractSlider_QDragEnterEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractSlider_dragEnterEvent_void_QAbstractSlider_QDragEnterEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSlider* arg0 = object<QAbstractSlider>(param_this);
@@ -1109,8 +1040,8 @@ namespace Mu
             ((MuQt_QAbstractSlider*)arg0)->dragEnterEvent_pub(arg1);
     }
 
-    void qt_QAbstractSlider_dragLeaveEvent_void_QAbstractSlider_QDragLeaveEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractSlider_dragLeaveEvent_void_QAbstractSlider_QDragLeaveEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSlider* arg0 = object<QAbstractSlider>(param_this);
@@ -1121,8 +1052,8 @@ namespace Mu
             ((MuQt_QAbstractSlider*)arg0)->dragLeaveEvent_pub(arg1);
     }
 
-    void qt_QAbstractSlider_dragMoveEvent_void_QAbstractSlider_QDragMoveEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractSlider_dragMoveEvent_void_QAbstractSlider_QDragMoveEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                              Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSlider* arg0 = object<QAbstractSlider>(param_this);
@@ -1133,8 +1064,7 @@ namespace Mu
             ((MuQt_QAbstractSlider*)arg0)->dragMoveEvent_pub(arg1);
     }
 
-    void qt_QAbstractSlider_dropEvent_void_QAbstractSlider_QDropEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractSlider_dropEvent_void_QAbstractSlider_QDropEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSlider* arg0 = object<QAbstractSlider>(param_this);
@@ -1145,8 +1075,7 @@ namespace Mu
             ((MuQt_QAbstractSlider*)arg0)->dropEvent_pub(arg1);
     }
 
-    void qt_QAbstractSlider_focusInEvent_void_QAbstractSlider_QFocusEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractSlider_focusInEvent_void_QAbstractSlider_QFocusEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSlider* arg0 = object<QAbstractSlider>(param_this);
@@ -1157,20 +1086,16 @@ namespace Mu
             ((MuQt_QAbstractSlider*)arg0)->focusInEvent_pub(arg1);
     }
 
-    bool qt_QAbstractSlider_focusNextPrevChild_bool_QAbstractSlider_bool(
-        Mu::Thread& NODE_THREAD, Pointer param_this, bool param_next)
+    bool qt_QAbstractSlider_focusNextPrevChild_bool_QAbstractSlider_bool(Mu::Thread& NODE_THREAD, Pointer param_this, bool param_next)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSlider* arg0 = object<QAbstractSlider>(param_this);
         bool arg1 = (bool)(param_next);
-        return isMuQtObject(arg0) ? ((MuQt_QAbstractSlider*)arg0)
-                                        ->focusNextPrevChild_pub_parent(arg1)
-                                  : ((MuQt_QAbstractSlider*)arg0)
-                                        ->focusNextPrevChild_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QAbstractSlider*)arg0)->focusNextPrevChild_pub_parent(arg1)
+                                  : ((MuQt_QAbstractSlider*)arg0)->focusNextPrevChild_pub(arg1);
     }
 
-    void qt_QAbstractSlider_focusOutEvent_void_QAbstractSlider_QFocusEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractSlider_focusOutEvent_void_QAbstractSlider_QFocusEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSlider* arg0 = object<QAbstractSlider>(param_this);
@@ -1181,8 +1106,7 @@ namespace Mu
             ((MuQt_QAbstractSlider*)arg0)->focusOutEvent_pub(arg1);
     }
 
-    void qt_QAbstractSlider_hideEvent_void_QAbstractSlider_QHideEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractSlider_hideEvent_void_QAbstractSlider_QHideEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSlider* arg0 = object<QAbstractSlider>(param_this);
@@ -1193,8 +1117,7 @@ namespace Mu
             ((MuQt_QAbstractSlider*)arg0)->hideEvent_pub(arg1);
     }
 
-    void qt_QAbstractSlider_keyReleaseEvent_void_QAbstractSlider_QKeyEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractSlider_keyReleaseEvent_void_QAbstractSlider_QKeyEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSlider* arg0 = object<QAbstractSlider>(param_this);
@@ -1205,8 +1128,7 @@ namespace Mu
             ((MuQt_QAbstractSlider*)arg0)->keyReleaseEvent_pub(arg1);
     }
 
-    void qt_QAbstractSlider_leaveEvent_void_QAbstractSlider_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractSlider_leaveEvent_void_QAbstractSlider_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSlider* arg0 = object<QAbstractSlider>(param_this);
@@ -1217,22 +1139,20 @@ namespace Mu
             ((MuQt_QAbstractSlider*)arg0)->leaveEvent_pub(arg1);
     }
 
-    void
-    qt_QAbstractSlider_mouseDoubleClickEvent_void_QAbstractSlider_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractSlider_mouseDoubleClickEvent_void_QAbstractSlider_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                   Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSlider* arg0 = object<QAbstractSlider>(param_this);
         QMouseEvent* arg1 = getqpointer<QMouseEventType>(param_event);
         if (isMuQtObject(arg0))
-            ((MuQt_QAbstractSlider*)arg0)
-                ->mouseDoubleClickEvent_pub_parent(arg1);
+            ((MuQt_QAbstractSlider*)arg0)->mouseDoubleClickEvent_pub_parent(arg1);
         else
             ((MuQt_QAbstractSlider*)arg0)->mouseDoubleClickEvent_pub(arg1);
     }
 
-    void qt_QAbstractSlider_mouseMoveEvent_void_QAbstractSlider_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractSlider_mouseMoveEvent_void_QAbstractSlider_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                            Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSlider* arg0 = object<QAbstractSlider>(param_this);
@@ -1243,8 +1163,8 @@ namespace Mu
             ((MuQt_QAbstractSlider*)arg0)->mouseMoveEvent_pub(arg1);
     }
 
-    void qt_QAbstractSlider_mousePressEvent_void_QAbstractSlider_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractSlider_mousePressEvent_void_QAbstractSlider_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                             Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSlider* arg0 = object<QAbstractSlider>(param_this);
@@ -1255,8 +1175,8 @@ namespace Mu
             ((MuQt_QAbstractSlider*)arg0)->mousePressEvent_pub(arg1);
     }
 
-    void qt_QAbstractSlider_mouseReleaseEvent_void_QAbstractSlider_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractSlider_mouseReleaseEvent_void_QAbstractSlider_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                               Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSlider* arg0 = object<QAbstractSlider>(param_this);
@@ -1267,8 +1187,7 @@ namespace Mu
             ((MuQt_QAbstractSlider*)arg0)->mouseReleaseEvent_pub(arg1);
     }
 
-    void qt_QAbstractSlider_moveEvent_void_QAbstractSlider_QMoveEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractSlider_moveEvent_void_QAbstractSlider_QMoveEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSlider* arg0 = object<QAbstractSlider>(param_this);
@@ -1279,8 +1198,7 @@ namespace Mu
             ((MuQt_QAbstractSlider*)arg0)->moveEvent_pub(arg1);
     }
 
-    void qt_QAbstractSlider_paintEvent_void_QAbstractSlider_QPaintEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractSlider_paintEvent_void_QAbstractSlider_QPaintEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSlider* arg0 = object<QAbstractSlider>(param_this);
@@ -1291,8 +1209,7 @@ namespace Mu
             ((MuQt_QAbstractSlider*)arg0)->paintEvent_pub(arg1);
     }
 
-    void qt_QAbstractSlider_resizeEvent_void_QAbstractSlider_QResizeEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractSlider_resizeEvent_void_QAbstractSlider_QResizeEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSlider* arg0 = object<QAbstractSlider>(param_this);
@@ -1303,8 +1220,7 @@ namespace Mu
             ((MuQt_QAbstractSlider*)arg0)->resizeEvent_pub(arg1);
     }
 
-    void qt_QAbstractSlider_showEvent_void_QAbstractSlider_QShowEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractSlider_showEvent_void_QAbstractSlider_QShowEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSlider* arg0 = object<QAbstractSlider>(param_this);
@@ -1315,8 +1231,7 @@ namespace Mu
             ((MuQt_QAbstractSlider*)arg0)->showEvent_pub(arg1);
     }
 
-    void qt_QAbstractSlider_tabletEvent_void_QAbstractSlider_QTabletEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractSlider_tabletEvent_void_QAbstractSlider_QTabletEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSlider* arg0 = object<QAbstractSlider>(param_this);
@@ -1327,243 +1242,208 @@ namespace Mu
             ((MuQt_QAbstractSlider*)arg0)->tabletEvent_pub(arg1);
     }
 
-    int qt_QAbstractSlider_metric_int_QAbstractSlider_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_m)
+    int qt_QAbstractSlider_metric_int_QAbstractSlider_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_m)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSlider* arg0 = object<QAbstractSlider>(param_this);
-        QPaintDevice::PaintDeviceMetric arg1 =
-            (QPaintDevice::PaintDeviceMetric)(param_m);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QAbstractSlider*)arg0)->metric_pub_parent(arg1)
-                   : ((MuQt_QAbstractSlider*)arg0)->metric_pub(arg1);
+        QPaintDevice::PaintDeviceMetric arg1 = (QPaintDevice::PaintDeviceMetric)(param_m);
+        return isMuQtObject(arg0) ? ((MuQt_QAbstractSlider*)arg0)->metric_pub_parent(arg1)
+                                  : ((MuQt_QAbstractSlider*)arg0)->metric_pub(arg1);
     }
 
     static NODE_IMPLEMENTATION(_n_QAbstractSlider0, Pointer)
     {
-        NODE_RETURN(
-            qt_QAbstractSlider_QAbstractSlider_QAbstractSlider_QAbstractSlider_QWidget(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QAbstractSlider_QAbstractSlider_QAbstractSlider_QAbstractSlider_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                               NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_triggerAction0, void)
     {
-        qt_QAbstractSlider_triggerAction_void_QAbstractSlider_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QAbstractSlider_triggerAction_void_QAbstractSlider_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_repeatAction0, int)
     {
-        NODE_RETURN(qt_QAbstractSlider_repeatAction_int_QAbstractSlider(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QAbstractSlider_repeatAction_int_QAbstractSlider(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_setRepeatAction0, void)
     {
-        qt_QAbstractSlider_setRepeatAction_void_QAbstractSlider_int_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int), NODE_ARG(3, int));
+        qt_QAbstractSlider_setRepeatAction_void_QAbstractSlider_int_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                            NODE_ARG(2, int), NODE_ARG(3, int));
     }
 
     static NODE_IMPLEMENTATION(_n_sliderChange0, void)
     {
-        qt_QAbstractSlider_sliderChange_void_QAbstractSlider_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QAbstractSlider_sliderChange_void_QAbstractSlider_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_changeEvent0, void)
     {
-        qt_QAbstractSlider_changeEvent_void_QAbstractSlider_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractSlider_changeEvent_void_QAbstractSlider_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_event0, bool)
     {
-        NODE_RETURN(qt_QAbstractSlider_event_bool_QAbstractSlider_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QAbstractSlider_event_bool_QAbstractSlider_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_keyPressEvent0, void)
     {
-        qt_QAbstractSlider_keyPressEvent_void_QAbstractSlider_QKeyEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractSlider_keyPressEvent_void_QAbstractSlider_QKeyEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_timerEvent0, void)
     {
-        qt_QAbstractSlider_timerEvent_void_QAbstractSlider_QTimerEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractSlider_timerEvent_void_QAbstractSlider_QTimerEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_wheelEvent0, void)
     {
-        qt_QAbstractSlider_wheelEvent_void_QAbstractSlider_QWheelEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractSlider_wheelEvent_void_QAbstractSlider_QWheelEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_hasHeightForWidth0, bool)
     {
-        NODE_RETURN(qt_QAbstractSlider_hasHeightForWidth_bool_QAbstractSlider(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QAbstractSlider_hasHeightForWidth_bool_QAbstractSlider(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_heightForWidth0, int)
     {
-        NODE_RETURN(qt_QAbstractSlider_heightForWidth_int_QAbstractSlider_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QAbstractSlider_heightForWidth_int_QAbstractSlider_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_inputMethodQuery0, Pointer)
     {
         NODE_RETURN(
-            qt_QAbstractSlider_inputMethodQuery_QVariant_QAbstractSlider_int(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+            qt_QAbstractSlider_inputMethodQuery_QVariant_QAbstractSlider_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_minimumSizeHint0, Pointer)
     {
-        NODE_RETURN(qt_QAbstractSlider_minimumSizeHint_QSize_QAbstractSlider(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QAbstractSlider_minimumSizeHint_QSize_QAbstractSlider(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_sizeHint0, Pointer)
     {
-        NODE_RETURN(qt_QAbstractSlider_sizeHint_QSize_QAbstractSlider(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QAbstractSlider_sizeHint_QSize_QAbstractSlider(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_closeEvent0, void)
     {
-        qt_QAbstractSlider_closeEvent_void_QAbstractSlider_QCloseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractSlider_closeEvent_void_QAbstractSlider_QCloseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_contextMenuEvent0, void)
     {
-        qt_QAbstractSlider_contextMenuEvent_void_QAbstractSlider_QContextMenuEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractSlider_contextMenuEvent_void_QAbstractSlider_QContextMenuEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                   NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_dragEnterEvent0, void)
     {
-        qt_QAbstractSlider_dragEnterEvent_void_QAbstractSlider_QDragEnterEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractSlider_dragEnterEvent_void_QAbstractSlider_QDragEnterEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                               NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_dragLeaveEvent0, void)
     {
-        qt_QAbstractSlider_dragLeaveEvent_void_QAbstractSlider_QDragLeaveEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractSlider_dragLeaveEvent_void_QAbstractSlider_QDragLeaveEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                               NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_dragMoveEvent0, void)
     {
-        qt_QAbstractSlider_dragMoveEvent_void_QAbstractSlider_QDragMoveEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractSlider_dragMoveEvent_void_QAbstractSlider_QDragMoveEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                             NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_dropEvent0, void)
     {
-        qt_QAbstractSlider_dropEvent_void_QAbstractSlider_QDropEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractSlider_dropEvent_void_QAbstractSlider_QDropEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_focusInEvent0, void)
     {
-        qt_QAbstractSlider_focusInEvent_void_QAbstractSlider_QFocusEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractSlider_focusInEvent_void_QAbstractSlider_QFocusEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_focusNextPrevChild0, bool)
     {
         NODE_RETURN(
-            qt_QAbstractSlider_focusNextPrevChild_bool_QAbstractSlider_bool(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool)));
+            qt_QAbstractSlider_focusNextPrevChild_bool_QAbstractSlider_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool)));
     }
 
     static NODE_IMPLEMENTATION(_n_focusOutEvent0, void)
     {
-        qt_QAbstractSlider_focusOutEvent_void_QAbstractSlider_QFocusEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractSlider_focusOutEvent_void_QAbstractSlider_QFocusEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_hideEvent0, void)
     {
-        qt_QAbstractSlider_hideEvent_void_QAbstractSlider_QHideEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractSlider_hideEvent_void_QAbstractSlider_QHideEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_keyReleaseEvent0, void)
     {
-        qt_QAbstractSlider_keyReleaseEvent_void_QAbstractSlider_QKeyEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractSlider_keyReleaseEvent_void_QAbstractSlider_QKeyEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_leaveEvent0, void)
     {
-        qt_QAbstractSlider_leaveEvent_void_QAbstractSlider_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractSlider_leaveEvent_void_QAbstractSlider_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseDoubleClickEvent0, void)
     {
-        qt_QAbstractSlider_mouseDoubleClickEvent_void_QAbstractSlider_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractSlider_mouseDoubleClickEvent_void_QAbstractSlider_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                  NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseMoveEvent0, void)
     {
-        qt_QAbstractSlider_mouseMoveEvent_void_QAbstractSlider_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractSlider_mouseMoveEvent_void_QAbstractSlider_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mousePressEvent0, void)
     {
-        qt_QAbstractSlider_mousePressEvent_void_QAbstractSlider_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractSlider_mousePressEvent_void_QAbstractSlider_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseReleaseEvent0, void)
     {
-        qt_QAbstractSlider_mouseReleaseEvent_void_QAbstractSlider_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractSlider_mouseReleaseEvent_void_QAbstractSlider_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                              NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_moveEvent0, void)
     {
-        qt_QAbstractSlider_moveEvent_void_QAbstractSlider_QMoveEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractSlider_moveEvent_void_QAbstractSlider_QMoveEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_paintEvent0, void)
     {
-        qt_QAbstractSlider_paintEvent_void_QAbstractSlider_QPaintEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractSlider_paintEvent_void_QAbstractSlider_QPaintEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_resizeEvent0, void)
     {
-        qt_QAbstractSlider_resizeEvent_void_QAbstractSlider_QResizeEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractSlider_resizeEvent_void_QAbstractSlider_QResizeEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_showEvent0, void)
     {
-        qt_QAbstractSlider_showEvent_void_QAbstractSlider_QShowEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractSlider_showEvent_void_QAbstractSlider_QShowEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_tabletEvent0, void)
     {
-        qt_QAbstractSlider_tabletEvent_void_QAbstractSlider_QTabletEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractSlider_tabletEvent_void_QAbstractSlider_QTabletEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_metric0, int)
     {
-        NODE_RETURN(qt_QAbstractSlider_metric_int_QAbstractSlider_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QAbstractSlider_metric_int_QAbstractSlider_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     void QAbstractSliderType::load()
@@ -1583,36 +1463,27 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
-                   new Function(c, tn, castFromObject, Cast, Compiled,
-                                QAbstractSlider_QAbstractSlider_QObject, Return,
-                                ftn, Parameters,
+                   new Function(c, tn, castFromObject, Cast, Compiled, QAbstractSlider_QAbstractSlider_QObject, Return, ftn, Parameters,
                                 new Param(c, "object", "qt.QObject"), End),
 
                    EndArguments);
 
         addSymbols(
             // enums
-            new Alias(c, "SliderChange", "int") /* PROTECTED ENUM */,
-            new SymbolicConstant(c, "SliderRangeChange", "int", Value(int(0))),
-            new SymbolicConstant(c, "SliderOrientationChange", "int",
-                                 Value(int(1))),
+            new Alias(c, "SliderChange", "int") /* PROTECTED ENUM */, new SymbolicConstant(c, "SliderRangeChange", "int", Value(int(0))),
+            new SymbolicConstant(c, "SliderOrientationChange", "int", Value(int(1))),
             new SymbolicConstant(c, "SliderStepsChange", "int", Value(int(2))),
             new SymbolicConstant(c, "SliderValueChange", "int", Value(int(3))),
             // member functions
-            new Function(
-                c, "QAbstractSlider", _n_QAbstractSlider0, None, Compiled,
-                qt_QAbstractSlider_QAbstractSlider_QAbstractSlider_QAbstractSlider_QWidget,
-                Return, "qt.QAbstractSlider", Parameters,
-                new Param(c, "this", "qt.QAbstractSlider"),
-                new Param(c, "parent", "qt.QWidget"), End),
+            new Function(c, "QAbstractSlider", _n_QAbstractSlider0, None, Compiled,
+                         qt_QAbstractSlider_QAbstractSlider_QAbstractSlider_QAbstractSlider_QWidget, Return, "qt.QAbstractSlider",
+                         Parameters, new Param(c, "this", "qt.QAbstractSlider"), new Param(c, "parent", "qt.QWidget"), End),
             // PROP: hasTracking (bool; QAbstractSlider this)
             // PROP: invertedAppearance (bool; QAbstractSlider this)
             // PROP: invertedControls (bool; QAbstractSlider this)
@@ -1632,230 +1503,129 @@ namespace Mu
             // setTracking (void; QAbstractSlider this, bool enable) PROP:
             // singleStep (int; QAbstractSlider this) PROP: sliderPosition (int;
             // QAbstractSlider this)
-            new Function(
-                c, "triggerAction", _n_triggerAction0, None, Compiled,
-                qt_QAbstractSlider_triggerAction_void_QAbstractSlider_int,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractSlider"),
-                new Param(c, "action", "int"), End),
+            new Function(c, "triggerAction", _n_triggerAction0, None, Compiled, qt_QAbstractSlider_triggerAction_void_QAbstractSlider_int,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QAbstractSlider"), new Param(c, "action", "int"), End),
             // PROP: value (int; QAbstractSlider this)
-            new Function(c, "repeatAction", _n_repeatAction0, None, Compiled,
-                         qt_QAbstractSlider_repeatAction_int_QAbstractSlider,
-                         Return, "int", Parameters,
-                         new Param(c, "this", "qt.QAbstractSlider"), End),
-            new Function(
-                c, "setRepeatAction", _n_setRepeatAction0, None, Compiled,
-                qt_QAbstractSlider_setRepeatAction_void_QAbstractSlider_int_int_int,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractSlider"),
-                new Param(c, "action", "int"),
-                new Param(c, "thresholdTime", "int", Value((int)500)),
-                new Param(c, "repeatTime", "int", Value((int)50)), End),
-            _func[0] = new MemberFunction(
-                c, "sliderChange", _n_sliderChange0, None, Compiled,
-                qt_QAbstractSlider_sliderChange_void_QAbstractSlider_int,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractSlider"),
-                new Param(c, "change", "int"), End),
-            _func[1] = new MemberFunction(
-                c, "changeEvent", _n_changeEvent0, None, Compiled,
-                qt_QAbstractSlider_changeEvent_void_QAbstractSlider_QEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractSlider"),
-                new Param(c, "ev", "qt.QEvent"), End),
-            _func[2] = new MemberFunction(
-                c, "event", _n_event0, None, Compiled,
-                qt_QAbstractSlider_event_bool_QAbstractSlider_QEvent, Return,
-                "bool", Parameters, new Param(c, "this", "qt.QAbstractSlider"),
-                new Param(c, "e", "qt.QEvent"), End),
-            _func[3] = new MemberFunction(
-                c, "keyPressEvent", _n_keyPressEvent0, None, Compiled,
-                qt_QAbstractSlider_keyPressEvent_void_QAbstractSlider_QKeyEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractSlider"),
-                new Param(c, "ev", "qt.QKeyEvent"), End),
-            _func[4] = new MemberFunction(
-                c, "timerEvent", _n_timerEvent0, None, Compiled,
-                qt_QAbstractSlider_timerEvent_void_QAbstractSlider_QTimerEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractSlider"),
-                new Param(c, "e", "qt.QTimerEvent"), End),
-            _func[5] = new MemberFunction(
-                c, "wheelEvent", _n_wheelEvent0, None, Compiled,
-                qt_QAbstractSlider_wheelEvent_void_QAbstractSlider_QWheelEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractSlider"),
-                new Param(c, "e", "qt.QWheelEvent"), End),
-            _func[6] = new MemberFunction(
-                c, "hasHeightForWidth", _n_hasHeightForWidth0, None, Compiled,
-                qt_QAbstractSlider_hasHeightForWidth_bool_QAbstractSlider,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QAbstractSlider"), End),
-            _func[7] = new MemberFunction(
-                c, "heightForWidth", _n_heightForWidth0, None, Compiled,
-                qt_QAbstractSlider_heightForWidth_int_QAbstractSlider_int,
-                Return, "int", Parameters,
-                new Param(c, "this", "qt.QAbstractSlider"),
-                new Param(c, "w", "int"), End),
-            _func[8] = new MemberFunction(
-                c, "inputMethodQuery", _n_inputMethodQuery0, None, Compiled,
-                qt_QAbstractSlider_inputMethodQuery_QVariant_QAbstractSlider_int,
-                Return, "qt.QVariant", Parameters,
-                new Param(c, "this", "qt.QAbstractSlider"),
-                new Param(c, "query", "int"), End),
-            _func[9] = new MemberFunction(
-                c, "minimumSizeHint", _n_minimumSizeHint0, None, Compiled,
-                qt_QAbstractSlider_minimumSizeHint_QSize_QAbstractSlider,
-                Return, "qt.QSize", Parameters,
-                new Param(c, "this", "qt.QAbstractSlider"), End),
-            _func[10] = new MemberFunction(
-                c, "sizeHint", _n_sizeHint0, None, Compiled,
-                qt_QAbstractSlider_sizeHint_QSize_QAbstractSlider, Return,
-                "qt.QSize", Parameters,
-                new Param(c, "this", "qt.QAbstractSlider"), End),
+            new Function(c, "repeatAction", _n_repeatAction0, None, Compiled, qt_QAbstractSlider_repeatAction_int_QAbstractSlider, Return,
+                         "int", Parameters, new Param(c, "this", "qt.QAbstractSlider"), End),
+            new Function(c, "setRepeatAction", _n_setRepeatAction0, None, Compiled,
+                         qt_QAbstractSlider_setRepeatAction_void_QAbstractSlider_int_int_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QAbstractSlider"), new Param(c, "action", "int"),
+                         new Param(c, "thresholdTime", "int", Value((int)500)), new Param(c, "repeatTime", "int", Value((int)50)), End),
+            _func[0] = new MemberFunction(c, "sliderChange", _n_sliderChange0, None, Compiled,
+                                          qt_QAbstractSlider_sliderChange_void_QAbstractSlider_int, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QAbstractSlider"), new Param(c, "change", "int"), End),
+            _func[1] = new MemberFunction(c, "changeEvent", _n_changeEvent0, None, Compiled,
+                                          qt_QAbstractSlider_changeEvent_void_QAbstractSlider_QEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QAbstractSlider"), new Param(c, "ev", "qt.QEvent"), End),
+            _func[2] =
+                new MemberFunction(c, "event", _n_event0, None, Compiled, qt_QAbstractSlider_event_bool_QAbstractSlider_QEvent, Return,
+                                   "bool", Parameters, new Param(c, "this", "qt.QAbstractSlider"), new Param(c, "e", "qt.QEvent"), End),
+            _func[3] = new MemberFunction(c, "keyPressEvent", _n_keyPressEvent0, None, Compiled,
+                                          qt_QAbstractSlider_keyPressEvent_void_QAbstractSlider_QKeyEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QAbstractSlider"), new Param(c, "ev", "qt.QKeyEvent"), End),
+            _func[4] = new MemberFunction(c, "timerEvent", _n_timerEvent0, None, Compiled,
+                                          qt_QAbstractSlider_timerEvent_void_QAbstractSlider_QTimerEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QAbstractSlider"), new Param(c, "e", "qt.QTimerEvent"), End),
+            _func[5] = new MemberFunction(c, "wheelEvent", _n_wheelEvent0, None, Compiled,
+                                          qt_QAbstractSlider_wheelEvent_void_QAbstractSlider_QWheelEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QAbstractSlider"), new Param(c, "e", "qt.QWheelEvent"), End),
+            _func[6] = new MemberFunction(c, "hasHeightForWidth", _n_hasHeightForWidth0, None, Compiled,
+                                          qt_QAbstractSlider_hasHeightForWidth_bool_QAbstractSlider, Return, "bool", Parameters,
+                                          new Param(c, "this", "qt.QAbstractSlider"), End),
+            _func[7] = new MemberFunction(c, "heightForWidth", _n_heightForWidth0, None, Compiled,
+                                          qt_QAbstractSlider_heightForWidth_int_QAbstractSlider_int, Return, "int", Parameters,
+                                          new Param(c, "this", "qt.QAbstractSlider"), new Param(c, "w", "int"), End),
+            _func[8] = new MemberFunction(c, "inputMethodQuery", _n_inputMethodQuery0, None, Compiled,
+                                          qt_QAbstractSlider_inputMethodQuery_QVariant_QAbstractSlider_int, Return, "qt.QVariant",
+                                          Parameters, new Param(c, "this", "qt.QAbstractSlider"), new Param(c, "query", "int"), End),
+            _func[9] = new MemberFunction(c, "minimumSizeHint", _n_minimumSizeHint0, None, Compiled,
+                                          qt_QAbstractSlider_minimumSizeHint_QSize_QAbstractSlider, Return, "qt.QSize", Parameters,
+                                          new Param(c, "this", "qt.QAbstractSlider"), End),
+            _func[10] = new MemberFunction(c, "sizeHint", _n_sizeHint0, None, Compiled, qt_QAbstractSlider_sizeHint_QSize_QAbstractSlider,
+                                           Return, "qt.QSize", Parameters, new Param(c, "this", "qt.QAbstractSlider"), End),
             // MISSING: paintEngine ("QPaintEngine *"; QAbstractSlider this)
             // MISSING: actionEvent (void; QAbstractSlider this, "QActionEvent
             // *" event) // protected
-            _func[11] = new MemberFunction(
-                c, "closeEvent", _n_closeEvent0, None, Compiled,
-                qt_QAbstractSlider_closeEvent_void_QAbstractSlider_QCloseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractSlider"),
-                new Param(c, "event", "qt.QCloseEvent"), End),
-            _func[12] = new MemberFunction(
-                c, "contextMenuEvent", _n_contextMenuEvent0, None, Compiled,
-                qt_QAbstractSlider_contextMenuEvent_void_QAbstractSlider_QContextMenuEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractSlider"),
-                new Param(c, "event", "qt.QContextMenuEvent"), End),
-            _func[13] = new MemberFunction(
-                c, "dragEnterEvent", _n_dragEnterEvent0, None, Compiled,
-                qt_QAbstractSlider_dragEnterEvent_void_QAbstractSlider_QDragEnterEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractSlider"),
-                new Param(c, "event", "qt.QDragEnterEvent"), End),
-            _func[14] = new MemberFunction(
-                c, "dragLeaveEvent", _n_dragLeaveEvent0, None, Compiled,
-                qt_QAbstractSlider_dragLeaveEvent_void_QAbstractSlider_QDragLeaveEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractSlider"),
-                new Param(c, "event", "qt.QDragLeaveEvent"), End),
-            _func[15] = new MemberFunction(
-                c, "dragMoveEvent", _n_dragMoveEvent0, None, Compiled,
-                qt_QAbstractSlider_dragMoveEvent_void_QAbstractSlider_QDragMoveEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractSlider"),
-                new Param(c, "event", "qt.QDragMoveEvent"), End),
-            _func[16] = new MemberFunction(
-                c, "dropEvent", _n_dropEvent0, None, Compiled,
-                qt_QAbstractSlider_dropEvent_void_QAbstractSlider_QDropEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractSlider"),
-                new Param(c, "event", "qt.QDropEvent"), End),
+            _func[11] = new MemberFunction(c, "closeEvent", _n_closeEvent0, None, Compiled,
+                                           qt_QAbstractSlider_closeEvent_void_QAbstractSlider_QCloseEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QAbstractSlider"), new Param(c, "event", "qt.QCloseEvent"), End),
+            _func[12] =
+                new MemberFunction(c, "contextMenuEvent", _n_contextMenuEvent0, None, Compiled,
+                                   qt_QAbstractSlider_contextMenuEvent_void_QAbstractSlider_QContextMenuEvent, Return, "void", Parameters,
+                                   new Param(c, "this", "qt.QAbstractSlider"), new Param(c, "event", "qt.QContextMenuEvent"), End),
+            _func[13] =
+                new MemberFunction(c, "dragEnterEvent", _n_dragEnterEvent0, None, Compiled,
+                                   qt_QAbstractSlider_dragEnterEvent_void_QAbstractSlider_QDragEnterEvent, Return, "void", Parameters,
+                                   new Param(c, "this", "qt.QAbstractSlider"), new Param(c, "event", "qt.QDragEnterEvent"), End),
+            _func[14] =
+                new MemberFunction(c, "dragLeaveEvent", _n_dragLeaveEvent0, None, Compiled,
+                                   qt_QAbstractSlider_dragLeaveEvent_void_QAbstractSlider_QDragLeaveEvent, Return, "void", Parameters,
+                                   new Param(c, "this", "qt.QAbstractSlider"), new Param(c, "event", "qt.QDragLeaveEvent"), End),
+            _func[15] = new MemberFunction(c, "dragMoveEvent", _n_dragMoveEvent0, None, Compiled,
+                                           qt_QAbstractSlider_dragMoveEvent_void_QAbstractSlider_QDragMoveEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QAbstractSlider"), new Param(c, "event", "qt.QDragMoveEvent"), End),
+            _func[16] = new MemberFunction(c, "dropEvent", _n_dropEvent0, None, Compiled,
+                                           qt_QAbstractSlider_dropEvent_void_QAbstractSlider_QDropEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QAbstractSlider"), new Param(c, "event", "qt.QDropEvent"), End),
             // MISSING: enterEvent (void; QAbstractSlider this, "QEnterEvent *"
             // event) // protected
-            _func[17] = new MemberFunction(
-                c, "focusInEvent", _n_focusInEvent0, None, Compiled,
-                qt_QAbstractSlider_focusInEvent_void_QAbstractSlider_QFocusEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractSlider"),
-                new Param(c, "event", "qt.QFocusEvent"), End),
-            _func[18] = new MemberFunction(
-                c, "focusNextPrevChild", _n_focusNextPrevChild0, None, Compiled,
-                qt_QAbstractSlider_focusNextPrevChild_bool_QAbstractSlider_bool,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QAbstractSlider"),
-                new Param(c, "next", "bool"), End),
-            _func[19] = new MemberFunction(
-                c, "focusOutEvent", _n_focusOutEvent0, None, Compiled,
-                qt_QAbstractSlider_focusOutEvent_void_QAbstractSlider_QFocusEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractSlider"),
-                new Param(c, "event", "qt.QFocusEvent"), End),
-            _func[20] = new MemberFunction(
-                c, "hideEvent", _n_hideEvent0, None, Compiled,
-                qt_QAbstractSlider_hideEvent_void_QAbstractSlider_QHideEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractSlider"),
-                new Param(c, "event", "qt.QHideEvent"), End),
+            _func[17] = new MemberFunction(c, "focusInEvent", _n_focusInEvent0, None, Compiled,
+                                           qt_QAbstractSlider_focusInEvent_void_QAbstractSlider_QFocusEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QAbstractSlider"), new Param(c, "event", "qt.QFocusEvent"), End),
+            _func[18] = new MemberFunction(c, "focusNextPrevChild", _n_focusNextPrevChild0, None, Compiled,
+                                           qt_QAbstractSlider_focusNextPrevChild_bool_QAbstractSlider_bool, Return, "bool", Parameters,
+                                           new Param(c, "this", "qt.QAbstractSlider"), new Param(c, "next", "bool"), End),
+            _func[19] = new MemberFunction(c, "focusOutEvent", _n_focusOutEvent0, None, Compiled,
+                                           qt_QAbstractSlider_focusOutEvent_void_QAbstractSlider_QFocusEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QAbstractSlider"), new Param(c, "event", "qt.QFocusEvent"), End),
+            _func[20] = new MemberFunction(c, "hideEvent", _n_hideEvent0, None, Compiled,
+                                           qt_QAbstractSlider_hideEvent_void_QAbstractSlider_QHideEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QAbstractSlider"), new Param(c, "event", "qt.QHideEvent"), End),
             // MISSING: inputMethodEvent (void; QAbstractSlider this,
             // "QInputMethodEvent *" event) // protected
-            _func[21] = new MemberFunction(
-                c, "keyReleaseEvent", _n_keyReleaseEvent0, None, Compiled,
-                qt_QAbstractSlider_keyReleaseEvent_void_QAbstractSlider_QKeyEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractSlider"),
-                new Param(c, "event", "qt.QKeyEvent"), End),
-            _func[22] = new MemberFunction(
-                c, "leaveEvent", _n_leaveEvent0, None, Compiled,
-                qt_QAbstractSlider_leaveEvent_void_QAbstractSlider_QEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractSlider"),
-                new Param(c, "event", "qt.QEvent"), End),
-            _func[23] = new MemberFunction(
-                c, "mouseDoubleClickEvent", _n_mouseDoubleClickEvent0, None,
-                Compiled,
-                qt_QAbstractSlider_mouseDoubleClickEvent_void_QAbstractSlider_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractSlider"),
-                new Param(c, "event", "qt.QMouseEvent"), End),
-            _func[24] = new MemberFunction(
-                c, "mouseMoveEvent", _n_mouseMoveEvent0, None, Compiled,
-                qt_QAbstractSlider_mouseMoveEvent_void_QAbstractSlider_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractSlider"),
-                new Param(c, "event", "qt.QMouseEvent"), End),
-            _func[25] = new MemberFunction(
-                c, "mousePressEvent", _n_mousePressEvent0, None, Compiled,
-                qt_QAbstractSlider_mousePressEvent_void_QAbstractSlider_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractSlider"),
-                new Param(c, "event", "qt.QMouseEvent"), End),
-            _func[26] = new MemberFunction(
-                c, "mouseReleaseEvent", _n_mouseReleaseEvent0, None, Compiled,
-                qt_QAbstractSlider_mouseReleaseEvent_void_QAbstractSlider_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractSlider"),
-                new Param(c, "event", "qt.QMouseEvent"), End),
-            _func[27] = new MemberFunction(
-                c, "moveEvent", _n_moveEvent0, None, Compiled,
-                qt_QAbstractSlider_moveEvent_void_QAbstractSlider_QMoveEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractSlider"),
-                new Param(c, "event", "qt.QMoveEvent"), End),
+            _func[21] = new MemberFunction(c, "keyReleaseEvent", _n_keyReleaseEvent0, None, Compiled,
+                                           qt_QAbstractSlider_keyReleaseEvent_void_QAbstractSlider_QKeyEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QAbstractSlider"), new Param(c, "event", "qt.QKeyEvent"), End),
+            _func[22] = new MemberFunction(c, "leaveEvent", _n_leaveEvent0, None, Compiled,
+                                           qt_QAbstractSlider_leaveEvent_void_QAbstractSlider_QEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QAbstractSlider"), new Param(c, "event", "qt.QEvent"), End),
+            _func[23] =
+                new MemberFunction(c, "mouseDoubleClickEvent", _n_mouseDoubleClickEvent0, None, Compiled,
+                                   qt_QAbstractSlider_mouseDoubleClickEvent_void_QAbstractSlider_QMouseEvent, Return, "void", Parameters,
+                                   new Param(c, "this", "qt.QAbstractSlider"), new Param(c, "event", "qt.QMouseEvent"), End),
+            _func[24] = new MemberFunction(c, "mouseMoveEvent", _n_mouseMoveEvent0, None, Compiled,
+                                           qt_QAbstractSlider_mouseMoveEvent_void_QAbstractSlider_QMouseEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QAbstractSlider"), new Param(c, "event", "qt.QMouseEvent"), End),
+            _func[25] = new MemberFunction(c, "mousePressEvent", _n_mousePressEvent0, None, Compiled,
+                                           qt_QAbstractSlider_mousePressEvent_void_QAbstractSlider_QMouseEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QAbstractSlider"), new Param(c, "event", "qt.QMouseEvent"), End),
+            _func[26] =
+                new MemberFunction(c, "mouseReleaseEvent", _n_mouseReleaseEvent0, None, Compiled,
+                                   qt_QAbstractSlider_mouseReleaseEvent_void_QAbstractSlider_QMouseEvent, Return, "void", Parameters,
+                                   new Param(c, "this", "qt.QAbstractSlider"), new Param(c, "event", "qt.QMouseEvent"), End),
+            _func[27] = new MemberFunction(c, "moveEvent", _n_moveEvent0, None, Compiled,
+                                           qt_QAbstractSlider_moveEvent_void_QAbstractSlider_QMoveEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QAbstractSlider"), new Param(c, "event", "qt.QMoveEvent"), End),
             // MISSING: nativeEvent (bool; QAbstractSlider this, QByteArray
             // eventType, "void *" message, "qintptr *" result) // protected
-            _func[28] = new MemberFunction(
-                c, "paintEvent", _n_paintEvent0, None, Compiled,
-                qt_QAbstractSlider_paintEvent_void_QAbstractSlider_QPaintEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractSlider"),
-                new Param(c, "event", "qt.QPaintEvent"), End),
-            _func[29] = new MemberFunction(
-                c, "resizeEvent", _n_resizeEvent0, None, Compiled,
-                qt_QAbstractSlider_resizeEvent_void_QAbstractSlider_QResizeEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractSlider"),
-                new Param(c, "event", "qt.QResizeEvent"), End),
-            _func[30] = new MemberFunction(
-                c, "showEvent", _n_showEvent0, None, Compiled,
-                qt_QAbstractSlider_showEvent_void_QAbstractSlider_QShowEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractSlider"),
-                new Param(c, "event", "qt.QShowEvent"), End),
-            _func[31] = new MemberFunction(
-                c, "tabletEvent", _n_tabletEvent0, None, Compiled,
-                qt_QAbstractSlider_tabletEvent_void_QAbstractSlider_QTabletEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractSlider"),
-                new Param(c, "event", "qt.QTabletEvent"), End),
+            _func[28] = new MemberFunction(c, "paintEvent", _n_paintEvent0, None, Compiled,
+                                           qt_QAbstractSlider_paintEvent_void_QAbstractSlider_QPaintEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QAbstractSlider"), new Param(c, "event", "qt.QPaintEvent"), End),
+            _func[29] = new MemberFunction(c, "resizeEvent", _n_resizeEvent0, None, Compiled,
+                                           qt_QAbstractSlider_resizeEvent_void_QAbstractSlider_QResizeEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QAbstractSlider"), new Param(c, "event", "qt.QResizeEvent"), End),
+            _func[30] = new MemberFunction(c, "showEvent", _n_showEvent0, None, Compiled,
+                                           qt_QAbstractSlider_showEvent_void_QAbstractSlider_QShowEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QAbstractSlider"), new Param(c, "event", "qt.QShowEvent"), End),
+            _func[31] = new MemberFunction(c, "tabletEvent", _n_tabletEvent0, None, Compiled,
+                                           qt_QAbstractSlider_tabletEvent_void_QAbstractSlider_QTabletEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QAbstractSlider"), new Param(c, "event", "qt.QTabletEvent"), End),
             // MISSING: initPainter (void; QAbstractSlider this, "QPainter *"
             // painter) // protected
-            _func[32] = new MemberFunction(
-                c, "metric", _n_metric0, None, Compiled,
-                qt_QAbstractSlider_metric_int_QAbstractSlider_int, Return,
-                "int", Parameters, new Param(c, "this", "qt.QAbstractSlider"),
-                new Param(c, "m", "int"), End),
+            _func[32] =
+                new MemberFunction(c, "metric", _n_metric0, None, Compiled, qt_QAbstractSlider_metric_int_QAbstractSlider_int, Return,
+                                   "int", Parameters, new Param(c, "this", "qt.QAbstractSlider"), new Param(c, "m", "int"), End),
             // static functions
             EndArguments);
         globalScope()->addSymbols(EndArguments);

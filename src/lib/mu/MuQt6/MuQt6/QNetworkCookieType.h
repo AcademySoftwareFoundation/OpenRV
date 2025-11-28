@@ -47,8 +47,7 @@ namespace Mu
         //  Constructors
         //
 
-        QNetworkCookieType(Context* context, const char* name,
-                           Class* superClass = 0);
+        QNetworkCookieType(Context* context, const char* name, Class* superClass = 0);
         virtual ~QNetworkCookieType();
 
         //

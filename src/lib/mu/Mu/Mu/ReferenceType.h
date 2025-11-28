@@ -36,8 +36,7 @@ namespace Mu
     class ReferenceType : public Type
     {
     public:
-        ReferenceType(Context* context, const char* name,
-                      Type* dereferenceType);
+        ReferenceType(Context* context, const char* name, Type* dereferenceType);
 
         //
         //	Type API
@@ -61,10 +60,8 @@ namespace Mu
 
         const Type* dereferenceType() const { return _type; }
 
-        virtual void outputValue(std::ostream&, const Value&,
-                                 bool full = false) const;
-        virtual void outputValueRecursive(std::ostream&, const ValuePointer,
-                                          ValueOutputState&) const;
+        virtual void outputValue(std::ostream&, const Value&, bool full = false) const;
+        virtual void outputValueRecursive(std::ostream&, const ValuePointer, ValueOutputState&) const;
 
         //
         //	Match returns true only if there is an exact match.

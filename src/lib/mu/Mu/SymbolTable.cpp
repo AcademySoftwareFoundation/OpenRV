@@ -77,10 +77,7 @@ namespace Mu
         }
     }
 
-    bool SymbolTable::exists(Symbol* s) const
-    {
-        return _hashTable.find(s) ? true : false;
-    }
+    bool SymbolTable::exists(Symbol* s) const { return _hashTable.find(s) ? true : false; }
 
     // Symbol*
     // SymbolTable::find(const String& s) const
@@ -93,8 +90,7 @@ namespace Mu
 
     Symbol* SymbolTable::find(const Name& name) const
     {
-        for (const Item* i = _hashTable.firstItemOf(name.hash()); i;
-             i = i->next())
+        for (const Item* i = _hashTable.firstItemOf(name.hash()); i; i = i->next())
             if (i->data()->name() == name)
                 return i->data();
         return 0;

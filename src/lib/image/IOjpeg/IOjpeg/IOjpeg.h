@@ -39,8 +39,7 @@ namespace TwkFB
 
         struct FileState
         {
-            FileState(const std::string& name = "", FILE* f = 0,
-                      TwkUtil::FileStream* s = 0)
+            FileState(const std::string& name = "", FILE* f = 0, TwkUtil::FileStream* s = 0)
                 : filename(name)
                 , file(f)
                 , stream(s)
@@ -61,16 +60,12 @@ namespace TwkFB
 
         typedef struct jpeg_decompress_struct Decompressor;
 
-        IOjpeg(StorageFormat format = RGB, IOType ioMethod = StandardIO,
-               size_t chunkSize = 61440, int maxAsync = 16);
+        IOjpeg(StorageFormat format = RGB, IOType ioMethod = StandardIO, size_t chunkSize = 61440, int maxAsync = 16);
 
         virtual ~IOjpeg();
 
-        virtual void readImage(FrameBuffer& fb, const std::string& filename,
-                               const ReadRequest& request) const;
-        virtual void writeImage(const FrameBuffer& img,
-                                const std::string& filename,
-                                const WriteRequest& request) const;
+        virtual void readImage(FrameBuffer& fb, const std::string& filename, const ReadRequest& request) const;
+        virtual void writeImage(const FrameBuffer& img, const std::string& filename, const WriteRequest& request) const;
         virtual std::string about() const;
         virtual void getImageInfo(const std::string& filename, FBInfo&) const;
 
@@ -81,12 +76,9 @@ namespace TwkFB
         mutable bool m_error;
 
     private:
-        void readImageRGB(FrameBuffer& fb, const FileState&,
-                          Decompressor&) const;
-        void readImageRGBA(FrameBuffer& fb, const FileState&,
-                           Decompressor&) const;
-        void readImageYUV(FrameBuffer& fb, const FileState&,
-                          Decompressor&) const;
+        void readImageRGB(FrameBuffer& fb, const FileState&, Decompressor&) const;
+        void readImageRGBA(FrameBuffer& fb, const FileState&, Decompressor&) const;
+        void readImageYUV(FrameBuffer& fb, const FileState&, Decompressor&) const;
 
         bool canReadAsYUV(const Decompressor&) const;
 

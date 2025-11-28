@@ -53,16 +53,14 @@ namespace mp4v2Utils
         return true;
     }
 
-    bool assembleAtomName(void* fileHandle, int streamIndex, string atom,
-                          string& atomName)
+    bool assembleAtomName(void* fileHandle, int streamIndex, string atom, string& atomName)
     {
         // Assemble the Atom name
         string fourcc;
         if (!getFOURCC(fileHandle, streamIndex, fourcc))
             return false;
         ostringstream atomStm;
-        atomStm << "moov.trak[" << streamIndex << "].mdia.minf.stbl.stsd."
-                << fourcc << "." << atom;
+        atomStm << "moov.trak[" << streamIndex << "].mdia.minf.stbl.stsd." << fourcc << "." << atom;
         atomName = atomStm.str();
 
         return true;
@@ -87,8 +85,7 @@ namespace mp4v2Utils
         return true;
     }
 
-    bool getNCLCValues(void* fileHandle, int streamIndex, uint64_t& prim,
-                       uint64_t& xfer, uint64_t& mtrx)
+    bool getNCLCValues(void* fileHandle, int streamIndex, uint64_t& prim, uint64_t& xfer, uint64_t& mtrx)
     {
         string atomName;
         if (!assembleAtomName(fileHandle, streamIndex, "colr", atomName))
@@ -113,8 +110,7 @@ namespace mp4v2Utils
         return true;
     }
 
-    bool getPROFValues(void* fileHandle, int streamIndex,
-                       unsigned char*& profile, uint32_t& size)
+    bool getPROFValues(void* fileHandle, int streamIndex, unsigned char*& profile, uint32_t& size)
     {
         string atomName;
         if (!assembleAtomName(fileHandle, streamIndex, "colr", atomName))
@@ -130,8 +126,7 @@ namespace mp4v2Utils
         return true;
     }
 
-    bool addColrAtom(void* fileHandle, int streamIndex, uint64_t prim,
-                     uint64_t xfer, uint64_t mtrx)
+    bool addColrAtom(void* fileHandle, int streamIndex, uint64_t prim, uint64_t xfer, uint64_t mtrx)
     {
         // Assemble the Atom name
         MP4TrackId id = MP4FindTrackId(fileHandle, streamIndex);

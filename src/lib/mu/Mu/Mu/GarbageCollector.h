@@ -92,45 +92,21 @@ namespace Mu
         //  Main API
         //
 
-        template <typename T> static T* allocate(size_t s)
-        {
-            return reinterpret_cast<T*>(_api->allocate(s));
-        }
+        template <typename T> static T* allocate(size_t s) { return reinterpret_cast<T*>(_api->allocate(s)); }
 
-        template <typename T> static T* allocateAtomic(size_t s)
-        {
-            return reinterpret_cast<T*>(_api->allocateAtomic(s));
-        }
+        template <typename T> static T* allocateAtomic(size_t s) { return reinterpret_cast<T*>(_api->allocateAtomic(s)); }
 
-        template <typename T> static T* allocateAtomicOffPage(size_t s)
-        {
-            return reinterpret_cast<T*>(_api->allocateAtomicOffPage(s));
-        }
+        template <typename T> static T* allocateAtomicOffPage(size_t s) { return reinterpret_cast<T*>(_api->allocateAtomicOffPage(s)); }
 
-        template <typename T> static T* allocateOffPage(size_t s)
-        {
-            return reinterpret_cast<T*>(_api->allocateOffPage(s));
-        }
+        template <typename T> static T* allocateOffPage(size_t s) { return reinterpret_cast<T*>(_api->allocateOffPage(s)); }
 
-        template <typename T> static T* allocateStubborn(size_t s)
-        {
-            return reinterpret_cast<T*>(_api->allocateStubborn(s));
-        }
+        template <typename T> static T* allocateStubborn(size_t s) { return reinterpret_cast<T*>(_api->allocateStubborn(s)); }
 
-        template <typename T> static void beginChangeStubborn(T* p)
-        {
-            return _api->beginChangeStubborn((void*)(p));
-        }
+        template <typename T> static void beginChangeStubborn(T* p) { return _api->beginChangeStubborn((void*)(p)); }
 
-        template <typename T> static void endChangeStubborn(T* p)
-        {
-            return _api->endChangeStubborn((void*)(p));
-        }
+        template <typename T> static void endChangeStubborn(T* p) { return _api->endChangeStubborn((void*)(p)); }
 
-        template <typename T> static void free(T* p)
-        {
-            return _api->free(reinterpret_cast<void*>(p));
-        }
+        template <typename T> static void free(T* p) { return _api->free(reinterpret_cast<void*>(p)); }
 
         static void pushMainHeapAPI();
         static void pushMainHeapNoOptAPI();
@@ -160,10 +136,7 @@ namespace Mu
         static size_t mainArenaSize();
         static size_t auxArenaSize();
 
-        static void addCollectCallback(CollectCallback cb)
-        {
-            _collectCallbacks.push_back(cb);
-        }
+        static void addCollectCallback(CollectCallback cb) { _collectCallbacks.push_back(cb); }
 
         static size_t objectsScanned() { return _objectsScanned; }
 
@@ -191,19 +164,14 @@ namespace Mu
 
     // In the following GC_Tp is GC_true_type iff we are allocating a
     // pointerfree object.
-    template <class GC_Tp>
-    inline void* MU_GC_selective_alloc(size_t n, GC_Tp, bool ignore_off_page)
+    template <class GC_Tp> inline void* MU_GC_selective_alloc(size_t n, GC_Tp, bool ignore_off_page)
     {
-        return ignore_off_page ? MU_GC_ALLOC_IGNORE_OFF_PAGE(n)
-                               : MU_GC_ALLOC(n);
+        return ignore_off_page ? MU_GC_ALLOC_IGNORE_OFF_PAGE(n) : MU_GC_ALLOC(n);
     }
 
-    template <>
-    inline void* MU_GC_selective_alloc<GC_true_type>(size_t n, GC_true_type,
-                                                     bool ignore_off_page)
+    template <> inline void* MU_GC_selective_alloc<GC_true_type>(size_t n, GC_true_type, bool ignore_off_page)
     {
-        return ignore_off_page ? MU_GC_ALLOC_ATOMIC_IGNORE_OFF_PAGE(n)
-                               : MU_GC_ALLOC_ATOMIC(n);
+        return ignore_off_page ? MU_GC_ALLOC_ATOMIC_IGNORE_OFF_PAGE(n) : MU_GC_ALLOC_ATOMIC(n);
     }
 
     template <class GC_Tp> class MuGCAPI_allocator
@@ -227,10 +195,7 @@ namespace Mu
         MuGCAPI_allocator(const MuGCAPI_allocator&) throw() {}
 #if !(GC_NO_MEMBER_TEMPLATES || 0 < _MSC_VER && _MSC_VER <= 1200)
         // MSVC++ 6.0 do not support member templates
-        template <class GC_Tp1>
-        MuGCAPI_allocator(const MuGCAPI_allocator<GC_Tp1>&) throw()
-        {
-        }
+        template <class GC_Tp1> MuGCAPI_allocator(const MuGCAPI_allocator<GC_Tp1>&) throw() {}
 #endif
         ~MuGCAPI_allocator() throw() {}
 
@@ -244,22 +209,15 @@ namespace Mu
         GC_Tp* allocate(size_type GC_n, const void* = 0)
         {
             GC_type_traits<GC_Tp> traits;
-            return static_cast<GC_Tp*>(MU_GC_selective_alloc(
-                GC_n * sizeof(GC_Tp), traits.GC_is_ptr_free, false));
+            return static_cast<GC_Tp*>(MU_GC_selective_alloc(GC_n * sizeof(GC_Tp), traits.GC_is_ptr_free, false));
         }
 
         // __p is not permitted to be a null pointer.
         void deallocate(pointer __p, size_type /* GC_n */) { MU_GC_FREE(__p); }
 
-        size_type max_size() const throw()
-        {
-            return size_t(-1) / sizeof(GC_Tp);
-        }
+        size_type max_size() const throw() { return size_t(-1) / sizeof(GC_Tp); }
 
-        void construct(pointer __p, const GC_Tp& __val)
-        {
-            new (__p) GC_Tp(__val);
-        }
+        void construct(pointer __p, const GC_Tp& __val) { new (__p) GC_Tp(__val); }
 
         void destroy(pointer __p) { __p->~GC_Tp(); }
     };
@@ -278,16 +236,12 @@ namespace Mu
         };
     };
 
-    template <class GC_T1, class GC_T2>
-    inline bool operator==(const MuGCAPI_allocator<GC_T1>&,
-                           const MuGCAPI_allocator<GC_T2>&)
+    template <class GC_T1, class GC_T2> inline bool operator==(const MuGCAPI_allocator<GC_T1>&, const MuGCAPI_allocator<GC_T2>&)
     {
         return true;
     }
 
-    template <class GC_T1, class GC_T2>
-    inline bool operator!=(const MuGCAPI_allocator<GC_T1>&,
-                           const MuGCAPI_allocator<GC_T2>&)
+    template <class GC_T1, class GC_T2> inline bool operator!=(const MuGCAPI_allocator<GC_T1>&, const MuGCAPI_allocator<GC_T2>&)
     {
         return false;
     }

@@ -37,9 +37,7 @@ namespace Mu
 {
     using namespace std;
 
-    QWindowStateChangeEventType::QWindowStateChangeEventType(Context* c,
-                                                             const char* name,
-                                                             Class* super)
+    QWindowStateChangeEventType::QWindowStateChangeEventType(Context* c, const char* name, Class* super)
         : Class(c, name, super)
     {
     }
@@ -49,20 +47,16 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    int qt_QWindowStateChangeEvent_oldState_int_QWindowStateChangeEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    int qt_QWindowStateChangeEvent_oldState_int_QWindowStateChangeEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-        QWindowStateChangeEvent* arg0 =
-            getqpointer<QWindowStateChangeEventType>(param_this);
+        QWindowStateChangeEvent* arg0 = getqpointer<QWindowStateChangeEventType>(param_this);
         return int(arg0->oldState());
     }
 
     static NODE_IMPLEMENTATION(_n_oldState0, int)
     {
-        NODE_RETURN(
-            qt_QWindowStateChangeEvent_oldState_int_QWindowStateChangeEvent(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QWindowStateChangeEvent_oldState_int_QWindowStateChangeEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     void QWindowStateChangeEventType::load()
@@ -82,13 +76,11 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
                    new MemberVariable(c, "native", "qt.NativeObject"),
 
@@ -99,11 +91,8 @@ namespace Mu
         addSymbols(
             // enums
             // member functions
-            new Function(
-                c, "oldState", _n_oldState0, None, Compiled,
-                qt_QWindowStateChangeEvent_oldState_int_QWindowStateChangeEvent,
-                Return, "int", Parameters,
-                new Param(c, "this", "qt.QWindowStateChangeEvent"), End),
+            new Function(c, "oldState", _n_oldState0, None, Compiled, qt_QWindowStateChangeEvent_oldState_int_QWindowStateChangeEvent,
+                         Return, "int", Parameters, new Param(c, "this", "qt.QWindowStateChangeEvent"), End),
             // static functions
             EndArguments);
         globalScope()->addSymbols(EndArguments);

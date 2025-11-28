@@ -27,8 +27,7 @@ namespace TwkUtil
     class FileSequence
     {
     public:
-        TWK_EXC_DECLARE(Exception, TwkExc::Exception,
-                        "FileSequence::Exception: ");
+        TWK_EXC_DECLARE(Exception, TwkExc::Exception, "FileSequence::Exception: ");
 
         FileSequence(std::string filePattern);
 

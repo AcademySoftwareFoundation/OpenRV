@@ -59,8 +59,7 @@ namespace TwkApp
         }
         catch (std::exception& exc)
         {
-            cout << "ERROR: " << exc.what()
-                 << " -- while executing action: " << docString() << endl;
+            cout << "ERROR: " << exc.what() << " -- while executing action: " << docString() << endl;
         }
         catch (...)
         {
@@ -80,9 +79,6 @@ namespace TwkApp
 
     bool PyFunctionAction::error() const { return m_exception; }
 
-    Action* PyFunctionAction::copy() const
-    {
-        return new PyFunctionAction(m_func, docString());
-    }
+    Action* PyFunctionAction::copy() const { return new PyFunctionAction(m_func, docString()); }
 
 } // namespace TwkApp

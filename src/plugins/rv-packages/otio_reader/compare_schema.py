@@ -51,13 +51,9 @@ class Compare(otio.schema.Effect):
         self.secondary_element_id = secondary_element_id
         self.is_swapped = is_swapped
 
-    visible = otio.core.serializable_field(
-        "visible", required_type=bool, doc="visible: expects either true or false"
-    )
+    visible = otio.core.serializable_field("visible", required_type=bool, doc="visible: expects either true or false")
 
-    mode = otio.core.serializable_field(
-        "mode", required_type=str, doc="mode: expects a string"
-    )
+    mode = otio.core.serializable_field("mode", required_type=str, doc="mode: expects a string")
 
     _side_by_side = otio.core.serializable_field(
         "side_by_side",

@@ -60,9 +60,6 @@ namespace TwkApp
 
     bool PyStateFunc::error() const { return m_exception; }
 
-    Menu::StateFunc* PyStateFunc::copy() const
-    {
-        return new PyStateFunc(m_func);
-    }
+    Menu::StateFunc* PyStateFunc::copy() const { return new PyStateFunc(m_func); }
 
 } // namespace TwkApp

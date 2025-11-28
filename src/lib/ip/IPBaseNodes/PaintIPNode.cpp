@@ -43,9 +43,7 @@ namespace
             }
             catch (const std::exception& e)
             {
-                std::cout
-                    << "ERROR: Unable to get the frame from the pen component: "
-                    << e.what() << "'\n";
+                std::cout << "ERROR: Unable to get the frame from the pen component: " << e.what() << "'\n";
             }
         }
 
@@ -55,8 +53,7 @@ namespace
     // Calculates the opacity based on the distance from the annotated frame to
     // make the ghosted annotation more visible closer to the frame and less
     // visible further away
-    float getGhostOpacity(const int frame, const int startFrame,
-                          const int duration)
+    float getGhostOpacity(const int frame, const int startFrame, const int duration)
     {
         constexpr float minOpacity = 0.075;
         float ghostOpacity = 1.0;
@@ -64,16 +61,12 @@ namespace
         if (frame > startFrame) // Command starts before the current frame
                                 // (ghostBefore)
         {
-            ghostOpacity = static_cast<float>(duration)
-                               / static_cast<float>(frame - startFrame)
-                           + minOpacity;
+            ghostOpacity = static_cast<float>(duration) / static_cast<float>(frame - startFrame) + minOpacity;
         }
         if (frame < startFrame) // Command starts after the current frame
                                 // (ghostAfter)
         {
-            ghostOpacity = static_cast<float>(duration)
-                               / static_cast<float>(startFrame - frame)
-                           + minOpacity;
+            ghostOpacity = static_cast<float>(duration) / static_cast<float>(startFrame - frame) + minOpacity;
         }
 
         return ghostOpacity;
@@ -84,12 +77,9 @@ namespace
     // visibility range settings)
     // 2. Commands that end *before* the current frame
     // 3. Commands that start *after* the current frame
-    auto
-    separateCommandsByFrameGroup(const PaintIPNode::LocalCommands& commands,
-                                 const int frame, const size_t eye)
+    auto separateCommandsByFrameGroup(const PaintIPNode::LocalCommands& commands, const int frame, const size_t eye)
     {
-        PaintIPNode::LocalCommands
-            currentFrameCommands; // visible commands, excluding hold and ghost
+        PaintIPNode::LocalCommands currentFrameCommands; // visible commands, excluding hold and ghost
         PerFramePaintCommands beforeCommands;
         PerFramePaintCommands afterCommands;
 
@@ -102,8 +92,7 @@ namespace
             }
 
             // Don't add polylines with 0 points
-            if (auto* localPolyLine =
-                    dynamic_cast<PaintIPNode::LocalPolyLine*>(localCommand))
+            if (auto* localPolyLine = dynamic_cast<PaintIPNode::LocalPolyLine*>(localCommand))
             {
                 if (localPolyLine != nullptr && localPolyLine->npoints <= 0)
                 {
@@ -114,8 +103,7 @@ namespace
             const int startFrame = localCommand->startFrame;
             const int endFrame = startFrame + localCommand->duration - 1;
 
-            if (frame >= startFrame
-                && frame <= endFrame) // Command is visible on the current frame
+            if (frame >= startFrame && frame <= endFrame) // Command is visible on the current frame
             {
                 currentFrameCommands.push_back(localCommand);
             }
@@ -134,45 +122,36 @@ namespace
             }
         }
 
-        return std::make_tuple(currentFrameCommands, beforeCommands,
-                               afterCommands);
+        return std::make_tuple(currentFrameCommands, beforeCommands, afterCommands);
     }
 
-    void addBeforeCommands(PaintIPNode::LocalCommands* allCommands,
-                           PaintIPNode::LocalCommands* currentFrameCommands,
-                           const PerFramePaintCommands& beforeCommands,
-                           const PaintEffects& paintEffects, const int frame)
+    void addBeforeCommands(PaintIPNode::LocalCommands* allCommands, PaintIPNode::LocalCommands* currentFrameCommands,
+                           const PerFramePaintCommands& beforeCommands, const PaintEffects& paintEffects, const int frame)
     {
         int levelIndex = 1;
         bool isHoldedCommandsInFirstLevel = false;
 
-        bool isNewAnnotation = std::any_of(
-            currentFrameCommands->begin(), currentFrameCommands->end(),
-            [&frame](const auto* command)
-            { return command->startFrame == frame; });
+        bool isNewAnnotation = std::any_of(currentFrameCommands->begin(), currentFrameCommands->end(),
+                                           [&frame](const auto* command) { return command->startFrame == frame; });
 
         for (const auto& beforeCommand : beforeCommands)
         {
-            int ghostLevel =
-                levelIndex - (isHoldedCommandsInFirstLevel ? 1 : 0);
+            int ghostLevel = levelIndex - (isHoldedCommandsInFirstLevel ? 1 : 0);
 
             for (auto* command : beforeCommand.second)
             {
                 // Keep held annotations on the current frame only if there is
                 // no new annotation to add
-                if (levelIndex == 1 && paintEffects.hold != 0
-                    && !isNewAnnotation)
+                if (levelIndex == 1 && paintEffects.hold != 0 && !isNewAnnotation)
                 {
                     isHoldedCommandsInFirstLevel = true;
                     command->ghostOn = true;
 
-                    if (auto* polyLine =
-                            dynamic_cast<PaintIPNode::LocalPolyLine*>(command))
+                    if (auto* polyLine = dynamic_cast<PaintIPNode::LocalPolyLine*>(command))
                     {
                         command->ghostColor = polyLine->color;
                     }
-                    else if (auto* text =
-                                 dynamic_cast<PaintIPNode::LocalText*>(command))
+                    else if (auto* text = dynamic_cast<PaintIPNode::LocalText*>(command))
                     {
                         command->ghostColor = text->color;
                     }
@@ -180,15 +159,12 @@ namespace
                     currentFrameCommands->push_back(command);
                 }
 
-                if (paintEffects.ghost != 0
-                    && paintEffects.ghostBefore >= ghostLevel)
+                if (paintEffects.ghost != 0 && paintEffects.ghostBefore >= ghostLevel)
                 {
                     command->ghostOn = true;
-                    command->ghostColor = PaintIPNode::Color(
-                        1.0, 0.0, 0.0, 1.0); // Ghosted "Before" commands
-                                             // are drawn in green
-                    command->ghostColor[3] = getGhostOpacity(
-                        frame, command->startFrame, command->duration);
+                    command->ghostColor = PaintIPNode::Color(1.0, 0.0, 0.0, 1.0); // Ghosted "Before" commands
+                                                                                  // are drawn in green
+                    command->ghostColor[3] = getGhostOpacity(frame, command->startFrame, command->duration);
                     allCommands->push_back(command);
                 }
             }
@@ -196,8 +172,7 @@ namespace
         }
     }
 
-    void addAfterCommands(PaintIPNode::LocalCommands* allCommands,
-                          const PerFramePaintCommands& afterCommands,
+    void addAfterCommands(PaintIPNode::LocalCommands* allCommands, const PerFramePaintCommands& afterCommands,
                           const PaintEffects& paintEffects, const int frame)
     {
         int levelIndex = 1;
@@ -206,15 +181,12 @@ namespace
         {
             for (auto* command : afterCommand.second)
             {
-                if (paintEffects.ghost != 0
-                    && paintEffects.ghostAfter >= levelIndex)
+                if (paintEffects.ghost != 0 && paintEffects.ghostAfter >= levelIndex)
                 {
                     command->ghostOn = true;
-                    command->ghostColor = PaintIPNode::Color(
-                        0.0, 1.0, 0.0,
-                        1.0); // Ghosted "After" commands are drawn in red
-                    command->ghostColor[3] = getGhostOpacity(
-                        frame, command->startFrame, command->duration);
+                    command->ghostColor = PaintIPNode::Color(0.0, 1.0, 0.0,
+                                                             1.0); // Ghosted "After" commands are drawn in red
+                    command->ghostColor[3] = getGhostOpacity(frame, command->startFrame, command->duration);
                     allCommands->push_back(command);
                 }
             }
@@ -222,9 +194,7 @@ namespace
         }
     }
 
-    void
-    addVisibleCommands(PaintIPNode::LocalCommands* allCommands,
-                       const PaintIPNode::LocalCommands& currentFrameCommands)
+    void addVisibleCommands(PaintIPNode::LocalCommands* allCommands, const PaintIPNode::LocalCommands& currentFrameCommands)
     {
         for (auto* command : currentFrameCommands)
         {
@@ -233,23 +203,17 @@ namespace
         }
     }
 
-    PaintIPNode::LocalCommands
-    generateVisibleCommands(const PaintIPNode::LocalCommands& commands,
-                            const int frame, const size_t eye,
-                            const PaintEffects& paintEffects)
+    PaintIPNode::LocalCommands generateVisibleCommands(const PaintIPNode::LocalCommands& commands, const int frame, const size_t eye,
+                                                       const PaintEffects& paintEffects)
     {
-        PaintIPNode::LocalCommands
-            allCommands; // visible commands, including hold and ghost
-        PaintIPNode::LocalCommands
-            currentFrameCommands; // visible commands, excluding hold and ghost
+        PaintIPNode::LocalCommands allCommands;          // visible commands, including hold and ghost
+        PaintIPNode::LocalCommands currentFrameCommands; // visible commands, excluding hold and ghost
         PerFramePaintCommands beforeCommands;
         PerFramePaintCommands afterCommands;
 
-        std::tie(currentFrameCommands, beforeCommands, afterCommands) =
-            separateCommandsByFrameGroup(commands, frame, eye);
+        std::tie(currentFrameCommands, beforeCommands, afterCommands) = separateCommandsByFrameGroup(commands, frame, eye);
 
-        addBeforeCommands(&allCommands, &currentFrameCommands, beforeCommands,
-                          paintEffects, frame);
+        addBeforeCommands(&allCommands, &currentFrameCommands, beforeCommands, paintEffects, frame);
         addAfterCommands(&allCommands, afterCommands, paintEffects, frame);
         addVisibleCommands(&allCommands, currentFrameCommands);
 
@@ -266,8 +230,7 @@ namespace IPCore
     using namespace TwkPaint;
     using namespace TwkGLText;
 
-    PaintIPNode::PaintIPNode(const std::string& name, const NodeDefinition* def,
-                             IPGraph* g, GroupIPNode* group)
+    PaintIPNode::PaintIPNode(const std::string& name, const NodeDefinition* def, IPGraph* g, GroupIPNode* group)
         : IPNode(name, def, g, group)
     {
         //
@@ -315,32 +278,18 @@ namespace IPCore
         const IntProperty* durationP = c->property<IntProperty>("duration");
 
         const float width = widthP && widthP->size() ? widthP->front() : 0.01f;
-        const Vec4f color = colorP && colorP->size()
-                                ? colorP->front()
-                                : Vec4f(1.0, 1.0, 1.0, 1.0);
-        const string brush =
-            brushP && brushP->size() ? brushP->front() : string("circle");
-        const unsigned int join =
-            joinP && joinP->size() ? joinP->front() : Path::RoundJoin;
-        const unsigned int cap =
-            capP && capP->size() ? capP->front() : Path::SquareCap;
+        const Vec4f color = colorP && colorP->size() ? colorP->front() : Vec4f(1.0, 1.0, 1.0, 1.0);
+        const string brush = brushP && brushP->size() ? brushP->front() : string("circle");
+        const unsigned int join = joinP && joinP->size() ? joinP->front() : Path::RoundJoin;
+        const unsigned int cap = capP && capP->size() ? capP->front() : Path::SquareCap;
         const int debug = debugP && debugP->size() ? debugP->front() : 0;
-        const unsigned int mode =
-            modeP && modeP->size() ? modeP->front() : Paint::PolyLine::OverMode;
-        const unsigned int splat =
-            splatP && splatP->size() ? splatP->front() : 0;
-        const unsigned int version = versionP && versionP->size()
-                                         ? versionP->front()
-                                         : protocolVersion();
+        const unsigned int mode = modeP && modeP->size() ? modeP->front() : Paint::PolyLine::OverMode;
+        const unsigned int splat = splatP && splatP->size() ? splatP->front() : 0;
+        const unsigned int version = versionP && versionP->size() ? versionP->front() : protocolVersion();
         const int eye = eyeP && eyeP->size() ? eyeP->front() : 2;
 
-        const int startFrame =
-            (startFrameP != nullptr && startFrameP->size() != 0)
-                ? startFrameP->front()
-                : getStartFrame(*c);
-        const int duration = (durationP != nullptr && durationP->size() != 0)
-                                 ? durationP->front()
-                                 : 1;
+        const int startFrame = (startFrameP != nullptr && startFrameP->size() != 0) ? startFrameP->front() : getStartFrame(*c);
+        const int duration = (durationP != nullptr && durationP->size() != 0) ? durationP->front() : 1;
 
         p.width = width;
         p.color = color;
@@ -356,19 +305,14 @@ namespace IPCore
         p.startFrame = startFrame;
         p.duration = duration;
 
-        if (widthP && pointsP && widthP->size() == pointsP->size()
-            && widthP->size() > 1)
+        if (widthP && pointsP && widthP->size() == pointsP->size() && widthP->size() > 1)
         {
-            p.widths.assign(static_cast<const float*>(widthP->rawData()),
-                            static_cast<const float*>(widthP->rawData())
-                                + widthP->size());
+            p.widths.assign(static_cast<const float*>(widthP->rawData()), static_cast<const float*>(widthP->rawData()) + widthP->size());
         }
 
         if (pointsP && pointsP->size())
         {
-            p.points.assign(static_cast<const Vec2f*>(pointsP->rawData()),
-                            static_cast<const Vec2f*>(pointsP->rawData())
-                                + pointsP->size());
+            p.points.assign(static_cast<const Vec2f*>(pointsP->rawData()), static_cast<const Vec2f*>(pointsP->rawData()) + pointsP->size());
             p.npoints = pointsP->size();
         }
         else
@@ -407,35 +351,23 @@ namespace IPCore
         const IntProperty* durationP = c->property<IntProperty>("duration");
         const IntProperty* holdP = c->property<IntProperty>("hold");
         const IntProperty* ghostP = c->property<IntProperty>("ghost");
-        const IntProperty* ghostBeforeP =
-            c->property<IntProperty>("ghostBefore");
+        const IntProperty* ghostBeforeP = c->property<IntProperty>("ghostBefore");
         const IntProperty* ghostAfterP = c->property<IntProperty>("ghostAfter");
 
         const float size = sizeP && sizeP->size() ? sizeP->front() : 0.01f;
         const float scale = scaleP && scaleP->size() ? scaleP->front() : 1.0f;
         const float rot = rotP && rotP->size() ? rotP->front() : 0.0f;
         const float space = spaceP && spaceP->size() ? spaceP->front() : 1.0f;
-        const Vec4f color = colorP && colorP->size()
-                                ? colorP->front()
-                                : Vec4f(1.0, 1.0, 1.0, 1.0);
-        const Vec2f pos =
-            posP && posP->size() ? posP->front() : Vec2f(0.0, 0.0);
-        const string font =
-            fontP && fontP->size() ? fontP->front() : string("");
-        const string origin =
-            originP && originP->size() ? originP->front() : string("");
-        const string text =
-            textP && textP->size() ? textP->front() : string("");
+        const Vec4f color = colorP && colorP->size() ? colorP->front() : Vec4f(1.0, 1.0, 1.0, 1.0);
+        const Vec2f pos = posP && posP->size() ? posP->front() : Vec2f(0.0, 0.0);
+        const string font = fontP && fontP->size() ? fontP->front() : string("");
+        const string origin = originP && originP->size() ? originP->front() : string("");
+        const string text = textP && textP->size() ? textP->front() : string("");
         const int debug = debugP && debugP->size() ? debugP->front() : 0;
         const int eye = eyeP && eyeP->size() ? eyeP->front() : 2;
 
-        const int startFrame =
-            (startFrameP != nullptr && startFrameP->size() != 0)
-                ? startFrameP->front()
-                : 0;
-        const int duration = (durationP != nullptr && durationP->size() != 0)
-                                 ? durationP->front()
-                                 : 0;
+        const int startFrame = (startFrameP != nullptr && startFrameP->size() != 0) ? startFrameP->front() : 0;
+        const int duration = (durationP != nullptr && durationP->size() != 0) ? durationP->front() : 0;
 
         p.ptsize = size * 100.0 * 100.0;
         p.scale = 1.0 / 80.0 / 10.0 * scale;
@@ -477,16 +409,10 @@ namespace IPCore
         IPNode* sessionNode = graph()->sessionNode();
         if (sessionNode != nullptr)
         {
-            const IntProperty* holdProperty =
-                sessionNode->property<IntProperty>("paintEffects", "hold");
-            const IntProperty* ghostProperty =
-                sessionNode->property<IntProperty>("paintEffects", "ghost");
-            const IntProperty* ghostBeforeProperty =
-                sessionNode->property<IntProperty>("paintEffects",
-                                                   "ghostBefore");
-            const IntProperty* ghostAfterProperty =
-                sessionNode->property<IntProperty>("paintEffects",
-                                                   "ghostAfter");
+            const IntProperty* holdProperty = sessionNode->property<IntProperty>("paintEffects", "hold");
+            const IntProperty* ghostProperty = sessionNode->property<IntProperty>("paintEffects", "ghost");
+            const IntProperty* ghostBeforeProperty = sessionNode->property<IntProperty>("paintEffects", "ghostBefore");
+            const IntProperty* ghostAfterProperty = sessionNode->property<IntProperty>("paintEffects", "ghostAfter");
 
             if (holdProperty != nullptr && holdProperty->size() != 0)
             {
@@ -498,14 +424,12 @@ namespace IPCore
                 m_paintEffects.ghost = ghostProperty->front();
             }
 
-            if (ghostBeforeProperty != nullptr
-                && ghostBeforeProperty->size() != 0)
+            if (ghostBeforeProperty != nullptr && ghostBeforeProperty->size() != 0)
             {
                 m_paintEffects.ghostBefore = ghostBeforeProperty->front();
             }
 
-            if (ghostAfterProperty != nullptr
-                && ghostAfterProperty->size() != 0)
+            if (ghostAfterProperty != nullptr && ghostAfterProperty->size() != 0)
             {
                 m_paintEffects.ghostAfter = ghostAfterProperty->front();
             }
@@ -543,13 +467,11 @@ namespace IPCore
         IPNode::propertyChanged(p);
     }
 
-    static void fixV1Coordinates(Vec2fProperty* p,
-                                 const IPNode::ImageStructureInfo& info)
+    static void fixV1Coordinates(Vec2fProperty* p, const IPNode::ImageStructureInfo& info)
     {
         const float aspect = float(info.width) / float(info.height) / 2.0;
         const Mat44f& O = info.orientation;
-        Mat33f M(O(0, 0), O(0, 1), O(0, 2), O(1, 0), O(1, 1), O(1, 2), O(2, 0),
-                 O(2, 1), O(2, 2));
+        Mat33f M(O(0, 0), O(0, 1), O(0, 2), O(1, 0), O(1, 1), O(1, 2), O(2, 0), O(2, 1), O(2, 2));
 
         //
         //  DPX orientation was modified so it has to be treated uniquely
@@ -566,8 +488,7 @@ namespace IPCore
         }
     }
 
-    void PaintIPNode::readCompleted(const string& typeName,
-                                    unsigned int version)
+    void PaintIPNode::readCompleted(const string& typeName, unsigned int version)
     {
         Components& comps = components();
 
@@ -577,8 +498,7 @@ namespace IPCore
             //  Need to transform the cooridinates to version 2 style
             //
 
-            ImageStructureInfo info = imageStructureInfo(
-                graph()->contextForFrame(graph()->cache().inFrame()));
+            ImageStructureInfo info = imageStructureInfo(graph()->contextForFrame(graph()->cache().inFrame()));
 
             for (size_t i = 0; i < comps.size(); i++)
             {
@@ -590,8 +510,7 @@ namespace IPCore
 
                     if (s == "pen:")
                     {
-                        if (Vec2fProperty* p =
-                                c->property<Vec2fProperty>("points"))
+                        if (Vec2fProperty* p = c->property<Vec2fProperty>("points"))
                         {
                             fixV1Coordinates(p, info);
                         }
@@ -613,8 +532,7 @@ namespace IPCore
 
                     if (s == "text:")
                     {
-                        if (Vec2fProperty* p =
-                                c->property<Vec2fProperty>("position"))
+                        if (Vec2fProperty* p = c->property<Vec2fProperty>("position"))
                         {
                             fixV1Coordinates(p, info);
                         }
@@ -705,50 +623,6 @@ namespace IPCore
         if (showPaint)
         {
             std::lock_guard<std::mutex> commandsGuard{m_commandsMutex};
-            if (m_frameMap.count(frame) != 0)
-            {
-                Components& comps = m_frameMap[frame];
-                size_t s = comps.size();
-
-                for (size_t q = 0; q < s; q++)
-                {
-                    Component* c = comps[q];
-                    int numProps = c->properties().size();
-
-                    if (m_penStrokes.count(c) >= 1)
-                    {
-                        if (numProps == 0)
-                        {
-                            m_penStrokes.erase(c);
-                        }
-                        else
-                        {
-                            LocalPolyLine& pl = m_penStrokes[c];
-
-                            if (pl.eye == 2 || (pl.eye == context.eye))
-                            {
-                                head->commands.push_back(&pl);
-                            }
-                        }
-                    }
-                    else if (m_texts.count(c) >= 1)
-                    {
-                        if (numProps == 0)
-                        {
-                            m_texts.erase(c);
-                        }
-                        else
-                        {
-                            LocalText& t = m_texts[c];
-
-                            if (t.eye == 2 || (t.eye == context.eye))
-                            {
-                                head->commands.push_back(&t);
-                            }
-                        }
-                    }
-                }
-            }
 
             // generateVisibleCommands should only get the commands that are in
             // the order stack (e.g. m_frameMap)
@@ -771,19 +645,15 @@ namespace IPCore
 
             setPaintEffects();
 
-            LocalCommands visibleCommands = generateVisibleCommands(
-                frameCommands, frame, context.eye, m_paintEffects);
+            LocalCommands visibleCommands = generateVisibleCommands(frameCommands, frame, context.eye, m_paintEffects);
 
             for (auto* visibleCommand : visibleCommands)
             {
-                if (auto* polyLine = dynamic_cast<PaintIPNode::LocalPolyLine*>(
-                        visibleCommand))
+                if (auto* polyLine = dynamic_cast<PaintIPNode::LocalPolyLine*>(visibleCommand))
                 {
                     head->commands.push_back(polyLine);
                 }
-                else if (auto* localText =
-                             dynamic_cast<PaintIPNode::LocalText*>(
-                                 visibleCommand))
+                else if (auto* localText = dynamic_cast<PaintIPNode::LocalText*>(visibleCommand))
                 {
                     head->commands.push_back(localText);
                 }
@@ -795,8 +665,7 @@ namespace IPCore
 
             for (size_t i = 0; i < props.size(); i++)
             {
-                if (const StringProperty* sp =
-                        dynamic_cast<StringProperty*>(props[i]))
+                if (const StringProperty* sp = dynamic_cast<StringProperty*>(props[i]))
                 {
                     if (sp->size())
                     {

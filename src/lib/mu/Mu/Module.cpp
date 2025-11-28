@@ -64,8 +64,7 @@ namespace Mu
         return -1;
     }
 
-    Module* Module::loadDSO(const String& soName, Name name, int i,
-                            Process* process, Context* context)
+    Module* Module::loadDSO(const String& soName, Name name, int i, Process* process, Context* context)
     {
         DSOInterface dsoInterface;
         int index;
@@ -81,13 +80,11 @@ namespace Mu
                 return m;
             }
 
-            cerr << "WARNING: error intializing already loaded compiled module "
-                 << soName << endl;
+            cerr << "WARNING: error intializing already loaded compiled module " << soName << endl;
         }
 
 #ifdef HAVE_DLOPEN
-        if (dsoInterface._handle =
-                dlopen(soName.c_str(), RTLD_NOW | RTLD_GLOBAL))
+        if (dsoInterface._handle = dlopen(soName.c_str(), RTLD_NOW | RTLD_GLOBAL))
         {
             if (void* sym = dlsym(dsoInterface._handle, initName.c_str()))
 #if 0
@@ -99,17 +96,14 @@ namespace Mu
 
         if (dsoInterface._handle = LoadLibrary((LPCTSTR)uSoName.c_str()))
         {
-            if (void* sym = GetProcAddress((HMODULE)dsoInterface._handle,
-                                           initName.c_str()))
+            if (void* sym = GetProcAddress((HMODULE)dsoInterface._handle, initName.c_str()))
 #endif
             {
                 dsoInterface._init = (InitFunction)sym;
                 Context::PrimaryBit fence(context, false);
-                Context::SourceFileScope fileScope(context,
-                                                   context->internName(soName));
+                Context::SourceFileScope fileScope(context, context->internName(soName));
 
-                if (Module* m =
-                        (*dsoInterface._init)(name.c_str(), context, process))
+                if (Module* m = (*dsoInterface._init)(name.c_str(), context, process))
                 {
                     dsoInterface._filename = soName;
                     _dsoModules.push_back(dsoInterface);
@@ -117,13 +111,11 @@ namespace Mu
                     return m;
                 }
 
-                cerr << "WARNING: unable to intialize compiled module "
-                     << soName << endl;
+                cerr << "WARNING: unable to intialize compiled module " << soName << endl;
             }
             else
             {
-                cerr << "WARING: there is a bogus compiled module at " << soName
-                     << endl;
+                cerr << "WARING: there is a bogus compiled module at " << soName << endl;
 #ifndef PLATFORM_WINDOWS
                 cerr << dlerror() << endl;
 #endif
@@ -140,8 +132,7 @@ namespace Mu
         return 0;
     }
 
-    Module* Module::loadMUC(const String& mucName, Name name, Process* process,
-                            Context* context)
+    Module* Module::loadMUC(const String& mucName, Name name, Process* process, Context* context)
     {
         Archive::Reader reader(process, context);
         reader.setDebugOutput(_debugArchive);
@@ -154,8 +145,7 @@ namespace Mu
             {
                 Environment::PathComponents path;
                 Environment::pathComponents(mucName, path);
-                Context::SourceFileScope fileScope(
-                    context, context->internName(mucName));
+                Context::SourceFileScope fileScope(context, context->internName(mucName));
 
                 // cout << "INFO: reading muc file " << mucName << endl;
                 reader.read(infile);
@@ -184,14 +174,12 @@ namespace Mu
             }
             catch (std::exception& e)
             {
-                cerr << "ERROR: while loading muc module \"" << mucName << "\""
-                     << endl;
+                cerr << "ERROR: while loading muc module \"" << mucName << "\"" << endl;
                 cerr << "ERROR: " << e.what() << endl;
             }
             catch (...)
             {
-                cerr << "ERROR: while loading muc module \"" << mucName << "\""
-                     << endl;
+                cerr << "ERROR: while loading muc module \"" << mucName << "\"" << endl;
                 cerr << "ERROR: unknown exception" << endl;
             }
 
@@ -202,21 +190,18 @@ namespace Mu
         return 0;
     }
 
-    Module* Module::loadSource(const String& muName, Name name,
-                               Process* process, Context* context)
+    Module* Module::loadSource(const String& muName, Name name, Process* process, Context* context)
     {
         Context::ModuleList modules;
 
         try
         {
-            Context::SourceFileScope fileScope(context,
-                                               context->internName(muName));
+            Context::SourceFileScope fileScope(context, context->internName(muName));
             context->evalFile(muName.c_str(), process, modules);
         }
         catch (TypedValue& val)
         {
-            cerr << "ERROR: while loading source module \"" << muName << "\""
-                 << endl;
+            cerr << "ERROR: while loading source module \"" << muName << "\"" << endl;
             cerr << "ERROR: caught ";
 
             if (val._type)
@@ -235,20 +220,16 @@ namespace Mu
         }
         catch (std::exception& e)
         {
-            cerr << "ERROR: while loading source module \"" << muName << "\""
-                 << endl;
+            cerr << "ERROR: while loading source module \"" << muName << "\"" << endl;
             cerr << "ERROR: " << e.what() << endl;
         }
         catch (...)
         {
-            cerr << "ERROR: while loading source module \"" << muName << "\""
-                 << endl;
+            cerr << "ERROR: while loading source module \"" << muName << "\"" << endl;
             cerr << "ERROR: unknown exception" << endl;
         }
 
-        Module* m =
-            context->globalScope()->findSymbolOfTypeByQualifiedName<Module>(
-                name);
+        Module* m = context->globalScope()->findSymbolOfTypeByQualifiedName<Module>(name);
         if (m)
             m->_location = muName;
         return m;
@@ -358,8 +339,7 @@ namespace Mu
 
     Module* Module::load(Name name, Process* process, Context* context)
     {
-        if (Module* m =
-                context->findSymbolOfTypeByQualifiedName<Module>(name, true))
+        if (Module* m = context->findSymbolOfTypeByQualifiedName<Module>(name, true))
         {
             //
             //  If the module is already defined, return it. Loading an
@@ -415,8 +395,7 @@ namespace Mu
                         Archive::Names names;
                         writer.setDebugOutput(_debugArchive);
                         writer.setAnnotationOutput(true);
-                        writer.collectSymbolsFromFile(
-                            context->internName(muName), symbols);
+                        writer.collectSymbolsFromFile(context->internName(muName), symbols);
                         writer.collectNames(symbols, names);
                         writer.add(symbols);
                         writer.add(names);
@@ -446,8 +425,7 @@ namespace Mu
 
                             if (writer.writeDocumentation(str) > 0)
                             {
-                                ofstream dfile(mudName.c_str(),
-                                               ios_base::binary);
+                                ofstream dfile(mudName.c_str(), ios_base::binary);
                                 dfile << str.str();
                                 cout << "INFO: compiled " << mudName << endl;
                             }

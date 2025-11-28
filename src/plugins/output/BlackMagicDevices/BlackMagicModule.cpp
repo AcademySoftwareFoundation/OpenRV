@@ -98,9 +98,7 @@ namespace BlackMagicDevices
 #if defined(PLATFORM_WINDOWS)
         CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 
-        HRESULT result =
-            CoCreateInstance(CLSID_CDeckLinkIterator, nullptr, CLSCTX_ALL,
-                             IID_IDeckLinkIterator, (void**)&deviceIterator);
+        HRESULT result = CoCreateInstance(CLSID_CDeckLinkIterator, nullptr, CLSCTX_ALL, IID_IDeckLinkIterator, (void**)&deviceIterator);
         if (FAILED(result))
         {
             deviceIterator = nullptr;
@@ -111,8 +109,7 @@ namespace BlackMagicDevices
 
         if (deviceIterator == nullptr)
         {
-            TWK_THROW_EXC_STREAM(
-                "Decklink driver failed to initialize or is not installed");
+            TWK_THROW_EXC_STREAM("Decklink driver failed to initialize or is not installed");
         }
 
         return deviceIterator;
@@ -123,26 +120,18 @@ namespace BlackMagicDevices
     //
     void setBmdDeviceProfile(const std::string& bmdDeviceProfile)
     {
-        static const std::map<std::string, BMDProfileID> bmdProfileStringToId =
-            {{"bmdProfileOneSubDeviceFullDuplex",
-              bmdProfileOneSubDeviceFullDuplex},
-             {"bmdProfileOneSubDeviceHalfDuplex",
-              bmdProfileOneSubDeviceHalfDuplex},
-             {"bmdProfileTwoSubDevicesFullDuplex",
-              bmdProfileTwoSubDevicesFullDuplex},
-             {"bmdProfileTwoSubDevicesHalfDuplex",
-              bmdProfileTwoSubDevicesHalfDuplex},
-             {"bmdProfileFourSubDevicesHalfDuplex",
-              bmdProfileFourSubDevicesHalfDuplex}};
+        static const std::map<std::string, BMDProfileID> bmdProfileStringToId = {
+            {"bmdProfileOneSubDeviceFullDuplex", bmdProfileOneSubDeviceFullDuplex},
+            {"bmdProfileOneSubDeviceHalfDuplex", bmdProfileOneSubDeviceHalfDuplex},
+            {"bmdProfileTwoSubDevicesFullDuplex", bmdProfileTwoSubDevicesFullDuplex},
+            {"bmdProfileTwoSubDevicesHalfDuplex", bmdProfileTwoSubDevicesHalfDuplex},
+            {"bmdProfileFourSubDevicesHalfDuplex", bmdProfileFourSubDevicesHalfDuplex}};
 
-        const auto mapIter =
-            bmdProfileStringToId.find(evBlackmagicProfile.getValue());
+        const auto mapIter = bmdProfileStringToId.find(evBlackmagicProfile.getValue());
 
         if (mapIter == bmdProfileStringToId.end())
         {
-            std::cerr
-                << "ERROR: Unrecognized Blackmagic DeckLink device profile: "
-                << bmdDeviceProfile << std::endl;
+            std::cerr << "ERROR: Unrecognized Blackmagic DeckLink device profile: " << bmdDeviceProfile << std::endl;
             return;
         }
 
@@ -177,20 +166,16 @@ namespace BlackMagicDevices
         RAII<IDeckLink> deckLinkDevice(nullptr);
         if (deckLinkIterator.get()->Next(&deckLinkDevice.getRef()) != S_OK)
         {
-            std::cerr
-                << "ERROR: Could not get the IDeckLink interface to activate "
-                   "the requested profile: "
-                << bmdDeviceProfile << std::endl;
+            std::cerr << "ERROR: Could not get the IDeckLink interface to activate "
+                         "the requested profile: "
+                      << bmdDeviceProfile << std::endl;
 
             return;
         }
 
         // Get the IDeckLinkProfileAttributes interface if available
         RAII<IDeckLinkProfileAttributes> deckLinkProfileAttributes(nullptr);
-        if (deckLinkDevice.get()->QueryInterface(
-                IID_IDeckLinkProfileAttributes,
-                (void**)&deckLinkProfileAttributes.getRef())
-            != S_OK)
+        if (deckLinkDevice.get()->QueryInterface(IID_IDeckLinkProfileAttributes, (void**)&deckLinkProfileAttributes.getRef()) != S_OK)
         {
             std::cerr << "ERROR: Could not get the IDeckLinkProfileAttributes "
                          "interface "
@@ -201,14 +186,11 @@ namespace BlackMagicDevices
         }
 
         // Get Profile ID attribute
-        if (deckLinkProfileAttributes.get()->GetInt(BMDDeckLinkProfileID,
-                                                    &currentProfileIDInt)
-            != S_OK)
+        if (deckLinkProfileAttributes.get()->GetInt(BMDDeckLinkProfileID, &currentProfileIDInt) != S_OK)
         {
-            std::cerr
-                << "ERROR: Could not get the BMDDeckLinkProfileID to activate "
-                   "the requested profile: "
-                << bmdDeviceProfile << std::endl;
+            std::cerr << "ERROR: Could not get the BMDDeckLinkProfileID to activate "
+                         "the requested profile: "
+                      << bmdDeviceProfile << std::endl;
 
             return;
         }
@@ -217,23 +199,18 @@ namespace BlackMagicDevices
         // active
         if (currentProfileIDInt == static_cast<int64_t>(bmdProfileId))
         {
-            std::cout << "INFO: DeckLink device profile was already activated: "
-                      << bmdDeviceProfile << std::endl;
+            std::cout << "INFO: DeckLink device profile was already activated: " << bmdDeviceProfile << std::endl;
 
             return;
         }
 
         // Get the IDeckLinkProfileManager interface if available
         RAII<IDeckLinkProfileManager> deckLinkProfileManager(nullptr);
-        if (deckLinkDevice.get()->QueryInterface(
-                IID_IDeckLinkProfileManager,
-                (void**)&deckLinkProfileManager.getRef())
-            != S_OK)
+        if (deckLinkDevice.get()->QueryInterface(IID_IDeckLinkProfileManager, (void**)&deckLinkProfileManager.getRef()) != S_OK)
         {
-            std::cerr
-                << "ERROR: Could not get the IDeckLinkProfileManager interface "
-                   "to activate the requested profile: "
-                << bmdDeviceProfile << std::endl;
+            std::cerr << "ERROR: Could not get the IDeckLinkProfileManager interface "
+                         "to activate the requested profile: "
+                      << bmdDeviceProfile << std::endl;
 
             return;
         }
@@ -241,14 +218,12 @@ namespace BlackMagicDevices
         // Get the IDeckLinkProfile associated with the specified DeckLink
         // device profile id
         RAII<IDeckLinkProfile> deckLinkProfile(nullptr);
-        HRESULT result = deckLinkProfileManager.get()->GetProfile(
-            bmdProfileId, &deckLinkProfile.getRef());
+        HRESULT result = deckLinkProfileManager.get()->GetProfile(bmdProfileId, &deckLinkProfile.getRef());
         if (result != S_OK || !deckLinkProfile.get())
         {
-            std::cerr
-                << "ERROR: Could not get the IDeckLinkProfile associated with "
-                   "the requested profile: "
-                << bmdDeviceProfile << std::endl;
+            std::cerr << "ERROR: Could not get the IDeckLinkProfile associated with "
+                         "the requested profile: "
+                      << bmdDeviceProfile << std::endl;
 
             return;
         }
@@ -256,18 +231,14 @@ namespace BlackMagicDevices
         // Create profile callback object to determine when we have activated
         // requested profile
         std::shared_ptr<DeckLinkProfileCallback> deckLinkProfileCallback;
-        deckLinkProfileCallback =
-            std::make_shared<DeckLinkProfileCallback>(deckLinkProfile.get());
+        deckLinkProfileCallback = std::make_shared<DeckLinkProfileCallback>(deckLinkProfile.get());
 
         // Register IDeckLinkProfileCallback to monitor profile activation
-        if (deckLinkProfileManager.get()->SetCallback(
-                deckLinkProfileCallback.get())
-            != S_OK)
+        if (deckLinkProfileManager.get()->SetCallback(deckLinkProfileCallback.get()) != S_OK)
         {
-            std::cerr
-                << "ERROR: Could not register the profile callback to monitor "
-                   "the activation of the requested profile: "
-                << bmdDeviceProfile << std::endl;
+            std::cerr << "ERROR: Could not register the profile callback to monitor "
+                         "the activation of the requested profile: "
+                      << bmdDeviceProfile << std::endl;
             return;
         }
 
@@ -284,12 +255,10 @@ namespace BlackMagicDevices
         // Wait until profile change occurs.
         if (!deckLinkProfileCallback.get()->WaitForProfileActivation())
         {
-            std::cerr
-                << "ERROR: Timed out waiting for the new profile "
-                << bmdDeviceProfile
-                << " to be activated. Another application may be delaying the "
-                   "profile change."
-                << std::endl;
+            std::cerr << "ERROR: Timed out waiting for the new profile " << bmdDeviceProfile
+                      << " to be activated. Another application may be delaying the "
+                         "profile change."
+                      << std::endl;
             deckLinkProfileManager.get()->SetCallback(nullptr);
             return;
         }
@@ -297,8 +266,7 @@ namespace BlackMagicDevices
         deckLinkProfileManager.get()->SetCallback(nullptr);
 
         // Success if we reached this point
-        std::cout << "INFO: DeckLink device profile activated: "
-                  << bmdDeviceProfile << std::endl;
+        std::cout << "INFO: DeckLink device profile activated: " << bmdDeviceProfile << std::endl;
     }
 
     BlackMagicModule::BlackMagicModule(NativeDisplayPtr p)
@@ -319,8 +287,7 @@ namespace BlackMagicDevices
     string BlackMagicModule::SDKIdentifier() const
     {
         ostringstream str;
-        str << "DeckLink SDK Version "
-            << BLACKMAGIC_DECKLINK_API_VERSION_STRING;
+        str << "DeckLink SDK Version " << BLACKMAGIC_DECKLINK_API_VERSION_STRING;
         return str.str();
     }
 
@@ -361,8 +328,7 @@ namespace BlackMagicDevices
                 TWK_THROW_EXC_STREAM("Cannot get DeckLink device name");
             }
             char nameChar[256];
-            CFStringGetCString(name, nameChar, sizeof(nameChar),
-                               kCFStringEncodingMacRoman);
+            CFStringGetCString(name, nameChar, sizeof(nameChar), kCFStringEncodingMacRoman);
             CFRelease(name);
             string nameString(nameChar);
 #else
@@ -374,12 +340,9 @@ namespace BlackMagicDevices
             string nameString(name);
 #endif
 
-            if (deckLinkDevice->QueryInterface(IID_IDeckLinkOutput,
-                                               (void**)&playbackDevice)
-                == S_OK)
+            if (deckLinkDevice->QueryInterface(IID_IDeckLinkOutput, (void**)&playbackDevice) == S_OK)
             {
-                DeckLinkVideoDevice* device = new DeckLinkVideoDevice(
-                    this, nameString, deckLinkDevice, playbackDevice);
+                DeckLinkVideoDevice* device = new DeckLinkVideoDevice(this, nameString, deckLinkDevice, playbackDevice);
                 if (device->numVideoFormats() != 0)
                 {
                     m_devices.push_back(device);

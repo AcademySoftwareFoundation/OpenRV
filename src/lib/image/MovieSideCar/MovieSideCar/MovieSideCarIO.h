@@ -25,15 +25,13 @@ namespace TwkMovie
     class MovieSideCarIO : public MovieIO
     {
     public:
-        MovieSideCarIO(const std::string& pathToSideCar,
-                       bool cloneable = false);
+        MovieSideCarIO(const std::string& pathToSideCar, bool cloneable = false);
         virtual ~MovieSideCarIO();
 
         virtual std::string about() const;
         virtual MovieReader* movieReader() const;
         virtual MovieWriter* movieWriter() const;
-        virtual void getMovieInfo(const std::string& filename,
-                                  MovieInfo&) const;
+        virtual void getMovieInfo(const std::string& filename, MovieInfo&) const;
 
     private:
         std::string m_sidecarPath;

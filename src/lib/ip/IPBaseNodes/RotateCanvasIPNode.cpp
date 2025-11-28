@@ -17,9 +17,7 @@ namespace IPCore
     using namespace std;
     using namespace TwkMath;
 
-    RotateCanvasIPNode::RotateCanvasIPNode(const std::string& name,
-                                           const NodeDefinition* def,
-                                           IPGraph* graph, GroupIPNode* group)
+    RotateCanvasIPNode::RotateCanvasIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group)
         : IPNode(name, def, graph, group)
     {
         PropertyInfo* noSave = new PropertyInfo(PropertyInfo::NotPersistent);
@@ -35,8 +33,7 @@ namespace IPCore
         if (inputs().empty())
             return IPImage::newNoImage(this, "No Input");
 
-        const ImageStructureInfo info =
-            inputs()[0]->imageStructureInfo(context);
+        const ImageStructureInfo info = inputs()[0]->imageStructureInfo(context);
 
         Context c = context;
         c.allowInteractiveResize = false;
@@ -57,19 +54,16 @@ namespace IPCore
         if (rotate == Rotate90)
         {
             float r = (float)fbWidth / fbHeight;
-            image->textureMatrix.set(0, r, 0, -1.0f / r, 0, fbHeight, 0, 0,
-                                     1.0f);
+            image->textureMatrix.set(0, r, 0, -1.0f / r, 0, fbHeight, 0, 0, 1.0f);
         }
         else if (rotate == Rotate180)
         {
-            image->textureMatrix.set(-1.0f, 0, fbWidth, 0, -1.0f, fbHeight, 0,
-                                     0, 1.0f);
+            image->textureMatrix.set(-1.0f, 0, fbWidth, 0, -1.0f, fbHeight, 0, 0, 1.0f);
         }
         else if (rotate == Rotate270)
         {
             float r = (float)fbWidth / fbHeight;
-            image->textureMatrix.set(0, -r, fbWidth, 1.0f / r, 0, 0, 0, 0,
-                                     1.0f);
+            image->textureMatrix.set(0, -r, fbWidth, 1.0f / r, 0, 0, 0, 0, 1.0f);
         }
         if (rotate == Rotate90 || rotate == Rotate270)
         {
@@ -78,16 +72,13 @@ namespace IPCore
             image->height = tmp;
         }
 
-        IPImage* image2 =
-            new IPImage(this, IPImage::BlendRenderType, image->width,
-                        image->height, 1.0, IPImage::IntermediateBuffer);
+        IPImage* image2 = new IPImage(this, IPImage::BlendRenderType, image->width, image->height, 1.0, IPImage::IntermediateBuffer);
         image2->children = image;
         image2->shaderExpr = Shader::newSourceRGBA(image2);
         return image2;
     }
 
-    IPNode::ImageStructureInfo
-    RotateCanvasIPNode::imageStructureInfo(const Context& context) const
+    IPNode::ImageStructureInfo RotateCanvasIPNode::imageStructureInfo(const Context& context) const
     {
         Context c = context;
         c.allowInteractiveResize = false;

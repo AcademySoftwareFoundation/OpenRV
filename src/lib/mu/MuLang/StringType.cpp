@@ -44,8 +44,7 @@ using namespace std;
 typedef APIAllocatable::STLVector<TypedValue>::Type FormatArgs;
 typedef APIAllocatable::STLVector<Mu::String>::Type StringVector;
 
-static void throwBadFormatOpArgType(Thread& thread, int arg, char key,
-                                    const Type* atype)
+static void throwBadFormatOpArgType(Thread& thread, int arg, char key, const Type* atype)
 {
     ostringstream str;
     Process* p = thread.process();
@@ -53,8 +52,7 @@ static void throwBadFormatOpArgType(Thread& thread, int arg, char key,
 
     BadArgumentTypeException exc(thread);
     str << ": argument " << (arg + 1) << " of format operator (%)"
-        << " has type " << atype->fullyQualifiedName()
-        << " which is incompatible with format %" << key;
+        << " has type " << atype->fullyQualifiedName() << " which is incompatible with format %" << key;
     string temp(str.str());
     exc.message() += temp.c_str();
     throw exc;
@@ -137,8 +135,7 @@ Pointer string_string_string(Mu::Thread& NODE_THREAD, Pointer ptr)
         return stype->allocate("nil");
 }
 
-Pointer string_string_QMark_class_or_interface(Mu::Thread& NODE_THREAD,
-                                               Pointer ptr)
+Pointer string_string_QMark_class_or_interface(Mu::Thread& NODE_THREAD, Pointer ptr)
 {
     Object* obj = reinterpret_cast<Object*>(ptr);
     Process* p = NODE_THREAD.process();
@@ -209,8 +206,7 @@ Pointer string_string_vector_floatBSB_2ESB_(Mu::Thread& NODE_THREAD, Vector2f i)
 //  + operator
 //
 
-Pointer Plus__string_string_string(Mu::Thread& NODE_THREAD, Pointer ps1,
-                                   Pointer ps2)
+Pointer Plus__string_string_string(Mu::Thread& NODE_THREAD, Pointer ps1, Pointer ps2)
 {
     const StringType::String* s1 = reinterpret_cast<StringType::String*>(ps1);
     const StringType::String* s2 = reinterpret_cast<StringType::String*>(ps2);
@@ -246,8 +242,7 @@ Pointer Plus__string_string_string(Mu::Thread& NODE_THREAD, Pointer ps1,
 //  Assignment +=
 //
 
-Pointer Plus_EQ__stringAmp__stringAmp__string(Mu::Thread& NODE_THREAD,
-                                              Pointer pa, Pointer pb)
+Pointer Plus_EQ__stringAmp__stringAmp__string(Mu::Thread& NODE_THREAD, Pointer pa, Pointer pb)
 {
     Pointer* ppa = (Pointer*)pa;
     *ppa = Plus__string_string_string(NODE_THREAD, *ppa, pb);
@@ -286,8 +281,7 @@ bool bool_bool_string(Mu::Thread& NODE_THREAD, Pointer ptr)
     return *a == "true" ? true : false;
 }
 
-bool EQ_EQ__bool_string_string(Mu::Thread& NODE_THREAD, Pointer aptr,
-                               Pointer bptr)
+bool EQ_EQ__bool_string_string(Mu::Thread& NODE_THREAD, Pointer aptr, Pointer bptr)
 {
     const StringType::String* a = reinterpret_cast<StringType::String*>(aptr);
     const StringType::String* b = reinterpret_cast<StringType::String*>(bptr);
@@ -296,8 +290,7 @@ bool EQ_EQ__bool_string_string(Mu::Thread& NODE_THREAD, Pointer aptr,
     return *a == *b;
 }
 
-bool Bang_EQ__bool_string_string(Mu::Thread& NODE_THREAD, Pointer aptr,
-                                 Pointer bptr)
+bool Bang_EQ__bool_string_string(Mu::Thread& NODE_THREAD, Pointer aptr, Pointer bptr)
 {
     const StringType::String* a = reinterpret_cast<StringType::String*>(aptr);
     const StringType::String* b = reinterpret_cast<StringType::String*>(bptr);
@@ -314,11 +307,9 @@ bool Bang_EQ__bool_string_string(Mu::Thread& NODE_THREAD, Pointer aptr,
     return result;
 }
 
-static Pointer format_op(Mu::Thread& NODE_THREAD, Pointer fmtPtr,
-                         const FormatArgs& args)
+static Pointer format_op(Mu::Thread& NODE_THREAD, Pointer fmtPtr, const FormatArgs& args)
 {
-    const StringType::String* fmt =
-        reinterpret_cast<StringType::String*>(fmtPtr);
+    const StringType::String* fmt = reinterpret_cast<StringType::String*>(fmtPtr);
     Process* p = NODE_THREAD.process();
     MuLangContext* c = static_cast<MuLangContext*>(p->context());
     const StringType* stype = static_cast<const StringType*>(c->stringType());
@@ -335,22 +326,18 @@ static Pointer format_op(Mu::Thread& NODE_THREAD, Pointer fmtPtr,
     int regexec_result;
 
     while (!fmtstr.empty()
-           && (regexec_result = regexec(&StringType::_format_re, fmtstr.c_str(),
-                                        matches.size(), &matches.front(), 0))
-                  != REG_NOMATCH)
+           && (regexec_result = regexec(&StringType::_format_re, fmtstr.c_str(), matches.size(), &matches.front(), 0)) != REG_NOMATCH)
     {
         if (regexec_result)
         {
             char errtemp[256];
-            size_t n =
-                regerror(regexec_result, &StringType::_format_re, errtemp, 256);
+            size_t n = regerror(regexec_result, &StringType::_format_re, errtemp, 256);
             cout << "ERROR: format_op() => " << errtemp << endl;
         }
 
         if (matches[1].rm_so != size_t(-1))
         {
-            outstr << fmtstr.substr(matches[1].rm_so,
-                                    matches[1].rm_eo - matches[1].rm_so);
+            outstr << fmtstr.substr(matches[1].rm_so, matches[1].rm_eo - matches[1].rm_so);
         }
 
         if (matches[2].rm_so != size_t(-1))
@@ -366,8 +353,7 @@ static Pointer format_op(Mu::Thread& NODE_THREAD, Pointer fmtPtr,
                 if (argnum >= nargs)
                     break;
 
-                fmtsub = fmtstr.substr(matches[2].rm_so,
-                                       matches[2].rm_eo - matches[2].rm_so);
+                fmtsub = fmtstr.substr(matches[2].rm_so, matches[2].rm_eo - matches[2].rm_so);
 
                 const Type* t = args[argnum]._type;
                 int n = temp.size() - 1;
@@ -394,9 +380,7 @@ static Pointer format_op(Mu::Thread& NODE_THREAD, Pointer fmtPtr,
                             else if (n < 0)
                                 temp.resize(temp.size() * 2);
 
-                            n = snprintf(&temp.front(), temp.size(),
-                                         fmtsub.c_str(),
-                                         args[argnum]._value._int);
+                            n = snprintf(&temp.front(), temp.size(), fmtsub.c_str(), args[argnum]._value._int);
                         } while (n + 1 > temp.size() || n < 0);
                     }
                     else if (t == c->shortType())
@@ -415,9 +399,7 @@ static Pointer format_op(Mu::Thread& NODE_THREAD, Pointer fmtPtr,
                             else if (n < 0)
                                 temp.resize(temp.size() * 2);
 
-                            n = snprintf(&temp.front(), temp.size(),
-                                         fmtsub.c_str(),
-                                         args[argnum]._value._short);
+                            n = snprintf(&temp.front(), temp.size(), fmtsub.c_str(), args[argnum]._value._short);
                         } while (n + 1 > temp.size() || n < 0);
                     }
                     else if (t == c->byteType())
@@ -435,9 +417,7 @@ static Pointer format_op(Mu::Thread& NODE_THREAD, Pointer fmtPtr,
                             else if (n < 0)
                                 temp.resize(temp.size() * 2);
 
-                            n = snprintf(&temp.front(), temp.size(),
-                                         fmtsub.c_str(),
-                                         args[argnum]._value._char);
+                            n = snprintf(&temp.front(), temp.size(), fmtsub.c_str(), args[argnum]._value._char);
                         } while (n + 1 > temp.size() || n < 0);
                     }
                     else if (t == c->int64Type())
@@ -456,9 +436,7 @@ static Pointer format_op(Mu::Thread& NODE_THREAD, Pointer fmtPtr,
                             else if (n < 0)
                                 temp.resize(temp.size() * 2);
 
-                            n = snprintf(&temp.front(), temp.size(),
-                                         fmtsub.c_str(),
-                                         args[argnum]._value._int64);
+                            n = snprintf(&temp.front(), temp.size(), fmtsub.c_str(), args[argnum]._value._int64);
                         } while (n + 1 > temp.size() || n < 0);
                     }
                     else
@@ -482,9 +460,7 @@ static Pointer format_op(Mu::Thread& NODE_THREAD, Pointer fmtPtr,
                             else if (n < 0)
                                 temp.resize(temp.size() * 2);
 
-                            n = snprintf(&temp.front(), temp.size(),
-                                         fmtsub.c_str(),
-                                         args[argnum]._value._float);
+                            n = snprintf(&temp.front(), temp.size(), fmtsub.c_str(), args[argnum]._value._float);
                         } while (n + 1 > temp.size() || n < 0);
                     }
                     else if (t == c->doubleType())
@@ -496,9 +472,7 @@ static Pointer format_op(Mu::Thread& NODE_THREAD, Pointer fmtPtr,
                             else if (n < 0)
                                 temp.resize(temp.size() * 2);
 
-                            n = snprintf(&temp.front(), temp.size(),
-                                         fmtsub.c_str(),
-                                         args[argnum]._value._double);
+                            n = snprintf(&temp.front(), temp.size(), fmtsub.c_str(), args[argnum]._value._double);
                         } while (n + 1 > temp.size() || n < 0);
                     }
                     else if (t == c->halfType())
@@ -513,8 +487,7 @@ static Pointer format_op(Mu::Thread& NODE_THREAD, Pointer fmtPtr,
                             Value v = args[argnum]._value;
                             float f = shortToHalf(v._short);
 
-                            n = snprintf(&temp.front(), temp.size(),
-                                         fmtsub.c_str(), f);
+                            n = snprintf(&temp.front(), temp.size(), fmtsub.c_str(), f);
                         } while (n + 1 > temp.size() || n < 0);
                     }
                     else
@@ -540,13 +513,11 @@ static Pointer format_op(Mu::Thread& NODE_THREAD, Pointer fmtPtr,
                 case 's':
                     if (t == c->stringType())
                     {
-                        const StringType::String* o =
-                            (StringType::String*)args[argnum]._value._Pointer;
+                        const StringType::String* o = (StringType::String*)args[argnum]._value._Pointer;
 
                         if (!o)
                         {
-                            o = static_cast<const StringType*>(t)->allocate(
-                                "nil");
+                            o = static_cast<const StringType*>(t)->allocate("nil");
                             // throw NilArgumentException(NODE_THREAD);
                         }
 
@@ -557,14 +528,12 @@ static Pointer format_op(Mu::Thread& NODE_THREAD, Pointer fmtPtr,
                             else if (n < 0)
                                 temp.resize(temp.size() * 2);
 
-                            n = snprintf(&temp.front(), temp.size(),
-                                         fmtsub.c_str(), o->c_str());
+                            n = snprintf(&temp.front(), temp.size(), fmtsub.c_str(), o->c_str());
                         } while (n + 1 > temp.size() || n < 0);
                     }
                     else if (t == c->charArrayType())
                     {
-                        DynamicArray* array =
-                            (DynamicArray*)args[argnum]._value._Pointer;
+                        DynamicArray* array = (DynamicArray*)args[argnum]._value._Pointer;
 
                         vector<char> str;
 
@@ -576,9 +545,7 @@ static Pointer format_op(Mu::Thread& NODE_THREAD, Pointer fmtPtr,
                         }
                         else
                         {
-                            utf8::utf32to8(array->begin<int>(),
-                                           array->end<int>(),
-                                           back_inserter(str));
+                            utf8::utf32to8(array->begin<int>(), array->end<int>(), back_inserter(str));
                         }
 
                         str.push_back(0);
@@ -591,8 +558,7 @@ static Pointer format_op(Mu::Thread& NODE_THREAD, Pointer fmtPtr,
                             else if (n < 0)
                                 temp.resize(temp.size() * 2);
 
-                            n = snprintf(&temp.front(), temp.size(),
-                                         fmtsub.c_str(), result.c_str());
+                            n = snprintf(&temp.front(), temp.size(), fmtsub.c_str(), result.c_str());
                         } while (n + 1 > temp.size() || n < 0);
                     }
                     else
@@ -605,8 +571,7 @@ static Pointer format_op(Mu::Thread& NODE_THREAD, Pointer fmtPtr,
                         }
                         else
                         {
-                            str << "<#opaque " << hex
-                                << args[argnum]._value._Pointer << dec << ">";
+                            str << "<#opaque " << hex << args[argnum]._value._Pointer << dec << ">";
                         }
 
                         do
@@ -618,8 +583,7 @@ static Pointer format_op(Mu::Thread& NODE_THREAD, Pointer fmtPtr,
 
                             string stemp(str.str());
 
-                            n = snprintf(&temp.front(), temp.size(),
-                                         fmtsub.c_str(), stemp.c_str());
+                            n = snprintf(&temp.front(), temp.size(), fmtsub.c_str(), stemp.c_str());
                         } while (n + 1 > temp.size() || n < 0);
                     }
                     break;
@@ -637,8 +601,7 @@ static Pointer format_op(Mu::Thread& NODE_THREAD, Pointer fmtPtr,
     return stype->allocate(outstr);
 }
 
-Pointer PCent__string_string_int(Mu::Thread& NODE_THREAD, Pointer fmtPtr,
-                                 int arg)
+Pointer PCent__string_string_int(Mu::Thread& NODE_THREAD, Pointer fmtPtr, int arg)
 {
     Process* p = NODE_THREAD.process();
     MuLangContext* c = static_cast<MuLangContext*>(p->context());
@@ -649,8 +612,7 @@ Pointer PCent__string_string_int(Mu::Thread& NODE_THREAD, Pointer fmtPtr,
     return (Pointer)format_op(NODE_THREAD, fmtPtr, args);
 }
 
-Pointer PCent__string_string_int64(Mu::Thread& NODE_THREAD, Pointer fmtPtr,
-                                   int64 arg)
+Pointer PCent__string_string_int64(Mu::Thread& NODE_THREAD, Pointer fmtPtr, int64 arg)
 {
     Process* p = NODE_THREAD.process();
     MuLangContext* c = static_cast<MuLangContext*>(p->context());
@@ -661,8 +623,7 @@ Pointer PCent__string_string_int64(Mu::Thread& NODE_THREAD, Pointer fmtPtr,
     return (Pointer)format_op(NODE_THREAD, fmtPtr, args);
 }
 
-Pointer PCent__string_string_float(Mu::Thread& NODE_THREAD, Pointer fmtPtr,
-                                   float arg)
+Pointer PCent__string_string_float(Mu::Thread& NODE_THREAD, Pointer fmtPtr, float arg)
 {
     Process* p = NODE_THREAD.process();
     MuLangContext* c = static_cast<MuLangContext*>(p->context());
@@ -673,8 +634,7 @@ Pointer PCent__string_string_float(Mu::Thread& NODE_THREAD, Pointer fmtPtr,
     return (Pointer)format_op(NODE_THREAD, fmtPtr, args);
 }
 
-Pointer PCent__string_string_double(Mu::Thread& NODE_THREAD, Pointer fmtPtr,
-                                    double arg)
+Pointer PCent__string_string_double(Mu::Thread& NODE_THREAD, Pointer fmtPtr, double arg)
 {
     Process* p = NODE_THREAD.process();
     MuLangContext* c = static_cast<MuLangContext*>(p->context());
@@ -685,8 +645,7 @@ Pointer PCent__string_string_double(Mu::Thread& NODE_THREAD, Pointer fmtPtr,
     return (Pointer)format_op(NODE_THREAD, fmtPtr, args);
 }
 
-Pointer PCent__string_string_half(Mu::Thread& NODE_THREAD, Pointer fmtPtr,
-                                  short arg)
+Pointer PCent__string_string_half(Mu::Thread& NODE_THREAD, Pointer fmtPtr, short arg)
 {
     Process* p = NODE_THREAD.process();
     MuLangContext* c = static_cast<MuLangContext*>(p->context());
@@ -697,8 +656,7 @@ Pointer PCent__string_string_half(Mu::Thread& NODE_THREAD, Pointer fmtPtr,
     return (Pointer)format_op(NODE_THREAD, fmtPtr, args);
 }
 
-Pointer PCent__string_string_short(Mu::Thread& NODE_THREAD, Pointer fmtPtr,
-                                   short arg)
+Pointer PCent__string_string_short(Mu::Thread& NODE_THREAD, Pointer fmtPtr, short arg)
 {
     Process* p = NODE_THREAD.process();
     MuLangContext* c = static_cast<MuLangContext*>(p->context());
@@ -709,8 +667,7 @@ Pointer PCent__string_string_short(Mu::Thread& NODE_THREAD, Pointer fmtPtr,
     return (Pointer)format_op(NODE_THREAD, fmtPtr, args);
 }
 
-Pointer PCent__string_string_char(Mu::Thread& NODE_THREAD, Pointer fmtPtr,
-                                  int arg)
+Pointer PCent__string_string_char(Mu::Thread& NODE_THREAD, Pointer fmtPtr, int arg)
 {
     Process* p = NODE_THREAD.process();
     MuLangContext* c = static_cast<MuLangContext*>(p->context());
@@ -721,8 +678,7 @@ Pointer PCent__string_string_char(Mu::Thread& NODE_THREAD, Pointer fmtPtr,
     return (Pointer)format_op(NODE_THREAD, fmtPtr, args);
 }
 
-Pointer PCent__string_string_byte(Mu::Thread& NODE_THREAD, Pointer fmtPtr,
-                                  char arg)
+Pointer PCent__string_string_byte(Mu::Thread& NODE_THREAD, Pointer fmtPtr, char arg)
 {
     Process* p = NODE_THREAD.process();
     MuLangContext* c = static_cast<MuLangContext*>(p->context());
@@ -733,8 +689,7 @@ Pointer PCent__string_string_byte(Mu::Thread& NODE_THREAD, Pointer fmtPtr,
     return (Pointer)format_op(NODE_THREAD, fmtPtr, args);
 }
 
-Pointer PCent__string_string_QMark_class_not_tuple(Mu::Thread& NODE_THREAD,
-                                                   Pointer fmtPtr, Pointer arg)
+Pointer PCent__string_string_QMark_class_not_tuple(Mu::Thread& NODE_THREAD, Pointer fmtPtr, Pointer arg)
 {
     Process* p = NODE_THREAD.process();
     MuLangContext* c = static_cast<MuLangContext*>(p->context());
@@ -747,8 +702,7 @@ Pointer PCent__string_string_QMark_class_not_tuple(Mu::Thread& NODE_THREAD,
     return (Pointer)format_op(NODE_THREAD, fmtPtr, args);
 }
 
-Pointer PCent__string_string_QMark_opaque(Mu::Thread& NODE_THREAD,
-                                          Pointer fmtPtr, Pointer arg)
+Pointer PCent__string_string_QMark_opaque(Mu::Thread& NODE_THREAD, Pointer fmtPtr, Pointer arg)
 {
     Process* p = NODE_THREAD.process();
     MuLangContext* c = static_cast<MuLangContext*>(p->context());
@@ -759,8 +713,7 @@ Pointer PCent__string_string_QMark_opaque(Mu::Thread& NODE_THREAD,
     return (Pointer)format_op(NODE_THREAD, fmtPtr, args);
 }
 
-Pointer PCent__string_string_bool(Mu::Thread& NODE_THREAD, Pointer fmtPtr,
-                                  bool arg)
+Pointer PCent__string_string_bool(Mu::Thread& NODE_THREAD, Pointer fmtPtr, bool arg)
 {
     Process* p = NODE_THREAD.process();
     MuLangContext* c = static_cast<MuLangContext*>(p->context());
@@ -771,8 +724,7 @@ Pointer PCent__string_string_bool(Mu::Thread& NODE_THREAD, Pointer fmtPtr,
     return (Pointer)format_op(NODE_THREAD, fmtPtr, args);
 }
 
-Pointer PCent__string_string_vector_floatBSB_4ESB_(Mu::Thread& NODE_THREAD,
-                                                   Pointer fmtPtr, Vector4f arg)
+Pointer PCent__string_string_vector_floatBSB_4ESB_(Mu::Thread& NODE_THREAD, Pointer fmtPtr, Vector4f arg)
 {
     Process* p = NODE_THREAD.process();
     MuLangContext* c = static_cast<MuLangContext*>(p->context());
@@ -783,8 +735,7 @@ Pointer PCent__string_string_vector_floatBSB_4ESB_(Mu::Thread& NODE_THREAD,
     return (Pointer)format_op(NODE_THREAD, fmtPtr, args);
 }
 
-Pointer PCent__string_string_vector_floatBSB_3ESB_(Mu::Thread& NODE_THREAD,
-                                                   Pointer fmtPtr, Vector3f arg)
+Pointer PCent__string_string_vector_floatBSB_3ESB_(Mu::Thread& NODE_THREAD, Pointer fmtPtr, Vector3f arg)
 {
     Process* p = NODE_THREAD.process();
     MuLangContext* c = static_cast<MuLangContext*>(p->context());
@@ -795,8 +746,7 @@ Pointer PCent__string_string_vector_floatBSB_3ESB_(Mu::Thread& NODE_THREAD,
     return (Pointer)format_op(NODE_THREAD, fmtPtr, args);
 }
 
-Pointer PCent__string_string_vector_floatBSB_2ESB_(Mu::Thread& NODE_THREAD,
-                                                   Pointer fmtPtr, Vector2f arg)
+Pointer PCent__string_string_vector_floatBSB_2ESB_(Mu::Thread& NODE_THREAD, Pointer fmtPtr, Vector2f arg)
 {
     Process* p = NODE_THREAD.process();
     MuLangContext* c = static_cast<MuLangContext*>(p->context());
@@ -807,8 +757,7 @@ Pointer PCent__string_string_vector_floatBSB_2ESB_(Mu::Thread& NODE_THREAD,
     return format_op(NODE_THREAD, fmtPtr, args);
 }
 
-Pointer PCent__string_string_charBSB_2ESB_(Mu::Thread& NODE_THREAD,
-                                           Pointer fmtPtr, Pointer arg)
+Pointer PCent__string_string_charBSB_2ESB_(Mu::Thread& NODE_THREAD, Pointer fmtPtr, Pointer arg)
 {
     Process* p = NODE_THREAD.process();
     MuLangContext* c = static_cast<MuLangContext*>(p->context());
@@ -819,8 +768,7 @@ Pointer PCent__string_string_charBSB_2ESB_(Mu::Thread& NODE_THREAD,
     return format_op(NODE_THREAD, fmtPtr, args);
 }
 
-Pointer PCent__string_string_QMark_tuple(Mu::Thread& NODE_THREAD,
-                                         Pointer fmtPtr, Pointer argPtr)
+Pointer PCent__string_string_QMark_tuple(Mu::Thread& NODE_THREAD, Pointer fmtPtr, Pointer argPtr)
 {
     ClassInstance* obj = (ClassInstance*)argPtr;
 
@@ -895,8 +843,7 @@ Pointer PCent__string_string_QMark_tuple(Mu::Thread& NODE_THREAD,
 
 void print_void_string(Mu::Thread& NODE_THREAD, Pointer ptr)
 {
-    if (const StringType::String* o =
-            reinterpret_cast<StringType::String*>(ptr))
+    if (const StringType::String* o = reinterpret_cast<StringType::String*>(ptr))
     {
         cout << o->c_str() << flush;
     }
@@ -922,8 +869,7 @@ int string_hash_int_string(Mu::Thread& NODE_THREAD, Pointer ptr)
     return o->hash();
 }
 
-int compare_int_string_string(Mu::Thread& NODE_THREAD, Pointer aptr,
-                              Pointer bptr)
+int compare_int_string_string(Mu::Thread& NODE_THREAD, Pointer aptr, Pointer bptr)
 {
     const StringType::String* a = reinterpret_cast<StringType::String*>(aptr);
     const StringType::String* b = reinterpret_cast<StringType::String*>(bptr);
@@ -937,8 +883,7 @@ int compare_int_string_string(Mu::Thread& NODE_THREAD, Pointer aptr,
     return abuf.compare(bbuf);
 }
 
-Pointer string_join_string_stringBSB_ESB__string(Mu::Thread& NODE_THREAD,
-                                                 Pointer aptr, Pointer bptr)
+Pointer string_join_string_stringBSB_ESB__string(Mu::Thread& NODE_THREAD, Pointer aptr, Pointer bptr)
 {
     Process* p = NODE_THREAD.process();
     MuLangContext* c = static_cast<MuLangContext*>(p->context());
@@ -963,9 +908,7 @@ Pointer string_join_string_stringBSB_ESB__string(Mu::Thread& NODE_THREAD,
     return stype->allocate(sout);
 }
 
-Pointer string_split_stringBSB_ESB__string_string_bool(Mu::Thread& NODE_THREAD,
-                                                       Pointer aptr,
-                                                       Pointer bptr, bool seq)
+Pointer string_split_stringBSB_ESB__string_string_bool(Mu::Thread& NODE_THREAD, Pointer aptr, Pointer bptr, bool seq)
 {
     Process* p = NODE_THREAD.process();
     MuLangContext* c = static_cast<MuLangContext*>(p->context());
@@ -1001,8 +944,7 @@ Pointer string_split_stringBSB_ESB__string_string_bool(Mu::Thread& NODE_THREAD,
     DynamicArrayType::SizeVector sizes(1);
     sizes.front() = 0;
     const StringType* stype = static_cast<const StringType*>(str->type());
-    const DynamicArrayType* atype =
-        static_cast<DynamicArrayType*>(c->arrayType(stype, sizes));
+    const DynamicArrayType* atype = static_cast<DynamicArrayType*>(c->arrayType(stype, sizes));
 
     DynamicArray* array = new DynamicArray(atype, 1);
     int n = buffer.size();
@@ -1016,15 +958,13 @@ Pointer string_split_stringBSB_ESB__string_string_bool(Mu::Thread& NODE_THREAD,
     return array;
 }
 
-int string_BSB_ESB__char_string_int(Mu::Thread& NODE_THREAD, Pointer aptr,
-                                    int a)
+int string_BSB_ESB__char_string_int(Mu::Thread& NODE_THREAD, Pointer aptr, int a)
 {
     //
     //  This is the index operator.
     //
 
-    const StringType::String* self =
-        reinterpret_cast<StringType::String*>(aptr);
+    const StringType::String* self = reinterpret_cast<StringType::String*>(aptr);
     if (!self)
         throw NilArgumentException(NODE_THREAD);
 
@@ -1050,8 +990,7 @@ int string_BSB_ESB__char_string_int(Mu::Thread& NODE_THREAD, Pointer aptr,
     throw OutOfRangeException();
 }
 
-Pointer string_substr_string_string_int_int(Mu::Thread& NODE_THREAD,
-                                            Pointer aptr, int start, int len)
+Pointer string_substr_string_string_int_int(Mu::Thread& NODE_THREAD, Pointer aptr, int start, int len)
 {
     const StringType::String* s = reinterpret_cast<StringType::String*>(aptr);
     if (!s)
@@ -1085,6 +1024,62 @@ Pointer string_substr_string_string_int_int(Mu::Thread& NODE_THREAD,
     string os;
     os.insert(0, beg, end - beg);
     return c->stringType()->allocate(os);
+}
+
+int string_contains_int_string_string(Mu::Thread& NODE_THREAD, Pointer aptr, Pointer bptr)
+{
+    const StringType::String* str = reinterpret_cast<StringType::String*>(aptr);
+    const StringType::String* search = reinterpret_cast<StringType::String*>(bptr);
+    if (!str || !search)
+        throw NilArgumentException(NODE_THREAD);
+
+    UTF8String text = str->utf8();
+    UTF8String searchStr = search->utf8();
+
+    UTF8String::size_type pos = text.find(searchStr);
+    if (pos == UTF8String::npos)
+        return -1;
+
+    // Convert byte position to character position
+    const char* textPtr = text.c_str();
+    int charIndex = 0;
+    for (size_t i = 0; i < pos; ++charIndex)
+    {
+        int n;
+        UTF8convert(textPtr + i, n);
+        i += n;
+    }
+
+    return charIndex;
+}
+
+Pointer string_replace_string_string_string_string(Mu::Thread& NODE_THREAD, Pointer aptr, Pointer bptr, Pointer cptr)
+{
+    const StringType::String* str = reinterpret_cast<StringType::String*>(aptr);
+    const StringType::String* search = reinterpret_cast<StringType::String*>(bptr);
+    const StringType::String* replacement = reinterpret_cast<StringType::String*>(cptr);
+    if (!str || !search || !replacement)
+        throw NilArgumentException(NODE_THREAD);
+
+    Process* p = NODE_THREAD.process();
+    MuLangContext* c = static_cast<MuLangContext*>(p->context());
+
+    UTF8String text = str->utf8();
+    UTF8String searchStr = search->utf8();
+    UTF8String replaceStr = replacement->utf8();
+
+    UTF8String::size_type pos = text.find(searchStr);
+    if (pos == UTF8String::npos)
+    {
+        // Not found, return original string
+        return c->stringType()->allocate(text);
+    }
+
+    // Replace first occurrence
+    UTF8String result = text;
+    result.replace(pos, searchStr.length(), replaceStr);
+
+    return c->stringType()->allocate(result);
 }
 
 //----------------------------------------------------------------------
@@ -1188,25 +1183,13 @@ namespace Mu
 
     size_t StringType::String::numChars() const { return UTF8len(_utf8string); }
 
-    bool StringType::String::operator==(const char* b) const
-    {
-        return compare(b) == 0;
-    }
+    bool StringType::String::operator==(const char* b) const { return compare(b) == 0; }
 
-    bool StringType::String::operator==(const StringType::String& b) const
-    {
-        return compare(b.c_str()) == 0;
-    }
+    bool StringType::String::operator==(const StringType::String& b) const { return compare(b.c_str()) == 0; }
 
-    bool StringType::String::operator!=(const char* b) const
-    {
-        return compare(b) != 0;
-    }
+    bool StringType::String::operator!=(const char* b) const { return compare(b) != 0; }
 
-    bool StringType::String::operator!=(const StringType::String& b) const
-    {
-        return compare(b.c_str()) != 0;
-    }
+    bool StringType::String::operator!=(const StringType::String& b) const { return compare(b.c_str()) != 0; }
 
     int StringType::String::compare(const char* p) const
     {
@@ -1248,35 +1231,17 @@ namespace Mu
         return abuf;
     }
 
-    void StringType::String::copyConvert(UTF32String& s) const
-    {
-        utf8::utf8to32(_utf8string, _utf8string + size(), back_inserter(s));
-    }
+    void StringType::String::copyConvert(UTF32String& s) const { utf8::utf8to32(_utf8string, _utf8string + size(), back_inserter(s)); }
 
-    void StringType::String::copyConvert(UTF16String& s) const
-    {
-        utf8::utf8to16(_utf8string, _utf8string + size(), back_inserter(s));
-    }
+    void StringType::String::copyConvert(UTF16String& s) const { utf8::utf8to16(_utf8string, _utf8string + size(), back_inserter(s)); }
 
-    void StringType::String::copyConvert(UTF8String& s) const
-    {
-        s = _utf8string;
-    }
+    void StringType::String::copyConvert(UTF8String& s) const { s = _utf8string; }
 
-    void StringType::String::copyConvert(stdUTF32String& s) const
-    {
-        utf8::utf8to32(_utf8string, _utf8string + size(), back_inserter(s));
-    }
+    void StringType::String::copyConvert(stdUTF32String& s) const { utf8::utf8to32(_utf8string, _utf8string + size(), back_inserter(s)); }
 
-    void StringType::String::copyConvert(stdUTF16String& s) const
-    {
-        utf8::utf8to16(_utf8string, _utf8string + size(), back_inserter(s));
-    }
+    void StringType::String::copyConvert(stdUTF16String& s) const { utf8::utf8to16(_utf8string, _utf8string + size(), back_inserter(s)); }
 
-    void StringType::String::copyConvert(stdUTF8String& s) const
-    {
-        s = _utf8string;
-    }
+    void StringType::String::copyConvert(stdUTF8String& s) const { s = _utf8string; }
 
     //----------------------------------------------------------------------
 
@@ -1291,10 +1256,7 @@ namespace Mu
 
     size_t StringType::objectSize() const { return sizeof(StringType::String); }
 
-    void StringType::constructInstance(Pointer obj) const
-    {
-        new (obj) StringType::String(this);
-    }
+    void StringType::constructInstance(Pointer obj) const { new (obj) StringType::String(this); }
 
     void StringType::freeze()
     {
@@ -1309,13 +1271,9 @@ namespace Mu
         dst->set(src->c_str());
     }
 
-    void StringType::deleteObject(Object* obj) const
-    {
-        delete static_cast<StringType::String*>(obj);
-    }
+    void StringType::deleteObject(Object* obj) const { delete static_cast<StringType::String*>(obj); }
 
-    void StringType::outputValue(ostream& o, const Value& value,
-                                 bool full) const
+    void StringType::outputValue(ostream& o, const Value& value, bool full) const
     {
         String* s = reinterpret_cast<String*>(value._Pointer);
 
@@ -1329,8 +1287,7 @@ namespace Mu
         }
     }
 
-    void StringType::outputValueRecursive(ostream& o, const ValuePointer vp,
-                                          ValueOutputState&) const
+    void StringType::outputValueRecursive(ostream& o, const ValuePointer vp, ValueOutputState&) const
     {
         if (vp)
         {
@@ -1351,8 +1308,7 @@ namespace Mu
         }
     }
 
-    void StringType::outputQuotedString(ostream& o, const Mu::String& str,
-                                        char delim)
+    void StringType::outputQuotedString(ostream& o, const Mu::String& str, char delim)
     {
         o << delim;
 
@@ -1411,8 +1367,7 @@ namespace Mu
         o << delim;
     }
 
-    void StringType::serialize(std::ostream& o, Archive::Writer& archive,
-                               const ValuePointer p) const
+    void StringType::serialize(std::ostream& o, Archive::Writer& archive, const ValuePointer p) const
     {
         const String* ci = *static_cast<const String**>(p);
         o << ci->c_str();
@@ -1420,8 +1375,7 @@ namespace Mu
         Class::serialize(o, archive, p);
     }
 
-    void StringType::deserialize(std::istream& i, Archive::Reader& archive,
-                                 ValuePointer p) const
+    void StringType::deserialize(std::istream& i, Archive::Reader& archive, ValuePointer p) const
     {
         String* ci = *static_cast<String**>(p);
         ostringstream str;
@@ -1437,10 +1391,7 @@ namespace Mu
 
 #define T Thread&
 
-    Pointer __C_EQ__stringAmp__stringAmp__string(T, Pointer a, Pointer b)
-    {
-        return *(Pointer*)(a = b);
-    }
+    Pointer __C_EQ__stringAmp__stringAmp__string(T, Pointer a, Pointer b) { return *(Pointer*)(a = b); }
 
 #undef T
 
@@ -1452,19 +1403,14 @@ namespace Mu
             *b = 0;
             blank = b;
 
-            if (int err =
-                    regcomp(&_format_re,
-                            "([^%]*)?(%[-+ 0]*([0-9]*)(\\.[0-9]+)?[a-zA-Z%])?",
-                            REG_EXTENDED))
+            if (int err = regcomp(&_format_re, "([^%]*)?(%[-+ 0]*([0-9]*)(\\.[0-9]+)?[a-zA-Z%])?", REG_EXTENDED))
             {
                 vector<char> temp(1);
-                size_t n =
-                    regerror(err, &_format_re, &temp.front(), temp.size());
+                size_t n = regerror(err, &_format_re, &temp.front(), temp.size());
                 temp.resize(n + 1);
                 regerror(err, &_format_re, &temp.front(), temp.size());
 
-                cerr << "ERROR: internal format re failed: " << &temp.front()
-                     << endl;
+                cerr << "ERROR: internal format re failed: " << &temp.front() << endl;
             }
 
             _init = false;
@@ -1478,175 +1424,118 @@ namespace Mu
         s->addSymbols(
             new ReferenceType(c, "string&", this),
 
-            new Function(c, "string", StringType::construct, None, Compiled,
-                         string_string, Return, "string", End),
+            new Function(c, "string", StringType::construct, None, Compiled, string_string, Return, "string", End),
 
-            new Function(c, "string", BaseFunctions::dereference, Cast, Return,
-                         "string", Args, "string&", End),
+            new Function(c, "string", BaseFunctions::dereference, Cast, Return, "string", Args, "string&", End),
 
-            new Function(c, "string", StringType::from_int, Cast, Compiled,
-                         string_string_int, Return, "string", Args, "int", End),
+            new Function(c, "string", StringType::from_int, Cast, Compiled, string_string_int, Return, "string", Args, "int", End),
 
-            new Function(c, "string", StringType::from_int64, Cast, Compiled,
-                         string_string_int64, Return, "string", Args, "int64",
+            new Function(c, "string", StringType::from_int64, Cast, Compiled, string_string_int64, Return, "string", Args, "int64", End),
+
+            new Function(c, "string", StringType::from_float, Lossy, Compiled, string_string_float, Return, "string", Args, "float", End),
+
+            new Function(c, "string", StringType::from_double, Lossy, Compiled, string_string_double, Return, "string", Args, "double",
                          End),
 
-            new Function(c, "string", StringType::from_float, Lossy, Compiled,
-                         string_string_float, Return, "string", Args, "float",
-                         End),
+            new Function(c, "string", StringType::from_bool, Cast, Compiled, string_string_bool, Return, "string", Args, "bool", End),
 
-            new Function(c, "string", StringType::from_double, Lossy, Compiled,
-                         string_string_double, Return, "string", Args, "double",
-                         End),
+            new Function(c, "string", StringType::from_byte, Cast, Compiled, string_string_byte, Return, "string", Args, "byte", End),
 
-            new Function(c, "string", StringType::from_bool, Cast, Compiled,
-                         string_string_bool, Return, "string", Args, "bool",
-                         End),
+            new Function(c, "string", StringType::from_vector4, Cast, Compiled, string_string_vector_floatBSB_4ESB_, Return, "string", Args,
+                         "vector float[4]", End),
 
-            new Function(c, "string", StringType::from_byte, Cast, Compiled,
-                         string_string_byte, Return, "string", Args, "byte",
-                         End),
+            new Function(c, "string", StringType::from_vector3, Cast, Compiled, string_string_vector_floatBSB_3ESB_, Return, "string", Args,
+                         "vector float[3]", End),
 
-            new Function(c, "string", StringType::from_vector4, Cast, Compiled,
-                         string_string_vector_floatBSB_4ESB_, Return, "string",
-                         Args, "vector float[4]", End),
+            new Function(c, "string", StringType::from_vector2, Cast, Compiled, string_string_vector_floatBSB_2ESB_, Return, "string", Args,
+                         "vector float[2]", End),
 
-            new Function(c, "string", StringType::from_vector3, Cast, Compiled,
-                         string_string_vector_floatBSB_3ESB_, Return, "string",
-                         Args, "vector float[3]", End),
+            new Function(c, "string", StringType::from_string, None, Compiled, string_string_string, Return, "string", Args, "string", End),
 
-            new Function(c, "string", StringType::from_vector2, Cast, Compiled,
-                         string_string_vector_floatBSB_2ESB_, Return, "string",
-                         Args, "vector float[2]", End),
+            new Function(c, "string", StringType::from_class, Cast, Compiled, string_string_QMark_class_or_interface, Return, "string",
+                         Args, "?class_or_interface", End),
 
-            new Function(c, "string", StringType::from_string, None, Compiled,
-                         string_string_string, Return, "string", Args, "string",
-                         End),
-
-            new Function(c, "string", StringType::from_class, Cast, Compiled,
-                         string_string_QMark_class_or_interface, Return,
-                         "string", Args, "?class_or_interface", End),
-
-            new Function(c, "string", StringType::from_opaque, Cast, Compiled,
-                         string_string_QMark_opaque, Return, "string", Args,
+            new Function(c, "string", StringType::from_opaque, Cast, Compiled, string_string_QMark_opaque, Return, "string", Args,
                          "?opaque", End),
 
-            new Function(c, "string", StringType::from_variant, Cast, Compiled,
-                         string_string_QMark_variant, Return, "string", Args,
+            new Function(c, "string", StringType::from_variant, Cast, Compiled, string_string_QMark_variant, Return, "string", Args,
                          "?variant", End),
 
-            new Function(c, "int", StringType::to_int, Mapped, Compiled,
-                         int_int_string, Return, "int", Args, "string", End),
+            new Function(c, "int", StringType::to_int, Mapped, Compiled, int_int_string, Return, "int", Args, "string", End),
 
-            new Function(c, "float", StringType::to_float, Mapped, Compiled,
-                         float_float_string, Return, "float", Args, "string",
-                         End),
+            new Function(c, "float", StringType::to_float, Mapped, Compiled, float_float_string, Return, "float", Args, "string", End),
 
-            new Function(c, "double", StringType::to_double, Mapped, Compiled,
-                         double_double_string, Return, "double", Args, "string",
-                         End),
+            new Function(c, "double", StringType::to_double, Mapped, Compiled, double_double_string, Return, "double", Args, "string", End),
 
-            new Function(c, "bool", StringType::to_bool, Mapped, Compiled,
-                         bool_bool_string, Return, "bool", Args, "string", End),
+            new Function(c, "bool", StringType::to_bool, Mapped, Compiled, bool_bool_string, Return, "bool", Args, "string", End),
 
-            new Function(c, "=", BaseFunctions::assign, AsOp | NativeInlined,
-                         Compiled, __C_EQ__stringAmp__stringAmp__string, Return,
+            new Function(c, "=", BaseFunctions::assign, AsOp | NativeInlined, Compiled, __C_EQ__stringAmp__stringAmp__string, Return,
                          "string&", Args, "string&", "string", End),
 
-            new Function(c, "%", StringType::formatOp, Function::Operator,
-                         Compiled, PCent__string_string_QMark_tuple, Return,
-                         "string", Args, "string", "?tuple", End),
+            new Function(c, "%", StringType::formatOp, Function::Operator, Compiled, PCent__string_string_QMark_tuple, Return, "string",
+                         Args, "string", "?tuple", End),
 
-            new Function(c, "%", StringType::formatOp_class, Function::Operator,
-                         Compiled, PCent__string_string_QMark_class_not_tuple,
-                         Return, "string", Args, "string", "?object_not_tuple",
-                         End),
+            new Function(c, "%", StringType::formatOp_class, Function::Operator, Compiled, PCent__string_string_QMark_class_not_tuple,
+                         Return, "string", Args, "string", "?object_not_tuple", End),
 
-            new Function(c, "%", StringType::formatOp_opaque,
-                         Function::Operator, Compiled,
-                         PCent__string_string_QMark_opaque, Return, "string",
-                         Args, "string", "?opaque", End),
+            new Function(c, "%", StringType::formatOp_opaque, Function::Operator, Compiled, PCent__string_string_QMark_opaque, Return,
+                         "string", Args, "string", "?opaque", End),
 
-            new Function(c, "%", StringType::formatOp_int, Function::Operator,
-                         Compiled, PCent__string_string_int, Return, "string",
-                         Args, "string", "int", End),
+            new Function(c, "%", StringType::formatOp_int, Function::Operator, Compiled, PCent__string_string_int, Return, "string", Args,
+                         "string", "int", End),
 
-            new Function(c, "%", StringType::formatOp_int64, Function::Operator,
-                         Compiled, PCent__string_string_int64, Return, "string",
+            new Function(c, "%", StringType::formatOp_int64, Function::Operator, Compiled, PCent__string_string_int64, Return, "string",
                          Args, "string", "int64", End),
 
-            new Function(c, "%", StringType::formatOp_float, Function::Operator,
-                         Compiled, PCent__string_string_float, Return, "string",
+            new Function(c, "%", StringType::formatOp_float, Function::Operator, Compiled, PCent__string_string_float, Return, "string",
                          Args, "string", "float", End),
 
-            new Function(c, "%", StringType::formatOp_double,
-                         Function::Operator, Compiled,
-                         PCent__string_string_double, Return, "string", Args,
-                         "string", "double", End),
+            new Function(c, "%", StringType::formatOp_double, Function::Operator, Compiled, PCent__string_string_double, Return, "string",
+                         Args, "string", "double", End),
 
-            new Function(c, "%", StringType::formatOp_half, Function::Operator,
-                         Compiled, PCent__string_string_half, Return, "string",
-                         Args, "string", "half", End),
+            new Function(c, "%", StringType::formatOp_half, Function::Operator, Compiled, PCent__string_string_half, Return, "string", Args,
+                         "string", "half", End),
 
-            new Function(c, "%", StringType::formatOp_char, Function::Operator,
-                         Compiled, PCent__string_string_char, Return, "string",
-                         Args, "string", "char", End),
+            new Function(c, "%", StringType::formatOp_char, Function::Operator, Compiled, PCent__string_string_char, Return, "string", Args,
+                         "string", "char", End),
 
-            new Function(c, "%", StringType::formatOp_bool, Function::Operator,
-                         Compiled, PCent__string_string_bool, Return, "string",
-                         Args, "string", "bool", End),
+            new Function(c, "%", StringType::formatOp_bool, Function::Operator, Compiled, PCent__string_string_bool, Return, "string", Args,
+                         "string", "bool", End),
 
-            new Function(c, "%", StringType::formatOp_byte, Function::Operator,
-                         Compiled, PCent__string_string_byte, Return, "string",
-                         Args, "string", "byte", End),
+            new Function(c, "%", StringType::formatOp_byte, Function::Operator, Compiled, PCent__string_string_byte, Return, "string", Args,
+                         "string", "byte", End),
 
-            new Function(c, "%", StringType::formatOp_short, Function::Operator,
-                         Compiled, PCent__string_string_short, Return, "string",
+            new Function(c, "%", StringType::formatOp_short, Function::Operator, Compiled, PCent__string_string_short, Return, "string",
                          Args, "string", "short", End),
 
-            new Function(c, "%", StringType::formatOp_Vector4f,
-                         Function::Operator, Compiled,
-                         PCent__string_string_vector_floatBSB_4ESB_, Return,
-                         "string", Args, "string", "vector float[4]", End),
+            new Function(c, "%", StringType::formatOp_Vector4f, Function::Operator, Compiled, PCent__string_string_vector_floatBSB_4ESB_,
+                         Return, "string", Args, "string", "vector float[4]", End),
 
-            new Function(c, "%", StringType::formatOp_Vector3f,
-                         Function::Operator, Compiled,
-                         PCent__string_string_vector_floatBSB_3ESB_, Return,
-                         "string", Args, "string", "vector float[3]", End),
+            new Function(c, "%", StringType::formatOp_Vector3f, Function::Operator, Compiled, PCent__string_string_vector_floatBSB_3ESB_,
+                         Return, "string", Args, "string", "vector float[3]", End),
 
-            new Function(c, "%", StringType::formatOp_Vector2f,
-                         Function::Operator, Compiled,
-                         PCent__string_string_vector_floatBSB_2ESB_, Return,
-                         "string", Args, "string", "vector float[2]", End),
+            new Function(c, "%", StringType::formatOp_Vector2f, Function::Operator, Compiled, PCent__string_string_vector_floatBSB_2ESB_,
+                         Return, "string", Args, "string", "vector float[2]", End),
 
-            new Function(c, "%", StringType::formatOp_charArray,
-                         Function::Operator, Compiled,
-                         PCent__string_string_charBSB_2ESB_, Return, "string",
-                         Args, "string", "char[]", End),
+            new Function(c, "%", StringType::formatOp_charArray, Function::Operator, Compiled, PCent__string_string_charBSB_2ESB_, Return,
+                         "string", Args, "string", "char[]", End),
 
-            new Function(c, "+", StringType::plus, Op, Compiled,
-                         Plus__string_string_string, Return, "string", Args,
-                         "string", "string", End),
-
-            new Function(c, "==", StringType::equals, CommOp, Compiled,
-                         EQ_EQ__bool_string_string, Return, "bool", Args,
-                         "string", "string", End),
-
-            new Function(c, "!=", StringType::notequals, CommOp, Compiled,
-                         Bang_EQ__bool_string_string, Return, "bool", Args,
-                         "string", "string", End),
-
-            new Function(c, "print", StringType::print, None, Compiled,
-                         print_void_string, Return, "void", Args, "string",
+            new Function(c, "+", StringType::plus, Op, Compiled, Plus__string_string_string, Return, "string", Args, "string", "string",
                          End),
 
-            new Function(c, "+=", StringType::assignPlus, AsOp, Compiled,
-                         Plus_EQ__stringAmp__stringAmp__string, Return,
-                         "string&", Args, "string&", "string", End),
+            new Function(c, "==", StringType::equals, CommOp, Compiled, EQ_EQ__bool_string_string, Return, "bool", Args, "string", "string",
+                         End),
 
-            new Function(c, "compare", StringType::compare, Mapped, Compiled,
-                         compare_int_string_string, Return, "int", Args,
-                         "string", "string", End),
+            new Function(c, "!=", StringType::notequals, CommOp, Compiled, Bang_EQ__bool_string_string, Return, "bool", Args, "string",
+                         "string", End),
+
+            new Function(c, "print", StringType::print, None, Compiled, print_void_string, Return, "void", Args, "string", End),
+
+            new Function(c, "+=", StringType::assignPlus, AsOp, Compiled, Plus_EQ__stringAmp__stringAmp__string, Return, "string&", Args,
+                         "string&", "string", End),
+
+            new Function(c, "compare", StringType::compare, Mapped, Compiled, compare_int_string_string, Return, "int", Args, "string",
+                         "string", End),
 
             EndArguments);
 
@@ -1658,54 +1547,43 @@ namespace Mu
         context->arrayType(this, 1, 0);
 
         addSymbols(
-            new Function(c, "size", StringType::size, Mapped, Compiled,
-                         string_size_int_string, Return, "int", Parameters,
+            new Function(c, "size", StringType::size, Mapped, Compiled, string_size_int_string, Return, "int", Parameters,
                          new ParameterVariable(c, "this", "string"), End),
 
-            new Function(c, "substr", StringType::substr, Mapped, Compiled,
-                         string_substr_string_string_int_int, Return, "string",
-                         Parameters, new ParameterVariable(c, "this", "string"),
-                         new ParameterVariable(c, "index0", "int"),
+            new Function(c, "substr", StringType::substr, Mapped, Compiled, string_substr_string_string_int_int, Return, "string",
+                         Parameters, new ParameterVariable(c, "this", "string"), new ParameterVariable(c, "index0", "int"),
                          new ParameterVariable(c, "length", "int"), End),
 
-            new Function(c, "[]", StringType::index, Mapped, Compiled,
-                         string_BSB_ESB__char_string_int, Return, "char",
-                         Parameters, new ParameterVariable(c, "this", "string"),
-                         new ParameterVariable(c, "index", "int"), End),
+            new Function(c, "[]", StringType::index, Mapped, Compiled, string_BSB_ESB__char_string_int, Return, "char", Parameters,
+                         new ParameterVariable(c, "this", "string"), new ParameterVariable(c, "index", "int"), End),
 
-            new Function(
-                c, "split", StringType::split, Mapped, Compiled,
-                string_split_stringBSB_ESB__string_string_bool, Return,
-                "string[]", Parameters,
-                new ParameterVariable(c, "this", "string"),
-                new ParameterVariable(c, "delim", "string"),
-                new ParameterVariable(c, "sequence", "bool", Value(false)),
-                End),
+            new Function(c, "split", StringType::split, Mapped, Compiled, string_split_stringBSB_ESB__string_string_bool, Return,
+                         "string[]", Parameters, new ParameterVariable(c, "this", "string"), new ParameterVariable(c, "delim", "string"),
+                         new ParameterVariable(c, "sequence", "bool", Value(false)), End),
 
-            new Function(c, "join", StringType::join_array, Mapped, Compiled,
-                         string_join_string_stringBSB_ESB__string, Return,
-                         "string", Parameters,
-                         new ParameterVariable(c, "strings", "string[]"),
-                         new ParameterVariable(c, "seperator", "string"), End),
+            new Function(c, "join", StringType::join_array, Mapped, Compiled, string_join_string_stringBSB_ESB__string, Return, "string",
+                         Parameters, new ParameterVariable(c, "strings", "string[]"), new ParameterVariable(c, "seperator", "string"), End),
 
-            new Function(c, "hash", StringType::hash, Mapped, Compiled,
-                         string_hash_int_string, Return, "int", Parameters,
+            new Function(c, "hash", StringType::hash, Mapped, Compiled, string_hash_int_string, Return, "int", Parameters,
                          new ParameterVariable(c, "this", "string"), End),
+
+            new Function(c, "contains", StringType::contains, Mapped, Compiled, string_contains_int_string_string, Return, "int",
+                         Parameters, new ParameterVariable(c, "this", "string"), new ParameterVariable(c, "search", "string"), End),
+
+            new Function(c, "replace", StringType::replace, Mapped, Compiled, string_replace_string_string_string_string, Return, "string",
+                         Parameters, new ParameterVariable(c, "this", "string"), new ParameterVariable(c, "search", "string"),
+                         new ParameterVariable(c, "replacement", "string"), End),
 
             EndArguments);
     }
 
-    NODE_IMPLEMENTATION(StringType::construct, Pointer)
-    {
-        NODE_RETURN(::string_string(NODE_THREAD));
-    }
+    NODE_IMPLEMENTATION(StringType::construct, Pointer) { NODE_RETURN(::string_string(NODE_THREAD)); }
 
     NODE_IMPLEMENTATION(StringType::assignPlus, Pointer)
     {
         Pointer* i = reinterpret_cast<Pointer*>(NODE_ARG(0, Pointer));
         Pointer o = NODE_ARG(1, Pointer);
-        NODE_RETURN(::Plus_EQ__stringAmp__stringAmp__string(NODE_THREAD,
-                                                            (Pointer)i, o));
+        NODE_RETURN(::Plus_EQ__stringAmp__stringAmp__string(NODE_THREAD, (Pointer)i, o));
     }
 
     NODE_IMPLEMENTATION(StringType::plus, Pointer)
@@ -1715,107 +1593,66 @@ namespace Mu
         NODE_RETURN(Pointer(::Plus__string_string_string(NODE_THREAD, s1, s2)));
     }
 
-    NODE_IMPLEMENTATION(StringType::from_int, Pointer)
-    {
-        NODE_RETURN(string_string_int(NODE_THREAD, NODE_ARG(0, int)));
-    }
+    NODE_IMPLEMENTATION(StringType::from_int, Pointer) { NODE_RETURN(string_string_int(NODE_THREAD, NODE_ARG(0, int))); }
 
-    NODE_IMPLEMENTATION(StringType::from_int64, Pointer)
-    {
-        NODE_RETURN(string_string_int64(NODE_THREAD, NODE_ARG(0, int64)));
-    }
+    NODE_IMPLEMENTATION(StringType::from_int64, Pointer) { NODE_RETURN(string_string_int64(NODE_THREAD, NODE_ARG(0, int64))); }
 
-    NODE_IMPLEMENTATION(StringType::from_float, Pointer)
-    {
-        NODE_RETURN(string_string_float(NODE_THREAD, NODE_ARG(0, float)));
-    }
+    NODE_IMPLEMENTATION(StringType::from_float, Pointer) { NODE_RETURN(string_string_float(NODE_THREAD, NODE_ARG(0, float))); }
 
-    NODE_IMPLEMENTATION(StringType::from_double, Pointer)
-    {
-        NODE_RETURN(string_string_double(NODE_THREAD, NODE_ARG(0, double)));
-    }
+    NODE_IMPLEMENTATION(StringType::from_double, Pointer) { NODE_RETURN(string_string_double(NODE_THREAD, NODE_ARG(0, double))); }
 
-    NODE_IMPLEMENTATION(StringType::from_bool, Pointer)
-    {
-        NODE_RETURN(string_string_bool(NODE_THREAD, NODE_ARG(0, bool)));
-    }
+    NODE_IMPLEMENTATION(StringType::from_bool, Pointer) { NODE_RETURN(string_string_bool(NODE_THREAD, NODE_ARG(0, bool))); }
 
-    NODE_IMPLEMENTATION(StringType::from_byte, Pointer)
-    {
-        NODE_RETURN(string_string_byte(NODE_THREAD, NODE_ARG(0, char)));
-    }
+    NODE_IMPLEMENTATION(StringType::from_byte, Pointer) { NODE_RETURN(string_string_byte(NODE_THREAD, NODE_ARG(0, char))); }
 
     NODE_IMPLEMENTATION(StringType::from_vector4, Pointer)
     {
-        NODE_RETURN(string_string_vector_floatBSB_4ESB_(NODE_THREAD,
-                                                        NODE_ARG(0, Vector4f)));
+        NODE_RETURN(string_string_vector_floatBSB_4ESB_(NODE_THREAD, NODE_ARG(0, Vector4f)));
     }
 
     NODE_IMPLEMENTATION(StringType::from_vector3, Pointer)
     {
-        NODE_RETURN(string_string_vector_floatBSB_3ESB_(NODE_THREAD,
-                                                        NODE_ARG(0, Vector3f)));
+        NODE_RETURN(string_string_vector_floatBSB_3ESB_(NODE_THREAD, NODE_ARG(0, Vector3f)));
     }
 
     NODE_IMPLEMENTATION(StringType::from_vector2, Pointer)
     {
-        NODE_RETURN(string_string_vector_floatBSB_2ESB_(NODE_THREAD,
-                                                        NODE_ARG(0, Vector2f)));
+        NODE_RETURN(string_string_vector_floatBSB_2ESB_(NODE_THREAD, NODE_ARG(0, Vector2f)));
     }
 
-    NODE_IMPLEMENTATION(StringType::from_string, Pointer)
-    {
-        NODE_RETURN(string_string_string(NODE_THREAD, NODE_ARG(0, Pointer)));
-    }
+    NODE_IMPLEMENTATION(StringType::from_string, Pointer) { NODE_RETURN(string_string_string(NODE_THREAD, NODE_ARG(0, Pointer))); }
 
     NODE_IMPLEMENTATION(StringType::from_class, Pointer)
     {
-        NODE_RETURN(string_string_QMark_class_or_interface(
-            NODE_THREAD, NODE_ARG_OBJECT(0, Object)));
+        NODE_RETURN(string_string_QMark_class_or_interface(NODE_THREAD, NODE_ARG_OBJECT(0, Object)));
     }
 
     NODE_IMPLEMENTATION(StringType::from_opaque, Pointer)
     {
-        NODE_RETURN(string_string_QMark_opaque(NODE_THREAD,
-                                               NODE_ARG_OBJECT(0, Object)));
+        NODE_RETURN(string_string_QMark_opaque(NODE_THREAD, NODE_ARG_OBJECT(0, Object)));
     }
 
     NODE_IMPLEMENTATION(StringType::from_variant, Pointer)
     {
-        NODE_RETURN(string_string_QMark_variant(NODE_THREAD,
-                                                NODE_ARG_OBJECT(0, Object)));
+        NODE_RETURN(string_string_QMark_variant(NODE_THREAD, NODE_ARG_OBJECT(0, Object)));
     }
 
-    NODE_IMPLEMENTATION(StringType::to_int, int)
-    {
-        NODE_RETURN(int_int_string(NODE_THREAD, NODE_ARG(0, Pointer)));
-    }
+    NODE_IMPLEMENTATION(StringType::to_int, int) { NODE_RETURN(int_int_string(NODE_THREAD, NODE_ARG(0, Pointer))); }
 
-    NODE_IMPLEMENTATION(StringType::to_float, float)
-    {
-        NODE_RETURN(float_float_string(NODE_THREAD, NODE_ARG(0, Pointer)));
-    }
+    NODE_IMPLEMENTATION(StringType::to_float, float) { NODE_RETURN(float_float_string(NODE_THREAD, NODE_ARG(0, Pointer))); }
 
-    NODE_IMPLEMENTATION(StringType::to_double, double)
-    {
-        NODE_RETURN(double_double_string(NODE_THREAD, NODE_ARG(0, Pointer)));
-    }
+    NODE_IMPLEMENTATION(StringType::to_double, double) { NODE_RETURN(double_double_string(NODE_THREAD, NODE_ARG(0, Pointer))); }
 
-    NODE_IMPLEMENTATION(StringType::to_bool, bool)
-    {
-        NODE_RETURN(bool_bool_string(NODE_THREAD, NODE_ARG(0, Pointer)));
-    }
+    NODE_IMPLEMENTATION(StringType::to_bool, bool) { NODE_RETURN(bool_bool_string(NODE_THREAD, NODE_ARG(0, Pointer))); }
 
     NODE_IMPLEMENTATION(StringType::equals, bool)
     {
-        NODE_RETURN(EQ_EQ__bool_string_string(NODE_THREAD, NODE_ARG(0, Pointer),
-                                              NODE_ARG(1, Pointer)));
+        NODE_RETURN(EQ_EQ__bool_string_string(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     NODE_IMPLEMENTATION(StringType::notequals, bool)
     {
-        NODE_RETURN(Bang_EQ__bool_string_string(
-            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(Bang_EQ__bool_string_string(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     NODE_IMPLEMENTATION(StringType::formatOp, Pointer)
@@ -1858,24 +1695,21 @@ namespace Mu
     {
         Pointer fmt = NODE_ARG(0, Pointer);
         Vector4f arg = NODE_ARG(1, Vector4f);
-        NODE_RETURN(
-            PCent__string_string_vector_floatBSB_4ESB_(NODE_THREAD, fmt, arg));
+        NODE_RETURN(PCent__string_string_vector_floatBSB_4ESB_(NODE_THREAD, fmt, arg));
     }
 
     NODE_IMPLEMENTATION(StringType::formatOp_Vector3f, Pointer)
     {
         Pointer fmt = NODE_ARG(0, Pointer);
         Vector3f arg = NODE_ARG(1, Vector3f);
-        NODE_RETURN(
-            PCent__string_string_vector_floatBSB_3ESB_(NODE_THREAD, fmt, arg));
+        NODE_RETURN(PCent__string_string_vector_floatBSB_3ESB_(NODE_THREAD, fmt, arg));
     }
 
     NODE_IMPLEMENTATION(StringType::formatOp_Vector2f, Pointer)
     {
         Pointer fmt = NODE_ARG(0, Pointer);
         Vector2f arg = NODE_ARG(1, Vector2f);
-        NODE_RETURN(
-            PCent__string_string_vector_floatBSB_2ESB_(NODE_THREAD, fmt, arg));
+        NODE_RETURN(PCent__string_string_vector_floatBSB_2ESB_(NODE_THREAD, fmt, arg));
     }
 
     NODE_IMPLEMENTATION(StringType::formatOp_charArray, Pointer)
@@ -1897,8 +1731,7 @@ namespace Mu
     {
         Pointer fmt = NODE_ARG(0, Pointer);
         Pointer arg = NODE_ARG(1, Pointer);
-        NODE_RETURN(
-            PCent__string_string_QMark_class_not_tuple(NODE_THREAD, fmt, arg));
+        NODE_RETURN(PCent__string_string_QMark_class_not_tuple(NODE_THREAD, fmt, arg));
     }
 
     NODE_IMPLEMENTATION(StringType::formatOp_opaque, Pointer)
@@ -1908,51 +1741,47 @@ namespace Mu
         NODE_RETURN(PCent__string_string_QMark_opaque(NODE_THREAD, fmt, arg));
     }
 
-    NODE_IMPLEMENTATION(StringType::print, void)
-    {
-        print_void_string(NODE_THREAD, NODE_ARG(0, Pointer));
-    }
+    NODE_IMPLEMENTATION(StringType::print, void) { print_void_string(NODE_THREAD, NODE_ARG(0, Pointer)); }
 
-    NODE_IMPLEMENTATION(StringType::size, int)
-    {
-        NODE_RETURN(string_size_int_string(NODE_THREAD, NODE_ARG(0, Pointer)));
-    }
+    NODE_IMPLEMENTATION(StringType::size, int) { NODE_RETURN(string_size_int_string(NODE_THREAD, NODE_ARG(0, Pointer))); }
 
-    NODE_IMPLEMENTATION(StringType::hash, int)
-    {
-        NODE_RETURN(string_hash_int_string(NODE_THREAD, NODE_ARG(0, Pointer)));
-    }
+    NODE_IMPLEMENTATION(StringType::hash, int) { NODE_RETURN(string_hash_int_string(NODE_THREAD, NODE_ARG(0, Pointer))); }
 
     NODE_IMPLEMENTATION(StringType::compare, int)
     {
-        NODE_RETURN(compare_int_string_string(NODE_THREAD, NODE_ARG(0, Pointer),
-                                              NODE_ARG(1, Pointer)));
+        NODE_RETURN(compare_int_string_string(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     NODE_IMPLEMENTATION(StringType::split, Pointer)
     {
-        NODE_RETURN(string_split_stringBSB_ESB__string_string_bool(
-            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, bool)));
+        NODE_RETURN(
+            string_split_stringBSB_ESB__string_string_bool(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, bool)));
     }
 
     NODE_IMPLEMENTATION(StringType::join_array, Pointer)
     {
-        NODE_RETURN(string_join_string_stringBSB_ESB__string(
-            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(string_join_string_stringBSB_ESB__string(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     NODE_IMPLEMENTATION(StringType::index, int)
     {
-        NODE_RETURN(string_BSB_ESB__char_string_int(
-            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(string_BSB_ESB__char_string_int(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     NODE_IMPLEMENTATION(StringType::substr, Pointer)
     {
-        NODE_RETURN(string_substr_string_string_int_int(
-            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int)));
+        NODE_RETURN(string_substr_string_string_int_int(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int)));
+    }
+
+    NODE_IMPLEMENTATION(StringType::contains, int)
+    {
+        NODE_RETURN(string_contains_int_string_string(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+    }
+
+    NODE_IMPLEMENTATION(StringType::replace, Pointer)
+    {
+        NODE_RETURN(
+            string_replace_string_string_string_string(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, Pointer)));
     }
 
 } // namespace Mu

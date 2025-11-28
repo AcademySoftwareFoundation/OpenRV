@@ -37,20 +37,13 @@ namespace TwkFB
         typedef float R32;
         typedef char ASCII;
 
-        static void planarConfig(TwkFB::FrameBuffer&, int, int,
-                                 TwkFB::FrameBuffer::DataType);
+        static void planarConfig(TwkFB::FrameBuffer&, int, int, TwkFB::FrameBuffer::DataType);
 
-        static void readRGB8_PLANAR(const std::string&, const unsigned char*,
-                                    TwkFB::FrameBuffer&, int, int,
-                                    size_t maxbytes, bool swap);
+        static void readRGB8_PLANAR(const std::string&, const unsigned char*, TwkFB::FrameBuffer&, int, int, size_t maxbytes, bool swap);
 
-        static void readRGB16_PLANAR(const std::string&, const unsigned char*,
-                                     TwkFB::FrameBuffer&, int, int,
-                                     size_t maxbytes, bool swap);
+        static void readRGB16_PLANAR(const std::string&, const unsigned char*, TwkFB::FrameBuffer&, int, int, size_t maxbytes, bool swap);
 
-        static void readNoPaddingRGB16(const std::string&, const unsigned char*,
-                                       TwkFB::FrameBuffer&, int, int,
-                                       size_t maxbytes, bool swap);
+        static void readNoPaddingRGB16(const std::string&, const unsigned char*, TwkFB::FrameBuffer&, int, int, size_t maxbytes, bool swap);
     };
 
 } // namespace TwkFB

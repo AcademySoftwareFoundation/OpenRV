@@ -60,16 +60,14 @@ namespace Mu
         _baseType = 0;
     }
 
-    MuQt_QTimer::MuQt_QTimer(Pointer muobj, const CallEnvironment* ce,
-                             QObject* parent)
+    MuQt_QTimer::MuQt_QTimer(Pointer muobj, const CallEnvironment* ce, QObject* parent)
         : QTimer(parent)
     {
         _env = ce;
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QTimerType>(
-            c->internName("qt.QTimer"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QTimerType>(c->internName("qt.QTimer"));
     }
 
     void MuQt_QTimer::timerEvent(QTimerEvent* e)
@@ -86,8 +84,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QTimerEventType>(c, e, "qt.QTimerEvent"));
+            args[1] = Value(makeqpointer<QTimerEventType>(c, e, "qt.QTimerEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -128,8 +125,7 @@ namespace Mu
         {
             Function::ArgumentVector args(3);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeinstance<QObjectType>(c, watched, "qt.QObject"));
+            args[1] = Value(makeinstance<QObjectType>(c, watched, "qt.QObject"));
             args[2] = Value(makeqpointer<QEventType>(c, event, "qt.QEvent"));
             Value rval = _env->call(F, args);
             return (bool)(rval._bool);
@@ -166,8 +162,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  Mu Type CONSTRUCTORS
 
-    QTimerType::QTimerType(Context* c, const char* name, Class* super,
-                           Class* super2)
+    QTimerType::QTimerType(Context* c, const char* name, Class* super, Class* super2)
         : Class(c, name, vectorOf2(super, super2))
     {
     }
@@ -188,8 +183,7 @@ namespace Mu
         }
         else if (QTimer* w = object<QTimer>(widget))
         {
-            QTimerType* type = c->findSymbolOfTypeByQualifiedName<QTimerType>(
-                c->internName("qt.QTimer"), false);
+            QTimerType* type = c->findSymbolOfTypeByQualifiedName<QTimerType>(c->internName("qt.QTimer"), false);
             ClassInstance* o = ClassInstance::allocate(type);
             setobject(o, w);
             return o;
@@ -200,52 +194,39 @@ namespace Mu
         }
     }
 
-    static NODE_IMPLEMENTATION(castFromObject, Pointer)
-    {
-        NODE_RETURN(QTimer_QTimer_QObject(NODE_THREAD, NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(castFromObject, Pointer) { NODE_RETURN(QTimer_QTimer_QObject(NODE_THREAD, NODE_ARG(0, Pointer))); }
 
-    Pointer qt_QTimer_QTimer_QTimer_QTimer_QObject(Mu::Thread& NODE_THREAD,
-                                                   Pointer param_this,
-                                                   Pointer param_parent)
+    Pointer qt_QTimer_QTimer_QTimer_QTimer_QObject(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QObject* arg1 = object<QObject>(param_parent);
-        setobject(param_this,
-                  new MuQt_QTimer(param_this, NODE_THREAD.process()->callEnv(),
-                                  arg1));
+        setobject(param_this, new MuQt_QTimer(param_this, NODE_THREAD.process()->callEnv(), arg1));
         return param_this;
     }
 
-    bool qt_QTimer_isActive_bool_QTimer(Mu::Thread& NODE_THREAD,
-                                        Pointer param_this)
+    bool qt_QTimer_isActive_bool_QTimer(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTimer* arg0 = object<QTimer>(param_this);
         return arg0->isActive();
     }
 
-    void qt_QTimer_start_void_QTimer_int(Mu::Thread& NODE_THREAD,
-                                         Pointer param_this, int param_msec)
+    void qt_QTimer_start_void_QTimer_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_msec)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTimer* arg0 = object<QTimer>(param_this);
-        std::chrono::milliseconds arg1 =
-            (std::chrono::milliseconds)(param_msec);
+        std::chrono::milliseconds arg1 = (std::chrono::milliseconds)(param_msec);
         arg0->start(arg1);
     }
 
-    int qt_QTimer_timerId_int_QTimer(Mu::Thread& NODE_THREAD,
-                                     Pointer param_this)
+    int qt_QTimer_timerId_int_QTimer(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTimer* arg0 = object<QTimer>(param_this);
         return arg0->timerId();
     }
 
-    void qt_QTimer_timerEvent_void_QTimer_QTimerEvent(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this,
-                                                      Pointer param_e)
+    void qt_QTimer_timerEvent_void_QTimer_QTimerEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTimer* arg0 = object<QTimer>(param_this);
@@ -256,31 +237,25 @@ namespace Mu
             ((MuQt_QTimer*)arg0)->timerEvent_pub(arg1);
     }
 
-    bool qt_QTimer_event_bool_QTimer_QEvent(Mu::Thread& NODE_THREAD,
-                                            Pointer param_this, Pointer param_e)
+    bool qt_QTimer_event_bool_QTimer_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTimer* arg0 = object<QTimer>(param_this);
         QEvent* arg1 = getqpointer<QEventType>(param_e);
-        return isMuQtObject(arg0) ? arg0->QTimer::event(arg1)
-                                  : arg0->event(arg1);
+        return isMuQtObject(arg0) ? arg0->QTimer::event(arg1) : arg0->event(arg1);
     }
 
-    bool qt_QTimer_eventFilter_bool_QTimer_QObject_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_watched,
-        Pointer param_event)
+    bool qt_QTimer_eventFilter_bool_QTimer_QObject_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_watched,
+                                                          Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTimer* arg0 = object<QTimer>(param_this);
         QObject* arg1 = object<QObject>(param_watched);
         QEvent* arg2 = getqpointer<QEventType>(param_event);
-        return isMuQtObject(arg0) ? arg0->QTimer::eventFilter(arg1, arg2)
-                                  : arg0->eventFilter(arg1, arg2);
+        return isMuQtObject(arg0) ? arg0->QTimer::eventFilter(arg1, arg2) : arg0->eventFilter(arg1, arg2);
     }
 
-    void qt_QTimer_customEvent_void_QTimer_QEvent(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this,
-                                                  Pointer param_event)
+    void qt_QTimer_customEvent_void_QTimer_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTimer* arg0 = object<QTimer>(param_this);
@@ -293,51 +268,40 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(_n_QTimer0, Pointer)
     {
-        NODE_RETURN(qt_QTimer_QTimer_QTimer_QTimer_QObject(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QTimer_QTimer_QTimer_QTimer_QObject(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isActive0, bool)
     {
-        NODE_RETURN(qt_QTimer_isActive_bool_QTimer(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTimer_isActive_bool_QTimer(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_start0, void)
     {
-        qt_QTimer_start_void_QTimer_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QTimer_start_void_QTimer_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
-    static NODE_IMPLEMENTATION(_n_timerId0, int)
-    {
-        NODE_RETURN(qt_QTimer_timerId_int_QTimer(NODE_THREAD,
-                                                 NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_timerId0, int) { NODE_RETURN(qt_QTimer_timerId_int_QTimer(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
     static NODE_IMPLEMENTATION(_n_timerEvent0, void)
     {
-        qt_QTimer_timerEvent_void_QTimer_QTimerEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTimer_timerEvent_void_QTimer_QTimerEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_event0, bool)
     {
-        NODE_RETURN(qt_QTimer_event_bool_QTimer_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QTimer_event_bool_QTimer_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_eventFilter0, bool)
     {
-        NODE_RETURN(qt_QTimer_eventFilter_bool_QTimer_QObject_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QTimer_eventFilter_bool_QTimer_QObject_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                     NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_customEvent0, void)
     {
-        qt_QTimer_customEvent_void_QTimer_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTimer_customEvent_void_QTimer_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     void QTimerType::load()
@@ -357,16 +321,13 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
-                   new Function(c, tn, castFromObject, Cast, Compiled,
-                                QTimer_QTimer_QObject, Return, ftn, Parameters,
+                   new Function(c, tn, castFromObject, Cast, Compiled, QTimer_QTimer_QObject, Return, ftn, Parameters,
                                 new Param(c, "object", "qt.QObject"), End),
 
                    EndArguments);
@@ -374,11 +335,8 @@ namespace Mu
         addSymbols(
             // enums
             // member functions
-            new Function(c, "QTimer", _n_QTimer0, None, Compiled,
-                         qt_QTimer_QTimer_QTimer_QTimer_QObject, Return,
-                         "qt.QTimer", Parameters,
-                         new Param(c, "this", "qt.QTimer"),
-                         new Param(c, "parent", "qt.QObject"), End),
+            new Function(c, "QTimer", _n_QTimer0, None, Compiled, qt_QTimer_QTimer_QTimer_QTimer_QObject, Return, "qt.QTimer", Parameters,
+                         new Param(c, "this", "qt.QTimer"), new Param(c, "parent", "qt.QObject"), End),
             // MISSING: bindableActive ("QBindable<bool>"; QTimer this)
             // MISSING: bindableInterval ("QBindable<int>"; QTimer this)
             // MISSING: bindableSingleShot ("QBindable<bool>"; QTimer this)
@@ -389,9 +347,8 @@ namespace Mu
             // QMetaObject::Connection; QTimer this, QObject receiver,
             // "MemberFunction *" slot, flags Qt::ConnectionType connectionType)
             // PROP: interval (int; QTimer this)
-            new Function(c, "isActive", _n_isActive0, None, Compiled,
-                         qt_QTimer_isActive_bool_QTimer, Return, "bool",
-                         Parameters, new Param(c, "this", "qt.QTimer"), End),
+            new Function(c, "isActive", _n_isActive0, None, Compiled, qt_QTimer_isActive_bool_QTimer, Return, "bool", Parameters,
+                         new Param(c, "this", "qt.QTimer"), End),
             // PROP: isSingleShot (bool; QTimer this)
             // PROP: remainingTime (int; QTimer this)
             // PROP: setInterval (void; QTimer this, int msec)
@@ -399,39 +356,27 @@ namespace Mu
             // std::chrono::milliseconds value) PROP: setSingleShot (void;
             // QTimer this, bool singleShot) PROP: setTimerType (void; QTimer
             // this, flags Qt::TimerType atype)
-            new Function(c, "start", _n_start0, None, Compiled,
-                         qt_QTimer_start_void_QTimer_int, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QTimer"),
-                         new Param(c, "msec", "int"), End),
-            new Function(c, "timerId", _n_timerId0, None, Compiled,
-                         qt_QTimer_timerId_int_QTimer, Return, "int",
-                         Parameters, new Param(c, "this", "qt.QTimer"), End),
+            new Function(c, "start", _n_start0, None, Compiled, qt_QTimer_start_void_QTimer_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QTimer"), new Param(c, "msec", "int"), End),
+            new Function(c, "timerId", _n_timerId0, None, Compiled, qt_QTimer_timerId_int_QTimer, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QTimer"), End),
             // PROP: timerType (flags Qt::TimerType; QTimer this)
-            _func[0] = new MemberFunction(
-                c, "timerEvent", _n_timerEvent0, None, Compiled,
-                qt_QTimer_timerEvent_void_QTimer_QTimerEvent, Return, "void",
-                Parameters, new Param(c, "this", "qt.QTimer"),
-                new Param(c, "e", "qt.QTimerEvent"), End),
-            _func[1] = new MemberFunction(c, "event", _n_event0, None, Compiled,
-                                          qt_QTimer_event_bool_QTimer_QEvent,
-                                          Return, "bool", Parameters,
-                                          new Param(c, "this", "qt.QTimer"),
-                                          new Param(c, "e", "qt.QEvent"), End),
-            _func[2] = new MemberFunction(
-                c, "eventFilter", _n_eventFilter0, None, Compiled,
-                qt_QTimer_eventFilter_bool_QTimer_QObject_QEvent, Return,
-                "bool", Parameters, new Param(c, "this", "qt.QTimer"),
-                new Param(c, "watched", "qt.QObject"),
-                new Param(c, "event", "qt.QEvent"), End),
+            _func[0] =
+                new MemberFunction(c, "timerEvent", _n_timerEvent0, None, Compiled, qt_QTimer_timerEvent_void_QTimer_QTimerEvent, Return,
+                                   "void", Parameters, new Param(c, "this", "qt.QTimer"), new Param(c, "e", "qt.QTimerEvent"), End),
+            _func[1] = new MemberFunction(c, "event", _n_event0, None, Compiled, qt_QTimer_event_bool_QTimer_QEvent, Return, "bool",
+                                          Parameters, new Param(c, "this", "qt.QTimer"), new Param(c, "e", "qt.QEvent"), End),
+            _func[2] =
+                new MemberFunction(c, "eventFilter", _n_eventFilter0, None, Compiled, qt_QTimer_eventFilter_bool_QTimer_QObject_QEvent,
+                                   Return, "bool", Parameters, new Param(c, "this", "qt.QTimer"), new Param(c, "watched", "qt.QObject"),
+                                   new Param(c, "event", "qt.QEvent"), End),
             // MISSING: metaObject ("const QMetaObject *"; QTimer this)
             // MISSING: childEvent (void; QTimer this, "QChildEvent *" event) //
             // protected MISSING: connectNotify (void; QTimer this, "const
             // QMetaMethod &" signal) // protected
-            _func[3] = new MemberFunction(
-                c, "customEvent", _n_customEvent0, None, Compiled,
-                qt_QTimer_customEvent_void_QTimer_QEvent, Return, "void",
-                Parameters, new Param(c, "this", "qt.QTimer"),
-                new Param(c, "event", "qt.QEvent"), End),
+            _func[3] =
+                new MemberFunction(c, "customEvent", _n_customEvent0, None, Compiled, qt_QTimer_customEvent_void_QTimer_QEvent, Return,
+                                   "void", Parameters, new Param(c, "this", "qt.QTimer"), new Param(c, "event", "qt.QEvent"), End),
             // MISSING: disconnectNotify (void; QTimer this, "const QMetaMethod
             // &" signal) // protected static functions MISSING: singleShot
             // (void; int msec, QObject receiver, "const char *" member)

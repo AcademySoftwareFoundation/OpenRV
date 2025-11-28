@@ -19,8 +19,7 @@ namespace Mu
         //  Constructors
         //
 
-        QtColorTriangleType(Context* context, const char* name,
-                            Class* superClass = 0);
+        QtColorTriangleType(Context* context, const char* name, Class* superClass = 0);
         virtual ~QtColorTriangleType();
 
         //

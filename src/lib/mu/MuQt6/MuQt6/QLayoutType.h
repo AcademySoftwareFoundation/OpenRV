@@ -42,8 +42,7 @@ namespace Mu
         //  Constructors
         //
 
-        QLayoutType(Context* context, const char* name, Class* superClass = 0,
-                    Class* superClass2 = 0);
+        QLayoutType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QLayoutType();
 
@@ -71,8 +70,7 @@ namespace Mu
         virtual int indexOf(const QWidget* widget) const;
         virtual int indexOf(const QLayoutItem* layoutItem) const;
         virtual QLayoutItem* itemAt(int index) const;
-        virtual QLayoutItem* replaceWidget(QWidget* from, QWidget* to,
-                                           Qt::FindChildOptions options);
+        virtual QLayoutItem* replaceWidget(QWidget* from, QWidget* to, Qt::FindChildOptions options);
         virtual void setSpacing(int _p3);
         virtual int spacing() const;
         virtual QLayoutItem* takeAt(int index);
@@ -100,46 +98,25 @@ namespace Mu
         virtual QWidget* widget() const;
 
     public:
-        void addChildLayout_pub(QLayout* childLayout)
-        {
-            addChildLayout(childLayout);
-        }
+        void addChildLayout_pub(QLayout* childLayout) { addChildLayout(childLayout); }
 
-        void addChildLayout_pub_parent(QLayout* childLayout)
-        {
-            QLayout::addChildLayout(childLayout);
-        }
+        void addChildLayout_pub_parent(QLayout* childLayout) { QLayout::addChildLayout(childLayout); }
 
         void addChildWidget_pub(QWidget* w) { addChildWidget(w); }
 
-        void addChildWidget_pub_parent(QWidget* w)
-        {
-            QLayout::addChildWidget(w);
-        }
+        void addChildWidget_pub_parent(QWidget* w) { QLayout::addChildWidget(w); }
 
-        QRect alignmentRect_pub(const QRect& r) const
-        {
-            return alignmentRect(r);
-        }
+        QRect alignmentRect_pub(const QRect& r) const { return alignmentRect(r); }
 
-        QRect alignmentRect_pub_parent(const QRect& r) const
-        {
-            return QLayout::alignmentRect(r);
-        }
+        QRect alignmentRect_pub_parent(const QRect& r) const { return QLayout::alignmentRect(r); }
 
         void customEvent_pub(QEvent* event) { customEvent(event); }
 
-        void customEvent_pub_parent(QEvent* event)
-        {
-            QLayout::customEvent(event);
-        }
+        void customEvent_pub_parent(QEvent* event) { QLayout::customEvent(event); }
 
         void timerEvent_pub(QTimerEvent* event) { timerEvent(event); }
 
-        void timerEvent_pub_parent(QTimerEvent* event)
-        {
-            QLayout::timerEvent(event);
-        }
+        void timerEvent_pub_parent(QTimerEvent* event) { QLayout::timerEvent(event); }
 
     public:
         const QLayoutType* _baseType;
@@ -147,11 +124,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance*
-    QLayoutType::cachedInstance(const QLayoutType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QLayoutType::cachedInstance(const QLayoutType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

@@ -16,15 +16,12 @@ namespace IPCore
     using namespace std;
     using namespace TwkMath;
 
-    LensWarpIPNode::LensWarpIPNode(const std::string& name,
-                                   const NodeDefinition* def, IPGraph* graph,
-                                   GroupIPNode* group)
+    LensWarpIPNode::LensWarpIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group)
         : IPNode(name, def, graph, group)
     {
         m_activeProperty = declareProperty<IntProperty>("node.active", 1);
 
-        m_pixelAspect =
-            declareProperty<FloatProperty>("warp.pixelAspectRatio", 0.0f);
+        m_pixelAspect = declareProperty<FloatProperty>("warp.pixelAspectRatio", 0.0f);
 
         // Options are: "brown", "opencv", "pfbarrel",
         // "nuke", "tde4_ldp_anamorphic_deg_6", "adobe"
@@ -88,10 +85,7 @@ namespace IPCore
         }
     }
 
-    bool LensWarpIPNode::active() const
-    {
-        return (m_activeProperty->front() ? true : false);
-    }
+    bool LensWarpIPNode::active() const { return (m_activeProperty->front() ? true : false); }
 
     IPImage* LensWarpIPNode::evaluate(const Context& context)
     {
@@ -128,15 +122,11 @@ namespace IPCore
 
             if (pa > 1.0f || (pa == 1.0f && image->pixelAspect >= 1.0))
             {
-                image->width = image->fb
-                                   ? image->fb->uncropWidth() * pa
-                                   : image->width / image->pixelAspect * pa;
+                image->width = image->fb ? image->fb->uncropWidth() * pa : image->width / image->pixelAspect * pa;
             }
             if (pa < 1.0f || (pa == 1.0f && image->pixelAspect < 1.0))
             {
-                image->height = image->fb
-                                    ? image->fb->uncropHeight() / pa
-                                    : image->height * image->pixelAspect / pa;
+                image->height = image->fb ? image->fb->uncropHeight() / pa : image->height * image->pixelAspect / pa;
             }
 
             // Pixel Aspect may be changed down the line,
@@ -167,9 +157,8 @@ namespace IPCore
             const float cropRatioX = m_cropRatioX->front();
             const float cropRatioY = m_cropRatioY->front();
 
-            image->shaderExpr = Shader::newLensWarp(
-                image, image->shaderExpr, k1, k2, k3, d, p1, p2,
-                center + offset, Vec2f(fx, fy), Vec2f(cropRatioX, cropRatioY));
+            image->shaderExpr = Shader::newLensWarp(image, image->shaderExpr, k1, k2, k3, d, p1, p2, center + offset, Vec2f(fx, fy),
+                                                    Vec2f(cropRatioX, cropRatioY));
         }
         else if (model == "opencv")
         {
@@ -184,9 +173,8 @@ namespace IPCore
             const float cropRatioX = m_cropRatioX->front();
             const float cropRatioY = m_cropRatioY->front();
 
-            image->shaderExpr = Shader::newLensWarp(
-                image, image->shaderExpr, k1, k2, 0.0f, d, p1, p2, center,
-                Vec2f(fx, fy), Vec2f(cropRatioX, cropRatioY));
+            image->shaderExpr = Shader::newLensWarp(image, image->shaderExpr, k1, k2, 0.0f, d, p1, p2, center, Vec2f(fx, fy),
+                                                    Vec2f(cropRatioX, cropRatioY));
         }
         else if (model == "pfbarrel")
         {
@@ -205,12 +193,10 @@ namespace IPCore
             const float fx = 0.5f * sqrtf(1.0f + YXRatio * YXRatio);
             const float fy = fx;
 
-            image->shaderExpr = Shader::newLensWarp(
-                image, image->shaderExpr, k1, k2, 0.0f, d, 0.0f, 0.0f, center,
-                Vec2f(fx, fy), Vec2f(cropRatioX, cropRatioY));
+            image->shaderExpr = Shader::newLensWarp(image, image->shaderExpr, k1, k2, 0.0f, d, 0.0f, 0.0f, center, Vec2f(fx, fy),
+                                                    Vec2f(cropRatioX, cropRatioY));
         }
-        else if (model
-                 == "tde4_ldp_anamorphic_deg_6") // 3DE4 Anamorphic Degree 6
+        else if (model == "tde4_ldp_anamorphic_deg_6") // 3DE4 Anamorphic Degree 6
         {
             const float cx02 = m_cx02->front(); // Distortion Degree 2
             const float cy02 = m_cy02->front(); // Distortion Degree 2
@@ -241,32 +227,26 @@ namespace IPCore
             const float cropRatioY = m_cropRatioY->front();
 
             image->shaderExpr = Shader::newLensWarp3DE4AnamorphicDegree6(
-                image, image->shaderExpr, Vec2f(cx02, cy02), Vec2f(cx22, cy22),
-                Vec2f(cx04, cy04), Vec2f(cx24, cy24), Vec2f(cx44, cy44),
-                Vec2f(cx06, cy06), Vec2f(cx26, cy26), Vec2f(cx46, cy46),
-                Vec2f(cx66, cy66), center - offset, Vec2f(fx, fy),
+                image, image->shaderExpr, Vec2f(cx02, cy02), Vec2f(cx22, cy22), Vec2f(cx04, cy04), Vec2f(cx24, cy24), Vec2f(cx44, cy44),
+                Vec2f(cx06, cy06), Vec2f(cx26, cy26), Vec2f(cx46, cy46), Vec2f(cx66, cy66), center - offset, Vec2f(fx, fy),
                 Vec2f(cropRatioX, cropRatioY));
         }
         else if (model == "adobe") // Adobe LCP
         {
-            const float k1 = m_k1->front(); // stCamera: RadialDistortParam1
-            const float k2 = m_k2->front(); // stCamera: RadialDistortParam2
-            const float k3 = m_k3->front(); // stCamera: RadialDistortParam3
-            const float d =
-                0.99f; // This is a mystery; but it matches Lightroom.
-            const float p1 = m_p1->front(); // stCamera: TangentialDistortParam1
-            const float p2 = m_p2->front(); // stCamera: TangentialDistortParam2
-            Vec2f center =
-                m_center
-                    ->front(); // stCamera:ImageXCenter stCamera:ImageYCenter
-            const float fx = m_fx->front(); // stCamera:FocalLengthX
-            const float fy = m_fy->front(); // stCamera:FocalLengthY
+            const float k1 = m_k1->front();   // stCamera: RadialDistortParam1
+            const float k2 = m_k2->front();   // stCamera: RadialDistortParam2
+            const float k3 = m_k3->front();   // stCamera: RadialDistortParam3
+            const float d = 0.99f;            // This is a mystery; but it matches Lightroom.
+            const float p1 = m_p1->front();   // stCamera: TangentialDistortParam1
+            const float p2 = m_p2->front();   // stCamera: TangentialDistortParam2
+            Vec2f center = m_center->front(); // stCamera:ImageXCenter stCamera:ImageYCenter
+            const float fx = m_fx->front();   // stCamera:FocalLengthX
+            const float fy = m_fy->front();   // stCamera:FocalLengthY
             const float cropRatioX = m_cropRatioX->front();
             const float cropRatioY = m_cropRatioY->front();
 
-            image->shaderExpr = Shader::newLensWarp(
-                image, image->shaderExpr, k1, k2, k3, d, p1, p2, center,
-                Vec2f(fx, fy), Vec2f(cropRatioX, cropRatioY));
+            image->shaderExpr =
+                Shader::newLensWarp(image, image->shaderExpr, k1, k2, k3, d, p1, p2, center, Vec2f(fx, fy), Vec2f(cropRatioX, cropRatioY));
         }
         else if (model == "nuke") // IN PROGRESS;  needs to be figured out?
         {
@@ -280,12 +260,10 @@ namespace IPCore
             const float cropRatioX = m_cropRatioX->front();
             const float cropRatioY = m_cropRatioY->front();
 
-            image->shaderExpr = Shader::newLensWarp(
-                image, image->shaderExpr, k1, k2, 0.0f, d, 0.0f, 0.0f, center,
-                Vec2f(fx, fy), Vec2f(cropRatioX, cropRatioY));
+            image->shaderExpr = Shader::newLensWarp(image, image->shaderExpr, k1, k2, 0.0f, d, 0.0f, 0.0f, center, Vec2f(fx, fy),
+                                                    Vec2f(cropRatioX, cropRatioY));
         }
-        else if (model
-                 == "rv4.0.10") // Legacy brown model for rv version <= 4.0.10
+        else if (model == "rv4.0.10") // Legacy brown model for rv version <= 4.0.10
         {
             const float k1 = -m_k1->front();
             const float k2 = -m_k2->front();
@@ -300,16 +278,14 @@ namespace IPCore
             const float cropRatioX = 0.5f * m_cropRatioX->front();
             const float cropRatioY = 0.5f * m_cropRatioY->front();
 
-            image->shaderExpr = Shader::newLensWarp(
-                image, image->shaderExpr, k1, k2, k3, d, p1, p2,
-                center + offset, Vec2f(fx, fy), Vec2f(cropRatioX, cropRatioY));
+            image->shaderExpr = Shader::newLensWarp(image, image->shaderExpr, k1, k2, k3, d, p1, p2, center + offset, Vec2f(fx, fy),
+                                                    Vec2f(cropRatioX, cropRatioY));
         }
 
         return image;
     }
 
-    IPNode::ImageStructureInfo
-    LensWarpIPNode::imageStructureInfo(const Context& context) const
+    IPNode::ImageStructureInfo LensWarpIPNode::imageStructureInfo(const Context& context) const
     {
         ImageStructureInfo i = IPNode::imageStructureInfo(context);
 
@@ -331,8 +307,7 @@ namespace IPCore
         return i;
     }
 
-    void LensWarpIPNode::readCompleted(const std::string& typeName,
-                                       unsigned int version)
+    void LensWarpIPNode::readCompleted(const std::string& typeName, unsigned int version)
     {
         if (active() && pixelAspect() != 0.0f)
         {

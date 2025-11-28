@@ -38,12 +38,10 @@ namespace IPCore
     {
         bool useMerge = getenv("TWK_STACKIPNODE_USE_MERGE") != 0;
         bool useMergeForReplace =
-            (getenv("TWK_STACKIPNODE_USE_MERGE_FOR_REPLACE") == 0
-             || getenv("TWK_STACKIPNODE_USE_MERGE_FOR_REPLACE")[0] != '0');
+            (getenv("TWK_STACKIPNODE_USE_MERGE_FOR_REPLACE") == 0 || getenv("TWK_STACKIPNODE_USE_MERGE_FOR_REPLACE")[0] != '0');
     } // namespace
 
-    StackIPNode::StackIPNode(const std::string& name, const NodeDefinition* def,
-                             IPGraph* g, GroupIPNode* group)
+    StackIPNode::StackIPNode(const std::string& name, const NodeDefinition* def, IPGraph* g, GroupIPNode* group)
         : IPNode(name, def, g, group)
         , m_offset(0)
         , m_fit(true)
@@ -60,17 +58,12 @@ namespace IPCore
         m_outputSize->back() = 480;
 
         m_useCutInfo = declareProperty<IntProperty>("mode.useCutInfo", 1);
-        m_alignStartFrames =
-            declareProperty<IntProperty>("mode.alignStartFrames", 0);
+        m_alignStartFrames = declareProperty<IntProperty>("mode.alignStartFrames", 0);
         m_autoSize = declareProperty<IntProperty>("output.autoSize", 1);
-        m_activeAudioInput =
-            declareProperty<StringProperty>("output.chosenAudioInput", ".all.");
-        m_strictFrameRanges =
-            declareProperty<IntProperty>("mode.strictFrameRanges", 0);
-        m_interactiveSize =
-            declareProperty<IntProperty>("output.interactiveSize", 0);
-        m_supportReversedOrderBlending = declareProperty<IntProperty>(
-            "mode.supportReversedOrderBlending", 1);
+        m_activeAudioInput = declareProperty<StringProperty>("output.chosenAudioInput", ".all.");
+        m_strictFrameRanges = declareProperty<IntProperty>("mode.strictFrameRanges", 0);
+        m_interactiveSize = declareProperty<IntProperty>("output.interactiveSize", 0);
+        m_supportReversedOrderBlending = declareProperty<IntProperty>("mode.supportReversedOrderBlending", 1);
 
         if (m_defaultCompType == "layer")
         {
@@ -83,18 +76,14 @@ namespace IPCore
         }
 
         m_compMode = declareProperty<StringProperty>(
-            "composite.type", (this->name() == "defaultStack_stack"
-                               || this->name() == "defaultLayout_stack")
-                                  ? m_defaultCompType
-                                  : "over");
+            "composite.type", (this->name() == "defaultStack_stack" || this->name() == "defaultLayout_stack") ? m_defaultCompType : "over");
     }
 
     StackIPNode::~StackIPNode() { pthread_mutex_destroy(&m_lock); }
 
     bool StackIPNode::interactiveSize(const Context& c) const
     {
-        return m_interactiveSize->front() != 0 && graph()->viewNode() == group()
-               && c.allowInteractiveResize && c.viewWidth != 0
+        return m_interactiveSize->front() != 0 && graph()->viewNode() == group() && c.allowInteractiveResize && c.viewWidth != 0
                && c.viewHeight != 0;
     }
 
@@ -118,8 +107,7 @@ namespace IPCore
                 while (node->inputs().size())
                     node = node->inputs()[0];
 
-                if (const AdaptorIPNode* n =
-                        dynamic_cast<const AdaptorIPNode*>(node))
+                if (const AdaptorIPNode* n = dynamic_cast<const AdaptorIPNode*>(node))
                 {
                     node = n->groupInputNode();
                     if (node->name() == m_activeAudioInput->front())
@@ -150,8 +138,7 @@ namespace IPCore
     {
         if (!isDeleting())
         {
-            if (p == m_useCutInfo || p == m_alignStartFrames
-                || p == m_strictFrameRanges || p == m_outputFPS)
+            if (p == m_useCutInfo || p == m_alignStartFrames || p == m_strictFrameRanges || p == m_outputFPS)
             {
                 lock();
                 m_rangeInfoDirty = true;
@@ -197,16 +184,14 @@ namespace IPCore
         unlock();
     }
 
-    void StackIPNode::inputImageStructureChanged(int inputIndex,
-                                                 PropagateTarget target)
+    void StackIPNode::inputImageStructureChanged(int inputIndex, PropagateTarget target)
     {
         lock();
         m_structureInfoDirty = true;
         unlock();
     }
 
-    IPNode::ImageStructureInfo
-    StackIPNode::imageStructureInfo(const Context& context) const
+    IPNode::ImageStructureInfo StackIPNode::imageStructureInfo(const Context& context) const
     {
         if (interactiveSize(context))
         {
@@ -249,8 +234,7 @@ namespace IPCore
         for (int i = 0; i < inputs().size(); i++)
         {
             m_rangeInfos[i] = inputs()[i]->imageRangeInfo();
-            ImageStructureInfo sinfo = inputs()[i]->imageStructureInfo(
-                graph()->contextForFrame(m_rangeInfos[i].start));
+            ImageStructureInfo sinfo = inputs()[i]->imageStructureInfo(graph()->contextForFrame(m_rangeInfos[i].start));
 
             if (!i)
             {
@@ -268,10 +252,8 @@ namespace IPCore
             }
             else
             {
-                m_structureInfo.width =
-                    max(m_structureInfo.width, int(sinfo.width));
-                m_structureInfo.height =
-                    max(m_structureInfo.height, int(sinfo.height));
+                m_structureInfo.width = max(m_structureInfo.width, int(sinfo.width));
+                m_structureInfo.height = max(m_structureInfo.height, int(sinfo.height));
 
                 int duration = 0;
 
@@ -279,8 +261,7 @@ namespace IPCore
                 {
                     m_info.start = min(m_info.start, m_rangeInfos[i].cutIn);
                     m_info.end = max(m_info.end, m_rangeInfos[i].cutOut);
-                    duration =
-                        m_rangeInfos[i].cutOut - m_rangeInfos[i].cutIn + 1;
+                    duration = m_rangeInfos[i].cutOut - m_rangeInfos[i].cutIn + 1;
                 }
                 else
                 {
@@ -299,8 +280,7 @@ namespace IPCore
         m_info.cutOut = m_info.end;
         m_offset = m_info.start - 1;
 
-        if (m_outputFPS->front() == 0.0 && !m_rangeInfos.empty()
-            && !m_rangeInfos[0].isUndiscovered)
+        if (m_outputFPS->front() == 0.0 && !m_rangeInfos.empty() && !m_rangeInfos[0].isUndiscovered)
         {
             m_outputFPS->front() = m_rangeInfos[0].fps;
         }
@@ -428,29 +408,21 @@ namespace IPCore
     // where over(B, C, D, E) will be "rendered" into newly inserted IPImage K
     //
 
-    IPImage* StackIPNode::collapseInputs(const Context& context,
-                                         IPImage::BlendMode mode,
-                                         IPImageVector& images,
-                                         IPImageSet& modifiedImages)
+    IPImage* StackIPNode::collapseInputs(const Context& context, IPImage::BlendMode mode, IPImageVector& images, IPImageSet& modifiedImages)
     {
         size_t n = images.size();
 
         if (n <= MAX_TEXTURE_PER_BLEND)
         {
             const bool interactive = interactiveSize(context);
-            const float vw =
-                interactive ? context.viewWidth : m_structureInfo.width;
-            const float vh =
-                interactive ? context.viewHeight : m_structureInfo.height;
+            const float vw = interactive ? context.viewWidth : m_structureInfo.width;
+            const float vh = interactive ? context.viewHeight : m_structureInfo.height;
 
-            IPImage* root = new IPImage(this, IPImage::MergeRenderType, vw, vh,
-                                        1.0, IPImage::TemporaryBuffer);
+            IPImage* root = new IPImage(this, IPImage::MergeRenderType, vw, vh, 1.0, IPImage::TemporaryBuffer);
 
             Shader::ExpressionVector inExpressions;
-            balanceResourceUsage(IPNode::accumulate, images, modifiedImages, 8,
-                                 8, 81);
-            assembleMergeExpressions(root, images, modifiedImages, false,
-                                     inExpressions);
+            balanceResourceUsage(IPNode::accumulate, images, modifiedImages, 8, 8, 81);
+            assembleMergeExpressions(root, images, modifiedImages, false, inExpressions);
 
             root->appendChildren(images);
             root->mergeExpr = newBlend(root, inExpressions, mode);
@@ -467,14 +439,12 @@ namespace IPCore
             {
                 IPImageVector subImages;
 
-                for (size_t i = 0; i < MAX_TEXTURE_PER_BLEND && (q + i) < n;
-                     i++)
+                for (size_t i = 0; i < MAX_TEXTURE_PER_BLEND && (q + i) < n; i++)
                 {
                     subImages.push_back(images[q + i]);
                 }
 
-                newImages.push_back(
-                    collapseInputs(context, mode, subImages, modifiedImages));
+                newImages.push_back(collapseInputs(context, mode, subImages, modifiedImages));
             }
 
             return collapseInputs(context, mode, newImages, modifiedImages);
@@ -487,10 +457,8 @@ namespace IPCore
 
         const IPNodes& nodes = inputs();
         const bool interactive = interactiveSize(context);
-        const float vw =
-            interactive ? context.viewWidth : m_structureInfo.width;
-        const float vh =
-            interactive ? context.viewHeight : m_structureInfo.height;
+        const float vw = interactive ? context.viewWidth : m_structureInfo.width;
+        const float vh = interactive ? context.viewHeight : m_structureInfo.height;
         const float aspect = float(vw) / float(vh);
 
         const char* comp = "";
@@ -505,16 +473,13 @@ namespace IPCore
 
         const bool topmostOnly = !strcmp(comp, "topmost");
 
-        const bool localUseMerge =
-            useMerge
-            || (mode == IPImage::Replace && !topmostOnly && useMergeForReplace);
+        const bool localUseMerge = useMerge || (mode == IPImage::Replace && !topmostOnly && useMergeForReplace);
 
         IPImage* root = 0;
 
         if (localUseMerge)
         {
-            root = new IPImage(this, IPImage::MergeRenderType, vw, vh, 1.0,
-                               IPImage::IntermediateBuffer);
+            root = new IPImage(this, IPImage::MergeRenderType, vw, vh, 1.0, IPImage::IntermediateBuffer);
         }
         else
         {
@@ -523,8 +488,7 @@ namespace IPCore
 
         // Make sure to disable reverse-order blending if required.
         // See ImageRenderer::renderAllChildren for more details on this mode.
-        root->supportReversedOrderBlending =
-            m_supportReversedOrderBlending->front() != 0;
+        root->supportReversedOrderBlending = m_supportReversedOrderBlending->front() != 0;
 
         if (nodes.empty())
             return root;
@@ -578,9 +542,7 @@ namespace IPCore
                 {
                     // continue;
                     IPNode* node = nodes[i];
-                    TWK_THROW_STREAM(EvaluationFailedExc,
-                                     "StackIPNode evaluation failed on node "
-                                         << node->name());
+                    TWK_THROW_STREAM(EvaluationFailedExc, "StackIPNode evaluation failed on node " << node->name());
                 }
                 else if (current->isNoImage() || current->isBlank())
                 {
@@ -628,20 +590,17 @@ namespace IPCore
 
                     if (mode == IPImage::Replace)
                     {
-                        image->shaderExpr = Shader::newStencilBoxNegAlpha(
-                            image, image->shaderExpr);
+                        image->shaderExpr = Shader::newStencilBoxNegAlpha(image, image->shaderExpr);
                     }
                     else
                     {
-                        image->shaderExpr =
-                            Shader::newStencilBox(image, image->shaderExpr);
+                        image->shaderExpr = Shader::newStencilBox(image, image->shaderExpr);
                     }
 
                     size_t newWidth = image->width;
                     size_t newHeight = image->height;
-                    IPImage* newCurrent = new IPImage(
-                        this, IPImage::BlendRenderType, newWidth, newHeight,
-                        1.0, IPImage::IntermediateBuffer);
+                    IPImage* newCurrent =
+                        new IPImage(this, IPImage::BlendRenderType, newWidth, newHeight, 1.0, IPImage::IntermediateBuffer);
                     newCurrent->children = image;
                     newCurrent->shaderExpr = Shader::newSourceRGBA(newCurrent);
                     images[i] = newCurrent;
@@ -651,10 +610,8 @@ namespace IPCore
             if (ninputs == 1)
             {
                 Shader::ExpressionVector inExpressions;
-                balanceResourceUsage(IPNode::accumulate, images, modifiedImages,
-                                     8, 8, 81);
-                assembleMergeExpressions(root, images, modifiedImages, false,
-                                         inExpressions);
+                balanceResourceUsage(IPNode::accumulate, images, modifiedImages, 8, 8, 81);
+                assembleMergeExpressions(root, images, modifiedImages, false, inExpressions);
 
                 root->mergeExpr = inExpressions.front();
                 root->shaderExpr = Shader::newSourceRGBA(root);
@@ -676,14 +633,12 @@ namespace IPCore
                 if (!image->stencilBox.isEmpty())
                 {
                     convertBlendRenderTypeToIntermediate(image);
-                    image->shaderExpr =
-                        Shader::newStencilBox(image, image->shaderExpr);
+                    image->shaderExpr = Shader::newStencilBox(image, image->shaderExpr);
 
                     size_t newWidth = image->width;
                     size_t newHeight = image->height;
-                    IPImage* newCurrent = new IPImage(
-                        this, IPImage::BlendRenderType, newWidth, newHeight,
-                        1.0, IPImage::IntermediateBuffer);
+                    IPImage* newCurrent =
+                        new IPImage(this, IPImage::BlendRenderType, newWidth, newHeight, 1.0, IPImage::IntermediateBuffer);
                     newCurrent->children = image;
                     newCurrent->shaderExpr = Shader::newSourceRGBA(newCurrent);
                     images[i] = newCurrent;
@@ -705,10 +660,8 @@ namespace IPCore
         const int ninputs = inputs().size();
         const int frame = context.frame;
         const bool interactive = interactiveSize(context);
-        const float vw =
-            interactive ? context.viewWidth : m_structureInfo.width;
-        const float vh =
-            interactive ? context.viewHeight : m_structureInfo.height;
+        const float vw = interactive ? context.viewWidth : m_structureInfo.width;
+        const float vh = interactive ? context.viewHeight : m_structureInfo.height;
         const float aspect = float(vw) / float(vh);
 
         if (nodes.empty())
@@ -773,10 +726,7 @@ namespace IPCore
                 {
                     // continue;
                     IPNode* node = nodes[i];
-                    TWK_THROW_STREAM(EvaluationFailedExc,
-                                     "NULL imgid in StackIPNode "
-                                         << name() << " failed on input "
-                                         << node->name());
+                    TWK_THROW_STREAM(EvaluationFailedExc, "NULL imgid in StackIPNode " << name() << " failed on input " << node->name());
                 }
 
                 if (i)
@@ -802,8 +752,7 @@ namespace IPCore
         return root;
     }
 
-    void StackIPNode::testEvaluate(const Context& context,
-                                   TestEvaluationResult& result)
+    void StackIPNode::testEvaluate(const Context& context, TestEvaluationResult& result)
     {
         lazyUpdateRanges();
         IPNodes ins = inputs();
@@ -822,8 +771,7 @@ namespace IPCore
         }
     }
 
-    void StackIPNode::metaEvaluate(const Context& context,
-                                   MetaEvalVisitor& visitor)
+    void StackIPNode::metaEvaluate(const Context& context, MetaEvalVisitor& visitor)
     {
         lazyUpdateRanges();
         visitor.enter(context, this);
@@ -872,9 +820,7 @@ namespace IPCore
 
         size_t rval = 0;
 
-        AudioBuffer audioBuffer(
-            context.buffer.size(), context.buffer.channels(),
-            context.buffer.rate(), context.buffer.startTime());
+        AudioBuffer audioBuffer(context.buffer.size(), context.buffer.channels(), context.buffer.rate(), context.buffer.startTime());
 
         for (size_t i = 0; i < inputs().size(); i++)
         {
@@ -886,11 +832,9 @@ namespace IPCore
             if (m_activeAudioInputIndex >= 0 && m_activeAudioInputIndex != i)
                 continue;
 
-            const long foffset = inputFrame(i, m_info.start - m_offset, true)
-                                 - m_rangeInfos[i].start;
+            const long foffset = inputFrame(i, m_info.start - m_offset, true) - m_rangeInfos[i].start;
             const Time soffset = double(foffset) / context.fps;
-            Time contextStart = samplesToTime(context.buffer.startSample(),
-                                              context.buffer.rate());
+            Time contextStart = samplesToTime(context.buffer.startSample(), context.buffer.rate());
 
             AudioContext subContext(audioBuffer, context.fps);
             subContext.buffer.setStartTime(soffset + contextStart);
@@ -898,10 +842,8 @@ namespace IPCore
 
             rval = max(inputs()[i]->audioFillBuffer(subContext), rval);
 
-            transform(context.buffer.pointer(),
-                      context.buffer.pointer() + context.buffer.sizeInFloats(),
-                      subContext.buffer.pointer(), context.buffer.pointer(),
-                      plus<float>());
+            transform(context.buffer.pointer(), context.buffer.pointer() + context.buffer.sizeInFloats(), subContext.buffer.pointer(),
+                      context.buffer.pointer(), plus<float>());
 
             //
             //  If this was the .first. input to have audio then we are done.
@@ -922,17 +864,13 @@ namespace IPCore
         return rval;
     }
 
-    void StackIPNode::mapInputToEvalFrames(size_t inputIndex,
-                                           const FrameVector& inframes,
-                                           FrameVector& outframes) const
+    void StackIPNode::mapInputToEvalFrames(size_t inputIndex, const FrameVector& inframes, FrameVector& outframes) const
     {
         lazyUpdateRanges();
         mapInputToEvalFramesInternal(inputIndex, inframes, outframes);
     }
 
-    void StackIPNode::mapInputToEvalFramesInternal(size_t inputIndex,
-                                                   const FrameVector& inframes,
-                                                   FrameVector& outframes) const
+    void StackIPNode::mapInputToEvalFramesInternal(size_t inputIndex, const FrameVector& inframes, FrameVector& outframes) const
     {
         const ImageRangeInfo& info = m_rangeInfos[inputIndex];
         const bool useCutInfo = m_useCutInfo->front();
@@ -943,8 +881,7 @@ namespace IPCore
             for (size_t i = 0; i < inframes.size(); i++)
             {
                 int start = (useCutInfo) ? info.cutIn : info.start;
-                outframes.push_back((inframes[i] - start + m_info.start)
-                                    - m_offset);
+                outframes.push_back((inframes[i] - start + m_info.start) - m_offset);
             }
         }
         else
@@ -956,8 +893,7 @@ namespace IPCore
         }
     }
 
-    void StackIPNode::readCompleted(const string& typeName,
-                                    unsigned int version)
+    void StackIPNode::readCompleted(const string& typeName, unsigned int version)
     {
         updateChosenAudioInput();
 

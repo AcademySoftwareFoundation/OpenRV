@@ -22,8 +22,7 @@ namespace Mu
 {
     using namespace std;
 
-    VariantTagType::VariantTagType(Context* context, const char* name,
-                                   const Type* rep)
+    VariantTagType::VariantTagType(Context* context, const char* name, const Type* rep)
         : Type(context, name, PointerRep::rep())
         , _index(0)
     {
@@ -33,8 +32,7 @@ namespace Mu
         _isSerializable = true;
     }
 
-    VariantTagType::VariantTagType(Context* context, const char* name,
-                                   const char* rep)
+    VariantTagType::VariantTagType(Context* context, const char* name, const char* rep)
         : Type(context, name, PointerRep::rep())
         , _index(0)
     {
@@ -48,8 +46,7 @@ namespace Mu
     {
         const Module* global = globalModule();
 
-        const Type* type =
-            global->findSymbolOfTypeByQualifiedName<Type>(_repType.name);
+        const Type* type = global->findSymbolOfTypeByQualifiedName<Type>(_repType.name);
 
         if (type)
         {
@@ -91,10 +88,7 @@ namespace Mu
         return t->objectSize() + sizeof(VariantInstance);
     }
 
-    void VariantTagType::constructInstance(Pointer p) const
-    {
-        new (p) VariantInstance(this);
-    }
+    void VariantTagType::constructInstance(Pointer p) const { new (p) VariantInstance(this); }
 
     void VariantTagType::copyInstance(Pointer a, Pointer b) const
     {
@@ -103,10 +97,7 @@ namespace Mu
         representationType()->copyInstance(src->structure(), dst->structure());
     }
 
-    Value VariantTagType::nodeEval(const Node* n, Thread& thread) const
-    {
-        return Value((*n->func()._PointerFunc)(*n, thread));
-    }
+    Value VariantTagType::nodeEval(const Node* n, Thread& thread) const { return Value((*n->func()._PointerFunc)(*n, thread)); }
 
     void VariantTagType::nodeEval(void* p, const Node* n, Thread& thread) const
     {
@@ -138,8 +129,7 @@ namespace Mu
         return i->field(index);
     }
 
-    const ValuePointer VariantTagType::fieldPointer(const Object* o,
-                                                    size_t index) const
+    const ValuePointer VariantTagType::fieldPointer(const Object* o, size_t index) const
     {
         if (index > 0)
             return 0;
@@ -147,8 +137,7 @@ namespace Mu
         return i->field(index);
     }
 
-    void VariantTagType::outputValueRecursive(ostream& o, const ValuePointer p,
-                                              ValueOutputState& state) const
+    void VariantTagType::outputValueRecursive(ostream& o, const ValuePointer p, ValueOutputState& state) const
     {
         VariantInstance* obj = *reinterpret_cast<VariantInstance**>(p);
 
@@ -156,8 +145,7 @@ namespace Mu
         {
             o << fullyQualifiedName();
 
-            if (state.traversedObjects.find(obj)
-                != state.traversedObjects.end())
+            if (state.traversedObjects.find(obj) != state.traversedObjects.end())
             {
                 o << "...ad infinitum...";
             }
@@ -165,23 +153,19 @@ namespace Mu
             {
                 state.traversedObjects.insert(obj);
 
-                if (representationType()
-                    != globalModule()->context()->voidType())
+                if (representationType() != globalModule()->context()->voidType())
                 {
                     o << " {";
 
-                    if (const Class* c =
-                            dynamic_cast<const Class*>(representationType()))
+                    if (const Class* c = dynamic_cast<const Class*>(representationType()))
                     {
                         Object* vobj = obj->data<Object>();
-                        representationType()->outputValueRecursive(
-                            o, ValuePointer(&vobj), state);
+                        representationType()->outputValueRecursive(o, ValuePointer(&vobj), state);
                     }
                     else
                     {
                         void* vobj = obj->data<void>();
-                        representationType()->outputValueRecursive(
-                            o, ValuePointer(vobj), state);
+                        representationType()->outputValueRecursive(o, ValuePointer(vobj), state);
                     }
 
                     o << "}";
@@ -196,15 +180,13 @@ namespace Mu
         }
     }
 
-    void VariantTagType::outputValue(ostream& o, const Value& value,
-                                     bool full) const
+    void VariantTagType::outputValue(ostream& o, const Value& value, bool full) const
     {
         ValueOutputState state(o, full);
         outputValueRecursive(o, ValuePointer(&value._Pointer), state);
     }
 
-    void VariantTagType::serialize(ostream& o, Archive::Writer& writer,
-                                   const ValuePointer p) const
+    void VariantTagType::serialize(ostream& o, Archive::Writer& writer, const ValuePointer p) const
     {
         VariantInstance* i = *(VariantInstance**)p;
         Pointer pp = i->structure();
@@ -220,8 +202,7 @@ namespace Mu
         }
     }
 
-    void VariantTagType::deserialize(istream& in, Archive::Reader& reader,
-                                     ValuePointer p) const
+    void VariantTagType::deserialize(istream& in, Archive::Reader& reader, ValuePointer p) const
     {
         VariantInstance* i = *(VariantInstance**)p;
         Pointer pp = i->structure();
@@ -237,8 +218,7 @@ namespace Mu
         }
     }
 
-    void VariantTagType::reconstitute(Archive::Reader& reader,
-                                      Object* obj) const
+    void VariantTagType::reconstitute(Archive::Reader& reader, Object* obj) const
     {
         VariantInstance* i = (VariantInstance*)obj;
 
@@ -288,44 +268,35 @@ namespace Mu
 
         if (reptype != context->voidType())
         {
-            Function* dr = new Function(context, tn, BaseFunctions::dereference,
-                                        Cast, Return, ftn, Args, rtf, End);
+            Function* dr = new Function(context, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, rtf, End);
 
             s->addSymbol(dr);
 
-            Function* OpAs = new Function(
-                context, "=", BaseFunctions::assign,
-                Function::MemberOperator | Function::Operator, Return,
-                rt->fullyQualifiedName().c_str(), Args, rtf, ftn, End);
+            Function* OpAs = new Function(context, "=", BaseFunctions::assign, Function::MemberOperator | Function::Operator, Return,
+                                          rt->fullyQualifiedName().c_str(), Args, rtf, ftn, End);
 
             g->addSymbol(OpAs);
 
-            Function* FT = new Function(
-                context, tn, reptype->machineRep()->variantConstructorFunc(),
-                Mapped, Return, v->fullyQualifiedName().c_str(), Args,
-                reptype->fullyQualifiedName().c_str(), End);
+            Function* FT = new Function(context, tn, reptype->machineRep()->variantConstructorFunc(), Mapped, Return,
+                                        v->fullyQualifiedName().c_str(), Args, reptype->fullyQualifiedName().c_str(), End);
 
             addSymbol(FT);
         }
         else
         {
-            addSymbol(new Function(
-                context, tn, reptype->machineRep()->variantConstructorFunc(),
-                Mapped, Return, v->fullyQualifiedName().c_str(), End));
+            addSymbol(new Function(context, tn, reptype->machineRep()->variantConstructorFunc(), Mapped, Return,
+                                   v->fullyQualifiedName().c_str(), End));
         }
 
         //
         //
         //
 
-        s->addSymbols(new Function(context, tn, VariantTagType::upcast, Cast,
-                                   Return, ftn, Args, fsn, End),
+        s->addSymbols(new Function(context, tn, VariantTagType::upcast, Cast, Return, ftn, Args, fsn, End),
 
                       EndArguments);
 
-        addSymbols(new Function(context, "__unpack",
-                                reptype->machineRep()->unpackVariant(), Cast,
-                                Return, tt, Args, ftn, End),
+        addSymbols(new Function(context, "__unpack", reptype->machineRep()->unpackVariant(), Cast, Return, tt, Args, ftn, End),
 
                    EndArguments);
     }

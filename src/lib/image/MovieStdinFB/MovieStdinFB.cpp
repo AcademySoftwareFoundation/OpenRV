@@ -57,22 +57,19 @@ namespace TwkMovie
         mov->cacheFrames();
     }
 
-    void MovieStdinFB::postPreloadOpen(const MovieInfo& info,
-                                       const Movie::ReadRequest& request)
+    void MovieStdinFB::postPreloadOpen(const MovieInfo& info, const Movie::ReadRequest& request)
     {
         // request and info were unused in open().
         // Thus all of the work can be done in preloadOpen.
     }
 
-    void MovieStdinFB::preloadOpen(const std::string& filename,
-                                   const ReadRequest& request)
+    void MovieStdinFB::preloadOpen(const std::string& filename, const ReadRequest& request)
     {
         size_t len = filename.size();
 
         if (extension(filename) != "stdinfb")
         {
-            TWK_THROW_EXC_STREAM("StdFB: Unknown file type \"" << filename
-                                                               << "\"" << endl);
+            TWK_THROW_EXC_STREAM("StdFB: Unknown file type \"" << filename << "\"" << endl);
         }
 
         m_filename = basename(filename.substr(0, filename.size() - 8));
@@ -83,8 +80,7 @@ namespace TwkMovie
 
         if (tokens.empty())
         {
-            TWK_THROW_EXC_STREAM("StdFB: Badly formed filename \""
-                                 << m_filename << "\"" << endl);
+            TWK_THROW_EXC_STREAM("StdFB: Badly formed filename \"" << m_filename << "\"" << endl);
         }
 
         m_imageType = tokens[0];
@@ -106,8 +102,7 @@ namespace TwkMovie
 
         if (!m_io)
         {
-            TWK_THROW_EXC_STREAM("StdFB: Unknown file type \"" << m_imageType
-                                                               << "\"" << endl);
+            TWK_THROW_EXC_STREAM("StdFB: Unknown file type \"" << m_imageType << "\"" << endl);
         }
 
         FrameBuffer::DataType dataType = FrameBuffer::UCHAR;
@@ -120,8 +115,7 @@ namespace TwkMovie
 
             if (statement.size() != 2)
             {
-                cerr << "ERROR: bad stdfb specification: " << statement[0]
-                     << endl;
+                cerr << "ERROR: bad stdfb specification: " << statement[0] << endl;
                 continue;
             }
 
@@ -163,8 +157,7 @@ namespace TwkMovie
         }
     }
 
-    void MovieStdinFB::imagesAtFrame(const ReadRequest& request,
-                                     FrameBufferVector& fbs)
+    void MovieStdinFB::imagesAtFrame(const ReadRequest& request, FrameBufferVector& fbs)
     {
         int frame = request.frame;
         fbs.resize(1);
@@ -176,9 +169,7 @@ namespace TwkMovie
         {
             if (ifb->width() != 0)
             {
-                fb.restructure(ifb->width(), ifb->height(), ifb->depth(),
-                               ifb->numChannels(), ifb->dataType(),
-                               ifb->pixels<unsigned char>(),
+                fb.restructure(ifb->width(), ifb->height(), ifb->depth(), ifb->numChannels(), ifb->dataType(), ifb->pixels<unsigned char>(),
                                &ifb->channelNames(), ifb->orientation(), false);
 
                 fb.setIdentifier("");
@@ -204,8 +195,7 @@ namespace TwkMovie
         fb.attribute<bool>("RequestedFrameLoading") = true;
     }
 
-    void MovieStdinFB::identifiersAtFrame(const ReadRequest& request,
-                                          IdentifierVector& ids)
+    void MovieStdinFB::identifiersAtFrame(const ReadRequest& request, IdentifierVector& ids)
     {
         int frame = request.frame;
         ids.resize(1);
@@ -214,10 +204,7 @@ namespace TwkMovie
         ids.front() = str.str();
     }
 
-    void MovieStdinFB::identifier(int frame, std::ostream& o)
-    {
-        o << m_filename << ":" << frame;
-    }
+    void MovieStdinFB::identifier(int frame, std::ostream& o) { o << m_filename << ":" << frame; }
 
     //----------------------------------------------------------------------
 
@@ -230,20 +217,13 @@ namespace TwkMovie
 
     MovieStdinFBIO::~MovieStdinFBIO() {}
 
-    std::string MovieStdinFBIO::about() const
-    {
-        return "Tweak Stdin Image I/O";
-    }
+    std::string MovieStdinFBIO::about() const { return "Tweak Stdin Image I/O"; }
 
-    MovieReader* MovieStdinFBIO::movieReader() const
-    {
-        return new MovieStdinFB();
-    }
+    MovieReader* MovieStdinFBIO::movieReader() const { return new MovieStdinFB(); }
 
     MovieWriter* MovieStdinFBIO::movieWriter() const { return 0; }
 
-    void MovieStdinFBIO::getMovieInfo(const std::string& filename,
-                                      MovieInfo&) const
+    void MovieStdinFBIO::getMovieInfo(const std::string& filename, MovieInfo&) const
     {
         if (extension(filename) != "stdinfb")
         {

@@ -83,15 +83,12 @@ namespace IPCore
         init();
     }
 
-    IPImage::IPImage(const IPNode* n, const VideoDevice* d, RenderType type,
-                     RenderDestination dest, SamplerType stype,
+    IPImage::IPImage(const IPNode* n, const VideoDevice* d, RenderType type, RenderDestination dest, SamplerType stype,
                      bool useDeviceMargins)
         : node(n)
     {
-        VideoDevice::Resolution res =
-            d ? d->resolution() : VideoDevice::Resolution(1, 1, 1.0, 1.0);
-        VideoDevice::Margins m =
-            d && useDeviceMargins ? d->margins() : VideoDevice::Margins();
+        VideoDevice::Resolution res = d ? d->resolution() : VideoDevice::Resolution(1, 1, 1.0, 1.0);
+        VideoDevice::Margins m = d && useDeviceMargins ? d->margins() : VideoDevice::Margins();
 
         init();
         fb = 0;
@@ -111,8 +108,7 @@ namespace IPCore
         samplerType = stype;
     }
 
-    IPImage::IPImage(const IPNode* n, RenderType type, FrameBuffer* srcFB,
-                     RenderDestination dest, SamplerType stype)
+    IPImage::IPImage(const IPNode* n, RenderType type, FrameBuffer* srcFB, RenderDestination dest, SamplerType stype)
         : node(n)
     {
         init();
@@ -134,8 +130,7 @@ namespace IPCore
         recordResourceUsage();
     }
 
-    IPImage::IPImage(const IPNode* n, RenderType type, size_t w, size_t h,
-                     float pa, RenderDestination dest, InternalDataType dtype,
+    IPImage::IPImage(const IPNode* n, RenderType type, size_t w, size_t h, float pa, RenderDestination dest, InternalDataType dtype,
                      SamplerType stype)
         : node(n)
     {
@@ -170,9 +165,7 @@ namespace IPCore
 
         FrameBuffer* newSpecialFB(unsigned char* pixels, size_t w, size_t h)
         {
-            FrameBuffer* fb =
-                new FrameBuffer(1, 1, 4, FrameBuffer::UCHAR, pixels, 0,
-                                FrameBuffer::NATURAL, false);
+            FrameBuffer* fb = new FrameBuffer(1, 1, 4, FrameBuffer::UCHAR, pixels, 0, FrameBuffer::NATURAL, false);
 
             fb->setUncrop(w, h, 0, 0);
             fb->idstream() << fb->pixels<void>();
@@ -212,9 +205,7 @@ namespace IPCore
         return fb;
     }
 
-    FrameBuffer* IPImage::newNoImageFrameBufferWithAttrs(IPNode* node, size_t w,
-                                                         size_t h,
-                                                         const string& message)
+    FrameBuffer* IPImage::newNoImageFrameBufferWithAttrs(IPNode* node, size_t w, size_t h, const string& message)
     {
         FrameBuffer* fb = newNoImageFrameBuffer(w, h);
         if (node)
@@ -226,22 +217,19 @@ namespace IPCore
 
     IPImage* IPImage::newBlankImage(IPNode* node, size_t w, size_t h)
     {
-        IPImage* image = new IPImage(node, IPImage::BlendRenderType,
-                                     newBlankFrameBuffer(w, h));
+        IPImage* image = new IPImage(node, IPImage::BlendRenderType, newBlankFrameBuffer(w, h));
         image->shaderExpr = Shader::newSourceRGBA(image);
         return image;
     }
 
     IPImage* IPImage::newBlackImage(IPNode* node, size_t w, size_t h)
     {
-        IPImage* image = new IPImage(node, IPImage::BlendRenderType,
-                                     newBlackFrameBuffer(w, h));
+        IPImage* image = new IPImage(node, IPImage::BlendRenderType, newBlackFrameBuffer(w, h));
         image->shaderExpr = Shader::newSourceRGBA(image);
         return image;
     }
 
-    void IPImage::setErrorState(IPNode* node, const string& message,
-                                const string& type)
+    void IPImage::setErrorState(IPNode* node, const string& message, const string& type)
     {
         if (fb)
         {
@@ -254,8 +242,7 @@ namespace IPCore
 
     IPImage* IPImage::newErrorImage(IPNode* node, const string& message)
     {
-        IPImage* image =
-            new IPImage(node, IPImage::BlendRenderType, newErrorFrameBuffer());
+        IPImage* image = new IPImage(node, IPImage::BlendRenderType, newErrorFrameBuffer());
         image->shaderExpr = Shader::newSourceRGBA(image);
         image->setErrorState(node);
         return image;
@@ -263,8 +250,7 @@ namespace IPCore
 
     IPImage* IPImage::newNoImage(IPNode* node, const string& message)
     {
-        FrameBuffer* fb =
-            newNoImageFrameBufferWithAttrs(node, 1280, 720, message);
+        FrameBuffer* fb = newNoImageFrameBufferWithAttrs(node, 1280, 720, message);
         IPImage* image = new IPImage(node, IPImage::BlendRenderType, fb);
         image->shaderExpr = Shader::newSourceRGBA(image);
         return image;
@@ -302,8 +288,7 @@ namespace IPCore
         return id;
     }
 
-    IPImage::BlendMode
-    IPImage::getBlendModeFromString(const char* blendModeString)
+    IPImage::BlendMode IPImage::getBlendModeFromString(const char* blendModeString)
     {
         IPImage::BlendMode blendMode = IPImage::Over;
 
@@ -325,11 +310,7 @@ namespace IPCore
         return blendMode;
     }
 
-    bool IPImage::isType(const std::string& type) const
-    {
-        return fb && fb->hasAttribute("Type")
-               && fb->attribute<string>("Type") == type;
-    }
+    bool IPImage::isType(const std::string& type) const { return fb && fb->hasAttribute("Type") && fb->attribute<string>("Type") == type; }
 
     bool IPImage::isBlank() const { return isType("Blank"); }
 
@@ -341,21 +322,12 @@ namespace IPCore
 
     bool IPImage::isIntermediateRender() const
     {
-        return destination == IntermediateBuffer
-               || destination == TemporaryBuffer
-               || destination == OutputTexture;
+        return destination == IntermediateBuffer || destination == TemporaryBuffer || destination == OutputTexture;
     }
 
-    bool IPImage::isRootRender() const
-    {
-        return destination == LeftBuffer || destination == RightBuffer
-               || destination == MainBuffer;
-    }
+    bool IPImage::isRootRender() const { return destination == LeftBuffer || destination == RightBuffer || destination == MainBuffer; }
 
-    bool IPImage::isExternalRender() const
-    {
-        return renderType == ExternalRenderType;
-    }
+    bool IPImage::isExternalRender() const { return renderType == ExternalRenderType; }
 
     bool IPImage::isNoBuffer() const { return destination == NoBuffer; }
 
@@ -498,9 +470,8 @@ namespace IPCore
 
     int IPImage::displayWidth() const
     {
-        if (destination == IntermediateBuffer || destination == OutputTexture
-            || destination == DataBuffer || destination == CurrentFrameBuffer
-            || destination == TemporaryBuffer)
+        if (destination == IntermediateBuffer || destination == OutputTexture || destination == DataBuffer
+            || destination == CurrentFrameBuffer || destination == TemporaryBuffer)
         {
             return width;
         }
@@ -516,9 +487,8 @@ namespace IPCore
 
     int IPImage::displayHeight() const
     {
-        if (destination == IntermediateBuffer || destination == OutputTexture
-            || destination == DataBuffer || destination == CurrentFrameBuffer
-            || destination == TemporaryBuffer)
+        if (destination == IntermediateBuffer || destination == OutputTexture || destination == DataBuffer
+            || destination == CurrentFrameBuffer || destination == TemporaryBuffer)
         {
             return height;
         }
@@ -584,24 +554,20 @@ namespace IPCore
 
     static void hashMatrix(ostream& o, const IPImage::Matrix& M)
     {
-        o << "[" << M(0, 0) << "," << M(0, 1) << "," << M(0, 2) << ","
-          << M(0, 3) << "," << M(1, 0) << "," << M(1, 1) << "," << M(1, 2)
-          << "," << M(1, 3) << "," << M(2, 0) << "," << M(2, 1) << ","
-          << M(2, 2) << "," << M(2, 3) << "," << M(3, 0) << "," << M(3, 1)
+        o << "[" << M(0, 0) << "," << M(0, 1) << "," << M(0, 2) << "," << M(0, 3) << "," << M(1, 0) << "," << M(1, 1) << "," << M(1, 2)
+          << "," << M(1, 3) << "," << M(2, 0) << "," << M(2, 1) << "," << M(2, 2) << "," << M(2, 3) << "," << M(3, 0) << "," << M(3, 1)
           << "," << M(3, 2) << "," << M(3, 3) << "]";
     }
 
     static void hashMatrix33(ostream& o, const IPImage::Matrix33& M)
     {
-        o << "[" << M(0, 0) << "," << M(0, 1) << "," << M(0, 2) << ","
-          << M(1, 0) << "," << M(1, 1) << "," << M(1, 2) << "," << M(2, 0)
+        o << "[" << M(0, 0) << "," << M(0, 1) << "," << M(0, 2) << "," << M(1, 0) << "," << M(1, 1) << "," << M(1, 2) << "," << M(2, 0)
           << "," << M(2, 1) << "," << M(2, 2) << "]";
     }
 
     static void hashBox(ostream& o, const IPImage::Box2& box)
     {
-        o << "[[" << box.min.x << "," << box.min.y << "][" << box.max.x << ","
-          << box.max.y << "]]";
+        o << "[[" << box.min.x << "," << box.min.y << "][" << box.max.x << "," << box.max.y << "]]";
     }
 
     Mat44f IPImage::computeOrientationMatrix(const FrameBuffer* fb) const
@@ -610,16 +576,14 @@ namespace IPCore
 
         if (fb)
         {
-            if (fb->orientation() == FrameBuffer::TOPLEFT
-                || fb->orientation() == FrameBuffer::TOPRIGHT)
+            if (fb->orientation() == FrameBuffer::TOPLEFT || fb->orientation() == FrameBuffer::TOPRIGHT)
             {
                 Mat44f S;
                 S.makeScale(Vec3f(1, -1, 1));
                 T *= S;
             }
 
-            if (fb->orientation() == FrameBuffer::TOPRIGHT
-                || fb->orientation() == FrameBuffer::BOTTOMRIGHT)
+            if (fb->orientation() == FrameBuffer::TOPRIGHT || fb->orientation() == FrameBuffer::BOTTOMRIGHT)
             {
                 Mat44f S;
                 S.makeScale(Vec3f(-1, 1, 1));
@@ -630,8 +594,7 @@ namespace IPCore
         return T;
     }
 
-    void IPImage::computeMatrices(const VideoDevice* controlDevice,
-                                  const VideoDevice* outputDevice)
+    void IPImage::computeMatrices(const VideoDevice* controlDevice, const VideoDevice* outputDevice)
     {
         InternalGLMatricesContext c;
         c.outputWidth = controlDevice->internalWidth();
@@ -655,8 +618,7 @@ namespace IPCore
         f.window(-viewAspect / 2.0f, viewAspect / 2.0f, -0.5, 0.5, -1, 1, true);
         projectionMatrix = f.matrix();
 
-        viewport = Box2f(Vec2f(margins.left, margins.bottom),
-                         Vec2f(margins.left + gw, margins.bottom + gh));
+        viewport = Box2f(Vec2f(margins.left, margins.bottom), Vec2f(margins.left + gw, margins.bottom + gh));
 
         c.projectionMatrix = projectionMatrix;
         c.viewport = viewport;
@@ -683,8 +645,7 @@ namespace IPCore
         computeMatricesRecursive(c);
     }
 
-    void IPImage::computeMatricesRecursive(
-        const InternalGLMatricesContext& baseContext)
+    void IPImage::computeMatricesRecursive(const InternalGLMatricesContext& baseContext)
     {
         //
         //  Recurse on siblings first
@@ -708,8 +669,7 @@ namespace IPCore
         //
 
         Mat44f currentMatrix = baseContext.parentMatrix * transformMatrix;
-        Mat44f currentMatrixGlobal =
-            baseContext.parentMatrixGlobal * transformMatrix;
+        Mat44f currentMatrixGlobal = baseContext.parentMatrixGlobal * transformMatrix;
 
         // if (fb)
         // {
@@ -725,9 +685,7 @@ namespace IPCore
                 imageAspect = (float)width / height;
                 if (isCropped && cropStartY != cropEndY)
                 {
-                    imageAspect *= (float)(cropEndX - cropStartX)
-                                   * (float)height
-                                   / (float)((cropEndY - cropStartY) * width);
+                    imageAspect *= (float)(cropEndX - cropStartX) * (float)height / (float)((cropEndY - cropStartY) * width);
                 }
             }
 
@@ -803,23 +761,15 @@ namespace IPCore
 
                     if (context.controlDevice == device)
                     {
-                        margins = isExternalRender()
-                                      ? context.controlDevice->margins()
-                                      : Margins();
-                        context.outputWidth =
-                            context.controlDevice->internalWidth();
-                        context.outputHeight =
-                            context.controlDevice->internalHeight();
+                        margins = isExternalRender() ? context.controlDevice->margins() : Margins();
+                        context.outputWidth = context.controlDevice->internalWidth();
+                        context.outputHeight = context.controlDevice->internalHeight();
                     }
                     else if (context.outputDevice == device)
                     {
-                        margins = isExternalRender()
-                                      ? context.outputDevice->margins()
-                                      : Margins();
-                        context.outputWidth =
-                            context.outputDevice->internalWidth();
-                        context.outputHeight =
-                            context.outputDevice->internalHeight();
+                        margins = isExternalRender() ? context.outputDevice->margins() : Margins();
+                        context.outputWidth = context.outputDevice->internalWidth();
+                        context.outputHeight = context.outputDevice->internalHeight();
                     }
 
                     //
@@ -833,13 +783,10 @@ namespace IPCore
                     const float viewAspect = gw / gh;
 
                     Frustumf f;
-                    f.window(-viewAspect / 2.0f, viewAspect / 2.0f, -0.5, 0.5,
-                             -1, 1, true);
+                    f.window(-viewAspect / 2.0f, viewAspect / 2.0f, -0.5, 0.5, -1, 1, true);
                     projectionMatrix = f.matrix();
 
-                    viewport =
-                        Box2f(Vec2f(margins.left, margins.bottom),
-                              Vec2f(margins.left + gw, margins.bottom + gh));
+                    viewport = Box2f(Vec2f(margins.left, margins.bottom), Vec2f(margins.left + gw, margins.bottom + gh));
 
                     context.projectionMatrix = projectionMatrix;
                     context.viewport = viewport;
@@ -878,8 +825,7 @@ namespace IPCore
         }
     }
 
-    void IPImage::computeGraphIDRecursive(const IPImage* parent, size_t index,
-                                          size_t& coordNum) const
+    void IPImage::computeGraphIDRecursive(const IPImage* parent, size_t index, size_t& coordNum) const
     {
         //
         //  The graphID is unique for a given render pass in the IPImage tree
@@ -916,9 +862,7 @@ namespace IPCore
         if (fb)
         {
         }
-        else if (destination == IntermediateBuffer
-                 && (renderType == MergeRenderType
-                     || renderType == RecordOnlyType))
+        else if (destination == IntermediateBuffer && (renderType == MergeRenderType || renderType == RecordOnlyType))
         {
             //
             //  Children of this image are numbered because they all
@@ -994,9 +938,9 @@ namespace IPCore
     // this is used in ImageRenderer for paint FBO caching
     // in case there is one or less command, no command hash will be included
     // in renderIDWithPartialPaint
-    const string& IPImage::renderIDWithPartialPaint() const
+    const string& IPImage::renderIDWithPartialPaint(const bool force_recompute) const
     {
-        if (renderIDNeedsCompute())
+        if (force_recompute || renderIDNeedsCompute())
             computeRenderIDs();
         return m_renderIDWithPartialPaint;
     }
@@ -1032,8 +976,7 @@ namespace IPCore
 
         if (isCropped)
         {
-            o << "crop{" << cropStartX << "_" << cropStartY << "_" << cropEndX
-              << "_" << cropEndY << "}";
+            o << "crop{" << cropStartX << "_" << cropStartY << "_" << cropEndX << "_" << cropEndY << "}";
         }
 
         for (IPImage* child = children; child; child = child->next)
@@ -1123,8 +1066,7 @@ namespace IPCore
 
         using namespace Shader;
 
-        void assembleFrameBuffersFromExpr(const Expression* expr,
-                                          bool isMerge = false)
+        void assembleFrameBuffersFromExpr(const Expression* expr, bool isMerge = false)
         {
             const ArgumentVector& boundArgs = expr->arguments();
             const size_t nargs = boundArgs.size();
@@ -1132,20 +1074,16 @@ namespace IPCore
             // push fbs in order from leave to root
             for (size_t i = 0; i < nargs; ++i)
             {
-                if (BoundExpression* be =
-                        dynamic_cast<BoundExpression*>(boundArgs[i]))
+                if (BoundExpression* be = dynamic_cast<BoundExpression*>(boundArgs[i]))
                 {
-                    const Expression* expr2 =
-                        static_cast<const Expression*>(be->valuePointer());
+                    const Expression* expr2 = static_cast<const Expression*>(be->valuePointer());
                     assembleFrameBuffersFromExpr(expr2);
                 }
-                if (BoundSampler* bsampler =
-                        dynamic_cast<BoundSampler*>(boundArgs[i]))
+                if (BoundSampler* bsampler = dynamic_cast<BoundSampler*>(boundArgs[i]))
                 {
                     const FrameBuffer* fb = bsampler->value().fb;
                     const IPImage* image = bsampler->value().image;
-                    if (fb
-                        && !image) // only get the aux ones, not the source ones
+                    if (fb && !image) // only get the aux ones, not the source ones
                     {
                         // Increment ref count of fb if it is ref counted
                         if (fb->hasStaticRef())
@@ -1313,8 +1251,7 @@ namespace IPCore
         if (image->fb)
             o << "|" << image->fb->width() << "x" << image->fb->height();
 
-        o << "|" << image->resourceUsage.fetches << ","
-          << image->resourceUsage.buffers << "," << image->resourceUsage.coords;
+        o << "|" << image->resourceUsage.fetches << "," << image->resourceUsage.buffers << "," << image->resourceUsage.coords;
 
         if (image->pixelAspect != 1.0)
             o << "|Pa";
@@ -1329,8 +1266,7 @@ namespace IPCore
         }
         else
         {
-            o << " (" << image->node->name() << ":" << image->node->protocol()
-              << ")";
+            o << " (" << image->node->name() << ":" << image->node->protocol() << ")";
         }
 
         o << " " << image;
@@ -1343,8 +1279,7 @@ namespace IPCore
             }
         }
 
-        for (IPImage::TagMap::const_iterator i = image->tagMap.begin();
-             i != image->tagMap.end(); ++i)
+        for (IPImage::TagMap::const_iterator i = image->tagMap.begin(); i != image->tagMap.end(); ++i)
         {
             o << " " << i->first << ":" << i->second;
         }
@@ -1355,8 +1290,7 @@ namespace IPCore
         printTreeRecursive(o, image->next, level);
     }
 
-    static void printIDTreeRecursive(ostream& o, const IPImageID* image,
-                                     int level)
+    static void printIDTreeRecursive(ostream& o, const IPImageID* image, int level)
     {
         if (!image)
             return;
@@ -1391,15 +1325,9 @@ namespace IPCore
             appendChild(images[i]);
     }
 
-    void printTree(ostream& o, const IPImage* i)
-    {
-        printTreeRecursive(o, i, 0);
-    }
+    void printTree(ostream& o, const IPImage* i) { printTreeRecursive(o, i, 0); }
 
-    void printIDTree(ostream& o, const IPImageID* i)
-    {
-        printIDTreeRecursive(o, i, 0);
-    }
+    void printIDTree(ostream& o, const IPImageID* i) { printIDTreeRecursive(o, i, 0); }
 
     void printTreeStdout(const IPImage* i) { printTree(cout, i); }
 

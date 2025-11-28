@@ -56,16 +56,14 @@ namespace Mu
         _baseType = 0;
     }
 
-    MuQt_QObject::MuQt_QObject(Pointer muobj, const CallEnvironment* ce,
-                               QObject* parent)
+    MuQt_QObject::MuQt_QObject(Pointer muobj, const CallEnvironment* ce, QObject* parent)
         : QObject(parent)
     {
         _env = ce;
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QObjectType>(
-            c->internName("qt.QObject"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QObjectType>(c->internName("qt.QObject"));
     }
 
     bool MuQt_QObject::event(QEvent* e)
@@ -100,8 +98,7 @@ namespace Mu
         {
             Function::ArgumentVector args(3);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeinstance<QObjectType>(c, watched, "qt.QObject"));
+            args[1] = Value(makeinstance<QObjectType>(c, watched, "qt.QObject"));
             args[2] = Value(makeqpointer<QEventType>(c, event, "qt.QEvent"));
             Value rval = _env->call(F, args);
             return (bool)(rval._bool);
@@ -149,8 +146,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QTimerEventType>(c, event, "qt.QTimerEvent"));
+            args[1] = Value(makeqpointer<QTimerEventType>(c, event, "qt.QTimerEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -162,8 +158,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  Mu Type CONSTRUCTORS
 
-    QObjectType::QObjectType(Context* c, const char* name, Class* super,
-                             Class* super2)
+    QObjectType::QObjectType(Context* c, const char* name, Class* super, Class* super2)
         : Class(c, name, vectorOf2(super, super2))
     {
     }
@@ -184,8 +179,7 @@ namespace Mu
         }
         else if (QObject* w = object<QObject>(widget))
         {
-            QObjectType* type = c->findSymbolOfTypeByQualifiedName<QObjectType>(
-                c->internName("qt.QObject"), false);
+            QObjectType* type = c->findSymbolOfTypeByQualifiedName<QObjectType>(c->internName("qt.QObject"), false);
             ClassInstance* o = ClassInstance::allocate(type);
             setobject(o, w);
             return o;
@@ -196,26 +190,17 @@ namespace Mu
         }
     }
 
-    static NODE_IMPLEMENTATION(castFromObject, Pointer)
-    {
-        NODE_RETURN(QObject_QObject_QObject(NODE_THREAD, NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(castFromObject, Pointer) { NODE_RETURN(QObject_QObject_QObject(NODE_THREAD, NODE_ARG(0, Pointer))); }
 
-    Pointer qt_QObject_QObject_QObject_QObject_QObject(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this,
-                                                       Pointer param_parent)
+    Pointer qt_QObject_QObject_QObject_QObject_QObject(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QObject* arg1 = object<QObject>(param_parent);
-        setobject(param_this,
-                  new MuQt_QObject(param_this, NODE_THREAD.process()->callEnv(),
-                                   arg1));
+        setobject(param_this, new MuQt_QObject(param_this, NODE_THREAD.process()->callEnv(), arg1));
         return param_this;
     }
 
-    bool qt_QObject_blockSignals_bool_QObject_bool(Mu::Thread& NODE_THREAD,
-                                                   Pointer param_this,
-                                                   bool param_block)
+    bool qt_QObject_blockSignals_bool_QObject_bool(Mu::Thread& NODE_THREAD, Pointer param_this, bool param_block)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QObject* arg0 = object<QObject>(param_this);
@@ -223,47 +208,39 @@ namespace Mu
         return arg0->blockSignals(arg1);
     }
 
-    void qt_QObject_dumpObjectInfo_void_QObject(Mu::Thread& NODE_THREAD,
-                                                Pointer param_this)
+    void qt_QObject_dumpObjectInfo_void_QObject(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QObject* arg0 = object<QObject>(param_this);
         arg0->dumpObjectInfo();
     }
 
-    void qt_QObject_dumpObjectTree_void_QObject(Mu::Thread& NODE_THREAD,
-                                                Pointer param_this)
+    void qt_QObject_dumpObjectTree_void_QObject(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QObject* arg0 = object<QObject>(param_this);
         arg0->dumpObjectTree();
     }
 
-    bool qt_QObject_event_bool_QObject_QEvent(Mu::Thread& NODE_THREAD,
-                                              Pointer param_this,
-                                              Pointer param_e)
+    bool qt_QObject_event_bool_QObject_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QObject* arg0 = object<QObject>(param_this);
         QEvent* arg1 = getqpointer<QEventType>(param_e);
-        return isMuQtObject(arg0) ? arg0->QObject::event(arg1)
-                                  : arg0->event(arg1);
+        return isMuQtObject(arg0) ? arg0->QObject::event(arg1) : arg0->event(arg1);
     }
 
-    bool qt_QObject_eventFilter_bool_QObject_QObject_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_watched,
-        Pointer param_event)
+    bool qt_QObject_eventFilter_bool_QObject_QObject_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_watched,
+                                                            Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QObject* arg0 = object<QObject>(param_this);
         QObject* arg1 = object<QObject>(param_watched);
         QEvent* arg2 = getqpointer<QEventType>(param_event);
-        return isMuQtObject(arg0) ? arg0->QObject::eventFilter(arg1, arg2)
-                                  : arg0->eventFilter(arg1, arg2);
+        return isMuQtObject(arg0) ? arg0->QObject::eventFilter(arg1, arg2) : arg0->eventFilter(arg1, arg2);
     }
 
-    void qt_QObject_installEventFilter_void_QObject_QObject(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_filterObj)
+    void qt_QObject_installEventFilter_void_QObject_QObject(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_filterObj)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QObject* arg0 = object<QObject>(param_this);
@@ -271,24 +248,21 @@ namespace Mu
         arg0->installEventFilter(arg1);
     }
 
-    bool qt_QObject_isWidgetType_bool_QObject(Mu::Thread& NODE_THREAD,
-                                              Pointer param_this)
+    bool qt_QObject_isWidgetType_bool_QObject(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QObject* arg0 = object<QObject>(param_this);
         return arg0->isWidgetType();
     }
 
-    bool qt_QObject_isWindowType_bool_QObject(Mu::Thread& NODE_THREAD,
-                                              Pointer param_this)
+    bool qt_QObject_isWindowType_bool_QObject(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QObject* arg0 = object<QObject>(param_this);
         return arg0->isWindowType();
     }
 
-    void qt_QObject_killTimer_void_QObject_int(Mu::Thread& NODE_THREAD,
-                                               Pointer param_this, int param_id)
+    void qt_QObject_killTimer_void_QObject_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_id)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QObject* arg0 = object<QObject>(param_this);
@@ -296,16 +270,14 @@ namespace Mu
         arg0->killTimer(arg1);
     }
 
-    Pointer qt_QObject_parent_QObject_QObject(Mu::Thread& NODE_THREAD,
-                                              Pointer param_this)
+    Pointer qt_QObject_parent_QObject_QObject(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QObject* arg0 = object<QObject>(param_this);
         return makeinstance<QObjectType>(c, arg0->parent(), "qt.QObject");
     }
 
-    void qt_QObject_removeEventFilter_void_QObject_QObject(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_obj)
+    void qt_QObject_removeEventFilter_void_QObject_QObject(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_obj)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QObject* arg0 = object<QObject>(param_this);
@@ -313,9 +285,7 @@ namespace Mu
         arg0->removeEventFilter(arg1);
     }
 
-    void qt_QObject_setParent_void_QObject_QObject(Mu::Thread& NODE_THREAD,
-                                                   Pointer param_this,
-                                                   Pointer param_parent)
+    void qt_QObject_setParent_void_QObject_QObject(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QObject* arg0 = object<QObject>(param_this);
@@ -323,18 +293,14 @@ namespace Mu
         arg0->setParent(arg1);
     }
 
-    bool qt_QObject_signalsBlocked_bool_QObject(Mu::Thread& NODE_THREAD,
-                                                Pointer param_this)
+    bool qt_QObject_signalsBlocked_bool_QObject(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QObject* arg0 = object<QObject>(param_this);
         return arg0->signalsBlocked();
     }
 
-    int qt_QObject_startTimer_int_QObject_int_int(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this,
-                                                  int param_interval,
-                                                  int param_timerType)
+    int qt_QObject_startTimer_int_QObject_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_interval, int param_timerType)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QObject* arg0 = object<QObject>(param_this);
@@ -343,9 +309,7 @@ namespace Mu
         return arg0->startTimer(arg1, arg2);
     }
 
-    void qt_QObject_customEvent_void_QObject_QEvent(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this,
-                                                    Pointer param_event)
+    void qt_QObject_customEvent_void_QObject_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QObject* arg0 = object<QObject>(param_this);
@@ -356,26 +320,21 @@ namespace Mu
             ((MuQt_QObject*)arg0)->customEvent_pub(arg1);
     }
 
-    Pointer qt_QObject_sender_QObject_QObject(Mu::Thread& NODE_THREAD,
-                                              Pointer param_this)
+    Pointer qt_QObject_sender_QObject_QObject(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QObject* arg0 = object<QObject>(param_this);
-        return makeinstance<QObjectType>(c, ((MuQt_QObject*)arg0)->sender_pub(),
-                                         "qt.QObject");
+        return makeinstance<QObjectType>(c, ((MuQt_QObject*)arg0)->sender_pub(), "qt.QObject");
     }
 
-    int qt_QObject_senderSignalIndex_int_QObject(Mu::Thread& NODE_THREAD,
-                                                 Pointer param_this)
+    int qt_QObject_senderSignalIndex_int_QObject(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QObject* arg0 = object<QObject>(param_this);
         return ((MuQt_QObject*)arg0)->senderSignalIndex_pub();
     }
 
-    void qt_QObject_timerEvent_void_QObject_QTimerEvent(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this,
-                                                        Pointer param_event)
+    void qt_QObject_timerEvent_void_QObject_QTimerEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QObject* arg0 = object<QObject>(param_this);
@@ -386,143 +345,119 @@ namespace Mu
             ((MuQt_QObject*)arg0)->timerEvent_pub(arg1);
     }
 
-    Pointer qt_QObject_tr_string_QObject_string_string_int(
-        Mu::Thread& NODE_THREAD, Pointer sourceText, Pointer disambiguation,
-        int n)
+    Pointer qt_QObject_tr_string_QObject_string_string_int(Mu::Thread& NODE_THREAD, Pointer sourceText, Pointer disambiguation, int n)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QString arg0 = qstring(sourceText);
         QString arg1 = qstring(disambiguation);
         int arg2 = n;
-        return makestring(c, QObject::tr(arg0.toStdString().c_str(),
-                                         arg1.toStdString().c_str(), arg2));
+        return makestring(c, QObject::tr(arg0.toStdString().c_str(), arg1.toStdString().c_str(), arg2));
     }
 
     static NODE_IMPLEMENTATION(_n_QObject0, Pointer)
     {
-        NODE_RETURN(qt_QObject_QObject_QObject_QObject_QObject(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QObject_QObject_QObject_QObject_QObject(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_blockSignals0, bool)
     {
-        NODE_RETURN(qt_QObject_blockSignals_bool_QObject_bool(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool)));
+        NODE_RETURN(qt_QObject_blockSignals_bool_QObject_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool)));
     }
 
     static NODE_IMPLEMENTATION(_n_dumpObjectInfo0, void)
     {
-        qt_QObject_dumpObjectInfo_void_QObject(NODE_THREAD,
-                                               NONNIL_NODE_ARG(0, Pointer));
+        qt_QObject_dumpObjectInfo_void_QObject(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_dumpObjectTree0, void)
     {
-        qt_QObject_dumpObjectTree_void_QObject(NODE_THREAD,
-                                               NONNIL_NODE_ARG(0, Pointer));
+        qt_QObject_dumpObjectTree_void_QObject(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_event0, bool)
     {
-        NODE_RETURN(qt_QObject_event_bool_QObject_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QObject_event_bool_QObject_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_eventFilter0, bool)
     {
-        NODE_RETURN(qt_QObject_eventFilter_bool_QObject_QObject_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QObject_eventFilter_bool_QObject_QObject_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                       NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_installEventFilter0, void)
     {
-        qt_QObject_installEventFilter_void_QObject_QObject(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QObject_installEventFilter_void_QObject_QObject(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_isWidgetType0, bool)
     {
-        NODE_RETURN(qt_QObject_isWidgetType_bool_QObject(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QObject_isWidgetType_bool_QObject(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isWindowType0, bool)
     {
-        NODE_RETURN(qt_QObject_isWindowType_bool_QObject(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QObject_isWindowType_bool_QObject(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_killTimer0, void)
     {
-        qt_QObject_killTimer_void_QObject_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QObject_killTimer_void_QObject_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_parent0, Pointer)
     {
-        NODE_RETURN(qt_QObject_parent_QObject_QObject(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QObject_parent_QObject_QObject(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_removeEventFilter0, void)
     {
-        qt_QObject_removeEventFilter_void_QObject_QObject(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QObject_removeEventFilter_void_QObject_QObject(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setParent0, void)
     {
-        qt_QObject_setParent_void_QObject_QObject(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QObject_setParent_void_QObject_QObject(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_signalsBlocked0, bool)
     {
-        NODE_RETURN(qt_QObject_signalsBlocked_bool_QObject(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QObject_signalsBlocked_bool_QObject(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_startTimer0, int)
     {
-        NODE_RETURN(qt_QObject_startTimer_int_QObject_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int)));
+        NODE_RETURN(
+            qt_QObject_startTimer_int_QObject_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_customEvent0, void)
     {
-        qt_QObject_customEvent_void_QObject_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QObject_customEvent_void_QObject_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_sender0, Pointer)
     {
-        NODE_RETURN(qt_QObject_sender_QObject_QObject(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QObject_sender_QObject_QObject(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_senderSignalIndex0, int)
     {
-        NODE_RETURN(qt_QObject_senderSignalIndex_int_QObject(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QObject_senderSignalIndex_int_QObject(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_timerEvent0, void)
     {
-        qt_QObject_timerEvent_void_QObject_QTimerEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QObject_timerEvent_void_QObject_QTimerEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_tr0, Pointer)
     {
-        NODE_RETURN(qt_QObject_tr_string_QObject_string_string_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int)));
+        NODE_RETURN(qt_QObject_tr_string_QObject_string_string_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                   NODE_ARG(2, int)));
     }
 
-    static Pointer findChild_Object_string(Thread& NODE_THREAD, Pointer obj,
-                                           Pointer p)
+    static Pointer findChild_Object_string(Thread& NODE_THREAD, Pointer obj, Pointer p)
     {
         ClassInstance* self = reinterpret_cast<ClassInstance*>(obj);
         StringType::String* name = reinterpret_cast<StringType::String*>(p);
@@ -534,8 +469,7 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(findChild, Pointer)
     {
-        NODE_RETURN(findChild_Object_string(NODE_THREAD, NODE_ARG(0, Pointer),
-                                            NODE_ARG(1, Pointer)));
+        NODE_RETURN(findChild_Object_string(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
 #include <MuQt5/QVariantType.h>
@@ -543,9 +477,7 @@ namespace Mu
 #include <MuQt5/QEventType.h>
 #include <MuQt5/QVariantType.h>
 
-    static bool setProperty_bool_Object_string_qt_QVariant(Thread& NODE_THREAD,
-                                                           Pointer obj,
-                                                           Pointer n, Pointer v)
+    static bool setProperty_bool_Object_string_qt_QVariant(Thread& NODE_THREAD, Pointer obj, Pointer n, Pointer v)
     {
         ClassInstance* self = reinterpret_cast<ClassInstance*>(obj);
         StringType::String* name = reinterpret_cast<StringType::String*>(n);
@@ -556,9 +488,8 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(setProperty, bool)
     {
-        NODE_RETURN(setProperty_bool_Object_string_qt_QVariant(
-            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer)));
+        NODE_RETURN(
+            setProperty_bool_Object_string_qt_QVariant(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, Pointer)));
     }
 
     void QObjectType::load()
@@ -578,19 +509,15 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
                    new MemberVariable(c, "native", "qt.NativeObject"),
 
-                   new Function(c, tn, castFromObject, Cast, Compiled,
-                                QObject_QObject_QObject, Return, ftn,
-                                Parameters,
+                   new Function(c, tn, castFromObject, Cast, Compiled, QObject_QObject_QObject, Return, ftn, Parameters,
                                 new Param(c, "object", "qt.QObject"), End),
 
                    EndArguments);
@@ -598,39 +525,25 @@ namespace Mu
         addSymbols(
             // enums
             // member functions
-            new Function(c, "QObject", _n_QObject0, None, Compiled,
-                         qt_QObject_QObject_QObject_QObject_QObject, Return,
-                         "qt.QObject", Parameters,
-                         new Param(c, "this", "qt.QObject"),
-                         new Param(c, "parent", "qt.QObject"), End),
-            new Function(c, "blockSignals", _n_blockSignals0, None, Compiled,
-                         qt_QObject_blockSignals_bool_QObject_bool, Return,
-                         "bool", Parameters, new Param(c, "this", "qt.QObject"),
-                         new Param(c, "block", "bool"), End),
+            new Function(c, "QObject", _n_QObject0, None, Compiled, qt_QObject_QObject_QObject_QObject_QObject, Return, "qt.QObject",
+                         Parameters, new Param(c, "this", "qt.QObject"), new Param(c, "parent", "qt.QObject"), End),
+            new Function(c, "blockSignals", _n_blockSignals0, None, Compiled, qt_QObject_blockSignals_bool_QObject_bool, Return, "bool",
+                         Parameters, new Param(c, "this", "qt.QObject"), new Param(c, "block", "bool"), End),
             // MISSING: children ("const QObjectList &"; QObject this)
             // MISSING: connect (flags QMetaObject::Connection; QObject this,
             // QObject sender, "const char *" signal, "const char *" method,
             // flags Qt::ConnectionType type)
-            new Function(c, "dumpObjectInfo", _n_dumpObjectInfo0, None,
-                         Compiled, qt_QObject_dumpObjectInfo_void_QObject,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QObject"), End),
-            new Function(c, "dumpObjectTree", _n_dumpObjectTree0, None,
-                         Compiled, qt_QObject_dumpObjectTree_void_QObject,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QObject"), End),
+            new Function(c, "dumpObjectInfo", _n_dumpObjectInfo0, None, Compiled, qt_QObject_dumpObjectInfo_void_QObject, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QObject"), End),
+            new Function(c, "dumpObjectTree", _n_dumpObjectTree0, None, Compiled, qt_QObject_dumpObjectTree_void_QObject, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QObject"), End),
             // MISSING: dynamicPropertyNames ("QList<QByteArray>"; QObject this)
-            _func[0] = new MemberFunction(c, "event", _n_event0, None, Compiled,
-                                          qt_QObject_event_bool_QObject_QEvent,
-                                          Return, "bool", Parameters,
-                                          new Param(c, "this", "qt.QObject"),
-                                          new Param(c, "e", "qt.QEvent"), End),
-            _func[1] = new MemberFunction(
-                c, "eventFilter", _n_eventFilter0, None, Compiled,
-                qt_QObject_eventFilter_bool_QObject_QObject_QEvent, Return,
-                "bool", Parameters, new Param(c, "this", "qt.QObject"),
-                new Param(c, "watched", "qt.QObject"),
-                new Param(c, "event", "qt.QEvent"), End),
+            _func[0] = new MemberFunction(c, "event", _n_event0, None, Compiled, qt_QObject_event_bool_QObject_QEvent, Return, "bool",
+                                          Parameters, new Param(c, "this", "qt.QObject"), new Param(c, "e", "qt.QEvent"), End),
+            _func[1] =
+                new MemberFunction(c, "eventFilter", _n_eventFilter0, None, Compiled, qt_QObject_eventFilter_bool_QObject_QObject_QEvent,
+                                   Return, "bool", Parameters, new Param(c, "this", "qt.QObject"), new Param(c, "watched", "qt.QObject"),
+                                   new Param(c, "event", "qt.QEvent"), End),
             // MISSING: findChild ("T"; QObject this, string name, flags
             // Qt::FindChildOptions options) MISSING: findChildren ("QList<T>";
             // QObject this, string name, flags Qt::FindChildOptions options)
@@ -639,78 +552,51 @@ namespace Mu
             // ("QList<T>"; QObject this, "const QRegularExpression &" re, flags
             // Qt::FindChildOptions options) MISSING: inherits (bool; QObject
             // this, "const char *" className)
-            new Function(
-                c, "installEventFilter", _n_installEventFilter0, None, Compiled,
-                qt_QObject_installEventFilter_void_QObject_QObject, Return,
-                "void", Parameters, new Param(c, "this", "qt.QObject"),
-                new Param(c, "filterObj", "qt.QObject"), End),
-            new Function(c, "isWidgetType", _n_isWidgetType0, None, Compiled,
-                         qt_QObject_isWidgetType_bool_QObject, Return, "bool",
+            new Function(c, "installEventFilter", _n_installEventFilter0, None, Compiled,
+                         qt_QObject_installEventFilter_void_QObject_QObject, Return, "void", Parameters, new Param(c, "this", "qt.QObject"),
+                         new Param(c, "filterObj", "qt.QObject"), End),
+            new Function(c, "isWidgetType", _n_isWidgetType0, None, Compiled, qt_QObject_isWidgetType_bool_QObject, Return, "bool",
                          Parameters, new Param(c, "this", "qt.QObject"), End),
-            new Function(c, "isWindowType", _n_isWindowType0, None, Compiled,
-                         qt_QObject_isWindowType_bool_QObject, Return, "bool",
+            new Function(c, "isWindowType", _n_isWindowType0, None, Compiled, qt_QObject_isWindowType_bool_QObject, Return, "bool",
                          Parameters, new Param(c, "this", "qt.QObject"), End),
-            new Function(c, "killTimer", _n_killTimer0, None, Compiled,
-                         qt_QObject_killTimer_void_QObject_int, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QObject"),
-                         new Param(c, "id", "int"), End),
+            new Function(c, "killTimer", _n_killTimer0, None, Compiled, qt_QObject_killTimer_void_QObject_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QObject"), new Param(c, "id", "int"), End),
             // MISSING: metaObject ("const QMetaObject *"; QObject this)
             // MISSING: moveToThread (void; QObject this, "QThread *"
             // targetThread) PROP: objectName (string; QObject this)
-            new Function(c, "parent", _n_parent0, None, Compiled,
-                         qt_QObject_parent_QObject_QObject, Return,
-                         "qt.QObject", Parameters,
+            new Function(c, "parent", _n_parent0, None, Compiled, qt_QObject_parent_QObject_QObject, Return, "qt.QObject", Parameters,
                          new Param(c, "this", "qt.QObject"), End),
             // MISSING: property (QVariant; QObject this, "const char *" name)
-            new Function(
-                c, "removeEventFilter", _n_removeEventFilter0, None, Compiled,
-                qt_QObject_removeEventFilter_void_QObject_QObject, Return,
-                "void", Parameters, new Param(c, "this", "qt.QObject"),
-                new Param(c, "obj", "qt.QObject"), End),
+            new Function(c, "removeEventFilter", _n_removeEventFilter0, None, Compiled, qt_QObject_removeEventFilter_void_QObject_QObject,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QObject"), new Param(c, "obj", "qt.QObject"), End),
             // PROP: setObjectName (void; QObject this, string name)
-            new Function(c, "setParent", _n_setParent0, None, Compiled,
-                         qt_QObject_setParent_void_QObject_QObject, Return,
-                         "void", Parameters, new Param(c, "this", "qt.QObject"),
-                         new Param(c, "parent", "qt.QObject"), End),
+            new Function(c, "setParent", _n_setParent0, None, Compiled, qt_QObject_setParent_void_QObject_QObject, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QObject"), new Param(c, "parent", "qt.QObject"), End),
             // MISSING: setProperty (bool; QObject this, "const char *" name,
             // QVariant value)
-            new Function(c, "signalsBlocked", _n_signalsBlocked0, None,
-                         Compiled, qt_QObject_signalsBlocked_bool_QObject,
-                         Return, "bool", Parameters,
-                         new Param(c, "this", "qt.QObject"), End),
-            new Function(
-                c, "startTimer", _n_startTimer0, None, Compiled,
-                qt_QObject_startTimer_int_QObject_int_int, Return, "int",
-                Parameters, new Param(c, "this", "qt.QObject"),
-                new Param(c, "interval", "int"),
-                new Param(c, "timerType", "int", Value((int)Qt::CoarseTimer)),
-                End),
+            new Function(c, "signalsBlocked", _n_signalsBlocked0, None, Compiled, qt_QObject_signalsBlocked_bool_QObject, Return, "bool",
+                         Parameters, new Param(c, "this", "qt.QObject"), End),
+            new Function(c, "startTimer", _n_startTimer0, None, Compiled, qt_QObject_startTimer_int_QObject_int_int, Return, "int",
+                         Parameters, new Param(c, "this", "qt.QObject"), new Param(c, "interval", "int"),
+                         new Param(c, "timerType", "int", Value((int)Qt::CoarseTimer)), End),
             // MISSING: thread ("QThread *"; QObject this)
             // MISSING: childEvent (void; QObject this, "QChildEvent *" event)
             // // protected MISSING: connectNotify (void; QObject this, "const
             // QMetaMethod &" signal) // protected
-            _func[2] = new MemberFunction(
-                c, "customEvent", _n_customEvent0, None, Compiled,
-                qt_QObject_customEvent_void_QObject_QEvent, Return, "void",
-                Parameters, new Param(c, "this", "qt.QObject"),
-                new Param(c, "event", "qt.QEvent"), End),
+            _func[2] =
+                new MemberFunction(c, "customEvent", _n_customEvent0, None, Compiled, qt_QObject_customEvent_void_QObject_QEvent, Return,
+                                   "void", Parameters, new Param(c, "this", "qt.QObject"), new Param(c, "event", "qt.QEvent"), End),
             // MISSING: disconnectNotify (void; QObject this, "const QMetaMethod
             // &" signal) // protected MISSING: isSignalConnected (bool; QObject
             // this, "const QMetaMethod &" signal) // protected MISSING:
             // receivers (int; QObject this, "const char *" signal) // protected
-            new Function(c, "sender", _n_sender0, None, Compiled,
-                         qt_QObject_sender_QObject_QObject, Return,
-                         "qt.QObject", Parameters,
+            new Function(c, "sender", _n_sender0, None, Compiled, qt_QObject_sender_QObject_QObject, Return, "qt.QObject", Parameters,
                          new Param(c, "this", "qt.QObject"), End),
-            new Function(c, "senderSignalIndex", _n_senderSignalIndex0, None,
-                         Compiled, qt_QObject_senderSignalIndex_int_QObject,
-                         Return, "int", Parameters,
-                         new Param(c, "this", "qt.QObject"), End),
-            _func[3] = new MemberFunction(
-                c, "timerEvent", _n_timerEvent0, None, Compiled,
-                qt_QObject_timerEvent_void_QObject_QTimerEvent, Return, "void",
-                Parameters, new Param(c, "this", "qt.QObject"),
-                new Param(c, "event", "qt.QTimerEvent"), End),
+            new Function(c, "senderSignalIndex", _n_senderSignalIndex0, None, Compiled, qt_QObject_senderSignalIndex_int_QObject, Return,
+                         "int", Parameters, new Param(c, "this", "qt.QObject"), End),
+            _func[3] =
+                new MemberFunction(c, "timerEvent", _n_timerEvent0, None, Compiled, qt_QObject_timerEvent_void_QObject_QTimerEvent, Return,
+                                   "void", Parameters, new Param(c, "this", "qt.QObject"), new Param(c, "event", "qt.QTimerEvent"), End),
             // static functions
             // MISSING: connect (flags QMetaObject::Connection; QObject sender,
             // "const char *" signal, QObject receiver, "const char *" method,
@@ -726,24 +612,18 @@ namespace Mu
             // connect (flags QMetaObject::Connection; QObject sender,
             // "PointerToMemberFunction" signal, QObject context, "Functor"
             // functor, flags Qt::ConnectionType type)
-            new Function(
-                c, "tr", _n_tr0, None, Compiled,
-                qt_QObject_tr_string_QObject_string_string_int, Return,
-                "string", Parameters, new Param(c, "sourceText", "string"),
-                new Param(c, "disambiguation", "string", Value(nullptr)),
-                new Param(c, "n", "int", Value((int)-1)), End),
+            new Function(c, "tr", _n_tr0, None, Compiled, qt_QObject_tr_string_QObject_string_string_int, Return, "string", Parameters,
+                         new Param(c, "sourceText", "string"), new Param(c, "disambiguation", "string", Value(nullptr)),
+                         new Param(c, "n", "int", Value((int)-1)), End),
             EndArguments);
         globalScope()->addSymbols(EndArguments);
         scope()->addSymbols(EndArguments);
 
-        addSymbols(new Function(c, "findChild", findChild, None, Return, ftn,
-                                Parameters, new Param(c, "this", ftn),
+        addSymbols(new Function(c, "findChild", findChild, None, Return, ftn, Parameters, new Param(c, "this", ftn),
                                 new Param(c, "name", "string"), End),
 
-                   new Function(c, "setProperty", setProperty, None, Return,
-                                "bool", Parameters, new Param(c, "this", ftn),
-                                new Param(c, "name", "string"),
-                                new Param(c, "value", "qt.QVariant"), End),
+                   new Function(c, "setProperty", setProperty, None, Return, "bool", Parameters, new Param(c, "this", ftn),
+                                new Param(c, "name", "string"), new Param(c, "value", "qt.QVariant"), End),
 
                    EndArguments);
 

@@ -31,8 +31,7 @@ namespace Mu
         return c;
     }
 
-    void UTF8tokenize(STLVector<String>::Type& tokens, const String& str,
-                      String delimiters)
+    void UTF8tokenize(STLVector<String>::Type& tokens, const String& str, String delimiters)
     {
         String::size_type lastPos = str.find_first_not_of(delimiters, 0);
         String::size_type pos = str.find_first_of(delimiters, lastPos);
@@ -45,8 +44,7 @@ namespace Mu
         }
     }
 
-    void UTF8tokenize(APIAllocatable::STLVector<String>::Type& tokens,
-                      const String& str, String delimiters)
+    void UTF8tokenize(APIAllocatable::STLVector<String>::Type& tokens, const String& str, String delimiters)
     {
         String::size_type lastPos = str.find_first_not_of(delimiters, 0);
         String::size_type pos = str.find_first_of(delimiters, lastPos);

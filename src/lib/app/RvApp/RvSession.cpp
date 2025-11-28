@@ -143,18 +143,15 @@ namespace Rv
 
     static RegEx oldContainerNameRE("^([a-zA-Z0-9]+[^0-9])([0-9][0-9][0-9])$");
     static bool debugGC = false;
-    static std::string
-        defaultSequenceSequenceIPNodeName("defaultSequence_sequence");
+    static std::string defaultSequenceSequenceIPNodeName("defaultSequence_sequence");
 
-    static ENVVAR_BOOL(evUseSequenceEventsTracking,
-                       "RV_USE_SEQUENCE_EVENTS_TRACKING", true);
+    static ENVVAR_BOOL(evUseSequenceEventsTracking, "RV_USE_SEQUENCE_EVENTS_TRACKING", true);
 
     namespace
     {
         static bool firstTime = true;
 
-        bool checkForDirFiles(string filename, bool noSeq,
-                              SequenceNameList* files)
+        bool checkForDirFiles(string filename, bool noSeq, SequenceNameList* files)
         {
 #ifdef PLATFORM_WINDOWS
             if (filename.size() && filename[filename.size() - 1] == '/')
@@ -179,9 +176,7 @@ namespace Rv
             //
             {
                 isDir = true;
-                SequenceNameList seqs = sequencesInDirectory(
-                    filename,
-                    noSeq ? FalseSequencePredicate : GlobalExtensionPredicate);
+                SequenceNameList seqs = sequencesInDirectory(filename, noSeq ? FalseSequencePredicate : GlobalExtensionPredicate);
 
                 for (int i = 0; i < seqs.size(); i++)
                 {
@@ -205,8 +200,7 @@ namespace Rv
             // minus numeric_limits<int>::max() depending on where it is
             // initialized cutOut on the other hand is always initialized with
             // the plus version.
-            return sargs.cutIn != -numeric_limits<int>::max()
-                   && sargs.cutIn != numeric_limits<int>::max()
+            return sargs.cutIn != -numeric_limits<int>::max() && sargs.cutIn != numeric_limits<int>::max()
                    && sargs.cutOut != numeric_limits<int>::max();
         }
 
@@ -241,12 +235,9 @@ namespace Rv
             //  initialization.
             //
 
-            IPCore::Application::setOptionValueFromEnvironment(
-                "nodePath", "TWK_NODE_PLUGIN_PATH");
-            IPCore::Application::setOptionValueFromEnvironment(
-                "nodeDefinitionOverride", "TWK_NODE_DEFINITION_OVERRIDE");
-            addRvNodeDefinitions(
-                IPCore::Application::instance()->nodeManager());
+            IPCore::Application::setOptionValueFromEnvironment("nodePath", "TWK_NODE_PLUGIN_PATH");
+            IPCore::Application::setOptionValueFromEnvironment("nodeDefinitionOverride", "TWK_NODE_DEFINITION_OVERRIDE");
+            addRvNodeDefinitions(IPCore::Application::instance()->nodeManager());
 
             // NOTE_QT: This function call ends up in the following code path:
             //          new Shader::Function -> initGLSLVersion() -> glGetString
@@ -256,22 +247,18 @@ namespace Rv
         }
 
         m_mediaLoadingSetEmptyConnection =
-            graph().mediaLoadingSetEmptySignal().connect(
-                boost::bind(&RvSession::onGraphMediaSetEmpty, this));
+            graph().mediaLoadingSetEmptySignal().connect(boost::bind(&RvSession::onGraphMediaSetEmpty, this));
 
         // register the signal to detecting removing of node in the graphe
-        m_nodeWillRemoveConnection = graph().nodeWillRemoveSignal().connect(
-            boost::bind(&RvSession::onGraphNodeWillRemove, this,
-                        std::placeholders::_1));
+        m_nodeWillRemoveConnection =
+            graph().nodeWillRemoveSignal().connect(boost::bind(&RvSession::onGraphNodeWillRemove, this, std::placeholders::_1));
 
         //
         // register the signal to detect fastAddSourceEnabled in the graphe
         auto rvGraph = dynamic_cast<RvGraph*>(&graph());
         if (rvGraph)
-            m_fastAddSourceChangedConnection =
-                rvGraph->fastAddSourceChangedSignal().connect(
-                    boost::bind(&RvSession::onGraphFastAddSourceChanged, this,
-                                std::placeholders::_1, std::placeholders::_2));
+            m_fastAddSourceChangedConnection = rvGraph->fastAddSourceChangedSignal().connect(
+                boost::bind(&RvSession::onGraphFastAddSourceChanged, this, std::placeholders::_1, std::placeholders::_2));
 
         graph().clear();
 
@@ -396,13 +383,9 @@ namespace Rv
     class LoadState
     {
     public:
-        LoadState(RvSession* s, Options::SourceArgsVector& sav, bool noSeq,
-                  bool dpo, bool mg, string tg);
+        LoadState(RvSession* s, Options::SourceArgsVector& sav, bool noSeq, bool dpo, bool mg, string tg);
 
-        bool isLoading()
-        {
-            return (!m_sav.empty() && m_savIndex < m_sav.size());
-        }
+        bool isLoading() { return (!m_sav.empty() && m_savIndex < m_sav.size()); }
 
         int loadCount() { return isLoading() ? m_loadCount : 0; }
 
@@ -420,21 +403,14 @@ namespace Rv
 
         IPCore::ReadFailedExc& readExc() { return m_rexc; }
 
-        int numSourcesRead()
-        {
-            return (m_session->sources().size() - m_nPreexistingSources);
-        }
+        int numSourcesRead() { return (m_session->sources().size() - m_nPreexistingSources); }
 
         int lastLoadedIndex() { return m_lastLoadedSourceIndex; }
 
         bool timeToLoad();
-        void nextPattern(string& pattern, Options::SourceArgs& sargs,
-                         bool& addLayer);
+        void nextPattern(string& pattern, Options::SourceArgs& sargs, bool& addLayer);
 
-        bool nextPatternIsLayer(Options::SourceArgs& sargs)
-        {
-            return (m_perSourceIndex != 0 && sargs.singleSource);
-        }
+        bool nextPatternIsLayer(Options::SourceArgs& sargs) { return (m_perSourceIndex != 0 && sargs.singleSource); }
 
     private:
         RvSession* m_session;
@@ -454,8 +430,7 @@ namespace Rv
         int m_lastLoadedSourceIndex;
     };
 
-    LoadState::LoadState(RvSession* s, Options::SourceArgsVector& sav,
-                         bool noSeq, bool dpo, bool mg, string tg)
+    LoadState::LoadState(RvSession* s, Options::SourceArgsVector& sav, bool noSeq, bool dpo, bool mg, string tg)
         : m_session(s)
         , m_sav(sav)
         , m_savIndex(0)
@@ -477,9 +452,7 @@ namespace Rv
             const Options::SourceArgs& sargs = m_sav[q];
             const Options::Files& files = sargs.files;
             SequenceNameList inputPatterns,
-                inputPatternsOrig = sequencesInFileList(
-                    files,
-                    noSeq ? FalseSequencePredicate : GlobalExtensionPredicate);
+                inputPatternsOrig = sequencesInFileList(files, noSeq ? FalseSequencePredicate : GlobalExtensionPredicate);
 
             //
             //  Need to check for directories
@@ -501,7 +474,45 @@ namespace Rv
                 }
                 else // not a directory, so it's a movie, add to preloader.
                 {
-                    m_session->startPreloadingMedia(filename);
+                    if (isDir)
+                    {
+                        // If the directory contains multiple files, we
+                        // evaluate the directory-filter event to see if we
+                        // should filter out some of the files.
+                        string newfile;
+                        for (int i = 0; i < inputPatterns.size(); ++i)
+                        {
+                            string eval = m_session->userGenericEvent("directory-filter", inputPatterns[i]);
+                            if (eval.empty())
+                            {
+                                newfile = filename;
+                                // If they dont specify a filter we assume its
+                                // the first file. and assume there isn't a
+                                // filter, so we can just skip the loop.
+                                break;
+                            }
+                            if (eval[0] == '0')
+                            {
+                                // If the filter returns a string starting with
+                                // '0', we assume that the user wants to filter
+                                // out that file. So we remove it from the list
+                                // of input patterns. We also decrement the
+                                // index to account for the removed file.
+                                inputPatterns.erase(inputPatterns.begin() + i);
+                                --i;
+                                continue;
+                            }
+                            if (i == 0)
+                                // special case for the first file in the
+                                // directory to start preloading.
+                                m_session->startPreloadingMedia(inputPatterns[i]);
+                        }
+                    }
+                    else
+                    {
+                        // not a directory, so it's a movie, add to preloader.
+                        m_session->startPreloadingMedia(filename);
+                    }
                 }
             }
 
@@ -515,15 +526,13 @@ namespace Rv
         if (!isLoading())
             return false;
 
-        bool ret =
-            (m_loadCount == 0) ? (m_tryCount == 3) : (m_tryCount % 2 == 1);
+        bool ret = (m_loadCount == 0) ? (m_tryCount == 3) : (m_tryCount % 2 == 1);
         ++m_tryCount;
 
         return ret;
     }
 
-    void LoadState::nextPattern(string& pattern, Options::SourceArgs& sargs,
-                                bool& addLayer)
+    void LoadState::nextPattern(string& pattern, Options::SourceArgs& sargs, bool& addLayer)
     {
         sargs = m_sav[m_savIndex];
         addLayer = m_perSourceIndex != 0 && sargs.singleSource;
@@ -546,29 +555,19 @@ namespace Rv
         // get the cookies and headers and updated media filename.
         std::deque<std::pair<std::string, std::string>> params;
 
-        std::string file =
-            TwkMediaLibrary::lookupFilenameInMediaLibrary(filename, params);
+        std::string file = TwkMediaLibrary::lookupFilenameInMediaLibrary(filename, params);
 
         // build a ReadRequest with the cookies and headers
         Movie::ReadRequest request;
-        std::copy(params.begin(), params.end(),
-                  back_inserter(request.parameters));
+        std::copy(params.begin(), params.end(), back_inserter(request.parameters));
 
         // push a reader to be scheduled
         GenericIO::getPreloader().addReader(file, request);
     }
 
-    int RvSession::loadCount()
-    {
-        return m_readingGTO ? m_gtoSourceCount
-                            : (m_loadState ? m_loadState->loadCount() : 0);
-    }
+    int RvSession::loadCount() { return m_readingGTO ? m_gtoSourceCount : (m_loadState ? m_loadState->loadCount() : 0); }
 
-    int RvSession::loadTotal()
-    {
-        return m_readingGTO ? m_gtoSourceTotal
-                            : (m_loadState ? m_loadState->loadTotal() : 0);
-    }
+    int RvSession::loadTotal() { return m_readingGTO ? m_gtoSourceTotal : (m_loadState ? m_loadState->loadTotal() : 0); }
 
     void RvSession::continueLoading()
     {
@@ -622,8 +621,7 @@ namespace Rv
 
                 m_loadState->nextPattern(pattern, sargs, addLayer);
                 const char* file = pattern.c_str();
-                readSource(file, sargs, true, addLayer, m_loadState->tag(),
-                           m_loadState->merge());
+                readSource(file, sargs, true, addLayer, m_loadState->tag(), m_loadState->merge());
 
                 // cout << "INFO: " << ((addLayer) ? "+ " : "") << file << endl;
 
@@ -633,21 +631,15 @@ namespace Rv
         }
         catch (TwkExc::Exception& exc)
         {
-            m_loadState->readExc()
-                << exc.str() << " (" << m_loadState->lastLoadedIndex() << ") "
-                << endl;
+            m_loadState->readExc() << exc.str() << " (" << m_loadState->lastLoadedIndex() << ") " << endl;
         }
         catch (std::exception& exc)
         {
-            m_loadState->readExc()
-                << exc.what() << " while reading " << file << " ("
-                << m_loadState->lastLoadedIndex() << ") " << endl;
+            m_loadState->readExc() << exc.what() << " while reading " << file << " (" << m_loadState->lastLoadedIndex() << ") " << endl;
         }
         catch (...)
         {
-            m_loadState->readExc()
-                << "Unknown Exception while reading " << file << " ("
-                << m_loadState->lastLoadedIndex() << ") " << endl;
+            m_loadState->readExc() << "Unknown Exception while reading " << file << " (" << m_loadState->lastLoadedIndex() << ") " << endl;
         }
 
         setViewNode(viewNodeName());
@@ -702,9 +694,7 @@ namespace Rv
         }
     }
 
-    void RvSession::readUnorganizedFileList(const StringVector& infiles,
-                                            bool doProcessOpts, bool merge,
-                                            const string& tag)
+    void RvSession::readUnorganizedFileList(const StringVector& infiles, bool doProcessOpts, bool merge, const string& tag)
     {
         int rvFileCount = 0;
         for (int i = 0; i < infiles.size(); ++i)
@@ -715,8 +705,7 @@ namespace Rv
             merge = true;
 
         //  PROGLOAD  this func should take tag for when called from mu
-        Options::SourceArgsVector insources =
-            Options::sharedOptions().parseSourceArgs(infiles);
+        Options::SourceArgsVector insources = Options::sharedOptions().parseSourceArgs(infiles);
 
         int nexisting = sources().size();
 
@@ -737,8 +726,7 @@ namespace Rv
             {
                 if (m_loadState)
                     cerr << "ERROR: already have load state!\n" << endl;
-                m_loadState = new LoadState(this, insources, m_noSequences,
-                                            doProcessOpts, merge, tag);
+                m_loadState = new LoadState(this, insources, m_noSequences, doProcessOpts, merge, tag);
 
                 if (m_loadState->loadTotal() > 1)
                 {
@@ -764,9 +752,8 @@ namespace Rv
             {
                 Options::SourceArgs& sargs = insources[q];
                 const Options::Files& files = sargs.files;
-                SequenceNameList inputPatterns = sequencesInFileList(
-                    files, m_noSequences ? FalseSequencePredicate
-                                         : GlobalExtensionPredicate);
+                SequenceNameList inputPatterns =
+                    sequencesInFileList(files, m_noSequences ? FalseSequencePredicate : GlobalExtensionPredicate);
 
                 for (int i = 0; i < inputPatterns.size(); i++)
                 {
@@ -778,8 +765,7 @@ namespace Rv
 
                         readSource(file, sargs, true, addLayer, "", merge);
 
-                        cout << "INFO: " << ((addLayer) ? "+ " : "")
-                             << inputPatterns[i] << endl;
+                        cout << "INFO: " << ((addLayer) ? "+ " : "") << inputPatterns[i] << endl;
                     }
                     catch (TwkExc::Exception& exc)
                     {
@@ -787,13 +773,11 @@ namespace Rv
                     }
                     catch (std::exception& exc)
                     {
-                        rexc << exc.what() << " while reading " << file << " ("
-                             << i << ") " << endl;
+                        rexc << exc.what() << " while reading " << file << " (" << i << ") " << endl;
                     }
                     catch (...)
                     {
-                        rexc << "Unknown Exception while reading " << file
-                             << " (" << i << ") " << endl;
+                        rexc << "Unknown Exception while reading " << file << " (" << i << ") " << endl;
                     }
                 }
             }
@@ -879,24 +863,19 @@ namespace Rv
 
         if (opts.wipes)
         {
-            StackGroupIPNode* stackNode =
-                dynamic_cast<StackGroupIPNode*>(graph().viewNode());
+            StackGroupIPNode* stackNode = dynamic_cast<StackGroupIPNode*>(graph().viewNode());
             if (!stackNode)
             {
                 setViewNode("defaultStack");
                 stackNode = (StackGroupIPNode*)graph().viewNode();
             }
-            TwkContainer::IntProperty* ip =
-                stackNode->createProperty<TwkContainer::IntProperty>(
-                    "ui.wipes");
+            TwkContainer::IntProperty* ip = stackNode->createProperty<TwkContainer::IntProperty>("ui.wipes");
             ip->resize(1);
             ip->front() = 1;
             stackNode->propertyChanged(ip);
 
             StackIPNode* compNode = stackNode->stackNode();
-            TwkContainer::StringProperty* sp =
-                stackNode->createProperty<TwkContainer::StringProperty>(
-                    "composite.type");
+            TwkContainer::StringProperty* sp = stackNode->createProperty<TwkContainer::StringProperty>("composite.type");
             sp->resize(1);
             sp->front() = "over";
             compNode->propertyChanged(sp);
@@ -938,9 +917,7 @@ namespace Rv
 
             setInitEval("");
 
-            string output =
-                TwkApp::muEval(muContext(), muProcess(), muModuleList(),
-                               mu.c_str(), "Command line eval");
+            string output = TwkApp::muEval(muContext(), muProcess(), muModuleList(), mu.c_str(), "Command line eval");
 
             if ("string => \"noprint\"" != output)
             {
@@ -956,8 +933,7 @@ namespace Rv
         }
     }
 
-    void RvSession::applySingleSourceArgs(Options::SourceArgs& sargs,
-                                          SourceIPNode* node)
+    void RvSession::applySingleSourceArgs(Options::SourceArgs& sargs, SourceIPNode* node)
     {
         if (!node)
             return;
@@ -1003,8 +979,7 @@ namespace Rv
                 setFPS(sargs.fps);
                 const IPGraph::NodeMap& vnodes = graph().viewableNodes();
 
-                for (IPGraph::NodeMap::const_iterator i = vnodes.begin();
-                     i != vnodes.end(); ++i)
+                for (IPGraph::NodeMap::const_iterator i = vnodes.begin(); i != vnodes.end(); ++i)
                 {
                     if (graph().isDefaultView((*i).first))
                         copySessionStateToNode((*i).second);
@@ -1014,8 +989,7 @@ namespace Rv
 
         if (sargs.volume != -1)
         {
-            if (FloatProperty* p =
-                    node->property<FloatProperty>("group.volume"))
+            if (FloatProperty* p = node->property<FloatProperty>("group.volume"))
             {
                 p->front() = sargs.volume;
                 node->propertyChanged(p);
@@ -1024,8 +998,7 @@ namespace Rv
 
         if (sargs.audioOffset != 0)
         {
-            if (FloatProperty* p =
-                    node->property<FloatProperty>("group.audioOffset"))
+            if (FloatProperty* p = node->property<FloatProperty>("group.audioOffset"))
             {
                 p->front() = sargs.audioOffset;
                 node->propertyChanged(p);
@@ -1034,8 +1007,7 @@ namespace Rv
 
         if (sargs.rangeOffset != 0)
         {
-            if (IntProperty* p =
-                    node->property<IntProperty>("group.rangeOffset"))
+            if (IntProperty* p = node->property<IntProperty>("group.rangeOffset"))
             {
                 p->front() = sargs.rangeOffset;
                 node->propertyChanged(p);
@@ -1044,8 +1016,7 @@ namespace Rv
 
         if (sargs.rangeStart != numeric_limits<int>::max())
         {
-            IntProperty* p =
-                node->createProperty<IntProperty>("group.rangeStart");
+            IntProperty* p = node->createProperty<IntProperty>("group.rangeStart");
             p->resize(1);
             node->newPropertyCreated(p);
             p->front() = sargs.rangeStart;
@@ -1054,8 +1025,7 @@ namespace Rv
 
         if (sargs.noMovieAudio)
         {
-            if (IntProperty* p =
-                    node->property<IntProperty>("group.noMovieAudio"))
+            if (IntProperty* p = node->property<IntProperty>("group.noMovieAudio"))
             {
                 p->front() = 1;
                 node->propertyChanged(p);
@@ -1064,11 +1034,9 @@ namespace Rv
 
         if (sargs.stereoRelativeOffset != 0.0)
         {
-            if (SourceStereoIPNode* snode = dynamic_cast<SourceStereoIPNode*>(
-                    graph().findNodeAssociatedWith(node, "RVSourceStereo")))
+            if (SourceStereoIPNode* snode = dynamic_cast<SourceStereoIPNode*>(graph().findNodeAssociatedWith(node, "RVSourceStereo")))
             {
-                if (FloatProperty* p =
-                        snode->property<FloatProperty>("stereo.relativeOffset"))
+                if (FloatProperty* p = snode->property<FloatProperty>("stereo.relativeOffset"))
                 {
                     p->front() = sargs.stereoRelativeOffset;
                     snode->propertyChanged(p);
@@ -1078,11 +1046,9 @@ namespace Rv
 
         if (sargs.stereoRightOffset != 0.0)
         {
-            if (SourceStereoIPNode* snode = dynamic_cast<SourceStereoIPNode*>(
-                    graph().findNodeAssociatedWith(node, "RVSourceStereo")))
+            if (SourceStereoIPNode* snode = dynamic_cast<SourceStereoIPNode*>(graph().findNodeAssociatedWith(node, "RVSourceStereo")))
             {
-                if (FloatProperty* p =
-                        snode->property<FloatProperty>("stereo.rightOffset"))
+                if (FloatProperty* p = snode->property<FloatProperty>("stereo.rightOffset"))
                 {
                     p->front() = sargs.stereoRightOffset;
                     snode->propertyChanged(p);
@@ -1092,11 +1058,9 @@ namespace Rv
 
         if (sargs.pixelAspect != 0.0)
         {
-            if (LensWarpIPNode* lnode = dynamic_cast<LensWarpIPNode*>(
-                    graph().findNodeAssociatedWith(node, "RVLensWarp")))
+            if (LensWarpIPNode* lnode = dynamic_cast<LensWarpIPNode*>(graph().findNodeAssociatedWith(node, "RVLensWarp")))
             {
-                if (FloatProperty* p =
-                        lnode->property<FloatProperty>("warp.pixelAspectRatio"))
+                if (FloatProperty* p = lnode->property<FloatProperty>("warp.pixelAspectRatio"))
                 {
                     p->front() = sargs.pixelAspect;
                     lnode->propertyChanged(p);
@@ -1142,17 +1106,14 @@ namespace Rv
 
         if (sargs.cmap != "")
         {
-            if (ChannelMapIPNode* cmapnode = dynamic_cast<ChannelMapIPNode*>(
-                    graph().findNodeAssociatedWith(node, "RVChannelMap")))
+            if (ChannelMapIPNode* cmapnode = dynamic_cast<ChannelMapIPNode*>(graph().findNodeAssociatedWith(node, "RVChannelMap")))
             {
                 StringVector chans;
                 stl_ext::tokenize(chans, sargs.cmap, ",");
                 cmapnode->setChannelMap(chans);
-                if ((chans.size() > 1)
-                    || ((sargs.selectType == "") && (sargs.selectName == "")))
+                if ((chans.size() > 1) || ((sargs.selectType == "") && (sargs.selectName == "")))
                 {
-                    node->setProperty<IntProperty>("request.readAllChannels",
-                                                   1);
+                    node->setProperty<IntProperty>("request.readAllChannels", 1);
                 }
             }
         }
@@ -1160,13 +1121,9 @@ namespace Rv
         if (sargs.fcdl != "")
         {
             if (PipelineGroupIPNode* pipeGroup =
-                    dynamic_cast<PipelineGroupIPNode*>(
-                        node->group()->memberByType(
-                            "RVLinearizePipelineGroup")))
+                    dynamic_cast<PipelineGroupIPNode*>(node->group()->memberByType("RVLinearizePipelineGroup")))
             {
-                if (FileSpaceLinearizeIPNode* cdlnode =
-                        dynamic_cast<FileSpaceLinearizeIPNode*>(
-                            pipeGroup->memberByType("RVLinearize")))
+                if (FileSpaceLinearizeIPNode* cdlnode = dynamic_cast<FileSpaceLinearizeIPNode*>(pipeGroup->memberByType("RVLinearize")))
                 {
                     readCDL(sargs.fcdl, cdlnode->name(), true);
                 }
@@ -1175,12 +1132,9 @@ namespace Rv
 
         if (sargs.lcdl != "")
         {
-            if (PipelineGroupIPNode* pipeGroup =
-                    dynamic_cast<PipelineGroupIPNode*>(
-                        node->group()->memberByType("RVColorPipelineGroup")))
+            if (PipelineGroupIPNode* pipeGroup = dynamic_cast<PipelineGroupIPNode*>(node->group()->memberByType("RVColorPipelineGroup")))
             {
-                if (ColorIPNode* cdlnode = dynamic_cast<ColorIPNode*>(
-                        pipeGroup->memberByType("RVColor")))
+                if (ColorIPNode* cdlnode = dynamic_cast<ColorIPNode*>(pipeGroup->memberByType("RVColor")))
                 {
                     readCDL(sargs.lcdl, cdlnode->name(), true);
                 }
@@ -1190,12 +1144,9 @@ namespace Rv
         if (sargs.flut != "")
         {
             if (PipelineGroupIPNode* pipeGroup =
-                    dynamic_cast<PipelineGroupIPNode*>(
-                        node->group()->memberByType(
-                            "RVLinearizePipelineGroup")))
+                    dynamic_cast<PipelineGroupIPNode*>(node->group()->memberByType("RVLinearizePipelineGroup")))
             {
-                if (LUTIPNode* lutnode = dynamic_cast<LUTIPNode*>(
-                        pipeGroup->memberByType("RVLinearize")))
+                if (LUTIPNode* lutnode = dynamic_cast<LUTIPNode*>(pipeGroup->memberByType("RVLinearize")))
                 {
                     readLUT(sargs.flut, lutnode->name(), true);
                 }
@@ -1204,8 +1155,7 @@ namespace Rv
 
         if (sargs.pclut != "")
         {
-            if (LUTIPNode* lutnode = dynamic_cast<LUTIPNode*>(
-                    graph().findNodeAssociatedWith(node, "RVCacheLUT")))
+            if (LUTIPNode* lutnode = dynamic_cast<LUTIPNode*>(graph().findNodeAssociatedWith(node, "RVCacheLUT")))
             {
                 readLUT(sargs.pclut, lutnode->name(), true);
             }
@@ -1213,12 +1163,9 @@ namespace Rv
 
         if (sargs.llut != "")
         {
-            if (PipelineGroupIPNode* pipeGroup =
-                    dynamic_cast<PipelineGroupIPNode*>(
-                        node->group()->memberByType("RVLookPipelineGroup")))
+            if (PipelineGroupIPNode* pipeGroup = dynamic_cast<PipelineGroupIPNode*>(node->group()->memberByType("RVLookPipelineGroup")))
             {
-                if (LUTIPNode* lutnode = dynamic_cast<LUTIPNode*>(
-                        pipeGroup->memberByType("RVLookLUT")))
+                if (LUTIPNode* lutnode = dynamic_cast<LUTIPNode*>(pipeGroup->memberByType("RVLookLUT")))
                 {
                     readLUT(sargs.llut, lutnode->name(), true);
                 }
@@ -1227,17 +1174,13 @@ namespace Rv
 
         if (sargs.hascrop || sargs.hasuncrop)
         {
-            if (FormatIPNode* fnode = dynamic_cast<FormatIPNode*>(
-                    graph().findNodeAssociatedWith(node, "RVFormat")))
+            if (FormatIPNode* fnode = dynamic_cast<FormatIPNode*>(graph().findNodeAssociatedWith(node, "RVFormat")))
             {
                 if (sargs.hascrop)
-                    fnode->setCrop(int(sargs.crop[0]), int(sargs.crop[1]),
-                                   int(sargs.crop[2]), int(sargs.crop[3]));
+                    fnode->setCrop(int(sargs.crop[0]), int(sargs.crop[1]), int(sargs.crop[2]), int(sargs.crop[3]));
 
                 if (sargs.hasuncrop)
-                    fnode->setUncrop(int(sargs.uncrop[0]), int(sargs.uncrop[1]),
-                                     int(sargs.uncrop[2]),
-                                     int(sargs.uncrop[3]));
+                    fnode->setUncrop(int(sargs.uncrop[0]), int(sargs.uncrop[1]), int(sargs.uncrop[2]), int(sargs.uncrop[3]));
             }
         }
     }
@@ -1251,9 +1194,7 @@ namespace Rv
         readSource(filename, sargs, addContents, false, tag);
     }
 
-    void RvSession::readSourceHelper(StringVector files,
-                                     Options::SourceArgs& sargs,
-                                     bool addContents, bool addToExistingSource)
+    void RvSession::readSourceHelper(StringVector files, Options::SourceArgs& sargs, bool addContents, bool addToExistingSource)
     {
         if (!addContents)
             clear();
@@ -1274,20 +1215,14 @@ namespace Rv
         updateRange();
     }
 
-    void RvSession::readSource(const std::string& infilename,
-                               Options::SourceArgs& sargs, bool addContents,
-                               bool addToExistingSource, const string& tag,
-                               bool merge)
+    void RvSession::readSource(const std::string& infilename, Options::SourceArgs& sargs, bool addContents, bool addToExistingSource,
+                               const string& tag, bool merge)
     {
-        HOP_PROF_DYN_NAME(
-            std::string(std::string("RvSession::readSource : ") + infilename)
-                .c_str());
+        HOP_PROF_DYN_NAME(std::string(std::string("RvSession::readSource : ") + infilename).c_str());
 
-        string filename =
-            pathConform(IPCore::Application::mapFromVar(infilename));
+        string filename = pathConform(IPCore::Application::mapFromVar(infilename));
         string eventContents = filename + ";;" + tag;
-        string newfilename =
-            userGenericEvent("incoming-source-path", eventContents);
+        string newfilename = userGenericEvent("incoming-source-path", eventContents);
 
         if (newfilename != "")
         {
@@ -1332,29 +1267,24 @@ namespace Rv
                         addSource(movies, sargs);
                 }
                 else
-                    TWK_THROW_STREAM(IPCore::ReadFailedExc,
-                                     "Cannot access stereo media " << filename);
+                    TWK_THROW_STREAM(IPCore::ReadFailedExc, "Cannot access stereo media " << filename);
             }
             else
             {
                 StringVector movies;
                 movies.push_back(filename);
-                readSourceHelper(movies, sargs, addContents,
-                                 addToExistingSource);
+                readSourceHelper(movies, sargs, addContents, addToExistingSource);
             }
 
             updateAnnotationsUI();
         }
     }
 
-    void RvSession::addToSource(const string& srcNode, const string& infilename,
-                                const string& tag)
+    void RvSession::addToSource(const string& srcNode, const string& infilename, const string& tag)
     {
-        string filename =
-            pathConform(IPCore::Application::mapFromVar(infilename));
+        string filename = pathConform(IPCore::Application::mapFromVar(infilename));
         string eventContents = filename + ";;" + tag;
-        string newfilename =
-            userGenericEvent("incoming-source-path", eventContents);
+        string newfilename = userGenericEvent("incoming-source-path", eventContents);
 
         if (newfilename != "")
         {
@@ -1375,13 +1305,11 @@ namespace Rv
             }
             else if (files.size() == 0)
             {
-                TWK_THROW_STREAM(IPCore::ReadFailedExc,
-                                 "Direcory contains no media");
+                TWK_THROW_STREAM(IPCore::ReadFailedExc, "Direcory contains no media");
             }
             else
             {
-                TWK_THROW_STREAM(IPCore::ReadFailedExc,
-                                 "Direcory contains too many sequences");
+                TWK_THROW_STREAM(IPCore::ReadFailedExc, "Directory contains too many sequences");
             }
         }
 
@@ -1392,9 +1320,7 @@ namespace Rv
             addToSourceHelper(srcNode, movies, sargs);
     }
 
-    SourceIPNode* RvSession::addToSourceHelper(const string& srcNode,
-                                               StringVector movies,
-                                               Options::SourceArgs& sargs)
+    SourceIPNode* RvSession::addToSourceHelper(const string& srcNode, StringVector movies, Options::SourceArgs& sargs)
     {
         SourceIPNode* node = 0;
         if (movies.empty())
@@ -1452,16 +1378,13 @@ namespace Rv
         return node;
     }
 
-    void RvSession::buildFileList(const StringVector& files, string tag,
-                                  StringVector& collected)
+    void RvSession::buildFileList(const StringVector& files, string tag, StringVector& collected)
     {
         for (int i = 0; i < files.size(); i++)
         {
-            string filename =
-                pathConform(IPCore::Application::mapFromVar(files[i]));
+            string filename = pathConform(IPCore::Application::mapFromVar(files[i]));
             string eventContents = filename + ";;" + tag;
-            string newfilename =
-                userGenericEvent("incoming-source-path", eventContents);
+            string newfilename = userGenericEvent("incoming-source-path", eventContents);
 
             if (newfilename != "")
                 filename = newfilename;
@@ -1470,9 +1393,7 @@ namespace Rv
         }
     }
 
-    SourceIPNode* RvSession::addSourceWithTag(const StringVector& files,
-                                              string tag, string nodeName,
-                                              string mediaRepName)
+    SourceIPNode* RvSession::addSourceWithTag(const StringVector& files, string tag, string nodeName, string mediaRepName)
     {
         Options::SourceArgs sargs;
         if (!files.empty())
@@ -1484,8 +1405,7 @@ namespace Rv
                 sourceArgs.push_back(files[i]);
             }
             sourceArgs.push_back("]");
-            Options::SourceArgsVector srcArgsVector =
-                Options::sharedOptions().parseSourceArgs(sourceArgs);
+            Options::SourceArgsVector srcArgsVector = Options::sharedOptions().parseSourceArgs(sourceArgs);
             sargs = srcArgsVector[0];
         }
 
@@ -1494,8 +1414,7 @@ namespace Rv
         if (movies.empty())
             TWK_THROW_EXC_STREAM("ERROR: No files for reading" << endl);
 
-        auto result =
-            addSource(movies, sargs, nodeName, "RVFileSource", mediaRepName);
+        auto result = addSource(movies, sargs, nodeName, "RVFileSource", mediaRepName);
 
         // We need to update the frame range here because the FastAddSourceGuard
         // set the inputs of the SequenceIPNode after the
@@ -1505,20 +1424,15 @@ namespace Rv
         return result;
     }
 
-    SourceIPNode* RvSession::addSource(string filename,
-                                       Options::SourceArgs& sargs,
-                                       string nodeName)
+    SourceIPNode* RvSession::addSource(string filename, Options::SourceArgs& sargs, string nodeName)
     {
         StringVector movies(1);
         movies.front() = filename;
         return addSource(movies, sargs, nodeName);
     }
 
-    SourceIPNode* RvSession::addSource(const StringVector& movies,
-                                       Options::SourceArgs& sargs,
-                                       string nodeName, string nodeType,
-                                       string mediaRepName,
-                                       string mediaRepSource)
+    SourceIPNode* RvSession::addSource(const StringVector& movies, Options::SourceArgs& sargs, string nodeName, string nodeType,
+                                       string mediaRepName, string mediaRepSource)
     {
         //
         // Determine the source media rep name and source to use if any
@@ -1551,17 +1465,14 @@ namespace Rv
                 mediaRepLinkedSrcNode = sourceNode(mediaRepSource);
             }
             if (!mediaRepLinkedSrcNode)
-                TWK_THROW_EXC_STREAM(
-                    "ERROR: Could not find specified source node" << endl);
+                TWK_THROW_EXC_STREAM("ERROR: Could not find specified source node" << endl);
 
             // Make sure the media rep name does not already exists
             if (mediaRepLinkedSrcNode)
             {
                 StringVector mediaReps;
                 sourceMediaReps(mediaRepLinkedSrcNode->name(), mediaReps);
-                if (any_of(mediaReps.begin(), mediaReps.end(),
-                           [&](const string& elem)
-                           { return elem == mediaRepName; }))
+                if (any_of(mediaReps.begin(), mediaReps.end(), [&](const string& elem) { return elem == mediaRepName; }))
                 {
                     TWK_THROW_EXC_STREAM("ERROR: Source media representation "
                                          "name already exists: "
@@ -1570,15 +1481,13 @@ namespace Rv
             }
         }
 
-        SourceIPNode* source = rvgraph().addSource(
-            nodeType, nodeName, mediaRepName, mediaRepLinkedSrcNode);
+        SourceIPNode* source = rvgraph().addSource(nodeType, nodeName, mediaRepName, mediaRepLinkedSrcNode);
 
         //
         //  Set the media on the source
         //
 
-        source->mediaChangedSignal().connect(
-            boost::bind(&RvSession::newMediaLoaded, this, source));
+        source->mediaChangedSignal().connect(boost::bind(&RvSession::newMediaLoaded, this, source));
         StringProperty* movie = source->property<StringProperty>("media.movie");
         for (int i = 0; i < movies.size(); ++i)
             movie->push_back(movies[i]);
@@ -1608,8 +1517,7 @@ namespace Rv
         // sg_first_frame/sg_last_frame/sg_uploaded_movie_frame_rate
         if (hasCutPoints(sargs))
         {
-            source->declareProperty<Vec2iProperty>(
-                "proxy.range", Vec2i(sargs.cutIn, sargs.cutOut));
+            source->declareProperty<Vec2iProperty>("proxy.range", Vec2i(sargs.cutIn, sargs.cutOut));
         }
         if (sargs.fps != 0.0)
         {
@@ -1642,8 +1550,7 @@ namespace Rv
 
         if (!nodes.empty())
         {
-            if (DisplayStereoIPNode* stereo =
-                    dynamic_cast<DisplayStereoIPNode*>(nodes.front()))
+            if (DisplayStereoIPNode* stereo = dynamic_cast<DisplayStereoIPNode*>(nodes.front()))
             {
                 if (stereo->stereoType() == "hardware")
                     send(stereoHardwareOnMessage());
@@ -1661,8 +1568,7 @@ namespace Rv
         return source;
     }
 
-    SourceIPNode* RvSession::addImageSource(const string& mediaName,
-                                            const MovieInfo& info)
+    SourceIPNode* RvSession::addImageSource(const string& mediaName, const MovieInfo& info)
     {
         StringVector movies(1);
         movies.front() = mediaName;
@@ -1676,8 +1582,7 @@ namespace Rv
 
     void RvSession::newMediaLoaded(SourceIPNode* node)
     {
-        if (SourceGroupIPNode* group =
-                dynamic_cast<SourceGroupIPNode*>(node->group()))
+        if (SourceGroupIPNode* group = dynamic_cast<SourceGroupIPNode*>(node->group()))
         {
             //
             //  If there isn't a name already give it one
@@ -1709,25 +1614,21 @@ namespace Rv
             if (Options::sharedOptions().progressiveSourceLoading)
             {
                 if (action != "modified")
-                    userGenericEvent("source-group-proxy-complete",
-                                     sgccontents.str());
+                    userGenericEvent("source-group-proxy-complete", sgccontents.str());
                 else
-                    userGenericEvent("source-group-complete",
-                                     sgccontents.str());
+                    userGenericEvent("source-group-complete", sgccontents.str());
             }
             else
             {
                 // Note: It was decided to trigger the
                 // source-group-proxy-complete event even when progressive
                 // source loading is disabled
-                userGenericEvent("source-group-proxy-complete",
-                                 sgccontents.str());
+                userGenericEvent("source-group-proxy-complete", sgccontents.str());
 
                 userGenericEvent("source-group-complete", sgccontents.str());
             }
 
-            if ((sources.size() == 1 && action == "new")
-                || m_conductorSource == node)
+            if ((sources.size() == 1 && action == "new") || m_conductorSource == node)
             {
                 updateRange();
                 m_inc = graph().root()->imageRangeInfo().inc;
@@ -1751,8 +1652,7 @@ namespace Rv
         }
     }
 
-    vector<FileSourceIPNode*>
-    RvSession::findSourcesByMedia(const string& filename, const string& node)
+    vector<FileSourceIPNode*> RvSession::findSourcesByMedia(const string& filename, const string& node)
     {
         vector<FileSourceIPNode*> sources;
 
@@ -1785,14 +1685,11 @@ namespace Rv
         return sources;
     }
 
-    void RvSession::relocateSource(const string& oldFilename,
-                                   const string& newFilename,
-                                   const string& srcNode)
+    void RvSession::relocateSource(const string& oldFilename, const string& newFilename, const string& srcNode)
     {
         string newF = pathConform(IPCore::Application::mapFromVar(newFilename));
 
-        vector<FileSourceIPNode*> sources =
-            findSourcesByMedia(oldFilename, srcNode);
+        vector<FileSourceIPNode*> sources = findSourcesByMedia(oldFilename, srcNode);
 
         for (int i = 0; i < sources.size(); ++i)
         {
@@ -1802,11 +1699,9 @@ namespace Rv
             mrcontents << source->name() << ";;" << oldFilename << ";;" << newF;
             userGenericEvent("media-relocated", mrcontents.str());
 
-            StringProperty* movie =
-                source->property<StringProperty>("media.movie");
+            StringProperty* movie = source->property<StringProperty>("media.movie");
             movie->front() = newFilename;
-            IntProperty* mediaActive =
-                source->property<IntProperty>("media.active");
+            IntProperty* mediaActive = source->property<IntProperty>("media.active");
             mediaActive->front() = 1;
             source->propertyChanged(movie);
 
@@ -1816,9 +1711,7 @@ namespace Rv
         }
     }
 
-    void RvSession::setSourceMedia(const std::string& srcNode,
-                                   const StringVector& files,
-                                   const std::string& tag)
+    void RvSession::setSourceMedia(const std::string& srcNode, const StringVector& files, const std::string& tag)
     {
 
         if (IPNode* node = graph().findNode(srcNode))
@@ -1827,21 +1720,17 @@ namespace Rv
             buildFileList(files, tag, mediaFiles);
             if (!mediaFiles.empty())
             {
-                if (FileSourceIPNode* fsipn =
-                        dynamic_cast<FileSourceIPNode*>(node))
+                if (FileSourceIPNode* fsipn = dynamic_cast<FileSourceIPNode*>(node))
                 {
-                    const bool isProgressiveLoadingEnabled =
-                        fsipn->hasProgressiveSourceLoading();
+                    const bool isProgressiveLoadingEnabled = fsipn->hasProgressiveSourceLoading();
                     fsipn->setProgressiveSourceLoading(false);
 
                     fsipn->clearMedia();
-                    StringProperty* movie =
-                        fsipn->property<StringProperty>("media.movie");
+                    StringProperty* movie = fsipn->property<StringProperty>("media.movie");
                     movie->resize(0);
                     for (int i = 0; i < mediaFiles.size(); ++i)
                         movie->push_back(mediaFiles[i]);
-                    IntProperty* mediaActive =
-                        fsipn->property<IntProperty>("media.active");
+                    IntProperty* mediaActive = fsipn->property<IntProperty>("media.active");
                     mediaActive->front() = 1;
                     fsipn->propertyChanged(movie);
 
@@ -1854,8 +1743,7 @@ namespace Rv
                     smscontents << srcNode << ";;" << tag;
                     userGenericEvent("source-media-set", smscontents.str());
 
-                    fsipn->setProgressiveSourceLoading(
-                        isProgressiveLoadingEnabled);
+                    fsipn->setProgressiveSourceLoading(isProgressiveLoadingEnabled);
                 }
                 else
                 {
@@ -1865,14 +1753,12 @@ namespace Rv
         }
         else
         {
-            TWK_THROW_STREAM(IPCore::ReadFailedExc,
-                             "Can't find node " << srcNode);
+            TWK_THROW_STREAM(IPCore::ReadFailedExc, "Can't find node " << srcNode);
         }
     }
 
-    SourceIPNode* RvSession::addSourceMediaRep(
-        const std::string& srcNodeName, const std::string& mediaRepName,
-        const StringVector& mediaRepPathsAndOptionsArg, const std::string& tag)
+    SourceIPNode* RvSession::addSourceMediaRep(const std::string& srcNodeName, const std::string& mediaRepName,
+                                               const StringVector& mediaRepPathsAndOptionsArg, const std::string& tag)
     {
         Options::SourceArgs sargs;
         if (!mediaRepPathsAndOptionsArg.empty())
@@ -1884,8 +1770,7 @@ namespace Rv
                 sourceArgs.push_back(mediaRepPathsAndOptionsArg[i]);
             }
             sourceArgs.push_back("]");
-            Options::SourceArgsVector srcArgsVector =
-                Options::sharedOptions().parseSourceArgs(sourceArgs);
+            Options::SourceArgsVector srcArgsVector = Options::sharedOptions().parseSourceArgs(sourceArgs);
             sargs = srcArgsVector[0];
         }
 
@@ -1894,9 +1779,7 @@ namespace Rv
         if (mediaRepPaths.empty())
             TWK_THROW_EXC_STREAM("ERROR: No files for reading" << endl);
 
-        auto result =
-            addSource(mediaRepPaths, sargs, "" /*nodeName*/,
-                      "RVFileSource" /*nodeType*/, mediaRepName, srcNodeName);
+        auto result = addSource(mediaRepPaths, sargs, "" /*nodeName*/, "RVFileSource" /*nodeType*/, mediaRepName, srcNodeName);
 
         return result;
     }
@@ -1904,14 +1787,12 @@ namespace Rv
     // Returns true if the switch node as parameter belongs to an RVSwitchGroup
     static bool isGroupedSwitchNode(SwitchIPNode const* const switchNode)
     {
-        return switchNode && switchNode->group() != nullptr
-               && switchNode->group()->protocol() == "RVSwitchGroup";
+        return switchNode && switchNode->group() != nullptr && switchNode->group()->protocol() == "RVSwitchGroup";
     }
 
     // Find and return the Switch node(s) associated with the specified source
     // node name if any
-    vector<SwitchIPNode*>
-    RvSession::findSwitchIPNodes(const string& srcNodeOrSwitchNodeName)
+    vector<SwitchIPNode*> RvSession::findSwitchIPNodes(const string& srcNodeOrSwitchNodeName)
     {
         vector<SwitchIPNode*> switchNodes;
 
@@ -1929,9 +1810,7 @@ namespace Rv
             SwitchIPNode* switchNode = dynamic_cast<SwitchIPNode*>(srcNode);
             if (!switchNode && srcNode->group())
             {
-                switchNode =
-                    dynamic_cast<SwitchIPNode*>(graph().findNodeAssociatedWith(
-                        srcNode->group(), "RVSwitch"));
+                switchNode = dynamic_cast<SwitchIPNode*>(graph().findNodeAssociatedWith(srcNode->group(), "RVSwitch"));
             }
 
             // Make sure that the switch node (if any) is part of a switch group
@@ -1962,8 +1841,7 @@ namespace Rv
         {
             switchInput = adaptor->groupInputNode();
         }
-        if (SourceGroupIPNode* srcGroup =
-                dynamic_cast<SourceGroupIPNode*>(switchInput))
+        if (SourceGroupIPNode* srcGroup = dynamic_cast<SourceGroupIPNode*>(switchInput))
         {
             return srcGroup;
         }
@@ -1975,16 +1853,13 @@ namespace Rv
     // media representation if any
     static SourceIPNode* sourceFromSwitchInput(IPNode* switchInput)
     {
-        if (SourceGroupIPNode* srcGroup =
-                sourceGroupFromSwitchInput(switchInput))
+        if (SourceGroupIPNode* srcGroup = sourceGroupFromSwitchInput(switchInput))
         {
-            if (FileSourceIPNode* srcNode = dynamic_cast<FileSourceIPNode*>(
-                    srcGroup->memberByType("RVFileSource")))
+            if (FileSourceIPNode* srcNode = dynamic_cast<FileSourceIPNode*>(srcGroup->memberByType("RVFileSource")))
             {
                 return srcNode;
             }
-            if (ImageSourceIPNode* srcNode = dynamic_cast<ImageSourceIPNode*>(
-                    srcGroup->memberByType("RVImageSource")))
+            if (ImageSourceIPNode* srcNode = dynamic_cast<ImageSourceIPNode*>(srcGroup->memberByType("RVImageSource")))
             {
                 return srcNode;
             }
@@ -1995,15 +1870,11 @@ namespace Rv
 
     // Finds and returns the source group corresponding to the requested source
     // media representation if any
-    static SourceGroupIPNode*
-    findSourceGroupMediaRep(SwitchIPNode* switchNode,
-                            const std::string& mediaRepName,
-                            SourceIPNode*& out_srcNode)
+    static SourceGroupIPNode* findSourceGroupMediaRep(SwitchIPNode* switchNode, const std::string& mediaRepName, SourceIPNode*& out_srcNode)
     {
         for (int i = 0; i < switchNode->inputs().size(); ++i)
         {
-            if (SourceIPNode* srcNode =
-                    sourceFromSwitchInput(switchNode->inputs()[i]))
+            if (SourceIPNode* srcNode = sourceFromSwitchInput(switchNode->inputs()[i]))
             {
                 if (srcNode->mediaRepName() == mediaRepName)
                 {
@@ -2024,8 +1895,7 @@ namespace Rv
         SwitchIPNode* switchNode = this->switchNode(srcNodeOrSwitchNodeName);
         if (!switchNode)
         {
-            std::vector<SwitchIPNode*> switchNodes =
-                findSwitchIPNodes(srcNodeOrSwitchNodeName);
+            std::vector<SwitchIPNode*> switchNodes = findSwitchIPNodes(srcNodeOrSwitchNodeName);
             if (!switchNodes.empty())
             {
                 switchNode = switchNodes[0];
@@ -2048,8 +1918,7 @@ namespace Rv
     }
 
     // Finds and returns the Source Media Representation names available
-    void RvSession::sourceMediaReps(const string& srcNodeOrSwitchNodeName,
-                                    StringVector& sourceMediaReps,
+    void RvSession::sourceMediaReps(const string& srcNodeOrSwitchNodeName, StringVector& sourceMediaReps,
                                     StringVector* sourceNodes /* = nullptr */
     )
     {
@@ -2062,8 +1931,7 @@ namespace Rv
         SwitchIPNode* switchNode = this->switchNode(srcNodeOrSwitchNodeName);
         if (!switchNode)
         {
-            std::vector<SwitchIPNode*> switchNodes =
-                findSwitchIPNodes(srcNodeOrSwitchNodeName);
+            std::vector<SwitchIPNode*> switchNodes = findSwitchIPNodes(srcNodeOrSwitchNodeName);
             if (!switchNodes.empty())
             {
                 switchNode = switchNodes[0];
@@ -2086,8 +1954,7 @@ namespace Rv
 
         for (size_t i = 0; i < switchNode->inputs().size(); ++i)
         {
-            if (SourceIPNode* srcNode =
-                    sourceFromSwitchInput(switchNode->inputs()[i]))
+            if (SourceIPNode* srcNode = sourceFromSwitchInput(switchNode->inputs()[i]))
             {
                 sourceMediaReps.push_back(srcNode->mediaRepName());
                 if (sourceNodes)
@@ -2119,8 +1986,7 @@ namespace Rv
         // single source media representation
         if (!switchNodes.empty() && switchNodes[0]->inputs().size() >= 1)
         {
-            SourceIPNode* srcNode =
-                sourceFromSwitchInput(switchNodes[0]->inputs()[0]);
+            SourceIPNode* srcNode = sourceFromSwitchInput(switchNodes[0]->inputs()[0]);
             if (srcNode)
             {
                 return srcNode->name();
@@ -2130,9 +1996,8 @@ namespace Rv
         return "";
     }
 
-    void RvSession::setActiveSourceMediaRep(
-        const std::string& srcNodeOrSwitchNodeName,
-        const std::string& mediaRepName, const std::string& tag)
+    void RvSession::setActiveSourceMediaRep(const std::string& srcNodeOrSwitchNodeName, const std::string& mediaRepName,
+                                            const std::string& tag)
     {
         // Find the Switch node associated with the specified switch or source
         // node if any
@@ -2150,19 +2015,16 @@ namespace Rv
         // Nothing to do if there isn't any
         if (switchNodes.empty())
         {
-            if (srcNodeOrSwitchNodeName != ""
-                && srcNodeOrSwitchNodeName != "all")
+            if (srcNodeOrSwitchNodeName != "" && srcNodeOrSwitchNodeName != "all")
             {
                 // Log an error but only if the requested media rep to activate
                 // is not the currently active one
                 SourceIPNode* srcNode = sourceNode(srcNodeOrSwitchNodeName);
                 if (!srcNode || srcNode->mediaRepName() != mediaRepName)
                 {
-                    TWK_THROW_STREAM(
-                        IPCore::ReadFailedExc,
-                        "Can't find switch node associated with source node "
-                            << srcNodeOrSwitchNodeName << " to select the '"
-                            << mediaRepName << "' media representation.");
+                    TWK_THROW_STREAM(IPCore::ReadFailedExc, "Can't find switch node associated with source node "
+                                                                << srcNodeOrSwitchNodeName << " to select the '" << mediaRepName
+                                                                << "' media representation.");
                 }
             }
 
@@ -2172,21 +2034,16 @@ namespace Rv
         // Swap media for all the specified switch node(s)
         for (const auto& switchNode : switchNodes)
         {
-            if (SourceIPNode* activeSrcNode =
-                    sourceFromSwitchInput(switchNode->activeInput()))
+            if (SourceIPNode* activeSrcNode = sourceFromSwitchInput(switchNode->activeInput()))
             {
                 // Select the requested media representation if this not the
                 // currently selected one.
                 if (activeSrcNode->mediaRepName() != mediaRepName)
                 {
                     SourceIPNode* newSrcNode = nullptr;
-                    if (SourceGroupIPNode* newSrcGroup =
-                            findSourceGroupMediaRep(switchNode, mediaRepName,
-                                                    newSrcNode))
+                    if (SourceGroupIPNode* newSrcGroup = findSourceGroupMediaRep(switchNode, mediaRepName, newSrcNode))
                     {
-                        if (StringProperty* switchInputProp =
-                                switchNode->property<StringProperty>(
-                                    "output.input"))
+                        if (StringProperty* switchInputProp = switchNode->property<StringProperty>("output.input"))
                         {
                             if ((*switchInputProp)[0] != newSrcGroup->name())
                             {
@@ -2196,27 +2053,19 @@ namespace Rv
                                 switchNode->propertyChanged(switchInputProp);
 
                                 ostringstream eventContents;
-                                eventContents << newSrcNode->name() << ";;"
-                                              << newSrcNode->mediaRepName()
-                                              << ";;" << activeSrcNode->name()
-                                              << ";;"
-                                              << activeSrcNode->mediaRepName();
-                                userGenericEvent("source-media-rep-activated",
-                                                 eventContents.str());
+                                eventContents << newSrcNode->name() << ";;" << newSrcNode->mediaRepName() << ";;" << activeSrcNode->name()
+                                              << ";;" << activeSrcNode->mediaRepName();
+                                userGenericEvent("source-media-rep-activated", eventContents.str());
                             }
                         }
                     }
                     else
                     {
-                        if (srcNodeOrSwitchNodeName != ""
-                            && srcNodeOrSwitchNodeName != "all")
+                        if (srcNodeOrSwitchNodeName != "" && srcNodeOrSwitchNodeName != "all")
                         {
-                            TWK_THROW_STREAM(
-                                IPCore::ReadFailedExc,
-                                "Can't find source group associated with "
-                                    << srcNodeOrSwitchNodeName
-                                    << " to select the '" << mediaRepName
-                                    << "' media representation.");
+                            TWK_THROW_STREAM(IPCore::ReadFailedExc, "Can't find source group associated with "
+                                                                        << srcNodeOrSwitchNodeName << " to select the '" << mediaRepName
+                                                                        << "' media representation.");
                         }
                         else
                         {
@@ -2242,8 +2091,7 @@ namespace Rv
     {
         const string filename = pathConform(infilename);
         const string ext = extension(filename);
-        const bool writeAsCopy =
-            request.optionValue<bool>("writeAsCopy", false);
+        const bool writeAsCopy = request.optionValue<bool>("writeAsCopy", false);
 
         if (ext == "rv")
         {
@@ -2262,8 +2110,7 @@ namespace Rv
             const IPGraph::NodeMap& nodeMap = graph().nodeMap();
             bool bigFile = false;
 
-            for (NodeMap::const_iterator i = nodeMap.begin();
-                 i != nodeMap.end(); ++i)
+            for (NodeMap::const_iterator i = nodeMap.begin(); i != nodeMap.end(); ++i)
             {
                 IPNode* n = i->second;
                 if (dynamic_cast<ImageSourceIPNode*>(n))
@@ -2368,8 +2215,7 @@ namespace Rv
         {
             if (IPNode* node = graph().findNode(tokens.front()))
             {
-                if (SwitchIPNode* switchNode =
-                        dynamic_cast<SwitchIPNode*>(node))
+                if (SwitchIPNode* switchNode = dynamic_cast<SwitchIPNode*>(node))
                 {
                     return switchNode;
                 }
@@ -2379,8 +2225,7 @@ namespace Rv
         return 0;
     }
 
-    const TwkFB::FrameBuffer*
-    RvSession::currentFB(const std::string& sourceName) const
+    const TwkFB::FrameBuffer* RvSession::currentFB(const std::string& sourceName) const
     {
         if (m_displayImage)
         {
@@ -2435,9 +2280,7 @@ namespace Rv
                     {
                         string n = fb->attribute<string>("RVSource");
 
-                        if (sourceName.compare(0, string::npos, n, 0,
-                                               sourceName.size())
-                            == 0)
+                        if (sourceName.compare(0, string::npos, n, 0, sourceName.size()) == 0)
                         {
                             return fb;
                         }
@@ -2458,8 +2301,7 @@ namespace Rv
         {
             makeActive();
             Context::ArgumentVector v;
-            TypedValue tv =
-                TwkApp::muContext()->evalFunction(TwkApp::muProcess(), F, v);
+            TypedValue tv = TwkApp::muContext()->evalFunction(TwkApp::muProcess(), F, v);
 
             if ((m_data = (Object*)tv._value._Pointer))
             {
@@ -2500,8 +2342,7 @@ namespace Rv
 
         if (m_initEval != "")
         {
-            string output = muEval(muContext(), muProcess(), muModuleList(),
-                                   m_initEval.c_str(), "Command line eval");
+            string output = muEval(muContext(), muProcess(), muModuleList(), m_initEval.c_str(), "Command line eval");
 
             if ("string => \"noprint\"" != output)
             {
@@ -2608,48 +2449,28 @@ namespace Rv
     namespace
     {
 
-        void makeTopLevelSet(PropertyContainer* connections,
-                             GTOReader::Containers& containers,
-                             set<string>& topLevelSet)
+        void makeTopLevelSet(PropertyContainer* connections, GTOReader::Containers& containers, set<string>& topLevelSet)
         {
-            StringProperty* lhs =
-                connections
-                    ? connections->property<StringProperty>("evaluation.lhs")
-                    : 0;
-            StringProperty* rhs =
-                connections
-                    ? connections->property<StringProperty>("evaluation.rhs")
-                    : 0;
-            StringPairProperty* cons =
-                connections ? connections->property<StringPairProperty>(
-                                  "evaluation.connections")
-                            : 0;
-            StringProperty* top =
-                connections ? connections->property<StringProperty>("top.nodes")
-                            : 0;
+            StringProperty* lhs = connections ? connections->property<StringProperty>("evaluation.lhs") : 0;
+            StringProperty* rhs = connections ? connections->property<StringProperty>("evaluation.rhs") : 0;
+            StringPairProperty* cons = connections ? connections->property<StringPairProperty>("evaluation.connections") : 0;
+            StringProperty* top = connections ? connections->property<StringProperty>("top.nodes") : 0;
 
             if (top)
             {
-                std::copy(top->valueContainer().begin(),
-                          top->valueContainer().end(),
-                          std::inserter(topLevelSet, topLevelSet.begin()));
+                std::copy(top->valueContainer().begin(), top->valueContainer().end(), std::inserter(topLevelSet, topLevelSet.begin()));
             }
 
             if (lhs && rhs)
             {
-                std::copy(lhs->valueContainer().begin(),
-                          lhs->valueContainer().end(),
-                          std::inserter(topLevelSet, topLevelSet.begin()));
+                std::copy(lhs->valueContainer().begin(), lhs->valueContainer().end(), std::inserter(topLevelSet, topLevelSet.begin()));
 
-                std::copy(rhs->valueContainer().begin(),
-                          rhs->valueContainer().end(),
-                          std::inserter(topLevelSet, topLevelSet.begin()));
+                std::copy(rhs->valueContainer().begin(), rhs->valueContainer().end(), std::inserter(topLevelSet, topLevelSet.begin()));
             }
 
             if (cons)
             {
-                const StringPairProperty::container_type& array =
-                    cons->valueContainer();
+                const StringPairProperty::container_type& array = cons->valueContainer();
 
                 for (size_t i = 0; i < array.size(); i++)
                 {
@@ -2676,19 +2497,14 @@ namespace Rv
             }
         }
 
-        void inputsForNode(PropertyContainer* connections, IPGraph& graph,
-                           const string& name, IPGraph::IPNodes& inputs)
+        void inputsForNode(PropertyContainer* connections, IPGraph& graph, const string& name, IPGraph::IPNodes& inputs)
         {
             if (!connections)
                 return;
 
-            StringProperty* lhs =
-                connections->property<StringProperty>("evaluation.lhs");
-            StringProperty* rhs =
-                connections->property<StringProperty>("evaluation.rhs");
-            StringPairProperty* cons =
-                connections->property<StringPairProperty>(
-                    "evaluation.connections");
+            StringProperty* lhs = connections->property<StringProperty>("evaluation.lhs");
+            StringProperty* rhs = connections->property<StringProperty>("evaluation.rhs");
+            StringPairProperty* cons = connections->property<StringPairProperty>("evaluation.connections");
 
             if (!cons)
             {
@@ -2712,10 +2528,7 @@ namespace Rv
                         }
                         else
                         {
-                            cout << "WARNING: could not find node "
-                                 << arrow.first
-                                 << " when trying to connect inputs for "
-                                 << name << endl;
+                            cout << "WARNING: could not find node " << arrow.first << " when trying to connect inputs for " << name << endl;
                         }
                     }
                 }
@@ -2732,9 +2545,7 @@ namespace Rv
                         }
                         else
                         {
-                            cout << "WARNING: could not find node " << (*lhs)[i]
-                                 << " when trying to connect inputs for "
-                                 << name << endl;
+                            cout << "WARNING: could not find node " << (*lhs)[i] << " when trying to connect inputs for " << name << endl;
                         }
                     }
                 }
@@ -2754,8 +2565,7 @@ namespace Rv
         {
             static char buf[16];
             static RegEx endRE("(.*[^0-9])([0-9]+)");
-            static RegEx midRE(
-                "(.*[^0-9])([0-9][0-9][0-9][0-9][0-9][0-9])([^0-9].*)");
+            static RegEx midRE("(.*[^0-9])([0-9][0-9][0-9][0-9][0-9][0-9])([^0-9].*)");
 
             if (disallowedNames.count(name) > 0)
             {
@@ -2816,8 +2626,7 @@ namespace Rv
             return name;
         }
 
-        void uniqifyContainerNames(GTOReader::Containers& containers,
-                                   NameSet& existingNames)
+        void uniqifyContainerNames(GTOReader::Containers& containers, NameSet& existingNames)
         {
             NameSet origNames;
             NameSet conflictingNames;
@@ -2852,8 +2661,7 @@ namespace Rv
             NameSet disallowedNames = existingNames;
             disallowedNames.insert(origNames.begin(), origNames.end());
 
-            for (NameSet::iterator i = conflictingNames.begin();
-                 i != conflictingNames.end(); ++i)
+            for (NameSet::iterator i = conflictingNames.begin(); i != conflictingNames.end(); ++i)
             {
 
                 string newName = uniqueName(*i, disallowedNames);
@@ -2891,8 +2699,7 @@ namespace Rv
                     if (newNameMap.count(inputName))
                         inputName = newNameMap[inputName];
 
-                    newName =
-                        groupName + nm.substr(gp, ip - gp + 1) + inputName;
+                    newName = groupName + nm.substr(gp, ip - gp + 1) + inputName;
 
                     newNameMap[nm] = newName;
                 }
@@ -2921,11 +2728,9 @@ namespace Rv
                     Component::Container& props = comps[j]->properties();
                     for (int k = 0; k < props.size(); ++k)
                     {
-                        if (StringProperty* sp =
-                                dynamic_cast<StringProperty*>(props[k]))
+                        if (StringProperty* sp = dynamic_cast<StringProperty*>(props[k]))
                         {
-                            for (StringProperty::iterator l = sp->begin();
-                                 l != sp->end(); ++l)
+                            for (StringProperty::iterator l = sp->begin(); l != sp->end(); ++l)
                             {
                                 if (newNameMap.count(*l))
                                 {
@@ -2933,12 +2738,9 @@ namespace Rv
                                 }
                             }
                         }
-                        else if (StringPairProperty* spp =
-                                     dynamic_cast<StringPairProperty*>(
-                                         props[k]))
+                        else if (StringPairProperty* spp = dynamic_cast<StringPairProperty*>(props[k]))
                         {
-                            for (StringPairProperty::iterator l = spp->begin();
-                                 l != spp->end(); ++l)
+                            for (StringPairProperty::iterator l = spp->begin(); l != spp->end(); ++l)
                             {
                                 if (newNameMap.count(l->first))
                                 {
@@ -2955,9 +2757,7 @@ namespace Rv
             }
         }
 
-        template <typename T>
-        inline T* nonEmptyProperty(PropertyContainer* pc, const char* comp,
-                                   const char* prop)
+        template <typename T> inline T* nonEmptyProperty(PropertyContainer* pc, const char* comp, const char* prop)
         {
             T* p = pc->property<T>(comp, prop);
             if (p && p->size() == 0)
@@ -2969,16 +2769,12 @@ namespace Rv
 
     static bool isProgressionProtocol(const std::string& protoName)
     {
-        return (protoName == "RVSource" || protoName == "RVFileSource"
-                || protoName == "RVImageSource");
+        return (protoName == "RVSource" || protoName == "RVFileSource" || protoName == "RVImageSource");
     }
 
-    void RvSession::readGTO(const string& infilename, bool merge,
-                            Options::SourceArgs& sargs)
+    void RvSession::readGTO(const string& infilename, bool merge, Options::SourceArgs& sargs)
     {
-        HOP_PROF_DYN_NAME(
-            std::string(std::string("RvSession::readGTO : ") + infilename)
-                .c_str());
+        HOP_PROF_DYN_NAME(std::string(std::string("RvSession::readGTO : ") + infilename).c_str());
 
         const VideoDevice* outputDevice = outputVideoDevice();
 
@@ -2991,11 +2787,7 @@ namespace Rv
         GTOReader reader;
         GTOReader::Containers containers;
         {
-            HOP_PROF_DYN_NAME(
-                std::string(
-                    std::string("RvSession::readGTO - GTOReader.read : ")
-                    + filename)
-                    .c_str());
+            HOP_PROF_DYN_NAME(std::string(std::string("RvSession::readGTO - GTOReader.read : ") + filename).c_str());
 
             containers = reader.read(filename.c_str());
         }
@@ -3006,9 +2798,7 @@ namespace Rv
         {
             NameSet existingNames;
 
-            for (IPGraph::NodeMap::const_iterator i =
-                     graph().viewableNodes().begin();
-                 i != graph().viewableNodes().end(); ++i)
+            for (IPGraph::NodeMap::const_iterator i = graph().viewableNodes().begin(); i != graph().viewableNodes().end(); ++i)
             {
                 string n = (*i).second->name();
                 if (!graph().isDefaultView(n))
@@ -3049,8 +2839,7 @@ namespace Rv
 
             if (p == "IPNodeDefinition")
             {
-                pc->declareProperty<StringProperty>("node.origin", infilename,
-                                                    notPersistent, true);
+                pc->declareProperty<StringProperty>("node.origin", infilename, notPersistent, true);
                 NodeDefinition* def = new NodeDefinition(pc);
                 IPCore::App()->nodeManager()->addDefinition(def);
             }
@@ -3067,17 +2856,14 @@ namespace Rv
         case 1:
         case 2:
         case 4:
-            cout << "INFO: reading version " << m_inputFileVersion
-                 << " session file format" << endl;
+            cout << "INFO: reading version " << m_inputFileVersion << " session file format" << endl;
             break;
         case 3:
-            cout << "INFO: reading version " << m_inputFileVersion
-                 << " session file format (which never existed)" << endl;
+            cout << "INFO: reading version " << m_inputFileVersion << " session file format (which never existed)" << endl;
             m_inputFileVersion = 4;
             break;
         default:
-            cout << "WARNING: trying to read version " << m_inputFileVersion
-                 << " session file format";
+            cout << "WARNING: trying to read version " << m_inputFileVersion << " session file format";
 
             if (m_inputFileVersion > 4)
                 cout << " created by a newer version of RV";
@@ -3123,6 +2909,26 @@ namespace Rv
                 string p = protocol(pc);
                 if (isProgressionProtocol(p))
                     ++m_gtoSourceTotal;
+
+                // Optimization: Start preloading media if this is an
+                // RVFileSource with active media
+                if (p == "RVFileSource" && !Options::sharedOptions().progressiveSourceLoading)
+                {
+                    IntProperty* mediaActive = pc->property<IntProperty>("media.active");
+                    if (mediaActive && !mediaActive->empty() && mediaActive->front() == 1)
+                    {
+                        StringProperty* movie = pc->property<StringProperty>("media.movie");
+                        if (movie && !movie->empty())
+                        {
+                            // Start preloading for all movie instances in the
+                            // container
+                            for (size_t j = 0; j < movie->size(); j++)
+                            {
+                                startPreloadingMedia((*movie)[j]);
+                            }
+                        }
+                    }
+                }
             }
 
             m_gtoSourceCount = 0;
@@ -3159,16 +2965,13 @@ namespace Rv
                     }
                     else if (pcname == "sequence")
                     {
-                        TwkContainer::setName(
-                            *pc, defaultSequenceSequenceIPNodeName);
+                        TwkContainer::setName(*pc, defaultSequenceSequenceIPNodeName);
 
-                        IntProperty* v1Ins =
-                            pc->property<IntProperty>("edl", "in");
+                        IntProperty* v1Ins = pc->property<IntProperty>("edl", "in");
                         if (v1Ins)
                             v1InsVec = v1Ins->valueContainer();
 
-                        IntProperty* v1Outs =
-                            pc->property<IntProperty>("edl", "out");
+                        IntProperty* v1Outs = pc->property<IntProperty>("edl", "out");
                         if (v1Outs)
                             v1OutsVec = v1Outs->valueContainer();
                     }
@@ -3188,8 +2991,7 @@ namespace Rv
                         pc->removeProperty<FloatProperty>("pip", "y");
                         pc->removeProperty<FloatProperty>("pip", "width");
 
-                        StringProperty* v1CType =
-                            pc->property<StringProperty>("composite", "type");
+                        StringProperty* v1CType = pc->property<StringProperty>("composite", "type");
                         if (v1CType)
                         {
                             if (v1CType->front() == "pip")
@@ -3337,19 +3139,15 @@ namespace Rv
                         // pipeline nodes ever changes.
                         //
 
-                        string groupName = pcname.substr(
-                            0, pcname.size() - 12); // Minus "_transform2D"
+                        string groupName = pcname.substr(0, pcname.size() - 12); // Minus "_transform2D"
                         string nlName = groupName + "_tolinPipeline_1";
 
                         TwkContainer::setProtocol(*nl, "RVLensWarp");
                         TwkContainer::setName(*nl, nlName);
 
-                        if (FloatProperty* oldP = pc->property<FloatProperty>(
-                                "pixel", "aspectRatio"))
+                        if (FloatProperty* oldP = pc->property<FloatProperty>("pixel", "aspectRatio"))
                         {
-                            FloatProperty* newP =
-                                nl->createProperty<FloatProperty>(
-                                    "warp", "pixelAspectRatio");
+                            FloatProperty* newP = nl->createProperty<FloatProperty>("warp", "pixelAspectRatio");
                             newP->resize(1);
                             newP->front() = oldP->front();
 
@@ -3370,14 +3168,12 @@ namespace Rv
                     }
                     else if (p == "RVFileSource")
                     {
-                        if (StringProperty* oldP = pc->property<StringProperty>(
-                                "request", "stereoViews"))
+                        if (StringProperty* oldP = pc->property<StringProperty>("request", "stereoViews"))
                         {
                             oldP->clearToDefaultValue();
                         }
 
-                        if (StringProperty* sp = pc->property<StringProperty>(
-                                "request.imageLayerSelection"))
+                        if (StringProperty* sp = pc->property<StringProperty>("request.imageLayerSelection"))
                         {
                             if (!sp->empty())
                             {
@@ -3385,30 +3181,26 @@ namespace Rv
                                 v[0] = "layer";
                                 v[1] = "";
                                 v[2] = sp->front();
-                                pc->declareProperty<StringProperty>(
-                                    "request.imageComponent", v);
+                                pc->declareProperty<StringProperty>("request.imageComponent", v);
                             }
 
                             pc->removeProperty(sp);
                         }
 
-                        if (StringProperty* sp = pc->property<StringProperty>(
-                                "request.imageViewSelection"))
+                        if (StringProperty* sp = pc->property<StringProperty>("request.imageViewSelection"))
                         {
                             if (!sp->empty())
                             {
                                 StringVector v(2);
                                 v[0] = "view";
                                 v[1] = sp->front();
-                                pc->declareProperty<StringProperty>(
-                                    "request.imageComponent", v);
+                                pc->declareProperty<StringProperty>("request.imageComponent", v);
                             }
 
                             pc->removeProperty(sp);
                         }
 
-                        if (StringProperty* sp = pc->property<StringProperty>(
-                                "request.imageChannelSelection"))
+                        if (StringProperty* sp = pc->property<StringProperty>("request.imageChannelSelection"))
                         {
                             if (!sp->empty())
                             {
@@ -3418,8 +3210,7 @@ namespace Rv
                                 v[2] = "";
                                 v[3] = sp->front();
 
-                                pc->declareProperty<StringProperty>(
-                                    "request.imageComponent", v);
+                                pc->declareProperty<StringProperty>("request.imageComponent", v);
                             }
 
                             pc->removeProperty(sp);
@@ -3463,12 +3254,9 @@ namespace Rv
                         addNodeCreationContext(n);
                         userGenericEvent("new-node", n->name());
 
-                        n->mediaChangedSignal().connect(
-                            boost::bind(&RvSession::newMediaLoaded, this, n));
-                        StringProperty* movie =
-                            n->property<StringProperty>("media.movie");
-                        if (FileSourceIPNode* fsipn =
-                                dynamic_cast<FileSourceIPNode*>(n))
+                        n->mediaChangedSignal().connect(boost::bind(&RvSession::newMediaLoaded, this, n));
+                        StringProperty* movie = n->property<StringProperty>("media.movie");
+                        if (FileSourceIPNode* fsipn = dynamic_cast<FileSourceIPNode*>(n))
                         {
                             fsipn->storeInputParameters(sargs.inparams);
                             StringVector movies, userMovies;
@@ -3551,8 +3339,7 @@ namespace Rv
                         }
                         else
                         {
-                            cout << "WARNING: cannot make a node of type "
-                                 << fprotocol << " for node " << nodeName
+                            cout << "WARNING: cannot make a node of type " << fprotocol << " for node " << nodeName
                                  << " in .rv file: ignoring" << endl;
                         }
                     }
@@ -3612,8 +3399,7 @@ namespace Rv
                         //  to build themselves.
                         //
 
-                        if (!graph().isDefaultView(n->name())
-                            || (!merge && inputs.size()))
+                        if (!graph().isDefaultView(n->name()) || (!merge && inputs.size()))
                             n->setInputs(inputs);
 
                         try
@@ -3621,15 +3407,12 @@ namespace Rv
                             if (n->protocol() == fprotocol)
                             {
                                 n->copy(pc);
-                                readCompletedNodes.push_back(
-                                    make_pair(n->name(), fprotocolVersion));
+                                readCompletedNodes.push_back(make_pair(n->name(), fprotocolVersion));
                             }
                         }
                         catch (std::exception& e)
                         {
-                            cerr << "ERROR: in file, node "
-                                 << TwkContainer::name(pc) << ": " << endl
-                                 << e.what();
+                            cerr << "ERROR: in file, node " << TwkContainer::name(pc) << ": " << endl << e.what();
                         }
                     }
                     else
@@ -3664,9 +3447,7 @@ namespace Rv
                     HOP_PROF("Rv::RvSession::readGTO : PASS 4.A");
                     usedContainers.clear();
 
-                    for (PropertyContainerSet::const_iterator i =
-                             unusedContainers.begin();
-                         i != unusedContainers.end(); ++i)
+                    for (PropertyContainerSet::const_iterator i = unusedContainers.begin(); i != unusedContainers.end(); ++i)
                     {
                         PropertyContainer* pc = *i;
                         string fprotocol = protocol(pc);
@@ -3691,30 +3472,24 @@ namespace Rv
                                     //  modified their properties.
                                     //
 
-                                    if (n->protocol() != "RVFileSource"
-                                        && n->protocol() != "RVImageSource")
+                                    if (n->protocol() != "RVFileSource" && n->protocol() != "RVImageSource")
                                     {
                                         n->copy(pc);
                                     }
 
                                     addNodeCreationContext(n);
-                                    readCompletedNodes.push_back(
-                                        make_pair(n->name(), fprotocolVersion));
+                                    readCompletedNodes.push_back(make_pair(n->name(), fprotocolVersion));
                                     usedContainers.insert(pc);
                                 }
                             }
                             catch (std::exception& e)
                             {
-                                cerr << "ERROR: in file, node "
-                                     << TwkContainer::name(pc) << ": " << endl
-                                     << e.what();
+                                cerr << "ERROR: in file, node " << TwkContainer::name(pc) << ": " << endl << e.what();
                             }
                         }
                     }
 
-                    for (PropertyContainerSet::const_iterator i =
-                             usedContainers.begin();
-                         i != usedContainers.end(); ++i)
+                    for (PropertyContainerSet::const_iterator i = usedContainers.begin(); i != usedContainers.end(); ++i)
                     {
                         unusedContainers.erase(*i);
                     }
@@ -3730,30 +3505,23 @@ namespace Rv
                 //  been readCompleted().
 
                 {
-                    HOP_PROF_DYN_NAME(
-                        std::string(
-                            std::string("Rv::RvSession::readGTO : PASS 4.B "
-                                        "(readCompletedNodes size = ")
-                            + std::to_string(readCompletedNodes.size()))
-                            .c_str());
+                    HOP_PROF_DYN_NAME(std::string(std::string("Rv::RvSession::readGTO : PASS 4.B "
+                                                              "(readCompletedNodes size = ")
+                                                  + std::to_string(readCompletedNodes.size()))
+                                          .c_str());
                     for (int i = 0; i < readCompletedNodes.size(); i++)
                     {
-                        HOP_ZONE((i % 2 == 0) ? HOP_ZONE_COLOR_10
-                                              : HOP_ZONE_COLOR_11);
+                        HOP_ZONE((i % 2 == 0) ? HOP_ZONE_COLOR_10 : HOP_ZONE_COLOR_11);
                         IPNode* n(nullptr);
                         {
-                            HOP_PROF_DYN_NAME(
-                                std::string(std::string("findNode : ")
-                                            + readCompletedNodes[i].first)
-                                    .c_str());
+                            HOP_PROF_DYN_NAME(std::string(std::string("findNode : ") + readCompletedNodes[i].first).c_str());
 
                             n = graph().findNode(readCompletedNodes[i].first);
                         }
                         if (n)
                         {
                             HOP_PROF("readCompleted");
-                            n->readCompleted(n->protocol(),
-                                             readCompletedNodes[i].second);
+                            n->readCompleted(n->protocol(), readCompletedNodes[i].second);
                             if (isProgressionProtocol(n->protocol()))
                             {
                                 send(updateLoadingMessage());
@@ -3782,8 +3550,7 @@ namespace Rv
             {
                 if (IPNode* n = graph().findNode(readCompletedNodes[i].first))
                 {
-                    n->readCompleted(n->protocol(),
-                                     readCompletedNodes[i].second);
+                    n->readCompleted(n->protocol(), readCompletedNodes[i].second);
                 }
             }
         } // HOP_PROF_DYN for PASS 5
@@ -3835,14 +3602,10 @@ namespace Rv
                 //  we read a v1 session file, so update all session/outputFPSs
                 //
 
-                for (IPGraph::NodeMap::const_iterator i =
-                         graph().nodeMap().begin();
-                     i != graph().nodeMap().end(); ++i)
+                for (IPGraph::NodeMap::const_iterator i = graph().nodeMap().begin(); i != graph().nodeMap().end(); ++i)
                 {
-                    FloatProperty* ofpsp = (*i).second->property<FloatProperty>(
-                        "timing.outputFPS");
-                    FloatProperty* sfpsp =
-                        (*i).second->property<FloatProperty>("session.fps");
+                    FloatProperty* ofpsp = (*i).second->property<FloatProperty>("timing.outputFPS");
+                    FloatProperty* sfpsp = (*i).second->property<FloatProperty>("session.fps");
 
                     if (ofpsp)
                         ofpsp->front() = v1FPS;
@@ -3870,8 +3633,7 @@ namespace Rv
         } // HOP_PROF_DYN for TEARDOWN
     }
 
-    void RvSession::readLUTOnAll(string name, const string& nodeType,
-                                 bool activate)
+    void RvSession::readLUTOnAll(string name, const string& nodeType, bool activate)
     {
         NodeVector nodes;
         string filename = pathConform(IPCore::Application::mapFromVar(name));
@@ -3907,8 +3669,7 @@ namespace Rv
         CDL::ColorCorrectionCollection ccc = CDL::readCDL(name);
         if (ccc.size() > 1)
         {
-            cout << "WARNING: Found more than one cdl in " << name
-                 << ". Using first one found." << endl;
+            cout << "WARNING: Found more than one cdl in " << name << ". Using first one found." << endl;
         }
 
         if (ccc.size() <= 0)
@@ -3917,20 +3678,14 @@ namespace Rv
         NodeVector cdlNodes;
         for (size_t i = 0; i < props.size(); i++)
         {
-            if (FileSpaceLinearizeIPNode* node =
-                    dynamic_cast<FileSpaceLinearizeIPNode*>(
-                        props[i]->container()))
+            if (FileSpaceLinearizeIPNode* node = dynamic_cast<FileSpaceLinearizeIPNode*>(props[i]->container()))
             {
                 cdlNodes.push_back(node);
 
-                Vec3fProperty* slope =
-                    node->property<Vec3fProperty>("CDL.slope");
-                Vec3fProperty* offset =
-                    node->property<Vec3fProperty>("CDL.offset");
-                Vec3fProperty* power =
-                    node->property<Vec3fProperty>("CDL.power");
-                FloatProperty* saturation =
-                    node->property<FloatProperty>("CDL.saturation");
+                Vec3fProperty* slope = node->property<Vec3fProperty>("CDL.slope");
+                Vec3fProperty* offset = node->property<Vec3fProperty>("CDL.offset");
+                Vec3fProperty* power = node->property<Vec3fProperty>("CDL.power");
+                FloatProperty* saturation = node->property<FloatProperty>("CDL.saturation");
                 IntProperty* active = node->property<IntProperty>("CDL.active");
 
                 CDL::ColorCorrection cc = ccc.front();
@@ -3941,19 +3696,14 @@ namespace Rv
                 saturation->front() = cc.saturation;
                 active->front() = (active) ? 1 : 0;
             }
-            else if (ColorIPNode* node =
-                         dynamic_cast<ColorIPNode*>(props[i]->container()))
+            else if (ColorIPNode* node = dynamic_cast<ColorIPNode*>(props[i]->container()))
             {
                 cdlNodes.push_back(node);
 
-                Vec3fProperty* slope =
-                    node->property<Vec3fProperty>("CDL.slope");
-                Vec3fProperty* offset =
-                    node->property<Vec3fProperty>("CDL.offset");
-                Vec3fProperty* power =
-                    node->property<Vec3fProperty>("CDL.power");
-                FloatProperty* saturation =
-                    node->property<FloatProperty>("CDL.saturation");
+                Vec3fProperty* slope = node->property<Vec3fProperty>("CDL.slope");
+                Vec3fProperty* offset = node->property<Vec3fProperty>("CDL.offset");
+                Vec3fProperty* power = node->property<Vec3fProperty>("CDL.power");
+                FloatProperty* saturation = node->property<FloatProperty>("CDL.saturation");
                 IntProperty* active = node->property<IntProperty>("CDL.active");
 
                 CDL::ColorCorrection cc = ccc.front();
@@ -3973,8 +3723,7 @@ namespace Rv
         }
     }
 
-    void RvSession::readLUT(string filename, const string& nodeName,
-                            bool activate)
+    void RvSession::readLUT(string filename, const string& nodeName, bool activate)
     {
         PropertyVector props;
         graph().findProperty(m_frame, props, nodeName + ".lut.active");
@@ -3982,19 +3731,16 @@ namespace Rv
         NodeVector lutNodes;
         for (size_t i = 0; i < props.size(); i++)
         {
-            if (LUTIPNode* node =
-                    dynamic_cast<LUTIPNode*>(props[i]->container()))
+            if (LUTIPNode* node = dynamic_cast<LUTIPNode*>(props[i]->container()))
             {
                 lutNodes.push_back(node);
 
-                StringProperty* lutFile =
-                    node->property<StringProperty>("lut.file");
+                StringProperty* lutFile = node->property<StringProperty>("lut.file");
                 lutFile->front() = filename;
 
                 if (activate)
                 {
-                    if (IntProperty* p =
-                            node->property<IntProperty>("lut.active"))
+                    if (IntProperty* p = node->property<IntProperty>("lut.active"))
                     {
                         p->resize(1);
                         p->front() = 1;
@@ -4011,10 +3757,7 @@ namespace Rv
         }
     }
 
-    void RvSession::readEDL(const char* filename)
-    {
-        cerr << "ERROR: Unsupported file format" << endl;
-    }
+    void RvSession::readEDL(const char* filename) { cerr << "ERROR: Unsupported file format" << endl; }
 
     void RvSession::setScaleOnAll(float scale)
     {
@@ -4022,8 +3765,7 @@ namespace Rv
         reload(currentFrame(), currentFrame());
     }
 
-    static string swapV(const string& filename, const string& pat,
-                        const string& v)
+    static string swapV(const string& filename, const string& pat, const string& v)
     {
         string vfilename = filename;
         string::size_type p;
@@ -4036,8 +3778,7 @@ namespace Rv
         return vfilename;
     }
 
-    void RvSession::checkForStereoPaths(const string& filename,
-                                        StringVector& movies)
+    void RvSession::checkForStereoPaths(const string& filename, StringVector& movies)
     {
         if (isStereoSequence(filename))
         {
@@ -4048,26 +3789,19 @@ namespace Rv
                 for (size_t j = 0; j < m_VStrings.size(); j += 2)
                 {
                     string Vfilename = swapV(vfilename, "%V", m_VStrings[j]);
-                    ExistingFileList Vfiles =
-                        existingFilesInSequence(Vfilename);
-                    if (Vfiles.size() > 0
-                        && TwkUtil::fileExists(Vfiles[0].name.c_str()))
+                    ExistingFileList Vfiles = existingFilesInSequence(Vfilename);
+                    if (Vfiles.size() > 0 && TwkUtil::fileExists(Vfiles[0].name.c_str()))
                     {
                         movies.push_back(Vfilename);
-                        string rfilename =
-                            swapV(swapV(filename, "%v", m_vStrings[i + 1]),
-                                  "%V", m_VStrings[j + 1]);
-                        ExistingFileList rfiles =
-                            existingFilesInSequence(rfilename);
-                        if (rfiles.size() > 0
-                            && TwkUtil::fileExists(rfiles[0].name.c_str()))
+                        string rfilename = swapV(swapV(filename, "%v", m_vStrings[i + 1]), "%V", m_VStrings[j + 1]);
+                        ExistingFileList rfiles = existingFilesInSequence(rfilename);
+                        if (rfiles.size() > 0 && TwkUtil::fileExists(rfiles[0].name.c_str()))
                         {
                             movies.push_back(rfilename);
                         }
                         else
                         {
-                            cerr << "ERROR: can't find right eye in "
-                                 << filename << endl;
+                            cerr << "ERROR: can't find right eye in " << filename << endl;
                         }
 
                         return;
@@ -4103,8 +3837,7 @@ namespace Rv
         }
     }
 
-    void RvSession::findCurrentNodesByTypeName(NodeVector& nodes,
-                                               const string& typeName)
+    void RvSession::findCurrentNodesByTypeName(NodeVector& nodes, const string& typeName)
     {
         if (typeName == "RVSource")
         {
@@ -4117,8 +3850,7 @@ namespace Rv
         }
     }
 
-    void RvSession::findNodesByTypeName(NodeVector& nodes,
-                                        const string& typeName)
+    void RvSession::findNodesByTypeName(NodeVector& nodes, const string& typeName)
     {
         if (typeName == "RVSource")
         {
@@ -4131,8 +3863,7 @@ namespace Rv
         }
     }
 
-    IPNode* RvSession::newNode(const std::string& typeName,
-                               const std::string& nodeName)
+    IPNode* RvSession::newNode(const std::string& typeName, const std::string& nodeName)
     {
         IPNode* node = graph().newNode(typeName, nodeName);
 
@@ -4155,8 +3886,7 @@ namespace Rv
 
     void RvSession::deleteNode(IPNode* node)
     {
-        bool isSource = dynamic_cast<SourceGroupIPNode*>(node)
-                        || dynamic_cast<SourceIPNode*>(node);
+        bool isSource = dynamic_cast<SourceGroupIPNode*>(node) || dynamic_cast<SourceIPNode*>(node);
         string name = node->name();
 
         if (isSource)
@@ -4173,8 +3903,7 @@ namespace Rv
             userGenericEvent("after-source-delete", name);
     }
 
-    void RvSession::readProfile(const string& infilename, IPNode* node,
-                                const ReadRequest& request)
+    void RvSession::readProfile(const string& infilename, IPNode* node, const ReadRequest& request)
     {
         Session::readProfile(infilename, node, request);
     }
@@ -4182,8 +3911,7 @@ namespace Rv
     // onGraphFastAddSourceChanged is called after the graph changes the state
     // of fastAddSourceEnabled
     //
-    void RvSession::onGraphFastAddSourceChanged(bool begin,
-                                                int newFastAddSourceEnabled)
+    void RvSession::onGraphFastAddSourceChanged(bool begin, int newFastAddSourceEnabled)
     {
         if (begin && (newFastAddSourceEnabled == 1))
             unsetSequenceEvents();
@@ -4191,10 +3919,7 @@ namespace Rv
             setSequenceEvents();
     }
 
-    void RvSession::onGraphMediaSetEmpty()
-    {
-        userGenericEvent("after-progressive-loading", "");
-    }
+    void RvSession::onGraphMediaSetEmpty() { userGenericEvent("after-progressive-loading", ""); }
 
     // connects events from the sequence IP node
     //
@@ -4203,8 +3928,7 @@ namespace Rv
         if (!evUseSequenceEventsTracking.getValue())
             return;
 
-        auto sequenceIPNode = dynamic_cast<SequenceIPNode*>(
-            m_graph->findNode(defaultSequenceSequenceIPNodeName));
+        auto sequenceIPNode = dynamic_cast<SequenceIPNode*>(m_graph->findNode(defaultSequenceSequenceIPNodeName));
         setSequenceIPNode(sequenceIPNode);
         m_firstSequenceChange = true;
     }
@@ -4228,20 +3952,16 @@ namespace Rv
 
         if (m_sequenceIPNode)
         {
-            m_sequenceIPNode->changingSignal().disconnect(
-                boost::bind(&RvSession::onSequenceChanging, this));
-            m_sequenceIPNode->changedSignal().disconnect(
-                boost::bind(&RvSession::onSequenceChanged, this));
+            m_sequenceIPNode->changingSignal().disconnect(boost::bind(&RvSession::onSequenceChanging, this));
+            m_sequenceIPNode->changedSignal().disconnect(boost::bind(&RvSession::onSequenceChanged, this));
         }
 
         m_sequenceIPNode = newSequenceIPNode;
 
         if (m_sequenceIPNode)
         {
-            m_sequenceIPNode->changingSignal().connect(
-                boost::bind(&RvSession::onSequenceChanging, this));
-            m_sequenceIPNode->changedSignal().connect(
-                boost::bind(&RvSession::onSequenceChanged, this));
+            m_sequenceIPNode->changingSignal().connect(boost::bind(&RvSession::onSequenceChanging, this));
+            m_sequenceIPNode->changedSignal().connect(boost::bind(&RvSession::onSequenceChanged, this));
         }
     }
 
@@ -4266,9 +3986,7 @@ namespace Rv
         m_currentSourceIndex = m_sequenceIPNode->indexAtFrame(frameNum);
         if (m_currentSourceIndex >= 0)
         {
-            m_sequenceIPNode->getSourceRange(m_currentSourceIndex,
-                                             m_currentSourceRangeInfo,
-                                             m_currentSourceOffset);
+            m_sequenceIPNode->getSourceRange(m_currentSourceIndex, m_currentSourceRangeInfo, m_currentSourceOffset);
         }
     }
 
@@ -4293,8 +4011,7 @@ namespace Rv
 
         IPCore::IPNode::ImageRangeInfo newSourceRangeInfo;
         int newSourceOffset;
-        if (!m_sequenceIPNode->getSourceRange(
-                m_currentSourceIndex, newSourceRangeInfo, newSourceOffset))
+        if (!m_sequenceIPNode->getSourceRange(m_currentSourceIndex, newSourceRangeInfo, newSourceOffset))
         {
             m_currentSourceIndex = -1;
             return;
@@ -4306,15 +4023,9 @@ namespace Rv
         {
             // we want that the playhead stays at the same relative position in
             // the source
-            double ratio =
-                static_cast<double>(currFrameNum - m_currentSourceOffset)
-                / (m_currentSourceRangeInfo.cutOut
-                   - m_currentSourceRangeInfo.cutIn + 1);
-            newFrameNum =
-                newSourceOffset
-                + static_cast<int>(ratio
-                                   * (newSourceRangeInfo.cutOut
-                                      - newSourceRangeInfo.cutIn + 1));
+            double ratio = static_cast<double>(currFrameNum - m_currentSourceOffset)
+                           / (m_currentSourceRangeInfo.cutOut - m_currentSourceRangeInfo.cutIn + 1);
+            newFrameNum = newSourceOffset + static_cast<int>(ratio * (newSourceRangeInfo.cutOut - newSourceRangeInfo.cutIn + 1));
         }
         else
         {
@@ -4347,19 +4058,11 @@ namespace Rv
         auto* sessionNode = graph().sessionNode();
         if (sessionNode != nullptr)
         {
-            const IntProperty* holdProperty =
-                sessionNode->property<IntProperty>("paintEffects", "hold");
-            const IntProperty* ghostProperty =
-                sessionNode->property<IntProperty>("paintEffects", "ghost");
+            const IntProperty* holdProperty = sessionNode->property<IntProperty>("paintEffects", "hold");
+            const IntProperty* ghostProperty = sessionNode->property<IntProperty>("paintEffects", "ghost");
 
-            const int hold =
-                (holdProperty != nullptr && holdProperty->size() != 0)
-                    ? holdProperty->front()
-                    : 0;
-            const int ghost =
-                (ghostProperty != nullptr && ghostProperty->size() != 0)
-                    ? ghostProperty->front()
-                    : 0;
+            const int hold = (holdProperty != nullptr && holdProperty->size() != 0) ? holdProperty->front() : 0;
+            const int ghost = (ghostProperty != nullptr && ghostProperty->size() != 0) ? ghostProperty->front() : 0;
 
             userGenericEvent("update-hold-button", std::to_string(hold));
             userGenericEvent("update-ghost-button", std::to_string(ghost));

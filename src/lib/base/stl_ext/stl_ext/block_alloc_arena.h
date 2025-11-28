@@ -44,8 +44,7 @@ namespace stl_ext
 
         typedef void (*garbage_function)(block_alloc_arena*);
 
-        block_alloc_arena(size_t garbage_limit = 1024 * 16,
-                          size_t large_block_size = 1 << 13);
+        block_alloc_arena(size_t garbage_limit = 1024 * 16, size_t large_block_size = 1 << 13);
         ~block_alloc_arena();
 
         void* allocate(size_t);
@@ -152,16 +151,10 @@ namespace stl_ext
         friend class iterator;
     };
 
-#define BLOCK_ALLOC_NEW_AND_DELETE                                     \
-    static void* operator new(size_t s)                                \
-    {                                                                  \
-        return stl_ext::block_alloc_arena::static_arena().allocate(s); \
-    };                                                                 \
-                                                                       \
-    static void operator delete(void* p, size_t s)                     \
-    {                                                                  \
-        stl_ext::block_alloc_arena::static_arena().deallocate(p, s);   \
-    }
+#define BLOCK_ALLOC_NEW_AND_DELETE                                                                          \
+    static void* operator new(size_t s) { return stl_ext::block_alloc_arena::static_arena().allocate(s); }; \
+                                                                                                            \
+    static void operator delete(void* p, size_t s) { stl_ext::block_alloc_arena::static_arena().deallocate(p, s); }
 
 } // namespace stl_ext
 

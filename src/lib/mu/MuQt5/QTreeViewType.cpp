@@ -74,16 +74,14 @@ namespace Mu
         _baseType = 0;
     }
 
-    MuQt_QTreeView::MuQt_QTreeView(Pointer muobj, const CallEnvironment* ce,
-                                   QWidget* parent)
+    MuQt_QTreeView::MuQt_QTreeView(Pointer muobj, const CallEnvironment* ce, QWidget* parent)
         : QTreeView(parent)
     {
         _env = ce;
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QTreeViewType>(
-            c->internName("qt.QTreeView"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QTreeViewType>(c->internName("qt.QTreeView"));
     }
 
     QModelIndex MuQt_QTreeView::indexAt(const QPoint& point) const
@@ -188,8 +186,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeinstance<QAbstractItemModelType>(
-                c, model, "qt.QAbstractItemModel"));
+            args[1] = Value(makeinstance<QAbstractItemModelType>(c, model, "qt.QAbstractItemModel"));
             Value rval = _env->call(F, args);
         }
         else
@@ -212,8 +209,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
+            args[1] = Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
             Value rval = _env->call(F, args);
         }
         else
@@ -236,8 +232,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeinstance<QItemSelectionModelType>(
-                c, selectionModel, "qt.QItemSelectionModel"));
+            args[1] = Value(makeinstance<QItemSelectionModelType>(c, selectionModel, "qt.QItemSelectionModel"));
             Value rval = _env->call(F, args);
         }
         else
@@ -257,8 +252,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
+            args[1] = Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
             Value rval = _env->call(F, args);
             return getqtype<QRectType>(rval._Pointer);
         }
@@ -268,8 +262,7 @@ namespace Mu
         }
     }
 
-    void MuQt_QTreeView::currentChanged(const QModelIndex& current,
-                                        const QModelIndex& previous)
+    void MuQt_QTreeView::currentChanged(const QModelIndex& current, const QModelIndex& previous)
     {
         if (!_env)
         {
@@ -283,10 +276,8 @@ namespace Mu
         {
             Function::ArgumentVector args(3);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqtype<QModelIndexType>(c, current, "qt.QModelIndex"));
-            args[2] = Value(
-                makeqtype<QModelIndexType>(c, previous, "qt.QModelIndex"));
+            args[1] = Value(makeqtype<QModelIndexType>(c, current, "qt.QModelIndex"));
+            args[2] = Value(makeqtype<QModelIndexType>(c, previous, "qt.QModelIndex"));
             Value rval = _env->call(F, args);
         }
         else
@@ -309,8 +300,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqpointer<QDragMoveEventType>(
-                c, event, "qt.QDragMoveEvent"));
+            args[1] = Value(makeqpointer<QDragMoveEventType>(c, event, "qt.QDragMoveEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -350,8 +340,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
+            args[1] = Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
             Value rval = _env->call(F, args);
             return (bool)(rval._bool);
         }
@@ -375,8 +364,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QKeyEventType>(c, event, "qt.QKeyEvent"));
+            args[1] = Value(makeqpointer<QKeyEventType>(c, event, "qt.QKeyEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -399,8 +387,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -423,8 +410,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -447,8 +433,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -471,8 +456,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -495,8 +479,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QPaintEventType>(c, event, "qt.QPaintEvent"));
+            args[1] = Value(makeqpointer<QPaintEventType>(c, event, "qt.QPaintEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -505,8 +488,7 @@ namespace Mu
         }
     }
 
-    void MuQt_QTreeView::rowsAboutToBeRemoved(const QModelIndex& parent,
-                                              int start, int end)
+    void MuQt_QTreeView::rowsAboutToBeRemoved(const QModelIndex& parent, int start, int end)
     {
         if (!_env)
         {
@@ -520,8 +502,7 @@ namespace Mu
         {
             Function::ArgumentVector args(4);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqtype<QModelIndexType>(c, parent, "qt.QModelIndex"));
+            args[1] = Value(makeqtype<QModelIndexType>(c, parent, "qt.QModelIndex"));
             args[2] = Value(start);
             args[3] = Value(end);
             Value rval = _env->call(F, args);
@@ -532,8 +513,7 @@ namespace Mu
         }
     }
 
-    void MuQt_QTreeView::rowsInserted(const QModelIndex& parent, int start,
-                                      int end)
+    void MuQt_QTreeView::rowsInserted(const QModelIndex& parent, int start, int end)
     {
         if (!_env)
         {
@@ -547,8 +527,7 @@ namespace Mu
         {
             Function::ArgumentVector args(4);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqtype<QModelIndexType>(c, parent, "qt.QModelIndex"));
+            args[1] = Value(makeqtype<QModelIndexType>(c, parent, "qt.QModelIndex"));
             args[2] = Value(start);
             args[3] = Value(end);
             Value rval = _env->call(F, args);
@@ -603,8 +582,7 @@ namespace Mu
         }
     }
 
-    void MuQt_QTreeView::selectionChanged(const QItemSelection& selected,
-                                          const QItemSelection& deselected)
+    void MuQt_QTreeView::selectionChanged(const QItemSelection& selected, const QItemSelection& deselected)
     {
         if (!_env)
         {
@@ -618,10 +596,8 @@ namespace Mu
         {
             Function::ArgumentVector args(3);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqtype<QItemSelectionType>(c, selected,
-                                                          "qt.QItemSelection"));
-            args[2] = Value(makeqtype<QItemSelectionType>(c, deselected,
-                                                          "qt.QItemSelection"));
+            args[1] = Value(makeqtype<QItemSelectionType>(c, selected, "qt.QItemSelection"));
+            args[2] = Value(makeqtype<QItemSelectionType>(c, deselected, "qt.QItemSelection"));
             Value rval = _env->call(F, args);
         }
         else
@@ -630,9 +606,7 @@ namespace Mu
         }
     }
 
-    void
-    MuQt_QTreeView::setSelection(const QRect& rect,
-                                 QItemSelectionModel::SelectionFlags command)
+    void MuQt_QTreeView::setSelection(const QRect& rect, QItemSelectionModel::SelectionFlags command)
     {
         if (!_env)
         {
@@ -691,8 +665,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QTimerEventType>(c, event, "qt.QTimerEvent"));
+            args[1] = Value(makeqpointer<QTimerEventType>(c, event, "qt.QTimerEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -784,8 +757,7 @@ namespace Mu
         }
     }
 
-    QRegion MuQt_QTreeView::visualRegionForSelection(
-        const QItemSelection& selection) const
+    QRegion MuQt_QTreeView::visualRegionForSelection(const QItemSelection& selection) const
     {
         if (!_env)
             return QTreeView::visualRegionForSelection(selection);
@@ -796,8 +768,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqtype<QItemSelectionType>(c, selection,
-                                                          "qt.QItemSelection"));
+            args[1] = Value(makeqtype<QItemSelectionType>(c, selection, "qt.QItemSelection"));
             Value rval = _env->call(F, args);
             return getqtype<QRegionType>(rval._Pointer);
         }
@@ -849,9 +820,7 @@ namespace Mu
         }
     }
 
-    bool MuQt_QTreeView::edit(const QModelIndex& index,
-                              QAbstractItemView::EditTrigger trigger,
-                              QEvent* event)
+    bool MuQt_QTreeView::edit(const QModelIndex& index, QAbstractItemView::EditTrigger trigger, QEvent* event)
     {
         if (!_env)
             return QTreeView::edit(index, trigger, event);
@@ -862,8 +831,7 @@ namespace Mu
         {
             Function::ArgumentVector args(4);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
+            args[1] = Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
             args[2] = Value(int(trigger));
             args[3] = Value(makeqpointer<QEventType>(c, event, "qt.QEvent"));
             Value rval = _env->call(F, args);
@@ -875,9 +843,7 @@ namespace Mu
         }
     }
 
-    QItemSelectionModel::SelectionFlags
-    MuQt_QTreeView::selectionCommand(const QModelIndex& index,
-                                     const QEvent* event) const
+    QItemSelectionModel::SelectionFlags MuQt_QTreeView::selectionCommand(const QModelIndex& index, const QEvent* event) const
     {
         if (!_env)
             return QTreeView::selectionCommand(index, event);
@@ -888,8 +854,7 @@ namespace Mu
         {
             Function::ArgumentVector args(3);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
+            args[1] = Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
             args[2] = Value(makeqpointer<QEventType>(c, event, "qt.QEvent"));
             Value rval = _env->call(F, args);
             return (QItemSelectionModel::SelectionFlags)(rval._int);
@@ -937,8 +902,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqpointer<QDragEnterEventType>(
-                c, event, "qt.QDragEnterEvent"));
+            args[1] = Value(makeqpointer<QDragEnterEventType>(c, event, "qt.QDragEnterEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -961,8 +925,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqpointer<QDragLeaveEventType>(
-                c, event, "qt.QDragLeaveEvent"));
+            args[1] = Value(makeqpointer<QDragLeaveEventType>(c, event, "qt.QDragLeaveEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -985,8 +948,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QDropEventType>(c, event, "qt.QDropEvent"));
+            args[1] = Value(makeqpointer<QDropEventType>(c, event, "qt.QDropEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -1030,8 +992,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QFocusEventType>(c, event, "qt.QFocusEvent"));
+            args[1] = Value(makeqpointer<QFocusEventType>(c, event, "qt.QFocusEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -1075,8 +1036,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QFocusEventType>(c, event, "qt.QFocusEvent"));
+            args[1] = Value(makeqpointer<QFocusEventType>(c, event, "qt.QFocusEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -1099,8 +1059,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QResizeEventType>(c, event, "qt.QResizeEvent"));
+            args[1] = Value(makeqpointer<QResizeEventType>(c, event, "qt.QResizeEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -1112,8 +1071,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  Mu Type CONSTRUCTORS
 
-    QTreeViewType::QTreeViewType(Context* c, const char* name, Class* super,
-                                 Class* super2)
+    QTreeViewType::QTreeViewType(Context* c, const char* name, Class* super, Class* super2)
         : Class(c, name, vectorOf2(super, super2))
     {
     }
@@ -1134,9 +1092,7 @@ namespace Mu
         }
         else if (QTreeView* w = object<QTreeView>(widget))
         {
-            QTreeViewType* type =
-                c->findSymbolOfTypeByQualifiedName<QTreeViewType>(
-                    c->internName("qt.QTreeView"), false);
+            QTreeViewType* type = c->findSymbolOfTypeByQualifiedName<QTreeViewType>(c->internName("qt.QTreeView"), false);
             ClassInstance* o = ClassInstance::allocate(type);
             setobject(o, w);
             return o;
@@ -1147,25 +1103,17 @@ namespace Mu
         }
     }
 
-    static NODE_IMPLEMENTATION(castFromObject, Pointer)
-    {
-        NODE_RETURN(
-            QTreeView_QTreeView_QObject(NODE_THREAD, NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(castFromObject, Pointer) { NODE_RETURN(QTreeView_QTreeView_QObject(NODE_THREAD, NODE_ARG(0, Pointer))); }
 
-    Pointer qt_QTreeView_QTreeView_QTreeView_QTreeView_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
+    Pointer qt_QTreeView_QTreeView_QTreeView_QTreeView_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWidget* arg1 = object<QWidget>(param_parent);
-        setobject(param_this,
-                  new MuQt_QTreeView(param_this,
-                                     NODE_THREAD.process()->callEnv(), arg1));
+        setobject(param_this, new MuQt_QTreeView(param_this, NODE_THREAD.process()->callEnv(), arg1));
         return param_this;
     }
 
-    int qt_QTreeView_columnAt_int_QTreeView_int(Mu::Thread& NODE_THREAD,
-                                                Pointer param_this, int param_x)
+    int qt_QTreeView_columnAt_int_QTreeView_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_x)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeView* arg0 = object<QTreeView>(param_this);
@@ -1173,8 +1121,7 @@ namespace Mu
         return arg0->columnAt(arg1);
     }
 
-    int qt_QTreeView_columnViewportPosition_int_QTreeView_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_column)
+    int qt_QTreeView_columnViewportPosition_int_QTreeView_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_column)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeView* arg0 = object<QTreeView>(param_this);
@@ -1182,9 +1129,7 @@ namespace Mu
         return arg0->columnViewportPosition(arg1);
     }
 
-    int qt_QTreeView_columnWidth_int_QTreeView_int(Mu::Thread& NODE_THREAD,
-                                                   Pointer param_this,
-                                                   int param_column)
+    int qt_QTreeView_columnWidth_int_QTreeView_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_column)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeView* arg0 = object<QTreeView>(param_this);
@@ -1192,38 +1137,30 @@ namespace Mu
         return arg0->columnWidth(arg1);
     }
 
-    Pointer qt_QTreeView_header_QHeaderView_QTreeView(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    Pointer qt_QTreeView_header_QHeaderView_QTreeView(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeView* arg0 = object<QTreeView>(param_this);
-        return makeinstance<QHeaderViewType>(c, arg0->header(),
-                                             "qt.QHeaderView");
+        return makeinstance<QHeaderViewType>(c, arg0->header(), "qt.QHeaderView");
     }
 
-    Pointer qt_QTreeView_indexAbove_QModelIndex_QTreeView_QModelIndex(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index)
-    {
-        MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-        QTreeView* arg0 = object<QTreeView>(param_this);
-        const QModelIndex arg1 = getqtype<QModelIndexType>(param_index);
-        return makeqtype<QModelIndexType>(c, arg0->indexAbove(arg1),
-                                          "qt.QModelIndex");
-    }
-
-    Pointer qt_QTreeView_indexBelow_QModelIndex_QTreeView_QModelIndex(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index)
+    Pointer qt_QTreeView_indexAbove_QModelIndex_QTreeView_QModelIndex(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeView* arg0 = object<QTreeView>(param_this);
         const QModelIndex arg1 = getqtype<QModelIndexType>(param_index);
-        return makeqtype<QModelIndexType>(c, arg0->indexBelow(arg1),
-                                          "qt.QModelIndex");
+        return makeqtype<QModelIndexType>(c, arg0->indexAbove(arg1), "qt.QModelIndex");
     }
 
-    bool qt_QTreeView_isColumnHidden_bool_QTreeView_int(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this,
-                                                        int param_column)
+    Pointer qt_QTreeView_indexBelow_QModelIndex_QTreeView_QModelIndex(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index)
+    {
+        MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
+        QTreeView* arg0 = object<QTreeView>(param_this);
+        const QModelIndex arg1 = getqtype<QModelIndexType>(param_index);
+        return makeqtype<QModelIndexType>(c, arg0->indexBelow(arg1), "qt.QModelIndex");
+    }
+
+    bool qt_QTreeView_isColumnHidden_bool_QTreeView_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_column)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeView* arg0 = object<QTreeView>(param_this);
@@ -1231,8 +1168,7 @@ namespace Mu
         return arg0->isColumnHidden(arg1);
     }
 
-    bool qt_QTreeView_isExpanded_bool_QTreeView_QModelIndex(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index)
+    bool qt_QTreeView_isExpanded_bool_QTreeView_QModelIndex(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeView* arg0 = object<QTreeView>(param_this);
@@ -1240,9 +1176,8 @@ namespace Mu
         return arg0->isExpanded(arg1);
     }
 
-    bool qt_QTreeView_isFirstColumnSpanned_bool_QTreeView_int_QModelIndex(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
-        Pointer param_parent)
+    bool qt_QTreeView_isFirstColumnSpanned_bool_QTreeView_int_QModelIndex(Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
+                                                                          Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeView* arg0 = object<QTreeView>(param_this);
@@ -1251,9 +1186,8 @@ namespace Mu
         return arg0->isFirstColumnSpanned(arg1, arg2);
     }
 
-    bool qt_QTreeView_isRowHidden_bool_QTreeView_int_QModelIndex(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
-        Pointer param_parent)
+    bool qt_QTreeView_isRowHidden_bool_QTreeView_int_QModelIndex(Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
+                                                                 Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeView* arg0 = object<QTreeView>(param_this);
@@ -1262,9 +1196,8 @@ namespace Mu
         return arg0->isRowHidden(arg1, arg2);
     }
 
-    void qt_QTreeView_setColumnHidden_void_QTreeView_int_bool(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_column,
-        bool param_hide)
+    void qt_QTreeView_setColumnHidden_void_QTreeView_int_bool(Mu::Thread& NODE_THREAD, Pointer param_this, int param_column,
+                                                              bool param_hide)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeView* arg0 = object<QTreeView>(param_this);
@@ -1273,9 +1206,7 @@ namespace Mu
         arg0->setColumnHidden(arg1, arg2);
     }
 
-    void qt_QTreeView_setColumnWidth_void_QTreeView_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_column,
-        int param_width)
+    void qt_QTreeView_setColumnWidth_void_QTreeView_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_column, int param_width)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeView* arg0 = object<QTreeView>(param_this);
@@ -1284,9 +1215,8 @@ namespace Mu
         arg0->setColumnWidth(arg1, arg2);
     }
 
-    void qt_QTreeView_setExpanded_void_QTreeView_QModelIndex_bool(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index,
-        bool param_expanded)
+    void qt_QTreeView_setExpanded_void_QTreeView_QModelIndex_bool(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index,
+                                                                  bool param_expanded)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeView* arg0 = object<QTreeView>(param_this);
@@ -1295,9 +1225,8 @@ namespace Mu
         arg0->setExpanded(arg1, arg2);
     }
 
-    void qt_QTreeView_setFirstColumnSpanned_void_QTreeView_int_QModelIndex_bool(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
-        Pointer param_parent, bool param_span)
+    void qt_QTreeView_setFirstColumnSpanned_void_QTreeView_int_QModelIndex_bool(Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
+                                                                                Pointer param_parent, bool param_span)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeView* arg0 = object<QTreeView>(param_this);
@@ -1307,8 +1236,7 @@ namespace Mu
         arg0->setFirstColumnSpanned(arg1, arg2, arg3);
     }
 
-    void qt_QTreeView_setHeader_void_QTreeView_QHeaderView(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_header)
+    void qt_QTreeView_setHeader_void_QTreeView_QHeaderView(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_header)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeView* arg0 = object<QTreeView>(param_this);
@@ -1316,9 +1244,8 @@ namespace Mu
         arg0->setHeader(arg1);
     }
 
-    void qt_QTreeView_setRowHidden_void_QTreeView_int_QModelIndex_bool(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
-        Pointer param_parent, bool param_hide)
+    void qt_QTreeView_setRowHidden_void_QTreeView_int_QModelIndex_bool(Mu::Thread& NODE_THREAD, Pointer param_this, int param_row,
+                                                                       Pointer param_parent, bool param_hide)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeView* arg0 = object<QTreeView>(param_this);
@@ -1328,8 +1255,7 @@ namespace Mu
         arg0->setRowHidden(arg1, arg2, arg3);
     }
 
-    void qt_QTreeView_setTreePosition_void_QTreeView_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_index)
+    void qt_QTreeView_setTreePosition_void_QTreeView_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_index)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeView* arg0 = object<QTreeView>(param_this);
@@ -1337,9 +1263,7 @@ namespace Mu
         arg0->setTreePosition(arg1);
     }
 
-    void qt_QTreeView_sortByColumn_void_QTreeView_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_column,
-        int param_order)
+    void qt_QTreeView_sortByColumn_void_QTreeView_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_column, int param_order)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeView* arg0 = object<QTreeView>(param_this);
@@ -1348,29 +1272,23 @@ namespace Mu
         arg0->sortByColumn(arg1, arg2);
     }
 
-    int qt_QTreeView_treePosition_int_QTreeView(Mu::Thread& NODE_THREAD,
-                                                Pointer param_this)
+    int qt_QTreeView_treePosition_int_QTreeView(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeView* arg0 = object<QTreeView>(param_this);
         return arg0->treePosition();
     }
 
-    Pointer qt_QTreeView_indexAt_QModelIndex_QTreeView_QPoint(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_point)
+    Pointer qt_QTreeView_indexAt_QModelIndex_QTreeView_QPoint(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_point)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeView* arg0 = object<QTreeView>(param_this);
         const QPoint arg1 = getqtype<QPointType>(param_point);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QModelIndexType>(
-                         c, arg0->QTreeView::indexAt(arg1), "qt.QModelIndex")
-                   : makeqtype<QModelIndexType>(c, arg0->indexAt(arg1),
-                                                "qt.QModelIndex");
+        return isMuQtObject(arg0) ? makeqtype<QModelIndexType>(c, arg0->QTreeView::indexAt(arg1), "qt.QModelIndex")
+                                  : makeqtype<QModelIndexType>(c, arg0->indexAt(arg1), "qt.QModelIndex");
     }
 
-    void qt_QTreeView_keyboardSearch_void_QTreeView_string(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_search)
+    void qt_QTreeView_keyboardSearch_void_QTreeView_string(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_search)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeView* arg0 = object<QTreeView>(param_this);
@@ -1381,8 +1299,7 @@ namespace Mu
             arg0->keyboardSearch(arg1);
     }
 
-    void qt_QTreeView_reset_void_QTreeView(Mu::Thread& NODE_THREAD,
-                                           Pointer param_this)
+    void qt_QTreeView_reset_void_QTreeView(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeView* arg0 = object<QTreeView>(param_this);
@@ -1392,8 +1309,7 @@ namespace Mu
             arg0->reset();
     }
 
-    void qt_QTreeView_selectAll_void_QTreeView(Mu::Thread& NODE_THREAD,
-                                               Pointer param_this)
+    void qt_QTreeView_selectAll_void_QTreeView(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeView* arg0 = object<QTreeView>(param_this);
@@ -1403,8 +1319,7 @@ namespace Mu
             arg0->selectAll();
     }
 
-    void qt_QTreeView_setModel_void_QTreeView_QAbstractItemModel(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_model)
+    void qt_QTreeView_setModel_void_QTreeView_QAbstractItemModel(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_model)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeView* arg0 = object<QTreeView>(param_this);
@@ -1415,8 +1330,7 @@ namespace Mu
             arg0->setModel(arg1);
     }
 
-    void qt_QTreeView_setRootIndex_void_QTreeView_QModelIndex(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index)
+    void qt_QTreeView_setRootIndex_void_QTreeView_QModelIndex(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeView* arg0 = object<QTreeView>(param_this);
@@ -1427,35 +1341,28 @@ namespace Mu
             arg0->setRootIndex(arg1);
     }
 
-    void qt_QTreeView_setSelectionModel_void_QTreeView_QItemSelectionModel(
-        Mu::Thread& NODE_THREAD, Pointer param_this,
-        Pointer param_selectionModel)
+    void qt_QTreeView_setSelectionModel_void_QTreeView_QItemSelectionModel(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                           Pointer param_selectionModel)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeView* arg0 = object<QTreeView>(param_this);
-        QItemSelectionModel* arg1 =
-            object<QItemSelectionModel>(param_selectionModel);
+        QItemSelectionModel* arg1 = object<QItemSelectionModel>(param_selectionModel);
         if (isMuQtObject(arg0))
             arg0->QTreeView::setSelectionModel(arg1);
         else
             arg0->setSelectionModel(arg1);
     }
 
-    Pointer qt_QTreeView_visualRect_QRect_QTreeView_QModelIndex(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index)
+    Pointer qt_QTreeView_visualRect_QRect_QTreeView_QModelIndex(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeView* arg0 = object<QTreeView>(param_this);
         const QModelIndex arg1 = getqtype<QModelIndexType>(param_index);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QRectType>(c, arg0->QTreeView::visualRect(arg1),
-                                          "qt.QRect")
-                   : makeqtype<QRectType>(c, arg0->visualRect(arg1),
-                                          "qt.QRect");
+        return isMuQtObject(arg0) ? makeqtype<QRectType>(c, arg0->QTreeView::visualRect(arg1), "qt.QRect")
+                                  : makeqtype<QRectType>(c, arg0->visualRect(arg1), "qt.QRect");
     }
 
-    int qt_QTreeView_indexRowSizeHint_int_QTreeView_QModelIndex(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index)
+    int qt_QTreeView_indexRowSizeHint_int_QTreeView_QModelIndex(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeView* arg0 = object<QTreeView>(param_this);
@@ -1463,8 +1370,7 @@ namespace Mu
         return ((MuQt_QTreeView*)arg0)->indexRowSizeHint_pub(arg1);
     }
 
-    int qt_QTreeView_rowHeight_int_QTreeView_QModelIndex(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index)
+    int qt_QTreeView_rowHeight_int_QTreeView_QModelIndex(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeView* arg0 = object<QTreeView>(param_this);
@@ -1472,9 +1378,8 @@ namespace Mu
         return ((MuQt_QTreeView*)arg0)->rowHeight_pub(arg1);
     }
 
-    void qt_QTreeView_currentChanged_void_QTreeView_QModelIndex_QModelIndex(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_current,
-        Pointer param_previous)
+    void qt_QTreeView_currentChanged_void_QTreeView_QModelIndex_QModelIndex(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                            Pointer param_current, Pointer param_previous)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeView* arg0 = object<QTreeView>(param_this);
@@ -1486,8 +1391,7 @@ namespace Mu
             ((MuQt_QTreeView*)arg0)->currentChanged_pub(arg1, arg2);
     }
 
-    void qt_QTreeView_dragMoveEvent_void_QTreeView_QDragMoveEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QTreeView_dragMoveEvent_void_QTreeView_QDragMoveEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeView* arg0 = object<QTreeView>(param_this);
@@ -1498,29 +1402,24 @@ namespace Mu
             ((MuQt_QTreeView*)arg0)->dragMoveEvent_pub(arg1);
     }
 
-    int qt_QTreeView_horizontalOffset_int_QTreeView(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this)
+    int qt_QTreeView_horizontalOffset_int_QTreeView(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeView* arg0 = object<QTreeView>(param_this);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QTreeView*)arg0)->horizontalOffset_pub_parent()
-                   : ((MuQt_QTreeView*)arg0)->horizontalOffset_pub();
+        return isMuQtObject(arg0) ? ((MuQt_QTreeView*)arg0)->horizontalOffset_pub_parent()
+                                  : ((MuQt_QTreeView*)arg0)->horizontalOffset_pub();
     }
 
-    bool qt_QTreeView_isIndexHidden_bool_QTreeView_QModelIndex(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index)
+    bool qt_QTreeView_isIndexHidden_bool_QTreeView_QModelIndex(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeView* arg0 = object<QTreeView>(param_this);
         const QModelIndex arg1 = getqtype<QModelIndexType>(param_index);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QTreeView*)arg0)->isIndexHidden_pub_parent(arg1)
-                   : ((MuQt_QTreeView*)arg0)->isIndexHidden_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QTreeView*)arg0)->isIndexHidden_pub_parent(arg1)
+                                  : ((MuQt_QTreeView*)arg0)->isIndexHidden_pub(arg1);
     }
 
-    void qt_QTreeView_keyPressEvent_void_QTreeView_QKeyEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QTreeView_keyPressEvent_void_QTreeView_QKeyEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeView* arg0 = object<QTreeView>(param_this);
@@ -1531,8 +1430,7 @@ namespace Mu
             ((MuQt_QTreeView*)arg0)->keyPressEvent_pub(arg1);
     }
 
-    void qt_QTreeView_mouseDoubleClickEvent_void_QTreeView_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QTreeView_mouseDoubleClickEvent_void_QTreeView_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeView* arg0 = object<QTreeView>(param_this);
@@ -1543,8 +1441,7 @@ namespace Mu
             ((MuQt_QTreeView*)arg0)->mouseDoubleClickEvent_pub(arg1);
     }
 
-    void qt_QTreeView_mouseMoveEvent_void_QTreeView_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QTreeView_mouseMoveEvent_void_QTreeView_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeView* arg0 = object<QTreeView>(param_this);
@@ -1555,8 +1452,7 @@ namespace Mu
             ((MuQt_QTreeView*)arg0)->mouseMoveEvent_pub(arg1);
     }
 
-    void qt_QTreeView_mousePressEvent_void_QTreeView_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QTreeView_mousePressEvent_void_QTreeView_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeView* arg0 = object<QTreeView>(param_this);
@@ -1567,8 +1463,7 @@ namespace Mu
             ((MuQt_QTreeView*)arg0)->mousePressEvent_pub(arg1);
     }
 
-    void qt_QTreeView_mouseReleaseEvent_void_QTreeView_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QTreeView_mouseReleaseEvent_void_QTreeView_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeView* arg0 = object<QTreeView>(param_this);
@@ -1579,8 +1474,7 @@ namespace Mu
             ((MuQt_QTreeView*)arg0)->mouseReleaseEvent_pub(arg1);
     }
 
-    void qt_QTreeView_paintEvent_void_QTreeView_QPaintEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QTreeView_paintEvent_void_QTreeView_QPaintEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeView* arg0 = object<QTreeView>(param_this);
@@ -1591,9 +1485,8 @@ namespace Mu
             ((MuQt_QTreeView*)arg0)->paintEvent_pub(arg1);
     }
 
-    void qt_QTreeView_rowsAboutToBeRemoved_void_QTreeView_QModelIndex_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent,
-        int param_start, int param_end)
+    void qt_QTreeView_rowsAboutToBeRemoved_void_QTreeView_QModelIndex_int_int(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                              Pointer param_parent, int param_start, int param_end)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeView* arg0 = object<QTreeView>(param_this);
@@ -1601,15 +1494,13 @@ namespace Mu
         int arg2 = (int)(param_start);
         int arg3 = (int)(param_end);
         if (isMuQtObject(arg0))
-            ((MuQt_QTreeView*)arg0)
-                ->rowsAboutToBeRemoved_pub_parent(arg1, arg2, arg3);
+            ((MuQt_QTreeView*)arg0)->rowsAboutToBeRemoved_pub_parent(arg1, arg2, arg3);
         else
             ((MuQt_QTreeView*)arg0)->rowsAboutToBeRemoved_pub(arg1, arg2, arg3);
     }
 
-    void qt_QTreeView_rowsInserted_void_QTreeView_QModelIndex_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent,
-        int param_start, int param_end)
+    void qt_QTreeView_rowsInserted_void_QTreeView_QModelIndex_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent,
+                                                                      int param_start, int param_end)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeView* arg0 = object<QTreeView>(param_this);
@@ -1622,8 +1513,7 @@ namespace Mu
             ((MuQt_QTreeView*)arg0)->rowsInserted_pub(arg1, arg2, arg3);
     }
 
-    void qt_QTreeView_scrollContentsBy_void_QTreeView_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_dx, int param_dy)
+    void qt_QTreeView_scrollContentsBy_void_QTreeView_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_dx, int param_dy)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeView* arg0 = object<QTreeView>(param_this);
@@ -1635,64 +1525,50 @@ namespace Mu
             ((MuQt_QTreeView*)arg0)->scrollContentsBy_pub(arg1, arg2);
     }
 
-    Pointer qt_QTreeView_selectedIndexes_qt__QModelIndexBSB_ESB__QTreeView(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QTreeView_selectedIndexes_qt__QModelIndexBSB_ESB__QTreeView(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeView* arg0 = object<QTreeView>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqmodelindexlist(
-                         c,
-                         ((MuQt_QTreeView*)arg0)->selectedIndexes_pub_parent())
-                   : makeqmodelindexlist(
-                         c, ((MuQt_QTreeView*)arg0)->selectedIndexes_pub());
+        return isMuQtObject(arg0) ? makeqmodelindexlist(c, ((MuQt_QTreeView*)arg0)->selectedIndexes_pub_parent())
+                                  : makeqmodelindexlist(c, ((MuQt_QTreeView*)arg0)->selectedIndexes_pub());
     }
 
-    void
-    qt_QTreeView_selectionChanged_void_QTreeView_QItemSelection_QItemSelection(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_selected,
-        Pointer param_deselected)
+    void qt_QTreeView_selectionChanged_void_QTreeView_QItemSelection_QItemSelection(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                    Pointer param_selected, Pointer param_deselected)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeView* arg0 = object<QTreeView>(param_this);
-        const QItemSelection arg1 =
-            getqtype<QItemSelectionType>(param_selected);
-        const QItemSelection arg2 =
-            getqtype<QItemSelectionType>(param_deselected);
+        const QItemSelection arg1 = getqtype<QItemSelectionType>(param_selected);
+        const QItemSelection arg2 = getqtype<QItemSelectionType>(param_deselected);
         if (isMuQtObject(arg0))
             ((MuQt_QTreeView*)arg0)->selectionChanged_pub_parent(arg1, arg2);
         else
             ((MuQt_QTreeView*)arg0)->selectionChanged_pub(arg1, arg2);
     }
 
-    void qt_QTreeView_setSelection_void_QTreeView_QRect_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_rect,
-        int param_command)
+    void qt_QTreeView_setSelection_void_QTreeView_QRect_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_rect,
+                                                            int param_command)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeView* arg0 = object<QTreeView>(param_this);
         const QRect arg1 = getqtype<QRectType>(param_rect);
-        QItemSelectionModel::SelectionFlags arg2 =
-            (QItemSelectionModel::SelectionFlags)(param_command);
+        QItemSelectionModel::SelectionFlags arg2 = (QItemSelectionModel::SelectionFlags)(param_command);
         if (isMuQtObject(arg0))
             ((MuQt_QTreeView*)arg0)->setSelection_pub_parent(arg1, arg2);
         else
             ((MuQt_QTreeView*)arg0)->setSelection_pub(arg1, arg2);
     }
 
-    int qt_QTreeView_sizeHintForColumn_int_QTreeView_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_column)
+    int qt_QTreeView_sizeHintForColumn_int_QTreeView_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_column)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeView* arg0 = object<QTreeView>(param_this);
         int arg1 = (int)(param_column);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QTreeView*)arg0)->sizeHintForColumn_pub_parent(arg1)
-                   : ((MuQt_QTreeView*)arg0)->sizeHintForColumn_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QTreeView*)arg0)->sizeHintForColumn_pub_parent(arg1)
+                                  : ((MuQt_QTreeView*)arg0)->sizeHintForColumn_pub(arg1);
     }
 
-    void qt_QTreeView_timerEvent_void_QTreeView_QTimerEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QTreeView_timerEvent_void_QTreeView_QTimerEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeView* arg0 = object<QTreeView>(param_this);
@@ -1703,8 +1579,7 @@ namespace Mu
             ((MuQt_QTreeView*)arg0)->timerEvent_pub(arg1);
     }
 
-    void qt_QTreeView_updateGeometries_void_QTreeView(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    void qt_QTreeView_updateGeometries_void_QTreeView(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeView* arg0 = object<QTreeView>(param_this);
@@ -1714,122 +1589,82 @@ namespace Mu
             ((MuQt_QTreeView*)arg0)->updateGeometries_pub();
     }
 
-    int qt_QTreeView_verticalOffset_int_QTreeView(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this)
+    int qt_QTreeView_verticalOffset_int_QTreeView(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeView* arg0 = object<QTreeView>(param_this);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QTreeView*)arg0)->verticalOffset_pub_parent()
-                   : ((MuQt_QTreeView*)arg0)->verticalOffset_pub();
+        return isMuQtObject(arg0) ? ((MuQt_QTreeView*)arg0)->verticalOffset_pub_parent() : ((MuQt_QTreeView*)arg0)->verticalOffset_pub();
     }
 
-    bool qt_QTreeView_viewportEvent_bool_QTreeView_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    bool qt_QTreeView_viewportEvent_bool_QTreeView_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeView* arg0 = object<QTreeView>(param_this);
         QEvent* arg1 = getqpointer<QEventType>(param_event);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QTreeView*)arg0)->viewportEvent_pub_parent(arg1)
-                   : ((MuQt_QTreeView*)arg0)->viewportEvent_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QTreeView*)arg0)->viewportEvent_pub_parent(arg1)
+                                  : ((MuQt_QTreeView*)arg0)->viewportEvent_pub(arg1);
     }
 
-    Pointer
-    qt_QTreeView_viewportSizeHint_QSize_QTreeView(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this)
+    Pointer qt_QTreeView_viewportSizeHint_QSize_QTreeView(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeView* arg0 = object<QTreeView>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QSizeType>(
-                         c,
-                         ((MuQt_QTreeView*)arg0)->viewportSizeHint_pub_parent(),
-                         "qt.QSize")
-                   : makeqtype<QSizeType>(
-                         c, ((MuQt_QTreeView*)arg0)->viewportSizeHint_pub(),
-                         "qt.QSize");
+        return isMuQtObject(arg0) ? makeqtype<QSizeType>(c, ((MuQt_QTreeView*)arg0)->viewportSizeHint_pub_parent(), "qt.QSize")
+                                  : makeqtype<QSizeType>(c, ((MuQt_QTreeView*)arg0)->viewportSizeHint_pub(), "qt.QSize");
     }
 
-    Pointer
-    qt_QTreeView_visualRegionForSelection_QRegion_QTreeView_QItemSelection(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_selection)
+    Pointer qt_QTreeView_visualRegionForSelection_QRegion_QTreeView_QItemSelection(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                   Pointer param_selection)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeView* arg0 = object<QTreeView>(param_this);
-        const QItemSelection arg1 =
-            getqtype<QItemSelectionType>(param_selection);
+        const QItemSelection arg1 = getqtype<QItemSelectionType>(param_selection);
         return isMuQtObject(arg0)
-                   ? makeqtype<QRegionType>(
-                         c,
-                         ((MuQt_QTreeView*)arg0)
-                             ->visualRegionForSelection_pub_parent(arg1),
-                         "qt.QRegion")
-                   : makeqtype<QRegionType>(
-                         c,
-                         ((MuQt_QTreeView*)arg0)
-                             ->visualRegionForSelection_pub(arg1),
-                         "qt.QRegion");
+                   ? makeqtype<QRegionType>(c, ((MuQt_QTreeView*)arg0)->visualRegionForSelection_pub_parent(arg1), "qt.QRegion")
+                   : makeqtype<QRegionType>(c, ((MuQt_QTreeView*)arg0)->visualRegionForSelection_pub(arg1), "qt.QRegion");
     }
 
-    int qt_QTreeView_sizeHintForRow_int_QTreeView_int(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this,
-                                                      int param_row)
+    int qt_QTreeView_sizeHintForRow_int_QTreeView_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_row)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeView* arg0 = object<QTreeView>(param_this);
         int arg1 = (int)(param_row);
-        return isMuQtObject(arg0) ? arg0->QTreeView::sizeHintForRow(arg1)
-                                  : arg0->sizeHintForRow(arg1);
+        return isMuQtObject(arg0) ? arg0->QTreeView::sizeHintForRow(arg1) : arg0->sizeHintForRow(arg1);
     }
 
-    Pointer qt_QTreeView_inputMethodQuery_QVariant_QTreeView_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_query)
+    Pointer qt_QTreeView_inputMethodQuery_QVariant_QTreeView_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_query)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeView* arg0 = object<QTreeView>(param_this);
         Qt::InputMethodQuery arg1 = (Qt::InputMethodQuery)(param_query);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QVariantType>(
-                         c, arg0->QTreeView::inputMethodQuery(arg1),
-                         "qt.QVariant")
-                   : makeqtype<QVariantType>(c, arg0->inputMethodQuery(arg1),
-                                             "qt.QVariant");
+        return isMuQtObject(arg0) ? makeqtype<QVariantType>(c, arg0->QTreeView::inputMethodQuery(arg1), "qt.QVariant")
+                                  : makeqtype<QVariantType>(c, arg0->inputMethodQuery(arg1), "qt.QVariant");
     }
 
-    bool qt_QTreeView_edit_bool_QTreeView_QModelIndex_int_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index,
-        int param_trigger, Pointer param_event)
+    bool qt_QTreeView_edit_bool_QTreeView_QModelIndex_int_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index,
+                                                                 int param_trigger, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeView* arg0 = object<QTreeView>(param_this);
         const QModelIndex arg1 = getqtype<QModelIndexType>(param_index);
-        QAbstractItemView::EditTrigger arg2 =
-            (QAbstractItemView::EditTrigger)(param_trigger);
+        QAbstractItemView::EditTrigger arg2 = (QAbstractItemView::EditTrigger)(param_trigger);
         QEvent* arg3 = getqpointer<QEventType>(param_event);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QTreeView*)arg0)->edit_pub_parent(arg1, arg2, arg3)
-                   : ((MuQt_QTreeView*)arg0)->edit_pub(arg1, arg2, arg3);
+        return isMuQtObject(arg0) ? ((MuQt_QTreeView*)arg0)->edit_pub_parent(arg1, arg2, arg3)
+                                  : ((MuQt_QTreeView*)arg0)->edit_pub(arg1, arg2, arg3);
     }
 
-    int qt_QTreeView_selectionCommand_int_QTreeView_QModelIndex_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index,
-        Pointer param_event)
+    int qt_QTreeView_selectionCommand_int_QTreeView_QModelIndex_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index,
+                                                                       Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeView* arg0 = object<QTreeView>(param_this);
         const QModelIndex arg1 = getqtype<QModelIndexType>(param_index);
         const QEvent* arg2 = getqpointer<QEventType>(param_event);
-        return isMuQtObject(arg0)
-                   ? int(((MuQt_QTreeView*)arg0)
-                             ->selectionCommand_pub_parent(arg1, arg2))
-                   : int(((MuQt_QTreeView*)arg0)
-                             ->selectionCommand_pub(arg1, arg2));
+        return isMuQtObject(arg0) ? int(((MuQt_QTreeView*)arg0)->selectionCommand_pub_parent(arg1, arg2))
+                                  : int(((MuQt_QTreeView*)arg0)->selectionCommand_pub(arg1, arg2));
     }
 
-    void qt_QTreeView_startDrag_void_QTreeView_int(Mu::Thread& NODE_THREAD,
-                                                   Pointer param_this,
-                                                   int param_supportedActions)
+    void qt_QTreeView_startDrag_void_QTreeView_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_supportedActions)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeView* arg0 = object<QTreeView>(param_this);
@@ -1840,8 +1675,7 @@ namespace Mu
             ((MuQt_QTreeView*)arg0)->startDrag_pub(arg1);
     }
 
-    void qt_QTreeView_dragEnterEvent_void_QTreeView_QDragEnterEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QTreeView_dragEnterEvent_void_QTreeView_QDragEnterEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeView* arg0 = object<QTreeView>(param_this);
@@ -1852,8 +1686,7 @@ namespace Mu
             ((MuQt_QTreeView*)arg0)->dragEnterEvent_pub(arg1);
     }
 
-    void qt_QTreeView_dragLeaveEvent_void_QTreeView_QDragLeaveEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QTreeView_dragLeaveEvent_void_QTreeView_QDragLeaveEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeView* arg0 = object<QTreeView>(param_this);
@@ -1864,8 +1697,7 @@ namespace Mu
             ((MuQt_QTreeView*)arg0)->dragLeaveEvent_pub(arg1);
     }
 
-    void qt_QTreeView_dropEvent_void_QTreeView_QDropEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QTreeView_dropEvent_void_QTreeView_QDropEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeView* arg0 = object<QTreeView>(param_this);
@@ -1876,20 +1708,15 @@ namespace Mu
             ((MuQt_QTreeView*)arg0)->dropEvent_pub(arg1);
     }
 
-    bool qt_QTreeView_event_bool_QTreeView_QEvent(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this,
-                                                  Pointer param_event_)
+    bool qt_QTreeView_event_bool_QTreeView_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event_)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeView* arg0 = object<QTreeView>(param_this);
         QEvent* arg1 = getqpointer<QEventType>(param_event_);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QTreeView*)arg0)->event_pub_parent(arg1)
-                   : ((MuQt_QTreeView*)arg0)->event_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QTreeView*)arg0)->event_pub_parent(arg1) : ((MuQt_QTreeView*)arg0)->event_pub(arg1);
     }
 
-    void qt_QTreeView_focusInEvent_void_QTreeView_QFocusEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QTreeView_focusInEvent_void_QTreeView_QFocusEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeView* arg0 = object<QTreeView>(param_this);
@@ -1900,20 +1727,16 @@ namespace Mu
             ((MuQt_QTreeView*)arg0)->focusInEvent_pub(arg1);
     }
 
-    bool qt_QTreeView_focusNextPrevChild_bool_QTreeView_bool(
-        Mu::Thread& NODE_THREAD, Pointer param_this, bool param_next)
+    bool qt_QTreeView_focusNextPrevChild_bool_QTreeView_bool(Mu::Thread& NODE_THREAD, Pointer param_this, bool param_next)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeView* arg0 = object<QTreeView>(param_this);
         bool arg1 = (bool)(param_next);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QTreeView*)arg0)
-                         ->focusNextPrevChild_pub_parent(arg1)
-                   : ((MuQt_QTreeView*)arg0)->focusNextPrevChild_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QTreeView*)arg0)->focusNextPrevChild_pub_parent(arg1)
+                                  : ((MuQt_QTreeView*)arg0)->focusNextPrevChild_pub(arg1);
     }
 
-    void qt_QTreeView_focusOutEvent_void_QTreeView_QFocusEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QTreeView_focusOutEvent_void_QTreeView_QFocusEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeView* arg0 = object<QTreeView>(param_this);
@@ -1924,8 +1747,7 @@ namespace Mu
             ((MuQt_QTreeView*)arg0)->focusOutEvent_pub(arg1);
     }
 
-    void qt_QTreeView_resizeEvent_void_QTreeView_QResizeEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QTreeView_resizeEvent_void_QTreeView_QResizeEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTreeView* arg0 = object<QTreeView>(param_this);
@@ -1938,419 +1760,342 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(_n_QTreeView0, Pointer)
     {
-        NODE_RETURN(qt_QTreeView_QTreeView_QTreeView_QTreeView_QWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QTreeView_QTreeView_QTreeView_QTreeView_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_columnAt0, int)
     {
-        NODE_RETURN(qt_QTreeView_columnAt_int_QTreeView_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QTreeView_columnAt_int_QTreeView_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_columnViewportPosition0, int)
     {
-        NODE_RETURN(qt_QTreeView_columnViewportPosition_int_QTreeView_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QTreeView_columnViewportPosition_int_QTreeView_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_columnWidth0, int)
     {
-        NODE_RETURN(qt_QTreeView_columnWidth_int_QTreeView_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QTreeView_columnWidth_int_QTreeView_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_header0, Pointer)
     {
-        NODE_RETURN(qt_QTreeView_header_QHeaderView_QTreeView(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTreeView_header_QHeaderView_QTreeView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_indexAbove0, Pointer)
     {
-        NODE_RETURN(qt_QTreeView_indexAbove_QModelIndex_QTreeView_QModelIndex(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(
+            qt_QTreeView_indexAbove_QModelIndex_QTreeView_QModelIndex(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_indexBelow0, Pointer)
     {
-        NODE_RETURN(qt_QTreeView_indexBelow_QModelIndex_QTreeView_QModelIndex(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(
+            qt_QTreeView_indexBelow_QModelIndex_QTreeView_QModelIndex(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isColumnHidden0, bool)
     {
-        NODE_RETURN(qt_QTreeView_isColumnHidden_bool_QTreeView_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QTreeView_isColumnHidden_bool_QTreeView_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_isExpanded0, bool)
     {
-        NODE_RETURN(qt_QTreeView_isExpanded_bool_QTreeView_QModelIndex(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QTreeView_isExpanded_bool_QTreeView_QModelIndex(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isFirstColumnSpanned0, bool)
     {
-        NODE_RETURN(
-            qt_QTreeView_isFirstColumnSpanned_bool_QTreeView_int_QModelIndex(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-                NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QTreeView_isFirstColumnSpanned_bool_QTreeView_int_QModelIndex(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                     NODE_ARG(1, int), NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isRowHidden0, bool)
     {
-        NODE_RETURN(qt_QTreeView_isRowHidden_bool_QTreeView_int_QModelIndex(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QTreeView_isRowHidden_bool_QTreeView_int_QModelIndex(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                            NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_setColumnHidden0, void)
     {
-        qt_QTreeView_setColumnHidden_void_QTreeView_int_bool(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, bool));
+        qt_QTreeView_setColumnHidden_void_QTreeView_int_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, bool));
     }
 
     static NODE_IMPLEMENTATION(_n_setColumnWidth0, void)
     {
-        qt_QTreeView_setColumnWidth_void_QTreeView_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int));
+        qt_QTreeView_setColumnWidth_void_QTreeView_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setExpanded0, void)
     {
-        qt_QTreeView_setExpanded_void_QTreeView_QModelIndex_bool(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, bool));
+        qt_QTreeView_setExpanded_void_QTreeView_QModelIndex_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                 NODE_ARG(2, bool));
     }
 
     static NODE_IMPLEMENTATION(_n_setFirstColumnSpanned0, void)
     {
-        qt_QTreeView_setFirstColumnSpanned_void_QTreeView_int_QModelIndex_bool(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, Pointer), NODE_ARG(3, bool));
+        qt_QTreeView_setFirstColumnSpanned_void_QTreeView_int_QModelIndex_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                               NODE_ARG(2, Pointer), NODE_ARG(3, bool));
     }
 
     static NODE_IMPLEMENTATION(_n_setHeader0, void)
     {
-        qt_QTreeView_setHeader_void_QTreeView_QHeaderView(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTreeView_setHeader_void_QTreeView_QHeaderView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setRowHidden0, void)
     {
-        qt_QTreeView_setRowHidden_void_QTreeView_int_QModelIndex_bool(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, Pointer), NODE_ARG(3, bool));
+        qt_QTreeView_setRowHidden_void_QTreeView_int_QModelIndex_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                      NODE_ARG(2, Pointer), NODE_ARG(3, bool));
     }
 
     static NODE_IMPLEMENTATION(_n_setTreePosition0, void)
     {
-        qt_QTreeView_setTreePosition_void_QTreeView_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QTreeView_setTreePosition_void_QTreeView_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_sortByColumn0, void)
     {
-        qt_QTreeView_sortByColumn_void_QTreeView_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int));
+        qt_QTreeView_sortByColumn_void_QTreeView_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_treePosition0, int)
     {
-        NODE_RETURN(qt_QTreeView_treePosition_int_QTreeView(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTreeView_treePosition_int_QTreeView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_indexAt0, Pointer)
     {
-        NODE_RETURN(qt_QTreeView_indexAt_QModelIndex_QTreeView_QPoint(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QTreeView_indexAt_QModelIndex_QTreeView_QPoint(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_keyboardSearch0, void)
     {
-        qt_QTreeView_keyboardSearch_void_QTreeView_string(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTreeView_keyboardSearch_void_QTreeView_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
-    static NODE_IMPLEMENTATION(_n_reset0, void)
-    {
-        qt_QTreeView_reset_void_QTreeView(NODE_THREAD,
-                                          NONNIL_NODE_ARG(0, Pointer));
-    }
+    static NODE_IMPLEMENTATION(_n_reset0, void) { qt_QTreeView_reset_void_QTreeView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)); }
 
-    static NODE_IMPLEMENTATION(_n_selectAll0, void)
-    {
-        qt_QTreeView_selectAll_void_QTreeView(NODE_THREAD,
-                                              NONNIL_NODE_ARG(0, Pointer));
-    }
+    static NODE_IMPLEMENTATION(_n_selectAll0, void) { qt_QTreeView_selectAll_void_QTreeView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)); }
 
     static NODE_IMPLEMENTATION(_n_setModel0, void)
     {
-        qt_QTreeView_setModel_void_QTreeView_QAbstractItemModel(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTreeView_setModel_void_QTreeView_QAbstractItemModel(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setRootIndex0, void)
     {
-        qt_QTreeView_setRootIndex_void_QTreeView_QModelIndex(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTreeView_setRootIndex_void_QTreeView_QModelIndex(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setSelectionModel0, void)
     {
-        qt_QTreeView_setSelectionModel_void_QTreeView_QItemSelectionModel(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTreeView_setSelectionModel_void_QTreeView_QItemSelectionModel(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_visualRect0, Pointer)
     {
-        NODE_RETURN(qt_QTreeView_visualRect_QRect_QTreeView_QModelIndex(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QTreeView_visualRect_QRect_QTreeView_QModelIndex(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_indexRowSizeHint0, int)
     {
-        NODE_RETURN(qt_QTreeView_indexRowSizeHint_int_QTreeView_QModelIndex(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(
+            qt_QTreeView_indexRowSizeHint_int_QTreeView_QModelIndex(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_rowHeight0, int)
     {
-        NODE_RETURN(qt_QTreeView_rowHeight_int_QTreeView_QModelIndex(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QTreeView_rowHeight_int_QTreeView_QModelIndex(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_currentChanged0, void)
     {
-        qt_QTreeView_currentChanged_void_QTreeView_QModelIndex_QModelIndex(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer));
+        qt_QTreeView_currentChanged_void_QTreeView_QModelIndex_QModelIndex(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                           NODE_ARG(2, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_dragMoveEvent0, void)
     {
-        qt_QTreeView_dragMoveEvent_void_QTreeView_QDragMoveEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTreeView_dragMoveEvent_void_QTreeView_QDragMoveEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_horizontalOffset0, int)
     {
-        NODE_RETURN(qt_QTreeView_horizontalOffset_int_QTreeView(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTreeView_horizontalOffset_int_QTreeView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isIndexHidden0, bool)
     {
-        NODE_RETURN(qt_QTreeView_isIndexHidden_bool_QTreeView_QModelIndex(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QTreeView_isIndexHidden_bool_QTreeView_QModelIndex(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_keyPressEvent0, void)
     {
-        qt_QTreeView_keyPressEvent_void_QTreeView_QKeyEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTreeView_keyPressEvent_void_QTreeView_QKeyEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseDoubleClickEvent0, void)
     {
-        qt_QTreeView_mouseDoubleClickEvent_void_QTreeView_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTreeView_mouseDoubleClickEvent_void_QTreeView_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseMoveEvent0, void)
     {
-        qt_QTreeView_mouseMoveEvent_void_QTreeView_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTreeView_mouseMoveEvent_void_QTreeView_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mousePressEvent0, void)
     {
-        qt_QTreeView_mousePressEvent_void_QTreeView_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTreeView_mousePressEvent_void_QTreeView_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseReleaseEvent0, void)
     {
-        qt_QTreeView_mouseReleaseEvent_void_QTreeView_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTreeView_mouseReleaseEvent_void_QTreeView_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_paintEvent0, void)
     {
-        qt_QTreeView_paintEvent_void_QTreeView_QPaintEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTreeView_paintEvent_void_QTreeView_QPaintEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_rowsAboutToBeRemoved0, void)
     {
-        qt_QTreeView_rowsAboutToBeRemoved_void_QTreeView_QModelIndex_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int), NODE_ARG(3, int));
+        qt_QTreeView_rowsAboutToBeRemoved_void_QTreeView_QModelIndex_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                             NODE_ARG(2, int), NODE_ARG(3, int));
     }
 
     static NODE_IMPLEMENTATION(_n_rowsInserted0, void)
     {
-        qt_QTreeView_rowsInserted_void_QTreeView_QModelIndex_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int), NODE_ARG(3, int));
+        qt_QTreeView_rowsInserted_void_QTreeView_QModelIndex_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                     NODE_ARG(2, int), NODE_ARG(3, int));
     }
 
     static NODE_IMPLEMENTATION(_n_scrollContentsBy0, void)
     {
-        qt_QTreeView_scrollContentsBy_void_QTreeView_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int));
+        qt_QTreeView_scrollContentsBy_void_QTreeView_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_selectedIndexes0, Pointer)
     {
-        NODE_RETURN(
-            qt_QTreeView_selectedIndexes_qt__QModelIndexBSB_ESB__QTreeView(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTreeView_selectedIndexes_qt__QModelIndexBSB_ESB__QTreeView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_selectionChanged0, void)
     {
-        qt_QTreeView_selectionChanged_void_QTreeView_QItemSelection_QItemSelection(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer));
+        qt_QTreeView_selectionChanged_void_QTreeView_QItemSelection_QItemSelection(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                   NODE_ARG(1, Pointer), NODE_ARG(2, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setSelection0, void)
     {
-        qt_QTreeView_setSelection_void_QTreeView_QRect_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int));
+        qt_QTreeView_setSelection_void_QTreeView_QRect_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                           NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_sizeHintForColumn0, int)
     {
-        NODE_RETURN(qt_QTreeView_sizeHintForColumn_int_QTreeView_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QTreeView_sizeHintForColumn_int_QTreeView_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_timerEvent0, void)
     {
-        qt_QTreeView_timerEvent_void_QTreeView_QTimerEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTreeView_timerEvent_void_QTreeView_QTimerEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_updateGeometries0, void)
     {
-        qt_QTreeView_updateGeometries_void_QTreeView(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
+        qt_QTreeView_updateGeometries_void_QTreeView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_verticalOffset0, int)
     {
-        NODE_RETURN(qt_QTreeView_verticalOffset_int_QTreeView(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTreeView_verticalOffset_int_QTreeView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_viewportEvent0, bool)
     {
-        NODE_RETURN(qt_QTreeView_viewportEvent_bool_QTreeView_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QTreeView_viewportEvent_bool_QTreeView_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_viewportSizeHint0, Pointer)
     {
-        NODE_RETURN(qt_QTreeView_viewportSizeHint_QSize_QTreeView(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QTreeView_viewportSizeHint_QSize_QTreeView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_visualRegionForSelection0, Pointer)
     {
-        NODE_RETURN(
-            qt_QTreeView_visualRegionForSelection_QRegion_QTreeView_QItemSelection(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QTreeView_visualRegionForSelection_QRegion_QTreeView_QItemSelection(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                           NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_sizeHintForRow0, int)
     {
-        NODE_RETURN(qt_QTreeView_sizeHintForRow_int_QTreeView_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QTreeView_sizeHintForRow_int_QTreeView_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_inputMethodQuery0, Pointer)
     {
-        NODE_RETURN(qt_QTreeView_inputMethodQuery_QVariant_QTreeView_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QTreeView_inputMethodQuery_QVariant_QTreeView_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_edit0, bool)
     {
-        NODE_RETURN(qt_QTreeView_edit_bool_QTreeView_QModelIndex_int_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int), NODE_ARG(3, Pointer)));
+        NODE_RETURN(qt_QTreeView_edit_bool_QTreeView_QModelIndex_int_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                            NODE_ARG(2, int), NODE_ARG(3, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_selectionCommand0, int)
     {
-        NODE_RETURN(
-            qt_QTreeView_selectionCommand_int_QTreeView_QModelIndex_QEvent(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QTreeView_selectionCommand_int_QTreeView_QModelIndex_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                   NODE_ARG(1, Pointer), NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_startDrag0, void)
     {
-        qt_QTreeView_startDrag_void_QTreeView_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QTreeView_startDrag_void_QTreeView_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_dragEnterEvent0, void)
     {
-        qt_QTreeView_dragEnterEvent_void_QTreeView_QDragEnterEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTreeView_dragEnterEvent_void_QTreeView_QDragEnterEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_dragLeaveEvent0, void)
     {
-        qt_QTreeView_dragLeaveEvent_void_QTreeView_QDragLeaveEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTreeView_dragLeaveEvent_void_QTreeView_QDragLeaveEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_dropEvent0, void)
     {
-        qt_QTreeView_dropEvent_void_QTreeView_QDropEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTreeView_dropEvent_void_QTreeView_QDropEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_event0, bool)
     {
-        NODE_RETURN(qt_QTreeView_event_bool_QTreeView_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QTreeView_event_bool_QTreeView_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_focusInEvent0, void)
     {
-        qt_QTreeView_focusInEvent_void_QTreeView_QFocusEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTreeView_focusInEvent_void_QTreeView_QFocusEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_focusNextPrevChild0, bool)
     {
-        NODE_RETURN(qt_QTreeView_focusNextPrevChild_bool_QTreeView_bool(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool)));
+        NODE_RETURN(qt_QTreeView_focusNextPrevChild_bool_QTreeView_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool)));
     }
 
     static NODE_IMPLEMENTATION(_n_focusOutEvent0, void)
     {
-        qt_QTreeView_focusOutEvent_void_QTreeView_QFocusEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTreeView_focusOutEvent_void_QTreeView_QFocusEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_resizeEvent0, void)
     {
-        qt_QTreeView_resizeEvent_void_QTreeView_QResizeEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QTreeView_resizeEvent_void_QTreeView_QResizeEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     void QTreeViewType::load()
@@ -2370,17 +2115,13 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
-                   new Function(c, tn, castFromObject, Cast, Compiled,
-                                QTreeView_QTreeView_QObject, Return, ftn,
-                                Parameters,
+                   new Function(c, tn, castFromObject, Cast, Compiled, QTreeView_QTreeView_QObject, Return, ftn, Parameters,
                                 new Param(c, "object", "qt.QObject"), End),
 
                    EndArguments);
@@ -2388,71 +2129,37 @@ namespace Mu
         addSymbols(
             // enums
             // member functions
-            new Function(c, "QTreeView", _n_QTreeView0, None, Compiled,
-                         qt_QTreeView_QTreeView_QTreeView_QTreeView_QWidget,
-                         Return, "qt.QTreeView", Parameters,
-                         new Param(c, "this", "qt.QTreeView"),
-                         new Param(c, "parent", "qt.QWidget"), End),
+            new Function(c, "QTreeView", _n_QTreeView0, None, Compiled, qt_QTreeView_QTreeView_QTreeView_QTreeView_QWidget, Return,
+                         "qt.QTreeView", Parameters, new Param(c, "this", "qt.QTreeView"), new Param(c, "parent", "qt.QWidget"), End),
             // PROP: allColumnsShowFocus (bool; QTreeView this)
             // PROP: autoExpandDelay (int; QTreeView this)
-            new Function(c, "columnAt", _n_columnAt0, None, Compiled,
-                         qt_QTreeView_columnAt_int_QTreeView_int, Return, "int",
-                         Parameters, new Param(c, "this", "qt.QTreeView"),
-                         new Param(c, "x", "int"), End),
-            new Function(
-                c, "columnViewportPosition", _n_columnViewportPosition0, None,
-                Compiled, qt_QTreeView_columnViewportPosition_int_QTreeView_int,
-                Return, "int", Parameters, new Param(c, "this", "qt.QTreeView"),
-                new Param(c, "column", "int"), End),
-            new Function(c, "columnWidth", _n_columnWidth0, None, Compiled,
-                         qt_QTreeView_columnWidth_int_QTreeView_int, Return,
-                         "int", Parameters,
-                         new Param(c, "this", "qt.QTreeView"),
-                         new Param(c, "column", "int"), End),
+            new Function(c, "columnAt", _n_columnAt0, None, Compiled, qt_QTreeView_columnAt_int_QTreeView_int, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QTreeView"), new Param(c, "x", "int"), End),
+            new Function(c, "columnViewportPosition", _n_columnViewportPosition0, None, Compiled,
+                         qt_QTreeView_columnViewportPosition_int_QTreeView_int, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QTreeView"), new Param(c, "column", "int"), End),
+            new Function(c, "columnWidth", _n_columnWidth0, None, Compiled, qt_QTreeView_columnWidth_int_QTreeView_int, Return, "int",
+                         Parameters, new Param(c, "this", "qt.QTreeView"), new Param(c, "column", "int"), End),
             // PROP: expandsOnDoubleClick (bool; QTreeView this)
-            new Function(c, "header", _n_header0, None, Compiled,
-                         qt_QTreeView_header_QHeaderView_QTreeView, Return,
-                         "qt.QHeaderView", Parameters,
-                         new Param(c, "this", "qt.QTreeView"), End),
+            new Function(c, "header", _n_header0, None, Compiled, qt_QTreeView_header_QHeaderView_QTreeView, Return, "qt.QHeaderView",
+                         Parameters, new Param(c, "this", "qt.QTreeView"), End),
             // PROP: indentation (int; QTreeView this)
-            new Function(
-                c, "indexAbove", _n_indexAbove0, None, Compiled,
-                qt_QTreeView_indexAbove_QModelIndex_QTreeView_QModelIndex,
-                Return, "qt.QModelIndex", Parameters,
-                new Param(c, "this", "qt.QTreeView"),
-                new Param(c, "index", "qt.QModelIndex"), End),
-            new Function(
-                c, "indexBelow", _n_indexBelow0, None, Compiled,
-                qt_QTreeView_indexBelow_QModelIndex_QTreeView_QModelIndex,
-                Return, "qt.QModelIndex", Parameters,
-                new Param(c, "this", "qt.QTreeView"),
-                new Param(c, "index", "qt.QModelIndex"), End),
+            new Function(c, "indexAbove", _n_indexAbove0, None, Compiled, qt_QTreeView_indexAbove_QModelIndex_QTreeView_QModelIndex, Return,
+                         "qt.QModelIndex", Parameters, new Param(c, "this", "qt.QTreeView"), new Param(c, "index", "qt.QModelIndex"), End),
+            new Function(c, "indexBelow", _n_indexBelow0, None, Compiled, qt_QTreeView_indexBelow_QModelIndex_QTreeView_QModelIndex, Return,
+                         "qt.QModelIndex", Parameters, new Param(c, "this", "qt.QTreeView"), new Param(c, "index", "qt.QModelIndex"), End),
             // PROP: isAnimated (bool; QTreeView this)
-            new Function(
-                c, "isColumnHidden", _n_isColumnHidden0, None, Compiled,
-                qt_QTreeView_isColumnHidden_bool_QTreeView_int, Return, "bool",
-                Parameters, new Param(c, "this", "qt.QTreeView"),
-                new Param(c, "column", "int"), End),
-            new Function(c, "isExpanded", _n_isExpanded0, None, Compiled,
-                         qt_QTreeView_isExpanded_bool_QTreeView_QModelIndex,
-                         Return, "bool", Parameters,
-                         new Param(c, "this", "qt.QTreeView"),
-                         new Param(c, "index", "qt.QModelIndex"), End),
-            new Function(
-                c, "isFirstColumnSpanned", _n_isFirstColumnSpanned0, None,
-                Compiled,
-                qt_QTreeView_isFirstColumnSpanned_bool_QTreeView_int_QModelIndex,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QTreeView"),
-                new Param(c, "row", "int"),
-                new Param(c, "parent", "qt.QModelIndex"), End),
+            new Function(c, "isColumnHidden", _n_isColumnHidden0, None, Compiled, qt_QTreeView_isColumnHidden_bool_QTreeView_int, Return,
+                         "bool", Parameters, new Param(c, "this", "qt.QTreeView"), new Param(c, "column", "int"), End),
+            new Function(c, "isExpanded", _n_isExpanded0, None, Compiled, qt_QTreeView_isExpanded_bool_QTreeView_QModelIndex, Return,
+                         "bool", Parameters, new Param(c, "this", "qt.QTreeView"), new Param(c, "index", "qt.QModelIndex"), End),
+            new Function(c, "isFirstColumnSpanned", _n_isFirstColumnSpanned0, None, Compiled,
+                         qt_QTreeView_isFirstColumnSpanned_bool_QTreeView_int_QModelIndex, Return, "bool", Parameters,
+                         new Param(c, "this", "qt.QTreeView"), new Param(c, "row", "int"), new Param(c, "parent", "qt.QModelIndex"), End),
             // PROP: isHeaderHidden (bool; QTreeView this)
-            new Function(
-                c, "isRowHidden", _n_isRowHidden0, None, Compiled,
-                qt_QTreeView_isRowHidden_bool_QTreeView_int_QModelIndex, Return,
-                "bool", Parameters, new Param(c, "this", "qt.QTreeView"),
-                new Param(c, "row", "int"),
-                new Param(c, "parent", "qt.QModelIndex"), End),
+            new Function(c, "isRowHidden", _n_isRowHidden0, None, Compiled, qt_QTreeView_isRowHidden_bool_QTreeView_int_QModelIndex, Return,
+                         "bool", Parameters, new Param(c, "this", "qt.QTreeView"), new Param(c, "row", "int"),
+                         new Param(c, "parent", "qt.QModelIndex"), End),
             // PROP: isSortingEnabled (bool; QTreeView this)
             // PROP: itemsExpandable (bool; QTreeView this)
             // PROP: resetIndentation (void; QTreeView this)
@@ -2460,336 +2167,199 @@ namespace Mu
             // PROP: setAllColumnsShowFocus (void; QTreeView this, bool enable)
             // PROP: setAnimated (void; QTreeView this, bool enable)
             // PROP: setAutoExpandDelay (void; QTreeView this, int delay)
-            new Function(
-                c, "setColumnHidden", _n_setColumnHidden0, None, Compiled,
-                qt_QTreeView_setColumnHidden_void_QTreeView_int_bool, Return,
-                "void", Parameters, new Param(c, "this", "qt.QTreeView"),
-                new Param(c, "column", "int"), new Param(c, "hide", "bool"),
-                End),
-            new Function(
-                c, "setColumnWidth", _n_setColumnWidth0, None, Compiled,
-                qt_QTreeView_setColumnWidth_void_QTreeView_int_int, Return,
-                "void", Parameters, new Param(c, "this", "qt.QTreeView"),
-                new Param(c, "column", "int"), new Param(c, "width", "int"),
-                End),
-            new Function(
-                c, "setExpanded", _n_setExpanded0, None, Compiled,
-                qt_QTreeView_setExpanded_void_QTreeView_QModelIndex_bool,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTreeView"),
-                new Param(c, "index", "qt.QModelIndex"),
-                new Param(c, "expanded", "bool"), End),
+            new Function(c, "setColumnHidden", _n_setColumnHidden0, None, Compiled, qt_QTreeView_setColumnHidden_void_QTreeView_int_bool,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QTreeView"), new Param(c, "column", "int"),
+                         new Param(c, "hide", "bool"), End),
+            new Function(c, "setColumnWidth", _n_setColumnWidth0, None, Compiled, qt_QTreeView_setColumnWidth_void_QTreeView_int_int,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QTreeView"), new Param(c, "column", "int"),
+                         new Param(c, "width", "int"), End),
+            new Function(c, "setExpanded", _n_setExpanded0, None, Compiled, qt_QTreeView_setExpanded_void_QTreeView_QModelIndex_bool,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QTreeView"), new Param(c, "index", "qt.QModelIndex"),
+                         new Param(c, "expanded", "bool"), End),
             // PROP: setExpandsOnDoubleClick (void; QTreeView this, bool enable)
-            new Function(
-                c, "setFirstColumnSpanned", _n_setFirstColumnSpanned0, None,
-                Compiled,
-                qt_QTreeView_setFirstColumnSpanned_void_QTreeView_int_QModelIndex_bool,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTreeView"),
-                new Param(c, "row", "int"),
-                new Param(c, "parent", "qt.QModelIndex"),
-                new Param(c, "span", "bool"), End),
-            new Function(c, "setHeader", _n_setHeader0, None, Compiled,
-                         qt_QTreeView_setHeader_void_QTreeView_QHeaderView,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QTreeView"),
-                         new Param(c, "header", "qt.QHeaderView"), End),
+            new Function(c, "setFirstColumnSpanned", _n_setFirstColumnSpanned0, None, Compiled,
+                         qt_QTreeView_setFirstColumnSpanned_void_QTreeView_int_QModelIndex_bool, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QTreeView"), new Param(c, "row", "int"), new Param(c, "parent", "qt.QModelIndex"),
+                         new Param(c, "span", "bool"), End),
+            new Function(c, "setHeader", _n_setHeader0, None, Compiled, qt_QTreeView_setHeader_void_QTreeView_QHeaderView, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QTreeView"), new Param(c, "header", "qt.QHeaderView"), End),
             // PROP: setHeaderHidden (void; QTreeView this, bool hide)
             // PROP: setIndentation (void; QTreeView this, int i)
             // PROP: setItemsExpandable (void; QTreeView this, bool enable)
             // PROP: setRootIsDecorated (void; QTreeView this, bool show)
-            new Function(
-                c, "setRowHidden", _n_setRowHidden0, None, Compiled,
-                qt_QTreeView_setRowHidden_void_QTreeView_int_QModelIndex_bool,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTreeView"),
-                new Param(c, "row", "int"),
-                new Param(c, "parent", "qt.QModelIndex"),
-                new Param(c, "hide", "bool"), End),
+            new Function(c, "setRowHidden", _n_setRowHidden0, None, Compiled, qt_QTreeView_setRowHidden_void_QTreeView_int_QModelIndex_bool,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QTreeView"), new Param(c, "row", "int"),
+                         new Param(c, "parent", "qt.QModelIndex"), new Param(c, "hide", "bool"), End),
             // PROP: setSortingEnabled (void; QTreeView this, bool enable)
-            new Function(
-                c, "setTreePosition", _n_setTreePosition0, None, Compiled,
-                qt_QTreeView_setTreePosition_void_QTreeView_int, Return, "void",
-                Parameters, new Param(c, "this", "qt.QTreeView"),
-                new Param(c, "index", "int"), End),
+            new Function(c, "setTreePosition", _n_setTreePosition0, None, Compiled, qt_QTreeView_setTreePosition_void_QTreeView_int, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QTreeView"), new Param(c, "index", "int"), End),
             // PROP: setUniformRowHeights (void; QTreeView this, bool uniform)
             // PROP: setWordWrap (void; QTreeView this, bool on)
-            new Function(c, "sortByColumn", _n_sortByColumn0, None, Compiled,
-                         qt_QTreeView_sortByColumn_void_QTreeView_int_int,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QTreeView"),
-                         new Param(c, "column", "int"),
+            new Function(c, "sortByColumn", _n_sortByColumn0, None, Compiled, qt_QTreeView_sortByColumn_void_QTreeView_int_int, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QTreeView"), new Param(c, "column", "int"),
                          new Param(c, "order", "int"), End),
-            new Function(c, "treePosition", _n_treePosition0, None, Compiled,
-                         qt_QTreeView_treePosition_int_QTreeView, Return, "int",
+            new Function(c, "treePosition", _n_treePosition0, None, Compiled, qt_QTreeView_treePosition_int_QTreeView, Return, "int",
                          Parameters, new Param(c, "this", "qt.QTreeView"), End),
             // PROP: uniformRowHeights (bool; QTreeView this)
             // PROP: wordWrap (bool; QTreeView this)
             // MISSING: dataChanged (void; QTreeView this, QModelIndex topLeft,
             // QModelIndex bottomRight, "const QVector<int> &" roles)
-            _func[0] = new MemberFunction(
-                c, "indexAt", _n_indexAt0, None, Compiled,
-                qt_QTreeView_indexAt_QModelIndex_QTreeView_QPoint, Return,
-                "qt.QModelIndex", Parameters,
-                new Param(c, "this", "qt.QTreeView"),
-                new Param(c, "point", "qt.QPoint"), End),
-            _func[1] = new MemberFunction(
-                c, "keyboardSearch", _n_keyboardSearch0, None, Compiled,
-                qt_QTreeView_keyboardSearch_void_QTreeView_string, Return,
-                "void", Parameters, new Param(c, "this", "qt.QTreeView"),
-                new Param(c, "search", "string"), End),
-            _func[2] = new MemberFunction(
-                c, "reset", _n_reset0, None, Compiled,
-                qt_QTreeView_reset_void_QTreeView, Return, "void", Parameters,
-                new Param(c, "this", "qt.QTreeView"), End),
+            _func[0] = new MemberFunction(c, "indexAt", _n_indexAt0, None, Compiled, qt_QTreeView_indexAt_QModelIndex_QTreeView_QPoint,
+                                          Return, "qt.QModelIndex", Parameters, new Param(c, "this", "qt.QTreeView"),
+                                          new Param(c, "point", "qt.QPoint"), End),
+            _func[1] = new MemberFunction(c, "keyboardSearch", _n_keyboardSearch0, None, Compiled,
+                                          qt_QTreeView_keyboardSearch_void_QTreeView_string, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QTreeView"), new Param(c, "search", "string"), End),
+            _func[2] = new MemberFunction(c, "reset", _n_reset0, None, Compiled, qt_QTreeView_reset_void_QTreeView, Return, "void",
+                                          Parameters, new Param(c, "this", "qt.QTreeView"), End),
             // MISSING: scrollTo (void; QTreeView this, QModelIndex index,
             // "ScrollHint" hint)
-            _func[3] = new MemberFunction(
-                c, "selectAll", _n_selectAll0, None, Compiled,
-                qt_QTreeView_selectAll_void_QTreeView, Return, "void",
-                Parameters, new Param(c, "this", "qt.QTreeView"), End),
-            _func[4] = new MemberFunction(
-                c, "setModel", _n_setModel0, None, Compiled,
-                qt_QTreeView_setModel_void_QTreeView_QAbstractItemModel, Return,
-                "void", Parameters, new Param(c, "this", "qt.QTreeView"),
-                new Param(c, "model", "qt.QAbstractItemModel"), End),
-            _func[5] = new MemberFunction(
-                c, "setRootIndex", _n_setRootIndex0, None, Compiled,
-                qt_QTreeView_setRootIndex_void_QTreeView_QModelIndex, Return,
-                "void", Parameters, new Param(c, "this", "qt.QTreeView"),
-                new Param(c, "index", "qt.QModelIndex"), End),
-            _func[6] = new MemberFunction(
-                c, "setSelectionModel", _n_setSelectionModel0, None, Compiled,
-                qt_QTreeView_setSelectionModel_void_QTreeView_QItemSelectionModel,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTreeView"),
-                new Param(c, "selectionModel", "qt.QItemSelectionModel"), End),
-            _func[7] = new MemberFunction(
-                c, "visualRect", _n_visualRect0, None, Compiled,
-                qt_QTreeView_visualRect_QRect_QTreeView_QModelIndex, Return,
-                "qt.QRect", Parameters, new Param(c, "this", "qt.QTreeView"),
-                new Param(c, "index", "qt.QModelIndex"), End),
+            _func[3] = new MemberFunction(c, "selectAll", _n_selectAll0, None, Compiled, qt_QTreeView_selectAll_void_QTreeView, Return,
+                                          "void", Parameters, new Param(c, "this", "qt.QTreeView"), End),
+            _func[4] = new MemberFunction(c, "setModel", _n_setModel0, None, Compiled,
+                                          qt_QTreeView_setModel_void_QTreeView_QAbstractItemModel, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QTreeView"), new Param(c, "model", "qt.QAbstractItemModel"), End),
+            _func[5] = new MemberFunction(c, "setRootIndex", _n_setRootIndex0, None, Compiled,
+                                          qt_QTreeView_setRootIndex_void_QTreeView_QModelIndex, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QTreeView"), new Param(c, "index", "qt.QModelIndex"), End),
+            _func[6] =
+                new MemberFunction(c, "setSelectionModel", _n_setSelectionModel0, None, Compiled,
+                                   qt_QTreeView_setSelectionModel_void_QTreeView_QItemSelectionModel, Return, "void", Parameters,
+                                   new Param(c, "this", "qt.QTreeView"), new Param(c, "selectionModel", "qt.QItemSelectionModel"), End),
+            _func[7] = new MemberFunction(c, "visualRect", _n_visualRect0, None, Compiled,
+                                          qt_QTreeView_visualRect_QRect_QTreeView_QModelIndex, Return, "qt.QRect", Parameters,
+                                          new Param(c, "this", "qt.QTreeView"), new Param(c, "index", "qt.QModelIndex"), End),
             // MISSING: drawBranches (void; QTreeView this, "QPainter *"
             // painter, QRect rect, QModelIndex index) // protected MISSING:
             // drawRow (void; QTreeView this, "QPainter *" painter, "const
             // QStyleOptionViewItem &" option, QModelIndex index) // protected
             // MISSING: drawTree (void; QTreeView this, "QPainter *" painter,
             // QRegion region) // protected
-            new Function(
-                c, "indexRowSizeHint", _n_indexRowSizeHint0, None, Compiled,
-                qt_QTreeView_indexRowSizeHint_int_QTreeView_QModelIndex, Return,
-                "int", Parameters, new Param(c, "this", "qt.QTreeView"),
-                new Param(c, "index", "qt.QModelIndex"), End),
-            new Function(c, "rowHeight", _n_rowHeight0, None, Compiled,
-                         qt_QTreeView_rowHeight_int_QTreeView_QModelIndex,
-                         Return, "int", Parameters,
-                         new Param(c, "this", "qt.QTreeView"),
-                         new Param(c, "index", "qt.QModelIndex"), End),
-            _func[8] = new MemberFunction(
-                c, "currentChanged", _n_currentChanged0, None, Compiled,
-                qt_QTreeView_currentChanged_void_QTreeView_QModelIndex_QModelIndex,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTreeView"),
-                new Param(c, "current", "qt.QModelIndex"),
-                new Param(c, "previous", "qt.QModelIndex"), End),
-            _func[9] = new MemberFunction(
-                c, "dragMoveEvent", _n_dragMoveEvent0, None, Compiled,
-                qt_QTreeView_dragMoveEvent_void_QTreeView_QDragMoveEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTreeView"),
-                new Param(c, "event", "qt.QDragMoveEvent"), End),
-            _func[10] = new MemberFunction(
-                c, "horizontalOffset", _n_horizontalOffset0, None, Compiled,
-                qt_QTreeView_horizontalOffset_int_QTreeView, Return, "int",
-                Parameters, new Param(c, "this", "qt.QTreeView"), End),
-            _func[11] = new MemberFunction(
-                c, "isIndexHidden", _n_isIndexHidden0, None, Compiled,
-                qt_QTreeView_isIndexHidden_bool_QTreeView_QModelIndex, Return,
-                "bool", Parameters, new Param(c, "this", "qt.QTreeView"),
-                new Param(c, "index", "qt.QModelIndex"), End),
-            _func[12] = new MemberFunction(
-                c, "keyPressEvent", _n_keyPressEvent0, None, Compiled,
-                qt_QTreeView_keyPressEvent_void_QTreeView_QKeyEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QTreeView"),
-                new Param(c, "event", "qt.QKeyEvent"), End),
-            _func[13] = new MemberFunction(
-                c, "mouseDoubleClickEvent", _n_mouseDoubleClickEvent0, None,
-                Compiled,
-                qt_QTreeView_mouseDoubleClickEvent_void_QTreeView_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTreeView"),
-                new Param(c, "event", "qt.QMouseEvent"), End),
-            _func[14] = new MemberFunction(
-                c, "mouseMoveEvent", _n_mouseMoveEvent0, None, Compiled,
-                qt_QTreeView_mouseMoveEvent_void_QTreeView_QMouseEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QTreeView"),
-                new Param(c, "event", "qt.QMouseEvent"), End),
-            _func[15] = new MemberFunction(
-                c, "mousePressEvent", _n_mousePressEvent0, None, Compiled,
-                qt_QTreeView_mousePressEvent_void_QTreeView_QMouseEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QTreeView"),
-                new Param(c, "event", "qt.QMouseEvent"), End),
-            _func[16] = new MemberFunction(
-                c, "mouseReleaseEvent", _n_mouseReleaseEvent0, None, Compiled,
-                qt_QTreeView_mouseReleaseEvent_void_QTreeView_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTreeView"),
-                new Param(c, "event", "qt.QMouseEvent"), End),
+            new Function(c, "indexRowSizeHint", _n_indexRowSizeHint0, None, Compiled,
+                         qt_QTreeView_indexRowSizeHint_int_QTreeView_QModelIndex, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QTreeView"), new Param(c, "index", "qt.QModelIndex"), End),
+            new Function(c, "rowHeight", _n_rowHeight0, None, Compiled, qt_QTreeView_rowHeight_int_QTreeView_QModelIndex, Return, "int",
+                         Parameters, new Param(c, "this", "qt.QTreeView"), new Param(c, "index", "qt.QModelIndex"), End),
+            _func[8] = new MemberFunction(c, "currentChanged", _n_currentChanged0, None, Compiled,
+                                          qt_QTreeView_currentChanged_void_QTreeView_QModelIndex_QModelIndex, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QTreeView"), new Param(c, "current", "qt.QModelIndex"),
+                                          new Param(c, "previous", "qt.QModelIndex"), End),
+            _func[9] = new MemberFunction(c, "dragMoveEvent", _n_dragMoveEvent0, None, Compiled,
+                                          qt_QTreeView_dragMoveEvent_void_QTreeView_QDragMoveEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QTreeView"), new Param(c, "event", "qt.QDragMoveEvent"), End),
+            _func[10] =
+                new MemberFunction(c, "horizontalOffset", _n_horizontalOffset0, None, Compiled, qt_QTreeView_horizontalOffset_int_QTreeView,
+                                   Return, "int", Parameters, new Param(c, "this", "qt.QTreeView"), End),
+            _func[11] = new MemberFunction(c, "isIndexHidden", _n_isIndexHidden0, None, Compiled,
+                                           qt_QTreeView_isIndexHidden_bool_QTreeView_QModelIndex, Return, "bool", Parameters,
+                                           new Param(c, "this", "qt.QTreeView"), new Param(c, "index", "qt.QModelIndex"), End),
+            _func[12] = new MemberFunction(c, "keyPressEvent", _n_keyPressEvent0, None, Compiled,
+                                           qt_QTreeView_keyPressEvent_void_QTreeView_QKeyEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QTreeView"), new Param(c, "event", "qt.QKeyEvent"), End),
+            _func[13] = new MemberFunction(c, "mouseDoubleClickEvent", _n_mouseDoubleClickEvent0, None, Compiled,
+                                           qt_QTreeView_mouseDoubleClickEvent_void_QTreeView_QMouseEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QTreeView"), new Param(c, "event", "qt.QMouseEvent"), End),
+            _func[14] = new MemberFunction(c, "mouseMoveEvent", _n_mouseMoveEvent0, None, Compiled,
+                                           qt_QTreeView_mouseMoveEvent_void_QTreeView_QMouseEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QTreeView"), new Param(c, "event", "qt.QMouseEvent"), End),
+            _func[15] = new MemberFunction(c, "mousePressEvent", _n_mousePressEvent0, None, Compiled,
+                                           qt_QTreeView_mousePressEvent_void_QTreeView_QMouseEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QTreeView"), new Param(c, "event", "qt.QMouseEvent"), End),
+            _func[16] = new MemberFunction(c, "mouseReleaseEvent", _n_mouseReleaseEvent0, None, Compiled,
+                                           qt_QTreeView_mouseReleaseEvent_void_QTreeView_QMouseEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QTreeView"), new Param(c, "event", "qt.QMouseEvent"), End),
             // MISSING: moveCursor (QModelIndex; QTreeView this, "CursorAction"
             // cursorAction, flags Qt::KeyboardModifiers modifiers) // protected
-            _func[17] = new MemberFunction(
-                c, "paintEvent", _n_paintEvent0, None, Compiled,
-                qt_QTreeView_paintEvent_void_QTreeView_QPaintEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QTreeView"),
-                new Param(c, "event", "qt.QPaintEvent"), End),
-            _func[18] = new MemberFunction(
-                c, "rowsAboutToBeRemoved", _n_rowsAboutToBeRemoved0, None,
-                Compiled,
-                qt_QTreeView_rowsAboutToBeRemoved_void_QTreeView_QModelIndex_int_int,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTreeView"),
-                new Param(c, "parent", "qt.QModelIndex"),
-                new Param(c, "start", "int"), new Param(c, "end", "int"), End),
-            _func[19] = new MemberFunction(
-                c, "rowsInserted", _n_rowsInserted0, None, Compiled,
-                qt_QTreeView_rowsInserted_void_QTreeView_QModelIndex_int_int,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTreeView"),
-                new Param(c, "parent", "qt.QModelIndex"),
-                new Param(c, "start", "int"), new Param(c, "end", "int"), End),
-            _func[20] = new MemberFunction(
-                c, "scrollContentsBy", _n_scrollContentsBy0, None, Compiled,
-                qt_QTreeView_scrollContentsBy_void_QTreeView_int_int, Return,
-                "void", Parameters, new Param(c, "this", "qt.QTreeView"),
-                new Param(c, "dx", "int"), new Param(c, "dy", "int"), End),
-            _func[21] = new MemberFunction(
-                c, "selectedIndexes", _n_selectedIndexes0, None, Compiled,
-                qt_QTreeView_selectedIndexes_qt__QModelIndexBSB_ESB__QTreeView,
-                Return, "qt.QModelIndex[]", Parameters,
-                new Param(c, "this", "qt.QTreeView"), End),
-            _func[22] = new MemberFunction(
-                c, "selectionChanged", _n_selectionChanged0, None, Compiled,
-                qt_QTreeView_selectionChanged_void_QTreeView_QItemSelection_QItemSelection,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTreeView"),
-                new Param(c, "selected", "qt.QItemSelection"),
-                new Param(c, "deselected", "qt.QItemSelection"), End),
+            _func[17] = new MemberFunction(c, "paintEvent", _n_paintEvent0, None, Compiled,
+                                           qt_QTreeView_paintEvent_void_QTreeView_QPaintEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QTreeView"), new Param(c, "event", "qt.QPaintEvent"), End),
+            _func[18] = new MemberFunction(c, "rowsAboutToBeRemoved", _n_rowsAboutToBeRemoved0, None, Compiled,
+                                           qt_QTreeView_rowsAboutToBeRemoved_void_QTreeView_QModelIndex_int_int, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QTreeView"), new Param(c, "parent", "qt.QModelIndex"),
+                                           new Param(c, "start", "int"), new Param(c, "end", "int"), End),
+            _func[19] = new MemberFunction(c, "rowsInserted", _n_rowsInserted0, None, Compiled,
+                                           qt_QTreeView_rowsInserted_void_QTreeView_QModelIndex_int_int, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QTreeView"), new Param(c, "parent", "qt.QModelIndex"),
+                                           new Param(c, "start", "int"), new Param(c, "end", "int"), End),
+            _func[20] = new MemberFunction(c, "scrollContentsBy", _n_scrollContentsBy0, None, Compiled,
+                                           qt_QTreeView_scrollContentsBy_void_QTreeView_int_int, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QTreeView"), new Param(c, "dx", "int"), new Param(c, "dy", "int"), End),
+            _func[21] = new MemberFunction(c, "selectedIndexes", _n_selectedIndexes0, None, Compiled,
+                                           qt_QTreeView_selectedIndexes_qt__QModelIndexBSB_ESB__QTreeView, Return, "qt.QModelIndex[]",
+                                           Parameters, new Param(c, "this", "qt.QTreeView"), End),
+            _func[22] = new MemberFunction(c, "selectionChanged", _n_selectionChanged0, None, Compiled,
+                                           qt_QTreeView_selectionChanged_void_QTreeView_QItemSelection_QItemSelection, Return, "void",
+                                           Parameters, new Param(c, "this", "qt.QTreeView"), new Param(c, "selected", "qt.QItemSelection"),
+                                           new Param(c, "deselected", "qt.QItemSelection"), End),
             _func[23] = new MemberFunction(
-                c, "setSelection", _n_setSelection0, None, Compiled,
-                qt_QTreeView_setSelection_void_QTreeView_QRect_int, Return,
-                "void", Parameters, new Param(c, "this", "qt.QTreeView"),
-                new Param(c, "rect", "qt.QRect"),
-                new Param(c, "command", "int"), End),
-            _func[24] = new MemberFunction(
-                c, "sizeHintForColumn", _n_sizeHintForColumn0, None, Compiled,
-                qt_QTreeView_sizeHintForColumn_int_QTreeView_int, Return, "int",
-                Parameters, new Param(c, "this", "qt.QTreeView"),
-                new Param(c, "column", "int"), End),
-            _func[25] = new MemberFunction(
-                c, "timerEvent", _n_timerEvent0, None, Compiled,
-                qt_QTreeView_timerEvent_void_QTreeView_QTimerEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QTreeView"),
-                new Param(c, "event", "qt.QTimerEvent"), End),
-            _func[26] = new MemberFunction(
-                c, "updateGeometries", _n_updateGeometries0, None, Compiled,
-                qt_QTreeView_updateGeometries_void_QTreeView, Return, "void",
-                Parameters, new Param(c, "this", "qt.QTreeView"), End),
-            _func[27] = new MemberFunction(
-                c, "verticalOffset", _n_verticalOffset0, None, Compiled,
-                qt_QTreeView_verticalOffset_int_QTreeView, Return, "int",
-                Parameters, new Param(c, "this", "qt.QTreeView"), End),
-            _func[28] = new MemberFunction(
-                c, "viewportEvent", _n_viewportEvent0, None, Compiled,
-                qt_QTreeView_viewportEvent_bool_QTreeView_QEvent, Return,
-                "bool", Parameters, new Param(c, "this", "qt.QTreeView"),
-                new Param(c, "event", "qt.QEvent"), End),
-            _func[29] = new MemberFunction(
-                c, "viewportSizeHint", _n_viewportSizeHint0, None, Compiled,
-                qt_QTreeView_viewportSizeHint_QSize_QTreeView, Return,
-                "qt.QSize", Parameters, new Param(c, "this", "qt.QTreeView"),
-                End),
-            _func[30] = new MemberFunction(
-                c, "visualRegionForSelection", _n_visualRegionForSelection0,
-                None, Compiled,
-                qt_QTreeView_visualRegionForSelection_QRegion_QTreeView_QItemSelection,
-                Return, "qt.QRegion", Parameters,
-                new Param(c, "this", "qt.QTreeView"),
-                new Param(c, "selection", "qt.QItemSelection"), End),
-            _func[31] = new MemberFunction(
-                c, "sizeHintForRow", _n_sizeHintForRow0, None, Compiled,
-                qt_QTreeView_sizeHintForRow_int_QTreeView_int, Return, "int",
-                Parameters, new Param(c, "this", "qt.QTreeView"),
-                new Param(c, "row", "int"), End),
-            _func[32] = new MemberFunction(
-                c, "inputMethodQuery", _n_inputMethodQuery0, None, Compiled,
-                qt_QTreeView_inputMethodQuery_QVariant_QTreeView_int, Return,
-                "qt.QVariant", Parameters, new Param(c, "this", "qt.QTreeView"),
-                new Param(c, "query", "int"), End),
-            _func[33] = new MemberFunction(
-                c, "edit", _n_edit0, None,
-                Compiled,
-                qt_QTreeView_edit_bool_QTreeView_QModelIndex_int_QEvent, Return,
-                "bool", Parameters, new Param(c, "this", "qt.QTreeView"),
-                new Param(c, "index", "qt.QModelIndex"),
-                new Param(c, "trigger", "int"),
-                new Param(c, "event", "qt.QEvent"), End),
-            _func[34] = new MemberFunction(
-                c, "selectionCommand", _n_selectionCommand0, None, Compiled,
-                qt_QTreeView_selectionCommand_int_QTreeView_QModelIndex_QEvent,
-                Return, "int", Parameters, new Param(c, "this", "qt.QTreeView"),
-                new Param(c, "index", "qt.QModelIndex"),
-                new Param(c, "event", "qt.QEvent"), End),
-            _func[35] = new MemberFunction(
-                c, "startDrag", _n_startDrag0, None, Compiled,
-                qt_QTreeView_startDrag_void_QTreeView_int, Return, "void",
-                Parameters, new Param(c, "this", "qt.QTreeView"),
-                new Param(c, "supportedActions", "int"), End),
+                c, "setSelection", _n_setSelection0, None, Compiled, qt_QTreeView_setSelection_void_QTreeView_QRect_int, Return, "void",
+                Parameters, new Param(c, "this", "qt.QTreeView"), new Param(c, "rect", "qt.QRect"), new Param(c, "command", "int"), End),
+            _func[24] = new MemberFunction(c, "sizeHintForColumn", _n_sizeHintForColumn0, None, Compiled,
+                                           qt_QTreeView_sizeHintForColumn_int_QTreeView_int, Return, "int", Parameters,
+                                           new Param(c, "this", "qt.QTreeView"), new Param(c, "column", "int"), End),
+            _func[25] = new MemberFunction(c, "timerEvent", _n_timerEvent0, None, Compiled,
+                                           qt_QTreeView_timerEvent_void_QTreeView_QTimerEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QTreeView"), new Param(c, "event", "qt.QTimerEvent"), End),
+            _func[26] = new MemberFunction(c, "updateGeometries", _n_updateGeometries0, None, Compiled,
+                                           qt_QTreeView_updateGeometries_void_QTreeView, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QTreeView"), End),
+            _func[27] =
+                new MemberFunction(c, "verticalOffset", _n_verticalOffset0, None, Compiled, qt_QTreeView_verticalOffset_int_QTreeView,
+                                   Return, "int", Parameters, new Param(c, "this", "qt.QTreeView"), End),
+            _func[28] = new MemberFunction(c, "viewportEvent", _n_viewportEvent0, None, Compiled,
+                                           qt_QTreeView_viewportEvent_bool_QTreeView_QEvent, Return, "bool", Parameters,
+                                           new Param(c, "this", "qt.QTreeView"), new Param(c, "event", "qt.QEvent"), End),
+            _func[29] = new MemberFunction(c, "viewportSizeHint", _n_viewportSizeHint0, None, Compiled,
+                                           qt_QTreeView_viewportSizeHint_QSize_QTreeView, Return, "qt.QSize", Parameters,
+                                           new Param(c, "this", "qt.QTreeView"), End),
+            _func[30] =
+                new MemberFunction(c, "visualRegionForSelection", _n_visualRegionForSelection0, None, Compiled,
+                                   qt_QTreeView_visualRegionForSelection_QRegion_QTreeView_QItemSelection, Return, "qt.QRegion", Parameters,
+                                   new Param(c, "this", "qt.QTreeView"), new Param(c, "selection", "qt.QItemSelection"), End),
+            _func[31] =
+                new MemberFunction(c, "sizeHintForRow", _n_sizeHintForRow0, None, Compiled, qt_QTreeView_sizeHintForRow_int_QTreeView_int,
+                                   Return, "int", Parameters, new Param(c, "this", "qt.QTreeView"), new Param(c, "row", "int"), End),
+            _func[32] = new MemberFunction(c, "inputMethodQuery", _n_inputMethodQuery0, None, Compiled,
+                                           qt_QTreeView_inputMethodQuery_QVariant_QTreeView_int, Return, "qt.QVariant", Parameters,
+                                           new Param(c, "this", "qt.QTreeView"), new Param(c, "query", "int"), End),
+            _func[33] =
+                new MemberFunction(c, "edit", _n_edit0, None, Compiled, qt_QTreeView_edit_bool_QTreeView_QModelIndex_int_QEvent, Return,
+                                   "bool", Parameters, new Param(c, "this", "qt.QTreeView"), new Param(c, "index", "qt.QModelIndex"),
+                                   new Param(c, "trigger", "int"), new Param(c, "event", "qt.QEvent"), End),
+            _func[34] = new MemberFunction(c, "selectionCommand", _n_selectionCommand0, None, Compiled,
+                                           qt_QTreeView_selectionCommand_int_QTreeView_QModelIndex_QEvent, Return, "int", Parameters,
+                                           new Param(c, "this", "qt.QTreeView"), new Param(c, "index", "qt.QModelIndex"),
+                                           new Param(c, "event", "qt.QEvent"), End),
+            _func[35] =
+                new MemberFunction(c, "startDrag", _n_startDrag0, None, Compiled, qt_QTreeView_startDrag_void_QTreeView_int, Return, "void",
+                                   Parameters, new Param(c, "this", "qt.QTreeView"), new Param(c, "supportedActions", "int"), End),
             // MISSING: viewOptions ("QStyleOptionViewItem"; QTreeView this) //
             // protected
-            _func[36] = new MemberFunction(
-                c, "dragEnterEvent", _n_dragEnterEvent0, None, Compiled,
-                qt_QTreeView_dragEnterEvent_void_QTreeView_QDragEnterEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTreeView"),
-                new Param(c, "event", "qt.QDragEnterEvent"), End),
-            _func[37] = new MemberFunction(
-                c, "dragLeaveEvent", _n_dragLeaveEvent0, None, Compiled,
-                qt_QTreeView_dragLeaveEvent_void_QTreeView_QDragLeaveEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QTreeView"),
-                new Param(c, "event", "qt.QDragLeaveEvent"), End),
-            _func[38] = new MemberFunction(
-                c, "dropEvent", _n_dropEvent0, None, Compiled,
-                qt_QTreeView_dropEvent_void_QTreeView_QDropEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QTreeView"),
-                new Param(c, "event", "qt.QDropEvent"), End),
-            _func[39] = new MemberFunction(
-                c, "event", _n_event0, None, Compiled,
-                qt_QTreeView_event_bool_QTreeView_QEvent, Return, "bool",
-                Parameters, new Param(c, "this", "qt.QTreeView"),
-                new Param(c, "event_", "qt.QEvent"), End),
-            _func[40] = new MemberFunction(
-                c, "focusInEvent", _n_focusInEvent0, None, Compiled,
-                qt_QTreeView_focusInEvent_void_QTreeView_QFocusEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QTreeView"),
-                new Param(c, "event", "qt.QFocusEvent"), End),
-            _func[41] = new MemberFunction(
-                c, "focusNextPrevChild", _n_focusNextPrevChild0, None, Compiled,
-                qt_QTreeView_focusNextPrevChild_bool_QTreeView_bool, Return,
-                "bool", Parameters, new Param(c, "this", "qt.QTreeView"),
-                new Param(c, "next", "bool"), End),
-            _func[42] = new MemberFunction(
-                c, "focusOutEvent", _n_focusOutEvent0, None, Compiled,
-                qt_QTreeView_focusOutEvent_void_QTreeView_QFocusEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QTreeView"),
-                new Param(c, "event", "qt.QFocusEvent"), End),
+            _func[36] = new MemberFunction(c, "dragEnterEvent", _n_dragEnterEvent0, None, Compiled,
+                                           qt_QTreeView_dragEnterEvent_void_QTreeView_QDragEnterEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QTreeView"), new Param(c, "event", "qt.QDragEnterEvent"), End),
+            _func[37] = new MemberFunction(c, "dragLeaveEvent", _n_dragLeaveEvent0, None, Compiled,
+                                           qt_QTreeView_dragLeaveEvent_void_QTreeView_QDragLeaveEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QTreeView"), new Param(c, "event", "qt.QDragLeaveEvent"), End),
+            _func[38] =
+                new MemberFunction(c, "dropEvent", _n_dropEvent0, None, Compiled, qt_QTreeView_dropEvent_void_QTreeView_QDropEvent, Return,
+                                   "void", Parameters, new Param(c, "this", "qt.QTreeView"), new Param(c, "event", "qt.QDropEvent"), End),
+            _func[39] = new MemberFunction(c, "event", _n_event0, None, Compiled, qt_QTreeView_event_bool_QTreeView_QEvent, Return, "bool",
+                                           Parameters, new Param(c, "this", "qt.QTreeView"), new Param(c, "event_", "qt.QEvent"), End),
+            _func[40] = new MemberFunction(c, "focusInEvent", _n_focusInEvent0, None, Compiled,
+                                           qt_QTreeView_focusInEvent_void_QTreeView_QFocusEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QTreeView"), new Param(c, "event", "qt.QFocusEvent"), End),
+            _func[41] = new MemberFunction(c, "focusNextPrevChild", _n_focusNextPrevChild0, None, Compiled,
+                                           qt_QTreeView_focusNextPrevChild_bool_QTreeView_bool, Return, "bool", Parameters,
+                                           new Param(c, "this", "qt.QTreeView"), new Param(c, "next", "bool"), End),
+            _func[42] = new MemberFunction(c, "focusOutEvent", _n_focusOutEvent0, None, Compiled,
+                                           qt_QTreeView_focusOutEvent_void_QTreeView_QFocusEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QTreeView"), new Param(c, "event", "qt.QFocusEvent"), End),
             // MISSING: inputMethodEvent (void; QTreeView this,
             // "QInputMethodEvent *" event) // protected
-            _func[43] = new MemberFunction(
-                c, "resizeEvent", _n_resizeEvent0, None, Compiled,
-                qt_QTreeView_resizeEvent_void_QTreeView_QResizeEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QTreeView"),
-                new Param(c, "event", "qt.QResizeEvent"), End),
+            _func[43] = new MemberFunction(c, "resizeEvent", _n_resizeEvent0, None, Compiled,
+                                           qt_QTreeView_resizeEvent_void_QTreeView_QResizeEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QTreeView"), new Param(c, "event", "qt.QResizeEvent"), End),
             // static functions
             EndArguments);
         globalScope()->addSymbols(EndArguments);

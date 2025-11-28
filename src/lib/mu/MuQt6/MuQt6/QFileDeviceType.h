@@ -42,8 +42,7 @@ namespace Mu
         //  Constructors
         //
 
-        QFileDeviceType(Context* context, const char* name,
-                        Class* superClass = 0, Class* superClass2 = 0);
+        QFileDeviceType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QFileDeviceType();
 
@@ -90,10 +89,7 @@ namespace Mu
     public:
         qint64 skipData_pub(qint64 maxSize) { return skipData(maxSize); }
 
-        qint64 skipData_pub_parent(qint64 maxSize)
-        {
-            return QFileDevice::skipData(maxSize);
-        }
+        qint64 skipData_pub_parent(qint64 maxSize) { return QFileDevice::skipData(maxSize); }
 
     public:
         const QFileDeviceType* _baseType;
@@ -101,11 +97,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance*
-    QFileDeviceType::cachedInstance(const QFileDeviceType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QFileDeviceType::cachedInstance(const QFileDeviceType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

@@ -42,8 +42,7 @@ namespace Mu
         //  Constructors
         //
 
-        QActionType(Context* context, const char* name, Class* superClass = 0,
-                    Class* superClass2 = 0);
+        QActionType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QActionType();
 
@@ -67,10 +66,8 @@ namespace Mu
     public:
         virtual ~MuQt_QAction();
         MuQt_QAction(Pointer muobj, const CallEnvironment*, QObject* parent);
-        MuQt_QAction(Pointer muobj, const CallEnvironment*, const QString& text,
-                     QObject* parent);
-        MuQt_QAction(Pointer muobj, const CallEnvironment*, const QIcon& icon,
-                     const QString& text, QObject* parent);
+        MuQt_QAction(Pointer muobj, const CallEnvironment*, const QString& text, QObject* parent);
+        MuQt_QAction(Pointer muobj, const CallEnvironment*, const QIcon& icon, const QString& text, QObject* parent);
 
     protected:
         virtual bool event(QEvent* e);
@@ -89,17 +86,11 @@ namespace Mu
 
         void customEvent_pub(QEvent* event) { customEvent(event); }
 
-        void customEvent_pub_parent(QEvent* event)
-        {
-            QAction::customEvent(event);
-        }
+        void customEvent_pub_parent(QEvent* event) { QAction::customEvent(event); }
 
         void timerEvent_pub(QTimerEvent* event) { timerEvent(event); }
 
-        void timerEvent_pub_parent(QTimerEvent* event)
-        {
-            QAction::timerEvent(event);
-        }
+        void timerEvent_pub_parent(QTimerEvent* event) { QAction::timerEvent(event); }
 
     public:
         const QActionType* _baseType;
@@ -107,11 +98,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance*
-    QActionType::cachedInstance(const QActionType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QActionType::cachedInstance(const QActionType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

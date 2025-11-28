@@ -13,15 +13,9 @@ namespace TwkApp
 
     SelectionState::SelectionState() {}
 
-    SelectionState::~SelectionState()
-    {
-        stl_ext::delete_contents(m_selections);
-    }
+    SelectionState::~SelectionState() { stl_ext::delete_contents(m_selections); }
 
-    SelectionState::SelectionState(const SelectionState& state)
-    {
-        (*this) = state;
-    }
+    SelectionState::SelectionState(const SelectionState& state) { (*this) = state; }
 
     SelectionState& SelectionState::operator=(const SelectionState& state)
     {
@@ -36,8 +30,7 @@ namespace TwkApp
         return *this;
     }
 
-    Selection* SelectionState::selection(const std::string& name,
-                                         bool createIfNotThere)
+    Selection* SelectionState::selection(const std::string& name, bool createIfNotThere)
     {
         for (int i = 0; i < m_selections.size(); i++)
         {
@@ -59,8 +52,7 @@ namespace TwkApp
         return 0;
     }
 
-    Selection* SelectionState::selection(const SelectionType* t,
-                                         bool createIfNotThere)
+    Selection* SelectionState::selection(const SelectionType* t, bool createIfNotThere)
     {
         for (int i = 0; i < m_selections.size(); i++)
         {
@@ -79,10 +71,7 @@ namespace TwkApp
         return 0;
     }
 
-    const Selection* SelectionState::selection(const std::string& name) const
-    {
-        return const_cast<SelectionState*>(this)->selection(name);
-    }
+    const Selection* SelectionState::selection(const std::string& name) const { return const_cast<SelectionState*>(this)->selection(name); }
 
     void SelectionState::set(Selection* sel)
     {

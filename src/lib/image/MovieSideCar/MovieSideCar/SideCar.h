@@ -48,10 +48,8 @@ namespace TwkMovie
         //  Types
         //
 
-        typedef boost::interprocess::offset_ptr<void, int32_t, uint64_t>
-            interop_offset_ptr;
-        typedef boost::interprocess::message_queue_t<interop_offset_ptr>
-            interop_message_queue;
+        typedef boost::interprocess::offset_ptr<void, int32_t, uint64_t> interop_offset_ptr;
+        typedef boost::interprocess::message_queue_t<interop_offset_ptr> interop_message_queue;
         typedef interop_message_queue Queue;
         typedef boost::interprocess::shared_memory_object SharedMemory;
         typedef boost::interprocess::mapped_region MappedRegion;
@@ -63,9 +61,7 @@ namespace TwkMovie
         //  Constructors
         //
 
-        SideCar(const std::string& commandQueueName,
-                const std::string& responseQueueName, size_t launchPID,
-                MovieIO*);
+        SideCar(const std::string& commandQueueName, const std::string& responseQueueName, size_t launchPID, MovieIO*);
 
         ~SideCar();
 

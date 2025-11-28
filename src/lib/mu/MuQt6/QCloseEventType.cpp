@@ -51,9 +51,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    Pointer
-    qt_QCloseEvent_QCloseEvent_QCloseEvent_QCloseEvent(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this)
+    Pointer qt_QCloseEvent_QCloseEvent_QCloseEvent_QCloseEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         setqpointer<QCloseEventType>(param_this, new QCloseEvent());
@@ -62,8 +60,7 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(_n_QCloseEvent0, Pointer)
     {
-        NODE_RETURN(qt_QCloseEvent_QCloseEvent_QCloseEvent_QCloseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QCloseEvent_QCloseEvent_QCloseEvent_QCloseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     void QCloseEventType::load()
@@ -83,13 +80,11 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
                    new MemberVariable(c, "native", "qt.NativeObject"),
 
@@ -100,10 +95,8 @@ namespace Mu
         addSymbols(
             // enums
             // member functions
-            new Function(c, "QCloseEvent", _n_QCloseEvent0, None, Compiled,
-                         qt_QCloseEvent_QCloseEvent_QCloseEvent_QCloseEvent,
-                         Return, "qt.QCloseEvent", Parameters,
-                         new Param(c, "this", "qt.QCloseEvent"), End),
+            new Function(c, "QCloseEvent", _n_QCloseEvent0, None, Compiled, qt_QCloseEvent_QCloseEvent_QCloseEvent_QCloseEvent, Return,
+                         "qt.QCloseEvent", Parameters, new Param(c, "this", "qt.QCloseEvent"), End),
             // static functions
             EndArguments);
         globalScope()->addSymbols(EndArguments);

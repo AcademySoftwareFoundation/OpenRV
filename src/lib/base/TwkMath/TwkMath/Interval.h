@@ -193,10 +193,7 @@ namespace TwkMath
     //******************************************************************************
     // TEMPLATE AND INLINE FUNCTIONS
     //******************************************************************************
-    template <typename T> inline bool Interval<T>::isInfinite() const
-    {
-        return (bool)(min == Math<T>::min() && max == Math<T>::max());
-    }
+    template <typename T> inline bool Interval<T>::isInfinite() const { return (bool)(min == Math<T>::min() && max == Math<T>::max()); }
 
     //******************************************************************************
     template <typename T> inline void Interval<T>::makeInfinite()
@@ -206,10 +203,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <typename T> inline bool Interval<T>::isValid() const
-    {
-        return (bool)(min <= max);
-    }
+    template <typename T> inline bool Interval<T>::isValid() const { return (bool)(min <= max); }
 
     //******************************************************************************
     template <typename T> T Interval<T>::size() const
@@ -283,8 +277,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <typename T>
-    Interval<T>& Interval<T>::operator+=(const Interval<T>& ivl)
+    template <typename T> Interval<T>& Interval<T>::operator+=(const Interval<T>& ivl)
     {
         assert(isValid() && ivl.isValid());
 
@@ -317,8 +310,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <typename T>
-    Interval<T>& Interval<T>::operator-=(const Interval<T>& ivl)
+    template <typename T> Interval<T>& Interval<T>::operator-=(const Interval<T>& ivl)
     {
         assert(isValid() && ivl.isValid());
 
@@ -362,8 +354,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <typename T>
-    Interval<T>& Interval<T>::operator*=(const Interval<T>& ivl)
+    template <typename T> Interval<T>& Interval<T>::operator*=(const Interval<T>& ivl)
     {
         assert(isValid() && ivl.isValid());
 
@@ -415,8 +406,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <typename T>
-    Interval<T>& Interval<T>::operator/=(const Interval<T>& ivl)
+    template <typename T> Interval<T>& Interval<T>::operator/=(const Interval<T>& ivl)
     {
         assert(isValid() && ivl.isValid());
 
@@ -443,47 +433,25 @@ namespace TwkMath
     // FUNCTIONS WHICH OPERATE ON INTERVALS
     //******************************************************************************
     //******************************************************************************
-    template <typename T> inline T size(const Interval<T>& r)
-    {
-        return r.size();
-    }
+    template <typename T> inline T size(const Interval<T>& r) { return r.size(); }
 
     //******************************************************************************
-    template <typename T> inline T center(const Interval<T>& r)
-    {
-        return r.center();
-    }
+    template <typename T> inline T center(const Interval<T>& r) { return r.center(); }
 
     //******************************************************************************
-    template <typename T> inline bool isInfinite(const Interval<T>& r)
-    {
-        return r.isInfinite();
-    }
+    template <typename T> inline bool isInfinite(const Interval<T>& r) { return r.isInfinite(); }
 
     //******************************************************************************
-    template <typename T> inline void makeInfinite(Interval<T>& r)
-    {
-        r.makeInfinite();
-    }
+    template <typename T> inline void makeInfinite(Interval<T>& r) { r.makeInfinite(); }
 
     //******************************************************************************
-    template <typename T> inline bool isValid(const Interval<T>& r)
-    {
-        return r.isValid();
-    }
+    template <typename T> inline bool isValid(const Interval<T>& r) { return r.isValid(); }
 
     //******************************************************************************
-    template <typename T> inline void makeValid(Interval<T>& r)
-    {
-        r.makeValid();
-    }
+    template <typename T> inline void makeValid(Interval<T>& r) { r.makeValid(); }
 
     //******************************************************************************
-    template <typename T>
-    inline bool intersects(const Interval<T>& r, const T& v)
-    {
-        return r.intersects(v);
-    }
+    template <typename T> inline bool intersects(const Interval<T>& r, const T& v) { return r.intersects(v); }
 
     //******************************************************************************
     //******************************************************************************
@@ -492,8 +460,7 @@ namespace TwkMath
     //******************************************************************************
     // ADDITION
     //******************************************************************************
-    template <typename T>
-    Interval<T> operator+(const T& a, const Interval<T>& b)
+    template <typename T> Interval<T> operator+(const T& a, const Interval<T>& b)
     {
         assert(b.isValid());
 
@@ -508,8 +475,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <typename T>
-    Interval<T> operator+(const Interval<T>& a, const T& b)
+    template <typename T> Interval<T> operator+(const Interval<T>& a, const T& b)
     {
         assert(a.isValid());
 
@@ -524,8 +490,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <typename T>
-    Interval<T> operator+(const Interval<T>& a, const Interval<T>& b)
+    template <typename T> Interval<T> operator+(const Interval<T>& a, const Interval<T>& b)
     {
         assert(a.isValid() && b.isValid());
 
@@ -563,8 +528,7 @@ namespace TwkMath
     //******************************************************************************
     // SUBTRACTION
     //******************************************************************************
-    template <typename T>
-    Interval<T> operator-(const T& a, const Interval<T>& b)
+    template <typename T> Interval<T> operator-(const T& a, const Interval<T>& b)
     {
         assert(b.isValid());
 
@@ -579,8 +543,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <typename T>
-    Interval<T> operator-(const Interval<T>& a, const T& b)
+    template <typename T> Interval<T> operator-(const Interval<T>& a, const T& b)
     {
         assert(a.isValid());
 
@@ -595,8 +558,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <typename T>
-    Interval<T> operator-(const Interval<T>& a, const Interval<T>& b)
+    template <typename T> Interval<T> operator-(const Interval<T>& a, const Interval<T>& b)
     {
         assert(a.isValid() && b.isValid());
 
@@ -617,8 +579,7 @@ namespace TwkMath
     //******************************************************************************
     // MULTIPLICATION
     //******************************************************************************
-    template <typename T>
-    Interval<T> operator*(const T& a, const Interval<T>& b)
+    template <typename T> Interval<T> operator*(const T& a, const Interval<T>& b)
     {
         assert(b.isValid());
 
@@ -635,8 +596,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <typename T>
-    Interval<T> operator*(const Interval<T>& a, const T& b)
+    template <typename T> Interval<T> operator*(const Interval<T>& a, const T& b)
     {
         assert(a.isValid());
 
@@ -653,8 +613,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <typename T>
-    Interval<T> operator*(const Interval<T>& a, const Interval<T>& b)
+    template <typename T> Interval<T> operator*(const Interval<T>& a, const Interval<T>& b)
     {
         assert(a.isValid() && b.isValid());
 
@@ -673,16 +632,14 @@ namespace TwkMath
             const T bc = a.max * b.min;
             const T bd = a.max * b.max;
 
-            return Interval<T>(std::min(std::min(ac, ad), std::min(bc, bd)),
-                               std::max(std::max(ac, ad), std::max(bc, bd)));
+            return Interval<T>(std::min(std::min(ac, ad), std::min(bc, bd)), std::max(std::max(ac, ad), std::max(bc, bd)));
         }
     }
 
     //******************************************************************************
     // DIVISION
     //******************************************************************************
-    template <typename T>
-    Interval<T> operator/(const T& a, const Interval<T>& b)
+    template <typename T> Interval<T> operator/(const T& a, const Interval<T>& b)
     {
         assert(b.isValid());
 
@@ -701,8 +658,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <typename T>
-    Interval<T> operator/(const Interval<T>& a, const T& b)
+    template <typename T> Interval<T> operator/(const Interval<T>& a, const T& b)
     {
         assert(a.isValid());
 
@@ -725,8 +681,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <typename T>
-    Interval<T> operator/(const Interval<T>& a, const Interval<T>& b)
+    template <typename T> Interval<T> operator/(const Interval<T>& a, const Interval<T>& b)
     {
         assert(a.isValid() && b.isValid());
 
@@ -746,8 +701,7 @@ namespace TwkMath
             const T ad = a.min / b.max;
             const T bc = a.max / b.min;
             const T bd = a.max / b.max;
-            return Interval<T>(std::min(std::min(ac, ad), std::min(bc, bd)),
-                               std::max(std::max(ac, ad), std::max(bc, bd)));
+            return Interval<T>(std::min(std::min(ac, ad), std::min(bc, bd)), std::max(std::max(ac, ad), std::max(bc, bd)));
         }
     }
 
@@ -758,8 +712,7 @@ namespace TwkMath
     //******************************************************************************
     // EQUALS
     //******************************************************************************
-    template <typename T>
-    BooleanInterval operator==(const T& a, const Interval<T>& b)
+    template <typename T> BooleanInterval operator==(const T& a, const Interval<T>& b)
     {
         assert(b.isValid());
 
@@ -778,8 +731,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <typename T>
-    BooleanInterval operator==(const Interval<T>& a, const T& b)
+    template <typename T> BooleanInterval operator==(const Interval<T>& a, const T& b)
     {
         assert(a.isValid());
 
@@ -798,8 +750,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <typename T>
-    BooleanInterval operator==(const Interval<T>& a, const Interval<T>& b)
+    template <typename T> BooleanInterval operator==(const Interval<T>& a, const Interval<T>& b)
     {
         assert(a.isValid() && b.isValid());
 
@@ -820,10 +771,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    inline bool same(BooleanInterval a, BooleanInterval b)
-    {
-        return ((int)a) == ((int)b);
-    }
+    inline bool same(BooleanInterval a, BooleanInterval b) { return ((int)a) == ((int)b); }
 
     //******************************************************************************
     BooleanInterval operator==(BooleanInterval a, BooleanInterval b);
@@ -831,8 +779,7 @@ namespace TwkMath
     //******************************************************************************
     // NOT EQUALS
     //******************************************************************************
-    template <typename T>
-    BooleanInterval operator!=(const T& a, const Interval<T>& b)
+    template <typename T> BooleanInterval operator!=(const T& a, const Interval<T>& b)
     {
         assert(b.isValid());
 
@@ -851,8 +798,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <typename T>
-    BooleanInterval operator!=(const Interval<T>& a, const T& b)
+    template <typename T> BooleanInterval operator!=(const Interval<T>& a, const T& b)
     {
         assert(a.isValid());
 
@@ -871,8 +817,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <typename T>
-    BooleanInterval operator!=(const Interval<T>& a, const Interval<T>& b)
+    template <typename T> BooleanInterval operator!=(const Interval<T>& a, const Interval<T>& b)
     {
         assert(a.isValid() && b.isValid());
 
@@ -898,8 +843,7 @@ namespace TwkMath
     //******************************************************************************
     // LESS THAN
     //******************************************************************************
-    template <typename T>
-    BooleanInterval operator<(const T& a, const Interval<T>& b)
+    template <typename T> BooleanInterval operator<(const T& a, const Interval<T>& b)
     {
         assert(b.isValid());
 
@@ -918,8 +862,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <typename T>
-    BooleanInterval operator<(const Interval<T>& a, const T& b)
+    template <typename T> BooleanInterval operator<(const Interval<T>& a, const T& b)
     {
         assert(a.isValid());
 
@@ -938,8 +881,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <typename T>
-    BooleanInterval operator<(const Interval<T>& a, const Interval<T>& b)
+    template <typename T> BooleanInterval operator<(const Interval<T>& a, const Interval<T>& b)
     {
         assert(a.isValid() && b.isValid());
 
@@ -960,8 +902,7 @@ namespace TwkMath
     //******************************************************************************
     // LESS THAN OR EQUALS
     //******************************************************************************
-    template <typename T>
-    BooleanInterval operator<=(const T& a, const Interval<T>& b)
+    template <typename T> BooleanInterval operator<=(const T& a, const Interval<T>& b)
     {
         assert(b.isValid());
 
@@ -980,8 +921,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <typename T>
-    BooleanInterval operator<=(const Interval<T>& a, const T& b)
+    template <typename T> BooleanInterval operator<=(const Interval<T>& a, const T& b)
     {
         assert(a.isValid());
 
@@ -1000,8 +940,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <typename T>
-    BooleanInterval operator<=(const Interval<T>& a, const Interval<T>& b)
+    template <typename T> BooleanInterval operator<=(const Interval<T>& a, const Interval<T>& b)
     {
         assert(a.isValid() && b.isValid());
 
@@ -1022,8 +961,7 @@ namespace TwkMath
     //******************************************************************************
     // GREATER THAN
     //******************************************************************************
-    template <typename T>
-    BooleanInterval operator>(const T& a, const Interval<T>& b)
+    template <typename T> BooleanInterval operator>(const T& a, const Interval<T>& b)
     {
         assert(b.isValid());
 
@@ -1042,8 +980,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <typename T>
-    BooleanInterval operator>(const Interval<T>& a, const T& b)
+    template <typename T> BooleanInterval operator>(const Interval<T>& a, const T& b)
     {
         assert(a.isValid());
 
@@ -1062,8 +999,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <typename T>
-    BooleanInterval operator>(const Interval<T>& a, const Interval<T>& b)
+    template <typename T> BooleanInterval operator>(const Interval<T>& a, const Interval<T>& b)
     {
         assert(a.isValid() && b.isValid());
 
@@ -1084,8 +1020,7 @@ namespace TwkMath
     //******************************************************************************
     // GREATER THAN OR EQUALS
     //******************************************************************************
-    template <typename T>
-    BooleanInterval operator>=(const T& a, const Interval<T>& b)
+    template <typename T> BooleanInterval operator>=(const T& a, const Interval<T>& b)
     {
         assert(b.isValid());
 
@@ -1104,8 +1039,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <typename T>
-    BooleanInterval operator>=(const Interval<T>& a, const T& b)
+    template <typename T> BooleanInterval operator>=(const Interval<T>& a, const T& b)
     {
         assert(a.isValid());
 
@@ -1124,8 +1058,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <typename T>
-    BooleanInterval operator>=(const Interval<T>& a, const Interval<T>& b)
+    template <typename T> BooleanInterval operator>=(const Interval<T>& a, const Interval<T>& b)
     {
         assert(a.isValid() && b.isValid());
 

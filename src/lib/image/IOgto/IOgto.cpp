@@ -41,8 +41,7 @@ namespace TwkFB
         //
 
         StringPairVector codecs;
-        codecs.push_back(
-            StringPair("text", "Text (no compression, huge file)"));
+        codecs.push_back(StringPair("text", "Text (no compression, huge file)"));
         codecs.push_back(StringPair("raw", "Raw (no compression)"));
         codecs.push_back(StringPair("zip", "ZIP compression"));
 
@@ -86,12 +85,9 @@ namespace TwkFB
                     {
                         const ImageReader::Plane& plane = image.planes[0];
 
-                        fbi.numChannels = image.planes.size() > 1
-                                              ? image.planes.size()
-                                              : plane.channels.size();
+                        fbi.numChannels = image.planes.size() > 1 ? image.planes.size() : plane.channels.size();
                         fbi.dataType = (FrameBuffer::DataType)plane.dataType;
-                        fbi.orientation =
-                            (FrameBuffer::Orientation)plane.orientation;
+                        fbi.orientation = (FrameBuffer::Orientation)plane.orientation;
                     }
 
                     image.fb->copyAttributesTo(&fbi.proxy);
@@ -103,29 +99,21 @@ namespace TwkFB
         }
     }
 
-    void IOgto::readImages(FrameBufferVector& fbs, const string& filename,
-                           const ReadRequest& request) const
+    void IOgto::readImages(FrameBufferVector& fbs, const string& filename, const ReadRequest& request) const
     {
-        FileStream::Type ftype = m_iotype == StandardIO
-                                     ? FileStream::Buffering
-                                     : (FileStream::Type)(m_iotype - 1);
+        FileStream::Type ftype = m_iotype == StandardIO ? FileStream::Buffering : (FileStream::Type)(m_iotype - 1);
 
         FileStream fstream(filename, ftype, m_iosize, m_iomaxAsync);
 
-        readImageInMemory(fbs, fstream.data(), fstream.size(), filename,
-                          request);
+        readImageInMemory(fbs, fstream.data(), fstream.size(), filename, request);
     }
 
-    void IOgto::readImageStream(FrameBufferVector& fbs, istream& instream,
-                                const string& filename,
-                                const ReadRequest& request) const
+    void IOgto::readImageStream(FrameBufferVector& fbs, istream& instream, const string& filename, const ReadRequest& request) const
     {
         ImageReader reader(fbs, instream, filename);
     }
 
-    void IOgto::readImageInMemory(FrameBufferVector& fbs, void* data,
-                                  size_t size, const string& filename,
-                                  const ReadRequest& request) const
+    void IOgto::readImageInMemory(FrameBufferVector& fbs, void* data, size_t size, const string& filename, const ReadRequest& request) const
     {
         ImageReader reader(fbs, data, size, filename);
     }
@@ -135,9 +123,7 @@ namespace TwkFB
     //  WRITING
     //
 
-    void IOgto::writeImages(const ConstFrameBufferVector& imgs,
-                            const std::string& filename,
-                            const WriteRequest& request) const
+    void IOgto::writeImages(const ConstFrameBufferVector& imgs, const std::string& filename, const WriteRequest& request) const
     {
         ofstream file(UNICODE_C_STR(filename.c_str()));
 
@@ -147,14 +133,11 @@ namespace TwkFB
         }
         else
         {
-            TWK_THROW_STREAM(IOException,
-                             "cannot open \"" << filename << "\" for writing");
+            TWK_THROW_STREAM(IOException, "cannot open \"" << filename << "\" for writing");
         }
     }
 
-    void IOgto::writeImageStream(const ConstFrameBufferVector& fbs,
-                                 ostream& outstream,
-                                 const WriteRequest& request) const
+    void IOgto::writeImageStream(const ConstFrameBufferVector& fbs, ostream& outstream, const WriteRequest& request) const
     {
         Gto::Writer writer(outstream);
         vector<WriteState> states(fbs.size());
@@ -203,8 +186,7 @@ namespace TwkFB
         writer.endData();
     }
 
-    void IOgto::declareOneImageStream(Gto::Writer& writer, WriteState& state,
-                                      const WriteRequest& request) const
+    void IOgto::declareOneImageStream(Gto::Writer& writer, WriteState& state, const WriteRequest& request) const
     {
         //
         //  The way GTO write works, you have to declare everything up
@@ -243,30 +225,25 @@ namespace TwkFB
 
             const FBAttribute* a = attrs[i];
 
-            if (const FloatAttribute* ta =
-                    dynamic_cast<const FloatAttribute*>(a))
+            if (const FloatAttribute* ta = dynamic_cast<const FloatAttribute*>(a))
             {
                 atype = Gto::Float;
             }
-            else if (const Vec2fAttribute* va =
-                         dynamic_cast<const Vec2fAttribute*>(a))
+            else if (const Vec2fAttribute* va = dynamic_cast<const Vec2fAttribute*>(a))
             {
                 atype = Gto::Float;
                 awidth = 2;
             }
-            else if (const Mat44fAttribute* ma =
-                         dynamic_cast<const Mat44fAttribute*>(a))
+            else if (const Mat44fAttribute* ma = dynamic_cast<const Mat44fAttribute*>(a))
             {
                 atype = Gto::Float;
                 awidth = 16;
             }
-            else if (const IntAttribute* ia =
-                         dynamic_cast<const IntAttribute*>(a))
+            else if (const IntAttribute* ia = dynamic_cast<const IntAttribute*>(a))
             {
                 atype = Gto::Int;
             }
-            else if (const StringAttribute* sa =
-                         dynamic_cast<const StringAttribute*>(a))
+            else if (const StringAttribute* sa = dynamic_cast<const StringAttribute*>(a))
             {
                 atype = Gto::String;
                 string v = sa->value(); // prevent windows issues
@@ -359,9 +336,8 @@ namespace TwkFB
                 break;
             }
 
-            size_t total = ((plane->width() + plane->scanlinePixelPadding())
-                            * (plane->height() + plane->extraScanlines()))
-                           * plane->numChannels();
+            size_t total =
+                ((plane->width() + plane->scanlinePixelPadding()) * (plane->height() + plane->extraScanlines())) * plane->numChannels();
 
             writer.property("pixels", ptype, total, 1, "pixels");
             writer.endComponent();
@@ -370,9 +346,7 @@ namespace TwkFB
         writer.endObject();
     }
 
-    void IOgto::writeOneImageStream(Gto::Writer& writer, WriteState& state,
-                                    ostream& outstream,
-                                    const WriteRequest& request) const
+    void IOgto::writeOneImageStream(Gto::Writer& writer, WriteState& state, ostream& outstream, const WriteRequest& request) const
     {
         const FrameBuffer* fb = state.fb;
         const FrameBuffer::AttributeVector& attrs = fb->attributes();
@@ -423,32 +397,27 @@ namespace TwkFB
             else
                 aname = a->name().substr(p + 3, string::npos);
 
-            if (const FloatAttribute* fa =
-                    dynamic_cast<const FloatAttribute*>(a))
+            if (const FloatAttribute* fa = dynamic_cast<const FloatAttribute*>(a))
             {
                 float v = fa->value();
                 writer.propertyData(&v, aname.c_str(), 1);
             }
-            else if (const Vec2fAttribute* va =
-                         dynamic_cast<const Vec2fAttribute*>(a))
+            else if (const Vec2fAttribute* va = dynamic_cast<const Vec2fAttribute*>(a))
             {
                 TwkMath::Vec2f v = va->value();
                 writer.propertyData(&v, aname.c_str(), 1);
             }
-            else if (const Mat44fAttribute* ma =
-                         dynamic_cast<const Mat44fAttribute*>(a))
+            else if (const Mat44fAttribute* ma = dynamic_cast<const Mat44fAttribute*>(a))
             {
                 TwkMath::Mat44f M = ma->value();
                 writer.propertyData(&M, aname.c_str(), 1);
             }
-            else if (const IntAttribute* ia =
-                         dynamic_cast<const IntAttribute*>(a))
+            else if (const IntAttribute* ia = dynamic_cast<const IntAttribute*>(a))
             {
                 int v = ia->value();
                 writer.propertyData(&v, aname.c_str(), 1);
             }
-            else if (const StringAttribute* sa =
-                         dynamic_cast<const StringAttribute*>(a))
+            else if (const StringAttribute* sa = dynamic_cast<const StringAttribute*>(a))
             {
                 string v = sa->value();
                 int id = writer.lookup(v.c_str());

@@ -21,9 +21,7 @@ namespace TwkApp
 {
     using namespace std;
 
-    QTBundle::QTBundle(const FileName& appName, size_t majv, size_t minv,
-                       size_t revn, bool unused, bool sandboxed,
-                       bool inheritedSandbox)
+    QTBundle::QTBundle(const FileName& appName, size_t majv, size_t minv, size_t revn, bool unused, bool sandboxed, bool inheritedSandbox)
         : Bundle(appName, majv, minv, revn, sandboxed, inheritedSandbox)
         , m_appName(appName.c_str())
         , m_initialized(false)
@@ -89,21 +87,14 @@ namespace TwkApp
         m_pyhome = m_root;
         m_pyhome.cd("lib");
         m_pyhome.cd("python" PYTHON_VERSION);
-        bool setPythonHome =
-            !(getenv("PYTHONHOME") && getenv("RV_ALLOW_SITE_PYTHONHOME"));
+        bool setPythonHome = !(getenv("PYTHONHOME") && getenv("RV_ALLOW_SITE_PYTHONHOME"));
         if (setPythonHome)
-            setEnvVar("PYTHONHOME", m_root.absolutePath().toUtf8().constData(),
-                      true);
+            setEnvVar("PYTHONHOME", m_root.absolutePath().toUtf8().constData(), true);
 
         bool forceToFront = (!getenv("RV_PYTHONPATH_APPEND_ONLY"));
 
-        addPathToEnvVar(
-            "PYTHONPATH",
-            m_pyhome.absoluteFilePath("lib-dynload").toUtf8().constData(),
-            forceToFront);
-        addPathToEnvVar("PYTHONPATH",
-                        m_pyhome.absolutePath().toUtf8().constData(),
-                        forceToFront);
+        addPathToEnvVar("PYTHONPATH", m_pyhome.absoluteFilePath("lib-dynload").toUtf8().constData(), forceToFront);
+        addPathToEnvVar("PYTHONPATH", m_pyhome.absolutePath().toUtf8().constData(), forceToFront);
 
         if (const char* c = getenv("RV_SUPPORT_PATH"))
         {
@@ -144,13 +135,9 @@ namespace TwkApp
 
                 if (!profiles.exists())
                 {
-                    static const char* dirs[] = {"Packages",     "ImageFormats",
-                                                 "MovieFormats", "Mu",
-                                                 "SupportFiles", "ConfigFiles",
-                                                 "lib",          "Python",
-                                                 "OIIO",         "Nodes",
-                                                 "Profiles",     "Output",
-                                                 "MediaLibrary", NULL};
+                    static const char* dirs[] = {"Packages",    "ImageFormats", "MovieFormats", "Mu",   "SupportFiles",
+                                                 "ConfigFiles", "lib",          "Python",       "OIIO", "Nodes",
+                                                 "Profiles",    "Output",       "MediaLibrary", NULL};
 
                     for (size_t q = 0; dirs[q]; q++)
                     {
@@ -162,74 +149,50 @@ namespace TwkApp
 
                 if (dir.exists("Profiles"))
                 {
-                    addPathToEnvVar(
-                        "TWK_PROFILE_PLUGIN_PATH",
-                        dir.absoluteFilePath("Profiles").toUtf8().constData());
+                    addPathToEnvVar("TWK_PROFILE_PLUGIN_PATH", dir.absoluteFilePath("Profiles").toUtf8().constData());
                 }
 
                 if (dir.exists("ImageFormats"))
                 {
-                    addPathToEnvVar("TWK_FB_PLUGIN_PATH",
-                                    dir.absoluteFilePath("ImageFormats")
-                                        .toUtf8()
-                                        .constData());
+                    addPathToEnvVar("TWK_FB_PLUGIN_PATH", dir.absoluteFilePath("ImageFormats").toUtf8().constData());
                 }
 
                 if (dir.exists("Nodes"))
                 {
-                    addPathToEnvVar(
-                        "TWK_NODE_PLUGIN_PATH",
-                        dir.absoluteFilePath("Nodes").toUtf8().constData());
+                    addPathToEnvVar("TWK_NODE_PLUGIN_PATH", dir.absoluteFilePath("Nodes").toUtf8().constData());
                 }
 
                 if (dir.exists("OIIO"))
                 {
-                    addPathToEnvVar(
-                        "OIIO_LIBRARY_PATH",
-                        dir.absoluteFilePath("OIIO").toUtf8().constData());
+                    addPathToEnvVar("OIIO_LIBRARY_PATH", dir.absoluteFilePath("OIIO").toUtf8().constData());
                 }
 
                 if (dir.exists("Output"))
                 {
-                    addPathToEnvVar(
-                        "TWK_OUTPUT_PLUGIN_PATH",
-                        dir.absoluteFilePath("Output").toUtf8().constData());
+                    addPathToEnvVar("TWK_OUTPUT_PLUGIN_PATH", dir.absoluteFilePath("Output").toUtf8().constData());
                 }
 
                 if (dir.exists("MovieFormats"))
                 {
-                    addPathToEnvVar("TWK_MOVIE_PLUGIN_PATH",
-                                    dir.absoluteFilePath("MovieFormats")
-                                        .toUtf8()
-                                        .constData());
+                    addPathToEnvVar("TWK_MOVIE_PLUGIN_PATH", dir.absoluteFilePath("MovieFormats").toUtf8().constData());
                 }
 
                 if (dir.exists("Mu"))
                 {
                     //  cerr << "    Mu subdir exists" << endl;
-                    addPathToEnvVar(
-                        "MU_MODULE_PATH",
-                        dir.absoluteFilePath("Mu").toUtf8().constData());
+                    addPathToEnvVar("MU_MODULE_PATH", dir.absoluteFilePath("Mu").toUtf8().constData());
                 }
 
                 if (dir.exists("Python"))
                 {
                     //  cerr << "    Mu subdir exists" << endl;
-                    addPathToEnvVar(
-                        "PYTHONPATH",
-                        dir.absoluteFilePath("Python").toUtf8().constData());
+                    addPathToEnvVar("PYTHONPATH", dir.absoluteFilePath("Python").toUtf8().constData());
                 }
 
                 if (dir.exists("MediaLibrary"))
                 {
-                    addPathToEnvVar("TWK_MEDIA_LIBRARY_PLUGIN_PATH",
-                                    dir.absoluteFilePath("MediaLibrary")
-                                        .toUtf8()
-                                        .constData());
-                    addPathToEnvVar("PYTHONPATH",
-                                    dir.absoluteFilePath("MediaLibrary")
-                                        .toUtf8()
-                                        .constData());
+                    addPathToEnvVar("TWK_MEDIA_LIBRARY_PLUGIN_PATH", dir.absoluteFilePath("MediaLibrary").toUtf8().constData());
+                    addPathToEnvVar("PYTHONPATH", dir.absoluteFilePath("MediaLibrary").toUtf8().constData());
                 }
             }
             else
@@ -247,8 +210,7 @@ namespace TwkApp
 //  additional dlls (like jpeg.dll) in the bin directory.
 //
 #ifdef PLATFORM_WINDOWS
-        addPathToEnvVar("PATH", m_bin.absolutePath().toUtf8().constData(),
-                        true);
+        addPathToEnvVar("PATH", m_bin.absolutePath().toUtf8().constData(), true);
 #endif
     }
 
@@ -344,8 +306,7 @@ namespace TwkApp
         return executableFile(name);
     }
 
-    Bundle::Path QTBundle::defaultLicense(const FileName& licFileName,
-                                          const FileName& type)
+    Bundle::Path QTBundle::defaultLicense(const FileName& licFileName, const FileName& type)
     {
         if (!m_initialized)
             init();
@@ -355,8 +316,7 @@ namespace TwkApp
         return string(m_etc.absoluteFilePath(lic).toUtf8().data());
     }
 
-    Bundle::PathVector QTBundle::licenseFiles(const FileName& licFileName,
-                                              const FileName& type)
+    Bundle::PathVector QTBundle::licenseFiles(const FileName& licFileName, const FileName& type)
     {
         if (!m_initialized)
             init();
@@ -397,8 +357,7 @@ namespace TwkApp
         return paths;
     }
 
-    Bundle::Path QTBundle::rcfile(const FileName& rcfileName,
-                                  const FileName& type, const EnvVar& rcenv)
+    Bundle::Path QTBundle::rcfile(const FileName& rcfileName, const FileName& type, const EnvVar& rcenv)
     {
         if (!m_initialized)
             init();
@@ -446,8 +405,7 @@ namespace TwkApp
         // paths.push_back(m_homeSupport.absolutePath().toUtf8().data());
         for (size_t i = 0; i < m_supportPath.size(); i++)
         {
-            paths.push_back(
-                m_supportPath[i].absolutePath().toUtf8().constData());
+            paths.push_back(m_supportPath[i].absolutePath().toUtf8().constData());
         }
 
         return paths;
@@ -462,10 +420,7 @@ namespace TwkApp
 
         for (size_t i = 0; i < m_supportPath.size(); i++)
         {
-            paths.push_back(m_supportPath[i]
-                                .absoluteFilePath(pluginType.c_str())
-                                .toUtf8()
-                                .constData());
+            paths.push_back(m_supportPath[i].absoluteFilePath(pluginType.c_str()).toUtf8().constData());
         }
 
         return paths;
@@ -544,8 +499,7 @@ namespace TwkApp
         }
     }
 
-    void QTBundle::addPathToEnvVar(const EnvVar& var, const Path& value,
-                                   bool toHead)
+    void QTBundle::addPathToEnvVar(const EnvVar& var, const Path& value, bool toHead)
     {
         ostringstream str;
         const char* envvar = getenv(var.c_str());
@@ -582,10 +536,7 @@ namespace TwkApp
         setEnvVar(var, str.str(), true);
     }
 
-    Bundle::FileName QTBundle::crashLogFile()
-    {
-        return FileName(".tweak_crash_log");
-    }
+    Bundle::FileName QTBundle::crashLogFile() { return FileName(".tweak_crash_log"); }
 
     Bundle::Path QTBundle::crashLogDirectory() { return getenv("HOME"); }
 
@@ -595,18 +546,13 @@ namespace TwkApp
         return s.toUtf8().constData();
     }
 
-    TwkApp::Bundle::FileAccessPermission
-    QTBundle::permissionForFileAccess(const Path&, bool readonly) const
+    TwkApp::Bundle::FileAccessPermission QTBundle::permissionForFileAccess(const Path&, bool readonly) const
     {
         FileAccessPermission permission;
         return permission;
     }
 
-    TwkApp::Bundle::AccessObject
-    QTBundle::beginFileAccessWithPermission(const FileAccessPermission&) const
-    {
-        return AccessObject(0x1);
-    }
+    TwkApp::Bundle::AccessObject QTBundle::beginFileAccessWithPermission(const FileAccessPermission&) const { return AccessObject(0x1); }
 
     void QTBundle::endFileAccessWithPermission(AccessObject) const
     {

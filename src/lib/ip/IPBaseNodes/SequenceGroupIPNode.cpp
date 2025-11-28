@@ -26,9 +26,7 @@ namespace IPCore
 
     bool SequenceGroupIPNode::m_defaultAutoRetime = true;
 
-    SequenceGroupIPNode::SequenceGroupIPNode(const std::string& name,
-                                             const NodeDefinition* def,
-                                             IPGraph* graph, GroupIPNode* group)
+    SequenceGroupIPNode::SequenceGroupIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group)
         : GroupIPNode(name, def, graph, group)
         , m_maxFPS(0.0)
         , m_soundTrackNode(0)
@@ -39,18 +37,14 @@ namespace IPCore
 
         m_useMaxFPS = def->stringValue("defaults.autoFPSType", "") == "max";
 
-        m_soundTrackFile =
-            declareProperty<StringProperty>("soundtrack.file", "");
-        m_soundTrackOffset =
-            declareProperty<FloatProperty>("soundtrack.offset", 0.0f);
+        m_soundTrackFile = declareProperty<StringProperty>("soundtrack.file", "");
+        m_soundTrackOffset = declareProperty<FloatProperty>("soundtrack.offset", 0.0f);
 
-        m_sequenceNode =
-            newMemberNodeOfType<SequenceIPNode>(sequenceType(), "sequence");
+        m_sequenceNode = newMemberNodeOfType<SequenceIPNode>(sequenceType(), "sequence");
         m_sequenceNode->setVolatileInputs(m_useMaxFPS);
         setRoot(m_sequenceNode);
 
-        m_retimeToOutput = declareProperty<IntProperty>(
-            "timing.retimeInputs", m_defaultAutoRetime ? 1 : 0);
+        m_retimeToOutput = declareProperty<IntProperty>("timing.retimeInputs", m_defaultAutoRetime ? 1 : 0);
 
         m_markersIn = declareProperty<IntProperty>("markers.in");
         m_markersOut = declareProperty<IntProperty>("markers.out");
@@ -69,43 +63,25 @@ namespace IPCore
         m_soundTrackNode = 0;
     }
 
-    string SequenceGroupIPNode::sequenceType()
-    {
-        return definition()->stringValue("defaults.sequenceType", "Sequence");
-    }
+    string SequenceGroupIPNode::sequenceType() { return definition()->stringValue("defaults.sequenceType", "Sequence"); }
 
-    string SequenceGroupIPNode::retimeType()
-    {
-        return definition()->stringValue("defaults.retimeType", "Retime");
-    }
+    string SequenceGroupIPNode::retimeType() { return definition()->stringValue("defaults.retimeType", "Retime"); }
 
-    string SequenceGroupIPNode::paintType()
-    {
-        return definition()->stringValue("defaults.paintType", "Paint");
-    }
+    string SequenceGroupIPNode::paintType() { return definition()->stringValue("defaults.paintType", "Paint"); }
 
-    string SequenceGroupIPNode::audioAddType()
-    {
-        return definition()->stringValue("defaults.audioAddType", "AudioAdd");
-    }
+    string SequenceGroupIPNode::audioAddType() { return definition()->stringValue("defaults.audioAddType", "AudioAdd"); }
 
-    string SequenceGroupIPNode::audioSourceType()
-    {
-        return definition()->stringValue("defaults.audioSourceType",
-                                         "FileSource");
-    }
+    string SequenceGroupIPNode::audioSourceType() { return definition()->stringValue("defaults.audioSourceType", "FileSource"); }
 
-    IPNode* SequenceGroupIPNode::newSubGraphForInput(size_t index,
-                                                     const IPNodes& newInputs)
+    IPNode* SequenceGroupIPNode::newSubGraphForInput(size_t index, const IPNodes& newInputs)
     {
         float fps = m_sequenceNode->imageRangeInfo().fps;
         if (fps == 0.0 && !newInputs.empty())
         {
             // Find the first input that has a discovered imageRangeInfo, and
             // use it for the fps if any.
-            auto it = std::find_if(
-                newInputs.begin(), newInputs.end(), [](const auto& input)
-                { return !input->imageRangeInfo().isUndiscovered; });
+            auto it =
+                std::find_if(newInputs.begin(), newInputs.end(), [](const auto& input) { return !input->imageRangeInfo().isUndiscovered; });
             if (it != newInputs.end())
             {
                 fps = (*it)->imageRangeInfo().fps;
@@ -123,8 +99,7 @@ namespace IPCore
         }
 
         AdaptorIPNode* anode = newAdaptorForInput(newInputs[index]);
-        IPNode* paintNode =
-            newMemberNodeForInput(paintType(), newInputs[index], "p");
+        IPNode* paintNode = newMemberNodeForInput(paintType(), newInputs[index], "p");
 
         paintNode->setInputs1(anode);
 
@@ -138,19 +113,16 @@ namespace IPCore
 
         if (fps != 0.0f && retimeInputs || m_useMaxFPS)
         {
-            IPNode* retimer =
-                newMemberNodeForInput(retimeType(), newInputs[index], "rt");
+            IPNode* retimer = newMemberNodeForInput(retimeType(), newInputs[index], "rt");
             retimer->setInputs1(node);
-            retimer->setProperty<FloatProperty>("output.fps",
-                                                m_useMaxFPS ? m_maxFPS : fps);
+            retimer->setProperty<FloatProperty>("output.fps", m_useMaxFPS ? m_maxFPS : fps);
             node = retimer;
         }
 
         return node;
     }
 
-    IPNode* SequenceGroupIPNode::modifySubGraphForInput(
-        size_t index, const IPNodes& newInputs, IPNode* subgraph)
+    IPNode* SequenceGroupIPNode::modifySubGraphForInput(size_t index, const IPNodes& newInputs, IPNode* subgraph)
     {
         bool retimeInputs = m_retimeToOutput->front() ? true : false;
 
@@ -160,27 +132,22 @@ namespace IPCore
             if (!inputRangeInfo.isUndiscovered)
             {
                 IPNode* innode = newInputs[index];
-                IPNode* retimer =
-                    newMemberNodeForInput(retimeType(), innode, "rt");
+                IPNode* retimer = newMemberNodeForInput(retimeType(), innode, "rt");
                 retimer->setInputs1(subgraph);
-                retimer->setProperty<FloatProperty>("output.fps",
-                                                    inputRangeInfo.fps);
+                retimer->setProperty<FloatProperty>("output.fps", inputRangeInfo.fps);
                 subgraph = retimer;
             }
         }
 
-        if ((retimeInputs || m_useMaxFPS)
-            && subgraph->protocol() != retimeType())
+        if ((retimeInputs || m_useMaxFPS) && subgraph->protocol() != retimeType())
         {
             auto const inputRangeInfo = newInputs[index]->imageRangeInfo();
             if (!inputRangeInfo.isUndiscovered)
             {
                 IPNode* innode = newInputs[index];
-                IPNode* retimer =
-                    newMemberNodeForInput(retimeType(), innode, "rt");
+                IPNode* retimer = newMemberNodeForInput(retimeType(), innode, "rt");
                 retimer->setInputs1(subgraph);
-                retimer->setProperty<FloatProperty>("output.fps",
-                                                    inputRangeInfo.fps);
+                retimer->setProperty<FloatProperty>("output.fps", inputRangeInfo.fps);
                 subgraph = retimer;
             }
         }
@@ -189,8 +156,7 @@ namespace IPCore
         {
             float retimeFPS = 0.0f;
             if (retimeInputs)
-                retimeFPS = m_useMaxFPS ? m_maxFPS
-                                        : m_sequenceNode->imageRangeInfo().fps;
+                retimeFPS = m_useMaxFPS ? m_maxFPS : m_sequenceNode->imageRangeInfo().fps;
             else
                 retimeFPS = newInputs[index]->imageRangeInfo().fps;
 
@@ -212,8 +178,7 @@ namespace IPCore
 
                 for (size_t i = 0; i < newInputs.size(); i++)
                 {
-                    m_maxFPS =
-                        std::max(newInputs[i]->imageRangeInfo().fps, m_maxFPS);
+                    m_maxFPS = std::max(newInputs[i]->imageRangeInfo().fps, m_maxFPS);
                 }
 
                 m_sequenceNode->outputFPSProperty()->front() = m_maxFPS;
@@ -234,8 +199,7 @@ namespace IPCore
             graph()->beginGraphEdit();
             IPNodes cachedInputs = inputs();
             if (inputIndex >= 0)
-                setInputsWithReordering(cachedInputs, m_sequenceNode,
-                                        inputIndex);
+                setInputsWithReordering(cachedInputs, m_sequenceNode, inputIndex);
             else
                 setInputs(cachedInputs);
             configureSoundTrack();
@@ -245,10 +209,8 @@ namespace IPCore
 
     void SequenceGroupIPNode::configureSoundTrack()
     {
-        const string filename =
-            propertyValue<StringProperty>(m_soundTrackFile, "");
-        const float offset =
-            propertyValue<FloatProperty>(m_soundTrackOffset, 0.0f);
+        const string filename = propertyValue<StringProperty>(m_soundTrackFile, "");
+        const float offset = propertyValue<FloatProperty>(m_soundTrackOffset, 0.0f);
 
         if (filename == "")
         {
@@ -268,12 +230,9 @@ namespace IPCore
         {
             if (!m_audioAddNode)
             {
-                m_audioAddNode = newMemberNodeOfType<AudioAddIPNode>(
-                    audioAddType(), "audioAdd");
-                m_soundTrackRetime = newMemberNodeOfType<RetimeIPNode>(
-                    retimeType(), "soundtrackRetime");
-                m_soundTrackNode = newMemberNodeOfType<FileSourceIPNode>(
-                    audioSourceType(), "soundtrackSource");
+                m_audioAddNode = newMemberNodeOfType<AudioAddIPNode>(audioAddType(), "audioAdd");
+                m_soundTrackRetime = newMemberNodeOfType<RetimeIPNode>(retimeType(), "soundtrackRetime");
+                m_soundTrackNode = newMemberNodeOfType<FileSourceIPNode>(audioSourceType(), "soundtrackSource");
 
                 m_soundTrackNode->setProgressiveSourceLoading(true);
                 m_soundTrackRetime->setInputs1(m_soundTrackNode);
@@ -282,19 +241,13 @@ namespace IPCore
                 setRoot(m_audioAddNode);
             }
 
-            if (m_soundTrackNode->propertyValue<StringProperty>("media.movie",
-                                                                "")
-                != filename)
+            if (m_soundTrackNode->propertyValue<StringProperty>("media.movie", "") != filename)
             {
-                m_soundTrackNode->setProperty<FloatProperty>(
-                    "group.audioOffset", offset);
-                float fps = m_useMaxFPS ? m_maxFPS
-                                        : m_sequenceNode->imageRangeInfo().fps;
-                m_soundTrackRetime->setProperty<FloatProperty>("output.fps",
-                                                               fps);
+                m_soundTrackNode->setProperty<FloatProperty>("group.audioOffset", offset);
+                float fps = m_useMaxFPS ? m_maxFPS : m_sequenceNode->imageRangeInfo().fps;
+                m_soundTrackRetime->setProperty<FloatProperty>("output.fps", fps);
 
-                PropertyEditor<StringProperty> edit(m_soundTrackNode,
-                                                    "media.movie");
+                PropertyEditor<StringProperty> edit(m_soundTrackNode, "media.movie");
                 edit.setValue(filename);
             }
         }
@@ -304,16 +257,14 @@ namespace IPCore
     {
         if (!isDeleting())
         {
-            if (p == m_retimeToOutput
-                || p == m_sequenceNode->outputFPSProperty())
+            if (p == m_retimeToOutput || p == m_sequenceNode->outputFPSProperty())
             {
                 rebuild();
                 propagateRangeChange();
                 if (p == m_sequenceNode->outputFPSProperty())
                     return;
             }
-            else if (p == m_sequenceNode->outputSizeProperty()
-                     || p == m_sequenceNode->autoSizeProperty())
+            else if (p == m_sequenceNode->outputSizeProperty() || p == m_sequenceNode->autoSizeProperty())
             {
                 return;
             }
@@ -360,9 +311,7 @@ namespace IPCore
                 clipinfo.out = frame;
                 clipinfo.inputCutOut = p.sourceFrame;
 
-                clipinfo.node->mediaInfo(
-                    graph()->contextForFrame(clipinfo.inputCutIn),
-                    clipinfo.media);
+                clipinfo.node->mediaInfo(graph()->contextForFrame(clipinfo.inputCutIn), clipinfo.media);
 
                 ImageRangeInfo iinfo = clipinfo.node->imageRangeInfo();
                 clipinfo.inputFPS = iinfo.fps;
@@ -381,9 +330,7 @@ namespace IPCore
         return edl;
     }
 
-    void SequenceGroupIPNode::inputMediaChanged(IPNode* srcNode,
-                                                int srcOutIndex,
-                                                PropagateTarget target)
+    void SequenceGroupIPNode::inputMediaChanged(IPNode* srcNode, int srcOutIndex, PropagateTarget target)
     {
         IPNode::inputMediaChanged(srcNode, srcOutIndex, target);
 

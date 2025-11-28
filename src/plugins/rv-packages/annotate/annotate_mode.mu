@@ -83,10 +83,13 @@ class: AnnotateMinorMode : MinorMode
         DrawMode     penMode;
         string       sliderName;
         ColorFunc    colorFunction;
+        string       category;
+        string       defaultTooltip;
     }
 
     MetaEvalInfo      _currentNodeInfo;
     string            _currentNode;
+    string            _userSelectedNode;
     DrawMode          _currentDrawMode;
     DrawMode[]        _drawModes;
     DrawMode          _selectDrawMode;
@@ -102,6 +105,7 @@ class: AnnotateMinorMode : MinorMode
     DrawMode          _smudgeDrawMode;
     string            _currentDrawObject;
     string            _drawModeTable;
+    string            _disabledTooltipMessage;
     int               _debug;
     Color             _color;
     Point             _pointer;
@@ -216,35 +220,51 @@ class: AnnotateMinorMode : MinorMode
                 _currentNodeInfo = nil;
                 _currentNode = nil;
             }
-            else if (_storeOnSrc)
+            else
             {
-                //
-                //  Find first source node:
-                //
-                let sourcePaintCount = 0;
-
-                for_each (i; infos)
+                if (_userSelectedNode != "")
                 {
-                    if (nodeType(nodeGroup(i.node)) == "RVSourceGroup")
+                    for_each (i; infos)
                     {
-                        if (sourcePaintCount == 0)
+                        if (i.node == _userSelectedNode)
                         {
                             _currentNodeInfo = i;
                             _currentNode = i.node;
+                            return;
                         }
-                        ++sourcePaintCount;
                     }
                 }
-                if (sourcePaintCount != 1)
+                
+                if (_storeOnSrc)
+                {
+                    //
+                    //  Find first source node:
+                    //
+                    let sourcePaintCount = 0;
+
+                    for_each (i; infos)
+                    {
+                        if (nodeType(nodeGroup(i.node)) == "RVSourceGroup")
+                        {
+                            if (sourcePaintCount == 0)
+                            {
+                                _currentNodeInfo = i;
+                                _currentNode = i.node;
+                            }
+                            ++sourcePaintCount;
+                        }
+                    }
+                    if (sourcePaintCount != 1)
+                    {
+                        _currentNodeInfo = infos.front();
+                        _currentNode = _currentNodeInfo.node;
+                    }
+                }
+                else
                 {
                     _currentNodeInfo = infos.front();
                     _currentNode = _currentNodeInfo.node;
                 }
-            }
-            else
-            {
-                _currentNodeInfo = infos.front();
-                _currentNode = _currentNodeInfo.node;
             }
         }
         catch (...)
@@ -403,6 +423,7 @@ class: AnnotateMinorMode : MinorMode
                      "%s.join" % n,
                      "%s.cap" % n,
                      "%s.points" % n,
+                     "%s.splat" % n,
                      "%s.startFrame" % n,
                      "%s.duration" % n
                     ];
@@ -462,12 +483,9 @@ class: AnnotateMinorMode : MinorMode
         newProperty(startFrameName, IntType, 1);
         newProperty(durationName, IntType, 1);
 
-        if (mode != RenderOverMode)
-        {
-            let modeName = "%s.mode" % n;
-            newProperty(modeName, IntType, 1);
-            setIntProperty(modeName, int[] {mode}, true);
-        }
+        let modeName = "%s.mode" % n;
+        newProperty(modeName, IntType, 1);
+        setIntProperty(modeName, int[] {mode}, true);
 
         bool useWidth = false;
 
@@ -507,7 +525,7 @@ class: AnnotateMinorMode : MinorMode
         insertStringProperty(orderName, string[] {n.split(".").back()});
 
         endCompoundStateChange();
-        n;
+        return n;
     }
 
     method: addToStroke (void; Point p)
@@ -585,12 +603,9 @@ class: AnnotateMinorMode : MinorMode
         newProperty(startFrameName, IntType, 1);
         newProperty(durationName, IntType, 1);
 
-        if (mode != RenderOverMode)
-        {
-            let modeName = "%s.mode" % n;
-            newProperty(modeName, IntType, 1);
-            setIntProperty(modeName, int[] {mode}, true);
-        }
+        let modeName = "%s.mode" % n;
+        newProperty(modeName, IntType, 1);
+        setIntProperty(modeName, int[] {mode}, true);
 
         setFloatProperty(posName, float[] {pos.x, pos.y}, true);
         setFloatProperty(colorName, float[] {color[0], color[1], color[2], color[3]}, true);
@@ -617,7 +632,7 @@ class: AnnotateMinorMode : MinorMode
         insertStringProperty(orderName, string[] {n.split(".").back()});
 
         endCompoundStateChange();
-        n;
+        return n;
     }
 
     method: setText (void; char[] s)
@@ -670,8 +685,9 @@ class: AnnotateMinorMode : MinorMode
         }
         catch (...)
         {
-            return ("", Point(0,0));
+            ; /* nothing */
         }
+        return ("", Point(0,0));
     }
 
     method: pointerLocationFromNDC ((string, Point); Point point)
@@ -703,8 +719,9 @@ class: AnnotateMinorMode : MinorMode
         }
         catch (...)
         {
-            return ("", Point(0,0));
+            ; /* nothing */
         }
+        return ("", Point(0,0));
     }
 
     method: penPush (void; Event event)
@@ -977,11 +994,6 @@ class: AnnotateMinorMode : MinorMode
 
     method: push (void; Event event)
     {
-        if (filterLiveReviewEvents()) {
-            sendInternalEvent("live-review-blocked-event");
-            return;
-        }
-
         let (name, ip) = pointerLocation(event);
         pushStrokeCommon(name, ip, event, true /*supportPressure*/);
     }
@@ -1053,11 +1065,6 @@ class: AnnotateMinorMode : MinorMode
 
     method: drag (void; Event event)
     {
-        if (filterLiveReviewEvents()) {
-            sendInternalEvent("live-review-blocked-event");
-            return;
-        }
-
         if (_currentDrawObject eq nil)
         {
             //
@@ -1336,6 +1343,14 @@ class: AnnotateMinorMode : MinorMode
         _textPlacementMode = false;
         _currentDrawMode = d;
         commands.setCursor(d.cursor);
+        
+        if (_active && !commands.isEventCategoryEnabled("annotate_category"))
+        {
+            if (_manageDock neq nil) _manageDock.hide();
+            if (_drawDock neq nil) _drawDock.hide();
+            _hideDrawPane = 0;
+        }
+        
         updateDrawModeUI();
         _toolSliderLabel.setText(if d.sliderName eq nil then "Opacity" else d.sliderName);
     }
@@ -1743,8 +1758,9 @@ class: AnnotateMinorMode : MinorMode
         }
         catch (...)
         {
-            return DisabledMenuState;
+            ; /* nothing */
         }
+        return DisabledMenuState;
     }
 
     method: showDrawingsSlot (void; Event event)
@@ -1821,11 +1837,17 @@ class: AnnotateMinorMode : MinorMode
         if (_currentDrawMode eq _selectDrawMode)
         {
             _hideDrawPane = _hideDrawPane + 1;
-            if (_active) toggle();
+            if (_active && commands.isEventCategoryEnabled("annotate_category"))
+            {
+                toggle();
+            }
         }
         else
         {
-            if (!_active) toggle();
+            if (!_active && commands.isEventCategoryEnabled("annotate_category"))
+            {
+                toggle();
+            }
             _hideDrawPane = 0;
         }
 
@@ -1956,12 +1978,86 @@ class: AnnotateMinorMode : MinorMode
     method: nextSlot (void; bool b) { nextAnnotatedFrame(); }
     method: prevSlot (void; bool b) { prevAnnotatedFrame(); }
 
-    method: onPresenterChanged(void; Event event)
+
+    method: setDisabledTooltipMessage(void; Event event)
     {
-        if (_active && filterLiveReviewEvents())
+        let message = event.contents();
+        if (message != "")
         {
+            _disabledTooltipMessage = message;
+        }
+        event.reject();
+    }
+
+    method: onCategoryStateChanged(void; Event event)
+    {
+        if (_active && !commands.isEventCategoryEnabled("annotate_category"))
+        {
+            _hideDrawPane = 0;
             toggle();
         }
+        
+        // Update individual tool availability
+        updateToolAvailability();
+        
+        event.reject();
+    }
+    
+    method: updateToolAvailability(void;)
+    {
+        if (!commands.isEventCategoryEnabled("annotate_category"))
+        {
+            if (_manageDock neq nil) _manageDock.hide();
+            if (_drawDock neq nil) _drawDock.hide();
+            _hideDrawPane = 0;
+        }
+        
+        // Update tool states
+        for_each (tool; _drawModes)
+        {
+            if (tool.category neq nil && tool.category != "")
+            {
+                let enabled = commands.isEventCategoryEnabled(tool.category);
+                tool.button.setEnabled(enabled);
+                tool.action.setEnabled(enabled);
+                
+                if (enabled)
+                {
+                    tool.action.setToolTip(tool.defaultTooltip);
+                }
+                else
+                {
+                    tool.action.setToolTip(_disabledTooltipMessage);
+                    
+                    if (_currentDrawMode eq tool)
+                    {
+                        setDrawModeSlot(true, _selectDrawMode);
+                    }
+                }
+            }
+        }
+    }
+
+    method: setCurrentNodeEvent (void; Event event)
+    {
+        let nodeName = event.contents();
+        
+        if (nodeName != "")
+        {
+            let infos = findPaintNodes();
+            
+            for_each (info; infos)
+            {
+                if (info.node == nodeName)
+                {
+                    _userSelectedNode = nodeName;
+                    return;
+                }
+            }
+        }
+
+        _userSelectedNode = "";
+
         event.reject();
     }
 
@@ -1980,6 +2076,8 @@ class: AnnotateMinorMode : MinorMode
         _cursorChar        = char(0x1);
         _autoSave          = true;
         _hideDrawPane      = 0;
+        _userSelectedNode   = "";
+        _disabledTooltipMessage = "This tool is currently unavailable";
 
         let m = mainWindowWidget(),
             g = QActionGroup(m);
@@ -2058,7 +2156,13 @@ class: AnnotateMinorMode : MinorMode
                                      1,
                                      1,
                                      0.024, 0.001,
-                                     PressureMode.None };
+                                     PressureMode.None,
+                                     nil,
+                                     nil,
+                                     nil,
+                                     nil,
+                                     "annotate_select_category",
+                                     "Select" };
 
         _dropperDrawMode = DrawMode { "Sample Color",
                                       "sample",
@@ -2075,7 +2179,13 @@ class: AnnotateMinorMode : MinorMode
                                      0.024, 0.001,
                                      1,
                                      1,
-                                     PressureMode.None };
+                                     PressureMode.None,
+                                     nil,
+                                     nil,
+                                     nil,
+                                     nil,
+                                     "annotate_sample_category",
+                                     "Sample Color" };
 
         _textDrawMode  = DrawMode { "Text",
                                       "text",
@@ -2092,7 +2202,13 @@ class: AnnotateMinorMode : MinorMode
                                      0.01, 0.0015,
                                      1,
                                      1,
-                                     PressureMode.None };
+                                     PressureMode.None,
+                                     nil,
+                                     nil,
+                                     nil,
+                                     nil,
+                                     "annotate_text_category",
+                                     "Text" };
 
         _penDrawMode = DrawMode { "Pen",
                                   "pen",
@@ -2109,7 +2225,13 @@ class: AnnotateMinorMode : MinorMode
                                   0.024, 0.001,
                                   1,
                                   1,
-                                  defaultPMode };
+                                  defaultPMode,
+                                  nil,
+                                  nil,
+                                  nil,
+                                  nil,
+                                  "annotate_pen_category",
+                                  "Pen" };
 
 
         _airBrushDrawMode = DrawMode { "Air Brush",
@@ -2127,7 +2249,13 @@ class: AnnotateMinorMode : MinorMode
                                        0.044, 0.001,
                                        1,
                                        1,
-                                       defaultPMode };
+                                       defaultPMode,
+                                       nil,
+                                       nil,
+                                       nil,
+                                       nil,
+                                       "annotate_airbrush_category",
+                                       "Air Brush" };
 
 
         _hardEraseDrawMode = DrawMode { "Hard Erase",
@@ -2146,7 +2274,13 @@ class: AnnotateMinorMode : MinorMode
                                         0.024, 0.001,
                                         1,
                                         1,
-                                        PressureMode.None };
+                                        PressureMode.None,
+                                        nil,
+                                        nil,
+                                        nil,
+                                        nil,
+                                        "annotate_harderase_category",
+                                        "Hard Erase" };
 
         _softEraseDrawMode = DrawMode { "Air Brush Erase",
                                         "airerase",
@@ -2164,7 +2298,13 @@ class: AnnotateMinorMode : MinorMode
                                         0.044, 0.001,
                                         1,
                                         1,
-                                        PressureMode.None };
+                                        PressureMode.None,
+                                        nil,
+                                        nil,
+                                        nil,
+                                        nil,
+                                        "annotate_softerase_category",
+                                        "Air Brush Erase" };
 
         _dodgeDrawMode     = DrawMode { "Dodge",
                                         "dodge",
@@ -2185,7 +2325,9 @@ class: AnnotateMinorMode : MinorMode
                                         _hardEraseDrawMode,
                                         nil,
                                         "Intensity",
-                                        dodgeFunc };
+                                        dodgeFunc,
+                                        "annotate_dodge_category",
+                                        "Dodge" };
 
         _burnDrawMode     = DrawMode { "Burn",
                                         "burn",
@@ -2206,7 +2348,9 @@ class: AnnotateMinorMode : MinorMode
                                         _hardEraseDrawMode,
                                         nil,
                                         "Intensity",
-                                        burnFunc };
+                                        burnFunc,
+                                        "annotate_burn_category",
+                                        "Burn" };
 
         _cloneDrawMode    = DrawMode { "Clone",
                                         "clone",
@@ -2223,7 +2367,13 @@ class: AnnotateMinorMode : MinorMode
                                         0.044, 0.001,
                                         1,
                                         1,
-                                        PressureMode.None };
+                                        PressureMode.None,
+                                        nil,
+                                        nil,
+                                        nil,
+                                        nil,
+                                        "annotate_clone_category",
+                                        "Clone" };
 
         _smudgeDrawMode   = DrawMode { "Smudge",
                                         "smudge",
@@ -2240,7 +2390,13 @@ class: AnnotateMinorMode : MinorMode
                                         0.044, 0.001,
                                         1,
                                         1,
-                                        PressureMode.None };
+                                        PressureMode.None,
+                                        nil,
+                                        nil,
+                                        nil,
+                                        nil,
+                                        "annotate_smudge_category",
+                                        "Smudge" };
 
         _drawModes = DrawMode[] { _selectDrawMode, _penDrawMode, _airBrushDrawMode,
                                   _textDrawMode, _dropperDrawMode, _hardEraseDrawMode,
@@ -2368,8 +2524,8 @@ class: AnnotateMinorMode : MinorMode
 
         init(name,
              nil,
-             [("pointer-1--drag", drag, "Add to current stroke"),
-              ("pointer-1--push", push, "Start New Stroke"),
+             [("pointer-1--drag", makeCategoryEventFunc("annotate_category", drag), "Add to current stroke"),
+              ("pointer-1--push", makeCategoryEventFunc("annotate_category", push), "Start New Stroke"),
               ("pointer-1--release", release, "End Current Stroke"),
               ("pointer--move", move, ""),
               ("pointer--shift--move", editRadius, ""),
@@ -2381,13 +2537,13 @@ class: AnnotateMinorMode : MinorMode
               ("after-graph-view-change", afterGraphViewChange, "Update UI"),
               ("frame-changed", updateFrameDependentStateEvent, ""),
               ("play-stop", updateFrameDependentStateEvent, ""),
-              ("stylus-pen--push", penPush, "Pen Down"),
-              ("stylus-pen--drag", drag, "Pen Drag"),
+              ("stylus-pen--push", makeCategoryEventFunc("annotate_category", penPush), "Pen Down"),
+              ("stylus-pen--drag", makeCategoryEventFunc("annotate_category", drag), "Pen Drag"),
               ("stylus-pen--shift--move", editRadius, ""),
               ("stylus-pen--move", move, "Pen Move"),
               ("stylus-pen--release", release, "Pen Release"),
-              ("stylus-eraser--push", eraserPush, "Pen Down"),
-              ("stylus-eraser--drag", drag, "Pen Drag"),
+              ("stylus-eraser--push", makeCategoryEventFunc("annotate_category", eraserPush), "Pen Down"),
+              ("stylus-eraser--drag", makeCategoryEventFunc("annotate_category", drag), "Pen Drag"),
               ("stylus-eraser--move", move, "Pen Move"),
               ("stylus-eraser--shift--move", editRadius, ""),
               ("stylus-eraser--release", release, "Pen Release"),
@@ -2395,11 +2551,15 @@ class: AnnotateMinorMode : MinorMode
               ("pointer--leave", pointerGone, "Pointer Gone"),
               ("pointer--enter", pointerNotGone, "Pointer Back"),
               ("graph-state-change", maybeAutoMark, "Possibly Auto-mark Frames"),
-              ("key-down--meta-shift--right", nextEvent, "Next Annotated Frame"),
-              ("key-down--meta-shift--left", prevEvent, "Previous Annotated Frame"),
-              ("key-down--alt-shift--right", nextEvent, "Next Annotated Frame"),
-              ("key-down--alt-shift--left", prevEvent, "Previous Annotated Frame"),
-              ("internal-sync-presenter-changed", onPresenterChanged, "Live Review Presenter Changed"),
+              // bound by menuItem("   Next Annotated Frame") // ("key-down--meta-shift--right", nextEvent, "Next Annotated Frame"),
+              // bound by menuItem("   Previous Annotated Frame") // ("key-down--meta-shift--left", prevEvent, "Previous Annotated Frame"),
+              // bound by menuItem("   Next Annotated Frame") // ("key-down--alt-shift--right", nextEvent, "Next Annotated Frame"),
+              // bound by menuItem("   Previous Annotated Frame") // ("key-down--alt-shift--left", prevEvent, "Previous Annotated Frame"),
+              ("event-category-state-changed", onCategoryStateChanged, "Category state changed"),
+              ("annotate-set-disabled-tooltip", setDisabledTooltipMessage, "Set disabled tooltip message"),
+              ("clear-annotations-current-frame", clearEvent, "Clear annotations on current frame"),
+              ("clear-annotations-all-frames", clearAllEvent, "Clear annotations on all frames"),
+              ("set-current-annotate-mode-node", setCurrentNodeEvent, "Set current paint node"),
               // --------------------------------------------------------------
               // For NDC drawing support used in automated testing
               ("stylus-color-rgb", setColorRGB, "Select color RGB"),
@@ -2413,34 +2573,35 @@ class: AnnotateMinorMode : MinorMode
               //("preferences-show", prefsShow, "Configure Preferences"),
               //("preferences-hide", prefsHide, "Write Preferences"),
               ],
-             Menu {
-                 {"Annotation", Menu {
-                     {"Actions on Current Frame", nil, nil, inactiveState},
-                     {"   Undo", undoEvent, nil, undoState},
-                     {"   Redo", redoEvent, nil, redoState},
-                     {"   Clear Drawings", clearEvent, nil, undoState},
-                     {"_", nil, nil, nil},
-                     {"Actions on Timeline", nil, nil, inactiveState},
-                     {"   Clear All Drawings", clearAllEvent, nil, undoState},
-                     {"   Show Drawings", showDrawingsSlot, nil, isShowingDrawings},
-                     {"   Next Annotated Frame", nextEvent, "alt shift right", nextPrevState},
-                     {"   Previous Annotated Frame", prevEvent, "alt shift left", nextPrevState},
-                     {"_", nil, nil, nil},
-                     {"Configure", Menu {
-                         {"Show Brush", showBrushSlot, nil, isShowingBrush},
-                         {"Brush Size Relative to View", scaleBrushSlot, nil, isScalingBrush},
-                         {"_", nil, nil, nil},
-                         {"Draw On Source When Possible", toggleStoreOnSrc, nil, storeOnSrc},
-                         {"Automatically Mark Annotated Frames", toggleAutoMark, nil, autoMark},
-                         {"Unique Color For Each Tool", toggleLinkToolColors, nil, unlinkToolColors},
-                         {"_", nil, nil, nil},
-                         {"Live Drawing in Sync", liveDrawingsEvent, nil, liveDrawingsState},
-                         {"Start Automatically During Sync", syncAutoStartEvent, nil, isSyncAutoStart},
-                         {"_", nil, nil, nil},
-                         {"Save Current Settings as Defaults", saveDefaults, nil, nil},
-                         {"Always Save Settings as Defaults On Exit", autoSave, nil, isAutoSaveEnabled}
-                     }}
-             }}},
+             newMenu(MenuItem[] {
+                 subMenu("Annotation", MenuItem[] {
+                     menuText("Actions on Current Frame"),
+                     menuItem("   Undo", "", "annotate_category", undoEvent, undoState),
+                     menuItem("   Redo", "", "annotate_category", redoEvent, redoState),
+                     menuItem("   Clear Drawings", "", "annotate_category", clearEvent, undoState),
+                     menuSeparator(),
+                     menuText("Actions on Timeline"),
+                     menuItem("   Clear All Drawings", "", "annotate_category", clearAllEvent, undoState),
+                     menuItem("   Show Drawings", "", "annotate_category", showDrawingsSlot, isShowingDrawings),
+                     menuItem("   Next Annotated Frame", "key-down--alt-shift--right", "annotate_category", nextEvent, nextPrevState),
+                     menuItem("   Previous Annotated Frame", "key-down--alt-shift--left", "annotate_category", prevEvent, nextPrevState),
+                     menuSeparator(),
+                     subMenu("Configure", MenuItem[] {
+                         menuItem("Show Brush", "", "annotate_category", showBrushSlot, isShowingBrush),
+                         menuItem("Brush Size Relative to View", "", "annotate_category", scaleBrushSlot, isScalingBrush),
+                         menuSeparator(),
+                         menuItem("Draw On Source When Possible", "", "annotate_category", toggleStoreOnSrc, storeOnSrc),
+                         menuItem("Automatically Mark Annotated Frames", "", "annotate_category", toggleAutoMark, autoMark),
+                         menuItem("Unique Color For Each Tool", "", "annotate_category", toggleLinkToolColors, unlinkToolColors),
+                         menuSeparator(),
+                         menuItem("Live Drawing in Sync", "", "annotate_category", liveDrawingsEvent, liveDrawingsState),
+                         menuItem("Start Automatically During Sync", "", "annotate_category", syncAutoStartEvent, isSyncAutoStart),
+                         menuSeparator(),
+                         menuItem("Save Current Settings as Defaults", "", "annotate_category", saveDefaults, enabledItem),
+                         menuItem("Always Save Settings as Defaults On Exit", "", "annotate_category", autoSave, isAutoSaveEnabled)
+                     })
+                 })
+             }),
              "z"
              );
 
@@ -2529,6 +2690,19 @@ class: AnnotateMinorMode : MinorMode
         {
             ; // ignore
         }
+        
+        //
+        //  Bind global event handler for category state changes
+        //  This must be global (not mode-local) so it works even when mode is semi-active
+        //
+        let self = this;  // Capture the instance for lambda closure
+        bind("default", "global", "event-category-state-changed", 
+             \: (void; Event event) 
+             {
+                 self.updateToolAvailability();
+                 event.reject();
+             }, 
+             "");
     }
 
     method: deactivate (void;)
@@ -2547,11 +2721,25 @@ class: AnnotateMinorMode : MinorMode
     method: activate (void;)
     {
         updateCurrentNode();
-        if (_manageDock neq nil) _manageDock.show();
-        if (_drawDock neq nil) _drawDock.show();
+        updateToolAvailability();
+        
+        if (commands.isEventCategoryEnabled("annotate_category"))
+        {
+            if (_manageDock neq nil) _manageDock.show();
+            if (_drawDock neq nil) _drawDock.show();
+        }
+        else
+        {
+            // Explicitly hide panels if category is disabled
+            if (_manageDock neq nil) _manageDock.hide();
+            if (_drawDock neq nil) _drawDock.hide();
+            _hideDrawPane = 0;
+        }
+        
         setCursor(_currentDrawMode.cursor);
         updateDrawModeUI();
         setTags();
+        sendInternalEvent("annotate-mode-activated");
     }
 
     method: render (void; Event event)

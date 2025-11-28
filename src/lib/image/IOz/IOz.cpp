@@ -82,8 +82,7 @@ namespace TwkFB
         fbi.proxy.setTransferFunction(ColorSpace::Linear());
     }
 
-    void IOz::readImage(FrameBuffer& fb, const std::string& filename,
-                        const ReadRequest& request) const
+    void IOz::readImage(FrameBuffer& fb, const std::string& filename, const ReadRequest& request) const
     {
         ZFile::Reader reader;
         reader.setInputFile(filename.c_str());
@@ -101,8 +100,7 @@ namespace TwkFB
 
         if (m_normalizeOnInput)
         {
-            for (float *p = const_cast<float*>(reader.data()), *e = p + (w * h);
-                 p != e; ++p)
+            for (float *p = const_cast<float*>(reader.data()), *e = p + (w * h); p != e; ++p)
             {
                 if (*p >= 1e30)
                     *p = 0;
@@ -131,9 +129,6 @@ namespace TwkFB
         fb.setTransferFunction(ColorSpace::Linear());
     }
 
-    void IOz::writeImage(const FrameBuffer& img, const std::string& filename,
-                         const WriteRequest& request) const
-    {
-    }
+    void IOz::writeImage(const FrameBuffer& img, const std::string& filename, const WriteRequest& request) const {}
 
 } //  End namespace TwkFB

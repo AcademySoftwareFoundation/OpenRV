@@ -65,10 +65,8 @@ namespace TwkPaint
         m_colors.push_back(color);
     }
 
-    static void roundCap(size_t i0, size_t i1, size_t i2, const float dir,
-                         PointArray& rPoints, PointArray& rTexCoords,
-                         IndexTriangleArray& rTris,
-                         ScalarArray& rDirectionCoords)
+    static void roundCap(size_t i0, size_t i1, size_t i2, const float dir, PointArray& rPoints, PointArray& rTexCoords,
+                         IndexTriangleArray& rTris, ScalarArray& rDirectionCoords)
     {
         const Point& v0 = rPoints[i0];
         const Point& v1 = rPoints[i1];
@@ -119,10 +117,8 @@ namespace TwkPaint
         rTris.push_back(t);
     }
 
-    void Path::addStamp(const float dir, Point point, float w, Color c,
-                        PointArray& rPoints, PointArray& rTexCoords,
-                        IndexTriangleArray& rTris,
-                        ScalarArray& rDirectionCoords, ColorArray& rColors)
+    void Path::addStamp(const float dir, Point point, float w, Color c, PointArray& rPoints, PointArray& rTexCoords,
+                        IndexTriangleArray& rTris, ScalarArray& rDirectionCoords, ColorArray& rColors)
     {
         Point p0 = Point(point.x - w, point.y - w);
         Point p1 = Point(point.x + w, point.y - w);
@@ -171,8 +167,7 @@ namespace TwkPaint
     // 'location' 2.0 / 5.0 f2 will have 'location' 4.0 / 5.0 this is a very
     // simple mechanism, further improvements might be needed
     //
-    void Path::filterPoints(PointArray& fpoints, ScalarArray& directionCoords,
-                            ScalarArray& fwidths, ColorArray& fcolors,
+    void Path::filterPoints(PointArray& fpoints, ScalarArray& directionCoords, ScalarArray& fwidths, ColorArray& fcolors,
                             vector<PointType>& pointTypes, bool splatOnly)
     {
         const bool constWidth = isConstantWidth();
@@ -205,8 +200,7 @@ namespace TwkPaint
             const float mag = magnitude(p0 - p1);
 
             const char* sensitivityStr = getenv("TWK_PAINT_SPLAT_SENSITIVITY");
-            const float sensitivity =
-                (sensitivityStr) ? atof(sensitivityStr) : 1.0;
+            const float sensitivity = (sensitivityStr) ? atof(sensitivityStr) : 1.0;
 
             if (splatOnly)
             {
@@ -250,9 +244,7 @@ namespace TwkPaint
                         Point b = fpoints[s - 2];
                         Point c = fpoints[s - 1];
 
-                        if (pointTypes[s - 3] != SplatPoint
-                            && pointTypes[s - 2] != SplatPoint
-                            && pointTypes[s - 1] != SplatPoint
+                        if (pointTypes[s - 3] != SplatPoint && pointTypes[s - 2] != SplatPoint && pointTypes[s - 1] != SplatPoint
                             && angleBetween(a - b, c - b) < pi / 2.0)
                         {
                             // cout << "danger point at " << (s-2) << endl;
@@ -261,8 +253,7 @@ namespace TwkPaint
                             directionCoords[s - 1] = m_directionCoords[s - 2];
                             pointTypes[s - 1] = StartPoint;
                             fpoints.push_back(p1);
-                            directionCoords.push_back(
-                                mag + m_directionCoords.back());
+                            directionCoords.push_back(mag + m_directionCoords.back());
                             pointTypes.push_back(BodyPoint);
 
                             if (!constWidth)
@@ -301,12 +292,8 @@ namespace TwkPaint
         }
     }
 
-    void Path::computeSegmentQuads(SegmentVector& segments,
-                                   const PointArray& fpoints,
-                                   const ScalarArray& fwidths,
-                                   const ColorArray& fcolors,
-                                   const PointTypeVector& pointTypes,
-                                   bool constWidth)
+    void Path::computeSegmentQuads(SegmentVector& segments, const PointArray& fpoints, const ScalarArray& fwidths,
+                                   const ColorArray& fcolors, const PointTypeVector& pointTypes, bool constWidth)
     {
         size_t n = fpoints.size();
         segments.resize(n - 1);
@@ -324,8 +311,7 @@ namespace TwkPaint
             const PointType type0 = pointTypes[i];
             const PointType type1 = pointTypes[i + 1];
 
-            if ((type0 == EndPoint && type1 == StartPoint)
-                || type0 == SplatPoint || type1 == SplatPoint)
+            if ((type0 == EndPoint && type1 == StartPoint) || type0 == SplatPoint || type1 == SplatPoint)
             {
                 s.none = true;
                 continue;
@@ -377,11 +363,8 @@ namespace TwkPaint
         }
     }
 
-    void Path::computeJoins(JoinVector& joins, const SegmentVector& segments,
-                            const PointArray& fpoints,
-                            const ScalarArray& fwidths,
-                            const ColorArray& colors,
-                            const PointTypeVector& pointTypes, bool constWidth)
+    void Path::computeJoins(JoinVector& joins, const SegmentVector& segments, const PointArray& fpoints, const ScalarArray& fwidths,
+                            const ColorArray& colors, const PointTypeVector& pointTypes, bool constWidth)
     {
         joins.resize(segments.size() + 1);
         size_t n = joins.size();
@@ -516,9 +499,7 @@ namespace TwkPaint
 
                     Point ip = intersectionOfLines(a, b, c, d);
 
-                    if (dot(ip - fpoints[i],
-                            normalize(fpoints[i - 1] - fpoints[i]))
-                        >= m_width)
+                    if (dot(ip - fpoints[i], normalize(fpoints[i - 1] - fpoints[i])) >= m_width)
                     {
                         // cout << "overlap at " << i << ", c.z = " << c.z <<
                         // endl;
@@ -526,9 +507,8 @@ namespace TwkPaint
                     else
                     {
 
-                        j.miterPoint = intersectionOfLines(
-                            Vec2d(s0.points[1]), Vec2d(s0.points[2]),
-                            Vec2d(s1.points[1]), Vec2d(s1.points[2]));
+                        j.miterPoint =
+                            intersectionOfLines(Vec2d(s0.points[1]), Vec2d(s0.points[2]), Vec2d(s1.points[1]), Vec2d(s1.points[2]));
                     }
 
                     j.points[0] = ip;
@@ -565,18 +545,15 @@ namespace TwkPaint
 
                     Point ip = intersectionOfLines(a, b, c, d);
 
-                    if (dot(ip - fpoints[i],
-                            normalize(fpoints[i + 1] - fpoints[i]))
-                        >= m_width)
+                    if (dot(ip - fpoints[i], normalize(fpoints[i + 1] - fpoints[i])) >= m_width)
                     {
                         // cout << "overlap at " << i << ", c.z = " << c.z <<
                         // endl;
                     }
                     else
                     {
-                        j.miterPoint = intersectionOfLines(
-                            Vec2d(s0.points[0]), Vec2d(s0.points[3]),
-                            Vec2d(s1.points[0]), Vec2d(s1.points[3]));
+                        j.miterPoint =
+                            intersectionOfLines(Vec2d(s0.points[0]), Vec2d(s0.points[3]), Vec2d(s1.points[0]), Vec2d(s1.points[3]));
                     }
 
                     j.points[0] = ip;
@@ -596,12 +573,8 @@ namespace TwkPaint
         }
     }
 
-    void Path::buildSegmentGeometry(const Segment& segment, Join& j0,
-                                    const float dir0, Join& j1,
-                                    const float dir1, PointArray& rPoints,
-                                    PointArray& rTexCoords,
-                                    IndexTriangleArray& rTris,
-                                    ScalarArray& rDirectionCoords)
+    void Path::buildSegmentGeometry(const Segment& segment, Join& j0, const float dir0, Join& j1, const float dir1, PointArray& rPoints,
+                                    PointArray& rTexCoords, IndexTriangleArray& rTris, ScalarArray& rDirectionCoords)
     {
         //
         //  First half
@@ -610,9 +583,7 @@ namespace TwkPaint
         bool sharedSwap = false;
         bool swapSecond = false;
 
-        float dir =
-            0.5
-            * (dir0 + dir1); // this is a naive scheme but might suffice for now
+        float dir = 0.5 * (dir0 + dir1); // this is a naive scheme but might suffice for now
 
         if (j0.threePoints)
         {
@@ -756,15 +727,12 @@ namespace TwkPaint
         }
     }
 
-    void Path::buildJoin(JoinStyle js, const Join& j, const float dir,
-                         PointArray& rPoints, PointArray& rTexCoords,
-                         IndexTriangleArray& rTris,
-                         ScalarArray& rDirectionCoords)
+    void Path::buildJoin(JoinStyle js, const Join& j, const float dir, PointArray& rPoints, PointArray& rTexCoords,
+                         IndexTriangleArray& rTris, ScalarArray& rDirectionCoords)
     {
         if (j.type == SplatPoint)
         {
-            addStamp(dir, j.center, j.width, j.colors[0], rPoints, rTexCoords,
-                     rTris, rDirectionCoords, m_rColors);
+            addStamp(dir, j.center, j.width, j.colors[0], rPoints, rTexCoords, rTris, rDirectionCoords, m_rColors);
             return;
         }
 
@@ -776,8 +744,7 @@ namespace TwkPaint
         case BevelJoin:
             if (j.threePoints)
             {
-                rTris.push_back(
-                    IndexTriangle(j.indices[0], j.indices[1], j.indices[2]));
+                rTris.push_back(IndexTriangle(j.indices[0], j.indices[1], j.indices[2]));
             }
             break;
 
@@ -790,11 +757,9 @@ namespace TwkPaint
 
             if (j.threePoints)
             {
-                rTris.push_back(
-                    IndexTriangle(j.indices[0], j.indices[1], mindex));
+                rTris.push_back(IndexTriangle(j.indices[0], j.indices[1], mindex));
 
-                rTris.push_back(
-                    IndexTriangle(j.indices[0], mindex, j.indices[2]));
+                rTris.push_back(IndexTriangle(j.indices[0], mindex, j.indices[2]));
             }
         }
         break;
@@ -831,8 +796,7 @@ namespace TwkPaint
                     {
                         rPoints.push_back(M * Vec(sin(q), cos(q)));
                         rDirectionCoords.push_back(dir);
-                        rTexCoords.push_back(
-                            Vec(.5f, j.positive ? 1.0f : 0.0f));
+                        rTexCoords.push_back(Vec(.5f, j.positive ? 1.0f : 0.0f));
                     }
                 }
 
@@ -840,8 +804,7 @@ namespace TwkPaint
 
                 if (na == n)
                 {
-                    rTris.push_back(IndexTriangle(j.indices[0], j.indices[1],
-                                                  j.indices[2]));
+                    rTris.push_back(IndexTriangle(j.indices[0], j.indices[1], j.indices[2]));
                 }
                 else
                 {
@@ -865,10 +828,8 @@ namespace TwkPaint
         }
     }
 
-    void Path::buildCap(CapStyle cs, const Join& j, const float directionality,
-                        PointArray& rPoints, PointArray& rTexCoords,
-                        IndexTriangleArray& rTris,
-                        ScalarArray& rDirectionCoords)
+    void Path::buildCap(CapStyle cs, const Join& j, const float directionality, PointArray& rPoints, PointArray& rTexCoords,
+                        IndexTriangleArray& rTris, ScalarArray& rDirectionCoords)
     {
         switch (cs)
         {
@@ -879,8 +840,7 @@ namespace TwkPaint
             bool start = j.type == StartPoint;
 
             const float dist = j.width;
-            Vec dir = normalize(
-                crossUp(rPoints[j.indices[0]] - rPoints[j.indices[1]]));
+            Vec dir = normalize(crossUp(rPoints[j.indices[0]] - rPoints[j.indices[1]]));
             if (j.type == StartPoint)
                 dir = -dir;
 
@@ -897,18 +857,14 @@ namespace TwkPaint
 
             if (start)
             {
-                rTris.push_back(
-                    IndexTriangle(j.indices[2], j.indices[0], n - 2));
-                rTris.push_back(
-                    IndexTriangle(j.indices[1], j.indices[2], n - 1));
+                rTris.push_back(IndexTriangle(j.indices[2], j.indices[0], n - 2));
+                rTris.push_back(IndexTriangle(j.indices[1], j.indices[2], n - 1));
                 rTris.push_back(IndexTriangle(n - 2, n - 1, j.indices[2]));
             }
             else
             {
-                rTris.push_back(
-                    IndexTriangle(j.indices[0], j.indices[2], n - 2));
-                rTris.push_back(
-                    IndexTriangle(j.indices[2], j.indices[1], n - 1));
+                rTris.push_back(IndexTriangle(j.indices[0], j.indices[2], n - 2));
+                rTris.push_back(IndexTriangle(j.indices[2], j.indices[1], n - 1));
                 rTris.push_back(IndexTriangle(n - 1, n - 2, j.indices[2]));
             }
         }
@@ -916,23 +872,18 @@ namespace TwkPaint
         case RoundCap:
             if (j.type == StartPoint)
             {
-                roundCap(j.indices[2], j.indices[0], j.indices[1],
-                         directionality, rPoints, rTexCoords, rTris,
-                         rDirectionCoords);
+                roundCap(j.indices[2], j.indices[0], j.indices[1], directionality, rPoints, rTexCoords, rTris, rDirectionCoords);
             }
             else if (j.type == EndPoint)
             {
-                roundCap(j.indices[2], j.indices[1], j.indices[0],
-                         directionality, rPoints, rTexCoords, rTris,
-                         rDirectionCoords);
+                roundCap(j.indices[2], j.indices[1], j.indices[0], directionality, rPoints, rTexCoords, rTris, rDirectionCoords);
             }
             break;
         }
     }
 
-    void Path::computeGeometry(JoinStyle js, CapStyle cs, TextureStyle ts,
-                               Algorithm algo, bool dosmooth,
-                               float smoothInterval, bool splatOnly)
+    void Path::computeGeometry(JoinStyle js, CapStyle cs, TextureStyle ts, Algorithm algo, bool dosmooth, float smoothInterval,
+                               bool splatOnly)
     {
         if (dosmooth)
             smooth(smoothInterval);
@@ -963,8 +914,7 @@ namespace TwkPaint
         //  dups.
         //
 
-        filterPoints(fpoints, m_directionCoords, fwidths, fcolors, pointTypes,
-                     splatOnly);
+        filterPoints(fpoints, m_directionCoords, fwidths, fcolors, pointTypes, splatOnly);
 
         const size_t n = fpoints.size();
 
@@ -974,8 +924,7 @@ namespace TwkPaint
             //  This the case for a single sample point
             //
 
-            addStamp(0, fpoints.front(), constWidth ? m_width : fwidths.front(),
-                     hasColor ? fcolors.front() : black, m_rPoints,
+            addStamp(0, fpoints.front(), constWidth ? m_width : fwidths.front(), hasColor ? fcolors.front() : black, m_rPoints,
                      m_rTexCoords, m_rTris, m_rDirectionCoords, m_rColors);
             return;
         }
@@ -986,16 +935,14 @@ namespace TwkPaint
         //
 
         vector<Segment> segments;
-        computeSegmentQuads(segments, fpoints, fwidths, fcolors, pointTypes,
-                            constWidth);
+        computeSegmentQuads(segments, fpoints, fwidths, fcolors, pointTypes, constWidth);
 
         //
         //  Compute the join struct for each point using the segment info
         //
 
         vector<Join> joins;
-        computeJoins(joins, segments, fpoints, fwidths, fcolors, pointTypes,
-                     constWidth);
+        computeJoins(joins, segments, fpoints, fwidths, fcolors, pointTypes, constWidth);
 
         //
         //  Compute final segment triangles, share vertices whenever possible
@@ -1010,9 +957,7 @@ namespace TwkPaint
 
             const float diri = m_directionCoords[i];
             const float diriplus1 = m_directionCoords[i + 1];
-            buildSegmentGeometry(s, joins[i], diri, joins[i + 1], diriplus1,
-                                 m_rPoints, m_rTexCoords, m_rTris,
-                                 m_rDirectionCoords);
+            buildSegmentGeometry(s, joins[i], diri, joins[i + 1], diriplus1, m_rPoints, m_rTexCoords, m_rTris, m_rDirectionCoords);
         }
 
         //
@@ -1024,8 +969,7 @@ namespace TwkPaint
             Join& j = joins[i];
             if (j.type == BodyPoint || j.type == SplatPoint)
             {
-                buildJoin(js, j, m_directionCoords[i], m_rPoints, m_rTexCoords,
-                          m_rTris, m_rDirectionCoords);
+                buildJoin(js, j, m_directionCoords[i], m_rPoints, m_rTexCoords, m_rTris, m_rDirectionCoords);
             }
         }
 
@@ -1038,8 +982,7 @@ namespace TwkPaint
             const Join& j = joins[i];
             if (j.type != StartPoint && j.type != EndPoint)
                 continue;
-            buildCap(cs, j, m_directionCoords[i], m_rPoints, m_rTexCoords,
-                     m_rTris, m_rDirectionCoords);
+            buildCap(cs, j, m_directionCoords[i], m_rPoints, m_rTexCoords, m_rTris, m_rDirectionCoords);
         }
 
         assert(m_rPoints.size() == m_rDirectionCoords.size());
@@ -1069,28 +1012,23 @@ namespace TwkPaint
     {
         for (size_t i = 0; i < m_rPoints.size(); i++)
         {
-            cout << "v " << m_rPoints[i].x << " " << m_rPoints[i].y << " 0"
-                 << endl;
+            cout << "v " << m_rPoints[i].x << " " << m_rPoints[i].y << " 0" << endl;
         }
 
         for (size_t i = 0; i < m_rTexCoords.size(); i++)
         {
-            cout << "vt " << m_rTexCoords[i].x << " " << m_rTexCoords[i].y
-                 << endl;
+            cout << "vt " << m_rTexCoords[i].x << " " << m_rTexCoords[i].y << endl;
         }
 
         for (size_t i = 0; i < m_rTris.size(); i++)
         {
             IndexTriangle t = m_rTris[i];
             t += IndexTriangle(1, 1, 1);
-            cout << "f " << t[0] << "/" << t[0] << " " << t[1] << "/" << t[1]
-                 << " " << t[2] << "/" << t[2] << endl;
+            cout << "f " << t[0] << "/" << t[0] << " " << t[1] << "/" << t[1] << " " << t[2] << "/" << t[2] << endl;
         }
     }
 
-    void Path::sampleCentripetalCatmull(const Point p0, const Point p1,
-                                        const Point p2, const Point p3,
-                                        size_t n, PointArray& newPoints)
+    void Path::sampleCentripetalCatmull(const Point p0, const Point p1, const Point p2, const Point p3, size_t n, PointArray& newPoints)
     {
 
         // using centripetal catmull interpolation
@@ -1102,17 +1040,9 @@ namespace TwkPaint
 
         // compute ts
         t0 = 0;
-        t1 = pow((Scalar)((p1.x - p0.x) * (p1.x - p0.x)
-                          + (p1.y - p0.y) * (p1.y - p0.y)),
-                 (Scalar)0.25);
-        t2 = t1
-             + pow((Scalar)((p2.x - p1.x) * (p2.x - p1.x)
-                            + (p2.y - p1.y) * (p2.y - p1.y)),
-                   (Scalar)0.25);
-        t3 = t2
-             + pow((Scalar)((p3.x - p2.x) * (p3.x - p2.x)
-                            + (p3.y - p2.y) * (p3.y - p2.y)),
-                   (Scalar)0.25);
+        t1 = pow((Scalar)((p1.x - p0.x) * (p1.x - p0.x) + (p1.y - p0.y) * (p1.y - p0.y)), (Scalar)0.25);
+        t2 = t1 + pow((Scalar)((p2.x - p1.x) * (p2.x - p1.x) + (p2.y - p1.y) * (p2.y - p1.y)), (Scalar)0.25);
+        t3 = t2 + pow((Scalar)((p3.x - p2.x) * (p3.x - p2.x) + (p3.y - p2.y) * (p3.y - p2.y)), (Scalar)0.25);
 
         // sample between p1 and p2
         for (size_t q = 1; q < n; q++)
@@ -1212,18 +1142,15 @@ namespace TwkPaint
 
                 if (i == 1)
                 {
-                    sampleCentripetalCatmull(p0 + (p0 - p3), p0, p3,
-                                             inPoints[i + 1], n, newPoints);
+                    sampleCentripetalCatmull(p0 + (p0 - p3), p0, p3, inPoints[i + 1], n, newPoints);
                 }
                 else if (i == inPoints.size() - 1)
                 {
-                    sampleCentripetalCatmull(inPoints[i - 2], p0, p3,
-                                             p3 + (p3 - p0), n, newPoints);
+                    sampleCentripetalCatmull(inPoints[i - 2], p0, p3, p3 + (p3 - p0), n, newPoints);
                 }
                 else
                 {
-                    sampleCentripetalCatmull(inPoints[i - 2], p0, p3,
-                                             inPoints[i + 1], n, newPoints);
+                    sampleCentripetalCatmull(inPoints[i - 2], p0, p3, inPoints[i + 1], n, newPoints);
                 }
 
                 for (size_t q = 1; q < n; q++)

@@ -67,8 +67,7 @@ namespace IPCore
         PropertyVector m_props;
     };
 
-    template <class T>
-    PropertyEditor<T>::PropertyEditor(IPNode* node, const std::string& propName)
+    template <class T> PropertyEditor<T>::PropertyEditor(IPNode* node, const std::string& propName)
     {
         T* prop = node->property<T>(propName);
         if (prop)
@@ -84,9 +83,7 @@ namespace IPCore
         m_graph = n ? n->graph() : 0;
     }
 
-    template <class T>
-    PropertyEditor<T>::PropertyEditor(IPGraph& graph, int frame,
-                                      const std::string& name)
+    template <class T> PropertyEditor<T>::PropertyEditor(IPGraph& graph, int frame, const std::string& name)
     {
         graph.findPropertyOfType<T>(frame, m_props, name);
         if (m_props.empty())
@@ -94,9 +91,7 @@ namespace IPCore
         m_graph = &graph;
     }
 
-    template <class T>
-    PropertyEditor<T>::PropertyEditor(IPGraph& graph,
-                                      const UntypedPropertyVector& propVector)
+    template <class T> PropertyEditor<T>::PropertyEditor(IPGraph& graph, const UntypedPropertyVector& propVector)
     {
         size_t s = propVector.size();
         m_props.resize(s);
@@ -116,8 +111,7 @@ namespace IPCore
 
     template <class T> PropertyEditor<T>::~PropertyEditor() {}
 
-    template <class T>
-    typename PropertyEditor<T>::ValueType PropertyEditor<T>::value()
+    template <class T> typename PropertyEditor<T>::ValueType PropertyEditor<T>::value()
     {
         for (size_t i = 0; i < m_props.size(); i++)
         {
@@ -129,16 +123,13 @@ namespace IPCore
         return m_props[0]->front();
     }
 
-    template <class T>
-    typename PropertyEditor<T>::ContainerType& PropertyEditor<T>::container()
+    template <class T> typename PropertyEditor<T>::ContainerType& PropertyEditor<T>::container()
     {
         // can only return the first prop's container
         return m_props[0]->valueContainer();
     }
 
-    template <class T>
-    void
-    PropertyEditor<T>::setValue(const typename PropertyEditor<T>::ValueType& v)
+    template <class T> void PropertyEditor<T>::setValue(const typename PropertyEditor<T>::ValueType& v)
     {
         IPGraph::GraphEdit edit(*m_graph, m_props);
 
@@ -159,8 +150,7 @@ namespace IPCore
         }
     }
 
-    template <class T>
-    void PropertyEditor<T>::setValue(const ContainerVector& container)
+    template <class T> void PropertyEditor<T>::setValue(const ContainerVector& container)
     {
         IPGraph::GraphEdit edit(*m_graph, m_props);
         assert(container.size() == m_props.size());
@@ -176,9 +166,7 @@ namespace IPCore
         }
     }
 
-    template <class T>
-    void PropertyEditor<T>::setValue(
-        const typename PropertyEditor<T>::ContainerType& v)
+    template <class T> void PropertyEditor<T>::setValue(const typename PropertyEditor<T>::ContainerType& v)
     {
         IPGraph::GraphEdit edit(*m_graph, m_props);
 

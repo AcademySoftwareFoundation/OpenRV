@@ -22,15 +22,11 @@ namespace TwkImg
     public:
         static Img4f* read(const char* fileName);
 
-        static Img4f* read(const char* fileName, TwkMath::Mat44f& Mcamera,
-                           TwkMath::Mat44f& Mscreen);
+        static Img4f* read(const char* fileName, TwkMath::Mat44f& Mcamera, TwkMath::Mat44f& Mscreen);
 
-        static bool write(const Img4f* img, const char* fileName,
-                          Imf::Compression compression = Imf::PIZ_COMPRESSION);
+        static bool write(const Img4f* img, const char* fileName, Imf::Compression compression = Imf::PIZ_COMPRESSION);
 
-        static bool write(const Img4f* img, const char* fileName,
-                          const TwkMath::Mat44f& Mcamera,
-                          const TwkMath::Mat44f& Mscreen,
+        static bool write(const Img4f* img, const char* fileName, const TwkMath::Mat44f& Mcamera, const TwkMath::Mat44f& Mscreen,
                           Imf::Compression compression = Imf::PIZ_COMPRESSION);
     };
 

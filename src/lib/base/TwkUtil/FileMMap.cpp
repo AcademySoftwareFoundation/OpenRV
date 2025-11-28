@@ -51,8 +51,7 @@ namespace TwkUtil
             if (rawdata == MAP_FAILED)
             {
                 close(file);
-                TWK_THROW_EXC_STREAM("MMap: " << strerror(errno) << ": "
-                                              << filename);
+                TWK_THROW_EXC_STREAM("MMap: " << strerror(errno) << ": " << filename);
             }
         }
         else
@@ -106,10 +105,8 @@ namespace TwkUtil
 
         OFSTRUCT of;
 
-        fileHandle = (long)CreateFile(
-            filename.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL,
-            OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN | FILE_ATTRIBUTE_NORMAL,
-            NULL);
+        fileHandle = (long)CreateFile(filename.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING,
+                                      FILE_FLAG_SEQUENTIAL_SCAN | FILE_ATTRIBUTE_NORMAL, NULL);
 
         if (((HANDLE)fileHandle) == INVALID_HANDLE_VALUE)
         {
@@ -118,18 +115,15 @@ namespace TwkUtil
 
         if (reallyMMap)
         {
-            mapHandle = (long)CreateFileMapping(((HANDLE)fileHandle), NULL,
-                                                PAGE_READONLY, 0, 0, NULL);
+            mapHandle = (long)CreateFileMapping(((HANDLE)fileHandle), NULL, PAGE_READONLY, 0, 0, NULL);
 
             if (!mapHandle || ((HANDLE)mapHandle) == INVALID_HANDLE_VALUE)
             {
                 CloseHandle((HANDLE)fileHandle);
-                TWK_THROW_EXC_STREAM("CreateFileMapping: cannot open "
-                                     << filename);
+                TWK_THROW_EXC_STREAM("CreateFileMapping: cannot open " << filename);
             }
 
-            rawdata =
-                (void*)MapViewOfFile((HANDLE)mapHandle, FILE_MAP_READ, 0, 0, 0);
+            rawdata = (void*)MapViewOfFile((HANDLE)mapHandle, FILE_MAP_READ, 0, 0, 0);
 
             if (!rawdata)
             {

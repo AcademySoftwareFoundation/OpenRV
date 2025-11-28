@@ -22,8 +22,7 @@ namespace TwkAudio
 
         if (insize == outsize)
         {
-            memcpy(outbuffer.pointer(), inbuffer.pointer(),
-                   inbuffer.sizeInBytes());
+            memcpy(outbuffer.pointer(), inbuffer.pointer(), inbuffer.sizeInBytes());
         }
         else if (insize > outsize)
         {
@@ -34,9 +33,7 @@ namespace TwkAudio
                 double s = outbuffer.size();
                 float* o = outbuffer.pointer();
 
-                for (const float *i = inbuffer.pointer(),
-                                 *e = i + outbuffer.size();
-                     i < e; i++, index++)
+                for (const float *i = inbuffer.pointer(), *e = i + outbuffer.size(); i < e; i++, index++)
                 {
                     *o = *i * smoothstep(1.0 - double(index) / s);
                 }
@@ -44,9 +41,7 @@ namespace TwkAudio
                 index = 0;
                 o = outbuffer.pointer();
 
-                for (const float *i = inbuffer.pointer() + (insize - outsize),
-                                 *e = i + outbuffer.size();
-                     i < e; i++, index++)
+                for (const float *i = inbuffer.pointer() + (insize - outsize), *e = i + outbuffer.size(); i < e; i++, index++)
                 {
                     *o = *i * smoothstep(double(index) / s);
                 }

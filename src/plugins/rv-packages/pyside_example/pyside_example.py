@@ -1,7 +1,7 @@
 #
-# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved. 
-# 
-# SPDX-License-Identifier: Apache-2.0 
+# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
 #
 import os
 
@@ -12,20 +12,18 @@ try:
     from PySide2.QtWidgets import *
     from PySide2.QtUiTools import QUiLoader
 except ImportError:
-  try:
-    from PySide6 import QtGui, QtCore, QtWidgets
-    from PySide6.QtGui import *
-    from PySide6.QtCore import *
-    from PySide6.QtWidgets import *
-    from PySide6.QtUiTools import QUiLoader
-  except ImportError:
-    pass
+    try:
+        from PySide6 import QtGui, QtCore, QtWidgets
+        from PySide6.QtGui import *
+        from PySide6.QtCore import *
+        from PySide6.QtWidgets import *
+        from PySide6.QtUiTools import QUiLoader
+    except ImportError:
+        pass
 
 from OpenGL.GL import *
 from OpenGL.GLUT import *
 from OpenGL.GLU import *
-import types
-import math
 import rv
 import rv.qtutils
 
@@ -106,7 +104,7 @@ class PySideDockTest(rv.rvtypes.MinorMode):
                     if self.rvSessionQObject is not None:
                         self.rvSessionQObject.setWindowOpacity(0.5)
                     rv.commands.setIntProperty(prop, [0], True)
-            except:
+            except Exception:
                 pass
 
         return F
@@ -129,7 +127,7 @@ class PySideDockTest(rv.rvtypes.MinorMode):
                     p[0] = spins[index].minimum()
                 spins[index].setValue(p[0])
                 rv.commands.setFloatProperty(prop, p, True)
-            except:
+            except Exception:
                 pass
 
         return F
@@ -138,14 +136,14 @@ class PySideDockTest(rv.rvtypes.MinorMode):
         def F(value):
             try:
                 rv.commands.setFloatProperty(prop, [p], True)
-            except:
+            except Exception:
                 pass
 
         def F():
             try:
                 p = spins[index].value()
                 rv.commands.setFloatProperty(prop, [p], True)
-            except:
+            except Exception:
                 pass
 
         return F
@@ -154,14 +152,12 @@ class PySideDockTest(rv.rvtypes.MinorMode):
         array = []
         for n in names:
             array.append(self.dialog.findChild(typeObj, n))
-            if array[-1] == None:
+            if array[-1] is None:
                 print("Can't find", n)
         return array
 
     def hookup(self, checkbox, spins, dials, prop, last):
-        checkbox.released.connect(
-            self.checkBoxPressed(checkbox, "%s.node.active" % prop)
-        )
+        checkbox.released.connect(self.checkBoxPressed(checkbox, "%s.node.active" % prop))
         for i in range(0, 3):
             dial = dials[i]
             spin = spins[i]
@@ -175,11 +171,7 @@ class PySideDockTest(rv.rvtypes.MinorMode):
         self.init("pyside_example", None, None)
 
         self.loader = QUiLoader()
-        uifile = QFile(
-            os.path.join(
-                self.supportPath(pyside_example, "pyside_example"), "control.ui"
-            )
-        )
+        uifile = QFile(os.path.join(self.supportPath(pyside_example, "pyside_example"), "control.ui"))
         uifile.open(QFile.ReadOnly)
         self.dialog = self.loader.load(uifile)
         uifile.close()
@@ -194,9 +186,7 @@ class PySideDockTest(rv.rvtypes.MinorMode):
         # have to hold refs here so they don't get deleted
         self.radialDistortDials = self.findSet(QDial, ["k1Dial", "k2Dial", "k3Dial"])
 
-        self.radialDistortSpins = self.findSet(
-            QDoubleSpinBox, ["k1SpinBox", "k2SpinBox", "k3SpinBox"]
-        )
+        self.radialDistortSpins = self.findSet(QDoubleSpinBox, ["k1SpinBox", "k2SpinBox", "k3SpinBox"])
 
         self.lastRadialDistort = [0, 0, 0]
 

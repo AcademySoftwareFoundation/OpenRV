@@ -25,8 +25,7 @@ namespace Rv
 
     namespace
     {
-        static void KeyArrayCallback(const void* key, const void* value,
-                                     void* context)
+        static void KeyArrayCallback(const void* key, const void* value, void* context)
         {
             CFMutableArrayRef langKeys = (CFMutableArrayRef)context;
             CFArrayAppendValue(langKeys, key);
@@ -35,8 +34,7 @@ namespace Rv
         string tostring(CFStringRef s)
         {
             vector<char> str(CFStringGetLength(s) * 4 + 1);
-            CFStringGetCString(s, &str.front(), str.size(),
-                               kCFStringEncodingUTF8);
+            CFStringGetCString(s, &str.front(), str.size(), kCFStringEncodingUTF8);
             return string(&str.front());
         }
 
@@ -44,29 +42,20 @@ namespace Rv
         {
             int depth = 0;
 
-            if (CFStringCompare(pixEnc, CFSTR(IO32BitDirectPixels),
-                                kCFCompareCaseInsensitive)
-                == kCFCompareEqualTo)
+            if (CFStringCompare(pixEnc, CFSTR(IO32BitDirectPixels), kCFCompareCaseInsensitive) == kCFCompareEqualTo)
                 depth = 8;
-            else if (CFStringCompare(pixEnc, CFSTR(IO16BitDirectPixels),
-                                     kCFCompareCaseInsensitive)
-                     == kCFCompareEqualTo)
+            else if (CFStringCompare(pixEnc, CFSTR(IO16BitDirectPixels), kCFCompareCaseInsensitive) == kCFCompareEqualTo)
                 depth = 5;
-            else if (CFStringCompare(pixEnc, CFSTR(IO8BitIndexedPixels),
-                                     kCFCompareCaseInsensitive)
-                     == kCFCompareEqualTo)
+            else if (CFStringCompare(pixEnc, CFSTR(IO8BitIndexedPixels), kCFCompareCaseInsensitive) == kCFCompareEqualTo)
                 depth = 2;
-            else if (CFStringCompare(pixEnc, CFSTR(kIO30BitDirectPixels),
-                                     kCFCompareCaseInsensitive)
-                     == kCFCompareEqualTo)
+            else if (CFStringCompare(pixEnc, CFSTR(kIO30BitDirectPixels), kCFCompareCaseInsensitive) == kCFCompareEqualTo)
                 depth = 10;
 
             CFRelease(pixEnc);
             return depth;
         }
 
-        double modeHz(CGDisplayModeRef mode, CFMutableArrayRef ioModesArray,
-                      int ioModeCount, double defaultHz)
+        double modeHz(CGDisplayModeRef mode, CFMutableArrayRef ioModesArray, int ioModeCount, double defaultHz)
         {
             //
             //  CGDisplayModeGetRefreshRate can return 0.0 which is not
@@ -81,27 +70,19 @@ namespace Rv
 
             for (CFIndex i = 0; i < ioModeCount; ++i)
             {
-                if (CFMutableDictionaryRef dict =
-                        (CFMutableDictionaryRef)CFArrayGetValueAtIndex(
-                            ioModesArray, i))
+                if (CFMutableDictionaryRef dict = (CFMutableDictionaryRef)CFArrayGetValueAtIndex(ioModesArray, i))
                 {
-                    CFNumberRef num = (CFNumberRef)CFDictionaryGetValue(
-                        dict, CFSTR(kIOFBModeIDKey));
+                    CFNumberRef num = (CFNumberRef)CFDictionaryGetValue(dict, CFSTR(kIOFBModeIDKey));
                     int32_t n = 0;
                     CFNumberGetValue(num, kCFNumberSInt32Type, &n);
 
                     if (n == modeID)
                     {
-                        if (const CFDataRef data =
-                                (CFDataRef)CFDictionaryGetValue(
-                                    dict, CFSTR(kIOFBModeDMKey)))
+                        if (const CFDataRef data = (CFDataRef)CFDictionaryGetValue(dict, CFSTR(kIOFBModeDMKey)))
                         {
-                            IODisplayModeInformation* ioModeInfo =
-                                (IODisplayModeInformation*)CFDataGetBytePtr(
-                                    data);
+                            IODisplayModeInformation* ioModeInfo = (IODisplayModeInformation*)CFDataGetBytePtr(data);
 
-                            if (ioModeInfo && ioModeInfo->nominalWidth == width
-                                && ioModeInfo->nominalHeight == height)
+                            if (ioModeInfo && ioModeInfo->nominalWidth == width && ioModeInfo->nominalHeight == height)
                             {
                                 hz = ioModeInfo->refreshRate / 65536.0;
                                 break;
@@ -126,20 +107,16 @@ namespace Rv
             return hz;
         }
 
-        CGDisplayModeRef displayModeRefFromIOMode(int32_t ioMode,
-                                                  CGDirectDisplayID cgScreen)
+        CGDisplayModeRef displayModeRefFromIOMode(int32_t ioMode, CGDirectDisplayID cgScreen)
         {
             io_service_t ioFB = CGDisplayIOServicePort(cgScreen);
             CFMutableDictionaryRef ioFBConfigDict =
-                (CFMutableDictionaryRef)IORegistryEntryCreateCFProperty(
-                    ioFB, CFSTR(kIOFBConfigKey), kCFAllocatorDefault,
-                    kNilOptions);
+                (CFMutableDictionaryRef)IORegistryEntryCreateCFProperty(ioFB, CFSTR(kIOFBConfigKey), kCFAllocatorDefault, kNilOptions);
             CFArrayRef array = CGDisplayCopyAllDisplayModes(cgScreen, NULL);
 
             for (CFIndex i = 0, n = CFArrayGetCount(array); i < n; i++)
             {
-                const CGDisplayModeRef mode =
-                    (CGDisplayModeRef)CFArrayGetValueAtIndex(array, i);
+                const CGDisplayModeRef mode = (CGDisplayModeRef)CFArrayGetValueAtIndex(array, i);
                 const int32_t id = CGDisplayModeGetIODisplayModeID(mode);
 
                 if (id == ioMode)
@@ -151,10 +128,7 @@ namespace Rv
 
     } // namespace
 
-    CGDesktopVideoDevice::CGDesktopVideoDevice(VideoModule* m,
-                                               const std::string& name,
-                                               CGDirectDisplayID cgScreen,
-                                               int qtScreen,
+    CGDesktopVideoDevice::CGDesktopVideoDevice(VideoModule* m, const std::string& name, CGDirectDisplayID cgScreen, int qtScreen,
                                                const QTGLVideoDevice* share)
         : DesktopVideoDevice(m, name, share)
         , m_cgScreen(cgScreen)
@@ -185,8 +159,7 @@ namespace Rv
 
         CVDisplayLinkRef cvLinkRef = 0;
         CVDisplayLinkCreateWithCGDisplay(m_cgScreen, &cvLinkRef);
-        CVTime cvRef =
-            CVDisplayLinkGetNominalOutputVideoRefreshPeriod(cvLinkRef);
+        CVTime cvRef = CVDisplayLinkGetNominalOutputVideoRefreshPeriod(cvLinkRef);
         double cvRefHz = double(cvRef.timeScale) / double(cvRef.timeValue);
         CFRelease(cvLinkRef);
 
@@ -202,12 +175,9 @@ namespace Rv
 
         io_service_t ioFB = CGDisplayIOServicePort(m_cgScreen);
         CFMutableDictionaryRef ioFBConfigDict =
-            (CFMutableDictionaryRef)IORegistryEntryCreateCFProperty(
-                ioFB, CFSTR(kIOFBConfigKey), kCFAllocatorDefault, kNilOptions);
+            (CFMutableDictionaryRef)IORegistryEntryCreateCFProperty(ioFB, CFSTR(kIOFBConfigKey), kCFAllocatorDefault, kNilOptions);
         CFMutableArrayRef ioModesArray =
-            (ioFBConfigDict) ? (CFMutableArrayRef)CFDictionaryGetValue(
-                                   ioFBConfigDict, CFSTR(kIOFBModesKey))
-                             : 0;
+            (ioFBConfigDict) ? (CFMutableArrayRef)CFDictionaryGetValue(ioFBConfigDict, CFSTR(kIOFBModesKey)) : 0;
         int ioModeCount = (ioModesArray) ? CFArrayGetCount(ioModesArray) : 0;
 
         CFArrayRef array = CGDisplayCopyAllDisplayModes(m_cgScreen, NULL);
@@ -221,20 +191,17 @@ namespace Rv
 
         for (CFIndex i = 0, n = CFArrayGetCount(array); i < n; i++)
         {
-            const CGDisplayModeRef mode =
-                (CGDisplayModeRef)CFArrayGetValueAtIndex(array, i);
+            const CGDisplayModeRef mode = (CGDisplayModeRef)CFArrayGetValueAtIndex(array, i);
             const int32_t id = CGDisplayModeGetIODisplayModeID(mode);
             const size_t flags = CGDisplayModeGetIOFlags(mode);
-            const size_t depth =
-                depthFromPixelEncoding(CGDisplayModeCopyPixelEncoding(mode));
+            const size_t depth = depthFromPixelEncoding(CGDisplayModeCopyPixelEncoding(mode));
 
             if ((flags & kDisplayModeSafetyFlags) && depth >= 8)
             {
                 const size_t width = CGDisplayModeGetWidth(mode);
                 const size_t height = CGDisplayModeGetHeight(mode);
                 const int32_t ioID = CGDisplayModeGetIODisplayModeID(mode);
-                const double hz =
-                    modeHz(mode, ioModesArray, ioModeCount, cvRefHz);
+                const double hz = modeHz(mode, ioModesArray, ioModeCount, cvRefHz);
 
                 ostringstream str;
                 str << width << " x " << height;
@@ -251,9 +218,7 @@ namespace Rv
                 //      << ", (" << id << ")"
                 //      << endl;
 
-                m_videoFormats.push_back(
-                    DesktopVideoFormat(width, height, 1.0, 1.0, hz, str.str(),
-                                       (void*)(size_t)ioID));
+                m_videoFormats.push_back(DesktopVideoFormat(width, height, 1.0, 1.0, hz, str.str(), (void*)(size_t)ioID));
             }
         }
 
@@ -293,9 +258,7 @@ namespace Rv
 
             m_ioModeMap[currentModeID] = m_videoFormats.size();
 
-            m_videoFormats.push_back(
-                DesktopVideoFormat(w, h, 1.0, 1.0, cvRefHz, str.str(),
-                                   (void*)(size_t)currentModeID));
+            m_videoFormats.push_back(DesktopVideoFormat(w, h, 1.0, 1.0, cvRefHz, str.str(), (void*)(size_t)currentModeID));
 
             //
             //  Then re-sort and re-determine index.
@@ -329,10 +292,7 @@ namespace Rv
 
     CGDesktopVideoDevice::~CGDesktopVideoDevice() { close(); }
 
-    void CGDesktopVideoDevice::makeCurrent() const
-    {
-        m_viewDevice->makeCurrent();
-    }
+    void CGDesktopVideoDevice::makeCurrent() const { m_viewDevice->makeCurrent(); }
 
     bool CGDesktopVideoDevice::isSyncing() const
     {
@@ -399,11 +359,9 @@ namespace Rv
         }
         attrs.push_back(0);
 
-        if (CGLError err = CGLChoosePixelFormat(
-                (CGLPixelFormatAttribute*)&attrs.front(), &m_pfo, &m_npfo))
+        if (CGLError err = CGLChoosePixelFormat((CGLPixelFormatAttribute*)&attrs.front(), &m_pfo, &m_npfo))
         {
-            cout << "ERROR: choosing pixel format: " << CGLErrorString(err)
-                 << endl;
+            cout << "ERROR: choosing pixel format: " << CGLErrorString(err) << endl;
             exit(-1);
         }
 
@@ -416,20 +374,17 @@ namespace Rv
         // CGDisplayHideCursor(m_cgScreen);
         m_savedMode = CGDisplayCopyDisplayMode(m_cgScreen);
 
-        CGDisplayModeRef mode =
-            displayModeRefFromIOMode(int32_t((size_t)format.data), m_cgScreen);
+        CGDisplayModeRef mode = displayModeRefFromIOMode(int32_t((size_t)format.data), m_cgScreen);
         CGDisplaySetDisplayMode(m_cgScreen, mode, NULL);
         CGDisplayCapture(m_cgScreen);
 
-        CGLSetFullScreenOnDisplay(m_context,
-                                  CGDisplayIDToOpenGLDisplayMask(m_cgScreen));
+        CGLSetFullScreenOnDisplay(m_context, CGDisplayIDToOpenGLDisplayMask(m_cgScreen));
         GLint one = 1;
         GLint zero = 0;
         CGLSetParameter(m_context, kCGLCPSwapInterval, m_vsync ? &one : &zero);
         CGLSetParameter(m_context, kCGLCPSurfaceOrder, &one);
 
-        m_viewDevice = new CGGLVideoDevice(0, format.width, format.height,
-                                           false, m_context, false);
+        m_viewDevice = new CGGLVideoDevice(0, format.width, format.height, false, m_context, false);
         m_viewDevice->makeCurrent();
     }
 
@@ -458,19 +413,13 @@ namespace Rv
         m_context = 0;
     }
 
-    VideoDevice::Resolution CGDesktopVideoDevice::resolution() const
-    {
-        return format();
-    }
+    VideoDevice::Resolution CGDesktopVideoDevice::resolution() const { return format(); }
 
     size_t CGDesktopVideoDevice::width() const { return resolution().width; }
 
     size_t CGDesktopVideoDevice::height() const { return resolution().height; }
 
-    float CGDesktopVideoDevice::pixelScale() const
-    {
-        return resolution().pixelScale;
-    }
+    float CGDesktopVideoDevice::pixelScale() const { return resolution().pixelScale; }
 
     VideoDevice::VideoFormat CGDesktopVideoDevice::format() const
     {
@@ -496,23 +445,16 @@ namespace Rv
             {
                 if (IPCore::debugPlayback)
                 {
-                    cout << "WARNING: recovered from unexpected video mode "
-                         << endl;
+                    cout << "WARNING: recovered from unexpected video mode " << endl;
                 }
                 return m_videoFormats[i->second];
             }
         }
     }
 
-    VideoDevice::Offset CGDesktopVideoDevice::offset() const
-    {
-        return Offset(0, 0);
-    }
+    VideoDevice::Offset CGDesktopVideoDevice::offset() const { return Offset(0, 0); }
 
-    VideoDevice::Timing CGDesktopVideoDevice::timing() const
-    {
-        return format();
-    }
+    VideoDevice::Timing CGDesktopVideoDevice::timing() const { return format(); }
 
     TwkApp::VideoDevice::ColorProfile CGDesktopVideoDevice::colorProfile() const
     {
@@ -520,23 +462,20 @@ namespace Rv
         //  Get the display's color sync profile
         //
 
-        if (ColorSyncProfileRef iccRef =
-                ColorSyncProfileCreateWithDisplayID(m_cgScreen))
+        if (ColorSyncProfileRef iccRef = ColorSyncProfileCreateWithDisplayID(m_cgScreen))
         {
             m_colorProfile.type = ICCProfile;
 
             CFStringRef desc = ColorSyncProfileCopyDescriptionString(iccRef);
             CFIndex n = CFStringGetLength(desc);
             vector<char> buffer(n * 4 + 1);
-            CFStringGetCString(desc, &buffer.front(), buffer.size(),
-                               kCFStringEncodingUTF8);
+            CFStringGetCString(desc, &buffer.front(), buffer.size(), kCFStringEncodingUTF8);
             m_colorProfile.description = &buffer.front();
 
             CFURLRef url = ColorSyncProfileGetURL(iccRef, NULL);
             CFStringRef urlstr = CFURLGetString(url);
             buffer.resize(CFStringGetLength(urlstr) * 4 + 1);
-            CFStringGetCString(urlstr, &buffer.front(), buffer.size(),
-                               kCFStringEncodingUTF8);
+            CFStringGetCString(urlstr, &buffer.front(), buffer.size(), kCFStringEncodingUTF8);
 
             m_colorProfile.url = &buffer.front();
         }
@@ -548,8 +487,8 @@ namespace Rv
         return m_colorProfile;
     }
 
-    std::vector<VideoDevice*> CGDesktopVideoDevice::createDesktopVideoDevices(
-        TwkApp::VideoModule* module, const QTGLVideoDevice* shareDevice)
+    std::vector<VideoDevice*> CGDesktopVideoDevice::createDesktopVideoDevices(TwkApp::VideoModule* module,
+                                                                              const QTGLVideoDevice* shareDevice)
     {
         std::vector<VideoDevice*> devices;
 
@@ -565,28 +504,20 @@ namespace Rv
 
             CFStringRef localName = NULL;
             io_connect_t displayPort = CGDisplayIOServicePort(aID);
-            CFDictionaryRef dict =
-                (CFDictionaryRef)IODisplayCreateInfoDictionary(
-                    displayPort, kIODisplayOnlyPreferredName);
-            CFDictionaryRef names = (CFDictionaryRef)CFDictionaryGetValue(
-                dict, CFSTR(kDisplayProductName));
+            CFDictionaryRef dict = (CFDictionaryRef)IODisplayCreateInfoDictionary(displayPort, kIODisplayOnlyPreferredName);
+            CFDictionaryRef names = (CFDictionaryRef)CFDictionaryGetValue(dict, CFSTR(kDisplayProductName));
 
             if (names)
             {
-                CFArrayRef langKeys = CFArrayCreateMutable(
-                    kCFAllocatorDefault, 0, &kCFTypeArrayCallBacks);
-                CFDictionaryApplyFunction(names, KeyArrayCallback,
-                                          (void*)langKeys);
-                CFArrayRef orderLangKeys =
-                    CFBundleCopyPreferredLocalizationsFromArray(langKeys);
+                CFArrayRef langKeys = CFArrayCreateMutable(kCFAllocatorDefault, 0, &kCFTypeArrayCallBacks);
+                CFDictionaryApplyFunction(names, KeyArrayCallback, (void*)langKeys);
+                CFArrayRef orderLangKeys = CFBundleCopyPreferredLocalizationsFromArray(langKeys);
                 CFRelease(langKeys);
 
                 if (orderLangKeys && CFArrayGetCount(orderLangKeys))
                 {
-                    CFStringRef langKey =
-                        (CFStringRef)CFArrayGetValueAtIndex(orderLangKeys, 0);
-                    localName =
-                        (CFStringRef)CFDictionaryGetValue(names, langKey);
+                    CFStringRef langKey = (CFStringRef)CFArrayGetValueAtIndex(orderLangKeys, 0);
+                    localName = (CFStringRef)CFDictionaryGetValue(names, langKey);
                     CFRetain(localName);
                 }
 
@@ -609,11 +540,9 @@ namespace Rv
             }
             else
             {
-                localBuffer =
-                    vector<char>(CFStringGetLength(localName) * 4 + 1);
+                localBuffer = vector<char>(CFStringGetLength(localName) * 4 + 1);
 
-                CFStringGetCString(localName, &localBuffer.front(),
-                                   localBuffer.size(), kCFStringEncodingUTF8);
+                CFStringGetCString(localName, &localBuffer.front(), localBuffer.size(), kCFStringEncodingUTF8);
 
                 nameP = &localBuffer.front();
             }
@@ -625,8 +554,7 @@ namespace Rv
             //  seems to be true.  The [NSScreen screens] call is used in Qt
             //  core\ code to define Qt screens.
             //
-            CGDesktopVideoDevice* sd =
-                new CGDesktopVideoDevice(module, nameP, aID, i, shareDevice);
+            CGDesktopVideoDevice* sd = new CGDesktopVideoDevice(module, nameP, aID, i, shareDevice);
             devices.push_back(sd);
 
             CFRelease(dict);

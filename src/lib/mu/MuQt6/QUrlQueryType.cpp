@@ -55,37 +55,30 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(__allocate, Pointer)
     {
-        QUrlQueryType::Instance* i =
-            new QUrlQueryType::Instance((Class*)NODE_THIS.type());
+        QUrlQueryType::Instance* i = new QUrlQueryType::Instance((Class*)NODE_THIS.type());
         QUrlQueryType::registerFinalizer(i);
         NODE_RETURN(i);
     }
 
-    void QUrlQueryType::registerFinalizer(void* o)
-    {
-        GC_register_finalizer(o, QUrlQueryType::finalizer, 0, 0, 0);
-    }
+    void QUrlQueryType::registerFinalizer(void* o) { GC_register_finalizer(o, QUrlQueryType::finalizer, 0, 0, 0); }
 
     void QUrlQueryType::finalizer(void* obj, void* data)
     {
-        QUrlQueryType::Instance* i =
-            reinterpret_cast<QUrlQueryType::Instance*>(obj);
+        QUrlQueryType::Instance* i = reinterpret_cast<QUrlQueryType::Instance*>(obj);
         delete i;
     }
 
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    Pointer qt_QUrlQuery_QUrlQuery_QUrlQuery_QUrlQuery(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this)
+    Pointer qt_QUrlQuery_QUrlQuery_QUrlQuery_QUrlQuery(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         setqtype<QUrlQueryType>(param_this, QUrlQuery());
         return param_this;
     }
 
-    Pointer qt_QUrlQuery_QUrlQuery_QUrlQuery_QUrlQuery_QUrl(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_url)
+    Pointer qt_QUrlQuery_QUrlQuery_QUrlQuery_QUrlQuery_QUrl(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_url)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QUrl arg1 = getqtype<QUrlType>(param_url);
@@ -93,8 +86,7 @@ namespace Mu
         return param_this;
     }
 
-    Pointer qt_QUrlQuery_QUrlQuery_QUrlQuery_QUrlQuery_string(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_queryString)
+    Pointer qt_QUrlQuery_QUrlQuery_QUrlQuery_QUrlQuery_string(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_queryString)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QString arg1 = qstring(param_queryString);
@@ -102,9 +94,8 @@ namespace Mu
         return param_this;
     }
 
-    void qt_QUrlQuery_addQueryItem_void_QUrlQuery_string_string(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_key,
-        Pointer param_value)
+    void qt_QUrlQuery_addQueryItem_void_QUrlQuery_string_string(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_key,
+                                                                Pointer param_value)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QUrlQuery& arg0 = getqtype<QUrlQueryType>(param_this);
@@ -114,20 +105,17 @@ namespace Mu
         setqtype<QUrlQueryType>(param_this, arg0);
     }
 
-    Pointer qt_QUrlQuery_allQueryItemValues_stringBSB_ESB__QUrlQuery_string_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_key,
-        int param_encoding)
+    Pointer qt_QUrlQuery_allQueryItemValues_stringBSB_ESB__QUrlQuery_string_int(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                Pointer param_key, int param_encoding)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QUrlQuery& arg0 = getqtype<QUrlQueryType>(param_this);
         const QString arg1 = qstring(param_key);
-        QUrl::ComponentFormattingOptions arg2 =
-            (QUrl::ComponentFormattingOptions)(param_encoding);
+        QUrl::ComponentFormattingOptions arg2 = (QUrl::ComponentFormattingOptions)(param_encoding);
         return makestringlist(c, arg0.allQueryItemValues(arg1, arg2));
     }
 
-    void qt_QUrlQuery_clear_void_QUrlQuery(Mu::Thread& NODE_THREAD,
-                                           Pointer param_this)
+    void qt_QUrlQuery_clear_void_QUrlQuery(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QUrlQuery& arg0 = getqtype<QUrlQueryType>(param_this);
@@ -135,8 +123,7 @@ namespace Mu
         setqtype<QUrlQueryType>(param_this, arg0);
     }
 
-    bool qt_QUrlQuery_hasQueryItem_bool_QUrlQuery_string(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_key)
+    bool qt_QUrlQuery_hasQueryItem_bool_QUrlQuery_string(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_key)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QUrlQuery& arg0 = getqtype<QUrlQueryType>(param_this);
@@ -144,39 +131,32 @@ namespace Mu
         return arg0.hasQueryItem(arg1);
     }
 
-    bool qt_QUrlQuery_isEmpty_bool_QUrlQuery(Mu::Thread& NODE_THREAD,
-                                             Pointer param_this)
+    bool qt_QUrlQuery_isEmpty_bool_QUrlQuery(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QUrlQuery& arg0 = getqtype<QUrlQueryType>(param_this);
         return arg0.isEmpty();
     }
 
-    Pointer qt_QUrlQuery_query_string_QUrlQuery_int(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this,
-                                                    int param_encoding)
+    Pointer qt_QUrlQuery_query_string_QUrlQuery_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_encoding)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QUrlQuery& arg0 = getqtype<QUrlQueryType>(param_this);
-        QUrl::ComponentFormattingOptions arg1 =
-            (QUrl::ComponentFormattingOptions)(param_encoding);
+        QUrl::ComponentFormattingOptions arg1 = (QUrl::ComponentFormattingOptions)(param_encoding);
         return makestring(c, arg0.query(arg1));
     }
 
-    Pointer qt_QUrlQuery_queryItemValue_string_QUrlQuery_string_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_key,
-        int param_encoding)
+    Pointer qt_QUrlQuery_queryItemValue_string_QUrlQuery_string_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_key,
+                                                                    int param_encoding)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QUrlQuery& arg0 = getqtype<QUrlQueryType>(param_this);
         const QString arg1 = qstring(param_key);
-        QUrl::ComponentFormattingOptions arg2 =
-            (QUrl::ComponentFormattingOptions)(param_encoding);
+        QUrl::ComponentFormattingOptions arg2 = (QUrl::ComponentFormattingOptions)(param_encoding);
         return makestring(c, arg0.queryItemValue(arg1, arg2));
     }
 
-    void qt_QUrlQuery_removeAllQueryItems_void_QUrlQuery_string(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_key)
+    void qt_QUrlQuery_removeAllQueryItems_void_QUrlQuery_string(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_key)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QUrlQuery& arg0 = getqtype<QUrlQueryType>(param_this);
@@ -185,8 +165,7 @@ namespace Mu
         setqtype<QUrlQueryType>(param_this, arg0);
     }
 
-    void qt_QUrlQuery_removeQueryItem_void_QUrlQuery_string(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_key)
+    void qt_QUrlQuery_removeQueryItem_void_QUrlQuery_string(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_key)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QUrlQuery& arg0 = getqtype<QUrlQueryType>(param_this);
@@ -195,9 +174,7 @@ namespace Mu
         setqtype<QUrlQueryType>(param_this, arg0);
     }
 
-    void qt_QUrlQuery_setQuery_void_QUrlQuery_string(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_this,
-                                                     Pointer param_queryString)
+    void qt_QUrlQuery_setQuery_void_QUrlQuery_string(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_queryString)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QUrlQuery& arg0 = getqtype<QUrlQueryType>(param_this);
@@ -206,9 +183,7 @@ namespace Mu
         setqtype<QUrlQueryType>(param_this, arg0);
     }
 
-    void qt_QUrlQuery_swap_void_QUrlQuery_QUrlQuery(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this,
-                                                    Pointer param_other)
+    void qt_QUrlQuery_swap_void_QUrlQuery_QUrlQuery(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_other)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QUrlQuery& arg0 = getqtype<QUrlQueryType>(param_this);
@@ -217,19 +192,15 @@ namespace Mu
         setqtype<QUrlQueryType>(param_this, arg0);
     }
 
-    Pointer qt_QUrlQuery_toString_string_QUrlQuery_int(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this,
-                                                       int param_encoding)
+    Pointer qt_QUrlQuery_toString_string_QUrlQuery_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_encoding)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QUrlQuery& arg0 = getqtype<QUrlQueryType>(param_this);
-        QUrl::ComponentFormattingOptions arg1 =
-            (QUrl::ComponentFormattingOptions)(param_encoding);
+        QUrl::ComponentFormattingOptions arg1 = (QUrl::ComponentFormattingOptions)(param_encoding);
         return makestring(c, arg0.toString(arg1));
     }
 
-    bool qt_QUrlQuery_operatorBang_EQ__bool_QUrlQuery_QUrlQuery(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_other)
+    bool qt_QUrlQuery_operatorBang_EQ__bool_QUrlQuery_QUrlQuery(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_other)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QUrlQuery& arg0 = getqtype<QUrlQueryType>(param_this);
@@ -237,8 +208,7 @@ namespace Mu
         return arg0.operator!=(arg1);
     }
 
-    bool qt_QUrlQuery_operatorEQ_EQ__bool_QUrlQuery_QUrlQuery(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_other)
+    bool qt_QUrlQuery_operatorEQ_EQ__bool_QUrlQuery_QUrlQuery(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_other)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QUrlQuery& arg0 = getqtype<QUrlQueryType>(param_this);
@@ -248,108 +218,87 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(_n_QUrlQuery0, Pointer)
     {
-        NODE_RETURN(qt_QUrlQuery_QUrlQuery_QUrlQuery_QUrlQuery(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QUrlQuery_QUrlQuery_QUrlQuery_QUrlQuery(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_QUrlQuery1, Pointer)
     {
-        NODE_RETURN(qt_QUrlQuery_QUrlQuery_QUrlQuery_QUrlQuery_QUrl(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QUrlQuery_QUrlQuery_QUrlQuery_QUrlQuery_QUrl(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_QUrlQuery2, Pointer)
     {
-        NODE_RETURN(qt_QUrlQuery_QUrlQuery_QUrlQuery_QUrlQuery_string(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QUrlQuery_QUrlQuery_QUrlQuery_QUrlQuery_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_addQueryItem0, void)
     {
-        qt_QUrlQuery_addQueryItem_void_QUrlQuery_string_string(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer));
+        qt_QUrlQuery_addQueryItem_void_QUrlQuery_string_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                               NODE_ARG(2, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_allQueryItemValues0, Pointer)
     {
-        NODE_RETURN(
-            qt_QUrlQuery_allQueryItemValues_stringBSB_ESB__QUrlQuery_string_int(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, int)));
+        NODE_RETURN(qt_QUrlQuery_allQueryItemValues_stringBSB_ESB__QUrlQuery_string_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                        NODE_ARG(1, Pointer), NODE_ARG(2, int)));
     }
 
-    static NODE_IMPLEMENTATION(_n_clear0, void)
-    {
-        qt_QUrlQuery_clear_void_QUrlQuery(NODE_THREAD,
-                                          NONNIL_NODE_ARG(0, Pointer));
-    }
+    static NODE_IMPLEMENTATION(_n_clear0, void) { qt_QUrlQuery_clear_void_QUrlQuery(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)); }
 
     static NODE_IMPLEMENTATION(_n_hasQueryItem0, bool)
     {
-        NODE_RETURN(qt_QUrlQuery_hasQueryItem_bool_QUrlQuery_string(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QUrlQuery_hasQueryItem_bool_QUrlQuery_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isEmpty0, bool)
     {
-        NODE_RETURN(qt_QUrlQuery_isEmpty_bool_QUrlQuery(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QUrlQuery_isEmpty_bool_QUrlQuery(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_query0, Pointer)
     {
-        NODE_RETURN(qt_QUrlQuery_query_string_QUrlQuery_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QUrlQuery_query_string_QUrlQuery_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_queryItemValue0, Pointer)
     {
-        NODE_RETURN(qt_QUrlQuery_queryItemValue_string_QUrlQuery_string_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int)));
+        NODE_RETURN(qt_QUrlQuery_queryItemValue_string_QUrlQuery_string_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                            NODE_ARG(2, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_removeAllQueryItems0, void)
     {
-        qt_QUrlQuery_removeAllQueryItems_void_QUrlQuery_string(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QUrlQuery_removeAllQueryItems_void_QUrlQuery_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_removeQueryItem0, void)
     {
-        qt_QUrlQuery_removeQueryItem_void_QUrlQuery_string(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QUrlQuery_removeQueryItem_void_QUrlQuery_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setQuery0, void)
     {
-        qt_QUrlQuery_setQuery_void_QUrlQuery_string(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QUrlQuery_setQuery_void_QUrlQuery_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_swap0, void)
     {
-        qt_QUrlQuery_swap_void_QUrlQuery_QUrlQuery(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QUrlQuery_swap_void_QUrlQuery_QUrlQuery(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_toString0, Pointer)
     {
-        NODE_RETURN(qt_QUrlQuery_toString_string_QUrlQuery_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QUrlQuery_toString_string_QUrlQuery_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorBang_EQ_0, bool)
     {
-        NODE_RETURN(qt_QUrlQuery_operatorBang_EQ__bool_QUrlQuery_QUrlQuery(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QUrlQuery_operatorBang_EQ__bool_QUrlQuery_QUrlQuery(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorEQ_EQ_0, bool)
     {
-        NODE_RETURN(qt_QUrlQuery_operatorEQ_EQ__bool_QUrlQuery_QUrlQuery(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QUrlQuery_operatorEQ_EQ__bool_QUrlQuery_QUrlQuery(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     void QUrlQueryType::load()
@@ -369,132 +318,77 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(
-            new Function(c, "__allocate", __allocate, None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", __allocate, None, Return, ftn, End),
 
-            EndArguments);
+                   EndArguments);
 
         addSymbols(EndArguments);
 
         addSymbols(
             // enums
             // member functions
-            new Function(c, "QUrlQuery", _n_QUrlQuery0, None, Compiled,
-                         qt_QUrlQuery_QUrlQuery_QUrlQuery_QUrlQuery, Return,
-                         "qt.QUrlQuery", Parameters,
-                         new Param(c, "this", "qt.QUrlQuery"), End),
-            new Function(c, "QUrlQuery", _n_QUrlQuery1, None, Compiled,
-                         qt_QUrlQuery_QUrlQuery_QUrlQuery_QUrlQuery_QUrl,
-                         Return, "qt.QUrlQuery", Parameters,
-                         new Param(c, "this", "qt.QUrlQuery"),
-                         new Param(c, "url", "qt.QUrl"), End),
-            new Function(c, "QUrlQuery", _n_QUrlQuery2, None, Compiled,
-                         qt_QUrlQuery_QUrlQuery_QUrlQuery_QUrlQuery_string,
-                         Return, "qt.QUrlQuery", Parameters,
-                         new Param(c, "this", "qt.QUrlQuery"),
-                         new Param(c, "queryString", "string"), End),
+            new Function(c, "QUrlQuery", _n_QUrlQuery0, None, Compiled, qt_QUrlQuery_QUrlQuery_QUrlQuery_QUrlQuery, Return, "qt.QUrlQuery",
+                         Parameters, new Param(c, "this", "qt.QUrlQuery"), End),
+            new Function(c, "QUrlQuery", _n_QUrlQuery1, None, Compiled, qt_QUrlQuery_QUrlQuery_QUrlQuery_QUrlQuery_QUrl, Return,
+                         "qt.QUrlQuery", Parameters, new Param(c, "this", "qt.QUrlQuery"), new Param(c, "url", "qt.QUrl"), End),
+            new Function(c, "QUrlQuery", _n_QUrlQuery2, None, Compiled, qt_QUrlQuery_QUrlQuery_QUrlQuery_QUrlQuery_string, Return,
+                         "qt.QUrlQuery", Parameters, new Param(c, "this", "qt.QUrlQuery"), new Param(c, "queryString", "string"), End),
             // MISSING: QUrlQuery (QUrlQuery; QUrlQuery this, QUrlQuery other)
             // MISSING: QUrlQuery (QUrlQuery; QUrlQuery this, "QUrlQuery & &"
             // other)
-            new Function(c, "addQueryItem", _n_addQueryItem0, None, Compiled,
-                         qt_QUrlQuery_addQueryItem_void_QUrlQuery_string_string,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QUrlQuery"),
-                         new Param(c, "key", "string"),
+            new Function(c, "addQueryItem", _n_addQueryItem0, None, Compiled, qt_QUrlQuery_addQueryItem_void_QUrlQuery_string_string,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QUrlQuery"), new Param(c, "key", "string"),
                          new Param(c, "value", "string"), End),
-            new Function(
-                c, "allQueryItemValues", _n_allQueryItemValues0, None, Compiled,
-                qt_QUrlQuery_allQueryItemValues_stringBSB_ESB__QUrlQuery_string_int,
-                Return, "string[]", Parameters,
-                new Param(c, "this", "qt.QUrlQuery"),
-                new Param(c, "key", "string"),
-                new Param(c, "encoding", "int",
-                          Value((int)QUrl::PrettyDecoded)),
-                End),
-            new Function(c, "clear", _n_clear0, None, Compiled,
-                         qt_QUrlQuery_clear_void_QUrlQuery, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QUrlQuery"), End),
-            new Function(c, "hasQueryItem", _n_hasQueryItem0, None, Compiled,
-                         qt_QUrlQuery_hasQueryItem_bool_QUrlQuery_string,
-                         Return, "bool", Parameters,
-                         new Param(c, "this", "qt.QUrlQuery"),
-                         new Param(c, "key", "string"), End),
-            new Function(c, "isEmpty", _n_isEmpty0, None, Compiled,
-                         qt_QUrlQuery_isEmpty_bool_QUrlQuery, Return, "bool",
-                         Parameters, new Param(c, "this", "qt.QUrlQuery"), End),
-            new Function(c, "query", _n_query0, None, Compiled,
-                         qt_QUrlQuery_query_string_QUrlQuery_int, Return,
-                         "string", Parameters,
-                         new Param(c, "this", "qt.QUrlQuery"),
-                         new Param(c, "encoding", "int",
-                                   Value((int)QUrl::PrettyDecoded)),
-                         End),
-            new Function(
-                c, "queryItemValue", _n_queryItemValue0, None, Compiled,
-                qt_QUrlQuery_queryItemValue_string_QUrlQuery_string_int, Return,
-                "string", Parameters, new Param(c, "this", "qt.QUrlQuery"),
-                new Param(c, "key", "string"),
-                new Param(c, "encoding", "int",
-                          Value((int)QUrl::PrettyDecoded)),
-                End),
+            new Function(c, "allQueryItemValues", _n_allQueryItemValues0, None, Compiled,
+                         qt_QUrlQuery_allQueryItemValues_stringBSB_ESB__QUrlQuery_string_int, Return, "string[]", Parameters,
+                         new Param(c, "this", "qt.QUrlQuery"), new Param(c, "key", "string"),
+                         new Param(c, "encoding", "int", Value((int)QUrl::PrettyDecoded)), End),
+            new Function(c, "clear", _n_clear0, None, Compiled, qt_QUrlQuery_clear_void_QUrlQuery, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QUrlQuery"), End),
+            new Function(c, "hasQueryItem", _n_hasQueryItem0, None, Compiled, qt_QUrlQuery_hasQueryItem_bool_QUrlQuery_string, Return,
+                         "bool", Parameters, new Param(c, "this", "qt.QUrlQuery"), new Param(c, "key", "string"), End),
+            new Function(c, "isEmpty", _n_isEmpty0, None, Compiled, qt_QUrlQuery_isEmpty_bool_QUrlQuery, Return, "bool", Parameters,
+                         new Param(c, "this", "qt.QUrlQuery"), End),
+            new Function(c, "query", _n_query0, None, Compiled, qt_QUrlQuery_query_string_QUrlQuery_int, Return, "string", Parameters,
+                         new Param(c, "this", "qt.QUrlQuery"), new Param(c, "encoding", "int", Value((int)QUrl::PrettyDecoded)), End),
+            new Function(c, "queryItemValue", _n_queryItemValue0, None, Compiled, qt_QUrlQuery_queryItemValue_string_QUrlQuery_string_int,
+                         Return, "string", Parameters, new Param(c, "this", "qt.QUrlQuery"), new Param(c, "key", "string"),
+                         new Param(c, "encoding", "int", Value((int)QUrl::PrettyDecoded)), End),
             // MISSING: queryItems ("QList<QPair<QString, QString>>"; QUrlQuery
             // this, flags QUrl::ComponentFormattingOptions encoding) MISSING:
             // queryPairDelimiter ("QChar"; QUrlQuery this) MISSING:
             // queryValueDelimiter ("QChar"; QUrlQuery this)
-            new Function(c, "removeAllQueryItems", _n_removeAllQueryItems0,
-                         None, Compiled,
-                         qt_QUrlQuery_removeAllQueryItems_void_QUrlQuery_string,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QUrlQuery"),
-                         new Param(c, "key", "string"), End),
-            new Function(
-                c, "removeQueryItem", _n_removeQueryItem0, None, Compiled,
-                qt_QUrlQuery_removeQueryItem_void_QUrlQuery_string, Return,
-                "void", Parameters, new Param(c, "this", "qt.QUrlQuery"),
-                new Param(c, "key", "string"), End),
-            new Function(c, "setQuery", _n_setQuery0, None, Compiled,
-                         qt_QUrlQuery_setQuery_void_QUrlQuery_string, Return,
-                         "void", Parameters,
-                         new Param(c, "this", "qt.QUrlQuery"),
-                         new Param(c, "queryString", "string"), End),
+            new Function(c, "removeAllQueryItems", _n_removeAllQueryItems0, None, Compiled,
+                         qt_QUrlQuery_removeAllQueryItems_void_QUrlQuery_string, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QUrlQuery"), new Param(c, "key", "string"), End),
+            new Function(c, "removeQueryItem", _n_removeQueryItem0, None, Compiled, qt_QUrlQuery_removeQueryItem_void_QUrlQuery_string,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QUrlQuery"), new Param(c, "key", "string"), End),
+            new Function(c, "setQuery", _n_setQuery0, None, Compiled, qt_QUrlQuery_setQuery_void_QUrlQuery_string, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QUrlQuery"), new Param(c, "queryString", "string"), End),
             // MISSING: setQueryDelimiters (void; QUrlQuery this, "QChar"
             // valueDelimiter, "QChar" pairDelimiter) MISSING: setQueryItems
             // (void; QUrlQuery this, "const QList<QPair<QString, QString>> &"
             // query)
-            new Function(c, "swap", _n_swap0, None, Compiled,
-                         qt_QUrlQuery_swap_void_QUrlQuery_QUrlQuery, Return,
-                         "void", Parameters,
-                         new Param(c, "this", "qt.QUrlQuery"),
-                         new Param(c, "other", "qt.QUrlQuery"), End),
-            new Function(c, "toString", _n_toString0, None, Compiled,
-                         qt_QUrlQuery_toString_string_QUrlQuery_int, Return,
-                         "string", Parameters,
-                         new Param(c, "this", "qt.QUrlQuery"),
-                         new Param(c, "encoding", "int",
-                                   Value((int)QUrl::PrettyDecoded)),
+            new Function(c, "swap", _n_swap0, None, Compiled, qt_QUrlQuery_swap_void_QUrlQuery_QUrlQuery, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QUrlQuery"), new Param(c, "other", "qt.QUrlQuery"), End),
+            new Function(c, "toString", _n_toString0, None, Compiled, qt_QUrlQuery_toString_string_QUrlQuery_int, Return, "string",
+                         Parameters, new Param(c, "this", "qt.QUrlQuery"), new Param(c, "encoding", "int", Value((int)QUrl::PrettyDecoded)),
                          End),
             // static functions
             // MISSING: defaultQueryPairDelimiter ("char16_t"; )
             // MISSING: defaultQueryValueDelimiter ("char16_t"; )
             EndArguments);
         globalScope()->addSymbols(
-            new Function(c, "!=", _n_operatorBang_EQ_0, Op, Compiled,
-                         qt_QUrlQuery_operatorBang_EQ__bool_QUrlQuery_QUrlQuery,
-                         Return, "bool", Parameters,
-                         new Param(c, "this", "qt.QUrlQuery"),
-                         new Param(c, "other", "qt.QUrlQuery"), End),
+            new Function(c, "!=", _n_operatorBang_EQ_0, Op, Compiled, qt_QUrlQuery_operatorBang_EQ__bool_QUrlQuery_QUrlQuery, Return,
+                         "bool", Parameters, new Param(c, "this", "qt.QUrlQuery"), new Param(c, "other", "qt.QUrlQuery"), End),
             // MISSING: = (QUrlQuery; QUrlQuery this, QUrlQuery other)
             // MISSING: = (QUrlQuery; QUrlQuery this, "QUrlQuery & &" other)
-            new Function(c, "==", _n_operatorEQ_EQ_0, Op, Compiled,
-                         qt_QUrlQuery_operatorEQ_EQ__bool_QUrlQuery_QUrlQuery,
-                         Return, "bool", Parameters,
-                         new Param(c, "this", "qt.QUrlQuery"),
-                         new Param(c, "other", "qt.QUrlQuery"), End),
+            new Function(c, "==", _n_operatorEQ_EQ_0, Op, Compiled, qt_QUrlQuery_operatorEQ_EQ__bool_QUrlQuery_QUrlQuery, Return, "bool",
+                         Parameters, new Param(c, "this", "qt.QUrlQuery"), new Param(c, "other", "qt.QUrlQuery"), End),
             EndArguments);
         scope()->addSymbols(EndArguments);
     }

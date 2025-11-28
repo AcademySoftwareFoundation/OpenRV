@@ -27,8 +27,7 @@ namespace TwkFB
 
     void IOsgi::Header::valid()
     {
-        if ((storage != 1 && storage != 0) || (magic != Cigam && magic != Magic)
-            || (bytesPerChannel != 1 && bytesPerChannel != 2)
+        if ((storage != 1 && storage != 0) || (magic != Cigam && magic != Magic) || (bytesPerChannel != 1 && bytesPerChannel != 2)
             || (dimension < 1 || dimension > 3) || (colormapID != 0))
         {
             TWK_THROW_STREAM(IOException, "SGI header has non-standard values");
@@ -91,8 +90,7 @@ namespace TwkFB
 
         if (!infile)
         {
-            TWK_THROW_STREAM(IOException, "Unable to open SGI file \""
-                                              << filename << "\" for reading");
+            TWK_THROW_STREAM(IOException, "Unable to open SGI file \"" << filename << "\" for reading");
         }
 
         Header header;
@@ -113,18 +111,15 @@ namespace TwkFB
             fbi.height = header.height;
             fbi.numChannels = header.numChannels;
             fbi.orientation = FrameBuffer::NATURAL;
-            fbi.dataType = header.bytesPerChannel == 1 ? FrameBuffer::UCHAR
-                                                       : FrameBuffer::USHORT;
+            fbi.dataType = header.bytesPerChannel == 1 ? FrameBuffer::UCHAR : FrameBuffer::USHORT;
         }
         else
         {
-            TWK_THROW_STREAM(IOException, "Bad magic number in SGI file \""
-                                              << filename << "\"");
+            TWK_THROW_STREAM(IOException, "Bad magic number in SGI file \"" << filename << "\"");
         }
     }
 
-    void IOsgi::readVerbatim(ifstream& infile, const Header& header,
-                             FrameBuffer& fb, bool swap) const
+    void IOsgi::readVerbatim(ifstream& infile, const Header& header, FrameBuffer& fb, bool swap) const
     {
         //
         //  This is the easy case: just scarf each plane into its FB
@@ -147,8 +142,7 @@ namespace TwkFB
         }
     }
 
-    static void expandBytes(unsigned char* optr, unsigned char* iptr,
-                            size_t expected)
+    static void expandBytes(unsigned char* optr, unsigned char* iptr, size_t expected)
     {
         unsigned char pixel = 0, count = 0;
         size_t total = 0;
@@ -191,8 +185,7 @@ namespace TwkFB
         }
     }
 
-    static void expandShorts(unsigned short* optr, unsigned short* iptr,
-                             size_t expected)
+    static void expandShorts(unsigned short* optr, unsigned short* iptr, size_t expected)
     {
         unsigned short pixel = 0, count = 0;
         size_t total = 0;
@@ -235,8 +228,7 @@ namespace TwkFB
         }
     }
 
-    void IOsgi::readRLE(ifstream& infile, const Header& header, FrameBuffer& fb,
-                        bool swap) const
+    void IOsgi::readRLE(ifstream& infile, const Header& header, FrameBuffer& fb, bool swap) const
     {
         const size_t numPlanes = fb.numPlanes();
         const size_t numEntries = numPlanes * header.height;
@@ -275,8 +267,7 @@ namespace TwkFB
         unsigned char* bufp = &scanbuffer.front();
         size_t index = 0;
 
-        for (FrameBuffer* p = fb.firstPlane(); p;
-             p = p->nextPlane(), index += numEntries / fb.numPlanes())
+        for (FrameBuffer* p = fb.firstPlane(); p; p = p->nextPlane(), index += numEntries / fb.numPlanes())
         {
             const int32* otable = &offsets.front() + index;
             const int32* ltable = &lengths.front() + index;
@@ -291,36 +282,31 @@ namespace TwkFB
 
                 if (infile.fail() || infile.eof())
                 {
-                    TWK_THROW_STREAM(IOException,
-                                     "IOsgi: premature eof or failure");
+                    TWK_THROW_STREAM(IOException, "IOsgi: premature eof or failure");
                 }
 
                 if (header.bytesPerChannel == 1)
                 {
-                    expandBytes(p->scanline<unsigned char>(y), bufp,
-                                header.width);
+                    expandBytes(p->scanline<unsigned char>(y), bufp, header.width);
                 }
                 else
                 {
                     if (swap)
                         swapShorts(bufp, len / 2);
 
-                    expandShorts(p->scanline<unsigned short>(y),
-                                 (unsigned short*)bufp, header.width);
+                    expandShorts(p->scanline<unsigned short>(y), (unsigned short*)bufp, header.width);
                 }
             }
         }
     }
 
-    void IOsgi::readImage(FrameBuffer& fb, const std::string& filename,
-                          const ReadRequest& request) const
+    void IOsgi::readImage(FrameBuffer& fb, const std::string& filename, const ReadRequest& request) const
     {
         ifstream infile(UNICODE_C_STR(filename.c_str()), ios::binary);
 
         if (!infile)
         {
-            TWK_THROW_STREAM(IOException, "Unable to open SGI file \""
-                                              << filename << "\" for reading");
+            TWK_THROW_STREAM(IOException, "Unable to open SGI file \"" << filename << "\" for reading");
         }
 
         Header header;
@@ -339,9 +325,7 @@ namespace TwkFB
             const int nplanes = header.numChannels;
             const int nc = 1;
 
-            FrameBuffer::DataType dataType = header.bytesPerChannel == 1
-                                                 ? FrameBuffer::UCHAR
-                                                 : FrameBuffer::USHORT;
+            FrameBuffer::DataType dataType = header.bytesPerChannel == 1 ? FrameBuffer::UCHAR : FrameBuffer::USHORT;
 
             FrameBuffer::StringVector names;
             planeNames(nplanes, names);
@@ -367,13 +351,11 @@ namespace TwkFB
         }
         else
         {
-            TWK_THROW_STREAM(IOException, "Bad magic number in SGI file \""
-                                              << filename << "\"");
+            TWK_THROW_STREAM(IOException, "Bad magic number in SGI file \"" << filename << "\"");
         }
     }
 
-    void IOsgi::writeImage(const FrameBuffer& img, const std::string& filename,
-                           const WriteRequest& request) const
+    void IOsgi::writeImage(const FrameBuffer& img, const std::string& filename, const WriteRequest& request) const
     {
         FrameBufferIO::writeImage(img, filename, request);
     }

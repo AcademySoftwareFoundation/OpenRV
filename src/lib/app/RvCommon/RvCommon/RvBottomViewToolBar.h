@@ -13,7 +13,9 @@
 #include <QtWidgets/QSlider>
 #include <TwkApp/EventNode.h>
 #include <QAction>
-#include <unordered_map>
+#include <array>
+#include <string>
+#include <string_view>
 
 namespace IPCore
 {
@@ -66,13 +68,26 @@ namespace Rv
         void playModeMenuTriggered(QAction*);
         void playModeMenuUpdate();
 
+    protected:
+        bool eventFilter(QObject* obj, QEvent* event) override;
+
     private:
+        struct ActionCategoryMapping
+        {
+            QAction* action;
+            std::string_view category;
+            QString defaultTooltip;
+        };
+
         template <class T> void setVolumeLevel(T& inst, int level);
 
         void setVolumeIcon();
-        void setLiveReviewFilteredActions(bool isDisabled);
+        void updateActionAvailability();
+        void updatePlayModeButtonState();
 
         IPCore::Session* m_session;
+        QString m_customCannotUseTooltip;
+        QString m_customDisabledPrefix;
         QAction* m_smAction;
         QAction* m_paintAction;
         QAction* m_infoAction;
@@ -83,12 +98,15 @@ namespace Rv
         QAction* m_ghostAction;
         QAction* m_backStepAction;
         QAction* m_forwardStepAction;
-        QAction* m_backPlayAction;
+        QAction* m_backwardPlayAction;
         QAction* m_forwardPlayAction;
         QAction* m_backMarkAction;
         QAction* m_forwardMarkAction;
         QAction* m_playModeAction;
         QMenu* m_playModeMenu;
+        QAction* m_playModeLoopAction;
+        QAction* m_playModeOnceAction;
+        QAction* m_playModePingPongAction;
         QAction* m_audioAction;
         QSlider* m_audioSlider;
         QMenu* m_audioMenu;
@@ -104,11 +122,10 @@ namespace Rv
         QIcon m_volumeHighIcon;
         QIcon m_volumeHighMutedIcon;
 
-        std::unordered_map<QAction*, QString> m_liveReviewFilteredActions;
+        std::array<ActionCategoryMapping, 11> m_actionCategoryMappings;
     };
 
-    template <class T>
-    void RvBottomViewToolBar::setVolumeLevel(T& inst, int level)
+    template <class T> void RvBottomViewToolBar::setVolumeLevel(T& inst, int level)
     {
         if (level > 67)
         {

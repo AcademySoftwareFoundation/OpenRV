@@ -162,8 +162,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <>
-    bool Box<Vec2i>::intersects(const Vec2i& origin, const Vec2i& dir) const
+    template <> bool Box<Vec2i>::intersects(const Vec2i& origin, const Vec2i& dir) const
     {
         // Ripped off of GGEMS
         static const int LEFT = -1;
@@ -294,8 +293,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <>
-    bool Box<Vec2i>::closestInteriorPoint(const Vec2i& pt, Vec2i& ret) const
+    template <> bool Box<Vec2i>::closestInteriorPoint(const Vec2i& pt, Vec2i& ret) const
     {
         // Don't have to check empty or infinite here
         // because the check below implicitly does so.
@@ -538,8 +536,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <>
-    bool Box<Vec2f>::intersects(const Vec2f& origin, const Vec2f& dir) const
+    template <> bool Box<Vec2f>::intersects(const Vec2f& origin, const Vec2f& dir) const
     {
         // Ripped off of GGEMS
         static const float LEFT = -1.0f;
@@ -670,8 +667,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <>
-    bool Box<Vec2f>::closestInteriorPoint(const Vec2f& pt, Vec2f& ret) const
+    template <> bool Box<Vec2f>::closestInteriorPoint(const Vec2f& pt, Vec2f& ret) const
     {
         // Don't have to check empty or infinite here
         // because the check below implicitly does so.
@@ -914,8 +910,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <>
-    bool Box<Vec2d>::intersects(const Vec2d& origin, const Vec2d& dir) const
+    template <> bool Box<Vec2d>::intersects(const Vec2d& origin, const Vec2d& dir) const
     {
         // Ripped off of GGEMS
         static const double LEFT = -1.0;
@@ -1046,8 +1041,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <>
-    bool Box<Vec2d>::closestInteriorPoint(const Vec2d& pt, Vec2d& ret) const
+    template <> bool Box<Vec2d>::closestInteriorPoint(const Vec2d& pt, Vec2d& ret) const
     {
         // Don't have to check empty or infinite here
         // because the check below implicitly does so.
@@ -1320,8 +1314,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <>
-    bool Box<Vec3i>::intersects(const Vec3i& origin, const Vec3i& dir) const
+    template <> bool Box<Vec3i>::intersects(const Vec3i& origin, const Vec3i& dir) const
     {
         // Ripped off of GGEMS
         static const int LEFT = -1;
@@ -1422,8 +1415,7 @@ namespace TwkMath
             maxT.z = -1;
         }
 
-        int whichPlane = maxT.x > maxT.y ? (maxT.x > maxT.z ? 0 : 2)
-                                         : (maxT.y > maxT.z ? 1 : 2);
+        int whichPlane = maxT.x > maxT.y ? (maxT.x > maxT.z ? 0 : 2) : (maxT.y > maxT.z ? 1 : 2);
 
         if (maxT[whichPlane] < 0)
         {
@@ -1494,8 +1486,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <>
-    bool Box<Vec3i>::closestInteriorPoint(const Vec3i& pt, Vec3i& ret) const
+    template <> bool Box<Vec3i>::closestInteriorPoint(const Vec3i& pt, Vec3i& ret) const
     {
         // Don't have to check empty or infinite here
         // because the check below implicitly does so.
@@ -1801,8 +1792,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <>
-    bool Box<Vec3f>::intersects(const Vec3f& origin, const Vec3f& dir) const
+    template <> bool Box<Vec3f>::intersects(const Vec3f& origin, const Vec3f& dir) const
     {
         // Ripped off of GGEMS
         static const float LEFT = -1.0f;
@@ -1903,8 +1893,7 @@ namespace TwkMath
             maxT.z = -1.0f;
         }
 
-        int whichPlane = maxT.x > maxT.y ? (maxT.x > maxT.z ? 0 : 2)
-                                         : (maxT.y > maxT.z ? 1 : 2);
+        int whichPlane = maxT.x > maxT.y ? (maxT.x > maxT.z ? 0 : 2) : (maxT.y > maxT.z ? 1 : 2);
 
         if (maxT[whichPlane] < 0.0f)
         {
@@ -1975,8 +1964,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <>
-    bool Box<Vec3f>::closestInteriorPoint(const Vec3f& pt, Vec3f& ret) const
+    template <> bool Box<Vec3f>::closestInteriorPoint(const Vec3f& pt, Vec3f& ret) const
     {
         // Don't have to check empty or infinite here
         // because the check below implicitly does so.
@@ -2282,8 +2270,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <>
-    bool Box<Vec3d>::intersects(const Vec3d& origin, const Vec3d& dir) const
+    template <> bool Box<Vec3d>::intersects(const Vec3d& origin, const Vec3d& dir) const
     {
         // Ripped off of GGEMS
         static const double LEFT = -1.0;
@@ -2384,8 +2371,7 @@ namespace TwkMath
             maxT.z = -1.0;
         }
 
-        int whichPlane = maxT.x > maxT.y ? (maxT.x > maxT.z ? 0 : 2)
-                                         : (maxT.y > maxT.z ? 1 : 2);
+        int whichPlane = maxT.x > maxT.y ? (maxT.x > maxT.z ? 0 : 2) : (maxT.y > maxT.z ? 1 : 2);
 
         if (maxT[whichPlane] < 0.0)
         {
@@ -2456,8 +2442,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <>
-    bool Box<Vec3d>::closestInteriorPoint(const Vec3d& pt, Vec3d& ret) const
+    template <> bool Box<Vec3d>::closestInteriorPoint(const Vec3d& pt, Vec3d& ret) const
     {
         // Don't have to check empty or infinite here
         // because the check below implicitly does so.

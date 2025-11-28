@@ -74,17 +74,14 @@ namespace Mu
         _baseType = 0;
     }
 
-    MuQt_QAbstractSpinBox::MuQt_QAbstractSpinBox(Pointer muobj,
-                                                 const CallEnvironment* ce,
-                                                 QWidget* parent)
+    MuQt_QAbstractSpinBox::MuQt_QAbstractSpinBox(Pointer muobj, const CallEnvironment* ce, QWidget* parent)
         : QAbstractSpinBox(parent)
     {
         _env = ce;
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QAbstractSpinBoxType>(
-            c->internName("qt.QAbstractSpinBox"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QAbstractSpinBoxType>(c->internName("qt.QAbstractSpinBox"));
     }
 
     void MuQt_QAbstractSpinBox::stepBy(int steps)
@@ -131,8 +128,7 @@ namespace Mu
         }
     }
 
-    QVariant
-    MuQt_QAbstractSpinBox::inputMethodQuery(Qt::InputMethodQuery query) const
+    QVariant MuQt_QAbstractSpinBox::inputMethodQuery(Qt::InputMethodQuery query) const
     {
         if (!_env)
             return QAbstractSpinBox::inputMethodQuery(query);
@@ -230,8 +226,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QCloseEventType>(c, event, "qt.QCloseEvent"));
+            args[1] = Value(makeqpointer<QCloseEventType>(c, event, "qt.QCloseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -254,8 +249,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqpointer<QContextMenuEventType>(
-                c, event, "qt.QContextMenuEvent"));
+            args[1] = Value(makeqpointer<QContextMenuEventType>(c, event, "qt.QContextMenuEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -278,8 +272,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QFocusEventType>(c, event, "qt.QFocusEvent"));
+            args[1] = Value(makeqpointer<QFocusEventType>(c, event, "qt.QFocusEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -302,8 +295,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QFocusEventType>(c, event, "qt.QFocusEvent"));
+            args[1] = Value(makeqpointer<QFocusEventType>(c, event, "qt.QFocusEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -326,8 +318,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QHideEventType>(c, event, "qt.QHideEvent"));
+            args[1] = Value(makeqpointer<QHideEventType>(c, event, "qt.QHideEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -350,8 +341,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QKeyEventType>(c, event, "qt.QKeyEvent"));
+            args[1] = Value(makeqpointer<QKeyEventType>(c, event, "qt.QKeyEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -374,8 +364,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QKeyEventType>(c, event, "qt.QKeyEvent"));
+            args[1] = Value(makeqpointer<QKeyEventType>(c, event, "qt.QKeyEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -398,8 +387,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -422,8 +410,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -446,8 +433,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -470,8 +456,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QPaintEventType>(c, event, "qt.QPaintEvent"));
+            args[1] = Value(makeqpointer<QPaintEventType>(c, event, "qt.QPaintEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -494,8 +479,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QResizeEventType>(c, event, "qt.QResizeEvent"));
+            args[1] = Value(makeqpointer<QResizeEventType>(c, event, "qt.QResizeEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -518,8 +502,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QShowEventType>(c, event, "qt.QShowEvent"));
+            args[1] = Value(makeqpointer<QShowEventType>(c, event, "qt.QShowEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -542,8 +525,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QTimerEventType>(c, event, "qt.QTimerEvent"));
+            args[1] = Value(makeqpointer<QTimerEventType>(c, event, "qt.QTimerEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -566,8 +548,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QWheelEventType>(c, event, "qt.QWheelEvent"));
+            args[1] = Value(makeqpointer<QWheelEventType>(c, event, "qt.QWheelEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -631,8 +612,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqpointer<QDragEnterEventType>(
-                c, event, "qt.QDragEnterEvent"));
+            args[1] = Value(makeqpointer<QDragEnterEventType>(c, event, "qt.QDragEnterEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -655,8 +635,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqpointer<QDragLeaveEventType>(
-                c, event, "qt.QDragLeaveEvent"));
+            args[1] = Value(makeqpointer<QDragLeaveEventType>(c, event, "qt.QDragLeaveEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -679,8 +658,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqpointer<QDragMoveEventType>(
-                c, event, "qt.QDragMoveEvent"));
+            args[1] = Value(makeqpointer<QDragMoveEventType>(c, event, "qt.QDragMoveEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -703,8 +681,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QDropEventType>(c, event, "qt.QDropEvent"));
+            args[1] = Value(makeqpointer<QDropEventType>(c, event, "qt.QDropEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -794,8 +771,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, event, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -818,8 +794,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QMoveEventType>(c, event, "qt.QMoveEvent"));
+            args[1] = Value(makeqpointer<QMoveEventType>(c, event, "qt.QMoveEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -842,8 +817,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QTabletEventType>(c, event, "qt.QTabletEvent"));
+            args[1] = Value(makeqpointer<QTabletEventType>(c, event, "qt.QTabletEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -876,8 +850,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  Mu Type CONSTRUCTORS
 
-    QAbstractSpinBoxType::QAbstractSpinBoxType(Context* c, const char* name,
-                                               Class* super, Class* super2)
+    QAbstractSpinBoxType::QAbstractSpinBoxType(Context* c, const char* name, Class* super, Class* super2)
         : Class(c, name, vectorOf2(super, super2))
     {
     }
@@ -887,8 +860,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    static Pointer
-    QAbstractSpinBox_QAbstractSpinBox_QObject(Thread& NODE_THREAD, Pointer obj)
+    static Pointer QAbstractSpinBox_QAbstractSpinBox_QObject(Thread& NODE_THREAD, Pointer obj)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         ClassInstance* widget = reinterpret_cast<ClassInstance*>(obj);
@@ -900,8 +872,7 @@ namespace Mu
         else if (QAbstractSpinBox* w = object<QAbstractSpinBox>(widget))
         {
             QAbstractSpinBoxType* type =
-                c->findSymbolOfTypeByQualifiedName<QAbstractSpinBoxType>(
-                    c->internName("qt.QAbstractSpinBox"), false);
+                c->findSymbolOfTypeByQualifiedName<QAbstractSpinBoxType>(c->internName("qt.QAbstractSpinBox"), false);
             ClassInstance* o = ClassInstance::allocate(type);
             setobject(o, w);
             return o;
@@ -914,32 +885,26 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(castFromObject, Pointer)
     {
-        NODE_RETURN(QAbstractSpinBox_QAbstractSpinBox_QObject(
-            NODE_THREAD, NODE_ARG(0, Pointer)));
+        NODE_RETURN(QAbstractSpinBox_QAbstractSpinBox_QObject(NODE_THREAD, NODE_ARG(0, Pointer)));
     }
 
-    Pointer
-    qt_QAbstractSpinBox_QAbstractSpinBox_QAbstractSpinBox_QAbstractSpinBox_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
+    Pointer qt_QAbstractSpinBox_QAbstractSpinBox_QAbstractSpinBox_QAbstractSpinBox_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                           Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWidget* arg1 = object<QWidget>(param_parent);
-        setobject(param_this,
-                  new MuQt_QAbstractSpinBox(
-                      param_this, NODE_THREAD.process()->callEnv(), arg1));
+        setobject(param_this, new MuQt_QAbstractSpinBox(param_this, NODE_THREAD.process()->callEnv(), arg1));
         return param_this;
     }
 
-    void qt_QAbstractSpinBox_interpretText_void_QAbstractSpinBox(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    void qt_QAbstractSpinBox_interpretText_void_QAbstractSpinBox(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSpinBox* arg0 = object<QAbstractSpinBox>(param_this);
         arg0->interpretText();
     }
 
-    void qt_QAbstractSpinBox_stepBy_void_QAbstractSpinBox_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_steps)
+    void qt_QAbstractSpinBox_stepBy_void_QAbstractSpinBox_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_steps)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSpinBox* arg0 = object<QAbstractSpinBox>(param_this);
@@ -950,66 +915,48 @@ namespace Mu
             arg0->stepBy(arg1);
     }
 
-    bool qt_QAbstractSpinBox_event_bool_QAbstractSpinBox_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event_)
+    bool qt_QAbstractSpinBox_event_bool_QAbstractSpinBox_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event_)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSpinBox* arg0 = object<QAbstractSpinBox>(param_this);
         QEvent* arg1 = getqpointer<QEventType>(param_event_);
-        return isMuQtObject(arg0) ? arg0->QAbstractSpinBox::event(arg1)
-                                  : arg0->event(arg1);
+        return isMuQtObject(arg0) ? arg0->QAbstractSpinBox::event(arg1) : arg0->event(arg1);
     }
 
-    Pointer qt_QAbstractSpinBox_inputMethodQuery_QVariant_QAbstractSpinBox_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_query)
+    Pointer qt_QAbstractSpinBox_inputMethodQuery_QVariant_QAbstractSpinBox_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_query)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSpinBox* arg0 = object<QAbstractSpinBox>(param_this);
         Qt::InputMethodQuery arg1 = (Qt::InputMethodQuery)(param_query);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QVariantType>(
-                         c, arg0->QAbstractSpinBox::inputMethodQuery(arg1),
-                         "qt.QVariant")
-                   : makeqtype<QVariantType>(c, arg0->inputMethodQuery(arg1),
-                                             "qt.QVariant");
+        return isMuQtObject(arg0) ? makeqtype<QVariantType>(c, arg0->QAbstractSpinBox::inputMethodQuery(arg1), "qt.QVariant")
+                                  : makeqtype<QVariantType>(c, arg0->inputMethodQuery(arg1), "qt.QVariant");
     }
 
-    Pointer qt_QAbstractSpinBox_minimumSizeHint_QSize_QAbstractSpinBox(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QAbstractSpinBox_minimumSizeHint_QSize_QAbstractSpinBox(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSpinBox* arg0 = object<QAbstractSpinBox>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QSizeType>(
-                         c, arg0->QAbstractSpinBox::minimumSizeHint(),
-                         "qt.QSize")
-                   : makeqtype<QSizeType>(c, arg0->minimumSizeHint(),
-                                          "qt.QSize");
+        return isMuQtObject(arg0) ? makeqtype<QSizeType>(c, arg0->QAbstractSpinBox::minimumSizeHint(), "qt.QSize")
+                                  : makeqtype<QSizeType>(c, arg0->minimumSizeHint(), "qt.QSize");
     }
 
-    Pointer
-    qt_QAbstractSpinBox_sizeHint_QSize_QAbstractSpinBox(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this)
+    Pointer qt_QAbstractSpinBox_sizeHint_QSize_QAbstractSpinBox(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSpinBox* arg0 = object<QAbstractSpinBox>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QSizeType>(c, arg0->QAbstractSpinBox::sizeHint(),
-                                          "qt.QSize")
-                   : makeqtype<QSizeType>(c, arg0->sizeHint(), "qt.QSize");
+        return isMuQtObject(arg0) ? makeqtype<QSizeType>(c, arg0->QAbstractSpinBox::sizeHint(), "qt.QSize")
+                                  : makeqtype<QSizeType>(c, arg0->sizeHint(), "qt.QSize");
     }
 
-    Pointer qt_QAbstractSpinBox_lineEdit_QLineEdit_QAbstractSpinBox(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QAbstractSpinBox_lineEdit_QLineEdit_QAbstractSpinBox(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSpinBox* arg0 = object<QAbstractSpinBox>(param_this);
-        return makeinstance<QLineEditType>(
-            c, ((MuQt_QAbstractSpinBox*)arg0)->lineEdit_pub(), "qt.QLineEdit");
+        return makeinstance<QLineEditType>(c, ((MuQt_QAbstractSpinBox*)arg0)->lineEdit_pub(), "qt.QLineEdit");
     }
 
-    void qt_QAbstractSpinBox_setLineEdit_void_QAbstractSpinBox_QLineEdit(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_lineEdit)
+    void qt_QAbstractSpinBox_setLineEdit_void_QAbstractSpinBox_QLineEdit(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                         Pointer param_lineEdit)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSpinBox* arg0 = object<QAbstractSpinBox>(param_this);
@@ -1017,8 +964,7 @@ namespace Mu
         ((MuQt_QAbstractSpinBox*)arg0)->setLineEdit_pub(arg1);
     }
 
-    void qt_QAbstractSpinBox_changeEvent_void_QAbstractSpinBox_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractSpinBox_changeEvent_void_QAbstractSpinBox_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSpinBox* arg0 = object<QAbstractSpinBox>(param_this);
@@ -1029,8 +975,7 @@ namespace Mu
             ((MuQt_QAbstractSpinBox*)arg0)->changeEvent_pub(arg1);
     }
 
-    void qt_QAbstractSpinBox_closeEvent_void_QAbstractSpinBox_QCloseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractSpinBox_closeEvent_void_QAbstractSpinBox_QCloseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSpinBox* arg0 = object<QAbstractSpinBox>(param_this);
@@ -1041,22 +986,20 @@ namespace Mu
             ((MuQt_QAbstractSpinBox*)arg0)->closeEvent_pub(arg1);
     }
 
-    void
-    qt_QAbstractSpinBox_contextMenuEvent_void_QAbstractSpinBox_QContextMenuEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractSpinBox_contextMenuEvent_void_QAbstractSpinBox_QContextMenuEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                      Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSpinBox* arg0 = object<QAbstractSpinBox>(param_this);
-        QContextMenuEvent* arg1 =
-            getqpointer<QContextMenuEventType>(param_event);
+        QContextMenuEvent* arg1 = getqpointer<QContextMenuEventType>(param_event);
         if (isMuQtObject(arg0))
             ((MuQt_QAbstractSpinBox*)arg0)->contextMenuEvent_pub_parent(arg1);
         else
             ((MuQt_QAbstractSpinBox*)arg0)->contextMenuEvent_pub(arg1);
     }
 
-    void qt_QAbstractSpinBox_focusInEvent_void_QAbstractSpinBox_QFocusEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractSpinBox_focusInEvent_void_QAbstractSpinBox_QFocusEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                            Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSpinBox* arg0 = object<QAbstractSpinBox>(param_this);
@@ -1067,8 +1010,8 @@ namespace Mu
             ((MuQt_QAbstractSpinBox*)arg0)->focusInEvent_pub(arg1);
     }
 
-    void qt_QAbstractSpinBox_focusOutEvent_void_QAbstractSpinBox_QFocusEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractSpinBox_focusOutEvent_void_QAbstractSpinBox_QFocusEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                             Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSpinBox* arg0 = object<QAbstractSpinBox>(param_this);
@@ -1079,8 +1022,7 @@ namespace Mu
             ((MuQt_QAbstractSpinBox*)arg0)->focusOutEvent_pub(arg1);
     }
 
-    void qt_QAbstractSpinBox_hideEvent_void_QAbstractSpinBox_QHideEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractSpinBox_hideEvent_void_QAbstractSpinBox_QHideEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSpinBox* arg0 = object<QAbstractSpinBox>(param_this);
@@ -1091,8 +1033,7 @@ namespace Mu
             ((MuQt_QAbstractSpinBox*)arg0)->hideEvent_pub(arg1);
     }
 
-    void qt_QAbstractSpinBox_keyPressEvent_void_QAbstractSpinBox_QKeyEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractSpinBox_keyPressEvent_void_QAbstractSpinBox_QKeyEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSpinBox* arg0 = object<QAbstractSpinBox>(param_this);
@@ -1103,8 +1044,8 @@ namespace Mu
             ((MuQt_QAbstractSpinBox*)arg0)->keyPressEvent_pub(arg1);
     }
 
-    void qt_QAbstractSpinBox_keyReleaseEvent_void_QAbstractSpinBox_QKeyEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractSpinBox_keyReleaseEvent_void_QAbstractSpinBox_QKeyEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                             Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSpinBox* arg0 = object<QAbstractSpinBox>(param_this);
@@ -1115,8 +1056,8 @@ namespace Mu
             ((MuQt_QAbstractSpinBox*)arg0)->keyReleaseEvent_pub(arg1);
     }
 
-    void qt_QAbstractSpinBox_mouseMoveEvent_void_QAbstractSpinBox_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractSpinBox_mouseMoveEvent_void_QAbstractSpinBox_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                              Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSpinBox* arg0 = object<QAbstractSpinBox>(param_this);
@@ -1127,8 +1068,8 @@ namespace Mu
             ((MuQt_QAbstractSpinBox*)arg0)->mouseMoveEvent_pub(arg1);
     }
 
-    void qt_QAbstractSpinBox_mousePressEvent_void_QAbstractSpinBox_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractSpinBox_mousePressEvent_void_QAbstractSpinBox_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                               Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSpinBox* arg0 = object<QAbstractSpinBox>(param_this);
@@ -1139,9 +1080,8 @@ namespace Mu
             ((MuQt_QAbstractSpinBox*)arg0)->mousePressEvent_pub(arg1);
     }
 
-    void
-    qt_QAbstractSpinBox_mouseReleaseEvent_void_QAbstractSpinBox_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractSpinBox_mouseReleaseEvent_void_QAbstractSpinBox_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                 Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSpinBox* arg0 = object<QAbstractSpinBox>(param_this);
@@ -1152,8 +1092,7 @@ namespace Mu
             ((MuQt_QAbstractSpinBox*)arg0)->mouseReleaseEvent_pub(arg1);
     }
 
-    void qt_QAbstractSpinBox_paintEvent_void_QAbstractSpinBox_QPaintEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractSpinBox_paintEvent_void_QAbstractSpinBox_QPaintEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSpinBox* arg0 = object<QAbstractSpinBox>(param_this);
@@ -1164,8 +1103,8 @@ namespace Mu
             ((MuQt_QAbstractSpinBox*)arg0)->paintEvent_pub(arg1);
     }
 
-    void qt_QAbstractSpinBox_resizeEvent_void_QAbstractSpinBox_QResizeEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractSpinBox_resizeEvent_void_QAbstractSpinBox_QResizeEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                            Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSpinBox* arg0 = object<QAbstractSpinBox>(param_this);
@@ -1176,8 +1115,7 @@ namespace Mu
             ((MuQt_QAbstractSpinBox*)arg0)->resizeEvent_pub(arg1);
     }
 
-    void qt_QAbstractSpinBox_showEvent_void_QAbstractSpinBox_QShowEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractSpinBox_showEvent_void_QAbstractSpinBox_QShowEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSpinBox* arg0 = object<QAbstractSpinBox>(param_this);
@@ -1188,8 +1126,7 @@ namespace Mu
             ((MuQt_QAbstractSpinBox*)arg0)->showEvent_pub(arg1);
     }
 
-    void qt_QAbstractSpinBox_timerEvent_void_QAbstractSpinBox_QTimerEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractSpinBox_timerEvent_void_QAbstractSpinBox_QTimerEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSpinBox* arg0 = object<QAbstractSpinBox>(param_this);
@@ -1200,8 +1137,7 @@ namespace Mu
             ((MuQt_QAbstractSpinBox*)arg0)->timerEvent_pub(arg1);
     }
 
-    void qt_QAbstractSpinBox_wheelEvent_void_QAbstractSpinBox_QWheelEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractSpinBox_wheelEvent_void_QAbstractSpinBox_QWheelEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSpinBox* arg0 = object<QAbstractSpinBox>(param_this);
@@ -1212,28 +1148,23 @@ namespace Mu
             ((MuQt_QAbstractSpinBox*)arg0)->wheelEvent_pub(arg1);
     }
 
-    bool qt_QAbstractSpinBox_hasHeightForWidth_bool_QAbstractSpinBox(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    bool qt_QAbstractSpinBox_hasHeightForWidth_bool_QAbstractSpinBox(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSpinBox* arg0 = object<QAbstractSpinBox>(param_this);
-        return isMuQtObject(arg0) ? arg0->QAbstractSpinBox::hasHeightForWidth()
-                                  : arg0->hasHeightForWidth();
+        return isMuQtObject(arg0) ? arg0->QAbstractSpinBox::hasHeightForWidth() : arg0->hasHeightForWidth();
     }
 
-    int qt_QAbstractSpinBox_heightForWidth_int_QAbstractSpinBox_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_w)
+    int qt_QAbstractSpinBox_heightForWidth_int_QAbstractSpinBox_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_w)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSpinBox* arg0 = object<QAbstractSpinBox>(param_this);
         int arg1 = (int)(param_w);
-        return isMuQtObject(arg0) ? arg0->QAbstractSpinBox::heightForWidth(arg1)
-                                  : arg0->heightForWidth(arg1);
+        return isMuQtObject(arg0) ? arg0->QAbstractSpinBox::heightForWidth(arg1) : arg0->heightForWidth(arg1);
     }
 
-    void
-    qt_QAbstractSpinBox_dragEnterEvent_void_QAbstractSpinBox_QDragEnterEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractSpinBox_dragEnterEvent_void_QAbstractSpinBox_QDragEnterEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                  Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSpinBox* arg0 = object<QAbstractSpinBox>(param_this);
@@ -1244,9 +1175,8 @@ namespace Mu
             ((MuQt_QAbstractSpinBox*)arg0)->dragEnterEvent_pub(arg1);
     }
 
-    void
-    qt_QAbstractSpinBox_dragLeaveEvent_void_QAbstractSpinBox_QDragLeaveEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractSpinBox_dragLeaveEvent_void_QAbstractSpinBox_QDragLeaveEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                  Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSpinBox* arg0 = object<QAbstractSpinBox>(param_this);
@@ -1257,8 +1187,8 @@ namespace Mu
             ((MuQt_QAbstractSpinBox*)arg0)->dragLeaveEvent_pub(arg1);
     }
 
-    void qt_QAbstractSpinBox_dragMoveEvent_void_QAbstractSpinBox_QDragMoveEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractSpinBox_dragMoveEvent_void_QAbstractSpinBox_QDragMoveEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSpinBox* arg0 = object<QAbstractSpinBox>(param_this);
@@ -1269,8 +1199,7 @@ namespace Mu
             ((MuQt_QAbstractSpinBox*)arg0)->dragMoveEvent_pub(arg1);
     }
 
-    void qt_QAbstractSpinBox_dropEvent_void_QAbstractSpinBox_QDropEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractSpinBox_dropEvent_void_QAbstractSpinBox_QDropEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSpinBox* arg0 = object<QAbstractSpinBox>(param_this);
@@ -1281,8 +1210,7 @@ namespace Mu
             ((MuQt_QAbstractSpinBox*)arg0)->dropEvent_pub(arg1);
     }
 
-    void qt_QAbstractSpinBox_enterEvent_void_QAbstractSpinBox_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractSpinBox_enterEvent_void_QAbstractSpinBox_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSpinBox* arg0 = object<QAbstractSpinBox>(param_this);
@@ -1293,20 +1221,16 @@ namespace Mu
             ((MuQt_QAbstractSpinBox*)arg0)->enterEvent_pub(arg1);
     }
 
-    bool qt_QAbstractSpinBox_focusNextPrevChild_bool_QAbstractSpinBox_bool(
-        Mu::Thread& NODE_THREAD, Pointer param_this, bool param_next)
+    bool qt_QAbstractSpinBox_focusNextPrevChild_bool_QAbstractSpinBox_bool(Mu::Thread& NODE_THREAD, Pointer param_this, bool param_next)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSpinBox* arg0 = object<QAbstractSpinBox>(param_this);
         bool arg1 = (bool)(param_next);
-        return isMuQtObject(arg0) ? ((MuQt_QAbstractSpinBox*)arg0)
-                                        ->focusNextPrevChild_pub_parent(arg1)
-                                  : ((MuQt_QAbstractSpinBox*)arg0)
-                                        ->focusNextPrevChild_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QAbstractSpinBox*)arg0)->focusNextPrevChild_pub_parent(arg1)
+                                  : ((MuQt_QAbstractSpinBox*)arg0)->focusNextPrevChild_pub(arg1);
     }
 
-    void qt_QAbstractSpinBox_leaveEvent_void_QAbstractSpinBox_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractSpinBox_leaveEvent_void_QAbstractSpinBox_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSpinBox* arg0 = object<QAbstractSpinBox>(param_this);
@@ -1317,22 +1241,19 @@ namespace Mu
             ((MuQt_QAbstractSpinBox*)arg0)->leaveEvent_pub(arg1);
     }
 
-    void
-    qt_QAbstractSpinBox_mouseDoubleClickEvent_void_QAbstractSpinBox_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractSpinBox_mouseDoubleClickEvent_void_QAbstractSpinBox_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                     Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSpinBox* arg0 = object<QAbstractSpinBox>(param_this);
         QMouseEvent* arg1 = getqpointer<QMouseEventType>(param_event);
         if (isMuQtObject(arg0))
-            ((MuQt_QAbstractSpinBox*)arg0)
-                ->mouseDoubleClickEvent_pub_parent(arg1);
+            ((MuQt_QAbstractSpinBox*)arg0)->mouseDoubleClickEvent_pub_parent(arg1);
         else
             ((MuQt_QAbstractSpinBox*)arg0)->mouseDoubleClickEvent_pub(arg1);
     }
 
-    void qt_QAbstractSpinBox_moveEvent_void_QAbstractSpinBox_QMoveEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractSpinBox_moveEvent_void_QAbstractSpinBox_QMoveEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSpinBox* arg0 = object<QAbstractSpinBox>(param_this);
@@ -1343,8 +1264,8 @@ namespace Mu
             ((MuQt_QAbstractSpinBox*)arg0)->moveEvent_pub(arg1);
     }
 
-    void qt_QAbstractSpinBox_tabletEvent_void_QAbstractSpinBox_QTabletEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractSpinBox_tabletEvent_void_QAbstractSpinBox_QTabletEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                            Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSpinBox* arg0 = object<QAbstractSpinBox>(param_this);
@@ -1355,248 +1276,215 @@ namespace Mu
             ((MuQt_QAbstractSpinBox*)arg0)->tabletEvent_pub(arg1);
     }
 
-    int qt_QAbstractSpinBox_metric_int_QAbstractSpinBox_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_m)
+    int qt_QAbstractSpinBox_metric_int_QAbstractSpinBox_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_m)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractSpinBox* arg0 = object<QAbstractSpinBox>(param_this);
-        QPaintDevice::PaintDeviceMetric arg1 =
-            (QPaintDevice::PaintDeviceMetric)(param_m);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QAbstractSpinBox*)arg0)->metric_pub_parent(arg1)
-                   : ((MuQt_QAbstractSpinBox*)arg0)->metric_pub(arg1);
+        QPaintDevice::PaintDeviceMetric arg1 = (QPaintDevice::PaintDeviceMetric)(param_m);
+        return isMuQtObject(arg0) ? ((MuQt_QAbstractSpinBox*)arg0)->metric_pub_parent(arg1)
+                                  : ((MuQt_QAbstractSpinBox*)arg0)->metric_pub(arg1);
     }
 
     static NODE_IMPLEMENTATION(_n_QAbstractSpinBox0, Pointer)
     {
-        NODE_RETURN(
-            qt_QAbstractSpinBox_QAbstractSpinBox_QAbstractSpinBox_QAbstractSpinBox_QWidget(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QAbstractSpinBox_QAbstractSpinBox_QAbstractSpinBox_QAbstractSpinBox_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                                   NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_interpretText0, void)
     {
-        qt_QAbstractSpinBox_interpretText_void_QAbstractSpinBox(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
+        qt_QAbstractSpinBox_interpretText_void_QAbstractSpinBox(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_stepBy0, void)
     {
-        qt_QAbstractSpinBox_stepBy_void_QAbstractSpinBox_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QAbstractSpinBox_stepBy_void_QAbstractSpinBox_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_event0, bool)
     {
-        NODE_RETURN(qt_QAbstractSpinBox_event_bool_QAbstractSpinBox_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QAbstractSpinBox_event_bool_QAbstractSpinBox_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_inputMethodQuery0, Pointer)
     {
         NODE_RETURN(
-            qt_QAbstractSpinBox_inputMethodQuery_QVariant_QAbstractSpinBox_int(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+            qt_QAbstractSpinBox_inputMethodQuery_QVariant_QAbstractSpinBox_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_minimumSizeHint0, Pointer)
     {
-        NODE_RETURN(qt_QAbstractSpinBox_minimumSizeHint_QSize_QAbstractSpinBox(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QAbstractSpinBox_minimumSizeHint_QSize_QAbstractSpinBox(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_sizeHint0, Pointer)
     {
-        NODE_RETURN(qt_QAbstractSpinBox_sizeHint_QSize_QAbstractSpinBox(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QAbstractSpinBox_sizeHint_QSize_QAbstractSpinBox(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_lineEdit0, Pointer)
     {
-        NODE_RETURN(qt_QAbstractSpinBox_lineEdit_QLineEdit_QAbstractSpinBox(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QAbstractSpinBox_lineEdit_QLineEdit_QAbstractSpinBox(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_setLineEdit0, void)
     {
-        qt_QAbstractSpinBox_setLineEdit_void_QAbstractSpinBox_QLineEdit(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractSpinBox_setLineEdit_void_QAbstractSpinBox_QLineEdit(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_changeEvent0, void)
     {
-        qt_QAbstractSpinBox_changeEvent_void_QAbstractSpinBox_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractSpinBox_changeEvent_void_QAbstractSpinBox_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_closeEvent0, void)
     {
-        qt_QAbstractSpinBox_closeEvent_void_QAbstractSpinBox_QCloseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractSpinBox_closeEvent_void_QAbstractSpinBox_QCloseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_contextMenuEvent0, void)
     {
-        qt_QAbstractSpinBox_contextMenuEvent_void_QAbstractSpinBox_QContextMenuEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractSpinBox_contextMenuEvent_void_QAbstractSpinBox_QContextMenuEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                     NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_focusInEvent0, void)
     {
-        qt_QAbstractSpinBox_focusInEvent_void_QAbstractSpinBox_QFocusEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractSpinBox_focusInEvent_void_QAbstractSpinBox_QFocusEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_focusOutEvent0, void)
     {
-        qt_QAbstractSpinBox_focusOutEvent_void_QAbstractSpinBox_QFocusEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractSpinBox_focusOutEvent_void_QAbstractSpinBox_QFocusEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_hideEvent0, void)
     {
-        qt_QAbstractSpinBox_hideEvent_void_QAbstractSpinBox_QHideEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractSpinBox_hideEvent_void_QAbstractSpinBox_QHideEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_keyPressEvent0, void)
     {
-        qt_QAbstractSpinBox_keyPressEvent_void_QAbstractSpinBox_QKeyEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractSpinBox_keyPressEvent_void_QAbstractSpinBox_QKeyEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_keyReleaseEvent0, void)
     {
-        qt_QAbstractSpinBox_keyReleaseEvent_void_QAbstractSpinBox_QKeyEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractSpinBox_keyReleaseEvent_void_QAbstractSpinBox_QKeyEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseMoveEvent0, void)
     {
-        qt_QAbstractSpinBox_mouseMoveEvent_void_QAbstractSpinBox_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractSpinBox_mouseMoveEvent_void_QAbstractSpinBox_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                             NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mousePressEvent0, void)
     {
-        qt_QAbstractSpinBox_mousePressEvent_void_QAbstractSpinBox_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractSpinBox_mousePressEvent_void_QAbstractSpinBox_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                              NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseReleaseEvent0, void)
     {
-        qt_QAbstractSpinBox_mouseReleaseEvent_void_QAbstractSpinBox_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractSpinBox_mouseReleaseEvent_void_QAbstractSpinBox_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_paintEvent0, void)
     {
-        qt_QAbstractSpinBox_paintEvent_void_QAbstractSpinBox_QPaintEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractSpinBox_paintEvent_void_QAbstractSpinBox_QPaintEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_resizeEvent0, void)
     {
-        qt_QAbstractSpinBox_resizeEvent_void_QAbstractSpinBox_QResizeEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractSpinBox_resizeEvent_void_QAbstractSpinBox_QResizeEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_showEvent0, void)
     {
-        qt_QAbstractSpinBox_showEvent_void_QAbstractSpinBox_QShowEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractSpinBox_showEvent_void_QAbstractSpinBox_QShowEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_timerEvent0, void)
     {
-        qt_QAbstractSpinBox_timerEvent_void_QAbstractSpinBox_QTimerEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractSpinBox_timerEvent_void_QAbstractSpinBox_QTimerEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_wheelEvent0, void)
     {
-        qt_QAbstractSpinBox_wheelEvent_void_QAbstractSpinBox_QWheelEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractSpinBox_wheelEvent_void_QAbstractSpinBox_QWheelEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_hasHeightForWidth0, bool)
     {
-        NODE_RETURN(qt_QAbstractSpinBox_hasHeightForWidth_bool_QAbstractSpinBox(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QAbstractSpinBox_hasHeightForWidth_bool_QAbstractSpinBox(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_heightForWidth0, int)
     {
-        NODE_RETURN(qt_QAbstractSpinBox_heightForWidth_int_QAbstractSpinBox_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(
+            qt_QAbstractSpinBox_heightForWidth_int_QAbstractSpinBox_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_dragEnterEvent0, void)
     {
-        qt_QAbstractSpinBox_dragEnterEvent_void_QAbstractSpinBox_QDragEnterEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractSpinBox_dragEnterEvent_void_QAbstractSpinBox_QDragEnterEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                 NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_dragLeaveEvent0, void)
     {
-        qt_QAbstractSpinBox_dragLeaveEvent_void_QAbstractSpinBox_QDragLeaveEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractSpinBox_dragLeaveEvent_void_QAbstractSpinBox_QDragLeaveEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                 NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_dragMoveEvent0, void)
     {
-        qt_QAbstractSpinBox_dragMoveEvent_void_QAbstractSpinBox_QDragMoveEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractSpinBox_dragMoveEvent_void_QAbstractSpinBox_QDragMoveEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                               NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_dropEvent0, void)
     {
-        qt_QAbstractSpinBox_dropEvent_void_QAbstractSpinBox_QDropEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractSpinBox_dropEvent_void_QAbstractSpinBox_QDropEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_enterEvent0, void)
     {
-        qt_QAbstractSpinBox_enterEvent_void_QAbstractSpinBox_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractSpinBox_enterEvent_void_QAbstractSpinBox_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_focusNextPrevChild0, bool)
     {
         NODE_RETURN(
-            qt_QAbstractSpinBox_focusNextPrevChild_bool_QAbstractSpinBox_bool(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool)));
+            qt_QAbstractSpinBox_focusNextPrevChild_bool_QAbstractSpinBox_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool)));
     }
 
     static NODE_IMPLEMENTATION(_n_leaveEvent0, void)
     {
-        qt_QAbstractSpinBox_leaveEvent_void_QAbstractSpinBox_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractSpinBox_leaveEvent_void_QAbstractSpinBox_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseDoubleClickEvent0, void)
     {
-        qt_QAbstractSpinBox_mouseDoubleClickEvent_void_QAbstractSpinBox_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractSpinBox_mouseDoubleClickEvent_void_QAbstractSpinBox_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                    NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_moveEvent0, void)
     {
-        qt_QAbstractSpinBox_moveEvent_void_QAbstractSpinBox_QMoveEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractSpinBox_moveEvent_void_QAbstractSpinBox_QMoveEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_tabletEvent0, void)
     {
-        qt_QAbstractSpinBox_tabletEvent_void_QAbstractSpinBox_QTabletEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractSpinBox_tabletEvent_void_QAbstractSpinBox_QTabletEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_metric0, int)
     {
-        NODE_RETURN(qt_QAbstractSpinBox_metric_int_QAbstractSpinBox_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QAbstractSpinBox_metric_int_QAbstractSpinBox_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     void QAbstractSpinBoxType::load()
@@ -1616,17 +1504,13 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
-                   new Function(c, tn, castFromObject, Cast, Compiled,
-                                QAbstractSpinBox_QAbstractSpinBox_QObject,
-                                Return, ftn, Parameters,
+                   new Function(c, tn, castFromObject, Cast, Compiled, QAbstractSpinBox_QAbstractSpinBox_QObject, Return, ftn, Parameters,
                                 new Param(c, "object", "qt.QObject"), End),
 
                    EndArguments);
@@ -1634,23 +1518,17 @@ namespace Mu
         addSymbols(
             // enums
             // member functions
-            new Function(
-                c, "QAbstractSpinBox", _n_QAbstractSpinBox0, None, Compiled,
-                qt_QAbstractSpinBox_QAbstractSpinBox_QAbstractSpinBox_QAbstractSpinBox_QWidget,
-                Return, "qt.QAbstractSpinBox", Parameters,
-                new Param(c, "this", "qt.QAbstractSpinBox"),
-                new Param(c, "parent", "qt.QWidget"), End),
+            new Function(c, "QAbstractSpinBox", _n_QAbstractSpinBox0, None, Compiled,
+                         qt_QAbstractSpinBox_QAbstractSpinBox_QAbstractSpinBox_QAbstractSpinBox_QWidget, Return, "qt.QAbstractSpinBox",
+                         Parameters, new Param(c, "this", "qt.QAbstractSpinBox"), new Param(c, "parent", "qt.QWidget"), End),
             // PROP: alignment (flags Qt::Alignment; QAbstractSpinBox this)
             // PROP: buttonSymbols (flags QAbstractSpinBox::ButtonSymbols;
             // QAbstractSpinBox this) PROP: correctionMode (flags
             // QAbstractSpinBox::CorrectionMode; QAbstractSpinBox this) PROP:
             // hasAcceptableInput (bool; QAbstractSpinBox this) PROP: hasFrame
             // (bool; QAbstractSpinBox this)
-            new Function(
-                c, "interpretText", _n_interpretText0, None, Compiled,
-                qt_QAbstractSpinBox_interpretText_void_QAbstractSpinBox, Return,
-                "void", Parameters, new Param(c, "this", "qt.QAbstractSpinBox"),
-                End),
+            new Function(c, "interpretText", _n_interpretText0, None, Compiled, qt_QAbstractSpinBox_interpretText_void_QAbstractSpinBox,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QAbstractSpinBox"), End),
             // PROP: isAccelerated (bool; QAbstractSpinBox this)
             // PROP: isGroupSeparatorShown (bool; QAbstractSpinBox this)
             // PROP: isReadOnly (bool; QAbstractSpinBox this)
@@ -1668,231 +1546,134 @@ namespace Mu
             // setSpecialValueText (void; QAbstractSpinBox this, string txt)
             // PROP: setWrapping (void; QAbstractSpinBox this, bool w)
             // PROP: specialValueText (string; QAbstractSpinBox this)
-            _func[0] = new MemberFunction(
-                c, "stepBy", _n_stepBy0, None, Compiled,
-                qt_QAbstractSpinBox_stepBy_void_QAbstractSpinBox_int, Return,
-                "void", Parameters, new Param(c, "this", "qt.QAbstractSpinBox"),
-                new Param(c, "steps", "int"), End),
+            _func[0] =
+                new MemberFunction(c, "stepBy", _n_stepBy0, None, Compiled, qt_QAbstractSpinBox_stepBy_void_QAbstractSpinBox_int, Return,
+                                   "void", Parameters, new Param(c, "this", "qt.QAbstractSpinBox"), new Param(c, "steps", "int"), End),
             // PROP: text (string; QAbstractSpinBox this)
             // MISSING: validate (flags QValidator::State; QAbstractSpinBox
             // this, string input, "int &" pos) PROP: wrapping (bool;
             // QAbstractSpinBox this)
-            _func[1] = new MemberFunction(
-                c, "event", _n_event0, None, Compiled,
-                qt_QAbstractSpinBox_event_bool_QAbstractSpinBox_QEvent, Return,
-                "bool", Parameters, new Param(c, "this", "qt.QAbstractSpinBox"),
-                new Param(c, "event_", "qt.QEvent"), End),
-            _func[2] = new MemberFunction(
-                c, "inputMethodQuery", _n_inputMethodQuery0, None, Compiled,
-                qt_QAbstractSpinBox_inputMethodQuery_QVariant_QAbstractSpinBox_int,
-                Return, "qt.QVariant", Parameters,
-                new Param(c, "this", "qt.QAbstractSpinBox"),
-                new Param(c, "query", "int"), End),
-            _func[3] = new MemberFunction(
-                c, "minimumSizeHint", _n_minimumSizeHint0, None, Compiled,
-                qt_QAbstractSpinBox_minimumSizeHint_QSize_QAbstractSpinBox,
-                Return, "qt.QSize", Parameters,
-                new Param(c, "this", "qt.QAbstractSpinBox"), End),
-            _func[4] = new MemberFunction(
-                c, "sizeHint", _n_sizeHint0, None, Compiled,
-                qt_QAbstractSpinBox_sizeHint_QSize_QAbstractSpinBox, Return,
-                "qt.QSize", Parameters,
-                new Param(c, "this", "qt.QAbstractSpinBox"), End),
+            _func[1] = new MemberFunction(c, "event", _n_event0, None, Compiled, qt_QAbstractSpinBox_event_bool_QAbstractSpinBox_QEvent,
+                                          Return, "bool", Parameters, new Param(c, "this", "qt.QAbstractSpinBox"),
+                                          new Param(c, "event_", "qt.QEvent"), End),
+            _func[2] = new MemberFunction(c, "inputMethodQuery", _n_inputMethodQuery0, None, Compiled,
+                                          qt_QAbstractSpinBox_inputMethodQuery_QVariant_QAbstractSpinBox_int, Return, "qt.QVariant",
+                                          Parameters, new Param(c, "this", "qt.QAbstractSpinBox"), new Param(c, "query", "int"), End),
+            _func[3] = new MemberFunction(c, "minimumSizeHint", _n_minimumSizeHint0, None, Compiled,
+                                          qt_QAbstractSpinBox_minimumSizeHint_QSize_QAbstractSpinBox, Return, "qt.QSize", Parameters,
+                                          new Param(c, "this", "qt.QAbstractSpinBox"), End),
+            _func[4] = new MemberFunction(c, "sizeHint", _n_sizeHint0, None, Compiled, qt_QAbstractSpinBox_sizeHint_QSize_QAbstractSpinBox,
+                                          Return, "qt.QSize", Parameters, new Param(c, "this", "qt.QAbstractSpinBox"), End),
             // MISSING: initStyleOption (void; QAbstractSpinBox this,
             // "QStyleOptionSpinBox *" option) // protected
-            new Function(
-                c, "lineEdit", _n_lineEdit0, None, Compiled,
-                qt_QAbstractSpinBox_lineEdit_QLineEdit_QAbstractSpinBox, Return,
-                "qt.QLineEdit", Parameters,
-                new Param(c, "this", "qt.QAbstractSpinBox"), End),
-            new Function(
-                c, "setLineEdit", _n_setLineEdit0, None, Compiled,
-                qt_QAbstractSpinBox_setLineEdit_void_QAbstractSpinBox_QLineEdit,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractSpinBox"),
-                new Param(c, "lineEdit", "qt.QLineEdit"), End),
-            _func[5] = new MemberFunction(
-                c, "changeEvent", _n_changeEvent0, None, Compiled,
-                qt_QAbstractSpinBox_changeEvent_void_QAbstractSpinBox_QEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractSpinBox"),
-                new Param(c, "event", "qt.QEvent"), End),
-            _func[6] = new MemberFunction(
-                c, "closeEvent", _n_closeEvent0, None, Compiled,
-                qt_QAbstractSpinBox_closeEvent_void_QAbstractSpinBox_QCloseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractSpinBox"),
-                new Param(c, "event", "qt.QCloseEvent"), End),
-            _func[7] = new MemberFunction(
-                c, "contextMenuEvent", _n_contextMenuEvent0, None, Compiled,
-                qt_QAbstractSpinBox_contextMenuEvent_void_QAbstractSpinBox_QContextMenuEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractSpinBox"),
-                new Param(c, "event", "qt.QContextMenuEvent"), End),
-            _func[8] = new MemberFunction(
-                c, "focusInEvent", _n_focusInEvent0, None, Compiled,
-                qt_QAbstractSpinBox_focusInEvent_void_QAbstractSpinBox_QFocusEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractSpinBox"),
-                new Param(c, "event", "qt.QFocusEvent"), End),
-            _func[9] = new MemberFunction(
-                c, "focusOutEvent", _n_focusOutEvent0, None, Compiled,
-                qt_QAbstractSpinBox_focusOutEvent_void_QAbstractSpinBox_QFocusEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractSpinBox"),
-                new Param(c, "event", "qt.QFocusEvent"), End),
-            _func[10] = new MemberFunction(
-                c, "hideEvent", _n_hideEvent0, None, Compiled,
-                qt_QAbstractSpinBox_hideEvent_void_QAbstractSpinBox_QHideEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractSpinBox"),
-                new Param(c, "event", "qt.QHideEvent"), End),
-            _func[11] = new MemberFunction(
-                c, "keyPressEvent", _n_keyPressEvent0, None, Compiled,
-                qt_QAbstractSpinBox_keyPressEvent_void_QAbstractSpinBox_QKeyEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractSpinBox"),
-                new Param(c, "event", "qt.QKeyEvent"), End),
-            _func[12] = new MemberFunction(
-                c, "keyReleaseEvent", _n_keyReleaseEvent0, None, Compiled,
-                qt_QAbstractSpinBox_keyReleaseEvent_void_QAbstractSpinBox_QKeyEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractSpinBox"),
-                new Param(c, "event", "qt.QKeyEvent"), End),
-            _func[13] = new MemberFunction(
-                c, "mouseMoveEvent", _n_mouseMoveEvent0, None, Compiled,
-                qt_QAbstractSpinBox_mouseMoveEvent_void_QAbstractSpinBox_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractSpinBox"),
-                new Param(c, "event", "qt.QMouseEvent"), End),
-            _func[14] = new MemberFunction(
-                c, "mousePressEvent", _n_mousePressEvent0, None, Compiled,
-                qt_QAbstractSpinBox_mousePressEvent_void_QAbstractSpinBox_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractSpinBox"),
-                new Param(c, "event", "qt.QMouseEvent"), End),
-            _func[15] = new MemberFunction(
-                c, "mouseReleaseEvent", _n_mouseReleaseEvent0, None, Compiled,
-                qt_QAbstractSpinBox_mouseReleaseEvent_void_QAbstractSpinBox_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractSpinBox"),
-                new Param(c, "event", "qt.QMouseEvent"), End),
-            _func[16] = new MemberFunction(
-                c, "paintEvent", _n_paintEvent0, None, Compiled,
-                qt_QAbstractSpinBox_paintEvent_void_QAbstractSpinBox_QPaintEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractSpinBox"),
-                new Param(c, "event", "qt.QPaintEvent"), End),
-            _func[17] = new MemberFunction(
-                c, "resizeEvent", _n_resizeEvent0, None, Compiled,
-                qt_QAbstractSpinBox_resizeEvent_void_QAbstractSpinBox_QResizeEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractSpinBox"),
-                new Param(c, "event", "qt.QResizeEvent"), End),
-            _func[18] = new MemberFunction(
-                c, "showEvent", _n_showEvent0, None, Compiled,
-                qt_QAbstractSpinBox_showEvent_void_QAbstractSpinBox_QShowEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractSpinBox"),
-                new Param(c, "event", "qt.QShowEvent"), End),
-            _func[19] = new MemberFunction(
-                c, "timerEvent", _n_timerEvent0, None, Compiled,
-                qt_QAbstractSpinBox_timerEvent_void_QAbstractSpinBox_QTimerEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractSpinBox"),
-                new Param(c, "event", "qt.QTimerEvent"), End),
-            _func[20] = new MemberFunction(
-                c, "wheelEvent", _n_wheelEvent0, None, Compiled,
-                qt_QAbstractSpinBox_wheelEvent_void_QAbstractSpinBox_QWheelEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractSpinBox"),
-                new Param(c, "event", "qt.QWheelEvent"), End),
-            _func[21] = new MemberFunction(
-                c, "hasHeightForWidth", _n_hasHeightForWidth0, None, Compiled,
-                qt_QAbstractSpinBox_hasHeightForWidth_bool_QAbstractSpinBox,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QAbstractSpinBox"), End),
-            _func[22] = new MemberFunction(
-                c, "heightForWidth", _n_heightForWidth0, None, Compiled,
-                qt_QAbstractSpinBox_heightForWidth_int_QAbstractSpinBox_int,
-                Return, "int", Parameters,
-                new Param(c, "this", "qt.QAbstractSpinBox"),
-                new Param(c, "w", "int"), End),
+            new Function(c, "lineEdit", _n_lineEdit0, None, Compiled, qt_QAbstractSpinBox_lineEdit_QLineEdit_QAbstractSpinBox, Return,
+                         "qt.QLineEdit", Parameters, new Param(c, "this", "qt.QAbstractSpinBox"), End),
+            new Function(c, "setLineEdit", _n_setLineEdit0, None, Compiled, qt_QAbstractSpinBox_setLineEdit_void_QAbstractSpinBox_QLineEdit,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QAbstractSpinBox"), new Param(c, "lineEdit", "qt.QLineEdit"),
+                         End),
+            _func[5] = new MemberFunction(c, "changeEvent", _n_changeEvent0, None, Compiled,
+                                          qt_QAbstractSpinBox_changeEvent_void_QAbstractSpinBox_QEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QAbstractSpinBox"), new Param(c, "event", "qt.QEvent"), End),
+            _func[6] = new MemberFunction(c, "closeEvent", _n_closeEvent0, None, Compiled,
+                                          qt_QAbstractSpinBox_closeEvent_void_QAbstractSpinBox_QCloseEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QAbstractSpinBox"), new Param(c, "event", "qt.QCloseEvent"), End),
+            _func[7] =
+                new MemberFunction(c, "contextMenuEvent", _n_contextMenuEvent0, None, Compiled,
+                                   qt_QAbstractSpinBox_contextMenuEvent_void_QAbstractSpinBox_QContextMenuEvent, Return, "void", Parameters,
+                                   new Param(c, "this", "qt.QAbstractSpinBox"), new Param(c, "event", "qt.QContextMenuEvent"), End),
+            _func[8] = new MemberFunction(c, "focusInEvent", _n_focusInEvent0, None, Compiled,
+                                          qt_QAbstractSpinBox_focusInEvent_void_QAbstractSpinBox_QFocusEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QAbstractSpinBox"), new Param(c, "event", "qt.QFocusEvent"), End),
+            _func[9] = new MemberFunction(c, "focusOutEvent", _n_focusOutEvent0, None, Compiled,
+                                          qt_QAbstractSpinBox_focusOutEvent_void_QAbstractSpinBox_QFocusEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QAbstractSpinBox"), new Param(c, "event", "qt.QFocusEvent"), End),
+            _func[10] = new MemberFunction(c, "hideEvent", _n_hideEvent0, None, Compiled,
+                                           qt_QAbstractSpinBox_hideEvent_void_QAbstractSpinBox_QHideEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QAbstractSpinBox"), new Param(c, "event", "qt.QHideEvent"), End),
+            _func[11] = new MemberFunction(c, "keyPressEvent", _n_keyPressEvent0, None, Compiled,
+                                           qt_QAbstractSpinBox_keyPressEvent_void_QAbstractSpinBox_QKeyEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QAbstractSpinBox"), new Param(c, "event", "qt.QKeyEvent"), End),
+            _func[12] = new MemberFunction(c, "keyReleaseEvent", _n_keyReleaseEvent0, None, Compiled,
+                                           qt_QAbstractSpinBox_keyReleaseEvent_void_QAbstractSpinBox_QKeyEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QAbstractSpinBox"), new Param(c, "event", "qt.QKeyEvent"), End),
+            _func[13] = new MemberFunction(c, "mouseMoveEvent", _n_mouseMoveEvent0, None, Compiled,
+                                           qt_QAbstractSpinBox_mouseMoveEvent_void_QAbstractSpinBox_QMouseEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QAbstractSpinBox"), new Param(c, "event", "qt.QMouseEvent"), End),
+            _func[14] =
+                new MemberFunction(c, "mousePressEvent", _n_mousePressEvent0, None, Compiled,
+                                   qt_QAbstractSpinBox_mousePressEvent_void_QAbstractSpinBox_QMouseEvent, Return, "void", Parameters,
+                                   new Param(c, "this", "qt.QAbstractSpinBox"), new Param(c, "event", "qt.QMouseEvent"), End),
+            _func[15] =
+                new MemberFunction(c, "mouseReleaseEvent", _n_mouseReleaseEvent0, None, Compiled,
+                                   qt_QAbstractSpinBox_mouseReleaseEvent_void_QAbstractSpinBox_QMouseEvent, Return, "void", Parameters,
+                                   new Param(c, "this", "qt.QAbstractSpinBox"), new Param(c, "event", "qt.QMouseEvent"), End),
+            _func[16] = new MemberFunction(c, "paintEvent", _n_paintEvent0, None, Compiled,
+                                           qt_QAbstractSpinBox_paintEvent_void_QAbstractSpinBox_QPaintEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QAbstractSpinBox"), new Param(c, "event", "qt.QPaintEvent"), End),
+            _func[17] = new MemberFunction(c, "resizeEvent", _n_resizeEvent0, None, Compiled,
+                                           qt_QAbstractSpinBox_resizeEvent_void_QAbstractSpinBox_QResizeEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QAbstractSpinBox"), new Param(c, "event", "qt.QResizeEvent"), End),
+            _func[18] = new MemberFunction(c, "showEvent", _n_showEvent0, None, Compiled,
+                                           qt_QAbstractSpinBox_showEvent_void_QAbstractSpinBox_QShowEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QAbstractSpinBox"), new Param(c, "event", "qt.QShowEvent"), End),
+            _func[19] = new MemberFunction(c, "timerEvent", _n_timerEvent0, None, Compiled,
+                                           qt_QAbstractSpinBox_timerEvent_void_QAbstractSpinBox_QTimerEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QAbstractSpinBox"), new Param(c, "event", "qt.QTimerEvent"), End),
+            _func[20] = new MemberFunction(c, "wheelEvent", _n_wheelEvent0, None, Compiled,
+                                           qt_QAbstractSpinBox_wheelEvent_void_QAbstractSpinBox_QWheelEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QAbstractSpinBox"), new Param(c, "event", "qt.QWheelEvent"), End),
+            _func[21] = new MemberFunction(c, "hasHeightForWidth", _n_hasHeightForWidth0, None, Compiled,
+                                           qt_QAbstractSpinBox_hasHeightForWidth_bool_QAbstractSpinBox, Return, "bool", Parameters,
+                                           new Param(c, "this", "qt.QAbstractSpinBox"), End),
+            _func[22] = new MemberFunction(c, "heightForWidth", _n_heightForWidth0, None, Compiled,
+                                           qt_QAbstractSpinBox_heightForWidth_int_QAbstractSpinBox_int, Return, "int", Parameters,
+                                           new Param(c, "this", "qt.QAbstractSpinBox"), new Param(c, "w", "int"), End),
             // MISSING: paintEngine ("QPaintEngine *"; QAbstractSpinBox this)
             // MISSING: actionEvent (void; QAbstractSpinBox this, "QActionEvent
             // *" event) // protected
-            _func[23] = new MemberFunction(
-                c, "dragEnterEvent", _n_dragEnterEvent0, None, Compiled,
-                qt_QAbstractSpinBox_dragEnterEvent_void_QAbstractSpinBox_QDragEnterEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractSpinBox"),
-                new Param(c, "event", "qt.QDragEnterEvent"), End),
-            _func[24] = new MemberFunction(
-                c, "dragLeaveEvent", _n_dragLeaveEvent0, None, Compiled,
-                qt_QAbstractSpinBox_dragLeaveEvent_void_QAbstractSpinBox_QDragLeaveEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractSpinBox"),
-                new Param(c, "event", "qt.QDragLeaveEvent"), End),
-            _func[25] = new MemberFunction(
-                c, "dragMoveEvent", _n_dragMoveEvent0, None, Compiled,
-                qt_QAbstractSpinBox_dragMoveEvent_void_QAbstractSpinBox_QDragMoveEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractSpinBox"),
-                new Param(c, "event", "qt.QDragMoveEvent"), End),
-            _func[26] = new MemberFunction(
-                c, "dropEvent", _n_dropEvent0, None, Compiled,
-                qt_QAbstractSpinBox_dropEvent_void_QAbstractSpinBox_QDropEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractSpinBox"),
-                new Param(c, "event", "qt.QDropEvent"), End),
-            _func[27] = new MemberFunction(
-                c, "enterEvent", _n_enterEvent0, None, Compiled,
-                qt_QAbstractSpinBox_enterEvent_void_QAbstractSpinBox_QEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractSpinBox"),
-                new Param(c, "event", "qt.QEvent"), End),
-            _func[28] = new MemberFunction(
-                c, "focusNextPrevChild", _n_focusNextPrevChild0, None, Compiled,
-                qt_QAbstractSpinBox_focusNextPrevChild_bool_QAbstractSpinBox_bool,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QAbstractSpinBox"),
-                new Param(c, "next", "bool"), End),
+            _func[23] =
+                new MemberFunction(c, "dragEnterEvent", _n_dragEnterEvent0, None, Compiled,
+                                   qt_QAbstractSpinBox_dragEnterEvent_void_QAbstractSpinBox_QDragEnterEvent, Return, "void", Parameters,
+                                   new Param(c, "this", "qt.QAbstractSpinBox"), new Param(c, "event", "qt.QDragEnterEvent"), End),
+            _func[24] =
+                new MemberFunction(c, "dragLeaveEvent", _n_dragLeaveEvent0, None, Compiled,
+                                   qt_QAbstractSpinBox_dragLeaveEvent_void_QAbstractSpinBox_QDragLeaveEvent, Return, "void", Parameters,
+                                   new Param(c, "this", "qt.QAbstractSpinBox"), new Param(c, "event", "qt.QDragLeaveEvent"), End),
+            _func[25] =
+                new MemberFunction(c, "dragMoveEvent", _n_dragMoveEvent0, None, Compiled,
+                                   qt_QAbstractSpinBox_dragMoveEvent_void_QAbstractSpinBox_QDragMoveEvent, Return, "void", Parameters,
+                                   new Param(c, "this", "qt.QAbstractSpinBox"), new Param(c, "event", "qt.QDragMoveEvent"), End),
+            _func[26] = new MemberFunction(c, "dropEvent", _n_dropEvent0, None, Compiled,
+                                           qt_QAbstractSpinBox_dropEvent_void_QAbstractSpinBox_QDropEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QAbstractSpinBox"), new Param(c, "event", "qt.QDropEvent"), End),
+            _func[27] = new MemberFunction(c, "enterEvent", _n_enterEvent0, None, Compiled,
+                                           qt_QAbstractSpinBox_enterEvent_void_QAbstractSpinBox_QEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QAbstractSpinBox"), new Param(c, "event", "qt.QEvent"), End),
+            _func[28] = new MemberFunction(c, "focusNextPrevChild", _n_focusNextPrevChild0, None, Compiled,
+                                           qt_QAbstractSpinBox_focusNextPrevChild_bool_QAbstractSpinBox_bool, Return, "bool", Parameters,
+                                           new Param(c, "this", "qt.QAbstractSpinBox"), new Param(c, "next", "bool"), End),
             // MISSING: inputMethodEvent (void; QAbstractSpinBox this,
             // "QInputMethodEvent *" event) // protected
-            _func[29] = new MemberFunction(
-                c, "leaveEvent", _n_leaveEvent0, None, Compiled,
-                qt_QAbstractSpinBox_leaveEvent_void_QAbstractSpinBox_QEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractSpinBox"),
-                new Param(c, "event", "qt.QEvent"), End),
-            _func[30] = new MemberFunction(
-                c, "mouseDoubleClickEvent", _n_mouseDoubleClickEvent0, None,
-                Compiled,
-                qt_QAbstractSpinBox_mouseDoubleClickEvent_void_QAbstractSpinBox_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractSpinBox"),
-                new Param(c, "event", "qt.QMouseEvent"), End),
-            _func[31] = new MemberFunction(
-                c, "moveEvent", _n_moveEvent0, None, Compiled,
-                qt_QAbstractSpinBox_moveEvent_void_QAbstractSpinBox_QMoveEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractSpinBox"),
-                new Param(c, "event", "qt.QMoveEvent"), End),
+            _func[29] = new MemberFunction(c, "leaveEvent", _n_leaveEvent0, None, Compiled,
+                                           qt_QAbstractSpinBox_leaveEvent_void_QAbstractSpinBox_QEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QAbstractSpinBox"), new Param(c, "event", "qt.QEvent"), End),
+            _func[30] =
+                new MemberFunction(c, "mouseDoubleClickEvent", _n_mouseDoubleClickEvent0, None, Compiled,
+                                   qt_QAbstractSpinBox_mouseDoubleClickEvent_void_QAbstractSpinBox_QMouseEvent, Return, "void", Parameters,
+                                   new Param(c, "this", "qt.QAbstractSpinBox"), new Param(c, "event", "qt.QMouseEvent"), End),
+            _func[31] = new MemberFunction(c, "moveEvent", _n_moveEvent0, None, Compiled,
+                                           qt_QAbstractSpinBox_moveEvent_void_QAbstractSpinBox_QMoveEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QAbstractSpinBox"), new Param(c, "event", "qt.QMoveEvent"), End),
             // MISSING: nativeEvent (bool; QAbstractSpinBox this, QByteArray
             // eventType, "void *" message, "long *" result) // protected
-            _func[32] = new MemberFunction(
-                c, "tabletEvent", _n_tabletEvent0, None, Compiled,
-                qt_QAbstractSpinBox_tabletEvent_void_QAbstractSpinBox_QTabletEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractSpinBox"),
-                new Param(c, "event", "qt.QTabletEvent"), End),
+            _func[32] = new MemberFunction(c, "tabletEvent", _n_tabletEvent0, None, Compiled,
+                                           qt_QAbstractSpinBox_tabletEvent_void_QAbstractSpinBox_QTabletEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QAbstractSpinBox"), new Param(c, "event", "qt.QTabletEvent"), End),
             // MISSING: initPainter (void; QAbstractSpinBox this, "QPainter *"
             // painter) // protected
-            _func[33] = new MemberFunction(
-                c, "metric", _n_metric0, None, Compiled,
-                qt_QAbstractSpinBox_metric_int_QAbstractSpinBox_int, Return,
-                "int", Parameters, new Param(c, "this", "qt.QAbstractSpinBox"),
-                new Param(c, "m", "int"), End),
+            _func[33] =
+                new MemberFunction(c, "metric", _n_metric0, None, Compiled, qt_QAbstractSpinBox_metric_int_QAbstractSpinBox_int, Return,
+                                   "int", Parameters, new Param(c, "this", "qt.QAbstractSpinBox"), new Param(c, "m", "int"), End),
             // static functions
             EndArguments);
         globalScope()->addSymbols(EndArguments);

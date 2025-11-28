@@ -19,6 +19,7 @@
 #include <RvCommon/RvConsoleWindow.h>
 #include <RvCommon/RvNetworkDialog.h>
 #include <RvCommon/TwkQTAction.h>
+#include <TwkApp/EventNode.h>
 #ifdef PLATFORM_WINDOWS
 #include <GL/glew.h>
 #endif
@@ -69,6 +70,7 @@ namespace Rv
     using namespace std;
     using namespace TwkMath;
     using namespace IPCore;
+    using namespace TwkApp;
 
 #if 0
 #define DB_ICON 0x01
@@ -86,12 +88,39 @@ namespace Rv
 #define DBL(level, x)
 #endif
 
-    inline QString utf8(const std::string& us)
-    {
-        return QString::fromUtf8(us.c_str());
-    }
+    inline QString utf8(const std::string& us) { return QString::fromUtf8(us.c_str()); }
 
     static int sessionCount = 0;
+
+    //
+    //  Helper class to listen for UI blocking events
+    //
+    class UIBlockingEventNode : public EventNode
+    {
+    public:
+        explicit UIBlockingEventNode(RvDocument* doc)
+            : EventNode("UIBlockingEventNode")
+            , m_doc(doc)
+        {
+        }
+
+        Result receiveEvent(const Event& event) override
+        {
+            if (const auto* gevent = dynamic_cast<const GenericStringEvent*>(&event))
+            {
+                if (event.name() == "block-ui-overlay")
+                {
+                    bool block = (gevent->stringContent() == "true");
+                    m_doc->setUIBlocked(block);
+                    return EventAccept;
+                }
+            }
+            return EventAcceptAndContinue;
+        }
+
+    private:
+        RvDocument* m_doc;
+    };
 
     RvDocument::RvDocument()
         : QMainWindow()
@@ -119,6 +148,7 @@ namespace Rv
         , m_diagnosticsView(0)
         , m_sourceEditor(0)
         , m_displayLink(0)
+        , m_blockingOverlay(0)
     {
         DB("RvDocument constructed");
 
@@ -128,14 +158,12 @@ namespace Rv
 
         const TwkApp::Application::Documents& docs = TwkApp::App()->documents();
 
-        setWindowIcon(
-            QIcon(qApp->applicationDirPath() + QString(RV_ICON_PATH_SUFFIX)));
+        setWindowIcon(QIcon(qApp->applicationDirPath() + QString(RV_ICON_PATH_SUFFIX)));
 
         Rv::Options& opts = Options::sharedOptions();
 
         bool resetGLPrefs = false;
-        m_startupResize =
-            (opts.width == -1 && opts.height == -1 && opts.startupResize);
+        m_startupResize = (opts.width == -1 && opts.height == -1 && opts.startupResize);
 
         checkDriverVSync();
 
@@ -160,24 +188,18 @@ namespace Rv
 
         if (docs.empty())
         {
-            m_glView = new GLView(
-                this, 0, this,
-                opts.stereoMode && !strcmp(opts.stereoMode, "hardware"),
-                opts.vsync != 0 && !m_vsyncDisabled, true, opts.dispRedBits,
-                opts.dispGreenBits, opts.dispBlueBits, opts.dispAlphaBits,
-                !m_startupResize);
+            m_glView =
+                new GLView(this, 0, this, opts.stereoMode && !strcmp(opts.stereoMode, "hardware"), opts.vsync != 0 && !m_vsyncDisabled,
+                           true, opts.dispRedBits, opts.dispGreenBits, opts.dispBlueBits, opts.dispAlphaBits, !m_startupResize);
         }
         else
         {
             RvSession* s = static_cast<RvSession*>(docs.front());
             RvDocument* rvDoc = (RvDocument*)s->opaquePointer();
-            m_glView = new GLView(
-                this, rvDoc->view()->context(), this,
-                opts.stereoMode && !strcmp(opts.stereoMode, "hardware"),
-                opts.vsync != 0 && !m_vsyncDisabled,
-                true, // double buffer
-                opts.dispRedBits, opts.dispGreenBits, opts.dispBlueBits,
-                opts.dispAlphaBits, !m_startupResize);
+            m_glView = new GLView(this, rvDoc->view()->context(), this, opts.stereoMode && !strcmp(opts.stereoMode, "hardware"),
+                                  opts.vsync != 0 && !m_vsyncDisabled,
+                                  true, // double buffer
+                                  opts.dispRedBits, opts.dispGreenBits, opts.dispBlueBits, opts.dispAlphaBits, !m_startupResize);
         }
 
         // Create DiagnosticsView as a dockable widget (lazy initialization).
@@ -214,21 +236,18 @@ namespace Rv
                            [this]()
                            {
                                QSize currentSize = size();
-                               resize(currentSize.width() + 1,
-                                      currentSize.height());
+                               resize(currentSize.width() + 1, currentSize.height());
                                resize(currentSize);
                            });
         // #endif
 
         m_resetPolicyTimer = new QTimer(this);
         m_resetPolicyTimer->setSingleShot(true);
-        connect(m_resetPolicyTimer, SIGNAL(timeout()), this,
-                SLOT(resetSizePolicy()));
+        connect(m_resetPolicyTimer, SIGNAL(timeout()), this, SLOT(resetSizePolicy()));
 
         m_frameChangedTimer = new QTimer(this);
         m_frameChangedTimer->setSingleShot(true);
-        connect(m_frameChangedTimer, SIGNAL(timeout()), this,
-                SLOT(frameChanged()));
+        connect(m_frameChangedTimer, SIGNAL(timeout()), this, SLOT(frameChanged()));
 
         m_menuTimer = new QTimer(this);
         m_menuTimer->setInterval(50);
@@ -240,21 +259,17 @@ namespace Rv
 
         int op_ret, ev_ret, er_ret;
 
-        bool haveNV = XQueryExtension(QX11Info::display(), "NV-GLX", &op_ret,
-                                      &ev_ret, &er_ret);
+        bool haveNV = XQueryExtension(QX11Info::display(), "NV-GLX", &op_ret, &ev_ret, &er_ret);
 
         if (!haveNV)
         {
             cerr << endl;
-            cerr << "ERROR:******* NV-GLX Extension Missing ***********"
-                 << endl;
-            cerr << "    If you're using an Nvidia card, please install"
-                 << endl;
+            cerr << "ERROR:******* NV-GLX Extension Missing ***********" << endl;
+            cerr << "    If you're using an Nvidia card, please install" << endl;
             cerr << "    the optimized NVIDIA binary driver." << endl;
             cerr << "    If you're using an ATI card, please be aware " << endl;
             cerr << "    that RV has not been tested with ATI cards." << endl;
-            cerr << "**************************************************"
-                 << endl;
+            cerr << "**************************************************" << endl;
             cerr << endl;
         }
 #endif
@@ -264,6 +279,25 @@ namespace Rv
             Qt::WindowFlags flags = windowFlags();
             setWindowFlags(flags | Qt::FramelessWindowHint);
         }
+
+        //
+        //  Create UI blocking overlay - transparent widget that captures all input
+        //  Used during presenter transitions in Live Review to prevent interaction
+        //  without closing panels
+        //
+        m_blockingOverlay = new QWidget(this);
+        m_blockingOverlay->setObjectName("UIBlockingOverlay");
+
+        // Semi-transparent dark overlay for visual feedback
+        m_blockingOverlay->setStyleSheet("QWidget#UIBlockingOverlay { background-color: rgba(0, 0, 0, 100); }");
+
+        // Ensure it stays on top and captures input
+        m_blockingOverlay->raise();
+        m_blockingOverlay->setAttribute(Qt::WA_TransparentForMouseEvents, false);
+        m_blockingOverlay->setFocusPolicy(Qt::StrongFocus);
+
+        // Hide by default
+        m_blockingOverlay->hide();
     }
 
     void RvDocument::initializeSession()
@@ -299,40 +333,31 @@ namespace Rv
             m_topViewToolBar->setSession(m_session);
             m_bottomViewToolBar->setSession(m_session);
 
+            // Create and connect UI blocking event node to listen to session events
+            m_uiBlockingEventNode = std::make_unique<UIBlockingEventNode>(this);
+            m_uiBlockingEventNode->listenTo(m_session);
+
             // 10.5 looks better without it (no longer has the 100% white top)
             // setAttribute(Qt::WA_MacBrushedMetal);
 
             m_session->addNotification(this, IPCore::Session::updateMessage());
-            m_session->addNotification(this,
-                                       IPCore::Session::updateLoadingMessage());
-            m_session->addNotification(this,
-                                       IPCore::Session::fullScreenOnMessage());
-            m_session->addNotification(this,
-                                       IPCore::Session::fullScreenOffMessage());
-            m_session->addNotification(
-                this, IPCore::Session::stereoHardwareOnMessage());
-            m_session->addNotification(
-                this, IPCore::Session::stereoHardwareOffMessage());
+            m_session->addNotification(this, IPCore::Session::updateLoadingMessage());
+            m_session->addNotification(this, IPCore::Session::fullScreenOnMessage());
+            m_session->addNotification(this, IPCore::Session::fullScreenOffMessage());
+            m_session->addNotification(this, IPCore::Session::stereoHardwareOnMessage());
+            m_session->addNotification(this, IPCore::Session::stereoHardwareOffMessage());
             m_session->addNotification(this, TwkApp::Document::deleteMessage());
-            m_session->addNotification(this,
-                                       TwkApp::Document::menuChangedMessage());
+            m_session->addNotification(this, TwkApp::Document::menuChangedMessage());
             m_session->addNotification(this, TwkApp::Document::activeMessage());
-            m_session->addNotification(
-                this, TwkApp::Document::filenameChangedMessage());
-            m_session->addNotification(
-                this, IPCore::Session::audioUnavailbleMessage());
-            m_session->addNotification(
-                this, IPCore::Session::eventDeviceChangedMessage());
-            m_session->addNotification(this,
-                                       IPCore::Session::stopPlayMessage());
+            m_session->addNotification(this, TwkApp::Document::filenameChangedMessage());
+            m_session->addNotification(this, IPCore::Session::audioUnavailbleMessage());
+            m_session->addNotification(this, IPCore::Session::eventDeviceChangedMessage());
+            m_session->addNotification(this, IPCore::Session::stopPlayMessage());
 
-            m_session->playStartSignal().connect(boost::bind(
-                &RvDocument::playStartSlot, this, std::placeholders::_1));
-            m_session->playStopSignal().connect(boost::bind(
-                &RvDocument::playStopSlot, this, std::placeholders::_1));
+            m_session->playStartSignal().connect(boost::bind(&RvDocument::playStartSlot, this, std::placeholders::_1));
+            m_session->playStopSignal().connect(boost::bind(&RvDocument::playStopSlot, this, std::placeholders::_1));
             m_session->physicalVideoDeviceChangedSignal().connect(
-                boost::bind(&RvDocument::physicalVideoDeviceChangedSlot, this,
-                            std::placeholders::_1));
+                boost::bind(&RvDocument::physicalVideoDeviceChangedSlot, this, std::placeholders::_1));
         }
     }
 
@@ -366,9 +391,8 @@ namespace Rv
             if (file)
             {
                 file << "# RV playback debug data" << endl;
-                file << "# version " << TWK_DEPLOY_MAJOR_VERSION() << "."
-                     << TWK_DEPLOY_MINOR_VERSION() << "."
-                     << TWK_DEPLOY_PATCH_LEVEL() << endl;
+                file << "# version " << TWK_DEPLOY_MAJOR_VERSION() << "." << TWK_DEPLOY_MINOR_VERSION() << "." << TWK_DEPLOY_PATCH_LEVEL()
+                     << endl;
                 file << "# -------------------------------------------" << endl;
                 file << "# PLATFORM = " << PLATFORM_STRING << endl;
                 file << "# COMPILER = " << COMPILER_STRING << endl;
@@ -394,8 +418,7 @@ namespace Rv
         }
 
 #ifdef PLATFORM_DARWIN
-        if (m_displayLink && m_displayLink->isValid()
-            && m_displayLink->isActive())
+        if (m_displayLink && m_displayLink->isValid() && m_displayLink->isActive())
         {
             m_displayLink->stop();
             delete m_displayLink;
@@ -409,6 +432,11 @@ namespace Rv
         m_session->setOutputVideoDevice(0);
         m_session->setControlVideoDevice(0);
         m_session->removeNotification(this);
+
+        if (m_uiBlockingEventNode)
+        {
+            m_session->breakConnection(m_uiBlockingEventNode.get());
+        }
 
         if (m_sourceEditor)
             m_sourceEditor->hide();
@@ -469,8 +497,7 @@ namespace Rv
 #endif
     }
 
-    void RvDocument::physicalVideoDeviceChangedSlot(
-        const TwkApp::VideoDevice* device)
+    void RvDocument::physicalVideoDeviceChangedSlot(const TwkApp::VideoDevice* device)
     {
 #ifdef PLATFORM_DARWIN
         if (m_displayLink && m_displayLink->isActive())
@@ -491,9 +518,7 @@ namespace Rv
         //
 
 #if defined(PLATFORM_DARWIN) && 0
-        if (CGDesktopVideoDevice* cgdevice =
-                dynamic_cast<CGDesktopVideoDevice*>(
-                    m_glView->videoDevice()->physicalDevice()))
+        if (CGDesktopVideoDevice* cgdevice = dynamic_cast<CGDesktopVideoDevice*>(m_glView->videoDevice()->physicalDevice()))
         {
             if (m_displayLink)
                 m_displayLink->start(m_session, cgdevice);
@@ -509,8 +534,7 @@ namespace Rv
 #endif
     }
 
-    bool RvDocument::receive(Notifier* originator, Notifier* sender,
-                             MessageId m, MessageData* data)
+    bool RvDocument::receive(Notifier* originator, Notifier* sender, MessageId m, MessageData* data)
     {
         //
         //  Don't respond to messages if we're closing.
@@ -522,8 +546,7 @@ namespace Rv
         {
             if (m_session->loadCount() == 0)
                 setDocumentDisabled(true, true);
-            m_session->update(5.0 /*5 secs*/,
-                              true /* update in any playing mode*/);
+            m_session->update(5.0 /*5 secs*/, true /* update in any playing mode*/);
             qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
             if (m_session->loadCount() >= m_session->loadTotal() - 1)
                 setDocumentDisabled(false, false);
@@ -536,9 +559,8 @@ namespace Rv
         {
             if (m_session->eventVideoDevice() && m_glView->videoDevice())
             {
-                m_glView->videoDevice()->translator().setRelativeDomain(
-                    m_session->eventVideoDevice()->width(),
-                    m_session->eventVideoDevice()->height());
+                m_glView->videoDevice()->translator().setRelativeDomain(m_session->eventVideoDevice()->width(),
+                                                                        m_session->eventVideoDevice()->height());
             }
         }
         else if (m == TwkApp::Document::filenameChangedMessage())
@@ -596,31 +618,27 @@ namespace Rv
             QMessageBox box(this);
             box.setWindowTitle(tr(UI_APPLICATION_NAME ": Audio Failure"));
             QString baseText = tr("Audio Device is Currently Unavailable");
-            QString detailedText =
-                tr("Another program (maybe another copy of RV?) "
-                   "is blocking use of the audio device. "
-                   "If you quit the other program you may be "
-                   "able to use the audio again if you restart RV.\n "
-                   "You might also try other audio devices in the preferences "
-                   "audio tab. "
+            QString detailedText = tr("Another program (maybe another copy of RV?) "
+                                      "is blocking use of the audio device. "
+                                      "If you quit the other program you may be "
+                                      "able to use the audio again if you restart RV.\n "
+                                      "You might also try other audio devices in the preferences "
+                                      "audio tab. "
 #ifdef PLATFORM_LINUX
-                   "For example, the ALSA \"default\" and \"dmix\" "
-                   "devices allow sharing of audio."
+                                      "For example, the ALSA \"default\" and \"dmix\" "
+                                      "devices allow sharing of audio."
 #endif
-                );
+            );
             box.setText(baseText + "\n\n" + detailedText);
             box.setWindowModality(Qt::WindowModal);
             // QPushButton* b1 = box.addButton(tr("Keep Trying"),
             // QMessageBox::AcceptRole);
-            QPushButton* b2 =
-                box.addButton(tr("Turn Off Audio"), QMessageBox::AcceptRole);
+            QPushButton* b2 = box.addButton(tr("Turn Off Audio"), QMessageBox::AcceptRole);
 
 #ifdef PLATFORM_LINUX
             // Show the RV Icon-- otherwise the user has no idea where
             // this came from if RV isn't up yet.
-            box.setIconPixmap(QPixmap(qApp->applicationDirPath()
-                                      + QString(RV_ICON_PATH_SUFFIX))
-                                  .scaledToHeight(64));
+            box.setIconPixmap(QPixmap(qApp->applicationDirPath() + QString(RV_ICON_PATH_SUFFIX)).scaledToHeight(64));
 #else
             box.setIcon(QMessageBox::Critical);
 #endif
@@ -645,35 +663,28 @@ namespace Rv
     void RvDocument::resetGLStateAndPrefs()
     {
         QMessageBox box(this);
-        box.setWindowTitle(
-            tr(UI_APPLICATION_NAME ": Invalid Display Configuration"));
+        box.setWindowTitle(tr(UI_APPLICATION_NAME ": Invalid Display Configuration"));
         QString baseText = tr("Display Configuration is Invalid");
-        QString detailedText =
-            tr("The display configuration in the preferences is\n"
-               "incompatible with this driver and/or graphics "
-               "hardware.\n" UI_APPLICATION_NAME
-               " will use the default display configuration to continue.\n"
+        QString detailedText = tr("The display configuration in the preferences is\n"
+                                  "incompatible with this driver and/or graphics "
+                                  "hardware.\n" UI_APPLICATION_NAME " will use the default display configuration to continue.\n"
 #ifdef PLATFORM_LINUX
-               "You can check available display possibilities\n"
-               "using the glxinfo command with the -t option from a shell\n"
-               "or use the driver configuration UI.\n"
+                                  "You can check available display possibilities\n"
+                                  "using the glxinfo command with the -t option from a shell\n"
+                                  "or use the driver configuration UI.\n"
 #endif
-               "You have a choice: reset the preference automatically\n"
-               "or use the Rendering preferences to change it manually.\n");
+                                  "You have a choice: reset the preference automatically\n"
+                                  "or use the Rendering preferences to change it manually.\n");
 
         box.setText(baseText + "\n\n" + detailedText);
         box.setWindowModality(Qt::WindowModal);
-        QPushButton* b1 =
-            box.addButton(tr("Reset Automatically"), QMessageBox::RejectRole);
-        QPushButton* b2 = box.addButton(tr("Change Preferences Manually"),
-                                        QMessageBox::AcceptRole);
+        QPushButton* b1 = box.addButton(tr("Reset Automatically"), QMessageBox::RejectRole);
+        QPushButton* b2 = box.addButton(tr("Change Preferences Manually"), QMessageBox::AcceptRole);
 
 #ifdef PLATFORM_LINUX
         // Show the RV Icon-- otherwise the user has no idea where
         // this came from if RV isn't up yet.
-        box.setIconPixmap(
-            QPixmap(qApp->applicationDirPath() + QString(RV_ICON_PATH_SUFFIX))
-                .scaledToHeight(64));
+        box.setIconPixmap(QPixmap(qApp->applicationDirPath() + QString(RV_ICON_PATH_SUFFIX)).scaledToHeight(64));
 #else
         box.setIcon(QMessageBox::Critical);
 #endif
@@ -734,8 +745,7 @@ namespace Rv
     {
         m_glView->setMinimumContentSize(64, 64);
         m_glView->setMinimumSize(QSize(64, 64));
-        m_glView->setSizePolicy(
-            QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred));
+        m_glView->setSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred));
     }
 
     void RvDocument::setDocumentDisabled(bool b, bool menuBarOnly)
@@ -754,8 +764,7 @@ namespace Rv
         }
     }
 
-    void RvDocument::rebuildGLView(bool stereo, bool vsync, bool doubleBuffer,
-                                   int red, int green, int blue, int alpha)
+    void RvDocument::rebuildGLView(bool stereo, bool vsync, bool doubleBuffer, int red, int green, int blue, int alpha)
     {
         //
         //  On the mac, we need to carefully replace the content GL widget so
@@ -775,19 +784,14 @@ namespace Rv
         lazyDeleteGLView();
 
         GLView* oldGLView = m_glView;
-        Qt::KeyboardModifiers cur =
-            m_glView->videoDevice()->translator().currentModifiers();
+        Qt::KeyboardModifiers cur = m_glView->videoDevice()->translator().currentModifiers();
         oldGLView->stopProcessingEvents();
 
-        GLView* newGLView =
-            new GLView(this, view()->context(), this, stereo, vsync,
-                       doubleBuffer, red, green, blue, alpha);
+        GLView* newGLView = new GLView(this, view()->context(), this, stereo, vsync, doubleBuffer, red, green, blue, alpha);
 
-        newGLView->setContentSize(oldGLView->sizeHint().width(),
-                                  oldGLView->sizeHint().height());
+        newGLView->setContentSize(oldGLView->sizeHint().width(), oldGLView->sizeHint().height());
 
-        newGLView->setMinimumSize(oldGLView->minimumSizeHint().width(),
-                                  oldGLView->minimumSizeHint().height());
+        newGLView->setMinimumSize(oldGLView->minimumSizeHint().width(), oldGLView->minimumSizeHint().height());
 
         bool resetGLPrefs = false;
 
@@ -809,16 +813,14 @@ namespace Rv
 
         m_topViewToolBar->setDevice(m_glView->videoDevice());
 
-        bool same =
-            m_session->outputVideoDevice() == m_session->controlVideoDevice();
+        bool same = m_session->outputVideoDevice() == m_session->controlVideoDevice();
         m_session->setEventVideoDevice(0);
         m_session->setOutputVideoDevice(0);
         m_session->setControlVideoDevice(m_glView->videoDevice());
         if (same)
             m_session->setOutputVideoDevice(m_glView->videoDevice());
 
-        m_glView->videoDevice()->sendEvent(TwkApp::RenderContextChangeEvent(
-            "gl-context-changed", m_glView->videoDevice()));
+        m_glView->videoDevice()->sendEvent(TwkApp::RenderContextChangeEvent("gl-context-changed", m_glView->videoDevice()));
 
         if (resetGLPrefs)
             resetGLStateAndPrefs();
@@ -829,8 +831,7 @@ namespace Rv
 
             for (size_t i = 0; i < devices.size(); i++)
             {
-                if (DesktopVideoDevice* d =
-                        dynamic_cast<DesktopVideoDevice*>(devices[i]))
+                if (DesktopVideoDevice* d = dynamic_cast<DesktopVideoDevice*>(devices[i]))
                 {
                     d->setShareDevice(m_glView->videoDevice());
                 }
@@ -1006,8 +1007,7 @@ namespace Rv
         }
 
         m_session->userRenderEvent("layout");
-        IPCore::Session::Margins margins =
-            m_session->controlVideoDevice()->margins();
+        IPCore::Session::Margins margins = m_session->controlVideoDevice()->margins();
         float mw = int(margins.left + margins.right);
         float mh = int(margins.top + margins.bottom);
 
@@ -1106,8 +1106,7 @@ namespace Rv
 
         for (unsigned int i = 0; i < docs.size(); i++)
         {
-            windows.push_back(
-                reinterpret_cast<RvDocument*>(docs[i]->opaquePointer()));
+            windows.push_back(reinterpret_cast<RvDocument*>(docs[i]->opaquePointer()));
         }
 
         float w = 0;
@@ -1121,8 +1120,7 @@ namespace Rv
         }
 
         QRect ssize = screen->availableGeometry();
-        DB("resizeToFit available geom w " << ssize.width() << " h "
-                                           << ssize.height());
+        DB("resizeToFit available geom w " << ssize.width() << " h " << ssize.height());
         QRect ts = screen->geometry();
         float sw = float(ssize.width());
         float sh = float(ssize.height());
@@ -1150,17 +1148,12 @@ namespace Rv
             //  Find source nodes in eval path
             //
             IPNode::MetaEvalInfoVector evalInfos;
-            IPNode::MetaEvalClosestByTypeName collector(evalInfos,
-                                                        "RVSourceGroup");
-            m_session->rootNode()->metaEvaluate(
-                m_session->graph().contextForFrame(m_session->currentFrame()),
-                collector);
+            IPNode::MetaEvalClosestByTypeName collector(evalInfos, "RVSourceGroup");
+            m_session->rootNode()->metaEvaluate(m_session->graph().contextForFrame(m_session->currentFrame()), collector);
             if (evalInfos.size())
             {
                 IPNode::ImageStructureInfo info =
-                    evalInfos[0].node->imageStructureInfo(
-                        m_session->graph().contextForFrame(
-                            m_session->currentFrame()));
+                    evalInfos[0].node->imageStructureInfo(m_session->graph().contextForFrame(m_session->currentFrame()));
                 w = int(info.width);
                 h = int(info.height);
                 DB("resizeToFit w " << info.width << " h " << info.height);
@@ -1176,12 +1169,10 @@ namespace Rv
             {
                 IPNode* node = nodes.front();
                 IPNode::ImageRangeInfo range = nodes.front()->imageRangeInfo();
-                IPNode::ImageStructureInfo info = node->imageStructureInfo(
-                    m_session->graph().contextForFrame(range.start));
+                IPNode::ImageStructureInfo info = node->imageStructureInfo(m_session->graph().contextForFrame(range.start));
                 w = int(info.width);
                 h = int(info.height);
-                DB("resizeToFit source info w " << info.width << " h "
-                                                << info.height);
+                DB("resizeToFit source info w " << info.width << " h " << info.height);
             }
         }
         if (w <= 0 || h <= 0)
@@ -1277,8 +1268,7 @@ namespace Rv
         m_glView->setMinimumContentSize(int(w), int(h));
         m_glView->updateGeometry();
 
-        DB("resizeToFit resulting size w " << m_glView->width() << " h "
-                                           << m_glView->height());
+        DB("resizeToFit resulting size w " << m_glView->width() << " h " << m_glView->height());
 
         const int dh = m_glView->height() - int(h);
         const int dw = m_glView->width() - int(w);
@@ -1296,8 +1286,7 @@ namespace Rv
             m_glView->setMinimumContentSize(int(w), int(h));
             m_glView->updateGeometry();
         }
-        DB("resizeToFit final resulting size w " << m_glView->width() << " h "
-                                                 << m_glView->height());
+        DB("resizeToFit final resulting size w " << m_glView->width() << " h " << m_glView->height());
 
         m_resetPolicyTimer->start();
 
@@ -1394,12 +1383,11 @@ namespace Rv
         QRect mr = mb()->geometry();
         QRect vr = m_glView->geometry();
 
-        DB("RvDocument::childrenRect mb"
-           << " shown " << menuBarShown() << " vis " << mb()->isVisible()
-           << " w" << mr.width() << " h " << mr.height()
-           << " view "
-              " w"
-           << vr.width() << " vh " << vr.height());
+        DB("RvDocument::childrenRect mb" << " shown " << menuBarShown() << " vis " << mb()->isVisible() << " w" << mr.width() << " h "
+                                         << mr.height()
+                                         << " view "
+                                            " w"
+                                         << vr.width() << " vh " << vr.height());
 
         QRect r = QMainWindow::childrenRect();
         DB("RvDocument::childrenRect r w " << r.width() << " h " << r.height());
@@ -1410,8 +1398,7 @@ namespace Rv
         //
         r.setWidth(vr.width());
 #ifndef PLATFORM_DARWIN
-        r.setHeight((menuBarShown()) ? (mr.height() + vr.height())
-                                     : vr.height());
+        r.setHeight((menuBarShown()) ? (mr.height() + vr.height()) : vr.height());
 #else
         r.setHeight(vr.height());
 #endif
@@ -1475,8 +1462,7 @@ namespace Rv
             }
             else
             {
-                cout << "ERROR: menuActivated() failed to get TwkQTAction"
-                     << endl;
+                cout << "ERROR: menuActivated() failed to get TwkQTAction" << endl;
             }
         }
 
@@ -1498,9 +1484,7 @@ namespace Rv
 
                     if (item && ((S && !S->error()) || !S))
                     {
-                        Session* d =
-                            a->doc()
-                                ->session(); // TwkApp::Document::activeDocument();
+                        Session* d = a->doc()->session(); // TwkApp::Document::activeDocument();
                         d->makeCurrentSession();
                         int state = S ? (S->error() ? -1 : S->state()) : 0;
 
@@ -1529,8 +1513,7 @@ namespace Rv
                         if (S && S->error())
                         {
                             a->setEnabled(false);
-                            a->setIcon(
-                                colorAdjustedIcon(":images/del_32x32.png"));
+                            a->setIcon(colorAdjustedIcon(":images/del_32x32.png"));
                             a->setText(QString("ERROR : ") + a->text());
                         }
                     }
@@ -1655,8 +1638,7 @@ namespace Rv
         return ret;
     }
 
-    void RvDocument::convert(QMenu* qmenu, const TwkApp::Menu* menu,
-                             bool shortcuts)
+    void RvDocument::convert(QMenu* qmenu, const TwkApp::Menu* menu, bool shortcuts)
     {
         for (int i = 0; i < menu->items().size(); i++)
         {
@@ -1667,8 +1649,7 @@ namespace Rv
                 QMenu* subMenu = qmenu->addMenu(utf8(item->title()));
                 subMenu->setFont(qmenu->font());
                 //  rt.go();
-                connect(subMenu, SIGNAL(aboutToShow()), this,
-                        SLOT(aboutToShowMenu()));
+                connect(subMenu, SIGNAL(aboutToShow()), this, SLOT(aboutToShowMenu()));
                 //  rt.stop();
                 convert(subMenu, item->subMenu(), shortcuts);
                 subMenu->menuAction()->setMenuRole(QAction::NoRole);
@@ -1681,8 +1662,7 @@ namespace Rv
             {
                 TwkQTAction* a = new TwkQTAction(item, this, qmenu);
 
-                if ((item->stateFunc() && item->stateFunc()->error())
-                    || (item->action() && item->action()->error()))
+                if ((item->stateFunc() && item->stateFunc()->error()) || (item->action() && item->action()->error()))
                 {
                     a->setText(QString("ERROR : ") + utf8(item->title()));
                     a->setIcon(colorAdjustedIcon(":images/del_32x32.png"));
@@ -1697,8 +1677,7 @@ namespace Rv
                 {
                     string sc = buildShortcutString(item->key());
                     a->setShortcut(QString(sc.c_str()));
-                    if (sc.size() == 1
-                        && QString("") == a->shortcut().toString())
+                    if (sc.size() == 1 && QString("") == a->shortcut().toString())
                     {
                         //
                         //  setShortcut takes a QKeySequence, and when
@@ -1755,10 +1734,8 @@ namespace Rv
                 QList<QAction*> menuActions = menu->actions();
                 for (QAction* menuAction : menuActions)
                 {
-                    if (menuAction == RvApp()->aboutAction()
-                        || menuAction == RvApp()->prefAction()
-                        || menuAction == RvApp()->networkAction()
-                        || menuAction == RvApp()->quitAction())
+                    if (menuAction == RvApp()->aboutAction() || menuAction == RvApp()->prefAction()
+                        || menuAction == RvApp()->networkAction() || menuAction == RvApp()->quitAction())
                     {
                         menu->removeAction(menuAction);
                     }
@@ -1840,8 +1817,7 @@ namespace Rv
 
                 QMenu* menu = mb()->addMenu(title);
                 //  rt.go();
-                connect(menu, SIGNAL(aboutToShow()), this,
-                        SLOT(aboutToShowMenu()));
+                connect(menu, SIGNAL(aboutToShow()), this, SLOT(aboutToShowMenu()));
                 //  rt.stop();
                 convert(menu, item->subMenu(), shortcuts);
 
@@ -1850,8 +1826,7 @@ namespace Rv
                 pmenu->setFont(f);
 #endif
                 //  rt.go();
-                connect(pmenu, SIGNAL(aboutToShow()), this,
-                        SLOT(aboutToShowMenu()));
+                connect(pmenu, SIGNAL(aboutToShow()), this, SLOT(aboutToShowMenu()));
                 //  rt.stop();
                 convert(pmenu, item->subMenu(), shortcuts);
             }
@@ -1890,8 +1865,7 @@ namespace Rv
 #endif
 
         convert(m_userPopup, menu, shortcuts);
-        connect(m_userPopup, SIGNAL(aboutToShow()), this,
-                SLOT(aboutToShowMenu()));
+        connect(m_userPopup, SIGNAL(aboutToShow()), this, SLOT(aboutToShowMenu()));
         m_userPopup->popup(point);
     }
 
@@ -1933,9 +1907,7 @@ namespace Rv
 
         if (e->type() == QEvent::WindowActivate)
         {
-            DB("event: WindowActivate "
-               << m_session->name() << ", currently active "
-               << Rv::Session::activeSession()->name());
+            DB("event: WindowActivate " << m_session->name() << ", currently active " << Rv::Session::activeSession()->name());
             //
             //  We should only have to call makeActive() if we are not
             //  currently the active session, but in that case Qt seems
@@ -1990,8 +1962,7 @@ namespace Rv
 
         //    if (! m_closeEventReceived)
         {
-            string ok =
-                m_session->userGenericEvent("before-session-deletion", "");
+            string ok = m_session->userGenericEvent("before-session-deletion", "");
 
             if (ok == "")
                 event->accept();
@@ -2008,17 +1979,50 @@ namespace Rv
             m_session->askForRedraw();
     }
 
+    void RvDocument::resizeEvent(QResizeEvent* event)
+    {
+        QMainWindow::resizeEvent(event);
+
+        // Keep overlay covering entire window when visible
+        if (m_blockingOverlay && m_blockingOverlay->isVisible())
+        {
+            m_blockingOverlay->setGeometry(0, 0, width(), height());
+            m_blockingOverlay->raise();
+        }
+    }
+
+    void RvDocument::setUIBlocked(bool blocked)
+    {
+        if (!m_blockingOverlay)
+        {
+            return;
+        }
+
+        if (blocked)
+        {
+            // Cover entire window
+            m_blockingOverlay->setGeometry(0, 0, width(), height());
+            m_blockingOverlay->raise(); // Bring to front, above everything
+            m_blockingOverlay->show();
+
+            // Grab focus to also block keyboard input
+            m_blockingOverlay->setFocus(Qt::OtherFocusReason);
+        }
+        else
+        {
+            m_blockingOverlay->hide();
+        }
+    }
+
     void RvDocument::addWatchFile(const string& path)
     {
         if (!m_watcher)
         {
             m_watcher = new QFileSystemWatcher();
 
-            connect(m_watcher, SIGNAL(fileChanged(const QString&)), this,
-                    SLOT(watchedFileChanged(const QString&)));
+            connect(m_watcher, SIGNAL(fileChanged(const QString&)), this, SLOT(watchedFileChanged(const QString&)));
 
-            connect(m_watcher, SIGNAL(directoryChanged(const QString&)), this,
-                    SLOT(watchedFileChanged(const QString&)));
+            connect(m_watcher, SIGNAL(directoryChanged(const QString&)), this, SLOT(watchedFileChanged(const QString&)));
         }
 
         m_watcher->addPath(path.c_str());
@@ -2034,8 +2038,7 @@ namespace Rv
 
     void RvDocument::watchedFileChanged(const QString& path)
     {
-        TwkApp::GenericStringEvent event(
-            "file-changed", m_glView->videoDevice(), path.toUtf8().data());
+        TwkApp::GenericStringEvent event("file-changed", m_glView->videoDevice(), path.toUtf8().data());
 
         // cout << m_watcher->files().size() << endl;
         // cout << m_watcher->directories().size() << endl;
@@ -2054,23 +2057,18 @@ namespace Rv
         {
             QMessageBox box(this);
             box.setWindowTitle(tr(UI_APPLICATION_NAME ": VSync Conflict"));
-            QString baseText =
-                tr("Both the graphics driver and RV v-sync are "
-                   "ON. " UI_APPLICATION_NAME " vsync is being disabled.");
-            QString detailedText(
-                "RV's vsync is being disabled for this session because "
-                "the graphics driver's vsync is also ON. "
-                "You can change this in the nvidia-settings or "
-                "in " UI_APPLICATION_NAME "'s preferences. "
-                "Running " UI_APPLICATION_NAME
-                " with both vsyncs enabled causes incorrect "
-                "playback. ");
+            QString baseText = tr("Both the graphics driver and RV v-sync are "
+                                  "ON. " UI_APPLICATION_NAME " vsync is being disabled.");
+            QString detailedText("RV's vsync is being disabled for this session because "
+                                 "the graphics driver's vsync is also ON. "
+                                 "You can change this in the nvidia-settings or "
+                                 "in " UI_APPLICATION_NAME "'s preferences. "
+                                 "Running " UI_APPLICATION_NAME " with both vsyncs enabled causes incorrect "
+                                 "playback. ");
             box.setText(baseText + "\n\n" + detailedText);
             box.setWindowModality(Qt::WindowModal);
             QPushButton* b1 = box.addButton(tr("Ok"), QMessageBox::AcceptRole);
-            box.setIconPixmap(QPixmap(qApp->applicationDirPath()
-                                      + QString(RV_ICON_PATH_SUFFIX))
-                                  .scaledToHeight(64));
+            box.setIconPixmap(QPixmap(qApp->applicationDirPath() + QString(RV_ICON_PATH_SUFFIX)).scaledToHeight(64));
             box.exec();
             opts.vsync = 0;
             m_vsyncDisabled = true;
@@ -2084,23 +2082,18 @@ namespace Rv
         if (queryDriverVSync())
         {
             QMessageBox box(this);
-            box.setWindowTitle(
-                tr(UI_APPLICATION_NAME ": Driver VSync Conflict"));
+            box.setWindowTitle(tr(UI_APPLICATION_NAME ": Driver VSync Conflict"));
             QString baseText = tr("The graphics driver v-sync is ON. "
                                   "This can result in bad playback performance "
                                   "in presentation mode.");
-            QString detailedText(
-                "The graphics driver's vsync is ON. "
-                "You can change this in the nvidia-settings OpenGL section. "
-                "Running " UI_APPLICATION_NAME
-                " in presentation mode with the driver "
-                "vsync enabled will cause incorrect "
-                "playback. ");
+            QString detailedText("The graphics driver's vsync is ON. "
+                                 "You can change this in the nvidia-settings OpenGL section. "
+                                 "Running " UI_APPLICATION_NAME " in presentation mode with the driver "
+                                 "vsync enabled will cause incorrect "
+                                 "playback. ");
             box.setWindowModality(Qt::WindowModal);
             QPushButton* b1 = box.addButton(tr("Ok"), QMessageBox::AcceptRole);
-            box.setIconPixmap(QPixmap(qApp->applicationDirPath()
-                                      + QString(RV_ICON_PATH_SUFFIX))
-                                  .scaledToHeight(64));
+            box.setIconPixmap(QPixmap(qApp->applicationDirPath() + QString(RV_ICON_PATH_SUFFIX)).scaledToHeight(64));
             box.exec();
         }
     }

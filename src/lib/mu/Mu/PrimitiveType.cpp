@@ -14,8 +14,7 @@ namespace Mu
 
     using namespace std;
 
-    PrimitiveType::PrimitiveType(Context* context, const char* tname,
-                                 const MachineRep* rep)
+    PrimitiveType::PrimitiveType(Context* context, const char* tname, const MachineRep* rep)
         : Type(context, tname, rep)
     {
         _isPrimitive = true;
@@ -26,14 +25,8 @@ namespace Mu
 
     size_t PrimitiveType::objectSize() const { return machineRep()->size(); }
 
-    void PrimitiveType::constructInstance(Pointer p) const
-    {
-        memset(p, 0, machineRep()->size());
-    }
+    void PrimitiveType::constructInstance(Pointer p) const { memset(p, 0, machineRep()->size()); }
 
-    void PrimitiveType::copyInstance(Pointer a, Pointer b) const
-    {
-        memcpy(b, a, machineRep()->size());
-    }
+    void PrimitiveType::copyInstance(Pointer a, Pointer b) const { memcpy(b, a, machineRep()->size()); }
 
 } // namespace Mu

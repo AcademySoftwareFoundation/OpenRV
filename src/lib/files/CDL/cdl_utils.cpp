@@ -23,8 +23,7 @@ namespace
         cc.slope = e.second.get<Vec3f>("SOPNode.Slope", cc.slope);
         cc.offset = e.second.get<Vec3f>("SOPNode.Offset", cc.offset);
         cc.power = e.second.get<Vec3f>("SOPNode.Power", cc.power);
-        cc.saturation =
-            e.second.get<float>("SatNode.Saturation", cc.saturation);
+        cc.saturation = e.second.get<float>("SatNode.Saturation", cc.saturation);
 
         return cc;
     }
@@ -40,7 +39,7 @@ namespace CDL
 
     bool isCDLFile(const std::string& filepath)
     {
-        const string ext = boost::filesystem::extension(filepath);
+        const string ext = boost::filesystem::path(filepath).extension().string();
 
         //
         //  Add the extensions that we support.
@@ -65,8 +64,7 @@ namespace CDL
         filebuf fb;
         if (!fb.open(filepath.c_str(), ios::in))
         {
-            cerr << "ERROR: Unable to open CDL file: '" << filepath << "'"
-                 << endl;
+            cerr << "ERROR: Unable to open CDL file: '" << filepath << "'" << endl;
             return collection;
         }
 
@@ -78,8 +76,7 @@ namespace CDL
         }
         catch (property_tree::xml_parser_error& exc)
         {
-            cerr << "ERROR: Unable to read XML '" << filepath << "'. "
-                 << exc.what() << endl;
+            cerr << "ERROR: Unable to read XML '" << filepath << "'. " << exc.what() << endl;
             fb.close();
             return collection;
         }
@@ -87,8 +84,7 @@ namespace CDL
         try
         {
             string seed = "";
-            string extension =
-                boost::filesystem::path(filepath).extension().string();
+            string extension = boost::filesystem::path(filepath).extension().string();
             if (extension == ".cc")
             {
                 BOOST_FOREACH (const property_tree::ptree::value_type& e, pt)

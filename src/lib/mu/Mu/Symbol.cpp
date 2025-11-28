@@ -25,10 +25,7 @@ namespace Mu
 {
     using namespace std;
 
-    static void symbol_finalizer(void* obj, void* data)
-    {
-        Symbol* s = (Symbol*)obj;
-    }
+    static void symbol_finalizer(void* obj, void* data) { Symbol* s = (Symbol*)obj; }
 
     Symbol::Symbol(Context* context, const char* name)
         : _context(context)
@@ -188,9 +185,7 @@ namespace Mu
 
     Symbol* Symbol::findSymbolByQualifiedName(Name name, bool restricted)
     {
-        const Symbol* s =
-            const_cast<const Symbol*>(this)->findSymbolByQualifiedName(
-                name, restricted);
+        const Symbol* s = const_cast<const Symbol*>(this)->findSymbolByQualifiedName(name, restricted);
         return const_cast<Symbol*>(s);
     }
 
@@ -221,8 +216,7 @@ namespace Mu
         return String::npos;
     }
 
-    const Symbol* Symbol::findSymbolByQualifiedName(Name name,
-                                                    bool restricted) const
+    const Symbol* Symbol::findSymbolByQualifiedName(Name name, bool restricted) const
     {
         size_t p;
         const String& sname = name;
@@ -247,14 +241,11 @@ namespace Mu
                     {
                         Name n = context()->internName(rest.c_str());
 
-                        for (const Symbol* s = sym->firstOverload(); s;
-                             s = s->nextOverload())
+                        for (const Symbol* s = sym->firstOverload(); s; s = s->nextOverload())
                         {
                             if (!restricted || s->_searchable)
                             {
-                                if (const Symbol* child =
-                                        s->findSymbolByQualifiedName(
-                                            n, restricted))
+                                if (const Symbol* child = s->findSymbolByQualifiedName(n, restricted))
                                 {
                                     return child;
                                 }
@@ -302,8 +293,7 @@ namespace Mu
         return const_cast<Symbol*>(s);
     }
 
-    static void qualifiedNameLookup(const Symbol::NameVector& name,
-                                    Symbol* base, Symbol::SymbolVector& symbols)
+    static void qualifiedNameLookup(const Symbol::NameVector& name, Symbol* base, Symbol::SymbolVector& symbols)
     {
         if (Symbol* s = base->findSymbol(name[0]))
         {
@@ -327,16 +317,13 @@ namespace Mu
         }
     }
 
-    static void qualifiedNameLookup(const Symbol::NameVector& name,
-                                    const Symbol* base,
-                                    Symbol::ConstSymbolVector& symbols)
+    static void qualifiedNameLookup(const Symbol::NameVector& name, const Symbol* base, Symbol::ConstSymbolVector& symbols)
     {
         if (const Symbol* s = base->findSymbol(name[0]))
         {
             if (name.size() == 1)
             {
-                for (const Symbol* n = s->firstOverload(); n;
-                     n = n->nextOverload())
+                for (const Symbol* n = s->firstOverload(); n; n = n->nextOverload())
                 {
                     symbols.push_back(n);
                 }
@@ -346,8 +333,7 @@ namespace Mu
                 Symbol::NameVector newName = name;
                 newName.erase(newName.begin());
 
-                for (const Symbol* n = s->firstOverload(); n;
-                     n = n->nextOverload())
+                for (const Symbol* n = s->firstOverload(); n; n = n->nextOverload())
                 {
                     qualifiedNameLookup(newName, n, symbols);
                 }
@@ -386,8 +372,7 @@ namespace Mu
         }
     }
 
-    void Symbol::findSymbols(QualifiedName name,
-                             ConstSymbolVector& symbols) const
+    void Symbol::findSymbols(QualifiedName name, ConstSymbolVector& symbols) const
     {
         NameVector names;
         context()->separateName(name, names);
@@ -405,15 +390,9 @@ namespace Mu
         }
     }
 
-    Module* Symbol::globalModule()
-    {
-        return static_cast<Module*>(globalScope());
-    }
+    Module* Symbol::globalModule() { return static_cast<Module*>(globalScope()); }
 
-    const Module* Symbol::globalModule() const
-    {
-        return static_cast<const Module*>(globalScope());
-    }
+    const Module* Symbol::globalModule() const { return static_cast<const Module*>(globalScope()); }
 
     Symbol* Symbol::globalScope()
     {

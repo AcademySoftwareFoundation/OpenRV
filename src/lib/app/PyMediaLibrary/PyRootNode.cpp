@@ -19,17 +19,15 @@
 
 namespace
 {
-    static ENVVAR_BOOL(evUseMediaLibraryPlugins, "RV_USE_MEDIA_LIBRARY_PLUGINS",
-                       true);
+    static ENVVAR_BOOL(evUseMediaLibraryPlugins, "RV_USE_MEDIA_LIBRARY_PLUGINS", true);
 
-    constexpr std::array<std::string_view, 7> PLUGIN_FUNCTIONS = {
-        {{"is_plugin_enabled"},
-         {"is_library_media_url"},
-         {"is_streaming"},
-         {"is_redirecting"},
-         {"get_http_cookies"},
-         {"get_http_headers"},
-         {"get_http_redirection"}}};
+    constexpr std::array<std::string_view, 7> PLUGIN_FUNCTIONS = {{{"is_plugin_enabled"},
+                                                                   {"is_library_media_url"},
+                                                                   {"is_streaming"},
+                                                                   {"is_redirecting"},
+                                                                   {"get_http_cookies"},
+                                                                   {"get_http_headers"},
+                                                                   {"get_http_redirection"}}};
 
     using Plugin = PyObject*;
     using PluginVector = std::vector<std::pair<std::string, Plugin>>;
@@ -48,34 +46,26 @@ namespace
         std::set<std::string> pluginNames;
         PyLockObject lock;
 
-        const TwkUtil::FileNameList pluginPackages =
-            TwkUtil::findInPath(".*", pluginPathsEnv);
+        const TwkUtil::FileNameList pluginPackages = TwkUtil::findInPath(".*", pluginPathsEnv);
 
         for (const auto& pluginPackage : pluginPackages)
         {
-            const TwkUtil::FileNameList pluginFiles =
-                TwkUtil::findInPath(".*\\.py", pluginPackage);
+            const TwkUtil::FileNameList pluginFiles = TwkUtil::findInPath(".*\\.py", pluginPackage);
 
             for (const auto& pluginFile : pluginFiles)
             {
-                const std::string pluginImportPath =
-                    TwkUtil::basename(TwkUtil::dirname(pluginFile)) + "."
-                    + TwkUtil::prefix(pluginFile);
+                const std::string pluginImportPath = TwkUtil::basename(TwkUtil::dirname(pluginFile)) + "." + TwkUtil::prefix(pluginFile);
 
                 if (pluginNames.find(pluginImportPath) != pluginNames.end())
                 {
-                    std::cerr << "Plug-In " << pluginImportPath << " ("
-                              << pluginFile
-                              << ") already loaded with the same name. Skipped."
+                    std::cerr << "Plug-In " << pluginImportPath << " (" << pluginFile << ") already loaded with the same name. Skipped."
                               << std::endl;
                     continue;
                 }
 
-                std::cout << "Importing MediaLibrary Plug-In: "
-                          << pluginImportPath << std::endl;
+                std::cout << "Importing MediaLibrary Plug-In: " << pluginImportPath << std::endl;
 
-                Plugin pluginObj =
-                    PyImport_ImportModule(pluginImportPath.c_str());
+                Plugin pluginObj = PyImport_ImportModule(pluginImportPath.c_str());
                 if (pluginObj)
                 {
                     bool valid = true;
@@ -85,10 +75,8 @@ namespace
 
                         if (!valid)
                         {
-                            std::cerr << "Plug-In " << pluginImportPath << "("
-                                      << pluginFile << ") does not have "
-                                      << func.data() << " function. Skipped."
-                                      << std::endl;
+                            std::cerr << "Plug-In " << pluginImportPath << "(" << pluginFile << ") does not have " << func.data()
+                                      << " function. Skipped." << std::endl;
                             break;
                         }
                     }
@@ -99,8 +87,7 @@ namespace
                         continue;
                     }
 
-                    PyObject* enabledObj = PyObject_CallMethod(
-                        pluginObj, "is_plugin_enabled", nullptr);
+                    PyObject* enabledObj = PyObject_CallMethod(pluginObj, "is_plugin_enabled", nullptr);
 
                     if (enabledObj == nullptr)
                     {
@@ -121,8 +108,7 @@ namespace
                 }
                 else
                 {
-                    std::cerr << "Failed to load " << pluginImportPath << "("
-                              << pluginFile << ")" << std::endl;
+                    std::cerr << "Failed to load " << pluginImportPath << "(" << pluginFile << ")" << std::endl;
                     PyErr_Print();
                 }
             }
@@ -158,10 +144,7 @@ namespace TwkMediaLibrary
 
     PyRootNode::~PyRootNode() { unloadPlugins(); }
 
-    bool PyRootNode::isLibraryMediaURL(const URL& url) const
-    {
-        return !mediaNodesForURL(url).empty();
-    }
+    bool PyRootNode::isLibraryMediaURL(const URL& url) const { return !mediaNodesForURL(url).empty(); }
 
     MediaNodeVector PyRootNode::mediaNodesForURL(const URL& url) const
     {
@@ -185,8 +168,7 @@ namespace TwkMediaLibrary
                 const auto& pluginName = pluginContainer.first;
                 const auto& plugin = pluginContainer.second;
 
-                PyObject* ret = PyObject_CallMethod(
-                    plugin, "is_library_media_url", "s", url.c_str());
+                PyObject* ret = PyObject_CallMethod(plugin, "is_library_media_url", "s", url.c_str());
                 if (ret == nullptr)
                 {
                     PyErr_Print();
@@ -195,8 +177,7 @@ namespace TwkMediaLibrary
 
                 if (PyObject_IsTrue(ret))
                 {
-                    mediaNodes.push_back(new PyMediaNode(
-                        m_library, url, (PyNode*)this, plugin, pluginName));
+                    mediaNodes.push_back(new PyMediaNode(m_library, url, (PyNode*)this, plugin, pluginName));
                 }
 
                 Py_XDECREF(ret);

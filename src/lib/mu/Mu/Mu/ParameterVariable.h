@@ -25,18 +25,14 @@ namespace Mu
             InputOutput = 1 << 11,
         };
 
-        ParameterVariable(Context* context, const char* name,
-                          const Type* storageClass, Attributes a = ReadWrite);
+        ParameterVariable(Context* context, const char* name, const Type* storageClass, Attributes a = ReadWrite);
 
-        ParameterVariable(Context* context, const char* name,
-                          const char* storageClass, Attributes a = ReadWrite);
+        ParameterVariable(Context* context, const char* name, const char* storageClass, Attributes a = ReadWrite);
 
-        ParameterVariable(Context* context, const char* name,
-                          const Type* storageClass, const Value& defaultValue,
+        ParameterVariable(Context* context, const char* name, const Type* storageClass, const Value& defaultValue,
                           Attributes a = ReadWrite);
 
-        ParameterVariable(Context* context, const char* name,
-                          const char* storageClass, const Value& defaultValue,
+        ParameterVariable(Context* context, const char* name, const char* storageClass, const Value& defaultValue,
                           Attributes a = ReadWrite);
 
         virtual ~ParameterVariable();

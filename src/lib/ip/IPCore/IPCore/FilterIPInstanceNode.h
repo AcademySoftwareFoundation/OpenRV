@@ -16,8 +16,7 @@ namespace IPCore
     class FilterIPInstanceNode : public IPInstanceNode
     {
     public:
-        FilterIPInstanceNode(const std::string& name, const NodeDefinition* def,
-                             IPGraph* graph, GroupIPNode* group = 0);
+        FilterIPInstanceNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group = 0);
 
         virtual ~FilterIPInstanceNode();
 

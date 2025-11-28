@@ -13,7 +13,7 @@
 INCLUDE(ProcessorCount) # require CMake 3.15+
 PROCESSORCOUNT(_cpu_count)
 
-RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_PNG" "1.6.48" "" "")
+RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_PNG" "${RV_DEPS_PNG_VERSION}" "" "")
 RV_SHOW_STANDARD_DEPS_VARIABLES()
 
 SET(_download_url
@@ -21,16 +21,16 @@ SET(_download_url
 )
 
 SET(_download_hash
-    "be6cc9e411c26115db3b9eab1159a1d9"
+    ${RV_DEPS_PNG_DOWNLOAD_HASH}
 )
 
 SET(_libpng_lib_version
-    "16.48.0"
+    "${_version_major}${_version_minor}.${_version_patch}.0"
 )
 IF(NOT RV_TARGET_WINDOWS)
-  RV_MAKE_STANDARD_LIB_NAME("png16" "${_libpng_lib_version}" "SHARED" "d")
+  RV_MAKE_STANDARD_LIB_NAME("png${_version_major}${_version_minor}" "${_libpng_lib_version}" "SHARED" "d")
 ELSE()
-  RV_MAKE_STANDARD_LIB_NAME("libpng16" "${_libpng_lib_version}" "SHARED" "d")
+  RV_MAKE_STANDARD_LIB_NAME("libpng${_version_major}${_version_minor}" "${_libpng_lib_version}" "SHARED" "d")
 ENDIF()
 # The '_configure_options' list gets reset and initialized in 'RV_CREATE_STANDARD_DEPS_VARIABLES' Future: The main branch of libpng has deprecated
 # 'PNG_EXECUTABLES' in favor of 'PNG_TOOLS'.

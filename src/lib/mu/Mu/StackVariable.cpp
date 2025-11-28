@@ -16,16 +16,12 @@ namespace Mu
 
     using namespace std;
 
-    StackVariable::StackVariable(Context* context, const char* name,
-                                 const Type* storageClass, int stackPos,
-                                 Attributes a)
+    StackVariable::StackVariable(Context* context, const char* name, const Type* storageClass, int stackPos, Attributes a)
         : Variable(context, name, storageClass, stackPos, a)
     {
     }
 
-    StackVariable::StackVariable(Context* context, const char* name,
-                                 const char* storageClass, int stackPos,
-                                 Attributes a)
+    StackVariable::StackVariable(Context* context, const char* name, const char* storageClass, int stackPos, Attributes a)
         : Variable(context, name, storageClass, stackPos, a)
     {
     }
@@ -34,10 +30,8 @@ namespace Mu
 
     String StackVariable::mangledName() const
     {
-        static const char* cppkeywords[] = {
-            "this",    "switch", "default",   "auto",     "case",
-            "return",  "throw",  "catch",     "template", "class",
-            "private", "public", "protected", NULL};
+        static const char* cppkeywords[] = {"this",  "switch",   "default", "auto",    "case",   "return",    "throw",
+                                            "catch", "template", "class",   "private", "public", "protected", NULL};
 
         for (const char** k = cppkeywords; *k; k++)
         {
@@ -81,9 +75,6 @@ namespace Mu
         o << " (on stack)";
     }
 
-    void StackVariable::outputNode(std::ostream& o, const Node* n) const
-    {
-        o << n->type()->name() << " stack " << name();
-    }
+    void StackVariable::outputNode(std::ostream& o, const Node* n) const { o << n->type()->name() << " stack " << name(); }
 
 } // namespace Mu

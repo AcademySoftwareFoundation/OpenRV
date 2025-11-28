@@ -19,8 +19,7 @@ namespace LUT
 {
     using namespace std;
 
-    void readPanavisionLUT(const string& filename, const string& type,
-                           LUTData& lut)
+    void readPanavisionLUT(const string& filename, const string& type, LUTData& lut)
     {
         ifstream file(filename.c_str(), ios::binary);
         lut.data.resize(0);

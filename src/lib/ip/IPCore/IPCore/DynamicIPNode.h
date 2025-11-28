@@ -47,8 +47,7 @@ namespace IPCore
     public:
         typedef Shader::Function Function;
 
-        DynamicIPNode(const std::string& name, const NodeDefinition* def,
-                      IPGraph* graph, GroupIPNode* group = 0);
+        DynamicIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group = 0);
 
         virtual ~DynamicIPNode();
 
@@ -60,13 +59,11 @@ namespace IPCore
 
         std::string stringValue(const std::string& name) const;
         StringProperty* stringProp(const std::string& name);
-        void setStringValue(const std::string& name, const std::string& value,
-                            bool withNotification = false);
+        void setStringValue(const std::string& name, const std::string& value, bool withNotification = false);
 
         int intValue(const std::string& name) const;
         IntProperty* intProp(const std::string& name);
-        void setIntValue(const std::string& name, int value,
-                         bool withNotification = false);
+        void setIntValue(const std::string& name, int value, bool withNotification = false);
 
         bool outputError() const;
         bool outputValid() const;

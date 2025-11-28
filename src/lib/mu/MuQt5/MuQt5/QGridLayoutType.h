@@ -39,8 +39,7 @@ namespace Mu
         //  Constructors
         //
 
-        QGridLayoutType(Context* context, const char* name,
-                        Class* superClass = 0, Class* superClass2 = 0);
+        QGridLayoutType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QGridLayoutType();
 
@@ -63,8 +62,7 @@ namespace Mu
     {
     public:
         virtual ~MuQt_QGridLayout();
-        MuQt_QGridLayout(Pointer muobj, const CallEnvironment*,
-                         QWidget* parent);
+        MuQt_QGridLayout(Pointer muobj, const CallEnvironment*, QWidget* parent);
         MuQt_QGridLayout(Pointer muobj, const CallEnvironment*);
         virtual int count() const;
         virtual Qt::Orientations expandingDirections() const;
@@ -92,10 +90,7 @@ namespace Mu
     public:
         void addItem_pub(QLayoutItem* item) { addItem(item); }
 
-        void addItem_pub_parent(QLayoutItem* item)
-        {
-            QGridLayout::addItem(item);
-        }
+        void addItem_pub_parent(QLayoutItem* item) { QGridLayout::addItem(item); }
 
     public:
         const QGridLayoutType* _baseType;
@@ -103,11 +98,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance*
-    QGridLayoutType::cachedInstance(const QGridLayoutType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QGridLayoutType::cachedInstance(const QGridLayoutType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

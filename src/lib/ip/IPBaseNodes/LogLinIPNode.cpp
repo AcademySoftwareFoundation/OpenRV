@@ -75,14 +75,12 @@ namespace IPCore
                 state.logtype = type->empty() ? 0 : type->front();
             }
 
-            if (IntProperty* white =
-                    property<IntProperty>("parameters", "referenceWhite"))
+            if (IntProperty* white = property<IntProperty>("parameters", "referenceWhite"))
             {
                 state.cinRefWhite = white->empty() ? 685 : white->front();
             }
 
-            if (IntProperty* black =
-                    property<IntProperty>("parameters", "referenceBlack"))
+            if (IntProperty* black = property<IntProperty>("parameters", "referenceBlack"))
             {
                 state.cinRefBlack = black->empty() ? 95 : black->front();
             }

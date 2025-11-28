@@ -202,10 +202,7 @@ namespace TwkMovie
         DB("finishTask " << index << " complete");
     }
 
-    const WriteTask& WriteTaskManager::taskByIndex(int index)
-    {
-        return tasks[index];
-    }
+    const WriteTask& WriteTaskManager::taskByIndex(int index) { return tasks[index]; }
 
     void WriteTaskManager::threadMain(int threadNumber)
     {
@@ -233,13 +230,11 @@ namespace TwkMovie
             }
             catch (std::exception& exc)
             {
-                cerr << "ERROR: std::exception while writing '" << t.filename
-                     << "': " << exc.what() << endl;
+                cerr << "ERROR: std::exception while writing '" << t.filename << "': " << exc.what() << endl;
             }
             catch (...)
             {
-                cerr << "ERROR: unknown exception while writing '" << t.filename
-                     << endl;
+                cerr << "ERROR: unknown exception while writing '" << t.filename << endl;
             }
 
             for (int i = 0; i < t.fbs.size(); i++)
@@ -247,16 +242,14 @@ namespace TwkMovie
 
             finishTask(index);
 
-            DB("thread " << threadNumber << " finished writing '"
-                         << t.filename);
+            DB("thread " << threadNumber << " finished writing '" << t.filename);
         }
         DB("thread " << threadNumber << " finished");
     }
 
     static void trampoline(void* vdata)
     {
-        WriteTaskManager::ThreadData* data =
-            reinterpret_cast<WriteTaskManager::ThreadData*>(vdata);
+        WriteTaskManager::ThreadData* data = reinterpret_cast<WriteTaskManager::ThreadData*>(vdata);
         TwkUtil::setThreadName("MovieFBWriter");
         data->manager->threadMain(data->threadNumber);
     }
@@ -292,8 +285,7 @@ namespace TwkMovie
                 //  tasks
                 //
                 static const size_t waitCondTimeOutInSecs = 5;
-                if (!stl_ext::thread_group::wait_cond_time(
-                        waitCond, managerLock, waitCondTimeOutInSecs * 1e6))
+                if (!stl_ext::thread_group::wait_cond_time(waitCond, managerLock, waitCondTimeOutInSecs * 1e6))
                 {
                     DB("addTask waiting-timed out");
 
@@ -347,8 +339,7 @@ namespace TwkMovie
 
     MovieFBWriter::~MovieFBWriter() {}
 
-    bool MovieFBWriter::write(Movie* inMovie, const string& filepattern,
-                              WriteRequest& writeRequest)
+    bool MovieFBWriter::write(Movie* inMovie, const string& filepattern, WriteRequest& writeRequest)
     {
         m_movie = inMovie;
         bool verbose = writeRequest.verbose;
@@ -379,8 +370,7 @@ namespace TwkMovie
         if (writeRequest.timeRangeOverride)
         {
             frames.resize(writeRequest.frames.size());
-            copy(writeRequest.frames.begin(), writeRequest.frames.end(),
-                 frames.begin());
+            copy(writeRequest.frames.begin(), writeRequest.frames.end(), frames.begin());
         }
         else
         {
@@ -399,22 +389,19 @@ namespace TwkMovie
         {
             ostringstream str;
             str << frames.size();
-            params.insert(params.begin(),
-                          StringPair("output/sequence_len", str.str()));
+            params.insert(params.begin(), StringPair("output/sequence_len", str.str()));
         }
 
         {
             ostringstream str;
             str << fs;
-            params.insert(params.begin(),
-                          StringPair("output/start_frame", str.str()));
+            params.insert(params.begin(), StringPair("output/start_frame", str.str()));
         }
 
         {
             ostringstream str;
             str << fe;
-            params.insert(params.begin(),
-                          StringPair("output/end_frame", str.str()));
+            params.insert(params.begin(), StringPair("output/end_frame", str.str()));
         }
 
         // this one is updated every frame
@@ -424,12 +411,10 @@ namespace TwkMovie
         string timeStr;
         string sequencePattern;
 
-        const bool hasPatterns =
-            splitSequenceName(imagePattern, timeStr, sequencePattern);
+        const bool hasPatterns = splitSequenceName(imagePattern, timeStr, sequencePattern);
         if (hasPatterns)
         {
-            WriteTaskManager manager(
-                (writeRequest.threads) ? writeRequest.threads : 1);
+            WriteTaskManager manager((writeRequest.threads) ? writeRequest.threads : 1);
 
             for (unsigned int i = 0; i < frames.size(); i++)
             {
@@ -441,8 +426,7 @@ namespace TwkMovie
 
                 if (f < fs || f > fe)
                     continue;
-                string filename =
-                    replaceFrameSymbols(imagePattern, f, int(fps));
+                string filename = replaceFrameSymbols(imagePattern, f, int(fps));
 
                 {
                     //
@@ -474,9 +458,7 @@ namespace TwkMovie
 
                 if (verbose)
                 {
-                    cout << "INFO: writing frame " << f << " ("
-                         << int(float(i) / float(frames.size() - 1) * 10000.0)
-                                / float(100.0)
+                    cout << "INFO: writing frame " << f << " (" << int(float(i) / float(frames.size() - 1) * 10000.0) / float(100.0)
                          << "% done)" << endl;
                 }
 

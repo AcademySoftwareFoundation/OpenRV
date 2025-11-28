@@ -42,8 +42,7 @@ namespace Mu
         //  Constructors
         //
 
-        QWebEngineProfileType(Context* context, const char* name,
-                              Class* superClass = 0, Class* superClass2 = 0);
+        QWebEngineProfileType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QWebEngineProfileType();
 
@@ -65,10 +64,8 @@ namespace Mu
     class MuQt_QWebEngineProfile : public QWebEngineProfile
     {
     public:
-        MuQt_QWebEngineProfile(Pointer muobj, const CallEnvironment*,
-                               QObject* parent);
-        MuQt_QWebEngineProfile(Pointer muobj, const CallEnvironment*,
-                               const QString& storageName, QObject* parent);
+        MuQt_QWebEngineProfile(Pointer muobj, const CallEnvironment*, QObject* parent);
+        MuQt_QWebEngineProfile(Pointer muobj, const CallEnvironment*, const QString& storageName, QObject* parent);
         virtual bool event(QEvent* e);
         virtual bool eventFilter(QObject* watched, QEvent* event);
 
@@ -79,17 +76,11 @@ namespace Mu
     public:
         void customEvent_pub(QEvent* event) { customEvent(event); }
 
-        void customEvent_pub_parent(QEvent* event)
-        {
-            QWebEngineProfile::customEvent(event);
-        }
+        void customEvent_pub_parent(QEvent* event) { QWebEngineProfile::customEvent(event); }
 
         void timerEvent_pub(QTimerEvent* event) { timerEvent(event); }
 
-        void timerEvent_pub_parent(QTimerEvent* event)
-        {
-            QWebEngineProfile::timerEvent(event);
-        }
+        void timerEvent_pub_parent(QTimerEvent* event) { QWebEngineProfile::timerEvent(event); }
 
     public:
         const QWebEngineProfileType* _baseType;
@@ -97,11 +88,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance* QWebEngineProfileType::cachedInstance(
-        const QWebEngineProfileType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QWebEngineProfileType::cachedInstance(const QWebEngineProfileType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

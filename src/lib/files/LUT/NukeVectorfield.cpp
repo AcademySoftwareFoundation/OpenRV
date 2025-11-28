@@ -18,8 +18,7 @@ namespace LUT
 {
     using namespace std;
 
-    void readNukeVectorfield(const string& filename, const string& type,
-                             LUTData& lut)
+    void readNukeVectorfield(const string& filename, const string& type, LUTData& lut)
     {
         ifstream file(filename.c_str(), ios::binary);
         lut.data.resize(0);
@@ -93,8 +92,7 @@ namespace LUT
         // read data
         //
 
-        if (!Read3DLUTData(file, lut.dimensions[0], lut.dimensions[1],
-                           lut.dimensions[2], FLOAT_DEPTH, true, 0, lut.data))
+        if (!Read3DLUTData(file, lut.dimensions[0], lut.dimensions[1], lut.dimensions[2], FLOAT_DEPTH, true, 0, lut.data))
         {
             TWK_THROW_EXC_STREAM("data parsing error " << filename);
         }

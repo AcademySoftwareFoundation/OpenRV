@@ -76,11 +76,9 @@ namespace TwkMovie
         //
         //  MovieReader API
         //
-        virtual void preloadOpen(const std::string& filename,
-                                 const ReadRequest& request);
+        virtual void preloadOpen(const std::string& filename, const ReadRequest& request);
 
-        virtual void postPreloadOpen(const MovieInfo& as,
-                                     const ReadRequest& request);
+        virtual void postPreloadOpen(const MovieInfo& as, const ReadRequest& request);
 
         //
         //  Open from an existing Rv Session. If w and h are 0, the size
@@ -88,10 +86,8 @@ namespace TwkMovie
         //  session after you pass it in.
         //
 
-        void open(Rv::RvSession* session, const TwkMovie::MovieInfo& as,
-                  TwkAudio::ChannelsVector audioChannels,
-                  double audioRate = TWEAK_AUDIO_DEFAULT_SAMPLE_RATE,
-                  size_t audioPacketSize = 512);
+        void open(Rv::RvSession* session, const TwkMovie::MovieInfo& as, TwkAudio::ChannelsVector audioChannels,
+                  double audioRate = TWEAK_AUDIO_DEFAULT_SAMPLE_RATE, size_t audioPacketSize = 512);
 
         //
         //  Movie API
@@ -137,8 +133,7 @@ namespace TwkMovie
         virtual std::string about() const;
         virtual TwkMovie::MovieReader* movieReader() const;
         virtual TwkMovie::MovieWriter* movieWriter() const;
-        virtual TwkMovie::MovieInfo
-        getMovieInfo(const std::string& filename) const;
+        virtual TwkMovie::MovieInfo getMovieInfo(const std::string& filename) const;
     };
 
 } // namespace TwkMovie

@@ -32,7 +32,6 @@ OUTPUT_DIR = ""
 TEMP_DIR = ""
 VARIANT = ""
 ARCH = ""
-OPENTIMELINEIO_SOURCE_DIR = ""
 
 LIB_DIR = ""
 
@@ -112,7 +111,7 @@ except Exception as e:
 '''
 
 
-def get_python_interpreter_args(python_home: str, variant : str) -> List[str]:
+def get_python_interpreter_args(python_home: str, variant: str) -> List[str]:
     """
     Return the path to the python interpreter given a Python home
 
@@ -120,28 +119,23 @@ def get_python_interpreter_args(python_home: str, variant : str) -> List[str]:
     :return: Path to the python interpreter
     """
 
-    build_opentimelineio = platform.system() == "Windows" and variant == "Debug"
-    python_name_pattern = "python*" if not build_opentimelineio else "python_d*"
+    # On Windows Debug, use the debug Python interpreter (python_d.exe)
+    use_debug_python = platform.system() == "Windows" and variant == "Debug"
+    python_name_pattern = "python*" if not use_debug_python else "python_d*"
 
-    python_interpreters = glob.glob(
-        os.path.join(python_home, python_name_pattern), recursive=True
-    )
-    python_interpreters += glob.glob(
-        os.path.join(python_home, "bin", python_name_pattern)
-    )
+    python_interpreters = glob.glob(os.path.join(python_home, python_name_pattern), recursive=True)
+    python_interpreters += glob.glob(os.path.join(python_home, "bin", python_name_pattern))
 
     # sort put python# before python#-config, prioritize debug on Windows debug builds
     python_interpreters = sorted(
-        [
-            p
-            for p in python_interpreters
-            if os.path.islink(p) is False and os.access(p, os.X_OK)
-        ],
+        [p for p in python_interpreters if os.path.islink(p) is False and os.access(p, os.X_OK)],
         key=lambda p: (
             "-config" in os.path.basename(p),  # config variants last
-            not ("_d" in os.path.basename(p) and platform.system() == "Windows" and variant.lower() == "debug"),  # prioritize _d on Windows debug
-            os.path.basename(p)  # alphabetical
-        )
+            not (
+                "_d" in os.path.basename(p) and platform.system() == "Windows" and variant.lower() == "debug"
+            ),  # prioritize _d on Windows debug
+            os.path.basename(p),  # alphabetical
+        ),
     )
 
     if not python_interpreters or os.path.exists(python_interpreters[0]) is False:
@@ -162,9 +156,7 @@ def patch_python_distribution(python_home: str) -> None:
     :param python_home: Home of the Python to patch.
     """
 
-    for failed_lib in glob.glob(
-        os.path.join(python_home, "lib", "**", "*_failed.so"), recursive=True
-    ):
+    for failed_lib in glob.glob(os.path.join(python_home, "lib", "**", "*_failed.so"), recursive=True):
         # The Python build mark some so as _failed if it cannot load OpenSSL. In our case it's expected because
         # out OpenSSL package works with RPATH and the RPATH is not set on the python build tests. If the lib failed
         # for other reasons, it will fail later in our build script.
@@ -173,10 +165,8 @@ def patch_python_distribution(python_home: str) -> None:
             shutil.move(failed_lib, failed_lib.replace("_failed.so", ".so"))
     if OPENSSL_OUTPUT_DIR:
         if platform.system() == "Darwin":
-            openssl_libs = glob.glob(
-                os.path.join(OPENSSL_OUTPUT_DIR, "lib", "lib*.dylib*")
-            )
-            openssl_libs = [l for l in openssl_libs if os.path.islink(l) is False]
+            openssl_libs = glob.glob(os.path.join(OPENSSL_OUTPUT_DIR, "lib", "lib*.dylib*"))
+            openssl_libs = [lib for lib in openssl_libs if os.path.islink(lib) is False]
 
             python_openssl_libs = []
 
@@ -186,9 +176,7 @@ def patch_python_distribution(python_home: str) -> None:
                 shutil.copyfile(lib_path, dest)
                 python_openssl_libs.append(dest)
 
-            libs_to_patch = glob.glob(
-                os.path.join(python_home, "lib", "**", "*.so"), recursive=True
-            )
+            libs_to_patch = glob.glob(os.path.join(python_home, "lib", "**", "*.so"), recursive=True)
 
             for lib_path in python_openssl_libs:
                 lib_name = os.path.basename(lib_path)
@@ -207,9 +195,7 @@ def patch_python_distribution(python_home: str) -> None:
                     subprocess.run(install_name_tool_change_args).check_returncode()
 
         elif platform.system() == "Linux":
-            openssl_libs = glob.glob(
-                os.path.join(OPENSSL_OUTPUT_DIR, LIB_DIR, "lib*.so*")
-            )
+            openssl_libs = glob.glob(os.path.join(OPENSSL_OUTPUT_DIR, LIB_DIR, "lib*.so*"))
 
             for lib_path in openssl_libs:
                 print(f"Copying {lib_path} to the python home")
@@ -237,7 +223,7 @@ def patch_python_distribution(python_home: str) -> None:
 
     pip_args = python_interpreter_args + ["-m", "pip"]
 
-    for package in ["pip", "certifi", "six", "wheel", "packaging", "requests"]:
+    for package in ["pip", "certifi", "six", "wheel", "packaging", "requests", "pydantic"]:
         package_install_args = pip_args + [
             "install",
             "--upgrade",
@@ -256,9 +242,7 @@ def patch_python_distribution(python_home: str) -> None:
     print(f"Installing wheel with {wheel_install_args}")
     subprocess.run(wheel_install_args).check_returncode()
 
-    site_packages = glob.glob(
-        os.path.join(python_home, "**", "site-packages"), recursive=True
-    )[0]
+    site_packages = glob.glob(os.path.join(python_home, "**", "site-packages"), recursive=True)[0]
 
     if os.path.exists(site_packages) is False:
         raise FileNotFoundError()
@@ -272,9 +256,7 @@ def patch_python_distribution(python_home: str) -> None:
     print(f"Installing the sitecustomize.py payload at {site_customize_path}")
     site_customize_path = os.path.join(site_packages, "sitecustomize.py")
     if os.path.exists(site_customize_path):
-        print(
-            "Found a sitecustomize.py in the site-packages, the content of the file will be overwritten"
-        )
+        print("Found a sitecustomize.py in the site-packages, the content of the file will be overwritten")
         os.remove(site_customize_path)
 
     with open(site_customize_path, "w") as sitecustomize_file:
@@ -297,56 +279,8 @@ def test_python_distribution(python_home: str) -> None:
 
         python_interpreter_args = get_python_interpreter_args(tmp_python_home, VARIANT)
 
-        # Note: We need to build opentimelineio from sources in Windows+Debug
-        #       because the official wheel links with the release version of
-        #       python while RV uses the debug version.
-        build_opentimelineio = platform.system() == "Windows" and VARIANT == "Debug"
-        if build_opentimelineio:
-            print(f"Building opentimelineio")
-
-            # Request an opentimelineio debug build
-            my_env = os.environ.copy()
-            my_env["OTIO_CXX_DEBUG_BUILD"] = "1"
-
-            # Specify the location of the debug python import lib (eg. python39_d.lib)
-            python_include_dirs = os.path.join(tmp_python_home, "include")
-            python_lib = os.path.join(
-                tmp_python_home, "libs", f"python{PYTHON_VERSION}_d.lib"
-            )
-            my_env["CMAKE_ARGS"] = (
-                f"-DPython_LIBRARY={python_lib} -DCMAKE_INCLUDE_PATH={python_include_dirs}"
-            )
-
-            opentimelineio_install_arg = python_interpreter_args + [
-                "-m",
-                "pip",
-                "install",
-                ".",
-            ]
-
-            result = subprocess.run(
-                opentimelineio_install_arg,
-                env=my_env,
-                cwd=OPENTIMELINEIO_SOURCE_DIR,
-            ).check_returncode()
-
-            # Note : The OpenTimelineIO build will generate the pyd with names that are not loadable by default
-            # Example: _opentimed_d.cp39-win_amd64.pyd instead of _opentime_d.pyd
-            # and _otiod_d.cp39-win_amd64.pyd instead of _otio_d.pyd
-            # We fix those names here
-            otio_module_dir = os.path.join(
-                tmp_python_home, "lib", "site-packages", "opentimelineio"
-            )
-            for _file in os.listdir(otio_module_dir):
-                if _file.endswith("pyd"):
-                    otio_lib_name_split = os.path.basename(_file).split(".")
-                    if len(otio_lib_name_split) > 2:
-                        new_otio_lib_name = (
-                            otio_lib_name_split[0].replace("d_d", "_d") + ".pyd"
-                        )
-                        src_file = os.path.join(otio_module_dir, _file)
-                        dst_file = os.path.join(otio_module_dir, new_otio_lib_name)
-                        shutil.copyfile(src_file, dst_file)
+        # Note: OpenTimelineIO is installed via requirements.txt for all platforms and build types.
+        # The git URL in requirements.txt ensures it builds from source with proper linkage.
 
         wheel_install_arg = python_interpreter_args + [
             "-m",
@@ -355,10 +289,7 @@ def test_python_distribution(python_home: str) -> None:
             "cryptography",
         ]
 
-        if not build_opentimelineio:
-            wheel_install_arg.append("opentimelineio")
-
-        print(f"Validating the that we can install a wheel with {wheel_install_arg}")
+        print(f"Validating that we can install a wheel with {wheel_install_arg}")
         subprocess.run(wheel_install_arg).check_returncode()
 
         python_validation_args = python_interpreter_args + [
@@ -400,9 +331,7 @@ def test_python_distribution(python_home: str) -> None:
             ),
         ]
         print(f"Validating the python package with {python_validation2_args}")
-        subprocess.run(
-            python_validation2_args, env={**os.environ, "SSL_CERT_FILE": dummy_ssl_file}
-        ).check_returncode()
+        subprocess.run(python_validation2_args, env={**os.environ, "SSL_CERT_FILE": dummy_ssl_file}).check_returncode()
 
         python_validation3_args = python_interpreter_args + [
             "-c",
@@ -471,9 +400,7 @@ def configure() -> None:
 
             if platform.system() == "Linux":
                 # This option prevent Python to build the _ssl module correctly on Darwin.
-                configure_args.append(
-                    f"--with-openssl-rpath={OPENSSL_OUTPUT_DIR}/{LIB_DIR}"
-                )
+                configure_args.append(f"--with-openssl-rpath={OPENSSL_OUTPUT_DIR}/{LIB_DIR}")
 
         if VARIANT == "Release":
             configure_args.append("--enable-optimizations")
@@ -483,62 +410,32 @@ def configure() -> None:
         PKG_CONFIG_PATH = []
 
         if platform.system() == "Darwin":
-            readline_prefix_proc = subprocess.run(
-                ["brew", "--prefix", "readline"], capture_output=True
-            )
+            readline_prefix_proc = subprocess.run(["brew", "--prefix", "readline"], capture_output=True)
             readline_prefix_proc.check_returncode()
 
-            tcl_prefix_proc = subprocess.run(
-                ["brew", "--prefix", "tcl-tk@8"], capture_output=True
-            )
+            tcl_prefix_proc = subprocess.run(["brew", "--prefix", "tcl-tk@8"], capture_output=True)
             tcl_prefix_proc.check_returncode()
 
-            python_tk_prefix_proc = subprocess.run(
-                ["brew", "--prefix", "python-tk"], capture_output=True
-            )
+            python_tk_prefix_proc = subprocess.run(["brew", "--prefix", "python-tk"], capture_output=True)
             python_tk_prefix_proc.check_returncode()
 
-            xz_prefix_proc = subprocess.run(
-                ["brew", "--prefix", "xz"], capture_output=True
-            )
+            xz_prefix_proc = subprocess.run(["brew", "--prefix", "xz"], capture_output=True)
             xz_prefix_proc.check_returncode()
 
-            sdk_prefix_proc = subprocess.run(
-                ["xcrun", "--show-sdk-path"], capture_output=True
-            )
+            sdk_prefix_proc = subprocess.run(["xcrun", "--show-sdk-path"], capture_output=True)
             sdk_prefix_proc.check_returncode()
 
-            readline_prefix = (
-                pathlib.Path(readline_prefix_proc.stdout.strip().decode("utf-8"))
-                .resolve()
-                .__str__()
-            )
-            tcl_prefix = (
-                pathlib.Path(tcl_prefix_proc.stdout.strip().decode("utf-8"))
-                .resolve()
-                .__str__()
-            )
-            xz_prefix = (
-                pathlib.Path(xz_prefix_proc.stdout.strip().decode("utf-8"))
-                .resolve()
-                .__str__()
-            )
-            sdk_prefix = (
-                pathlib.Path(sdk_prefix_proc.stdout.strip().decode("utf-8"))
-                .resolve()
-                .__str__()
-            )
-            python_tk_prefix = (
-                pathlib.Path(python_tk_prefix_proc.stdout.strip().decode("utf-8"))
-                .resolve()
-                .__str__()
-            )
+            readline_prefix = pathlib.Path(readline_prefix_proc.stdout.strip().decode("utf-8")).resolve().__str__()
+            tcl_prefix = pathlib.Path(tcl_prefix_proc.stdout.strip().decode("utf-8")).resolve().__str__()
+            xz_prefix = pathlib.Path(xz_prefix_proc.stdout.strip().decode("utf-8")).resolve().__str__()
+            sdk_prefix = pathlib.Path(sdk_prefix_proc.stdout.strip().decode("utf-8")).resolve().__str__()
+            python_tk_prefix = pathlib.Path(python_tk_prefix_proc.stdout.strip().decode("utf-8")).resolve().__str__()
 
-            CPPFLAGS.append(f'-I{os.path.join(readline_prefix, "include")}')
-            CPPFLAGS.append(f'-I{os.path.join(tcl_prefix, "include")}')
-            CPPFLAGS.append(f'-I{os.path.join(xz_prefix, "include")}')
-            CPPFLAGS.append(f'-I{os.path.join(sdk_prefix, "usr", "include")}')
-            CPPFLAGS.append(f'-I{os.path.join(python_tk_prefix, "include")}')
+            CPPFLAGS.append(f"-I{os.path.join(readline_prefix, 'include')}")
+            CPPFLAGS.append(f"-I{os.path.join(tcl_prefix, 'include')}")
+            CPPFLAGS.append(f"-I{os.path.join(xz_prefix, 'include')}")
+            CPPFLAGS.append(f"-I{os.path.join(sdk_prefix, 'usr', 'include')}")
+            CPPFLAGS.append(f"-I{os.path.join(python_tk_prefix, 'include')}")
 
             LD_LIBRARY_PATH.append(os.path.join(readline_prefix, "lib"))
             LD_LIBRARY_PATH.append(os.path.join(tcl_prefix, "lib"))
@@ -552,14 +449,10 @@ def configure() -> None:
 
         if OPENSSL_OUTPUT_DIR:
             if platform.system() == "Darwin":
-                configure_args.append(
-                    f"LC_RPATH={os.path.join(OPENSSL_OUTPUT_DIR, LIB_DIR)}"
-                )
-                configure_args.append(f'LDFLAGS={" ".join(LDFLAGS)}')
-                configure_args.append(f'CPPFLAGS={" ".join(CPPFLAGS)}')
-                configure_args.append(
-                    f"DYLD_LIBRARY_PATH={os.path.join(OPENSSL_OUTPUT_DIR, LIB_DIR)}"
-                )
+                configure_args.append(f"LC_RPATH={os.path.join(OPENSSL_OUTPUT_DIR, LIB_DIR)}")
+                configure_args.append(f"LDFLAGS={' '.join(LDFLAGS)}")
+                configure_args.append(f"CPPFLAGS={' '.join(CPPFLAGS)}")
+                configure_args.append(f"DYLD_LIBRARY_PATH={os.path.join(OPENSSL_OUTPUT_DIR, LIB_DIR)}")
             else:
                 # Linux (NOT Windows was checked before)
                 configure_args.append(f"LDFLAGS=-L{OPENSSL_OUTPUT_DIR}/{LIB_DIR}")
@@ -571,9 +464,7 @@ def configure() -> None:
 
         print(f"Executing {configure_args} from {SOURCE_DIR}")
 
-        subprocess.run(
-            configure_args, cwd=SOURCE_DIR, env=subprocess_env
-        ).check_returncode()
+        subprocess.run(configure_args, cwd=SOURCE_DIR, env=subprocess_env).check_returncode()
 
         makefile_path = os.path.join(SOURCE_DIR, "Makefile")
         old_makefile_path = os.path.join(SOURCE_DIR, "Makefile.old")
@@ -590,9 +481,7 @@ def configure() -> None:
                     if new_line.startswith("LINKFORSHARED="):
                         if platform.system() == "Linux":
                             makefile.write(
-                                new_line.strip()
-                                + " -Wl,-rpath,'$$ORIGIN/../lib',-rpath,'$$ORIGIN/../Qt'"
-                                + "\n"
+                                new_line.strip() + " -Wl,-rpath,'$$ORIGIN/../lib',-rpath,'$$ORIGIN/../Qt'" + "\n"
                             )
                         elif platform.system() == "Darwin":
                             makefile.write(
@@ -610,7 +499,6 @@ def build() -> None:
     """
 
     if platform.system() == "Windows":
-
         build_args = [
             os.path.join(SOURCE_DIR, "PCBuild", "build.bat"),
             "-p",
@@ -682,9 +570,7 @@ def install_python_vfx2023() -> None:
         # libs - required by pyside2
         dst_dir = os.path.join(OUTPUT_DIR, "libs")
         os.mkdir(dst_dir)
-        python_libs = glob.glob(
-            os.path.join(SOURCE_DIR, "PCBuild", "amd64", "python*.lib")
-        )
+        python_libs = glob.glob(os.path.join(SOURCE_DIR, "PCBuild", "amd64", "python*.lib"))
         if python_libs:
             for python_lib in python_libs:
                 shutil.copy(python_lib, dst_dir)
@@ -723,6 +609,7 @@ def install_python_vfx2023() -> None:
 
     patch_python_distribution(OUTPUT_DIR)
     test_python_distribution(OUTPUT_DIR)
+
 
 def install_python_vfx2024() -> None:
     """
@@ -769,10 +656,7 @@ def install_python_vfx2024() -> None:
 
         print(f"Executing {install_args}")
 
-        subprocess.run(
-            install_args,
-            cwd=SOURCE_DIR
-        ).check_returncode()
+        subprocess.run(install_args, cwd=SOURCE_DIR).check_returncode()
 
         # bin
         libs_dir = os.path.join(OUTPUT_DIR, "libs")
@@ -793,7 +677,7 @@ def install_python_vfx2024() -> None:
 
         # Move files under root directory into the bin folder.
         for filename in os.listdir(os.path.join(OUTPUT_DIR)):
-            file_path = os.path.join(OUTPUT_DIR, filename)  
+            file_path = os.path.join(OUTPUT_DIR, filename)
             if os.path.isfile(file_path):
                 shutil.move(file_path, os.path.join(dst_dir, filename))
 
@@ -840,6 +724,7 @@ def install_python_vfx2024() -> None:
     patch_python_distribution(OUTPUT_DIR)
     test_python_distribution(OUTPUT_DIR)
 
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
@@ -849,9 +734,7 @@ if __name__ == "__main__":
     parser.add_argument("--install", dest="install", action="store_true")
 
     parser.add_argument("--source-dir", dest="source", type=pathlib.Path, required=True)
-    parser.add_argument(
-        "--openssl-dir", dest="openssl", type=pathlib.Path, required=False
-    )
+    parser.add_argument("--openssl-dir", dest="openssl", type=pathlib.Path, required=False)
     parser.add_argument("--temp-dir", dest="temp", type=pathlib.Path, required=True)
     parser.add_argument("--output-dir", dest="output", type=pathlib.Path, required=True)
 
@@ -859,14 +742,6 @@ if __name__ == "__main__":
     parser.add_argument("--arch", dest="arch", type=str, required=False, default="")
 
     parser.add_argument("--vfx_platform", dest="vfx_platform", type=int, required=True)
-
-    parser.add_argument(
-        "--opentimelineio-source-dir",
-        dest="otio_source_dir",
-        type=str,
-        required=False,
-        default="",
-    )
 
     if platform.system() == "Windows":
         # Major and minor version of Python without dots. E.g. 3.10.3 -> 310
@@ -888,7 +763,6 @@ if __name__ == "__main__":
     OPENSSL_OUTPUT_DIR = args.openssl
     VARIANT = args.variant
     ARCH = args.arch
-    OPENTIMELINEIO_SOURCE_DIR = args.otio_source_dir
     VFX_PLATFORM = args.vfx_platform
 
     if platform.system() == "Darwin":
@@ -898,7 +772,7 @@ if __name__ == "__main__":
         # TODO: Note: This might not be right on Debian based platform.
         if VFX_PLATFORM == 2023:
             LIB_DIR = "lib"
-        elif VFX_PLATFORM == 2024:
+        elif VFX_PLATFORM >= 2024:
             LIB_DIR = "lib64"
 
     if platform.system() == "Windows":
@@ -914,9 +788,9 @@ if __name__ == "__main__":
         build()
 
     if args.install:
-        # The install functions has a lot of similiarity but I think it is better to have two differents 
+        # The install functions has a lot of similiarity but I think it is better to have two differents
         # functions because it will be easier to drop the support for a VFX platform.
         if VFX_PLATFORM == 2023:
             install_python_vfx2023()
-        elif VFX_PLATFORM == 2024:
+        elif VFX_PLATFORM >= 2024:
             install_python_vfx2024()

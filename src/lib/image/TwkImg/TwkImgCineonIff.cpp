@@ -263,10 +263,7 @@ namespace TwkImg
         };
 
         //*****************************************************************************
-        FileInformation::FileInformation()
-        {
-            memset((void*)this, 0, sizeof(FileInformation));
-        }
+        FileInformation::FileInformation() { memset((void*)this, 0, sizeof(FileInformation)); }
 
         //*****************************************************************************
         void FileInformation::read(std::istream& stream)
@@ -294,8 +291,7 @@ namespace TwkImg
             }
             else if (magic_num != 0x802A5FD7)
             {
-                std::cerr << "Bad magic number. was supposed to be: "
-                          << 0x802A5FD7 << std::endl
+                std::cerr << "Bad magic number. was supposed to be: " << 0x802A5FD7 << std::endl
                           << "Instead got: " << magic_num << std::endl;
                 IffExc exc("Wrong magic number for Film Industry Cineon file.");
                 throw(exc);
@@ -331,8 +327,7 @@ namespace TwkImg
         //*****************************************************************************
         void FileInformation::writeAscii(std::ostream& stream) const
         {
-            stream << "------- File Header Information ("
-                   << sizeof(FileInformation) << " bytes) -------" << std::endl
+            stream << "------- File Header Information (" << sizeof(FileInformation) << " bytes) -------" << std::endl
                    << "Magic Number: " << magic_num << std::endl
                    << "Offset to image data: " << offset << std::endl
                    << "File size: " << file_size << std::endl
@@ -347,10 +342,7 @@ namespace TwkImg
         }
 
         //*****************************************************************************
-        ImageElement::ImageElement()
-        {
-            memset((void*)this, 0, sizeof(ImageElement));
-        }
+        ImageElement::ImageElement() { memset((void*)this, 0, sizeof(ImageElement)); }
 
         //*****************************************************************************
         void ImageElement::read(std::istream& stream)
@@ -393,10 +385,7 @@ namespace TwkImg
         //*****************************************************************************
         void ImageElement::writeAscii(std::ostream& stream) const
         {
-            stream << "\tDesignator 1: "
-                   << ((designator1 == 0) ? "Universal Metric"
-                                          : "Vendor Specific")
-                   << std::endl
+            stream << "\tDesignator 1: " << ((designator1 == 0) ? "Universal Metric" : "Vendor Specific") << std::endl
                    << "\tDesignator 2: ";
 
             switch (designator2)
@@ -437,10 +426,7 @@ namespace TwkImg
         }
 
         //*****************************************************************************
-        ImageInformation::ImageInformation()
-        {
-            memset((void*)this, 0, sizeof(ImageInformation));
-        }
+        ImageInformation::ImageInformation() { memset((void*)this, 0, sizeof(ImageInformation)); }
 
         //*****************************************************************************
         void ImageInformation::read(std::istream& stream)
@@ -497,8 +483,7 @@ namespace TwkImg
         //*****************************************************************************
         void ImageInformation::writeAscii(std::ostream& stream) const
         {
-            stream << "------- Image Header Information ("
-                   << sizeof(ImageInformation) << " bytes) -------" << std::endl
+            stream << "------- Image Header Information (" << sizeof(ImageInformation) << " bytes) -------" << std::endl
                    << "Image Orientation: ";
 
             switch (orientation)
@@ -529,8 +514,7 @@ namespace TwkImg
                 break;
             }
 
-            stream << "Number of Channels: " << (int)num_channels << "-----"
-                   << std::endl;
+            stream << "Number of Channels: " << (int)num_channels << "-----" << std::endl;
 
             for (int i = 0; i < 7; ++i)
             {
@@ -552,10 +536,7 @@ namespace TwkImg
         }
 
         //*****************************************************************************
-        DataFormatInformation::DataFormatInformation()
-        {
-            memset((void*)this, 0, sizeof(DataFormatInformation));
-        }
+        DataFormatInformation::DataFormatInformation() { memset((void*)this, 0, sizeof(DataFormatInformation)); }
 
         //*****************************************************************************
         void DataFormatInformation::read(std::istream& stream)
@@ -590,9 +571,7 @@ namespace TwkImg
         //*****************************************************************************
         void DataFormatInformation::writeAscii(std::ostream& stream) const
         {
-            stream << "------- Data Format Header Information ("
-                   << sizeof(DataFormatInformation) << " bytes) -------"
-                   << std::endl;
+            stream << "------- Data Format Header Information (" << sizeof(DataFormatInformation) << " bytes) -------" << std::endl;
 
             stream << "Data Interleave: ";
             switch (interleave)
@@ -640,17 +619,12 @@ namespace TwkImg
                 break;
             }
 
-            stream << "Packing Tightness: "
-                   << ((tightness == 0) ? "At most one pixel per cell"
-                                        : "As many fields as possible per cell")
+            stream << "Packing Tightness: " << ((tightness == 0) ? "At most one pixel per cell" : "As many fields as possible per cell")
                    << std::endl;
 
-            stream << "Data Sign: "
-                   << ((data_sign == 0) ? "unsigned" : "signed") << std::endl;
+            stream << "Data Sign: " << ((data_sign == 0) ? "unsigned" : "signed") << std::endl;
 
-            stream << "Image Sense: "
-                   << ((image_sense == 0) ? "positive" : "negative")
-                   << std::endl;
+            stream << "Image Sense: " << ((image_sense == 0) ? "positive" : "negative") << std::endl;
 
             stream << "End of Line Padding: " << eol_padding << std::endl
                    << "End of Channel Padding: " << eoc_padding << std::endl
@@ -658,10 +632,7 @@ namespace TwkImg
         }
 
         //*****************************************************************************
-        ImageOriginInformation::ImageOriginInformation()
-        {
-            memset((void*)this, 0, sizeof(ImageOriginInformation));
-        }
+        ImageOriginInformation::ImageOriginInformation() { memset((void*)this, 0, sizeof(ImageOriginInformation)); }
 
         //*****************************************************************************
         void ImageOriginInformation::read(std::istream& stream)
@@ -708,9 +679,7 @@ namespace TwkImg
         //*****************************************************************************
         void ImageOriginInformation::writeAscii(std::ostream& stream) const
         {
-            stream << "------- Image Origin Header Information ("
-                   << sizeof(ImageOriginInformation) << " bytes) -------"
-                   << std::endl
+            stream << "------- Image Origin Header Information (" << sizeof(ImageOriginInformation) << " bytes) -------" << std::endl
                    << "X offset: " << x_offset << std::endl
                    << "Y offset: " << y_offset << std::endl
                    << "Image Filename: " << filename << std::endl
@@ -718,22 +687,15 @@ namespace TwkImg
                    << "Creation Time: " << creation_time << std::endl
                    << "Input Device: " << input_device << std::endl
                    << "Input Device Model: " << input_device_model << std::endl
-                   << "Input Device Serial: " << input_device_serial
-                   << std::endl
-                   << "X Input Device pitch: " << input_device_X_pitch
-                   << std::endl
-                   << "Y Input Device pitch: " << input_device_Y_pitch
-                   << std::endl
-                   << "Image gamma of capture device: " << input_gamma
-                   << std::endl
+                   << "Input Device Serial: " << input_device_serial << std::endl
+                   << "X Input Device pitch: " << input_device_X_pitch << std::endl
+                   << "Y Input Device pitch: " << input_device_Y_pitch << std::endl
+                   << "Image gamma of capture device: " << input_gamma << std::endl
                    << "Reserved: " << reserved << std::endl;
         }
 
         //*****************************************************************************
-        FilmInformation::FilmInformation()
-        {
-            memset((void*)this, 0, sizeof(FilmInformation));
-        }
+        FilmInformation::FilmInformation() { memset((void*)this, 0, sizeof(FilmInformation)); }
 
         //*****************************************************************************
         void FilmInformation::read(std::istream& stream)
@@ -780,8 +742,7 @@ namespace TwkImg
         //*****************************************************************************
         void FilmInformation::writeAscii(std::ostream& stream) const
         {
-            stream << "------- Film-Specific Header Information ("
-                   << sizeof(FilmInformation) << " bytes ) -------" << std::endl
+            stream << "------- Film-Specific Header Information (" << sizeof(FilmInformation) << " bytes ) -------" << std::endl
                    << "Film Manufacturer ID: " << (int)film_mfg_id << std::endl
                    << "Film Type ID: " << (int)film_type << std::endl
                    << "Offset: " << (int)offset << std::endl
@@ -798,9 +759,7 @@ namespace TwkImg
 
         //*****************************************************************************
         // Printing Density to Relative Exposure
-        void printingDensityToRelativeExposure(const PIXEL& pd, Col3f& re,
-                                               int codeShiftR, int codeShiftG,
-                                               int codeShiftB)
+        void printingDensityToRelativeExposure(const PIXEL& pd, Col3f& re, int codeShiftR, int codeShiftG, int codeShiftB)
         {
             // Step 0. Code shift.
             int red = (codeShiftR + (int)pd.red) & CHAN_MASK;
@@ -834,9 +793,7 @@ namespace TwkImg
         }
 
         //*****************************************************************************
-        void relativeExposureToPrintingDensity(const Col3f& re, PIXEL& pd,
-                                               int codeShiftR, int codeShiftG,
-                                               int codeShiftB)
+        void relativeExposureToPrintingDensity(const Col3f& re, PIXEL& pd, int codeShiftR, int codeShiftG, int codeShiftB)
         {
             Col3f tmp(re);
 
@@ -878,12 +835,9 @@ namespace TwkImg
             tmp /= 0.002f;
 
             // Step 5. Put into the PIXEL struct.
-            const unsigned int tr = static_cast<unsigned int>(
-                std::clamp(tmp.x + (float)codeShiftR, 0.0f, 1023.0f));
-            const unsigned int tg = static_cast<unsigned int>(
-                std::clamp(tmp.y + (float)codeShiftG, 0.0f, 1023.0f));
-            const unsigned int tb = static_cast<unsigned int>(
-                std::clamp(tmp.z + (float)codeShiftB, 0.0f, 1023.0f));
+            const unsigned int tr = static_cast<unsigned int>(std::clamp(tmp.x + (float)codeShiftR, 0.0f, 1023.0f));
+            const unsigned int tg = static_cast<unsigned int>(std::clamp(tmp.y + (float)codeShiftG, 0.0f, 1023.0f));
+            const unsigned int tb = static_cast<unsigned int>(std::clamp(tmp.z + (float)codeShiftB, 0.0f, 1023.0f));
             pd.setR(tr);
             pd.setG(tg);
             pd.setB(tb);
@@ -893,8 +847,7 @@ namespace TwkImg
     } // End anonymous namespace
 
     //*****************************************************************************
-    Img4f* CineonIff::read(std::istream& cinStream, int codeShiftR,
-                           int codeShiftG, int codeShiftB, bool linearize)
+    Img4f* CineonIff::read(std::istream& cinStream, int codeShiftR, int codeShiftG, int codeShiftB, bool linearize)
     {
         FileInformation genericHeader;
         ImageInformation infoHeader;
@@ -950,18 +903,13 @@ namespace TwkImg
 
                 if (linearize)
                 {
-                    printingDensityToRelativeExposure(
-                        srcPixel, (*((Col3f*)dstPixel)), codeShiftR, codeShiftG,
-                        codeShiftB);
+                    printingDensityToRelativeExposure(srcPixel, (*((Col3f*)dstPixel)), codeShiftR, codeShiftG, codeShiftB);
                 }
                 else
                 {
-                    (*dstPixel).x =
-                        STD_MAX(((int)srcPixel.red) + codeShiftR, 0);
-                    (*dstPixel).y =
-                        STD_MAX(((int)srcPixel.green) + codeShiftG, 0);
-                    (*dstPixel).z =
-                        STD_MAX(((int)srcPixel.blue) + codeShiftB, 0);
+                    (*dstPixel).x = STD_MAX(((int)srcPixel.red) + codeShiftR, 0);
+                    (*dstPixel).y = STD_MAX(((int)srcPixel.green) + codeShiftG, 0);
+                    (*dstPixel).z = STD_MAX(((int)srcPixel.blue) + codeShiftB, 0);
                     (*dstPixel) /= 1023.0f;
                 }
                 (*dstPixel).w = 1.0f;
@@ -972,8 +920,7 @@ namespace TwkImg
     }
 
     //*****************************************************************************
-    Img4f* CineonIff::read(const char* imgFileName, int codeShiftR,
-                           int codeShiftG, int codeShiftB, bool linearize)
+    Img4f* CineonIff::read(const char* imgFileName, int codeShiftR, int codeShiftG, int codeShiftB, bool linearize)
     {
         std::ifstream imgStream(UNICODE_C_STR(imgFileName), BINARY_INPUT_FLAGS);
 
@@ -983,8 +930,7 @@ namespace TwkImg
             throw(exc);
         }
 
-        Img4f* ret = CineonIff::read(imgStream, codeShiftR, codeShiftG,
-                                     codeShiftB, linearize);
+        Img4f* ret = CineonIff::read(imgStream, codeShiftR, codeShiftG, codeShiftB, linearize);
 
         imgStream.close();
 
@@ -996,9 +942,8 @@ namespace TwkImg
 #define NEED_USER_DATA 0
 
     //*****************************************************************************
-    void CineonIff::write(const Img4f* img, std::ostream& cinStream,
-                          const char* fileName, int codeShiftR, int codeShiftG,
-                          int codeShiftB, bool deLinearize)
+    void CineonIff::write(const Img4f* img, std::ostream& cinStream, const char* fileName, int codeShiftR, int codeShiftG, int codeShiftB,
+                          bool deLinearize)
     {
         assert(img != NULL);
         if (fileName == NULL)
@@ -1132,18 +1077,13 @@ namespace TwkImg
             {
                 if (deLinearize)
                 {
-                    relativeExposureToPrintingDensity(
-                        (*((Col3f*)srcPixel)), (PIXEL&)dstPixel, codeShiftR,
-                        codeShiftG, codeShiftB);
+                    relativeExposureToPrintingDensity((*((Col3f*)srcPixel)), (PIXEL&)dstPixel, codeShiftR, codeShiftG, codeShiftB);
                 }
                 else
                 {
-                    const float tr = std::clamp(
-                        (srcPixel->x * 1023.0f) + codeShiftR, 0.0f, 1023.0f);
-                    const float tg = std::clamp(
-                        (srcPixel->y * 1023.0f) + codeShiftG, 0.0f, 1023.0f);
-                    const float tb = std::clamp(
-                        (srcPixel->z * 1023.0f) + codeShiftB, 0.0f, 1023.0f);
+                    const float tr = std::clamp((srcPixel->x * 1023.0f) + codeShiftR, 0.0f, 1023.0f);
+                    const float tg = std::clamp((srcPixel->y * 1023.0f) + codeShiftG, 0.0f, 1023.0f);
+                    const float tb = std::clamp((srcPixel->z * 1023.0f) + codeShiftB, 0.0f, 1023.0f);
 
                     dstPixel.setR((unsigned int)tr);
                     dstPixel.setG((unsigned int)tg);
@@ -1163,12 +1103,9 @@ namespace TwkImg
     }
 
     //*****************************************************************************
-    void CineonIff::write(const Img4f* img, const char* imgFileName,
-                          int codeShiftR, int codeShiftG, int codeShiftB,
-                          bool deLinearize)
+    void CineonIff::write(const Img4f* img, const char* imgFileName, int codeShiftR, int codeShiftG, int codeShiftB, bool deLinearize)
     {
-        std::ofstream imgStream(UNICODE_C_STR(imgFileName),
-                                BINARY_OUTPUT_FLAGS);
+        std::ofstream imgStream(UNICODE_C_STR(imgFileName), BINARY_OUTPUT_FLAGS);
 
         if (!imgStream)
         {
@@ -1176,8 +1113,7 @@ namespace TwkImg
             throw(exc);
         }
 
-        CineonIff::write(img, imgStream, imgFileName, codeShiftR, codeShiftG,
-                         codeShiftB, deLinearize);
+        CineonIff::write(img, imgStream, imgFileName, codeShiftR, codeShiftG, codeShiftB, deLinearize);
 
         imgStream.close();
     }

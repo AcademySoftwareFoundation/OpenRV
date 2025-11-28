@@ -148,18 +148,14 @@ class ExampleOTIOReaderPlugin(rvtypes.MinorMode):
         Adds OTIO to Open File dialog filters
         """
         event.reject()
-        event.setReturnContent(
-            "{}:{}".format(event.returnContents(), "otio;OpenTimelineIO")
-        )
+        event.setReturnContent("{}:{}".format(event.returnContents(), "otio;OpenTimelineIO"))
 
     def otio_export(self, event):
         """
         Exports the currently viewed node to the OTIO file from the event
         """
         event.reject()
-        otio_timeline = otio_writer.write_otio_file(
-            commands.viewNode(), event.contents()
-        )
+        otio_writer.write_otio_file(commands.viewNode(), event.contents())
 
     def expand_sources(self):
         """
@@ -179,11 +175,7 @@ class ExampleOTIOReaderPlugin(rvtypes.MinorMode):
                     continue
 
                 # get the source file name
-                paths = [
-                    info["file"]
-                    for info in commands.sourceMediaInfoList(src)
-                    if "file" in info
-                ]
+                paths = [info["file"] for info in commands.sourceMediaInfoList(src) if "file" in info]
                 for info_path in paths:
                     # Looking for: 'blank,otioFile=/foo.otio.movieproc'
                     parts = info_path.split("=", 1)
@@ -223,16 +215,12 @@ def _remove_source_from_views(source_group):
 
 
 def createMode():
-    support_files_path = os.path.join(
-        os.path.dirname(os.path.realpath(__file__)), "..", "SupportFiles", "otio_reader"
-    )
+    support_files_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..", "SupportFiles", "otio_reader")
 
     manifest_path = os.environ.get("OTIO_PLUGIN_MANIFEST_PATH", "")
     if manifest_path:
         manifest_path += os.pathsep
-    os.environ["OTIO_PLUGIN_MANIFEST_PATH"] = manifest_path + os.path.join(
-        support_files_path, "manifest.json"
-    )
+    os.environ["OTIO_PLUGIN_MANIFEST_PATH"] = manifest_path + os.path.join(support_files_path, "manifest.json")
     sys.path.append(support_files_path)
 
     return ExampleOTIOReaderPlugin()

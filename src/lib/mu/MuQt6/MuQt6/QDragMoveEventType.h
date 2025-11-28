@@ -37,8 +37,7 @@ namespace Mu
         //  Constructors
         //
 
-        QDragMoveEventType(Context* context, const char* name,
-                           Class* superClass = 0);
+        QDragMoveEventType(Context* context, const char* name, Class* superClass = 0);
         virtual ~QDragMoveEventType();
 
         //

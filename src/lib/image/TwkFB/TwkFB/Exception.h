@@ -15,21 +15,14 @@ namespace TwkFB
 {
 
     TWK_DERIVED_EXCEPTION_WITH_EXPORT(Exception, TWKFB_EXPORT)
-    TWK_DERIVED_EXCEPTION_FROM_WITH_EXPORT(Exception, UnsupportedException,
-                                           TWKFB_EXPORT)
-    TWK_DERIVED_EXCEPTION_FROM_WITH_EXPORT(Exception, BitDepthTooLowException,
-                                           TWKFB_EXPORT)
-    TWK_DERIVED_EXCEPTION_FROM_WITH_EXPORT(Exception, BitDepthTooHighException,
-                                           TWKFB_EXPORT)
-    TWK_DERIVED_EXCEPTION_FROM_WITH_EXPORT(Exception, BadDataTypeForOperation,
-                                           TWKFB_EXPORT)
+    TWK_DERIVED_EXCEPTION_FROM_WITH_EXPORT(Exception, UnsupportedException, TWKFB_EXPORT)
+    TWK_DERIVED_EXCEPTION_FROM_WITH_EXPORT(Exception, BitDepthTooLowException, TWKFB_EXPORT)
+    TWK_DERIVED_EXCEPTION_FROM_WITH_EXPORT(Exception, BitDepthTooHighException, TWKFB_EXPORT)
+    TWK_DERIVED_EXCEPTION_FROM_WITH_EXPORT(Exception, BadDataTypeForOperation, TWKFB_EXPORT)
     TWK_DERIVED_EXCEPTION_FROM_WITH_EXPORT(Exception, IOException, TWKFB_EXPORT)
-    TWK_DERIVED_EXCEPTION_FROM_WITH_EXPORT(Exception, NullImageException,
-                                           TWKFB_EXPORT)
-    TWK_DERIVED_EXCEPTION_FROM_WITH_EXPORT(Exception, CacheFullException,
-                                           TWKFB_EXPORT)
-    TWK_DERIVED_EXCEPTION_FROM_WITH_EXPORT(Exception, CacheMismatchException,
-                                           TWKFB_EXPORT)
+    TWK_DERIVED_EXCEPTION_FROM_WITH_EXPORT(Exception, NullImageException, TWKFB_EXPORT)
+    TWK_DERIVED_EXCEPTION_FROM_WITH_EXPORT(Exception, CacheFullException, TWKFB_EXPORT)
+    TWK_DERIVED_EXCEPTION_FROM_WITH_EXPORT(Exception, CacheMismatchException, TWKFB_EXPORT)
 
 } // namespace TwkFB
 

@@ -18,21 +18,21 @@ INCLUDE(ProcessorCount) # require CMake 3.15+
 PROCESSORCOUNT(_cpu_count)
 
 # OpenImageIO required >= 3.9, using latest 4.0
-RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_TIFF" "4.6.0" "" "")
+RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_TIFF" "${RV_DEPS_TIFF_VERSION}" "" "")
 
 SET(_download_url
     "https://gitlab.com/libtiff/libtiff/-/archive/v${_version}/libtiff-v${_version}.tar.gz"
 )
 
 SET(_download_hash
-    "118a2e5fc9ed71653195b332b9715890"
+    ${RV_DEPS_TIFF_DOWNLOAD_HASH}
 )
 
 IF(NOT RV_TARGET_WINDOWS)
   # Mac/Linux: Use the unversionned .dylib.so LINK which points to the proper file (which has a diff version number) Mac/Linux: TIFF doesn't use a Postfix only
   # 'MSVC'.
   IF(RV_TARGET_DARWIN)
-    RV_MAKE_STANDARD_LIB_NAME("tiff" "6.0.2" "SHARED" "")
+    RV_MAKE_STANDARD_LIB_NAME("tiff" "${RV_DEPS_TIFF_VERSION_LIB}" "SHARED" "")
   ELSE()
     RV_MAKE_STANDARD_LIB_NAME("tiff" "" "SHARED" "")
   ENDIF()

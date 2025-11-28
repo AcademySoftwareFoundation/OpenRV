@@ -74,14 +74,13 @@ namespace TwkMovie
         uint32_t truncMode; // irrelevant for reading
         uint32_t sizeX;
         uint32_t sizeY;
-        uint32_t
-            packing; // should be one of the above defined DM_PACKING values
+        uint32_t packing; // should be one of the above defined DM_PACKING values
         double rate;
         uint32_t interlacing; // 0: progressive, 1: interlaced.
         char timeCode[128];   // null terminated string containing timecode,
-                            // preferebly as "frame of day", like 90000, but can
-                            // be 01:20:30:11 style too
-        char tapeName[128]; // null terminated tape name string
+                              // preferebly as "frame of day", like 90000, but can
+                              // be 01:20:30:11 style too
+        char tapeName[128];   // null terminated tape name string
 
         uint32_t getMagic() { return MAGIC; }
 
@@ -246,15 +245,13 @@ namespace TwkMovie
         return mov;
     }
 
-    void MovieMistika::postPreloadOpen(const MovieInfo& /*unused*/,
-                                       const Movie::ReadRequest& /*unused*/)
+    void MovieMistika::postPreloadOpen(const MovieInfo& /*unused*/, const Movie::ReadRequest& /*unused*/)
     {
         // all the work was done in preloadOpen()
         // since info and request were unused.
     }
 
-    void MovieMistika::preloadOpen(const string& filename,
-                                   const ReadRequest& request)
+    void MovieMistika::preloadOpen(const string& filename, const ReadRequest& request)
     {
         m_filename = filename;
         m_request = request;
@@ -262,15 +259,13 @@ namespace TwkMovie
         FILE* file = TwkUtil::fopen(m_filename.c_str(), "r");
         if (!file)
         {
-            TWK_THROW_STREAM(IOException,
-                             "Can not open Mistika file " << filename);
+            TWK_THROW_STREAM(IOException, "Can not open Mistika file " << filename);
         }
 
         if (fread(m_header, sizeof(MistikaFileHeader), 1, file) != 1)
         {
             fclose(file);
-            TWK_THROW_STREAM(IOException,
-                             "Can not read Mistika header: " << filename);
+            TWK_THROW_STREAM(IOException, "Can not read Mistika header: " << filename);
         }
         fclose(file);
 
@@ -294,16 +289,13 @@ namespace TwkMovie
 
         if (m_header->lookupPacking(m_header->packing) != "RGB10")
         {
-            TWK_THROW_STREAM(IOException,
-                             "Unsupported Mistika packing format: "
-                                 << m_header->lookupPacking(m_header->packing)
-                                 << " (" << m_header->packing << ")");
+            TWK_THROW_STREAM(IOException, "Unsupported Mistika packing format: " << m_header->lookupPacking(m_header->packing) << " ("
+                                                                                 << m_header->packing << ")");
         }
 
         if (m_header->numFrames <= 0)
         {
-            TWK_THROW_STREAM(IOException,
-                             "Found no Mistika frames in: " << m_filename);
+            TWK_THROW_STREAM(IOException, "Found no Mistika frames in: " << m_filename);
         }
 
         //
@@ -311,9 +303,7 @@ namespace TwkMovie
         //
 
         string tc = string(m_header->timeCode);
-        int start = (tc.find(":") != string::npos)
-                        ? timecodeToFrames(tc, m_header->rate)
-                        : atoi(m_header->timeCode);
+        int start = (tc.find(":") != string::npos) ? timecodeToFrames(tc, m_header->rate) : atoi(m_header->timeCode);
 
         m_info.start = start;
         m_info.end = start + m_header->numFrames - 1;
@@ -329,8 +319,7 @@ namespace TwkMovie
         m_info.pixelAspect = 1;
         m_info.video = true;
         m_info.orientation = FrameBuffer::TOPLEFT;
-        m_info.numChannels =
-            3; // XXX this needs adjusting when we support more formats.
+        m_info.numChannels = 3; // XXX this needs adjusting when we support more formats.
 
         switch (m_header->packing)
         {
@@ -342,8 +331,7 @@ namespace TwkMovie
         }
     }
 
-    void MovieMistika::imagesAtFrame(const ReadRequest& request,
-                                     FrameBufferVector& fbs)
+    void MovieMistika::imagesAtFrame(const ReadRequest& request, FrameBufferVector& fbs)
     {
         int frame = request.frame;
         int frameOffset = frame - m_info.start;
@@ -360,12 +348,10 @@ namespace TwkMovie
         uint32_t frameSize = m_header->GetBytesPerFrame();
         uint32_t firstFrameOffset = frameSize;
 
-        unsigned char* frameB =
-            TWK_ALLOCATE_ARRAY_PAGE_ALIGNED(unsigned char, frameSize);
+        unsigned char* frameB = TWK_ALLOCATE_ARRAY_PAGE_ALIGNED(unsigned char, frameSize);
         if (!frameB)
         {
-            TWK_THROW_EXC_STREAM("Error reading Mistika file "
-                                 << filename() << ", out of memory");
+            TWK_THROW_EXC_STREAM("Error reading Mistika file " << filename() << ", out of memory");
         }
         //
         // But if we decide to use this mem in-place, we won't free it here.
@@ -376,30 +362,24 @@ namespace TwkMovie
         HANDLE file;
         DWORD flags = FILE_FLAG_SEQUENTIAL_SCAN;
 
-        file =
-            CreateFileW(UNICODE_C_STR(m_filename.c_str()), GENERIC_READ,
-                        FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-                        NULL, OPEN_EXISTING, flags, NULL);
+        file = CreateFileW(UNICODE_C_STR(m_filename.c_str()), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL,
+                           OPEN_EXISTING, flags, NULL);
 
         if (file == INVALID_HANDLE_VALUE)
         {
-            TWK_THROW_EXC_STREAM("CreateFile: cannot open "
-                                 << m_filename
-                                 << ", error: " << GetLastError());
+            TWK_THROW_EXC_STREAM("CreateFile: cannot open " << m_filename << ", error: " << GetLastError());
         }
 
         LARGE_INTEGER inout;
         inout.QuadPart = 0;
 
         LARGE_INTEGER offset;
-        offset.QuadPart = __int64(frameSize) * __int64(frameOffset)
-                          + __int64(firstFrameOffset);
+        offset.QuadPart = __int64(frameSize) * __int64(frameOffset) + __int64(firstFrameOffset);
 
         if (0 == SetFilePointerEx(file, offset, &inout, FILE_BEGIN))
         {
             CloseHandle(file);
-            TWK_THROW_EXC_STREAM("SetFilePointer: failed reading "
-                                 << m_filename << ", error " << GetLastError());
+            TWK_THROW_EXC_STREAM("SetFilePointer: failed reading " << m_filename << ", error " << GetLastError());
         }
 
         DWORD nread = 0;
@@ -407,32 +387,24 @@ namespace TwkMovie
         if (!ReadFile(file, frameB, frameSize, &nread, NULL))
         {
             CloseHandle(file);
-            TWK_THROW_EXC_STREAM("ReadFile: failed reading "
-                                 << m_filename << ", error " << GetLastError());
+            TWK_THROW_EXC_STREAM("ReadFile: failed reading " << m_filename << ", error " << GetLastError());
         }
         CloseHandle(file);
 #else
         FILE* file = TwkUtil::fopen(m_filename.c_str(), "r");
         if (!file)
         {
-            TWK_THROW_STREAM(IOException,
-                             "Can not open Mistika file " << filename());
+            TWK_THROW_STREAM(IOException, "Can not open Mistika file " << filename());
         }
-        if (0
-            != fseeko(file,
-                      off_t(frameSize) * off_t(frameOffset)
-                          + off_t(firstFrameOffset),
-                      SEEK_SET))
+        if (0 != fseeko(file, off_t(frameSize) * off_t(frameOffset) + off_t(firstFrameOffset), SEEK_SET))
         {
             fclose(file);
-            TWK_THROW_STREAM(IOException,
-                             "Could not seek to Mistika frame: " << frame);
+            TWK_THROW_STREAM(IOException, "Could not seek to Mistika frame: " << frame);
         }
         if (fread(frameB, frameSize, 1, file) != 1)
         {
             fclose(file);
-            TWK_THROW_STREAM(IOException,
-                             "Could not read Mistika frame number: " << frame);
+            TWK_THROW_STREAM(IOException, "Could not read Mistika frame number: " << frame);
         }
         fclose(file);
 #endif
@@ -484,41 +456,28 @@ namespace TwkMovie
             switch (pixelFormat)
             {
             case RGB8:
-                Read10Bit::readRGB8(m_filename, (unsigned char*)frameB, fb,
-                                    m_header->sizeX, m_header->sizeY, 0,
-                                    m_swap);
+                Read10Bit::readRGB8(m_filename, (unsigned char*)frameB, fb, m_header->sizeX, m_header->sizeY, 0, m_swap);
                 break;
             case RGBA8:
-                Read10Bit::readRGBA8(m_filename, (unsigned char*)frameB, fb,
-                                     m_header->sizeX, m_header->sizeY, 0, false,
-                                     m_swap);
+                Read10Bit::readRGBA8(m_filename, (unsigned char*)frameB, fb, m_header->sizeX, m_header->sizeY, 0, false, m_swap);
                 break;
             case RGB8_PLANAR:
             default:
-                Read10Bit::readRGB8_PLANAR(m_filename, (unsigned char*)frameB,
-                                           fb, m_header->sizeX, m_header->sizeY,
-                                           0, m_swap);
+                Read10Bit::readRGB8_PLANAR(m_filename, (unsigned char*)frameB, fb, m_header->sizeX, m_header->sizeY, 0, m_swap);
                 break;
             case RGB10_A2:
-                Read10Bit::readRGB10_A2(m_filename, (unsigned char*)frameB, fb,
-                                        m_header->sizeX, m_header->sizeY, 0,
-                                        m_swap, true, (unsigned char*)frameB);
+                Read10Bit::readRGB10_A2(m_filename, (unsigned char*)frameB, fb, m_header->sizeX, m_header->sizeY, 0, m_swap, true,
+                                        (unsigned char*)frameB);
                 doDelete = false;
                 break;
             case RGB16:
-                Read10Bit::readRGB16(m_filename, (unsigned char*)frameB, fb,
-                                     m_header->sizeX, m_header->sizeY, 0,
-                                     m_swap);
+                Read10Bit::readRGB16(m_filename, (unsigned char*)frameB, fb, m_header->sizeX, m_header->sizeY, 0, m_swap);
                 break;
             case RGBA16:
-                Read10Bit::readRGBA16(m_filename, (unsigned char*)frameB, fb,
-                                      m_header->sizeX, m_header->sizeY, 0,
-                                      false, m_swap);
+                Read10Bit::readRGBA16(m_filename, (unsigned char*)frameB, fb, m_header->sizeX, m_header->sizeY, 0, false, m_swap);
                 break;
             case RGB16_PLANAR:
-                Read10Bit::readRGB16_PLANAR(m_filename, (unsigned char*)frameB,
-                                            fb, m_header->sizeX,
-                                            m_header->sizeY, 0, m_swap);
+                Read10Bit::readRGB16_PLANAR(m_filename, (unsigned char*)frameB, fb, m_header->sizeX, m_header->sizeY, 0, m_swap);
                 break;
             }
             break;
@@ -550,8 +509,7 @@ namespace TwkMovie
             //            }
             //            break;
         default:
-            TWK_THROW_STREAM(IOException, "Unsupported Mistika packing format: "
-                                              << m_header->packing);
+            TWK_THROW_STREAM(IOException, "Unsupported Mistika packing format: " << m_header->packing);
             break;
         }
 
@@ -561,22 +519,17 @@ namespace TwkMovie
         fb.setIdentifier("");
         identifier(frame, fb.idstream());
         fb.addAttribute(new IntAttribute("Mistika/Version", m_header->version));
-        fb.addAttribute(
-            new IntAttribute("Mistika/Frames", m_header->numFrames));
-        fb.addAttribute(new StringAttribute(
-            "Mistika/Packing", m_header->lookupPacking(m_header->packing)));
+        fb.addAttribute(new IntAttribute("Mistika/Frames", m_header->numFrames));
+        fb.addAttribute(new StringAttribute("Mistika/Packing", m_header->lookupPacking(m_header->packing)));
         fb.addAttribute(new FloatAttribute("Mistika/Rate", m_header->rate));
-        fb.addAttribute(
-            new IntAttribute("Mistika/Interlacing", m_header->interlacing));
+        fb.addAttribute(new IntAttribute("Mistika/Interlacing", m_header->interlacing));
         fb.addAttribute(new StringAttribute("Mistika/TC", m_header->timeCode));
-        fb.addAttribute(
-            new StringAttribute("Mistika/Tape", m_header->tapeName));
+        fb.addAttribute(new StringAttribute("Mistika/Tape", m_header->tapeName));
 
         fb.addAttribute(new StringAttribute("File", m_filename));
     }
 
-    void MovieMistika::identifiersAtFrame(const ReadRequest& request,
-                                          IdentifierVector& ids)
+    void MovieMistika::identifiersAtFrame(const ReadRequest& request, IdentifierVector& ids)
     {
         int frame = request.frame;
         ostringstream str;
@@ -609,15 +562,11 @@ namespace TwkMovie
 
     std::string MovieMistikaIO::about() const { return "Mistika Movie"; }
 
-    MovieReader* MovieMistikaIO::movieReader() const
-    {
-        return new MovieMistika();
-    }
+    MovieReader* MovieMistikaIO::movieReader() const { return new MovieMistika(); }
 
     MovieWriter* MovieMistikaIO::movieWriter() const { return 0; }
 
-    void MovieMistikaIO::getMovieInfo(const std::string& filename,
-                                      MovieInfo&) const
+    void MovieMistikaIO::getMovieInfo(const std::string& filename, MovieInfo&) const
     {
         TWK_THROW_STREAM(IOException, "Unknown usage: " << filename);
     }

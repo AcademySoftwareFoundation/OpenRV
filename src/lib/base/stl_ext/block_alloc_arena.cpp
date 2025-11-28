@@ -139,15 +139,13 @@ namespace stl_ext
             }
             catch (std::bad_alloc& e)
             {
-                cerr << "ERROR: block_alloc_arena: failed to allocate " << on
-                     << " bytes from arena size " << (n << 3) << endl;
+                cerr << "ERROR: block_alloc_arena: failed to allocate " << on << " bytes from arena size " << (n << 3) << endl;
 
                 throw;
             }
             catch (std::exception& e)
             {
-                cerr << "ERROR: caught std::exception during allocation"
-                     << endl;
+                cerr << "ERROR: caught std::exception during allocation" << endl;
 
                 throw;
             }
@@ -199,9 +197,7 @@ namespace stl_ext
             return false;
 
         n = adjust_size(n);
-        return _small_blocks.size() > n && _small_blocks[n]
-                   ? _small_blocks[n]->is_allocated(p)
-                   : false;
+        return _small_blocks.size() > n && _small_blocks[n] ? _small_blocks[n]->is_allocated(p) : false;
     }
 
     bool block_alloc_arena::is_allocated(const void* p) const
@@ -273,9 +269,7 @@ namespace stl_ext
         if (_i == end)
         {
             _index++;
-            for (; _index < _arena->_small_blocks.size()
-                   && !_arena->_small_blocks[_index];
-                 _index++)
+            for (; _index < _arena->_small_blocks.size() && !_arena->_small_blocks[_index]; _index++)
                 ;
             if (_index >= _arena->_small_blocks.size())
             {

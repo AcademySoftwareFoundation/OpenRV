@@ -33,9 +33,7 @@ namespace IPCore
 
     float SoundTrackIPNode::defaultVolume = 1.0;
 
-    SoundTrackIPNode::SoundTrackIPNode(const std::string& name,
-                                       const NodeDefinition* def, IPGraph* g,
-                                       GroupIPNode* group)
+    SoundTrackIPNode::SoundTrackIPNode(const std::string& name, const NodeDefinition* def, IPGraph* g, GroupIPNode* group)
         : IPNode(name, def, g, group)
         , m_sampleStart(0)
         , m_sampleEnd(0)
@@ -47,19 +45,15 @@ namespace IPCore
 
         bool softClamp = def->intValue("defaults.softClamp", 0);
 
-        m_volume =
-            declareProperty<FloatProperty>("audio.volume", defaultVolume);
+        m_volume = declareProperty<FloatProperty>("audio.volume", defaultVolume);
         m_balance = declareProperty<FloatProperty>("audio.balance", 0.0f);
         m_offset = declareProperty<FloatProperty>("audio.offset", 0.0f);
-        m_internalOffset =
-            declareProperty<FloatProperty>("audio.internalOffset", 0.0f);
+        m_internalOffset = declareProperty<FloatProperty>("audio.internalOffset", 0.0f);
         m_mute = declareProperty<IntProperty>("audio.mute", 0);
-        m_softClamp =
-            declareProperty<IntProperty>("audio.softClamp", softClamp ? 1 : 0);
+        m_softClamp = declareProperty<IntProperty>("audio.softClamp", softClamp ? 1 : 0);
         m_visualWidth = declareProperty<IntProperty>("visual.width", 0);
         m_visualHeight = declareProperty<IntProperty>("visual.height", 0);
-        m_visualStartFrame =
-            declareProperty<IntProperty>("visual.frameStart", 0);
+        m_visualStartFrame = declareProperty<IntProperty>("visual.frameStart", 0);
         m_visualEndFrame = declareProperty<IntProperty>("visual.frameEnd", 0);
         pthread_mutex_init(&m_fblock, 0);
     }
@@ -91,8 +85,7 @@ namespace IPCore
     {
         return (graph()->audioCachingMode() == IPGraph::BufferCache)
                    ? 1.0
-                   : double(m_sampleCurrent - m_sampleStart)
-                         / double(m_sampleEnd - m_sampleStart);
+                   : double(m_sampleCurrent - m_sampleStart) / double(m_sampleEnd - m_sampleStart);
     }
 
     IPImage* SoundTrackIPNode::evaluate(const Context& context)
@@ -115,22 +108,17 @@ namespace IPCore
 
                 AudioCache& cache = graph()->audioCache();
                 cache.lock();
-                const size_t packetSize =
-                    (cache.packetSize() > 0) ? cache.packetSize() : 512;
+                const size_t packetSize = (cache.packetSize() > 0) ? cache.packetSize() : 512;
                 const TwkAudio::Layout layout = cache.layout();
                 const double rate = cache.rate();
                 cache.unlock();
 
                 int channels = TwkAudio::channelsCount(layout);
-                size_t npackets =
-                    MAX_SAMPLES_PROCESSED_PER_EVAL / (packetSize * channels);
+                size_t npackets = MAX_SAMPLES_PROCESSED_PER_EVAL / (packetSize * channels);
 
-                for (size_t n = 0;
-                     m_sampleCurrent < m_sampleEnd && n < npackets;
-                     m_sampleCurrent += packetSize, n++)
+                for (size_t n = 0; m_sampleCurrent < m_sampleEnd && n < npackets; m_sampleCurrent += packetSize, n++)
                 {
-                    AudioBuffer buffer(packetSize, layout, rate,
-                                       samplesToTime(m_sampleCurrent, rate));
+                    AudioBuffer buffer(packetSize, layout, rate, samplesToTime(m_sampleCurrent, rate));
 
                     cache.lock();
                     const bool found = cache.fillBuffer(buffer);
@@ -138,19 +126,15 @@ namespace IPCore
 
                     if (found)
                     {
-                        AudioContext acontext(buffer,
-                                              graph()->cache().displayFPS());
+                        AudioContext acontext(buffer, graph()->cache().displayFPS());
                         renderAudio(acontext);
                     }
                 }
             }
 
-            IPImage* image =
-                new IPImage(this, IPImage::BlendRenderType,
-                            m_fb->referenceCopy(), IPImage::OutputTexture);
+            IPImage* image = new IPImage(this, IPImage::BlendRenderType, m_fb->referenceCopy(), IPImage::OutputTexture);
 
-            image->tagMap[IPImage::textureIDTagName()] =
-                IPImage::waveformTagValue();
+            image->tagMap[IPImage::textureIDTagName()] = IPImage::waveformTagValue();
             return image;
         }
 
@@ -232,12 +216,8 @@ namespace IPCore
 
         float offset = m_offset->front() + m_internalOffset->front();
 
-        const SampleTime newStart = timeToSamples(
-            ((fs - m_graphConfig.minFrame) / m_graphConfig.fps) - offset,
-            m_audioConfig.rate);
-        const SampleTime newEnd = timeToSamples(
-            ((fe - m_graphConfig.minFrame + 1) / m_graphConfig.fps) - offset,
-            m_audioConfig.rate);
+        const SampleTime newStart = timeToSamples(((fs - m_graphConfig.minFrame) / m_graphConfig.fps) - offset, m_audioConfig.rate);
+        const SampleTime newEnd = timeToSamples(((fe - m_graphConfig.minFrame + 1) / m_graphConfig.fps) - offset, m_audioConfig.rate);
 
         lockFB();
         m_sampleStart = newStart;
@@ -267,10 +247,7 @@ namespace IPCore
         IPNode::graphConfigure(config);
     }
 
-    void SoundTrackIPNode::setInputs(const IPNodes& nodes)
-    {
-        IPNode::setInputs(nodes);
-    }
+    void SoundTrackIPNode::setInputs(const IPNodes& nodes) { IPNode::setInputs(nodes); }
 
     IPNode::ImageRangeInfo SoundTrackIPNode::imageRangeInfo() const
     {
@@ -301,8 +278,7 @@ namespace IPCore
 
         AudioBuffer& buffer = context.buffer;
         const SampleTime s = buffer.startSample();
-        if ((s + SampleTime(buffer.size()) < m_sampleStart)
-            || (s > m_sampleEnd))
+        if ((s + SampleTime(buffer.size()) < m_sampleStart) || (s > m_sampleEnd))
             return;
 
         lockFB();
@@ -311,8 +287,7 @@ namespace IPCore
         //  render this buffer (in/out points  could have been reset in the
         //  meantime).
         //
-        if ((s + SampleTime(buffer.size()) >= m_sampleStart)
-            && (s <= m_sampleEnd))
+        if ((s + SampleTime(buffer.size()) >= m_sampleStart) && (s <= m_sampleEnd))
         {
             renderAudioWaveform(context);
         }
@@ -334,8 +309,7 @@ namespace IPCore
 
         const double l = double(m_sampleEnd - m_sampleStart);
         const double t0 = double(bufStart - m_sampleStart) / l;
-        const double t1 =
-            double((bufStart + buffer.size()) - m_sampleStart) / l;
+        const double t1 = double((bufStart + buffer.size()) - m_sampleStart) / l;
 
         const int i0 = max(0, int(t0 * h));
         const int i1 = min(h - 1, int(t1 * h));
@@ -356,15 +330,12 @@ namespace IPCore
         //  render window.
         //
 
-        SampleTime firstSampleIndexInWindow =
-            max(SampleTime(0), SampleTime(m_sampleStart - bufStart));
-        SampleTime firstSampleIndexBeyondWindow =
-            min(SampleTime(nsamples), SampleTime(m_sampleEnd - bufStart));
+        SampleTime firstSampleIndexInWindow = max(SampleTime(0), SampleTime(m_sampleStart - bufStart));
+        SampleTime firstSampleIndexBeyondWindow = min(SampleTime(nsamples), SampleTime(m_sampleEnd - bufStart));
 
         const float normalize = 1.0f / channels;
 
-        for (size_t i = firstSampleIndexInWindow * channels;
-             i < firstSampleIndexBeyondWindow * channels; i += channels)
+        for (size_t i = firstSampleIndexInWindow * channels; i < firstSampleIndexBeyondWindow * channels; i += channels)
         {
             float v = 0.0f;
             for (int j = 0; j < channels; ++j)
@@ -375,8 +346,7 @@ namespace IPCore
             // float v = float(i)/float(nsamples*channels);  /* show position of
             // sample in buffer graphically */
 
-            int sl = int(float(h)
-                         * float(i / channels + bufStart - m_sampleStart) / l);
+            int sl = int(float(h) * float(i / channels + bufStart - m_sampleStart) / l);
             if (sl >= i1)
                 continue;
             if (sl < i0)
@@ -408,8 +378,7 @@ namespace IPCore
         for (int sl = i0; sl <= i1 && sl < h; sl++)
         {
             RangeStats& s = m_stats[sl];
-            if (s.min == std::numeric_limits<float>::max()
-                || s.max == -std::numeric_limits<float>::max())
+            if (s.min == std::numeric_limits<float>::max() || s.max == -std::numeric_limits<float>::max())
             {
                 //
                 //  We somehow messed up above and don't have stats for
@@ -434,10 +403,8 @@ namespace IPCore
                 b = 0;
                 a = 255;
             }
-            const int imedianPos =
-                ((s.totalPos / float(s.nPos)) + 1.0) / 2.0 * wn;
-            const int imedianNeg =
-                ((s.totalNeg / float(s.nNeg)) + 1.0) / 2.0 * wn;
+            const int imedianPos = ((s.totalPos / float(s.nPos)) + 1.0) / 2.0 * wn;
+            const int imedianNeg = ((s.totalNeg / float(s.nNeg)) + 1.0) / 2.0 * wn;
             const int imax = ((s.max + 1.0) / 2.0) * wn;
             const int imin = ((s.min + 1.0) / 2.0) * wn;
 

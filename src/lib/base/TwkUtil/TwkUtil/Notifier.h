@@ -52,8 +52,7 @@ namespace TwkUtil
         };
 
         typedef TypedMessageData<std::string> StringData;
-        typedef bool (Notifier::*ReceiveFunction)(Notifier*, MessageId,
-                                                  MessageData*);
+        typedef bool (Notifier::*ReceiveFunction)(Notifier*, MessageId, MessageData*);
         typedef std::vector<Notifier*> NotifierVector;
 
         //

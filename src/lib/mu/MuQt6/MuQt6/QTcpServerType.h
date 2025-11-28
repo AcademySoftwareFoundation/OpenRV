@@ -42,8 +42,7 @@ namespace Mu
         //  Constructors
         //
 
-        QTcpServerType(Context* context, const char* name,
-                       Class* superClass = 0, Class* superClass2 = 0);
+        QTcpServerType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QTcpServerType();
 
@@ -77,29 +76,17 @@ namespace Mu
         virtual void timerEvent(QTimerEvent* event);
 
     public:
-        void addPendingConnection_pub(QTcpSocket* socket)
-        {
-            addPendingConnection(socket);
-        }
+        void addPendingConnection_pub(QTcpSocket* socket) { addPendingConnection(socket); }
 
-        void addPendingConnection_pub_parent(QTcpSocket* socket)
-        {
-            QTcpServer::addPendingConnection(socket);
-        }
+        void addPendingConnection_pub_parent(QTcpSocket* socket) { QTcpServer::addPendingConnection(socket); }
 
         void customEvent_pub(QEvent* event) { customEvent(event); }
 
-        void customEvent_pub_parent(QEvent* event)
-        {
-            QTcpServer::customEvent(event);
-        }
+        void customEvent_pub_parent(QEvent* event) { QTcpServer::customEvent(event); }
 
         void timerEvent_pub(QTimerEvent* event) { timerEvent(event); }
 
-        void timerEvent_pub_parent(QTimerEvent* event)
-        {
-            QTcpServer::timerEvent(event);
-        }
+        void timerEvent_pub_parent(QTimerEvent* event) { QTcpServer::timerEvent(event); }
 
     public:
         const QTcpServerType* _baseType;
@@ -107,11 +94,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance*
-    QTcpServerType::cachedInstance(const QTcpServerType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QTcpServerType::cachedInstance(const QTcpServerType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

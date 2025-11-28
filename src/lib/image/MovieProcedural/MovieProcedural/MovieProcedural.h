@@ -95,21 +95,17 @@ namespace TwkMovie
         //
         //  MovieReader API
         //
-        virtual void preloadOpen(const std::string& filename,
-                                 const ReadRequest& request);
+        virtual void preloadOpen(const std::string& filename, const ReadRequest& request);
 
-        virtual void postPreloadOpen(const MovieInfo& as,
-                                     const ReadRequest& request);
+        virtual void postPreloadOpen(const MovieInfo& as, const ReadRequest& request);
 
         //
         //  Movie API
 
         virtual bool hasAudio() const;
         virtual bool canConvertAudioRate() const;
-        virtual void imagesAtFrame(const ReadRequest& request,
-                                   FrameBufferVector&);
-        virtual void identifiersAtFrame(const ReadRequest& request,
-                                        IdentifierVector&);
+        virtual void imagesAtFrame(const ReadRequest& request, FrameBufferVector&);
+        virtual void identifiersAtFrame(const ReadRequest& request, IdentifierVector&);
         virtual size_t audioFillBuffer(const AudioReadRequest&, AudioBuffer&);
         virtual void flush();
 
@@ -126,8 +122,7 @@ namespace TwkMovie
         void renderNoise(FrameBuffer&);
         void renderImage(const std::string&, FrameBuffer&);
         void renderSolid(FrameBuffer&, float r, float g, float b, float a);
-        void renderHRamp(FrameBuffer&, float r0, float g0, float b0, float a0,
-                         float r1, float g1, float b1, float a1);
+        void renderHRamp(FrameBuffer&, float r0, float g0, float b0, float a0, float r1, float g1, float b1, float a1);
         void renderSMPTEBars(FrameBuffer&);
         void renderSRGBMacbethColorChart(FrameBuffer&);
         void renderACESMacbethColorChart(FrameBuffer&);
@@ -163,8 +158,7 @@ namespace TwkMovie
         virtual std::string about() const;
         virtual MovieReader* movieReader() const;
         virtual MovieWriter* movieWriter() const;
-        virtual void getMovieInfo(const std::string& filename,
-                                  MovieInfo&) const;
+        virtual void getMovieInfo(const std::string& filename, MovieInfo&) const;
     };
 
 } // namespace TwkMovie

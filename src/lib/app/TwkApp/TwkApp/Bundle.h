@@ -64,9 +64,8 @@ namespace TwkApp
         //
         //
 
-        Bundle(const std::string& appName, size_t major_version,
-               size_t minor_version, size_t revision_number,
-               bool sandboxed = false, bool inheritedSandbox = false);
+        Bundle(const std::string& appName, size_t major_version, size_t minor_version, size_t revision_number, bool sandboxed = false,
+               bool inheritedSandbox = false);
 
         virtual ~Bundle();
 
@@ -117,8 +116,7 @@ namespace TwkApp
         //      rcfile("rvrc", "mu", "RV_INIT")
         //
 
-        virtual Path rcfile(const FileName& rcfileName, const FileName& type,
-                            const EnvVar& rcenv) = 0;
+        virtual Path rcfile(const FileName& rcfileName, const FileName& type, const EnvVar& rcenv) = 0;
 
         //
         //  Find a seach path for types of plugins, or scripts. The app
@@ -143,15 +141,13 @@ namespace TwkApp
         //  Find all the license files in the usual system locations
         //
 
-        virtual PathVector licenseFiles(const FileName& licFileName,
-                                        const FileName& type) = 0;
+        virtual PathVector licenseFiles(const FileName& licFileName, const FileName& type) = 0;
 
         //
         //  Location of default license (may not exist)
         //
 
-        virtual Path defaultLicense(const FileName& licFileName,
-                                    const FileName& type) = 0;
+        virtual Path defaultLicense(const FileName& licFileName, const FileName& type) = 0;
 
         //
         //  Get/Set environment variables
@@ -159,14 +155,11 @@ namespace TwkApp
         //  if force is false, and the env var exists, it will not be touched.
         //
 
-        virtual std::string getEnvVar(const EnvVar& name,
-                                      const std::string& defaultValue = "");
+        virtual std::string getEnvVar(const EnvVar& name, const std::string& defaultValue = "");
 
-        virtual void setEnvVar(const EnvVar& name, const Path& value,
-                               bool force = false) = 0;
+        virtual void setEnvVar(const EnvVar& name, const Path& value, bool force = false) = 0;
 
-        virtual void addPathToEnvVar(const EnvVar& name,
-                                     const PathVector& value) = 0;
+        virtual void addPathToEnvVar(const EnvVar& name, const PathVector& value) = 0;
 
         //
         //  User directories. These don't necessarily exist.
@@ -202,22 +195,17 @@ namespace TwkApp
         //
 
         virtual void rescanCache(const std::string& cacheName);
-        virtual bool hasCacheItem(const std::string& cacheName,
-                                  const CacheItemName&);
-        virtual Path cacheItemPath(const std::string& cacheName,
-                                   const CacheItemName&);
-        virtual void addCacheItem(const std::string& cacheName,
-                                  const CacheItemName&, size_t size = 0);
+        virtual bool hasCacheItem(const std::string& cacheName, const CacheItemName&);
+        virtual Path cacheItemPath(const std::string& cacheName, const CacheItemName&);
+        virtual void addCacheItem(const std::string& cacheName, const CacheItemName&, size_t size = 0);
 
         //
         //  Security API for external filesystem resources
         //  This is chiefly here to support sandboxing
         //
 
-        virtual FileAccessPermission
-        permissionForFileAccess(const Path&, bool readonly) const;
-        virtual AccessObject
-        beginFileAccessWithPermission(const FileAccessPermission&) const;
+        virtual FileAccessPermission permissionForFileAccess(const Path&, bool readonly) const;
+        virtual AccessObject beginFileAccessWithPermission(const FileAccessPermission&) const;
         virtual void endFileAccessWithPermission(AccessObject) const;
 
     private:

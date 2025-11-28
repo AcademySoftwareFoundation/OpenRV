@@ -19,12 +19,9 @@ namespace Rv
     public:
         typedef FileTypeTraits Parent;
 
-        MediaFileTypes(bool readable, bool writeable,
-                       const QString& defaultExt = "");
+        MediaFileTypes(bool readable, bool writeable, const QString& defaultExt = "");
 
-        MediaFileTypes(bool readable, bool writeable,
-                       const QList<QPair<QString, QString>>& files,
-                       const QString& defaultExt = "");
+        MediaFileTypes(bool readable, bool writeable, const QList<QPair<QString, QString>>& files, const QString& defaultExt = "");
 
         virtual ~MediaFileTypes();
 

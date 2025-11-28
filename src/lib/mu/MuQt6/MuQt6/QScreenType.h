@@ -42,8 +42,7 @@ namespace Mu
         //  Constructors
         //
 
-        QScreenType(Context* context, const char* name, Class* superClass = 0,
-                    Class* superClass2 = 0);
+        QScreenType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QScreenType();
 
@@ -76,17 +75,11 @@ namespace Mu
     public:
         void customEvent_pub(QEvent* event) { customEvent(event); }
 
-        void customEvent_pub_parent(QEvent* event)
-        {
-            QScreen::customEvent(event);
-        }
+        void customEvent_pub_parent(QEvent* event) { QScreen::customEvent(event); }
 
         void timerEvent_pub(QTimerEvent* event) { timerEvent(event); }
 
-        void timerEvent_pub_parent(QTimerEvent* event)
-        {
-            QScreen::timerEvent(event);
-        }
+        void timerEvent_pub_parent(QTimerEvent* event) { QScreen::timerEvent(event); }
 
     public:
         const QScreenType* _baseType;
@@ -94,11 +87,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance*
-    QScreenType::cachedInstance(const QScreenType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QScreenType::cachedInstance(const QScreenType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

@@ -56,16 +56,14 @@ namespace Mu
         _baseType = 0;
     }
 
-    MuQt_QEventLoop::MuQt_QEventLoop(Pointer muobj, const CallEnvironment* ce,
-                                     QObject* parent)
+    MuQt_QEventLoop::MuQt_QEventLoop(Pointer muobj, const CallEnvironment* ce, QObject* parent)
         : QEventLoop(parent)
     {
         _env = ce;
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QEventLoopType>(
-            c->internName("qt.QEventLoop"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QEventLoopType>(c->internName("qt.QEventLoop"));
     }
 
     bool MuQt_QEventLoop::event(QEvent* event_)
@@ -100,8 +98,7 @@ namespace Mu
         {
             Function::ArgumentVector args(3);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeinstance<QObjectType>(c, watched, "qt.QObject"));
+            args[1] = Value(makeinstance<QObjectType>(c, watched, "qt.QObject"));
             args[2] = Value(makeqpointer<QEventType>(c, event, "qt.QEvent"));
             Value rval = _env->call(F, args);
             return (bool)(rval._bool);
@@ -149,8 +146,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QTimerEventType>(c, event, "qt.QTimerEvent"));
+            args[1] = Value(makeqpointer<QTimerEventType>(c, event, "qt.QTimerEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -162,8 +158,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  Mu Type CONSTRUCTORS
 
-    QEventLoopType::QEventLoopType(Context* c, const char* name, Class* super,
-                                   Class* super2)
+    QEventLoopType::QEventLoopType(Context* c, const char* name, Class* super, Class* super2)
         : Class(c, name, vectorOf2(super, super2))
     {
     }
@@ -173,8 +168,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    static Pointer QEventLoop_QEventLoop_QObject(Thread& NODE_THREAD,
-                                                 Pointer obj)
+    static Pointer QEventLoop_QEventLoop_QObject(Thread& NODE_THREAD, Pointer obj)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         ClassInstance* widget = reinterpret_cast<ClassInstance*>(obj);
@@ -185,9 +179,7 @@ namespace Mu
         }
         else if (QEventLoop* w = object<QEventLoop>(widget))
         {
-            QEventLoopType* type =
-                c->findSymbolOfTypeByQualifiedName<QEventLoopType>(
-                    c->internName("qt.QEventLoop"), false);
+            QEventLoopType* type = c->findSymbolOfTypeByQualifiedName<QEventLoopType>(c->internName("qt.QEventLoop"), false);
             ClassInstance* o = ClassInstance::allocate(type);
             setobject(o, w);
             return o;
@@ -198,37 +190,25 @@ namespace Mu
         }
     }
 
-    static NODE_IMPLEMENTATION(castFromObject, Pointer)
-    {
-        NODE_RETURN(
-            QEventLoop_QEventLoop_QObject(NODE_THREAD, NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(castFromObject, Pointer) { NODE_RETURN(QEventLoop_QEventLoop_QObject(NODE_THREAD, NODE_ARG(0, Pointer))); }
 
-    Pointer qt_QEventLoop_QEventLoop_QEventLoop_QEventLoop_QObject(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
+    Pointer qt_QEventLoop_QEventLoop_QEventLoop_QEventLoop_QObject(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QObject* arg1 = object<QObject>(param_parent);
-        setobject(param_this,
-                  new MuQt_QEventLoop(param_this,
-                                      NODE_THREAD.process()->callEnv(), arg1));
+        setobject(param_this, new MuQt_QEventLoop(param_this, NODE_THREAD.process()->callEnv(), arg1));
         return param_this;
     }
 
-    int qt_QEventLoop_exec_int_QEventLoop_int(Mu::Thread& NODE_THREAD,
-                                              Pointer param_this,
-                                              int param_flags)
+    int qt_QEventLoop_exec_int_QEventLoop_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_flags)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QEventLoop* arg0 = object<QEventLoop>(param_this);
-        QEventLoop::ProcessEventsFlags arg1 =
-            (QEventLoop::ProcessEventsFlags)(param_flags);
+        QEventLoop::ProcessEventsFlags arg1 = (QEventLoop::ProcessEventsFlags)(param_flags);
         return arg0->exec(arg1);
     }
 
-    void qt_QEventLoop_exit_void_QEventLoop_int(Mu::Thread& NODE_THREAD,
-                                                Pointer param_this,
-                                                int param_returnCode)
+    void qt_QEventLoop_exit_void_QEventLoop_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_returnCode)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QEventLoop* arg0 = object<QEventLoop>(param_this);
@@ -236,69 +216,57 @@ namespace Mu
         arg0->exit(arg1);
     }
 
-    bool qt_QEventLoop_isRunning_bool_QEventLoop(Mu::Thread& NODE_THREAD,
-                                                 Pointer param_this)
+    bool qt_QEventLoop_isRunning_bool_QEventLoop(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QEventLoop* arg0 = object<QEventLoop>(param_this);
         return arg0->isRunning();
     }
 
-    bool qt_QEventLoop_processEvents_bool_QEventLoop_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_flags)
+    bool qt_QEventLoop_processEvents_bool_QEventLoop_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_flags)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QEventLoop* arg0 = object<QEventLoop>(param_this);
-        QEventLoop::ProcessEventsFlags arg1 =
-            (QEventLoop::ProcessEventsFlags)(param_flags);
+        QEventLoop::ProcessEventsFlags arg1 = (QEventLoop::ProcessEventsFlags)(param_flags);
         return arg0->processEvents(arg1);
     }
 
-    void qt_QEventLoop_processEvents_void_QEventLoop_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_flags,
-        int param_maxTime)
+    void qt_QEventLoop_processEvents_void_QEventLoop_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_flags,
+                                                             int param_maxTime)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QEventLoop* arg0 = object<QEventLoop>(param_this);
-        QEventLoop::ProcessEventsFlags arg1 =
-            (QEventLoop::ProcessEventsFlags)(param_flags);
+        QEventLoop::ProcessEventsFlags arg1 = (QEventLoop::ProcessEventsFlags)(param_flags);
         int arg2 = (int)(param_maxTime);
         arg0->processEvents(arg1, arg2);
     }
 
-    void qt_QEventLoop_wakeUp_void_QEventLoop(Mu::Thread& NODE_THREAD,
-                                              Pointer param_this)
+    void qt_QEventLoop_wakeUp_void_QEventLoop(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QEventLoop* arg0 = object<QEventLoop>(param_this);
         arg0->wakeUp();
     }
 
-    bool qt_QEventLoop_event_bool_QEventLoop_QEvent(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this,
-                                                    Pointer param_event_)
+    bool qt_QEventLoop_event_bool_QEventLoop_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event_)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QEventLoop* arg0 = object<QEventLoop>(param_this);
         QEvent* arg1 = getqpointer<QEventType>(param_event_);
-        return isMuQtObject(arg0) ? arg0->QEventLoop::event(arg1)
-                                  : arg0->event(arg1);
+        return isMuQtObject(arg0) ? arg0->QEventLoop::event(arg1) : arg0->event(arg1);
     }
 
-    bool qt_QEventLoop_eventFilter_bool_QEventLoop_QObject_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_watched,
-        Pointer param_event)
+    bool qt_QEventLoop_eventFilter_bool_QEventLoop_QObject_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_watched,
+                                                                  Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QEventLoop* arg0 = object<QEventLoop>(param_this);
         QObject* arg1 = object<QObject>(param_watched);
         QEvent* arg2 = getqpointer<QEventType>(param_event);
-        return isMuQtObject(arg0) ? arg0->QEventLoop::eventFilter(arg1, arg2)
-                                  : arg0->eventFilter(arg1, arg2);
+        return isMuQtObject(arg0) ? arg0->QEventLoop::eventFilter(arg1, arg2) : arg0->eventFilter(arg1, arg2);
     }
 
-    void qt_QEventLoop_customEvent_void_QEventLoop_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QEventLoop_customEvent_void_QEventLoop_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QEventLoop* arg0 = object<QEventLoop>(param_this);
@@ -309,8 +277,7 @@ namespace Mu
             ((MuQt_QEventLoop*)arg0)->customEvent_pub(arg1);
     }
 
-    void qt_QEventLoop_timerEvent_void_QEventLoop_QTimerEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QEventLoop_timerEvent_void_QEventLoop_QTimerEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QEventLoop* arg0 = object<QEventLoop>(param_this);
@@ -323,70 +290,55 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(_n_QEventLoop0, Pointer)
     {
-        NODE_RETURN(qt_QEventLoop_QEventLoop_QEventLoop_QEventLoop_QObject(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QEventLoop_QEventLoop_QEventLoop_QEventLoop_QObject(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_exec0, int)
     {
-        NODE_RETURN(qt_QEventLoop_exec_int_QEventLoop_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QEventLoop_exec_int_QEventLoop_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_exit0, void)
     {
-        qt_QEventLoop_exit_void_QEventLoop_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QEventLoop_exit_void_QEventLoop_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_isRunning0, bool)
     {
-        NODE_RETURN(qt_QEventLoop_isRunning_bool_QEventLoop(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QEventLoop_isRunning_bool_QEventLoop(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_processEvents0, bool)
     {
-        NODE_RETURN(qt_QEventLoop_processEvents_bool_QEventLoop_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QEventLoop_processEvents_bool_QEventLoop_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_processEvents1, void)
     {
-        qt_QEventLoop_processEvents_void_QEventLoop_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int));
+        qt_QEventLoop_processEvents_void_QEventLoop_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int));
     }
 
-    static NODE_IMPLEMENTATION(_n_wakeUp0, void)
-    {
-        qt_QEventLoop_wakeUp_void_QEventLoop(NODE_THREAD,
-                                             NONNIL_NODE_ARG(0, Pointer));
-    }
+    static NODE_IMPLEMENTATION(_n_wakeUp0, void) { qt_QEventLoop_wakeUp_void_QEventLoop(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)); }
 
     static NODE_IMPLEMENTATION(_n_event0, bool)
     {
-        NODE_RETURN(qt_QEventLoop_event_bool_QEventLoop_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QEventLoop_event_bool_QEventLoop_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_eventFilter0, bool)
     {
-        NODE_RETURN(qt_QEventLoop_eventFilter_bool_QEventLoop_QObject_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QEventLoop_eventFilter_bool_QEventLoop_QObject_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                             NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_customEvent0, void)
     {
-        qt_QEventLoop_customEvent_void_QEventLoop_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QEventLoop_customEvent_void_QEventLoop_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_timerEvent0, void)
     {
-        qt_QEventLoop_timerEvent_void_QEventLoop_QTimerEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QEventLoop_timerEvent_void_QEventLoop_QTimerEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     void QEventLoopType::load()
@@ -406,17 +358,13 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
-                   new Function(c, tn, castFromObject, Cast, Compiled,
-                                QEventLoop_QEventLoop_QObject, Return, ftn,
-                                Parameters,
+                   new Function(c, tn, castFromObject, Cast, Compiled, QEventLoop_QEventLoop_QObject, Return, ftn, Parameters,
                                 new Param(c, "object", "qt.QObject"), End),
 
                    EndArguments);
@@ -424,69 +372,40 @@ namespace Mu
         addSymbols(
             // enums
             // member functions
-            new Function(c, "QEventLoop", _n_QEventLoop0, None, Compiled,
-                         qt_QEventLoop_QEventLoop_QEventLoop_QEventLoop_QObject,
-                         Return, "qt.QEventLoop", Parameters,
-                         new Param(c, "this", "qt.QEventLoop"),
-                         new Param(c, "parent", "qt.QObject"), End),
-            new Function(
-                c, "exec", _n_exec0, None, Compiled,
-                qt_QEventLoop_exec_int_QEventLoop_int, Return, "int",
-                Parameters, new Param(c, "this", "qt.QEventLoop"),
-                new Param(c, "flags", "int", Value((int)QEventLoop::AllEvents)),
-                End),
-            new Function(c, "exit", _n_exit0, None, Compiled,
-                         qt_QEventLoop_exit_void_QEventLoop_int, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QEventLoop"),
-                         new Param(c, "returnCode", "int", Value((int)0)), End),
-            new Function(c, "isRunning", _n_isRunning0, None, Compiled,
-                         qt_QEventLoop_isRunning_bool_QEventLoop, Return,
-                         "bool", Parameters,
+            new Function(c, "QEventLoop", _n_QEventLoop0, None, Compiled, qt_QEventLoop_QEventLoop_QEventLoop_QEventLoop_QObject, Return,
+                         "qt.QEventLoop", Parameters, new Param(c, "this", "qt.QEventLoop"), new Param(c, "parent", "qt.QObject"), End),
+            new Function(c, "exec", _n_exec0, None, Compiled, qt_QEventLoop_exec_int_QEventLoop_int, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QEventLoop"), new Param(c, "flags", "int", Value((int)QEventLoop::AllEvents)), End),
+            new Function(c, "exit", _n_exit0, None, Compiled, qt_QEventLoop_exit_void_QEventLoop_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QEventLoop"), new Param(c, "returnCode", "int", Value((int)0)), End),
+            new Function(c, "isRunning", _n_isRunning0, None, Compiled, qt_QEventLoop_isRunning_bool_QEventLoop, Return, "bool", Parameters,
                          new Param(c, "this", "qt.QEventLoop"), End),
-            new Function(
-                c, "processEvents", _n_processEvents0, None, Compiled,
-                qt_QEventLoop_processEvents_bool_QEventLoop_int, Return, "bool",
-                Parameters, new Param(c, "this", "qt.QEventLoop"),
-                new Param(c, "flags", "int", Value((int)QEventLoop::AllEvents)),
-                End),
-            new Function(c, "processEvents", _n_processEvents1, None, Compiled,
-                         qt_QEventLoop_processEvents_void_QEventLoop_int_int,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QEventLoop"),
-                         new Param(c, "flags", "int"),
+            new Function(c, "processEvents", _n_processEvents0, None, Compiled, qt_QEventLoop_processEvents_bool_QEventLoop_int, Return,
+                         "bool", Parameters, new Param(c, "this", "qt.QEventLoop"),
+                         new Param(c, "flags", "int", Value((int)QEventLoop::AllEvents)), End),
+            new Function(c, "processEvents", _n_processEvents1, None, Compiled, qt_QEventLoop_processEvents_void_QEventLoop_int_int, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QEventLoop"), new Param(c, "flags", "int"),
                          new Param(c, "maxTime", "int"), End),
-            new Function(c, "wakeUp", _n_wakeUp0, None, Compiled,
-                         qt_QEventLoop_wakeUp_void_QEventLoop, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QEventLoop"),
-                         End),
-            _func[0] = new MemberFunction(
-                c, "event", _n_event0, None, Compiled,
-                qt_QEventLoop_event_bool_QEventLoop_QEvent, Return, "bool",
-                Parameters, new Param(c, "this", "qt.QEventLoop"),
-                new Param(c, "event_", "qt.QEvent"), End),
-            _func[1] = new MemberFunction(
-                c, "eventFilter", _n_eventFilter0, None, Compiled,
-                qt_QEventLoop_eventFilter_bool_QEventLoop_QObject_QEvent,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QEventLoop"),
-                new Param(c, "watched", "qt.QObject"),
-                new Param(c, "event", "qt.QEvent"), End),
+            new Function(c, "wakeUp", _n_wakeUp0, None, Compiled, qt_QEventLoop_wakeUp_void_QEventLoop, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QEventLoop"), End),
+            _func[0] = new MemberFunction(c, "event", _n_event0, None, Compiled, qt_QEventLoop_event_bool_QEventLoop_QEvent, Return, "bool",
+                                          Parameters, new Param(c, "this", "qt.QEventLoop"), new Param(c, "event_", "qt.QEvent"), End),
+            _func[1] = new MemberFunction(c, "eventFilter", _n_eventFilter0, None, Compiled,
+                                          qt_QEventLoop_eventFilter_bool_QEventLoop_QObject_QEvent, Return, "bool", Parameters,
+                                          new Param(c, "this", "qt.QEventLoop"), new Param(c, "watched", "qt.QObject"),
+                                          new Param(c, "event", "qt.QEvent"), End),
             // MISSING: metaObject ("const QMetaObject *"; QEventLoop this)
             // MISSING: childEvent (void; QEventLoop this, "QChildEvent *"
             // event) // protected MISSING: connectNotify (void; QEventLoop
             // this, "const QMetaMethod &" signal) // protected
-            _func[2] = new MemberFunction(
-                c, "customEvent", _n_customEvent0, None, Compiled,
-                qt_QEventLoop_customEvent_void_QEventLoop_QEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QEventLoop"),
-                new Param(c, "event", "qt.QEvent"), End),
+            _func[2] = new MemberFunction(c, "customEvent", _n_customEvent0, None, Compiled,
+                                          qt_QEventLoop_customEvent_void_QEventLoop_QEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QEventLoop"), new Param(c, "event", "qt.QEvent"), End),
             // MISSING: disconnectNotify (void; QEventLoop this, "const
             // QMetaMethod &" signal) // protected
-            _func[3] = new MemberFunction(
-                c, "timerEvent", _n_timerEvent0, None, Compiled,
-                qt_QEventLoop_timerEvent_void_QEventLoop_QTimerEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QEventLoop"),
-                new Param(c, "event", "qt.QTimerEvent"), End),
+            _func[3] = new MemberFunction(c, "timerEvent", _n_timerEvent0, None, Compiled,
+                                          qt_QEventLoop_timerEvent_void_QEventLoop_QTimerEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QEventLoop"), new Param(c, "event", "qt.QTimerEvent"), End),
             // static functions
             EndArguments);
         globalScope()->addSymbols(EndArguments);

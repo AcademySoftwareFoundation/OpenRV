@@ -21,8 +21,7 @@ namespace IPCore
     class YCToRGBIPNode : public IPNode
     {
     public:
-        YCToRGBIPNode(const std::string& name, const NodeDefinition* def,
-                      IPGraph* graph, GroupIPNode* group = 0);
+        YCToRGBIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group = 0);
 
         virtual ~YCToRGBIPNode();
 

@@ -19,11 +19,9 @@ namespace stl_ext
     //  linear search to find the element to remove.
     //
 
-    template <typename C>
-    void remove(C& container, typename C::value_type value)
+    template <typename C> void remove(C& container, typename C::value_type value)
     {
-        typename C::iterator i =
-            std::find(container.begin(), container.end(), value);
+        typename C::iterator i = std::find(container.begin(), container.end(), value);
 
         if (i != container.end())
         {
@@ -39,12 +37,9 @@ namespace stl_ext
     //  then erases the last element.
     //
 
-    template <class Container>
-    void remove_unsorted(Container& container,
-                         typename Container::value_type value)
+    template <class Container> void remove_unsorted(Container& container, typename Container::value_type value)
     {
-        typename Container::iterator i =
-            std::find(container.begin(), container.end(), value);
+        typename Container::iterator i = std::find(container.begin(), container.end(), value);
 
         if (i != container.end())
         {
@@ -62,8 +57,7 @@ namespace stl_ext
 
     template <class Container> inline void delete_contents(Container& container)
     {
-        for (typename Container::iterator i = container.begin();
-             i != container.end(); ++i)
+        for (typename Container::iterator i = container.begin(); i != container.end(); ++i)
             delete *i;
     }
 
@@ -73,12 +67,9 @@ namespace stl_ext
     //  Returns true if the element exists inside the container false otherwise.
     //
 
-    template <class Container>
-    inline bool exists(const Container& container,
-                       typename Container::value_type value)
+    template <class Container> inline bool exists(const Container& container, typename Container::value_type value)
     {
-        return std::find(container.begin(), container.end(), value)
-               != container.end();
+        return std::find(container.begin(), container.end(), value) != container.end();
     }
 
     //
@@ -139,26 +130,19 @@ namespace stl_ext
     //  Full container versions of std algorithms
     //
 
-    template <class Container, class UnaryFunction>
-    inline typename Container::iterator for_each(Container& c, UnaryFunction f)
+    template <class Container, class UnaryFunction> inline typename Container::iterator for_each(Container& c, UnaryFunction f)
     {
         return std::for_each(c.begin(), c.end(), f);
     }
 
-    template <class Container>
-    inline typename Container::iterator
-    find(Container& c, const typename Container::value_type& v)
+    template <class Container> inline typename Container::iterator find(Container& c, const typename Container::value_type& v)
     {
         return std::find(c.begin(), c.end(), v);
     }
 
-    template <class Container> inline void sort(Container& c)
-    {
-        std::sort(c.begin(), c.end());
-    }
+    template <class Container> inline void sort(Container& c) { std::sort(c.begin(), c.end()); }
 
-    template <class Container, class OutputIterator>
-    inline OutputIterator copy(const Container& c, OutputIterator i)
+    template <class Container, class OutputIterator> inline OutputIterator copy(const Container& c, OutputIterator i)
     {
         return std::copy(c.begin(), c.end(), i);
     }

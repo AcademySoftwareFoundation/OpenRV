@@ -83,10 +83,7 @@ namespace stl_ext
         ptr _p;
     };
 
-    template <class T> inline T* markable_cast(markable_pointer p)
-    {
-        return reinterpret_cast<T*>(p.pointer());
-    }
+    template <class T> inline T* markable_cast(markable_pointer p) { return reinterpret_cast<T*>(p.pointer()); }
 
 } // namespace stl_ext
 

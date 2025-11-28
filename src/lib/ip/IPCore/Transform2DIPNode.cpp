@@ -27,9 +27,7 @@ namespace IPCore
     using namespace TwkFB;
     using namespace std;
 
-    Transform2DIPNode::Transform2DIPNode(const std::string& name,
-                                         const NodeDefinition* def, IPGraph* g,
-                                         GroupIPNode* group)
+    Transform2DIPNode::Transform2DIPNode(const std::string& name, const NodeDefinition* def, IPGraph* g, GroupIPNode* group)
         : IPNode(name, def, g, group)
         , m_adaptiveResampling(false)
         , m_visibleBox(0)
@@ -41,30 +39,23 @@ namespace IPCore
         setMaxInputs(1);
         setHasLinearTransform(true);
 
-        const bool newStyleVisibleBox =
-            def->intValue("defaults.newStyleVisibleBox", 0) != 0;
+        const bool newStyleVisibleBox = def->intValue("defaults.newStyleVisibleBox", 0) != 0;
 
         IntProperty* ip;
 
         m_flip = declareProperty<IntProperty>("transform.flip", 0);
         m_flop = declareProperty<IntProperty>("transform.flop", 0);
         m_rotate = declareProperty<FloatProperty>("transform.rotate", 0.0f);
-        m_translate =
-            declareProperty<Vec2fProperty>("transform.translate", Vec2f(0, 0));
-        m_scale =
-            declareProperty<Vec2fProperty>("transform.scale", Vec2f(1, 1));
+        m_translate = declareProperty<Vec2fProperty>("transform.translate", Vec2f(0, 0));
+        m_scale = declareProperty<Vec2fProperty>("transform.scale", Vec2f(1, 1));
         m_active = declareProperty<IntProperty>("transform.active", 1);
 
         if (newStyleVisibleBox)
         {
-            m_leftVisibleBox =
-                declareProperty<FloatProperty>("visibleBox.left", 0.0f);
-            m_rightVisibleBox =
-                declareProperty<FloatProperty>("visibleBox.right", 1.0f);
-            m_bottomVisibleBox =
-                declareProperty<FloatProperty>("visibleBox.bottom", 0.0f);
-            m_topVisibleBox =
-                declareProperty<FloatProperty>("visibleBox.top", 1.0f);
+            m_leftVisibleBox = declareProperty<FloatProperty>("visibleBox.left", 0.0f);
+            m_rightVisibleBox = declareProperty<FloatProperty>("visibleBox.right", 1.0f);
+            m_bottomVisibleBox = declareProperty<FloatProperty>("visibleBox.bottom", 0.0f);
+            m_topVisibleBox = declareProperty<FloatProperty>("visibleBox.top", 1.0f);
         }
         else
         {
@@ -173,8 +164,7 @@ namespace IPCore
             y1 = propertyValue(m_topVisibleBox, 1.0f);
         }
 
-        const bool stencilBox =
-            x0 > 0.0f || x1 < 1.0f || y0 > 0.0f || y1 < 1.0f;
+        const bool stencilBox = x0 > 0.0f || x1 < 1.0f || y0 > 0.0f || y1 < 1.0f;
 
         //
         //  Create a new context with our matrix in there
@@ -195,8 +185,7 @@ namespace IPCore
 
             for (size_t i = 0; i < props.size(); i++)
             {
-                if (const StringProperty* sp =
-                        dynamic_cast<StringProperty*>(props[i]))
+                if (const StringProperty* sp = dynamic_cast<StringProperty*>(props[i]))
                 {
                     if (sp->size())
                     {
@@ -210,8 +199,7 @@ namespace IPCore
         {
             for (IPImage* child = root->children; child; child = child->next)
             {
-                if (root->children->width >= root->width
-                    || root->children->height >= root->height)
+                if (root->children->width >= root->width || root->children->height >= root->height)
                 {
                     child->transformMatrix = M * child->transformMatrix;
                 }
@@ -231,8 +219,7 @@ namespace IPCore
             // switch node (MMR)
             if (dynamic_cast<const SwitchIPNode*>(root->node))
             {
-                for (IPImage* child = root->children; child;
-                     child = child->next)
+                for (IPImage* child = root->children; child; child = child->next)
                 {
                     child->stencilBox.min = root->stencilBox.min;
                     child->stencilBox.max = root->stencilBox.max;

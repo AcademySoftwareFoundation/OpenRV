@@ -13,7 +13,7 @@
 INCLUDE(ProcessorCount) # require CMake 3.15+
 PROCESSORCOUNT(_cpu_count)
 
-RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_RAW" "0.21.1" "make" "../src/configure")
+RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_RAW" "${RV_DEPS_RAW_VERSION}" "make" "../src/configure")
 IF(RV_TARGET_LINUX)
   # Overriding _lib_dir created in 'RV_CREATE_STANDARD_DEPS_VARIABLES' since this CMake-based project isn't using lib64
   SET(_lib_dir
@@ -27,11 +27,13 @@ SET(_download_url
 )
 
 SET(_download_hash
-    "3ad334296a7a2c8ee841f353cc1b450b"
+    "${RV_DEPS_RAW_DOWNLOAD_HASH}"
 )
 
+# LIBRAW_SHLIB_CURRENT value in libraw_version.h
+# https://github.com/LibRaw/LibRaw/blob/master/libraw/libraw_version.h
 SET(_libraw_lib_version
-    "23"
+    ${RV_DEPS_RAW_VERSION_LIB}
 )
 IF(NOT RV_TARGET_WINDOWS)
   RV_MAKE_STANDARD_LIB_NAME("raw" "${_libraw_lib_version}" "SHARED" "")

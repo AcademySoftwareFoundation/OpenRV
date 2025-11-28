@@ -37,8 +37,7 @@ namespace Mu
         //  Constructors
         //
 
-        QContextMenuEventType(Context* context, const char* name,
-                              Class* superClass = 0);
+        QContextMenuEventType(Context* context, const char* name, Class* superClass = 0);
         virtual ~QContextMenuEventType();
 
         //

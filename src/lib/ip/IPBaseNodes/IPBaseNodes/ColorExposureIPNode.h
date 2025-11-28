@@ -15,8 +15,7 @@ namespace IPCore
     class ColorExposureIPNode : public IPNode
     {
     public:
-        ColorExposureIPNode(const std::string& name, const NodeDefinition* def,
-                            IPGraph* graph, GroupIPNode* group = 0);
+        ColorExposureIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group = 0);
 
         virtual ~ColorExposureIPNode();
 

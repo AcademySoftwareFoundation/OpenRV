@@ -18,9 +18,7 @@ namespace TwkMath
     // Function to see if two line segments intersect.
     // Line segments a-b, c-d
     // This function is exact.
-    template <typename T>
-    bool segmentsIntersect(const Vec2<T>& a, const Vec2<T>& b, const Vec2<T>& c,
-                           const Vec2<T>& d)
+    template <typename T> bool segmentsIntersect(const Vec2<T>& a, const Vec2<T>& b, const Vec2<T>& c, const Vec2<T>& d)
     {
         // Make swappable
         const Vec2<T>* p[4] = {&a, &b, &c, &d};
@@ -69,9 +67,7 @@ namespace TwkMath
     // does a line cast from point P in the X direction hit the line segment
     // defined by A-B? This function is exact - will always return the same
     // answer for the same inputs in any order.
-    template <typename T>
-    bool testPointVsSegment(const Vec2<T>& a, const Vec2<T>& b,
-                            const Vec2<T>& P)
+    template <typename T> bool testPointVsSegment(const Vec2<T>& a, const Vec2<T>& b, const Vec2<T>& P)
     {
         const Vec2<T>* p[2] = {&a, &b};
 

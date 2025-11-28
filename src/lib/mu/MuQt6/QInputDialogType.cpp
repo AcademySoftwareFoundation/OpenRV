@@ -71,17 +71,14 @@ namespace Mu
         _baseType = 0;
     }
 
-    MuQt_QInputDialog::MuQt_QInputDialog(Pointer muobj,
-                                         const CallEnvironment* ce,
-                                         QWidget* parent, Qt::WindowFlags flags)
+    MuQt_QInputDialog::MuQt_QInputDialog(Pointer muobj, const CallEnvironment* ce, QWidget* parent, Qt::WindowFlags flags)
         : QInputDialog(parent, flags)
     {
         _env = ce;
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QInputDialogType>(
-            c->internName("qt.QInputDialog"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QInputDialogType>(c->internName("qt.QInputDialog"));
     }
 
     void MuQt_QInputDialog::done(int result)
@@ -184,8 +181,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QCloseEventType>(c, e, "qt.QCloseEvent"));
+            args[1] = Value(makeqpointer<QCloseEventType>(c, e, "qt.QCloseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -208,8 +204,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqpointer<QContextMenuEventType>(
-                c, e, "qt.QContextMenuEvent"));
+            args[1] = Value(makeqpointer<QContextMenuEventType>(c, e, "qt.QContextMenuEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -277,8 +272,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QResizeEventType>(c, _p15, "qt.QResizeEvent"));
+            args[1] = Value(makeqpointer<QResizeEventType>(c, _p15, "qt.QResizeEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -301,8 +295,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QShowEventType>(c, event, "qt.QShowEvent"));
+            args[1] = Value(makeqpointer<QShowEventType>(c, event, "qt.QShowEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -314,8 +307,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  Mu Type CONSTRUCTORS
 
-    QInputDialogType::QInputDialogType(Context* c, const char* name,
-                                       Class* super, Class* super2)
+    QInputDialogType::QInputDialogType(Context* c, const char* name, Class* super, Class* super2)
         : Class(c, name, vectorOf2(super, super2))
     {
     }
@@ -325,8 +317,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    static Pointer QInputDialog_QInputDialog_QObject(Thread& NODE_THREAD,
-                                                     Pointer obj)
+    static Pointer QInputDialog_QInputDialog_QObject(Thread& NODE_THREAD, Pointer obj)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         ClassInstance* widget = reinterpret_cast<ClassInstance*>(obj);
@@ -337,9 +328,7 @@ namespace Mu
         }
         else if (QInputDialog* w = object<QInputDialog>(widget))
         {
-            QInputDialogType* type =
-                c->findSymbolOfTypeByQualifiedName<QInputDialogType>(
-                    c->internName("qt.QInputDialog"), false);
+            QInputDialogType* type = c->findSymbolOfTypeByQualifiedName<QInputDialogType>(c->internName("qt.QInputDialog"), false);
             ClassInstance* o = ClassInstance::allocate(type);
             setobject(o, w);
             return o;
@@ -352,159 +341,132 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(castFromObject, Pointer)
     {
-        NODE_RETURN(QInputDialog_QInputDialog_QObject(NODE_THREAD,
-                                                      NODE_ARG(0, Pointer)));
+        NODE_RETURN(QInputDialog_QInputDialog_QObject(NODE_THREAD, NODE_ARG(0, Pointer)));
     }
 
-    Pointer qt_QInputDialog_QInputDialog_QInputDialog_QInputDialog_QWidget_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent,
-        int param_flags)
+    Pointer qt_QInputDialog_QInputDialog_QInputDialog_QInputDialog_QWidget_int(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                               Pointer param_parent, int param_flags)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWidget* arg1 = object<QWidget>(param_parent);
         Qt::WindowFlags arg2 = (Qt::WindowFlags)(param_flags);
-        setobject(param_this, new MuQt_QInputDialog(
-                                  param_this, NODE_THREAD.process()->callEnv(),
-                                  arg1, arg2));
+        setobject(param_this, new MuQt_QInputDialog(param_this, NODE_THREAD.process()->callEnv(), arg1, arg2));
         return param_this;
     }
 
-    Pointer qt_QInputDialog_cancelButtonText_string_QInputDialog(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QInputDialog_cancelButtonText_string_QInputDialog(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QInputDialog* arg0 = object<QInputDialog>(param_this);
         return makestring(c, arg0->cancelButtonText());
     }
 
-    Pointer qt_QInputDialog_comboBoxItems_stringBSB_ESB__QInputDialog(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QInputDialog_comboBoxItems_stringBSB_ESB__QInputDialog(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QInputDialog* arg0 = object<QInputDialog>(param_this);
         return makestringlist(c, arg0->comboBoxItems());
     }
 
-    int qt_QInputDialog_doubleDecimals_int_QInputDialog(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this)
+    int qt_QInputDialog_doubleDecimals_int_QInputDialog(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QInputDialog* arg0 = object<QInputDialog>(param_this);
         return arg0->doubleDecimals();
     }
 
-    double
-    qt_QInputDialog_doubleMaximum_double_QInputDialog(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    double qt_QInputDialog_doubleMaximum_double_QInputDialog(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QInputDialog* arg0 = object<QInputDialog>(param_this);
         return arg0->doubleMaximum();
     }
 
-    double
-    qt_QInputDialog_doubleMinimum_double_QInputDialog(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    double qt_QInputDialog_doubleMinimum_double_QInputDialog(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QInputDialog* arg0 = object<QInputDialog>(param_this);
         return arg0->doubleMinimum();
     }
 
-    double
-    qt_QInputDialog_doubleStep_double_QInputDialog(Mu::Thread& NODE_THREAD,
-                                                   Pointer param_this)
+    double qt_QInputDialog_doubleStep_double_QInputDialog(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QInputDialog* arg0 = object<QInputDialog>(param_this);
         return arg0->doubleStep();
     }
 
-    double
-    qt_QInputDialog_doubleValue_double_QInputDialog(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this)
+    double qt_QInputDialog_doubleValue_double_QInputDialog(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QInputDialog* arg0 = object<QInputDialog>(param_this);
         return arg0->doubleValue();
     }
 
-    int qt_QInputDialog_inputMode_int_QInputDialog(Mu::Thread& NODE_THREAD,
-                                                   Pointer param_this)
+    int qt_QInputDialog_inputMode_int_QInputDialog(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QInputDialog* arg0 = object<QInputDialog>(param_this);
         return int(arg0->inputMode());
     }
 
-    int qt_QInputDialog_intMaximum_int_QInputDialog(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this)
+    int qt_QInputDialog_intMaximum_int_QInputDialog(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QInputDialog* arg0 = object<QInputDialog>(param_this);
         return arg0->intMaximum();
     }
 
-    int qt_QInputDialog_intMinimum_int_QInputDialog(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this)
+    int qt_QInputDialog_intMinimum_int_QInputDialog(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QInputDialog* arg0 = object<QInputDialog>(param_this);
         return arg0->intMinimum();
     }
 
-    int qt_QInputDialog_intStep_int_QInputDialog(Mu::Thread& NODE_THREAD,
-                                                 Pointer param_this)
+    int qt_QInputDialog_intStep_int_QInputDialog(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QInputDialog* arg0 = object<QInputDialog>(param_this);
         return arg0->intStep();
     }
 
-    int qt_QInputDialog_intValue_int_QInputDialog(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this)
+    int qt_QInputDialog_intValue_int_QInputDialog(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QInputDialog* arg0 = object<QInputDialog>(param_this);
         return arg0->intValue();
     }
 
-    bool qt_QInputDialog_isComboBoxEditable_bool_QInputDialog(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    bool qt_QInputDialog_isComboBoxEditable_bool_QInputDialog(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QInputDialog* arg0 = object<QInputDialog>(param_this);
         return arg0->isComboBoxEditable();
     }
 
-    Pointer
-    qt_QInputDialog_labelText_string_QInputDialog(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this)
+    Pointer qt_QInputDialog_labelText_string_QInputDialog(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QInputDialog* arg0 = object<QInputDialog>(param_this);
         return makestring(c, arg0->labelText());
     }
 
-    Pointer
-    qt_QInputDialog_okButtonText_string_QInputDialog(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_this)
+    Pointer qt_QInputDialog_okButtonText_string_QInputDialog(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QInputDialog* arg0 = object<QInputDialog>(param_this);
         return makestring(c, arg0->okButtonText());
     }
 
-    int qt_QInputDialog_options_int_QInputDialog(Mu::Thread& NODE_THREAD,
-                                                 Pointer param_this)
+    int qt_QInputDialog_options_int_QInputDialog(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QInputDialog* arg0 = object<QInputDialog>(param_this);
         return int(arg0->options());
     }
 
-    void qt_QInputDialog_setCancelButtonText_void_QInputDialog_string(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_text)
+    void qt_QInputDialog_setCancelButtonText_void_QInputDialog_string(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_text)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QInputDialog* arg0 = object<QInputDialog>(param_this);
@@ -512,8 +474,7 @@ namespace Mu
         arg0->setCancelButtonText(arg1);
     }
 
-    void qt_QInputDialog_setComboBoxEditable_void_QInputDialog_bool(
-        Mu::Thread& NODE_THREAD, Pointer param_this, bool param_editable)
+    void qt_QInputDialog_setComboBoxEditable_void_QInputDialog_bool(Mu::Thread& NODE_THREAD, Pointer param_this, bool param_editable)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QInputDialog* arg0 = object<QInputDialog>(param_this);
@@ -521,8 +482,7 @@ namespace Mu
         arg0->setComboBoxEditable(arg1);
     }
 
-    void qt_QInputDialog_setComboBoxItems_void_QInputDialog_stringBSB_ESB_(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_items)
+    void qt_QInputDialog_setComboBoxItems_void_QInputDialog_stringBSB_ESB_(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_items)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QInputDialog* arg0 = object<QInputDialog>(param_this);
@@ -530,8 +490,7 @@ namespace Mu
         arg0->setComboBoxItems(arg1);
     }
 
-    void qt_QInputDialog_setDoubleDecimals_void_QInputDialog_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_decimals)
+    void qt_QInputDialog_setDoubleDecimals_void_QInputDialog_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_decimals)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QInputDialog* arg0 = object<QInputDialog>(param_this);
@@ -539,8 +498,7 @@ namespace Mu
         arg0->setDoubleDecimals(arg1);
     }
 
-    void qt_QInputDialog_setDoubleMaximum_void_QInputDialog_double(
-        Mu::Thread& NODE_THREAD, Pointer param_this, double param_max)
+    void qt_QInputDialog_setDoubleMaximum_void_QInputDialog_double(Mu::Thread& NODE_THREAD, Pointer param_this, double param_max)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QInputDialog* arg0 = object<QInputDialog>(param_this);
@@ -548,8 +506,7 @@ namespace Mu
         arg0->setDoubleMaximum(arg1);
     }
 
-    void qt_QInputDialog_setDoubleMinimum_void_QInputDialog_double(
-        Mu::Thread& NODE_THREAD, Pointer param_this, double param_min)
+    void qt_QInputDialog_setDoubleMinimum_void_QInputDialog_double(Mu::Thread& NODE_THREAD, Pointer param_this, double param_min)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QInputDialog* arg0 = object<QInputDialog>(param_this);
@@ -557,9 +514,8 @@ namespace Mu
         arg0->setDoubleMinimum(arg1);
     }
 
-    void qt_QInputDialog_setDoubleRange_void_QInputDialog_double_double(
-        Mu::Thread& NODE_THREAD, Pointer param_this, double param_min,
-        double param_max)
+    void qt_QInputDialog_setDoubleRange_void_QInputDialog_double_double(Mu::Thread& NODE_THREAD, Pointer param_this, double param_min,
+                                                                        double param_max)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QInputDialog* arg0 = object<QInputDialog>(param_this);
@@ -568,8 +524,7 @@ namespace Mu
         arg0->setDoubleRange(arg1, arg2);
     }
 
-    void qt_QInputDialog_setDoubleStep_void_QInputDialog_double(
-        Mu::Thread& NODE_THREAD, Pointer param_this, double param_step)
+    void qt_QInputDialog_setDoubleStep_void_QInputDialog_double(Mu::Thread& NODE_THREAD, Pointer param_this, double param_step)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QInputDialog* arg0 = object<QInputDialog>(param_this);
@@ -577,8 +532,7 @@ namespace Mu
         arg0->setDoubleStep(arg1);
     }
 
-    void qt_QInputDialog_setDoubleValue_void_QInputDialog_double(
-        Mu::Thread& NODE_THREAD, Pointer param_this, double param_value)
+    void qt_QInputDialog_setDoubleValue_void_QInputDialog_double(Mu::Thread& NODE_THREAD, Pointer param_this, double param_value)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QInputDialog* arg0 = object<QInputDialog>(param_this);
@@ -586,8 +540,7 @@ namespace Mu
         arg0->setDoubleValue(arg1);
     }
 
-    void qt_QInputDialog_setInputMode_void_QInputDialog_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_mode)
+    void qt_QInputDialog_setInputMode_void_QInputDialog_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_mode)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QInputDialog* arg0 = object<QInputDialog>(param_this);
@@ -595,8 +548,7 @@ namespace Mu
         arg0->setInputMode(arg1);
     }
 
-    void qt_QInputDialog_setIntMaximum_void_QInputDialog_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_max)
+    void qt_QInputDialog_setIntMaximum_void_QInputDialog_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_max)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QInputDialog* arg0 = object<QInputDialog>(param_this);
@@ -604,8 +556,7 @@ namespace Mu
         arg0->setIntMaximum(arg1);
     }
 
-    void qt_QInputDialog_setIntMinimum_void_QInputDialog_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_min)
+    void qt_QInputDialog_setIntMinimum_void_QInputDialog_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_min)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QInputDialog* arg0 = object<QInputDialog>(param_this);
@@ -613,9 +564,7 @@ namespace Mu
         arg0->setIntMinimum(arg1);
     }
 
-    void qt_QInputDialog_setIntRange_void_QInputDialog_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_min,
-        int param_max)
+    void qt_QInputDialog_setIntRange_void_QInputDialog_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_min, int param_max)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QInputDialog* arg0 = object<QInputDialog>(param_this);
@@ -624,8 +573,7 @@ namespace Mu
         arg0->setIntRange(arg1, arg2);
     }
 
-    void qt_QInputDialog_setIntStep_void_QInputDialog_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_step)
+    void qt_QInputDialog_setIntStep_void_QInputDialog_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_step)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QInputDialog* arg0 = object<QInputDialog>(param_this);
@@ -633,8 +581,7 @@ namespace Mu
         arg0->setIntStep(arg1);
     }
 
-    void qt_QInputDialog_setIntValue_void_QInputDialog_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_value)
+    void qt_QInputDialog_setIntValue_void_QInputDialog_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_value)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QInputDialog* arg0 = object<QInputDialog>(param_this);
@@ -642,8 +589,7 @@ namespace Mu
         arg0->setIntValue(arg1);
     }
 
-    void qt_QInputDialog_setLabelText_void_QInputDialog_string(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_text)
+    void qt_QInputDialog_setLabelText_void_QInputDialog_string(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_text)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QInputDialog* arg0 = object<QInputDialog>(param_this);
@@ -651,8 +597,7 @@ namespace Mu
         arg0->setLabelText(arg1);
     }
 
-    void qt_QInputDialog_setOkButtonText_void_QInputDialog_string(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_text)
+    void qt_QInputDialog_setOkButtonText_void_QInputDialog_string(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_text)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QInputDialog* arg0 = object<QInputDialog>(param_this);
@@ -660,30 +605,24 @@ namespace Mu
         arg0->setOkButtonText(arg1);
     }
 
-    void qt_QInputDialog_setOption_void_QInputDialog_int_bool(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_option,
-        bool param_on)
+    void qt_QInputDialog_setOption_void_QInputDialog_int_bool(Mu::Thread& NODE_THREAD, Pointer param_this, int param_option, bool param_on)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QInputDialog* arg0 = object<QInputDialog>(param_this);
-        QInputDialog::InputDialogOption arg1 =
-            (QInputDialog::InputDialogOption)(param_option);
+        QInputDialog::InputDialogOption arg1 = (QInputDialog::InputDialogOption)(param_option);
         bool arg2 = (bool)(param_on);
         arg0->setOption(arg1, arg2);
     }
 
-    void qt_QInputDialog_setOptions_void_QInputDialog_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_options)
+    void qt_QInputDialog_setOptions_void_QInputDialog_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_options)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QInputDialog* arg0 = object<QInputDialog>(param_this);
-        QInputDialog::InputDialogOptions arg1 =
-            (QInputDialog::InputDialogOptions)(param_options);
+        QInputDialog::InputDialogOptions arg1 = (QInputDialog::InputDialogOptions)(param_options);
         arg0->setOptions(arg1);
     }
 
-    void qt_QInputDialog_setTextEchoMode_void_QInputDialog_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_mode)
+    void qt_QInputDialog_setTextEchoMode_void_QInputDialog_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_mode)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QInputDialog* arg0 = object<QInputDialog>(param_this);
@@ -691,8 +630,7 @@ namespace Mu
         arg0->setTextEchoMode(arg1);
     }
 
-    void qt_QInputDialog_setTextValue_void_QInputDialog_string(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_text)
+    void qt_QInputDialog_setTextValue_void_QInputDialog_string(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_text)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QInputDialog* arg0 = object<QInputDialog>(param_this);
@@ -700,36 +638,29 @@ namespace Mu
         arg0->setTextValue(arg1);
     }
 
-    bool qt_QInputDialog_testOption_bool_QInputDialog_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_option)
+    bool qt_QInputDialog_testOption_bool_QInputDialog_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_option)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QInputDialog* arg0 = object<QInputDialog>(param_this);
-        QInputDialog::InputDialogOption arg1 =
-            (QInputDialog::InputDialogOption)(param_option);
+        QInputDialog::InputDialogOption arg1 = (QInputDialog::InputDialogOption)(param_option);
         return arg0->testOption(arg1);
     }
 
-    int qt_QInputDialog_textEchoMode_int_QInputDialog(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    int qt_QInputDialog_textEchoMode_int_QInputDialog(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QInputDialog* arg0 = object<QInputDialog>(param_this);
         return int(arg0->textEchoMode());
     }
 
-    Pointer
-    qt_QInputDialog_textValue_string_QInputDialog(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this)
+    Pointer qt_QInputDialog_textValue_string_QInputDialog(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QInputDialog* arg0 = object<QInputDialog>(param_this);
         return makestring(c, arg0->textValue());
     }
 
-    void qt_QInputDialog_done_void_QInputDialog_int(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this,
-                                                    int param_result)
+    void qt_QInputDialog_done_void_QInputDialog_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_result)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QInputDialog* arg0 = object<QInputDialog>(param_this);
@@ -740,21 +671,15 @@ namespace Mu
             arg0->done(arg1);
     }
 
-    Pointer
-    qt_QInputDialog_minimumSizeHint_QSize_QInputDialog(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this)
+    Pointer qt_QInputDialog_minimumSizeHint_QSize_QInputDialog(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QInputDialog* arg0 = object<QInputDialog>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QSizeType>(
-                         c, arg0->QInputDialog::minimumSizeHint(), "qt.QSize")
-                   : makeqtype<QSizeType>(c, arg0->minimumSizeHint(),
-                                          "qt.QSize");
+        return isMuQtObject(arg0) ? makeqtype<QSizeType>(c, arg0->QInputDialog::minimumSizeHint(), "qt.QSize")
+                                  : makeqtype<QSizeType>(c, arg0->minimumSizeHint(), "qt.QSize");
     }
 
-    void qt_QInputDialog_setVisible_void_QInputDialog_bool(
-        Mu::Thread& NODE_THREAD, Pointer param_this, bool param_visible)
+    void qt_QInputDialog_setVisible_void_QInputDialog_bool(Mu::Thread& NODE_THREAD, Pointer param_this, bool param_visible)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QInputDialog* arg0 = object<QInputDialog>(param_this);
@@ -765,19 +690,15 @@ namespace Mu
             arg0->setVisible(arg1);
     }
 
-    Pointer qt_QInputDialog_sizeHint_QSize_QInputDialog(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this)
+    Pointer qt_QInputDialog_sizeHint_QSize_QInputDialog(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QInputDialog* arg0 = object<QInputDialog>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QSizeType>(c, arg0->QInputDialog::sizeHint(),
-                                          "qt.QSize")
-                   : makeqtype<QSizeType>(c, arg0->sizeHint(), "qt.QSize");
+        return isMuQtObject(arg0) ? makeqtype<QSizeType>(c, arg0->QInputDialog::sizeHint(), "qt.QSize")
+                                  : makeqtype<QSizeType>(c, arg0->sizeHint(), "qt.QSize");
     }
 
-    void qt_QInputDialog_closeEvent_void_QInputDialog_QCloseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QInputDialog_closeEvent_void_QInputDialog_QCloseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QInputDialog* arg0 = object<QInputDialog>(param_this);
@@ -788,8 +709,7 @@ namespace Mu
             ((MuQt_QInputDialog*)arg0)->closeEvent_pub(arg1);
     }
 
-    void qt_QInputDialog_contextMenuEvent_void_QInputDialog_QContextMenuEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QInputDialog_contextMenuEvent_void_QInputDialog_QContextMenuEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QInputDialog* arg0 = object<QInputDialog>(param_this);
@@ -800,22 +720,18 @@ namespace Mu
             ((MuQt_QInputDialog*)arg0)->contextMenuEvent_pub(arg1);
     }
 
-    bool qt_QInputDialog_eventFilter_bool_QInputDialog_QObject_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_o,
-        Pointer param_e)
+    bool qt_QInputDialog_eventFilter_bool_QInputDialog_QObject_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_o,
+                                                                      Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QInputDialog* arg0 = object<QInputDialog>(param_this);
         QObject* arg1 = object<QObject>(param_o);
         QEvent* arg2 = getqpointer<QEventType>(param_e);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QInputDialog*)arg0)
-                         ->eventFilter_pub_parent(arg1, arg2)
-                   : ((MuQt_QInputDialog*)arg0)->eventFilter_pub(arg1, arg2);
+        return isMuQtObject(arg0) ? ((MuQt_QInputDialog*)arg0)->eventFilter_pub_parent(arg1, arg2)
+                                  : ((MuQt_QInputDialog*)arg0)->eventFilter_pub(arg1, arg2);
     }
 
-    void qt_QInputDialog_keyPressEvent_void_QInputDialog_QKeyEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QInputDialog_keyPressEvent_void_QInputDialog_QKeyEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QInputDialog* arg0 = object<QInputDialog>(param_this);
@@ -826,8 +742,7 @@ namespace Mu
             ((MuQt_QInputDialog*)arg0)->keyPressEvent_pub(arg1);
     }
 
-    void qt_QInputDialog_resizeEvent_void_QInputDialog_QResizeEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param__p15)
+    void qt_QInputDialog_resizeEvent_void_QInputDialog_QResizeEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param__p15)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QInputDialog* arg0 = object<QInputDialog>(param_this);
@@ -838,8 +753,7 @@ namespace Mu
             ((MuQt_QInputDialog*)arg0)->resizeEvent_pub(arg1);
     }
 
-    void qt_QInputDialog_showEvent_void_QInputDialog_QShowEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QInputDialog_showEvent_void_QInputDialog_QShowEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QInputDialog* arg0 = object<QInputDialog>(param_this);
@@ -852,315 +766,261 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(_n_QInputDialog0, Pointer)
     {
-        NODE_RETURN(
-            qt_QInputDialog_QInputDialog_QInputDialog_QInputDialog_QWidget_int(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, int)));
+        NODE_RETURN(qt_QInputDialog_QInputDialog_QInputDialog_QInputDialog_QWidget_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                       NODE_ARG(1, Pointer), NODE_ARG(2, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_cancelButtonText0, Pointer)
     {
-        NODE_RETURN(qt_QInputDialog_cancelButtonText_string_QInputDialog(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QInputDialog_cancelButtonText_string_QInputDialog(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_comboBoxItems0, Pointer)
     {
-        NODE_RETURN(qt_QInputDialog_comboBoxItems_stringBSB_ESB__QInputDialog(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QInputDialog_comboBoxItems_stringBSB_ESB__QInputDialog(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_doubleDecimals0, int)
     {
-        NODE_RETURN(qt_QInputDialog_doubleDecimals_int_QInputDialog(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QInputDialog_doubleDecimals_int_QInputDialog(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_doubleMaximum0, double)
     {
-        NODE_RETURN(qt_QInputDialog_doubleMaximum_double_QInputDialog(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QInputDialog_doubleMaximum_double_QInputDialog(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_doubleMinimum0, double)
     {
-        NODE_RETURN(qt_QInputDialog_doubleMinimum_double_QInputDialog(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QInputDialog_doubleMinimum_double_QInputDialog(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_doubleStep0, double)
     {
-        NODE_RETURN(qt_QInputDialog_doubleStep_double_QInputDialog(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QInputDialog_doubleStep_double_QInputDialog(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_doubleValue0, double)
     {
-        NODE_RETURN(qt_QInputDialog_doubleValue_double_QInputDialog(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QInputDialog_doubleValue_double_QInputDialog(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_inputMode0, int)
     {
-        NODE_RETURN(qt_QInputDialog_inputMode_int_QInputDialog(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QInputDialog_inputMode_int_QInputDialog(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_intMaximum0, int)
     {
-        NODE_RETURN(qt_QInputDialog_intMaximum_int_QInputDialog(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QInputDialog_intMaximum_int_QInputDialog(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_intMinimum0, int)
     {
-        NODE_RETURN(qt_QInputDialog_intMinimum_int_QInputDialog(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QInputDialog_intMinimum_int_QInputDialog(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_intStep0, int)
     {
-        NODE_RETURN(qt_QInputDialog_intStep_int_QInputDialog(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QInputDialog_intStep_int_QInputDialog(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_intValue0, int)
     {
-        NODE_RETURN(qt_QInputDialog_intValue_int_QInputDialog(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QInputDialog_intValue_int_QInputDialog(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isComboBoxEditable0, bool)
     {
-        NODE_RETURN(qt_QInputDialog_isComboBoxEditable_bool_QInputDialog(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QInputDialog_isComboBoxEditable_bool_QInputDialog(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_labelText0, Pointer)
     {
-        NODE_RETURN(qt_QInputDialog_labelText_string_QInputDialog(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QInputDialog_labelText_string_QInputDialog(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_okButtonText0, Pointer)
     {
-        NODE_RETURN(qt_QInputDialog_okButtonText_string_QInputDialog(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QInputDialog_okButtonText_string_QInputDialog(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_options0, int)
     {
-        NODE_RETURN(qt_QInputDialog_options_int_QInputDialog(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QInputDialog_options_int_QInputDialog(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_setCancelButtonText0, void)
     {
-        qt_QInputDialog_setCancelButtonText_void_QInputDialog_string(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QInputDialog_setCancelButtonText_void_QInputDialog_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setComboBoxEditable0, void)
     {
-        qt_QInputDialog_setComboBoxEditable_void_QInputDialog_bool(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool));
+        qt_QInputDialog_setComboBoxEditable_void_QInputDialog_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool));
     }
 
     static NODE_IMPLEMENTATION(_n_setComboBoxItems0, void)
     {
-        qt_QInputDialog_setComboBoxItems_void_QInputDialog_stringBSB_ESB_(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QInputDialog_setComboBoxItems_void_QInputDialog_stringBSB_ESB_(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setDoubleDecimals0, void)
     {
-        qt_QInputDialog_setDoubleDecimals_void_QInputDialog_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QInputDialog_setDoubleDecimals_void_QInputDialog_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setDoubleMaximum0, void)
     {
-        qt_QInputDialog_setDoubleMaximum_void_QInputDialog_double(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, double));
+        qt_QInputDialog_setDoubleMaximum_void_QInputDialog_double(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, double));
     }
 
     static NODE_IMPLEMENTATION(_n_setDoubleMinimum0, void)
     {
-        qt_QInputDialog_setDoubleMinimum_void_QInputDialog_double(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, double));
+        qt_QInputDialog_setDoubleMinimum_void_QInputDialog_double(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, double));
     }
 
     static NODE_IMPLEMENTATION(_n_setDoubleRange0, void)
     {
-        qt_QInputDialog_setDoubleRange_void_QInputDialog_double_double(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, double),
-            NODE_ARG(2, double));
+        qt_QInputDialog_setDoubleRange_void_QInputDialog_double_double(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, double),
+                                                                       NODE_ARG(2, double));
     }
 
     static NODE_IMPLEMENTATION(_n_setDoubleStep0, void)
     {
-        qt_QInputDialog_setDoubleStep_void_QInputDialog_double(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, double));
+        qt_QInputDialog_setDoubleStep_void_QInputDialog_double(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, double));
     }
 
     static NODE_IMPLEMENTATION(_n_setDoubleValue0, void)
     {
-        qt_QInputDialog_setDoubleValue_void_QInputDialog_double(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, double));
+        qt_QInputDialog_setDoubleValue_void_QInputDialog_double(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, double));
     }
 
     static NODE_IMPLEMENTATION(_n_setInputMode0, void)
     {
-        qt_QInputDialog_setInputMode_void_QInputDialog_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QInputDialog_setInputMode_void_QInputDialog_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setIntMaximum0, void)
     {
-        qt_QInputDialog_setIntMaximum_void_QInputDialog_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QInputDialog_setIntMaximum_void_QInputDialog_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setIntMinimum0, void)
     {
-        qt_QInputDialog_setIntMinimum_void_QInputDialog_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QInputDialog_setIntMinimum_void_QInputDialog_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setIntRange0, void)
     {
-        qt_QInputDialog_setIntRange_void_QInputDialog_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int));
+        qt_QInputDialog_setIntRange_void_QInputDialog_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setIntStep0, void)
     {
-        qt_QInputDialog_setIntStep_void_QInputDialog_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QInputDialog_setIntStep_void_QInputDialog_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setIntValue0, void)
     {
-        qt_QInputDialog_setIntValue_void_QInputDialog_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QInputDialog_setIntValue_void_QInputDialog_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setLabelText0, void)
     {
-        qt_QInputDialog_setLabelText_void_QInputDialog_string(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QInputDialog_setLabelText_void_QInputDialog_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setOkButtonText0, void)
     {
-        qt_QInputDialog_setOkButtonText_void_QInputDialog_string(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QInputDialog_setOkButtonText_void_QInputDialog_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setOption0, void)
     {
-        qt_QInputDialog_setOption_void_QInputDialog_int_bool(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, bool));
+        qt_QInputDialog_setOption_void_QInputDialog_int_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, bool));
     }
 
     static NODE_IMPLEMENTATION(_n_setOptions0, void)
     {
-        qt_QInputDialog_setOptions_void_QInputDialog_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QInputDialog_setOptions_void_QInputDialog_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setTextEchoMode0, void)
     {
-        qt_QInputDialog_setTextEchoMode_void_QInputDialog_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QInputDialog_setTextEchoMode_void_QInputDialog_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setTextValue0, void)
     {
-        qt_QInputDialog_setTextValue_void_QInputDialog_string(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QInputDialog_setTextValue_void_QInputDialog_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_testOption0, bool)
     {
-        NODE_RETURN(qt_QInputDialog_testOption_bool_QInputDialog_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QInputDialog_testOption_bool_QInputDialog_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_textEchoMode0, int)
     {
-        NODE_RETURN(qt_QInputDialog_textEchoMode_int_QInputDialog(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QInputDialog_textEchoMode_int_QInputDialog(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_textValue0, Pointer)
     {
-        NODE_RETURN(qt_QInputDialog_textValue_string_QInputDialog(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QInputDialog_textValue_string_QInputDialog(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_done0, void)
     {
-        qt_QInputDialog_done_void_QInputDialog_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QInputDialog_done_void_QInputDialog_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_minimumSizeHint0, Pointer)
     {
-        NODE_RETURN(qt_QInputDialog_minimumSizeHint_QSize_QInputDialog(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QInputDialog_minimumSizeHint_QSize_QInputDialog(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_setVisible0, void)
     {
-        qt_QInputDialog_setVisible_void_QInputDialog_bool(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool));
+        qt_QInputDialog_setVisible_void_QInputDialog_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool));
     }
 
     static NODE_IMPLEMENTATION(_n_sizeHint0, Pointer)
     {
-        NODE_RETURN(qt_QInputDialog_sizeHint_QSize_QInputDialog(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QInputDialog_sizeHint_QSize_QInputDialog(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_closeEvent0, void)
     {
-        qt_QInputDialog_closeEvent_void_QInputDialog_QCloseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QInputDialog_closeEvent_void_QInputDialog_QCloseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_contextMenuEvent0, void)
     {
-        qt_QInputDialog_contextMenuEvent_void_QInputDialog_QContextMenuEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QInputDialog_contextMenuEvent_void_QInputDialog_QContextMenuEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                             NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_eventFilter0, bool)
     {
-        NODE_RETURN(
-            qt_QInputDialog_eventFilter_bool_QInputDialog_QObject_QEvent(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QInputDialog_eventFilter_bool_QInputDialog_QObject_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                 NODE_ARG(1, Pointer), NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_keyPressEvent0, void)
     {
-        qt_QInputDialog_keyPressEvent_void_QInputDialog_QKeyEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QInputDialog_keyPressEvent_void_QInputDialog_QKeyEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_resizeEvent0, void)
     {
-        qt_QInputDialog_resizeEvent_void_QInputDialog_QResizeEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QInputDialog_resizeEvent_void_QInputDialog_QResizeEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_showEvent0, void)
     {
-        qt_QInputDialog_showEvent_void_QInputDialog_QShowEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QInputDialog_showEvent_void_QInputDialog_QShowEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     //
@@ -1179,17 +1039,12 @@ namespace Mu
         bool b;
     };
 
-    static Pointer qt_QInputDialog_getText(Thread& NODE_THREAD,
-                                           Pointer param_parent,
-                                           Pointer param_title,
-                                           Pointer param_label,
-                                           int param_echoMode,
-                                           Pointer param_text, int param_flags)
+    static Pointer qt_QInputDialog_getText(Thread& NODE_THREAD, Pointer param_parent, Pointer param_title, Pointer param_label,
+                                           int param_echoMode, Pointer param_text, int param_flags)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
 
-        QWidget* parent =
-            object<QWidget>(reinterpret_cast<ClassInstance*>(param_parent));
+        QWidget* parent = object<QWidget>(reinterpret_cast<ClassInstance*>(param_parent));
         QString title = qstring(param_title);
         QString label = qstring(param_label);
         QLineEdit::EchoMode mode = (QLineEdit::EchoMode)param_echoMode;
@@ -1197,8 +1052,7 @@ namespace Mu
         QString text = qstring(param_text);
 
         bool ok = false;
-        QString result =
-            QInputDialog::getText(parent, title, label, mode, text, &ok, flags);
+        QString result = QInputDialog::getText(parent, title, label, mode, text, &ok, flags);
 
         Context::TypeVector tt(2);
         tt[0] = c->stringType();
@@ -1214,10 +1068,8 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(getText, Pointer)
     {
-        NODE_RETURN(qt_QInputDialog_getText(
-            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer), NODE_ARG(3, int), NODE_ARG(4, Pointer),
-            NODE_ARG(5, int)));
+        NODE_RETURN(qt_QInputDialog_getText(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, Pointer), NODE_ARG(3, int),
+                                            NODE_ARG(4, Pointer), NODE_ARG(5, int)));
     }
 
     void QInputDialogType::load()
@@ -1237,17 +1089,13 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
-                   new Function(c, tn, castFromObject, Cast, Compiled,
-                                QInputDialog_QInputDialog_QObject, Return, ftn,
-                                Parameters,
+                   new Function(c, tn, castFromObject, Cast, Compiled, QInputDialog_QInputDialog_QObject, Return, ftn, Parameters,
                                 new Param(c, "object", "qt.QObject"), End),
 
                    EndArguments);
@@ -1255,266 +1103,132 @@ namespace Mu
         addSymbols(
             // enums
             // member functions
-            new Function(
-                c, "QInputDialog", _n_QInputDialog0, None, Compiled,
-                qt_QInputDialog_QInputDialog_QInputDialog_QInputDialog_QWidget_int,
-                Return, "qt.QInputDialog", Parameters,
-                new Param(c, "this", "qt.QInputDialog"),
-                new Param(c, "parent", "qt.QWidget"),
-                new Param(c, "flags", "int", Value((int)Qt::WindowFlags())),
-                End),
-            new Function(c, "cancelButtonText", _n_cancelButtonText0, None,
-                         Compiled,
-                         qt_QInputDialog_cancelButtonText_string_QInputDialog,
-                         Return, "string", Parameters,
+            new Function(c, "QInputDialog", _n_QInputDialog0, None, Compiled,
+                         qt_QInputDialog_QInputDialog_QInputDialog_QInputDialog_QWidget_int, Return, "qt.QInputDialog", Parameters,
+                         new Param(c, "this", "qt.QInputDialog"), new Param(c, "parent", "qt.QWidget"),
+                         new Param(c, "flags", "int", Value((int)Qt::WindowFlags())), End),
+            new Function(c, "cancelButtonText", _n_cancelButtonText0, None, Compiled, qt_QInputDialog_cancelButtonText_string_QInputDialog,
+                         Return, "string", Parameters, new Param(c, "this", "qt.QInputDialog"), End),
+            new Function(c, "comboBoxItems", _n_comboBoxItems0, None, Compiled, qt_QInputDialog_comboBoxItems_stringBSB_ESB__QInputDialog,
+                         Return, "string[]", Parameters, new Param(c, "this", "qt.QInputDialog"), End),
+            new Function(c, "doubleDecimals", _n_doubleDecimals0, None, Compiled, qt_QInputDialog_doubleDecimals_int_QInputDialog, Return,
+                         "int", Parameters, new Param(c, "this", "qt.QInputDialog"), End),
+            new Function(c, "doubleMaximum", _n_doubleMaximum0, None, Compiled, qt_QInputDialog_doubleMaximum_double_QInputDialog, Return,
+                         "double", Parameters, new Param(c, "this", "qt.QInputDialog"), End),
+            new Function(c, "doubleMinimum", _n_doubleMinimum0, None, Compiled, qt_QInputDialog_doubleMinimum_double_QInputDialog, Return,
+                         "double", Parameters, new Param(c, "this", "qt.QInputDialog"), End),
+            new Function(c, "doubleStep", _n_doubleStep0, None, Compiled, qt_QInputDialog_doubleStep_double_QInputDialog, Return, "double",
+                         Parameters, new Param(c, "this", "qt.QInputDialog"), End),
+            new Function(c, "doubleValue", _n_doubleValue0, None, Compiled, qt_QInputDialog_doubleValue_double_QInputDialog, Return,
+                         "double", Parameters, new Param(c, "this", "qt.QInputDialog"), End),
+            new Function(c, "inputMode", _n_inputMode0, None, Compiled, qt_QInputDialog_inputMode_int_QInputDialog, Return, "int",
+                         Parameters, new Param(c, "this", "qt.QInputDialog"), End),
+            new Function(c, "intMaximum", _n_intMaximum0, None, Compiled, qt_QInputDialog_intMaximum_int_QInputDialog, Return, "int",
+                         Parameters, new Param(c, "this", "qt.QInputDialog"), End),
+            new Function(c, "intMinimum", _n_intMinimum0, None, Compiled, qt_QInputDialog_intMinimum_int_QInputDialog, Return, "int",
+                         Parameters, new Param(c, "this", "qt.QInputDialog"), End),
+            new Function(c, "intStep", _n_intStep0, None, Compiled, qt_QInputDialog_intStep_int_QInputDialog, Return, "int", Parameters,
                          new Param(c, "this", "qt.QInputDialog"), End),
-            new Function(
-                c, "comboBoxItems", _n_comboBoxItems0, None, Compiled,
-                qt_QInputDialog_comboBoxItems_stringBSB_ESB__QInputDialog,
-                Return, "string[]", Parameters,
-                new Param(c, "this", "qt.QInputDialog"), End),
-            new Function(
-                c, "doubleDecimals", _n_doubleDecimals0, None, Compiled,
-                qt_QInputDialog_doubleDecimals_int_QInputDialog, Return, "int",
-                Parameters, new Param(c, "this", "qt.QInputDialog"), End),
-            new Function(c, "doubleMaximum", _n_doubleMaximum0, None, Compiled,
-                         qt_QInputDialog_doubleMaximum_double_QInputDialog,
-                         Return, "double", Parameters,
+            new Function(c, "intValue", _n_intValue0, None, Compiled, qt_QInputDialog_intValue_int_QInputDialog, Return, "int", Parameters,
                          new Param(c, "this", "qt.QInputDialog"), End),
-            new Function(c, "doubleMinimum", _n_doubleMinimum0, None, Compiled,
-                         qt_QInputDialog_doubleMinimum_double_QInputDialog,
-                         Return, "double", Parameters,
+            new Function(c, "isComboBoxEditable", _n_isComboBoxEditable0, None, Compiled,
+                         qt_QInputDialog_isComboBoxEditable_bool_QInputDialog, Return, "bool", Parameters,
                          new Param(c, "this", "qt.QInputDialog"), End),
-            new Function(c, "doubleStep", _n_doubleStep0, None, Compiled,
-                         qt_QInputDialog_doubleStep_double_QInputDialog, Return,
-                         "double", Parameters,
-                         new Param(c, "this", "qt.QInputDialog"), End),
-            new Function(c, "doubleValue", _n_doubleValue0, None, Compiled,
-                         qt_QInputDialog_doubleValue_double_QInputDialog,
-                         Return, "double", Parameters,
-                         new Param(c, "this", "qt.QInputDialog"), End),
-            new Function(c, "inputMode", _n_inputMode0, None, Compiled,
-                         qt_QInputDialog_inputMode_int_QInputDialog, Return,
-                         "int", Parameters,
-                         new Param(c, "this", "qt.QInputDialog"), End),
-            new Function(c, "intMaximum", _n_intMaximum0, None, Compiled,
-                         qt_QInputDialog_intMaximum_int_QInputDialog, Return,
-                         "int", Parameters,
-                         new Param(c, "this", "qt.QInputDialog"), End),
-            new Function(c, "intMinimum", _n_intMinimum0, None, Compiled,
-                         qt_QInputDialog_intMinimum_int_QInputDialog, Return,
-                         "int", Parameters,
-                         new Param(c, "this", "qt.QInputDialog"), End),
-            new Function(c, "intStep", _n_intStep0, None, Compiled,
-                         qt_QInputDialog_intStep_int_QInputDialog, Return,
-                         "int", Parameters,
-                         new Param(c, "this", "qt.QInputDialog"), End),
-            new Function(c, "intValue", _n_intValue0, None, Compiled,
-                         qt_QInputDialog_intValue_int_QInputDialog, Return,
-                         "int", Parameters,
-                         new Param(c, "this", "qt.QInputDialog"), End),
-            new Function(c, "isComboBoxEditable", _n_isComboBoxEditable0, None,
-                         Compiled,
-                         qt_QInputDialog_isComboBoxEditable_bool_QInputDialog,
-                         Return, "bool", Parameters,
-                         new Param(c, "this", "qt.QInputDialog"), End),
-            new Function(c, "labelText", _n_labelText0, None, Compiled,
-                         qt_QInputDialog_labelText_string_QInputDialog, Return,
-                         "string", Parameters,
-                         new Param(c, "this", "qt.QInputDialog"), End),
-            new Function(c, "okButtonText", _n_okButtonText0, None, Compiled,
-                         qt_QInputDialog_okButtonText_string_QInputDialog,
-                         Return, "string", Parameters,
-                         new Param(c, "this", "qt.QInputDialog"), End),
+            new Function(c, "labelText", _n_labelText0, None, Compiled, qt_QInputDialog_labelText_string_QInputDialog, Return, "string",
+                         Parameters, new Param(c, "this", "qt.QInputDialog"), End),
+            new Function(c, "okButtonText", _n_okButtonText0, None, Compiled, qt_QInputDialog_okButtonText_string_QInputDialog, Return,
+                         "string", Parameters, new Param(c, "this", "qt.QInputDialog"), End),
             // MISSING: open (void; QInputDialog this, QObject receiver, "const
             // char *" member)
-            new Function(c, "options", _n_options0, None, Compiled,
-                         qt_QInputDialog_options_int_QInputDialog, Return,
-                         "int", Parameters,
+            new Function(c, "options", _n_options0, None, Compiled, qt_QInputDialog_options_int_QInputDialog, Return, "int", Parameters,
                          new Param(c, "this", "qt.QInputDialog"), End),
-            new Function(
-                c, "setCancelButtonText", _n_setCancelButtonText0, None,
-                Compiled,
-                qt_QInputDialog_setCancelButtonText_void_QInputDialog_string,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QInputDialog"),
-                new Param(c, "text", "string"), End),
-            new Function(
-                c, "setComboBoxEditable", _n_setComboBoxEditable0, None,
-                Compiled,
-                qt_QInputDialog_setComboBoxEditable_void_QInputDialog_bool,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QInputDialog"),
-                new Param(c, "editable", "bool"), End),
-            new Function(
-                c, "setComboBoxItems", _n_setComboBoxItems0, None, Compiled,
-                qt_QInputDialog_setComboBoxItems_void_QInputDialog_stringBSB_ESB_,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QInputDialog"),
-                new Param(c, "items", "string[]"), End),
-            new Function(
-                c, "setDoubleDecimals", _n_setDoubleDecimals0, None, Compiled,
-                qt_QInputDialog_setDoubleDecimals_void_QInputDialog_int, Return,
-                "void", Parameters, new Param(c, "this", "qt.QInputDialog"),
-                new Param(c, "decimals", "int"), End),
-            new Function(
-                c, "setDoubleMaximum", _n_setDoubleMaximum0, None, Compiled,
-                qt_QInputDialog_setDoubleMaximum_void_QInputDialog_double,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QInputDialog"),
-                new Param(c, "max", "double"), End),
-            new Function(
-                c, "setDoubleMinimum", _n_setDoubleMinimum0, None, Compiled,
-                qt_QInputDialog_setDoubleMinimum_void_QInputDialog_double,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QInputDialog"),
-                new Param(c, "min", "double"), End),
-            new Function(
-                c, "setDoubleRange", _n_setDoubleRange0, None, Compiled,
-                qt_QInputDialog_setDoubleRange_void_QInputDialog_double_double,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QInputDialog"),
-                new Param(c, "min", "double"), new Param(c, "max", "double"),
-                End),
-            new Function(c, "setDoubleStep", _n_setDoubleStep0, None, Compiled,
-                         qt_QInputDialog_setDoubleStep_void_QInputDialog_double,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QInputDialog"),
-                         new Param(c, "step", "double"), End),
-            new Function(
-                c, "setDoubleValue", _n_setDoubleValue0, None, Compiled,
-                qt_QInputDialog_setDoubleValue_void_QInputDialog_double, Return,
-                "void", Parameters, new Param(c, "this", "qt.QInputDialog"),
-                new Param(c, "value", "double"), End),
-            new Function(c, "setInputMode", _n_setInputMode0, None, Compiled,
-                         qt_QInputDialog_setInputMode_void_QInputDialog_int,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QInputDialog"),
-                         new Param(c, "mode", "int"), End),
-            new Function(c, "setIntMaximum", _n_setIntMaximum0, None, Compiled,
-                         qt_QInputDialog_setIntMaximum_void_QInputDialog_int,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QInputDialog"),
+            new Function(c, "setCancelButtonText", _n_setCancelButtonText0, None, Compiled,
+                         qt_QInputDialog_setCancelButtonText_void_QInputDialog_string, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QInputDialog"), new Param(c, "text", "string"), End),
+            new Function(c, "setComboBoxEditable", _n_setComboBoxEditable0, None, Compiled,
+                         qt_QInputDialog_setComboBoxEditable_void_QInputDialog_bool, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QInputDialog"), new Param(c, "editable", "bool"), End),
+            new Function(c, "setComboBoxItems", _n_setComboBoxItems0, None, Compiled,
+                         qt_QInputDialog_setComboBoxItems_void_QInputDialog_stringBSB_ESB_, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QInputDialog"), new Param(c, "items", "string[]"), End),
+            new Function(c, "setDoubleDecimals", _n_setDoubleDecimals0, None, Compiled,
+                         qt_QInputDialog_setDoubleDecimals_void_QInputDialog_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QInputDialog"), new Param(c, "decimals", "int"), End),
+            new Function(c, "setDoubleMaximum", _n_setDoubleMaximum0, None, Compiled,
+                         qt_QInputDialog_setDoubleMaximum_void_QInputDialog_double, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QInputDialog"), new Param(c, "max", "double"), End),
+            new Function(c, "setDoubleMinimum", _n_setDoubleMinimum0, None, Compiled,
+                         qt_QInputDialog_setDoubleMinimum_void_QInputDialog_double, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QInputDialog"), new Param(c, "min", "double"), End),
+            new Function(c, "setDoubleRange", _n_setDoubleRange0, None, Compiled,
+                         qt_QInputDialog_setDoubleRange_void_QInputDialog_double_double, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QInputDialog"), new Param(c, "min", "double"), new Param(c, "max", "double"), End),
+            new Function(c, "setDoubleStep", _n_setDoubleStep0, None, Compiled, qt_QInputDialog_setDoubleStep_void_QInputDialog_double,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QInputDialog"), new Param(c, "step", "double"), End),
+            new Function(c, "setDoubleValue", _n_setDoubleValue0, None, Compiled, qt_QInputDialog_setDoubleValue_void_QInputDialog_double,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QInputDialog"), new Param(c, "value", "double"), End),
+            new Function(c, "setInputMode", _n_setInputMode0, None, Compiled, qt_QInputDialog_setInputMode_void_QInputDialog_int, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QInputDialog"), new Param(c, "mode", "int"), End),
+            new Function(c, "setIntMaximum", _n_setIntMaximum0, None, Compiled, qt_QInputDialog_setIntMaximum_void_QInputDialog_int, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QInputDialog"), new Param(c, "max", "int"), End),
+            new Function(c, "setIntMinimum", _n_setIntMinimum0, None, Compiled, qt_QInputDialog_setIntMinimum_void_QInputDialog_int, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QInputDialog"), new Param(c, "min", "int"), End),
+            new Function(c, "setIntRange", _n_setIntRange0, None, Compiled, qt_QInputDialog_setIntRange_void_QInputDialog_int_int, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QInputDialog"), new Param(c, "min", "int"),
                          new Param(c, "max", "int"), End),
-            new Function(c, "setIntMinimum", _n_setIntMinimum0, None, Compiled,
-                         qt_QInputDialog_setIntMinimum_void_QInputDialog_int,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QInputDialog"),
-                         new Param(c, "min", "int"), End),
-            new Function(
-                c, "setIntRange", _n_setIntRange0, None, Compiled,
-                qt_QInputDialog_setIntRange_void_QInputDialog_int_int, Return,
-                "void", Parameters, new Param(c, "this", "qt.QInputDialog"),
-                new Param(c, "min", "int"), new Param(c, "max", "int"), End),
-            new Function(c, "setIntStep", _n_setIntStep0, None, Compiled,
-                         qt_QInputDialog_setIntStep_void_QInputDialog_int,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QInputDialog"),
-                         new Param(c, "step", "int"), End),
-            new Function(c, "setIntValue", _n_setIntValue0, None, Compiled,
-                         qt_QInputDialog_setIntValue_void_QInputDialog_int,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QInputDialog"),
-                         new Param(c, "value", "int"), End),
-            new Function(c, "setLabelText", _n_setLabelText0, None, Compiled,
-                         qt_QInputDialog_setLabelText_void_QInputDialog_string,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QInputDialog"),
-                         new Param(c, "text", "string"), End),
-            new Function(
-                c, "setOkButtonText", _n_setOkButtonText0, None, Compiled,
-                qt_QInputDialog_setOkButtonText_void_QInputDialog_string,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QInputDialog"),
-                new Param(c, "text", "string"), End),
-            new Function(
-                c, "setOption", _n_setOption0, None, Compiled,
-                qt_QInputDialog_setOption_void_QInputDialog_int_bool, Return,
-                "void", Parameters, new Param(c, "this", "qt.QInputDialog"),
-                new Param(c, "option", "int"), new Param(c, "on", "bool"), End),
-            new Function(c, "setOptions", _n_setOptions0, None, Compiled,
-                         qt_QInputDialog_setOptions_void_QInputDialog_int,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QInputDialog"),
-                         new Param(c, "options", "int"), End),
-            new Function(
-                c, "setTextEchoMode", _n_setTextEchoMode0, None, Compiled,
-                qt_QInputDialog_setTextEchoMode_void_QInputDialog_int, Return,
-                "void", Parameters, new Param(c, "this", "qt.QInputDialog"),
-                new Param(c, "mode", "int"), End),
-            new Function(c, "setTextValue", _n_setTextValue0, None, Compiled,
-                         qt_QInputDialog_setTextValue_void_QInputDialog_string,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QInputDialog"),
-                         new Param(c, "text", "string"), End),
-            new Function(c, "testOption", _n_testOption0, None, Compiled,
-                         qt_QInputDialog_testOption_bool_QInputDialog_int,
-                         Return, "bool", Parameters,
-                         new Param(c, "this", "qt.QInputDialog"),
-                         new Param(c, "option", "int"), End),
-            new Function(c, "textEchoMode", _n_textEchoMode0, None, Compiled,
-                         qt_QInputDialog_textEchoMode_int_QInputDialog, Return,
-                         "int", Parameters,
-                         new Param(c, "this", "qt.QInputDialog"), End),
-            new Function(c, "textValue", _n_textValue0, None, Compiled,
-                         qt_QInputDialog_textValue_string_QInputDialog, Return,
-                         "string", Parameters,
-                         new Param(c, "this", "qt.QInputDialog"), End),
-            _func[0] = new MemberFunction(
-                c, "done", _n_done0, None, Compiled,
-                qt_QInputDialog_done_void_QInputDialog_int, Return, "void",
-                Parameters, new Param(c, "this", "qt.QInputDialog"),
-                new Param(c, "result", "int"), End),
-            _func[1] = new MemberFunction(
-                c, "minimumSizeHint", _n_minimumSizeHint0, None, Compiled,
-                qt_QInputDialog_minimumSizeHint_QSize_QInputDialog, Return,
-                "qt.QSize", Parameters, new Param(c, "this", "qt.QInputDialog"),
-                End),
-            _func[2] = new MemberFunction(
-                c, "setVisible", _n_setVisible0, None, Compiled,
-                qt_QInputDialog_setVisible_void_QInputDialog_bool, Return,
-                "void", Parameters, new Param(c, "this", "qt.QInputDialog"),
-                new Param(c, "visible", "bool"), End),
-            _func[3] = new MemberFunction(
-                c, "sizeHint", _n_sizeHint0, None, Compiled,
-                qt_QInputDialog_sizeHint_QSize_QInputDialog, Return, "qt.QSize",
-                Parameters, new Param(c, "this", "qt.QInputDialog"), End),
-            _func[4] = new MemberFunction(
-                c, "closeEvent", _n_closeEvent0, None, Compiled,
-                qt_QInputDialog_closeEvent_void_QInputDialog_QCloseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QInputDialog"),
-                new Param(c, "e", "qt.QCloseEvent"), End),
-            _func[5] = new MemberFunction(
-                c, "contextMenuEvent", _n_contextMenuEvent0, None, Compiled,
-                qt_QInputDialog_contextMenuEvent_void_QInputDialog_QContextMenuEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QInputDialog"),
-                new Param(c, "e", "qt.QContextMenuEvent"), End),
-            _func[6] = new MemberFunction(
-                c, "eventFilter", _n_eventFilter0, None, Compiled,
-                qt_QInputDialog_eventFilter_bool_QInputDialog_QObject_QEvent,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QInputDialog"),
-                new Param(c, "o", "qt.QObject"), new Param(c, "e", "qt.QEvent"),
-                End),
-            _func[7] = new MemberFunction(
-                c, "keyPressEvent", _n_keyPressEvent0, None, Compiled,
-                qt_QInputDialog_keyPressEvent_void_QInputDialog_QKeyEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QInputDialog"),
-                new Param(c, "e", "qt.QKeyEvent"), End),
-            _func[8] = new MemberFunction(
-                c, "resizeEvent", _n_resizeEvent0, None, Compiled,
-                qt_QInputDialog_resizeEvent_void_QInputDialog_QResizeEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QInputDialog"),
-                new Param(c, "_p15", "qt.QResizeEvent"), End),
-            _func[9] = new MemberFunction(
-                c, "showEvent", _n_showEvent0, None, Compiled,
-                qt_QInputDialog_showEvent_void_QInputDialog_QShowEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QInputDialog"),
-                new Param(c, "event", "qt.QShowEvent"), End),
+            new Function(c, "setIntStep", _n_setIntStep0, None, Compiled, qt_QInputDialog_setIntStep_void_QInputDialog_int, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QInputDialog"), new Param(c, "step", "int"), End),
+            new Function(c, "setIntValue", _n_setIntValue0, None, Compiled, qt_QInputDialog_setIntValue_void_QInputDialog_int, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QInputDialog"), new Param(c, "value", "int"), End),
+            new Function(c, "setLabelText", _n_setLabelText0, None, Compiled, qt_QInputDialog_setLabelText_void_QInputDialog_string, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QInputDialog"), new Param(c, "text", "string"), End),
+            new Function(c, "setOkButtonText", _n_setOkButtonText0, None, Compiled,
+                         qt_QInputDialog_setOkButtonText_void_QInputDialog_string, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QInputDialog"), new Param(c, "text", "string"), End),
+            new Function(c, "setOption", _n_setOption0, None, Compiled, qt_QInputDialog_setOption_void_QInputDialog_int_bool, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QInputDialog"), new Param(c, "option", "int"),
+                         new Param(c, "on", "bool"), End),
+            new Function(c, "setOptions", _n_setOptions0, None, Compiled, qt_QInputDialog_setOptions_void_QInputDialog_int, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QInputDialog"), new Param(c, "options", "int"), End),
+            new Function(c, "setTextEchoMode", _n_setTextEchoMode0, None, Compiled, qt_QInputDialog_setTextEchoMode_void_QInputDialog_int,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QInputDialog"), new Param(c, "mode", "int"), End),
+            new Function(c, "setTextValue", _n_setTextValue0, None, Compiled, qt_QInputDialog_setTextValue_void_QInputDialog_string, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QInputDialog"), new Param(c, "text", "string"), End),
+            new Function(c, "testOption", _n_testOption0, None, Compiled, qt_QInputDialog_testOption_bool_QInputDialog_int, Return, "bool",
+                         Parameters, new Param(c, "this", "qt.QInputDialog"), new Param(c, "option", "int"), End),
+            new Function(c, "textEchoMode", _n_textEchoMode0, None, Compiled, qt_QInputDialog_textEchoMode_int_QInputDialog, Return, "int",
+                         Parameters, new Param(c, "this", "qt.QInputDialog"), End),
+            new Function(c, "textValue", _n_textValue0, None, Compiled, qt_QInputDialog_textValue_string_QInputDialog, Return, "string",
+                         Parameters, new Param(c, "this", "qt.QInputDialog"), End),
+            _func[0] = new MemberFunction(c, "done", _n_done0, None, Compiled, qt_QInputDialog_done_void_QInputDialog_int, Return, "void",
+                                          Parameters, new Param(c, "this", "qt.QInputDialog"), new Param(c, "result", "int"), End),
+            _func[1] = new MemberFunction(c, "minimumSizeHint", _n_minimumSizeHint0, None, Compiled,
+                                          qt_QInputDialog_minimumSizeHint_QSize_QInputDialog, Return, "qt.QSize", Parameters,
+                                          new Param(c, "this", "qt.QInputDialog"), End),
+            _func[2] = new MemberFunction(c, "setVisible", _n_setVisible0, None, Compiled,
+                                          qt_QInputDialog_setVisible_void_QInputDialog_bool, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QInputDialog"), new Param(c, "visible", "bool"), End),
+            _func[3] = new MemberFunction(c, "sizeHint", _n_sizeHint0, None, Compiled, qt_QInputDialog_sizeHint_QSize_QInputDialog, Return,
+                                          "qt.QSize", Parameters, new Param(c, "this", "qt.QInputDialog"), End),
+            _func[4] = new MemberFunction(c, "closeEvent", _n_closeEvent0, None, Compiled,
+                                          qt_QInputDialog_closeEvent_void_QInputDialog_QCloseEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QInputDialog"), new Param(c, "e", "qt.QCloseEvent"), End),
+            _func[5] = new MemberFunction(c, "contextMenuEvent", _n_contextMenuEvent0, None, Compiled,
+                                          qt_QInputDialog_contextMenuEvent_void_QInputDialog_QContextMenuEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QInputDialog"), new Param(c, "e", "qt.QContextMenuEvent"), End),
+            _func[6] = new MemberFunction(c, "eventFilter", _n_eventFilter0, None, Compiled,
+                                          qt_QInputDialog_eventFilter_bool_QInputDialog_QObject_QEvent, Return, "bool", Parameters,
+                                          new Param(c, "this", "qt.QInputDialog"), new Param(c, "o", "qt.QObject"),
+                                          new Param(c, "e", "qt.QEvent"), End),
+            _func[7] = new MemberFunction(c, "keyPressEvent", _n_keyPressEvent0, None, Compiled,
+                                          qt_QInputDialog_keyPressEvent_void_QInputDialog_QKeyEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QInputDialog"), new Param(c, "e", "qt.QKeyEvent"), End),
+            _func[8] = new MemberFunction(c, "resizeEvent", _n_resizeEvent0, None, Compiled,
+                                          qt_QInputDialog_resizeEvent_void_QInputDialog_QResizeEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QInputDialog"), new Param(c, "_p15", "qt.QResizeEvent"), End),
+            _func[9] = new MemberFunction(c, "showEvent", _n_showEvent0, None, Compiled,
+                                          qt_QInputDialog_showEvent_void_QInputDialog_QShowEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QInputDialog"), new Param(c, "event", "qt.QShowEvent"), End),
             // static functions
             // MISSING: getDouble (double; QWidget parent, string title, string
             // label, double value, double min, double max, int decimals, "bool
@@ -1547,14 +1261,9 @@ namespace Mu
         tt[1] = c->boolType();
         c->tupleType(tt);
 
-        addSymbols(new Function(c, "getText", getText, None, Return,
-                                "(string,bool)", Parameters,
-                                new Param(c, "parent", "qt.QWidget"),
-                                new Param(c, "title", "string"),
-                                new Param(c, "label", "string"),
-                                new Param(c, "echoMode", "int"),
-                                new Param(c, "text", "string"),
-                                new Param(c, "windowFlags", "int"), End),
+        addSymbols(new Function(c, "getText", getText, None, Return, "(string,bool)", Parameters, new Param(c, "parent", "qt.QWidget"),
+                                new Param(c, "title", "string"), new Param(c, "label", "string"), new Param(c, "echoMode", "int"),
+                                new Param(c, "text", "string"), new Param(c, "windowFlags", "int"), End),
 
                    EndArguments);
 

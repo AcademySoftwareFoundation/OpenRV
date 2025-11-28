@@ -120,8 +120,7 @@ namespace Mu
             newGlConstant(GLU_VERSION), newGlConstant(GLU_EXTENSIONS),
 
             /* ErrorCode */
-            newGlConstant(GLU_INVALID_ENUM), newGlConstant(GLU_INVALID_VALUE),
-            newGlConstant(GLU_OUT_OF_MEMORY),
+            newGlConstant(GLU_INVALID_ENUM), newGlConstant(GLU_INVALID_VALUE), newGlConstant(GLU_OUT_OF_MEMORY),
             //        newGlConstant( GLU_INVALID_OPERATION ),
 
             /* NurbsDisplay */
@@ -159,33 +158,24 @@ namespace Mu
             //        newGlConstant( GLU_NURBS_END_DATA_EXT ),
 
             /* NurbsError */
-            newGlConstant(GLU_NURBS_ERROR1), newGlConstant(GLU_NURBS_ERROR2),
-            newGlConstant(GLU_NURBS_ERROR3), newGlConstant(GLU_NURBS_ERROR4),
-            newGlConstant(GLU_NURBS_ERROR5), newGlConstant(GLU_NURBS_ERROR6),
-            newGlConstant(GLU_NURBS_ERROR7), newGlConstant(GLU_NURBS_ERROR8),
-            newGlConstant(GLU_NURBS_ERROR9), newGlConstant(GLU_NURBS_ERROR10),
-            newGlConstant(GLU_NURBS_ERROR11), newGlConstant(GLU_NURBS_ERROR12),
-            newGlConstant(GLU_NURBS_ERROR13), newGlConstant(GLU_NURBS_ERROR14),
-            newGlConstant(GLU_NURBS_ERROR15), newGlConstant(GLU_NURBS_ERROR16),
-            newGlConstant(GLU_NURBS_ERROR17), newGlConstant(GLU_NURBS_ERROR18),
-            newGlConstant(GLU_NURBS_ERROR19), newGlConstant(GLU_NURBS_ERROR20),
-            newGlConstant(GLU_NURBS_ERROR21), newGlConstant(GLU_NURBS_ERROR22),
-            newGlConstant(GLU_NURBS_ERROR23), newGlConstant(GLU_NURBS_ERROR24),
-            newGlConstant(GLU_NURBS_ERROR25), newGlConstant(GLU_NURBS_ERROR26),
-            newGlConstant(GLU_NURBS_ERROR27), newGlConstant(GLU_NURBS_ERROR28),
-            newGlConstant(GLU_NURBS_ERROR29), newGlConstant(GLU_NURBS_ERROR30),
-            newGlConstant(GLU_NURBS_ERROR31), newGlConstant(GLU_NURBS_ERROR32),
-            newGlConstant(GLU_NURBS_ERROR33), newGlConstant(GLU_NURBS_ERROR34),
-            newGlConstant(GLU_NURBS_ERROR35), newGlConstant(GLU_NURBS_ERROR36),
+            newGlConstant(GLU_NURBS_ERROR1), newGlConstant(GLU_NURBS_ERROR2), newGlConstant(GLU_NURBS_ERROR3),
+            newGlConstant(GLU_NURBS_ERROR4), newGlConstant(GLU_NURBS_ERROR5), newGlConstant(GLU_NURBS_ERROR6),
+            newGlConstant(GLU_NURBS_ERROR7), newGlConstant(GLU_NURBS_ERROR8), newGlConstant(GLU_NURBS_ERROR9),
+            newGlConstant(GLU_NURBS_ERROR10), newGlConstant(GLU_NURBS_ERROR11), newGlConstant(GLU_NURBS_ERROR12),
+            newGlConstant(GLU_NURBS_ERROR13), newGlConstant(GLU_NURBS_ERROR14), newGlConstant(GLU_NURBS_ERROR15),
+            newGlConstant(GLU_NURBS_ERROR16), newGlConstant(GLU_NURBS_ERROR17), newGlConstant(GLU_NURBS_ERROR18),
+            newGlConstant(GLU_NURBS_ERROR19), newGlConstant(GLU_NURBS_ERROR20), newGlConstant(GLU_NURBS_ERROR21),
+            newGlConstant(GLU_NURBS_ERROR22), newGlConstant(GLU_NURBS_ERROR23), newGlConstant(GLU_NURBS_ERROR24),
+            newGlConstant(GLU_NURBS_ERROR25), newGlConstant(GLU_NURBS_ERROR26), newGlConstant(GLU_NURBS_ERROR27),
+            newGlConstant(GLU_NURBS_ERROR28), newGlConstant(GLU_NURBS_ERROR29), newGlConstant(GLU_NURBS_ERROR30),
+            newGlConstant(GLU_NURBS_ERROR31), newGlConstant(GLU_NURBS_ERROR32), newGlConstant(GLU_NURBS_ERROR33),
+            newGlConstant(GLU_NURBS_ERROR34), newGlConstant(GLU_NURBS_ERROR35), newGlConstant(GLU_NURBS_ERROR36),
             newGlConstant(GLU_NURBS_ERROR37),
 
             /* NurbsProperty */
-            newGlConstant(GLU_AUTO_LOAD_MATRIX), newGlConstant(GLU_CULLING),
-            newGlConstant(GLU_SAMPLING_TOLERANCE),
-            newGlConstant(GLU_DISPLAY_MODE),
-            newGlConstant(GLU_PARAMETRIC_TOLERANCE),
-            newGlConstant(GLU_SAMPLING_METHOD), newGlConstant(GLU_U_STEP),
-            newGlConstant(GLU_V_STEP),
+            newGlConstant(GLU_AUTO_LOAD_MATRIX), newGlConstant(GLU_CULLING), newGlConstant(GLU_SAMPLING_TOLERANCE),
+            newGlConstant(GLU_DISPLAY_MODE), newGlConstant(GLU_PARAMETRIC_TOLERANCE), newGlConstant(GLU_SAMPLING_METHOD),
+            newGlConstant(GLU_U_STEP), newGlConstant(GLU_V_STEP),
             //        newGlConstant( GLU_NURBS_MODE ),
             //        newGlConstant( GLU_NURBS_MODE_EXT ),
             //        newGlConstant( GLU_NURBS_TESSELLATOR ),
@@ -198,99 +188,70 @@ namespace Mu
             //        newGlConstant( GLU_OBJECT_PARAMETRIC_ERROR_EXT ),
             //        newGlConstant( GLU_OBJECT_PATH_LENGTH ),
             //        newGlConstant( GLU_OBJECT_PATH_LENGTH_EXT ),
-            newGlConstant(GLU_PATH_LENGTH), newGlConstant(GLU_PARAMETRIC_ERROR),
-            newGlConstant(GLU_DOMAIN_DISTANCE),
+            newGlConstant(GLU_PATH_LENGTH), newGlConstant(GLU_PARAMETRIC_ERROR), newGlConstant(GLU_DOMAIN_DISTANCE),
 
             /* NurbsTrim */
             newGlConstant(GLU_MAP1_TRIM_2), newGlConstant(GLU_MAP1_TRIM_3),
 
             /* QuadricDrawStyle */
-            newGlConstant(GLU_POINT), newGlConstant(GLU_LINE),
-            newGlConstant(GLU_FILL), newGlConstant(GLU_SILHOUETTE),
+            newGlConstant(GLU_POINT), newGlConstant(GLU_LINE), newGlConstant(GLU_FILL), newGlConstant(GLU_SILHOUETTE),
 
             /* QuadricCallback */
             /* ), */
 
             /* QuadricNormal */
-            newGlConstant(GLU_SMOOTH), newGlConstant(GLU_FLAT),
-            newGlConstant(GLU_NONE),
+            newGlConstant(GLU_SMOOTH), newGlConstant(GLU_FLAT), newGlConstant(GLU_NONE),
 
             /* QuadricOrientation */
             newGlConstant(GLU_OUTSIDE), newGlConstant(GLU_INSIDE),
 
             /* TessCallback */
-            newGlConstant(GLU_TESS_BEGIN), newGlConstant(GLU_BEGIN),
-            newGlConstant(GLU_TESS_VERTEX), newGlConstant(GLU_VERTEX),
-            newGlConstant(GLU_TESS_END), newGlConstant(GLU_END),
-            newGlConstant(GLU_TESS_ERROR), newGlConstant(GLU_TESS_EDGE_FLAG),
-            newGlConstant(GLU_EDGE_FLAG), newGlConstant(GLU_TESS_COMBINE),
-            newGlConstant(GLU_TESS_BEGIN_DATA),
-            newGlConstant(GLU_TESS_VERTEX_DATA),
-            newGlConstant(GLU_TESS_END_DATA),
-            newGlConstant(GLU_TESS_ERROR_DATA),
-            newGlConstant(GLU_TESS_EDGE_FLAG_DATA),
-            newGlConstant(GLU_TESS_COMBINE_DATA),
+            newGlConstant(GLU_TESS_BEGIN), newGlConstant(GLU_BEGIN), newGlConstant(GLU_TESS_VERTEX), newGlConstant(GLU_VERTEX),
+            newGlConstant(GLU_TESS_END), newGlConstant(GLU_END), newGlConstant(GLU_TESS_ERROR), newGlConstant(GLU_TESS_EDGE_FLAG),
+            newGlConstant(GLU_EDGE_FLAG), newGlConstant(GLU_TESS_COMBINE), newGlConstant(GLU_TESS_BEGIN_DATA),
+            newGlConstant(GLU_TESS_VERTEX_DATA), newGlConstant(GLU_TESS_END_DATA), newGlConstant(GLU_TESS_ERROR_DATA),
+            newGlConstant(GLU_TESS_EDGE_FLAG_DATA), newGlConstant(GLU_TESS_COMBINE_DATA),
 
             /* TessContour */
-            newGlConstant(GLU_CW), newGlConstant(GLU_CCW),
-            newGlConstant(GLU_INTERIOR), newGlConstant(GLU_EXTERIOR),
+            newGlConstant(GLU_CW), newGlConstant(GLU_CCW), newGlConstant(GLU_INTERIOR), newGlConstant(GLU_EXTERIOR),
             newGlConstant(GLU_UNKNOWN),
 
             /* TessProperty */
-            newGlConstant(GLU_TESS_WINDING_RULE),
-            newGlConstant(GLU_TESS_BOUNDARY_ONLY),
-            newGlConstant(GLU_TESS_TOLERANCE),
+            newGlConstant(GLU_TESS_WINDING_RULE), newGlConstant(GLU_TESS_BOUNDARY_ONLY), newGlConstant(GLU_TESS_TOLERANCE),
 
             /* TessError */
-            newGlConstant(GLU_TESS_ERROR1), newGlConstant(GLU_TESS_ERROR2),
-            newGlConstant(GLU_TESS_ERROR3), newGlConstant(GLU_TESS_ERROR4),
-            newGlConstant(GLU_TESS_ERROR5), newGlConstant(GLU_TESS_ERROR6),
-            newGlConstant(GLU_TESS_ERROR7), newGlConstant(GLU_TESS_ERROR8),
-            newGlConstant(GLU_TESS_MISSING_BEGIN_POLYGON),
-            newGlConstant(GLU_TESS_MISSING_BEGIN_CONTOUR),
-            newGlConstant(GLU_TESS_MISSING_END_POLYGON),
-            newGlConstant(GLU_TESS_MISSING_END_CONTOUR),
-            newGlConstant(GLU_TESS_COORD_TOO_LARGE),
-            newGlConstant(GLU_TESS_NEED_COMBINE_CALLBACK),
+            newGlConstant(GLU_TESS_ERROR1), newGlConstant(GLU_TESS_ERROR2), newGlConstant(GLU_TESS_ERROR3), newGlConstant(GLU_TESS_ERROR4),
+            newGlConstant(GLU_TESS_ERROR5), newGlConstant(GLU_TESS_ERROR6), newGlConstant(GLU_TESS_ERROR7), newGlConstant(GLU_TESS_ERROR8),
+            newGlConstant(GLU_TESS_MISSING_BEGIN_POLYGON), newGlConstant(GLU_TESS_MISSING_BEGIN_CONTOUR),
+            newGlConstant(GLU_TESS_MISSING_END_POLYGON), newGlConstant(GLU_TESS_MISSING_END_CONTOUR),
+            newGlConstant(GLU_TESS_COORD_TOO_LARGE), newGlConstant(GLU_TESS_NEED_COMBINE_CALLBACK),
 
             /* TessWinding */
-            newGlConstant(GLU_TESS_WINDING_ODD),
-            newGlConstant(GLU_TESS_WINDING_NONZERO),
-            newGlConstant(GLU_TESS_WINDING_POSITIVE),
-            newGlConstant(GLU_TESS_WINDING_NEGATIVE),
-            newGlConstant(GLU_TESS_WINDING_ABS_GEQ_TWO),
+            newGlConstant(GLU_TESS_WINDING_ODD), newGlConstant(GLU_TESS_WINDING_NONZERO), newGlConstant(GLU_TESS_WINDING_POSITIVE),
+            newGlConstant(GLU_TESS_WINDING_NEGATIVE), newGlConstant(GLU_TESS_WINDING_ABS_GEQ_TWO),
 
-            new Function(c, "gluBuild2DMipmaps", GLUModule::gluBuild2DMipmaps,
-                         None, Return, "int", Args, "int", "int", "int", "int",
-                         "int", "?class", End),
+            new Function(c, "gluBuild2DMipmaps", GLUModule::gluBuild2DMipmaps, None, Return, "int", Args, "int", "int", "int", "int", "int",
+                         "?class", End),
 
-            new Function(c, "gluCheckExtension", GLUModule::gluCheckExtension,
-                         None, Return, "bool", Args, "string", "string", End),
+            new Function(c, "gluCheckExtension", GLUModule::gluCheckExtension, None, Return, "bool", Args, "string", "string", End),
 
-            new Function(c, "gluErrorString", GLUModule::gluErrorString, None,
-                         Return, "string", Args, "int", End),
+            new Function(c, "gluErrorString", GLUModule::gluErrorString, None, Return, "string", Args, "int", End),
 
-            new Function(c, "gluGetString", GLUModule::gluGetString, None,
-                         Return, "string", Args, "int", End),
+            new Function(c, "gluGetString", GLUModule::gluGetString, None, Return, "string", Args, "int", End),
 
-            new Function(c, "gluLookAt", GLUModule::gluLookAt, None, Return,
-                         "void", Args, "float", "float", "float", "float",
-                         "float", "float", "float", "float", "float", End),
+            new Function(c, "gluLookAt", GLUModule::gluLookAt, None, Return, "void", Args, "float", "float", "float", "float", "float",
+                         "float", "float", "float", "float", End),
 
-            new Function(c, "gluLookAt", GLUModule::gluLookAtv, None, Return,
-                         "void", Args, "vector float[3]", "vector float[3]",
+            new Function(c, "gluLookAt", GLUModule::gluLookAtv, None, Return, "void", Args, "vector float[3]", "vector float[3]",
                          "vector float[3]", End),
 
-            new Function(c, "gluOrtho2D", GLUModule::gluOrtho2D, None, Return,
-                         "void", Args, "float", "float", "float", "float", End),
+            new Function(c, "gluOrtho2D", GLUModule::gluOrtho2D, None, Return, "void", Args, "float", "float", "float", "float", End),
 
-            new Function(c, "gluPerspective", GLUModule::gluPerspective, None,
-                         Return, "void", Args, "float", "float", "float",
-                         "float", End),
+            new Function(c, "gluPerspective", GLUModule::gluPerspective, None, Return, "void", Args, "float", "float", "float", "float",
+                         End),
 
-            new Function(c, "gluScaleImage", GLUModule::gluScaleImage, None,
-                         Return, "int", Args, "int", "int", "int", "?dyn_array",
-                         "int", "int", "?dyn_array", End),
+            new Function(c, "gluScaleImage", GLUModule::gluScaleImage, None, Return, "int", Args, "int", "int", "int", "?dyn_array", "int",
+                         "int", "?dyn_array", End),
 
             EndArguments);
     }
@@ -314,8 +275,7 @@ namespace Mu
         const Type* dataType = data->elementType();
 
         GLenum type = 0;
-        if (dataType == c->floatType() || dataType == c->vec3fType()
-            || dataType == c->vec4fType())
+        if (dataType == c->floatType() || dataType == c->vec3fType() || dataType == c->vec4fType())
         {
             type = GL_FLOAT;
         }
@@ -328,8 +288,7 @@ namespace Mu
             throw IncompatableArraysException(NODE_THREAD);
         }
 
-        NODE_RETURN(::gluBuild2DMipmaps(target, internalFormat, width, height,
-                                        format, type, data->data<void>()));
+        NODE_RETURN(::gluBuild2DMipmaps(target, internalFormat, width, height, format, type, data->data<void>()));
         //     }
         //     else
         //     {
@@ -339,10 +298,8 @@ namespace Mu
 
     NODE_IMPLEMENTATION(GLUModule::gluCheckExtension, bool)
     {
-        const StringType::String* a =
-            NODE_ARG_OBJECT(0, const StringType::String);
-        const StringType::String* b =
-            NODE_ARG_OBJECT(1, const StringType::String);
+        const StringType::String* a = NODE_ARG_OBJECT(0, const StringType::String);
+        const StringType::String* b = NODE_ARG_OBJECT(1, const StringType::String);
         const char* extName = a->c_str();
         const char* extString = b->c_str();
         /* AJG - gluCheckExtension - doesn't exist? */
@@ -382,8 +339,7 @@ namespace Mu
 
     NODE_IMPLEMENTATION(GLUModule::gluLookAt, void)
     {
-        ::gluLookAt(NODE_ARG(0, float), NODE_ARG(1, float), NODE_ARG(2, float),
-                    NODE_ARG(3, float), NODE_ARG(4, float), NODE_ARG(5, float),
+        ::gluLookAt(NODE_ARG(0, float), NODE_ARG(1, float), NODE_ARG(2, float), NODE_ARG(3, float), NODE_ARG(4, float), NODE_ARG(5, float),
                     NODE_ARG(6, float), NODE_ARG(7, float), NODE_ARG(8, float));
     }
 
@@ -392,20 +348,17 @@ namespace Mu
         const Vector3f& eye = NODE_ARG(0, Vector3f);
         const Vector3f& center = NODE_ARG(1, Vector3f);
         const Vector3f& up = NODE_ARG(2, Vector3f);
-        ::gluLookAt(eye[0], eye[1], eye[2], center[0], center[1], center[2],
-                    up[0], up[1], up[2]);
+        ::gluLookAt(eye[0], eye[1], eye[2], center[0], center[1], center[2], up[0], up[1], up[2]);
     }
 
     NODE_IMPLEMENTATION(GLUModule::gluOrtho2D, void)
     {
-        ::gluOrtho2D(NODE_ARG(0, float), NODE_ARG(1, float), NODE_ARG(2, float),
-                     NODE_ARG(3, float));
+        ::gluOrtho2D(NODE_ARG(0, float), NODE_ARG(1, float), NODE_ARG(2, float), NODE_ARG(3, float));
     }
 
     NODE_IMPLEMENTATION(GLUModule::gluPerspective, void)
     {
-        ::gluPerspective(NODE_ARG(0, float), NODE_ARG(1, float),
-                         NODE_ARG(2, float), NODE_ARG(3, float));
+        ::gluPerspective(NODE_ARG(0, float), NODE_ARG(1, float), NODE_ARG(2, float), NODE_ARG(3, float));
     }
 
     NODE_IMPLEMENTATION(GLUModule::gluScaleImage, int)
@@ -421,8 +374,7 @@ namespace Mu
         const Type* dataInType = dataIn->elementType();
 
         GLenum typeIn = 0;
-        if (dataInType == c->floatType() || dataInType == c->vec3fType()
-            || dataInType == c->vec4fType())
+        if (dataInType == c->floatType() || dataInType == c->vec3fType() || dataInType == c->vec4fType())
         {
             typeIn = GL_FLOAT;
         }
@@ -442,8 +394,7 @@ namespace Mu
         const Type* dataOutType = dataOut->elementType();
 
         GLenum typeOut = 0;
-        if (dataOutType == c->floatType() || dataOutType == c->vec3fType()
-            || dataOutType == c->vec4fType())
+        if (dataOutType == c->floatType() || dataOutType == c->vec3fType() || dataOutType == c->vec4fType())
         {
             typeOut = GL_FLOAT;
         }
@@ -486,9 +437,7 @@ namespace Mu
 
         dataOut->resize(wOut * hOut * numElements);
 
-        NODE_RETURN(::gluScaleImage(format, wIn, hIn, typeIn,
-                                    dataIn->data<void>(), wOut, hOut, typeOut,
-                                    dataOut->data<void>()));
+        NODE_RETURN(::gluScaleImage(format, wIn, hIn, typeIn, dataIn->data<void>(), wOut, hOut, typeOut, dataOut->data<void>()));
     }
 
 } // namespace Mu

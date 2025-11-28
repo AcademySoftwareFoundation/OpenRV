@@ -305,8 +305,7 @@ namespace Gto
         return m_names[n];
     }
 
-    void Writer::beginObject(const char* name, const char* protocol,
-                             uint32 version)
+    void Writer::beginObject(const char* name, const char* protocol, uint32 version)
     {
         if (m_objectActive)
         {
@@ -334,13 +333,9 @@ namespace Gto
         m_objectActive = true;
     }
 
-    void Writer::beginComponent(const char* name, uint32 flags)
-    {
-        beginComponent(name, NULL, flags);
-    }
+    void Writer::beginComponent(const char* name, uint32 flags) { beginComponent(name, NULL, flags); }
 
-    void Writer::beginComponent(const char* name, const char* interp,
-                                uint32 flags)
+    void Writer::beginComponent(const char* name, const char* interp, uint32 flags)
     {
         if (!m_objectActive)
         {
@@ -390,8 +385,7 @@ namespace Gto
 
     void Writer::endObject() { m_objectActive = false; }
 
-    void Writer::property(const char* name, DataType type, size_t numElements,
-                          const Dimensions& dims, const char* interp)
+    void Writer::property(const char* name, DataType type, size_t numElements, const Dimensions& dims, const char* interp)
     {
         if (!m_objectActive || !m_componentActive)
         {
@@ -423,8 +417,7 @@ namespace Gto
         }
     }
 
-    void Writer::constructStringTable(const std::string* orderedStrings,
-                                      size_t num)
+    void Writer::constructStringTable(const std::string* orderedStrings, size_t num)
     {
         if (num > 0 && orderedStrings == 0)
         {
@@ -468,8 +461,7 @@ namespace Gto
             m_strings[s] = count;
         }
 
-        for (StringMap::iterator i = m_strings.begin(); i != m_strings.end();
-             ++i)
+        for (StringMap::iterator i = m_strings.begin(); i != m_strings.end(); ++i)
         {
             if (i->second == -1)
                 i->second = count++;
@@ -507,8 +499,7 @@ namespace Gto
 
         m_names.resize(m_strings.size());
 
-        for (StringMap::iterator i = m_strings.begin(); i != m_strings.end();
-             ++i)
+        for (StringMap::iterator i = m_strings.begin(); i != m_strings.end(); ++i)
         {
             m_names[i->second] = i->first;
         }
@@ -538,9 +529,7 @@ namespace Gto
 
     void Writer::writeMaybeQuotedString(const string& str)
     {
-        static const char* keywords[] = {"float", "double", "half", "bool",
-                                         "int",   "short",  "byte", "as",
-                                         "GTOa",  "string", 0};
+        static const char* keywords[] = {"float", "double", "half", "bool", "int", "short", "byte", "as", "GTOa", "string", 0};
 
         for (const char** k = keywords; *k; k++)
         {
@@ -724,8 +713,7 @@ namespace Gto
 
         write(&header, sizeof(Header));
 
-        for (StringVector::iterator i = m_names.begin(); i != m_names.end();
-             ++i)
+        for (StringVector::iterator i = m_names.begin(); i != m_names.end(); ++i)
         {
             write(*i);
         }
@@ -751,18 +739,15 @@ namespace Gto
         flush();
     }
 
-    bool Writer::propertySanityCheck(const char* propertyName, uint32 size,
-                                     const Dimensions& dims)
+    bool Writer::propertySanityCheck(const char* propertyName, uint32 size, const Dimensions& dims)
     {
         if (!propertyName)
             return true;
         size_t p = m_currentProperty - 1;
 
-        if (propertyName != NULL
-            && propertyName != m_names[m_properties[p].name])
+        if (propertyName != NULL && propertyName != m_names[m_properties[p].name])
         {
-            std::cerr << "ERROR: Gto::Writer: propertyData expected '"
-                      << m_names[m_properties[p].name] << "' but got data for '"
+            std::cerr << "ERROR: Gto::Writer: propertyData expected '" << m_names[m_properties[p].name] << "' but got data for '"
                       << propertyName << "' instead." << std::endl;
             m_error = true;
             return false;
@@ -770,28 +755,20 @@ namespace Gto
 
         if (size > 0 && size != m_properties[p].size)
         {
-            std::cerr
-                << "ERROR: Gto::Writer: propertyData expected data of size "
-                << m_properties[p].size << " but got data of size " << size
-                << " instead while writing property '"
-                << m_names[m_properties[p].name] << "'" << std::endl;
+            std::cerr << "ERROR: Gto::Writer: propertyData expected data of size " << m_properties[p].size << " but got data of size "
+                      << size << " instead while writing property '" << m_names[m_properties[p].name] << "'" << std::endl;
             m_error = true;
             return false;
         }
 
-        if (dims.x > 0 && dims.x != m_properties[p].dims.x
-            && dims.y != m_properties[p].dims.y
-            && dims.z != m_properties[p].dims.z
+        if (dims.x > 0 && dims.x != m_properties[p].dims.x && dims.y != m_properties[p].dims.y && dims.z != m_properties[p].dims.z
             && dims.w != m_properties[p].dims.w)
         {
             std::cerr << "ERROR: Gto::Writer: propertyData expected data of "
                          "dimension "
-                      << m_properties[p].dims.x << "x" << m_properties[p].dims.y
-                      << "x" << m_properties[p].dims.z << "x"
-                      << m_properties[p].dims.w << " but got data of dimension "
-                      << dims.x << "x" << dims.y << "x" << dims.z << "x"
-                      << dims.w << " instead while writing property '"
-                      << m_names[m_properties[p].name] << "'" << std::endl;
+                      << m_properties[p].dims.x << "x" << m_properties[p].dims.y << "x" << m_properties[p].dims.z << "x"
+                      << m_properties[p].dims.w << " but got data of dimension " << dims.x << "x" << dims.y << "x" << dims.z << "x"
+                      << dims.w << " instead while writing property '" << m_names[m_properties[p].name] << "'" << std::endl;
             m_error = true;
             return false;
         }
@@ -799,8 +776,7 @@ namespace Gto
         return true;
     }
 
-    void Writer::propertyDataRaw(const void* data, const char* propertyName,
-                                 uint32 size, const Dimensions& dims)
+    void Writer::propertyDataRaw(const void* data, const char* propertyName, uint32 size, const Dimensions& dims)
     {
         if (!m_beginDataCalled)
             beginData();
@@ -816,8 +792,7 @@ namespace Gto
         {
             if (m_type == TextGTO)
             {
-                PropertyPath p0 =
-                    p == 0 ? PropertyPath() : m_propertyMap[p - 1];
+                PropertyPath p0 = p == 0 ? PropertyPath() : m_propertyMap[p - 1];
                 PropertyPath p1 = m_propertyMap[p];
 
                 if (p0.objectIndex != p1.objectIndex)
@@ -897,8 +872,7 @@ namespace Gto
                                 writeFormatted("\n");
 
                             writeIndent((i + 1) * 4);
-                            writeMaybeQuotedString(
-                                p1.componentScope[i].c_str());
+                            writeMaybeQuotedString(p1.componentScope[i].c_str());
                             writeFormatted("\n");
                             writeIndent((i + 1) * 4);
                             writeFormatted("{\n");
@@ -927,14 +901,11 @@ namespace Gto
                 }
                 else if (info.dims.x > 0 && info.dims.y > 0 && info.dims.z > 0)
                 {
-                    writeFormatted("[%d,%d,%d]", info.dims.x, info.dims.y,
-                                   info.dims.z);
+                    writeFormatted("[%d,%d,%d]", info.dims.x, info.dims.y, info.dims.z);
                 }
-                else if (info.dims.x > 0 && info.dims.y > 0 && info.dims.z > 0
-                         && info.dims.w > 0)
+                else if (info.dims.x > 0 && info.dims.y > 0 && info.dims.z > 0 && info.dims.w > 0)
                 {
-                    writeFormatted("[%d,%d,%d,%d]", info.dims.x, info.dims.y,
-                                   info.dims.z, info.dims.w);
+                    writeFormatted("[%d,%d,%d,%d]", info.dims.x, info.dims.y, info.dims.z, info.dims.w);
                 }
 
                 writeText(" ");
@@ -967,8 +938,7 @@ namespace Gto
 
                     if (isNumber(DataType(info.type)))
                     {
-                        Number num =
-                            asNumber(bdata + (i * ds), DataType(info.type));
+                        Number num = asNumber(bdata + (i * ds), DataType(info.type));
 
                         if (num.type == Int)
                         {
@@ -991,9 +961,7 @@ namespace Gto
                     }
                 }
 
-                if (n > 0
-                    && (info.dims.x > 1 || info.dims.y > 0 || info.dims.z > 0
-                        || info.dims.w > 0))
+                if (n > 0 && (info.dims.x > 1 || info.dims.y > 0 || info.dims.z > 0 || info.dims.w > 0))
                 {
                     writeText(" ]");
                 }

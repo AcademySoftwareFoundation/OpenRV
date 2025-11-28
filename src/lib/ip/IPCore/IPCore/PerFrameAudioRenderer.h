@@ -51,9 +51,8 @@ namespace IPCore
         /// PerFrameAudioRenderer API
         ///
 
-        FrameData
-        dataForFrame(int f, size_t seqindex,
-                     bool silence = false); // f is relative to startFrame
+        FrameData dataForFrame(int f, size_t seqindex,
+                               bool silence = false); // f is relative to startFrame
 
         ///
         ///  play() will return almost immediately -- a worker thread will

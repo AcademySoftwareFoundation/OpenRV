@@ -28,8 +28,7 @@ namespace TwkAudio
     {
     }
 
-    AudioBuffer::AudioBuffer(size_t numSamples, ChannelsVector channels,
-                             Time rate, Time startTime, size_t margin)
+    AudioBuffer::AudioBuffer(size_t numSamples, ChannelsVector channels, Time rate, Time startTime, size_t margin)
         : m_rate(rate)
         , m_startTime(startTime)
         , m_numSamples(numSamples)
@@ -38,12 +37,10 @@ namespace TwkAudio
         , m_channels(channels)
     {
         m_buffer.resize((m_numSamples + 2 * m_margin) * m_channels.size());
-        m_data =
-            numSamples ? (&m_buffer.front() + margin * m_channels.size()) : 0;
+        m_data = numSamples ? (&m_buffer.front() + margin * m_channels.size()) : 0;
     }
 
-    AudioBuffer::AudioBuffer(size_t numSamples, TwkAudio::Layout layout,
-                             Time rate, Time startTime, size_t margin)
+    AudioBuffer::AudioBuffer(size_t numSamples, TwkAudio::Layout layout, Time rate, Time startTime, size_t margin)
         : m_rate(rate)
         , m_startTime(startTime)
         , m_numSamples(numSamples)
@@ -52,12 +49,10 @@ namespace TwkAudio
         , m_channels(TwkAudio::layoutChannels(layout))
     {
         m_buffer.resize((m_numSamples + 2 * m_margin) * m_channels.size());
-        m_data =
-            numSamples ? (&m_buffer.front() + margin * m_channels.size()) : 0;
+        m_data = numSamples ? (&m_buffer.front() + margin * m_channels.size()) : 0;
     }
 
-    AudioBuffer::AudioBuffer(Time start, Time duration, Time rate,
-                             ChannelsVector channels, size_t margin)
+    AudioBuffer::AudioBuffer(Time start, Time duration, Time rate, ChannelsVector channels, size_t margin)
         : m_startTime(start)
         , m_rate(rate)
         , m_numSamples(size_t(duration * rate + 0.49))
@@ -65,13 +60,10 @@ namespace TwkAudio
         , m_channels(channels)
     {
         m_buffer.resize((m_numSamples + 2 * m_margin) * m_channels.size());
-        m_data =
-            m_numSamples ? (&m_buffer.front() + margin * m_channels.size()) : 0;
+        m_data = m_numSamples ? (&m_buffer.front() + margin * m_channels.size()) : 0;
     }
 
-    AudioBuffer::AudioBuffer(BufferPointer externalMemory,
-                             ChannelsVector channels, size_t numSamples,
-                             Time start, Time rate, size_t margin)
+    AudioBuffer::AudioBuffer(BufferPointer externalMemory, ChannelsVector channels, size_t numSamples, Time start, Time rate, size_t margin)
         : m_startTime(start)
         , m_rate(rate)
         , m_data(externalMemory + margin)
@@ -81,18 +73,14 @@ namespace TwkAudio
     {
     }
 
-    AudioBuffer::AudioBuffer(AudioBuffer& inbuffer, size_t startOffsetSample,
-                             size_t numSamples, Time startTime)
+    AudioBuffer::AudioBuffer(AudioBuffer& inbuffer, size_t startOffsetSample, size_t numSamples, Time startTime)
     {
         m_channels = inbuffer.channels();
         m_numSamples = numSamples;
         m_margin = 0;
         m_rate = inbuffer.rate();
         m_startTime = startTime;
-        m_data =
-            inbuffer.size()
-                ? (inbuffer.pointer() + startOffsetSample * m_channels.size())
-                : 0;
+        m_data = inbuffer.size() ? (inbuffer.pointer() + startOffsetSample * m_channels.size()) : 0;
     }
 
     void AudioBuffer::ownData()
@@ -103,9 +91,7 @@ namespace TwkAudio
 
             if (!m_buffer.empty())
             {
-                memcpy(&m_buffer.front(), m_data - m_margin,
-                       sizeof(float) * m_channels.size()
-                           * (m_numSamples + 2 * m_margin));
+                memcpy(&m_buffer.front(), m_data - m_margin, sizeof(float) * m_channels.size() * (m_numSamples + 2 * m_margin));
 
                 m_data = &m_buffer.front() + m_margin * m_channels.size();
             }
@@ -118,8 +104,7 @@ namespace TwkAudio
         }
     }
 
-    void AudioBuffer::reconfigure(size_t numSamples, ChannelsVector channels,
-                                  Time rate, Time startTime, size_t margin)
+    void AudioBuffer::reconfigure(size_t numSamples, ChannelsVector channels, Time rate, Time startTime, size_t margin)
     {
         ownData();
         m_buffer.resize((numSamples + 2 * margin) * channels.size());
@@ -129,22 +114,18 @@ namespace TwkAudio
         m_rate = rate;
         m_startTime = startTime;
         m_margin = margin;
-        m_data =
-            numSamples ? (&m_buffer.front() + margin * m_channels.size()) : 0;
+        m_data = numSamples ? (&m_buffer.front() + margin * m_channels.size()) : 0;
     }
 
-    void AudioBuffer::reconfigure(size_t numSamples, TwkAudio::Layout layout,
-                                  Time rate, Time startTime, size_t margin)
+    void AudioBuffer::reconfigure(size_t numSamples, TwkAudio::Layout layout, Time rate, Time startTime, size_t margin)
     {
-        return reconfigure(numSamples, layoutChannels(layout), rate, startTime,
-                           margin);
+        return reconfigure(numSamples, layoutChannels(layout), rate, startTime, margin);
     }
 
     void AudioBuffer::zero()
     {
         if (m_data)
-            memset(m_data - m_margin * m_channels.size(), 0,
-                   sizeInBytesIncludingMargin());
+            memset(m_data - m_margin * m_channels.size(), 0, sizeInBytesIncludingMargin());
     }
 
     void AudioBuffer::zeroRegion(size_t start, size_t n)
@@ -246,20 +227,16 @@ namespace TwkAudio
 
         if (maxCount > 1 && m_startTime != 0.0)
         {
-            cerr << "Time=" << m_startTime
-                 << " : AudioBuffer::check() called from " << label << ": "
-                 << "zeroCount=" << maxCount << " gapCount=" << gapCount
-                 << endl;
+            cerr << "Time=" << m_startTime << " : AudioBuffer::check() called from " << label << ": "
+                 << "zeroCount=" << maxCount << " gapCount=" << gapCount << endl;
 
             return false;
         }
 
         if (outOfBoundsCount)
         {
-            cerr << "Time=" << m_startTime
-                 << " : AudioBuffer::check() called from " << label << ": "
-                 << "outOfBoundsCount=" << outOfBoundsCount
-                 << "maxValue=" << maxValue << "minValue=" << minValue << endl;
+            cerr << "Time=" << m_startTime << " : AudioBuffer::check() called from " << label << ": "
+                 << "outOfBoundsCount=" << outOfBoundsCount << "maxValue=" << maxValue << "minValue=" << minValue << endl;
 
             return false;
         }

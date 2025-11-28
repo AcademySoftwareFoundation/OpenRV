@@ -114,15 +114,11 @@ namespace Rv
     using namespace IPCore;
     using namespace TwkQtCoreUtil;
 
-    static void throwBadArgumentException(const Mu::Node& node,
-                                          Mu::Thread& thread,
-                                          const Mu::String& msg)
+    static void throwBadArgumentException(const Mu::Node& node, Mu::Thread& thread, const Mu::String& msg)
     {
         ostringstream str;
-        const Mu::MuLangContext* context =
-            static_cast<const Mu::MuLangContext*>(thread.context());
-        ExceptionType::Exception* e =
-            new ExceptionType::Exception(context->exceptionType());
+        const Mu::MuLangContext* context = static_cast<const Mu::MuLangContext*>(thread.context());
+        ExceptionType::Exception* e = new ExceptionType::Exception(context->exceptionType());
         str << "in " << node.symbol()->fullyQualifiedName() << ": " << msg;
         e->string() += str.str().c_str();
         thread.setException(e);
@@ -146,374 +142,237 @@ namespace Rv
         context->listType(context->tupleType(types));
 
         commands->addSymbols(
-            new Function(c, "framebufferPixelValue", framebufferPixelValue,
-                         None, Return, "vector float[4]", Parameters,
-                         new Param(c, "px", "float"),
-                         new Param(c, "py", "float"), End),
+            new Function(c, "framebufferPixelValue", framebufferPixelValue, None, Return, "vector float[4]", Parameters,
+                         new Param(c, "px", "float"), new Param(c, "py", "float"), End),
 
             new Function(c, "resizeFit", resizeFit, None, Return, "void", End),
 
-            new Function(c, "setViewSize", setViewSize, None, Return, "void",
-                         Parameters, new Param(c, "width", "int"),
+            new Function(c, "setViewSize", setViewSize, None, Return, "void", Parameters, new Param(c, "width", "int"),
                          new Param(c, "height", "int"), End),
 
-            new Function(c, "startupResize", startupResize, None, Return,
-                         "bool", End),
+            new Function(c, "startupResize", startupResize, None, Return, "bool", End),
 
-            new Function(c, "popupMenu", popupMenu, None, Return, "void",
-                         Parameters, new Param(c, "event", "Event"),
-                         new Param(c, "menu", "MenuItem[]", Value(Pointer(0))),
-                         End),
+            new Function(c, "popupMenu", popupMenu, None, Return, "void", Parameters, new Param(c, "event", "Event"),
+                         new Param(c, "menu", "MenuItem[]", Value(Pointer(0))), End),
 
-            new Function(
-                c, "popupMenuAtPoint", popupMenuAtPoint, None, Return, "void",
-                Parameters, new Param(c, "x", "int"), new Param(c, "y", "int"),
-                new Param(c, "menu", "MenuItem[]", Value(Pointer(0))), End),
+            new Function(c, "popupMenuAtPoint", popupMenuAtPoint, None, Return, "void", Parameters, new Param(c, "x", "int"),
+                         new Param(c, "y", "int"), new Param(c, "menu", "MenuItem[]", Value(Pointer(0))), End),
 
-            new Function(c, "setWindowTitle", setWindowTitle, None, Return,
-                         "void", Parameters, new Param(c, "title", "string"),
-                         End),
+            new Function(c, "setWindowTitle", setWindowTitle, None, Return, "void", Parameters, new Param(c, "title", "string"), End),
 
             new Function(c, "center", center, None, Return, "void", End),
 
             new Function(c, "close", close, None, Return, "void", End),
 
-            new Function(c, "toggleMenuBar", toggleMenuBar, None, Return,
-                         "void", End),
+            new Function(c, "toggleMenuBar", toggleMenuBar, None, Return, "void", End),
 
-            new Function(c, "isMenuBarVisible", isMenuBarVisible, None, Return,
-                         "bool", End),
+            new Function(c, "isMenuBarVisible", isMenuBarVisible, None, Return, "bool", End),
 
-            new SymbolicConstant(c, "OneExistingFile", "int",
-                                 Value(int(RvFileDialog::OneExistingFile))),
-            new SymbolicConstant(c, "ManyExistingFiles", "int",
-                                 Value(int(RvFileDialog::ManyExistingFiles))),
-            new SymbolicConstant(
-                c, "ManyExistingFilesAndDirectories", "int",
-                Value(int(RvFileDialog::ManyExistingFilesAndDirectories))),
-            new SymbolicConstant(c, "OneFileName", "int",
-                                 Value(int(RvFileDialog::OneFileName))),
-            new SymbolicConstant(c, "OneDirectory", "int",
-                                 Value(int(RvFileDialog::OneDirectory))),
+            new SymbolicConstant(c, "OneExistingFile", "int", Value(int(RvFileDialog::OneExistingFile))),
+            new SymbolicConstant(c, "ManyExistingFiles", "int", Value(int(RvFileDialog::ManyExistingFiles))),
+            new SymbolicConstant(c, "ManyExistingFilesAndDirectories", "int", Value(int(RvFileDialog::ManyExistingFilesAndDirectories))),
+            new SymbolicConstant(c, "OneFileName", "int", Value(int(RvFileDialog::OneFileName))),
+            new SymbolicConstant(c, "OneDirectory", "int", Value(int(RvFileDialog::OneDirectory))),
 
-            new Function(
-                c, "openMediaFileDialog", openMediaFileDialog, None, Return,
-                "string[]", Parameters, new Param(c, "associated", "bool"),
-                new Param(c, "selectType", "int"),
-                new Param(c, "filter", "string", Value(Pointer(0))),
-                new Param(c, "defaultPath", "string", Value(Pointer(0))),
-                new Param(c, "label", "string", Value(Pointer(0))), End),
+            new Function(c, "openMediaFileDialog", openMediaFileDialog, None, Return, "string[]", Parameters,
+                         new Param(c, "associated", "bool"), new Param(c, "selectType", "int"),
+                         new Param(c, "filter", "string", Value(Pointer(0))), new Param(c, "defaultPath", "string", Value(Pointer(0))),
+                         new Param(c, "label", "string", Value(Pointer(0))), End),
 
-            new Function(
-                c, "openFileDialog", openFileDialog, None, Return, "string[]",
-                Parameters, new Param(c, "associated", "bool"),
-                new Param(c, "multiple", "bool", Value(false)),
-                new Param(c, "directory", "bool", Value(false)),
-                new Param(c, "filter", "string", Value(Pointer(0))),
-                new Param(c, "defaultPath", "string", Value(Pointer(0))), End),
+            new Function(c, "openFileDialog", openFileDialog, None, Return, "string[]", Parameters, new Param(c, "associated", "bool"),
+                         new Param(c, "multiple", "bool", Value(false)), new Param(c, "directory", "bool", Value(false)),
+                         new Param(c, "filter", "string", Value(Pointer(0))), new Param(c, "defaultPath", "string", Value(Pointer(0))),
+                         End),
 
-            new Function(
-                c, "saveFileDialog", saveFileDialog, None, Return, "string",
-                Parameters, new Param(c, "associated", "bool"),
-                new Param(c, "filter", "string", Value(Pointer(0))),
-                new Param(c, "defaultPath", "string", Value(Pointer(0))),
-                new Param(c, "directory", "bool", Value(false)), End),
+            new Function(c, "saveFileDialog", saveFileDialog, None, Return, "string", Parameters, new Param(c, "associated", "bool"),
+                         new Param(c, "filter", "string", Value(Pointer(0))), new Param(c, "defaultPath", "string", Value(Pointer(0))),
+                         new Param(c, "directory", "bool", Value(false)), End),
 
-            new SymbolicConstant(c, "CursorNone", "int",
-                                 Value(int(Qt::BlankCursor))),
-            new SymbolicConstant(c, "CursorArrow", "int",
-                                 Value(int(Qt::ArrowCursor))),
-            new SymbolicConstant(c, "CursorDefault", "int",
-                                 Value(int(Qt::ArrowCursor))),
+            new SymbolicConstant(c, "CursorNone", "int", Value(int(Qt::BlankCursor))),
+            new SymbolicConstant(c, "CursorArrow", "int", Value(int(Qt::ArrowCursor))),
+            new SymbolicConstant(c, "CursorDefault", "int", Value(int(Qt::ArrowCursor))),
 
-            new Function(c, "setCursor", setCursor, None, Return, "void",
-                         Parameters, new Param(c, "cursorType", "int"), End),
+            new Function(c, "setCursor", setCursor, None, Return, "void", Parameters, new Param(c, "cursorType", "int"), End),
 
-            new SymbolicConstant(c, "InfoAlert", "int", Value(0)),
-            new SymbolicConstant(c, "WarningAlert", "int", Value(1)),
+            new SymbolicConstant(c, "InfoAlert", "int", Value(0)), new SymbolicConstant(c, "WarningAlert", "int", Value(1)),
             new SymbolicConstant(c, "ErrorAlert", "int", Value(2)),
 
-            new Function(c, "stereoSupported", stereoSupported, None, Return,
-                         "bool", End),
+            new Function(c, "stereoSupported", stereoSupported, None, Return, "bool", End),
 
-            new Function(c, "alertPanel", alertPanel, None, Return, "int",
-                         Parameters, new Param(c, "associated", "bool"),
-                         new Param(c, "type", "int"),
-                         new Param(c, "title", "string"),
-                         new Param(c, "message", "string"),
-                         new Param(c, "button0", "string"),
-                         new Param(c, "button1", "string"),
-                         new Param(c, "button2", "string"), End),
+            new Function(c, "alertPanel", alertPanel, None, Return, "int", Parameters, new Param(c, "associated", "bool"),
+                         new Param(c, "type", "int"), new Param(c, "title", "string"), new Param(c, "message", "string"),
+                         new Param(c, "button0", "string"), new Param(c, "button1", "string"), new Param(c, "button2", "string"), End),
 
-            new Function(c, "watchFile", watchFile, None, Return, "void",
-                         Parameters, new Param(c, "filename", "string"),
+            new Function(c, "watchFile", watchFile, None, Return, "void", Parameters, new Param(c, "filename", "string"),
                          new Param(c, "watch", "bool"), End),
 
-            new Function(c, "showNetworkDialog", showNetworkDialog, None,
-                         Return, "void", End),
+            new Function(c, "showNetworkDialog", showNetworkDialog, None, Return, "void", End),
 
-            new Function(c, "showConsole", showConsole, None, Return, "void",
-                         End),
+            new Function(c, "showConsole", showConsole, None, Return, "void", End),
 
-            new Function(c, "isConsoleVisible", isConsoleVisible, None, Return,
-                         "bool", End),
+            new Function(c, "isConsoleVisible", isConsoleVisible, None, Return, "bool", End),
             // network
 
-            new Function(
-                c, "remoteSendMessage", remoteSendMessage, None, Return, "void",
-                Parameters, new Param(c, "message", "string"),
-                new Param(c, "recipients", "string[]", Value(Pointer(0))), End),
+            new Function(c, "remoteSendMessage", remoteSendMessage, None, Return, "void", Parameters, new Param(c, "message", "string"),
+                         new Param(c, "recipients", "string[]", Value(Pointer(0))), End),
 
-            new Function(
-                c, "remoteSendEvent", remoteSendEvent, None, Return, "void",
-                Parameters, new Param(c, "event", "string"),
-                new Param(c, "target", "string"),
-                new Param(c, "contents", "string"),
-                new Param(c, "recipients", "string[]", Value(Pointer(0))), End),
+            new Function(c, "remoteSendEvent", remoteSendEvent, None, Return, "void", Parameters, new Param(c, "event", "string"),
+                         new Param(c, "target", "string"), new Param(c, "contents", "string"),
+                         new Param(c, "recipients", "string[]", Value(Pointer(0))), End),
 
-            new Function(c, "remoteSendDataEvent", remoteSendDataEvent, None,
-                         Return, "void", Parameters,
-                         new Param(c, "event", "string"),
-                         new Param(c, "target", "string"),
-                         new Param(c, "interp", "string"),
-                         new Param(c, "data", "byte[]"),
+            new Function(c, "remoteSendDataEvent", remoteSendDataEvent, None, Return, "void", Parameters, new Param(c, "event", "string"),
+                         new Param(c, "target", "string"), new Param(c, "interp", "string"), new Param(c, "data", "byte[]"),
                          new Param(c, "recipients", "string[]"), End),
 
-            new Function(c, "remoteConnections", remoteConnections, None,
-                         Return, "string[]", End),
+            new Function(c, "remoteConnections", remoteConnections, None, Return, "string[]", End),
 
-            new Function(c, "remoteApplications", remoteApplications, None,
-                         Return, "string[]", End),
+            new Function(c, "remoteApplications", remoteApplications, None, Return, "string[]", End),
 
-            new Function(c, "remoteContacts", remoteContacts, None, Return,
-                         "string[]", End),
+            new Function(c, "remoteContacts", remoteContacts, None, Return, "string[]", End),
 
-            new Function(c, "remoteLocalContactName", remoteLocalContactName,
-                         None, Return, "string", End),
+            new Function(c, "remoteLocalContactName", remoteLocalContactName, None, Return, "string", End),
 
-            new Function(c, "setRemoteLocalContactName",
-                         setRemoteLocalContactName, None, Return, "string",
-                         Parameters, new Param(c, "name", "string"), End),
+            new Function(c, "setRemoteLocalContactName", setRemoteLocalContactName, None, Return, "string", Parameters,
+                         new Param(c, "name", "string"), End),
 
-            new Function(c, "remoteConnect", remoteConnect, None, Return,
-                         "void", Parameters, new Param(c, "name", "string"),
-                         new Param(c, "host", "string"),
-                         new Param(c, "port", "int", Value(0)), End),
+            new Function(c, "remoteConnect", remoteConnect, None, Return, "void", Parameters, new Param(c, "name", "string"),
+                         new Param(c, "host", "string"), new Param(c, "port", "int", Value(0)), End),
 
-            new Function(c, "remoteDisconnect", remoteDisconnect, None, Return,
-                         "void", Parameters,
-                         new Param(c, "remoteContact", "string"), End),
+            new Function(c, "remoteDisconnect", remoteDisconnect, None, Return, "void", Parameters, new Param(c, "remoteContact", "string"),
+                         End),
 
-            new Function(c, "remoteNetwork", remoteNetwork, None, Return,
-                         "void", Parameters, new Param(c, "on", "bool"), End),
+            new Function(c, "remoteNetwork", remoteNetwork, None, Return, "void", Parameters, new Param(c, "on", "bool"), End),
 
-            new Function(c, "remoteConnectionIsIncoming",
-                         remoteConnectionIsIncoming, None, Return, "bool",
-                         Parameters, new Param(c, "connection", "string"), End),
+            new Function(c, "remoteConnectionIsIncoming", remoteConnectionIsIncoming, None, Return, "bool", Parameters,
+                         new Param(c, "connection", "string"), End),
 
-            new Function(c, "spoofConnectionStream", spoofConnectionStream,
-                         None, Return, "void", Parameters,
-                         new Param(c, "streamFile", "string"),
-                         new Param(c, "timeScale", "float"),
+            new Function(c, "spoofConnectionStream", spoofConnectionStream, None, Return, "void", Parameters,
+                         new Param(c, "streamFile", "string"), new Param(c, "timeScale", "float"),
                          new Param(c, "verbose", "bool", Value(false)), End),
 
-            new SymbolicConstant(c, "NetworkStatusOn", "int", Value(1)),
-            new SymbolicConstant(c, "NetworkStatusOff", "int", Value(0)),
+            new SymbolicConstant(c, "NetworkStatusOn", "int", Value(1)), new SymbolicConstant(c, "NetworkStatusOff", "int", Value(0)),
 
-            new Function(c, "remoteNetworkStatus", remoteNetworkStatus, None,
-                         Return, "int", End),
+            new Function(c, "remoteNetworkStatus", remoteNetworkStatus, None, Return, "int", End),
 
-            new SymbolicConstant(c, "NetworkPermissionAsk", "int",
-                                 Value(int(RvNetworkDialog::AskConnect))),
-            new SymbolicConstant(c, "NetworkPermissionAllow", "int",
-                                 Value(int(RvNetworkDialog::AllowConnect))),
-            new SymbolicConstant(c, "NetworkPermissionDeny", "int",
-                                 Value(int(RvNetworkDialog::DenyConnect))),
+            new SymbolicConstant(c, "NetworkPermissionAsk", "int", Value(int(RvNetworkDialog::AskConnect))),
+            new SymbolicConstant(c, "NetworkPermissionAllow", "int", Value(int(RvNetworkDialog::AllowConnect))),
+            new SymbolicConstant(c, "NetworkPermissionDeny", "int", Value(int(RvNetworkDialog::DenyConnect))),
 
-            new Function(c, "remoteDefaultPermission", remoteDefaultPermission,
-                         None, Return, "int", End),
+            new Function(c, "remoteDefaultPermission", remoteDefaultPermission, None, Return, "int", End),
 
-            new Function(c, "setRemoteDefaultPermission",
-                         setRemoteDefaultPermission, None, Return, "void",
-                         Parameters, new Param(c, "permission", "int"), End),
+            new Function(c, "setRemoteDefaultPermission", setRemoteDefaultPermission, None, Return, "void", Parameters,
+                         new Param(c, "permission", "int"), End),
 
-            new Function(c, "writeSetting", writeSetting, None, Return, "void",
-                         Parameters, new Param(c, "group", "string"),
-                         new Param(c, "name", "string"),
-                         new Param(c, "value", "SettingsValue"), End),
+            new Function(c, "writeSetting", writeSetting, None, Return, "void", Parameters, new Param(c, "group", "string"),
+                         new Param(c, "name", "string"), new Param(c, "value", "SettingsValue"), End),
 
-            new Function(c, "readSetting", readSetting, None, Return,
-                         "SettingsValue", Parameters,
-                         new Param(c, "group", "string"),
-                         new Param(c, "name", "string"),
-                         new Param(c, "defaultValue", "SettingsValue"), End),
+            new Function(c, "readSetting", readSetting, None, Return, "SettingsValue", Parameters, new Param(c, "group", "string"),
+                         new Param(c, "name", "string"), new Param(c, "defaultValue", "SettingsValue"), End),
 
-            new Function(
-                c, "httpGet", httpGet, None, Return, "void", Parameters,
-                new Param(c, "url", "string"),
-                new Param(c, "headers", "[(string,string)]"),
-                new Param(c, "replyEvent", "string"),
-                new Param(c, "authenticationEvent", "string",
-                          Value(Pointer(0))),
-                new Param(c, "progressEvent", "string", Value(Pointer(0))),
-                new Param(c, "ignoreSslErrors", "bool", Value(false)),
-                new Param(c, "urlIsEncoded", "bool", Value(false)), End),
+            new Function(c, "httpGet", httpGet, None, Return, "void", Parameters, new Param(c, "url", "string"),
+                         new Param(c, "headers", "[(string,string)]"), new Param(c, "replyEvent", "string"),
+                         new Param(c, "authenticationEvent", "string", Value(Pointer(0))),
+                         new Param(c, "progressEvent", "string", Value(Pointer(0))), new Param(c, "ignoreSslErrors", "bool", Value(false)),
+                         new Param(c, "urlIsEncoded", "bool", Value(false)), End),
 
-            new Function(
-                c, "httpPost", httpPostString, None, Return, "void", Parameters,
-                new Param(c, "url", "string"),
-                new Param(c, "headers", "[(string,string)]"),
-                new Param(c, "postString", "string"),
-                new Param(c, "replyEvent", "string"),
-                new Param(c, "authenticationEvent", "string",
-                          Value(Pointer(0))),
-                new Param(c, "progressEvent", "string", Value(Pointer(0))),
-                new Param(c, "ignoreSslErrors", "bool", Value(false)),
-                new Param(c, "urlIsEncoded", "bool", Value(false)), End),
+            new Function(c, "httpPost", httpPostString, None, Return, "void", Parameters, new Param(c, "url", "string"),
+                         new Param(c, "headers", "[(string,string)]"), new Param(c, "postString", "string"),
+                         new Param(c, "replyEvent", "string"), new Param(c, "authenticationEvent", "string", Value(Pointer(0))),
+                         new Param(c, "progressEvent", "string", Value(Pointer(0))), new Param(c, "ignoreSslErrors", "bool", Value(false)),
+                         new Param(c, "urlIsEncoded", "bool", Value(false)), End),
 
-            new Function(
-                c, "httpPost", httpPostData, None, Return, "void", Parameters,
-                new Param(c, "url", "string"),
-                new Param(c, "headers", "[(string,string)]"),
-                new Param(c, "postData", "byte[]"),
-                new Param(c, "replyEvent", "string"),
-                new Param(c, "authenticationEvent", "string",
-                          Value(Pointer(0))),
-                new Param(c, "progressEvent", "string", Value(Pointer(0))),
-                new Param(c, "ignoreSslErrors", "bool", Value(false)),
-                new Param(c, "urlIsEncoded", "bool", Value(false)), End),
+            new Function(c, "httpPost", httpPostData, None, Return, "void", Parameters, new Param(c, "url", "string"),
+                         new Param(c, "headers", "[(string,string)]"), new Param(c, "postData", "byte[]"),
+                         new Param(c, "replyEvent", "string"), new Param(c, "authenticationEvent", "string", Value(Pointer(0))),
+                         new Param(c, "progressEvent", "string", Value(Pointer(0))), new Param(c, "ignoreSslErrors", "bool", Value(false)),
+                         new Param(c, "urlIsEncoded", "bool", Value(false)), End),
 
-            new Function(
-                c, "httpPut", httpPutString, None, Return, "void", Parameters,
-                new Param(c, "url", "string"),
-                new Param(c, "headers", "[(string,string)]"),
-                new Param(c, "putString", "string"),
-                new Param(c, "replyEvent", "string"),
-                new Param(c, "authenticationEvent", "string",
-                          Value(Pointer(0))),
-                new Param(c, "progressEvent", "string", Value(Pointer(0))),
-                new Param(c, "ignoreSslErrors", "bool", Value(false)),
-                new Param(c, "urlIsEncoded", "bool", Value(false)), End),
+            new Function(c, "httpPut", httpPutString, None, Return, "void", Parameters, new Param(c, "url", "string"),
+                         new Param(c, "headers", "[(string,string)]"), new Param(c, "putString", "string"),
+                         new Param(c, "replyEvent", "string"), new Param(c, "authenticationEvent", "string", Value(Pointer(0))),
+                         new Param(c, "progressEvent", "string", Value(Pointer(0))), new Param(c, "ignoreSslErrors", "bool", Value(false)),
+                         new Param(c, "urlIsEncoded", "bool", Value(false)), End),
 
-            new Function(
-                c, "httpPut", httpPutData, None, Return, "void", Parameters,
-                new Param(c, "url", "string"),
-                new Param(c, "headers", "[(string,string)]"),
-                new Param(c, "putData", "byte[]"),
-                new Param(c, "replyEvent", "string"),
-                new Param(c, "authenticationEvent", "string",
-                          Value(Pointer(0))),
-                new Param(c, "progressEvent", "string", Value(Pointer(0))),
-                new Param(c, "ignoreSslErrors", "bool", Value(false)),
-                new Param(c, "urlIsEncoded", "bool", Value(false)), End),
+            new Function(c, "httpPut", httpPutData, None, Return, "void", Parameters, new Param(c, "url", "string"),
+                         new Param(c, "headers", "[(string,string)]"), new Param(c, "putData", "byte[]"),
+                         new Param(c, "replyEvent", "string"), new Param(c, "authenticationEvent", "string", Value(Pointer(0))),
+                         new Param(c, "progressEvent", "string", Value(Pointer(0))), new Param(c, "ignoreSslErrors", "bool", Value(false)),
+                         new Param(c, "urlIsEncoded", "bool", Value(false)), End),
 
-            new Function(c, "mainWindowWidget", mainWindowWidget, None, Return,
-                         "qt.QMainWindow", End),
+            new Function(c, "mainWindowWidget", mainWindowWidget, None, Return, "qt.QMainWindow", End),
 
-            new Function(c, "mainViewWidget", mainViewWidget, None, Return,
-                         "qt.QWidget", End),
+            new Function(c, "mainViewWidget", mainViewWidget, None, Return, "qt.QWidget", End),
 
-            new Function(c, "prefTabWidget", prefTabWidget, None, Return,
-                         "qt.QTabWidget", End),
+            new Function(c, "prefTabWidget", prefTabWidget, None, Return, "qt.QTabWidget", End),
 
-            new Function(c, "sessionBottomToolBar", sessionBottomToolBar, None,
-                         Return, "qt.QToolBar", End),
+            new Function(c, "sessionBottomToolBar", sessionBottomToolBar, None, Return, "qt.QToolBar", End),
 
-            new Function(c, "networkAccessManager", networkAccessManager, None,
-                         Return, "qt.QNetworkAccessManager", End),
+            new Function(c, "networkAccessManager", networkAccessManager, None, Return, "qt.QNetworkAccessManager", End),
 
-            new Function(c, "javascriptMuExport", javascriptMuExport, None,
-                         Return, "void", Parameters,
+            new Function(c, "javascriptMuExport", javascriptMuExport, None, Return, "void", Parameters,
                          new Param(c, "frame", "qt.QWebEnginePage"), End),
 
-            new Function(c, "sessionFromUrl", sessionFromUrl, None, Return,
-                         "void", Parameters, new Param(c, "url", "string"),
-                         End),
+            new Function(c, "sessionFromUrl", sessionFromUrl, None, Return, "void", Parameters, new Param(c, "url", "string"), End),
 
-            new Function(c, "putUrlOnClipboard", putUrlOnClipboard, None,
-                         Return, "void", Parameters,
-                         new Param(c, "url", "string"),
-                         new Param(c, "title", "string"),
-                         new Param(c, "doEncode", "bool", Value(true)), End),
+            new Function(c, "putUrlOnClipboard", putUrlOnClipboard, None, Return, "void", Parameters, new Param(c, "url", "string"),
+                         new Param(c, "title", "string"), new Param(c, "doEncode", "bool", Value(true)), End),
 
-            new Function(c, "myNetworkPort", myNetworkPort, None, Return, "int",
-                         End),
+            new Function(c, "myNetworkPort", myNetworkPort, None, Return, "int", End),
 
-            new Function(c, "myNetworkHost", myNetworkHost, None, Return,
-                         "string", End),
+            new Function(c, "myNetworkHost", myNetworkHost, None, Return, "string", End),
 
-            new Function(c, "encodePassword", encodePassword, None, Return,
-                         "string", Parameters,
-                         new Param(c, "password", "string"), End),
+            new Function(c, "encodePassword", encodePassword, None, Return, "string", Parameters, new Param(c, "password", "string"), End),
 
-            new Function(c, "decodePassword", decodePassword, None, Return,
-                         "string", Parameters,
-                         new Param(c, "password", "string"), End),
+            new Function(c, "decodePassword", decodePassword, None, Return, "string", Parameters, new Param(c, "password", "string"), End),
 
             new Function(c, "cacheDir", cacheDir, None, Return, "string", End),
 
-            new Function(c, "openUrl", openUrl, None, Return, "void",
-                         Parameters, new Param(c, "url", "string"), End),
+            new Function(c, "openUrl", openUrl, None, Return, "void", Parameters, new Param(c, "url", "string"), End),
 
-            new Function(c, "openUrlFromUrl", openUrlFromUrl, None, Return,
-                         "void", Parameters, new Param(c, "url", "qt.QUrl"),
-                         End),
+            new Function(c, "openUrlFromUrl", openUrlFromUrl, None, Return, "void", Parameters, new Param(c, "url", "qt.QUrl"), End),
 
-            new Function(c, "queryDriverAttribute", queryDriverAttribute, None,
-                         Return, "string", Parameters,
+            new Function(c, "queryDriverAttribute", queryDriverAttribute, None, Return, "string", Parameters,
                          new Param(c, "attribute", "string"), End),
 
-            new Function(c, "setDriverAttribute", setDriverAttribute, None,
-                         Return, "void", Parameters,
-                         new Param(c, "attribute", "string"),
+            new Function(c, "setDriverAttribute", setDriverAttribute, None, Return, "void", Parameters, new Param(c, "attribute", "string"),
                          new Param(c, "value", "string"), End),
 
-            new Function(c, "setPresentationMode", setPresentationMode, None,
-                         Return, "void", Parameters,
-                         new Param(c, "value", "bool"), End),
+            new Function(c, "setPresentationMode", setPresentationMode, None, Return, "void", Parameters, new Param(c, "value", "bool"),
+                         End),
 
-            new Function(c, "presentationMode", presentationMode, None, Return,
-                         "bool", End),
+            new Function(c, "presentationMode", presentationMode, None, Return, "bool", End),
 
-            new Function(c, "packageListFromSetting", packageListFromSetting,
-                         None, Return, "string[]", Parameters,
+            new Function(c, "setPresentationDevice", setPresentationDevice, None, Return, "void", Parameters,
+                         new Param(c, "name", "string"), End),
+
+            new Function(c, "loadSettingsIntoOptions", loadSettingsIntoOptions, None, Return, "void", End),
+
+            new Function(c, "packageListFromSetting", packageListFromSetting, None, Return, "string[]", Parameters,
                          new Param(c, "settingName", "string"), End),
 
-            new Function(c, "showTopViewToolbar", showTopViewToolbar, None,
-                         Return, "void", Parameters,
-                         new Param(c, "show", "bool"), End),
+            new Function(c, "showTopViewToolbar", showTopViewToolbar, None, Return, "void", Parameters, new Param(c, "show", "bool"), End),
 
-            new Function(c, "showBottomViewToolbar", showBottomViewToolbar,
-                         None, Return, "void", Parameters,
-                         new Param(c, "show", "bool"), End),
-
-            new Function(c, "isTopViewToolbarVisible", isTopViewToolbarVisible,
-                         None, Return, "bool", End),
-
-            new Function(c, "isBottomViewToolbarVisible",
-                         isBottomViewToolbarVisible, None, Return, "bool", End),
-
-            new Function(c, "editNodeSource", editNodeSource, None, Return,
-                         "void", Parameters, new Param(c, "nodeName", "string"),
+            new Function(c, "showBottomViewToolbar", showBottomViewToolbar, None, Return, "void", Parameters, new Param(c, "show", "bool"),
                          End),
 
-            new Function(c, "editProfiles", editProfiles, None, Return, "void",
-                         End),
+            new Function(c, "isTopViewToolbarVisible", isTopViewToolbarVisible, None, Return, "bool", End),
 
-            new Function(c, "validateShotgunToken", validateShotgunToken, None,
-                         Return, "string", Parameters,
-                         new Param(c, "port", "int", Value(-1)),
-                         new Param(c, "tag", "string", Value(Pointer(0))), End),
+            new Function(c, "isBottomViewToolbarVisible", isBottomViewToolbarVisible, None, Return, "bool", End),
+
+            new Function(c, "editNodeSource", editNodeSource, None, Return, "void", Parameters, new Param(c, "nodeName", "string"), End),
+
+            new Function(c, "editProfiles", editProfiles, None, Return, "void", End),
+
+            new Function(c, "validateShotgunToken", validateShotgunToken, None, Return, "string", Parameters,
+                         new Param(c, "port", "int", Value(-1)), new Param(c, "tag", "string", Value(Pointer(0))), End),
 
             new Function(c, "launchTLI", launchTLI, None, Return, "void", End),
 
             new Function(c, "rvioSetup", rvioSetup, None, Return, "void", End),
 
-            new Function(c, "showDiagnostics", showDiagnostics, None, Return,
-                         "void", End),
+            new Function(c, "showDiagnostics", showDiagnostics, None, Return, "void", End),
 
-            new Function(c, "devicePixelRatio", devicePixelRatio, None, Return,
-                         "float", End),
+            new Function(c, "devicePixelRatio", devicePixelRatio, None, Return, "float", End),
 
             EndArguments);
     }
@@ -634,14 +493,12 @@ namespace Rv
         Session* s = Session::currentSession();
         RvDocument* rvDoc = (RvDocument*)s->opaquePointer();
 
-        TwkApp::EventType::EventInstance* e =
-            NODE_ARG_OBJECT(0, TwkApp::EventType::EventInstance);
+        TwkApp::EventType::EventInstance* e = NODE_ARG_OBJECT(0, TwkApp::EventType::EventInstance);
 
         DynamicArray* array = NODE_ARG_OBJECT(1, DynamicArray);
         QPoint lp;
 
-        if (const TwkApp::PointerEvent* pevent =
-                dynamic_cast<const TwkApp::PointerEvent*>(e->event))
+        if (const TwkApp::PointerEvent* pevent = dynamic_cast<const TwkApp::PointerEvent*>(e->event))
         {
             lp = QPoint(pevent->x(), rvDoc->view()->height() - pevent->y() - 1);
         }
@@ -668,8 +525,7 @@ namespace Rv
 
     NODE_IMPLEMENTATION(setWindowTitle, void)
     {
-        const StringType::String* title =
-            NODE_ARG_OBJECT(0, StringType::String);
+        const StringType::String* title = NODE_ARG_OBJECT(0, StringType::String);
 
         Session* s = Session::currentSession();
         assert(s);
@@ -734,10 +590,8 @@ namespace Rv
         StringType::String* path = NODE_ARG_OBJECT(3, StringType::String);
         StringType::String* label = NODE_ARG_OBJECT(4, StringType::String);
 
-        const DynamicArrayType* atype =
-            static_cast<const DynamicArrayType*>(NODE_THIS.type());
-        const StringType* stype =
-            static_cast<const StringType*>(atype->elementType());
+        const DynamicArrayType* atype = static_cast<const DynamicArrayType*>(NODE_THIS.type());
+        const StringType* stype = static_cast<const StringType*>(atype->elementType());
 
         FileTypeTraits* traits = 0;
         bool hasSinglePair = false;
@@ -783,10 +637,8 @@ namespace Rv
 
         if (sessionToMediaDialog.find(s) == sessionToMediaDialog.end())
         {
-            sessionToMediaDialog[s] = new RvFileDialog(
-                rvDoc, new MediaFileTypes(true, false),
-                RvFileDialog::OpenFileRole, sheet ? Qt::Sheet : Qt::Dialog,
-                "MediaFileDialog");
+            sessionToMediaDialog[s] = new RvFileDialog(rvDoc, new MediaFileTypes(true, false), RvFileDialog::OpenFileRole,
+                                                       sheet ? Qt::Sheet : Qt::Dialog, "MediaFileDialog");
         }
 
         RvFileDialog& dialog = *sessionToMediaDialog[s];
@@ -823,8 +675,7 @@ namespace Rv
         else
         {
             MuLangContext* context = static_cast<MuLangContext*>(p->context());
-            ExceptionType::Exception* e =
-                new ExceptionType::Exception(context->exceptionType());
+            ExceptionType::Exception* e = new ExceptionType::Exception(context->exceptionType());
             e->string() += "operation cancelled";
             NODE_THREAD.setException(e);
             ProgramException exc(NODE_THREAD, e);
@@ -858,10 +709,8 @@ namespace Rv
         StringType::String* filter = NODE_ARG_OBJECT(3, StringType::String);
         StringType::String* path = NODE_ARG_OBJECT(4, StringType::String);
 
-        const DynamicArrayType* atype =
-            static_cast<const DynamicArrayType*>(NODE_THIS.type());
-        const StringType* stype =
-            static_cast<const StringType*>(atype->elementType());
+        const DynamicArrayType* atype = static_cast<const DynamicArrayType*>(NODE_THIS.type());
+        const StringType* stype = static_cast<const StringType*>(atype->elementType());
 
         FileTypeTraits* traits = 0;
         bool hasSinglePair = false;
@@ -902,9 +751,8 @@ namespace Rv
 
         if (sessionToOpenDialog.find(s) == sessionToOpenDialog.end())
         {
-            sessionToOpenDialog[s] = new RvFileDialog(
-                rvDoc, traits, RvFileDialog::OpenFileRole,
-                sheet ? Qt::Sheet : Qt::Dialog, "OpenFileDialog");
+            sessionToOpenDialog[s] =
+                new RvFileDialog(rvDoc, traits, RvFileDialog::OpenFileRole, sheet ? Qt::Sheet : Qt::Dialog, "OpenFileDialog");
         }
         else
         {
@@ -917,14 +765,12 @@ namespace Rv
             dialog.setFileTypeIndex(2);
 
         dialog.setFileMode(multi ? RvFileDialog::ManyExistingFiles
-                                 : ((directory) ? RvFileDialog::OneDirectoryName
-                                                : RvFileDialog::OneFileName));
+                                 : ((directory) ? RvFileDialog::OneDirectoryName : RvFileDialog::OneFileName));
 
         if (path)
             dialog.setDirectory(UTF8::qconvert(path->c_str()));
         dialog.setRole(RvFileDialog::OpenFileRole);
-        dialog.setTitleLabel(multi ? QString("Open Files")
-                                   : QString("Open File"));
+        dialog.setTitleLabel(multi ? QString("Open Files") : QString("Open File"));
         dialog.setViewMode(RvFileDialog::DetailedFileView);
         dialog.lockViewMode(true);
 
@@ -952,8 +798,7 @@ namespace Rv
         else
         {
             MuLangContext* context = static_cast<MuLangContext*>(p->context());
-            ExceptionType::Exception* e =
-                new ExceptionType::Exception(context->exceptionType());
+            ExceptionType::Exception* e = new ExceptionType::Exception(context->exceptionType());
             e->string() += "operation cancelled";
             NODE_THREAD.setException(e);
             ProgramException exc(NODE_THREAD, e);
@@ -975,8 +820,7 @@ namespace Rv
         StringType::String* path = NODE_ARG_OBJECT(2, StringType::String);
         bool directory = NODE_ARG(3, bool);
 
-        const StringType* stype =
-            static_cast<const StringType*>(NODE_THIS.type());
+        const StringType* stype = static_cast<const StringType*>(NODE_THIS.type());
 
         FileTypeTraits* traits = 0;
         bool hasSinglePair = false;
@@ -1015,9 +859,8 @@ namespace Rv
 
         if (sessionToSaveDialog.find(s) == sessionToSaveDialog.end())
         {
-            sessionToSaveDialog[s] = new RvFileDialog(
-                rvDoc, traits, RvFileDialog::SaveFileRole,
-                sheet ? Qt::Sheet : Qt::Dialog, "SaveFileDialog");
+            sessionToSaveDialog[s] =
+                new RvFileDialog(rvDoc, traits, RvFileDialog::SaveFileRole, sheet ? Qt::Sheet : Qt::Dialog, "SaveFileDialog");
         }
         else
         {
@@ -1026,8 +869,7 @@ namespace Rv
 
         RvFileDialog& dialog = *sessionToSaveDialog[s];
 
-        dialog.setFileMode((directory) ? RvFileDialog::OneDirectoryName
-                                       : RvFileDialog::OneFileName);
+        dialog.setFileMode((directory) ? RvFileDialog::OneDirectoryName : RvFileDialog::OneFileName);
 
         if (hasSinglePair)
             dialog.setFileTypeIndex(2);
@@ -1058,39 +900,27 @@ namespace Rv
                 //  QFileInfo says a non-existant file is not writable, so have
                 //  to check the directory in that case.
                 //
-                const bool isDirWritable = TwkUtil::isWritable(
-                    UTF8::qconvert(info.absolutePath()).c_str());
+                const bool isDirWritable = TwkUtil::isWritable(UTF8::qconvert(info.absolutePath()).c_str());
                 const bool isFileWritable = TwkUtil::isWritable(v.c_str());
-                if ((!info.exists() && !isDirWritable)
-                    || (info.exists() && !isFileWritable))
+                if ((!info.exists() && !isDirWritable) || (info.exists() && !isFileWritable))
                 {
-                    QString message =
-                        QString("File '") + UTF8::qconvert(v.c_str())
-                        + "' is not writable; please check the permissions or "
-                          "choose another location.";
-                    QMessageBox confirm(QMessageBox::Warning, "Permissions",
-                                        message, QMessageBox::NoButton, rvDoc,
-                                        Qt::Sheet);
+                    QString message = QString("File '") + UTF8::qconvert(v.c_str())
+                                      + "' is not writable; please check the permissions or "
+                                        "choose another location.";
+                    QMessageBox confirm(QMessageBox::Warning, "Permissions", message, QMessageBox::NoButton, rvDoc, Qt::Sheet);
 
-                    QPushButton* q1 =
-                        confirm.addButton("OK", QMessageBox::AcceptRole);
+                    QPushButton* q1 = confirm.addButton("OK", QMessageBox::AcceptRole);
                     confirm.setIcon(QMessageBox::Question);
                     confirm.exec();
                     v = "";
                 }
                 else if (info.exists())
                 {
-                    QString message = QString("File '")
-                                      + UTF8::qconvert(v.c_str())
-                                      + "' exists; overwrite ?";
-                    QMessageBox confirm(QMessageBox::Warning, "Overwrite",
-                                        message, QMessageBox::NoButton, rvDoc,
-                                        Qt::Sheet);
+                    QString message = QString("File '") + UTF8::qconvert(v.c_str()) + "' exists; overwrite ?";
+                    QMessageBox confirm(QMessageBox::Warning, "Overwrite", message, QMessageBox::NoButton, rvDoc, Qt::Sheet);
 
-                    QPushButton* q1 =
-                        confirm.addButton("Overwrite", QMessageBox::AcceptRole);
-                    QPushButton* q2 =
-                        confirm.addButton("Cancel", QMessageBox::RejectRole);
+                    QPushButton* q1 = confirm.addButton("Overwrite", QMessageBox::AcceptRole);
+                    QPushButton* q2 = confirm.addButton("Cancel", QMessageBox::RejectRole);
                     confirm.setIcon(QMessageBox::Question);
                     confirm.exec();
                     if (confirm.clickedButton() != q1)
@@ -1099,10 +929,8 @@ namespace Rv
             }
             else
             {
-                MuLangContext* context =
-                    static_cast<MuLangContext*>(p->context());
-                ExceptionType::Exception* e =
-                    new ExceptionType::Exception(context->exceptionType());
+                MuLangContext* context = static_cast<MuLangContext*>(p->context());
+                ExceptionType::Exception* e = new ExceptionType::Exception(context->exceptionType());
                 e->string() += "operation cancelled";
                 NODE_THREAD.setException(e);
                 ProgramException exc(NODE_THREAD, e);
@@ -1127,8 +955,7 @@ namespace Rv
         Process* p = NODE_THREAD.process();
         bool sheet = NODE_ARG(0, bool);
         int type = NODE_ARG(1, int);
-        const StringType::String* title =
-            NODE_ARG_OBJECT(2, StringType::String);
+        const StringType::String* title = NODE_ARG_OBJECT(2, StringType::String);
         const StringType::String* msg = NODE_ARG_OBJECT(3, StringType::String);
         const StringType::String* b1 = NODE_ARG_OBJECT(4, StringType::String);
         const StringType::String* b2 = NODE_ARG_OBJECT(5, StringType::String);
@@ -1154,14 +981,9 @@ namespace Rv
         box.setWindowModality(Qt::WindowModal);
 #endif
 
-        QPushButton* q1 =
-            box.addButton(UTF8::qconvert(b1->c_str()), QMessageBox::AcceptRole);
-        QPushButton* q2 = b2 ? box.addButton(UTF8::qconvert(b2->c_str()),
-                                             QMessageBox::RejectRole)
-                             : 0;
-        QPushButton* q3 = b3 ? box.addButton(UTF8::qconvert(b3->c_str()),
-                                             QMessageBox::ApplyRole)
-                             : 0;
+        QPushButton* q1 = box.addButton(UTF8::qconvert(b1->c_str()), QMessageBox::AcceptRole);
+        QPushButton* q2 = b2 ? box.addButton(UTF8::qconvert(b2->c_str()), QMessageBox::RejectRole) : 0;
+        QPushButton* q3 = b3 ? box.addButton(UTF8::qconvert(b3->c_str()), QMessageBox::ApplyRole) : 0;
 
         switch (type)
         {
@@ -1235,10 +1057,7 @@ namespace Rv
         RvApp()->console()->raise();
     }
 
-    NODE_IMPLEMENTATION(isConsoleVisible, bool)
-    {
-        NODE_RETURN(RvApp()->console()->isVisible());
-    }
+    NODE_IMPLEMENTATION(isConsoleVisible, bool) { NODE_RETURN(RvApp()->console()->isVisible()); }
 
     NODE_IMPLEMENTATION(remoteSendMessage, void)
     {
@@ -1254,8 +1073,7 @@ namespace Rv
             {
                 for (int i = 0; i < recipients->size(); i++)
                 {
-                    if (StringType::String* s =
-                            recipients->element<StringType::String*>(i))
+                    if (StringType::String* s = recipients->element<StringType::String*>(i))
                     {
                         client->sendMessage(s->c_str(), msg->c_str());
                     }
@@ -1284,18 +1102,15 @@ namespace Rv
             {
                 for (int i = 0; i < recipients->size(); i++)
                 {
-                    if (StringType::String* s =
-                            recipients->element<StringType::String*>(i))
+                    if (StringType::String* s = recipients->element<StringType::String*>(i))
                     {
-                        client->sendEvent(s->c_str(), event->c_str(),
-                                          target->c_str(), msg->c_str());
+                        client->sendEvent(s->c_str(), event->c_str(), target->c_str(), msg->c_str());
                     }
                 }
             }
             else
             {
-                client->broadcastEvent(event->c_str(), target->c_str(),
-                                       msg->c_str());
+                client->broadcastEvent(event->c_str(), target->c_str(), msg->c_str());
             }
         }
     }
@@ -1311,8 +1126,7 @@ namespace Rv
         if (!array || !interp || !target || !event)
             throw NilArgumentException(NODE_THREAD);
 
-        string newInterp = string("DATAEVENT(") + event->c_str() + ","
-                           + target->c_str() + "," + interp->c_str() + ")";
+        string newInterp = string("DATAEVENT(") + event->c_str() + "," + target->c_str() + "," + interp->c_str() + ")";
 
         const unsigned char* datap = array->data<unsigned char>();
         QByteArray qarray((const char*)datap, array->size());
@@ -1323,8 +1137,7 @@ namespace Rv
             {
                 for (int i = 0; i < recipients->size(); i++)
                 {
-                    if (StringType::String* s =
-                            recipients->element<StringType::String*>(i))
+                    if (StringType::String* s = recipients->element<StringType::String*>(i))
                     {
                         client->sendData(s->c_str(), newInterp.c_str(), qarray);
                     }
@@ -1337,10 +1150,8 @@ namespace Rv
     {
         Session* s = Session::currentSession();
         Process* p = NODE_THREAD.process();
-        const DynamicArrayType* atype =
-            static_cast<const DynamicArrayType*>(NODE_THIS.type());
-        const StringType* stype =
-            static_cast<const StringType*>(atype->elementType());
+        const DynamicArrayType* atype = static_cast<const DynamicArrayType*>(NODE_THIS.type());
+        const StringType* stype = static_cast<const StringType*>(atype->elementType());
         DynamicArray* array = new DynamicArray(atype, 1);
         RvNetworkDialog* d = RvApp()->networkWindow();
         vector<string> connections = d->connections();
@@ -1356,8 +1167,7 @@ namespace Rv
         array->resize(myConnections.size());
         for (int i = 0; i < myConnections.size(); i++)
         {
-            array->element<StringType::String*>(i) =
-                stype->allocate(myConnections[i]);
+            array->element<StringType::String*>(i) = stype->allocate(myConnections[i]);
         }
 
         NODE_RETURN(array);
@@ -1367,10 +1177,8 @@ namespace Rv
     {
         Session* s = Session::currentSession();
         Process* p = NODE_THREAD.process();
-        const DynamicArrayType* atype =
-            static_cast<const DynamicArrayType*>(NODE_THIS.type());
-        const StringType* stype =
-            static_cast<const StringType*>(atype->elementType());
+        const DynamicArrayType* atype = static_cast<const DynamicArrayType*>(NODE_THIS.type());
+        const StringType* stype = static_cast<const StringType*>(atype->elementType());
         DynamicArray* array = new DynamicArray(atype, 1);
         RvNetworkDialog* d = RvApp()->networkWindow();
         vector<string> apps = d->applications();
@@ -1389,10 +1197,8 @@ namespace Rv
     {
         Session* s = Session::currentSession();
         Process* p = NODE_THREAD.process();
-        const DynamicArrayType* atype =
-            static_cast<const DynamicArrayType*>(NODE_THIS.type());
-        const StringType* stype =
-            static_cast<const StringType*>(atype->elementType());
+        const DynamicArrayType* atype = static_cast<const DynamicArrayType*>(NODE_THIS.type());
+        const StringType* stype = static_cast<const StringType*>(atype->elementType());
         DynamicArray* array = new DynamicArray(atype, 1);
         RvNetworkDialog* d = RvApp()->networkWindow();
         vector<string> contacts = d->contacts();
@@ -1401,8 +1207,7 @@ namespace Rv
 
         for (int i = 0; i < contacts.size(); i++)
         {
-            array->element<StringType::String*>(i) =
-                stype->allocate(contacts[i]);
+            array->element<StringType::String*>(i) = stype->allocate(contacts[i]);
         }
 
         NODE_RETURN(array);
@@ -1410,11 +1215,9 @@ namespace Rv
 
     NODE_IMPLEMENTATION(remoteLocalContactName, Pointer)
     {
-        const StringType* stype =
-            static_cast<const StringType*>(NODE_THIS.type());
+        const StringType* stype = static_cast<const StringType*>(NODE_THIS.type());
 
-        NODE_RETURN(stype->allocate(
-            RvApp()->networkWindow()->localContactName().c_str()));
+        NODE_RETURN(stype->allocate(RvApp()->networkWindow()->localContactName().c_str()));
     }
 
     NODE_IMPLEMENTATION(setRemoteLocalContactName, void)
@@ -1493,8 +1296,7 @@ namespace Rv
 
         RvNetworkDialog* d = RvApp()->networkWindow();
 
-        d->spoofConnectionStream(UTF8::qconvert(name->c_str()), timeScale,
-                                 verbose);
+        d->spoofConnectionStream(UTF8::qconvert(name->c_str()), timeScale, verbose);
     }
 
     NODE_IMPLEMENTATION(remoteNetworkStatus, int)
@@ -1503,10 +1305,7 @@ namespace Rv
         NODE_RETURN(d->client() ? 1 : 0);
     }
 
-    NODE_IMPLEMENTATION(remoteDefaultPermission, int)
-    {
-        NODE_RETURN(RvApp()->networkWindow()->defaultPermission());
-    }
+    NODE_IMPLEMENTATION(remoteDefaultPermission, int) { NODE_RETURN(RvApp()->networkWindow()->defaultPermission()); }
 
     NODE_IMPLEMENTATION(setRemoteDefaultPermission, void)
     {
@@ -1521,8 +1320,7 @@ namespace Rv
         StringType::String* name = NODE_ARG_OBJECT(1, StringType::String);
         VariantInstance* vobj = NODE_ARG_OBJECT(2, VariantInstance);
         const VariantTagType* tt = vobj->tagType();
-        const SettingsValueType* vtype =
-            static_cast<const SettingsValueType*>(tt->variantType());
+        const SettingsValueType* vtype = static_cast<const SettingsValueType*>(tt->variantType());
 
         QVariant value;
 
@@ -1537,8 +1335,7 @@ namespace Rv
             value.setValue(*vobj->data<int>());
             break;
         case SettingsValueType::StringType:
-            value.setValue(
-                UTF8::qconvert(vobj->data<StringType::String>()->c_str()));
+            value.setValue(UTF8::qconvert(vobj->data<StringType::String>()->c_str()));
             break;
         case SettingsValueType::BoolType:
             value.setValue(*vobj->data<bool>());
@@ -1592,8 +1389,7 @@ namespace Rv
         settings.endGroup();
     }
 
-    static QVariant::Type
-    settingsTypeToQVariantType(SettingsValueType::ValueType t)
+    static QVariant::Type settingsTypeToQVariantType(SettingsValueType::ValueType t)
     {
         switch (t)
         {
@@ -1638,14 +1434,10 @@ namespace Rv
         QVariant value = settings.value(UTF8::qconvert(name->c_str()));
         settings.endGroup();
 
-        const SettingsValueType* vtype =
-            static_cast<const SettingsValueType*>(NODE_THIS.type());
+        const SettingsValueType* vtype = static_cast<const SettingsValueType*>(NODE_THIS.type());
 
         VariantInstance* vobj = 0;
-        QVariant::Type type =
-            defaultObj
-                ? settingsTypeToQVariantType(vtype->valueType(defaultObj))
-                : value.type();
+        QVariant::Type type = defaultObj ? settingsTypeToQVariantType(vtype->valueType(defaultObj)) : value.type();
 
         switch (type)
         {
@@ -1683,8 +1475,7 @@ namespace Rv
 
             for (size_t i = 0; i < array->size(); i++)
             {
-                array->element<StringType::String*>(i) =
-                    stype->allocate(list[i].toUtf8().constData());
+                array->element<StringType::String*>(i) = stype->allocate(list[i].toUtf8().constData());
             }
         }
         break;
@@ -1693,15 +1484,12 @@ namespace Rv
             QVariantList list = value.toList();
 
             if (list.empty())
-                throwBadArgumentException(NODE_THIS, NODE_THREAD,
-                                          "Bad value in settings file");
+                throwBadArgumentException(NODE_THIS, NODE_THREAD, "Bad value in settings file");
 
             QVariant one = list.front();
-            bool isfloat = vtype->valueType(defaultObj)
-                           == SettingsValueType::FloatArrayType;
+            bool isfloat = vtype->valueType(defaultObj) == SettingsValueType::FloatArrayType;
 
-            vobj = VariantInstance::allocate(isfloat ? vtype->floatArrayType()
-                                                     : vtype->intArrayType());
+            vobj = VariantInstance::allocate(isfloat ? vtype->floatArrayType() : vtype->intArrayType());
 
             DynamicArray* array = vobj->data<DynamicArray>();
             array->resize(list.size());
@@ -1751,25 +1539,19 @@ namespace Rv
         {
             if (ClassInstance* spair = list.value<ClassInstance*>())
             {
-                const StringPairTupleStruct* sp =
-                    spair->data<StringPairTupleStruct>();
+                const StringPairTupleStruct* sp = spair->data<StringPairTupleStruct>();
                 if (!sp->s0 || !sp->s1)
-                    throwBadArgumentException(NODE_THIS, NODE_THREAD,
-                                              "Bad header argument");
+                    throwBadArgumentException(NODE_THIS, NODE_THREAD, "Bad header argument");
 
-                headers.push_back(
-                    QPair<QString, QString>(UTF8::qconvert(sp->s0->c_str()),
-                                            UTF8::qconvert(sp->s1->c_str())));
+                headers.push_back(QPair<QString, QString>(UTF8::qconvert(sp->s0->c_str()), UTF8::qconvert(sp->s1->c_str())));
             }
         }
 
         if (RvWebManager* m = RvApp()->webManager())
         {
-            m->httpGet(UTF8::qconvert(url->c_str()), headers, s,
-                       UTF8::qconvert(replyEvent ? replyEvent->c_str() : ""),
-                       UTF8::qconvert(authEvent ? authEvent->c_str() : ""),
-                       UTF8::qconvert(progEvent ? progEvent->c_str() : ""),
-                       ignore, urlIsEncoded);
+            m->httpGet(UTF8::qconvert(url->c_str()), headers, s, UTF8::qconvert(replyEvent ? replyEvent->c_str() : ""),
+                       UTF8::qconvert(authEvent ? authEvent->c_str() : ""), UTF8::qconvert(progEvent ? progEvent->c_str() : ""), ignore,
+                       urlIsEncoded);
         }
     }
 
@@ -1793,27 +1575,19 @@ namespace Rv
         {
             if (ClassInstance* spair = list.value<ClassInstance*>())
             {
-                const StringPairTupleStruct* sp =
-                    spair->data<StringPairTupleStruct>();
+                const StringPairTupleStruct* sp = spair->data<StringPairTupleStruct>();
                 if (!sp->s0 || !sp->s1)
-                    throwBadArgumentException(NODE_THIS, NODE_THREAD,
-                                              "Bad header argument");
+                    throwBadArgumentException(NODE_THIS, NODE_THREAD, "Bad header argument");
 
-                headers.push_back(
-                    QPair<QString, QString>(UTF8::qconvert(sp->s0->c_str()),
-                                            UTF8::qconvert(sp->s1->c_str())));
+                headers.push_back(QPair<QString, QString>(UTF8::qconvert(sp->s0->c_str()), UTF8::qconvert(sp->s1->c_str())));
             }
         }
 
         if (RvWebManager* m = RvApp()->webManager())
         {
-            m->httpPost(
-                url->c_str(), headers,
-                postString ? QByteArray(postString->c_str()) : QByteArray(), s,
-                UTF8::qconvert(replyEvent ? replyEvent->c_str() : ""),
-                UTF8::qconvert(authEvent ? authEvent->c_str() : ""),
-                UTF8::qconvert(progEvent ? progEvent->c_str() : ""), ignore,
-                urlIsEncoded);
+            m->httpPost(url->c_str(), headers, postString ? QByteArray(postString->c_str()) : QByteArray(), s,
+                        UTF8::qconvert(replyEvent ? replyEvent->c_str() : ""), UTF8::qconvert(authEvent ? authEvent->c_str() : ""),
+                        UTF8::qconvert(progEvent ? progEvent->c_str() : ""), ignore, urlIsEncoded);
         }
     }
 
@@ -1837,31 +1611,21 @@ namespace Rv
         {
             if (ClassInstance* spair = list.value<ClassInstance*>())
             {
-                const StringPairTupleStruct* sp =
-                    spair->data<StringPairTupleStruct>();
+                const StringPairTupleStruct* sp = spair->data<StringPairTupleStruct>();
                 if (!sp->s0 || !sp->s1)
-                    throwBadArgumentException(NODE_THIS, NODE_THREAD,
-                                              "Bad header argument");
+                    throwBadArgumentException(NODE_THIS, NODE_THREAD, "Bad header argument");
 
-                headers.push_back(
-                    QPair<QString, QString>(UTF8::qconvert(sp->s0->c_str()),
-                                            UTF8::qconvert(sp->s1->c_str())));
+                headers.push_back(QPair<QString, QString>(UTF8::qconvert(sp->s0->c_str()), UTF8::qconvert(sp->s1->c_str())));
             }
         }
 
         if (RvWebManager* m = RvApp()->webManager())
         {
-            const unsigned char* datap =
-                (postData) ? postData->data<unsigned char>() : 0;
+            const unsigned char* datap = (postData) ? postData->data<unsigned char>() : 0;
 
-            m->httpPost(
-                url->c_str(), headers,
-                postData ? QByteArray((const char*)datap, postData->size())
-                         : QByteArray(),
-                s, UTF8::qconvert(replyEvent ? replyEvent->c_str() : ""),
-                UTF8::qconvert(authEvent ? authEvent->c_str() : ""),
-                UTF8::qconvert(progEvent ? progEvent->c_str() : ""), ignore,
-                urlIsEncoded);
+            m->httpPost(url->c_str(), headers, postData ? QByteArray((const char*)datap, postData->size()) : QByteArray(), s,
+                        UTF8::qconvert(replyEvent ? replyEvent->c_str() : ""), UTF8::qconvert(authEvent ? authEvent->c_str() : ""),
+                        UTF8::qconvert(progEvent ? progEvent->c_str() : ""), ignore, urlIsEncoded);
         }
     }
 
@@ -1885,27 +1649,19 @@ namespace Rv
         {
             if (ClassInstance* spair = list.value<ClassInstance*>())
             {
-                const StringPairTupleStruct* sp =
-                    spair->data<StringPairTupleStruct>();
+                const StringPairTupleStruct* sp = spair->data<StringPairTupleStruct>();
                 if (!sp->s0 || !sp->s1)
-                    throwBadArgumentException(NODE_THIS, NODE_THREAD,
-                                              "Bad header argument");
+                    throwBadArgumentException(NODE_THIS, NODE_THREAD, "Bad header argument");
 
-                headers.push_back(
-                    QPair<QString, QString>(UTF8::qconvert(sp->s0->c_str()),
-                                            UTF8::qconvert(sp->s1->c_str())));
+                headers.push_back(QPair<QString, QString>(UTF8::qconvert(sp->s0->c_str()), UTF8::qconvert(sp->s1->c_str())));
             }
         }
 
         if (RvWebManager* m = RvApp()->webManager())
         {
-            m->httpPut(UTF8::qconvert(url->c_str()), headers,
-                       putString ? QByteArray(putString->c_str())
-                                 : QByteArray(),
-                       s, UTF8::qconvert(replyEvent ? replyEvent->c_str() : ""),
-                       UTF8::qconvert(authEvent ? authEvent->c_str() : ""),
-                       UTF8::qconvert(progEvent ? progEvent->c_str() : ""),
-                       ignore, urlIsEncoded);
+            m->httpPut(UTF8::qconvert(url->c_str()), headers, putString ? QByteArray(putString->c_str()) : QByteArray(), s,
+                       UTF8::qconvert(replyEvent ? replyEvent->c_str() : ""), UTF8::qconvert(authEvent ? authEvent->c_str() : ""),
+                       UTF8::qconvert(progEvent ? progEvent->c_str() : ""), ignore, urlIsEncoded);
         }
     }
 
@@ -1929,30 +1685,21 @@ namespace Rv
         {
             if (ClassInstance* spair = list.value<ClassInstance*>())
             {
-                const StringPairTupleStruct* sp =
-                    spair->data<StringPairTupleStruct>();
+                const StringPairTupleStruct* sp = spair->data<StringPairTupleStruct>();
                 if (!sp->s0 || !sp->s1)
-                    throwBadArgumentException(NODE_THIS, NODE_THREAD,
-                                              "Bad header argument");
+                    throwBadArgumentException(NODE_THIS, NODE_THREAD, "Bad header argument");
 
-                headers.push_back(
-                    QPair<QString, QString>(UTF8::qconvert(sp->s0->c_str()),
-                                            UTF8::qconvert(sp->s1->c_str())));
+                headers.push_back(QPair<QString, QString>(UTF8::qconvert(sp->s0->c_str()), UTF8::qconvert(sp->s1->c_str())));
             }
         }
 
         if (RvWebManager* m = RvApp()->webManager())
         {
-            const unsigned char* datap =
-                (putData) ? putData->data<unsigned char>() : 0;
+            const unsigned char* datap = (putData) ? putData->data<unsigned char>() : 0;
 
-            m->httpPut(UTF8::qconvert(url->c_str()), headers,
-                       putData ? QByteArray((const char*)datap, putData->size())
-                               : QByteArray(),
-                       s, UTF8::qconvert(replyEvent ? replyEvent->c_str() : ""),
-                       UTF8::qconvert(authEvent ? authEvent->c_str() : ""),
-                       UTF8::qconvert(progEvent ? progEvent->c_str() : ""),
-                       ignore, urlIsEncoded);
+            m->httpPut(UTF8::qconvert(url->c_str()), headers, putData ? QByteArray((const char*)datap, putData->size()) : QByteArray(), s,
+                       UTF8::qconvert(replyEvent ? replyEvent->c_str() : ""), UTF8::qconvert(authEvent ? authEvent->c_str() : ""),
+                       UTF8::qconvert(progEvent ? progEvent->c_str() : ""), ignore, urlIsEncoded);
         }
     }
 
@@ -1963,9 +1710,7 @@ namespace Rv
         Session* s = Session::currentSession();
         RvDocument* doc = reinterpret_cast<RvDocument*>(s->opaquePointer());
 
-        const QMainWindowType* type =
-            c->findSymbolOfTypeByQualifiedName<QMainWindowType>(
-                c->internName("qt.QMainWindow"), false);
+        const QMainWindowType* type = c->findSymbolOfTypeByQualifiedName<QMainWindowType>(c->internName("qt.QMainWindow"), false);
 
         NODE_RETURN(makeinstance(type, static_cast<QMainWindow*>(doc)));
     }
@@ -1978,9 +1723,7 @@ namespace Rv
         RvDocument* doc = reinterpret_cast<RvDocument*>(s->opaquePointer());
         QWidget* w = doc->view();
 
-        const QWidgetType* type =
-            c->findSymbolOfTypeByQualifiedName<QWidgetType>(
-                c->internName("qt.QWidget"), false);
+        const QWidgetType* type = c->findSymbolOfTypeByQualifiedName<QWidgetType>(c->internName("qt.QWidget"), false);
 
         NODE_RETURN(makeinstance(type, static_cast<QWidget*>(w)));
     }
@@ -1993,9 +1736,7 @@ namespace Rv
 
         QTabWidget* w = RvApp()->prefDialog()->tabWidget();
 
-        const QTabWidgetType* type =
-            c->findSymbolOfTypeByQualifiedName<QTabWidgetType>(
-                c->internName("qt.QTabWidget"), false);
+        const QTabWidgetType* type = c->findSymbolOfTypeByQualifiedName<QTabWidgetType>(c->internName("qt.QTabWidget"), false);
 
         NODE_RETURN(makeinstance(type, w));
     }
@@ -2009,9 +1750,7 @@ namespace Rv
 
         QToolBar* toolBar = doc->bottomViewToolBar();
 
-        const QToolBarType* type =
-            c->findSymbolOfTypeByQualifiedName<QToolBarType>(
-                c->internName("qt.QToolBar"), false);
+        const QToolBarType* type = c->findSymbolOfTypeByQualifiedName<QToolBarType>(c->internName("qt.QToolBar"), false);
 
         NODE_RETURN(makeinstance(type, toolBar));
     }
@@ -2024,11 +1763,9 @@ namespace Rv
         RvWebManager* m = RvApp()->webManager();
 
         const QNetworkAccessManagerType* type =
-            c->findSymbolOfTypeByQualifiedName<QNetworkAccessManagerType>(
-                c->internName("qt.QNetworkAccessManager"), false);
+            c->findSymbolOfTypeByQualifiedName<QNetworkAccessManagerType>(c->internName("qt.QNetworkAccessManager"), false);
 
-        NODE_RETURN(makeinstance(
-            type, static_cast<QNetworkAccessManager*>(m->netManager())));
+        NODE_RETURN(makeinstance(type, static_cast<QNetworkAccessManager*>(m->netManager())));
     }
 
     NODE_IMPLEMENTATION(javascriptMuExport, void)
@@ -2038,8 +1775,7 @@ namespace Rv
         Session* s = Session::currentSession();
         RvDocument* doc = reinterpret_cast<RvDocument*>(s->opaquePointer());
 
-        QWebEnginePage* frame =
-            Mu::object<QWebEnginePage>(NODE_ARG_OBJECT(0, ClassInstance));
+        QWebEnginePage* frame = Mu::object<QWebEnginePage>(NODE_ARG_OBJECT(0, ClassInstance));
 
         RvJavaScriptObject* obj = new RvJavaScriptObject(doc, frame);
     }
@@ -2084,15 +1820,11 @@ namespace Rv
         */
     }
 
-    NODE_IMPLEMENTATION(myNetworkPort, int)
-    {
-        NODE_RETURN(RvApp()->networkWindow()->myPort());
-    }
+    NODE_IMPLEMENTATION(myNetworkPort, int) { NODE_RETURN(RvApp()->networkWindow()->myPort()); }
 
     NODE_IMPLEMENTATION(myNetworkHost, Pointer)
     {
-        const StringType* stype =
-            static_cast<const StringType*>(NODE_THIS.type());
+        const StringType* stype = static_cast<const StringType*>(NODE_THIS.type());
         StringType::String* str = 0;
 
         Options& opts = Options::sharedOptions();
@@ -2126,8 +1858,7 @@ namespace Rv
     NODE_IMPLEMENTATION(encodePassword, Pointer)
     {
         StringType::String* pass = NODE_ARG_OBJECT(0, StringType::String);
-        const StringType* stype =
-            static_cast<const StringType*>(NODE_THIS.type());
+        const StringType* stype = static_cast<const StringType*>(NODE_THIS.type());
 
         string enc = TwkQtBase::encode(pass->c_str());
 
@@ -2137,13 +1868,11 @@ namespace Rv
     NODE_IMPLEMENTATION(decodePassword, Pointer)
     {
         StringType::String* pass = NODE_ARG_OBJECT(0, StringType::String);
-        const StringType* stype =
-            static_cast<const StringType*>(NODE_THIS.type());
+        const StringType* stype = static_cast<const StringType*>(NODE_THIS.type());
 
         if (!pass)
         {
-            throwBadArgumentException(NODE_THIS, NODE_THREAD,
-                                      "Null password could not be decoded.");
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "Null password could not be decoded.");
         }
 
         string dec = TwkQtBase::decode(pass->c_str());
@@ -2153,25 +1882,21 @@ namespace Rv
 
     NODE_IMPLEMENTATION(cacheDir, Pointer)
     {
-        const StringType* stype =
-            static_cast<const StringType*>(NODE_THIS.type());
+        const StringType* stype = static_cast<const StringType*>(NODE_THIS.type());
 
-        QStringList cacheLocations =
-            QStandardPaths::standardLocations(QStandardPaths::CacheLocation);
+        QStringList cacheLocations = QStandardPaths::standardLocations(QStandardPaths::CacheLocation);
         QDir cacheDir(cacheLocations.front());
 
         if (!cacheDir.exists())
             cacheDir.mkpath(cacheDir.absolutePath());
 
-        NODE_RETURN(
-            stype->allocate(cacheDir.absolutePath().toUtf8().constData()));
+        NODE_RETURN(stype->allocate(cacheDir.absolutePath().toUtf8().constData()));
     }
 
     namespace
     {
 
-        void openUrlWithDesktopServices(const Mu::Node& node,
-                                        Mu::Thread& thread, QUrl& qurl)
+        void openUrlWithDesktopServices(const Mu::Node& node, Mu::Thread& thread, QUrl& qurl)
         {
 #ifdef PLATFORM_LINUX
             string pathS;
@@ -2184,8 +1909,7 @@ namespace Rv
             if (qurl.isValid())
                 QDesktopServices::openUrl(qurl);
             else
-                throwBadArgumentException(node, thread,
-                                          "QUrl argument is not valid");
+                throwBadArgumentException(node, thread, "QUrl argument is not valid");
 
 #ifdef PLATFORM_LINUX
             if (path)
@@ -2211,8 +1935,7 @@ namespace Rv
         Pointer qp = NODE_ARG(0, Pointer);
 
         if (!qp)
-            throwBadArgumentException(NODE_THIS, NODE_THREAD,
-                                      "Nil QUrl argument");
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "Nil QUrl argument");
 
         QUrl& qurl = getqtype<QUrlType>(qp);
 
@@ -2243,9 +1966,7 @@ namespace Rv
 
             QString message = "Cannot start presentation mode when multiple "
                               "sessions are active";
-            QMessageBox confirm(QMessageBox::Warning, "Presentation Mode",
-                                message, QMessageBox::NoButton, rvDoc,
-                                Qt::Sheet);
+            QMessageBox confirm(QMessageBox::Warning, "Presentation Mode", message, QMessageBox::NoButton, rvDoc, Qt::Sheet);
 
             QPushButton* q1 = confirm.addButton("Ok", QMessageBox::AcceptRole);
             confirm.setIcon(QMessageBox::Warning);
@@ -2255,39 +1976,77 @@ namespace Rv
         s->setCaching(mode);
     }
 
-    NODE_IMPLEMENTATION(presentationMode, bool)
+    NODE_IMPLEMENTATION(presentationMode, bool) { NODE_RETURN(RvApp()->isInPresentationMode()); }
+
+    NODE_IMPLEMENTATION(setPresentationDevice, void)
     {
-        NODE_RETURN(RvApp()->isInPresentationMode());
+        StringType::String* deviceName = NODE_ARG_OBJECT(0, StringType::String);
+        Rv::Options& opts = Rv::Options::sharedOptions();
+
+        if (!deviceName)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "Nil setting name.");
+
+        if (VideoDevice* d = RvApp()->findPresentationDevice(deviceName->c_str()))
+        {
+            bool presenting = RvApp()->isInPresentationMode();
+            Session* s = Session::currentSession();
+            Session::CachingMode mode = s->cachingMode();
+
+            if (presenting)
+            {
+                s->setCaching(Session::NeverCache);
+                RvApp()->setPresentationMode(false);
+            }
+
+            RV_QSETTINGS;
+            settings.beginGroup("Video");
+            settings.setValue("presentationDevice", QString::fromUtf8(deviceName->c_str()));
+            settings.endGroup();
+
+            Rv::RvPreferences::loadSettingsIntoOptions(opts);
+
+            RvApp()->setVideoDeviceStateFromSettings(d);
+
+            if (presenting)
+            {
+                RvApp()->setPresentationMode(true);
+                s->setCaching(mode);
+            }
+        }
+        else
+        {
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "device not found");
+        }
+    }
+
+    NODE_IMPLEMENTATION(loadSettingsIntoOptions, void)
+    {
+        Rv::Options& opts = Rv::Options::sharedOptions();
+        Rv::RvPreferences::loadSettingsIntoOptions(opts);
     }
 
     NODE_IMPLEMENTATION(packageListFromSetting, Pointer)
     {
         StringType::String* setting = NODE_ARG_OBJECT(0, StringType::String);
-        const DynamicArrayType* atype =
-            static_cast<const DynamicArrayType*>(NODE_THIS.type());
-        const StringType* stype =
-            static_cast<const StringType*>(atype->elementType());
+        const DynamicArrayType* atype = static_cast<const DynamicArrayType*>(NODE_THIS.type());
+        const StringType* stype = static_cast<const StringType*>(atype->elementType());
         DynamicArray* array = new DynamicArray(atype, 1);
 
         if (!setting)
-            throwBadArgumentException(NODE_THIS, NODE_THREAD,
-                                      "Nil setting name.");
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "Nil setting name.");
 
         RV_QSETTINGS;
 
         settings.beginGroup("ModeManager");
 
-        QStringList l = Rv::PackageManager::swapAppDir(
-            settings.value(setting->c_str(), QStringList()).toStringList(),
-            false);
+        QStringList l = Rv::PackageManager::swapAppDir(settings.value(setting->c_str(), QStringList()).toStringList(), false);
 
         settings.endGroup();
 
         array->resize(l.size());
         for (int i = 0; i < l.size(); i++)
         {
-            array->element<StringType::String*>(i) =
-                stype->allocate(UTF8::qconvert(l[i]));
+            array->element<StringType::String*>(i) = stype->allocate(UTF8::qconvert(l[i]));
         }
 
         NODE_RETURN(array);
@@ -2335,15 +2094,11 @@ namespace Rv
         }
         else
         {
-            throwBadArgumentException(NODE_THIS, NODE_THREAD,
-                                      "valid nodeName required");
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "valid nodeName required");
         }
     }
 
-    NODE_IMPLEMENTATION(editProfiles, void)
-    {
-        RvApp()->profileManager()->show();
-    }
+    NODE_IMPLEMENTATION(editProfiles, void) { RvApp()->profileManager()->show(); }
 
     NODE_IMPLEMENTATION(validateShotgunToken, Mu::Pointer)
     {
@@ -2387,8 +2142,7 @@ namespace Rv
         float devicePixelRatio = 1.0f;
 
         const Session* s = Session::currentSession();
-        const RvDocument* doc =
-            reinterpret_cast<RvDocument*>(s->opaquePointer());
+        const RvDocument* doc = reinterpret_cast<RvDocument*>(s->opaquePointer());
 
         if (doc != nullptr && doc->view() != nullptr)
         {

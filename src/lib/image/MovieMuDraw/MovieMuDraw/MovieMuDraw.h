@@ -43,8 +43,7 @@ namespace TwkMovie
         //  Constructors
         //
 
-        MovieMuDraw(Movie*, Mu::MuLangContext*, Mu::Process*,
-                    TwkGLF::GLVideoDevice* d = 0);
+        MovieMuDraw(Movie*, Mu::MuLangContext*, Mu::Process*, TwkGLF::GLVideoDevice* d = 0);
 
         virtual ~MovieMuDraw();
 

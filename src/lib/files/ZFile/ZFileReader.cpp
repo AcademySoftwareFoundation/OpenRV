@@ -109,10 +109,8 @@ namespace ZFile
         m_in->read((char*)&m_header.magicNumber, sizeof(m_header.magicNumber));
         m_in->read((char*)&m_header.imageWidth, sizeof(m_header.imageWidth));
         m_in->read((char*)&m_header.imageHeight, sizeof(m_header.imageHeight));
-        m_in->read((char*)&m_header.worldToScreen,
-                   sizeof(m_header.worldToScreen));
-        m_in->read((char*)&m_header.worldToCamera,
-                   sizeof(m_header.worldToCamera));
+        m_in->read((char*)&m_header.worldToScreen, sizeof(m_header.worldToScreen));
+        m_in->read((char*)&m_header.worldToCamera, sizeof(m_header.worldToCamera));
 
         //
         // Check if this file needs byte-swapping

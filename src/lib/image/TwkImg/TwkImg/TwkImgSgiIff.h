@@ -44,11 +44,9 @@ namespace TwkImg
         };
 
         // Pixel reading routines
-        static void readPixelsRLE(Img4uc& into, Header& aHeader,
-                                  std::istream& in);
+        static void readPixelsRLE(Img4uc& into, Header& aHeader, std::istream& in);
         static void readPixels(Img4uc& into, Header& aHeader, std::istream& in);
-        static void writePixels(const Img4uc& outof, Header& aHeader,
-                                std::ostream& out);
+        static void writePixels(const Img4uc& outof, Header& aHeader, std::ostream& out);
     };
 
     //******************************************************************************

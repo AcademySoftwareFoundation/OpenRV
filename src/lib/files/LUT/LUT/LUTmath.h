@@ -29,8 +29,7 @@ namespace LUT
 
     void IdentityLUT(std::vector<float>& data, std::vector<int>& sizes);
 
-    void ApplyLUTtoPixel(std::vector<float>& data, std::vector<int>& sizes,
-                         float& r, float& g, float& b);
+    void ApplyLUTtoPixel(std::vector<float>& data, std::vector<int>& sizes, float& r, float& g, float& b);
 
 } // namespace LUT
 

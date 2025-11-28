@@ -42,8 +42,7 @@ namespace Mu
         //  Constructors
         //
 
-        QCheckBoxType(Context* context, const char* name, Class* superClass = 0,
-                      Class* superClass2 = 0);
+        QCheckBoxType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QCheckBoxType();
 
@@ -67,8 +66,7 @@ namespace Mu
     public:
         virtual ~MuQt_QCheckBox();
         MuQt_QCheckBox(Pointer muobj, const CallEnvironment*, QWidget* parent);
-        MuQt_QCheckBox(Pointer muobj, const CallEnvironment*,
-                       const QString& text, QWidget* parent);
+        MuQt_QCheckBox(Pointer muobj, const CallEnvironment*, const QString& text, QWidget* parent);
         virtual QSize minimumSizeHint() const;
         virtual QSize sizeHint() const;
 
@@ -99,17 +97,11 @@ namespace Mu
 
         bool hitButton_pub(const QPoint& pos) const { return hitButton(pos); }
 
-        bool hitButton_pub_parent(const QPoint& pos) const
-        {
-            return QCheckBox::hitButton(pos);
-        }
+        bool hitButton_pub_parent(const QPoint& pos) const { return QCheckBox::hitButton(pos); }
 
         void mouseMoveEvent_pub(QMouseEvent* e) { mouseMoveEvent(e); }
 
-        void mouseMoveEvent_pub_parent(QMouseEvent* e)
-        {
-            QCheckBox::mouseMoveEvent(e);
-        }
+        void mouseMoveEvent_pub_parent(QMouseEvent* e) { QCheckBox::mouseMoveEvent(e); }
 
         void nextCheckState_pub() { nextCheckState(); }
 
@@ -117,10 +109,7 @@ namespace Mu
 
         void paintEvent_pub(QPaintEvent* _p14) { paintEvent(_p14); }
 
-        void paintEvent_pub_parent(QPaintEvent* _p14)
-        {
-            QCheckBox::paintEvent(_p14);
-        }
+        void paintEvent_pub_parent(QPaintEvent* _p14) { QCheckBox::paintEvent(_p14); }
 
         void changeEvent_pub(QEvent* e) { changeEvent(e); }
 
@@ -128,45 +117,27 @@ namespace Mu
 
         void focusInEvent_pub(QFocusEvent* e) { focusInEvent(e); }
 
-        void focusInEvent_pub_parent(QFocusEvent* e)
-        {
-            QCheckBox::focusInEvent(e);
-        }
+        void focusInEvent_pub_parent(QFocusEvent* e) { QCheckBox::focusInEvent(e); }
 
         void focusOutEvent_pub(QFocusEvent* e) { focusOutEvent(e); }
 
-        void focusOutEvent_pub_parent(QFocusEvent* e)
-        {
-            QCheckBox::focusOutEvent(e);
-        }
+        void focusOutEvent_pub_parent(QFocusEvent* e) { QCheckBox::focusOutEvent(e); }
 
         void keyPressEvent_pub(QKeyEvent* e) { keyPressEvent(e); }
 
-        void keyPressEvent_pub_parent(QKeyEvent* e)
-        {
-            QCheckBox::keyPressEvent(e);
-        }
+        void keyPressEvent_pub_parent(QKeyEvent* e) { QCheckBox::keyPressEvent(e); }
 
         void keyReleaseEvent_pub(QKeyEvent* e) { keyReleaseEvent(e); }
 
-        void keyReleaseEvent_pub_parent(QKeyEvent* e)
-        {
-            QCheckBox::keyReleaseEvent(e);
-        }
+        void keyReleaseEvent_pub_parent(QKeyEvent* e) { QCheckBox::keyReleaseEvent(e); }
 
         void mousePressEvent_pub(QMouseEvent* e) { mousePressEvent(e); }
 
-        void mousePressEvent_pub_parent(QMouseEvent* e)
-        {
-            QCheckBox::mousePressEvent(e);
-        }
+        void mousePressEvent_pub_parent(QMouseEvent* e) { QCheckBox::mousePressEvent(e); }
 
         void mouseReleaseEvent_pub(QMouseEvent* e) { mouseReleaseEvent(e); }
 
-        void mouseReleaseEvent_pub_parent(QMouseEvent* e)
-        {
-            QCheckBox::mouseReleaseEvent(e);
-        }
+        void mouseReleaseEvent_pub_parent(QMouseEvent* e) { QCheckBox::mouseReleaseEvent(e); }
 
         void timerEvent_pub(QTimerEvent* e) { timerEvent(e); }
 
@@ -178,11 +149,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance*
-    QCheckBoxType::cachedInstance(const QCheckBoxType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QCheckBoxType::cachedInstance(const QCheckBoxType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

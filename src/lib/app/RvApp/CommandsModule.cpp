@@ -97,21 +97,16 @@ namespace Rv
 
     //----------------------------------------------------------------------
 
-    static void throwBadArgumentException(const Mu::Node& node,
-                                          Mu::Thread& thread,
-                                          const Mu::String& msg)
+    static void throwBadArgumentException(const Mu::Node& node, Mu::Thread& thread, const Mu::String& msg)
     {
-        const Mu::MuLangContext* context =
-            static_cast<const Mu::MuLangContext*>(thread.context());
-        ExceptionType::Exception* e =
-            new ExceptionType::Exception(context->exceptionType());
+        const Mu::MuLangContext* context = static_cast<const Mu::MuLangContext*>(thread.context());
+        ExceptionType::Exception* e = new ExceptionType::Exception(context->exceptionType());
 
         ostringstream str;
 
         if (context->debugging())
         {
-            const Mu::AnnotatedNode& anode =
-                static_cast<const Mu::AnnotatedNode&>(node);
+            const Mu::AnnotatedNode& anode = static_cast<const Mu::AnnotatedNode&>(node);
             // When linenum is 0, it indicates that sourceFileName is either
             // empty or not null-terminated. This typically occurs when an
             // exception is raised from a Python plugin. Despite populating the
@@ -119,8 +114,7 @@ namespace Rv
             // display in the console for such cases.
             if (anode.linenum() > 0)
             {
-                str << anode.sourceFileName() << ", line " << anode.linenum()
-                    << ", char " << anode.charnum() << ": ";
+                str << anode.sourceFileName() << ", line " << anode.linenum() << ", char " << anode.charnum() << ": ";
             }
         }
 
@@ -132,25 +126,20 @@ namespace Rv
         throw exc;
     }
 
-    static void throwBadProperty(Thread& thread, const Mu::Node& node,
-                                 const Mu::String& name)
+    static void throwBadProperty(Thread& thread, const Mu::Node& node, const Mu::String& name)
     {
         Process* process = thread.process();
-        MuLangContext* context =
-            static_cast<MuLangContext*>(process->context());
-        ExceptionType::Exception* e =
-            new ExceptionType::Exception(context->exceptionType());
+        MuLangContext* context = static_cast<MuLangContext*>(process->context());
+        ExceptionType::Exception* e = new ExceptionType::Exception(context->exceptionType());
 
         ostringstream str;
 
         if (context->debugging())
         {
-            const Mu::AnnotatedNode& anode =
-                static_cast<const Mu::AnnotatedNode&>(node);
+            const Mu::AnnotatedNode& anode = static_cast<const Mu::AnnotatedNode&>(node);
             if (anode.linenum() > 0)
             {
-                str << anode.sourceFileName() << ", line " << anode.linenum()
-                    << ", char " << anode.charnum() << ": ";
+                str << anode.sourceFileName() << ", line " << anode.linenum() << ", char " << anode.charnum() << ": ";
             }
         }
 
@@ -163,25 +152,20 @@ namespace Rv
         throw exc;
     }
 
-    static void throwBadPropertyType(Thread& thread, const Mu::Node& node,
-                                     const Mu::String& name)
+    static void throwBadPropertyType(Thread& thread, const Mu::Node& node, const Mu::String& name)
     {
         Process* process = thread.process();
-        MuLangContext* context =
-            static_cast<MuLangContext*>(process->context());
-        ExceptionType::Exception* e =
-            new ExceptionType::Exception(context->exceptionType());
+        MuLangContext* context = static_cast<MuLangContext*>(process->context());
+        ExceptionType::Exception* e = new ExceptionType::Exception(context->exceptionType());
 
         ostringstream str;
 
         if (context->debugging())
         {
-            const Mu::AnnotatedNode& anode =
-                static_cast<const Mu::AnnotatedNode&>(node);
+            const Mu::AnnotatedNode& anode = static_cast<const Mu::AnnotatedNode&>(node);
             if (anode.linenum() > 0)
             {
-                str << anode.sourceFileName() << ", line " << anode.linenum()
-                    << ", char " << anode.charnum() << ": ";
+                str << anode.sourceFileName() << ", line " << anode.linenum() << ", char " << anode.charnum() << ": ";
             }
         }
 
@@ -194,9 +178,7 @@ namespace Rv
         throw exc;
     }
 
-    static void getProperty(Session::PropertyVector& props, Mu::Thread& thread,
-                            const Mu::Node& node,
-                            const Mu::StringType::String* name)
+    static void getProperty(Session::PropertyVector& props, Mu::Thread& thread, const Mu::Node& node, const Mu::StringType::String* name)
     {
         if (!name)
             throwBadArgumentException(node, thread, "node name is nil");
@@ -295,11 +277,9 @@ namespace Rv
         Process* p = NODE_THREAD.process();
         MuLangContext* c = TwkApp::muContext();
         Session* s = Session::currentSession();
-        const DynamicArrayType* atype =
-            reinterpret_cast<const DynamicArrayType*>(NODE_THIS.type());
+        const DynamicArrayType* atype = reinterpret_cast<const DynamicArrayType*>(NODE_THIS.type());
         const StringType* stype = c->stringType();
-        const StringType::String* tname =
-            NODE_ARG_OBJECT(0, StringType::String);
+        const StringType::String* tname = NODE_ARG_OBJECT(0, StringType::String);
 
         if (!tname)
             throwBadArgumentException(NODE_THIS, NODE_THREAD, "nil tname");
@@ -311,8 +291,7 @@ namespace Rv
 
         for (int i = 0; i < nodes.size(); i++)
         {
-            array->element<StringType::String*>(i) =
-                stype->allocate(nodes[i]->name());
+            array->element<StringType::String*>(i) = stype->allocate(nodes[i]->name());
         }
 
         NODE_RETURN(array);
@@ -327,12 +306,9 @@ namespace Rv
         Process* p = NODE_THREAD.process();
         MuLangContext* c = TwkApp::muContext();
         Session* s = Session::currentSession();
-        const TupleType* ttype =
-            static_cast<const TupleType*>(NODE_THIS.type());
-        const StringType* stype =
-            static_cast<const StringType*>(ttype->tupleFieldTypes()[0]);
-        const DynamicArrayType* atype =
-            static_cast<const DynamicArrayType*>(ttype->tupleFieldTypes()[1]);
+        const TupleType* ttype = static_cast<const TupleType*>(NODE_THIS.type());
+        const StringType* stype = static_cast<const StringType*>(ttype->tupleFieldTypes()[0]);
+        const DynamicArrayType* atype = static_cast<const DynamicArrayType*>(ttype->tupleFieldTypes()[1]);
         const StringType::String* name = NODE_ARG_OBJECT(0, StringType::String);
 
         if (!name)
@@ -374,8 +350,7 @@ namespace Rv
 
         if (!node)
         {
-            throwBadArgumentException(NODE_THIS, NODE_THREAD,
-                                      "bad source name");
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "bad source name");
         }
 
         size_t index = atoi(mindex.c_str());
@@ -391,14 +366,12 @@ namespace Rv
 
         for (unsigned int i = 0; i < views.size(); i++)
         {
-            tuple->views->element<ClassInstance*>(i) =
-                stype->allocate(views[i]);
+            tuple->views->element<ClassInstance*>(i) = stype->allocate(views[i]);
         }
 
         for (unsigned int i = 0; i < layers.size(); i++)
         {
-            tuple->layers->element<ClassInstance*>(i) =
-                stype->allocate(layers[i]);
+            tuple->layers->element<ClassInstance*>(i) = stype->allocate(layers[i]);
         }
 
         NODE_RETURN(obj);
@@ -418,10 +391,7 @@ namespace Rv
         NODE_RETURN(float(s->userTimer().elapsed()));
     }
 
-    NODE_IMPLEMENTATION(theTime, float)
-    {
-        NODE_RETURN(float(theTimer.elapsed()));
-    }
+    NODE_IMPLEMENTATION(theTime, float) { NODE_RETURN(float(theTimer.elapsed())); }
 
     NODE_IMPLEMENTATION(stopTimer, float)
     {
@@ -466,8 +436,7 @@ namespace Rv
             throwBadArgumentException(NODE_THIS, NODE_THREAD, "nil node");
 
         IPGraph::GraphEdit edit(RvSession::currentRvSession()->graph());
-        RvSession::currentRvSession()->readCDL(name->c_str(), node->c_str(),
-                                               activate);
+        RvSession::currentRvSession()->readCDL(name->c_str(), node->c_str(), activate);
     }
 
     NODE_IMPLEMENTATION(readLUT, void)
@@ -483,8 +452,7 @@ namespace Rv
             throwBadArgumentException(NODE_THIS, NODE_THREAD, "nil node");
 
         IPGraph::GraphEdit edit(RvSession::currentRvSession()->graph());
-        RvSession::currentRvSession()->readLUT(name->c_str(), node->c_str(),
-                                               activate);
+        RvSession::currentRvSession()->readLUT(name->c_str(), node->c_str(), activate);
     }
 
     NODE_IMPLEMENTATION(updateLUT, void)
@@ -546,9 +514,8 @@ namespace Rv
 
         TwkApp::VideoDevice::Margins m = s->eventVideoDevice()->margins();
 
-        TwkFB::FrameBuffer* fb = new TwkFB::FrameBuffer(
-            d->width() - m.left - m.right, d->height() - m.bottom - m.top, 4,
-            TwkFB::FrameBuffer::UCHAR);
+        TwkFB::FrameBuffer* fb =
+            new TwkFB::FrameBuffer(d->width() - m.left - m.right, d->height() - m.bottom - m.top, 4, TwkFB::FrameBuffer::UCHAR);
 
         // Get current framebuffer id.
         GLuint qtDefaultFBO;
@@ -561,8 +528,7 @@ namespace Rv
         // Ensure we're reading from Qt's default framebuffer.
         glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, d->fboID());
 
-        glReadPixels(m.left, m.bottom, d->width() - m.left - m.right,
-                     d->height() - m.bottom - m.top, GL_RGBA, GL_UNSIGNED_BYTE,
+        glReadPixels(m.left, m.bottom, d->width() - m.left - m.right, d->height() - m.bottom - m.top, GL_RGBA, GL_UNSIGNED_BYTE,
                      fb->pixels<unsigned char>());
 
         glFinish();
@@ -600,8 +566,7 @@ namespace Rv
         DynamicArray* views = NODE_ARG_OBJECT(15, DynamicArray);
 
         if (!name)
-            throwBadArgumentException(NODE_THIS, NODE_THREAD,
-                                      "nil source name");
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "nil source name");
 
         IPNode::MovieInfo info;
         info.width = width;
@@ -623,8 +588,7 @@ namespace Rv
             info.dataType = TwkFB::FrameBuffer::UCHAR;
             break;
         case 16:
-            info.dataType =
-                fp ? TwkFB::FrameBuffer::HALF : TwkFB::FrameBuffer::USHORT;
+            info.dataType = fp ? TwkFB::FrameBuffer::HALF : TwkFB::FrameBuffer::USHORT;
             break;
         case 32:
             info.dataType = TwkFB::FrameBuffer::FLOAT;
@@ -667,19 +631,15 @@ namespace Rv
         StringType::String* view = NODE_ARG_OBJECT(3, StringType::String);
 
         if (!source)
-            throwBadArgumentException(NODE_THIS, NODE_THREAD,
-                                      "nil source name");
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "nil source name");
 
         if (IPNode* node = s->graph().findNode(source->c_str()))
         {
-            if (ImageSourceIPNode* imageNode =
-                    dynamic_cast<ImageSourceIPNode*>(node))
+            if (ImageSourceIPNode* imageNode = dynamic_cast<ImageSourceIPNode*>(node))
             {
                 IPGraph::GraphEdit edit(s->graph());
 
-                Property* p = imageNode->findCreatePixels(
-                    frame, view ? view->c_str() : "-",
-                    layer ? layer->c_str() : "-");
+                Property* p = imageNode->findCreatePixels(frame, view ? view->c_str() : "-", layer ? layer->c_str() : "-");
                 ostringstream str;
                 str << name(node) << ".image." << p->name();
                 NODE_RETURN(stype->allocate(str));
@@ -696,15 +656,13 @@ namespace Rv
         MuLangContext* c = static_cast<MuLangContext*>(p->context());
         Event* event = NODE_ARG_OBJECT(0, Event);
 
-        if (const PixelBlockTransferEvent* pe =
-                dynamic_cast<const PixelBlockTransferEvent*>(event->event))
+        if (const PixelBlockTransferEvent* pe = dynamic_cast<const PixelBlockTransferEvent*>(event->event))
         {
             const RvGraph::Sources& sources = s->rvgraph().imageSources();
 
             for (size_t i = 0; i < sources.size(); i++)
             {
-                if (ImageSourceIPNode* node =
-                        dynamic_cast<ImageSourceIPNode*>(sources[i]))
+                if (ImageSourceIPNode* node = dynamic_cast<ImageSourceIPNode*>(sources[i]))
                 {
                     size_t index = node->mediaIndex(pe->media());
 
@@ -725,17 +683,13 @@ namespace Rv
 
                             IPGraph::GraphEdit edit(s->graph());
 
-                            node->insertPixels(pe->view(), pe->layer(),
-                                               pe->frame(), pe->x(), pe->y(),
-                                               pe->width(), pe->height(),
+                            node->insertPixels(pe->view(), pe->layer(), pe->frame(), pe->x(), pe->y(), pe->width(), pe->height(),
                                                pe->pixels(), pe->size());
                         }
                         catch (PixelBlockSizeMismatchExc& exc)
                         {
                             cerr << "ERROR: " << exc.what() << endl;
-                            throwBadArgumentException(
-                                NODE_THIS, NODE_THREAD,
-                                "bad pixel block recieved");
+                            throwBadArgumentException(NODE_THIS, NODE_THREAD, "bad pixel block recieved");
                         }
                     }
                 }
@@ -783,12 +737,23 @@ namespace Rv
         NODE_RETURN(s->loadCount());
     }
 
+    NODE_IMPLEMENTATION(setUIBlocked, void)
+    {
+        bool blocked = NODE_ARG(0, bool);
+        RvSession* session = RvSession::currentRvSession();
+        if (session)
+        {
+            // Send event that RvDocument will listen for
+            // This avoids dependency issues between RvApp and RvCommon
+            session->userGenericEvent("block-ui-overlay", blocked ? "true" : "false");
+        }
+    }
+
     NODE_IMPLEMENTATION(data, Pointer)
     {
         RvSession* s = RvSession::currentRvSession();
         if (!s)
-            throwBadArgumentException(NODE_THIS, NODE_THREAD,
-                                      "No active session available");
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "No active session available");
         NODE_RETURN(s->data());
     }
 
@@ -798,8 +763,7 @@ namespace Rv
         Process* p = NODE_THREAD.process();
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         DynamicArrayType* type = (DynamicArrayType*)NODE_THIS.type();
-        const TupleType* ttype =
-            static_cast<const TupleType*>(type->elementType());
+        const TupleType* ttype = static_cast<const TupleType*>(type->elementType());
 
         struct STuple
         {
@@ -897,8 +861,7 @@ namespace Rv
         Process* p = NODE_THREAD.process();
         MuLangContext* c = TwkApp::muContext();
         RvSession* s = RvSession::currentRvSession();
-        const DynamicArrayType* atype =
-            reinterpret_cast<const DynamicArrayType*>(NODE_THIS.type());
+        const DynamicArrayType* atype = reinterpret_cast<const DynamicArrayType*>(NODE_THIS.type());
         const StringType* stype = c->stringType();
 
         if (!s->currentFB())
@@ -924,8 +887,7 @@ namespace Rv
         {
             for (int i = 0; i < f->numChannels(); i++, index++)
             {
-                array->element<ClassInstance*>(index) =
-                    stype->allocate(f->channelName(i));
+                array->element<ClassInstance*>(index) = stype->allocate(f->channelName(i));
             }
         }
 
@@ -937,8 +899,7 @@ namespace Rv
         Process* p = NODE_THREAD.process();
         MuLangContext* c = TwkApp::muContext();
         RvSession* s = RvSession::currentRvSession();
-        const DynamicArrayType* atype =
-            reinterpret_cast<const DynamicArrayType*>(NODE_THIS.type());
+        const DynamicArrayType* atype = reinterpret_cast<const DynamicArrayType*>(NODE_THIS.type());
         const Class* ttype = static_cast<const Class*>(atype->elementType());
         const StringType* stype = c->stringType();
 
@@ -949,8 +910,7 @@ namespace Rv
 
         const TwkFB::FrameBuffer* fb = s->currentFB();
 
-        const TwkFB::FrameBuffer::AttributeVector& attributes =
-            fb->attributes();
+        const TwkFB::FrameBuffer::AttributeVector& attributes = fb->attributes();
 
         struct STuple
         {
@@ -979,16 +939,13 @@ namespace Rv
         Process* p = NODE_THREAD.process();
         MuLangContext* c = TwkApp::muContext();
         RvSession* s = RvSession::currentRvSession();
-        const DynamicArrayType* atype =
-            static_cast<const DynamicArrayType*>(NODE_THIS.type());
+        const DynamicArrayType* atype = static_cast<const DynamicArrayType*>(NODE_THIS.type());
         const Class* ttype = static_cast<const Class*>(atype->elementType());
         const StringType* stype = c->stringType();
         const StringType::String* name = NODE_ARG_OBJECT(0, StringType::String);
-        const StringType::String* media =
-            NODE_ARG_OBJECT(1, StringType::String);
+        const StringType::String* media = NODE_ARG_OBJECT(1, StringType::String);
 
-        const TwkFB::FrameBuffer* fb =
-            name ? s->currentFB(name->c_str()) : s->currentFB();
+        const TwkFB::FrameBuffer* fb = name ? s->currentFB(name->c_str()) : s->currentFB();
 
         //
         //  Even if we found an FB above, this source media may have changed
@@ -1009,8 +966,7 @@ namespace Rv
                 {
                     size_t index = snode->mediaIndex(media->c_str());
                     if (index == size_t(-1))
-                        throwBadArgumentException(NODE_THIS, NODE_THREAD,
-                                                  "bad source name");
+                        throwBadArgumentException(NODE_THIS, NODE_THREAD, "bad source name");
                     fb = &snode->mediaMovieInfo(index).proxy;
                 }
             }
@@ -1019,8 +975,7 @@ namespace Rv
         if (!fb)
             NODE_RETURN(0);
 
-        const TwkFB::FrameBuffer::AttributeVector& attributes =
-            fb->attributes();
+        const TwkFB::FrameBuffer::AttributeVector& attributes = fb->attributes();
 
         struct STuple
         {
@@ -1049,19 +1004,14 @@ namespace Rv
         Process* p = NODE_THREAD.process();
         MuLangContext* c = TwkApp::muContext();
         RvSession* s = RvSession::currentRvSession();
-        const DynamicArrayType* atype =
-            static_cast<const DynamicArrayType*>(NODE_THIS.type());
-        const TupleType* ttype =
-            static_cast<const TupleType*>(atype->elementType());
-        const DynamicArrayType* btype =
-            static_cast<const DynamicArrayType*>(ttype->tupleFieldTypes()[1]);
+        const DynamicArrayType* atype = static_cast<const DynamicArrayType*>(NODE_THIS.type());
+        const TupleType* ttype = static_cast<const TupleType*>(atype->elementType());
+        const DynamicArrayType* btype = static_cast<const DynamicArrayType*>(ttype->tupleFieldTypes()[1]);
         const StringType* stype = c->stringType();
         const StringType::String* name = NODE_ARG_OBJECT(0, StringType::String);
-        const StringType::String* media =
-            NODE_ARG_OBJECT(1, StringType::String);
+        const StringType::String* media = NODE_ARG_OBJECT(1, StringType::String);
 
-        const TwkFB::FrameBuffer* fb =
-            name ? s->currentFB(name->c_str()) : s->currentFB();
+        const TwkFB::FrameBuffer* fb = name ? s->currentFB(name->c_str()) : s->currentFB();
 
         //
         //  Even if we found an FB above, this source media may have changed
@@ -1082,8 +1032,7 @@ namespace Rv
                 {
                     size_t index = snode->mediaIndex(media->c_str());
                     if (index == size_t(-1))
-                        throwBadArgumentException(NODE_THIS, NODE_THREAD,
-                                                  "bad source name");
+                        throwBadArgumentException(NODE_THIS, NODE_THREAD, "bad source name");
                     fb = &snode->mediaMovieInfo(index).proxy;
                 }
             }
@@ -1092,8 +1041,7 @@ namespace Rv
         if (!fb)
             NODE_RETURN(0);
 
-        const TwkFB::FrameBuffer::AttributeVector& attributes =
-            fb->attributes();
+        const TwkFB::FrameBuffer::AttributeVector& attributes = fb->attributes();
 
         struct STuple
         {
@@ -1105,8 +1053,7 @@ namespace Rv
 
         for (int i = 0; i < attributes.size(); i++)
         {
-            if (TwkFB::DataContainerAttribute* da =
-                    dynamic_cast<TwkFB::DataContainerAttribute*>(attributes[i]))
+            if (TwkFB::DataContainerAttribute* da = dynamic_cast<TwkFB::DataContainerAttribute*>(attributes[i]))
             {
                 count++;
             }
@@ -1117,15 +1064,13 @@ namespace Rv
 
         for (int i = 0, c = 0; i < attributes.size(); i++)
         {
-            if (TwkFB::DataContainerAttribute* da =
-                    dynamic_cast<TwkFB::DataContainerAttribute*>(attributes[i]))
+            if (TwkFB::DataContainerAttribute* da = dynamic_cast<TwkFB::DataContainerAttribute*>(attributes[i]))
             {
                 ClassInstance* tuple = ClassInstance::allocate(ttype);
                 STuple* st = reinterpret_cast<STuple*>(tuple->structure());
                 st->attrName = stype->allocate(da->name());
 
-                DynamicArray* barray =
-                    new DynamicArray(btype, 1); // 1-dimensional
+                DynamicArray* barray = new DynamicArray(btype, 1); // 1-dimensional
                 const TwkFB::DataContainer* data = da->dataContainer();
                 const size_t n = data->size();
 
@@ -1159,8 +1104,7 @@ namespace Rv
         p[2] = 0;
         p[3] = 0;
 
-        const TwkFB::FrameBuffer* fb =
-            name ? s->currentFB(name->c_str()) : s->currentFB();
+        const TwkFB::FrameBuffer* fb = name ? s->currentFB(name->c_str()) : s->currentFB();
 
         if (fb && fb->uncrop())
         {
@@ -1173,30 +1117,22 @@ namespace Rv
             double offsetX = fb->uncropX();
             double offsetY = fb->uncropY();
             int orientation = fb->orientation();
-            if (orientation == TwkFB::FrameBuffer::BOTTOMRIGHT
-                || orientation == TwkFB::FrameBuffer::TOPRIGHT)
-                offsetX = double(fb->uncropWidth()) - double(fb->width())
-                          - double(fb->uncropX());
-            if (orientation == TwkFB::FrameBuffer::TOPLEFT
-                || orientation == TwkFB::FrameBuffer::TOPRIGHT)
-                offsetY = double(fb->uncropHeight()) - double(fb->height())
-                          - double(fb->uncropY());
+            if (orientation == TwkFB::FrameBuffer::BOTTOMRIGHT || orientation == TwkFB::FrameBuffer::TOPRIGHT)
+                offsetX = double(fb->uncropWidth()) - double(fb->width()) - double(fb->uncropX());
+            if (orientation == TwkFB::FrameBuffer::TOPLEFT || orientation == TwkFB::FrameBuffer::TOPRIGHT)
+                offsetY = double(fb->uncropHeight()) - double(fb->height()) - double(fb->uncropY());
 
             const double w = double(fb->width());
             const double h = double(fb->height());
             const double cx0 = double(offsetX) / double(fb->uncropWidth());
             const double cy0 = double(offsetY) / double(fb->uncropHeight());
-            const double cx1 =
-                double(offsetX + fb->width()) / double(fb->uncropWidth());
-            const double cy1 =
-                double(offsetY + fb->height()) / double(fb->uncropHeight());
+            const double cx1 = double(offsetX + fb->width()) / double(fb->uncropWidth());
+            const double cy1 = double(offsetY + fb->height()) / double(fb->uncropHeight());
             const double cw = cx1 - cx0;
             const double ch = cy1 - cy0;
 
-            x = (double(x) / double(fb->uncropWidth()) - cx0) / cw
-                * (fb->width() - 1);
-            y = (double(y) / double(fb->uncropHeight()) - cy0) / ch
-                * (fb->height() - 1);
+            x = (double(x) / double(fb->uncropWidth()) - cx0) / cw * (fb->width() - 1);
+            y = (double(y) / double(fb->uncropHeight()) - cy0) / ch * (fb->height() - 1);
         }
 
         // Because of tiling, we can obtain x/y coordinates that are in the
@@ -1220,12 +1156,10 @@ namespace Rv
         MuLangContext* c = TwkApp::muContext();
         RvSession* s = RvSession::currentRvSession();
         const StringType::String* name = NODE_ARG_OBJECT(0, StringType::String);
-        const DynamicArrayType* atype =
-            reinterpret_cast<const DynamicArrayType*>(NODE_THIS.type());
+        const DynamicArrayType* atype = reinterpret_cast<const DynamicArrayType*>(NODE_THIS.type());
         const StringType* stype = c->stringType();
 
-        const TwkFB::FrameBuffer* fb =
-            name ? s->currentFB(name->c_str()) : s->currentFB();
+        const TwkFB::FrameBuffer* fb = name ? s->currentFB(name->c_str()) : s->currentFB();
 
         if (!fb)
             NODE_RETURN(0);
@@ -1246,8 +1180,7 @@ namespace Rv
         {
             for (int i = 0; i < f->numChannels(); i++, index++)
             {
-                array->element<ClassInstance*>(index) =
-                    stype->allocate(f->channelName(i));
+                array->element<ClassInstance*>(index) = stype->allocate(f->channelName(i));
             }
         }
 
@@ -1257,8 +1190,7 @@ namespace Rv
     NODE_IMPLEMENTATION(addSource, void)
     {
         Session* s = RvSession::currentRvSession();
-        const StringType::String* source =
-            NODE_ARG_OBJECT(0, StringType::String);
+        const StringType::String* source = NODE_ARG_OBJECT(0, StringType::String);
         const StringType::String* tag = NODE_ARG_OBJECT(1, StringType::String);
 
         if (!source)
@@ -1308,16 +1240,13 @@ namespace Rv
         for (size_t i = 0; i < array->size(); i++)
         {
 
-            string arg = IPCore::Application::mapFromVar(
-                array->element<StringType::String*>(i)->c_str());
+            string arg = IPCore::Application::mapFromVar(array->element<StringType::String*>(i)->c_str());
             filesAndOptions.emplace_back(arg);
-            filesAndOptionsRemote.emplace_back(
-                IPCore::Application::mapToVar(arg));
+            filesAndOptionsRemote.emplace_back(IPCore::Application::mapToVar(arg));
         }
 
         // silences broadcasting events below this constructor
-        IPMu::RemoteRvCommand remoteRvCommand(s, "addSourceVerbose",
-                                              filesAndOptionsRemote, tag);
+        IPMu::RemoteRvCommand remoteRvCommand(s, "addSourceVerbose", filesAndOptionsRemote, tag);
 
         // Now that we've broadcast the remote event, complete the work without
         // broadcasting anything else.
@@ -1338,8 +1267,7 @@ namespace Rv
             // If progressive source loading is disabled, we don't have to check
             // if the graph isMediaLoading() because this mechanism is not used
             // in that case.
-            if (!Options::sharedOptions().progressiveSourceLoading
-                || !s->graph().isMediaLoading())
+            if (!Options::sharedOptions().progressiveSourceLoading || !s->graph().isMediaLoading())
             {
                 s->userGenericEvent("before-progressive-loading", "");
             }
@@ -1393,15 +1321,13 @@ namespace Rv
 
         for (size_t i = 0; i < array->size(); i++)
         {
-            string arg = IPCore::Application::mapFromVar(
-                array->element<StringType::String*>(i)->c_str());
+            string arg = IPCore::Application::mapFromVar(array->element<StringType::String*>(i)->c_str());
             sargs.push_back(arg);
             sargsRemote.push_back(IPCore::Application::mapToVar(arg));
         }
 
         // silences broadcasting events below this constructor
-        IPMu::RemoteRvCommand remoteRvCommand(s, "addSources", sargsRemote, tag,
-                                              processOpts, merge);
+        IPMu::RemoteRvCommand remoteRvCommand(s, "addSources", sargsRemote, tag, processOpts, merge);
 
         //
         //  Note we do not make GraphEdit object here, since this load will be
@@ -1416,8 +1342,7 @@ namespace Rv
     {
         RvSession* s = RvSession::currentRvSession();
         DynamicArray* array = NODE_ARG_OBJECT(0, DynamicArray);
-        const DynamicArrayType* atype =
-            reinterpret_cast<const DynamicArrayType*>(NODE_THIS.type());
+        const DynamicArrayType* atype = reinterpret_cast<const DynamicArrayType*>(NODE_THIS.type());
         StringType::String* muTag = NODE_ARG_OBJECT(1, StringType::String);
         string tag = (muTag) ? muTag->c_str() : "";
         MuLangContext* c = TwkApp::muContext();
@@ -1439,11 +1364,9 @@ namespace Rv
             filesAndOptions.reserve(currentSource->size());
             for (size_t j = 0; j < currentSource->size(); j++)
             {
-                string arg = IPCore::Application::mapFromVar(
-                    currentSource->element<StringType::String*>(j)->c_str());
+                string arg = IPCore::Application::mapFromVar(currentSource->element<StringType::String*>(j)->c_str());
                 filesAndOptions.emplace_back(arg);
-                filesAndOptionsRemote.emplace_back(
-                    IPCore::Application::mapToVar(arg));
+                filesAndOptionsRemote.emplace_back(IPCore::Application::mapToVar(arg));
             }
 
             allFilesAndOptions.push_back(filesAndOptions);
@@ -1451,8 +1374,7 @@ namespace Rv
         }
 
         // silences broadcasting events below this constructor
-        IPMu::RemoteRvCommand remoteRvCommand(s, "addSourcesVerbose",
-                                              allFilesAndOptionsRemote, tag);
+        IPMu::RemoteRvCommand remoteRvCommand(s, "addSourcesVerbose", allFilesAndOptionsRemote, tag);
 
         // Now that we've broadcast the remote event, complete the work without
         // broadcasting anything else.
@@ -1473,8 +1395,7 @@ namespace Rv
             // If progressive source loading is disabled, we don't have to check
             // if the graph isMediaLoading() because this mechanism is not used
             // in that case.
-            if (!Options::sharedOptions().progressiveSourceLoading
-                || !s->graph().isMediaLoading())
+            if (!Options::sharedOptions().progressiveSourceLoading || !s->graph().isMediaLoading())
             {
                 s->userGenericEvent("before-progressive-loading", "");
             }
@@ -1535,8 +1456,7 @@ namespace Rv
         // relying only on one and risking that the other gets used
         // inadvertantly in the future.
         Rv::Options::sharedOptions().progressiveSourceLoading = enable;
-        IPCore::Application::setOptionValue<bool>("progressiveSourceLoading",
-                                                  enable);
+        IPCore::Application::setOptionValue<bool>("progressiveSourceLoading", enable);
     }
 
     NODE_IMPLEMENTATION(progressiveSourceLoading, bool)
@@ -1572,8 +1492,7 @@ namespace Rv
             throwBadArgumentException(NODE_THIS, NODE_THREAD, "nil file arg");
 
         IPGraph::GraphEdit edit(s->graph());
-        s->addToSource(node->c_str(), file->c_str(),
-                       string(tag ? tag->c_str() : ""));
+        s->addToSource(node->c_str(), file->c_str(), string(tag ? tag->c_str() : ""));
         s->askForRedraw();
     }
 
@@ -1593,8 +1512,7 @@ namespace Rv
             files.push_back(array->element<StringType::String*>(i)->c_str());
 
         IPGraph::GraphEdit edit(s->graph());
-        s->setSourceMedia(node->c_str(), files,
-                          string(tag ? tag->c_str() : ""));
+        s->setSourceMedia(node->c_str(), files, string(tag ? tag->c_str() : ""));
         s->askForRedraw();
     }
 
@@ -1602,38 +1520,29 @@ namespace Rv
     {
         RvSession* s = RvSession::currentRvSession();
         StringType::String* sourceNode = NODE_ARG_OBJECT(0, StringType::String);
-        StringType::String* mediaRepName =
-            NODE_ARG_OBJECT(1, StringType::String);
-        DynamicArray* mediaRepPathsAndOptionsArg =
-            NODE_ARG_OBJECT(2, DynamicArray);
+        StringType::String* mediaRepName = NODE_ARG_OBJECT(1, StringType::String);
+        DynamicArray* mediaRepPathsAndOptionsArg = NODE_ARG_OBJECT(2, DynamicArray);
         StringType::String* tag = NODE_ARG_OBJECT(3, StringType::String);
         Process* p = NODE_THREAD.process();
         MuLangContext* c = static_cast<MuLangContext*>(p->context());
         const StringType* stype = c->stringType();
 
         if (!sourceNode)
-            throwBadArgumentException(NODE_THIS, NODE_THREAD,
-                                      "nil source node arg");
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "nil source node arg");
         if (!mediaRepName)
-            throwBadArgumentException(NODE_THIS, NODE_THREAD,
-                                      "nil media representation name arg");
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "nil media representation name arg");
         if (!mediaRepPathsAndOptionsArg)
-            throwBadArgumentException(NODE_THIS, NODE_THREAD,
-                                      "nil media representation paths arg");
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "nil media representation paths arg");
 
         vector<string> mediaRepPathsAndOptions;
         mediaRepPathsAndOptions.reserve(mediaRepPathsAndOptionsArg->size());
         for (size_t i = 0; i < mediaRepPathsAndOptionsArg->size(); i++)
-            mediaRepPathsAndOptions.emplace_back(
-                mediaRepPathsAndOptionsArg->element<StringType::String*>(i)
-                    ->c_str());
+            mediaRepPathsAndOptions.emplace_back(mediaRepPathsAndOptionsArg->element<StringType::String*>(i)->c_str());
 
         IPGraph::GraphEdit edit(s->graph());
-        SourceIPNode* node = s->addSourceMediaRep(
-            sourceNode->c_str(), mediaRepName->c_str(), mediaRepPathsAndOptions,
-            string(tag ? tag->c_str() : ""));
-        StringType::String* nodeName =
-            stype->allocate(node ? node->name() : "");
+        SourceIPNode* node =
+            s->addSourceMediaRep(sourceNode->c_str(), mediaRepName->c_str(), mediaRepPathsAndOptions, string(tag ? tag->c_str() : ""));
+        StringType::String* nodeName = stype->allocate(node ? node->name() : "");
         NODE_RETURN(nodeName);
     }
 
@@ -1641,24 +1550,19 @@ namespace Rv
     {
         RvSession* s = RvSession::currentRvSession();
         StringType::String* sourceNode = NODE_ARG_OBJECT(0, StringType::String);
-        StringType::String* mediaRepName =
-            NODE_ARG_OBJECT(1, StringType::String);
+        StringType::String* mediaRepName = NODE_ARG_OBJECT(1, StringType::String);
         StringType::String* tag = NODE_ARG_OBJECT(2, StringType::String);
 
         if (!sourceNode)
-            throwBadArgumentException(NODE_THIS, NODE_THREAD,
-                                      "nil source node arg");
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "nil source node arg");
         if (!mediaRepName)
-            throwBadArgumentException(NODE_THIS, NODE_THREAD,
-                                      "nil media representation name arg");
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "nil media representation name arg");
 
         IPGraph::GraphEdit edit(s->graph());
 
         try
         {
-            s->setActiveSourceMediaRep(sourceNode->c_str(),
-                                       mediaRepName->c_str(),
-                                       string(tag ? tag->c_str() : ""));
+            s->setActiveSourceMediaRep(sourceNode->c_str(), mediaRepName->c_str(), string(tag ? tag->c_str() : ""));
         }
         catch (TwkExc::Exception& exc)
         {
@@ -1674,13 +1578,11 @@ namespace Rv
         StringType::String* sourceNode = NODE_ARG_OBJECT(0, StringType::String);
         Process* p = NODE_THREAD.process();
         MuLangContext* c = static_cast<MuLangContext*>(p->context());
-        const DynamicArrayType* atype =
-            reinterpret_cast<const DynamicArrayType*>(NODE_THIS.type());
+        const DynamicArrayType* atype = reinterpret_cast<const DynamicArrayType*>(NODE_THIS.type());
         const StringType* stype = c->stringType();
 
         if (!sourceNode)
-            throwBadArgumentException(NODE_THIS, NODE_THREAD,
-                                      "nil source node arg");
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "nil source node arg");
 
         std::string mediaRepName = s->sourceMediaRep(sourceNode->c_str());
         StringType::String* name = stype->allocate(mediaRepName);
@@ -1694,13 +1596,11 @@ namespace Rv
         StringType::String* sourceNode = NODE_ARG_OBJECT(0, StringType::String);
         Process* p = NODE_THREAD.process();
         MuLangContext* c = static_cast<MuLangContext*>(p->context());
-        const DynamicArrayType* atype =
-            reinterpret_cast<const DynamicArrayType*>(NODE_THIS.type());
+        const DynamicArrayType* atype = reinterpret_cast<const DynamicArrayType*>(NODE_THIS.type());
         const StringType* stype = c->stringType();
 
         if (!sourceNode)
-            throwBadArgumentException(NODE_THIS, NODE_THREAD,
-                                      "nil source node arg");
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "nil source node arg");
 
         Session::StringVector mediaReps;
         s->sourceMediaReps(sourceNode->c_str(), mediaReps);
@@ -1708,8 +1608,7 @@ namespace Rv
         names->resize(mediaReps.size());
         for (size_t i = 0; i < mediaReps.size(); i++)
         {
-            names->element<StringType::String*>(i) =
-                stype->allocate(mediaReps[i]);
+            names->element<StringType::String*>(i) = stype->allocate(mediaReps[i]);
         }
 
         NODE_RETURN(names);
@@ -1718,27 +1617,21 @@ namespace Rv
     NODE_IMPLEMENTATION(sourceMediaRepsAndNodes, Pointer)
     {
         RvSession* s = RvSession::currentRvSession();
-        StringType::String* sourceOrSwitchNode =
-            NODE_ARG_OBJECT(0, StringType::String);
+        StringType::String* sourceOrSwitchNode = NODE_ARG_OBJECT(0, StringType::String);
         Process* p = NODE_THREAD.process();
         MuLangContext* c = static_cast<MuLangContext*>(p->context());
-        const DynamicArrayType* atype =
-            reinterpret_cast<const DynamicArrayType*>(NODE_THIS.type());
-        const TupleType* ttype =
-            static_cast<const TupleType*>(atype->elementType());
+        const DynamicArrayType* atype = reinterpret_cast<const DynamicArrayType*>(NODE_THIS.type());
+        const TupleType* ttype = static_cast<const TupleType*>(atype->elementType());
         const StringType* stype = c->stringType();
 
         if (!sourceOrSwitchNode)
-            throwBadArgumentException(NODE_THIS, NODE_THREAD,
-                                      "nil source or switch node arg");
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "nil source or switch node arg");
 
         Session::StringVector mediaRepNames;
         Session::StringVector mediaRepSrcNodes;
-        s->sourceMediaReps(sourceOrSwitchNode->c_str(), mediaRepNames,
-                           &mediaRepSrcNodes);
+        s->sourceMediaReps(sourceOrSwitchNode->c_str(), mediaRepNames, &mediaRepSrcNodes);
 
-        if (mediaRepNames.empty()
-            || (mediaRepNames.size() != mediaRepSrcNodes.size()))
+        if (mediaRepNames.empty() || (mediaRepNames.size() != mediaRepSrcNodes.size()))
             NODE_RETURN(0);
 
         struct STuple
@@ -1769,16 +1662,13 @@ namespace Rv
         StringType::String* sourceNode = NODE_ARG_OBJECT(0, StringType::String);
         Process* p = NODE_THREAD.process();
         MuLangContext* c = static_cast<MuLangContext*>(p->context());
-        const DynamicArrayType* atype =
-            reinterpret_cast<const DynamicArrayType*>(NODE_THIS.type());
+        const DynamicArrayType* atype = reinterpret_cast<const DynamicArrayType*>(NODE_THIS.type());
         const StringType* stype = c->stringType();
 
         if (!sourceNode)
-            throwBadArgumentException(NODE_THIS, NODE_THREAD,
-                                      "nil source node arg");
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "nil source node arg");
 
-        std::string switchNodeName =
-            s->sourceMediaRepSwitchNode(sourceNode->c_str());
+        std::string switchNodeName = s->sourceMediaRepSwitchNode(sourceNode->c_str());
         StringType::String* name = stype->allocate(switchNodeName);
 
         NODE_RETURN(name);
@@ -1790,16 +1680,13 @@ namespace Rv
         StringType::String* sourceNode = NODE_ARG_OBJECT(0, StringType::String);
         Process* p = NODE_THREAD.process();
         MuLangContext* c = static_cast<MuLangContext*>(p->context());
-        const DynamicArrayType* atype =
-            reinterpret_cast<const DynamicArrayType*>(NODE_THIS.type());
+        const DynamicArrayType* atype = reinterpret_cast<const DynamicArrayType*>(NODE_THIS.type());
         const StringType* stype = c->stringType();
 
         if (!sourceNode)
-            throwBadArgumentException(NODE_THIS, NODE_THREAD,
-                                      "nil source node arg");
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "nil source node arg");
 
-        std::string sourceNodeName =
-            s->sourceMediaRepSourceNode(sourceNode->c_str());
+        std::string sourceNodeName = s->sourceMediaRepSourceNode(sourceNode->c_str());
         StringType::String* name = stype->allocate(sourceNodeName);
 
         NODE_RETURN(name);
@@ -1826,11 +1713,9 @@ namespace Rv
         if (!node)
             throwBadArgumentException(NODE_THIS, NODE_THREAD, "nil node arg");
         if (!oldName)
-            throwBadArgumentException(NODE_THIS, NODE_THREAD,
-                                      "old media name is nil");
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "old media name is nil");
         if (!newName)
-            throwBadArgumentException(NODE_THIS, NODE_THREAD,
-                                      "new media name is nil");
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "new media name is nil");
 
         IPGraph::GraphEdit edit(s->graph());
         s->relocateSource(oldName->c_str(), newName->c_str(), node->c_str());
@@ -1842,12 +1727,10 @@ namespace Rv
         RvSession* s = RvSession::currentRvSession();
         const StringType* t = static_cast<const StringType*>(NODE_THIS.type());
         const StringType::String* key = NODE_ARG_OBJECT(0, StringType::String);
-        const StringType::String* defaultValue =
-            NODE_ARG_OBJECT(1, StringType::String);
+        const StringType::String* defaultValue = NODE_ARG_OBJECT(1, StringType::String);
 
         if (!key)
-            throwBadArgumentException(NODE_THIS, NODE_THREAD,
-                                      "flag key is nil");
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "flag key is nil");
 
         string val = s->lookupMuFlag(key->c_str());
 
@@ -1867,21 +1750,18 @@ namespace Rv
         {
             if (!(node = s->graph().findNode(name->c_str())))
             {
-                throwBadArgumentException(NODE_THIS, NODE_THREAD,
-                                          "Bad ocio node name");
+                throwBadArgumentException(NODE_THIS, NODE_THREAD, "Bad ocio node name");
             }
         }
         else
         {
-            throwBadArgumentException(NODE_THIS, NODE_THREAD,
-                                      "Null ocio node name");
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "Null ocio node name");
         }
 
         OCIOIPNode* ocioNode = dynamic_cast<OCIOIPNode*>(node);
         if (!ocioNode)
         {
-            throwBadArgumentException(NODE_THIS, NODE_THREAD,
-                                      "Not an ocio node");
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "Not an ocio node");
         }
 
         try
@@ -1905,10 +1785,7 @@ namespace Rv
         NODE_RETURN(name);
     }
 
-    NODE_IMPLEMENTATION(licensingState, int)
-    {
-        NODE_RETURN(TWK_DEPLOY_GET_LICENSE_STATE());
-    }
+    NODE_IMPLEMENTATION(licensingState, int) { NODE_RETURN(TWK_DEPLOY_GET_LICENSE_STATE()); }
 
     //----------------------------------------------------------------------
     //
@@ -1990,8 +1867,7 @@ namespace Rv
         fields[12] = make_pair(string("audioChannels"), context->intType());
         fields[13] = make_pair(string("audioFloat"), context->boolType());
         fields[14] = make_pair(string("displayMode"), context->intType());
-        context->arrayType(context->structType(0, "VideoDeviceState", fields),
-                           1, 0);
+        context->arrayType(context->structType(0, "VideoDeviceState", fields), 1, 0);
 
         fields.resize(3);
         fields[0] = make_pair(string("name"), context->stringType());
@@ -2016,15 +1892,13 @@ namespace Rv
         fields[3] = make_pair(string("size"), context->intType());
         fields[4] = make_pair(string("userDefined"), context->boolType());
         fields[5] = make_pair(string("info"), context->stringType());
-        context->arrayType(context->structType(0, "PropertyInfo", fields), 1,
-                           0);
+        context->arrayType(context->structType(0, "PropertyInfo", fields), 1, 0);
 
         fields.resize(3);
         fields[0] = make_pair(string("node"), context->stringType());
         fields[1] = make_pair(string("nodeType"), context->stringType());
         fields[2] = make_pair(string("frame"), context->intType());
-        context->arrayType(context->structType(0, "MetaEvalInfo", fields), 1,
-                           0);
+        context->arrayType(context->structType(0, "MetaEvalInfo", fields), 1, 0);
 
         fields.resize(5);
         fields[0] = make_pair(string("extension"), context->stringType());
@@ -2079,316 +1953,207 @@ namespace Rv
         types.erase(types.begin());
         context->tupleType(types); // (string[],string[])
 
-        commands->addSymbols(
-            new SymbolicConstant(c, "RGB709", "int", Value(0)),
-            new SymbolicConstant(c, "CIEXYZ", "int", Value(1)),
+        commands->addSymbols(new SymbolicConstant(c, "RGB709", "int", Value(0)), new SymbolicConstant(c, "CIEXYZ", "int", Value(1)),
 
-            new SymbolicConstant(c, "PlayLoop", "int", Value(0)),
-            new SymbolicConstant(c, "PlayOnce", "int", Value(1)),
-            new SymbolicConstant(c, "PlayPingPong", "int", Value(2)),
+                             new SymbolicConstant(c, "PlayLoop", "int", Value(0)), new SymbolicConstant(c, "PlayOnce", "int", Value(1)),
+                             new SymbolicConstant(c, "PlayPingPong", "int", Value(2)),
 
-            new SymbolicConstant(c, "OkImageStatus", "int",
-                                 Value(Session::OkStatus)),
-            new SymbolicConstant(c, "ErrorImageStatus", "int",
-                                 Value(Session::ErrorStatus)),
-            new SymbolicConstant(c, "WarningImageStatus", "int",
-                                 Value(Session::WarningStatus)),
-            new SymbolicConstant(c, "NoImageStatus", "int",
-                                 Value(Session::NoImageStatus)),
-            new SymbolicConstant(c, "PartialImageStatus", "int",
-                                 Value(Session::PartialStatus)),
-            new SymbolicConstant(c, "LoadingImageStatus", "int",
-                                 Value(Session::LoadingStatus)),
+                             new SymbolicConstant(c, "OkImageStatus", "int", Value(Session::OkStatus)),
+                             new SymbolicConstant(c, "ErrorImageStatus", "int", Value(Session::ErrorStatus)),
+                             new SymbolicConstant(c, "WarningImageStatus", "int", Value(Session::WarningStatus)),
+                             new SymbolicConstant(c, "NoImageStatus", "int", Value(Session::NoImageStatus)),
+                             new SymbolicConstant(c, "PartialImageStatus", "int", Value(Session::PartialStatus)),
+                             new SymbolicConstant(c, "LoadingImageStatus", "int", Value(Session::LoadingStatus)),
 
-            new SymbolicConstant(c, "SequenceSession", "int",
-                                 Value(Session::SequenceSession)),
-            new SymbolicConstant(c, "StackSession", "int",
-                                 Value(Session::StackSession)),
+                             new SymbolicConstant(c, "SequenceSession", "int", Value(Session::SequenceSession)),
+                             new SymbolicConstant(c, "StackSession", "int", Value(Session::StackSession)),
 
-            new SymbolicConstant(c, "CacheOff", "int",
-                                 Value(Session::NeverCache)),
-            new SymbolicConstant(c, "CacheBuffer", "int",
-                                 Value(Session::BufferCache)),
-            new SymbolicConstant(c, "CacheGreedy", "int",
-                                 Value(Session::GreedyCache)),
+                             new SymbolicConstant(c, "CacheOff", "int", Value(Session::NeverCache)),
+                             new SymbolicConstant(c, "CacheBuffer", "int", Value(Session::BufferCache)),
+                             new SymbolicConstant(c, "CacheGreedy", "int", Value(Session::GreedyCache)),
 
-            new SymbolicConstant(c, "IntType", "int",
-                                 Value(Property::IntLayout)),
-            new SymbolicConstant(c, "FloatType", "int",
-                                 Value(Property::FloatLayout)),
-            new SymbolicConstant(c, "HalfType", "int",
-                                 Value(Property::HalfLayout)),
-            new SymbolicConstant(c, "StringType", "int",
-                                 Value(Property::StringLayout)),
-            new SymbolicConstant(c, "ByteType", "int",
-                                 Value(Property::ByteLayout)),
-            new SymbolicConstant(c, "ShortType", "int",
-                                 Value(Property::ShortLayout)),
+                             new SymbolicConstant(c, "IntType", "int", Value(Property::IntLayout)),
+                             new SymbolicConstant(c, "FloatType", "int", Value(Property::FloatLayout)),
+                             new SymbolicConstant(c, "HalfType", "int", Value(Property::HalfLayout)),
+                             new SymbolicConstant(c, "StringType", "int", Value(Property::StringLayout)),
+                             new SymbolicConstant(c, "ByteType", "int", Value(Property::ByteLayout)),
+                             new SymbolicConstant(c, "ShortType", "int", Value(Property::ShortLayout)),
 
-            new SymbolicConstant(c, "IndependentDisplayMode", "int",
-                                 Value(VideoDevice::IndependentDisplayMode)),
-            new SymbolicConstant(c, "MirrorDisplayMode", "int",
-                                 Value(VideoDevice::MirrorDisplayMode)),
-            new SymbolicConstant(c, "NotADisplayMode", "int",
-                                 Value(VideoDevice::NotADisplayMode)),
+                             new SymbolicConstant(c, "IndependentDisplayMode", "int", Value(VideoDevice::IndependentDisplayMode)),
+                             new SymbolicConstant(c, "MirrorDisplayMode", "int", Value(VideoDevice::MirrorDisplayMode)),
+                             new SymbolicConstant(c, "NotADisplayMode", "int", Value(VideoDevice::NotADisplayMode)),
 
-            new SymbolicConstant(c, "VideoAndDataFormatID", "int",
-                                 Value(VideoDevice::VideoAndDataFormatID)),
-            new SymbolicConstant(c, "DeviceNameID", "int",
-                                 Value(VideoDevice::DeviceNameID)),
-            new SymbolicConstant(c, "ModuleNameID", "int",
-                                 Value(VideoDevice::ModuleNameID)),
+                             new SymbolicConstant(c, "VideoAndDataFormatID", "int", Value(VideoDevice::VideoAndDataFormatID)),
+                             new SymbolicConstant(c, "DeviceNameID", "int", Value(VideoDevice::DeviceNameID)),
+                             new SymbolicConstant(c, "ModuleNameID", "int", Value(VideoDevice::ModuleNameID)),
 
-            EndArguments);
+                             EndArguments);
 
         commands->addSymbols(
 
             new Function(c, "data", data, None, Return, "object", End),
 
-            new Function(c, "sources", sources, None, Return,
-                         "(string,int,int,int,float,bool,bool)[]", End),
+            new Function(c, "sources", sources, None, Return, "(string,int,int,int,float,bool,bool)[]", End),
 
-            new Function(c, "sourceMedia", sourceMedia, None, Return,
-                         "(string,string[],string[])", Parameters,
+            new Function(c, "sourceMedia", sourceMedia, None, Return, "(string,string[],string[])", Parameters,
                          new Param(c, "sourceName", "string"), End),
 
-            new Function(c, "sourcePixelValue", sourcePixelValue, None, Return,
-                         "vector float[4]", Parameters,
-                         new Param(c, "sourceName", "string"),
-                         new Param(c, "px", "float"),
-                         new Param(c, "py", "float"), End),
+            new Function(c, "sourcePixelValue", sourcePixelValue, None, Return, "vector float[4]", Parameters,
+                         new Param(c, "sourceName", "string"), new Param(c, "px", "float"), new Param(c, "py", "float"), End),
 
-            new Function(c, "sourceAttributes", sourceAttributes, None, Return,
-                         "(string,string)[]", Parameters,
-                         new Param(c, "sourceName", "string"),
-                         new Param(c, "mediaName", "string", Value()), End),
+            new Function(c, "sourceAttributes", sourceAttributes, None, Return, "(string,string)[]", Parameters,
+                         new Param(c, "sourceName", "string"), new Param(c, "mediaName", "string", Value()), End),
 
-            new Function(c, "sourceDataAttributes", sourceDataAttributes, None,
-                         Return, "(string,byte[])[]", Parameters,
-                         new Param(c, "sourceName", "string"),
-                         new Param(c, "mediaName", "string", Value()), End),
+            new Function(c, "sourceDataAttributes", sourceDataAttributes, None, Return, "(string,byte[])[]", Parameters,
+                         new Param(c, "sourceName", "string"), new Param(c, "mediaName", "string", Value()), End),
 
-            new Function(c, "sourceDisplayChannelNames",
-                         sourceDisplayChannelNames, None, Parameters,
-                         new Param(c, "sourceName", "string"), Return,
-                         "string[]", End),
-
-            new Function(c, "getCurrentImageSize", getCurrentImageSize, None,
-                         Return, "vector float[2]", End),
-
-            new Function(c, "getCurrentPixelValue", getCurrentPixelValue, None,
-                         Return, "vector float[4]", Parameters,
-                         new Param(c, "point", "vector float[2]"), End),
-
-            new Function(c, "getCurrentAttributes", getCurrentAttributes, None,
-                         Return, "(string,string)[]", End),
-
-            new Function(c, "getCurrentImageChannelNames",
-                         getCurrentImageChannelNames, None, Return, "string[]",
-                         End),
-
-            new Function(c, "getCurrentNodesOfType", getCurrentNodesOfType,
-                         None, Parameters, new Param(c, "typeName", "string"),
+            new Function(c, "sourceDisplayChannelNames", sourceDisplayChannelNames, None, Parameters, new Param(c, "sourceName", "string"),
                          Return, "string[]", End),
 
-            new Function(c, "addSource", addSource, None, Return, "void",
-                         Parameters, new Param(c, "fileName", "string"),
+            new Function(c, "getCurrentImageSize", getCurrentImageSize, None, Return, "vector float[2]", End),
+
+            new Function(c, "getCurrentPixelValue", getCurrentPixelValue, None, Return, "vector float[4]", Parameters,
+                         new Param(c, "point", "vector float[2]"), End),
+
+            new Function(c, "getCurrentAttributes", getCurrentAttributes, None, Return, "(string,string)[]", End),
+
+            new Function(c, "getCurrentImageChannelNames", getCurrentImageChannelNames, None, Return, "string[]", End),
+
+            new Function(c, "getCurrentNodesOfType", getCurrentNodesOfType, None, Parameters, new Param(c, "typeName", "string"), Return,
+                         "string[]", End),
+
+            new Function(c, "addSource", addSource, None, Return, "void", Parameters, new Param(c, "fileName", "string"),
                          new Param(c, "tag", "string", Value()), End),
 
-            new Function(c, "addSource", addSourceMulti, None, Return, "void",
-                         Parameters, new Param(c, "fileNames", "string[]"),
+            new Function(c, "addSource", addSourceMulti, None, Return, "void", Parameters, new Param(c, "fileNames", "string[]"),
                          new Param(c, "tag", "string", Value()), End),
 
-            new Function(c, "addSourceVerbose", addSourceVerbose, None, Return,
-                         "string", Parameters,
-                         new Param(c, "filePathsAndOptions", "string[]"),
-                         new Param(c, "tag", "string", Value()), End),
+            new Function(c, "addSourceVerbose", addSourceVerbose, None, Return, "string", Parameters,
+                         new Param(c, "filePathsAndOptions", "string[]"), new Param(c, "tag", "string", Value()), End),
 
-            new Function(c, "addSourceBegin", addSourceBegin, None, Return,
-                         "void", End),
+            new Function(c, "addSourceBegin", addSourceBegin, None, Return, "void", End),
 
-            new Function(c, "addSourceEnd", addSourceEnd, None, Return, "void",
-                         End),
+            new Function(c, "addSourceEnd", addSourceEnd, None, Return, "void", End),
 
-            new Function(c, "startPreloadingMedia", startPreloadingMedia, None,
-                         Return, "void", Parameters,
+            new Function(c, "startPreloadingMedia", startPreloadingMedia, None, Return, "void", Parameters,
                          new Param(c, "fileName", "string"), End),
 
-            new Function(c, "addSources", addSources, None, Return, "void",
-                         Parameters, new Param(c, "fileNames", "string[]"),
-                         new Param(c, "tag", "string", Value()),
-                         new Param(c, "processOpts", "bool", Value(false)),
+            new Function(c, "addSources", addSources, None, Return, "void", Parameters, new Param(c, "fileNames", "string[]"),
+                         new Param(c, "tag", "string", Value()), new Param(c, "processOpts", "bool", Value(false)),
                          new Param(c, "merge", "bool", Value(false)), End),
 
-            new Function(c, "addSourcesVerbose", addSourcesVerbose, None,
-                         Return, "string[]", Parameters,
-                         new Param(c, "filePathsAndOptions", "string[][]"),
-                         new Param(c, "tag", "string", Value()), End),
+            new Function(c, "addSourcesVerbose", addSourcesVerbose, None, Return, "string[]", Parameters,
+                         new Param(c, "filePathsAndOptions", "string[][]"), new Param(c, "tag", "string", Value()), End),
 
-            new Function(c, "setProgressiveSourceLoading",
-                         setProgressiveSourceLoading, None, Return, "void",
-                         Parameters, new Param(c, "enable", "bool"), End),
+            new Function(c, "setProgressiveSourceLoading", setProgressiveSourceLoading, None, Return, "void", Parameters,
+                         new Param(c, "enable", "bool"), End),
 
-            new Function(c, "progressiveSourceLoading",
-                         progressiveSourceLoading, None, Return, "bool", End),
+            new Function(c, "progressiveSourceLoading", progressiveSourceLoading, None, Return, "bool", End),
 
-            new Function(
-                c, "newImageSource", newImageSource, None, Return, "string",
-                Parameters, new Param(c, "mediaName", "string"),
-                new Param(c, "width", "int"), new Param(c, "height", "int"),
-                new Param(c, "uncropWidth", "int"),
-                new Param(c, "uncropHeight", "int"),
-                new Param(c, "uncropX", "int"), new Param(c, "uncropY", "int"),
-                new Param(c, "pixelAspect", "float"),
-                new Param(c, "channels", "int"),
-                new Param(c, "bitsPerChannel", "int"),
-                new Param(c, "floatingPoint", "bool"),
-                new Param(c, "startFrame", "int"),
-                new Param(c, "endFrame", "int"), new Param(c, "fps", "float"),
-                new Param(c, "layers", "string[]", Value()),
-                new Param(c, "views", "string[]", Value()), End),
+            new Function(c, "newImageSource", newImageSource, None, Return, "string", Parameters, new Param(c, "mediaName", "string"),
+                         new Param(c, "width", "int"), new Param(c, "height", "int"), new Param(c, "uncropWidth", "int"),
+                         new Param(c, "uncropHeight", "int"), new Param(c, "uncropX", "int"), new Param(c, "uncropY", "int"),
+                         new Param(c, "pixelAspect", "float"), new Param(c, "channels", "int"), new Param(c, "bitsPerChannel", "int"),
+                         new Param(c, "floatingPoint", "bool"), new Param(c, "startFrame", "int"), new Param(c, "endFrame", "int"),
+                         new Param(c, "fps", "float"), new Param(c, "layers", "string[]", Value()),
+                         new Param(c, "views", "string[]", Value()), End),
 
-            new Function(c, "newImageSourcePixels", newImageSourcePixels, None,
-                         Return, "string", Parameters,
-                         new Param(c, "sourceName", "string"),
-                         new Param(c, "frame", "int"),
-                         new Param(c, "layer", "string", Value()),
+            new Function(c, "newImageSourcePixels", newImageSourcePixels, None, Return, "string", Parameters,
+                         new Param(c, "sourceName", "string"), new Param(c, "frame", "int"), new Param(c, "layer", "string", Value()),
                          new Param(c, "view", "string", Value()), End),
 
-            new Function(c, "insertCreatePixelBlock", insertCreatePixelBlock,
-                         None, Return, "void", Parameters,
+            new Function(c, "insertCreatePixelBlock", insertCreatePixelBlock, None, Return, "void", Parameters,
                          new Param(c, "event", "Event"), End),
 
-            new Function(c, "addToSource", addToSource, None, Return, "void",
-                         Parameters, new Param(c, "fileName", "string"),
+            new Function(c, "addToSource", addToSource, None, Return, "void", Parameters, new Param(c, "fileName", "string"),
                          new Param(c, "tag", "string", Value()), End),
 
-            new Function(c, "addToSource", addToSource2, None, Return, "void",
-                         Parameters, new Param(c, "sourceNode", "string"),
-                         new Param(c, "fileName", "string"),
-                         new Param(c, "tag", "string"), End),
+            new Function(c, "addToSource", addToSource2, None, Return, "void", Parameters, new Param(c, "sourceNode", "string"),
+                         new Param(c, "fileName", "string"), new Param(c, "tag", "string"), End),
 
-            new Function(c, "setSourceMedia", setSourceMedia, None, Return,
-                         "void", Parameters,
-                         new Param(c, "sourceNode", "string"),
-                         new Param(c, "fileNames", "string[]"),
+            new Function(c, "setSourceMedia", setSourceMedia, None, Return, "void", Parameters, new Param(c, "sourceNode", "string"),
+                         new Param(c, "fileNames", "string[]"), new Param(c, "tag", "string", Value()), End),
+
+            new Function(c, "addSourceMediaRep", addSourceMediaRep, None, Return, "string", Parameters,
+                         new Param(c, "sourceNode", "string"), new Param(c, "mediaRepName", "string"),
+                         new Param(c, "mediaRepPathsAndOptions", "string[]"), new Param(c, "tag", "string", Value()), End),
+
+            new Function(c, "setActiveSourceMediaRep", setActiveSourceMediaRep, None, Return, "void", Parameters,
+                         new Param(c, "sourceNode", "string"), new Param(c, "mediaRepName", "string"),
                          new Param(c, "tag", "string", Value()), End),
 
-            new Function(c, "addSourceMediaRep", addSourceMediaRep, None,
-                         Return, "string", Parameters,
-                         new Param(c, "sourceNode", "string"),
-                         new Param(c, "mediaRepName", "string"),
-                         new Param(c, "mediaRepPathsAndOptions", "string[]"),
-                         new Param(c, "tag", "string", Value()), End),
+            new Function(c, "sourceMediaRep", sourceMediaRep, None, Return, "string", Parameters, new Param(c, "sourceNode", "string"),
+                         End),
 
-            new Function(c, "setActiveSourceMediaRep", setActiveSourceMediaRep,
-                         None, Return, "void", Parameters,
-                         new Param(c, "sourceNode", "string"),
-                         new Param(c, "mediaRepName", "string"),
-                         new Param(c, "tag", "string", Value()), End),
+            new Function(c, "sourceMediaReps", sourceMediaReps, None, Return, "string[]", Parameters, new Param(c, "sourceNode", "string"),
+                         End),
 
-            new Function(c, "sourceMediaRep", sourceMediaRep, None, Return,
-                         "string", Parameters,
-                         new Param(c, "sourceNode", "string"), End),
-
-            new Function(c, "sourceMediaReps", sourceMediaReps, None, Return,
-                         "string[]", Parameters,
-                         new Param(c, "sourceNode", "string"), End),
-
-            new Function(c, "sourceMediaRepsAndNodes", sourceMediaRepsAndNodes,
-                         None, Return, "(string,string)[]", Parameters,
+            new Function(c, "sourceMediaRepsAndNodes", sourceMediaRepsAndNodes, None, Return, "(string,string)[]", Parameters,
                          new Param(c, "sourceOrSwitchNode", "string"), End),
 
-            new Function(c, "sourceMediaRepSwitchNode",
-                         sourceMediaRepSwitchNode, None, Return, "string",
-                         Parameters, new Param(c, "sourceNode", "string"), End),
+            new Function(c, "sourceMediaRepSwitchNode", sourceMediaRepSwitchNode, None, Return, "string", Parameters,
+                         new Param(c, "sourceNode", "string"), End),
 
-            new Function(c, "sourceMediaRepSourceNode",
-                         sourceMediaRepSourceNode, None, Return, "string",
-                         Parameters, new Param(c, "sourceNode", "string"), End),
+            new Function(c, "sourceMediaRepSourceNode", sourceMediaRepSourceNode, None, Return, "string", Parameters,
+                         new Param(c, "sourceNode", "string"), End),
 
-            new Function(c, "relocateSource", relocateSource, None, Return,
-                         "void", Parameters,
-                         new Param(c, "oldFileName", "string"),
+            new Function(c, "relocateSource", relocateSource, None, Return, "void", Parameters, new Param(c, "oldFileName", "string"),
                          new Param(c, "newFileName", "string"), End),
 
-            new Function(c, "relocateSource", relocateSource2, None, Return,
-                         "void", Parameters,
-                         new Param(c, "sourceNode", "string"),
-                         new Param(c, "oldFileName", "string"),
-                         new Param(c, "newFileName", "string"), End),
+            new Function(c, "relocateSource", relocateSource2, None, Return, "void", Parameters, new Param(c, "sourceNode", "string"),
+                         new Param(c, "oldFileName", "string"), new Param(c, "newFileName", "string"), End),
 
-            new Function(
-                c, "commandLineFlag", commandLineFlag, None, Return, "string",
-                Parameters, new Param(c, "flagName", "string"),
-                new Param(c, "defaultValue", "string", Value(Pointer(0))), End),
+            new Function(c, "commandLineFlag", commandLineFlag, None, Return, "string", Parameters, new Param(c, "flagName", "string"),
+                         new Param(c, "defaultValue", "string", Value(Pointer(0))), End),
 
-            new Function(c, "readLUT", readLUT, None, Return, "void",
-                         Parameters, new Param(c, "filename", "string"),
-                         new Param(c, "nodeName", "string"),
-                         new Param(c, "activate", "bool", Value(false)), End),
+            new Function(c, "readLUT", readLUT, None, Return, "void", Parameters, new Param(c, "filename", "string"),
+                         new Param(c, "nodeName", "string"), new Param(c, "activate", "bool", Value(false)), End),
 
-            new Function(c, "readCDL", readCDL, None, Return, "void",
-                         Parameters, new Param(c, "filename", "string"),
-                         new Param(c, "nodeName", "string"),
-                         new Param(c, "activate", "bool", Value(false)), End),
+            new Function(c, "readCDL", readCDL, None, Return, "void", Parameters, new Param(c, "filename", "string"),
+                         new Param(c, "nodeName", "string"), new Param(c, "activate", "bool", Value(false)), End),
 
-            new Function(c, "setSessionType", setSessionType, None, Return,
-                         "void", Parameters, new Param(c, "sessionType", "int"),
-                         End),
+            new Function(c, "setSessionType", setSessionType, None, Return, "void", Parameters, new Param(c, "sessionType", "int"), End),
 
-            new Function(c, "getSessionType", getSessionType, None, Return,
-                         "int", End),
+            new Function(c, "getSessionType", getSessionType, None, Return, "int", End),
 
-            new Function(c, "startTimer", startTimer, None, Return, "void",
-                         End),
+            new Function(c, "startTimer", startTimer, None, Return, "void", End),
 
-            new Function(c, "elapsedTime", elapsedTime, None, Return, "float",
-                         End),
+            new Function(c, "elapsedTime", elapsedTime, None, Return, "float", End),
 
             new Function(c, "theTime", theTime, None, Return, "float", End),
 
             new Function(c, "stopTimer", stopTimer, None, Return, "float", End),
 
-            new Function(c, "isTimerRunning", isTimerRunning, None, Return,
-                         "bool", End),
+            new Function(c, "isTimerRunning", isTimerRunning, None, Return, "bool", End),
 
             new Function(c, "updateLUT", updateLUT, None, Return, "void", End),
 
-            new Function(c, "exportCurrentFrame", exportCurrentFrame, None,
-                         Return, "void", Parameters,
-                         new Param(c, "filename", "string"), End),
-
-            new Function(c, "exportCurrentSourceFrame",
-                         exportCurrentSourceFrame, None, Return, "void",
-                         Parameters, new Param(c, "filename", "string"), End),
-
-            new Function(c, "optionsPlay", optionsPlay, None, Return, "int",
+            new Function(c, "exportCurrentFrame", exportCurrentFrame, None, Return, "void", Parameters, new Param(c, "filename", "string"),
                          End),
 
-            new Function(c, "optionsPlayReset", optionsPlayReset, None, Return,
-                         "void", End),
+            new Function(c, "exportCurrentSourceFrame", exportCurrentSourceFrame, None, Return, "void", Parameters,
+                         new Param(c, "filename", "string"), End),
 
-            new Function(c, "optionsNoPackages", optionsNoPackages, None,
-                         Return, "int", End),
+            new Function(c, "optionsPlay", optionsPlay, None, Return, "int", End),
 
-            new Function(c, "optionsProgressiveLoading",
-                         optionsProgressiveLoading, None, Return, "int", End),
+            new Function(c, "optionsPlayReset", optionsPlayReset, None, Return, "void", End),
+
+            new Function(c, "optionsNoPackages", optionsNoPackages, None, Return, "int", End),
+
+            new Function(c, "optionsProgressiveLoading", optionsProgressiveLoading, None, Return, "int", End),
 
             new Function(c, "loadTotal", loadTotal, None, Return, "int", End),
 
             new Function(c, "loadCount", loadCount, None, Return, "int", End),
 
-            new Function(c, "shortAppName", shortAppName, None, Return,
-                         "string", End),
+            new Function(c, "setUIBlocked", setUIBlocked, None, Return, "void", Parameters, new Param(c, "blocked", "bool"), End),
 
-            new Function(c, "ocioUpdateConfig", ocioUpdateConfig, None, Return,
-                         "void", Parameters,
-                         new Param(c, "node", "string", Value(Pointer(0))),
-                         End),
+            new Function(c, "shortAppName", shortAppName, None, Return, "string", End),
 
-            new Function(c, "licensingState", licensingState, None, Return,
-                         "int", End),
+            new Function(c, "ocioUpdateConfig", ocioUpdateConfig, None, Return, "void", Parameters,
+                         new Param(c, "node", "string", Value(Pointer(0))), End),
+
+            new Function(c, "licensingState", licensingState, None, Return, "int", End),
 
             EndArguments);
     }

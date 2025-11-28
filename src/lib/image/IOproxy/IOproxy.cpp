@@ -105,8 +105,7 @@ namespace TwkFB
 
                             if (name == ":info")
                             {
-                                for (size_t x = 0; x < c->properties.size();
-                                     x++)
+                                for (size_t x = 0; x < c->properties.size(); x++)
                                 {
                                     const Property* p = c->properties[x];
 
@@ -118,8 +117,7 @@ namespace TwkFB
                             }
                         }
 
-                        ProxyFBIO* io =
-                            new ProxyFBIO(identifier, sortKey, fname);
+                        ProxyFBIO* io = new ProxyFBIO(identifier, sortKey, fname);
 
                         for (size_t j = 0; j < o->components.size(); j++)
                         {
@@ -150,38 +148,28 @@ namespace TwkFB
                                 }
                                 else if (p->name == "codecs")
                                 {
-                                    for (int i = 0; i < p->size * p->dims.x;
-                                         i += 2)
+                                    for (int i = 0; i < p->size * p->dims.x; i += 2)
                                     {
-                                        codecs.push_back(
-                                            make_pair((p->stringData)[i],
-                                                      (p->stringData)[i + 1]));
+                                        codecs.push_back(make_pair((p->stringData)[i], (p->stringData)[i + 1]));
                                     }
                                 }
                                 else if (p->name == "encodeParams")
                                 {
-                                    for (int i = 0; i < p->size * p->dims.x;
-                                         i += 2)
+                                    for (int i = 0; i < p->size * p->dims.x; i += 2)
                                     {
-                                        encodeParams.push_back(
-                                            make_pair((p->stringData)[i],
-                                                      (p->stringData)[i + 1]));
+                                        encodeParams.push_back(make_pair((p->stringData)[i], (p->stringData)[i + 1]));
                                     }
                                 }
                                 else if (p->name == "decodeParams")
                                 {
-                                    for (int i = 0; i < p->size * p->dims.x;
-                                         i += 2)
+                                    for (int i = 0; i < p->size * p->dims.x; i += 2)
                                     {
-                                        decodeParams.push_back(
-                                            make_pair((p->stringData)[i],
-                                                      (p->stringData)[i + 1]));
+                                        decodeParams.push_back(make_pair((p->stringData)[i], (p->stringData)[i + 1]));
                                     }
                                 }
                             }
 
-                            io->add(name, desc, caps, codecs, decodeParams,
-                                    encodeParams);
+                            io->add(name, desc, caps, codecs, decodeParams, encodeParams);
                         }
 
                         GenericIO::addPlugin(io);

@@ -65,16 +65,14 @@ namespace Mu
         _baseType = 0;
     }
 
-    MuQt_QDial::MuQt_QDial(Pointer muobj, const CallEnvironment* ce,
-                           QWidget* parent)
+    MuQt_QDial::MuQt_QDial(Pointer muobj, const CallEnvironment* ce, QWidget* parent)
         : QDial(parent)
     {
         _env = ce;
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QDialType>(
-            c->internName("qt.QDial"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QDialType>(c->internName("qt.QDial"));
     }
 
     QSize MuQt_QDial::minimumSizeHint() const
@@ -152,8 +150,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -176,8 +173,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -200,8 +196,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -224,8 +219,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QPaintEventType>(c, pe, "qt.QPaintEvent"));
+            args[1] = Value(makeqpointer<QPaintEventType>(c, pe, "qt.QPaintEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -248,8 +242,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QResizeEventType>(c, e, "qt.QResizeEvent"));
+            args[1] = Value(makeqpointer<QResizeEventType>(c, e, "qt.QResizeEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -318,8 +311,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QTimerEventType>(c, e, "qt.QTimerEvent"));
+            args[1] = Value(makeqpointer<QTimerEventType>(c, e, "qt.QTimerEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -342,8 +334,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QWheelEventType>(c, e, "qt.QWheelEvent"));
+            args[1] = Value(makeqpointer<QWheelEventType>(c, e, "qt.QWheelEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -355,8 +346,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  Mu Type CONSTRUCTORS
 
-    QDialType::QDialType(Context* c, const char* name, Class* super,
-                         Class* super2)
+    QDialType::QDialType(Context* c, const char* name, Class* super, Class* super2)
         : Class(c, name, vectorOf2(super, super2))
     {
     }
@@ -377,8 +367,7 @@ namespace Mu
         }
         else if (QDial* w = object<QDial>(widget))
         {
-            QDialType* type = c->findSymbolOfTypeByQualifiedName<QDialType>(
-                c->internName("qt.QDial"), false);
+            QDialType* type = c->findSymbolOfTypeByQualifiedName<QDialType>(c->internName("qt.QDial"), false);
             ClassInstance* o = ClassInstance::allocate(type);
             setobject(o, w);
             return o;
@@ -389,59 +378,41 @@ namespace Mu
         }
     }
 
-    static NODE_IMPLEMENTATION(castFromObject, Pointer)
-    {
-        NODE_RETURN(QDial_QDial_QObject(NODE_THREAD, NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(castFromObject, Pointer) { NODE_RETURN(QDial_QDial_QObject(NODE_THREAD, NODE_ARG(0, Pointer))); }
 
-    Pointer qt_QDial_QDial_QDial_QDial_QWidget(Mu::Thread& NODE_THREAD,
-                                               Pointer param_this,
-                                               Pointer param_parent)
+    Pointer qt_QDial_QDial_QDial_QDial_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWidget* arg1 = object<QWidget>(param_parent);
-        setobject(
-            param_this,
-            new MuQt_QDial(param_this, NODE_THREAD.process()->callEnv(), arg1));
+        setobject(param_this, new MuQt_QDial(param_this, NODE_THREAD.process()->callEnv(), arg1));
         return param_this;
     }
 
-    Pointer qt_QDial_minimumSizeHint_QSize_QDial(Mu::Thread& NODE_THREAD,
-                                                 Pointer param_this)
+    Pointer qt_QDial_minimumSizeHint_QSize_QDial(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QDial* arg0 = object<QDial>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QSizeType>(c, arg0->QDial::minimumSizeHint(),
-                                          "qt.QSize")
-                   : makeqtype<QSizeType>(c, arg0->minimumSizeHint(),
-                                          "qt.QSize");
+        return isMuQtObject(arg0) ? makeqtype<QSizeType>(c, arg0->QDial::minimumSizeHint(), "qt.QSize")
+                                  : makeqtype<QSizeType>(c, arg0->minimumSizeHint(), "qt.QSize");
     }
 
-    Pointer qt_QDial_sizeHint_QSize_QDial(Mu::Thread& NODE_THREAD,
-                                          Pointer param_this)
+    Pointer qt_QDial_sizeHint_QSize_QDial(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QDial* arg0 = object<QDial>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QSizeType>(c, arg0->QDial::sizeHint(),
-                                          "qt.QSize")
-                   : makeqtype<QSizeType>(c, arg0->sizeHint(), "qt.QSize");
+        return isMuQtObject(arg0) ? makeqtype<QSizeType>(c, arg0->QDial::sizeHint(), "qt.QSize")
+                                  : makeqtype<QSizeType>(c, arg0->sizeHint(), "qt.QSize");
     }
 
-    bool qt_QDial_event_bool_QDial_QEvent(Mu::Thread& NODE_THREAD,
-                                          Pointer param_this, Pointer param_e)
+    bool qt_QDial_event_bool_QDial_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QDial* arg0 = object<QDial>(param_this);
         QEvent* arg1 = getqpointer<QEventType>(param_e);
-        return isMuQtObject(arg0) ? ((MuQt_QDial*)arg0)->event_pub_parent(arg1)
-                                  : ((MuQt_QDial*)arg0)->event_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QDial*)arg0)->event_pub_parent(arg1) : ((MuQt_QDial*)arg0)->event_pub(arg1);
     }
 
-    void qt_QDial_mouseMoveEvent_void_QDial_QMouseEvent(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this,
-                                                        Pointer param_e)
+    void qt_QDial_mouseMoveEvent_void_QDial_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QDial* arg0 = object<QDial>(param_this);
@@ -452,8 +423,7 @@ namespace Mu
             ((MuQt_QDial*)arg0)->mouseMoveEvent_pub(arg1);
     }
 
-    void qt_QDial_mousePressEvent_void_QDial_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QDial_mousePressEvent_void_QDial_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QDial* arg0 = object<QDial>(param_this);
@@ -464,8 +434,7 @@ namespace Mu
             ((MuQt_QDial*)arg0)->mousePressEvent_pub(arg1);
     }
 
-    void qt_QDial_mouseReleaseEvent_void_QDial_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QDial_mouseReleaseEvent_void_QDial_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QDial* arg0 = object<QDial>(param_this);
@@ -476,9 +445,7 @@ namespace Mu
             ((MuQt_QDial*)arg0)->mouseReleaseEvent_pub(arg1);
     }
 
-    void qt_QDial_paintEvent_void_QDial_QPaintEvent(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this,
-                                                    Pointer param_pe)
+    void qt_QDial_paintEvent_void_QDial_QPaintEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_pe)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QDial* arg0 = object<QDial>(param_this);
@@ -489,9 +456,7 @@ namespace Mu
             ((MuQt_QDial*)arg0)->paintEvent_pub(arg1);
     }
 
-    void qt_QDial_resizeEvent_void_QDial_QResizeEvent(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this,
-                                                      Pointer param_e)
+    void qt_QDial_resizeEvent_void_QDial_QResizeEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QDial* arg0 = object<QDial>(param_this);
@@ -502,9 +467,7 @@ namespace Mu
             ((MuQt_QDial*)arg0)->resizeEvent_pub(arg1);
     }
 
-    void qt_QDial_changeEvent_void_QDial_QEvent(Mu::Thread& NODE_THREAD,
-                                                Pointer param_this,
-                                                Pointer param_ev)
+    void qt_QDial_changeEvent_void_QDial_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_ev)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QDial* arg0 = object<QDial>(param_this);
@@ -515,9 +478,7 @@ namespace Mu
             ((MuQt_QDial*)arg0)->changeEvent_pub(arg1);
     }
 
-    void qt_QDial_keyPressEvent_void_QDial_QKeyEvent(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_this,
-                                                     Pointer param_ev)
+    void qt_QDial_keyPressEvent_void_QDial_QKeyEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_ev)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QDial* arg0 = object<QDial>(param_this);
@@ -528,9 +489,7 @@ namespace Mu
             ((MuQt_QDial*)arg0)->keyPressEvent_pub(arg1);
     }
 
-    void qt_QDial_timerEvent_void_QDial_QTimerEvent(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this,
-                                                    Pointer param_e)
+    void qt_QDial_timerEvent_void_QDial_QTimerEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QDial* arg0 = object<QDial>(param_this);
@@ -541,9 +500,7 @@ namespace Mu
             ((MuQt_QDial*)arg0)->timerEvent_pub(arg1);
     }
 
-    void qt_QDial_wheelEvent_void_QDial_QWheelEvent(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this,
-                                                    Pointer param_e)
+    void qt_QDial_wheelEvent_void_QDial_QWheelEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QDial* arg0 = object<QDial>(param_this);
@@ -556,80 +513,67 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(_n_QDial0, Pointer)
     {
-        NODE_RETURN(qt_QDial_QDial_QDial_QDial_QWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QDial_QDial_QDial_QDial_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_minimumSizeHint0, Pointer)
     {
-        NODE_RETURN(qt_QDial_minimumSizeHint_QSize_QDial(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QDial_minimumSizeHint_QSize_QDial(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_sizeHint0, Pointer)
     {
-        NODE_RETURN(qt_QDial_sizeHint_QSize_QDial(NODE_THREAD,
-                                                  NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QDial_sizeHint_QSize_QDial(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_event0, bool)
     {
-        NODE_RETURN(qt_QDial_event_bool_QDial_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QDial_event_bool_QDial_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseMoveEvent0, void)
     {
-        qt_QDial_mouseMoveEvent_void_QDial_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QDial_mouseMoveEvent_void_QDial_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mousePressEvent0, void)
     {
-        qt_QDial_mousePressEvent_void_QDial_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QDial_mousePressEvent_void_QDial_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseReleaseEvent0, void)
     {
-        qt_QDial_mouseReleaseEvent_void_QDial_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QDial_mouseReleaseEvent_void_QDial_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_paintEvent0, void)
     {
-        qt_QDial_paintEvent_void_QDial_QPaintEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QDial_paintEvent_void_QDial_QPaintEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_resizeEvent0, void)
     {
-        qt_QDial_resizeEvent_void_QDial_QResizeEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QDial_resizeEvent_void_QDial_QResizeEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_changeEvent0, void)
     {
-        qt_QDial_changeEvent_void_QDial_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QDial_changeEvent_void_QDial_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_keyPressEvent0, void)
     {
-        qt_QDial_keyPressEvent_void_QDial_QKeyEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QDial_keyPressEvent_void_QDial_QKeyEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_timerEvent0, void)
     {
-        qt_QDial_timerEvent_void_QDial_QTimerEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QDial_timerEvent_void_QDial_QTimerEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_wheelEvent0, void)
     {
-        qt_QDial_wheelEvent_void_QDial_QWheelEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QDial_wheelEvent_void_QDial_QWheelEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     void QDialType::load()
@@ -649,16 +593,13 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
-                   new Function(c, tn, castFromObject, Cast, Compiled,
-                                QDial_QDial_QObject, Return, ftn, Parameters,
+                   new Function(c, tn, castFromObject, Cast, Compiled, QDial_QDial_QObject, Return, ftn, Parameters,
                                 new Param(c, "object", "qt.QObject"), End),
 
                    EndArguments);
@@ -666,75 +607,47 @@ namespace Mu
         addSymbols(
             // enums
             // member functions
-            new Function(c, "QDial", _n_QDial0, None, Compiled,
-                         qt_QDial_QDial_QDial_QDial_QWidget, Return, "qt.QDial",
-                         Parameters, new Param(c, "this", "qt.QDial"),
-                         new Param(c, "parent", "qt.QWidget"), End),
+            new Function(c, "QDial", _n_QDial0, None, Compiled, qt_QDial_QDial_QDial_QDial_QWidget, Return, "qt.QDial", Parameters,
+                         new Param(c, "this", "qt.QDial"), new Param(c, "parent", "qt.QWidget"), End),
             // PROP: notchSize (int; QDial this)
             // PROP: notchTarget (double; QDial this)
             // PROP: notchesVisible (bool; QDial this)
             // PROP: setNotchTarget (void; QDial this, double target)
             // PROP: wrapping (bool; QDial this)
-            _func[0] = new MemberFunction(
-                c, "minimumSizeHint", _n_minimumSizeHint0, None, Compiled,
-                qt_QDial_minimumSizeHint_QSize_QDial, Return, "qt.QSize",
-                Parameters, new Param(c, "this", "qt.QDial"), End),
-            _func[1] = new MemberFunction(
-                c, "sizeHint", _n_sizeHint0, None, Compiled,
-                qt_QDial_sizeHint_QSize_QDial, Return, "qt.QSize", Parameters,
-                new Param(c, "this", "qt.QDial"), End),
+            _func[0] = new MemberFunction(c, "minimumSizeHint", _n_minimumSizeHint0, None, Compiled, qt_QDial_minimumSizeHint_QSize_QDial,
+                                          Return, "qt.QSize", Parameters, new Param(c, "this", "qt.QDial"), End),
+            _func[1] = new MemberFunction(c, "sizeHint", _n_sizeHint0, None, Compiled, qt_QDial_sizeHint_QSize_QDial, Return, "qt.QSize",
+                                          Parameters, new Param(c, "this", "qt.QDial"), End),
             // MISSING: initStyleOption (void; QDial this, "QStyleOptionSlider
             // *" option) // protected
-            _func[2] = new MemberFunction(c, "event", _n_event0, None, Compiled,
-                                          qt_QDial_event_bool_QDial_QEvent,
-                                          Return, "bool", Parameters,
-                                          new Param(c, "this", "qt.QDial"),
-                                          new Param(c, "e", "qt.QEvent"), End),
-            _func[3] = new MemberFunction(
-                c, "mouseMoveEvent", _n_mouseMoveEvent0, None, Compiled,
-                qt_QDial_mouseMoveEvent_void_QDial_QMouseEvent, Return, "void",
-                Parameters, new Param(c, "this", "qt.QDial"),
-                new Param(c, "e", "qt.QMouseEvent"), End),
-            _func[4] = new MemberFunction(
-                c, "mousePressEvent", _n_mousePressEvent0, None, Compiled,
-                qt_QDial_mousePressEvent_void_QDial_QMouseEvent, Return, "void",
-                Parameters, new Param(c, "this", "qt.QDial"),
-                new Param(c, "e", "qt.QMouseEvent"), End),
-            _func[5] = new MemberFunction(
-                c, "mouseReleaseEvent", _n_mouseReleaseEvent0, None, Compiled,
-                qt_QDial_mouseReleaseEvent_void_QDial_QMouseEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QDial"),
-                new Param(c, "e", "qt.QMouseEvent"), End),
-            _func[6] = new MemberFunction(
-                c, "paintEvent", _n_paintEvent0, None, Compiled,
-                qt_QDial_paintEvent_void_QDial_QPaintEvent, Return, "void",
-                Parameters, new Param(c, "this", "qt.QDial"),
-                new Param(c, "pe", "qt.QPaintEvent"), End),
-            _func[7] = new MemberFunction(
-                c, "resizeEvent", _n_resizeEvent0, None, Compiled,
-                qt_QDial_resizeEvent_void_QDial_QResizeEvent, Return, "void",
-                Parameters, new Param(c, "this", "qt.QDial"),
-                new Param(c, "e", "qt.QResizeEvent"), End),
-            _func[8] = new MemberFunction(
-                c, "changeEvent", _n_changeEvent0, None, Compiled,
-                qt_QDial_changeEvent_void_QDial_QEvent, Return, "void",
-                Parameters, new Param(c, "this", "qt.QDial"),
-                new Param(c, "ev", "qt.QEvent"), End),
-            _func[9] = new MemberFunction(
-                c, "keyPressEvent", _n_keyPressEvent0, None, Compiled,
-                qt_QDial_keyPressEvent_void_QDial_QKeyEvent, Return, "void",
-                Parameters, new Param(c, "this", "qt.QDial"),
-                new Param(c, "ev", "qt.QKeyEvent"), End),
-            _func[10] = new MemberFunction(
-                c, "timerEvent", _n_timerEvent0, None, Compiled,
-                qt_QDial_timerEvent_void_QDial_QTimerEvent, Return, "void",
-                Parameters, new Param(c, "this", "qt.QDial"),
-                new Param(c, "e", "qt.QTimerEvent"), End),
-            _func[11] = new MemberFunction(
-                c, "wheelEvent", _n_wheelEvent0, None, Compiled,
-                qt_QDial_wheelEvent_void_QDial_QWheelEvent, Return, "void",
-                Parameters, new Param(c, "this", "qt.QDial"),
-                new Param(c, "e", "qt.QWheelEvent"), End),
+            _func[2] = new MemberFunction(c, "event", _n_event0, None, Compiled, qt_QDial_event_bool_QDial_QEvent, Return, "bool",
+                                          Parameters, new Param(c, "this", "qt.QDial"), new Param(c, "e", "qt.QEvent"), End),
+            _func[3] =
+                new MemberFunction(c, "mouseMoveEvent", _n_mouseMoveEvent0, None, Compiled, qt_QDial_mouseMoveEvent_void_QDial_QMouseEvent,
+                                   Return, "void", Parameters, new Param(c, "this", "qt.QDial"), new Param(c, "e", "qt.QMouseEvent"), End),
+            _func[4] = new MemberFunction(c, "mousePressEvent", _n_mousePressEvent0, None, Compiled,
+                                          qt_QDial_mousePressEvent_void_QDial_QMouseEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QDial"), new Param(c, "e", "qt.QMouseEvent"), End),
+            _func[5] = new MemberFunction(c, "mouseReleaseEvent", _n_mouseReleaseEvent0, None, Compiled,
+                                          qt_QDial_mouseReleaseEvent_void_QDial_QMouseEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QDial"), new Param(c, "e", "qt.QMouseEvent"), End),
+            _func[6] =
+                new MemberFunction(c, "paintEvent", _n_paintEvent0, None, Compiled, qt_QDial_paintEvent_void_QDial_QPaintEvent, Return,
+                                   "void", Parameters, new Param(c, "this", "qt.QDial"), new Param(c, "pe", "qt.QPaintEvent"), End),
+            _func[7] =
+                new MemberFunction(c, "resizeEvent", _n_resizeEvent0, None, Compiled, qt_QDial_resizeEvent_void_QDial_QResizeEvent, Return,
+                                   "void", Parameters, new Param(c, "this", "qt.QDial"), new Param(c, "e", "qt.QResizeEvent"), End),
+            _func[8] = new MemberFunction(c, "changeEvent", _n_changeEvent0, None, Compiled, qt_QDial_changeEvent_void_QDial_QEvent, Return,
+                                          "void", Parameters, new Param(c, "this", "qt.QDial"), new Param(c, "ev", "qt.QEvent"), End),
+            _func[9] =
+                new MemberFunction(c, "keyPressEvent", _n_keyPressEvent0, None, Compiled, qt_QDial_keyPressEvent_void_QDial_QKeyEvent,
+                                   Return, "void", Parameters, new Param(c, "this", "qt.QDial"), new Param(c, "ev", "qt.QKeyEvent"), End),
+            _func[10] =
+                new MemberFunction(c, "timerEvent", _n_timerEvent0, None, Compiled, qt_QDial_timerEvent_void_QDial_QTimerEvent, Return,
+                                   "void", Parameters, new Param(c, "this", "qt.QDial"), new Param(c, "e", "qt.QTimerEvent"), End),
+            _func[11] =
+                new MemberFunction(c, "wheelEvent", _n_wheelEvent0, None, Compiled, qt_QDial_wheelEvent_void_QDial_QWheelEvent, Return,
+                                   "void", Parameters, new Param(c, "this", "qt.QDial"), new Param(c, "e", "qt.QWheelEvent"), End),
             // static functions
             EndArguments);
         globalScope()->addSymbols(EndArguments);

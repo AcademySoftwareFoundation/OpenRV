@@ -29,9 +29,7 @@ namespace Rv
         char filename[256];
         unz_file_info fileInfo;
 
-        if (unzGetCurrentFileInfo(uf, &fileInfo, filename, sizeof(filename),
-                                  nullptr, 0, nullptr, 0)
-            != UNZ_OK)
+        if (unzGetCurrentFileInfo(uf, &fileInfo, filename, sizeof(filename), nullptr, 0, nullptr, 0) != UNZ_OK)
         {
             cerr << "ERROR: Unable to get file info" << endl;
             return "";
@@ -65,8 +63,7 @@ namespace Rv
         return QString::fromStdString(fullPath);
     }
 
-    vector<QString> unzipBundle(const string& zipFilePath,
-                                const string& outputPath)
+    vector<QString> unzipBundle(const string& zipFilePath, const string& outputPath)
     {
         vector<QString> includedPackages;
 
@@ -153,10 +150,7 @@ namespace Rv
                 {
                     unz_file_info fileInfo;
                     char fileName[256];
-                    if (unzGetCurrentFileInfo(uf, &fileInfo, fileName,
-                                              sizeof(fileName), nullptr, 0,
-                                              nullptr, 0)
-                            == UNZ_OK
+                    if (unzGetCurrentFileInfo(uf, &fileInfo, fileName, sizeof(fileName), nullptr, 0, nullptr, 0) == UNZ_OK
                         && strcmp(fileName, "PACKAGE") == 0)
                     {
                         return false;
@@ -172,13 +166,11 @@ namespace Rv
         return false; // Extension is not zip or rvpkgs
     }
 
-    vector<QString> PackageManager::handleBundle(const QString& bundlePath,
-                                                 const QString& outputPath)
+    vector<QString> PackageManager::handleBundle(const QString& bundlePath, const QString& outputPath)
     {
 
         // Attempting to unzip bundle into the Packages directory
-        vector<QString> includedPackages =
-            unzipBundle(bundlePath.toStdString(), outputPath.toStdString());
+        vector<QString> includedPackages = unzipBundle(bundlePath.toStdString(), outputPath.toStdString());
         if (includedPackages.size() == 0)
         {
             cerr << "ERROR: Unable to unzip bundle." << endl;
@@ -207,10 +199,8 @@ namespace Rv
         {
             QFileInfo info(m_packages[i].file);
 
-            if (info.fileName() == zipfile || info.absoluteFilePath() == zipfile
-                || info.absoluteFilePath() == zipfileCanonical
-                || rx.match(info.fileName()).hasMatch()
-                || rx.match(info.absoluteFilePath()).hasMatch())
+            if (info.fileName() == zipfile || info.absoluteFilePath() == zipfile || info.absoluteFilePath() == zipfileCanonical
+                || rx.match(info.fileName()).hasMatch() || rx.match(info.absoluteFilePath()).hasMatch())
             {
                 return i;
             }
@@ -315,10 +305,8 @@ namespace Rv
         {
             RV_QSETTINGS;
             settings.beginGroup("ModeManager");
-            settings.setValue("doNotLoadPackages",
-                              swapAppDir(m_doNotLoadPackages, true));
-            settings.setValue("optionalPackages",
-                              swapAppDir(m_optLoadPackages, true));
+            settings.setValue("doNotLoadPackages", swapAppDir(m_doNotLoadPackages, true));
+            settings.setValue("optionalPackages", swapAppDir(m_optLoadPackages, true));
             settings.endGroup();
         }
 
@@ -410,8 +398,7 @@ namespace Rv
 
         if (pname.isEmpty())
         {
-            cerr << "ERROR: Illegal package file name: "
-                 << package.file.toUtf8().data() << endl
+            cerr << "ERROR: Illegal package file name: " << package.file.toUtf8().data() << endl
                  << "       should be either <name>.zip or "
                     "<name>-<version>.rvpkg"
                  << endl;
@@ -443,24 +430,18 @@ namespace Rv
             if (auxIndex != -1)
             {
                 const AuxFile& a = package.auxFiles[auxIndex];
-                QDir outdir(rdir.absoluteFilePath(
-                    expandVarsInPath(package, a.location)));
+                QDir outdir(rdir.absoluteFilePath(expandVarsInPath(package, a.location)));
                 QFileInfo auxfileInfo(a.file);
                 QString auxfileName = auxfileInfo.fileName();
-                outfilename =
-                    outdir.absoluteFilePath(auxfileName).toUtf8().constData();
+                outfilename = outdir.absoluteFilePath(auxfileName).toUtf8().constData();
             }
-            else if (filename.endsWith(".mu") || filename.endsWith(".mud")
-                     || filename.endsWith(".muc"))
+            else if (filename.endsWith(".mu") || filename.endsWith(".mud") || filename.endsWith(".muc"))
             {
-                outfilename =
-                    mudir.absoluteFilePath(baseName).toUtf8().constData();
+                outfilename = mudir.absoluteFilePath(baseName).toUtf8().constData();
             }
-            else if (filename.endsWith(".py") || filename.endsWith(".pyc")
-                     || filename.endsWith(".pyo") || filename.endsWith(".pyd"))
+            else if (filename.endsWith(".py") || filename.endsWith(".pyc") || filename.endsWith(".pyo") || filename.endsWith(".pyd"))
             {
-                outfilename =
-                    pydir.absoluteFilePath(baseName).toUtf8().constData();
+                outfilename = pydir.absoluteFilePath(baseName).toUtf8().constData();
             }
             else if (filename.endsWith(".glsl") || filename.endsWith(".gto"))
             //
@@ -468,20 +449,17 @@ namespace Rv
             //  code.
             //
             {
-                outfilename =
-                    nodedir.absoluteFilePath(baseName).toUtf8().constData();
+                outfilename = nodedir.absoluteFilePath(baseName).toUtf8().constData();
             }
             else if (filename.endsWith(".profile"))
             //
             //  Assume this is a Profile
             //
             {
-                outfilename =
-                    profdir.absoluteFilePath(baseName).toUtf8().constData();
+                outfilename = profdir.absoluteFilePath(baseName).toUtf8().constData();
             }
 
-            QString n =
-                QString::fromUtf8(outfilename.c_str(), outfilename.size());
+            QString n = QString::fromUtf8(outfilename.c_str(), outfilename.size());
             QFile file(n);
 
             if (file.exists())
@@ -592,8 +570,7 @@ namespace Rv
 
                 if (unzLocateFile(file, filename.toUtf8().data(), 1) != UNZ_OK)
                 {
-                    cerr << "ERROR: reading zip file "
-                         << package.file.toUtf8().data() << endl;
+                    cerr << "ERROR: reading zip file " << package.file.toUtf8().data() << endl;
                     break;
                 }
 
@@ -605,8 +582,7 @@ namespace Rv
                 if (auxIndex != -1)
                 {
                     const AuxFile& a = package.auxFiles[auxIndex];
-                    QDir outdir(rdir.absoluteFilePath(
-                        expandVarsInPath(package, a.location)));
+                    QDir outdir(rdir.absoluteFilePath(expandVarsInPath(package, a.location)));
                     if (!outdir.exists())
                     {
                         bool success = outdir.mkpath(".");
@@ -620,36 +596,26 @@ namespace Rv
                     }
                     QFileInfo auxfileInfo(a.file);
                     QString auxfileName = auxfileInfo.fileName();
-                    outfilename = outdir.absoluteFilePath(auxfileName)
-                                      .toUtf8()
-                                      .constData();
+                    outfilename = outdir.absoluteFilePath(auxfileName).toUtf8().constData();
                 }
-                else if (filename.endsWith(".mu") || filename.endsWith(".mud")
-                         || filename.endsWith(".muc"))
+                else if (filename.endsWith(".mu") || filename.endsWith(".mud") || filename.endsWith(".muc"))
                 {
-                    outfilename =
-                        mudir.absoluteFilePath(baseName).toUtf8().data();
+                    outfilename = mudir.absoluteFilePath(baseName).toUtf8().data();
                 }
-                else if (filename.endsWith(".py") || filename.endsWith(".pyc")
-                         || filename.endsWith(".pyo")
-                         || filename.endsWith(".pyd"))
+                else if (filename.endsWith(".py") || filename.endsWith(".pyc") || filename.endsWith(".pyo") || filename.endsWith(".pyd"))
                 {
-                    outfilename =
-                        pydir.absoluteFilePath(baseName).toUtf8().data();
+                    outfilename = pydir.absoluteFilePath(baseName).toUtf8().data();
                 }
-                else if (filename.endsWith(".so") || filename.endsWith(".dll")
-                         || filename.endsWith(".dylib"))
+                else if (filename.endsWith(".so") || filename.endsWith(".dll") || filename.endsWith(".dylib"))
                 {
                     if (package.imageio.contains(filename))
                     {
-                        outfilename =
-                            imgdir.absoluteFilePath(baseName).toUtf8().data();
+                        outfilename = imgdir.absoluteFilePath(baseName).toUtf8().data();
                         fbio = true;
                     }
                     else if (package.movieio.contains(filename))
                     {
-                        outfilename =
-                            movdir.absoluteFilePath(baseName).toUtf8().data();
+                        outfilename = movdir.absoluteFilePath(baseName).toUtf8().data();
                     }
                     else
                     {
@@ -657,47 +623,38 @@ namespace Rv
                         {
                             if (package.modes[q].file == filename)
                             {
-                                outfilename = mudir.absoluteFilePath(baseName)
-                                                  .toUtf8()
-                                                  .data();
+                                outfilename = mudir.absoluteFilePath(baseName).toUtf8().data();
                             }
                         }
                     }
 
                     if (outfilename == "")
                     {
-                        outfilename =
-                            libdir.absoluteFilePath(baseName).toUtf8().data();
+                        outfilename = libdir.absoluteFilePath(baseName).toUtf8().data();
                     }
                 }
-                else if (filename.endsWith(".glsl")
-                         || filename.endsWith(".gto"))
+                else if (filename.endsWith(".glsl") || filename.endsWith(".gto"))
                 //
                 //  Assume this is a NodeDefinition file (gto) or associated
                 //  shader code.
                 //
                 {
-                    outfilename =
-                        nodedir.absoluteFilePath(baseName).toUtf8().constData();
+                    outfilename = nodedir.absoluteFilePath(baseName).toUtf8().constData();
                 }
                 else if (filename.endsWith(".profile"))
                 {
-                    outfilename =
-                        profdir.absoluteFilePath(baseName).toUtf8().constData();
+                    outfilename = profdir.absoluteFilePath(baseName).toUtf8().constData();
                 }
                 else
                 {
-                    outfilename =
-                        supportdir.absoluteFilePath(baseName).toUtf8().data();
+                    outfilename = supportdir.absoluteFilePath(baseName).toUtf8().data();
                 }
 
-                ofstream outfile(UNICODE_C_STR(outfilename.c_str()),
-                                 ios::binary);
+                ofstream outfile(UNICODE_C_STR(outfilename.c_str()), ios::binary);
 
                 while (1)
                 {
-                    int read = unzReadCurrentFile(file, &buffer.front(),
-                                                  buffer.size());
+                    int read = unzReadCurrentFile(file, &buffer.front(), buffer.size());
                     if (read == 0)
                         break;
                     else
@@ -706,9 +663,7 @@ namespace Rv
 
                 if (fbio)
                 {
-                    string makeFBIO =
-                        TwkApp::Bundle::mainBundle()->executableFile(
-                            "makeFBIOformats");
+                    string makeFBIO = TwkApp::Bundle::mainBundle()->executableFile("makeFBIOformats");
                     QFileInfo info(outfilename.c_str());
                     QString dir = info.dir().absolutePath();
                     string cmd = makeFBIO;
@@ -757,9 +712,8 @@ namespace Rv
             {
                 if (mlistV1[q].name == name)
                 {
-                    cerr << "WARNING: removing duplicate mode entry in "
-                         << rvloadV1.toUtf8().data() << " for mode "
-                         << name.toUtf8().data() << endl;
+                    cerr << "WARNING: removing duplicate mode entry in " << rvloadV1.toUtf8().data() << " for mode " << name.toUtf8().data()
+                         << endl;
 
                     mlistV1.erase(mlistV1.begin() + q);
                 }
@@ -768,9 +722,8 @@ namespace Rv
             {
                 if (mlistV2[q].name == name)
                 {
-                    cerr << "WARNING: removing duplicate mode entry in "
-                         << rvloadV2.toUtf8().data() << " for mode "
-                         << name.toUtf8().data() << endl;
+                    cerr << "WARNING: removing duplicate mode entry in " << rvloadV2.toUtf8().data() << " for mode " << name.toUtf8().data()
+                         << endl;
 
                     mlistV2.erase(mlistV2.begin() + q);
                 }
@@ -822,18 +775,15 @@ namespace Rv
         //
 
         QFileInfo rinfo(package.file);
-        writeInstallationFile(
-            rinfo.absoluteDir().absoluteFilePath("rvinstall"));
+        writeInstallationFile(rinfo.absoluteDir().absoluteFilePath("rvinstall"));
 
         return true;
     }
 
     bool PackageManager::makeSupportDirTree(QDir& root)
     {
-        const char* dirs[] = {"Mu",          "Python",       "SupportFiles",
-                              "ConfigFiles", "ImageFormats", "MovieFormats",
-                              "Packages",    "lib",          "libquicktime",
-                              "Nodes",       "Profiles",     NULL};
+        const char* dirs[] = {"Mu",       "Python", "SupportFiles", "ConfigFiles", "ImageFormats", "MovieFormats",
+                              "Packages", "lib",    "libquicktime", "Nodes",       "Profiles",     NULL};
 
         for (const char** d = dirs; *d; d++)
         {
@@ -940,47 +890,36 @@ namespace Rv
             if (auxIndex != -1)
             {
                 const AuxFile& a = package.auxFiles[auxIndex];
-                QDir outdir(rdir.absoluteFilePath(
-                    expandVarsInPath(package, a.location)));
+                QDir outdir(rdir.absoluteFilePath(expandVarsInPath(package, a.location)));
                 QFileInfo auxfileInfo(a.file);
                 QString auxfileName = auxfileInfo.fileName();
-                outfilename =
-                    outdir.absoluteFilePath(auxfileName).toUtf8().constData();
+                outfilename = outdir.absoluteFilePath(auxfileName).toUtf8().constData();
             }
-            else if (filename.endsWith(".mu") || filename.endsWith(".mud")
-                     || filename.endsWith(".muc"))
+            else if (filename.endsWith(".mu") || filename.endsWith(".mud") || filename.endsWith(".muc"))
             {
                 outfilename = mudir.absoluteFilePath(baseName);
 
                 if (filename.endsWith(".mu"))
                 {
                     baseName.chop(3);
-                    auxfiles.push_back(
-                        mudir.absoluteFilePath(baseName + QString(".muc")));
-                    auxfiles.push_back(
-                        mudir.absoluteFilePath(baseName + QString(".mud")));
-                    auxfiles.push_back(
-                        mudir.absoluteFilePath(baseName + QString(".so")));
+                    auxfiles.push_back(mudir.absoluteFilePath(baseName + QString(".muc")));
+                    auxfiles.push_back(mudir.absoluteFilePath(baseName + QString(".mud")));
+                    auxfiles.push_back(mudir.absoluteFilePath(baseName + QString(".so")));
                 }
             }
-            else if (filename.endsWith(".py") || filename.endsWith(".pyc")
-                     || filename.endsWith(".pyo") || filename.endsWith(".pyd"))
+            else if (filename.endsWith(".py") || filename.endsWith(".pyc") || filename.endsWith(".pyo") || filename.endsWith(".pyd"))
             {
                 outfilename = pydir.absoluteFilePath(baseName);
 
                 if (filename.endsWith(".py"))
                 {
                     baseName.chop(3);
-                    auxfiles.push_back(
-                        pydir.absoluteFilePath(baseName + QString(".pyc")));
-                    auxfiles.push_back(
-                        pydir.absoluteFilePath(baseName + QString(".pyd")));
-                    auxfiles.push_back(
-                        pydir.absoluteFilePath(baseName + QString(".pyo")));
+                    auxfiles.push_back(pydir.absoluteFilePath(baseName + QString(".pyc")));
+                    auxfiles.push_back(pydir.absoluteFilePath(baseName + QString(".pyd")));
+                    auxfiles.push_back(pydir.absoluteFilePath(baseName + QString(".pyo")));
                 }
             }
-            else if (filename.endsWith(".so") || filename.endsWith(".dll")
-                     || filename.endsWith(".dylib"))
+            else if (filename.endsWith(".so") || filename.endsWith(".dll") || filename.endsWith(".dylib"))
             {
                 if (package.imageio.contains(filename))
                 {
@@ -1100,8 +1039,7 @@ namespace Rv
 
         package.installed = false;
         QFileInfo rinfo(package.file);
-        writeInstallationFile(
-            rinfo.absoluteDir().absoluteFilePath("rvinstall"));
+        writeInstallationFile(rinfo.absoluteDir().absoluteFilePath("rvinstall"));
 
         return true;
     }
@@ -1143,11 +1081,8 @@ namespace Rv
 
                 QFileInfo finfo(infile);
 
-                m_packages.back().fileWritable = TwkUtil::isWritable(
-                    TwkQtCoreUtil::UTF8::qconvert(infile).c_str());
-                m_packages.back().dirWritable = TwkUtil::isWritable(
-                    TwkQtCoreUtil::UTF8::qconvert(finfo.absolutePath())
-                        .c_str());
+                m_packages.back().fileWritable = TwkUtil::isWritable(TwkQtCoreUtil::UTF8::qconvert(infile).c_str());
+                m_packages.back().dirWritable = TwkUtil::isWritable(TwkQtCoreUtil::UTF8::qconvert(finfo.absolutePath()).c_str());
 
                 unz_global_info info;
                 unzGetGlobalInfo(file, &info);
@@ -1163,8 +1098,7 @@ namespace Rv
                 {
                     // unz_file_info info;
                     char temp[256];
-                    unzGetCurrentFileInfo(file, NULL /*&info*/, temp, 256, NULL,
-                                          0, NULL, 0);
+                    unzGetCurrentFileInfo(file, NULL /*&info*/, temp, 256, NULL, 0, NULL, 0);
                     temp[255] = 0;
                     files.push_back(temp);
                     QString f = temp;
@@ -1181,8 +1115,7 @@ namespace Rv
                 while (!unzeof(file))
                 {
                     buffer.resize(buffer.size() + 256);
-                    int read =
-                        unzReadCurrentFile(file, &buffer.back() - 255, 256);
+                    int read = unzReadCurrentFile(file, &buffer.back() - 255, 256);
                     if (read != 256)
                         buffer.resize(buffer.size() - 256 + read);
                 }
@@ -1204,9 +1137,7 @@ namespace Rv
                         return;
                     }
 
-                    yaml_parser_set_input_string(
-                        &parser, (const unsigned char*)&buffer.front(),
-                        buffer.size());
+                    yaml_parser_set_input_string(&parser, (const unsigned char*)&buffer.front(), buffer.size());
 
                     Package& package = m_packages.back();
                     package.installed = false;
@@ -1275,8 +1206,7 @@ namespace Rv
                             break;
                         case YAML_SCALAR_EVENT:
                         {
-                            QString v = QString::fromUtf8(
-                                (const char*)input_event.data.scalar.value);
+                            QString v = QString::fromUtf8((const char*)input_event.data.scalar.value);
                             // cout << "scalar " << v.toUtf8().data() << endl;
 
                             if (!valueState)
@@ -1367,18 +1297,12 @@ namespace Rv
                                     requires
                                 = v;
                                 else if (pname == "rv") package.rvversion = v;
-                                else if (pname == "openrv")
-                                    package.openrvversion = v;
-                                else if (pname == "imageio") package.imageio =
-                                    v.split(" ");
-                                else if (pname == "movieio") package.movieio =
-                                    v.split(" ");
-                                else if (pname == "hidden") package.hidden =
-                                    v == "true";
-                                else if (pname == "system") package.system =
-                                    v == "true";
-                                else if (pname == "optional") package.optional =
-                                    v == "true";
+                                else if (pname == "openrv") package.openrvversion = v;
+                                else if (pname == "imageio") package.imageio = v.split(" ");
+                                else if (pname == "movieio") package.movieio = v.split(" ");
+                                else if (pname == "hidden") package.hidden = v == "true";
+                                else if (pname == "system") package.system = v == "true";
+                                else if (pname == "optional") package.optional = v == "true";
                                 valueState = false;
                             }
                         }
@@ -1388,13 +1312,10 @@ namespace Rv
                         }
                     }
 
-                    static const bool isOpenRV =
-                        std::string_view(INTERNAL_APPLICATION_NAME) == "OpenRV";
+                    static const bool isOpenRV = std::string_view(INTERNAL_APPLICATION_NAME) == "OpenRV";
 
-                    package.compatible = versionCompatible(
-                        isOpenRV ? package.openrvversion : package.rvversion,
-                        TWK_DEPLOY_MAJOR_VERSION(), TWK_DEPLOY_MINOR_VERSION(),
-                        TWK_DEPLOY_PATCH_LEVEL());
+                    package.compatible = versionCompatible(isOpenRV ? package.openrvversion : package.rvversion, TWK_DEPLOY_MAJOR_VERSION(),
+                                                           TWK_DEPLOY_MINOR_VERSION(), TWK_DEPLOY_PATCH_LEVEL());
 
                     package.zipFile = true;
                     package.installing = false;
@@ -1404,34 +1325,31 @@ namespace Rv
                     for (auto& auxFolder : package.auxFolders)
                     {
                         // Iterate through files and compare paths
-                        std::for_each(
-                            package.files.begin(), package.files.end(),
-                            [&](const QString& fullPath)
-                            {
-                                // Check if the file is in the current folder or
-                                // any of its subdirectories
-                                if (fullPath.startsWith(auxFolder.folder + '/'))
-                                {
-                                    // Separate the filename and directory
-                                    // structure information
-                                    QFileInfo fileInfo(fullPath);
-                                    QString fileName = fileInfo.fileName();
-                                    QString directory = fileInfo.dir().path();
+                        std::for_each(package.files.begin(), package.files.end(),
+                                      [&](const QString& fullPath)
+                                      {
+                                          // Check if the file is in the current folder or
+                                          // any of its subdirectories
+                                          if (fullPath.startsWith(auxFolder.folder + '/'))
+                                          {
+                                              // Separate the filename and directory
+                                              // structure information
+                                              QFileInfo fileInfo(fullPath);
+                                              QString fileName = fileInfo.fileName();
+                                              QString directory = fileInfo.dir().path();
 
-                                    AuxFile newAuxFile;
-                                    newAuxFile.file = fullPath;
-                                    newAuxFile.location =
-                                        auxFolder.location + "/" + directory;
-                                    package.auxFiles.push_back(newAuxFile);
-                                }
-                            });
+                                              AuxFile newAuxFile;
+                                              newAuxFile.file = fullPath;
+                                              newAuxFile.location = auxFolder.location + "/" + directory;
+                                              package.auxFiles.push_back(newAuxFile);
+                                          }
+                                      });
                     }
 
                     QRegularExpression rvpkgRE(R"((.*)-[0-9]+\.[0-9]+\.rvpkg)");
                     QRegularExpression zipRE(R"((.*)\.zip)");
 
-                    QRegularExpressionMatch match =
-                        rvpkgRE.match(finfo.fileName());
+                    QRegularExpressionMatch match = rvpkgRE.match(finfo.fileName());
                     if (!match.hasMatch())
                     {
                         match = zipRE.match(finfo.fileName());
@@ -1447,8 +1365,7 @@ namespace Rv
         }
     }
 
-    PackageManager::ModeEntryList
-    PackageManager::loadModeFile(const QString& filename)
+    PackageManager::ModeEntryList PackageManager::loadModeFile(const QString& filename)
     {
         QFile file(filename);
         bool exists = file.exists();
@@ -1486,15 +1403,9 @@ namespace Rv
                     entry.event = parts[index++];
                     entry.loaded = parts[index++] == "true";
                     entry.active = parts[index++] == "true";
-                    entry.rvversion =
-                        (rvloadVersion == 1) ? "" : parts[index++];
-                    entry.optional = (rvloadVersion >= 3 && parts.size() >= 9
-                                          ? parts[index++] == "true"
-                                          : false);
-                    entry.openrvversion =
-                        (rvloadVersion >= 4 && parts.size() >= 10
-                             ? parts[index++]
-                             : "");
+                    entry.rvversion = (rvloadVersion == 1) ? "" : parts[index++];
+                    entry.optional = (rvloadVersion >= 3 && parts.size() >= 9 ? parts[index++] == "true" : false);
+                    entry.openrvversion = (rvloadVersion >= 4 && parts.size() >= 10 ? parts[index++] : "");
 
                     int requiresIndex = index;
                     for (int i = requiresIndex; i < parts.size(); i++)
@@ -1510,8 +1421,7 @@ namespace Rv
         return list;
     }
 
-    void PackageManager::writeModeFile(const QString& filename,
-                                       const ModeEntryList& list, int version)
+    void PackageManager::writeModeFile(const QString& filename, const ModeEntryList& list, int version)
     {
         QFile file(filename);
 
@@ -1523,15 +1433,14 @@ namespace Rv
             {
                 const ModeEntry& e = list[i];
 
-                QString line =
-                    QString("%1,%2,%3,%4,%5,%6,%7")
-                        .arg(e.name)
-                        .arg(e.package)
-                        .arg(e.menu == "" ? QString("nil") : e.menu)
-                        .arg(e.shortcut == "" ? QString("nil") : e.shortcut)
-                        .arg(e.event == "" ? QString("nil") : e.event)
-                        .arg(e.loaded ? QString("true") : QString("false"))
-                        .arg(e.active ? QString("true") : QString("false"));
+                QString line = QString("%1,%2,%3,%4,%5,%6,%7")
+                                   .arg(e.name)
+                                   .arg(e.package)
+                                   .arg(e.menu == "" ? QString("nil") : e.menu)
+                                   .arg(e.shortcut == "" ? QString("nil") : e.shortcut)
+                                   .arg(e.event == "" ? QString("nil") : e.event)
+                                   .arg(e.loaded ? QString("true") : QString("false"))
+                                   .arg(e.active ? QString("true") : QString("false"));
 
                 if (version > 1 || version == 0)
                 {
@@ -1568,8 +1477,7 @@ namespace Rv
         }
     }
 
-    void PackageManager::loadInstalltionFile(const QDir& dir,
-                                             const QString& filename)
+    void PackageManager::loadInstalltionFile(const QDir& dir, const QString& filename)
     {
         QFile file(filename);
         bool exists = file.exists();
@@ -1581,8 +1489,7 @@ namespace Rv
             bool installed = line.size() > 1 && line[0] == '*';
             if (installed)
                 line.remove(0, 1);
-            QString path =
-                QFileInfo(dir.absoluteFilePath(line)).canonicalFilePath();
+            QString path = QFileInfo(dir.absoluteFilePath(line)).canonicalFilePath();
             QMap<QString, int>::iterator i = m_packageMap.find(path);
 
             if (i == m_packageMap.end())
@@ -1598,9 +1505,8 @@ namespace Rv
                     m_packages.back().installed = installed;
                     m_packages.back().zipFile = false;
                     m_packages.back().name = "Missing Package";
-                    m_packages.back().description =
-                        "<p><i>The original zip file for this package is "
-                        "missing</i></p>";
+                    m_packages.back().description = "<p><i>The original zip file for this package is "
+                                                    "missing</i></p>";
                     m_packageMap.insert(line, m_packages.size() - 1);
                 }
                 else
@@ -1672,8 +1578,7 @@ namespace Rv
     //  use of different versions of RV (stored in different directories).
     //
 
-    QStringList PackageManager::swapAppDir(const QStringList& packages,
-                                           bool swapIn)
+    QStringList PackageManager::swapAppDir(const QStringList& packages, bool swapIn)
     {
         QString appDirSymbol("$APPLICATION_DIR");
         QFileInfo topInfo(TwkApp::Bundle::mainBundle()->top().c_str());
@@ -1721,14 +1626,8 @@ namespace Rv
         {
             RV_QSETTINGS;
             settings.beginGroup("ModeManager");
-            m_doNotLoadPackages =
-                swapAppDir(settings.value("doNotLoadPackages", QStringList())
-                               .toStringList(),
-                           false);
-            m_optLoadPackages =
-                swapAppDir(settings.value("optionalPackages", QStringList())
-                               .toStringList(),
-                           false);
+            m_doNotLoadPackages = swapAppDir(settings.value("doNotLoadPackages", QStringList()).toStringList(), false);
+            m_optLoadPackages = swapAppDir(settings.value("optionalPackages", QStringList()).toStringList(), false);
             settings.endGroup();
         }
 
@@ -1745,8 +1644,7 @@ namespace Rv
 
                 for (size_t q = 0; q < entries.size(); q++)
                 {
-                    if (entries[q].fileName().endsWith(".zip")
-                        || entries[q].fileName().endsWith("rvpkg")
+                    if (entries[q].fileName().endsWith(".zip") || entries[q].fileName().endsWith("rvpkg")
                         || entries[q].fileName().endsWith("rvpkgs"))
                     {
                         loadPackageInfo(entries[q].filePath());
@@ -1778,8 +1676,7 @@ namespace Rv
             {
                 if (dir.exists("rvload2"))
                 {
-                    PackageManager::ModeEntryList entries =
-                        loadModeFile(dir.absoluteFilePath("rvload2"));
+                    PackageManager::ModeEntryList entries = loadModeFile(dir.absoluteFilePath("rvload2"));
 
                     for (size_t i = 0; i < entries.size(); i++)
                     {
@@ -1789,9 +1686,7 @@ namespace Rv
                         {
                             for (size_t i = 0; i < m_packages.size(); i++)
                             {
-                                if (QFileInfo(m_packages[i].file).fileName()
-                                        == entry.package
-                                    && m_packages[i].optional)
+                                if (QFileInfo(m_packages[i].file).fileName() == entry.package && m_packages[i].optional)
                                 //
                                 //  Then this package has been "opted in" so
                                 //  reset optional flag
@@ -1810,21 +1705,18 @@ namespace Rv
 
         for (size_t i = 0; i < m_packages.size(); i++)
         {
-            m_packages[i].loadable =
-                !m_doNotLoadPackages.contains(m_packages[i].file);
+            m_packages[i].loadable = !m_doNotLoadPackages.contains(m_packages[i].file);
 
             if (m_packages[i].optional)
             {
-                m_packages[i].loadable =
-                    m_optLoadPackages.contains(m_packages[i].file);
+                m_packages[i].loadable = m_optLoadPackages.contains(m_packages[i].file);
             }
 
             declarePackage(m_packages[i], i);
         }
     }
 
-    bool PackageManager::addPackages(const QStringList& files,
-                                     const QString& path)
+    bool PackageManager::addPackages(const QStringList& files, const QString& path)
     {
         //
         //  First check that package files exist and have legal names
@@ -1840,8 +1732,7 @@ namespace Rv
             // Unpacking any bundles
             if (isBundle(files[i]))
             {
-                cout << "INFO: Bundle detected, adding subpackages now."
-                     << endl;
+                cout << "INFO: Bundle detected, adding subpackages now." << endl;
 
                 // Installing bundle
                 vector<QString> includedPackages = handleBundle(files[i], path);
@@ -1867,8 +1758,7 @@ namespace Rv
                 return false;
             }
 
-            if (!rvpkgRE.match(info.fileName()).hasMatch()
-                && !zipRE.match(info.fileName()).hasMatch()
+            if (!rvpkgRE.match(info.fileName()).hasMatch() && !zipRE.match(info.fileName()).hasMatch()
                 && !rvpkgsRE.match(info.fileName()).hasMatch())
             {
                 QString t("ERROR: Illegal package file name: ");
@@ -1886,8 +1776,7 @@ namespace Rv
 
         if (!dir.exists())
         {
-            cerr << "ERROR: target support directory "
-                 << dir.absolutePath().toUtf8().constData()
+            cerr << "ERROR: target support directory " << dir.absolutePath().toUtf8().constData()
                  << " does not exist: please create it first" << endl;
             return false;
         }
@@ -1954,16 +1843,13 @@ namespace Rv
                 QFileInfo packageFI(m_packages[q].file);
                 QFileInfo incomingFI(files[i]);
 
-                if (packageFI.canonicalFilePath()
-                    == incomingFI.canonicalFilePath())
+                if (packageFI.canonicalFilePath() == incomingFI.canonicalFilePath())
                 {
                     if (m_packages[q].installed)
                     {
                         if (!uninstallForRemoval(m_packages[q].file))
                         {
-                            cerr << "SKIPPING: "
-                                 << m_packages[q].file.toUtf8().constData()
-                                 << endl;
+                            cerr << "SKIPPING: " << m_packages[q].file.toUtf8().constData() << endl;
                             continue;
                         }
 
@@ -1974,8 +1860,7 @@ namespace Rv
 
                     if (!QFile::remove(files[i]))
                     {
-                        cerr << "ERROR: " << files[i].toUtf8().constData()
-                             << " not removed" << endl;
+                        cerr << "ERROR: " << files[i].toUtf8().constData() << " not removed" << endl;
                     }
                     else
                     {
@@ -1998,8 +1883,7 @@ namespace Rv
         for (size_t i = 0; i < toremove.size(); i++)
         {
             QFileInfo info(toremove[i]);
-            writeInstallationFile(
-                info.absoluteDir().absoluteFilePath("rvinstall"));
+            writeInstallationFile(info.absoluteDir().absoluteFilePath("rvinstall"));
         }
 
         loadPackages();
@@ -2010,8 +1894,7 @@ namespace Rv
     //  Default implementation uses cin/cout
     //
 
-    bool PackageManager::yesOrNo(const char* m1, const char* m2,
-                                 const QString& msg, const char* q)
+    bool PackageManager::yesOrNo(const char* m1, const char* m2, const QString& msg, const char* q)
     {
         char yorn = 0;
 
@@ -2058,15 +1941,12 @@ namespace Rv
 
     bool PackageManager::overwriteExistingFiles(const QString& msg)
     {
-        return yesOrNo("Existing Package Files",
-                       "Package files conflict with existing files.", msg,
-                       "Overwrite existing files?");
+        return yesOrNo("Existing Package Files", "Package files conflict with existing files.", msg, "Overwrite existing files?");
     }
 
     void PackageManager::errorMissingPackageDependancies(const QString& msg)
     {
-        cerr << "ERROR: Some package dependancies are missing" << endl
-             << msg.toUtf8().constData() << endl;
+        cerr << "ERROR: Some package dependancies are missing" << endl << msg.toUtf8().constData() << endl;
     }
 
     bool PackageManager::uninstallDependantPackages(const QString& msg)
@@ -2079,20 +1959,17 @@ namespace Rv
 
     void PackageManager::informCannotRemoveSomeFiles(const QString& msg)
     {
-        cout << "INFO: Some Files Cannot Be Removed" << endl
-             << msg.toUtf8().constData() << endl;
+        cout << "INFO: Some Files Cannot Be Removed" << endl << msg.toUtf8().constData() << endl;
     }
 
     void PackageManager::errorModeFileWriteFailed(const QString& file)
     {
-        cerr << "ERROR: File write failed: " << file.toUtf8().constData()
-             << endl;
+        cerr << "ERROR: File write failed: " << file.toUtf8().constData() << endl;
     }
 
     void PackageManager::informPackageFailedToCopy(const QString& msg)
     {
-        cout << "INFO: package failed to copy: " << msg.toUtf8().constData()
-             << endl;
+        cout << "INFO: package failed to copy: " << msg.toUtf8().constData() << endl;
     }
 
     void PackageManager::declarePackage(Package&, size_t)
@@ -2102,9 +1979,7 @@ namespace Rv
 
     bool PackageManager::uninstallForRemoval(const QString& msg)
     {
-        return yesOrNo("Package is installed",
-                       "In order to remove the package it must be uninstalled",
-                       msg, "Uninstall?");
+        return yesOrNo("Package is installed", "In order to remove the package it must be uninstalled", msg, "Uninstall?");
     }
 
     int PackageManager::auxFileIndex(Package& p, const QString& file)
@@ -2150,8 +2025,7 @@ namespace Rv
         }
     }
 
-    static void assembleSettings(RvSettings::SettingsMap& map,
-                                 const char* envVar, QString prefFileName)
+    static void assembleSettings(RvSettings::SettingsMap& map, const char* envVar, QString prefFileName)
     {
         const char* p = getenv(envVar);
         if (!p)
@@ -2176,8 +2050,7 @@ namespace Rv
             if (!prefDirs[i].exists(prefFileName))
                 continue;
 
-            QString overrideFileName =
-                prefDirs[i].absoluteFilePath(prefFileName);
+            QString overrideFileName = prefDirs[i].absoluteFilePath(prefFileName);
             QFileInfo overrideFileInfo(overrideFileName);
 
 #ifdef PLATFORM_WINDOWS
@@ -2189,8 +2062,7 @@ namespace Rv
             overrideSettings.setFallbacksEnabled(false);
             if (overrideSettings.status() != QSettings::NoError)
             {
-                cerr << "ERROR: RvSettings was unable to read settings for: '"
-                     << overrideSettings.fileName().toStdString()
+                cerr << "ERROR: RvSettings was unable to read settings for: '" << overrideSettings.fileName().toStdString()
                      << "' err: " << overrideSettings.status() << endl;
                 continue;
             }
@@ -2218,16 +2090,11 @@ namespace Rv
             path = p;
         else
             path = QDir::homePath();
-        name = QFileInfo(path).canonicalFilePath() + "/"
-               + INTERNAL_ORGANIZATION_NAME + "/" + INTERNAL_APPLICATION_NAME
-               + ".ini";
+        name = QFileInfo(path).canonicalFilePath() + "/" + INTERNAL_ORGANIZATION_NAME + "/" + INTERNAL_APPLICATION_NAME + ".ini";
 #elif defined(PLATFORM_DARWIN)
-        name = QDir::homePath() + "/Library/Preferences/com."
-               + INTERNAL_ORGANIZATION_NAME + "." + INTERNAL_APPLICATION_NAME
-               + ".plist";
+        name = QDir::homePath() + "/Library/Preferences/com." + INTERNAL_ORGANIZATION_NAME + "." + INTERNAL_APPLICATION_NAME + ".plist";
 #else
-        name = QDir::homePath() + "/.config/" + INTERNAL_ORGANIZATION_NAME + "/"
-               + INTERNAL_APPLICATION_NAME + ".conf";
+        name = QDir::homePath() + "/.config/" + INTERNAL_ORGANIZATION_NAME + "/" + INTERNAL_APPLICATION_NAME + ".conf";
 #endif
 
         return name;
@@ -2275,10 +2142,8 @@ namespace Rv
 
         QString prefsFileName = QFileInfo(defaultSettingsFileName()).fileName();
 
-        assembleSettings(m_overridingSettings, "RV_PREFS_OVERRIDE_PATH",
-                         prefsFileName);
-        assembleSettings(m_clobberingSettings, "RV_PREFS_CLOBBER_PATH",
-                         prefsFileName);
+        assembleSettings(m_overridingSettings, "RV_PREFS_OVERRIDE_PATH", prefsFileName);
+        assembleSettings(m_clobberingSettings, "RV_PREFS_CLOBBER_PATH", prefsFileName);
 
         QCoreApplication::setApplicationName(INTERNAL_APPLICATION_NAME);
 
@@ -2287,11 +2152,9 @@ namespace Rv
 
     RvSettings::~RvSettings()
     {
-        if (!m_userSettingsErrorAlredyReported
-            && (m_userSettings->status() != QSettings::NoError))
+        if (!m_userSettingsErrorAlredyReported && (m_userSettings->status() != QSettings::NoError))
         {
-            cerr << "ERROR: RvSettings encountered error with: '"
-                 << m_userSettings->fileName().toStdString()
+            cerr << "ERROR: RvSettings encountered error with: '" << m_userSettings->fileName().toStdString()
                  << "' err: " << m_userSettings->status() << endl;
 
             m_userSettingsErrorAlredyReported = true;
@@ -2306,16 +2169,13 @@ namespace Rv
 #else
         QSettings::Format format(QSettings::NativeFormat);
 #endif
-        QSettings* qs = new QSettings(
-            format, QSettings::UserScope, INTERNAL_ORGANIZATION_NAME,
-            PackageManager::ignoringPrefs() ? "RVALT"
-                                            : INTERNAL_APPLICATION_NAME);
+        QSettings* qs = new QSettings(format, QSettings::UserScope, INTERNAL_ORGANIZATION_NAME,
+                                      PackageManager::ignoringPrefs() ? "RVALT" : INTERNAL_APPLICATION_NAME);
         qs->setFallbacksEnabled(false);
 
         if (qs->status() != QSettings::NoError)
         {
-            cerr << "ERROR: RvSettings was unable to read settings for: '"
-                 << qs->fileName().toStdString() << "' err: " << qs->status()
+            cerr << "ERROR: RvSettings was unable to read settings for: '" << qs->fileName().toStdString() << "' err: " << qs->status()
                  << endl;
         }
 
@@ -2351,15 +2211,13 @@ namespace Rv
 
     void RvSettings::endGroup() { m_userSettings->endGroup(); }
 
-    QVariant RvSettings::value(const QString& key,
-                               const QVariant& defaultValue) const
+    QVariant RvSettings::value(const QString& key, const QVariant& defaultValue) const
     {
         SettingsMap::const_iterator i;
 
         QString fullKey = m_userSettings->group() + "/" + key;
 
-        if ((i = m_clobberingSettings.find(fullKey))
-            != m_clobberingSettings.end())
+        if ((i = m_clobberingSettings.find(fullKey)) != m_clobberingSettings.end())
         //
         //  Clobbering value always wins
         //
@@ -2373,8 +2231,7 @@ namespace Rv
         {
             return m_userSettings->value(key, defaultValue);
         }
-        else if ((i = m_overridingSettings.find(fullKey))
-                 != m_overridingSettings.end())
+        else if ((i = m_overridingSettings.find(fullKey)) != m_overridingSettings.end())
         //
         //  No user key either, so use the overriding initializer
         //
@@ -2391,8 +2248,7 @@ namespace Rv
 
         QString fullKey = m_userSettings->group() + "/" + key;
 
-        if ((i = m_clobberingSettings.find(fullKey))
-            != m_clobberingSettings.end())
+        if ((i = m_clobberingSettings.find(fullKey)) != m_clobberingSettings.end())
         //
         //  Value came from clobbering settings, so check that incoming value is
         //  different, then remove from clobbering settings (otherwise,
@@ -2404,9 +2260,7 @@ namespace Rv
             m_clobberingSettings.erase(i);
         }
 
-        if ((i = m_overridingSettings.find(fullKey))
-                != m_overridingSettings.end()
-            && !m_userSettings->contains(key))
+        if ((i = m_overridingSettings.find(fullKey)) != m_overridingSettings.end() && !m_userSettings->contains(key))
         //
         //  Value came from overriding settings, so check that incoming value is
         //  different, then remove from overriding settings (otherwise,
@@ -2429,11 +2283,9 @@ namespace Rv
     void RvSettings::sync()
     {
         m_userSettings->sync();
-        if (!m_userSettingsErrorAlredyReported
-            && (m_userSettings->status() != QSettings::NoError))
+        if (!m_userSettingsErrorAlredyReported && (m_userSettings->status() != QSettings::NoError))
         {
-            cerr << "ERROR: RvSettings was unable to write settings for: '"
-                 << m_userSettings->fileName().toStdString()
+            cerr << "ERROR: RvSettings was unable to write settings for: '" << m_userSettings->fileName().toStdString()
                  << "' err: " << m_userSettings->status() << endl;
 
             m_userSettingsErrorAlredyReported = true;
@@ -2444,8 +2296,7 @@ namespace Rv
     {
         QString fullKey = m_userSettings->group() + "/" + key;
 
-        if (!m_clobberingSettings.contains(fullKey)
-            && m_userSettings->contains(key))
+        if (!m_clobberingSettings.contains(fullKey) && m_userSettings->contains(key))
         //
         //  Only remove key from user settings if it didn't come from the
         //  clobbering settings in the first place.
@@ -2459,9 +2310,7 @@ namespace Rv
     {
         QString fullKey = m_userSettings->group() + "/" + key;
 
-        if (m_clobberingSettings.contains(fullKey)
-            || m_userSettings->contains(key)
-            || m_overridingSettings.contains(fullKey))
+        if (m_clobberingSettings.contains(fullKey) || m_userSettings->contains(key) || m_overridingSettings.contains(fullKey))
         //
         //  The setting is provided by clobbering settings, or by user settings,
         //  or by overriding settings.

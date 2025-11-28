@@ -44,10 +44,8 @@ namespace Mu
         virtual void deleteObject(Object*) const;
         virtual void output(std::ostream&) const;
         virtual void outputNode(std::ostream&, const Node*) const;
-        virtual void outputValue(std::ostream&, const Value&,
-                                 bool full = false) const;
-        virtual void outputValueRecursive(std::ostream&, const ValuePointer,
-                                          ValueOutputState&) const;
+        virtual void outputValue(std::ostream&, const Value&, bool full = false) const;
+        virtual void outputValueRecursive(std::ostream&, const ValuePointer, ValueOutputState&) const;
 
         //
         //	As symbols are added to the interface, it will add virtual

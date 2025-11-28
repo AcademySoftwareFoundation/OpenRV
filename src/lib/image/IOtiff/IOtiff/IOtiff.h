@@ -17,18 +17,14 @@ namespace TwkFB
     class IOtiff : public StreamingFrameBufferIO
     {
     public:
-        IOtiff(bool addAlphaTo3Channel = false, bool useRGBPlanar = false,
-               IOType ioMethod = StandardIO, size_t chunkSize = 61440,
+        IOtiff(bool addAlphaTo3Channel = false, bool useRGBPlanar = false, IOType ioMethod = StandardIO, size_t chunkSize = 61440,
                int maxAsync = 16);
 
         virtual ~IOtiff();
 
-        virtual void readImage(FrameBuffer& fb, const std::string& filename,
-                               const ReadRequest& request) const;
+        virtual void readImage(FrameBuffer& fb, const std::string& filename, const ReadRequest& request) const;
 
-        virtual void writeImage(const FrameBuffer& img,
-                                const std::string& filename,
-                                const WriteRequest& request) const;
+        virtual void writeImage(const FrameBuffer& img, const std::string& filename, const WriteRequest& request) const;
 
         virtual std::string about() const;
         virtual void getImageInfo(const std::string& filename, FBInfo&) const;

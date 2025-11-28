@@ -39,8 +39,7 @@ namespace Mu
         //  Constructors
         //
 
-        QLabelType(Context* context, const char* name, Class* superClass = 0,
-                   Class* superClass2 = 0);
+        QLabelType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QLabelType();
 
@@ -63,10 +62,8 @@ namespace Mu
     {
     public:
         virtual ~MuQt_QLabel();
-        MuQt_QLabel(Pointer muobj, const CallEnvironment*, QWidget* parent,
-                    Qt::WindowFlags f);
-        MuQt_QLabel(Pointer muobj, const CallEnvironment*, const QString& text,
-                    QWidget* parent, Qt::WindowFlags f);
+        MuQt_QLabel(Pointer muobj, const CallEnvironment*, QWidget* parent, Qt::WindowFlags f);
+        MuQt_QLabel(Pointer muobj, const CallEnvironment*, const QString& text, QWidget* parent, Qt::WindowFlags f);
         virtual int heightForWidth(int w) const;
         virtual QSize minimumSizeHint() const;
         virtual QSize sizeHint() const;
@@ -89,15 +86,9 @@ namespace Mu
 
         void changeEvent_pub_parent(QEvent* ev) { QLabel::changeEvent(ev); }
 
-        void contextMenuEvent_pub(QContextMenuEvent* ev)
-        {
-            contextMenuEvent(ev);
-        }
+        void contextMenuEvent_pub(QContextMenuEvent* ev) { contextMenuEvent(ev); }
 
-        void contextMenuEvent_pub_parent(QContextMenuEvent* ev)
-        {
-            QLabel::contextMenuEvent(ev);
-        }
+        void contextMenuEvent_pub_parent(QContextMenuEvent* ev) { QLabel::contextMenuEvent(ev); }
 
         bool event_pub(QEvent* e) { return event(e); }
 
@@ -105,62 +96,35 @@ namespace Mu
 
         void focusInEvent_pub(QFocusEvent* ev) { focusInEvent(ev); }
 
-        void focusInEvent_pub_parent(QFocusEvent* ev)
-        {
-            QLabel::focusInEvent(ev);
-        }
+        void focusInEvent_pub_parent(QFocusEvent* ev) { QLabel::focusInEvent(ev); }
 
-        bool focusNextPrevChild_pub(bool next)
-        {
-            return focusNextPrevChild(next);
-        }
+        bool focusNextPrevChild_pub(bool next) { return focusNextPrevChild(next); }
 
-        bool focusNextPrevChild_pub_parent(bool next)
-        {
-            return QLabel::focusNextPrevChild(next);
-        }
+        bool focusNextPrevChild_pub_parent(bool next) { return QLabel::focusNextPrevChild(next); }
 
         void focusOutEvent_pub(QFocusEvent* ev) { focusOutEvent(ev); }
 
-        void focusOutEvent_pub_parent(QFocusEvent* ev)
-        {
-            QLabel::focusOutEvent(ev);
-        }
+        void focusOutEvent_pub_parent(QFocusEvent* ev) { QLabel::focusOutEvent(ev); }
 
         void keyPressEvent_pub(QKeyEvent* ev) { keyPressEvent(ev); }
 
-        void keyPressEvent_pub_parent(QKeyEvent* ev)
-        {
-            QLabel::keyPressEvent(ev);
-        }
+        void keyPressEvent_pub_parent(QKeyEvent* ev) { QLabel::keyPressEvent(ev); }
 
         void mouseMoveEvent_pub(QMouseEvent* ev) { mouseMoveEvent(ev); }
 
-        void mouseMoveEvent_pub_parent(QMouseEvent* ev)
-        {
-            QLabel::mouseMoveEvent(ev);
-        }
+        void mouseMoveEvent_pub_parent(QMouseEvent* ev) { QLabel::mouseMoveEvent(ev); }
 
         void mousePressEvent_pub(QMouseEvent* ev) { mousePressEvent(ev); }
 
-        void mousePressEvent_pub_parent(QMouseEvent* ev)
-        {
-            QLabel::mousePressEvent(ev);
-        }
+        void mousePressEvent_pub_parent(QMouseEvent* ev) { QLabel::mousePressEvent(ev); }
 
         void mouseReleaseEvent_pub(QMouseEvent* ev) { mouseReleaseEvent(ev); }
 
-        void mouseReleaseEvent_pub_parent(QMouseEvent* ev)
-        {
-            QLabel::mouseReleaseEvent(ev);
-        }
+        void mouseReleaseEvent_pub_parent(QMouseEvent* ev) { QLabel::mouseReleaseEvent(ev); }
 
         void paintEvent_pub(QPaintEvent* _p14) { paintEvent(_p14); }
 
-        void paintEvent_pub_parent(QPaintEvent* _p14)
-        {
-            QLabel::paintEvent(_p14);
-        }
+        void paintEvent_pub_parent(QPaintEvent* _p14) { QLabel::paintEvent(_p14); }
 
     public:
         const QLabelType* _baseType;
@@ -168,11 +132,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance*
-    QLabelType::cachedInstance(const QLabelType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QLabelType::cachedInstance(const QLabelType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

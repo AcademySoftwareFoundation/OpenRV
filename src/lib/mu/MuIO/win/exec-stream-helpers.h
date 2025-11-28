@@ -179,14 +179,12 @@ private:
 
     char const* m_message_prefix; // error occured in the thread, if any
     DWORD
-    m_error_code; // they are examined only after the thread has terminated
-    char const*
-        m_error_message; // so setting them anywhere in the thread is safe
+    m_error_code;                // they are examined only after the thread has terminated
+    char const* m_error_message; // so setting them anywhere in the thread is safe
 
-    DWORD m_wait_timeout;       // parameters used in thread
-    std::size_t m_buffer_limit; // they are set before the thread is started,
-    std::size_t
-        m_read_buffer_size; // so accessing them anywhere in the thread is safe
+    DWORD m_wait_timeout;           // parameters used in thread
+    std::size_t m_buffer_limit;     // they are set before the thread is started,
+    std::size_t m_read_buffer_size; // so accessing them anywhere in the thread is safe
 
     HANDLE m_thread;
     event_t m_want_data; // for synchronisation between get and reader_thread
@@ -200,9 +198,7 @@ private:
     static DWORD WINAPI reader_thread(LPVOID param);
     static DWORD WINAPI writer_thread(LPVOID param);
 
-    void check_error(std::string const& message_prefix, DWORD error_code,
-                     std::string const& error_message);
-    void note_thread_error(char const* message_prefix, DWORD error_code,
-                           char const* error_message);
+    void check_error(std::string const& message_prefix, DWORD error_code, std::string const& error_message);
+    void note_thread_error(char const* message_prefix, DWORD error_code, char const* error_message);
     bool check_thread_stopped();
 };

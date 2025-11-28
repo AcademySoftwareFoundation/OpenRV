@@ -104,8 +104,7 @@ int utf8Main(int argc, char** argv)
 
     const GenericIO::Plugins& plugs = GenericIO::allPlugins();
 
-    for (GenericIO::Plugins::const_iterator i = plugs.begin(); i != plugs.end();
-         ++i)
+    for (GenericIO::Plugins::const_iterator i = plugs.begin(); i != plugs.end(); ++i)
     {
         MovieIO* plugin = *i;
 
@@ -130,12 +129,9 @@ int utf8Main(int argc, char** argv)
             writer.property("description", Gto::String, 1);
             writer.property("capabilities", Gto::Int, 1);
             writer.property("video_codecs", Gto::String, info.codecs.size(), 2);
-            writer.property("audio_codecs", Gto::String,
-                            info.audioCodecs.size(), 2);
-            writer.property("encode_parameters", Gto::String,
-                            info.encodeParameters.size(), 3);
-            writer.property("decode_parameters", Gto::String,
-                            info.decodeParameters.size(), 3);
+            writer.property("audio_codecs", Gto::String, info.audioCodecs.size(), 2);
+            writer.property("encode_parameters", Gto::String, info.encodeParameters.size(), 3);
+            writer.property("decode_parameters", Gto::String, info.decodeParameters.size(), 3);
             writer.endComponent();
 
             writer.intern(info.description);
@@ -172,8 +168,7 @@ int utf8Main(int argc, char** argv)
 
     writer.beginData();
 
-    for (GenericIO::Plugins::const_iterator i = plugs.begin(); i != plugs.end();
-         ++i)
+    for (GenericIO::Plugins::const_iterator i = plugs.begin(); i != plugs.end(); ++i)
     {
         MovieIO* plugin = *i;
 
@@ -217,19 +212,15 @@ int utf8Main(int argc, char** argv)
             for (int j = 0; j < info.encodeParameters.size(); j++)
             {
                 eparams.push_back(writer.lookup(info.encodeParameters[j].name));
-                eparams.push_back(
-                    writer.lookup(info.encodeParameters[j].description));
-                eparams.push_back(
-                    writer.lookup(info.encodeParameters[j].codec));
+                eparams.push_back(writer.lookup(info.encodeParameters[j].description));
+                eparams.push_back(writer.lookup(info.encodeParameters[j].codec));
             }
 
             for (int j = 0; j < info.decodeParameters.size(); j++)
             {
                 dparams.push_back(writer.lookup(info.decodeParameters[j].name));
-                dparams.push_back(
-                    writer.lookup(info.decodeParameters[j].description));
-                dparams.push_back(
-                    writer.lookup(info.decodeParameters[j].codec));
+                dparams.push_back(writer.lookup(info.decodeParameters[j].description));
+                dparams.push_back(writer.lookup(info.decodeParameters[j].codec));
             }
 
             if (vcodecs.empty())

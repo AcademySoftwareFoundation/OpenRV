@@ -34,8 +34,7 @@ namespace Mu
         //  Constructors
         //
 
-        QPaintEventType(Context* context, const char* name,
-                        Class* superClass = 0);
+        QPaintEventType(Context* context, const char* name, Class* superClass = 0);
         virtual ~QPaintEventType();
 
         //

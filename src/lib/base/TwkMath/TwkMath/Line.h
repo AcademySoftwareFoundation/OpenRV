@@ -58,40 +58,30 @@ namespace TwkMath
         Point operator()(float) const;
     };
 
-    template <class T>
-    inline Line<T>::Line(const typename Line<T>::Point& p1,
-                         const typename Line<T>::Dir& d)
+    template <class T> inline Line<T>::Line(const typename Line<T>::Point& p1, const typename Line<T>::Dir& d)
     {
         origin = p1;
         direction = d.normalized();
     }
 
-    template <class T> inline T Line<T>::operator()(float u) const
-    {
-        return direction * u + origin;
-    }
+    template <class T> inline T Line<T>::operator()(float u) const { return direction * u + origin; }
 
-    template <class T>
-    inline bool Line<T>::isParallelTo(const Line<T>& line) const
+    template <class T> inline bool Line<T>::isParallelTo(const Line<T>& line) const
     {
         return Math<Scalar>::abs(dot(line.direction, direction)) == Scalar(1);
     }
 
-    template <class T>
-    inline typename T::value_type
-    Line<T>::nearestUTo(const typename Line<T>::Point& p) const
+    template <class T> inline typename T::value_type Line<T>::nearestUTo(const typename Line<T>::Point& p) const
     {
         return dot(p - origin, direction);
     }
 
-    template <class T>
-    inline T Line<T>::nearestPointTo(const typename Line<T>::Point& p) const
+    template <class T> inline T Line<T>::nearestPointTo(const typename Line<T>::Point& p) const
     {
         return nearestUTo(p) * direction + origin;
     }
 
-    template <class T>
-    inline typename T::value_type Line<T>::nearestUTo(const Line<T>& line) const
+    template <class T> inline typename T::value_type Line<T>::nearestUTo(const Line<T>& line) const
     {
         //
         //	Same algorithm as in ImathLine.h
@@ -118,11 +108,7 @@ namespace TwkMath
         return (num / denom);
     }
 
-    template <class T>
-    inline T Line<T>::nearestPointTo(const Line<T>& line) const
-    {
-        return origin + direction * nearestUTo(line);
-    }
+    template <class T> inline T Line<T>::nearestPointTo(const Line<T>& line) const { return origin + direction * nearestUTo(line); }
 
     typedef Line<Vec3f> Line3f;
     typedef Line<Vec2f> Line2f;

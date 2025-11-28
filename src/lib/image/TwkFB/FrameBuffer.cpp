@@ -42,9 +42,7 @@
 #endif
 #endif
 
-#define SWAPSHORT(x)                            \
-    ((uint16_t)((((uint16_t)(x) & 0xff00) >> 8) \
-                | (((uint16_t)(x) & 0x00ff) << 8)))
+#define SWAPSHORT(x) ((uint16_t)((((uint16_t)(x) & 0xff00) >> 8) | (((uint16_t)(x) & 0x00ff) << 8)))
 
 namespace TwkFB
 {
@@ -91,6 +89,10 @@ namespace TwkFB
         std::string SMPTE_C() { return "SMPTE-C"; }
 
         std::string SMPTE240M() { return "SMPTE-240M"; }
+
+        std::string SMPTE2084() { return "SMPTE-2084"; }
+
+        std::string HybridLogGamma() { return "Hybrid Log-Gamma"; }
 
         std::string CineonLog() { return "Cineon Log"; }
 
@@ -178,10 +180,7 @@ namespace TwkFB
 
         std::string FilmStyleMatrix() { return "ColorSpace/FilmStyleMatrix"; }
 
-        std::string FilmStyleInverseMatrix()
-        {
-            return "ColorSpace/FilmStyleInverseMatrix";
-        }
+        std::string FilmStyleInverseMatrix() { return "ColorSpace/FilmStyleInverseMatrix"; }
 
         std::string Gamma() { return "ColorSpace/Gamma"; }
 
@@ -195,10 +194,7 @@ namespace TwkFB
 
         std::string LogCBlackSignal() { return "ColorSpace/LogCBlackSignal"; }
 
-        std::string LogCEncodingOffset()
-        {
-            return "ColorSpace/LogCEncodingOffset";
-        }
+        std::string LogCEncodingOffset() { return "ColorSpace/LogCEncodingOffset"; }
 
         std::string LogCEncodingGain() { return "ColorSpace/LogCEncodingGain"; }
 
@@ -210,10 +206,7 @@ namespace TwkFB
 
         std::string LogCLinearOffset() { return "ColorSpace/LogCLinearOffset"; }
 
-        std::string LogCLinearCutPoint()
-        {
-            return "ColorSpace/LogCLinearCutPoint";
-        }
+        std::string LogCLinearCutPoint() { return "ColorSpace/LogCLinearCutPoint"; }
 
         std::string LogCCutPoint() { return "ColorSpace/LogCCutPoint"; }
 
@@ -227,10 +220,7 @@ namespace TwkFB
 
         std::string AdoptedNeutral() { return "ColorSpace/AdoptedNeutral"; }
 
-        std::string ICCProfileDescription()
-        {
-            return "ColorSpace/ICC/Description";
-        }
+        std::string ICCProfileDescription() { return "ColorSpace/ICC/Description"; }
 
         std::string ICCProfileData() { return "ColorSpace/ICC/Data"; }
 
@@ -276,9 +266,7 @@ namespace TwkFB
         copyFrom(&fb);
     }
 
-    FrameBuffer::FrameBuffer(CoordinateTypes coordinateType, int width,
-                             int height, int depth, DataType dataType,
-                             unsigned char* data,
+    FrameBuffer::FrameBuffer(CoordinateTypes coordinateType, int width, int height, int depth, DataType dataType, unsigned char* data,
                              const StringVector* channelNames)
         : m_coordinateType(coordinateType)
         , m_data(0)
@@ -300,17 +288,13 @@ namespace TwkFB
         , m_staticRef(0)
     {
         // cout << "FB CONSTRUCT 4: " << this << endl;
-        restructure(width, height, depth, channelNames->size(), dataType, data,
-                    channelNames, BOTTOMLEFT, true, /* Manage the data buffer */
-                    0,                              /* No extra lines */
-                    0);                             /* No extra pixels */
+        restructure(width, height, depth, channelNames->size(), dataType, data, channelNames, BOTTOMLEFT, true, /* Manage the data buffer */
+                    0,                                                                                          /* No extra lines */
+                    0);                                                                                         /* No extra pixels */
     }
 
-    FrameBuffer::FrameBuffer(int width, int height, int numChannels,
-                             DataType dataType, unsigned char* data,
-                             const StringVector* channelNames,
-                             Orientation orient, int extraScanlines,
-                             int extraScanlinePixels)
+    FrameBuffer::FrameBuffer(int width, int height, int numChannels, DataType dataType, unsigned char* data,
+                             const StringVector* channelNames, Orientation orient, int extraScanlines, int extraScanlinePixels)
         : m_coordinateType(PixelCoordinates)
         , m_data(0)
         , m_allocSize(0)
@@ -331,16 +315,13 @@ namespace TwkFB
         , m_staticRef(0)
     {
         // cout << "FB CONSTRUCT 3: " << this << endl;
-        restructure(width, height, 1, numChannels, dataType, data, channelNames,
-                    orient, (data ? false : true), extraScanlines,
+        restructure(width, height, 1, numChannels, dataType, data, channelNames, orient, (data ? false : true), extraScanlines,
                     extraScanlinePixels);
     }
 
-    FrameBuffer::FrameBuffer(int width, int height, int numChannels,
-                             DataType dataType, unsigned char* data,
-                             const StringVector* channelNames,
-                             Orientation orient, bool deleteOnDestruction,
-                             int extraScanlines, int extraScanlinePixels)
+    FrameBuffer::FrameBuffer(int width, int height, int numChannels, DataType dataType, unsigned char* data,
+                             const StringVector* channelNames, Orientation orient, bool deleteOnDestruction, int extraScanlines,
+                             int extraScanlinePixels)
         : m_coordinateType(PixelCoordinates)
         , m_data(0)
         , m_allocSize(0)
@@ -361,16 +342,12 @@ namespace TwkFB
         , m_staticRef(0)
     {
         // cout << "FB CONSTRUCT 2: " << this << endl;
-        restructure(width, height, 1, numChannels, dataType, data, channelNames,
-                    orient, deleteOnDestruction, extraScanlines,
+        restructure(width, height, 1, numChannels, dataType, data, channelNames, orient, deleteOnDestruction, extraScanlines,
                     extraScanlinePixels);
     }
 
-    FrameBuffer::FrameBuffer(CoordinateTypes coordinateType, int width,
-                             int height, int depth, int numChannels,
-                             DataType dataType, unsigned char* data,
-                             const StringVector* channelNames,
-                             Orientation orient, bool deleteOnDestruction,
+    FrameBuffer::FrameBuffer(CoordinateTypes coordinateType, int width, int height, int depth, int numChannels, DataType dataType,
+                             unsigned char* data, const StringVector* channelNames, Orientation orient, bool deleteOnDestruction,
                              int extraScanlines, int extraScanlinePixels)
         : m_coordinateType(coordinateType)
         , m_data(0)
@@ -392,8 +369,7 @@ namespace TwkFB
         , m_staticRef(0)
     {
         // cout << "FB CONSTRUCT 1: " << this << endl;
-        restructure(width, height, depth, numChannels, dataType, data,
-                    channelNames, orient, deleteOnDestruction, extraScanlines,
+        restructure(width, height, depth, numChannels, dataType, data, channelNames, orient, deleteOnDestruction, extraScanlines,
                     extraScanlinePixels);
     }
 
@@ -403,9 +379,7 @@ namespace TwkFB
 #ifdef NDEBUG
         if (!isRootPlane())
         {
-            cout
-                << "ERROR: Cannot access idstream on non-root FrameBuffer plane"
-                << endl;
+            cout << "ERROR: Cannot access idstream on non-root FrameBuffer plane" << endl;
         }
 #endif
         return m_idstream;
@@ -435,8 +409,7 @@ namespace TwkFB
 #ifdef NDEBUG
         if (!isRootPlane())
         {
-            cout << "ERROR: Cannot setIdentifier on non-root FrameBuffer plane"
-                 << endl;
+            cout << "ERROR: Cannot setIdentifier on non-root FrameBuffer plane" << endl;
             return;
         }
 #endif
@@ -445,14 +418,9 @@ namespace TwkFB
             m_idstream.seekp(s.size());
     }
 
-    void FrameBuffer::restructure(int width, int height, int depth,
-                                  int numChannels, DataType dataType,
-                                  unsigned char* data,
-                                  const StringVector* channelNames,
-                                  Orientation orient, bool deleteOnDestruction,
-                                  int extraScanlines, int extraScanlinePixels,
-                                  unsigned char* deletePointer,
-                                  bool clearAttributes)
+    void FrameBuffer::restructure(int width, int height, int depth, int numChannels, DataType dataType, unsigned char* data,
+                                  const StringVector* channelNames, Orientation orient, bool deleteOnDestruction, int extraScanlines,
+                                  int extraScanlinePixels, unsigned char* deletePointer, bool clearAttributes)
     {
         // cout << "RESTRUCTURE " << this << " : " << identifier() << endl;
 
@@ -498,8 +466,7 @@ namespace TwkFB
         // m_allocSize = m_dataSize + m_scanlineSize;
         m_allocSize = m_dataSize;
 
-        if (!data && oldsize == m_allocSize && deleteOnDestruction
-            && m_deleteDataOnDestruction)
+        if (!data && oldsize == m_allocSize && deleteOnDestruction && m_deleteDataOnDestruction)
         {
             // the structure change allows us to reuse the data
         }
@@ -519,8 +486,7 @@ namespace TwkFB
 
             if (m_allocSize || data)
             {
-                m_data = data ? data
-                              : (unsigned char*)allocateLargeBlock(m_allocSize);
+                m_data = data ? data : (unsigned char*)allocateLargeBlock(m_allocSize);
                 // cout << "FB: allocated (1) " << (void*)m_data << endl;
             }
             else
@@ -691,21 +657,15 @@ namespace TwkFB
         }
     }
 
-    void FrameBuffer::restructurePlanar(int w, int h,
-                                        const StringVector& planeNames,
-                                        DataType type, Orientation orient)
+    void FrameBuffer::restructurePlanar(int w, int h, const StringVector& planeNames, DataType type, Orientation orient)
     {
         Samplings samps(planeNames.size());
         fill(samps.begin(), samps.end(), 1);
         restructurePlanar(w, h, samps, samps, planeNames, type, orient);
     }
 
-    void FrameBuffer::restructurePlanar(int w, int h,
-                                        const Samplings& xSamplings,
-                                        const Samplings& ySamplings,
-                                        const StringVector& planeNames,
-                                        DataType type, Orientation orient,
-                                        size_t nchannels)
+    void FrameBuffer::restructurePlanar(int w, int h, const Samplings& xSamplings, const Samplings& ySamplings,
+                                        const StringVector& planeNames, DataType type, Orientation orient, size_t nchannels)
     {
         // assert(xSamplings.size() != planeNames.size() / nchannels - 1);
         // assert(ySamplings.size() != planeNames.size() / nchannels - 1);
@@ -721,8 +681,7 @@ namespace TwkFB
             planes[i] = fb;
         }
 
-        planes.front()->restructure(w / xSamplings[0], h / ySamplings[0], 0,
-                                    nchannels, type, 0, 0, orient, true);
+        planes.front()->restructure(w / xSamplings[0], h / ySamplings[0], 0, nchannels, type, 0, 0, orient, true);
 
         for (size_t i = 0; i < nchannels; i++)
         {
@@ -735,14 +694,11 @@ namespace TwkFB
 
             if (fb = planes[q])
             {
-                fb->restructure(w / xSamplings[q], h / ySamplings[q], 0,
-                                nchannels, type, 0, 0, orient, true);
+                fb->restructure(w / xSamplings[q], h / ySamplings[q], 0, nchannels, type, 0, 0, orient, true);
             }
             else
             {
-                fb = new FrameBuffer(PixelCoordinates, w / xSamplings[q],
-                                     h / ySamplings[q], 0, nchannels, type, 0,
-                                     0, orient, true);
+                fb = new FrameBuffer(PixelCoordinates, w / xSamplings[q], h / ySamplings[q], 0, nchannels, type, 0, 0, orient, true);
                 appendPlane(fb);
             }
 
@@ -899,8 +855,7 @@ namespace TwkFB
             case USHORT:
                 for (int i = 0; i < npc; ++i)
                 {
-                    newData[i] =
-                        (unsigned char)(pixels<unsigned short>()[i] >> 8);
+                    newData[i] = (unsigned char)(pixels<unsigned short>()[i] >> 8);
                 }
                 break;
             case UINT:
@@ -913,23 +868,20 @@ namespace TwkFB
             case HALF:
                 for (int i = 0; i < npc; ++i)
                 {
-                    newData[i] = (unsigned char)clamp(
-                        pixels<half>()[i] * 255.0f, 0.0f, 255.0f);
+                    newData[i] = (unsigned char)clamp(pixels<half>()[i] * 255.0f, 0.0f, 255.0f);
                 }
                 break;
 #endif
             case FLOAT:
                 for (int i = 0; i < npc; ++i)
                 {
-                    newData[i] = (unsigned char)clamp(
-                        pixels<float>()[i] * 255.0f, 0.0f, 255.0f);
+                    newData[i] = (unsigned char)clamp(pixels<float>()[i] * 255.0f, 0.0f, 255.0f);
                 }
                 break;
             case DOUBLE:
                 for (int i = 0; i < npc; ++i)
                 {
-                    newData[i] = (unsigned char)clamp(
-                        pixels<double>()[i] * 255.0, 0.0, 255.0);
+                    newData[i] = (unsigned char)clamp(pixels<double>()[i] * 255.0, 0.0, 255.0);
                 }
                 break;
 
@@ -965,23 +917,20 @@ namespace TwkFB
             case HALF:
                 for (int i = 0; i < npc; ++i)
                 {
-                    newData[i] = (unsigned short)clamp(
-                        pixels<half>()[i] * 65535.0f, 0.0f, 65535.0f);
+                    newData[i] = (unsigned short)clamp(pixels<half>()[i] * 65535.0f, 0.0f, 65535.0f);
                 }
                 break;
 #endif
             case FLOAT:
                 for (int i = 0; i < npc; ++i)
                 {
-                    newData[i] = (unsigned short)clamp(
-                        pixels<float>()[i] * 65535.0f, 0.0f, 65535.0f);
+                    newData[i] = (unsigned short)clamp(pixels<float>()[i] * 65535.0f, 0.0f, 65535.0f);
                 }
                 break;
             case DOUBLE:
                 for (int i = 0; i < npc; ++i)
                 {
-                    newData[i] = (unsigned short)clamp(
-                        pixels<double>()[i] * 65535.0, 0.0, 65535.0);
+                    newData[i] = (unsigned short)clamp(pixels<double>()[i] * 65535.0, 0.0, 65535.0);
                 }
                 break;
 
@@ -1060,8 +1009,7 @@ namespace TwkFB
             case USHORT:
                 for (int i = 0; i < npc; ++i)
                 {
-                    newData[i] =
-                        (half)(double(pixels<unsigned short>()[i]) / 65536.0);
+                    newData[i] = (half)(double(pixels<unsigned short>()[i]) / 65536.0);
                 }
                 break;
             case UINT:
@@ -1190,8 +1138,7 @@ namespace TwkFB
         break;
 
         default:
-            TWK_THROW_EXC_STREAM("Attempted conversion to unknown data stype "
-                                 << newDataType);
+            TWK_THROW_EXC_STREAM("Attempted conversion to unknown data stype " << newDataType);
         }
 
         recalcStrides();
@@ -1260,10 +1207,7 @@ namespace TwkFB
         }
     }
 
-    void FrameBuffer::removeChannel(const string& name)
-    {
-        removeChannel(channel(name));
-    }
+    void FrameBuffer::removeChannel(const string& name) { removeChannel(channel(name)); }
 
     bool FrameBuffer::hasChannel(const std::string& name) const
     {
@@ -1311,23 +1255,17 @@ namespace TwkFB
                 pixel<float>(x, y, ib) = b;
                 break;
             case UCHAR:
-                pixel<unsigned char>(x, y, ir) =
-                    (unsigned char)clamp(r * 255.0f, 0.0f, 255.0f);
+                pixel<unsigned char>(x, y, ir) = (unsigned char)clamp(r * 255.0f, 0.0f, 255.0f);
                 ;
-                pixel<unsigned char>(x, y, ig) =
-                    (unsigned char)clamp(g * 255.0f, 0.0f, 255.0f);
+                pixel<unsigned char>(x, y, ig) = (unsigned char)clamp(g * 255.0f, 0.0f, 255.0f);
                 ;
-                pixel<unsigned char>(x, y, ib) =
-                    (unsigned char)clamp(b * 255.0f, 0.0f, 255.0f);
+                pixel<unsigned char>(x, y, ib) = (unsigned char)clamp(b * 255.0f, 0.0f, 255.0f);
                 ;
                 break;
             case USHORT:
-                pixel<unsigned short>(x, y, ir) =
-                    (unsigned short)clamp(r * 65535.0f, 0.0f, 65535.0f);
-                pixel<unsigned short>(x, y, ig) =
-                    (unsigned short)clamp(g * 65535.0f, 0.0f, 65535.0f);
-                pixel<unsigned short>(x, y, ib) =
-                    (unsigned short)clamp(b * 65535.0f, 0.0f, 65535.0f);
+                pixel<unsigned short>(x, y, ir) = (unsigned short)clamp(r * 65535.0f, 0.0f, 65535.0f);
+                pixel<unsigned short>(x, y, ig) = (unsigned short)clamp(g * 65535.0f, 0.0f, 65535.0f);
+                pixel<unsigned short>(x, y, ib) = (unsigned short)clamp(b * 65535.0f, 0.0f, 65535.0f);
                 break;
             case UINT:
                 pixel<unsigned int>(x, y, ir) = (unsigned int)r;
@@ -1361,18 +1299,14 @@ namespace TwkFB
                 pixel<float>(x, y, 1) = g;
                 break;
             case UCHAR:
-                pixel<unsigned char>(x, y, 0) =
-                    (unsigned char)clamp(r * 255.0f, 0.0f, 255.0f);
+                pixel<unsigned char>(x, y, 0) = (unsigned char)clamp(r * 255.0f, 0.0f, 255.0f);
                 ;
-                pixel<unsigned char>(x, y, 1) =
-                    (unsigned char)clamp(g * 255.0f, 0.0f, 255.0f);
+                pixel<unsigned char>(x, y, 1) = (unsigned char)clamp(g * 255.0f, 0.0f, 255.0f);
                 ;
                 break;
             case USHORT:
-                pixel<unsigned short>(x, y, 0) =
-                    (unsigned short)clamp(r * 65535.0f, 0.0f, 65535.0f);
-                pixel<unsigned short>(x, y, 1) =
-                    (unsigned short)clamp(g * 65535.0f, 0.0f, 65535.0f);
+                pixel<unsigned short>(x, y, 0) = (unsigned short)clamp(r * 65535.0f, 0.0f, 65535.0f);
+                pixel<unsigned short>(x, y, 1) = (unsigned short)clamp(g * 65535.0f, 0.0f, 65535.0f);
                 break;
             case UINT:
                 pixel<unsigned int>(x, y, 0) = (unsigned int)r;
@@ -1402,13 +1336,11 @@ namespace TwkFB
                 pixel<float>(x, y, 0) = r;
                 break;
             case UCHAR:
-                pixel<unsigned char>(x, y, 0) =
-                    (unsigned char)clamp(r * 255.0f, 0.0f, 255.0f);
+                pixel<unsigned char>(x, y, 0) = (unsigned char)clamp(r * 255.0f, 0.0f, 255.0f);
                 ;
                 break;
             case USHORT:
-                pixel<unsigned short>(x, y, 0) =
-                    (unsigned short)clamp(r * 65535.0f, 0.0f, 65535.0f);
+                pixel<unsigned short>(x, y, 0) = (unsigned short)clamp(r * 65535.0f, 0.0f, 65535.0f);
                 break;
             case UINT:
                 pixel<unsigned int>(x, y, 0) = (unsigned int)r;
@@ -1429,8 +1361,7 @@ namespace TwkFB
         }
     }
 
-    void FrameBuffer::setPixel4f(float r, float g, float b, float a, int x,
-                                 int y)
+    void FrameBuffer::setPixel4f(float r, float g, float b, float a, int x, int y)
     {
         if (x >= m_width || y >= m_height || m_width == 0 || m_height == 0)
         {
@@ -1454,34 +1385,26 @@ namespace TwkFB
                 pixel<float>(x, y, ia) = a;
             break;
         case UCHAR:
-            pixel<unsigned char>(x, y, ir) =
-                (unsigned char)clamp(r * 255.0f, 0.0f, 255.0f);
+            pixel<unsigned char>(x, y, ir) = (unsigned char)clamp(r * 255.0f, 0.0f, 255.0f);
             ;
             if (m_numChannels > 1)
-                pixel<unsigned char>(x, y, ig) =
-                    (unsigned char)clamp(g * 255.0f, 0.0f, 255.0f);
+                pixel<unsigned char>(x, y, ig) = (unsigned char)clamp(g * 255.0f, 0.0f, 255.0f);
             ;
             if (m_numChannels > 2)
-                pixel<unsigned char>(x, y, ib) =
-                    (unsigned char)clamp(b * 255.0f, 0.0f, 255.0f);
+                pixel<unsigned char>(x, y, ib) = (unsigned char)clamp(b * 255.0f, 0.0f, 255.0f);
             ;
             if (m_numChannels > 3)
-                pixel<unsigned char>(x, y, ia) =
-                    (unsigned char)clamp(a * 255.0f, 0.0f, 255.0f);
+                pixel<unsigned char>(x, y, ia) = (unsigned char)clamp(a * 255.0f, 0.0f, 255.0f);
             ;
             break;
         case USHORT:
-            pixel<unsigned short>(x, y, ir) =
-                (unsigned short)clamp(r * 65535.0f, 0.0f, 65535.0f);
+            pixel<unsigned short>(x, y, ir) = (unsigned short)clamp(r * 65535.0f, 0.0f, 65535.0f);
             if (m_numChannels > 1)
-                pixel<unsigned short>(x, y, ig) =
-                    (unsigned short)clamp(g * 65535.0f, 0.0f, 65535.0f);
+                pixel<unsigned short>(x, y, ig) = (unsigned short)clamp(g * 65535.0f, 0.0f, 65535.0f);
             if (m_numChannels > 2)
-                pixel<unsigned short>(x, y, ib) =
-                    (unsigned short)clamp(b * 65535.0f, 0.0f, 65535.0f);
+                pixel<unsigned short>(x, y, ib) = (unsigned short)clamp(b * 65535.0f, 0.0f, 65535.0f);
             if (m_numChannels > 3)
-                pixel<unsigned short>(x, y, ia) =
-                    (unsigned short)clamp(a * 65535.0f, 0.0f, 65535.0f);
+                pixel<unsigned short>(x, y, ia) = (unsigned short)clamp(a * 65535.0f, 0.0f, 65535.0f);
             break;
         case UINT:
             pixel<unsigned int>(x, y, ir) = (unsigned int)r;
@@ -1721,8 +1644,7 @@ namespace TwkFB
         if (y > m_height - 1 && y < m_height)
             y = m_height - 1;
 
-        if (x > m_width - 1 || y > m_height - 1 || x < 0 || y < 0
-            || m_width == 0 || m_height == 0)
+        if (x > m_width - 1 || y > m_height - 1 || x < 0 || y < 0 || m_width == 0 || m_height == 0)
         {
             throw NullImageException();
         }
@@ -1983,12 +1905,9 @@ namespace TwkFB
         const float dx = x - xFloor;
         const float dy = y - yFloor;
 
-        r = TwkMath::lerp(TwkMath::lerp(r00, r10, dx),
-                          TwkMath::lerp(r01, r11, dx), dy);
-        g = TwkMath::lerp(TwkMath::lerp(g00, g10, dx),
-                          TwkMath::lerp(g01, g11, dx), dy);
-        b = TwkMath::lerp(TwkMath::lerp(b00, b10, dx),
-                          TwkMath::lerp(b01, b11, dx), dy);
+        r = TwkMath::lerp(TwkMath::lerp(r00, r10, dx), TwkMath::lerp(r01, r11, dx), dy);
+        g = TwkMath::lerp(TwkMath::lerp(g00, g10, dx), TwkMath::lerp(g01, g11, dx), dy);
+        b = TwkMath::lerp(TwkMath::lerp(b00, b10, dx), TwkMath::lerp(b01, b11, dx), dy);
     }
 
     void FrameBuffer::getPixelBilinearRGB4f(float x, float y, float* p) const
@@ -2027,10 +1946,8 @@ namespace TwkFB
         vector<string> chname(1);
         chname.front() = m_channelNames.front();
 
-        FrameBuffer* fb = new FrameBuffer(
-            m_coordinateType, m_width, m_height, m_depth, m_numChannels,
-            m_dataType, 0, &m_channelNames, m_orientation, true,
-            extraScanlines(), scanlinePixelPadding());
+        FrameBuffer* fb = new FrameBuffer(m_coordinateType, m_width, m_height, m_depth, m_numChannels, m_dataType, 0, &m_channelNames,
+                                          m_orientation, true, extraScanlines(), scanlinePixelPadding());
 
         fb->m_coordinateType = coordinateType();
 
@@ -2042,10 +1959,8 @@ namespace TwkFB
 
     FrameBuffer* FrameBuffer::referenceCopy() const
     {
-        FrameBuffer* fb = new FrameBuffer(
-            m_coordinateType, m_width, m_height, m_depth, m_numChannels,
-            m_dataType, m_data, &m_channelNames, m_orientation, false,
-            extraScanlines(), scanlinePixelPadding());
+        FrameBuffer* fb = new FrameBuffer(m_coordinateType, m_width, m_height, m_depth, m_numChannels, m_dataType, m_data, &m_channelNames,
+                                          m_orientation, false, extraScanlines(), scanlinePixelPadding());
 
         fb->m_coordinateType = coordinateType();
 
@@ -2080,18 +1995,15 @@ namespace TwkFB
     {
         m_coordinateType = fb->coordinateType();
 
-        restructure(fb->width(), fb->height(), fb->depth(), fb->numChannels(),
-                    fb->dataType(),
-                    const_cast<FrameBuffer*>(fb)->pixels<unsigned char>(),
-                    &fb->channelNames(), fb->orientation(), false,
+        restructure(fb->width(), fb->height(), fb->depth(), fb->numChannels(), fb->dataType(),
+                    const_cast<FrameBuffer*>(fb)->pixels<unsigned char>(), &fb->channelNames(), fb->orientation(), false,
                     fb->extraScanlines(), fb->scanlinePixelPadding());
 
         fb->copyAttributesTo(this);
         setPixelAspectRatio(fb->pixelAspectRatio());
         if (isRootPlane())
             setIdentifier(fb->identifier());
-        setUncrop(fb->uncropWidth(), fb->uncropHeight(), fb->uncropX(),
-                  fb->uncropY());
+        setUncrop(fb->uncropWidth(), fb->uncropHeight(), fb->uncropX(), fb->uncropY());
         setUncropActive(fb->uncrop());
 
         if (fb->nextPlane())
@@ -2119,8 +2031,7 @@ namespace TwkFB
 
     void FrameBuffer::outputAttrs(ostream& o) const
     {
-        for (AttributeVector::const_iterator i = m_attributes.begin();
-             i != m_attributes.end(); ++i)
+        for (AttributeVector::const_iterator i = m_attributes.begin(); i != m_attributes.end(); ++i)
         {
             FBAttribute* a = *i;
             o << a->name() << " = " << a->valueAsString() << endl;
@@ -2195,8 +2106,7 @@ namespace TwkFB
             break;
         }
 
-        o << "FB: " << width() << " x " << height() << "  " << type
-          << " per channel,"
+        o << "FB: " << width() << " x " << height() << "  " << type << " per channel,"
           << " origin " << otype << ", channels = [";
 
         for (int i = 0; i < m_channelNames.size(); i++)
@@ -2211,8 +2121,7 @@ namespace TwkFB
         if (m_uncrop)
         {
             o << " uncrop = ["
-              << " " << m_uncropWidth << " " << m_uncropHeight << " "
-              << m_uncropX << " " << m_uncropY << "]";
+              << " " << m_uncropWidth << " " << m_uncropHeight << " " << m_uncropX << " " << m_uncropY << "]";
         }
 
         if (m_nextPlane)
@@ -2222,9 +2131,7 @@ namespace TwkFB
         }
     }
 
-    void
-    FrameBuffer::appendAttributesAndPrefixTo(FrameBuffer* fb,
-                                             const std::string& prefix) const
+    void FrameBuffer::appendAttributesAndPrefixTo(FrameBuffer* fb, const std::string& prefix) const
     {
         if (fb == this)
             return;
@@ -2276,8 +2183,7 @@ namespace TwkFB
 
     void FrameBuffer::deleteAttribute(const FBAttribute* a)
     {
-        AttributeVector::iterator i =
-            find(m_attributes.begin(), m_attributes.end(), a);
+        AttributeVector::iterator i = find(m_attributes.begin(), m_attributes.end(), a);
 
         if (i != m_attributes.end())
         {
@@ -2286,83 +2192,39 @@ namespace TwkFB
         }
     }
 
-    void FrameBuffer::setPrimaryColorSpace(const string& name)
-    {
-        attribute<string>(ColorSpace::Primaries()) = name;
-    }
+    void FrameBuffer::setPrimaryColorSpace(const string& name) { attribute<string>(ColorSpace::Primaries()) = name; }
 
-    void FrameBuffer::setTransferFunction(const string& name)
-    {
-        attribute<string>(ColorSpace::TransferFunction()) = name;
-    }
+    void FrameBuffer::setTransferFunction(const string& name) { attribute<string>(ColorSpace::TransferFunction()) = name; }
 
-    void FrameBuffer::setConversion(const string& name)
-    {
-        attribute<string>(ColorSpace::Conversion()) = name;
-    }
+    void FrameBuffer::setConversion(const string& name) { attribute<string>(ColorSpace::Conversion()) = name; }
 
-    void FrameBuffer::setRange(const string& name)
-    {
-        attribute<string>(ColorSpace::Range()) = name;
-    }
+    void FrameBuffer::setRange(const string& name) { attribute<string>(ColorSpace::Range()) = name; }
 
-    void FrameBuffer::setChromaPlacement(const string& name)
-    {
-        attribute<string>(ColorSpace::ChromaPlacement()) = name;
-    }
+    void FrameBuffer::setChromaPlacement(const string& name) { attribute<string>(ColorSpace::ChromaPlacement()) = name; }
 
-    void FrameBuffer::setGamma(float exponent)
-    {
-        attribute<float>(ColorSpace::Gamma()) = exponent;
-    }
+    void FrameBuffer::setGamma(float exponent) { attribute<float>(ColorSpace::Gamma()) = exponent; }
 
-    bool FrameBuffer::hasPrimaryColorSpace() const
-    {
-        return findAttribute(ColorSpace::Primaries()) != 0;
-    }
+    bool FrameBuffer::hasPrimaryColorSpace() const { return findAttribute(ColorSpace::Primaries()) != 0; }
 
-    bool FrameBuffer::hasConversion() const
-    {
-        return findAttribute(ColorSpace::Conversion()) != 0;
-    }
+    bool FrameBuffer::hasConversion() const { return findAttribute(ColorSpace::Conversion()) != 0; }
 
-    bool FrameBuffer::hasRange() const
-    {
-        return findAttribute(ColorSpace::Range()) != 0;
-    }
+    bool FrameBuffer::hasRange() const { return findAttribute(ColorSpace::Range()) != 0; }
 
-    bool FrameBuffer::hasRGBtoXYZMatrix() const
-    {
-        return findAttribute(ColorSpace::RGBtoXYZMatrix()) != 0;
-    }
+    bool FrameBuffer::hasRGBtoXYZMatrix() const { return findAttribute(ColorSpace::RGBtoXYZMatrix()) != 0; }
 
-    bool FrameBuffer::hasLogCParameters() const
-    {
-        return findAttribute(ColorSpace::LogCBlackOffset()) != 0;
-    }
+    bool FrameBuffer::hasLogCParameters() const { return findAttribute(ColorSpace::LogCBlackOffset()) != 0; }
 
-    bool FrameBuffer::hasTransferFunction() const
-    {
-        return findAttribute(ColorSpace::TransferFunction()) != 0;
-    }
+    bool FrameBuffer::hasTransferFunction() const { return findAttribute(ColorSpace::TransferFunction()) != 0; }
 
-    bool FrameBuffer::hasPrimaries() const
-    {
-        return findAttribute(ColorSpace::WhitePrimary()) != 0;
-    }
+    bool FrameBuffer::hasPrimaries() const { return findAttribute(ColorSpace::WhitePrimary()) != 0; }
 
-    bool FrameBuffer::hasAdoptedNeutral() const
-    {
-        return findAttribute(ColorSpace::AdoptedNeutral()) != 0;
-    }
+    bool FrameBuffer::hasAdoptedNeutral() const { return findAttribute(ColorSpace::AdoptedNeutral()) != 0; }
 
-    void FrameBuffer::primaries(const std::string& primaryName, float& x,
-                                float& y) const
+    void FrameBuffer::primaries(const std::string& primaryName, float& x, float& y) const
     {
         if (const FBAttribute* a = findAttribute(primaryName))
         {
-            if (const Vec2fAttribute* sa =
-                    dynamic_cast<const Vec2fAttribute*>(a))
+            if (const Vec2fAttribute* sa = dynamic_cast<const Vec2fAttribute*>(a))
             {
                 x = sa->value().x;
                 y = sa->value().y;
@@ -2374,14 +2236,9 @@ namespace TwkFB
         y = 0;
     }
 
-    void FrameBuffer::setAdoptedNeutral(float x, float y)
-    {
-        attribute<Vec2f>(ColorSpace::AdoptedNeutral()) = Vec2f(x, y);
-    }
+    void FrameBuffer::setAdoptedNeutral(float x, float y) { attribute<Vec2f>(ColorSpace::AdoptedNeutral()) = Vec2f(x, y); }
 
-    void FrameBuffer::setPrimaries(float xWhite, float yWhite, float xRed,
-                                   float yRed, float xGreen, float yGreen,
-                                   float xBlue, float yBlue)
+    void FrameBuffer::setPrimaries(float xWhite, float yWhite, float xRed, float yRed, float xGreen, float yGreen, float xBlue, float yBlue)
     {
         attribute<Vec2f>(ColorSpace::BluePrimary()) = Vec2f(xBlue, yBlue);
         attribute<Vec2f>(ColorSpace::GreenPrimary()) = Vec2f(xGreen, yGreen);
@@ -2413,28 +2270,18 @@ namespace TwkFB
         return chr;
     }
 
-    void FrameBuffer::setMatrixAttribute(std::string name, float r0c0,
-                                         float r0c1, float r0c2, float r0c3,
-                                         float r1c0, float r1c1, float r1c2,
-                                         float r1c3, float r2c0, float r2c1,
-                                         float r2c2, float r2c3, float r3c0,
-                                         float r3c1, float r3c2, float r3c3)
+    void FrameBuffer::setMatrixAttribute(std::string name, float r0c0, float r0c1, float r0c2, float r0c3, float r1c0, float r1c1,
+                                         float r1c2, float r1c3, float r2c0, float r2c1, float r2c2, float r2c3, float r3c0, float r3c1,
+                                         float r3c2, float r3c3)
     {
-        attribute<Mat44f>(name) =
-            Mat44f(r0c0, r0c1, r0c2, r0c3, r1c0, r1c1, r1c2, r1c3, r2c0, r2c1,
-                   r2c2, r2c3, r3c0, r3c1, r3c2, r3c3);
+        attribute<Mat44f>(name) = Mat44f(r0c0, r0c1, r0c2, r0c3, r1c0, r1c1, r1c2, r1c3, r2c0, r2c1, r2c2, r2c3, r3c0, r3c1, r3c2, r3c3);
     }
 
-    void FrameBuffer::setRGBToXYZMatrix(float r0c0, float r0c1, float r0c2,
-                                        float r0c3, float r1c0, float r1c1,
-                                        float r1c2, float r1c3, float r2c0,
-                                        float r2c1, float r2c2, float r2c3,
-                                        float r3c0, float r3c1, float r3c2,
-                                        float r3c3)
+    void FrameBuffer::setRGBToXYZMatrix(float r0c0, float r0c1, float r0c2, float r0c3, float r1c0, float r1c1, float r1c2, float r1c3,
+                                        float r2c0, float r2c1, float r2c2, float r2c3, float r3c0, float r3c1, float r3c2, float r3c3)
     {
-        setMatrixAttribute(ColorSpace::RGBtoXYZMatrix(), r0c0, r0c1, r0c2, r0c3,
-                           r1c0, r1c1, r1c2, r1c3, r2c0, r2c1, r2c2, r2c3, r3c0,
-                           r3c1, r3c2, r3c3);
+        setMatrixAttribute(ColorSpace::RGBtoXYZMatrix(), r0c0, r0c1, r0c2, r0c3, r1c0, r1c1, r1c2, r1c3, r2c0, r2c1, r2c2, r2c3, r3c0, r3c1,
+                           r3c2, r3c3);
     }
 
     const string& FrameBuffer::primaryColorSpace() const
@@ -2443,8 +2290,7 @@ namespace TwkFB
 
         if (const FBAttribute* a = findAttribute(ColorSpace::Primaries()))
         {
-            if (const StringAttribute* sa =
-                    dynamic_cast<const StringAttribute*>(a))
+            if (const StringAttribute* sa = dynamic_cast<const StringAttribute*>(a))
             {
                 return sa->value();
             }
@@ -2457,11 +2303,9 @@ namespace TwkFB
     {
         static string none = "None";
 
-        if (const FBAttribute* a =
-                findAttribute(ColorSpace::TransferFunction()))
+        if (const FBAttribute* a = findAttribute(ColorSpace::TransferFunction()))
         {
-            if (const StringAttribute* sa =
-                    dynamic_cast<const StringAttribute*>(a))
+            if (const StringAttribute* sa = dynamic_cast<const StringAttribute*>(a))
             {
                 return sa->value();
             }
@@ -2476,8 +2320,7 @@ namespace TwkFB
 
         if (const FBAttribute* a = findAttribute(ColorSpace::Conversion()))
         {
-            if (const StringAttribute* sa =
-                    dynamic_cast<const StringAttribute*>(a))
+            if (const StringAttribute* sa = dynamic_cast<const StringAttribute*>(a))
             {
                 return sa->value();
             }
@@ -2492,8 +2335,7 @@ namespace TwkFB
 
         if (const FBAttribute* a = findAttribute(ColorSpace::Range()))
         {
-            if (const StringAttribute* sa =
-                    dynamic_cast<const StringAttribute*>(a))
+            if (const StringAttribute* sa = dynamic_cast<const StringAttribute*>(a))
             {
                 return sa->value();
             }
@@ -2510,27 +2352,23 @@ namespace TwkFB
 
         if (hProfile)
         {
-            attribute<float>(ColorSpace::ICCProfileVersion()) =
-                float(cmsGetProfileVersion(hProfile));
+            attribute<float>(ColorSpace::ICCProfileVersion()) = float(cmsGetProfileVersion(hProfile));
 
             char temp[256];
-            cmsGetProfileInfoASCII(hProfile, cmsInfoDescription, "en", "US",
-                                   temp, 256);
+            cmsGetProfileInfoASCII(hProfile, cmsInfoDescription, "en", "US", temp, 256);
 
             attribute<string>(ColorSpace::ICCProfileDescription()) = temp;
 
             if (FBAttribute* a = findAttribute(ColorSpace::ICCProfileData()))
             {
-                if (DataContainerAttribute* da =
-                        dynamic_cast<DataContainerAttribute*>(a))
+                if (DataContainerAttribute* da = dynamic_cast<DataContainerAttribute*>(a))
                 {
                     da->set(prof, len);
                 }
             }
             else
             {
-                addAttribute(new DataContainerAttribute(
-                    ColorSpace::ICCProfileData(), prof, len));
+                addAttribute(new DataContainerAttribute(ColorSpace::ICCProfileData(), prof, len));
             }
 
             cmsCloseProfile(hProfile);
@@ -2541,8 +2379,7 @@ namespace TwkFB
     {
         if (const FBAttribute* a = findAttribute(ColorSpace::ICCProfileData()))
         {
-            if (const DataContainerAttribute* da =
-                    dynamic_cast<const DataContainerAttribute*>(a))
+            if (const DataContainerAttribute* da = dynamic_cast<const DataContainerAttribute*>(a))
             {
                 return da->dataContainer();
             }
@@ -2607,9 +2444,8 @@ namespace TwkFB
 
         if (fb->previousPlane())
         {
-            TWK_THROW_EXC_STREAM(
-                "Attempt to append a plane to FrameBuffer that is already "
-                "part of a multi-plane FrameBuffer failed.");
+            TWK_THROW_EXC_STREAM("Attempt to append a plane to FrameBuffer that is already "
+                                 "part of a multi-plane FrameBuffer failed.");
         }
 
         FrameBuffer* f = this;
@@ -2624,9 +2460,8 @@ namespace TwkFB
     {
         if (!fb->nextPlane() && !fb->previousPlane())
         {
-            TWK_THROW_EXC_STREAM(
-                "Attempt to remove a plane from a FrameBuffer that it is "
-                "not part of.");
+            TWK_THROW_EXC_STREAM("Attempt to remove a plane from a FrameBuffer that it is "
+                                 "not part of.");
         }
 
         if (fb == this)
@@ -2676,8 +2511,7 @@ namespace TwkFB
         if (fb == this)
             return;
 
-        restructure(fb->width(), fb->height(), fb->depth(), fb->numChannels(),
-                    fb->dataType(), fb->pixels<unsigned char>(),
+        restructure(fb->width(), fb->height(), fb->depth(), fb->numChannels(), fb->dataType(), fb->pixels<unsigned char>(),
                     &fb->channelNames(), fb->orientation(), false);
 
         fb->copyAttributesTo(this);
@@ -2761,8 +2595,7 @@ namespace TwkFB
         {
             if (const FrameBuffer* uv = nextPlane())
             {
-                return uv->numChannels() == 2 && uv->hasChannel("U")
-                       && uv->hasChannel("V");
+                return uv->numChannels() == 2 && uv->hasChannel("U") && uv->hasChannel("V");
             }
         }
 
@@ -2779,8 +2612,7 @@ namespace TwkFB
                 {
                     if (c->numChannels() == 2)
                     {
-                        return c->channelName(0) == "RY"
-                               && c->channelName(1) == "BY";
+                        return c->channelName(0) == "RY" && c->channelName(1) == "BY";
                     }
                 }
             }
@@ -2857,25 +2689,15 @@ namespace TwkFB
     {
         if (fb == this)
             return;
-        setUncrop(fb->uncropWidth(), fb->uncropHeight(), fb->uncropX(),
-                  fb->uncropY());
+        setUncrop(fb->uncropWidth(), fb->uncropHeight(), fb->uncropX(), fb->uncropY());
         setUncropActive(fb->uncrop());
     }
 
-    float FrameBuffer::uncroppedAspect() const
-    {
-        return float(m_uncropWidth) / float(m_uncropHeight);
-    }
+    float FrameBuffer::uncroppedAspect() const { return float(m_uncropWidth) / float(m_uncropHeight); }
 
-    void* FrameBuffer::allocateLargeBlock(size_t s)
-    {
-        return TwkUtil::MemPool::alloc(s);
-    }
+    void* FrameBuffer::allocateLargeBlock(size_t s) { return TwkUtil::MemPool::alloc(s); }
 
-    void FrameBuffer::deallocateLargeBlock(void* p)
-    {
-        return TwkUtil::MemPool::dealloc(p);
-    }
+    void FrameBuffer::deallocateLargeBlock(void* p) { return TwkUtil::MemPool::dealloc(p); }
 
     size_t FrameBuffer::sizeOfDataType(DataType t)
     {

@@ -34,8 +34,7 @@ namespace Mu
         //  Constructors
         //
 
-        QSpacerItemType(Context* context, const char* name,
-                        Class* superClass = 0);
+        QSpacerItemType(Context* context, const char* name, Class* superClass = 0);
         virtual ~QSpacerItemType();
 
         static bool isInheritable() { return true; }
@@ -57,9 +56,7 @@ namespace Mu
     {
     public:
         virtual ~MuQt_QSpacerItem();
-        MuQt_QSpacerItem(Pointer muobj, const CallEnvironment*, int w, int h,
-                         QSizePolicy::Policy hPolicy,
-                         QSizePolicy::Policy vPolicy);
+        MuQt_QSpacerItem(Pointer muobj, const CallEnvironment*, int w, int h, QSizePolicy::Policy hPolicy, QSizePolicy::Policy vPolicy);
         virtual Qt::Orientations expandingDirections() const;
         virtual QRect geometry() const;
         virtual bool isEmpty() const;
@@ -81,11 +78,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance*
-    QSpacerItemType::cachedInstance(const QSpacerItemType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QSpacerItemType::cachedInstance(const QSpacerItemType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 
