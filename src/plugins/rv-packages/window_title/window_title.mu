@@ -130,7 +130,7 @@ class: WindowTitle : MinorMode
               ("source-group-complete", updateAfterDelay, ""),
               ("graph-node-inputs-changed", updateAfterDelay, ""),
               ("source-media-rep-activated", updateAfterDelay, ""),
-              ("frame-changed", updateTitle, "")
+              ("frame-changed", updateTitle, "")],
              nil);
 
         _title = "";
