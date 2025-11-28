@@ -630,7 +630,7 @@ namespace IPCore
         result.poorRandomAccessPerformance = slow || result.poorRandomAccessPerformance;
     }
 
-    FileSourceIPNode::MediaPointer FileSourceIPNode::getMediaFromContext(ImageComponent& selection, const Context& context)
+    FileSourceIPNode::MediaPointer FileSourceIPNode::getMediaFromContext(ImageComponent& selection, const Context& context) const
     {
         selection = selectComponentFromContext(context);
 
@@ -657,7 +657,7 @@ namespace IPCore
         return media;
     }
 
-    FileSourceIPNode::MediaPointer FileSourceIPNode::mediaForComponent(ImageComponent& c, const Context& context)
+    FileSourceIPNode::MediaPointer FileSourceIPNode::mediaForComponent(ImageComponent& c, const Context& context) const
     {
         if (!c.isValid())
             return nullptr;
@@ -786,7 +786,7 @@ namespace IPCore
         return nullptr;
     }
 
-    FileSourceIPNode::MediaPointer FileSourceIPNode::defaultMedia(int eye)
+    FileSourceIPNode::MediaPointer FileSourceIPNode::defaultMedia(int eye) const
     {
         const QReadLocker readLock(&m_mediaMutex);
 
@@ -819,7 +819,7 @@ namespace IPCore
         return m_mediaVector.empty() ? nullptr : m_mediaVector.front();
     }
 
-    FileSourceIPNode::Movie* FileSourceIPNode::movieForThread(const Media* media, const Context& context)
+    FileSourceIPNode::Movie* FileSourceIPNode::movieForThread(const Media* media, const Context& context) const
     {
         if (!media)
             return 0;
@@ -1654,34 +1654,24 @@ namespace IPCore
         int ha = 0;
         int w = 0;
         int h = 0;
-        int na = 0;
-        int nv = 0;
         float pa = 1.0;
         Mat44f O;
+        ImageComponent selection;
+        MediaPointer media = getMediaFromContext(selection, context);
 
-        for (size_t i = 0; i < m_mediaVector.size(); i++)
+        if (media)
         {
-            Movie* mov = m_mediaVector[i]->primaryMovie();
-            bool audio = mov->hasAudio() && (!mov->hasVideo() || !m_noMovieAudio->front());
-            bool video = mov->hasVideo();
-
+            Movie* mov = media->primaryMovie();
             const MovieInfo& info = mov->info();
             const int iw = info.uncropWidth;
             const int ih = info.uncropHeight;
             const float ipa = info.pixelAspect;
 
-            if (audio && !video)
+            if (mov->hasVideo())
             {
-                na++;
-                wa = max(wa, iw);
-                ha = max(ha, ih);
-            }
-
-            if (video)
-            {
-                nv++;
                 w = max(w, iw);
                 h = max(h, ih);
+
                 //
                 //  pixelaspect may be < or > 1.0 so just adopt any
                 //  value that is interesting.
@@ -1691,12 +1681,6 @@ namespace IPCore
 
                 O = orientationMatrix(info.orientation);
             }
-        }
-
-        if (!nv && na)
-        {
-            w = wa;
-            h = ha;
         }
 
         return ImageStructureInfo(w * (pa > 1.0 ? pa : 1.0), h / (pa < 1.0 ? pa : 1.0), pa, O);
