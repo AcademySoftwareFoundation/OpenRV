@@ -40,3 +40,5 @@ session_manager.mu
 maya_tools.mu
 # See rvnuke_mode.mu.in
 rvnuke_mode.mu
+# see generate_about_rv.py
+about_rv.cpp
