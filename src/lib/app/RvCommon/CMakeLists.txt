@@ -346,14 +346,6 @@ ADD_CUSTOM_TARGET(
   DEPENDS ${_about_rv_cpp}
 )
 
-SET_SOURCE_FILES_PROPERTIES(
-  ${_about_rv_cpp}
-  PROPERTIES SKIP_AUTOMOC ON
-             SKIP_AUTOUIC ON
-             SKIP_AUTORCC ON
-             GENERATED TRUE
-)
-
 LIST(APPEND _sources ${_about_rv_cpp})
 
 ADD_LIBRARY(
