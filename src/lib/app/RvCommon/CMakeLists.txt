@@ -195,7 +195,7 @@ ENDFOREACH()
 # Generate about_rv.cpp with build information
 #
 SET(_about_rv_cpp
-    ${CMAKE_CURRENT_BINARY_DIR}/about_rv.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/${_target}/generated/about_rv.cpp
 )
 
 # Get compiler name
@@ -340,12 +340,29 @@ ADD_CUSTOM_COMMAND(
   VERBATIM
 )
 
+# Create explicit target to ensure about_rv.cpp is generated before RvCommon builds
+ADD_CUSTOM_TARGET(
+  generate_about_rv_cpp
+  DEPENDS ${_about_rv_cpp}
+)
+
+SET_SOURCE_FILES_PROPERTIES(
+  ${_about_rv_cpp}
+  PROPERTIES SKIP_AUTOMOC ON
+             SKIP_AUTOUIC ON
+             SKIP_AUTORCC ON
+             GENERATED TRUE
+)
+
 LIST(APPEND _sources ${_about_rv_cpp})
 
 ADD_LIBRARY(
   ${_target} STATIC
   ${_sources} qrc/RvCommon.qrc
 )
+
+# Ensure about_rv.cpp is generated before building RvCommon
+ADD_DEPENDENCIES(${_target} generate_about_rv_cpp)
 
 # Need that with Qt6 since the code for this target does not support unicode correctly.
 IF(RV_TARGET_WINDOWS

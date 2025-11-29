@@ -12,6 +12,9 @@
 **/*.pkg
 **/*.dmg
 
+# CMake generated
+**/about_rv.cpp
+
 # Windows
 **/*.pdb
 **/*.idb
