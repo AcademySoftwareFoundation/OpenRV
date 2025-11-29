@@ -4087,12 +4087,12 @@ namespace IPCore
             case FrameBuffer::PACKED_R10_G10_B10_X2:
                 d->format = GL_RGBA;
                 d->channelType = GL_UNSIGNED_INT_10_10_10_2;
-                d->internalFormat = GL_RGB10;
+                d->internalFormat = GL_RGB10_A2;
                 break;
             case FrameBuffer::PACKED_X2_B10_G10_R10:
                 d->format = GL_RGBA;
                 d->channelType = GL_UNSIGNED_INT_2_10_10_10_REV;
-                d->internalFormat = GL_RGB10;
+                d->internalFormat = GL_RGB10_A2;
                 break;
             case FrameBuffer::PACKED_Cb8_Y8_Cr8_Y8:
             case FrameBuffer::PACKED_Y8_Cb8_Y8_Cr8:
