@@ -12,6 +12,14 @@ from datetime import datetime
 from pathlib import Path
 
 
+# Print to BOTH stdout and stderr immediately before any other imports
+sys.stdout.write("=== calling generate_about_rv.py STDOUT ===\n")
+sys.stdout.flush()
+sys.stderr.write("=== calling generate_about_rv.py STDERR ===\n")
+sys.stderr.flush()
+print("=== generate_about_rv.py starting ===", flush=True)
+
+
 def get_git_info(git_hash_from_cmake=""):
     """Get git commit hash - prefer the one from CMake for consistency"""
     if git_hash_from_cmake:
@@ -277,6 +285,7 @@ const char* about_RV = "{html_str}";
 
 
 if __name__ == "__main__":
+    print(f"=== Arguments received: {len(sys.argv)} ===", flush=True)
     if len(sys.argv) < 9:
         print(
             "Usage: generate_about_rv.py <output_file> <compiler> <build_type> "
@@ -284,6 +293,7 @@ if __name__ == "__main__":
         )
         sys.exit(1)
 
+    print("=== Parsing arguments ===", flush=True)
     output_file = sys.argv[1]
     compiler = sys.argv[2]
     build_type = sys.argv[3]
@@ -296,6 +306,7 @@ if __name__ == "__main__":
     versions_str = sys.argv[10] if len(sys.argv) > 10 else ""
     git_hash = sys.argv[11] if len(sys.argv) > 11 else ""
 
+    print(f"=== Calling generate_about_cpp for: {output_file} ===", flush=True)
     generate_about_cpp(
         output_file,
         compiler,
