@@ -9,6 +9,7 @@
 import sys
 import subprocess
 from datetime import datetime
+from pathlib import Path
 
 
 def get_git_info(git_hash_from_cmake=""):
@@ -249,10 +250,30 @@ def generate_about_cpp(
 const char* about_RV = "{html_str}";
 '''
 
-    with open(output_file, "w", encoding="utf-8") as f:
-        f.write(cpp_content)
+    # Ensure the output directory exists
+    try:
+        output_path = Path(output_file)
+        print(f"Creating directory: {output_path.parent}")
+        output_path.parent.mkdir(parents=True, exist_ok=True)
 
-    print(f"Generated {output_file}")
+        print(f"Writing to: {output_path}")
+        with open(output_file, "w", encoding="utf-8", newline="\n") as f:
+            f.write(cpp_content)
+
+        # Verify the file was written
+        if not output_path.exists():
+            print(f"ERROR: File was not created: {output_file}", file=sys.stderr)
+            sys.exit(1)
+
+        file_size = output_path.stat().st_size
+        print(f"Generated {output_file} ({file_size} bytes)")
+
+    except Exception as e:
+        print(f"ERROR generating {output_file}: {e}", file=sys.stderr)
+        import traceback
+
+        traceback.print_exc()
+        sys.exit(1)
 
 
 if __name__ == "__main__":
