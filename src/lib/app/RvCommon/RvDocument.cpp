@@ -203,7 +203,7 @@ namespace Rv
         }
 
         // Create DiagnosticsView as a dockable widget (lazy initialization).
-        m_diagnosticsView = new DiagnosticsView(nullptr, m_glView->format());
+        m_diagnosticsView = new DiagnosticsView(nullptr, m_glView->actualFormat());
 
         // Dockable to QMainWindow, not centralwidget.
         m_diagnosticsDock = new QDockWidget(tr("Diagnostics"), this);
@@ -798,18 +798,28 @@ namespace Rv
         size_t ow = centralWidget()->width();
         size_t oh = centralWidget()->height();
 
-        if (!newGLView->isValid())
-        {
-            delete newGLView;
-            newGLView = new GLView(this, view()->context(), this);
-            resetGLPrefs = true;
-        }
-
-        m_stackedLayout->addWidget(newGLView);
+        // Add widget to layout and show FIRST - isValid() only returns true after widget is shown
         m_stackedLayout->removeWidget(oldGLView);
+        m_stackedLayout->addWidget(newGLView);
         m_glView = newGLView;
         m_glView->show();
         m_glView->setFocus(Qt::OtherFocusReason);
+
+        // Process events to trigger GL context creation and initializeGL()
+        QApplication::processEvents();
+
+        // Now check validity (after initialization has occurred)
+        if (!newGLView->isValid())
+        {
+            m_stackedLayout->removeWidget(newGLView);
+            delete newGLView;
+            newGLView = new GLView(this, view()->context(), this);
+            m_stackedLayout->addWidget(newGLView);
+            m_glView = newGLView;
+            m_glView->show();
+            m_glView->setFocus(Qt::OtherFocusReason);
+            resetGLPrefs = true;
+        }
 
         m_topViewToolBar->setDevice(m_glView->videoDevice());
 
@@ -848,15 +858,16 @@ namespace Rv
 
     void RvDocument::setStereo(bool b)
     {
-        const bool vsync = m_glView->format().swapInterval() == 1;
-        const bool stereo = m_glView->format().stereo();
+        QSurfaceFormat format = m_glView->actualFormat();
+        const bool vsync = format.swapInterval() == 1;
+        const bool stereo = format.stereo();
         bool dbl = false;
-        if (m_glView->format().swapBehavior() == QSurfaceFormat::DoubleBuffer)
+        if (format.swapBehavior() == QSurfaceFormat::DoubleBuffer)
             dbl = true;
-        const int red = m_glView->format().redBufferSize();
-        const int green = m_glView->format().greenBufferSize();
-        const int blue = m_glView->format().blueBufferSize();
-        const int alpha = m_glView->format().alphaBufferSize();
+        const int red = format.redBufferSize();
+        const int green = format.greenBufferSize();
+        const int blue = format.blueBufferSize();
+        const int alpha = format.alphaBufferSize();
         if (b != stereo)
             rebuildGLView(b, vsync, dbl, red, green, blue, alpha);
     }
@@ -865,27 +876,29 @@ namespace Rv
     {
         if (m_vsyncDisabled)
             return;
-        const bool vsync = m_glView->format().swapInterval() == 1;
-        const bool stereo = m_glView->format().stereo();
+        QSurfaceFormat format = m_glView->actualFormat();
+        const bool vsync = format.swapInterval() == 1;
+        const bool stereo = format.stereo();
         bool dbl = false;
-        if (m_glView->format().swapBehavior() == QSurfaceFormat::DoubleBuffer)
+        if (format.swapBehavior() == QSurfaceFormat::DoubleBuffer)
             dbl = true;
-        const int red = m_glView->format().redBufferSize();
-        const int green = m_glView->format().greenBufferSize();
-        const int blue = m_glView->format().blueBufferSize();
-        const int alpha = m_glView->format().alphaBufferSize();
+        const int red = format.redBufferSize();
+        const int green = format.greenBufferSize();
+        const int blue = format.blueBufferSize();
+        const int alpha = format.alphaBufferSize();
         if (b != vsync)
             rebuildGLView(stereo, b, dbl, red, green, blue, alpha);
     }
 
     void RvDocument::setDoubleBuffer(bool b)
     {
-        bool vsync = m_glView->format().swapInterval() == 1;
-        const bool stereo = m_glView->format().stereo();
-        const int red = m_glView->format().redBufferSize();
-        const int green = m_glView->format().greenBufferSize();
-        const int blue = m_glView->format().blueBufferSize();
-        const int alpha = m_glView->format().alphaBufferSize();
+        QSurfaceFormat format = m_glView->actualFormat();
+        bool vsync = format.swapInterval() == 1;
+        const bool stereo = format.stereo();
+        const int red = format.redBufferSize();
+        const int green = format.greenBufferSize();
+        const int blue = format.blueBufferSize();
+        const int alpha = format.alphaBufferSize();
 
         if (!b)
             vsync = false;
@@ -895,15 +908,16 @@ namespace Rv
 
     void RvDocument::setDisplayOutput(DisplayOutputType type)
     {
-        const bool vsync = m_glView->format().swapInterval() == 1;
-        const bool stereo = m_glView->format().stereo();
+        QSurfaceFormat format = m_glView->actualFormat();
+        const bool vsync = format.swapInterval() == 1;
+        const bool stereo = format.stereo();
         bool dbl = false;
-        if (m_glView->format().swapBehavior() == QSurfaceFormat::DoubleBuffer)
+        if (format.swapBehavior() == QSurfaceFormat::DoubleBuffer)
             dbl = true;
-        int red = m_glView->format().redBufferSize();
-        int green = m_glView->format().greenBufferSize();
-        int blue = m_glView->format().blueBufferSize();
-        int alpha = m_glView->format().alphaBufferSize();
+        int red = format.redBufferSize();
+        int green = format.greenBufferSize();
+        int blue = format.blueBufferSize();
+        int alpha = format.alphaBufferSize();
 
         switch (type)
         {

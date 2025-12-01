@@ -42,6 +42,9 @@ namespace Rv
 
         QTGLVideoDevice* videoDevice() const { return m_videoDevice; }
 
+        // Get the actual OpenGL format (works around Qt bug where format() may be incorrect)
+        QSurfaceFormat actualFormat() const;
+
         void stopProcessingEvents();
 
         virtual bool event(QEvent*);
@@ -97,6 +100,7 @@ namespace Rv
         bool m_stopProcessingEvents;
         void* m_syncThreadData;
         QOpenGLContext* m_sharedContext;
+        QSurfaceFormat m_actualFormat; // Actual format queried from OpenGL (corrects Qt bug)
     };
 
 } // namespace Rv

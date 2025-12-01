@@ -119,6 +119,41 @@ namespace Rv
 
     } // namespace
 
+    //
+    // Helper function to query actual OpenGL framebuffer format
+    // Works around Qt bug (qcocoaglcontext.mm:267) where it divides NSOpenGLPFAColorSize by 4
+    // instead of 3, causing it to report 8-8-8-2 when the actual format is 10-10-10-2
+    //
+    namespace
+    {
+        QSurfaceFormat queryActualFormat(QOpenGLContext* context, const QSurfaceFormat& qtFormat)
+        {
+            QSurfaceFormat actualFormat = qtFormat;
+
+            if (!context || !context->isValid())
+                return actualFormat;
+
+            // Query OpenGL directly for actual framebuffer bit depths
+            GLint redBits = 0, greenBits = 0, blueBits = 0, alphaBits = 0;
+            glGetIntegerv(GL_RED_BITS, &redBits);
+            glGetIntegerv(GL_GREEN_BITS, &greenBits);
+            glGetIntegerv(GL_BLUE_BITS, &blueBits);
+            glGetIntegerv(GL_ALPHA_BITS, &alphaBits);
+
+            // Update format with actual values from OpenGL
+            if (redBits > 0)
+                actualFormat.setRedBufferSize(redBits);
+            if (greenBits > 0)
+                actualFormat.setGreenBufferSize(greenBits);
+            if (blueBits > 0)
+                actualFormat.setBlueBufferSize(blueBits);
+            if (alphaBits >= 0)
+                actualFormat.setAlphaBufferSize(alphaBits);
+
+            return actualFormat;
+        }
+    } // namespace
+
     GLView::GLView(QWidget* parent, QOpenGLContext* sharedContext, RvDocument* doc, bool stereo, bool vsync, bool doubleBuffer, int red,
                    int green, int blue, int alpha, bool noResize)
         : QOpenGLWidget(parent)
@@ -155,6 +190,8 @@ namespace Rv
         m_eventProcessingTimer.setSingleShot(true);
         connect(&m_eventProcessingTimer, SIGNAL(timeout()), this, SLOT(eventProcessingTimeout()));
     }
+
+    QSurfaceFormat GLView::actualFormat() const { return m_actualFormat; }
 
     GLView::~GLView()
     {
@@ -262,11 +299,17 @@ namespace Rv
             }
 
             // NOTE_QT6: QGLFormat is deprecated. Using QSurfaceFormat now.
-            QSurfaceFormat f = context()->format();
+            QSurfaceFormat maybeBuggyQtFormat = context()->format();
 
-#ifndef PLATFORM_DARWIN
+            // Get the ACTUAL format by querying OpenGL directly (works around Qt bug)
+            QSurfaceFormat f = queryActualFormat(context(), maybeBuggyQtFormat);
+
+            // Store the actual format so it can be retrieved via actualFormat()
+            m_actualFormat = f;
+
             //
-            //  Doesn't work on OS X
+            //  Check if we got the requested format using ACTUAL OpenGL values
+            //  (not Qt's potentially buggy reported values)
             //
             if (f.redBufferSize() != m_red && m_red != 0)
             {
@@ -295,7 +338,7 @@ namespace Rv
                 // QMessageBox::AcceptRole); box.setIcon(QMessageBox::Critical);
                 // box.exec();
             }
-#endif
+
             if (f.stencilBufferSize() == 0)
             {
                 cout << "WARNING: no stencil buffer available" << endl;
@@ -592,7 +635,6 @@ namespace Rv
     //
     if (event->type() == QEvent::TabletPress && !isActiveWindow())
     {
-        cerr << "activating window" << endl;
         QEvent activateEvent(QEvent::WindowActivate);
         //m_frameBuffer->translator().sendQTEvent(new QEvent(QEvent::WindowActivate));
         session->setEventVideoDevice(videoDevice());
