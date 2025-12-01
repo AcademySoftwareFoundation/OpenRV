@@ -53,6 +53,7 @@ namespace IPCore
         inline constexpr std::string_view annotateSmudgeCategory = "annotate_smudge_category";
         inline constexpr std::string_view annotateSofteraseCategory = "annotate_softerase_category";
         inline constexpr std::string_view annotateTextCategory = "annotate_text_category";
+        inline constexpr std::string_view holdAndGhostCategory = "holdAndGhost_category";
         inline constexpr std::string_view backwardplayCategory = "backwardplay_category";
         inline constexpr std::string_view clearCategory = "clear_category";
         inline constexpr std::string_view exportCategory = "export_category";
@@ -72,6 +73,8 @@ namespace IPCore
         inline constexpr std::string_view screeningroomCategory = "screeningroom_category";
         inline constexpr std::string_view unclassifiedCategory = "unclassified_category";
         inline constexpr std::string_view viewmodeCategory = "viewmode_category";
+        inline constexpr std::string_view fullscreenModeCategory = "fullscreenMode_category";
+        inline constexpr std::string_view backgroundStyleCategory = "backgroundStyle_category";
         inline constexpr std::string_view wipesCategory = "wipes_category";
 
         constexpr auto all_categories()

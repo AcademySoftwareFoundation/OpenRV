@@ -350,8 +350,8 @@ namespace Rv
         m_actionCategoryMappings = {{
             {m_smAction, IPCore::EventCategories::sessionmanagerCategory, m_smAction->toolTip()},
             {m_paintAction, IPCore::EventCategories::annotateCategory, m_paintAction->toolTip()},
-            {m_holdAction, IPCore::EventCategories::annotateCategory, m_holdAction->toolTip()},
-            {m_ghostAction, IPCore::EventCategories::annotateCategory, m_ghostAction->toolTip()},
+            {m_holdAction, IPCore::EventCategories::holdAndGhostCategory, m_holdAction->toolTip()},
+            {m_ghostAction, IPCore::EventCategories::holdAndGhostCategory, m_ghostAction->toolTip()},
             {m_backStepAction, IPCore::EventCategories::playcontrolCategory, m_backStepAction->toolTip()},
             {m_forwardStepAction, IPCore::EventCategories::playcontrolCategory, m_forwardStepAction->toolTip()},
             {m_backwardPlayAction, IPCore::EventCategories::backwardplayCategory, m_backwardPlayAction->toolTip()},
@@ -467,7 +467,6 @@ namespace Rv
             }
             else if (name == "event-category-state-changed")
             {
-                // Update action availability when presenter changes or session mode changes
                 updateActionAvailability();
             }
             else if (name == "toolbar-set-cannot-use-tooltip")
