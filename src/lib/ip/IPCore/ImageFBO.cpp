@@ -124,11 +124,11 @@ namespace IPCore
             break;
         case IPImage::UInt10A2DataType:
             type = GL_UNSIGNED_INT_10_10_10_2;
-            iformat = GL_RGB10_A2;
+            iformat = GL_RGB10;
             break;
         case IPImage::UInt10A2RevDataType:
             type = GL_UNSIGNED_INT_2_10_10_10_REV;
-            iformat = GL_RGB10_A2;
+            iformat = GL_RGB10;
             break;
         }
 
