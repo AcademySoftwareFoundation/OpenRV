@@ -1431,9 +1431,18 @@ class: AnnotateMinorMode : MinorMode
 
     method: undoRedoUpdate (void;)
     {
+        if (_currentNode eq nil)
+        {
+            _undoAct.setEnabled(false);
+            _redoAct.setEnabled(false);
+            _clearAct.setEnabled(false);
+            return;
+        }
+
         let frame = _currentNodeInfo.frame;
         let undoProperty = frameUserUndoStackName(_currentNode, frame);
         let redoProperty = frameUserRedoStackName(_currentNode, frame);
+        let orderProperty = frameOrderName(_currentNode, frame);
         let playing = isPlaying();
 
         _undoAct.setEnabled(!playing &&
@@ -1443,6 +1452,10 @@ class: AnnotateMinorMode : MinorMode
         _redoAct.setEnabled(!playing &&
                             propertyExists(redoProperty) &&
                             propertyInfo(redoProperty).size > 0);
+
+        _clearAct.setEnabled(!playing &&
+                            propertyExists(orderProperty) &&
+                            propertyInfo(orderProperty).size > 0);
     }
 
     method: undoPaint (void;)
@@ -2794,6 +2807,7 @@ class: AnnotateMinorMode : MinorMode
     {
         updateCurrentNode();
         updateToolAvailability();
+        undoRedoUpdate();
         
         if (commands.isEventCategoryEnabled("annotate_category"))
         {
