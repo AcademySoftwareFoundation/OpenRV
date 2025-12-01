@@ -244,6 +244,14 @@ ELSE() # Not WINDOWS
   )
 ENDIF()
 
+# Set the appropriate library for CMAKE_ARGS based on platform
+# Windows needs the import library (.lib), Unix needs the shared library (.so/.dylib)
+IF(RV_TARGET_WINDOWS)
+  SET(_python3_cmake_library ${_python3_implib})
+ELSE()
+  SET(_python3_cmake_library ${_python3_lib})
+ENDIF()
+
 # Generate requirements.txt from template with the OpenTimelineIO version substituted
 SET(_requirements_input_file
     "${PROJECT_SOURCE_DIR}/src/build/requirements.txt.in"
@@ -258,36 +266,30 @@ CONFIGURE_FILE(
     @ONLY
 )
 
-IF(RV_TARGET_WINDOWS)
-  # On Windows, OpenTimelineIO needs to be built from source and requires
-  # CMake to find the Python libraries. Set CMAKE_ARGS to help pybind11
-  # locate the Python development files.
-  # This is required for both old and new versions of pybind11, but especially
-  # for pybind11 v2.13.6+ which has stricter Python library detection.
-  # Note: pybind11's FindPythonLibsNew.cmake uses PYTHON_LIBRARY (all caps),
-  # PYTHON_INCLUDE_DIR, and PYTHON_EXECUTABLE variables.
-  
-  IF(CMAKE_BUILD_TYPE MATCHES "^Debug$")
-    # For Debug builds, we need to tell OpenTimelineIO to build in debug mode
-    # and link against the debug Python library (python311_d.lib)
-    SET(_requirements_install_command
-        ${CMAKE_COMMAND} -E env
-        "OTIO_CXX_DEBUG_BUILD=1"
-        "CMAKE_ARGS=-DPYTHON_LIBRARY=${_python3_implib} -DPYTHON_INCLUDE_DIR=${_include_dir} -DPYTHON_EXECUTABLE=${_python3_executable}"
-        "${_python3_executable}" -m pip install --upgrade -r "${_requirements_output_file}"
-    )
-  ELSE()
-    SET(_requirements_install_command
-        ${CMAKE_COMMAND} -E env
-        "CMAKE_ARGS=-DPYTHON_LIBRARY=${_python3_implib} -DPYTHON_INCLUDE_DIR=${_include_dir} -DPYTHON_EXECUTABLE=${_python3_executable}"
-        "${_python3_executable}" -m pip install --upgrade -r "${_requirements_output_file}"
-    )
-  ENDIF()
+# OpenTimelineIO needs to be built from source with CMAKE_ARGS to ensure it uses
+# the correct custom-built Python libraries. This is required for both old and new
+# versions of pybind11, especially pybind11 v2.13.6+ which has stricter detection.
+# Note: pybind11's FindPythonLibsNew.cmake uses PYTHON_LIBRARY (all caps),
+# PYTHON_INCLUDE_DIR, and PYTHON_EXECUTABLE variables.
+# --no-cache-dir: Don't use pip's wheel cache (prevents using wheels built for wrong Python version)
+# --force-reinstall: Reinstall packages even if already installed (ensures fresh build)
+
+# Set OTIO_CXX_DEBUG_BUILD for all Debug builds to ensure OTIO's C++ extensions
+# are built with debug symbols and proper optimization levels matching RV's build type.
+# On Windows, this also ensures OTIO links against the debug Python library (python311_d.lib).
+IF(CMAKE_BUILD_TYPE MATCHES "^Debug$")
+  SET(_otio_debug_env "OTIO_CXX_DEBUG_BUILD=1")
 ELSE()
-  SET(_requirements_install_command
-      "${_python3_executable}" -m pip install --upgrade -r "${_requirements_output_file}"
-  )
+  SET(_otio_debug_env "")
 ENDIF()
+
+# Single unified command for all platforms and build types
+SET(_requirements_install_command
+    ${CMAKE_COMMAND} -E env
+    ${_otio_debug_env}
+    "CMAKE_ARGS=-DPYTHON_LIBRARY=${_python3_cmake_library} -DPYTHON_INCLUDE_DIR=${_include_dir} -DPYTHON_EXECUTABLE=${_python3_executable}"
+    "${_python3_executable}" -m pip install --upgrade --no-cache-dir --force-reinstall -r "${_requirements_output_file}"
+)
 
 IF(RV_TARGET_WINDOWS)
   SET(_patch_python_command
