@@ -7,14 +7,14 @@
 INCLUDE(ProcessorCount) # require CMake 3.15+
 PROCESSORCOUNT(_cpu_count)
 
-RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_SPDLOG" "1.11.0" "" "")
+RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_SPDLOG" "${RV_DEPS_SPDLOG_VERSION}" "" "")
 
 SET(_download_url
     "https://github.com/gabime/spdlog/archive/refs/tags/v${_version}.zip"
 )
 
 SET(_download_hash
-    cd620e0f103737a122a3b6539bd0a57a
+    ${RV_DEPS_SPDLOG_DOWNLOAD_HASH}
 )
 
 SET(_install_dir

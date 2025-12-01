@@ -14,7 +14,8 @@ INCLUDE(ProcessorCount) # require CMake 3.15+
 PROCESSORCOUNT(_cpu_count)
 
 # version 2+ requires changes to IOjp2 project
-RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_OPENJPEG" "2.5.0" "make" "")
+RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_OPENJPEG" "${RV_DEPS_OPENJPEG_VERSION}" "make" "")
+
 IF(RV_TARGET_LINUX)
   # Overriding _lib_dir created in 'RV_CREATE_STANDARD_DEPS_VARIABLES' since this CMake-based project isn't using lib64
   SET(_lib_dir
@@ -27,13 +28,13 @@ SET(_download_url
     "https://github.com/uclouvain/openjpeg/archive/refs/tags/v${_version}.tar.gz"
 )
 SET(_download_hash
-    "5cbb822a1203dd75b85639da4f4ecaab"
+    ${RV_DEPS_OPENJPEG_DOWNLOAD_HASH}
 )
 
 IF(RV_TARGET_WINDOWS)
   RV_MAKE_STANDARD_LIB_NAME("openjp2" "" "SHARED" "")
 ELSE()
-  RV_MAKE_STANDARD_LIB_NAME("openjp2" "2.5.0" "SHARED" "")
+  RV_MAKE_STANDARD_LIB_NAME("openjp2" "${RV_DEPS_OPENJPEG_VERSION}" "SHARED" "")
 ENDIF()
 
 
@@ -91,7 +92,7 @@ SET_PROPERTY(
 
 # It is required to force directory creation at configure time otherwise CMake complains about importing a non-existing path
 SET(_openjpeg_include_dir
-    "${_include_dir}/openjpeg-2.5"
+    "${_include_dir}/openjpeg-${_version_major}.${_version_minor}"
 )
 FILE(MAKE_DIRECTORY "${_openjpeg_include_dir}")
 TARGET_INCLUDE_DIRECTORIES(

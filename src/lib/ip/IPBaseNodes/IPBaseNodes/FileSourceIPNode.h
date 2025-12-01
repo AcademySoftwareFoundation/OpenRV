@@ -200,10 +200,10 @@ namespace IPCore
         void addMedia(const SharedMediaPointer& sharedMedia, const SharedMediaPointer& proxySharedMedia = SharedMediaPointer());
         void changeMedia(const SharedMediaPointer& sharedMedia, const SharedMediaPointer& proxySharedMedia = SharedMediaPointer());
 
-        MediaPointer getMediaFromContext(ImageComponent& selection, const Context& context);
-        MediaPointer mediaForComponent(ImageComponent&, const Context& context);
-        MediaPointer defaultMedia(int);
-        Movie* movieForThread(const Media*, const Context&);
+        MediaPointer getMediaFromContext(ImageComponent& selection, const Context& context) const;
+        MediaPointer mediaForComponent(ImageComponent&, const Context& context) const;
+        MediaPointer defaultMedia(int) const;
+        Movie* movieForThread(const Media*, const Context&) const;
         void setupRequest(const Movie*, const ImageComponent&, const Context&, Movie::ReadRequest& request);
 
         void reloadMediaFromFiles();

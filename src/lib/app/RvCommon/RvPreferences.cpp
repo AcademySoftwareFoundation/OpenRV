@@ -2409,7 +2409,7 @@ namespace Rv
             }
             renderer->availableRates(d, currentFormat, rates);
         }
-#if defined(RV_VFX_CY2024)
+#if defined(QT65ON)
         m_ui.audioDeviceRateWidget->setMinimum(rates.front());
         m_ui.audioDeviceRateWidget->setMaximum(rates.back());
 #endif
@@ -2527,7 +2527,7 @@ namespace Rv
             }
             renderer->availableRates(d, currentFormat, rates);
         }
-#if defined(RV_VFX_CY2024)
+#if defined(QT65ON)
         m_ui.audioDeviceRateWidget->setMinimum(rates.front());
         m_ui.audioDeviceRateWidget->setMaximum(rates.back());
 #endif
@@ -2619,7 +2619,7 @@ namespace Rv
             }
             renderer->availableRates(d, currentFormat, rates);
         }
-#if defined(RV_VFX_CY2024)
+#if defined(QT65ON)
         m_ui.audioDeviceRateWidget->setMinimum(rates.front());
         m_ui.audioDeviceRateWidget->setMaximum(rates.back());
 #endif
@@ -2691,7 +2691,7 @@ namespace Rv
         IPCore::App()->stopAll();
         renderer->shutdown();
         renderer->availableRates(d, currentFormat, rates);
-#if defined(RV_VFX_CY2024)
+#if defined(QT65ON)
         m_ui.audioDeviceRateWidget->setMinimum(rates.front());
         m_ui.audioDeviceRateWidget->setMaximum(rates.back());
 #endif

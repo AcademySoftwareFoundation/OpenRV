@@ -129,6 +129,7 @@ class: WindowTitle : MinorMode
               ("after-progressive-loading", updateAfterDelay, ""),
               ("source-group-complete", updateAfterDelay, ""),
               ("graph-node-inputs-changed", updateAfterDelay, ""),
+              ("source-media-rep-activated", updateAfterDelay, ""),
               ("frame-changed", updateTitle, "")],
              nil);
 

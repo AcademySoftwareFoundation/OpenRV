@@ -48,12 +48,17 @@ namespace IPCore
 
         void start();
 
+        void startProducingSilence() { m_silence = true; }
+
+        void stopProducingSilence() { m_silence = false; }
+
     public slots:
         void resetDevice();
         void stopDevice();
 
     private:
         QTAudioThread& m_thread;
+        bool m_silence = false;
     };
 
     class QTAudioOutput : public QAudioSink
@@ -63,6 +68,16 @@ namespace IPCore
     public:
         QTAudioOutput(QAudioDevice& audioDevice, QAudioFormat& audioFormat, QTAudioIODevice& ioDevice, QTAudioThread& audioThread);
         ~QTAudioOutput();
+
+        bool isFlushing() const { return m_isFlushing; }
+
+        void startFlushing();
+
+        void doneFlushing() { m_isFlushing = false; }
+
+        void accumulateFlushedBytes(qint64 n) { m_flushedBytes += n; }
+
+        bool flushedEnough() const { return m_flushedBytes >= bufferSize(); }
 
     public slots:
         void startAudio();
@@ -82,6 +97,8 @@ namespace IPCore
         QAudioFormat& m_format;
         QTAudioIODevice& m_ioDevice;
         QTAudioThread& m_thread;
+        bool m_isFlushing = false;
+        qint64 m_flushedBytes;
     };
 
     class QTAudioThread : public QThread
