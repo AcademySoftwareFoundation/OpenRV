@@ -266,6 +266,8 @@ IF(RV_TARGET_WINDOWS)
   # for pybind11 v2.13.6+ which has stricter Python library detection.
   # Note: pybind11's FindPythonLibsNew.cmake uses PYTHON_LIBRARY (all caps),
   # PYTHON_INCLUDE_DIR, and PYTHON_EXECUTABLE variables.
+  # --no-cache-dir: Don't use pip's wheel cache (prevents using wheels built for wrong Python version)
+  # --force-reinstall: Reinstall packages even if already installed (ensures fresh build)
   
   IF(CMAKE_BUILD_TYPE MATCHES "^Debug$")
     # For Debug builds, we need to tell OpenTimelineIO to build in debug mode
@@ -274,18 +276,26 @@ IF(RV_TARGET_WINDOWS)
         ${CMAKE_COMMAND} -E env
         "OTIO_CXX_DEBUG_BUILD=1"
         "CMAKE_ARGS=-DPYTHON_LIBRARY=${_python3_implib} -DPYTHON_INCLUDE_DIR=${_include_dir} -DPYTHON_EXECUTABLE=${_python3_executable}"
-        "${_python3_executable}" -m pip install --upgrade -r "${_requirements_output_file}"
+        "${_python3_executable}" -m pip install --upgrade --no-cache-dir --force-reinstall -r "${_requirements_output_file}"
     )
   ELSE()
     SET(_requirements_install_command
         ${CMAKE_COMMAND} -E env
         "CMAKE_ARGS=-DPYTHON_LIBRARY=${_python3_implib} -DPYTHON_INCLUDE_DIR=${_include_dir} -DPYTHON_EXECUTABLE=${_python3_executable}"
-        "${_python3_executable}" -m pip install --upgrade -r "${_requirements_output_file}"
+        "${_python3_executable}" -m pip install --upgrade --no-cache-dir --force-reinstall -r "${_requirements_output_file}"
     )
   ENDIF()
 ELSE()
+  # On macOS and Linux, force pip to build OpenTimelineIO from source and avoid using
+  # cached wheels that may have been built for a different Python version.
+  # This ensures ABI compatibility with our custom-built Python.
+  # --no-cache-dir: Don't use pip's wheel cache (prevents using wheels built for wrong Python version)
+  # --force-reinstall: Reinstall packages even if already installed (ensures fresh build)
+  # CMAKE_ARGS: Tell OTIO's CMake build which Python to use (prevents it from finding system Python via pyenv/etc)
   SET(_requirements_install_command
-      "${_python3_executable}" -m pip install --upgrade -r "${_requirements_output_file}"
+      ${CMAKE_COMMAND} -E env
+      "CMAKE_ARGS=-DPYTHON_EXECUTABLE=${_python3_executable}"
+      "${_python3_executable}" -m pip install --upgrade --no-cache-dir --force-reinstall -r "${_requirements_output_file}"
   )
 ENDIF()
 
