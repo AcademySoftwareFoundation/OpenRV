@@ -294,6 +294,9 @@ SET(_versions_list
     "imgui:${RV_DEPS_IMGUI_VERSION}"
     "numpy:$ENV{RV_DEPS_NUMPY_VERSION}"
     "otio:${RV_DEPS_OTIO_VERSION}"
+    "expat:${RV_DEPS_EXPAT_VERSION}"
+    "nanobind:${RV_DEPS_NANOBIND_VERSION}"
+    "pcre2:${RV_DEPS_PCRE2_VERSION}"
 )
 
 # Add commercial RV-specific SDK versions if they exist
@@ -316,6 +319,11 @@ IF(DEFINED RV_DEPS_X264_VERSION
    AND RV_DEPS_X264_VERSION
 )
   LIST(APPEND _versions_list "x264:${RV_DEPS_X264_VERSION}")
+ENDIF()
+IF(DEFINED RV_DEPS_NDI_VERSION
+   AND RV_DEPS_NDI_VERSION
+)
+  LIST(APPEND _versions_list "ndi:${RV_DEPS_NDI_VERSION}")
 ENDIF()
 
 STRING(REPLACE ";" "," _versions_str "${_versions_list}")

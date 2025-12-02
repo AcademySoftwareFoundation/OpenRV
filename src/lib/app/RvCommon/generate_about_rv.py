@@ -56,23 +56,23 @@ def get_dependencies_info(vfx_platform, versions, app_name, platform=""):
     # Detect if we're on macOS
     is_macos = "darwin" in platform.lower() or "macos" in platform.lower()
 
-    # VFX Platform components (listed in order)
+    # VFX Platform components (alphabetical order)
     # Note: PyQt is NOT used by RV (only PySide), so it's excluded from the list
     vfx_deps = [
-        ("Qt Framework", get_ver("Qt"), qt_license),
-        ("CMake", get_ver("CMake"), "BSD 3-Clause"),
-        ("Python", get_ver("Python"), "PSF License"),
-        ("PySide", get_ver("PySide"), pyside_license),
-        ("NumPy", get_ver("numpy", "1.24+"), "BSD 3-Clause"),
-        ("Imath", get_ver("Imath"), "BSD 3-Clause"),
-        ("OpenEXR", get_ver("OpenEXR"), "BSD 3-Clause"),
         ("Boost", get_ver("Boost"), "Boost Software License"),
-        ("OpenImageIO", get_ver("OpenImageIO"), "Apache 2.0"),
+        ("CMake", get_ver("CMake"), "BSD 3-Clause"),
+        ("Imath", get_ver("Imath"), "BSD 3-Clause"),
+        ("NumPy", get_ver("numpy", "1.24+"), "BSD 3-Clause"),
         ("OpenColorIO", get_ver("OpenColorIO"), "BSD 3-Clause"),
+        ("OpenEXR", get_ver("OpenEXR"), "BSD 3-Clause"),
+        ("OpenImageIO", get_ver("OpenImageIO"), "Apache 2.0"),
         ("OpenTimelineIO", get_ver("otio"), "Apache 2.0"),
+        ("PySide", get_ver("PySide"), pyside_license),
+        ("Python", get_ver("Python"), "PSF License"),
+        ("Qt Framework", get_ver("Qt"), qt_license),
     ]
 
-    # RV-specific proprietary components (only for commercial RV)
+    # RV-specific proprietary components (only for commercial RV, alphabetical order)
     rv_specific_deps = []
     if is_commercial_rv:
         # Apple ProRes is only available on macOS (and not on ARM64 currently)
@@ -83,32 +83,36 @@ def get_dependencies_info(vfx_platform, versions, app_name, platform=""):
         # Always add these for commercial RV (version will show "Not Used" if not available)
         rv_specific_deps.extend(
             [
-                ("RED R3D SDK", get_ver("r3dsdk", "Not Used"), "RED Proprietary"),
                 ("ARRI SDK", get_ver("arriraw", "Not Used"), "ARRI Proprietary"),
+                ("NDI SDK", get_ver("ndi", "Not Used"), "NDI Proprietary"),
+                ("RED R3D SDK", get_ver("r3dsdk", "Not Used"), "RED Proprietary"),
                 ("x264", get_ver("x264", "Not Used"), "x264 Commercial License"),
             ]
         )
 
-    # Other third-party components
+    # Other third-party components (alphabetical order)
     other_deps = [
-        ("FFmpeg", get_ver("FFmpeg"), "LGPL v2.1+"),
-        ("libjpeg-turbo", get_ver("jpegturbo"), "BSD-style"),
-        ("libpng", get_ver("png"), "libpng License"),
-        ("libtiff", get_ver("tiff"), "libtiff License"),
-        ("OpenJPEG", get_ver("openjpeg"), "BSD 2-Clause"),
-        ("OpenJPH", get_ver("openjph"), "BSD 2-Clause"),
-        ("libwebp", get_ver("webp"), "BSD 3-Clause"),
-        ("LibRaw", get_ver("raw"), "LGPL v2.1 / CDDL"),
-        ("dav1d", get_ver("dav1d"), "BSD 2-Clause"),
-        ("zlib", get_ver("zlib"), "zlib License"),
-        ("OpenSSL", get_ver("OpenSSL"), "Apache License 2.0"),
-        ("GLEW", get_ver("GLEW"), "Modified BSD / MIT"),
-        ("Dear ImGui", get_ver("imgui"), "MIT License"),
-        ("spdlog", get_ver("spdlog"), "MIT License"),
-        ("yaml-cpp", get_ver("yaml-cpp"), "MIT License"),
-        ("Boehm GC", get_ver("gc"), "MIT-style"),
         ("AJA NTV2 SDK", get_ver("aja"), "MIT License"),
         ("Blackmagic DeckLink SDK", get_ver("bmd"), "Proprietary"),
+        ("Boehm GC", get_ver("gc"), "MIT-style"),
+        ("dav1d", get_ver("dav1d"), "BSD 2-Clause"),
+        ("Dear ImGui", get_ver("imgui"), "MIT License"),
+        ("Expat", get_ver("expat"), "MIT License"),
+        ("FFmpeg", get_ver("FFmpeg"), "LGPL v2.1+"),
+        ("GLEW", get_ver("GLEW"), "Modified BSD / MIT"),
+        ("libjpeg-turbo", get_ver("jpegturbo"), "BSD-style"),
+        ("libpng", get_ver("png"), "libpng License"),
+        ("LibRaw", get_ver("raw"), "LGPL v2.1 / CDDL"),
+        ("libtiff", get_ver("tiff"), "libtiff License"),
+        ("libwebp", get_ver("webp"), "BSD 3-Clause"),
+        ("nanobind", get_ver("nanobind"), "BSD 3-Clause"),
+        ("OpenJPEG", get_ver("openjpeg"), "BSD 2-Clause"),
+        ("OpenJPH", get_ver("openjph"), "BSD 2-Clause"),
+        ("OpenSSL", get_ver("OpenSSL"), "Apache License 2.0"),
+        ("PCRE2", get_ver("pcre2"), "BSD License"),
+        ("spdlog", get_ver("spdlog"), "MIT License"),
+        ("yaml-cpp", get_ver("yaml-cpp"), "MIT License"),
+        ("zlib", get_ver("zlib"), "zlib License"),
     ]
 
     return vfx_deps, other_deps, rv_specific_deps
