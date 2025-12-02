@@ -69,6 +69,7 @@ def get_dependencies_info(vfx_platform, versions, app_name, platform=""):
         ("Boost", get_ver("Boost"), "Boost Software License"),
         ("OpenImageIO", get_ver("OpenImageIO"), "Apache 2.0"),
         ("OpenColorIO", get_ver("OpenColorIO"), "BSD 3-Clause"),
+        ("OpenTimelineIO", get_ver("otio"), "Apache 2.0"),
     ]
 
     # RV-specific proprietary components (only for commercial RV)

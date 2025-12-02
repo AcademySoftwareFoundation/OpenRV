@@ -304,6 +304,7 @@ SET(_versions_list
     "bmd:${RV_DEPS_BMD_VERSION}"
     "imgui:${RV_DEPS_IMGUI_VERSION}"
     "numpy:${RV_DEPS_NUMPY_VERSION}"
+    "otio:${RV_DEPS_OTIO_VERSION}"
 )
 
 # Add commercial RV-specific SDK versions if they exist
