@@ -3896,12 +3896,6 @@ namespace IPMu
         }
     }
 
-    NODE_IMPLEMENTATION(filterLiveReviewEvents, bool)
-    {
-        Session* s = Session::currentSession();
-        NODE_RETURN(s->filterLiveReviewEvents());
-    }
-
     NODE_IMPLEMENTATION(enableEventCategory, void)
     {
         Session* s = Session::currentSession();
@@ -5863,8 +5857,6 @@ namespace IPMu
 
             new Function(c, "setFilterLiveReviewEvents", setFilterLiveReviewEvents, None, Return, "void", Parameters,
                          new Param(c, "shouldFilterEvents", "bool"), End),
-
-            new Function(c, "filterLiveReviewEvents", filterLiveReviewEvents, None, Return, "bool", End),
 
             new Function(c, "enableEventCategory", enableEventCategory, None, Return, "void", Parameters,
                          new Param(c, "category", "string"), End),

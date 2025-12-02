@@ -302,7 +302,6 @@ all_mu_commands = [
     "getReleaseVariant",
     "isDebug",
     "setFilterLiveReviewEvents",
-    "filterLiveReviewEvents",
     "enableEventCategory",
     "disableEventCategory",
     "isEventCategoryEnabled",
