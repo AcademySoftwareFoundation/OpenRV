@@ -263,20 +263,9 @@ SET(_arch_name
     ${CMAKE_SYSTEM_PROCESSOR}
 )
 
-# Gather dependency versions
-IF(RV_VFX_PLATFORM STRGREATER_EQUAL CY2024)
-  SET(_qt_version
-      "${RV_DEPS_QT6_VERSION}"
-  )
-ELSE()
-  SET(_qt_version
-      "${RV_DEPS_QT5_VERSION}"
-  )
-ENDIF()
-
 # Create a JSON-like string with versions (using semicolon as separator for CMake list)
 SET(_versions_list
-    "Qt:${_qt_version}"
+    "Qt:${RV_DEPS_QT_VERSION}"
     "CMake:${CMAKE_VERSION}"
     "Python:${RV_DEPS_PYTHON3_VERSION}"
     "PySide:${RV_DEPS_PYSIDE_VERSION}"
@@ -303,7 +292,7 @@ SET(_versions_list
     "aja:${RV_DEPS_AJA_VERSION}"
     "bmd:${RV_DEPS_BMD_VERSION}"
     "imgui:${RV_DEPS_IMGUI_VERSION}"
-    "numpy:${RV_DEPS_NUMPY_VERSION}"
+    "numpy:$ENV{RV_DEPS_NUMPY_VERSION}"
     "otio:${RV_DEPS_OTIO_VERSION}"
 )
 
