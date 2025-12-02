@@ -6,23 +6,15 @@
 #
 # Generate about_rv.cpp with build and dependency information
 
+import argparse
 import sys
-import subprocess
 from datetime import datetime
 from pathlib import Path
 
 
 def get_git_info(git_hash_from_cmake=""):
-    """Get git commit hash - prefer the one from CMake for consistency"""
-    if git_hash_from_cmake:
-        return git_hash_from_cmake
-
-    # Fallback: try to get from git if not provided
-    try:
-        result = subprocess.run(["git", "log", "-1", "--pretty=format:%h"], capture_output=True, text=True, check=True)
-        return result.stdout.strip()
-    except (subprocess.CalledProcessError, FileNotFoundError, OSError):
-        return "unknown"
+    """Get git commit hash from CMake"""
+    return git_hash_from_cmake if git_hash_from_cmake else "unknown"
 
 
 def parse_versions(versions_str):
@@ -36,40 +28,35 @@ def parse_versions(versions_str):
     return versions
 
 
-def get_dependencies_info(vfx_platform, versions, app_name, platform=""):
+def get_dependencies_info(versions, app_name, platform=""):
     """Generate dependency information using detected versions"""
 
-    # Helper to get version or default
-    def get_ver(key, default="Unknown"):
+    def get_version(key, default="Unknown"):
         version = versions.get(key, default)
-        # Strip FFmpeg's 'n' prefix from version tags (e.g., n6.1.2 -> 6.1.2)
+        # Strip FFmpeg's 'n' prefix (e.g., n6.1.2 -> 6.1.2)
         if key == "FFmpeg" and version.startswith("n"):
             version = version[1:]
         return version
 
-    # Determine Qt license based on application type
     # OpenRV uses LGPL, commercial RV uses Qt Commercial
     is_commercial_rv = app_name == "RV"
     qt_license = "Qt Commercial" if is_commercial_rv else "LGPL v3"
     pyside_license = "Qt Commercial" if is_commercial_rv else "LGPL v3"
 
-    # Detect if we're on macOS
     is_macos = "darwin" in platform.lower() or "macos" in platform.lower()
 
-    # VFX Platform components (alphabetical order)
-    # Note: PyQt is NOT used by RV (only PySide), so it's excluded from the list
     vfx_deps = [
-        ("Boost", get_ver("Boost"), "Boost Software License"),
-        ("CMake", get_ver("CMake"), "BSD 3-Clause"),
-        ("Imath", get_ver("Imath"), "BSD 3-Clause"),
-        ("NumPy", get_ver("numpy", "1.24+"), "BSD 3-Clause"),
-        ("OpenColorIO", get_ver("OpenColorIO"), "BSD 3-Clause"),
-        ("OpenEXR", get_ver("OpenEXR"), "BSD 3-Clause"),
-        ("OpenImageIO", get_ver("OpenImageIO"), "Apache 2.0"),
-        ("OpenTimelineIO", get_ver("otio"), "Apache 2.0"),
-        ("PySide", get_ver("PySide"), pyside_license),
-        ("Python", get_ver("Python"), "PSF License"),
-        ("Qt Framework", get_ver("Qt"), qt_license),
+        ("Boost", get_version("Boost"), "Boost Software License"),
+        ("CMake", get_version("CMake"), "BSD 3-Clause"),
+        ("Imath", get_version("Imath"), "BSD 3-Clause"),
+        ("NumPy", get_version("numpy", "1.24+"), "BSD 3-Clause"),
+        ("OpenColorIO", get_version("OpenColorIO"), "BSD 3-Clause"),
+        ("OpenEXR", get_version("OpenEXR"), "BSD 3-Clause"),
+        ("OpenImageIO", get_version("OpenImageIO"), "Apache 2.0"),
+        ("OpenTimelineIO", get_version("otio"), "Apache 2.0"),
+        ("PySide", get_version("PySide"), pyside_license),
+        ("Python", get_version("Python"), "PSF License"),
+        ("Qt Framework", get_version("Qt"), qt_license),
     ]
 
     # RV-specific proprietary components (only for commercial RV, alphabetical order)
@@ -77,42 +64,42 @@ def get_dependencies_info(vfx_platform, versions, app_name, platform=""):
     if is_commercial_rv:
         # Apple ProRes is only available on macOS (and not on ARM64 currently)
         if is_macos:
-            prores_ver = get_ver("prores", "Not Used")
+            prores_ver = get_version("prores", "Not Used")
             rv_specific_deps.append(("Apple ProRes", prores_ver, "Apple Proprietary"))
 
         # Always add these for commercial RV (version will show "Not Used" if not available)
         rv_specific_deps.extend(
             [
-                ("ARRI SDK", get_ver("arriraw", "Not Used"), "ARRI Proprietary"),
-                ("NDI SDK", get_ver("ndi", "Not Used"), "NDI Proprietary"),
-                ("RED R3D SDK", get_ver("r3dsdk", "Not Used"), "RED Proprietary"),
-                ("x264", get_ver("x264", "Not Used"), "x264 Commercial License"),
+                ("ARRI SDK", get_version("arriraw", "Not Used"), "ARRI Proprietary"),
+                ("NDI SDK", get_version("ndi", "Not Used"), "NDI Proprietary"),
+                ("RED R3D SDK", get_version("r3dsdk", "Not Used"), "RED Proprietary"),
+                ("x264", get_version("x264", "Not Used"), "x264 Commercial License"),
             ]
         )
 
     # Other third-party components (alphabetical order)
     other_deps = [
-        ("AJA NTV2 SDK", get_ver("aja"), "MIT License"),
-        ("Blackmagic DeckLink SDK", get_ver("bmd"), "Proprietary"),
-        ("Boehm GC", get_ver("gc"), "MIT-style"),
-        ("dav1d", get_ver("dav1d"), "BSD 2-Clause"),
-        ("Dear ImGui", get_ver("imgui"), "MIT License"),
-        ("Expat", get_ver("expat"), "MIT License"),
-        ("FFmpeg", get_ver("FFmpeg"), "LGPL v2.1+"),
-        ("GLEW", get_ver("GLEW"), "Modified BSD / MIT"),
-        ("libjpeg-turbo", get_ver("jpegturbo"), "BSD-style"),
-        ("libpng", get_ver("png"), "libpng License"),
-        ("LibRaw", get_ver("raw"), "LGPL v2.1 / CDDL"),
-        ("libtiff", get_ver("tiff"), "libtiff License"),
-        ("libwebp", get_ver("webp"), "BSD 3-Clause"),
-        ("nanobind", get_ver("nanobind"), "BSD 3-Clause"),
-        ("OpenJPEG", get_ver("openjpeg"), "BSD 2-Clause"),
-        ("OpenJPH", get_ver("openjph"), "BSD 2-Clause"),
-        ("OpenSSL", get_ver("OpenSSL"), "Apache License 2.0"),
-        ("PCRE2", get_ver("pcre2"), "BSD License"),
-        ("spdlog", get_ver("spdlog"), "MIT License"),
-        ("yaml-cpp", get_ver("yaml-cpp"), "MIT License"),
-        ("zlib", get_ver("zlib"), "zlib License"),
+        ("AJA NTV2 SDK", get_version("aja"), "MIT License"),
+        ("Blackmagic DeckLink SDK", get_version("bmd"), "Proprietary"),
+        ("Boehm GC", get_version("gc"), "MIT-style"),
+        ("dav1d", get_version("dav1d"), "BSD 2-Clause"),
+        ("Dear ImGui", get_version("imgui"), "MIT License"),
+        ("Expat", get_version("expat"), "MIT License"),
+        ("FFmpeg", get_version("FFmpeg"), "LGPL v2.1+"),
+        ("GLEW", get_version("GLEW"), "Modified BSD / MIT"),
+        ("libjpeg-turbo", get_version("jpegturbo"), "BSD-style"),
+        ("libpng", get_version("png"), "libpng License"),
+        ("LibRaw", get_version("raw"), "LGPL v2.1 / CDDL"),
+        ("libtiff", get_version("tiff"), "libtiff License"),
+        ("libwebp", get_version("webp"), "BSD 3-Clause"),
+        ("nanobind", get_version("nanobind"), "BSD 3-Clause"),
+        ("OpenJPEG", get_version("openjpeg"), "BSD 2-Clause"),
+        ("OpenJPH", get_version("openjph"), "BSD 2-Clause"),
+        ("OpenSSL", get_version("OpenSSL"), "Apache License 2.0"),
+        ("PCRE2", get_version("pcre2"), "BSD License"),
+        ("spdlog", get_version("spdlog"), "MIT License"),
+        ("yaml-cpp", get_version("yaml-cpp"), "MIT License"),
+        ("zlib", get_version("zlib"), "zlib License"),
     ]
 
     return vfx_deps, other_deps, rv_specific_deps
@@ -121,10 +108,7 @@ def get_dependencies_info(vfx_platform, versions, app_name, platform=""):
 def generate_about_cpp(
     output_file,
     compiler,
-    build_type,
-    cxx_flags,
     vfx_platform,
-    build_root,
     platform,
     arch,
     app_name,
@@ -135,7 +119,7 @@ def generate_about_cpp(
 
     git_commit = get_git_info(git_hash)
     versions = parse_versions(versions_str)
-    vfx_deps, other_deps, rv_specific_deps = get_dependencies_info(vfx_platform, versions, app_name, platform)
+    vfx_deps, other_deps, rv_specific_deps = get_dependencies_info(versions, app_name, platform)
     build_date = datetime.now().strftime("%B %d, %Y")
 
     # Build the HTML content
@@ -282,37 +266,28 @@ const char* about_RV = "{html_str}";
 
 
 if __name__ == "__main__":
-    print("=== generate_about_rv.py starting ===", flush=True)
-    if len(sys.argv) < 9:
-        print(
-            "Usage: generate_about_rv.py <output_file> <compiler> <build_type> "
-            + "<cxx_flags> <vfx_platform> <build_root> <platform> <arch> <app_name> [versions] [git_hash]"
-        )
-        sys.exit(1)
+    parser = argparse.ArgumentParser(
+        description="Generate about_rv.cpp with build and dependency information"
+    )
+    parser.add_argument("output_file", help="Path to the output C++ file")
+    parser.add_argument("compiler", help="Compiler name and version")
+    parser.add_argument("vfx_platform", help="VFX Platform version (e.g., CY2024)")
+    parser.add_argument("platform", help="Target platform (e.g., macOS, Linux, Windows)")
+    parser.add_argument("arch", help="Target architecture (e.g., x86_64, arm64)")
+    parser.add_argument("app_name", nargs="?", default="Open RV", help="Application name")
+    parser.add_argument("versions", nargs="?", default="", help="Comma-separated dependency versions")
+    parser.add_argument("git_hash", nargs="?", default="", help="Git commit hash")
 
-    output_file = sys.argv[1]
-    compiler = sys.argv[2]
-    build_type = sys.argv[3]
-    cxx_flags = sys.argv[4]
-    vfx_platform = sys.argv[5]
-    build_root = sys.argv[6]
-    platform = sys.argv[7]
-    arch = sys.argv[8]
-    app_name = sys.argv[9] if len(sys.argv) > 9 else "Open RV"
-    versions_str = sys.argv[10] if len(sys.argv) > 10 else ""
-    git_hash = sys.argv[11] if len(sys.argv) > 11 else ""
+    args = parser.parse_args()
 
-    print(f"=== Calling generate_about_cpp for: {output_file} ===", flush=True)
+    print(f"=== generate_about_rv.py: generating {args.output_file} ===", flush=True)
     generate_about_cpp(
-        output_file,
-        compiler,
-        build_type,
-        cxx_flags,
-        vfx_platform,
-        build_root,
-        platform,
-        arch,
-        app_name,
-        versions_str,
-        git_hash,
+        args.output_file,
+        args.compiler,
+        args.vfx_platform,
+        args.platform,
+        args.arch,
+        args.app_name,
+        args.versions,
+        args.git_hash,
     )

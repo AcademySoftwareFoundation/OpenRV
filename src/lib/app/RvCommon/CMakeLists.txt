@@ -223,9 +223,6 @@ ELSE()
   )
 ENDIF()
 
-# Get CXX flags
-STRING(REPLACE ";" " " _cxx_flags_str "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_${CMAKE_BUILD_TYPE}}")
-
 # Get VFX platform
 IF(RV_VFX_PLATFORM)
   SET(_vfx_platform_str
@@ -236,9 +233,6 @@ ELSE()
       "N/A"
   )
 ENDIF()
-
-# Get build root
-GET_FILENAME_COMPONENT(_build_root ${CMAKE_BINARY_DIR} NAME)
 
 # Get platform and arch
 IF(RV_TARGET_DARWIN)
@@ -331,8 +325,8 @@ STRING(REPLACE ";" "," _versions_str "${_versions_list}")
 ADD_CUSTOM_COMMAND(
   OUTPUT ${_about_rv_cpp}
   COMMAND
-    python3 ${CMAKE_CURRENT_SOURCE_DIR}/generate_about_rv.py ${_about_rv_cpp} "${_compiler_name}" "${CMAKE_BUILD_TYPE}" "${_cxx_flags_str}"
-    "${_vfx_platform_str}" "${_build_root}" "${_platform_name}" "${_arch_name}" "${RV_UI_APPLICATION_NAME}" "${_versions_str}" "${RV_GIT_COMMIT_SHORT_HASH}"
+    python3 ${CMAKE_CURRENT_SOURCE_DIR}/generate_about_rv.py ${_about_rv_cpp} "${_compiler_name}"
+    "${_vfx_platform_str}" "${_platform_name}" "${_arch_name}" "${RV_UI_APPLICATION_NAME}" "${_versions_str}" "${RV_GIT_COMMIT_SHORT_HASH}"
   DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/generate_about_rv.py
   COMMENT "Generating about_rv.cpp with build information"
   VERBATIM
