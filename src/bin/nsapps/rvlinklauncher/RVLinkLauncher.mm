@@ -9,13 +9,13 @@
 @interface RVLinkURLHandler : NSObject {
     BOOL urlProcessed;
     NSAlert *currentAlert;
+    NSString *latestRVLinkURL;
 }
 - (void)handleGetURLEvent:(NSAppleEventDescriptor *)event withReplyEvent:(NSAppleEventDescriptor *)replyEvent;
 - (void)processRVLinkURL:(NSString *)rvlinkURL;
 - (BOOL)hasProcessedURL;
 - (NSMutableArray<NSURL *> *)findRVAppsUsingMDFind;
 - (NSMutableArray<NSURL *> *)findRVAppsUsingWorkspace:(NSString *)rvlinkURL;
-+ (BOOL)terminateOtherInstancesIfNeeded;
 @end
 
 @implementation RVLinkURLHandler
@@ -24,6 +24,7 @@
     if (self) {
         urlProcessed = NO;
         currentAlert = nil;
+        latestRVLinkURL = nil;
     }
     return self;
 }
@@ -32,51 +33,42 @@
     return urlProcessed;
 }
 
-+ (BOOL)terminateOtherInstancesIfNeeded {
-    NSString *bundleID = [[NSBundle mainBundle] bundleIdentifier];
-    NSArray<NSRunningApplication *> *runningInstances = 
-        [NSRunningApplication runningApplicationsWithBundleIdentifier:bundleID];
-    
-    int currentPID = [[NSProcessInfo processInfo] processIdentifier];
-    
-    // Terminate any other running instances to prevent multiple dialogs
-    for (NSRunningApplication *app in runningInstances) {
-        int instancePID = [app processIdentifier];
-        
-        if (instancePID != currentPID) {
-            // Use forceTerminate because the other instance may be blocked in a modal dialog
-            [app forceTerminate];
-            [NSThread sleepForTimeInterval:0.3];
-        }
+- (void)dealloc {
+    if (latestRVLinkURL != nil) {
+        [latestRVLinkURL release];
+        latestRVLinkURL = nil;
     }
-    
-    return NO;
+    [super dealloc];
 }
 
 - (void)handleGetURLEvent:(NSAppleEventDescriptor *)event withReplyEvent:(NSAppleEventDescriptor *)replyEvent
 {
     NSLog(@"*** RVLinkLauncher Apple Event handler called! ***");
-    
-    // If we're showing a dialog, close it so we can show a new one with the new URL
-    if (currentAlert != nil) {
-        [[NSApplication sharedApplication] stopModal];
-        [[currentAlert window] close];
-        urlProcessed = NO;
-        currentAlert = nil;
-    }
-    
+
     @try {
         NSAppleEventDescriptor *directObjectDescriptor = [event paramDescriptorForKeyword:keyDirectObject];
         if (directObjectDescriptor != nil) {
             NSString *url = [directObjectDescriptor stringValue];
             if (url != nil && [url hasPrefix:@"rvlink://"]) {
                 NSLog(@"RVLinkLauncher received URL: %@", url);
-                [self processRVLinkURL:url];
+
+                // Track the most recent rvlink URL
+                if (latestRVLinkURL != nil) {
+                    [latestRVLinkURL release];
+                    latestRVLinkURL = nil;
+                }
+                latestRVLinkURL = [url copy];
+
+                if (currentAlert != nil) {
+                    // Update the existing dialog in place and bring it to the front
+                    [currentAlert setInformativeText:[NSString stringWithFormat:@"Opening: %@", latestRVLinkURL]];
+                    [[currentAlert window] makeKeyAndOrderFront:nil];
+                } else {
+                    // No dialog is currently shown – process normally
+                    [self processRVLinkURL:latestRVLinkURL];
+                }
+
                 urlProcessed = YES;
-                // Exit app after processing URL
-                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-                    [[NSApplication sharedApplication] terminate:nil];
-                });
             } else {
                 NSLog(@"RVLinkLauncher received invalid or non-rvlink URL: %@", url);
             }
@@ -153,6 +145,16 @@
 
 - (void)processRVLinkURL:(NSString *)rvlinkURL
 {
+    // Remember the URL we are currently processing so that if new URLs arrive
+    // while a chooser dialog is visible, we can still open the most recent one.
+    if (rvlinkURL != nil) {
+        if (latestRVLinkURL != nil) {
+            [latestRVLinkURL release];
+            latestRVLinkURL = nil;
+        }
+        latestRVLinkURL = [rvlinkURL copy];
+    }
+
     // Find all RV apps using both discovery methods
     NSLog(@"Discovering RV applications using multiple methods...");
     
@@ -204,7 +206,7 @@
         NSString *displayName = [[NSFileManager defaultManager] displayNameAtPath:[selectedAppURL path]];
         NSLog(@"Only one RV application found, launching directly: %@", displayName);
         
-        NSURL *targetURL = [NSURL URLWithString:rvlinkURL];
+        NSURL *targetURL = [NSURL URLWithString:latestRVLinkURL];
         if (targetURL != nil) {
             NSWorkspaceOpenConfiguration *config = [NSWorkspaceOpenConfiguration configuration];
             [[NSWorkspace sharedWorkspace] openURLs:@[targetURL]
@@ -215,11 +217,11 @@
                     NSLog(@"Failed to launch app: %@", [selectedAppURL path]);
                     NSLog(@"Error: %@", [err localizedDescription]);
                 } else {
-                    NSLog(@"Successfully opened URL: %@ with app: %@", rvlinkURL, [selectedAppURL path]);
+                    NSLog(@"Successfully opened URL: %@ with app: %@", latestRVLinkURL, [selectedAppURL path]);
                 }
             }];
         } else {
-            NSLog(@"Invalid rvlink URL: %@", rvlinkURL);
+            NSLog(@"Invalid rvlink URL: %@", latestRVLinkURL);
         }
         return;
     }
@@ -227,7 +229,7 @@
     // Present chooser UI for multiple apps
     currentAlert = [[NSAlert alloc] init];
     [currentAlert setMessageText:@"Choose RV Application"];
-    [currentAlert setInformativeText:[NSString stringWithFormat:@"Opening: %@", rvlinkURL]];
+    [currentAlert setInformativeText:[NSString stringWithFormat:@"Opening: %@", latestRVLinkURL]];
     [currentAlert addButtonWithTitle:@"Open"];
     [currentAlert addButtonWithTitle:@"Cancel"];
 
@@ -271,7 +273,7 @@
     
     if (result == NSAlertFirstButtonReturn) {
         NSURL *selectedAppURL = [[popup selectedItem] representedObject];
-        NSURL *targetURL = [NSURL URLWithString:rvlinkURL];
+        NSURL *targetURL = [NSURL URLWithString:latestRVLinkURL];
         if (targetURL != nil) {
             NSWorkspaceOpenConfiguration *config = [NSWorkspaceOpenConfiguration configuration];
             [[NSWorkspace sharedWorkspace] openURLs:@[targetURL]
@@ -325,9 +327,6 @@ int main(int argc, const char * argv[])
             CFRelease(currentHandler);
         }
 
-        // Terminate any other running instances to prevent multiple dialogs
-        [RVLinkURLHandler terminateOtherInstancesIfNeeded];
-
         // Check for command line URL
         NSString *rvlinkURL = nil;
         for (int i = 1; i < argc; i++) {
@@ -338,10 +337,17 @@ int main(int argc, const char * argv[])
             }
         }
         
-        // If a URL was provided via command line, process it immediately and exit
+        // If a URL was provided via command line, forward it to LaunchServices and exit.
+        // This avoids creating a second launcher instance with its own UI when the
+        // binary is invoked directly from the terminal.
         if (rvlinkURL != nil) {
-            NSLog(@"Processing rvlink URL from command line: %@", rvlinkURL);
-            [urlHandler processRVLinkURL:rvlinkURL];
+            NSLog(@"Forwarding rvlink URL from command line to LaunchServices: %@", rvlinkURL);
+            NSURL *url = [NSURL URLWithString:rvlinkURL];
+            if (url != nil) {
+                [[NSWorkspace sharedWorkspace] openURL:url];
+            } else {
+                NSLog(@"Invalid rvlink URL from command line: %@", rvlinkURL);
+            }
             return 0;
         }
         
