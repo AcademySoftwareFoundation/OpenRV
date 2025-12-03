@@ -5,9 +5,9 @@
     <key>CFBundleName</key>
     <string>RVLinkLauncher</string>
     <key>CFBundleIdentifier</key>
-    <string>com.autodesk.${RV_INTERNAL_APPLICATION_NAME}.${_target}.${RV_MAJOR_VERSION}.${RV_MINOR_VERSION}.${RV_REVISION_NUMBER}</string>
+    <string>com.autodesk.${RV_INTERNAL_APPLICATION_NAME}.${_target}.${RV_MAJOR_VERSION}.${RV_MINOR_VERSION}.${RV_REVISION_NUMBER}${RV_VERSION_SUFFIX}</string>
     <key>CFBundleVersion</key>
-    <string>${RV_MAJOR_VERSION}.${RV_MINOR_VERSION}.${RV_REVISION_NUMBER}</string>
+    <string>${RV_MAJOR_VERSION}.${RV_MINOR_VERSION}.${RV_REVISION_NUMBER}${RV_VERSION_SUFFIX}</string>
     <key>CFBundleExecutable</key>
     <string>RVLinkLauncher</string>
     <key>CFBundlePackageType</key>
@@ -20,10 +20,8 @@
     <string>RVLinkLauncher.icns</string>
     <key>LSApplicationCategoryType</key>
     <string>public.app-category.utilities</string>
-    <key>LSMultipleInstancesProhibited</key>
-    <true/>
     <key>CFBundleShortVersionString</key>
-    <string>${RV_MAJOR_VERSION}.${RV_MINOR_VERSION}.${RV_REVISION_NUMBER}</string>
+    <string>${RV_MAJOR_VERSION}.${RV_MINOR_VERSION}.${RV_REVISION_NUMBER}${RV_VERSION_SUFFIX}</string>
     <key>CFBundleSupportedPlatforms</key>
     <array>
         <string>MacOSX</string>
