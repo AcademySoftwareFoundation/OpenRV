@@ -659,7 +659,8 @@ namespace IPCore
     //      with the audio thread.
     //----------------------------------------------------------------------
     QTAudioIODevice::QTAudioIODevice(QTAudioThread& audiothread)
-        : m_thread(audiothread){QTAUDIO_DEBUG("QTAudioIODevice:")}
+        : m_thread(audiothread)
+        , m_silence(false){QTAUDIO_DEBUG("QTAudioIODevice:")}
 
         QTAudioIODevice::~QTAudioIODevice()
     {
@@ -686,6 +687,23 @@ namespace IPCore
     qint64 QTAudioIODevice::readData(char* data, qint64 maxLenInBytes)
     {
         //  QTAUDIO_DEBUG("QTAudioIODevice::readData")
+        if (m_thread.audioOutput()->isFlushing())
+        {
+            memset(data, 0, maxLenInBytes);
+            m_thread.audioOutput()->accumulateFlushedBytes(maxLenInBytes);
+            if (m_thread.audioOutput()->flushedEnough())
+            {
+                m_thread.audioOutput()->suspendAudio();
+                m_thread.audioOutput()->doneFlushing();
+            }
+            return maxLenInBytes;
+        }
+
+        if (m_silence)
+        {
+            memset(data, 0, maxLenInBytes);
+            return maxLenInBytes;
+        }
         int bytesWritten = m_thread.qIODeviceCallback(data, maxLenInBytes);
         return bytesWritten;
     }
@@ -712,7 +730,9 @@ namespace IPCore
         , m_device(audioDevice)
         , m_format(audioFormat)
         , m_ioDevice(ioDevice)
-        , m_thread(audioThread){QTAUDIO_DEBUG("QTAudioOutput")}
+        , m_thread(audioThread)
+        , m_isFlushing(false)
+        , m_flushedBytes(0){QTAUDIO_DEBUG("QTAudioOutput")}
 
         QTAudioOutput::~QTAudioOutput()
     {
@@ -739,6 +759,8 @@ namespace IPCore
     {
         QTAUDIO_DEBUG("QTAudioOutput::startAudio check")
 
+        doneFlushing();
+
         if (state() == QAudio::StoppedState)
         {
             m_thread.startOfInitialization();
@@ -753,6 +775,7 @@ namespace IPCore
             // again before calling start().
             setAudioOutputBufferSize();
 #endif
+            m_ioDevice.stopProducingSilence();
             m_thread.setStartSample(0);
             m_thread.setProcessedSamples(0);
             m_thread.setPreRollDelay(0);
@@ -764,6 +787,7 @@ namespace IPCore
 #ifdef PLATFORM_LINUX
             m_thread.setPreRollDelay(0);
 #endif
+            m_ioDevice.stopProducingSilence();
             resume();
         }
     }
@@ -783,7 +807,12 @@ namespace IPCore
 
         if (state() != QAudio::StoppedState)
         {
+#ifdef PLATFORM_LINUX
+            // On Linux, use suspend() instead of stop() to avoid audio corruption after multiple cycles
+            suspend();
+#else
             stop();
+#endif
         }
     }
 
@@ -797,16 +826,39 @@ namespace IPCore
         }
     }
 
+    void QTAudioOutput::startFlushing()
+    {
+        m_isFlushing = true;
+        m_flushedBytes = 0;
+    }
+
     void QTAudioOutput::suspendAndResetAudio()
     {
         QTAUDIO_DEBUG("QTAudioOutput::suspendAndResetAudio")
 
         if (state() != QAudio::StoppedState)
         {
+#ifdef PLATFORM_LINUX
+            // On Linux, to avoid audio corruption after multiple cycles, we
+            // cannot call reset() or suspend() directly as the internal
+            // buffer will not be cleared, causing audio bleed. Instead,
+            // we start a flushing process that will feed the sink with
+            // silence until its buffer is cleared, and then suspend it.
+            if (state() == QAudio::ActiveState)
+            {
+                startFlushing();
+            }
+            else
+            {
+                suspend();
+            }
+#else
             suspend();
+            // On non-Linux platforms, do a full reset to clear buffers immediately
             QTAUDIO_DEBUG("QTAudioOutput::suspendAndResetAudio - before reset")
             reset();
             QTAUDIO_DEBUG("QTAudioOutput::suspendAndResetAudio - after reset")
+#endif
         }
     }
 
