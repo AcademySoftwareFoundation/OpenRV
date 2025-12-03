@@ -801,8 +801,12 @@ jobs:
 
       - name: Add Rust to PATH for msys2
         run: |
-          ls -al $HOME/.cargo/bin
-          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+          echo $CARGO_HOME
+
+      - name: Add Rust to PATH for msys2
+        run: |
+          echo $CARGO_HOME
+          echo "$CARGO_HOME/bin" >> $GITHUB_PATH
         shell: msys2 {0}
 
       - name: Display environment variables
