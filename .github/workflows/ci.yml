@@ -808,7 +808,7 @@ jobs:
 
       - name: Add Rust to PATH for msys2
         run: |
-          echo "export PATH=\"$HOME/.cargo/bin:\$PATH\"" >> ~/.bash_profile
+          echo "export PATH=\"/c/Users/runneradmin/.cargo/bin:\$PATH\"" >> ~/.bash_profile
         shell: msys2 {0}
 
       - name: Verify Rust in msys2
