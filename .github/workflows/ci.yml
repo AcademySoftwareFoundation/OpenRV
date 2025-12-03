@@ -276,10 +276,12 @@ jobs:
         if: ${{ matrix.rocky-version == '8' }}
         run: |
           source /opt/rh/gcc-toolset-11/enable
-          echo "CC=$(which gcc)" >> $GITHUB_ENV
-          echo "CXX=$(which g++)" >> $GITHUB_ENV
-          echo "PATH=$PATH" >> $GITHUB_ENV
+          echo "/opt/rh/gcc-toolset-11/root/usr/bin" >> $GITHUB_PATH
+          echo "CC=/opt/rh/gcc-toolset-11/root/usr/bin/gcc" >> $GITHUB_ENV
+          echo "CXX=/opt/rh/gcc-toolset-11/root/usr/bin/g++" >> $GITHUB_ENV
           echo "LD_LIBRARY_PATH=$LD_LIBRARY_PATH" >> $GITHUB_ENV
+          gcc --version
+          g++ --version
 
       - name: Check out repository code
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # 4.1.7
@@ -795,6 +797,12 @@ jobs:
       - name: Set ACLOCAL_PATH environment variable
         run: |
           echo "export ACLOCAL_PATH=/c/msys64/usr/share/aclocal" >> ~/.bash_profile
+        shell: msys2 {0}
+
+      - name: Add Rust to PATH for msys2
+        run: |
+          ls -al $HOME/.cargo/bin
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
         shell: msys2 {0}
 
       - name: Display environment variables
