@@ -777,6 +777,13 @@ jobs:
         with:
           toolchain: stable
 
+      - name: Verify Rust installation
+        run: |
+          rustc --version
+          cargo --version
+          where rustc
+          where cargo
+
       - name: Cache CMake for Windows
         uses: actions/cache@v4
         id: windows-cmake-cache
@@ -801,12 +808,15 @@ jobs:
 
       - name: Add Rust to PATH for msys2
         run: |
-          echo $CARGO_HOME
+          echo "export PATH=\"$HOME/.cargo/bin:\$PATH\"" >> ~/.bash_profile
+        shell: msys2 {0}
 
-      - name: Add Rust to PATH for msys2
+      - name: Verify Rust in msys2
         run: |
-          echo $CARGO_HOME
-          echo "$CARGO_HOME/bin" >> $GITHUB_PATH
+          echo "Checking for Rust in msys2..."
+          rustc --version || echo "WARNING: Rust not found in msys2 PATH"
+          cargo --version || echo "WARNING: Cargo not found in msys2 PATH"
+          echo "PATH: $PATH"
         shell: msys2 {0}
 
       - name: Display environment variables
@@ -882,6 +892,15 @@ jobs:
           cmake --version
           export QT_HOME=c:/Qt/${{ matrix.qt-version }}/msvc2019_64
           cmake -B _build -G "Visual Studio 17 2022" -A x64 -DRV_DEPS_WIN_PERL_ROOT=c:/Strawberry/perl/bin -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} -DRV_DEPS_QT_LOCATION=$QT_HOME -DRV_VFX_PLATFORM=${{ matrix.vfx-platform }}
+        shell: msys2 {0}
+
+      - name: Final Rust verification before build
+        run: |
+          echo "Verifying Rust is accessible for the build..."
+          rustc --version
+          cargo --version
+          echo "Rust PATH:"
+          where rustc
         shell: msys2 {0}
           
       - name: Build OpenRV dependencies
