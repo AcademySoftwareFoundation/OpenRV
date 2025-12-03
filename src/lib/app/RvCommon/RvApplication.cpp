@@ -132,7 +132,11 @@ namespace
 
                                     // Another known warning/error which we can safely ignore.
                                     "Release of profile requested but WebEnginePage still not "
-                                    "deleted"sv};
+                                    "deleted"sv,
+
+                                    // Qt pointer dispatch warning when touch events arrive without
+                                    // a target window (harmless, happens during window transitions)
+                                    "skipping QEventPoint"sv};
 
         return any_of(silenced.begin(), silenced.end(), [text](const auto& msg) { return text.find(msg) != string::npos; });
     }
