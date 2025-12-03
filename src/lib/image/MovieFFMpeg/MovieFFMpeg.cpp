@@ -1480,6 +1480,7 @@ namespace TwkMovie
                 avcodec_free_context(avCodecContext);
                 return false;
             }
+            m_pxlFormatOnOpen = nativeFormat;
         }
 
         //
@@ -3912,6 +3913,26 @@ namespace TwkMovie
         AVPixelFormat nativeFormat = videoCodecContext->sw_pix_fmt;
         outFrame->format = nativeFormat;
         const AVPixFmtDescriptor* desc = av_pix_fmt_desc_get(nativeFormat);
+        if (!desc && nativeFormat == AV_PIX_FMT_NONE)
+        {
+            static bool warned = false;
+            if (!warned)
+            {
+                std::cout << "WARNING: FFmpeg detected pixel format "
+                             "AV_PIX_FMT_NONE for frames in "
+                          << m_filename << ". Using fallback pixel format: "
+                          << av_get_pix_fmt_name(m_pxlFormatOnOpen)
+                          << std::endl;
+                warned = true;
+            }
+            // Use the pixel format detected when the file was opened as a
+            // fallback. Assumes that m_pxlFormatOnOpen is set because the file
+            // was opened.
+            outFrame->format = m_pxlFormatOnOpen;
+            nativeFormat = m_pxlFormatOnOpen;
+            desc = av_pix_fmt_desc_get(nativeFormat);
+        }
+
         int bitSize = desc->comp[0].depth - desc->comp[0].shift;
         int numPlanes = 0;
         bool hasAlpha = (desc->flags & AV_PIX_FMT_FLAG_ALPHA);
