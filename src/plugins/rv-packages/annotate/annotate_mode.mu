@@ -1737,6 +1737,25 @@ class: AnnotateMinorMode : MinorMode
         setStringProperty(orderProperty, order, true);
         endCompoundStateChange();
     }
+
+    method: clearAllUsersUndoRedoStacks (void; string node, int frame, string excludeUser="")
+    {
+        regex undoRedoPattern = regex(".*\\.frame:[0-9]+\\.(undo|redo)_.*");
+
+        for_each (prop; properties(node))
+        {
+            if (undoRedoPattern.match(prop) && propertyExists(prop))
+            {
+                if (excludeUser != "")
+                {
+                    regex excludePattern = regex(".*_(" + excludeUser + ")$");
+                    if (excludePattern.match(prop))
+                    {
+                        continue;
+                    }
+                }
+                setStringProperty(prop, string[] {}, true);
+            }
         }
     }
 
@@ -1746,36 +1765,114 @@ class: AnnotateMinorMode : MinorMode
         let undoProperty = frameUserUndoStackName(node, frame);
         let redoProperty = frameUserRedoStackName(node, frame);
 
-        if (propertyExists(undoProperty))
+        if (propertyExists(orderProperty) && propertyInfo(orderProperty).size > 0)
         {
-            if (!propertyExists(redoProperty))
-            {
-                newProperty(redoProperty, StringType, 1);
-            }
-
-            let undo = getStringProperty(undoProperty);
-            let redo = getStringProperty(redoProperty);
             let order = getStringProperty(orderProperty);
-
-            if (undo.size() > 0)
+            
+            if (order.size() > 0)
             {
-                redo.push_back("start");
-                for_each(stroke; undo)
+                string[] undo;
+                string[] redo;
+                
+                for_each(stroke; order)
                 {
-                    redo.push_back(stroke);
+                    undo.push_back(stroke);
                 }
-                redo.push_back("end");
-
-                undo.clear();
+                undo.push_back(string(order.size()));
+                undo.push_back("clearAll");
+                
                 order.clear();
+                
+                beginCompoundStateChange();
+                
+                if (!propertyExists(undoProperty))
+                {
+                    newProperty(undoProperty, StringType, 1);
+                }
+                if (!propertyExists(redoProperty))
+                {
+                    newProperty(redoProperty, StringType, 1);
+                }
+                
+                setStringProperty(undoProperty, undo, true);
+                setStringProperty(redoProperty, redo, true);
+                setStringProperty(orderProperty, order, true);
+
+                let excludeUser = encodedName(_user) + "_" + _processId;
+                clearAllUsersUndoRedoStacks(node, frame, excludeUser);
+                
+                endCompoundStateChange();
+            }
+        }
+    }
+
+    method: clearAllPaint (void;)
+    {
+        string[] clearAllActions;
+        clearAllActions.push_back("clearAllFrames");
+
+        beginCompoundStateChange();
+        
+        for_each(node; nodes())
+        {
+            let annotatedFrames = findAnnotatedFrames(node);
+            for_each(frame; annotatedFrames)
+            {
+                let orderProperty = frameOrderName(node, frame);
+                if (propertyExists(orderProperty) && propertyInfo(orderProperty).size > 0)
+                {
+                    let order = getStringProperty(orderProperty);
+                    for_each(stroke; order)
+                    {
+                        clearAllActions.push_back(node);
+                        clearAllActions.push_back(stroke);
+                    }
+
+                    setStringProperty(orderProperty, string[] {}, true);
+                }
+
+                let sourceFrame = sourceFrame(frame);
+                if (sourceFrame != frame)
+                {
+                    let sourceFrameOrderProperty = frameOrderName(node, sourceFrame);
+                    if (propertyExists(sourceFrameOrderProperty) && propertyInfo(sourceFrameOrderProperty).size > 0)
+                    {
+                        let srcOrder = getStringProperty(sourceFrameOrderProperty);
+                        for_each(stroke; srcOrder)
+                        {
+                            clearAllActions.push_back(node);
+                            clearAllActions.push_back(stroke);
+                        }
+                        
+                        setStringProperty(sourceFrameOrderProperty, string[] {}, true);
+                    }
+                }
+
+                clearAllUsersUndoRedoStacks(node, frame, "");
+            }
+        }
+        
+        if (clearAllActions.size() > 1)
+        {
+            let clearAllUndoName = undoClearAllFramesActionName();
+            let clearAllRedoName = redoClearAllFramesActionName();
+            
+            if (!propertyExists(clearAllUndoName))
+            {
+                newProperty(clearAllUndoName, StringType, 1);
             }
 
-            beginCompoundStateChange();
-            setStringProperty(undoProperty, undo, true);
-            setStringProperty(redoProperty, redo, true);
-            setStringProperty(orderProperty, order, true);
-            endCompoundStateChange();
+            setStringProperty(clearAllUndoName, clearAllActions, true);
+            
+            if (propertyExists(clearAllRedoName))
+            {
+                deleteProperty(clearAllRedoName);
+            }
         }
+
+        endCompoundStateChange();
+        updateFrameDependentState();
+        redraw();
     }
 
     method: populateAnnotationList (void;)
@@ -1918,20 +2015,13 @@ class: AnnotateMinorMode : MinorMode
         {
             let answer = alertPanel(true, InfoAlert, "Clear all annotations from the current timeline?", nil, "OK", "Cancel", nil);
 
-            if (answer != 0)
-            {
-                return;
-            }
-        }
-
-        for_each(node; nodes())
+        if (answer != 0)
         {
-            let annotatedFrames = findAnnotatedFrames(node);
-            for_each(frame; annotatedFrames)
-            {
-                clearPaint(node, frame);
-                clearPaint(node, sourceFrame(frame));
-            }
+            return;
+        }
+        else
+        {
+            clearAllPaint();
         }
 
         updateFrameDependentState();
