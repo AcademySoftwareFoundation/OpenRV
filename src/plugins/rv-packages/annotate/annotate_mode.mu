@@ -140,6 +140,8 @@ class: AnnotateMinorMode : MinorMode
     QAction           _undoAct;
     QAction           _redoAct;
     QAction           _clearAct;
+    QAction           _clearFrameAct;
+    QAction           _clearAllFramesAct;
     QListWidget       _annotationsWidget;
     QTextEdit         _notesEdit;
     QDockWidget       _manageDock;
@@ -418,7 +420,7 @@ class: AnnotateMinorMode : MinorMode
     method: updateFrameDependentState (void;)
     {
         updateCurrentNode();
-        undoRedoUpdate();
+        undoRedoClearUpdate();
         //populateAnnotationList();
     }
 
@@ -1142,7 +1144,7 @@ class: AnnotateMinorMode : MinorMode
             endCompoundStateChange();
         }
 
-        undoRedoUpdate();
+        undoRedoClearUpdate();
         redraw();
     }
 
@@ -1397,6 +1399,7 @@ class: AnnotateMinorMode : MinorMode
         }
         
         updateDrawModeUI();
+        undoRedoClearUpdate();
         _toolSliderLabel.setText(if d.sliderName eq nil then "Opacity" else d.sliderName);
     }
 
@@ -1450,13 +1453,15 @@ class: AnnotateMinorMode : MinorMode
         _colorDialog.show();
     }
 
-    method: undoRedoUpdate (void;)
+    method: undoRedoClearUpdate (void;)
     {
-        if (_currentNode eq nil)
+        if (_currentDrawMode eq _selectDrawMode || _currentNode eq nil)
         {
             _undoAct.setEnabled(false);
             _redoAct.setEnabled(false);
             _clearAct.setEnabled(false);
+            _clearFrameAct.setEnabled(false);
+            _clearAllFramesAct.setEnabled(false);
             return;
         }
 
@@ -1464,19 +1469,47 @@ class: AnnotateMinorMode : MinorMode
         let undoProperty = frameUserUndoStackName(_currentNode, frame);
         let redoProperty = frameUserRedoStackName(_currentNode, frame);
         let orderProperty = frameOrderName(_currentNode, frame);
+        let clearAllUndoProperty = undoClearAllFramesActionName();
+        let clearAllRedoProperty = redoClearAllFramesActionName();
         let playing = isPlaying();
 
-        _undoAct.setEnabled(!playing &&
-                            propertyExists(undoProperty) &&
-                            propertyInfo(undoProperty).size > 0);
+        let hasUndoClearAll = propertyExists(clearAllUndoProperty) && 
+                              propertyInfo(clearAllUndoProperty).size > 0;
+        let hasFrameUndo = propertyExists(undoProperty) &&
+                           propertyInfo(undoProperty).size > 0;
+        _undoAct.setEnabled(!playing && (hasUndoClearAll || hasFrameUndo));
 
-        _redoAct.setEnabled(!playing &&
-                            propertyExists(redoProperty) &&
-                            propertyInfo(redoProperty).size > 0);
+        let hasRedoClearAll = propertyExists(clearAllRedoProperty) &&
+                              propertyInfo(clearAllRedoProperty).size > 0;
+        let hasFrameRedo = propertyExists(redoProperty) &&
+                           propertyInfo(redoProperty).size > 0;
+        _redoAct.setEnabled(!playing && (hasRedoClearAll || hasFrameRedo));
 
-        _clearAct.setEnabled(!playing &&
-                            propertyExists(orderProperty) &&
-                            propertyInfo(orderProperty).size > 0);
+        _clearAct.setEnabled(!playing);
+
+        if (!playing)
+        {
+            bool hasCurrentFrameStrokes = propertyExists(orderProperty) && 
+                                          propertyInfo(orderProperty).size > 0;
+            _clearFrameAct.setEnabled(hasCurrentFrameStrokes);
+
+            bool hasAnyStrokes = false;
+            for_each(node; nodes())
+            {
+                let annotatedFrames = findAnnotatedFrames(node);
+                if (!annotatedFrames.empty())
+                {
+                    hasAnyStrokes = true;
+                    break;
+                }
+            }
+            _clearAllFramesAct.setEnabled(hasAnyStrokes);
+        }
+        else
+        {
+            _clearFrameAct.setEnabled(false);
+            _clearAllFramesAct.setEnabled(false);
+        }
     }
 
     method: undoPaint (void;)
@@ -2855,14 +2888,14 @@ class: AnnotateMinorMode : MinorMode
         _clearButton.setDefaultAction(_clearAct);
 
         let clearMenu = QMenu("Clear Frame", _clearButton);
-        let clearFrame = clearMenu.addAction("Clear Frame");
-        let clearAllFrames = clearMenu.addAction("Clear All Frames on Timeline");
+        _clearFrameAct = clearMenu.addAction("Clear Frame");
+        _clearAllFramesAct = clearMenu.addAction("Clear All Frames on Timeline");
 
         _clearButton.setMenu(clearMenu);
         _clearButton.setPopupMode(QToolButton.InstantPopup);
 
-        connect(clearFrame, QAction.triggered, clearSlot);
-        connect(clearAllFrames, QAction.triggered, clearAllSlot);
+        connect(_clearFrameAct, QAction.triggered, clearSlot);
+        connect(_clearAllFramesAct, QAction.triggered, clearAllSlot);
         _clearButton.setStyleSheet("QToolButton::menu-indicator { subcontrol-position: bottom right; top: -2px; }");
 
         _drawDock.setWidget(_drawPane);
@@ -3089,7 +3122,7 @@ class: AnnotateMinorMode : MinorMode
     {
         updateCurrentNode();
         updateToolAvailability();
-        undoRedoUpdate();
+        undoRedoClearUpdate();
         
         if (commands.isEventCategoryEnabled("annotate_category"))
         {
