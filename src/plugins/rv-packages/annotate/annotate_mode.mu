@@ -408,12 +408,12 @@ class: AnnotateMinorMode : MinorMode
         "%s.frame:%d.redo_%s_%d" % (node, frame, encodedName(_user), _processId);
     }
 
-    method: undoClearAllFramesActionName (string;)
+    method: undoClearAllFramesName (string;)
     {
         "%s.paint.undoClearAllFrames_%s_%d" % (viewNode(), encodedName(_user), _processId);
     }
 
-    method: redoClearAllFramesActionName (string;)
+    method: redoClearAllFramesName (string;)
     {
         "%s.paint.redoClearAllFrames_%s_%d" % (viewNode(), encodedName(_user), _processId);
     }
@@ -1470,8 +1470,8 @@ class: AnnotateMinorMode : MinorMode
         let undoProperty = frameUserUndoStackName(_currentNode, frame);
         let redoProperty = frameUserRedoStackName(_currentNode, frame);
         let orderProperty = frameOrderName(_currentNode, frame);
-        let clearAllUndoProperty = undoClearAllFramesActionName();
-        let clearAllRedoProperty = redoClearAllFramesActionName();
+        let clearAllUndoProperty = undoClearAllFramesName();
+        let clearAllRedoProperty = redoClearAllFramesName();
         let playing = isPlaying();
 
         let hasUndoClearAll = propertyExists(clearAllUndoProperty) && 
@@ -1515,8 +1515,8 @@ class: AnnotateMinorMode : MinorMode
 
     method: undoPaint (void;)
     {
-        let clearAllUndoProperty = undoClearAllFramesActionName();
-        let clearAllRedoProperty = redoClearAllFramesActionName();
+        let clearAllUndoProperty = undoClearAllFramesName();
+        let clearAllRedoProperty = redoClearAllFramesName();
         
         if (propertyExists(clearAllUndoProperty) && propertyInfo(clearAllUndoProperty).size > 0)
         {
@@ -1551,7 +1551,7 @@ class: AnnotateMinorMode : MinorMode
                 }
                 setStringProperty(clearAllRedoProperty, clearAllUndo, true);
                 
-                deleteProperty(clearAllUndoProperty);
+                setStringProperty(clearAllUndoProperty, string[] {}, true);
                 
                 endCompoundStateChange();
                 return;
@@ -1641,12 +1641,12 @@ class: AnnotateMinorMode : MinorMode
 
     method: redoPaint (void;)
     {
-        let clearAllUndoName = undoClearAllFramesActionName();
-        let clearAllRedoName = redoClearAllFramesActionName();
+        let clearAllUndoProperty = undoClearAllFramesName();
+        let clearAllRedoProperty = redoClearAllFramesName();
 
-        if (propertyExists(clearAllRedoName) && propertyInfo(clearAllRedoName).size > 0)
+        if (propertyExists(clearAllRedoProperty) && propertyInfo(clearAllRedoProperty).size > 0)
         {
-            let clearAllRedo = getStringProperty(clearAllRedoName);
+            let clearAllRedo = getStringProperty(clearAllRedoProperty);
 
             // clearAllRedo format: ["clearAllFrames", "node1", "stroke1", "node2", "stroke2"]
             if (clearAllRedo.size() > 1 && clearAllRedo[0] == "clearAllFrames")
@@ -1677,13 +1677,13 @@ class: AnnotateMinorMode : MinorMode
                     }
                 }
                 
-                if (!propertyExists(clearAllUndoName))
+                if (!propertyExists(clearAllUndoProperty))
                 {
-                    newProperty(clearAllUndoName, StringType, 1);
+                    newProperty(clearAllUndoProperty, StringType, 1);
                 }
-                setStringProperty(clearAllUndoName, clearAllRedo, true);
+                setStringProperty(clearAllUndoProperty, clearAllRedo, true);
                 
-                deleteProperty(clearAllRedoName);
+                setStringProperty(clearAllRedoProperty, string[] {}, true);
                 
                 endCompoundStateChange();
                 return;
@@ -1887,19 +1887,19 @@ class: AnnotateMinorMode : MinorMode
         
         if (clearAllActions.size() > 1)
         {
-            let clearAllUndoName = undoClearAllFramesActionName();
-            let clearAllRedoName = redoClearAllFramesActionName();
+            let clearAllUndoProperty = undoClearAllFramesName();
+            let clearAllRedoProperty = redoClearAllFramesName();
             
-            if (!propertyExists(clearAllUndoName))
+            if (!propertyExists(clearAllUndoProperty))
             {
-                newProperty(clearAllUndoName, StringType, 1);
+                newProperty(clearAllUndoProperty, StringType, 1);
             }
 
-            setStringProperty(clearAllUndoName, clearAllActions, true);
+            setStringProperty(clearAllUndoProperty, clearAllActions, true);
             
-            if (propertyExists(clearAllRedoName))
+            if (propertyExists(clearAllRedoProperty))
             {
-                deleteProperty(clearAllRedoName);
+                setStringProperty(clearAllRedoProperty, string[] {}, true);
             }
         }
 
@@ -2119,7 +2119,7 @@ class: AnnotateMinorMode : MinorMode
             return DisabledMenuState;
         }
 
-        let clearAllUndoProperty = undoClearAllFramesActionName();
+        let clearAllUndoProperty = undoClearAllFramesName();
         if (propertyExists(clearAllUndoProperty) && propertyInfo(clearAllUndoProperty).size > 0)
         {
             return UncheckedMenuState;
@@ -2135,8 +2135,8 @@ class: AnnotateMinorMode : MinorMode
             return DisabledMenuState;
         }
         
-        let clearAllRedoProprety = redoClearAllFramesActionName();
-        if (propertyExists(clearAllRedoProprety) && propertyInfo(clearAllRedoProprety).size > 0)
+        let clearAllRedoProperty = redoClearAllFramesName();
+        if (propertyExists(clearAllRedoProperty) && propertyInfo(clearAllRedoProperty).size > 0)
         {
             return UncheckedMenuState;
         }
