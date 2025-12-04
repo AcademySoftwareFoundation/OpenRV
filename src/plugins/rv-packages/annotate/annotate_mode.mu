@@ -396,15 +396,17 @@ class: AnnotateMinorMode : MinorMode
         "%s.frame:%d.order" % (node, frame);
     }
 
-
     method: frameUserUndoStackName (string; string node, int frame)
     {
-        "%s.frame:%d.undo_%s" % (node, frame, encodedName(_user));
+        "%s.frame:%d.undo_%s_%d" % (node, frame, encodedName(_user), _processId);
     }
 
     method: frameUserRedoStackName (string; string node, int frame)
     {
-        "%s.frame:%d.redo_%s" % (node, frame, encodedName(_user));
+    method: undoClearAllFramesActionName (string;)
+    {
+        "%s.paint.undoClearAllFrames_%s_%d" % (viewNode(), encodedName(_user), _processId);
+    }
     }
 
     method: updateFrameDependentState (void;)
@@ -1461,41 +1463,128 @@ class: AnnotateMinorMode : MinorMode
 
     method: undoPaint (void;)
     {
+        let clearAllUndoProperty = undoClearAllFramesActionName();
+        let clearAllRedoProperty = redoClearAllFramesActionName();
+        
+        if (propertyExists(clearAllUndoProperty) && propertyInfo(clearAllUndoProperty).size > 0)
+        {
+            let clearAllUndo = getStringProperty(clearAllUndoProperty);
+
+            // clearAllUndo format: ["clearAllFrames", "node1", "stroke1", "node2", "stroke2"]
+            if (clearAllUndo.size() > 1 && clearAllUndo[0] == "clearAllFrames")
+            {
+                beginCompoundStateChange();
+                
+                for (int i = 1; i < clearAllUndo.size(); i += 2)
+                {
+                    let node = clearAllUndo[i];
+                    let stroke = clearAllUndo[i + 1];
+
+                    let parts = stroke.split(":"); // Stroke format: type:id:frame:user_processId
+                    let frame = int(parts[2]);
+
+                    let orderName = frameOrderName(node, frame);
+
+                    if (!propertyExists(orderName))
+                    {
+                        newProperty(orderName, StringType, 1);
+                    }
+
+                    insertStringProperty(orderName, string[] {stroke});
+                }
+
+                if (!propertyExists(clearAllRedoProperty))
+                {
+                    newProperty(clearAllRedoProperty, StringType, 1);
+                }
+                setStringProperty(clearAllRedoProperty, clearAllUndo, true);
+                
+                deleteProperty(clearAllUndoProperty);
+                
+                endCompoundStateChange();
+                return;
+            }
+        }
+
         let frame = _currentNodeInfo.frame;
-        let orderProperty = frameOrderName(_currentNode, frame);
         let undoProperty = frameUserUndoStackName(_currentNode, frame);
         let redoProperty = frameUserRedoStackName(_currentNode, frame);
-
-        if (propertyExists(undoProperty))
+        let orderProperty = frameOrderName(_currentNode, frame);
+        
+        if (!propertyExists(undoProperty) || propertyInfo(undoProperty).size == 0)
         {
-            if (!propertyExists(redoProperty))
-            {
-                newProperty(redoProperty, StringType, 1);
-            }
-
-            let undo = getStringProperty(undoProperty);
-            let redo = getStringProperty(redoProperty);
-            let order = getStringProperty(orderProperty);
-
-            let stroke = undo.back();
-            redo.push_back(stroke);
-            undo.resize(undo.size()-1);
-
-            for_index(i; order)
-            {
-                if (order[i] == stroke)
-                {
-                    order.erase(i, 1);
-                    break;
-                }
-            }
-
-            beginCompoundStateChange();
-            setStringProperty(undoProperty, undo, true);
-            setStringProperty(redoProperty, redo, true);
-            setStringProperty(orderProperty, order, true);
-            endCompoundStateChange();
+            return;
         }
+        
+        if (!propertyExists(redoProperty))
+        {
+            newProperty(redoProperty, StringType, 1);
+        }
+        
+        let undo = getStringProperty(undoProperty);
+        let redo = getStringProperty(redoProperty);
+        let order = getStringProperty(orderProperty);
+        
+        let action = undo.back();
+        undo.resize(undo.size() - 1);
+        
+        if (action == "create")
+        {
+            if (undo.size() > 0)
+            {
+                let stroke = undo.back();
+                undo.resize(undo.size() - 1);
+                
+                for_index(i; order)
+                {
+                    if (order[i] == stroke)
+                    {
+                        order.erase(i, 1);
+                        break;
+                    }
+                }
+                
+                redo.push_back(stroke);
+                redo.push_back("create");
+            }
+        }
+        else if (action == "clearAll")
+        {
+            if (undo.size() > 0)
+            {
+                let strokeCount = undo.back();
+                undo.resize(undo.size() - 1);
+                let count = int(strokeCount);
+                
+                string[] strokes;
+                for (int i = 0; i < count; i++)
+                {
+                    if (undo.size() > 0)
+                    {
+                        strokes.push_back(undo.back());
+                        undo.resize(undo.size() - 1);
+                    }
+                }
+
+                for_each(stroke; strokes)
+                {
+                    order.push_back(stroke);
+                }
+                
+                for_each(stroke; strokes)
+                {
+                    redo.push_back(stroke);
+                }
+                redo.push_back(strokeCount);
+                redo.push_back("clearAll");
+            }
+        }
+        
+        beginCompoundStateChange();
+        setStringProperty(undoProperty, undo, true);
+        setStringProperty(redoProperty, redo, true);
+        setStringProperty(orderProperty, order, true);
+        endCompoundStateChange();
     }
 
     method: redoPaint (void;)
@@ -1816,9 +1905,18 @@ class: AnnotateMinorMode : MinorMode
 
     method: undoState (int;)
     {
-        if isSessionEmpty() || _currentNode eq nil
-             then DisabledMenuState
-             else propOnState(frameUserUndoStackName(_currentNode, _currentNodeInfo.frame));
+        if (isSessionEmpty() || _currentNode eq nil)
+        {
+            return DisabledMenuState;
+        }
+
+        let clearAllUndoProperty = undoClearAllFramesActionName();
+        if (propertyExists(clearAllUndoProperty) && propertyInfo(clearAllUndoProperty).size > 0)
+        {
+            return UncheckedMenuState;
+        }
+
+        return propOnState(frameUserUndoStackName(_currentNode, _currentNodeInfo.frame));
     }
 
     method: redoState (int;)
