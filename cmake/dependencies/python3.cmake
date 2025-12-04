@@ -377,13 +377,16 @@ IF(RV_TARGET_WINDOWS
    AND CMAKE_BUILD_TYPE MATCHES "^Debug$"
 )
   # OCIO v2.2's pybind11 doesn't find python<ver>.lib in Debug since the name is python<ver>_d.lib.
+  # Also, Rust libraries (like cryptography via pyo3) look for python3.lib.
   ADD_CUSTOM_COMMAND(
     TARGET ${_python3_target}
     POST_BUILD
     COMMENT "Copying Debug Python lib as a unversionned file for Debug"
     COMMAND cmake -E copy_if_different ${_python3_implib} ${_python_release_libpath}
-    COMMAND cmake -E copy_if_different ${_python3_implib} ${_python_release_in_bin_libpath} DEPENDS ${_python3_target} ${_requirements_output_file}
-            ${_requirements_input_file}
+    COMMAND cmake -E copy_if_different ${_python3_implib} ${_python_release_in_bin_libpath}
+    COMMAND cmake -E copy_if_different ${_lib_dir}/python${PYTHON_VERSION_MAJOR}_d.lib ${_lib_dir}/python${PYTHON_VERSION_MAJOR}.lib
+    COMMAND cmake -E copy_if_different ${_bin_dir}/python${PYTHON_VERSION_MAJOR}_d.lib ${_bin_dir}/python${PYTHON_VERSION_MAJOR}.lib
+    DEPENDS ${_python3_target} ${_requirements_output_file} ${_requirements_input_file}
   )
 ENDIF()
 
