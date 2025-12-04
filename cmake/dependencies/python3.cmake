@@ -273,6 +273,7 @@ ENDIF()
 SET(_requirements_install_command
     ${CMAKE_COMMAND} -E env
     ${_otio_debug_env}
+    "OPENSSL_DIR=${RV_DEPS_OPENSSL_INSTALL_DIR}"
     "CMAKE_ARGS=-DPYTHON_LIBRARY=${_python3_cmake_library} -DPYTHON_INCLUDE_DIR=${_include_dir} -DPYTHON_EXECUTABLE=${_python3_executable}"
     "${_python3_executable}" -s -E -I -m pip install --upgrade --no-cache-dir --force-reinstall --no-binary :all: -r "${_requirements_output_file}"
 )
