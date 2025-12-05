@@ -171,7 +171,8 @@ class: AnnotateMinorMode : MinorMode
 
     char              _cursorChar;
 
-    int              _hideDrawPane;
+    int               _hideDrawPane;
+    bool              _skipConfirmations;
 
     // filtering control based on time and dx/dy deltas during drag events
     // to prevent sending ridiculous number of mouse/tablet events if using
@@ -1651,27 +1652,28 @@ class: AnnotateMinorMode : MinorMode
 
     method: clearAllSlot (void; bool checked)
     {
-        let answer = alertPanel(true, InfoAlert, "Clear all annotations from the current timeline?", nil, "OK", "Cancel", nil);
+        if (!_skipConfirmations) 
+        {
+            let answer = alertPanel(true, InfoAlert, "Clear all annotations from the current timeline?", nil, "OK", "Cancel", nil);
 
-        if (answer != 0)
-        {
-            return;
-        }
-        else
-        {
-            for_each(node; nodes())
+            if (answer != 0)
             {
-                let annotatedFrames = findAnnotatedFrames(node);
-                for_each(frame; annotatedFrames)
-                {
-                    clearPaint(node, frame);
-                    clearPaint(node, sourceFrame(frame));
-                }
+                return;
             }
-
-            updateFrameDependentState();
-            redraw();
         }
+
+        for_each(node; nodes())
+        {
+            let annotatedFrames = findAnnotatedFrames(node);
+            for_each(frame; annotatedFrames)
+            {
+                clearPaint(node, frame);
+                clearPaint(node, sourceFrame(frame));
+            }
+        }
+
+        updateFrameDependentState();
+        redraw();
     }
 
     method: redoSlot (void; bool checked)
@@ -2078,6 +2080,7 @@ class: AnnotateMinorMode : MinorMode
         _hideDrawPane      = 0;
         _userSelectedNode   = "";
         _disabledTooltipMessage = "This tool is currently unavailable";
+        _skipConfirmations = system.getenv("RV_SKIP_CONFIRMATIONS", nil) neq nil;
 
         let m = mainWindowWidget(),
             g = QActionGroup(m);
