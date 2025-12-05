@@ -782,8 +782,6 @@ namespace IPCore
         void setGlobalAudioOffset(float, bool internal = false);
         void setGlobalSwapEyes(bool);
 
-        bool filterLiveReviewEvents();
-
         //
         //  Event Category Blocking
         //
@@ -1239,7 +1237,6 @@ namespace IPCore
         int m_avPlaybackVersion;
         bool m_enableFastTurnAround;
         double m_lastDrawingTime;
-        bool m_filterLiveReviewEvents{false};
         std::vector<std::string_view> m_disabledEventCategories; // List of blocked event categories
 
         class FpsCalculator;

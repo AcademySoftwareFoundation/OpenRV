@@ -680,8 +680,6 @@ namespace IPCore
         }
     }
 
-    bool Session::filterLiveReviewEvents() { return m_filterLiveReviewEvents; }
-
     //----------------------------------------------------------------------
     // Event Category Blocking
     //----------------------------------------------------------------------
