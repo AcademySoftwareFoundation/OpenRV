@@ -266,9 +266,7 @@ const char* about_RV = "{html_str}";
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Generate about_rv.cpp with build and dependency information"
-    )
+    parser = argparse.ArgumentParser(description="Generate about_rv.cpp with build and dependency information")
     parser.add_argument("output_file", help="Path to the output C++ file")
     parser.add_argument("compiler", help="Compiler name and version")
     parser.add_argument("vfx_platform", help="VFX Platform version (e.g., CY2024)")
