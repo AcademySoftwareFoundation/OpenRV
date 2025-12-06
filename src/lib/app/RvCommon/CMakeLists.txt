@@ -191,10 +191,161 @@ FOREACH(
   LIST(APPEND _sources ${outfile})
 ENDFOREACH()
 
+#
+# Generate about_rv.cpp with build information
+#
+SET(_about_rv_cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/${_target}/generated/about_rv.cpp
+)
+
+# Get compiler name
+IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+  SET(_compiler_name
+      "GCC ${CMAKE_CXX_COMPILER_VERSION}"
+  )
+ELSEIF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  IF(CMAKE_CXX_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC")
+    SET(_compiler_name
+        "Clang-cl ${CMAKE_CXX_COMPILER_VERSION}"
+    )
+  ELSE()
+    SET(_compiler_name
+        "Clang ${CMAKE_CXX_COMPILER_VERSION}"
+    )
+  ENDIF()
+ELSEIF(MSVC)
+  SET(_compiler_name
+      "MSVC ${CMAKE_CXX_COMPILER_VERSION}"
+  )
+ELSE()
+  SET(_compiler_name
+      "${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}"
+  )
+ENDIF()
+
+# Get VFX platform
+IF(RV_VFX_PLATFORM)
+  SET(_vfx_platform_str
+      ${RV_VFX_PLATFORM}
+  )
+ELSE()
+  SET(_vfx_platform_str
+      "N/A"
+  )
+ENDIF()
+
+# Get platform and arch
+IF(RV_TARGET_DARWIN)
+  SET(_platform_name
+      "macOS"
+  )
+ELSEIF(RV_TARGET_LINUX)
+  SET(_platform_name
+      "Linux"
+  )
+ELSEIF(RV_TARGET_WINDOWS)
+  SET(_platform_name
+      "Windows"
+  )
+ELSE()
+  SET(_platform_name
+      ${CMAKE_SYSTEM_NAME}
+  )
+ENDIF()
+
+SET(_arch_name
+    ${CMAKE_SYSTEM_PROCESSOR}
+)
+
+# Create a JSON-like string with versions (using semicolon as separator for CMake list)
+SET(_versions_list
+    "Qt:${RV_DEPS_QT_VERSION}"
+    "Python:${RV_DEPS_PYTHON3_VERSION}"
+    "PySide:${RV_DEPS_PYSIDE_VERSION}"
+    "Boost:${RV_DEPS_BOOST_VERSION}"
+    "Imath:${RV_DEPS_IMATH_VERSION}"
+    "OpenEXR:${RV_DEPS_OPENEXR_VERSION}"
+    "OpenImageIO:${RV_DEPS_OIIO_VERSION}"
+    "OpenColorIO:${RV_DEPS_OCIO_VERSION}"
+    "FFmpeg:${RV_DEPS_FFMPEG_VERSION}"
+    "OpenSSL:${RV_DEPS_OPENSSL_VERSION}"
+    "GLEW:${RV_DEPS_GLEW_VERSION_LIB}"
+    "spdlog:${RV_DEPS_SPDLOG_VERSION}"
+    "yaml-cpp:${RV_DEPS_YAML_CPP_VERSION}"
+    "zlib:${RV_DEPS_ZLIB_VERSION}"
+    "dav1d:${RV_DEPS_DAV1D_VERSION}"
+    "jpegturbo:${RV_DEPS_JPEGTURBO_VERSION}"
+    "png:${RV_DEPS_PNG_VERSION}"
+    "tiff:${RV_DEPS_TIFF_VERSION}"
+    "webp:${RV_DEPS_WEBP_VERSION}"
+    "openjpeg:${RV_DEPS_OPENJPEG_VERSION}"
+    "openjph:${RV_DEPS_OPENJPH_VERSION}"
+    "raw:${RV_DEPS_RAW_VERSION}"
+    "gc:${RV_DEPS_GC_VERSION}"
+    "aja:${RV_DEPS_AJA_VERSION}"
+    "bmd:${RV_DEPS_BMD_VERSION}"
+    "imgui:${RV_DEPS_IMGUI_VERSION}"
+    "numpy:$ENV{RV_DEPS_NUMPY_VERSION}"
+    "otio:${RV_DEPS_OTIO_VERSION}"
+    "expat:${RV_DEPS_EXPAT_VERSION}"
+    "nanobind:${RV_DEPS_NANOBIND_VERSION}"
+    "pcre2:${RV_DEPS_PCRE2_VERSION}"
+)
+
+# Add commercial RV-specific SDK versions if they exist
+IF(DEFINED RV_DEPS_PRORES_VERSION
+   AND RV_DEPS_PRORES_VERSION
+)
+  LIST(APPEND _versions_list "prores:${RV_DEPS_PRORES_VERSION}")
+ENDIF()
+IF(DEFINED RV_DEPS_R3DSDK_VERSION
+   AND RV_DEPS_R3DSDK_VERSION
+)
+  LIST(APPEND _versions_list "r3dsdk:${RV_DEPS_R3DSDK_VERSION}")
+ENDIF()
+IF(DEFINED RV_DEPS_ARRIRAW_VERSION
+   AND RV_DEPS_ARRIRAW_VERSION
+)
+  LIST(APPEND _versions_list "arriraw:${RV_DEPS_ARRIRAW_VERSION}")
+ENDIF()
+IF(DEFINED RV_DEPS_X264_VERSION
+   AND RV_DEPS_X264_VERSION
+)
+  LIST(APPEND _versions_list "x264:${RV_DEPS_X264_VERSION}")
+ENDIF()
+IF(DEFINED RV_DEPS_NDI_VERSION
+   AND RV_DEPS_NDI_VERSION
+)
+  LIST(APPEND _versions_list "ndi:${RV_DEPS_NDI_VERSION}")
+ENDIF()
+
+STRING(REPLACE ";" "," _versions_str "${_versions_list}")
+
+ADD_CUSTOM_COMMAND(
+  OUTPUT ${_about_rv_cpp}
+  COMMAND
+    python3 ${CMAKE_CURRENT_SOURCE_DIR}/generate_about_rv.py ${_about_rv_cpp} "${_compiler_name}"
+    "${_vfx_platform_str}" "${_platform_name}" "${_arch_name}" "${RV_UI_APPLICATION_NAME}" "${_versions_str}" "${RV_GIT_COMMIT_SHORT_HASH}"
+  DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/generate_about_rv.py
+  COMMENT "Generating about_rv.cpp with build information"
+  VERBATIM
+)
+
+# Create explicit target to ensure about_rv.cpp is generated before RvCommon builds
+ADD_CUSTOM_TARGET(
+  generate_about_rv_cpp
+  DEPENDS ${_about_rv_cpp}
+)
+
+LIST(APPEND _sources ${_about_rv_cpp})
+
 ADD_LIBRARY(
   ${_target} STATIC
   ${_sources} qrc/RvCommon.qrc
 )
+
+# Ensure about_rv.cpp is generated before building RvCommon
+ADD_DEPENDENCIES(${_target} generate_about_rv_cpp)
 
 # Need that with Qt6 since the code for this target does not support unicode correctly.
 IF(RV_TARGET_WINDOWS
