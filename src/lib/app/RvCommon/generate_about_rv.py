@@ -47,7 +47,6 @@ def get_dependencies_info(versions, app_name, platform=""):
 
     vfx_deps = [
         ("Boost", get_version("Boost"), "Boost Software License"),
-        ("CMake", get_version("CMake"), "BSD 3-Clause"),
         ("Imath", get_version("Imath"), "BSD 3-Clause"),
         ("NumPy", get_version("numpy", "1.24+"), "BSD 3-Clause"),
         ("OpenColorIO", get_version("OpenColorIO"), "BSD 3-Clause"),

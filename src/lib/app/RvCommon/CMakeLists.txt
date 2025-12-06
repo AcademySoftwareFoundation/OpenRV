@@ -260,7 +260,6 @@ SET(_arch_name
 # Create a JSON-like string with versions (using semicolon as separator for CMake list)
 SET(_versions_list
     "Qt:${RV_DEPS_QT_VERSION}"
-    "CMake:${CMAKE_VERSION}"
     "Python:${RV_DEPS_PYTHON3_VERSION}"
     "PySide:${RV_DEPS_PYSIDE_VERSION}"
     "Boost:${RV_DEPS_BOOST_VERSION}"
