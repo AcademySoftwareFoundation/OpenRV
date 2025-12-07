@@ -31,18 +31,12 @@ SET(RV_DEPS_PYTHON_VERSION_SHORT
 )
 
 # This version is used for generating src/build/requirements.txt from requirements.txt.in template
-# All platforms install OpenTimelineIO from git to ensure consistent source builds.
 SET(_opentimelineio_version
     "${RV_DEPS_OTIO_VERSION}"
 )
 
 SET(_pyside_version 
     "${RV_DEPS_PYSIDE_VERSION}"
-)
-# Construct the full git URL for pip to use in requirements.txt
-# Using this avoids @ symbol conflicts in CONFIGURE_FILE
-SET(_opentimelineio_pip_url
-    "git+https://github.com/AcademySoftwareFoundation/OpenTimelineIO@v${_opentimelineio_version}#egg=OpenTimelineIO"
 )
 
 SET(_python3_download_url
@@ -78,9 +72,6 @@ SET(_source_dir
 SET(_build_dir
     ${RV_DEPS_BASE_DIR}/${_python3_target}/build
 )
-
-# Note: OpenTimelineIO is now installed via requirements.txt from git URL for all platforms.
-# This ensures consistent source builds across Windows, Mac, and Linux.
 
 FETCHCONTENT_DECLARE(
   ${_pyside_target}
@@ -283,12 +274,13 @@ ELSE()
   SET(_otio_debug_env "")
 ENDIF()
 
-# Single unified command for all platforms and build types
+# Using --no-binary :all: to ensure all packages with native extensions are built from source
+# against our custom Python build, preventing ABI compatibility issues.
 SET(_requirements_install_command
     ${CMAKE_COMMAND} -E env
     ${_otio_debug_env}
     "CMAKE_ARGS=-DPYTHON_LIBRARY=${_python3_cmake_library} -DPYTHON_INCLUDE_DIR=${_include_dir} -DPYTHON_EXECUTABLE=${_python3_executable}"
-    "${_python3_executable}" -m pip install --upgrade --no-cache-dir --force-reinstall -r "${_requirements_output_file}"
+    "${_python3_executable}" -m pip install --upgrade --no-cache-dir --force-reinstall --no-binary :all: -r "${_requirements_output_file}"
 )
 
 IF(RV_TARGET_WINDOWS)
