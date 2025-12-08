@@ -167,6 +167,9 @@ namespace Mu
             new Function(c, "PyFunction_Check", nPyFunction_Check, None, Return, "bool", Parameters,
                          new ParameterVariable(c, "obj", "python.PyObject"), End),
 
+            new Function(c, "PyObject_Str", nPyObject_Str, None, Return, "python.PyObject", Parameters,
+                         new ParameterVariable(c, "obj", "python.PyObject"), End),
+
             new Function(c, "Py_TYPE", nPy_TYPE, None, Return, "python.PyTypeObject", Parameters,
                          new ParameterVariable(c, "obj", "python.PyObject"), End),
 
@@ -1044,6 +1047,13 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         PyObject* obj = NODE_ARG_OBJECT(0, PyObject);
         NODE_RETURN(PyBytes_Check(obj));
+    }
+
+    NODE_IMPLEMENTATION(PyModule::nPyObject_Str, Pointer)
+    {
+        PyLockObject locker;
+        PyObject* obj = NODE_ARG_OBJECT(0, PyObject);
+        NODE_RETURN(PyObject_Str(obj));
     }
 
     NODE_IMPLEMENTATION(PyModule::nPyObject_CallObject, Pointer)
