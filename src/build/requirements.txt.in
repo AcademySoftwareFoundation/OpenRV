@@ -25,6 +25,4 @@ packaging               # License: Apache Software License, BSD License
 requests                # License: Apache Software License (Apache 2.0)
 cryptography            # License: Apache Software License, BSD License ((Apache-2.0 OR BSD-3-Clause) AND PSF-2.0)
 pydantic                # License: MIT License (MIT)
-python-dateutil         # License: Apache Software License, BSD License (Apache 2.0, BSD-3-Clause)
-pygments                # License: BSD License (BSD-2-Clause)
 
