@@ -554,6 +554,19 @@ class: AnnotateMinorMode : MinorMode
             setStringProperty(redoName, string[] {}, true);
         }
 
+        let clearAllUndoProperty = undoClearAllFramesName();
+        let clearAllRedoProperty = redoClearAllFramesName();
+        
+        if (propertyExists(clearAllUndoProperty))
+        {
+            setStringProperty(clearAllUndoProperty, string[] {}, true);
+        }
+        
+        if (propertyExists(clearAllRedoProperty))
+        {
+            setStringProperty(clearAllRedoProperty, string[] {}, true);
+        }
+
         endCompoundStateChange();
         return n;
     }
@@ -671,6 +684,19 @@ class: AnnotateMinorMode : MinorMode
         if (propertyExists(redoName))
         {
             setStringProperty(redoName, string[] {}, true);
+        }
+
+        let clearAllUndoProperty = undoClearAllFramesName();
+        let clearAllRedoProperty = redoClearAllFramesName();
+        
+        if (propertyExists(clearAllUndoProperty))
+        {
+            setStringProperty(clearAllUndoProperty, string[] {}, true);
+        }
+        
+        if (propertyExists(clearAllRedoProperty))
+        {
+            setStringProperty(clearAllRedoProperty, string[] {}, true);
         }
 
         endCompoundStateChange();
