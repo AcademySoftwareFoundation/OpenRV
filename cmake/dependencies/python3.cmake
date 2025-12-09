@@ -13,34 +13,32 @@ SET(_opentimelineio_target
 )
 
 SET(_pyside_target
-  "${RV_DEPS_PYSIDE_TARGET}"
+    "${RV_DEPS_PYSIDE_TARGET}"
 )
 
 SET(_python3_version
     "${RV_DEPS_PYTHON_VERSION}"
 )
-string(REPLACE "." ";" _python_version_list "${_python3_version}")
+STRING(REPLACE "." ";" _python_version_list "${_python3_version}")
 
-list(GET _python_version_list 0 PYTHON_VERSION_MAJOR)
-list(GET _python_version_list 1 PYTHON_VERSION_MINOR)
-list(GET _python_version_list 2 PYTHON_VERSION_PATCH)
-
+LIST(GET _python_version_list 0 PYTHON_VERSION_MAJOR)
+LIST(GET _python_version_list 1 PYTHON_VERSION_MINOR)
+LIST(GET _python_version_list 2 PYTHON_VERSION_PATCH)
 
 SET(RV_DEPS_PYTHON_VERSION_SHORT
     "${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}"
 )
 
-# This version is used for generating src/build/requirements.txt from requirements.txt.in template
-# All platforms install OpenTimelineIO from git to ensure consistent source builds.
+# This version is used for generating src/build/requirements.txt from requirements.txt.in template All platforms install OpenTimelineIO from git to ensure
+# consistent source builds.
 SET(_opentimelineio_version
     "${RV_DEPS_OTIO_VERSION}"
 )
 
-SET(_pyside_version 
+SET(_pyside_version
     "${RV_DEPS_PYSIDE_VERSION}"
 )
-# Construct the full git URL for pip to use in requirements.txt
-# Using this avoids @ symbol conflicts in CONFIGURE_FILE
+# Construct the full git URL for pip to use in requirements.txt Using this avoids @ symbol conflicts in CONFIGURE_FILE
 SET(_opentimelineio_pip_url
     "git+https://github.com/AcademySoftwareFoundation/OpenTimelineIO@v${_opentimelineio_version}#egg=OpenTimelineIO"
 )
@@ -49,7 +47,7 @@ SET(_python3_download_url
     "https://github.com/python/cpython/archive/refs/tags/v${_python3_version}.zip"
 )
 
-SET(_python3_download_hash 
+SET(_python3_download_hash
     "${RV_DEPS_PYTHON_DOWNLOAD_HASH}"
 )
 
@@ -62,11 +60,11 @@ SET(_opentimelineio_git_tag
 )
 
 SET(_pyside_archive_url
-  "${RV_DEPS_PYSIDE_ARCHIVE_URL}"
+    "${RV_DEPS_PYSIDE_ARCHIVE_URL}"
 )
 
-SET(_pyside_download_hash 
-  "${RV_DEPS_PYSIDE_DOWNLOAD_HASH}"
+SET(_pyside_download_hash
+    "${RV_DEPS_PYSIDE_DOWNLOAD_HASH}"
 )
 
 SET(_install_dir
@@ -79,8 +77,8 @@ SET(_build_dir
     ${RV_DEPS_BASE_DIR}/${_python3_target}/build
 )
 
-# Note: OpenTimelineIO is now installed via requirements.txt from git URL for all platforms.
-# This ensures consistent source builds across Windows, Mac, and Linux.
+# Note: OpenTimelineIO is now installed via requirements.txt from git URL for all platforms. This ensures consistent source builds across Windows, Mac, and
+# Linux.
 
 FETCHCONTENT_DECLARE(
   ${_pyside_target}
@@ -108,7 +106,6 @@ LIST(APPEND _python3_make_command ${_build_dir})
 
 LIST(APPEND _python3_make_command "--vfx_platform")
 LIST(APPEND _python3_make_command ${RV_VFX_CY_YEAR})
-
 
 IF(DEFINED RV_DEPS_OPENSSL_INSTALL_DIR)
   LIST(APPEND _python3_make_command "--openssl-dir")
@@ -260,11 +257,7 @@ SET(_requirements_output_file
     "${CMAKE_BINARY_DIR}/requirements.txt"
 )
 
-CONFIGURE_FILE(
-    ${_requirements_input_file}
-    ${_requirements_output_file}
-    @ONLY
-)
+CONFIGURE_FILE(${_requirements_input_file} ${_requirements_output_file} @ONLY)
 
 # OpenTimelineIO needs to be built from source with CMAKE_ARGS to ensure it uses
 # the correct custom-built Python libraries. This is required for both old and new
@@ -298,8 +291,18 @@ IF(RV_TARGET_WINDOWS)
        patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/patch/python-${RV_DEPS_PYTHON_VERSION}/python.${RV_DEPS_PYTHON_VERSION}.get_externals.bat.patch"
   )
 
-  #TODO: Above patches are for Python 3.11.9, need to add other versions.
-  RV_VFX_SET_VARIABLE(_patch_command CY2023 "" CY2024 "${_patch_python_command}" CY2025 "${_patch_python_command}" CY2026 "")
+  # TODO: Above patches are for Python 3.11.9, need to add other versions.
+  RV_VFX_SET_VARIABLE(
+    _patch_command
+    CY2023
+    ""
+    CY2024
+    "${_patch_python_command}"
+    CY2025
+    "${_patch_python_command}"
+    CY2026
+    ""
+  )
   # Split the command into a semi-colon separated list.
   SEPARATE_ARGUMENTS(_patch_command)
   STRING(
@@ -339,10 +342,8 @@ IF(APPLE
       patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/patch/pyopengl-accelerate.patch
   )
 
-  # TODO: pyopengl is now at 3.1.10.  
-  # Need to check if this is an improvement
-  # Still need the patch https://github.com/mcfletch/pyopengl/blob/master/accelerate/src/vbo.pyx
-  # https://github.com/mcfletch/pyopengl/compare/release-3.1.8...3.1.10
+  # TODO: pyopengl is now at 3.1.10. Need to check if this is an improvement Still need the patch
+  # https://github.com/mcfletch/pyopengl/blob/master/accelerate/src/vbo.pyx https://github.com/mcfletch/pyopengl/compare/release-3.1.8...3.1.10
   EXTERNALPROJECT_ADD(
     pyopengl_accelerate
     URL "https://github.com/mcfletch/pyopengl/archive/refs/tags/release-3.1.8.tar.gz"
@@ -387,7 +388,8 @@ IF(RV_TARGET_WINDOWS
     POST_BUILD
     COMMENT "Copying Debug Python lib as a unversionned file for Debug"
     COMMAND cmake -E copy_if_different ${_python3_implib} ${_python_release_libpath}
-    COMMAND cmake -E copy_if_different ${_python3_implib} ${_python_release_in_bin_libpath} DEPENDS ${_python3_target} ${_requirements_output_file} ${_requirements_input_file}
+    COMMAND cmake -E copy_if_different ${_python3_implib} ${_python_release_in_bin_libpath} DEPENDS ${_python3_target} ${_requirements_output_file}
+            ${_requirements_input_file}
   )
 ENDIF()
 
