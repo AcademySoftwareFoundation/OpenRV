@@ -18,7 +18,7 @@ is ready to be used.
 ```python
 Example:
 myObject = otio.schemadef.Paint.Paint(
-    name, points, rgba, type, brush, layer_range, visible
+    name, id, points, rgba, type, brush, layer_range, visible
 )
 """
 
@@ -35,8 +35,9 @@ class Paint(otio.core.SerializableObject):
     def __init__(
         self,
         name: str = "",
-        points: list | None = None,
-        rgba: list | None = None,
+        id: str = "",
+        points: list = [],
+        rgba: list = [],
         type: str = "",
         brush: str = "",
         layer_range: otio.opentime.TimeRange | None = None,
@@ -44,6 +45,7 @@ class Paint(otio.core.SerializableObject):
     ) -> None:
         super().__init__()
         self.name = name
+        self.id = id
         self.points = points
         self.rgba = rgba
         self.type = type
@@ -52,6 +54,8 @@ class Paint(otio.core.SerializableObject):
         self.visible = visible
 
     name = otio.core.serializable_field("name", required_type=str, doc=("name: expects a string"))
+
+    id = otio.core.serializable_field("id", required_type=str, doc=("name: expects a string"))
 
     _points = otio.core.serializable_field(
         "points", required_type=list, doc=("points: expects a list of point objects")
@@ -97,13 +101,13 @@ class Paint(otio.core.SerializableObject):
 
     def __str__(self) -> str:
         return (
-            f"Paint({self.name}, {self.points}, {self.rgba}, {self.type}, "
+            f"Paint({self.name}, {self.id}, {self.points}, {self.rgba}, {self.type}, "
             f"{self.brush}, {self.layer_range}, {self.visible})"
         )
 
     def __repr__(self) -> str:
         return (
-            f"otio.schema.Paint(name={self.name!r}, points={self.points!r}, "
+            f"otio.schema.Paint(name={self.name!r}, id={self.id!r}, points={self.points!r}, "
             f"rgba={self.rgba!r}, type={self.type!r}, brush={self.brush!r}, "
             f"layer_range={self.layer_range!r}, visible={self.visible!r})"
         )
