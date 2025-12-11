@@ -2074,14 +2074,13 @@ class: AnnotateMinorMode : MinorMode
         {
             let answer = alertPanel(true, InfoAlert, "Clear all annotations from the current timeline?", nil, "OK", "Cancel", nil);
 
-        if (answer != 0)
-        {
-            return;
+            if (answer != 0)
+            {
+                return;
+            }
         }
-        else
-        {
-            clearAllPaint();
-        }
+
+        clearAllPaint();
 
         updateFrameDependentState();
         redraw();
