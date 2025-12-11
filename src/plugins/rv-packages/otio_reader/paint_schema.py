@@ -29,7 +29,7 @@ import opentimelineio as otio
 class Paint(otio.core.SerializableObject):
     """A schema for the start of an annotation"""
 
-    _serializable_label = "Paint.1"  # TODO: Update this to Paint.2
+    _serializable_label = "Paint.2"
     _name = "Paint"
 
     def __init__(
