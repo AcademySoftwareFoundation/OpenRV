@@ -212,25 +212,19 @@ class: AnnotateMinorMode : MinorMode
 
     method: findStrokeByUuid (string; string node, int frame, string uuid)
     {
-        regex strokePattern = regex("^" + regex.replace("\\.", node, "\\.") + "\\.(pen|text):[0-9]+:[0-9]+:.*$");
+        regex uuidPattern = regex("^" + regex.replace("\\.", node, "\\.") + "\\.(pen|text):[0-9]+:[0-9]+:.*\\.uuid$");
         
         for_each (property; properties(node))
         {
-            if (strokePattern.match(property))
+            if (uuidPattern.match(property))
             {
-                let parts = property.split(".");
-                if (parts.size() >= 2)
+                let storedId = getStringProperty(property).front();
+                if (storedId == uuid)
                 {
-                    let strokeName = parts[1];
-                    let uuidProperty = "%s.%s.uuid" % (node, strokeName);
-                    
-                    if (propertyExists(uuidProperty))
+                    let parts = property.split(".");
+                    if (parts.size() >= 2)
                     {
-                        let storedId = getStringProperty(uuidProperty).front();
-                        if (storedId == uuid)
-                        {
-                            return strokeName;
-                        }
+                        return parts[1];
                     }
                 }
             }
@@ -1609,23 +1603,20 @@ class: AnnotateMinorMode : MinorMode
                     let node = clearAllUndo[i];
                     let uuid = clearAllUndo[i + 1];
                     
-                    if (uuid != "")
+                    let stroke = findStrokeByUuid(node, frame(), uuid);
+                    if (stroke != "")
                     {
-                        let stroke = findStrokeByUuid(node, frame(), uuid);
-                        if (stroke != "")
+                        let parts = stroke.split(":"); // Stroke format: type:id:frame:user_processId
+                        let frame = int(parts[2]);
+
+                        let orderName = frameOrderName(node, frame);
+
+                        if (!propertyExists(orderName))
                         {
-                            let parts = stroke.split(":"); // Stroke format: type:id:frame:user_processId
-                            let frame = int(parts[2]);
-
-                            let orderName = frameOrderName(node, frame);
-
-                            if (!propertyExists(orderName))
-                            {
-                                newProperty(orderName, StringType, 1);
-                            }
-
-                            insertStringProperty(orderName, string[] {stroke});
+                            newProperty(orderName, StringType, 1);
                         }
+
+                        insertStringProperty(orderName, string[] {stroke});
                     }
                 }
 
@@ -1758,28 +1749,25 @@ class: AnnotateMinorMode : MinorMode
                     let node = clearAllRedo[i];
                     let uuid = clearAllRedo[i + 1];
                     
-                    if (uuid != "")
+                    let stroke = findStrokeByUuid(node, frame(), uuid);
+                    if (stroke != "")
                     {
-                        let stroke = findStrokeByUuid(node, frame(), uuid);
-                        if (stroke != "")
-                        {
-                            let parts = stroke.split(":"); // Stroke format: type:id:frame:user_processId
-                            let frame = int(parts[2]);
+                        let parts = stroke.split(":"); // Stroke format: type:id:frame:user_processId
+                        let frame = int(parts[2]);
 
-                            let orderName = frameOrderName(node, frame);
-                            if (propertyExists(orderName))
+                        let orderName = frameOrderName(node, frame);
+                        if (propertyExists(orderName))
+                        {
+                            let order = getStringProperty(orderName);
+                            for_index(index; order)
                             {
-                                let order = getStringProperty(orderName);
-                                for_index(index; order)
+                                if (order[index] == stroke)
                                 {
-                                    if (order[index] == stroke)
-                                    {
-                                        order.erase(index, 1);
-                                        break;
-                                    }
+                                    order.erase(index, 1);
+                                    break;
                                 }
-                                setStringProperty(orderName, order, true);
                             }
+                            setStringProperty(orderName, order, true);
                         }
                     }
                 }
