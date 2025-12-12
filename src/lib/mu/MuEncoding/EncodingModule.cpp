@@ -38,36 +38,29 @@ namespace Mu
         MuLangContext* c = (MuLangContext*)globalModule()->context();
         c->arrayType(c->byteType(), 1, 0);
 
-        addSymbols(
-            new Function(c, "to_base64", EncodingModule::to_base64, None,
-                         Return, "byte[]", Parameters,
-                         new ParameterVariable(c, "data", "byte[]"), End),
+        addSymbols(new Function(c, "to_base64", EncodingModule::to_base64, None, Return, "byte[]", Parameters,
+                                new ParameterVariable(c, "data", "byte[]"), End),
 
-            new Function(c, "from_base64", EncodingModule::from_base64, None,
-                         Return, "byte[]", Parameters,
-                         new ParameterVariable(c, "data", "byte[]"), End),
+                   new Function(c, "from_base64", EncodingModule::from_base64, None, Return, "byte[]", Parameters,
+                                new ParameterVariable(c, "data", "byte[]"), End),
 
-            new Function(c, "string_to_utf8", EncodingModule::string_to_utf8,
-                         None, Return, "byte[]", Parameters,
-                         new ParameterVariable(c, "text", "string"), End),
+                   new Function(c, "string_to_utf8", EncodingModule::string_to_utf8, None, Return, "byte[]", Parameters,
+                                new ParameterVariable(c, "text", "string"), End),
 
-            new Function(c, "utf8_to_string", EncodingModule::utf8_to_string,
-                         None, Return, "string", Parameters,
-                         new ParameterVariable(c, "data", "byte[]"), End),
+                   new Function(c, "utf8_to_string", EncodingModule::utf8_to_string, None, Return, "string", Parameters,
+                                new ParameterVariable(c, "data", "byte[]"), End),
 
-            EndArguments);
+                   EndArguments);
     }
 
     NODE_IMPLEMENTATION(EncodingModule::to_base64, Pointer)
     {
-        static const char* base64Table =
-            "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+        static const char* base64Table = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
         Process* p = NODE_THREAD.process();
         MuLangContext* c = static_cast<MuLangContext*>(p->context());
         const DynamicArray* in = NODE_ARG_OBJECT(0, DynamicArray);
-        DynamicArray* out = new DynamicArray(
-            static_cast<const DynamicArrayType*>(in->type()), 1);
+        DynamicArray* out = new DynamicArray(static_cast<const DynamicArrayType*>(in->type()), 1);
 
         const size_t insize = in->size();
 
@@ -86,10 +79,8 @@ namespace Mu
             const byte c = in->element<byte>(i + 2);
 
             out->element<byte>(j + 0) = base64Table[a >> 2];
-            out->element<byte>(j + 1) =
-                base64Table[((a & 0x3) << 4) + (b >> 4)];
-            out->element<byte>(j + 2) =
-                base64Table[((b & 0xf) << 2) + (c >> 6)];
+            out->element<byte>(j + 1) = base64Table[((a & 0x3) << 4) + (b >> 4)];
+            out->element<byte>(j + 2) = base64Table[((b & 0xf) << 2) + (c >> 6)];
             out->element<byte>(j + 3) = base64Table[c & 0x3f];
         }
 
@@ -103,10 +94,8 @@ namespace Mu
             const byte b = in->element<byte>(insize - 1);
             const byte c = 0;
             out->element<byte>(outsize - 4) = base64Table[a >> 2];
-            out->element<byte>(outsize - 3) =
-                base64Table[((a & 0x3) << 4) + (b >> 4)];
-            out->element<byte>(outsize - 2) =
-                base64Table[((b & 0xf) << 2) + (c >> 6)];
+            out->element<byte>(outsize - 3) = base64Table[((a & 0x3) << 4) + (b >> 4)];
+            out->element<byte>(outsize - 2) = base64Table[((b & 0xf) << 2) + (c >> 6)];
             out->element<byte>(outsize - 1) = '=';
         }
         break;
@@ -115,8 +104,7 @@ namespace Mu
             const byte a = in->element<byte>(insize - 1);
             const byte b = 0;
             out->element<byte>(outsize - 4) = base64Table[a >> 2];
-            out->element<byte>(outsize - 3) =
-                base64Table[((a & 0x3) << 4) + (b >> 4)];
+            out->element<byte>(outsize - 3) = base64Table[((a & 0x3) << 4) + (b >> 4)];
             out->element<byte>(outsize - 2) = '=';
             out->element<byte>(outsize - 1) = '=';
         }
@@ -149,8 +137,7 @@ namespace Mu
         Process* p = NODE_THREAD.process();
         MuLangContext* c = static_cast<MuLangContext*>(p->context());
         const DynamicArray* in = NODE_ARG_OBJECT(0, DynamicArray);
-        DynamicArray* out = new DynamicArray(
-            static_cast<const DynamicArrayType*>(in->type()), 1);
+        DynamicArray* out = new DynamicArray(static_cast<const DynamicArrayType*>(in->type()), 1);
 
         const size_t insize = in->size();
         const size_t rem = insize % 4;
@@ -205,8 +192,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(p->context());
         const StringType::String* s = NODE_ARG_OBJECT(0, StringType::String);
 
-        const DynamicArrayType* atype =
-            static_cast<const DynamicArrayType*>(NODE_THIS.type());
+        const DynamicArrayType* atype = static_cast<const DynamicArrayType*>(NODE_THIS.type());
         DynamicArray* array = new DynamicArray(atype, 1);
 
         //

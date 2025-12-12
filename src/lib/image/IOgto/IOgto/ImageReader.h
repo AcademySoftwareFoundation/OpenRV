@@ -120,11 +120,9 @@ namespace TwkFB
         //  yourself.
         //
 
-        ImageReader(FrameBufferVector& fbs, std::istream& instream,
-                    const std::string& infilename, bool nopixels = false);
+        ImageReader(FrameBufferVector& fbs, std::istream& instream, const std::string& infilename, bool nopixels = false);
 
-        ImageReader(FrameBufferVector& fbs, void* data, size_t size,
-                    const std::string& infilename, bool nopixels = false);
+        ImageReader(FrameBufferVector& fbs, void* data, size_t size, const std::string& infilename, bool nopixels = false);
 
         virtual ~ImageReader();
 
@@ -132,18 +130,12 @@ namespace TwkFB
         //  Gto::Reader API
         //
 
-        virtual Request object(const std::string& name,
-                               const std::string& protocol,
-                               unsigned int protocolVersion,
+        virtual Request object(const std::string& name, const std::string& protocol, unsigned int protocolVersion,
                                const ObjectInfo& header);
 
-        virtual Request component(const std::string& name,
-                                  const std::string& interp,
-                                  const ComponentInfo& header);
+        virtual Request component(const std::string& name, const std::string& interp, const ComponentInfo& header);
 
-        virtual Request property(const std::string& name,
-                                 const std::string& interp,
-                                 const PropertyInfo& header);
+        virtual Request property(const std::string& name, const std::string& interp, const PropertyInfo& header);
 
         virtual void descriptionComplete();
 

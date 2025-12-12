@@ -57,17 +57,14 @@ namespace TwkApp
 
             if (pluginFiles.empty())
             {
-                std::cout << "INFO: no output plugins found in "
-                          << getenv(envVar.c_str()) << std::endl;
+                std::cout << "INFO: no output plugins found in " << getenv(envVar.c_str()) << std::endl;
             }
 
             for (int i = 0; i < pluginFiles.size(); i++)
             {
-                std::cout << "INFO: loading plugin " << pluginFiles[i]
-                          << std::endl;
+                std::cout << "INFO: loading plugin " << pluginFiles[i] << std::endl;
 
-                if (TwkApp::OutputPluginPtr plugin =
-                        TwkApp::OutputPlugin::loadPlugin(pluginFiles[i]))
+                if (TwkApp::OutputPluginPtr plugin = TwkApp::OutputPlugin::loadPlugin(pluginFiles[i]))
                 {
                     addPlugin(plugin);
                 }
@@ -94,9 +91,6 @@ namespace TwkApp
         return *m_plugins;
     }
 
-    void OutputPlugins::addPlugin(const TwkApp::OutputPluginPtr& plugin)
-    {
-        plugins().insert(plugin);
-    }
+    void OutputPlugins::addPlugin(const TwkApp::OutputPluginPtr& plugin) { plugins().insert(plugin); }
 
 } // namespace TwkApp

@@ -55,7 +55,7 @@ SET_PROPERTY(
 #
 # Supported VFX platform.
 SET(RV_VFX_SUPPORTED_OPTIONS
-    CY2023 CY2024
+    CY2023 CY2024 CY2025 CY2026
 )
 # Default option
 SET(_RV_VFX_PLATFORM
@@ -91,7 +91,7 @@ SET_PROPERTY(
 
 # Supported FFmpeg versions.
 SET(RV_FFMPEG_SUPPORTED_OPTIONS
-    6 7
+    6 7 8
 )
 # Default option
 SET(_RV_FFMPEG

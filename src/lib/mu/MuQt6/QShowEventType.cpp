@@ -51,9 +51,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    Pointer
-    qt_QShowEvent_QShowEvent_QShowEvent_QShowEvent(Mu::Thread& NODE_THREAD,
-                                                   Pointer param_this)
+    Pointer qt_QShowEvent_QShowEvent_QShowEvent_QShowEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         setqpointer<QShowEventType>(param_this, new QShowEvent());
@@ -62,8 +60,7 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(_n_QShowEvent0, Pointer)
     {
-        NODE_RETURN(qt_QShowEvent_QShowEvent_QShowEvent_QShowEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QShowEvent_QShowEvent_QShowEvent_QShowEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     void QShowEventType::load()
@@ -83,13 +80,11 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
                    new MemberVariable(c, "native", "qt.NativeObject"),
 
@@ -100,10 +95,8 @@ namespace Mu
         addSymbols(
             // enums
             // member functions
-            new Function(c, "QShowEvent", _n_QShowEvent0, None, Compiled,
-                         qt_QShowEvent_QShowEvent_QShowEvent_QShowEvent, Return,
-                         "qt.QShowEvent", Parameters,
-                         new Param(c, "this", "qt.QShowEvent"), End),
+            new Function(c, "QShowEvent", _n_QShowEvent0, None, Compiled, qt_QShowEvent_QShowEvent_QShowEvent_QShowEvent, Return,
+                         "qt.QShowEvent", Parameters, new Param(c, "this", "qt.QShowEvent"), End),
             // static functions
             EndArguments);
         globalScope()->addSymbols(EndArguments);

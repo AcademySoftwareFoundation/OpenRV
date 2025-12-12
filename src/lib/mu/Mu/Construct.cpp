@@ -17,8 +17,7 @@ namespace Mu
     {
     }
 
-    Construct::Construct(Context* context, const char* name, NodeFunc func,
-                         Attributes attributes, ...)
+    Construct::Construct(Context* context, const char* name, NodeFunc func, Attributes attributes, ...)
         : Function(context, name)
     {
         va_list ap;

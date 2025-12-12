@@ -18,6 +18,9 @@
 #include <boost/program_options.hpp> // This has to come before the ByteSwap.h
 #include <TwkUtil/ByteSwap.h>
 #include <algorithm>
+#include <cstddef>
+#include <sstream>
+#include <stdexcept>
 #include <string>
 #include <stl_ext/replace_alloc.h>
 #include <TwkGLF/GL.h>
@@ -36,6 +39,37 @@ namespace
     }
 
 #define BM_CHECK(T) checkForFalse(T, __LINE__);
+
+    HRESULT getVideoFrameBuffer(IDeckLinkMutableVideoFrame* frame, void** buffer)
+    {
+        IDeckLinkVideoBuffer* videoBuffer = nullptr;
+        HRESULT result = frame->QueryInterface(IID_IDeckLinkVideoBuffer, reinterpret_cast<void**>(&videoBuffer));
+
+        if (result != S_OK)
+        {
+            return result;
+        }
+
+        result = videoBuffer->StartAccess(bmdBufferAccessReadAndWrite);
+        if (result != S_OK)
+        {
+            videoBuffer->Release();
+            return result;
+        }
+
+        result = videoBuffer->GetBytes(buffer);
+
+        result = videoBuffer->EndAccess(bmdBufferAccessReadAndWrite);
+        if (result != S_OK)
+        {
+            videoBuffer->Release();
+            return result;
+        }
+
+        videoBuffer->Release();
+
+        return result;
+    }
 
 } // namespace
 
@@ -58,8 +92,7 @@ namespace BlackMagicDevices
 // for optimization purposes
 #define VIDEOBUFFERSIZE 8
 
-    static ENVVAR_BOOL(evDetectSkippedFrames, "RV_DETECT_SKIPPED_FRAMES",
-                       false);
+    static ENVVAR_BOOL(evDetectSkippedFrames, "RV_DETECT_SKIPPED_FRAMES", false);
 
     const char* const HDMI_HDR_METADATA_ARG = "hdmi-hdr-metadata";
 
@@ -75,38 +108,35 @@ namespace BlackMagicDevices
         size_t value;
     };
 
-    static DeckLinkDataFormat dataFormats[] = {
-        {"8 Bit YUV", bmdFormat8BitYUV, VideoDevice::Y0CbY1Cr_8_422, false},
-        {"10 Bit YUV", bmdFormat10BitYUV, VideoDevice::YCrCb_BM_10_422, false},
-        //{"8 Bit ARGB", bmdFormat8BitARGB, VideoDevice::BGRA8, true},
-        //{"8 Bit BGRA", bmdFormat8BitBGRA, VideoDevice::BGRA8, true}, //
-        // CHANGED
-        // NAME
-        {"8 Bit RGBA", bmdFormat8BitBGRA, VideoDevice::BGRA8, true},
-        //{"10 Bit RGB", bmdFormat10BitRGB, VideoDevice::RGB10X2, true},
-        //{"10 Bit RGBX", bmdFormat10BitRGBX, VideoDevice::RGB10X2, true},
-        //{"10 Bit RGBXLE", bmdFormat10BitRGBXLE, VideoDevice::RGB10X2, true},
-        ////
-        // CHANGED NAME
-        {"10 Bit RGB", bmdFormat10BitRGBXLE, VideoDevice::RGB10X2, true},
-        {"12 Bit RGB", bmdFormat12BitRGBLE, VideoDevice::RGB16, true},
+    static DeckLinkDataFormat dataFormats[] = {{"8 Bit YUV", bmdFormat8BitYUV, VideoDevice::Y0CbY1Cr_8_422, false},
+                                               {"10 Bit YUV", bmdFormat10BitYUV, VideoDevice::YCrCb_BM_10_422, false},
+                                               //{"8 Bit ARGB", bmdFormat8BitARGB, VideoDevice::BGRA8, true},
+                                               //{"8 Bit BGRA", bmdFormat8BitBGRA, VideoDevice::BGRA8, true}, //
+                                               // CHANGED
+                                               // NAME
+                                               {"8 Bit RGBA", bmdFormat8BitBGRA, VideoDevice::BGRA8, true},
+                                               //{"10 Bit RGB", bmdFormat10BitRGB, VideoDevice::RGB10X2, true},
+                                               //{"10 Bit RGBX", bmdFormat10BitRGBX, VideoDevice::RGB10X2, true},
+                                               //{"10 Bit RGBXLE", bmdFormat10BitRGBXLE, VideoDevice::RGB10X2, true},
+                                               ////
+                                               // CHANGED NAME
+                                               {"10 Bit RGB", bmdFormat10BitRGBXLE, VideoDevice::RGB10X2, true},
+                                               {"12 Bit RGB", bmdFormat12BitRGBLE, VideoDevice::RGB16, true},
 
-        {"Stereo 8 Bit YUV", bmdFormat8BitYUV, VideoDevice::Y0CbY1Cr_8_422,
-         false},
-        {"Stereo 10 Bit YUV", bmdFormat10BitYUV, VideoDevice::YCrCb_BM_10_422,
-         false},
-        //{"Stereo 8 Bit ARGB", bmdFormat8BitARGB, VideoDevice::BGRA8, true},
-        //{"Stereo 8 Bit BGRA", bmdFormat8BitBGRA, VideoDevice::BGRA8, true}, //
-        // CHANGED NAME
-        {"Stereo 8 Bit RGBA", bmdFormat8BitBGRA, VideoDevice::BGRA8, true},
-        //{"Stereo 10 Bit RGB", bmdFormat10BitRGB, VideoDevice::RGB10X2, true},
-        //{"Stereo 10 Bit RGBX", bmdFormat10BitRGBX, VideoDevice::RGB10X2,
-        // true},
-        //{"Stereo 10 Bit RGBXLE", bmdFormat10BitRGBXLE, VideoDevice::RGB10X2,
-        // true}, // CHANGED NAME
-        {"Stereo 10 Bit RGB", bmdFormat10BitRGBXLE, VideoDevice::RGB10X2, true},
-        {"Stereo 12 Bit RGB", bmdFormat12BitRGBLE, VideoDevice::RGB16, true},
-        {NULL, bmdFormat8BitBGRA, VideoDevice::BGRA8, true}};
+                                               {"Stereo 8 Bit YUV", bmdFormat8BitYUV, VideoDevice::Y0CbY1Cr_8_422, false},
+                                               {"Stereo 10 Bit YUV", bmdFormat10BitYUV, VideoDevice::YCrCb_BM_10_422, false},
+                                               //{"Stereo 8 Bit ARGB", bmdFormat8BitARGB, VideoDevice::BGRA8, true},
+                                               //{"Stereo 8 Bit BGRA", bmdFormat8BitBGRA, VideoDevice::BGRA8, true}, //
+                                               // CHANGED NAME
+                                               {"Stereo 8 Bit RGBA", bmdFormat8BitBGRA, VideoDevice::BGRA8, true},
+                                               //{"Stereo 10 Bit RGB", bmdFormat10BitRGB, VideoDevice::RGB10X2, true},
+                                               //{"Stereo 10 Bit RGBX", bmdFormat10BitRGBX, VideoDevice::RGB10X2,
+                                               // true},
+                                               //{"Stereo 10 Bit RGBXLE", bmdFormat10BitRGBXLE, VideoDevice::RGB10X2,
+                                               // true}, // CHANGED NAME
+                                               {"Stereo 10 Bit RGB", bmdFormat10BitRGBXLE, VideoDevice::RGB10X2, true},
+                                               {"Stereo 12 Bit RGB", bmdFormat12BitRGBLE, VideoDevice::RGB16, true},
+                                               {NULL, bmdFormat8BitBGRA, VideoDevice::BGRA8, true}};
 
     //
     // The 1556p formats are commented out. None of our Declink cards seem
@@ -127,134 +157,121 @@ namespace BlackMagicDevices
         {1920, 1080, 1.0, 50.00, "1080p 50Hz", bmdModeHD1080p50},
         {1920, 1080, 1.0, 59.94, "1080p 59.94Hz", bmdModeHD1080p5994},
         {1920, 1080, 1.0, 60.00, "1080p 60Hz", bmdModeHD1080p6000},
-        {2048, 1080, 1.0, 23.98, "1080p (2048x1080) DCI 2K 23.98Hz",
-         bmdMode2kDCI2398},
-        {2048, 1080, 1.0, 24.00, "1080p (2048x1080) DCI 2K 24Hz",
-         bmdMode2kDCI24},
-        {2048, 1080, 1.0, 25.00, "1080p (2048x1080) DCI 2K 25Hz",
-         bmdMode2kDCI25},
-        {2048, 1080, 1.0, 29.97, "1080p (2048x1080) DCI 2K 29.97Hz",
-         bmdMode2kDCI2997},
-        {2048, 1080, 1.0, 30.00, "1080p (2048x1080) DCI 2K 30Hz",
-         bmdMode2kDCI30},
-        {2048, 1080, 1.0, 50.00, "1080p (2048x1080) DCI 2K 50Hz",
-         bmdMode2kDCI50},
-        {2048, 1080, 1.0, 59.94, "1080p (2048x1080) DCI 2K 59.94Hz",
-         bmdMode2kDCI5994},
-        {2048, 1080, 1.0, 60.00, "1080p (2048x1080) DCI 2K 60Hz",
-         bmdMode2kDCI60},
-        {3840, 2160, 1.0, 23.98, "2160p (3840x2160) UHD 4K 23.98Hz",
-         bmdMode4K2160p2398},
-        {3840, 2160, 1.0, 24.00, "2160p (3840x2160) UHD 4K 24Hz",
-         bmdMode4K2160p24},
-        {3840, 2160, 1.0, 25.00, "2160p (3840x2160) UHD 4K 25Hz",
-         bmdMode4K2160p25},
-        {3840, 2160, 1.0, 29.97, "2160p (3840x2160) UHD 4K 29.97Hz",
-         bmdMode4K2160p2997},
-        {3840, 2160, 1.0, 30.00, "2160p (3840x2160) UHD 4K 30Hz",
-         bmdMode4K2160p30},
-        {3840, 2160, 1.0, 50.00, "2160p (3840x2160) UHD 4K 50Hz",
-         bmdMode4K2160p50},
-        {3840, 2160, 1.0, 59.94, "2160p (3840x2160) UHD 4K 59.94Hz",
-         bmdMode4K2160p5994},
-        {3840, 2160, 1.0, 60.00, "2160p (3840x2160) UHD 4K 60Hz",
-         bmdMode4K2160p60},
-        {4096, 2160, 1.0, 23.98, "2160p (4096x2160) DCI 4K 23.98Hz",
-         bmdMode4kDCI2398},
-        {4096, 2160, 1.0, 24.00, "2160p (4096x2160) DCI 4K 24Hz",
-         bmdMode4kDCI24},
-        {4096, 2160, 1.0, 25.00, "2160p (4096x2160) DCI 4K 25Hz",
-         bmdMode4kDCI25},
-        {4096, 2160, 1.0, 29.97, "2160p (4096x2160) DCI 4K 29.97Hz",
-         bmdMode4kDCI2997},
-        {4096, 2160, 1.0, 30.00, "2160p (4096x2160) DCI 4K 30Hz",
-         bmdMode4kDCI30},
-        {4096, 2160, 1.0, 50.00, "2160p (4096x2160) DCI 4K 50Hz",
-         bmdMode4kDCI50},
-        {4096, 2160, 1.0, 59.94, "2160p (4096x2160) DCI 4K 59.94Hz",
-         bmdMode4kDCI5994},
-        {4096, 2160, 1.0, 60.00, "2160p (4096x2160) DCI 4K 60Hz",
-         bmdMode4kDCI60},
-        {7680, 4320, 1.0, 23.98, "4320p (7680x4320) UHD 8K 23.98Hz",
-         bmdMode8K4320p2398},
-        {7680, 4320, 1.0, 24.00, "4320p (7680x4320) UHD 8K 24Hz",
-         bmdMode8K4320p24},
-        {7680, 4320, 1.0, 25.00, "4320p (7680x4320) UHD 8K 25Hz",
-         bmdMode8K4320p25},
-        {7680, 4320, 1.0, 29.97, "4320p (7680x4320) UHD 8K 29.97Hz",
-         bmdMode8K4320p2997},
-        {7680, 4320, 1.0, 30.00, "4320p (7680x4320) UHD 8K 30Hz",
-         bmdMode8K4320p30},
-        {7680, 4320, 1.0, 50.00, "4320p (7680x4320) UHD 8K 50Hz",
-         bmdMode8K4320p50},
-        {7680, 4320, 1.0, 59.94, "4320p (7680x4320) UHD 8K 59.94Hz",
-         bmdMode8K4320p5994},
-        {7680, 4320, 1.0, 60.00, "4320p (7680x4320) UHD 8K 60Hz",
-         bmdMode8K4320p60},
-        {8192, 4320, 1.0, 23.98, "4320p (8192x4320) DCI 8K 23.98Hz",
-         bmdMode8kDCI2398},
-        {8192, 4320, 1.0, 24.00, "4320p (8192x4320) DCI 8K 24Hz",
-         bmdMode8kDCI24},
-        {8192, 4320, 1.0, 25.00, "4320p (8192x4320) DCI 8K 25Hz",
-         bmdMode8kDCI25},
-        {8192, 4320, 1.0, 29.97, "4320p (8192x4320) DCI 8K 29.97Hz",
-         bmdMode8kDCI2997},
-        {8192, 4320, 1.0, 30.00, "4320p (8192x4320) DCI 8K 30Hz",
-         bmdMode8kDCI30},
-        {8192, 4320, 1.0, 50.00, "4320p (8192x4320) DCI 8K 50Hz",
-         bmdMode8kDCI50},
-        {8192, 4320, 1.0, 59.94, "4320p (8192x4320) DCI 8K 59.94Hz",
-         bmdMode8kDCI5994},
-        {8192, 4320, 1.0, 60.00, "4320p (8192x4320) DCI 8K 60Hz",
-         bmdMode8kDCI60},
+        {2048, 1080, 1.0, 23.98, "1080p (2048x1080) DCI 2K 23.98Hz", bmdMode2kDCI2398},
+        {2048, 1080, 1.0, 24.00, "1080p (2048x1080) DCI 2K 24Hz", bmdMode2kDCI24},
+        {2048, 1080, 1.0, 25.00, "1080p (2048x1080) DCI 2K 25Hz", bmdMode2kDCI25},
+        {2048, 1080, 1.0, 29.97, "1080p (2048x1080) DCI 2K 29.97Hz", bmdMode2kDCI2997},
+        {2048, 1080, 1.0, 30.00, "1080p (2048x1080) DCI 2K 30Hz", bmdMode2kDCI30},
+        {2048, 1080, 1.0, 50.00, "1080p (2048x1080) DCI 2K 50Hz", bmdMode2kDCI50},
+        {2048, 1080, 1.0, 59.94, "1080p (2048x1080) DCI 2K 59.94Hz", bmdMode2kDCI5994},
+        {2048, 1080, 1.0, 60.00, "1080p (2048x1080) DCI 2K 60Hz", bmdMode2kDCI60},
+        {3840, 2160, 1.0, 23.98, "2160p (3840x2160) UHD 4K 23.98Hz", bmdMode4K2160p2398},
+        {3840, 2160, 1.0, 24.00, "2160p (3840x2160) UHD 4K 24Hz", bmdMode4K2160p24},
+        {3840, 2160, 1.0, 25.00, "2160p (3840x2160) UHD 4K 25Hz", bmdMode4K2160p25},
+        {3840, 2160, 1.0, 29.97, "2160p (3840x2160) UHD 4K 29.97Hz", bmdMode4K2160p2997},
+        {3840, 2160, 1.0, 30.00, "2160p (3840x2160) UHD 4K 30Hz", bmdMode4K2160p30},
+        {3840, 2160, 1.0, 50.00, "2160p (3840x2160) UHD 4K 50Hz", bmdMode4K2160p50},
+        {3840, 2160, 1.0, 59.94, "2160p (3840x2160) UHD 4K 59.94Hz", bmdMode4K2160p5994},
+        {3840, 2160, 1.0, 60.00, "2160p (3840x2160) UHD 4K 60Hz", bmdMode4K2160p60},
+        {4096, 2160, 1.0, 23.98, "2160p (4096x2160) DCI 4K 23.98Hz", bmdMode4kDCI2398},
+        {4096, 2160, 1.0, 24.00, "2160p (4096x2160) DCI 4K 24Hz", bmdMode4kDCI24},
+        {4096, 2160, 1.0, 25.00, "2160p (4096x2160) DCI 4K 25Hz", bmdMode4kDCI25},
+        {4096, 2160, 1.0, 29.97, "2160p (4096x2160) DCI 4K 29.97Hz", bmdMode4kDCI2997},
+        {4096, 2160, 1.0, 30.00, "2160p (4096x2160) DCI 4K 30Hz", bmdMode4kDCI30},
+        {4096, 2160, 1.0, 50.00, "2160p (4096x2160) DCI 4K 50Hz", bmdMode4kDCI50},
+        {4096, 2160, 1.0, 59.94, "2160p (4096x2160) DCI 4K 59.94Hz", bmdMode4kDCI5994},
+        {4096, 2160, 1.0, 60.00, "2160p (4096x2160) DCI 4K 60Hz", bmdMode4kDCI60},
+        {7680, 4320, 1.0, 23.98, "4320p (7680x4320) UHD 8K 23.98Hz", bmdMode8K4320p2398},
+        {7680, 4320, 1.0, 24.00, "4320p (7680x4320) UHD 8K 24Hz", bmdMode8K4320p24},
+        {7680, 4320, 1.0, 25.00, "4320p (7680x4320) UHD 8K 25Hz", bmdMode8K4320p25},
+        {7680, 4320, 1.0, 29.97, "4320p (7680x4320) UHD 8K 29.97Hz", bmdMode8K4320p2997},
+        {7680, 4320, 1.0, 30.00, "4320p (7680x4320) UHD 8K 30Hz", bmdMode8K4320p30},
+        {7680, 4320, 1.0, 50.00, "4320p (7680x4320) UHD 8K 50Hz", bmdMode8K4320p50},
+        {7680, 4320, 1.0, 59.94, "4320p (7680x4320) UHD 8K 59.94Hz", bmdMode8K4320p5994},
+        {7680, 4320, 1.0, 60.00, "4320p (7680x4320) UHD 8K 60Hz", bmdMode8K4320p60},
+        {8192, 4320, 1.0, 23.98, "4320p (8192x4320) DCI 8K 23.98Hz", bmdMode8kDCI2398},
+        {8192, 4320, 1.0, 24.00, "4320p (8192x4320) DCI 8K 24Hz", bmdMode8kDCI24},
+        {8192, 4320, 1.0, 25.00, "4320p (8192x4320) DCI 8K 25Hz", bmdMode8kDCI25},
+        {8192, 4320, 1.0, 29.97, "4320p (8192x4320) DCI 8K 29.97Hz", bmdMode8kDCI2997},
+        {8192, 4320, 1.0, 30.00, "4320p (8192x4320) DCI 8K 30Hz", bmdMode8kDCI30},
+        {8192, 4320, 1.0, 50.00, "4320p (8192x4320) DCI 8K 50Hz", bmdMode8kDCI50},
+        {8192, 4320, 1.0, 59.94, "4320p (8192x4320) DCI 8K 59.94Hz", bmdMode8kDCI5994},
+        {8192, 4320, 1.0, 60.00, "4320p (8192x4320) DCI 8K 60Hz", bmdMode8kDCI60},
         {1920, 1080, 1.0, 47.95, "1080p 47.95Hz", bmdModeHD1080p4795},
-        {2048, 1080, 1.0, 47.95, "1080p (2048x1080) DCI 2K 47.95Hz",
-         bmdMode2kDCI4795},
-        {3840, 2160, 1.0, 47.95, "2160p (3840x2160) UHD 4K 47.95Hz",
-         bmdMode4K2160p4795},
-        {4096, 2160, 1.0, 47.95, "2160p (4096x2160) DCI 4K 47.95Hz",
-         bmdMode4kDCI4795},
-        {7680, 4320, 1.0, 47.95, "4320p (7680x4320) UHD 8K 47.95Hz",
-         bmdMode8K4320p4795},
-        {8192, 4320, 1.0, 47.95, "4320p (8192x4320) DCI 8K 47.95Hz",
-         bmdMode8kDCI4795},
+        {2048, 1080, 1.0, 47.95, "1080p (2048x1080) DCI 2K 47.95Hz", bmdMode2kDCI4795},
+        {3840, 2160, 1.0, 47.95, "2160p (3840x2160) UHD 4K 47.95Hz", bmdMode4K2160p4795},
+        {4096, 2160, 1.0, 47.95, "2160p (4096x2160) DCI 4K 47.95Hz", bmdMode4kDCI4795},
+        {7680, 4320, 1.0, 47.95, "4320p (7680x4320) UHD 8K 47.95Hz", bmdMode8K4320p4795},
+        {8192, 4320, 1.0, 47.95, "4320p (8192x4320) DCI 8K 47.95Hz", bmdMode8kDCI4795},
         {1920, 1080, 1.0, 48.00, "1080p 48Hz", bmdModeHD1080p48},
-        {2048, 1080, 1.0, 48.00, "1080p (2048x1080) DCI 2K 48Hz",
-         bmdMode2kDCI48},
-        {3840, 2160, 1.0, 48.00, "2160p (3840x2160) UHD 4K 48Hz",
-         bmdMode4K2160p48},
-        {4096, 2160, 1.0, 48.00, "2160p (4096x2160) DCI 4K 48Hz",
-         bmdMode4kDCI48},
-        {7680, 4320, 1.0, 48.00, "4320p (7680x4320) UHD 8K 48Hz",
-         bmdMode8K4320p48},
-        {8192, 4320, 1.0, 48.00, "4320p (8192x4320) DCI 8K 48Hz",
-         bmdMode8kDCI48},
+        {2048, 1080, 1.0, 48.00, "1080p (2048x1080) DCI 2K 48Hz", bmdMode2kDCI48},
+        {3840, 2160, 1.0, 48.00, "2160p (3840x2160) UHD 4K 48Hz", bmdMode4K2160p48},
+        {4096, 2160, 1.0, 48.00, "2160p (4096x2160) DCI 4K 48Hz", bmdMode4kDCI48},
+        {7680, 4320, 1.0, 48.00, "4320p (7680x4320) UHD 8K 48Hz", bmdMode8K4320p48},
+        {8192, 4320, 1.0, 48.00, "4320p (8192x4320) DCI 8K 48Hz", bmdMode8kDCI48},
         {1920, 1080, 1.0, 120.00, "1080p 120Hz", bmdModeHD1080p120},
-        {2048, 1080, 1.0, 120.00, "1080p (2048x1080) DCI 2K 120Hz",
-         bmdMode2kDCI120},
-        {3840, 2160, 1.0, 120.00, "2160p (3840x2160) UHD 4K 120Hz",
-         bmdMode4K2160p120},
-        {4096, 2160, 1.0, 120.00, "4096p (4096x2160) DCI 4K 120Hz",
-         bmdMode4kDCI120},
+        {2048, 1080, 1.0, 120.00, "1080p (2048x1080) DCI 2K 120Hz", bmdMode2kDCI120},
+        {3840, 2160, 1.0, 120.00, "2160p (3840x2160) UHD 4K 120Hz", bmdMode4K2160p120},
+        {4096, 2160, 1.0, 120.00, "4096p (4096x2160) DCI 4K 120Hz", bmdMode4kDCI120},
         {0, 0, 1.0, 00.00, NULL, bmdModeHD720p50},
     };
 
-    static DeckLinkAudioFormat audioFormats[] = {
-        {48000.0, bmdAudioSampleRate48kHz, TwkAudio::Int16Format,
-         bmdAudioSampleType16bitInteger, 2, TwkAudio::Stereo_2,
-         "16 bit 48kHz Stereo"},
-        {48000.0, bmdAudioSampleRate48kHz, TwkAudio::Int32Format,
-         bmdAudioSampleType32bitInteger, 2, TwkAudio::Stereo_2,
-         "24 bit 48kHz Stereo"},
-        {48000.0, bmdAudioSampleRate48kHz, TwkAudio::Int32Format,
-         bmdAudioSampleType32bitInteger, 8, TwkAudio::Surround_7_1,
-         "24 bit 48kHz 7.1 Surround"},
-        {48000.0, bmdAudioSampleRate48kHz, TwkAudio::Int32Format,
-         bmdAudioSampleType32bitInteger, 8, TwkAudio::SDDS_7_1,
-         "24 bit 48kHz 7.1 Surround SDDS"},
-        {48000.0, bmdAudioSampleRate48kHz, TwkAudio::Int32Format,
-         bmdAudioSampleType32bitInteger, 16, TwkAudio::Generic_16,
-         "24 bit 48kHz 16 channel"}};
+    static DeckLinkAudioFormat audioFormats[] = {{48000.0, bmdAudioSampleRate48kHz, TwkAudio::Int16Format, bmdAudioSampleType16bitInteger,
+                                                  2, TwkAudio::Stereo_2, "16 bit 48kHz Stereo"},
+                                                 {48000.0, bmdAudioSampleRate48kHz, TwkAudio::Int32Format, bmdAudioSampleType32bitInteger,
+                                                  2, TwkAudio::Stereo_2, "24 bit 48kHz Stereo"},
+                                                 {48000.0, bmdAudioSampleRate48kHz, TwkAudio::Int32Format, bmdAudioSampleType32bitInteger,
+                                                  8, TwkAudio::Surround_7_1, "24 bit 48kHz 7.1 Surround"},
+                                                 {48000.0, bmdAudioSampleRate48kHz, TwkAudio::Int32Format, bmdAudioSampleType32bitInteger,
+                                                  8, TwkAudio::SDDS_7_1, "24 bit 48kHz 7.1 Surround SDDS"},
+                                                 {48000.0, bmdAudioSampleRate48kHz, TwkAudio::Int32Format, bmdAudioSampleType32bitInteger,
+                                                  9, TwkAudio::Generic_9, "24 bit 48kHz 9 channel"},
+                                                 {48000.0, bmdAudioSampleRate48kHz, TwkAudio::Int32Format, bmdAudioSampleType32bitInteger,
+                                                  10, TwkAudio::Surround_9_1, "24 bit 48kHz 9.1 Surround"},
+                                                 {48000.0, bmdAudioSampleRate48kHz, TwkAudio::Int32Format, bmdAudioSampleType32bitInteger,
+                                                  11, TwkAudio::Generic_11, "24 bit 48kHz 11 channel"},
+                                                 {48000.0, bmdAudioSampleRate48kHz, TwkAudio::Int32Format, bmdAudioSampleType32bitInteger,
+                                                  12, TwkAudio::Generic_12, "24 bit 48kHz 12 channel"},
+                                                 {48000.0, bmdAudioSampleRate48kHz, TwkAudio::Int32Format, bmdAudioSampleType32bitInteger,
+                                                  13, TwkAudio::Generic_13, "24 bit 48kHz 13 channel"},
+                                                 {48000.0, bmdAudioSampleRate48kHz, TwkAudio::Int32Format, bmdAudioSampleType32bitInteger,
+                                                  14, TwkAudio::Generic_14, "24 bit 48kHz 14 channel"},
+                                                 {48000.0, bmdAudioSampleRate48kHz, TwkAudio::Int32Format, bmdAudioSampleType32bitInteger,
+                                                  15, TwkAudio::Generic_15, "24 bit 48kHz 15 channel"},
+                                                 {48000.0, bmdAudioSampleRate48kHz, TwkAudio::Int32Format, bmdAudioSampleType32bitInteger,
+                                                  16, TwkAudio::Generic_16, "24 bit 48kHz 16 channel"},
+                                                 {48000.0, bmdAudioSampleRate48kHz, TwkAudio::Int32Format, bmdAudioSampleType32bitInteger,
+                                                  17, TwkAudio::Generic_17, "24 bit 48kHz 17 channel"},
+                                                 {48000.0, bmdAudioSampleRate48kHz, TwkAudio::Int32Format, bmdAudioSampleType32bitInteger,
+                                                  18, TwkAudio::Generic_18, "24 bit 48kHz 18 channel"},
+                                                 {48000.0, bmdAudioSampleRate48kHz, TwkAudio::Int32Format, bmdAudioSampleType32bitInteger,
+                                                  19, TwkAudio::Generic_19, "24 bit 48kHz 19 channel"},
+                                                 {48000.0, bmdAudioSampleRate48kHz, TwkAudio::Int32Format, bmdAudioSampleType32bitInteger,
+                                                  20, TwkAudio::Generic_20, "24 bit 48kHz 20 channel"},
+                                                 {48000.0, bmdAudioSampleRate48kHz, TwkAudio::Int32Format, bmdAudioSampleType32bitInteger,
+                                                  21, TwkAudio::Generic_21, "24 bit 48kHz 21 channel"},
+                                                 {48000.0, bmdAudioSampleRate48kHz, TwkAudio::Int32Format, bmdAudioSampleType32bitInteger,
+                                                  22, TwkAudio::Generic_22, "24 bit 48kHz 22 channel"},
+                                                 {48000.0, bmdAudioSampleRate48kHz, TwkAudio::Int32Format, bmdAudioSampleType32bitInteger,
+                                                  23, TwkAudio::Generic_23, "24 bit 48kHz 23 channel"},
+                                                 {48000.0, bmdAudioSampleRate48kHz, TwkAudio::Int32Format, bmdAudioSampleType32bitInteger,
+                                                  24, TwkAudio::Generic_24, "24 bit 48kHz 24 channel"},
+                                                 {48000.0, bmdAudioSampleRate48kHz, TwkAudio::Int32Format, bmdAudioSampleType32bitInteger,
+                                                  25, TwkAudio::Generic_25, "24 bit 48kHz 25 channel"},
+                                                 {48000.0, bmdAudioSampleRate48kHz, TwkAudio::Int32Format, bmdAudioSampleType32bitInteger,
+                                                  26, TwkAudio::Generic_26, "24 bit 48kHz 26 channel"},
+                                                 {48000.0, bmdAudioSampleRate48kHz, TwkAudio::Int32Format, bmdAudioSampleType32bitInteger,
+                                                  27, TwkAudio::Generic_27, "24 bit 48kHz 27 channel"},
+                                                 {48000.0, bmdAudioSampleRate48kHz, TwkAudio::Int32Format, bmdAudioSampleType32bitInteger,
+                                                  28, TwkAudio::Generic_28, "24 bit 48kHz 28 channel"},
+                                                 {48000.0, bmdAudioSampleRate48kHz, TwkAudio::Int32Format, bmdAudioSampleType32bitInteger,
+                                                  29, TwkAudio::Generic_29, "24 bit 48kHz 29 channel"},
+                                                 {48000.0, bmdAudioSampleRate48kHz, TwkAudio::Int32Format, bmdAudioSampleType32bitInteger,
+                                                  30, TwkAudio::Generic_30, "24 bit 48kHz 30 channel"},
+                                                 {48000.0, bmdAudioSampleRate48kHz, TwkAudio::Int32Format, bmdAudioSampleType32bitInteger,
+                                                  31, TwkAudio::Generic_31, "24 bit 48kHz 31 channel"},
+                                                 {48000.0, bmdAudioSampleRate48kHz, TwkAudio::Int32Format, bmdAudioSampleType32bitInteger,
+                                                  32, TwkAudio::Generic_32, "24 bit 48kHz 32 channel"}};
 
     // 4K/8K Transport combo box items indices
     // Note: VIDEO_TRANSPORT_DEFAULT = SingleLink but kept for backward
@@ -270,15 +287,12 @@ namespace BlackMagicDevices
         {"Single Link", VIDEO_TRANSPORT_SINGLE_LINK},
         {"Dual Link", VIDEO_TRANSPORT_DUAL_LINK},
         {"Quad Link", VIDEO_TRANSPORT_QUAD_LINK},
-        {"Quad Link-Square Division Quad Split mode",
-         VIDEO_TRANSPORT_QUADRANTS},
+        {"Quad Link-Square Division Quad Split mode", VIDEO_TRANSPORT_QUADRANTS},
     };
 
-    BMDSupportedVideoModeFlags
-    getBmdSupportedVideoModeFlag(const size_t in_video4KTransport)
+    BMDSupportedVideoModeFlags getBmdSupportedVideoModeFlag(const size_t in_video4KTransport)
     {
-        BMDSupportedVideoModeFlags bmdSupportedVideoModeFlag =
-            bmdSupportedVideoModeDefault;
+        BMDSupportedVideoModeFlags bmdSupportedVideoModeFlag = bmdSupportedVideoModeDefault;
         switch (in_video4KTransport)
         {
         case VIDEO_TRANSPORT_DEFAULT:
@@ -297,8 +311,7 @@ namespace BlackMagicDevices
         return bmdSupportedVideoModeFlag;
     }
 
-    int getBmdLinkConfiguration(const size_t in_video4KTransport,
-                                int& out_bmdQuadLinkSquareDivisionSplit)
+    int getBmdLinkConfiguration(const size_t in_video4KTransport, int& out_bmdQuadLinkSquareDivisionSplit)
     {
         int bmdLinkConfiguration = bmdLinkConfigurationSingleLink;
         out_bmdQuadLinkSquareDivisionSplit = -1;
@@ -352,10 +365,7 @@ namespace BlackMagicDevices
             cout << "lockData for " << t << endl;
     }
 
-    void DeckLinkVideoDevice::PBOData::unlockData()
-    {
-        pthread_mutex_unlock(&mutex);
-    }
+    void DeckLinkVideoDevice::PBOData::unlockData() { pthread_mutex_unlock(&mutex); }
 
     void DeckLinkVideoDevice::PBOData::lockState()
     {
@@ -367,21 +377,14 @@ namespace BlackMagicDevices
             cout << "lockState for " << t << endl;
     }
 
-    void DeckLinkVideoDevice::PBOData::unlockState()
-    {
-        pthread_mutex_unlock(&stateMutex);
-    }
+    void DeckLinkVideoDevice::PBOData::unlockState() { pthread_mutex_unlock(&stateMutex); }
 
     //
     //  DeckLinkVideoDevice
     //
-    DeckLinkVideoDevice::DeckLinkVideoDevice(BlackMagicModule* m,
-                                             const std::string& name,
-                                             IDeckLink* d, IDeckLinkOutput* p)
-        : GLBindableVideoDevice(m, name,
-                                BlockingTransfer | ImageOutput | ProvidesSync
-                                    | FixedResolution | Clock | AudioOutput
-                                    | NormalizedCoordinates)
+    DeckLinkVideoDevice::DeckLinkVideoDevice(BlackMagicModule* m, const std::string& name, IDeckLink* d, IDeckLinkOutput* p)
+        : GLBindableVideoDevice(
+              m, name, BlockingTransfer | ImageOutput | ProvidesSync | FixedResolution | Clock | AudioOutput | NormalizedCoordinates)
         , m_readyFrame(NULL)
         , m_readyStereoFrame(NULL)
         , m_needsFrameConverter(false)
@@ -439,11 +442,8 @@ namespace BlackMagicDevices
 
                 BMDDisplayMode displayMode;
                 HRESULT hr = m_outputAPI->DoesSupportVideoMode(
-                    bmdVideoConnectionUnspecified, p->value, q->value,
-                    bmdNoVideoOutputConversion,
-                    isStereo ? bmdSupportedVideoModeDualStream3D
-                             : bmdSupportedVideoModeDefault,
-                    &displayMode, &supported);
+                    bmdVideoConnectionUnspecified, p->value, q->value, bmdNoVideoOutputConversion,
+                    isStereo ? bmdSupportedVideoModeDualStream3D : bmdSupportedVideoModeDefault, &displayMode, &supported);
 
                 if (hr == S_OK && supported)
                 {
@@ -461,14 +461,11 @@ namespace BlackMagicDevices
         }
 
         // Get the IDeckLinkConfiguration interface
-        unsigned int result = m_deviceAPI->QueryInterface(
-            IID_IDeckLinkConfiguration, (void**)&m_configuration);
+        unsigned int result = m_deviceAPI->QueryInterface(IID_IDeckLinkConfiguration, (void**)&m_configuration);
         if (result != S_OK)
         {
             m_configuration = NULL;
-            TWK_THROW_EXC_STREAM(
-                "Could not get the IDeckLinkConfiguration interface (error 0x"
-                << hex << result << ")\n");
+            TWK_THROW_EXC_STREAM("Could not get the IDeckLinkConfiguration interface (error 0x" << hex << result << ")\n");
         }
     }
 
@@ -492,26 +489,15 @@ namespace BlackMagicDevices
         }
     }
 
-    size_t DeckLinkVideoDevice::asyncMaxMappedBuffers() const
-    {
-        return m_pboSize;
-    }
+    size_t DeckLinkVideoDevice::asyncMaxMappedBuffers() const { return m_pboSize; }
 
-    VideoDevice::Time DeckLinkVideoDevice::deviceLatency() const
-    {
-        return Time(0);
-    }
+    VideoDevice::Time DeckLinkVideoDevice::deviceLatency() const { return Time(0); }
 
-    size_t DeckLinkVideoDevice::numDataFormats() const
-    {
-        return m_decklinkDataFormats.size();
-    }
+    size_t DeckLinkVideoDevice::numDataFormats() const { return m_decklinkDataFormats.size(); }
 
-    DeckLinkVideoDevice::DataFormat
-    DeckLinkVideoDevice::dataFormatAtIndex(size_t i) const
+    DeckLinkVideoDevice::DataFormat DeckLinkVideoDevice::dataFormatAtIndex(size_t i) const
     {
-        return DataFormat(m_decklinkDataFormats[i].iformat,
-                          m_decklinkDataFormats[i].desc);
+        return DataFormat(m_decklinkDataFormats[i].iformat, m_decklinkDataFormats[i].desc);
     }
 
     void DeckLinkVideoDevice::setDataFormat(size_t i)
@@ -520,24 +506,17 @@ namespace BlackMagicDevices
         m_internalDataFormat = i;
     }
 
-    size_t DeckLinkVideoDevice::currentDataFormat() const
-    {
-        return m_internalDataFormat;
-    }
+    size_t DeckLinkVideoDevice::currentDataFormat() const { return m_internalDataFormat; }
 
     size_t DeckLinkVideoDevice::numAudioFormats() const { return 5; }
 
-    DeckLinkVideoDevice::AudioFormat
-    DeckLinkVideoDevice::audioFormatAtIndex(size_t index) const
+    DeckLinkVideoDevice::AudioFormat DeckLinkVideoDevice::audioFormatAtIndex(size_t index) const
     {
         const DeckLinkAudioFormat& f = audioFormats[index];
         return AudioFormat(f.hz, f.prec, f.numChannels, f.layout, f.desc);
     }
 
-    size_t DeckLinkVideoDevice::currentAudioFormat() const
-    {
-        return m_internalAudioFormat;
-    }
+    size_t DeckLinkVideoDevice::currentAudioFormat() const { return m_internalAudioFormat; }
 
     void DeckLinkVideoDevice::setAudioFormat(size_t i)
     {
@@ -549,22 +528,15 @@ namespace BlackMagicDevices
         m_audioFrameSizes.clear();
     }
 
-    size_t DeckLinkVideoDevice::numVideoFormats() const
-    {
-        return m_decklinkVideoFormats.size();
-    }
+    size_t DeckLinkVideoDevice::numVideoFormats() const { return m_decklinkVideoFormats.size(); }
 
-    DeckLinkVideoDevice::VideoFormat
-    DeckLinkVideoDevice::videoFormatAtIndex(size_t index) const
+    DeckLinkVideoDevice::VideoFormat DeckLinkVideoDevice::videoFormatAtIndex(size_t index) const
     {
         const DeckLinkVideoFormat& f = m_decklinkVideoFormats[index];
         return VideoFormat(f.width, f.height, f.pa, 1.0f, f.hz, f.desc);
     }
 
-    size_t DeckLinkVideoDevice::currentVideoFormat() const
-    {
-        return m_internalVideoFormat;
-    }
+    size_t DeckLinkVideoDevice::currentVideoFormat() const { return m_internalVideoFormat; }
 
     void DeckLinkVideoDevice::setVideoFormat(size_t i)
     {
@@ -595,13 +567,10 @@ namespace BlackMagicDevices
             bool supported = false;
 #endif
 
-            HRESULT hr = m_outputAPI->DoesSupportVideoMode(
-                bmdVideoConnectionUnspecified, p->value, q->value,
-                bmdNoVideoOutputConversion,
-                isStereo
-                    ? bmdSupportedVideoModeDualStream3D
-                    : getBmdSupportedVideoModeFlag(m_internalVideo4KTransport),
-                &displayMode, &supported);
+            HRESULT hr = m_outputAPI->DoesSupportVideoMode(bmdVideoConnectionUnspecified, p->value, q->value, bmdNoVideoOutputConversion,
+                                                           isStereo ? bmdSupportedVideoModeDualStream3D
+                                                                    : getBmdSupportedVideoModeFlag(m_internalVideo4KTransport),
+                                                           &displayMode, &supported);
 
             if (hr == S_OK && supported)
             {
@@ -612,13 +581,9 @@ namespace BlackMagicDevices
         m_audioFrameSizes.clear();
     }
 
-    size_t DeckLinkVideoDevice::numVideo4KTransports() const
-    {
-        return sizeof(video4KTransports) / sizeof(video4KTransports[0]);
-    }
+    size_t DeckLinkVideoDevice::numVideo4KTransports() const { return sizeof(video4KTransports) / sizeof(video4KTransports[0]); }
 
-    DeckLinkVideoDevice::Video4KTransport
-    DeckLinkVideoDevice::video4KTransportAtIndex(size_t i) const
+    DeckLinkVideoDevice::Video4KTransport DeckLinkVideoDevice::video4KTransportAtIndex(size_t i) const
     {
         const DeckLinkVideo4KTransport& m = video4KTransports[i];
         return Video4KTransport(m.desc);
@@ -630,30 +595,23 @@ namespace BlackMagicDevices
         m_internalVideo4KTransport = i;
     }
 
-    size_t DeckLinkVideoDevice::currentVideo4KTransport() const
-    {
-        return m_internalVideo4KTransport;
-    }
+    size_t DeckLinkVideoDevice::currentVideo4KTransport() const { return m_internalVideo4KTransport; }
 
     DeckLinkVideoDevice::Timing DeckLinkVideoDevice::timing() const
     {
-        const DeckLinkVideoFormat& f =
-            m_decklinkVideoFormats[m_internalVideoFormat];
+        const DeckLinkVideoFormat& f = m_decklinkVideoFormats[m_internalVideoFormat];
         return DeckLinkVideoDevice::Timing(f.hz);
     }
 
     DeckLinkVideoDevice::VideoFormat DeckLinkVideoDevice::format() const
     {
-        const DeckLinkVideoFormat& f =
-            m_decklinkVideoFormats[m_internalVideoFormat];
-        return DeckLinkVideoDevice::VideoFormat(f.width, f.height, f.pa, 1.0f,
-                                                f.hz, f.desc);
+        const DeckLinkVideoFormat& f = m_decklinkVideoFormats[m_internalVideoFormat];
+        return DeckLinkVideoDevice::VideoFormat(f.width, f.height, f.pa, 1.0f, f.hz, f.desc);
     }
 
     size_t DeckLinkVideoDevice::numSyncModes() const { return 1; }
 
-    DeckLinkVideoDevice::SyncMode
-    DeckLinkVideoDevice::syncModeAtIndex(size_t i) const
+    DeckLinkVideoDevice::SyncMode DeckLinkVideoDevice::syncModeAtIndex(size_t i) const
     {
         const DeckLinkSyncMode& m = syncModes[i];
         return SyncMode(m.desc);
@@ -665,10 +623,7 @@ namespace BlackMagicDevices
         m_internalSyncMode = i;
     }
 
-    size_t DeckLinkVideoDevice::currentSyncMode() const
-    {
-        return m_internalSyncMode;
-    }
+    size_t DeckLinkVideoDevice::currentSyncMode() const { return m_internalSyncMode; }
 
     size_t DeckLinkVideoDevice::numSyncSources() const
     {
@@ -676,8 +631,7 @@ namespace BlackMagicDevices
         return 0;
     }
 
-    DeckLinkVideoDevice::SyncSource
-    DeckLinkVideoDevice::syncSourceAtIndex(size_t i) const
+    DeckLinkVideoDevice::SyncSource DeckLinkVideoDevice::syncSourceAtIndex(size_t i) const
     {
         const DeckLinkSyncSource& m = syncSources[i];
         return SyncSource(m.desc);
@@ -689,17 +643,12 @@ namespace BlackMagicDevices
         m_internalSyncSource = i;
     }
 
-    size_t DeckLinkVideoDevice::currentSyncSource() const
-    {
-        return m_internalSyncSource;
-    }
+    size_t DeckLinkVideoDevice::currentSyncSource() const { return m_internalSyncSource; }
 
-    void DeckLinkVideoDevice::audioFrameSizeSequence(
-        AudioFrameSizeVector& fsizes) const
+    void DeckLinkVideoDevice::audioFrameSizeSequence(AudioFrameSizeVector& fsizes) const
     {
         // same as AJA
-        const DeckLinkVideoFormat& f =
-            m_decklinkVideoFormats[m_internalVideoFormat];
+        const DeckLinkVideoFormat& f = m_decklinkVideoFormats[m_internalVideoFormat];
 
         m_audioFrameSizes.resize(5);
         fsizes.resize(5);
@@ -743,16 +692,13 @@ namespace BlackMagicDevices
 
         options_description desc("BlackMagic Device Options");
 
-        desc.add_options()("help,h", "Usage Message")("verbose,v", "Verbose")(
-            "method,m", value<string>(), "Method (ipbo, basic)")(
-            "ring-buffer-size,s",
-            value<int>()->default_value(DEFAULT_RINGBUFFER_SIZE),
-            "Ring Buffer Size")(
-            HDMI_HDR_METADATA_ARG, value<string>(),
-            "HDMI HDR Metadata - comma-separated values - all floats except "
-            "eotf "
-            "which is an int: "
-            "rx,ry,gx,gy,bx,by,wx,wy,minML,maxML,mCLL,mFALL,eotf");
+        desc.add_options()("help,h", "Usage Message")("verbose,v", "Verbose")("method,m", value<string>(), "Method (ipbo, basic)")(
+            "ring-buffer-size,s", value<int>()->default_value(DEFAULT_RINGBUFFER_SIZE),
+            "Ring Buffer Size")(HDMI_HDR_METADATA_ARG, value<string>(),
+                                "HDMI HDR Metadata - comma-separated values - all floats except "
+                                "eotf "
+                                "which is an int: "
+                                "rx,ry,gx,gy,bx,by,wx,wy,minML,maxML,mCLL,mFALL,eotf");
 
         variables_map vm;
 
@@ -815,33 +761,26 @@ namespace BlackMagicDevices
 
             if (m_infoFeedback)
             {
-                cout << "INFO: BMD HDR Metadata input = " << hdrMetadata
-                     << endl;
+                std::cout << "INFO: BMD HDR Metadata input = " << hdrMetadata << '\n';
             }
 
-            // Parse the HDR metadata provided and save it as a static in the
-            // HDRVideoFrame class
+            // Parse the HDR metadata provided
             // Note that the same HDR metadata will be used for all the video
             // frames in the queue
-            bool parsingSuccessful = HDRVideoFrame::SetHDRMetadata(hdrMetadata);
-            if (parsingSuccessful)
+            bool parsingSuccessful = parseHDRMetadata(hdrMetadata);
+            if (parsingSuccessful && m_infoFeedback)
             {
-                if (m_infoFeedback)
-                {
-                    cout << "INFO: BMD HDR Metadata parsing successful ="
-                         << endl
-                         << HDRVideoFrame::DumpHDRMetadata() << endl;
-                }
+                std::cout << "INFO: BMD HDR Metadata parsing successful =\n" << dumpHDRMetadata() << '\n';
             }
             else
             {
                 m_useHDRMetadata = false;
                 if (m_infoFeedback)
                 {
-                    cout << "INFO: BMD HDR Metadata parsing error. HDR "
-                            "metadata will not "
-                            "be used"
-                         << endl;
+                    std::cout << "INFO: BMD HDR Metadata parsing error. HDR "
+                                 "metadata will not "
+                                 "be used"
+                              << '\n';
                 }
             }
         }
@@ -850,14 +789,13 @@ namespace BlackMagicDevices
         m_firstThreeCounter = 0;
         m_frameCount = 0;
         m_totalPlayoutFrames = 0;
-        m_lastPboData = NULL;
-        m_secondLastPboData = NULL;
+        m_lastPboData = nullptr;
+        m_secondLastPboData = nullptr;
 
         IDeckLinkDisplayModeIterator* pDLDisplayModeIterator = NULL;
         IDeckLinkDisplayMode* pDLDisplayMode = NULL;
 
-        const DeckLinkVideoFormat& v =
-            m_decklinkVideoFormats[m_internalVideoFormat];
+        const DeckLinkVideoFormat& v = m_decklinkVideoFormats[m_internalVideoFormat];
         BMDDisplayMode displayMode = v.value;
 
         // dynamically determine what pixel formats are supported based on the
@@ -865,35 +803,26 @@ namespace BlackMagicDevices
         m_decklinkDataFormats.clear();
 
         // play black frames when idle
-        if (m_configuration->SetInt(bmdDeckLinkConfigVideoOutputIdleOperation,
-                                    bmdIdleVideoOutputBlack)
-            != S_OK)
+        if (m_configuration->SetInt(bmdDeckLinkConfigVideoOutputIdleOperation, bmdIdleVideoOutputBlack) != S_OK)
         {
             TWK_THROW_EXC_STREAM("Cannot set decklink configuration\n");
         }
 
         // Set Video Transport (SingleLink/DualLink/QuadLink)
         int bmdQuadLinkSquareDivisionSplit = -1;
-        int bmdLinkConfiguration = getBmdLinkConfiguration(
-            m_internalVideo4KTransport, bmdQuadLinkSquareDivisionSplit);
+        int bmdLinkConfiguration = getBmdLinkConfiguration(m_internalVideo4KTransport, bmdQuadLinkSquareDivisionSplit);
 
-        if (m_configuration->SetInt(bmdDeckLinkConfigSDIOutputLinkConfiguration,
-                                    bmdLinkConfiguration)
-            != S_OK)
+        if (m_configuration->SetInt(bmdDeckLinkConfigSDIOutputLinkConfiguration, bmdLinkConfiguration) != S_OK)
         {
-            TWK_THROW_EXC_STREAM(
-                "Cannot set decklink SDI Output Link Configuration to "
-                << video4KTransports[m_internalVideo4KTransport].desc);
+            TWK_THROW_EXC_STREAM("Cannot set decklink SDI Output Link Configuration to "
+                                 << video4KTransports[m_internalVideo4KTransport].desc);
         }
         if (bmdQuadLinkSquareDivisionSplit != -1)
         {
-            if (m_configuration->SetFlag(
-                    bmdDeckLinkConfigQuadLinkSDIVideoOutputSquareDivisionSplit,
-                    bmdQuadLinkSquareDivisionSplit)
+            if (m_configuration->SetFlag(bmdDeckLinkConfigQuadLinkSDIVideoOutputSquareDivisionSplit, bmdQuadLinkSquareDivisionSplit)
                 != S_OK)
             {
-                TWK_THROW_EXC_STREAM(
-                    "Cannot set Square Division Quad Split mode\n");
+                TWK_THROW_EXC_STREAM("Cannot set Square Division Quad Split mode\n");
             }
         }
 
@@ -907,19 +836,16 @@ namespace BlackMagicDevices
             bool supported = false;
 #endif
 
-            HRESULT hr = m_outputAPI->DoesSupportVideoMode(
-                bmdVideoConnectionUnspecified, v.value, q->value,
-                bmdNoVideoOutputConversion,
-                getBmdSupportedVideoModeFlag(m_internalVideo4KTransport),
-                &displayMode, &supported);
+            HRESULT hr =
+                m_outputAPI->DoesSupportVideoMode(bmdVideoConnectionUnspecified, v.value, q->value, bmdNoVideoOutputConversion,
+                                                  getBmdSupportedVideoModeFlag(m_internalVideo4KTransport), &displayMode, &supported);
             if (hr == S_OK && supported)
             {
                 m_decklinkDataFormats.push_back(*q);
             }
         }
 
-        const DeckLinkDataFormat& d =
-            m_decklinkDataFormats[m_internalDataFormat];
+        const DeckLinkDataFormat& d = m_decklinkDataFormats[m_internalDataFormat];
         const string& dname = d.desc;
         m_outputPixelFormat = d.value;
 
@@ -937,8 +863,7 @@ namespace BlackMagicDevices
 
         m_videoFrameBufferSize = m_stereo ? m_pboSize * 2 : m_pboSize;
 
-        if (m_outputAPI->GetDisplayModeIterator(&pDLDisplayModeIterator)
-            != S_OK)
+        if (m_outputAPI->GetDisplayModeIterator(&pDLDisplayModeIterator) != S_OK)
         {
             TWK_THROW_EXC_STREAM("Cannot get display mode iterator.");
         }
@@ -961,8 +886,7 @@ namespace BlackMagicDevices
 
         if (pDLDisplayMode == NULL)
         {
-            TWK_THROW_EXC_STREAM(
-                "Cannot get specified BMDDisplayMode on DeckLink.");
+            TWK_THROW_EXC_STREAM("Cannot get specified BMDDisplayMode on DeckLink.");
         }
 
         m_frameWidth = pDLDisplayMode->GetWidth();
@@ -971,40 +895,30 @@ namespace BlackMagicDevices
 
         // Set the Video Output Color Space (RGB444/YUV422)
         const int bmdEnable444 = d.rgb ? 1 : 0;
-        HRESULT hr = m_configuration->SetFlag(
-            bmdDeckLinkConfig444SDIVideoOutput, bmdEnable444);
+        HRESULT hr = m_configuration->SetFlag(bmdDeckLinkConfig444SDIVideoOutput, bmdEnable444);
         if (hr != S_OK && hr != E_NOTIMPL)
         {
             TWK_THROW_EXC_STREAM("BMD: Failed to set 444 SDI output\n");
         }
 
         // enable video
-        BMDVideoOutputFlags videoOutputFlags =
-            m_stereo ? bmdVideoOutputDualStream3D : bmdVideoOutputFlagDefault;
-        if (m_outputAPI->EnableVideoOutput(displayMode, videoOutputFlags)
-            != S_OK)
+        BMDVideoOutputFlags videoOutputFlags = m_stereo ? bmdVideoOutputDualStream3D : bmdVideoOutputFlagDefault;
+        if (m_outputAPI->EnableVideoOutput(displayMode, videoOutputFlags) != S_OK)
         {
             TWK_THROW_EXC_STREAM("Cannot enable video output on DeckLink.");
         }
 
-        m_framesPerSecond =
-            (unsigned long)((m_frameTimescale + (m_frameDuration - 1))
-                            / m_frameDuration);
-        m_audioSamplesPerFrame =
-            (unsigned long)((m_audioSampleRate * m_frameDuration)
-                            / m_frameTimescale);
+        m_framesPerSecond = (unsigned long)((m_frameTimescale + (m_frameDuration - 1)) / m_frameDuration);
+        m_audioSamplesPerFrame = (unsigned long)((m_audioSampleRate * m_frameDuration) / m_frameTimescale);
 
         // Allocate audio buffers
         m_audioFormatSizeInBytes = TwkAudio::formatSizeInBytes(m_audioFormat);
         for (int i = 0; i < NB_AUDIO_BUFFERS; i++)
         {
-            m_audioData[i] =
-                new char[m_audioSamplesPerFrame * m_audioChannelCount
-                         * m_audioFormatSizeInBytes];
+            m_audioData[i] = new char[m_audioSamplesPerFrame * m_audioChannelCount * m_audioFormatSizeInBytes];
             std::memset(m_audioData[i],
                         0, // Fill value
-                        m_audioSamplesPerFrame * m_audioChannelCount
-                            * m_audioFormatSizeInBytes);
+                        m_audioSamplesPerFrame * m_audioChannelCount * m_audioFormatSizeInBytes);
         }
 
         //
@@ -1029,12 +943,16 @@ namespace BlackMagicDevices
         for (int i = 0; i < m_videoFrameBufferSize; i++)
         {
             IDeckLinkMutableVideoFrame* outputFrame = nullptr;
-            const DeckLinkDataFormat& dataFormat =
-                m_decklinkDataFormats[m_internalDataFormat];
-            if (m_outputAPI->CreateVideoFrame(
-                    m_frameWidth, m_frameHeight,
-                    bytesPerRow(dataFormat.value, m_frameWidth),
-                    dataFormat.value, bmdFrameFlagFlipVertical, &outputFrame)
+            const DeckLinkDataFormat& dataFormat = m_decklinkDataFormats[m_internalDataFormat];
+
+            int32_t frameRowBytes = 0;
+            HRESULT hr = deckLinkOutput()->RowBytesForPixelFormat(dataFormat.value, static_cast<int32_t>(m_frameWidth), &frameRowBytes);
+            if (hr != S_OK)
+            {
+                throw runtime_error("Cannot get the row bytes for the pixel format");
+            }
+            if (m_outputAPI->CreateVideoFrame(static_cast<int32_t>(m_frameWidth), static_cast<int32_t>(m_frameHeight), frameRowBytes,
+                                              dataFormat.value, bmdFrameFlagFlipVertical, &outputFrame)
                 != S_OK)
             {
                 TWK_THROW_EXC_STREAM("Cannot create video frame on DeckLink.");
@@ -1057,13 +975,11 @@ namespace BlackMagicDevices
             // either BGRA8 or RGBA10_10_10_2
             IDeckLinkMutableVideoFrame* readbackFrame;
 
-            if (m_outputAPI->CreateVideoFrame(
-                    m_frameWidth, m_frameHeight, m_frameWidth * 4,
-                    m_readPixelFormat, bmdFrameFlagFlipVertical, &readbackFrame)
+            if (m_outputAPI->CreateVideoFrame(m_frameWidth, m_frameHeight, m_frameWidth * 4, m_readPixelFormat, bmdFrameFlagFlipVertical,
+                                              &readbackFrame)
                 != S_OK)
             {
-                TWK_THROW_EXC_STREAM(
-                    "Cannot create readback frame on DeckLink.");
+                TWK_THROW_EXC_STREAM("Cannot create readback frame on DeckLink.");
             }
 
             m_DLReadbackVideoFrameQueue.push_back(readbackFrame);
@@ -1077,25 +993,18 @@ namespace BlackMagicDevices
         {
             for (int i = 1; i < m_DLOutputVideoFrameQueue.size(); i += 2)
             {
-                m_rightEyeToStereoFrameMap[m_DLOutputVideoFrameQueue.at(i)] =
-                    new StereoVideoFrame(m_DLOutputVideoFrameQueue.at(i - 1),
-                                         m_DLOutputVideoFrameQueue.at(i));
-            }
-        }
+                auto stereoVideoFrameProvider =
+                    std::make_unique<StereoVideoFrame::Provider>(m_DLOutputVideoFrameQueue.at(i - 1), m_DLOutputVideoFrameQueue.at(i));
 
-        //
-        //  Create the HDRVideoFrames
-        //  Note that no video frame memory will be allocated here, only a COM
-        //  object structure. An HDRVideoFrame is a COM object implementing the
-        //  following COM interfaces: IUnknown, IDeckLinkVideoFrame, and
-        //  IDeckLinkVideoFrameMetadataExtensions
-        //
-        if (m_useHDRMetadata)
-        {
-            for (int i = 0; i < m_DLOutputVideoFrameQueue.size(); i++)
-            {
-                m_FrameToHDRFrameMap[m_DLOutputVideoFrameQueue.at(i)] =
-                    new HDRVideoFrame(m_DLOutputVideoFrameQueue.at(i));
+                HRESULT result = m_DLOutputVideoFrameQueue.at(i - 1)->SetInterfaceProvider(IID_IDeckLinkVideoFrame3DExtensions,
+                                                                                           stereoVideoFrameProvider.get());
+                if (result != S_OK)
+                {
+                    throw runtime_error("Failed to set stereo interface "
+                                        "provider on left frame.");
+                }
+
+                m_rightEyeToStereoFrameMap[m_DLOutputVideoFrameQueue.at(i)] = std::move(stereoVideoFrameProvider);
             }
         }
 
@@ -1108,9 +1017,7 @@ namespace BlackMagicDevices
         //  Set the audio output mode
         //
 
-        if (m_outputAPI->EnableAudioOutput(
-                m_audioSampleRate, m_audioSampleDepth, m_audioChannelCount,
-                bmdAudioOutputStreamContinuous)
+        if (m_outputAPI->EnableAudioOutput(m_audioSampleRate, m_audioSampleDepth, m_audioChannelCount, bmdAudioOutputStreamContinuous)
             != S_OK)
         {
             TWK_THROW_EXC_STREAM("Cannot enable audio output on DeckLink.");
@@ -1122,8 +1029,8 @@ namespace BlackMagicDevices
         }
 
         m_readyFrame = m_DLOutputVideoFrameQueue.at(0);
-        m_readyStereoFrame =
-            m_rightEyeToStereoFrameMap[m_DLOutputVideoFrameQueue.at(1)];
+        m_readyStereoFrame = m_rightEyeToStereoFrameMap[m_DLOutputVideoFrameQueue.at(1)].get();
+        m_rightEyeToStereoFrameMap[m_DLOutputVideoFrameQueue.at(1)].get();
 
         m_open = true;
     }
@@ -1170,24 +1077,7 @@ namespace BlackMagicDevices
 
             if (m_stereo)
             {
-                StereoFrameMap::iterator it;
-                for (it = m_rightEyeToStereoFrameMap.begin();
-                     it != m_rightEyeToStereoFrameMap.end(); ++it)
-                {
-                    delete it->second;
-                }
                 m_rightEyeToStereoFrameMap.clear();
-            }
-
-            if (m_useHDRMetadata)
-            {
-                HDRVideoFrameMap::iterator it;
-                for (it = m_FrameToHDRFrameMap.begin();
-                     it != m_FrameToHDRFrameMap.end(); ++it)
-                {
-                    delete it->second;
-                }
-                m_FrameToHDRFrameMap.clear();
             }
         }
 
@@ -1218,9 +1108,7 @@ namespace BlackMagicDevices
         m_hasAudio = true;
         rc = pthread_mutex_unlock(&audioMutex);
 
-        std::memcpy(m_audioData[m_audioDataIndex], data,
-                    m_audioFormatSizeInBytes * m_audioSamplesPerFrame
-                        * m_audioChannelCount);
+        std::memcpy(m_audioData[m_audioDataIndex], data, m_audioFormatSizeInBytes * m_audioSamplesPerFrame * m_audioChannelCount);
         m_audioDataIndex = (m_audioDataIndex + 1) % 2;
     }
 
@@ -1231,8 +1119,7 @@ namespace BlackMagicDevices
         fbo->bind();
 
         IDeckLinkMutableVideoFrame* readbackVideoFrame = NULL;
-        IDeckLinkMutableVideoFrame* outputVideoFrame =
-            m_DLOutputVideoFrameQueue.front();
+        IDeckLinkMutableVideoFrame* outputVideoFrame = m_DLOutputVideoFrameQueue.front();
         m_DLOutputVideoFrameQueue.push_back(outputVideoFrame);
         m_DLOutputVideoFrameQueue.pop_front();
 
@@ -1248,8 +1135,7 @@ namespace BlackMagicDevices
         if (m_pbos)
             transferChannelPBO(n, fbo, outputVideoFrame, readbackVideoFrame);
         else
-            transferChannelReadPixels(n, fbo, outputVideoFrame,
-                                      readbackVideoFrame);
+            transferChannelReadPixels(n, fbo, outputVideoFrame, readbackVideoFrame);
 
         if (n == 0 && !m_stereo)
         {
@@ -1259,16 +1145,14 @@ namespace BlackMagicDevices
         else if (n == 1) // in case of stereo, ready frame is updated when right
                          // eye is transfered
         {
-            m_readyStereoFrame = m_rightEyeToStereoFrameMap[outputVideoFrame];
+            m_readyStereoFrame = m_rightEyeToStereoFrameMap[outputVideoFrame].get();
         }
 
         return true;
     }
 
-    void DeckLinkVideoDevice::transferChannelPBO(
-        size_t n, const GLFBO* fbo,
-        IDeckLinkMutableVideoFrame* outputVideoFrame,
-        IDeckLinkMutableVideoFrame* readbackVideoFrame) const
+    void DeckLinkVideoDevice::transferChannelPBO(size_t n, const GLFBO* fbo, IDeckLinkMutableVideoFrame* outputVideoFrame,
+                                                 IDeckLinkMutableVideoFrame* readbackVideoFrame) const
     {
         HOP_CALL(glFinish();)
         HOP_PROF_FUNC();
@@ -1279,8 +1163,7 @@ namespace BlackMagicDevices
             lastPboData = m_secondLastPboData;
         }
 
-        const DeckLinkDataFormat& d =
-            m_decklinkDataFormats[m_internalDataFormat];
+        const DeckLinkDataFormat& d = m_decklinkDataFormats[m_internalDataFormat];
 
         // GL_UNSIGNED_INT_10_10_10_2 is a non native GPU format which leads to
         // costly GPU readbacks. To work around this performance issue we will
@@ -1296,8 +1179,7 @@ namespace BlackMagicDevices
             perform_ABGR10_to_RGBA10_conversion = true;
         }
 
-        const bool perform_rgb16_to_rgb12_conversion =
-            (d.value == bmdFormat12BitRGBLE);
+        const bool perform_rgb16_to_rgb12_conversion = (d.value == bmdFormat12BitRGBLE);
 
         if (lastPboData)
         {
@@ -1308,55 +1190,47 @@ namespace BlackMagicDevices
             lastPboData->state = PBOData::State::Transferring;
             lastPboData->unlockState();
 
-            void* p =
-                (void*)glMapBuffer(GL_PIXEL_PACK_BUFFER_ARB, GL_READ_ONLY_ARB);
+            void* p = (void*)glMapBuffer(GL_PIXEL_PACK_BUFFER_ARB, GL_READ_ONLY_ARB);
             TWK_GLDEBUG;
-            if (p)
+
+            if (p != nullptr)
             {
-                void* pFrame;
-                outputVideoFrame->GetBytes(&pFrame);
+                void* pFrame = nullptr;
+                HRESULT result = getVideoFrameBuffer(outputVideoFrame, &pFrame);
+                if (result != S_OK)
+                {
+                    throw std::runtime_error("Failed to get video frame buffer");
+                }
 
                 if (d.iformat >= VideoDevice::Y0CbY1Cr_8_422)
                 {
                     if (d.iformat == VideoDevice::Y0CbY1Cr_8_422)
                     {
-                        subsample422_8bit_UYVY_MP(
-                            m_frameWidth, m_frameHeight,
-                            reinterpret_cast<uint8_t*>(p),
-                            reinterpret_cast<uint8_t*>(pFrame));
+                        subsample422_8bit_UYVY_MP(m_frameWidth, m_frameHeight, reinterpret_cast<uint8_t*>(p),
+                                                  reinterpret_cast<uint8_t*>(pFrame));
                     }
                     else
                     {
-                        subsample422_10bit_MP(
-                            m_frameWidth, m_frameHeight,
-                            reinterpret_cast<uint32_t*>(p),
-                            reinterpret_cast<uint32_t*>(pFrame),
-                            m_frameWidth * sizeof(uint32_t),
-                            static_cast<size_t>(
-                                outputVideoFrame->GetRowBytes()));
+                        subsample422_10bit_MP(m_frameWidth, m_frameHeight, reinterpret_cast<uint32_t*>(p),
+                                              reinterpret_cast<uint32_t*>(pFrame), m_frameWidth * sizeof(uint32_t),
+                                              static_cast<size_t>(outputVideoFrame->GetRowBytes()));
                     }
                 }
                 else
                 {
                     if (perform_ABGR10_to_RGBA10_conversion)
                     {
-                        convert_ABGR10_to_RGBA10_MP(
-                            m_frameWidth, m_frameHeight,
-                            reinterpret_cast<uint32_t*>(p),
-                            reinterpret_cast<uint32_t*>(pFrame));
+                        convert_ABGR10_to_RGBA10_MP(m_frameWidth, m_frameHeight, reinterpret_cast<uint32_t*>(p),
+                                                    reinterpret_cast<uint32_t*>(pFrame));
                     }
                     else if (perform_rgb16_to_rgb12_conversion)
                     {
-                        convert_RGB16_to_RGB12_MP(
-                            m_frameWidth, m_frameHeight, p, pFrame,
-                            m_frameWidth * sizeof(uint16_t) * 3,
-                            static_cast<size_t>(
-                                outputVideoFrame->GetRowBytes()));
+                        convert_RGB16_to_RGB12_MP(m_frameWidth, m_frameHeight, p, pFrame, m_frameWidth * sizeof(uint16_t) * 3,
+                                                  static_cast<size_t>(outputVideoFrame->GetRowBytes()));
                     }
                     else
                     {
-                        FastMemcpy_MP(pFrame, p,
-                                      m_frameHeight * m_frameWidth * 4);
+                        FastMemcpy_MP(pFrame, p, m_frameHeight * m_frameWidth * 4);
                     }
                 }
             }
@@ -1373,15 +1247,10 @@ namespace BlackMagicDevices
         {
 #if defined(HOP_ENABLED)
             std::string hopMsg = std::string("glReadPixels() next PBO");
-            const size_t pixelSize = TwkGLF::pixelSizeFromTextureFormat(
-                m_textureFormat, m_textureType);
-            hopMsg += std::string(" - width=") + std::to_string(m_frameWidth)
-                      + std::string(", height=") + std::to_string(m_frameHeight)
-                      + std::string(", pixelSize=") + std::to_string(pixelSize)
-                      + std::string(", textureFormat=")
-                      + std::to_string(m_textureFormat)
-                      + std::string(", textureType=")
-                      + std::to_string(m_textureType);
+            const size_t pixelSize = TwkGLF::pixelSizeFromTextureFormat(m_textureFormat, m_textureType);
+            hopMsg += std::string(" - width=") + std::to_string(m_frameWidth) + std::string(", height=") + std::to_string(m_frameHeight)
+                      + std::string(", pixelSize=") + std::to_string(pixelSize) + std::string(", textureFormat=")
+                      + std::to_string(m_textureFormat) + std::string(", textureType=") + std::to_string(m_textureType);
             HOP_PROF_DYN_NAME(hopMsg.c_str());
 #endif
 
@@ -1409,8 +1278,7 @@ namespace BlackMagicDevices
                 TWK_GLDEBUG;
             }
 
-            glReadPixels(0, 0, m_frameWidth, m_frameHeight, m_textureFormat,
-                         textureTypeToUse, 0);
+            glReadPixels(0, 0, m_frameWidth, m_frameHeight, m_textureFormat, textureTypeToUse, 0);
             TWK_GLDEBUG;
 
             if (m_stereo && n == 0)
@@ -1427,31 +1295,35 @@ namespace BlackMagicDevices
         }
     }
 
-    void DeckLinkVideoDevice::transferChannelReadPixels(
-        size_t n, const GLFBO* fbo,
-        IDeckLinkMutableVideoFrame* outputVideoFrame,
-        IDeckLinkMutableVideoFrame* readbackVideoFrame) const
+    void DeckLinkVideoDevice::transferChannelReadPixels(size_t n, const GLFBO* fbo, IDeckLinkMutableVideoFrame* outputVideoFrame,
+                                                        IDeckLinkMutableVideoFrame* readbackVideoFrame) const
     {
         HOP_PROF_FUNC();
 
-        void* pFrame;
+        void* pFrame = nullptr;
         if (m_needsFrameConverter)
         {
-            readbackVideoFrame->GetBytes(&pFrame);
+            HRESULT result = getVideoFrameBuffer(readbackVideoFrame, &pFrame);
+            if (result != S_OK)
+            {
+                throw std::runtime_error("Failed to get readback video frame buffer");
+            }
         }
         else
         {
-            outputVideoFrame->GetBytes(&pFrame);
+            HRESULT result = getVideoFrameBuffer(outputVideoFrame, &pFrame);
+            if (result != S_OK)
+            {
+                throw std::runtime_error("Failed to get output video frame buffer");
+            }
         }
 
-        const DeckLinkDataFormat& d =
-            m_decklinkDataFormats[m_internalDataFormat];
+        const DeckLinkDataFormat& d = m_decklinkDataFormats[m_internalDataFormat];
 
         TwkUtil::Timer timer;
         timer.start();
 
-        glReadPixels(0, 0, m_frameWidth, m_frameHeight, m_textureFormat,
-                     m_textureType, pFrame);
+        glReadPixels(0, 0, m_frameWidth, m_frameHeight, m_textureFormat, m_textureType, pFrame);
 
         timer.stop();
 
@@ -1462,22 +1334,22 @@ namespace BlackMagicDevices
             TwkUtil::Timer timer;
             timer.start();
 
-            void* outData;
-            outputVideoFrame->GetBytes(&outData);
+            void* outData = nullptr;
+            HRESULT result = getVideoFrameBuffer(outputVideoFrame, &outData);
+            if (result != S_OK)
+            {
+                throw std::runtime_error("Failed to get output video frame buffer for conversion");
+            }
             if (d.iformat == VideoDevice::Y0CbY1Cr_8_422)
             {
-                subsample422_8bit_UYVY_MP(m_frameWidth, m_frameHeight,
-                                          reinterpret_cast<uint8_t*>(pFrame),
+                subsample422_8bit_UYVY_MP(m_frameWidth, m_frameHeight, reinterpret_cast<uint8_t*>(pFrame),
                                           reinterpret_cast<uint8_t*>(outData));
             }
             else
             {
-                subsample422_10bit_MP(
-                    m_frameWidth, m_frameHeight,
-                    reinterpret_cast<uint32_t*>(pFrame),
-                    reinterpret_cast<uint32_t*>(outData),
-                    m_frameWidth * sizeof(uint32_t),
-                    static_cast<size_t>(outputVideoFrame->GetRowBytes()));
+                subsample422_10bit_MP(m_frameWidth, m_frameHeight, reinterpret_cast<uint32_t*>(pFrame),
+                                      reinterpret_cast<uint32_t*>(outData), m_frameWidth * sizeof(uint32_t),
+                                      static_cast<size_t>(outputVideoFrame->GetRowBytes()));
             }
 
             timer.stop();
@@ -1517,11 +1389,9 @@ namespace BlackMagicDevices
             if ((m_totalPlayoutFrames > 5))
             {
                 const double secondsPerFrame = 1.0 / m_framesPerSecond;
-                const double secondsSinceLastReadyFrame =
-                    sinceLastReadyFrameTimer.elapsed();
+                const double secondsSinceLastReadyFrame = sinceLastReadyFrameTimer.elapsed();
 #if defined(HOP_ENABLED)
-                std::string hopMsg =
-                    std::string("detector-msSinceLastReadyFrame=");
+                std::string hopMsg = std::string("detector-msSinceLastReadyFrame=");
                 hopMsg += std::to_string(secondsSinceLastReadyFrame * 1000.0);
                 HOP_PROF_DYN_NAME(hopMsg.c_str());
 #endif
@@ -1529,9 +1399,7 @@ namespace BlackMagicDevices
                 {
                     HOP_PROF("skippedFrame");
                     cout << "WARNING: Skipped Frame"
-                         << " - secondsSinceLastReadyFrame="
-                         << secondsSinceLastReadyFrame
-                         << " - Frame Rate=" << m_framesPerSecond << endl;
+                         << " - secondsSinceLastReadyFrame=" << secondsSinceLastReadyFrame << " - Frame Rate=" << m_framesPerSecond << endl;
                 }
             }
             sinceLastReadyFrameTimer.start();
@@ -1562,8 +1430,7 @@ namespace BlackMagicDevices
         return true;
     }
 
-    void DeckLinkVideoDevice::transfer2(const GLFBO* fbo,
-                                        const GLFBO* fbo2) const
+    void DeckLinkVideoDevice::transfer2(const GLFBO* fbo, const GLFBO* fbo2) const
     {
         if (!m_open)
             return;
@@ -1628,10 +1495,8 @@ namespace BlackMagicDevices
         {
             size_t num = m_stereo ? m_pboSize * 2 : m_pboSize;
 
-            const size_t bytesPerPixel = std::max(
-                static_cast<size_t>(4),
-                pixelSizeInBytes(
-                    m_decklinkDataFormats[m_internalDataFormat].iformat));
+            const size_t bytesPerPixel =
+                std::max(static_cast<size_t>(4), pixelSizeInBytes(m_decklinkDataFormats[m_internalDataFormat].iformat));
 
             for (size_t q = 0; q < num; q++)
             {
@@ -1640,9 +1505,7 @@ namespace BlackMagicDevices
                 TWK_GLDEBUG;
                 glBindBuffer(GL_PIXEL_PACK_BUFFER_ARB, glObject);
                 TWK_GLDEBUG;
-                glBufferData(GL_PIXEL_PACK_BUFFER_ARB,
-                             m_frameWidth * bytesPerPixel * m_frameHeight, NULL,
-                             GL_STATIC_READ);
+                glBufferData(GL_PIXEL_PACK_BUFFER_ARB, m_frameWidth * bytesPerPixel * m_frameHeight, NULL, GL_STATIC_READ);
                 TWK_GLDEBUG;
                 glBindBuffer(GL_PIXEL_PACK_BUFFER_ARB, 0);
                 TWK_GLDEBUG;
@@ -1654,49 +1517,41 @@ namespace BlackMagicDevices
         resetClock();
     }
 
-    void DeckLinkVideoDevice::bind2(const GLVideoDevice* d,
-                                    const GLVideoDevice* d2) const
-    {
-        bind(d);
-    }
+    void DeckLinkVideoDevice::bind2(const GLVideoDevice* d, const GLVideoDevice* d2) const { bind(d); }
 
     void DeckLinkVideoDevice::ScheduleFrame() const
     {
         if (isOpen())
         {
-            IDeckLinkVideoFrame* outputVideoFrame =
-                m_stereo ? (IDeckLinkVideoFrame*)m_readyStereoFrame
-                         : (IDeckLinkVideoFrame*)m_readyFrame;
+            IDeckLinkVideoFrame* outputVideoFrame = m_stereo ? m_readyStereoFrame->GetLeftFrame() : (IDeckLinkVideoFrame*)m_readyFrame;
 
-            if (m_useHDRMetadata)
+            if (m_useHDRMetadata && (outputVideoFrame != nullptr))
             {
-                outputVideoFrame =
-                    (IDeckLinkVideoFrame*)m_FrameToHDRFrameMap[m_readyFrame];
+                setHDRMetadataOnFrame(outputVideoFrame);
             }
 
-            if (outputVideoFrame)
+            if (outputVideoFrame != nullptr)
             {
-                // Prevent undesirable audio artifacts when repeating the same
-                // frame Note that some conditions might prevent RV from
-                // fetching a new frame in time. In this case the same frame has
-                // to be sent to the output. Repeating one frame has a minimal
-                // impact on the review session. However repeating the same
-                // audio snippet might cause an undesirable audio artifact. This
-                // is what we want to prevent here. Example of such a condition:
-                // when adding media to a sequence while a playback is already
-                // in progress for example,
+                // Prevent undesirable audio artifacts when repeating the
+                // same frame Note that some conditions might prevent RV
+                // from fetching a new frame in time. In this case the same
+                // frame has to be sent to the output. Repeating one frame
+                // has a minimal impact on the review session. However
+                // repeating the same audio snippet might cause an
+                // undesirable audio artifact. This is what we want to
+                // prevent here. Example of such a condition: when adding
+                // media to a sequence while a playback is already in
+                // progress for example,
                 bool skipAudioIfAny = false;
-                static IDeckLinkVideoFrame*
-                    previouslyScheduledOutputVideoFrame = nullptr;
+                static IDeckLinkVideoFrame* previouslyScheduledOutputVideoFrame = nullptr;
                 if (outputVideoFrame == previouslyScheduledOutputVideoFrame)
                 {
                     skipAudioIfAny = true;
                 }
                 previouslyScheduledOutputVideoFrame = outputVideoFrame;
 
-                HRESULT r = m_outputAPI->ScheduleVideoFrame(
-                    outputVideoFrame, (m_totalPlayoutFrames * m_frameDuration),
-                    m_frameDuration, m_frameTimescale);
+                HRESULT r = m_outputAPI->ScheduleVideoFrame(outputVideoFrame, (m_totalPlayoutFrames * m_frameDuration), m_frameDuration,
+                                                            m_frameTimescale);
 
                 if (r != S_OK)
                     TWK_THROW_EXC_STREAM("Cannot schedule frame.");
@@ -1708,14 +1563,11 @@ namespace BlackMagicDevices
                     rc = pthread_mutex_unlock(&audioMutex);
                     int index = (m_audioDataIndex == 1) ? 0 : 1;
                     if (m_audioData[index]
-                        && m_outputAPI->ScheduleAudioSamples(
-                               m_audioData[index], m_audioSamplesPerFrame,
-                               (m_totalPlayoutFrames * m_audioSamplesPerFrame),
-                               bmdAudioSampleRate48kHz, NULL)
+                        && m_outputAPI->ScheduleAudioSamples(m_audioData[index], m_audioSamplesPerFrame,
+                                                             (m_totalPlayoutFrames * m_audioSamplesPerFrame), bmdAudioSampleRate48kHz, NULL)
                                != S_OK)
                     {
-                        TWK_THROW_EXC_STREAM(
-                            "Failed to perform audio transfers.");
+                        TWK_THROW_EXC_STREAM("Failed to perform audio transfers.");
                     }
                 }
                 else
@@ -1728,30 +1580,8 @@ namespace BlackMagicDevices
         }
     }
 
-    size_t DeckLinkVideoDevice::bytesPerRow(BMDPixelFormat bmdFormat,
-                                            size_t width) const
-    {
-        switch (bmdFormat)
-        {
-        case bmdFormat8BitYUV:
-            return m_frameWidth * 16 / 8;
-        case bmdFormat8BitBGRA:
-            return m_frameWidth * 32 / 8;
-        case bmdFormat10BitYUV:
-            return ((m_frameWidth + 47) / 48) * 128;
-        case bmdFormat10BitRGBXLE:
-            return ((m_frameWidth + 63) / 64) * 256;
-        case bmdFormat12BitRGBLE:
-            return (m_frameWidth * 36) / 8;
-        default:
-            TWK_THROW_EXC_STREAM("Unknown pixel format.");
-        }
-    }
-
     HRESULT
-    DeckLinkVideoDevice::ScheduledFrameCompleted(
-        IDeckLinkVideoFrame* completedFrame,
-        BMDOutputFrameCompletionResult result)
+    DeckLinkVideoDevice::ScheduledFrameCompleted(IDeckLinkVideoFrame* completedFrame, BMDOutputFrameCompletionResult result)
     {
         ScheduleFrame();
 
@@ -1778,6 +1608,285 @@ namespace BlackMagicDevices
             m_outputAPI->StartScheduledPlayback(0, 100, 1.0);
         }
         return S_OK;
+    }
+
+    std::string DeckLinkVideoDevice::dumpHDRMetadata() const
+    {
+        std::ostringstream hdrMetedata;
+
+        hdrMetedata << "redPrimaryX:                    " << s_hdrMetadata.referencePrimaries.RedX << '\n'
+                    << "redPrimaryY:                    " << s_hdrMetadata.referencePrimaries.RedY << '\n'
+                    << "greenPrimaryX:                  " << s_hdrMetadata.referencePrimaries.GreenX << '\n'
+                    << "greenPrimaryY:                  " << s_hdrMetadata.referencePrimaries.GreenY << '\n'
+                    << "bluePrimaryX:                   " << s_hdrMetadata.referencePrimaries.BlueX << '\n'
+                    << "bluePrimaryY:                   " << s_hdrMetadata.referencePrimaries.BlueY << '\n'
+                    << "whitePointX:                    " << s_hdrMetadata.referencePrimaries.WhiteX << '\n'
+                    << "whitePointY:                    " << s_hdrMetadata.referencePrimaries.WhiteY << '\n'
+                    << "minMasteringLuminance:          " << s_hdrMetadata.minDisplayMasteringLuminance << '\n'
+                    << "maxMasteringLuminance:          " << s_hdrMetadata.maxDisplayMasteringLuminance << '\n'
+                    << "maxContentLightLevel:           " << s_hdrMetadata.maxContentLightLevel << '\n'
+                    << "maxFrameAverageLightLevel:      " << s_hdrMetadata.maxFrameAverageLightLevel << '\n'
+                    << "electroOpticalTransferFunction: " << s_hdrMetadata.electroOpticalTransferFunction << '\n';
+        return hdrMetedata.str();
+    }
+
+    bool DeckLinkVideoDevice::parseHDRMetadata(const std::string& data)
+    {
+        // Very, very basic and brutal parsing routine for the hdr
+        // argument string.
+        // No error checking, no validation, no plan B, data must be
+        // exactly as expected or it won't work.
+        //
+        // Sample values :
+        //    redPrimaryX:                    0.708000004
+        //    redPrimaryY:                    0.291999996
+        //    greenPrimaryX:                  0.170000002
+        //    greenPrimaryY:                  0.79699999
+        //    bluePrimaryX:                   0.130999997
+        //    bluePrimaryY:                   0.0460000001
+        //    whitePointX:                    0.312700003
+        //    whitePointY:                    0.328999996
+        //    minMasteringLuminance:          0.00499999989
+        //    maxMasteringLuminance:          10000.0
+        //    maxContentLightLevel:           0.0
+        //    maxFrameAverageLightLevel:      0.0
+        //    electroOpticalTransferFunction: 2
+        //
+        // Expected format (to be entered in the "Additional Options"
+        // box of the Video preferences panel):
+        //
+        // --hdmi-hdr-metadata=0.708000004,0.291999996,0.170000002,0.79699999,0.130999997,0.0460000001,0.312700003,0.328999996,0.00499999989,10000.0,0.0,0.0,2
+        //
+        // or via env var:
+        //
+        // setenv TWK_BLACKMAGIC_HDMI_HDR_METADATA
+        // "0.708000004,0.291999996,0.170000002,0.79699999,0.130999997,0.0460000001,0.312700003,0.328999996,0.00499999989,10000.0,0.0,0.0,2"
+        //
+        // (the types - float vs int - are important!)
+
+        size_t pos0 = 0;
+        size_t pos1;
+
+        // redPrimaryX
+        pos1 = data.find(",", pos0);
+        if (pos1 == std::string::npos)
+            return false;
+        s_hdrMetadata.referencePrimaries.RedX = atof(data.substr(pos0, pos1 - pos0).c_str());
+        pos0 = pos1 + 1;
+
+        // redPrimaryY
+        pos1 = data.find(",", pos0);
+        if (pos1 == std::string::npos)
+            return false;
+        s_hdrMetadata.referencePrimaries.RedY = atof(data.substr(pos0, pos1 - pos0).c_str());
+        pos0 = pos1 + 1;
+
+        // greenPrimaryX
+        pos1 = data.find(",", pos0);
+        if (pos1 == std::string::npos)
+            return false;
+        s_hdrMetadata.referencePrimaries.GreenX = atof(data.substr(pos0, pos1 - pos0).c_str());
+        pos0 = pos1 + 1;
+
+        // greenPrimaryY
+        pos1 = data.find(",", pos0);
+        if (pos1 == std::string::npos)
+            return false;
+        s_hdrMetadata.referencePrimaries.GreenY = atof(data.substr(pos0, pos1 - pos0).c_str());
+        pos0 = pos1 + 1;
+
+        // bluePrimaryX
+        pos1 = data.find(",", pos0);
+        if (pos1 == std::string::npos)
+            return false;
+        s_hdrMetadata.referencePrimaries.BlueX = atof(data.substr(pos0, pos1 - pos0).c_str());
+        pos0 = pos1 + 1;
+
+        // bluePrimaryY
+        pos1 = data.find(",", pos0);
+        if (pos1 == std::string::npos)
+            return false;
+        s_hdrMetadata.referencePrimaries.BlueY = atof(data.substr(pos0, pos1 - pos0).c_str());
+        pos0 = pos1 + 1;
+
+        // whitePointX
+        pos1 = data.find(",", pos0);
+        if (pos1 == std::string::npos)
+            return false;
+        s_hdrMetadata.referencePrimaries.WhiteX = atof(data.substr(pos0, pos1 - pos0).c_str());
+        pos0 = pos1 + 1;
+
+        // whitePointY
+        pos1 = data.find(",", pos0);
+        if (pos1 == std::string::npos)
+            return false;
+        s_hdrMetadata.referencePrimaries.WhiteY = atof(data.substr(pos0, pos1 - pos0).c_str());
+        pos0 = pos1 + 1;
+
+        // minMasteringLuminance
+        pos1 = data.find(",", pos0);
+        if (pos1 == std::string::npos)
+            return false;
+        s_hdrMetadata.minDisplayMasteringLuminance = atof(data.substr(pos0, pos1 - pos0).c_str());
+        pos0 = pos1 + 1;
+
+        // maxMasteringLuminance
+        pos1 = data.find(",", pos0);
+        if (pos1 == std::string::npos)
+            return false;
+        s_hdrMetadata.maxDisplayMasteringLuminance = atof(data.substr(pos0, pos1 - pos0).c_str());
+        pos0 = pos1 + 1;
+
+        // maxContentLightLevel
+        pos1 = data.find(",", pos0);
+        if (pos1 == std::string::npos)
+            return false;
+        s_hdrMetadata.maxContentLightLevel = atof(data.substr(pos0, pos1 - pos0).c_str());
+        pos0 = pos1 + 1;
+
+        // maxFrameAverageLightLevel
+        pos1 = data.find(",", pos0);
+        if (pos1 == std::string::npos)
+            return false;
+        s_hdrMetadata.maxFrameAverageLightLevel = atof(data.substr(pos0, pos1 - pos0).c_str());
+        pos0 = pos1 + 1;
+
+        // electroOpticalTransferFunction (last value, no comma)
+        s_hdrMetadata.electroOpticalTransferFunction = atoll(data.substr(pos0).c_str());
+
+        return true;
+    }
+
+    void DeckLinkVideoDevice::setHDRMetadataOnFrame(IDeckLinkVideoFrame* frame) const
+    {
+        if (!frame || !m_useHDRMetadata)
+            return;
+
+        IDeckLinkVideoFrameMutableMetadataExtensions* metadataExtensions = nullptr;
+        auto result =
+            frame->QueryInterface(IID_IDeckLinkVideoFrameMutableMetadataExtensions, reinterpret_cast<void**>(&metadataExtensions));
+
+        if (result != S_OK || metadataExtensions == nullptr)
+        {
+            if (m_infoFeedback)
+            {
+                cout << "WARNING: Failed to query HDR metadata extensions "
+                        "interface\n";
+            }
+            return;
+        }
+
+        // Set colorspace to Rec.2020
+        result = metadataExtensions->SetInt(bmdDeckLinkFrameMetadataColorspace, bmdColorspaceRec2020);
+        if (result != S_OK && m_infoFeedback)
+        {
+            std::cout << "WARNING: Failed to set colorspace metadata\n";
+        }
+
+        // Set EOTF
+        result =
+            metadataExtensions->SetInt(bmdDeckLinkFrameMetadataHDRElectroOpticalTransferFunc, s_hdrMetadata.electroOpticalTransferFunction);
+
+        if (result != S_OK && m_infoFeedback)
+        {
+            std::cout << "WARNING: Failed to set EOTF metadata\n";
+        }
+
+        // Set display primaries
+        result = metadataExtensions->SetFloat(bmdDeckLinkFrameMetadataHDRDisplayPrimariesRedX, s_hdrMetadata.referencePrimaries.RedX);
+
+        if (result != S_OK && m_infoFeedback)
+        {
+            std::cout << "WARNING: Failed to set primaries red X metadata\n";
+        }
+
+        result = metadataExtensions->SetFloat(bmdDeckLinkFrameMetadataHDRDisplayPrimariesRedY, s_hdrMetadata.referencePrimaries.RedY);
+
+        if (result != S_OK && m_infoFeedback)
+        {
+            std::cout << "WARNING: Failed to set primaries red Y metadata\n";
+        }
+
+        result = metadataExtensions->SetFloat(bmdDeckLinkFrameMetadataHDRDisplayPrimariesGreenX, s_hdrMetadata.referencePrimaries.GreenX);
+
+        if (result != S_OK && m_infoFeedback)
+        {
+            std::cout << "WARNING: Failed to set primaries green X metadata\n";
+        }
+
+        result = metadataExtensions->SetFloat(bmdDeckLinkFrameMetadataHDRDisplayPrimariesGreenY, s_hdrMetadata.referencePrimaries.GreenY);
+
+        if (result != S_OK && m_infoFeedback)
+        {
+            std::cout << "WARNING: Failed to set primaries green Y metadata\n";
+        }
+
+        result = metadataExtensions->SetFloat(bmdDeckLinkFrameMetadataHDRDisplayPrimariesBlueX, s_hdrMetadata.referencePrimaries.BlueX);
+
+        if (result != S_OK && m_infoFeedback)
+        {
+            std::cout << "WARNING: Failed to set primaries blue X metadata\n";
+        }
+
+        result = metadataExtensions->SetFloat(bmdDeckLinkFrameMetadataHDRDisplayPrimariesBlueY, s_hdrMetadata.referencePrimaries.BlueY);
+
+        if (result != S_OK && m_infoFeedback)
+        {
+            std::cout << "WARNING: Failed to set primaries blue Y metadata\n";
+        }
+
+        // Set white point
+        result = metadataExtensions->SetFloat(bmdDeckLinkFrameMetadataHDRWhitePointX, s_hdrMetadata.referencePrimaries.WhiteX);
+
+        if (result != S_OK && m_infoFeedback)
+        {
+            std::cout << "WARNING: Failed to set primaries white X metadata\n";
+        }
+
+        result = metadataExtensions->SetFloat(bmdDeckLinkFrameMetadataHDRWhitePointY, s_hdrMetadata.referencePrimaries.WhiteY);
+
+        if (result != S_OK && m_infoFeedback)
+        {
+            std::cout << "WARNING: Failed to set primaries white Y metadata\n";
+        }
+
+        // Set luminance levels
+        result = metadataExtensions->SetFloat(bmdDeckLinkFrameMetadataHDRMaxDisplayMasteringLuminance,
+                                              s_hdrMetadata.maxDisplayMasteringLuminance);
+
+        if (result != S_OK && m_infoFeedback)
+        {
+            std::cout << "WARNING: Failed to set max display mastering "
+                         "luminance metadata\n";
+        }
+
+        result = metadataExtensions->SetFloat(bmdDeckLinkFrameMetadataHDRMinDisplayMasteringLuminance,
+                                              s_hdrMetadata.minDisplayMasteringLuminance);
+
+        if (result != S_OK && m_infoFeedback)
+        {
+            std::cout << "WARNING: Failed to set min display mastering "
+                         "luminance metadata\n";
+        }
+
+        result = metadataExtensions->SetFloat(bmdDeckLinkFrameMetadataHDRMaximumContentLightLevel, s_hdrMetadata.maxContentLightLevel);
+
+        if (result != S_OK && m_infoFeedback)
+        {
+            std::cout << "WARNING: Failed to set maximum content light level "
+                         "metadata\n";
+        }
+
+        result =
+            metadataExtensions->SetFloat(bmdDeckLinkFrameMetadataHDRMaximumFrameAverageLightLevel, s_hdrMetadata.maxFrameAverageLightLevel);
+
+        if (result != S_OK && m_infoFeedback)
+        {
+            std::cout << "WARNING: Failed to set maximum frame average light "
+                         "level metadata\n";
+        }
+
+        metadataExtensions->Release();
     }
 
 } // namespace BlackMagicDevices

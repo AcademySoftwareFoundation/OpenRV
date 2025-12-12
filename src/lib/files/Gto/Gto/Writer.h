@@ -34,8 +34,7 @@ namespace Gto
 
         struct PropertyPath
         {
-            PropertyPath(size_t a = size_t(-1), const std::string& cname = "",
-                         const StringVector& scope = StringVector(1))
+            PropertyPath(size_t a = size_t(-1), const std::string& cname = "", const StringVector& scope = StringVector(1))
                 : objectIndex(a)
                 , componentName(cname)
                 , componentScope(scope)
@@ -75,10 +74,7 @@ namespace Gto
         //  Deprecated open API
         //
 
-        bool open(const char* f, bool c)
-        {
-            return open(f, c ? CompressedGTO : BinaryGTO);
-        }
+        bool open(const char* f, bool c) { return open(f, c ? CompressedGTO : BinaryGTO); }
 
         //
         //  Close stream if applicable.
@@ -93,8 +89,7 @@ namespace Gto
         //  "polygon", "loop", "NURBS", "particle".
         //
 
-        void beginObject(const char* name, const char* protocol,
-                         uint32 protocolVersion);
+        void beginObject(const char* name, const char* protocol, uint32 protocolVersion);
 
         //
         //  beginComponent() -- declare a component. This can only be
@@ -105,26 +100,21 @@ namespace Gto
         //
 
         void beginComponent(const char* name, uint32 flags = 0);
-        void beginComponent(const char* name, const char* interp,
-                            uint32 flags = 0);
+        void beginComponent(const char* name, const char* interp, uint32 flags = 0);
 
         //
         //  delcare a property of a component
         //
 
-        void property(const char* name, Gto::DataType, size_t numElements,
-                      const Dimensions& dims = Dimensions(),
-                      const char* interp = 0);
+        void property(const char* name, Gto::DataType, size_t numElements, const Dimensions& dims = Dimensions(), const char* interp = 0);
 
         //
         //  For backwards compatibility
         //
 
-        void property(const char* name, Gto::DataType type, size_t numElements,
-                      size_t width, const char* interp = 0)
+        void property(const char* name, Gto::DataType type, size_t numElements, size_t width, const char* interp = 0)
         {
-            property(name, type, numElements, Dimensions(width, 0, 0, 0),
-                     interp);
+            property(name, type, numElements, Dimensions(width, 0, 0, 0), interp);
         }
 
         void endComponent();
@@ -173,26 +163,21 @@ namespace Gto
         //  data matches.
         //
 
-        void propertyDataRaw(const void* data, const char* propertyName = 0,
-                             uint32 size = 0,
+        void propertyDataRaw(const void* data, const char* propertyName = 0, uint32 size = 0,
                              const Dimensions& dims = Dimensions(0, 0, 0, 0));
 
         void emptyProperty() { propertyDataRaw((void*)0); }
 
         template <typename T>
-        void propertyData(const T* data, const char* propertyName = 0,
-                          uint32 size = 0,
-                          const Dimensions& dims = Dimensions(0, 0, 0, 0));
+        void propertyData(const T* data, const char* propertyName = 0, uint32 size = 0, const Dimensions& dims = Dimensions(0, 0, 0, 0));
 
         template <typename T>
-        void propertyData(const std::vector<T>& data,
-                          const char* propertyName = 0, uint32 size = 0,
+        void propertyData(const std::vector<T>& data, const char* propertyName = 0, uint32 size = 0,
                           const Dimensions& dims = Dimensions(0, 0, 0, 0));
 
         template <class T>
-        void propertyDataInContainer(
-            const T& container, const char* propertyName = 0, uint32 size = 0,
-            const Dimensions& dims = Dimensions(0, 0, 0, 0));
+        void propertyDataInContainer(const T& container, const char* propertyName = 0, uint32 size = 0,
+                                     const Dimensions& dims = Dimensions(0, 0, 0, 0));
 
         void endData();
 
@@ -238,17 +223,13 @@ namespace Gto
         bool m_componentActive : 1;
     };
 
-    template <typename T>
-    void Writer::propertyData(const T* data, const char* propertyName,
-                              uint32 size, const Dimensions& dims)
+    template <typename T> void Writer::propertyData(const T* data, const char* propertyName, uint32 size, const Dimensions& dims)
     {
         propertyDataRaw(data, propertyName, size, dims);
     }
 
     template <class T>
-    void Writer::propertyData(const std::vector<T>& container,
-                              const char* propertyName, uint32 size,
-                              const Dimensions& dims)
+    void Writer::propertyData(const std::vector<T>& container, const char* propertyName, uint32 size, const Dimensions& dims)
     {
         //
         //  Assumes vector implementation uses contiguous
@@ -268,9 +249,7 @@ namespace Gto
     }
 
     template <class T>
-    void Writer::propertyDataInContainer(const T& container,
-                                         const char* propertyName, uint32 size,
-                                         const Dimensions& dims)
+    void Writer::propertyDataInContainer(const T& container, const char* propertyName, uint32 size, const Dimensions& dims)
     {
         typedef typename T::value_type value_type;
         typedef typename T::const_iterator iterator;

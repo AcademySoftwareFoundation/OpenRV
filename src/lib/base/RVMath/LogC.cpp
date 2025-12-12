@@ -38,18 +38,12 @@ namespace RVMath
 
         m_ExposureGain = gain;
         m_GraySignal = m_Param.midGraySignal / m_ExposureGain;
-        m_EncodingGain =
-            (log(m_ExposureGain) / log(2.0f) * (0.89f - 1.0f) / 3.0f + 1.0f)
-            * m_Param.encodingGain;
+        m_EncodingGain = (log(m_ExposureGain) / log(2.0f) * (0.89f - 1.0f) / 3.0f + 1.0f) * m_Param.encodingGain;
         m_EncodingOffset = m_Param.encodingOffset;
         for (int ioff = 0; ioff < 3; ++ioff)
         {
-            m_BlackOffset =
-                ((m_Param.encodingBlack - m_EncodingOffset) / m_EncodingGain
-                 - m_LinOffset)
-                / m_LinSlope;
-            m_EncodingOffset = m_Param.encodingOffset
-                               - log10(1 + m_BlackOffset) * m_EncodingGain;
+            m_BlackOffset = ((m_Param.encodingBlack - m_EncodingOffset) / m_EncodingGain - m_LinOffset) / m_LinSlope;
+            m_EncodingOffset = m_Param.encodingOffset - log10(1 + m_BlackOffset) * m_EncodingGain;
         }
         m_MaxValue = unconstrainedValue(1.0);
         return (true);

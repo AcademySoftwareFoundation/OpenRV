@@ -44,8 +44,7 @@
 #include <boost/functional/hash.hpp>
 #include <boost/filesystem.hpp>
 
-#define AUDIO_READPOSITIONOFFSET_THRESHOLD \
-    0.01 // In secs; this is the max amount of slip we will allow
+#define AUDIO_READPOSITIONOFFSET_THRESHOLD 0.01 // In secs; this is the max amount of slip we will allow
 
 #define AUDIO_RESAMPLER_WINDOW_SIZE 64
 
@@ -112,22 +111,17 @@ namespace IPCore
             return T;
         }
 
-        FrameBuffer* allocateResizedFBs(FrameBuffer* in, float sx, float sy,
-                                        FrameBuffer::DataType outType)
+        FrameBuffer* allocateResizedFBs(FrameBuffer* in, float sx, float sy, FrameBuffer::DataType outType)
         {
             int ow = int(float(in->width()) * sx);
             int oh = int(float(in->height()) * sy);
 
-            if (ow != in->width() || oh != in->height()
-                || outType != in->dataType())
+            if (ow != in->width() || oh != in->height() || outType != in->dataType())
             {
-                FrameBuffer* fb =
-                    new FrameBuffer(ow, oh, in->numChannels(), outType, 0,
-                                    &in->channelNames(), in->orientation());
+                FrameBuffer* fb = new FrameBuffer(ow, oh, in->numChannels(), outType, 0, &in->channelNames(), in->orientation());
 
                 if (in->nextPlane())
-                    fb->appendPlane(
-                        allocateResizedFBs(in->nextPlane(), sx, sy, outType));
+                    fb->appendPlane(allocateResizedFBs(in->nextPlane(), sx, sy, outType));
                 return fb;
             }
             else
@@ -138,8 +132,7 @@ namespace IPCore
 
         FrameBuffer* resizeFB(FrameBuffer* inFB, float scale)
         {
-            FrameBuffer* outFB =
-                allocateResizedFBs(inFB, scale, scale, inFB->dataType());
+            FrameBuffer* outFB = allocateResizedFBs(inFB, scale, scale, inFB->dataType());
             TwkFBAux::resize(inFB, outFB);
             outFB->setIdentifier(inFB->identifier());
             inFB->copyAttributesTo(outFB);
@@ -149,14 +142,12 @@ namespace IPCore
         int getLengthLimit()
         {
             // Check if the user set an override on the maximum texture size.
-            int lengthLimit =
-                Application::optionValue<int>("maxTextureSizeOverride", int(0));
+            int lengthLimit = Application::optionValue<int>("maxTextureSizeOverride", int(0));
             // If the user did not set an override, honor the real setting,
             // defaulting to 8192 if none.
             if (lengthLimit == 0)
             {
-                lengthLimit =
-                    Application::optionValue<int>("maxTextureSize", int(8192));
+                lengthLimit = Application::optionValue<int>("maxTextureSize", int(8192));
             }
 
             return lengthLimit;
@@ -192,12 +183,8 @@ namespace IPCore
                 // When source-tiling is ON, compute the smallest square layout
                 // that contains square tiles that are equal-or-less-than the
                 // maximum texture size (lengthLimit).
-                const int nbTilesX =
-                    static_cast<int>(ceil(static_cast<float>(fullFBWidth)
-                                          / static_cast<float>(lengthLimit)));
-                const int nbTilesY =
-                    static_cast<int>(ceil(static_cast<float>(fullFBHeight)
-                                          / static_cast<float>(lengthLimit)));
+                const int nbTilesX = static_cast<int>(ceil(static_cast<float>(fullFBWidth) / static_cast<float>(lengthLimit)));
+                const int nbTilesY = static_cast<int>(ceil(static_cast<float>(fullFBHeight) / static_cast<float>(lengthLimit)));
                 tilingInfo.numTiles = std::max(nbTilesX, nbTilesY);
             }
 
@@ -232,51 +219,23 @@ namespace IPCore
         bool hasAudio;
         bool hasValidRange;
 
-        Movie* primaryMovie() const
-        {
-            return movies.empty() ? 0 : movies.front().get();
-        }
+        Movie* primaryMovie() const { return movies.empty() ? 0 : movies.front().get(); }
 
-        Movie* primaryAudioMovie() const
-        {
-            return audioMovie.get() ? audioMovie.get() : primaryMovie();
-        }
+        Movie* primaryAudioMovie() const { return audioMovie.get() ? audioMovie.get() : primaryMovie(); }
 
-        bool hasView(const std::string& viewName) const
-        {
-            return views.count(viewName) > 0;
-        }
+        bool hasView(const std::string& viewName) const { return views.count(viewName) > 0; }
 
-        bool hasLayer(const std::string& layerName) const
-        {
-            return layers.count(layerName) > 0;
-        }
+        bool hasLayer(const std::string& layerName) const { return layers.count(layerName) > 0; }
 
-        bool hasChannel(const std::string& channelName) const
-        {
-            return channels.count(channelName) > 0;
-        }
+        bool hasChannel(const std::string& channelName) const { return channels.count(channelName) > 0; }
 
-        bool matchesView(const ImageComponent& i) const
-        {
-            return i.name.size() >= 1 && hasView(i.name[0]);
-        }
+        bool matchesView(const ImageComponent& i) const { return i.name.size() >= 1 && hasView(i.name[0]); }
 
-        bool matchesLayer(const ImageComponent& i) const
-        {
-            return i.name.size() >= 2 && hasLayer(i.name[1]);
-        }
+        bool matchesLayer(const ImageComponent& i) const { return i.name.size() >= 2 && hasLayer(i.name[1]); }
 
-        bool matchesChannel(const ImageComponent& i) const
-        {
-            return i.name.size() >= 3 && hasChannel(i.name[2]);
-        }
+        bool matchesChannel(const ImageComponent& i) const { return i.name.size() >= 3 && hasChannel(i.name[2]); }
 
-        Movie* movieForThread(size_t index) const
-        {
-            return movies.size() > index ? movies[index].get()
-                                         : movies.front().get();
-        };
+        Movie* movieForThread(size_t index) const { return movies.size() > index ? movies[index].get() : movies.front().get(); };
     };
 
     class FileSourceIPNode::Media : public ResamplingMovie
@@ -296,35 +255,17 @@ namespace IPCore
 
         bool hasView(const std::string& v) const { return shared->hasView(v); }
 
-        bool hasLayer(const std::string& l) const
-        {
-            return shared->hasLayer(l);
-        }
+        bool hasLayer(const std::string& l) const { return shared->hasLayer(l); }
 
-        bool hasChannel(const std::string& c) const
-        {
-            return shared->hasChannel(c);
-        }
+        bool hasChannel(const std::string& c) const { return shared->hasChannel(c); }
 
-        bool matchesView(const ImageComponent& i) const
-        {
-            return shared->matchesView(i);
-        }
+        bool matchesView(const ImageComponent& i) const { return shared->matchesView(i); }
 
-        bool matchesLayer(const ImageComponent& i) const
-        {
-            return shared->matchesLayer(i);
-        }
+        bool matchesLayer(const ImageComponent& i) const { return shared->matchesLayer(i); }
 
-        bool matchesChannel(const ImageComponent& i) const
-        {
-            return shared->matchesChannel(i);
-        }
+        bool matchesChannel(const ImageComponent& i) const { return shared->matchesChannel(i); }
 
-        Movie* primaryMovie() const
-        {
-            return shared->movies.empty() ? 0 : shared->movies.front().get();
-        }
+        Movie* primaryMovie() const { return shared->movies.empty() ? 0 : shared->movies.front().get(); }
 
         Movie* audioMovie() const { return shared->primaryAudioMovie(); }
 
@@ -333,9 +274,7 @@ namespace IPCore
         SharedMediaPointer shared;
     };
 
-    FileSourceIPNode::FileSourceIPNode(const std::string& name,
-                                       const NodeDefinition* def, IPGraph* g,
-                                       GroupIPNode* group,
+    FileSourceIPNode::FileSourceIPNode(const std::string& name, const NodeDefinition* def, IPGraph* g, GroupIPNode* group,
                                        const std::string mediaRepName)
         : SourceIPNode(name, def, g, group, mediaRepName)
         , m_workItemID(0)
@@ -343,13 +282,10 @@ namespace IPCore
         setMaxInputs(0);
         setMinInputs(0);
 
-        PropertyInfo* ainfo = new PropertyInfo(PropertyInfo::ExcludeFromProfile
-                                               | PropertyInfo::Persistent
-                                               | PropertyInfo::Animatable);
+        PropertyInfo* ainfo = new PropertyInfo(PropertyInfo::ExcludeFromProfile | PropertyInfo::Persistent | PropertyInfo::Animatable);
 
-        PropertyInfo* einfo = new PropertyInfo(
-            PropertyInfo::ExcludeFromProfile | PropertyInfo::Persistent
-            | PropertyInfo::RequiresGraphEdit);
+        PropertyInfo* einfo =
+            new PropertyInfo(PropertyInfo::ExcludeFromProfile | PropertyInfo::Persistent | PropertyInfo::RequiresGraphEdit);
 
         m_offset = 0;
         m_rangeOffset = 0;
@@ -366,26 +302,18 @@ namespace IPCore
         m_mediaMovies = declareProperty<StringProperty>("media.movie");
         m_mediaViewNames = declareProperty<StringProperty>("media.name");
         m_fps = declareProperty<FloatProperty>("group.fps", 0.0f, einfo);
-        m_cutIn = declareProperty<IntProperty>(
-            "cut.in", -numeric_limits<int>::max(), einfo);
-        m_cutOut = declareProperty<IntProperty>(
-            "cut.out", numeric_limits<int>::max(), einfo);
+        m_cutIn = declareProperty<IntProperty>("cut.in", -numeric_limits<int>::max(), einfo);
+        m_cutOut = declareProperty<IntProperty>("cut.out", numeric_limits<int>::max(), einfo);
         m_volume = declareProperty<FloatProperty>("group.volume", 1.0f, ainfo);
-        m_offset =
-            declareProperty<FloatProperty>("group.audioOffset", 0.0f, ainfo);
+        m_offset = declareProperty<FloatProperty>("group.audioOffset", 0.0f, ainfo);
         m_rangeOffset = declareProperty<IntProperty>("group.rangeOffset", 0);
-        m_noMovieAudio =
-            declareProperty<IntProperty>("group.noMovieAudio", 0, ainfo);
-        m_balance =
-            declareProperty<FloatProperty>("group.balance", 0.0f, ainfo);
-        m_crossover =
-            declareProperty<FloatProperty>("group.crossover", 0.0f, ainfo);
-        m_readAllChannels =
-            declareProperty<IntProperty>("request.readAllChannels", 0);
+        m_noMovieAudio = declareProperty<IntProperty>("group.noMovieAudio", 0, ainfo);
+        m_balance = declareProperty<FloatProperty>("group.balance", 0.0f, ainfo);
+        m_crossover = declareProperty<FloatProperty>("group.crossover", 0.0f, ainfo);
+        m_readAllChannels = declareProperty<IntProperty>("request.readAllChannels", 0);
         m_rangeStart = 0;
 
-        const bool progressiveSourceLoading =
-            Application::optionValue<bool>("progressiveSourceLoading", false);
+        const bool progressiveSourceLoading = Application::optionValue<bool>("progressiveSourceLoading", false);
         setProgressiveSourceLoading(progressiveSourceLoading);
     }
 
@@ -395,16 +323,14 @@ namespace IPCore
         clearMedia();
     }
 
-    FileSourceIPNode::SharedMedia*
-    FileSourceIPNode::newSharedMedia(Movie* mov, bool hasValidRange)
+    FileSourceIPNode::SharedMedia* FileSourceIPNode::newSharedMedia(Movie* mov, bool hasValidRange)
     {
         SharedMedia* sharedMedia = new SharedMedia(hasValidRange);
         const MovieInfo& info = mov->info();
 
         sharedMedia->hasVideo = mov->hasVideo();
         sharedMedia->hasAudio = mov->hasAudio();
-        sharedMedia->privateContainer =
-            reinterpret_cast<PropertyContainer*>(mov->info().privateData);
+        sharedMedia->privateContainer = reinterpret_cast<PropertyContainer*>(mov->info().privateData);
 
         //
         //  First movie is used by the display thread (thread 0)
@@ -427,8 +353,7 @@ namespace IPCore
                     sharedMedia->audioMovie = movp;
                 }
 
-                const size_t nthreads =
-                    graph()->numEvalThreads() + 1; //  rthreads + display thread
+                const size_t nthreads = graph()->numEvalThreads() + 1; //  rthreads + display thread
 
                 //
                 //  Each reader thread gets its own copy.
@@ -443,8 +368,7 @@ namespace IPCore
                     }
                     else
                     {
-                        cerr << "ERROR: failed to clone Movie '"
-                             << reader->filename() << "'" << endl;
+                        cerr << "ERROR: failed to clone Movie '" << reader->filename() << "'" << endl;
                         break;
                     }
                 }
@@ -495,8 +419,7 @@ namespace IPCore
 
                         for (size_t ci = 0; ci < linfo.channels.size(); ci++)
                         {
-                            const FBInfo::ChannelInfo& cinfo =
-                                linfo.channels[ci];
+                            const FBInfo::ChannelInfo& cinfo = linfo.channels[ci];
                             sharedMedia->channels.insert(cinfo.name);
                         }
                     }
@@ -507,11 +430,9 @@ namespace IPCore
                         //  Make sure we have a default layer for the channels
                         sharedMedia->layers.insert("");
 
-                        for (size_t ci = 0; ci < vinfo.otherChannels.size();
-                             ci++)
+                        for (size_t ci = 0; ci < vinfo.otherChannels.size(); ci++)
                         {
-                            const FBInfo::ChannelInfo& cinfo =
-                                vinfo.otherChannels[ci];
+                            const FBInfo::ChannelInfo& cinfo = vinfo.otherChannels[ci];
                             sharedMedia->channels.insert(cinfo.name);
                         }
                     }
@@ -522,9 +443,7 @@ namespace IPCore
         return sharedMedia;
     }
 
-    void
-    FileSourceIPNode::changeMedia(const SharedMediaPointer& sharedMedia,
-                                  const SharedMediaPointer& proxySharedMedia)
+    void FileSourceIPNode::changeMedia(const SharedMediaPointer& sharedMedia, const SharedMediaPointer& proxySharedMedia)
     {
         const QWriteLocker writeLock(&m_mediaMutex);
 
@@ -570,8 +489,7 @@ namespace IPCore
             if (media->hasVideo())
                 hasVideo = true;
 
-            if (media->hasAudio()
-                && (!media->hasVideo() || !m_noMovieAudio->front()))
+            if (media->hasAudio() && (!media->hasVideo() || !m_noMovieAudio->front()))
                 hasAudio = true;
 
             Movie* mov = media->primaryMovie();
@@ -625,8 +543,7 @@ namespace IPCore
         }
     }
 
-    void FileSourceIPNode::addMedia(const SharedMediaPointer& sharedMedia,
-                                    const SharedMediaPointer& proxySharedMedia)
+    void FileSourceIPNode::addMedia(const SharedMediaPointer& sharedMedia, const SharedMediaPointer& proxySharedMedia)
     {
         HOP_PROF_FUNC();
 
@@ -643,16 +560,12 @@ namespace IPCore
         if (m_workItemID)
         {
             addDispatchJob(Application::instance()->dispatchToMainThread(
-                [this, sharedMedia,
-                 proxySharedMedia](Application::DispatchID dispatchID)
+                [this, sharedMedia, proxySharedMedia](Application::DispatchID dispatchID)
                 {
                     {
-                        LockGuard dispatchGuard(
-                            m_dispatchIDCancelRequestedMutex);
+                        LockGuard dispatchGuard(m_dispatchIDCancelRequestedMutex);
 
-                        bool isCanceled =
-                            (m_dispatchIDCancelRequestedSet.count(dispatchID)
-                             >= 1);
+                        bool isCanceled = (m_dispatchIDCancelRequestedSet.count(dispatchID) >= 1);
                         if (isCanceled)
                         {
                             m_dispatchIDCancelRequestedSet.erase(dispatchID);
@@ -676,11 +589,8 @@ namespace IPCore
                     propagateRangeChange();
 
                     {
-                        LockGuard dispatchGuard(
-                            m_dispatchIDCancelRequestedMutex);
-                        bool isCanceled =
-                            (m_dispatchIDCancelRequestedSet.count(dispatchID)
-                             >= 1);
+                        LockGuard dispatchGuard(m_dispatchIDCancelRequestedMutex);
+                        bool isCanceled = (m_dispatchIDCancelRequestedSet.count(dispatchID) >= 1);
                         if (isCanceled)
                         {
                             m_dispatchIDCancelRequestedSet.erase(dispatchID);
@@ -706,8 +616,7 @@ namespace IPCore
         }
     }
 
-    void FileSourceIPNode::testEvaluate(const Context& context,
-                                        TestEvaluationResult& result)
+    void FileSourceIPNode::testEvaluate(const Context& context, TestEvaluationResult& result)
     {
         bool slow = false;
 
@@ -718,26 +627,21 @@ namespace IPCore
                 slow = true;
         }
 
-        result.poorRandomAccessPerformance =
-            slow || result.poorRandomAccessPerformance;
+        result.poorRandomAccessPerformance = slow || result.poorRandomAccessPerformance;
     }
 
-    FileSourceIPNode::MediaPointer
-    FileSourceIPNode::getMediaFromContext(ImageComponent& selection,
-                                          const Context& context)
+    FileSourceIPNode::MediaPointer FileSourceIPNode::getMediaFromContext(ImageComponent& selection, const Context& context) const
     {
         selection = selectComponentFromContext(context);
 
         MediaPointer media = mediaForComponent(selection, context);
         if (context.stereo)
         {
-            ImageComponent newSelection =
-                stereoComponent(selection, context.eye);
+            ImageComponent newSelection = stereoComponent(selection, context.eye);
 
             if (newSelection.isValid())
             {
-                if (MediaPointer newMedia =
-                        mediaForComponent(newSelection, context))
+                if (MediaPointer newMedia = mediaForComponent(newSelection, context))
                 {
                     selection = newSelection;
                     media = newMedia;
@@ -753,9 +657,7 @@ namespace IPCore
         return media;
     }
 
-    FileSourceIPNode::MediaPointer
-    FileSourceIPNode::mediaForComponent(ImageComponent& c,
-                                        const Context& context)
+    FileSourceIPNode::MediaPointer FileSourceIPNode::mediaForComponent(ImageComponent& c, const Context& context) const
     {
         if (!c.isValid())
             return nullptr;
@@ -848,9 +750,7 @@ namespace IPCore
                         //
                         if (Movie* mov = movieForThread(media.get(), context))
                         {
-                            ImageComponent newSelection = ImageComponent(
-                                LayerComponent, mov->info().defaultView,
-                                c.name[1]);
+                            ImageComponent newSelection = ImageComponent(LayerComponent, mov->info().defaultView, c.name[1]);
                             if (media->matchesLayer(newSelection))
                             {
                                 c = newSelection;
@@ -872,9 +772,7 @@ namespace IPCore
                     //
                     if (Movie* mov = movieForThread(media.get(), context))
                     {
-                        ImageComponent newSelection = ImageComponent(
-                            ChannelComponent, mov->info().defaultView,
-                            c.name[1], c.name[2]);
+                        ImageComponent newSelection = ImageComponent(ChannelComponent, mov->info().defaultView, c.name[1], c.name[2]);
                         if (media->matchesChannel(newSelection))
                         {
                             c = newSelection;
@@ -888,7 +786,7 @@ namespace IPCore
         return nullptr;
     }
 
-    FileSourceIPNode::MediaPointer FileSourceIPNode::defaultMedia(int eye)
+    FileSourceIPNode::MediaPointer FileSourceIPNode::defaultMedia(int eye) const
     {
         const QReadLocker readLock(&m_mediaMutex);
 
@@ -921,17 +819,14 @@ namespace IPCore
         return m_mediaVector.empty() ? nullptr : m_mediaVector.front();
     }
 
-    FileSourceIPNode::Movie*
-    FileSourceIPNode::movieForThread(const Media* media, const Context& context)
+    FileSourceIPNode::Movie* FileSourceIPNode::movieForThread(const Media* media, const Context& context) const
     {
         if (!media)
             return 0;
         return media->shared->movieForThread(context.threadNum);
     }
 
-    void FileSourceIPNode::setupRequest(const Movie* mov,
-                                        const ImageComponent& selection,
-                                        const Context& context,
+    void FileSourceIPNode::setupRequest(const Movie* mov, const ImageComponent& selection, const Context& context,
                                         Movie::ReadRequest& request)
     {
         //
@@ -946,8 +841,7 @@ namespace IPCore
 
         if (m_rangeStart && m_rangeStart->size())
         {
-            request.frame =
-                request.frame - m_rangeStart->front() + mov->info().start;
+            request.frame = request.frame - m_rangeStart->front() + mov->info().start;
         }
 
         request.missing = context.missing;
@@ -981,8 +875,7 @@ namespace IPCore
         //  Copy the input parameters
         //
 
-        std::copy(m_inparams.begin(), m_inparams.end(),
-                  back_inserter(request.parameters));
+        std::copy(m_inparams.begin(), m_inparams.end(), back_inserter(request.parameters));
     }
 
     namespace
@@ -1051,8 +944,7 @@ namespace IPCore
         }
         else if (hasAlphaAttr)
         {
-            img->unpremulted =
-                fb->attribute<string>("AlphaType") == "Unpremultiplied";
+            img->unpremulted = fb->attribute<string>("AlphaType") == "Unpremultiplied";
         }
     }
 
@@ -1062,8 +954,7 @@ namespace IPCore
         // or is currently loading, this will have no effect.
         graph()->prioritizeWorkItem(m_workItemID);
 
-        const bool profile = (context.thread & DisplayThread)
-                             && graph()->needsProfilingSamples();
+        const bool profile = (context.thread & DisplayThread) && graph()->needsProfilingSamples();
         ImageComponent selection;
         MediaPointer media;
         {
@@ -1079,8 +970,7 @@ namespace IPCore
         Movie* mov = movieForThread(media.get(), context);
         if (!mov || !media)
         {
-            TWK_THROW_EXC_STREAM(
-                "ERROR: FileSourceIPNode::evaluate: no media found.");
+            TWK_THROW_EXC_STREAM("ERROR: FileSourceIPNode::evaluate: no media found.");
         }
 
         Movie::ReadRequest request(context.frame, context.stereo);
@@ -1103,8 +993,7 @@ namespace IPCore
         {
 #if defined(HOP_ENABLED)
             std::string imagesAtFrameMsg =
-                std::string("imagesAtFrame(") + std::to_string(context.frame)
-                + std::string(") : ") + filename().c_str();
+                std::string("imagesAtFrame(") + std::to_string(context.frame) + std::string(") : ") + filename().c_str();
             HOP_PROF_DYN_NAME(imagesAtFrameMsg.c_str());
 #endif
 
@@ -1196,9 +1085,7 @@ namespace IPCore
 
             while (fbs.size() < ids.size())
             {
-                FrameBuffer* fb = IPImage::newNoImageFrameBufferWithAttrs(
-                    this, mov->info().width, mov->info().height,
-                    "No Source Image");
+                FrameBuffer* fb = IPImage::newNoImageFrameBufferWithAttrs(this, mov->info().width, mov->info().height, "No Source Image");
                 fbs.push_back(fb);
             }
 
@@ -1239,8 +1126,7 @@ namespace IPCore
         //  cache is not restricted.
         //
 
-        if (CacheEvalThread == context.thread && !graph()->cacheThreadContinue()
-            && !context.cacheNode)
+        if (CacheEvalThread == context.thread && !graph()->cacheThreadContinue() && !context.cacheNode)
         {
             //
             //  We want to be sure the cache is actually overflowing before we
@@ -1300,8 +1186,7 @@ namespace IPCore
 
         ostringstream sourceValue;
 
-        const StringAttribute* va =
-            dynamic_cast<const StringAttribute*>(fullFB->findAttribute("View"));
+        const StringAttribute* va = dynamic_cast<const StringAttribute*>(fullFB->findAttribute("View"));
 
         int lframe = request.frame;
         if (lframe > mov->info().end)
@@ -1311,12 +1196,9 @@ namespace IPCore
 
         fullFB->newAttribute<int>("SourceFrame", lframe);
 
-        sourceValue << name() << "."
-                    << ((context.stereo && context.eye == 1) ? 1 : 0) << "/"
-                    << (va ? va->value() : "0") << "/" << lframe;
+        sourceValue << name() << "." << ((context.stereo && context.eye == 1) ? 1 : 0) << "/" << (va ? va->value() : "0") << "/" << lframe;
 
-        TilingInfo tilingInfo =
-            getTilingInfo(fullFB->width(), fullFB->height());
+        TilingInfo tilingInfo = getTilingInfo(fullFB->width(), fullFB->height());
 
         if (tilingInfo.scale < 1.0f)
         {
@@ -1347,8 +1229,7 @@ namespace IPCore
         }
         else
         {
-            root = new IPImage(this, IPImage::BlendRenderType, fullFB->width(),
-                               fullFB->height(), 1.0);
+            root = new IPImage(this, IPImage::BlendRenderType, fullFB->width(), fullFB->height(), 1.0);
         }
 
         if (failed)
@@ -1439,8 +1320,7 @@ namespace IPCore
                         // the first plane is explicitely put in the cache.
                         // Sub-planes are implicitely put in the cache (planes
                         // are chained).
-                        tileFB->attribute<FrameBuffer*>("ProxyBufferOwnerPtr") =
-                            masterBuffer;
+                        tileFB->attribute<FrameBuffer*>("ProxyBufferOwnerPtr") = masterBuffer;
                     }
 
                     // Now that all planes have been copied, restrcture each of
@@ -1451,61 +1331,42 @@ namespace IPCore
                     FrameBuffer* aFullPlaneFB = fullFB;
                     while (aTilePlaneFB && aFullPlaneFB)
                     {
-                        const int tilePosX = static_cast<int>(
-                            static_cast<float>(x)
-                                / static_cast<float>(tilingInfo.numTiles)
-                                * static_cast<float>(aFullPlaneFB->width())
-                            + 0.5f);
-                        const int tilePosY = static_cast<int>(
-                            static_cast<float>(y)
-                                / static_cast<float>(tilingInfo.numTiles)
-                                * static_cast<float>(aFullPlaneFB->height())
-                            + 0.5f);
+                        const int tilePosX = static_cast<int>(static_cast<float>(x) / static_cast<float>(tilingInfo.numTiles)
+                                                                  * static_cast<float>(aFullPlaneFB->width())
+                                                              + 0.5f);
+                        const int tilePosY = static_cast<int>(static_cast<float>(y) / static_cast<float>(tilingInfo.numTiles)
+                                                                  * static_cast<float>(aFullPlaneFB->height())
+                                                              + 0.5f);
 
                         int tileSizeX = static_cast<int>(
-                            1.0f / static_cast<float>(tilingInfo.numTiles)
-                                * static_cast<float>(aFullPlaneFB->width())
-                            + 0.5f);
+                            1.0f / static_cast<float>(tilingInfo.numTiles) * static_cast<float>(aFullPlaneFB->width()) + 0.5f);
 
                         int tileSizeY = static_cast<int>(
-                            1.0f / static_cast<float>(tilingInfo.numTiles)
-                                * static_cast<float>(aFullPlaneFB->height())
-                            + 0.5f);
+                            1.0f / static_cast<float>(tilingInfo.numTiles) * static_cast<float>(aFullPlaneFB->height()) + 0.5f);
 
                         // Make sure that the last tiles doe not overshoot the
                         // full plane which would cause an access violation.
                         // Note that this can happen because of the round up in
                         // the previous float to integer conversion. Example:
                         // numTiles=6, aFullPlaneFB->height=94605
-                        tileSizeX = std::min(tileSizeX,
-                                             aFullPlaneFB->width() - tilePosX);
-                        tileSizeY = std::min(tileSizeY,
-                                             aFullPlaneFB->height() - tilePosY);
+                        tileSizeX = std::min(tileSizeX, aFullPlaneFB->width() - tilePosX);
+                        tileSizeY = std::min(tileSizeY, aFullPlaneFB->height() - tilePosY);
 
-                        unsigned char* tilePixels =
-                            (aFullPlaneFB->pixels<unsigned char>()
-                             + tilePosY * aFullPlaneFB->scanlineSize()
-                             + tilePosX * aFullPlaneFB->pixelSize());
+                        unsigned char* tilePixels = (aFullPlaneFB->pixels<unsigned char>() + tilePosY * aFullPlaneFB->scanlineSize()
+                                                     + tilePosX * aFullPlaneFB->pixelSize());
 
                         // This will resize the properties to fit the tile size
-                        aTilePlaneFB->restructure(
-                            tileSizeX, tileSizeY, aFullPlaneFB->depth(),
-                            aFullPlaneFB->numChannels(),
-                            aFullPlaneFB->dataType(), tilePixels,
-                            &aFullPlaneFB->channelNames(),
-                            aFullPlaneFB->orientation(),
-                            // The 1st tile becomes owner of the pixel data
-                            isMasterBuffer /* deleteOnDestruction */,
-                            aFullPlaneFB->extraScanlines(),
-                            aFullPlaneFB->scanlinePixelPadding(), NULL,
-                            false /* do not clear attributes */);
+                        aTilePlaneFB->restructure(tileSizeX, tileSizeY, aFullPlaneFB->depth(), aFullPlaneFB->numChannels(),
+                                                  aFullPlaneFB->dataType(), tilePixels, &aFullPlaneFB->channelNames(),
+                                                  aFullPlaneFB->orientation(),
+                                                  // The 1st tile becomes owner of the pixel data
+                                                  isMasterBuffer /* deleteOnDestruction */, aFullPlaneFB->extraScanlines(),
+                                                  aFullPlaneFB->scanlinePixelPadding(), NULL, false /* do not clear attributes */);
 
                         // Override the scanline sizes computed during the call
                         // to restructure, using the full framebuffer sizes.
-                        aTilePlaneFB->setScanlineSize(
-                            aFullPlaneFB->scanlineSize());
-                        aTilePlaneFB->setScanlinePaddedSize(
-                            aFullPlaneFB->scanlinePaddedSize());
+                        aTilePlaneFB->setScanlineSize(aFullPlaneFB->scanlineSize());
+                        aTilePlaneFB->setScanlinePaddedSize(aFullPlaneFB->scanlinePaddedSize());
 
                         if (isMasterBuffer)
                         {
@@ -1523,8 +1384,7 @@ namespace IPCore
 
                     tileFB->idstream() << "/tile_x" << x << "_y" << y;
 
-                    IPImage* tileIPImage =
-                        new IPImage(this, IPImage::BlendRenderType, tileFB);
+                    IPImage* tileIPImage = new IPImage(this, IPImage::BlendRenderType, tileFB);
 
                     if (failed)
                     {
@@ -1536,8 +1396,7 @@ namespace IPCore
                     {
                         tileIPImage->info = &(mov->info());
 
-                        tileIPImage->shaderExpr =
-                            Shader::sourceAssemblyShader(tileIPImage);
+                        tileIPImage->shaderExpr = Shader::sourceAssemblyShader(tileIPImage);
                         tileIPImage->recordResourceUsage();
 
                         // Configure the tile FrameBuffer/IPImage.
@@ -1548,9 +1407,7 @@ namespace IPCore
                     Mat44f S;
                     Mat44f T;
 
-                    const float frameRatio = static_cast<float>(info.width)
-                                             / static_cast<float>(info.height)
-                                             * info.pixelAspect;
+                    const float frameRatio = static_cast<float>(info.width) / static_cast<float>(info.height) * info.pixelAspect;
 
                     const float gridSizeX = tilingInfo.numTiles;
                     const float gridSizeY = tilingInfo.numTiles;
@@ -1577,8 +1434,7 @@ namespace IPCore
                     offsetY -= centerY;
 
                     // Apply the orientation settings.
-                    if (mov->info().orientation == FrameBuffer::TOPLEFT
-                        || mov->info().orientation == FrameBuffer::TOPRIGHT)
+                    if (mov->info().orientation == FrameBuffer::TOPLEFT || mov->info().orientation == FrameBuffer::TOPRIGHT)
                     {
                         offsetY = -offsetY;
                     }
@@ -1587,8 +1443,7 @@ namespace IPCore
                     M = T * M;
 
                     // Apply the global transformation matrix
-                    tileIPImage->transformMatrix =
-                        M * tileIPImage->transformMatrix;
+                    tileIPImage->transformMatrix = M * tileIPImage->transformMatrix;
 
                     // Keep the transformation matrix as an attribute so we can
                     // re-apply it to any IPImage created when this fb is found
@@ -1598,24 +1453,18 @@ namespace IPCore
                     {
                         for (int colIndex = 0; colIndex < 4; colIndex++)
                         {
-                            txMatCoeffs.push_back(tileIPImage->transformMatrix(
-                                rowIndex, colIndex));
+                            txMatCoeffs.push_back(tileIPImage->transformMatrix(rowIndex, colIndex));
                         }
                     }
 
-                    TypedFBVectorAttribute<float>* attr =
-                        new TypedFBVectorAttribute<float>("TransformMatrix",
-                                                          txMatCoeffs);
+                    TypedFBVectorAttribute<float>* attr = new TypedFBVectorAttribute<float>("TransformMatrix", txMatCoeffs);
                     tileIPImage->fb->addAttribute(attr);
 
                     ostringstream tileRVSource;
-                    tileRVSource
-                        << name() << "/tile_x" << x << "_y" << y << "."
-                        << ((context.stereo && context.eye == 1) ? 1 : 0) << "/"
-                        << (va ? va->value() : "0") << "/" << lframe;
+                    tileRVSource << name() << "/tile_x" << x << "_y" << y << "." << ((context.stereo && context.eye == 1) ? 1 : 0) << "/"
+                                 << (va ? va->value() : "0") << "/" << lframe;
 
-                    tileIPImage->fb->attribute<string>("RVSource") =
-                        tileRVSource.str();
+                    tileIPImage->fb->attribute<string>("RVSource") = tileRVSource.str();
 
                     root->appendChild(tileIPImage);
                 }
@@ -1625,9 +1474,7 @@ namespace IPCore
             // it can evict every
             if (masterBuffer)
             {
-                TypedFBVectorAttribute<FrameBuffer*>* attr =
-                    new TypedFBVectorAttribute<FrameBuffer*>("ProxyBuffers",
-                                                             proxyBuffers);
+                TypedFBVectorAttribute<FrameBuffer*>* attr = new TypedFBVectorAttribute<FrameBuffer*>("ProxyBuffers", proxyBuffers);
                 masterBuffer->addAttribute(attr);
             }
 
@@ -1648,8 +1495,7 @@ namespace IPCore
 
     IPImageID* FileSourceIPNode::evaluateIdentifier(const Context& context)
     {
-        const bool profile = (context.thread & DisplayThread)
-                             && graph()->needsProfilingSamples();
+        const bool profile = (context.thread & DisplayThread) && graph()->needsProfilingSamples();
         ImageComponent selection;
         MediaPointer media;
         {
@@ -1665,8 +1511,7 @@ namespace IPCore
         Movie* mov = movieForThread(media.get(), context);
         if (!mov || !media)
         {
-            TWK_THROW_EXC_STREAM(
-                "ERROR: FileSourceIPNode::evaluateIdentifier no media found.");
+            TWK_THROW_EXC_STREAM("ERROR: FileSourceIPNode::evaluateIdentifier no media found.");
         }
 
         Movie::ReadRequest request(context.frame, context.stereo);
@@ -1792,10 +1637,8 @@ namespace IPCore
             int cutout = max(start, min(end, m_cutOut->front()));
 
             // Only use undiscovered range in async mode
-            const auto isUndiscovered =
-                hasProgressiveSourceLoading() && !media->shared->hasValidRange;
-            return ImageRangeInfo(start, end, mov->info().inc, fps(), cutin,
-                                  cutout, isUndiscovered);
+            const auto isUndiscovered = hasProgressiveSourceLoading() && !media->shared->hasValidRange;
+            return ImageRangeInfo(start, end, mov->info().inc, fps(), cutin, cutout, isUndiscovered);
         }
 
         // Only use undiscovered range in async mode
@@ -1803,8 +1646,7 @@ namespace IPCore
         return ImageRangeInfo(0, 0, 0, 0.0, 0, 0, isUndiscovered);
     }
 
-    IPNode::ImageStructureInfo
-    FileSourceIPNode::imageStructureInfo(const Context& context) const
+    IPNode::ImageStructureInfo FileSourceIPNode::imageStructureInfo(const Context& context) const
     {
         const QReadLocker readLock(&m_mediaMutex);
 
@@ -1812,35 +1654,24 @@ namespace IPCore
         int ha = 0;
         int w = 0;
         int h = 0;
-        int na = 0;
-        int nv = 0;
         float pa = 1.0;
         Mat44f O;
+        ImageComponent selection;
+        MediaPointer media = getMediaFromContext(selection, context);
 
-        for (size_t i = 0; i < m_mediaVector.size(); i++)
+        if (media)
         {
-            Movie* mov = m_mediaVector[i]->primaryMovie();
-            bool audio = mov->hasAudio()
-                         && (!mov->hasVideo() || !m_noMovieAudio->front());
-            bool video = mov->hasVideo();
-
+            Movie* mov = media->primaryMovie();
             const MovieInfo& info = mov->info();
             const int iw = info.uncropWidth;
             const int ih = info.uncropHeight;
             const float ipa = info.pixelAspect;
 
-            if (audio && !video)
+            if (mov->hasVideo())
             {
-                na++;
-                wa = max(wa, iw);
-                ha = max(ha, ih);
-            }
-
-            if (video)
-            {
-                nv++;
                 w = max(w, iw);
                 h = max(h, ih);
+
                 //
                 //  pixelaspect may be < or > 1.0 so just adopt any
                 //  value that is interesting.
@@ -1852,20 +1683,12 @@ namespace IPCore
             }
         }
 
-        if (!nv && na)
-        {
-            w = wa;
-            h = ha;
-        }
-
-        return ImageStructureInfo(w * (pa > 1.0 ? pa : 1.0),
-                                  h / (pa < 1.0 ? pa : 1.0), pa, O);
+        return ImageStructureInfo(w * (pa > 1.0 ? pa : 1.0), h / (pa < 1.0 ? pa : 1.0), pa, O);
     }
 
     void FileSourceIPNode::audioConfigure(const AudioConfiguration& config)
     {
-        const QWriteLocker writeLock(
-            &m_mediaMutex); // Always take the media mutex before the audio one
+        const QWriteLocker writeLock(&m_mediaMutex); // Always take the media mutex before the audio one
         LockGuard lockAudio(m_audioMutex);
 
         m_adevRate = config.rate;
@@ -1877,18 +1700,15 @@ namespace IPCore
             Media* media = m_mediaVector[i].get();
             Movie* mov = media->audioMovie();
 
-            if (!mov->hasAudio()
-                || (mov->hasVideo() && m_noMovieAudio->front()))
+            if (!mov->hasAudio() || (mov->hasVideo() && m_noMovieAudio->front()))
                 continue;
 
-            Movie::AudioConfiguration conf(config.rate, config.layout,
-                                           config.samples);
+            Movie::AudioConfiguration conf(config.rate, config.layout, config.samples);
             mov->audioConfigure(conf);
 
             if (!mov->canConvertAudioRate())
             {
-                double factor =
-                    m_adevRate / double(mov->info().audioSampleRate);
+                double factor = m_adevRate / double(mov->info().audioSampleRate);
 
                 //
                 //  The "3" below is a magic number. This may need to
@@ -1898,11 +1718,7 @@ namespace IPCore
 
                 const size_t grainSlop = 3;
 
-                size_t overflow =
-                    (timeToSamples(m_grainDuration + m_grainEnvelope * 2.0,
-                                   m_adevRate)
-                     * grainSlop)
-                    / m_adevSamples;
+                size_t overflow = (timeToSamples(m_grainDuration + m_grainEnvelope * 2.0, m_adevRate) * grainSlop) / m_adevSamples;
 
                 if (overflow <= 1)
                     overflow = 2;
@@ -1951,12 +1767,9 @@ namespace IPCore
         //  of the audio renderer in use)
         //
 
-        if ((buffer.rate() != m_adevRate)
-            || (buffer.channels() != TwkAudio::layoutChannels(m_adevLayout)))
+        if ((buffer.rate() != m_adevRate) || (buffer.channels() != TwkAudio::layoutChannels(m_adevLayout)))
         {
-            AudioConfiguration config(
-                buffer.rate(), TwkAudio::channelLayout(buffer.channels()),
-                buffer.size());
+            AudioConfiguration config(buffer.rate(), TwkAudio::channelLayout(buffer.channels()), buffer.size());
             audioConfigure(config);
         }
 
@@ -1984,10 +1797,8 @@ namespace IPCore
         const size_t num = buffer.size();
         const size_t end = start + num;
 
-        const size_t grainSamples =
-            timeToSamples(m_grainDuration, buffer.rate());
-        const size_t grainMarginSamples =
-            timeToSamples(m_grainEnvelope, buffer.rate());
+        const size_t grainSamples = timeToSamples(m_grainDuration, buffer.rate());
+        const size_t grainMarginSamples = timeToSamples(m_grainEnvelope, buffer.rate());
         const size_t grainSyncWidth = grainSamples + grainMarginSamples;
 
         const size_t sync0 = start / grainSyncWidth;
@@ -2003,15 +1814,13 @@ namespace IPCore
             //  time.
             //
 
-            Time t = i * samplesToTime(grainSyncWidth, rate)
-                     - samplesToTime(grainMarginSamples, rate);
+            Time t = i * samplesToTime(grainSyncWidth, rate) - samplesToTime(grainMarginSamples, rate);
             Time d = samplesToTime(grainSize, rate);
 
             if (t < 0)
                 t = 0;
 
-            AudioBuffer grain(grainSize, buffer.channels(), rate,
-                              t * fpsfactor);
+            AudioBuffer grain(grainSize, buffer.channels(), rate, t * fpsfactor);
             AudioContext rcontext(grain, fps());
 
             if (audioFillBufferInternal(rcontext) == 0)
@@ -2039,9 +1848,7 @@ namespace IPCore
                 }
                 else if (q > grainSyncWidth)
                 {
-                    env = 1.0
-                          - double(q - grainSyncWidth)
-                                / double(grainMarginSamples);
+                    env = 1.0 - double(q - grainSyncWidth) / double(grainMarginSamples);
                 }
 
                 for (size_t c = 0; c < ch; c++)
@@ -2051,14 +1858,12 @@ namespace IPCore
             }
         }
 
-        AUDIOBUFFER_CHECK(buffer,
-                          "FileSourceIPNode::audioFillBuffer() after grain")
+        AUDIOBUFFER_CHECK(buffer, "FileSourceIPNode::audioFillBuffer() after grain")
 
         return buffer.size();
     }
 
-    size_t
-    FileSourceIPNode::audioFillBufferInternal(const AudioContext& context)
+    size_t FileSourceIPNode::audioFillBufferInternal(const AudioContext& context)
     {
         //
         //  There's some fps conversion that happens here: RV always plays
@@ -2073,8 +1878,7 @@ namespace IPCore
         //  fps. In order to handle fps
         //
 
-        const QReadLocker readLock(
-            &m_mediaMutex); // Always take the media mutex before the audio one
+        const QReadLocker readLock(&m_mediaMutex); // Always take the media mutex before the audio one
 
         vector<size_t> audioMedia;
         for (size_t i = 0; i < m_mediaVector.size(); i++)
@@ -2098,22 +1902,18 @@ namespace IPCore
         //  now
         //
 
-        if (!audioMedia.size() || !context.buffer.numChannels()
-            || !context.buffer.size())
+        if (!audioMedia.size() || !context.buffer.numChannels() || !context.buffer.size())
         {
             return targetNumSamples; // buffer full of zeros
         }
 
         LockGuard lockAudio(m_audioMutex);
 
-        for (vector<size_t>::iterator am = audioMedia.begin();
-             am != audioMedia.end(); am++)
+        for (vector<size_t>::iterator am = audioMedia.begin(); am != audioMedia.end(); am++)
         {
             Media* media = m_mediaVector[*am].get();
 
-            AudioBuffer mediaBuffer(
-                context.buffer.size(), context.buffer.channels(),
-                context.buffer.rate(), offsetStartTime(context));
+            AudioBuffer mediaBuffer(context.buffer.size(), context.buffer.channels(), context.buffer.rate(), offsetStartTime(context));
 
             media->setBackwards(isBackwards());
 
@@ -2125,13 +1925,10 @@ namespace IPCore
             //  Mix into the output stream
             //
 
-            const float volume = taperedClamp(m_volume->front(), 0.0f, 1.0f)
-                                 / float(audioMedia.size());
+            const float volume = taperedClamp(m_volume->front(), 0.0f, 1.0f) / float(audioMedia.size());
             const float balance = max(-1.0f, min(m_balance->front(), 1.0f));
-            const float lvol =
-                (balance > 0.0f ? (1.0f - balance) : 1.0f) * volume;
-            const float rvol =
-                (balance < 0.0f ? (1.0f + balance) : 1.0f) * volume;
+            const float lvol = (balance > 0.0f ? (1.0f - balance) : 1.0f) * volume;
+            const float rvol = (balance < 0.0f ? (1.0f + balance) : 1.0f) * volume;
             const bool naudio = (*am != 0);
 
             mixChannels(mediaBuffer, context.buffer, lvol, rvol, naudio);
@@ -2143,8 +1940,7 @@ namespace IPCore
     TwkAudio::Time FileSourceIPNode::offsetStartTime(const AudioContext context)
     {
         const double rate = context.buffer.rate();
-        const Time startTime =
-            samplesToTime(context.buffer.startSample(), rate);
+        const Time startTime = samplesToTime(context.buffer.startSample(), rate);
 
         return (startTime - m_offset->front()) * (context.fps / fps());
     }
@@ -2154,8 +1950,7 @@ namespace IPCore
         const QReadLocker readLock(&m_mediaMutex);
         for (size_t i = 0; i < m_mediaVector.size(); i++)
         {
-            const SharedMoviePointerVector& movies =
-                m_mediaVector[i]->shared->movies;
+            const SharedMoviePointerVector& movies = m_mediaVector[i]->shared->movies;
             for (size_t q = 0; q < movies.size(); q++)
                 movies[q]->flush();
         }
@@ -2166,8 +1961,7 @@ namespace IPCore
         const QReadLocker readLock(&m_mediaMutex);
         for (size_t i = 0; i < m_mediaVector.size(); i++)
         {
-            const SharedMoviePointerVector& movies =
-                m_mediaVector[i]->shared->movies;
+            const SharedMoviePointerVector& movies = m_mediaVector[i]->shared->movies;
             for (size_t q = 0; q < movies.size(); q++)
                 movies[q]->invalidateFileSystemInfo();
         }
@@ -2183,9 +1977,8 @@ namespace IPCore
             const QReadLocker readLock(&m_mediaMutex);
             if (!m_mediaVector.empty())
             {
-                size = Vec2i(
-                    m_mediaVector.front()->primaryMovie()->info().uncropWidth,
-                    m_mediaVector.front()->primaryMovie()->info().uncropHeight);
+                size = Vec2i(m_mediaVector.front()->primaryMovie()->info().uncropWidth,
+                             m_mediaVector.front()->primaryMovie()->info().uncropHeight);
             }
         }
 
@@ -2203,15 +1996,10 @@ namespace IPCore
         //  profiles
         //
 
-        declareProperty<Vec2iProperty>("proxy.range",
-                                       Vec2i(info.start, info.end + 1),
-                                       m_mediaMovies->info());
-        declareProperty<IntProperty>("proxy.inc", info.inc,
-                                     m_mediaMovies->info());
-        declareProperty<FloatProperty>("proxy.fps", info.fps,
-                                       m_mediaMovies->info());
-        declareProperty<Vec2iProperty>("proxy.size", size,
-                                       m_mediaMovies->info());
+        declareProperty<Vec2iProperty>("proxy.range", Vec2i(info.start, info.end + 1), m_mediaMovies->info());
+        declareProperty<IntProperty>("proxy.inc", info.inc, m_mediaMovies->info());
+        declareProperty<FloatProperty>("proxy.fps", info.fps, m_mediaMovies->info());
+        declareProperty<Vec2iProperty>("proxy.size", size, m_mediaMovies->info());
 
         //
         //  Do PATHSWAP mappings.
@@ -2258,8 +2046,7 @@ namespace IPCore
         m_tempComponents.clear();
     }
 
-    void FileSourceIPNode::readCompleted(const std::string& typeName,
-                                         unsigned int version)
+    void FileSourceIPNode::readCompleted(const std::string& typeName, unsigned int version)
     {
         {
             HOP_PROF("FileSourceIPNode::readCompleted - "
@@ -2272,8 +2059,7 @@ namespace IPCore
         //
 
         {
-            HOP_PROF(
-                "FileSourceIPNode::readCompleted - Application::mapFromVar");
+            HOP_PROF("FileSourceIPNode::readCompleted - Application::mapFromVar");
             if (StringProperty* sp = m_mediaMovies)
             {
                 for (int i = 0; i < sp->size(); i++)
@@ -2288,7 +2074,20 @@ namespace IPCore
             m_rangeStart = p;
         }
 
-        if (isMediaActive())
+        // Reload media if the media is active or if the range is not the
+        // default
+        // - If the media is active, we need to reload the media to ensure that
+        // the correct frames are loaded
+        // - If the media is NOT active, we normally don't want to reload the
+        // media because doing so would be detrimental to performances in a
+        // multiple media representations scenario where we only load the
+        // active media representation(s).
+        // - If the media is NOT active, we need to reload the media if the
+        // range is not the default range. This special case is typically for
+        // missing media.
+        const Vec2i defaultRange = Vec2i(0, 1);
+        const Vec2i range = propertyValue<Vec2iProperty>("proxy.range", defaultRange);
+        if (isMediaActive() || range != defaultRange)
         {
             HOP_PROF("FileSourceIPNode::readCompleted - reloadMediaFromFiles");
             reloadMediaFromFiles();
@@ -2334,8 +2133,7 @@ namespace IPCore
         }
     }
 
-    const FileSourceIPNode::Movie*
-    FileSourceIPNode::movieByMediaIndex(size_t index) const
+    const FileSourceIPNode::Movie* FileSourceIPNode::movieByMediaIndex(size_t index) const
     {
         const QReadLocker readLock(&m_mediaMutex);
         if (index < m_mediaVector.size())
@@ -2348,8 +2146,7 @@ namespace IPCore
         }
     }
 
-    FileSourceIPNode::Movie*
-    FileSourceIPNode::movieByMediaName(const string& name)
+    FileSourceIPNode::Movie* FileSourceIPNode::movieByMediaName(const string& name)
     {
         const QReadLocker readLock(&m_mediaMutex);
         for (size_t i = 0; i < m_mediaVector.size(); i++)
@@ -2366,8 +2163,7 @@ namespace IPCore
         return 0;
     }
 
-    const FileSourceIPNode::Movie*
-    FileSourceIPNode::movieByMediaName(const string& name) const
+    const FileSourceIPNode::Movie* FileSourceIPNode::movieByMediaName(const string& name) const
     {
         const QReadLocker readLock(&m_mediaMutex);
         for (size_t i = 0; i < m_mediaVector.size(); i++)
@@ -2480,8 +2276,7 @@ namespace IPCore
 
             for (int j = 0; j < smpv.size(); ++j)
             {
-                if (smpv[j]->hasAudio()
-                    && (!smpv[j]->hasVideo() || !m_noMovieAudio->front()))
+                if (smpv[j]->hasAudio() && (!smpv[j]->hasVideo() || !m_noMovieAudio->front()))
                 {
                     hasAudio = true;
                     break;
@@ -2511,13 +2306,11 @@ namespace IPCore
             if (group())
                 group()->flushIDsOfGroup();
         }
-        else if (p == m_offset || p == m_volume || p == m_balance
-                 || p == m_crossover || p == m_noMovieAudio)
+        else if (p == m_offset || p == m_volume || p == m_balance || p == m_crossover || p == m_noMovieAudio)
         {
             graph()->flushAudioCache();
         }
-        else if (p == m_rangeOffset || p == m_rangeStart || p == m_cutOut
-                 || p == m_cutIn)
+        else if (p == m_rangeOffset || p == m_rangeStart || p == m_cutOut || p == m_cutIn)
         {
             propagateRangeChange();
         }
@@ -2537,10 +2330,7 @@ namespace IPCore
         SourceIPNode::propertyChanged(p);
     }
 
-    void FileSourceIPNode::propertyWillChange(const Property* p)
-    {
-        IPNode::propertyWillChange(p);
-    }
+    void FileSourceIPNode::propertyWillChange(const Property* p) { IPNode::propertyWillChange(p); }
 
     size_t FileSourceIPNode::numMedia() const
     {
@@ -2565,8 +2355,7 @@ namespace IPCore
         return size_t(-1);
     }
 
-    const SourceIPNode::MovieInfo&
-    FileSourceIPNode::mediaMovieInfo(size_t index) const
+    const SourceIPNode::MovieInfo& FileSourceIPNode::mediaMovieInfo(size_t index) const
     {
         if (const Movie* mov = movieByMediaIndex(index))
         {
@@ -2574,22 +2363,19 @@ namespace IPCore
         }
         else
         {
-            TWK_THROW_STREAM(LayerOutOfBoundsExc,
-                             "Index " << index << " is out-of-bounds");
+            TWK_THROW_STREAM(LayerOutOfBoundsExc, "Index " << index << " is out-of-bounds");
         }
     }
 
     const string& FileSourceIPNode::mediaName(size_t index) const
     {
-        if (const MovieReader* mov =
-                dynamic_cast<const MovieReader*>(movieByMediaIndex(index)))
+        if (const MovieReader* mov = dynamic_cast<const MovieReader*>(movieByMediaIndex(index)))
         {
             return mov->filename();
         }
         else
         {
-            TWK_THROW_STREAM(LayerOutOfBoundsExc,
-                             "Index " << index << " is out-of-bounds");
+            TWK_THROW_STREAM(LayerOutOfBoundsExc, "Index " << index << " is out-of-bounds");
         }
     }
 
@@ -2673,8 +2459,7 @@ namespace IPCore
             // Note: This progressive source loading mechanism does not work
             // well with procedural movies : frame#1 is always black. As a
             // work-around we are not using asynchronous loading with movieproc
-            if (hasProgressiveSourceLoading()
-                && TwkUtil::extension(filename) != "movieproc")
+            if (hasProgressiveSourceLoading() && TwkUtil::extension(filename) != "movieproc")
             {
                 // In async mode, start by loading a proxy movie.
                 ostringstream errorString;
@@ -2684,8 +2469,7 @@ namespace IPCore
                                             2.0, // wait 2 sec to display error
                                             filename, defaultFPS);
 
-                SharedMediaPointer sharedMedia(
-                    newSharedMedia(mov, find("proxy.range")));
+                SharedMediaPointer sharedMedia(newSharedMedia(mov, find("proxy.range")));
                 sharedMedias[i] = sharedMedia;
                 addMedia(sharedMedia);
             }
@@ -2732,9 +2516,7 @@ namespace IPCore
         }
     }
 
-    void
-    FileSourceIPNode::openMovieTask(const string& filename,
-                                    const SharedMediaPointer& proxySharedMedia)
+    void FileSourceIPNode::openMovieTask(const string& filename, const SharedMediaPointer& proxySharedMedia)
     {
         HOP_PROF_FUNC();
 
@@ -2770,16 +2552,14 @@ namespace IPCore
         {
             if (errMsg.tellp() == std::streampos(0))
             {
-                errMsg << "Could not locate \"" << filename
-                       << "\". Relocate source to fix.";
+                errMsg << "Could not locate \"" << filename << "\". Relocate source to fix.";
             }
 
             mov = openProxyMovie(errMsg.str(), 0.0, filename, defaultFPS);
 
             ostringstream str;
             str << name() << ";;" << filename << ";;" << mediaRepName();
-            TwkApp::GenericStringEvent event("source-media-unavailable",
-                                             graph(), str.str());
+            TwkApp::GenericStringEvent event("source-media-unavailable", graph(), str.str());
 
             // The following instructions can only be executed on the main
             // thread. Dispatch to main thread only when using async loading.
@@ -2797,17 +2577,12 @@ namespace IPCore
                     [this, event](Application::DispatchID dispatchID)
                     {
                         {
-                            LockGuard dispatchGuard(
-                                m_dispatchIDCancelRequestedMutex);
+                            LockGuard dispatchGuard(m_dispatchIDCancelRequestedMutex);
 
-                            bool isCanceled =
-                                (m_dispatchIDCancelRequestedSet.count(
-                                     dispatchID)
-                                 >= 1);
+                            bool isCanceled = (m_dispatchIDCancelRequestedSet.count(dispatchID) >= 1);
                             if (isCanceled)
                             {
-                                m_dispatchIDCancelRequestedSet.erase(
-                                    dispatchID);
+                                m_dispatchIDCancelRequestedSet.erase(dispatchID);
                                 return;
                             }
                         }
@@ -2816,16 +2591,11 @@ namespace IPCore
                         graph()->sendEvent(event);
 
                         {
-                            LockGuard dispatchGuard(
-                                m_dispatchIDCancelRequestedMutex);
-                            bool isCanceled =
-                                (m_dispatchIDCancelRequestedSet.count(
-                                     dispatchID)
-                                 >= 1);
+                            LockGuard dispatchGuard(m_dispatchIDCancelRequestedMutex);
+                            bool isCanceled = (m_dispatchIDCancelRequestedSet.count(dispatchID) >= 1);
                             if (isCanceled)
                             {
-                                m_dispatchIDCancelRequestedSet.erase(
-                                    dispatchID);
+                                m_dispatchIDCancelRequestedSet.erase(dispatchID);
                                 return;
                             }
                         }
@@ -2835,13 +2605,11 @@ namespace IPCore
             }
         }
 
-        SharedMediaPointer sharedMedia(
-            newSharedMedia(mov, true /*hasValidRange*/));
+        SharedMediaPointer sharedMedia(newSharedMedia(mov, true /*hasValidRange*/));
         addMedia(sharedMedia, proxySharedMedia);
     }
 
-    string FileSourceIPNode::cacheHash(const string& filename,
-                                       const string& prefix)
+    string FileSourceIPNode::cacheHash(const string& filename, const string& prefix)
     {
         string hashString;
 
@@ -2877,16 +2645,13 @@ namespace IPCore
         return hashString;
     }
 
-    string
-    FileSourceIPNode::lookupFilenameInMediaLibrary(const string& filename)
+    string FileSourceIPNode::lookupFilenameInMediaLibrary(const string& filename)
     {
-        string file =
-            TwkMediaLibrary::lookupFilenameInMediaLibrary(filename, m_inparams);
+        string file = TwkMediaLibrary::lookupFilenameInMediaLibrary(filename, m_inparams);
         return file;
     }
 
-    bool FileSourceIPNode::findCachedMediaMetaData(const string& filename,
-                                                   PropertyContainer* pc)
+    bool FileSourceIPNode::findCachedMediaMetaData(const string& filename, PropertyContainer* pc)
     {
         //
         //  Check this node first -- we may find it here if a session is being
@@ -2916,12 +2681,10 @@ namespace IPCore
 
         if (bundle->hasCacheItem("MediaMetadata", cacheItemString))
         {
-            Bundle::Path p =
-                bundle->cacheItemPath("MediaMetadata", cacheItemString);
+            Bundle::Path p = bundle->cacheItemPath("MediaMetadata", cacheItemString);
             TwkContainer::GTOReader reader(true);
             reader.read(p.c_str());
-            const TwkContainer::GTOReader::Containers& containers =
-                reader.containersRead();
+            const TwkContainer::GTOReader::Containers& containers = reader.containersRead();
             assert(containers.size() == 1);
 
             for (size_t i = 0; i < containers.size(); i++)
@@ -2945,14 +2708,10 @@ namespace IPCore
         // Ensure file exists and is accessible by the current user before
         // continuing
         //
-        if (!TwkUtil::pathIsURL(filename)
-            && TwkUtil::extension(filename) != "movieproc")
+        if (!TwkUtil::pathIsURL(filename) && TwkUtil::extension(filename) != "movieproc")
         {
-            const auto firstFileInSeq =
-                TwkUtil::firstFileInPattern(filename.c_str());
-            const char* pathToTest = firstFileInSeq.empty()
-                                         ? filename.c_str()
-                                         : firstFileInSeq.c_str();
+            const auto firstFileInSeq = TwkUtil::firstFileInPattern(filename.c_str());
+            const char* pathToTest = firstFileInSeq.empty() ? filename.c_str() : firstFileInSeq.c_str();
 
             if (!TwkUtil::isReadable(pathToTest))
             {
@@ -2966,10 +2725,8 @@ namespace IPCore
         info.privateData = pc;
 
         Movie::ReadRequest request;
-        std::copy(m_inparams.begin(), m_inparams.end(),
-                  back_inserter(request.parameters));
-        MovieReader* reader =
-            TwkMovie::GenericIO::openMovieReader(filename, info, request);
+        std::copy(m_inparams.begin(), m_inparams.end(), back_inserter(request.parameters));
+        MovieReader* reader = TwkMovie::GenericIO::openMovieReader(filename, info, request);
 
         if (reader && reader->needsScan())
         {
@@ -2978,15 +2735,12 @@ namespace IPCore
             string cacheItemString = cacheHash(filename, "movpd_");
 
             Bundle* bundle = Bundle::mainBundle();
-            string cachePath =
-                bundle->cacheItemPath("MediaMetadata", cacheItemString);
-            boost::filesystem::create_directories(
-                boost::filesystem::path(UNICODE_STR(cachePath)).parent_path());
+            string cachePath = bundle->cacheItemPath("MediaMetadata", cacheItemString);
+            boost::filesystem::create_directories(boost::filesystem::path(UNICODE_STR(cachePath)).parent_path());
 
             TwkContainer::GTOWriter writer;
             TwkContainer::GTOWriter::ObjectVector objs(1);
-            objs[0] = TwkContainer::GTOWriter::Object(pc, cacheItemString,
-                                                      "MovieIOPrivatedata", 1);
+            objs[0] = TwkContainer::GTOWriter::Object(pc, cacheItemString, "MovieIOPrivatedata", 1);
             writer.write(cachePath.c_str(), objs, Gto::Writer::CompressedGTO);
 
             bundle->addCacheItem("MediaMetaData", cacheItemString);
@@ -2995,36 +2749,28 @@ namespace IPCore
         return reader;
     }
 
-    FileSourceIPNode::Movie*
-    FileSourceIPNode::openProxyMovie(const string& errorString,
-                                     double minBeforeTime,
-                                     const string filename, double defaultFPS)
+    FileSourceIPNode::Movie* FileSourceIPNode::openProxyMovie(const string& errorString, double minBeforeTime, const string filename,
+                                                              double defaultFPS)
     {
         Vec2i range = propertyValue<Vec2iProperty>("proxy.range", Vec2i(1, 20));
         int inc = propertyValue<IntProperty>("proxy.inc", 1);
-        Vec2i size =
-            propertyValue<Vec2iProperty>("proxy.size", Vec2i(1280, 720));
+        Vec2i size = propertyValue<Vec2iProperty>("proxy.size", Vec2i(1280, 720));
         float fps = propertyValue<FloatProperty>("proxy.fps", defaultFPS);
 
         ostringstream proxy;
-        proxy << definition()->stringValue("defaults.missingMovieProc", "black")
-              << ",start=" << range[0] << ",end=" << range[1] - 1
-              << ",inc=" << inc << ",width=" << size[0] << ",height=" << size[1]
-              << ",fps=" << fps << ",filename=" << TwkUtil::id64Encode(filename)
-              << ",attr:MissingFile=1";
+        proxy << definition()->stringValue("defaults.missingMovieProc", "black") << ",start=" << range[0] << ",end=" << range[1] - 1
+              << ",inc=" << inc << ",width=" << size[0] << ",height=" << size[1] << ",fps=" << fps
+              << ",filename=" << TwkUtil::id64Encode(filename) << ",attr:MissingFile=1";
         if (!errorString.empty())
         {
-            proxy << ",errorString=" << TwkUtil::id64Encode(errorString)
-                  << ",minBeforeTime="
-                  << minBeforeTime; // wait 2 seconds before to display this
-                                    // message
+            proxy << ",errorString=" << TwkUtil::id64Encode(errorString) << ",minBeforeTime=" << minBeforeTime; // wait 2 seconds before to
+                                                                                                                // display this message
         }
         proxy << ".movieproc";
 
         Movie::ReadRequest request(range[0]);
         MovieInfo info;
-        MovieReader* reader =
-            TwkMovie::GenericIO::openMovieReader(proxy.str(), info, request);
+        MovieReader* reader = TwkMovie::GenericIO::openMovieReader(proxy.str(), info, request);
 
         return reader;
     }

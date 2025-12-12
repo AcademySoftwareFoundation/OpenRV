@@ -24,10 +24,7 @@ std::string g_filename;
 
 // The 'LD_LIBRARY_PATH' is mandatory for the RV app under Linux
 // let's check it is defined.
-TEST_CASE("test definition of the LD_LIBRARY_PATH environment variable")
-{
-    REQUIRE(getenv("LD_LIBRARY_PATH"));
-}
+TEST_CASE("test definition of the LD_LIBRARY_PATH environment variable") { REQUIRE(getenv("LD_LIBRARY_PATH")); }
 
 //
 // This test verifies the loadability of the `libALSASafeAudioModule.so`
@@ -38,11 +35,9 @@ TEST_CASE("test loading module")
     // This is not used, it's only to keep the linker from discarding
     // the IPCore symbols from the library, which are needed the libraries
     // that have dlopen called on them.
-    IPCore::AudioRenderer::RendererParameters params =
-        IPCore::AudioRenderer::defaultParameters();
+    IPCore::AudioRenderer::RendererParameters params = IPCore::AudioRenderer::defaultParameters();
 
-    cout << "INFO: Trying to load '" << g_filename.c_str() << "' module"
-         << endl;
+    cout << "INFO: Trying to load '" << g_filename.c_str() << "' module" << endl;
     void* handle = dlopen(g_filename.c_str(), RTLD_LAZY);
     CHECK(handle);
     if (handle)
@@ -52,13 +47,11 @@ TEST_CASE("test loading module")
     }
     else
     {
-        cerr << "ERROR: loading '" << g_filename.c_str()
-             << "' module : " << dlerror() << endl;
+        cerr << "ERROR: loading '" << g_filename.c_str() << "' module : " << dlerror() << endl;
     }
 }
 
-DOCTEST_MSVC_SUPPRESS_WARNING_WITH_PUSH(
-    4007) // 'function' : must be 'attribute' - see issue #182
+DOCTEST_MSVC_SUPPRESS_WARNING_WITH_PUSH(4007) // 'function' : must be 'attribute' - see issue #182
 
 int main(int argc, char* argv[])
 {

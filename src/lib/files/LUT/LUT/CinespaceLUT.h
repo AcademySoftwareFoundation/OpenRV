@@ -12,8 +12,7 @@
 namespace LUT
 {
 
-    void readCinespaceLUT(const std::string& filename, const std::string& type,
-                          LUTData& data);
+    void readCinespaceLUT(const std::string& filename, const std::string& type, LUTData& data);
 
 } // namespace LUT
 

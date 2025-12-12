@@ -28,10 +28,7 @@ namespace TwkMath
 
     inline float noise(const Vec4f& v) { return noise(v.x, v.y, v.z, v.w); }
 
-    inline float noise(const Vec3f& v, float e)
-    {
-        return noise(v.x, v.y, v.z, e);
-    }
+    inline float noise(const Vec3f& v, float e) { return noise(v.x, v.y, v.z, e); }
 
     // With gradients
     float noiseAndGrad(float v, float& grad);

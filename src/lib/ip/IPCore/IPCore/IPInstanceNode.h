@@ -36,9 +36,7 @@ namespace IPCore
         typedef std::vector<TwkFB::FrameBuffer*> FrameBufferVector;
         typedef std::vector<Shader::Expression*> ExprVector;
 
-        IPInstanceNode(const std::string& name,
-                       const NodeDefinition* definition, IPGraph* graph,
-                       GroupIPNode* group = 0);
+        IPInstanceNode(const std::string& name, const NodeDefinition* definition, IPGraph* graph, GroupIPNode* group = 0);
 
         virtual ~IPInstanceNode();
 
@@ -49,15 +47,11 @@ namespace IPCore
 
         virtual bool testInputs(const IPNodes&, std::ostringstream&) const;
 
-        Shader::Expression* bind(IPImage*, Shader::Expression*,
-                                 const Context&) const;
+        Shader::Expression* bind(IPImage*, Shader::Expression*, const Context&) const;
 
-        Shader::Expression* bind(IPImage*, const ExprVector&,
-                                 const Context&) const;
+        Shader::Expression* bind(IPImage*, const ExprVector&, const Context&) const;
 
-        Shader::BoundSymbol* boundSymbolFromSymbol(IPImage*,
-                                                   const Shader::Symbol*,
-                                                   const Context&) const;
+        Shader::BoundSymbol* boundSymbolFromSymbol(IPImage*, const Shader::Symbol*, const Context&) const;
 
         void addFillerInputs(IPImageVector& inImages);
 

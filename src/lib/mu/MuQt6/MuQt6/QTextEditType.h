@@ -42,8 +42,7 @@ namespace Mu
         //  Constructors
         //
 
-        QTextEditType(Context* context, const char* name, Class* superClass = 0,
-                      Class* superClass2 = 0);
+        QTextEditType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QTextEditType();
 
@@ -67,8 +66,7 @@ namespace Mu
     public:
         virtual ~MuQt_QTextEdit();
         MuQt_QTextEdit(Pointer muobj, const CallEnvironment*, QWidget* parent);
-        MuQt_QTextEdit(Pointer muobj, const CallEnvironment*,
-                       const QString& text, QWidget* parent);
+        MuQt_QTextEdit(Pointer muobj, const CallEnvironment*, const QString& text, QWidget* parent);
         virtual QVariant loadResource(int type, const QUrl& name);
         virtual QVariant inputMethodQuery(Qt::InputMethodQuery property) const;
 
@@ -108,70 +106,37 @@ namespace Mu
         virtual bool event(QEvent* event_);
 
     public:
-        bool canInsertFromMimeData_pub(const QMimeData* source) const
-        {
-            return canInsertFromMimeData(source);
-        }
+        bool canInsertFromMimeData_pub(const QMimeData* source) const { return canInsertFromMimeData(source); }
 
-        bool canInsertFromMimeData_pub_parent(const QMimeData* source) const
-        {
-            return QTextEdit::canInsertFromMimeData(source);
-        }
+        bool canInsertFromMimeData_pub_parent(const QMimeData* source) const { return QTextEdit::canInsertFromMimeData(source); }
 
-        QMimeData* createMimeDataFromSelection_pub() const
-        {
-            return createMimeDataFromSelection();
-        }
+        QMimeData* createMimeDataFromSelection_pub() const { return createMimeDataFromSelection(); }
 
-        QMimeData* createMimeDataFromSelection_pub_parent() const
-        {
-            return QTextEdit::createMimeDataFromSelection();
-        }
+        QMimeData* createMimeDataFromSelection_pub_parent() const { return QTextEdit::createMimeDataFromSelection(); }
 
-        void insertFromMimeData_pub(const QMimeData* source)
-        {
-            insertFromMimeData(source);
-        }
+        void insertFromMimeData_pub(const QMimeData* source) { insertFromMimeData(source); }
 
-        void insertFromMimeData_pub_parent(const QMimeData* source)
-        {
-            QTextEdit::insertFromMimeData(source);
-        }
+        void insertFromMimeData_pub_parent(const QMimeData* source) { QTextEdit::insertFromMimeData(source); }
 
         void changeEvent_pub(QEvent* e) { changeEvent(e); }
 
         void changeEvent_pub_parent(QEvent* e) { QTextEdit::changeEvent(e); }
 
-        void contextMenuEvent_pub(QContextMenuEvent* event)
-        {
-            contextMenuEvent(event);
-        }
+        void contextMenuEvent_pub(QContextMenuEvent* event) { contextMenuEvent(event); }
 
-        void contextMenuEvent_pub_parent(QContextMenuEvent* event)
-        {
-            QTextEdit::contextMenuEvent(event);
-        }
+        void contextMenuEvent_pub_parent(QContextMenuEvent* event) { QTextEdit::contextMenuEvent(event); }
 
         void dragEnterEvent_pub(QDragEnterEvent* e) { dragEnterEvent(e); }
 
-        void dragEnterEvent_pub_parent(QDragEnterEvent* e)
-        {
-            QTextEdit::dragEnterEvent(e);
-        }
+        void dragEnterEvent_pub_parent(QDragEnterEvent* e) { QTextEdit::dragEnterEvent(e); }
 
         void dragLeaveEvent_pub(QDragLeaveEvent* e) { dragLeaveEvent(e); }
 
-        void dragLeaveEvent_pub_parent(QDragLeaveEvent* e)
-        {
-            QTextEdit::dragLeaveEvent(e);
-        }
+        void dragLeaveEvent_pub_parent(QDragLeaveEvent* e) { QTextEdit::dragLeaveEvent(e); }
 
         void dragMoveEvent_pub(QDragMoveEvent* e) { dragMoveEvent(e); }
 
-        void dragMoveEvent_pub_parent(QDragMoveEvent* e)
-        {
-            QTextEdit::dragMoveEvent(e);
-        }
+        void dragMoveEvent_pub_parent(QDragMoveEvent* e) { QTextEdit::dragMoveEvent(e); }
 
         void dropEvent_pub(QDropEvent* e) { dropEvent(e); }
 
@@ -179,100 +144,55 @@ namespace Mu
 
         void focusInEvent_pub(QFocusEvent* e) { focusInEvent(e); }
 
-        void focusInEvent_pub_parent(QFocusEvent* e)
-        {
-            QTextEdit::focusInEvent(e);
-        }
+        void focusInEvent_pub_parent(QFocusEvent* e) { QTextEdit::focusInEvent(e); }
 
-        bool focusNextPrevChild_pub(bool next)
-        {
-            return focusNextPrevChild(next);
-        }
+        bool focusNextPrevChild_pub(bool next) { return focusNextPrevChild(next); }
 
-        bool focusNextPrevChild_pub_parent(bool next)
-        {
-            return QTextEdit::focusNextPrevChild(next);
-        }
+        bool focusNextPrevChild_pub_parent(bool next) { return QTextEdit::focusNextPrevChild(next); }
 
         void focusOutEvent_pub(QFocusEvent* e) { focusOutEvent(e); }
 
-        void focusOutEvent_pub_parent(QFocusEvent* e)
-        {
-            QTextEdit::focusOutEvent(e);
-        }
+        void focusOutEvent_pub_parent(QFocusEvent* e) { QTextEdit::focusOutEvent(e); }
 
         void keyPressEvent_pub(QKeyEvent* e) { keyPressEvent(e); }
 
-        void keyPressEvent_pub_parent(QKeyEvent* e)
-        {
-            QTextEdit::keyPressEvent(e);
-        }
+        void keyPressEvent_pub_parent(QKeyEvent* e) { QTextEdit::keyPressEvent(e); }
 
         void keyReleaseEvent_pub(QKeyEvent* e) { keyReleaseEvent(e); }
 
-        void keyReleaseEvent_pub_parent(QKeyEvent* e)
-        {
-            QTextEdit::keyReleaseEvent(e);
-        }
+        void keyReleaseEvent_pub_parent(QKeyEvent* e) { QTextEdit::keyReleaseEvent(e); }
 
-        void mouseDoubleClickEvent_pub(QMouseEvent* e)
-        {
-            mouseDoubleClickEvent(e);
-        }
+        void mouseDoubleClickEvent_pub(QMouseEvent* e) { mouseDoubleClickEvent(e); }
 
-        void mouseDoubleClickEvent_pub_parent(QMouseEvent* e)
-        {
-            QTextEdit::mouseDoubleClickEvent(e);
-        }
+        void mouseDoubleClickEvent_pub_parent(QMouseEvent* e) { QTextEdit::mouseDoubleClickEvent(e); }
 
         void mouseMoveEvent_pub(QMouseEvent* e) { mouseMoveEvent(e); }
 
-        void mouseMoveEvent_pub_parent(QMouseEvent* e)
-        {
-            QTextEdit::mouseMoveEvent(e);
-        }
+        void mouseMoveEvent_pub_parent(QMouseEvent* e) { QTextEdit::mouseMoveEvent(e); }
 
         void mousePressEvent_pub(QMouseEvent* e) { mousePressEvent(e); }
 
-        void mousePressEvent_pub_parent(QMouseEvent* e)
-        {
-            QTextEdit::mousePressEvent(e);
-        }
+        void mousePressEvent_pub_parent(QMouseEvent* e) { QTextEdit::mousePressEvent(e); }
 
         void mouseReleaseEvent_pub(QMouseEvent* e) { mouseReleaseEvent(e); }
 
-        void mouseReleaseEvent_pub_parent(QMouseEvent* e)
-        {
-            QTextEdit::mouseReleaseEvent(e);
-        }
+        void mouseReleaseEvent_pub_parent(QMouseEvent* e) { QTextEdit::mouseReleaseEvent(e); }
 
         void paintEvent_pub(QPaintEvent* event) { paintEvent(event); }
 
-        void paintEvent_pub_parent(QPaintEvent* event)
-        {
-            QTextEdit::paintEvent(event);
-        }
+        void paintEvent_pub_parent(QPaintEvent* event) { QTextEdit::paintEvent(event); }
 
         void resizeEvent_pub(QResizeEvent* e) { resizeEvent(e); }
 
-        void resizeEvent_pub_parent(QResizeEvent* e)
-        {
-            QTextEdit::resizeEvent(e);
-        }
+        void resizeEvent_pub_parent(QResizeEvent* e) { QTextEdit::resizeEvent(e); }
 
         void scrollContentsBy_pub(int dx, int dy) { scrollContentsBy(dx, dy); }
 
-        void scrollContentsBy_pub_parent(int dx, int dy)
-        {
-            QTextEdit::scrollContentsBy(dx, dy);
-        }
+        void scrollContentsBy_pub_parent(int dx, int dy) { QTextEdit::scrollContentsBy(dx, dy); }
 
         void showEvent_pub(QShowEvent* _p13) { showEvent(_p13); }
 
-        void showEvent_pub_parent(QShowEvent* _p13)
-        {
-            QTextEdit::showEvent(_p13);
-        }
+        void showEvent_pub_parent(QShowEvent* _p13) { QTextEdit::showEvent(_p13); }
 
         void wheelEvent_pub(QWheelEvent* e) { wheelEvent(e); }
 
@@ -280,24 +200,15 @@ namespace Mu
 
         bool viewportEvent_pub(QEvent* event) { return viewportEvent(event); }
 
-        bool viewportEvent_pub_parent(QEvent* event)
-        {
-            return QTextEdit::viewportEvent(event);
-        }
+        bool viewportEvent_pub_parent(QEvent* event) { return QTextEdit::viewportEvent(event); }
 
         QSize viewportSizeHint_pub() const { return viewportSizeHint(); }
 
-        QSize viewportSizeHint_pub_parent() const
-        {
-            return QTextEdit::viewportSizeHint();
-        }
+        QSize viewportSizeHint_pub_parent() const { return QTextEdit::viewportSizeHint(); }
 
         bool event_pub(QEvent* event_) { return event(event_); }
 
-        bool event_pub_parent(QEvent* event_)
-        {
-            return QTextEdit::event(event_);
-        }
+        bool event_pub_parent(QEvent* event_) { return QTextEdit::event(event_); }
 
     public:
         const QTextEditType* _baseType;
@@ -305,11 +216,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance*
-    QTextEditType::cachedInstance(const QTextEditType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QTextEditType::cachedInstance(const QTextEditType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

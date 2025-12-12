@@ -38,8 +38,7 @@ namespace Mu
     {
     }
 
-    Function::Function(Context* context, const char* name, NodeFunc func,
-                       Attributes attrs, ...)
+    Function::Function(Context* context, const char* name, NodeFunc func, Attributes attrs, ...)
         : Symbol(context, name)
     {
         va_list ap;
@@ -48,17 +47,14 @@ namespace Mu
         va_end(ap);
     }
 
-    Function::Function(Context* context, const char* name,
-                       const Type* returnType, int nparams,
-                       ParameterVariable** params, Node* code, Attributes attrs)
+    Function::Function(Context* context, const char* name, const Type* returnType, int nparams, ParameterVariable** params, Node* code,
+                       Attributes attrs)
         : Symbol(context, name)
     {
         init(code, returnType, nparams, params, attrs);
     }
 
-    Function::Function(Context* context, const char* name,
-                       const Type* returnType, int nparams,
-                       ParameterVariable** params, NodeFunc func,
+    Function::Function(Context* context, const char* name, const Type* returnType, int nparams, ParameterVariable** params, NodeFunc func,
                        Attributes attrs)
         : Symbol(context, name)
     {
@@ -66,8 +62,7 @@ namespace Mu
         _func = func;
     }
 
-    void Function::init(Node* code, const Type* returnType, int nparams,
-                        ParameterVariable** params, Attributes attrs)
+    void Function::init(Node* code, const Type* returnType, int nparams, ParameterVariable** params, Attributes attrs)
     {
         Signature* sig = new Signature();
 
@@ -109,8 +104,7 @@ namespace Mu
         _unresolvedStubs = false;
         _datanode = _hiddenArgument;
 
-        sig->push_back(returnType ? returnType->fullyQualifiedName()
-                                  : context()->internName(""));
+        sig->push_back(returnType ? returnType->fullyQualifiedName() : context()->internName(""));
 
         for (size_t i = 0; i < nparams; i++)
         {
@@ -222,13 +216,11 @@ namespace Mu
                         break;
 
                     {
-                        const StringVector* names =
-                            reinterpret_cast<StringVector*>(arg);
+                        const StringVector* names = reinterpret_cast<StringVector*>(arg);
 
                         for (int i = 0; i < names->size(); i++)
                         {
-                            typeNames.push_back(
-                                context()->internName((*names)[i]));
+                            typeNames.push_back(context()->internName((*names)[i]));
                             _minimumArgs++;
                             if (_maximumArgs < typeNames.size())
                                 _maximumArgs = typeNames.size();
@@ -245,8 +237,7 @@ namespace Mu
 
                     if (_hasParameters)
                     {
-                        ParameterVariable* p =
-                            reinterpret_cast<ParameterVariable*>(arg);
+                        ParameterVariable* p = reinterpret_cast<ParameterVariable*>(arg);
                         if (!p->hasDefaultValue())
                         {
                             _minimumArgs++;
@@ -262,8 +253,7 @@ namespace Mu
                 case Optional:
                     if (_hasParameters)
                     {
-                        ParameterVariable* p =
-                            reinterpret_cast<ParameterVariable*>(arg);
+                        ParameterVariable* p = reinterpret_cast<ParameterVariable*>(arg);
                         p->setAddress(_parameters.size());
                         addSymbol(p);
                         typeNames.push_back(p->storageClassName());
@@ -391,8 +381,7 @@ namespace Mu
 
             if (symbolState() != ResolvedState)
             {
-                cerr << "WARNING: unable to resolve function "
-                     << fullyQualifiedName() << endl;
+                cerr << "WARNING: unable to resolve function " << fullyQualifiedName() << endl;
                 return 0;
             }
 
@@ -434,8 +423,7 @@ namespace Mu
             //  in that case find out if we're polytypic right now.
             //
 
-            if (pv->storageClass() && pv->storageClass()->isTypeVariable()
-                && !native())
+            if (pv->storageClass() && pv->storageClass()->isTypeVariable() && !native())
             {
                 _polymorphic = true;
             }
@@ -476,8 +464,7 @@ namespace Mu
         //	handled by the argName() function.
         //
 
-        o << fullyQualifiedName() << " (" << returnType()->fullyQualifiedName()
-          << ";";
+        o << fullyQualifiedName() << " (" << returnType()->fullyQualifiedName() << ";";
 
         if (hasParameters())
         {
@@ -486,9 +473,7 @@ namespace Mu
                 const ParameterVariable* p = parameter(i);
                 const Type* pc = p->storageClass();
 
-                o << (i ? ", " : " ")
-                  << (pc ? pc->fullyQualifiedName().c_str() : "*unresolved*")
-                  << " " << p->name();
+                o << (i ? ", " : " ") << (pc ? pc->fullyQualifiedName().c_str() : "*unresolved*") << " " << p->name();
 
                 if (p->hasDefaultValue())
                 {
@@ -554,14 +539,12 @@ namespace Mu
         {
             for (int i = 0; i < _signature->size(); i++)
             {
-                const Type* t =
-                    static_cast<const Type*>((*_signature)[i].symbol);
+                const Type* t = static_cast<const Type*>((*_signature)[i].symbol);
 
                 if (t->isTypePattern())
                 {
                     _multiSignature = true;
-                    const TypePattern* ptype =
-                        static_cast<const TypePattern*>(t);
+                    const TypePattern* ptype = static_cast<const TypePattern*>(t);
                     if (ptype->variadic())
                         _variadic = true;
                 }
@@ -632,8 +615,7 @@ namespace Mu
 
                 if (type->isTypePattern())
                 {
-                    const TypePattern* ptype =
-                        static_cast<const TypePattern*>(type);
+                    const TypePattern* ptype = static_cast<const TypePattern*>(type);
                     ptype->argumentAdjust(i, fi);
                 }
             }
@@ -649,10 +631,7 @@ namespace Mu
         return true;
     }
 
-    int Function::numFreeVariables() const
-    {
-        return _hasParameters ? _parameters.size() - numArgs() : 0;
-    }
+    int Function::numFreeVariables() const { return _hasParameters ? _parameters.size() - numArgs() : 0; }
 
     const ParameterVariable* Function::parameter(int i) const
     {
@@ -832,8 +811,7 @@ namespace Mu
                 return Function::None;
             }
         }
-        else if (const GlobalVariable* v =
-                     dynamic_cast<const GlobalVariable*>(n->symbol()))
+        else if (const GlobalVariable* v = dynamic_cast<const GlobalVariable*>(n->symbol()))
         {
             //
             //  If its either taking the address of or value of a global
@@ -842,8 +820,7 @@ namespace Mu
 
             return Function::None;
         }
-        else if (const MemberVariable* v =
-                     dynamic_cast<const MemberVariable*>(n->symbol()))
+        else if (const MemberVariable* v = dynamic_cast<const MemberVariable*>(n->symbol()))
         {
             //
             //  If its taking the address of a MemberVariable its not
@@ -897,8 +874,7 @@ namespace Mu
         }
         else
         {
-            sig[0].name = _code ? _code->type()->fullyQualifiedName().nameRef()
-                                : context()->internName("").nameRef();
+            sig[0].name = _code ? _code->type()->fullyQualifiedName().nameRef() : context()->internName("").nameRef();
         }
 
         //

@@ -77,24 +77,15 @@ namespace Rv
         QFrame* qf;
         QAction* a;
 
-        m_iconMap["RVSourceGroup"] =
-            colorAdjustedIcon(":/images/videofile_48x48.png");
-        m_iconMap["RVImageSource"] =
-            colorAdjustedIcon(":/images/videofile_48x48.png");
-        m_iconMap["RVSwitchGroup"] =
-            colorAdjustedIcon(":/images/shuffle_48x48.png");
-        m_iconMap["RVRetimeGroup"] =
-            colorAdjustedIcon(":/images/tempo_48x48.png");
-        m_iconMap["RVLayoutGroup"] =
-            colorAdjustedIcon(":/images/lgicn_48x48.png");
-        m_iconMap["RVStackGroup"] =
-            colorAdjustedIcon(":/images/photoalbum_48x48.png");
-        m_iconMap["RVSequenceGroup"] =
-            colorAdjustedIcon(":/images/playlist_48x48.png");
-        m_iconMap["RVFolderGroup"] =
-            colorAdjustedIcon(":/images/foldr_48x48.png");
-        m_iconMap["RVFileSource"] =
-            colorAdjustedIcon(":/images/videofile_48x48.png");
+        m_iconMap["RVSourceGroup"] = colorAdjustedIcon(":/images/videofile_48x48.png");
+        m_iconMap["RVImageSource"] = colorAdjustedIcon(":/images/videofile_48x48.png");
+        m_iconMap["RVSwitchGroup"] = colorAdjustedIcon(":/images/shuffle_48x48.png");
+        m_iconMap["RVRetimeGroup"] = colorAdjustedIcon(":/images/tempo_48x48.png");
+        m_iconMap["RVLayoutGroup"] = colorAdjustedIcon(":/images/lgicn_48x48.png");
+        m_iconMap["RVStackGroup"] = colorAdjustedIcon(":/images/photoalbum_48x48.png");
+        m_iconMap["RVSequenceGroup"] = colorAdjustedIcon(":/images/playlist_48x48.png");
+        m_iconMap["RVFolderGroup"] = colorAdjustedIcon(":/images/foldr_48x48.png");
+        m_iconMap["RVFileSource"] = colorAdjustedIcon(":/images/videofile_48x48.png");
         m_iconMap[""] = colorAdjustedIcon(":/images/new_48x48.png");
 
         setProperty("tbstyle", QVariant(QString("viewer")));
@@ -113,10 +104,8 @@ namespace Rv
         b->setProperty("tbstyle", QVariant(QString("view_menu")));
         b->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 
-        connect(m_viewBackAction, SIGNAL(triggered(bool)), this,
-                SLOT(previousViewNode()));
-        connect(m_viewForwardAction, SIGNAL(triggered(bool)), this,
-                SLOT(nextViewNode()));
+        connect(m_viewBackAction, SIGNAL(triggered(bool)), this, SLOT(previousViewNode()));
+        connect(m_viewForwardAction, SIGNAL(triggered(bool)), this, SLOT(nextViewNode()));
 
         QToolButton* viewButton = new QToolButton(this);
         m_viewMenuAction = new QAction(this);
@@ -129,34 +118,31 @@ namespace Rv
         m_viewMenu = new QMenu(viewButton);
         m_viewMenu->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
         m_viewMenu->setProperty("tbstyle", QVariant(QString("view_menu")));
-        m_viewMenu->setStyleSheet(
-            "QMenu::item:checked { background-color: rgb(20,20,20); }");
+        m_viewMenu->setStyleSheet("QMenu::item:checked { background-color: rgb(20,20,20); }");
 
         viewButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
         viewButton->setMenu(m_viewMenu);
         addWidget(viewButton);
 
-        connect(m_viewMenu, SIGNAL(triggered(QAction*)), this,
-                SLOT(viewMenuChanged(QAction*)));
-        connect(m_viewMenu, SIGNAL(aboutToShow()), this,
-                SLOT(viewMenuUpdate()));
+        connect(m_viewMenu, SIGNAL(triggered(QAction*)), this, SLOT(viewMenuChanged(QAction*)));
+        connect(m_viewMenu, SIGNAL(aboutToShow()), this, SLOT(viewMenuUpdate()));
 
         m_fullScreenAction = addAction("");
         m_fullScreenAction->setIcon(QIcon(":/images/fullscreen.png"));
+        m_fullScreenAction->setToolTip("Toggle full-screen mode");
         b = dynamic_cast<QToolButton*>(widgetForAction(m_fullScreenAction));
         b->setProperty("tbstyle", QVariant(QString("view_menu")));
         b->setToolButtonStyle(Qt::ToolButtonIconOnly);
         b->setPopupMode(QToolButton::InstantPopup);
-        b->setToolTip("Toggle full-screen mode");
 
         m_frameAction = addAction("");
+        m_frameAction->setToolTip("Frame image in view");
         b = dynamic_cast<QToolButton*>(widgetForAction(m_frameAction));
         b->setIcon(QIcon(":/images/frame.png"));
         b->setProperty("tbstyle", QVariant(QString("view_menu")));
         b->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
         b->setPopupMode(QToolButton::DelayedPopup);
         b->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-        b->setToolTip("Frame image in view");
 
         m = new QMenu(b);
         a = m->addAction("Frame");
@@ -166,11 +152,9 @@ namespace Rv
 
         b->setMenu(m);
 
-        connect(m, SIGNAL(triggered(QAction*)), this,
-                SLOT(frameMenuChanged(QAction*)));
+        connect(m, SIGNAL(triggered(QAction*)), this, SLOT(frameMenuChanged(QAction*)));
         connect(m_frameAction, SIGNAL(triggered()), this, SLOT(frame()));
-        connect(m_fullScreenAction, SIGNAL(triggered()), this,
-                SLOT(fullscreen()));
+        connect(m_fullScreenAction, SIGNAL(triggered()), this, SLOT(fullscreen()));
 
         m_bgMenuAction = addAction("");
         b = dynamic_cast<QToolButton*>(widgetForAction(m_bgMenuAction));
@@ -187,8 +171,7 @@ namespace Rv
         m_whiteBGAction = m->addAction("  White");
         m_checkerBGAction = m->addAction("  Checker");
         m_crossHatchBGAction = m->addAction("  Cross Hatch");
-        m->setStyleSheet(
-            "QMenu::item:checked { background-color: rgb(20,20,20); }");
+        m->setStyleSheet("QMenu::item:checked { background-color: rgb(20,20,20); }");
         m_blackBGAction->setCheckable(true);
         m_18GreyBGAction->setCheckable(true);
         m_50GreyBGAction->setCheckable(true);
@@ -209,10 +192,8 @@ namespace Rv
         connect(m_18GreyBGAction, SIGNAL(triggered()), this, SLOT(bg18()));
         connect(m_50GreyBGAction, SIGNAL(triggered()), this, SLOT(bg50()));
         connect(m_whiteBGAction, SIGNAL(triggered()), this, SLOT(bgWhite()));
-        connect(m_checkerBGAction, SIGNAL(triggered()), this,
-                SLOT(bgChecker()));
-        connect(m_crossHatchBGAction, SIGNAL(triggered()), this,
-                SLOT(bgHatch()));
+        connect(m_checkerBGAction, SIGNAL(triggered()), this, SLOT(bgChecker()));
+        connect(m_crossHatchBGAction, SIGNAL(triggered()), this, SLOT(bgHatch()));
 
         m_stereoMenuAction = addAction("Mono");
         m_stereoMenuAction->setIcon(QIcon(":/images/stereo.png"));
@@ -271,28 +252,18 @@ namespace Rv
         // m_stereoActions.push_back(m_shutterStereoAction);
 
         connect(m, SIGNAL(aboutToShow()), this, SLOT(stereoMenuUpdate()));
-        connect(m_monoStereoAction, SIGNAL(triggered()), this,
-                SLOT(monoStereo()));
-        connect(m_anaglyphStereoAction, SIGNAL(triggered()), this,
-                SLOT(anaglyphStereo()));
-        connect(m_lumanaglyphStereoAction, SIGNAL(triggered()), this,
-                SLOT(lumanaglyphStereo()));
-        connect(m_sideBySideStereoAction, SIGNAL(triggered()), this,
-                SLOT(sideBySideStereo()));
-        connect(m_mirroredSideBySideStereoAction, SIGNAL(triggered()), this,
-                SLOT(mirroredStereo()));
-        connect(m_checkerStereoAction, SIGNAL(triggered()), this,
-                SLOT(checkerStereo()));
-        connect(m_scanlineStereoAction, SIGNAL(triggered()), this,
-                SLOT(scanlineStereo()));
-        connect(m_leftStereoAction, SIGNAL(triggered()), this,
-                SLOT(leftStereo()));
-        connect(m_rightStereoAction, SIGNAL(triggered()), this,
-                SLOT(rightStereo()));
+        connect(m_monoStereoAction, SIGNAL(triggered()), this, SLOT(monoStereo()));
+        connect(m_anaglyphStereoAction, SIGNAL(triggered()), this, SLOT(anaglyphStereo()));
+        connect(m_lumanaglyphStereoAction, SIGNAL(triggered()), this, SLOT(lumanaglyphStereo()));
+        connect(m_sideBySideStereoAction, SIGNAL(triggered()), this, SLOT(sideBySideStereo()));
+        connect(m_mirroredSideBySideStereoAction, SIGNAL(triggered()), this, SLOT(mirroredStereo()));
+        connect(m_checkerStereoAction, SIGNAL(triggered()), this, SLOT(checkerStereo()));
+        connect(m_scanlineStereoAction, SIGNAL(triggered()), this, SLOT(scanlineStereo()));
+        connect(m_leftStereoAction, SIGNAL(triggered()), this, SLOT(leftStereo()));
+        connect(m_rightStereoAction, SIGNAL(triggered()), this, SLOT(rightStereo()));
         // connect(m_shutterStereoAction, SIGNAL(triggered()), this,
         //         SLOT(shutterStereo()));
-        connect(m_swapStereoAction, SIGNAL(triggered()), this,
-                SLOT(swapEyes()));
+        connect(m_swapStereoAction, SIGNAL(triggered()), this, SLOT(swapEyes()));
 
         m_channelMenuAction = addAction("Color (RGB)");
         m_channelMenuAction->setIcon(QIcon(":/images/view_channel.png"));
@@ -319,8 +290,7 @@ namespace Rv
         m_LChannelAction->setCheckable(true);
 
         connect(m, SIGNAL(aboutToShow()), this, SLOT(channelMenuUpdate()));
-        connect(m_RGBChannelAction, SIGNAL(triggered()), this,
-                SLOT(channelsRGB()));
+        connect(m_RGBChannelAction, SIGNAL(triggered()), this, SLOT(channelsRGB()));
         connect(m_RChannelAction, SIGNAL(triggered()), this, SLOT(channelsR()));
         connect(m_GChannelAction, SIGNAL(triggered()), this, SLOT(channelsG()));
         connect(m_BChannelAction, SIGNAL(triggered()), this, SLOT(channelsB()));
@@ -389,39 +359,33 @@ namespace Rv
         m_dither8->setCheckable(true);
         m_dither10->setCheckable(true);
 
-        connect(m_monitorMenu, SIGNAL(aboutToShow()), this,
-                SLOT(monitorMenuUpdate()));
-        connect(m_noTransferAction, SIGNAL(triggered()), this,
-                SLOT(transferNone()));
+        connect(m_monitorMenu, SIGNAL(aboutToShow()), this, SLOT(monitorMenuUpdate()));
+        connect(m_noTransferAction, SIGNAL(triggered()), this, SLOT(transferNone()));
         connect(m_srgbAction, SIGNAL(triggered()), this, SLOT(transferSRGB()));
-        connect(m_rec709Action, SIGNAL(triggered()), this,
-                SLOT(transferRec709()));
+        connect(m_rec709Action, SIGNAL(triggered()), this, SLOT(transferRec709()));
         connect(m_g22Action, SIGNAL(triggered()), this, SLOT(transfer22()));
         connect(m_g24Action, SIGNAL(triggered()), this, SLOT(transfer24()));
         connect(m_g26Action, SIGNAL(triggered()), this, SLOT(transfer26()));
-        connect(m_primaries709Action, SIGNAL(triggered()), this,
-                SLOT(primaries709()));
-        connect(m_primariesP3Action, SIGNAL(triggered()), this,
-                SLOT(primariesP3()));
-        connect(m_primariesSMPTECAction, SIGNAL(triggered()), this,
-                SLOT(primariesSMPTEC()));
-        connect(m_primariesXYZAction, SIGNAL(triggered()), this,
-                SLOT(primariesXYZ()));
-        connect(m_primariesAdobeRGBAction, SIGNAL(triggered()), this,
-                SLOT(primariesAdobeRGB()));
-        connect(m_primariesDreamColorAction, SIGNAL(triggered()), this,
-                SLOT(primariesDreamColor()));
+        connect(m_primaries709Action, SIGNAL(triggered()), this, SLOT(primaries709()));
+        connect(m_primariesP3Action, SIGNAL(triggered()), this, SLOT(primariesP3()));
+        connect(m_primariesSMPTECAction, SIGNAL(triggered()), this, SLOT(primariesSMPTEC()));
+        connect(m_primariesXYZAction, SIGNAL(triggered()), this, SLOT(primariesXYZ()));
+        connect(m_primariesAdobeRGBAction, SIGNAL(triggered()), this, SLOT(primariesAdobeRGB()));
+        connect(m_primariesDreamColorAction, SIGNAL(triggered()), this, SLOT(primariesDreamColor()));
         connect(m_ditherOff, SIGNAL(triggered()), this, SLOT(ditherOff()));
         connect(m_dither8, SIGNAL(triggered()), this, SLOT(dither8()));
         connect(m_dither10, SIGNAL(triggered()), this, SLOT(dither10()));
 
-        m_liveReviewFilteredActions = {
-            {m_viewMenuAction, m_viewMenuAction->toolTip()},
-            {m_viewBackAction, m_viewBackAction->toolTip()},
-            {m_viewForwardAction, m_viewForwardAction->toolTip()},
-            {m_stereoMenuAction, m_stereoMenuAction->toolTip()},
-            {m_channelMenuAction, m_channelMenuAction->toolTip()},
-            {m_monitorMenuAction, m_monitorMenuAction->toolTip()}};
+        // Map toolbar actions to their corresponding event categories
+        m_actionCategoryMappings = {{{m_viewBackAction, IPCore::EventCategories::viewmodeCategory, m_viewBackAction->toolTip()},
+                                     {m_viewForwardAction, IPCore::EventCategories::viewmodeCategory, m_viewForwardAction->toolTip()},
+                                     {m_viewMenuAction, IPCore::EventCategories::viewmodeCategory, m_viewMenuAction->toolTip()},
+                                     {m_fullScreenAction, IPCore::EventCategories::fullscreenModeCategory, m_fullScreenAction->toolTip()},
+                                     {m_frameAction, IPCore::EventCategories::viewmodeCategory, m_frameAction->toolTip()},
+                                     {m_bgMenuAction, IPCore::EventCategories::backgroundStyleCategory, m_bgMenuAction->toolTip()},
+                                     {m_stereoMenuAction, IPCore::EventCategories::viewmodeCategory, m_stereoMenuAction->toolTip()},
+                                     {m_channelMenuAction, IPCore::EventCategories::viewmodeCategory, m_channelMenuAction->toolTip()},
+                                     {m_monitorMenuAction, IPCore::EventCategories::viewmodeCategory, m_monitorMenuAction->toolTip()}}};
 
         if (m_session)
             setSession(m_session);
@@ -442,10 +406,7 @@ namespace Rv
         }
     }
 
-    void RvTopViewToolBar::updateActionToolButton(QAction* action,
-                                                  const string& text,
-                                                  const string& icon,
-                                                  bool forceRepaint)
+    void RvTopViewToolBar::updateActionToolButton(QAction* action, const string& text, const string& icon, bool forceRepaint)
     {
         action->setText(text.c_str());
         QToolButton* b = dynamic_cast<QToolButton*>(widgetForAction(action));
@@ -471,8 +432,7 @@ namespace Rv
 
     EventNode::Result RvTopViewToolBar::receiveEvent(const Event& event)
     {
-        if (const GenericStringEvent* gevent =
-                dynamic_cast<const GenericStringEvent*>(&event))
+        if (const GenericStringEvent* gevent = dynamic_cast<const GenericStringEvent*>(&event))
         {
             const string& name = event.name();
             const string& contents = gevent->stringContent();
@@ -484,8 +444,7 @@ namespace Rv
                 IPGraph::PropertyVector props;
 
                 IPNode* node = m_session->graph().findNode(parts.front());
-                m_session->graph().findProperty(m_session->currentFrame(),
-                                                props, contents);
+                m_session->graph().findProperty(m_session->currentFrame(), props, contents);
 
                 if (!node)
                 {
@@ -493,12 +452,11 @@ namespace Rv
                     return EventAcceptAndContinue;
                 }
 
-                if (parts[2] == "type" && parts[1] == "stereo"
-                    && node->protocol() == "RVDisplayStereo")
+                if (parts[2] == "type" && parts[1] == "stereo" && node->protocol() == "RVDisplayStereo")
                 {
                     stereoMenuUpdate();
                 }
-                else if (node->protocol() == "RVDisplayColor" || node->protocol() == "OCIODisplay" )
+                else if (node->protocol() == "RVDisplayColor" || node->protocol() == "OCIODisplay")
                 {
                     if (parts[1] == "color")
                     {
@@ -506,8 +464,7 @@ namespace Rv
                         {
                             channelMenuUpdate();
                         }
-                        else if (parts[2] == "sRGB" || parts[2] == "Rec709"
-                                 || parts[2] == "gamma")
+                        else if (parts[2] == "sRGB" || parts[2] == "Rec709" || parts[2] == "gamma")
                         {
                             // monitorMenuUpdate();
                         }
@@ -540,9 +497,7 @@ namespace Rv
                                     if (device->name() == deviceName)
                                     {
                                         m_outputDevice = device;
-                                        updateActionToolButton(
-                                            m_monitorMenuAction, deviceName,
-                                            "view_display.png");
+                                        updateActionToolButton(m_monitorMenuAction, deviceName, "view_display.png");
                                         return EventAcceptAndContinue;
                                     }
                                 }
@@ -553,32 +508,31 @@ namespace Rv
 
                 if (m_device || m_outputDevice)
                 {
-                    string t = m_outputDevice ? m_outputDevice->name()
-                                              : m_device->name();
-                    updateActionToolButton(m_monitorMenuAction, t,
-                                           "view_display.png");
+                    string t = m_outputDevice ? m_outputDevice->name() : m_device->name();
+                    updateActionToolButton(m_monitorMenuAction, t, "view_display.png");
                 }
             }
             else if (name == "bg-pattern-change")
             {
                 bgMenuUpdate();
             }
-            else if (name == "internal-sync-presenter-changed"
-                     || name == "sync-session-ended")
+            else if (name == "event-category-state-changed")
             {
-                bool isDisabled = m_session->filterLiveReviewEvents();
-                setLiveReviewFilteredActions(isDisabled);
+                updateActionAvailability();
+            }
+            else if (name == "toolbar-set-disabled-prefix")
+            {
+                m_customDisabledPrefix = QString::fromUtf8(contents.c_str());
+                updateActionAvailability();
             }
         }
-        else if (const VideoDeviceContextChangeEvent* vevent =
-                     dynamic_cast<const VideoDeviceContextChangeEvent*>(&event))
+        else if (const VideoDeviceContextChangeEvent* vevent = dynamic_cast<const VideoDeviceContextChangeEvent*>(&event))
         {
             m_device = vevent->m_physicalDevice;
 
             if (!m_outputDevice)
             {
-                updateActionToolButton(m_monitorMenuAction, m_device->name(),
-                                       "view_display.png");
+                updateActionToolButton(m_monitorMenuAction, m_device->name(), "view_display.png");
             }
 
             monitorMenuUpdate();
@@ -614,17 +568,9 @@ namespace Rv
         return false;
     }
 
-    void RvTopViewToolBar::frame()
-    {
-        m_session->userGenericEvent("remote-eval",
-                                    "extra_commands.frameImage()");
-    }
+    void RvTopViewToolBar::frame() { m_session->userGenericEvent("remote-eval", "extra_commands.frameImage()"); }
 
-    void RvTopViewToolBar::fullscreen()
-    {
-        m_session->userGenericEvent("remote-eval",
-                                    "extra_commands.toggleFullScreen()");
-    }
+    void RvTopViewToolBar::fullscreen() { m_session->userGenericEvent("remote-eval", "extra_commands.toggleFullScreen()"); }
 
     void RvTopViewToolBar::viewMenuChanged(QAction* action)
     {
@@ -638,8 +584,7 @@ namespace Rv
     {
         if (!m_session)
             return;
-        m_session->userGenericEvent("remote-eval",
-                                    UTF8::qconvert(action->data().toString()));
+        m_session->userGenericEvent("remote-eval", UTF8::qconvert(action->data().toString()));
     }
 
     void RvTopViewToolBar::viewMenuUpdate()
@@ -652,8 +597,7 @@ namespace Rv
 
         const IPGraph::NodeMap& nodes = m_session->graph().viewableNodes();
 
-        for (IPGraph::NodeMap::const_iterator i = nodes.begin();
-             i != nodes.end(); ++i)
+        for (IPGraph::NodeMap::const_iterator i = nodes.begin(); i != nodes.end(); ++i)
         {
             IPNode* node = (*i).second;
             string pname = node->protocol();
@@ -661,8 +605,7 @@ namespace Rv
             string nodeName = node->name();
             QString p = pname.c_str();
             QIcon icon = m_iconMap.contains(p) ? m_iconMap[p] : m_iconMap[""];
-            QAction* action =
-                m_viewMenu->addAction(icon, UTF8::qconvert(uiName));
+            QAction* action = m_viewMenu->addAction(icon, UTF8::qconvert(uiName));
 
             action->setData(UTF8::qconvert(nodeName));
             action->setCheckable(true);
@@ -671,8 +614,7 @@ namespace Rv
             if (node == vnode)
             {
                 m_viewMenuAction->setIcon(icon);
-                m_viewMenuAction->setText(UTF8::qconvert(uiName)
-                                          + QString(" "));
+                m_viewMenuAction->setText(UTF8::qconvert(uiName) + QString(" "));
                 update();
             }
         }
@@ -779,10 +721,8 @@ namespace Rv
 
     void RvTopViewToolBar::stereoMenuUpdate()
     {
-        m_stereoMenuAction->setText(
-            "DLP  CHECKER"); // just a measurement string
-        QToolButton* b =
-            dynamic_cast<QToolButton*>(widgetForAction(m_stereoMenuAction));
+        m_stereoMenuAction->setText("DLP  CHECKER"); // just a measurement string
+        QToolButton* b = dynamic_cast<QToolButton*>(widgetForAction(m_stereoMenuAction));
         b->setIcon(QIcon(":/images/stereo.png"));
         int w = b->sizeHint().width();
         b->setMinimumWidth(w);
@@ -790,15 +730,12 @@ namespace Rv
         if (!m_session)
         {
             m_stereoMenuAction->setText("Mono");
-            QToolButton* b =
-                dynamic_cast<QToolButton*>(widgetForAction(m_stereoMenuAction));
+            QToolButton* b = dynamic_cast<QToolButton*>(widgetForAction(m_stereoMenuAction));
             b->setIcon(QIcon(":/images/stereo.png"));
             return;
         }
 
-        StringPropertyEditor editor(m_session->graph(),
-                                    m_session->currentFrame(),
-                                    "@RVDisplayStereo.stereo.type");
+        StringPropertyEditor editor(m_session->graph(), m_session->currentFrame(), "@RVDisplayStereo.stereo.type");
 
         string type = editor.value();
         if (type == "mono")
@@ -814,8 +751,7 @@ namespace Rv
             if (checked)
             {
                 m_stereoMenuAction->setText(a->text());
-                QToolButton* b = dynamic_cast<QToolButton*>(
-                    widgetForAction(m_stereoMenuAction));
+                QToolButton* b = dynamic_cast<QToolButton*>(widgetForAction(m_stereoMenuAction));
                 b->setIcon(QIcon(":/images/stereo.png"));
             }
         }
@@ -824,12 +760,9 @@ namespace Rv
         {
             // Update the menu entry for Global Swap Eyes
             // according to the property value.
-            IntPropertyEditor globalSwapEyes(m_session->graph(),
-                                             m_session->currentFrame(),
-                                             "@RVDisplayStereo.stereo.swap");
+            IntPropertyEditor globalSwapEyes(m_session->graph(), m_session->currentFrame(), "@RVDisplayStereo.stereo.swap");
             m_swapStereoAction->setEnabled(true);
-            m_swapStereoAction->setChecked(globalSwapEyes.value() ? true
-                                                                  : false);
+            m_swapStereoAction->setChecked(globalSwapEyes.value() ? true : false);
         }
         else
         {
@@ -843,13 +776,10 @@ namespace Rv
     {
         Session::CachingMode m = m_session->cachingMode();
 
-        StringPropertyEditor editor(m_session->graph(),
-                                    m_session->currentFrame(),
-                                    "@RVDisplayStereo.stereo.type");
+        StringPropertyEditor editor(m_session->graph(), m_session->currentFrame(), "@RVDisplayStereo.stereo.type");
 
         string oldType = editor.value();
-        bool kickCache = (oldType == "off" && type != "off")
-                         || (oldType != "off" && type == "off");
+        bool kickCache = (oldType == "off" && type != "off") || (oldType != "off" && type == "off");
 
         if (kickCache)
             m_session->setCaching(Session::NeverCache);
@@ -900,16 +830,14 @@ namespace Rv
 
     void RvTopViewToolBar::swapEyes()
     {
-        IntPropertyEditor editor(m_session->graph(), m_session->currentFrame(),
-                                 "@RVDisplayStereo.stereo.swap");
+        IntPropertyEditor editor(m_session->graph(), m_session->currentFrame(), "@RVDisplayStereo.stereo.swap");
         editor.setValue(editor.value() == 0);
     }
 
     void RvTopViewToolBar::channelMenuUpdate()
     {
         m_channelMenuAction->setText("MMMMMMMM"); // just a measurement string
-        QToolButton* b =
-            dynamic_cast<QToolButton*>(widgetForAction(m_channelMenuAction));
+        QToolButton* b = dynamic_cast<QToolButton*>(widgetForAction(m_channelMenuAction));
         b->setIcon(QIcon(":/images/view_channel.png"));
         int w = b->sizeHint().width();
         b->setMinimumWidth(w);
@@ -923,8 +851,7 @@ namespace Rv
         if (hasDisplay || hasOCIODisplay)
         {
 
-            IntPropertyEditor editor(m_session->graph(),
-                                     m_session->currentFrame(),
+            IntPropertyEditor editor(m_session->graph(), m_session->currentFrame(),
                                      hasOCIODisplay ? "#OCIODisplay.color.channelFlood" : "#RVDisplayColor.color.channelFlood");
 
             m_RGBChannelAction->setVisible(true);
@@ -976,8 +903,7 @@ namespace Rv
             a->setChecked(true);
 
             m_channelMenuAction->setText(a->text());
-            b = dynamic_cast<QToolButton*>(
-                widgetForAction(m_channelMenuAction));
+            b = dynamic_cast<QToolButton*>(widgetForAction(m_channelMenuAction));
             b->setIcon(QIcon(":/images/view_channel.png"));
         }
         else
@@ -997,8 +923,7 @@ namespace Rv
             m_LChannelAction->setVisible(false);
 
             m_channelMenuAction->setText(m_RGBChannelAction->text());
-            b = dynamic_cast<QToolButton*>(
-                widgetForAction(m_channelMenuAction));
+            b = dynamic_cast<QToolButton*>(widgetForAction(m_channelMenuAction));
             b->setIcon(QIcon(":/images/view_channel.png"));
         }
     }
@@ -1020,12 +945,9 @@ namespace Rv
         if (!m_session)
             return false;
 
-        StringPropertyEditor displayPipeline(
-            m_session->graph(), m_session->currentFrame(),
-            "@RVDisplayPipelineGroup.pipeline.nodes");
+        StringPropertyEditor displayPipeline(m_session->graph(), m_session->currentFrame(), "@RVDisplayPipelineGroup.pipeline.nodes");
 
-        const StringPropertyEditor::ContainerType& pipelineNodes =
-            displayPipeline.container();
+        const StringPropertyEditor::ContainerType& pipelineNodes = displayPipeline.container();
         bool hasDisplay = false;
 
         for (size_t i = 0; i < pipelineNodes.size(); i++)
@@ -1040,14 +962,11 @@ namespace Rv
     bool RvTopViewToolBar::hasOCIODisplayPipeline()
     {
         if (!m_session)
-        return false;
+            return false;
 
-        StringPropertyEditor displayPipeline(
-            m_session->graph(), m_session->currentFrame(),
-            "@RVDisplayPipelineGroup.pipeline.nodes");
+        StringPropertyEditor displayPipeline(m_session->graph(), m_session->currentFrame(), "@RVDisplayPipelineGroup.pipeline.nodes");
 
-        const StringPropertyEditor::ContainerType& pipelineNodes =
-            displayPipeline.container();
+        const StringPropertyEditor::ContainerType& pipelineNodes = displayPipeline.container();
         bool hasDisplay = false;
 
         for (size_t i = 0; i < pipelineNodes.size(); i++)
@@ -1061,13 +980,11 @@ namespace Rv
 
     void RvTopViewToolBar::monitorMenuUpdate()
     {
-        updateActionToolButton(m_monitorMenuAction, "MMMMMMMMMMMMM",
-                               "view_display.png");
+        updateActionToolButton(m_monitorMenuAction, "MMMMMMMMMMMMM", "view_display.png");
         if (!m_device)
             return;
 
-        string name =
-            m_outputDevice ? m_outputDevice->name() : m_device->name();
+        string name = m_outputDevice ? m_outputDevice->name() : m_device->name();
         updateActionToolButton(m_monitorMenuAction, name, "view_display.png");
 
         bool hasDisplay = hasStandardDisplayPipeline();
@@ -1136,17 +1053,14 @@ namespace Rv
         //  Display Info
         //
 
-        QString html =
-            "<style type=\"text/css\"> td { padding: 4px; } </style><table>";
+        QString html = "<style type=\"text/css\"> td { padding: 4px; } </style><table>";
 
         for (const auto module : RvApp()->videoModules())
         {
             for (const auto device : module->devices())
             {
-                VideoDevice::VideoFormat format =
-                    device->videoFormatAtIndex(device->currentVideoFormat());
-                VideoDevice::DataFormat data =
-                    device->dataFormatAtIndex(device->currentDataFormat());
+                VideoDevice::VideoFormat format = device->videoFormatAtIndex(device->currentVideoFormat());
+                VideoDevice::DataFormat data = device->dataFormatAtIndex(device->currentDataFormat());
 
                 QString icon;
 
@@ -1217,8 +1131,7 @@ namespace Rv
         bool ocio = hasOCIODisplayPipeline();
         if (ocio)
         {
-            IntPropertyEditor dither(m_session->graph(), m_session->currentFrame(),
-            "@OCIODisplay.color.dither");
+            IntPropertyEditor dither(m_session->graph(), m_session->currentFrame(), "@OCIODisplay.color.dither");
 
             m_ditherOff->setChecked(dither.value() == 0);
             m_dither8->setChecked(dither.value() == 8);
@@ -1227,40 +1140,27 @@ namespace Rv
             return;
         }
 
-        IntPropertyEditor srgb(m_session->graph(), m_session->currentFrame(),
-                               "@RVDisplayColor.color.sRGB");
+        IntPropertyEditor srgb(m_session->graph(), m_session->currentFrame(), "@RVDisplayColor.color.sRGB");
 
-        IntPropertyEditor rec709(m_session->graph(), m_session->currentFrame(),
-                                 "@RVDisplayColor.color.Rec709");
+        IntPropertyEditor rec709(m_session->graph(), m_session->currentFrame(), "@RVDisplayColor.color.Rec709");
 
-        FloatPropertyEditor gamma(m_session->graph(), m_session->currentFrame(),
-                                  "@RVDisplayColor.color.gamma");
+        FloatPropertyEditor gamma(m_session->graph(), m_session->currentFrame(), "@RVDisplayColor.color.gamma");
 
-        Vec2fPropertyEditor white(m_session->graph(), m_session->currentFrame(),
-                                  "@RVDisplayColor.chromaticities.white");
+        Vec2fPropertyEditor white(m_session->graph(), m_session->currentFrame(), "@RVDisplayColor.chromaticities.white");
 
-        Vec2fPropertyEditor red(m_session->graph(), m_session->currentFrame(),
-                                "@RVDisplayColor.chromaticities.red");
+        Vec2fPropertyEditor red(m_session->graph(), m_session->currentFrame(), "@RVDisplayColor.chromaticities.red");
 
-        Vec2fPropertyEditor green(m_session->graph(), m_session->currentFrame(),
-                                  "@RVDisplayColor.chromaticities.green");
+        Vec2fPropertyEditor green(m_session->graph(), m_session->currentFrame(), "@RVDisplayColor.chromaticities.green");
 
-        Vec2fPropertyEditor blue(m_session->graph(), m_session->currentFrame(),
-                                 "@RVDisplayColor.chromaticities.blue");
+        Vec2fPropertyEditor blue(m_session->graph(), m_session->currentFrame(), "@RVDisplayColor.chromaticities.blue");
 
-        Vec2fPropertyEditor neutral(m_session->graph(),
-                                    m_session->currentFrame(),
-                                    "@RVDisplayColor.chromaticities.neutral");
+        Vec2fPropertyEditor neutral(m_session->graph(), m_session->currentFrame(), "@RVDisplayColor.chromaticities.neutral");
 
-        IntPropertyEditor active(m_session->graph(), m_session->currentFrame(),
-                                 "@RVDisplayColor.chromaticities.active");
+        IntPropertyEditor active(m_session->graph(), m_session->currentFrame(), "@RVDisplayColor.chromaticities.active");
 
-        IntPropertyEditor adoptedNeutral(
-            m_session->graph(), m_session->currentFrame(),
-            "@RVDisplayColor.chromaticities.adoptedNeutral");
+        IntPropertyEditor adoptedNeutral(m_session->graph(), m_session->currentFrame(), "@RVDisplayColor.chromaticities.adoptedNeutral");
 
-        IntPropertyEditor dither(m_session->graph(), m_session->currentFrame(),
-                                 "@RVDisplayColor.color.dither");
+        IntPropertyEditor dither(m_session->graph(), m_session->currentFrame(), "@RVDisplayColor.color.dither");
 
         m_noTransferAction->setChecked(false);
         m_srgbAction->setChecked(false);
@@ -1320,8 +1220,7 @@ namespace Rv
         //  Primaries
         //
 
-        Chromaticities<float> currentChr(red.value(), green.value(),
-                                         blue.value(), white.value());
+        Chromaticities<float> currentChr(red.value(), green.value(), blue.value(), white.value());
 
         m_primaries709Action->setChecked(false);
         m_primariesP3Action->setChecked(false);
@@ -1362,14 +1261,11 @@ namespace Rv
 
     void RvTopViewToolBar::setTransferFunction(const string& name, float value)
     {
-        IntPropertyEditor srgb(m_session->graph(), m_session->currentFrame(),
-                               "@RVDisplayColor.color.sRGB");
+        IntPropertyEditor srgb(m_session->graph(), m_session->currentFrame(), "@RVDisplayColor.color.sRGB");
 
-        IntPropertyEditor rec709(m_session->graph(), m_session->currentFrame(),
-                                 "@RVDisplayColor.color.Rec709");
+        IntPropertyEditor rec709(m_session->graph(), m_session->currentFrame(), "@RVDisplayColor.color.Rec709");
 
-        FloatPropertyEditor gamma(m_session->graph(), m_session->currentFrame(),
-                                  "@RVDisplayColor.color.gamma");
+        FloatPropertyEditor gamma(m_session->graph(), m_session->currentFrame(), "@RVDisplayColor.color.gamma");
 
         if (name == "srgb")
         {
@@ -1399,28 +1295,19 @@ namespace Rv
 
     void RvTopViewToolBar::setPrimaries(const Chromaticities<float>& chr)
     {
-        Vec2fPropertyEditor white(m_session->graph(), m_session->currentFrame(),
-                                  "@RVDisplayColor.chromaticities.white");
+        Vec2fPropertyEditor white(m_session->graph(), m_session->currentFrame(), "@RVDisplayColor.chromaticities.white");
 
-        Vec2fPropertyEditor red(m_session->graph(), m_session->currentFrame(),
-                                "@RVDisplayColor.chromaticities.red");
+        Vec2fPropertyEditor red(m_session->graph(), m_session->currentFrame(), "@RVDisplayColor.chromaticities.red");
 
-        Vec2fPropertyEditor green(m_session->graph(), m_session->currentFrame(),
-                                  "@RVDisplayColor.chromaticities.green");
+        Vec2fPropertyEditor green(m_session->graph(), m_session->currentFrame(), "@RVDisplayColor.chromaticities.green");
 
-        Vec2fPropertyEditor blue(m_session->graph(), m_session->currentFrame(),
-                                 "@RVDisplayColor.chromaticities.blue");
+        Vec2fPropertyEditor blue(m_session->graph(), m_session->currentFrame(), "@RVDisplayColor.chromaticities.blue");
 
-        Vec2fPropertyEditor neutral(m_session->graph(),
-                                    m_session->currentFrame(),
-                                    "@RVDisplayColor.chromaticities.neutral");
+        Vec2fPropertyEditor neutral(m_session->graph(), m_session->currentFrame(), "@RVDisplayColor.chromaticities.neutral");
 
-        IntPropertyEditor active(m_session->graph(), m_session->currentFrame(),
-                                 "@RVDisplayColor.chromaticities.active");
+        IntPropertyEditor active(m_session->graph(), m_session->currentFrame(), "@RVDisplayColor.chromaticities.active");
 
-        IntPropertyEditor adoptedNeutral(
-            m_session->graph(), m_session->currentFrame(),
-            "@RVDisplayColor.chromaticities.adoptedNeutral");
+        IntPropertyEditor adoptedNeutral(m_session->graph(), m_session->currentFrame(), "@RVDisplayColor.chromaticities.adoptedNeutral");
 
         active.setValue(1);
         adoptedNeutral.setValue(1);
@@ -1435,10 +1322,7 @@ namespace Rv
 
     void RvTopViewToolBar::transferSRGB() { setTransferFunction("srgb", 0); }
 
-    void RvTopViewToolBar::transferRec709()
-    {
-        setTransferFunction("rec709", 0);
-    }
+    void RvTopViewToolBar::transferRec709() { setTransferFunction("rec709", 0); }
 
     void RvTopViewToolBar::transfer22() { setTransferFunction("gamma", 2.2); }
 
@@ -1446,35 +1330,17 @@ namespace Rv
 
     void RvTopViewToolBar::transfer26() { setTransferFunction("gamma", 2.6); }
 
-    void RvTopViewToolBar::primaries709()
-    {
-        setPrimaries(Chromaticities<float>::Rec709());
-    }
+    void RvTopViewToolBar::primaries709() { setPrimaries(Chromaticities<float>::Rec709()); }
 
-    void RvTopViewToolBar::primariesP3()
-    {
-        setPrimaries(Chromaticities<float>::P3());
-    }
+    void RvTopViewToolBar::primariesP3() { setPrimaries(Chromaticities<float>::P3()); }
 
-    void RvTopViewToolBar::primariesSMPTEC()
-    {
-        setPrimaries(Chromaticities<float>::SMPTE_C());
-    }
+    void RvTopViewToolBar::primariesSMPTEC() { setPrimaries(Chromaticities<float>::SMPTE_C()); }
 
-    void RvTopViewToolBar::primariesXYZ()
-    {
-        setPrimaries(Chromaticities<float>::XYZ());
-    }
+    void RvTopViewToolBar::primariesXYZ() { setPrimaries(Chromaticities<float>::XYZ()); }
 
-    void RvTopViewToolBar::primariesAdobeRGB()
-    {
-        setPrimaries(Chromaticities<float>::AdobeRGB());
-    }
+    void RvTopViewToolBar::primariesAdobeRGB() { setPrimaries(Chromaticities<float>::AdobeRGB()); }
 
-    void RvTopViewToolBar::primariesDreamColor()
-    {
-        setPrimaries(Chromaticities<float>::DreamcolorFull());
-    }
+    void RvTopViewToolBar::primariesDreamColor() { setPrimaries(Chromaticities<float>::DreamcolorFull()); }
 
     void RvTopViewToolBar::ditherOff()
     {
@@ -1498,8 +1364,7 @@ namespace Rv
     {
         bool ocio = hasOCIODisplayPipeline();
         IntPropertyEditor editor(m_session->graph(), m_session->currentFrame(),
-                                 ocio ?  "@OCIODisplay.color.dither" : "@RVDisplayColor.color.dither");
-
+                                 ocio ? "@OCIODisplay.color.dither" : "@RVDisplayColor.color.dither");
 
         editor.setValue(10);
     }
@@ -1516,24 +1381,34 @@ namespace Rv
 
     void RvTopViewToolBar::setFullscreen(bool fullscreen)
     {
-        QToolButton* b =
-            dynamic_cast<QToolButton*>(widgetForAction(m_fullScreenAction));
-        b->setIcon(QIcon(fullscreen ? ":/images/unfullscreen"
-                                    : ":/images/fullscreen.png"));
+        QToolButton* b = dynamic_cast<QToolButton*>(widgetForAction(m_fullScreenAction));
+        b->setIcon(QIcon(fullscreen ? ":/images/unfullscreen" : ":/images/fullscreen.png"));
     }
 
-    void RvTopViewToolBar::setLiveReviewFilteredActions(bool isDisabled)
+    void RvTopViewToolBar::updateActionAvailability()
     {
-        for (const auto& button : m_liveReviewFilteredActions)
-        {
-            QAction* action = button.first;
-            QString tooltipText = button.second;
+        if (!m_session)
+            return;
 
-            if (action != nullptr)
+        // Update action enabled/disabled state based on event category filtering
+        for (const auto& mapping : m_actionCategoryMappings)
+        {
+            if (mapping.action != nullptr)
             {
-                action->setDisabled(isDisabled);
-                action->setToolTip(isDisabled ? "You must be presenter to use"
-                                              : tooltipText);
+                bool categoryEnabled = m_session->isEventCategoryEnabled(mapping.category);
+
+                mapping.action->setEnabled(categoryEnabled);
+                if (categoryEnabled)
+                {
+                    mapping.action->setToolTip(mapping.defaultTooltip);
+                }
+                else
+                {
+                    QString tooltip = m_customDisabledPrefix.isEmpty() 
+                                      ? mapping.defaultTooltip 
+                                      : m_customDisabledPrefix + mapping.defaultTooltip;
+                    mapping.action->setToolTip(tooltip);
+                }
             }
         }
     }

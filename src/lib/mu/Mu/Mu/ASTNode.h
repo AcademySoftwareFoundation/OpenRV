@@ -35,8 +35,7 @@ namespace Mu
         typedef NodeAssembler::NodeList NodeList;
 
         ASTNode(NodeAssembler& as, int numArgs, const Symbol* s)
-            : AnnotatedNode(numArgs, BaseFunctions::unresolved, s, as.lineNum(),
-                            as.charNum(), as.sourceName())
+            : AnnotatedNode(numArgs, BaseFunctions::unresolved, s, as.lineNum(), as.charNum(), as.sourceName())
             , scope(as.scopeState())
         {
         }
@@ -78,8 +77,7 @@ namespace Mu
     class ASTSymbol : public ASTNode
     {
     public:
-        ASTSymbol(NodeAssembler& as, int numArgs, const Symbol* s,
-                  const Symbol* sym)
+        ASTSymbol(NodeAssembler& as, int numArgs, const Symbol* s, const Symbol* sym)
             : ASTNode(as, numArgs, s)
             , symbol(sym)
         {
@@ -153,8 +151,7 @@ namespace Mu
     class ASTMemberReference : public ASTName
     {
     public:
-        ASTMemberReference(NodeAssembler& as, int numArgs, const Symbol* s,
-                           Name n)
+        ASTMemberReference(NodeAssembler& as, int numArgs, const Symbol* s, Name n)
             : ASTName(as, numArgs, s, n)
         {
         }
@@ -170,8 +167,7 @@ namespace Mu
     class ASTStackReference : public ASTSymbol
     {
     public:
-        ASTStackReference(NodeAssembler& as, int numArgs, const Symbol* s,
-                          const Symbol* sym)
+        ASTStackReference(NodeAssembler& as, int numArgs, const Symbol* s, const Symbol* sym)
             : ASTSymbol(as, numArgs, s, sym)
             , dereference(false)
         {
@@ -235,8 +231,7 @@ namespace Mu
     class ASTStackDeclaration : public ASTName
     {
     public:
-        ASTStackDeclaration(NodeAssembler& as, const Symbol* s, Name n,
-                            StackVariable* sv)
+        ASTStackDeclaration(NodeAssembler& as, const Symbol* s, Name n, StackVariable* sv)
             : ASTName(as, 0, s, n)
             , dummy(sv)
         {
@@ -253,8 +248,7 @@ namespace Mu
     class ASTListConstructor : public ASTNode
     {
     public:
-        ASTListConstructor(NodeAssembler& as, int numArgs, Node** args,
-                           const Symbol* s)
+        ASTListConstructor(NodeAssembler& as, int numArgs, Node** args, const Symbol* s)
             : ASTNode(as, numArgs, s)
         {
             setArgs(args, numArgs);
@@ -270,8 +264,7 @@ namespace Mu
     class ASTTupleConstructor : public ASTNode
     {
     public:
-        ASTTupleConstructor(NodeAssembler& as, int numArgs, Node** args,
-                            const Symbol* s)
+        ASTTupleConstructor(NodeAssembler& as, int numArgs, Node** args, const Symbol* s)
             : ASTNode(as, numArgs, s)
         {
             setArgs(args, numArgs);
@@ -287,8 +280,7 @@ namespace Mu
     class ASTIndexMember : public ASTNode
     {
     public:
-        ASTIndexMember(NodeAssembler& as, int numArgs, Node** args,
-                       const Symbol* s)
+        ASTIndexMember(NodeAssembler& as, int numArgs, Node** args, const Symbol* s)
             : ASTNode(as, numArgs, s)
         {
             setArgs(args, numArgs);

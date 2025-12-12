@@ -30,8 +30,7 @@ namespace Mu
 
     ListType::~ListType() {}
 
-    void ListType::outputValueRecursive(ostream& o, const ValuePointer vp,
-                                        ValueOutputState& state) const
+    void ListType::outputValueRecursive(ostream& o, const ValuePointer vp, ValueOutputState& state) const
     {
         ClassInstance* obj = *reinterpret_cast<ClassInstance**>(vp);
 
@@ -41,8 +40,7 @@ namespace Mu
 
             for (List list(0, obj); *list; ++list)
             {
-                list.type()->elementType()->outputValueRecursive(
-                    o, list.valuePointer(), state);
+                list.type()->elementType()->outputValueRecursive(o, list.valuePointer(), state);
                 if (list.next())
                     o << ", ";
             }
@@ -145,11 +143,9 @@ namespace Mu
         s->addSymbols(
             new ReferenceType(c, rn, this),
 
-            new Function(c, tn, BaseFunctions::dereference, Cast, Return, tn,
-                         Args, tn, End),
+            new Function(c, tn, BaseFunctions::dereference, Cast, Return, tn, Args, tn, End),
 
-            new Function(c, tn, ListType::construct_aggregate, Mapped, Args, en,
-                         Optional, "?+", Maximum, 999999, Return, tn, End),
+            new Function(c, tn, ListType::construct_aggregate, Mapped, Args, en, Optional, "?+", Maximum, 999999, Return, tn, End),
 
 #if 0
                   new Function(c, tn, ListType::copyconstruct, None,
@@ -157,12 +153,9 @@ namespace Mu
                                Args, tn, End),
 #endif
 
-            new Function(c, "=", BaseFunctions::assign,
-                         Function::MemberOperator | Function::Operator, Return,
-                         rn, Args, rn, tn, End),
+            new Function(c, "=", BaseFunctions::assign, Function::MemberOperator | Function::Operator, Return, rn, Args, rn, tn, End),
 
-            new Function(c, "eq", BaseFunctions::eq, CommOp, Return, "bool",
-                         Args, tn, tn, End),
+            new Function(c, "eq", BaseFunctions::eq, CommOp, Return, "bool", Args, tn, tn, End),
 
 #if 0
                   new Function(c, "==", ListType::equals, Mapped,
@@ -176,19 +169,15 @@ namespace Mu
 
             EndArguments);
 
-        globalScope()->addSymbols(
-            new Function(c, "cons", ListType::cons, Mapped, Return, tn, Args,
-                         en, tn, End),
+        globalScope()->addSymbols(new Function(c, "cons", ListType::cons, Mapped, Return, tn, Args, en, tn, End),
 
-            new Function(c, "tail", ListType::tail, Mapped, Return, tn, Args,
-                         tn, End),
+                                  new Function(c, "tail", ListType::tail, Mapped, Return, tn, Args, tn, End),
 
-            new Function(c, "head", head, Mapped, Return, en, Args, tn, End),
+                                  new Function(c, "head", head, Mapped, Return, en, Args, tn, End),
 
-            EndArguments);
+                                  EndArguments);
 
-        addSymbols(new MemberVariable(c, "value", en),
-                   new MemberVariable(c, "next", tn), EndArguments);
+        addSymbols(new MemberVariable(c, "value", en), new MemberVariable(c, "next", tn), EndArguments);
 
         freeze();
     }
@@ -207,8 +196,7 @@ namespace Mu
         const ListType* c = static_cast<const ListType*>(NODE_THIS.type());
         const Node* n = 0;
 
-        List list(static_cast<const ListType*>(NODE_THIS.type()), NODE_THREAD,
-                  NODE_THIS.argNode(0));
+        List list(static_cast<const ListType*>(NODE_THIS.type()), NODE_THREAD, NODE_THIS.argNode(0));
 
         for (size_t i = 1; n = NODE_THIS.argNode(i); i++)
         {
@@ -224,10 +212,8 @@ namespace Mu
         const ListType* c = static_cast<const ListType*>(NODE_THIS.type());
         const Type* etype = c->elementType();
         ClassInstance* head = ClassInstance::allocate(c);
-        etype->nodeEval(head->structure() + c->valueOffset(),
-                        NODE_THIS.argNode(0), NODE_THREAD);
-        ClassInstance** next =
-            (ClassInstance**)(head->structure() + c->nextOffset());
+        etype->nodeEval(head->structure() + c->valueOffset(), NODE_THIS.argNode(0), NODE_THREAD);
+        ClassInstance** next = (ClassInstance**)(head->structure() + c->nextOffset());
         *next = NODE_ARG_OBJECT(1, ClassInstance);
         NODE_RETURN(head);
     }
@@ -238,21 +224,19 @@ namespace Mu
         if (!head)
             throw NilArgumentException(NODE_THREAD);
         const ListType* c = static_cast<const ListType*>(NODE_THIS.type());
-        ClassInstance** next =
-            (ClassInstance**)(head->structure() + c->nextOffset());
+        ClassInstance** next = (ClassInstance**)(head->structure() + c->nextOffset());
         NODE_RETURN(*next);
     }
 
-#define NODE_HEAD(TYPE)                                                    \
-    NODE_IMPLEMENTATION(ListType::head_##TYPE, TYPE)                       \
-    {                                                                      \
-        ClassInstance* head = NODE_ARG_OBJECT(0, ClassInstance);           \
-        if (!head)                                                         \
-            throw NilArgumentException(NODE_THREAD);                       \
-        const ListType* c = static_cast<const ListType*>(head->type());    \
-        TYPE* p =                                                          \
-            reinterpret_cast<TYPE*>(head->structure() + c->valueOffset()); \
-        NODE_RETURN(*p);                                                   \
+#define NODE_HEAD(TYPE)                                                          \
+    NODE_IMPLEMENTATION(ListType::head_##TYPE, TYPE)                             \
+    {                                                                            \
+        ClassInstance* head = NODE_ARG_OBJECT(0, ClassInstance);                 \
+        if (!head)                                                               \
+            throw NilArgumentException(NODE_THREAD);                             \
+        const ListType* c = static_cast<const ListType*>(head->type());          \
+        TYPE* p = reinterpret_cast<TYPE*>(head->structure() + c->valueOffset()); \
+        NODE_RETURN(*p);                                                         \
     }
 
     NODE_HEAD(int)

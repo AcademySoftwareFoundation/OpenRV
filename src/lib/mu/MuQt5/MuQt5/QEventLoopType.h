@@ -39,8 +39,7 @@ namespace Mu
         //  Constructors
         //
 
-        QEventLoopType(Context* context, const char* name,
-                       Class* superClass = 0, Class* superClass2 = 0);
+        QEventLoopType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QEventLoopType();
 
@@ -74,17 +73,11 @@ namespace Mu
     public:
         void customEvent_pub(QEvent* event) { customEvent(event); }
 
-        void customEvent_pub_parent(QEvent* event)
-        {
-            QEventLoop::customEvent(event);
-        }
+        void customEvent_pub_parent(QEvent* event) { QEventLoop::customEvent(event); }
 
         void timerEvent_pub(QTimerEvent* event) { timerEvent(event); }
 
-        void timerEvent_pub_parent(QTimerEvent* event)
-        {
-            QEventLoop::timerEvent(event);
-        }
+        void timerEvent_pub_parent(QTimerEvent* event) { QEventLoop::timerEvent(event); }
 
     public:
         const QEventLoopType* _baseType;
@@ -92,11 +85,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance*
-    QEventLoopType::cachedInstance(const QEventLoopType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QEventLoopType::cachedInstance(const QEventLoopType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

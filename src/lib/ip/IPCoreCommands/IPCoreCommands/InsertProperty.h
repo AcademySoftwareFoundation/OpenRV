@@ -37,9 +37,7 @@ namespace IPCore
             typedef typename T::container_type Container;
             typedef typename Property::Layout Layout;
 
-            void setArgs(IPGraph* graph, const std::string& nodeName,
-                         const std::string& propPath, Container& value,
-                         size_t index);
+            void setArgs(IPGraph* graph, const std::string& nodeName, const std::string& propPath, Container& value, size_t index);
 
             virtual void doit();
             virtual void undo();
@@ -53,10 +51,8 @@ namespace IPCore
         };
 
         template <typename T>
-        void InsertProperty<T>::setArgs(IPGraph* graph,
-                                        const std::string& nodeName,
-                                        const std::string& propPath,
-                                        Container& value, size_t index)
+        void InsertProperty<T>::setArgs(IPGraph* graph, const std::string& nodeName, const std::string& propPath, Container& value,
+                                        size_t index)
         {
             m_graph = graph;
             m_value = value;
@@ -66,8 +62,7 @@ namespace IPCore
 
             if (!m_graph->findNode(m_nodeName))
             {
-                TWK_THROW_EXC_STREAM("NewProperty: unknown node "
-                                     << m_nodeName);
+                TWK_THROW_EXC_STREAM("NewProperty: unknown node " << m_nodeName);
             }
         }
 
@@ -78,13 +73,10 @@ namespace IPCore
                 if (T* prop = node->property<T>(m_propPath))
                 {
                     node->propertyWillChangeSignal()(prop);
-                    node->propertyWillInsertSignal()(prop, m_index,
-                                                     m_value.size());
+                    node->propertyWillInsertSignal()(prop, m_index, m_value.size());
                     Container& c = prop->valueContainer();
-                    c.insert(c.begin() + m_index, m_value.begin(),
-                             m_value.end());
-                    node->propertyDidInsertSignal()(prop, m_index,
-                                                    m_value.size());
+                    c.insert(c.begin() + m_index, m_value.begin(), m_value.end());
+                    node->propertyDidInsertSignal()(prop, m_index, m_value.size());
                     node->propertyChangedSignal()(prop);
                 }
             }
@@ -98,15 +90,13 @@ namespace IPCore
                 {
                     node->propertyWillChangeSignal()(prop);
                     Container& c = prop->valueContainer();
-                    c.erase(c.begin() + m_index,
-                            c.begin() + m_index + m_value.size());
+                    c.erase(c.begin() + m_index, c.begin() + m_index + m_value.size());
                     node->propertyChangedSignal()(prop);
                 }
             }
         }
 
-        template <typename T>
-        class InsertPropertyInfo : public TwkApp::CommandInfo
+        template <typename T> class InsertPropertyInfo : public TwkApp::CommandInfo
         {
         public:
             InsertPropertyInfo(const std::string& name)
@@ -116,10 +106,7 @@ namespace IPCore
 
             virtual ~InsertPropertyInfo() {}
 
-            virtual TwkApp::Command* newCommand() const
-            {
-                return new InsertProperty<T>(this);
-            }
+            virtual TwkApp::Command* newCommand() const { return new InsertProperty<T>(this); }
         };
 
     } // namespace Commands

@@ -221,8 +221,7 @@ namespace Mu
         Context::NameValuePairs timespecFields(2);
         timespecFields[0] = make_pair(string("tv_sec"), int64_T);
         timespecFields[1] = make_pair(string("tv_nsec"), int_T);
-        const Type* timespec_T =
-            context->structType(this, "timespec", timespecFields);
+        const Type* timespec_T = context->structType(this, "timespec", timespecFields);
 
         //
         //  These may have to change. The largest file size that can be
@@ -242,8 +241,7 @@ namespace Mu
         statFields[7] = make_pair(string("st_atime"), timespec_T);
         statFields[8] = make_pair(string("st_mtime"), timespec_T);
         statFields[9] = make_pair(string("st_ctime"), timespec_T);
-        const StructType* stat_T =
-            context->structType(this, "statinfo", statFields);
+        const StructType* stat_T = context->structType(this, "statinfo", statFields);
 
         //
         //  Make the function type (void;)
@@ -272,34 +270,26 @@ namespace Mu
 
             SYMCONST(SEEK_SET), SYMCONST(SEEK_CUR), SYMCONST(SEEK_END),
 
-            SYMCONST(SIGABRT), SYMCONST(SIGINT), SYMCONST(SIGILL),
-            SYMCONST(SIGFPE), SYMCONST(SIGSEGV), SYMCONST(SIGTERM),
+            SYMCONST(SIGABRT), SYMCONST(SIGINT), SYMCONST(SIGILL), SYMCONST(SIGFPE), SYMCONST(SIGSEGV), SYMCONST(SIGTERM),
 
 #ifndef _MSC_VER
             // fcntl commands
-            SYMCONST(F_DUPFD), SYMCONST(F_GETFD), SYMCONST(F_SETFD),
-            SYMCONST(F_GETFL), SYMCONST(F_SETFL), SYMCONST(F_GETOWN),
-            SYMCONST(F_SETOWN), SYMCONST(F_GETLK), SYMCONST(F_SETLK),
-            SYMCONST(F_SETLKW),
+            SYMCONST(F_DUPFD), SYMCONST(F_GETFD), SYMCONST(F_SETFD), SYMCONST(F_GETFL), SYMCONST(F_SETFL), SYMCONST(F_GETOWN),
+            SYMCONST(F_SETOWN), SYMCONST(F_GETLK), SYMCONST(F_SETLK), SYMCONST(F_SETLKW),
 
             // flock
-            SYMCONST(LOCK_SH), SYMCONST(LOCK_EX), SYMCONST(LOCK_NB),
-            SYMCONST(LOCK_UN),
+            SYMCONST(LOCK_SH), SYMCONST(LOCK_EX), SYMCONST(LOCK_NB), SYMCONST(LOCK_UN),
 
             SYMCONST(SIGHUP), SYMCONST(SIGQUIT), SYMCONST(SIGTRAP),
             //                 SYMCONST(SIGEMT),
-            SYMCONST(SIGKILL), SYMCONST(SIGBUS), SYMCONST(SIGSYS),
-            SYMCONST(SIGPIPE), SYMCONST(SIGALRM), SYMCONST(SIGURG),
-            SYMCONST(SIGSTOP), SYMCONST(SIGTSTP), SYMCONST(SIGCONT),
-            SYMCONST(SIGCHLD), SYMCONST(SIGTTIN), SYMCONST(SIGTTOU),
-            SYMCONST(SIGIO), SYMCONST(SIGXCPU), SYMCONST(SIGXFSZ),
-            SYMCONST(SIGVTALRM), SYMCONST(SIGPROF), SYMCONST(SIGWINCH),
+            SYMCONST(SIGKILL), SYMCONST(SIGBUS), SYMCONST(SIGSYS), SYMCONST(SIGPIPE), SYMCONST(SIGALRM), SYMCONST(SIGURG),
+            SYMCONST(SIGSTOP), SYMCONST(SIGTSTP), SYMCONST(SIGCONT), SYMCONST(SIGCHLD), SYMCONST(SIGTTIN), SYMCONST(SIGTTOU),
+            SYMCONST(SIGIO), SYMCONST(SIGXCPU), SYMCONST(SIGXFSZ), SYMCONST(SIGVTALRM), SYMCONST(SIGPROF), SYMCONST(SIGWINCH),
             //                 SYMCONST(SIGINFO),
             SYMCONST(SIGUSR1), SYMCONST(SIGUSR2),
 #endif
 
-            SYMCONST(O_RDONLY), SYMCONST(O_WRONLY), SYMCONST(O_RDWR),
-            SYMCONST(O_APPEND), SYMCONST(O_CREAT), SYMCONST(O_TRUNC),
+            SYMCONST(O_RDONLY), SYMCONST(O_WRONLY), SYMCONST(O_RDWR), SYMCONST(O_APPEND), SYMCONST(O_CREAT), SYMCONST(O_TRUNC),
             SYMCONST(O_EXCL),
 #ifndef WIN32
             SYMCONST(O_NONBLOCK),
@@ -311,18 +301,14 @@ namespace Mu
 #ifndef WIN32
             SYMCONST(AF_UNIX), SYMCONST(AF_INET), SYMCONST(AF_INET6),
 
-            SYMCONST(SOCK_STREAM), SYMCONST(SOCK_DGRAM), SYMCONST(SOCK_RAW),
-            SYMCONST(SOCK_SEQPACKET), SYMCONST(SOCK_RDM),
+            SYMCONST(SOCK_STREAM), SYMCONST(SOCK_DGRAM), SYMCONST(SOCK_RAW), SYMCONST(SOCK_SEQPACKET), SYMCONST(SOCK_RDM),
 
             // stat
-            SYMCONST(S_IFMT), SYMCONST(S_IFIFO), SYMCONST(S_IFCHR),
-            SYMCONST(S_IFDIR), SYMCONST(S_IFBLK), SYMCONST(S_IFREG),
+            SYMCONST(S_IFMT), SYMCONST(S_IFIFO), SYMCONST(S_IFCHR), SYMCONST(S_IFDIR), SYMCONST(S_IFBLK), SYMCONST(S_IFREG),
             SYMCONST(S_IFLNK), SYMCONST(S_IFSOCK),
             // SYMCONST(S_IFWHT),
-            SYMCONST(S_ISUID), SYMCONST(S_ISGID), SYMCONST(S_ISVTX),
-            SYMCONST(S_IRWXU), SYMCONST(S_IRUSR), SYMCONST(S_IWUSR),
-            SYMCONST(S_IXUSR), SYMCONST(S_IRWXG), SYMCONST(S_IRGRP),
-            SYMCONST(S_IWGRP), SYMCONST(S_IXGRP), SYMCONST(S_IRWXO),
+            SYMCONST(S_ISUID), SYMCONST(S_ISGID), SYMCONST(S_ISVTX), SYMCONST(S_IRWXU), SYMCONST(S_IRUSR), SYMCONST(S_IWUSR),
+            SYMCONST(S_IXUSR), SYMCONST(S_IRWXG), SYMCONST(S_IRGRP), SYMCONST(S_IWGRP), SYMCONST(S_IXGRP), SYMCONST(S_IRWXO),
             SYMCONST(S_IROTH), SYMCONST(S_IWOTH), SYMCONST(S_IXOTH),
             // SYMCONST(S_ISTXT),
             SYMCONST(S_IREAD), SYMCONST(S_IWRITE), SYMCONST(S_IEXEC),
@@ -330,225 +316,151 @@ namespace Mu
 
             EndArguments);
 
-        addSymbols(
-            new Function(c, "getenv", SystemModule::getenv, None, Args,
-                         "string", Return, "string", End),
+        addSymbols(new Function(c, "getenv", SystemModule::getenv, None, Args, "string", Return, "string", End),
 
-            new Function(c, "getenv", SystemModule::getenv2, None, Args,
-                         "string", "string", Return, "string", End),
+                   new Function(c, "getenv", SystemModule::getenv2, None, Args, "string", "string", Return, "string", End),
 
-            new Function(c, "getenv", SystemModule::getenv3, None, Return,
-                         "[string]", End),
+                   new Function(c, "getenv", SystemModule::getenv3, None, Return, "[string]", End),
 
-            new Function(c, "unsetenv", SystemModule::unsetenv, None, Args,
-                         "string", Return, "void", End),
+                   new Function(c, "unsetenv", SystemModule::unsetenv, None, Args, "string", Return, "void", End),
 
-            new Function(c, "putenv", SystemModule::putenv, None, Args,
-                         "string", Return, "void", End),
+                   new Function(c, "putenv", SystemModule::putenv, None, Args, "string", Return, "void", End),
 
-            new Function(c, "setenv", SystemModule::setenv, None, Args,
-                         "string", "string", "bool", Return, "void", End),
+                   new Function(c, "setenv", SystemModule::setenv, None, Args, "string", "string", "bool", Return, "void", End),
 
-            new Function(c, "getcwd", SystemModule::getcwd, None, Return,
-                         "string", End),
+                   new Function(c, "getcwd", SystemModule::getcwd, None, Return, "string", End),
 
-            new Function(c, "ctermid", SystemModule::ctermid, None, Return,
-                         "string", End),
+                   new Function(c, "ctermid", SystemModule::ctermid, None, Return, "string", End),
 
-            new Function(c, "chdir", SystemModule::chdir, None, Args, "string",
-                         Return, "void", End),
+                   new Function(c, "chdir", SystemModule::chdir, None, Args, "string", Return, "void", End),
 
-            new Function(c, "getuid", SystemModule::getuid, None, Return, "int",
-                         End),
+                   new Function(c, "getuid", SystemModule::getuid, None, Return, "int", End),
 
-            new Function(c, "geteuid", SystemModule::geteuid, None, Return,
-                         "int", End),
+                   new Function(c, "geteuid", SystemModule::geteuid, None, Return, "int", End),
 
-            new Function(c, "getgid", SystemModule::getgid, None, Return, "int",
-                         End),
+                   new Function(c, "getgid", SystemModule::getgid, None, Return, "int", End),
 
-            new Function(c, "getegid", SystemModule::getegid, None, Return,
-                         "int", End),
+                   new Function(c, "getegid", SystemModule::getegid, None, Return, "int", End),
 
-            new Function(c, "getpid", SystemModule::getpid, None, Return, "int",
-                         End),
+                   new Function(c, "getpid", SystemModule::getpid, None, Return, "int", End),
 
-            new Function(c, "getppid", SystemModule::getppid, None, Return,
-                         "int", End),
+                   new Function(c, "getppid", SystemModule::getppid, None, Return, "int", End),
 
-            new Function(c, "getpgid", SystemModule::getpgid, None, Args, "int",
-                         Return, "int", End),
+                   new Function(c, "getpgid", SystemModule::getpgid, None, Args, "int", Return, "int", End),
 
-            new Function(c, "getpgrp", SystemModule::getpgrp, None, Return,
-                         "int", End),
+                   new Function(c, "getpgrp", SystemModule::getpgrp, None, Return, "int", End),
 
-            new Function(c, "setuid", SystemModule::setuid, None, Args, "int",
-                         Return, "void", End),
+                   new Function(c, "setuid", SystemModule::setuid, None, Args, "int", Return, "void", End),
 
-            new Function(c, "seteuid", SystemModule::seteuid, None, Args, "int",
-                         Return, "void", End),
+                   new Function(c, "seteuid", SystemModule::seteuid, None, Args, "int", Return, "void", End),
 
-            new Function(c, "setgid", SystemModule::setgid, None, Args, "int",
-                         Return, "void", End),
+                   new Function(c, "setgid", SystemModule::setgid, None, Args, "int", Return, "void", End),
 
-            new Function(c, "setegid", SystemModule::setegid, None, Args, "int",
-                         Return, "void", End),
+                   new Function(c, "setegid", SystemModule::setegid, None, Args, "int", Return, "void", End),
 
-            new Function(c, "setsid", SystemModule::setsid, None, Return, "int",
-                         End),
+                   new Function(c, "setsid", SystemModule::setsid, None, Return, "int", End),
 
-            new Function(c, "setpgid", SystemModule::setpgid, None, Args, "int",
-                         "int", Return, "void", End),
+                   new Function(c, "setpgid", SystemModule::setpgid, None, Args, "int", "int", Return, "void", End),
 
-            new Function(c, "setreuid", SystemModule::setreuid, None, Args,
-                         "int", "int", Return, "void", End),
+                   new Function(c, "setreuid", SystemModule::setreuid, None, Args, "int", "int", Return, "void", End),
 
-            new Function(c, "setregid", SystemModule::setregid, None, Args,
-                         "int", "int", Return, "void", End),
+                   new Function(c, "setregid", SystemModule::setregid, None, Args, "int", "int", Return, "void", End),
 
-            new Function(c, "umask", SystemModule::umask, None, Args, "int",
-                         Return, "int", End),
+                   new Function(c, "umask", SystemModule::umask, None, Args, "int", Return, "int", End),
 
-            new Function(c, "chmod", SystemModule::chmod, None, Args, "string",
-                         "int", Return, "void", End),
+                   new Function(c, "chmod", SystemModule::chmod, None, Args, "string", "int", Return, "void", End),
 
-            new Function(c, "mkdir", SystemModule::mkdir, None, Args, "string",
-                         "int", Return, "void", End),
+                   new Function(c, "mkdir", SystemModule::mkdir, None, Args, "string", "int", Return, "void", End),
 
-            new Function(c, "mkfifo", SystemModule::mkfifo, None, Args,
-                         "string", "int", Return, "void", End),
+                   new Function(c, "mkfifo", SystemModule::mkfifo, None, Args, "string", "int", Return, "void", End),
 
-            new Function(c, "mknod", SystemModule::mknod, None, Args, "string",
-                         "int", "int", Return, "void", End),
+                   new Function(c, "mknod", SystemModule::mknod, None, Args, "string", "int", "int", Return, "void", End),
 
-            new Function(c, "readlink", SystemModule::readlink, None, Args,
-                         "string", Return, "string", End),
+                   new Function(c, "readlink", SystemModule::readlink, None, Args, "string", Return, "string", End),
 
-            new Function(c, "fork", SystemModule::fork, None, Return, "int",
-                         End),
+                   new Function(c, "fork", SystemModule::fork, None, Return, "int", End),
 
-            new Function(c, "exec", SystemModule::exec, None, Return, "void",
-                         Args, "string", "[string]", "[string]", End),
+                   new Function(c, "exec", SystemModule::exec, None, Return, "void", Args, "string", "[string]", "[string]", End),
 
-            new Function(c, "system", SystemModule::system, None, Return, "int",
-                         Args, "string", End),
+                   new Function(c, "system", SystemModule::system, None, Return, "int", Args, "string", End),
 
-            new Function(c, "system2", SystemModule::system2, None, Return,
-                         "string", Args, "string", End),
+                   new Function(c, "system2", SystemModule::system2, None, Return, "string", Args, "string", End),
 
-            new Function(c, "defaultWindowsOpen",
-                         SystemModule::defaultWindowsOpen, None, Return, "int",
-                         Args, "string", End),
+                   new Function(c, "defaultWindowsOpen", SystemModule::defaultWindowsOpen, None, Return, "int", Args, "string", End),
 
-            new Function(c, "wait", SystemModule::wait, None, Return,
-                         "(int,int)", End),
+                   new Function(c, "wait", SystemModule::wait, None, Return, "(int,int)", End),
 
-            new Function(c, "wait", SystemModule::waitpid, None, Return,
-                         "(int,int)", Args, "int", "int", End),
+                   new Function(c, "wait", SystemModule::waitpid, None, Return, "(int,int)", Args, "int", "int", End),
 
-            new Function(c, "WIFEXITED", SystemModule::wifexited, None, Return,
-                         "bool", Args, "int", End),
+                   new Function(c, "WIFEXITED", SystemModule::wifexited, None, Return, "bool", Args, "int", End),
 
-            new Function(c, "WIFSIGNALED", SystemModule::wifsignaled, None,
-                         Return, "bool", Args, "int", End),
+                   new Function(c, "WIFSIGNALED", SystemModule::wifsignaled, None, Return, "bool", Args, "int", End),
 
-            new Function(c, "WIFSTOPPED", SystemModule::wifstopped, None,
-                         Return, "bool", Args, "int", End),
+                   new Function(c, "WIFSTOPPED", SystemModule::wifstopped, None, Return, "bool", Args, "int", End),
 
-            new Function(c, "WCOREDUMP", SystemModule::wcoredump, None, Return,
-                         "int", Args, "bool", End),
+                   new Function(c, "WCOREDUMP", SystemModule::wcoredump, None, Return, "int", Args, "bool", End),
 
-            new Function(c, "WEXITSTATUS", SystemModule::wexitstatus, None,
-                         Return, "int", Args, "int", End),
+                   new Function(c, "WEXITSTATUS", SystemModule::wexitstatus, None, Return, "int", Args, "int", End),
 
-            new Function(c, "WTERMSIG", SystemModule::wtermsig, None, Return,
-                         "int", Args, "int", End),
+                   new Function(c, "WTERMSIG", SystemModule::wtermsig, None, Return, "int", Args, "int", End),
 
-            new Function(c, "WSTOPSIG", SystemModule::wstopsig, None, Return,
-                         "int", Args, "int", End),
+                   new Function(c, "WSTOPSIG", SystemModule::wstopsig, None, Return, "int", Args, "int", End),
 
-            new Function(c, "_exit", SystemModule::_exit, None, Return, "void",
-                         Args, "int", End),
+                   new Function(c, "_exit", SystemModule::_exit, None, Return, "void", Args, "int", End),
 
-            new Function(c, "kill", SystemModule::kill, None, Return, "void",
-                         Args, "int", "int", End),
+                   new Function(c, "kill", SystemModule::kill, None, Return, "void", Args, "int", "int", End),
 
-            new Function(c, "getdtablesize", SystemModule::getdtablesize, None,
-                         Return, "int", End),
+                   new Function(c, "getdtablesize", SystemModule::getdtablesize, None, Return, "int", End),
 
-            new Function(c, "flock", SystemModule::flock, None, Return, "int",
-                         Args, "int", "int", End),
+                   new Function(c, "flock", SystemModule::flock, None, Return, "int", Args, "int", "int", End),
 
-            new Function(c, "fcntl", SystemModule::fcntl, None, Return, "int",
-                         Args, "int", "int", "int", End),
+                   new Function(c, "fcntl", SystemModule::fcntl, None, Return, "int", Args, "int", "int", "int", End),
 
-            new Function(c, "pipe", SystemModule::pipe, None, Return,
-                         "(int,int)", End),
+                   new Function(c, "pipe", SystemModule::pipe, None, Return, "(int,int)", End),
 
-            new Function(c, "open", SystemModule::open, None, Return, "int",
-                         Args, "string", "int", "int", End),
+                   new Function(c, "open", SystemModule::open, None, Return, "int", Args, "string", "int", "int", End),
 
-            new Function(c, "close", SystemModule::close, None, Return, "void",
-                         Args, "int", End),
+                   new Function(c, "close", SystemModule::close, None, Return, "void", Args, "int", End),
 
-            new Function(c, "dup", SystemModule::dup, None, Return, "int", Args,
-                         "int", End),
+                   new Function(c, "dup", SystemModule::dup, None, Return, "int", Args, "int", End),
 
-            new Function(c, "dup2", SystemModule::dup2, None, Return, "int",
-                         Args, "int", "int", End),
+                   new Function(c, "dup2", SystemModule::dup2, None, Return, "int", Args, "int", "int", End),
 
-            new Function(c, "read", SystemModule::read, None, Return, "int",
-                         Args, "int", "byte[]", End),
+                   new Function(c, "read", SystemModule::read, None, Return, "int", Args, "int", "byte[]", End),
 
-            new Function(c, "write", SystemModule::write, None, Return, "int",
-                         Args, "int", "byte[]", End),
+                   new Function(c, "write", SystemModule::write, None, Return, "int", Args, "int", "byte[]", End),
 
-            new Function(c, "lseek", SystemModule::lseek, None, Return, "int",
-                         Args, "int", "int", "int", End),
+                   new Function(c, "lseek", SystemModule::lseek, None, Return, "int", Args, "int", "int", "int", End),
 
-            new Function(c, "link", SystemModule::link, None, Return, "void",
-                         Args, "string", "string", End),
+                   new Function(c, "link", SystemModule::link, None, Return, "void", Args, "string", "string", End),
 
-            new Function(c, "unlink", SystemModule::link, None, Return, "void",
-                         Args, "string", End),
+                   new Function(c, "unlink", SystemModule::link, None, Return, "void", Args, "string", End),
 
-            new Function(c, "ioctl", SystemModule::ioctl, None, Return, "void",
-                         Args, "int", "int64", "?", End),
+                   new Function(c, "ioctl", SystemModule::ioctl, None, Return, "void", Args, "int", "int64", "?", End),
 
-            new Function(c, "stat", SystemModule::stat, None, Return,
-                         "system.statinfo", Args, "string", End),
+                   new Function(c, "stat", SystemModule::stat, None, Return, "system.statinfo", Args, "string", End),
 
-            new Function(c, "S_ISBLK", SystemModule::s_isblk, Mapped, Return,
-                         "bool", Args, "short", End),
+                   new Function(c, "S_ISBLK", SystemModule::s_isblk, Mapped, Return, "bool", Args, "short", End),
 
-            new Function(c, "S_ISCHR", SystemModule::s_ischr, Mapped, Return,
-                         "bool", Args, "short", End),
+                   new Function(c, "S_ISCHR", SystemModule::s_ischr, Mapped, Return, "bool", Args, "short", End),
 
-            new Function(c, "S_ISDIR", SystemModule::s_isdir, Mapped, Return,
-                         "bool", Args, "short", End),
+                   new Function(c, "S_ISDIR", SystemModule::s_isdir, Mapped, Return, "bool", Args, "short", End),
 
-            new Function(c, "S_ISFIFO", SystemModule::s_isfifo, Mapped, Return,
-                         "bool", Args, "short", End),
+                   new Function(c, "S_ISFIFO", SystemModule::s_isfifo, Mapped, Return, "bool", Args, "short", End),
 
-            new Function(c, "S_ISREG", SystemModule::s_isreg, Mapped, Return,
-                         "bool", Args, "short", End),
+                   new Function(c, "S_ISREG", SystemModule::s_isreg, Mapped, Return, "bool", Args, "short", End),
 
-            new Function(c, "S_ISLNK", SystemModule::s_islnk, Mapped, Return,
-                         "bool", Args, "short", End),
+                   new Function(c, "S_ISLNK", SystemModule::s_islnk, Mapped, Return, "bool", Args, "short", End),
 
-            new Function(c, "S_ISSOCK", SystemModule::s_issock, Mapped, Return,
-                         "bool", Args, "short", End),
+                   new Function(c, "S_ISSOCK", SystemModule::s_issock, Mapped, Return, "bool", Args, "short", End),
 
-            new Function(c, "socket", SystemModule::socket, None, Return, "int",
-                         Args, "int", "int", "int", End),
+                   new Function(c, "socket", SystemModule::socket, None, Return, "int", Args, "int", "int", "int", End),
 
-            new Function(c, "time", SystemModule::time, None, Return, "int64",
-                         End),
+                   new Function(c, "time", SystemModule::time, None, Return, "int64", End),
 
-            new Function(c, "gettimeofday", SystemModule::gettimeofday, None,
-                         Return, "(int64,int)", End),
+                   new Function(c, "gettimeofday", SystemModule::gettimeofday, None, Return, "(int64,int)", End),
 
-            EndArguments);
+                   EndArguments);
 
         //
         //  Additional standard C functions. FILE* is made an OpaqueType
@@ -558,30 +470,22 @@ namespace Mu
 
         addSymbol(new OpaqueType(c, "FILE"));
 
-        addSymbols(new Function(c, "fopen", SystemModule::fopen, None, Return,
-                                "system.FILE", Args, "string", "string", End),
+        addSymbols(
+            new Function(c, "fopen", SystemModule::fopen, None, Return, "system.FILE", Args, "string", "string", End),
 
-                   new Function(c, "fdopen", SystemModule::fdopen, None, Return,
-                                "system.FILE", Args, "int", "string", End),
+            new Function(c, "fdopen", SystemModule::fdopen, None, Return, "system.FILE", Args, "int", "string", End),
 
-                   new Function(c, "freopen", SystemModule::freopen, None,
-                                Return, "system.FILE", Args, "string", "string",
-                                "system.FILE", End),
+            new Function(c, "freopen", SystemModule::freopen, None, Return, "system.FILE", Args, "string", "string", "system.FILE", End),
 
-                   new Function(c, "fclose", SystemModule::fclose, None, Return,
-                                "void", Args, "system.FILE", End),
+            new Function(c, "fclose", SystemModule::fclose, None, Return, "void", Args, "system.FILE", End),
 
-                   new Function(c, "clearerr", SystemModule::clearerr, None,
-                                Return, "void", Args, "system.FILE", End),
+            new Function(c, "clearerr", SystemModule::clearerr, None, Return, "void", Args, "system.FILE", End),
 
-                   new Function(c, "feof", SystemModule::feof, None, Return,
-                                "bool", Args, "system.FILE", End),
+            new Function(c, "feof", SystemModule::feof, None, Return, "bool", Args, "system.FILE", End),
 
-                   new Function(c, "ferror", SystemModule::ferror, None, Return,
-                                "bool", Args, "system.FILE", End),
+            new Function(c, "ferror", SystemModule::ferror, None, Return, "bool", Args, "system.FILE", End),
 
-                   new Function(c, "fileno", SystemModule::fileno, None, Return,
-                                "int", Args, "system.FILE", End),
+            new Function(c, "fileno", SystemModule::fileno, None, Return, "int", Args, "system.FILE", End),
 
 #if 0
                 new Function(c, "fread", SystemModule::fread, None,
@@ -605,7 +509,7 @@ namespace Mu
                              End),
 #endif
 
-                   EndArguments);
+            EndArguments);
     }
 
     static void ThrowErrno(Thread& thread, int errnum)
@@ -670,8 +574,7 @@ namespace Mu
         Process* p = NODE_THREAD.process();
         MuLangContext* c = static_cast<MuLangContext*>(p->context());
         const ListType* ltype = static_cast<const ListType*>(NODE_THIS.type());
-        const Mu::StringType* stype =
-            static_cast<const Mu::StringType*>(ltype->elementType());
+        const Mu::StringType* stype = static_cast<const Mu::StringType*>(ltype->elementType());
         List list(p, ltype);
 
         for (char** e = environ; *e; e++)
@@ -696,8 +599,7 @@ namespace Mu
     NODE_IMPLEMENTATION(SystemModule::putenv, void)
     {
         Process* p = NODE_THREAD.process();
-        const StringType::String* keyval =
-            NODE_ARG_OBJECT(0, StringType::String);
+        const StringType::String* keyval = NODE_ARG_OBJECT(0, StringType::String);
 
 #ifndef _MSC_VER
         if (::putenv((char*)keyval->c_str()))
@@ -725,8 +627,7 @@ namespace Mu
     NODE_IMPLEMENTATION(SystemModule::getcwd, Pointer)
     {
         Process* p = NODE_THREAD.process();
-        const StringType* stype =
-            static_cast<const StringType*>(NODE_THIS.type());
+        const StringType* stype = static_cast<const StringType*>(NODE_THIS.type());
 
         char temp[1024];
 
@@ -753,8 +654,7 @@ namespace Mu
     NODE_IMPLEMENTATION(SystemModule::ctermid, Pointer)
     {
         Process* p = NODE_THREAD.process();
-        const StringType* stype =
-            static_cast<const StringType*>(NODE_THIS.type());
+        const StringType* stype = static_cast<const StringType*>(NODE_THIS.type());
 
 #ifdef _MSC_VER
         NODE_RETURN(0);
@@ -1055,8 +955,7 @@ NODE_IMPLEMENTATION(SystemModule::issetugid, bool)
 #endif
 
         Process* p = NODE_THREAD.process();
-        const StringType* stype =
-            static_cast<const StringType*>(NODE_THIS.type());
+        const StringType* stype = static_cast<const StringType*>(NODE_THIS.type());
 
         NODE_RETURN(stype->allocate(buf));
     }
@@ -1081,15 +980,13 @@ NODE_IMPLEMENTATION(SystemModule::issetugid, bool)
         vector<const char*> argv;
         vector<const char*> envv;
 
-        for (List args(p, NODE_ARG_OBJECT(1, ClassInstance)); args.isNotNil();
-             args++)
+        for (List args(p, NODE_ARG_OBJECT(1, ClassInstance)); args.isNotNil(); args++)
         {
             const StringType::String* s = args.value<StringType::String*>();
             argv.push_back(s->c_str());
         }
 
-        for (List envp(p, NODE_ARG_OBJECT(2, ClassInstance)); envp.isNotNil();
-             envp++)
+        for (List envp(p, NODE_ARG_OBJECT(2, ClassInstance)); envp.isNotNil(); envp++)
         {
             const StringType::String* s = envp.value<StringType::String*>();
             envv.push_back(s->c_str());
@@ -1111,8 +1008,7 @@ NODE_IMPLEMENTATION(SystemModule::issetugid, bool)
         int status = 0;
 
 #ifdef PLATFORM_WINDOWS
-        HINSTANCE st =
-            ShellExecute(NULL, "open", url->c_str(), NULL, NULL, SW_SHOWNORMAL);
+        HINSTANCE st = ShellExecute(NULL, "open", url->c_str(), NULL, NULL, SW_SHOWNORMAL);
 #endif
 
         NODE_RETURN(status);
@@ -1370,8 +1266,7 @@ NODE_IMPLEMENTATION(SystemModule::issetugid, bool)
 
         Process* p = NODE_THREAD.process();
 
-        const StringType* stype =
-            static_cast<const StringType*>(NODE_THIS.type());
+        const StringType* stype = static_cast<const StringType*>(NODE_THIS.type());
 
         int ch = fgetc(fd);
         ostringstream ostr;
@@ -1470,10 +1365,8 @@ NODE_IMPLEMENTATION(SystemModule::issetugid, bool)
 
     NODE_IMPLEMENTATION(SystemModule::link, void)
     {
-        const StringType::String* name1 =
-            NODE_ARG_OBJECT(0, StringType::String);
-        const StringType::String* name2 =
-            NODE_ARG_OBJECT(1, StringType::String);
+        const StringType::String* name1 = NODE_ARG_OBJECT(0, StringType::String);
+        const StringType::String* name2 = NODE_ARG_OBJECT(1, StringType::String);
 
 #ifndef _MSC_VER
         if (::link(name1->c_str(), name2->c_str()))
@@ -1485,8 +1378,7 @@ NODE_IMPLEMENTATION(SystemModule::issetugid, bool)
 
     NODE_IMPLEMENTATION(SystemModule::unlink, void)
     {
-        const StringType::String* name1 =
-            NODE_ARG_OBJECT(0, StringType::String);
+        const StringType::String* name1 = NODE_ARG_OBJECT(0, StringType::String);
 
         if (::unlink(name1->c_str()))
         {
@@ -1531,8 +1423,7 @@ NODE_IMPLEMENTATION(SystemModule::issetugid, bool)
         const Class* ttype = static_cast<const Class*>(rtype->fieldType(7));
         struct stat s;
 
-        const StringType::String* arg0 =
-            NODE_ARG_OBJECT(0, const StringType::String);
+        const StringType::String* arg0 = NODE_ARG_OBJECT(0, const StringType::String);
         const char* filename = arg0->c_str();
 
         if (::stat(filename, &s))
@@ -1669,10 +1560,8 @@ NODE_IMPLEMENTATION(SystemModule::issetugid, bool)
 
     NODE_IMPLEMENTATION(SystemModule::fopen, Pointer)
     {
-        const StringType::String* arg0 =
-            NODE_ARG_OBJECT(0, const StringType::String);
-        const StringType::String* arg1 =
-            NODE_ARG_OBJECT(1, const StringType::String);
+        const StringType::String* arg0 = NODE_ARG_OBJECT(0, const StringType::String);
+        const StringType::String* arg1 = NODE_ARG_OBJECT(1, const StringType::String);
         const char* filename = arg0->c_str();
         const char* mode = arg1->c_str();
 
@@ -1685,10 +1574,8 @@ NODE_IMPLEMENTATION(SystemModule::issetugid, bool)
 
     NODE_IMPLEMENTATION(SystemModule::freopen, Pointer)
     {
-        const StringType::String* arg0 =
-            NODE_ARG_OBJECT(0, const StringType::String);
-        const StringType::String* arg1 =
-            NODE_ARG_OBJECT(1, const StringType::String);
+        const StringType::String* arg0 = NODE_ARG_OBJECT(0, const StringType::String);
+        const StringType::String* arg1 = NODE_ARG_OBJECT(1, const StringType::String);
         const char* filename = arg0->c_str();
         const char* mode = arg1->c_str();
         FILE* f = NODE_ARG_OBJECT(2, FILE);
@@ -1703,8 +1590,7 @@ NODE_IMPLEMENTATION(SystemModule::issetugid, bool)
     NODE_IMPLEMENTATION(SystemModule::fdopen, Pointer)
     {
         int fd = NODE_ARG(0, int);
-        const StringType::String* arg1 =
-            NODE_ARG_OBJECT(0, const StringType::String);
+        const StringType::String* arg1 = NODE_ARG_OBJECT(0, const StringType::String);
 
         FILE* file = ::fdopen(fd, arg1->c_str());
         if (!file)

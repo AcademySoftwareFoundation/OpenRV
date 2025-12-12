@@ -50,38 +50,31 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(__allocate, Pointer)
     {
-        QMarginsType::Instance* i =
-            new QMarginsType::Instance((Class*)NODE_THIS.type());
+        QMarginsType::Instance* i = new QMarginsType::Instance((Class*)NODE_THIS.type());
         QMarginsType::registerFinalizer(i);
         NODE_RETURN(i);
     }
 
-    void QMarginsType::registerFinalizer(void* o)
-    {
-        GC_register_finalizer(o, QMarginsType::finalizer, 0, 0, 0);
-    }
+    void QMarginsType::registerFinalizer(void* o) { GC_register_finalizer(o, QMarginsType::finalizer, 0, 0, 0); }
 
     void QMarginsType::finalizer(void* obj, void* data)
     {
-        QMarginsType::Instance* i =
-            reinterpret_cast<QMarginsType::Instance*>(obj);
+        QMarginsType::Instance* i = reinterpret_cast<QMarginsType::Instance*>(obj);
         delete i;
     }
 
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    Pointer qt_QMargins_QMargins_QMargins_QMargins(Mu::Thread& NODE_THREAD,
-                                                   Pointer param_this)
+    Pointer qt_QMargins_QMargins_QMargins_QMargins(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         setqtype<QMarginsType>(param_this, QMargins());
         return param_this;
     }
 
-    Pointer qt_QMargins_QMargins_QMargins_QMargins_int_int_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_left,
-        int param_top, int param_right, int param_bottom)
+    Pointer qt_QMargins_QMargins_QMargins_QMargins_int_int_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_left,
+                                                                   int param_top, int param_right, int param_bottom)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         int arg1 = (int)(param_left);
@@ -92,41 +85,35 @@ namespace Mu
         return param_this;
     }
 
-    int qt_QMargins_bottom_int_QMargins(Mu::Thread& NODE_THREAD,
-                                        Pointer param_this)
+    int qt_QMargins_bottom_int_QMargins(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMargins arg0 = getqtype<QMarginsType>(param_this);
         return arg0.bottom();
     }
 
-    bool qt_QMargins_isNull_bool_QMargins(Mu::Thread& NODE_THREAD,
-                                          Pointer param_this)
+    bool qt_QMargins_isNull_bool_QMargins(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMargins arg0 = getqtype<QMarginsType>(param_this);
         return arg0.isNull();
     }
 
-    int qt_QMargins_left_int_QMargins(Mu::Thread& NODE_THREAD,
-                                      Pointer param_this)
+    int qt_QMargins_left_int_QMargins(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMargins arg0 = getqtype<QMarginsType>(param_this);
         return arg0.left();
     }
 
-    int qt_QMargins_right_int_QMargins(Mu::Thread& NODE_THREAD,
-                                       Pointer param_this)
+    int qt_QMargins_right_int_QMargins(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMargins arg0 = getqtype<QMarginsType>(param_this);
         return arg0.right();
     }
 
-    void qt_QMargins_setBottom_void_QMargins_int(Mu::Thread& NODE_THREAD,
-                                                 Pointer param_this,
-                                                 int param_bottom)
+    void qt_QMargins_setBottom_void_QMargins_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_bottom)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMargins arg0 = getqtype<QMarginsType>(param_this);
@@ -135,9 +122,7 @@ namespace Mu
         setqtype<QMarginsType>(param_this, arg0);
     }
 
-    void qt_QMargins_setLeft_void_QMargins_int(Mu::Thread& NODE_THREAD,
-                                               Pointer param_this,
-                                               int param_left)
+    void qt_QMargins_setLeft_void_QMargins_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_left)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMargins arg0 = getqtype<QMarginsType>(param_this);
@@ -146,9 +131,7 @@ namespace Mu
         setqtype<QMarginsType>(param_this, arg0);
     }
 
-    void qt_QMargins_setRight_void_QMargins_int(Mu::Thread& NODE_THREAD,
-                                                Pointer param_this,
-                                                int param_right)
+    void qt_QMargins_setRight_void_QMargins_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_right)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMargins arg0 = getqtype<QMarginsType>(param_this);
@@ -157,8 +140,7 @@ namespace Mu
         setqtype<QMarginsType>(param_this, arg0);
     }
 
-    void qt_QMargins_setTop_void_QMargins_int(Mu::Thread& NODE_THREAD,
-                                              Pointer param_this, int param_Top)
+    void qt_QMargins_setTop_void_QMargins_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_Top)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMargins arg0 = getqtype<QMarginsType>(param_this);
@@ -167,8 +149,7 @@ namespace Mu
         setqtype<QMarginsType>(param_this, arg0);
     }
 
-    int qt_QMargins_top_int_QMargins(Mu::Thread& NODE_THREAD,
-                                     Pointer param_this)
+    int qt_QMargins_top_int_QMargins(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMargins arg0 = getqtype<QMarginsType>(param_this);
@@ -177,70 +158,47 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(_n_QMargins0, Pointer)
     {
-        NODE_RETURN(qt_QMargins_QMargins_QMargins_QMargins(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QMargins_QMargins_QMargins_QMargins(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_QMargins1, Pointer)
     {
-        NODE_RETURN(qt_QMargins_QMargins_QMargins_QMargins_int_int_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int), NODE_ARG(3, int), NODE_ARG(4, int)));
+        NODE_RETURN(qt_QMargins_QMargins_QMargins_QMargins_int_int_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                           NODE_ARG(2, int), NODE_ARG(3, int), NODE_ARG(4, int)));
     }
 
-    static NODE_IMPLEMENTATION(_n_bottom0, int)
-    {
-        NODE_RETURN(qt_QMargins_bottom_int_QMargins(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_bottom0, int) { NODE_RETURN(qt_QMargins_bottom_int_QMargins(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
     static NODE_IMPLEMENTATION(_n_isNull0, bool)
     {
-        NODE_RETURN(qt_QMargins_isNull_bool_QMargins(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QMargins_isNull_bool_QMargins(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
-    static NODE_IMPLEMENTATION(_n_left0, int)
-    {
-        NODE_RETURN(qt_QMargins_left_int_QMargins(NODE_THREAD,
-                                                  NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_left0, int) { NODE_RETURN(qt_QMargins_left_int_QMargins(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
-    static NODE_IMPLEMENTATION(_n_right0, int)
-    {
-        NODE_RETURN(qt_QMargins_right_int_QMargins(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_right0, int) { NODE_RETURN(qt_QMargins_right_int_QMargins(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
     static NODE_IMPLEMENTATION(_n_setBottom0, void)
     {
-        qt_QMargins_setBottom_void_QMargins_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QMargins_setBottom_void_QMargins_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setLeft0, void)
     {
-        qt_QMargins_setLeft_void_QMargins_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QMargins_setLeft_void_QMargins_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setRight0, void)
     {
-        qt_QMargins_setRight_void_QMargins_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QMargins_setRight_void_QMargins_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setTop0, void)
     {
-        qt_QMargins_setTop_void_QMargins_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QMargins_setTop_void_QMargins_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
-    static NODE_IMPLEMENTATION(_n_top0, int)
-    {
-        NODE_RETURN(qt_QMargins_top_int_QMargins(NODE_THREAD,
-                                                 NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_top0, int) { NODE_RETURN(qt_QMargins_top_int_QMargins(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
     void QMarginsType::load()
     {
@@ -259,64 +217,42 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(
-            new Function(c, "__allocate", __allocate, None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", __allocate, None, Return, ftn, End),
 
-            EndArguments);
+                   EndArguments);
 
         addSymbols(EndArguments);
 
         addSymbols(
             // enums
             // member functions
-            new Function(c, "QMargins", _n_QMargins0, None, Compiled,
-                         qt_QMargins_QMargins_QMargins_QMargins, Return,
-                         "qt.QMargins", Parameters,
+            new Function(c, "QMargins", _n_QMargins0, None, Compiled, qt_QMargins_QMargins_QMargins_QMargins, Return, "qt.QMargins",
+                         Parameters, new Param(c, "this", "qt.QMargins"), End),
+            new Function(c, "QMargins", _n_QMargins1, None, Compiled, qt_QMargins_QMargins_QMargins_QMargins_int_int_int_int, Return,
+                         "qt.QMargins", Parameters, new Param(c, "this", "qt.QMargins"), new Param(c, "left", "int"),
+                         new Param(c, "top", "int"), new Param(c, "right", "int"), new Param(c, "bottom", "int"), End),
+            new Function(c, "bottom", _n_bottom0, None, Compiled, qt_QMargins_bottom_int_QMargins, Return, "int", Parameters,
                          new Param(c, "this", "qt.QMargins"), End),
-            new Function(
-                c, "QMargins", _n_QMargins1, None, Compiled,
-                qt_QMargins_QMargins_QMargins_QMargins_int_int_int_int, Return,
-                "qt.QMargins", Parameters, new Param(c, "this", "qt.QMargins"),
-                new Param(c, "left", "int"), new Param(c, "top", "int"),
-                new Param(c, "right", "int"), new Param(c, "bottom", "int"),
-                End),
-            new Function(c, "bottom", _n_bottom0, None, Compiled,
-                         qt_QMargins_bottom_int_QMargins, Return, "int",
-                         Parameters, new Param(c, "this", "qt.QMargins"), End),
-            new Function(c, "isNull", _n_isNull0, None, Compiled,
-                         qt_QMargins_isNull_bool_QMargins, Return, "bool",
-                         Parameters, new Param(c, "this", "qt.QMargins"), End),
-            new Function(c, "left", _n_left0, None, Compiled,
-                         qt_QMargins_left_int_QMargins, Return, "int",
-                         Parameters, new Param(c, "this", "qt.QMargins"), End),
-            new Function(c, "right", _n_right0, None, Compiled,
-                         qt_QMargins_right_int_QMargins, Return, "int",
-                         Parameters, new Param(c, "this", "qt.QMargins"), End),
-            new Function(c, "setBottom", _n_setBottom0, None, Compiled,
-                         qt_QMargins_setBottom_void_QMargins_int, Return,
-                         "void", Parameters,
-                         new Param(c, "this", "qt.QMargins"),
-                         new Param(c, "bottom", "int"), End),
-            new Function(c, "setLeft", _n_setLeft0, None, Compiled,
-                         qt_QMargins_setLeft_void_QMargins_int, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QMargins"),
-                         new Param(c, "left", "int"), End),
-            new Function(c, "setRight", _n_setRight0, None, Compiled,
-                         qt_QMargins_setRight_void_QMargins_int, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QMargins"),
-                         new Param(c, "right", "int"), End),
-            new Function(c, "setTop", _n_setTop0, None, Compiled,
-                         qt_QMargins_setTop_void_QMargins_int, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QMargins"),
-                         new Param(c, "Top", "int"), End),
-            new Function(c, "top", _n_top0, None, Compiled,
-                         qt_QMargins_top_int_QMargins, Return, "int",
-                         Parameters, new Param(c, "this", "qt.QMargins"), End),
+            new Function(c, "isNull", _n_isNull0, None, Compiled, qt_QMargins_isNull_bool_QMargins, Return, "bool", Parameters,
+                         new Param(c, "this", "qt.QMargins"), End),
+            new Function(c, "left", _n_left0, None, Compiled, qt_QMargins_left_int_QMargins, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QMargins"), End),
+            new Function(c, "right", _n_right0, None, Compiled, qt_QMargins_right_int_QMargins, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QMargins"), End),
+            new Function(c, "setBottom", _n_setBottom0, None, Compiled, qt_QMargins_setBottom_void_QMargins_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QMargins"), new Param(c, "bottom", "int"), End),
+            new Function(c, "setLeft", _n_setLeft0, None, Compiled, qt_QMargins_setLeft_void_QMargins_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QMargins"), new Param(c, "left", "int"), End),
+            new Function(c, "setRight", _n_setRight0, None, Compiled, qt_QMargins_setRight_void_QMargins_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QMargins"), new Param(c, "right", "int"), End),
+            new Function(c, "setTop", _n_setTop0, None, Compiled, qt_QMargins_setTop_void_QMargins_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QMargins"), new Param(c, "Top", "int"), End),
+            new Function(c, "top", _n_top0, None, Compiled, qt_QMargins_top_int_QMargins, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QMargins"), End),
             // MISSING: = ("QMargins & operator*"; QMargins this, int factor)
             // MISSING: = ("QMargins & operator*"; QMargins this, double factor)
             // static functions

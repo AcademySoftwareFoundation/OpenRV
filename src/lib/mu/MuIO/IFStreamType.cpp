@@ -31,8 +31,7 @@ namespace Mu
 
     void IFStreamType::finalizer(void* obj, void* data)
     {
-        IFStreamType::IFStream* i =
-            reinterpret_cast<IFStreamType::IFStream*>(obj);
+        IFStreamType::IFStream* i = reinterpret_cast<IFStreamType::IFStream*>(obj);
 
         if (i->_ifstream != &cin)
         {
@@ -60,10 +59,7 @@ namespace Mu
 
     Object* IFStreamType::newObject() const { return new IFStream(this); }
 
-    void IFStreamType::deleteObject(Object* obj) const
-    {
-        delete static_cast<IFStreamType::IFStream*>(obj);
-    }
+    void IFStreamType::deleteObject(Object* obj) const { delete static_cast<IFStreamType::IFStream*>(obj); }
 
     void IFStreamType::load()
     {
@@ -81,39 +77,29 @@ namespace Mu
 
         s->addSymbols(new ReferenceType(c, "ifstream&", this),
 
-                      new Function(c, "ifstream", IFStreamType::construct0,
-                                   None, Return, tn, End),
+                      new Function(c, "ifstream", IFStreamType::construct0, None, Return, tn, End),
 
-                      new Function(c, "ifstream", IFStreamType::construct, None,
-                                   Return, tn, Args, "string", End),
+                      new Function(c, "ifstream", IFStreamType::construct, None, Return, tn, Args, "string", End),
 
-                      new Function(c, "ifstream", IFStreamType::construct1,
-                                   None, Return, tn, Args, "string", "int",
-                                   End),
+                      new Function(c, "ifstream", IFStreamType::construct1, None, Return, tn, Args, "string", "int", End),
 
-                      new Function(c, "ifstream", BaseFunctions::dereference,
-                                   Cast, Return, tn, Args, rn, End),
+                      new Function(c, "ifstream", BaseFunctions::dereference, Cast, Return, tn, Args, rn, End),
 
                       EndArguments);
 
         globalScope()->addSymbols(
 
-            new Function(c, "print", StreamType::print, None, Return, "void",
-                         Args, tn, End),
+            new Function(c, "print", StreamType::print, None, Return, "void", Args, tn, End),
 
-            new Function(c, "=", BaseFunctions::assign, AsOp, Return, rn, Args,
-                         rn, tn, End),
+            new Function(c, "=", BaseFunctions::assign, AsOp, Return, rn, Args, rn, tn, End),
 
             EndArguments);
 
-        addSymbols(new Function(c, "close", IFStreamType::close, None, Return,
-                                "void", Args, tn, End),
+        addSymbols(new Function(c, "close", IFStreamType::close, None, Return, "void", Args, tn, End),
 
-                   new Function(c, "open", IFStreamType::open, None, Return,
-                                "void", Args, tn, "string", "int", End),
+                   new Function(c, "open", IFStreamType::open, None, Return, "void", Args, tn, "string", "int", End),
 
-                   new Function(c, "is_open", IFStreamType::is_open, None,
-                                Return, "bool", Args, tn, End),
+                   new Function(c, "is_open", IFStreamType::is_open, None, Return, "bool", Args, tn, End),
 
                    EndArguments);
     }
@@ -135,8 +121,7 @@ namespace Mu
         const Class* c = static_cast<const IFStreamType*>(NODE_THIS.type());
         IFStreamType::IFStream* o = new IFStreamType::IFStream(c);
         o->setString(file->c_str());
-        o->_ios = o->_istream = o->_ifstream =
-            new std::ifstream(UNICODE_C_STR(file->c_str()));
+        o->_ios = o->_istream = o->_ifstream = new std::ifstream(UNICODE_C_STR(file->c_str()));
         NODE_RETURN(Pointer(o));
     }
 
@@ -149,15 +134,13 @@ namespace Mu
         const Class* c = static_cast<const IFStreamType*>(NODE_THIS.type());
         IFStreamType::IFStream* o = new IFStreamType::IFStream(c);
         o->setString(file->c_str());
-        o->_ios = o->_istream = o->_ifstream =
-            new std::ifstream(UNICODE_C_STR(file->c_str()), mode);
+        o->_ios = o->_istream = o->_ifstream = new std::ifstream(UNICODE_C_STR(file->c_str()), mode);
         NODE_RETURN(Pointer(o));
     }
 
     NODE_IMPLEMENTATION(IFStreamType::close, void)
     {
-        IFStreamType::IFStream* stream =
-            NODE_ARG_OBJECT(0, IFStreamType::IFStream);
+        IFStreamType::IFStream* stream = NODE_ARG_OBJECT(0, IFStreamType::IFStream);
         stream->_ifstream->close();
 
         if (stream->_ifstream != &cin)
@@ -169,19 +152,16 @@ namespace Mu
 
     NODE_IMPLEMENTATION(IFStreamType::is_open, bool)
     {
-        IFStreamType::IFStream* stream =
-            NODE_ARG_OBJECT(0, IFStreamType::IFStream);
+        IFStreamType::IFStream* stream = NODE_ARG_OBJECT(0, IFStreamType::IFStream);
         NODE_RETURN(stream->_ifstream->is_open());
     }
 
     NODE_IMPLEMENTATION(IFStreamType::open, void)
     {
-        IFStreamType::IFStream* stream =
-            NODE_ARG_OBJECT(0, IFStreamType::IFStream);
+        IFStreamType::IFStream* stream = NODE_ARG_OBJECT(0, IFStreamType::IFStream);
         const StringType::String* file = NODE_ARG_OBJECT(1, StringType::String);
         int flags = NODE_ARG(2, int);
-        stream->_ifstream->open(UNICODE_C_STR(file->c_str()),
-                                ios::openmode(flags));
+        stream->_ifstream->open(UNICODE_C_STR(file->c_str()), ios::openmode(flags));
     }
 
 } // namespace Mu

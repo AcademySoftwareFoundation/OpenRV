@@ -1,19 +1,20 @@
 #
-# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved. 
-# 
-# SPDX-License-Identifier: Apache-2.0 
+# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
 #
 """
 Simple tests asserting that our testing setup
 does report failures.
 """
+
 import unittest
 
 
 class TestMiscFailures(unittest.TestCase):
     def test_importing_invalid_package(self):
         with self.assertRaises(ImportError):
-            import non_existing_package
+            import non_existing_package  # noqa: F401
 
     # def test_invalid_syntax(self):
     #    with self.assertRaises(SyntaxError):
@@ -22,7 +23,7 @@ class TestMiscFailures(unittest.TestCase):
 
     def test_calling_non_existing_method(self):
         with self.assertRaises(NameError):
-            pirnt("Hello from Python!")
+            pirnt("Hello from Python!")  # noqa: F821
 
 
 if __name__ == "__main__":

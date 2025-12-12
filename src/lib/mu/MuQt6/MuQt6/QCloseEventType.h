@@ -37,8 +37,7 @@ namespace Mu
         //  Constructors
         //
 
-        QCloseEventType(Context* context, const char* name,
-                        Class* superClass = 0);
+        QCloseEventType(Context* context, const char* name, Class* superClass = 0);
         virtual ~QCloseEventType();
 
         //

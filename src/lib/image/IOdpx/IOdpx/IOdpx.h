@@ -121,7 +121,7 @@ namespace TwkFB
                            // (XPDS)
             U32 offset;    // C: offset to image data in bytes
             ASCII
-            vers[8]; // C: which header format version is being used (v1.0)
+            vers[8];              // C: which header format version is being used (v1.0)
             U32 file_size;        // C: file size in bytes
             U32 ditto_key;        // read time short cut - 0 = same, 1 = new
             U32 gen_hdr_size;     // generic header length in bytes
@@ -129,9 +129,9 @@ namespace TwkFB
             U32 user_data_size;   // user-defined data length in bytes
             ASCII file_name[100]; // image file name
             ASCII
-            create_time[24];    // file creation date "yyyy:mm:dd:hh:mm:ss:LTZ"
-            ASCII creator[100]; // file creator's name
-            ASCII project[200]; // project name
+            create_time[24];      // file creation date "yyyy:mm:dd:hh:mm:ss:LTZ"
+            ASCII creator[100];   // file creator's name
+            ASCII project[200];   // project name
             ASCII copyright[200]; // right to use or copyright info
             U32 key;              // encryption ( FFFFFFFF = unencrypted )
             ASCII Reserved[104];  // reserved field TBD (need to pad)
@@ -153,20 +153,20 @@ namespace TwkFB
 
             struct _image_element
             {
-                U32 data_sign;    // C: data sign (0 = unsigned, 1 = signed )
-                                  // "Core set images are unsigned"
-                U32 ref_low_data; // reference low data code value
+                U32 data_sign;         // C: data sign (0 = unsigned, 1 = signed )
+                                       // "Core set images are unsigned"
+                U32 ref_low_data;      // reference low data code value
                 R32 ref_low_quantity;  // reference low quantity represented
                 U32 ref_high_data;     // reference high data code value
                 R32 ref_high_quantity; // reference high quantity represented
                 U8 descriptor;         // C: descriptor for image element
-                U8 transfer;     // C: transfer characteristics for element
-                U8 colorimetric; // C: colormetric specification for element
-                U8 bit_size;     // C: bit size for element
-                U16 packing;     // C: packing for element
-                U16 encoding;    // C: encoding for element
-                U32 data_offset; // C: offset to data of element
-                U32 eol_padding; // end of line padding used in element
+                U8 transfer;           // C: transfer characteristics for element
+                U8 colorimetric;       // C: colormetric specification for element
+                U8 bit_size;           // C: bit size for element
+                U16 packing;           // C: packing for element
+                U16 encoding;          // C: encoding for element
+                U32 data_offset;       // C: offset to data of element
+                U32 eol_padding;       // end of line padding used in element
                 U32 eo_image_padding;  // end of image padding used in element
                 ASCII description[32]; // description of element
             } image_element[8];        // NOTE THERE ARE EIGHT OF THESE
@@ -219,13 +219,13 @@ namespace TwkFB
 
         struct DPXFilmHeader
         {
-            ASCII film_mfg_id[2]; // film manufacturer ID code (2 digits from
-                                  // film edge code)
-            ASCII film_type[2];   // file type (2 digits from film edge code)
-            ASCII offset[2];  // offset in perfs (2 digits from film edge code)
-            ASCII prefix[6];  // prefix (6 digits from film edge code)
-            ASCII count[4];   // count (4 digits from film edge code)
-            ASCII format[32]; // format (i.e. academy)
+            ASCII film_mfg_id[2];  // film manufacturer ID code (2 digits from
+                                   // film edge code)
+            ASCII film_type[2];    // file type (2 digits from film edge code)
+            ASCII offset[2];       // offset in perfs (2 digits from film edge code)
+            ASCII prefix[6];       // prefix (6 digits from film edge code)
+            ASCII count[4];        // count (4 digits from film edge code)
+            ASCII format[32];      // format (i.e. academy)
             U32 frame_position;    // frame position in sequence
             U32 sequence_len;      // sequence length in frames
             U32 held_count;        // held count (1 = default)
@@ -240,12 +240,12 @@ namespace TwkFB
 
         struct DPXTelevisionHeader
         {
-            U32 tim_code;    // SMPTE time code
-            U32 userBits;    // SMPTE user bits
-            U8 interlace;    // interlace ( 0 = noninterlaced, 1 = 2:1 interlace
-            U8 field_num;    // field number
-            U8 video_signal; // video signal standard (table 4)
-            U8 unused;       // used for byte alignment only
+            U32 tim_code;          // SMPTE time code
+            U32 userBits;          // SMPTE user bits
+            U8 interlace;          // interlace ( 0 = noninterlaced, 1 = 2:1 interlace
+            U8 field_num;          // field number
+            U8 video_signal;       // video signal standard (table 4)
+            U8 unused;             // used for byte alignment only
             R32 hor_sample_rate;   // horizontal sampling rate in Hz
             R32 ver_sample_rate;   // vertical sampling rate in Hz
             R32 frame_rate;        // temporal sampling rate or frame rate in Hz
@@ -345,12 +345,10 @@ namespace TwkFB
         //  Ctors
         //
 
-        IOdpx(StorageFormat format = RGB16, bool useChromaticies = false,
-              IOType type = StandardIO, size_t chunkSize = 61440,
+        IOdpx(StorageFormat format = RGB16, bool useChromaticies = false, IOType type = StandardIO, size_t chunkSize = 61440,
               int maxAsync = 16);
 
-        IOdpx(const std::string& format, bool useChromaticies = false,
-              IOType type = StandardIO, size_t chunkSize = 61440,
+        IOdpx(const std::string& format, bool useChromaticies = false, IOType type = StandardIO, size_t chunkSize = 61440,
               int maxAsync = 16);
 
         virtual ~IOdpx();
@@ -365,10 +363,8 @@ namespace TwkFB
         //  FrameBufferIO API
         //
 
-        virtual void readImages(FrameBufferVector&, const std::string& filename,
-                                const ReadRequest& request) const;
-        virtual void writeImage(const FrameBuffer&, const std::string& filename,
-                                const WriteRequest& request) const;
+        virtual void readImages(FrameBufferVector&, const std::string& filename, const ReadRequest& request) const;
+        virtual void writeImage(const FrameBuffer&, const std::string& filename, const WriteRequest& request) const;
         virtual std::string about() const;
         virtual void getImageInfo(const std::string& filename, FBInfo&) const;
 
@@ -377,8 +373,7 @@ namespace TwkFB
         virtual bool getBoolAttribute(const std::string& name) const;
         virtual void setBoolAttribute(const std::string& name, bool value);
         virtual std::string getStringAttribute(const std::string& name) const;
-        virtual void setStringAttribute(const std::string& name,
-                                        const std::string& value);
+        virtual void setStringAttribute(const std::string& name, const std::string& value);
 
     private:
         bool m_useChromaticities;

@@ -56,10 +56,7 @@ namespace Mu
             //  Size in bytes
             //
 
-            size_t size() const
-            {
-                return _utf8string ? strlen(_utf8string) : 0;
-            }
+            size_t size() const { return _utf8string ? strlen(_utf8string) : 0; }
 
             //
             //  Size in chars
@@ -142,22 +139,17 @@ namespace Mu
         // can call the static function if you already have a std::string.
         //
 
-        virtual void outputValue(std::ostream&, const Value&,
-                                 bool full = false) const;
-        virtual void outputValueRecursive(std::ostream&, const ValuePointer,
-                                          ValueOutputState&) const;
-        static void outputQuotedString(std::ostream&, const Mu::String&,
-                                       char delim = '"');
+        virtual void outputValue(std::ostream&, const Value&, bool full = false) const;
+        virtual void outputValueRecursive(std::ostream&, const ValuePointer, ValueOutputState&) const;
+        static void outputQuotedString(std::ostream&, const Mu::String&, char delim = '"');
 
         //
         //  Archiving.
         //
 
-        virtual void serialize(std::ostream&, Archive::Writer&,
-                               const ValuePointer) const;
+        virtual void serialize(std::ostream&, Archive::Writer&, const ValuePointer) const;
 
-        virtual void deserialize(std::istream&, Archive::Reader&,
-                                 ValuePointer) const;
+        virtual void deserialize(std::istream&, Archive::Reader&, ValuePointer) const;
 
         //
         //	Load function is called when the symbol is added to the
@@ -202,6 +194,8 @@ namespace Mu
         static NODE_DECLARATION(split, Pointer);
         static NODE_DECLARATION(join_array, Pointer);
         static NODE_DECLARATION(compare, int);
+        static NODE_DECLARATION(contains, int);
+        static NODE_DECLARATION(replace, Pointer);
 
         static NODE_DECLARATION(formatOp, Pointer);
         static NODE_DECLARATION(formatOp_int, Pointer);

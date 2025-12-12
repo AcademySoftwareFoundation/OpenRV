@@ -67,16 +67,14 @@ namespace Mu
         _baseType = 0;
     }
 
-    MuQt_QAbstractScrollArea::MuQt_QAbstractScrollArea(
-        Pointer muobj, const CallEnvironment* ce, QWidget* parent)
+    MuQt_QAbstractScrollArea::MuQt_QAbstractScrollArea(Pointer muobj, const CallEnvironment* ce, QWidget* parent)
         : QAbstractScrollArea(parent)
     {
         _env = ce;
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QAbstractScrollAreaType>(
-            c->internName("qt.QAbstractScrollArea"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QAbstractScrollAreaType>(c->internName("qt.QAbstractScrollArea"));
     }
 
     void MuQt_QAbstractScrollArea::setupViewport(QWidget* viewport)
@@ -93,8 +91,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeinstance<QWidgetType>(c, viewport, "qt.QWidget"));
+            args[1] = Value(makeinstance<QWidgetType>(c, viewport, "qt.QWidget"));
             Value rval = _env->call(F, args);
         }
         else
@@ -222,8 +219,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqpointer<QContextMenuEventType>(
-                c, e, "qt.QContextMenuEvent"));
+            args[1] = Value(makeqpointer<QContextMenuEventType>(c, e, "qt.QContextMenuEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -246,8 +242,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqpointer<QDragEnterEventType>(
-                c, event, "qt.QDragEnterEvent"));
+            args[1] = Value(makeqpointer<QDragEnterEventType>(c, event, "qt.QDragEnterEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -270,8 +265,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqpointer<QDragLeaveEventType>(
-                c, event, "qt.QDragLeaveEvent"));
+            args[1] = Value(makeqpointer<QDragLeaveEventType>(c, event, "qt.QDragLeaveEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -294,8 +288,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqpointer<QDragMoveEventType>(
-                c, event, "qt.QDragMoveEvent"));
+            args[1] = Value(makeqpointer<QDragMoveEventType>(c, event, "qt.QDragMoveEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -318,8 +311,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QDropEventType>(c, event, "qt.QDropEvent"));
+            args[1] = Value(makeqpointer<QDropEventType>(c, event, "qt.QDropEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -386,8 +378,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -410,8 +401,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -434,8 +424,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -458,8 +447,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
+            args[1] = Value(makeqpointer<QMouseEventType>(c, e, "qt.QMouseEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -482,8 +470,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QPaintEventType>(c, event, "qt.QPaintEvent"));
+            args[1] = Value(makeqpointer<QPaintEventType>(c, event, "qt.QPaintEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -506,8 +493,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QResizeEventType>(c, event, "qt.QResizeEvent"));
+            args[1] = Value(makeqpointer<QResizeEventType>(c, event, "qt.QResizeEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -530,8 +516,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqpointer<QWheelEventType>(c, e, "qt.QWheelEvent"));
+            args[1] = Value(makeqpointer<QWheelEventType>(c, e, "qt.QWheelEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -566,10 +551,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  Mu Type CONSTRUCTORS
 
-    QAbstractScrollAreaType::QAbstractScrollAreaType(Context* c,
-                                                     const char* name,
-                                                     Class* super,
-                                                     Class* super2)
+    QAbstractScrollAreaType::QAbstractScrollAreaType(Context* c, const char* name, Class* super, Class* super2)
         : Class(c, name, vectorOf2(super, super2))
     {
     }
@@ -579,9 +561,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    static Pointer
-    QAbstractScrollArea_QAbstractScrollArea_QObject(Thread& NODE_THREAD,
-                                                    Pointer obj)
+    static Pointer QAbstractScrollArea_QAbstractScrollArea_QObject(Thread& NODE_THREAD, Pointer obj)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         ClassInstance* widget = reinterpret_cast<ClassInstance*>(obj);
@@ -593,8 +573,7 @@ namespace Mu
         else if (QAbstractScrollArea* w = object<QAbstractScrollArea>(widget))
         {
             QAbstractScrollAreaType* type =
-                c->findSymbolOfTypeByQualifiedName<QAbstractScrollAreaType>(
-                    c->internName("qt.QAbstractScrollArea"), false);
+                c->findSymbolOfTypeByQualifiedName<QAbstractScrollAreaType>(c->internName("qt.QAbstractScrollArea"), false);
             ClassInstance* o = ClassInstance::allocate(type);
             setobject(o, w);
             return o;
@@ -607,26 +586,21 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(castFromObject, Pointer)
     {
-        NODE_RETURN(QAbstractScrollArea_QAbstractScrollArea_QObject(
-            NODE_THREAD, NODE_ARG(0, Pointer)));
+        NODE_RETURN(QAbstractScrollArea_QAbstractScrollArea_QObject(NODE_THREAD, NODE_ARG(0, Pointer)));
     }
 
-    Pointer
-    qt_QAbstractScrollArea_QAbstractScrollArea_QAbstractScrollArea_QAbstractScrollArea_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
+    Pointer qt_QAbstractScrollArea_QAbstractScrollArea_QAbstractScrollArea_QAbstractScrollArea_QWidget(Mu::Thread& NODE_THREAD,
+                                                                                                       Pointer param_this,
+                                                                                                       Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QWidget* arg1 = object<QWidget>(param_parent);
-        setobject(param_this,
-                  new MuQt_QAbstractScrollArea(
-                      param_this, NODE_THREAD.process()->callEnv(), arg1));
+        setobject(param_this, new MuQt_QAbstractScrollArea(param_this, NODE_THREAD.process()->callEnv(), arg1));
         return param_this;
     }
 
-    void
-    qt_QAbstractScrollArea_addScrollBarWidget_void_QAbstractScrollArea_QWidget_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_widget,
-        int param_alignment)
+    void qt_QAbstractScrollArea_addScrollBarWidget_void_QAbstractScrollArea_QWidget_int(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                        Pointer param_widget, int param_alignment)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractScrollArea* arg0 = object<QAbstractScrollArea>(param_this);
@@ -635,26 +609,22 @@ namespace Mu
         arg0->addScrollBarWidget(arg1, arg2);
     }
 
-    Pointer qt_QAbstractScrollArea_cornerWidget_QWidget_QAbstractScrollArea(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QAbstractScrollArea_cornerWidget_QWidget_QAbstractScrollArea(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractScrollArea* arg0 = object<QAbstractScrollArea>(param_this);
         return makeinstance<QWidgetType>(c, arg0->cornerWidget(), "qt.QWidget");
     }
 
-    Pointer
-    qt_QAbstractScrollArea_maximumViewportSize_QSize_QAbstractScrollArea(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QAbstractScrollArea_maximumViewportSize_QSize_QAbstractScrollArea(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractScrollArea* arg0 = object<QAbstractScrollArea>(param_this);
         return makeqtype<QSizeType>(c, arg0->maximumViewportSize(), "qt.QSize");
     }
 
-    void
-    qt_QAbstractScrollArea_setCornerWidget_void_QAbstractScrollArea_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_widget)
+    void qt_QAbstractScrollArea_setCornerWidget_void_QAbstractScrollArea_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                 Pointer param_widget)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractScrollArea* arg0 = object<QAbstractScrollArea>(param_this);
@@ -662,8 +632,8 @@ namespace Mu
         arg0->setCornerWidget(arg1);
     }
 
-    void qt_QAbstractScrollArea_setViewport_void_QAbstractScrollArea_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_widget)
+    void qt_QAbstractScrollArea_setViewport_void_QAbstractScrollArea_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                             Pointer param_widget)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractScrollArea* arg0 = object<QAbstractScrollArea>(param_this);
@@ -671,8 +641,8 @@ namespace Mu
         arg0->setViewport(arg1);
     }
 
-    void qt_QAbstractScrollArea_setupViewport_void_QAbstractScrollArea_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_viewport)
+    void qt_QAbstractScrollArea_setupViewport_void_QAbstractScrollArea_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                               Pointer param_viewport)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractScrollArea* arg0 = object<QAbstractScrollArea>(param_this);
@@ -683,57 +653,45 @@ namespace Mu
             arg0->setupViewport(arg1);
     }
 
-    Pointer qt_QAbstractScrollArea_viewport_QWidget_QAbstractScrollArea(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QAbstractScrollArea_viewport_QWidget_QAbstractScrollArea(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractScrollArea* arg0 = object<QAbstractScrollArea>(param_this);
         return makeinstance<QWidgetType>(c, arg0->viewport(), "qt.QWidget");
     }
 
-    Pointer qt_QAbstractScrollArea_minimumSizeHint_QSize_QAbstractScrollArea(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QAbstractScrollArea_minimumSizeHint_QSize_QAbstractScrollArea(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractScrollArea* arg0 = object<QAbstractScrollArea>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QSizeType>(
-                         c, arg0->QAbstractScrollArea::minimumSizeHint(),
-                         "qt.QSize")
-                   : makeqtype<QSizeType>(c, arg0->minimumSizeHint(),
-                                          "qt.QSize");
+        return isMuQtObject(arg0) ? makeqtype<QSizeType>(c, arg0->QAbstractScrollArea::minimumSizeHint(), "qt.QSize")
+                                  : makeqtype<QSizeType>(c, arg0->minimumSizeHint(), "qt.QSize");
     }
 
-    Pointer qt_QAbstractScrollArea_sizeHint_QSize_QAbstractScrollArea(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QAbstractScrollArea_sizeHint_QSize_QAbstractScrollArea(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractScrollArea* arg0 = object<QAbstractScrollArea>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QSizeType>(
-                         c, arg0->QAbstractScrollArea::sizeHint(), "qt.QSize")
-                   : makeqtype<QSizeType>(c, arg0->sizeHint(), "qt.QSize");
+        return isMuQtObject(arg0) ? makeqtype<QSizeType>(c, arg0->QAbstractScrollArea::sizeHint(), "qt.QSize")
+                                  : makeqtype<QSizeType>(c, arg0->sizeHint(), "qt.QSize");
     }
 
-    void
-    qt_QAbstractScrollArea_scrollContentsBy_void_QAbstractScrollArea_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_dx, int param_dy)
+    void qt_QAbstractScrollArea_scrollContentsBy_void_QAbstractScrollArea_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_dx,
+                                                                                  int param_dy)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractScrollArea* arg0 = object<QAbstractScrollArea>(param_this);
         int arg1 = (int)(param_dx);
         int arg2 = (int)(param_dy);
         if (isMuQtObject(arg0))
-            ((MuQt_QAbstractScrollArea*)arg0)
-                ->scrollContentsBy_pub_parent(arg1, arg2);
+            ((MuQt_QAbstractScrollArea*)arg0)->scrollContentsBy_pub_parent(arg1, arg2);
         else
             ((MuQt_QAbstractScrollArea*)arg0)->scrollContentsBy_pub(arg1, arg2);
     }
 
-    void
-    qt_QAbstractScrollArea_setViewportMargins_void_QAbstractScrollArea_int_int_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_left,
-        int param_top, int param_right, int param_bottom)
+    void qt_QAbstractScrollArea_setViewportMargins_void_QAbstractScrollArea_int_int_int_int(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                            int param_left, int param_top, int param_right,
+                                                                                            int param_bottom)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractScrollArea* arg0 = object<QAbstractScrollArea>(param_this);
@@ -741,13 +699,11 @@ namespace Mu
         int arg2 = (int)(param_top);
         int arg3 = (int)(param_right);
         int arg4 = (int)(param_bottom);
-        ((MuQt_QAbstractScrollArea*)arg0)
-            ->setViewportMargins_pub(arg1, arg2, arg3, arg4);
+        ((MuQt_QAbstractScrollArea*)arg0)->setViewportMargins_pub(arg1, arg2, arg3, arg4);
     }
 
-    void
-    qt_QAbstractScrollArea_setViewportMargins_void_QAbstractScrollArea_QMargins(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_margins)
+    void qt_QAbstractScrollArea_setViewportMargins_void_QAbstractScrollArea_QMargins(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                     Pointer param_margins)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractScrollArea* arg0 = object<QAbstractScrollArea>(param_this);
@@ -755,61 +711,45 @@ namespace Mu
         ((MuQt_QAbstractScrollArea*)arg0)->setViewportMargins_pub(arg1);
     }
 
-    bool qt_QAbstractScrollArea_viewportEvent_bool_QAbstractScrollArea_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    bool qt_QAbstractScrollArea_viewportEvent_bool_QAbstractScrollArea_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                              Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractScrollArea* arg0 = object<QAbstractScrollArea>(param_this);
         QEvent* arg1 = getqpointer<QEventType>(param_event);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QAbstractScrollArea*)arg0)
-                         ->viewportEvent_pub_parent(arg1)
-                   : ((MuQt_QAbstractScrollArea*)arg0)->viewportEvent_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QAbstractScrollArea*)arg0)->viewportEvent_pub_parent(arg1)
+                                  : ((MuQt_QAbstractScrollArea*)arg0)->viewportEvent_pub(arg1);
     }
 
-    Pointer qt_QAbstractScrollArea_viewportMargins_QMargins_QAbstractScrollArea(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QAbstractScrollArea_viewportMargins_QMargins_QAbstractScrollArea(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractScrollArea* arg0 = object<QAbstractScrollArea>(param_this);
-        return makeqtype<QMarginsType>(
-            c, ((MuQt_QAbstractScrollArea*)arg0)->viewportMargins_pub(),
-            "qt.QMargins");
+        return makeqtype<QMarginsType>(c, ((MuQt_QAbstractScrollArea*)arg0)->viewportMargins_pub(), "qt.QMargins");
     }
 
-    Pointer qt_QAbstractScrollArea_viewportSizeHint_QSize_QAbstractScrollArea(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QAbstractScrollArea_viewportSizeHint_QSize_QAbstractScrollArea(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractScrollArea* arg0 = object<QAbstractScrollArea>(param_this);
-        return isMuQtObject(arg0)
-                   ? makeqtype<QSizeType>(c,
-                                          ((MuQt_QAbstractScrollArea*)arg0)
-                                              ->viewportSizeHint_pub_parent(),
-                                          "qt.QSize")
-                   : makeqtype<QSizeType>(c,
-                                          ((MuQt_QAbstractScrollArea*)arg0)
-                                              ->viewportSizeHint_pub(),
-                                          "qt.QSize");
+        return isMuQtObject(arg0) ? makeqtype<QSizeType>(c, ((MuQt_QAbstractScrollArea*)arg0)->viewportSizeHint_pub_parent(), "qt.QSize")
+                                  : makeqtype<QSizeType>(c, ((MuQt_QAbstractScrollArea*)arg0)->viewportSizeHint_pub(), "qt.QSize");
     }
 
-    void
-    qt_QAbstractScrollArea_contextMenuEvent_void_QAbstractScrollArea_QContextMenuEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QAbstractScrollArea_contextMenuEvent_void_QAbstractScrollArea_QContextMenuEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                            Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractScrollArea* arg0 = object<QAbstractScrollArea>(param_this);
         QContextMenuEvent* arg1 = getqpointer<QContextMenuEventType>(param_e);
         if (isMuQtObject(arg0))
-            ((MuQt_QAbstractScrollArea*)arg0)
-                ->contextMenuEvent_pub_parent(arg1);
+            ((MuQt_QAbstractScrollArea*)arg0)->contextMenuEvent_pub_parent(arg1);
         else
             ((MuQt_QAbstractScrollArea*)arg0)->contextMenuEvent_pub(arg1);
     }
 
-    void
-    qt_QAbstractScrollArea_dragEnterEvent_void_QAbstractScrollArea_QDragEnterEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractScrollArea_dragEnterEvent_void_QAbstractScrollArea_QDragEnterEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                        Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractScrollArea* arg0 = object<QAbstractScrollArea>(param_this);
@@ -820,9 +760,8 @@ namespace Mu
             ((MuQt_QAbstractScrollArea*)arg0)->dragEnterEvent_pub(arg1);
     }
 
-    void
-    qt_QAbstractScrollArea_dragLeaveEvent_void_QAbstractScrollArea_QDragLeaveEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractScrollArea_dragLeaveEvent_void_QAbstractScrollArea_QDragLeaveEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                        Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractScrollArea* arg0 = object<QAbstractScrollArea>(param_this);
@@ -833,9 +772,8 @@ namespace Mu
             ((MuQt_QAbstractScrollArea*)arg0)->dragLeaveEvent_pub(arg1);
     }
 
-    void
-    qt_QAbstractScrollArea_dragMoveEvent_void_QAbstractScrollArea_QDragMoveEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractScrollArea_dragMoveEvent_void_QAbstractScrollArea_QDragMoveEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                      Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractScrollArea* arg0 = object<QAbstractScrollArea>(param_this);
@@ -846,8 +784,8 @@ namespace Mu
             ((MuQt_QAbstractScrollArea*)arg0)->dragMoveEvent_pub(arg1);
     }
 
-    void qt_QAbstractScrollArea_dropEvent_void_QAbstractScrollArea_QDropEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractScrollArea_dropEvent_void_QAbstractScrollArea_QDropEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                              Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractScrollArea* arg0 = object<QAbstractScrollArea>(param_this);
@@ -858,20 +796,17 @@ namespace Mu
             ((MuQt_QAbstractScrollArea*)arg0)->dropEvent_pub(arg1);
     }
 
-    bool qt_QAbstractScrollArea_event_bool_QAbstractScrollArea_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event_)
+    bool qt_QAbstractScrollArea_event_bool_QAbstractScrollArea_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event_)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractScrollArea* arg0 = object<QAbstractScrollArea>(param_this);
         QEvent* arg1 = getqpointer<QEventType>(param_event_);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QAbstractScrollArea*)arg0)->event_pub_parent(arg1)
-                   : ((MuQt_QAbstractScrollArea*)arg0)->event_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QAbstractScrollArea*)arg0)->event_pub_parent(arg1)
+                                  : ((MuQt_QAbstractScrollArea*)arg0)->event_pub(arg1);
     }
 
-    void
-    qt_QAbstractScrollArea_keyPressEvent_void_QAbstractScrollArea_QKeyEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QAbstractScrollArea_keyPressEvent_void_QAbstractScrollArea_QKeyEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                 Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractScrollArea* arg0 = object<QAbstractScrollArea>(param_this);
@@ -882,23 +817,20 @@ namespace Mu
             ((MuQt_QAbstractScrollArea*)arg0)->keyPressEvent_pub(arg1);
     }
 
-    void
-    qt_QAbstractScrollArea_mouseDoubleClickEvent_void_QAbstractScrollArea_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QAbstractScrollArea_mouseDoubleClickEvent_void_QAbstractScrollArea_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                           Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractScrollArea* arg0 = object<QAbstractScrollArea>(param_this);
         QMouseEvent* arg1 = getqpointer<QMouseEventType>(param_e);
         if (isMuQtObject(arg0))
-            ((MuQt_QAbstractScrollArea*)arg0)
-                ->mouseDoubleClickEvent_pub_parent(arg1);
+            ((MuQt_QAbstractScrollArea*)arg0)->mouseDoubleClickEvent_pub_parent(arg1);
         else
             ((MuQt_QAbstractScrollArea*)arg0)->mouseDoubleClickEvent_pub(arg1);
     }
 
-    void
-    qt_QAbstractScrollArea_mouseMoveEvent_void_QAbstractScrollArea_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QAbstractScrollArea_mouseMoveEvent_void_QAbstractScrollArea_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                    Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractScrollArea* arg0 = object<QAbstractScrollArea>(param_this);
@@ -909,9 +841,8 @@ namespace Mu
             ((MuQt_QAbstractScrollArea*)arg0)->mouseMoveEvent_pub(arg1);
     }
 
-    void
-    qt_QAbstractScrollArea_mousePressEvent_void_QAbstractScrollArea_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QAbstractScrollArea_mousePressEvent_void_QAbstractScrollArea_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                     Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractScrollArea* arg0 = object<QAbstractScrollArea>(param_this);
@@ -922,22 +853,20 @@ namespace Mu
             ((MuQt_QAbstractScrollArea*)arg0)->mousePressEvent_pub(arg1);
     }
 
-    void
-    qt_QAbstractScrollArea_mouseReleaseEvent_void_QAbstractScrollArea_QMouseEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QAbstractScrollArea_mouseReleaseEvent_void_QAbstractScrollArea_QMouseEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                       Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractScrollArea* arg0 = object<QAbstractScrollArea>(param_this);
         QMouseEvent* arg1 = getqpointer<QMouseEventType>(param_e);
         if (isMuQtObject(arg0))
-            ((MuQt_QAbstractScrollArea*)arg0)
-                ->mouseReleaseEvent_pub_parent(arg1);
+            ((MuQt_QAbstractScrollArea*)arg0)->mouseReleaseEvent_pub_parent(arg1);
         else
             ((MuQt_QAbstractScrollArea*)arg0)->mouseReleaseEvent_pub(arg1);
     }
 
-    void qt_QAbstractScrollArea_paintEvent_void_QAbstractScrollArea_QPaintEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractScrollArea_paintEvent_void_QAbstractScrollArea_QPaintEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractScrollArea* arg0 = object<QAbstractScrollArea>(param_this);
@@ -948,9 +877,8 @@ namespace Mu
             ((MuQt_QAbstractScrollArea*)arg0)->paintEvent_pub(arg1);
     }
 
-    void
-    qt_QAbstractScrollArea_resizeEvent_void_QAbstractScrollArea_QResizeEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QAbstractScrollArea_resizeEvent_void_QAbstractScrollArea_QResizeEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                  Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractScrollArea* arg0 = object<QAbstractScrollArea>(param_this);
@@ -961,8 +889,8 @@ namespace Mu
             ((MuQt_QAbstractScrollArea*)arg0)->resizeEvent_pub(arg1);
     }
 
-    void qt_QAbstractScrollArea_wheelEvent_void_QAbstractScrollArea_QWheelEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    void qt_QAbstractScrollArea_wheelEvent_void_QAbstractScrollArea_QWheelEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractScrollArea* arg0 = object<QAbstractScrollArea>(param_this);
@@ -973,8 +901,7 @@ namespace Mu
             ((MuQt_QAbstractScrollArea*)arg0)->wheelEvent_pub(arg1);
     }
 
-    void qt_QAbstractScrollArea_changeEvent_void_QAbstractScrollArea_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_ev)
+    void qt_QAbstractScrollArea_changeEvent_void_QAbstractScrollArea_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_ev)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractScrollArea* arg0 = object<QAbstractScrollArea>(param_this);
@@ -987,202 +914,179 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(_n_QAbstractScrollArea0, Pointer)
     {
-        NODE_RETURN(
-            qt_QAbstractScrollArea_QAbstractScrollArea_QAbstractScrollArea_QAbstractScrollArea_QWidget(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QAbstractScrollArea_QAbstractScrollArea_QAbstractScrollArea_QAbstractScrollArea_QWidget(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_addScrollBarWidget0, void)
     {
-        qt_QAbstractScrollArea_addScrollBarWidget_void_QAbstractScrollArea_QWidget_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int));
+        qt_QAbstractScrollArea_addScrollBarWidget_void_QAbstractScrollArea_QWidget_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                       NODE_ARG(1, Pointer), NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_cornerWidget0, Pointer)
     {
-        NODE_RETURN(
-            qt_QAbstractScrollArea_cornerWidget_QWidget_QAbstractScrollArea(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QAbstractScrollArea_cornerWidget_QWidget_QAbstractScrollArea(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_maximumViewportSize0, Pointer)
     {
-        NODE_RETURN(
-            qt_QAbstractScrollArea_maximumViewportSize_QSize_QAbstractScrollArea(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QAbstractScrollArea_maximumViewportSize_QSize_QAbstractScrollArea(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_setCornerWidget0, void)
     {
-        qt_QAbstractScrollArea_setCornerWidget_void_QAbstractScrollArea_QWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractScrollArea_setCornerWidget_void_QAbstractScrollArea_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setViewport0, void)
     {
-        qt_QAbstractScrollArea_setViewport_void_QAbstractScrollArea_QWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractScrollArea_setViewport_void_QAbstractScrollArea_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setupViewport0, void)
     {
-        qt_QAbstractScrollArea_setupViewport_void_QAbstractScrollArea_QWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractScrollArea_setupViewport_void_QAbstractScrollArea_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                              NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_viewport0, Pointer)
     {
-        NODE_RETURN(qt_QAbstractScrollArea_viewport_QWidget_QAbstractScrollArea(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QAbstractScrollArea_viewport_QWidget_QAbstractScrollArea(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_minimumSizeHint0, Pointer)
     {
-        NODE_RETURN(
-            qt_QAbstractScrollArea_minimumSizeHint_QSize_QAbstractScrollArea(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QAbstractScrollArea_minimumSizeHint_QSize_QAbstractScrollArea(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_sizeHint0, Pointer)
     {
-        NODE_RETURN(qt_QAbstractScrollArea_sizeHint_QSize_QAbstractScrollArea(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QAbstractScrollArea_sizeHint_QSize_QAbstractScrollArea(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_scrollContentsBy0, void)
     {
-        qt_QAbstractScrollArea_scrollContentsBy_void_QAbstractScrollArea_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int));
+        qt_QAbstractScrollArea_scrollContentsBy_void_QAbstractScrollArea_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                                 NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setViewportMargins0, void)
     {
         qt_QAbstractScrollArea_setViewportMargins_void_QAbstractScrollArea_int_int_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int), NODE_ARG(3, int), NODE_ARG(4, int));
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int), NODE_ARG(3, int), NODE_ARG(4, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setViewportMargins1, void)
     {
-        qt_QAbstractScrollArea_setViewportMargins_void_QAbstractScrollArea_QMargins(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractScrollArea_setViewportMargins_void_QAbstractScrollArea_QMargins(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                    NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_viewportEvent0, bool)
     {
-        NODE_RETURN(
-            qt_QAbstractScrollArea_viewportEvent_bool_QAbstractScrollArea_QEvent(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QAbstractScrollArea_viewportEvent_bool_QAbstractScrollArea_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                         NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_viewportMargins0, Pointer)
     {
-        NODE_RETURN(
-            qt_QAbstractScrollArea_viewportMargins_QMargins_QAbstractScrollArea(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QAbstractScrollArea_viewportMargins_QMargins_QAbstractScrollArea(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_viewportSizeHint0, Pointer)
     {
-        NODE_RETURN(
-            qt_QAbstractScrollArea_viewportSizeHint_QSize_QAbstractScrollArea(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QAbstractScrollArea_viewportSizeHint_QSize_QAbstractScrollArea(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_contextMenuEvent0, void)
     {
-        qt_QAbstractScrollArea_contextMenuEvent_void_QAbstractScrollArea_QContextMenuEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractScrollArea_contextMenuEvent_void_QAbstractScrollArea_QContextMenuEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                           NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_dragEnterEvent0, void)
     {
-        qt_QAbstractScrollArea_dragEnterEvent_void_QAbstractScrollArea_QDragEnterEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractScrollArea_dragEnterEvent_void_QAbstractScrollArea_QDragEnterEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                       NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_dragLeaveEvent0, void)
     {
-        qt_QAbstractScrollArea_dragLeaveEvent_void_QAbstractScrollArea_QDragLeaveEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractScrollArea_dragLeaveEvent_void_QAbstractScrollArea_QDragLeaveEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                       NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_dragMoveEvent0, void)
     {
-        qt_QAbstractScrollArea_dragMoveEvent_void_QAbstractScrollArea_QDragMoveEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractScrollArea_dragMoveEvent_void_QAbstractScrollArea_QDragMoveEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                     NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_dropEvent0, void)
     {
-        qt_QAbstractScrollArea_dropEvent_void_QAbstractScrollArea_QDropEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractScrollArea_dropEvent_void_QAbstractScrollArea_QDropEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                             NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_event0, bool)
     {
         NODE_RETURN(
-            qt_QAbstractScrollArea_event_bool_QAbstractScrollArea_QEvent(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+            qt_QAbstractScrollArea_event_bool_QAbstractScrollArea_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_keyPressEvent0, void)
     {
-        qt_QAbstractScrollArea_keyPressEvent_void_QAbstractScrollArea_QKeyEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractScrollArea_keyPressEvent_void_QAbstractScrollArea_QKeyEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseDoubleClickEvent0, void)
     {
-        qt_QAbstractScrollArea_mouseDoubleClickEvent_void_QAbstractScrollArea_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractScrollArea_mouseDoubleClickEvent_void_QAbstractScrollArea_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                          NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseMoveEvent0, void)
     {
-        qt_QAbstractScrollArea_mouseMoveEvent_void_QAbstractScrollArea_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractScrollArea_mouseMoveEvent_void_QAbstractScrollArea_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                   NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mousePressEvent0, void)
     {
-        qt_QAbstractScrollArea_mousePressEvent_void_QAbstractScrollArea_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractScrollArea_mousePressEvent_void_QAbstractScrollArea_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                    NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_mouseReleaseEvent0, void)
     {
-        qt_QAbstractScrollArea_mouseReleaseEvent_void_QAbstractScrollArea_QMouseEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractScrollArea_mouseReleaseEvent_void_QAbstractScrollArea_QMouseEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                      NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_paintEvent0, void)
     {
-        qt_QAbstractScrollArea_paintEvent_void_QAbstractScrollArea_QPaintEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractScrollArea_paintEvent_void_QAbstractScrollArea_QPaintEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                               NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_resizeEvent0, void)
     {
-        qt_QAbstractScrollArea_resizeEvent_void_QAbstractScrollArea_QResizeEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractScrollArea_resizeEvent_void_QAbstractScrollArea_QResizeEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                 NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_wheelEvent0, void)
     {
-        qt_QAbstractScrollArea_wheelEvent_void_QAbstractScrollArea_QWheelEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractScrollArea_wheelEvent_void_QAbstractScrollArea_QWheelEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                               NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_changeEvent0, void)
     {
-        qt_QAbstractScrollArea_changeEvent_void_QAbstractScrollArea_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QAbstractScrollArea_changeEvent_void_QAbstractScrollArea_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     void QAbstractScrollAreaType::load()
@@ -1202,60 +1106,42 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
-                   new Function(c, tn, castFromObject, Cast, Compiled,
-                                QAbstractScrollArea_QAbstractScrollArea_QObject,
-                                Return, ftn, Parameters,
-                                new Param(c, "object", "qt.QObject"), End),
+                   new Function(c, tn, castFromObject, Cast, Compiled, QAbstractScrollArea_QAbstractScrollArea_QObject, Return, ftn,
+                                Parameters, new Param(c, "object", "qt.QObject"), End),
 
                    EndArguments);
 
         addSymbols(
             // enums
             // member functions
-            new Function(
-                c, "QAbstractScrollArea", _n_QAbstractScrollArea0, None,
-                Compiled,
-                qt_QAbstractScrollArea_QAbstractScrollArea_QAbstractScrollArea_QAbstractScrollArea_QWidget,
-                Return, "qt.QAbstractScrollArea", Parameters,
-                new Param(c, "this", "qt.QAbstractScrollArea"),
-                new Param(c, "parent", "qt.QWidget"), End),
-            new Function(
-                c, "addScrollBarWidget", _n_addScrollBarWidget0, None, Compiled,
-                qt_QAbstractScrollArea_addScrollBarWidget_void_QAbstractScrollArea_QWidget_int,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractScrollArea"),
-                new Param(c, "widget", "qt.QWidget"),
-                new Param(c, "alignment", "int"), End),
-            new Function(
-                c, "cornerWidget", _n_cornerWidget0, None, Compiled,
-                qt_QAbstractScrollArea_cornerWidget_QWidget_QAbstractScrollArea,
-                Return, "qt.QWidget", Parameters,
-                new Param(c, "this", "qt.QAbstractScrollArea"), End),
+            new Function(c, "QAbstractScrollArea", _n_QAbstractScrollArea0, None, Compiled,
+                         qt_QAbstractScrollArea_QAbstractScrollArea_QAbstractScrollArea_QAbstractScrollArea_QWidget, Return,
+                         "qt.QAbstractScrollArea", Parameters, new Param(c, "this", "qt.QAbstractScrollArea"),
+                         new Param(c, "parent", "qt.QWidget"), End),
+            new Function(c, "addScrollBarWidget", _n_addScrollBarWidget0, None, Compiled,
+                         qt_QAbstractScrollArea_addScrollBarWidget_void_QAbstractScrollArea_QWidget_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QAbstractScrollArea"), new Param(c, "widget", "qt.QWidget"),
+                         new Param(c, "alignment", "int"), End),
+            new Function(c, "cornerWidget", _n_cornerWidget0, None, Compiled,
+                         qt_QAbstractScrollArea_cornerWidget_QWidget_QAbstractScrollArea, Return, "qt.QWidget", Parameters,
+                         new Param(c, "this", "qt.QAbstractScrollArea"), End),
             // MISSING: horizontalScrollBar ("QScrollBar *"; QAbstractScrollArea
             // this) PROP: horizontalScrollBarPolicy (flags Qt::ScrollBarPolicy;
             // QAbstractScrollArea this)
-            new Function(
-                c, "maximumViewportSize", _n_maximumViewportSize0, None,
-                Compiled,
-                qt_QAbstractScrollArea_maximumViewportSize_QSize_QAbstractScrollArea,
-                Return, "qt.QSize", Parameters,
-                new Param(c, "this", "qt.QAbstractScrollArea"), End),
+            new Function(c, "maximumViewportSize", _n_maximumViewportSize0, None, Compiled,
+                         qt_QAbstractScrollArea_maximumViewportSize_QSize_QAbstractScrollArea, Return, "qt.QSize", Parameters,
+                         new Param(c, "this", "qt.QAbstractScrollArea"), End),
             // MISSING: scrollBarWidgets ("QWidgetList"; QAbstractScrollArea
             // this, flags Qt::Alignment alignment)
-            new Function(
-                c, "setCornerWidget", _n_setCornerWidget0, None, Compiled,
-                qt_QAbstractScrollArea_setCornerWidget_void_QAbstractScrollArea_QWidget,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractScrollArea"),
-                new Param(c, "widget", "qt.QWidget"), End),
+            new Function(c, "setCornerWidget", _n_setCornerWidget0, None, Compiled,
+                         qt_QAbstractScrollArea_setCornerWidget_void_QAbstractScrollArea_QWidget, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QAbstractScrollArea"), new Param(c, "widget", "qt.QWidget"), End),
             // MISSING: setHorizontalScrollBar (void; QAbstractScrollArea this,
             // "QScrollBar *" scrollBar) PROP: setHorizontalScrollBarPolicy
             // (void; QAbstractScrollArea this, flags Qt::ScrollBarPolicy _p20)
@@ -1264,165 +1150,99 @@ namespace Mu
             // setVerticalScrollBar (void; QAbstractScrollArea this, "QScrollBar
             // *" scrollBar) PROP: setVerticalScrollBarPolicy (void;
             // QAbstractScrollArea this, flags Qt::ScrollBarPolicy _p20)
-            new Function(
-                c, "setViewport", _n_setViewport0, None, Compiled,
-                qt_QAbstractScrollArea_setViewport_void_QAbstractScrollArea_QWidget,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractScrollArea"),
-                new Param(c, "widget", "qt.QWidget"), End),
-            _func[0] = new MemberFunction(
-                c, "setupViewport", _n_setupViewport0, None, Compiled,
-                qt_QAbstractScrollArea_setupViewport_void_QAbstractScrollArea_QWidget,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractScrollArea"),
-                new Param(c, "viewport", "qt.QWidget"), End),
+            new Function(c, "setViewport", _n_setViewport0, None, Compiled,
+                         qt_QAbstractScrollArea_setViewport_void_QAbstractScrollArea_QWidget, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QAbstractScrollArea"), new Param(c, "widget", "qt.QWidget"), End),
+            _func[0] = new MemberFunction(c, "setupViewport", _n_setupViewport0, None, Compiled,
+                                          qt_QAbstractScrollArea_setupViewport_void_QAbstractScrollArea_QWidget, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QAbstractScrollArea"), new Param(c, "viewport", "qt.QWidget"), End),
             // PROP: sizeAdjustPolicy (flags
             // QAbstractScrollArea::SizeAdjustPolicy; QAbstractScrollArea this)
             // MISSING: verticalScrollBar ("QScrollBar *"; QAbstractScrollArea
             // this) PROP: verticalScrollBarPolicy (flags Qt::ScrollBarPolicy;
             // QAbstractScrollArea this)
-            new Function(
-                c, "viewport", _n_viewport0, None, Compiled,
-                qt_QAbstractScrollArea_viewport_QWidget_QAbstractScrollArea,
-                Return, "qt.QWidget", Parameters,
-                new Param(c, "this", "qt.QAbstractScrollArea"), End),
-            _func[1] = new MemberFunction(
-                c, "minimumSizeHint", _n_minimumSizeHint0, None, Compiled,
-                qt_QAbstractScrollArea_minimumSizeHint_QSize_QAbstractScrollArea,
-                Return, "qt.QSize", Parameters,
-                new Param(c, "this", "qt.QAbstractScrollArea"), End),
-            _func[2] = new MemberFunction(
-                c, "sizeHint", _n_sizeHint0, None, Compiled,
-                qt_QAbstractScrollArea_sizeHint_QSize_QAbstractScrollArea,
-                Return, "qt.QSize", Parameters,
-                new Param(c, "this", "qt.QAbstractScrollArea"), End),
-            _func[3] = new MemberFunction(
-                c, "scrollContentsBy", _n_scrollContentsBy0, None, Compiled,
-                qt_QAbstractScrollArea_scrollContentsBy_void_QAbstractScrollArea_int_int,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractScrollArea"),
-                new Param(c, "dx", "int"), new Param(c, "dy", "int"), End),
-            new Function(
-                c, "setViewportMargins", _n_setViewportMargins0, None, Compiled,
-                qt_QAbstractScrollArea_setViewportMargins_void_QAbstractScrollArea_int_int_int_int,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractScrollArea"),
-                new Param(c, "left", "int"), new Param(c, "top", "int"),
-                new Param(c, "right", "int"), new Param(c, "bottom", "int"),
-                End),
-            new Function(
-                c, "setViewportMargins", _n_setViewportMargins1, None, Compiled,
-                qt_QAbstractScrollArea_setViewportMargins_void_QAbstractScrollArea_QMargins,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractScrollArea"),
-                new Param(c, "margins", "qt.QMargins"), End),
-            _func[4] = new MemberFunction(
-                c, "viewportEvent", _n_viewportEvent0, None, Compiled,
-                qt_QAbstractScrollArea_viewportEvent_bool_QAbstractScrollArea_QEvent,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QAbstractScrollArea"),
-                new Param(c, "event", "qt.QEvent"), End),
-            new Function(
-                c, "viewportMargins", _n_viewportMargins0, None, Compiled,
-                qt_QAbstractScrollArea_viewportMargins_QMargins_QAbstractScrollArea,
-                Return, "qt.QMargins", Parameters,
-                new Param(c, "this", "qt.QAbstractScrollArea"), End),
-            _func[5] = new MemberFunction(
-                c, "viewportSizeHint", _n_viewportSizeHint0, None, Compiled,
-                qt_QAbstractScrollArea_viewportSizeHint_QSize_QAbstractScrollArea,
-                Return, "qt.QSize", Parameters,
-                new Param(c, "this", "qt.QAbstractScrollArea"), End),
-            _func[6] = new MemberFunction(
-                c, "contextMenuEvent", _n_contextMenuEvent0, None, Compiled,
-                qt_QAbstractScrollArea_contextMenuEvent_void_QAbstractScrollArea_QContextMenuEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractScrollArea"),
-                new Param(c, "e", "qt.QContextMenuEvent"), End),
-            _func[7] = new MemberFunction(
-                c, "dragEnterEvent", _n_dragEnterEvent0, None, Compiled,
-                qt_QAbstractScrollArea_dragEnterEvent_void_QAbstractScrollArea_QDragEnterEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractScrollArea"),
-                new Param(c, "event", "qt.QDragEnterEvent"), End),
-            _func[8] = new MemberFunction(
-                c, "dragLeaveEvent", _n_dragLeaveEvent0, None, Compiled,
-                qt_QAbstractScrollArea_dragLeaveEvent_void_QAbstractScrollArea_QDragLeaveEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractScrollArea"),
-                new Param(c, "event", "qt.QDragLeaveEvent"), End),
-            _func[9] = new MemberFunction(
-                c, "dragMoveEvent", _n_dragMoveEvent0, None, Compiled,
-                qt_QAbstractScrollArea_dragMoveEvent_void_QAbstractScrollArea_QDragMoveEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractScrollArea"),
-                new Param(c, "event", "qt.QDragMoveEvent"), End),
-            _func[10] = new MemberFunction(
-                c, "dropEvent", _n_dropEvent0, None, Compiled,
-                qt_QAbstractScrollArea_dropEvent_void_QAbstractScrollArea_QDropEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractScrollArea"),
-                new Param(c, "event", "qt.QDropEvent"), End),
-            _func[11] = new MemberFunction(
-                c, "event", _n_event0, None, Compiled,
-                qt_QAbstractScrollArea_event_bool_QAbstractScrollArea_QEvent,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QAbstractScrollArea"),
-                new Param(c, "event_", "qt.QEvent"), End),
-            _func[12] = new MemberFunction(
-                c, "keyPressEvent", _n_keyPressEvent0, None, Compiled,
-                qt_QAbstractScrollArea_keyPressEvent_void_QAbstractScrollArea_QKeyEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractScrollArea"),
-                new Param(c, "e", "qt.QKeyEvent"), End),
-            _func[13] = new MemberFunction(
-                c, "mouseDoubleClickEvent", _n_mouseDoubleClickEvent0, None,
-                Compiled,
-                qt_QAbstractScrollArea_mouseDoubleClickEvent_void_QAbstractScrollArea_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractScrollArea"),
-                new Param(c, "e", "qt.QMouseEvent"), End),
-            _func[14] = new MemberFunction(
-                c, "mouseMoveEvent", _n_mouseMoveEvent0, None, Compiled,
-                qt_QAbstractScrollArea_mouseMoveEvent_void_QAbstractScrollArea_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractScrollArea"),
-                new Param(c, "e", "qt.QMouseEvent"), End),
-            _func[15] = new MemberFunction(
-                c, "mousePressEvent", _n_mousePressEvent0, None, Compiled,
-                qt_QAbstractScrollArea_mousePressEvent_void_QAbstractScrollArea_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractScrollArea"),
-                new Param(c, "e", "qt.QMouseEvent"), End),
-            _func[16] = new MemberFunction(
-                c, "mouseReleaseEvent", _n_mouseReleaseEvent0, None, Compiled,
-                qt_QAbstractScrollArea_mouseReleaseEvent_void_QAbstractScrollArea_QMouseEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractScrollArea"),
-                new Param(c, "e", "qt.QMouseEvent"), End),
+            new Function(c, "viewport", _n_viewport0, None, Compiled, qt_QAbstractScrollArea_viewport_QWidget_QAbstractScrollArea, Return,
+                         "qt.QWidget", Parameters, new Param(c, "this", "qt.QAbstractScrollArea"), End),
+            _func[1] = new MemberFunction(c, "minimumSizeHint", _n_minimumSizeHint0, None, Compiled,
+                                          qt_QAbstractScrollArea_minimumSizeHint_QSize_QAbstractScrollArea, Return, "qt.QSize", Parameters,
+                                          new Param(c, "this", "qt.QAbstractScrollArea"), End),
+            _func[2] =
+                new MemberFunction(c, "sizeHint", _n_sizeHint0, None, Compiled, qt_QAbstractScrollArea_sizeHint_QSize_QAbstractScrollArea,
+                                   Return, "qt.QSize", Parameters, new Param(c, "this", "qt.QAbstractScrollArea"), End),
+            _func[3] = new MemberFunction(c, "scrollContentsBy", _n_scrollContentsBy0, None, Compiled,
+                                          qt_QAbstractScrollArea_scrollContentsBy_void_QAbstractScrollArea_int_int, Return, "void",
+                                          Parameters, new Param(c, "this", "qt.QAbstractScrollArea"), new Param(c, "dx", "int"),
+                                          new Param(c, "dy", "int"), End),
+            new Function(c, "setViewportMargins", _n_setViewportMargins0, None, Compiled,
+                         qt_QAbstractScrollArea_setViewportMargins_void_QAbstractScrollArea_int_int_int_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QAbstractScrollArea"), new Param(c, "left", "int"), new Param(c, "top", "int"),
+                         new Param(c, "right", "int"), new Param(c, "bottom", "int"), End),
+            new Function(c, "setViewportMargins", _n_setViewportMargins1, None, Compiled,
+                         qt_QAbstractScrollArea_setViewportMargins_void_QAbstractScrollArea_QMargins, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QAbstractScrollArea"), new Param(c, "margins", "qt.QMargins"), End),
+            _func[4] = new MemberFunction(c, "viewportEvent", _n_viewportEvent0, None, Compiled,
+                                          qt_QAbstractScrollArea_viewportEvent_bool_QAbstractScrollArea_QEvent, Return, "bool", Parameters,
+                                          new Param(c, "this", "qt.QAbstractScrollArea"), new Param(c, "event", "qt.QEvent"), End),
+            new Function(c, "viewportMargins", _n_viewportMargins0, None, Compiled,
+                         qt_QAbstractScrollArea_viewportMargins_QMargins_QAbstractScrollArea, Return, "qt.QMargins", Parameters,
+                         new Param(c, "this", "qt.QAbstractScrollArea"), End),
+            _func[5] = new MemberFunction(c, "viewportSizeHint", _n_viewportSizeHint0, None, Compiled,
+                                          qt_QAbstractScrollArea_viewportSizeHint_QSize_QAbstractScrollArea, Return, "qt.QSize", Parameters,
+                                          new Param(c, "this", "qt.QAbstractScrollArea"), End),
+            _func[6] = new MemberFunction(c, "contextMenuEvent", _n_contextMenuEvent0, None, Compiled,
+                                          qt_QAbstractScrollArea_contextMenuEvent_void_QAbstractScrollArea_QContextMenuEvent, Return,
+                                          "void", Parameters, new Param(c, "this", "qt.QAbstractScrollArea"),
+                                          new Param(c, "e", "qt.QContextMenuEvent"), End),
+            _func[7] = new MemberFunction(c, "dragEnterEvent", _n_dragEnterEvent0, None, Compiled,
+                                          qt_QAbstractScrollArea_dragEnterEvent_void_QAbstractScrollArea_QDragEnterEvent, Return, "void",
+                                          Parameters, new Param(c, "this", "qt.QAbstractScrollArea"),
+                                          new Param(c, "event", "qt.QDragEnterEvent"), End),
+            _func[8] = new MemberFunction(c, "dragLeaveEvent", _n_dragLeaveEvent0, None, Compiled,
+                                          qt_QAbstractScrollArea_dragLeaveEvent_void_QAbstractScrollArea_QDragLeaveEvent, Return, "void",
+                                          Parameters, new Param(c, "this", "qt.QAbstractScrollArea"),
+                                          new Param(c, "event", "qt.QDragLeaveEvent"), End),
+            _func[9] =
+                new MemberFunction(c, "dragMoveEvent", _n_dragMoveEvent0, None, Compiled,
+                                   qt_QAbstractScrollArea_dragMoveEvent_void_QAbstractScrollArea_QDragMoveEvent, Return, "void", Parameters,
+                                   new Param(c, "this", "qt.QAbstractScrollArea"), new Param(c, "event", "qt.QDragMoveEvent"), End),
+            _func[10] = new MemberFunction(c, "dropEvent", _n_dropEvent0, None, Compiled,
+                                           qt_QAbstractScrollArea_dropEvent_void_QAbstractScrollArea_QDropEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QAbstractScrollArea"), new Param(c, "event", "qt.QDropEvent"), End),
+            _func[11] = new MemberFunction(c, "event", _n_event0, None, Compiled,
+                                           qt_QAbstractScrollArea_event_bool_QAbstractScrollArea_QEvent, Return, "bool", Parameters,
+                                           new Param(c, "this", "qt.QAbstractScrollArea"), new Param(c, "event_", "qt.QEvent"), End),
+            _func[12] =
+                new MemberFunction(c, "keyPressEvent", _n_keyPressEvent0, None, Compiled,
+                                   qt_QAbstractScrollArea_keyPressEvent_void_QAbstractScrollArea_QKeyEvent, Return, "void", Parameters,
+                                   new Param(c, "this", "qt.QAbstractScrollArea"), new Param(c, "e", "qt.QKeyEvent"), End),
+            _func[13] =
+                new MemberFunction(c, "mouseDoubleClickEvent", _n_mouseDoubleClickEvent0, None, Compiled,
+                                   qt_QAbstractScrollArea_mouseDoubleClickEvent_void_QAbstractScrollArea_QMouseEvent, Return, "void",
+                                   Parameters, new Param(c, "this", "qt.QAbstractScrollArea"), new Param(c, "e", "qt.QMouseEvent"), End),
+            _func[14] =
+                new MemberFunction(c, "mouseMoveEvent", _n_mouseMoveEvent0, None, Compiled,
+                                   qt_QAbstractScrollArea_mouseMoveEvent_void_QAbstractScrollArea_QMouseEvent, Return, "void", Parameters,
+                                   new Param(c, "this", "qt.QAbstractScrollArea"), new Param(c, "e", "qt.QMouseEvent"), End),
+            _func[15] =
+                new MemberFunction(c, "mousePressEvent", _n_mousePressEvent0, None, Compiled,
+                                   qt_QAbstractScrollArea_mousePressEvent_void_QAbstractScrollArea_QMouseEvent, Return, "void", Parameters,
+                                   new Param(c, "this", "qt.QAbstractScrollArea"), new Param(c, "e", "qt.QMouseEvent"), End),
+            _func[16] =
+                new MemberFunction(c, "mouseReleaseEvent", _n_mouseReleaseEvent0, None, Compiled,
+                                   qt_QAbstractScrollArea_mouseReleaseEvent_void_QAbstractScrollArea_QMouseEvent, Return, "void",
+                                   Parameters, new Param(c, "this", "qt.QAbstractScrollArea"), new Param(c, "e", "qt.QMouseEvent"), End),
             _func[17] = new MemberFunction(
-                c, "paintEvent", _n_paintEvent0, None, Compiled,
-                qt_QAbstractScrollArea_paintEvent_void_QAbstractScrollArea_QPaintEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractScrollArea"),
-                new Param(c, "event", "qt.QPaintEvent"), End),
+                c, "paintEvent", _n_paintEvent0, None, Compiled, qt_QAbstractScrollArea_paintEvent_void_QAbstractScrollArea_QPaintEvent,
+                Return, "void", Parameters, new Param(c, "this", "qt.QAbstractScrollArea"), new Param(c, "event", "qt.QPaintEvent"), End),
             _func[18] = new MemberFunction(
-                c, "resizeEvent", _n_resizeEvent0, None, Compiled,
-                qt_QAbstractScrollArea_resizeEvent_void_QAbstractScrollArea_QResizeEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractScrollArea"),
-                new Param(c, "event", "qt.QResizeEvent"), End),
+                c, "resizeEvent", _n_resizeEvent0, None, Compiled, qt_QAbstractScrollArea_resizeEvent_void_QAbstractScrollArea_QResizeEvent,
+                Return, "void", Parameters, new Param(c, "this", "qt.QAbstractScrollArea"), new Param(c, "event", "qt.QResizeEvent"), End),
             _func[19] = new MemberFunction(
-                c, "wheelEvent", _n_wheelEvent0, None, Compiled,
-                qt_QAbstractScrollArea_wheelEvent_void_QAbstractScrollArea_QWheelEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractScrollArea"),
-                new Param(c, "e", "qt.QWheelEvent"), End),
-            _func[20] = new MemberFunction(
-                c, "changeEvent", _n_changeEvent0, None, Compiled,
-                qt_QAbstractScrollArea_changeEvent_void_QAbstractScrollArea_QEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QAbstractScrollArea"),
-                new Param(c, "ev", "qt.QEvent"), End),
+                c, "wheelEvent", _n_wheelEvent0, None, Compiled, qt_QAbstractScrollArea_wheelEvent_void_QAbstractScrollArea_QWheelEvent,
+                Return, "void", Parameters, new Param(c, "this", "qt.QAbstractScrollArea"), new Param(c, "e", "qt.QWheelEvent"), End),
+            _func[20] = new MemberFunction(c, "changeEvent", _n_changeEvent0, None, Compiled,
+                                           qt_QAbstractScrollArea_changeEvent_void_QAbstractScrollArea_QEvent, Return, "void", Parameters,
+                                           new Param(c, "this", "qt.QAbstractScrollArea"), new Param(c, "ev", "qt.QEvent"), End),
             // static functions
             EndArguments);
         globalScope()->addSymbols(EndArguments);

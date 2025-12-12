@@ -59,16 +59,12 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(__allocate, Pointer)
     {
-        QImageType::Instance* i =
-            new QImageType::Instance((Class*)NODE_THIS.type());
+        QImageType::Instance* i = new QImageType::Instance((Class*)NODE_THIS.type());
         QImageType::registerFinalizer(i);
         NODE_RETURN(i);
     }
 
-    void QImageType::registerFinalizer(void* o)
-    {
-        GC_register_finalizer(o, QImageType::finalizer, 0, 0, 0);
-    }
+    void QImageType::registerFinalizer(void* o) { GC_register_finalizer(o, QImageType::finalizer, 0, 0, 0); }
 
     void QImageType::finalizer(void* obj, void* data)
     {
@@ -79,18 +75,14 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    Pointer qt_QImage_QImage_QImage_QImage(Mu::Thread& NODE_THREAD,
-                                           Pointer param_this)
+    Pointer qt_QImage_QImage_QImage_QImage(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         setpaintdevice(param_this, QImage());
         return param_this;
     }
 
-    Pointer qt_QImage_QImage_QImage_QImage_QSize_int(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_this,
-                                                     Pointer param_size,
-                                                     int param_format)
+    Pointer qt_QImage_QImage_QImage_QImage_QSize_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_size, int param_format)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QSize arg1 = getqtype<QSizeType>(param_size);
@@ -99,10 +91,7 @@ namespace Mu
         return param_this;
     }
 
-    Pointer qt_QImage_QImage_QImage_QImage_int_int_int(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this,
-                                                       int param_width,
-                                                       int param_height,
+    Pointer qt_QImage_QImage_QImage_QImage_int_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_width, int param_height,
                                                        int param_format)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
@@ -113,32 +102,28 @@ namespace Mu
         return param_this;
     }
 
-    bool qt_QImage_allGray_bool_QImage(Mu::Thread& NODE_THREAD,
-                                       Pointer param_this)
+    bool qt_QImage_allGray_bool_QImage(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QImage& arg0 = getqtype<QImageType>(param_this);
         return arg0.allGray();
     }
 
-    int qt_QImage_bitPlaneCount_int_QImage(Mu::Thread& NODE_THREAD,
-                                           Pointer param_this)
+    int qt_QImage_bitPlaneCount_int_QImage(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QImage& arg0 = getqtype<QImageType>(param_this);
         return arg0.bitPlaneCount();
     }
 
-    int64 qt_QImage_cacheKey_int64_QImage(Mu::Thread& NODE_THREAD,
-                                          Pointer param_this)
+    int64 qt_QImage_cacheKey_int64_QImage(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QImage& arg0 = getqtype<QImageType>(param_this);
         return arg0.cacheKey();
     }
 
-    int qt_QImage_color_int_QImage_int(Mu::Thread& NODE_THREAD,
-                                       Pointer param_this, int param_i)
+    int qt_QImage_color_int_QImage_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_i)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QImage& arg0 = getqtype<QImageType>(param_this);
@@ -146,18 +131,14 @@ namespace Mu
         return arg0.color(arg1);
     }
 
-    int qt_QImage_colorCount_int_QImage(Mu::Thread& NODE_THREAD,
-                                        Pointer param_this)
+    int qt_QImage_colorCount_int_QImage(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QImage& arg0 = getqtype<QImageType>(param_this);
         return arg0.colorCount();
     }
 
-    void qt_QImage_convertTo_void_QImage_int_int(Mu::Thread& NODE_THREAD,
-                                                 Pointer param_this,
-                                                 int param_format,
-                                                 int param_flags)
+    void qt_QImage_convertTo_void_QImage_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_format, int param_flags)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QImage& arg0 = getqtype<QImageType>(param_this);
@@ -166,34 +147,25 @@ namespace Mu
         arg0.convertTo(arg1, arg2);
     }
 
-    Pointer qt_QImage_convertToFormat_QImage_QImage_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_format,
-        int param_flags)
+    Pointer qt_QImage_convertToFormat_QImage_QImage_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_format, int param_flags)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QImage& arg0 = getqtype<QImageType>(param_this);
         QImage::Format arg1 = (QImage::Format)(param_format);
         Qt::ImageConversionFlags arg2 = (Qt::ImageConversionFlags)(param_flags);
-        return makeqtype<QImageType>(c, arg0.convertToFormat(arg1, arg2),
-                                     "qt.QImage");
+        return makeqtype<QImageType>(c, arg0.convertToFormat(arg1, arg2), "qt.QImage");
     }
 
-    Pointer qt_QImage_convertedTo_QImage_QImage_int_int(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this,
-                                                        int param_format,
-                                                        int param_flags)
+    Pointer qt_QImage_convertedTo_QImage_QImage_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_format, int param_flags)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QImage& arg0 = getqtype<QImageType>(param_this);
         QImage::Format arg1 = (QImage::Format)(param_format);
         Qt::ImageConversionFlags arg2 = (Qt::ImageConversionFlags)(param_flags);
-        return makeqtype<QImageType>(c, arg0.convertedTo(arg1, arg2),
-                                     "qt.QImage");
+        return makeqtype<QImageType>(c, arg0.convertedTo(arg1, arg2), "qt.QImage");
     }
 
-    Pointer qt_QImage_copy_QImage_QImage_QRect(Mu::Thread& NODE_THREAD,
-                                               Pointer param_this,
-                                               Pointer param_rectangle)
+    Pointer qt_QImage_copy_QImage_QImage_QRect(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_rectangle)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QImage& arg0 = getqtype<QImageType>(param_this);
@@ -201,9 +173,8 @@ namespace Mu
         return makeqtype<QImageType>(c, arg0.copy(arg1), "qt.QImage");
     }
 
-    Pointer qt_QImage_copy_QImage_QImage_int_int_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_x, int param_y,
-        int param_width, int param_height)
+    Pointer qt_QImage_copy_QImage_QImage_int_int_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_x, int param_y,
+                                                         int param_width, int param_height)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QImage& arg0 = getqtype<QImageType>(param_this);
@@ -211,41 +182,33 @@ namespace Mu
         int arg2 = (int)(param_y);
         int arg3 = (int)(param_width);
         int arg4 = (int)(param_height);
-        return makeqtype<QImageType>(c, arg0.copy(arg1, arg2, arg3, arg4),
-                                     "qt.QImage");
+        return makeqtype<QImageType>(c, arg0.copy(arg1, arg2, arg3, arg4), "qt.QImage");
     }
 
-    Pointer qt_QImage_createAlphaMask_QImage_QImage_int(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this,
-                                                        int param_flags)
+    Pointer qt_QImage_createAlphaMask_QImage_QImage_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_flags)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QImage& arg0 = getqtype<QImageType>(param_this);
         Qt::ImageConversionFlags arg1 = (Qt::ImageConversionFlags)(param_flags);
-        return makeqtype<QImageType>(c, arg0.createAlphaMask(arg1),
-                                     "qt.QImage");
+        return makeqtype<QImageType>(c, arg0.createAlphaMask(arg1), "qt.QImage");
     }
 
-    Pointer qt_QImage_createHeuristicMask_QImage_QImage_bool(
-        Mu::Thread& NODE_THREAD, Pointer param_this, bool param_clipTight)
+    Pointer qt_QImage_createHeuristicMask_QImage_QImage_bool(Mu::Thread& NODE_THREAD, Pointer param_this, bool param_clipTight)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QImage& arg0 = getqtype<QImageType>(param_this);
         bool arg1 = (bool)(param_clipTight);
-        return makeqtype<QImageType>(c, arg0.createHeuristicMask(arg1),
-                                     "qt.QImage");
+        return makeqtype<QImageType>(c, arg0.createHeuristicMask(arg1), "qt.QImage");
     }
 
-    Pointer qt_QImage_createMaskFromColor_QImage_QImage_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_color,
-        int param_mode)
+    Pointer qt_QImage_createMaskFromColor_QImage_QImage_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_color,
+                                                                int param_mode)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QImage& arg0 = getqtype<QImageType>(param_this);
         QRgb arg1 = (int)(param_color);
         Qt::MaskMode arg2 = (Qt::MaskMode)(param_mode);
-        return makeqtype<QImageType>(c, arg0.createMaskFromColor(arg1, arg2),
-                                     "qt.QImage");
+        return makeqtype<QImageType>(c, arg0.createMaskFromColor(arg1, arg2), "qt.QImage");
     }
 
     int qt_QImage_depth_int_QImage(Mu::Thread& NODE_THREAD, Pointer param_this)
@@ -255,33 +218,28 @@ namespace Mu
         return arg0.depth();
     }
 
-    double qt_QImage_devicePixelRatio_double_QImage(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this)
+    double qt_QImage_devicePixelRatio_double_QImage(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QImage& arg0 = getqtype<QImageType>(param_this);
         return arg0.devicePixelRatio();
     }
 
-    int qt_QImage_dotsPerMeterX_int_QImage(Mu::Thread& NODE_THREAD,
-                                           Pointer param_this)
+    int qt_QImage_dotsPerMeterX_int_QImage(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QImage& arg0 = getqtype<QImageType>(param_this);
         return arg0.dotsPerMeterX();
     }
 
-    int qt_QImage_dotsPerMeterY_int_QImage(Mu::Thread& NODE_THREAD,
-                                           Pointer param_this)
+    int qt_QImage_dotsPerMeterY_int_QImage(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QImage& arg0 = getqtype<QImageType>(param_this);
         return arg0.dotsPerMeterY();
     }
 
-    void qt_QImage_fill_void_QImage_int(Mu::Thread& NODE_THREAD,
-                                        Pointer param_this,
-                                        int param_pixelValue)
+    void qt_QImage_fill_void_QImage_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_pixelValue)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QImage& arg0 = getqtype<QImageType>(param_this);
@@ -289,9 +247,7 @@ namespace Mu
         arg0.fill(arg1);
     }
 
-    void qt_QImage_fill_void_QImage_QColor(Mu::Thread& NODE_THREAD,
-                                           Pointer param_this,
-                                           Pointer param_color)
+    void qt_QImage_fill_void_QImage_QColor(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_color)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QImage& arg0 = getqtype<QImageType>(param_this);
@@ -306,8 +262,7 @@ namespace Mu
         return int(arg0.format());
     }
 
-    bool qt_QImage_hasAlphaChannel_bool_QImage(Mu::Thread& NODE_THREAD,
-                                               Pointer param_this)
+    bool qt_QImage_hasAlphaChannel_bool_QImage(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QImage& arg0 = getqtype<QImageType>(param_this);
@@ -321,9 +276,7 @@ namespace Mu
         return arg0.height();
     }
 
-    void qt_QImage_invertPixels_void_QImage_int(Mu::Thread& NODE_THREAD,
-                                                Pointer param_this,
-                                                int param_mode)
+    void qt_QImage_invertPixels_void_QImage_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_mode)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QImage& arg0 = getqtype<QImageType>(param_this);
@@ -331,26 +284,21 @@ namespace Mu
         arg0.invertPixels(arg1);
     }
 
-    bool qt_QImage_isGrayscale_bool_QImage(Mu::Thread& NODE_THREAD,
-                                           Pointer param_this)
+    bool qt_QImage_isGrayscale_bool_QImage(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QImage& arg0 = getqtype<QImageType>(param_this);
         return arg0.isGrayscale();
     }
 
-    bool qt_QImage_isNull_bool_QImage(Mu::Thread& NODE_THREAD,
-                                      Pointer param_this)
+    bool qt_QImage_isNull_bool_QImage(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QImage& arg0 = getqtype<QImageType>(param_this);
         return arg0.isNull();
     }
 
-    void qt_QImage_mirror_void_QImage_bool_bool(Mu::Thread& NODE_THREAD,
-                                                Pointer param_this,
-                                                bool param_horizontal,
-                                                bool param_vertical)
+    void qt_QImage_mirror_void_QImage_bool_bool(Mu::Thread& NODE_THREAD, Pointer param_this, bool param_horizontal, bool param_vertical)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QImage& arg0 = getqtype<QImageType>(param_this);
@@ -359,9 +307,7 @@ namespace Mu
         arg0.mirror(arg1, arg2);
     }
 
-    Pointer qt_QImage_mirrored_QImage_QImage_bool_bool(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this,
-                                                       bool param_horizontal,
+    Pointer qt_QImage_mirrored_QImage_QImage_bool_bool(Mu::Thread& NODE_THREAD, Pointer param_this, bool param_horizontal,
                                                        bool param_vertical)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
@@ -371,17 +317,14 @@ namespace Mu
         return makeqtype<QImageType>(c, arg0.mirrored(arg1, arg2), "qt.QImage");
     }
 
-    Pointer qt_QImage_offset_QPoint_QImage(Mu::Thread& NODE_THREAD,
-                                           Pointer param_this)
+    Pointer qt_QImage_offset_QPoint_QImage(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QImage& arg0 = getqtype<QImageType>(param_this);
         return makeqtype<QPointType>(c, arg0.offset(), "qt.QPoint");
     }
 
-    int qt_QImage_pixel_int_QImage_QPoint(Mu::Thread& NODE_THREAD,
-                                          Pointer param_this,
-                                          Pointer param_position)
+    int qt_QImage_pixel_int_QImage_QPoint(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_position)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QImage& arg0 = getqtype<QImageType>(param_this);
@@ -389,9 +332,7 @@ namespace Mu
         return arg0.pixel(arg1);
     }
 
-    int qt_QImage_pixel_int_QImage_int_int(Mu::Thread& NODE_THREAD,
-                                           Pointer param_this, int param_x,
-                                           int param_y)
+    int qt_QImage_pixel_int_QImage_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_x, int param_y)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QImage& arg0 = getqtype<QImageType>(param_this);
@@ -400,9 +341,7 @@ namespace Mu
         return arg0.pixel(arg1, arg2);
     }
 
-    Pointer qt_QImage_pixelColor_QColor_QImage_QPoint(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this,
-                                                      Pointer param_position)
+    Pointer qt_QImage_pixelColor_QColor_QImage_QPoint(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_position)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QImage& arg0 = getqtype<QImageType>(param_this);
@@ -410,21 +349,16 @@ namespace Mu
         return makeqtype<QColorType>(c, arg0.pixelColor(arg1), "qt.QColor");
     }
 
-    Pointer qt_QImage_pixelColor_QColor_QImage_int_int(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this,
-                                                       int param_x, int param_y)
+    Pointer qt_QImage_pixelColor_QColor_QImage_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_x, int param_y)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QImage& arg0 = getqtype<QImageType>(param_this);
         int arg1 = (int)(param_x);
         int arg2 = (int)(param_y);
-        return makeqtype<QColorType>(c, arg0.pixelColor(arg1, arg2),
-                                     "qt.QColor");
+        return makeqtype<QColorType>(c, arg0.pixelColor(arg1, arg2), "qt.QColor");
     }
 
-    int qt_QImage_pixelIndex_int_QImage_QPoint(Mu::Thread& NODE_THREAD,
-                                               Pointer param_this,
-                                               Pointer param_position)
+    int qt_QImage_pixelIndex_int_QImage_QPoint(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_position)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QImage& arg0 = getqtype<QImageType>(param_this);
@@ -432,9 +366,7 @@ namespace Mu
         return arg0.pixelIndex(arg1);
     }
 
-    int qt_QImage_pixelIndex_int_QImage_int_int(Mu::Thread& NODE_THREAD,
-                                                Pointer param_this, int param_x,
-                                                int param_y)
+    int qt_QImage_pixelIndex_int_QImage_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_x, int param_y)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QImage& arg0 = getqtype<QImageType>(param_this);
@@ -443,17 +375,14 @@ namespace Mu
         return arg0.pixelIndex(arg1, arg2);
     }
 
-    Pointer qt_QImage_rect_QRect_QImage(Mu::Thread& NODE_THREAD,
-                                        Pointer param_this)
+    Pointer qt_QImage_rect_QRect_QImage(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QImage& arg0 = getqtype<QImageType>(param_this);
         return makeqtype<QRectType>(c, arg0.rect(), "qt.QRect");
     }
 
-    bool qt_QImage_reinterpretAsFormat_bool_QImage_int(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this,
-                                                       int param_format)
+    bool qt_QImage_reinterpretAsFormat_bool_QImage_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_format)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QImage& arg0 = getqtype<QImageType>(param_this);
@@ -461,77 +390,62 @@ namespace Mu
         return arg0.reinterpretAsFormat(arg1);
     }
 
-    void qt_QImage_rgbSwap_void_QImage(Mu::Thread& NODE_THREAD,
-                                       Pointer param_this)
+    void qt_QImage_rgbSwap_void_QImage(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QImage& arg0 = getqtype<QImageType>(param_this);
         arg0.rgbSwap();
     }
 
-    Pointer qt_QImage_rgbSwapped_QImage_QImage(Mu::Thread& NODE_THREAD,
-                                               Pointer param_this)
+    Pointer qt_QImage_rgbSwapped_QImage_QImage(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QImage& arg0 = getqtype<QImageType>(param_this);
         return makeqtype<QImageType>(c, arg0.rgbSwapped(), "qt.QImage");
     }
 
-    Pointer qt_QImage_scaled_QImage_QImage_QSize_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_size,
-        int param_aspectRatioMode, int param_transformMode)
+    Pointer qt_QImage_scaled_QImage_QImage_QSize_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_size,
+                                                         int param_aspectRatioMode, int param_transformMode)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QImage& arg0 = getqtype<QImageType>(param_this);
         const QSize arg1 = getqtype<QSizeType>(param_size);
         Qt::AspectRatioMode arg2 = (Qt::AspectRatioMode)(param_aspectRatioMode);
-        Qt::TransformationMode arg3 =
-            (Qt::TransformationMode)(param_transformMode);
-        return makeqtype<QImageType>(c, arg0.scaled(arg1, arg2, arg3),
-                                     "qt.QImage");
+        Qt::TransformationMode arg3 = (Qt::TransformationMode)(param_transformMode);
+        return makeqtype<QImageType>(c, arg0.scaled(arg1, arg2, arg3), "qt.QImage");
     }
 
-    Pointer qt_QImage_scaled_QImage_QImage_int_int_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_width,
-        int param_height, int param_aspectRatioMode, int param_transformMode)
+    Pointer qt_QImage_scaled_QImage_QImage_int_int_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_width, int param_height,
+                                                           int param_aspectRatioMode, int param_transformMode)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QImage& arg0 = getqtype<QImageType>(param_this);
         int arg1 = (int)(param_width);
         int arg2 = (int)(param_height);
         Qt::AspectRatioMode arg3 = (Qt::AspectRatioMode)(param_aspectRatioMode);
-        Qt::TransformationMode arg4 =
-            (Qt::TransformationMode)(param_transformMode);
-        return makeqtype<QImageType>(c, arg0.scaled(arg1, arg2, arg3, arg4),
-                                     "qt.QImage");
+        Qt::TransformationMode arg4 = (Qt::TransformationMode)(param_transformMode);
+        return makeqtype<QImageType>(c, arg0.scaled(arg1, arg2, arg3, arg4), "qt.QImage");
     }
 
-    Pointer qt_QImage_scaledToHeight_QImage_QImage_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_height,
-        int param_mode)
+    Pointer qt_QImage_scaledToHeight_QImage_QImage_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_height, int param_mode)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QImage& arg0 = getqtype<QImageType>(param_this);
         int arg1 = (int)(param_height);
         Qt::TransformationMode arg2 = (Qt::TransformationMode)(param_mode);
-        return makeqtype<QImageType>(c, arg0.scaledToHeight(arg1, arg2),
-                                     "qt.QImage");
+        return makeqtype<QImageType>(c, arg0.scaledToHeight(arg1, arg2), "qt.QImage");
     }
 
-    Pointer qt_QImage_scaledToWidth_QImage_QImage_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_width,
-        int param_mode)
+    Pointer qt_QImage_scaledToWidth_QImage_QImage_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_width, int param_mode)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QImage& arg0 = getqtype<QImageType>(param_this);
         int arg1 = (int)(param_width);
         Qt::TransformationMode arg2 = (Qt::TransformationMode)(param_mode);
-        return makeqtype<QImageType>(c, arg0.scaledToWidth(arg1, arg2),
-                                     "qt.QImage");
+        return makeqtype<QImageType>(c, arg0.scaledToWidth(arg1, arg2), "qt.QImage");
     }
 
-    void qt_QImage_setAlphaChannel_void_QImage_QImage(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_alphaChannel)
+    void qt_QImage_setAlphaChannel_void_QImage_QImage(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_alphaChannel)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QImage& arg0 = getqtype<QImageType>(param_this);
@@ -539,10 +453,7 @@ namespace Mu
         arg0.setAlphaChannel(arg1);
     }
 
-    void qt_QImage_setColor_void_QImage_int_int(Mu::Thread& NODE_THREAD,
-                                                Pointer param_this,
-                                                int param_index,
-                                                int param_colorValue)
+    void qt_QImage_setColor_void_QImage_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_index, int param_colorValue)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QImage& arg0 = getqtype<QImageType>(param_this);
@@ -551,9 +462,7 @@ namespace Mu
         arg0.setColor(arg1, arg2);
     }
 
-    void qt_QImage_setColorCount_void_QImage_int(Mu::Thread& NODE_THREAD,
-                                                 Pointer param_this,
-                                                 int param_colorCount)
+    void qt_QImage_setColorCount_void_QImage_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_colorCount)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QImage& arg0 = getqtype<QImageType>(param_this);
@@ -561,8 +470,7 @@ namespace Mu
         arg0.setColorCount(arg1);
     }
 
-    void qt_QImage_setDevicePixelRatio_void_QImage_double(
-        Mu::Thread& NODE_THREAD, Pointer param_this, double param_scaleFactor)
+    void qt_QImage_setDevicePixelRatio_void_QImage_double(Mu::Thread& NODE_THREAD, Pointer param_this, double param_scaleFactor)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QImage& arg0 = getqtype<QImageType>(param_this);
@@ -570,9 +478,7 @@ namespace Mu
         arg0.setDevicePixelRatio(arg1);
     }
 
-    void qt_QImage_setDotsPerMeterX_void_QImage_int(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this,
-                                                    int param_x)
+    void qt_QImage_setDotsPerMeterX_void_QImage_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_x)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QImage& arg0 = getqtype<QImageType>(param_this);
@@ -580,9 +486,7 @@ namespace Mu
         arg0.setDotsPerMeterX(arg1);
     }
 
-    void qt_QImage_setDotsPerMeterY_void_QImage_int(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this,
-                                                    int param_y)
+    void qt_QImage_setDotsPerMeterY_void_QImage_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_y)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QImage& arg0 = getqtype<QImageType>(param_this);
@@ -590,9 +494,7 @@ namespace Mu
         arg0.setDotsPerMeterY(arg1);
     }
 
-    void qt_QImage_setOffset_void_QImage_QPoint(Mu::Thread& NODE_THREAD,
-                                                Pointer param_this,
-                                                Pointer param_offset)
+    void qt_QImage_setOffset_void_QImage_QPoint(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_offset)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QImage& arg0 = getqtype<QImageType>(param_this);
@@ -600,9 +502,7 @@ namespace Mu
         arg0.setOffset(arg1);
     }
 
-    void qt_QImage_setPixel_void_QImage_QPoint_int(Mu::Thread& NODE_THREAD,
-                                                   Pointer param_this,
-                                                   Pointer param_position,
+    void qt_QImage_setPixel_void_QImage_QPoint_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_position,
                                                    int param_index_or_rgb)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
@@ -612,9 +512,7 @@ namespace Mu
         arg0.setPixel(arg1, arg2);
     }
 
-    void qt_QImage_setPixel_void_QImage_int_int_int(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this,
-                                                    int param_x, int param_y,
+    void qt_QImage_setPixel_void_QImage_int_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_x, int param_y,
                                                     int param_index_or_rgb)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
@@ -625,9 +523,8 @@ namespace Mu
         arg0.setPixel(arg1, arg2, arg3);
     }
 
-    void qt_QImage_setPixelColor_void_QImage_QPoint_QColor(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_position,
-        Pointer param_color)
+    void qt_QImage_setPixelColor_void_QImage_QPoint_QColor(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_position,
+                                                           Pointer param_color)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QImage& arg0 = getqtype<QImageType>(param_this);
@@ -636,9 +533,8 @@ namespace Mu
         arg0.setPixelColor(arg1, arg2);
     }
 
-    void qt_QImage_setPixelColor_void_QImage_int_int_QColor(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_x, int param_y,
-        Pointer param_color)
+    void qt_QImage_setPixelColor_void_QImage_int_int_QColor(Mu::Thread& NODE_THREAD, Pointer param_this, int param_x, int param_y,
+                                                            Pointer param_color)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QImage& arg0 = getqtype<QImageType>(param_this);
@@ -648,10 +544,7 @@ namespace Mu
         arg0.setPixelColor(arg1, arg2, arg3);
     }
 
-    void qt_QImage_setText_void_QImage_string_string(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_this,
-                                                     Pointer param_key,
-                                                     Pointer param_text)
+    void qt_QImage_setText_void_QImage_string_string(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_key, Pointer param_text)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QImage& arg0 = getqtype<QImageType>(param_this);
@@ -660,17 +553,14 @@ namespace Mu
         arg0.setText(arg1, arg2);
     }
 
-    Pointer qt_QImage_size_QSize_QImage(Mu::Thread& NODE_THREAD,
-                                        Pointer param_this)
+    Pointer qt_QImage_size_QSize_QImage(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QImage& arg0 = getqtype<QImageType>(param_this);
         return makeqtype<QSizeType>(c, arg0.size(), "qt.QSize");
     }
 
-    void qt_QImage_swap_void_QImage_QImage(Mu::Thread& NODE_THREAD,
-                                           Pointer param_this,
-                                           Pointer param_other)
+    void qt_QImage_swap_void_QImage_QImage(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_other)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QImage& arg0 = getqtype<QImageType>(param_this);
@@ -678,9 +568,7 @@ namespace Mu
         arg0.swap(arg1);
     }
 
-    Pointer qt_QImage_text_string_QImage_string(Mu::Thread& NODE_THREAD,
-                                                Pointer param_this,
-                                                Pointer param_key)
+    Pointer qt_QImage_text_string_QImage_string(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_key)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QImage& arg0 = getqtype<QImageType>(param_this);
@@ -688,29 +576,24 @@ namespace Mu
         return makestring(c, arg0.text(arg1));
     }
 
-    Pointer qt_QImage_textKeys_stringBSB_ESB__QImage(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_this)
+    Pointer qt_QImage_textKeys_stringBSB_ESB__QImage(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QImage& arg0 = getqtype<QImageType>(param_this);
         return makestringlist(c, arg0.textKeys());
     }
 
-    Pointer qt_QImage_transformed_QImage_QImage_QTransform_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_matrix,
-        int param_mode)
+    Pointer qt_QImage_transformed_QImage_QImage_QTransform_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_matrix,
+                                                               int param_mode)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QImage& arg0 = getqtype<QImageType>(param_this);
         const QTransform arg1 = getqtype<QTransformType>(param_matrix);
         Qt::TransformationMode arg2 = (Qt::TransformationMode)(param_mode);
-        return makeqtype<QImageType>(c, arg0.transformed(arg1, arg2),
-                                     "qt.QImage");
+        return makeqtype<QImageType>(c, arg0.transformed(arg1, arg2), "qt.QImage");
     }
 
-    bool qt_QImage_valid_bool_QImage_QPoint(Mu::Thread& NODE_THREAD,
-                                            Pointer param_this,
-                                            Pointer param_pos)
+    bool qt_QImage_valid_bool_QImage_QPoint(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_pos)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QImage& arg0 = getqtype<QImageType>(param_this);
@@ -718,9 +601,7 @@ namespace Mu
         return arg0.valid(arg1);
     }
 
-    bool qt_QImage_valid_bool_QImage_int_int(Mu::Thread& NODE_THREAD,
-                                             Pointer param_this, int param_x,
-                                             int param_y)
+    bool qt_QImage_valid_bool_QImage_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_x, int param_y)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QImage& arg0 = getqtype<QImageType>(param_this);
@@ -736,9 +617,7 @@ namespace Mu
         return arg0.width();
     }
 
-    bool qt_QImage_operatorBang_EQ__bool_QImage_QImage(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this,
-                                                       Pointer param_image)
+    bool qt_QImage_operatorBang_EQ__bool_QImage_QImage(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_image)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QImage& arg0 = getqtype<QImageType>(param_this);
@@ -746,9 +625,7 @@ namespace Mu
         return arg0.operator!=(arg1);
     }
 
-    bool qt_QImage_operatorEQ_EQ__bool_QImage_QImage(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_this,
-                                                     Pointer param_image)
+    bool qt_QImage_operatorEQ_EQ__bool_QImage_QImage(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_image)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QImage& arg0 = getqtype<QImageType>(param_this);
@@ -756,448 +633,344 @@ namespace Mu
         return arg0.operator==(arg1);
     }
 
-    Pointer qt_QImage_trueMatrix_QTransform_QTransform_int_int(
-        Mu::Thread& NODE_THREAD, Pointer param_matrix, int param_width,
-        int param_height)
+    Pointer qt_QImage_trueMatrix_QTransform_QTransform_int_int(Mu::Thread& NODE_THREAD, Pointer param_matrix, int param_width,
+                                                               int param_height)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QTransform arg0 = getqtype<QTransformType>(param_matrix);
         int arg1 = (int)(param_width);
         int arg2 = (int)(param_height);
-        return makeqtype<QTransformType>(
-            c, QImage::trueMatrix(arg0, arg1, arg2), "qt.QTransform");
+        return makeqtype<QTransformType>(c, QImage::trueMatrix(arg0, arg1, arg2), "qt.QTransform");
     }
 
     static NODE_IMPLEMENTATION(_n_QImage0, Pointer)
     {
-        NODE_RETURN(qt_QImage_QImage_QImage_QImage(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QImage_QImage_QImage_QImage(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_QImage1, Pointer)
     {
-        NODE_RETURN(qt_QImage_QImage_QImage_QImage_QSize_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int)));
+        NODE_RETURN(
+            qt_QImage_QImage_QImage_QImage_QSize_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_QImage2, Pointer)
     {
-        NODE_RETURN(qt_QImage_QImage_QImage_QImage_int_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int), NODE_ARG(3, int)));
+        NODE_RETURN(qt_QImage_QImage_QImage_QImage_int_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int),
+                                                               NODE_ARG(3, int)));
     }
 
-    static NODE_IMPLEMENTATION(_n_allGray0, bool)
-    {
-        NODE_RETURN(qt_QImage_allGray_bool_QImage(NODE_THREAD,
-                                                  NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_allGray0, bool) { NODE_RETURN(qt_QImage_allGray_bool_QImage(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
     static NODE_IMPLEMENTATION(_n_bitPlaneCount0, int)
     {
-        NODE_RETURN(qt_QImage_bitPlaneCount_int_QImage(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QImage_bitPlaneCount_int_QImage(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_cacheKey0, int64)
     {
-        NODE_RETURN(qt_QImage_cacheKey_int64_QImage(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QImage_cacheKey_int64_QImage(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_color0, int)
     {
-        NODE_RETURN(qt_QImage_color_int_QImage_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QImage_color_int_QImage_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_colorCount0, int)
     {
-        NODE_RETURN(qt_QImage_colorCount_int_QImage(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QImage_colorCount_int_QImage(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_convertTo0, void)
     {
-        qt_QImage_convertTo_void_QImage_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int));
+        qt_QImage_convertTo_void_QImage_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_convertToFormat0, Pointer)
     {
-        NODE_RETURN(qt_QImage_convertToFormat_QImage_QImage_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int)));
+        NODE_RETURN(
+            qt_QImage_convertToFormat_QImage_QImage_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_convertedTo0, Pointer)
     {
-        NODE_RETURN(qt_QImage_convertedTo_QImage_QImage_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int)));
+        NODE_RETURN(
+            qt_QImage_convertedTo_QImage_QImage_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_copy0, Pointer)
     {
-        NODE_RETURN(qt_QImage_copy_QImage_QImage_QRect(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QImage_copy_QImage_QImage_QRect(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_copy1, Pointer)
     {
-        NODE_RETURN(qt_QImage_copy_QImage_QImage_int_int_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int), NODE_ARG(3, int), NODE_ARG(4, int)));
+        NODE_RETURN(qt_QImage_copy_QImage_QImage_int_int_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                 NODE_ARG(2, int), NODE_ARG(3, int), NODE_ARG(4, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_createAlphaMask0, Pointer)
     {
-        NODE_RETURN(qt_QImage_createAlphaMask_QImage_QImage_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QImage_createAlphaMask_QImage_QImage_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_createHeuristicMask0, Pointer)
     {
-        NODE_RETURN(qt_QImage_createHeuristicMask_QImage_QImage_bool(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool)));
+        NODE_RETURN(qt_QImage_createHeuristicMask_QImage_QImage_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool)));
     }
 
     static NODE_IMPLEMENTATION(_n_createMaskFromColor0, Pointer)
     {
-        NODE_RETURN(qt_QImage_createMaskFromColor_QImage_QImage_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int)));
+        NODE_RETURN(qt_QImage_createMaskFromColor_QImage_QImage_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                        NODE_ARG(2, int)));
     }
 
-    static NODE_IMPLEMENTATION(_n_depth0, int)
-    {
-        NODE_RETURN(qt_QImage_depth_int_QImage(NODE_THREAD,
-                                               NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_depth0, int) { NODE_RETURN(qt_QImage_depth_int_QImage(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
     static NODE_IMPLEMENTATION(_n_devicePixelRatio0, double)
     {
-        NODE_RETURN(qt_QImage_devicePixelRatio_double_QImage(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QImage_devicePixelRatio_double_QImage(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_dotsPerMeterX0, int)
     {
-        NODE_RETURN(qt_QImage_dotsPerMeterX_int_QImage(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QImage_dotsPerMeterX_int_QImage(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_dotsPerMeterY0, int)
     {
-        NODE_RETURN(qt_QImage_dotsPerMeterY_int_QImage(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QImage_dotsPerMeterY_int_QImage(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_fill0, void)
     {
-        qt_QImage_fill_void_QImage_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                                       NODE_ARG(1, int));
+        qt_QImage_fill_void_QImage_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_fill1, void)
     {
-        qt_QImage_fill_void_QImage_QColor(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QImage_fill_void_QImage_QColor(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
-    static NODE_IMPLEMENTATION(_n_format0, int)
-    {
-        NODE_RETURN(qt_QImage_format_int_QImage(NODE_THREAD,
-                                                NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_format0, int) { NODE_RETURN(qt_QImage_format_int_QImage(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
     static NODE_IMPLEMENTATION(_n_hasAlphaChannel0, bool)
     {
-        NODE_RETURN(qt_QImage_hasAlphaChannel_bool_QImage(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QImage_hasAlphaChannel_bool_QImage(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
-    static NODE_IMPLEMENTATION(_n_height0, int)
-    {
-        NODE_RETURN(qt_QImage_height_int_QImage(NODE_THREAD,
-                                                NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_height0, int) { NODE_RETURN(qt_QImage_height_int_QImage(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
     static NODE_IMPLEMENTATION(_n_invertPixels0, void)
     {
-        qt_QImage_invertPixels_void_QImage_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QImage_invertPixels_void_QImage_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_isGrayscale0, bool)
     {
-        NODE_RETURN(qt_QImage_isGrayscale_bool_QImage(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QImage_isGrayscale_bool_QImage(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
-    static NODE_IMPLEMENTATION(_n_isNull0, bool)
-    {
-        NODE_RETURN(qt_QImage_isNull_bool_QImage(NODE_THREAD,
-                                                 NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_isNull0, bool) { NODE_RETURN(qt_QImage_isNull_bool_QImage(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
     static NODE_IMPLEMENTATION(_n_mirror0, void)
     {
-        qt_QImage_mirror_void_QImage_bool_bool(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool),
-            NODE_ARG(2, bool));
+        qt_QImage_mirror_void_QImage_bool_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool), NODE_ARG(2, bool));
     }
 
     static NODE_IMPLEMENTATION(_n_mirrored0, Pointer)
     {
-        NODE_RETURN(qt_QImage_mirrored_QImage_QImage_bool_bool(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool),
-            NODE_ARG(2, bool)));
+        NODE_RETURN(
+            qt_QImage_mirrored_QImage_QImage_bool_bool(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, bool), NODE_ARG(2, bool)));
     }
 
     static NODE_IMPLEMENTATION(_n_offset0, Pointer)
     {
-        NODE_RETURN(qt_QImage_offset_QPoint_QImage(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QImage_offset_QPoint_QImage(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_pixel0, int)
     {
-        NODE_RETURN(qt_QImage_pixel_int_QImage_QPoint(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QImage_pixel_int_QImage_QPoint(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_pixel1, int)
     {
-        NODE_RETURN(qt_QImage_pixel_int_QImage_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int)));
+        NODE_RETURN(qt_QImage_pixel_int_QImage_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_pixelColor0, Pointer)
     {
-        NODE_RETURN(qt_QImage_pixelColor_QColor_QImage_QPoint(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QImage_pixelColor_QColor_QImage_QPoint(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_pixelColor1, Pointer)
     {
-        NODE_RETURN(qt_QImage_pixelColor_QColor_QImage_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int)));
+        NODE_RETURN(
+            qt_QImage_pixelColor_QColor_QImage_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_pixelIndex0, int)
     {
-        NODE_RETURN(qt_QImage_pixelIndex_int_QImage_QPoint(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QImage_pixelIndex_int_QImage_QPoint(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_pixelIndex1, int)
     {
-        NODE_RETURN(qt_QImage_pixelIndex_int_QImage_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int)));
+        NODE_RETURN(qt_QImage_pixelIndex_int_QImage_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int)));
     }
 
-    static NODE_IMPLEMENTATION(_n_rect0, Pointer)
-    {
-        NODE_RETURN(qt_QImage_rect_QRect_QImage(NODE_THREAD,
-                                                NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_rect0, Pointer) { NODE_RETURN(qt_QImage_rect_QRect_QImage(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
     static NODE_IMPLEMENTATION(_n_reinterpretAsFormat0, bool)
     {
-        NODE_RETURN(qt_QImage_reinterpretAsFormat_bool_QImage_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QImage_reinterpretAsFormat_bool_QImage_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
-    static NODE_IMPLEMENTATION(_n_rgbSwap0, void)
-    {
-        qt_QImage_rgbSwap_void_QImage(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
-    }
+    static NODE_IMPLEMENTATION(_n_rgbSwap0, void) { qt_QImage_rgbSwap_void_QImage(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)); }
 
     static NODE_IMPLEMENTATION(_n_rgbSwapped0, Pointer)
     {
-        NODE_RETURN(qt_QImage_rgbSwapped_QImage_QImage(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QImage_rgbSwapped_QImage_QImage(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_scaled0, Pointer)
     {
-        NODE_RETURN(qt_QImage_scaled_QImage_QImage_QSize_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int), NODE_ARG(3, int)));
+        NODE_RETURN(qt_QImage_scaled_QImage_QImage_QSize_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                 NODE_ARG(2, int), NODE_ARG(3, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_scaled1, Pointer)
     {
-        NODE_RETURN(qt_QImage_scaled_QImage_QImage_int_int_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int), NODE_ARG(3, int), NODE_ARG(4, int)));
+        NODE_RETURN(qt_QImage_scaled_QImage_QImage_int_int_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
+                                                                   NODE_ARG(2, int), NODE_ARG(3, int), NODE_ARG(4, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_scaledToHeight0, Pointer)
     {
-        NODE_RETURN(qt_QImage_scaledToHeight_QImage_QImage_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int)));
+        NODE_RETURN(
+            qt_QImage_scaledToHeight_QImage_QImage_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_scaledToWidth0, Pointer)
     {
-        NODE_RETURN(qt_QImage_scaledToWidth_QImage_QImage_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int)));
+        NODE_RETURN(
+            qt_QImage_scaledToWidth_QImage_QImage_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_setAlphaChannel0, void)
     {
-        qt_QImage_setAlphaChannel_void_QImage_QImage(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QImage_setAlphaChannel_void_QImage_QImage(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setColor0, void)
     {
-        qt_QImage_setColor_void_QImage_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int));
+        qt_QImage_setColor_void_QImage_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setColorCount0, void)
     {
-        qt_QImage_setColorCount_void_QImage_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QImage_setColorCount_void_QImage_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setDevicePixelRatio0, void)
     {
-        qt_QImage_setDevicePixelRatio_void_QImage_double(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, double));
+        qt_QImage_setDevicePixelRatio_void_QImage_double(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, double));
     }
 
     static NODE_IMPLEMENTATION(_n_setDotsPerMeterX0, void)
     {
-        qt_QImage_setDotsPerMeterX_void_QImage_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QImage_setDotsPerMeterX_void_QImage_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setDotsPerMeterY0, void)
     {
-        qt_QImage_setDotsPerMeterY_void_QImage_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QImage_setDotsPerMeterY_void_QImage_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setOffset0, void)
     {
-        qt_QImage_setOffset_void_QImage_QPoint(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QImage_setOffset_void_QImage_QPoint(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setPixel0, void)
     {
-        qt_QImage_setPixel_void_QImage_QPoint_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int));
+        qt_QImage_setPixel_void_QImage_QPoint_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setPixel1, void)
     {
-        qt_QImage_setPixel_void_QImage_int_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int), NODE_ARG(3, int));
+        qt_QImage_setPixel_void_QImage_int_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int),
+                                                   NODE_ARG(3, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setPixelColor0, void)
     {
-        qt_QImage_setPixelColor_void_QImage_QPoint_QColor(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer));
+        qt_QImage_setPixelColor_void_QImage_QPoint_QColor(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                          NODE_ARG(2, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setPixelColor1, void)
     {
-        qt_QImage_setPixelColor_void_QImage_int_int_QColor(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int), NODE_ARG(3, Pointer));
+        qt_QImage_setPixelColor_void_QImage_int_int_QColor(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int),
+                                                           NODE_ARG(3, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setText0, void)
     {
-        qt_QImage_setText_void_QImage_string_string(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer));
+        qt_QImage_setText_void_QImage_string_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, Pointer));
     }
 
-    static NODE_IMPLEMENTATION(_n_size0, Pointer)
-    {
-        NODE_RETURN(qt_QImage_size_QSize_QImage(NODE_THREAD,
-                                                NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_size0, Pointer) { NODE_RETURN(qt_QImage_size_QSize_QImage(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
     static NODE_IMPLEMENTATION(_n_swap0, void)
     {
-        qt_QImage_swap_void_QImage_QImage(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QImage_swap_void_QImage_QImage(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_text0, Pointer)
     {
-        NODE_RETURN(qt_QImage_text_string_QImage_string(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QImage_text_string_QImage_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_textKeys0, Pointer)
     {
-        NODE_RETURN(qt_QImage_textKeys_stringBSB_ESB__QImage(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QImage_textKeys_stringBSB_ESB__QImage(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_transformed0, Pointer)
     {
-        NODE_RETURN(qt_QImage_transformed_QImage_QImage_QTransform_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int)));
+        NODE_RETURN(qt_QImage_transformed_QImage_QImage_QTransform_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                       NODE_ARG(2, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_valid0, bool)
     {
-        NODE_RETURN(qt_QImage_valid_bool_QImage_QPoint(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QImage_valid_bool_QImage_QPoint(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_valid1, bool)
     {
-        NODE_RETURN(qt_QImage_valid_bool_QImage_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int)));
+        NODE_RETURN(qt_QImage_valid_bool_QImage_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int)));
     }
 
-    static NODE_IMPLEMENTATION(_n_width0, int)
-    {
-        NODE_RETURN(qt_QImage_width_int_QImage(NODE_THREAD,
-                                               NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_width0, int) { NODE_RETURN(qt_QImage_width_int_QImage(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
     static NODE_IMPLEMENTATION(_n_operatorBang_EQ_0, bool)
     {
-        NODE_RETURN(qt_QImage_operatorBang_EQ__bool_QImage_QImage(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QImage_operatorBang_EQ__bool_QImage_QImage(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorEQ_EQ_0, bool)
     {
-        NODE_RETURN(qt_QImage_operatorEQ_EQ__bool_QImage_QImage(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QImage_operatorEQ_EQ__bool_QImage_QImage(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_trueMatrix0, Pointer)
     {
-        NODE_RETURN(qt_QImage_trueMatrix_QTransform_QTransform_int_int(
-            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int)));
+        NODE_RETURN(
+            qt_QImage_trueMatrix_QTransform_QTransform_int_int(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int)));
     }
 
     //
@@ -1206,25 +979,19 @@ namespace Mu
     // SPDX-License-Identifier: Apache-2.0
     //
 
-    static Pointer QImage_QImage_QImage_QImage_string_string(
-        Thread& NODE_THREAD, Pointer param_this, Pointer param_fileName,
-        Pointer param_format)
+    static Pointer QImage_QImage_QImage_QImage_string_string(Thread& NODE_THREAD, Pointer param_this, Pointer param_fileName,
+                                                             Pointer param_format)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QString arg1 = qstring(param_fileName);
-        const char* arg2 =
-            param_format
-                ? reinterpret_cast<StringType::String*>(param_format)->c_str()
-                : 0;
+        const char* arg2 = param_format ? reinterpret_cast<StringType::String*>(param_format)->c_str() : 0;
         setqtype<QImageType>(param_this, QImage(arg1, arg2));
         return param_this;
     }
 
     static NODE_IMPLEMENTATION(_n_QImage8, Pointer)
     {
-        return QImage_QImage_QImage_QImage_string_string(
-            NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer));
+        return QImage_QImage_QImage_QImage_string_string(NODE_THREAD, NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, Pointer));
     }
 
     void QImageType::load()
@@ -1244,125 +1011,63 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(
-            new Function(c, "__allocate", __allocate, None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", __allocate, None, Return, ftn, End),
 
-            EndArguments);
-
-        addSymbols(new Alias(c, "Format", "int"),
-                   new SymbolicConstant(c, "Format_Invalid", "int",
-                                        Value(int(QImage::Format_Invalid))),
-                   new SymbolicConstant(c, "Format_Mono", "int",
-                                        Value(int(QImage::Format_Mono))),
-                   new SymbolicConstant(c, "Format_MonoLSB", "int",
-                                        Value(int(QImage::Format_MonoLSB))),
-                   new SymbolicConstant(c, "Format_Indexed8", "int",
-                                        Value(int(QImage::Format_Indexed8))),
-                   new SymbolicConstant(c, "Format_RGB32", "int",
-                                        Value(int(QImage::Format_RGB32))),
-                   new SymbolicConstant(c, "Format_ARGB32", "int",
-                                        Value(int(QImage::Format_ARGB32))),
-                   new SymbolicConstant(
-                       c, "Format_ARGB32_Premultiplied", "int",
-                       Value(int(QImage::Format_ARGB32_Premultiplied))),
-                   new SymbolicConstant(c, "Format_RGB16", "int",
-                                        Value(int(QImage::Format_RGB16))),
-                   new SymbolicConstant(
-                       c, "Format_ARGB8565_Premultiplied", "int",
-                       Value(int(QImage::Format_ARGB8565_Premultiplied))),
-                   new SymbolicConstant(c, "Format_RGB666", "int",
-                                        Value(int(QImage::Format_RGB666))),
-                   new SymbolicConstant(
-                       c, "Format_ARGB6666_Premultiplied", "int",
-                       Value(int(QImage::Format_ARGB6666_Premultiplied))),
-                   new SymbolicConstant(c, "Format_RGB555", "int",
-                                        Value(int(QImage::Format_RGB555))),
-                   new SymbolicConstant(
-                       c, "Format_ARGB8555_Premultiplied", "int",
-                       Value(int(QImage::Format_ARGB8555_Premultiplied))),
-                   new SymbolicConstant(c, "Format_RGB888", "int",
-                                        Value(int(QImage::Format_RGB888))),
-                   new SymbolicConstant(c, "Format_RGB444", "int",
-                                        Value(int(QImage::Format_RGB444))),
-                   new SymbolicConstant(
-                       c, "Format_ARGB4444_Premultiplied", "int",
-                       Value(int(QImage::Format_ARGB4444_Premultiplied))),
-                   new SymbolicConstant(c, "Format_RGBX8888", "int",
-                                        Value(int(QImage::Format_RGBX8888))),
-                   new SymbolicConstant(c, "Format_RGBA8888", "int",
-                                        Value(int(QImage::Format_RGBA8888))),
-                   new SymbolicConstant(
-                       c, "Format_RGBA8888_Premultiplied", "int",
-                       Value(int(QImage::Format_RGBA8888_Premultiplied))),
-                   new SymbolicConstant(c, "Format_BGR30", "int",
-                                        Value(int(QImage::Format_BGR30))),
-                   new SymbolicConstant(
-                       c, "Format_A2BGR30_Premultiplied", "int",
-                       Value(int(QImage::Format_A2BGR30_Premultiplied))),
-                   new SymbolicConstant(c, "Format_RGB30", "int",
-                                        Value(int(QImage::Format_RGB30))),
-                   new SymbolicConstant(
-                       c, "Format_A2RGB30_Premultiplied", "int",
-                       Value(int(QImage::Format_A2RGB30_Premultiplied))),
-                   new SymbolicConstant(c, "Format_Alpha8", "int",
-                                        Value(int(QImage::Format_Alpha8))),
-                   new SymbolicConstant(c, "Format_Grayscale8", "int",
-                                        Value(int(QImage::Format_Grayscale8))),
-                   new SymbolicConstant(c, "Format_Grayscale16", "int",
-                                        Value(int(QImage::Format_Grayscale16))),
-                   new SymbolicConstant(c, "Format_RGBX64", "int",
-                                        Value(int(QImage::Format_RGBX64))),
-                   new SymbolicConstant(c, "Format_RGBA64", "int",
-                                        Value(int(QImage::Format_RGBA64))),
-                   new SymbolicConstant(
-                       c, "Format_RGBA64_Premultiplied", "int",
-                       Value(int(QImage::Format_RGBA64_Premultiplied))),
-                   new SymbolicConstant(c, "Format_BGR888", "int",
-                                        Value(int(QImage::Format_BGR888))),
-                   new SymbolicConstant(c, "Format_RGBX16FPx4", "int",
-                                        Value(int(QImage::Format_RGBX16FPx4))),
-                   new SymbolicConstant(c, "Format_RGBA16FPx4", "int",
-                                        Value(int(QImage::Format_RGBA16FPx4))),
-                   new SymbolicConstant(
-                       c, "Format_RGBA16FPx4_Premultiplied", "int",
-                       Value(int(QImage::Format_RGBA16FPx4_Premultiplied))),
-                   new SymbolicConstant(c, "Format_RGBX32FPx4", "int",
-                                        Value(int(QImage::Format_RGBX32FPx4))),
-                   new SymbolicConstant(c, "Format_RGBA32FPx4", "int",
-                                        Value(int(QImage::Format_RGBA32FPx4))),
-                   new SymbolicConstant(
-                       c, "Format_RGBA32FPx4_Premultiplied", "int",
-                       Value(int(QImage::Format_RGBA32FPx4_Premultiplied))),
-                   new Alias(c, "InvertMode", "int"),
-                   new SymbolicConstant(c, "InvertRgb", "int",
-                                        Value(int(QImage::InvertRgb))),
-                   new SymbolicConstant(c, "InvertRgba", "int",
-                                        Value(int(QImage::InvertRgba))),
                    EndArguments);
+
+        addSymbols(new Alias(c, "Format", "int"), new SymbolicConstant(c, "Format_Invalid", "int", Value(int(QImage::Format_Invalid))),
+                   new SymbolicConstant(c, "Format_Mono", "int", Value(int(QImage::Format_Mono))),
+                   new SymbolicConstant(c, "Format_MonoLSB", "int", Value(int(QImage::Format_MonoLSB))),
+                   new SymbolicConstant(c, "Format_Indexed8", "int", Value(int(QImage::Format_Indexed8))),
+                   new SymbolicConstant(c, "Format_RGB32", "int", Value(int(QImage::Format_RGB32))),
+                   new SymbolicConstant(c, "Format_ARGB32", "int", Value(int(QImage::Format_ARGB32))),
+                   new SymbolicConstant(c, "Format_ARGB32_Premultiplied", "int", Value(int(QImage::Format_ARGB32_Premultiplied))),
+                   new SymbolicConstant(c, "Format_RGB16", "int", Value(int(QImage::Format_RGB16))),
+                   new SymbolicConstant(c, "Format_ARGB8565_Premultiplied", "int", Value(int(QImage::Format_ARGB8565_Premultiplied))),
+                   new SymbolicConstant(c, "Format_RGB666", "int", Value(int(QImage::Format_RGB666))),
+                   new SymbolicConstant(c, "Format_ARGB6666_Premultiplied", "int", Value(int(QImage::Format_ARGB6666_Premultiplied))),
+                   new SymbolicConstant(c, "Format_RGB555", "int", Value(int(QImage::Format_RGB555))),
+                   new SymbolicConstant(c, "Format_ARGB8555_Premultiplied", "int", Value(int(QImage::Format_ARGB8555_Premultiplied))),
+                   new SymbolicConstant(c, "Format_RGB888", "int", Value(int(QImage::Format_RGB888))),
+                   new SymbolicConstant(c, "Format_RGB444", "int", Value(int(QImage::Format_RGB444))),
+                   new SymbolicConstant(c, "Format_ARGB4444_Premultiplied", "int", Value(int(QImage::Format_ARGB4444_Premultiplied))),
+                   new SymbolicConstant(c, "Format_RGBX8888", "int", Value(int(QImage::Format_RGBX8888))),
+                   new SymbolicConstant(c, "Format_RGBA8888", "int", Value(int(QImage::Format_RGBA8888))),
+                   new SymbolicConstant(c, "Format_RGBA8888_Premultiplied", "int", Value(int(QImage::Format_RGBA8888_Premultiplied))),
+                   new SymbolicConstant(c, "Format_BGR30", "int", Value(int(QImage::Format_BGR30))),
+                   new SymbolicConstant(c, "Format_A2BGR30_Premultiplied", "int", Value(int(QImage::Format_A2BGR30_Premultiplied))),
+                   new SymbolicConstant(c, "Format_RGB30", "int", Value(int(QImage::Format_RGB30))),
+                   new SymbolicConstant(c, "Format_A2RGB30_Premultiplied", "int", Value(int(QImage::Format_A2RGB30_Premultiplied))),
+                   new SymbolicConstant(c, "Format_Alpha8", "int", Value(int(QImage::Format_Alpha8))),
+                   new SymbolicConstant(c, "Format_Grayscale8", "int", Value(int(QImage::Format_Grayscale8))),
+                   new SymbolicConstant(c, "Format_Grayscale16", "int", Value(int(QImage::Format_Grayscale16))),
+                   new SymbolicConstant(c, "Format_RGBX64", "int", Value(int(QImage::Format_RGBX64))),
+                   new SymbolicConstant(c, "Format_RGBA64", "int", Value(int(QImage::Format_RGBA64))),
+                   new SymbolicConstant(c, "Format_RGBA64_Premultiplied", "int", Value(int(QImage::Format_RGBA64_Premultiplied))),
+                   new SymbolicConstant(c, "Format_BGR888", "int", Value(int(QImage::Format_BGR888))),
+                   new SymbolicConstant(c, "Format_RGBX16FPx4", "int", Value(int(QImage::Format_RGBX16FPx4))),
+                   new SymbolicConstant(c, "Format_RGBA16FPx4", "int", Value(int(QImage::Format_RGBA16FPx4))),
+                   new SymbolicConstant(c, "Format_RGBA16FPx4_Premultiplied", "int", Value(int(QImage::Format_RGBA16FPx4_Premultiplied))),
+                   new SymbolicConstant(c, "Format_RGBX32FPx4", "int", Value(int(QImage::Format_RGBX32FPx4))),
+                   new SymbolicConstant(c, "Format_RGBA32FPx4", "int", Value(int(QImage::Format_RGBA32FPx4))),
+                   new SymbolicConstant(c, "Format_RGBA32FPx4_Premultiplied", "int", Value(int(QImage::Format_RGBA32FPx4_Premultiplied))),
+                   new Alias(c, "InvertMode", "int"), new SymbolicConstant(c, "InvertRgb", "int", Value(int(QImage::InvertRgb))),
+                   new SymbolicConstant(c, "InvertRgba", "int", Value(int(QImage::InvertRgba))), EndArguments);
 
         addSymbols(
             // enums
             // member functions
-            new Function(c, "QImage", _n_QImage0, None, Compiled,
-                         qt_QImage_QImage_QImage_QImage, Return, "qt.QImage",
-                         Parameters, new Param(c, "this", "qt.QImage"), End),
-            new Function(c, "QImage", _n_QImage1, None, Compiled,
-                         qt_QImage_QImage_QImage_QImage_QSize_int, Return,
-                         "qt.QImage", Parameters,
-                         new Param(c, "this", "qt.QImage"),
-                         new Param(c, "size", "qt.QSize"),
+            new Function(c, "QImage", _n_QImage0, None, Compiled, qt_QImage_QImage_QImage_QImage, Return, "qt.QImage", Parameters,
+                         new Param(c, "this", "qt.QImage"), End),
+            new Function(c, "QImage", _n_QImage1, None, Compiled, qt_QImage_QImage_QImage_QImage_QSize_int, Return, "qt.QImage", Parameters,
+                         new Param(c, "this", "qt.QImage"), new Param(c, "size", "qt.QSize"), new Param(c, "format", "int"), End),
+            new Function(c, "QImage", _n_QImage2, None, Compiled, qt_QImage_QImage_QImage_QImage_int_int_int, Return, "qt.QImage",
+                         Parameters, new Param(c, "this", "qt.QImage"), new Param(c, "width", "int"), new Param(c, "height", "int"),
                          new Param(c, "format", "int"), End),
-            new Function(
-                c, "QImage", _n_QImage2, None, Compiled,
-                qt_QImage_QImage_QImage_QImage_int_int_int, Return, "qt.QImage",
-                Parameters, new Param(c, "this", "qt.QImage"),
-                new Param(c, "width", "int"), new Param(c, "height", "int"),
-                new Param(c, "format", "int"), End),
             // MISSING: QImage (QImage; QImage this, "uchar *" data, int width,
             // int height, flags QImage::Format format, "QImageCleanupFunction"
             // cleanupFunction, "void *" cleanupInfo) MISSING: QImage (QImage;
@@ -1379,27 +1084,21 @@ namespace Mu
             // MISSING: QImage (QImage; QImage this, string fileName, "const
             // char *" format) MISSING: QImage (QImage; QImage this, QImage
             // image) MISSING: QImage (QImage; QImage this, "QImage & &" other)
-            new Function(c, "allGray", _n_allGray0, None, Compiled,
-                         qt_QImage_allGray_bool_QImage, Return, "bool",
-                         Parameters, new Param(c, "this", "qt.QImage"), End),
+            new Function(c, "allGray", _n_allGray0, None, Compiled, qt_QImage_allGray_bool_QImage, Return, "bool", Parameters,
+                         new Param(c, "this", "qt.QImage"), End),
             // MISSING: applyColorTransform (void; QImage this, "const
             // QColorTransform &" transform)
-            new Function(c, "bitPlaneCount", _n_bitPlaneCount0, None, Compiled,
-                         qt_QImage_bitPlaneCount_int_QImage, Return, "int",
+            new Function(c, "bitPlaneCount", _n_bitPlaneCount0, None, Compiled, qt_QImage_bitPlaneCount_int_QImage, Return, "int",
                          Parameters, new Param(c, "this", "qt.QImage"), End),
             // MISSING: bits ("uchar *"; QImage this)
             // MISSING: bits ("const uchar *"; QImage this)
             // MISSING: bytesPerLine ("qsizetype"; QImage this)
-            new Function(c, "cacheKey", _n_cacheKey0, None, Compiled,
-                         qt_QImage_cacheKey_int64_QImage, Return, "int64",
-                         Parameters, new Param(c, "this", "qt.QImage"), End),
-            new Function(c, "color", _n_color0, None, Compiled,
-                         qt_QImage_color_int_QImage_int, Return, "int",
-                         Parameters, new Param(c, "this", "qt.QImage"),
-                         new Param(c, "i", "int"), End),
-            new Function(c, "colorCount", _n_colorCount0, None, Compiled,
-                         qt_QImage_colorCount_int_QImage, Return, "int",
-                         Parameters, new Param(c, "this", "qt.QImage"), End),
+            new Function(c, "cacheKey", _n_cacheKey0, None, Compiled, qt_QImage_cacheKey_int64_QImage, Return, "int64", Parameters,
+                         new Param(c, "this", "qt.QImage"), End),
+            new Function(c, "color", _n_color0, None, Compiled, qt_QImage_color_int_QImage_int, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QImage"), new Param(c, "i", "int"), End),
+            new Function(c, "colorCount", _n_colorCount0, None, Compiled, qt_QImage_colorCount_int_QImage, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QImage"), End),
             // MISSING: colorSpace ("QColorSpace"; QImage this)
             // MISSING: colorTable ("QList<QRgb>"; QImage this)
             // MISSING: colorTransformed (QImage; QImage this, "const
@@ -1407,109 +1106,67 @@ namespace Mu
             // QImage this, "const QColorTransform &" transform) MISSING:
             // constBits ("const uchar *"; QImage this) MISSING: constScanLine
             // ("const uchar *"; QImage this, int i)
-            new Function(
-                c, "convertTo", _n_convertTo0, None, Compiled,
-                qt_QImage_convertTo_void_QImage_int_int, Return, "void",
-                Parameters, new Param(c, "this", "qt.QImage"),
-                new Param(c, "format", "int"),
-                new Param(c, "flags", "int", Value((int)Qt::AutoColor)), End),
+            new Function(c, "convertTo", _n_convertTo0, None, Compiled, qt_QImage_convertTo_void_QImage_int_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QImage"), new Param(c, "format", "int"),
+                         new Param(c, "flags", "int", Value((int)Qt::AutoColor)), End),
             // MISSING: convertToColorSpace (void; QImage this, "const
             // QColorSpace &" colorSpace)
-            new Function(
-                c, "convertToFormat", _n_convertToFormat0, None, Compiled,
-                qt_QImage_convertToFormat_QImage_QImage_int_int, Return,
-                "qt.QImage", Parameters, new Param(c, "this", "qt.QImage"),
-                new Param(c, "format", "int"),
-                new Param(c, "flags", "int", Value((int)Qt::AutoColor)), End),
+            new Function(c, "convertToFormat", _n_convertToFormat0, None, Compiled, qt_QImage_convertToFormat_QImage_QImage_int_int, Return,
+                         "qt.QImage", Parameters, new Param(c, "this", "qt.QImage"), new Param(c, "format", "int"),
+                         new Param(c, "flags", "int", Value((int)Qt::AutoColor)), End),
             // MISSING: convertToFormat (QImage; QImage this, flags
             // QImage::Format format, flags Qt::ImageConversionFlags flags)
             // MISSING: convertToFormat (QImage; QImage this, flags
             // QImage::Format format, "const QList<QRgb> &" colorTable, flags
             // Qt::ImageConversionFlags flags)
-            new Function(
-                c, "convertedTo", _n_convertedTo0, None, Compiled,
-                qt_QImage_convertedTo_QImage_QImage_int_int, Return,
-                "qt.QImage", Parameters, new Param(c, "this", "qt.QImage"),
-                new Param(c, "format", "int"),
-                new Param(c, "flags", "int", Value((int)Qt::AutoColor)), End),
+            new Function(c, "convertedTo", _n_convertedTo0, None, Compiled, qt_QImage_convertedTo_QImage_QImage_int_int, Return,
+                         "qt.QImage", Parameters, new Param(c, "this", "qt.QImage"), new Param(c, "format", "int"),
+                         new Param(c, "flags", "int", Value((int)Qt::AutoColor)), End),
             // MISSING: convertedTo (QImage; QImage this, flags QImage::Format
             // format, flags Qt::ImageConversionFlags flags) MISSING:
             // convertedToColorSpace (QImage; QImage this, "const QColorSpace &"
             // colorSpace)
-            new Function(c, "copy", _n_copy0, None, Compiled,
-                         qt_QImage_copy_QImage_QImage_QRect, Return,
-                         "qt.QImage", Parameters,
-                         new Param(c, "this", "qt.QImage"),
-                         new Param(c, "rectangle", "qt.QRect"), End),
-            new Function(c, "copy", _n_copy1, None, Compiled,
-                         qt_QImage_copy_QImage_QImage_int_int_int_int, Return,
-                         "qt.QImage", Parameters,
-                         new Param(c, "this", "qt.QImage"),
-                         new Param(c, "x", "int"), new Param(c, "y", "int"),
-                         new Param(c, "width", "int"),
-                         new Param(c, "height", "int"), End),
-            new Function(
-                c, "createAlphaMask", _n_createAlphaMask0, None, Compiled,
-                qt_QImage_createAlphaMask_QImage_QImage_int, Return,
-                "qt.QImage", Parameters, new Param(c, "this", "qt.QImage"),
-                new Param(c, "flags", "int", Value((int)Qt::AutoColor)), End),
-            new Function(c, "createHeuristicMask", _n_createHeuristicMask0,
-                         None, Compiled,
-                         qt_QImage_createHeuristicMask_QImage_QImage_bool,
-                         Return, "qt.QImage", Parameters,
-                         new Param(c, "this", "qt.QImage"),
-                         new Param(c, "clipTight", "bool"), End),
-            new Function(
-                c, "createMaskFromColor", _n_createMaskFromColor0, None,
-                Compiled, qt_QImage_createMaskFromColor_QImage_QImage_int_int,
-                Return, "qt.QImage", Parameters,
-                new Param(c, "this", "qt.QImage"), new Param(c, "color", "int"),
-                new Param(c, "mode", "int", Value((int)Qt::MaskInColor)), End),
-            new Function(c, "depth", _n_depth0, None, Compiled,
-                         qt_QImage_depth_int_QImage, Return, "int", Parameters,
+            new Function(c, "copy", _n_copy0, None, Compiled, qt_QImage_copy_QImage_QImage_QRect, Return, "qt.QImage", Parameters,
+                         new Param(c, "this", "qt.QImage"), new Param(c, "rectangle", "qt.QRect"), End),
+            new Function(c, "copy", _n_copy1, None, Compiled, qt_QImage_copy_QImage_QImage_int_int_int_int, Return, "qt.QImage", Parameters,
+                         new Param(c, "this", "qt.QImage"), new Param(c, "x", "int"), new Param(c, "y", "int"),
+                         new Param(c, "width", "int"), new Param(c, "height", "int"), End),
+            new Function(c, "createAlphaMask", _n_createAlphaMask0, None, Compiled, qt_QImage_createAlphaMask_QImage_QImage_int, Return,
+                         "qt.QImage", Parameters, new Param(c, "this", "qt.QImage"),
+                         new Param(c, "flags", "int", Value((int)Qt::AutoColor)), End),
+            new Function(c, "createHeuristicMask", _n_createHeuristicMask0, None, Compiled,
+                         qt_QImage_createHeuristicMask_QImage_QImage_bool, Return, "qt.QImage", Parameters,
+                         new Param(c, "this", "qt.QImage"), new Param(c, "clipTight", "bool"), End),
+            new Function(c, "createMaskFromColor", _n_createMaskFromColor0, None, Compiled,
+                         qt_QImage_createMaskFromColor_QImage_QImage_int_int, Return, "qt.QImage", Parameters,
+                         new Param(c, "this", "qt.QImage"), new Param(c, "color", "int"),
+                         new Param(c, "mode", "int", Value((int)Qt::MaskInColor)), End),
+            new Function(c, "depth", _n_depth0, None, Compiled, qt_QImage_depth_int_QImage, Return, "int", Parameters,
                          new Param(c, "this", "qt.QImage"), End),
             // MISSING: deviceIndependentSize ("QSizeF"; QImage this)
-            new Function(c, "devicePixelRatio", _n_devicePixelRatio0, None,
-                         Compiled, qt_QImage_devicePixelRatio_double_QImage,
-                         Return, "double", Parameters,
-                         new Param(c, "this", "qt.QImage"), End),
-            new Function(c, "dotsPerMeterX", _n_dotsPerMeterX0, None, Compiled,
-                         qt_QImage_dotsPerMeterX_int_QImage, Return, "int",
+            new Function(c, "devicePixelRatio", _n_devicePixelRatio0, None, Compiled, qt_QImage_devicePixelRatio_double_QImage, Return,
+                         "double", Parameters, new Param(c, "this", "qt.QImage"), End),
+            new Function(c, "dotsPerMeterX", _n_dotsPerMeterX0, None, Compiled, qt_QImage_dotsPerMeterX_int_QImage, Return, "int",
                          Parameters, new Param(c, "this", "qt.QImage"), End),
-            new Function(c, "dotsPerMeterY", _n_dotsPerMeterY0, None, Compiled,
-                         qt_QImage_dotsPerMeterY_int_QImage, Return, "int",
+            new Function(c, "dotsPerMeterY", _n_dotsPerMeterY0, None, Compiled, qt_QImage_dotsPerMeterY_int_QImage, Return, "int",
                          Parameters, new Param(c, "this", "qt.QImage"), End),
-            new Function(c, "fill", _n_fill0, None, Compiled,
-                         qt_QImage_fill_void_QImage_int, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QImage"),
-                         new Param(c, "pixelValue", "int"), End),
-            new Function(c, "fill", _n_fill1, None, Compiled,
-                         qt_QImage_fill_void_QImage_QColor, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QImage"),
-                         new Param(c, "color", "qt.QColor"), End),
+            new Function(c, "fill", _n_fill0, None, Compiled, qt_QImage_fill_void_QImage_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QImage"), new Param(c, "pixelValue", "int"), End),
+            new Function(c, "fill", _n_fill1, None, Compiled, qt_QImage_fill_void_QImage_QColor, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QImage"), new Param(c, "color", "qt.QColor"), End),
             // MISSING: fill (void; QImage this, flags Qt::GlobalColor color)
-            new Function(c, "format", _n_format0, None, Compiled,
-                         qt_QImage_format_int_QImage, Return, "int", Parameters,
+            new Function(c, "format", _n_format0, None, Compiled, qt_QImage_format_int_QImage, Return, "int", Parameters,
                          new Param(c, "this", "qt.QImage"), End),
-            new Function(c, "hasAlphaChannel", _n_hasAlphaChannel0, None,
-                         Compiled, qt_QImage_hasAlphaChannel_bool_QImage,
-                         Return, "bool", Parameters,
-                         new Param(c, "this", "qt.QImage"), End),
-            new Function(c, "height", _n_height0, None, Compiled,
-                         qt_QImage_height_int_QImage, Return, "int", Parameters,
-                         new Param(c, "this", "qt.QImage"), End),
-            new Function(
-                c, "invertPixels", _n_invertPixels0, None, Compiled,
-                qt_QImage_invertPixels_void_QImage_int, Return, "void",
-                Parameters, new Param(c, "this", "qt.QImage"),
-                new Param(c, "mode", "int", Value((int)QImage::InvertRgb)),
-                End),
-            new Function(c, "isGrayscale", _n_isGrayscale0, None, Compiled,
-                         qt_QImage_isGrayscale_bool_QImage, Return, "bool",
+            new Function(c, "hasAlphaChannel", _n_hasAlphaChannel0, None, Compiled, qt_QImage_hasAlphaChannel_bool_QImage, Return, "bool",
                          Parameters, new Param(c, "this", "qt.QImage"), End),
-            new Function(c, "isNull", _n_isNull0, None, Compiled,
-                         qt_QImage_isNull_bool_QImage, Return, "bool",
-                         Parameters, new Param(c, "this", "qt.QImage"), End),
+            new Function(c, "height", _n_height0, None, Compiled, qt_QImage_height_int_QImage, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QImage"), End),
+            new Function(c, "invertPixels", _n_invertPixels0, None, Compiled, qt_QImage_invertPixels_void_QImage_int, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QImage"), new Param(c, "mode", "int", Value((int)QImage::InvertRgb)), End),
+            new Function(c, "isGrayscale", _n_isGrayscale0, None, Compiled, qt_QImage_isGrayscale_bool_QImage, Return, "bool", Parameters,
+                         new Param(c, "this", "qt.QImage"), End),
+            new Function(c, "isNull", _n_isNull0, None, Compiled, qt_QImage_isNull_bool_QImage, Return, "bool", Parameters,
+                         new Param(c, "this", "qt.QImage"), End),
             // MISSING: load (bool; QImage this, string fileName, "const char *"
             // format) MISSING: load (bool; QImage this, QIODevice device,
             // "const char *" format) MISSING: loadFromData (bool; QImage this,
@@ -1517,206 +1174,108 @@ namespace Mu
             // loadFromData (bool; QImage this, "const uchar *" data, int len,
             // "const char *" format) MISSING: loadFromData (bool; QImage this,
             // QByteArray data, "const char *" format)
-            new Function(c, "mirror", _n_mirror0, None, Compiled,
-                         qt_QImage_mirror_void_QImage_bool_bool, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QImage"),
-                         new Param(c, "horizontal", "bool"),
-                         new Param(c, "vertical", "bool"), End),
-            new Function(c, "mirrored", _n_mirrored0, None, Compiled,
-                         qt_QImage_mirrored_QImage_QImage_bool_bool, Return,
-                         "qt.QImage", Parameters,
-                         new Param(c, "this", "qt.QImage"),
-                         new Param(c, "horizontal", "bool"),
+            new Function(c, "mirror", _n_mirror0, None, Compiled, qt_QImage_mirror_void_QImage_bool_bool, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QImage"), new Param(c, "horizontal", "bool"), new Param(c, "vertical", "bool"), End),
+            new Function(c, "mirrored", _n_mirrored0, None, Compiled, qt_QImage_mirrored_QImage_QImage_bool_bool, Return, "qt.QImage",
+                         Parameters, new Param(c, "this", "qt.QImage"), new Param(c, "horizontal", "bool"),
                          new Param(c, "vertical", "bool"), End),
             // MISSING: mirrored (QImage; QImage this, bool horizontal, bool
             // vertical)
-            new Function(c, "offset", _n_offset0, None, Compiled,
-                         qt_QImage_offset_QPoint_QImage, Return, "qt.QPoint",
-                         Parameters, new Param(c, "this", "qt.QImage"), End),
-            new Function(c, "pixel", _n_pixel0, None, Compiled,
-                         qt_QImage_pixel_int_QImage_QPoint, Return, "int",
-                         Parameters, new Param(c, "this", "qt.QImage"),
-                         new Param(c, "position", "qt.QPoint"), End),
-            new Function(c, "pixel", _n_pixel1, None, Compiled,
-                         qt_QImage_pixel_int_QImage_int_int, Return, "int",
-                         Parameters, new Param(c, "this", "qt.QImage"),
-                         new Param(c, "x", "int"), new Param(c, "y", "int"),
-                         End),
-            new Function(c, "pixelColor", _n_pixelColor0, None, Compiled,
-                         qt_QImage_pixelColor_QColor_QImage_QPoint, Return,
-                         "qt.QColor", Parameters,
-                         new Param(c, "this", "qt.QImage"),
-                         new Param(c, "position", "qt.QPoint"), End),
-            new Function(
-                c, "pixelColor", _n_pixelColor1, None, Compiled,
-                qt_QImage_pixelColor_QColor_QImage_int_int, Return, "qt.QColor",
-                Parameters, new Param(c, "this", "qt.QImage"),
-                new Param(c, "x", "int"), new Param(c, "y", "int"), End),
-            // MISSING: pixelFormat ("QPixelFormat"; QImage this)
-            new Function(c, "pixelIndex", _n_pixelIndex0, None, Compiled,
-                         qt_QImage_pixelIndex_int_QImage_QPoint, Return, "int",
-                         Parameters, new Param(c, "this", "qt.QImage"),
-                         new Param(c, "position", "qt.QPoint"), End),
-            new Function(c, "pixelIndex", _n_pixelIndex1, None, Compiled,
-                         qt_QImage_pixelIndex_int_QImage_int_int, Return, "int",
-                         Parameters, new Param(c, "this", "qt.QImage"),
-                         new Param(c, "x", "int"), new Param(c, "y", "int"),
-                         End),
-            new Function(c, "rect", _n_rect0, None, Compiled,
-                         qt_QImage_rect_QRect_QImage, Return, "qt.QRect",
-                         Parameters, new Param(c, "this", "qt.QImage"), End),
-            new Function(c, "reinterpretAsFormat", _n_reinterpretAsFormat0,
-                         None, Compiled,
-                         qt_QImage_reinterpretAsFormat_bool_QImage_int, Return,
-                         "bool", Parameters, new Param(c, "this", "qt.QImage"),
-                         new Param(c, "format", "int"), End),
-            new Function(c, "rgbSwap", _n_rgbSwap0, None, Compiled,
-                         qt_QImage_rgbSwap_void_QImage, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QImage"), End),
-            new Function(c, "rgbSwapped", _n_rgbSwapped0, None, Compiled,
-                         qt_QImage_rgbSwapped_QImage_QImage, Return,
-                         "qt.QImage", Parameters,
+            new Function(c, "offset", _n_offset0, None, Compiled, qt_QImage_offset_QPoint_QImage, Return, "qt.QPoint", Parameters,
                          new Param(c, "this", "qt.QImage"), End),
+            new Function(c, "pixel", _n_pixel0, None, Compiled, qt_QImage_pixel_int_QImage_QPoint, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QImage"), new Param(c, "position", "qt.QPoint"), End),
+            new Function(c, "pixel", _n_pixel1, None, Compiled, qt_QImage_pixel_int_QImage_int_int, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QImage"), new Param(c, "x", "int"), new Param(c, "y", "int"), End),
+            new Function(c, "pixelColor", _n_pixelColor0, None, Compiled, qt_QImage_pixelColor_QColor_QImage_QPoint, Return, "qt.QColor",
+                         Parameters, new Param(c, "this", "qt.QImage"), new Param(c, "position", "qt.QPoint"), End),
+            new Function(c, "pixelColor", _n_pixelColor1, None, Compiled, qt_QImage_pixelColor_QColor_QImage_int_int, Return, "qt.QColor",
+                         Parameters, new Param(c, "this", "qt.QImage"), new Param(c, "x", "int"), new Param(c, "y", "int"), End),
+            // MISSING: pixelFormat ("QPixelFormat"; QImage this)
+            new Function(c, "pixelIndex", _n_pixelIndex0, None, Compiled, qt_QImage_pixelIndex_int_QImage_QPoint, Return, "int", Parameters,
+                         new Param(c, "this", "qt.QImage"), new Param(c, "position", "qt.QPoint"), End),
+            new Function(c, "pixelIndex", _n_pixelIndex1, None, Compiled, qt_QImage_pixelIndex_int_QImage_int_int, Return, "int",
+                         Parameters, new Param(c, "this", "qt.QImage"), new Param(c, "x", "int"), new Param(c, "y", "int"), End),
+            new Function(c, "rect", _n_rect0, None, Compiled, qt_QImage_rect_QRect_QImage, Return, "qt.QRect", Parameters,
+                         new Param(c, "this", "qt.QImage"), End),
+            new Function(c, "reinterpretAsFormat", _n_reinterpretAsFormat0, None, Compiled, qt_QImage_reinterpretAsFormat_bool_QImage_int,
+                         Return, "bool", Parameters, new Param(c, "this", "qt.QImage"), new Param(c, "format", "int"), End),
+            new Function(c, "rgbSwap", _n_rgbSwap0, None, Compiled, qt_QImage_rgbSwap_void_QImage, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QImage"), End),
+            new Function(c, "rgbSwapped", _n_rgbSwapped0, None, Compiled, qt_QImage_rgbSwapped_QImage_QImage, Return, "qt.QImage",
+                         Parameters, new Param(c, "this", "qt.QImage"), End),
             // MISSING: rgbSwapped (QImage; QImage this)
             // MISSING: save (bool; QImage this, string fileName, "const char *"
             // format, int quality) MISSING: save (bool; QImage this, QIODevice
             // device, "const char *" format, int quality)
-            new Function(c, "scaled", _n_scaled0, None, Compiled,
-                         qt_QImage_scaled_QImage_QImage_QSize_int_int, Return,
-                         "qt.QImage", Parameters,
-                         new Param(c, "this", "qt.QImage"),
-                         new Param(c, "size", "qt.QSize"),
-                         new Param(c, "aspectRatioMode", "int",
-                                   Value((int)Qt::IgnoreAspectRatio)),
-                         new Param(c, "transformMode", "int",
-                                   Value((int)Qt::FastTransformation)),
-                         End),
-            new Function(
-                c, "scaled", _n_scaled1, None, Compiled,
-                qt_QImage_scaled_QImage_QImage_int_int_int_int, Return,
-                "qt.QImage", Parameters, new Param(c, "this", "qt.QImage"),
-                new Param(c, "width", "int"), new Param(c, "height", "int"),
-                new Param(c, "aspectRatioMode", "int",
-                          Value((int)Qt::IgnoreAspectRatio)),
-                new Param(c, "transformMode", "int",
-                          Value((int)Qt::FastTransformation)),
-                End),
-            new Function(
-                c, "scaledToHeight", _n_scaledToHeight0, None, Compiled,
-                qt_QImage_scaledToHeight_QImage_QImage_int_int, Return,
-                "qt.QImage", Parameters, new Param(c, "this", "qt.QImage"),
-                new Param(c, "height", "int"),
-                new Param(c, "mode", "int", Value((int)Qt::FastTransformation)),
-                End),
-            new Function(
-                c, "scaledToWidth", _n_scaledToWidth0, None, Compiled,
-                qt_QImage_scaledToWidth_QImage_QImage_int_int, Return,
-                "qt.QImage", Parameters, new Param(c, "this", "qt.QImage"),
-                new Param(c, "width", "int"),
-                new Param(c, "mode", "int", Value((int)Qt::FastTransformation)),
-                End),
+            new Function(c, "scaled", _n_scaled0, None, Compiled, qt_QImage_scaled_QImage_QImage_QSize_int_int, Return, "qt.QImage",
+                         Parameters, new Param(c, "this", "qt.QImage"), new Param(c, "size", "qt.QSize"),
+                         new Param(c, "aspectRatioMode", "int", Value((int)Qt::IgnoreAspectRatio)),
+                         new Param(c, "transformMode", "int", Value((int)Qt::FastTransformation)), End),
+            new Function(c, "scaled", _n_scaled1, None, Compiled, qt_QImage_scaled_QImage_QImage_int_int_int_int, Return, "qt.QImage",
+                         Parameters, new Param(c, "this", "qt.QImage"), new Param(c, "width", "int"), new Param(c, "height", "int"),
+                         new Param(c, "aspectRatioMode", "int", Value((int)Qt::IgnoreAspectRatio)),
+                         new Param(c, "transformMode", "int", Value((int)Qt::FastTransformation)), End),
+            new Function(c, "scaledToHeight", _n_scaledToHeight0, None, Compiled, qt_QImage_scaledToHeight_QImage_QImage_int_int, Return,
+                         "qt.QImage", Parameters, new Param(c, "this", "qt.QImage"), new Param(c, "height", "int"),
+                         new Param(c, "mode", "int", Value((int)Qt::FastTransformation)), End),
+            new Function(c, "scaledToWidth", _n_scaledToWidth0, None, Compiled, qt_QImage_scaledToWidth_QImage_QImage_int_int, Return,
+                         "qt.QImage", Parameters, new Param(c, "this", "qt.QImage"), new Param(c, "width", "int"),
+                         new Param(c, "mode", "int", Value((int)Qt::FastTransformation)), End),
             // MISSING: scanLine ("uchar *"; QImage this, int i)
             // MISSING: scanLine ("const uchar *"; QImage this, int i)
-            new Function(c, "setAlphaChannel", _n_setAlphaChannel0, None,
-                         Compiled, qt_QImage_setAlphaChannel_void_QImage_QImage,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QImage"),
-                         new Param(c, "alphaChannel", "qt.QImage"), End),
-            new Function(c, "setColor", _n_setColor0, None, Compiled,
-                         qt_QImage_setColor_void_QImage_int_int, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QImage"),
-                         new Param(c, "index", "int"),
-                         new Param(c, "colorValue", "int"), End),
-            new Function(c, "setColorCount", _n_setColorCount0, None, Compiled,
-                         qt_QImage_setColorCount_void_QImage_int, Return,
-                         "void", Parameters, new Param(c, "this", "qt.QImage"),
-                         new Param(c, "colorCount", "int"), End),
+            new Function(c, "setAlphaChannel", _n_setAlphaChannel0, None, Compiled, qt_QImage_setAlphaChannel_void_QImage_QImage, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QImage"), new Param(c, "alphaChannel", "qt.QImage"), End),
+            new Function(c, "setColor", _n_setColor0, None, Compiled, qt_QImage_setColor_void_QImage_int_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QImage"), new Param(c, "index", "int"), new Param(c, "colorValue", "int"), End),
+            new Function(c, "setColorCount", _n_setColorCount0, None, Compiled, qt_QImage_setColorCount_void_QImage_int, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QImage"), new Param(c, "colorCount", "int"), End),
             // MISSING: setColorSpace (void; QImage this, "const QColorSpace &"
             // colorSpace) MISSING: setColorTable (void; QImage this, "const
             // QList<QRgb> &" colors)
-            new Function(
-                c, "setDevicePixelRatio", _n_setDevicePixelRatio0, None,
-                Compiled, qt_QImage_setDevicePixelRatio_void_QImage_double,
-                Return, "void", Parameters, new Param(c, "this", "qt.QImage"),
-                new Param(c, "scaleFactor", "double"), End),
-            new Function(c, "setDotsPerMeterX", _n_setDotsPerMeterX0, None,
-                         Compiled, qt_QImage_setDotsPerMeterX_void_QImage_int,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QImage"),
-                         new Param(c, "x", "int"), End),
-            new Function(c, "setDotsPerMeterY", _n_setDotsPerMeterY0, None,
-                         Compiled, qt_QImage_setDotsPerMeterY_void_QImage_int,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QImage"),
-                         new Param(c, "y", "int"), End),
-            new Function(c, "setOffset", _n_setOffset0, None, Compiled,
-                         qt_QImage_setOffset_void_QImage_QPoint, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QImage"),
-                         new Param(c, "offset", "qt.QPoint"), End),
-            new Function(c, "setPixel", _n_setPixel0, None, Compiled,
-                         qt_QImage_setPixel_void_QImage_QPoint_int, Return,
-                         "void", Parameters, new Param(c, "this", "qt.QImage"),
-                         new Param(c, "position", "qt.QPoint"),
+            new Function(c, "setDevicePixelRatio", _n_setDevicePixelRatio0, None, Compiled,
+                         qt_QImage_setDevicePixelRatio_void_QImage_double, Return, "void", Parameters, new Param(c, "this", "qt.QImage"),
+                         new Param(c, "scaleFactor", "double"), End),
+            new Function(c, "setDotsPerMeterX", _n_setDotsPerMeterX0, None, Compiled, qt_QImage_setDotsPerMeterX_void_QImage_int, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QImage"), new Param(c, "x", "int"), End),
+            new Function(c, "setDotsPerMeterY", _n_setDotsPerMeterY0, None, Compiled, qt_QImage_setDotsPerMeterY_void_QImage_int, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QImage"), new Param(c, "y", "int"), End),
+            new Function(c, "setOffset", _n_setOffset0, None, Compiled, qt_QImage_setOffset_void_QImage_QPoint, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QImage"), new Param(c, "offset", "qt.QPoint"), End),
+            new Function(c, "setPixel", _n_setPixel0, None, Compiled, qt_QImage_setPixel_void_QImage_QPoint_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QImage"), new Param(c, "position", "qt.QPoint"), new Param(c, "index_or_rgb", "int"),
+                         End),
+            new Function(c, "setPixel", _n_setPixel1, None, Compiled, qt_QImage_setPixel_void_QImage_int_int_int, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QImage"), new Param(c, "x", "int"), new Param(c, "y", "int"),
                          new Param(c, "index_or_rgb", "int"), End),
-            new Function(c, "setPixel", _n_setPixel1, None, Compiled,
-                         qt_QImage_setPixel_void_QImage_int_int_int, Return,
-                         "void", Parameters, new Param(c, "this", "qt.QImage"),
-                         new Param(c, "x", "int"), new Param(c, "y", "int"),
-                         new Param(c, "index_or_rgb", "int"), End),
-            new Function(c, "setPixelColor", _n_setPixelColor0, None, Compiled,
-                         qt_QImage_setPixelColor_void_QImage_QPoint_QColor,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QImage"),
-                         new Param(c, "position", "qt.QPoint"),
+            new Function(c, "setPixelColor", _n_setPixelColor0, None, Compiled, qt_QImage_setPixelColor_void_QImage_QPoint_QColor, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QImage"), new Param(c, "position", "qt.QPoint"),
                          new Param(c, "color", "qt.QColor"), End),
-            new Function(c, "setPixelColor", _n_setPixelColor1, None, Compiled,
-                         qt_QImage_setPixelColor_void_QImage_int_int_QColor,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QImage"),
-                         new Param(c, "x", "int"), new Param(c, "y", "int"),
+            new Function(c, "setPixelColor", _n_setPixelColor1, None, Compiled, qt_QImage_setPixelColor_void_QImage_int_int_QColor, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QImage"), new Param(c, "x", "int"), new Param(c, "y", "int"),
                          new Param(c, "color", "qt.QColor"), End),
-            new Function(c, "setText", _n_setText0, None, Compiled,
-                         qt_QImage_setText_void_QImage_string_string, Return,
-                         "void", Parameters, new Param(c, "this", "qt.QImage"),
-                         new Param(c, "key", "string"),
-                         new Param(c, "text", "string"), End),
-            new Function(c, "size", _n_size0, None, Compiled,
-                         qt_QImage_size_QSize_QImage, Return, "qt.QSize",
-                         Parameters, new Param(c, "this", "qt.QImage"), End),
-            // MISSING: sizeInBytes ("qsizetype"; QImage this)
-            new Function(c, "swap", _n_swap0, None, Compiled,
-                         qt_QImage_swap_void_QImage_QImage, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QImage"),
-                         new Param(c, "other", "qt.QImage"), End),
-            new Function(c, "text", _n_text0, None, Compiled,
-                         qt_QImage_text_string_QImage_string, Return, "string",
-                         Parameters, new Param(c, "this", "qt.QImage"),
-                         new Param(c, "key", "string"), End),
-            new Function(c, "textKeys", _n_textKeys0, None, Compiled,
-                         qt_QImage_textKeys_stringBSB_ESB__QImage, Return,
-                         "string[]", Parameters,
+            new Function(c, "setText", _n_setText0, None, Compiled, qt_QImage_setText_void_QImage_string_string, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QImage"), new Param(c, "key", "string"), new Param(c, "text", "string"), End),
+            new Function(c, "size", _n_size0, None, Compiled, qt_QImage_size_QSize_QImage, Return, "qt.QSize", Parameters,
                          new Param(c, "this", "qt.QImage"), End),
+            // MISSING: sizeInBytes ("qsizetype"; QImage this)
+            new Function(c, "swap", _n_swap0, None, Compiled, qt_QImage_swap_void_QImage_QImage, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QImage"), new Param(c, "other", "qt.QImage"), End),
+            new Function(c, "text", _n_text0, None, Compiled, qt_QImage_text_string_QImage_string, Return, "string", Parameters,
+                         new Param(c, "this", "qt.QImage"), new Param(c, "key", "string"), End),
+            new Function(c, "textKeys", _n_textKeys0, None, Compiled, qt_QImage_textKeys_stringBSB_ESB__QImage, Return, "string[]",
+                         Parameters, new Param(c, "this", "qt.QImage"), End),
             // MISSING: toCGImage ("CGImageRef"; QImage this)
             // MISSING: toHBITMAP ("HBITMAP"; QImage this)
             // MISSING: toHICON ("HICON"; QImage this, QImage mask)
-            new Function(
-                c, "transformed", _n_transformed0, None, Compiled,
-                qt_QImage_transformed_QImage_QImage_QTransform_int, Return,
-                "qt.QImage", Parameters, new Param(c, "this", "qt.QImage"),
-                new Param(c, "matrix", "qt.QTransform"),
-                new Param(c, "mode", "int", Value((int)Qt::FastTransformation)),
-                End),
-            new Function(c, "valid", _n_valid0, None, Compiled,
-                         qt_QImage_valid_bool_QImage_QPoint, Return, "bool",
-                         Parameters, new Param(c, "this", "qt.QImage"),
-                         new Param(c, "pos", "qt.QPoint"), End),
-            new Function(c, "valid", _n_valid1, None, Compiled,
-                         qt_QImage_valid_bool_QImage_int_int, Return, "bool",
-                         Parameters, new Param(c, "this", "qt.QImage"),
-                         new Param(c, "x", "int"), new Param(c, "y", "int"),
-                         End),
-            new Function(c, "width", _n_width0, None, Compiled,
-                         qt_QImage_width_int_QImage, Return, "int", Parameters,
+            new Function(c, "transformed", _n_transformed0, None, Compiled, qt_QImage_transformed_QImage_QImage_QTransform_int, Return,
+                         "qt.QImage", Parameters, new Param(c, "this", "qt.QImage"), new Param(c, "matrix", "qt.QTransform"),
+                         new Param(c, "mode", "int", Value((int)Qt::FastTransformation)), End),
+            new Function(c, "valid", _n_valid0, None, Compiled, qt_QImage_valid_bool_QImage_QPoint, Return, "bool", Parameters,
+                         new Param(c, "this", "qt.QImage"), new Param(c, "pos", "qt.QPoint"), End),
+            new Function(c, "valid", _n_valid1, None, Compiled, qt_QImage_valid_bool_QImage_int_int, Return, "bool", Parameters,
+                         new Param(c, "this", "qt.QImage"), new Param(c, "x", "int"), new Param(c, "y", "int"), End),
+            new Function(c, "width", _n_width0, None, Compiled, qt_QImage_width_int_QImage, Return, "int", Parameters,
                          new Param(c, "this", "qt.QImage"), End),
             // MISSING: QVariant ("QVariant operator"; QImage this)
             // static functions
@@ -1728,24 +1287,17 @@ namespace Mu
             // icon) MISSING: toImageFormat (flags QImage::Format;
             // "QPixelFormat" format) MISSING: toPixelFormat ("QPixelFormat";
             // flags QImage::Format format)
-            new Function(c, "trueMatrix", _n_trueMatrix0, None, Compiled,
-                         qt_QImage_trueMatrix_QTransform_QTransform_int_int,
-                         Return, "qt.QTransform", Parameters,
-                         new Param(c, "matrix", "qt.QTransform"),
-                         new Param(c, "width", "int"),
+            new Function(c, "trueMatrix", _n_trueMatrix0, None, Compiled, qt_QImage_trueMatrix_QTransform_QTransform_int_int, Return,
+                         "qt.QTransform", Parameters, new Param(c, "matrix", "qt.QTransform"), new Param(c, "width", "int"),
                          new Param(c, "height", "int"), End),
             EndArguments);
         globalScope()->addSymbols(
-            new Function(c, "!=", _n_operatorBang_EQ_0, Op, Compiled,
-                         qt_QImage_operatorBang_EQ__bool_QImage_QImage, Return,
-                         "bool", Parameters, new Param(c, "this", "qt.QImage"),
-                         new Param(c, "image", "qt.QImage"), End),
+            new Function(c, "!=", _n_operatorBang_EQ_0, Op, Compiled, qt_QImage_operatorBang_EQ__bool_QImage_QImage, Return, "bool",
+                         Parameters, new Param(c, "this", "qt.QImage"), new Param(c, "image", "qt.QImage"), End),
             // MISSING: = (QImage; QImage this, QImage image)
             // MISSING: = (QImage; QImage this, "QImage & &" other)
-            new Function(c, "==", _n_operatorEQ_EQ_0, Op, Compiled,
-                         qt_QImage_operatorEQ_EQ__bool_QImage_QImage, Return,
-                         "bool", Parameters, new Param(c, "this", "qt.QImage"),
-                         new Param(c, "image", "qt.QImage"), End),
+            new Function(c, "==", _n_operatorEQ_EQ_0, Op, Compiled, qt_QImage_operatorEQ_EQ__bool_QImage_QImage, Return, "bool", Parameters,
+                         new Param(c, "this", "qt.QImage"), new Param(c, "image", "qt.QImage"), End),
             EndArguments);
         scope()->addSymbols(EndArguments);
 
@@ -1758,11 +1310,8 @@ namespace Mu
         // MISSING: QImage (QImage; QImage this, string fileName, "const char *"
         // format)
 
-        addSymbol(new Function(c, "QImage", _n_QImage8, None, Compiled,
-                               QImage_QImage_QImage_QImage_string_string,
-                               Return, "qt.QImage", Parameters,
-                               new Param(c, "this", "qt.QImage"),
-                               new Param(c, "fileName", "string"),
+        addSymbol(new Function(c, "QImage", _n_QImage8, None, Compiled, QImage_QImage_QImage_QImage_string_string, Return, "qt.QImage",
+                               Parameters, new Param(c, "this", "qt.QImage"), new Param(c, "fileName", "string"),
                                new Param(c, "format", "string"), End));
     }
 

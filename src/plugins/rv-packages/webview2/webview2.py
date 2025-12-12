@@ -1,8 +1,15 @@
 #
-# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved. 
-# 
-# SPDX-License-Identifier: Apache-2.0 
+# Copyright (C) 2023  Autodesk, Inc. All Rights Reserved.
 #
+# SPDX-License-Identifier: Apache-2.0
+#
+
+import sys
+import os
+
+
+from rv import rvtypes
+from rv import qtutils
 
 try:
     from PySide2 import QtCore
@@ -16,29 +23,21 @@ try:
     )  # import qApp#, QMainWindow, QLabel, QPixmap, QColor, QGridLayout, QWidget, QPushButton, QComboBox
     from PySide2.QtWidgets import QDockWidget
 except ImportError:
-  try:
-    from PySide6 import QtCore
-    from PySide6 import QtWidgets
-    from PySide6 import QtWebChannel
-    from PySide6 import QtWebEngineWidgets
-    from PySide6 import QtQml
+    try:
+        from PySide6 import QtCore
+        from PySide6 import QtWidgets
+        from PySide6 import QtWebChannel
+        from PySide6 import QtWebEngineWidgets
+        from PySide6 import QtQml
 
-    from PySide6.QtWidgets import (
-        qApp,
-    )  # import qApp#, QMainWindow, QLabel, QPixmap, QColor, QGridLayout, QWidget, QPushButton, QComboBox
-    from PySide6.QtWidgets import QDockWidget
-  except ImportError:
-    pass
+        from PySide6.QtWidgets import (
+            qApp,
+        )  # import qApp#, QMainWindow, QLabel, QPixmap, QColor, QGridLayout, QWidget, QPushButton, QComboBox
+        from PySide6.QtWidgets import QDockWidget
+    except ImportError:
+        pass
 
 print(QtWebEngineWidgets.__file__)
-
-import sys, os
-
-import rv.commands
-from shiboken2 import getCppPointer
-
-from rv import rvtypes
-from rv import qtutils
 
 
 class WebView2(rvtypes.MinorMode):
@@ -57,9 +56,7 @@ class WebView2(rvtypes.MinorMode):
 
         qtutils.javascriptExport(self.webview.page())
 
-        defaultpath = "file:///" + os.path.join(
-            self.supportPath(sys.modules[__name__]), "webview_example.html"
-        )
+        defaultpath = "file:///" + os.path.join(self.supportPath(sys.modules[__name__]), "webview_example.html")
         self.webview.load(defaultpath)
 
     def activate(self):

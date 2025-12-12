@@ -7,7 +7,7 @@
 INCLUDE(ProcessorCount) # require CMake 3.15+
 PROCESSORCOUNT(_cpu_count)
 
-RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_IMGUI" "bundle_20250323" "" "")
+RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_IMGUI" "${RV_DEPS_IMGUI_VERSION}" "" "")
 RV_SHOW_STANDARD_DEPS_VARIABLES()
 
 SET(_imgui_download_url
@@ -16,7 +16,7 @@ SET(_imgui_download_url
 
 # Hashes for verification (replace with actual hash values)
 SET(_imgui_download_hash
-    "1ea3f48e9c6ae8230dac6e8a54f6e74b"
+    ${RV_DEPS_IMGUI_DOWNLOAD_HASH}
 )
 
 # There is no version suffix for imgui library name.
@@ -42,7 +42,7 @@ ENDIF()
 
 IF(RV_TARGET_WINDOWS)
   SET(_libpath
-    ${_bin_dir}/${_libname}
+      ${_bin_dir}/${_libname}
   )
 ELSE()
   SET(_libpath
@@ -54,7 +54,7 @@ ENDIF()
 EXTERNALPROJECT_ADD(
   implot_download
   GIT_REPOSITORY "https://github.com/pthom/implot.git"
-  GIT_TAG "61af48ee1369083a3da391a849867af6d1b811a6"
+  GIT_TAG ${RV_DEPS_IMPLOT_TAG}
   DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
   DOWNLOAD_EXTRACT_TIMESTAMP TRUE
   SOURCE_DIR ${CMAKE_BINARY_DIR}/${_target}/deps/implot
@@ -75,7 +75,7 @@ SET(_patch_command_for_imgui_backend_qt
 EXTERNALPROJECT_ADD(
   imgui_backend_qt_download
   GIT_REPOSITORY "https://github.com/dpaulat/imgui-backend-qt.git"
-  GIT_TAG "023345ca8abf731fc50568c0197ceebe76bb4324"
+  GIT_TAG ${RV_DEPS_IMGUI_BACKEND_QT_TAG}
   DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
   DOWNLOAD_EXTRACT_TIMESTAMP TRUE
   SOURCE_DIR ${CMAKE_BINARY_DIR}/${_target}/deps/imgui-backend-qt
@@ -91,7 +91,7 @@ EXTERNALPROJECT_ADD(
 EXTERNALPROJECT_ADD(
   imgui_node_editor_download
   GIT_REPOSITORY "https://github.com/pthom/imgui-node-editor.git"
-  GIT_TAG "dae8edccf15d19e995599ecd505e7fa1d3264a4c"
+  GIT_TAG ${RV_DEPS_IMGUI_NODE_EDITOR_TAG}
   DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
   DOWNLOAD_EXTRACT_TIMESTAMP TRUE
   SOURCE_DIR ${CMAKE_BINARY_DIR}/${_target}/deps/imgui-node-editor
@@ -103,13 +103,18 @@ EXTERNALPROJECT_ADD(
   USES_TERMINAL_DOWNLOAD TRUE
 )
 
-RV_VFX_SET_VARIABLE(_qt_location CY2023 "${RV_DEPS_QT5_LOCATION}" CY2024 "${RV_DEPS_QT6_LOCATION}")
-RV_VFX_SET_VARIABLE(_find_qt_version CY2023 "Qt5" CY2024 "Qt6")
+SET(_qt_location
+    ${RV_DEPS_QT_LOCATION}
+)
+SET(_find_qt_version
+    "Qt${RV_DEPS_QT_MAJOR}"
+)
 IF(NOT _qt_location)
-  RV_VFX_SET_VARIABLE(_qt_major CY2023 "5" CY2024 "6")
-  MESSAGE(FATAL_ERROR "Qt is not found in path \"${_qt_location}\". Please provide -DRV_DEPS_QT${_qt_major}_LOCATION=<path> to CMake.")
+  SET(_qt_major
+      ${RV_DEPS_QT_MAJOR}
+  )
+  MESSAGE(FATAL_ERROR "Qt is not found in path \"${_qt_location}\". Please provide -DRV_DEPS_QT_LOCATION=<path> to CMake.")
 ENDIF()
-
 
 SET(_patch_command_for_imgui
     patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/patch/imgui_cpp_h.patch
@@ -127,8 +132,8 @@ EXTERNALPROJECT_ADD(
     ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/imgui/CMakeLists.txt ${CMAKE_BINARY_DIR}/${_target}/src/CMakeLists.txt && ${CMAKE_COMMAND} -E
     copy_directory ${CMAKE_BINARY_DIR}/${_target}/deps/implot ${CMAKE_BINARY_DIR}/${_target}/src/implot && ${CMAKE_COMMAND} -E copy_directory
     ${CMAKE_BINARY_DIR}/${_target}/deps/imgui-backend-qt/backends ${CMAKE_BINARY_DIR}/${_target}/src/backends && ${CMAKE_COMMAND} -E copy_directory
-    ${CMAKE_BINARY_DIR}/${_target}/deps/imgui-node-editor ${CMAKE_BINARY_DIR}/${_target}/src/imgui-node-editor 
-    && ${_patch_command_for_imgui_backend_qt} && ${_patch_command_for_imgui}
+    ${CMAKE_BINARY_DIR}/${_target}/deps/imgui-node-editor ${CMAKE_BINARY_DIR}/${_target}/src/imgui-node-editor && ${_patch_command_for_imgui_backend_qt} &&
+    ${_patch_command_for_imgui}
   CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options} -DFIND_QT_VERSION=${_find_qt_version} -DCMAKE_PREFIX_PATH=${_qt_location}/lib/cmake
   BUILD_COMMAND ${_cmake_build_command}
   INSTALL_COMMAND ${_cmake_install_command}
@@ -168,3 +173,9 @@ TARGET_INCLUDE_DIRECTORIES(
 )
 
 LIST(APPEND RV_DEPS_LIST imgui::imgui)
+
+# Set version for about dialog
+SET(RV_DEPS_IMGUI_VERSION
+    ${_version}
+    CACHE INTERNAL "" FORCE
+)

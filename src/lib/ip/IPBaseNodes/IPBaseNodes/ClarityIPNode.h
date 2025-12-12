@@ -22,8 +22,7 @@ namespace IPCore
     class ClarityIPNode : public IPNode
     {
     public:
-        ClarityIPNode(const std::string& name, const NodeDefinition* def,
-                      IPGraph* graph, GroupIPNode* group = 0);
+        ClarityIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group = 0);
 
         virtual ~ClarityIPNode();
 

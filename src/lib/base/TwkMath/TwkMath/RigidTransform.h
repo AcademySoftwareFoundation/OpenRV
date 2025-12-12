@@ -90,10 +90,7 @@ namespace TwkMath
         void operator=(const Mat44<T>& M) { set(M); }
     };
 
-    template <typename T> RigidTransform<T>::RigidTransform(const Mat44<T>& M)
-    {
-        set(M);
-    }
+    template <typename T> RigidTransform<T>::RigidTransform(const Mat44<T>& M) { set(M); }
 
     template <typename T> void RigidTransform<T>::set(const Mat44<T>& M)
     {
@@ -165,31 +162,24 @@ namespace TwkMath
         const float h = T(2) * (yz - sx);
         const float i = T(1) - T(2) * (yy + xx);
 
-        return Mat44<T>(a * scale.x, d * scale.y, g * scale.z, translation.x,
-                        b * scale.x, e * scale.y, h * scale.z, translation.y,
-                        c * scale.x, f * scale.y, i * scale.z, translation.z,
-                        T(0), T(0), T(0), T(1));
+        return Mat44<T>(a * scale.x, d * scale.y, g * scale.z, translation.x, b * scale.x, e * scale.y, h * scale.z, translation.y,
+                        c * scale.x, f * scale.y, i * scale.z, translation.z, T(0), T(0), T(0), T(1));
     }
 
     template <typename T, typename InterpT>
-    inline RigidTransform<T> lerp(const RigidTransform<T>& a,
-                                  const RigidTransform<T>& b, const InterpT u)
+    inline RigidTransform<T> lerp(const RigidTransform<T>& a, const RigidTransform<T>& b, const InterpT u)
     {
         const InterpT u0 = InterpT(1) - u;
-        return RigidTransform<T>(a.translation * u0 + b.translation * u,
-                                 slerp(a.orientation, b.orientation, u),
+        return RigidTransform<T>(a.translation * u0 + b.translation * u, slerp(a.orientation, b.orientation, u),
                                  a.scale * u0 + b.scale * u);
     }
 
-    template <typename T>
-    inline RigidTransform<T> inverse(const RigidTransform<T>& r)
+    template <typename T> inline RigidTransform<T> inverse(const RigidTransform<T>& r)
     {
-        return RigidTransform<T>(-r.translation, ~r.orientation,
-                                 1.0f / r.scale);
+        return RigidTransform<T>(-r.translation, ~r.orientation, 1.0f / r.scale);
     }
 
-    template <typename T>
-    inline Vec3<T> operator*(const RigidTransform<T>& r, const Vec3<T>& v)
+    template <typename T> inline Vec3<T> operator*(const RigidTransform<T>& r, const Vec3<T>& v)
     {
         return r.orientation * (r.scale * v) + r.translation;
     }

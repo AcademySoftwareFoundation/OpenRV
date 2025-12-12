@@ -41,8 +41,7 @@ namespace TwkUtil
 
         if (dir == NULL)
         {
-            string str("Unable to open directory with opendir(\"" + m_directory
-                       + "\")");
+            string str("Unable to open directory with opendir(\"" + m_directory + "\")");
             TWK_EXC_THROW_WHAT(Exception, str);
         }
 
@@ -72,10 +71,7 @@ namespace TwkUtil
         return Match(m_regex, m_fileList[filenum]).subStr(subnum);
     }
 
-    int RegexGlob::fileSubInt(const int filenum, const int subnum) const
-    {
-        return atoi(fileSubStr(filenum, subnum).c_str());
-    }
+    int RegexGlob::fileSubInt(const int filenum, const int subnum) const { return atoi(fileSubStr(filenum, subnum).c_str()); }
 
     int RegexGlob::matchCount() const
     {

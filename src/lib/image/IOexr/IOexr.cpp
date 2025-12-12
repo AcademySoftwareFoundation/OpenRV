@@ -56,15 +56,11 @@ namespace TwkFB
     using namespace std;
     using namespace TwkUtil;
 
-    TwkMath::Vec2i convert(const Imath::V2i& v)
-    {
-        return TwkMath::Vec2i(v.x, v.y);
-    }
+    TwkMath::Vec2i convert(const Imath::V2i& v) { return TwkMath::Vec2i(v.x, v.y); }
 
     bool IOexr::isAMultiPartSharedAttribute(const std::string& name)
     {
-        if (name == "displayWindow" || name == "pixelAspectRatio"
-            || name == Imf::TimeCodeAttribute::staticTypeName()
+        if (name == "displayWindow" || name == "pixelAspectRatio" || name == Imf::TimeCodeAttribute::staticTypeName()
             || name == Imf::ChromaticitiesAttribute::staticTypeName())
         {
             return true;
@@ -74,9 +70,7 @@ namespace TwkFB
 
     bool IOexr::isAces(const Imf::Chromaticities& c)
     {
-        return c.red == acesChromaticities().red
-               && c.green == acesChromaticities().green
-               && c.blue == acesChromaticities().blue
+        return c.red == acesChromaticities().red && c.green == acesChromaticities().green && c.blue == acesChromaticities().blue
                && c.white == acesChromaticities().white;
     }
 
@@ -84,23 +78,20 @@ namespace TwkFB
     // Imf::acesChromaticities()
     const Imf::Chromaticities& IOexr::acesChromaticities()
     {
-        static const Imf::Chromaticities acesChr(
-            Imath::V2f(0.73470f, 0.26530f),  // red
-            Imath::V2f(0.00000f, 1.00000f),  // green
-            Imath::V2f(0.00010f, -0.07700f), // blue
-            Imath::V2f(0.32168f, 0.33767f)); // white
+        static const Imf::Chromaticities acesChr(Imath::V2f(0.73470f, 0.26530f),  // red
+                                                 Imath::V2f(0.00000f, 1.00000f),  // green
+                                                 Imath::V2f(0.00010f, -0.07700f), // blue
+                                                 Imath::V2f(0.32168f, 0.33767f)); // white
 
         return acesChr;
     }
 
     static bool isXYZ(const Imf::Chromaticities& c)
     {
-        return c.red == Imath::V2f(1, 0) && c.green == Imath::V2f(0, 1)
-               && c.blue == Imath::V2f(0, 0) && c.white == Imath::V2f(0.333333);
+        return c.red == Imath::V2f(1, 0) && c.green == Imath::V2f(0, 1) && c.blue == Imath::V2f(0, 0) && c.white == Imath::V2f(0.333333);
     }
 
-    template <class T>
-    std::ostream& output(std::ostream& s, const Imath::Matrix33<T>& m)
+    template <class T> std::ostream& output(std::ostream& s, const Imath::Matrix33<T>& m)
     {
         s << m[0][0] << " " << m[0][1] << " " << m[0][2] << "\n"
           << " " << m[1][0] << " " << m[1][1] << " " << m[1][2] << "\n"
@@ -109,29 +100,23 @@ namespace TwkFB
         return s;
     }
 
-    template <class T>
-    std::ostream& output(std::ostream& s, const Imath::Matrix44<T>& m)
+    template <class T> std::ostream& output(std::ostream& s, const Imath::Matrix44<T>& m)
     {
-        s << m[0][0] << " " << m[0][1] << " " << m[0][2] << " " << m[0][3]
-          << "\n"
+        s << m[0][0] << " " << m[0][1] << " " << m[0][2] << " " << m[0][3] << "\n"
           <<
 
-            " " << m[1][0] << " " << m[1][1] << " " << m[1][2] << " " << m[1][3]
-          << "\n"
+            " " << m[1][0] << " " << m[1][1] << " " << m[1][2] << " " << m[1][3] << "\n"
           <<
 
-            " " << m[2][0] << " " << m[2][1] << " " << m[2][2] << " " << m[2][3]
-          << "\n"
+            " " << m[2][0] << " " << m[2][1] << " " << m[2][2] << " " << m[2][3] << "\n"
           <<
 
-            " " << m[3][0] << " " << m[3][1] << " " << m[3][2] << " " << m[3][3]
-          << "\n";
+            " " << m[3][0] << " " << m[3][1] << " " << m[3][2] << " " << m[3][3] << "\n";
 
         return s;
     }
 
-    int IOexr::indexOfChannelName(const vector<string>& channelNames,
-                                  const char* names[], bool exact)
+    int IOexr::indexOfChannelName(const vector<string>& channelNames, const char* names[], bool exact)
     {
         for (size_t i = 0; i < channelNames.size(); i++)
         {
@@ -150,8 +135,7 @@ namespace TwkFB
         return -1;
     }
 
-    int IOexr::indexOfChannelName(const vector<MultiPartChannel>& channelsMP,
-                                  const char* names[], bool exact)
+    int IOexr::indexOfChannelName(const vector<MultiPartChannel>& channelsMP, const char* names[], bool exact)
     {
         for (size_t i = 0; i < channelsMP.size(); i++)
         {
@@ -220,9 +204,7 @@ namespace TwkFB
 
     bool IOexr::channelIsRGB(const string& channelName)
     {
-        static const char* names[] = {"r",    "R",     "red",   "Red", "g",
-                                      "G",    "green", "Green", "b",   "B",
-                                      "blue", "Blue",  NULL};
+        static const char* names[] = {"r", "R", "red", "Red", "g", "G", "green", "Green", "b", "B", "blue", "Blue", NULL};
         string name = channelName;
         string::size_type index = name.rfind(".");
         if (index != string::npos)
@@ -236,8 +218,7 @@ namespace TwkFB
         return false;
     }
 
-    string IOexr::findAnAlpha(const Imf::MultiPartInputFile& file, int partNum,
-                              const string& layer, const string& view)
+    string IOexr::findAnAlpha(const Imf::MultiPartInputFile& file, int partNum, const string& layer, const string& view)
     {
         Imf::ChannelList cl = file.header(partNum).channels();
 
@@ -285,20 +266,16 @@ namespace TwkFB
         return mpChannel.name;
     }
 
-    void IOexr::findAnAlphaInView(const Imf::MultiPartInputFile& file,
-                                  const string& view, const string& partName,
-                                  MultiPartChannel& alpha)
+    void IOexr::findAnAlphaInView(const Imf::MultiPartInputFile& file, const string& view, const string& partName, MultiPartChannel& alpha)
     {
         const int noOfParts = file.parts();
         bool foundBestMatch = false;
         for (int p = 0; p < noOfParts; ++p)
         {
-            if ((file.header(p).hasView() && file.header(p).view() == view)
-                || (view == ""))
+            if ((file.header(p).hasView() && file.header(p).view() == view) || (view == ""))
             {
                 Imf::ChannelList cl = file.header(p).channels();
-                for (Imf::ChannelList::Iterator ci = cl.begin(); ci != cl.end();
-                     ++ci)
+                for (Imf::ChannelList::Iterator ci = cl.begin(); ci != cl.end(); ++ci)
                 {
                     string t = ci.name();
 
@@ -307,9 +284,7 @@ namespace TwkFB
                         alpha.name = t;
                         alpha.channel = ci.channel();
                         alpha.partNumber = p;
-                        alpha.partName =
-                            (file.header(p).hasName() ? file.header(p).name()
-                                                      : "");
+                        alpha.partName = (file.header(p).hasName() ? file.header(p).name() : "");
 
                         if (partName == alpha.partName)
                         {
@@ -326,15 +301,12 @@ namespace TwkFB
                         if (base == view)
                         {
                             string n = t.substr(index + 1, t.size() - index);
-                            if (n == "a" || n == "A" || n == "alpha"
-                                || n == "Alpha")
+                            if (n == "a" || n == "A" || n == "alpha" || n == "Alpha")
                             {
                                 alpha.name = n;
                                 alpha.channel = ci.channel();
                                 alpha.partNumber = p;
-                                alpha.partName = (file.header(p).hasName()
-                                                      ? file.header(p).name()
-                                                      : "");
+                                alpha.partName = (file.header(p).hasName() ? file.header(p).name() : "");
 
                                 if (partName == alpha.partName)
                                 {
@@ -369,8 +341,7 @@ namespace TwkFB
         return rval;
     }
 
-    void IOexr::channelSplit(const string& name, string& base,
-                             string& layerView)
+    void IOexr::channelSplit(const string& name, string& base, string& layerView)
     {
         layerView.clear();
         base.clear();
@@ -438,8 +409,7 @@ namespace TwkFB
             a = "Z";
     }
 
-    Imf::ChannelList::Iterator
-    IOexr::findChannelWithBasename(const string& cname, Imf::ChannelList& cl)
+    Imf::ChannelList::Iterator IOexr::findChannelWithBasename(const string& cname, Imf::ChannelList& cl)
     {
         //
         //  Check first for exact matches, otherwise we'll return "BLAH.R" for
@@ -470,17 +440,15 @@ namespace TwkFB
         return cl.end();
     }
 
-    vector<IOexr::MultiPartChannel>::const_iterator
-    IOexr::findChannelWithBasenameMP(
-        const string& cname, const vector<MultiPartChannel>& mpChannelList)
+    vector<IOexr::MultiPartChannel>::const_iterator IOexr::findChannelWithBasenameMP(const string& cname,
+                                                                                     const vector<MultiPartChannel>& mpChannelList)
     {
         //
         //  Check first for exact matches, otherwise we'll return "BLAH.R" for
         //  "R" if it happens to appear earlier in the channel list.
         //
 
-        for (vector<MultiPartChannel>::const_iterator i = mpChannelList.begin();
-             i != mpChannelList.end(); ++i)
+        for (vector<MultiPartChannel>::const_iterator i = mpChannelList.begin(); i != mpChannelList.end(); ++i)
         {
             if (i->name == cname)
             {
@@ -489,8 +457,7 @@ namespace TwkFB
             }
         }
 
-        for (vector<MultiPartChannel>::const_iterator i = mpChannelList.begin();
-             i != mpChannelList.end(); ++i)
+        for (vector<MultiPartChannel>::const_iterator i = mpChannelList.begin(); i != mpChannelList.end(); ++i)
         {
             string base = baseChannelName(i->name);
             canonicalName(base);
@@ -505,15 +472,9 @@ namespace TwkFB
         return mpChannelList.end();
     }
 
-    bool IOexr::LayerOrNamedViewChannel(const string& c)
-    {
-        return c.rfind(".") != string::npos;
-    }
+    bool IOexr::LayerOrNamedViewChannel(const string& c) { return c.rfind(".") != string::npos; }
 
-    bool IOexr::LayerOrNamedViewChannelMP(const MultiPartChannel& mp)
-    {
-        return LayerOrNamedViewChannel(mp.name);
-    }
+    bool IOexr::LayerOrNamedViewChannelMP(const MultiPartChannel& mp) { return LayerOrNamedViewChannel(mp.name); }
 
     int IOexr::channelOrder(string& s)
     {
@@ -627,19 +588,12 @@ namespace TwkFB
         return a.compare(b) < 0;
     }
 
-    bool IOexr::ChannelCompMP(const MultiPartChannel& ia,
-                              const MultiPartChannel& ib)
-    {
-        return ChannelComp(ia.fullname, ib.fullname);
-    }
+    bool IOexr::ChannelCompMP(const MultiPartChannel& ia, const MultiPartChannel& ib) { return ChannelComp(ia.fullname, ib.fullname); }
 
     //----------------------------------------------------------------------
 
-    IOexr::IOexr(bool rgbaOnly, bool convertYRYBY, bool planar3channel,
-                 bool inheritChannels, bool noOneChannelPlanes, bool stripAlpha,
-                 bool readWindowIsDisplayWindow, ReadWindow readWindow,
-                 WriteMethod writeMethod, IOType type, size_t chunk,
-                 int maxAsync)
+    IOexr::IOexr(bool rgbaOnly, bool convertYRYBY, bool planar3channel, bool inheritChannels, bool noOneChannelPlanes, bool stripAlpha,
+                 bool readWindowIsDisplayWindow, ReadWindow readWindow, WriteMethod writeMethod, IOType type, size_t chunk, int maxAsync)
         : StreamingFrameBufferIO("IOexr", "m0", type, chunk, maxAsync)
         , m_rgbaOnly(rgbaOnly)
         , m_convertYRYBY(convertYRYBY)
@@ -651,34 +605,25 @@ namespace TwkFB
         , m_readWindow(readWindow)
         , m_writeMethod(writeMethod)
     {
-        unsigned int cap = ImageRead | ImageWrite | BruteForceIO | PlanarRead
-                           | PlanarWrite | Float16Capable | Float32Capable;
+        unsigned int cap = ImageRead | ImageWrite | BruteForceIO | PlanarRead | PlanarWrite | Float16Capable | Float32Capable;
 
         StringPairVector codecs;
         codecs.push_back(StringPair("PIZ", "piz-based wavelet compression"));
-        codecs.push_back(
-            StringPair("ZIP", "zlib compression, in blocks of 16 scan lines"));
-        codecs.push_back(
-            StringPair("ZIPS", "zlib compression, one scan line at a time"));
+        codecs.push_back(StringPair("ZIP", "zlib compression, in blocks of 16 scan lines"));
+        codecs.push_back(StringPair("ZIPS", "zlib compression, one scan line at a time"));
         codecs.push_back(StringPair("RLE", "run length encoding"));
         codecs.push_back(StringPair("PXR24", "lossy 24-bit float compression"));
-        codecs.push_back(StringPair(
-            "B44",
-            "lossy 4-by-4 pixel block compression, fixed compression rate"));
-        codecs.push_back(
-            StringPair("B44A", "lossy 4-by-4 pixel block compression, flat "
-                               "fields are comressed more"));
-        codecs.push_back(StringPair(
-            "DWAA", "lossy DCT based compression, in blocks of 32 scanlines"));
-        codecs.push_back(StringPair(
-            "DWAB", "lossy DCT based compression, in blocks of 256 scanlines"));
+        codecs.push_back(StringPair("B44", "lossy 4-by-4 pixel block compression, fixed compression rate"));
+        codecs.push_back(StringPair("B44A", "lossy 4-by-4 pixel block compression, flat "
+                                            "fields are comressed more"));
+        codecs.push_back(StringPair("DWAA", "lossy DCT based compression, in blocks of 32 scanlines"));
+        codecs.push_back(StringPair("DWAB", "lossy DCT based compression, in blocks of 256 scanlines"));
         codecs.push_back(StringPair("NONE", "uncompressed"));
 
         addType("exr", "OpenEXR Image", cap, codecs);
         addType("txr", "TXR OpenEXR Image", cap, codecs);
         addType("openexr", "OpenEXR Image", cap, codecs);
-        addType("aces", "Academy Color Encoding Specification Image", cap,
-                codecs);
+        addType("aces", "Academy Color Encoding Specification Image", cap, codecs);
         addType("sxr", "Stereo/Multiview/Multipart OpenEXR Image", cap, codecs);
     }
 
@@ -761,8 +706,7 @@ namespace TwkFB
 
     void IOexr::setWriteMethod(WriteMethod choice) { m_writeMethod = choice; }
 
-    void IOexr::readAllAttributes(const Imf::MultiPartInputFile& file,
-                                  FrameBuffer& fb, const set<int>& parts)
+    void IOexr::readAllAttributes(const Imf::MultiPartInputFile& file, FrameBuffer& fb, const set<int>& parts)
     {
         set<int> partNumbersRead;
         if (parts.empty())
@@ -781,14 +725,11 @@ namespace TwkFB
         map<string, int> attrSharedCountTable;
         if (partNumbersRead.size() > 1)
         {
-            for (set<int>::const_iterator it = partNumbersRead.begin();
-                 it != partNumbersRead.end(); ++it)
+            for (set<int>::const_iterator it = partNumbersRead.begin(); it != partNumbersRead.end(); ++it)
             {
                 const int partNum = (*it);
 
-                for (Imf::Header::ConstIterator i =
-                         file.header(partNum).begin();
-                     i != file.header(partNum).end(); ++i)
+                for (Imf::Header::ConstIterator i = file.header(partNum).begin(); i != file.header(partNum).end(); ++i)
                 {
                     if (attrSharedCountTable.count(i.name()) == 0)
                     {
@@ -805,8 +746,7 @@ namespace TwkFB
             }
         }
 
-        for (set<int>::const_iterator it = partNumbersRead.begin();
-             it != partNumbersRead.end(); ++it)
+        for (set<int>::const_iterator it = partNumbersRead.begin(); it != partNumbersRead.end(); ++it)
         {
             const int partNum = (*it);
 
@@ -818,14 +758,12 @@ namespace TwkFB
                 ostr << fileFormatVersion
                      << ", "
                         "flags 0x"
-                     << setbase(16) << Imf::getFlags(file.version())
-                     << setbase(10) << "\n";
+                     << setbase(16) << Imf::getFlags(file.version()) << setbase(10) << "\n";
 
                 fb.newAttribute("EXR/file format version", ostr.str());
             }
 
-            for (Imf::Header::ConstIterator i = file.header(partNum).begin();
-                 i != file.header(partNum).end(); ++i)
+            for (Imf::Header::ConstIterator i = file.header(partNum).begin(); i != file.header(partNum).end(); ++i)
             {
                 const Imf::Attribute* attr = &(i.attribute());
                 string aname = i.name();
@@ -835,8 +773,7 @@ namespace TwkFB
                 // e.g. /EXR/<part number>
                 ostringstream metaDataPrefix;
                 metaDataPrefix << "EXR/";
-                if (attrSharedCountTable.count(aname) == 1
-                    && attrSharedCountTable[aname] > 1)
+                if (attrSharedCountTable.count(aname) == 1 && attrSharedCountTable[aname] > 1)
                 {
                     metaDataPrefix << partNum << '/';
                 }
@@ -852,8 +789,7 @@ namespace TwkFB
                  << endl;
 #endif
 
-                if (const Imf::StringAttribute* a =
-                        dynamic_cast<const Imf::StringAttribute*>(attr))
+                if (const Imf::StringAttribute* a = dynamic_cast<const Imf::StringAttribute*>(attr))
                 {
                     if (file.parts() > 1)
                     {
@@ -867,28 +803,23 @@ namespace TwkFB
                         fb.newAttribute(name, a->value());
                     }
                 }
-                else if (const Imf::StringVectorAttribute* a =
-                             dynamic_cast<const Imf::StringVectorAttribute*>(
-                                 attr))
+                else if (const Imf::StringVectorAttribute* a = dynamic_cast<const Imf::StringVectorAttribute*>(attr))
                 {
                     fb.newAttribute(name, a->value());
                 }
-                else if (const Imf::FloatAttribute* a =
-                             dynamic_cast<const Imf::FloatAttribute*>(attr))
+                else if (const Imf::FloatAttribute* a = dynamic_cast<const Imf::FloatAttribute*>(attr))
                 {
                     ostringstream str;
                     str << a->value();
                     fb.newAttribute(name, str.str());
                 }
-                else if (const Imf::RationalAttribute* a =
-                             dynamic_cast<const Imf::RationalAttribute*>(attr))
+                else if (const Imf::RationalAttribute* a = dynamic_cast<const Imf::RationalAttribute*>(attr))
                 {
                     ostringstream str;
                     str << float(a->value());
                     fb.newAttribute(name, str.str());
                 }
-                else if (const Imf::IntAttribute* a =
-                             dynamic_cast<const Imf::IntAttribute*>(attr))
+                else if (const Imf::IntAttribute* a = dynamic_cast<const Imf::IntAttribute*>(attr))
                 {
                     if (name != "EXR/chunkCount")
                     {
@@ -897,22 +828,19 @@ namespace TwkFB
                         fb.newAttribute(name, str.str());
                     }
                 }
-                else if (const Imf::V2iAttribute* a =
-                             dynamic_cast<const Imf::V2iAttribute*>(attr))
+                else if (const Imf::V2iAttribute* a = dynamic_cast<const Imf::V2iAttribute*>(attr))
                 {
                     ostringstream str;
                     str << a->value();
                     fb.newAttribute(name, str.str());
                 }
-                else if (const Imf::V3iAttribute* a =
-                             dynamic_cast<const Imf::V3iAttribute*>(attr))
+                else if (const Imf::V3iAttribute* a = dynamic_cast<const Imf::V3iAttribute*>(attr))
                 {
                     ostringstream str;
                     str << a->value();
                     fb.newAttribute(name, str.str());
                 }
-                else if (const Imf::V2fAttribute* a =
-                             dynamic_cast<const Imf::V2fAttribute*>(attr))
+                else if (const Imf::V2fAttribute* a = dynamic_cast<const Imf::V2fAttribute*>(attr))
                 {
                     if (name == "EXR/adoptedNeutral")
                     {
@@ -925,29 +853,25 @@ namespace TwkFB
                         fb.newAttribute(name, str.str());
                     }
                 }
-                else if (const Imf::V3fAttribute* a =
-                             dynamic_cast<const Imf::V3fAttribute*>(attr))
+                else if (const Imf::V3fAttribute* a = dynamic_cast<const Imf::V3fAttribute*>(attr))
                 {
                     ostringstream str;
                     str << a->value();
                     fb.newAttribute(name, str.str());
                 }
-                else if (const Imf::Box2iAttribute* a =
-                             dynamic_cast<const Imf::Box2iAttribute*>(attr))
+                else if (const Imf::Box2iAttribute* a = dynamic_cast<const Imf::Box2iAttribute*>(attr))
                 {
                     ostringstream str;
                     str << a->value().min << " - " << a->value().max;
                     fb.newAttribute(name, str.str());
                 }
-                else if (const Imf::Box2fAttribute* a =
-                             dynamic_cast<const Imf::Box2fAttribute*>(attr))
+                else if (const Imf::Box2fAttribute* a = dynamic_cast<const Imf::Box2fAttribute*>(attr))
                 {
                     ostringstream str;
                     str << a->value().min << " - " << a->value().max;
                     fb.newAttribute(name, str.str());
                 }
-                else if (const Imf::LineOrderAttribute* a =
-                             dynamic_cast<const Imf::LineOrderAttribute*>(attr))
+                else if (const Imf::LineOrderAttribute* a = dynamic_cast<const Imf::LineOrderAttribute*>(attr))
                 {
                     ostringstream str;
                     switch (a->value())
@@ -967,9 +891,7 @@ namespace TwkFB
                     }
                     fb.newAttribute(name, str.str());
                 }
-                else if (const Imf::CompressionAttribute* a =
-                             dynamic_cast<const Imf::CompressionAttribute*>(
-                                 attr))
+                else if (const Imf::CompressionAttribute* a = dynamic_cast<const Imf::CompressionAttribute*>(attr))
                 {
                     ostringstream str;
                     switch (a->value())
@@ -1010,28 +932,23 @@ namespace TwkFB
                     }
                     fb.newAttribute(name, str.str());
                 }
-                else if (const Imf::M44fAttribute* a =
-                             dynamic_cast<const Imf::M44fAttribute*>(attr))
+                else if (const Imf::M44fAttribute* a = dynamic_cast<const Imf::M44fAttribute*>(attr))
                 {
                     ostringstream str;
                     output(str, a->value());
                     fb.newAttribute(name, str.str());
                 }
-                else if (const Imf::M33fAttribute* a =
-                             dynamic_cast<const Imf::M33fAttribute*>(attr))
+                else if (const Imf::M33fAttribute* a = dynamic_cast<const Imf::M33fAttribute*>(attr))
                 {
                     ostringstream str;
                     output(str, a->value());
                     fb.newAttribute(name, str.str());
                 }
-                else if (const Imf::ChromaticitiesAttribute* a =
-                             dynamic_cast<const Imf::ChromaticitiesAttribute*>(
-                                 attr))
+                else if (const Imf::ChromaticitiesAttribute* a = dynamic_cast<const Imf::ChromaticitiesAttribute*>(attr))
                 {
                     Imf::Chromaticities c = a->value();
 
-                    fb.setPrimaries(c.white.x, c.white.y, c.red.x, c.red.y,
-                                    c.green.x, c.green.y, c.blue.x, c.blue.y);
+                    fb.setPrimaries(c.white.x, c.white.y, c.red.x, c.red.y, c.green.x, c.green.y, c.blue.x, c.blue.y);
 
                     if (isAces(c))
                     {
@@ -1046,14 +963,10 @@ namespace TwkFB
                         fb.setPrimaryColorSpace(ColorSpace::Generic());
                     }
                 }
-                else if (const Imf::TileDescriptionAttribute* a =
-                             dynamic_cast<const Imf::TileDescriptionAttribute*>(
-                                 attr))
+                else if (const Imf::TileDescriptionAttribute* a = dynamic_cast<const Imf::TileDescriptionAttribute*>(attr))
                 {
-                    fb.newAttribute("EXR/TileDescription/xSize",
-                                    int(a->value().xSize));
-                    fb.newAttribute("EXR/TileDescription/ySize",
-                                    int(a->value().ySize));
+                    fb.newAttribute("EXR/TileDescription/xSize", int(a->value().xSize));
+                    fb.newAttribute("EXR/TileDescription/ySize", int(a->value().ySize));
 
                     string mode = "Unknown Level Mode";
                     switch (a->value().mode)
@@ -1089,8 +1002,7 @@ namespace TwkFB
 
                     fb.newAttribute("EXR/TileDescription/roundingMode", mode);
                 }
-                else if (const Imf::EnvmapAttribute* a =
-                             dynamic_cast<const Imf::EnvmapAttribute*>(attr))
+                else if (const Imf::EnvmapAttribute* a = dynamic_cast<const Imf::EnvmapAttribute*>(attr))
                 {
                     ostringstream str;
 
@@ -1109,54 +1021,29 @@ namespace TwkFB
 
                     fb.newAttribute(name, str.str());
                 }
-                else if (const Imf::TimeCodeAttribute* a =
-                             dynamic_cast<const Imf::TimeCodeAttribute*>(attr))
+                else if (const Imf::TimeCodeAttribute* a = dynamic_cast<const Imf::TimeCodeAttribute*>(attr))
                 {
-                    fb.newAttribute("EXR/timeCode/userData",
-                                    (int)a->value().userData());
-                    fb.newAttribute("EXR/timeCode/bgf2",
-                                    (int)a->value().bgf2());
-                    fb.newAttribute("EXR/timeCode/bgf1",
-                                    (int)a->value().bgf1());
-                    fb.newAttribute("EXR/timeCode/bgf0",
-                                    (int)a->value().bgf0());
-                    fb.newAttribute("EXR/timeCode/fieldPhase",
-                                    (int)a->value().fieldPhase());
-                    fb.newAttribute("EXR/timeCode/colorFrame",
-                                    (int)a->value().colorFrame());
-                    fb.newAttribute("EXR/timeCode/dropFrame",
-                                    (int)a->value().dropFrame());
+                    fb.newAttribute("EXR/timeCode/userData", (int)a->value().userData());
+                    fb.newAttribute("EXR/timeCode/bgf2", (int)a->value().bgf2());
+                    fb.newAttribute("EXR/timeCode/bgf1", (int)a->value().bgf1());
+                    fb.newAttribute("EXR/timeCode/bgf0", (int)a->value().bgf0());
+                    fb.newAttribute("EXR/timeCode/fieldPhase", (int)a->value().fieldPhase());
+                    fb.newAttribute("EXR/timeCode/colorFrame", (int)a->value().colorFrame());
+                    fb.newAttribute("EXR/timeCode/dropFrame", (int)a->value().dropFrame());
                     fb.newAttribute("EXR/timeCode/frame", a->value().frame());
-                    fb.newAttribute("EXR/timeCode/seconds",
-                                    a->value().seconds());
-                    fb.newAttribute("EXR/timeCode/minutes",
-                                    a->value().minutes());
+                    fb.newAttribute("EXR/timeCode/seconds", a->value().seconds());
+                    fb.newAttribute("EXR/timeCode/minutes", a->value().minutes());
                     fb.newAttribute("EXR/timeCode/hours", a->value().hours());
                 }
-                else if (const Imf::KeyCodeAttribute* a =
-                             dynamic_cast<const Imf::KeyCodeAttribute*>(attr))
+                else if (const Imf::KeyCodeAttribute* a = dynamic_cast<const Imf::KeyCodeAttribute*>(attr))
                 {
-                    fb.newAttribute(metaDataPrefix.str()
-                                        + string("KeyCode/filmMfcCode"),
-                                    a->value().filmMfcCode());
-                    fb.newAttribute(metaDataPrefix.str()
-                                        + string("KeyCode/filmType"),
-                                    a->value().filmType());
-                    fb.newAttribute(metaDataPrefix.str()
-                                        + string("KeyCode/prefix"),
-                                    a->value().prefix());
-                    fb.newAttribute(metaDataPrefix.str()
-                                        + string("KeyCode/count"),
-                                    a->value().count());
-                    fb.newAttribute(metaDataPrefix.str()
-                                        + string("KeyCode/perfOffset"),
-                                    a->value().perfOffset());
-                    fb.newAttribute(metaDataPrefix.str()
-                                        + string("KeyCode/perfsPerFrame"),
-                                    a->value().perfsPerFrame());
-                    fb.newAttribute(metaDataPrefix.str()
-                                        + string("KeyCode/perfsPerCount"),
-                                    a->value().perfsPerCount());
+                    fb.newAttribute(metaDataPrefix.str() + string("KeyCode/filmMfcCode"), a->value().filmMfcCode());
+                    fb.newAttribute(metaDataPrefix.str() + string("KeyCode/filmType"), a->value().filmType());
+                    fb.newAttribute(metaDataPrefix.str() + string("KeyCode/prefix"), a->value().prefix());
+                    fb.newAttribute(metaDataPrefix.str() + string("KeyCode/count"), a->value().count());
+                    fb.newAttribute(metaDataPrefix.str() + string("KeyCode/perfOffset"), a->value().perfOffset());
+                    fb.newAttribute(metaDataPrefix.str() + string("KeyCode/perfsPerFrame"), a->value().perfsPerFrame());
+                    fb.newAttribute(metaDataPrefix.str() + string("KeyCode/perfsPerCount"), a->value().perfsPerCount());
                 }
             }
 
@@ -1165,29 +1052,22 @@ namespace TwkFB
 
             if (dspWin.min != datWin.min || dspWin.max != datWin.max)
             {
-                fb.newAttribute(
-                    "DataWindowSize",
-                    convert(datWin.max - datWin.min + Imath::V2i(1, 1)));
+                fb.newAttribute("DataWindowSize", convert(datWin.max - datWin.min + Imath::V2i(1, 1)));
                 fb.newAttribute("DataWindowOrigin", convert(datWin.min));
-                fb.newAttribute(
-                    "DisplayWindowSize",
-                    convert(dspWin.max - dspWin.min + Imath::V2i(1, 1)));
+                fb.newAttribute("DisplayWindowSize", convert(dspWin.max - dspWin.min + Imath::V2i(1, 1)));
                 fb.newAttribute("DisplayWindowOrigin", convert(dspWin.min));
             }
         }
     }
 
-    void IOexr::readAllAttributes(const Imf::MultiPartInputFile& file,
-                                  FrameBuffer& fb)
+    void IOexr::readAllAttributes(const Imf::MultiPartInputFile& file, FrameBuffer& fb)
     {
         set<int> parts;
         parts.insert(0);
         readAllAttributes(file, fb, parts);
     }
 
-    size_t IOexr::channelListIteratorDifference(
-        Imf::ChannelList::ConstIterator a,
-        const Imf::ChannelList::ConstIterator& b)
+    size_t IOexr::channelListIteratorDifference(Imf::ChannelList::ConstIterator a, const Imf::ChannelList::ConstIterator& b)
     {
         size_t count = 0;
         while (a != b)
@@ -1198,13 +1078,9 @@ namespace TwkFB
         return count;
     }
 
-    size_t IOexr::channelListSize(const Imf::ChannelList& cl)
-    {
-        return channelListIteratorDifference(cl.begin(), cl.end());
-    }
+    size_t IOexr::channelListSize(const Imf::ChannelList& cl) { return channelListIteratorDifference(cl.begin(), cl.end()); }
 
-    void IOexr::setChannelInfo(const Imf::ChannelList::ConstIterator& i,
-                               FBInfo::ChannelInfo& info)
+    void IOexr::setChannelInfo(const Imf::ChannelList::ConstIterator& i, FBInfo::ChannelInfo& info)
     {
         info.name = i.name();
 
@@ -1224,8 +1100,7 @@ namespace TwkFB
         }
     }
 
-    void IOexr::setChannelInfo(const string& name, Imf::PixelType type,
-                               FBInfo::ChannelInfo& info)
+    void IOexr::setChannelInfo(const string& name, Imf::PixelType type, FBInfo::ChannelInfo& info)
     {
         info.name = name;
 
@@ -1262,9 +1137,7 @@ namespace TwkFB
         else
         {
             ViewNames views;
-            if (vattr = file.header(partNum)
-                            .findTypedAttribute<Imf::StringVectorAttribute>(
-                                "multiView"))
+            if (vattr = file.header(partNum).findTypedAttribute<Imf::StringVectorAttribute>("multiView"))
             {
                 // Implies read a MultiView file
                 views = vattr->value();
@@ -1273,8 +1146,7 @@ namespace TwkFB
         }
     }
 
-    void IOexr::readImages(FrameBufferVector& fbs, const std::string& filename,
-                           const ReadRequest& request) const
+    void IOexr::readImages(FrameBufferVector& fbs, const std::string& filename, const ReadRequest& request) const
     {
         if (m_iotype == StandardIO)
         {
@@ -1290,9 +1162,7 @@ namespace TwkFB
         }
     }
 
-    void IOexr::readImagesFromFile(Imf::MultiPartInputFile& file,
-                                   FrameBufferVector& fbs,
-                                   const std::string& filename,
+    void IOexr::readImagesFromFile(Imf::MultiPartInputFile& file, FrameBufferVector& fbs, const std::string& filename,
                                    const ReadRequest& request) const
     {
         fbs.clear();
@@ -1317,10 +1187,8 @@ namespace TwkFB
         }
 #endif
 
-        const string& requestedLayer =
-            request.layers.empty() ? "" : request.layers.front();
-        const string& requestedChannel =
-            request.channels.empty() ? "" : request.channels.front();
+        const string& requestedLayer = request.layers.empty() ? "" : request.layers.front();
+        const string& requestedChannel = request.channels.empty() ? "" : request.channels.front();
 
         const Imf::StringVectorAttribute* vattr = 0;
         int partNum = 0;
@@ -1335,9 +1203,7 @@ namespace TwkFB
                 //  use the "view" of part zero.
                 //
                 const Imf::Header& header = file.header(0);
-                if (const Imf::StringAttribute* sAttr =
-                        header.findTypedAttribute<Imf::StringAttribute>(
-                            "defaultView"))
+                if (const Imf::StringAttribute* sAttr = header.findTypedAttribute<Imf::StringAttribute>("defaultView"))
                 {
                     requestedView = sAttr->value();
                 }
@@ -1352,16 +1218,12 @@ namespace TwkFB
             }
 
             // Implies read a MultiPart file
-            readImagesFromMultiPartFile(file, fbs, filename, requestedView,
-                                        requestedLayer, requestedChannel,
-                                        request.allChannels);
+            readImagesFromMultiPartFile(file, fbs, filename, requestedView, requestedLayer, requestedChannel, request.allChannels);
         }
         else
         {
             ViewNames views;
-            if (vattr = file.header(partNum)
-                            .findTypedAttribute<Imf::StringVectorAttribute>(
-                                "multiView"))
+            if (vattr = file.header(partNum).findTypedAttribute<Imf::StringVectorAttribute>("multiView"))
             {
                 // Implies read a MultiView file
                 views = vattr->value();
@@ -1378,8 +1240,7 @@ namespace TwkFB
             }
             else
             {
-                if (std::find(views.begin(), views.end(), request.views.front())
-                    != views.end())
+                if (std::find(views.begin(), views.end(), request.views.front()) != views.end())
                 {
                     requestedView = request.views.front();
                 }
@@ -1390,16 +1251,12 @@ namespace TwkFB
                 }
             }
 
-            readImagesFromMultiViewFile(file, fbs, filename, requestedView,
-                                        requestedLayer, requestedChannel,
-                                        request.allChannels, partNum, views,
-                                        (requestedView == defaultView));
+            readImagesFromMultiViewFile(file, fbs, filename, requestedView, requestedLayer, requestedChannel, request.allChannels, partNum,
+                                        views, (requestedView == defaultView));
         }
     }
 
-    void IOexr::writeImages(const ConstFrameBufferVector& fbs,
-                            const std::string& filename,
-                            const WriteRequest& request) const
+    void IOexr::writeImages(const ConstFrameBufferVector& fbs, const std::string& filename, const WriteRequest& request) const
     {
         if (m_writeMethod == IOexr::MultiPartWriter)
         {

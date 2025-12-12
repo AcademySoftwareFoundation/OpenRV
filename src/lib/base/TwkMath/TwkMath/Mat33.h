@@ -114,9 +114,7 @@ namespace TwkMath
         }
 
         // Direct constructor. Initializes elements directly
-        Mat33(const T& v00, const T& v01, const T& v02, const T& v10,
-              const T& v11, const T& v12, const T& v20, const T& v21,
-              const T& v22)
+        Mat33(const T& v00, const T& v01, const T& v02, const T& v10, const T& v11, const T& v12, const T& v20, const T& v21, const T& v22)
             : m00(v00)
             , m01(v01)
             , m02(v02)
@@ -239,8 +237,7 @@ namespace TwkMath
         const T& operator()(size_type row, size_type col) const;
         T& operator()(size_type row, size_type col);
 
-        void set(const T& v00, const T& v01, const T& v02, const T& v10,
-                 const T& v11, const T& v12, const T& v20, const T& v21,
+        void set(const T& v00, const T& v01, const T& v02, const T& v10, const T& v11, const T& v12, const T& v20, const T& v21,
                  const T& v22)
         {
             m00 = v00;
@@ -296,10 +293,7 @@ namespace TwkMath
 
         // Is the matrix affine or not? (Do parallel lines remain parallel
         // after being transformed by the matrix)
-        bool isAffine() const
-        {
-            return ((m22 == T1) && (m21 == T0) && (m20 == T0));
-        }
+        bool isAffine() const { return ((m22 == T1) && (m21 == T0) && (m20 == T0)); }
 
         // Create a translation matrix.
         void makeTranslation(const Vec2<T>& t)
@@ -372,9 +366,7 @@ namespace TwkMath
     //******************************************************************************
     // TEMPLATE AND INLINE FUNCTIONS
     //******************************************************************************
-    template <typename T>
-    inline const T*
-    Mat33<T>::operator[](typename Mat33<T>::size_type rowIndex) const
+    template <typename T> inline const T* Mat33<T>::operator[](typename Mat33<T>::size_type rowIndex) const
     {
         assert(rowIndex < 3);
 #ifdef COMPILER_GCC2
@@ -385,8 +377,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <typename T>
-    inline T* Mat33<T>::operator[](typename Mat33<T>::size_type rowIndex)
+    template <typename T> inline T* Mat33<T>::operator[](typename Mat33<T>::size_type rowIndex)
     {
         assert(rowIndex < 3);
 #ifdef COMPILER_GCC2
@@ -398,9 +389,7 @@ namespace TwkMath
 
     //******************************************************************************
     template <typename T>
-    inline const T&
-    Mat33<T>::operator()(typename Mat33<T>::size_type rowIndex,
-                         typename Mat33<T>::size_type colIndex) const
+    inline const T& Mat33<T>::operator()(typename Mat33<T>::size_type rowIndex, typename Mat33<T>::size_type colIndex) const
     {
         assert(rowIndex < 3);
         assert(colIndex < 3);
@@ -412,9 +401,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <typename T>
-    inline T& Mat33<T>::operator()(typename Mat33<T>::size_type rowIndex,
-                                   typename Mat33<T>::size_type colIndex)
+    template <typename T> inline T& Mat33<T>::operator()(typename Mat33<T>::size_type rowIndex, typename Mat33<T>::size_type colIndex)
     {
         assert(rowIndex < 3);
         assert(colIndex < 3);
@@ -442,16 +429,10 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <typename T> inline Mat33<T> Mat33<T>::transposed() const
-    {
-        return Mat33<T>(m00, m10, m20, m01, m11, m21, m02, m12, m22);
-    }
+    template <typename T> inline Mat33<T> Mat33<T>::transposed() const { return Mat33<T>(m00, m10, m20, m01, m11, m21, m02, m12, m22); }
 
     //******************************************************************************
-    template <typename T> inline T Mat33<T>::determinant() const
-    {
-        return determinant3x3(m00, m01, m02, m10, m11, m12, m20, m21, m22);
-    }
+    template <typename T> inline T Mat33<T>::determinant() const { return determinant3x3(m00, m01, m02, m10, m11, m12, m20, m21, m22); }
 
     //******************************************************************************
     template <typename T> void Mat33<T>::invert()
@@ -506,28 +487,24 @@ namespace TwkMath
     {
         if (isAffine())
         {
-            return Vec2<T>((m00 * v.x) + (m01 * v.y) + m02,
-                           (m10 * v.x) + (m11 * v.y) + m12);
+            return Vec2<T>((m00 * v.x) + (m01 * v.y) + m02, (m10 * v.x) + (m11 * v.y) + m12);
         }
         else
         {
             const T w = (m20 * v.x) + (m21 * v.y) + m22;
-            return Vec2<T>(((m00 * v.x) + (m01 * v.y) + m02) / w,
-                           ((m10 * v.x) + (m11 * v.y) + m12) / w);
+            return Vec2<T>(((m00 * v.x) + (m01 * v.y) + m02) / w, ((m10 * v.x) + (m11 * v.y) + m12) / w);
         }
     }
 
     //******************************************************************************
-    template <typename T>
-    inline Vec2<T> Mat33<T>::transformDir(const Vec2<T>& d) const
+    template <typename T> inline Vec2<T> Mat33<T>::transformDir(const Vec2<T>& d) const
     {
         assert(isAffine());
         return Vec2<T>((m00 * d.x) + (m01 * d.y), (m10 * d.x) + (m11 * d.y));
     }
 
     //******************************************************************************
-    template <typename T>
-    inline Mat33<T>& Mat33<T>::operator+=(const Mat33<T>& v)
+    template <typename T> inline Mat33<T>& Mat33<T>::operator+=(const Mat33<T>& v)
     {
         m00 += v.m00;
         m01 += v.m01;
@@ -544,8 +521,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <typename T>
-    inline Mat33<T>& Mat33<T>::operator-=(const Mat33<T>& v)
+    template <typename T> inline Mat33<T>& Mat33<T>::operator-=(const Mat33<T>& v)
     {
         m00 -= v.m00;
         m01 -= v.m01;
@@ -630,61 +606,34 @@ namespace TwkMath
     // FUNCTIONS WHICH OPERATE ON MAT33
     //******************************************************************************
     //******************************************************************************
-    template <typename T>
-    inline typename Mat33<T>::size_type rowDimension(const Mat33<T>&)
-    {
-        return 3;
-    }
+    template <typename T> inline typename Mat33<T>::size_type rowDimension(const Mat33<T>&) { return 3; }
 
     //******************************************************************************
-    template <typename T>
-    inline typename Mat33<T>::size_type colDimension(const Mat33<T>&)
-    {
-        return 3;
-    }
+    template <typename T> inline typename Mat33<T>::size_type colDimension(const Mat33<T>&) { return 3; }
 
     //******************************************************************************
-    template <typename T> inline void makeIdentity(Mat33<T>& m)
-    {
-        m.makeIdentity();
-    }
+    template <typename T> inline void makeIdentity(Mat33<T>& m) { m.makeIdentity(); }
 
     //******************************************************************************
     template <typename T> inline void transpose(Mat33<T>& m) { m.transpose(); }
 
     //******************************************************************************
-    template <typename T> inline Mat33<T> transposed(const Mat33<T>& m)
-    {
-        return m.transposed();
-    }
+    template <typename T> inline Mat33<T> transposed(const Mat33<T>& m) { return m.transposed(); }
 
     //******************************************************************************
-    template <typename T> inline T determinant(const Mat33<T>& m)
-    {
-        return m.determinant();
-    }
+    template <typename T> inline T determinant(const Mat33<T>& m) { return m.determinant(); }
 
     //******************************************************************************
     template <typename T> inline void invert(Mat33<T>& m) { m.invert(); }
 
     //******************************************************************************
-    template <typename T> inline Mat33<T> inverted(const Mat33<T>& m)
-    {
-        return m.inverted();
-    }
+    template <typename T> inline Mat33<T> inverted(const Mat33<T>& m) { return m.inverted(); }
 
     //******************************************************************************
-    template <typename T> inline bool isAffine(const Mat33<T>& m)
-    {
-        return m.isAffine();
-    }
+    template <typename T> inline bool isAffine(const Mat33<T>& m) { return m.isAffine(); }
 
     //******************************************************************************
-    template <typename T>
-    inline void makeTranslation(Mat33<T>& m, const Vec2<T>& t)
-    {
-        m.makeTranslation(t);
-    }
+    template <typename T> inline void makeTranslation(Mat33<T>& m, const Vec2<T>& t) { m.makeTranslation(t); }
 
     //******************************************************************************
     template <typename T> inline Mat33<T> translationMatrix(const Vec2<T>& t)
@@ -695,24 +644,13 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <typename T>
-    inline void setTranslation(Mat33<T>& m, const Vec2<T>& t)
-    {
-        m.setTranslation(t);
-    }
+    template <typename T> inline void setTranslation(Mat33<T>& m, const Vec2<T>& t) { m.setTranslation(t); }
 
     //******************************************************************************
-    template <typename T>
-    inline void addTranslation(Mat33<T>& m, const Vec2<T>& t)
-    {
-        m.addTranslation(t);
-    }
+    template <typename T> inline void addTranslation(Mat33<T>& m, const Vec2<T>& t) { m.addTranslation(t); }
 
     //******************************************************************************
-    template <typename T> inline void makeScale(Mat33<T>& m, const Vec2<T>& s)
-    {
-        m.makeScale(s);
-    }
+    template <typename T> inline void makeScale(Mat33<T>& m, const Vec2<T>& s) { m.makeScale(s); }
 
     //******************************************************************************
     template <typename T> inline Mat33<T> scaleMatrix(const Vec2<T>& s)
@@ -723,15 +661,10 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <typename T>
-    inline void makeRotation(Mat33<T>& m, const T& angleInRadians)
-    {
-        m.makeRotation(angleInRadians);
-    }
+    template <typename T> inline void makeRotation(Mat33<T>& m, const T& angleInRadians) { m.makeRotation(angleInRadians); }
 
     //******************************************************************************
-    template <typename T>
-    inline Mat33<T> rotationMatrix(const T& angleInRadians)
+    template <typename T> inline Mat33<T> rotationMatrix(const T& angleInRadians)
     {
         Mat33<T> ret((void*)1);
         ret.makeRotation(angleInRadians);
@@ -739,18 +672,10 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <typename T>
-    inline Vec2<T> transform(const Mat33<T>& m, const Vec2<T>& v)
-    {
-        return m.transform(v);
-    }
+    template <typename T> inline Vec2<T> transform(const Mat33<T>& m, const Vec2<T>& v) { return m.transform(v); }
 
     //******************************************************************************
-    template <typename T>
-    inline Vec2<T> transformDir(const Mat33<T>& m, const Vec2<T>& v)
-    {
-        return m.transformDir(v);
-    }
+    template <typename T> inline Vec2<T> transformDir(const Mat33<T>& m, const Vec2<T>& v) { return m.transformDir(v); }
 
     //******************************************************************************
     //******************************************************************************
@@ -760,8 +685,7 @@ namespace TwkMath
     // ADDITION
     // Matrices can only be added to other matrices of the same size.
     // No scalars, no vectors.
-    template <typename T>
-    inline Mat33<T> operator+(const Mat33<T>& a, const Mat33<T>& b)
+    template <typename T> inline Mat33<T> operator+(const Mat33<T>& a, const Mat33<T>& b)
     {
         return Mat33<T>(a.m00 + b.m00, a.m01 + b.m01, a.m02 + b.m02,
 
@@ -774,16 +698,14 @@ namespace TwkMath
     // NEGATION
     template <typename T> inline Mat33<T> operator-(const Mat33<T>& a)
     {
-        return Mat33<T>(-a.m00, -a.m01, -a.m02, -a.m10, -a.m11, -a.m12, -a.m20,
-                        -a.m21, -a.m22);
+        return Mat33<T>(-a.m00, -a.m01, -a.m02, -a.m10, -a.m11, -a.m12, -a.m20, -a.m21, -a.m22);
     }
 
     //******************************************************************************
     // SUBTRACTION
     // Matrices can only be subtracted from other matrices of the same size.
     // No scalars, no vectors.
-    template <typename T>
-    inline Mat33<T> operator-(const Mat33<T>& a, const Mat33<T>& b)
+    template <typename T> inline Mat33<T> operator-(const Mat33<T>& a, const Mat33<T>& b)
     {
         return Mat33<T>(a.m00 - b.m00, a.m01 - b.m01, a.m02 - b.m02,
 
@@ -796,47 +718,38 @@ namespace TwkMath
     // SCALAR MULTIPLICATION
     // Matrices can be left and right multiplied by scalars, both of which
     // produce the same effect of multiplying all elements of the matrix.
-    template <typename T>
-    inline Mat33<T> operator*(const Mat33<T>& a, const T& b)
+    template <typename T> inline Mat33<T> operator*(const Mat33<T>& a, const T& b)
     {
-        return Mat33<T>(a.m00 * b, a.m01 * b, a.m02 * b, a.m10 * b, a.m11 * b,
-                        a.m12 * b, a.m20 * b, a.m21 * b, a.m22 * b);
+        return Mat33<T>(a.m00 * b, a.m01 * b, a.m02 * b, a.m10 * b, a.m11 * b, a.m12 * b, a.m20 * b, a.m21 * b, a.m22 * b);
     }
 
     //******************************************************************************
-    template <typename T>
-    inline Mat33<T> operator*(const T& a, const Mat33<T>& b)
+    template <typename T> inline Mat33<T> operator*(const T& a, const Mat33<T>& b)
     {
-        return Mat33<T>(a * b.m00, a * b.m01, a * b.m02, a * b.m10, a * b.m11,
-                        a * b.m12, a * b.m20, a * b.m21, a * b.m22);
+        return Mat33<T>(a * b.m00, a * b.m01, a * b.m02, a * b.m10, a * b.m11, a * b.m12, a * b.m20, a * b.m21, a * b.m22);
     }
 
     //******************************************************************************
     // VECTOR MULTIPLICATION
     // Matrices can be left multiplied by a vector, which results in a vector.
     // Matrices can be right multiplied by a vector, which results in a vector.
-    template <typename T>
-    inline Vec3<T> operator*(const Vec3<T>& v, const Mat33<T>& m)
+    template <typename T> inline Vec3<T> operator*(const Vec3<T>& v, const Mat33<T>& m)
     {
-        return Vec3<T>((v.x * m.m00) + (v.y * m.m10) + (v.z * m.m20),
-                       (v.x * m.m01) + (v.y * m.m11) + (v.z * m.m21),
+        return Vec3<T>((v.x * m.m00) + (v.y * m.m10) + (v.z * m.m20), (v.x * m.m01) + (v.y * m.m11) + (v.z * m.m21),
                        (v.x * m.m02) + (v.y * m.m12) + (v.z * m.m22));
     }
 
     //******************************************************************************
-    template <typename T>
-    inline Vec3<T> operator*(const Mat33<T>& m, const Vec3<T>& v)
+    template <typename T> inline Vec3<T> operator*(const Mat33<T>& m, const Vec3<T>& v)
     {
-        return Vec3<T>((m.m00 * v.x) + (m.m01 * v.y) + (m.m02 * v.z),
-                       (m.m10 * v.x) + (m.m11 * v.y) + (m.m12 * v.z),
+        return Vec3<T>((m.m00 * v.x) + (m.m01 * v.y) + (m.m02 * v.z), (m.m10 * v.x) + (m.m11 * v.y) + (m.m12 * v.z),
                        (m.m20 * v.x) + (m.m21 * v.y) + (m.m22 * v.z));
     }
 
     //******************************************************************************
     // HOMOGENEOUS VECTOR MULTIPLICATION
     // Either direction.
-    template <typename T>
-    inline Vec2<T> operator*(const Vec2<T>& v, const Mat33<T>& m)
+    template <typename T> inline Vec2<T> operator*(const Vec2<T>& v, const Mat33<T>& m)
     {
         Vec3<T> v3(v.x, v.y, T1);
         v3 = v3 * m;
@@ -844,8 +757,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <typename T>
-    inline Vec2<T> operator*(const Mat33<T>& m, const Vec2<T>& v)
+    template <typename T> inline Vec2<T> operator*(const Mat33<T>& m, const Vec2<T>& v)
     {
         Vec3<T> v3(v.x, v.y, T1);
         v3 = m * v3;
@@ -854,19 +766,15 @@ namespace TwkMath
 
     //******************************************************************************
     // MATRIX MULTIPLICATION
-    template <typename T>
-    inline Mat33<T> operator*(const Mat33<T>& a, const Mat33<T>& b)
+    template <typename T> inline Mat33<T> operator*(const Mat33<T>& a, const Mat33<T>& b)
     {
-        return Mat33<T>((a.m00 * b.m00) + (a.m01 * b.m10) + (a.m02 * b.m20),
-                        (a.m00 * b.m01) + (a.m01 * b.m11) + (a.m02 * b.m21),
+        return Mat33<T>((a.m00 * b.m00) + (a.m01 * b.m10) + (a.m02 * b.m20), (a.m00 * b.m01) + (a.m01 * b.m11) + (a.m02 * b.m21),
                         (a.m00 * b.m02) + (a.m01 * b.m12) + (a.m02 * b.m22),
 
-                        (a.m10 * b.m00) + (a.m11 * b.m10) + (a.m12 * b.m20),
-                        (a.m10 * b.m01) + (a.m11 * b.m11) + (a.m12 * b.m21),
+                        (a.m10 * b.m00) + (a.m11 * b.m10) + (a.m12 * b.m20), (a.m10 * b.m01) + (a.m11 * b.m11) + (a.m12 * b.m21),
                         (a.m10 * b.m02) + (a.m11 * b.m12) + (a.m12 * b.m22),
 
-                        (a.m20 * b.m00) + (a.m21 * b.m10) + (a.m22 * b.m20),
-                        (a.m20 * b.m01) + (a.m21 * b.m11) + (a.m22 * b.m21),
+                        (a.m20 * b.m00) + (a.m21 * b.m10) + (a.m22 * b.m20), (a.m20 * b.m01) + (a.m21 * b.m11) + (a.m22 * b.m21),
                         (a.m20 * b.m02) + (a.m21 * b.m12) + (a.m22 * b.m22));
     }
 
@@ -874,8 +782,7 @@ namespace TwkMath
     // DIVISION
     // Matrices can only be divided by scalar.
     // Scalars cannot be divided by matrices.
-    template <typename T>
-    inline Mat33<T> operator/(const Mat33<T>& a, const T& b)
+    template <typename T> inline Mat33<T> operator/(const Mat33<T>& a, const T& b)
     {
         assert(b != T0);
         return Mat33<T>(a.m00 / b, a.m01 / b, a.m02 / b,
@@ -890,8 +797,7 @@ namespace TwkMath
     // COMPARISON OPERATORS
     //******************************************************************************
     //******************************************************************************
-    template <typename T>
-    inline bool operator==(const Mat33<T>& a, const Mat33<T>& b)
+    template <typename T> inline bool operator==(const Mat33<T>& a, const Mat33<T>& b)
     {
         return ((a.m00 == b.m00) && (a.m01 == b.m01) && (a.m02 == b.m02) &&
 
@@ -901,8 +807,7 @@ namespace TwkMath
     }
 
     //******************************************************************************
-    template <typename T>
-    inline bool operator!=(const Mat33<T>& a, const Mat33<T>& b)
+    template <typename T> inline bool operator!=(const Mat33<T>& a, const Mat33<T>& b)
     {
         return ((a.m00 != b.m00) || (a.m01 != b.m01) || (a.m02 != b.m02) ||
 
@@ -913,17 +818,11 @@ namespace TwkMath
 
     //******************************************************************************
 
-    template <typename T>
-    bool zeroWithinTolerance(const Mat33<T>& M, T tolerance)
+    template <typename T> bool zeroWithinTolerance(const Mat33<T>& M, T tolerance)
     {
-        if (Math<T>::abs(M.m00) > tolerance || Math<T>::abs(M.m01) > tolerance
-            || Math<T>::abs(M.m02) > tolerance
-            || Math<T>::abs(M.m10) > tolerance
-            || Math<T>::abs(M.m11) > tolerance
-            || Math<T>::abs(M.m12) > tolerance
-            || Math<T>::abs(M.m20) > tolerance
-            || Math<T>::abs(M.m21) > tolerance
-            || Math<T>::abs(M.m22) > tolerance)
+        if (Math<T>::abs(M.m00) > tolerance || Math<T>::abs(M.m01) > tolerance || Math<T>::abs(M.m02) > tolerance
+            || Math<T>::abs(M.m10) > tolerance || Math<T>::abs(M.m11) > tolerance || Math<T>::abs(M.m12) > tolerance
+            || Math<T>::abs(M.m20) > tolerance || Math<T>::abs(M.m21) > tolerance || Math<T>::abs(M.m22) > tolerance)
         {
             return false;
         }

@@ -13,23 +13,18 @@ namespace IPCore
     {
         using namespace std;
 
-        SetRangeFromViewNodeInfo::SetRangeFromViewNodeInfo(
-            const string& n, TwkApp::CommandInfo::UndoType t)
+        SetRangeFromViewNodeInfo::SetRangeFromViewNodeInfo(const string& n, TwkApp::CommandInfo::UndoType t)
             : CommandInfo(n, t)
         {
         }
 
         SetRangeFromViewNodeInfo::~SetRangeFromViewNodeInfo() {}
 
-        TwkApp::Command* SetRangeFromViewNodeInfo::newCommand() const
-        {
-            return new SetRangeFromViewNode(this);
-        }
+        TwkApp::Command* SetRangeFromViewNodeInfo::newCommand() const { return new SetRangeFromViewNode(this); }
 
         //----------------------------------------------------------------------
 
-        SetRangeFromViewNode::SetRangeFromViewNode(
-            const SetRangeFromViewNodeInfo* info)
+        SetRangeFromViewNode::SetRangeFromViewNode(const SetRangeFromViewNodeInfo* info)
             : Command(info)
             , m_session(0)
         {

@@ -48,10 +48,7 @@ namespace Mu
 #endif
         }
 
-        void pathComponents(const String& path, PathComponents& components)
-        {
-            UTF8tokenize(components, path, "/");
-        }
+        void pathComponents(const String& path, PathComponents& components) { UTF8tokenize(components, path, "/"); }
 
         void setModulePath(const SearchPath& paths)
         {

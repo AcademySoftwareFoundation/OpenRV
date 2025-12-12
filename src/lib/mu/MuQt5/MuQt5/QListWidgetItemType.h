@@ -34,8 +34,7 @@ namespace Mu
         //  Constructors
         //
 
-        QListWidgetItemType(Context* context, const char* name,
-                            Class* superClass = 0);
+        QListWidgetItemType(Context* context, const char* name, Class* superClass = 0);
         virtual ~QListWidgetItemType();
 
         //

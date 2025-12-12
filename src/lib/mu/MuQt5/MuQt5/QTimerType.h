@@ -39,8 +39,7 @@ namespace Mu
         //  Constructors
         //
 
-        QTimerType(Context* context, const char* name, Class* superClass = 0,
-                   Class* superClass2 = 0);
+        QTimerType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QTimerType();
 
@@ -82,10 +81,7 @@ namespace Mu
 
         void customEvent_pub(QEvent* event) { customEvent(event); }
 
-        void customEvent_pub_parent(QEvent* event)
-        {
-            QTimer::customEvent(event);
-        }
+        void customEvent_pub_parent(QEvent* event) { QTimer::customEvent(event); }
 
     public:
         const QTimerType* _baseType;
@@ -93,11 +89,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance*
-    QTimerType::cachedInstance(const QTimerType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QTimerType::cachedInstance(const QTimerType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

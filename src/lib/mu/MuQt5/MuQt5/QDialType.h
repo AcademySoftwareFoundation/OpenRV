@@ -39,8 +39,7 @@ namespace Mu
         //  Constructors
         //
 
-        QDialType(Context* context, const char* name, Class* superClass = 0,
-                  Class* superClass2 = 0);
+        QDialType(Context* context, const char* name, Class* superClass = 0, Class* superClass2 = 0);
 
         virtual ~QDialType();
 
@@ -86,24 +85,15 @@ namespace Mu
 
         void mouseMoveEvent_pub(QMouseEvent* e) { mouseMoveEvent(e); }
 
-        void mouseMoveEvent_pub_parent(QMouseEvent* e)
-        {
-            QDial::mouseMoveEvent(e);
-        }
+        void mouseMoveEvent_pub_parent(QMouseEvent* e) { QDial::mouseMoveEvent(e); }
 
         void mousePressEvent_pub(QMouseEvent* e) { mousePressEvent(e); }
 
-        void mousePressEvent_pub_parent(QMouseEvent* e)
-        {
-            QDial::mousePressEvent(e);
-        }
+        void mousePressEvent_pub_parent(QMouseEvent* e) { QDial::mousePressEvent(e); }
 
         void mouseReleaseEvent_pub(QMouseEvent* e) { mouseReleaseEvent(e); }
 
-        void mouseReleaseEvent_pub_parent(QMouseEvent* e)
-        {
-            QDial::mouseReleaseEvent(e);
-        }
+        void mouseReleaseEvent_pub_parent(QMouseEvent* e) { QDial::mouseReleaseEvent(e); }
 
         void paintEvent_pub(QPaintEvent* pe) { paintEvent(pe); }
 
@@ -119,10 +109,7 @@ namespace Mu
 
         void keyPressEvent_pub(QKeyEvent* ev) { keyPressEvent(ev); }
 
-        void keyPressEvent_pub_parent(QKeyEvent* ev)
-        {
-            QDial::keyPressEvent(ev);
-        }
+        void keyPressEvent_pub_parent(QKeyEvent* ev) { QDial::keyPressEvent(ev); }
 
         void timerEvent_pub(QTimerEvent* e) { timerEvent(e); }
 
@@ -138,11 +125,7 @@ namespace Mu
         const CallEnvironment* _env;
     };
 
-    inline ClassInstance*
-    QDialType::cachedInstance(const QDialType::MuQtType* obj)
-    {
-        return obj->_obj;
-    }
+    inline ClassInstance* QDialType::cachedInstance(const QDialType::MuQtType* obj) { return obj->_obj; }
 
 } // namespace Mu
 

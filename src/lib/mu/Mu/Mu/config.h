@@ -217,15 +217,11 @@ namespace Mu
 #define MU_GC_ALLOC(t) Mu::GarbageCollector::api()->allocate(t)
 #define MU_GC_ALLOC_STUBBORN(t) Mu::GarbageCollector::api()->allocateStubborn(t)
 #define MU_GC_ALLOC_ATOMIC(t) Mu::GarbageCollector::api()->allocateAtomic(t)
-#define MU_GC_ALLOC_ATOMIC_IGNORE_OFF_PAGE(t) \
-    Mu::GarbageCollector::api()->allocateAtomicOffPage(t)
-#define MU_GC_ALLOC_IGNORE_OFF_PAGE(t) \
-    Mu::GarbageCollector::api()->allocateOffPage(t)
+#define MU_GC_ALLOC_ATOMIC_IGNORE_OFF_PAGE(t) Mu::GarbageCollector::api()->allocateAtomicOffPage(t)
+#define MU_GC_ALLOC_IGNORE_OFF_PAGE(t) Mu::GarbageCollector::api()->allocateOffPage(t)
 #define MU_GC_FREE(t) Mu::GarbageCollector::api()->free(t)
-#define MU_GC_END_CHANGE_STUBBORN(x) \
-    Mu::GarbageCollector::api()->endChangeStubborn((void*)x)
-#define MU_GC_BEGIN_CHANGE_STUBBORN(x) \
-    Mu::GarbageCollector::api()->beginChangeStubborn((void*)x)
+#define MU_GC_END_CHANGE_STUBBORN(x) Mu::GarbageCollector::api()->endChangeStubborn((void*)x)
+#define MU_GC_BEGIN_CHANGE_STUBBORN(x) Mu::GarbageCollector::api()->beginChangeStubborn((void*)x)
 
 //----------------------------------------------------------------------
 #ifdef MU_USE_BOEHM_COLLECTOR
@@ -236,23 +232,17 @@ namespace Mu
     static void* operator new[](size_t size) { return MU_GC_ALLOC(size); } \
     static void operator delete(void* p, size_t s) {}                      \
     static void operator delete[](void* pnt) {}
-#define MU_GCAPI_STUBBORN_NEW_DELETE                                        \
-    static void* operator new(size_t s, void* p) { return p; }              \
-    static void* operator new(size_t s) { return MU_GC_ALLOC_STUBBORN(s); } \
-    static void* operator new[](size_t size)                                \
-    {                                                                       \
-        return MU_GC_ALLOC_STUBBORN(size);                                  \
-    }                                                                       \
-    static void operator delete(void* p, size_t s) {}                       \
+#define MU_GCAPI_STUBBORN_NEW_DELETE                                                \
+    static void* operator new(size_t s, void* p) { return p; }                      \
+    static void* operator new(size_t s) { return MU_GC_ALLOC_STUBBORN(s); }         \
+    static void* operator new[](size_t size) { return MU_GC_ALLOC_STUBBORN(size); } \
+    static void operator delete(void* p, size_t s) {}                               \
     static void operator delete[](void* pnt) {}
-#define MU_GCAPI_ATOMIC_NEW_DELETE                                        \
-    static void* operator new(size_t s, void* p) { return p; }            \
-    static void* operator new(size_t s) { return MU_GC_ALLOC_ATOMIC(s); } \
-    static void* operator new[](size_t size)                              \
-    {                                                                     \
-        return MU_GC_ALLOC_ATOMIC(size);                                  \
-    }                                                                     \
-    static void operator delete(void* p, size_t s) {}                     \
+#define MU_GCAPI_ATOMIC_NEW_DELETE                                                \
+    static void* operator new(size_t s, void* p) { return p; }                    \
+    static void* operator new(size_t s) { return MU_GC_ALLOC_ATOMIC(s); }         \
+    static void* operator new[](size_t size) { return MU_GC_ALLOC_ATOMIC(size); } \
+    static void operator delete(void* p, size_t s) {}                             \
     static void operator delete[](void* pnt) {}
 #define MU_GC_NEW_DELETE                                                 \
     static void* operator new(size_t s, void* p) { return p; }           \
@@ -260,23 +250,17 @@ namespace Mu
     static void* operator new[](size_t size) { return GC_MALLOC(size); } \
     static void operator delete(void* p, size_t s) {}                    \
     static void operator delete[](void* pnt) {}
-#define MU_GC_STUBBORN_NEW_DELETE                                         \
-    static void* operator new(size_t s, void* p) { return p; }            \
-    static void* operator new(size_t s) { return GC_MALLOC_STUBBORN(s); } \
-    static void* operator new[](size_t size)                              \
-    {                                                                     \
-        return GC_MALLOC_STUBBORN(size);                                  \
-    }                                                                     \
-    static void operator delete(void* p, size_t s) {}                     \
+#define MU_GC_STUBBORN_NEW_DELETE                                                 \
+    static void* operator new(size_t s, void* p) { return p; }                    \
+    static void* operator new(size_t s) { return GC_MALLOC_STUBBORN(s); }         \
+    static void* operator new[](size_t size) { return GC_MALLOC_STUBBORN(size); } \
+    static void operator delete(void* p, size_t s) {}                             \
     static void operator delete[](void* pnt) {}
-#define MU_GC_ATOMIC_NEW_DELETE                                         \
-    static void* operator new(size_t s, void* p) { return p; }          \
-    static void* operator new(size_t s) { return GC_MALLOC_ATOMIC(s); } \
-    static void* operator new[](size_t size)                            \
-    {                                                                   \
-        return GC_MALLOC_ATOMIC(size);                                  \
-    }                                                                   \
-    static void operator delete(void* p, size_t s) {}                   \
+#define MU_GC_ATOMIC_NEW_DELETE                                                 \
+    static void* operator new(size_t s, void* p) { return p; }                  \
+    static void* operator new(size_t s) { return GC_MALLOC_ATOMIC(s); }         \
+    static void* operator new[](size_t size) { return GC_MALLOC_ATOMIC(size); } \
+    static void operator delete(void* p, size_t s) {}                           \
     static void operator delete[](void* pnt) {}
 #define MU_STL_ALLOCATOR gc_allocator
 #define MU_STL_MUAPI_ALLOCATOR MuGCAPI_allocator

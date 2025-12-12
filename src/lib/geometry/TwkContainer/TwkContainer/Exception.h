@@ -45,14 +45,11 @@ namespace TwkContainer
     };
 
     TWK_GEOM_EXC_DECLARE(ReadFailedExc, Exception, "read failed")
-    TWK_GEOM_EXC_DECLARE(BadPropertyTypeMatchExc, Exception,
-                         "bad property match")
+    TWK_GEOM_EXC_DECLARE(BadPropertyTypeMatchExc, Exception, "bad property match")
     TWK_GEOM_EXC_DECLARE(NoPropertyExc, Exception, "no such property")
     TWK_GEOM_EXC_DECLARE(UnexpectedExc, Exception, "unexpected program state")
-    TWK_GEOM_EXC_DECLARE(TypeMismatchExc, Exception,
-                         "PropertyContainer type mismatch")
-    TWK_GEOM_EXC_DECLARE(IncompatibleGeometryExc, Exception,
-                         "incompatible geometry")
+    TWK_GEOM_EXC_DECLARE(TypeMismatchExc, Exception, "PropertyContainer type mismatch")
+    TWK_GEOM_EXC_DECLARE(IncompatibleGeometryExc, Exception, "incompatible geometry")
 
 } // namespace TwkContainer
 

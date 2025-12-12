@@ -16,13 +16,13 @@ from pathlib import Path
 import subprocess
 import threading
 
-from typing import Iterable
 
 future_lock = threading.Lock()
 
 # Configure logging.
-logging.basicConfig(format='-- %(message)s')
+logging.basicConfig(format="-- %(message)s")
 logger = logging.getLogger().setLevel(logging.INFO)
+
 
 def get_object_files(target):
     target = Path(target)
@@ -40,9 +40,7 @@ def get_object_files(target):
 
 
 def get_rpaths(object_file_path):
-    otool_output = subprocess.check_output(
-        ["otool", "-l", object_file_path]
-    ).decode().splitlines()
+    otool_output = subprocess.check_output(["otool", "-l", object_file_path]).decode().splitlines()
 
     i = 0
     while i < len(otool_output):
@@ -60,10 +58,9 @@ def get_rpaths(object_file_path):
                     yield rpath_line[1]
                     break
 
+
 def get_shared_library_paths(object_file_path):
-    otool_output = subprocess.check_output(
-        ["otool", "-L", object_file_path]
-    ).decode().splitlines()
+    otool_output = subprocess.check_output(["otool", "-L", object_file_path]).decode().splitlines()
 
     i = 0
 
@@ -73,6 +70,7 @@ def get_shared_library_paths(object_file_path):
         if "(compatibility version" in otool_line:
             yield otool_line.split("(compatibility")[0].strip()
 
+
 def delete_rpath(object_file_path, rpath):
     delete_rpath_command = [
         "install_name_tool",
@@ -81,6 +79,7 @@ def delete_rpath(object_file_path, rpath):
         object_file_path,
     ]
     subprocess.run(delete_rpath_command).check_returncode()
+
 
 def change_shared_library_path(object_file_path, old_library_path):
     new_library_path = f"@rpath/{os.path.basename(old_library_path)}"
@@ -96,6 +95,7 @@ def change_shared_library_path(object_file_path, old_library_path):
 
     return new_library_path
 
+
 def fix_rpath(target, root):
     for file in get_object_files(target):
         logging.info(f"Fixing rpaths for {file}")
@@ -104,7 +104,7 @@ def fix_rpath(target, root):
         # become invalid due to our rpath fixing logic.
         # IMPORTANT:
         #    Numpy was the only issue found, but it could happend again if new dependencies are added.
-        is_numpy = file._str.find(f"numpy")
+        is_numpy = file._str.find("numpy")
         if is_numpy > -1:
             logging.info(f"Skipping {file} because numpy")
             return
@@ -114,7 +114,7 @@ def fix_rpath(target, root):
         for rpath in get_rpaths(file):
             output = f"\trpath: {rpath}"
 
-            if rpath.startswith("@") is False and rpath.startswith(".") is False and not rpath in deletedRPATH:
+            if rpath.startswith("@") is False and rpath.startswith(".") is False and rpath not in deletedRPATH:
                 delete_rpath(file, rpath)
                 deletedRPATH.append(rpath)
                 output += " (Deleted)"
@@ -128,22 +128,25 @@ def fix_rpath(target, root):
 
             shared_library_name = os.path.basename(library_path)
             if library_path.startswith(root) or library_path == shared_library_name:
-                 new_library_path = change_shared_library_path(file, library_path)
-                 output += f" (Changed to {new_library_path})"
+                new_library_path = change_shared_library_path(file, library_path)
+                output += f" (Changed to {new_library_path})"
 
             logging.info(output)
 
+
 def read_paths_from_file(file_path):
     paths = []
-    with open(file_path, 'r') as file:
+    with open(file_path, "r") as file:
         for line in file:
-            paths.append(line.strip()) # strip() removes newline characters
+            paths.append(line.strip())  # strip() removes newline characters
     return paths
+
 
 def fix_rpath_with_lock(path, root_dir):
     with future_lock:
         return fix_rpath(str(path), str(root_dir))
-    
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
@@ -162,7 +165,7 @@ if __name__ == "__main__":
         raise FileNotFoundError(f"Unable to locate {args.files_list.absolute()}")
     if args.root_dir.exists() is False:
         raise FileNotFoundError(f"Unable to locate {args.root_dir.absolute()}")
-    
+
     # file option has priority over files-list.
     if args.file:
         # Fail if file is not in root
@@ -172,7 +175,10 @@ if __name__ == "__main__":
         paths = read_paths_from_file(str(args.files_list.resolve().absolute()))
         with concurrent.futures.ThreadPoolExecutor() as executor:
             # Create a list of futures for each path to be processed.
-            futures = [executor.submit(fix_rpath_with_lock, pathlib.Path(path), args.root_dir.resolve().absolute()) for path in paths]
+            futures = [
+                executor.submit(fix_rpath_with_lock, pathlib.Path(path), args.root_dir.resolve().absolute())
+                for path in paths
+            ]
             for future in concurrent.futures.as_completed(futures):
                 try:
                     result = future.result()

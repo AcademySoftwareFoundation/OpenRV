@@ -56,8 +56,7 @@ namespace IPCore
             Interpolation method;
         };
 
-        FormatIPNode(const std::string& name, const NodeDefinition* def,
-                     IPGraph*, GroupIPNode* group = 0);
+        FormatIPNode(const std::string& name, const NodeDefinition* def, IPGraph*, GroupIPNode* group = 0);
         virtual ~FormatIPNode();
 
         virtual IPImage* evaluate(const Context&);

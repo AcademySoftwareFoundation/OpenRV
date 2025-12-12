@@ -58,21 +58,17 @@ namespace Mu
         _baseType = 0;
     }
 
-    MuQt_QNetworkCookieJar::MuQt_QNetworkCookieJar(Pointer muobj,
-                                                   const CallEnvironment* ce,
-                                                   QObject* parent)
+    MuQt_QNetworkCookieJar::MuQt_QNetworkCookieJar(Pointer muobj, const CallEnvironment* ce, QObject* parent)
         : QNetworkCookieJar(parent)
     {
         _env = ce;
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QNetworkCookieJarType>(
-            c->internName("qt.QNetworkCookieJar"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QNetworkCookieJarType>(c->internName("qt.QNetworkCookieJar"));
     }
 
-    QList<QNetworkCookie>
-    MuQt_QNetworkCookieJar::cookiesForUrl(const QUrl& url) const
+    QList<QNetworkCookie> MuQt_QNetworkCookieJar::cookiesForUrl(const QUrl& url) const
     {
         if (!_env)
             return QNetworkCookieJar::cookiesForUrl(url);
@@ -104,8 +100,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqtype<QNetworkCookieType>(c, cookie, "qt.QNetworkCookie"));
+            args[1] = Value(makeqtype<QNetworkCookieType>(c, cookie, "qt.QNetworkCookie"));
             Value rval = _env->call(F, args);
             return (bool)(rval._bool);
         }
@@ -126,8 +121,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqtype<QNetworkCookieType>(c, cookie, "qt.QNetworkCookie"));
+            args[1] = Value(makeqtype<QNetworkCookieType>(c, cookie, "qt.QNetworkCookie"));
             Value rval = _env->call(F, args);
             return (bool)(rval._bool);
         }
@@ -137,8 +131,7 @@ namespace Mu
         }
     }
 
-    bool MuQt_QNetworkCookieJar::setCookiesFromUrl(
-        const QList<QNetworkCookie>& cookieList, const QUrl& url)
+    bool MuQt_QNetworkCookieJar::setCookiesFromUrl(const QList<QNetworkCookie>& cookieList, const QUrl& url)
     {
         if (!_env)
             return QNetworkCookieJar::setCookiesFromUrl(cookieList, url);
@@ -149,8 +142,7 @@ namespace Mu
         {
             Function::ArgumentVector args(3);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(makeqtypelist<QNetworkCookie, QNetworkCookieType>(
-                c, cookieList, "qt.QNetworkCookie"));
+            args[1] = Value(makeqtypelist<QNetworkCookie, QNetworkCookieType>(c, cookieList, "qt.QNetworkCookie"));
             args[2] = Value(makeqtype<QUrlType>(c, url, "qt.QUrl"));
             Value rval = _env->call(F, args);
             return (bool)(rval._bool);
@@ -172,8 +164,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqtype<QNetworkCookieType>(c, cookie, "qt.QNetworkCookie"));
+            args[1] = Value(makeqtype<QNetworkCookieType>(c, cookie, "qt.QNetworkCookie"));
             Value rval = _env->call(F, args);
             return (bool)(rval._bool);
         }
@@ -183,8 +174,7 @@ namespace Mu
         }
     }
 
-    bool MuQt_QNetworkCookieJar::validateCookie(const QNetworkCookie& cookie,
-                                                const QUrl& url) const
+    bool MuQt_QNetworkCookieJar::validateCookie(const QNetworkCookie& cookie, const QUrl& url) const
     {
         if (!_env)
             return QNetworkCookieJar::validateCookie(cookie, url);
@@ -195,8 +185,7 @@ namespace Mu
         {
             Function::ArgumentVector args(3);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqtype<QNetworkCookieType>(c, cookie, "qt.QNetworkCookie"));
+            args[1] = Value(makeqtype<QNetworkCookieType>(c, cookie, "qt.QNetworkCookie"));
             args[2] = Value(makeqtype<QUrlType>(c, url, "qt.QUrl"));
             Value rval = _env->call(F, args);
             return (bool)(rval._bool);
@@ -239,8 +228,7 @@ namespace Mu
         {
             Function::ArgumentVector args(3);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeinstance<QObjectType>(c, watched, "qt.QObject"));
+            args[1] = Value(makeinstance<QObjectType>(c, watched, "qt.QObject"));
             args[2] = Value(makeqpointer<QEventType>(c, event, "qt.QEvent"));
             Value rval = _env->call(F, args);
             return (bool)(rval._bool);
@@ -288,8 +276,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QTimerEventType>(c, event, "qt.QTimerEvent"));
+            args[1] = Value(makeqpointer<QTimerEventType>(c, event, "qt.QTimerEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -301,8 +288,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  Mu Type CONSTRUCTORS
 
-    QNetworkCookieJarType::QNetworkCookieJarType(Context* c, const char* name,
-                                                 Class* super, Class* super2)
+    QNetworkCookieJarType::QNetworkCookieJarType(Context* c, const char* name, Class* super, Class* super2)
         : Class(c, name, vectorOf2(super, super2))
     {
     }
@@ -312,9 +298,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    static Pointer
-    QNetworkCookieJar_QNetworkCookieJar_QObject(Thread& NODE_THREAD,
-                                                Pointer obj)
+    static Pointer QNetworkCookieJar_QNetworkCookieJar_QObject(Thread& NODE_THREAD, Pointer obj)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         ClassInstance* widget = reinterpret_cast<ClassInstance*>(obj);
@@ -326,8 +310,7 @@ namespace Mu
         else if (QNetworkCookieJar* w = object<QNetworkCookieJar>(widget))
         {
             QNetworkCookieJarType* type =
-                c->findSymbolOfTypeByQualifiedName<QNetworkCookieJarType>(
-                    c->internName("qt.QNetworkCookieJar"), false);
+                c->findSymbolOfTypeByQualifiedName<QNetworkCookieJarType>(c->internName("qt.QNetworkCookieJar"), false);
             ClassInstance* o = ClassInstance::allocate(type);
             setobject(o, w);
             return o;
@@ -340,147 +323,114 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(castFromObject, Pointer)
     {
-        NODE_RETURN(QNetworkCookieJar_QNetworkCookieJar_QObject(
-            NODE_THREAD, NODE_ARG(0, Pointer)));
+        NODE_RETURN(QNetworkCookieJar_QNetworkCookieJar_QObject(NODE_THREAD, NODE_ARG(0, Pointer)));
     }
 
-    Pointer
-    qt_QNetworkCookieJar_QNetworkCookieJar_QNetworkCookieJar_QNetworkCookieJar_QObject(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
+    Pointer qt_QNetworkCookieJar_QNetworkCookieJar_QNetworkCookieJar_QNetworkCookieJar_QObject(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                               Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QObject* arg1 = object<QObject>(param_parent);
-        setobject(param_this,
-                  new MuQt_QNetworkCookieJar(
-                      param_this, NODE_THREAD.process()->callEnv(), arg1));
+        setobject(param_this, new MuQt_QNetworkCookieJar(param_this, NODE_THREAD.process()->callEnv(), arg1));
         return param_this;
     }
 
-    Pointer
-    qt_QNetworkCookieJar_cookiesForUrl_qt__QNetworkCookieBSB_ESB__QNetworkCookieJar_QUrl(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_url)
+    Pointer qt_QNetworkCookieJar_cookiesForUrl_qt__QNetworkCookieBSB_ESB__QNetworkCookieJar_QUrl(Mu::Thread& NODE_THREAD,
+                                                                                                 Pointer param_this, Pointer param_url)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QNetworkCookieJar* arg0 = object<QNetworkCookieJar>(param_this);
         const QUrl arg1 = getqtype<QUrlType>(param_url);
         return isMuQtObject(arg0)
-                   ? makeqtypelist<QNetworkCookie, QNetworkCookieType>(
-                         c, arg0->QNetworkCookieJar::cookiesForUrl(arg1),
-                         "qt.QNetworkCookie")
-                   : makeqtypelist<QNetworkCookie, QNetworkCookieType>(
-                         c, arg0->cookiesForUrl(arg1), "qt.QNetworkCookie");
+                   ? makeqtypelist<QNetworkCookie, QNetworkCookieType>(c, arg0->QNetworkCookieJar::cookiesForUrl(arg1), "qt.QNetworkCookie")
+                   : makeqtypelist<QNetworkCookie, QNetworkCookieType>(c, arg0->cookiesForUrl(arg1), "qt.QNetworkCookie");
     }
 
-    bool
-    qt_QNetworkCookieJar_deleteCookie_bool_QNetworkCookieJar_QNetworkCookie(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_cookie)
+    bool qt_QNetworkCookieJar_deleteCookie_bool_QNetworkCookieJar_QNetworkCookie(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                 Pointer param_cookie)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QNetworkCookieJar* arg0 = object<QNetworkCookieJar>(param_this);
         const QNetworkCookie arg1 = getqtype<QNetworkCookieType>(param_cookie);
-        return isMuQtObject(arg0) ? arg0->QNetworkCookieJar::deleteCookie(arg1)
-                                  : arg0->deleteCookie(arg1);
+        return isMuQtObject(arg0) ? arg0->QNetworkCookieJar::deleteCookie(arg1) : arg0->deleteCookie(arg1);
     }
 
-    bool
-    qt_QNetworkCookieJar_insertCookie_bool_QNetworkCookieJar_QNetworkCookie(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_cookie)
+    bool qt_QNetworkCookieJar_insertCookie_bool_QNetworkCookieJar_QNetworkCookie(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                 Pointer param_cookie)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QNetworkCookieJar* arg0 = object<QNetworkCookieJar>(param_this);
         const QNetworkCookie arg1 = getqtype<QNetworkCookieType>(param_cookie);
-        return isMuQtObject(arg0) ? arg0->QNetworkCookieJar::insertCookie(arg1)
-                                  : arg0->insertCookie(arg1);
+        return isMuQtObject(arg0) ? arg0->QNetworkCookieJar::insertCookie(arg1) : arg0->insertCookie(arg1);
     }
 
-    bool
-    qt_QNetworkCookieJar_setCookiesFromUrl_bool_QNetworkCookieJar_qt__QNetworkCookieBSB_ESB__QUrl(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_cookieList,
-        Pointer param_url)
+    bool qt_QNetworkCookieJar_setCookiesFromUrl_bool_QNetworkCookieJar_qt__QNetworkCookieBSB_ESB__QUrl(Mu::Thread& NODE_THREAD,
+                                                                                                       Pointer param_this,
+                                                                                                       Pointer param_cookieList,
+                                                                                                       Pointer param_url)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QNetworkCookieJar* arg0 = object<QNetworkCookieJar>(param_this);
-        const QList<QNetworkCookie> arg1 =
-            qtypelist<QNetworkCookie, QNetworkCookieType>(param_cookieList);
+        const QList<QNetworkCookie> arg1 = qtypelist<QNetworkCookie, QNetworkCookieType>(param_cookieList);
         const QUrl arg2 = getqtype<QUrlType>(param_url);
-        return isMuQtObject(arg0)
-                   ? arg0->QNetworkCookieJar::setCookiesFromUrl(arg1, arg2)
-                   : arg0->setCookiesFromUrl(arg1, arg2);
+        return isMuQtObject(arg0) ? arg0->QNetworkCookieJar::setCookiesFromUrl(arg1, arg2) : arg0->setCookiesFromUrl(arg1, arg2);
     }
 
-    bool
-    qt_QNetworkCookieJar_updateCookie_bool_QNetworkCookieJar_QNetworkCookie(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_cookie)
+    bool qt_QNetworkCookieJar_updateCookie_bool_QNetworkCookieJar_QNetworkCookie(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                 Pointer param_cookie)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QNetworkCookieJar* arg0 = object<QNetworkCookieJar>(param_this);
         const QNetworkCookie arg1 = getqtype<QNetworkCookieType>(param_cookie);
-        return isMuQtObject(arg0) ? arg0->QNetworkCookieJar::updateCookie(arg1)
-                                  : arg0->updateCookie(arg1);
+        return isMuQtObject(arg0) ? arg0->QNetworkCookieJar::updateCookie(arg1) : arg0->updateCookie(arg1);
     }
 
-    Pointer
-    qt_QNetworkCookieJar_allCookies_qt__QNetworkCookieBSB_ESB__QNetworkCookieJar(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QNetworkCookieJar_allCookies_qt__QNetworkCookieBSB_ESB__QNetworkCookieJar(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QNetworkCookieJar* arg0 = object<QNetworkCookieJar>(param_this);
-        return makeqtypelist<QNetworkCookie, QNetworkCookieType>(
-            c, ((MuQt_QNetworkCookieJar*)arg0)->allCookies_pub(),
-            "qt.QNetworkCookie");
+        return makeqtypelist<QNetworkCookie, QNetworkCookieType>(c, ((MuQt_QNetworkCookieJar*)arg0)->allCookies_pub(), "qt.QNetworkCookie");
     }
 
-    void
-    qt_QNetworkCookieJar_setAllCookies_void_QNetworkCookieJar_qt__QNetworkCookieBSB_ESB_(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_cookieList)
+    void qt_QNetworkCookieJar_setAllCookies_void_QNetworkCookieJar_qt__QNetworkCookieBSB_ESB_(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                              Pointer param_cookieList)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QNetworkCookieJar* arg0 = object<QNetworkCookieJar>(param_this);
-        const QList<QNetworkCookie> arg1 =
-            qtypelist<QNetworkCookie, QNetworkCookieType>(param_cookieList);
+        const QList<QNetworkCookie> arg1 = qtypelist<QNetworkCookie, QNetworkCookieType>(param_cookieList);
         ((MuQt_QNetworkCookieJar*)arg0)->setAllCookies_pub(arg1);
     }
 
-    bool
-    qt_QNetworkCookieJar_validateCookie_bool_QNetworkCookieJar_QNetworkCookie_QUrl(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_cookie,
-        Pointer param_url)
+    bool qt_QNetworkCookieJar_validateCookie_bool_QNetworkCookieJar_QNetworkCookie_QUrl(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                        Pointer param_cookie, Pointer param_url)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QNetworkCookieJar* arg0 = object<QNetworkCookieJar>(param_this);
         const QNetworkCookie arg1 = getqtype<QNetworkCookieType>(param_cookie);
         const QUrl arg2 = getqtype<QUrlType>(param_url);
-        return isMuQtObject(arg0) ? ((MuQt_QNetworkCookieJar*)arg0)
-                                        ->validateCookie_pub_parent(arg1, arg2)
-                                  : ((MuQt_QNetworkCookieJar*)arg0)
-                                        ->validateCookie_pub(arg1, arg2);
+        return isMuQtObject(arg0) ? ((MuQt_QNetworkCookieJar*)arg0)->validateCookie_pub_parent(arg1, arg2)
+                                  : ((MuQt_QNetworkCookieJar*)arg0)->validateCookie_pub(arg1, arg2);
     }
 
-    bool qt_QNetworkCookieJar_event_bool_QNetworkCookieJar_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
+    bool qt_QNetworkCookieJar_event_bool_QNetworkCookieJar_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QNetworkCookieJar* arg0 = object<QNetworkCookieJar>(param_this);
         QEvent* arg1 = getqpointer<QEventType>(param_e);
-        return isMuQtObject(arg0) ? arg0->QNetworkCookieJar::event(arg1)
-                                  : arg0->event(arg1);
+        return isMuQtObject(arg0) ? arg0->QNetworkCookieJar::event(arg1) : arg0->event(arg1);
     }
 
-    bool qt_QNetworkCookieJar_eventFilter_bool_QNetworkCookieJar_QObject_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_watched,
-        Pointer param_event)
+    bool qt_QNetworkCookieJar_eventFilter_bool_QNetworkCookieJar_QObject_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                Pointer param_watched, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QNetworkCookieJar* arg0 = object<QNetworkCookieJar>(param_this);
         QObject* arg1 = object<QObject>(param_watched);
         QEvent* arg2 = getqpointer<QEventType>(param_event);
-        return isMuQtObject(arg0)
-                   ? arg0->QNetworkCookieJar::eventFilter(arg1, arg2)
-                   : arg0->eventFilter(arg1, arg2);
+        return isMuQtObject(arg0) ? arg0->QNetworkCookieJar::eventFilter(arg1, arg2) : arg0->eventFilter(arg1, arg2);
     }
 
-    void qt_QNetworkCookieJar_customEvent_void_QNetworkCookieJar_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QNetworkCookieJar_customEvent_void_QNetworkCookieJar_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QNetworkCookieJar* arg0 = object<QNetworkCookieJar>(param_this);
@@ -491,8 +441,8 @@ namespace Mu
             ((MuQt_QNetworkCookieJar*)arg0)->customEvent_pub(arg1);
     }
 
-    void qt_QNetworkCookieJar_timerEvent_void_QNetworkCookieJar_QTimerEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QNetworkCookieJar_timerEvent_void_QNetworkCookieJar_QTimerEvent(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                            Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QNetworkCookieJar* arg0 = object<QNetworkCookieJar>(param_this);
@@ -505,97 +455,77 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(_n_QNetworkCookieJar0, Pointer)
     {
-        NODE_RETURN(
-            qt_QNetworkCookieJar_QNetworkCookieJar_QNetworkCookieJar_QNetworkCookieJar_QObject(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QNetworkCookieJar_QNetworkCookieJar_QNetworkCookieJar_QNetworkCookieJar_QObject(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_cookiesForUrl0, Pointer)
     {
-        NODE_RETURN(
-            qt_QNetworkCookieJar_cookiesForUrl_qt__QNetworkCookieBSB_ESB__QNetworkCookieJar_QUrl(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QNetworkCookieJar_cookiesForUrl_qt__QNetworkCookieBSB_ESB__QNetworkCookieJar_QUrl(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_deleteCookie0, bool)
     {
-        NODE_RETURN(
-            qt_QNetworkCookieJar_deleteCookie_bool_QNetworkCookieJar_QNetworkCookie(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QNetworkCookieJar_deleteCookie_bool_QNetworkCookieJar_QNetworkCookie(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                            NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_insertCookie0, bool)
     {
-        NODE_RETURN(
-            qt_QNetworkCookieJar_insertCookie_bool_QNetworkCookieJar_QNetworkCookie(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QNetworkCookieJar_insertCookie_bool_QNetworkCookieJar_QNetworkCookie(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                            NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_setCookiesFromUrl0, bool)
     {
-        NODE_RETURN(
-            qt_QNetworkCookieJar_setCookiesFromUrl_bool_QNetworkCookieJar_qt__QNetworkCookieBSB_ESB__QUrl(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QNetworkCookieJar_setCookiesFromUrl_bool_QNetworkCookieJar_qt__QNetworkCookieBSB_ESB__QUrl(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_updateCookie0, bool)
     {
-        NODE_RETURN(
-            qt_QNetworkCookieJar_updateCookie_bool_QNetworkCookieJar_QNetworkCookie(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QNetworkCookieJar_updateCookie_bool_QNetworkCookieJar_QNetworkCookie(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                            NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_allCookies0, Pointer)
     {
-        NODE_RETURN(
-            qt_QNetworkCookieJar_allCookies_qt__QNetworkCookieBSB_ESB__QNetworkCookieJar(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QNetworkCookieJar_allCookies_qt__QNetworkCookieBSB_ESB__QNetworkCookieJar(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_setAllCookies0, void)
     {
-        qt_QNetworkCookieJar_setAllCookies_void_QNetworkCookieJar_qt__QNetworkCookieBSB_ESB_(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QNetworkCookieJar_setAllCookies_void_QNetworkCookieJar_qt__QNetworkCookieBSB_ESB_(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                             NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_validateCookie0, bool)
     {
-        NODE_RETURN(
-            qt_QNetworkCookieJar_validateCookie_bool_QNetworkCookieJar_QNetworkCookie_QUrl(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QNetworkCookieJar_validateCookie_bool_QNetworkCookieJar_QNetworkCookie_QUrl(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_event0, bool)
     {
-        NODE_RETURN(qt_QNetworkCookieJar_event_bool_QNetworkCookieJar_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(
+            qt_QNetworkCookieJar_event_bool_QNetworkCookieJar_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_eventFilter0, bool)
     {
-        NODE_RETURN(
-            qt_QNetworkCookieJar_eventFilter_bool_QNetworkCookieJar_QObject_QEvent(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QNetworkCookieJar_eventFilter_bool_QNetworkCookieJar_QObject_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                           NODE_ARG(1, Pointer), NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_customEvent0, void)
     {
-        qt_QNetworkCookieJar_customEvent_void_QNetworkCookieJar_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QNetworkCookieJar_customEvent_void_QNetworkCookieJar_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_timerEvent0, void)
     {
-        qt_QNetworkCookieJar_timerEvent_void_QNetworkCookieJar_QTimerEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QNetworkCookieJar_timerEvent_void_QNetworkCookieJar_QTimerEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     void QNetworkCookieJarType::load()
@@ -615,17 +545,13 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
-                   new Function(c, tn, castFromObject, Cast, Compiled,
-                                QNetworkCookieJar_QNetworkCookieJar_QObject,
-                                Return, ftn, Parameters,
+                   new Function(c, tn, castFromObject, Cast, Compiled, QNetworkCookieJar_QNetworkCookieJar_QObject, Return, ftn, Parameters,
                                 new Param(c, "object", "qt.QObject"), End),
 
                    EndArguments);
@@ -633,93 +559,59 @@ namespace Mu
         addSymbols(
             // enums
             // member functions
-            new Function(
-                c, "QNetworkCookieJar", _n_QNetworkCookieJar0, None, Compiled,
-                qt_QNetworkCookieJar_QNetworkCookieJar_QNetworkCookieJar_QNetworkCookieJar_QObject,
-                Return, "qt.QNetworkCookieJar", Parameters,
-                new Param(c, "this", "qt.QNetworkCookieJar"),
-                new Param(c, "parent", "qt.QObject"), End),
-            _func[0] = new MemberFunction(
-                c, "cookiesForUrl", _n_cookiesForUrl0, None, Compiled,
-                qt_QNetworkCookieJar_cookiesForUrl_qt__QNetworkCookieBSB_ESB__QNetworkCookieJar_QUrl,
-                Return, "qt.QNetworkCookie[]", Parameters,
-                new Param(c, "this", "qt.QNetworkCookieJar"),
-                new Param(c, "url", "qt.QUrl"), End),
-            _func[1] = new MemberFunction(
-                c, "deleteCookie", _n_deleteCookie0, None, Compiled,
-                qt_QNetworkCookieJar_deleteCookie_bool_QNetworkCookieJar_QNetworkCookie,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QNetworkCookieJar"),
-                new Param(c, "cookie", "qt.QNetworkCookie"), End),
-            _func[2] = new MemberFunction(
-                c, "insertCookie", _n_insertCookie0, None, Compiled,
-                qt_QNetworkCookieJar_insertCookie_bool_QNetworkCookieJar_QNetworkCookie,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QNetworkCookieJar"),
-                new Param(c, "cookie", "qt.QNetworkCookie"), End),
-            _func[3] = new MemberFunction(
-                c, "setCookiesFromUrl", _n_setCookiesFromUrl0, None, Compiled,
-                qt_QNetworkCookieJar_setCookiesFromUrl_bool_QNetworkCookieJar_qt__QNetworkCookieBSB_ESB__QUrl,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QNetworkCookieJar"),
-                new Param(c, "cookieList", "qt.QNetworkCookie[]"),
-                new Param(c, "url", "qt.QUrl"), End),
-            _func[4] = new MemberFunction(
-                c, "updateCookie", _n_updateCookie0, None, Compiled,
-                qt_QNetworkCookieJar_updateCookie_bool_QNetworkCookieJar_QNetworkCookie,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QNetworkCookieJar"),
-                new Param(c, "cookie", "qt.QNetworkCookie"), End),
-            new Function(
-                c, "allCookies", _n_allCookies0, None, Compiled,
-                qt_QNetworkCookieJar_allCookies_qt__QNetworkCookieBSB_ESB__QNetworkCookieJar,
-                Return, "qt.QNetworkCookie[]", Parameters,
-                new Param(c, "this", "qt.QNetworkCookieJar"), End),
-            new Function(
-                c, "setAllCookies", _n_setAllCookies0, None, Compiled,
-                qt_QNetworkCookieJar_setAllCookies_void_QNetworkCookieJar_qt__QNetworkCookieBSB_ESB_,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QNetworkCookieJar"),
-                new Param(c, "cookieList", "qt.QNetworkCookie[]"), End),
-            _func[5] = new MemberFunction(
-                c, "validateCookie", _n_validateCookie0, None, Compiled,
-                qt_QNetworkCookieJar_validateCookie_bool_QNetworkCookieJar_QNetworkCookie_QUrl,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QNetworkCookieJar"),
-                new Param(c, "cookie", "qt.QNetworkCookie"),
-                new Param(c, "url", "qt.QUrl"), End),
-            _func[6] = new MemberFunction(
-                c, "event", _n_event0, None, Compiled,
-                qt_QNetworkCookieJar_event_bool_QNetworkCookieJar_QEvent,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QNetworkCookieJar"),
-                new Param(c, "e", "qt.QEvent"), End),
-            _func[7] = new MemberFunction(
-                c, "eventFilter", _n_eventFilter0, None, Compiled,
-                qt_QNetworkCookieJar_eventFilter_bool_QNetworkCookieJar_QObject_QEvent,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QNetworkCookieJar"),
-                new Param(c, "watched", "qt.QObject"),
-                new Param(c, "event", "qt.QEvent"), End),
+            new Function(c, "QNetworkCookieJar", _n_QNetworkCookieJar0, None, Compiled,
+                         qt_QNetworkCookieJar_QNetworkCookieJar_QNetworkCookieJar_QNetworkCookieJar_QObject, Return, "qt.QNetworkCookieJar",
+                         Parameters, new Param(c, "this", "qt.QNetworkCookieJar"), new Param(c, "parent", "qt.QObject"), End),
+            _func[0] = new MemberFunction(c, "cookiesForUrl", _n_cookiesForUrl0, None, Compiled,
+                                          qt_QNetworkCookieJar_cookiesForUrl_qt__QNetworkCookieBSB_ESB__QNetworkCookieJar_QUrl, Return,
+                                          "qt.QNetworkCookie[]", Parameters, new Param(c, "this", "qt.QNetworkCookieJar"),
+                                          new Param(c, "url", "qt.QUrl"), End),
+            _func[1] =
+                new MemberFunction(c, "deleteCookie", _n_deleteCookie0, None, Compiled,
+                                   qt_QNetworkCookieJar_deleteCookie_bool_QNetworkCookieJar_QNetworkCookie, Return, "bool", Parameters,
+                                   new Param(c, "this", "qt.QNetworkCookieJar"), new Param(c, "cookie", "qt.QNetworkCookie"), End),
+            _func[2] =
+                new MemberFunction(c, "insertCookie", _n_insertCookie0, None, Compiled,
+                                   qt_QNetworkCookieJar_insertCookie_bool_QNetworkCookieJar_QNetworkCookie, Return, "bool", Parameters,
+                                   new Param(c, "this", "qt.QNetworkCookieJar"), new Param(c, "cookie", "qt.QNetworkCookie"), End),
+            _func[3] = new MemberFunction(c, "setCookiesFromUrl", _n_setCookiesFromUrl0, None, Compiled,
+                                          qt_QNetworkCookieJar_setCookiesFromUrl_bool_QNetworkCookieJar_qt__QNetworkCookieBSB_ESB__QUrl,
+                                          Return, "bool", Parameters, new Param(c, "this", "qt.QNetworkCookieJar"),
+                                          new Param(c, "cookieList", "qt.QNetworkCookie[]"), new Param(c, "url", "qt.QUrl"), End),
+            _func[4] =
+                new MemberFunction(c, "updateCookie", _n_updateCookie0, None, Compiled,
+                                   qt_QNetworkCookieJar_updateCookie_bool_QNetworkCookieJar_QNetworkCookie, Return, "bool", Parameters,
+                                   new Param(c, "this", "qt.QNetworkCookieJar"), new Param(c, "cookie", "qt.QNetworkCookie"), End),
+            new Function(c, "allCookies", _n_allCookies0, None, Compiled,
+                         qt_QNetworkCookieJar_allCookies_qt__QNetworkCookieBSB_ESB__QNetworkCookieJar, Return, "qt.QNetworkCookie[]",
+                         Parameters, new Param(c, "this", "qt.QNetworkCookieJar"), End),
+            new Function(c, "setAllCookies", _n_setAllCookies0, None, Compiled,
+                         qt_QNetworkCookieJar_setAllCookies_void_QNetworkCookieJar_qt__QNetworkCookieBSB_ESB_, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QNetworkCookieJar"), new Param(c, "cookieList", "qt.QNetworkCookie[]"), End),
+            _func[5] = new MemberFunction(c, "validateCookie", _n_validateCookie0, None, Compiled,
+                                          qt_QNetworkCookieJar_validateCookie_bool_QNetworkCookieJar_QNetworkCookie_QUrl, Return, "bool",
+                                          Parameters, new Param(c, "this", "qt.QNetworkCookieJar"),
+                                          new Param(c, "cookie", "qt.QNetworkCookie"), new Param(c, "url", "qt.QUrl"), End),
+            _func[6] =
+                new MemberFunction(c, "event", _n_event0, None, Compiled, qt_QNetworkCookieJar_event_bool_QNetworkCookieJar_QEvent, Return,
+                                   "bool", Parameters, new Param(c, "this", "qt.QNetworkCookieJar"), new Param(c, "e", "qt.QEvent"), End),
+            _func[7] = new MemberFunction(c, "eventFilter", _n_eventFilter0, None, Compiled,
+                                          qt_QNetworkCookieJar_eventFilter_bool_QNetworkCookieJar_QObject_QEvent, Return, "bool",
+                                          Parameters, new Param(c, "this", "qt.QNetworkCookieJar"), new Param(c, "watched", "qt.QObject"),
+                                          new Param(c, "event", "qt.QEvent"), End),
             // MISSING: metaObject ("const QMetaObject *"; QNetworkCookieJar
             // this) MISSING: childEvent (void; QNetworkCookieJar this,
             // "QChildEvent *" event) // protected MISSING: connectNotify (void;
             // QNetworkCookieJar this, "const QMetaMethod &" signal) //
             // protected
-            _func[8] = new MemberFunction(
-                c, "customEvent", _n_customEvent0, None, Compiled,
-                qt_QNetworkCookieJar_customEvent_void_QNetworkCookieJar_QEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QNetworkCookieJar"),
-                new Param(c, "event", "qt.QEvent"), End),
+            _func[8] = new MemberFunction(c, "customEvent", _n_customEvent0, None, Compiled,
+                                          qt_QNetworkCookieJar_customEvent_void_QNetworkCookieJar_QEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QNetworkCookieJar"), new Param(c, "event", "qt.QEvent"), End),
             // MISSING: disconnectNotify (void; QNetworkCookieJar this, "const
             // QMetaMethod &" signal) // protected
-            _func[9] = new MemberFunction(
-                c, "timerEvent", _n_timerEvent0, None, Compiled,
-                qt_QNetworkCookieJar_timerEvent_void_QNetworkCookieJar_QTimerEvent,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QNetworkCookieJar"),
-                new Param(c, "event", "qt.QTimerEvent"), End),
+            _func[9] = new MemberFunction(c, "timerEvent", _n_timerEvent0, None, Compiled,
+                                          qt_QNetworkCookieJar_timerEvent_void_QNetworkCookieJar_QTimerEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QNetworkCookieJar"), new Param(c, "event", "qt.QTimerEvent"), End),
             // static functions
             EndArguments);
         globalScope()->addSymbols(EndArguments);

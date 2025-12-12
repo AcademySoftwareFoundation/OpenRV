@@ -83,29 +83,15 @@ namespace TwkMath
         T operator()() { return T(nextFloat()); }
     };
 
-    template <> inline int QuickRandGenerator<int>::operator()()
-    {
-        return nextLong();
-    }
+    template <> inline int QuickRandGenerator<int>::operator()() { return nextLong(); }
 
-    template <>
-    inline unsigned int QuickRandGenerator<unsigned int>::operator()()
-    {
-        return nextULong();
-    }
+    template <> inline unsigned int QuickRandGenerator<unsigned int>::operator()() { return nextULong(); }
 
-    template <> inline char QuickRandGenerator<char>::operator()()
-    {
-        return char(nextULong() % sizeof(char));
-    }
+    template <> inline char QuickRandGenerator<char>::operator()() { return char(nextULong() % sizeof(char)); }
 
-    template <> inline short QuickRandGenerator<short>::operator()()
-    {
-        return char(nextULong() % sizeof(short));
-    }
+    template <> inline short QuickRandGenerator<short>::operator()() { return char(nextULong() % sizeof(short)); }
 
-    template <>
-    inline unsigned short QuickRandGenerator<unsigned short>::operator()()
+    template <> inline unsigned short QuickRandGenerator<unsigned short>::operator()()
     {
         return char(nextULong() % sizeof(unsigned short));
     }
@@ -145,8 +131,7 @@ namespace TwkMath
     //  GaussRand as an STL Generator function.
     //
 
-    template <typename T, class RANDGEN>
-    class GaussRandGenerator : public GaussRand<RANDGEN>
+    template <typename T, class RANDGEN> class GaussRandGenerator : public GaussRand<RANDGEN>
     {
     public:
         GaussRandGenerator(RANDGEN& r)
@@ -228,8 +213,7 @@ namespace TwkMath
     }
 
     //*****************************************************************************
-    inline unsigned long QuickRand::nextULong(unsigned long low,
-                                              unsigned long high)
+    inline unsigned long QuickRand::nextULong(unsigned long low, unsigned long high)
     {
         if (low < high)
         {
@@ -299,25 +283,16 @@ namespace TwkMath
     }
 
     //*****************************************************************************
-    inline float QuickRand::nextFloat()
-    {
-        return ((float)nextULong()) / ((float)ULONG_MAX);
-    }
+    inline float QuickRand::nextFloat() { return ((float)nextULong()) / ((float)ULONG_MAX); }
 
     //*****************************************************************************
     inline float QuickRand::next() { return nextFloat(); }
 
     //*****************************************************************************
-    inline float QuickRand::nextFloat(float range)
-    {
-        return range * nextFloat();
-    }
+    inline float QuickRand::nextFloat(float range) { return range * nextFloat(); }
 
     //*****************************************************************************
-    inline float QuickRand::nextFloat(float start, float end)
-    {
-        return start + nextFloat(end - start);
-    }
+    inline float QuickRand::nextFloat(float start, float end) { return start + nextFloat(end - start); }
 
     //*****************************************************************************
     template <class RANDGEN> float GaussRand<RANDGEN>::next()
@@ -357,11 +332,7 @@ namespace TwkMath
     }
 
     //*****************************************************************************
-    template <class RANDGEN>
-    inline float GaussRand<RANDGEN>::next(float mean, float stddev)
-    {
-        return mean + (next() * stddev);
-    }
+    template <class RANDGEN> inline float GaussRand<RANDGEN>::next(float mean, float stddev) { return mean + (next() * stddev); }
 
 } // End namespace TwkMath
 

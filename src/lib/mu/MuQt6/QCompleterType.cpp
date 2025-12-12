@@ -64,40 +64,34 @@ namespace Mu
         _baseType = 0;
     }
 
-    MuQt_QCompleter::MuQt_QCompleter(Pointer muobj, const CallEnvironment* ce,
-                                     QObject* parent)
+    MuQt_QCompleter::MuQt_QCompleter(Pointer muobj, const CallEnvironment* ce, QObject* parent)
         : QCompleter(parent)
     {
         _env = ce;
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QCompleterType>(
-            c->internName("qt.QCompleter"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QCompleterType>(c->internName("qt.QCompleter"));
     }
 
-    MuQt_QCompleter::MuQt_QCompleter(Pointer muobj, const CallEnvironment* ce,
-                                     QAbstractItemModel* model, QObject* parent)
+    MuQt_QCompleter::MuQt_QCompleter(Pointer muobj, const CallEnvironment* ce, QAbstractItemModel* model, QObject* parent)
         : QCompleter(model, parent)
     {
         _env = ce;
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QCompleterType>(
-            c->internName("qt.QCompleter"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QCompleterType>(c->internName("qt.QCompleter"));
     }
 
-    MuQt_QCompleter::MuQt_QCompleter(Pointer muobj, const CallEnvironment* ce,
-                                     const QStringList& list, QObject* parent)
+    MuQt_QCompleter::MuQt_QCompleter(Pointer muobj, const CallEnvironment* ce, const QStringList& list, QObject* parent)
         : QCompleter(list, parent)
     {
         _env = ce;
         _obj = reinterpret_cast<ClassInstance*>(muobj);
         _obj->retainExternal();
         MuLangContext* c = (MuLangContext*)_env->context();
-        _baseType = c->findSymbolOfTypeByQualifiedName<QCompleterType>(
-            c->internName("qt.QCompleter"));
+        _baseType = c->findSymbolOfTypeByQualifiedName<QCompleterType>(c->internName("qt.QCompleter"));
     }
 
     QString MuQt_QCompleter::pathFromIndex(const QModelIndex& index) const
@@ -111,8 +105,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] =
-                Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
+            args[1] = Value(makeqtype<QModelIndexType>(c, index, "qt.QModelIndex"));
             Value rval = _env->call(F, args);
             return qstring(rval._Pointer);
         }
@@ -223,8 +216,7 @@ namespace Mu
         {
             Function::ArgumentVector args(2);
             args[0] = Value(Pointer(_obj));
-            args[1] = Value(
-                makeqpointer<QTimerEventType>(c, event, "qt.QTimerEvent"));
+            args[1] = Value(makeqpointer<QTimerEventType>(c, event, "qt.QTimerEvent"));
             Value rval = _env->call(F, args);
         }
         else
@@ -236,8 +228,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  Mu Type CONSTRUCTORS
 
-    QCompleterType::QCompleterType(Context* c, const char* name, Class* super,
-                                   Class* super2)
+    QCompleterType::QCompleterType(Context* c, const char* name, Class* super, Class* super2)
         : Class(c, name, vectorOf2(super, super2))
     {
     }
@@ -247,8 +238,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    static Pointer QCompleter_QCompleter_QObject(Thread& NODE_THREAD,
-                                                 Pointer obj)
+    static Pointer QCompleter_QCompleter_QObject(Thread& NODE_THREAD, Pointer obj)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         ClassInstance* widget = reinterpret_cast<ClassInstance*>(obj);
@@ -259,9 +249,7 @@ namespace Mu
         }
         else if (QCompleter* w = object<QCompleter>(widget))
         {
-            QCompleterType* type =
-                c->findSymbolOfTypeByQualifiedName<QCompleterType>(
-                    c->internName("qt.QCompleter"), false);
+            QCompleterType* type = c->findSymbolOfTypeByQualifiedName<QCompleterType>(c->internName("qt.QCompleter"), false);
             ClassInstance* o = ClassInstance::allocate(type);
             setobject(o, w);
             return o;
@@ -272,128 +260,94 @@ namespace Mu
         }
     }
 
-    static NODE_IMPLEMENTATION(castFromObject, Pointer)
-    {
-        NODE_RETURN(
-            QCompleter_QCompleter_QObject(NODE_THREAD, NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(castFromObject, Pointer) { NODE_RETURN(QCompleter_QCompleter_QObject(NODE_THREAD, NODE_ARG(0, Pointer))); }
 
-    Pointer qt_QCompleter_QCompleter_QCompleter_QCompleter_QObject(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
+    Pointer qt_QCompleter_QCompleter_QCompleter_QCompleter_QObject(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QObject* arg1 = object<QObject>(param_parent);
-        setobject(param_this,
-                  new MuQt_QCompleter(param_this,
-                                      NODE_THREAD.process()->callEnv(), arg1));
+        setobject(param_this, new MuQt_QCompleter(param_this, NODE_THREAD.process()->callEnv(), arg1));
         return param_this;
     }
 
-    Pointer
-    qt_QCompleter_QCompleter_QCompleter_QCompleter_QAbstractItemModel_QObject(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_model,
-        Pointer param_parent)
+    Pointer qt_QCompleter_QCompleter_QCompleter_QCompleter_QAbstractItemModel_QObject(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                      Pointer param_model, Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QAbstractItemModel* arg1 = object<QAbstractItemModel>(param_model);
         QObject* arg2 = object<QObject>(param_parent);
-        setobject(param_this, new MuQt_QCompleter(
-                                  param_this, NODE_THREAD.process()->callEnv(),
-                                  arg1, arg2));
+        setobject(param_this, new MuQt_QCompleter(param_this, NODE_THREAD.process()->callEnv(), arg1, arg2));
         return param_this;
     }
 
-    Pointer
-    qt_QCompleter_QCompleter_QCompleter_QCompleter_stringBSB_ESB__QObject(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_list,
-        Pointer param_parent)
+    Pointer qt_QCompleter_QCompleter_QCompleter_QCompleter_stringBSB_ESB__QObject(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                  Pointer param_list, Pointer param_parent)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QStringList arg1 = qstringlist(param_list);
         QObject* arg2 = object<QObject>(param_parent);
-        setobject(param_this, new MuQt_QCompleter(
-                                  param_this, NODE_THREAD.process()->callEnv(),
-                                  arg1, arg2));
+        setobject(param_this, new MuQt_QCompleter(param_this, NODE_THREAD.process()->callEnv(), arg1, arg2));
         return param_this;
     }
 
-    int qt_QCompleter_completionCount_int_QCompleter(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_this)
+    int qt_QCompleter_completionCount_int_QCompleter(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QCompleter* arg0 = object<QCompleter>(param_this);
         return arg0->completionCount();
     }
 
-    Pointer qt_QCompleter_completionModel_QAbstractItemModel_QCompleter(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QCompleter_completionModel_QAbstractItemModel_QCompleter(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QCompleter* arg0 = object<QCompleter>(param_this);
-        return makeinstance<QAbstractItemModelType>(c, arg0->completionModel(),
-                                                    "qt.QAbstractItemModel");
+        return makeinstance<QAbstractItemModelType>(c, arg0->completionModel(), "qt.QAbstractItemModel");
     }
 
-    Pointer
-    qt_QCompleter_currentCompletion_string_QCompleter(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    Pointer qt_QCompleter_currentCompletion_string_QCompleter(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QCompleter* arg0 = object<QCompleter>(param_this);
         return makestring(c, arg0->currentCompletion());
     }
 
-    Pointer
-    qt_QCompleter_currentIndex_QModelIndex_QCompleter(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    Pointer qt_QCompleter_currentIndex_QModelIndex_QCompleter(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QCompleter* arg0 = object<QCompleter>(param_this);
-        return makeqtype<QModelIndexType>(c, arg0->currentIndex(),
-                                          "qt.QModelIndex");
+        return makeqtype<QModelIndexType>(c, arg0->currentIndex(), "qt.QModelIndex");
     }
 
-    int qt_QCompleter_currentRow_int_QCompleter(Mu::Thread& NODE_THREAD,
-                                                Pointer param_this)
+    int qt_QCompleter_currentRow_int_QCompleter(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QCompleter* arg0 = object<QCompleter>(param_this);
         return arg0->currentRow();
     }
 
-    Pointer
-    qt_QCompleter_model_QAbstractItemModel_QCompleter(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    Pointer qt_QCompleter_model_QAbstractItemModel_QCompleter(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QCompleter* arg0 = object<QCompleter>(param_this);
-        return makeinstance<QAbstractItemModelType>(c, arg0->model(),
-                                                    "qt.QAbstractItemModel");
+        return makeinstance<QAbstractItemModelType>(c, arg0->model(), "qt.QAbstractItemModel");
     }
 
-    Pointer qt_QCompleter_pathFromIndex_string_QCompleter_QModelIndex(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index)
+    Pointer qt_QCompleter_pathFromIndex_string_QCompleter_QModelIndex(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_index)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QCompleter* arg0 = object<QCompleter>(param_this);
         const QModelIndex arg1 = getqtype<QModelIndexType>(param_index);
-        return isMuQtObject(arg0)
-                   ? makestring(c, arg0->QCompleter::pathFromIndex(arg1))
-                   : makestring(c, arg0->pathFromIndex(arg1));
+        return isMuQtObject(arg0) ? makestring(c, arg0->QCompleter::pathFromIndex(arg1)) : makestring(c, arg0->pathFromIndex(arg1));
     }
 
-    Pointer
-    qt_QCompleter_popup_QAbstractItemView_QCompleter(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_this)
+    Pointer qt_QCompleter_popup_QAbstractItemView_QCompleter(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QCompleter* arg0 = object<QCompleter>(param_this);
-        return makeinstance<QAbstractItemViewType>(c, arg0->popup(),
-                                                   "qt.QAbstractItemView");
+        return makeinstance<QAbstractItemViewType>(c, arg0->popup(), "qt.QAbstractItemView");
     }
 
-    bool qt_QCompleter_setCurrentRow_bool_QCompleter_int(
-        Mu::Thread& NODE_THREAD, Pointer param_this, int param_row)
+    bool qt_QCompleter_setCurrentRow_bool_QCompleter_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_row)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QCompleter* arg0 = object<QCompleter>(param_this);
@@ -401,8 +355,7 @@ namespace Mu
         return arg0->setCurrentRow(arg1);
     }
 
-    void qt_QCompleter_setModel_void_QCompleter_QAbstractItemModel(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_model)
+    void qt_QCompleter_setModel_void_QCompleter_QAbstractItemModel(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_model)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QCompleter* arg0 = object<QCompleter>(param_this);
@@ -410,8 +363,7 @@ namespace Mu
         arg0->setModel(arg1);
     }
 
-    void qt_QCompleter_setPopup_void_QCompleter_QAbstractItemView(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_popup)
+    void qt_QCompleter_setPopup_void_QCompleter_QAbstractItemView(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_popup)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QCompleter* arg0 = object<QCompleter>(param_this);
@@ -419,8 +371,7 @@ namespace Mu
         arg0->setPopup(arg1);
     }
 
-    void qt_QCompleter_setWidget_void_QCompleter_QWidget(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_widget)
+    void qt_QCompleter_setWidget_void_QCompleter_QWidget(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_widget)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QCompleter* arg0 = object<QCompleter>(param_this);
@@ -428,53 +379,41 @@ namespace Mu
         arg0->setWidget(arg1);
     }
 
-    Pointer qt_QCompleter_splitPath_stringBSB_ESB__QCompleter_string(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_path)
+    Pointer qt_QCompleter_splitPath_stringBSB_ESB__QCompleter_string(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_path)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QCompleter* arg0 = object<QCompleter>(param_this);
         const QString arg1 = qstring(param_path);
-        return isMuQtObject(arg0)
-                   ? makestringlist(c, arg0->QCompleter::splitPath(arg1))
-                   : makestringlist(c, arg0->splitPath(arg1));
+        return isMuQtObject(arg0) ? makestringlist(c, arg0->QCompleter::splitPath(arg1)) : makestringlist(c, arg0->splitPath(arg1));
     }
 
-    Pointer qt_QCompleter_widget_QWidget_QCompleter(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this)
+    Pointer qt_QCompleter_widget_QWidget_QCompleter(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QCompleter* arg0 = object<QCompleter>(param_this);
         return makeinstance<QWidgetType>(c, arg0->widget(), "qt.QWidget");
     }
 
-    bool qt_QCompleter_event_bool_QCompleter_QEvent(Mu::Thread& NODE_THREAD,
-                                                    Pointer param_this,
-                                                    Pointer param_ev)
+    bool qt_QCompleter_event_bool_QCompleter_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_ev)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QCompleter* arg0 = object<QCompleter>(param_this);
         QEvent* arg1 = getqpointer<QEventType>(param_ev);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QCompleter*)arg0)->event_pub_parent(arg1)
-                   : ((MuQt_QCompleter*)arg0)->event_pub(arg1);
+        return isMuQtObject(arg0) ? ((MuQt_QCompleter*)arg0)->event_pub_parent(arg1) : ((MuQt_QCompleter*)arg0)->event_pub(arg1);
     }
 
-    bool qt_QCompleter_eventFilter_bool_QCompleter_QObject_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_o,
-        Pointer param_e)
+    bool qt_QCompleter_eventFilter_bool_QCompleter_QObject_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_o,
+                                                                  Pointer param_e)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QCompleter* arg0 = object<QCompleter>(param_this);
         QObject* arg1 = object<QObject>(param_o);
         QEvent* arg2 = getqpointer<QEventType>(param_e);
-        return isMuQtObject(arg0)
-                   ? ((MuQt_QCompleter*)arg0)
-                         ->eventFilter_pub_parent(arg1, arg2)
-                   : ((MuQt_QCompleter*)arg0)->eventFilter_pub(arg1, arg2);
+        return isMuQtObject(arg0) ? ((MuQt_QCompleter*)arg0)->eventFilter_pub_parent(arg1, arg2)
+                                  : ((MuQt_QCompleter*)arg0)->eventFilter_pub(arg1, arg2);
     }
 
-    void qt_QCompleter_customEvent_void_QCompleter_QEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QCompleter_customEvent_void_QCompleter_QEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QCompleter* arg0 = object<QCompleter>(param_this);
@@ -485,8 +424,7 @@ namespace Mu
             ((MuQt_QCompleter*)arg0)->customEvent_pub(arg1);
     }
 
-    void qt_QCompleter_timerEvent_void_QCompleter_QTimerEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
+    void qt_QCompleter_timerEvent_void_QCompleter_QTimerEvent(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_event)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QCompleter* arg0 = object<QCompleter>(param_this);
@@ -499,133 +437,112 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(_n_QCompleter0, Pointer)
     {
-        NODE_RETURN(qt_QCompleter_QCompleter_QCompleter_QCompleter_QObject(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QCompleter_QCompleter_QCompleter_QCompleter_QObject(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_QCompleter1, Pointer)
     {
-        NODE_RETURN(
-            qt_QCompleter_QCompleter_QCompleter_QCompleter_QAbstractItemModel_QObject(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QCompleter_QCompleter_QCompleter_QCompleter_QAbstractItemModel_QObject(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                              NODE_ARG(1, Pointer), NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_QCompleter2, Pointer)
     {
-        NODE_RETURN(
-            qt_QCompleter_QCompleter_QCompleter_QCompleter_stringBSB_ESB__QObject(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QCompleter_QCompleter_QCompleter_QCompleter_stringBSB_ESB__QObject(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
+                                                                                          NODE_ARG(1, Pointer), NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_completionCount0, int)
     {
-        NODE_RETURN(qt_QCompleter_completionCount_int_QCompleter(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QCompleter_completionCount_int_QCompleter(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_completionModel0, Pointer)
     {
-        NODE_RETURN(qt_QCompleter_completionModel_QAbstractItemModel_QCompleter(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QCompleter_completionModel_QAbstractItemModel_QCompleter(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_currentCompletion0, Pointer)
     {
-        NODE_RETURN(qt_QCompleter_currentCompletion_string_QCompleter(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QCompleter_currentCompletion_string_QCompleter(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_currentIndex0, Pointer)
     {
-        NODE_RETURN(qt_QCompleter_currentIndex_QModelIndex_QCompleter(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QCompleter_currentIndex_QModelIndex_QCompleter(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_currentRow0, int)
     {
-        NODE_RETURN(qt_QCompleter_currentRow_int_QCompleter(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QCompleter_currentRow_int_QCompleter(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_model0, Pointer)
     {
-        NODE_RETURN(qt_QCompleter_model_QAbstractItemModel_QCompleter(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QCompleter_model_QAbstractItemModel_QCompleter(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_pathFromIndex0, Pointer)
     {
-        NODE_RETURN(qt_QCompleter_pathFromIndex_string_QCompleter_QModelIndex(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(
+            qt_QCompleter_pathFromIndex_string_QCompleter_QModelIndex(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_popup0, Pointer)
     {
-        NODE_RETURN(qt_QCompleter_popup_QAbstractItemView_QCompleter(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QCompleter_popup_QAbstractItemView_QCompleter(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_setCurrentRow0, bool)
     {
-        NODE_RETURN(qt_QCompleter_setCurrentRow_bool_QCompleter_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
+        NODE_RETURN(qt_QCompleter_setCurrentRow_bool_QCompleter_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_setModel0, void)
     {
-        qt_QCompleter_setModel_void_QCompleter_QAbstractItemModel(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QCompleter_setModel_void_QCompleter_QAbstractItemModel(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setPopup0, void)
     {
-        qt_QCompleter_setPopup_void_QCompleter_QAbstractItemView(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QCompleter_setPopup_void_QCompleter_QAbstractItemView(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setWidget0, void)
     {
-        qt_QCompleter_setWidget_void_QCompleter_QWidget(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QCompleter_setWidget_void_QCompleter_QWidget(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_splitPath0, Pointer)
     {
-        NODE_RETURN(qt_QCompleter_splitPath_stringBSB_ESB__QCompleter_string(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(
+            qt_QCompleter_splitPath_stringBSB_ESB__QCompleter_string(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_widget0, Pointer)
     {
-        NODE_RETURN(qt_QCompleter_widget_QWidget_QCompleter(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QCompleter_widget_QWidget_QCompleter(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_event0, bool)
     {
-        NODE_RETURN(qt_QCompleter_event_bool_QCompleter_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QCompleter_event_bool_QCompleter_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_eventFilter0, bool)
     {
-        NODE_RETURN(qt_QCompleter_eventFilter_bool_QCompleter_QObject_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, Pointer)));
+        NODE_RETURN(qt_QCompleter_eventFilter_bool_QCompleter_QObject_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
+                                                                             NODE_ARG(2, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_customEvent0, void)
     {
-        qt_QCompleter_customEvent_void_QCompleter_QEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QCompleter_customEvent_void_QCompleter_QEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_timerEvent0, void)
     {
-        qt_QCompleter_timerEvent_void_QCompleter_QTimerEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QCompleter_timerEvent_void_QCompleter_QTimerEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     void QCompleterType::load()
@@ -645,17 +562,13 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
-                   new Function(c, tn, castFromObject, Cast, Compiled,
-                                QCompleter_QCompleter_QObject, Return, ftn,
-                                Parameters,
+                   new Function(c, tn, castFromObject, Cast, Compiled, QCompleter_QCompleter_QObject, Return, ftn, Parameters,
                                 new Param(c, "object", "qt.QObject"), End),
 
                    EndArguments);
@@ -663,142 +576,85 @@ namespace Mu
         addSymbols(
             // enums
             // member functions
-            new Function(c, "QCompleter", _n_QCompleter0, None, Compiled,
-                         qt_QCompleter_QCompleter_QCompleter_QCompleter_QObject,
-                         Return, "qt.QCompleter", Parameters,
-                         new Param(c, "this", "qt.QCompleter"),
+            new Function(c, "QCompleter", _n_QCompleter0, None, Compiled, qt_QCompleter_QCompleter_QCompleter_QCompleter_QObject, Return,
+                         "qt.QCompleter", Parameters, new Param(c, "this", "qt.QCompleter"), new Param(c, "parent", "qt.QObject"), End),
+            new Function(c, "QCompleter", _n_QCompleter1, None, Compiled,
+                         qt_QCompleter_QCompleter_QCompleter_QCompleter_QAbstractItemModel_QObject, Return, "qt.QCompleter", Parameters,
+                         new Param(c, "this", "qt.QCompleter"), new Param(c, "model", "qt.QAbstractItemModel"),
                          new Param(c, "parent", "qt.QObject"), End),
-            new Function(
-                c, "QCompleter", _n_QCompleter1, None, Compiled,
-                qt_QCompleter_QCompleter_QCompleter_QCompleter_QAbstractItemModel_QObject,
-                Return, "qt.QCompleter", Parameters,
-                new Param(c, "this", "qt.QCompleter"),
-                new Param(c, "model", "qt.QAbstractItemModel"),
-                new Param(c, "parent", "qt.QObject"), End),
-            new Function(
-                c, "QCompleter", _n_QCompleter2, None, Compiled,
-                qt_QCompleter_QCompleter_QCompleter_QCompleter_stringBSB_ESB__QObject,
-                Return, "qt.QCompleter", Parameters,
-                new Param(c, "this", "qt.QCompleter"),
-                new Param(c, "list", "string[]"),
-                new Param(c, "parent", "qt.QObject"), End),
+            new Function(c, "QCompleter", _n_QCompleter2, None, Compiled,
+                         qt_QCompleter_QCompleter_QCompleter_QCompleter_stringBSB_ESB__QObject, Return, "qt.QCompleter", Parameters,
+                         new Param(c, "this", "qt.QCompleter"), new Param(c, "list", "string[]"), new Param(c, "parent", "qt.QObject"),
+                         End),
             // PROP: caseSensitivity (flags Qt::CaseSensitivity; QCompleter
             // this) PROP: completionColumn (int; QCompleter this)
-            new Function(c, "completionCount", _n_completionCount0, None,
-                         Compiled, qt_QCompleter_completionCount_int_QCompleter,
-                         Return, "int", Parameters,
-                         new Param(c, "this", "qt.QCompleter"), End),
+            new Function(c, "completionCount", _n_completionCount0, None, Compiled, qt_QCompleter_completionCount_int_QCompleter, Return,
+                         "int", Parameters, new Param(c, "this", "qt.QCompleter"), End),
             // PROP: completionMode (flags QCompleter::CompletionMode;
             // QCompleter this)
-            new Function(
-                c, "completionModel", _n_completionModel0, None, Compiled,
-                qt_QCompleter_completionModel_QAbstractItemModel_QCompleter,
-                Return, "qt.QAbstractItemModel", Parameters,
-                new Param(c, "this", "qt.QCompleter"), End),
+            new Function(c, "completionModel", _n_completionModel0, None, Compiled,
+                         qt_QCompleter_completionModel_QAbstractItemModel_QCompleter, Return, "qt.QAbstractItemModel", Parameters,
+                         new Param(c, "this", "qt.QCompleter"), End),
             // PROP: completionPrefix (string; QCompleter this)
             // PROP: completionRole (int; QCompleter this)
-            new Function(c, "currentCompletion", _n_currentCompletion0, None,
-                         Compiled,
-                         qt_QCompleter_currentCompletion_string_QCompleter,
-                         Return, "string", Parameters,
-                         new Param(c, "this", "qt.QCompleter"), End),
-            new Function(c, "currentIndex", _n_currentIndex0, None, Compiled,
-                         qt_QCompleter_currentIndex_QModelIndex_QCompleter,
-                         Return, "qt.QModelIndex", Parameters,
-                         new Param(c, "this", "qt.QCompleter"), End),
-            new Function(c, "currentRow", _n_currentRow0, None, Compiled,
-                         qt_QCompleter_currentRow_int_QCompleter, Return, "int",
-                         Parameters, new Param(c, "this", "qt.QCompleter"),
-                         End),
+            new Function(c, "currentCompletion", _n_currentCompletion0, None, Compiled, qt_QCompleter_currentCompletion_string_QCompleter,
+                         Return, "string", Parameters, new Param(c, "this", "qt.QCompleter"), End),
+            new Function(c, "currentIndex", _n_currentIndex0, None, Compiled, qt_QCompleter_currentIndex_QModelIndex_QCompleter, Return,
+                         "qt.QModelIndex", Parameters, new Param(c, "this", "qt.QCompleter"), End),
+            new Function(c, "currentRow", _n_currentRow0, None, Compiled, qt_QCompleter_currentRow_int_QCompleter, Return, "int",
+                         Parameters, new Param(c, "this", "qt.QCompleter"), End),
             // PROP: filterMode (flags Qt::MatchFlags; QCompleter this)
             // PROP: maxVisibleItems (int; QCompleter this)
-            new Function(c, "model", _n_model0, None, Compiled,
-                         qt_QCompleter_model_QAbstractItemModel_QCompleter,
-                         Return, "qt.QAbstractItemModel", Parameters,
-                         new Param(c, "this", "qt.QCompleter"), End),
+            new Function(c, "model", _n_model0, None, Compiled, qt_QCompleter_model_QAbstractItemModel_QCompleter, Return,
+                         "qt.QAbstractItemModel", Parameters, new Param(c, "this", "qt.QCompleter"), End),
             // PROP: modelSorting (flags QCompleter::ModelSorting; QCompleter
             // this)
-            _func[0] = new MemberFunction(
-                c, "pathFromIndex", _n_pathFromIndex0, None, Compiled,
-                qt_QCompleter_pathFromIndex_string_QCompleter_QModelIndex,
-                Return, "string", Parameters,
-                new Param(c, "this", "qt.QCompleter"),
-                new Param(c, "index", "qt.QModelIndex"), End),
-            new Function(c, "popup", _n_popup0, None, Compiled,
-                         qt_QCompleter_popup_QAbstractItemView_QCompleter,
-                         Return, "qt.QAbstractItemView", Parameters,
-                         new Param(c, "this", "qt.QCompleter"), End),
+            _func[0] = new MemberFunction(c, "pathFromIndex", _n_pathFromIndex0, None, Compiled,
+                                          qt_QCompleter_pathFromIndex_string_QCompleter_QModelIndex, Return, "string", Parameters,
+                                          new Param(c, "this", "qt.QCompleter"), new Param(c, "index", "qt.QModelIndex"), End),
+            new Function(c, "popup", _n_popup0, None, Compiled, qt_QCompleter_popup_QAbstractItemView_QCompleter, Return,
+                         "qt.QAbstractItemView", Parameters, new Param(c, "this", "qt.QCompleter"), End),
             // PROP: setCaseSensitivity (void; QCompleter this, flags
             // Qt::CaseSensitivity caseSensitivity) PROP: setCompletionColumn
             // (void; QCompleter this, int column) PROP: setCompletionMode
             // (void; QCompleter this, flags QCompleter::CompletionMode mode)
             // PROP: setCompletionRole (void; QCompleter this, int role)
-            new Function(c, "setCurrentRow", _n_setCurrentRow0, None, Compiled,
-                         qt_QCompleter_setCurrentRow_bool_QCompleter_int,
-                         Return, "bool", Parameters,
-                         new Param(c, "this", "qt.QCompleter"),
-                         new Param(c, "row", "int"), End),
+            new Function(c, "setCurrentRow", _n_setCurrentRow0, None, Compiled, qt_QCompleter_setCurrentRow_bool_QCompleter_int, Return,
+                         "bool", Parameters, new Param(c, "this", "qt.QCompleter"), new Param(c, "row", "int"), End),
             // PROP: setFilterMode (void; QCompleter this, flags Qt::MatchFlags
             // filterMode) PROP: setMaxVisibleItems (void; QCompleter this, int
             // maxItems)
-            new Function(
-                c, "setModel", _n_setModel0, None, Compiled,
-                qt_QCompleter_setModel_void_QCompleter_QAbstractItemModel,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QCompleter"),
-                new Param(c, "model", "qt.QAbstractItemModel"), End),
+            new Function(c, "setModel", _n_setModel0, None, Compiled, qt_QCompleter_setModel_void_QCompleter_QAbstractItemModel, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QCompleter"), new Param(c, "model", "qt.QAbstractItemModel"), End),
             // PROP: setModelSorting (void; QCompleter this, flags
             // QCompleter::ModelSorting sorting)
-            new Function(
-                c, "setPopup", _n_setPopup0, None, Compiled,
-                qt_QCompleter_setPopup_void_QCompleter_QAbstractItemView,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QCompleter"),
-                new Param(c, "popup", "qt.QAbstractItemView"), End),
-            new Function(c, "setWidget", _n_setWidget0, None, Compiled,
-                         qt_QCompleter_setWidget_void_QCompleter_QWidget,
-                         Return, "void", Parameters,
-                         new Param(c, "this", "qt.QCompleter"),
-                         new Param(c, "widget", "qt.QWidget"), End),
-            _func[1] = new MemberFunction(
-                c, "splitPath", _n_splitPath0, None, Compiled,
-                qt_QCompleter_splitPath_stringBSB_ESB__QCompleter_string,
-                Return, "string[]", Parameters,
-                new Param(c, "this", "qt.QCompleter"),
-                new Param(c, "path", "string"), End),
-            new Function(c, "widget", _n_widget0, None, Compiled,
-                         qt_QCompleter_widget_QWidget_QCompleter, Return,
-                         "qt.QWidget", Parameters,
+            new Function(c, "setPopup", _n_setPopup0, None, Compiled, qt_QCompleter_setPopup_void_QCompleter_QAbstractItemView, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QCompleter"), new Param(c, "popup", "qt.QAbstractItemView"), End),
+            new Function(c, "setWidget", _n_setWidget0, None, Compiled, qt_QCompleter_setWidget_void_QCompleter_QWidget, Return, "void",
+                         Parameters, new Param(c, "this", "qt.QCompleter"), new Param(c, "widget", "qt.QWidget"), End),
+            _func[1] = new MemberFunction(c, "splitPath", _n_splitPath0, None, Compiled,
+                                          qt_QCompleter_splitPath_stringBSB_ESB__QCompleter_string, Return, "string[]", Parameters,
+                                          new Param(c, "this", "qt.QCompleter"), new Param(c, "path", "string"), End),
+            new Function(c, "widget", _n_widget0, None, Compiled, qt_QCompleter_widget_QWidget_QCompleter, Return, "qt.QWidget", Parameters,
                          new Param(c, "this", "qt.QCompleter"), End),
             // PROP: wrapAround (bool; QCompleter this)
-            _func[2] = new MemberFunction(
-                c, "event", _n_event0, None, Compiled,
-                qt_QCompleter_event_bool_QCompleter_QEvent, Return, "bool",
-                Parameters, new Param(c, "this", "qt.QCompleter"),
-                new Param(c, "ev", "qt.QEvent"), End),
+            _func[2] = new MemberFunction(c, "event", _n_event0, None, Compiled, qt_QCompleter_event_bool_QCompleter_QEvent, Return, "bool",
+                                          Parameters, new Param(c, "this", "qt.QCompleter"), new Param(c, "ev", "qt.QEvent"), End),
             _func[3] = new MemberFunction(
-                c, "eventFilter", _n_eventFilter0, None, Compiled,
-                qt_QCompleter_eventFilter_bool_QCompleter_QObject_QEvent,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QCompleter"),
-                new Param(c, "o", "qt.QObject"), new Param(c, "e", "qt.QEvent"),
-                End),
+                c, "eventFilter", _n_eventFilter0, None, Compiled, qt_QCompleter_eventFilter_bool_QCompleter_QObject_QEvent, Return, "bool",
+                Parameters, new Param(c, "this", "qt.QCompleter"), new Param(c, "o", "qt.QObject"), new Param(c, "e", "qt.QEvent"), End),
             // MISSING: metaObject ("const QMetaObject *"; QCompleter this)
             // MISSING: childEvent (void; QCompleter this, "QChildEvent *"
             // event) // protected MISSING: connectNotify (void; QCompleter
             // this, "const QMetaMethod &" signal) // protected
-            _func[4] = new MemberFunction(
-                c, "customEvent", _n_customEvent0, None, Compiled,
-                qt_QCompleter_customEvent_void_QCompleter_QEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QCompleter"),
-                new Param(c, "event", "qt.QEvent"), End),
+            _func[4] = new MemberFunction(c, "customEvent", _n_customEvent0, None, Compiled,
+                                          qt_QCompleter_customEvent_void_QCompleter_QEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QCompleter"), new Param(c, "event", "qt.QEvent"), End),
             // MISSING: disconnectNotify (void; QCompleter this, "const
             // QMetaMethod &" signal) // protected
-            _func[5] = new MemberFunction(
-                c, "timerEvent", _n_timerEvent0, None, Compiled,
-                qt_QCompleter_timerEvent_void_QCompleter_QTimerEvent, Return,
-                "void", Parameters, new Param(c, "this", "qt.QCompleter"),
-                new Param(c, "event", "qt.QTimerEvent"), End),
+            _func[5] = new MemberFunction(c, "timerEvent", _n_timerEvent0, None, Compiled,
+                                          qt_QCompleter_timerEvent_void_QCompleter_QTimerEvent, Return, "void", Parameters,
+                                          new Param(c, "this", "qt.QCompleter"), new Param(c, "event", "qt.QTimerEvent"), End),
             // static functions
             EndArguments);
         globalScope()->addSymbols(EndArguments);

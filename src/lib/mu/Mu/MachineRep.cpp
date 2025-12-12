@@ -29,8 +29,7 @@
 #endif
 
 #ifdef _MSC_VER
-#define LOCAL_ARRAY(NAME, TYPE, SIZE) \
-    TYPE* NAME = (TYPE*)alloca((SIZE) * sizeof(TYPE))
+#define LOCAL_ARRAY(NAME, TYPE, SIZE) TYPE* NAME = (TYPE*)alloca((SIZE) * sizeof(TYPE))
 #else
 #define LOCAL_ARRAY(NAME, TYPE, SIZE) TYPE NAME[SIZE]
 #endif
@@ -95,8 +94,7 @@ namespace Mu
         _allReps.push_back(this);
     }
 
-    MachineRep::MachineRep(const char* name, const char* fmtName,
-                           MachineRep* elementRep, size_t width)
+    MachineRep::MachineRep(const char* name, const char* fmtName, MachineRep* elementRep, size_t width)
         : _constantFunc(0)
         , _referenceStackFunc(0)
         , _dereferenceStackFunc(0)
@@ -143,8 +141,7 @@ namespace Mu
 
     NODE_IMPLEMENTATION(MachineRep::referenceClassMember, Pointer)
     {
-        const MemberVariable* v =
-            static_cast<const MemberVariable*>(NODE_THIS.symbol());
+        const MemberVariable* v = static_cast<const MemberVariable*>(NODE_THIS.symbol());
         ClassInstance* i = NODE_ARG_OBJECT(0, ClassInstance);
         if (!i)
             throw NilArgumentException(NODE_THREAD);
@@ -185,123 +182,106 @@ namespace Mu
 
     FloatRep::~FloatRep() { _rep = 0; }
 
-    ValuePointer FloatRep::valuePointer(Value& v) const
-    {
-        return ValuePointer(&v._float);
+    ValuePointer FloatRep::valuePointer(Value& v) const { return ValuePointer(&v._float); }
+
+    const ValuePointer FloatRep::valuePointer(const Value& v) const { return ValuePointer(&v._float); }
+
+    Value FloatRep::value(ValuePointer p) const { return Value(*reinterpret_cast<float*>(p)); }
+
+#define MACHINEFUNCS(CLASS, TYPE)                                                          \
+    NODE_IMPLEMENTATION(CLASS::referenceStack, Pointer)                                    \
+    {                                                                                      \
+        const StackVariable* sv = static_cast<const StackVariable*>(NODE_THIS.symbol());   \
+        size_t index = sv->address() + NODE_THREAD.stackOffset();                          \
+        NODE_RETURN((Pointer) & (NODE_THREAD.stack()[index].as<TYPE>()));                  \
+    }                                                                                      \
+                                                                                           \
+    NODE_IMPLEMENTATION(CLASS::dereferenceStack, TYPE)                                     \
+    {                                                                                      \
+        const StackVariable* sv = static_cast<const StackVariable*>(NODE_THIS.symbol());   \
+        size_t index = sv->address() + NODE_THREAD.stackOffset();                          \
+        NODE_RETURN(NODE_THREAD.stack()[index].as<TYPE>());                                \
+    }                                                                                      \
+                                                                                           \
+    NODE_IMPLEMENTATION(CLASS::referenceGlobal, Pointer)                                   \
+    {                                                                                      \
+        const GlobalVariable* gv = static_cast<const GlobalVariable*>(NODE_THIS.symbol()); \
+        Process* process = NODE_THREAD.process();                                          \
+        NODE_RETURN((Pointer) & (process->globals()[gv->address()]._##TYPE));              \
+    }                                                                                      \
+                                                                                           \
+    NODE_IMPLEMENTATION(CLASS::dereferenceGlobal, TYPE)                                    \
+    {                                                                                      \
+        const GlobalVariable* gv = static_cast<const GlobalVariable*>(NODE_THIS.symbol()); \
+        Process* process = NODE_THREAD.process();                                          \
+        NODE_RETURN(process->globals()[gv->address()]._##TYPE);                            \
+    }                                                                                      \
+                                                                                           \
+    NODE_IMPLEMENTATION(CLASS::constant, TYPE)                                             \
+    {                                                                                      \
+        TYPE v = NODE_DATA(TYPE);                                                          \
+        NODE_RETURN(v);                                                                    \
     }
 
-    const ValuePointer FloatRep::valuePointer(const Value& v) const
-    {
-        return ValuePointer(&v._float);
+#define METHODFUNCS(CLASS, TYPE)                                                          \
+    NODE_IMPLEMENTATION(CLASS::callMethod, TYPE)                                          \
+    {                                                                                     \
+        const MemberFunction* f = static_cast<const MemberFunction*>(NODE_THIS.symbol()); \
+        ClassInstance* i = reinterpret_cast<ClassInstance*>(NODE_ARG(0, Pointer));        \
+        if (!i)                                                                           \
+            throw NilArgumentException(NODE_THREAD);                                      \
+        const MemberFunction* F = i->classType()->dynamicLookup(f);                       \
+        TYPE t;                                                                           \
+                                                                                          \
+        size_t nargs = NODE_THIS.numArgs();                                               \
+        LOCAL_ARRAY(argv, const Node*, nargs + 1);                                        \
+        DataNode dn(0, PointerRep::rep()->constantFunc(), i->type());                     \
+        dn._data._Pointer = i;                                                            \
+        argv[0] = &dn;                                                                    \
+        argv[nargs] = 0;                                                                  \
+        for (size_t i = 1; i < nargs; i++)                                                \
+            argv[i] = NODE_THIS.argNode(i);                                               \
+        Node n((Node**)argv, F);                                                          \
+                                                                                          \
+        try                                                                               \
+        {                                                                                 \
+            t = (*F->func()._##TYPE##Func)(n, NODE_THREAD);                               \
+        }                                                                                 \
+        catch (...)                                                                       \
+        {                                                                                 \
+            n.releaseArgv();                                                              \
+            throw;                                                                        \
+        }                                                                                 \
+                                                                                          \
+        n.releaseArgv();                                                                  \
+        NODE_RETURN(t);                                                                   \
     }
 
-    Value FloatRep::value(ValuePointer p) const
-    {
-        return Value(*reinterpret_cast<float*>(p));
+#define CLASSMEMBERFUNCS(CLASS, TYPE)                                                     \
+    NODE_IMPLEMENTATION(CLASS::dereferenceClassMember, TYPE)                              \
+    {                                                                                     \
+        const MemberVariable* v = static_cast<const MemberVariable*>(NODE_THIS.symbol()); \
+        ClassInstance* i = NODE_ARG_OBJECT(0, ClassInstance);                             \
+        if (!i)                                                                           \
+            throw NilArgumentException(NODE_THREAD);                                      \
+        size_t offset = v->instanceOffset();                                              \
+        TYPE* tp = reinterpret_cast<TYPE*>(i->structure() + offset);                      \
+        NODE_RETURN(*tp);                                                                 \
     }
 
-#define MACHINEFUNCS(CLASS, TYPE)                                             \
-    NODE_IMPLEMENTATION(CLASS::referenceStack, Pointer)                       \
-    {                                                                         \
-        const StackVariable* sv =                                             \
-            static_cast<const StackVariable*>(NODE_THIS.symbol());            \
-        size_t index = sv->address() + NODE_THREAD.stackOffset();             \
-        NODE_RETURN((Pointer) & (NODE_THREAD.stack()[index].as<TYPE>()));     \
-    }                                                                         \
-                                                                              \
-    NODE_IMPLEMENTATION(CLASS::dereferenceStack, TYPE)                        \
-    {                                                                         \
-        const StackVariable* sv =                                             \
-            static_cast<const StackVariable*>(NODE_THIS.symbol());            \
-        size_t index = sv->address() + NODE_THREAD.stackOffset();             \
-        NODE_RETURN(NODE_THREAD.stack()[index].as<TYPE>());                   \
-    }                                                                         \
-                                                                              \
-    NODE_IMPLEMENTATION(CLASS::referenceGlobal, Pointer)                      \
-    {                                                                         \
-        const GlobalVariable* gv =                                            \
-            static_cast<const GlobalVariable*>(NODE_THIS.symbol());           \
-        Process* process = NODE_THREAD.process();                             \
-        NODE_RETURN((Pointer) & (process->globals()[gv->address()]._##TYPE)); \
-    }                                                                         \
-                                                                              \
-    NODE_IMPLEMENTATION(CLASS::dereferenceGlobal, TYPE)                       \
-    {                                                                         \
-        const GlobalVariable* gv =                                            \
-            static_cast<const GlobalVariable*>(NODE_THIS.symbol());           \
-        Process* process = NODE_THREAD.process();                             \
-        NODE_RETURN(process->globals()[gv->address()]._##TYPE);               \
-    }                                                                         \
-                                                                              \
-    NODE_IMPLEMENTATION(CLASS::constant, TYPE)                                \
-    {                                                                         \
-        TYPE v = NODE_DATA(TYPE);                                             \
-        NODE_RETURN(v);                                                       \
-    }
-
-#define METHODFUNCS(CLASS, TYPE)                                      \
-    NODE_IMPLEMENTATION(CLASS::callMethod, TYPE)                      \
-    {                                                                 \
-        const MemberFunction* f =                                     \
-            static_cast<const MemberFunction*>(NODE_THIS.symbol());   \
-        ClassInstance* i =                                            \
-            reinterpret_cast<ClassInstance*>(NODE_ARG(0, Pointer));   \
-        if (!i)                                                       \
-            throw NilArgumentException(NODE_THREAD);                  \
-        const MemberFunction* F = i->classType()->dynamicLookup(f);   \
-        TYPE t;                                                       \
-                                                                      \
-        size_t nargs = NODE_THIS.numArgs();                           \
-        LOCAL_ARRAY(argv, const Node*, nargs + 1);                    \
-        DataNode dn(0, PointerRep::rep()->constantFunc(), i->type()); \
-        dn._data._Pointer = i;                                        \
-        argv[0] = &dn;                                                \
-        argv[nargs] = 0;                                              \
-        for (size_t i = 1; i < nargs; i++)                            \
-            argv[i] = NODE_THIS.argNode(i);                           \
-        Node n((Node**)argv, F);                                      \
-                                                                      \
-        try                                                           \
-        {                                                             \
-            t = (*F->func()._##TYPE##Func)(n, NODE_THREAD);           \
-        }                                                             \
-        catch (...)                                                   \
-        {                                                             \
-            n.releaseArgv();                                          \
-            throw;                                                    \
-        }                                                             \
-                                                                      \
-        n.releaseArgv();                                              \
-        NODE_RETURN(t);                                               \
-    }
-
-#define CLASSMEMBERFUNCS(CLASS, TYPE)                                \
-    NODE_IMPLEMENTATION(CLASS::dereferenceClassMember, TYPE)         \
-    {                                                                \
-        const MemberVariable* v =                                    \
-            static_cast<const MemberVariable*>(NODE_THIS.symbol());  \
-        ClassInstance* i = NODE_ARG_OBJECT(0, ClassInstance);        \
-        if (!i)                                                      \
-            throw NilArgumentException(NODE_THREAD);                 \
-        size_t offset = v->instanceOffset();                         \
-        TYPE* tp = reinterpret_cast<TYPE*>(i->structure() + offset); \
-        NODE_RETURN(*tp);                                            \
-    }
-
-#define VARIANTFUNCS(CLASS, TYPE)                                            \
-    NODE_IMPLEMENTATION(CLASS::unpackVariant, TYPE)                          \
-    {                                                                        \
-        VariantInstance* i = NODE_ARG_OBJECT(0, VariantInstance);            \
-        NODE_RETURN(*(i->data<TYPE>()));                                     \
-    }                                                                        \
-                                                                             \
-    NODE_IMPLEMENTATION(CLASS::variantConstructor, Pointer)                  \
-    {                                                                        \
-        const VariantTagType* c =                                            \
-            static_cast<const VariantTagType*>(NODE_THIS.symbol()->scope()); \
-        VariantInstance* i = VariantInstance::allocate(c);                   \
-        *(i->data<TYPE>()) = NODE_ARG(0, TYPE);                              \
-        NODE_RETURN(i);                                                      \
+#define VARIANTFUNCS(CLASS, TYPE)                                                                  \
+    NODE_IMPLEMENTATION(CLASS::unpackVariant, TYPE)                                                \
+    {                                                                                              \
+        VariantInstance* i = NODE_ARG_OBJECT(0, VariantInstance);                                  \
+        NODE_RETURN(*(i->data<TYPE>()));                                                           \
+    }                                                                                              \
+                                                                                                   \
+    NODE_IMPLEMENTATION(CLASS::variantConstructor, Pointer)                                        \
+    {                                                                                              \
+        const VariantTagType* c = static_cast<const VariantTagType*>(NODE_THIS.symbol()->scope()); \
+        VariantInstance* i = VariantInstance::allocate(c);                                         \
+        *(i->data<TYPE>()) = NODE_ARG(0, TYPE);                                                    \
+        NODE_RETURN(i);                                                                            \
     }
 
 //  NOTE: there needs to be a MU_SAFE_ARGUMENTS version of this too.
@@ -355,112 +335,109 @@ namespace Mu
         NODE_RETURN(TYPE());                                                 \
     }
 
-#define ACTIVATIONFUNCS(CLASS, TYPE)                                          \
-    NODE_IMPLEMENTATION(CLASS::functionActivationFunc, TYPE)                  \
-    {                                                                         \
-        const Function* f = static_cast<const Function*>(NODE_THIS.symbol()); \
-        int n = NODE_NUM_ARGS();                                              \
-        int s = f->stackSize();                                               \
-        Thread::StackRecord record(NODE_THREAD);                              \
-        record.beginActivation(s);                                            \
-                                                                              \
-        Value val;                                                            \
-        for (int i = 0; i < s; i++)                                           \
-        {                                                                     \
-            if (i < n)                                                        \
-            {                                                                 \
-                val = NODE_EVAL_VALUE(NODE_THIS.argNode(i), NODE_THREAD);     \
-            }                                                                 \
-            else                                                              \
-            {                                                                 \
-                zero(val);                                                    \
-            }                                                                 \
-                                                                              \
-            record.setParameter(i, val);                                      \
-        }                                                                     \
-                                                                              \
-        record.endParameters();                                               \
-                                                                              \
-        const Node* body = f->body();                                         \
-        if (!body)                                                            \
-            throw UnimplementedMethodException(NODE_THREAD);                  \
-        TYPE v;                                                               \
-                                                                              \
-        if (NodeFunc func = body->func())                                     \
-        {                                                                     \
-            NODE_THREAD.jumpPointBegin(JumpReturnCode::Return                 \
-                                       | JumpReturnCode::TailFuse);           \
-            int rv = SETJMP(NODE_THREAD.jumpPoint());                         \
-                                                                              \
-            if (rv == JumpReturnCode::NoJump)                                 \
-            {                                                                 \
-                v = (func._##TYPE##Func)(*body, NODE_THREAD);                 \
-            }                                                                 \
-            else if (rv == JumpReturnCode::TailFuse)                          \
-            {                                                                 \
-                return CLASS::functionActivationFunc(                         \
-                    *NODE_THREAD.continuation(), NODE_THREAD);                \
-            }                                                                 \
-            else                                                              \
-            {                                                                 \
-                NODE_THREAD.jumpPointRestore();                               \
-                v = NODE_THREAD.returnValue()._##TYPE;                        \
-            }                                                                 \
-                                                                              \
-            NODE_THREAD.jumpPointEnd();                                       \
-        }                                                                     \
-        else                                                                  \
-        {                                                                     \
-            throw NilNodeFuncException(NODE_THREAD);                          \
-        }                                                                     \
-                                                                              \
-        NODE_RETURN(v);                                                       \
-    }                                                                         \
-                                                                              \
-    NODE_IMPLEMENTATION(CLASS::functionReturnFunc, TYPE)                      \
-    {                                                                         \
-        Value v(NODE_ARG(0, TYPE));                                           \
-        NODE_THREAD.jump(JumpReturnCode::Return, 1, v);                       \
-        NODE_RETURN(v._##TYPE);                                               \
-    }                                                                         \
-                                                                              \
-    NODE_IMPLEMENTATION(CLASS::invokeInterface, TYPE)                         \
-    {                                                                         \
-        const Function* f = static_cast<const Function*>(NODE_THIS.symbol()); \
-        const Interface* i = static_cast<const Interface*>(f->scope());       \
-        ClassInstance* o =                                                    \
-            reinterpret_cast<ClassInstance*>(NODE_ARG(0, Pointer));           \
-                                                                              \
-        if (const InterfaceImp* imp = o->classType()->implementation(i))      \
-        {                                                                     \
-            size_t offset = f->interfaceIndex();                              \
-            NodeFunc func = imp->func(offset);                                \
-                                                                              \
-            size_t nargs = NODE_THIS.numArgs();                               \
-            LOCAL_ARRAY(argv, const Node*, nargs + 1);                        \
-            DataNode dn(0, PointerRep::rep()->constantFunc(), o->type());     \
-            dn._data._Pointer = o;                                            \
-            argv[0] = &dn;                                                    \
-            argv[nargs] = 0;                                                  \
-            for (size_t i = 1; i < nargs; i++)                                \
-                argv[i] = NODE_THIS.argNode(i);                               \
-            Node n((Node**)argv, f);                                          \
-            TYPE t = (*func._##TYPE##Func)(n, NODE_THREAD);                   \
-            n.releaseArgv();                                                  \
-            NODE_RETURN(t);                                                   \
-        }                                                                     \
-        else                                                                  \
-        {                                                                     \
-            throw BadInterfaceInvocationException(NODE_THREAD);               \
-        }                                                                     \
-    }                                                                         \
-                                                                              \
-    NODE_IMPLEMENTATION(CLASS::tailFuse, TYPE)                                \
-    {                                                                         \
-        NODE_THREAD.setContinuation(NODE_THIS.argNode(0));                    \
-        NODE_THREAD.jump(JumpReturnCode::TailFuse);                           \
-        Value v;                                                              \
-        NODE_RETURN(v._##TYPE);                                               \
+#define ACTIVATIONFUNCS(CLASS, TYPE)                                                            \
+    NODE_IMPLEMENTATION(CLASS::functionActivationFunc, TYPE)                                    \
+    {                                                                                           \
+        const Function* f = static_cast<const Function*>(NODE_THIS.symbol());                   \
+        int n = NODE_NUM_ARGS();                                                                \
+        int s = f->stackSize();                                                                 \
+        Thread::StackRecord record(NODE_THREAD);                                                \
+        record.beginActivation(s);                                                              \
+                                                                                                \
+        Value val;                                                                              \
+        for (int i = 0; i < s; i++)                                                             \
+        {                                                                                       \
+            if (i < n)                                                                          \
+            {                                                                                   \
+                val = NODE_EVAL_VALUE(NODE_THIS.argNode(i), NODE_THREAD);                       \
+            }                                                                                   \
+            else                                                                                \
+            {                                                                                   \
+                zero(val);                                                                      \
+            }                                                                                   \
+                                                                                                \
+            record.setParameter(i, val);                                                        \
+        }                                                                                       \
+                                                                                                \
+        record.endParameters();                                                                 \
+                                                                                                \
+        const Node* body = f->body();                                                           \
+        if (!body)                                                                              \
+            throw UnimplementedMethodException(NODE_THREAD);                                    \
+        TYPE v;                                                                                 \
+                                                                                                \
+        if (NodeFunc func = body->func())                                                       \
+        {                                                                                       \
+            NODE_THREAD.jumpPointBegin(JumpReturnCode::Return | JumpReturnCode::TailFuse);      \
+            int rv = SETJMP(NODE_THREAD.jumpPoint());                                           \
+                                                                                                \
+            if (rv == JumpReturnCode::NoJump)                                                   \
+            {                                                                                   \
+                v = (func._##TYPE##Func)(*body, NODE_THREAD);                                   \
+            }                                                                                   \
+            else if (rv == JumpReturnCode::TailFuse)                                            \
+            {                                                                                   \
+                return CLASS::functionActivationFunc(*NODE_THREAD.continuation(), NODE_THREAD); \
+            }                                                                                   \
+            else                                                                                \
+            {                                                                                   \
+                NODE_THREAD.jumpPointRestore();                                                 \
+                v = NODE_THREAD.returnValue()._##TYPE;                                          \
+            }                                                                                   \
+                                                                                                \
+            NODE_THREAD.jumpPointEnd();                                                         \
+        }                                                                                       \
+        else                                                                                    \
+        {                                                                                       \
+            throw NilNodeFuncException(NODE_THREAD);                                            \
+        }                                                                                       \
+                                                                                                \
+        NODE_RETURN(v);                                                                         \
+    }                                                                                           \
+                                                                                                \
+    NODE_IMPLEMENTATION(CLASS::functionReturnFunc, TYPE)                                        \
+    {                                                                                           \
+        Value v(NODE_ARG(0, TYPE));                                                             \
+        NODE_THREAD.jump(JumpReturnCode::Return, 1, v);                                         \
+        NODE_RETURN(v._##TYPE);                                                                 \
+    }                                                                                           \
+                                                                                                \
+    NODE_IMPLEMENTATION(CLASS::invokeInterface, TYPE)                                           \
+    {                                                                                           \
+        const Function* f = static_cast<const Function*>(NODE_THIS.symbol());                   \
+        const Interface* i = static_cast<const Interface*>(f->scope());                         \
+        ClassInstance* o = reinterpret_cast<ClassInstance*>(NODE_ARG(0, Pointer));              \
+                                                                                                \
+        if (const InterfaceImp* imp = o->classType()->implementation(i))                        \
+        {                                                                                       \
+            size_t offset = f->interfaceIndex();                                                \
+            NodeFunc func = imp->func(offset);                                                  \
+                                                                                                \
+            size_t nargs = NODE_THIS.numArgs();                                                 \
+            LOCAL_ARRAY(argv, const Node*, nargs + 1);                                          \
+            DataNode dn(0, PointerRep::rep()->constantFunc(), o->type());                       \
+            dn._data._Pointer = o;                                                              \
+            argv[0] = &dn;                                                                      \
+            argv[nargs] = 0;                                                                    \
+            for (size_t i = 1; i < nargs; i++)                                                  \
+                argv[i] = NODE_THIS.argNode(i);                                                 \
+            Node n((Node**)argv, f);                                                            \
+            TYPE t = (*func._##TYPE##Func)(n, NODE_THREAD);                                     \
+            n.releaseArgv();                                                                    \
+            NODE_RETURN(t);                                                                     \
+        }                                                                                       \
+        else                                                                                    \
+        {                                                                                       \
+            throw BadInterfaceInvocationException(NODE_THREAD);                                 \
+        }                                                                                       \
+    }                                                                                           \
+                                                                                                \
+    NODE_IMPLEMENTATION(CLASS::tailFuse, TYPE)                                                  \
+    {                                                                                           \
+        NODE_THREAD.setContinuation(NODE_THIS.argNode(0));                                      \
+        NODE_THREAD.jump(JumpReturnCode::TailFuse);                                             \
+        Value v;                                                                                \
+        NODE_RETURN(v._##TYPE);                                                                 \
     }
 
 #define DYNACTIVATIONFUNCS(CLASS, TYPE)                                \
@@ -541,15 +518,9 @@ namespace Mu
 
     ValuePointer DoubleRep::valuePointer(Value& v) const { return &v._double; }
 
-    const ValuePointer DoubleRep::valuePointer(const Value& v) const
-    {
-        return ValuePointer(&v._double);
-    }
+    const ValuePointer DoubleRep::valuePointer(const Value& v) const { return ValuePointer(&v._double); }
 
-    Value DoubleRep::value(ValuePointer p) const
-    {
-        return Value(*reinterpret_cast<double*>(p));
-    }
+    Value DoubleRep::value(ValuePointer p) const { return Value(*reinterpret_cast<double*>(p)); }
 
     ACTIVATIONFUNCS(DoubleRep, double)
     DYNACTIVATIONFUNCS(DoubleRep, double)
@@ -594,15 +565,9 @@ namespace Mu
 
     ValuePointer IntRep::valuePointer(Value& v) const { return &v._int; }
 
-    const ValuePointer IntRep::valuePointer(const Value& v) const
-    {
-        return ValuePointer(&v._int);
-    }
+    const ValuePointer IntRep::valuePointer(const Value& v) const { return ValuePointer(&v._int); }
 
-    Value IntRep::value(ValuePointer p) const
-    {
-        return Value(*reinterpret_cast<int*>(p));
-    }
+    Value IntRep::value(ValuePointer p) const { return Value(*reinterpret_cast<int*>(p)); }
 
     MACHINEFUNCS(IntRep, int)
     FRAMEBLOCK(IntRep, int)
@@ -648,15 +613,9 @@ namespace Mu
 
     ValuePointer Int64Rep::valuePointer(Value& v) const { return &v._int64; }
 
-    const ValuePointer Int64Rep::valuePointer(const Value& v) const
-    {
-        return ValuePointer(&v._int64);
-    }
+    const ValuePointer Int64Rep::valuePointer(const Value& v) const { return ValuePointer(&v._int64); }
 
-    Value Int64Rep::value(ValuePointer p) const
-    {
-        return Value(*reinterpret_cast<int64*>(p));
-    }
+    Value Int64Rep::value(ValuePointer p) const { return Value(*reinterpret_cast<int64*>(p)); }
 
     MACHINEFUNCS(Int64Rep, int64)
     FRAMEBLOCK(Int64Rep, int64)
@@ -701,15 +660,9 @@ namespace Mu
 
     ValuePointer ShortRep::valuePointer(Value& v) const { return &v._short; }
 
-    const ValuePointer ShortRep::valuePointer(const Value& v) const
-    {
-        return ValuePointer(&v._short);
-    }
+    const ValuePointer ShortRep::valuePointer(const Value& v) const { return ValuePointer(&v._short); }
 
-    Value ShortRep::value(ValuePointer p) const
-    {
-        return Value(*reinterpret_cast<short*>(p));
-    }
+    Value ShortRep::value(ValuePointer p) const { return Value(*reinterpret_cast<short*>(p)); }
 
     MACHINEFUNCS(ShortRep, short)
     FRAMEBLOCK(ShortRep, short)
@@ -754,15 +707,9 @@ namespace Mu
 
     ValuePointer CharRep::valuePointer(Value& v) const { return &v._char; }
 
-    const ValuePointer CharRep::valuePointer(const Value& v) const
-    {
-        return ValuePointer(&v._char);
-    }
+    const ValuePointer CharRep::valuePointer(const Value& v) const { return ValuePointer(&v._char); }
 
-    Value CharRep::value(ValuePointer p) const
-    {
-        return Value(*reinterpret_cast<char*>(p));
-    }
+    Value CharRep::value(ValuePointer p) const { return Value(*reinterpret_cast<char*>(p)); }
 
     MACHINEFUNCS(CharRep, char)
     FRAMEBLOCK(CharRep, char)
@@ -807,15 +754,9 @@ namespace Mu
 
     ValuePointer BoolRep::valuePointer(Value& v) const { return &v._bool; }
 
-    const ValuePointer BoolRep::valuePointer(const Value& v) const
-    {
-        return ValuePointer(&v._bool);
-    }
+    const ValuePointer BoolRep::valuePointer(const Value& v) const { return ValuePointer(&v._bool); }
 
-    Value BoolRep::value(ValuePointer p) const
-    {
-        return Value(*reinterpret_cast<bool*>(p));
-    }
+    Value BoolRep::value(ValuePointer p) const { return Value(*reinterpret_cast<bool*>(p)); }
 
     MACHINEFUNCS(BoolRep, bool)
     FRAMEBLOCK(BoolRep, bool)
@@ -866,20 +807,11 @@ namespace Mu
 
     PointerRep::~PointerRep() { _rep = 0; }
 
-    ValuePointer PointerRep::valuePointer(Value& v) const
-    {
-        return &v._Pointer;
-    }
+    ValuePointer PointerRep::valuePointer(Value& v) const { return &v._Pointer; }
 
-    const ValuePointer PointerRep::valuePointer(const Value& v) const
-    {
-        return ValuePointer(&v._Pointer);
-    }
+    const ValuePointer PointerRep::valuePointer(const Value& v) const { return ValuePointer(&v._Pointer); }
 
-    Value PointerRep::value(ValuePointer p) const
-    {
-        return Value(*reinterpret_cast<Pointer*>(p));
-    }
+    Value PointerRep::value(ValuePointer p) const { return Value(*reinterpret_cast<Pointer*>(p)); }
 
     MACHINEFUNCS(PointerRep, Pointer)
     FRAMEBLOCK(PointerRep, Pointer)
@@ -897,8 +829,7 @@ namespace Mu
 
     NODE_IMPLEMENTATION(PointerRep::variantConstructor, Pointer)
     {
-        const VariantTagType* c =
-            static_cast<const VariantTagType*>(NODE_THIS.symbol()->scope());
+        const VariantTagType* c = static_cast<const VariantTagType*>(NODE_THIS.symbol()->scope());
         VariantInstance* i = VariantInstance::allocate(c);
         const Type* t = i->tagType()->representationType();
         t->copyInstance(NODE_ARG(0, Pointer), i->structure());
@@ -941,20 +872,11 @@ namespace Mu
 
     Vector4FloatRep::~Vector4FloatRep() { _rep = 0; }
 
-    ValuePointer Vector4FloatRep::valuePointer(Value& v) const
-    {
-        return ValuePointer(&v._Vector4f);
-    }
+    ValuePointer Vector4FloatRep::valuePointer(Value& v) const { return ValuePointer(&v._Vector4f); }
 
-    const ValuePointer Vector4FloatRep::valuePointer(const Value& v) const
-    {
-        return ValuePointer(&v._Vector4f);
-    }
+    const ValuePointer Vector4FloatRep::valuePointer(const Value& v) const { return ValuePointer(&v._Vector4f); }
 
-    Value Vector4FloatRep::value(ValuePointer p) const
-    {
-        return Value(*reinterpret_cast<Vector4f*>(p));
-    }
+    Value Vector4FloatRep::value(ValuePointer p) const { return Value(*reinterpret_cast<Vector4f*>(p)); }
 
     MACHINEFUNCS(Vector4FloatRep, Vector4f)
     FRAMEBLOCK(Vector4FloatRep, Vector4f)
@@ -966,24 +888,21 @@ namespace Mu
 
     NODE_IMPLEMENTATION(Vector4FloatRep::referenceMember, Pointer)
     {
-        const MemberVariable* v =
-            static_cast<const MemberVariable*>(NODE_THIS.symbol());
+        const MemberVariable* v = static_cast<const MemberVariable*>(NODE_THIS.symbol());
         Vector4f* vp = reinterpret_cast<Vector4f*>(NODE_ARG(0, Pointer));
         NODE_RETURN((Pointer) & (*vp)[v->address()]);
     }
 
     NODE_IMPLEMENTATION(Vector4FloatRep::dereferenceMember, float)
     {
-        const MemberVariable* v =
-            static_cast<const MemberVariable*>(NODE_THIS.symbol());
+        const MemberVariable* v = static_cast<const MemberVariable*>(NODE_THIS.symbol());
         Vector4f* vp = reinterpret_cast<Vector4f*>(NODE_ARG(0, Pointer));
         NODE_RETURN((*vp)[v->address()]);
     }
 
     NODE_IMPLEMENTATION(Vector4FloatRep::extractMember, float)
     {
-        const MemberVariable* var =
-            static_cast<const MemberVariable*>(NODE_THIS.symbol());
+        const MemberVariable* var = static_cast<const MemberVariable*>(NODE_THIS.symbol());
         Vector4f v = NODE_ARG(0, Vector4f);
         NODE_RETURN(v[var->address()]);
     }
@@ -1024,20 +943,11 @@ namespace Mu
 
     Vector3FloatRep::~Vector3FloatRep() { _rep = 0; }
 
-    ValuePointer Vector3FloatRep::valuePointer(Value& v) const
-    {
-        return &v._Vector3f;
-    }
+    ValuePointer Vector3FloatRep::valuePointer(Value& v) const { return &v._Vector3f; }
 
-    const ValuePointer Vector3FloatRep::valuePointer(const Value& v) const
-    {
-        return ValuePointer(&v._Vector3f);
-    }
+    const ValuePointer Vector3FloatRep::valuePointer(const Value& v) const { return ValuePointer(&v._Vector3f); }
 
-    Value Vector3FloatRep::value(ValuePointer p) const
-    {
-        return Value(*reinterpret_cast<Vector3f*>(p));
-    }
+    Value Vector3FloatRep::value(ValuePointer p) const { return Value(*reinterpret_cast<Vector3f*>(p)); }
 
     MACHINEFUNCS(Vector3FloatRep, Vector3f)
     FRAMEBLOCK(Vector3FloatRep, Vector3f)
@@ -1049,24 +959,21 @@ namespace Mu
 
     NODE_IMPLEMENTATION(Vector3FloatRep::referenceMember, Pointer)
     {
-        const MemberVariable* v =
-            static_cast<const MemberVariable*>(NODE_THIS.symbol());
+        const MemberVariable* v = static_cast<const MemberVariable*>(NODE_THIS.symbol());
         Vector3f* vp = reinterpret_cast<Vector3f*>(NODE_ARG(0, Pointer));
         NODE_RETURN((Pointer) & (*vp)[v->address()]);
     }
 
     NODE_IMPLEMENTATION(Vector3FloatRep::dereferenceMember, float)
     {
-        const MemberVariable* v =
-            static_cast<const MemberVariable*>(NODE_THIS.symbol());
+        const MemberVariable* v = static_cast<const MemberVariable*>(NODE_THIS.symbol());
         Vector3f* vp = reinterpret_cast<Vector3f*>(NODE_ARG(0, Pointer));
         NODE_RETURN((*vp)[v->address()]);
     }
 
     NODE_IMPLEMENTATION(Vector3FloatRep::extractMember, float)
     {
-        const MemberVariable* var =
-            static_cast<const MemberVariable*>(NODE_THIS.symbol());
+        const MemberVariable* var = static_cast<const MemberVariable*>(NODE_THIS.symbol());
         Vector3f v = NODE_ARG(0, Vector3f);
         NODE_RETURN(v[var->address()]);
     }
@@ -1107,20 +1014,11 @@ namespace Mu
 
     Vector2FloatRep::~Vector2FloatRep() { _rep = 0; }
 
-    ValuePointer Vector2FloatRep::valuePointer(Value& v) const
-    {
-        return &v._Vector2f;
-    }
+    ValuePointer Vector2FloatRep::valuePointer(Value& v) const { return &v._Vector2f; }
 
-    const ValuePointer Vector2FloatRep::valuePointer(const Value& v) const
-    {
-        return ValuePointer(&v._Vector2f);
-    }
+    const ValuePointer Vector2FloatRep::valuePointer(const Value& v) const { return ValuePointer(&v._Vector2f); }
 
-    Value Vector2FloatRep::value(ValuePointer p) const
-    {
-        return Value(*reinterpret_cast<Vector2f*>(p));
-    }
+    Value Vector2FloatRep::value(ValuePointer p) const { return Value(*reinterpret_cast<Vector2f*>(p)); }
 
     MACHINEFUNCS(Vector2FloatRep, Vector2f)
     FRAMEBLOCK(Vector2FloatRep, Vector2f)
@@ -1132,24 +1030,21 @@ namespace Mu
 
     NODE_IMPLEMENTATION(Vector2FloatRep::referenceMember, Pointer)
     {
-        const MemberVariable* v =
-            static_cast<const MemberVariable*>(NODE_THIS.symbol());
+        const MemberVariable* v = static_cast<const MemberVariable*>(NODE_THIS.symbol());
         Vector2f* vp = reinterpret_cast<Vector2f*>(NODE_ARG(0, Pointer));
         NODE_RETURN((Pointer) & (*vp)[v->address()]);
     }
 
     NODE_IMPLEMENTATION(Vector2FloatRep::dereferenceMember, float)
     {
-        const MemberVariable* v =
-            static_cast<const MemberVariable*>(NODE_THIS.symbol());
+        const MemberVariable* v = static_cast<const MemberVariable*>(NODE_THIS.symbol());
         Vector2f* vp = reinterpret_cast<Vector2f*>(NODE_ARG(0, Pointer));
         NODE_RETURN((*vp)[v->address()]);
     }
 
     NODE_IMPLEMENTATION(Vector2FloatRep::extractMember, float)
     {
-        const MemberVariable* var =
-            static_cast<const MemberVariable*>(NODE_THIS.symbol());
+        const MemberVariable* var = static_cast<const MemberVariable*>(NODE_THIS.symbol());
         Vector2f v = NODE_ARG(0, Vector2f);
         NODE_RETURN(v[var->address()]);
     }
@@ -1273,8 +1168,7 @@ namespace Mu
                 //  Pretty sweet deal!
                 //
 
-                return VoidRep::functionActivationFunc(
-                    *NODE_THREAD.continuation(), NODE_THREAD);
+                return VoidRep::functionActivationFunc(*NODE_THREAD.continuation(), NODE_THREAD);
             }
             case JumpReturnCode::NoJump:
                 (func._voidFunc)(*body, NODE_THREAD);
@@ -1298,10 +1192,7 @@ namespace Mu
         NODE_THREAD.jump(JumpReturnCode::TailFuse);
     }
 
-    NODE_IMPLEMENTATION(VoidRep::functionReturnFunc, void)
-    {
-        NODE_THREAD.jump(JumpReturnCode::Return);
-    }
+    NODE_IMPLEMENTATION(VoidRep::functionReturnFunc, void) { NODE_THREAD.jump(JumpReturnCode::Return); }
 
     NODE_IMPLEMENTATION(VoidRep::dynamicActivation, void)
     {
@@ -1334,8 +1225,7 @@ namespace Mu
     {
         const Function* f = static_cast<const Function*>(NODE_THIS.symbol());
         const Interface* i = static_cast<const Interface*>(f->scope());
-        ClassInstance* o =
-            reinterpret_cast<ClassInstance*>(NODE_ARG(0, Pointer));
+        ClassInstance* o = reinterpret_cast<ClassInstance*>(NODE_ARG(0, Pointer));
 
         if (const InterfaceImp* imp = o->classType()->implementation(i))
         {
@@ -1365,18 +1255,15 @@ namespace Mu
 
     NODE_IMPLEMENTATION(VoidRep::variantConstructor, Pointer)
     {
-        const VariantTagType* c =
-            static_cast<const VariantTagType*>(NODE_THIS.symbol()->scope());
+        const VariantTagType* c = static_cast<const VariantTagType*>(NODE_THIS.symbol()->scope());
         VariantInstance* i = VariantInstance::allocate(c);
         NODE_RETURN(i);
     }
 
     NODE_IMPLEMENTATION(VoidRep::callMethod, void)
     {
-        const MemberFunction* f =
-            static_cast<const MemberFunction*>(NODE_THIS.symbol());
-        ClassInstance* i =
-            reinterpret_cast<ClassInstance*>(NODE_ARG(0, Pointer));
+        const MemberFunction* f = static_cast<const MemberFunction*>(NODE_THIS.symbol());
+        ClassInstance* i = reinterpret_cast<ClassInstance*>(NODE_ARG(0, Pointer));
         if (!i)
             throw NilArgumentException(NODE_THREAD);
         const MemberFunction* F = i->classType()->dynamicLookup(f);

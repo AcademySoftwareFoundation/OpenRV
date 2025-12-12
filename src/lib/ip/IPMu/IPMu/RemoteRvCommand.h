@@ -23,26 +23,19 @@ namespace IPMu
     class RemoteRvCommand
     {
     public:
-        template <typename... Args>
-        RemoteRvCommand(IPCore::Session* s, const std::string& command,
-                        Args&&... args)
+        template <typename... Args> RemoteRvCommand(IPCore::Session* s, const std::string& command, Args&&... args)
         {
             m_session = s;
             std::string parameters = pack(command, std::forward<Args>(args)...);
 
-            m_session->userGenericEvent("generic-rv-command",
-                                        parameters.c_str(), "");
+            m_session->userGenericEvent("generic-rv-command", parameters.c_str(), "");
 
             m_session->userGenericEvent("push-eat-broadcast-events", "");
         }
 
-        ~RemoteRvCommand()
-        {
-            m_session->userGenericEvent("pop-eat-broadcast-events", "");
-        }
+        ~RemoteRvCommand() { m_session->userGenericEvent("pop-eat-broadcast-events", ""); }
 
-        template <typename... Args>
-        static std::string pack(const std::string& name, Args&&... args)
+        template <typename... Args> static std::string pack(const std::string& name, Args&&... args)
         {
             QJsonObject obj;
             obj["name"] = QString::fromStdString(name);
@@ -88,8 +81,7 @@ namespace IPMu
         }
 
         // Handle all vector types generically
-        template <typename T>
-        static QJsonArray vectorToJson(const std::vector<T>& vec)
+        template <typename T> static QJsonArray vectorToJson(const std::vector<T>& vec)
         {
             QJsonArray arr;
             for (const auto& item : vec)

@@ -43,8 +43,7 @@ namespace IPCore
             typedef T Property;
             typedef typename Property::Layout Layout;
 
-            void setArgs(IPGraph* graph, const std::string& nodeName,
-                         const std::string& propPath);
+            void setArgs(IPGraph* graph, const std::string& nodeName, const std::string& propPath);
 
             virtual void doit();
             virtual void undo();
@@ -58,9 +57,7 @@ namespace IPCore
             Property* m_prop;
         };
 
-        template <typename T>
-        void NewProperty<T>::setArgs(IPGraph* graph, const std::string& node,
-                                     const std::string& propPath)
+        template <typename T> void NewProperty<T>::setArgs(IPGraph* graph, const std::string& node, const std::string& propPath)
         {
             m_graph = graph;
             m_nodeName = node;
@@ -68,8 +65,7 @@ namespace IPCore
 
             if (!m_graph->findNode(m_nodeName))
             {
-                TWK_THROW_EXC_STREAM("NewProperty: unknown node "
-                                     << m_nodeName);
+                TWK_THROW_EXC_STREAM("NewProperty: unknown node " << m_nodeName);
             }
         }
 
@@ -105,10 +101,7 @@ namespace IPCore
 
             virtual ~NewPropertyInfo() {}
 
-            virtual TwkApp::Command* newCommand() const
-            {
-                return new NewProperty<T>(this);
-            }
+            virtual TwkApp::Command* newCommand() const { return new NewProperty<T>(this); }
         };
 
     } // namespace Commands

@@ -42,8 +42,7 @@ namespace Mu
     {
     }
 
-    QRadialGradientType::QRadialGradientType(Context* c, const char* name,
-                                             Class* super)
+    QRadialGradientType::QRadialGradientType(Context* c, const char* name, Class* super)
         : Class(c, name, super)
     {
     }
@@ -52,53 +51,43 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(__allocate, Pointer)
     {
-        QRadialGradientType::Instance* i =
-            new QRadialGradientType::Instance((Class*)NODE_THIS.type());
+        QRadialGradientType::Instance* i = new QRadialGradientType::Instance((Class*)NODE_THIS.type());
         QRadialGradientType::registerFinalizer(i);
         NODE_RETURN(i);
     }
 
-    void QRadialGradientType::registerFinalizer(void* o)
-    {
-        GC_register_finalizer(o, QRadialGradientType::finalizer, 0, 0, 0);
-    }
+    void QRadialGradientType::registerFinalizer(void* o) { GC_register_finalizer(o, QRadialGradientType::finalizer, 0, 0, 0); }
 
     void QRadialGradientType::finalizer(void* obj, void* data)
     {
-        QRadialGradientType::Instance* i =
-            reinterpret_cast<QRadialGradientType::Instance*>(obj);
+        QRadialGradientType::Instance* i = reinterpret_cast<QRadialGradientType::Instance*>(obj);
         delete i;
     }
 
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    Pointer qt_QRadialGradient_QRadialGradient_QRadialGradient_QRadialGradient(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QRadialGradient_QRadialGradient_QRadialGradient_QRadialGradient(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         setqtype<QRadialGradientType>(param_this, QRadialGradient());
         return param_this;
     }
 
-    Pointer
-    qt_QRadialGradient_QRadialGradient_QRadialGradient_QRadialGradient_QPointF_double_QPointF(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_center,
-        double param_radius, Pointer param_focalPoint)
+    Pointer qt_QRadialGradient_QRadialGradient_QRadialGradient_QRadialGradient_QPointF_double_QPointF(
+        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_center, double param_radius, Pointer param_focalPoint)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QPointF arg1 = getqtype<QPointFType>(param_center);
         qreal arg2 = (double)(param_radius);
         const QPointF arg3 = getqtype<QPointFType>(param_focalPoint);
-        setqtype<QRadialGradientType>(param_this,
-                                      QRadialGradient(arg1, arg2, arg3));
+        setqtype<QRadialGradientType>(param_this, QRadialGradient(arg1, arg2, arg3));
         return param_this;
     }
 
-    Pointer
-    qt_QRadialGradient_QRadialGradient_QRadialGradient_QRadialGradient_double_double_double_double_double(
-        Mu::Thread& NODE_THREAD, Pointer param_this, double param_cx,
-        double param_cy, double param_radius, double param_fx, double param_fy)
+    Pointer qt_QRadialGradient_QRadialGradient_QRadialGradient_QRadialGradient_double_double_double_double_double(
+        Mu::Thread& NODE_THREAD, Pointer param_this, double param_cx, double param_cy, double param_radius, double param_fx,
+        double param_fy)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         qreal arg1 = (double)(param_cx);
@@ -106,15 +95,12 @@ namespace Mu
         qreal arg3 = (double)(param_radius);
         qreal arg4 = (double)(param_fx);
         qreal arg5 = (double)(param_fy);
-        setqtype<QRadialGradientType>(
-            param_this, QRadialGradient(arg1, arg2, arg3, arg4, arg5));
+        setqtype<QRadialGradientType>(param_this, QRadialGradient(arg1, arg2, arg3, arg4, arg5));
         return param_this;
     }
 
-    Pointer
-    qt_QRadialGradient_QRadialGradient_QRadialGradient_QRadialGradient_QPointF_double(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_center,
-        double param_radius)
+    Pointer qt_QRadialGradient_QRadialGradient_QRadialGradient_QRadialGradient_QPointF_double(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                                              Pointer param_center, double param_radius)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QPointF arg1 = getqtype<QPointFType>(param_center);
@@ -123,24 +109,20 @@ namespace Mu
         return param_this;
     }
 
-    Pointer
-    qt_QRadialGradient_QRadialGradient_QRadialGradient_QRadialGradient_double_double_double(
-        Mu::Thread& NODE_THREAD, Pointer param_this, double param_cx,
-        double param_cy, double param_radius)
+    Pointer qt_QRadialGradient_QRadialGradient_QRadialGradient_QRadialGradient_double_double_double(Mu::Thread& NODE_THREAD,
+                                                                                                    Pointer param_this, double param_cx,
+                                                                                                    double param_cy, double param_radius)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         qreal arg1 = (double)(param_cx);
         qreal arg2 = (double)(param_cy);
         qreal arg3 = (double)(param_radius);
-        setqtype<QRadialGradientType>(param_this,
-                                      QRadialGradient(arg1, arg2, arg3));
+        setqtype<QRadialGradientType>(param_this, QRadialGradient(arg1, arg2, arg3));
         return param_this;
     }
 
-    Pointer
-    qt_QRadialGradient_QRadialGradient_QRadialGradient_QRadialGradient_QPointF_double_QPointF_double(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_center,
-        double param_centerRadius, Pointer param_focalPoint,
+    Pointer qt_QRadialGradient_QRadialGradient_QRadialGradient_QRadialGradient_QPointF_double_QPointF_double(
+        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_center, double param_centerRadius, Pointer param_focalPoint,
         double param_focalRadius)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
@@ -148,15 +130,12 @@ namespace Mu
         qreal arg2 = (double)(param_centerRadius);
         const QPointF arg3 = getqtype<QPointFType>(param_focalPoint);
         qreal arg4 = (double)(param_focalRadius);
-        setqtype<QRadialGradientType>(param_this,
-                                      QRadialGradient(arg1, arg2, arg3, arg4));
+        setqtype<QRadialGradientType>(param_this, QRadialGradient(arg1, arg2, arg3, arg4));
         return param_this;
     }
 
-    Pointer
-    qt_QRadialGradient_QRadialGradient_QRadialGradient_QRadialGradient_double_double_double_double_double_double(
-        Mu::Thread& NODE_THREAD, Pointer param_this, double param_cx,
-        double param_cy, double param_centerRadius, double param_fx,
+    Pointer qt_QRadialGradient_QRadialGradient_QRadialGradient_QRadialGradient_double_double_double_double_double_double(
+        Mu::Thread& NODE_THREAD, Pointer param_this, double param_cx, double param_cy, double param_centerRadius, double param_fx,
         double param_fy, double param_focalRadius)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
@@ -166,55 +145,46 @@ namespace Mu
         qreal arg4 = (double)(param_fx);
         qreal arg5 = (double)(param_fy);
         qreal arg6 = (double)(param_focalRadius);
-        setqtype<QRadialGradientType>(
-            param_this, QRadialGradient(arg1, arg2, arg3, arg4, arg5, arg6));
+        setqtype<QRadialGradientType>(param_this, QRadialGradient(arg1, arg2, arg3, arg4, arg5, arg6));
         return param_this;
     }
 
-    Pointer
-    qt_QRadialGradient_center_QPointF_QRadialGradient(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    Pointer qt_QRadialGradient_center_QPointF_QRadialGradient(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRadialGradient arg0 = getqtype<QRadialGradientType>(param_this);
         return makeqtype<QPointFType>(c, arg0.center(), "qt.QPointF");
     }
 
-    double qt_QRadialGradient_centerRadius_double_QRadialGradient(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    double qt_QRadialGradient_centerRadius_double_QRadialGradient(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRadialGradient arg0 = getqtype<QRadialGradientType>(param_this);
         return arg0.centerRadius();
     }
 
-    Pointer qt_QRadialGradient_focalPoint_QPointF_QRadialGradient(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QRadialGradient_focalPoint_QPointF_QRadialGradient(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRadialGradient arg0 = getqtype<QRadialGradientType>(param_this);
         return makeqtype<QPointFType>(c, arg0.focalPoint(), "qt.QPointF");
     }
 
-    double qt_QRadialGradient_focalRadius_double_QRadialGradient(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    double qt_QRadialGradient_focalRadius_double_QRadialGradient(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRadialGradient arg0 = getqtype<QRadialGradientType>(param_this);
         return arg0.focalRadius();
     }
 
-    double
-    qt_QRadialGradient_radius_double_QRadialGradient(Mu::Thread& NODE_THREAD,
-                                                     Pointer param_this)
+    double qt_QRadialGradient_radius_double_QRadialGradient(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRadialGradient arg0 = getqtype<QRadialGradientType>(param_this);
         return arg0.radius();
     }
 
-    void qt_QRadialGradient_setCenter_void_QRadialGradient_QPointF(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_center)
+    void qt_QRadialGradient_setCenter_void_QRadialGradient_QPointF(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_center)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRadialGradient arg0 = getqtype<QRadialGradientType>(param_this);
@@ -223,9 +193,8 @@ namespace Mu
         setqtype<QRadialGradientType>(param_this, arg0);
     }
 
-    void qt_QRadialGradient_setCenter_void_QRadialGradient_double_double(
-        Mu::Thread& NODE_THREAD, Pointer param_this, double param_x,
-        double param_y)
+    void qt_QRadialGradient_setCenter_void_QRadialGradient_double_double(Mu::Thread& NODE_THREAD, Pointer param_this, double param_x,
+                                                                         double param_y)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRadialGradient arg0 = getqtype<QRadialGradientType>(param_this);
@@ -235,8 +204,7 @@ namespace Mu
         setqtype<QRadialGradientType>(param_this, arg0);
     }
 
-    void qt_QRadialGradient_setCenterRadius_void_QRadialGradient_double(
-        Mu::Thread& NODE_THREAD, Pointer param_this, double param_radius)
+    void qt_QRadialGradient_setCenterRadius_void_QRadialGradient_double(Mu::Thread& NODE_THREAD, Pointer param_this, double param_radius)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRadialGradient arg0 = getqtype<QRadialGradientType>(param_this);
@@ -245,8 +213,8 @@ namespace Mu
         setqtype<QRadialGradientType>(param_this, arg0);
     }
 
-    void qt_QRadialGradient_setFocalPoint_void_QRadialGradient_QPointF(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_focalPoint)
+    void qt_QRadialGradient_setFocalPoint_void_QRadialGradient_QPointF(Mu::Thread& NODE_THREAD, Pointer param_this,
+                                                                       Pointer param_focalPoint)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRadialGradient arg0 = getqtype<QRadialGradientType>(param_this);
@@ -255,9 +223,8 @@ namespace Mu
         setqtype<QRadialGradientType>(param_this, arg0);
     }
 
-    void qt_QRadialGradient_setFocalPoint_void_QRadialGradient_double_double(
-        Mu::Thread& NODE_THREAD, Pointer param_this, double param_x,
-        double param_y)
+    void qt_QRadialGradient_setFocalPoint_void_QRadialGradient_double_double(Mu::Thread& NODE_THREAD, Pointer param_this, double param_x,
+                                                                             double param_y)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRadialGradient arg0 = getqtype<QRadialGradientType>(param_this);
@@ -267,8 +234,7 @@ namespace Mu
         setqtype<QRadialGradientType>(param_this, arg0);
     }
 
-    void qt_QRadialGradient_setFocalRadius_void_QRadialGradient_double(
-        Mu::Thread& NODE_THREAD, Pointer param_this, double param_radius)
+    void qt_QRadialGradient_setFocalRadius_void_QRadialGradient_double(Mu::Thread& NODE_THREAD, Pointer param_this, double param_radius)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRadialGradient arg0 = getqtype<QRadialGradientType>(param_this);
@@ -277,8 +243,7 @@ namespace Mu
         setqtype<QRadialGradientType>(param_this, arg0);
     }
 
-    void qt_QRadialGradient_setRadius_void_QRadialGradient_double(
-        Mu::Thread& NODE_THREAD, Pointer param_this, double param_radius)
+    void qt_QRadialGradient_setRadius_void_QRadialGradient_double(Mu::Thread& NODE_THREAD, Pointer param_this, double param_radius)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRadialGradient arg0 = getqtype<QRadialGradientType>(param_this);
@@ -289,134 +254,108 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(_n_QRadialGradient0, Pointer)
     {
-        NODE_RETURN(
-            qt_QRadialGradient_QRadialGradient_QRadialGradient_QRadialGradient(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QRadialGradient_QRadialGradient_QRadialGradient_QRadialGradient(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_QRadialGradient1, Pointer)
     {
-        NODE_RETURN(
-            qt_QRadialGradient_QRadialGradient_QRadialGradient_QRadialGradient_QPointF_double_QPointF(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, double), NODE_ARG(3, Pointer)));
+        NODE_RETURN(qt_QRadialGradient_QRadialGradient_QRadialGradient_QRadialGradient_QPointF_double_QPointF(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, double), NODE_ARG(3, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_QRadialGradient2, Pointer)
     {
-        NODE_RETURN(
-            qt_QRadialGradient_QRadialGradient_QRadialGradient_QRadialGradient_double_double_double_double_double(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, double),
-                NODE_ARG(2, double), NODE_ARG(3, double), NODE_ARG(4, double),
-                NODE_ARG(5, double)));
+        NODE_RETURN(qt_QRadialGradient_QRadialGradient_QRadialGradient_QRadialGradient_double_double_double_double_double(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, double), NODE_ARG(2, double), NODE_ARG(3, double), NODE_ARG(4, double),
+            NODE_ARG(5, double)));
     }
 
     static NODE_IMPLEMENTATION(_n_QRadialGradient3, Pointer)
     {
-        NODE_RETURN(
-            qt_QRadialGradient_QRadialGradient_QRadialGradient_QRadialGradient_QPointF_double(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, double)));
+        NODE_RETURN(qt_QRadialGradient_QRadialGradient_QRadialGradient_QRadialGradient_QPointF_double(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, double)));
     }
 
     static NODE_IMPLEMENTATION(_n_QRadialGradient4, Pointer)
     {
-        NODE_RETURN(
-            qt_QRadialGradient_QRadialGradient_QRadialGradient_QRadialGradient_double_double_double(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, double),
-                NODE_ARG(2, double), NODE_ARG(3, double)));
+        NODE_RETURN(qt_QRadialGradient_QRadialGradient_QRadialGradient_QRadialGradient_double_double_double(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, double), NODE_ARG(2, double), NODE_ARG(3, double)));
     }
 
     static NODE_IMPLEMENTATION(_n_QRadialGradient5, Pointer)
     {
-        NODE_RETURN(
-            qt_QRadialGradient_QRadialGradient_QRadialGradient_QRadialGradient_QPointF_double_QPointF_double(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-                NODE_ARG(2, double), NODE_ARG(3, Pointer),
-                NODE_ARG(4, double)));
+        NODE_RETURN(qt_QRadialGradient_QRadialGradient_QRadialGradient_QRadialGradient_QPointF_double_QPointF_double(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, double), NODE_ARG(3, Pointer),
+            NODE_ARG(4, double)));
     }
 
     static NODE_IMPLEMENTATION(_n_QRadialGradient6, Pointer)
     {
-        NODE_RETURN(
-            qt_QRadialGradient_QRadialGradient_QRadialGradient_QRadialGradient_double_double_double_double_double_double(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, double),
-                NODE_ARG(2, double), NODE_ARG(3, double), NODE_ARG(4, double),
-                NODE_ARG(5, double), NODE_ARG(6, double)));
+        NODE_RETURN(qt_QRadialGradient_QRadialGradient_QRadialGradient_QRadialGradient_double_double_double_double_double_double(
+            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, double), NODE_ARG(2, double), NODE_ARG(3, double), NODE_ARG(4, double),
+            NODE_ARG(5, double), NODE_ARG(6, double)));
     }
 
     static NODE_IMPLEMENTATION(_n_center0, Pointer)
     {
-        NODE_RETURN(qt_QRadialGradient_center_QPointF_QRadialGradient(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QRadialGradient_center_QPointF_QRadialGradient(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_centerRadius0, double)
     {
-        NODE_RETURN(qt_QRadialGradient_centerRadius_double_QRadialGradient(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QRadialGradient_centerRadius_double_QRadialGradient(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_focalPoint0, Pointer)
     {
-        NODE_RETURN(qt_QRadialGradient_focalPoint_QPointF_QRadialGradient(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QRadialGradient_focalPoint_QPointF_QRadialGradient(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_focalRadius0, double)
     {
-        NODE_RETURN(qt_QRadialGradient_focalRadius_double_QRadialGradient(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QRadialGradient_focalRadius_double_QRadialGradient(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_radius0, double)
     {
-        NODE_RETURN(qt_QRadialGradient_radius_double_QRadialGradient(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QRadialGradient_radius_double_QRadialGradient(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_setCenter0, void)
     {
-        qt_QRadialGradient_setCenter_void_QRadialGradient_QPointF(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QRadialGradient_setCenter_void_QRadialGradient_QPointF(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setCenter1, void)
     {
-        qt_QRadialGradient_setCenter_void_QRadialGradient_double_double(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, double),
-            NODE_ARG(2, double));
+        qt_QRadialGradient_setCenter_void_QRadialGradient_double_double(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, double),
+                                                                        NODE_ARG(2, double));
     }
 
     static NODE_IMPLEMENTATION(_n_setCenterRadius0, void)
     {
-        qt_QRadialGradient_setCenterRadius_void_QRadialGradient_double(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, double));
+        qt_QRadialGradient_setCenterRadius_void_QRadialGradient_double(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, double));
     }
 
     static NODE_IMPLEMENTATION(_n_setFocalPoint0, void)
     {
-        qt_QRadialGradient_setFocalPoint_void_QRadialGradient_QPointF(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
+        qt_QRadialGradient_setFocalPoint_void_QRadialGradient_QPointF(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer));
     }
 
     static NODE_IMPLEMENTATION(_n_setFocalPoint1, void)
     {
-        qt_QRadialGradient_setFocalPoint_void_QRadialGradient_double_double(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, double),
-            NODE_ARG(2, double));
+        qt_QRadialGradient_setFocalPoint_void_QRadialGradient_double_double(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, double),
+                                                                            NODE_ARG(2, double));
     }
 
     static NODE_IMPLEMENTATION(_n_setFocalRadius0, void)
     {
-        qt_QRadialGradient_setFocalRadius_void_QRadialGradient_double(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, double));
+        qt_QRadialGradient_setFocalRadius_void_QRadialGradient_double(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, double));
     }
 
     static NODE_IMPLEMENTATION(_n_setRadius0, void)
     {
-        qt_QRadialGradient_setRadius_void_QRadialGradient_double(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, double));
+        qt_QRadialGradient_setRadius_void_QRadialGradient_double(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, double));
     }
 
     void QRadialGradientType::load()
@@ -436,136 +375,78 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(
-            new Function(c, "__allocate", __allocate, None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", __allocate, None, Return, ftn, End),
 
-            EndArguments);
+                   EndArguments);
 
         addSymbols(EndArguments);
 
         addSymbols(
             // enums
             // member functions
-            new Function(
-                c, "QRadialGradient", _n_QRadialGradient0, None, Compiled,
-                qt_QRadialGradient_QRadialGradient_QRadialGradient_QRadialGradient,
-                Return, "qt.QRadialGradient", Parameters,
-                new Param(c, "this", "qt.QRadialGradient"), End),
-            new Function(
-                c, "QRadialGradient", _n_QRadialGradient1, None, Compiled,
-                qt_QRadialGradient_QRadialGradient_QRadialGradient_QRadialGradient_QPointF_double_QPointF,
-                Return, "qt.QRadialGradient", Parameters,
-                new Param(c, "this", "qt.QRadialGradient"),
-                new Param(c, "center", "qt.QPointF"),
-                new Param(c, "radius", "double"),
-                new Param(c, "focalPoint", "qt.QPointF"), End),
-            new Function(
-                c, "QRadialGradient", _n_QRadialGradient2, None, Compiled,
-                qt_QRadialGradient_QRadialGradient_QRadialGradient_QRadialGradient_double_double_double_double_double,
-                Return, "qt.QRadialGradient", Parameters,
-                new Param(c, "this", "qt.QRadialGradient"),
-                new Param(c, "cx", "double"), new Param(c, "cy", "double"),
-                new Param(c, "radius", "double"), new Param(c, "fx", "double"),
-                new Param(c, "fy", "double"), End),
-            new Function(
-                c, "QRadialGradient", _n_QRadialGradient3, None, Compiled,
-                qt_QRadialGradient_QRadialGradient_QRadialGradient_QRadialGradient_QPointF_double,
-                Return, "qt.QRadialGradient", Parameters,
-                new Param(c, "this", "qt.QRadialGradient"),
-                new Param(c, "center", "qt.QPointF"),
-                new Param(c, "radius", "double"), End),
-            new Function(
-                c, "QRadialGradient", _n_QRadialGradient4, None, Compiled,
-                qt_QRadialGradient_QRadialGradient_QRadialGradient_QRadialGradient_double_double_double,
-                Return, "qt.QRadialGradient", Parameters,
-                new Param(c, "this", "qt.QRadialGradient"),
-                new Param(c, "cx", "double"), new Param(c, "cy", "double"),
-                new Param(c, "radius", "double"), End),
-            new Function(
-                c, "QRadialGradient", _n_QRadialGradient5, None, Compiled,
-                qt_QRadialGradient_QRadialGradient_QRadialGradient_QRadialGradient_QPointF_double_QPointF_double,
-                Return, "qt.QRadialGradient", Parameters,
-                new Param(c, "this", "qt.QRadialGradient"),
-                new Param(c, "center", "qt.QPointF"),
-                new Param(c, "centerRadius", "double"),
-                new Param(c, "focalPoint", "qt.QPointF"),
-                new Param(c, "focalRadius", "double"), End),
-            new Function(
-                c, "QRadialGradient", _n_QRadialGradient6, None, Compiled,
-                qt_QRadialGradient_QRadialGradient_QRadialGradient_QRadialGradient_double_double_double_double_double_double,
-                Return, "qt.QRadialGradient", Parameters,
-                new Param(c, "this", "qt.QRadialGradient"),
-                new Param(c, "cx", "double"), new Param(c, "cy", "double"),
-                new Param(c, "centerRadius", "double"),
-                new Param(c, "fx", "double"), new Param(c, "fy", "double"),
-                new Param(c, "focalRadius", "double"), End),
-            new Function(c, "center", _n_center0, None, Compiled,
-                         qt_QRadialGradient_center_QPointF_QRadialGradient,
-                         Return, "qt.QPointF", Parameters,
+            new Function(c, "QRadialGradient", _n_QRadialGradient0, None, Compiled,
+                         qt_QRadialGradient_QRadialGradient_QRadialGradient_QRadialGradient, Return, "qt.QRadialGradient", Parameters,
                          new Param(c, "this", "qt.QRadialGradient"), End),
-            new Function(c, "centerRadius", _n_centerRadius0, None, Compiled,
-                         qt_QRadialGradient_centerRadius_double_QRadialGradient,
-                         Return, "double", Parameters,
-                         new Param(c, "this", "qt.QRadialGradient"), End),
-            new Function(c, "focalPoint", _n_focalPoint0, None, Compiled,
-                         qt_QRadialGradient_focalPoint_QPointF_QRadialGradient,
-                         Return, "qt.QPointF", Parameters,
-                         new Param(c, "this", "qt.QRadialGradient"), End),
-            new Function(c, "focalRadius", _n_focalRadius0, None, Compiled,
-                         qt_QRadialGradient_focalRadius_double_QRadialGradient,
-                         Return, "double", Parameters,
-                         new Param(c, "this", "qt.QRadialGradient"), End),
-            new Function(c, "radius", _n_radius0, None, Compiled,
-                         qt_QRadialGradient_radius_double_QRadialGradient,
-                         Return, "double", Parameters,
-                         new Param(c, "this", "qt.QRadialGradient"), End),
-            new Function(
-                c, "setCenter", _n_setCenter0, None, Compiled,
-                qt_QRadialGradient_setCenter_void_QRadialGradient_QPointF,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QRadialGradient"),
-                new Param(c, "center", "qt.QPointF"), End),
-            new Function(
-                c, "setCenter", _n_setCenter1, None, Compiled,
-                qt_QRadialGradient_setCenter_void_QRadialGradient_double_double,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QRadialGradient"),
-                new Param(c, "x", "double"), new Param(c, "y", "double"), End),
-            new Function(
-                c, "setCenterRadius", _n_setCenterRadius0, None, Compiled,
-                qt_QRadialGradient_setCenterRadius_void_QRadialGradient_double,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QRadialGradient"),
-                new Param(c, "radius", "double"), End),
-            new Function(
-                c, "setFocalPoint", _n_setFocalPoint0, None, Compiled,
-                qt_QRadialGradient_setFocalPoint_void_QRadialGradient_QPointF,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QRadialGradient"),
-                new Param(c, "focalPoint", "qt.QPointF"), End),
-            new Function(
-                c, "setFocalPoint", _n_setFocalPoint1, None, Compiled,
-                qt_QRadialGradient_setFocalPoint_void_QRadialGradient_double_double,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QRadialGradient"),
-                new Param(c, "x", "double"), new Param(c, "y", "double"), End),
-            new Function(
-                c, "setFocalRadius", _n_setFocalRadius0, None, Compiled,
-                qt_QRadialGradient_setFocalRadius_void_QRadialGradient_double,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QRadialGradient"),
-                new Param(c, "radius", "double"), End),
-            new Function(
-                c, "setRadius", _n_setRadius0, None, Compiled,
-                qt_QRadialGradient_setRadius_void_QRadialGradient_double,
-                Return, "void", Parameters,
-                new Param(c, "this", "qt.QRadialGradient"),
-                new Param(c, "radius", "double"), End),
+            new Function(c, "QRadialGradient", _n_QRadialGradient1, None, Compiled,
+                         qt_QRadialGradient_QRadialGradient_QRadialGradient_QRadialGradient_QPointF_double_QPointF, Return,
+                         "qt.QRadialGradient", Parameters, new Param(c, "this", "qt.QRadialGradient"), new Param(c, "center", "qt.QPointF"),
+                         new Param(c, "radius", "double"), new Param(c, "focalPoint", "qt.QPointF"), End),
+            new Function(c, "QRadialGradient", _n_QRadialGradient2, None, Compiled,
+                         qt_QRadialGradient_QRadialGradient_QRadialGradient_QRadialGradient_double_double_double_double_double, Return,
+                         "qt.QRadialGradient", Parameters, new Param(c, "this", "qt.QRadialGradient"), new Param(c, "cx", "double"),
+                         new Param(c, "cy", "double"), new Param(c, "radius", "double"), new Param(c, "fx", "double"),
+                         new Param(c, "fy", "double"), End),
+            new Function(c, "QRadialGradient", _n_QRadialGradient3, None, Compiled,
+                         qt_QRadialGradient_QRadialGradient_QRadialGradient_QRadialGradient_QPointF_double, Return, "qt.QRadialGradient",
+                         Parameters, new Param(c, "this", "qt.QRadialGradient"), new Param(c, "center", "qt.QPointF"),
+                         new Param(c, "radius", "double"), End),
+            new Function(c, "QRadialGradient", _n_QRadialGradient4, None, Compiled,
+                         qt_QRadialGradient_QRadialGradient_QRadialGradient_QRadialGradient_double_double_double, Return,
+                         "qt.QRadialGradient", Parameters, new Param(c, "this", "qt.QRadialGradient"), new Param(c, "cx", "double"),
+                         new Param(c, "cy", "double"), new Param(c, "radius", "double"), End),
+            new Function(c, "QRadialGradient", _n_QRadialGradient5, None, Compiled,
+                         qt_QRadialGradient_QRadialGradient_QRadialGradient_QRadialGradient_QPointF_double_QPointF_double, Return,
+                         "qt.QRadialGradient", Parameters, new Param(c, "this", "qt.QRadialGradient"), new Param(c, "center", "qt.QPointF"),
+                         new Param(c, "centerRadius", "double"), new Param(c, "focalPoint", "qt.QPointF"),
+                         new Param(c, "focalRadius", "double"), End),
+            new Function(c, "QRadialGradient", _n_QRadialGradient6, None, Compiled,
+                         qt_QRadialGradient_QRadialGradient_QRadialGradient_QRadialGradient_double_double_double_double_double_double,
+                         Return, "qt.QRadialGradient", Parameters, new Param(c, "this", "qt.QRadialGradient"), new Param(c, "cx", "double"),
+                         new Param(c, "cy", "double"), new Param(c, "centerRadius", "double"), new Param(c, "fx", "double"),
+                         new Param(c, "fy", "double"), new Param(c, "focalRadius", "double"), End),
+            new Function(c, "center", _n_center0, None, Compiled, qt_QRadialGradient_center_QPointF_QRadialGradient, Return, "qt.QPointF",
+                         Parameters, new Param(c, "this", "qt.QRadialGradient"), End),
+            new Function(c, "centerRadius", _n_centerRadius0, None, Compiled, qt_QRadialGradient_centerRadius_double_QRadialGradient,
+                         Return, "double", Parameters, new Param(c, "this", "qt.QRadialGradient"), End),
+            new Function(c, "focalPoint", _n_focalPoint0, None, Compiled, qt_QRadialGradient_focalPoint_QPointF_QRadialGradient, Return,
+                         "qt.QPointF", Parameters, new Param(c, "this", "qt.QRadialGradient"), End),
+            new Function(c, "focalRadius", _n_focalRadius0, None, Compiled, qt_QRadialGradient_focalRadius_double_QRadialGradient, Return,
+                         "double", Parameters, new Param(c, "this", "qt.QRadialGradient"), End),
+            new Function(c, "radius", _n_radius0, None, Compiled, qt_QRadialGradient_radius_double_QRadialGradient, Return, "double",
+                         Parameters, new Param(c, "this", "qt.QRadialGradient"), End),
+            new Function(c, "setCenter", _n_setCenter0, None, Compiled, qt_QRadialGradient_setCenter_void_QRadialGradient_QPointF, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QRadialGradient"), new Param(c, "center", "qt.QPointF"), End),
+            new Function(c, "setCenter", _n_setCenter1, None, Compiled, qt_QRadialGradient_setCenter_void_QRadialGradient_double_double,
+                         Return, "void", Parameters, new Param(c, "this", "qt.QRadialGradient"), new Param(c, "x", "double"),
+                         new Param(c, "y", "double"), End),
+            new Function(c, "setCenterRadius", _n_setCenterRadius0, None, Compiled,
+                         qt_QRadialGradient_setCenterRadius_void_QRadialGradient_double, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QRadialGradient"), new Param(c, "radius", "double"), End),
+            new Function(c, "setFocalPoint", _n_setFocalPoint0, None, Compiled,
+                         qt_QRadialGradient_setFocalPoint_void_QRadialGradient_QPointF, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QRadialGradient"), new Param(c, "focalPoint", "qt.QPointF"), End),
+            new Function(c, "setFocalPoint", _n_setFocalPoint1, None, Compiled,
+                         qt_QRadialGradient_setFocalPoint_void_QRadialGradient_double_double, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QRadialGradient"), new Param(c, "x", "double"), new Param(c, "y", "double"), End),
+            new Function(c, "setFocalRadius", _n_setFocalRadius0, None, Compiled,
+                         qt_QRadialGradient_setFocalRadius_void_QRadialGradient_double, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QRadialGradient"), new Param(c, "radius", "double"), End),
+            new Function(c, "setRadius", _n_setRadius0, None, Compiled, qt_QRadialGradient_setRadius_void_QRadialGradient_double, Return,
+                         "void", Parameters, new Param(c, "this", "qt.QRadialGradient"), new Param(c, "radius", "double"), End),
             // static functions
             EndArguments);
         globalScope()->addSymbols(EndArguments);

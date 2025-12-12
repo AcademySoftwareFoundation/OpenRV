@@ -218,9 +218,6 @@ class: SequenceGroupEditMode : MinorMode
     {
         \: (int;)
         {
-            if (filterLiveReviewEvents()) {
-                return DisabledMenuState;
-            }
             let p = getIntProperty("#RVSequence.mode.%s" % name).front();
             if p == 0 then UncheckedMenuState else CheckedMenuState;
         };
@@ -228,13 +225,13 @@ class: SequenceGroupEditMode : MinorMode
 
     method: menu (Menu;)
     {
-        Menu {
-            {"Sequence", Menu {
-                {"_", nil, nil, nil},
-                {"Auto EDL", autoEDL, nil, stateFunc("autoEDL")},
-                {"Use Source Cut Info", useCutInfo, nil, stateFunc("useCutInfo")}
-            }
-        }};
+        newMenu(MenuItem[] {
+            subMenu("Sequence", MenuItem[] {
+                menuSeparator(),
+                menuItem("Auto EDL", "", "viewmode_category", autoEDL, stateFunc("autoEDL")),
+                menuItem("Use Source Cut Info", "", "viewmode_category", useCutInfo, stateFunc("useCutInfo"))
+            })
+        });
     }
 
    

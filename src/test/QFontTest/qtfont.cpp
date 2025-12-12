@@ -22,8 +22,7 @@ TEST_CASE("Load QFont")
 
     QApplication app(argc, const_cast<char**>(argv));
     const char* path = getenv("RV_FONT_PATH");
-    REQUIRE_MESSAGE(path != nullptr,
-                    "Please use RV_FONT_PATH to set a path to a font");
+    REQUIRE_MESSAGE(path != nullptr, "Please use RV_FONT_PATH to set a path to a font");
 
     const int loaded = QFontDatabase::addApplicationFont(path);
     CHECK_NE(loaded, -1);
@@ -39,8 +38,7 @@ TEST_CASE("Load QFont From Resource")
     Q_INIT_RESOURCE(RvCommon);
 
     QFile res(":/fonts/fontawesome-webfont.ttf");
-    REQUIRE_MESSAGE(res.open(QIODevice::ReadOnly),
-                    "Unable to find font in QRC");
+    REQUIRE_MESSAGE(res.open(QIODevice::ReadOnly), "Unable to find font in QRC");
 
     QByteArray fontData(res.readAll());
     res.close();
@@ -61,8 +59,7 @@ TEST_CASE("Load QFont From QTBundle")
     bundle.initializeAfterQApplication();
 
     QFile res(":/fonts/fontawesome-webfont.ttf");
-    REQUIRE_MESSAGE(res.open(QIODevice::ReadOnly),
-                    "Unable to find font in QRC");
+    REQUIRE_MESSAGE(res.open(QIODevice::ReadOnly), "Unable to find font in QRC");
 
     QByteArray fontData(res.readAll());
     res.close();

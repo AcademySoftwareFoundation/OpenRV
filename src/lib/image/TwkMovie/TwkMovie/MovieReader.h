@@ -120,19 +120,14 @@ namespace TwkMovie
         ///       preloadOpen() and postPrelodaOpen().
         ///
 
-        virtual void preloadOpen(const std::string& filename,
-                                 const ReadRequest& request);
+        virtual void preloadOpen(const std::string& filename, const ReadRequest& request);
 
-        virtual void
-        postPreloadOpen(const MovieInfo& info = MovieInfo(),
-                        const ReadRequest& request = ReadRequest());
+        virtual void postPreloadOpen(const MovieInfo& info = MovieInfo(), const ReadRequest& request = ReadRequest());
 
         ///
         ///  Open may throw.
         ///
-        virtual void open(const std::string& filename,
-                          const MovieInfo& info = MovieInfo(),
-                          const ReadRequest& request = ReadRequest());
+        virtual void open(const std::string& filename, const MovieInfo& info = MovieInfo(), const ReadRequest& request = ReadRequest());
 
         ///
         /// if an additional scanning pass is required after open this
@@ -160,14 +155,10 @@ namespace TwkMovie
     private:
         MovieReader(const Movie& copy) {} /// no copying
 
-        MovieReader& operator=(const Movie& copy)
-        {
-            return *this;
-        }; /// no assignment
+        MovieReader& operator=(const Movie& copy) { return *this; }; /// no assignment
 
     protected:
-        std::string
-            m_filename; /// derived class should set this to the filename
+        std::string m_filename; /// derived class should set this to the filename
         ReadRequest m_request;
     };
 

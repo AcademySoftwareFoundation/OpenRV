@@ -16,8 +16,7 @@ namespace IPCore
     class CacheIPNode : public IPNode
     {
     public:
-        CacheIPNode(const std::string& name, const NodeDefinition* def,
-                    IPGraph* graph, GroupIPNode* group = 0);
+        CacheIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group = 0);
 
         CacheIPNode(const std::string& name, const NodeDefinition* def,
                     const IPNode* sourceNode, // used in IPImage constructor

@@ -7,7 +7,7 @@
 #
 # [OIIO -- Sources](https://github.com/OpenImageIO/oiio)
 #
-# [OIIO -- Documentation](https://openimageio.readthedocs.io/en/v2.4.7.1/)
+# [OIIO -- Documentation](https://openimageio.readthedocs.io/en/v${VERSION)NUMBER}/)
 #
 # [OIIO -- Build instructions](https://github.com/OpenImageIO/oiio/blob/master/INSTALL.md)
 #
@@ -15,17 +15,17 @@
 INCLUDE(ProcessorCount) # require CMake 3.15+
 PROCESSORCOUNT(_cpu_count)
 
-RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_OIIO" "2.4.6.0" "make" "")
+RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_OIIO" "${RV_DEPS_OIIO_VERSION}" "make" "")
 RV_SHOW_STANDARD_DEPS_VARIABLES()
 
 SET(_download_url
     "https://github.com/AcademySoftwareFoundation/OpenImageIO/archive/refs/tags/v${_version}.tar.gz"
 )
 SET(_download_hash
-    "628c588112ce8e08f31ec3417eb6828d"
+    "${RV_DEPS_OIIO_DOWNLOAD_HASH}"
 )
 
-RV_MAKE_STANDARD_LIB_NAME("OpenImageIO_Util" "2.4.6" "SHARED" "${RV_DEBUG_POSTFIX}")
+RV_MAKE_STANDARD_LIB_NAME("OpenImageIO_Util" "${_oiio_ver_major_minor}" "SHARED" "${RV_DEBUG_POSTFIX}")
 SET(_byprojects_copy
     ${_byproducts}
 )
@@ -38,7 +38,13 @@ SET(_oiio_utils_libpath
 SET(_oiio_utils_implibpath
     ${_implibpath}
 )
-RV_MAKE_STANDARD_LIB_NAME("OpenImageIO" "2.4.6" "SHARED" "${RV_DEBUG_POSTFIX}")
+
+# Strips that last group from the version number 
+# and stores it in _oiio_ver_major_minor
+# eg. 1.2.3.4 -> 1.2.3
+string(REGEX REPLACE "^([0-9]+\\.[0-9]+\\.[0-9]+)\\..*" "\\1" _oiio_ver_major_minor ${RV_DEPS_OIIO_VERSION})
+
+RV_MAKE_STANDARD_LIB_NAME("OpenImageIO" "${_oiio_ver_major_minor}" "SHARED" "${RV_DEBUG_POSTFIX}")
 LIST(APPEND _byproducts ${_byprojects_copy})
 
 # The '_configure_options' list gets reset and initialized in 'RV_CREATE_STANDARD_DEPS_VARIABLES'
@@ -90,26 +96,7 @@ LIST(APPEND _configure_options "-DOPENJPEG_INCLUDE_DIR=${_openjpeg_include_dir}"
 
 LIST(APPEND _configure_options "-DTIFF_ROOT=${RV_DEPS_TIFF_ROOT_DIR}")
 
-GET_TARGET_PROPERTY(_ffmpeg_include_dir ffmpeg::avcodec INTERFACE_INCLUDE_DIRECTORIES)
-IF(RV_TARGET_WINDOWS)
-  GET_TARGET_PROPERTY(_ffmpeg_libavcodec ffmpeg::avcodec IMPORTED_IMPLIB)
-  GET_TARGET_PROPERTY(_ffmpeg_libavformat ffmpeg::avformat IMPORTED_IMPLIB)
-  GET_TARGET_PROPERTY(_ffmpeg_libavutil ffmpeg::avutil IMPORTED_IMPLIB)
-  GET_TARGET_PROPERTY(_ffmpeg_libswscale ffmpeg::swscale IMPORTED_IMPLIB)
-ELSE()
-  GET_TARGET_PROPERTY(_ffmpeg_libavcodec ffmpeg::avcodec IMPORTED_LOCATION)
-  GET_TARGET_PROPERTY(_ffmpeg_libavformat ffmpeg::avformat IMPORTED_LOCATION)
-  GET_TARGET_PROPERTY(_ffmpeg_libavutil ffmpeg::avutil IMPORTED_LOCATION)
-  GET_TARGET_PROPERTY(_ffmpeg_libswscale ffmpeg::swscale IMPORTED_LOCATION)
-ENDIF()
-LIST(APPEND _configure_options "-DFFMPEG_INCLUDE_DIR=${_ffmpeg_include_dir}")
-LIST(APPEND _configure_options "-DFFMPEG_INCLUDES=${_ffmpeg_include_dir}")
-LIST(APPEND _configure_options "-DFFMPEG_AVCODEC_INCLUDE_DIR=${_ffmpeg_include_dir}")
-LIST(APPEND _configure_options "-DFFMPEG_LIBRARIES=${_ffmpeg_libavcodec} ${_ffmpeg_libavformat} ${_ffmpeg_libavutil} ${_ffmpeg_libswscale}")
-LIST(APPEND _configure_options "-DFFMPEG_LIBAVCODEC=${_ffmpeg_libavcodec}")
-LIST(APPEND _configure_options "-DFFMPEG_LIBAVFORMAT=${_ffmpeg_libavformat}")
-LIST(APPEND _configure_options "-DFFMPEG_LIBAVUTIL=${_ffmpeg_libavutil}")
-LIST(APPEND _configure_options "-DFFMPEG_LIBSWSCALE=${_ffmpeg_libswscale}")
+LIST(APPEND _configure_options "-USE_FFMPEG=0")
 
 IF(RV_TARGET_LINUX)
   MESSAGE(STATUS "Building OpenImageIO using system's freetype library.")
@@ -167,10 +154,6 @@ IF(NOT RV_TARGET_WINDOWS)
             Imath::Imath
             Webp::Webp
             Raw::Raw
-            ffmpeg::swresample
-            ffmpeg::swscale
-            ffmpeg::avcodec
-            ffmpeg::swresample
             ZLIB::ZLIB
     CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options}
     BUILD_COMMAND ${_cmake_build_command}
@@ -225,10 +208,6 @@ ELSE()
             Imath::Imath
             Webp::Webp
             Raw::Raw
-            ffmpeg::swresample
-            ffmpeg::swscale
-            ffmpeg::avcodec
-            ffmpeg::swresample
             ZLIB::ZLIB
     CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options}
     BUILD_COMMAND ${CMAKE_COMMAND} ${_oiio_build_options}

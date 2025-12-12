@@ -20,8 +20,7 @@ namespace IPCore
     {
         PropertyInfo* nodesInfo = 0;
 
-        bool equals(const IPNode::StringVector& a,
-                    const IPNode::StringVector& b)
+        bool equals(const IPNode::StringVector& a, const IPNode::StringVector& b)
         {
             const size_t asize = a.size();
             const size_t bsize = b.size();
@@ -40,9 +39,7 @@ namespace IPCore
 
     } // namespace
 
-    PipelineGroupIPNode::PipelineGroupIPNode(const std::string& name,
-                                             const NodeDefinition* def,
-                                             IPGraph* graph, GroupIPNode* group)
+    PipelineGroupIPNode::PipelineGroupIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group)
         : GroupIPNode(name, def, graph, group)
     {
         if (!nodesInfo)
@@ -53,15 +50,12 @@ namespace IPCore
             //  reliably we need to build these lazily
             //
 
-            nodesInfo = new PropertyInfo(
-                PropertyInfo::Persistent | PropertyInfo::RequiresGraphEdit, 1);
+            nodesInfo = new PropertyInfo(PropertyInfo::Persistent | PropertyInfo::RequiresGraphEdit, 1);
         }
 
         setMaxInputs(1);
-        m_nodeTypeNames =
-            declareProperty<StringProperty>("pipeline.nodes", nodesInfo);
-        m_nodeTypeNames->valueContainer() =
-            def->stringArrayValue("defaults.pipeline");
+        m_nodeTypeNames = declareProperty<StringProperty>("pipeline.nodes", nodesInfo);
+        m_nodeTypeNames->valueContainer() = def->stringArrayValue("defaults.pipeline");
     }
 
     PipelineGroupIPNode::~PipelineGroupIPNode()
@@ -79,8 +73,7 @@ namespace IPCore
         }
         else if (!m_nodes.empty())
         {
-            if (AdaptorIPNode* anode =
-                    dynamic_cast<AdaptorIPNode*>(m_nodes.back()))
+            if (AdaptorIPNode* anode = dynamic_cast<AdaptorIPNode*>(m_nodes.back()))
             {
                 anode->setGroupInputNode(inputs[0]);
             }
@@ -194,9 +187,7 @@ namespace IPCore
             }
             else
             {
-                cout << "ERROR: PipelineGroup " << name()
-                     << " cannot create node of type \"" << typeName
-                     << "\": ignoring" << endl;
+                cout << "ERROR: PipelineGroup " << name() << " cannot create node of type \"" << typeName << "\": ignoring" << endl;
             }
         }
 
@@ -219,17 +210,13 @@ namespace IPCore
         GroupIPNode::propertyChanged(p);
     }
 
-    void PipelineGroupIPNode::readCompleted(const string& type,
-                                            unsigned int version)
+    void PipelineGroupIPNode::readCompleted(const string& type, unsigned int version)
     {
         buildPipeline();
         GroupIPNode::readCompleted(type, version);
     }
 
-    IPNode::StringVector PipelineGroupIPNode::pipeline() const
-    {
-        return m_nodeTypeNames->valueContainer();
-    }
+    IPNode::StringVector PipelineGroupIPNode::pipeline() const { return m_nodeTypeNames->valueContainer(); }
 
     void PipelineGroupIPNode::setPipeline(const StringVector& array)
     {
@@ -256,8 +243,7 @@ namespace IPCore
         setPipeline(newPipeline);
     }
 
-    void PipelineGroupIPNode::setPipeline3(const string& a, const string& b,
-                                           const string& c)
+    void PipelineGroupIPNode::setPipeline3(const string& a, const string& b, const string& c)
     {
         StringVector newPipeline(3);
         newPipeline[0] = a;
@@ -266,8 +252,7 @@ namespace IPCore
         setPipeline(newPipeline);
     }
 
-    void PipelineGroupIPNode::setPipeline4(const string& a, const string& b,
-                                           const string& c, const string& d)
+    void PipelineGroupIPNode::setPipeline4(const string& a, const string& b, const string& c, const string& d)
     {
         StringVector newPipeline(4);
         newPipeline[0] = a;
@@ -277,8 +262,7 @@ namespace IPCore
         setPipeline(newPipeline);
     }
 
-    IPNode* PipelineGroupIPNode::findNodeInPipelineByTypeName(
-        const std::string& name) const
+    IPNode* PipelineGroupIPNode::findNodeInPipelineByTypeName(const std::string& name) const
     {
         for (size_t i = 1; i < m_nodes.size(); i++)
         {
@@ -289,15 +273,11 @@ namespace IPCore
         return 0;
     }
 
-    string PipelineGroupIPNode::profile() const
-    {
-        return propertyValue<StringProperty>("profile.name", "");
-    }
+    string PipelineGroupIPNode::profile() const { return propertyValue<StringProperty>("profile.name", ""); }
 
     void PipelineGroupIPNode::copyNode(const IPNode* node)
     {
-        if (const PipelineGroupIPNode* group =
-                dynamic_cast<const PipelineGroupIPNode*>(node))
+        if (const PipelineGroupIPNode* group = dynamic_cast<const PipelineGroupIPNode*>(node))
         {
             if (group->definition() == definition())
             {

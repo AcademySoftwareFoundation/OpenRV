@@ -30,8 +30,7 @@ namespace TwkContainer
             {
             }
 
-            Object(PropertyContainer* c, const std::string& n = "",
-                   const std::string& p = "", unsigned int v = 0)
+            Object(PropertyContainer* c, const std::string& n = "", const std::string& p = "", unsigned int v = 0)
                 : container(c)
                 , protocol(p)
                 , protocolVersion(v)

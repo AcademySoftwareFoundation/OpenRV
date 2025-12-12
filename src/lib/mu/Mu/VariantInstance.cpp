@@ -41,8 +41,7 @@ namespace Mu
         Context* context = thread.context();
 
         Name n = context->internName(cname);
-        VariantTagType* t =
-            context->findSymbolOfTypeByQualifiedName<VariantTagType>(n);
+        VariantTagType* t = context->findSymbolOfTypeByQualifiedName<VariantTagType>(n);
         assert(t);
         t->representationType()->constructInstance(structure());
     }
@@ -50,9 +49,7 @@ namespace Mu
     VariantInstance* VariantInstance::allocate(const VariantTagType* c)
     {
         size_t s = c->objectSize();
-        unsigned char* obj =
-            (unsigned char*)(c->isGCAtomic() ? MU_GC_ALLOC_ATOMIC(s)
-                                             : MU_GC_ALLOC(s));
+        unsigned char* obj = (unsigned char*)(c->isGCAtomic() ? MU_GC_ALLOC_ATOMIC(s) : MU_GC_ALLOC(s));
         return new (obj) VariantInstance(c);
     }
 
@@ -63,9 +60,7 @@ namespace Mu
         const Class* t = context->findSymbolOfTypeByQualifiedName<Class>(n);
         assert(t);
         size_t s = t->objectSize();
-        unsigned char* obj =
-            (unsigned char*)(t->isGCAtomic() ? MU_GC_ALLOC_ATOMIC(s)
-                                             : MU_GC_ALLOC(s));
+        unsigned char* obj = (unsigned char*)(t->isGCAtomic() ? MU_GC_ALLOC_ATOMIC(s) : MU_GC_ALLOC(s));
         return new (obj) VariantInstance(thread, c);
     }
 

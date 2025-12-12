@@ -59,10 +59,7 @@ namespace TwkAudio
 
         Time rate() const { return m_packetRate; }
 
-        TwkAudio::ChannelsVector channels() const
-        {
-            return TwkAudio::layoutChannels(m_packetLayout);
-        }
+        TwkAudio::ChannelsVector channels() const { return TwkAudio::layoutChannels(m_packetLayout); }
 
         TwkAudio::Layout layout() const { return m_packetLayout; }
 
@@ -97,8 +94,7 @@ namespace TwkAudio
         /// The default packet rate is TWEAK_AUDIO_DEFAULT_SAMPLE_RATE.
         ///
 
-        void configurePacket(size_t samples, TwkAudio::Layout layout,
-                             Time rate);
+        void configurePacket(size_t samples, TwkAudio::Layout layout, Time rate);
 
         ///
         /// The AudioBuffer configuration must match package
@@ -139,10 +135,7 @@ namespace TwkAudio
         void computeCachedRangesStat(double frameRate, FrameRangeVector&);
 
     protected:
-        SampleTime sampleAtTime(Time t) const
-        {
-            return timeToSamples(t, m_packetRate);
-        }
+        SampleTime sampleAtTime(Time t) const { return timeToSamples(t, m_packetRate); }
 
         SampleTime packetOffset(SampleTime s) const { return s % m_packetSize; }
 

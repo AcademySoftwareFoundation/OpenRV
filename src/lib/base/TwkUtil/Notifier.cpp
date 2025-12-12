@@ -101,8 +101,7 @@ namespace TwkUtil
 
 #if DEBUG_MESSAGE_LOCKING
         if (err != 0)
-            cerr << "ERROR: Notifier::lockMessages() failed, err: "
-                 << strerror(err) << endl;
+            cerr << "ERROR: Notifier::lockMessages() failed, err: " << strerror(err) << endl;
 #endif
     }
 
@@ -112,8 +111,7 @@ namespace TwkUtil
 
 #if DEBUG_MESSAGE_LOCKING
         if (err != 0)
-            cerr << "ERROR: Notifier::unlockMessages() failed, err: "
-                 << strerror(err) << endl;
+            cerr << "ERROR: Notifier::unlockMessages() failed, err: " << strerror(err) << endl;
 #endif
     }
 
@@ -136,8 +134,7 @@ namespace TwkUtil
 
         do
         {
-            NotifierVector::iterator i = find(m_destructRecipients.begin(),
-                                              m_destructRecipients.end(), N);
+            NotifierVector::iterator i = find(m_destructRecipients.begin(), m_destructRecipients.end(), N);
 
             if (i != m_destructRecipients.end())
             {
@@ -307,8 +304,7 @@ namespace TwkUtil
         }
     }
 
-    bool Notifier::addNotification(Notifier* N, Message* message,
-                                   bool createIfNone)
+    bool Notifier::addNotification(Notifier* N, Message* message, bool createIfNone)
     {
         Node* node = findNode(message);
 
@@ -395,10 +391,7 @@ namespace TwkUtil
         }
     }
 
-    bool Notifier::receive(Notifier*, Notifier*, MessageId, MessageData*)
-    {
-        return true;
-    }
+    bool Notifier::receive(Notifier*, Notifier*, MessageId, MessageData*) { return true; }
 
     void Notifier::receiveInternal(MessageId, MessageData*) {}
 
@@ -416,14 +409,12 @@ namespace TwkUtil
         }
         else
         {
-            std::cerr << "Notifier \"" << name() << "\" can't send message id "
-                      << id << " because it is invalid" << std::endl
+            std::cerr << "Notifier \"" << name() << "\" can't send message id " << id << " because it is invalid" << std::endl
                       << std::flush;
         }
     }
 
-    void Notifier::send(Notifier* originator, Notifier::Message* message,
-                        MessageData* data)
+    void Notifier::send(Notifier* originator, Notifier::Message* message, MessageData* data)
     {
         if (Node* node = findNode(message))
         {
@@ -439,12 +430,10 @@ namespace TwkUtil
                     {
                         if (message->m_debug)
                         {
-                            receiver->debugReceive(originator, this,
-                                                   message->m_id, data);
+                            receiver->debugReceive(originator, this, message->m_id, data);
                         }
 
-                        if (receiver->receive(originator, this, message->m_id,
-                                              data))
+                        if (receiver->receive(originator, this, message->m_id, data))
                         {
                             receiver->send(originator, message, data);
                         }
@@ -458,22 +447,17 @@ namespace TwkUtil
 
     //----------------------------------------------------------------------
 
-    bool Notifier::debugReceive(Notifier*, Notifier* N, MessageId id,
-                                MessageData* data)
+    bool Notifier::debugReceive(Notifier*, Notifier* N, MessageId id, MessageData* data)
     {
         if (Message* message = findMessage(id))
         {
-            std::cerr << N->name() << " sent \"" << message->m_text
-                      << "\" message to " << name() << std::endl
-                      << std::flush;
+            std::cerr << N->name() << " sent \"" << message->m_text << "\" message to " << name() << std::endl << std::flush;
 
             return true;
         }
         else
         {
-            std::cerr << "Notifier \"" << N->name()
-                      << "\"  sent garbage message" << std::endl
-                      << std::flush;
+            std::cerr << "Notifier \"" << N->name() << "\"  sent garbage message" << std::endl << std::flush;
             return false;
         }
     }

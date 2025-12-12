@@ -33,11 +33,9 @@ namespace Mu
     //  Tokenize a string into a buffer
     //
 
-    void UTF8tokenize(STLVector<Mu::String>::Type& tokens,
-                      const Mu::String& str, Mu::String delimiters = " ");
+    void UTF8tokenize(STLVector<Mu::String>::Type& tokens, const Mu::String& str, Mu::String delimiters = " ");
 
-    void UTF8tokenize(APIAllocatable::STLVector<Mu::String>::Type& tokens,
-                      const Mu::String& str, Mu::String delimiters = " ");
+    void UTF8tokenize(APIAllocatable::STLVector<Mu::String>::Type& tokens, const Mu::String& str, Mu::String delimiters = " ");
 
     //
     //  Convert a UTF-8 string in to a UTF32 string

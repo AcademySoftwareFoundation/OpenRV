@@ -16,9 +16,11 @@
 #include <TwkContainer/PropertyContainer.h>
 #include <TwkMath/Time.h>
 #include <TwkUtil/Timer.h>
+#include <array>
 #include <map>
 #include <limits>
 #include <deque>
+#include <string_view>
 #include <boost/signals2.hpp>
 #include <boost/thread/condition_variable.hpp>
 #include <boost/thread/mutex.hpp>
@@ -29,6 +31,67 @@ namespace IPCore
     class IPNode;
     class ImageRenderer;
     class PropertyInfo;
+
+    //
+    //  Event Category Constants
+    //
+    //  Central definition of all event category names used throughout RV.
+    //  These categories are used by the event filtering system to control
+    //  which UI actions are enabled/disabled.
+    //
+    namespace EventCategories
+    {
+        inline constexpr std::string_view annotateCategory = "annotate_category";
+        inline constexpr std::string_view annotateAirbrushCategory = "annotate_airbrush_category";
+        inline constexpr std::string_view annotateBurnCategory = "annotate_burn_category";
+        inline constexpr std::string_view annotateCloneCategory = "annotate_clone_category";
+        inline constexpr std::string_view annotateDodgeCategory = "annotate_dodge_category";
+        inline constexpr std::string_view annotateHarderaseCategory = "annotate_harderase_category";
+        inline constexpr std::string_view annotatePenCategory = "annotate_pen_category";
+        inline constexpr std::string_view annotateSampleCategory = "annotate_sample_category";
+        inline constexpr std::string_view annotateSelectCategory = "annotate_select_category";
+        inline constexpr std::string_view annotateSmudgeCategory = "annotate_smudge_category";
+        inline constexpr std::string_view annotateSofteraseCategory = "annotate_softerase_category";
+        inline constexpr std::string_view annotateTextCategory = "annotate_text_category";
+        inline constexpr std::string_view holdAndGhostCategory = "holdAndGhost_category";
+        inline constexpr std::string_view backwardplayCategory = "backwardplay_category";
+        inline constexpr std::string_view clearCategory = "clear_category";
+        inline constexpr std::string_view exportCategory = "export_category";
+        inline constexpr std::string_view flowptCategory = "flowpt_category";
+        inline constexpr std::string_view helpCategory = "help_category";
+        inline constexpr std::string_view infoCategory = "info_category";
+        inline constexpr std::string_view markCategory = "mark_category";
+        inline constexpr std::string_view mediaCategory = "media_category";
+        inline constexpr std::string_view playcontrolCategory = "playcontrol_category";
+        inline constexpr std::string_view playmodeLoopCategory = "playmode_loop_category";
+        inline constexpr std::string_view playmodeOnceCategory = "playmode_once_category";
+        inline constexpr std::string_view playmodePingPongCategory = "playmode_pingpong_category";
+        inline constexpr std::string_view presentationCategory = "presentation_category";
+        inline constexpr std::string_view sessionmanagerCategory = "sessionmanager_category";
+        inline constexpr std::string_view sourceCategory = "source_category";
+        inline constexpr std::string_view systemCategory = "system_category";
+        inline constexpr std::string_view screeningroomCategory = "screeningroom_category";
+        inline constexpr std::string_view unclassifiedCategory = "unclassified_category";
+        inline constexpr std::string_view viewmodeCategory = "viewmode_category";
+        inline constexpr std::string_view fullscreenModeCategory = "fullscreenMode_category";
+        inline constexpr std::string_view backgroundStyleCategory = "backgroundStyle_category";
+        inline constexpr std::string_view wipesCategory = "wipes_category";
+
+        constexpr auto all_categories()
+        {
+            // Explicitly specify template parameters for MSVC compatibility.
+            // CTAD (Class Template Argument Deduction) works on GCC/Clang but
+            // fails on Windows MSVC, so we specify the number of categories explicitly.
+            return std::array<std::string_view, 32>{
+                annotateCategory,         annotateAirbrushCategory, annotateBurnCategory,      annotateCloneCategory,  annotateDodgeCategory,
+                annotateHarderaseCategory, annotatePenCategory,     annotateSampleCategory,    annotateSelectCategory, annotateSmudgeCategory,
+                annotateSofteraseCategory, annotateTextCategory,    backwardplayCategory,          clearCategory,          exportCategory,
+                flowptCategory,           helpCategory,            infoCategory,              markCategory,           mediaCategory,
+                playcontrolCategory,      playmodeLoopCategory,    playmodeOnceCategory,      playmodePingPongCategory, presentationCategory,
+                sessionmanagerCategory,   sourceCategory,          systemCategory,            screeningroomCategory,  unclassifiedCategory,
+                viewmodeCategory,         wipesCategory};
+        }
+    } // namespace EventCategories
 
     //
     //  class Session
@@ -141,13 +204,11 @@ namespace IPCore
         typedef std::deque<int> IntDeque;
         typedef std::vector<int> IntVector;
 
-        typedef std::pair<TwkAudio::SampleTime, TwkAudio::SampleTime>
-            AudioRange;
+        typedef std::pair<TwkAudio::SampleTime, TwkAudio::SampleTime> AudioRange;
 
         struct WriteObject
         {
-            WriteObject(PropertyContainer* p, const std::string& n,
-                        const std::string& pr, unsigned int v)
+            WriteObject(PropertyContainer* p, const std::string& n, const std::string& pr, unsigned int v)
                 : container(p)
                 , name(n)
                 , protocol(pr)
@@ -225,19 +286,14 @@ namespace IPCore
         typedef boost::signals2::signal<void(int, int)> RangeSignal;
         typedef boost::signals2::signal<void(IPNode*)> NodeSignal;
         typedef boost::signals2::signal<void(const std::string&)> StringSignal;
-        typedef boost::signals2::signal<void(int, const std::string&)>
-            FrameAndStringSignal;
-        typedef boost::signals2::signal<void(const VideoDevice*)>
-            VideoDeviceSignal;
+        typedef boost::signals2::signal<void(int, const std::string&)> FrameAndStringSignal;
+        typedef boost::signals2::signal<void(const VideoDevice*)> VideoDeviceSignal;
 
         //
         //  SIGNALS
         //
 
-        FrameAndStringSignal& frameChangedSignal()
-        {
-            return m_frameChangedSignal;
-        }
+        FrameAndStringSignal& frameChangedSignal() { return m_frameChangedSignal; }
 
         VoidSignal& updateSignal() { return m_updateSignal; }
 
@@ -251,25 +307,13 @@ namespace IPCore
 
         VoidSignal& sessionChangedSignal() { return m_sessionChangedSignal; }
 
-        VoidSignal& stereoHardwareOnSignal()
-        {
-            return m_stereoHardwareOnSignal;
-        }
+        VoidSignal& stereoHardwareOnSignal() { return m_stereoHardwareOnSignal; }
 
-        VoidSignal& stereoHardwareOffSignal()
-        {
-            return m_stereoHardwareOffSignal;
-        }
+        VoidSignal& stereoHardwareOffSignal() { return m_stereoHardwareOffSignal; }
 
-        VoidSignal& audioUnavailableSignal()
-        {
-            return m_audioUnavailableSignal;
-        }
+        VoidSignal& audioUnavailableSignal() { return m_audioUnavailableSignal; }
 
-        VoidSignal& eventDeviceChangedSignal()
-        {
-            return m_eventDeviceChangedSignal;
-        }
+        VoidSignal& eventDeviceChangedSignal() { return m_eventDeviceChangedSignal; }
 
         VoidSignal& glQueryCompleteSignal() { return m_glQueryCompleteSignal; }
 
@@ -281,27 +325,15 @@ namespace IPCore
 
         RangeSignal& rangeNarrowedSignal() { return m_rangeNarrowedSignal; }
 
-        VoidSignal& beforeSessionClearSignal()
-        {
-            return m_beforeSessionClearSignal;
-        }
+        VoidSignal& beforeSessionClearSignal() { return m_beforeSessionClearSignal; }
 
-        VoidSignal& afterSessionClearSignal()
-        {
-            return m_afterSessionClearSignal;
-        }
+        VoidSignal& afterSessionClearSignal() { return m_afterSessionClearSignal; }
 
-        VoidSignal& realtimeModeChangedSignal()
-        {
-            return m_realtimeModeChangedSignal;
-        }
+        VoidSignal& realtimeModeChangedSignal() { return m_realtimeModeChangedSignal; }
 
         VoidSignal& playModeChangedSignal() { return m_playModeChangedSignal; }
 
-        StringSignal& beforePlayStartSignal()
-        {
-            return m_beforePlayStartSignal;
-        }
+        StringSignal& beforePlayStartSignal() { return m_beforePlayStartSignal; }
 
         StringSignal& playStartSignal() { return m_playStartSignal; }
 
@@ -313,59 +345,29 @@ namespace IPCore
 
         TimeSignal& fpsChangedSignal() { return m_fpsChangedSignal; }
 
-        StringSignal& cacheModeChangedSignal()
-        {
-            return m_cacheModeChangedSignal;
-        }
+        StringSignal& cacheModeChangedSignal() { return m_cacheModeChangedSignal; }
 
         VoidSignal& bgChangedSignal() { return m_bgChangedSignal; }
 
-        VideoDeviceSignal& outputVideoDeviceChangedSignal()
-        {
-            return m_outputVideoDeviceChangedSignal;
-        }
+        VideoDeviceSignal& outputVideoDeviceChangedSignal() { return m_outputVideoDeviceChangedSignal; }
 
-        VideoDeviceSignal& physicalVideoDeviceChangedSignal()
-        {
-            return m_physicalVideoDeviceChangedSignal;
-        }
+        VideoDeviceSignal& physicalVideoDeviceChangedSignal() { return m_physicalVideoDeviceChangedSignal; }
 
-        NodeSignal& beforeGraphViewChangeSignal()
-        {
-            return m_beforeGraphViewChangeSignal;
-        }
+        NodeSignal& beforeGraphViewChangeSignal() { return m_beforeGraphViewChangeSignal; }
 
-        NodeSignal& afterGraphViewChangeSignal()
-        {
-            return m_afterGraphViewChangeSignal;
-        }
+        NodeSignal& afterGraphViewChangeSignal() { return m_afterGraphViewChangeSignal; }
 
         VoidSignal& playIncChangedSignal() { return m_playIncChangedSignal; }
 
-        VideoDeviceSignal& marginsChangedSignal()
-        {
-            return m_marginsChangedSignal;
-        }
+        VideoDeviceSignal& marginsChangedSignal() { return m_marginsChangedSignal; }
 
-        StringSignal& beforeSessionReadSignal()
-        {
-            return m_beforeSessionReadSignal;
-        }
+        StringSignal& beforeSessionReadSignal() { return m_beforeSessionReadSignal; }
 
-        StringSignal& afterSessionReadSignal()
-        {
-            return m_afterSessionReadSignal;
-        }
+        StringSignal& afterSessionReadSignal() { return m_afterSessionReadSignal; }
 
-        StringSignal& beforeSessionWriteSignal()
-        {
-            return m_beforeSessionWriteSignal;
-        }
+        StringSignal& beforeSessionWriteSignal() { return m_beforeSessionWriteSignal; }
 
-        StringSignal& afterSessionWriteSignal()
-        {
-            return m_afterSessionWriteSignal;
-        }
+        StringSignal& afterSessionWriteSignal() { return m_afterSessionWriteSignal; }
 
         //
         //  Messages (deprecated, use signals)
@@ -447,11 +449,9 @@ namespace IPCore
         //  Profiles. NOTE: reading a profile causes it to be applied.
         //
 
-        virtual void writeProfile(const std::string& filename, IPNode* node,
-                                  const WriteRequest&);
+        virtual void writeProfile(const std::string& filename, IPNode* node, const WriteRequest&);
 
-        virtual void readProfile(const std::string& filename, IPNode* node,
-                                 const WriteRequest&);
+        virtual void readProfile(const std::string& filename, IPNode* node, const WriteRequest&);
 
         //
         //  Batch mode means we're running without events
@@ -486,27 +486,17 @@ namespace IPCore
 
         void setRendererBGType(unsigned int);
 
-        void setMargins(float left, float right, float top, float bottom,
-                        bool allDevices = false);
+        void setMargins(float left, float right, float top, float bottom, bool allDevices = false);
 
         //
         //  Video devices
         //
 
-        const VideoDevice* controlVideoDevice() const
-        {
-            return m_controlVideoDevice;
-        }
+        const VideoDevice* controlVideoDevice() const { return m_controlVideoDevice; }
 
-        const VideoDevice* outputVideoDevice() const
-        {
-            return m_outputVideoDevice;
-        }
+        const VideoDevice* outputVideoDevice() const { return m_outputVideoDevice; }
 
-        const VideoDevice* eventVideoDevice() const
-        {
-            return m_eventVideoDevice;
-        }
+        const VideoDevice* eventVideoDevice() const { return m_eventVideoDevice; }
 
         void setControlVideoDevice(const VideoDevice*);
         void setOutputVideoDevice(const VideoDevice*);
@@ -514,11 +504,7 @@ namespace IPCore
 
         void deviceSizeChanged(const VideoDevice*);
 
-        bool multipleVideoDevices() const
-        {
-            return m_outputVideoDevice
-                   && m_controlVideoDevice != m_outputVideoDevice;
-        }
+        bool multipleVideoDevices() const { return m_outputVideoDevice && m_controlVideoDevice != m_outputVideoDevice; }
 
         void clearVideoDeviceCaches();
 
@@ -593,8 +579,7 @@ namespace IPCore
         void renderState();
         void recordRenderState();
 
-        void userRender(const VideoDevice*, const char* event,
-                        const std::string& contents = "");
+        void userRender(const VideoDevice*, const char* event, const std::string& contents = "");
 
         //
         //  Post render calls IPGraph::postEvaluation.
@@ -609,37 +594,29 @@ namespace IPCore
         //  content if there is any.
         //
 
-        std::string userGenericEvent(const std::string& eventName,
-                                     const std::string& contents,
-                                     const std::string& senderName = "");
+        std::string userGenericEvent(const std::string& eventName, const std::string& contents, const std::string& senderName = "");
 
         //
         //  Similar to userGenericEvent but has render information (like
         //  the domain) as well.
         //
 
-        void userRenderEvent(const std::string& eventName,
-                             const std::string& contents = "");
+        void userRenderEvent(const std::string& eventName, const std::string& contents = "");
 
         //
         //  Used to send raw data. Will return the the event return
         //  content if there is any.
         //
 
-        std::string userRawDataEvent(const std::string& eventName,
-                                     const std::string& contentType,
-                                     const char* data, size_t size,
-                                     const char* utf8 = 0,
-                                     const std::string& senderName = "");
+        std::string userRawDataEvent(const std::string& eventName, const std::string& contentType, const char* data, size_t size,
+                                     const char* utf8 = 0, const std::string& senderName = "");
 
         //
         //  Send a PixelBlockTransferEvent. The interp string is parsed to
         //  produce the event fields.
         //
 
-        void pixelBlockEvent(const std::string& eventName,
-                             const std::string& interp, const char* data,
-                             size_t dataSize);
+        void pixelBlockEvent(const std::string& eventName, const std::string& interp, const char* data, size_t dataSize);
 
         //
         //  Evaluation
@@ -662,10 +639,7 @@ namespace IPCore
 
         bool isPlaying() const { return m_timer.isRunning(); }
 
-        bool isUpdating() const
-        {
-            return isPlaying() || m_stopTimer.isRunning();
-        }
+        bool isUpdating() const { return isPlaying() || m_stopTimer.isRunning(); }
 
         void setFrame(int f);
         void setFrameInternal(int f, std::string eventData = "");
@@ -774,10 +748,7 @@ namespace IPCore
 
         void setAudioTimeShift(double d, double sensitivity = 0.1);
 
-        bool audioTimeShiftValid() const
-        {
-            return m_audioTimeShift != std::numeric_limits<double>::max();
-        }
+        bool audioTimeShiftValid() const { return m_audioTimeShift != std::numeric_limits<double>::max(); }
 
         void setAudioFirstPass(bool b);
 
@@ -814,8 +785,14 @@ namespace IPCore
         void setGlobalAudioOffset(float, bool internal = false);
         void setGlobalSwapEyes(bool);
 
-        void setFilterLiveReviewEvents(bool shouldFilterEvents = false);
-        bool filterLiveReviewEvents();
+        //
+        //  Event Category Blocking
+        //
+        void enableEventCategory(std::string_view category);
+        void disableEventCategory(std::string_view category);
+        bool isEventCategoryDisabled(std::string_view category) const;
+        bool isEventCategoryEnabled(std::string_view category) const;
+        const std::vector<std::string_view>& disabledEventCategories() const;
 
         //
         //  Marks
@@ -854,8 +831,7 @@ namespace IPCore
         bool setViewNode(const std::string& nodeName, bool force = false);
         std::string viewNodeName() const;
 
-        virtual IPNode* newNode(const std::string& typeName,
-                                const std::string& nodeName);
+        virtual IPNode* newNode(const std::string& typeName, const std::string& nodeName);
 
         //
         //  Current IPNode::State
@@ -913,17 +889,11 @@ namespace IPCore
 
         static Session* currentSession() { return m_currentSession; }
 
-        static Session* activeSession()
-        {
-            return static_cast<Session*>(Document::activeDocument());
-        }
+        static Session* activeSession() { return static_cast<Session*>(Document::activeDocument()); }
 
         void makeCurrentSession() { m_currentSession = this; }
 
-        std::string nextUIName(const std::string& name)
-        {
-            return m_uiNameCache.nextUIName(name);
-        }
+        std::string nextUIName(const std::string& name) { return m_uiNameCache.nextUIName(name); }
 
         //
         //  Access to IP graph
@@ -936,27 +906,22 @@ namespace IPCore
         //  otherwise the node with the exact name is returned.
         //
 
-        virtual void findProperty(PropertyVector& props,
-                                  const std::string& name);
+        virtual void findProperty(PropertyVector& props, const std::string& name);
 
-        template <typename T>
-        void findPropertyOfType(std::vector<T*>& props,
-                                const std::string& name);
+        template <typename T> void findPropertyOfType(std::vector<T*>& props, const std::string& name);
 
         //
         //  Finds all nodes that have a specific type name (like RVSource)
         //  in the current evaluation path.
         //
 
-        virtual void findCurrentNodesByTypeName(NodeVector& nodes,
-                                                const std::string& typeName);
+        virtual void findCurrentNodesByTypeName(NodeVector& nodes, const std::string& typeName);
 
         //
         //  Finds all nodes that have a specific type name (like RVSource)
         //
 
-        virtual void findNodesByTypeName(NodeVector& nodes,
-                                         const std::string& typeName);
+        virtual void findNodesByTypeName(NodeVector& nodes, const std::string& typeName);
 
         //
         //  User timer
@@ -990,10 +955,7 @@ namespace IPCore
         //  Cache RAM usage and wait time
         //
 
-        static void setCacheLookBehindFraction(float percent)
-        {
-            m_cacheLookBehindFraction = percent;
-        }
+        static void setCacheLookBehindFraction(float percent) { m_cacheLookBehindFraction = percent; }
 
         static void setMaxBufferedWaitTime(float seconds)
         {
@@ -1003,15 +965,9 @@ namespace IPCore
 
         float maxBufferedWaitTime() const { return m_maxBufferedWaitSeconds; };
 
-        static void setMaxGreedyCacheSize(size_t bytes)
-        {
-            m_maxGreedyCacheSize = bytes;
-        }
+        static void setMaxGreedyCacheSize(size_t bytes) { m_maxGreedyCacheSize = bytes; }
 
-        static void setMaxBufferCacheSize(size_t bytes)
-        {
-            m_maxBufferCacheSize = bytes;
-        }
+        static void setMaxBufferCacheSize(size_t bytes) { m_maxBufferCacheSize = bytes; }
 
         static void setUsePreEval(bool b) { m_usePreEval = b; }
 
@@ -1092,15 +1048,9 @@ namespace IPCore
 
         bool postFirstNonEmptyRender() { return m_postFirstNonEmptyRender; }
 
-        void addMissingInfo(const std::string s)
-        {
-            m_missingFrameInfos.push_back(s);
-        }
+        void addMissingInfo(const std::string s) { m_missingFrameInfos.push_back(s); }
 
-        const std::vector<std::string>& missingFrameInfo() const
-        {
-            return m_missingFrameInfos;
-        }
+        const std::vector<std::string>& missingFrameInfo() const { return m_missingFrameInfos; }
 
         void setSessionStateFromNode(IPNode*);
 
@@ -1115,9 +1065,7 @@ namespace IPCore
     protected:
         virtual TwkApp::EventNode::Result propagateEvent(const TwkApp::Event&);
 
-        void writeGTO(const std::string& filename,
-                      const WriteObjectVector& headerObjects,
-                      const WriteRequest& request,
+        void writeGTO(const std::string& filename, const WriteObjectVector& headerObjects, const WriteRequest& request,
                       const bool writeSession = true);
 
         void unpackSessionContainer(PropertyContainer*);
@@ -1153,8 +1101,7 @@ namespace IPCore
 
         struct Fdata
         {
-            Fdata(double a, int b, double c, double d, double d2, int e, int f,
-                  int g, double h, int i, int j)
+            Fdata(double a, int b, double c, double d, double d2, int e, int f, int g, double h, int i, int j)
                 : s(a)
                 , sync(b)
                 , elapsed0(c)
@@ -1196,8 +1143,7 @@ namespace IPCore
         Time predictedTimeUntilSync_v2() const;
         void render_v2();
         void postRender_v2();
-        int targetFrame_v2(
-            double elapsed) const; // also applies to RV_AVPLAYBACK_VERSION=0
+        int targetFrame_v2(double elapsed) const; // also applies to RV_AVPLAYBACK_VERSION=0
 
     protected:
         UINameCache m_uiNameCache;
@@ -1294,7 +1240,7 @@ namespace IPCore
         int m_avPlaybackVersion;
         bool m_enableFastTurnAround;
         double m_lastDrawingTime;
-        bool m_filterLiveReviewEvents{false};
+        std::vector<std::string_view> m_disabledEventCategories; // List of blocked event categories
 
         class FpsCalculator;
         struct FBStatusCheck;
@@ -1377,9 +1323,7 @@ namespace IPCore
     extern bool debugPlayback;
     extern bool debugPlaybackVerbose;
 
-    template <typename T>
-    void Session::findPropertyOfType(std::vector<T*>& props,
-                                     const std::string& name)
+    template <typename T> void Session::findPropertyOfType(std::vector<T*>& props, const std::string& name)
     {
         PropertyVector p;
         findProperty(p, name);

@@ -26,9 +26,7 @@ namespace IPCore
     using namespace boost;
     using namespace std;
 
-    RetimeIPNode::RetimeIPNode(const std::string& name,
-                               const NodeDefinition* def, IPGraph* g,
-                               GroupIPNode* group)
+    RetimeIPNode::RetimeIPNode(const std::string& name, const NodeDefinition* def, IPGraph* g, GroupIPNode* group)
         : IPNode(name, def, g, group)
         , m_vscale(0)
         , m_voffset(0)
@@ -75,20 +73,16 @@ namespace IPCore
         //  "retiming" styles.
         //
 
-        m_explicitActive =
-            declareProperty<IntProperty>("explicit.active", false);
-        m_explicitFirstOutputFrame =
-            declareProperty<IntProperty>("explicit.firstOutputFrame", 1);
-        m_explicitInputFrames =
-            declareProperty<IntProperty>("explicit.inputFrames");
+        m_explicitActive = declareProperty<IntProperty>("explicit.active", false);
+        m_explicitFirstOutputFrame = declareProperty<IntProperty>("explicit.firstOutputFrame", 1);
+        m_explicitInputFrames = declareProperty<IntProperty>("explicit.inputFrames");
 
         setMaxInputs(1);
     }
 
     RetimeIPNode::~RetimeIPNode() {}
 
-    bool RetimeIPNode::testInputs(const IPNodes& inputs,
-                                  std::ostringstream& msg) const
+    bool RetimeIPNode::testInputs(const IPNodes& inputs, std::ostringstream& msg) const
     {
         if (inputs.size() > 1)
         {
@@ -198,8 +192,7 @@ namespace IPCore
             //  inputframe is mapped to, so minimize as we go.
             //
 
-            m_explicitInToOut.resize(maxInputFrame - minInputFrame + 1,
-                                     numeric_limits<int>::max());
+            m_explicitInToOut.resize(maxInputFrame - minInputFrame + 1, numeric_limits<int>::max());
 
             for (int i = 0; i < m_explicitInputFrames->size(); ++i)
             {
@@ -256,8 +249,7 @@ namespace IPCore
             //
             if (m_warpKeyFrames->size() != m_warpKeyRates->size())
             {
-                cerr << "WARNING: warp key numbers don't match, skipping warp."
-                     << endl;
+                cerr << "WARNING: warp key numbers don't match, skipping warp." << endl;
                 return;
             }
             int warpKeyIndex = -1;
@@ -327,9 +319,7 @@ namespace IPCore
                     //  make sure our lower bound is still greatest lower bound
                     //
                     int nextKeyIndex = warpKeyIndex;
-                    while (nextKeyIndex < frames.size()
-                           && inputFrame
-                                  >= frames[nextKeyIndex] - m_inputInfo.start)
+                    while (nextKeyIndex < frames.size() && inputFrame >= frames[nextKeyIndex] - m_inputInfo.start)
                     {
                         ++nextKeyIndex;
                     }
@@ -341,8 +331,7 @@ namespace IPCore
                     {
                         warpKeyIndex = frames.size() - 1;
                         aScale = bScale = rates[warpKeyIndex];
-                        aFrame = bFrame =
-                            frames[warpKeyIndex] - m_inputInfo.start;
+                        aFrame = bFrame = frames[warpKeyIndex] - m_inputInfo.start;
                     }
                     else
                     {
@@ -354,13 +343,8 @@ namespace IPCore
                         aScale = rates[warpKeyIndex];
                         aFrame = frames[warpKeyIndex] - m_inputInfo.start;
 
-                        bScale = (warpKeyIndex < frames.size() - 1)
-                                     ? rates[warpKeyIndex + 1]
-                                     : aScale;
-                        bFrame =
-                            (warpKeyIndex < frames.size() - 1)
-                                ? frames[warpKeyIndex + 1] - m_inputInfo.start
-                                : aFrame;
+                        bScale = (warpKeyIndex < frames.size() - 1) ? rates[warpKeyIndex + 1] : aScale;
+                        bFrame = (warpKeyIndex < frames.size() - 1) ? frames[warpKeyIndex + 1] - m_inputInfo.start : aFrame;
                     }
 
                     if (m_warpStyle->front() == 0)
@@ -374,8 +358,7 @@ namespace IPCore
                             scale = bScale;
                         else
                         {
-                            float t = float(inputFrame - aFrame)
-                                      / float(bFrame - aFrame);
+                            float t = float(inputFrame - aFrame) / float(bFrame - aFrame);
                             scale = (1.0 - t) * aScale + t * bScale;
                         }
                     }
@@ -418,9 +401,7 @@ namespace IPCore
                 //  Stop mapping process if we're about to run off the end of
                 //  the input sequence.
                 //
-                if (needInputFrame
-                    && (inputFrame + 1)
-                           > (m_inputInfo.end - m_inputInfo.start + EPSILON))
+                if (needInputFrame && (inputFrame + 1) > (m_inputInfo.end - m_inputInfo.start + EPSILON))
                     break;
 
                 //
@@ -435,16 +416,13 @@ namespace IPCore
 
                 if (needInputFrame)
                 {
-                    int targetOutput = (needOutputFrame)
-                                           ? (outputFrame + 1)
-                                           : m_warpedInToOut.back();
+                    int targetOutput = (needOutputFrame) ? (outputFrame + 1) : m_warpedInToOut.back();
                     m_warpedInToOut.push_back(targetOutput);
                     inputGap = 0.0;
                 }
                 if (needOutputFrame)
                 {
-                    int targetInput = (needInputFrame) ? (inputFrame + 1)
-                                                       : m_warpedOutToIn.back();
+                    int targetInput = (needInputFrame) ? (inputFrame + 1) : m_warpedOutToIn.back();
                     m_warpedOutToIn.push_back(targetInput);
                     outputGap = 0.0;
                 }
@@ -629,9 +607,7 @@ namespace IPCore
         return f;
     }
 
-    void RetimeIPNode::mapInputToEvalFrames(size_t index,
-                                            const FrameVector& inframes,
-                                            FrameVector& outframes) const
+    void RetimeIPNode::mapInputToEvalFrames(size_t index, const FrameVector& inframes, FrameVector& outframes) const
     {
         if (size_t s = inframes.size())
         {
@@ -667,29 +643,25 @@ namespace IPCore
         return img;
     }
 
-    IPNode::ImageStructureInfo
-    RetimeIPNode::imageStructureInfo(const Context& context) const
+    IPNode::ImageStructureInfo RetimeIPNode::imageStructureInfo(const Context& context) const
     {
         if (inputs().size())
         {
             int newFrame = retimedFrame(context.frame);
-            return inputs().front()->imageStructureInfo(
-                graph()->contextForFrame(newFrame));
+            return inputs().front()->imageStructureInfo(graph()->contextForFrame(newFrame));
         }
 
         return ImageStructureInfo();
     }
 
-    void RetimeIPNode::metaEvaluate(const Context& context,
-                                    MetaEvalVisitor& visitor)
+    void RetimeIPNode::metaEvaluate(const Context& context, MetaEvalVisitor& visitor)
     {
         Context c = context;
         c.frame = retimedFrame(context.frame);
         IPNode::metaEvaluate(c, visitor);
     }
 
-    void RetimeIPNode::testEvaluate(const Context& context,
-                                    TestEvaluationResult& result)
+    void RetimeIPNode::testEvaluate(const Context& context, TestEvaluationResult& result)
     {
         Context newContext = context;
         newContext.frame = retimedFrame(context.frame);
@@ -753,8 +725,7 @@ namespace IPCore
             // updateExplicitData()?
 
             info.start = info.cutIn = m_explicitFirstOutputFrame->front();
-            info.end = info.cutOut =
-                info.start + m_explicitInputFrames->size() - 1;
+            info.end = info.cutOut = info.start + m_explicitInputFrames->size() - 1;
             //  cerr << "rinfo s " << info.start << " i " << info.cutIn << " o "
             //  << info.cutOut << " e " << info.end << endl;
 
@@ -790,15 +761,13 @@ namespace IPCore
 
             while (retimedFrame(iend + inc) == info.end)
             {
-                if (m_warpActive->front()
-                    && iend + inc > m_warpedOutToIn.size())
+                if (m_warpActive->front() && iend + inc > m_warpedOutToIn.size())
                     break;
                 iend += inc;
             }
             while (retimedFrame(iout + inc) == info.cutOut)
             {
-                if (m_warpActive->front()
-                    && iout + inc > m_warpedOutToIn.size())
+                if (m_warpActive->front() && iout + inc > m_warpedOutToIn.size())
                     break;
                 iout += inc;
             }
@@ -858,8 +827,7 @@ namespace IPCore
 
         if (reversed)
         {
-            startTime = Time(m_inputInfo.end - m_inputInfo.start)
-                        / Time(m_inputInfo.fps);
+            startTime = Time(m_inputInfo.end - m_inputInfo.start) / Time(m_inputInfo.fps);
             startTime -= samplesToTime(nsamples, context.buffer.rate());
             startTime -= context.buffer.startTime();
         }
@@ -891,10 +859,8 @@ namespace IPCore
         const size_t num = buffer.size();
         const size_t end = start + num;
 
-        const size_t grainSamples =
-            timeToSamples(m_grainDuration, buffer.rate());
-        const size_t grainMarginSamples =
-            timeToSamples(m_grainEnvelope, buffer.rate());
+        const size_t grainSamples = timeToSamples(m_grainDuration, buffer.rate());
+        const size_t grainMarginSamples = timeToSamples(m_grainEnvelope, buffer.rate());
         const size_t grainSyncWidth = grainSamples + grainMarginSamples;
 
         const size_t sync0 = start / grainSyncWidth;
@@ -910,8 +876,7 @@ namespace IPCore
             //  time.
             //
 
-            Time t = i * samplesToTime(grainSyncWidth, rate)
-                     - samplesToTime(grainMarginSamples, rate);
+            Time t = i * samplesToTime(grainSyncWidth, rate) - samplesToTime(grainMarginSamples, rate);
             Time d = samplesToTime(grainSize, rate);
 
             if (t < 0)
@@ -945,9 +910,7 @@ namespace IPCore
                 }
                 else if (q > grainSyncWidth)
                 {
-                    env = 1.0
-                          - double(q - grainSyncWidth)
-                                / double(grainMarginSamples);
+                    env = 1.0 - double(q - grainSyncWidth) / double(grainMarginSamples);
                 }
 
                 for (size_t c = 0; c < ch; c++)
@@ -964,9 +927,7 @@ namespace IPCore
     {
         if (m_explicitInputFrames->empty())
         {
-            cerr << "ERROR: retime node '" << name()
-                 << "': explicit retiming active, but no input frames set"
-                 << endl;
+            cerr << "ERROR: retime node '" << name() << "': explicit retiming active, but no input frames set" << endl;
             return false;
         }
 

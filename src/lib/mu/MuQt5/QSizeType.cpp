@@ -50,16 +50,12 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(__allocate, Pointer)
     {
-        QSizeType::Instance* i =
-            new QSizeType::Instance((Class*)NODE_THIS.type());
+        QSizeType::Instance* i = new QSizeType::Instance((Class*)NODE_THIS.type());
         QSizeType::registerFinalizer(i);
         NODE_RETURN(i);
     }
 
-    void QSizeType::registerFinalizer(void* o)
-    {
-        GC_register_finalizer(o, QSizeType::finalizer, 0, 0, 0);
-    }
+    void QSizeType::registerFinalizer(void* o) { GC_register_finalizer(o, QSizeType::finalizer, 0, 0, 0); }
 
     void QSizeType::finalizer(void* obj, void* data)
     {
@@ -70,18 +66,14 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    Pointer qt_QSize_QSize_QSize_QSize(Mu::Thread& NODE_THREAD,
-                                       Pointer param_this)
+    Pointer qt_QSize_QSize_QSize_QSize(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         setqtype<QSizeType>(param_this, QSize());
         return param_this;
     }
 
-    Pointer qt_QSize_QSize_QSize_QSize_int_int(Mu::Thread& NODE_THREAD,
-                                               Pointer param_this,
-                                               int param_width,
-                                               int param_height)
+    Pointer qt_QSize_QSize_QSize_QSize_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_width, int param_height)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         int arg1 = (int)(param_width);
@@ -90,9 +82,7 @@ namespace Mu
         return param_this;
     }
 
-    Pointer qt_QSize_boundedTo_QSize_QSize_QSize(Mu::Thread& NODE_THREAD,
-                                                 Pointer param_this,
-                                                 Pointer param_otherSize)
+    Pointer qt_QSize_boundedTo_QSize_QSize_QSize(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_otherSize)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSize arg0 = getqtype<QSizeType>(param_this);
@@ -100,9 +90,7 @@ namespace Mu
         return makeqtype<QSizeType>(c, arg0.boundedTo(arg1), "qt.QSize");
     }
 
-    Pointer qt_QSize_expandedTo_QSize_QSize_QSize(Mu::Thread& NODE_THREAD,
-                                                  Pointer param_this,
-                                                  Pointer param_otherSize)
+    Pointer qt_QSize_expandedTo_QSize_QSize_QSize(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_otherSize)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSize arg0 = getqtype<QSizeType>(param_this);
@@ -117,8 +105,7 @@ namespace Mu
         return arg0.height();
     }
 
-    bool qt_QSize_isEmpty_bool_QSize(Mu::Thread& NODE_THREAD,
-                                     Pointer param_this)
+    bool qt_QSize_isEmpty_bool_QSize(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSize arg0 = getqtype<QSizeType>(param_this);
@@ -132,18 +119,15 @@ namespace Mu
         return arg0.isNull();
     }
 
-    bool qt_QSize_isValid_bool_QSize(Mu::Thread& NODE_THREAD,
-                                     Pointer param_this)
+    bool qt_QSize_isValid_bool_QSize(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSize arg0 = getqtype<QSizeType>(param_this);
         return arg0.isValid();
     }
 
-    void qt_QSize_scale_void_QSize_int_int_int(Mu::Thread& NODE_THREAD,
-                                               Pointer param_this,
-                                               int param_width,
-                                               int param_height, int param_mode)
+    void qt_QSize_scale_void_QSize_int_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_width, int param_height,
+                                               int param_mode)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSize arg0 = getqtype<QSizeType>(param_this);
@@ -154,9 +138,7 @@ namespace Mu
         setqtype<QSizeType>(param_this, arg0);
     }
 
-    void qt_QSize_scale_void_QSize_QSize_int(Mu::Thread& NODE_THREAD,
-                                             Pointer param_this,
-                                             Pointer param_size, int param_mode)
+    void qt_QSize_scale_void_QSize_QSize_int(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_size, int param_mode)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSize arg0 = getqtype<QSizeType>(param_this);
@@ -166,8 +148,7 @@ namespace Mu
         setqtype<QSizeType>(param_this, arg0);
     }
 
-    void qt_QSize_setHeight_void_QSize_int(Mu::Thread& NODE_THREAD,
-                                           Pointer param_this, int param_height)
+    void qt_QSize_setHeight_void_QSize_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_height)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSize arg0 = getqtype<QSizeType>(param_this);
@@ -176,8 +157,7 @@ namespace Mu
         setqtype<QSizeType>(param_this, arg0);
     }
 
-    void qt_QSize_setWidth_void_QSize_int(Mu::Thread& NODE_THREAD,
-                                          Pointer param_this, int param_width)
+    void qt_QSize_setWidth_void_QSize_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_width)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSize arg0 = getqtype<QSizeType>(param_this);
@@ -186,8 +166,7 @@ namespace Mu
         setqtype<QSizeType>(param_this, arg0);
     }
 
-    void qt_QSize_transpose_void_QSize(Mu::Thread& NODE_THREAD,
-                                       Pointer param_this)
+    void qt_QSize_transpose_void_QSize(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSize arg0 = getqtype<QSizeType>(param_this);
@@ -202,9 +181,7 @@ namespace Mu
         return arg0.width();
     }
 
-    Pointer qt_QSize_operatorPlus_EQ__QSize_QSize_QSize(Mu::Thread& NODE_THREAD,
-                                                        Pointer param_this,
-                                                        Pointer param_size)
+    Pointer qt_QSize_operatorPlus_EQ__QSize_QSize_QSize(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_size)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSize arg0 = getqtype<QSizeType>(param_this);
@@ -212,8 +189,7 @@ namespace Mu
         return makeqtype<QSizeType>(c, arg0.operator+=(arg1), "qt.QSize");
     }
 
-    Pointer qt_QSize_operatorMinus_EQ__QSize_QSize_QSize(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_size)
+    Pointer qt_QSize_operatorMinus_EQ__QSize_QSize_QSize(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_size)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSize arg0 = getqtype<QSizeType>(param_this);
@@ -221,8 +197,7 @@ namespace Mu
         return makeqtype<QSizeType>(c, arg0.operator-=(arg1), "qt.QSize");
     }
 
-    Pointer qt_QSize_operatorSlash_EQ__QSize_QSize_double(
-        Mu::Thread& NODE_THREAD, Pointer param_this, double param_divisor)
+    Pointer qt_QSize_operatorSlash_EQ__QSize_QSize_double(Mu::Thread& NODE_THREAD, Pointer param_this, double param_divisor)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSize arg0 = getqtype<QSizeType>(param_this);
@@ -230,108 +205,69 @@ namespace Mu
         return makeqtype<QSizeType>(c, arg0.operator/=(arg1), "qt.QSize");
     }
 
-    static NODE_IMPLEMENTATION(_n_QSize0, Pointer)
-    {
-        NODE_RETURN(qt_QSize_QSize_QSize_QSize(NODE_THREAD,
-                                               NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_QSize0, Pointer) { NODE_RETURN(qt_QSize_QSize_QSize_QSize(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
     static NODE_IMPLEMENTATION(_n_QSize1, Pointer)
     {
-        NODE_RETURN(qt_QSize_QSize_QSize_QSize_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int)));
+        NODE_RETURN(qt_QSize_QSize_QSize_QSize_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int)));
     }
 
     static NODE_IMPLEMENTATION(_n_boundedTo0, Pointer)
     {
-        NODE_RETURN(qt_QSize_boundedTo_QSize_QSize_QSize(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QSize_boundedTo_QSize_QSize_QSize(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_expandedTo0, Pointer)
     {
-        NODE_RETURN(qt_QSize_expandedTo_QSize_QSize_QSize(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QSize_expandedTo_QSize_QSize_QSize(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
-    static NODE_IMPLEMENTATION(_n_height0, int)
-    {
-        NODE_RETURN(qt_QSize_height_int_QSize(NODE_THREAD,
-                                              NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_height0, int) { NODE_RETURN(qt_QSize_height_int_QSize(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
-    static NODE_IMPLEMENTATION(_n_isEmpty0, bool)
-    {
-        NODE_RETURN(qt_QSize_isEmpty_bool_QSize(NODE_THREAD,
-                                                NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_isEmpty0, bool) { NODE_RETURN(qt_QSize_isEmpty_bool_QSize(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
-    static NODE_IMPLEMENTATION(_n_isNull0, bool)
-    {
-        NODE_RETURN(qt_QSize_isNull_bool_QSize(NODE_THREAD,
-                                               NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_isNull0, bool) { NODE_RETURN(qt_QSize_isNull_bool_QSize(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
-    static NODE_IMPLEMENTATION(_n_isValid0, bool)
-    {
-        NODE_RETURN(qt_QSize_isValid_bool_QSize(NODE_THREAD,
-                                                NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_isValid0, bool) { NODE_RETURN(qt_QSize_isValid_bool_QSize(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
     static NODE_IMPLEMENTATION(_n_scale0, void)
     {
-        qt_QSize_scale_void_QSize_int_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int), NODE_ARG(3, int));
+        qt_QSize_scale_void_QSize_int_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int),
+                                              NODE_ARG(3, int));
     }
 
     static NODE_IMPLEMENTATION(_n_scale1, void)
     {
-        qt_QSize_scale_void_QSize_QSize_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer),
-            NODE_ARG(2, int));
+        qt_QSize_scale_void_QSize_QSize_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer), NODE_ARG(2, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setHeight0, void)
     {
-        qt_QSize_setHeight_void_QSize_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QSize_setHeight_void_QSize_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setWidth0, void)
     {
-        qt_QSize_setWidth_void_QSize_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
+        qt_QSize_setWidth_void_QSize_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
-    static NODE_IMPLEMENTATION(_n_transpose0, void)
-    {
-        qt_QSize_transpose_void_QSize(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer));
-    }
+    static NODE_IMPLEMENTATION(_n_transpose0, void) { qt_QSize_transpose_void_QSize(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)); }
 
-    static NODE_IMPLEMENTATION(_n_width0, int)
-    {
-        NODE_RETURN(
-            qt_QSize_width_int_QSize(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_width0, int) { NODE_RETURN(qt_QSize_width_int_QSize(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
     static NODE_IMPLEMENTATION(_n_operatorPlus_EQ_0, Pointer)
     {
-        NODE_RETURN(qt_QSize_operatorPlus_EQ__QSize_QSize_QSize(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QSize_operatorPlus_EQ__QSize_QSize_QSize(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorMinus_EQ_0, Pointer)
     {
-        NODE_RETURN(qt_QSize_operatorMinus_EQ__QSize_QSize_QSize(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QSize_operatorMinus_EQ__QSize_QSize_QSize(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorSlash_EQ_0, Pointer)
     {
-        NODE_RETURN(qt_QSize_operatorSlash_EQ__QSize_QSize_double(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, double)));
+        NODE_RETURN(qt_QSize_operatorSlash_EQ__QSize_QSize_double(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, double)));
     }
 
     void QSizeType::load()
@@ -351,97 +287,60 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(
-            new Function(c, "__allocate", __allocate, None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", __allocate, None, Return, ftn, End),
 
-            EndArguments);
+                   EndArguments);
 
         addSymbols(EndArguments);
 
         addSymbols(
             // enums
             // member functions
-            new Function(c, "QSize", _n_QSize0, None, Compiled,
-                         qt_QSize_QSize_QSize_QSize, Return, "qt.QSize",
-                         Parameters, new Param(c, "this", "qt.QSize"), End),
-            new Function(c, "QSize", _n_QSize1, None, Compiled,
-                         qt_QSize_QSize_QSize_QSize_int_int, Return, "qt.QSize",
-                         Parameters, new Param(c, "this", "qt.QSize"),
-                         new Param(c, "width", "int"),
-                         new Param(c, "height", "int"), End),
-            new Function(c, "boundedTo", _n_boundedTo0, None, Compiled,
-                         qt_QSize_boundedTo_QSize_QSize_QSize, Return,
-                         "qt.QSize", Parameters,
-                         new Param(c, "this", "qt.QSize"),
-                         new Param(c, "otherSize", "qt.QSize"), End),
-            new Function(c, "expandedTo", _n_expandedTo0, None, Compiled,
-                         qt_QSize_expandedTo_QSize_QSize_QSize, Return,
-                         "qt.QSize", Parameters,
-                         new Param(c, "this", "qt.QSize"),
-                         new Param(c, "otherSize", "qt.QSize"), End),
-            new Function(c, "height", _n_height0, None, Compiled,
-                         qt_QSize_height_int_QSize, Return, "int", Parameters,
+            new Function(c, "QSize", _n_QSize0, None, Compiled, qt_QSize_QSize_QSize_QSize, Return, "qt.QSize", Parameters,
                          new Param(c, "this", "qt.QSize"), End),
-            new Function(c, "isEmpty", _n_isEmpty0, None, Compiled,
-                         qt_QSize_isEmpty_bool_QSize, Return, "bool",
-                         Parameters, new Param(c, "this", "qt.QSize"), End),
-            new Function(c, "isNull", _n_isNull0, None, Compiled,
-                         qt_QSize_isNull_bool_QSize, Return, "bool", Parameters,
+            new Function(c, "QSize", _n_QSize1, None, Compiled, qt_QSize_QSize_QSize_QSize_int_int, Return, "qt.QSize", Parameters,
+                         new Param(c, "this", "qt.QSize"), new Param(c, "width", "int"), new Param(c, "height", "int"), End),
+            new Function(c, "boundedTo", _n_boundedTo0, None, Compiled, qt_QSize_boundedTo_QSize_QSize_QSize, Return, "qt.QSize",
+                         Parameters, new Param(c, "this", "qt.QSize"), new Param(c, "otherSize", "qt.QSize"), End),
+            new Function(c, "expandedTo", _n_expandedTo0, None, Compiled, qt_QSize_expandedTo_QSize_QSize_QSize, Return, "qt.QSize",
+                         Parameters, new Param(c, "this", "qt.QSize"), new Param(c, "otherSize", "qt.QSize"), End),
+            new Function(c, "height", _n_height0, None, Compiled, qt_QSize_height_int_QSize, Return, "int", Parameters,
                          new Param(c, "this", "qt.QSize"), End),
-            new Function(c, "isValid", _n_isValid0, None, Compiled,
-                         qt_QSize_isValid_bool_QSize, Return, "bool",
-                         Parameters, new Param(c, "this", "qt.QSize"), End),
+            new Function(c, "isEmpty", _n_isEmpty0, None, Compiled, qt_QSize_isEmpty_bool_QSize, Return, "bool", Parameters,
+                         new Param(c, "this", "qt.QSize"), End),
+            new Function(c, "isNull", _n_isNull0, None, Compiled, qt_QSize_isNull_bool_QSize, Return, "bool", Parameters,
+                         new Param(c, "this", "qt.QSize"), End),
+            new Function(c, "isValid", _n_isValid0, None, Compiled, qt_QSize_isValid_bool_QSize, Return, "bool", Parameters,
+                         new Param(c, "this", "qt.QSize"), End),
             // MISSING: rheight ("int &"; QSize this)
             // MISSING: rwidth ("int &"; QSize this)
-            new Function(c, "scale", _n_scale0, None, Compiled,
-                         qt_QSize_scale_void_QSize_int_int_int, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QSize"),
-                         new Param(c, "width", "int"),
-                         new Param(c, "height", "int"),
+            new Function(c, "scale", _n_scale0, None, Compiled, qt_QSize_scale_void_QSize_int_int_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QSize"), new Param(c, "width", "int"), new Param(c, "height", "int"),
                          new Param(c, "mode", "int"), End),
-            new Function(c, "scale", _n_scale1, None, Compiled,
-                         qt_QSize_scale_void_QSize_QSize_int, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QSize"),
-                         new Param(c, "size", "qt.QSize"),
-                         new Param(c, "mode", "int"), End),
-            new Function(c, "setHeight", _n_setHeight0, None, Compiled,
-                         qt_QSize_setHeight_void_QSize_int, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QSize"),
-                         new Param(c, "height", "int"), End),
-            new Function(c, "setWidth", _n_setWidth0, None, Compiled,
-                         qt_QSize_setWidth_void_QSize_int, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QSize"),
-                         new Param(c, "width", "int"), End),
-            new Function(c, "transpose", _n_transpose0, None, Compiled,
-                         qt_QSize_transpose_void_QSize, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QSize"), End),
-            new Function(c, "width", _n_width0, None, Compiled,
-                         qt_QSize_width_int_QSize, Return, "int", Parameters,
+            new Function(c, "scale", _n_scale1, None, Compiled, qt_QSize_scale_void_QSize_QSize_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QSize"), new Param(c, "size", "qt.QSize"), new Param(c, "mode", "int"), End),
+            new Function(c, "setHeight", _n_setHeight0, None, Compiled, qt_QSize_setHeight_void_QSize_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QSize"), new Param(c, "height", "int"), End),
+            new Function(c, "setWidth", _n_setWidth0, None, Compiled, qt_QSize_setWidth_void_QSize_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QSize"), new Param(c, "width", "int"), End),
+            new Function(c, "transpose", _n_transpose0, None, Compiled, qt_QSize_transpose_void_QSize, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QSize"), End),
+            new Function(c, "width", _n_width0, None, Compiled, qt_QSize_width_int_QSize, Return, "int", Parameters,
                          new Param(c, "this", "qt.QSize"), End),
             // MISSING: = ("QSize & operator*"; QSize this, double factor)
             // static functions
             EndArguments);
         globalScope()->addSymbols(
-            new Function(c, "+=", _n_operatorPlus_EQ_0, Op, Compiled,
-                         qt_QSize_operatorPlus_EQ__QSize_QSize_QSize, Return,
-                         "qt.QSize", Parameters,
-                         new Param(c, "this", "qt.QSize"),
-                         new Param(c, "size", "qt.QSize"), End),
-            new Function(c, "-=", _n_operatorMinus_EQ_0, Op, Compiled,
-                         qt_QSize_operatorMinus_EQ__QSize_QSize_QSize, Return,
-                         "qt.QSize", Parameters,
-                         new Param(c, "this", "qt.QSize"),
-                         new Param(c, "size", "qt.QSize"), End),
-            new Function(c, "/=", _n_operatorSlash_EQ_0, Op, Compiled,
-                         qt_QSize_operatorSlash_EQ__QSize_QSize_double, Return,
-                         "qt.QSize", Parameters,
-                         new Param(c, "this", "qt.QSize"),
-                         new Param(c, "divisor", "double"), End),
+            new Function(c, "+=", _n_operatorPlus_EQ_0, Op, Compiled, qt_QSize_operatorPlus_EQ__QSize_QSize_QSize, Return, "qt.QSize",
+                         Parameters, new Param(c, "this", "qt.QSize"), new Param(c, "size", "qt.QSize"), End),
+            new Function(c, "-=", _n_operatorMinus_EQ_0, Op, Compiled, qt_QSize_operatorMinus_EQ__QSize_QSize_QSize, Return, "qt.QSize",
+                         Parameters, new Param(c, "this", "qt.QSize"), new Param(c, "size", "qt.QSize"), End),
+            new Function(c, "/=", _n_operatorSlash_EQ_0, Op, Compiled, qt_QSize_operatorSlash_EQ__QSize_QSize_double, Return, "qt.QSize",
+                         Parameters, new Param(c, "this", "qt.QSize"), new Param(c, "divisor", "double"), End),
             EndArguments);
         scope()->addSymbols(EndArguments);
     }

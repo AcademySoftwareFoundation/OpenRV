@@ -93,31 +93,15 @@ namespace TwkMath
     typedef Rand48Generator<float> Rand48Generatorf;
     typedef Rand48Generator<double> Rand48Generatord;
 
-    template <> inline int Rand48Generator<int>::operator()()
-    {
-        return nextLong();
-    }
+    template <> inline int Rand48Generator<int>::operator()() { return nextLong(); }
 
-    template <> inline unsigned int Rand48Generator<unsigned int>::operator()()
-    {
-        return nextULong();
-    }
+    template <> inline unsigned int Rand48Generator<unsigned int>::operator()() { return nextULong(); }
 
-    template <> inline char Rand48Generator<char>::operator()()
-    {
-        return char(nextULong() % sizeof(char));
-    }
+    template <> inline char Rand48Generator<char>::operator()() { return char(nextULong() % sizeof(char)); }
 
-    template <> inline short Rand48Generator<short>::operator()()
-    {
-        return char(nextULong() % sizeof(short));
-    }
+    template <> inline short Rand48Generator<short>::operator()() { return char(nextULong() % sizeof(short)); }
 
-    template <>
-    inline unsigned short Rand48Generator<unsigned short>::operator()()
-    {
-        return char(nextULong() % sizeof(unsigned short));
-    }
+    template <> inline unsigned short Rand48Generator<unsigned short>::operator()() { return char(nextULong() % sizeof(unsigned short)); }
 
     //*****************************************************************************
     // DEFINITIONS USED BY FUNCTIONS
@@ -148,8 +132,7 @@ namespace TwkMath
 #define A2 0x5
 #define C 0xB
 #define SET3(x, x0, x1, x2) ((x)[0] = (x0), (x)[1] = (x1), (x)[2] = (x2))
-#define SETLOW(x, y, n) \
-    SET3(x, LOW((y)[n]), LOW((y)[(n) + 1]), LOW((y)[(n) + 2]))
+#define SETLOW(x, y, n) SET3(x, LOW((y)[n]), LOW((y)[(n) + 1]), LOW((y)[(n) + 2]))
 #define SEED(x0, x1, x2) (SET3(m_x, x0, x1, x2), SET3(m_a, A0, A1, A2), m_c = C)
 
 #define HI_BIT ((unsigned long)1 << (2 * N - 1))
@@ -182,16 +165,10 @@ namespace TwkMath
     }
 
     //*****************************************************************************
-    inline double Rand48::nextDouble(double range)
-    {
-        return range * nextDouble();
-    }
+    inline double Rand48::nextDouble(double range) { return range * nextDouble(); }
 
     //*****************************************************************************
-    inline double Rand48::nextDouble(double lo, double hi)
-    {
-        return lo + (hi - lo) * nextDouble();
-    }
+    inline double Rand48::nextDouble(double lo, double hi) { return lo + (hi - lo) * nextDouble(); }
 
     //*****************************************************************************
     inline float Rand48::nextFloat() { return (float)nextDouble(); }
@@ -203,10 +180,7 @@ namespace TwkMath
     inline float Rand48::nextFloat(float range) { return range * nextFloat(); }
 
     //*****************************************************************************
-    inline float Rand48::nextFloat(float start, float end)
-    {
-        return start + nextFloat(end - start);
-    }
+    inline float Rand48::nextFloat(float start, float end) { return start + nextFloat(end - start); }
 
 //*****************************************************************************
 // UNDEF THINGS

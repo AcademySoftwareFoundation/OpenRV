@@ -27,9 +27,7 @@ namespace Mu
 
     //----------------------------------------------------------------------
 
-    DynamicArrayType::DynamicArrayType(Context* context, const char* name,
-                                       Class* super, const Type* elementType,
-                                       int dimensions)
+    DynamicArrayType::DynamicArrayType(Context* context, const char* name, Class* super, const Type* elementType, int dimensions)
         : Class(context, name, super)
         , _elementType(elementType)
     {
@@ -51,8 +49,7 @@ namespace Mu
 
     Type::MatchResult DynamicArrayType::match(const Type* t, Bindings& b) const
     {
-        if (const DynamicArrayType* atype =
-                dynamic_cast<const DynamicArrayType*>(t))
+        if (const DynamicArrayType* atype = dynamic_cast<const DynamicArrayType*>(t))
         {
             return elementType()->match(atype->elementType(), b);
         }
@@ -62,40 +59,25 @@ namespace Mu
         }
     }
 
-    Object* DynamicArrayType::newObject() const
-    {
-        return new DynamicArray(this, _dimensions);
-    }
+    Object* DynamicArrayType::newObject() const { return new DynamicArray(this, _dimensions); }
 
     size_t DynamicArrayType::objectSize() const { return sizeof(DynamicArray); }
 
-    void DynamicArrayType::constructInstance(Pointer obj) const
-    {
-        new (obj) DynamicArray(this, 1);
-    }
+    void DynamicArrayType::constructInstance(Pointer obj) const { new (obj) DynamicArray(this, 1); }
 
     void DynamicArrayType::copyInstance(Pointer a, Pointer b) const
     {
         DynamicArray* src = reinterpret_cast<DynamicArray*>(a);
         DynamicArray* dst = reinterpret_cast<DynamicArray*>(b);
         dst->resize(src->dimensions());
-        memcpy(dst->data<byte>(), src->data<byte>(),
-               src->size() * src->elementType()->machineRep()->size());
+        memcpy(dst->data<byte>(), src->data<byte>(), src->size() * src->elementType()->machineRep()->size());
     }
 
-    void DynamicArrayType::deleteObject(Object* obj) const
-    {
-        delete static_cast<DynamicArray*>(obj);
-    }
+    void DynamicArrayType::deleteObject(Object* obj) const { delete static_cast<DynamicArray*>(obj); }
 
-    Value DynamicArrayType::nodeEval(const Node* n, Thread& thread) const
-    {
-        return Value((*n->func()._PointerFunc)(*n, thread));
-    }
+    Value DynamicArrayType::nodeEval(const Node* n, Thread& thread) const { return Value((*n->func()._PointerFunc)(*n, thread)); }
 
-    void DynamicArrayType::outputValueRecursive(ostream& o,
-                                                const ValuePointer vp,
-                                                ValueOutputState& state) const
+    void DynamicArrayType::outputValueRecursive(ostream& o, const ValuePointer vp, ValueOutputState& state) const
     {
         const Type* etype = elementType();
         const DynamicArray* a = *reinterpret_cast<const DynamicArray**>(vp);
@@ -116,8 +98,7 @@ namespace Mu
                 {
                     if (i)
                         o << ", ";
-                    etype->outputValueRecursive(
-                        o, ValuePointer(a->elementPointer(i)), state);
+                    etype->outputValueRecursive(o, ValuePointer(a->elementPointer(i)), state);
 
                     if (!state.fullOutput && i > 80 && s > 81)
                     {
@@ -137,10 +118,7 @@ namespace Mu
         }
     }
 
-    const Type* DynamicArrayType::fieldType(size_t) const
-    {
-        return _elementType;
-    }
+    const Type* DynamicArrayType::fieldType(size_t) const { return _elementType; }
 
     ValuePointer DynamicArrayType::fieldPointer(Object* o, size_t index) const
     {
@@ -150,8 +128,7 @@ namespace Mu
         return 0;
     }
 
-    const ValuePointer DynamicArrayType::fieldPointer(const Object* o,
-                                                      size_t index) const
+    const ValuePointer DynamicArrayType::fieldPointer(const Object* o, size_t index) const
     {
         const DynamicArray* array = reinterpret_cast<const DynamicArray*>(o);
         if (index < array->size())
@@ -159,8 +136,7 @@ namespace Mu
         return 0;
     }
 
-    void DynamicArrayType::serialize(std::ostream& o, Archive::Writer& archive,
-                                     const ValuePointer p) const
+    void DynamicArrayType::serialize(std::ostream& o, Archive::Writer& archive, const ValuePointer p) const
     {
         const DynamicArray* array = *reinterpret_cast<const DynamicArray**>(p);
         size_t s = array->size();
@@ -168,9 +144,7 @@ namespace Mu
         Class::serialize(o, archive, p);
     }
 
-    void DynamicArrayType::deserialize(std::istream& in,
-                                       Archive::Reader& archive,
-                                       ValuePointer p) const
+    void DynamicArrayType::deserialize(std::istream& in, Archive::Reader& archive, ValuePointer p) const
     {
         DynamicArray* array = *reinterpret_cast<DynamicArray**>(p);
         size_t s;
@@ -201,8 +175,7 @@ namespace Mu
         const char* frn = frname.c_str();
         const char* et = elementType()->fullyQualifiedName().c_str();
         const char* fet = et;
-        const char* re =
-            elementType()->referenceType()->fullyQualifiedName().c_str();
+        const char* re = elementType()->referenceType()->fullyQualifiedName().c_str();
 
         //
         //	If a new MachineRep is added, this section of code must be
@@ -287,50 +260,37 @@ namespace Mu
 
         s->addSymbols(new ReferenceType(c, rn, this),
 
-                      new Function(c, tn, DynamicArrayType::dyn_construct, None,
+                      new Function(c, tn, DynamicArrayType::dyn_construct, None, Return, ftn, End),
+
+                      new Function(c, tn, DynamicArrayType::dyn_construct_aggregate, Mapped, Args, et, Optional, "?+", Maximum, 999999,
                                    Return, ftn, End),
 
-                      new Function(c, tn,
-                                   DynamicArrayType::dyn_construct_aggregate,
-                                   Mapped, Args, et, Optional, "?+", Maximum,
-                                   999999, Return, ftn, End),
+                      new Function(c, tn, DynamicArrayType::dyn_copyconstruct, None, Return, ftn, Args, ftn, End),
 
-                      new Function(c, tn, DynamicArrayType::dyn_copyconstruct,
-                                   None, Return, ftn, Args, ftn, End),
-
-                      new Function(c, tn, BaseFunctions::dereference, Cast,
-                                   Return, ftn, Args, frn, End),
-                      EndArguments);
+                      new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frn, End), EndArguments);
 
         globalScope()->addSymbols(
 
-            new Function(c, "=", BaseFunctions::assign, AsOp, Return, frn, Args,
-                         frn, ftn, End),
+            new Function(c, "=", BaseFunctions::assign, AsOp, Return, frn, Args, frn, ftn, End),
 
-            new Function(c, "eq", BaseFunctions::eq, CommOp, Return, "bool",
-                         Args, ftn, ftn, End),
+            new Function(c, "eq", BaseFunctions::eq, CommOp, Return, "bool", Args, ftn, ftn, End),
 
-            new Function(c, "==", DynamicArrayType::dyn_equals, Mapped, Return,
-                         "bool", Args, ftn, ftn, End),
+            new Function(c, "==", DynamicArrayType::dyn_equals, Mapped, Return, "bool", Args, ftn, ftn, End),
 
-            new Function(c, "print", DynamicArrayType::dyn_print, None, Return,
-                         "void", Args, ftn, End),
+            new Function(c, "print", DynamicArrayType::dyn_print, None, Return, "void", Args, ftn, End),
 
             EndArguments);
 
-        addSymbols(new Function(c, "size", DynamicArrayType::dyn_size, Mapped,
-                                Return, "int", Args, ftn, End),
+        addSymbols(new Function(c, "size", DynamicArrayType::dyn_size, Mapped, Return, "int", Args, ftn, End),
 
-                   new Function(c, "empty", DynamicArrayType::dyn_empty, Mapped,
-                                Return, "bool", Args, ftn, End),
+                   new Function(c, "empty", DynamicArrayType::dyn_empty, Mapped, Return, "bool", Args, ftn, End),
 
                    EndArguments);
 
         if (_dimensions > 1)
         {
             STLVector<ParameterVariable*>::Type parameters;
-            Type* intType =
-                globalScope()->findSymbolOfType<Type>(c->lookupName("int"));
+            Type* intType = globalScope()->findSymbolOfType<Type>(c->lookupName("int"));
 
             parameters.push_back(new ParameterVariable(c, "this", this));
             for (int i = 0; i < _dimensions; i++)
@@ -340,15 +300,11 @@ namespace Mu
                 parameters.push_back(new ParameterVariable(c, temp, intType));
             }
 
-            addSymbol(new Function(
-                c, "[]", (Type*)elementType()->referenceType(),
-                parameters.size(), &parameters.front(),
-                DynamicArrayType::dyn_indexN,
-                Mapped & Function::Native & Function::MemberOperator));
+            addSymbol(new Function(c, "[]", (Type*)elementType()->referenceType(), parameters.size(), &parameters.front(),
+                                   DynamicArrayType::dyn_indexN, Mapped & Function::Native & Function::MemberOperator));
 
-            addSymbol(new Function(
-                c, "resize", voidType, parameters.size(), &parameters.front(),
-                DynamicArrayType::dyn_resizeN, Function::Native));
+            addSymbol(new Function(c, "resize", voidType, parameters.size(), &parameters.front(), DynamicArrayType::dyn_resizeN,
+                                   Function::Native));
         }
 
         if (_dimensions == 1)
@@ -357,37 +313,27 @@ namespace Mu
             //  Add only if its one dimensional
             //
 
-            addSymbols(new Function(c, "front", DynamicArrayType::front, None,
-                                    Return, re, Args, ftn, End),
+            addSymbols(
+                new Function(c, "front", DynamicArrayType::front, None, Return, re, Args, ftn, End),
 
-                       new Function(c, "back", DynamicArrayType::back, None,
-                                    Return, re, Args, ftn, End),
+                new Function(c, "back", DynamicArrayType::back, None, Return, re, Args, ftn, End),
 
-                       new Function(c, "[]", DynamicArrayType::dyn_index1,
-                                    Mapped & Function::MemberOperator, Return,
-                                    re, Args, ftn, "int", End),
+                new Function(c, "[]", DynamicArrayType::dyn_index1, Mapped & Function::MemberOperator, Return, re, Args, ftn, "int", End),
 
-                       new Function(c, "resize", DynamicArrayType::dyn_resize1,
-                                    None, Return, "void", Args, ftn, "int",
-                                    End),
+                new Function(c, "resize", DynamicArrayType::dyn_resize1, None, Return, "void", Args, ftn, "int", End),
 
-                       EndArguments);
+                EndArguments);
         }
 
-        addSymbols(new Function(c, "clear", DynamicArrayType::clear, None,
-                                Return, "void", Args, ftn, End),
+        addSymbols(new Function(c, "clear", DynamicArrayType::clear, None, Return, "void", Args, ftn, End),
 
-                   new Function(c, "rest", DynamicArrayType::dyn_rest, Mapped,
-                                Return, ftn, Args, ftn, End),
+                   new Function(c, "rest", DynamicArrayType::dyn_rest, Mapped, Return, ftn, Args, ftn, End),
 
-                   new Function(c, "push_back", pushBackFunc, Retaining, Return,
-                                fet, Args, ftn, fet, End),
+                   new Function(c, "push_back", pushBackFunc, Retaining, Return, fet, Args, ftn, fet, End),
 
-                   new Function(c, "pop_back", popBackFunc, None, Return, fet,
-                                Args, ftn, End),
+                   new Function(c, "pop_back", popBackFunc, None, Return, fet, Args, ftn, End),
 
-                   new Function(c, "erase", eraseFunc, None, Return, "void",
-                                Args, ftn, "int", "int", End),
+                   new Function(c, "erase", eraseFunc, None, Return, "void", Args, ftn, "int", "int", End),
 
                    EndArguments);
     }
@@ -395,8 +341,7 @@ namespace Mu
     NODE_IMPLEMENTATION(DynamicArrayType::dyn_construct, Pointer)
     {
         Process* p = NODE_THREAD.process();
-        const DynamicArrayType* c =
-            static_cast<const DynamicArrayType*>(NODE_THIS.type());
+        const DynamicArrayType* c = static_cast<const DynamicArrayType*>(NODE_THIS.type());
         DynamicArray* o = new DynamicArray(c, c->_dimensions);
         NODE_RETURN(Pointer(o));
     }
@@ -404,8 +349,7 @@ namespace Mu
     NODE_IMPLEMENTATION(DynamicArrayType::dyn_construct_aggregate, Pointer)
     {
         Process* p = NODE_THREAD.process();
-        const DynamicArrayType* c =
-            static_cast<const DynamicArrayType*>(NODE_THIS.type());
+        const DynamicArrayType* c = static_cast<const DynamicArrayType*>(NODE_THIS.type());
         const Type* etype = c->elementType();
         DynamicArray* o = new DynamicArray(c, c->_dimensions);
         o->resize(NODE_THIS.numArgs());
@@ -426,8 +370,7 @@ namespace Mu
     NODE_IMPLEMENTATION(DynamicArrayType::dyn_rest, Pointer)
     {
         Process* p = NODE_THREAD.process();
-        const DynamicArrayType* c =
-            static_cast<const DynamicArrayType*>(NODE_THIS.type());
+        const DynamicArrayType* c = static_cast<const DynamicArrayType*>(NODE_THIS.type());
 
         DynamicArray* in = NODE_ARG_OBJECT(0, DynamicArray);
         if (!in)
@@ -442,8 +385,7 @@ namespace Mu
             {
                 size_t esize = in->arrayType()->elementRep()->size();
 
-                memcpy(o->elementPointer(0), in->elementPointer(1),
-                       esize * (in->size() - 1));
+                memcpy(o->elementPointer(0), in->elementPointer(1), esize * (in->size() - 1));
             }
         }
 
@@ -462,9 +404,7 @@ namespace Mu
         {
             if (a->size() == b->size())
             {
-                return !memcmp(a->elementPointer(0), b->elementPointer(0),
-                               a->size()
-                                   * a->elementType()->machineRep()->size());
+                return !memcmp(a->elementPointer(0), b->elementPointer(0), a->size() * a->elementType()->machineRep()->size());
             }
         }
 
@@ -474,8 +414,7 @@ namespace Mu
     NODE_IMPLEMENTATION(DynamicArrayType::dyn_copyconstruct, Pointer)
     {
         Process* p = NODE_THREAD.process();
-        const DynamicArrayType* c =
-            static_cast<const DynamicArrayType*>(NODE_THIS.type());
+        const DynamicArrayType* c = static_cast<const DynamicArrayType*>(NODE_THIS.type());
 
         DynamicArray* o = reinterpret_cast<DynamicArray*>(NODE_ARG(0, Pointer));
         if (!o)
@@ -484,8 +423,7 @@ namespace Mu
 
         n->resize(o->dimensions());
 
-        memcpy(n->data<char>(), o->data<char>(),
-               o->size() * o->type()->machineRep()->size());
+        memcpy(n->data<char>(), o->data<char>(), o->size() * o->type()->machineRep()->size());
 
         NODE_RETURN(Pointer(n));
     }
@@ -525,8 +463,7 @@ namespace Mu
 
     NODE_IMPLEMENTATION(DynamicArrayType::dyn_index1, Pointer)
     {
-        DynamicArray* self =
-            reinterpret_cast<DynamicArray*>(NODE_ARG(0, Pointer));
+        DynamicArray* self = reinterpret_cast<DynamicArray*>(NODE_ARG(0, Pointer));
         if (!self)
             throw NilArgumentException(NODE_THREAD);
         int a = NODE_ARG(1, int);
@@ -545,8 +482,7 @@ namespace Mu
 
     NODE_IMPLEMENTATION(DynamicArrayType::dyn_indexN, Pointer)
     {
-        DynamicArray* self =
-            reinterpret_cast<DynamicArray*>(NODE_ARG(0, Pointer));
+        DynamicArray* self = reinterpret_cast<DynamicArray*>(NODE_ARG(0, Pointer));
         if (!self)
             throw NilArgumentException(NODE_THREAD);
 
@@ -580,8 +516,7 @@ namespace Mu
         case 3:
             NODE_RETURN(self->elementPointer(indices[0], indices[1]));
         case 4:
-            NODE_RETURN(
-                self->elementPointer(indices[0], indices[1], indices[2]));
+            NODE_RETURN(self->elementPointer(indices[0], indices[1], indices[2]));
         default:
             throw UnimplementedFeatureException(NODE_THREAD);
         }
@@ -589,8 +524,7 @@ namespace Mu
 
     NODE_IMPLEMENTATION(DynamicArrayType::dyn_resize1, void)
     {
-        DynamicArray* self =
-            reinterpret_cast<DynamicArray*>(NODE_ARG(0, Pointer));
+        DynamicArray* self = reinterpret_cast<DynamicArray*>(NODE_ARG(0, Pointer));
         if (!self)
             throw NilArgumentException(NODE_THREAD);
         int a = NODE_ARG(1, int);
@@ -605,8 +539,7 @@ namespace Mu
 
     NODE_IMPLEMENTATION(DynamicArrayType::dyn_resizeN, void)
     {
-        DynamicArray* self =
-            reinterpret_cast<DynamicArray*>(NODE_ARG(0, Pointer));
+        DynamicArray* self = reinterpret_cast<DynamicArray*>(NODE_ARG(0, Pointer));
         if (!self)
             throw NilArgumentException(NODE_THREAD);
 
@@ -636,8 +569,7 @@ namespace Mu
 
     NODE_IMPLEMENTATION(DynamicArrayType::front, Pointer)
     {
-        DynamicArray* self =
-            reinterpret_cast<DynamicArray*>(NODE_ARG(0, Pointer));
+        DynamicArray* self = reinterpret_cast<DynamicArray*>(NODE_ARG(0, Pointer));
         if (!self)
             throw NilArgumentException(NODE_THREAD);
 
@@ -651,8 +583,7 @@ namespace Mu
 
     NODE_IMPLEMENTATION(DynamicArrayType::back, Pointer)
     {
-        DynamicArray* self =
-            reinterpret_cast<DynamicArray*>(NODE_ARG(0, Pointer));
+        DynamicArray* self = reinterpret_cast<DynamicArray*>(NODE_ARG(0, Pointer));
         if (!self)
             throw NilArgumentException(NODE_THREAD);
 
@@ -666,18 +597,17 @@ namespace Mu
         NODE_RETURN(self->elementPointer(s - 1));
     }
 
-#define NODE_PUSH_BACK(TYPE)                                       \
-    NODE_IMPLEMENTATION(DynamicArrayType::push_back_##TYPE, TYPE)  \
-    {                                                              \
-        DynamicArray* self =                                       \
-            reinterpret_cast<DynamicArray*>(NODE_ARG(0, Pointer)); \
-        if (!self)                                                 \
-            throw NilArgumentException(NODE_THREAD);               \
-        TYPE value = NODE_ARG(1, TYPE);                            \
-        size_t s = self->size();                                   \
-        self->resize(s + 1);                                       \
-        self->element<TYPE>(s) = value;                            \
-        NODE_RETURN(value);                                        \
+#define NODE_PUSH_BACK(TYPE)                                                        \
+    NODE_IMPLEMENTATION(DynamicArrayType::push_back_##TYPE, TYPE)                   \
+    {                                                                               \
+        DynamicArray* self = reinterpret_cast<DynamicArray*>(NODE_ARG(0, Pointer)); \
+        if (!self)                                                                  \
+            throw NilArgumentException(NODE_THREAD);                                \
+        TYPE value = NODE_ARG(1, TYPE);                                             \
+        size_t s = self->size();                                                    \
+        self->resize(s + 1);                                                        \
+        self->element<TYPE>(s) = value;                                             \
+        NODE_RETURN(value);                                                         \
     }
 
     NODE_PUSH_BACK(int)
@@ -692,23 +622,22 @@ namespace Mu
     NODE_PUSH_BACK(Vector3f)
     NODE_PUSH_BACK(Vector2f)
 
-#define NODE_POP_BACK(TYPE)                                        \
-    NODE_IMPLEMENTATION(DynamicArrayType::pop_back_##TYPE, TYPE)   \
-    {                                                              \
-        DynamicArray* self =                                       \
-            reinterpret_cast<DynamicArray*>(NODE_ARG(0, Pointer)); \
-        if (!self)                                                 \
-            throw NilArgumentException(NODE_THREAD);               \
-        size_t s = self->size();                                   \
-                                                                   \
-        if (s == 0)                                                \
-        {                                                          \
-            throw OutOfRangeException(NODE_THREAD);                \
-        }                                                          \
-                                                                   \
-        TYPE value = self->element<TYPE>(s - 1);                   \
-        self->resize(s - 1);                                       \
-        NODE_RETURN(value);                                        \
+#define NODE_POP_BACK(TYPE)                                                         \
+    NODE_IMPLEMENTATION(DynamicArrayType::pop_back_##TYPE, TYPE)                    \
+    {                                                                               \
+        DynamicArray* self = reinterpret_cast<DynamicArray*>(NODE_ARG(0, Pointer)); \
+        if (!self)                                                                  \
+            throw NilArgumentException(NODE_THREAD);                                \
+        size_t s = self->size();                                                    \
+                                                                                    \
+        if (s == 0)                                                                 \
+        {                                                                           \
+            throw OutOfRangeException(NODE_THREAD);                                 \
+        }                                                                           \
+                                                                                    \
+        TYPE value = self->element<TYPE>(s - 1);                                    \
+        self->resize(s - 1);                                                        \
+        NODE_RETURN(value);                                                         \
     }
 
     NODE_POP_BACK(int)
@@ -723,24 +652,23 @@ namespace Mu
     NODE_POP_BACK(Vector3f)
     NODE_POP_BACK(Vector2f)
 
-#define NODE_ERASE(TYPE)                                           \
-    NODE_IMPLEMENTATION(DynamicArrayType::erase_##TYPE, void)      \
-    {                                                              \
-        DynamicArray* self =                                       \
-            reinterpret_cast<DynamicArray*>(NODE_ARG(0, Pointer)); \
-        if (!self)                                                 \
-            throw NilArgumentException(NODE_THREAD);               \
-        int index = NODE_ARG(1, int);                              \
-        int n = NODE_ARG(2, int);                                  \
-                                                                   \
-        size_t s = self->size();                                   \
-                                                                   \
-        if (s == 0)                                                \
-        {                                                          \
-            throw OutOfRangeException(NODE_THREAD);                \
-        }                                                          \
-                                                                   \
-        self->erase(index, n);                                     \
+#define NODE_ERASE(TYPE)                                                            \
+    NODE_IMPLEMENTATION(DynamicArrayType::erase_##TYPE, void)                       \
+    {                                                                               \
+        DynamicArray* self = reinterpret_cast<DynamicArray*>(NODE_ARG(0, Pointer)); \
+        if (!self)                                                                  \
+            throw NilArgumentException(NODE_THREAD);                                \
+        int index = NODE_ARG(1, int);                                               \
+        int n = NODE_ARG(2, int);                                                   \
+                                                                                    \
+        size_t s = self->size();                                                    \
+                                                                                    \
+        if (s == 0)                                                                 \
+        {                                                                           \
+            throw OutOfRangeException(NODE_THREAD);                                 \
+        }                                                                           \
+                                                                                    \
+        self->erase(index, n);                                                      \
     }
 
     NODE_ERASE(int)

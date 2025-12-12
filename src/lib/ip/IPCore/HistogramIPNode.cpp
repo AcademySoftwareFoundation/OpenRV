@@ -24,9 +24,7 @@ namespace IPCore
     using namespace TwkMath;
     using namespace TwkFB;
 
-    HistogramIPNode::HistogramIPNode(const std::string& name,
-                                     const NodeDefinition* def, IPGraph* graph,
-                                     GroupIPNode* group)
+    HistogramIPNode::HistogramIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group)
         : IPNode(name, def, graph, group)
     {
         m_active = declareProperty<IntProperty>("node.active", 1);
@@ -54,8 +52,7 @@ namespace IPCore
             delete image;
             image = NULL;
         }
-        newImage->shaderExpr =
-            Shader::newColorLinearToSRGB(newImage->shaderExpr);
+        newImage->shaderExpr = Shader::newColorLinearToSRGB(newImage->shaderExpr);
 
         IPImage* image2 = NULL;
         size_t scale = max(newImage->width / 300, newImage->height / 300);
@@ -64,9 +61,7 @@ namespace IPCore
             const size_t newWidth = newImage->width / scale;
             const size_t newHeight = newImage->height / scale;
 
-            IPImage* smallImage =
-                new IPImage(this, IPImage::BlendRenderType, newWidth, newHeight,
-                            1.0, IPImage::IntermediateBuffer);
+            IPImage* smallImage = new IPImage(this, IPImage::BlendRenderType, newWidth, newHeight, 1.0, IPImage::IntermediateBuffer);
             smallImage->shaderExpr = Shader::newSourceRGBA(smallImage);
             smallImage->appendChild(newImage);
             image2 = smallImage;
@@ -76,16 +71,13 @@ namespace IPCore
             // this is the case where the image has a fb, and cannot be
             // converted by convertBlend func
             IPImage* insertImage =
-                new IPImage(this, IPImage::BlendRenderType, newImage->width,
-                            newImage->height, 1.0, IPImage::IntermediateBuffer);
+                new IPImage(this, IPImage::BlendRenderType, newImage->width, newImage->height, 1.0, IPImage::IntermediateBuffer);
             insertImage->shaderExpr = Shader::newSourceRGBA(insertImage);
             insertImage->appendChild(newImage);
             image2 = insertImage;
         }
 
-        IPImage* histo =
-            new IPImage(this, IPImage::BlendRenderType, 256, 1, 1.0,
-                        IPImage::DataBuffer, IPImage::FloatDataType);
+        IPImage* histo = new IPImage(this, IPImage::BlendRenderType, 256, 1, 1.0, IPImage::DataBuffer, IPImage::FloatDataType);
         histo->setHistogram(true);
         histo->appendChild(image2);
         histo->shaderExpr = Shader::newSourceRGBA(histo);
@@ -95,16 +87,14 @@ namespace IPCore
         size_t width = 256;
         size_t height = m_height ? m_height->front() : 100;
 
-        IPImage* result = new IPImage(this, IPImage::MergeRenderType, width,
-                                      height, 1.0, IPImage::IntermediateBuffer);
+        IPImage* result = new IPImage(this, IPImage::MergeRenderType, width, height, 1.0, IPImage::IntermediateBuffer);
 
         IPImageVector images;
         IPImageSet modifiedImages;
         images.push_back(histo);
         convertBlendRenderTypeToIntermediate(images, modifiedImages);
         Shader::ExpressionVector inExpressions;
-        assembleMergeExpressions(result, images, modifiedImages, false,
-                                 inExpressions);
+        assembleMergeExpressions(result, images, modifiedImages, false, inExpressions);
 
         result->shaderExpr = Shader::newSourceRGBA(result);
         result->mergeExpr = Shader::newHistogram(result, inExpressions);

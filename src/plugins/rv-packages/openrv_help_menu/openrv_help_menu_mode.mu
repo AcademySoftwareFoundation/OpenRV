@@ -133,27 +133,29 @@ class: OpenRVHelpMenuMinorMode : MinorMode
 
     method: OpenRVHelpMenuMinorMode (OpenRVHelpMenuMinorMode;)
     {
-        Menu menuList = Menu {
-                {"Online Resources",    nil, nil, inactiveState},
-                {"   RV User's Manual",   opUrl(,"https://aswf-openrv.readthedocs.io/en/latest/rv-manuals/rv-user-manual/rv-user-manual-chapter-one.html"), nil},
-                {"   RV Reference Manual", opUrl(,"https://aswf-openrv.readthedocs.io/en/latest/rv-manuals/rv-reference-manual/rv-reference-manual-chapter-one.html"), nil},
-                {"   Mu User's Manual",    opUrl(,"https://github.com/AcademySoftwareFoundation/OpenRV/blob/main/docs/rv-manuals/rv-mu-programming.md"), nil},
-                {"_",                   nil},
-                {"   GTO File Format (.rv files)", opUrl(,"https://github.com/AcademySoftwareFoundation/OpenRV/blob/main/docs/rv-manuals/rv-gto.md"), nil},
-                {"_",                   nil},
-                {"   Academy Software Foundation Open RV", opUrl(,"https://github.com/AcademySoftwareFoundation/OpenRV"), nil},
-                {"_",                   nil},
-                {"Other Resource",    nil, nil, inactiveState},
-                {"   Mu Command API Browser...",  docbrowser, nil},
-                {"_",                   nil},
-                {"Utilities",           nil, nil, inactiveState},
-                {"   Describe...",         describeHelp, "?"},
-                {"   Describe Key Binding...", describeKeyBinding, nil},
-                {"   Show Current Bindings", dumpBindings, nil},
-                {"   Show Environment",    ~showEnv}
-        };
+        Menu menuList = newMenu(MenuItem[] {
+                menuText("Online Resources"),
+                menuItem("   RV User's Manual", "", "help_category", opUrl(,"https://aswf-openrv.readthedocs.io/en/latest/rv-manuals/rv-user-manual/rv-user-manual-chapter-one.html"), enabledItem),
+                menuItem("   RV Reference Manual", "", "help_category", opUrl(,"https://aswf-openrv.readthedocs.io/en/latest/rv-manuals/rv-reference-manual/rv-reference-manual-chapter-one.html"), enabledItem),
+                menuItem("   Mu User's Manual", "", "help_category", opUrl(,"https://github.com/AcademySoftwareFoundation/OpenRV/blob/main/docs/rv-manuals/rv-mu-programming.md"), enabledItem),
+                menuSeparator(),
+                menuItem("   GTO File Format (.rv files)", "", "help_category", opUrl(,"https://github.com/AcademySoftwareFoundation/OpenRV/blob/main/docs/rv-manuals/rv-gto.md"), enabledItem),
+                menuSeparator(),
+                menuItem("   Academy Software Foundation Open RV", "", "help_category", opUrl(,"https://github.com/AcademySoftwareFoundation/OpenRV"), enabledItem),
+                menuSeparator(),
+                menuText("Other Resource"),
+                menuItem("   Mu Command API Browser...", "", "help_category", docbrowser, enabledItem),
+                menuSeparator(),
+                menuText("Utilities"),
+                menuItem("   Describe...", "key-down--?", "help_category", describeHelp, enabledItem),
+                menuItem("   Describe Key Binding...", "", "help_category", describeKeyBinding, enabledItem),
+                menuItem("   Show Current Bindings", "", "help_category", dumpBindings, enabledItem),
+                menuItem("   Show Environment", "", "help_category", ~showEnv, enabledItem)
+        });
 
-        Menu menu = Menu {{"Help", menuList}};
+        Menu menu = newMenu(MenuItem[] {
+            subMenu("Help", menuList)
+        });
 
         \: bindDescribe (void; string name, EventFunc F)
         {

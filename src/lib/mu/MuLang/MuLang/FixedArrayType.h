@@ -30,11 +30,9 @@ namespace Mu
     public:
         typedef STLVector<size_t>::Type SizeVector;
 
-        FixedArrayType(Context*, const char* name, Class* superClass,
-                       const Type* elementType, const SizeVector& dimensions);
+        FixedArrayType(Context*, const char* name, Class* superClass, const Type* elementType, const SizeVector& dimensions);
 
-        FixedArrayType(Context*, const char* name, Class* superClass,
-                       const Type* elementType, const size_t* dimensions,
+        FixedArrayType(Context*, const char* name, Class* superClass, const Type* elementType, const size_t* dimensions,
                        size_t nDimensions);
 
         ~FixedArrayType();
@@ -43,10 +41,7 @@ namespace Mu
 
         const Type* elementType() const { return _elementType; }
 
-        const MachineRep* elementRep() const
-        {
-            return elementType()->machineRep();
-        }
+        const MachineRep* elementRep() const { return elementType()->machineRep(); }
 
         const SizeVector& dimensions() const { return _dimensions; }
 
@@ -60,8 +55,7 @@ namespace Mu
         //	Symbol API
         //
 
-        virtual void outputValueRecursive(std::ostream&, const ValuePointer,
-                                          ValueOutputState&) const;
+        virtual void outputValueRecursive(std::ostream&, const ValuePointer, ValueOutputState&) const;
         virtual void load();
 
         //

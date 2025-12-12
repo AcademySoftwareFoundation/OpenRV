@@ -60,8 +60,7 @@ namespace Rv
 
     static Options* globalOptions = 0;
 
-    static ENVVAR_INT(evProgressiveSourceLoading,
-                      "RV_PROGRESSIVE_SOURCE_LOADING", 0);
+    static ENVVAR_INT(evProgressiveSourceLoading, "RV_PROGRESSIVE_SOURCE_LOADING", 0);
 
     // If you add a new debugging switch, please update getDebugCategories for
     // the help menu too.
@@ -164,8 +163,7 @@ namespace Rv
                "plugins";
     }
 
-    int collectParams(Options::Params& p, const Options::Files& inputFiles,
-                      int index)
+    int collectParams(Options::Params& p, const Options::Files& inputFiles, int index)
     {
         int count = -1;
         for (int i = index; i < inputFiles.size(); i++, count++)
@@ -177,8 +175,7 @@ namespace Rv
             string::size_type pos = v.find("=");
             if (pos == string::npos)
                 return count;
-            p.push_back(pair<string, string>(v.substr(0, pos),
-                                             v.substr(pos + 1, string::npos)));
+            p.push_back(pair<string, string>(v.substr(0, pos), v.substr(pos + 1, string::npos)));
         }
         return count;
     }
@@ -260,8 +257,7 @@ namespace Rv
 
     Options::Options()
     {
-        static const int numLogicalCPUs =
-            static_cast<int>(TwkUtil::SystemInfo::numCPUs());
+        static const int numLogicalCPUs = static_cast<int>(TwkUtil::SystemInfo::numCPUs());
         static const size_t usableMemory = TwkUtil::SystemInfo::usableMemory();
 
         displayPriority = -1;
@@ -295,10 +291,8 @@ namespace Rv
         maxlram = 1.0;   // 1 GB
         maxbwait = 5.0;  // seconds
         lookback = 25.0; // percent
-        readerThreads =
-            (numLogicalCPUs > 4) ? std::min(numLogicalCPUs / 4, 4) : 1;
-        workItemThreads =
-            (numLogicalCPUs > 4) ? std::min(numLogicalCPUs / 4, 4) : 1;
+        readerThreads = (numLogicalCPUs > 4) ? std::min(numLogicalCPUs / 4, 4) : 1;
+        workItemThreads = (numLogicalCPUs > 4) ? std::min(numLogicalCPUs / 4, 4) : 1;
         cacheOutsideRegion = 0;
         apple = 0;
         allowYUV = 0;
@@ -378,10 +372,7 @@ namespace Rv
         audioRate = TWEAK_AUDIO_DEFAULT_SAMPLE_RATE;
         audioPrecision = 16;
         audioLayout = (int)TwkAudio::Stereo_2;
-        audioMaxCache =
-            ROUND(usableMemory
-                  * DEFAULT_AUDIO_CACHE_SIZE_IN_SECONDS_PER_GB_OF_USABLE_MEMORY
-                  / (1024ULL * 1024ULL * 1024ULL));
+        audioMaxCache = ROUND(usableMemory * DEFAULT_AUDIO_CACHE_SIZE_IN_SECONDS_PER_GB_OF_USABLE_MEMORY / (1024ULL * 1024ULL * 1024ULL));
         audioMinCache = 0.9 * audioMaxCache;
         audioGlobalOffset = 0;
         audioDeviceLatency = 0;
@@ -526,8 +517,7 @@ namespace Rv
             {
                 if (inSource)
                 {
-                    TWK_THROW_STREAM(ReadFailedExc,
-                                     "Cannot nest source groups");
+                    TWK_THROW_STREAM(ReadFailedExc, "Cannot nest source groups");
                 }
 
                 inSource = true;
@@ -573,8 +563,7 @@ namespace Rv
                 inSource = false;
                 needFreshSource = true;
             }
-            else if (inSource && arg.size() && arg[0] == '+'
-                     && (i + 1 < inputFiles.size()))
+            else if (inSource && arg.size() && arg[0] == '+' && (i + 1 < inputFiles.size()))
             {
                 SourceArgs& a = sources.back();
 
@@ -660,13 +649,11 @@ namespace Rv
                     }
                     else
                     {
-                        TWK_THROW_STREAM(ReadFailedExc,
-                                         "Unknown flag '" + arg + "' in input");
+                        TWK_THROW_STREAM(ReadFailedExc, "Unknown flag '" + arg + "' in input");
                     }
                 }
             }
-            else if (!inSource
-                     && (needFreshSource || TwkUtil::Match(sequenceSpec, arg)))
+            else if (!inSource && (needFreshSource || TwkUtil::Match(sequenceSpec, arg)))
             {
                 sources.resize(sources.size() + 1);
                 sources.back().files.push_back(arg);
@@ -707,14 +694,11 @@ namespace Rv
                 {
                     if (!newInputFiles.empty())
                         newInputFiles.pop_back();
-                    newInputFiles.push_back(
-                        integrateFrameRange(inputFiles[i - 1], inputFiles[i]));
+                    newInputFiles.push_back(integrateFrameRange(inputFiles[i - 1], inputFiles[i]));
                 }
                 else
                 {
-                    cout << "WARNING: ignoring \"" << inputFiles[i]
-                         << "\" (input " << i
-                         << ") because it looks like a second frame range"
+                    cout << "WARNING: ignoring \"" << inputFiles[i] << "\" (input " << i << ") because it looks like a second frame range"
                          << endl;
                 }
             }
@@ -727,27 +711,21 @@ namespace Rv
         inputFiles = newInputFiles;
     }
 
-    static string strFromChar(const char* cp)
-    {
-        return (cp) ? string(cp) : string();
-    }
+    static string strFromChar(const char* cp) { return (cp) ? string(cp) : string(); }
 
-    static void addIfMissing(ostringstream& stream, const string& userString,
-                             const char* name, const int value)
+    static void addIfMissing(ostringstream& stream, const string& userString, const char* name, const int value)
     {
         if (userString.find(name) == string::npos)
             stream << " " << name << " " << value;
     }
 
-    static void addIfMissing(ostringstream& stream, const string& userString,
-                             const char* name, const char* value)
+    static void addIfMissing(ostringstream& stream, const string& userString, const char* name, const char* value)
     {
         if (userString.find(name) == string::npos)
             stream << " " << name << " " << value;
     }
 
-    static void addIfMissing(ostringstream& stream, const string& userString,
-                             const char* name, const float value)
+    static void addIfMissing(ostringstream& stream, const string& userString, const char* name, const float value)
     {
         if (userString.find(name) == string::npos)
             stream << " " << name << " " << value;
@@ -797,8 +775,7 @@ namespace Rv
         addIfMissing(exr, rvexr, "--rgbaOnly", exrRGBA);
         addIfMissing(exr, rvexr, "--inherit", exrInherit);
         addIfMissing(exr, rvexr, "--noOneChannel", exrNoOneChannel);
-        addIfMissing(exr, rvexr, "--readWindowIsDisplayWindow",
-                     exrReadWindowIsDisplayWindow);
+        addIfMissing(exr, rvexr, "--readWindowIsDisplayWindow", exrReadWindowIsDisplayWindow);
         addIfMissing(exr, rvexr, "--readWindow", exrReadWindow);
         addIfMissing(exr, rvexr, "--planar3channel", exrPlanar3Chan);
         addIfMissing(exr, rvexr, "--stripAlpha", exrStripAlpha);
@@ -883,8 +860,7 @@ namespace Rv
         //  Initialize IPCore prefs from Options
         //
 
-        IPCore::Application::OptionMap& optionMap =
-            IPCore::Application::optionMap();
+        IPCore::Application::OptionMap& optionMap = IPCore::Application::optionMap();
 
         optionMap["playMode"] = int(playMode);
         optionMap["loopMode"] = int(loopMode);
@@ -892,11 +868,9 @@ namespace Rv
         optionMap["audioMinCache"] = double(audioMinCache);
         optionMap["audioMaxCache"] = double(audioMaxCache);
         optionMap["displayPriority"] = size_t(displayPriority);
-        optionMap["schedulePolicy"] =
-            string(schedulePolicy ? schedulePolicy : "");
+        optionMap["schedulePolicy"] = string(schedulePolicy ? schedulePolicy : "");
         optionMap["workItemThreads"] = int(workItemThreads);
-        optionMap["progressiveSourceLoading"] =
-            bool(progressiveSourceLoading != 0);
+        optionMap["progressiveSourceLoading"] = bool(progressiveSourceLoading != 0);
 
         //
         //  Initialize IPCore prefs from Env Vars.  These may be for testing or
@@ -905,8 +879,7 @@ namespace Rv
 
         if (const char* c = getenv("TWK_MAX_TEXTURE_SIZE"))
         {
-            IPCore::Application::setOptionValue<int>("maxTextureSizeOverride",
-                                                     atoi(c));
+            IPCore::Application::setOptionValue<int>("maxTextureSizeOverride", atoi(c));
         }
 
         if (getenv("TWK_DISABLE_CACHE_STATS") != NULL)
@@ -1002,16 +975,13 @@ namespace Rv
         FormatIPNode::defaultResampleMethod = resampleMethod;
         FileSourceIPNode::defaultOverrideFPS = fps;
         FileSourceIPNode::defaultFPS = defaultfps;
-        SystemInfo::setUseableMemory(
-            size_t(double(maxcram) * 1024.0 * 1024.0 * 1024.0));
+        SystemInfo::setUseableMemory(size_t(double(maxcram) * 1024.0 * 1024.0 * 1024.0));
         Session::setUsePreEval(prefetch);
         ImageRenderer::setUseThreadedUpload(useThreadedUpload);
         Session::setMaxBufferedWaitTime(maxbwait);
         Session::setCacheLookBehindFraction(lookback);
-        Session::setMaxGreedyCacheSize(
-            size_t(double(maxcram) * 1024.0 * 1024.0 * 1024.0));
-        Session::setMaxBufferCacheSize(
-            size_t(double(maxlram) * 1024.0 * 1024.0 * 1024.0));
+        Session::setMaxGreedyCacheSize(size_t(double(maxcram) * 1024.0 * 1024.0 * 1024.0));
+        Session::setMaxBufferCacheSize(size_t(double(maxlram) * 1024.0 * 1024.0 * 1024.0));
         LUTIPNode::newGLSLlutInterp = newGLSLlutInterp;
         LayoutGroupIPNode::setDefaultAutoRetime(autoRetime);
         StackGroupIPNode::setDefaultAutoRetime(autoRetime);
@@ -1319,159 +1289,150 @@ namespace Rv
                                             "audioDeviceLatency",
                                             NULL};
 
-        size_t intoffsets[] = {
-            static_cast<size_t>((char*)(&this->acachesize) - (char*)this),
-            static_cast<size_t>((char*)(&this->aframesize) - (char*)this),
-            static_cast<size_t>((char*)(&this->allowYUV) - (char*)this),
-            static_cast<size_t>((char*)(&this->apple) - (char*)this),
-            static_cast<size_t>((char*)(&this->audioNice) - (char*)this),
-            static_cast<size_t>((char*)(&this->audioLayout) - (char*)this),
-            static_cast<size_t>((char*)(&this->audioNoLock) - (char*)this),
-            static_cast<size_t>((char*)(&this->audioScrub) - (char*)this),
-            static_cast<size_t>((char*)(&this->audioPreRoll) - (char*)this),
-            static_cast<size_t>((char*)(&this->audioOff) - (char*)this),
-            static_cast<size_t>((char*)(&this->audioPrecision) - (char*)this),
-            static_cast<size_t>((char*)(&this->autoRetime) - (char*)this),
-            static_cast<size_t>((char*)(&this->bakeURL) - (char*)this),
-            static_cast<size_t>((char*)(&this->cinIOMethod) - (char*)this),
-            static_cast<size_t>((char*)(&this->cinIOSize) - (char*)this),
-            static_cast<size_t>((char*)(&this->cinMaxAsync) - (char*)this),
-            static_cast<size_t>((char*)(&this->cinalt) - (char*)this),
-            static_cast<size_t>((char*)(&this->cinchroma) - (char*)this),
-            static_cast<size_t>((char*)(&this->connectPort) - (char*)this),
-            static_cast<size_t>((char*)(&this->cutInPoint) - (char*)this),
-            static_cast<size_t>((char*)(&this->cutOutPoint) - (char*)this),
-            static_cast<size_t>((char*)(&this->diff) - (char*)this),
-            static_cast<size_t>((char*)(&this->dispAlphaBits) - (char*)this),
-            static_cast<size_t>((char*)(&this->dispBlueBits) - (char*)this),
-            static_cast<size_t>((char*)(&this->dispGreenBits) - (char*)this),
-            static_cast<size_t>((char*)(&this->dispRedBits) - (char*)this),
-            static_cast<size_t>((char*)(&this->dpxIOMethod) - (char*)this),
-            static_cast<size_t>((char*)(&this->dpxIOSize) - (char*)this),
-            static_cast<size_t>((char*)(&this->dpxMaxAsync) - (char*)this),
-            static_cast<size_t>((char*)(&this->dpxchroma) - (char*)this),
-            static_cast<size_t>((char*)(&this->encodeURL) - (char*)this),
-            static_cast<size_t>((char*)(&this->exrIOMethod) - (char*)this),
-            static_cast<size_t>((char*)(&this->exrIOSize) - (char*)this),
-            static_cast<size_t>((char*)(&this->exrInherit) - (char*)this),
-            static_cast<size_t>((char*)(&this->exrMaxAsync) - (char*)this),
-            static_cast<size_t>((char*)(&this->exrNoOneChannel) - (char*)this),
-            static_cast<size_t>((char*)(&this->exrReadWindowIsDisplayWindow)
-                                - (char*)this),
-            static_cast<size_t>((char*)(&this->exrReadWindow) - (char*)this),
-            static_cast<size_t>((char*)(&this->exrPlanar3Chan) - (char*)this),
-            static_cast<size_t>((char*)(&this->exrStripAlpha) - (char*)this),
-            static_cast<size_t>((char*)(&this->exrRGBA) - (char*)this),
-            static_cast<size_t>((char*)(&this->exrcpus) - (char*)this),
-            static_cast<size_t>((char*)(&this->newGLSLlutInterp) - (char*)this),
-            static_cast<size_t>((char*)(&this->fullscreen) - (char*)this),
-            static_cast<size_t>((char*)(&this->present) - (char*)this),
-            static_cast<size_t>((char*)(&this->presentAudio) - (char*)this),
-            static_cast<size_t>((char*)(&this->inferSequence) - (char*)this),
-            static_cast<size_t>((char*)(&this->jpegIOMethod) - (char*)this),
-            static_cast<size_t>((char*)(&this->jpegIOSize) - (char*)this),
-            static_cast<size_t>((char*)(&this->jpegMaxAsync) - (char*)this),
-            static_cast<size_t>((char*)(&this->jpegRGBA) - (char*)this),
-            static_cast<size_t>((char*)(&this->lqt_decoder) - (char*)this),
-            static_cast<size_t>((char*)(&this->maxbits) - (char*)this),
-            static_cast<size_t>((char*)(&this->network) - (char*)this),
-            static_cast<size_t>((char*)(&this->networkOnStartup) - (char*)this),
-            static_cast<size_t>((char*)(&this->networkPerm) - (char*)this),
-            static_cast<size_t>((char*)(&this->networkPort) - (char*)this),
-            static_cast<size_t>((char*)(&this->noMovieAudio) - (char*)this),
-            static_cast<size_t>((char*)(&this->noPBO) - (char*)this),
-            static_cast<size_t>((char*)(&this->swapScanlines) - (char*)this),
-            static_cast<size_t>((char*)(&this->noPackages) - (char*)this),
-            static_cast<size_t>((char*)(&this->noPrefs) - (char*)this),
-            static_cast<size_t>((char*)(&this->noRanges) - (char*)this),
-            static_cast<size_t>((char*)(&this->noSequence) - (char*)this),
-            static_cast<size_t>((char*)(&this->nofloat) - (char*)this),
-            static_cast<size_t>((char*)(&this->nomb) - (char*)this),
-            static_cast<size_t>((char*)(&this->nukeSequence) - (char*)this),
-            static_cast<size_t>((char*)(&this->over) - (char*)this),
-            static_cast<size_t>((char*)(&this->play) - (char*)this),
-            static_cast<size_t>((char*)(&this->playMode) - (char*)this),
-            static_cast<size_t>((char*)(&this->loopMode) - (char*)this),
-            static_cast<size_t>((char*)(&this->prefetch) - (char*)this),
-            static_cast<size_t>((char*)(&this->useThreadedUpload)
-                                - (char*)this),
-            static_cast<size_t>((char*)(&this->useAppleClientStorage)
-                                - (char*)this),
-            static_cast<size_t>((char*)(&this->progressiveSourceLoading)
-                                - (char*)this),
-            static_cast<size_t>((char*)(&this->qtdesktop) - (char*)this),
-            static_cast<size_t>((char*)(&this->rangeOffset) - (char*)this),
-            static_cast<size_t>((char*)(&this->rangeStart) - (char*)this),
-            static_cast<size_t>((char*)(&this->readerThreads) - (char*)this),
-            static_cast<size_t>((char*)(&this->workItemThreads) - (char*)this),
-            static_cast<size_t>((char*)(&this->rec709) - (char*)this),
-            static_cast<size_t>((char*)(&this->resetPrefs) - (char*)this),
-            static_cast<size_t>((char*)(&this->sRGB) - (char*)this),
-            static_cast<size_t>((char*)(&this->showCMS) - (char*)this),
-            static_cast<size_t>((char*)(&this->showFormats) - (char*)this),
-            static_cast<size_t>((char*)(&this->showVersion) - (char*)this),
-            static_cast<size_t>((char*)(&this->stylusAsMouse) - (char*)this),
-            static_cast<size_t>((char*)(&this->sync) - (char*)this),
-            static_cast<size_t>((char*)(&this->tgaIOMethod) - (char*)this),
-            static_cast<size_t>((char*)(&this->tgaIOSize) - (char*)this),
-            static_cast<size_t>((char*)(&this->tgaMaxAsync) - (char*)this),
-            static_cast<size_t>((char*)(&this->tiffIOMethod) - (char*)this),
-            static_cast<size_t>((char*)(&this->tiffIOSize) - (char*)this),
-            static_cast<size_t>((char*)(&this->tiffMaxAsync) - (char*)this),
-            static_cast<size_t>((char*)(&this->tile) - (char*)this),
-            static_cast<size_t>((char*)(&this->urlsReuseSession) - (char*)this),
-            static_cast<size_t>((char*)(&this->useCache) - (char*)this),
-            static_cast<size_t>((char*)(&this->useLCache) - (char*)this),
-            static_cast<size_t>((char*)(&this->usecli) - (char*)this),
-            static_cast<size_t>((char*)(&this->vsync) - (char*)this),
-            static_cast<size_t>((char*)(&this->wipes) - (char*)this),
-            static_cast<size_t>((char*)(&this->xl) - (char*)this),
-            static_cast<size_t>((char*)(&this->noBorders) - (char*)this),
-            static_cast<size_t>((char*)(&this->screen) - (char*)this),
-            static_cast<size_t>((char*)(&this->x) - (char*)this),
-            static_cast<size_t>((char*)(&this->y) - (char*)this),
-            static_cast<size_t>((char*)(&this->width) - (char*)this),
-            static_cast<size_t>((char*)(&this->height) - (char*)this),
-            static_cast<size_t>((char*)(&this->startupResize) - (char*)this),
-            static_cast<size_t>((char*)(&this->displayPriority) - (char*)this),
-            static_cast<size_t>((char*)(&this->audioPriority) - (char*)this),
-            static_cast<size_t>((char*)(&this->stereoSwapEyes) - (char*)this),
-            0};
+        size_t intoffsets[] = {static_cast<size_t>((char*)(&this->acachesize) - (char*)this),
+                               static_cast<size_t>((char*)(&this->aframesize) - (char*)this),
+                               static_cast<size_t>((char*)(&this->allowYUV) - (char*)this),
+                               static_cast<size_t>((char*)(&this->apple) - (char*)this),
+                               static_cast<size_t>((char*)(&this->audioNice) - (char*)this),
+                               static_cast<size_t>((char*)(&this->audioLayout) - (char*)this),
+                               static_cast<size_t>((char*)(&this->audioNoLock) - (char*)this),
+                               static_cast<size_t>((char*)(&this->audioScrub) - (char*)this),
+                               static_cast<size_t>((char*)(&this->audioPreRoll) - (char*)this),
+                               static_cast<size_t>((char*)(&this->audioOff) - (char*)this),
+                               static_cast<size_t>((char*)(&this->audioPrecision) - (char*)this),
+                               static_cast<size_t>((char*)(&this->autoRetime) - (char*)this),
+                               static_cast<size_t>((char*)(&this->bakeURL) - (char*)this),
+                               static_cast<size_t>((char*)(&this->cinIOMethod) - (char*)this),
+                               static_cast<size_t>((char*)(&this->cinIOSize) - (char*)this),
+                               static_cast<size_t>((char*)(&this->cinMaxAsync) - (char*)this),
+                               static_cast<size_t>((char*)(&this->cinalt) - (char*)this),
+                               static_cast<size_t>((char*)(&this->cinchroma) - (char*)this),
+                               static_cast<size_t>((char*)(&this->connectPort) - (char*)this),
+                               static_cast<size_t>((char*)(&this->cutInPoint) - (char*)this),
+                               static_cast<size_t>((char*)(&this->cutOutPoint) - (char*)this),
+                               static_cast<size_t>((char*)(&this->diff) - (char*)this),
+                               static_cast<size_t>((char*)(&this->dispAlphaBits) - (char*)this),
+                               static_cast<size_t>((char*)(&this->dispBlueBits) - (char*)this),
+                               static_cast<size_t>((char*)(&this->dispGreenBits) - (char*)this),
+                               static_cast<size_t>((char*)(&this->dispRedBits) - (char*)this),
+                               static_cast<size_t>((char*)(&this->dpxIOMethod) - (char*)this),
+                               static_cast<size_t>((char*)(&this->dpxIOSize) - (char*)this),
+                               static_cast<size_t>((char*)(&this->dpxMaxAsync) - (char*)this),
+                               static_cast<size_t>((char*)(&this->dpxchroma) - (char*)this),
+                               static_cast<size_t>((char*)(&this->encodeURL) - (char*)this),
+                               static_cast<size_t>((char*)(&this->exrIOMethod) - (char*)this),
+                               static_cast<size_t>((char*)(&this->exrIOSize) - (char*)this),
+                               static_cast<size_t>((char*)(&this->exrInherit) - (char*)this),
+                               static_cast<size_t>((char*)(&this->exrMaxAsync) - (char*)this),
+                               static_cast<size_t>((char*)(&this->exrNoOneChannel) - (char*)this),
+                               static_cast<size_t>((char*)(&this->exrReadWindowIsDisplayWindow) - (char*)this),
+                               static_cast<size_t>((char*)(&this->exrReadWindow) - (char*)this),
+                               static_cast<size_t>((char*)(&this->exrPlanar3Chan) - (char*)this),
+                               static_cast<size_t>((char*)(&this->exrStripAlpha) - (char*)this),
+                               static_cast<size_t>((char*)(&this->exrRGBA) - (char*)this),
+                               static_cast<size_t>((char*)(&this->exrcpus) - (char*)this),
+                               static_cast<size_t>((char*)(&this->newGLSLlutInterp) - (char*)this),
+                               static_cast<size_t>((char*)(&this->fullscreen) - (char*)this),
+                               static_cast<size_t>((char*)(&this->present) - (char*)this),
+                               static_cast<size_t>((char*)(&this->presentAudio) - (char*)this),
+                               static_cast<size_t>((char*)(&this->inferSequence) - (char*)this),
+                               static_cast<size_t>((char*)(&this->jpegIOMethod) - (char*)this),
+                               static_cast<size_t>((char*)(&this->jpegIOSize) - (char*)this),
+                               static_cast<size_t>((char*)(&this->jpegMaxAsync) - (char*)this),
+                               static_cast<size_t>((char*)(&this->jpegRGBA) - (char*)this),
+                               static_cast<size_t>((char*)(&this->lqt_decoder) - (char*)this),
+                               static_cast<size_t>((char*)(&this->maxbits) - (char*)this),
+                               static_cast<size_t>((char*)(&this->network) - (char*)this),
+                               static_cast<size_t>((char*)(&this->networkOnStartup) - (char*)this),
+                               static_cast<size_t>((char*)(&this->networkPerm) - (char*)this),
+                               static_cast<size_t>((char*)(&this->networkPort) - (char*)this),
+                               static_cast<size_t>((char*)(&this->noMovieAudio) - (char*)this),
+                               static_cast<size_t>((char*)(&this->noPBO) - (char*)this),
+                               static_cast<size_t>((char*)(&this->swapScanlines) - (char*)this),
+                               static_cast<size_t>((char*)(&this->noPackages) - (char*)this),
+                               static_cast<size_t>((char*)(&this->noPrefs) - (char*)this),
+                               static_cast<size_t>((char*)(&this->noRanges) - (char*)this),
+                               static_cast<size_t>((char*)(&this->noSequence) - (char*)this),
+                               static_cast<size_t>((char*)(&this->nofloat) - (char*)this),
+                               static_cast<size_t>((char*)(&this->nomb) - (char*)this),
+                               static_cast<size_t>((char*)(&this->nukeSequence) - (char*)this),
+                               static_cast<size_t>((char*)(&this->over) - (char*)this),
+                               static_cast<size_t>((char*)(&this->play) - (char*)this),
+                               static_cast<size_t>((char*)(&this->playMode) - (char*)this),
+                               static_cast<size_t>((char*)(&this->loopMode) - (char*)this),
+                               static_cast<size_t>((char*)(&this->prefetch) - (char*)this),
+                               static_cast<size_t>((char*)(&this->useThreadedUpload) - (char*)this),
+                               static_cast<size_t>((char*)(&this->useAppleClientStorage) - (char*)this),
+                               static_cast<size_t>((char*)(&this->progressiveSourceLoading) - (char*)this),
+                               static_cast<size_t>((char*)(&this->qtdesktop) - (char*)this),
+                               static_cast<size_t>((char*)(&this->rangeOffset) - (char*)this),
+                               static_cast<size_t>((char*)(&this->rangeStart) - (char*)this),
+                               static_cast<size_t>((char*)(&this->readerThreads) - (char*)this),
+                               static_cast<size_t>((char*)(&this->workItemThreads) - (char*)this),
+                               static_cast<size_t>((char*)(&this->rec709) - (char*)this),
+                               static_cast<size_t>((char*)(&this->resetPrefs) - (char*)this),
+                               static_cast<size_t>((char*)(&this->sRGB) - (char*)this),
+                               static_cast<size_t>((char*)(&this->showCMS) - (char*)this),
+                               static_cast<size_t>((char*)(&this->showFormats) - (char*)this),
+                               static_cast<size_t>((char*)(&this->showVersion) - (char*)this),
+                               static_cast<size_t>((char*)(&this->stylusAsMouse) - (char*)this),
+                               static_cast<size_t>((char*)(&this->sync) - (char*)this),
+                               static_cast<size_t>((char*)(&this->tgaIOMethod) - (char*)this),
+                               static_cast<size_t>((char*)(&this->tgaIOSize) - (char*)this),
+                               static_cast<size_t>((char*)(&this->tgaMaxAsync) - (char*)this),
+                               static_cast<size_t>((char*)(&this->tiffIOMethod) - (char*)this),
+                               static_cast<size_t>((char*)(&this->tiffIOSize) - (char*)this),
+                               static_cast<size_t>((char*)(&this->tiffMaxAsync) - (char*)this),
+                               static_cast<size_t>((char*)(&this->tile) - (char*)this),
+                               static_cast<size_t>((char*)(&this->urlsReuseSession) - (char*)this),
+                               static_cast<size_t>((char*)(&this->useCache) - (char*)this),
+                               static_cast<size_t>((char*)(&this->useLCache) - (char*)this),
+                               static_cast<size_t>((char*)(&this->usecli) - (char*)this),
+                               static_cast<size_t>((char*)(&this->vsync) - (char*)this),
+                               static_cast<size_t>((char*)(&this->wipes) - (char*)this),
+                               static_cast<size_t>((char*)(&this->xl) - (char*)this),
+                               static_cast<size_t>((char*)(&this->noBorders) - (char*)this),
+                               static_cast<size_t>((char*)(&this->screen) - (char*)this),
+                               static_cast<size_t>((char*)(&this->x) - (char*)this),
+                               static_cast<size_t>((char*)(&this->y) - (char*)this),
+                               static_cast<size_t>((char*)(&this->width) - (char*)this),
+                               static_cast<size_t>((char*)(&this->height) - (char*)this),
+                               static_cast<size_t>((char*)(&this->startupResize) - (char*)this),
+                               static_cast<size_t>((char*)(&this->displayPriority) - (char*)this),
+                               static_cast<size_t>((char*)(&this->audioPriority) - (char*)this),
+                               static_cast<size_t>((char*)(&this->stereoSwapEyes) - (char*)this),
+                               0};
 
-        size_t floatoffsets[] = {
-            static_cast<size_t>((char*)(&this->audioMaxCache) - (char*)this),
-            static_cast<size_t>((char*)(&this->audioMinCache) - (char*)this),
-            static_cast<size_t>((char*)(&this->audioOffset) - (char*)this),
-            static_cast<size_t>((char*)(&this->audioRate) - (char*)this),
-            static_cast<size_t>((char*)(&this->brightness) - (char*)this),
-            static_cast<size_t>((char*)(&this->cropX0) - (char*)this),
-            static_cast<size_t>((char*)(&this->cropX1) - (char*)this),
-            static_cast<size_t>((char*)(&this->cropY0) - (char*)this),
-            static_cast<size_t>((char*)(&this->cropY1) - (char*)this),
-            static_cast<size_t>((char*)(&this->defaultfps) - (char*)this),
-            static_cast<size_t>((char*)(&this->fps) - (char*)this),
-            static_cast<size_t>((char*)(&this->gamma) - (char*)this),
-            static_cast<size_t>((char*)(&this->lookback) - (char*)this),
-            static_cast<size_t>((char*)(&this->maxbwait) - (char*)this),
-            static_cast<size_t>((char*)(&this->maxcram) - (char*)this),
-            static_cast<size_t>((char*)(&this->maxlram) - (char*)this),
-            static_cast<size_t>((char*)(&this->maxvram) - (char*)this),
-            static_cast<size_t>((char*)(&this->pixelAspect) - (char*)this),
-            static_cast<size_t>((char*)(&this->scale) - (char*)this),
-            static_cast<size_t>((char*)(&this->stereoOffset) - (char*)this),
-            static_cast<size_t>((char*)(&this->rightEyeStereoOffset)
-                                - (char*)this),
-            static_cast<size_t>((char*)(&this->totalcram) - (char*)this),
-            static_cast<size_t>((char*)(&this->uncropH) - (char*)this),
-            static_cast<size_t>((char*)(&this->uncropW) - (char*)this),
-            static_cast<size_t>((char*)(&this->uncropX) - (char*)this),
-            static_cast<size_t>((char*)(&this->uncropY) - (char*)this),
-            static_cast<size_t>((char*)(&this->volume) - (char*)this),
-            static_cast<size_t>((char*)(&this->audioGlobalOffset)
-                                - (char*)this),
-            static_cast<size_t>((char*)(&this->audioDeviceLatency)
-                                - (char*)this),
-            0};
+        size_t floatoffsets[] = {static_cast<size_t>((char*)(&this->audioMaxCache) - (char*)this),
+                                 static_cast<size_t>((char*)(&this->audioMinCache) - (char*)this),
+                                 static_cast<size_t>((char*)(&this->audioOffset) - (char*)this),
+                                 static_cast<size_t>((char*)(&this->audioRate) - (char*)this),
+                                 static_cast<size_t>((char*)(&this->brightness) - (char*)this),
+                                 static_cast<size_t>((char*)(&this->cropX0) - (char*)this),
+                                 static_cast<size_t>((char*)(&this->cropX1) - (char*)this),
+                                 static_cast<size_t>((char*)(&this->cropY0) - (char*)this),
+                                 static_cast<size_t>((char*)(&this->cropY1) - (char*)this),
+                                 static_cast<size_t>((char*)(&this->defaultfps) - (char*)this),
+                                 static_cast<size_t>((char*)(&this->fps) - (char*)this),
+                                 static_cast<size_t>((char*)(&this->gamma) - (char*)this),
+                                 static_cast<size_t>((char*)(&this->lookback) - (char*)this),
+                                 static_cast<size_t>((char*)(&this->maxbwait) - (char*)this),
+                                 static_cast<size_t>((char*)(&this->maxcram) - (char*)this),
+                                 static_cast<size_t>((char*)(&this->maxlram) - (char*)this),
+                                 static_cast<size_t>((char*)(&this->maxvram) - (char*)this),
+                                 static_cast<size_t>((char*)(&this->pixelAspect) - (char*)this),
+                                 static_cast<size_t>((char*)(&this->scale) - (char*)this),
+                                 static_cast<size_t>((char*)(&this->stereoOffset) - (char*)this),
+                                 static_cast<size_t>((char*)(&this->rightEyeStereoOffset) - (char*)this),
+                                 static_cast<size_t>((char*)(&this->totalcram) - (char*)this),
+                                 static_cast<size_t>((char*)(&this->uncropH) - (char*)this),
+                                 static_cast<size_t>((char*)(&this->uncropW) - (char*)this),
+                                 static_cast<size_t>((char*)(&this->uncropX) - (char*)this),
+                                 static_cast<size_t>((char*)(&this->uncropY) - (char*)this),
+                                 static_cast<size_t>((char*)(&this->volume) - (char*)this),
+                                 static_cast<size_t>((char*)(&this->audioGlobalOffset) - (char*)this),
+                                 static_cast<size_t>((char*)(&this->audioDeviceLatency) - (char*)this),
+                                 0};
 
         {
             size_t* o = intoffsets;
@@ -1493,26 +1454,18 @@ namespace Rv
 
 #define CHAROUT(x) "# " << #x << " = " << (x ? x : "") << endl
 
-        out << CHAROUT(audioDevice) << CHAROUT(audioModule)
-            << CHAROUT(bgpattern) << CHAROUT(cinPixel) << CHAROUT(cmapString)
-            << CHAROUT(selectType) << CHAROUT(selectName)
-            << CHAROUT(mediaRepName) << CHAROUT(mediaRepSource) << CHAROUT(cms)
-            << CHAROUT(cmsDisplay) << CHAROUT(cmsSimulation)
-            << CHAROUT(compMode) << CHAROUT(connectHost) << CHAROUT(dispLUT)
-            << CHAROUT(dpxPixel) << CHAROUT(eval) << CHAROUT(fileCDL)
-            << CHAROUT(fileLUT) << CHAROUT(initscript) << CHAROUT(layoutMode)
-            << CHAROUT(licarg) << CHAROUT(lookCDL) << CHAROUT(lookLUT)
-            << CHAROUT(mistPixel) << CHAROUT(networkHost) << CHAROUT(networkTag)
-            << CHAROUT(preCacheLUT) << CHAROUT(presentData)
-            << CHAROUT(presentDevice) << CHAROUT(presentFormat)
-            << CHAROUT(qtcss) << CHAROUT(qtstyle) << CHAROUT(resampleMethod)
-            << CHAROUT(schedulePolicy) << CHAROUT(sessionType)
-            << CHAROUT(stereoMode) << CHAROUT(view) << CHAROUT(windowType);
+        out << CHAROUT(audioDevice) << CHAROUT(audioModule) << CHAROUT(bgpattern) << CHAROUT(cinPixel) << CHAROUT(cmapString)
+            << CHAROUT(selectType) << CHAROUT(selectName) << CHAROUT(mediaRepName) << CHAROUT(mediaRepSource) << CHAROUT(cms)
+            << CHAROUT(cmsDisplay) << CHAROUT(cmsSimulation) << CHAROUT(compMode) << CHAROUT(connectHost) << CHAROUT(dispLUT)
+            << CHAROUT(dpxPixel) << CHAROUT(eval) << CHAROUT(fileCDL) << CHAROUT(fileLUT) << CHAROUT(initscript) << CHAROUT(layoutMode)
+            << CHAROUT(licarg) << CHAROUT(lookCDL) << CHAROUT(lookLUT) << CHAROUT(mistPixel) << CHAROUT(networkHost) << CHAROUT(networkTag)
+            << CHAROUT(preCacheLUT) << CHAROUT(presentData) << CHAROUT(presentDevice) << CHAROUT(presentFormat) << CHAROUT(qtcss)
+            << CHAROUT(qtstyle) << CHAROUT(resampleMethod) << CHAROUT(schedulePolicy) << CHAROUT(sessionType) << CHAROUT(stereoMode)
+            << CHAROUT(view) << CHAROUT(windowType);
 
         for (int i = 0; i < sendEvents.size(); ++i)
         {
-            out << CHAROUT(sendEvents[i].name.c_str())
-                << CHAROUT(sendEvents[i].content.c_str());
+            out << CHAROUT(sendEvents[i].name.c_str()) << CHAROUT(sendEvents[i].content.c_str());
         }
     }
 

@@ -55,9 +55,7 @@ namespace TwkMovie
     void shutdownMovieSideCars(int sig)
     {
         boost::lock_guard<boost::mutex> lock(movieSideCarsRunning_mutex);
-        for (std::list<MovieSideCar*>::iterator it =
-                 movieSideCarsRunning.begin();
-             it != movieSideCarsRunning.end(); ++it)
+        for (std::list<MovieSideCar*>::iterator it = movieSideCarsRunning.begin(); it != movieSideCarsRunning.end(); ++it)
         {
             (*it)->shutdown();
         }
@@ -111,8 +109,7 @@ namespace TwkMovie
     namespace
     {
 
-        void decodeChannelInfoVector(const string& buffer,
-                                     TwkFB::FBInfo::ChannelInfoVector& v)
+        void decodeChannelInfoVector(const string& buffer, TwkFB::FBInfo::ChannelInfoVector& v)
         {
             vector<string> parts;
             split(parts, buffer, is_any_of(string(",")));
@@ -131,8 +128,7 @@ namespace TwkMovie
             }
         }
 
-        void decodeLayerInfoVector(const string& buffer,
-                                   TwkFB::FBInfo::LayerInfoVector& v)
+        void decodeLayerInfoVector(const string& buffer, TwkFB::FBInfo::LayerInfoVector& v)
         {
             vector<string> parts;
             split(parts, buffer, is_any_of(string("`")));
@@ -159,8 +155,7 @@ namespace TwkMovie
             }
         }
 
-        void decodeViewInfoVector(const string& buffer,
-                                  TwkFB::FBInfo::ViewInfoVector& v)
+        void decodeViewInfoVector(const string& buffer, TwkFB::FBInfo::ViewInfoVector& v)
         {
             vector<string> parts;
             split(parts, buffer, is_any_of(string("|")));
@@ -188,8 +183,7 @@ namespace TwkMovie
             }
         }
 
-        void decodeAudioChannelsVector(const string& buffer,
-                                       TwkAudio::ChannelsVector& v)
+        void decodeAudioChannelsVector(const string& buffer, TwkAudio::ChannelsVector& v)
         {
             vector<string> parts;
             split(parts, buffer, is_any_of(string("|")));
@@ -282,8 +276,7 @@ namespace TwkMovie
 
     void MovieSideCar::sendCommand(const string& cmd, const string& args)
     {
-        size_t size =
-            Message::newMessage("app    ", &cout, cmd, args, m_buffer);
+        size_t size = Message::newMessage("app    ", &cout, cmd, args, m_buffer);
 
 #ifdef TWK_SIDECAR_USE_QUEUE
         try
@@ -336,14 +329,11 @@ namespace TwkMovie
                 *m_buffer = 0;
                 returnSize = 0;
 
-                bool timedout = !m_responseQueue->timed_receive(
-                    m_buffer, Message::SizeInBytes(), returnSize, priority,
-                    timeout);
+                bool timedout = !m_responseQueue->timed_receive(m_buffer, Message::SizeInBytes(), returnSize, priority, timeout);
                 if (returnSize == 0)
                     m_buffer[0] = 0;
 
-                if (!timedout && returnSize > 0
-                    && !Message::isCommand(m_buffer))
+                if (!timedout && returnSize > 0 && !Message::isCommand(m_buffer))
                 {
                     cout << "SIDECAR MESSAGE: " << m_buffer << std::flush;
                 }
@@ -371,8 +361,7 @@ namespace TwkMovie
                 *m_buffer = 0;
                 returnSize = 0;
 
-                m_responseQueue->receive(m_buffer, Message::SizeInBytes(),
-                                         returnSize, priority);
+                m_responseQueue->receive(m_buffer, Message::SizeInBytes(), returnSize, priority);
 
                 if (returnSize == 0)
                     m_buffer[0] = 0;
@@ -402,8 +391,7 @@ namespace TwkMovie
                 m_sidecarProcess->waitForReadyRead();
             } while (!m_sidecarProcess->canReadLine());
 
-            size_t readBytes = m_sidecarProcess->readLine(
-                m_buffer, Message::SizeInBytes() - 1);
+            size_t readBytes = m_sidecarProcess->readLine(m_buffer, Message::SizeInBytes() - 1);
 
             if (Message::isCommand(m_buffer))
             {
@@ -419,8 +407,7 @@ namespace TwkMovie
         return Message::parseMessage("app    ", &cout, m_buffer);
     }
 
-    void MovieSideCar::preloadOpen(const std::string& filename,
-                                   const ReadRequest& request)
+    void MovieSideCar::preloadOpen(const std::string& filename, const ReadRequest& request)
     {
         // there's lots of interprocess communication going on during the open
         // process. let's not get into it, in separate threads, using the
@@ -429,8 +416,7 @@ namespace TwkMovie
         m_request = request;
     }
 
-    void MovieSideCar::postPreloadOpen(const MovieInfo& as,
-                                       const Movie::ReadRequest& request)
+    void MovieSideCar::postPreloadOpen(const MovieInfo& as, const Movie::ReadRequest& request)
     {
         Lock lock(m_mutex);
 
@@ -462,13 +448,11 @@ namespace TwkMovie
         {
             try
             {
-                m_commandQueue = new Queue(
-                    interprocess::create_only, m_commandQueueName.c_str(),
-                    Message::MaxInQueue(), Message::SizeInBytes());
+                m_commandQueue =
+                    new Queue(interprocess::create_only, m_commandQueueName.c_str(), Message::MaxInQueue(), Message::SizeInBytes());
 
-                m_responseQueue = new Queue(
-                    interprocess::create_only, m_responseQueueName.c_str(),
-                    Message::MaxInQueue(), Message::SizeInBytes());
+                m_responseQueue =
+                    new Queue(interprocess::create_only, m_responseQueueName.c_str(), Message::MaxInQueue(), Message::SizeInBytes());
 
                 break;
             }
@@ -488,9 +472,8 @@ namespace TwkMovie
 
         ostringstream cmd;
 
-        cmd << '"' << m_sidecarPath << '"' << " --command "
-            << m_commandQueueName << " --response " << m_responseQueueName
-            << " --pid " << TwkUtil::processID();
+        cmd << '"' << m_sidecarPath << '"' << " --command " << m_commandQueueName << " --response " << m_responseQueueName << " --pid "
+            << TwkUtil::processID();
 
         m_sidecarProcess = new QProcess();
         m_sidecarProcess->start(cmd.str().c_str());
@@ -499,9 +482,7 @@ namespace TwkMovie
         {
             delete m_sidecarProcess;
             m_sidecarProcess = 0;
-            TWK_THROW_STREAM(IOException,
-                             "MovieSideCar: failed to start sidecar "
-                                 << m_sidecarPath);
+            TWK_THROW_STREAM(IOException, "MovieSideCar: failed to start sidecar " << m_sidecarPath);
         }
 
         //
@@ -516,9 +497,7 @@ namespace TwkMovie
         if (response != Message::OK())
         {
             shutdown();
-            TWK_THROW_STREAM(
-                IOException,
-                "MovieSideCar: failed to get acknowledge from sidecar");
+            TWK_THROW_STREAM(IOException, "MovieSideCar: failed to get acknowledge from sidecar");
         }
 
         //
@@ -535,9 +514,7 @@ namespace TwkMovie
         {
             shutdown();
             cout << "ERROR: got " << response << endl;
-            TWK_THROW_STREAM(
-                IOException,
-                "MovieSideCar: sidecar does not support this version");
+            TWK_THROW_STREAM(IOException, "MovieSideCar: sidecar does not support this version");
         }
 
         //
@@ -560,9 +537,7 @@ namespace TwkMovie
         else if (response != Message::FileOpened())
         {
             shutdown();
-            TWK_THROW_STREAM(
-                IOException,
-                "MovieSideCar: unexpected response to Message::FileOpened");
+            TWK_THROW_STREAM(IOException, "MovieSideCar: unexpected response to Message::FileOpened");
         }
 
         addMovieSideCars(this);
@@ -590,8 +565,7 @@ namespace TwkMovie
             FrameBufferVector gfbs;
             TwkFB::IOgto gtoreader;
             TwkFB::FrameBufferIO::ReadRequest gfbrequest;
-            gtoreader.readImageInMemory(gfbs, m_imageRegion, m_imageRegionSize,
-                                        m_filename, gfbrequest);
+            gtoreader.readImageInMemory(gfbs, m_imageRegion, m_imageRegionSize, m_filename, gfbrequest);
 
             gfbs.front()->copyAttributesTo(&m_info.proxy);
             for (size_t i = 0; i < gfbs.size(); i++)
@@ -632,8 +606,7 @@ namespace TwkMovie
 
     bool MovieSideCar::canConvertAudioRate() const { return m_canConvertAudio; }
 
-    void MovieSideCar::imagesAtFrame(const ReadRequest& request,
-                                     FrameBufferVector& fbs)
+    void MovieSideCar::imagesAtFrame(const ReadRequest& request, FrameBufferVector& fbs)
     {
         string arg = Message::encodeMovieReadRequest(request);
 
@@ -658,8 +631,7 @@ namespace TwkMovie
             TwkFB::FrameBufferIO::ReadRequest fbrequest;
 
             // reader.readImageStream(fbs, instr, m_filename, fbrequest);
-            reader.readImageInMemory(fbs, m_imageRegion, size, m_filename,
-                                     fbrequest);
+            reader.readImageInMemory(fbs, m_imageRegion, size, m_filename, fbrequest);
 
             for (size_t i = 0; i < fbs.size(); i++)
             {
@@ -671,9 +643,7 @@ namespace TwkMovie
         }
         else if (response == Message::Throw())
         {
-            TWK_THROW_STREAM(
-                IOException,
-                "MovieSideCar: sidecar threw on read: " << r.second);
+            TWK_THROW_STREAM(IOException, "MovieSideCar: sidecar threw on read: " << r.second);
         }
     }
 
@@ -687,8 +657,7 @@ namespace TwkMovie
         o << frame << ":" << m_filename;
     }
 
-    void MovieSideCar::identifiersAtFrame(const ReadRequest& request,
-                                          IdentifierVector& ids)
+    void MovieSideCar::identifiersAtFrame(const ReadRequest& request, IdentifierVector& ids)
     {
         ostringstream str;
         identifier(request.frame, str);
@@ -696,24 +665,18 @@ namespace TwkMovie
         ids.push_back(str.str());
     }
 
-    size_t MovieSideCar::audioFillBuffer(const AudioReadRequest& request,
-                                         AudioBuffer& buffer)
+    size_t MovieSideCar::audioFillBuffer(const AudioReadRequest& request, AudioBuffer& buffer)
     {
 
         ostringstream str;
-        str << request.startTime << "|" << request.duration << "|"
-            << request.margin;
+        str << request.startTime << "|" << request.duration << "|" << request.margin;
 
         const long margin = request.startTime == 0 ? 0 : request.margin;
-        const long start =
-            long(request.startTime * m_info.audioSampleRate + .49) - margin;
-        size_t num =
-            long(request.duration * m_info.audioSampleRate + .49) + margin * 2;
+        const long start = long(request.startTime * m_info.audioSampleRate + .49) - margin;
+        size_t num = long(request.duration * m_info.audioSampleRate + .49) + margin * 2;
 
         buffer.ownData();
-        buffer.reconfigure(num - 2 * request.margin, m_info.audioChannels,
-                           m_canConvertAudio ? buffer.rate()
-                                             : m_info.audioSampleRate,
+        buffer.reconfigure(num - 2 * request.margin, m_info.audioChannels, m_canConvertAudio ? buffer.rate() : m_info.audioSampleRate,
                            request.startTime, margin);
 
         Lock lock(m_mutex);
@@ -862,12 +825,9 @@ namespace TwkMovie
             istr >> m_audioRegionSize;
         }
 
-        m_sharedObject = new SharedMemory(interprocess::open_only,
-                                          m_sharedObjectName.c_str(),
-                                          interprocess::read_only);
+        m_sharedObject = new SharedMemory(interprocess::open_only, m_sharedObjectName.c_str(), interprocess::read_only);
 
-        m_sharedRegion =
-            new MappedRegion(*m_sharedObject, interprocess::read_only);
+        m_sharedRegion = new MappedRegion(*m_sharedObject, interprocess::read_only);
 
         m_imageRegion = ((char*)m_sharedRegion->get_address()) + imageOffet;
         m_audioRegion = ((char*)m_sharedRegion->get_address()) + audioOffset;

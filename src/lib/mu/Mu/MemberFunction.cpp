@@ -20,9 +20,7 @@ namespace Mu
         _method = true;
     }
 
-    MemberFunction::MemberFunction(Context* context, const char* name,
-                                   NodeFunc func,
-                                   Function::Attributes attributes, ...)
+    MemberFunction::MemberFunction(Context* context, const char* name, NodeFunc func, Function::Attributes attributes, ...)
         : Function(context, name)
         , _offset(0)
     {
@@ -34,9 +32,7 @@ namespace Mu
         va_end(ap);
     }
 
-    MemberFunction::MemberFunction(Context* context, const char* name,
-                                   const Type* returnType, int nparams,
-                                   ParameterVariable** v, Node* n,
+    MemberFunction::MemberFunction(Context* context, const char* name, const Type* returnType, int nparams, ParameterVariable** v, Node* n,
                                    Attributes attributes)
         : Function(context, name, returnType, nparams, v, n, attributes)
         , _offset(0)
@@ -45,10 +41,8 @@ namespace Mu
         _destructor = attributes & Destructor;
     }
 
-    MemberFunction::MemberFunction(Context* context, const char* name,
-                                   const Type* returnType, int nparams,
-                                   ParameterVariable** v, NodeFunc f,
-                                   Attributes attributes)
+    MemberFunction::MemberFunction(Context* context, const char* name, const Type* returnType, int nparams, ParameterVariable** v,
+                                   NodeFunc f, Attributes attributes)
         : Function(context, name, returnType, nparams, v, f, attributes)
         , _offset(0)
     {
@@ -64,20 +58,11 @@ namespace Mu
         o << " (member)";
     }
 
-    bool MemberFunction::isConstructor() const
-    {
-        return name() == scope()->name();
-    }
+    bool MemberFunction::isConstructor() const { return name() == scope()->name(); }
 
-    Class* MemberFunction::memberClass()
-    {
-        return dynamic_cast<Class*>(scope());
-    }
+    Class* MemberFunction::memberClass() { return dynamic_cast<Class*>(scope()); }
 
-    const Class* MemberFunction::memberClass() const
-    {
-        return dynamic_cast<const Class*>(scope());
-    }
+    const Class* MemberFunction::memberClass() const { return dynamic_cast<const Class*>(scope()); }
 
     bool MemberFunction::matches(const Function* f) const
     {
@@ -102,8 +87,7 @@ namespace Mu
         return false;
     }
 
-    void
-    MemberFunction::findOverridingFunctions(MemberFunctionVector& funcs) const
+    void MemberFunction::findOverridingFunctions(MemberFunctionVector& funcs) const
     {
         const Class* c = memberClass();
         c->findOverridingFunctions(this, funcs);

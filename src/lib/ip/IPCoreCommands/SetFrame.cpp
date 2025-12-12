@@ -14,18 +14,14 @@ namespace IPCore
     {
         using namespace std;
 
-        SetFrameInfo::SetFrameInfo(const string& n,
-                                   TwkApp::CommandInfo::UndoType t)
+        SetFrameInfo::SetFrameInfo(const string& n, TwkApp::CommandInfo::UndoType t)
             : CommandInfo(n, t)
         {
         }
 
         SetFrameInfo::~SetFrameInfo() {}
 
-        TwkApp::Command* SetFrameInfo::newCommand() const
-        {
-            return new SetFrame(this);
-        }
+        TwkApp::Command* SetFrameInfo::newCommand() const { return new SetFrame(this); }
 
         //----------------------------------------------------------------------
 

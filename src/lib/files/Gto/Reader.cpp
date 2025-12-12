@@ -88,8 +88,7 @@ namespace Gto
         {
             readMagicNumber();
 
-            if (m_header.magic != Header::Magic
-                && m_header.magic != Header::Cigam)
+            if (m_header.magic != Header::Magic && m_header.magic != Header::Cigam)
             {
                 return false;
             }
@@ -116,8 +115,7 @@ namespace Gto
         {
             readMagicNumber();
 
-            if (m_header.magic != Header::Magic
-                && m_header.magic != Header::Cigam)
+            if (m_header.magic != Header::Magic && m_header.magic != Header::Cigam)
             {
                 i.seekg(0, std::ios::beg);
                 return readTextGTO();
@@ -209,8 +207,7 @@ namespace Gto
 
         readMagicNumber();
 
-        if (m_header.magic == Header::MagicText
-            || m_header.magic == Header::CigamText)
+        if (m_header.magic == Header::MagicText || m_header.magic == Header::CigamText)
         {
             close();
 #ifdef _MSC_VER
@@ -290,21 +287,11 @@ namespace Gto
 
     void Reader::header(const Header&) {}
 
-    Reader::Request Reader::object(const string&, const string&, unsigned int,
-                                   const ObjectInfo&)
-    {
-        return Request(true);
-    }
+    Reader::Request Reader::object(const string&, const string&, unsigned int, const ObjectInfo&) { return Request(true); }
 
-    Reader::Request Reader::component(const string&, const ComponentInfo&)
-    {
-        return Request(true);
-    }
+    Reader::Request Reader::component(const string&, const ComponentInfo&) { return Request(true); }
 
-    Reader::Request Reader::property(const string&, const PropertyInfo&)
-    {
-        return Request(true);
-    }
+    Reader::Request Reader::property(const string&, const PropertyInfo&) { return Request(true); }
 
     void* Reader::data(const PropertyInfo&, size_t) { return 0; }
 
@@ -312,15 +299,13 @@ namespace Gto
 
     void Reader::descriptionComplete() {}
 
-    Reader::Request Reader::component(const string& name, const string& interp,
-                                      const ComponentInfo& c)
+    Reader::Request Reader::component(const string& name, const string& interp, const ComponentInfo& c)
     {
         // make it backwards compatible with version 2
         return component(name, c);
     }
 
-    Reader::Request Reader::property(const string& name, const string& interp,
-                                     const PropertyInfo& p)
+    Reader::Request Reader::property(const string& name, const string& interp, const PropertyInfo& p)
     {
         // make it backwards compatible with version 2
         return property(name, p);
@@ -370,8 +355,7 @@ namespace Gto
 
     void Reader::readHeader()
     {
-        read((char*)&m_header + sizeof(uint32),
-             sizeof(Header) - sizeof(uint32));
+        read((char*)&m_header + sizeof(uint32), sizeof(Header) - sizeof(uint32));
 
         if (m_error)
             return;
@@ -390,14 +374,11 @@ namespace Gto
             return;
         }
 
-        if (m_header.version != GTO_VERSION && m_header.version != 3
-            && m_header.version != 2)
+        if (m_header.version != GTO_VERSION && m_header.version != 3 && m_header.version != 2)
         {
             fail("version mismatch");
-            cerr << "ERROR: Gto::Reader: gto file version == "
-                 << m_header.version
-                 << ", which is not readable by this version (v" << GTO_VERSION
-                 << ")\n";
+            cerr << "ERROR: Gto::Reader: gto file version == " << m_header.version << ", which is not readable by this version (v"
+                 << GTO_VERSION << ")\n";
             return;
         }
 
@@ -473,9 +454,7 @@ namespace Gto
             }
             else if (!(m_mode & RandomAccess))
             {
-                Request r =
-                    object(stringFromId(o.name), stringFromId(o.protocolName),
-                           o.protocolVersion, o);
+                Request r = object(stringFromId(o.name), stringFromId(o.protocolName), o.protocolVersion, o);
 
                 o.requested = r.m_want;
                 o.objectData = r.m_data;
@@ -519,8 +498,7 @@ namespace Gto
                 c.parent = NULL;
                 poffset += c.numProperties;
 
-                for (size_t ioffset = 1; c.parent == 0 && ioffset <= q;
-                     ioffset++)
+                for (size_t ioffset = 1; c.parent == 0 && ioffset <= q; ioffset++)
                 {
                     const size_t index = m_components.size() - ioffset;
 
@@ -549,8 +527,7 @@ namespace Gto
                     if (m_error)
                         return;
 
-                    Request r = component(stringFromId(c.name),
-                                          stringFromId(c.interpretation), c);
+                    Request r = component(stringFromId(c.name), stringFromId(c.interpretation), c);
 
                     c.requested = r.m_want;
                     c.componentData = r.m_data;
@@ -567,8 +544,7 @@ namespace Gto
 
     void Reader::readProperties()
     {
-        for (Components::iterator i = m_components.begin();
-             i != m_components.end(); ++i)
+        for (Components::iterator i = m_components.begin(); i != m_components.end(); ++i)
         {
             const ComponentInfo& c = *i;
 
@@ -581,8 +557,7 @@ namespace Gto
                     PropertyHeader_v2 pv2;
                     read((char*)&pv2, sizeof(PropertyHeader_v2));
                     if (m_swapped)
-                        swapWords(&pv2,
-                                  sizeof(PropertyHeader_v2) / sizeof(uint32));
+                        swapWords(&pv2, sizeof(PropertyHeader_v2) / sizeof(uint32));
 
                     p.name = pv2.name;
                     p.size = pv2.size;
@@ -598,8 +573,7 @@ namespace Gto
                     PropertyHeader_v3 pv3;
                     read((char*)&pv3, sizeof(PropertyHeader_v3));
                     if (m_swapped)
-                        swapWords(&pv3,
-                                  sizeof(PropertyHeader_v3) / sizeof(uint32));
+                        swapWords(&pv3, sizeof(PropertyHeader_v3) / sizeof(uint32));
 
                     p.name = pv3.name;
                     p.size = pv3.size;
@@ -632,8 +606,7 @@ namespace Gto
                     if (m_error)
                         return;
 
-                    Request r = property(stringFromId(p.name),
-                                         stringFromId(p.interpretation), p);
+                    Request r = property(stringFromId(p.name), stringFromId(p.interpretation), p);
 
                     p.requested = r.m_want;
                     p.propertyData = r.m_data;
@@ -650,8 +623,7 @@ namespace Gto
 
     bool Reader::accessProperty(PropertyInfo& p)
     {
-        Request r =
-            property(stringFromId(p.name), stringFromId(p.interpretation), p);
+        Request r = property(stringFromId(p.name), stringFromId(p.interpretation), p);
 
         p.requested = r.m_want;
         p.propertyData = r.m_data;
@@ -688,8 +660,7 @@ namespace Gto
 
     bool Reader::accessObject(ObjectInfo& o)
     {
-        Request r = object(stringFromId(o.name), stringFromId(o.protocolName),
-                           o.protocolVersion, o);
+        Request r = object(stringFromId(o.name), stringFromId(o.protocolName), o.protocolVersion, o);
 
         o.requested = r.m_want;
         o.objectData = r.m_data;
@@ -752,23 +723,19 @@ namespace Gto
 
         Properties::iterator p = m_properties.begin();
 
-        for (Components::iterator i = m_components.begin();
-             i != m_components.end(); ++i)
+        for (Components::iterator i = m_components.begin(); i != m_components.end(); ++i)
         {
             ComponentInfo& comp = *i;
 
             if (comp.flags & Gto::Transposed)
             {
-                cerr << "ERROR: Transposed data for '"
-                     << stringFromId(comp.object->name) << "."
-                     << stringFromId(comp.name) << "' is currently unsupported."
-                     << endl;
+                cerr << "ERROR: Transposed data for '" << stringFromId(comp.object->name) << "." << stringFromId(comp.name)
+                     << "' is currently unsupported." << endl;
                 abort();
             }
             else
             {
-                for (Properties::iterator e = p + comp.numProperties; p != e;
-                     ++p)
+                for (Properties::iterator e = p + comp.numProperties; p != e; ++p)
                 {
                     if (!readProperty(*p))
                     {
@@ -922,8 +889,7 @@ namespace Gto
                 if (retval <= 0)
                 {
                     int zError = 0;
-                    std::cerr
-                        << "ERROR: Gto::Reader: Failed to read gto file: ";
+                    std::cerr << "ERROR: Gto::Reader: Failed to read gto file: ";
 #if ZLIB_VERNUM >= UPDATED_ZLIB_VERNUM
                     std::cerr << gzerror((gzFile_s*)m_gzfile, &zError);
 #else
@@ -1117,15 +1083,13 @@ namespace Gto
         //  when STL allocates new memory.
         //
 
-        if ((m_objects.size() > 0)
-            && (m_objects.capacity() <= m_objects.size()))
+        if ((m_objects.size() > 0) && (m_objects.capacity() <= m_objects.size()))
         {
             const ObjectInfo* startAddress = &m_objects.front();
             m_objects.push_back(info);
             const ObjectInfo* newStartAddress = &m_objects.front();
 
-            for (Components::iterator i = m_components.begin();
-                 i != m_components.end(); ++i)
+            for (Components::iterator i = m_components.begin(); i != m_components.end(); ++i)
             {
                 size_t offset = i->object - startAddress;
                 i->object = newStartAddress + offset;
@@ -1143,22 +1107,19 @@ namespace Gto
         //  See addObject coments
         //
 
-        if ((m_components.size() > 0)
-            && (m_components.capacity() <= m_components.size()))
+        if ((m_components.size() > 0) && (m_components.capacity() <= m_components.size()))
         {
             const ComponentInfo* startAddress = &m_components.front();
             m_components.push_back(info);
             const ComponentInfo* newStartAddress = &m_components.front();
 
-            for (Properties::iterator i = m_properties.begin();
-                 i != m_properties.end(); ++i)
+            for (Properties::iterator i = m_properties.begin(); i != m_properties.end(); ++i)
             {
                 size_t offset = i->component - startAddress;
                 i->component = newStartAddress + offset;
             }
 
-            for (Components::iterator i = m_components.begin();
-                 i != m_components.end(); ++i)
+            for (Components::iterator i = m_components.begin(); i != m_components.end(); ++i)
             {
                 size_t offset = i->parent - startAddress;
                 i->parent = newStartAddress + offset;
@@ -1170,8 +1131,7 @@ namespace Gto
         }
     }
 
-    void Reader::beginObject(unsigned int name, unsigned int proto,
-                             unsigned int version)
+    void Reader::beginObject(unsigned int name, unsigned int proto, unsigned int version)
     {
         ObjectInfo info;
         info.name = name;
@@ -1181,8 +1141,7 @@ namespace Gto
         info.pad = 0;
         info.coffset = 0;
 
-        Request r =
-            object(stringFromId(name), stringFromId(proto), version, info);
+        Request r = object(stringFromId(name), stringFromId(proto), version, info);
 
         info.requested = r.want();
         info.objectData = r.data();
@@ -1220,8 +1179,7 @@ namespace Gto
 
         if (info.object->requested)
         {
-            Request r =
-                component(stringFromId(nameID), stringFromId(interpID), info);
+            Request r = component(stringFromId(nameID), stringFromId(interpID), info);
 
             info.requested = r.want();
             info.componentData = r.data();
@@ -1241,9 +1199,7 @@ namespace Gto
         m_indexStack.pop_back();
     }
 
-    void Reader::beginProperty(unsigned int name, unsigned int interp,
-                               unsigned int size, DataType type,
-                               const Dimensions& dims)
+    void Reader::beginProperty(unsigned int name, unsigned int interp, unsigned int size, DataType type, const Dimensions& dims)
     {
         PropertyInfo info;
         info.name = name;
@@ -1266,8 +1222,7 @@ namespace Gto
 
         if (info.component->requested)
         {
-            Request r =
-                property(stringFromId(name), stringFromId(interp), info);
+            Request r = property(stringFromId(name), stringFromId(interp), info);
 
             info.requested = r.want();
             info.propertyData = r.data();
@@ -1281,20 +1236,13 @@ namespace Gto
         m_properties.push_back(info);
     }
 
-    size_t Reader::numAtomicValuesInBuffer() const
-    {
-        return m_buffer.size() / dataSizeInBytes(m_currentType.type);
-    }
+    size_t Reader::numAtomicValuesInBuffer() const { return m_buffer.size() / dataSizeInBytes(m_currentType.type); }
 
-    size_t Reader::numElementsInBuffer() const
-    {
-        return numAtomicValuesInBuffer() / elementSize(m_currentType);
-    }
+    size_t Reader::numElementsInBuffer() const { return numAtomicValuesInBuffer() / elementSize(m_currentType); }
 
     void Reader::fillToSize(size_t size)
     {
-        size_t esize =
-            dataSizeInBytes(m_currentType.type) * elementSize(m_currentType);
+        size_t esize = dataSizeInBytes(m_currentType.type) * elementSize(m_currentType);
 
         ByteArray element(esize);
 
@@ -1308,14 +1256,14 @@ namespace Gto
 
     void Reader::parseError(const char* msg)
     {
-        cerr << "ERROR: parsing GTO file \"" << infileName() << "\" at line "
-             << linenum() << ", char " << charnum() << " : " << msg << endl;
+        cerr << "ERROR: parsing GTO file \"" << infileName() << "\" at line " << linenum() << ", char " << charnum() << " : " << msg
+             << endl;
     }
 
     void Reader::parseWarning(const char* msg)
     {
-        cerr << "WARNING: parsing GTO file \"" << infileName() << "\" at line "
-             << linenum() << ", char " << charnum() << " : " << msg << endl;
+        cerr << "WARNING: parsing GTO file \"" << infileName() << "\" at line " << linenum() << ", char " << charnum() << " : " << msg
+             << endl;
     }
 
     void Reader::endProperty()

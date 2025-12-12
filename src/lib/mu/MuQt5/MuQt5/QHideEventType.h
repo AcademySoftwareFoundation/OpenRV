@@ -34,8 +34,7 @@ namespace Mu
         //  Constructors
         //
 
-        QHideEventType(Context* context, const char* name,
-                       Class* superClass = 0);
+        QHideEventType(Context* context, const char* name, Class* superClass = 0);
         virtual ~QHideEventType();
 
         //

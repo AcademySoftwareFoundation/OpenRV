@@ -57,37 +57,25 @@ namespace TwkAudio
     ///
 
 #ifdef WIN32
-    typedef ptrdiff_t
-        SampleTime; // should be signed size_t, may need to use ptrdiff_t
+    typedef ptrdiff_t SampleTime; // should be signed size_t, may need to use ptrdiff_t
 #else
-    typedef ssize_t
-        SampleTime; // should be signed size_t, may need to use ptrdiff_t
+    typedef ssize_t SampleTime; // should be signed size_t, may need to use ptrdiff_t
 #endif
 
     /// Convert sample count to Audio Time
 
-    inline Time samplesToTime(SampleTime samples, Time rate)
-    {
-        return double(samples) / rate;
-    }
+    inline Time samplesToTime(SampleTime samples, Time rate) { return double(samples) / rate; }
 
-    inline Time samplesToTime(size_t samples, Time rate)
-    {
-        return double(samples) / rate;
-    }
+    inline Time samplesToTime(size_t samples, Time rate) { return double(samples) / rate; }
 
     /// Convert Audio Time to sample count. Make sure to round "down" for
     /// negative times
 
-    inline SampleTime timeToSamples(Time t, Time rate)
-    {
-        return SampleTime((t < 0) ? t * rate - 0.49 : t * rate + 0.49);
-    }
+    inline SampleTime timeToSamples(Time t, Time rate) { return SampleTime((t < 0) ? t * rate - 0.49 : t * rate + 0.49); }
 
     /// SampleVector is the native storage for audio samples
 
-    typedef std::vector<float, stl_ext::replacement_allocator<float>>
-        SampleVector;
+    typedef std::vector<float, stl_ext::replacement_allocator<float>> SampleVector;
 
     // typedef std::vector<float> SampleVector;
 
@@ -141,19 +129,16 @@ namespace TwkAudio
         /// separately via margin).
         ///
 
-        AudioBuffer(size_t numSamples, ChannelsVector channels, Time rate,
-                    Time startTime = 0, size_t margin = 0);
+        AudioBuffer(size_t numSamples, ChannelsVector channels, Time rate, Time startTime = 0, size_t margin = 0);
 
-        AudioBuffer(size_t numSamples, TwkAudio::Layout layout, Time rate,
-                    Time startTime = 0, size_t margin = 0);
+        AudioBuffer(size_t numSamples, TwkAudio::Layout layout, Time rate, Time startTime = 0, size_t margin = 0);
 
         ///
         /// This constructor variation uses Time instead of exact
         /// samples. The start and duration should not include the margin.
         ///
 
-        AudioBuffer(Time start, Time duration, Time rate,
-                    ChannelsVector channels, size_t margin = 0);
+        AudioBuffer(Time start, Time duration, Time rate, ChannelsVector channels, size_t margin = 0);
 
         ///
         /// This constructor allows external memory to be used. If you
@@ -165,9 +150,7 @@ namespace TwkAudio
         /// margin.
         ///
 
-        AudioBuffer(BufferPointer externalMemory, ChannelsVector channels,
-                    size_t numSamples, Time start, Time rate,
-                    size_t margin = 0);
+        AudioBuffer(BufferPointer externalMemory, ChannelsVector channels, size_t numSamples, Time start, Time rate, size_t margin = 0);
 
         ///
         /// Create an AudioBuffer that's a window into another. The passed in
@@ -175,8 +158,7 @@ namespace TwkAudio
         /// outlive the lifetime of this one.
         ///
 
-        AudioBuffer(AudioBuffer& inbuffer, size_t startOffsetSample,
-                    size_t numSamples, Time startTime = 0);
+        AudioBuffer(AudioBuffer& inbuffer, size_t startOffsetSample, size_t numSamples, Time startTime = 0);
 
         ~AudioBuffer() {}
 
@@ -185,11 +167,9 @@ namespace TwkAudio
         ///  locally. numSamples should not include the margin.
         ///
 
-        void reconfigure(size_t numSamples, ChannelsVector channels, Time rate,
-                         Time startTime = 0, size_t margin = 0);
+        void reconfigure(size_t numSamples, ChannelsVector channels, Time rate, Time startTime = 0, size_t margin = 0);
 
-        void reconfigure(size_t numSamples, TwkAudio::Layout layout, Time rate,
-                         Time startTime = 0, size_t margin = 0);
+        void reconfigure(size_t numSamples, TwkAudio::Layout layout, Time rate, Time startTime = 0, size_t margin = 0);
 
         ///
         /// Raw pointer access
@@ -201,10 +181,7 @@ namespace TwkAudio
 
         BufferPointer pointerIncludingMargin() { return m_data - m_margin; }
 
-        const BufferPointer pointerIncludingMargin() const
-        {
-            return m_data - m_margin;
-        }
+        const BufferPointer pointerIncludingMargin() const { return m_data - m_margin; }
 
         ///
         /// Returns the margin value (in samples) on either side of the
@@ -243,29 +220,19 @@ namespace TwkAudio
         /// Size in samples (including margin)
         ///
 
-        size_t sizeIncludingMargin() const
-        {
-            return m_numSamples + 2 * m_margin;
-        }
+        size_t sizeIncludingMargin() const { return m_numSamples + 2 * m_margin; }
 
         ///
         /// Size in bytes. Does not include the margin.
         ///
 
-        size_t sizeInBytes() const
-        {
-            return m_numSamples * m_channels.size() * sizeof(float);
-        }
+        size_t sizeInBytes() const { return m_numSamples * m_channels.size() * sizeof(float); }
 
         ///
         /// Size in bytes. Including the margin.
         ///
 
-        size_t sizeInBytesIncludingMargin() const
-        {
-            return (m_numSamples + 2 * m_margin) * m_channels.size()
-                   * sizeof(float);
-        }
+        size_t sizeInBytesIncludingMargin() const { return (m_numSamples + 2 * m_margin) * m_channels.size() * sizeof(float); }
 
         ///
         /// Number of floats in buffer (samples * channels). Does not
@@ -279,10 +246,7 @@ namespace TwkAudio
         /// the margin.
         ///
 
-        size_t sizeInFloatsIncludingMargin() const
-        {
-            return (m_numSamples + 2 * m_margin) * m_channels.size();
-        }
+        size_t sizeInFloatsIncludingMargin() const { return (m_numSamples + 2 * m_margin) * m_channels.size(); }
 
         ///
         ///  Derived length in seconds. Does not include the margin
@@ -303,10 +267,7 @@ namespace TwkAudio
         /// the time value. Does not include the margin.
         ///
 
-        SampleTime startSample() const
-        {
-            return timeToSamples(m_startTime, m_rate);
-        }
+        SampleTime startSample() const { return timeToSamples(m_startTime, m_rate); }
 
         ///
         /// Setting buffer state
@@ -338,10 +299,7 @@ namespace TwkAudio
         /// Resize calls reconfigure. Preserves margins.
         ///
 
-        void resize(size_t numSamples)
-        {
-            reconfigure(numSamples, m_channels, m_rate, m_startTime, m_margin);
-        }
+        void resize(size_t numSamples) { reconfigure(numSamples, m_channels, m_rate, m_startTime, m_margin); }
 
         ///
         /// Is the data local to this object
@@ -373,12 +331,12 @@ namespace TwkAudio
         bool checkBuffer(const char* label = "") const;
 
     private:
-        BufferPointer m_data;  /// Pointer to the data (could be external)
-        size_t m_numSamples;   /// Only if external data is used
-        SampleVector m_buffer; /// internal buffer (if not external memory)
-        Time m_rate;           /// Rate in samples / second
-        Time m_startTime;      /// Start time in seconds
-        size_t m_margin;       /// additional margin samples at head and tail
+        BufferPointer m_data;      /// Pointer to the data (could be external)
+        size_t m_numSamples;       /// Only if external data is used
+        SampleVector m_buffer;     /// internal buffer (if not external memory)
+        Time m_rate;               /// Rate in samples / second
+        Time m_startTime;          /// Start time in seconds
+        size_t m_margin;           /// additional margin samples at head and tail
         ChannelsVector m_channels; /// named channel order used to mix buffers
     };
 

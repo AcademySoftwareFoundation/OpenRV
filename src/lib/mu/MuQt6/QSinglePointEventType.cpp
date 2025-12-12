@@ -42,8 +42,7 @@ namespace Mu
 {
     using namespace std;
 
-    QSinglePointEventType::QSinglePointEventType(Context* c, const char* name,
-                                                 Class* super)
+    QSinglePointEventType::QSinglePointEventType(Context* c, const char* name, Class* super)
         : Class(c, name, super)
     {
     }
@@ -53,128 +52,100 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    int
-    qt_QSinglePointEvent_button_int_QSinglePointEvent(Mu::Thread& NODE_THREAD,
-                                                      Pointer param_this)
+    int qt_QSinglePointEvent_button_int_QSinglePointEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-        QSinglePointEvent* arg0 =
-            getqpointer<QSinglePointEventType>(param_this);
+        QSinglePointEvent* arg0 = getqpointer<QSinglePointEventType>(param_this);
         return int(arg0->button());
     }
 
-    int
-    qt_QSinglePointEvent_buttons_int_QSinglePointEvent(Mu::Thread& NODE_THREAD,
-                                                       Pointer param_this)
+    int qt_QSinglePointEvent_buttons_int_QSinglePointEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-        QSinglePointEvent* arg0 =
-            getqpointer<QSinglePointEventType>(param_this);
+        QSinglePointEvent* arg0 = getqpointer<QSinglePointEventType>(param_this);
         return int(arg0->buttons());
     }
 
-    Pointer qt_QSinglePointEvent_globalPosition_QPointF_QSinglePointEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QSinglePointEvent_globalPosition_QPointF_QSinglePointEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-        QSinglePointEvent* arg0 =
-            getqpointer<QSinglePointEventType>(param_this);
+        QSinglePointEvent* arg0 = getqpointer<QSinglePointEventType>(param_this);
         return makeqtype<QPointFType>(c, arg0->globalPosition(), "qt.QPointF");
     }
 
-    Pointer qt_QSinglePointEvent_position_QPointF_QSinglePointEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QSinglePointEvent_position_QPointF_QSinglePointEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-        QSinglePointEvent* arg0 =
-            getqpointer<QSinglePointEventType>(param_this);
+        QSinglePointEvent* arg0 = getqpointer<QSinglePointEventType>(param_this);
         return makeqtype<QPointFType>(c, arg0->position(), "qt.QPointF");
     }
 
-    Pointer qt_QSinglePointEvent_scenePosition_QPointF_QSinglePointEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QSinglePointEvent_scenePosition_QPointF_QSinglePointEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-        QSinglePointEvent* arg0 =
-            getqpointer<QSinglePointEventType>(param_this);
+        QSinglePointEvent* arg0 = getqpointer<QSinglePointEventType>(param_this);
         return makeqtype<QPointFType>(c, arg0->scenePosition(), "qt.QPointF");
     }
 
-    bool qt_QSinglePointEvent_isBeginEvent_bool_QSinglePointEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    bool qt_QSinglePointEvent_isBeginEvent_bool_QSinglePointEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-        QSinglePointEvent* arg0 =
-            getqpointer<QSinglePointEventType>(param_this);
+        QSinglePointEvent* arg0 = getqpointer<QSinglePointEventType>(param_this);
         return arg0->isBeginEvent();
     }
 
-    bool qt_QSinglePointEvent_isEndEvent_bool_QSinglePointEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    bool qt_QSinglePointEvent_isEndEvent_bool_QSinglePointEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-        QSinglePointEvent* arg0 =
-            getqpointer<QSinglePointEventType>(param_this);
+        QSinglePointEvent* arg0 = getqpointer<QSinglePointEventType>(param_this);
         return arg0->isEndEvent();
     }
 
-    bool qt_QSinglePointEvent_isUpdateEvent_bool_QSinglePointEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    bool qt_QSinglePointEvent_isUpdateEvent_bool_QSinglePointEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
-        QSinglePointEvent* arg0 =
-            getqpointer<QSinglePointEventType>(param_this);
+        QSinglePointEvent* arg0 = getqpointer<QSinglePointEventType>(param_this);
         return arg0->isUpdateEvent();
     }
 
     static NODE_IMPLEMENTATION(_n_button0, int)
     {
-        NODE_RETURN(qt_QSinglePointEvent_button_int_QSinglePointEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QSinglePointEvent_button_int_QSinglePointEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_buttons0, int)
     {
-        NODE_RETURN(qt_QSinglePointEvent_buttons_int_QSinglePointEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QSinglePointEvent_buttons_int_QSinglePointEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_globalPosition0, Pointer)
     {
-        NODE_RETURN(
-            qt_QSinglePointEvent_globalPosition_QPointF_QSinglePointEvent(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QSinglePointEvent_globalPosition_QPointF_QSinglePointEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_position0, Pointer)
     {
-        NODE_RETURN(qt_QSinglePointEvent_position_QPointF_QSinglePointEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QSinglePointEvent_position_QPointF_QSinglePointEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_scenePosition0, Pointer)
     {
-        NODE_RETURN(
-            qt_QSinglePointEvent_scenePosition_QPointF_QSinglePointEvent(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QSinglePointEvent_scenePosition_QPointF_QSinglePointEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isBeginEvent0, bool)
     {
-        NODE_RETURN(qt_QSinglePointEvent_isBeginEvent_bool_QSinglePointEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QSinglePointEvent_isBeginEvent_bool_QSinglePointEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isEndEvent0, bool)
     {
-        NODE_RETURN(qt_QSinglePointEvent_isEndEvent_bool_QSinglePointEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QSinglePointEvent_isEndEvent_bool_QSinglePointEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_isUpdateEvent0, bool)
     {
-        NODE_RETURN(qt_QSinglePointEvent_isUpdateEvent_bool_QSinglePointEvent(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QSinglePointEvent_isUpdateEvent_bool_QSinglePointEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     void QSinglePointEventType::load()
@@ -194,13 +165,11 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
                    new MemberVariable(c, "native", "qt.NativeObject"),
 
@@ -211,47 +180,29 @@ namespace Mu
         addSymbols(
             // enums
             // member functions
-            new Function(c, "button", _n_button0, None, Compiled,
-                         qt_QSinglePointEvent_button_int_QSinglePointEvent,
-                         Return, "int", Parameters,
-                         new Param(c, "this", "qt.QSinglePointEvent"), End),
-            new Function(c, "buttons", _n_buttons0, None, Compiled,
-                         qt_QSinglePointEvent_buttons_int_QSinglePointEvent,
-                         Return, "int", Parameters,
-                         new Param(c, "this", "qt.QSinglePointEvent"), End),
+            new Function(c, "button", _n_button0, None, Compiled, qt_QSinglePointEvent_button_int_QSinglePointEvent, Return, "int",
+                         Parameters, new Param(c, "this", "qt.QSinglePointEvent"), End),
+            new Function(c, "buttons", _n_buttons0, None, Compiled, qt_QSinglePointEvent_buttons_int_QSinglePointEvent, Return, "int",
+                         Parameters, new Param(c, "this", "qt.QSinglePointEvent"), End),
             // PROP: exclusivePointGrabber (QObject; QSinglePointEvent this)
-            new Function(
-                c, "globalPosition", _n_globalPosition0, None, Compiled,
-                qt_QSinglePointEvent_globalPosition_QPointF_QSinglePointEvent,
-                Return, "qt.QPointF", Parameters,
-                new Param(c, "this", "qt.QSinglePointEvent"), End),
-            new Function(
-                c, "position", _n_position0, None, Compiled,
-                qt_QSinglePointEvent_position_QPointF_QSinglePointEvent, Return,
-                "qt.QPointF", Parameters,
-                new Param(c, "this", "qt.QSinglePointEvent"), End),
-            new Function(
-                c, "scenePosition", _n_scenePosition0, None, Compiled,
-                qt_QSinglePointEvent_scenePosition_QPointF_QSinglePointEvent,
-                Return, "qt.QPointF", Parameters,
-                new Param(c, "this", "qt.QSinglePointEvent"), End),
+            new Function(c, "globalPosition", _n_globalPosition0, None, Compiled,
+                         qt_QSinglePointEvent_globalPosition_QPointF_QSinglePointEvent, Return, "qt.QPointF", Parameters,
+                         new Param(c, "this", "qt.QSinglePointEvent"), End),
+            new Function(c, "position", _n_position0, None, Compiled, qt_QSinglePointEvent_position_QPointF_QSinglePointEvent, Return,
+                         "qt.QPointF", Parameters, new Param(c, "this", "qt.QSinglePointEvent"), End),
+            new Function(c, "scenePosition", _n_scenePosition0, None, Compiled,
+                         qt_QSinglePointEvent_scenePosition_QPointF_QSinglePointEvent, Return, "qt.QPointF", Parameters,
+                         new Param(c, "this", "qt.QSinglePointEvent"), End),
             // PROP: setExclusivePointGrabber (void; QSinglePointEvent this,
             // QObject exclusiveGrabber)
-            new MemberFunction(
-                c, "isBeginEvent", _n_isBeginEvent0, None, Compiled,
-                qt_QSinglePointEvent_isBeginEvent_bool_QSinglePointEvent,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QSinglePointEvent"), End),
-            new MemberFunction(
-                c, "isEndEvent", _n_isEndEvent0, None, Compiled,
-                qt_QSinglePointEvent_isEndEvent_bool_QSinglePointEvent, Return,
-                "bool", Parameters,
-                new Param(c, "this", "qt.QSinglePointEvent"), End),
-            new MemberFunction(
-                c, "isUpdateEvent", _n_isUpdateEvent0, None, Compiled,
-                qt_QSinglePointEvent_isUpdateEvent_bool_QSinglePointEvent,
-                Return, "bool", Parameters,
-                new Param(c, "this", "qt.QSinglePointEvent"), End),
+            new MemberFunction(c, "isBeginEvent", _n_isBeginEvent0, None, Compiled,
+                               qt_QSinglePointEvent_isBeginEvent_bool_QSinglePointEvent, Return, "bool", Parameters,
+                               new Param(c, "this", "qt.QSinglePointEvent"), End),
+            new MemberFunction(c, "isEndEvent", _n_isEndEvent0, None, Compiled, qt_QSinglePointEvent_isEndEvent_bool_QSinglePointEvent,
+                               Return, "bool", Parameters, new Param(c, "this", "qt.QSinglePointEvent"), End),
+            new MemberFunction(c, "isUpdateEvent", _n_isUpdateEvent0, None, Compiled,
+                               qt_QSinglePointEvent_isUpdateEvent_bool_QSinglePointEvent, Return, "bool", Parameters,
+                               new Param(c, "this", "qt.QSinglePointEvent"), End),
             // static functions
             EndArguments);
         globalScope()->addSymbols(EndArguments);

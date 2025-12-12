@@ -24,19 +24,15 @@ namespace mp4v2Utils
     //  COLR Reading
     //
     bool getFOURCC(void* fileHandle, int streamIndex, std::string& fourcc);
-    bool assembleColrAtomName(void* fileHandle, int streamIndex,
-                              std::string& atomName);
+    bool assembleColrAtomName(void* fileHandle, int streamIndex, std::string& atomName);
     bool getColrType(void* fileHandle, int streamIndex, std::string& colrType);
-    bool getNCLCValues(void* fileHandle, int streamIndex, uint64_t& prim,
-                       uint64_t& xfer, uint64_t& mtrx);
-    bool getPROFValues(void* fileHandle, int streamIndex,
-                       unsigned char*& profile, uint32_t& size);
+    bool getNCLCValues(void* fileHandle, int streamIndex, uint64_t& prim, uint64_t& xfer, uint64_t& mtrx);
+    bool getPROFValues(void* fileHandle, int streamIndex, unsigned char*& profile, uint32_t& size);
 
     //
     //  COLR Writing
     //
-    bool addColrAtom(void* fileHandle, int streamIndex, uint64_t prim,
-                     uint64_t xfer, uint64_t mtrx);
+    bool addColrAtom(void* fileHandle, int streamIndex, uint64_t prim, uint64_t xfer, uint64_t mtrx);
 
     //
     //  AVdn Reading

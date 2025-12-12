@@ -13,55 +13,37 @@ namespace TwkContainer
 
 #if 0
 
-#define PROPERTY_TRAITS_IMP(PTYPENAME, TYPE, TYPENAME, LAYOUT, XS)  \
-    template <> const char* PropertyTraits<TYPE>::typeName()        \
-    {                                                               \
-        return TYPENAME;                                            \
-    }                                                               \
-                                                                    \
-    template <> Property::Layout PropertyTraits<TYPE>::layout()     \
-    {                                                               \
-        return Property::LAYOUT;                                    \
-    }                                                               \
-                                                                    \
-    template <> size_t PropertyTraits<TYPE>::xsize() { return XS; } \
-                                                                    \
-    template <> size_t PropertyTraits<TYPE>::ysize() { return 0; }  \
-                                                                    \
+#define PROPERTY_TRAITS_IMP(PTYPENAME, TYPE, TYPENAME, LAYOUT, XS)                           \
+    template <> const char* PropertyTraits<TYPE>::typeName() { return TYPENAME; }            \
+                                                                                             \
+    template <> Property::Layout PropertyTraits<TYPE>::layout() { return Property::LAYOUT; } \
+                                                                                             \
+    template <> size_t PropertyTraits<TYPE>::xsize() { return XS; }                          \
+                                                                                             \
+    template <> size_t PropertyTraits<TYPE>::ysize() { return 0; }                           \
+                                                                                             \
     template <> size_t PropertyTraits<TYPE>::zsize() { return 0; }
 
-#define PROPERTY_TRAITS_IMP2(PTYPENAME, TYPE, TYPENAME, LAYOUT, XS, YS) \
-    template <> const char* PropertyTraits<TYPE>::typeName()            \
-    {                                                                   \
-        return TYPENAME;                                                \
-    }                                                                   \
-                                                                        \
-    template <> Property::Layout PropertyTraits<TYPE>::layout()         \
-    {                                                                   \
-        return Property::LAYOUT;                                        \
-    }                                                                   \
-                                                                        \
-    template <> size_t PropertyTraits<TYPE>::xsize() { return XS; }     \
-                                                                        \
-    template <> size_t PropertyTraits<TYPE>::ysize() { return YS; }     \
-                                                                        \
+#define PROPERTY_TRAITS_IMP2(PTYPENAME, TYPE, TYPENAME, LAYOUT, XS, YS)                      \
+    template <> const char* PropertyTraits<TYPE>::typeName() { return TYPENAME; }            \
+                                                                                             \
+    template <> Property::Layout PropertyTraits<TYPE>::layout() { return Property::LAYOUT; } \
+                                                                                             \
+    template <> size_t PropertyTraits<TYPE>::xsize() { return XS; }                          \
+                                                                                             \
+    template <> size_t PropertyTraits<TYPE>::ysize() { return YS; }                          \
+                                                                                             \
     template <> size_t PropertyTraits<TYPE>::zsize() { return 0; }
 
-#define PROPERTY_TRAITS_IMP3(PTYPENAME, TYPE, TYPENAME, LAYOUT, XS, YS, ZS) \
-    template <> const char* PropertyTraits<TYPE>::typeName()                \
-    {                                                                       \
-        return TYPENAME;                                                    \
-    }                                                                       \
-                                                                            \
-    template <> Property::Layout PropertyTraits<TYPE>::layout()             \
-    {                                                                       \
-        return Property::LAYOUT;                                            \
-    }                                                                       \
-                                                                            \
-    template <> size_t PropertyTraits<TYPE>::xsize() { return XS; }         \
-                                                                            \
-    template <> size_t PropertyTraits<TYPE>::ysize() { return YS; }         \
-                                                                            \
+#define PROPERTY_TRAITS_IMP3(PTYPENAME, TYPE, TYPENAME, LAYOUT, XS, YS, ZS)                  \
+    template <> const char* PropertyTraits<TYPE>::typeName() { return TYPENAME; }            \
+                                                                                             \
+    template <> Property::Layout PropertyTraits<TYPE>::layout() { return Property::LAYOUT; } \
+                                                                                             \
+    template <> size_t PropertyTraits<TYPE>::xsize() { return XS; }                          \
+                                                                                             \
+    template <> size_t PropertyTraits<TYPE>::ysize() { return YS; }                          \
+                                                                                             \
     template <> size_t PropertyTraits<TYPE>::zsize() { return ZS; }
                                                                         
 PROPERTY_TRAITS_IMP(FloatProperty, float, "float", FloatLayout, 1)

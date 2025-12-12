@@ -55,8 +55,7 @@ namespace IPCore
 
         typedef std::vector<RangeStats> RangeStatsVector;
 
-        SoundTrackIPNode(const std::string& name, const NodeDefinition* def,
-                         IPGraph* graph, GroupIPNode* group = 0);
+        SoundTrackIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group = 0);
 
         virtual ~SoundTrackIPNode();
         virtual IPImage* evaluate(const Context&);

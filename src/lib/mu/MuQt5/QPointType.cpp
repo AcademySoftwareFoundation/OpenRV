@@ -50,16 +50,12 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(__allocate, Pointer)
     {
-        QPointType::Instance* i =
-            new QPointType::Instance((Class*)NODE_THIS.type());
+        QPointType::Instance* i = new QPointType::Instance((Class*)NODE_THIS.type());
         QPointType::registerFinalizer(i);
         NODE_RETURN(i);
     }
 
-    void QPointType::registerFinalizer(void* o)
-    {
-        GC_register_finalizer(o, QPointType::finalizer, 0, 0, 0);
-    }
+    void QPointType::registerFinalizer(void* o) { GC_register_finalizer(o, QPointType::finalizer, 0, 0, 0); }
 
     void QPointType::finalizer(void* obj, void* data)
     {
@@ -70,18 +66,14 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    Pointer qt_QPoint_QPoint_QPoint_QPoint(Mu::Thread& NODE_THREAD,
-                                           Pointer param_this)
+    Pointer qt_QPoint_QPoint_QPoint_QPoint(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         setqtype<QPointType>(param_this, QPoint());
         return param_this;
     }
 
-    Pointer qt_QPoint_QPoint_QPoint_QPoint_int_int(Mu::Thread& NODE_THREAD,
-                                                   Pointer param_this,
-                                                   int param_xpos,
-                                                   int param_ypos)
+    Pointer qt_QPoint_QPoint_QPoint_QPoint_int_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_xpos, int param_ypos)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         int arg1 = (int)(param_xpos);
@@ -90,24 +82,21 @@ namespace Mu
         return param_this;
     }
 
-    bool qt_QPoint_isNull_bool_QPoint(Mu::Thread& NODE_THREAD,
-                                      Pointer param_this)
+    bool qt_QPoint_isNull_bool_QPoint(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QPoint arg0 = getqtype<QPointType>(param_this);
         return arg0.isNull();
     }
 
-    int qt_QPoint_manhattanLength_int_QPoint(Mu::Thread& NODE_THREAD,
-                                             Pointer param_this)
+    int qt_QPoint_manhattanLength_int_QPoint(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QPoint arg0 = getqtype<QPointType>(param_this);
         return arg0.manhattanLength();
     }
 
-    void qt_QPoint_setX_void_QPoint_int(Mu::Thread& NODE_THREAD,
-                                        Pointer param_this, int param_x)
+    void qt_QPoint_setX_void_QPoint_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_x)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QPoint arg0 = getqtype<QPointType>(param_this);
@@ -116,8 +105,7 @@ namespace Mu
         setqtype<QPointType>(param_this, arg0);
     }
 
-    void qt_QPoint_setY_void_QPoint_int(Mu::Thread& NODE_THREAD,
-                                        Pointer param_this, int param_y)
+    void qt_QPoint_setY_void_QPoint_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_y)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QPoint arg0 = getqtype<QPointType>(param_this);
@@ -140,8 +128,7 @@ namespace Mu
         return arg0.y();
     }
 
-    Pointer qt_QPoint_operatorPlus_EQ__QPoint_QPoint_QPoint(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_point)
+    Pointer qt_QPoint_operatorPlus_EQ__QPoint_QPoint_QPoint(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_point)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QPoint arg0 = getqtype<QPointType>(param_this);
@@ -149,8 +136,7 @@ namespace Mu
         return makeqtype<QPointType>(c, arg0.operator+=(arg1), "qt.QPoint");
     }
 
-    Pointer qt_QPoint_operatorMinus_EQ__QPoint_QPoint_QPoint(
-        Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_point)
+    Pointer qt_QPoint_operatorMinus_EQ__QPoint_QPoint_QPoint(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_point)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QPoint arg0 = getqtype<QPointType>(param_this);
@@ -158,8 +144,7 @@ namespace Mu
         return makeqtype<QPointType>(c, arg0.operator-=(arg1), "qt.QPoint");
     }
 
-    Pointer qt_QPoint_operatorSlash_EQ__QPoint_QPoint_double(
-        Mu::Thread& NODE_THREAD, Pointer param_this, double param_divisor)
+    Pointer qt_QPoint_operatorSlash_EQ__QPoint_QPoint_double(Mu::Thread& NODE_THREAD, Pointer param_this, double param_divisor)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QPoint arg0 = getqtype<QPointType>(param_this);
@@ -169,69 +154,48 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(_n_QPoint0, Pointer)
     {
-        NODE_RETURN(qt_QPoint_QPoint_QPoint_QPoint(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QPoint_QPoint_QPoint_QPoint(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_QPoint1, Pointer)
     {
-        NODE_RETURN(qt_QPoint_QPoint_QPoint_QPoint_int_int(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int),
-            NODE_ARG(2, int)));
+        NODE_RETURN(qt_QPoint_QPoint_QPoint_QPoint_int_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int), NODE_ARG(2, int)));
     }
 
-    static NODE_IMPLEMENTATION(_n_isNull0, bool)
-    {
-        NODE_RETURN(qt_QPoint_isNull_bool_QPoint(NODE_THREAD,
-                                                 NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_isNull0, bool) { NODE_RETURN(qt_QPoint_isNull_bool_QPoint(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
     static NODE_IMPLEMENTATION(_n_manhattanLength0, int)
     {
-        NODE_RETURN(qt_QPoint_manhattanLength_int_QPoint(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QPoint_manhattanLength_int_QPoint(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_setX0, void)
     {
-        qt_QPoint_setX_void_QPoint_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                                       NODE_ARG(1, int));
+        qt_QPoint_setX_void_QPoint_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
     static NODE_IMPLEMENTATION(_n_setY0, void)
     {
-        qt_QPoint_setY_void_QPoint_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer),
-                                       NODE_ARG(1, int));
+        qt_QPoint_setY_void_QPoint_int(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, int));
     }
 
-    static NODE_IMPLEMENTATION(_n_x0, int)
-    {
-        NODE_RETURN(
-            qt_QPoint_x_int_QPoint(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_x0, int) { NODE_RETURN(qt_QPoint_x_int_QPoint(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
-    static NODE_IMPLEMENTATION(_n_y0, int)
-    {
-        NODE_RETURN(
-            qt_QPoint_y_int_QPoint(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
-    }
+    static NODE_IMPLEMENTATION(_n_y0, int) { NODE_RETURN(qt_QPoint_y_int_QPoint(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }
 
     static NODE_IMPLEMENTATION(_n_operatorPlus_EQ_0, Pointer)
     {
-        NODE_RETURN(qt_QPoint_operatorPlus_EQ__QPoint_QPoint_QPoint(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QPoint_operatorPlus_EQ__QPoint_QPoint_QPoint(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorMinus_EQ_0, Pointer)
     {
-        NODE_RETURN(qt_QPoint_operatorMinus_EQ__QPoint_QPoint_QPoint(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
+        NODE_RETURN(qt_QPoint_operatorMinus_EQ__QPoint_QPoint_QPoint(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, Pointer)));
     }
 
     static NODE_IMPLEMENTATION(_n_operatorSlash_EQ_0, Pointer)
     {
-        NODE_RETURN(qt_QPoint_operatorSlash_EQ__QPoint_QPoint_double(
-            NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, double)));
+        NODE_RETURN(qt_QPoint_operatorSlash_EQ__QPoint_QPoint_double(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer), NODE_ARG(1, double)));
     }
 
     void QPointType::load()
@@ -251,51 +215,36 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(
-            new Function(c, "__allocate", __allocate, None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", __allocate, None, Return, ftn, End),
 
-            EndArguments);
+                   EndArguments);
 
         addSymbols(EndArguments);
 
         addSymbols(
             // enums
             // member functions
-            new Function(c, "QPoint", _n_QPoint0, None, Compiled,
-                         qt_QPoint_QPoint_QPoint_QPoint, Return, "qt.QPoint",
+            new Function(c, "QPoint", _n_QPoint0, None, Compiled, qt_QPoint_QPoint_QPoint_QPoint, Return, "qt.QPoint", Parameters,
+                         new Param(c, "this", "qt.QPoint"), End),
+            new Function(c, "QPoint", _n_QPoint1, None, Compiled, qt_QPoint_QPoint_QPoint_QPoint_int_int, Return, "qt.QPoint", Parameters,
+                         new Param(c, "this", "qt.QPoint"), new Param(c, "xpos", "int"), new Param(c, "ypos", "int"), End),
+            new Function(c, "isNull", _n_isNull0, None, Compiled, qt_QPoint_isNull_bool_QPoint, Return, "bool", Parameters,
+                         new Param(c, "this", "qt.QPoint"), End),
+            new Function(c, "manhattanLength", _n_manhattanLength0, None, Compiled, qt_QPoint_manhattanLength_int_QPoint, Return, "int",
                          Parameters, new Param(c, "this", "qt.QPoint"), End),
-            new Function(
-                c, "QPoint", _n_QPoint1, None, Compiled,
-                qt_QPoint_QPoint_QPoint_QPoint_int_int, Return, "qt.QPoint",
-                Parameters, new Param(c, "this", "qt.QPoint"),
-                new Param(c, "xpos", "int"), new Param(c, "ypos", "int"), End),
-            new Function(c, "isNull", _n_isNull0, None, Compiled,
-                         qt_QPoint_isNull_bool_QPoint, Return, "bool",
-                         Parameters, new Param(c, "this", "qt.QPoint"), End),
-            new Function(c, "manhattanLength", _n_manhattanLength0, None,
-                         Compiled, qt_QPoint_manhattanLength_int_QPoint, Return,
-                         "int", Parameters, new Param(c, "this", "qt.QPoint"),
-                         End),
             // MISSING: rx ("int &"; QPoint this)
             // MISSING: ry ("int &"; QPoint this)
-            new Function(c, "setX", _n_setX0, None, Compiled,
-                         qt_QPoint_setX_void_QPoint_int, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QPoint"),
-                         new Param(c, "x", "int"), End),
-            new Function(c, "setY", _n_setY0, None, Compiled,
-                         qt_QPoint_setY_void_QPoint_int, Return, "void",
-                         Parameters, new Param(c, "this", "qt.QPoint"),
-                         new Param(c, "y", "int"), End),
-            new Function(c, "x", _n_x0, None, Compiled, qt_QPoint_x_int_QPoint,
-                         Return, "int", Parameters,
+            new Function(c, "setX", _n_setX0, None, Compiled, qt_QPoint_setX_void_QPoint_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QPoint"), new Param(c, "x", "int"), End),
+            new Function(c, "setY", _n_setY0, None, Compiled, qt_QPoint_setY_void_QPoint_int, Return, "void", Parameters,
+                         new Param(c, "this", "qt.QPoint"), new Param(c, "y", "int"), End),
+            new Function(c, "x", _n_x0, None, Compiled, qt_QPoint_x_int_QPoint, Return, "int", Parameters,
                          new Param(c, "this", "qt.QPoint"), End),
-            new Function(c, "y", _n_y0, None, Compiled, qt_QPoint_y_int_QPoint,
-                         Return, "int", Parameters,
+            new Function(c, "y", _n_y0, None, Compiled, qt_QPoint_y_int_QPoint, Return, "int", Parameters,
                          new Param(c, "this", "qt.QPoint"), End),
             // MISSING: = ("QPoint & operator*"; QPoint this, "float" factor)
             // MISSING: = ("QPoint & operator*"; QPoint this, double factor)
@@ -303,21 +252,12 @@ namespace Mu
             // static functions
             EndArguments);
         globalScope()->addSymbols(
-            new Function(c, "+=", _n_operatorPlus_EQ_0, Op, Compiled,
-                         qt_QPoint_operatorPlus_EQ__QPoint_QPoint_QPoint,
-                         Return, "qt.QPoint", Parameters,
-                         new Param(c, "this", "qt.QPoint"),
-                         new Param(c, "point", "qt.QPoint"), End),
-            new Function(c, "-=", _n_operatorMinus_EQ_0, Op, Compiled,
-                         qt_QPoint_operatorMinus_EQ__QPoint_QPoint_QPoint,
-                         Return, "qt.QPoint", Parameters,
-                         new Param(c, "this", "qt.QPoint"),
-                         new Param(c, "point", "qt.QPoint"), End),
-            new Function(c, "/=", _n_operatorSlash_EQ_0, Op, Compiled,
-                         qt_QPoint_operatorSlash_EQ__QPoint_QPoint_double,
-                         Return, "qt.QPoint", Parameters,
-                         new Param(c, "this", "qt.QPoint"),
-                         new Param(c, "divisor", "double"), End),
+            new Function(c, "+=", _n_operatorPlus_EQ_0, Op, Compiled, qt_QPoint_operatorPlus_EQ__QPoint_QPoint_QPoint, Return, "qt.QPoint",
+                         Parameters, new Param(c, "this", "qt.QPoint"), new Param(c, "point", "qt.QPoint"), End),
+            new Function(c, "-=", _n_operatorMinus_EQ_0, Op, Compiled, qt_QPoint_operatorMinus_EQ__QPoint_QPoint_QPoint, Return,
+                         "qt.QPoint", Parameters, new Param(c, "this", "qt.QPoint"), new Param(c, "point", "qt.QPoint"), End),
+            new Function(c, "/=", _n_operatorSlash_EQ_0, Op, Compiled, qt_QPoint_operatorSlash_EQ__QPoint_QPoint_double, Return,
+                         "qt.QPoint", Parameters, new Param(c, "this", "qt.QPoint"), new Param(c, "divisor", "double"), End),
             EndArguments);
         scope()->addSymbols(EndArguments);
     }

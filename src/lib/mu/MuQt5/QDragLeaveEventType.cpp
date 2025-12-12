@@ -37,8 +37,7 @@ namespace Mu
 {
     using namespace std;
 
-    QDragLeaveEventType::QDragLeaveEventType(Context* c, const char* name,
-                                             Class* super)
+    QDragLeaveEventType::QDragLeaveEventType(Context* c, const char* name, Class* super)
         : Class(c, name, super)
     {
     }
@@ -48,8 +47,7 @@ namespace Mu
     //----------------------------------------------------------------------
     //  PRE-COMPILED FUNCTIONS
 
-    Pointer qt_QDragLeaveEvent_QDragLeaveEvent_QDragLeaveEvent_QDragLeaveEvent(
-        Mu::Thread& NODE_THREAD, Pointer param_this)
+    Pointer qt_QDragLeaveEvent_QDragLeaveEvent_QDragLeaveEvent_QDragLeaveEvent(Mu::Thread& NODE_THREAD, Pointer param_this)
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         setqpointer<QDragLeaveEventType>(param_this, new QDragLeaveEvent());
@@ -58,9 +56,7 @@ namespace Mu
 
     static NODE_IMPLEMENTATION(_n_QDragLeaveEvent0, Pointer)
     {
-        NODE_RETURN(
-            qt_QDragLeaveEvent_QDragLeaveEvent_QDragLeaveEvent_QDragLeaveEvent(
-                NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
+        NODE_RETURN(qt_QDragLeaveEvent_QDragLeaveEvent_QDragLeaveEvent_QDragLeaveEvent(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer)));
     }
 
     void QDragLeaveEventType::load()
@@ -80,13 +76,11 @@ namespace Mu
 
         scope()->addSymbols(new ReferenceType(c, rtn, this),
 
-                            new Function(c, tn, BaseFunctions::dereference,
-                                         Cast, Return, ftn, Args, frtn, End),
+                            new Function(c, tn, BaseFunctions::dereference, Cast, Return, ftn, Args, frtn, End),
 
                             EndArguments);
 
-        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate,
-                                None, Return, ftn, End),
+        addSymbols(new Function(c, "__allocate", BaseFunctions::classAllocate, None, Return, ftn, End),
 
                    new MemberVariable(c, "native", "qt.NativeObject"),
 
@@ -97,11 +91,9 @@ namespace Mu
         addSymbols(
             // enums
             // member functions
-            new Function(
-                c, "QDragLeaveEvent", _n_QDragLeaveEvent0, None, Compiled,
-                qt_QDragLeaveEvent_QDragLeaveEvent_QDragLeaveEvent_QDragLeaveEvent,
-                Return, "qt.QDragLeaveEvent", Parameters,
-                new Param(c, "this", "qt.QDragLeaveEvent"), End),
+            new Function(c, "QDragLeaveEvent", _n_QDragLeaveEvent0, None, Compiled,
+                         qt_QDragLeaveEvent_QDragLeaveEvent_QDragLeaveEvent_QDragLeaveEvent, Return, "qt.QDragLeaveEvent", Parameters,
+                         new Param(c, "this", "qt.QDragLeaveEvent"), End),
             // static functions
             EndArguments);
         globalScope()->addSymbols(EndArguments);

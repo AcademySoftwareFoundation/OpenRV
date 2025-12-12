@@ -36,8 +36,7 @@ namespace IPCore
         //  in your derived class.
         //
 
-        GroupIPNode(const std::string& name, const NodeDefinition* def,
-                    IPGraph* graph, GroupIPNode* group = 0);
+        GroupIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group = 0);
 
         virtual ~GroupIPNode();
 
@@ -54,11 +53,7 @@ namespace IPCore
 
         IPNode* memberByType(const std::string& typeName);
 
-        template <typename T>
-        T* memberByTypeNameOfType(const std::string& typeName)
-        {
-            return dynamic_cast<T*>(memberByType(typeName));
-        }
+        template <typename T> T* memberByTypeNameOfType(const std::string& typeName) { return dynamic_cast<T*>(memberByType(typeName)); }
 
         void internalOutputNodesFor(IPNode*, IPNodes&) const;
 
@@ -79,8 +74,7 @@ namespace IPCore
         //  Use this in order to make consistant internal node names
         //
 
-        std::string internalNodeNameForInput(IPNode* input,
-                                             const std::string& smallIdString);
+        std::string internalNodeNameForInput(IPNode* input, const std::string& smallIdString);
 
         std::string internalNodeName(const std::string& idstring);
 
@@ -107,8 +101,7 @@ namespace IPCore
         //  the whole set (like union of input ranges, etc).
         //
 
-        virtual IPNode* newSubGraphForInput(size_t index,
-                                            const IPNodes& newInputs);
+        virtual IPNode* newSubGraphForInput(size_t index, const IPNodes& newInputs);
 
         //
         //  Similar to above, but in the case where an existing input is
@@ -119,9 +112,7 @@ namespace IPCore
         //  be deleted by the implementor.
         //
 
-        virtual IPNode* modifySubGraphForInput(size_t index,
-                                               const IPNodes& newInputs,
-                                               IPNode* subgraph);
+        virtual IPNode* modifySubGraphForInput(size_t index, const IPNodes& newInputs, IPNode* subgraph);
 
         //
         //  Can be called by setInputs() to make life easier (where
@@ -135,8 +126,7 @@ namespace IPCore
         //  This operation is optimized for one input onlye if the
         //  inputIndexOnly is greater than zero.
 
-        virtual void setInputsWithReordering(const IPNodes&, IPNode* fanInNode,
-                                             int inputIndexOnly = -1);
+        virtual void setInputsWithReordering(const IPNodes&, IPNode* fanInNode, int inputIndexOnly = -1);
 
         //
         //  The rest of the IPNode API with special implementations that
@@ -160,12 +150,10 @@ namespace IPCore
         virtual void propagateGraphConfigToInputs(const GraphConfiguration&);
         virtual void inputChanged(int index);
         virtual void inputRangeChanged(int index, PropagateTarget target);
-        virtual void inputImageStructureChanged(int index,
-                                                PropagateTarget target);
+        virtual void inputImageStructureChanged(int index, PropagateTarget target);
         virtual void collectMemberNodes(IPNodeSet&, size_t depth = 0);
 
-        virtual void collectMemberNodesByTypeName(const std::string& typeName,
-                                                  IPNodeSet&, size_t depth = 0);
+        virtual void collectMemberNodesByTypeName(const std::string& typeName, IPNodeSet&, size_t depth = 0);
 
         //
         //  NOTE: readCompleted() will be called during profile reading
@@ -190,27 +178,18 @@ namespace IPCore
 
         void addAuxillaryOutput(IPNode*);
 
-        IPNode* newMemberNode(const std::string& typeName,
-                              const std::string& nameStem);
+        IPNode* newMemberNode(const std::string& typeName, const std::string& nameStem);
 
-        IPNode* newMemberNodeForInput(const std::string& typeName,
-                                      IPNode* input,
-                                      const std::string& smallName);
+        IPNode* newMemberNodeForInput(const std::string& typeName, IPNode* input, const std::string& smallName);
 
-        template <class T>
-        T* newMemberNodeOfType(const std::string& typeName,
-                               const std::string& nameStem)
+        template <class T> T* newMemberNodeOfType(const std::string& typeName, const std::string& nameStem)
         {
             return dynamic_cast<T*>(newMemberNode(typeName, nameStem));
         }
 
-        template <class T>
-        T* newMemberNodeOfTypeForInput(const std::string& typeName,
-                                       IPNode* input,
-                                       const std::string& smallIdString)
+        template <class T> T* newMemberNodeOfTypeForInput(const std::string& typeName, IPNode* input, const std::string& smallIdString)
         {
-            return dynamic_cast<T*>(
-                newMemberNodeForInput(typeName, input, smallIdString));
+            return dynamic_cast<T*>(newMemberNodeForInput(typeName, input, smallIdString));
         }
 
         AdaptorIPNode* newAdaptorForInput(IPNode* input);

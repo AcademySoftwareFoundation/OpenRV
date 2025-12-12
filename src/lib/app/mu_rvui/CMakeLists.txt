@@ -8,7 +8,7 @@ SET(_target
     "mu_rvui"
 )
 
-IF(RV_VFX_PLATFORM STREQUAL CY2024)
+IF(RV_VFX_PLATFORM STRGREATER_EQUAL CY2024)
   SET(MU_QT_QAPPLICATION_AVAILABLE_GEOMETRY
       "
        // Get available screen geometry for the screen containing the window\n \

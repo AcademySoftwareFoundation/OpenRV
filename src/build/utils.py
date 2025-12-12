@@ -261,11 +261,7 @@ def get_cygpath_windows(cygpath: str) -> str:
     Returns the windows path corresponding to the cygpath passed as parameter.
     :param string cygpath: cygpath to be translated. Example: C:/git/OpenRV/_build
     """
-    return (
-        subprocess.check_output(["cygpath", "--windows", "--absolute", f"{cygpath}"])
-        .rstrip()
-        .decode("utf-8")
-    )
+    return subprocess.check_output(["cygpath", "--windows", "--absolute", f"{cygpath}"]).rstrip().decode("utf-8")
 
 
 def update_env_path(newpaths: str) -> None:
@@ -274,7 +270,7 @@ def update_env_path(newpaths: str) -> None:
     """
     paths = os.environ["PATH"].lower().split(os.pathsep)
     for path in newpaths:
-        if not path.lower() in paths:
+        if path.lower() not in paths:
             paths.insert(0, path)
             os.environ["PATH"] = "{}{}{}".format(path, os.pathsep, os.environ["PATH"])
 
@@ -303,7 +299,7 @@ def source_widows_msvc_env(msvc_year: str) -> None:
                 if not (len(ob) == 2):
                     print("Unexpected result: {}".format(ob))
                     raise ValueError
-            except:
+            except Exception:
                 return False
             return True
 
@@ -330,10 +326,10 @@ def source_widows_msvc_env(msvc_year: str) -> None:
             # make sure the lines are strings
             lines = map(lambda s: s.decode(), lines)
         # consume whatever output occurs until the tag is reached
-        consume(itertools.takewhile(lambda l: tag not in l, lines))
+        consume(itertools.takewhile(lambda line: tag not in line, lines))
         # define a way to handle each KEY=VALUE line
         # parse key/values into pairs
-        pairs = map(lambda l: l.rstrip().split("=", 1), lines)
+        pairs = map(lambda line: line.rstrip().split("=", 1), lines)
         # make sure the pairs are valid
         valid_pairs = filter(validate_pair, pairs)
         # construct a dictionary of the pairs
@@ -378,24 +374,16 @@ def source_widows_msvc_env(msvc_year: str) -> None:
             )
 
     if not os.path.exists(vcvars_path):
-        print(
-            "ERROR: Failed to find the MSVC compiler environment init script (vcvars64.bat) on your system."
-        )
+        print("ERROR: Failed to find the MSVC compiler environment init script (vcvars64.bat) on your system.")
         return
     else:
-        print(
-            f"Found MSVC compiler environment init script (vcvars64.bat):\n{vcvars_path}"
-        )
+        print(f"Found MSVC compiler environment init script (vcvars64.bat):\n{vcvars_path}")
 
     # Get MSVC env
     vcvars_cmd = [vcvars_path]
     msvc_env = get_environment_from_batch_command(vcvars_cmd)
-    msvc_env_paths = os.pathsep.join(
-        [msvc_env[k] for k in msvc_env if k.upper() == "PATH"]
-    ).split(os.pathsep)
-    msvc_env_without_paths = dict(
-        [(k, msvc_env[k]) for k in msvc_env if k.upper() != "PATH"]
-    )
+    msvc_env_paths = os.pathsep.join([msvc_env[k] for k in msvc_env if k.upper() == "PATH"]).split(os.pathsep)
+    msvc_env_without_paths = dict([(k, msvc_env[k]) for k in msvc_env if k.upper() != "PATH"])
 
     # Extend os.environ with MSVC env
     update_env_path(msvc_env_paths)
@@ -414,16 +402,13 @@ def get_mingw64_path_on_windows(winpath: str) -> str:
         return winpath
 
     return (
-        subprocess.check_output(
-            ["c:\\msys64\\usr\\bin\\cygpath.exe", "--mixed", "--absolute", f"{winpath}"]
-        )
+        subprocess.check_output(["c:\\msys64\\usr\\bin\\cygpath.exe", "--mixed", "--absolute", f"{winpath}"])
         .rstrip()
         .decode("utf-8")
     )
 
 
 def get_mingw64_args(cmd_args: List[str]) -> List[str]:
-
     updated_cmd_args = cmd_args
     updated_cmd_args.append(";sleep 10")
 

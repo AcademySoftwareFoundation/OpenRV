@@ -27,14 +27,8 @@ namespace TwkApp
 
     bool VideoModule::isOpen() const { return false; }
 
-    const VideoModule::VideoDevices& VideoModule::devices() const
-    {
-        return m_devices;
-    }
+    const VideoModule::VideoDevices& VideoModule::devices() const { return m_devices; }
 
-    VideoDevice* VideoModule::deviceFromPosition(int x, int y) const
-    {
-        return 0;
-    }
+    VideoDevice* VideoModule::deviceFromPosition(int x, int y) const { return 0; }
 
 } // namespace TwkApp

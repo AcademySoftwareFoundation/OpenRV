@@ -107,27 +107,16 @@ namespace Mu
     //  float value = evalNodeFunc<float>(F, node, thread);
     //
 
-    template <typename T>
-    inline T evalNodeFunc(NodeFunc F, const Node& N, Thread& Th)
+    template <typename T> inline T evalNodeFunc(NodeFunc F, const Node& N, Thread& Th)
     {
-        return reinterpret_cast<typename TypedNodeFunc<T>::Function>(
-            F._voidFunc)(N, Th);
+        return reinterpret_cast<typename TypedNodeFunc<T>::Function>(F._voidFunc)(N, Th);
     }
 
-    template <typename T> inline NodeFunc nodefunc_cast(T f)
-    {
-        return NodeFunc(VoidFunc(f));
-    }
+    template <typename T> inline NodeFunc nodefunc_cast(T f) { return NodeFunc(VoidFunc(f)); }
 
-    inline bool operator==(NodeFunc a, NodeFunc b)
-    {
-        return a._voidFunc == b._voidFunc;
-    }
+    inline bool operator==(NodeFunc a, NodeFunc b) { return a._voidFunc == b._voidFunc; }
 
-    inline bool operator!=(NodeFunc a, NodeFunc b)
-    {
-        return a._voidFunc != b._voidFunc;
-    }
+    inline bool operator!=(NodeFunc a, NodeFunc b) { return a._voidFunc != b._voidFunc; }
 
 #else
 

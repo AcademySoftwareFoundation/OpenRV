@@ -43,8 +43,7 @@ namespace TwkApp
     {
         HOP_PROF_FUNC();
 
-        const EventType* etype =
-            static_cast<const EventType*>(m_func->function()->argType(0));
+        const EventType* etype = static_cast<const EventType*>(m_func->function()->argType(0));
         Mu::Process* p = muProcess();
 
         EventType::EventInstance* e = new EventType::EventInstance(etype);
@@ -67,8 +66,7 @@ namespace TwkApp
 
             if (m_func != preservedFunc || !m_func || !(m_func->function()))
             {
-                cerr << "ERROR: event handler function object corrupted!"
-                     << endl;
+                cerr << "ERROR: event handler function object corrupted!" << endl;
             }
 
             cerr << "ERROR: function = " << preservedFuncName.str() << endl;
@@ -79,14 +77,11 @@ namespace TwkApp
                 o->type()->outputValue(cerr, (Mu::ValuePointer)&o);
                 cerr << endl;
 
-                if (o->type() == muContext()->exceptionType()
-                    && muContext()->debugging())
+                if (o->type() == muContext()->exceptionType() && muContext()->debugging())
                 {
-                    const Mu::ExceptionType::Exception* exc =
-                        static_cast<const Mu::ExceptionType::Exception*>(o);
+                    const Mu::ExceptionType::Exception* exc = static_cast<const Mu::ExceptionType::Exception*>(o);
 
-                    cerr << "Backtrace:" << endl
-                         << exc->backtraceAsString() << endl;
+                    cerr << "Backtrace:" << endl << exc->backtraceAsString() << endl;
                 }
             }
 
@@ -100,9 +95,6 @@ namespace TwkApp
 
     bool MuFuncAction::error() const { return m_exception; }
 
-    Action* MuFuncAction::copy() const
-    {
-        return new MuFuncAction(m_func, docString());
-    }
+    Action* MuFuncAction::copy() const { return new MuFuncAction(m_func, docString()); }
 
 } // namespace TwkApp

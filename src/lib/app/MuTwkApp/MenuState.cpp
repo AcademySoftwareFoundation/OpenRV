@@ -53,14 +53,11 @@ namespace TwkApp
                 e->type()->outputValue(cerr, (ValuePointer)&e);
                 cerr << endl;
 
-                if (e->type() == muContext()->exceptionType()
-                    && muContext()->debugging())
+                if (e->type() == muContext()->exceptionType() && muContext()->debugging())
                 {
-                    const Mu::ExceptionType::Exception* exc =
-                        static_cast<const Mu::ExceptionType::Exception*>(e);
+                    const Mu::ExceptionType::Exception* exc = static_cast<const Mu::ExceptionType::Exception*>(e);
 
-                    cerr << "Backtrace:" << endl
-                         << exc->backtraceAsString() << endl;
+                    cerr << "Backtrace:" << endl << exc->backtraceAsString() << endl;
                 }
             }
 
@@ -76,9 +73,6 @@ namespace TwkApp
 
     bool MuStateFunc::error() const { return m_exception; }
 
-    Menu::StateFunc* MuStateFunc::copy() const
-    {
-        return new MuStateFunc(m_func);
-    }
+    Menu::StateFunc* MuStateFunc::copy() const { return new MuStateFunc(m_func); }
 
 } // namespace TwkApp

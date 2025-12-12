@@ -21,22 +21,17 @@ namespace IPCore
     using namespace TwkContainer;
     using namespace TwkMath;
 
-    SourceIPNode::SourceIPNode(const std::string& name,
-                               const NodeDefinition* def, IPGraph* g,
-                               GroupIPNode* group,
+    SourceIPNode::SourceIPNode(const std::string& name, const NodeDefinition* def, IPGraph* g, GroupIPNode* group,
                                const std::string mediaRepName, bool mediaActive)
         : IPNode(name, def, g, group)
     {
         setMaxInputs(0);
-        m_imageComponent =
-            createProperty<StringProperty>("request.imageComponent");
+        m_imageComponent = createProperty<StringProperty>("request.imageComponent");
         m_eyeViews = createProperty<StringProperty>("request.stereoViews");
         m_updateAction = "new";
 
-        m_mediaRepName =
-            declareProperty<StringProperty>("media.repName", mediaRepName);
-        m_mediaActive =
-            declareProperty<IntProperty>("media.active", mediaActive ? 1 : 0);
+        m_mediaRepName = declareProperty<StringProperty>("media.repName", mediaRepName);
+        m_mediaActive = declareProperty<IntProperty>("media.active", mediaActive ? 1 : 0);
     }
 
     SourceIPNode::~SourceIPNode() {}
@@ -57,14 +52,11 @@ namespace IPCore
         //
 
         ImageRangeInfo info = imageRangeInfo();
-        ImageStructureInfo sinfo =
-            imageStructureInfo(graph()->contextForFrame(info.start));
+        ImageStructureInfo sinfo = imageStructureInfo(graph()->contextForFrame(info.start));
 
-        declareProperty<Vec2iProperty>("proxy.range",
-                                       Vec2i(info.start, info.end + 1));
+        declareProperty<Vec2iProperty>("proxy.range", Vec2i(info.start, info.end + 1));
         declareProperty<IntProperty>("proxy.inc", info.inc);
-        declareProperty<Vec2iProperty>("proxy.size",
-                                       Vec2i(sinfo.width, sinfo.height));
+        declareProperty<Vec2iProperty>("proxy.size", Vec2i(sinfo.width, sinfo.height));
     }
 
     void SourceIPNode::writeCompleted()
@@ -78,11 +70,7 @@ namespace IPCore
         removeProperty(find("proxy.size"));
     }
 
-    void SourceIPNode::readCompleted(const std::string& typeName,
-                                     unsigned int version)
-    {
-        m_updateAction = "session";
-    }
+    void SourceIPNode::readCompleted(const std::string& typeName, unsigned int version) { m_updateAction = "session"; }
 
     void SourceIPNode::addUserAttributes(FrameBuffer* fb)
     {
@@ -110,18 +98,15 @@ namespace IPCore
                     }
                     else if (fp->size() == 2)
                     {
-                        fb->attribute<Vec2f>(p->name()) =
-                            Vec2f((*fp)[0], (*fp)[1]);
+                        fb->attribute<Vec2f>(p->name()) = Vec2f((*fp)[0], (*fp)[1]);
                     }
                     else if (fp->size() == 3)
                     {
-                        fb->attribute<Vec3f>(p->name()) =
-                            Vec3f((*fp)[0], (*fp)[1], (*fp)[2]);
+                        fb->attribute<Vec3f>(p->name()) = Vec3f((*fp)[0], (*fp)[1], (*fp)[2]);
                     }
                     else if (fp->size() == 4)
                     {
-                        fb->attribute<Vec4f>(p->name()) =
-                            Vec4f((*fp)[0], (*fp)[1], (*fp)[2], (*fp)[3]);
+                        fb->attribute<Vec4f>(p->name()) = Vec4f((*fp)[0], (*fp)[1], (*fp)[2], (*fp)[3]);
                     }
                 }
 
@@ -133,18 +118,15 @@ namespace IPCore
                     }
                     else if (ip->size() == 2)
                     {
-                        fb->attribute<Vec2i>(p->name()) =
-                            Vec2f((*ip)[0], (*ip)[1]);
+                        fb->attribute<Vec2i>(p->name()) = Vec2f((*ip)[0], (*ip)[1]);
                     }
                     else if (ip->size() == 3)
                     {
-                        fb->attribute<Vec3i>(p->name()) =
-                            Vec3f((*ip)[0], (*ip)[1], (*ip)[2]);
+                        fb->attribute<Vec3i>(p->name()) = Vec3f((*ip)[0], (*ip)[1], (*ip)[2]);
                     }
                     else if (ip->size() == 4)
                     {
-                        fb->attribute<Vec4i>(p->name()) =
-                            Vec4f((*ip)[0], (*ip)[1], (*ip)[2], (*ip)[3]);
+                        fb->attribute<Vec4i>(p->name()) = Vec4f((*ip)[0], (*ip)[1], (*ip)[2], (*ip)[3]);
                     }
                 }
             }
@@ -179,18 +161,15 @@ namespace IPCore
                     }
                     else if (fp->size() == 2)
                     {
-                        str << p->name() << "@" << (*fp)[0] << "@" << (*fp)[1]
-                            << "@";
+                        str << p->name() << "@" << (*fp)[0] << "@" << (*fp)[1] << "@";
                     }
                     else if (fp->size() == 3)
                     {
-                        str << p->name() << "@" << (*fp)[0] << "@" << (*fp)[1]
-                            << "@" << (*fp)[2] << "@";
+                        str << p->name() << "@" << (*fp)[0] << "@" << (*fp)[1] << "@" << (*fp)[2] << "@";
                     }
                     else if (fp->size() == 4)
                     {
-                        str << p->name() << "@" << (*fp)[0] << "@" << (*fp)[1]
-                            << "@" << (*fp)[2] << "@" << (*fp)[3] << "@";
+                        str << p->name() << "@" << (*fp)[0] << "@" << (*fp)[1] << "@" << (*fp)[2] << "@" << (*fp)[3] << "@";
                     }
                 }
 
@@ -202,18 +181,15 @@ namespace IPCore
                     }
                     else if (ip->size() == 2)
                     {
-                        str << p->name() << "@" << (*ip)[0] << "@" << (*ip)[1]
-                            << "@";
+                        str << p->name() << "@" << (*ip)[0] << "@" << (*ip)[1] << "@";
                     }
                     else if (ip->size() == 3)
                     {
-                        str << p->name() << "@" << (*ip)[0] << "@" << (*ip)[1]
-                            << "@" << (*ip)[2] << "@";
+                        str << p->name() << "@" << (*ip)[0] << "@" << (*ip)[1] << "@" << (*ip)[2] << "@";
                     }
                     else if (ip->size() == 4)
                     {
-                        str << p->name() << "@" << (*ip)[0] << "@" << (*ip)[1]
-                            << "@" << (*ip)[2] << "@" << (*ip)[2] << "@";
+                        str << p->name() << "@" << (*ip)[0] << "@" << (*ip)[1] << "@" << (*ip)[2] << "@" << (*ip)[2] << "@";
                     }
                 }
             }
@@ -222,8 +198,7 @@ namespace IPCore
         return str.str();
     }
 
-    IPNode::ImageComponent
-    SourceIPNode::selectComponentFromContext(const Context& context) const
+    IPNode::ImageComponent SourceIPNode::selectComponentFromContext(const Context& context) const
     {
         //
         //  If the user has indicated a specific component start with that
@@ -231,8 +206,7 @@ namespace IPCore
 
         if (!m_imageComponent->empty())
         {
-            const StringProperty::container_type& data =
-                m_imageComponent->valueContainer();
+            const StringProperty::container_type& data = m_imageComponent->valueContainer();
             const string type = data[0];
             const size_t size = data.size();
 
@@ -259,13 +233,11 @@ namespace IPCore
                 }
                 else if (size == 3)
                 {
-                    return ImageComponent(ChannelComponent, "", data[1],
-                                          data[2]);
+                    return ImageComponent(ChannelComponent, "", data[1], data[2]);
                 }
                 else if (size == 4)
                 {
-                    return ImageComponent(ChannelComponent, data[1], data[2],
-                                          data[3]);
+                    return ImageComponent(ChannelComponent, data[1], data[2], data[3]);
                 }
             }
         }
@@ -273,9 +245,7 @@ namespace IPCore
         return context.component;
     }
 
-    IPNode::ImageComponent
-    SourceIPNode::stereoComponent(const ImageComponent& component,
-                                  size_t eye) const
+    IPNode::ImageComponent SourceIPNode::stereoComponent(const ImageComponent& component, size_t eye) const
     {
         size_t neyes = m_eyeViews->size();
 
@@ -301,25 +271,17 @@ namespace IPCore
             return "";
     }
 
-    void SourceIPNode::mediaInfo(const Context& context,
-                                 MediaInfoVector& infos) const
+    void SourceIPNode::mediaInfo(const Context& context, MediaInfoVector& infos) const
     {
         for (size_t i = 0; i < numMedia(); i++)
         {
-            infos.push_back(MediaInfo(mediaName(i), mediaMovieInfo(i),
-                                      const_cast<SourceIPNode*>(this)));
+            infos.push_back(MediaInfo(mediaName(i), mediaMovieInfo(i), const_cast<SourceIPNode*>(this)));
         }
     }
 
-    const string& SourceIPNode::mediaRepName() const
-    {
-        return m_mediaRepName->front();
-    }
+    const string& SourceIPNode::mediaRepName() const { return m_mediaRepName->front(); }
 
-    bool SourceIPNode::isMediaActive() const
-    {
-        return m_mediaActive->front() != 0;
-    }
+    bool SourceIPNode::isMediaActive() const { return m_mediaActive->front() != 0; }
 
     void SourceIPNode::setMediaActive(bool state)
     {
@@ -331,8 +293,7 @@ namespace IPCore
         }
     }
 
-    void SourceIPNode::updateStereoViews(const vector<string>& views,
-                                         StringProperty* viewsP) const
+    void SourceIPNode::updateStereoViews(const vector<string>& views, StringProperty* viewsP) const
     {
         //
         //  If we have left and right views, use them, if we have 2 or more
@@ -348,8 +309,7 @@ namespace IPCore
         if (views.size() > 0 && viewsP)
         {
             if (std::find(views.begin(), views.end(), "left") != views.end()
-                && std::find(views.begin(), views.end(), "right")
-                       != views.end())
+                && std::find(views.begin(), views.end(), "right") != views.end())
             {
                 viewsP->resize(2);
                 viewsP->front() = "left";

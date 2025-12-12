@@ -43,8 +43,7 @@ namespace IPCore
             typedef std::vector<std::string> StringVector;
             typedef PropertyEditor<T> Editor;
 
-            void setArgs(IPGraph* graph, int frame, const std::string& propPath,
-                         const ValueType& value);
+            void setArgs(IPGraph* graph, int frame, const std::string& propPath, const ValueType& value);
 
             virtual void doit();
             virtual void undo();
@@ -57,10 +56,7 @@ namespace IPCore
             ValueTypeVector m_oldValues;
         };
 
-        template <typename T>
-        void SetProperty<T>::setArgs(IPGraph* graph, int frame,
-                                     const std::string& propPath,
-                                     const ValueType& value)
+        template <typename T> void SetProperty<T>::setArgs(IPGraph* graph, int frame, const std::string& propPath, const ValueType& value)
         {
             m_graph = graph;
             m_propPath = propPath;
@@ -71,8 +67,7 @@ namespace IPCore
         template <typename T> void SetProperty<T>::doit()
         {
             Editor edit(*m_graph, m_frame, m_propPath);
-            const typename Editor::PropertyVector& props =
-                edit.propertyVector();
+            const typename Editor::PropertyVector& props = edit.propertyVector();
 
             m_oldValues.resize(props.size());
 
@@ -100,10 +95,7 @@ namespace IPCore
 
             virtual ~SetPropertyInfo() {}
 
-            virtual TwkApp::Command* newCommand() const
-            {
-                return new SetProperty<T>(this);
-            }
+            virtual TwkApp::Command* newCommand() const { return new SetProperty<T>(this); }
         };
 
     } // namespace Commands

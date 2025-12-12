@@ -7,14 +7,14 @@
 INCLUDE(ProcessorCount) # require CMake 3.15+
 PROCESSORCOUNT(_cpu_count)
 
-RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_GLEW" "e1a80a9f12d7def202d394f46e44cfced1104bfb" "make" "")
+RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_GLEW" "${RV_DEPS_GLEW_VERSION}" "make" "")
 
 SET(_download_url
     "https://github.com/nigels-com/glew/archive/${_version}.zip"
 )
 
 SET(_download_hash
-    9bfc689dabeb4e305ce80b5b6f28bcf9
+    ${RV_DEPS_GLEW_DOWNLOAD_HASH}
 )
 
 SET(_install_dir
@@ -33,11 +33,11 @@ ENDIF()
 
 IF(RV_TARGET_DARWIN)
   SET(_glew_lib_name
-      ${CMAKE_SHARED_LIBRARY_PREFIX}GLEW.2.2.0${CMAKE_SHARED_LIBRARY_SUFFIX}
+      ${CMAKE_SHARED_LIBRARY_PREFIX}GLEW.${RV_DEPS_GLEW_VERSION_LIB}${CMAKE_SHARED_LIBRARY_SUFFIX}
   )
 ELSE()
   SET(_glew_lib_name
-      ${CMAKE_SHARED_LIBRARY_PREFIX}GLEW${CMAKE_SHARED_LIBRARY_SUFFIX}.2.2.0
+      ${CMAKE_SHARED_LIBRARY_PREFIX}GLEW${CMAKE_SHARED_LIBRARY_SUFFIX}.${RV_DEPS_GLEW_VERSION_LIB}
   )
 ENDIF()
 SET(_glew_lib
@@ -52,6 +52,12 @@ EXTERNALPROJECT_ADD(
   URL_MD5 ${_download_hash}
   DOWNLOAD_NAME ${_target}_${_version}.zip
   DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
+  # Patch to fix the build issue with OpenGL-Registry Pinning the OpenGL-Registry version to a specific commit https://github.com/nigels-com/glew/issues/449
+  # Also clone the required glfixes repository
+  PATCH_COMMAND
+    cd auto && git clone https://github.com/KhronosGroup/OpenGL-Registry.git || true && cd OpenGL-Registry && git checkout
+    a77f5b6ffd0b0b74904f755ae977fa278eac4e95 && cd .. && git clone --depth=1 --branch glew https://github.com/nigels-com/glfixes glfixes || true && touch
+    OpenGL-Registry/.dummy && cd ..
   CONFIGURE_COMMAND cd auto && ${_make_command} && cd .. && ${_make_command}
   BUILD_COMMAND ${_make_command} -j${_cpu_count} GLEW_DEST=${_install_dir}
   INSTALL_COMMAND ${_make_command} install LIBDIR=${_lib_dir} GLEW_DEST=${_install_dir}

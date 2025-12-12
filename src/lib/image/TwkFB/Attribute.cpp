@@ -18,13 +18,9 @@ namespace TwkFB
 
     TWK_CLASS_NEW_DELETE(FBAttribute)
 
-    FBAttribute* DataContainerAttribute::copy() const
-    {
-        return new DataContainerAttribute(name(), data(), size());
-    }
+    FBAttribute* DataContainerAttribute::copy() const { return new DataContainerAttribute(name(), data(), size()); }
 
-    FBAttribute*
-    DataContainerAttribute::copyWithPrefix(const string& prefix) const
+    FBAttribute* DataContainerAttribute::copyWithPrefix(const string& prefix) const
     {
         return new DataContainerAttribute(prefix + name(), data(), size());
     }
@@ -37,8 +33,7 @@ namespace TwkFB
     }
 
     template <>
-    TypedFBAttribute<const char*>::TypedFBAttribute(const std::string& name,
-                                                    const char* value)
+    TypedFBAttribute<const char*>::TypedFBAttribute(const std::string& name, const char* value)
         : FBAttribute(name)
     {
         //  FRIENDLY REMINDER: USE A STRING ATTR INSTEAD OF CHAR*
@@ -49,13 +44,11 @@ namespace TwkFB
     }
 
     template <>
-    TypedFBAttribute<char*>::TypedFBAttribute(const std::string& name,
-                                              char* value)
+    TypedFBAttribute<char*>::TypedFBAttribute(const std::string& name, char* value)
         : FBAttribute(name)
     {
         //  FRIENDLY REMINDER: USE A STRING ATTR INSTEAD OF CHAR*
-        cout << "ERROR: TypedFBAttribute<T> where T is char* is not allowed"
-             << endl;
+        cout << "ERROR: TypedFBAttribute<T> where T is char* is not allowed" << endl;
         abort();
     }
 

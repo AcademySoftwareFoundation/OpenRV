@@ -166,8 +166,7 @@ namespace TwkMovie
         //  Convert to Y RY BY
         //
 
-        void convertToYRYBY(int Ysamples, int RYsamples, int BYsamples,
-                            int Asamples = 1)
+        void convertToYRYBY(int Ysamples, int RYsamples, int BYsamples, int Asamples = 1)
         {
             m_ysamples = Ysamples;
             m_rysamples = RYsamples;
@@ -265,10 +264,8 @@ namespace TwkMovie
         //
 
         virtual bool hasAudio() const;
-        virtual void imagesAtFrame(const ReadRequest& request,
-                                   FrameBufferVector& fbs);
-        virtual void identifiersAtFrame(const ReadRequest& request,
-                                        IdentifierVector& ids);
+        virtual void imagesAtFrame(const ReadRequest& request, FrameBufferVector& fbs);
+        virtual void identifiersAtFrame(const ReadRequest& request, IdentifierVector& ids);
         virtual void audioConfigure(const AudioConfiguration& conf);
         virtual size_t audioFillBuffer(const AudioReadRequest&, AudioBuffer&);
         virtual void flush();

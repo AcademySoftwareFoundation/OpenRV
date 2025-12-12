@@ -21,9 +21,7 @@ namespace IPCore
     using namespace std;
     using namespace stl_ext;
 
-    ChannelMapIPNode::ChannelMapIPNode(const std::string& name,
-                                       const NodeDefinition* def,
-                                       IPGraph* graph, GroupIPNode* group)
+    ChannelMapIPNode::ChannelMapIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group)
         : IPNode(name, def, graph, group)
     {
         m_showErrorMessageInEvaluate = true;
@@ -42,10 +40,7 @@ namespace IPCore
         }
     }
 
-    void ChannelMapIPNode::outputDisconnect(IPNode* node)
-    {
-        IPNode::outputDisconnect(node);
-    }
+    void ChannelMapIPNode::outputDisconnect(IPNode* node) { IPNode::outputDisconnect(node); }
 
     IPImage* ChannelMapIPNode::evaluate(const Context& context)
     {
@@ -98,8 +93,7 @@ namespace IPCore
                             }
                             str << (*chmap)[i];
                         }
-                        cerr << "ERROR: channel map '" << str.str()
-                             << "' failed" << endl;
+                        cerr << "ERROR: channel map '" << str.str() << "' failed" << endl;
                         m_showErrorMessageInEvaluate = false;
                     }
                 }

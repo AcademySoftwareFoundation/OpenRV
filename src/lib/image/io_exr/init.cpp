@@ -58,40 +58,19 @@ extern "C"
                 int argc = newargs.size();
 
                 options_description desc("");
-                desc.add_options()(
-                    "rgbaOnly", value<int>(&rgbaOnly)->default_value(rgbaOnly),
-                    "Always use EXR default RGBA reader")(
-                    "convertYRYBY",
-                    value<int>(&convertYRYBY)->default_value(convertYRYBY),
-                    "Convert Y-RY-BY images to RGBA")(
-                    "planar3channel",
-                    value<int>(&planar3channel)->default_value(planar3channel),
-                    "Data Window to read")(
-                    "inherit", value<int>(&inherit)->default_value(inherit),
-                    "Guess RGBA channel names")(
-                    "noOneChannel",
-                    value<int>(&noOneChannel)->default_value(noOneChannel),
-                    "Data Window to read")(
-                    "readWindow",
-                    value<int>(&readWindow)->default_value(readWindow),
-                    "Data Window to read")(
-                    "readWindowIsDisplayWindow",
-                    value<int>(&readWindowIsDisplayWindow)
-                        ->default_value(readWindowIsDisplayWindow),
-                    "Read Window is Display Window")(
-                    "stripAlpha",
-                    value<int>(&stripAlpha)->default_value(stripAlpha),
-                    "Strip alpha channel from EXRs for speed")(
+                desc.add_options()("rgbaOnly", value<int>(&rgbaOnly)->default_value(rgbaOnly), "Always use EXR default RGBA reader")(
+                    "convertYRYBY", value<int>(&convertYRYBY)->default_value(convertYRYBY), "Convert Y-RY-BY images to RGBA")(
+                    "planar3channel", value<int>(&planar3channel)->default_value(planar3channel),
+                    "Data Window to read")("inherit", value<int>(&inherit)->default_value(inherit), "Guess RGBA channel names")(
+                    "noOneChannel", value<int>(&noOneChannel)->default_value(noOneChannel),
+                    "Data Window to read")("readWindow", value<int>(&readWindow)->default_value(readWindow), "Data Window to read")(
+                    "readWindowIsDisplayWindow", value<int>(&readWindowIsDisplayWindow)->default_value(readWindowIsDisplayWindow),
+                    "Read Window is Display Window")("stripAlpha", value<int>(&stripAlpha)->default_value(stripAlpha),
+                                                     "Strip alpha channel from EXRs for speed")(
                     "ioMethod", value<int>(&ioMethod)->default_value(ioMethod),
-                    "I/O Method")("ioSize",
-                                  value<int>(&ioSize)->default_value(ioSize),
-                                  "I/O Max async read size")(
-                    "ioMaxAsync",
-                    value<int>(&ioMaxAsync)->default_value(ioMaxAsync),
-                    "I/O Max ASync Requests")(
-                    "writeMethod",
-                    value<int>(&writeMethod)->default_value(writeMethod),
-                    "Write Method");
+                    "I/O Method")("ioSize", value<int>(&ioSize)->default_value(ioSize), "I/O Max async read size")(
+                    "ioMaxAsync", value<int>(&ioMaxAsync)->default_value(ioMaxAsync),
+                    "I/O Max ASync Requests")("writeMethod", value<int>(&writeMethod)->default_value(writeMethod), "Write Method");
 
                 variables_map vm;
                 store(parse_command_line(argc, argv, desc), vm);
@@ -108,11 +87,9 @@ extern "C"
             }
         }
 
-        return new IOexr(
-            rgbaOnly, convertYRYBY, planar3channel, inherit, noOneChannel,
-            stripAlpha, readWindowIsDisplayWindow,
-            (IOexr::ReadWindow)readWindow, (IOexr::WriteMethod)writeMethod,
-            (StreamingFrameBufferIO::IOType)ioMethod, ioSize, ioMaxAsync);
+        return new IOexr(rgbaOnly, convertYRYBY, planar3channel, inherit, noOneChannel, stripAlpha, readWindowIsDisplayWindow,
+                         (IOexr::ReadWindow)readWindow, (IOexr::WriteMethod)writeMethod, (StreamingFrameBufferIO::IOType)ioMethod, ioSize,
+                         ioMaxAsync);
     }
 
     void destroy(IOexr* plug) { delete plug; }

@@ -33,8 +33,7 @@ namespace TwkFB
 
         for (int i = 0; i < value.size(); i++)
         {
-            if (value[i] != ')' && value[i] != '(' && value[i] != '['
-                && value[i] != ']' && value[i] != ',')
+            if (value[i] != ')' && value[i] != '(' && value[i] != '[' && value[i] != ']' && value[i] != ',')
             {
                 str << value[i];
             }
@@ -55,8 +54,7 @@ namespace TwkFB
         //  Guess if M needs to be transposed
         //
 
-        if ((M(3, 0) > 1e-6 || M(3, 1) > 1e-6 || M(3, 2) > 1e-6)
-            && (M(0, 3) < 1e-6 || M(1, 3) < 1e-6 || M(2, 3) < 1e-6))
+        if ((M(3, 0) > 1e-6 || M(3, 1) > 1e-6 || M(3, 2) > 1e-6) && (M(0, 3) < 1e-6 || M(1, 3) < 1e-6 || M(2, 3) < 1e-6))
         {
             // cout << "INFO: depth map transposing" << endl;
             M.transpose();
@@ -71,8 +69,7 @@ namespace TwkFB
         init();
     }
 
-    DepthMap::DepthMap(const FrameBuffer* fb, int depthChannel,
-                       DepthSpace space)
+    DepthMap::DepthMap(const FrameBuffer* fb, int depthChannel, DepthSpace space)
         : m_fb(fb)
         , m_depthChannel(depthChannel)
         , m_space(space)
@@ -183,10 +180,7 @@ namespace TwkFB
         return depthAtNDC((1.0f + q.x) / 2.0f, (1.0f - q.y) / 2.0f);
     }
 
-    float DepthMap::depthOfWorldPoint(Point p) const
-    {
-        return (m_worldToCamera * p).z;
-    }
+    float DepthMap::depthOfWorldPoint(Point p) const { return (m_worldToCamera * p).z; }
 
     float DepthMap::depthAtPixel(size_t x, size_t y) const
     {
@@ -208,9 +202,6 @@ namespace TwkFB
         }
     }
 
-    float DepthMap::relativeDepthAtWorldPoint(Point p) const
-    {
-        return depthOfWorldPoint(p) - depthAtWorldPoint(p);
-    }
+    float DepthMap::relativeDepthAtWorldPoint(Point p) const { return depthOfWorldPoint(p) - depthAtWorldPoint(p); }
 
 } // namespace TwkFB

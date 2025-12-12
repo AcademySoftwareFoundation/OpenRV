@@ -49,6 +49,28 @@ MACRO(RV_CREATE_STANDARD_DEPS_VARIABLES target_name version make_command configu
   SET(_version
       ${version}
   )
+  
+    # Attempt to match Major.Minor.Patch
+    # CMAKE_MATCH_1 will be Major, CMAKE_MATCH_2 Minor, etc.
+    string(REGEX MATCH "^([0-9]+)\\.?([0-9]*)\\.?([0-9]*)" _dummy "${_version}")
+    # If the group was found, use it; otherwise default to 0
+    if(CMAKE_MATCH_1)
+        set(_version_major ${CMAKE_MATCH_1})
+    else()
+        set(_version_major 0)
+    endif()
+
+    if(CMAKE_MATCH_2)
+        set(_version_minor ${CMAKE_MATCH_2})
+    else()
+        set(_version_minor 0)
+    endif()
+
+    if(CMAKE_MATCH_3)
+        set(_version_patch ${CMAKE_MATCH_3})
+    else()
+        set(_version_patch 0)
+    endif()
   SET(${target_name}_VERSION
       ${_version}
       CACHE INTERNAL "" FORCE
@@ -112,15 +134,18 @@ ENDMACRO()
 
 MACRO(RV_SHOW_STANDARD_DEPS_VARIABLES)
   MESSAGE(DEBUG "RV_CREATE_STANDARD_DEPS_VARIABLES:")
-  MESSAGE(DEBUG "  _target       ='${_target}'")
-  MESSAGE(DEBUG "  _version      ='${_version}'")
-  MESSAGE(DEBUG "  _base_dir     ='${_base_dir}'")
-  MESSAGE(DEBUG "  _build_dir    ='${_build_dir}'")
-  MESSAGE(DEBUG "  _source_dir   ='${_source_dir}'")
-  MESSAGE(DEBUG "  _install_dir  ='${_install_dir}'")
-  MESSAGE(DEBUG "  _include_dir  ='${_include_dir}'")
-  MESSAGE(DEBUG "  _bin_dir      ='${_bin_dir}'")
-  MESSAGE(DEBUG "  _lib_dir      ='${_lib_dir}'")
+  MESSAGE(DEBUG "  _target        ='${_target}'")
+  MESSAGE(DEBUG "  _version       ='${_version}'")
+  MESSAGE(DEBUG "  _version_major ='${_version_major}'")
+  MESSAGE(DEBUG "  _version_minor ='${_version_minor}'")
+  MESSAGE(DEBUG "  _version_patch ='${_version_patch}'")
+  MESSAGE(DEBUG "  _base_dir      ='${_base_dir}'")
+  MESSAGE(DEBUG "  _build_dir     ='${_build_dir}'")
+  MESSAGE(DEBUG "  _source_dir    ='${_source_dir}'")
+  MESSAGE(DEBUG "  _install_dir   ='${_install_dir}'")
+  MESSAGE(DEBUG "  _include_dir   ='${_include_dir}'")
+  MESSAGE(DEBUG "  _bin_dir       ='${_bin_dir}'")
+  MESSAGE(DEBUG "  _lib_dir       ='${_lib_dir}'")
   MESSAGE(DEBUG "  _make_command      ='${_make_command}'")
   MESSAGE(DEBUG "  _configure_command ='${_configure_command}'")
   MESSAGE(DEBUG "  ${_target}_VERSION='${${_target}_VERSION}'")

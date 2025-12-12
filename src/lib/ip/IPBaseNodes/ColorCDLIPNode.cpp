@@ -22,9 +22,7 @@ namespace IPCore
     using namespace TwkContainer;
     using namespace TwkMath;
 
-    ColorCDLIPNode::ColorCDLIPNode(const std::string& name,
-                                   const NodeDefinition* def, IPGraph* graph,
-                                   GroupIPNode* group)
+    ColorCDLIPNode::ColorCDLIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group)
         : IPNode(name, def, graph, group)
     {
         setMaxInputs(1);
@@ -34,14 +32,10 @@ namespace IPCore
 
         m_active = declareProperty<IntProperty>("node.active", 1);
         m_file = declareProperty<StringProperty>("node.file", "");
-        m_colorspace = declareProperty<StringProperty>(
-            "node.colorspace",
-            definition()->stringValue("defaults.colorspace", "rec709"));
-        m_slope = declareProperty<Vec3fProperty>("node.slope",
-                                                 Vec3f(1.0f, 1.0f, 1.0f));
+        m_colorspace = declareProperty<StringProperty>("node.colorspace", definition()->stringValue("defaults.colorspace", "rec709"));
+        m_slope = declareProperty<Vec3fProperty>("node.slope", Vec3f(1.0f, 1.0f, 1.0f));
         m_offset = declareProperty<Vec3fProperty>("node.offset", Vec3f(0.0f));
-        m_power = declareProperty<Vec3fProperty>("node.power",
-                                                 Vec3f(1.0f, 1.0f, 1.0f));
+        m_power = declareProperty<Vec3fProperty>("node.power", Vec3f(1.0f, 1.0f, 1.0f));
         m_saturation = declareProperty<FloatProperty>("node.saturation", 1.0f);
         m_noclamp = declareProperty<IntProperty>("node.noClamp", 1);
     }
@@ -62,8 +56,7 @@ namespace IPCore
             updateProperties();
     }
 
-    void ColorCDLIPNode::readCompleted(const std::string& type,
-                                       unsigned int version)
+    void ColorCDLIPNode::readCompleted(const std::string& type, unsigned int version)
     {
         IPNode::readCompleted(type, version);
         updateProperties();
@@ -79,8 +72,7 @@ namespace IPCore
         CDL::ColorCorrectionCollection ccc = CDL::readCDL(m_file->front());
         if (ccc.size() > 1)
         {
-            cout << "WARNING: Found more than one cdl in " << m_file->front()
-                 << ". Using first one found." << endl;
+            cout << "WARNING: Found more than one cdl in " << m_file->front() << ". Using first one found." << endl;
         }
         if (ccc.size() > 0)
         {
@@ -130,28 +122,23 @@ namespace IPCore
             saturation = ip->front();
         }
 
-        if (offset != Vec3f(0.0f) || slope != Vec3f(1.0f)
-            || power != Vec3f(1.0f) || saturation != 1.0f)
+        if (offset != Vec3f(0.0f) || slope != Vec3f(1.0f) || power != Vec3f(1.0f) || saturation != 1.0f)
         {
             bool noClamp = false;
             if (IntProperty* ip = m_noclamp)
                 noClamp = ip->front();
 
-            const string colorspace =
-                m_colorspace ? m_colorspace->front() : "rec709";
+            const string colorspace = m_colorspace ? m_colorspace->front() : "rec709";
 
             const bool isACESLog = (colorspace == "aceslog");
 
             if (isACESLog || (colorspace == "aces"))
             {
-                img->shaderExpr = Shader::newColorCDLForACES(
-                    img->shaderExpr, slope, offset, power, saturation, noClamp,
-                    isACESLog);
+                img->shaderExpr = Shader::newColorCDLForACES(img->shaderExpr, slope, offset, power, saturation, noClamp, isACESLog);
             }
             else
             {
-                img->shaderExpr = Shader::newColorCDL(
-                    img->shaderExpr, slope, offset, power, saturation, noClamp);
+                img->shaderExpr = Shader::newColorCDL(img->shaderExpr, slope, offset, power, saturation, noClamp);
             }
         }
 

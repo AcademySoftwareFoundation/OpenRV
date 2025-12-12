@@ -35,8 +35,7 @@ namespace TwkMovie
         //  Constructors
         //
 
-        LeaderFooterMovie(Movie*, int fs, int fe, Movie* leader = 0,
-                          Movie* footer = 0);
+        LeaderFooterMovie(Movie*, int fs, int fe, Movie* leader = 0, Movie* footer = 0);
         virtual ~LeaderFooterMovie();
 
         virtual void imagesAtFrame(const ReadRequest&, FrameBufferVector& fbs);

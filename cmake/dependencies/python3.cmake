@@ -12,54 +12,60 @@ SET(_opentimelineio_target
     "RV_DEPS_OPENTIMELINEIO"
 )
 
-RV_VFX_SET_VARIABLE(_pyside_target CY2023 "RV_DEPS_PYSIDE2" CY2024 "RV_DEPS_PYSIDE6")
-
-SET(PYTHON_VERSION_MAJOR
-    3
+SET(_pyside_target
+    "${RV_DEPS_PYSIDE_TARGET}"
 )
-
-RV_VFX_SET_VARIABLE(PYTHON_VERSION_MINOR CY2023 "10" CY2024 "11")
-
-RV_VFX_SET_VARIABLE(PYTHON_VERSION_PATCH CY2023 "13" CY2024 "9")
 
 SET(_python3_version
-    "${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}.${PYTHON_VERSION_PATCH}"
+    "${RV_DEPS_PYTHON_VERSION}"
 )
+STRING(REPLACE "." ";" _python_version_list "${_python3_version}")
 
-SET(RV_DEPS_PYTHON_VERSION_MAJOR
-    ${PYTHON_VERSION_MAJOR}
-)
+LIST(GET _python_version_list 0 PYTHON_VERSION_MAJOR)
+LIST(GET _python_version_list 1 PYTHON_VERSION_MINOR)
+LIST(GET _python_version_list 2 PYTHON_VERSION_PATCH)
+
 SET(RV_DEPS_PYTHON_VERSION_SHORT
     "${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}"
 )
 
+# This version is used for generating src/build/requirements.txt from requirements.txt.in template All platforms install OpenTimelineIO from git to ensure
+# consistent source builds.
 SET(_opentimelineio_version
-    "0.16.0"
+    "${RV_DEPS_OTIO_VERSION}"
 )
 
-RV_VFX_SET_VARIABLE(_pyside_version CY2023 "5.15.10" CY2024 "6.5.3")
+SET(_pyside_version
+    "${RV_DEPS_PYSIDE_VERSION}"
+)
+# Construct the full git URL for pip to use in requirements.txt Using this avoids @ symbol conflicts in CONFIGURE_FILE
+SET(_opentimelineio_pip_url
+    "git+https://github.com/AcademySoftwareFoundation/OpenTimelineIO@v${_opentimelineio_version}#egg=OpenTimelineIO"
+)
 
 SET(_python3_download_url
     "https://github.com/python/cpython/archive/refs/tags/v${_python3_version}.zip"
 )
-RV_VFX_SET_VARIABLE(_python3_download_hash CY2023 "21b32503f31386b37f0c42172dfe5637" CY2024 "392eccd4386936ffcc46ed08057db3e7")
+
+SET(_python3_download_hash
+    "${RV_DEPS_PYTHON_DOWNLOAD_HASH}"
+)
 
 SET(_opentimelineio_download_url
     "https://github.com/AcademySoftwareFoundation/OpenTimelineIO"
 )
+
 SET(_opentimelineio_git_tag
     "v${_opentimelineio_version}"
 )
 
-RV_VFX_SET_VARIABLE(
-  _pyside_archive_url
-  CY2023
-  "https://mirrors.ocf.berkeley.edu/qt/official_releases/QtForPython/pyside2/PySide2-${_pyside_version}-src/pyside-setup-opensource-src-${_pyside_version}.zip"
-  CY2024
-  "https://mirrors.ocf.berkeley.edu/qt/official_releases/QtForPython/pyside6/PySide6-${_pyside_version}-src/pyside-setup-everywhere-src-${_pyside_version}.zip"
+SET(_pyside_archive_url
+    "${RV_DEPS_PYSIDE_ARCHIVE_URL}"
 )
 
-RV_VFX_SET_VARIABLE(_pyside_download_hash CY2023 "87841aaced763b6b52e9b549e31a493f" CY2024 "515d3249c6e743219ff0d7dd25b8c8d8")
+SET(_pyside_download_hash
+    "${RV_DEPS_PYSIDE_DOWNLOAD_HASH}"
+)
 
 SET(_install_dir
     ${RV_DEPS_BASE_DIR}/${_python3_target}/install
@@ -71,18 +77,8 @@ SET(_build_dir
     ${RV_DEPS_BASE_DIR}/${_python3_target}/build
 )
 
-IF(RV_TARGET_WINDOWS)
-
-  FETCHCONTENT_DECLARE(
-    ${_opentimelineio_target}
-    GIT_REPOSITORY ${_opentimelineio_download_url}
-    GIT_TAG ${_opentimelineio_git_tag}
-    SOURCE_SUBDIR "src" # Avoids the top level CMakeLists.txt
-  )
-
-  FETCHCONTENT_MAKEAVAILABLE(${_opentimelineio_target})
-
-ENDIF()
+# Note: OpenTimelineIO is now installed via requirements.txt from git URL for all platforms. This ensures consistent source builds across Windows, Mac, and
+# Linux.
 
 FETCHCONTENT_DECLARE(
   ${_pyside_target}
@@ -109,21 +105,17 @@ LIST(APPEND _python3_make_command "--temp-dir")
 LIST(APPEND _python3_make_command ${_build_dir})
 
 LIST(APPEND _python3_make_command "--vfx_platform")
-RV_VFX_SET_VARIABLE(_vfx_platform_ CY2023 "2023" CY2024 "2024")
-LIST(APPEND _python3_make_command ${_vfx_platform_})
+LIST(APPEND _python3_make_command ${RV_VFX_CY_YEAR})
 
 IF(DEFINED RV_DEPS_OPENSSL_INSTALL_DIR)
   LIST(APPEND _python3_make_command "--openssl-dir")
   LIST(APPEND _python3_make_command ${RV_DEPS_OPENSSL_INSTALL_DIR})
 ENDIF()
 IF(RV_TARGET_WINDOWS)
-  LIST(APPEND _python3_make_command "--opentimelineio-source-dir")
-  LIST(APPEND _python3_make_command ${rv_deps_opentimelineio_SOURCE_DIR})
   LIST(APPEND _python3_make_command "--python-version")
   LIST(APPEND _python3_make_command "${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR}")
 ENDIF()
 
-# TODO_QT: Maybe we could use something like NOT CY2023 since after 2023, it is Qt6 TODO_QT: Below code could be simplified, but for now it is faster to test.
 IF(RV_VFX_PLATFORM STREQUAL CY2023)
   SET(_pyside_make_command_script
       "${PROJECT_SOURCE_DIR}/src/build/make_pyside.py"
@@ -149,10 +141,10 @@ IF(RV_VFX_PLATFORM STREQUAL CY2023)
   LIST(APPEND _pyside_make_command "--python-dir")
   LIST(APPEND _pyside_make_command ${_install_dir})
   LIST(APPEND _pyside_make_command "--qt-dir")
-  LIST(APPEND _pyside_make_command ${RV_DEPS_QT5_LOCATION})
+  LIST(APPEND _pyside_make_command ${RV_DEPS_QT_LOCATION})
   LIST(APPEND _pyside_make_command "--python-version")
   LIST(APPEND _pyside_make_command "${RV_DEPS_PYTHON_VERSION_SHORT}")
-ELSEIF(RV_VFX_PLATFORM STREQUAL CY2024)
+ELSEIF(RV_VFX_PLATFORM STRGREATER_EQUAL CY2024)
   SET(_pyside_make_command_script
       "${PROJECT_SOURCE_DIR}/src/build/make_pyside6.py"
   )
@@ -177,7 +169,7 @@ ELSEIF(RV_VFX_PLATFORM STREQUAL CY2024)
   LIST(APPEND _pyside_make_command "--python-dir")
   LIST(APPEND _pyside_make_command ${_install_dir})
   LIST(APPEND _pyside_make_command "--qt-dir")
-  LIST(APPEND _pyside_make_command ${RV_DEPS_QT6_LOCATION})
+  LIST(APPEND _pyside_make_command ${RV_DEPS_QT_LOCATION})
   LIST(APPEND _pyside_make_command "--python-version")
   LIST(APPEND _pyside_make_command "${RV_DEPS_PYTHON_VERSION_SHORT}")
 ENDIF()
@@ -249,21 +241,68 @@ ELSE() # Not WINDOWS
   )
 ENDIF()
 
-SET(_requirements_file
-    "${PROJECT_SOURCE_DIR}/src/build/requirements.txt"
+# Set the appropriate library for CMAKE_ARGS based on platform
+# Windows needs the import library (.lib), Unix needs the shared library (.so/.dylib)
+IF(RV_TARGET_WINDOWS)
+  SET(_python3_cmake_library ${_python3_implib})
+ELSE()
+  SET(_python3_cmake_library ${_python3_lib})
+ENDIF()
+
+# Generate requirements.txt from template with the OpenTimelineIO version substituted
+SET(_requirements_input_file
+    "${PROJECT_SOURCE_DIR}/src/build/requirements.txt.in"
 )
+SET(_requirements_output_file
+    "${CMAKE_BINARY_DIR}/requirements.txt"
+)
+
+CONFIGURE_FILE(${_requirements_input_file} ${_requirements_output_file} @ONLY)
+
+# OpenTimelineIO needs to be built from source with CMAKE_ARGS to ensure it uses
+# the correct custom-built Python libraries. This is required for both old and new
+# versions of pybind11, especially pybind11 v2.13.6+ which has stricter detection.
+# Note: pybind11's FindPythonLibsNew.cmake uses PYTHON_LIBRARY (all caps),
+# PYTHON_INCLUDE_DIR, and PYTHON_EXECUTABLE variables.
+# --no-cache-dir: Don't use pip's wheel cache (prevents using wheels built for wrong Python version)
+# --force-reinstall: Reinstall packages even if already installed (ensures fresh build)
+
+# Set OTIO_CXX_DEBUG_BUILD for all Debug builds to ensure OTIO's C++ extensions
+# are built with debug symbols and proper optimization levels matching RV's build type.
+# On Windows, this also ensures OTIO links against the debug Python library (python311_d.lib).
+IF(CMAKE_BUILD_TYPE MATCHES "^Debug$")
+  SET(_otio_debug_env "OTIO_CXX_DEBUG_BUILD=1")
+ELSE()
+  SET(_otio_debug_env "")
+ENDIF()
+
+# Single unified command for all platforms and build types
 SET(_requirements_install_command
-    "${_python3_executable}" -m pip install --upgrade -r "${_requirements_file}"
+    ${CMAKE_COMMAND} -E env
+    ${_otio_debug_env}
+    "CMAKE_ARGS=-DPYTHON_LIBRARY=${_python3_cmake_library} -DPYTHON_INCLUDE_DIR=${_include_dir} -DPYTHON_EXECUTABLE=${_python3_executable}"
+    "${_python3_executable}" -s -E -I -m pip install --upgrade --no-cache-dir --force-reinstall -r "${_requirements_output_file}"
 )
 
 IF(RV_TARGET_WINDOWS)
-  SET(_patch_python3_11_command
-      "patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/patch/python.3.11.openssl.props.patch &&\
-       patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/patch/python.3.11.python.props.patch &&\
-       patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/patch/python.3.11.get_externals.bat.patch"
+  SET(_patch_python_command
+      "patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/patch/python-${RV_DEPS_PYTHON_VERSION}/python.${RV_DEPS_PYTHON_VERSION}.openssl.props.patch &&\
+       patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/patch/python-${RV_DEPS_PYTHON_VERSION}/python.${RV_DEPS_PYTHON_VERSION}.python.props.patch &&\
+       patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/patch/python-${RV_DEPS_PYTHON_VERSION}/python.${RV_DEPS_PYTHON_VERSION}.get_externals.bat.patch"
   )
 
-  RV_VFX_SET_VARIABLE(_patch_command CY2023 "" CY2024 "${_patch_python3_11_command}")
+  # TODO: Above patches are for Python 3.11.9, need to add other versions.
+  RV_VFX_SET_VARIABLE(
+    _patch_command
+    CY2023
+    ""
+    CY2024
+    "${_patch_python_command}"
+    CY2025
+    "${_patch_python_command}"
+    CY2026
+    ""
+  )
   # Split the command into a semi-colon separated list.
   SEPARATE_ARGUMENTS(_patch_command)
   STRING(
@@ -303,6 +342,8 @@ IF(APPLE
       patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/patch/pyopengl-accelerate.patch
   )
 
+  # TODO: pyopengl is now at 3.1.10. Need to check if this is an improvement Still need the patch
+  # https://github.com/mcfletch/pyopengl/blob/master/accelerate/src/vbo.pyx https://github.com/mcfletch/pyopengl/compare/release-3.1.8...3.1.10
   EXTERNALPROJECT_ADD(
     pyopengl_accelerate
     URL "https://github.com/mcfletch/pyopengl/archive/refs/tags/release-3.1.8.tar.gz"
@@ -331,11 +372,11 @@ SET(${_python3_target}-requirements-flag
 )
 
 ADD_CUSTOM_COMMAND(
-  COMMENT "Installing requirements from ${_requirements_file}"
+  COMMENT "Installing requirements from ${_requirements_output_file}"
   OUTPUT ${${_python3_target}-requirements-flag}
   COMMAND ${_requirements_install_command}
   COMMAND cmake -E touch ${${_python3_target}-requirements-flag}
-  DEPENDS ${_python3_target} ${_requirements_file}
+  DEPENDS ${_python3_target} ${_requirements_output_file} ${_requirements_input_file}
 )
 
 IF(RV_TARGET_WINDOWS
@@ -347,7 +388,8 @@ IF(RV_TARGET_WINDOWS
     POST_BUILD
     COMMENT "Copying Debug Python lib as a unversionned file for Debug"
     COMMAND cmake -E copy_if_different ${_python3_implib} ${_python_release_libpath}
-    COMMAND cmake -E copy_if_different ${_python3_implib} ${_python_release_in_bin_libpath} DEPENDS ${_python3_target} ${_requirements_file}
+    COMMAND cmake -E copy_if_different ${_python3_implib} ${_python_release_in_bin_libpath} DEPENDS ${_python3_target} ${_requirements_output_file}
+            ${_requirements_input_file}
   )
 ENDIF()
 
@@ -355,7 +397,6 @@ SET(${_pyside_target}-build-flag
     ${_install_dir}/${_pyside_target}-build-flag
 )
 
-# TODO_QT: Maybe we could use something like NOT CY2023 since after 2023, it is Qt6 TODO_QT: Below code could be simplified, but for now it is faster to test.
 IF(RV_VFX_PLATFORM STREQUAL CY2023)
   ADD_CUSTOM_COMMAND(
     COMMENT "Building PySide2 using ${_pyside_make_command_script}"
@@ -372,11 +413,11 @@ IF(RV_VFX_PLATFORM STREQUAL CY2023)
   SET(_build_flag_depends
       ${${_pyside_target}-build-flag}
   )
-ELSEIF(RV_VFX_PLATFORM STREQUAL CY2024)
+ELSEIF(RV_VFX_PLATFORM STRGREATER_EQUAL CY2024)
   ADD_CUSTOM_COMMAND(
     COMMENT "Building PySide6 using ${_pyside_make_command_script}"
     OUTPUT ${${_pyside_target}-build-flag}
-    COMMAND ${_pyside_make_command} --prepare --build
+    COMMAND ${CMAKE_COMMAND} -E env "RV_DEPS_NUMPY_VERSION=$ENV{RV_DEPS_NUMPY_VERSION}" ${_pyside_make_command} --prepare --build
     COMMAND cmake -E touch ${${_pyside_target}-build-flag}
     DEPENDS ${_python3_target} ${_pyside_make_command_script} ${${_python3_target}-requirements-flag}
     USES_TERMINAL
@@ -393,7 +434,7 @@ IF(RV_TARGET_WINDOWS)
       ${RV_STAGE_INCLUDE_DIR} COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir}/bin ${RV_STAGE_BIN_DIR}
   )
 
-  IF(RV_VFX_CY2024)
+  IF(RV_VFX_PLATFORM STRGREATER_EQUAL CY2024)
     LIST(
       APPEND
       _copy_commands

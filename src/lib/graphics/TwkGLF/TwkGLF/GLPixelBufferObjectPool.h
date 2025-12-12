@@ -20,8 +20,7 @@ namespace TwkGLF
     class GLPixelBufferObjectFromPool
     {
     public:
-        GLPixelBufferObjectFromPool(GLPixelBufferObject::PackDir dir,
-                                    unsigned int num_bytes);
+        GLPixelBufferObjectFromPool(GLPixelBufferObject::PackDir dir, unsigned int num_bytes);
         ~GLPixelBufferObjectFromPool();
 
         void bind();
