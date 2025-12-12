@@ -138,31 +138,14 @@ def hook_function(in_timeline: otio.schemadef.Annotation.Annotation, argument_ma
                 },
             )
 
-            user = "annotation"
-            process_id = "123456"
-
-            if not layer.soft_deleted:
-                if not commands.propertyExists(f"{frame_component}.order"):
-                    commands.newProperty(f"{frame_component}.order", commands.StringType, 1)
-
-                commands.insertStringProperty(f"{frame_component}.order", [f"pen:{stroke_id}:{frame}:{user}"])
-
-            if not commands.propertyExists(f"{frame_component}.undo_{user}_{process_id}"):
-                commands.newProperty(f"{frame_component}.undo_{user}_{process_id}", commands.StringType, 1)
-
-            commands.insertStringProperty(
-                f"{frame_component}.undo_{user}_{process_id}", [f"pen:{stroke_id}:{frame}:{user}", "create"]
-            )
-
-            if commands.propertyExists(f"{frame_component}.redo_{user}_{process_id}"):
-                commands.setStringProperty(f"{frame_component}.redo_{user}_{process_id}", [])
-
             points_property = f"{pen_component}.points"
             width_property = f"{pen_component}.width"
+
             if not commands.propertyExists(points_property):
                 commands.newProperty(points_property, commands.FloatType, 2)
             if not commands.propertyExists(width_property):
                 commands.newProperty(width_property, commands.FloatType, 1)
+
             for point in layer.points:
                 world_coordinate_x, world_coordinate_y, world_coordinate_width = _transform_otio_to_world_coordinate(
                     point
@@ -173,3 +156,9 @@ def hook_function(in_timeline: otio.schemadef.Annotation.Annotation, argument_ma
                     [world_coordinate_x, world_coordinate_y],
                 )
                 commands.insertFloatProperty(width_property, [world_coordinate_width])
+
+            if not layer.soft_deleted:
+                if not commands.propertyExists(f"{frame_component}.order"):
+                    commands.newProperty(f"{frame_component}.order", commands.StringType, 1)
+
+                commands.insertStringProperty(f"{frame_component}.order", [f"pen:{stroke_id}:{frame}:annotation"])
