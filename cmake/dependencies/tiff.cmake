@@ -51,7 +51,6 @@ GET_TARGET_PROPERTY(zlib_include_dir ZLIB::ZLIB INTERFACE_INCLUDE_DIRECTORIES)
 LIST(APPEND _configure_options "-DZLIB_INCLUDE_DIR=${zlib_include_dir}")
 LIST(APPEND _configure_options "-DZLIB_LIBRARY=${zlib_library}")
 
-
 IF(RV_TARGET_WINDOWS)
   GET_TARGET_PROPERTY(jpeg_library jpeg-turbo::jpeg IMPORTED_IMPLIB)
 ELSE()
@@ -63,8 +62,9 @@ LIST(APPEND _configure_options "-DJPEG_LIBRARY=${jpeg_library}")
 
 LIST(APPEND _configure_options "-Djpeg=ON")
 LIST(APPEND _configure_options "-Dlzma=OFF")
-LIST(APPEND _configure_options "-Dzlib=ON")
 LIST(APPEND _configure_options "-Dwebp=OFF")
+LIST(APPEND _configure_options "-Dzlib=ON")
+LIST(APPEND _configure_options "-Dzstd=OFF")
 
 # Do not need TIFF tools.
 LIST(APPEND _configure_options "-Dtiff-tools=OFF")
@@ -110,9 +110,13 @@ SET_PROPERTY(
 )
 IF(RV_TARGET_WINDOWS)
   IF(${CMAKE_BUILD_TYPE} STREQUAL "Release")
-    SET(_tiff_lib_name "tiff.lib")
+    SET(_tiff_lib_name
+        "tiff.lib"
+    )
   ELSEIF(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
-    SET(_tiff_lib_name "tiffd.lib")
+    SET(_tiff_lib_name
+        "tiffd.lib"
+    )
   ENDIF()
 
   SET_PROPERTY(
