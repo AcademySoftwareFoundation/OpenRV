@@ -567,9 +567,12 @@ class: AnnotateMinorMode : MinorMode
 
         let uuid = generateUuid();
         let uuidProperty = "%s.uuid" % n;
-        
         newProperty(uuidProperty, StringType, 1);
         setStringProperty(uuidProperty, string[] {uuid}, true);
+
+        let softDeletedProperty = "%s.softDeleted" % n;
+        newProperty(softDeletedProperty, IntType, 1);
+        setIntProperty(softDeletedProperty, int[] {0}, true);
 
         let stroke = n.split(".").back();
 
@@ -708,6 +711,10 @@ class: AnnotateMinorMode : MinorMode
 
         newProperty(uuidProperty, StringType, 1);
         setStringProperty(uuidProperty, string[] {uuid}, true);
+
+        let softDeletedProperty = "%s.softDeleted" % n;
+        newProperty(softDeletedProperty, IntType, 1);
+        setIntProperty(softDeletedProperty, int[] {0}, true);
 
         let stroke = n.split(".").back();
 
@@ -1609,6 +1616,12 @@ class: AnnotateMinorMode : MinorMode
                         let parts = stroke.split(":"); // Stroke format: type:id:frame:user_processId
                         let frame = int(parts[2]);
 
+                        let softDeleted = "%s.%s.softDeleted" % (node, stroke);
+                        if (propertyExists(softDeleted))
+                        {
+                            setIntProperty(softDeleted, int[] {0}, true);
+                        }
+
                         let orderName = frameOrderName(node, frame);
 
                         if (!propertyExists(orderName))
@@ -1669,6 +1682,12 @@ class: AnnotateMinorMode : MinorMode
                 let stroke = findStrokeByUuid(_currentNode, frame, uuid);
                 if (stroke != "")
                 {
+                    let softDeleted = "%s.%s.softDeleted" % (_currentNode, stroke);
+                    if (propertyExists(softDeleted))
+                    {
+                        setIntProperty(softDeleted, int[] {1}, true);
+                    }
+                    
                     for_index(i; order)
                     {
                         if (order[i] == stroke)
@@ -1705,6 +1724,13 @@ class: AnnotateMinorMode : MinorMode
                 {
                     affectedStrokes.push_back(uuid);
                     let stroke = findStrokeByUuid(_currentNode, frame, uuid);
+                    
+                    let softDeleted = "%s.%s.softDeleted" % (_currentNode, stroke);
+                    if (propertyExists(softDeleted))
+                    {
+                        setIntProperty(softDeleted, int[] {0}, true);
+                    }
+                    
                     order.push_back(stroke);
                 }
                 
@@ -1754,6 +1780,12 @@ class: AnnotateMinorMode : MinorMode
                     {
                         let parts = stroke.split(":"); // Stroke format: type:id:frame:user_processId
                         let frame = int(parts[2]);
+
+                        let softDeleted = "%s.%s.softDeleted" % (node, stroke);
+                        if (propertyExists(softDeleted))
+                        {
+                            setIntProperty(softDeleted, int[] {1}, true);
+                        }
 
                         let orderName = frameOrderName(node, frame);
                         if (propertyExists(orderName))
@@ -1821,6 +1853,12 @@ class: AnnotateMinorMode : MinorMode
                 let stroke = findStrokeByUuid(_currentNode, frame, uuid);
                 if (stroke != "")
                 {
+                    let softDeleted = "%s.%s.softDeleted" % (_currentNode, stroke);
+                    if (propertyExists(softDeleted))
+                    {
+                        setIntProperty(softDeleted, int[] {0}, true);
+                    }
+                    
                     order.push_back(stroke);
                     
                     undo.push_back(uuid);
@@ -1850,6 +1888,13 @@ class: AnnotateMinorMode : MinorMode
                 {
                     affectedStrokes.push_back(uuid);
                     let stroke = findStrokeByUuid(_currentNode, frame, uuid);
+                    
+                    let softDeleted = "%s.%s.softDeleted" % (_currentNode, stroke);
+                    if (propertyExists(softDeleted))
+                    {
+                        setIntProperty(softDeleted, int[] {1}, true);
+                    }
+                    
                     for_index(i; order)
                     {
                         if (order[i] == stroke)
@@ -1926,6 +1971,11 @@ class: AnnotateMinorMode : MinorMode
                     {
                         let uuid = getStringProperty(uuidProperty).front();
                         undo.push_back(uuid);
+                        let softDeleted = "%s.%s.softDeleted" % (node, stroke);
+                        if (propertyExists(softDeleted))
+                        {
+                            setIntProperty(softDeleted, int[] {1}, true);
+                        }
                     }
                 }
                 undo.push_back(string(order.size()));
@@ -1981,6 +2031,11 @@ class: AnnotateMinorMode : MinorMode
                         {
                             let uuid = getStringProperty(uuidProperty).front();
                             clearAllActions.push_back(uuid);
+                            let softDeleted = "%s.%s.softDeleted" % (node, stroke);
+                            if (propertyExists(softDeleted))
+                            {
+                                setIntProperty(softDeleted, int[] {1}, true);
+                            }
                         }
                         else
                         {
@@ -2007,10 +2062,11 @@ class: AnnotateMinorMode : MinorMode
                             {
                                 let uuid = getStringProperty(uuidProperty).front();
                                 clearAllActions.push_back(uuid);
-                            }
-                            else
-                            {
-                                clearAllActions.push_back("");
+                                let softDeleted = "%s.%s.softDeleted" % (node, stroke);
+                                if (propertyExists(softDeleted))
+                                {
+                                    setIntProperty(softDeleted, int[] {1}, true);
+                                }
                             }
                         }
                         
