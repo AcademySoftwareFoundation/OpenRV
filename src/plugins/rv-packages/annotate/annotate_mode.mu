@@ -2260,13 +2260,6 @@ class: AnnotateMinorMode : MinorMode
         return if _syncAutoStart then CheckedMenuState else UncheckedMenuState;
     }
 
-    method: undoSlot (void; bool checked)
-    {
-        undoPaint();
-        updateFrameDependentState();
-        redraw();
-    }
-
     method: clearSlot (void; bool checked)
     {
         clearPaint(_currentNode, _currentNodeInfo.frame);
@@ -2288,6 +2281,13 @@ class: AnnotateMinorMode : MinorMode
 
         clearAllPaint();
 
+        updateFrameDependentState();
+        redraw();
+    }
+
+    method: undoSlot (void; bool checked)
+    {
+        undoPaint();
         updateFrameDependentState();
         redraw();
     }
@@ -3128,6 +3128,8 @@ class: AnnotateMinorMode : MinorMode
 
         _clearButton.setMenu(clearMenu);
         _clearButton.setPopupMode(QToolButton.InstantPopup);
+
+        connect(clearMenu, QMenu.aboutToShow, undoRedoClearUpdate);
 
         connect(_clearFrameAct, QAction.triggered, clearSlot);
         connect(_clearAllFramesAct, QAction.triggered, clearAllSlot);
