@@ -73,8 +73,9 @@ All other dependencies are shared across variations.
 1. [Install tools and build dependencies](rocky_install_tools_and_dependencies)
 2. [Install Pyenv / Python](rocky_install_pyenv_and_python)
 3. [Install CMake](rocky_install_cmake)
-4. [Install Qt](rocky_install_qt)
-5. [Build Open RV](rocky_build_openrv)
+4. [Install Rust](rocky_install_rust)
+5. [Install Qt](rocky_install_qt)
+6. [Build Open RV](rocky_build_openrv)
 6. [Building with Docker (Optional)](rocky_building_with_docker)
 
 
@@ -164,8 +165,34 @@ cmake --version  # confirm the version of your newly installed version of CMake
 cmake version 3.31.6
 ```
 
+(rocky_install_rust)=
+### 4. Install Rust
+
+````{warning}
+Rust version **1.92 or later** is required to build certain Python dependencies (such as cryptography).
+````
+
+Install Rust using rustup:
+
+```bash
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+```
+
+This will install the latest stable version of Rust. After installation, add Rust to your current shell session:
+
+```bash
+source $HOME/.cargo/env
+```
+
+Verify that Rust is installed correctly:
+
+```bash
+rustc --version
+cargo --version
+```
+
 (rocky_install_qt)=
-### 4. Install Qt
+### 5. Install Qt
 
 Download the latest open-source [Qt installer](https://www.qt.io/download-open-source). We do not recommend that you install Qt from other installable sources as it may introduce build issues.
 
@@ -193,19 +220,19 @@ Note 1: If you install Qt at a different installation path, you will need to man
 Note 2: Qt modules for Logs, Android, iOS and WebAssembly are not required to build Open RV. 
 
 (rocky_build_openrv)=
-### 5. Build Open RV
+### 6. Build Open RV
 
 Once the platform-specific installation process is complete, building Open RV follows the same process for all platforms. Please refer to the [Common Build Instructions](config_common_build.md) for the complete build process.
 
 (rocky_building_with_docker)=
-### 6. Building with Docker (Optional)
+### 7. Building with Docker (Optional)
 
 To build Open RV using Docker, use the provided Dockerfile found in this repository, which should already contain all required dependencies. 
 
 Please go through the cloning procedure found in the [common build process](config_common_build.md). Once cloned, get back here to build the docker image, run the container, and build Open RV within the docker container.
 
 
-#### 5.1. Build the image and run
+#### 7.1. Build the image and run
 
 ````{tabs}
 ```{code-tab} bash Rocky 9
@@ -223,7 +250,7 @@ docker run -d openrv-rocky8 /bin/bash -c "sleep infinity"
 
 
 
-#### 5.2. Create and run the container
+#### 7.2. Create and run the container
 ```bash
 # Lookup the container id for openrv-rocky{8/9}
 docker container ls
@@ -237,11 +264,11 @@ docker container ls
 docker container exec -it <id> /bin/bash  # replace 'id' with your value
 ```
 
-#### 5.3. Build Open RV in the container
+#### 7.3. Build Open RV in the container
 
 Once you are into the container, you can follow the [common build process](config_common_build.md) to build Open RV.
 
-#### 5.4. Copy the stage folder outside of the container
+#### 7.4. Copy the stage folder outside of the container
 
 If you are on a host that is the same as, or compatible with, your version of Rocky Linux, you can copy the stage folder outside of the container and execute Open RV.
 
