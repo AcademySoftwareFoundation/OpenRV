@@ -409,10 +409,6 @@ FUNCTION(rv_stage)
       ENDIF()
 
       LIST(REMOVE_ITEM _files Makefile CMakeLists.txt ${_package_file})
-      
-      # Remove macOS metadata files
-      LIST(FILTER _files EXCLUDE REGEX ".*\\.DS_Store$")
-      LIST(FILTER _files EXCLUDE REGEX "^__MACOSX/.*")
 
       IF(NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${_package_file})
         MESSAGE(FATAL_ERROR "Couldn't find expected package descriptor file: '${_package_file}'")
