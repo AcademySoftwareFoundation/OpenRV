@@ -435,13 +435,8 @@ FUNCTION(rv_stage)
         MESSAGE(DEBUG "Found version for '${arg_TARGET}.rvpkg' package version ${_pkg_version} ...")
       ENDIF()
 
-      # Normalize version to major.minor format for filename (strip patch if present)
-      # This ensures compatibility with existing package loading code that expects X.X format
-      STRING(REGEX REPLACE "^([0-9]+)\\.([0-9]+)(\\.[0-9]+)?.*" "\\1.\\2" _pkg_version_normalized "${_pkg_version}")
-      MESSAGE(DEBUG "Normalized package version from '${_pkg_version}' to '${_pkg_version_normalized}' for filename")
-
       SET(_package_filename
-          "${RV_PACKAGES_DIR}/${arg_TARGET}-${_pkg_version_normalized}.rvpkg"
+          "${RV_PACKAGES_DIR}/${arg_TARGET}-${_pkg_version}.rvpkg"
       )
 
       LIST(APPEND RV_PACKAGE_LIST "${RV_PACKAGES_DIR}/${arg_TARGET}-${_pkg_version}.rvpkg")
