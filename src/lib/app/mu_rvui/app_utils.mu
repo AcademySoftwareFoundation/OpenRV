@@ -28,7 +28,7 @@ MenuStateFunc   := (int;);
 
 \: checkAndBlockEventCategory(bool; string category)
 {
-    if (!commands.isEventCategoryEnabled("category"))
+    if (!commands.isEventCategoryEnabled(category))
     {
         sendInternalEvent("category-event-blocked", category);
         return false;
