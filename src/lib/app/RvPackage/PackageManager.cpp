@@ -67,27 +67,6 @@ namespace Rv
         }
 
         string fullPath = outputPath + "/" + filename;
-        
-        // Check if this is a directory entry (ends with /)
-        if (fullPath.back() == '/')
-        {
-            unzCloseCurrentFile(uf);
-            return ""; // Skip directory entries
-        }
-        
-        // Create parent directories if needed
-        QFileInfo fileInfo_qt(QString::fromStdString(fullPath));
-        QDir parentDir = fileInfo_qt.dir();
-        if (!parentDir.exists())
-        {
-            if (!parentDir.mkpath("."))
-            {
-                cerr << "ERROR: Unable to create directory: " << parentDir.absolutePath().toStdString() << endl;
-                unzCloseCurrentFile(uf);
-                return "";
-            }
-        }
-        
         FILE* outFile = std::fopen(fullPath.c_str(), "wb");
         if (outFile == nullptr)
         {
