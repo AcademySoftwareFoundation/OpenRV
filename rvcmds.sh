@@ -337,8 +337,17 @@ __rv_build_with_errors() {
     
     # Extract and display compilation errors
     if [[ -f "${build_log}" ]]; then
-      # Extract error messages (looking for common error patterns)
-      grep -E "error:|fatal error:|undefined reference|❌|FAILED:" "${build_log}" | grep -v "warnings being treated as errors" | head -50 > "${error_summary}" 2>/dev/null || true
+      # Extract error messages (looking for common error patterns across platforms)
+      # Patterns cover:
+      #   - GCC/Clang:  "error:", "fatal error:", "undefined reference"
+      #   - MSVC:       "error C####:", "error LNK####:", ": error :"
+      #   - Ninja:      "FAILED:"
+      #   - CMake:      "CMake Error"
+      #   - Linker:     "unresolved external symbol", "undefined symbol"
+      grep -E "(error C[0-9]+:|error LNK[0-9]+:|: error :|error:|fatal error:|undefined reference|undefined symbol|unresolved external symbol|FAILED:|CMake Error)" "${build_log}" | \
+        grep -v "warnings being treated as errors" | \
+        grep -v "0 error" | \
+        head -50 > "${error_summary}" 2>/dev/null || true
       
       if [[ -s "${error_summary}" ]]; then
         echo "🔥 Compilation Errors Found:"
