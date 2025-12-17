@@ -398,8 +398,6 @@ cargo --version
 ````{note}
 The Rust installation will be located at `%USERPROFILE%\.cargo\bin` (typically `C:\Users\<username>\.cargo\bin`). Do not forget to add the location to the PATH environment variable in [step 9. Setup environment variables](#setup_env).
 ````
-# End of Selection
-```
 
 (install_msys2)=
 ## 8. Install MSYS2
