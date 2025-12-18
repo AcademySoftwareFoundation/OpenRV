@@ -20,12 +20,13 @@
 #include <unistd.h>
 #endif
 
+#include <QFileInfo>
+#include <TwkQtCoreUtil/QtConvert.h>
+
 #ifdef PLATFORM_WINDOWS
 #include <windows.h>
 #include <codecvt>
 #include <wchar.h>
-#include <QFileInfo>
-#include <TwkQtCoreUtil/QtConvert.h>
 #include <mutex>
 #endif
 
