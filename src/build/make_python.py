@@ -69,10 +69,19 @@ try:
     if "SSL_CERT_FILE" not in os.environ and "DO_NOT_SET_SSL_CERT_FILE" not in os.environ:
         os.environ["SSL_CERT_FILE"] = certifi.where()
 
+except ImportError:
+    # certifi not installed yet - this is expected during build when pip installs build dependencies
+    pass
 except Exception as e:
-    print("Failed to set certifi.where() as SSL_CERT_FILE.", file=sys.stderr)
-    print(e, file=sys.stderr)
-    print("Set DO_NOT_SET_SSL_CERT_FILE to skip this step in RV's Python initialization.", file=sys.stderr)
+    # Only print errors for unexpected exceptions, and only if verbose mode is enabled
+    try:
+        import os as _os
+        if "PYTHONVERBOSE" in _os.environ:
+            print("Failed to set certifi.where() as SSL_CERT_FILE.", file=sys.stderr)
+            print(e, file=sys.stderr)
+            print("Set DO_NOT_SET_SSL_CERT_FILE to skip this step in RV's Python initialization.", file=sys.stderr)
+    except:
+        pass
 
 try:
     import os
@@ -106,9 +115,15 @@ try:
         site.removeduppaths()
 
 except Exception as e:
-    print("Failed to reorder RV's Python search path", file=sys.stderr)
-    print(e, file=sys.stderr)
-    print("Set DO_NOT_REORDER_PYTHON_PATH to skip this step in RV's Python initialization.", file=sys.stderr)
+    # Only print errors if verbose mode is enabled
+    try:
+        import os as _os
+        if "PYTHONVERBOSE" in _os.environ:
+            print("Failed to reorder RV's Python search path", file=sys.stderr)
+            print(e, file=sys.stderr)
+            print("Set DO_NOT_REORDER_PYTHON_PATH to skip this step in RV's Python initialization.", file=sys.stderr)
+    except:
+        pass
 '''
 
 
