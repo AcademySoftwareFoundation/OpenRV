@@ -74,10 +74,11 @@ All other dependencies are shared across variations.
 4. [Install CMake](install_cmake)
 5. [Install Qt](install_windows_qt)
 6. [Install Strawberry Perl](install_strawberry_perl)
-7. [Install MSYS2](install_msys2)
+7. [Install Rust](install_rust)
+8. [Install MSYS2](install_msys2)
     1. [Install required MSYS2 pacman packages (from an MSYS2-MinGW64 shell)](install_msys2_packages)
-8. [Setup environment variables](setup_env)
-9. [Build Open RV](build_windows_openrv)
+9. [Setup environment variables](setup_env)
+10. [Build Open RV](build_windows_openrv)
 
 
 ````{warning}
@@ -373,8 +374,33 @@ Take note of the installation path for Strawberry Perl, as it will be required i
 The default path is `C:\Strawberry`.
 ````
 
+(install_rust)=
+## 7. Install Rust
+
+````{warning}
+Rust version **1.92 or later** is required to build certain Python dependencies (such as cryptography).
+````
+
+Install Rust using rustup-init:
+
+1. Download rustup-init from [https://win.rustup.rs/x86_64](https://win.rustup.rs/x86_64)
+2. Run `rustup-init.exe`
+3. Follow the prompts to complete the installation (the default options are recommended)
+4. After installation, close and reopen your terminal to apply the PATH changes
+
+Verify that Rust is installed correctly and check the version:
+
+```bash
+rustc --version
+cargo --version
+```
+
+````{note}
+The Rust installation will be located at `%USERPROFILE%\.cargo\bin` (typically `C:\Users\<username>\.cargo\bin`). Do not forget to add the location to the PATH environment variable in [Setup environment variables](#setup_env).
+````
+
 (install_msys2)=
-## 7. Install MSYS2
+## 8. Install MSYS2
 
 ````{warning}
 
@@ -389,7 +415,7 @@ Download and install the latest [MSYS2](https://www.msys2.org/). Open RV is **NO
 MSYS2 is only used for convenience as it comes with a package manager with utility packages required for the Open RV build such as cmake, git, flex, bison, nasm, unzip, zip, etc.
 
 (install_msys2_packages)=
-### 7.1 Install required MSYS2 pacman packages
+### 8.1 Install required MSYS2 pacman packages
 
 ````{note}
 The MSYS2 MingGW64 (mingw64.exe) terminal MUST be used.\
@@ -432,7 +458,7 @@ While installing the MSYS packages, review the list for any missing package. Som
 Note: To confirm which version/location of any tool used inside the MSYS shell, `where` can be used e.g. `where python`. If there's more than one path return, the top one will be used.
 
 (setup_env)=
-### 8. Setup environment variables
+### 9. Setup environment variables
 
 ````{note}
 This is the step where the path of Strawberry Perl, Python, CMake and Qt will be needed.
@@ -447,14 +473,19 @@ These modifications will be added to the `.bash_profile` file located in the Use
 #### PATH environment variable
 
 ````{note}
-Update the CMake, Strawberry Perl and Python location to reflect your installation path, using **forward slashes (/)** for a Unix-style path 
+Update the CMake, Strawberry Perl, Python, and Rust locations to reflect your installation paths, using **forward slashes (/)** for a Unix-style path 
 to prevent issues later on.
 (e.g., C:\Python310 becomes /c/Python310).
+
+**For Rust:** Replace `<username>` with your actual Windows username. You can find your username by running `echo %USERNAME%` in a Windows command prompt.
+The Rust installation is located at `%USERPROFILE%\.cargo\bin` (typically `C:\Users\<username>\.cargo\bin`), 
+which becomes `/c/Users/<username>/.cargo/bin` in MSYS2 format.
 ````
 
 The following paths **must** be added to the PATH environment variable within MSYS2:
 - CMake binary directory
 - Python binary directory
+- Rust cargo binary directory
 - MSYS2's `mingw64/bin`
 - Strawberry perl directory
 
@@ -462,11 +493,15 @@ The following paths **must** be added to the PATH environment variable within MS
 
 ````{tabs}
 ```{code-tab} bash VFX-CY2024
-echo 'export PATH="/c/Program Files/CMake/bin:/c/Python311:/c/msys64/mingw64/bin:$PATH:/c/Strawberry/perl/bin"' >> ~/.bash_profile
+echo 'export PATH="/c/Program Files/CMake/bin:/c/Python311:/c/Users/<username>/.cargo/bin:/c/msys64/mingw64/bin:$PATH:/c/Strawberry/perl/bin"' >> ~/.bash_profile
 ```
 ```{code-tab} bash VFX-CY2023
-echo 'export PATH="/c/Program Files/CMake/bin:/c/Python310:/c/msys64/mingw64/bin:$PATH:/c/Strawberry/perl/bin"' >> ~/.bash_profile
+echo 'export PATH="/c/Program Files/CMake/bin:/c/Python310:/c/Users/<username>/.cargo/bin:/c/msys64/mingw64/bin:$PATH:/c/Strawberry/perl/bin"' >> ~/.bash_profile
 ```
+````
+
+````{warning}
+Remember to replace `<username>` with your actual Windows username in the commands above.
 ````
 
 #### ACLOCAL_PATH
@@ -501,7 +536,7 @@ source ~/.bash_profile
 ```
 
 (build_windows_openrv)=
-## 9. Build Open RV
+## 10. Build Open RV
 
 Once the platform-specific installation process is complete, building Open RV follows the same process for all platforms. Please refer to the [Common Build Instructions](config_common_build.md) for the complete build process.
 

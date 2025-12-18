@@ -1,10 +1,11 @@
 # This file contains all the packages that will be packaged with RV. Please add the license next to the package.
 # NOTE: This is a CMake template file. The actual requirements.txt is generated during CMake configuration.
 #       To update OpenTimelineIO version, edit _opentimelineio_version in cmake/dependencies/python3.cmake
+# NOTE: Using --no-binary :all: in pip install ensures all packages are built from source against our custom Python.
 
 pip                     # License: MIT License (MIT)
 setuptools              # License: MIT License
-@_opentimelineio_pip_url@ # License: Other/Proprietary License (Modified Apache 2.0 License)
+opentimelineio==@_opentimelineio_version@ # License: Other/Proprietary License (Modified Apache 2.0 License)
 PyOpenGL                # License: BSD License (BSD)
 
 # MacOS only - PyOpenGL_accelerate is built from source in python3.cmake as a workaround until the fix

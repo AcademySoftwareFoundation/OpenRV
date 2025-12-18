@@ -29,18 +29,13 @@ SET(RV_DEPS_PYTHON_VERSION_SHORT
     "${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}"
 )
 
-# This version is used for generating src/build/requirements.txt from requirements.txt.in template All platforms install OpenTimelineIO from git to ensure
-# consistent source builds.
+# This version is used for generating src/build/requirements.txt from requirements.txt.in template
 SET(_opentimelineio_version
     "${RV_DEPS_OTIO_VERSION}"
 )
 
 SET(_pyside_version
     "${RV_DEPS_PYSIDE_VERSION}"
-)
-# Construct the full git URL for pip to use in requirements.txt Using this avoids @ symbol conflicts in CONFIGURE_FILE
-SET(_opentimelineio_pip_url
-    "git+https://github.com/AcademySoftwareFoundation/OpenTimelineIO@v${_opentimelineio_version}#egg=OpenTimelineIO"
 )
 
 SET(_python3_download_url
@@ -76,9 +71,6 @@ SET(_source_dir
 SET(_build_dir
     ${RV_DEPS_BASE_DIR}/${_python3_target}/build
 )
-
-# Note: OpenTimelineIO is now installed via requirements.txt from git URL for all platforms. This ensures consistent source builds across Windows, Mac, and
-# Linux.
 
 FETCHCONTENT_DECLARE(
   ${_pyside_target}
@@ -276,12 +268,21 @@ ELSE()
   SET(_otio_debug_env "")
 ENDIF()
 
-# Single unified command for all platforms and build types
+# Using --no-binary :all: to ensure all packages with native extensions are built from source
+# against our custom Python build, preventing ABI compatibility issues.
 SET(_requirements_install_command
     ${CMAKE_COMMAND} -E env
     ${_otio_debug_env}
+)
+
+# Only set OPENSSL_DIR if we built OpenSSL ourselves (not for Rocky Linux 8 CY2023 which uses system OpenSSL)
+IF(DEFINED RV_DEPS_OPENSSL_INSTALL_DIR)
+  LIST(APPEND _requirements_install_command "OPENSSL_DIR=${RV_DEPS_OPENSSL_INSTALL_DIR}")
+ENDIF()
+
+LIST(APPEND _requirements_install_command
     "CMAKE_ARGS=-DPYTHON_LIBRARY=${_python3_cmake_library} -DPYTHON_INCLUDE_DIR=${_include_dir} -DPYTHON_EXECUTABLE=${_python3_executable}"
-    "${_python3_executable}" -s -E -I -m pip install --upgrade --no-cache-dir --force-reinstall -r "${_requirements_output_file}"
+    "${_python3_executable}" -s -E -I -m pip install --upgrade --no-cache-dir --force-reinstall --no-binary :all: -r "${_requirements_output_file}"
 )
 
 IF(RV_TARGET_WINDOWS)
@@ -383,13 +384,16 @@ IF(RV_TARGET_WINDOWS
    AND CMAKE_BUILD_TYPE MATCHES "^Debug$"
 )
   # OCIO v2.2's pybind11 doesn't find python<ver>.lib in Debug since the name is python<ver>_d.lib.
+  # Also, Rust libraries (like cryptography via pyo3) look for python3.lib.
   ADD_CUSTOM_COMMAND(
     TARGET ${_python3_target}
     POST_BUILD
     COMMENT "Copying Debug Python lib as a unversionned file for Debug"
     COMMAND cmake -E copy_if_different ${_python3_implib} ${_python_release_libpath}
-    COMMAND cmake -E copy_if_different ${_python3_implib} ${_python_release_in_bin_libpath} DEPENDS ${_python3_target} ${_requirements_output_file}
-            ${_requirements_input_file}
+    COMMAND cmake -E copy_if_different ${_python3_implib} ${_python_release_in_bin_libpath}
+    COMMAND cmake -E copy_if_different ${_lib_dir}/python${PYTHON_VERSION_MAJOR}_d.lib ${_lib_dir}/python${PYTHON_VERSION_MAJOR}.lib
+    COMMAND cmake -E copy_if_different ${_bin_dir}/python${PYTHON_VERSION_MAJOR}_d.lib ${_bin_dir}/python${PYTHON_VERSION_MAJOR}.lib
+    DEPENDS ${_python3_target} ${_requirements_output_file} ${_requirements_input_file}
   )
 ENDIF()
 
